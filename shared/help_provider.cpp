@@ -18,9 +18,9 @@ public:
     {
         controller.Initialize(zen::getResourceDir() +
 #ifdef FFS_WIN
-                              wxT("FreeFileSync.chm"));
+                              L"FreeFileSync.chm");
 #elif defined FFS_LINUX
-                              wxT("Help/FreeFileSync.hhp"));
+                              L"Help/FreeFileSync.hhp");
 #endif
     }
 

@@ -20,10 +20,8 @@ struct ReturnSyncConfig
     };
 };
 
-ReturnSyncConfig::ButtonPressed showSyncConfigDlg(zen::CompareVariant   compareVar,
-                                                  zen::SyncConfig&      syncConfiguration,
-                                                  zen::DeletionPolicy&  handleDeletion,
-                                                  wxString&              customDeletionDirectory,
+ReturnSyncConfig::ButtonPressed showSyncConfigDlg(CompareVariant compareVar,
+                                                  SyncConfig&    syncCfg,
                                                   xmlAccess::OnGuiError* handleError); //optional input parameter
 }
 

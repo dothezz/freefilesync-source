@@ -2,5 +2,5 @@
 
 namespace zen
 {
-    const wxString currentVersion = wxT("3.21"); //internal linkage!
+const wxString currentVersion = wxT("4.0"); //internal linkage!
 }

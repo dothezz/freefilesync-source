@@ -5,6 +5,7 @@
 // **************************************************************************
 
 #include "file_id.h"
+#include "file_id_internal.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -16,21 +17,8 @@
 #endif
 
 
-namespace
-{
-template <class T> inline
-std::string numberToBytes(T number)
-{
-    const char* rawBegin = reinterpret_cast<const char*>(&number);
-    return std::string(rawBegin, rawBegin + sizeof(number));
-}
-}
-
-
 std::string util::retrieveFileID(const Zstring& filename)
 {
-    std::string fileID;
-
 #ifdef FFS_WIN
     //WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is cheap!
     //http://msdn.microsoft.com/en-us/library/aa363788(VS.85).aspx
@@ -40,34 +28,27 @@ std::string util::retrieveFileID(const Zstring& filename)
     const HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
                                       0,
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      NULL,
+                                      0,
                                       OPEN_EXISTING,
                                       FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, //FILE_FLAG_BACKUP_SEMANTICS needed to open a directory
                                       NULL);
     if (hFile != INVALID_HANDLE_VALUE)
     {
-        Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hFile);
-        (void)dummy; //silence warning "unused variable"
+        LOKI_ON_BLOCK_EXIT2(::CloseHandle(hFile));
 
         BY_HANDLE_FILE_INFORMATION fileInfo = {};
         if (::GetFileInformationByHandle(hFile, &fileInfo))
-        {
-            fileID += numberToBytes(fileInfo.dwVolumeSerialNumber);
-            fileID += numberToBytes(fileInfo.nFileIndexHigh);
-            fileID += numberToBytes(fileInfo.nFileIndexLow);
-        }
+            return extractFileID(fileInfo);
     }
 
 #elif defined FFS_LINUX
     struct stat fileInfo = {};
     if (::lstat(filename.c_str(), &fileInfo) == 0) //lstat() does not follow symlinks
-    {
-        fileID += numberToBytes(fileInfo.st_dev);
-        fileID += numberToBytes(fileInfo.st_ino);
-    }
+        return extractFileID(fileInfo);
 #endif
-    assert(!fileID.empty());
-    return fileID;
+
+    assert(false);
+    return std::string();
 }
 
 

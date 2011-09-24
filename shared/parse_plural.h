@@ -240,7 +240,7 @@ private:
                 const Expression& e = parse();
                 expr = &dynamic_cast<const Expr<int>&>(e);
             }
-            catch(std::bad_cast&) { throw ParsingError(); }
+            catch (std::bad_cast&) { throw ParsingError(); }
 
             consumeToken(Token::TK_END);
         }
@@ -327,7 +327,7 @@ private:
 
             Token::Type t = token().type;
             if (t == Token::TK_LESS      || //associativity: n/a
-                t == Token::TK_LESS_EQUAL||
+                t == Token::TK_LESS_EQUAL ||
                 t == Token::TK_GREATER   ||
                 t == Token::TK_GREATER_EQUAL)
             {

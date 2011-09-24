@@ -28,7 +28,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -41,7 +41,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -70,16 +70,15 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>BUILD\Bin\</OutDir>
     <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
-    <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
     <GenerateManifest>false</GenerateManifest>
-    <EmbedManifest>true</EmbedManifest>
+    <TargetName>$(ProjectName)_Debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>BUILD\Bin\</OutDir>
     <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
-    <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
     <GenerateManifest>false</GenerateManifest>
+    <TargetName>$(ProjectName)_Debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -94,7 +93,6 @@
     <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
-    <EmbedManifest>true</EmbedManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -105,17 +103,16 @@
       <AdditionalIncludeDirectories>.\shared;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>$(ProjectDir)shared\pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;$(ProjectDir)shared/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(ProjectDir)shared/pch.h;$(SolutionDir)shared/warn_static.h</ForcedIncludeFiles>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>wxmsw28ud_aui.lib;wxmsw28ud_adv.lib;wxmsw28ud_core.lib;wxbase28ud.lib;wxpngd.lib;wxzlibd.lib;wxbase28ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\C++\wxWidgets\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
@@ -140,17 +137,15 @@
       <AdditionalIncludeDirectories>.\shared;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>$(ProjectDir)shared\pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;$(ProjectDir)shared/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(ProjectDir)shared/pch.h;$(SolutionDir)shared/warn_static.h</ForcedIncludeFiles>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>wxmsw28ud_aui.lib;wxmsw28ud_adv.lib;wxmsw28ud_core.lib;wxbase28ud.lib;wxpngd.lib;wxzlibd.lib;wxbase28ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\C++\wxWidgets-x64\lib\vc_lib;C:\Program Files\C++\Boost\stage64\lib</AdditionalLibraryDirectories>
@@ -172,14 +167,12 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\shared;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;</ForcedIncludeFiles>
     </ClCompile>
@@ -188,12 +181,12 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalDependencies>wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files\C++\wxWidgets\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswu</AdditionalIncludeDirectories>
@@ -208,23 +201,19 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\shared;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4512;4996;4100;4127</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalDependencies>wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files\C++\wxWidgets-x64\lib\vc_lib;C:\Program Files\C++\Boost\stage64\lib</AdditionalLibraryDirectories>
@@ -238,6 +227,10 @@
       <Culture>
       </Culture>
     </ResourceCompile>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="algorithm.cpp">
@@ -261,9 +254,8 @@
     <ClCompile Include="library\status_handler.cpp" />
     <ClCompile Include="shared\app_main.cpp" />
     <ClCompile Include="shared\custom_button.cpp" />
-    <ClCompile Include="shared\custom_combo_box.cpp" />
+    <ClCompile Include="shared\folder_history_box.cpp" />
     <ClCompile Include="shared\custom_tooltip.cpp" />
-    <ClCompile Include="shared\dll_loader.cpp" />
     <ClCompile Include="shared\dir_name.cpp" />
     <ClCompile Include="shared\dst_hack.cpp" />
     <ClCompile Include="shared\file_handling.cpp" />

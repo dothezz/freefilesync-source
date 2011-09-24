@@ -29,11 +29,11 @@ typedef FILE* FileHandle;
 class FileInput
 {
 public:
-    FileInput(const Zstring& filename);                    //throw (FileError: ErrorNotExisting)
+    FileInput(const Zstring& filename);                    //throw FileError, ErrorNotExisting
     FileInput(FileHandle handle, const Zstring& filename); //takes ownership!
     ~FileInput();
 
-    size_t read(void* buffer, size_t bytesToRead); //throw (FileError); returns actual number of bytes read
+    size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns actual number of bytes read
     bool eof(); //end of file reached
 
 private:
@@ -54,11 +54,11 @@ public:
         ACC_OVERWRITE,
         ACC_CREATE_NEW
     };
-    FileOutput(const Zstring& filename, AccessFlag access); //throw (FileError: ErrorTargetPathMissing, ErrorTargetExisting)
+    FileOutput(const Zstring& filename, AccessFlag access); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
     FileOutput(FileHandle handle, const Zstring& filename); //takes ownership!
     ~FileOutput();
 
-    void write(const void* buffer, size_t bytesToWrite); //throw (FileError)
+    void write(const void* buffer, size_t bytesToWrite); //throw FileError
 
 private:
     FileOutput(const FileOutput&);

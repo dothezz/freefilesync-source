@@ -65,6 +65,7 @@
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
 			<Add option="-std=gnu++0x" />
+			<Add option='-include &quot;../shared/warn_static.h&quot;' />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DwxUSE_UNICODE" />
@@ -125,7 +126,6 @@
 		<Unit filename="..\library\process_xml.cpp" />
 		<Unit filename="..\shared\dir_watcher.cpp" />
 		<Unit filename="..\shared\dir_watcher.h" />
-		<Unit filename="..\shared\dll_loader.cpp" />
 		<Unit filename="..\shared\dll_loader.h" />
 		<Unit filename="..\shared\dst_hack.cpp" />
 		<Unit filename="..\shared\dst_hack.h" />
@@ -135,6 +135,7 @@
 		<Unit filename="..\shared\file_id.cpp" />
 		<Unit filename="..\shared\file_io.cpp" />
 		<Unit filename="..\shared\file_traverser.cpp" />
+		<Unit filename="..\shared\folder_history_box.cpp" />
 		<Unit filename="..\shared\global_func.h" />
 		<Unit filename="..\shared\help_provider.cpp" />
 		<Unit filename="..\shared\i18n.cpp" />

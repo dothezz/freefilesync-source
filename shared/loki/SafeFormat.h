@@ -73,7 +73,7 @@ template <class Char>
 void write(std::pair<Char*, std::size_t>& s, const Char* from, const Char* to)
 {
     assert(from <= to);
-    if(from + s.second < to)
+    if (from + s.second < to)
         throw std::overflow_error("");
     // s.first: position one past the final copied element
     s.first = std::copy(from, to, s.first);
@@ -106,9 +106,9 @@ struct PrintfState
     }
 
 #define LOKI_PRINTF_STATE_FORWARD(type) \
-            PrintfState& operator()(type par) {\
-                return (*this)(static_cast< LOKI_SAFEFORMAT_UNSIGNED_LONG >(par)); \
-            }
+    PrintfState& operator()(type par) {\
+        return (*this)(static_cast< LOKI_SAFEFORMAT_UNSIGNED_LONG >(par)); \
+    }
 
     LOKI_PRINTF_STATE_FORWARD(bool)
     LOKI_PRINTF_STATE_FORWARD(char)
@@ -171,21 +171,21 @@ struct PrintfState
     PrintfState& operator()(void* n)
     {
         if (result_ == -1) return *this; // don't even bother
-        PrintUsing_snprintf(n,"p");
+        PrintUsing_snprintf(n, "p");
         return *this;
     }
 
     PrintfState& operator()(double n)
     {
         if (result_ == -1) return *this; // don't even bother
-        PrintUsing_snprintf(n,"eEfgG");
+        PrintUsing_snprintf(n, "eEfgG");
         return *this;
     }
 
     PrintfState& operator()(long double n)
     {
         if (result_ == -1) return *this; // don't even bother
-        PrintUsing_snprintf(n,"eEfgG");
+        PrintUsing_snprintf(n, "eEfgG");
         return *this;
     }
 

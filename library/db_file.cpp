@@ -48,7 +48,7 @@ Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
     Zstring dbname = Zstring(Zstr(".sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
 #endif
 
-    return baseMap.getBaseDir<side>() + dbname;
+    return baseMap.getBaseDirPf<side>() + dbname;
 }
 
 
@@ -56,12 +56,12 @@ Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
 class FileInputStreamDB : public FileInputStream
 {
 public:
-    FileInputStreamDB(const Zstring& filename) : //throw (FileError)
+    FileInputStreamDB(const Zstring& filename) : //throw FileError
         FileInputStream(filename)
     {
         //read FreeFileSync file identifier
         char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
-        Read(formatDescr, sizeof(formatDescr)); //throw (FileError)
+        Read(formatDescr, sizeof(formatDescr)); //throw FileError
 
         if (!std::equal(FILE_FORMAT_DESCR, FILE_FORMAT_DESCR + sizeof(FILE_FORMAT_DESCR), formatDescr))
             throw FileError(_("Incompatible synchronization database format:") + " \n" + "\"" + filename + "\"");
@@ -74,11 +74,11 @@ private:
 class FileOutputStreamDB : public FileOutputStream
 {
 public:
-    FileOutputStreamDB(const Zstring& filename) : //throw (FileError)
+    FileOutputStreamDB(const Zstring& filename) : //throw FileError
         FileOutputStream(filename)
     {
         //write FreeFileSync file identifier
-        Write(FILE_FORMAT_DESCR, sizeof(FILE_FORMAT_DESCR)); //throw (FileError)
+        Write(FILE_FORMAT_DESCR, sizeof(FILE_FORMAT_DESCR)); //throw FileError
     }
 
 private:
@@ -164,7 +164,7 @@ typedef std::map<UniqueId, MemoryStreamPtr> StreamMapping;    //list of streams 
 class ReadFileStream : public zen::ReadInputStream
 {
 public:
-    ReadFileStream(wxInputStream& stream, const wxString& filename, StreamMapping& streamList, bool leftSide) : ReadInputStream(stream, filename)
+    ReadFileStream(wxInputStream& stream, const wxString& filename, StreamMapping& streamList) : ReadInputStream(stream, filename)
     {
         //|-------------------------------------------------------------------------------------
         //| ensure 32/64 bit portability: used fixed size data types only e.g. boost::uint32_t |
@@ -172,69 +172,28 @@ public:
 
         boost::int32_t version = readNumberC<boost::int32_t>();
 
-#ifndef _MSC_VER
-#warning remove this check after migration!
-#endif
-        if (version != 6) //migrate!
+        if (version != FILE_FORMAT_VER) //read file format version
+            throw FileError(_("Incompatible synchronization database format:") + " \n" + "\"" + filename.c_str() + "\"");
 
-            if (version != FILE_FORMAT_VER) //read file format version
-                throw FileError(_("Incompatible synchronization database format:") + " \n" + "\"" + filename.c_str() + "\"");
+        streamList.clear();
 
-
-#ifndef _MSC_VER
-#warning remove this case after migration!
-#endif
-
-        if (version == 6)
+        boost::uint32_t dbCount = readNumberC<boost::uint32_t>(); //number of databases: one for each sync-pair
+        while (dbCount-- != 0)
         {
-            streamList.clear();
+            //DB id of partner databases
+            const CharArray tmp2 = readArrayC();
+            const std::string sessionID(tmp2->begin(), tmp2->end());
 
-            //read DB id
-            const CharArray tmp = readArrayC();
-            std::string mainId(tmp->begin(), tmp->end());
+            CharArray buffer = readArrayC(); //read db-entry stream (containing DirInformation)
 
-            boost::uint32_t dbCount = readNumberC<boost::uint32_t>(); //number of databases: one for each sync-pair
-            while (dbCount-- != 0)
-            {
-                //DB id of partner databases
-                const CharArray tmp2 = readArrayC();
-                const std::string partnerID(tmp2->begin(), tmp2->end());
-
-                CharArray buffer = readArrayC(); //read db-entry stream (containing DirInformation)
-
-                if (leftSide)
-                    streamList.insert(std::make_pair(partnerID + mainId, buffer));
-                else
-                    streamList.insert(std::make_pair(mainId + partnerID, buffer));
-            }
-        }
-        else
-        {
-            streamList.clear();
-
-            boost::uint32_t dbCount = readNumberC<boost::uint32_t>(); //number of databases: one for each sync-pair
-            while (dbCount-- != 0)
-            {
-                //DB id of partner databases
-                const CharArray tmp2 = readArrayC();
-                const std::string sessionID(tmp2->begin(), tmp2->end());
-
-                CharArray buffer = readArrayC(); //read db-entry stream (containing DirInformation)
-
-                streamList.insert(std::make_pair(sessionID, buffer));
-            }
+            streamList.insert(std::make_pair(sessionID, buffer));
         }
     }
 };
 
 namespace
 {
-StreamMapping loadStreams(const Zstring& filename,
-
-#ifndef _MSC_VER
-#warning remove this parameter after migration!
-#endif
-                          bool leftSide) //throw (FileError)
+StreamMapping loadStreams(const Zstring& filename) //throw FileError
 {
     if (!zen::fileExists(filename))
         throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + " \n\n" +
@@ -244,12 +203,12 @@ StreamMapping loadStreams(const Zstring& filename,
     try
     {
         //read format description (uncompressed)
-        FileInputStreamDB uncompressed(filename); //throw (FileError)
+        FileInputStreamDB uncompressed(filename); //throw FileError
 
         wxZlibInputStream input(uncompressed, wxZLIB_ZLIB);
 
         StreamMapping streamList;
-        ReadFileStream(input, toWx(filename), streamList, leftSide);
+        ReadFileStream(input, toWx(filename), streamList);
         return streamList;
     }
     catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
@@ -277,14 +236,14 @@ DirInfoPtr parseStream(const std::vector<char>& stream, const Zstring& fileName)
 }
 
 
-std::pair<DirInfoPtr, DirInfoPtr> zen::loadFromDisk(const BaseDirMapping& baseMapping) //throw (FileError)
+std::pair<DirInfoPtr, DirInfoPtr> zen::loadFromDisk(const BaseDirMapping& baseMapping) //throw FileError
 {
     const Zstring fileNameLeft  = getDBFilename<LEFT_SIDE>(baseMapping);
     const Zstring fileNameRight = getDBFilename<RIGHT_SIDE>(baseMapping);
 
     //read file data: list of session ID + DirInfo-stream
-    const StreamMapping streamListLeft  = ::loadStreams(fileNameLeft, true);  //throw (FileError)
-    const StreamMapping streamListRight = ::loadStreams(fileNameRight, false); //throw (FileError)
+    const StreamMapping streamListLeft  = ::loadStreams(fileNameLeft);  //throw FileError
+    const StreamMapping streamListRight = ::loadStreams(fileNameRight); //throw FileError
 
     //find associated session: there can be at most one session within intersection of left and right ids
     StreamMapping::const_iterator streamLeft  = streamListLeft .end();
@@ -484,11 +443,11 @@ public:
 
 
 //save/load DirContainer
-void saveFile(const StreamMapping& streamList, const Zstring& filename) //throw (FileError)
+void saveFile(const StreamMapping& streamList, const Zstring& filename) //throw FileError
 {
     {
         //write format description (uncompressed)
-        FileOutputStreamDB uncompressed(filename); //throw (FileError)
+        FileOutputStreamDB uncompressed(filename); //throw FileError
 
         wxZlibOutputStream output(uncompressed, 4, wxZLIB_ZLIB);
         /* 4 - best compromise between speed and compression: (scanning 200.000 objects)
@@ -516,7 +475,7 @@ bool equalEntry(const MemoryStreamPtr& lhs, const MemoryStreamPtr& rhs)
 }
 
 
-void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
+void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw FileError
 {
     //transactional behaviour! write to tmp files first
     const Zstring dbNameLeftTmp  = getDBFilename<LEFT_SIDE >(baseMapping, true);
@@ -527,7 +486,7 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 
     //delete old tmp file, if necessary -> throws if deletion fails!
     removeFile(dbNameLeftTmp);  //
-    removeFile(dbNameRightTmp); //throw (FileError)
+    removeFile(dbNameRightTmp); //throw FileError
 
     //(try to) load old database files...
     StreamMapping streamListLeft;
@@ -535,14 +494,14 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 
     try //read file data: list of session ID + DirInfo-stream
     {
-        streamListLeft = ::loadStreams(dbNameLeft, true);
+        streamListLeft = ::loadStreams(dbNameLeft);
     }
-    catch(FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
+    catch (FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
     try
     {
-        streamListRight = ::loadStreams(dbNameRight, false);
+        streamListRight = ::loadStreams(dbNameRight);
     }
-    catch(FileError&) {}
+    catch (FileError&) {}
 
     //find associated session: there can be at most one session within intersection of left and right ids
     StreamMapping::iterator streamLeft  = streamListLeft .end();
@@ -572,7 +531,7 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
             oldDirInfoRight = parseStream(*streamRight->second, dbNameRight); //throw FileError
         }
     }
-    catch(FileError&)
+    catch (FileError&)
     {
         //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
         oldDirInfoLeft .reset(); //read both or none!
@@ -622,17 +581,17 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 
     //write (temp-) files...
     Loki::ScopeGuard guardTempFileLeft = Loki::MakeGuard(&zen::removeFile, dbNameLeftTmp);
-    saveFile(streamListLeft, dbNameLeftTmp);  //throw (FileError)
+    saveFile(streamListLeft, dbNameLeftTmp);  //throw FileError
 
     Loki::ScopeGuard guardTempFileRight = Loki::MakeGuard(&zen::removeFile, dbNameRightTmp);
-    saveFile(streamListRight, dbNameRightTmp); //throw (FileError)
+    saveFile(streamListRight, dbNameRightTmp); //throw FileError
 
     //operation finished: rename temp files -> this should work transactionally:
     //if there were no write access, creation of temp files would have failed
     removeFile(dbNameLeft);
     removeFile(dbNameRight);
-    renameFile(dbNameLeftTmp,  dbNameLeft);  //throw (FileError);
-    renameFile(dbNameRightTmp, dbNameRight); //throw (FileError);
+    renameFile(dbNameLeftTmp,  dbNameLeft);  //throw FileError;
+    renameFile(dbNameRightTmp, dbNameRight); //throw FileError;
 
     guardTempFileLeft. Dismiss(); //no need to delete temp file anymore
     guardTempFileRight.Dismiss(); //

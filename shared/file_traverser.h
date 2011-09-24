@@ -44,7 +44,7 @@ public:
         ReturnValDir(Loki::Int2Type<TRAVERSING_DIR_IGNORE>) : returnCode(TRAVERSING_DIR_IGNORE), subDirCb(NULL) {}
         ReturnValDir(Loki::Int2Type<TRAVERSING_DIR_CONTINUE>, TraverseCallback& subDirCallback) : returnCode(TRAVERSING_DIR_CONTINUE), subDirCb(&subDirCallback) {}
 
-        const ReturnValueEnh returnCode;
+        ReturnValueEnh returnCode;
         TraverseCallback* subDirCb;
     };
 

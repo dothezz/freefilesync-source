@@ -16,8 +16,8 @@ namespace zen
 class ExtractLines
 {
 public:
-    ExtractLines(const Zstring& filename, const std::string& lineBreak = std::string()); //throw (FileError)
-    bool getLine(std::string& output); //throw (FileError)
+    ExtractLines(const Zstring& filename, const std::string& lineBreak = std::string()); //throw FileError
+    bool getLine(std::string& output); //throw FileError
 
 private:
     zen::FileInput inputStream;

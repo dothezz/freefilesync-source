@@ -83,10 +83,13 @@ public:
                 bool transactionalFileCopy,
                 ProcessCallback& handler);
 
-    //CONTRACT: syncConfig must have SAME SIZE folderCmp and correspond per row!
+    //CONTRACT: syncConfig must have SAME SIZE folderCmp and correspond row-wise!
     void startSynchronizationProcess(const std::vector<FolderPairSyncCfg>& syncConfig, FolderComparison& folderCmp);
 
 private:
+    SyncProcess(const SyncProcess&);
+    SyncProcess& operator=(const SyncProcess&);
+
     friend class SynchronizeFolderPair;
 
     const bool verifyCopiedFiles_;

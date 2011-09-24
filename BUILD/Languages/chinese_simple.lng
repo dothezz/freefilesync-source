@@ -8,75 +8,116 @@
 </header>
 
 <source>Searching for directory %x...</source>
-<target></target>
+<target>正在搜索目录 %x...</target>
+
 <source>Show in Explorer</source>
 <target>在Explorer中显示</target>
+
 <source>Open with default application</source>
 <target>用默认应用软件打开</target>
+
 <source>Browse directory</source>
 <target>浏览目录</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>实时同步 - 自动同步</target>
+
 <source>Browse</source>
 <target>浏览</target>
-<source>Invalid commandline: %x</source>
-<target>非法命令行:%x</target>
+
+<source>Invalid command line: %x</source>
+<target>无效的命令行: %x</target>
+
 <source>Error resolving symbolic link:</source>
 <target>解决符号链接出错:</target>
-<source>Show popup</source>
-<target>显示弹出窗口</target>
-<source>Show popup on errors or warnings</source>
-<target>在错误或警告时显示弹出窗口</target>
+
+<source>Show pop-up</source>
+<target>显示弹出对话框</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>在错误或警告时显示弹出对话框</target>
+
 <source>Ignore errors</source>
 <target>忽略错误</target>
+
 <source>Hide all error and warning messages</source>
 <target>隐藏所有错误与警告信息</target>
+
 <source>Exit instantly</source>
 <target>立即退出</target>
+
 <source>Abort synchronization immediately</source>
 <target>立即中止同步</target>
+
+<source>Select alternate comparison settings</source>
+<target>选择替换的比较设置</target>
+
 <source>Select alternate synchronization settings</source>
 <target>选择替换同步设置</target>
+
 <source>No filter selected</source>
 <target>没有选定过滤器</target>
+
 <source>Filter is active</source>
 <target>过滤器已激活</target>
-<source>Clear filter settings</source>
-<target>清除过滤器设置</target>
+
 <source>Remove alternate settings</source>
 <target>移除替换设置</target>
+
+<source>Clear filter settings</source>
+<target>清除过滤器设置</target>
+
 <source>Create a batch job</source>
 <target>创建一个批处理作业</target>
+
 <source>Synchronization settings</source>
 <target>同步设置</target>
+
 <source>Comparison settings</source>
 <target>比较设置</target>
+
 <source>About</source>
 <target>关于</target>
+
 <source>Error</source>
 <target>错误</target>
+
 <source>Warning</source>
 <target>警告</target>
+
 <source>Question</source>
 <target>问题</target>
+
 <source>Confirm</source>
 <target>确认</target>
+
 <source>Configure filter</source>
 <target>配置过滤</target>
+
 <source>Customize columns</source>
 <target>自定义栏</target>
+
 <source>Global settings</source>
 <target>全局设置</target>
+
 <source>Synchronization Preview</source>
 <target>同步预览</target>
+
 <source>Find</source>
 <target>查找</target>
+
+<source>Select time span</source>
+<target>选择时间跨度</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
+
 <source>%x KB</source>
 <target>%x KB</target>
+
 <source>%x GB</source>
 <target>%x GB</target>
+
 <source>
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
@@ -84,46 +125,64 @@
 <target>
 <pluralform>%x 字节</pluralform>
 </target>
+
 <source><Symlink></source>
 <target><符号连接></target>
+
 <source><Directory></source>
 <target><目录></target>
+
 <source>Size</source>
 <target>大小</target>
+
 <source>Date</source>
 <target>日期</target>
+
 <source>Full path</source>
 <target>完整路径</target>
+
 <source>Filename</source>
 <target>文件名</target>
+
 <source>Relative path</source>
 <target>相对路径</target>
+
 <source>Directory</source>
 <target>目录</target>
+
 <source>Extension</source>
 <target>扩展名</target>
+
 <source>Comparison Result</source>
 <target>比较结果</target>
+
 <source>Incompatible synchronization database format:</source>
 <target>不兼容的同步数据库格式:</target>
+
 <source>Initial synchronization:</source>
 <target>初始化同步:</target>
+
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync数据库文件其中一个不存在:</target>
+
 <source>Error reading from synchronization database:</source>
 <target>从同步数据库中读取时出错:</target>
+
 <source>Database files do not share a common synchronization session:</source>
-<target></target>
+<target>数据库文件没不共享一个公共的同步段</target>
+
 <source>An exception occurred!</source>
 <target>发生异常!</target>
-<source>Error deleting file:</source>
-<target>删除文件出错:</target>
+
 <source>Error reading file attributes:</source>
 <target>读取文件属性出错:</target>
+
 <source>Waiting while directory is locked (%x)...</source>
 <target>由于目录已锁定而正在等待(%x)...</target>
+
 <source>Error setting directory lock:</source>
 <target>设置目录锁定时出错:</target>
+
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -131,27 +190,39 @@
 <target>
 <pluralform>%x 秒</pluralform>
 </target>
+
 <source>Info</source>
 <target>信息</target>
+
 <source>Fatal Error</source>
 <target>致命错误</target>
+
 <source>Scanning:</source>
 <target>扫描中:</target>
+
 <source>Encoding extended time information: %x</source>
 <target>正在编码扩展时间信息:%x</target>
+
 <source>
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>[%x 线程]</pluralform>
+</target>
+
 <source>Invalid FreeFileSync config file!</source>
 <target>无效的 FreeFileSync 配置文件!</target>
+
 <source>File does not exist:</source>
 <target>文件不存在:</target>
+
 <source>Error parsing configuration file:</source>
 <target>分析配置文件出错:</target>
+
 <source>/sec</source>
 <target>/秒</target>
+
 <source>
 <pluralform>1 min</pluralform>
 <pluralform>%x min</pluralform>
@@ -159,6 +230,7 @@
 <target>
 <pluralform>%x 分</pluralform>
 </target>
+
 <source>
 <pluralform>1 hour</pluralform>
 <pluralform>%x hours</pluralform>
@@ -166,6 +238,7 @@
 <target>
 <pluralform>%x 小时</pluralform>
 </target>
+
 <source>
 <pluralform>1 day</pluralform>
 <pluralform>%x days</pluralform>
@@ -173,28 +246,40 @@
 <target>
 <pluralform>%x 天</pluralform>
 </target>
+
 <source>S&ave configuration...</source>
 <target>保存配置(&A)...</target>
+
 <source>&Load configuration...</source>
 <target>加载配置(&L)...</target>
+
 <source>&Quit</source>
 <target>退出(&Q)</target>
+
 <source>&File</source>
 <target>文件(&F)</target>
+
 <source>&Content</source>
 <target>内容(&C)</target>
+
 <source>&About...</source>
 <target>关于(&A)...</target>
+
 <source>&Help</source>
 <target>帮助(&H)</target>
+
 <source>Usage:</source>
 <target>用法:</target>
+
 <source>1. Select directories to monitor.</source>
 <target>1. 选择要监视的目录.</target>
+
 <source>2. Enter a command line.</source>
 <target>2. 输入一个命令行.</target>
+
 <source>3. Press 'Start'.</source>
 <target>3. 点击'开始'.</target>
+
 <source>
 The command line is executed each time:
 - all directories become available (e.g. USB stick insert)
@@ -205,310 +290,461 @@ The command line is executed each time:
 - 所有目录转为可用状态(例如插入U盘)
 - 目录或子目录里的文件被修改
 </target>
+
 <source>Directories to watch</source>
 <target>要监视的目录</target>
+
 <source>Add folder</source>
 <target>添加文件夹</target>
+
 <source>Remove folder</source>
 <target>删除文件夹</target>
+
 <source>Select a folder</source>
 <target>选择一个文件夹</target>
+
 <source>Command line</source>
 <target>命令行</target>
+
 <source>Minimum Idle Time [seconds]</source>
 <target>最小空闲时间[秒]</target>
+
 <source>Idle time between detection of last change and execution of command line in seconds</source>
 <target>以秒计的最后变更和执行命令行之间的空闲时间</target>
+
 <source>Start</source>
 <target>开始</target>
+
 <source>(Build: %x)</source>
 <target>(Build: %x)</target>
+
 <source>RealtimeSync configuration</source>
 <target>实时同步配置</target>
+
 <source>File already exists. Overwrite?</source>
 <target>文件已经存在.覆盖?</target>
+
 <source>&Restore</source>
 <target>恢复(&R)</target>
+
 <source>&Exit</source>
 <target>退出(&E)</target>
+
 <source>Monitoring active...</source>
 <target>监视激活...</target>
+
 <source>Waiting for missing directories...</source>
 <target>正在等待丢失的目录...</target>
+
 <source>A directory input field is empty.</source>
 <target>有一个目录输入字段是空的.</target>
+
 <source>Drag && drop</source>
 <target>拖放</target>
+
 <source>Could not initialize directory monitoring:</source>
 <target>不能初始化目录监视:</target>
+
 <source>Error when monitoring directories.</source>
 <target>监视目录时出错.</target>
+
 <source>Conversion error:</source>
 <target>转换错误:</target>
+
+<source>Error deleting file:</source>
+<target>删除文件出错:</target>
+
 <source>Error moving file:</source>
 <target>移动文件时出错:</target>
+
 <source>Target file already existing!</source>
 <target>目标文件已经存在!</target>
+
 <source>Error moving directory:</source>
 <target>移动目录时出错:</target>
+
 <source>Target directory already existing!</source>
 <target>目标目录已经存在!</target>
+
 <source>Error deleting directory:</source>
 <target>删除目录出错:</target>
+
 <source>Error changing modification time:</source>
 <target>改变修改时间时出错:</target>
+
 <source>Error loading library function:</source>
 <target>加载库函数出错:</target>
+
 <source>Error reading security context:</source>
 <target>读取安全上下文时出错:</target>
+
 <source>Error writing security context:</source>
 <target>写入安全上下文时出错:</target>
+
 <source>Error copying file permissions:</source>
 <target>复制文件权限时出错:</target>
+
 <source>Error creating directory:</source>
 <target>创建目录出错:</target>
+
 <source>Error copying symbolic link:</source>
 <target>复制符号链接时出错:</target>
+
 <source>Error copying file:</source>
 <target>复制文件出错:</target>
+
 <source>Error opening file:</source>
 <target>打开文件出错:</target>
+
 <source>Error writing file:</source>
 <target>写入文件出错:</target>
+
 <source>Error reading file:</source>
 <target>读取文件出错:</target>
+
 <source>Operation aborted!</source>
 <target>操作已取消!</target>
-<source>Endless loop when traversing directory:</source>
-<target>遍历目录时出现无限循环:</target>
-<source>Error traversing directory:</source>
-<target>遍历目录出错:</target>
-<source>Windows Error Code %x:</source>
-<target>Windows错误代码 %x:</target>
-<source>Linux Error Code %x:</source>
-<target>Linux错误代码 %x:</target>
-<source>Error setting privilege:</source>
-<target>设置权限时出错:</target>
-<source>Error moving to Recycle Bin:</source>
-<target>移动到回收站出错:</target>
+
 <source>Could not load a required DLL:</source>
 <target>不能加载所需的动态连接库:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>遍历目录时出现无限循环:</target>
+
+<source>Error traversing directory:</source>
+<target>遍历目录出错:</target>
+
+<source>Windows Error Code %x:</source>
+<target>Windows错误代码 %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux错误代码 %x:</target>
+
+<source>Error setting privilege:</source>
+<target>设置权限时出错:</target>
+
+<source>Error moving to Recycle Bin:</source>
+<target>移动到回收站出错:</target>
+
 <source>Error writing to synchronization database:</source>
 <target>向同步数据库中写入时出错:</target>
-<source>Error starting Volume Shadow Copy Service!</source>
-<target>启动卷影复制服务时出错!</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>使用卷影复制服务时出错!</target>
+
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>不支持在WOW64上使用卷影复制. 请使用 FreeFileSync 64位版本.</target>
+
 <source>Could not determine volume name for file:</source>
 <target>不能确定此文件的卷名称:</target>
+
 <source>Volume name %x not part of filename %y!</source>
 <target>卷名 %x 并非文件名 %y 的一部分!</target>
+
 <source>%x TB</source>
 <target>%x TB</target>
+
 <source>%x PB</source>
 <target>%x PB</target>
+
 <source>%x%</source>
 <target>%x%</target>
+
 <source>Could not read values for the following XML nodes:</source>
 <target>不能从如下XML节点读取数值:</target>
+
 <source>Logging</source>
 <target>记录</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync 批处理文件</target>
+
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync 配置</target>
+
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync 批处理作业</target>
+
 <source>Unable to create logfile!</source>
 <target>无法创建日志!</target>
+
 <source>Batch execution</source>
 <target>批处理执行</target>
+
 <source>Log-messages:</source>
 <target>日志信息:</target>
+
 <source>Stop</source>
 <target>停止</target>
+
 <source>Total time:</source>
 <target>总共时间:</target>
+
 <source>Synchronization aborted!</source>
 <target>同步已放弃!</target>
+
 <source>Synchronization completed with errors!</source>
 <target>同步已完成但有错误.</target>
+
 <source>Synchronization completed successfully!</source>
 <target>同步成功完成!</target>
+
 <source>Press "Switch" to open FreeFileSync GUI mode.</source>
 <target>按"切换"可打开FreeFileSync图形用户界面模块.</target>
+
 <source>Switching to FreeFileSync GUI mode...</source>
 <target>切换至FreeFileSync图形用户界面模块...</target>
+
 <source>Unable to connect to sourceforge.net!</source>
 <target>无法链接到 Sourceforge.net!</target>
+
 <source>A newer version of FreeFileSync is available:</source>
 <target>FreeFileSync 有新版可用:</target>
+
 <source>Download now?</source>
 <target>立即下载?</target>
+
 <source>Information</source>
 <target>信息</target>
+
 <source>FreeFileSync is up to date!</source>
 <target>FreeFileSync 已是最新!</target>
+
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>要让 FreeFileSync 保持每周检查一次更新吗?></target>
+
 <source>(Requires an Internet connection!)</source>
 <target>(需要因特网连接!)</target>
+
 <source>1. &Compare</source>
 <target>1. 比较(&C)</target>
+
 <source>2. &Synchronize...</source>
 <target>2. 同步(&S)...</target>
+
 <source>S&witch view</source>
 <target>切换视图(&W)</target>
+
 <source>&New</source>
 <target>新建(&N)</target>
+
 <source>&Program</source>
 <target>程序(&P)</target>
+
 <source>&Language</source>
 <target>切换语言(&L)</target>
+
 <source>&Global settings...</source>
 <target>全局设置(&G)...</target>
+
 <source>&Create batch job...</source>
 <target>创建批处理作业(&C)...</target>
+
 <source>&Export file list...</source>
 <target>导出文件列表(&E)...</target>
+
 <source>&Advanced</source>
 <target>高级(&A)</target>
+
 <source>&Check for new version</source>
 <target>检查更新(&C)</target>
+
 <source>Compare</source>
 <target>比较</target>
+
 <source>Compare both sides</source>
 <target>比较两侧</target>
+
 <source>&Abort</source>
 <target>取消(&A)</target>
+
 <source>Synchronize...</source>
 <target>同步...</target>
+
 <source>Start synchronization</source>
 <target>开始同步</target>
-<source>Swap sides</source>
-<target>两侧互换</target>
+
 <source>Add folder pair</source>
 <target>添加成对文件夹</target>
+
 <source>Remove folder pair</source>
 <target>删除文件夹对</target>
+
+<source>Swap sides</source>
+<target>两侧互换</target>
+
 <source>Save current configuration to file</source>
 <target>保存当前配置到文件</target>
+
 <source>Load configuration from file</source>
 <target>从文件加载配置</target>
+
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>最后使用的配置(按DEL键将其从列表中移除)</target>
+
 <source>Hide excluded items</source>
 <target>隐藏已排除的项目</target>
+
 <source>Hide filtered or temporarily excluded files</source>
 <target>隐藏已过滤或临时排除的文件</target>
+
 <source>Number of files and directories that will be created</source>
 <target>一些文件和目录将被创建</target>
+
 <source>Number of files that will be overwritten</source>
 <target>一些文件和目录将被覆盖</target>
+
 <source>Number of files and directories that will be deleted</source>
 <target>一些文件和目录将被删除</target>
+
 <source>Total amount of data that will be transferred</source>
 <target>将被转移的总数据</target>
-<source>Left</source>
-<target>左侧</target>
-<source>Right</source>
-<target>右侧</target>
+
 <source>Batch job</source>
 <target>批处理作业</target>
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>为自动同步创建一个批处理. 要开始批处理模式只需简单地双击批处理文件或通过命令行执行：FreeFileSync.exe <批处理文件名>. 此外还可以通过操作系统的计划任务来定时执行.</target>
+
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
+<target>创建一个用于自动同步的批处理文件. 要开始批处理模式只需简单地双击此文件或通过命令行执行: FreeFileSync.exe <ffs_batch 文件>. 此文件还可以用于你操作系统的计划任务中.</target>
+
 <source>Help</source>
 <target>帮助</target>
+
 <source>Filter files</source>
 <target>过滤文件</target>
+
 <source>Error handling</source>
 <target>错误处理</target>
+
+<source>Left</source>
+<target>左侧</target>
+
+<source>Right</source>
+<target>右侧</target>
+
 <source>Overview</source>
 <target>摘要</target>
+
 <source>Status feedback</source>
 <target>状况反馈</target>
+
 <source>Run minimized</source>
-<target></target>
+<target>以最小化运行</target>
+
 <source>Maximum number of logfiles:</source>
 <target>最大的日志文件数:</target>
+
 <source>Select logfile directory:</source>
 <target>选择日志保存位置:</target>
+
 <source>Batch settings</source>
-<target></target>
+<target>批处理设置</target>
+
 <source>&Save</source>
 <target>保存(&S)</target>
+
 <source>&Load</source>
 <target>加载(&L)</target>
+
 <source>&Cancel</source>
 <target>取消(&C)</target>
+
 <source>Elements found:</source>
 <target>已找到的元素:</target>
+
 <source>Elements remaining:</source>
 <target>剩余的元素:</target>
+
 <source>Speed:</source>
 <target>速度:</target>
+
 <source>Time remaining:</source>
 <target>剩余时间:</target>
+
 <source>Time elapsed:</source>
 <target>已用时间:</target>
+
 <source>Operation:</source>
 <target>操作:</target>
+
 <source>Select variant:</source>
 <target>选择变化的:</target>
+
 <source><Automatic></source>
 <target><自动></target>
+
 <source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
 <target>使用数据库来识别和传送两边的改变. 自动检测删除和冲突状态.</target>
+
 <source>Mirror ->></source>
 <target>镜像 ->></target>
+
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>镜像备份左边的文件夹.同步后右边的文件夹被修改为和左边文件夹精确匹配.</target>
+
 <source>Update -></source>
 <target>更新 -></target>
+
 <source>Copy new or updated files to right folder.</source>
 <target>复制新的或修改过的文件到右侧文件夹</target>
+
 <source>Custom</source>
 <target>自定义</target>
+
 <source>Configure your own synchronization rules.</source>
 <target>配置你自己的同步规则.</target>
+
 <source>Deletion handling</source>
 <target>删除处理</target>
+
 <source>&OK</source>
 <target>确定(&O)</target>
+
 <source>Configuration</source>
 <target>配置</target>
+
 <source>Category</source>
 <target>分类</target>
+
 <source>Action</source>
 <target>动作</target>
+
 <source>File/folder exists on left side only</source>
 <target>文件/文件夹仅存在于左侧</target>
+
 <source>File/folder exists on right side only</source>
 <target>文件/文件夹仅存在于右侧</target>
+
 <source>Left file is newer</source>
 <target>左侧文件较新</target>
+
 <source>Right file is newer</source>
 <target>右侧文件较新</target>
+
 <source>Files have different content</source>
 <target>文件内容不同</target>
+
 <source>Conflict/file cannot be categorized</source>
 <target>冲突/文件不能被分类</target>
+
 <source>Compare by...</source>
 <target>比较选项...</target>
+
 <source>
 Files are found equal if
-     - file size
      - last write time and date
+     - file size
 are the same
 </source>
 <target>
 文件被认为是相同的，如果
-     - 文件大小
      - 最后修改时间和日期
-相同
+     - 文件大小
+是相同的
 </target>
-<source>File size and date</source>
-<target>文件大小和日期</target>
+
+<source>File time and size</source>
+<target>文件时间和日期</target>
+
 <source>
 Files are found equal if
      - file content
@@ -519,93 +755,85 @@ is the same
      - 文件内容
 相同
 </target>
+
 <source>File content</source>
 <target>文件内容</target>
+
 <source>Symbolic Link handling</source>
 <target>符号连接处理方式</target>
+
 <source>Synchronizing...</source>
 <target>同步中...</target>
+
 <source>Elements processed:</source>
 <target>已处理的元素:</target>
+
 <source>&Pause</source>
 <target>暂停(&P)</target>
-<source>Compare by "File size and date"</source>
-<target>通过文件大小和日期比较</target>
-<source>This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.</source>
-<target>此变化评估两个文件名相同的文件,只有当他们有同样的文件大小并且最后修改日期和时间也相同时才认为它们是相同的.</target>
-<source>When the comparison is started with this option set the following decision tree is processed:</source>
-<target>当以此选项开始比较时以下决定树被处理:</target>
-<source>As a result the files are separated into the following categories:</source>
-<target>其结果是文件分为以下几类:</target>
-<source>- equal</source>
-<target>- 相同</target>
-<source>- left newer</source>
-<target>- 左侧较新</target>
-<source>- right newer</source>
-<target>- 右侧较新</target>
-<source>- exists left only</source>
-<target>- 仅左侧存在的</target>
-<source>- exists right only</source>
-<target>- 仅右侧存在的</target>
-<source>- conflict (same date, different size)</source>
-<target>- 冲突(相同日期,不同大小)</target>
-<source>Compare by "File content"</source>
-<target>通过文件内容比较</target>
-<source>
-As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.
 
-With this option enabled the decision tree is smaller:
-</source>
-<target>
-顾名思义,两个相同文件名的文件当且仅当它们具有相同的内容时会被认为是相同的.
-此选项对于一致性检查比较有用，而不是备份操作. 因此,文件时间没有被考虑到. 
-
-通过此选项使决策树较小:
-</target>
-<source>- different</source>
-<target>- 不同</target>
 <source>Source code written in C++ utilizing:</source>
 <target>源代码用如下C++工具写成:</target>
+
 <source>Big thanks for localizing FreeFileSync goes out to:</source>
 <target>非常感谢以下本地化 FreeFileSync 的工作人员:</target>
+
 <source>Feedback and suggestions are welcome at:</source>
 <target>欢迎在下面提出反馈意见和建议:</target>
+
 <source>FreeFileSync at Sourceforge</source>
 <target>Sourceforge上的FreeFileSync</target>
+
 <source>Homepage</source>
 <target>主页</target>
+
 <source>If you like FFS</source>
 <target>如果你喜欢 FFS</target>
+
 <source>Donate with PayPal</source>
 <target>通过PayPal捐赠</target>
+
 <source>Email</source>
 <target>邮箱</target>
+
 <source>Report translation error</source>
 <target>报告翻译错误</target>
+
 <source>Published under the GNU General Public License:</source>
 <target>在GNU通用公共许可下发布:</target>
+
 <source>Ignore subsequent errors</source>
 <target>忽略随后的错误</target>
+
 <source>Hide further error messages during the current process</source>
 <target>在当前进程中隐藏进一步的错误信息</target>
+
 <source>&Ignore</source>
 <target>忽略(&I)</target>
+
 <source>&Retry</source>
 <target>重试(&R)</target>
+
 <source>Do not show this dialog again</source>
 <target>不要再显示此对话框</target>
+
 <source>&Switch</source>
 <target>切换(&S)</target>
+
 <source>&Yes</source>
 <target>是(&Y)</target>
+
 <source>&No</source>
 <target>否(&N)</target>
+
 <source>Delete on both sides</source>
 <target>从两侧删除</target>
+
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>从两侧删除(即使仅在一侧选择文件)</target>
+
 <source>Use Recycle Bin</source>
 <target>使用回收站</target>
+
 <source>
 Only files/directories that match all filter settings will be selected for synchronization.
 Note: The name filter must be specified relative(!) to main synchronization directories.
@@ -614,16 +842,22 @@ Note: The name filter must be specified relative(!) to main synchronization dire
 只有匹配所有过滤器设置的文件/目录会被选择用于同步.
 备注:文件名过滤器必须指定为同步主目录的相对路径.
 </target>
+
 <source>Hints:</source>
 <target>提示:</target>
+
 <source>1. Enter relative file or directory names separated by ';' or a new line.</source>
 <target>1. 输入相对文件或文件夹名称,用';'或空行分隔.</target>
+
 <source>2. Use wildcard characters '*' and '?'.</source>
 <target>2. 使用通配符‘*’和‘?’.</target>
+
 <source>3. Exclude files directly on main grid via context menu.</source>
 <target>3. 通过右键菜单在主网格排除文件.</target>
+
 <source>Example</source>
 <target>例如</target>
+
 <source>
 Include: *.doc;*.zip;*.exe
 Exclude: \stuff\temp\*
@@ -632,30 +866,40 @@ Exclude: \stuff\temp\*
 包括: *.doc;*.zip;*.exe
 排除: \stuff\temp\*
 </target>
+
 <source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
 <target>同步所有 .doc, .zip和 .exe 文件, 除了"temp"中的一切.</target>
+
 <source>Include</source>
 <target>包括</target>
+
 <source>Exclude</source>
 <target>排除</target>
-<source>Select time span:</source>
-<target>选择时间间隔:</target>
-<source>Minimum file size:</source>
-<target>最小文件大小:</target>
-<source>Maximum file size:</source>
+
+<source>Minimum file size</source>
+<target>最小文件大小</target>
+
+<source>Maximum file size</source>
 <target>最大文件大小</target>
+
 <source>&Default</source>
 <target>默认(&D)</target>
+
 <source>Move column up</source>
 <target>上移一行</target>
+
 <source>Move column down</source>
 <target>下移一行</target>
-<source>Transactional File Copy</source>
-<target></target>
+
+<source>Transactional file copy</source>
+<target>事务文件复制</target>
+
 <source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target></target>
+<target>首先写文件到临时文件(*.ffs_tmp)然后重命名. 如此保证了一致性，即使在出现致命错误的情况下.</target>
+
 <source>Copy locked files</source>
 <target>复制被锁定的文件</target>
+
 <source>
 Copy shared or locked files using Volume Shadow Copy Service
 (Requires Administrator rights)
@@ -664,8 +908,10 @@ Copy shared or locked files using Volume Shadow Copy Service
 通过卷影复制服务复制共享或锁定的文件
 (需要管理员权限)
 </target>
-<source>Copy filesystem permissions</source>
-<target>复制文件系统的权限</target>
+
+<source>Copy file access permissions</source>
+<target>复制文件存取权限</target>
+
 <source>
 Transfer file and directory permissions
 (Requires Administrator rights)
@@ -674,138 +920,217 @@ Transfer file and directory permissions
 转移文件和目录的权限
 (需要管理员权限)
 </target>
+
 <source>Hidden dialogs:</source>
 <target>隐藏对话框:</target>
+
 <source>Reset</source>
 <target>重置</target>
+
 <source>Show hidden dialogs</source>
 <target>显示隐藏的对话框</target>
+
 <source>External applications</source>
 <target>外部应用程序</target>
+
 <source>Description</source>
 <target>描述</target>
+
 <source>Variant</source>
 <target>变化</target>
+
 <source>Statistics</source>
 <target>统计</target>
+
 <source>Find what:</source>
 <target>要查找什么:</target>
+
 <source>Match case</source>
 <target>匹配大小写</target>
+
 <source>&Find next</source>
 <target>查找下一个(&F)</target>
-<source>You may try to synchronize remaining items again (WITHOUT having to re-compare)!</source>
-<target>您可能会尝试再次同步剩余的项目(而不必重新比较)!</target>
-<source>Batch file created successfully!</source>
-<target>批处理文件创建成功!</target>
+
 <source>Main bar</source>
 <target>主工具条</target>
+
 <source>Folder pairs</source>
 <target>文件夹对</target>
+
 <source>Select view</source>
 <target>选择视图</target>
+
 <source>Set direction:</source>
 <target>设置方向:</target>
+
 <source>Exclude temporarily</source>
 <target>暂时排除</target>
+
 <source>Include temporarily</source>
 <target>暂时包括</target>
+
 <source>Exclude via filter:</source>
 <target>通过过滤器排除:</target>
+
 <source><multiple selection></source>
 <target><多选></target>
+
 <source>D-Click</source>
 <target>双击</target>
+
 <source>Delete</source>
 <target>删除</target>
+
 <source>Customize...</source>
 <target>自定义...</target>
+
+<source>Select time span...</source>
+<target>选择时间跨度...</target>
+
 <source>Auto-adjust columns</source>
 <target>自动调整栏宽</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
+
 <source>Include all rows</source>
 <target>包括所有行</target>
+
 <source>Exclude all rows</source>
 <target>排除所有行</target>
+
 <source>Reset view</source>
 <target>重置视图</target>
+
 <source>Show "%x"</source>
 <target>显示 "%x"</target>
+
 <source><Last session></source>
 <target><最后会话></target>
+
 <source>Configuration saved!</source>
 <target>配置已保存!</target>
+
 <source>Save changes to current configuration?</source>
 <target>保存更改到当前配置?</target>
+
 <source>Configuration loaded!</source>
 <target>配置已加载!</target>
+
 <source>Folder Comparison and Synchronization</source>
 <target>文件夹比较与同步</target>
+
 <source>Hide files that exist on left side only</source>
 <target>隐藏仅在左侧的文件</target>
+
 <source>Show files that exist on left side only</source>
 <target>显示仅存在左侧的文件</target>
+
 <source>Hide files that exist on right side only</source>
 <target>隐藏仅在右侧的文件</target>
+
 <source>Show files that exist on right side only</source>
 <target>显示仅存在右侧的文件</target>
+
 <source>Hide files that are newer on left</source>
 <target>隐藏左侧较新的文件</target>
+
 <source>Show files that are newer on left</source>
 <target>显示左侧较新的文件</target>
+
 <source>Hide files that are newer on right</source>
 <target>隐藏右侧较新的文件</target>
+
 <source>Show files that are newer on right</source>
 <target>显示右侧较新的文件</target>
+
 <source>Hide files that are equal</source>
 <target>隐藏相同的文件</target>
+
 <source>Show files that are equal</source>
 <target>显示相同的文件</target>
+
 <source>Hide files that are different</source>
 <target>隐藏不同的文件</target>
+
 <source>Show files that are different</source>
 <target>显示不同的文件</target>
+
 <source>Hide conflicts</source>
 <target>隐藏冲突</target>
+
 <source>Show conflicts</source>
 <target>显示冲突</target>
+
 <source>Hide files that will be created on the left side</source>
 <target>隐藏将在左侧被建立的文件</target>
+
 <source>Show files that will be created on the left side</source>
 <target>显示将在左侧被建立的文件</target>
+
 <source>Hide files that will be created on the right side</source>
 <target>隐藏将在右侧被建立的文件</target>
+
 <source>Show files that will be created on the right side</source>
 <target>显示将在右侧被建立的文件</target>
+
 <source>Hide files that will be deleted on the left side</source>
 <target>隐藏将在左侧被删除的文件</target>
+
 <source>Show files that will be deleted on the left side</source>
 <target>显示将在左侧被删除的文件</target>
+
 <source>Hide files that will be deleted on the right side</source>
 <target>隐藏将在右侧被删除的文件</target>
+
 <source>Show files that will be deleted on the right side</source>
 <target>显示将在右侧被删除的文件</target>
+
 <source>Hide files that will be overwritten on left side</source>
 <target>隐藏将在左侧被覆盖的文件</target>
+
 <source>Show files that will be overwritten on left side</source>
 <target>显示将在左侧被覆盖的文件</target>
+
 <source>Hide files that will be overwritten on right side</source>
 <target>隐藏将在右侧被覆盖的文件</target>
+
 <source>Show files that will be overwritten on right side</source>
 <target>显示将在右侧被覆盖的文件</target>
+
 <source>Hide files that won't be copied</source>
 <target>隐藏将不会被复制的文件</target>
+
 <source>Show files that won't be copied</source>
 <target>显示将不被复制的文件</target>
+
 <source>All directories in sync!</source>
 <target>所有目录同步!</target>
+
 <source>Please run a Compare first before synchronizing!</source>
 <target>同步之前请先进行对比</target>
+
 <source>Comma separated list</source>
 <target>逗号分隔的列表</target>
+
 <source>Legend</source>
 <target>图例</target>
+
 <source>File list exported!</source>
 <target>文件清单已经导出!</target>
+
+<source>Batch file created successfully!</source>
+<target>批处理文件创建成功!</target>
+
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -813,6 +1138,7 @@ Transfer file and directory permissions
 <target>
 <pluralform>%x 个对象被成功删除!</pluralform>
 </target>
+
 <source>
 <pluralform>1 directory</pluralform>
 <pluralform>%x directories</pluralform>
@@ -820,6 +1146,7 @@ Transfer file and directory permissions
 <target>
 <pluralform>%x 目录</pluralform>
 </target>
+
 <source>
 <pluralform>1 file</pluralform>
 <pluralform>%x files</pluralform>
@@ -827,6 +1154,7 @@ Transfer file and directory permissions
 <target>
 <pluralform>%x 文件</pluralform>
 </target>
+
 <source>
 <pluralform>%x of 1 row in view</pluralform>
 <pluralform>%x of %y rows in view</pluralform>
@@ -834,72 +1162,97 @@ Transfer file and directory permissions
 <target>
 <pluralform>%y 中的 %x 行可见</pluralform>
 </target>
+
 <source>Scanning...</source>
 <target>正扫描...</target>
+
 <source>Comparing content...</source>
 <target>正在比较文件内容...</target>
+
 <source>Paused</source>
 <target>已暂停</target>
+
 <source>Aborted</source>
 <target>已取消</target>
+
 <source>Completed</source>
 <target>完成</target>
+
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>取消请求: 正在等待当前操作完成...</target>
+
 <source>Continue</source>
 <target>继续</target>
+
 <source>Pause</source>
 <target>暂停</target>
+
 <source>Cannot find %x</source>
 <target>找不到 %x</target>
-<source>DECISION TREE</source>
-<target>决策树</target>
-<source>file exists on both sides</source>
-<target>文件在两侧均已存在</target>
-<source>on one side only</source>
-<target>仅在一侧</target>
-<source>same date</source>
-<target>日期相同</target>
-<source>different date</source>
-<target>日期不同</target>
+
 <source>Inactive</source>
 <target>不使用</target>
-<source>Second</source>
-<target>秒</target>
-<source>Minute</source>
-<target>分</target>
-<source>Hour</source>
-<target>小时</target>
-<source>Day</source>
-<target>天</target>
+
+<source>Last x hours</source>
+<target>最后 x 小时</target>
+
+<source>Today</source>
+<target>今天</target>
+
+<source>This week</source>
+<target>本周</target>
+
+<source>This month</source>
+<target>本月</target>
+
+<source>This year</source>
+<target>今年</target>
+
 <source>Byte</source>
 <target>字节</target>
+
 <source>KB</source>
 <target>KB</target>
+
 <source>MB</source>
 <target>MB</target>
+
 <source>Filter: All pairs</source>
 <target>过滤器:所有的配对</target>
+
 <source>Filter: Single pair</source>
 <target>过滤器:单一的配对</target>
+
 <source>Ignore</source>
 <target>忽略</target>
+
 <source>Direct</source>
 <target>直接</target>
+
 <source>Follow</source>
 <target>跟随</target>
+
+<source>Copy NTFS permissions</source>
+<target>复制NTFS权限</target>
+
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>集成外部应用程序到右键菜单. 如下宏可用:</target>
+
 <source>- full file or directory name</source>
 <target>- 完整的文件名或目录名</target>
+
 <source>- directory part only</source>
 <target>- 只对目录部分</target>
+
 <source>- Other side's counterpart to %name</source>
 <target>- 另一侧参照 %name</target>
+
 <source>- Other side's counterpart to %dir</source>
 <target>- 另一侧参照 %dir</target>
+
 <source>Restore all hidden dialogs?</source>
 <target>恢复所有被隐藏的对话框?</target>
+
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
 <pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
@@ -907,6 +1260,7 @@ Transfer file and directory permissions
 <target>
 <pluralform>你是否真的要移动如下 %x 个对象到回收站?</pluralform>
 </target>
+
 <source>
 <pluralform>Do you really want to delete the following object?</pluralform>
 <pluralform>Do you really want to delete the following %x objects?</pluralform>
@@ -914,139 +1268,211 @@ Transfer file and directory permissions
 <target>
 <pluralform>你是否真的要删除如下 %x 个对象?</pluralform>
 </target>
+
 <source>Leave as unresolved conflict</source>
 <target>遗留为未解决的冲突</target>
+
 <source>Delete permanently</source>
 <target>永久性删除</target>
+
 <source>Delete or overwrite files permanently</source>
 <target>永久性删除或覆盖文件</target>
+
 <source>Use Recycle Bin when deleting or overwriting files</source>
 <target>当删除或覆盖文件时使用回收站</target>
+
 <source>Versioning</source>
 <target>保留历史版本</target>
+
 <source>Move files into a time-stamped subdirectory</source>
 <target>移动文件到时间标记子目录</target>
-<source>Cannot determine sync-direction:</source>
-<target>不能检测同步方向:</target>
-<source>Filter settings have changed!</source>
-<target>过滤设置已改变!</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>在最后的同步之后两边均已改变!</target>
+
+<source>Cannot determine sync-direction:</source>
+<target>不能检测同步方向:</target>
+
 <source>No change since last synchronization!</source>
 <target>自从最后一次同步以来没有变动!</target>
+
+<source>Filter settings have changed!</source>
+<target>过滤设置已改变!</target>
+
 <source>The file was not processed by last synchronization!</source>
 <target>此文件在最后一次同步中未被处理!</target>
-<source>Planned directory deletion is in conflict with its subdirectories and -files!</source>
-<target>计划的目录删除与其子目录和文件有冲突!</target>
+
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>设置默认的同步方向:旧文件会被新文件覆盖.</target>
+
 <source>The file does not contain a valid configuration:</source>
 <target>该文件不包含有效的配置:</target>
+
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>你可以忽略这个错误而认为目录是空的.</target>
+
 <source>Directory does not exist:</source>
 <target>目录不存在:</target>
+
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目录有依赖性！在设立同步规则时请小心:</target>
+
 <source>Comparing content of files %x</source>
 <target>正在比较文件 %x 的内容</target>
+
 <source>Memory allocation failed!</source>
 <target>内存分配失败!</target>
+
 <source>File %x has an invalid date!</source>
 <target>文件 %x 的日期非法!</target>
+
 <source>Conflict detected:</source>
 <target>检测到冲突:</target>
+
 <source>Files %x have the same date but a different size!</source>
 <target>文件 %x 日期相同但大小不同!</target>
+
 <source>Symlinks %x have the same date but a different target!</source>
 <target>符号连接 %x 有相同的日期但目标不同!</target>
+
 <source>Comparing files by content failed.</source>
 <target>按文件内容比较失败.</target>
+
 <source>Generating file list...</source>
 <target>生成文件列表...</target>
+
 <source>Multiple...</source>
 <target>并联...</target>
+
 <source>Both sides are equal</source>
 <target>两侧相等</target>
+
 <source>Files/folders differ in attributes only</source>
 <target>文件/文件夹仅属性不同</target>
+
 <source>Copy new file/folder to left</source>
 <target>复制新文件/文件夹至左侧</target>
+
 <source>Copy new file/folder to right</source>
 <target>复制新文件/文件夹至右侧</target>
+
 <source>Delete left file/folder</source>
 <target>删除左侧文件/文件夹</target>
+
 <source>Delete right file/folder</source>
 <target>删除右侧文件/文件夹</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>从右侧覆盖左侧的文件/文件夹</target>
+
 <source>Overwrite right file/folder with left one</source>
 <target>从左侧覆盖右侧的文件/文件夹</target>
+
 <source>Do nothing</source>
 <target>保持不动</target>
+
 <source>Copy file attributes only to left</source>
 <target>仅复制文件属性到左侧</target>
+
 <source>Copy file attributes only to right</source>
 <target>仅复制文件属性到右侧</target>
+
 <source>Deleting file %x</source>
 <target>正删除文件 %x</target>
-<source>Deleting Symbolic Link %x</source>
-<target>正在删除符号连接 %x</target>
+
 <source>Deleting folder %x</source>
 <target>正删除文件夹 %x</target>
-<source>Moving %x to Recycle Bin</source>
-<target>移动 %x 到回收站</target>
-<source>Moving file %x to user-defined directory %y</source>
-<target>移动文件 %x 到用户定义目录 %y</target>
-<source>Moving folder %x to user-defined directory %y</source>
-<target>移动文件夹 %x 到用户定义目录 %y</target>
-<source>Moving Symbolic Link %x to user-defined directory %y</source>
-<target>正在移动符号连接 %x 到用户定义目录 %y</target>
-<source>Copying new file %x to %y</source>
-<target>复制新文件 %x 到 %y</target>
-<source>Copying new Symbolic Link %x to %y</source>
-<target>复制新符号连接 %x 到 %y</target>
-<source>Overwriting file %x in %y</source>
-<target>正在 %y 上覆盖文件 %x</target>
-<source>Overwriting Symbolic Link %x in %y</source>
-<target>正在 %y 上覆盖符号连接 %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>正在删除符号连接 %x</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>正在移动文件 %x 到回收站</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>正在移动文件夹 %x 到回收站</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>正在移动符号连接 %x 到回收站</target>
+
+<source>Moving file %x to %y</source>
+<target>正在移动文件 %x 到 %y</target>
+
+<source>Moving folder %x to %y</source>
+<target>正在移动文件夹 %x 到 %y</target>
+
+<source>Moving symbolic link %x to %y</source>
+<target>正在移动符号连接 %x 到 %y</target>
+
+<source>Creating file %x</source>
+<target>正在创建文件 %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>正在创建符号连接 %x</target>
+
 <source>Creating folder %x</source>
 <target>正创建文件夹 %x</target>
+
+<source>Overwriting file %x</source>
+<target>正在覆盖文件 %x</target>
+
+<source>Overwriting symbolic link %x</source>
+<target>正在覆盖符号连接 %x</target>
+
 <source>Verifying file %x</source>
 <target>校验文件 %x</target>
+
 <source>Updating attributes of %x</source>
 <target>更新 %x 的属性</target>
-<source>Source directory does not exist anymore:</source>
-<target>源目录已经不存在:</target>
-<source>Nothing to synchronize according to configuration!</source>
-<target>根据配置没有任何同步!</target>
+
 <source>Target directory name must not be empty!</source>
 <target>目标目录名不能为空!</target>
+
 <source>User-defined directory for deletion was not specified!</source>
 <target>用于删除的用户定义目录没有指定!</target>
+
+<source>Source directory does not exist anymore:</source>
+<target>源目录已经不存在:</target>
+
 <source>Unresolved conflicts existing!</source>
 <target>存在不可解决的冲突!</target>
+
 <source>You can ignore conflicts and continue synchronization.</source>
 <target>你可忽略冲突并继续同步.</target>
+
 <source>Significant difference detected:</source>
 <target>已侦测到显著不同:</target>
+
 <source>More than 50% of the total number of files will be copied or deleted!</source>
 <target>超过总数 50% 以上的文件要被复制或删除!</target>
+
 <source>Not enough free disk space available in:</source>
 <target>没有足够的可用磁盘空间用于:</target>
+
 <source>Free disk space required:</source>
 <target>需要可用的磁盘空间:</target>
+
 <source>Free disk space available:</source>
 <target>可用磁盘空间:</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target></target>
+<target>如下路径的回收站不可用! 文件会被永久删除:</target>
+
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>有一个目录将被修改,而它是多个文件夹对的一部分!请重新检查同步设置!</target>
+
 <source>Processing folder pair:</source>
 <target>正在处理成对文件夹:</target>
+
 <source>Generating database...</source>
 <target>正在生成数据库...</target>
+
+<source>Nothing to synchronize according to configuration!</source>
+<target>根据配置没有任何同步!</target>
+
 <source>Error copying locked file %x!</source>
 <target>复制已锁定的文件时出错 %x!</target>
+
 <source>Data verification error: Source and target file have different content!</source>
 <target>数据校验错误:源文件和目标文件内容不同!</target>
+

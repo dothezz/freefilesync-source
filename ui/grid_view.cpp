@@ -8,6 +8,7 @@
 #include "sorting.h"
 #include "../synchronization.h"
 #include <boost/bind.hpp>
+#include "../shared/stl_tools.h"
 
 using namespace zen;
 
@@ -258,8 +259,7 @@ void GridView::removeInvalidRows()
     viewRef.clear();
 
     //remove rows that have been deleted meanwhile
-    sortedRef.erase(std::remove_if(sortedRef.begin(), sortedRef.end(),
-                                   boost::bind(&GridView::isInvalidRow, this, _1)), sortedRef.end());
+    vector_remove_if(sortedRef, [&](const RefIndex& refIdx) { return this->isInvalidRow(refIdx); });
 }
 
 
@@ -278,29 +278,24 @@ public:
         index_(index),
         sortedRef_(sortedRef) {}
 
-    void execute(const HierarchyObject& hierObj)
+    void execute(HierarchyObject& hierObj)
     {
-        //add file references
         std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), *this);
-
-        //add symlink references
         std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), *this);
-
-        //add dir references
-        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(), *this);
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), *this);
     }
 
-    void operator()(const FileMapping& fileObj)
+    void operator()(FileMapping& fileObj)
     {
         sortedRef_.push_back(RefIndex(index_, fileObj.getId()));
     }
 
-    void operator()(const SymLinkMapping& linkObj)
+    void operator()(SymLinkMapping& linkObj)
     {
         sortedRef_.push_back(RefIndex(index_, linkObj.getId()));
     }
 
-    void operator()(const DirMapping& dirObj)
+    void operator()(DirMapping& dirObj)
     {
         sortedRef_.push_back(RefIndex(index_, dirObj.getId()));
         execute(dirObj); //add recursion here to list sub-objects directly below parent!
@@ -319,7 +314,7 @@ void GridView::setData(FolderComparison& newData)
     folderCmp.swap(newData);
 
     //fill sortedRef
-    for (FolderComparison::const_iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
+    for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
         SerializeHierarchy(sortedRef, j - folderCmp.begin()).execute(*j);
 }
 
@@ -338,7 +333,7 @@ public:
 };
 
 
-template <bool ascending, zen::SelectedSide side>
+template <bool ascending>
 class GridView::LessRelativeName : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
@@ -359,7 +354,7 @@ public:
         else if (fsObjB == NULL)
             return true;
 
-        return lessRelativeName<ascending, side>(*fsObjA, *fsObjB);
+        return lessRelativeName<ascending>(*fsObjA, *fsObjB);
     }
 private:
     const GridView& m_view;
@@ -526,10 +521,8 @@ void GridView::sortView(SortType type, bool onLeft, bool ascending)
     switch (type)
     {
         case SORT_BY_REL_NAME:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<true,  LEFT_SIDE>(*this));
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<false, RIGHT_SIDE>(*this));
+            if      ( ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<true>(*this));
+            else if (!ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<false>(*this));
             break;
         case SORT_BY_FILENAME:
             if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  LEFT_SIDE >(*this));

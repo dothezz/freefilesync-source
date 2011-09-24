@@ -10,7 +10,7 @@
 using namespace zen;
 
 
-void ReadInputStream::throwReadError() const  //throw (FileError)
+void ReadInputStream::throwReadError() const  //throw FileError
 {
     throw zen::FileError(_("Error reading from synchronization database:") + " \n" + "\"" +  errorObjName_.c_str() + "\"");
 }
@@ -32,7 +32,7 @@ ReadInputStream::CharArray ReadInputStream::readArrayC() const
 
 
 //--------------------------------------------------------------------------------------------------------
-void WriteOutputStream::throwWriteError() const //throw (FileError)
+void WriteOutputStream::throwWriteError() const //throw FileError
 {
     throw zen::FileError(_("Error writing to synchronization database:") + " \n" + "\"" + errorObjName_.c_str() + "\"");
 }

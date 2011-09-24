@@ -7,6 +7,7 @@
 #include "watcher.h"
 #include "../shared/file_handling.h"
 #include "../shared/i18n.h"
+#include "../shared/stl_tools.h"
 #include <set>
 #include <wx/timer.h>
 #include "../shared/resolve_path.h"
@@ -32,112 +33,102 @@ bool rts::updateUiIsAllowed()
     return false;
 }
 
-
-class MonitorExistence //detect changes to directory availability
+namespace
 {
-public:
-    MonitorExistence() : allExisting_(true) {}
-
-    //initialization
-    void addForMonitoring(const Zstring& dirName)
-    {
-        dirList.insert(dirName);
-    }
-
-    bool allExisting() const //polling explicitly allowed!
-    {
-        const int UPDATE_INTERVAL = 1000; //1 second interval
-
-        const wxLongLong current = wxGetLocalTimeMillis();
-        if (current - lastCheck >= UPDATE_INTERVAL)
-        {
-            lastCheck = current;
-            allExisting_ = std::find_if(dirList.begin(), dirList.end(), std::not1(std::ptr_fun(&zen::dirExists))) == dirList.end();
-        }
-
-        return allExisting_;
-    }
-
-private:
-    mutable wxLongLong lastCheck;
-    mutable bool allExisting_;
-
-    std::set<Zstring, LessFilename> dirList; //save avail. directories, avoid double-entries
-};
+const int CHECK_DIR_INTERVAL = 1000; //1 second interval
+}
 
 
-
-rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler) //throw(FileError)
+rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, WaitCallback* statusHandler) //throw FileError
 {
-    if (dirNames.empty()) //pathological case, but check is needed nevertheless
+    std::set<Zstring, LessFilename> dirNamesFmt;
+
+    std::for_each(dirNamesNonFmt.begin(), dirNamesNonFmt.end(),
+                  [&](const Zstring& dirnameNonFmt)
+    {
+        const Zstring& dirnameFmt = zen::getFormattedDirectoryName(dirnameNonFmt);
+
+        if (dirnameFmt.empty())
+            throw zen::FileError(_("A directory input field is empty."));
+        dirNamesFmt.insert(dirnameFmt);
+    });
+    if (dirNamesFmt.empty()) //pathological case, but check is needed nevertheless
         throw zen::FileError(_("A directory input field is empty."));
 
+
     //detect when volumes are removed/are not available anymore
-    MonitorExistence checkExist;
-    std::vector<std::shared_ptr<DirWatcher>> watches;
+    std::vector<std::pair<Zstring, std::shared_ptr<DirWatcher>>> watches;
 
-    for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
+    for (auto iter = dirNamesFmt.begin(); iter != dirNamesFmt.end(); ++iter)
     {
-        const Zstring formattedDir = zen::getFormattedDirectoryName(*i);
-
-        if (formattedDir.empty())
-            throw zen::FileError(_("A directory input field is empty."));
-
-        checkExist.addForMonitoring(formattedDir);
-
+        const Zstring& dirnameFmt = *iter;
         try
         {
-            watches.push_back(std::make_shared<DirWatcher>(formattedDir)); //throw FileError
+            watches.push_back(std::make_pair(dirnameFmt, std::make_shared<DirWatcher>(dirnameFmt))); //throw FileError
         }
-        catch (zen::FileError&)
+        catch (FileError&)
         {
-            if (!zen::dirExists(formattedDir)) //that's no good locking behavior, but better than nothing
+            //Note: checking for directory existence is NOT transactional!!!
+            if (!dirExists(dirnameFmt)) //that's no good locking behavior, but better than nothing
                 return CHANGE_DIR_MISSING;
             throw;
         }
     }
 
+    wxLongLong lastCheck;
     while (true)
     {
-        //IMPORTANT CHECK: dirwatcher has problems detecting removal of top watched directories!
-        if (!checkExist.allExisting()) //check for removed devices:
-            return CHANGE_DIR_MISSING;
-
-        try
+        const bool checkDirExistNow = [&lastCheck]() -> bool //checking once per sec should suffice
         {
-            for (auto iter = watches.begin(); iter != watches.end(); ++iter)
+            const wxLongLong current = wxGetLocalTimeMillis();
+            if (current - lastCheck >= CHECK_DIR_INTERVAL)
             {
-                std::vector<Zstring> changedFiles = (*iter)->getChanges(); //throw FileError
+                lastCheck = current;
+                return true;
+            }
+            return false;
+        }();
+
+
+        for (auto iter = watches.begin(); iter != watches.end(); ++iter)
+        {
+            const Zstring& dirname = iter->first;
+            DirWatcher& watcher = *(iter->second);
+
+            //IMPORTANT CHECK: dirwatcher has problems detecting removal of top watched directories!
+            if (checkDirExistNow)
+                if (!dirExists(dirname)) //catch errors related to directory removal, e.g. ERROR_NETNAME_DELETED
+                    return CHANGE_DIR_MISSING;
+
+            try
+            {
+                std::vector<Zstring> changedFiles = watcher.getChanges(); //throw FileError
 
                 //remove to be ignored changes
-                changedFiles.erase(std::remove_if(changedFiles.begin(), changedFiles.end(),
-                                                  [](const Zstring& name)
+                vector_remove_if(changedFiles, [](const Zstring & name)
                 {
                     return endsWith(name, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
                            endsWith(name, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
                     //no need to ignore temporal recycle bin directory: this must be caused by a file deletion anyway
-                }), changedFiles.end());
+                });
 
                 if (!changedFiles.empty())
                 {
                     /*
                                     std::for_each(changedFiles.begin(), changedFiles.end(),
                                     [](const Zstring& fn) { wxMessageBox(toWx(fn));});
-
-                    				const wxString filename = toWx(changedFiles[0]);
-                                        ::wxSetEnv(wxT("RTS_CHANGE"), filename);
                     */
-
-                    return CHANGE_DETECTED; //directory change detected
+                    return WaitResult(CHANGE_DETECTED, changedFiles[0]); //directory change detected
                 }
+
             }
-        }
-        catch (FileError&)
-        {
-            //maybe some error is caused due to some unexpected removal/unavailability of a watched directory? If so we can remedy this error:
-            if (!checkExist.allExisting())
-                return CHANGE_DIR_MISSING;
-            throw;
+            catch (FileError&)
+            {
+                //Note: checking for directory existence is NOT transactional!!!
+                if (!dirExists(dirname)) //catch errors related to directory removal, e.g. ERROR_NETNAME_DELETED
+                    return CHANGE_DIR_MISSING;
+                throw;
+            }
         }
 
         wxMilliSleep(rts::UI_UPDATE_INTERVAL);
@@ -147,35 +138,29 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
 
 
 //support for monitoring newly connected directories volumes (e.g.: USB-sticks)
-void rts::waitForMissingDirs(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler) //throw(FileError)
+void rts::waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt, WaitCallback* statusHandler) //throw FileError
 {
     wxLongLong lastCheck;
 
     while (true)
     {
-        const int UPDATE_INTERVAL = 1000; //1 second interval
         const wxLongLong current = wxGetLocalTimeMillis();
-        if (current - lastCheck >= UPDATE_INTERVAL)
+        if (current - lastCheck >= CHECK_DIR_INTERVAL)
         {
             lastCheck = current;
 
-            bool allExisting = true;
-            for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
-            {
-                //support specifying volume by name => call getFormattedDirectoryName() repeatedly
-                const Zstring formattedDir = zen::getFormattedDirectoryName(*i);
+            if (std::find_if(dirNamesNonFmt.begin(), dirNamesNonFmt.end(),
+                             [&](const Zstring& dirnameNonFmt) -> bool
+        {
+            //support specifying volume by name => call getFormattedDirectoryName() repeatedly
+            const Zstring formattedDir = zen::getFormattedDirectoryName(dirnameNonFmt);
 
                 if (formattedDir.empty())
                     throw zen::FileError(_("A directory input field is empty."));
 
-                if (!zen::dirExists(formattedDir))
-                {
-                    allExisting = false;
-                    break;
-                }
-            }
-            if (allExisting) //check for newly arrived devices:
-                return;
+                return !dirExists(formattedDir);
+            }) == dirNamesNonFmt.end())
+            return;
         }
 
         wxMilliSleep(rts::UI_UPDATE_INTERVAL);

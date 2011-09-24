@@ -482,10 +482,10 @@ inline SafeBitField< unique_index, word_t > operator != ( bool, SafeBitField< un
 #ifdef LOKI_SAFE_BIT_FIELD
 #ifndef LOKI_BIT_FIELD_NONTEMPLATE_INIT
 #define LOKI_BIT_CONST( field_t, label, bit_index ) \
-            static const field_t::const_t label = field_t::const_t::make_bit_const<bit_index>()
+    static const field_t::const_t label = field_t::const_t::make_bit_const<bit_index>()
 #else
 #define LOKI_BIT_CONST( field_t, label, bit_index ) \
-            static const field_t::const_t label = field_t::const_t::make_bit_const( bit_index )
+    static const field_t::const_t label = field_t::const_t::make_bit_const( bit_index )
 #endif // LOKI_BIT_FIELD_NONTEMPLATE_INIT
 #else
 inline size_t make_bit_const( size_t i ) { return ( i > 0 ) ? ( size_t(1) << ( ( i > 0 ) ? ( i - 1 ) : 0 ) ) : 0; }

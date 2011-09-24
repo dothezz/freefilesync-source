@@ -40,7 +40,7 @@ public:
     };
 
     void setStatus(Status status);
-    void setProgress(size_t current, size_t total);
+    void setProgress(double fraction); //between [0, 1]
 
 private:
     class Pimpl;

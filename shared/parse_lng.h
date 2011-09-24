@@ -309,7 +309,7 @@ private:
         {
             std::string tmp;
             for (std::string::const_iterator i = text.begin(); i != text.end(); ++i)
-                if(*i == '\r')
+                if (*i == '\r')
                 {
                     std::string::const_iterator next = i + 1;
                     if (next != text.end() && *next == '\n')
@@ -451,7 +451,7 @@ private:
 
         }
 
-        if (!pluralList.empty()&& static_cast<int>(pluralList.size()) != formCount) //invalid number of plural forms
+        if (!pluralList.empty() && static_cast<int>(pluralList.size()) != formCount) //invalid number of plural forms
             throw ParsingError(scn.position().first, scn.position().second);
 
         consumeToken(Token::TK_TRG_END);
@@ -572,7 +572,7 @@ void generateLng(const TranslationList& in, const TransHeader& header, std::stri
 
             fileStream += KnownTokens::text(Token::TK_TRG_BEGIN);
             fileStream += translation;
-            fileStream += KnownTokens::text(Token::TK_TRG_END) + LB;
+            fileStream += KnownTokens::text(Token::TK_TRG_END) + LB + LB;
 
         }
         else if (plural)
@@ -590,7 +590,7 @@ void generateLng(const TranslationList& in, const TransHeader& header, std::stri
             fileStream += KnownTokens::text(Token::TK_PLURAL_END) + LB;
             fileStream += KnownTokens::text(Token::TK_PLURAL_BEGIN);
             fileStream += engPlural;
-            fileStream += KnownTokens::text(Token::TK_PLURAL_END)+ LB;
+            fileStream += KnownTokens::text(Token::TK_PLURAL_END) + LB;
             fileStream += KnownTokens::text(Token::TK_SRC_END) + LB;
 
             fileStream += KnownTokens::text(Token::TK_TRG_BEGIN);
@@ -605,7 +605,7 @@ void generateLng(const TranslationList& in, const TransHeader& header, std::stri
                 fileStream += plForm;
                 fileStream += KnownTokens::text(Token::TK_PLURAL_END) + LB;
             }
-            fileStream += KnownTokens::text(Token::TK_TRG_END) + LB;
+            fileStream += KnownTokens::text(Token::TK_TRG_END) + LB + LB;
         }
         else
         {

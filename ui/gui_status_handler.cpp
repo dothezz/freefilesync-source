@@ -116,6 +116,13 @@ void CompareStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 
 }
 
 
+void CompareStatusHandler::reportStatus(const wxString& text)
+{
+    mainDlg.compareStatus->setStatusText_NoUpdate(text);
+    requestUiRefresh(); //throw AbortThisProcess
+}
+
+
 void CompareStatusHandler::reportInfo(const wxString& text)
 {
     mainDlg.compareStatus->setStatusText_NoUpdate(text);
@@ -154,12 +161,9 @@ void CompareStatusHandler::reportFatalError(const wxString& errorMessage)
 {
     forceUiRefresh();
 
-    //show message and abort: currently there are no fatal errors during comparison that can be ignored
     bool dummy = false;
     showErrorDlg(ReturnErrorDlg::BUTTON_ABORT,
                  errorMessage, dummy);
-
-    abortThisProcess();
 }
 
 
@@ -170,7 +174,7 @@ void CompareStatusHandler::reportWarning(const wxString& warningMessage, bool& w
 
     forceUiRefresh();
 
-    //show popup and ask user how to handle warning
+    //show pop-up and ask user how to handle warning
     bool dontWarnAgain = false;
     switch (showWarningDlg(ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_ABORT,
                            warningMessage,
@@ -223,9 +227,9 @@ SyncStatusHandler::~SyncStatusHandler()
 
     //finalize error log
     if (abortIsRequested())
-        errorLog.logMsg(_("Synchronization aborted!") + " \n" + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"), TYPE_ERROR);
+        errorLog.logMsg(_("Synchronization aborted!"), TYPE_ERROR);
     else if (totalErrors > 0)
-        errorLog.logMsg(_("Synchronization completed with errors!") + " \n" + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"), TYPE_WARNING);
+        errorLog.logMsg(_("Synchronization completed with errors!"), TYPE_WARNING);
     else
         errorLog.logMsg(_("Synchronization completed successfully!"), TYPE_INFO);
 
@@ -264,13 +268,18 @@ void SyncStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 dat
 }
 
 
+void SyncStatusHandler::reportStatus(const wxString& text)
+{
+    syncStatusFrame.setStatusText_NoUpdate(text); //throw ()
+    requestUiRefresh(); //throw AbortThisProccess
+}
+
+
 void SyncStatusHandler::reportInfo(const wxString& text)
 {
-    //if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
     errorLog.logMsg(text, TYPE_INFO);
 
     syncStatusFrame.setStatusText_NoUpdate(text); //throw ()
-
     requestUiRefresh(); //throw AbortThisProccess
 }
 

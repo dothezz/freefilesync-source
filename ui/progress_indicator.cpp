@@ -20,6 +20,7 @@
 #include "../library/error_log.h"
 #include "../shared/toggle_button.h"
 #include "../shared/taskbar.h"
+#include "../shared/image_tools.h"
 
 using namespace zen;
 
@@ -78,13 +79,12 @@ private:
     wxStopWatch timeElapsed;
 
     //gauge variables
-    int            totalObjects;
+    int        totalObjects;
     zen::Int64 totalData;      //each data element represents one byte for proper progress indicator scaling
-    int            currentObjects; //each object represents a file or directory processed
+    int        currentObjects; //each object represents a file or directory processed
     zen::Int64 currentData;
-    double         scalingFactor;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
 
-    void showProgressExternally(const wxString& progressText, float percent = 0);
+    void showProgressExternally(const wxString& progressText, double fraction = 0); //between [0, 1]
 
     enum CurrentStatus
     {
@@ -97,7 +97,7 @@ private:
     std::unique_ptr<util::Taskbar> taskbar_;
 
     //remaining time
-    std::auto_ptr<Statistics> statistics;
+    std::unique_ptr<Statistics> statistics;
     long lastStatCallSpeed;   //used for calculating intervals between statistics update
     long lastStatCallRemTime; //
 };
@@ -161,7 +161,6 @@ CompareStatus::CompareStatusImpl::CompareStatusImpl(wxTopLevelWindow& parentWind
     totalData(0),
     currentObjects(0),
     currentData(0),
-    scalingFactor(0),
     status(SCANNING),
     lastStatCallSpeed(-1000000), //some big number
     lastStatCallRemTime(-1000000)
@@ -202,7 +201,6 @@ void CompareStatus::CompareStatusImpl::init()
     totalData      = 0;
     currentObjects = 0;
     currentData    = 0;
-    scalingFactor  = 0;
 
     statistics.reset();
 
@@ -230,11 +228,6 @@ void CompareStatus::CompareStatusImpl::switchToCompareBytewise(int totalObjectsT
 
     currentObjects = 0;
     totalObjects   = totalObjectsToProcess;
-
-    if (totalData != 0)
-        scalingFactor = GAUGE_FULL_RANGE / to<double>(totalData); //let's normalize to 50000
-    else
-        scalingFactor = 0;
 
     //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
     statistics.reset(new Statistics(totalObjectsToProcess, to<double>(totalDataToProcess), windowSizeRemainingTime, windowSizeBytesPerSec));
@@ -272,7 +265,7 @@ void CompareStatus::CompareStatusImpl::setStatusText_NoUpdate(const wxString& te
 }
 
 
-void CompareStatus::CompareStatusImpl::showProgressExternally(const wxString& progressText, float percent)
+void CompareStatus::CompareStatusImpl::showProgressExternally(const wxString& progressText, double fraction)
 {
     if (parentWindow_.GetTitle() != progressText)
         parentWindow_.SetTitle(progressText);
@@ -281,20 +274,16 @@ void CompareStatus::CompareStatusImpl::showProgressExternally(const wxString& pr
     using namespace util;
 
     if (taskbar_.get())
-    {
-        const size_t current = 100000 * percent / 100;
-        const size_t total   = 100000;
         switch (status)
         {
             case SCANNING:
                 taskbar_->setStatus(Taskbar::STATUS_INDETERMINATE);
                 break;
             case COMPARING_CONTENT:
+                taskbar_->setProgress(fraction);
                 taskbar_->setStatus(Taskbar::STATUS_NORMAL);
-                taskbar_->setProgress(current, total);
                 break;
         }
-    }
 }
 
 
@@ -305,7 +294,8 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
     {
         //wxWindowUpdateLocker dummy(this) -> not needed
 
-        const float percent = totalData == 0 ? 0 : to<double>(currentData) * 100.0 / to<double>(totalData);
+        //add both data + obj-count, to handle "deletion-only" cases
+        const double fraction = totalData + totalObjects == 0 ? 0 : to<double>(currentData + currentObjects) / to<double>(totalData + totalObjects);
 
         //write status information to taskbar, parent title ect.
         switch (status)
@@ -314,10 +304,9 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
                 showProgressExternally(toStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
                 break;
             case COMPARING_CONTENT:
-                showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content..."), percent);
+                showProgressExternally(formatPercentage(fraction) + wxT(" - ") + _("Comparing content..."), fraction);
                 break;
         }
-
 
         bool updateLayout = false; //avoid screen flicker by calling layout() only if necessary
 
@@ -333,7 +322,7 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
         setNewText(toStringSep(scannedObjects), *m_staticTextScanned, updateLayout);
 
         //progress indicator for "compare file content"
-        m_gauge2->SetValue(to<double>(currentData) * scalingFactor);
+        m_gauge2->SetValue(common::round(fraction * GAUGE_FULL_RANGE));
 
         //remaining files left for file comparison
         const wxString filesToCompareTmp = toStringSep(totalObjects - currentObjects);
@@ -376,6 +365,29 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
 //########################################################################################
 
 
+namespace
+{
+inline
+wxBitmap buttonPressed(const std::string& name)
+{
+    wxBitmap background = GlobalResources::getImage(wxT("log button pressed"));
+    return layOver(GlobalResources::getImage(utf8CvrtTo<wxString>(name)), background);
+}
+
+
+inline
+wxBitmap buttonReleased(const std::string& name)
+{
+    wxImage output = greyScale(GlobalResources::getImage(utf8CvrtTo<wxString>(name))).ConvertToImage();
+    //GlobalResources::getImage(utf8CvrtTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
+    //brighten(output, 30);
+
+    zen::move(output, 0, -1); //move image right one pixel
+    return output;
+}
+}
+
+
 class LogControl : public LogControlGenerated
 {
 public:
@@ -385,14 +397,14 @@ public:
         const int warningCount = log_.typeCount(TYPE_WARNING);
         const int infoCount    = log_.typeCount(TYPE_INFO);
 
-        m_bpButtonErrors->init(GlobalResources::instance().getImage(wxT("log error")),          _("Error") + wxString::Format(wxT(" (%d)"), errorCount),
-                               GlobalResources::instance().getImage(wxT("log error inactive")), _("Error") + wxString::Format(wxT(" (%d)"), errorCount));
+        m_bpButtonErrors->init(buttonPressed ("error"), _("Error") + wxString::Format(wxT(" (%d)"), errorCount),
+                               buttonReleased("error"), _("Error") + wxString::Format(wxT(" (%d)"), errorCount));
 
-        m_bpButtonWarnings->init(GlobalResources::instance().getImage(wxT("log warning")),          _("Warning") + wxString::Format(wxT(" (%d)"), warningCount),
-                                 GlobalResources::instance().getImage(wxT("log warning inactive")), _("Warning") + wxString::Format(wxT(" (%d)"), warningCount));
+        m_bpButtonWarnings->init(buttonPressed ("warning"), _("Warning") + wxString::Format(wxT(" (%d)"), warningCount),
+                                 buttonReleased("warning"), _("Warning") + wxString::Format(wxT(" (%d)"), warningCount));
 
-        m_bpButtonInfo->init(GlobalResources::instance().getImage(wxT("log info")),          _("Info") + wxString::Format(wxT(" (%d)"), infoCount),
-                             GlobalResources::instance().getImage(wxT("log info inactive")), _("Info") + wxString::Format(wxT(" (%d)"), infoCount));
+        m_bpButtonInfo->init(buttonPressed ("info"), _("Info") + wxString::Format(wxT(" (%d)"), infoCount),
+                             buttonReleased("info"), _("Info") + wxString::Format(wxT(" (%d)"), infoCount));
 
         m_bpButtonErrors  ->setActive(true);
         m_bpButtonWarnings->setActive(true);
@@ -496,7 +508,7 @@ private:
     void OnResumeFromTray(wxCommandEvent& event);
 
     bool currentProcessIsRunning();
-    void showProgressExternally(const wxString& progressText, float percent = 0); //percent may already be included in progressText
+    void showProgressExternally(const wxString& progressText, double fraction = 0); //between [0, 1]
 
     const wxString jobName_;
     wxStopWatch timeElapsed;
@@ -509,7 +521,6 @@ private:
     zen::Int64 totalData;
     int        currentObjects; //each object represents a file or directory processed
     zen::Int64 currentData;    //each data element represents one byte for proper progress indicator scaling
-    double     scalingFactor;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
 
     //status variables
     size_t scannedObjects;
@@ -618,7 +629,6 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     totalData(0),
     currentObjects(0),
     currentData(0),
-    scalingFactor(0),
     scannedObjects(0),
     processPaused(false),
     currentStatus(SyncStatus::ABORTED),
@@ -719,11 +729,6 @@ void SyncStatus::SyncStatusImpl::resetGauge(int totalObjectsToProcess, zen::Int6
     currentObjects = 0;
     totalObjects   = totalObjectsToProcess;
 
-    if (totalData != 0)
-        scalingFactor = GAUGE_FULL_RANGE / to<double>(totalData); //let's normalize to 50000
-    else
-        scalingFactor = 0;
-
     //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
     statistics.reset(new Statistics(totalObjectsToProcess, to<double>(totalDataToProcess), windowSizeRemainingTime, windowSizeBytesPerSec));
 
@@ -757,11 +762,11 @@ void SyncStatus::SyncStatusImpl::setStatusText_NoUpdate(const wxString& text)
 }
 
 
-void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progressText, float percent)
+void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progressText, double fraction)
 {
     //write status information to systray, if window is minimized
     if (trayIcon.get())
-        trayIcon->setToolTip(progressText, percent);
+        trayIcon->setToolTip2(progressText, fraction);
 
     wxString progressTextFmt = progressText;
     progressTextFmt.Replace(wxT("\n"), wxT(" - "));
@@ -777,15 +782,11 @@ void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progress
             this->SetTitle(progressTextFmt);
     }
 
-
     using namespace util;
 
     //show progress on Windows 7 taskbar
     if (taskbar_.get())
     {
-        const size_t current = 100000 * percent / 100;
-        const size_t total   = 100000;
-
         switch (currentStatus)
         {
             case SyncStatus::SCANNING:
@@ -794,29 +795,58 @@ void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progress
             case SyncStatus::FINISHED_WITH_SUCCESS:
             case SyncStatus::COMPARING_CONTENT:
             case SyncStatus::SYNCHRONIZING:
+                taskbar_->setProgress(fraction);
                 taskbar_->setStatus(Taskbar::STATUS_NORMAL);
-                taskbar_->setProgress(current, total);
                 break;
             case SyncStatus::PAUSE:
+                taskbar_->setProgress(fraction);
                 taskbar_->setStatus(Taskbar::STATUS_PAUSED);
-                taskbar_->setProgress(current, total);
                 break;
             case SyncStatus::ABORTED:
             case SyncStatus::FINISHED_WITH_ERROR:
+                taskbar_->setProgress(fraction);
                 taskbar_->setStatus(Taskbar::STATUS_ERROR);
-                taskbar_->setProgress(current, total);
                 break;
         }
     }
 }
 
+#ifdef FFS_WIN
+namespace
+{
+enum Zorder
+{
+    ZORDER_CORRECT,
+    ZORDER_WRONG,
+    ZORDER_INDEFIINTE,
+};
+
+Zorder validateZorder(const wxWindow& top, const wxWindow& bottom)
+{
+    HWND hTop    = static_cast<HWND>(top.GetHWND());
+    HWND hBottom = static_cast<HWND>(bottom.GetHWND());
+    assert(hTop && hBottom);
+
+    for (HWND hAbove = hBottom; hAbove; hAbove = ::GetNextWindow(hAbove, GW_HWNDPREV)) //GW_HWNDPREV means "to foreground"
+        if (hAbove == hTop)
+            return ZORDER_CORRECT;
+
+    for (HWND hAbove = ::GetNextWindow(hTop, GW_HWNDPREV); hAbove; hAbove = ::GetNextWindow(hAbove, GW_HWNDPREV))
+        if (hAbove == hBottom)
+            return ZORDER_WRONG;
+
+    return ZORDER_INDEFIINTE;
+}
+}
+#endif
 
 void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
 {
     //static RetrieveStatistics statistic;
     //statistic.writeEntry(currentData.ToDouble(), currentObjects);
 
-    const float percent = totalData == 0 ? 100.0 : to<double>(currentData) * 100.0 / to<double>(totalData);
+    //add both data + obj-count, to handle "deletion-only" cases
+    const double fraction = totalData + totalObjects == 0 ? 1 : to<double>(currentData + currentObjects) / to<double>(totalData + totalObjects);
 
     //write status information to systray, taskbar, parent title ect.
 
@@ -827,20 +857,20 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
             showProgressExternally(toStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
             break;
         case SyncStatus::COMPARING_CONTENT:
-            showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content...") + postFix, percent);
+            showProgressExternally(formatPercentage(fraction) + wxT(" - ") + _("Comparing content...") + postFix, fraction);
             break;
         case SyncStatus::SYNCHRONIZING:
-            showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Synchronizing...") + postFix, percent);
+            showProgressExternally(formatPercentage(fraction) + wxT(" - ") + _("Synchronizing...") + postFix, fraction);
             break;
         case SyncStatus::PAUSE:
-            showProgressExternally((totalData != 0 ? formatPercentage(currentData, totalData) + wxT(" - ") : wxString()) + _("Paused") + postFix, percent);
+            showProgressExternally(formatPercentage(fraction) + wxT(" - ") + _("Paused") + postFix, fraction);
             break;
         case SyncStatus::ABORTED:
-            showProgressExternally(_("Aborted") + postFix, percent);
+            showProgressExternally(_("Aborted") + postFix, fraction);
             break;
         case SyncStatus::FINISHED_WITH_SUCCESS:
         case SyncStatus::FINISHED_WITH_ERROR:
-            showProgressExternally(_("Completed") + postFix, percent);
+            showProgressExternally(_("Completed") + postFix, fraction);
             break;
     }
 
@@ -861,8 +891,7 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
             case SyncStatus::FINISHED_WITH_SUCCESS:
             case SyncStatus::FINISHED_WITH_ERROR:
             case SyncStatus::ABORTED:
-                m_gauge1->SetValue(totalData == 0 ? GAUGE_FULL_RANGE :
-                                   common::round(to<double>(currentData) * scalingFactor));
+                m_gauge1->SetValue(common::round(fraction * GAUGE_FULL_RANGE));
                 break;
             case SyncStatus::PAUSE: //no change to gauge: don't switch between indeterminate/determinate modus
                 break;
@@ -912,10 +941,25 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
         }
     }
 
+#ifdef FFS_WIN
+    //workaround Windows 7 bug messing up z-order after temporary application hangs: https://sourceforge.net/tracker/index.php?func=detail&aid=3376523&group_id=234430&atid=1093080
+    if (mainDialog)
+        if (validateZorder(*this, *mainDialog) == ZORDER_WRONG)
+        {
+            HWND hProgress = static_cast<HWND>(GetHWND());
+
+            if (::IsWindowVisible(hProgress))
+            {
+                ::ShowWindow(hProgress, SW_HIDE); //make Windows recalculate z-order
+                ::ShowWindow(hProgress, SW_SHOW); //
+            }
+        }
+#endif
+
     if (allowYield)
     {
         //support for pause button
-        if(processPaused)
+        if (processPaused)
         {
             if (statistics.get()) statistics->pauseTimer();
 
@@ -949,37 +993,37 @@ void SyncStatus::SyncStatusImpl::setCurrentStatus(SyncStatus::SyncStatusID id)
     switch (id)
     {
         case SyncStatus::ABORTED:
-            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusError")));
+            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusError")));
             m_staticTextStatus->SetLabel(_("Aborted"));
             break;
 
         case SyncStatus::FINISHED_WITH_SUCCESS:
-            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusSuccess")));
+            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusSuccess")));
             m_staticTextStatus->SetLabel(_("Completed"));
             break;
 
         case SyncStatus::FINISHED_WITH_ERROR:
-            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusWarning")));
+            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusWarning")));
             m_staticTextStatus->SetLabel(_("Completed"));
             break;
 
         case SyncStatus::PAUSE:
-            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusPause")));
+            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusPause")));
             m_staticTextStatus->SetLabel(_("Paused"));
             break;
 
         case SyncStatus::SCANNING:
-            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusScanning")));
+            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusScanning")));
             m_staticTextStatus->SetLabel(_("Scanning..."));
             break;
 
         case SyncStatus::COMPARING_CONTENT:
-            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusBinaryCompare")));
+            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusBinaryCompare")));
             m_staticTextStatus->SetLabel(_("Comparing content..."));
             break;
 
         case SyncStatus::SYNCHRONIZING:
-            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusSyncing")));
+            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusSyncing")));
             m_staticTextStatus->SetLabel(_("Synchronizing..."));
             break;
     }

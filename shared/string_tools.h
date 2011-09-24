@@ -311,8 +311,7 @@ bool endsWith(const S& str, const T& postfix)
 }
 
 
-// get all characters after the last occurence of ch
-// (returns the whole string if ch not found)
+//returns the whole string if ch not found
 template <class S, class T> inline
 S afterLast(const S& str, const T& ch)
 {
@@ -329,8 +328,7 @@ S afterLast(const S& str, const T& ch)
 }
 
 
-// get all characters before the last occurence of ch
-// (returns empty string if ch not found)
+//returns empty string if ch not found
 template <class S, class T> inline
 S beforeLast(const S& str, const T& ch)
 {
@@ -515,7 +513,7 @@ private:
     {
         wchar_t buffer[50];
 #ifdef __MINGW32__
-        int charsWritten = ::swprintf(buffer, L"%f", static_cast<double>(number)); //MinGW does not comply to the C standard!
+        int charsWritten = ::swprintf(buffer, L"%f", static_cast<double>(number)); //MinGW does not comply to the C standard here
 #else
         int charsWritten = std::swprintf(buffer, 50, L"%f", static_cast<double>(number));
 #endif
@@ -662,12 +660,12 @@ inline
 S toString(const Num& number) //convert number to string the C++ way
 {
     using namespace implementation;
-    return CvrtNumberToString<S, Num,
+    return CvrtNumberToString < S, Num,
            Loki::TypeTraits<Num>::isSignedInt   ? NUM_TYPE_SIGNED_INT :
            Loki::TypeTraits<Num>::isUnsignedInt ? NUM_TYPE_UNSIGNED_INT :
            Loki::TypeTraits<Num>::isFloat       ? NUM_TYPE_FLOATING_POINT :
            NUM_TYPE_OTHER
-           >().convert(number);
+           > ().convert(number);
 }
 
 
@@ -676,12 +674,12 @@ inline
 Num toNumber(const S& str) //convert string to number the C++ way
 {
     using namespace implementation;
-    return CvrtStringToNumber<S, Num,
+    return CvrtStringToNumber < S, Num,
            Loki::TypeTraits<Num>::isSignedInt   ? NUM_TYPE_SIGNED_INT :
            Loki::TypeTraits<Num>::isUnsignedInt ? NUM_TYPE_UNSIGNED_INT :
            Loki::TypeTraits<Num>::isFloat       ? NUM_TYPE_FLOATING_POINT :
            NUM_TYPE_OTHER
-           >().convert(str);
+           > ().convert(str);
 }
 
 }

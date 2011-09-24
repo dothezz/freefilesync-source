@@ -170,8 +170,8 @@ class AbstractFact,
       class TList = typename AbstractFact::ProductList
       >
 class ConcreteFactory
-    : public GenLinearHierarchy<
-    typename TL::Reverse<TList>::Result, Creator, AbstractFact>
+    : public GenLinearHierarchy <
+    typename TL::Reverse<TList>::Result, Creator, AbstractFact >
 {
 public:
     typedef typename AbstractFact::ProductList ProductList;

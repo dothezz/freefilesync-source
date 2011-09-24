@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20110901;20151400">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "MS Mincho" }
+		H3.ctl { font-family: "Mangal" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Backup strategies</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>1.
+Full backup with versioning of old files</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
+synchronization settings select and specify a &quot;User-defined
+directory&quot; for deletion handling. FreeFileSync will place files
+that have been deleted or overwritten with newer versions into
+corresponding time-stamped sub directories. This provides a
+space-optimized way to retain all older versions of files while the
+most recent ones are available in main source and target directories.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>2.
+Full backup to different target directories</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">All
+directory input fields may contain environment variables and special
+macros that are expanded during synchronization. This allows for
+complete backups into different target directories.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">A
+directory &quot;C:\Source&quot; requires a daily backup into a
+time-stamped target directory like &quot;C:\Target_2009-10-08&quot;.
+Base directories are set up accordingly:</FONT></P>
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif">Source folder: &quot;<FONT FACE="Courier New, monospace">C:\Source</FONT>&quot;<BR>Target
+	folder: &quot;<FONT FACE="Courier New, monospace">C:\Target_%date%</FONT>&quot;</FONT></P>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Latter
+will be interactively replaced with the current date during
+synchronization. In order to further automate this process, you can
+create a *.ffs_batch file with this configuration and choose &quot;<I>ignore
+errors</I>&quot; to avoid the warning that target directory is not
+(yet) existing.</FONT></P>
+</BODY>
+</HTML>

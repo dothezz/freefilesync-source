@@ -10,88 +10,91 @@
 </OBJECT>
 <UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Usage">
-		<param name="Local" value="html\Overview.html">
-		<param name="ImageNumber" value="17">
+		<param name="Name" value="FreeFileSync">
+		<param name="Local" value="html\FreeFileSync.html">
+		<param name="ImageNumber" value="2">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="# Overview">
+			<param name="Local" value="html\FreeFileSync.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Backup Strategies">
+			<param name="Local" value="html\BackupStrategy.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Batch Scripting">
+			<param name="Local" value="html\Batch Scripting.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Compare by file size">
+			<param name="Local" value="html\CompareFileSize.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Comparison Settings">
+			<param name="Local" value="html\ComparisonSettings.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Daylight saving time">
+			<param name="Local" value="html\DaylightSavingTime.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Error notification">
+			<param name="Local" value="html\SendMail.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Exclude files">
+			<param name="Local" value="html\ExcludeSubfolder.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="External applications">
+			<param name="Local" value="html\ExternalApp.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Features">
+			<param name="Local" value="html\Features.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Macros">
+			<param name="Local" value="html\Macros.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Schedule Batch Job">
+			<param name="Local" value="html\ScheduleBatch.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Synchronize with FTP">
+			<param name="Local" value="html\Ftp.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Variable drive letters">
+			<param name="Local" value="html\VariableDrive.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Volume Shadow Copy">
+			<param name="Local" value="html\ShadowCopy.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Features">
-		<param name="Local" value="html\Features.html">
-		<param name="ImageNumber" value="11">
+		<param name="Name" value="RealtimeSync">
+		<param name="Local" value="html\RealtimeSync.html">
+		<param name="ImageNumber" value="2">
 		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="# Overview">
+			<param name="Local" value="html\RealtimeSync.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Run as Service">
+			<param name="Local" value="html\RunAsService.html">
+			</OBJECT>
+	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Links">
 		<param name="Local" value="html\Links.html">
 		<param name="ImageNumber" value="19">
 		</OBJECT>
-	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Advanced">
-		</OBJECT>
-	<UL>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Backup Strategies">
-			<param name="Local" value="html\advanced\BackupStrategy.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Batch Scripting">
-			<param name="Local" value="html\advanced\Batch Scripting.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Compare by file size">
-			<param name="Local" value="html\advanced\CompareFileSize.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Daylight saving time">
-			<param name="Local" value="html\advanced\DaylightSavingTime.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Drag &amp; drop support">
-			<param name="Local" value="html\advanced\DragDrop.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Error notification">
-			<param name="Local" value="html\advanced\SendMail.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Exclude files">
-			<param name="Local" value="html\advanced\ExcludeSubfolder.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="External applications">
-			<param name="Local" value="html\advanced\ExternalApp.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Macros">
-			<param name="Local" value="html\advanced\Macros.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="RealtimeSync">
-			<param name="Local" value="html\advanced\RealtimeSync.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Run as Service">
-			<param name="Local" value="html\advanced\RunAsService.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Schedule a Batch Job">
-			<param name="Local" value="html\advanced\ScheduleBatch.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Symbolic link handling">
-			<param name="Local" value="html\advanced\SymbolicLinks.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Synchronize with FTP">
-			<param name="Local" value="html\advanced\Ftp.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Variable drive letters">
-			<param name="Local" value="html\advanced\VariableDrive.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Volume Shadow Copy">
-			<param name="Local" value="html\advanced\ShadowCopy.html">
-			</OBJECT>
-	</UL>
 </UL>
 </BODY></HTML>

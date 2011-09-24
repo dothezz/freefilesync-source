@@ -29,6 +29,7 @@ public:
 
     virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
     virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
+    virtual void reportStatus(const wxString& text);
     virtual void reportInfo(const wxString& text);
     virtual void forceUiRefresh();
 
@@ -55,6 +56,7 @@ public:
 
     virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
     virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
+    virtual void reportStatus(const wxString& text);
     virtual void reportInfo(const wxString& text);
     virtual void forceUiRefresh();
 

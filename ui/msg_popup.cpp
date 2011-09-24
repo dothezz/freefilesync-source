@@ -36,7 +36,7 @@ ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxStri
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmap10->SetBitmap(GlobalResources::instance().getImage(wxT("error")));
+    m_bitmap10->SetBitmap(GlobalResources::getImage(wxT("error")));
     m_textCtrl8->SetValue(messageText);
     m_checkBoxIgnoreErrors->SetValue(ignoreNextErrors);
 
@@ -120,7 +120,7 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmap10->SetBitmap(GlobalResources::instance().getImage(wxT("warning")));
+    m_bitmap10->SetBitmap(GlobalResources::getImage(wxT("warning")));
     m_textCtrl8->SetValue(messageText);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -190,6 +190,7 @@ private:
     void OnCancel(wxCommandEvent& event);
     void OnYes(wxCommandEvent& event);
     void OnNo(wxCommandEvent& event);
+    void OnCheckBoxDontShowAgain(wxCommandEvent& event);
 
     bool* dontShowAgain; //optional
 };
@@ -203,7 +204,7 @@ QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxStri
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmap10->SetBitmap(GlobalResources::instance().getImage(wxT("question")));
+    m_bitmap10->SetBitmap(GlobalResources::getImage(wxT("question")));
     m_textCtrl8->SetValue(messageText);
     if (dontShowAgain)
         m_checkBoxDontAskAgain->SetValue(*dontShowAgain);
@@ -257,6 +258,12 @@ void QuestionDlg::OnNo(wxCommandEvent& event)
         *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
     EndModal(ReturnQuestionDlg::BUTTON_NO);
 }
+
+void QuestionDlg::OnCheckBoxDontShowAgain(wxCommandEvent& event)
+{
+    event.Skip();
+}
+
 
 
 ReturnQuestionDlg::ButtonPressed zen::showQuestionDlg(int activeButtons, const wxString& messageText, bool* dontShowAgain)

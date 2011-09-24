@@ -129,7 +129,7 @@ struct TypeAt<Typelist<Head, Tail>, 0>
 template <class Head, class Tail, unsigned int i>
 struct TypeAt<Typelist<Head, Tail>, i>
 {
-    typedef typename TypeAt<Tail, i - 1>::Result Result;
+    typedef typename TypeAt < Tail, i - 1 >::Result Result;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,8 +144,8 @@ struct TypeAt<Typelist<Head, Tail>, i>
 // returns the type in position 'index' in TList, or D if index is out-of-bounds
 ////////////////////////////////////////////////////////////////////////////////
 
-template <class TList, unsigned int index,
-         typename DefaultType = NullType>
+template < class TList, unsigned int index,
+         typename DefaultType = NullType >
 struct TypeAtNonStrict
 {
     typedef DefaultType Result;
@@ -161,7 +161,7 @@ template <class Head, class Tail, unsigned int i, typename DefaultType>
 struct TypeAtNonStrict<Typelist<Head, Tail>, i, DefaultType>
 {
     typedef typename
-    TypeAtNonStrict<Tail, i - 1, DefaultType>::Result Result;
+    TypeAtNonStrict < Tail, i - 1, DefaultType >::Result Result;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +212,7 @@ template <> struct Append<NullType, NullType>
 
 template <class T> struct Append<NullType, T>
 {
-    typedef Typelist<T,NullType> Result;
+    typedef Typelist<T, NullType> Result;
 };
 
 template <class Head, class Tail>
@@ -224,8 +224,8 @@ struct Append<NullType, Typelist<Head, Tail> >
 template <class Head, class Tail, class T>
 struct Append<Typelist<Head, Tail>, T>
 {
-    typedef Typelist<Head,
-            typename Append<Tail, T>::Result>
+    typedef Typelist < Head,
+            typename Append<Tail, T>::Result >
             Result;
 };
 
@@ -254,8 +254,8 @@ struct Erase<Typelist<T, Tail>, T>
 template <class Head, class Tail, class T> // Specialization 3
 struct Erase<Typelist<Head, Tail>, T>
 {
-    typedef Typelist<Head,
-            typename Erase<Tail, T>::Result>
+    typedef Typelist < Head,
+            typename Erase<Tail, T>::Result >
             Result;
 };
 
@@ -283,8 +283,8 @@ template <class Head, class Tail, class T>
 struct EraseAll<Typelist<Head, Tail>, T>
 {
     // Go all the way down the list removing the type
-    typedef Typelist<Head,
-            typename EraseAll<Tail, T>::Result>
+    typedef Typelist < Head,
+            typename EraseAll<Tail, T>::Result >
             Result;
 };
 
@@ -337,8 +337,8 @@ struct Replace<Typelist<T, Tail>, T, U>
 template <class Head, class Tail, class T, class U>
 struct Replace<Typelist<Head, Tail>, T, U>
 {
-    typedef Typelist<Head,
-            typename Replace<Tail, T, U>::Result>
+    typedef Typelist < Head,
+            typename Replace<Tail, T, U>::Result >
             Result;
 };
 
@@ -367,8 +367,8 @@ struct ReplaceAll<Typelist<T, Tail>, T, U>
 template <class Head, class Tail, class T, class U>
 struct ReplaceAll<Typelist<Head, Tail>, T, U>
 {
-    typedef Typelist<Head,
-            typename ReplaceAll<Tail, T, U>::Result>
+    typedef Typelist < Head,
+            typename ReplaceAll<Tail, T, U>::Result >
             Result;
 };
 
@@ -391,8 +391,8 @@ struct Reverse<NullType>
 template <class Head, class Tail>
 struct Reverse< Typelist<Head, Tail> >
 {
-    typedef typename Append<
-    typename Reverse<Tail>::Result, Head>::Result Result;
+    typedef typename Append <
+    typename Reverse<Tail>::Result, Head >::Result Result;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -417,9 +417,9 @@ struct MostDerived<Typelist<Head, Tail>, T>
 private:
     typedef typename MostDerived<Tail, T>::Result Candidate;
 public:
-    typedef typename Select<
-    SuperSubclass<Candidate,Head>::value,
-                  Head, Candidate>::Result Result;
+    typedef typename Select <
+    SuperSubclass<Candidate, Head>::value,
+                  Head, Candidate >::Result Result;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -444,8 +444,8 @@ struct DerivedToFront< Typelist<Head, Tail> >
 private:
     typedef typename MostDerived<Tail, Head>::Result
     TheMostDerived;
-    typedef typename Replace<Tail,
-            TheMostDerived, Head>::Result Temp;
+    typedef typename Replace < Tail,
+            TheMostDerived, Head >::Result Temp;
     typedef typename DerivedToFront<Temp>::Result L;
 public:
     typedef Typelist<TheMostDerived, L> Result;

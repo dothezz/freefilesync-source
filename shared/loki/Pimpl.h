@@ -101,7 +101,7 @@ public:
 
     T& operator*()
     {
-        return ptr_.operator*();
+        return ptr_.operator * ();
     }
 
     const T* operator->() const
@@ -111,7 +111,7 @@ public:
 
     const T& operator*() const
     {
-        return ptr_.operator*();
+        return ptr_.operator * ();
     }
 
     Pointer& wrapped()
@@ -136,7 +136,7 @@ private:
 template<class T, typename Pointer = ConstPropPtr<T> >
 struct PimplOwner
 {
-    Pimpl<T,Pointer> LOKI_INHERITED_PIMPL_NAME;
+    Pimpl<T, Pointer> LOKI_INHERITED_PIMPL_NAME;
 };
 
 

@@ -7,7 +7,9 @@
 #ifndef DLLLOADER_H_INCLUDED
 #define DLLLOADER_H_INCLUDED
 
+#include <memory>
 #include <string>
+#include "loki\ScopeGuard.h"
 
 #ifdef __WXMSW__ //we have wxWidgets
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -20,13 +22,35 @@
 
 namespace util
 {
-
 /*
-load function from a DLL library, e.g. from kernel32.dll
-NOTE: you're allowed to take a static reference to the return value! :)
+Manage DLL function and library ownership
+   - thread safety: like built-in type
+   - full value semantics
+
+ Usage:
+      typedef BOOL (WINAPI *IsWow64ProcessFun)(HANDLE hProcess, PBOOL Wow64Process);
+      const util::DllFun<IsWow64ProcessFun> isWow64Process(L"kernel32.dll", "IsWow64Process");
+      if (isWow64Process)
 */
-template <typename FunctionType>
-FunctionType getDllFun(const std::wstring& libraryName, const std::string& functionName);
+
+template <class Func>
+class DllFun
+{
+public:
+    DllFun() : fun(NULL) {}
+
+    DllFun(const wchar_t* libraryName, const char* functionName) :
+        hLibRef(new HMODULE(::LoadLibrary(libraryName)), deleter),
+        fun(*hLibRef ? reinterpret_cast<Func>(::GetProcAddress(*hLibRef, functionName)) : NULL) {}
+
+    operator Func() const { return fun; }
+
+private:
+    static void deleter(HMODULE* ptr) { if (*ptr) ::FreeLibrary(*ptr); delete ptr; }
+
+    std::shared_ptr<HMODULE> hLibRef;
+    Func fun;
+};
 
 /*
 extract binary resources from .exe/.dll:
@@ -48,13 +72,38 @@ std::string getResourceStream(const std::wstring& libraryName, size_t resourceId
 
 
 
-//---------------Inline Implementation---------------------------------------------------
-FARPROC loadSymbol(const std::wstring& libraryName, const std::string& functionName);
 
-template <typename FunctionType> inline
-FunctionType getDllFun(const std::wstring& libraryName, const std::string& functionName)
+
+
+
+
+
+//---------------Inline Implementation---------------------------------------------------
+inline
+std::string getResourceStream(const wchar_t* libraryName, size_t resourceId)
 {
-    return reinterpret_cast<FunctionType>(loadSymbol(libraryName, functionName));
+    std::string output;
+    HMODULE module = ::LoadLibrary(libraryName);
+    if (module)
+    {
+        LOKI_ON_BLOCK_EXIT2(::FreeLibrary(module));
+
+        const HRSRC res = ::FindResource(module, MAKEINTRESOURCE(resourceId), RT_RCDATA);
+        if (res != NULL)
+        {
+            const HGLOBAL resHandle = ::LoadResource(module, res);
+            if (resHandle != NULL)
+            {
+                const char* stream = static_cast<const char*>(::LockResource(resHandle));
+                if (stream)
+                {
+                    const DWORD streamSize = ::SizeofResource(module, res);
+                    output.assign(stream, streamSize);
+                }
+            }
+        }
+    }
+    return output;
 }
 }
 

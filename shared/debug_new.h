@@ -21,7 +21,7 @@ Usage:
 - Include everywhere before any other file: $(ProjectDir)\shared\debug_new.h
 For Minidumps:
 - Compile "debug_new.cpp"
-- Compile in Debug build (need Symbols and less restrictive Optimization)
+- Compile with debugging symbols and optimization deactivated
 */
 
 namespace mem_check

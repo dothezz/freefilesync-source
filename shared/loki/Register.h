@@ -113,18 +113,18 @@ struct UnRegisterOnDeleteSet
 #define LOKI_CONCAT(a,b,c,d) LOKI_CONCATE(a,b,c,d)
 
 #define LOKI_CHECK_CLASS_IN_LIST( CLASS , LIST )                                \
-                                                                                \
+    \
     struct LOKI_CONCAT(check_,CLASS,_isInList_,LIST)                            \
     {                                                                           \
         typedef int LOKI_CONCAT(ERROR_class_,CLASS,_isNotInList_,LIST);         \
     };                                                                          \
     typedef Loki::Select<Loki::TL::IndexOf<LIST, CLASS>::value == -1,           \
-                        CLASS,                                                  \
-                        LOKI_CONCAT(check_,CLASS,_isInList_,LIST)>              \
-                        ::Result LOKI_CONCAT(CLASS,isInList,LIST,result);       \
+    CLASS,                                                  \
+    LOKI_CONCAT(check_,CLASS,_isInList_,LIST)>              \
+    ::Result LOKI_CONCAT(CLASS,isInList,LIST,result);       \
     typedef LOKI_CONCAT(CLASS,isInList,LIST,result)::                           \
-                        LOKI_CONCAT(ERROR_class_,CLASS,_isNotInList_,LIST)      \
-                        LOKI_CONCAT(ERROR_class_,CLASS,_isNotInList__,LIST);
+    LOKI_CONCAT(ERROR_class_,CLASS,_isNotInList_,LIST)      \
+    LOKI_CONCAT(ERROR_class_,CLASS,_isNotInList__,LIST);
 
 
 } // namespace Loki

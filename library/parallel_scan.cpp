@@ -12,7 +12,6 @@
 #include "../shared/file_traverser.h"
 #include "../shared/file_error.h"
 #include "../shared/string_conv.h"
-#include "../shared/check_exist.h"
 #include "../shared/boost_thread_wrap.h" //include <boost/thread.hpp>
 #include "loki/ScopeGuard.h"
 //#include "../shared/file_id.h"
@@ -96,15 +95,13 @@ DiskInfo retrieveDiskInfo(const Zstring& pathName)
     HANDLE hVolume = ::CreateFile(volnameFmt.c_str(),
                                   0,
                                   FILE_SHARE_READ | FILE_SHARE_WRITE,
-                                  NULL,
+                                  0,
                                   OPEN_EXISTING,
                                   0,
                                   NULL);
     if (hVolume == INVALID_HANDLE_VALUE)
         return output;
-
-    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hVolume);
-    (void)dummy; //silence warning "unused variable"
+    LOKI_ON_BLOCK_EXIT2(::CloseHandle(hVolume));
 
     std::vector<char> buffer(sizeof(VOLUME_DISK_EXTENTS) + sizeof(DISK_EXTENT)); //reserve buffer for at most one disk! call below will then fail if volume spans multiple disks!
 
@@ -196,19 +193,22 @@ public:
     FillBufferCallback::HandleError reportError(const std::wstring& msg) //blocking call: context of worker thread
     {
         boost::unique_lock<boost::mutex> dummy(lockErrorMsg);
-        while(!errorMsg.empty() || errorResponse.get())
+        while (!errorMsg.empty() || errorResponse.get())
             conditionCanReportError.timed_wait(dummy, boost::posix_time::milliseconds(50)); //interruption point!
 
         errorMsg = BasicWString(msg);
 
-        while(!errorResponse.get())
+        while (!errorResponse.get())
             conditionGotResponse.timed_wait(dummy, boost::posix_time::milliseconds(50)); //interruption point!
 
         FillBufferCallback::HandleError rv = *errorResponse;
 
         errorMsg.clear();
         errorResponse.reset();
+
+        //dummy.unlock();
         conditionCanReportError.notify_one();
+
         return rv;
     }
 
@@ -219,6 +219,8 @@ public:
         {
             FillBufferCallback::HandleError rv = callback.reportError(cvrtString<std::wstring>(errorMsg)); //throw!
             errorResponse.reset(new FillBufferCallback::HandleError(rv));
+
+            //dummy.unlock();
             conditionGotResponse.notify_one();
         }
     }
@@ -324,7 +326,6 @@ public:
     const HardFilter::FilterRef filterInstance; //always bound!
 
     std::set<Zstring>& failedReads_; //relative postfixed names of directories that could not be read (empty for root)
-    std::set<DirContainer*> excludedDirs;
 
     AsyncCallback& acb_;
     int threadID_;
@@ -428,14 +429,12 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const Zchar* shortName, const 
     bool subObjMightMatch = true;
     const bool passFilter = cfg.filterInstance->passDirFilter(relName, &subObjMightMatch);
     if (!passFilter && !subObjMightMatch)
-            return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //do NOT traverse subdirs
-        //else: attention! ensure directory filtering is applied later to exclude actually filtered directories
+        return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //do NOT traverse subdirs
+    //else: attention! ensure directory filtering is applied later to exclude actually filtered directories
 
     DirContainer& subDir = output_.addSubDir(shortName);
     if (passFilter)
-		cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
-	else 
-        cfg.excludedDirs.insert(&subDir);
+        cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 
     TraverserShared::CallbackPointer subDirCallback = std::make_shared<DirCallback>(cfg, relName + FILE_NAME_SEPARATOR, subDir);
     cfg.callBackBox.push_back(subDirCallback); //handle lifetime
@@ -484,38 +483,6 @@ private:
 #endif
 //------------------------------------------------------------------------------------------
 
-template <class M, class Predicate> inline
-void map_remove_if(M& map, Predicate p)
-{
-    for (auto iter = map.begin(); iter != map.end();)
-        if (p(*iter))
-            map.erase(iter++);
-        else
-            ++iter;
-}
-
-void removeFilteredDirs(DirContainer& dirCont, const std::set<DirContainer*>& excludedDirs)
-{
-    //process subdirs recursively
-    std::for_each(dirCont.dirs.begin(), dirCont.dirs.end(),
-                  [&](std::pair<const Zstring, DirContainer>& item)
-    {
-        removeFilteredDirs(item.second, excludedDirs);
-    });
-
-    //remove superfluous directories
-    map_remove_if(dirCont.dirs,
-                  [&](std::pair<const Zstring, DirContainer>& item) -> bool
-    {
-        DirContainer& subDir = item.second;
-        return
-        subDir.dirs .empty() &&
-        subDir.files.empty() &&
-        subDir.links.empty() &&
-        excludedDirs.find(&subDir) != excludedDirs.end();
-    });
-}
-
 
 class WorkerThread
 {
@@ -530,8 +497,7 @@ public:
     void operator()() //thread entry
     {
         acb_->incActiveWorker();
-        Loki::ScopeGuard dummy = Loki::MakeGuard([&]() { acb_->decActiveWorker(); });
-        (void)dummy;
+        LOKI_ON_BLOCK_EXIT2(acb_->decActiveWorker(););
 
         std::for_each(workload_.begin(), workload_.end(),
                       [&](std::pair<DirectoryKey, DirectoryValue*>& item)
@@ -539,50 +505,40 @@ public:
             const Zstring& directoryName = item.first.dirnameFull_;
             DirectoryValue& dirVal = *item.second;
 
-            acb_->reportCurrentFile(directoryName, threadID_); //just in case directory existence check is blocking!
+            acb_->reportCurrentFile(directoryName, threadID_); //just in case first directory access is blocking
 
-            if (!directoryName.empty() &&
-                util::dirExistsAsync(directoryName).get()) //blocking + interruption point!
-                //folder existence already checked in startCompareProcess(): do not treat as error when arriving here!
-                //perf note: missing network drives should not delay here, as Windows buffers result of last existence check for a short time
+            TraverserShared travCfg(threadID_,
+                                    item.first.handleSymlinks_, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
+                                    item.first.filter_,
+                                    dirVal.failedReads,
+                                    *acb_);
+
+            DirCallback traverser(travCfg,
+                                  Zstring(),
+                                  dirVal.dirCont);
+
+            bool followSymlinks = false;
+            switch (item.first.handleSymlinks_)
             {
-                TraverserShared travCfg(threadID_,
-                                        item.first.handleSymlinks_, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
-                                        item.first.filter_,
-                                        dirVal.failedReads,
-                                        *acb_);
+                case SYMLINK_IGNORE:
+                    followSymlinks = false; //=> symlinks will be reported via onSymlink() where they are excluded
+                    break;
+                case SYMLINK_USE_DIRECTLY:
+                    followSymlinks = false;
+                    break;
+                case SYMLINK_FOLLOW_LINK:
+                    followSymlinks = true;
+                    break;
+            }
 
-                DirCallback traverser(travCfg,
-                                      Zstring(),
-                                      dirVal.dirCont);
-
-                bool followSymlinks = false;
-                switch (item.first.handleSymlinks_)
-                {
-                    case SYMLINK_IGNORE:
-                        followSymlinks = false; //=> symlinks will be reported via onSymlink() where they are excluded
-                        break;
-                    case SYMLINK_USE_DIRECTLY:
-                        followSymlinks = false;
-                        break;
-                    case SYMLINK_FOLLOW_LINK:
-                        followSymlinks = true;
-                        break;
-                }
-
-                DstHackCallback* dstCallbackPtr = NULL;
+            DstHackCallback* dstCallbackPtr = NULL;
 #ifdef FFS_WIN
-                DstHackCallbackImpl dstCallback(*acb_, threadID_);
-                dstCallbackPtr = &dstCallback;
+            DstHackCallbackImpl dstCallback(*acb_, threadID_);
+            dstCallbackPtr = &dstCallback;
 #endif
 
-                //get all files and folders from directoryPostfixed (and subdirectories)
-                traverseFolder(directoryName, followSymlinks, traverser, dstCallbackPtr); //exceptions may be thrown!
-
-                //attention: some filtered directories are still in the comparison result! (see include filter handling!)
-                if (!travCfg.excludedDirs.empty())
-                    removeFilteredDirs(dirVal.dirCont, travCfg.excludedDirs); //remove all excluded directories (but keeps those serving as parent folders for not excl. elements)
-            }
+            //get all files and folders from directoryPostfixed (and subdirectories)
+            traverseFolder(directoryName, followSymlinks, traverser, dstCallbackPtr); //exceptions may be thrown!
         });
     }
 

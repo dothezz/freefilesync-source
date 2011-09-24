@@ -45,7 +45,7 @@ bool operator<(const DirectoryKey& lhs, const DirectoryKey& rhs)
 struct DirectoryValue
 {
     DirContainer dirCont;
-    std::set<Zstring> failedReads; //relative postfixed names of directories that could not be read (empty for root), e.g. access denied, or temporal network drop
+    std::set<Zstring> failedReads; //relative postfixed names of directories that could not be read (empty string for root), e.g. access denied, or temporal network drop
 };
 
 

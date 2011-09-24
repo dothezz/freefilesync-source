@@ -6,9 +6,7 @@
 
 #include "xml_ffs.h"
 #include "../shared/standard_paths.h"
-#include "../shared/global_func.h"
 #include "../shared/zstring.h"
-//#include "functions.h"
 #include "../shared/xml_base.h"
 #include "../shared/string_conv.h"
 
@@ -30,7 +28,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 
     //additional folders
     std::for_each(batchCfg.mainCfg.additionalPairs.begin(), batchCfg.mainCfg.additionalPairs.end(),
-                  [&](const FolderPairEnh& fp)
+                  [&](const FolderPairEnh & fp)
     {
         uniqueFolders.insert(fp.leftDirectory);
         uniqueFolders.insert(fp.rightDirectory);
@@ -40,7 +38,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 
     output.directories.clear();
     std::transform(uniqueFolders.begin(), uniqueFolders.end(), std::back_inserter(output.directories),
-    [](const Zstring& fn) { return toWx(fn); });
+    [](const Zstring & fn) { return toWx(fn); });
 
     output.commandline = wxT("\"") + zen::getLauncher() + wxT("\"") +
                          wxT(" \"") + filename + wxT("\"");

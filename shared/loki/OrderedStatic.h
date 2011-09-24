@@ -76,8 +76,8 @@ protected:
 
     void SetLongevity(T* ptr)
     {
-        val_=ptr;
-        Loki::SetLongevity(val_,longevity_);
+        val_ = ptr;
+        Loki::SetLongevity(val_, longevity_);
     }
 
 private:
@@ -102,7 +102,7 @@ public:
     typedef void (OrderedStaticCreatorFunc::*Creator)();
 
     void createObjects();
-    void registerObject(unsigned int longevity,OrderedStaticCreatorFunc*,Creator);
+    void registerObject(unsigned int longevity, OrderedStaticCreatorFunc*, Creator);
 
 private:
     OrderedStaticManagerClass(const OrderedStaticManagerClass&);
@@ -110,7 +110,7 @@ private:
 
     struct Data
     {
-        Data(unsigned int,OrderedStaticCreatorFunc*, Creator);
+        Data(unsigned int, OrderedStaticCreatorFunc*, Creator);
         unsigned int longevity;
         OrderedStaticCreatorFunc* object;
         Creator creator;
@@ -158,7 +158,7 @@ public:
     OrderedStatic() : Private::OrderedStaticBase<T>(L)
     {
         OrderedStaticManager::Instance().registerObject
-        (L,this,&Private::OrderedStaticCreatorFunc::createObject);
+        (L, this, &Private::OrderedStaticCreatorFunc::createObject);
     }
 
     void createObject()
@@ -178,7 +178,7 @@ public:
     OrderedStatic(P1 p) : Private::OrderedStaticBase<T>(L), para_(p)
     {
         OrderedStaticManager::Instance().registerObject
-        (L,this,&Private::OrderedStaticCreatorFunc::createObject);
+        (L, this, &Private::OrderedStaticCreatorFunc::createObject);
     }
 
     void createObject()
@@ -203,7 +203,7 @@ public:
     OrderedStatic(Func p) : Private::OrderedStaticBase<T>(L), para_(p)
     {
         OrderedStaticManager::Instance().registerObject
-        (L,this,&Private::OrderedStaticCreatorFunc::createObject);
+        (L, this, &Private::OrderedStaticCreatorFunc::createObject);
     }
 
     void createObject()

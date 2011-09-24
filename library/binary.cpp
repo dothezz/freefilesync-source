@@ -38,10 +38,7 @@ public:
             bufSize /= 2;
     }
 
-    operator size_t() const
-    {
-        return bufSize;
-    }
+    operator size_t() const { return bufSize; }
 
 private:
     static const size_t BUFFER_SIZE_MIN   =       128 * 1024;
@@ -69,13 +66,15 @@ private:
 
 bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback)
 {
-    FileInput file1(filename1); //throw (FileError)
-    FileInput file2(filename2); //throw (FileError)
+    FileInput file1(filename1); //throw FileError
+    FileInput file2(filename2); //throw FileError
 
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf1;
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf2;
-    if (!cpyBuf1.get()) cpyBuf1.reset(new std::vector<char>());
-    if (!cpyBuf2.get()) cpyBuf2.reset(new std::vector<char>());
+    if (!cpyBuf1.get())
+        cpyBuf1.reset(new std::vector<char>());
+    if (!cpyBuf2.get())
+        cpyBuf2.reset(new std::vector<char>());
 
     std::vector<char>& memory1 = *cpyBuf1;
     std::vector<char>& memory2 = *cpyBuf2;

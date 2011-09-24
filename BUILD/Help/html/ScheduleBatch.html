@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20110830;15010600">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "MS Mincho" }
+		H3.ctl { font-family: "Mangal" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Schedule Batch
+Job</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Create
+	a new batch job via FreeFileSync's main
+	dialog:<BR></FONT><FONT FACE="Tahoma, sans-serif"><I>Menu-&gt;Advanced-&gt;Create
+	batch job</I></FONT> <FONT FACE="Tahoma, sans-serif">and save it,
+	for example, as &quot;</FONT><FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">&quot;.<BR>&nbsp;</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Enable
+	checkbox &quot;<I>Run miminized</I>&quot; to avoid blocking while
+	showing a status dialog at the end of the process.<BR><IMG SRC="RunMinimized.png" NAME="Grafik3" ALIGN=BOTTOM WIDTH=709 HEIGHT=332 BORDER=0></FONT></P>
+	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
+	order to prevent error or warning popup messages from stopping
+	progress, set &quot;<I>Error handling</I>&quot; to either &quot;<I>Ignore
+	errors</I>&quot; or &quot;<I>Exit instantly</I>&quot;.<BR><IMG SRC="ErrorHandling.png" NAME="Grafik4" ALIGN=BOTTOM WIDTH=313 HEIGHT=331 BORDER=0></FONT></P>
+	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Setup
+	your operating system's scheduler</FONT></P>
+</OL>
+<OL>
+	<OL TYPE=A>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Windows
+		7 Task Scheduler:</B></FONT></P>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Go
+			to Start and e</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><FONT SIZE=3><SPAN STYLE="font-weight: normal">nter
+			</SPAN></FONT></FONT><FONT FACE="Courier New, monospace"><FONT SIZE=3><SPAN STYLE="font-weight: normal">&quot;</SPAN></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><FONT SIZE=3><SPAN STYLE="font-weight: normal">taskschd.msc&quot;</SPAN></FONT></FONT></FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT COLOR="#000000"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=3>Create
+			a new basic task and follow the wizard.</FONT></FONT></FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT COLOR="#000000"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=3>Make
+			&quot;Program/script&quot; point to the location of
+			FreeFileSync.exe and specify the ffs_batch file under &quot;Add
+			arguments&quot;.</FONT></FONT></FONT></P>
+		</UL>
+	</OL>
+</OL>
+<OL>
+	<OL TYPE=A>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif"><FONT COLOR="#000000"><FONT SIZE=3>Use
+			quotes if any paths contain spaces, e.g.: </FONT></FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><FONT SIZE=3>&quot;C:\some
+			folder\SyncJob.ffs_batch&quot;</FONT></FONT></FONT><FONT COLOR="#000000"><FONT SIZE=3><BR></FONT></FONT><IMG SRC="win7scheduler.png" NAME="Grafik1" ALIGN=BOTTOM WIDTH=708 HEIGHT=321 BORDER=0><BR>&nbsp;</FONT></P>
+		</UL>
+	</OL>
+</OL>
+<OL>
+	<OL TYPE=A START=2>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Windows
+		XP Scheduled Tasks:</B></FONT></P>
+		<UL>
+			<LI VALUE=1><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Go
+			to <I>Start &rarr; Control Panel &rarr; Scheduled Tasks</I> and
+			select &quot;<I>Add Scheduled Task</I>&quot;.</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Follow
+			the wizard and select FreeFileSync.exe as program to run.</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif">Make
+			sure &quot;Run:&quot; is specified as: <FONT FACE="Courier New, monospace">&lt;FreeFileSync
+			installation directory&gt;\FreeFileSync.exe &lt;ffs_batch
+			file&gt;</FONT><BR><IMG SRC="ScheduleBatch_html_m10bf0d36.gif" NAME="Grafik2" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0><BR>&nbsp;</FONT></P>
+		</UL>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Ubuntu
+		Linux Gnome-schedule:</B></FONT></P>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif">Install
+			Gnome-schedule, if necessary: <FONT FACE="Courier New, monospace">sudo
+			apt-get install gnome-schedule</FONT></FONT></P>
+		</UL>
+	</OL>
+</OL>
+<OL>
+	<OL TYPE=A START=2>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Go
+			to </SPAN></FONT><FONT FACE="Tahoma, sans-serif"><I>System -&gt;
+			Preferences -&gt; Scheduled tasks</I></FONT></P>
+		</UL>
+	</OL>
+</OL>
+<OL>
+	<OL TYPE=A START=2>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">Specify
+			the command as:</SPAN></SPAN></FONT> <FONT FACE="Courier New, monospace"><I><SPAN STYLE="font-weight: normal">&lt;FreeFileSync
+			installation directory&gt;\FreeFileSync &lt;ffs_batch file&gt;<BR></SPAN></I></FONT><IMG SRC="ubuntuScheduler.png" NAME="Grafik5" ALIGN=BOTTOM WIDTH=629 HEIGHT=560 BORDER=0></P>
+		</UL>
+	</OL>
+</OL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT><FONT FACE="Tahoma, sans-serif"><BR>Beginning
+	with Windows Vista, the command always needs to start with the path
+	to &quot;FreeFileSync.exe&quot; even if file associations are set!</FONT>
+	<FONT FACE="Tahoma, sans-serif">Else the task will return with error
+	code 0xC1, &quot;%1 is not a valid Win32 application&quot;.</FONT></P>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+</BODY>
+</HTML>

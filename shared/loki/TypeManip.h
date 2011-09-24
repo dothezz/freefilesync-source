@@ -83,7 +83,7 @@ struct IsSameType
 };
 
 template <typename T>
-struct IsSameType<T,T>
+struct IsSameType<T, T>
 {
     enum { value = true };
 };
@@ -215,7 +215,7 @@ struct SuperSubclass<T, void>
 // Caveat: might not work if T and U are in a private inheritance hierarchy.
 ////////////////////////////////////////////////////////////////////////////////
 
-template<class T,class U>
+template<class T, class U>
 struct SuperSubclassStrict
 {
     enum { value = (::Loki::Conversion<const volatile U*, const volatile T*>::exists &&

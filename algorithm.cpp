@@ -7,13 +7,12 @@
 #include "algorithm.h"
 #include <iterator>
 #include <stdexcept>
-#include <wx/log.h>
+//#include <wx/log.h>
 #include "library/resources.h"
 #include "shared/file_handling.h"
 #include "shared/recycler.h"
 #include <wx/msgdlg.h>
 #include "library/norm_filter.h"
-#include <boost/bind.hpp>
 #include "shared/string_conv.h"
 #include "shared/global_func.h"
 #include "shared/i18n.h"
@@ -21,14 +20,16 @@
 #include "library/db_file.h"
 #include "shared/loki/ScopeGuard.h"
 #include "library/cmp_filetime.h"
+#include "shared/stl_tools.h"
 #include "library/norm_filter.h"
 
 using namespace zen;
+using namespace std::rel_ops;
 
 
 void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
-    std::for_each(folderCmp.begin(), folderCmp.end(), boost::bind(&BaseDirMapping::swap, _1));
+    std::for_each(begin(folderCmp), end(folderCmp), std::mem_fun_ref(&BaseDirMapping::flip));
     redetermineSyncDirection(config, folderCmp, NULL);
 }
 
@@ -41,46 +42,10 @@ public:
 
     void execute(HierarchyObject& hierObj) const
     {
-        util::ProxyForEach<const Redetermine> prx(*this); //grant std::for_each access to private parts of this class
-
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //process files
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //process links
-        std::for_each(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), prx); //process directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
     }
-
-    /*
-        void execute2(FileSystemObject& fsObj) const
-        {
-            struct RedetermineObject : public FSObjectVisitor
-            {
-                RedetermineObject(const Redetermine& parent,
-                                  FileSystemObject& fsObject) : parent_(parent), fsObj_(fsObject) {}
-
-                virtual void visit(const FileMapping& fileObj)
-                {
-                    parent_(static_cast<FileMapping&>(fsObj_));
-                }
-
-                virtual void visit(const SymLinkMapping& linkObj)
-                {
-                    parent_(static_cast<SymLinkMapping&>(fsObj_));
-                }
-
-                virtual void visit(const DirMapping& dirObj)
-                {
-                    parent_(static_cast<DirMapping&>(fsObj_));
-                }
-
-            private:
-                const Redetermine& parent_;
-                FileSystemObject& fsObj_; //hack
-            } redetObj(*this, fsObj);
-            fsObj.accept(redetObj);
-        }
-    */
-
-private:
-    friend class util::ProxyForEach<const Redetermine>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void operator()(FileMapping& fileObj) const
     {
@@ -108,7 +73,10 @@ private:
                 fileObj.setSyncDir(dirCfg.different);
                 break;
             case FILE_CONFLICT:
-                fileObj.setSyncDir(dirCfg.conflict);
+                if (dirCfg.conflict == SYNC_DIR_NONE)
+                    fileObj.setSyncDirConflict(fileObj.getCatConflict()); //take over category conflict
+                else
+                    fileObj.setSyncDir(dirCfg.conflict);
                 break;
             case FILE_EQUAL:
                 fileObj.setSyncDir(SYNC_DIR_NONE);
@@ -136,7 +104,10 @@ private:
                 linkObj.setSyncDir(dirCfg.rightNewer);
                 break;
             case SYMLINK_CONFLICT:
-                linkObj.setSyncDir(dirCfg.conflict);
+                if (dirCfg.conflict == SYNC_DIR_NONE)
+                    linkObj.setSyncDirConflict(linkObj.getCatConflict()); //take over category conflict
+                else
+                    linkObj.setSyncDir(dirCfg.conflict);
                 break;
             case SYMLINK_DIFFERENT:
                 linkObj.setSyncDir(dirCfg.different);
@@ -173,56 +144,51 @@ private:
         execute(dirObj);
     }
 
+private:
     const DirectionSet dirCfg;
 };
 
 
 //---------------------------------------------------------------------------------------------------------------
-class FindNonEqual //test if non-equal items exist in scanned data
+class HaveNonEqual //test if non-equal items exist in scanned data
 {
 public:
-    bool findNonEqual(const HierarchyObject& hierObj) const
+    bool operator()(const HierarchyObject& hierObj) const
     {
-        return std::find_if(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), *this) != hierObj.refSubFiles().end()  || //files
-               std::find_if(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), *this) != hierObj.refSubLinks(). end() || //symlinks
-               std::find_if(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), *this) != hierObj.refSubDirs(). end();    //directories
-    }
+        return std::find_if(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
+                            [](const FileMapping& fileObj)
+        {
+            return fileObj.getCategory() != FILE_EQUAL;
+        }) != hierObj.refSubFiles().end() || //files
 
-    //logical private! => __find_if (used by std::find_if) needs public access
-    bool operator()(const FileMapping& fileObj) const
-    {
-        return fileObj.getCategory() != FILE_EQUAL;
-    }
+               std::find_if(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
+                            [](const SymLinkMapping& linkObj)
+        {
+            return linkObj.getLinkCategory() != SYMLINK_EQUAL;
+        }) != hierObj.refSubLinks().end() || //symlinks
 
-    bool operator()(const SymLinkMapping& linkObj) const
-    {
-        return linkObj.getLinkCategory() != SYMLINK_EQUAL;
-    }
-
-    bool operator()(const DirMapping& dirObj) const
-    {
-        if (dirObj.getDirCategory() != DIR_EQUAL)
-            return true;
-
-        return findNonEqual(dirObj); //recursion
+               std::find_if(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(),
+                            [](const DirMapping& dirObj) -> bool
+        {
+            if (dirObj.getDirCategory() != DIR_EQUAL)
+                return true;
+            return HaveNonEqual()(dirObj); //recursion
+        }) != hierObj.refSubDirs ().end();    //directories
     }
 };
 
-
-struct AllElementsEqual : public std::unary_function<BaseDirMapping, bool>
+bool allElementsEqual(const BaseDirMapping& baseMap)
 {
-    bool operator()(const BaseDirMapping& baseMapping) const
-    {
-        return !FindNonEqual().findNonEqual(baseMapping);
-    }
-};
+    return !HaveNonEqual()(baseMap);
+}
 
 
 bool zen::allElementsEqual(const FolderComparison& folderCmp)
 {
-    return std::find_if(folderCmp.begin(), folderCmp.end(), std::not1(AllElementsEqual())) == folderCmp.end();
+    return std::find_if(begin(folderCmp), end(folderCmp), HaveNonEqual()) == end(folderCmp);
 }
 //---------------------------------------------------------------------------------------------------------------
+
 
 class DataSetFile
 {
@@ -246,28 +212,23 @@ public:
         init<RIGHT_SIDE>(fileObj);
     }
 
-    bool operator==(const DataSetFile& other) const
+    inline friend
+    bool operator==(const DataSetFile& lhs, const DataSetFile& rhs)
     {
-        if (shortName.empty())
-            return other.shortName.empty();
+        if (lhs.shortName.empty())
+            return rhs.shortName.empty();
         else
         {
-            if (other.shortName.empty())
+            if (rhs.shortName.empty())
                 return false;
             else
             {
-                return shortName == other.shortName && //detect changes in case (windows)
+                return lhs.shortName == rhs.shortName && //detect changes in case (windows)
                        //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
-                       sameFileTime(lastWriteTime, other.lastWriteTime, 2) &&
-                       fileSize == other.fileSize;
+                       sameFileTime(lhs.lastWriteTime, rhs.lastWriteTime, 2) &&
+                       lhs.fileSize == rhs.fileSize;
             }
         }
-    }
-
-    template <class T>
-    bool operator!=(const T& other) const
-    {
-        return !(*this == other);
     }
 
 private:
@@ -282,7 +243,7 @@ private:
         }
     }
 
-    Zstring      shortName;     //empty if object not existing
+    Zstring     shortName;     //empty if object not existing
     zen::Int64  lastWriteTime;
     zen::UInt64 fileSize;
 };
@@ -318,31 +279,26 @@ public:
         init<RIGHT_SIDE>(linkObj);
     }
 
-    bool operator==(const DataSetSymlink& other) const
+    inline friend
+    bool operator==(const DataSetSymlink& lhs, const DataSetSymlink& rhs)
     {
-        if (shortName.empty()) //test if object is existing at all
-            return other.shortName.empty();
+        if (lhs.shortName.empty()) //test if object is existing at all
+            return rhs.shortName.empty();
         else
         {
-            if (other.shortName.empty())
+            if (rhs.shortName.empty())
                 return false;
             else
             {
-                return shortName == other.shortName &&
+                return lhs.shortName == rhs.shortName &&
                        //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
-                       sameFileTime(lastWriteTime, other.lastWriteTime, 2) &&
+                       sameFileTime(lhs.lastWriteTime, rhs.lastWriteTime, 2) &&
 #ifdef FFS_WIN //comparison of symbolic link type is relevant for Windows only
-                       type == other.type &&
+                       lhs.type == rhs.type &&
 #endif
-                       targetPath == other.targetPath;
+                       lhs.targetPath == rhs.targetPath;
             }
         }
-    }
-
-    template <class T>
-    bool operator!=(const T& other) const
-    {
-        return !(*this == other);
     }
 
 private:
@@ -371,9 +327,9 @@ private:
     LinkDescriptor::LinkType type;
 #endif
 };
-
-
 //--------------------------------------------------------------------
+
+
 class DataSetDir
 {
 public:
@@ -388,23 +344,17 @@ public:
     DataSetDir(const DirMapping& dirObj, Loki::Int2Type<RIGHT_SIDE>) :
         shortName(dirObj.getShortName<RIGHT_SIDE>()) {}
 
-    bool operator==(const DataSetDir& other) const
+    inline friend
+    bool operator==(const DataSetDir& lhs, const DataSetDir& rhs)
     {
-        return shortName == other.shortName;
-    }
-
-    template <class T>
-    bool operator!=(const T& other) const
-    {
-        return !(*this == other);
+        return lhs.shortName == rhs.shortName;
     }
 
 private:
     Zstring shortName; //empty if object not existing
 };
-
-
 //--------------------------------------------------------------------------------------------------------
+
 DataSetFile retrieveDataSetFile(const Zstring& objShortName, const DirContainer* dbDirectory)
 {
     if (dbDirectory)
@@ -442,114 +392,6 @@ std::pair<DataSetDir, const DirContainer*> retrieveDataSetDir(const Zstring& obj
     return std::make_pair(DataSetDir(), static_cast<const DirContainer*>(NULL)); //object not found
 }
 
-
-//--------------------------------------------------------------------------------------------------------
-/*
-class SetDirChangedFilter
-{
-public:
-    SetDirChangedFilter() :
-        txtFilterChanged(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("Filter settings have changed!")) {}
-
-    void execute(HierarchyObject& hierObj) const
-    {
-        util::ProxyForEach<const SetDirChangedFilter> prx(*this); //grant std::for_each access to private parts of this class
-
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //process files
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //process links
-        std::for_each(hierObj.refSubDirs().begin(),  hierObj.refSubDirs().end(),  prx); //process directories
-    }
-
-private:
-    friend class util::ProxyForEach<const SetDirChangedFilter>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
-
-    void operator()(FileMapping& fileObj) const
-    {
-        const CompareFilesResult cat = fileObj.getCategory();
-
-        if (cat == FILE_EQUAL)
-            return;
-
-        if (cat == FILE_LEFT_SIDE_ONLY)
-            fileObj.setSyncDir(SYNC_DIR_RIGHT);
-        else if (cat == FILE_RIGHT_SIDE_ONLY)
-            fileObj.setSyncDir(SYNC_DIR_LEFT);
-        else
-            fileObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
-    }
-
-    void operator()(SymLinkMapping& linkObj) const
-    {
-        const CompareSymlinkResult cat = linkObj.getLinkCategory();
-
-        if (cat == SYMLINK_EQUAL)
-            return;
-
-        if (cat == SYMLINK_LEFT_SIDE_ONLY)
-            linkObj.setSyncDir(SYNC_DIR_RIGHT);
-        else if (cat == SYMLINK_RIGHT_SIDE_ONLY)
-            linkObj.setSyncDir(SYNC_DIR_LEFT);
-        else
-            linkObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
-    }
-
-    void operator()(DirMapping& dirObj) const
-    {
-        switch (dirObj.getDirCategory())
-        {
-        case DIR_LEFT_SIDE_ONLY:
-            dirObj.setSyncDir(SYNC_DIR_RIGHT);
-            break;
-        case DIR_RIGHT_SIDE_ONLY:
-            dirObj.setSyncDir(SYNC_DIR_LEFT);
-            break;
-        case DIR_EQUAL:
-            break;
-        }
-
-        execute(dirObj); //recursion
-    }
-
-    const wxString txtFilterChanged;
-};
-*/
-
-//test whether planned deletion of a directory is in conflict with (direct!) sub-elements that are not categorized for deletion (e.g. shall be copied or are in conflict themselves)
-class FindDeleteDirConflictNonRec
-{
-public:
-    bool conflictFound(const HierarchyObject& hierObj) const
-    {
-        return std::find_if(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), *this) != hierObj.refSubFiles().end() || //files
-               std::find_if(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), *this) != hierObj.refSubLinks().end() || //symlinks
-               std::find_if(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), *this) != hierObj.refSubDirs(). end();   //directories
-    }
-
-    //logical private! => __find_if (used by std::find_if) needs public access
-    bool operator()(const FileSystemObject& fsObj) const
-    {
-        switch (fsObj.getSyncOperation())
-        {
-            case SO_CREATE_NEW_LEFT:
-            case SO_CREATE_NEW_RIGHT:
-            case SO_UNRESOLVED_CONFLICT:
-                return true;
-
-            case SO_DELETE_LEFT:
-            case SO_DELETE_RIGHT:
-            case SO_OVERWRITE_LEFT:
-            case SO_OVERWRITE_RIGHT:
-            case SO_DO_NOTHING:
-            case SO_EQUAL:
-            case SO_COPY_METADATA_TO_LEFT:
-            case SO_COPY_METADATA_TO_RIGHT:
-                ;
-        }
-        return false;
-    }
-};
-
-
 //----------------------------------------------------------------------------------------------
 class RedetermineAuto
 {
@@ -557,15 +399,12 @@ public:
     RedetermineAuto(BaseDirMapping& baseDirectory,
                     DeterminationProblem* handler) :
         txtBothSidesChanged(_("Both sides have changed since last synchronization!")),
-        txtNoSideChanged(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("No change since last synchronization!")),
-        txtFilterChanged(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("Filter settings have changed!")),
-        txtLastSyncFail(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("The file was not processed by last synchronization!")),
-        txtDirDeleteConflict(_("Planned directory deletion is in conflict with its subdirectories and -files!")),
-        //        dbFilterLeft(NULL),
-        //        dbFilterRight(NULL),
+        txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization!")),
+        txtFilterChanged(_("Cannot determine sync-direction:") + L" \n" + _("Filter settings have changed!")),
+        txtLastSyncFail (_("Cannot determine sync-direction:") + L" \n" + _("The file was not processed by last synchronization!")),
         handler_(handler)
     {
-        if (AllElementsEqual()(baseDirectory)) //nothing to do: abort and don't show any nag-screens
+        if (allElementsEqual(baseDirectory)) //nothing to do: abort and don't show any nag-screens
             return;
 
         //try to load sync-database files
@@ -642,25 +481,19 @@ private:
         }
     */
 
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
-
-
     void execute(HierarchyObject& hierObj,
                  const DirContainer* dbDirectoryLeft,
                  const DirContainer* dbDirectoryRight)
     {
-        //process files
         std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-                      boost::bind(&RedetermineAuto::processFile, this, _1, dbDirectoryLeft, dbDirectoryRight));
-        //process symbolic links
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-                      boost::bind(&RedetermineAuto::processSymlink, this, _1, dbDirectoryLeft, dbDirectoryRight));
-        //process directories
-        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
-                      boost::bind(&RedetermineAuto::processDir, this, _1, dbDirectoryLeft, dbDirectoryRight));
-    }
+        [&](FileMapping& fileMap) { processFile(fileMap, dbDirectoryLeft, dbDirectoryRight); });
 
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
+        [&](SymLinkMapping& linkMap) { processSymlink(linkMap, dbDirectoryLeft, dbDirectoryRight); });
+
+        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
+        [&](DirMapping& dirMap) { processDir(dirMap, dbDirectoryLeft, dbDirectoryRight); });
+    }
 
     void processFile(FileMapping& fileObj,
                      const DirContainer* dbDirectoryLeft,
@@ -692,7 +525,7 @@ private:
                     else if (cat == FILE_RIGHT_SIDE_ONLY)
                         fileObj.setSyncDir(SYNC_DIR_LEFT);
                     else
-                        fileObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                        fileObj.setSyncDirConflict(txtFilterChanged);
                     return;
                 }
                 */
@@ -713,7 +546,7 @@ private:
             if (changeOnLeft)
             {
                 if (changeOnRight)
-                    fileObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                    fileObj.setSyncDirConflict(txtBothSidesChanged);
                 else
                     fileObj.setSyncDir(SYNC_DIR_RIGHT);
             }
@@ -722,13 +555,13 @@ private:
                 if (changeOnRight)
                     fileObj.setSyncDir(SYNC_DIR_LEFT);
                 else
-                    fileObj.setSyncDirConflict(txtNoSideChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                    fileObj.setSyncDirConflict(txtNoSideChanged);
             }
         }
-        else //object did not complete last sync
+        else //object did not complete last sync: important check: user may have changed comparison variant, so what was in sync according to last variant is not any longer!
         {
             if (changeOnLeft && changeOnRight)
-                fileObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                fileObj.setSyncDirConflict(txtBothSidesChanged);
             else
             {
                 //                if (cat == FILE_LEFT_SIDE_ONLY)
@@ -736,7 +569,7 @@ private:
                 //                else if (cat == FILE_RIGHT_SIDE_ONLY)
                 //                    fileObj.setSyncDir(SYNC_DIR_LEFT);
                 //                else
-                fileObj.setSyncDirConflict(txtLastSyncFail);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                fileObj.setSyncDirConflict(txtLastSyncFail);
             }
         }
     }
@@ -758,7 +591,7 @@ private:
                     else if (cat == SYMLINK_RIGHT_SIDE_ONLY)
                         linkObj.setSyncDir(SYNC_DIR_LEFT);
                     else
-                        linkObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                        linkObj.setSyncDirConflict(txtFilterChanged);
                     return;
                 }
                 */
@@ -779,7 +612,7 @@ private:
             if (changeOnLeft)
             {
                 if (changeOnRight)
-                    linkObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                    linkObj.setSyncDirConflict(txtBothSidesChanged);
                 else
                     linkObj.setSyncDir(SYNC_DIR_RIGHT);
             }
@@ -788,15 +621,15 @@ private:
                 if (changeOnRight)
                     linkObj.setSyncDir(SYNC_DIR_LEFT);
                 else
-                    linkObj.setSyncDirConflict(txtNoSideChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                    linkObj.setSyncDirConflict(txtNoSideChanged);
             }
         }
         else //object did not complete last sync
         {
             if (changeOnLeft && changeOnRight)
-                linkObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                linkObj.setSyncDirConflict(txtBothSidesChanged);
             else
-                linkObj.setSyncDirConflict(txtLastSyncFail);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                linkObj.setSyncDirConflict(txtLastSyncFail);
         }
     }
 
@@ -844,7 +677,7 @@ private:
                 if (changeOnLeft)
                 {
                     if (changeOnRight)
-                        dirObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                        dirObj.setSyncDirConflict(txtBothSidesChanged);
                     else
                         dirObj.setSyncDir(SYNC_DIR_RIGHT);
                 }
@@ -855,14 +688,14 @@ private:
                     else
                     {
                         assert(false);
-                        dirObj.setSyncDirConflict(txtNoSideChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                        dirObj.setSyncDirConflict(txtNoSideChanged);
                     }
                 }
             }
             else //object did not complete last sync
             {
                 if (changeOnLeft && changeOnRight)
-                    dirObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                    dirObj.setSyncDirConflict(txtBothSidesChanged);
                 else
                 {
                     //                    switch (cat)
@@ -877,29 +710,18 @@ private:
                     //                        assert(false);
                     //                    }
 
-                    dirObj.setSyncDirConflict(txtLastSyncFail);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                    dirObj.setSyncDirConflict(txtLastSyncFail);
                 }
             }
         }
 
         execute(dirObj, dataDbLeftStuff.second, dataDbRightStuff.second); //recursion
-        //###################################################################################################
-
-        //if a directory is to be deleted on one side, ensure that directions of sub-elements are "d’accord"
-        const SyncOperation syncOp = dirObj.getSyncOperation();
-        if (syncOp == SO_DELETE_LEFT ||
-            syncOp == SO_DELETE_RIGHT)
-        {
-            if (FindDeleteDirConflictNonRec().conflictFound(dirObj))
-                dirObj.setSyncDirConflict(txtDirDeleteConflict);
-        }
     }
 
-    const wxString txtBothSidesChanged;
-    const wxString txtNoSideChanged;
-    const wxString txtFilterChanged;
-    const wxString txtLastSyncFail;
-    const wxString txtDirDeleteConflict;
+    const std::wstring txtBothSidesChanged;
+    const std::wstring txtNoSideChanged;
+    const std::wstring txtFilterChanged;
+    const std::wstring txtLastSyncFail;
 
     //const HardFilter* dbFilterLeft;  //optional
     //const HardFilter* dbFilterRight; //optional
@@ -909,13 +731,33 @@ private:
 
 
 //---------------------------------------------------------------------------------------------------------------
-void zen::redetermineSyncDirection(const SyncConfig& config, BaseDirMapping& baseDirectory, DeterminationProblem* handler)
+std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& mainCfg)
 {
-    if (config.var == SyncConfig::AUTOMATIC)
+    //merge first and additional pairs
+    std::vector<FolderPairEnh> allPairs;
+    allPairs.push_back(mainCfg.firstPair);
+    allPairs.insert(allPairs.end(),
+                    mainCfg.additionalPairs.begin(), //add additional pairs
+                    mainCfg.additionalPairs.end());
+
+    std::vector<DirectionConfig> output;
+    std::for_each(allPairs.begin(), allPairs.end(),
+                  [&](const FolderPairEnh& fp)
+    {
+        output.push_back(fp.altSyncConfig.get() ? fp.altSyncConfig->directionCfg : mainCfg.syncCfg.directionCfg);
+    });
+
+    return output;
+}
+
+
+void zen::redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirMapping& baseDirectory, DeterminationProblem* handler)
+{
+    if (directConfig.var == DirectionConfig::AUTOMATIC)
         RedetermineAuto(baseDirectory, handler);
     else
     {
-        DirectionSet dirCfg = extractDirections(config);
+        DirectionSet dirCfg = extractDirections(directConfig);
         Redetermine(dirCfg).execute(baseDirectory);
     }
 }
@@ -925,20 +767,16 @@ void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderCompa
 {
     if (folderCmp.size() == 0)
         return;
-    else if (folderCmp.size() != mainCfg.additionalPairs.size() + 1)
+
+    std::vector<DirectionConfig> directCfgs = extractDirectionCfg(mainCfg);
+
+    if (folderCmp.size() != directCfgs.size())
         throw std::logic_error("Programming Error: Contract violation!");
 
-    //merge first and additional pairs
-    std::vector<FolderPairEnh> allPairs;
-    allPairs.push_back(mainCfg.firstPair);
-    allPairs.insert(allPairs.end(),
-                    mainCfg.additionalPairs.begin(), //add additional pairs
-                    mainCfg.additionalPairs.end());
-
-    for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
+    for (auto iter = folderCmp.begin(); iter != folderCmp.end(); ++iter)
     {
-        redetermineSyncDirection(i->altSyncConfig.get() ? i->altSyncConfig->syncConfiguration : mainCfg.syncConfiguration,
-                                 folderCmp[i - allPairs.begin()], handler);
+        const DirectionConfig& cfg = directCfgs[iter - folderCmp.begin()];
+        redetermineSyncDirection(cfg, **iter, handler);
     }
 }
 
@@ -969,15 +807,11 @@ public:
     }
 
 private:
-    friend class util::ProxyForEach<const SetNewDirection>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
-
     void execute(HierarchyObject& hierObj) const
     {
-        util::ProxyForEach<const SetNewDirection> prx(*this); //grant std::for_each access to private parts of this class
-
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //process files
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //process links
-        std::for_each(hierObj.refSubDirs().begin(),  hierObj.refSubDirs().end(),  prx); //process directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
     }
 
     const SyncDirection newDirection_;
@@ -1024,16 +858,12 @@ public:
 
     void execute(zen::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
     {
-        util::ProxyForEach<const InOrExcludeAllRows<include> > prx(*this); //grant std::for_each access to private parts of this class
-
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //process files
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //process links
-        std::for_each(hierObj.refSubDirs().begin(),  hierObj.refSubDirs().end(),  prx); //process directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
     }
 
 private:
-    friend class util::ProxyForEach<const InOrExcludeAllRows<include> >; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
-
     void operator()(zen::FileMapping& fileObj) const
     {
         fileObj.setActive(include);
@@ -1055,9 +885,9 @@ private:
 void zen::setActiveStatus(bool newStatus, zen::FolderComparison& folderCmp)
 {
     if (newStatus)
-        std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<true>());  //include all rows
+        std::for_each(begin(folderCmp), end(folderCmp), InOrExcludeAllRows<true>());  //include all rows
     else
-        std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<false>()); //exclude all rows
+        std::for_each(begin(folderCmp), end(folderCmp), InOrExcludeAllRows<false>()); //exclude all rows
 }
 
 
@@ -1125,16 +955,12 @@ public:
 
     void execute(zen::HierarchyObject& hierObj) const
     {
-        util::ProxyForEach<const ApplyHardFilter> prx(*this); //grant std::for_each access to private parts of this class
-
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //files
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //symlinks
-        std::for_each(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), prx); //directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
     };
 
 private:
-    friend class util::ProxyForEach<const ApplyHardFilter>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
-
     void operator()(zen::FileMapping& fileObj) const
     {
         if (Eval<strategy>().process(fileObj))
@@ -1171,7 +997,6 @@ template <>
 class ApplyHardFilter<STRATEGY_OR>; //usage of InOrExcludeAllRows doesn't allow for strategy "or"
 
 
-
 template <FilterStrategy strategy>
 class ApplySoftFilter //falsify only! -> can run directly after "hard/base filter"
 {
@@ -1180,16 +1005,12 @@ public:
 
     void execute(zen::HierarchyObject& hierObj) const
     {
-        util::ProxyForEach<const ApplySoftFilter> prx(*this); //grant std::for_each access to private parts of this class
-
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //files
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //symlinks
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs(). end(), prx); //directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
     };
 
 private:
-    friend class util::ProxyForEach<const ApplySoftFilter>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
-
     void operator()(zen::FileMapping& fileObj) const
     {
         if (Eval<strategy>().process(fileObj))
@@ -1280,7 +1101,7 @@ void zen::addSoftFiltering(BaseDirMapping& baseMap, const SoftFilter& timeSizeFi
 
 void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& mainCfg)
 {
-    if (folderCmp.size() == 0)
+    if (folderCmp.empty())
         return;
     else if (folderCmp.size() != mainCfg.additionalPairs.size() + 1)
         throw std::logic_error("Programming Error: Contract violation!");
@@ -1293,11 +1114,11 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
                     mainCfg.additionalPairs.end());
 
 
-    for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
+    for (auto iter = allPairs.begin(); iter != allPairs.end(); ++iter)
     {
-        BaseDirMapping& baseDirectory = folderCmp[i - allPairs.begin()];
+        BaseDirMapping& baseDirectory = *folderCmp[iter - allPairs.begin()];
 
-        const NormalizedFilter normFilter = normalizeFilters(mainCfg.globalFilter, i->localFilter);
+        const NormalizedFilter normFilter = normalizeFilters(mainCfg.globalFilter, iter->localFilter);
 
         //"set" hard filter
         ApplyHardFilter<STRATEGY_SET>(*normFilter.nameFilter).execute(baseDirectory);
@@ -1308,11 +1129,75 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
 }
 
 
+class FilterByTimeSpan
+{
+public:
+    FilterByTimeSpan(const Int64& timeFrom,
+                     const Int64& timeTo) :
+        timeFrom_(timeFrom),
+        timeTo_(timeTo) {}
+
+    void execute(zen::HierarchyObject& hierObj) const
+    {
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
+    };
+
+private:
+    void operator()(zen::FileMapping& fileObj) const
+    {
+        if (fileObj.isEmpty<LEFT_SIDE>())
+            fileObj.setActive(matchTime<RIGHT_SIDE>(fileObj));
+        else if (fileObj.isEmpty<RIGHT_SIDE>())
+            fileObj.setActive(matchTime<LEFT_SIDE>(fileObj));
+        else
+            fileObj.setActive(matchTime<RIGHT_SIDE>(fileObj) ||
+                              matchTime<LEFT_SIDE>(fileObj));
+    }
+
+    void operator()(zen::SymLinkMapping& linkObj) const
+    {
+        if (linkObj.isEmpty<LEFT_SIDE>())
+            linkObj.setActive(matchTime<RIGHT_SIDE>(linkObj));
+        else if (linkObj.isEmpty<RIGHT_SIDE>())
+            linkObj.setActive(matchTime<LEFT_SIDE>(linkObj));
+        else
+            linkObj.setActive(matchTime<RIGHT_SIDE>(linkObj) ||
+                              matchTime<LEFT_SIDE> (linkObj));
+    }
+
+    void operator()(zen::DirMapping& dirObj) const
+    {
+        dirObj.setActive(false);
+        execute(dirObj);  //recursion
+    }
+
+    template <SelectedSide side, class T>
+    bool matchTime(const T& obj) const
+    {
+        return timeFrom_ <= obj.template getLastWriteTime<side>() &&
+               obj.template getLastWriteTime<side>() <= timeTo_;
+    }
+
+    const Int64 timeFrom_;
+    const Int64 timeTo_;
+};
+
+
+void zen::applyTimeSpanFilter(FolderComparison& folderCmp, const Int64& timeFrom, const Int64& timeTo)
+{
+    FilterByTimeSpan spanFilter(timeFrom, timeTo);
+
+    std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirMapping& baseMap) { spanFilter.execute(baseMap); });
+}
+
+
 //############################################################################################################
 std::pair<wxString, int> zen::deleteFromGridAndHDPreview( //assemble message containing all files to be deleted
     const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,
     const std::vector<FileSystemObject*>& rowsToDeleteOnRight,
-    const bool deleteOnBothSides)
+    bool deleteOnBothSides)
 {
     //fast replacement for wxString modelling exponential growth
     typedef Zbase<wchar_t> zxString; //for use with UI texts
@@ -1377,10 +1262,8 @@ struct RemoveCallbackImpl : public zen::CallbackRemoveDir
 {
     RemoveCallbackImpl(DeleteFilesHandler& deleteCallback) : deleteCallback_(deleteCallback) {}
 
-    virtual void notifyDeletion(const Zstring& currentObject)
-    {
-        deleteCallback_.notifyDeletion(currentObject);
-    }
+    virtual void notifyFileDeletion(const Zstring& filename) { deleteCallback_.notifyDeletion(filename); }
+    virtual void notifyDirDeletion (const Zstring& dirname)  { deleteCallback_.notifyDeletion(dirname); }
 
 private:
     DeleteFilesHandler& deleteCallback_;
@@ -1390,22 +1273,23 @@ private:
 
 template <SelectedSide side, class InputIterator>
 void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
-                                const bool useRecycleBin,
+                                bool useRecycleBin,
                                 DeleteFilesHandler& statusHandler)
 {
-    for (InputIterator i = first; i != last; ++i)
+    for (auto iter = first; iter != last; ++iter) //VS 2010 bug prevents replacing this by std::for_each + lamba
     {
+        FileSystemObject& fsObj = **iter; //all pointers are required(!) to be bound
+
         while (true)
         {
             try
             {
-                FileSystemObject* const fsObj = *i; //all pointers are required(!) to be bound
-                if (!fsObj->isEmpty<side>()) //element may become implicitly delted, e.g. if parent folder was deleted first
+                if (!fsObj.isEmpty<side>()) //element may become implicitly delted, e.g. if parent folder was deleted first
                 {
                     if (useRecycleBin)
                     {
-                        if (zen::moveToRecycleBin(fsObj->getFullName<side>()))  //throw (FileError)
-                            statusHandler.notifyDeletion(fsObj->getFullName<side>());
+                        if (zen::moveToRecycleBin(fsObj.getFullName<side>()))  //throw FileError
+                            statusHandler.notifyDeletion(fsObj.getFullName<side>());
                     }
                     else
                     {
@@ -1419,7 +1303,7 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                             virtual void visit(const FileMapping& fileObj)
                             {
                                 if (zen::removeFile(fileObj.getFullName<side>()))
-                                    remCallback_.notifyDeletion(fileObj.getFullName<side>());
+                                    remCallback_.notifyFileDeletion(fileObj.getFullName<side>());
                             }
 
                             virtual void visit(const SymLinkMapping& linkObj)
@@ -1431,7 +1315,7 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                                         break;
                                     case LinkDescriptor::TYPE_FILE:
                                         if (zen::removeFile(linkObj.getFullName<side>()))
-                                            remCallback_.notifyDeletion(linkObj.getFullName<side>());
+                                            remCallback_.notifyFileDeletion(linkObj.getFullName<side>());
                                         break;
                                 }
                             }
@@ -1444,16 +1328,10 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                         private:
                             RemoveCallbackImpl& remCallback_;
                         } delPerm(removeCallback);
-                        fsObj->accept(delPerm);
+                        fsObj.accept(delPerm);
                     }
 
-                    fsObj->removeObject<side>(); //if directory: removes recursively!
-
-                    //update sync direction: as this is a synchronization tool, the user most likely wants to delete the other side, too!
-                    if (side == LEFT_SIDE)
-                        setSyncDirectionRec(SYNC_DIR_RIGHT, *fsObj); //set new direction (recursively)
-                    else
-                        setSyncDirectionRec(SYNC_DIR_LEFT, *fsObj);
+                    fsObj.removeObject<side>(); //if directory: removes recursively!
                 }
                 break;
             }
@@ -1474,40 +1352,39 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
 }
 
 
-void zen::deleteFromGridAndHD(FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
-                              std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
+void zen::deleteFromGridAndHD(std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
                               std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
-                              const bool deleteOnBothSides,
-                              const bool useRecycleBin,
+                              FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
+                              const std::vector<DirectionConfig>& directCfgs,
+                              bool deleteOnBothSides,
+                              bool useRecycleBin,
                               DeleteFilesHandler& statusHandler)
 {
-    //ensure cleanup: redetermination of sync-directions and removal of invalid rows
-				Loki::ScopeGuard guardFinalizeDeletion = Loki::MakeGuard([&]() { std::for_each(folderCmp.begin(), folderCmp.end(), BaseDirMapping::removeEmpty); });
-			(void) guardFinalizeDeletion;
+    if (folderCmp.size() == 0)
+        return;
+    else if (folderCmp.size() != directCfgs.size())
+        throw std::logic_error("Programming Error: Contract violation!");
 
-    std::set<FileSystemObject*> deleteLeft;
-    std::set<FileSystemObject*> deleteRight;
+    //build up mapping from base directory to corresponding direction config
+    std::map<const BaseDirMapping*, DirectionConfig> baseDirCfgs;
+    for (auto iter = folderCmp.begin(); iter != folderCmp.end(); ++iter)
+        baseDirCfgs[&** iter] = directCfgs[iter - folderCmp.begin()];
+
+    //ensure cleanup: redetermination of sync-directions and removal of invalid rows
+    LOKI_ON_BLOCK_EXIT2( std::for_each(begin(folderCmp), end(folderCmp), BaseDirMapping::removeEmpty); );
+
+    std::set<FileSystemObject*> deleteLeft (rowsToDeleteOnLeft .begin(), rowsToDeleteOnLeft .end());
+    std::set<FileSystemObject*> deleteRight(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
 
     if (deleteOnBothSides)
     {
-        //mix selected rows from left and right (and remove duplicates)
-        std::set<FileSystemObject*> tmp(rowsToDeleteOnLeft.begin(), rowsToDeleteOnLeft.end());
-        tmp.insert(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
-
-        std::remove_copy_if(tmp.begin(), tmp.end(),
-                            std::inserter(deleteLeft, deleteLeft.begin()), std::mem_fun(&FileSystemObject::isEmpty<LEFT_SIDE>)); //remove empty rows to ensure correct statistics
-
-        std::remove_copy_if(tmp.begin(), tmp.end(),
-                            std::inserter(deleteRight, deleteRight.begin()), std::mem_fun(&FileSystemObject::isEmpty<RIGHT_SIDE>));
+        deleteLeft.insert(deleteRight.begin(), deleteRight.end());
+        deleteRight = deleteLeft;
     }
-    else
-    {
-        std::remove_copy_if(rowsToDeleteOnLeft.begin(), rowsToDeleteOnLeft.end(),
-                            std::inserter(deleteLeft, deleteLeft.begin()), std::mem_fun(&FileSystemObject::isEmpty<LEFT_SIDE>)); //remove empty rows to ensure correct statistics
 
-        std::remove_copy_if(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end(),
-                            std::inserter(deleteRight, deleteRight.begin()), std::mem_fun(&FileSystemObject::isEmpty<RIGHT_SIDE>));
-    }
+    set_remove_if(deleteLeft,  std::mem_fun(&FileSystemObject::isEmpty<LEFT_SIDE>));  //remove empty rows to ensure correct statistics
+    set_remove_if(deleteRight, std::mem_fun(&FileSystemObject::isEmpty<RIGHT_SIDE>)); //
+
 
     deleteFromGridAndHDOneSide<LEFT_SIDE>(deleteLeft.begin(), deleteLeft.end(),
                                           useRecycleBin,
@@ -1516,6 +1393,36 @@ void zen::deleteFromGridAndHD(FolderComparison& folderCmp,                      
     deleteFromGridAndHDOneSide<RIGHT_SIDE>(deleteRight.begin(), deleteRight.end(),
                                            useRecycleBin,
                                            statusHandler);
+
+    //update sync direction: we cannot do a full redetermination since the user may have committed manual changes
+    std::set<FileSystemObject*> deletedTotal = deleteLeft;
+    deletedTotal.insert(deleteRight.begin(), deleteRight.end());
+
+    for (auto iter = deletedTotal.begin(); iter != deletedTotal.end(); ++iter)
+    {
+        FileSystemObject& fsObj = **iter; //all pointers are required(!) to be bound
+
+        if (fsObj.isEmpty<LEFT_SIDE>() != fsObj.isEmpty<RIGHT_SIDE>()) //make sure objects exists on one side only
+        {
+            auto cfgIter = baseDirCfgs.find(&fsObj.root());
+            if (cfgIter != baseDirCfgs.end())
+            {
+                SyncDirection newDir = SYNC_DIR_NONE;
+
+                if (cfgIter->second.var == DirectionConfig::AUTOMATIC)
+                    newDir = fsObj.isEmpty<LEFT_SIDE>() ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT;
+                else
+                {
+                    DirectionSet dirCfg = extractDirections(cfgIter->second);
+                    newDir = fsObj.isEmpty<LEFT_SIDE>() ? dirCfg.exRightSideOnly : dirCfg.exLeftSideOnly;
+                }
+
+                setSyncDirectionRec(newDir, fsObj); //set new direction (recursively)
+            }
+            else
+                assert(!"this should not happen!");
+        }
+    }
 }
 
 

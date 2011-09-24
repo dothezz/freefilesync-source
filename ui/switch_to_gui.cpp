@@ -20,8 +20,8 @@ void SwitchToGui::execute() const //throw()
 {
     try
     {
-        MainDialog* frame = new MainDialog(guiCfg, globalSettings_, true);
+        MainDialog* frame = new MainDialog(guiCfg, globalSettings_, true); //toplevel window
         frame->Show();
     }
-    catch(...) {}
+    catch (...) {}
 }

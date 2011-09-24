@@ -38,8 +38,8 @@ namespace Loki
 
 namespace Private
 {
-template <class SomeLhs, class SomeRhs,
-         class Executor, typename ResultType>
+template < class SomeLhs, class SomeRhs,
+         class Executor, typename ResultType >
 struct InvocationTraits
 {
     static ResultType
@@ -85,12 +85,12 @@ class StaticDispatcher
     {
         if (Head* p2 = dynamic_cast<Head*>(&rhs))
         {
-            Int2Type<(symmetric &&
-                      int(TL::IndexOf<TypesRhs, Head>::value) <
-                      int(TL::IndexOf<TypesLhs, SomeLhs>::value))> i2t;
+            Int2Type < (symmetric &&
+                        int(TL::IndexOf<TypesRhs, Head>::value) <
+                        int(TL::IndexOf<TypesLhs, SomeLhs>::value)) > i2t;
 
-            typedef Private::InvocationTraits<
-            SomeLhs, Head, Executor, ResultType> CallTraits;
+            typedef Private::InvocationTraits <
+            SomeLhs, Head, Executor, ResultType > CallTraits;
 
             return CallTraits::DoDispatch(lhs, *p2, exec, i2t);
         }
@@ -133,7 +133,7 @@ class BaseLhs,
       >
 class BasicDispatcher
 {
-    typedef std::pair<TypeInfo,TypeInfo> KeyType;
+    typedef std::pair<TypeInfo, TypeInfo> KeyType;
     typedef CallbackType MappedType;
     typedef AssocVector<KeyType, MappedType> MapType;
     MapType callbackMap_;
@@ -158,28 +158,28 @@ public:
 };
 
 // Non-inline to reduce compile time overhead...
-template <class BaseLhs, class BaseRhs,
-         typename ResultType, typename CallbackType>
-void BasicDispatcher<BaseLhs,BaseRhs,ResultType,CallbackType>
+template < class BaseLhs, class BaseRhs,
+         typename ResultType, typename CallbackType >
+void BasicDispatcher<BaseLhs, BaseRhs, ResultType, CallbackType>
 ::DoAdd(TypeInfo lhs, TypeInfo rhs, CallbackType fun)
 {
     callbackMap_[KeyType(lhs, rhs)] = fun;
 }
 
-template <class BaseLhs, class BaseRhs,
-         typename ResultType, typename CallbackType>
-bool BasicDispatcher<BaseLhs,BaseRhs,ResultType,CallbackType>
+template < class BaseLhs, class BaseRhs,
+         typename ResultType, typename CallbackType >
+bool BasicDispatcher<BaseLhs, BaseRhs, ResultType, CallbackType>
 ::DoRemove(TypeInfo lhs, TypeInfo rhs)
 {
     return callbackMap_.erase(KeyType(lhs, rhs)) == 1;
 }
 
-template <class BaseLhs, class BaseRhs,
-         typename ResultType, typename CallbackType>
-ResultType BasicDispatcher<BaseLhs,BaseRhs,ResultType,CallbackType>
+template < class BaseLhs, class BaseRhs,
+         typename ResultType, typename CallbackType >
+ResultType BasicDispatcher<BaseLhs, BaseRhs, ResultType, CallbackType>
 ::Go(BaseLhs& lhs, BaseRhs& rhs)
 {
-    typename MapType::key_type k(typeid(lhs),typeid(rhs));
+    typename MapType::key_type k(typeid(lhs), typeid(rhs));
     typename MapType::iterator i = callbackMap_.find(k);
     if (i == callbackMap_.end())
     {
@@ -223,11 +223,11 @@ struct DynamicCaster
 
 namespace Private
 {
-template <class BaseLhs, class BaseRhs,
+template < class BaseLhs, class BaseRhs,
          class SomeLhs, class SomeRhs,
          typename ResultType,
          class CastLhs, class CastRhs,
-         ResultType (*Callback)(SomeLhs&, SomeRhs&)>
+         ResultType (*Callback)(SomeLhs&, SomeRhs&) >
 struct FnDispatcherHelper
 {
     static ResultType Trampoline(BaseLhs& lhs, BaseRhs& rhs)
@@ -247,15 +247,15 @@ struct FnDispatcherHelper
 // Features automated conversions
 ////////////////////////////////////////////////////////////////////////////////
 
-template <class BaseLhs, class BaseRhs = BaseLhs,
+template < class BaseLhs, class BaseRhs = BaseLhs,
          typename ResultType = void,
          template <class, class> class CastingPolicy = DynamicCaster,
          template <class, class, class, class>
-         class DispatcherBackend = BasicDispatcher>
+         class DispatcherBackend = BasicDispatcher >
 class FnDispatcher
 {
-    DispatcherBackend<BaseLhs, BaseRhs, ResultType,
-                      ResultType (*)(BaseLhs&, BaseRhs&)> backEnd_;
+    DispatcherBackend < BaseLhs, BaseRhs, ResultType,
+                      ResultType (*)(BaseLhs&, BaseRhs&) > backEnd_;
 
 public:
     template <class SomeLhs, class SomeRhs>
@@ -264,33 +264,33 @@ public:
         return backEnd_.template Add<SomeLhs, SomeRhs>(pFun);
     }
 
-    template <class SomeLhs, class SomeRhs,
-             ResultType (*callback)(SomeLhs&, SomeRhs&)>
+    template < class SomeLhs, class SomeRhs,
+             ResultType (*callback)(SomeLhs&, SomeRhs&) >
     void Add()
     {
-        typedef Private::FnDispatcherHelper<
+        typedef Private::FnDispatcherHelper <
         BaseLhs, BaseRhs,
                  SomeLhs, SomeRhs,
                  ResultType,
-                 CastingPolicy<SomeLhs,BaseLhs>,
-                 CastingPolicy<SomeRhs,BaseRhs>,
-                 callback> Local;
+                 CastingPolicy<SomeLhs, BaseLhs>,
+                 CastingPolicy<SomeRhs, BaseRhs>,
+                 callback > Local;
 
         Add<SomeLhs, SomeRhs>(&Local::Trampoline);
     }
 
-    template <class SomeLhs, class SomeRhs,
+    template < class SomeLhs, class SomeRhs,
              ResultType (*callback)(SomeLhs&, SomeRhs&),
-             bool symmetric>
+             bool symmetric >
     void Add(bool = true) // [gcc] dummy bool
     {
-        typedef Private::FnDispatcherHelper<
+        typedef Private::FnDispatcherHelper <
         BaseLhs, BaseRhs,
                  SomeLhs, SomeRhs,
                  ResultType,
-                 CastingPolicy<SomeLhs,BaseLhs>,
-                 CastingPolicy<SomeRhs,BaseRhs>,
-                 callback> Local;
+                 CastingPolicy<SomeLhs, BaseLhs>,
+                 CastingPolicy<SomeRhs, BaseRhs>,
+                 callback > Local;
 
         Add<SomeLhs, SomeRhs>(&Local::Trampoline);
         if (symmetric)
@@ -318,19 +318,19 @@ public:
 
 namespace Private
 {
-template <class BaseLhs, class BaseRhs,
+template < class BaseLhs, class BaseRhs,
          class SomeLhs, class SomeRhs,
          typename ResultType,
          class CastLhs, class CastRhs,
-         class Fun, bool SwapArgs>
+         class Fun, bool SwapArgs >
 class FunctorDispatcherHelper
 {
     Fun fun_;
-    ResultType Fire(BaseLhs& lhs, BaseRhs& rhs,Int2Type<false>)
+    ResultType Fire(BaseLhs& lhs, BaseRhs& rhs, Int2Type<false>)
     {
         return fun_(CastLhs::Cast(lhs), CastRhs::Cast(rhs));
     }
-    ResultType Fire(BaseLhs& rhs, BaseRhs& lhs,Int2Type<true>)
+    ResultType Fire(BaseLhs& rhs, BaseRhs& lhs, Int2Type<true>)
     {
         return fun_(CastLhs::Cast(lhs), CastRhs::Cast(rhs));
     }
@@ -339,7 +339,7 @@ public:
 
     ResultType operator()(BaseLhs& lhs, BaseRhs& rhs)
     {
-        return Fire(lhs,rhs,Int2Type<SwapArgs>());
+        return Fire(lhs, rhs, Int2Type<SwapArgs>());
     }
 };
 }
@@ -350,11 +350,11 @@ public:
 // Features automated casting
 ////////////////////////////////////////////////////////////////////////////////
 
-template <class BaseLhs, class BaseRhs = BaseLhs,
+template < class BaseLhs, class BaseRhs = BaseLhs,
          typename ResultType = void,
          template <class, class> class CastingPolicy = DynamicCaster,
          template <class, class, class, class>
-         class DispatcherBackend = BasicDispatcher>
+         class DispatcherBackend = BasicDispatcher >
 class FunctorDispatcher
 {
     typedef LOKI_TYPELIST_2(BaseLhs&, BaseRhs&) ArgsList;
@@ -366,31 +366,31 @@ public:
     template <class SomeLhs, class SomeRhs, class Fun>
     void Add(const Fun& fun)
     {
-        typedef Private::FunctorDispatcherHelper<
+        typedef Private::FunctorDispatcherHelper <
         BaseLhs, BaseRhs,
                  SomeLhs, SomeRhs,
                  ResultType,
                  CastingPolicy<SomeLhs, BaseLhs>,
                  CastingPolicy<SomeRhs, BaseRhs>,
-                 Fun, false> Adapter;
+                 Fun, false > Adapter;
 
         backEnd_.template Add<SomeLhs, SomeRhs>(FunctorType(Adapter(fun)));
     }
     template <class SomeLhs, class SomeRhs, bool symmetric, class Fun>
     void Add(const Fun& fun)
     {
-        Add<SomeLhs,SomeRhs>(fun);
+        Add<SomeLhs, SomeRhs>(fun);
 
         if (symmetric)
         {
             // Note: symmetry only makes sense where BaseLhs==BaseRhs
-            typedef Private::FunctorDispatcherHelper<
+            typedef Private::FunctorDispatcherHelper <
             BaseLhs, BaseLhs,
                      SomeLhs, SomeRhs,
                      ResultType,
                      CastingPolicy<SomeLhs, BaseLhs>,
                      CastingPolicy<SomeRhs, BaseLhs>,
-                     Fun, true> AdapterR;
+                     Fun, true > AdapterR;
 
             backEnd_.template Add<SomeRhs, SomeLhs>(FunctorType(AdapterR(fun)));
         }

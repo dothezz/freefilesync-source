@@ -17,6 +17,7 @@
 #include "../shared/serialize.h"
 #include "../shared/build_info.h"
 #include "../shared/int64.h"
+#include "../shared/file_handling.h"
 
 #ifdef FFS_WIN
 #include <tlhelp32.h>
@@ -24,7 +25,6 @@
 #include "../shared/long_path_prefix.h"
 
 #elif defined FFS_LINUX
-#include "../shared/file_handling.h"
 #include <sys/stat.h>
 #include <cerrno>
 #include <unistd.h>
@@ -78,17 +78,15 @@ public:
         //although CreateFile/FILE_APPEND_DATA without SetFilePointerEx works locally, it MAY NOT work on some network shares creating a 4 gig file!!!
 
         const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename_.c_str()).c_str(),
-                                               FILE_GENERIC_WRITE,
+                                               GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
                                                FILE_SHARE_READ,
-                                               NULL,
+                                               0,
                                                OPEN_EXISTING,
                                                FILE_ATTRIBUTE_NORMAL,
                                                NULL);
         if (fileHandle == INVALID_HANDLE_VALUE)
             return;
-
-        Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, fileHandle);
-        (void)dummy; //silence warning "unused variable"
+        LOKI_ON_BLOCK_EXIT2(::CloseHandle(fileHandle));
 
         const LARGE_INTEGER moveDist = {};
         if (!::SetFilePointerEx(fileHandle, //__in       HANDLE hFile,
@@ -108,9 +106,7 @@ public:
         const int fileHandle = ::open(lockfilename_.c_str(), O_WRONLY | O_APPEND); //O_EXCL contains a race condition on NFS file systems: http://linux.die.net/man/2/open
         if (fileHandle == -1)
             return;
-
-        Loki::ScopeGuard dummy = Loki::MakeGuard(::close, fileHandle);
-        (void)dummy; //silence warning "unused variable"
+        LOKI_ON_BLOCK_EXIT2(::close(fileHandle));
 
         const ssize_t bytesWritten = ::write(fileHandle, buffer, 1);
         (void)bytesWritten;
@@ -124,20 +120,7 @@ private:
 
 namespace
 {
-void deleteLockFile(const Zstring& filename) //throw (FileError)
-{
-#ifdef FFS_WIN
-    if (!::DeleteFile(applyLongPathPrefix(filename).c_str()))
-#elif defined FFS_LINUX
-    if (::unlink(filename.c_str()) != 0)
-#endif
-    {
-        throw FileError(_("Error deleting file:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
-    }
-}
-
-
-zen::UInt64 getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNotExisting)
+UInt64 getLockFileSize(const Zstring& filename) //throw FileError, ErrorNotExisting
 {
 #ifdef FFS_WIN
     WIN32_FIND_DATA fileInfo = {};
@@ -192,13 +175,13 @@ namespace
 {
 //read string from file stream
 inline
-std::string readString(wxInputStream& stream)  //throw (std::exception)
+std::string readString(wxInputStream& stream)  //throw std::exception
 {
-    const boost::uint32_t strLength = readPOD<boost::uint32_t>(stream);
+    const auto strLength = readPOD<boost::uint32_t>(stream);
     std::string output;
     if (strLength > 0)
     {
-        output.resize(strLength); //may throw for corrupted data
+        output.resize(strLength); //throw std::bad_alloc
         stream.Read(&output[0], strLength);
     }
     return output;
@@ -208,9 +191,8 @@ std::string readString(wxInputStream& stream)  //throw (std::exception)
 inline
 void writeString(wxOutputStream& stream, const std::string& str)  //write string to filestream
 {
-    const boost::uint32_t strLength = static_cast<boost::uint32_t>(str.length());
-    writePOD<boost::uint32_t>(stream, strLength);
-    stream.Write(str.c_str(), strLength);
+    writePOD(stream, static_cast<boost::uint32_t>(str.length()));
+    stream.Write(str.c_str(), str.length());
 }
 
 
@@ -242,7 +224,7 @@ struct LockInformation
     LockInformation(wxInputStream& stream) //read
     {
         char formatDescr[sizeof(LOCK_FORMAT_DESCR)] = {};
-        stream.Read(formatDescr, sizeof(LOCK_FORMAT_DESCR));                  //file format header
+        stream.Read(formatDescr, sizeof(LOCK_FORMAT_DESCR));         //file format header
         const int lockFileVersion = readPOD<boost::int32_t>(stream); //
         (void)lockFileVersion;
 
@@ -286,6 +268,7 @@ enum ProcessStatus
 {
     PROC_STATUS_NOT_RUNNING,
     PROC_STATUS_RUNNING,
+    PROC_STATUS_ITS_US,
     PROC_STATUS_NO_IDEA
 };
 ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDescr)
@@ -295,15 +278,16 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
         return PROC_STATUS_NO_IDEA; //lock owned by different computer
 
 #ifdef FFS_WIN
+    if (procDescr.processId == ::GetCurrentProcessId()) //may seem obscure, but it's possible: a lock file is "stolen" and put back while the program is running
+        return PROC_STATUS_ITS_US;
+
     //note: ::OpenProcess() is no option as it may successfully return for crashed processes!
     HANDLE snapshot = ::CreateToolhelp32Snapshot(
                           TH32CS_SNAPPROCESS, //__in  DWORD dwFlags,
                           0);                 //__in  DWORD th32ProcessID
     if (snapshot == INVALID_HANDLE_VALUE)
         return PROC_STATUS_NO_IDEA;
-
-    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, snapshot);
-    (void)dummy; //silence warning "unused variable"
+    LOKI_ON_BLOCK_EXIT2(::CloseHandle(snapshot));
 
     PROCESSENTRY32 processEntry = {};
     processEntry.dwSize = sizeof(processEntry);
@@ -316,11 +300,14 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
         if (processEntry.th32ProcessID == procDescr.processId)
             return PROC_STATUS_RUNNING; //process still running
     }
-    while(::Process32Next(snapshot, &processEntry));
+    while (::Process32Next(snapshot, &processEntry));
 
     return PROC_STATUS_NOT_RUNNING;
 
 #elif defined FFS_LINUX
+    if (procDescr.processId == ::getpid()) //may seem obscure, but it's possible: a lock file is "stolen" and put back while the program is running
+        return PROC_STATUS_ITS_US;
+
     if (procDescr.processId <= 0 || procDescr.processId >= 65536)
         return PROC_STATUS_NO_IDEA; //invalid process id
 
@@ -329,30 +316,30 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
 }
 
 
-void writeLockInfo(const Zstring& lockfilename) //throw (FileError)
+void writeLockInfo(const Zstring& lockfilename) //throw FileError
 {
     //write GUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks, distributed network, etc.)
-    FileOutputStream lockFile(lockfilename); //throw (FileError)
+    FileOutputStream lockFile(lockfilename); //throw FileError
     LockInformation().toStream(lockFile);
 }
 
 
-LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw (FileError, ErrorNotExisting)
+LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw FileError, ErrorNotExisting
 {
     //read GUID from beginning of file
-    FileInputStream lockFile(lockfilename); //throw (FileError, ErrorNotExisting)
+    FileInputStream lockFile(lockfilename); //throw FileError, ErrorNotExisting
     return LockInformation(lockFile);
 }
 
 
-std::string retrieveLockId(const Zstring& lockfilename) //throw (FileError, ErrorNotExisting)
+std::string retrieveLockId(const Zstring& lockfilename) //throw FileError, ErrorNotExisting
 {
     return retrieveLockInfo(lockfilename).lockId;
 }
 }
 
 
-void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw (FileError)
+void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
 {
     std::wstring infoMsg = _("Waiting while directory is locked (%x)...");
     replace(infoMsg, L"%x", std::wstring(L"\"") + lockfilename + "\"");
@@ -361,15 +348,26 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
     //---------------------------------------------------------------
     try
     {
-        const LockInformation lockInfo = retrieveLockInfo(lockfilename); //throw (FileError, ErrorNotExisting)
-        const bool lockOwnderDead = getProcessStatus(lockInfo.procDescr) == PROC_STATUS_NOT_RUNNING; //convenience optimization: if we know the owning process crashed, we needn't wait DETECT_EXITUS_INTERVAL sec
+        const LockInformation lockInfo = retrieveLockInfo(lockfilename); //throw FileError, ErrorNotExisting
+
+        bool lockOwnderDead = false; //convenience optimization: if we know the owning process crashed, we needn't wait DETECT_EXITUS_INTERVAL sec
+        switch (getProcessStatus(lockInfo.procDescr))
+        {
+            case PROC_STATUS_ITS_US: //since we've already passed LockAdmin, the lock file seems abandoned ("stolen"?) although it's from this process
+            case PROC_STATUS_NOT_RUNNING:
+                lockOwnderDead = true;
+                break;
+            case PROC_STATUS_RUNNING:
+            case PROC_STATUS_NO_IDEA:
+                break;
+        }
 
         zen::UInt64 fileSizeOld;
         wxLongLong lockSilentStart = wxGetLocalTimeMillis();
 
         while (true)
         {
-            const zen::UInt64 fileSizeNew = ::getLockFileSize(lockfilename); //throw (FileError, ErrorNotExisting)
+            const zen::UInt64 fileSizeNew = ::getLockFileSize(lockfilename); //throw FileError, ErrorNotExisting
             wxLongLong currentTime = wxGetLocalTimeMillis();
 
             if (fileSizeNew != fileSizeOld)
@@ -382,17 +380,17 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
             if (lockOwnderDead || //no need to wait any longer...
                 currentTime - lockSilentStart > DETECT_EXITUS_INTERVAL)
             {
-                DirLock dummy(deleteAbandonedLockName(lockfilename), callback); //throw (FileError)
+                DirLock dummy(deleteAbandonedLockName(lockfilename), callback); //throw FileError
 
                 //now that the lock is in place check existence again: meanwhile another process may have deleted and created a new lock!
 
-                if (retrieveLockId(lockfilename) != lockInfo.lockId) //throw (FileError, ErrorNotExisting)
+                if (retrieveLockId(lockfilename) != lockInfo.lockId) //throw FileError, ErrorNotExisting
                     return; //another process has placed a new lock, leave scope: the wait for the old lock is technically over...
 
-                if (getLockFileSize(lockfilename) != fileSizeOld) //throw (FileError, ErrorNotExisting)
+                if (getLockFileSize(lockfilename) != fileSizeOld) //throw FileError, ErrorNotExisting
                     continue; //belated lifesign
 
-                ::deleteLockFile(lockfilename); //throw (FileError)
+                removeFile(lockfilename); //throw FileError
                 return;
             }
 
@@ -432,24 +430,28 @@ void releaseLock(const Zstring& lockfilename) //throw ()
 {
     try
     {
-        ::deleteLockFile(lockfilename);
+        removeFile(lockfilename);
     }
-    catch(...) {}
+    catch (...) {}
 }
 
 
-bool tryLock(const Zstring& lockfilename) //throw (FileError)
+bool tryLock(const Zstring& lockfilename) //throw FileError
 {
 #ifdef FFS_WIN
     const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename).c_str(),
-                                           GENERIC_WRITE,
+                                           GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
                                            FILE_SHARE_READ,
-                                           NULL,
+                                           0,
                                            CREATE_NEW,
                                            FILE_ATTRIBUTE_NORMAL,
                                            NULL);
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
+#ifndef _MSC_VER
+#warning fix this problem!
+        //read-only FTP may return: ERROR_FILE_EXISTS (NetDrive @ GNU)
+#endif
         if (::GetLastError() == ERROR_FILE_EXISTS)
             return false;
         else
@@ -471,10 +473,10 @@ bool tryLock(const Zstring& lockfilename) //throw (FileError)
     ::close(fileHandle);
 #endif
 
-    Loki::ScopeGuard guardLockFile = Loki::MakeGuard(::releaseLock, lockfilename);
+    Loki::ScopeGuard guardLockFile = Loki::MakeGuard(zen::removeFile, lockfilename);
 
     //write UUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks, etc.)
-    writeLockInfo(lockfilename); //throw (FileError)
+    writeLockInfo(lockfilename); //throw FileError
 
     guardLockFile.Dismiss(); //lockfile created successfully
     return true;
@@ -485,10 +487,10 @@ bool tryLock(const Zstring& lockfilename) //throw (FileError)
 class DirLock::SharedDirLock
 {
 public:
-    SharedDirLock(const Zstring& lockfilename, DirLockCallback* callback = NULL) : //throw (FileError)
+    SharedDirLock(const Zstring& lockfilename, DirLockCallback* callback = NULL) : //throw FileError
         lockfilename_(lockfilename)
     {
-        while (!::tryLock(lockfilename))             //throw (FileError)
+        while (!::tryLock(lockfilename))             //throw FileError
             ::waitOnDirLock(lockfilename, callback); //
 
         threadObj = boost::thread(LifeSigns(lockfilename));
@@ -522,7 +524,7 @@ public:
     }
 
     //create or retrieve a SharedDirLock
-    std::shared_ptr<SharedDirLock> retrieve(const Zstring& lockfilename, DirLockCallback* callback) //throw (FileError)
+    std::shared_ptr<SharedDirLock> retrieve(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
     {
         //optimization: check if there is an active(!) lock for "lockfilename"
         FileToUuidMap::const_iterator iterUuid = fileToUuid.find(lockfilename);
@@ -535,7 +537,7 @@ public:
 
         try //actual check based on lock UUID, deadlock prevention: "lockfilename" may be an alternative name for an already active lock
         {
-            const std::string lockId = retrieveLockId(lockfilename); //throw (FileError, ErrorNotExisting)
+            const std::string lockId = retrieveLockId(lockfilename); //throw FileError, ErrorNotExisting
 
             const std::shared_ptr<SharedDirLock>& activeLock = findActive(lockId); //returns null-lock if not found
             if (activeLock)
@@ -544,11 +546,11 @@ public:
                 return activeLock;
             }
         }
-        catch (const ErrorNotExisting&) {} //let other FileError(s) propagate!
+        catch (...) {} //catch everything, let SharedDirLock constructor deal with errors, e.g. 0-sized/corrupted lock file
 
         //not yet in buffer, so create a new directory lock
-        std::shared_ptr<SharedDirLock> newLock(new SharedDirLock(lockfilename, callback)); //throw (FileError)
-        const std::string newLockId = retrieveLockId(lockfilename); //throw (FileError, ErrorNotExisting)
+        std::shared_ptr<SharedDirLock> newLock(new SharedDirLock(lockfilename, callback)); //throw FileError
+        const std::string newLockId = retrieveLockId(lockfilename); //throw FileError, ErrorNotExisting
 
         //update registry
         fileToUuid[lockfilename] = newLockId; //throw()
@@ -579,7 +581,7 @@ private:
 };
 
 
-DirLock::DirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw (FileError)
+DirLock::DirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
 {
 #ifdef FFS_WIN
     std::vector<wchar_t> volName(std::max(lockfilename.size(), static_cast<size_t>(10000)));

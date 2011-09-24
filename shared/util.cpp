@@ -70,11 +70,10 @@ wxString zen::formatFilesizeToShortString(UInt64 size)
 }
 
 
-wxString zen::formatPercentage(zen::Int64 dividend, zen::Int64 divisor)
+wxString zen::formatPercentage(double fraction)
 {
-    const double ratio = divisor != 0 ? to<double>(dividend) * 100.0 / to<double>(divisor) : 0;
     wxString output = _("%x%");
-    output.Replace(wxT("%x"), wxString::Format(wxT("%3.2f"), ratio), false);
+    output.Replace(wxT("%x"), wxString::Format(wxT("%3.2f"), fraction * 100.0), false);
     return output;
 }
 
@@ -130,14 +129,7 @@ bool isVistaOrLater()
 wxString zen::utcTimeToLocalString(zen::Int64 utcTime)
 {
 #ifdef FFS_WIN
-    //convert ansi C time to FILETIME
-    zen::UInt64 fileTimeLong = to<zen::UInt64>(utcTime + //may be < 0
-                                               zen::Int64(3054539008UL, 2)); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
-    fileTimeLong *= 10000000U;
-
-    FILETIME lastWriteTimeUtc = {};
-    lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.getLo();
-    lastWriteTimeUtc.dwHighDateTime = fileTimeLong.getHi();
+    FILETIME lastWriteTimeUtc = tofiletime(utcTime); //convert ansi C time to FILETIME
 
     SYSTEMTIME systemTimeLocal = {};
 

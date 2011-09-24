@@ -24,6 +24,8 @@
 
 
 #ifdef _MSC_VER //I don't have Windows Driver Kit at hands right now, so unfortunately we need to redefine this structures and cross fingers...
+
+//from ntifs.h
 typedef struct _REPARSE_DATA_BUFFER
 {
     ULONG  ReparseTag;
@@ -60,7 +62,7 @@ typedef struct _REPARSE_DATA_BUFFER
 namespace
 {
 //retrieve raw target data of symlink or junction
-Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
+Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
 {
     using namespace zen;
 #ifdef FFS_WIN
@@ -69,25 +71,24 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
     try //reading certain symlinks requires admin rights! This shall not cause an error in user mode!
     {
         //allow access to certain symbolic links/junctions
-        Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw (FileError)
+        Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw FileError
     }
     catch (...) {}
 
     const HANDLE hLink = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),
                                       GENERIC_READ,
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      NULL,
+                                      0,
                                       OPEN_EXISTING,
                                       FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
                                       NULL);
     if (hLink == INVALID_HANDLE_VALUE)
         throw FileError(_("Error resolving symbolic link:") + "\n\"" + linkPath + "\"" + "\n\n" + getLastErrorFormatted());
-
-    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hLink);
-    (void)dummy; //silence warning "unused variable"
+    LOKI_ON_BLOCK_EXIT2(::CloseHandle(hLink));
 
     //respect alignment issues...
-    std::vector<char> buffer(REPARSE_DATA_BUFFER_HEADER_SIZE + MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+    const DWORD bufferSize = REPARSE_DATA_BUFFER_HEADER_SIZE + MAXIMUM_REPARSE_DATA_BUFFER_SIZE;
+    std::vector<char> buffer(bufferSize);
 
     DWORD bytesReturned; //dummy value required by FSCTL_GET_REPARSE_POINT!
     if (!::DeviceIoControl(hLink,                   //__in         HANDLE hDevice,
@@ -95,7 +96,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
                            NULL,                    //__in_opt     LPVOID lpInBuffer,
                            0,                       //__in         DWORD nInBufferSize,
                            &buffer[0],              //__out_opt    LPVOID lpOutBuffer,
-                           static_cast<DWORD>(buffer.size()), //__in         DWORD nOutBufferSize,
+                           bufferSize,              //__in         DWORD nOutBufferSize,
                            &bytesReturned,          //__out_opt    LPDWORD lpBytesReturned,
                            NULL))                   //__inout_opt  LPOVERLAPPED lpOverlapped
         throw FileError(_("Error resolving symbolic link:") + "\n\"" + linkPath + "\"" + "\n\n" + getLastErrorFormatted());
@@ -124,9 +125,9 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
 
 #elif defined FFS_LINUX
     const int BUFFER_SIZE = 10000;
-    char buffer[BUFFER_SIZE];
+    std::vector<char> buffer(BUFFER_SIZE);
 
-    const int bytesWritten = ::readlink(linkPath.c_str(), buffer, BUFFER_SIZE);
+    const int bytesWritten = ::readlink(linkPath.c_str(), &buffer[0], BUFFER_SIZE);
     if (bytesWritten < 0 || bytesWritten >= BUFFER_SIZE)
     {
         std::wstring errorMessage = _("Error resolving symbolic link:") + "\n\"" + linkPath + "\"";
@@ -136,7 +137,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
     }
     buffer[bytesWritten] = 0; //set null-terminating char
 
-    return buffer;
+    return Zstring(&buffer[0], bytesWritten);
 #endif
 }
 }

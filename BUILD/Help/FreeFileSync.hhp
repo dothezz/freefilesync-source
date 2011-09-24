@@ -2,7 +2,7 @@
 Compatibility=1.1 or later
 Compiled file=..\FreeFileSync.chm
 Contents file=Table of Contents.hhc
-Default topic=html\Overview.html
+Default topic=html\FreeFileSync.html
 Display compile progress=No
 Full-text search=Yes
 Language=0x409 Englisch (USA)
@@ -12,23 +12,22 @@ Title=FreeFileSync - Help
 [FILES]
 html\Features.html
 html\Links.html
-html\advanced\CompareFileSize.html
-html\advanced\DragDrop.html
-html\advanced\ExcludeSubfolder.html
-html\advanced\ExternalApp.html
-html\advanced\Ftp.html
-html\advanced\ScheduleBatch.html
-html\advanced\SendMail.html
-html\advanced\SymbolicLinks.html
-html\advanced\BackupStrategy.html
-html\advanced\VariableDrive.html
-html\Overview.html
-html\advanced\DaylightSavingTime.html
-html\advanced\Macros.html
-html\advanced\RealtimeSync.html
-html\advanced\ShadowCopy.html
-html\advanced\RunAsService.html
-html\advanced\Batch Scripting.html
+html\CompareFileSize.html
+html\ExcludeSubfolder.html
+html\ExternalApp.html
+html\Ftp.html
+html\ScheduleBatch.html
+html\SendMail.html
+html\BackupStrategy.html
+html\VariableDrive.html
+html\FreeFileSync.html
+html\DaylightSavingTime.html
+html\Macros.html
+html\RealtimeSync.html
+html\ShadowCopy.html
+html\RunAsService.html
+html\Batch Scripting.html
+html\ComparisonSettings.html
 
 [INFOTYPES]
 

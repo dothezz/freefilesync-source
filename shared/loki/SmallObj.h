@@ -224,14 +224,14 @@ class AllocatorSingleton : public SmallObjAllocator
 public:
 
     /// Defines type of allocator.
-    typedef AllocatorSingleton< ThreadingModel, chunkSize,
+    typedef AllocatorSingleton < ThreadingModel, chunkSize,
             maxSmallObjectSize, objectAlignSize, LifetimePolicy > MyAllocator;
 
     /// Defines type for thread-safety locking mechanism.
     typedef ThreadingModel< MyAllocator, MutexPolicy > MyThreadingModel;
 
     /// Defines singleton made from allocator.
-    typedef Loki::SingletonHolder< MyAllocator, Loki::CreateStatic,
+    typedef Loki::SingletonHolder < MyAllocator, Loki::CreateStatic,
             LifetimePolicy, ThreadingModel > MyAllocatorSingleton;
 
     /// Returns reference to the singleton.
@@ -441,7 +441,7 @@ class SmallObjectBase
 public:
     /// Defines type of allocator singleton, must be public
     /// to handle singleton lifetime dependencies.
-    typedef AllocatorSingleton< ThreadingModel, chunkSize,
+    typedef AllocatorSingleton < ThreadingModel, chunkSize,
             maxSmallObjectSize, objectAlignSize, LifetimePolicy > ObjAllocatorSingleton;
 
 private:
@@ -591,7 +591,7 @@ template <class, class> class ThreadingModel = LOKI_DEFAULT_THREADING_NO_OBJ_LEV
          template <class> class LifetimePolicy = LOKI_DEFAULT_SMALLOBJ_LIFETIME,
          class MutexPolicy = LOKI_DEFAULT_MUTEX
          >
-class SmallObject : public SmallObjectBase< ThreadingModel, chunkSize,
+class SmallObject : public SmallObjectBase < ThreadingModel, chunkSize,
     maxSmallObjectSize, objectAlignSize, LifetimePolicy, MutexPolicy >
 {
 
@@ -627,7 +627,7 @@ template <class, class> class ThreadingModel = LOKI_DEFAULT_THREADING_NO_OBJ_LEV
          template <class> class LifetimePolicy = LOKI_DEFAULT_SMALLOBJ_LIFETIME,
          class MutexPolicy = LOKI_DEFAULT_MUTEX
          >
-class SmallValueObject : public SmallObjectBase< ThreadingModel, chunkSize,
+class SmallValueObject : public SmallObjectBase < ThreadingModel, chunkSize,
     maxSmallObjectSize, objectAlignSize, LifetimePolicy, MutexPolicy >
 {
 protected:

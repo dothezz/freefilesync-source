@@ -10,10 +10,10 @@
 #include <vector>
 #include <wx/grid.h>
 #include "process_xml.h"
-#include <map>
 #include <memory>
 #include <set>
 #include "../file_hierarchy.h"
+#include "icon_buffer.h"
 
 
 class CustomGridTable;
@@ -75,19 +75,20 @@ public:
     //set sort direction indicator on UI
     typedef int SortColumn;
 
+    //notify wxGrid that underlying table size has changed
+    virtual void updateGridSizes();
+
     enum SortDirection
     {
         ASCENDING,
         DESCENDING
     };
-
-    //notify wxGrid that underlying table size has changed
-    virtual void updateGridSizes();
-
     typedef std::pair<SortColumn, SortDirection> SortMarker;
     void setSortMarker(SortMarker marker);
 
     bool isLeadGrid() const;
+
+    void setIconManager(const std::shared_ptr<zen::IconBuffer>& iconBuffer);
 
 protected:
     void RefreshCell(int row, int col);
@@ -105,6 +106,7 @@ private:
     virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight) = 0;
 
     void adjustGridHeights(wxEvent& event);
+    virtual void enableFileIcons(const std::shared_ptr<zen::IconBuffer>& iconBuffer) = 0;
 
     CustomGrid* m_gridLeft;
     CustomGrid* m_gridMiddle;
@@ -116,7 +118,6 @@ private:
 };
 
 
-template <bool showFileIcons>
 class GridCellRenderer;
 
 
@@ -125,7 +126,7 @@ class IconUpdater : private wxEvtHandler //update file icons periodically: use S
 {
 public:
     IconUpdater(CustomGridLeft* leftGrid, CustomGridRight* rightGrid);
-    ~IconUpdater(); //non-inline destructor for std::auto_ptr to work with forward declaration
+    ~IconUpdater();
 
 private:
     void loadIconsAsynchronously(wxEvent& event); //loads all (not yet) drawn icons
@@ -133,7 +134,7 @@ private:
     CustomGridRim* m_leftGrid;
     CustomGridRim* m_rightGrid;
 
-    std::auto_ptr<wxTimer> m_timer; //user timer event to periodically update icons: better than idle event because also active when scrolling! :)
+    std::unique_ptr<wxTimer> m_timer; //user timer event to periodically update icons: better than idle event because also active when scrolling! :)
 };
 
 
@@ -141,7 +142,6 @@ private:
 class CustomGridRim : public CustomGrid
 {
     friend class IconUpdater;
-    template <bool showFileIcons>
     friend class GridCellRenderer;
 
 public:
@@ -162,8 +162,6 @@ public:
 
     void autoSizeColumns();        //performance optimized column resizer
 
-    void enableFileIcons(const bool value);
-
     virtual void updateGridSizes();
 
 protected:
@@ -174,6 +172,7 @@ protected:
 
 private:
     CustomGridTableRim* getGridDataTableRim() const;
+    virtual void enableFileIcons(const std::shared_ptr<zen::IconBuffer>& iconBuffer);
 
     void OnResizeColumn(wxGridSizeEvent& event);
 
@@ -183,18 +182,15 @@ private:
     //asynchronous icon loading
     void getIconsToBeLoaded(std::vector<Zstring>& newLoad); //loads all (not yet) drawn icons
 
-    typedef size_t FromRow;
-    typedef size_t ToRow;
-    typedef std::pair<FromRow, ToRow> VisibleRowRange;
-    VisibleRowRange getVisibleRows();
-
+    typedef size_t RowBegin;
+    typedef size_t RowEnd;
+    std::pair<RowBegin, RowEnd> getVisibleRows(); //return [first, last) number pair
 
     typedef size_t RowNumber;
-    typedef bool   IconLoaded;
-    typedef std::map<RowNumber, IconLoaded> LoadSuccess;
-    LoadSuccess loadIconSuccess; //save status of last icon load when drawing on GUI
+    typedef std::set<RowNumber> FailedIconLoad;
+    FailedIconLoad failedLoads; //save status of last icon load when drawing on GUI
 
-    bool fileIconsAreEnabled;
+    std::shared_ptr<zen::IconBuffer> iconBuffer_;
 
     xmlAccess::ColumnAttributes columnSettings; //set visibility, position and width of columns
     CustomGridRim* otherGrid; //sibling grid on other side
@@ -259,7 +255,7 @@ public:
                      long style           = wxWANTS_CHARS,
                      const wxString& name = wxGridNameStr);
 
-    ~CustomGridMiddle(); //non-inline destructor for std::auto_ptr to work with forward declaration
+    ~CustomGridMiddle();
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
@@ -274,6 +270,7 @@ private:
     virtual CustomGridTable* getGridDataTable() const;
     CustomGridTableMiddle* getGridDataTableMiddle() const;
 
+    virtual void enableFileIcons(const std::shared_ptr<zen::IconBuffer>& iconBuffer) {};
 #ifdef FFS_WIN //get rid of scrollbars; Windows: overwrite virtual method
     virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh = true);
 #endif
@@ -308,7 +305,7 @@ private:
     int highlightedRow;
     BlockPosition highlightedPos;
 
-    std::auto_ptr<CustomTooltip> toolTip;
+    std::unique_ptr<CustomTooltip> toolTip;
 };
 
 //custom events for middle grid:

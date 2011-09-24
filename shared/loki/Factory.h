@@ -140,25 +140,25 @@ struct FactoryImpl<AP, Id, NullType>
     virtual AP* CreateObject(const Id& id ) = 0;
 };
 template <typename AP, typename Id, typename P1 >
-struct FactoryImpl<AP,Id, Seq<P1> >
+struct FactoryImpl<AP, Id, Seq<P1> >
         : public FactoryImplBase
 {
     typedef typename TypeTraits<P1>::ParameterType Parm1;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1 ) = 0;
+    virtual AP* CreateObject(const Id& id, Parm1 ) = 0;
 };
 
-template<typename AP, typename Id, typename P1,typename P2 >
+template<typename AP, typename Id, typename P1, typename P2 >
 struct FactoryImpl<AP, Id, Seq<P1, P2> >
         : public FactoryImplBase
 {
     typedef typename TypeTraits<P1>::ParameterType Parm1;
     typedef typename TypeTraits<P2>::ParameterType Parm2;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2 ) = 0;
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2 ) = 0;
 };
 
-template<typename AP, typename Id, typename P1,typename P2,typename P3 >
+template<typename AP, typename Id, typename P1, typename P2, typename P3 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3> >
         : public FactoryImplBase
 {
@@ -166,10 +166,10 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3> >
     typedef typename TypeTraits<P2>::ParameterType Parm2;
     typedef typename TypeTraits<P3>::ParameterType Parm3;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3 ) = 0;
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3 ) = 0;
 };
 
-template<typename AP, typename Id, typename P1,typename P2,typename P3,typename P4 >
+template<typename AP, typename Id, typename P1, typename P2, typename P3, typename P4 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4> >
         : public FactoryImplBase
 {
@@ -178,11 +178,11 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4> >
     typedef typename TypeTraits<P3>::ParameterType Parm3;
     typedef typename TypeTraits<P4>::ParameterType Parm4;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4 ) = 0;
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4 ) = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5 >
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5> >
         : public FactoryImplBase
 {
@@ -192,12 +192,12 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5> >
     typedef typename TypeTraits<P4>::ParameterType Parm4;
     typedef typename TypeTraits<P5>::ParameterType Parm5;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5 ) = 0;
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5 ) = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6> >
         : public FactoryImplBase
 {
@@ -208,14 +208,14 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6> >
     typedef typename TypeTraits<P5>::ParameterType Parm5;
     typedef typename TypeTraits<P6>::ParameterType Parm6;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6 )
         = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7> >
         : public FactoryImplBase
 {
@@ -227,14 +227,14 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7> >
     typedef typename TypeTraits<P6>::ParameterType Parm6;
     typedef typename TypeTraits<P7>::ParameterType Parm7;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7 )
         = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8> >
         : public FactoryImplBase
 {
@@ -247,14 +247,14 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8> >
     typedef typename TypeTraits<P7>::ParameterType Parm7;
     typedef typename TypeTraits<P8>::ParameterType Parm8;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8)
         = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9> >
         : public FactoryImplBase
 {
@@ -268,14 +268,14 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9> >
     typedef typename TypeTraits<P8>::ParameterType Parm8;
     typedef typename TypeTraits<P9>::ParameterType Parm9;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8, Parm9)
         = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10> >
         : public FactoryImplBase
 {
@@ -290,15 +290,15 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10> >
     typedef typename TypeTraits<P9>::ParameterType Parm9;
     typedef typename TypeTraits<P10>::ParameterType Parm10;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                             Parm6, Parm7, Parm8, Parm9,Parm10)
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                             Parm6, Parm7, Parm8, Parm9, Parm10)
         = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11> >
         : public FactoryImplBase
 {
@@ -314,16 +314,16 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11> >
     typedef typename TypeTraits<P10>::ParameterType Parm10;
     typedef typename TypeTraits<P11>::ParameterType Parm11;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                             Parm6, Parm7, Parm8, Parm9,Parm10,
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                             Parm6, Parm7, Parm8, Parm9, Parm10,
                              Parm11)
         = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11,typename P12>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11, typename P12 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12> >
         : public FactoryImplBase
 {
@@ -340,16 +340,16 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12
     typedef typename TypeTraits<P11>::ParameterType Parm11;
     typedef typename TypeTraits<P12>::ParameterType Parm12;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                             Parm6, Parm7, Parm8, Parm9,Parm10,
-                             Parm11,Parm12)
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                             Parm6, Parm7, Parm8, Parm9, Parm10,
+                             Parm11, Parm12)
         = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11,typename P12,typename P13>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11, typename P12, typename P13 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13> >
         : public FactoryImplBase
 {
@@ -367,16 +367,16 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12
     typedef typename TypeTraits<P12>::ParameterType Parm12;
     typedef typename TypeTraits<P13>::ParameterType Parm13;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                             Parm6, Parm7, Parm8, Parm9,Parm10,
-                             Parm11,Parm12,Parm13)
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                             Parm6, Parm7, Parm8, Parm9, Parm10,
+                             Parm11, Parm12, Parm13)
         = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11,typename P12,typename P13,typename P14>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11, typename P12, typename P13, typename P14 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14> >
         : public FactoryImplBase
 {
@@ -395,16 +395,16 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12
     typedef typename TypeTraits<P13>::ParameterType Parm13;
     typedef typename TypeTraits<P14>::ParameterType Parm14;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                             Parm6, Parm7, Parm8, Parm8,Parm10,
-                             Parm11,Parm12,Parm13,Parm14)
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                             Parm6, Parm7, Parm8, Parm8, Parm10,
+                             Parm11, Parm12, Parm13, Parm14)
         = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11,typename P12,typename P13,typename P14,typename P15 >
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11, typename P12, typename P13, typename P14, typename P15 >
 struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15> >
         : public FactoryImplBase
 {
@@ -424,34 +424,34 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12
     typedef typename TypeTraits<P14>::ParameterType Parm14;
     typedef typename TypeTraits<P15>::ParameterType Parm15;
     virtual ~FactoryImpl() {}
-    virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                             Parm6, Parm7, Parm8, Parm9,Parm10,
-                             Parm11,Parm12,Parm13,Parm14,Parm15 )
+    virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                             Parm6, Parm7, Parm8, Parm9, Parm10,
+                             Parm11, Parm12, Parm13, Parm14, Parm15 )
         = 0;
 };
 
 #ifndef LOKI_DISABLE_TYPELIST_MACROS
 
 template <typename AP, typename Id, typename P1 >
-struct FactoryImpl<AP,Id, LOKI_TYPELIST_1( P1 )>
+struct FactoryImpl<AP, Id, LOKI_TYPELIST_1( P1 )>
 : public FactoryImplBase
 {
     typedef typename TypeTraits<P1>::ParameterType Parm1;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1 ) = 0;
+virtual AP* CreateObject(const Id& id, Parm1 ) = 0;
 };
 
-template<typename AP, typename Id, typename P1,typename P2 >
+template<typename AP, typename Id, typename P1, typename P2 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_2( P1, P2 )>
 : public FactoryImplBase
 {
     typedef typename TypeTraits<P1>::ParameterType Parm1;
     typedef typename TypeTraits<P2>::ParameterType Parm2;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2 ) = 0;
+virtual AP* CreateObject(const Id& id, Parm1, Parm2 ) = 0;
 };
 
-template<typename AP, typename Id, typename P1,typename P2,typename P3 >
+template<typename AP, typename Id, typename P1, typename P2, typename P3 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_3( P1, P2, P3 )>
 : public FactoryImplBase
 {
@@ -459,10 +459,10 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_3( P1, P2, P3 )>
     typedef typename TypeTraits<P2>::ParameterType Parm2;
     typedef typename TypeTraits<P3>::ParameterType Parm3;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3 ) = 0;
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3 ) = 0;
 };
 
-template<typename AP, typename Id, typename P1,typename P2,typename P3,typename P4 >
+template<typename AP, typename Id, typename P1, typename P2, typename P3, typename P4 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_4( P1, P2, P3, P4 )>
 : public FactoryImplBase
 {
@@ -471,11 +471,11 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_4( P1, P2, P3, P4 )>
     typedef typename TypeTraits<P3>::ParameterType Parm3;
     typedef typename TypeTraits<P4>::ParameterType Parm4;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4 ) = 0;
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4 ) = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5 >
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_5( P1, P2, P3, P4, P5 )>
 : public FactoryImplBase
 {
@@ -485,12 +485,12 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_5( P1, P2, P3, P4, P5 )>
     typedef typename TypeTraits<P4>::ParameterType Parm4;
     typedef typename TypeTraits<P5>::ParameterType Parm5;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5 ) = 0;
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5 ) = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_6( P1, P2, P3, P4, P5, P6 )>
 : public FactoryImplBase
 {
@@ -501,14 +501,14 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_6( P1, P2, P3, P4, P5, P6 )>
     typedef typename TypeTraits<P5>::ParameterType Parm5;
     typedef typename TypeTraits<P6>::ParameterType Parm6;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6 )
     = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_7( P1, P2, P3, P4, P5, P6, P7 )>
 : public FactoryImplBase
 {
@@ -520,14 +520,14 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_7( P1, P2, P3, P4, P5, P6, P7 )>
     typedef typename TypeTraits<P6>::ParameterType Parm6;
     typedef typename TypeTraits<P7>::ParameterType Parm7;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7 )
     = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_8( P1, P2, P3, P4, P5, P6, P7, P8 )>
 : public FactoryImplBase
 {
@@ -540,14 +540,14 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_8( P1, P2, P3, P4, P5, P6, P7, P8 )>
     typedef typename TypeTraits<P7>::ParameterType Parm7;
     typedef typename TypeTraits<P8>::ParameterType Parm8;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8)
     = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_9( P1, P2, P3, P4, P5, P6, P7, P8, P9 )>
 : public FactoryImplBase
 {
@@ -561,14 +561,14 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_9( P1, P2, P3, P4, P5, P6, P7, P8, P9 )
     typedef typename TypeTraits<P8>::ParameterType Parm8;
     typedef typename TypeTraits<P9>::ParameterType Parm9;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8, Parm9)
     = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_10( P1, P2, P3, P4, P5, P6, P7, P8, P9, P10 )>
 : public FactoryImplBase
 {
@@ -583,15 +583,15 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_10( P1, P2, P3, P4, P5, P6, P7, P8, P9,
     typedef typename TypeTraits<P9>::ParameterType Parm9;
     typedef typename TypeTraits<P10>::ParameterType Parm10;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                         Parm6, Parm7, Parm8, Parm9,Parm10)
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                         Parm6, Parm7, Parm8, Parm9, Parm10)
     = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_11( P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11 )>
 : public FactoryImplBase
 {
@@ -607,16 +607,16 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_11( P1, P2, P3, P4, P5, P6, P7, P8, P9,
     typedef typename TypeTraits<P10>::ParameterType Parm10;
     typedef typename TypeTraits<P11>::ParameterType Parm11;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                         Parm6, Parm7, Parm8, Parm9,Parm10,
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                         Parm6, Parm7, Parm8, Parm9, Parm10,
                          Parm11)
     = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11,typename P12>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11, typename P12 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_12( P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12 )>
 : public FactoryImplBase
 {
@@ -633,16 +633,16 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_12( P1, P2, P3, P4, P5, P6, P7, P8, P9,
     typedef typename TypeTraits<P11>::ParameterType Parm11;
     typedef typename TypeTraits<P12>::ParameterType Parm12;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                         Parm6, Parm7, Parm8, Parm9,Parm10,
-                         Parm11,Parm12)
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                         Parm6, Parm7, Parm8, Parm9, Parm10,
+                         Parm11, Parm12)
     = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11,typename P12,typename P13>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11, typename P12, typename P13 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_13( P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13 )>
 : public FactoryImplBase
 {
@@ -660,16 +660,16 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_13( P1, P2, P3, P4, P5, P6, P7, P8, P9,
     typedef typename TypeTraits<P12>::ParameterType Parm12;
     typedef typename TypeTraits<P13>::ParameterType Parm13;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                         Parm6, Parm7, Parm8, Parm9,Parm10,
-                         Parm11,Parm12,Parm13)
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                         Parm6, Parm7, Parm8, Parm9, Parm10,
+                         Parm11, Parm12, Parm13)
     = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11,typename P12,typename P13,typename P14>
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11, typename P12, typename P13, typename P14 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_14( P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14 )>
 : public FactoryImplBase
 {
@@ -688,16 +688,16 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_14( P1, P2, P3, P4, P5, P6, P7, P8, P9,
     typedef typename TypeTraits<P13>::ParameterType Parm13;
     typedef typename TypeTraits<P14>::ParameterType Parm14;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                         Parm6, Parm7, Parm8, Parm8,Parm10,
-                         Parm11,Parm12,Parm13,Parm14)
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                         Parm6, Parm7, Parm8, Parm8, Parm10,
+                         Parm11, Parm12, Parm13, Parm14)
     = 0;
 };
 
-template<typename AP, typename Id,
-         typename P1,typename P2,typename P3,typename P4,typename P5,
-         typename P6,typename P7,typename P8,typename P9,typename P10,
-         typename P11,typename P12,typename P13,typename P14,typename P15 >
+template < typename AP, typename Id,
+         typename P1, typename P2, typename P3, typename P4, typename P5,
+         typename P6, typename P7, typename P8, typename P9, typename P10,
+         typename P11, typename P12, typename P13, typename P14, typename P15 >
 struct FactoryImpl<AP, Id, LOKI_TYPELIST_15( P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15 )>
 : public FactoryImplBase
 {
@@ -717,9 +717,9 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_15( P1, P2, P3, P4, P5, P6, P7, P8, P9,
     typedef typename TypeTraits<P14>::ParameterType Parm14;
     typedef typename TypeTraits<P15>::ParameterType Parm15;
 virtual ~FactoryImpl() {}
-virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
-                         Parm6, Parm7, Parm8, Parm9,Parm10,
-                         Parm11,Parm12,Parm13,Parm14,Parm15 )
+virtual AP* CreateObject(const Id& id, Parm1, Parm2, Parm3, Parm4, Parm5,
+                         Parm6, Parm7, Parm8, Parm9, Parm10,
+                         Parm11, Parm12, Parm13, Parm14, Parm15 )
     = 0;
 };
 
@@ -809,8 +809,8 @@ public:
     std::vector<IdentifierType> RegisteredIds()
     {
         std::vector<IdentifierType> ids;
-        for(typename IdToProductMap::iterator it = associations_.begin();
-            it != associations_.end(); ++it)
+        for (typename IdToProductMap::iterator it = associations_.begin();
+             it != associations_.end(); ++it)
         {
             ids.push_back(it->first);
         }
@@ -839,7 +839,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2 );
+            return (i->second)( p1, p2 );
         return this->OnUnknownType(id);
     }
 
@@ -848,7 +848,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3 );
+            return (i->second)( p1, p2, p3 );
         return this->OnUnknownType(id);
     }
 
@@ -857,7 +857,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4 );
+            return (i->second)( p1, p2, p3, p4 );
         return this->OnUnknownType(id);
     }
 
@@ -866,7 +866,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5 );
+            return (i->second)( p1, p2, p3, p4, p5 );
         return this->OnUnknownType(id);
     }
 
@@ -876,7 +876,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6 );
+            return (i->second)( p1, p2, p3, p4, p5, p6 );
         return this->OnUnknownType(id);
     }
 
@@ -886,7 +886,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6,p7 );
+            return (i->second)( p1, p2, p3, p4, p5, p6, p7 );
         return this->OnUnknownType(id);
     }
 
@@ -896,7 +896,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6,p7,p8 );
+            return (i->second)( p1, p2, p3, p4, p5, p6, p7, p8 );
         return this->OnUnknownType(id);
     }
 
@@ -906,16 +906,16 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6,p7,p8,p9 );
+            return (i->second)( p1, p2, p3, p4, p5, p6, p7, p8, p9 );
         return this->OnUnknownType(id);
     }
     AbstractProduct* CreateObject(const IdentifierType& id,
                                   Parm1 p1, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5,
-                                  Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,Parm10 p10)
+                                  Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10)
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6,p7,p8,p9,p10 );
+            return (i->second)( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 );
         return this->OnUnknownType(id);
     }
 
@@ -926,7 +926,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11 );
+            return (i->second)( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 );
         return this->OnUnknownType(id);
     }
 
@@ -937,7 +937,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12 );
+            return (i->second)( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 );
         return this->OnUnknownType(id);
     }
 
@@ -948,7 +948,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13 );
+            return (i->second)( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 );
         return this->OnUnknownType(id);
     }
 
@@ -959,7 +959,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14 );
+            return (i->second)( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14 );
         return this->OnUnknownType(id);
     }
 
@@ -970,7 +970,7 @@ public:
     {
         typename IdToProductMap::iterator i = associations_.find(id);
         if (i != associations_.end())
-            return (i->second)( p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15 );
+            return (i->second)( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 );
         return this->OnUnknownType(id);
     }
 

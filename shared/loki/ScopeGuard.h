@@ -65,7 +65,7 @@ protected:
             {
                 j.Execute();
             }
-            catch(...)
+            catch (...)
             {}
     }
 
@@ -440,15 +440,15 @@ inline ObjScopeGuardImpl0<Obj, MemFun> MakeObjGuard(Obj& obj, MemFun memFun)
 }
 
 template <typename Ret, class Obj1, class Obj2>
-inline ObjScopeGuardImpl0<Obj1,Ret(Obj2::*)()> MakeGuard(Ret(Obj2::*memFun)(), Obj1& obj)
+inline ObjScopeGuardImpl0<Obj1, Ret(Obj2::*)()> MakeGuard(Ret(Obj2::*memFun)(), Obj1& obj)
 {
-    return ObjScopeGuardImpl0<Obj1,Ret(Obj2::*)()>::MakeObjGuard(obj,memFun);
+    return ObjScopeGuardImpl0<Obj1, Ret(Obj2::*)()>::MakeObjGuard(obj, memFun);
 }
 
 template <typename Ret, class Obj1, class Obj2>
-inline ObjScopeGuardImpl0<Obj1,Ret(Obj2::*)()> MakeGuard(Ret(Obj2::*memFun)(), Obj1* obj)
+inline ObjScopeGuardImpl0<Obj1, Ret(Obj2::*)()> MakeGuard(Ret(Obj2::*memFun)(), Obj1* obj)
 {
-    return ObjScopeGuardImpl0<Obj1,Ret(Obj2::*)()>::MakeObjGuard(*obj,memFun);
+    return ObjScopeGuardImpl0<Obj1, Ret(Obj2::*)()>::MakeObjGuard(*obj, memFun);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -503,15 +503,15 @@ inline ObjScopeGuardImpl1<Obj, MemFun, P1> MakeObjGuard(Obj& obj, MemFun memFun,
 }
 
 template <typename Ret, class Obj1, class Obj2, typename P1a, typename P1b>
-inline ObjScopeGuardImpl1<Obj1,Ret(Obj2::*)(P1a),P1b> MakeGuard(Ret(Obj2::*memFun)(P1a), Obj1& obj, P1b p1)
+inline ObjScopeGuardImpl1<Obj1, Ret(Obj2::*)(P1a), P1b> MakeGuard(Ret(Obj2::*memFun)(P1a), Obj1& obj, P1b p1)
 {
-    return ObjScopeGuardImpl1<Obj1,Ret(Obj2::*)(P1a),P1b>::MakeObjGuard(obj,memFun,p1);
+    return ObjScopeGuardImpl1<Obj1, Ret(Obj2::*)(P1a), P1b>::MakeObjGuard(obj, memFun, p1);
 }
 
 template <typename Ret, class Obj1, class Obj2, typename P1a, typename P1b>
-inline ObjScopeGuardImpl1<Obj1,Ret(Obj2::*)(P1a),P1b> MakeGuard(Ret(Obj2::*memFun)(P1a), Obj1* obj, P1b p1)
+inline ObjScopeGuardImpl1<Obj1, Ret(Obj2::*)(P1a), P1b> MakeGuard(Ret(Obj2::*memFun)(P1a), Obj1* obj, P1b p1)
 {
-    return ObjScopeGuardImpl1<Obj1,Ret(Obj2::*)(P1a),P1b>::MakeObjGuard(*obj,memFun,p1);
+    return ObjScopeGuardImpl1<Obj1, Ret(Obj2::*)(P1a), P1b>::MakeObjGuard(*obj, memFun, p1);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -567,15 +567,15 @@ inline ObjScopeGuardImpl2<Obj, MemFun, P1, P2> MakeObjGuard(Obj& obj, MemFun mem
 }
 
 template <typename Ret, class Obj1, class Obj2, typename P1a, typename P1b, typename P2a, typename P2b>
-inline ObjScopeGuardImpl2<Obj1,Ret(Obj2::*)(P1a,P2a),P1b,P2b> MakeGuard(Ret(Obj2::*memFun)(P1a,P2a), Obj1& obj, P1b p1, P2b p2)
+inline ObjScopeGuardImpl2<Obj1, Ret(Obj2::*)(P1a, P2a), P1b, P2b> MakeGuard(Ret(Obj2::*memFun)(P1a, P2a), Obj1& obj, P1b p1, P2b p2)
 {
-    return ObjScopeGuardImpl2<Obj1,Ret(Obj2::*)(P1a,P2a),P1b,P2b>::MakeObjGuard(obj,memFun,p1,p2);
+    return ObjScopeGuardImpl2<Obj1, Ret(Obj2::*)(P1a, P2a), P1b, P2b>::MakeObjGuard(obj, memFun, p1, p2);
 }
 
 template <typename Ret, class Obj1, class Obj2, typename P1a, typename P1b, typename P2a, typename P2b>
-inline ObjScopeGuardImpl2<Obj1,Ret(Obj2::*)(P1a,P2a),P1b,P2b> MakeGuard(Ret(Obj2::*memFun)(P1a,P2a), Obj1* obj, P1b p1, P2b p2)
+inline ObjScopeGuardImpl2<Obj1, Ret(Obj2::*)(P1a, P2a), P1b, P2b> MakeGuard(Ret(Obj2::*memFun)(P1a, P2a), Obj1* obj, P1b p1, P2b p2)
 {
-    return ObjScopeGuardImpl2<Obj1,Ret(Obj2::*)(P1a,P2a),P1b,P2b>::MakeObjGuard(*obj,memFun,p1,p2);
+    return ObjScopeGuardImpl2<Obj1, Ret(Obj2::*)(P1a, P2a), P1b, P2b>::MakeObjGuard(*obj, memFun, p1, p2);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -661,6 +661,9 @@ MakeGuard( Ret( Obj2::*memFun )( P1a, P2a, P3a ), Obj1* obj, P1b p1, P2b p2, P3b
 
 #define LOKI_ON_BLOCK_EXIT      ::Loki::ScopeGuard LOKI_ANONYMOUS_VARIABLE(scopeGuard) = ::Loki::MakeGuard
 #define LOKI_ON_BLOCK_EXIT_OBJ  ::Loki::ScopeGuard LOKI_ANONYMOUS_VARIABLE(scopeGuard) = ::Loki::MakeObjGuard
+
+//by ZenJu
+#define LOKI_ON_BLOCK_EXIT2(X) ::Loki::ScopeGuard LOKI_ANONYMOUS_VARIABLE(scopeGuard) = ::Loki::MakeGuard([&](){X;}); (void)LOKI_ANONYMOUS_VARIABLE(scopeGuard);
 
 #endif // end file guardian
 

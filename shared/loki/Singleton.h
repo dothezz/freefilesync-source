@@ -119,7 +119,7 @@ template <typename T, typename Destroyer>
 class ConcreteLifetimeTracker : public LifetimeTracker
 {
 public:
-    ConcreteLifetimeTracker(T* p,unsigned int longevity, Destroyer d)
+    ConcreteLifetimeTracker(T* p, unsigned int longevity, Destroyer d)
         : LifetimeTracker(longevity)
         , pTracked_(p)
         , destroyer_(d)
@@ -151,7 +151,7 @@ void SetLongevity(T* pDynObject, unsigned int longevity,
     using namespace Private;
 
     // manage lifetime of stack manually
-    if(pTrackerArray==0)
+    if (pTrackerArray == 0)
         pTrackerArray = new TrackerArray;
 
     // automatically delete the ConcreteLifetimeTracker object when a exception is thrown
@@ -261,7 +261,7 @@ struct CreateUsing
         {
             //allocator.destroy(p);
             p->~T();
-            allocator.deallocate(p,1);
+            allocator.deallocate(p, 1);
         }
     };
 };
@@ -566,21 +566,21 @@ public:
 ///  \ingroup LongevityLifetimeGroup
 ///  \brief  Longest possible SingletonWithLongevity lifetime: 0xFFFFFFFF
 template <class T>
-struct DieLast  : SingletonFixedLongevity<0xFFFFFFFF ,T>
+struct DieLast  : SingletonFixedLongevity<0xFFFFFFFF , T>
 {};
 
 ///  \struct DieDirectlyBeforeLast
 ///  \ingroup LongevityLifetimeGroup
 ///  \brief  Lifetime is a one less than DieLast: 0xFFFFFFFF-1
 template <class T>
-struct DieDirectlyBeforeLast  : SingletonFixedLongevity<0xFFFFFFFF-1 ,T>
+struct DieDirectlyBeforeLast  : SingletonFixedLongevity < 0xFFFFFFFF - 1 , T >
 {};
 
 ///  \struct DieFirst
 ///  \ingroup LongevityLifetimeGroup
 ///  \brief  Shortest possible SingletonWithLongevity lifetime: 0
 template <class T>
-struct DieFirst : SingletonFixedLongevity<0,T>
+struct DieFirst : SingletonFixedLongevity<0, T>
 {};
 
 }//namespace LongevityLifetime
@@ -616,7 +616,7 @@ class FollowIntoDeath
         static void Init()
         {
             static bool done = false;
-            if(!done)
+            if (!done)
             {
                 followers_ = new Container;
                 done = true;
@@ -632,7 +632,7 @@ class FollowIntoDeath
         static void DestroyFollowers()
         {
             Init();
-            for(iterator it = followers_->begin(); it != followers_->end(); ++it)
+            for (iterator it = followers_->begin(); it != followers_->end(); ++it)
                 (*it)();
             delete followers_;
         }
@@ -660,7 +660,7 @@ public:
                 // template instantiation,  this adds a additional atexit entry
                 // does not work with SetLonlevity, but there you can control
                 // the lifetime with the GetLongevity function.
-                Lifetime<Followers<Master> >::ScheduleDestruction(0,Followers<Master>::DestroyFollowers);
+                Lifetime<Followers<Master> >::ScheduleDestruction(0, Followers<Master>::DestroyFollowers);
             }
 
             static void OnDeadReference()
@@ -741,7 +741,7 @@ private:
     SingletonHolder();
 
     // Data
-    typedef typename ThreadingModel<T*,MutexPolicy>::VolatileType PtrInstanceType;
+    typedef typename ThreadingModel<T*, MutexPolicy>::VolatileType PtrInstanceType;
     static PtrInstanceType pInstance_;
     static bool destroyed_;
 };
@@ -783,8 +783,8 @@ class T,
       template <class, class> class ThreadingModel,
       class MutexPolicy
       >
-inline T& SingletonHolder<T, CreationPolicy,
-       LifetimePolicy, ThreadingModel, MutexPolicy>::Instance()
+inline T& SingletonHolder < T, CreationPolicy,
+       LifetimePolicy, ThreadingModel, MutexPolicy >::Instance()
 {
     if (!pInstance_)
     {
@@ -805,10 +805,10 @@ template <class> class LifetimePolicy,
 template <class, class> class ThreadingModel,
 class MutexPolicy
 >
-void SingletonHolder<T, CreationPolicy,
-     LifetimePolicy, ThreadingModel, MutexPolicy>::MakeInstance()
+void SingletonHolder < T, CreationPolicy,
+     LifetimePolicy, ThreadingModel, MutexPolicy >::MakeInstance()
 {
-    typename ThreadingModel<SingletonHolder,MutexPolicy>::Lock guard;
+    typename ThreadingModel<SingletonHolder, MutexPolicy>::Lock guard;
     (void)guard;
 
     if (!pInstance_)
@@ -875,14 +875,14 @@ public:
 /// Put this macro called with a SingletonHolder typedef into your cpp file.
 
 #define LOKI_SINGLETON_INSTANCE_DEFINITION(SHOLDER)                     \
-namespace Loki                                                          \
-{                                                                        \
+    namespace Loki                                                          \
+    {                                                                        \
     template<>                                                          \
     SHOLDER::ObjectType&  Singleton<SHOLDER::ObjectType>::Instance()    \
     {                                                                   \
         return SHOLDER::Instance();                                     \
     }                                                                    \
-}
+    }
 
 
 #endif // end file guardian

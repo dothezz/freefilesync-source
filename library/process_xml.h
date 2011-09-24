@@ -75,22 +75,18 @@ struct XmlGuiConfig
     zen::MainConfiguration mainCfg;
 
     bool hideFilteredElements;
-
     OnGuiError handleError; //reaction on error situation during synchronization
     bool syncPreviewEnabled;
 
     bool operator==(const XmlGuiConfig& other) const
     {
-        return mainCfg                == other.mainCfg               &&
-               hideFilteredElements   == other.hideFilteredElements  &&
-               handleError            == other.handleError           &&
-               syncPreviewEnabled     == other.syncPreviewEnabled;
+        return mainCfg              == other.mainCfg               &&
+               hideFilteredElements == other.hideFilteredElements  &&
+               handleError          == other.handleError           &&
+               syncPreviewEnabled   == other.syncPreviewEnabled;
     }
 
-    bool operator!=(const XmlGuiConfig& other) const
-    {
-        return !(*this == other);
-    }
+    bool operator!=(const XmlGuiConfig& other) const { return !(*this == other); }
 };
 
 
@@ -112,10 +108,7 @@ struct XmlBatchConfig
 
 struct OptionalDialogs
 {
-    OptionalDialogs()
-    {
-        resetDialogs();
-    }
+    OptionalDialogs() { resetDialogs();}
 
     void resetDialogs();
 
@@ -131,6 +124,14 @@ struct OptionalDialogs
 };
 
 
+enum FileIconSize
+{
+    ICON_SIZE_SMALL,
+    ICON_SIZE_MEDIUM,
+    ICON_SIZE_LARGE
+};
+
+
 wxString getGlobalConfigFile();
 
 struct XmlGlobalSettings
@@ -143,7 +144,7 @@ struct XmlGlobalSettings
         copyFilePermissions(false),
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS
         verifyFileCopy(false),
-		transactionalFileCopy(true) {}
+        transactionalFileCopy(true) {}
 
     int programLanguage;
     bool copyLockedFiles;          //VSS usage
@@ -151,7 +152,7 @@ struct XmlGlobalSettings
 
     size_t fileTimeTolerance; //max. allowed file time deviation
     bool verifyFileCopy;   //verify copied files
-	bool transactionalFileCopy;
+    bool transactionalFileCopy;
 
     OptionalDialogs optDialogs;
 
@@ -165,7 +166,7 @@ struct XmlGlobalSettings
             maxFolderPairsVisible(6),
             autoAdjustColumnsLeft(false),
             autoAdjustColumnsRight(false),
-            folderHistMax(12),
+            folderHistMax(15),
             deleteOnBothSides(false),
             useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
 #ifdef FFS_WIN
@@ -173,8 +174,7 @@ struct XmlGlobalSettings
 #elif defined FFS_LINUX
             textSearchRespectCase(true),
 #endif
-            showFileIconsLeft(true),
-            showFileIconsRight(true),
+            iconSize(ICON_SIZE_MEDIUM),
             lastUpdateCheck(0)
         {
             //default external apps will be translated "on the fly"!!!
@@ -208,15 +208,15 @@ struct XmlGlobalSettings
         std::vector<wxString> cfgFileHistory;
         std::vector<wxString> lastUsedConfigFiles;
 
-        std::vector<wxString> folderHistoryLeft;
-        std::vector<wxString> folderHistoryRight;
+        std::vector<Zstring> folderHistoryLeft;
+        std::vector<Zstring> folderHistoryRight;
         unsigned int folderHistMax;
 
         bool deleteOnBothSides;
         bool useRecyclerForManualDeletion;
         bool textSearchRespectCase;
-        bool showFileIconsLeft;
-        bool showFileIconsRight;
+
+        FileIconSize iconSize;
 
         long lastUpdateCheck;          //time of last update check
 
@@ -252,17 +252,17 @@ bool sortByPositionAndVisibility(const ColumnAttrib& a, const ColumnAttrib& b)
     return a.position < b.position;
 }
 
-void readConfig(const wxString& filename, XmlGuiConfig&      config); //throw (xmlAccess::FfsXmlError)
-void readConfig(const wxString& filename, XmlBatchConfig&    config); //throw (xmlAccess::FfsXmlError)
-void readConfig(                          XmlGlobalSettings& config); //throw (xmlAccess::FfsXmlError)
+void readConfig(const wxString& filename, XmlGuiConfig&      config); //throw xmlAccess::FfsXmlError
+void readConfig(const wxString& filename, XmlBatchConfig&    config); //throw xmlAccess::FfsXmlError
+void readConfig(                          XmlGlobalSettings& config); //throw xmlAccess::FfsXmlError
 
-void writeConfig(const XmlGuiConfig&      config, const wxString& filename); //throw (xmlAccess::FfsXmlError)
-void writeConfig(const XmlBatchConfig&    config, const wxString& filename); //throw (xmlAccess::FfsXmlError)
-void writeConfig(const XmlGlobalSettings& config);                           //throw (xmlAccess::FfsXmlError)
+void writeConfig(const XmlGuiConfig&      config, const wxString& filename); //throw xmlAccess::FfsXmlError
+void writeConfig(const XmlBatchConfig&    config, const wxString& filename); //throw xmlAccess::FfsXmlError
+void writeConfig(const XmlGlobalSettings& config);                           //throw xmlAccess::FfsXmlError
 
 //config conversion utilities
 XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg);
-XmlBatchConfig convertGuiToBatch(const XmlGuiConfig&   guiCfg);
+XmlBatchConfig convertGuiToBatch(const XmlGuiConfig& guiCfg, const wxString& referenceFile);
 
 
 //convert (multiple) *.ffs_gui, *.ffs_batch files or combinations of both into target config structure:
@@ -275,8 +275,8 @@ enum MergeType
 };
 MergeType getMergeType(const std::vector<wxString>& filenames);   //throw ()
 
-void convertConfig(const std::vector<wxString>& filenames, XmlGuiConfig&   config); //throw (xmlAccess::FfsXmlError)
-void convertConfig(const std::vector<wxString>& filenames, XmlBatchConfig& config); //throw (xmlAccess::FfsXmlError)
+void convertConfig(const std::vector<wxString>& filenames, XmlGuiConfig&   config); //throw xmlAccess::FfsXmlError
+void convertConfig(const std::vector<wxString>& filenames, XmlBatchConfig& config); //throw xmlAccess::FfsXmlError
 }
 
 

@@ -120,15 +120,15 @@ private:
 
     struct RefIndex
     {
-        RefIndex(size_t folderInd, HierarchyObject::ObjectID id) :
+        RefIndex(size_t folderInd, FileSystemObject::ObjectID id) :
             folderIndex(folderInd),
             objId(id) {}
         size_t folderIndex;
-        HierarchyObject::ObjectID objId;
+        FileSystemObject::ObjectID objId;
     };
 
-    FileSystemObject* getReferencedRow(const RefIndex ref); //returns NULL if not found
-    const FileSystemObject* getReferencedRow(const RefIndex ref) const; //returns NULL if not found
+    FileSystemObject* getReferencedRow(const RefIndex& ref); //returns NULL if not found
+    const FileSystemObject* getReferencedRow(const RefIndex& ref) const; //returns NULL if not found
     bool isInvalidRow(const RefIndex& ref) const;
 
 
@@ -147,7 +147,7 @@ private:
     template <bool ascending>
     class LessDirectoryPair;
 
-    template <bool ascending, SelectedSide side>
+    template <bool ascending>
     class LessRelativeName;
 
     template <bool ascending, SelectedSide side>
@@ -219,17 +219,16 @@ size_t GridView::rowsTotal() const //total number of rows available
 
 
 inline
-const zen::FileSystemObject* GridView::getReferencedRow(const RefIndex ref) const
+const zen::FileSystemObject* GridView::getReferencedRow(const RefIndex& ref) const
 {
-    return folderCmp[ref.folderIndex].retrieveById(ref.objId);
+    return FileSystemObject::retrieve(ref.objId);
 }
 
 
 inline
-zen::FileSystemObject* GridView::getReferencedRow(const RefIndex ref)
+zen::FileSystemObject* GridView::getReferencedRow(const RefIndex& ref)
 {
-    //code re-use of const method: see Meyers Effective C++
-    return const_cast<FileSystemObject*>(static_cast<const GridView&>(*this).getReferencedRow(ref));
+    return FileSystemObject::retrieve(ref.objId);
 }
 }
 

@@ -69,7 +69,7 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
 
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
     {
-        wxString errorMsg = _("Invalid commandline: %x");
+        wxString errorMsg = _("Invalid command line: %x");
         wxString cmdFmt = wxString(L"\nFile: ") + filename + L"\nArg: " + arguments;
 
         errorMsg.Replace(L"%x", cmdFmt);
@@ -92,7 +92,7 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
         int rv = ::system(utf8CvrtTo<std::string>(command).c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
         if (rv == -1 || WEXITSTATUS(rv) == 127) //http://linux.die.net/man/3/system    "In case /bin/sh could not be executed, the exit status will be that of a command that does exit(127)"
         {
-            wxString errorMsg = _("Invalid commandline: %x");
+            wxString errorMsg = _("Invalid command line: %x");
             replace(errorMsg, L"%x", L"\n" + command);
             wxMessageBox(errorMsg);
             return;
@@ -100,7 +100,7 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
     }
     else
     {
-        // ! unfortunately it seems there is no way on Linux to get a failure notification for calling an invalid commandline asynchronously !
+        // ! unfortunately it seems there is no way on Linux to get a failure notification for calling an invalid command line asynchronously !
 
         //by default wxExecute uses a zero sized dummy window as a hack to keep focus which leaves a useless empty icon in ALT-TAB list
         //=> use wxEXEC_NODISABLE and roll our own window disabler!                   (see comment in  app.cpp: void *wxGUIAppTraits::BeforeChildWaitLoop())

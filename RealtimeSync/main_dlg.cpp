@@ -42,7 +42,7 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), NULL, this);
 
     //prepare drag & drop
-    dirNameFirst.reset(new zen::DirectoryName(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, sbSizerDirToWatch));
+    dirNameFirst.reset(new DirectoryName<wxTextCtrl>(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, sbSizerDirToWatch));
 
 
 #ifdef FFS_WIN
@@ -127,9 +127,9 @@ const wxString& MainDialog::lastConfigFileName()
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
 #ifdef FFS_WIN
-    zen::displayHelpEntry(wxT("html\\advanced\\RealtimeSync.html"));
+    zen::displayHelpEntry(wxT("html\\RealtimeSync.html"));
 #elif defined FFS_LINUX
-    zen::displayHelpEntry(wxT("html/advanced/RealtimeSync.html"));
+    zen::displayHelpEntry(wxT("html/RealtimeSync.html"));
 #endif
 }
 

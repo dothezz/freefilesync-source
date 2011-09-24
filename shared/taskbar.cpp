@@ -39,16 +39,6 @@ bool windows7TaskbarAvailable()
     //version overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
     return false;
 }
-
-
-std::wstring getTaskBarDllName()
-{
-    assert_static(util::is32BitBuild || util::is64BitBuild);
-
-    return util::is64BitBuild ?
-           L"Taskbar7_x64.dll" :
-           L"Taskbar7_Win32.dll";
-}
 }
 //########################################################################################################
 
@@ -58,8 +48,8 @@ class Taskbar::Pimpl //throw (TaskbarNotAvailable)
 public:
     Pimpl(const wxTopLevelWindow& window) :
         assocWindow(window.GetHWND()),
-        setStatus_(util::getDllFun<SetStatusFct>(  getTaskBarDllName(), setStatusFctName)),
-        setProgress_(util::getDllFun<SetProgressFct>(getTaskBarDllName(), setProgressFctName))
+        setStatus_  (getDllName(), setStatusFctName),
+        setProgress_(getDllName(), setProgressFctName)
     {
         if (!assocWindow || !setProgress_ || !setStatus_)
             throw TaskbarNotAvailable();
@@ -95,15 +85,15 @@ public:
         setStatus_(assocWindow, tbSevenStatus);
     }
 
-    void setProgress(size_t current, size_t total)
+    void setProgress(double fraction)
     {
-        setProgress_(assocWindow, current, total);
+        setProgress_(assocWindow, fraction * 100000, 100000);
     }
 
 private:
     void*  assocWindow; //HWND
-    const SetStatusFct setStatus_;
-    const SetProgressFct setProgress_;
+    const util::DllFun<SetStatusFct>   setStatus_;
+    const util::DllFun<SetProgressFct> setProgress_;
 };
 
 #elif defined HAVE_UBUNTU_UNITY //Ubuntu unity
@@ -150,9 +140,9 @@ public:
         }
     }
 
-    void setProgress(size_t current, size_t total)
+    void setProgress(double fraction)
     {
-        unity_launcher_entry_set_progress(tbEntry, total == 0 ? 0 : double(current) / total);
+        unity_launcher_entry_set_progress(tbEntry, fraction);
     }
 
 private:
@@ -177,4 +167,4 @@ Taskbar::Taskbar(const wxTopLevelWindow& window) : pimpl_(new Pimpl(window)) {} 
 Taskbar::~Taskbar() {} //std::unique_ptr ...
 
 void Taskbar::setStatus(Status status) { pimpl_->setStatus(status); }
-void Taskbar::setProgress(size_t current, size_t total) { pimpl_->setProgress(current, total); }
+void Taskbar::setProgress(double fraction) { pimpl_->setProgress(fraction); }

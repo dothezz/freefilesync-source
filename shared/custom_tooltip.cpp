@@ -17,7 +17,7 @@ public:
                         wxWindowID id = wxID_ANY,
                         const wxString& title = wxEmptyString,
                         const wxPoint& pos = wxDefaultPosition,
-                        const wxSize& size = wxSize( -1,-1 ),
+                        const wxSize& size = wxSize( -1, -1 ),
                         long style = wxFRAME_NO_TASKBAR | wxSTAY_ON_TOP | wxSTATIC_BORDER);
 
     wxStaticText* m_staticTextMain;
@@ -41,7 +41,7 @@ CustomTooltip::PopupFrameGenerated::PopupFrameGenerated(
     bSizer158 = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapLeft = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    bSizer158->Add( m_bitmapLeft, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer158->Add( m_bitmapLeft, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5 );
 
     m_staticTextMain = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
     bSizer158->Add( m_staticTextMain, 0, wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 5 );

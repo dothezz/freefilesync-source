@@ -11,7 +11,7 @@
 #include <string>
 #include "../shared/int64.h"
 
-const int UI_UPDATE_INTERVAL = 100; //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
+const int UI_UPDATE_INTERVAL = 100; //unit: [ms]; perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
 
 bool updateUiIsAllowed(); //test if a specific amount of time is over
 void updateUiNow();       //do the updating
@@ -37,9 +37,6 @@ struct ProcessCallback
     //these methods have to be implemented in the derived classes to handle error and status information
     virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID) = 0; //informs about the total amount of data that will be processed from now on
 
-    //called periodically after data was processed: expected(!) to update GUI!
-    virtual void reportInfo(const wxString& text) = 0;
-
     //note: this one must NOT throw in order to properly allow undoing setting of statistics!
     //it is in general paired with a call to requestUiRefresh() to compensate!
     virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed) = 0; //throw()
@@ -50,15 +47,22 @@ struct ProcessCallback
     //this method is triggered repeatedly by requestUiRefresh() and can be used to refresh the ui by dispatching pending events
     virtual void forceUiRefresh() = 0;
 
+    //called periodically after data was processed: expected(!) to request GUI update
+    virtual void reportStatus(const wxString& text) = 0; //status info only, should not be logged!
+
+    //called periodically after data was processed: expected(!) to request GUI update
+    virtual void reportInfo(const wxString& text) = 0;
+
+    virtual void reportWarning(const wxString& warningMessage, bool& warningActive) = 0;
+
     //error handling:
     enum Response
     {
         IGNORE_ERROR = 10,
         RETRY
     };
-    virtual Response reportError     (const wxString& errorMessage) = 0;  //recoverable error situation
-    virtual void     reportFatalError(const wxString& errorMessage) = 0; //non-recoverable error situation, implement abort!
-    virtual void     reportWarning   (const wxString& warningMessage, bool& warningActive) = 0;
+    virtual Response reportError     (const wxString& errorMessage) = 0; //recoverable error situation
+    virtual void     reportFatalError(const wxString& errorMessage) = 0; //non-recoverable error situation
 };
 
 

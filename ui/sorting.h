@@ -53,8 +53,7 @@ struct Compare<false>
 };
 
 
-template <bool ascending, SelectedSide side>
-inline
+template <bool ascending, SelectedSide side> inline
 bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
 {
     //presort types: first files, then directories then empty rows
@@ -82,24 +81,18 @@ bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
 }
 
 
-template <bool ascending, SelectedSide side>
+template <bool ascending> //side currently unused!
 bool lessRelativeName(const FileSystemObject& a, const FileSystemObject& b)
 {
-    if (a.isEmpty<side>())
-        return false;  //empty rows always last
-    else if (b.isEmpty<side>())
-        return true;  //empty rows always last
-
     const bool isDirectoryA = isDirectoryMapping(a);
     const Zstring& relDirNameA = isDirectoryA ?
-                                 a.getRelativeName<side>() : //directory
-                                 a.getParentRelativeName();  //file or symlink
+                                 a.getObjRelativeName() : //directory
+                                 a.getObjRelativeName().BeforeLast(FILE_NAME_SEPARATOR); //returns empty string if ch not found
 
     const bool isDirectoryB = isDirectoryMapping(b);
     const Zstring& relDirNameB = isDirectoryB ?
-                                 b.getRelativeName<side>() : //directory
-                                 b.getParentRelativeName();  //file or symlink
-
+                                 b.getObjRelativeName() : //directory
+                                 b.getObjRelativeName().BeforeLast(FILE_NAME_SEPARATOR); //returns empty string if ch not found
 
     //compare relative names without filenames first
     const int rv = cmpFileName(relDirNameA, relDirNameB);
@@ -112,13 +105,12 @@ bool lessRelativeName(const FileSystemObject& a, const FileSystemObject& b)
         else if (isDirectoryA)
             return true;
 
-        return LessFilename()(a.getShortName<side>(), b.getShortName<side>());
+        return LessFilename()(a.getObjShortName(), b.getObjShortName());
     }
 }
 
 
-template <bool ascending, SelectedSide side>
-inline
+template <bool ascending, SelectedSide side> inline
 bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
 {
     //empty rows always last
@@ -150,8 +142,7 @@ bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
 }
 
 
-template <bool ascending, SelectedSide side>
-inline
+template <bool ascending, SelectedSide side> inline
 bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
 {
     if (a.isEmpty<side>())
@@ -179,8 +170,7 @@ bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
 }
 
 
-template <bool ascending, SelectedSide side>
-inline
+template <bool ascending, SelectedSide side> inline
 bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
 {
     if (a.isEmpty<side>())
@@ -201,8 +191,7 @@ bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
 }
 
 
-template <bool ascending>
-inline
+template <bool ascending> inline
 bool lessCmpResult(const FileSystemObject& a, const FileSystemObject& b)
 {
     //presort result: equal shall appear at end of list
@@ -215,8 +204,7 @@ bool lessCmpResult(const FileSystemObject& a, const FileSystemObject& b)
 }
 
 
-template <bool ascending>
-inline
+template <bool ascending> inline
 bool lessSyncDirection(const FileSystemObject& a, const FileSystemObject& b)
 {
     return Compare<ascending>().isSmallerThan(a.getSyncOperation(), b.getSyncOperation());

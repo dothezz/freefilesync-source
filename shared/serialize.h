@@ -30,13 +30,13 @@ template <class S> void writeString(wxOutputStream& stream, const S& str);
 class FileInputStream : public wxInputStream
 {
 public:
-    FileInputStream(const Zstring& filename) : //throw (FileError)
+    FileInputStream(const Zstring& filename) : //throw FileError
         fileObj(filename) {}
 
 private:
     virtual size_t OnSysRead(void* buffer, size_t bufsize)
     {
-        return fileObj.read(buffer, bufsize); //throw (FileError)
+        return fileObj.read(buffer, bufsize); //throw FileError
     }
 
     zen::FileInput fileObj;
@@ -46,13 +46,13 @@ private:
 class FileOutputStream : public wxOutputStream
 {
 public:
-    FileOutputStream(const Zstring& filename) : //throw (FileError)
+    FileOutputStream(const Zstring& filename) : //throw FileError
         fileObj(filename, zen::FileOutput::ACC_OVERWRITE) {}
 
 private:
     virtual size_t OnSysWrite(const void* buffer, size_t bufsize)
     {
-        fileObj.write(buffer, bufsize); //throw (FileError)
+        fileObj.write(buffer, bufsize); //throw FileError
         return bufsize;
     }
 
@@ -61,19 +61,19 @@ private:
 
 
 
-class ReadInputStream //throw (FileError)
+class ReadInputStream //throw FileError
 {
 protected:
     ReadInputStream(wxInputStream& stream, const wxString& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
-    T readNumberC() const; //throw (FileError), checked read operation
+    T readNumberC() const; //throw FileError, checked read operation
 
     template <class S>
-    S readStringC() const; //throw (FileError), checked read operation
+    S readStringC() const; //throw FileError, checked read operation
 
     typedef std::shared_ptr<std::vector<char> > CharArray; //there's no guarantee std::string has a ref-counted implementation... so use this "thing"
-    CharArray readArrayC() const; //throw (FileError)
+    CharArray readArrayC() const; //throw FileError
 
     void check() const;
 
@@ -84,23 +84,23 @@ protected:
 
 private:
     wxInputStream& stream_;
-    void throwReadError() const;  //throw (FileError)
+    void throwReadError() const;  //throw FileError
     const wxString& errorObjName_; //used for error text only
 };
 
 
-class WriteOutputStream //throw (FileError)
+class WriteOutputStream //throw FileError
 {
 protected:
     WriteOutputStream(const wxString& errorObjName, wxOutputStream& stream) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
-    void writeNumberC(T number) const; //throw (FileError), checked write operation
+    void writeNumberC(T number) const; //throw FileError, checked write operation
 
     template <class S>
-    void writeStringC(const S& str) const; //throw (FileError), checked write operation
+    void writeStringC(const S& str) const; //throw FileError, checked write operation
 
-    void writeArrayC(const std::vector<char>& buffer) const; //throw (FileError)
+    void writeArrayC(const std::vector<char>& buffer) const; //throw FileError
 
     void check() const;
 
@@ -111,7 +111,7 @@ protected:
 
 private:
     wxOutputStream& stream_;
-    void throwWriteError() const;  //throw (FileError)
+    void throwWriteError() const;  //throw FileError
     const wxString& errorObjName_; //used for error text only!
 };
 
@@ -168,7 +168,7 @@ S readString(wxInputStream& stream)
 {
     typedef typename S::value_type CharType;
 
-    const boost::uint32_t strLength = readPOD<boost::uint32_t>(stream);
+    const auto strLength = readPOD<boost::uint32_t>(stream);
     if (strLength <= 1000)
     {
         CharType buffer[1000];
@@ -177,7 +177,7 @@ S readString(wxInputStream& stream)
     }
     else
     {
-        std::vector<CharType> buffer(strLength); //throw (std::bad_alloc)
+        std::vector<CharType> buffer(strLength); //throw std::bad_alloc
         stream.Read(&buffer[0], sizeof(CharType) * strLength);
         return S(&buffer[0], strLength);
     }

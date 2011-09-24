@@ -26,12 +26,19 @@ enum CompareVariant
 
 wxString getVariantName(CompareVariant var);
 
+enum SymLinkHandling
+{
+    SYMLINK_IGNORE,
+    SYMLINK_USE_DIRECTLY,
+    SYMLINK_FOLLOW_LINK
+};
+
 
 enum SyncDirection
 {
     SYNC_DIR_LEFT  = 0,
     SYNC_DIR_RIGHT,
-    SYNC_DIR_NONE //NOTE: align with SyncDirectionIntern before adding anything here!
+    SYNC_DIR_NONE
 };
 
 
@@ -136,17 +143,17 @@ bool operator==(const DirectionSet& lhs, const DirectionSet& rhs)
            lhs.conflict        == rhs.conflict;
 }
 
-struct SyncConfig //technical representation of sync-config
+struct DirectionConfig //technical representation of sync-config
 {
     enum Variant
     {
         AUTOMATIC, //use sync-database to determine directions
-        MIRROR,  //predefined
-        UPDATE,  //
-        CUSTOM    //use custom directions
+        MIRROR,    //predefined
+        UPDATE,    //
+        CUSTOM     //use custom directions
     };
 
-    SyncConfig() : var(AUTOMATIC) {}
+    DirectionConfig() : var(AUTOMATIC) {}
 
     Variant var;
 
@@ -155,17 +162,40 @@ struct SyncConfig //technical representation of sync-config
 };
 
 inline
-bool operator==(const SyncConfig& lhs, const SyncConfig& rhs)
+bool operator==(const DirectionConfig& lhs, const DirectionConfig& rhs)
 {
     return lhs.var == rhs.var &&
-           (lhs.var != SyncConfig::CUSTOM ||  lhs.custom == rhs.custom); //directions are only relevant if variant "custom" is active
+           (lhs.var != DirectionConfig::CUSTOM ||  lhs.custom == rhs.custom); //directions are only relevant if variant "custom" is active
 }
 
 //get sync directions: DON'T call for variant AUTOMATIC!
-DirectionSet extractDirections(const SyncConfig& cfg);
+DirectionSet extractDirections(const DirectionConfig& cfg);
 
-wxString getVariantName(SyncConfig::Variant var);
+wxString getVariantName(DirectionConfig::Variant var);
 
+
+
+struct CompConfig
+{
+    CompConfig(CompareVariant cmpVar,
+               SymLinkHandling handleSyml) :
+        compareVar(cmpVar),
+        handleSymlinks(handleSyml) {}
+
+    CompConfig() :
+        compareVar(CMP_BY_TIME_SIZE),
+        handleSymlinks(SYMLINK_IGNORE) {}
+
+    CompareVariant compareVar;
+    SymLinkHandling handleSymlinks;
+};
+
+inline
+bool operator==(const CompConfig& lhs, const CompConfig& rhs)
+{
+    return lhs.compareVar     == rhs.compareVar &&
+           lhs.handleSymlinks == rhs.handleSymlinks;
+}
 
 
 enum DeletionPolicy
@@ -176,20 +206,20 @@ enum DeletionPolicy
 };
 
 
-struct AlternateSyncConfig
+struct SyncConfig
 {
-    AlternateSyncConfig(const SyncConfig&    syncCfg,
-                        const DeletionPolicy handleDel,
-                        const wxString&      customDelDir) :
-        syncConfiguration(syncCfg),
+    SyncConfig(const DirectionConfig& directCfg,
+               const DeletionPolicy handleDel,
+               const wxString&      customDelDir) :
+        directionCfg(directCfg),
         handleDeletion(handleDel),
-        customDeletionDirectory(customDelDir) {};
+        customDeletionDirectory(customDelDir) {}
 
-    AlternateSyncConfig() :  //construct with default values
+    SyncConfig() :  //construct with default values
         handleDeletion(MOVE_TO_RECYCLE_BIN) {}
 
-    //Synchronisation settings
-    SyncConfig syncConfiguration;
+    //sync direction settings
+    DirectionConfig directionCfg;
 
     //misc options
     DeletionPolicy handleDeletion; //use Recycle, delete permanently or move to user-defined location
@@ -197,11 +227,12 @@ struct AlternateSyncConfig
 };
 
 inline
-bool operator==(const AlternateSyncConfig& lhs, const AlternateSyncConfig& rhs)
+bool operator==(const SyncConfig& lhs, const SyncConfig& rhs)
 {
-    return lhs.syncConfiguration       == rhs.syncConfiguration &&
-           lhs.handleDeletion          == rhs.handleDeletion    &&
-           lhs.customDeletionDirectory == rhs.customDeletionDirectory;
+    return lhs.directionCfg            == rhs.directionCfg   &&
+           lhs.handleDeletion          == rhs.handleDeletion &&
+           (lhs.handleDeletion != MOVE_TO_CUSTOM_DIRECTORY || //only cmp custom deletion directory if required!
+            lhs.customDeletionDirectory == rhs.customDeletionDirectory);
 }
 
 
@@ -216,10 +247,11 @@ enum UnitSize
 enum UnitTime
 {
     UTIME_NONE,
-    UTIME_SEC,
-    UTIME_MIN,
-    UTIME_HOUR,
-    UTIME_DAY
+    //UTIME_LAST_X_HOURS,
+    UTIME_TODAY,
+    UTIME_THIS_WEEK,
+    UTIME_THIS_MONTH,
+    UTIME_THIS_YEAR
 };
 
 struct FilterConfig
@@ -281,7 +313,7 @@ bool operator==(const FilterConfig& lhs, const FilterConfig& rhs)
 void resolveUnits(size_t timeSpan, UnitTime unitTimeSpan,
                   size_t sizeMin,  UnitSize unitSizeMin,
                   size_t sizeMax,  UnitSize unitSizeMax,
-                  zen::Int64&  timeSpanSec, //unit: seconds
+                  zen::Int64&  timeFrom,    //unit: UTC time, seconds
                   zen::UInt64& sizeMinBy,   //unit: bytes
                   zen::UInt64& sizeMaxBy);  //unit: bytes
 
@@ -292,17 +324,20 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
 
     FolderPairEnh(const Zstring& leftDir,
                   const Zstring& rightDir,
-                  const std::shared_ptr<const AlternateSyncConfig>& syncConfig,
+                  const std::shared_ptr<const CompConfig>& cmpConfig,
+                  const std::shared_ptr<const SyncConfig>& syncConfig,
                   const FilterConfig& filter) :
         leftDirectory(leftDir),
         rightDirectory(rightDir) ,
+        altCmpConfig(cmpConfig),
         altSyncConfig(syncConfig),
         localFilter(filter) {}
 
     Zstring leftDirectory;
     Zstring rightDirectory;
 
-    std::shared_ptr<const AlternateSyncConfig> altSyncConfig; //optional
+    std::shared_ptr<const CompConfig> altCmpConfig;  //optional
+    std::shared_ptr<const SyncConfig> altSyncConfig; //
     FilterConfig localFilter;
 };
 
@@ -313,6 +348,10 @@ bool operator==(const FolderPairEnh& lhs, const FolderPairEnh& rhs)
     return lhs.leftDirectory  == rhs.leftDirectory  &&
            lhs.rightDirectory == rhs.rightDirectory &&
 
+           (lhs.altCmpConfig.get() && rhs.altCmpConfig.get() ?
+            *lhs.altCmpConfig == *rhs.altCmpConfig :
+            lhs.altCmpConfig.get() == rhs.altCmpConfig.get()) &&
+
            (lhs.altSyncConfig.get() && rhs.altSyncConfig.get() ?
             *lhs.altSyncConfig == *rhs.altSyncConfig :
             lhs.altSyncConfig.get() == rhs.altSyncConfig.get()) &&
@@ -320,64 +359,43 @@ bool operator==(const FolderPairEnh& lhs, const FolderPairEnh& rhs)
            lhs.localFilter == rhs.localFilter;
 }
 
-enum SymLinkHandling
-{
-    SYMLINK_IGNORE,
-    SYMLINK_USE_DIRECTLY,
-    SYMLINK_FOLLOW_LINK
-};
-
 
 struct MainConfiguration
 {
     MainConfiguration() :
-        compareVar(CMP_BY_TIME_SIZE),
-        handleSymlinks(SYMLINK_IGNORE),
 #ifdef FFS_WIN
         globalFilter(Zstr("*"),
                      Zstr("\
 \\System Volume Information\\\n\
 \\RECYCLED\\\n\
 \\RECYCLER\\\n\
-\\$Recycle.Bin\\")),
+\\$Recycle.Bin\\")) {}
 #elif defined FFS_LINUX
         globalFilter(Zstr("*"),
                      Zstr("/.Trash-*/\n\
-                          /.recycle/")),
+                          /.recycle/")) {}
 #endif
-        handleDeletion(MOVE_TO_RECYCLE_BIN) {}
+
+    CompConfig   cmpConfig;    //global compare settings:         may be overwritten by folder pair settings
+    SyncConfig   syncCfg;      //global synchronisation settings: may be overwritten by folder pair settings
+    FilterConfig globalFilter; //global filter settings:          combined with folder pair settings
 
     FolderPairEnh firstPair; //there needs to be at least one pair!
     std::vector<FolderPairEnh> additionalPairs;
 
-    //Compare setting
-    CompareVariant compareVar;
-
-    SymLinkHandling handleSymlinks;
-
-    //GLOBAL filter settings
-    FilterConfig globalFilter;
-
-    //Synchronisation settings
-    SyncConfig syncConfiguration;
-    DeletionPolicy handleDeletion; //use Recycle, delete permanently or move to user-defined location
-    wxString customDeletionDirectory;
-
-    wxString getSyncVariantName();
+    wxString getCompVariantName() const;
+    wxString getSyncVariantName() const;
 };
 
 
 inline
 bool operator==(const MainConfiguration& lhs, const MainConfiguration& rhs)
 {
-    return lhs.firstPair         == rhs.firstPair         &&
-           lhs.additionalPairs   == rhs.additionalPairs   &&
-           lhs.compareVar        == rhs.compareVar        &&
-           lhs.handleSymlinks    == rhs.handleSymlinks    &&
-           lhs.syncConfiguration == rhs.syncConfiguration &&
-           lhs.globalFilter      == rhs.globalFilter      &&
-           lhs.handleDeletion    == rhs.handleDeletion    &&
-           lhs.customDeletionDirectory == rhs.customDeletionDirectory;
+    return lhs.cmpConfig       == rhs.cmpConfig       &&
+           lhs.globalFilter    == rhs.globalFilter    &&
+           lhs.syncCfg         == rhs.syncCfg         &&
+           lhs.firstPair       == rhs.firstPair       &&
+           lhs.additionalPairs == rhs.additionalPairs;
 }
 
 //facilitate drag & drop config merge:

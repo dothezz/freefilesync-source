@@ -23,7 +23,7 @@ FileInput::FileInput(FileHandle handle, const Zstring& filename) :
     filename_(filename) {}
 
 
-FileInput::FileInput(const Zstring& filename)  : //throw (FileError, ErrorNotExisting)
+FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExisting
     eofReached(false),
     filename_(filename)
 {
@@ -31,7 +31,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw (FileError, ErrorNotExi
     fileHandle = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
                               GENERIC_READ,
                               FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read open files that are shared by other applications
-                              NULL,
+                              0,
                               OPEN_EXISTING,
                               FILE_FLAG_SEQUENTIAL_SCAN,
                               /* possible values: (Reference http://msdn.microsoft.com/en-us/library/aa363858(VS.85).aspx#caching_behavior)
@@ -112,7 +112,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0)
 #endif
-        throw FileError(_("Error reading file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted());
+        throw FileError(_("Error reading file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted() + " (r)");
 
 #ifdef FFS_WIN
     if (bytesRead < bytesToRead) //falsify only!
@@ -137,14 +137,19 @@ bool FileInput::eof() //end of file reached
 FileOutput::FileOutput(FileHandle handle, const Zstring& filename) : fileHandle(handle), filename_(filename) {}
 
 
-FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw (FileError, ErrorTargetPathMissing, ErrorTargetExisting)
+FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
     filename_(filename)
 {
 #ifdef FFS_WIN
     fileHandle = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
-                              GENERIC_WRITE,
+                              GENERIC_READ | GENERIC_WRITE,
+                              /*  http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx
+                                     quote: When an application creates a file across a network, it is better
+                                     to use GENERIC_READ | GENERIC_WRITE for dwDesiredAccess than to use GENERIC_WRITE alone.
+                                     The resulting code is faster, because the redirector can use the cache manager and send fewer SMBs with more data.
+                                     This combination also avoids an issue where writing to a file across a network can occasionally return ERROR_ACCESS_DENIED. */
                               FILE_SHARE_READ | FILE_SHARE_DELETE, //note: FILE_SHARE_DELETE is required to rename file while handle is open!
-                              NULL,
+                              0,
                               access == ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW,
                               FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
                               NULL);
@@ -192,7 +197,7 @@ FileOutput::~FileOutput()
 }
 
 
-void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw (FileError)
+void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileError
 {
 #ifdef FFS_WIN
     DWORD bytesWritten = 0;

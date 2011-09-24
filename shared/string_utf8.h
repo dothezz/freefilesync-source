@@ -134,21 +134,21 @@ OutputIterator codePointToUtf8(CodePoint cp, OutputIterator result) //http://en.
         *result++ = static_cast<Char8>(cp);
     else if (cp < 0x800)
     {
-        *result++ = static_cast<Char8>((cp >> 6   )| 0xc0);
-        *result++ = static_cast<Char8>((cp & 0x3f )| 0x80);
+        *result++ = static_cast<Char8>((cp >> 6   ) | 0xc0);
+        *result++ = static_cast<Char8>((cp & 0x3f ) | 0x80);
     }
     else if (cp < 0x10000)
     {
-        *result++ = static_cast<Char8>((cp >> 12         )| 0xe0);
-        *result++ = static_cast<Char8>(((cp >> 6) & 0x3f )| 0x80);
-        *result++ = static_cast<Char8>((cp & 0x3f        )| 0x80);
+        *result++ = static_cast<Char8>((cp >> 12         ) | 0xe0);
+        *result++ = static_cast<Char8>(((cp >> 6) & 0x3f ) | 0x80);
+        *result++ = static_cast<Char8>((cp & 0x3f        ) | 0x80);
     }
     else
     {
-        *result++ = static_cast<Char8>((cp >> 18          )| 0xf0);
-        *result++ = static_cast<Char8>(((cp >> 12) & 0x3f )| 0x80);
-        *result++ = static_cast<Char8>(((cp >> 6)  & 0x3f )| 0x80);
-        *result++ = static_cast<Char8>((cp & 0x3f         )| 0x80);
+        *result++ = static_cast<Char8>((cp >> 18          ) | 0xf0);
+        *result++ = static_cast<Char8>(((cp >> 12) & 0x3f ) | 0x80);
+        *result++ = static_cast<Char8>(((cp >> 6)  & 0x3f ) | 0x80);
+        *result++ = static_cast<Char8>((cp & 0x3f         ) | 0x80);
     }
     return result;
 }
@@ -179,7 +179,7 @@ Function utf8ToCodePoint(CharIterator first, CharIterator last, Function f) //f 
 
     for ( ; first != last; ++first)
     {
-        auto getChar = [&](Char8& ch ) -> bool
+        auto getChar = [&](Char8 & ch) -> bool
         {
             if (++first == last)
             {

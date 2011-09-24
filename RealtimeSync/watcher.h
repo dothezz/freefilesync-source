@@ -28,15 +28,24 @@ public:
 
 
 //wait until changes are detected or if a directory is not available (anymore)
-enum WaitResult
+enum ChangeType
 {
     CHANGE_DETECTED,
     CHANGE_DIR_MISSING
 };
-WaitResult waitForChanges(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler); //throw(FileError)
+struct WaitResult
+{
+    WaitResult(ChangeType tp, const Zstring& chgFile = Zstring()) : type(tp), filename(chgFile) {}
+
+    ChangeType type;
+    Zstring filename; //filled if type == CHANGE_DETECTED
+};
+WaitResult waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, //non-formatted dir names that yet require call to getFormattedDirectoryName()
+                          WaitCallback* statusHandler); //throw(FileError)
 
 //wait until all directories become available (again)
-void waitForMissingDirs(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler); //throw(FileError)
+void waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt,
+                        WaitCallback* statusHandler); //throw(FileError)
 }
 
 #endif // WATCHER_H_INCLUDED

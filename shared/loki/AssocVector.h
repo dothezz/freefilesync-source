@@ -182,8 +182,8 @@ public:
     //http://developer.apple.com/documentation/DeveloperTools/gcc-3.3/libstdc++/23_containers/howto.html#4
     iterator insert(iterator pos, const value_type& val)
     {
-        if( (pos == begin() || this->operator()(*(pos-1),val)) &&
-            (pos == end()    || this->operator()(val, *pos)) )
+        if ( (pos == begin() || this->operator()(*(pos - 1), val)) &&
+             (pos == end()    || this->operator()(val, *pos)) )
         {
             return Base::insert(pos, val);
         }

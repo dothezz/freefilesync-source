@@ -440,7 +440,7 @@ public:
         : pCount_(static_cast<uintptr_t*>(
                       SmallObject<>::operator new(sizeof(uintptr_t))))
     {
-        assert(pCount_!=0);
+        assert(pCount_ != 0);
         *pCount_ = 1;
     }
 
@@ -500,7 +500,7 @@ private:
 ///  fixed at a higher design level, and no change to this class could fix it.
 ////////////////////////////////////////////////////////////////////////////////
 
-template <template <class, class> class ThreadingModel,
+template < template <class, class> class ThreadingModel,
          class MX = LOKI_DEFAULT_MUTEX >
 struct RefCountedMTAdj
 {
@@ -584,14 +584,14 @@ public:
 
     static P Clone(const P& val)
     {
-        if(val!=0)
+        if (val != 0)
             val->AddRef();
         return val;
     }
 
     static bool Release(const P& val)
     {
-        if(val!=0)
+        if (val != 0)
             val->Release();
         return false;
     }
@@ -1138,7 +1138,7 @@ public:
     typedef typename SP::StoredType StoredType;
     typedef typename SP::ReferenceType ReferenceType;
 
-    typedef typename Select<OP::destructiveCopy,SmartPtr, const SmartPtr>::Result
+    typedef typename Select<OP::destructiveCopy, SmartPtr, const SmartPtr>::Result
     CopyArg;
 
 private:
@@ -1146,7 +1146,7 @@ private:
 
 #ifdef LOKI_SMARTPTR_CONVERSION_CONSTRUCTOR_POLICY
     typedef typename Select< CP::allow, const StoredType&, NeverMatched>::Result ImplicitArg;
-    typedef typename Select<!CP::allow, const StoredType&, NeverMatched>::Result ExplicitArg;
+    typedef typename Select < !CP::allow, const StoredType&, NeverMatched >::Result ExplicitArg;
 #else
     typedef const StoredType& ImplicitArg;
     typedef typename Select<false, const StoredType&, NeverMatched>::Result ExplicitArg;
@@ -1765,8 +1765,8 @@ typename T,
          template <class> class CNP
          >
 struct less< Loki::SmartPtr<T, OP, CP, KP, SP, CNP > >
-        : public binary_function<Loki::SmartPtr<T, OP, CP, KP, SP, CNP >,
-          Loki::SmartPtr<T, OP, CP, KP, SP, CNP >, bool>
+        : public binary_function < Loki::SmartPtr<T, OP, CP, KP, SP, CNP >,
+          Loki::SmartPtr<T, OP, CP, KP, SP, CNP >, bool >
 {
     bool operator()(const Loki::SmartPtr<T, OP, CP, KP, SP, CNP >& lhs,
                     const Loki::SmartPtr<T, OP, CP, KP, SP, CNP >& rhs) const

@@ -35,7 +35,7 @@ private:
     };
 
     std::vector<StatEntry> data;
-    std::auto_ptr<wxStopWatch> timer;
+    std::unique_ptr<wxStopWatch> timer;
 };
 
 

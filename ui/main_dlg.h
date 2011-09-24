@@ -16,6 +16,7 @@
 #include <wx/aui/aui.h>
 #include "../shared/int64.h"
 
+class FolderHistory;
 class CustomGrid;
 class FFSCheckRowsEvent;
 class FFSSyncDirectionEvent;
@@ -94,9 +95,6 @@ private:
 
     void addFileToCfgHistory(const std::vector<wxString>& filenames);
 
-    void addLeftFolderToHistory(const wxString& leftFolder);
-    void addRightFolderToHistory(const wxString& rightFolder);
-
     void addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
     void removeAddFolderPair(size_t pos);
     void clearAddFolderPairs();
@@ -129,7 +127,6 @@ private:
     void onGridLeftButtonEvent(        wxKeyEvent& event);
     void onGridRightButtonEvent(       wxKeyEvent& event);
     void onGridMiddleButtonEvent(      wxKeyEvent& event);
-    void OnContextRim(                 wxGridEvent& event);
     void OnContextRimLabelLeft(        wxGridEvent& event);
     void OnContextRimLabelRight(       wxGridEvent& event);
     void OnContextMiddle(              wxGridEvent& event);
@@ -140,7 +137,7 @@ private:
     void OnContextSelectCompVariant(      wxMouseEvent& event);
     void OnContextSelectSyncVariant(      wxMouseEvent& event);
 
-    void applyCompareConfig();
+    void applyCompareConfig(bool globalLevel = true);
 
     void OnSetCompVariant(wxCommandEvent& event);
     void OnSetSyncVariant(wxCommandEvent& event);
@@ -156,8 +153,10 @@ private:
     void OnContextSyncDirRight      (wxCommandEvent& event);
     void OnContextCustColumnLeft    (wxCommandEvent& event);
     void OnContextCustColumnRight   (wxCommandEvent& event);
+    void OnContextSelectTimeSpan    (wxCommandEvent& event);
     void OnContextAutoAdjustLeft    (wxCommandEvent& event);
     void OnContextAutoAdjustRight   (wxCommandEvent& event);
+    void OnContextSetIconSize    (wxCommandEvent& event);
     void OnContextIncludeAll        (wxCommandEvent& event);
     void OnContextExcludeAll        (wxCommandEvent& event);
     void OnContextComparisonView    (wxCommandEvent& event);
@@ -165,6 +164,7 @@ private:
     void OnContextSetLayoutReset    (wxCommandEvent& event);
     void OnContextSetLayoutShowPanel(wxCommandEvent& event);
 
+    void OnContextRim(wxGridEvent& event);
     void OnDirSelected(wxFileDirPickerEvent& event);
 
     void OnCheckRows(FFSCheckRowsEvent& event);
@@ -309,6 +309,11 @@ private:
     wxAuiManager auiMgr; //implement dockable GUI design
 
     wxString defaultPerspective;
+
+    zen::Int64 manualTimeSpanFrom, manualTimeSpanTo; //buffer manual time span selection at session level
+
+    std::shared_ptr<FolderHistory> folderHistoryLeft;  //shared by all wxComboBox dropdown controls
+    std::shared_ptr<FolderHistory> folderHistoryRight; //always bound!
 };
 
 #endif // MAINDIALOG_H

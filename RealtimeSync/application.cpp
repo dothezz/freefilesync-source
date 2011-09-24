@@ -93,7 +93,7 @@ int Application::OnRun()
         wxFile safeOutput(zen::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
-        wxSafeShowMessage(_("An exception occurred!"), wxString::FromAscii(e.what()));
+        wxSafeShowMessage(_("An exception occurred!") + L" - RTS", wxString::FromAscii(e.what()));
         return -9;
     }
 

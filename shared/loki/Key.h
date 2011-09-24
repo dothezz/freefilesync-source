@@ -28,7 +28,7 @@
 namespace Loki
 {
 
-template<
+template <
 class Factory,
       typename IdentifierType
       >
@@ -44,7 +44,7 @@ bool operator<(const Key<F, I> &k1, const Key<F, I> &k2);
 /**
  * A Key class
  */
-template<
+template <
 class Factory,
       typename IdentifierType
       >
@@ -200,7 +200,7 @@ public:
 
     Key(const IdentifierType& id,
         Parm1& p1, Parm2& p2, Parm3& p3, Parm4& p4, Parm5& p5,
-        Parm6& p6, Parm7& p7, Parm8& p8, Parm9& p9,Parm10& p10) : count(10)
+        Parm6& p6, Parm7& p7, Parm8& p8, Parm9& p9, Parm10& p10) : count(10)
     {
         this->id = id;
         this->p1 = p1;
@@ -331,209 +331,209 @@ public:
 template<class F, typename I>
 bool operator==(const Key<F, I> &k1, const Key<F, I> &k2)
 {
-    if( k1.count != k2.count )
+    if ( k1.count != k2.count )
         return false;
-    switch(k1.count)
+    switch (k1.count)
     {
         case -1:
             return true;
         case 0:
-            if( k1.id == k2.id )
+            if ( k1.id == k2.id )
                 return true;
             else
                 return false;
         case 1:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) )
                 return true;
             else
                 return false;
         case 2:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) )
                 return true;
             else
                 return false;
         case 3:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) )
                 return true;
             else
                 return false;
         case 4:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) )
                 return true;
             else
                 return false;
         case 5:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) )
                 return true;
             else
                 return false;
         case 6:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) )
                 return true;
             else
                 return false;
         case 7:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) &&
-                (k1.p7 == k2.p7) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) &&
+                 (k1.p7 == k2.p7) )
                 return true;
             else
                 return false;
         case 8:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) &&
-                (k1.p7 == k2.p7) &&
-                (k1.p8 == k2.p8) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) &&
+                 (k1.p7 == k2.p7) &&
+                 (k1.p8 == k2.p8) )
                 return true;
             else
                 return false;
         case 9:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) &&
-                (k1.p7 == k2.p7) &&
-                (k1.p8 == k2.p8) &&
-                (k1.p9 == k2.p9) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) &&
+                 (k1.p7 == k2.p7) &&
+                 (k1.p8 == k2.p8) &&
+                 (k1.p9 == k2.p9) )
                 return true;
             else
                 return false;
         case 10:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) &&
-                (k1.p7 == k2.p7) &&
-                (k1.p8 == k2.p8) &&
-                (k1.p9 == k2.p9) &&
-                (k1.p10 == k2.p10) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) &&
+                 (k1.p7 == k2.p7) &&
+                 (k1.p8 == k2.p8) &&
+                 (k1.p9 == k2.p9) &&
+                 (k1.p10 == k2.p10) )
                 return true;
             else
                 return false;
         case 11:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) &&
-                (k1.p7 == k2.p7) &&
-                (k1.p8 == k2.p8) &&
-                (k1.p9 == k2.p9) &&
-                (k1.p10 == k2.p10) &&
-                (k1.p11 == k2.p11) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) &&
+                 (k1.p7 == k2.p7) &&
+                 (k1.p8 == k2.p8) &&
+                 (k1.p9 == k2.p9) &&
+                 (k1.p10 == k2.p10) &&
+                 (k1.p11 == k2.p11) )
                 return true;
             else
                 return false;
         case 12:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) &&
-                (k1.p7 == k2.p7) &&
-                (k1.p8 == k2.p8) &&
-                (k1.p9 == k2.p9) &&
-                (k1.p10 == k2.p10) &&
-                (k1.p11 == k2.p11) &&
-                (k1.p12 == k2.p12) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) &&
+                 (k1.p7 == k2.p7) &&
+                 (k1.p8 == k2.p8) &&
+                 (k1.p9 == k2.p9) &&
+                 (k1.p10 == k2.p10) &&
+                 (k1.p11 == k2.p11) &&
+                 (k1.p12 == k2.p12) )
                 return true;
             else
                 return false;
         case 13:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) &&
-                (k1.p7 == k2.p7) &&
-                (k1.p8 == k2.p8) &&
-                (k1.p9 == k2.p9) &&
-                (k1.p10 == k2.p10) &&
-                (k1.p11 == k2.p11) &&
-                (k1.p12 == k2.p12) &&
-                (k1.p13 == k2.p13) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) &&
+                 (k1.p7 == k2.p7) &&
+                 (k1.p8 == k2.p8) &&
+                 (k1.p9 == k2.p9) &&
+                 (k1.p10 == k2.p10) &&
+                 (k1.p11 == k2.p11) &&
+                 (k1.p12 == k2.p12) &&
+                 (k1.p13 == k2.p13) )
                 return true;
             else
                 return false;
         case 14:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) &&
-                (k1.p7 == k2.p7) &&
-                (k1.p8 == k2.p8) &&
-                (k1.p9 == k2.p9) &&
-                (k1.p10 == k2.p10) &&
-                (k1.p11 == k2.p11) &&
-                (k1.p12 == k2.p12) &&
-                (k1.p13 == k2.p13) &&
-                (k1.p14 == k2.p14) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) &&
+                 (k1.p7 == k2.p7) &&
+                 (k1.p8 == k2.p8) &&
+                 (k1.p9 == k2.p9) &&
+                 (k1.p10 == k2.p10) &&
+                 (k1.p11 == k2.p11) &&
+                 (k1.p12 == k2.p12) &&
+                 (k1.p13 == k2.p13) &&
+                 (k1.p14 == k2.p14) )
                 return true;
             else
                 return false;
         case 15:
-            if( (k1.id == k2.id) &&
-                (k1.p1 == k2.p1) &&
-                (k1.p2 == k2.p2) &&
-                (k1.p3 == k2.p3) &&
-                (k1.p4 == k2.p4) &&
-                (k1.p5 == k2.p5) &&
-                (k1.p6 == k2.p6) &&
-                (k1.p7 == k2.p7) &&
-                (k1.p8 == k2.p8) &&
-                (k1.p9 == k2.p9) &&
-                (k1.p10 == k2.p10) &&
-                (k1.p11 == k2.p11) &&
-                (k1.p12 == k2.p12) &&
-                (k1.p13 == k2.p13) &&
-                (k1.p14 == k2.p14) &&
-                (k1.p15 == k2.p15) )
+            if ( (k1.id == k2.id) &&
+                 (k1.p1 == k2.p1) &&
+                 (k1.p2 == k2.p2) &&
+                 (k1.p3 == k2.p3) &&
+                 (k1.p4 == k2.p4) &&
+                 (k1.p5 == k2.p5) &&
+                 (k1.p6 == k2.p6) &&
+                 (k1.p7 == k2.p7) &&
+                 (k1.p8 == k2.p8) &&
+                 (k1.p9 == k2.p9) &&
+                 (k1.p10 == k2.p10) &&
+                 (k1.p11 == k2.p11) &&
+                 (k1.p12 == k2.p12) &&
+                 (k1.p13 == k2.p13) &&
+                 (k1.p14 == k2.p14) &&
+                 (k1.p15 == k2.p15) )
                 return true;
             else
                 return false;
@@ -547,209 +547,209 @@ bool operator==(const Key<F, I> &k1, const Key<F, I> &k2)
 template<class F, typename I>
 bool operator<(const Key<F, I> &k1, const Key<F, I> &k2)
 {
-    if( k1.count < k2.count )
+    if ( k1.count < k2.count )
         return true;
-    switch(k1.count)
+    switch (k1.count)
     {
         case -1:
             return false;
         case 0:
-            if( k1.id < k2.id )
+            if ( k1.id < k2.id )
                 return true;
             else
                 return false;
         case 1:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) )
                 return true;
             else
                 return false;
         case 2:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) )
                 return true;
             else
                 return false;
         case 3:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) )
                 return true;
             else
                 return false;
         case 4:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) )
                 return true;
             else
                 return false;
         case 5:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) )
                 return true;
             else
                 return false;
         case 6:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) )
                 return true;
             else
                 return false;
         case 7:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) ||
-                (k1.p7 < k2.p7) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) ||
+                 (k1.p7 < k2.p7) )
                 return true;
             else
                 return false;
         case 8:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) ||
-                (k1.p7 < k2.p7) ||
-                (k1.p8 < k2.p8) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) ||
+                 (k1.p7 < k2.p7) ||
+                 (k1.p8 < k2.p8) )
                 return true;
             else
                 return false;
         case 9:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) ||
-                (k1.p7 < k2.p7) ||
-                (k1.p8 < k2.p8) ||
-                (k1.p9 < k2.p9) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) ||
+                 (k1.p7 < k2.p7) ||
+                 (k1.p8 < k2.p8) ||
+                 (k1.p9 < k2.p9) )
                 return true;
             else
                 return false;
         case 10:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) ||
-                (k1.p7 < k2.p7) ||
-                (k1.p8 < k2.p8) ||
-                (k1.p9 < k2.p9) ||
-                (k1.p10 < k2.p10) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) ||
+                 (k1.p7 < k2.p7) ||
+                 (k1.p8 < k2.p8) ||
+                 (k1.p9 < k2.p9) ||
+                 (k1.p10 < k2.p10) )
                 return true;
             else
                 return false;
         case 11:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) ||
-                (k1.p7 < k2.p7) ||
-                (k1.p8 < k2.p8) ||
-                (k1.p9 < k2.p9) ||
-                (k1.p10 < k2.p10) ||
-                (k1.p11 < k2.p11) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) ||
+                 (k1.p7 < k2.p7) ||
+                 (k1.p8 < k2.p8) ||
+                 (k1.p9 < k2.p9) ||
+                 (k1.p10 < k2.p10) ||
+                 (k1.p11 < k2.p11) )
                 return true;
             else
                 return false;
         case 12:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) ||
-                (k1.p7 < k2.p7) ||
-                (k1.p8 < k2.p8) ||
-                (k1.p9 < k2.p9) ||
-                (k1.p10 < k2.p10) ||
-                (k1.p11 < k2.p11) ||
-                (k1.p12 < k2.p12) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) ||
+                 (k1.p7 < k2.p7) ||
+                 (k1.p8 < k2.p8) ||
+                 (k1.p9 < k2.p9) ||
+                 (k1.p10 < k2.p10) ||
+                 (k1.p11 < k2.p11) ||
+                 (k1.p12 < k2.p12) )
                 return true;
             else
                 return false;
         case 13:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) ||
-                (k1.p7 < k2.p7) ||
-                (k1.p8 < k2.p8) ||
-                (k1.p9 < k2.p9) ||
-                (k1.p10 < k2.p10) ||
-                (k1.p11 < k2.p11) ||
-                (k1.p12 < k2.p12) ||
-                (k1.p13 < k2.p13) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) ||
+                 (k1.p7 < k2.p7) ||
+                 (k1.p8 < k2.p8) ||
+                 (k1.p9 < k2.p9) ||
+                 (k1.p10 < k2.p10) ||
+                 (k1.p11 < k2.p11) ||
+                 (k1.p12 < k2.p12) ||
+                 (k1.p13 < k2.p13) )
                 return true;
             else
                 return false;
         case 14:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) ||
-                (k1.p7 < k2.p7) ||
-                (k1.p8 < k2.p8) ||
-                (k1.p9 < k2.p9) ||
-                (k1.p10 < k2.p10) ||
-                (k1.p11 < k2.p11) ||
-                (k1.p12 < k2.p12) ||
-                (k1.p13 < k2.p13) ||
-                (k1.p14 < k2.p14) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) ||
+                 (k1.p7 < k2.p7) ||
+                 (k1.p8 < k2.p8) ||
+                 (k1.p9 < k2.p9) ||
+                 (k1.p10 < k2.p10) ||
+                 (k1.p11 < k2.p11) ||
+                 (k1.p12 < k2.p12) ||
+                 (k1.p13 < k2.p13) ||
+                 (k1.p14 < k2.p14) )
                 return true;
             else
                 return false;
         case 15:
-            if( (k1.id < k2.id) ||
-                (k1.p1 < k2.p1) ||
-                (k1.p2 < k2.p2) ||
-                (k1.p3 < k2.p3) ||
-                (k1.p4 < k2.p4) ||
-                (k1.p5 < k2.p5) ||
-                (k1.p6 < k2.p6) ||
-                (k1.p7 < k2.p7) ||
-                (k1.p8 < k2.p8) ||
-                (k1.p9 < k2.p9) ||
-                (k1.p10 < k2.p10) ||
-                (k1.p11 < k2.p11) ||
-                (k1.p12 < k2.p12) ||
-                (k1.p13 < k2.p13) ||
-                (k1.p14 < k2.p14) ||
-                (k1.p15 < k2.p15) )
+            if ( (k1.id < k2.id) ||
+                 (k1.p1 < k2.p1) ||
+                 (k1.p2 < k2.p2) ||
+                 (k1.p3 < k2.p3) ||
+                 (k1.p4 < k2.p4) ||
+                 (k1.p5 < k2.p5) ||
+                 (k1.p6 < k2.p6) ||
+                 (k1.p7 < k2.p7) ||
+                 (k1.p8 < k2.p8) ||
+                 (k1.p9 < k2.p9) ||
+                 (k1.p10 < k2.p10) ||
+                 (k1.p11 < k2.p11) ||
+                 (k1.p12 < k2.p12) ||
+                 (k1.p13 < k2.p13) ||
+                 (k1.p14 < k2.p14) ||
+                 (k1.p15 < k2.p15) )
                 return true;
             else
                 return false;

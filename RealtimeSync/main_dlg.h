@@ -30,7 +30,7 @@ public:
     wxString getName() const { return dirName.getName(); }
 
 private:
-    zen::DirectoryName dirName;
+    zen::DirectoryName<wxTextCtrl> dirName;
 };
 
 
@@ -69,7 +69,7 @@ private:
 
     static const wxString& lastConfigFileName();
 
-    std::auto_ptr<zen::DirectoryName> dirNameFirst;
+    std::auto_ptr<zen::DirectoryName<wxTextCtrl>> dirNameFirst;
     std::vector<DirectoryPanel*> dirNamesExtra; //additional pairs to the standard pair
 
     wxString currentConfigFileName;

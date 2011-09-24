@@ -5,6 +5,7 @@
 // **************************************************************************
 
 #include "check_version.h"
+#include <memory>
 #include <wx/msgdlg.h>
 #include <wx/protocol/http.h>
 #include <wx/sstream.h>
@@ -14,36 +15,15 @@
 #include <string_tools.h>
 #include "msg_popup.h"
 #include "../shared/standard_paths.h"
+#include "loki/ScopeGuard.h"
 #include <wx/tokenzr.h>
 #include "../shared/i18n.h"
 
-class CloseConnectionOnExit
-{
-public:
-    CloseConnectionOnExit(wxInputStream* httpStream, wxHTTP& webAccess) :
-        m_httpStream(httpStream),
-        m_webAccess(webAccess) {}
-
-    ~CloseConnectionOnExit()
-    {
-        delete m_httpStream; //must be deleted BEFORE webAccess is closed
-        m_webAccess.Close();
-    }
-
-private:
-    wxInputStream* m_httpStream;
-    wxHTTP& m_webAccess;
-};
-
-
 bool getOnlineVersion(wxString& version)
 {
-    wxHTTP webAccess;
-    wxInputStream* httpStream = NULL;
-
     wxWindowDisabler dummy;
-    CloseConnectionOnExit dummy2(httpStream, webAccess);
 
+    wxHTTP webAccess;
     webAccess.SetHeader(wxT("Content-type"), wxT("text/html; charset=utf-8"));
     webAccess.SetTimeout(5); //5 seconds of timeout instead of 10 minutes...
 
@@ -51,7 +31,8 @@ bool getOnlineVersion(wxString& version)
     {
         //wxApp::IsMainLoopRunning(); // should return true
 
-        httpStream = webAccess.GetInputStream(wxT("/viewvc/freefilesync/version/version.txt"));
+        std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(wxT("/viewvc/freefilesync/version/version.txt")));
+        //must be deleted BEFORE webAccess is closed
 
         if (httpStream && webAccess.GetError() == wxPROTO_NOERR)
         {

@@ -13,6 +13,11 @@
 namespace zen
 {
 Zstring getFormattedDirectoryName(const Zstring& dirname);
+
+
+#ifdef FFS_WIN
+std::vector<Zstring> getDirectoryAliases(Zstring dirname);
+#endif
 }
 
 

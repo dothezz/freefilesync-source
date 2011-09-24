@@ -28,77 +28,88 @@
 
 using namespace zen;
 
-
 #ifdef FFS_WIN
 namespace
 {
-typedef Zbase<wchar_t> BasicWString; //thread safe string class for UI texts
-
-
-struct SharedData
+class SharedData
 {
+public:
+    //context of worker thread
+    void addChanges(const char* buffer, DWORD bytesWritten, const Zstring& dirname) //throw ()
+    {
+        boost::lock_guard<boost::mutex> dummy(lockAccess);
+
+        std::set<Zstring>& output = changedFiles;
+
+        if (bytesWritten == 0) //according to docu this may happen in case of internal buffer overflow: report some "dummy" change
+            output.insert(L"Overflow!");
+        else
+        {
+            const char* bufPos = &buffer[0];
+            while (true)
+            {
+                const FILE_NOTIFY_INFORMATION& notifyInfo = reinterpret_cast<const FILE_NOTIFY_INFORMATION&>(*bufPos);
+
+                const Zstring fullname = dirname + Zstring(notifyInfo.FileName, notifyInfo.FileNameLength / sizeof(WCHAR));
+
+                //skip modifications sent by changed directories: reason for change, child element creation/deletion, will notify separately!
+                bool skip = false;
+                if (notifyInfo.Action == FILE_ACTION_RENAMED_OLD_NAME) //FILE_ACTION_RENAMED_NEW_NAME should suffice
+                    skip = true;
+                else if (notifyInfo.Action == FILE_ACTION_MODIFIED)
+                {
+                    //note: this check will not work if top watched directory has been renamed
+                    const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(fullname).c_str());
+                    bool isDir = ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY); //returns true for (dir-)symlinks also
+                    skip = isDir;
+                }
+
+                if (!skip)
+                    output.insert(fullname);
+
+                if (notifyInfo.NextEntryOffset == 0)
+                    break;
+                bufPos += notifyInfo.NextEntryOffset;
+            }
+        }
+    }
+
+    //context of main thread
+    void addChange(const Zstring& dirname) //throw ()
+    {
+        boost::lock_guard<boost::mutex> dummy(lockAccess);
+        changedFiles.insert(dirname);
+    }
+
+
+    //context of main thread
+    void getChanges(std::vector<Zstring>& output) //throw FileError
+    {
+        boost::lock_guard<boost::mutex> dummy(lockAccess);
+
+        //first check whether errors occured in thread
+        if (!errorMsg.empty())
+            throw zen::FileError(errorMsg.c_str());
+
+        output.assign(changedFiles.begin(), changedFiles.end());
+        changedFiles.clear();
+    }
+
+
+    //context of worker thread
+    void reportError(const std::wstring& msg) //throw ()
+    {
+        boost::lock_guard<boost::mutex> dummy(lockAccess);
+        errorMsg = cvrtString<BasicWString>(msg);
+    }
+
+private:
+    typedef Zbase<wchar_t> BasicWString; //thread safe string class for UI texts
+
     boost::mutex lockAccess;
     std::set<Zstring> changedFiles; //get rid of duplicate entries (actually occur!)
     BasicWString errorMsg; //non-empty if errors occured in thread
 };
-
-
-void addChanges(SharedData& shared, const char* buffer, DWORD bytesWritten, const Zstring& dirname) //throw ()
-{
-    boost::lock_guard<boost::mutex> dummy(shared.lockAccess);
-
-    std::set<Zstring>& output = shared.changedFiles;
-
-    if (bytesWritten == 0) //according to docu this may happen in case of internal buffer overflow: report some "dummy" change
-        output.insert(L"Overflow!");
-    else
-    {
-        const char* bufPos = &buffer[0];
-        while (true)
-        {
-            const FILE_NOTIFY_INFORMATION& notifyInfo = reinterpret_cast<const FILE_NOTIFY_INFORMATION&>(*bufPos);
-
-            const Zstring fullname = dirname + Zstring(notifyInfo.FileName, notifyInfo.FileNameLength / sizeof(WCHAR));
-
-            //skip modifications sent by changed directories: reason for change, child element creation/deletion, will notify separately!
-            bool skip = false;
-            if (notifyInfo.Action == FILE_ACTION_MODIFIED)
-            {
-                //note: this check will not work if top watched directory has been renamed
-                const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(fullname).c_str());
-                bool isDir = ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY); //returns true for (dir-)symlinks also
-                skip = isDir;
-            }
-
-            if (!skip)
-                output.insert(fullname);
-
-            if (notifyInfo.NextEntryOffset == 0)
-                break;
-            bufPos += notifyInfo.NextEntryOffset;
-        }
-    }
-}
-
-
-void getChanges(SharedData& shared, std::vector<Zstring>& output) //throw FileError
-{
-    boost::lock_guard<boost::mutex> dummy(shared.lockAccess);
-
-    //first check whether errors occured in thread
-    if (!shared.errorMsg.empty())
-        throw zen::FileError(shared.errorMsg.c_str());
-
-    output.assign(shared.changedFiles.begin(), shared.changedFiles.end());
-    shared.changedFiles.clear();
-}
-
-
-void reportError(SharedData& shared, const BasicWString& errorMsg) //throw ()
-{
-    boost::lock_guard<boost::mutex> dummy(shared.lockAccess);
-    shared.errorMsg = errorMsg;
-}
 
 
 class ReadChangesAsync
@@ -129,7 +140,7 @@ public:
                             OPEN_EXISTING,
                             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
                             NULL);
-        if(hDir == INVALID_HANDLE_VALUE )
+        if (hDir == INVALID_HANDLE_VALUE )
             throw FileError(_("Could not initialize directory monitoring:") + "\n\"" + utf8CvrtTo<std::wstring>(dirname) + "\"" + "\n\n" + zen::getLastErrorFormatted());
 
         //Loki::ScopeGuard guardDir = Loki::MakeGuard(::CloseHandle, hDir);
@@ -146,7 +157,7 @@ public:
     {
         try
         {
-            std::vector<char> buffer(64 * 1024); //maximum buffer size restricted by some networks protocols (according to docu)
+            std::vector<char> buffer(64 * 1024); //needs to be aligned on a DWORD boundary; maximum buffer size restricted by some networks protocols (according to docu)
 
             while (true)
             {
@@ -159,7 +170,7 @@ public:
                                                   false, //__in      BOOL bInitialState,
                                                   NULL); //__in_opt  LPCTSTR lpName
                 if (overlapped.hEvent == NULL)
-                    return ::reportError(*shared_, BasicWString(_("Error when monitoring directories.") + "\n\n" + getLastErrorFormatted())); //throw () + quit thread
+                    return shared_->reportError(_("Error when monitoring directories.") + " (CreateEvent)" + "\n\n" + getLastErrorFormatted()); //throw () + quit thread
 
                 Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, overlapped.hEvent);
                 (void)dummy;
@@ -176,14 +187,13 @@ public:
                                              NULL,                          //  __out_opt    LPDWORD lpBytesReturned,
                                              &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
                                              NULL))                    //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
-                    return ::reportError(*shared_, BasicWString(_("Error when monitoring directories.") + "\n\n" + getLastErrorFormatted())); //throw () + quit thread
+                    return shared_->reportError(_("Error when monitoring directories.") + " (ReadDirectoryChangesW)" + "\n\n" + getLastErrorFormatted()); //throw () + quit thread
 
                 //async I/O is a resource that needs to be guarded since it will write to local variable "buffer"!
                 Loki::ScopeGuard lockAio = Loki::MakeGuard([&]()
                 {
                     //http://msdn.microsoft.com/en-us/library/aa363789(v=vs.85).aspx
-                    bool cancelSuccess = ::CancelIo(hDir) == TRUE; //cancel all async I/O related to this handle and thread
-                    if (cancelSuccess)
+                    if (::CancelIo(hDir) == TRUE) //cancel all async I/O related to this handle and thread
                     {
                         DWORD bytesWritten = 0;
                         ::GetOverlappedResult(hDir, &overlapped, &bytesWritten, true); //wait until cancellation is complete
@@ -199,7 +209,7 @@ public:
                                               false))        //__in   BOOL bWait
                 {
                     if (::GetLastError() != ERROR_IO_INCOMPLETE)
-                        return ::reportError(*shared_, BasicWString(_("Error when monitoring directories.") + "\n\n" + getLastErrorFormatted())); //throw () + quit thread
+                        return shared_->reportError(_("Error when monitoring directories.") + " (GetOverlappedResult)" + "\n\n" + getLastErrorFormatted()); //throw () + quit thread
 
                     //execute asynchronous procedure calls (APC) queued on this thread
                     ::SleepEx(50,    // __in  DWORD dwMilliseconds,
@@ -209,7 +219,7 @@ public:
                 }
                 lockAio.Dismiss();
 
-                ::addChanges(*shared_, &buffer[0], bytesWritten, dirname); //throw ()
+                shared_->addChanges(&buffer[0], bytesWritten, dirname); //throw ()
             }
         }
         catch (boost::thread_interrupted&)
@@ -222,7 +232,7 @@ public:
         }
     }
 
-    ReadChangesAsync(ReadChangesAsync&& other) :
+    ReadChangesAsync(ReadChangesAsync && other) :
         hDir(INVALID_HANDLE_VALUE)
     {
         shared_ = std::move(other.shared_);
@@ -269,10 +279,7 @@ private:
         //now hDir should have been released
 
         //report removal as change to main directory
-        {
-            boost::lock_guard<boost::mutex> dummy(shared_->lockAccess);
-            shared_->changedFiles.insert(dirname_);
-        }
+        shared_->addChange(dirname_);
 
         removalRequested = true;
     } //don't throw!
@@ -327,7 +334,7 @@ DirWatcher::~DirWatcher()
 std::vector<Zstring> DirWatcher::getChanges() //throw FileError
 {
     std::vector<Zstring> output;
-    ::getChanges(*pimpl_->shared, output); //throw FileError
+    pimpl_->shared->getChanges(output); //throw FileError
     return output;
 }
 

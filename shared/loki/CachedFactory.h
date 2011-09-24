@@ -81,7 +81,7 @@ protected:
     AbstractProduct* release(ProductReturn& pProduct)
     {
         AbstractProduct* pPointer(pProduct);
-        pProduct=NULL;
+        pProduct = NULL;
         return pPointer;
     }
     const char* name() {return "pointer";}
@@ -172,9 +172,9 @@ private:
     {
         using namespace std;
         clock_t currentTime = clock();
-        D( cout << "currentTime = " << currentTime<< endl; )
-        D( cout << "currentTime - lastUpdate = " << currentTime - lastUpdate<< endl; )
-        if(currentTime - lastUpdate > timeValidity)
+        D( cout << "currentTime = " << currentTime << endl; )
+        D( cout << "currentTime - lastUpdate = " << currentTime - lastUpdate << endl; )
+        if (currentTime - lastUpdate > timeValidity)
         {
             m_vTimes.clear();
             D( cout << " is less than time validity " << timeValidity; )
@@ -213,7 +213,7 @@ protected:
     bool canCreate()
     {
         cleanVector();
-        if(m_vTimes.size()>maxCreation)
+        if (m_vTimes.size() > maxCreation)
             throw Exception();
         else
             return true;
@@ -233,10 +233,10 @@ public:
     // No more than maxCreation within byTime milliseconds
     void setRate(unsigned maxCreation, unsigned byTime)
     {
-        assert(byTime>0);
+        assert(byTime > 0);
         this->maxCreation = maxCreation;
         this->timeValidity = static_cast<clock_t>(byTime * CLOCKS_PER_SEC / 1000);
-        D( std::cout << "Setting no more than "<< maxCreation <<" creation within " << this->timeValidity <<" ms"<< std::endl; )
+        D( std::cout << "Setting no more than " << maxCreation << " creation within " << this->timeValidity << " ms" << std::endl; )
     }
 };
 
@@ -262,7 +262,7 @@ protected:
 
     bool canCreate()
     {
-        return !(created>=maxCreation);
+        return !(created >= maxCreation);
     }
 
     void onCreate()
@@ -279,9 +279,9 @@ public:
     // set the creation max amount
     void setMaxCreation(unsigned maxCreation)
     {
-        assert(maxCreation>0);
+        assert(maxCreation > 0);
         this->maxCreation = maxCreation;
-        D( std::cout << "Setting no more than " << maxCreation <<" creation" << std::endl; )
+        D( std::cout << "Setting no more than " << maxCreation << " creation" << std::endl; )
     }
 };
 
@@ -324,9 +324,9 @@ protected:
         assert(!m_mHitCount.empty());
         // inserting the swapped pair into a multimap
         SwappedHitMap copyMap;
-        for(HitMapItr itr = m_mHitCount.begin(); itr != m_mHitCount.end(); ++itr)
+        for (HitMapItr itr = m_mHitCount.begin(); itr != m_mHitCount.end(); ++itr)
             copyMap.insert(SwappedPair((*itr).second, (*itr).first));
-        if((*copyMap.rbegin()).first == 0) // the higher score is 0 ...
+        if ((*copyMap.rbegin()).first == 0) // the higher score is 0 ...
             throw EvictionException(); // there is no key evict
         return (*copyMap.begin()).second;
     }
@@ -381,7 +381,7 @@ protected:
 
     // this function is implemented in Cache and redirected
     // to the Storage Policy
-    virtual void remove(DT const key)=0;
+    virtual void remove(DT const key) = 0;
 
     // LRU Eviction policy
     void evict()
@@ -422,7 +422,7 @@ private:
         updateCounter(const DT& key): key_(key) {}
         void operator()(T x)
         {
-            x.second = (x.first == key_ ? (x.second >> 1) | ( 1 << ((sizeof(ST)-1)*8) ) : x.second >> 1);
+            x.second = (x.first == key_ ? (x.second >> 1) | ( 1 << ((sizeof(ST) - 1) * 8) ) : x.second >> 1);
             D( std::cout <<  x.second << std::endl; )
         }
         const DT& key_;
@@ -461,7 +461,7 @@ protected:
 
     // this function is implemented in Cache and redirected
     // to the Storage Policy
-    virtual void remove(DT const key)=0;
+    virtual void remove(DT const key) = 0;
 
     // LRU with Aging Eviction policy
     void evict()
@@ -515,15 +515,15 @@ protected:
     }
 
     // Implemented in Cache and redirected to the Storage Policy
-    virtual void remove(DT const key)=0;
+    virtual void remove(DT const key) = 0;
 
     // Random Eviction policy
     void evict()
     {
-        if(m_vKeys.empty())
+        if (m_vKeys.empty())
             throw EvictionException();
-        size_type random = static_cast<size_type>((m_vKeys.size()*rand())/(static_cast<size_type>(RAND_MAX) + 1));
-        remove(*(m_vKeys.begin()+random));
+        size_type random = static_cast<size_type>((m_vKeys.size() * rand()) / (static_cast<size_type>(RAND_MAX) + 1));
+        remove(*(m_vKeys.begin() + random));
     }
     const char* name() {return "random";}
 };
@@ -592,9 +592,9 @@ protected:
         cout << "## + Currently allocated : " << allocated << endl;
         cout << "## + Currently out       : " << out << endl;
         cout << "############################" << endl;
-        if(fetched!=0)
+        if (fetched != 0)
         {
-            cout << "## Overall efficiency " << 100*double(hit)/fetched <<"%"<< endl;
+            cout << "## Overall efficiency " << 100 * double(hit) / fetched << "%" << endl;
             cout << "############################" << endl;
         }
         cout << endl;
@@ -629,7 +629,7 @@ public:
     unsigned getMissed() {return fetched - hit;}
     unsigned getAllocated() {return allocated;}
     unsigned getOut() {return out;}
-    unsigned getDestroyed() {return created-allocated;}
+    unsigned getDestroyed() {return created - allocated;}
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -712,7 +712,7 @@ private:
 
     AbstractProduct* const getPointerToObjectInContainer(ObjVector& entry)
     {
-        if(entry.empty()) // No object available
+        if (entry.empty()) // No object available
         {
             // the object will be created in the calling function.
             // It has to be created in the calling function because of
@@ -723,7 +723,7 @@ private:
         {
             // returning the found object
             AbstractProduct* pObject(entry.back());
-            assert(pObject!=NULL);
+            assert(pObject != NULL);
             entry.pop_back();
             return pObject;
         }
@@ -731,9 +731,9 @@ private:
 
     bool shouldCreateObject(AbstractProduct* const pProduct)
     {
-        if(pProduct!=NULL) // object already exists
+        if (pProduct != NULL) // object already exists
             return false;
-        if(CP::canCreate()==false) // Are we allowed to Create ?
+        if (CP::canCreate() == false) // Are we allowed to Create ?
             EP::evict(); // calling Eviction Policy to clean up
         return true;
     }
@@ -797,16 +797,16 @@ protected:
     virtual void remove(AbstractProduct* const pProduct)
     {
         typename FetchedObjToKeyMap::iterator fetchedItr = providedObjects.find(pProduct);
-        if(fetchedItr!=providedObjects.end()) // object is unreleased.
+        if (fetchedItr != providedObjects.end()) // object is unreleased.
             throw CacheException();
         bool productRemoved = false;
         typename KeyToObjVectorMap::iterator objVectorItr;
         typename ObjVector::iterator objItr;
-        for(objVectorItr=fromKeyToObjVector.begin(); objVectorItr!=fromKeyToObjVector.end(); ++objVectorItr)
+        for (objVectorItr = fromKeyToObjVector.begin(); objVectorItr != fromKeyToObjVector.end(); ++objVectorItr)
         {
             ObjVector& v((*objVectorItr).second);
             objItr = remove_if(v.begin(), v.end(), std::bind2nd(std::equal_to<AbstractProduct*>(), pProduct));
-            if(objItr != v.end()) // we found the vector containing pProduct and removed it
+            if (objItr != v.end()) // we found the vector containing pProduct and removed it
             {
                 onDestroy(pProduct); // warning policies we are about to destroy an object
                 v.erase(objItr, v.end()); // real removing
@@ -814,7 +814,7 @@ protected:
                 break;
             }
         }
-        if(productRemoved==false)
+        if (productRemoved == false)
             throw CacheException(); // the product is not in the cache ?!
         delete pProduct; // deleting it
     }
@@ -833,14 +833,14 @@ public:
         for_each(fromKeyToObjVector.begin(), fromKeyToObjVector.end(),
                  deleteVectorObjects< typename KeyToObjVectorMap::value_type >()
                 );
-        if(!providedObjects.empty())
+        if (!providedObjects.empty())
         {
             // The factory is responsible for the creation and destruction of objects.
             // If objects are out during the destruction of the Factory : deleting anyway.
             // This might not be a good idea. But throwing an exception in a destructor is
             // considered as a bad pratice and asserting might be too much.
             // What to do ? Leaking memory or corrupting in use pointers ? hmm...
-            D( cout << "====>>  Cache destructor : deleting "<< providedObjects.size()<<" in use objects  <<====" << endl << endl; )
+            D( cout << "====>>  Cache destructor : deleting " << providedObjects.size() << " in use objects  <<====" << endl << endl; )
             for_each(providedObjects.begin(), providedObjects.end(),
                      deleteMapKeys< typename FetchedObjToKeyMap::value_type >()
                     );
@@ -878,7 +878,7 @@ public:
     {
         MyKey key(id);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
             pProduct = factory.CreateObject(key.id);
             onCreate(pProduct);
@@ -891,11 +891,11 @@ public:
     ProductReturn CreateObject(const IdentifierType& id,
                                Parm1 p1)
     {
-        MyKey key(id,p1);
+        MyKey key(id, p1);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1);
+            pProduct = factory.CreateObject(key.id, key.p1);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -906,11 +906,11 @@ public:
     ProductReturn CreateObject(const IdentifierType& id,
                                Parm1 p1, Parm2 p2)
     {
-        MyKey key(id,p1,p2);
+        MyKey key(id, p1, p2);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -921,11 +921,11 @@ public:
     ProductReturn CreateObject(const IdentifierType& id,
                                Parm1 p1, Parm2 p2, Parm3 p3)
     {
-        MyKey key(id,p1,p2,p3);
+        MyKey key(id, p1, p2, p3);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -936,12 +936,12 @@ public:
     ProductReturn CreateObject(const IdentifierType& id,
                                Parm1 p1, Parm2 p2, Parm3 p3, Parm4 p4)
     {
-        MyKey key(id,p1,p2,p3,p4);
+        MyKey key(id, p1, p2, p3, p4);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -952,12 +952,12 @@ public:
     ProductReturn CreateObject(const IdentifierType& id,
                                Parm1 p1, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5)
     {
-        MyKey key(id,p1,p2,p3,p4,p5);
+        MyKey key(id, p1, p2, p3, p4, p5);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -969,12 +969,12 @@ public:
                                Parm1 p1, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5,
                                Parm6 p6)
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6);
+        MyKey key(id, p1, p2, p3, p4, p5, p6);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -986,12 +986,12 @@ public:
                                Parm1 p1, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5,
                                Parm6 p6, Parm7 p7 )
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6,p7);
+        MyKey key(id, p1, p2, p3, p4, p5, p6, p7);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6,key.p7);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6, key.p7);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -1003,12 +1003,12 @@ public:
                                Parm1 p1, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5,
                                Parm6 p6, Parm7 p7, Parm8 p8)
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6,p7,p8);
+        MyKey key(id, p1, p2, p3, p4, p5, p6, p7, p8);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6,key.p7,key.p8);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6, key.p7, key.p8);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -1020,12 +1020,12 @@ public:
                                Parm1 p1, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5,
                                Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9)
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6,p7,p8,p9);
+        MyKey key(id, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6,key.p7,key.p8,key.p9);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6, key.p7, key.p8, key.p9);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -1035,14 +1035,14 @@ public:
 
     ProductReturn CreateObject(const IdentifierType& id,
                                Parm1 p1, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5,
-                               Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9,Parm10 p10)
+                               Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10)
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10);
+        MyKey key(id, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6,key.p7,key.p8,key.p9,key.p10);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6, key.p7, key.p8, key.p9, key.p10);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -1055,12 +1055,12 @@ public:
                                Parm6  p6, Parm7 p7, Parm8 p8, Parm9 p9, Parm10 p10,
                                Parm11 p11)
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11);
+        MyKey key(id, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6,key.p7,key.p8,key.p9,key.p10,key.p11);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6, key.p7, key.p8, key.p9, key.p10, key.p11);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -1073,12 +1073,12 @@ public:
                                Parm6  p6,  Parm7  p7, Parm8 p8, Parm9 p9, Parm10 p10,
                                Parm11 p11, Parm12 p12)
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12);
+        MyKey key(id, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6,key.p7,key.p8,key.p9,key.p10,key.p11,key.p12);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6, key.p7, key.p8, key.p9, key.p10, key.p11, key.p12);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -1091,13 +1091,13 @@ public:
                                Parm6  p6,  Parm7  p7,  Parm8  p8, Parm9 p9, Parm10 p10,
                                Parm11 p11, Parm12 p12, Parm13 p13)
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13);
+        MyKey key(id, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6,key.p7,key.p8,key.p9,key.p10,key.p11,key.p12
-                                            ,key.p13);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6, key.p7, key.p8, key.p9, key.p10, key.p11, key.p12
+                                            , key.p13);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -1110,13 +1110,13 @@ public:
                                Parm6  p6,  Parm7  p7,  Parm8  p8,  Parm9  p9, Parm10 p10,
                                Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14)
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14);
+        MyKey key(id, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6,key.p7,key.p8,key.p9,key.p10,key.p11,key.p12
-                                            ,key.p13,key.p14);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6, key.p7, key.p8, key.p9, key.p10, key.p11, key.p12
+                                            , key.p13, key.p14);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -1129,13 +1129,13 @@ public:
                                Parm6  p6,  Parm7  p7,  Parm8  p8,  Parm9  p9,  Parm10 p10,
                                Parm11 p11, Parm12 p12, Parm13 p13, Parm14 p14, Parm15 p15)
     {
-        MyKey key(id,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15);
+        MyKey key(id, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);
         AbstractProduct* pProduct(getPointerToObjectInContainer(getContainerFromKey(key)));
-        if(shouldCreateObject(pProduct))
+        if (shouldCreateObject(pProduct))
         {
-            pProduct = factory.CreateObject(key.id,key.p1,key.p2,key.p3
-                                            ,key.p4,key.p5,key.p6,key.p7,key.p8,key.p9,key.p10,key.p11,key.p12
-                                            ,key.p13,key.p14,key.p15);
+            pProduct = factory.CreateObject(key.id, key.p1, key.p2, key.p3
+                                            , key.p4, key.p5, key.p6, key.p7, key.p8, key.p9, key.p10, key.p11, key.p12
+                                            , key.p13, key.p14, key.p15);
             onCreate(pProduct);
         }
         onFetch(pProduct);
@@ -1153,7 +1153,7 @@ public:
     {
         AbstractProduct* pProduct(NP::release(object));
         typename FetchedObjToKeyMap::iterator itr = providedObjects.find(pProduct);
-        if(itr == providedObjects.end())
+        if (itr == providedObjects.end())
             throw CacheException();
         onRelease(pProduct);
         ReleaseObjectFromContainer(getContainerFromKey((*itr).second), pProduct);

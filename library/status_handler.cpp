@@ -6,8 +6,7 @@
 
 #include "status_handler.h"
 #include <wx/app.h>
-#include <wx/timer.h>
-
+#include <ctime>
 
 void updateUiNow()
 {
@@ -21,12 +20,14 @@ void updateUiNow()
 
 bool updateUiIsAllowed()
 {
-    static wxMilliClock_t lastExec = 0;
-    const wxMilliClock_t  newExec  = wxGetLocalTimeMillis();
+    const std::clock_t CLOCK_UPDATE_INTERVAL = UI_UPDATE_INTERVAL * CLOCKS_PER_SEC / 1000;
 
-    if (newExec - lastExec >= UI_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
+    static std::clock_t lastExec = 0;
+    const std::clock_t now = std::clock(); //this is quite fast: 2 * 10^-5
+
+    if (now - lastExec >= CLOCK_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
     {
-        lastExec = newExec;
+        lastExec = now;
         return true;
     }
     return false;

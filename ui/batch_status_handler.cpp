@@ -54,7 +54,7 @@ void removeFileNoThrow(const Zstring& filename)
     {
         zen::removeFile(filename);
     }
-    catch(...) {}
+    catch (...) {}
 }
 }
 
@@ -62,7 +62,7 @@ void removeFileNoThrow(const Zstring& filename)
 class LogFile
 {
 public:
-    LogFile(const wxString& logfileDirectory, const wxString& jobName) : jobName_(jobName) //throw (FileError&)
+    LogFile(const wxString& logfileDirectory, const wxString& jobName) : jobName_(jobName) //throw FileError
     {
         logfileName = findUniqueLogname(logfileDirectory, jobName);
 
@@ -298,10 +298,16 @@ void BatchStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 da
 }
 
 
+void BatchStatusHandler::reportStatus(const wxString& text)
+{
+    syncStatusFrame.setStatusText_NoUpdate(text);
+    requestUiRefresh(); //throw AbortThisProcess
+}
+
+
 void BatchStatusHandler::reportInfo(const wxString& text)
 {
-    if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING) //write file transfer information to log
-        errorLog.logMsg(text, TYPE_INFO); //avoid spamming with file copy info: visually identifying warning messages has priority! however when saving to a log file wee need this info
+    errorLog.logMsg(text, TYPE_INFO);
 
     syncStatusFrame.setStatusText_NoUpdate(text);
     requestUiRefresh(); //throw AbortThisProcess

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20110901;20164500">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "MS Mincho" }
+		H3.ctl { font-family: "Mangal" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Send error
+notification via email</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Create
+	a FreeFileSync batch file using &quot;<I>Run minimized</I>&quot;.<BR>&nbsp;</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Set
+	error handling to &quot;<I>Exit instantly</I>&quot; or &quot;<I>Ignore
+	errors</I>&quot; to avoid having a pop-up stop the program flow. In
+	case errors occur FreeFileSync will exit with a return code &lt; 0
+	that can be checked via the ERRORLEVEL batch command.<BR>&nbsp;</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Create
+	a *.cmd or *.bat file to specify the location of FreeFileSync.exe
+	and pass the name of the ffs_batch file as first argument; e.g.:</FONT></P>
+</OL>
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">&quot;C:\Program
+	Files\FreeFileSync\FreeFileSync.exe&quot; &quot;C:\SyncJob.ffs_batch&quot;<BR>@if
+	not errorlevel 0 (<BR>&nbsp;&nbsp;&nbsp;&nbsp;echo An error
+	occured!<BR>&nbsp;&nbsp;&nbsp;&nbsp;pause<BR>)</FONT></FONT></P>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Instead
+of displaying &quot;An error occurred!&quot; you can specify another
+command like sending an email notification (using a third party
+tool).</FONT> 
+</P>
+</BODY>
+</HTML>

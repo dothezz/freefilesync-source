@@ -122,8 +122,8 @@ struct FunctorImplBase
 // Specializations of FunctorImpl for up to 15 parameters follow
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, class TList,
-         template <class, class> class ThreadingModel = LOKI_DEFAULT_THREADING_NO_OBJ_LEVEL>
+template < typename R, class TList,
+         template <class, class> class ThreadingModel = LOKI_DEFAULT_THREADING_NO_OBJ_LEVEL >
 class FunctorImpl;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -160,8 +160,8 @@ public:
 // Specialization for 2 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2,
-         template <class, class> class ThreadingModel>
+template < typename R, typename P1, typename P2,
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, Seq<P1, P2>, ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -177,8 +177,8 @@ public:
 // Specialization for 3 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3,
-         template <class, class> class ThreadingModel>
+template < typename R, typename P1, typename P2, typename P3,
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, Seq<P1, P2, P3>, ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -195,8 +195,8 @@ public:
 // Specialization for 4 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
-         template <class, class> class ThreadingModel>
+template < typename R, typename P1, typename P2, typename P3, typename P4,
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, Seq<P1, P2, P3, P4>, ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -214,9 +214,9 @@ public:
 // Specialization for 5 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5,
-         template <class, class> class ThreadingModel>
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, Seq<P1, P2, P3, P4, P5>, ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -235,9 +235,9 @@ public:
 // Specialization for 6 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6,
-         template <class, class> class ThreadingModel>
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, Seq<P1, P2, P3, P4, P5, P6>, ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -257,9 +257,9 @@ public:
 // Specialization for 7 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7,
-         template <class, class> class ThreadingModel>
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, Seq<P1, P2, P3, P4, P5, P6, P7>, ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -281,11 +281,11 @@ public:
 // Specialization for 8 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R, Seq<P1, P2, P3, P4, P5, P6, P7, P8>,
-    ThreadingModel>
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R, Seq<P1, P2, P3, P4, P5, P6, P7, P8>,
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -307,11 +307,11 @@ public:
 // Specialization for 9 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9>,
-    ThreadingModel>
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9>,
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -334,12 +334,12 @@ public:
 // Specialization for 10 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10>,
-    ThreadingModel>
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10>,
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -363,13 +363,13 @@ public:
 // Specialization for 11 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R,
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R,
     Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11>,
-    ThreadingModel>
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -394,13 +394,13 @@ public:
 // Specialization for 12 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11, typename P12,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R,
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R,
     Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12>,
-    ThreadingModel>
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -426,13 +426,13 @@ public:
 // Specialization for 13 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11, typename P12, typename P13,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R,
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R,
     Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13>,
-    ThreadingModel>
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -459,14 +459,14 @@ public:
 // Specialization for 14 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11, typename P12, typename P13, typename P14,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R,
-    Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13,
-    P14>,
-    ThreadingModel>
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R,
+    Seq < P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13,
+    P14 > ,
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -494,14 +494,14 @@ public:
 // Specialization for 15 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11, typename P12, typename P13, typename P14,
-         typename P15, template <class, class> class ThreadingModel>
-class FunctorImpl<R,
-    Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13,
-    P14, P15>,
-    ThreadingModel>
+         typename P15, template <class, class> class ThreadingModel >
+class FunctorImpl < R,
+    Seq < P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13,
+    P14, P15 > ,
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -548,8 +548,8 @@ public:
 // Specialization for 2 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2,
-         template <class, class> class ThreadingModel>
+template < typename R, typename P1, typename P2,
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, LOKI_TYPELIST_2(P1, P2), ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -565,8 +565,8 @@ public:
 // Specialization for 3 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3,
-         template <class, class> class ThreadingModel>
+template < typename R, typename P1, typename P2, typename P3,
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, LOKI_TYPELIST_3(P1, P2, P3), ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -583,8 +583,8 @@ public:
 // Specialization for 4 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
-         template <class, class> class ThreadingModel>
+template < typename R, typename P1, typename P2, typename P3, typename P4,
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, LOKI_TYPELIST_4(P1, P2, P3, P4), ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -602,9 +602,9 @@ public:
 // Specialization for 5 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5,
-         template <class, class> class ThreadingModel>
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, LOKI_TYPELIST_5(P1, P2, P3, P4, P5), ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -623,9 +623,9 @@ public:
 // Specialization for 6 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6,
-         template <class, class> class ThreadingModel>
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, LOKI_TYPELIST_6(P1, P2, P3, P4, P5, P6), ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -645,9 +645,9 @@ public:
 // Specialization for 7 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7,
-         template <class, class> class ThreadingModel>
+         template <class, class> class ThreadingModel >
 class FunctorImpl<R, LOKI_TYPELIST_7(P1, P2, P3, P4, P5, P6, P7), ThreadingModel>
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
@@ -669,11 +669,11 @@ public:
 // Specialization for 8 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R, LOKI_TYPELIST_8(P1, P2, P3, P4, P5, P6, P7, P8),
-    ThreadingModel>
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R, LOKI_TYPELIST_8(P1, P2, P3, P4, P5, P6, P7, P8),
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -695,11 +695,11 @@ public:
 // Specialization for 9 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R, LOKI_TYPELIST_9(P1, P2, P3, P4, P5, P6, P7, P8, P9),
-    ThreadingModel>
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R, LOKI_TYPELIST_9(P1, P2, P3, P4, P5, P6, P7, P8, P9),
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -722,12 +722,12 @@ public:
 // Specialization for 10 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R, LOKI_TYPELIST_10(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10),
-    ThreadingModel>
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R, LOKI_TYPELIST_10(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10),
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -751,13 +751,13 @@ public:
 // Specialization for 11 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R,
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R,
     LOKI_TYPELIST_11(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11),
-    ThreadingModel>
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -782,13 +782,13 @@ public:
 // Specialization for 12 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11, typename P12,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R,
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R,
     LOKI_TYPELIST_12(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12),
-    ThreadingModel>
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -814,13 +814,13 @@ public:
 // Specialization for 13 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11, typename P12, typename P13,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R,
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R,
     LOKI_TYPELIST_13(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13),
-    ThreadingModel>
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -847,14 +847,14 @@ public:
 // Specialization for 14 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11, typename P12, typename P13, typename P14,
-         template <class, class> class ThreadingModel>
-class FunctorImpl<R,
+         template <class, class> class ThreadingModel >
+class FunctorImpl < R,
     LOKI_TYPELIST_14(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13,
                      P14),
-    ThreadingModel>
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -882,14 +882,14 @@ public:
 // Specialization for 15 parameters
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename R, typename P1, typename P2, typename P3, typename P4,
+template < typename R, typename P1, typename P2, typename P3, typename P4,
          typename P5, typename P6, typename P7, typename P8, typename P9,
          typename P10, typename P11, typename P12, typename P13, typename P14,
-         typename P15, template <class, class> class ThreadingModel>
-class FunctorImpl<R,
+         typename P15, template <class, class> class ThreadingModel >
+class FunctorImpl < R,
     LOKI_TYPELIST_15(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13,
                      P14, P15),
-    ThreadingModel>
+    ThreadingModel >
     : public Private::FunctorImplBase<R, ThreadingModel>
 {
 public:
@@ -957,13 +957,13 @@ public:
     {
         // there is no static information if Functor holds a member function
         // or a free function; this is the main difference to tr1::function
-        if(typeid(*this) != typeid(rhs))
+        if (typeid(*this) != typeid(rhs))
             return false; // cannot be equal
 
         const FunctorHandler& fh = static_cast<const FunctorHandler&>(rhs);
         // if this line gives a compiler error, you are using a function object.
         // you need to implement bool MyFnObj::operator == (const MyFnObj&) const;
-        return  f_==fh.f_;
+        return  f_ == fh.f_;
     }
 #endif
     // operator() implementations for up to 15 arguments
@@ -1045,8 +1045,8 @@ private:
 // Wraps pointers to member functions
 ////////////////////////////////////////////////////////////////////////////////
 
-template <class ParentFunctor, typename PointerToObj,
-         typename PointerToMemFn>
+template < class ParentFunctor, typename PointerToObj,
+         typename PointerToMemFn >
 class MemFunHandler : public ParentFunctor::Impl
 {
     typedef typename ParentFunctor::Impl Base;
@@ -1080,13 +1080,13 @@ public:
 
     bool operator==(const typename Base::FunctorImplBaseType& rhs) const
     {
-        if(typeid(*this) != typeid(rhs))
+        if (typeid(*this) != typeid(rhs))
             return false; // cannot be equal
 
         const MemFunHandler& mfh = static_cast<const MemFunHandler&>(rhs);
         // if this line gives a compiler error, you are using a function object.
         // you need to implement bool MyFnObj::operator == (const MyFnObj&) const;
-        return  pObj_==mfh.pObj_ && pMemFn_==mfh.pMemFn_;
+        return  pObj_ == mfh.pObj_ && pMemFn_ == mfh.pMemFn_;
     }
 #endif
 
@@ -1215,8 +1215,8 @@ public:
 /// objects  which have no operator== implemented, keep in mind when you enable
 /// operator==.
 ////////////////////////////////////////////////////////////////////////////////
-template <typename R = void, class TList = NullType,
-         template<class, class> class ThreadingModel = LOKI_DEFAULT_THREADING_NO_OBJ_LEVEL>
+template < typename R = void, class TList = NullType,
+         template<class, class> class ThreadingModel = LOKI_DEFAULT_THREADING_NO_OBJ_LEVEL >
 class Functor
 {
 public:
@@ -1295,9 +1295,9 @@ public:
 
     bool operator==(const Functor& rhs) const
     {
-        if(spImpl_.get()==0 && rhs.spImpl_.get()==0)
+        if (spImpl_.get() == 0 && rhs.spImpl_.get() == 0)
             return true;
-        if(spImpl_.get()!=0 && rhs.spImpl_.get()!=0)
+        if (spImpl_.get() != 0 && rhs.spImpl_.get() != 0)
             return *spImpl_.get() == *rhs.spImpl_.get();
         else
             return false;
@@ -1305,7 +1305,7 @@ public:
 
     bool operator!=(const Functor& rhs) const
     {
-        return !(*this==rhs);
+        return !(*this == rhs);
     }
 #endif
 
@@ -1445,7 +1445,7 @@ struct BinderFirstTraits< Functor<R, TList, ThreadingModel> >
 {
     typedef Functor<R, TList, ThreadingModel> OriginalFunctor;
 
-    typedef typename TL::Erase<TList,typename TL::TypeAt<TList, 0>::Result>
+    typedef typename TL::Erase<TList, typename TL::TypeAt<TList, 0>::Result>
     ::Result
     ParmList;
 
@@ -1493,9 +1493,9 @@ class BinderFirst
 
     typedef typename OriginalFunctor::Parm1 BoundType;
 
-    typedef typename Private::BinderFirstBoundTypeStorage<
+    typedef typename Private::BinderFirstBoundTypeStorage <
     typename Private::BinderFirstTraits<OriginalFunctor>
-    ::OriginalParm1>
+    ::OriginalParm1 >
     ::RefOrValue
     BoundTypeStorage;
 
@@ -1527,7 +1527,7 @@ public:
 
     bool operator==(const typename Base::FunctorImplBaseType& rhs) const
     {
-        if(typeid(*this) != typeid(rhs))
+        if (typeid(*this) != typeid(rhs))
             return false; // cannot be equal
         // if this line gives a compiler error, you are using a function object.
         // you need to implement bool MyFnObj::operator == (const MyFnObj&) const;
@@ -1659,7 +1659,7 @@ public:
 
     bool operator==(const typename Base::Impl::FunctorImplBaseType& rhs) const
     {
-        if(typeid(*this) != typeid(rhs))
+        if (typeid(*this) != typeid(rhs))
             return false; // cannot be equal
         // if this line gives a compiler error, you are using a function object.
         // you need to implement bool MyFnObj::operator == (const MyFnObj&) const;

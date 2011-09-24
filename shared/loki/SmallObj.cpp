@@ -1012,7 +1012,7 @@ void FixedAllocator::DoDeallocate(void* p)
 /// Calculates index into array where a FixedAllocator of numBytes is located.
 inline std::size_t GetOffset( std::size_t numBytes, std::size_t alignment )
 {
-    const std::size_t alignExtra = alignment-1;
+    const std::size_t alignExtra = alignment - 1;
     return ( numBytes + alignExtra ) / alignment;
 }
 
@@ -1070,7 +1070,7 @@ SmallObjAllocator::SmallObjAllocator( std::size_t pageSize,
     const std::size_t allocCount = GetOffset( maxObjectSize, objectAlignSize );
     pool_ = new FixedAllocator[ allocCount ];
     for ( std::size_t i = 0; i < allocCount; ++i )
-        pool_[ i ].Initialize( ( i+1 ) * objectAlignSize, pageSize );
+        pool_[ i ].Initialize( ( i + 1 ) * objectAlignSize, pageSize );
 }
 
 // SmallObjAllocator::~SmallObjAllocator --------------------------------------

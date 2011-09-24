@@ -19,7 +19,7 @@ public:
     FfsTrayIcon();
     ~FfsTrayIcon();
 
-    void setToolTip(const wxString& toolTipText, double percent = 0); //percent (optional), number between [0, 100], for small progress indicator
+    void setToolTip2(const wxString& toolTipText, double fraction = 0); //number between [0, 1], for small progress indicator
 
 private:
     FfsTrayIcon(const FfsTrayIcon&);

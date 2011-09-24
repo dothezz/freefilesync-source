@@ -54,8 +54,8 @@ template <typename T, //Character Type
     void setLength(T* ptr, size_t newLength)
 */
 
-template <typename T, //Character Type
-         class AP>    //Allocator Policy
+template < typename T, //Character Type
+         class AP >   //Allocator Policy
 class StorageDeepCopy : public AP
 {
 protected:
@@ -107,8 +107,8 @@ private:
 };
 
 
-template <typename T, //Character Type
-         class AP>    //Allocator Policy
+template < typename T, //Character Type
+         class AP >   //Allocator Policy
 class StorageRefCountThreadSafe : public AP
 {
 protected:
@@ -181,9 +181,9 @@ private:
 
 //perf note: interstingly StorageDeepCopy and StorageRefCountThreadSafe show same performance in FFS comparison
 
-template <class T,									                   //Character Type
+template < class T,									                  //Character Type
          template <class, class> class SP = StorageRefCountThreadSafe, //Storage Policy
-         class AP = AllocatorOptimalSpeed>				               //Allocator Policy
+         class AP = AllocatorOptimalSpeed >				              //Allocator Policy
 class Zbase : public SP<T, AP>
 {
 public:
@@ -191,7 +191,7 @@ public:
     Zbase(const T* source); //implicit conversion from a C-string
     Zbase(const T* source, size_t length);
     Zbase(const Zbase& source);
-    Zbase(Zbase&& tmp);
+    Zbase(Zbase && tmp);
     explicit Zbase(T source); //dangerous if implicit: T buffer[]; Zbase name = buffer; ups...
     //allow explicit construction from different string type, prevent ambiguity via SFINAE
     template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
@@ -253,7 +253,7 @@ public:
     void push_back(T val); //STL access
 
     Zbase& operator=(const Zbase& source);
-    Zbase& operator=(Zbase&& tmp);
+    Zbase& operator=(Zbase && tmp);
     Zbase& operator=(const T* source);
     Zbase& operator=(T source);
     Zbase& operator+=(const Zbase& other);
@@ -374,7 +374,7 @@ Zbase<T, SP, AP>::Zbase(const Zbase<T, SP, AP>& source)
 
 template <class T, template <class, class> class SP, class AP>
 inline
-Zbase<T, SP, AP>::Zbase(Zbase<T, SP, AP>&& tmp)
+Zbase<T, SP, AP>::Zbase(Zbase<T, SP, AP> && tmp)
 {
     rawStr = this->clone(tmp.rawStr); //for a ref-counting string there probably isn't a faster way, even with r-value references
 }
@@ -828,7 +828,7 @@ Zbase<T, SP, AP>& Zbase<T, SP, AP>::operator=(const Zbase<T, SP, AP>& source)
 
 template <class T, template <class, class> class SP, class AP>
 inline
-Zbase<T, SP, AP>& Zbase<T, SP, AP>::operator=(Zbase<T, SP, AP>&& tmp)
+Zbase<T, SP, AP>& Zbase<T, SP, AP>::operator=(Zbase<T, SP, AP> && tmp)
 {
     swap(tmp);
     return *this;

@@ -89,7 +89,7 @@ protected:
 public:
     FfsDirPickerCtrl* m_dirPickerMain;
 
-    MainDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RealtimeSync - Automated Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+    MainDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RealtimeSync - Automated Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL );
 
     ~MainDlgGenerated();
 
@@ -109,7 +109,7 @@ public:
     wxTextCtrl* m_txtCtrlDirectory;
     FfsDirPickerCtrl* m_dirPicker;
 
-    FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+    FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxTAB_TRAVERSAL );
     ~FolderGenerated();
 
 };

@@ -98,22 +98,48 @@ xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchCo
 {
     XmlGuiConfig output;
     output.mainCfg = batchCfg.mainCfg;
+
+    switch (batchCfg.handleError)
+    {
+        case ON_ERROR_EXIT:
+        case ON_ERROR_POPUP:
+            output.handleError = ON_GUIERROR_POPUP;
+            break;
+        case ON_ERROR_IGNORE:
+            output.handleError = ON_GUIERROR_IGNORE;
+            break;
+    }
     return output;
 }
 
 
-xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg)
+xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg, const wxString& referenceFile)
 {
-    XmlBatchConfig output;
+    //try to take over batch-specific settings from reference
+    if (!referenceFile.empty() && getXmlType(referenceFile) == XML_TYPE_BATCH)
+        try
+        {
+            XmlBatchConfig output;
+
+            std::vector<wxString> filenames;
+            filenames.push_back(referenceFile);
+            convertConfig(filenames, output); //throw xmlAccess::FfsXmlError
+
+            output.mainCfg = guiCfg.mainCfg;
+            return output;
+        }
+        catch (xmlAccess::FfsXmlError&) {}
+
+    XmlBatchConfig output; //use default batch-settings
     output.mainCfg = guiCfg.mainCfg;
 
     switch (guiCfg.handleError)
     {
         case ON_GUIERROR_POPUP:
-            output.handleError = xmlAccess::ON_ERROR_POPUP;
+            output.handleError = ON_ERROR_POPUP;
             break;
         case ON_GUIERROR_IGNORE:
-            output.handleError = xmlAccess::ON_ERROR_IGNORE;
+            output.handleError = ON_ERROR_IGNORE;
             break;
     }
 
@@ -158,12 +184,12 @@ xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<wxString>& filena
 namespace
 {
 template <class XmlCfg>
-XmlCfg loadCfgImpl(const wxString& filename, std::unique_ptr<xmlAccess::FfsXmlError>& exeption) //throw (xmlAccess::FfsXmlError)
+XmlCfg loadCfgImpl(const wxString& filename, std::unique_ptr<xmlAccess::FfsXmlError>& exeption) //throw xmlAccess::FfsXmlError
 {
     XmlCfg cfg;
     try
     {
-        xmlAccess::readConfig(filename, cfg); //throw (xmlAccess::FfsXmlError);
+        xmlAccess::readConfig(filename, cfg); //throw xmlAccess::FfsXmlError
     }
     catch (const xmlAccess::FfsXmlError& e)
     {
@@ -177,7 +203,7 @@ XmlCfg loadCfgImpl(const wxString& filename, std::unique_ptr<xmlAccess::FfsXmlEr
 
 
 template <class XmlCfg>
-void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config)   //throw (xmlAccess::FfsXmlError)
+void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config)   //throw xmlAccess::FfsXmlError
 {
     using namespace xmlAccess;
 
@@ -193,11 +219,11 @@ void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config
         switch (getXmlType(*i))
         {
             case XML_TYPE_GUI:
-                mainCfgs.push_back(loadCfgImpl<XmlGuiConfig>(*i, savedException).mainCfg); //throw (xmlAccess::FfsXmlError)
+                mainCfgs.push_back(loadCfgImpl<XmlGuiConfig>(*i, savedException).mainCfg); //throw xmlAccess::FfsXmlError
                 break;
 
             case XML_TYPE_BATCH:
-                mainCfgs.push_back(loadCfgImpl<XmlBatchConfig>(*i, savedException).mainCfg); //throw (xmlAccess::FfsXmlError)
+                mainCfgs.push_back(loadCfgImpl<XmlBatchConfig>(*i, savedException).mainCfg); //throw xmlAccess::FfsXmlError
                 break;
 
             case XML_TYPE_GLOBAL:
@@ -211,9 +237,9 @@ void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config
 
     try //...to init all non-"mainCfg" settings with first config file
     {
-        xmlAccess::readConfig(filenames[0], config); //throw (xmlAccess::FfsXmlError);
+        xmlAccess::readConfig(filenames[0], config); //throw xmlAccess::FfsXmlError
     }
-    catch (...) {}
+    catch (xmlAccess::FfsXmlError&) {}
 
     config.mainCfg = merge(mainCfgs);
 
@@ -364,6 +390,41 @@ bool readText(const std::string& input, OnGuiError& value)
 
 
 template <> inline
+void writeText(const FileIconSize& value, std::string& output)
+{
+    switch (value)
+    {
+        case ICON_SIZE_SMALL:
+            output = "Small";
+            break;
+        case ICON_SIZE_MEDIUM:
+            output = "Medium";
+            break;
+        case ICON_SIZE_LARGE:
+            output = "Large";
+            break;
+    }
+}
+
+
+template <> inline
+bool readText(const std::string& input, FileIconSize& value)
+{
+    std::string tmp = input;
+    zen::trim(tmp);
+    if (tmp == "Small")
+        value = ICON_SIZE_SMALL;
+    else if (tmp == "Medium")
+        value = ICON_SIZE_MEDIUM;
+    else if (tmp == "Large")
+        value = ICON_SIZE_LARGE;
+    else
+        return false;
+    return true;
+}
+
+
+template <> inline
 void writeText(const DeletionPolicy& value, std::string& output)
 {
     switch (value)
@@ -439,17 +500,20 @@ void writeText(const UnitTime& value, std::string& output)
         case UTIME_NONE:
             output = "Inactive";
             break;
-        case UTIME_SEC:
-            output = "Second";
+            //        case UTIME_LAST_X_HOURS:
+            //          output = "x-hours";
+            //        break;
+        case UTIME_TODAY:
+            output = "Today";
             break;
-        case UTIME_MIN:
-            output = "Minute";
+        case UTIME_THIS_WEEK:
+            output = "Week";
             break;
-        case UTIME_HOUR:
-            output = "Hour";
+        case UTIME_THIS_MONTH:
+            output = "Month";
             break;
-        case UTIME_DAY:
-            output = "Day";
+        case UTIME_THIS_YEAR:
+            output = "Year";
             break;
     }
 }
@@ -461,14 +525,16 @@ bool readText(const std::string& input, UnitTime& value)
     zen::trim(tmp);
     if (tmp == "Inactive")
         value = UTIME_NONE;
-    else if (tmp == "Second")
-        value = UTIME_SEC;
-    else if (tmp == "Minute")
-        value = UTIME_MIN;
-    else if (tmp == "Hour")
-        value = UTIME_HOUR;
-    else if (tmp == "Day")
-        value = UTIME_DAY;
+    //    else if (tmp == "x-hours")
+    //      value = UTIME_LAST_X_HOURS;
+    else if (tmp == "Today")
+        value = UTIME_TODAY;
+    else if (tmp == "Week")
+        value = UTIME_THIS_WEEK;
+    else if (tmp == "Month")
+        value = UTIME_THIS_MONTH;
+    else if (tmp == "Year")
+        value = UTIME_THIS_YEAR;
     else
         return false;
     return true;
@@ -529,38 +595,38 @@ bool readText(const std::string& input, UnitSize& value)
 
 
 template <> inline
-void writeText(const SyncConfig::Variant& value, std::string& output)
+void writeText(const DirectionConfig::Variant& value, std::string& output)
 {
     switch (value)
     {
-        case SyncConfig::AUTOMATIC:
+        case DirectionConfig::AUTOMATIC:
             output = "Automatic";
             break;
-        case SyncConfig::MIRROR:
+        case DirectionConfig::MIRROR:
             output = "Mirror";
             break;
-        case SyncConfig::UPDATE:
+        case DirectionConfig::UPDATE:
             output = "Update";
             break;
-        case SyncConfig::CUSTOM:
+        case DirectionConfig::CUSTOM:
             output = "Custom";
             break;
     }
 }
 
 template <> inline
-bool readText(const std::string& input, SyncConfig::Variant& value)
+bool readText(const std::string& input, DirectionConfig::Variant& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
     if (tmp == "Automatic")
-        value = SyncConfig::AUTOMATIC;
+        value = DirectionConfig::AUTOMATIC;
     else if (tmp == "Mirror")
-        value = SyncConfig::MIRROR;
+        value = DirectionConfig::MIRROR;
     else if (tmp == "Update")
-        value = SyncConfig::UPDATE;
+        value = DirectionConfig::UPDATE;
     else if (tmp == "Custom")
-        value = SyncConfig::CUSTOM;
+        value = DirectionConfig::CUSTOM;
     else
         return false;
     return true;
@@ -591,17 +657,33 @@ void writeValue(const ColumnAttrib& value, XmlElement& output)
 
 namespace
 {
-void readConfig(const XmlIn& in, SyncConfig& syncCfg)
+void readConfig(const XmlIn& in, CompConfig& cmpConfig)
 {
-    in["Variant"](syncCfg.var);
+    in["Variant"       ](cmpConfig.compareVar);
+    in["HandleSymlinks"](cmpConfig.handleSymlinks);
+}
+
+
+void readConfig(const XmlIn& in, DirectionConfig& directCfg)
+{
+    in["Variant"](directCfg.var);
 
     XmlIn inCustDir = in["CustomDirections"];
-    inCustDir["LeftOnly"  ](syncCfg.custom.exLeftSideOnly);
-    inCustDir["RightOnly" ](syncCfg.custom.exRightSideOnly);
-    inCustDir["LeftNewer" ](syncCfg.custom.leftNewer);
-    inCustDir["RightNewer"](syncCfg.custom.rightNewer);
-    inCustDir["Different" ](syncCfg.custom.different);
-    inCustDir["Conflict"  ](syncCfg.custom.conflict);
+    inCustDir["LeftOnly"  ](directCfg.custom.exLeftSideOnly);
+    inCustDir["RightOnly" ](directCfg.custom.exRightSideOnly);
+    inCustDir["LeftNewer" ](directCfg.custom.leftNewer);
+    inCustDir["RightNewer"](directCfg.custom.rightNewer);
+    inCustDir["Different" ](directCfg.custom.different);
+    inCustDir["Conflict"  ](directCfg.custom.conflict);
+}
+
+
+void readConfig(const XmlIn& in, SyncConfig& syncCfg)
+{
+    readConfig(in, syncCfg.directionCfg);
+
+    in["DeletionPolicy"      ](syncCfg.handleDeletion);
+    in["CustomDeletionFolder"](syncCfg.customDeletionDirectory);
 }
 
 
@@ -628,18 +710,24 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
     in["Right"](enhPair.rightDirectory);
 
     //###########################################################
-    //alternate sync configuration (optional)
-    XmlIn inAlt = in["AlternateSyncConfig"];
-    if (inAlt)
+    //alternate comp configuration (optional)
+    XmlIn inAltCmp = in["AlternateCompareConfig"];
+    if (inAltCmp)
     {
-        std::shared_ptr<AlternateSyncConfig> altSyncCfg = std::make_shared<AlternateSyncConfig>();
-        enhPair.altSyncConfig = altSyncCfg;
+        CompConfig altCmpCfg;
+        readConfig(inAltCmp, altCmpCfg);
 
-        //read sync configuration
-        readConfig(inAlt, altSyncCfg->syncConfiguration);
+        enhPair.altCmpConfig = std::make_shared<CompConfig>(altCmpCfg);;
+    }
+    //###########################################################
+    //alternate sync configuration (optional)
+    XmlIn inAltSync = in["SyncConfig"];
+    if (inAltSync)
+    {
+        SyncConfig altSyncCfg;
+        readConfig(inAltSync, altSyncCfg);
 
-        inAlt["DeletionPolicy"      ](altSyncCfg->handleDeletion);
-        inAlt["CustomDeletionFolder"](altSyncCfg->customDeletionDirectory);
+        enhPair.altSyncConfig = std::make_shared<SyncConfig>(altSyncCfg);
     }
 
     //###########################################################
@@ -650,24 +738,16 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
 
 void readConfig(const XmlIn& in, MainConfiguration& mainCfg)
 {
-    XmlIn inCmp  = in["MainConfig"]["Comparison"];
+    //read compare settings
+    XmlIn inCmp = in["MainConfig"]["Comparison"];
 
-    //read compare variant
-    inCmp["Variant"](mainCfg.compareVar);
-
-    //include symbolic links at all?
-    inCmp["HandleSymlinks"](mainCfg.handleSymlinks);
-
+    readConfig(inCmp, mainCfg.cmpConfig);
     //###########################################################
+
     XmlIn inSync = in["MainConfig"]["SyncConfig"];
 
     //read sync configuration
-    readConfig(inSync, mainCfg.syncConfiguration);
-    //###########################################################
-
-    //misc
-    inSync["DeletionPolicy"      ](mainCfg.handleDeletion);
-    inSync["CustomDeletionFolder"](mainCfg.customDeletionDirectory);
+    readConfig(inSync, mainCfg.syncCfg);
     //###########################################################
 
     XmlIn inFilter = in["MainConfig"]["GlobalFilter"];
@@ -731,7 +811,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     inShared["CopyLockedFiles"      ](config.copyLockedFiles);
     inShared["CopyFilePermissions"  ](config.copyFilePermissions);
-	inShared["TransactionalFileCopy"](config.transactionalFileCopy);
+    inShared["TransactionalFileCopy"](config.transactionalFileCopy);
     inShared["VerifyCopiedFiles"    ](config.verifyFileCopy);
 
     //max. allowed file time deviation
@@ -765,13 +845,12 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inWnd["ManualDeletionUseRecycler"](config.gui.useRecyclerForManualDeletion);
     inWnd["RespectCaseOnSearch"      ](config.gui.textSearchRespectCase);
 
-    //###########################################################
+    inWnd["IconSize"](config.gui.iconSize);
 
+    //###########################################################
     //read column attributes
     XmlIn inColLeft = inWnd["LeftColumns"];
-
     inColLeft.attribute("AutoAdjust",    config.gui.autoAdjustColumnsLeft);
-    inColLeft.attribute("ShowFileIcons", config.gui.showFileIconsLeft);
 
     inColLeft(config.gui.columnAttribLeft);
     for (size_t i = 0; i < config.gui.columnAttribLeft.size(); ++i)
@@ -779,9 +858,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     //###########################################################
     XmlIn inColRight = inWnd["RightColumns"];
-
     inColRight.attribute("AutoAdjust",    config.gui.autoAdjustColumnsRight);
-    inColRight.attribute("ShowFileIcons", config.gui.showFileIconsRight);
 
     inColRight(config.gui.columnAttribRight);
     for (size_t i = 0; i < config.gui.columnAttribRight.size(); ++i)
@@ -850,17 +927,33 @@ void xmlAccess::readConfig(xmlAccess::XmlGlobalSettings& config)
 //################################################################################################
 namespace
 {
-void writeConfig(const SyncConfig& syncCfg, XmlOut& out)
+void writeConfig(const CompConfig& cmpConfig, XmlOut& out)
 {
-    out["Variant"](syncCfg.var);
+    out["Variant"       ](cmpConfig.compareVar);
+    out["HandleSymlinks"](cmpConfig.handleSymlinks);
+}
+
+
+void writeConfig(const DirectionConfig& directCfg, XmlOut& out)
+{
+    out["Variant"](directCfg.var);
 
     XmlOut outCustDir = out["CustomDirections"];
-    outCustDir["LeftOnly"  ](syncCfg.custom.exLeftSideOnly);
-    outCustDir["RightOnly" ](syncCfg.custom.exRightSideOnly);
-    outCustDir["LeftNewer" ](syncCfg.custom.leftNewer);
-    outCustDir["RightNewer"](syncCfg.custom.rightNewer);
-    outCustDir["Different" ](syncCfg.custom.different);
-    outCustDir["Conflict"  ](syncCfg.custom.conflict);
+    outCustDir["LeftOnly"  ](directCfg.custom.exLeftSideOnly);
+    outCustDir["RightOnly" ](directCfg.custom.exRightSideOnly);
+    outCustDir["LeftNewer" ](directCfg.custom.leftNewer);
+    outCustDir["RightNewer"](directCfg.custom.rightNewer);
+    outCustDir["Different" ](directCfg.custom.different);
+    outCustDir["Conflict"  ](directCfg.custom.conflict);
+}
+
+
+void writeConfig(const SyncConfig& syncCfg, XmlOut& out)
+{
+    writeConfig(syncCfg.directionCfg, out);
+
+    out["DeletionPolicy"      ](syncCfg.handleDeletion);
+    out["CustomDeletionFolder"](syncCfg.customDeletionDirectory);
 }
 
 
@@ -889,16 +982,20 @@ void writeConfigFolderPair(const FolderPairEnh& enhPair, XmlOut& out)
     outPair["Right"](enhPair.rightDirectory);
 
     //###########################################################
+    //alternate comp configuration (optional)
+    if (enhPair.altCmpConfig.get())
+    {
+        XmlOut outAlt = outPair["AlternateCompareConfig"];
+
+        writeConfig(*enhPair.altCmpConfig, outAlt);
+    }
+    //###########################################################
     //alternate sync configuration (optional)
     if (enhPair.altSyncConfig.get())
     {
-        XmlOut outAlt = outPair["AlternateSyncConfig"];
+        XmlOut outAltSync = outPair["SyncConfig"];
 
-        //read sync configuration
-        writeConfig(enhPair.altSyncConfig->syncConfiguration, outAlt);
-
-        outAlt["DeletionPolicy"      ](enhPair.altSyncConfig->handleDeletion);
-        outAlt["CustomDeletionFolder"](enhPair.altSyncConfig->customDeletionDirectory);
+        writeConfig(*enhPair.altSyncConfig, outAltSync);
     }
 
     //###########################################################
@@ -910,24 +1007,14 @@ void writeConfigFolderPair(const FolderPairEnh& enhPair, XmlOut& out)
 
 void writeConfig(const MainConfiguration& mainCfg, XmlOut& out)
 {
-    XmlOut outCmp  = out["MainConfig"]["Comparison"];
+    XmlOut outCmp = out["MainConfig"]["Comparison"];
 
-    //write compare variant
-    outCmp["Variant"](mainCfg.compareVar);
-
-    //include symbolic links at all?
-    outCmp["HandleSymlinks"](mainCfg.handleSymlinks);
-
+    writeConfig(mainCfg.cmpConfig, outCmp);
     //###########################################################
+
     XmlOut outSync = out["MainConfig"]["SyncConfig"];
 
-    //write sync configuration
-    writeConfig(mainCfg.syncConfiguration, outSync);
-    //###########################################################
-
-    //misc
-    outSync["DeletionPolicy"      ](mainCfg.handleDeletion);
-    outSync["CustomDeletionFolder"](mainCfg.customDeletionDirectory);
+    writeConfig(mainCfg.syncCfg, outSync);
     //###########################################################
 
     XmlOut outFilter = out["MainConfig"]["GlobalFilter"];
@@ -1018,21 +1105,19 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outWnd["ManualDeletionUseRecycler"](config.gui.useRecyclerForManualDeletion);
     outWnd["RespectCaseOnSearch"      ](config.gui.textSearchRespectCase);
 
+    outWnd["IconSize"](config.gui.iconSize);
+
     //###########################################################
 
     //write column attributes
     XmlOut outColLeft = outWnd["LeftColumns"];
-
     outColLeft.attribute("AutoAdjust",    config.gui.autoAdjustColumnsLeft);
-    outColLeft.attribute("ShowFileIcons", config.gui.showFileIconsLeft);
 
     outColLeft(config.gui.columnAttribLeft);
 
     //###########################################################
     XmlOut outColRight = outWnd["RightColumns"];
-
     outColRight.attribute("AutoAdjust",    config.gui.autoAdjustColumnsRight);
-    outColRight.attribute("ShowFileIcons", config.gui.showFileIconsRight);
 
     outColRight(config.gui.columnAttribRight);
 

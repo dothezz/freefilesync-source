@@ -227,7 +227,7 @@ std::vector<Zstring> convert(const std::vector<wxString>& dirList)
 {
     std::set<Zstring, LessFilename> output;
     std::transform(dirList.begin(), dirList.end(),
-    std::inserter(output, output.end()), [](const wxString& str) { return zen::toZ(str); });
+    std::inserter(output, output.end()), [](const wxString & str) { return zen::toZ(str); });
     return std::vector<Zstring>(output.begin(), output.end());
 }
 }
@@ -291,15 +291,16 @@ watcher.h (low level wait for directory changes)
 
 rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& config, const wxString& jobname)
 {
-    const std::vector<Zstring> dirList = convert(config.directories);
+    Zstring lastFileChanged;
 
+    const std::vector<Zstring> dirList = convert(config.directories);
     try
     {
         WaitCallbackImpl callback(jobname);
 
         if (config.commandline.empty())
         {
-            std::wstring errorMsg = _("Invalid commandline: %x");
+            std::wstring errorMsg = _("Invalid command line: %x");
             replace(errorMsg, L"%x", L"\"" + config.commandline + L"\"");
             throw FileError(errorMsg);
         }
@@ -310,6 +311,8 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
 
         while (true)
         {
+            ::wxSetEnv(L"changed_file", utf8CvrtTo<wxString>(lastFileChanged)); //some way to output what file changed to the user
+
             //execute command
             zen::shellExecute(config.commandline, zen::EXEC_TYPE_SYNC);
 
@@ -322,7 +325,8 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
                 while (true)
                 {
                     //wait for changes (and for all directories to become available)
-                    switch (waitForChanges(dirList, &callback))
+                    WaitResult res = waitForChanges(dirList, &callback);
+                    switch (res.type)
                     {
                         case CHANGE_DIR_MISSING: //don't execute the commandline before all directories are available!
                             callback.scheduleNextSync(std::numeric_limits<long>::max()); //next sync not scheduled (yet)
@@ -331,6 +335,7 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
                             callback.notifyAllDirectoriesExist();
                             break;
                         case CHANGE_DETECTED:
+                            lastFileChanged = res.filename;
                             break;
                     }
 

@@ -120,7 +120,6 @@ inline Int64 operator<<(const Int64& lhs, int rhs) { return Int64(lhs) <<= rhs; 
 inline Int64 operator>>(const Int64& lhs, int rhs) { return Int64(lhs) >>= rhs; }
 
 
-
 class UInt64
 {
     struct DummyClass { operator size_t() { return 0U; } };
@@ -201,6 +200,28 @@ inline UInt64 operator>>(const UInt64& lhs, int rhs) { return UInt64(lhs) >>= rh
 
 template <> inline UInt64 to(Int64 number) { checkRange<boost::uint64_t>(number.value); return UInt64(number.value); }
 template <> inline Int64 to(UInt64 number) { checkRange<boost:: int64_t>(number.value); return  Int64(number.value); }
+
+
+#ifdef FFS_WIN
+//convert FILETIME (number of 100-nanosecond intervals since January 1, 1601 UTC)
+//       to time_t (number of seconds since Jan. 1st 1970 UTC)
+//
+//FAT32 time is preserved exactly: FAT32 -> toTimeT -> tofiletime -> FAT32
+inline
+Int64 toTimeT(const FILETIME& ft)
+{
+    return to<Int64>(UInt64(ft.dwLowDateTime, ft.dwHighDateTime) / 10000000U) - Int64(3054539008UL, 2);
+    //timeshift between ansi C time and FILETIME in seconds == 11644473600s
+}
+
+inline
+FILETIME tofiletime(const Int64& utcTime)
+{
+    const UInt64 fileTimeLong = to<UInt64>(utcTime + Int64(3054539008UL, 2)) * 10000000U;
+    const FILETIME output = { fileTimeLong.getLo(), fileTimeLong.getHi() };
+    return output;
+}
+#endif
 }
 
 

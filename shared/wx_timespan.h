@@ -43,10 +43,10 @@ public:
         wxBoxSizer* bSizer27 = new wxBoxSizer( wxHORIZONTAL );
 
         m_textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE );
-        bSizer27->Add(m_textCtrl, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+        bSizer27->Add(m_textCtrl, 1, wxALIGN_CENTER_VERTICAL | wxEXPAND, 5 );
 
-        m_spinBtn = new wxSpinButton(this, wxID_ANY, wxDefaultPosition, wxSize( 20,-1 ), wxSP_ARROW_KEYS );
-        bSizer27->Add(m_spinBtn, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+        m_spinBtn = new wxSpinButton(this, wxID_ANY, wxDefaultPosition, wxSize( 20, -1 ), wxSP_ARROW_KEYS );
+        bSizer27->Add(m_spinBtn, 0, wxALIGN_CENTER_VERTICAL | wxEXPAND, 5 );
 
         SetSizer(bSizer27);
         Layout();

@@ -17,7 +17,7 @@ namespace zen
 wxString extractJobName(const wxString& configFilename);
 
 wxString formatFilesizeToShortString(UInt64 filesize);
-wxString formatPercentage(Int64 dividend, Int64 divisor);
+wxString formatPercentage(double fraction); //between [0, 1]
 
 template <class NumberType>
 wxString toStringSep(NumberType number); //convert number to wxString including thousands separator

@@ -26,6 +26,7 @@ FILE_LIST+=xml_proc.cpp
 FILE_LIST+=xml_ffs.cpp
 FILE_LIST+=../library/process_xml.cpp
 FILE_LIST+=../structures.cpp
+FILE_LIST+=../shared/folder_history_box.cpp
 FILE_LIST+=../shared/util.cpp
 FILE_LIST+=../shared/i18n.cpp
 FILE_LIST+=../shared/localization.cpp

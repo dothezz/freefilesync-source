@@ -20,7 +20,7 @@ Member variable:
 
 Constructor code:
     enumDescrMap.
-    add(ON_ERROR_POPUP , _("Show popup")    , _("Show popup on errors or warnings")).
+    add(ON_ERROR_POPUP , _("Show pop-up")    , _("Show pop-up on errors or warnings")).
     add(ON_ERROR_IGNORE, _("Ignore errors") , _("Hide all error and warning messages")).
     add(ON_ERROR_EXIT  , _("Exit instantly"), _("Abort synchronization immediately"));
 

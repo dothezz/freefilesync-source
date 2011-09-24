@@ -887,7 +887,7 @@ private:
 
 #ifdef LOKI_SMARTPTR_CONVERSION_CONSTRUCTOR_POLICY
     typedef typename Select< CP::allow, const StoredType&, NeverMatched>::Result ImplicitArg;
-    typedef typename Select<!CP::allow, const StoredType&, NeverMatched>::Result ExplicitArg;
+    typedef typename Select < !CP::allow, const StoredType&, NeverMatched >::Result ExplicitArg;
 #else
     typedef const StoredType& ImplicitArg;
     typedef typename Select<false, const StoredType&, NeverMatched>::Result ExplicitArg;
@@ -1678,7 +1678,7 @@ typename T,
          template < class > class CNP
          >
 struct less< Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > >
-        : public binary_function<
+        : public binary_function <
         Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP >,
         Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP >, bool >
 {

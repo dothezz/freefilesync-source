@@ -164,14 +164,14 @@ struct FieldHelper<H, 0>
 
     typedef const typename H::LeftBase ConstLeftBase;
 
-    typedef typename Select<isConst, ConstLeftBase,
-            typename H::LeftBase>::Result LeftBase;
+    typedef typename Select < isConst, ConstLeftBase,
+            typename H::LeftBase >::Result LeftBase;
 
-    typedef typename Select<isTuple, ElementType,
-            UnitType>::Result UnqualifiedResultType;
+    typedef typename Select < isTuple, ElementType,
+            UnitType >::Result UnqualifiedResultType;
 
-    typedef typename Select<isConst, const UnqualifiedResultType,
-            UnqualifiedResultType>::Result ResultType;
+    typedef typename Select < isConst, const UnqualifiedResultType,
+            UnqualifiedResultType >::Result ResultType;
 
     static ResultType& Do(H& obj)
     {
@@ -194,19 +194,19 @@ struct FieldHelper
 
     typedef const typename H::RightBase ConstRightBase;
 
-    typedef typename Select<isConst, ConstRightBase,
-            typename H::RightBase>::Result RightBase;
+    typedef typename Select < isConst, ConstRightBase,
+            typename H::RightBase >::Result RightBase;
 
-    typedef typename Select<isTuple, ElementType,
-            UnitType>::Result UnqualifiedResultType;
+    typedef typename Select < isTuple, ElementType,
+            UnitType >::Result UnqualifiedResultType;
 
-    typedef typename Select<isConst, const UnqualifiedResultType,
-            UnqualifiedResultType>::Result ResultType;
+    typedef typename Select < isConst, const UnqualifiedResultType,
+            UnqualifiedResultType >::Result ResultType;
 
     static ResultType& Do(H& obj)
     {
         RightBase& rightBase = obj;
-        return FieldHelper<RightBase, i - 1>::Do(rightBase);
+        return FieldHelper < RightBase, i - 1 >::Do(rightBase);
     }
 };
 

@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20110910;15564800">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "MS Mincho" }
+		H3.ctl { font-family: "Mangal" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Comparison
+Settings</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><IMG SRC="CmpSettings.png" NAME="Grafik1" ALIGN=BOTTOM  BORDER=0></P>
+<H3 CLASS="western" STYLE="page-break-after: avoid"><FONT FACE="Tahoma, sans-serif">I.
+Compare by &quot;File time and size&quot;</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">This
+variant evaluates two equally named files as being equal when they
+have the same modification time <B>and</B> file size. When the
+comparison is started, the following decision tree is processed:</FONT></P>
+<OL TYPE=i>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>file
+	exists on one side only</B></FONT></P>
+	<OL TYPE=i>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">left
+			only</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">right
+			only</FONT></P>
+		</UL>
+	</OL>
+	<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>file
+	exists on both sides</B></FONT></P>
+	<OL TYPE=i>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>different
+		date</B></FONT></P>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">left
+			newer</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">right
+			newer</FONT></P>
+		</UL>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>same
+		date</B></FONT></P>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">equal</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">conflict
+			(same date, different size)</FONT></P>
+		</UL>
+	</OL>
+</OL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">This
+results into the following categories:</FONT></P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">left
+	only</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">right
+	only</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">left
+	newer</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">right
+	newer</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">equal</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">conflict
+	(same date, different size)</FONT></P>
+</UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H3 CLASS="western" STYLE="page-break-after: avoid"><FONT FACE="Tahoma, sans-serif">II.
+Compare by &quot;File content&quot;</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Two
+files which have the same name are marked as equal if and only if
+they have the same content. This option is more useful for
+consistency checks rather than backup operations for reasons of
+speed. The file modification time is not taken into account at all.</FONT></P>
+<OL TYPE=i>
+	<LI VALUE=1><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>file
+	exists on one side only</B></FONT></P>
+	<OL TYPE=a>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">left
+			only</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">right
+			only</FONT></P>
+		</UL>
+	</OL>
+	<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>file
+	exists on both sides</B></FONT></P>
+	<OL TYPE=a>
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">equal</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">different
+			content</FONT></P>
+		</UL>
+	</OL>
+</OL>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">As a
+result the files are separated into the following categories:</FONT></P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">left
+	only</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">right
+	only</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">equal</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">different
+	content</FONT></P>
+</UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Symbolic link
+handling</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
+offers three options to configure processing of symbolic links (also
+called symlinks or soft links):</FONT></P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Ignore:</B></SPAN></FONT></SPAN>
+	<FONT FACE="Tahoma, sans-serif">excludes symbolic links while
+	scanning input directories.<BR></FONT>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Direct:</B></FONT>
+	<FONT FACE="Tahoma, sans-serif">configures synchronization of the
+	symbolic link object itself and not its target. symbolic links will
+	be visible on main grid as a separate entity with corresponding meta
+	data. Links pointing to directories are not traversed and the link
+	object is copied directly during synchronization. <BR></FONT>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Follow:</B></SPAN>
+	dereferences symbolic links, i.e. they are treated like their target
+	objects. Links pointing to directories are traversed like ordinary
+	folders and the target of each link is copied during
+	synchronization.</FONT></P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT></P>
+	<UL>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
+		Windows the options described above always apply to </FONT><FONT FACE="Tahoma, sans-serif"><I>&quot;Reparse
+		Points&quot;</I></FONT><FONT FACE="Tahoma, sans-serif">. Reparse
+		Points are a more general concept including for example symbolic
+		links, junctions and mount points. The term </FONT><FONT FACE="Tahoma, sans-serif"><I>&quot;symbolic
+		link&quot; </I></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal">has
+		been retained nevertheless for harmonization with Linux.</SPAN></FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif">Copying
+		symbolic links requires the application to be started with
+		administrator rights.</FONT></P>
+	</UL>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+</BODY>
+</HTML>

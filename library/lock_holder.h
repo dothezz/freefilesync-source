@@ -20,10 +20,6 @@ public:
         if (dirnameFmt.empty())
             return;
 
-        std::wstring statusText = _("Searching for directory %x...");
-        replace(statusText, L"%x", std::wstring(L"\"") + dirnameFmt + L"\"", false);
-        procCallback.reportInfo(statusText);
-
         if (!dirExistsUpdating(dirnameFmt, procCallback))
             return;
 
@@ -35,7 +31,7 @@ public:
         public:
             WaitOnLockHandler(ProcessCallback& pc) : pc_(pc) {}
             virtual void requestUiRefresh() { pc_.requestUiRefresh(); }  //allowed to throw exceptions
-            virtual void reportInfo(const std::wstring& text) { pc_.reportInfo(text); }
+            virtual void reportInfo(const std::wstring& text) { pc_.reportStatus(text); }
         private:
             ProcessCallback& pc_;
         } callback(procCallback);

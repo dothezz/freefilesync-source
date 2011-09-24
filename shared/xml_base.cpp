@@ -16,28 +16,31 @@ using namespace zen;
 //loadXmlDocument vs loadStream:
 //1. better error reporting
 //2. quick exit if (potentially large) input file is not an XML
-void xmlAccess::loadXmlDocument(const wxString& filename, XmlDoc& doc) //throw FfsXmlError()
+void xmlAccess::loadXmlDocument(const wxString& filename, XmlDoc& doc) //throw FfsXmlError
 {
     std::string stream;
     try
     {
         {
             //quick test whether input is an XML: avoid loading large binary files up front!
-            //doesn't correctly handle BOM! (but no issue yet...)
             const std::string xmlBegin = "<?xml version=";
-            std::vector<char> buffer(xmlBegin.size());
+            std::vector<char> buffer(xmlBegin.size() + sizeof(zen::BYTE_ORDER_MARK_UTF8));
 
-            FileInput inputFile(toZ(filename)); //throw (FileError);
-            const size_t bytesRead = inputFile.read(&buffer[0], buffer.size()); //throw (FileError)
-            if (bytesRead < xmlBegin.size() || !std::equal(buffer.begin(), buffer.end(), xmlBegin.begin()))
+            FileInput inputFile(toZ(filename)); //throw FileError;
+            const size_t bytesRead = inputFile.read(&buffer[0], buffer.size()); //throw FileError
+
+            const std::string fileBegin(&buffer[0], bytesRead);
+
+            if (!startsWith(fileBegin, xmlBegin) &&
+                !startsWith(fileBegin, zen::BYTE_ORDER_MARK_UTF8 + xmlBegin)) //respect BOM!
                 throw FfsXmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
         }
 
-        const zen::UInt64 fs = zen::getFilesize(toZ(filename)); //throw (FileError)
+        const zen::UInt64 fs = zen::getFilesize(toZ(filename)); //throw FileError
         stream.resize(to<size_t>(fs));
 
-        FileInput inputFile(toZ(filename)); //throw (FileError);
-        const size_t bytesRead = inputFile.read(&stream[0], stream.size()); //throw (FileError)
+        FileInput inputFile(toZ(filename)); //throw FileError
+        const size_t bytesRead = inputFile.read(&stream[0], stream.size()); //throw FileError
         if (bytesRead < to<size_t>(fs))
         {
             wxString errorMessage = wxString(_("Error reading file:")) + wxT("\n\"") + filename + wxT("\"");
@@ -85,14 +88,14 @@ void xmlAccess::saveXmlDocument(const zen::XmlDoc& doc, const wxString& filename
                 if (zen::loadStream(filename) == stream) //throw XmlFileError
                     saveNecessary = false;
             }
-            catch(const zen::XmlFileError&) {}
+            catch (const zen::XmlFileError&) {}
     }
     catch (FileError&) {}
 
     if (saveNecessary)
         try
         {
-            FileOutput outputFile(toZ(filename), FileOutput::ACC_OVERWRITE); //throw (FileError)
+            FileOutput outputFile(toZ(filename), FileOutput::ACC_OVERWRITE); //throw FileError
             outputFile.write(stream.c_str(), stream.length());                 //
         }
         catch (const FileError& error) //more detailed error messages than with wxWidgets

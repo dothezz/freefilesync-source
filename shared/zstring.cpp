@@ -107,25 +107,25 @@ bool hasInvariantLocale()
 const LCID ZSTRING_INVARIANT_LOCALE = hasInvariantLocale() ?
                                       LOCALE_INVARIANT :
                                       MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT); //see: http://msdn.microsoft.com/en-us/goglobal/bb688122.aspx
+
+
+//try to call "CompareStringOrdinal" for low-level string comparison: unfortunately available not before Windows Vista!
+//by a factor ~3 faster than old string comparison using "LCMapString"
+typedef int (WINAPI* CompareStringOrdinalFunc)(LPCWSTR lpString1,
+                                               int     cchCount1,
+                                               LPCWSTR lpString2,
+                                               int     cchCount2,
+                                               BOOL    bIgnoreCase);
+util::DllFun<CompareStringOrdinalFunc> ordinalCompare; //caveat: function scope static initialization is not thread-safe in VS 2010!
+boost::once_flag initCmpStrOrdOnce = BOOST_ONCE_INIT;
 }
 
 
 int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA, size_t sizeB)
 {
-    //try to call "CompareStringOrdinal" for low-level string comparison: unfortunately available not before Windows Vista!
-    //by a factor ~3 faster than old string comparison using "LCMapString"
-    typedef int (WINAPI *CompareStringOrdinalFunc)(
-        LPCWSTR lpString1,
-        int     cchCount1,
-        LPCWSTR lpString2,
-        int     cchCount2,
-        BOOL    bIgnoreCase);
-    static CompareStringOrdinalFunc ordinalCompare = NULL; //caveat: function scope static initialization is not thread-safe in VS 2010!
-    static boost::once_flag once = BOOST_ONCE_INIT;
-    boost::call_once(once, []() { ordinalCompare = util::getDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal"); });
+    boost::call_once(initCmpStrOrdOnce, []() { ordinalCompare = util::DllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal"); });
 
-
-    if (ordinalCompare != NULL) //this additional test has no noticeable performance impact
+    if (ordinalCompare) //this additional test has no noticeable performance impact
     {
         const int rv = ordinalCompare(a,  	      //pointer to first string
                                       static_cast<int>(sizeA),	  //size, in bytes or characters, of first string

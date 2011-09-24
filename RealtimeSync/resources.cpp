@@ -41,7 +41,7 @@ GlobalResources::~GlobalResources()
 
 void GlobalResources::load() const
 {
-    wxFFileInputStream input(zen::getResourceDir() + wxT("Resources.dat"));
+    wxFFileInputStream input(zen::getResourceDir() + wxT("Resources.zip"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files

@@ -39,9 +39,13 @@ std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainC
     {
         return FolderPairCfg(getFormattedDirectoryName(enhPair.leftDirectory),  //ensure they end with FILE_NAME_SEPARATOR and replace macros
         getFormattedDirectoryName(enhPair.rightDirectory),
+
+        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->compareVar     : mainCfg.cmpConfig.compareVar,
+        enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->handleSymlinks : mainCfg.cmpConfig.handleSymlinks,
+
         normalizeFilters(mainCfg.globalFilter, enhPair.localFilter),
-        mainCfg.handleSymlinks,
-        enhPair.altSyncConfig.get() ? enhPair.altSyncConfig->syncConfiguration : mainCfg.syncConfiguration);
+
+        enhPair.altSyncConfig.get() ? enhPair.altSyncConfig->directionCfg : mainCfg.syncCfg.directionCfg);
     });
     return output;
 }
@@ -84,16 +88,15 @@ void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, 
 }
 
 
-void checkDirectoryExistence(const std::set<Zstring, LessFilename>& dirnames, ProcessCallback& procCallback)
+void checkDirectoryExistence(const std::set<Zstring, LessFilename>& dirnames,
+                             std::set<Zstring, LessFilename>& dirnamesExisting,
+                             ProcessCallback& procCallback)
 {
     std::for_each(dirnames.begin(), dirnames.end(),
                   [&](const Zstring& dirname)
     {
-        std::wstring statusText = _("Searching for directory %x...");
-        replace(statusText, L"%x", std::wstring(L"\"") + dirname + L"\"", false);
-        procCallback.reportInfo(statusText);
-
         if (!dirname.empty())
+        {
             while (!dirExistsUpdating(dirname, procCallback))
             {
                 const std::wstring additionalInfo = _("You can ignore this error to consider the directory as empty.");
@@ -101,12 +104,15 @@ void checkDirectoryExistence(const std::set<Zstring, LessFilename>& dirnames, Pr
                 ProcessCallback::Response rv = procCallback.reportError(errorMessage + "\n\n" + additionalInfo /* + " " + getLastErrorFormatted()*/);
 
                 if (rv == ProcessCallback::IGNORE_ERROR)
-                    break;
+                    return;
                 else if (rv == ProcessCallback::RETRY)
                     ;  //continue with loop
                 else
                     throw std::logic_error("Programming Error: Unknown return value! (2)");
             }
+
+            dirnamesExisting.insert(dirname);
+        }
     });
 }
 
@@ -205,12 +211,7 @@ CompareProcess::CompareProcess(size_t fileTimeTol,
     txtComparingContentOfFiles(toZ(_("Comparing content of files %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""), false)) {}
 
 
-CompareProcess::~CompareProcess() {} //std::auto_ptr does not work with forward declarations (Or we need a non-inline ~CompareProcess())!
-
-
-void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& directoryPairs,
-                                         const CompareVariant cmpVar,
-                                         FolderComparison& output)
+void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgList, FolderComparison& output)
 {
     /*
     #ifdef NDEBUG
@@ -225,22 +226,26 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
 
     //-------------------some basic checks:------------------------------------------
 
-    checkForIncompleteInput(directoryPairs, procCallback);
+    checkForIncompleteInput(cfgList, procCallback);
 
 
-    std::set<Zstring, LessFilename> dirnames;
-    std::for_each(directoryPairs.begin(), directoryPairs.end(),
-                  [&](const FolderPairCfg& fpCfg)
+    std::set<Zstring, LessFilename> dirnamesExisting; //list of directories that are *expected* to be existent (and need to be scanned)!
     {
-        dirnames.insert(fpCfg.leftDirectoryFmt);
-        dirnames.insert(fpCfg.rightDirectoryFmt);
-    });
+        std::set<Zstring, LessFilename> dirnames;
+        std::for_each(cfgList.begin(), cfgList.end(),
+                      [&](const FolderPairCfg& fpCfg)
+        {
+            dirnames.insert(fpCfg.leftDirectoryFmt);
+            dirnames.insert(fpCfg.rightDirectoryFmt);
+        });
+        checkDirectoryExistence(dirnames, dirnamesExisting, procCallback);
+    }
+    auto dirAvailable = [&](const Zstring& dirnameFmt) { return dirnamesExisting.find(dirnameFmt) != dirnamesExisting.end(); };
 
-    checkDirectoryExistence(dirnames, procCallback);
 
     {
         //check if folders have dependencies
-        wxString warningMessage = checkFolderDependency(directoryPairs);
+        wxString warningMessage = checkFolderDependency(cfgList);
         if (!warningMessage.empty())
             procCallback.reportWarning(warningMessage.c_str(), m_warnings.warningDependentFolders);
     }
@@ -253,11 +258,13 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
         //------------------- fill directory buffer ---------------------------------------------------
         std::set<DirectoryKey> keysToRead;
 
-        std::for_each(directoryPairs.begin(), directoryPairs.end(),
+        std::for_each(cfgList.begin(), cfgList.end(),
                       [&](const FolderPairCfg& fpCfg)
         {
-            keysToRead.insert(DirectoryKey(fpCfg.leftDirectoryFmt,  fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
-            keysToRead.insert(DirectoryKey(fpCfg.rightDirectoryFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
+            if (dirAvailable(fpCfg.leftDirectoryFmt)) //only request *currently existing * directories: at this point user is aware that non-ex + empty string are seen as empty folder!
+                keysToRead.insert(DirectoryKey(fpCfg.leftDirectoryFmt,  fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
+            if (dirAvailable(fpCfg.rightDirectoryFmt))
+                keysToRead.insert(DirectoryKey(fpCfg.rightDirectoryFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
         });
 
         class CbImpl : public FillBufferCallback
@@ -272,8 +279,8 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
                 procCallback_.updateProcessedData(itemTotal - itemsReported, 0); //processed data is communicated in subfunctions!
                 itemsReported = itemTotal;
 
-                procCallback_.reportInfo(statusMsg); //may throw
-                //procCallback_.requestUiRefresh(); //already called by reportInfo()
+                procCallback_.reportStatus(statusMsg); //may throw
+                //procCallback_.requestUiRefresh(); //already called by reportStatus()
             }
 
             virtual HandleError reportError(const std::wstring& errorText)
@@ -308,22 +315,38 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
 
         //traverse/process folders
         FolderComparison output_tmp; //write to output not before END of process!
-        switch (cmpVar)
+
+
+        //buffer "config"/"result of binary comparison" for latter processing as a single block
+        std::vector<std::pair<FolderPairCfg, BaseDirMapping*>> workLoadBinary;
+
+        std::for_each(cfgList.begin(), cfgList.end(),
+                      [&](const FolderPairCfg& fpCfg)
         {
-            case CMP_BY_TIME_SIZE:
-                compareByTimeSize(directoryPairs, output_tmp);
-                break;
-            case CMP_BY_CONTENT:
-                compareByContent(directoryPairs, output_tmp);
-                break;
-        }
+            output_tmp.push_back(std::make_shared<BaseDirMapping>(fpCfg.leftDirectoryFmt,
+                                                                  dirAvailable(fpCfg.leftDirectoryFmt),
+                                                                  fpCfg.rightDirectoryFmt,
+                                                                  dirAvailable(fpCfg.rightDirectoryFmt),
+                                                                  fpCfg.filter.nameFilter));
+            switch (fpCfg.compareVar)
+            {
+                case CMP_BY_TIME_SIZE:
+                    compareByTimeSize(fpCfg, *output_tmp.back());
+                    break;
+                case CMP_BY_CONTENT:
+                    workLoadBinary.push_back(std::make_pair(fpCfg, &*output_tmp.back()));
+                    break;
+            }
+        });
+        //process binary comparison in one block
+        compareByContent(workLoadBinary);
 
 
-        assert (output_tmp.size() == directoryPairs.size());
+        assert(output_tmp.size() == cfgList.size());
 
-        for (FolderComparison::iterator j = output_tmp.begin(); j != output_tmp.end(); ++j)
+        for (auto j = begin(output_tmp); j != end(output_tmp); ++j)
         {
-            const FolderPairCfg& fpCfg = directoryPairs[j - output_tmp.begin()];
+            const FolderPairCfg& fpCfg = cfgList[j - output_tmp.begin()];
 
             //set initial sync-direction
             class RedetermineCallback : public DeterminationProblem
@@ -342,7 +365,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
                 ProcessCallback& procCallback_;
             } redetCallback(m_warnings.warningSyncDatabase, procCallback);
 
-            zen::redetermineSyncDirection(fpCfg.syncConfiguration, *j, &redetCallback);
+            zen::redetermineSyncDirection(fpCfg.directionCfg, *j, &redetCallback);
         }
 
         //only if everything was processed correctly output is written to!
@@ -362,12 +385,12 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
 //--------------------assemble conflict descriptions---------------------------
 
 //check for very old dates or date2s in the future
-wxString getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
+std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 {
-    wxString msg = _("File %x has an invalid date!");
-    replace(msg, L"%x", wxString(L"\"") + fileNameFull + "\"");
-    msg += wxString(L"\n\n") + _("Date") + ": " + utcTimeToLocalString(utcTime);
-    return wxString(_("Conflict detected:")) + "\n" + msg;
+    std::wstring msg = _("File %x has an invalid date!");
+    replace(msg, L"%x", std::wstring(L"\"") + fileNameFull + "\"");
+    msg += L"\n\n" + _("Date") + ": " + utcTimeToLocalString(utcTime);
+    return _("Conflict detected:") + "\n" + msg;
 }
 
 
@@ -384,22 +407,14 @@ void makeSameLength(wxString& first, wxString& second)
 
 
 //check for changed files with same modification date
-wxString getConflictSameDateDiffSize(const FileMapping& fileObj)
+std::wstring getConflictSameDateDiffSize(const FileMapping& fileObj)
 {
-    //some beautification...
-    //    wxString left = wxString(_("Left")) + wxT(": ");
-    //    wxString right = wxString(_("Right")) + wxT(": ");
-    //    makeSameLength(left, right);
-
-    const wxString left  = wxT("<-- ");
-    const wxString right = wxT("--> ");
-
-    wxString msg = _("Files %x have the same date but a different size!");
+    std::wstring msg = _("Files %x have the same date but a different size!");
     replace(msg, wxT("%x"), wxString(wxT("\"")) + fileObj.getRelativeName<LEFT_SIDE>() + "\"");
     msg += L"\n\n";
-    msg += left + "\t" + _("Date") + ": " + utcTimeToLocalString(fileObj.getLastWriteTime<LEFT_SIDE>()) +
+    msg += L"<-- \t" + _("Date") + ": " + utcTimeToLocalString(fileObj.getLastWriteTime<LEFT_SIDE>()) +
            " \t" + _("Size") + ": " + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + wxT("\n");
-    msg += right + "\t" + _("Date") + ": " + utcTimeToLocalString(fileObj.getLastWriteTime<RIGHT_SIDE>()) +
+    msg += L"--> \t" + _("Date") + ": " + utcTimeToLocalString(fileObj.getLastWriteTime<RIGHT_SIDE>()) +
            " \t" + _("Size") + ": " + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
     return _("Conflict detected:") + "\n" + msg;
 }
@@ -445,8 +460,8 @@ void CompareProcess::categorizeSymlinkByTime(SymLinkMapping& linkObj) const
             }
             else
             {
-                wxString conflictMsg = _("Conflict detected:") + "\n" + _("Symlinks %x have the same date but a different target!");
-                replace(conflictMsg, L"%x", wxString(L"\"") + linkObj.getRelativeName<LEFT_SIDE>() + "\"");
+                std::wstring conflictMsg = _("Conflict detected:") + "\n" + _("Symlinks %x have the same date but a different target!");
+                replace(conflictMsg, L"%x", std::wstring(L"\"") + linkObj.getRelativeName<LEFT_SIDE>() + "\"");
                 linkObj.setCategoryConflict(conflictMsg);
             }
             break;
@@ -470,67 +485,55 @@ void CompareProcess::categorizeSymlinkByTime(SymLinkMapping& linkObj) const
 }
 
 
-void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairs, FolderComparison& output)
+void CompareProcess::compareByTimeSize(const FolderPairCfg& fpConfig, BaseDirMapping& output)
 {
-    output.reserve(output.size() + directoryPairs.size());
+    //do basis scan and retrieve files existing on both sides as "compareCandidates"
+    std::vector<FileMapping*> uncategorizedFiles;
+    std::vector<SymLinkMapping*> uncategorizedLinks;
+    performComparison(fpConfig, output, uncategorizedFiles, uncategorizedLinks);
 
-    //process one folder pair after each other
-    for (std::vector<FolderPairCfg>::const_iterator pair = directoryPairs.begin(); pair != directoryPairs.end(); ++pair)
+    //finish symlink categorization
+    std::for_each(uncategorizedLinks.begin(), uncategorizedLinks.end(),
+    [&](SymLinkMapping* linkMap) { this->categorizeSymlinkByTime(*linkMap); });
+
+    //categorize files that exist on both sides
+    const CmpFileTime timeCmp(fileTimeTolerance);
+
+    std::for_each(uncategorizedFiles.begin(), uncategorizedFiles.end(),
+                  [&](FileMapping* fileObj)
     {
-        BaseDirMapping newEntry(pair->leftDirectoryFmt,
-                                pair->rightDirectoryFmt,
-                                pair->filter.nameFilter);
-        output.push_back(newEntry); //attention: push_back() copies by value!!! performance: append BEFORE writing values into fileCmp!
-
-        //do basis scan and retrieve files existing on both sides as "compareCandidates"
-        std::vector<FileMapping*> uncategorizedFiles;
-        std::vector<SymLinkMapping*> uncategorizedLinks;
-        performComparison(*pair, output.back(), uncategorizedFiles, uncategorizedLinks);
-
-        //finish symlink categorization
-        std::for_each(uncategorizedLinks.begin(), uncategorizedLinks.end(),
-        [&](SymLinkMapping* linkMap) { this->categorizeSymlinkByTime(*linkMap); });
-
-        //categorize files that exist on both sides
-        const CmpFileTime timeCmp(fileTimeTolerance);
-
-        for (std::vector<FileMapping*>::iterator i = uncategorizedFiles.begin(); i != uncategorizedFiles.end(); ++i)
+        switch (timeCmp.getResult(fileObj->getLastWriteTime<LEFT_SIDE>(),
+                                  fileObj->getLastWriteTime<RIGHT_SIDE>()))
         {
-            FileMapping* const line = *i;
-
-            switch (timeCmp.getResult(line->getLastWriteTime<LEFT_SIDE>(),
-                                      line->getLastWriteTime<RIGHT_SIDE>()))
-            {
-                case CmpFileTime::TIME_EQUAL:
-                    if (line->getFileSize<LEFT_SIDE>() == line->getFileSize<RIGHT_SIDE>())
-                    {
-                        if (line->getShortName<LEFT_SIDE>() == line->getShortName<RIGHT_SIDE>())
-                            line->setCategory<FILE_EQUAL>();
-                        else
-                            line->setCategory<FILE_DIFFERENT_METADATA>();
-                    }
+            case CmpFileTime::TIME_EQUAL:
+                if (fileObj->getFileSize<LEFT_SIDE>() == fileObj->getFileSize<RIGHT_SIDE>())
+                {
+                    if (fileObj->getShortName<LEFT_SIDE>() == fileObj->getShortName<RIGHT_SIDE>())
+                        fileObj->setCategory<FILE_EQUAL>();
                     else
-                        line->setCategoryConflict(getConflictSameDateDiffSize(*line)); //same date, different filesize
-                    break;
+                        fileObj->setCategory<FILE_DIFFERENT_METADATA>();
+                }
+                else
+                    fileObj->setCategoryConflict(getConflictSameDateDiffSize(*fileObj)); //same date, different filesize
+                break;
 
-                case CmpFileTime::TIME_LEFT_NEWER:
-                    line->setCategory<FILE_LEFT_NEWER>();
-                    break;
+            case CmpFileTime::TIME_LEFT_NEWER:
+                fileObj->setCategory<FILE_LEFT_NEWER>();
+                break;
 
-                case CmpFileTime::TIME_RIGHT_NEWER:
-                    line->setCategory<FILE_RIGHT_NEWER>();
-                    break;
+            case CmpFileTime::TIME_RIGHT_NEWER:
+                fileObj->setCategory<FILE_RIGHT_NEWER>();
+                break;
 
-                case CmpFileTime::TIME_LEFT_INVALID:
-                    line->setCategoryConflict(getConflictInvalidDate(line->getFullName<LEFT_SIDE>(), line->getLastWriteTime<LEFT_SIDE>()));
-                    break;
+            case CmpFileTime::TIME_LEFT_INVALID:
+                fileObj->setCategoryConflict(getConflictInvalidDate(fileObj->getFullName<LEFT_SIDE>(), fileObj->getLastWriteTime<LEFT_SIDE>()));
+                break;
 
-                case CmpFileTime::TIME_RIGHT_INVALID:
-                    line->setCategoryConflict(getConflictInvalidDate(line->getFullName<RIGHT_SIDE>(), line->getLastWriteTime<RIGHT_SIDE>()));
-                    break;
-            }
+            case CmpFileTime::TIME_RIGHT_INVALID:
+                fileObj->setCategoryConflict(getConflictInvalidDate(fileObj->getFullName<RIGHT_SIDE>(), fileObj->getLastWriteTime<RIGHT_SIDE>()));
+                break;
         }
-    }
+    });
 }
 
 
@@ -538,7 +541,7 @@ UInt64 getBytesToCompare(const std::vector<FileMapping*>& rowsToCompare)
 {
     UInt64 dataTotal;
 
-    for (std::vector<FileMapping*>::const_iterator j = rowsToCompare.begin(); j != rowsToCompare.end(); ++j)
+    for (auto j = rowsToCompare.begin(); j != rowsToCompare.end(); ++j)
         dataTotal += (*j)->getFileSize<LEFT_SIDE>();  //left and right filesizes should be the same
 
     return dataTotal * 2U;
@@ -569,25 +572,20 @@ void CompareProcess::categorizeSymlinkByContent(SymLinkMapping& linkObj) const
 }
 
 
-void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& directoryPairs, FolderComparison& output)
+void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseDirMapping*>>& workLoad)
 {
-    //PERF_START;
-    std::vector<FileMapping*> compareCandidates;
+    if (workLoad.empty()) return;
 
-    //attention: make sure pointers in "compareCandidates" remain valid!!!
-    output.reserve(output.size() + directoryPairs.size());
+    //PERF_START;
+    std::vector<FileMapping*> undefinedFiles;
 
     //process one folder pair after each other
-    for (std::vector<FolderPairCfg>::const_iterator pair = directoryPairs.begin(); pair != directoryPairs.end(); ++pair)
+    for (auto workItem = workLoad.begin(); workItem != workLoad.end(); ++workItem)
     {
-        BaseDirMapping newEntry(pair->leftDirectoryFmt,
-                                pair->rightDirectoryFmt,
-                                pair->filter.nameFilter);
-        output.push_back(newEntry); //attention: push_back() copies by value!!! performance: append BEFORE writing values into fileCmp!
-
         std::vector<SymLinkMapping*> uncategorizedLinks;
         //do basis scan and retrieve candidates for binary comparison (files existing on both sides)
-        performComparison(*pair, output.back(), compareCandidates, uncategorizedLinks);
+
+        performComparison(workItem->first, *workItem->second, undefinedFiles, uncategorizedLinks);
 
         //finish symlink categorization
         std::for_each(uncategorizedLinks.begin(), uncategorizedLinks.end(),
@@ -600,19 +598,18 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
     //content comparison of file content happens AFTER finding corresponding files
     //in order to separate into two processes (scanning and comparing)
 
-    for (std::vector<FileMapping*>::iterator i = compareCandidates.begin(); i != compareCandidates.end(); ++i)
+    std::for_each(undefinedFiles.begin(), undefinedFiles.end(),
+                  [&](FileMapping* fileObj)
     {
         //pre-check: files have different content if they have a different filesize
-        if ((*i)->getFileSize<LEFT_SIDE>() != (*i)->getFileSize<RIGHT_SIDE>())
-            (*i)->setCategory<FILE_DIFFERENT>();
+        if (fileObj->getFileSize<LEFT_SIDE>() != fileObj->getFileSize<RIGHT_SIDE>())
+            fileObj->setCategory<FILE_DIFFERENT>();
         else
-            filesToCompareBytewise.push_back(*i);
-    }
+            filesToCompareBytewise.push_back(fileObj);
+    });
 
-
-
-    const size_t objectsTotal    = filesToCompareBytewise.size() * 2;
-    const UInt64 bytesTotal = getBytesToCompare(filesToCompareBytewise);
+    const size_t objectsTotal = filesToCompareBytewise.size() * 2;
+    const UInt64 bytesTotal   = getBytesToCompare(filesToCompareBytewise);
 
     procCallback.initNewProcess(static_cast<int>(objectsTotal),
                                 to<Int64>(bytesTotal),
@@ -621,33 +618,32 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
     const CmpFileTime timeCmp(fileTimeTolerance);
 
     //compare files (that have same size) bytewise...
-    for (std::vector<FileMapping*>::const_iterator j = filesToCompareBytewise.begin(); j != filesToCompareBytewise.end(); ++j)
+    std::for_each(filesToCompareBytewise.begin(), filesToCompareBytewise.end(),
+                  [&](FileMapping* fileObj)
     {
-        FileMapping* const line = *j;
-
         Zstring statusText = txtComparingContentOfFiles;
-        statusText.Replace(Zstr("%x"), line->getRelativeName<LEFT_SIDE>(), false);
-        procCallback.reportInfo(utf8CvrtTo<wxString>(statusText));
+        statusText.Replace(Zstr("%x"), fileObj->getRelativeName<LEFT_SIDE>(), false);
+        procCallback.reportStatus(utf8CvrtTo<wxString>(statusText));
 
         //check files that exist in left and right model but have different content
         while (true)
         {
             try
             {
-                if (filesHaveSameContentUpdating(line->getFullName<LEFT_SIDE>(),
-                                                 line->getFullName<RIGHT_SIDE>(),
-                                                 line->getFileSize<LEFT_SIDE>() * 2U,
+                if (filesHaveSameContentUpdating(fileObj->getFullName<LEFT_SIDE>(),
+                                                 fileObj->getFullName<RIGHT_SIDE>(),
+                                                 fileObj->getFileSize<LEFT_SIDE>() * 2U,
                                                  procCallback))
                 {
-                    if (line->getShortName<LEFT_SIDE>() == line->getShortName<RIGHT_SIDE>() &&
-                        timeCmp.getResult(line->getLastWriteTime<LEFT_SIDE>(),
-                                          line->getLastWriteTime<RIGHT_SIDE>()) == CmpFileTime::TIME_EQUAL)
-                        line->setCategory<FILE_EQUAL>();
+                    if (fileObj->getShortName<LEFT_SIDE>() == fileObj->getShortName<RIGHT_SIDE>() &&
+                        timeCmp.getResult(fileObj->getLastWriteTime<LEFT_SIDE>(),
+                                          fileObj->getLastWriteTime<RIGHT_SIDE>()) == CmpFileTime::TIME_EQUAL)
+                        fileObj->setCategory<FILE_EQUAL>();
                     else
-                        line->setCategory<FILE_DIFFERENT_METADATA>();
+                        fileObj->setCategory<FILE_DIFFERENT_METADATA>();
                 }
                 else
-                    line->setCategory<FILE_DIFFERENT>();
+                    fileObj->setCategory<FILE_DIFFERENT>();
 
                 procCallback.updateProcessedData(2, 0); //processed data is communicated in subfunctions!
                 procCallback.requestUiRefresh(); //may throw
@@ -658,7 +654,7 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
                 ProcessCallback::Response rv = procCallback.reportError(error.msg());
                 if (rv == ProcessCallback::IGNORE_ERROR)
                 {
-                    line->setCategoryConflict(wxString(_("Conflict detected:")) + wxT("\n") + _("Comparing files by content failed."));
+                    fileObj->setCategoryConflict(_("Conflict detected:") + L"\n" + _("Comparing files by content failed."));
                     break;
                 }
 
@@ -668,7 +664,7 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
                     throw std::logic_error("Programming Error: Unknown return value!");
             }
         }
-    }
+    });
 }
 
 
@@ -696,11 +692,6 @@ private:
 template <>
 void MergeSides::fillOneSide<LEFT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
 {
-    //reserve() fulfills one task here: massive performance improvement!
-    output.refSubFiles().reserve(dirCont.files.size());
-    output.refSubDirs(). reserve(dirCont.dirs. size());
-    output.refSubLinks().reserve(dirCont.links.size());
-
     for (DirContainer::FileList::const_iterator i = dirCont.files.begin(); i != dirCont.files.end(); ++i)
         output.addSubFile(i->second, i->first);
 
@@ -718,11 +709,6 @@ void MergeSides::fillOneSide<LEFT_SIDE>(const DirContainer& dirCont, HierarchyOb
 template <>
 void MergeSides::fillOneSide<RIGHT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
 {
-    //reserve() fulfills one task here: massive performance improvement!
-    output.refSubFiles().reserve(dirCont.files.size());
-    output.refSubDirs ().reserve(dirCont.dirs. size());
-    output.refSubLinks().reserve(dirCont.links.size());
-
     for (DirContainer::FileList::const_iterator i = dirCont.files.begin(); i != dirCont.files.end(); ++i)
         output.addSubFile(i->first, i->second);
 
@@ -737,120 +723,127 @@ void MergeSides::fillOneSide<RIGHT_SIDE>(const DirContainer& dirCont, HierarchyO
 }
 
 
-void MergeSides::execute(const DirContainer& leftSide, const DirContainer& rightSide, HierarchyObject& output)
+//improve merge-perf by over 70% + more natural default sequence
+template <class MapType, class ProcessLeftOnly, class ProcessRightOnly, class ProcessBoth> inline
+void linearMerge(const MapType& mapLeft, const MapType& mapRight, ProcessLeftOnly lo, ProcessRightOnly ro, ProcessBoth bo)
 {
-    //ATTENTION: HierarchyObject::retrieveById() can only work correctly if the following conditions are fulfilled:
-    //1. on each level, files are added first, symlinks, then directories (=> file id < link id < dir id)
-    //2. when a directory is added, all subdirectories must be added immediately (recursion) before the next dir on this level is added
-    //3. entries may be deleted but NEVER new ones inserted!!!
-    //=> this allows for a quasi-binary search by id!
+    const auto lessVal = mapLeft.value_comp();
 
-    //HierarchyObject::addSubFile() must not invalidate references used in "appendUndefined"!
+    auto iterLeft  = mapLeft .begin();
+    auto iterRight = mapRight.begin();
 
-    //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
-    output.refSubFiles().reserve(leftSide.files.size() + rightSide.files.size()); //assume worst case!
-    output.refSubDirs(). reserve(leftSide.dirs. size() + rightSide.dirs. size()); //
-    output.refSubLinks().reserve(leftSide.links.size() + rightSide.links.size()); //
+    auto finishLeft  = [&]() { std::for_each(iterLeft,  mapLeft .end(), lo); };
+    auto finishRight = [&]() { std::for_each(iterRight, mapRight.end(), ro); };
 
-    for (DirContainer::FileList::const_iterator i = leftSide.files.begin(); i != leftSide.files.end(); ++i)
-    {
-        DirContainer::FileList::const_iterator rightFile = rightSide.files.find(i->first);
+    if (iterLeft  == mapLeft .end()) return finishRight();
+    if (iterRight == mapRight.end()) return finishLeft();
 
-        //find files that exist on left but not on right
-        if (rightFile == rightSide.files.end())
-            output.addSubFile(i->second, i->first);
-        //find files that exist on left and right
+    for (;;)
+        if (lessVal(*iterLeft, *iterRight))
+        {
+            lo(*iterLeft);
+            if (++iterLeft == mapLeft.end())
+                return finishRight();
+        }
+        else if (lessVal(*iterRight, *iterLeft))
+        {
+            ro(*iterRight);
+            if (++iterRight == mapRight.end())
+                return finishLeft();
+        }
         else
         {
-            FileMapping& newEntry = output.addSubFile(
-                                        i->first,
-                                        i->second,
-                                        FILE_EQUAL, //FILE_EQUAL is just a dummy-value here
-                                        rightFile->first,
-                                        rightFile->second);
-            appendUndefinedFile.push_back(&newEntry);
+            bo(*iterLeft, *iterRight);
+            ++iterLeft;  //
+            ++iterRight; //increment BOTH before checking for end of range!
+            if (iterLeft  == mapLeft .end()) return finishRight();
+            if (iterRight == mapRight.end()) return finishLeft();
         }
-    }
-
-    //find files that exist on right but not on left
-    for (DirContainer::FileList::const_iterator j = rightSide.files.begin(); j != rightSide.files.end(); ++j)
-    {
-        if (leftSide.files.find(j->first) == leftSide.files.end())
-            output.addSubFile(j->first, j->second);
-    }
-
-
-    //-----------------------------------------------------------------------------------------------
-    for (DirContainer::LinkList::const_iterator i = leftSide.links.begin(); i != leftSide.links.end(); ++i)
-    {
-        DirContainer::LinkList::const_iterator rightLink = rightSide.links.find(i->first);
-
-        //find links that exist on left but not on right
-        if (rightLink == rightSide.links.end())
-            output.addSubLink(i->second, i->first);
-        //find links that exist on left and right
-        else
-        {
-            SymLinkMapping& newEntry = output.addSubLink(
-                                           i->first,
-                                           i->second,
-                                           SYMLINK_EQUAL, //SYMLINK_EQUAL is just a dummy-value here
-                                           rightLink->first,
-                                           rightLink->second);
-            appendUndefinedLink.push_back(&newEntry);
-        }
-    }
-
-    //find links that exist on right but not on left
-    for (DirContainer::LinkList::const_iterator j = rightSide.links.begin(); j != rightSide.links.end(); ++j)
-    {
-        if (leftSide.links.find(j->first) == leftSide.links.end())
-            output.addSubLink(j->first, j->second);
-    }
-
-
-    //-----------------------------------------------------------------------------------------------
-    for (DirContainer::DirList::const_iterator i = leftSide.dirs.begin(); i != leftSide.dirs.end(); ++i)
-    {
-        DirContainer::DirList::const_iterator rightDir = rightSide.dirs.find(i->first);
-
-        //find directories that exist on left but not on right
-        if (rightDir == rightSide.dirs.end())
-        {
-            DirMapping& newDirMap = output.addSubDir(i->first, Zstring());
-            fillOneSide<LEFT_SIDE>(i->second, newDirMap); //recurse into subdirectories
-        }
-        else //directories that exist on both sides
-        {
-            DirMapping& newDirMap = output.addSubDir(i->first, rightDir->first);
-            execute(i->second, rightDir->second, newDirMap); //recurse into subdirectories
-        }
-    }
-
-    //find directories that exist on right but not on left
-    for (DirContainer::DirList::const_iterator j = rightSide.dirs.begin(); j != rightSide.dirs.end(); ++j)
-    {
-        if (leftSide.dirs.find(j->first) == leftSide.dirs.end())
-        {
-            DirMapping& newDirMap = output.addSubDir(Zstring(), j->first);
-            fillOneSide<RIGHT_SIDE>(j->second, newDirMap); //recurse into subdirectories
-        }
-    }
 }
 
-void setDirFilter(HierarchyObject& hierObj, const HardFilter& filterProc)
+
+void MergeSides::execute(const DirContainer& leftSide, const DirContainer& rightSide, HierarchyObject& output)
 {
-    HierarchyObject::SubDirMapping& subDirs = hierObj.refSubDirs();
+    //HierarchyObject::addSubFile() must NOT invalidate references used in "appendUndefined"!
+
+    typedef const DirContainer::FileList::value_type FileData;
+
+    linearMerge(leftSide.files, rightSide.files,
+    [&](const FileData& fileLeft)  { output.addSubFile(fileLeft.second, fileLeft.first);   }, //left only
+    [&](const FileData& fileRight) { output.addSubFile(fileRight.first, fileRight.second); }, //right only
+
+    [&](const FileData& fileLeft, const FileData& fileRight) //both sides
+    {
+        FileMapping& newEntry = output.addSubFile(fileLeft.first,
+                                                  fileLeft.second,
+                                                  FILE_EQUAL, //FILE_EQUAL is just a dummy-value here
+                                                  fileRight.first,
+                                                  fileRight.second);
+        appendUndefinedFile.push_back(&newEntry);
+    });
+
+    //-----------------------------------------------------------------------------------------------
+    typedef const DirContainer::LinkList::value_type LinkData;
+
+    linearMerge(leftSide.links, rightSide.links,
+    [&](const LinkData& linkLeft)  { output.addSubLink(linkLeft.second, linkLeft.first);   }, //left only
+    [&](const LinkData& linkRight) { output.addSubLink(linkRight.first, linkRight.second); }, //right only
+
+    [&](const LinkData& linkLeft, const LinkData& linkRight) //both sides
+    {
+        SymLinkMapping& newEntry = output.addSubLink(linkLeft.first,
+                                                     linkLeft.second,
+                                                     SYMLINK_EQUAL, //SYMLINK_EQUAL is just a dummy-value here
+                                                     linkRight.first,
+                                                     linkRight.second);
+        appendUndefinedLink.push_back(&newEntry);
+    });
+
+    //-----------------------------------------------------------------------------------------------
+    typedef const DirContainer::DirList::value_type DirData;
+
+    linearMerge(leftSide.dirs, rightSide.dirs,
+                [&](const DirData& dirLeft) //left only
+    {
+        DirMapping& newDirMap = output.addSubDir(dirLeft.first, Zstring());
+        this->fillOneSide<LEFT_SIDE>(dirLeft.second, newDirMap); //recurse into subdirectories
+    },
+    [&](const DirData& dirRight) //right only
+    {
+        DirMapping& newDirMap = output.addSubDir(Zstring(), dirRight.first);
+        this->fillOneSide<RIGHT_SIDE>(dirRight.second, newDirMap); //recurse into subdirectories
+    },
+
+    [&](const DirData& dirLeft, const DirData& dirRight) //both sides
+    {
+        DirMapping& newDirMap = output.addSubDir(dirLeft.first, dirRight.first);
+        execute(dirLeft.second, dirRight.second, newDirMap); //recurse into subdirectories
+    });
+}
+
+//mark excluded directories (see fillBuffer()) + remove superfluous excluded subdirectories
+//note: this cannot be done while traversing directory, since both sides need to be taken into account, both for filtering AND removing subdirs!
+void processFilteredDirs(HierarchyObject& hierObj, const HardFilter& filterProc)
+{
+    auto& subDirs = hierObj.refSubDirs();
 
     //process subdirs recursively
     std::for_each(subDirs.begin(), subDirs.end(),
                   [&](DirMapping& dirObj)
     {
         dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName().c_str(), NULL)); //subObjMightMatch is always true in this context!
-        setDirFilter(dirObj, filterProc);
+        processFilteredDirs(dirObj, filterProc);
     });
 
-    //remove superfluous directories -> already done by fillBuffer(), secondly this would be dangerous here as it invalidates "std::vector<FileMapping*>& undefinedFiles"
+    //remove superfluous directories -> note: this does not invalidate "std::vector<FileMapping*>& undefinedFiles", since we delete folders only
+    //and there is no side-effect for memory positions of FileMapping and SymlinkMapping thanks to std::list!
+    subDirs.remove_if([](DirMapping& dirObj)
+    {
+        return !dirObj.isActive() &&
+               dirObj.refSubDirs ().empty() &&
+               dirObj.refSubLinks().empty() &&
+               dirObj.refSubFiles().empty();
+    });
 }
 }
 
@@ -866,28 +859,28 @@ void CompareProcess::performComparison(const FolderPairCfg& fpCfg,
 
     //PERF_START;
 
+    DirectoryValue emptyDummy;
     auto getDirValue = [&](const Zstring& dirnameFmt) -> const DirectoryValue&
     {
         auto iter = directoryBuffer.find(DirectoryKey(dirnameFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
-        if (iter == directoryBuffer.end())
-            throw std::logic_error("Programming Error: directory buffer entry not found!");
-        return iter->second;
+        return iter == directoryBuffer.end() ? emptyDummy : iter->second;
     };
 
     const DirectoryValue& bufValueLeft  = getDirValue(fpCfg.leftDirectoryFmt);
     const DirectoryValue& bufValueRight = getDirValue(fpCfg.rightDirectoryFmt);
 
-    procCallback.reportInfo(_("Generating file list..."));
+    procCallback.reportStatus(_("Generating file list..."));
     procCallback.forceUiRefresh(); //keep total number of scanned files up to date
 
-    //PERF_STOP;
+    //PERF_START;
     MergeSides(undefinedFiles, undefinedLinks).execute(bufValueLeft.dirCont, bufValueRight.dirCont, output);
+    //PERF_STOP;
 
     //##################### in/exclude rows according to filtering #####################
 
     //attention: some excluded directories are still in the comparison result! (see include filter handling!)
     if (!fpCfg.filter.nameFilter->isNull())
-        setDirFilter(output, *fpCfg.filter.nameFilter); //mark excluded directories (see fillBuffer())
+        processFilteredDirs(output, *fpCfg.filter.nameFilter); //mark excluded directories (see fillBuffer()) + remove superfluous excluded subdirectories
 
     //apply soft filtering / hard filter already applied
     addSoftFiltering(output, fpCfg.filter.timeSizeFilter);

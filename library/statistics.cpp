@@ -24,8 +24,6 @@ RetrieveStatistics::RetrieveStatistics() :
 
 RetrieveStatistics::~RetrieveStatistics()
 {
-    //keep non-inline destructor for std::auto_ptr to work with forward declaration
-
     //write statistics to a file
     wxFFile outputFile(wxT("statistics.dat"), wxT("w"));
 

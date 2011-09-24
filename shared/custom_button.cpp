@@ -10,37 +10,9 @@
 #include <algorithm>
 #include <limits>
 #include <cmath>
+#include "image_tools.h"
 
-
-namespace
-{
-bool isEqual(const wxBitmap& lhs, const wxBitmap& rhs)
-{
-    if (lhs.IsOk() != rhs.IsOk())
-        return false;
-
-    if (!lhs.IsOk())
-        return true;
-
-    const int pixelCount = lhs.GetWidth() * lhs.GetHeight();
-    if (pixelCount != rhs.GetWidth() * rhs.GetHeight())
-        return false;
-
-    wxImage imLhs = lhs.ConvertToImage();
-    wxImage imRhs = rhs.ConvertToImage();
-
-    if (imLhs.HasAlpha() != imRhs.HasAlpha())
-        return false;
-
-    if (imLhs.HasAlpha())
-    {
-        if (!std::equal(imLhs.GetAlpha(), imLhs.GetAlpha() + pixelCount, imRhs.GetAlpha()))
-            return false;
-    }
-
-    return std::equal(imLhs.GetData(), imLhs.GetData() + pixelCount * 3, imRhs.GetData());
-}
-}
+using namespace zen;
 
 
 void setBitmapLabel(wxBitmapButton& button, const wxBitmap& bmp)

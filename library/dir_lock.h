@@ -24,7 +24,7 @@ RAII structure to place a directory lock against other FFS processes:
 class DirLock
 {
 public:
-    DirLock(const Zstring& lockfilename, DirLockCallback* callback = NULL); //throw (FileError), callback only used during construction
+    DirLock(const Zstring& lockfilename, DirLockCallback* callback = NULL); //throw FileError, callback only used during construction
 
 private:
     class LockAdmin;

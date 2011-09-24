@@ -88,7 +88,7 @@ FILE_LIST+=shared/zstring.cpp
 FILE_LIST+=shared/app_main.cpp
 FILE_LIST+=shared/custom_button.cpp
 FILE_LIST+=shared/toggle_button.cpp
-FILE_LIST+=shared/custom_combo_box.cpp
+FILE_LIST+=shared/folder_history_box.cpp
 FILE_LIST+=shared/serialize.cpp
 FILE_LIST+=shared/file_id.cpp
 FILE_LIST+=shared/recycler.cpp
@@ -128,7 +128,7 @@ install:
 	BUILD/Help/ \
 	BUILD/Compare_Complete.wav \
 	BUILD/Sync_Complete.wav \
-	BUILD/Resources.dat \
+	BUILD/Resources.zip \
 	BUILD/Changelog.txt \
 	BUILD/License.txt \
 	BUILD/styles.rc \

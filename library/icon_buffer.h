@@ -17,25 +17,33 @@ namespace zen
 class IconBuffer
 {
 public:
-    static const wxIcon& getDirectoryIcon(); //generic icons
-    static const wxIcon& getFileIcon();      //
+    enum IconSize
+    {
+        SIZE_SMALL,
+        SIZE_MEDIUM,
+        SIZE_LARGE
+    };
 
-    static IconBuffer& getInstance();
-    bool requestFileIcon(const Zstring& fileName, wxIcon* icon = NULL); //returns false if icon is not in buffer
-    void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
-
-#ifdef FFS_WIN
-    static const int ICON_SIZE = 16;  //size in pixel
-#elif defined FFS_LINUX
-    static const int ICON_SIZE = 24;  //size in pixel
-#endif
-
-private:
-    IconBuffer();
+    IconBuffer(IconSize sz);
     ~IconBuffer();
 
+    int getSize() const { return cvrtSize(icoSize); } //*maximum* icon size in pixel
+
+    const wxIcon& genericDirIcon () { return genDirIcon;  }
+    const wxIcon& genericFileIcon() { return genFileIcon; }
+
+    bool requestFileIcon(const Zstring& filename, wxIcon* icon = NULL); //returns false if icon is not in buffer
+    void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
+
+    static int cvrtSize(IconSize sz);
+
+private:
     struct Pimpl;
     std::unique_ptr<Pimpl> pimpl;
+
+    const IconSize icoSize;
+    const wxIcon genDirIcon;
+    const wxIcon genFileIcon;
 };
 }
 

@@ -173,7 +173,7 @@ int Application::OnRun()
         wxFile safeOutput(zen::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
-        wxSafeShowMessage(_("An exception occurred!"), wxString::FromAscii(e.what()));
+        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", wxString::FromAscii(e.what()));
         return -9;
     }
     catch (...) //catch the rest
@@ -260,28 +260,26 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         });
 
         //COMPARE DIRECTORIES
-        zen::CompareProcess comparison(globSettings.fileTimeTolerance,
-                                       globSettings.optDialogs,
-                                       statusHandler);
+        zen::CompareProcess cmpProc(globSettings.fileTimeTolerance,
+                                    globSettings.optDialogs,
+                                    statusHandler);
 
         zen::FolderComparison folderCmp;
-        comparison.startCompareProcess(cmpConfig,
-                                       batchCfg.mainCfg.compareVar,
-                                       folderCmp);
+        cmpProc.startCompareProcess(cmpConfig, folderCmp);
 
         //START SYNCHRONIZATION
-        zen::SyncProcess synchronization(
+        zen::SyncProcess syncProc(
             globSettings.optDialogs,
             globSettings.verifyFileCopy,
             globSettings.copyLockedFiles,
             globSettings.copyFilePermissions,
-			globSettings.transactionalFileCopy,
+            globSettings.transactionalFileCopy,
             statusHandler);
 
         const std::vector<zen::FolderPairSyncCfg> syncProcessCfg = zen::extractSyncCfg(batchCfg.mainCfg);
         assert(syncProcessCfg.size() == folderCmp.size());
 
-        synchronization.startSynchronizationProcess(syncProcessCfg, folderCmp);
+        syncProc.startSynchronizationProcess(syncProcessCfg, folderCmp);
 
         //play (optional) sound notification after sync has completed
         if (!batchCfg.silent)

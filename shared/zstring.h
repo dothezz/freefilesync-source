@@ -102,7 +102,7 @@ struct EqualFilename //case-insensitive on Windows, case-sensitive on Linux
 
 #ifdef FFS_WIN
 template <template <class, class> class SP, class AP>
-void MakeUpper(Zbase<wchar_t, SP, AP>& str);
+void makeUpper(Zbase<wchar_t, SP, AP>& str);
 #endif
 
 #ifdef FFS_WIN //Windows stores filenames in wide character format
@@ -196,7 +196,7 @@ bool EqualFilename::operator()(const Zbase<T, SP, AP>& lhs, const Zbase<T, SP, A
 #ifdef FFS_WIN
 template <template <class, class> class SP, class AP>
 inline
-void MakeUpper(Zbase<wchar_t, SP, AP>& str)
+void makeUpper(Zbase<wchar_t, SP, AP>& str)
 {
     z_impl::makeUpperCaseWin(str.begin(), str.length());
 }

@@ -9,6 +9,7 @@
 #include <limits>
 #include "int64.h"
 #include "file_error.h"
+#include "dll_loader.h"
 
 using namespace zen;
 
@@ -78,11 +79,64 @@ bool dst::isFatDrive(const Zstring& fileName) //throw()
         assert(false); //shouldn't happen
         return false;
     }
-    const Zstring fileSystem = fsName;
-
     //DST hack seems to be working equally well for FAT and FAT32 (in particular creation time has 10^-2 s precision as advertised)
-    return fileSystem == Zstr("FAT") ||
-           fileSystem == Zstr("FAT32");
+    return fsName == Zstring(L"FAT") ||
+           fsName == Zstring(L"FAT32");
+}
+
+
+bool dst::vistaOrLater()
+{
+    OSVERSIONINFO osvi = {};
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    //IFileOperation is supported with Vista and later
+    if (::GetVersionEx(&osvi))
+        return osvi.dwMajorVersion > 5;
+    //XP    has majorVersion == 5, minorVersion == 1
+    //Vista has majorVersion == 6, minorVersion == 0
+    //version overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
+    return false;
+}
+
+
+bool dst::isFatDrive(HANDLE hFile) //throw()
+{
+    //dynamically load windows API function
+    typedef BOOL (WINAPI *GetVolumeInformationByHandleWFunc)(HANDLE  hFile,
+                                                             LPWSTR  lpVolumeNameBuffer,
+                                                             DWORD   nVolumeNameSize,
+                                                             LPDWORD lpVolumeSerialNumber,
+                                                             LPDWORD lpMaximumComponentLength,
+                                                             LPDWORD lpFileSystemFlags,
+                                                             LPWSTR  lpFileSystemNameBuffer,
+                                                             DWORD   nFileSystemNameSize);
+
+    const util::DllFun<GetVolumeInformationByHandleWFunc> getVolumeInformationByHandle(L"kernel32.dll", "GetVolumeInformationByHandleW");
+    if (!getVolumeInformationByHandle)
+    {
+        assert(false);
+        return false;
+    }
+
+    const size_t BUFFER_SIZE = MAX_PATH + 1;
+    wchar_t fsName[BUFFER_SIZE];
+
+    if (!getVolumeInformationByHandle(hFile,        //__in       HANDLE hFile,
+                                      NULL,         //__out      LPTSTR lpVolumeNameBuffer,
+                                      0,            //__in       DWORD nVolumeNameSize,
+                                      NULL,         //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                      NULL,         //__out_opt  LPDWORD lpMaximumComponentLength,
+                                      NULL,         //__out_opt  LPDWORD lpFileSystemFlags,
+                                      fsName,       //__out      LPTSTR lpFileSystemNameBuffer,
+                                      BUFFER_SIZE)) //__in       DWORD nFileSystemNameSize
+    {
+        assert(false); //shouldn't happen
+        return false;
+    }
+    //DST hack seems to be working equally well for FAT and FAT32 (in particular creation time has 10^-2 s precision as advertised)
+    return fsName == Zstring(L"FAT") ||
+           fsName == Zstring(L"FAT32");
 }
 
 
@@ -244,7 +298,7 @@ std::bitset<UTC_LOCAL_OFFSET_BITS> getUtcLocalShift()
 
     const int absValue = common::abs(timeShiftQuarter); //MSVC C++0x bug: std::bitset<>(unsigned long) is ambiguous
 
-    if (std::bitset<UTC_LOCAL_OFFSET_BITS - 1>(absValue).to_ulong() != static_cast<unsigned long>(absValue) || //time shifts that big shouldn't be possible!
+    if (std::bitset < UTC_LOCAL_OFFSET_BITS - 1 > (absValue).to_ulong() != static_cast<unsigned long>(absValue) || //time shifts that big shouldn't be possible!
         timeShiftSec % (60 * 15) != 0) //all known time shift have at least 15 minute granularity!
     {
         const std::wstring errorMessage = _("Conversion error:") + " Unexpected UTC <-> local time shift: " +

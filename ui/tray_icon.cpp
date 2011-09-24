@@ -13,6 +13,7 @@
 #include <wx/image.h>
 #include <wx/menu.h>
 #include <wx/icon.h> //req. by Linux
+#include "../shared/image_tools.h"
 
 
 const wxEventType FFS_REQUEST_RESUME_TRAY_EVENT = wxNewEventType();
@@ -47,16 +48,16 @@ void fillRange(wxImage& img, int pixelFirst, int pixelLast, const wxColor& col)
     }
 }
 
-wxIcon generateIcon(double percent) //generate icon with progress indicator
+wxIcon generateIcon(double fraction) //generate icon with progress indicator
 {
 #ifdef FFS_WIN
-    static const wxBitmap trayIcon = GlobalResources::instance().getImage(wxT("FFS_tray_win.png"));
+    static const wxBitmap trayIcon = GlobalResources::getImage(wxT("FFS_tray_win.png"));
 #elif defined FFS_LINUX
-    static const wxBitmap trayIcon = GlobalResources::instance().getImage(wxT("FFS_tray_linux.png"));
+    static const wxBitmap trayIcon = GlobalResources::getImage(wxT("FFS_tray_linux.png"));
 #endif
 
     const int pixelCount = trayIcon.GetWidth() * trayIcon.GetHeight();
-    const int startFillPixel = std::min(roundNum(percent / 100.0 * pixelCount), pixelCount);
+    const int startFillPixel = std::min(roundNum(fraction * pixelCount), pixelCount);
 
     //minor optimization
     static std::pair<int, wxIcon> buffer = std::make_pair(-1, wxNullIcon);
@@ -65,74 +66,81 @@ wxIcon generateIcon(double percent) //generate icon with progress indicator
 
     wxIcon genIcon;
 
-    wxImage genImage(trayIcon.ConvertToImage());
-    if (genImage.GetWidth()  > 0 &&
-        genImage.GetHeight() > 0)
     {
-        //fill black border row
-        if (startFillPixel <= pixelCount - genImage.GetWidth())
+        wxImage genImage(trayIcon.ConvertToImage());
+
+        //gradually make FFS icon brighter while nearing completion
+        zen::brighten(genImage, -200 * (1 - fraction));
+
+        //progress bar
+        if (genImage.GetWidth()  > 0 &&
+            genImage.GetHeight() > 0)
         {
+            //fill black border row
+            if (startFillPixel <= pixelCount - genImage.GetWidth())
+            {
+                /*
+                        --------
+                        ---bbbbb
+                        bbbbSyyy  S : start yellow remainder
+                        yyyyyyyy
+                */
+                int bStart = startFillPixel - genImage.GetWidth();
+                if (bStart % genImage.GetWidth() != 0) //add one more black pixel, see ascii-art
+                    --bStart;
+                fillRange(genImage, std::max(bStart, 0), startFillPixel, *wxBLACK);
+            }
+            else if (startFillPixel != pixelCount)
+            {
+                //special handling for last row
+                /*
+                        --------
+                        --------
+                        ---bbbbb
+                        ---bSyyy  S : start yellow remainder
+                */
+                int bStart = startFillPixel - genImage.GetWidth() - 1;
+                int bEnd = (bStart / genImage.GetWidth() + 1) * (genImage.GetWidth());
+
+                fillRange(genImage, std::max(bStart, 0), bEnd, *wxBLACK);
+                fillRange(genImage, startFillPixel - 1, startFillPixel, *wxBLACK);
+            }
+
+            //fill yellow remainder
+            fillRange(genImage, startFillPixel, pixelCount, wxColour(240, 200, 0));
+
             /*
-                    --------
-                    ---bbbbb
-                    bbbbSyyy  S : start yellow remainder
-                    yyyyyyyy
-            */
-            int bStart = startFillPixel - genImage.GetWidth();
-            if (bStart % genImage.GetWidth() != 0) //add one more black pixel, see ascii-art
-                --bStart;
-            fillRange(genImage, std::max(bStart, 0), startFillPixel, *wxBLACK);
-        }
-        else if (startFillPixel != pixelCount)
-        {
-            //special handling for last row
-            /*
-                    --------
-                    --------
-                    ---bbbbb
-                    ---bSyyy  S : start yellow remainder
-            */
-            int bStart = startFillPixel - genImage.GetWidth() - 1;
-            int bEnd = (bStart / genImage.GetWidth() + 1) * (genImage.GetWidth());
+                    const int indicatorWidth  = genImage.GetWidth() * .4;
+                    const int indicatorXBegin = std::ceil((genImage.GetWidth() - indicatorWidth) / 2.0);
+                    const int indicatorYBegin = genImage.GetHeight() - indicatorHeight;
 
-            fillRange(genImage, std::max(bStart, 0), bEnd, *wxBLACK);
-            fillRange(genImage, startFillPixel - 1, startFillPixel, *wxBLACK);
-        }
+                    //draw progress indicator: do NOT use wxDC::DrawRectangle! Doesn't respect alpha in Windows, but does in Linux!
+                    //We need a simple, working solution:
 
-        //fill yellow remainder
-        fillRange(genImage, startFillPixel, pixelCount, wxColour(240, 200, 0));
-
-        /*
-                const int indicatorWidth  = genImage.GetWidth() * .4;
-                const int indicatorXBegin = std::ceil((genImage.GetWidth() - indicatorWidth) / 2.0);
-                const int indicatorYBegin = genImage.GetHeight() - indicatorHeight;
-
-                //draw progress indicator: do NOT use wxDC::DrawRectangle! Doesn't respect alpha in Windows, but does in Linux!
-                //We need a simple, working solution:
-
-                for (int row = indicatorYBegin;  row < genImage.GetHeight(); ++row)
-                {
-                    for (int col = indicatorXBegin;  col < indicatorXBegin + indicatorWidth; ++col)
-                    {
-                        unsigned char* const pixelBegin = data + (row * genImage.GetWidth() + col) * 3;
-                        pixelBegin[0] = 240; //red
-                        pixelBegin[1] = 200; //green
-                        pixelBegin[2] = 0;   //blue
-                    }
-                }
-
-                if (genImage.HasAlpha())
-                {
-                    unsigned char* const alpha = genImage.GetAlpha();
-                    //make progress indicator fully opaque:
                     for (int row = indicatorYBegin;  row < genImage.GetHeight(); ++row)
-                        ::memset(alpha + row * genImage.GetWidth() + indicatorXBegin, wxIMAGE_ALPHA_OPAQUE, indicatorWidth);
-                }
-        */
-        genIcon.CopyFromBitmap(wxBitmap(genImage));
+                    {
+                        for (int col = indicatorXBegin;  col < indicatorXBegin + indicatorWidth; ++col)
+                        {
+                            unsigned char* const pixelBegin = data + (row * genImage.GetWidth() + col) * 3;
+                            pixelBegin[0] = 240; //red
+                            pixelBegin[1] = 200; //green
+                            pixelBegin[2] = 0;   //blue
+                        }
+                    }
+
+                    if (genImage.HasAlpha())
+                    {
+                        unsigned char* const alpha = genImage.GetAlpha();
+                        //make progress indicator fully opaque:
+                        for (int row = indicatorYBegin;  row < genImage.GetHeight(); ++row)
+                            ::memset(alpha + row * genImage.GetWidth() + indicatorXBegin, wxIMAGE_ALPHA_OPAQUE, indicatorWidth);
+                    }
+            */
+            genIcon.CopyFromBitmap(wxBitmap(genImage));
+        }
+        else //fallback
+            genIcon.CopyFromBitmap(trayIcon);
     }
-    else //fallback
-        genIcon.CopyFromBitmap(trayIcon);
 
     //fill buffer
     buffer.first  = startFillPixel;
@@ -197,9 +205,9 @@ FfsTrayIcon::~FfsTrayIcon()
 }
 
 
-void FfsTrayIcon::setToolTip(const wxString& toolTipText, double percent)
+void FfsTrayIcon::setToolTip2(const wxString& toolTipText, double fraction)
 {
-    trayIcon->SetIcon(generateIcon(percent), toolTipText);
+    trayIcon->SetIcon(generateIcon(fraction), toolTipText);
 }
 
 

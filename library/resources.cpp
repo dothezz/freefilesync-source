@@ -19,35 +19,13 @@ using namespace zen;
 
 const GlobalResources& GlobalResources::instance()
 {
-    static GlobalResources instance;
-    return instance;
+    static GlobalResources inst;
+    return inst;
 }
 
 
-GlobalResources::GlobalResources()
+namespace
 {
-    //init all the other resource files
-    animationMoney = new wxAnimation(wxNullAnimation);
-    animationSync  = new wxAnimation(wxNullAnimation);
-    programIcon    = new wxIcon(wxNullIcon);
-
-    load();
-}
-
-
-GlobalResources::~GlobalResources()
-{
-    //free bitmap resources
-    for (std::map<wxString, wxBitmap*>::iterator i = bitmapResource.begin(); i != bitmapResource.end(); ++i)
-        delete i->second;
-
-    //free other resources
-    delete animationMoney;
-    delete animationSync;
-    delete programIcon;
-}
-
-
 void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
 {
     //Workaround for wxWidgets:
@@ -64,11 +42,17 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
 
     animation->Load(seekAbleStream, wxANIMATION_TYPE_GIF);
 }
+}
 
 
-void GlobalResources::load()
+GlobalResources::GlobalResources()
 {
-    wxFFileInputStream input(zen::getResourceDir() + wxT("Resources.dat"));
+    //init all the other resource files
+    animationMoney = new wxAnimation(wxNullAnimation);
+    animationSync  = new wxAnimation(wxNullAnimation);
+    programIcon    = new wxIcon(wxNullIcon);
+
+    wxFFileInputStream input(zen::getResourceDir() + wxT("Resources.zip"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
@@ -78,7 +62,7 @@ void GlobalResources::load()
 
         while (true)
         {
-            std::auto_ptr<wxZipEntry> entry(resourceFile.GetNextEntry());
+            std::unique_ptr<wxZipEntry> entry(resourceFile.GetNextEntry());
             if (entry.get() == NULL)
                 break;
 
@@ -102,19 +86,37 @@ void GlobalResources::load()
     *programIcon = wxIcon(wxT("A_PROGRAM_ICON"));
 #else
     //use big logo bitmap for better quality
-    programIcon->CopyFromBitmap(getImage(wxT("FreeFileSync.png")));
+    programIcon->CopyFromBitmap(getImageInt(wxT("FreeFileSync.png")));
+    //attention: this is the reason we need a member getImage -> it must not implicitly create static object instance!!!
+    //erroneously calling static object constructor twice will deadlock on Linux!!
 #endif
 }
 
 
-const wxBitmap& GlobalResources::getImage(const wxString& imageName) const
+GlobalResources::~GlobalResources()
 {
-    const std::map<wxString, wxBitmap*>::const_iterator bmp = imageName.Find(wxChar('.')) == wxNOT_FOUND ? //assume .png ending if nothing else specified
-                                                              bitmapResource.find(imageName + wxT(".png")) :
-                                                              bitmapResource.find(imageName);
+    //free bitmap resources
+    for (std::map<wxString, wxBitmap*>::iterator i = bitmapResource.begin(); i != bitmapResource.end(); ++i)
+        delete i->second;
 
+    //free other resources
+    delete animationMoney;
+    delete animationSync;
+    delete programIcon;
+}
+
+
+const wxBitmap& GlobalResources::getImageInt(const wxString& imageName) const
+{
+    const std::map<wxString, wxBitmap*>::const_iterator bmp = bitmapResource.find(
+                                                                  imageName.Find(L'.') == wxNOT_FOUND ? //assume .png ending if nothing else specified
+                                                                  imageName + wxT(".png") :
+                                                                  imageName);
     if (bmp != bitmapResource.end())
         return *bmp->second;
     else
+    {
+        assert(false);
         return wxNullBitmap;
+    }
 }

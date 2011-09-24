@@ -11,64 +11,38 @@
 #include <wx/event.h>
 #include <wx/sizer.h>
 #include <wx/filepicker.h>
-#include <wx/combobox.h>
 #include "file_drop.h"
-
-
-class wxFileDirPickerEvent;
 
 namespace zen
 {
 //handle drag and drop, tooltip, label and manual input, coordinating a wxWindow, wxDirPickerCtrl, and wxComboBox/wxTextCtrl
 
-class DirectoryNameMainDlg : private wxEvtHandler
-{
-public:
-    DirectoryNameMainDlg(wxWindow&         dropWindow1,
-                         wxWindow&         dropWindow2,
-                         wxDirPickerCtrl&  dirPicker,
-                         wxComboBox&       dirName,
-                         wxStaticBoxSizer& staticBox);
-
-    virtual ~DirectoryNameMainDlg() {}
-
-    wxString getName() const;
-    void setName(const wxString& dirname);
-
-    virtual bool AcceptDrop(const std::vector<wxString>& droppedFiles) = 0; //return true if drop should be processed
-
-private:
-    void OnFilesDropped(FFSFileDropEvent& event);
-    void OnWriteDirManually(wxCommandEvent& event);
-    void OnDirSelected(wxFileDirPickerEvent& event);
-
-    const wxWindow&   dropWindow1_;
-    const wxWindow&   dropWindow2_;
-    wxDirPickerCtrl&  dirPicker_;
-    wxComboBox&       dirName_;
-    wxStaticBoxSizer& staticBox_;
-};
-
-
+template <class NameControl>  //NameControl may be wxTextCtrl, FolderHistoryBox
 class DirectoryName: private wxEvtHandler
 {
 public:
-    DirectoryName(wxWindow&        dropWindow,
-                  wxDirPickerCtrl& dirPicker,
-                  wxTextCtrl&      dirName,
-                  wxStaticBoxSizer* staticBox = NULL); //optional
+    DirectoryName(wxWindow&         dropWindow,
+                  wxDirPickerCtrl&  dirPicker,
+                  NameControl&      dirName,
+                  wxStaticBoxSizer* staticBox = NULL,
+                  wxWindow*        dropWindow2 = NULL); //optional
+
+    ~DirectoryName();
 
     wxString getName() const;
     void setName(const wxString& dirname);
 
 private:
+    virtual bool acceptDrop(const std::vector<wxString>& droppedFiles) { return true; }; //return true if drop should be processed
+
     void OnFilesDropped(FFSFileDropEvent& event);
     void OnWriteDirManually(wxCommandEvent& event);
     void OnDirSelected(wxFileDirPickerEvent& event);
 
-    const wxWindow&  dropWindow_;
-    wxDirPickerCtrl& dirPicker_;
-    wxTextCtrl&      dirName_;
+    const wxWindow&   dropWindow_;
+    const wxWindow*   dropWindow2_;
+    wxDirPickerCtrl&  dirPicker_;
+    NameControl&      dirName_;
     wxStaticBoxSizer* staticBox_; //optional
 };
 }

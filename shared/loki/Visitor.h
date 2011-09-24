@@ -249,7 +249,7 @@ typename R = void,
          >
 class BaseVisitable;
 
-template<typename R,template <typename, class> class CatchAll>
+template<typename R, template <typename, class> class CatchAll>
 class BaseVisitable<R, CatchAll, false>
 {
 public:
@@ -262,7 +262,7 @@ protected: // give access only to the hierarchy
     static ReturnType AcceptImpl(T& visited, BaseVisitor& guest)
     {
         // Apply the Acyclic Visitor
-        if (Visitor<T,R>* p = dynamic_cast<Visitor<T,R>*>(&guest))
+        if (Visitor<T, R>* p = dynamic_cast<Visitor<T, R>*>(&guest))
         {
             return p->Visit(visited);
         }
@@ -270,7 +270,7 @@ protected: // give access only to the hierarchy
     }
 };
 
-template<typename R,template <typename, class> class CatchAll>
+template<typename R, template <typename, class> class CatchAll>
 class BaseVisitable<R, CatchAll, true>
 {
 public:
@@ -283,7 +283,7 @@ protected: // give access only to the hierarchy
     static ReturnType AcceptImpl(const T& visited, BaseVisitor& guest)
     {
         // Apply the Acyclic Visitor
-        if (Visitor<T,R,true>* p = dynamic_cast<Visitor<T,R,true>*>(&guest))
+        if (Visitor<T, R, true>* p = dynamic_cast<Visitor<T, R, true>*>(&guest))
         {
             return p->Visit(visited);
         }

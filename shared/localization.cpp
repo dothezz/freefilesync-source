@@ -69,7 +69,7 @@ private:
 
     Translation       transMapping; //map original text |-> translation
     TranslationPlural transMappingPl;
-    std::auto_ptr<PluralForm> pluralParser;
+    std::unique_ptr<PluralForm> pluralParser;
     wxLanguage langId_;
 };
 
@@ -385,7 +385,7 @@ void zen::setLanguage(int language)
 
 
     //handle RTL swapping: we need wxWidgets to do this
-    static std::auto_ptr<CustomLocale> dummy;
+    static std::unique_ptr<CustomLocale> dummy;
     dummy.reset(); //avoid global locale lifetime overlap! wxWidgets cannot handle this and will crash!
     dummy.reset(new CustomLocale(languageFile.empty() ? wxLANGUAGE_ENGLISH : language));
 

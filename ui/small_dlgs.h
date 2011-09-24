@@ -25,8 +25,6 @@ struct ReturnSmallDlg
 
 void showAboutDialog();
 
-void showHelpDialog();
-
 ReturnSmallDlg::ButtonPressed showFilterDialog(bool isGlobalFilter, FilterConfig& filter);
 
 ReturnSmallDlg::ButtonPressed showDeleteDialog(
@@ -42,11 +40,11 @@ ReturnSmallDlg::ButtonPressed showSyncPreviewDlg(
     const SyncStatistics& statistics,
     bool& dontShowAgain);
 
-ReturnSmallDlg::ButtonPressed showCompareCfgDialog(
-    CompareVariant& cmpVar,
-    SymLinkHandling& handleSymlinks);
+ReturnSmallDlg::ButtonPressed showCompareCfgDialog(CompConfig& cmpConfig);
 
 ReturnSmallDlg::ButtonPressed showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings);
+
+ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(Int64& timeFrom, Int64& timeTo);
 }
 
 #endif // SMALLDIALOGS_H_INCLUDED

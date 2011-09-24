@@ -14,7 +14,6 @@
 #include <boost/thread/once.hpp>
 #include "dll_loader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#include "build_info.h"
 #include "assert_static.h"
 #include <algorithm>
 #include <functional>
@@ -33,17 +32,6 @@ using namespace zen;
 namespace
 {
 #ifdef FFS_WIN
-inline
-std::wstring getRecyclerDllName()
-{
-    assert_static(util::is32BitBuild || util::is64BitBuild);
-
-    return util::is64BitBuild ?
-           L"FileOperation_x64.dll":
-           L"FileOperation_Win32.dll";
-}
-
-
 bool vistaOrLater()
 {
     OSVERSIONINFO osvi = {};
@@ -71,7 +59,7 @@ IFileOperation  - multiple files  2,1s
 Nevertheless, let's use IFileOperation for better error reporting!
 */
 
-void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (FileError)
+void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw FileError
 {
     if (filesToDelete.empty())
         return;
@@ -87,12 +75,12 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
                        std::back_inserter(fileNames), std::mem_fun_ref(&Zstring::c_str));
 
         using namespace fileop;
-        MoveToRecycleBinFct moveToRecycler = util::getDllFun<MoveToRecycleBinFct>(getRecyclerDllName(), moveToRecycleBinFctName);
-        GetLastErrorFct     getLastError   = util::getDllFun<GetLastErrorFct>    (getRecyclerDllName(), getLastErrorFctName);
+        const util::DllFun<MoveToRecycleBinFct> moveToRecycler(getDllName(), moveToRecycleBinFctName);
+        const util::DllFun<GetLastErrorFct>     getLastError  (getDllName(), getLastErrorFctName);
 
-        if (moveToRecycler == NULL || getLastError == NULL)
+        if (!moveToRecycler || !getLastError)
             throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileNames[0] + "\"" + //report first file only... better than nothing
-                            "\n\n" + _("Could not load a required DLL:") + " \"" + getRecyclerDllName() + "\"");
+                            "\n\n" + _("Could not load a required DLL:") + " \"" + getDllName() + "\"");
 
         //#warning moving long file paths to recycler does not work! clarify!
         //        std::vector<Zstring> temp;
@@ -140,7 +128,7 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 }
 
 
-bool zen::moveToRecycleBin(const Zstring& filename)  //throw (FileError)
+bool zen::moveToRecycleBin(const Zstring& filename)  //throw FileError
 {
     if (!somethingExists(filename))
         return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
@@ -151,7 +139,7 @@ bool zen::moveToRecycleBin(const Zstring& filename)  //throw (FileError)
 
     std::vector<Zstring> fileNames;
     fileNames.push_back(filename);
-    ::moveToWindowsRecycler(fileNames);  //throw (FileError)
+    ::moveToWindowsRecycler(fileNames);  //throw FileError
 
 #elif defined FFS_LINUX
     Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(filename.c_str()); //never fails

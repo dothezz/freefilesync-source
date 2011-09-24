@@ -63,7 +63,7 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
 
 #ifdef FFS_WIN
     //Windows does NOT distinguish between upper/lower-case
-    MakeUpper(filterFormatted);
+    makeUpper(filterFormatted);
 #elif defined FFS_LINUX
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
@@ -133,19 +133,19 @@ bool matchesMask(const Zchar* str, const Zchar* mask)
     {
         switch (ch)
         {
-            case Zchar('?'):
+            case Zstr('?'):
                 if (*str == 0)
                     return false;
                 break;
 
-            case Zchar('*'):
+            case Zstr('*'):
                 //advance to next non-*/? char
                 do
                 {
                     ++mask;
                     ch = *mask;
                 }
-                while (ch == Zchar('*') || ch == Zchar('?'));
+                while (ch == Zstr('*') || ch == Zstr('?'));
                 //if mask ends with '*':
                 if (ch == 0)
                     return true;
@@ -178,10 +178,10 @@ bool matchesMaskBegin(const Zchar* str, const Zchar* mask)
 
         switch (ch)
         {
-            case Zchar('?'):
+            case Zstr('?'):
                 break;
 
-            case Zchar('*'):
+            case Zstr('*'):
                 return true;
 
             default:
@@ -273,7 +273,7 @@ bool NameFilter::passFileFilter(const Zstring& relFilename) const
 {
 #ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = relFilename;
-    MakeUpper(nameFormatted);
+    makeUpper(nameFormatted);
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
     const Zstring& nameFormatted = relFilename; //nothing to do here
 #endif
@@ -289,7 +289,7 @@ bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch
 
 #ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = relDirname;
-    MakeUpper(nameFormatted);
+    makeUpper(nameFormatted);
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
     const Zstring& nameFormatted = relDirname; //nothing to do here
 #endif

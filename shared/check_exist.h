@@ -48,7 +48,7 @@ boost::unique_future<bool> objExistsAsync(const Zstring& objname)
 {
     //thread safety: make it a pure value type for use in the thread!
     const Zstring objnameVal = objname; //atomic ref-count => binary value-type semantics!
-    boost::packaged_task<bool> pt([=] { return (*fun)(objnameVal); });
+    boost::packaged_task<bool> pt([ = ] { return (*fun)(objnameVal); });
     auto fut = pt.get_future();
     boost::thread(std::move(pt));
     return std::move(fut);

@@ -14,7 +14,7 @@ namespace zen
 {
 const Zstring SYNC_DB_FILE_ENDING = Zstr(".ffs_db");
 
-void saveToDisk(const BaseDirMapping& baseMapping); //throw (FileError)
+void saveToDisk(const BaseDirMapping& baseMapping); //throw FileError
 
 struct DirInformation
 {
@@ -25,7 +25,7 @@ typedef std::shared_ptr<const DirInformation> DirInfoPtr;
 
 DEFINE_NEW_FILE_ERROR(FileErrorDatabaseNotExisting);
 
-std::pair<DirInfoPtr, DirInfoPtr> loadFromDisk(const BaseDirMapping& baseMapping); //throw (FileError, FileErrorDatabaseNotExisting) -> return value always bound!
+std::pair<DirInfoPtr, DirInfoPtr> loadFromDisk(const BaseDirMapping& baseMapping); //throw FileError, FileErrorDatabaseNotExisting -> return value always bound!
 }
 
 #endif // DBFILE_H_INCLUDED

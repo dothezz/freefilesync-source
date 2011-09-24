@@ -165,7 +165,7 @@ class AbstractProduct,
 class SmartPointer
 {
 private:
-    typedef SmartPtr< AbstractProduct,OwnershipPolicy,
+    typedef SmartPtr < AbstractProduct, OwnershipPolicy,
             ConversionPolicy, CheckingPolicy,
             FunctionStorage, ConstnessPolicy > CallBackSP;
 protected:
@@ -195,7 +195,7 @@ private:
         CallBackSP& SP(*reinterpret_cast<CallBackSP*>(pSP));
         ReleaseObject(SP);
     }
-    virtual void ReleaseObject(ProductReturn& object)=0;
+    virtual void ReleaseObject(ProductReturn& object) = 0;
     const typename CallBackSP::FunctorType fun;
 };
 

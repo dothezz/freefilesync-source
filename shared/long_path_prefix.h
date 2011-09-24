@@ -83,7 +83,7 @@ inline
 Zstring zen::applyLongPathPrefixCreateDir(const Zstring& path) //throw()
 {
     //special rule for ::CreateDirectoryEx(): MAX_PATH - 12(=^ 8.3 filename) is threshold
-    return applyLongPathPrefixImpl<MAX_PATH - 12>(path);
+    return applyLongPathPrefixImpl < MAX_PATH - 12 > (path);
 }
 
 

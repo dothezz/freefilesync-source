@@ -19,6 +19,8 @@ Solve DST +-1h and time zone shift issues on FAT drives
 */
 
 bool isFatDrive(const Zstring& fileName); //throw ()
+bool isFatDrive(HANDLE hFile); //throw() -> call ONLY if vistaOrLater() == true!
+bool vistaOrLater();
 
 //all subsequent functions may throw the std::runtime_error exception!
 

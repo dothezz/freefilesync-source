@@ -21,6 +21,9 @@
 #include <wx/wupdlock.h>
 #include <wx/msgdlg.h>
 #include "../shared/mouse_move_dlg.h"
+#include "../shared/help_provider.h"
+#include "../shared/image_tools.h"
+#include "../shared/stl_tools.h"
 
 using namespace zen;
 
@@ -38,18 +41,18 @@ private:
 
 AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 {
-    m_bitmap9->SetBitmap(GlobalResources::instance().getImage(wxT("website")));
-    m_bitmap10->SetBitmap(GlobalResources::instance().getImage(wxT("email")));
-    m_bitmap11->SetBitmap(GlobalResources::instance().getImage(wxT("logo")));
-    m_bitmap13->SetBitmap(GlobalResources::instance().getImage(wxT("gpl")));
-    m_bitmapTransl->SetBitmap(GlobalResources::instance().getImage(wxT("translation")));
+    m_bitmap9->SetBitmap(GlobalResources::getImage(wxT("website")));
+    m_bitmap10->SetBitmap(GlobalResources::getImage(wxT("email")));
+    m_bitmap11->SetBitmap(GlobalResources::getImage(wxT("logo")));
+    m_bitmap13->SetBitmap(GlobalResources::getImage(wxT("gpl")));
+    m_bitmapTransl->SetBitmap(GlobalResources::getImage(wxT("translation")));
 
     //create language credits
     for (std::vector<ExistingTranslations::Entry>::const_iterator i = ExistingTranslations::get().begin(); i != ExistingTranslations::get().end(); ++i)
     {
         //flag
-        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::instance().getImage(i->languageFlag), wxDefaultPosition, wxSize(-1,11), 0 );
-        fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::getImage(i->languageFlag), wxDefaultPosition, wxSize(-1, 11), 0 );
+        fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5 );
 
         //language name
         wxStaticText* staticTextLanguage = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, i->languageName, wxDefaultPosition, wxDefaultSize, 0 );
@@ -117,81 +120,6 @@ void zen::showAboutDialog()
 //########################################################################################
 
 
-class HelpDlg : public HelpDlgGenerated
-{
-public:
-    HelpDlg(wxWindow* parent);
-
-private:
-    void OnClose(wxCloseEvent& event);
-    void OnOK(wxCommandEvent& event);
-};
-
-
-HelpDlg::HelpDlg(wxWindow* parent) : HelpDlgGenerated(parent)
-{
-#ifdef FFS_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
-
-    m_notebook1->SetFocus();
-
-    m_bitmap25->SetBitmap(GlobalResources::instance().getImage(wxT("help")));
-
-    //populate decision trees: "compare by date"
-    wxTreeItemId treeRoot      = m_treeCtrl1->AddRoot(_("DECISION TREE"));
-    wxTreeItemId treeBothSides = m_treeCtrl1->AppendItem(treeRoot, _("file exists on both sides"));
-    wxTreeItemId treeOneSide   = m_treeCtrl1->AppendItem(treeRoot, _("on one side only"));
-
-    m_treeCtrl1->AppendItem(treeOneSide, _("- exists left only"));
-    m_treeCtrl1->AppendItem(treeOneSide, _("- exists right only"));
-
-    wxTreeItemId treeSameDate = m_treeCtrl1->AppendItem(treeBothSides, _("same date"));
-    m_treeCtrl1->AppendItem(treeSameDate, _("- equal"));
-    m_treeCtrl1->AppendItem(treeSameDate, _("- conflict (same date, different size)"));
-
-
-    wxTreeItemId treeDifferentDate = m_treeCtrl1->AppendItem(treeBothSides, _("different date"));
-    m_treeCtrl1->AppendItem(treeDifferentDate, _("- left newer"));
-    m_treeCtrl1->AppendItem(treeDifferentDate, _("- right newer"));
-
-    m_treeCtrl1->ExpandAll();
-
-    //populate decision trees: "compare by content"
-    wxTreeItemId tree2Root      = m_treeCtrl2->AddRoot(_("DECISION TREE"));
-    wxTreeItemId tree2BothSides = m_treeCtrl2->AppendItem(tree2Root, _("file exists on both sides"));
-    wxTreeItemId tree2OneSide   = m_treeCtrl2->AppendItem(tree2Root, _("on one side only"));
-
-    m_treeCtrl2->AppendItem(tree2OneSide, _("- exists left only"));
-    m_treeCtrl2->AppendItem(tree2OneSide, _("- exists right only"));
-
-    m_treeCtrl2->AppendItem(tree2BothSides, _("- equal"));
-    m_treeCtrl2->AppendItem(tree2BothSides, _("- different"));
-
-    m_treeCtrl2->ExpandAll();
-}
-
-
-void HelpDlg::OnClose(wxCloseEvent& event)
-{
-    Destroy();
-}
-
-
-void HelpDlg::OnOK(wxCommandEvent& event)
-{
-    Destroy();
-}
-
-
-void zen::showHelpDialog()
-{
-    HelpDlg helpDlg(NULL);
-    helpDlg.ShowModal();
-}
-//########################################################################################
-
-
 class FilterDlg : public FilterDlgGenerated
 {
 public:
@@ -234,10 +162,11 @@ FilterDlg::FilterDlg(wxWindow* parent,
 
     enumTimeDescr.
     add(UTIME_NONE, _("Inactive")).
-    add(UTIME_SEC,  _("Second")).
-    add(UTIME_MIN,  _("Minute")).
-    add(UTIME_HOUR, _("Hour")).
-    add(UTIME_DAY,  _("Day"));
+    //add(UTIME_LAST_X_HOURS, _("Last x hours")). //better: "Last %x hour" ?
+    add(UTIME_TODAY,        _("Today")).
+    add(UTIME_THIS_WEEK,    _("This week")).
+    add(UTIME_THIS_MONTH,   _("This month")).
+    add(UTIME_THIS_YEAR,    _("This year"));
 
     enumSizeDescr.
     add(USIZE_NONE, _("Inactive")).
@@ -245,8 +174,8 @@ FilterDlg::FilterDlg(wxWindow* parent,
     add(USIZE_KB,   _("KB")).
     add(USIZE_MB,   _("MB"));
 
-    m_bitmap26->SetBitmap(GlobalResources::instance().getImage(wxT("filterOn")));
-    m_bpButtonHelp->SetBitmapLabel(GlobalResources::instance().getImage(wxT("help")));
+    m_bitmap26->SetBitmap(GlobalResources::getImage(wxT("filterOn")));
+    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getImage(wxT("help")));
 
     setFilter(filter);
 
@@ -267,30 +196,30 @@ void FilterDlg::updateGui()
 {
     FilterConfig activeCfg = getFilter();
 
-    if (!NameFilter(activeCfg.includeFilter, FilterConfig().excludeFilter).isNull())
-        m_bitmapInclude->SetBitmap(GlobalResources::instance().getImage(wxT("include")));
-    else
-        m_bitmapInclude->SetBitmap(GlobalResources::instance().getImage(wxT("include_grey")));
+    m_bitmapInclude->SetBitmap(
+        !NameFilter(activeCfg.includeFilter, FilterConfig().excludeFilter).isNull() ?
+        GlobalResources::getImage(wxT("include")) :
+        greyScale(GlobalResources::getImage(wxT("include"))));
 
-    if (!NameFilter(FilterConfig().includeFilter, activeCfg.excludeFilter).isNull())
-        m_bitmapExclude->SetBitmap(GlobalResources::instance().getImage(wxT("exclude")));
-    else
-        m_bitmapExclude->SetBitmap(GlobalResources::instance().getImage(wxT("exclude_grey")));
+    m_bitmapExclude->SetBitmap(
+        !NameFilter(FilterConfig().includeFilter, activeCfg.excludeFilter).isNull() ?
+        GlobalResources::getImage(wxT("exclude")) :
+        greyScale(GlobalResources::getImage(wxT("exclude"))));
 
-    if (activeCfg.unitTimeSpan != UTIME_NONE)
-        m_bitmapFilterDate->SetBitmap(GlobalResources::instance().getImage(wxT("clock")));
-    else
-        m_bitmapFilterDate->SetBitmap(GlobalResources::instance().getImage(wxT("clock_grey")));
+    m_bitmapFilterDate->SetBitmap(
+        activeCfg.unitTimeSpan != UTIME_NONE ?
+        GlobalResources::getImage(wxT("clock")) :
+        greyScale(GlobalResources::getImage(wxT("clock"))));
 
-    if (activeCfg.unitSizeMin != USIZE_NONE ||
-        activeCfg.unitSizeMax != USIZE_NONE)
-        m_bitmapFilterSize->SetBitmap(GlobalResources::instance().getImage(wxT("size")));
-    else
-        m_bitmapFilterSize->SetBitmap(GlobalResources::instance().getImage(wxT("size_grey")));
+    m_bitmapFilterSize->SetBitmap(
+        activeCfg.unitSizeMin != USIZE_NONE ||
+        activeCfg.unitSizeMax != USIZE_NONE ?
+        GlobalResources::getImage(wxT("size")) :
+        greyScale(GlobalResources::getImage(wxT("size"))));
 
-    m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan != UTIME_NONE);
-    m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin  != USIZE_NONE);
-    m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax  != USIZE_NONE);
+    //m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan == UTIME_LAST_X_HOURS);
+    m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != USIZE_NONE);
+    m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax != USIZE_NONE);
 }
 
 
@@ -447,13 +376,13 @@ void DeleteDialog::updateGui()
     {
         header = _P("Do you really want to move the following object to the Recycle Bin?",
                     "Do you really want to move the following %x objects to the Recycle Bin?", delInfo.second);
-        m_bitmap12->SetBitmap(GlobalResources::instance().getImage(wxT("recycler")));
+        m_bitmap12->SetBitmap(GlobalResources::getImage(wxT("recycler")));
     }
     else
     {
         header = _P("Do you really want to delete the following object?",
                     "Do you really want to delete the following %x objects?", delInfo.second);
-        m_bitmap12->SetBitmap(GlobalResources::instance().getImage(wxT("deleteFile")));
+        m_bitmap12->SetBitmap(GlobalResources::getImage(wxT("deleteFile")));
     }
     header.Replace(wxT("%x"), toStringSep(delInfo.second));
     m_staticTextHeader->SetLabel(header);
@@ -536,8 +465,8 @@ CustomizeColsDlg::CustomizeColsDlg(wxWindow* parent, xmlAccess::ColumnAttributes
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bpButton29->SetBitmapLabel(GlobalResources::instance().getImage(wxT("moveUp")));
-    m_bpButton30->SetBitmapLabel(GlobalResources::instance().getImage(wxT("moveDown")));
+    m_bpButton29->SetBitmapLabel(GlobalResources::getImage(wxT("moveUp")));
+    m_bpButton30->SetBitmapLabel(GlobalResources::getImage(wxT("moveDown")));
 
     xmlAccess::ColumnAttributes columnSettings = attr;
 
@@ -671,11 +600,11 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
 
     using zen::toStringSep;
 
-    m_buttonStartSync->setBitmapFront(GlobalResources::instance().getImage(wxT("startSync")));
-    m_bitmapCreate->SetBitmap(GlobalResources::instance().getImage(wxT("create")));
-    m_bitmapUpdate->SetBitmap(GlobalResources::instance().getImage(wxT("update")));
-    m_bitmapDelete->SetBitmap(GlobalResources::instance().getImage(wxT("delete")));
-    m_bitmapData->SetBitmap(GlobalResources::instance().getImage(wxT("data")));
+    m_buttonStartSync->setBitmapFront(GlobalResources::getImage(wxT("startSync")));
+    m_bitmapCreate->SetBitmap(GlobalResources::getImage(wxT("create")));
+    m_bitmapUpdate->SetBitmap(GlobalResources::getImage(wxT("update")));
+    m_bitmapDelete->SetBitmap(GlobalResources::getImage(wxT("delete")));
+    m_bitmapData->SetBitmap(GlobalResources::getImage(wxT("data")));
 
     m_staticTextVariant->SetLabel(variantName);
     m_textCtrlData->SetValue(zen::formatFilesizeToShortString(statistics.getDataToProcess()));
@@ -733,34 +662,34 @@ class CompareCfgDialog : public CmpCfgDlgGenerated
 {
 public:
     CompareCfgDialog(wxWindow* parent,
-                     zen::CompareVariant& cmpVar,
-                     SymLinkHandling& handleSymlinks);
+                     CompConfig& cmpConfig);
 
 private:
     void OnOkay(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event) { EndModal(0); }
     void OnCancel(wxCommandEvent& event) { EndModal(0); }
-    void OnTimeSize(wxCommandEvent& event);
-    void OnTimeSizeDouble(wxMouseEvent& event);
-    void OnContent(wxCommandEvent& event);
-    void OnContentDouble(wxMouseEvent& event);
     void OnShowHelp(wxCommandEvent& event);
+
+    void OnTimeSize(wxCommandEvent& event) { m_radioBtnSizeDate->SetValue(true); }
+    //void OnFilesize(wxCommandEvent& event) { m_radioBtnSize    ->SetValue(true); }
+    void OnContent (wxCommandEvent& event) { m_radioBtnContent ->SetValue(true); }
+
+    void OnTimeSizeDouble(wxMouseEvent& event);
+    void OnFilesizeDouble(wxMouseEvent& event);
+    void OnContentDouble(wxMouseEvent& event);
 
     void updateView();
 
-    zen::CompareVariant& cmpVarOut;
-    SymLinkHandling& handleSymlinksOut;
+    CompConfig& cmpConfigOut;
 
     zen::EnumDescrList<SymLinkHandling>  enumDescrHandleSyml;
 };
 
 
 CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
-                                   CompareVariant& cmpVar,
-                                   SymLinkHandling& handleSymlinks) :
+                                   CompConfig& cmpConfig) :
     CmpCfgDlgGenerated(parent),
-    cmpVarOut(cmpVar),
-    handleSymlinksOut(handleSymlinks)
+    cmpConfigOut(cmpConfig)
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -774,11 +703,12 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
     //move dialog up so that compare-config button and first config-variant are on same level
     //   Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
 
-    m_bpButtonHelp   ->SetBitmapLabel(GlobalResources::instance().getImage(wxT("help")));
-    m_bitmapByTime   ->SetBitmap     (GlobalResources::instance().getImage(wxT("clock")));
-    m_bitmapByContent->SetBitmap     (GlobalResources::instance().getImage(wxT("cmpByContent")));
+    m_bpButtonHelp   ->SetBitmapLabel(GlobalResources::getImage(wxT("help")));
+    m_bitmapByTime   ->SetBitmap     (GlobalResources::getImage(wxT("clock")));
+    //m_bitmapBySize   ->SetBitmap     (GlobalResources::getImage(wxT("size")));
+    m_bitmapByContent->SetBitmap     (GlobalResources::getImage(wxT("cmpByContent")));
 
-    switch (cmpVar)
+    switch (cmpConfig.compareVar)
     {
         case CMP_BY_TIME_SIZE:
             m_radioBtnSizeDate->SetValue(true);
@@ -790,7 +720,7 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
             break;
     }
 
-    setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, handleSymlinks);
+    setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, cmpConfig.handleSymlinks);
 
     updateView();
 }
@@ -803,25 +733,13 @@ void CompareCfgDialog::updateView()
 void CompareCfgDialog::OnOkay(wxCommandEvent& event)
 {
     if (m_radioBtnContent->GetValue())
-        cmpVarOut = CMP_BY_CONTENT;
+        cmpConfigOut.compareVar = CMP_BY_CONTENT;
     else
-        cmpVarOut = CMP_BY_TIME_SIZE;
+        cmpConfigOut.compareVar = CMP_BY_TIME_SIZE;
 
-    handleSymlinksOut = getEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks);
+    cmpConfigOut.handleSymlinks = getEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks);
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
-}
-
-
-void CompareCfgDialog::OnTimeSize(wxCommandEvent& event)
-{
-    m_radioBtnSizeDate->SetValue(true);
-}
-
-
-void CompareCfgDialog::OnContent(wxCommandEvent& event)
-{
-    m_radioBtnContent->SetValue(true);
 }
 
 
@@ -843,15 +761,17 @@ void CompareCfgDialog::OnContentDouble(wxMouseEvent& event)
 
 void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 {
-    HelpDlg helpDlg(this);
-    helpDlg.ShowModal();
+#ifdef FFS_WIN
+    zen::displayHelpEntry(wxT("html\\ComparisonSettings.html"));
+#elif defined FFS_LINUX
+    zen::displayHelpEntry(wxT("html/ComparisonSettings.html"));
+#endif
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(CompareVariant& cmpVar,
-                                                        SymLinkHandling& handleSymlinks)
+ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(CompConfig& cmpConfig)
 {
-    CompareCfgDialog syncDlg(NULL, cmpVar, handleSymlinks);
+    CompareCfgDialog syncDlg(NULL, cmpConfig);
 
     return static_cast<ReturnSmallDlg::ButtonPressed>(syncDlg.ShowModal());
 }
@@ -887,16 +807,18 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmapSettings->SetBitmap(GlobalResources::instance().getImage(wxT("settings")));
-    m_buttonResetDialogs->setBitmapFront(GlobalResources::instance().getImage(wxT("warningSmall")), 5);
-    m_bpButtonAddRow->SetBitmapLabel(GlobalResources::instance().getImage(wxT("addFolderPair")));
-    m_bpButtonRemoveRow->SetBitmapLabel(GlobalResources::instance().getImage(wxT("removeFolderPair")));
+    m_bitmapSettings->SetBitmap(GlobalResources::getImage(wxT("settings")));
+    m_buttonResetDialogs->setBitmapFront(GlobalResources::getImage(wxT("warningSmall")), 5);
+    m_bpButtonAddRow->SetBitmapLabel(GlobalResources::getImage(wxT("addFolderPair")));
+    m_bpButtonRemoveRow->SetBitmapLabel(GlobalResources::getImage(wxT("removeFolderPair")));
 
     m_checkBoxCopyLocked     ->SetValue(globalSettings.copyLockedFiles);
-	m_checkBoxTransCopy      ->SetValue(globalSettings.transactionalFileCopy);
+    m_checkBoxTransCopy      ->SetValue(globalSettings.transactionalFileCopy);
     m_checkBoxCopyPermissions->SetValue(globalSettings.copyFilePermissions);
 
-#ifndef FFS_WIN
+#ifdef FFS_WIN
+    m_checkBoxCopyPermissions->SetLabel(_("Copy NTFS permissions"));
+#else
     m_checkBoxCopyLocked->Hide();
 #endif
 
@@ -921,7 +843,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
     settings.copyLockedFiles       = m_checkBoxCopyLocked->GetValue();
-	settings.transactionalFileCopy = m_checkBoxTransCopy->GetValue();
+    settings.transactionalFileCopy = m_checkBoxTransCopy->GetValue();
     settings.copyFilePermissions   = m_checkBoxCopyPermissions->GetValue();
     settings.gui.externelApplications = getExtApp();
 
@@ -943,7 +865,7 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
 
     m_checkBoxCopyLocked     ->SetValue(defaultCfg.copyLockedFiles);
     m_checkBoxTransCopy      ->SetValue(defaultCfg.transactionalFileCopy);
-	m_checkBoxCopyPermissions->SetValue(defaultCfg.copyFilePermissions);
+    m_checkBoxCopyPermissions->SetValue(defaultCfg.copyFilePermissions);
     set(defaultCfg.gui.externelApplications);
 }
 
@@ -962,16 +884,21 @@ void GlobalSettingsDlg::OnClose(wxCloseEvent& event)
 
 void GlobalSettingsDlg::set(const xmlAccess::ExternalApps& extApp)
 {
+    auto extAppTmp = extApp;
+    vector_remove_if(extAppTmp, [](decltype(extAppTmp[0])& entry) { return entry.first.empty() && entry.second.empty(); });
+
+    extAppTmp.resize(extAppTmp.size() + 1); //append empty row to facilitate insertions
+
     const int rowCount = m_gridCustomCommand->GetNumberRows();
     if (rowCount > 0)
         m_gridCustomCommand->DeleteRows(0, rowCount);
 
-    m_gridCustomCommand->AppendRows(static_cast<int>(extApp.size()));
-    for (xmlAccess::ExternalApps::const_iterator i = extApp.begin(); i != extApp.end(); ++i)
+    m_gridCustomCommand->AppendRows(static_cast<int>(extAppTmp.size()));
+    for (auto iter = extAppTmp.begin(); iter != extAppTmp.end(); ++iter)
     {
-        const int row = i - extApp.begin();
-        m_gridCustomCommand->SetCellValue(row, 0, i->first);  //description
-        m_gridCustomCommand->SetCellValue(row, 1, i->second); //commandline
+        const int row = iter - extAppTmp.begin();
+        m_gridCustomCommand->SetCellValue(row, 0, iter->first);  //description
+        m_gridCustomCommand->SetCellValue(row, 1, iter->second); //commandline
     }
     Fit();
 }
@@ -981,9 +908,12 @@ xmlAccess::ExternalApps GlobalSettingsDlg::getExtApp()
 {
     xmlAccess::ExternalApps output;
     for (int i = 0; i < m_gridCustomCommand->GetNumberRows(); ++i)
-        output.push_back(
-            std::make_pair(m_gridCustomCommand->GetCellValue(i, 0),   //description
-                           m_gridCustomCommand->GetCellValue(i, 1))); //commandline
+    {
+        auto entry = std::make_pair(m_gridCustomCommand->GetCellValue(i, 0),  //description
+                                    m_gridCustomCommand->GetCellValue(i, 1)); //commandline
+        if (!entry.first.empty() || !entry.second.empty())
+            output.push_back(entry);
+    }
     return output;
 }
 
@@ -1023,4 +953,122 @@ ReturnSmallDlg::ButtonPressed zen::showGlobalSettingsDlg(xmlAccess::XmlGlobalSet
 {
     GlobalSettingsDlg settingsDlg(NULL, globalSettings);
     return static_cast<ReturnSmallDlg::ButtonPressed>(settingsDlg.ShowModal());
+}
+//########################################################################################
+
+
+class SelectTimespanDlg : public SelectTimespanDlgGenerated
+{
+public:
+    SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo);
+
+private:
+    void OnOkay(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event) { EndModal(0); }
+    void OnClose(wxCloseEvent& event) { EndModal(0); }
+
+    virtual void OnChangeSelectionFrom(wxCalendarEvent& event)
+    {
+        if (m_calendarFrom->GetDate() > m_calendarTo->GetDate())
+            m_calendarTo->SetDate(m_calendarFrom->GetDate());
+    }
+    virtual void OnChangeSelectionTo(wxCalendarEvent& event)
+    {
+        if (m_calendarFrom->GetDate() > m_calendarTo->GetDate())
+            m_calendarFrom->SetDate(m_calendarTo->GetDate());
+    }
+
+    Int64& timeFrom_;
+    Int64& timeTo_;
+};
+
+
+wxDateTime utcToLocalDateTime(time_t utcTime)
+{
+    //wxDateTime models local(!) time (in contrast to what documentation says), but this constructor takes time_t UTC
+    return wxDateTime(utcTime);
+}
+
+time_t localDateTimeToUtc(const wxDateTime& localTime)
+{
+    return localTime.GetTicks();
+}
+
+
+SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo) :
+    SelectTimespanDlgGenerated(parent),
+    timeFrom_(timeFrom),
+    timeTo_(timeTo)
+{
+#ifdef FFS_WIN
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
+#endif
+
+    long style = wxCAL_SHOW_HOLIDAYS;
+
+#ifdef FFS_WIN
+    DWORD firstDayOfWeek = 0;
+    if (::GetLocaleInfo(LOCALE_USER_DEFAULT,                   //__in   LCID Locale,
+                        LOCALE_IFIRSTDAYOFWEEK |               // first day of week specifier, 0-6, 0=Monday, 6=Sunday
+                        LOCALE_RETURN_NUMBER,                  //__in   LCTYPE LCType,
+                        reinterpret_cast<LPTSTR>(&firstDayOfWeek),      //__out  LPTSTR lpLCData,
+                        sizeof(firstDayOfWeek) / sizeof(TCHAR)) != 0 && //__in   int cchData
+        firstDayOfWeek == 6)
+        style |= wxCAL_SUNDAY_FIRST;
+    else //default
+#endif
+        style |= wxCAL_MONDAY_FIRST;
+
+    m_calendarFrom->SetWindowStyleFlag(style);
+    m_calendarTo  ->SetWindowStyleFlag(style);
+
+    //set default values
+    if (timeTo_ == 0)
+        timeTo_ = wxGetUTCTime(); //
+    if (timeFrom_ == 0)
+        timeFrom_ = timeTo_ - 7 * 24 * 3600; //default time span: one week from "now"
+
+    m_calendarFrom->SetDate(utcToLocalDateTime(to<time_t>(timeFrom_)));
+    m_calendarTo  ->SetDate(utcToLocalDateTime(to<time_t>(timeTo_)));
+
+    m_buttonOkay->SetFocus();
+    Fit();
+}
+
+
+void SelectTimespanDlg::OnOkay(wxCommandEvent& event)
+{
+    wxDateTime from = m_calendarFrom->GetDate();
+    wxDateTime to   = m_calendarTo  ->GetDate();
+
+    //align to full days
+    from.ResetTime();
+    to += wxTimeSpan::Day();
+    to.ResetTime(); //reset local(!) time
+    to -= wxTimeSpan::Second(); //go back to end of previous day
+
+    timeFrom_ = localDateTimeToUtc(from);
+    timeTo_   = localDateTimeToUtc(to);
+
+    /*
+    {
+        time_t current = zen::to<time_t>(timeFrom_);
+        struct tm* tdfewst = ::localtime(&current);
+        int budfk = 3;
+    }
+    {
+        time_t current = zen::to<time_t>(timeTo_);
+        struct tm* tdfewst = ::localtime(&current);
+        int budfk = 3;
+    }
+    */
+
+    EndModal(ReturnSmallDlg::BUTTON_OKAY);
+}
+
+
+ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(Int64& timeFrom, Int64& timeTo)
+{
+    SelectTimespanDlg timeSpanDlg(NULL, timeFrom, timeTo);
+    return static_cast<ReturnSmallDlg::ButtonPressed>(timeSpanDlg.ShowModal());
 }
