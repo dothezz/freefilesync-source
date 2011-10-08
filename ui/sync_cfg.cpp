@@ -5,17 +5,17 @@
 // **************************************************************************
 
 #include "sync_cfg.h"
-#include "../library/resources.h"
-#include "../shared/dir_name.h"
+#include "../lib/resources.h"
+#include "../lib/dir_name.h"
 #include <wx/wupdlock.h>
-#include "../shared/mouse_move_dlg.h"
-#include "../shared/string_conv.h"
-#include "../shared/dir_picker_i18n.h"
+#include <wx+/mouse_move_dlg.h>
+#include <wx+/string_conv.h>
+#include <wx+/dir_picker.h>
 #include "gui_generated.h"
 #include <memory>
-#include "../shared/wx_choice_enum.h"
-#include "../shared/dir_name.h"
-#include "../shared/image_tools.h"
+#include <wx+/choice_enum.h>
+#include "../lib/dir_name.h"
+#include <wx+/image_tools.h>
 
 using namespace zen;
 using namespace xmlAccess;

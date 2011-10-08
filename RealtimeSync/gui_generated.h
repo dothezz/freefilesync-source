@@ -1,17 +1,19 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Mar 22 2011)
+// C++ code generated with wxFormBuilder (version Jun 30 2011)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __gui_generated__
-#define __gui_generated__
+#ifndef __GUI_GENERATED_H__
+#define __GUI_GENERATED_H__
 
+#include <wx/artprov.h>
+#include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-
-class FfsDirPickerCtrl;
-class wxButtonWithImage;
+class wxStaticText;
+namespace zen { class BitmapButton; }
+namespace zen { class DirPickerCtrl; }
 
 #include <wx/string.h>
 #include <wx/bitmap.h>
@@ -35,7 +37,7 @@ class wxButtonWithImage;
 #include <wx/spinctrl.h>
 #include <wx/frame.h>
 
-#include "../shared/i18n.h"
+#include "../zen/i18n.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -53,7 +55,6 @@ protected:
     wxMenuItem* m_menuItemAbout;
     wxBoxSizer* bSizerMain;
     wxPanel* m_panelMain;
-
     wxStaticText* m_staticText2;
     wxStaticText* m_staticText3;
     wxStaticText* m_staticText4;
@@ -71,7 +72,7 @@ protected:
     wxTextCtrl* m_textCtrlCommand;
     wxSpinCtrl* m_spinCtrlDelay;
     wxStaticLine* m_staticline1;
-    wxButtonWithImage* m_buttonStart;
+    zen::BitmapButton* m_buttonStart;
     wxButton* m_buttonCancel;
 
     // Virtual event handlers, overide them in your derived class
@@ -87,9 +88,9 @@ protected:
 
 
 public:
-    FfsDirPickerCtrl* m_dirPickerMain;
+    zen::DirPickerCtrl* m_dirPickerMain;
 
-    MainDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RealtimeSync - Automated Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL );
+    MainDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RealtimeSync - Automated Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
     ~MainDlgGenerated();
 
@@ -107,11 +108,11 @@ protected:
 public:
     wxBitmapButton* m_bpButtonRemoveFolder;
     wxTextCtrl* m_txtCtrlDirectory;
-    FfsDirPickerCtrl* m_dirPicker;
+    zen::DirPickerCtrl* m_dirPicker;
 
-    FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1, -1 ), long style = wxTAB_TRAVERSAL );
+    FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
     ~FolderGenerated();
 
 };
 
-#endif //__gui_generated__
+#endif //__GUI_GENERATED_H__

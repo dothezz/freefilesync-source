@@ -1,0 +1,36 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+
+#ifndef GUID_H_INCLUDED
+#define GUID_H_INCLUDED
+
+#include <string>
+#include <boost/uuid/uuid.hpp>
+
+#ifdef __MINGW32__  //boost should start and clean up!
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+
+#include <boost/uuid/uuid_generators.hpp>
+
+#ifdef __MINGW32__
+#pragma GCC diagnostic pop
+#endif
+
+
+namespace zen
+{
+inline
+std::string generateGUID() //creates a 16 byte GUID
+{
+    boost::uuids::uuid nativeRep = boost::uuids::random_generator()();
+    return std::string(nativeRep.begin(), nativeRep.end());
+}
+}
+
+#endif // GUID_H_INCLUDED

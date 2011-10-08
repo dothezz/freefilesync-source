@@ -5,10 +5,10 @@
 // **************************************************************************
 
 #include "structures.h"
-#include "shared/i18n.h"
 #include <iterator>
 #include <stdexcept>
 #include <ctime>
+#include <zen/i18n.h>
 
 using namespace zen;
 
@@ -387,9 +387,9 @@ FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& l
     if (out.includeFilter == FilterConfig().includeFilter)
         out.includeFilter = global.includeFilter;
 
-    out.excludeFilter.Trim(true, false);
+    trim(out.excludeFilter, true, false);
     out.excludeFilter = global.excludeFilter + Zstr("\n") + out.excludeFilter;
-    out.excludeFilter.Trim(true, false);
+    trim(out.excludeFilter, true, false);
 
     //soft filter
     Int64  loctimeFrom;

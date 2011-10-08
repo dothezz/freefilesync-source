@@ -10,8 +10,8 @@
 #include "gui_generated.h"
 #include <vector>
 #include <memory>
-#include "../shared/dir_name.h"
-#include "../shared/dir_picker_i18n.h"
+#include "../lib/dir_name.h"
+#include <wx+/dir_picker.h>
 
 namespace xmlAccess
 {

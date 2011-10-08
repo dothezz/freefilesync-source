@@ -8,16 +8,15 @@
 #define FOLDERPAIR_H_INCLUDED
 
 #include "../structures.h"
-#include "../shared/dir_name.h"
-#include "../library/resources.h"
+#include "../lib/dir_name.h"
+#include "../lib/resources.h"
 #include "small_dlgs.h"
 #include "sync_cfg.h"
 #include <wx/event.h>
 #include <wx/menu.h>
-#include "../shared/util.h"
-#include "../shared/string_conv.h"
-#include "../library/norm_filter.h"
-#include "../shared/custom_button.h"
+#include <wx+/string_conv.h>
+#include "../lib/norm_filter.h"
+#include <wx+/button.h>
 
 namespace zen
 {

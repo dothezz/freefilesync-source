@@ -2,8 +2,8 @@ set argIn = WScript.Arguments
 num = argIn.Count
 
 if num = 0 then
-    WScript.Echo "Call a batch file silently" & VbCrLf & VbCrLf &_
-                 "Usage: WScript Invisible.vbs MyBatchfile.cmd <command line arguments>"
+    WScript.Echo "Call a Windows batch file (*.cmd, *.bat) without showing the console window" & VbCrLf & VbCrLf &_
+                 "Command line:" & VbCrLf & "WScript Invisible.vbs MyBatchfile.cmd <command line arguments>"
     WScript.Quit 1
 end if
 

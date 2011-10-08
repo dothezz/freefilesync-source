@@ -7,7 +7,7 @@
 #ifndef SYNCCONFIG_H_INCLUDED
 #define SYNCCONFIG_H_INCLUDED
 
-#include "../library/process_xml.h"
+#include "../lib/process_xml.h"
 
 namespace zen
 {

@@ -7,9 +7,9 @@
 #ifndef PROGRESSINDICATOR_H_INCLUDED
 #define PROGRESSINDICATOR_H_INCLUDED
 
-#include "../shared/zstring.h"
+#include <zen/zstring.h>
 #include <wx/toplevel.h>
-#include "../library/status_handler.h"
+#include "../lib/status_handler.h"
 #include "main_dlg.h"
 
 namespace zen

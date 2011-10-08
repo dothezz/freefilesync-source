@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>浏览</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows错误代码 %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux错误代码 %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>无效的命令行: %x</target>
 
@@ -223,30 +229,6 @@
 <source>/sec</source>
 <target>/秒</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x 分</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x 小时</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x 天</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>保存配置(&A)...</target>
 
@@ -405,26 +387,20 @@ The command line is executed each time:
 <source>Operation aborted!</source>
 <target>操作已取消!</target>
 
-<source>Could not load a required DLL:</source>
-<target>不能加载所需的动态连接库:</target>
-
 <source>Endless loop when traversing directory:</source>
 <target>遍历目录时出现无限循环:</target>
 
 <source>Error traversing directory:</source>
 <target>遍历目录出错:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows错误代码 %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux错误代码 %x:</target>
-
 <source>Error setting privilege:</source>
 <target>设置权限时出错:</target>
 
 <source>Error moving to Recycle Bin:</source>
 <target>移动到回收站出错:</target>
+
+<source>Could not load a required DLL:</source>
+<target>不能加载所需的动态连接库:</target>
 
 <source>Error writing to synchronization database:</source>
 <target>向同步数据库中写入时出错:</target>
@@ -449,6 +425,30 @@ The command line is executed each time:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x 分</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x 小时</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x 天</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>不能从如下XML节点读取数值:</target>
@@ -648,10 +648,13 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>取消(&C)</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>操作:</target>
+
+<source>Items found:</source>
 <target>已找到的元素:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>剩余的元素:</target>
 
 <source>Speed:</source>
@@ -662,9 +665,6 @@ The command line is executed each time:
 
 <source>Time elapsed:</source>
 <target>已用时间:</target>
-
-<source>Operation:</source>
-<target>操作:</target>
 
 <source>Select variant:</source>
 <target>选择变化的:</target>
@@ -765,7 +765,7 @@ is the same
 <source>Synchronizing...</source>
 <target>同步中...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>已处理的元素:</target>
 
 <source>&Pause</source>
@@ -894,8 +894,8 @@ Exclude: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>事务文件复制</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>首先写文件到临时文件(*.ffs_tmp)然后重命名. 如此保证了一致性，即使在出现致命错误的情况下.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>复制被锁定的文件</target>

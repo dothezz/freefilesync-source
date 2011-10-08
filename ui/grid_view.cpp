@@ -8,7 +8,7 @@
 #include "sorting.h"
 #include "../synchronization.h"
 #include <boost/bind.hpp>
-#include "../shared/stl_tools.h"
+#include <zen/stl_tools.h>
 
 using namespace zen;
 

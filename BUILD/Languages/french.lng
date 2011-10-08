@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Parcourir</target>
 
+<source>Windows Error Code %x:</source>
+<target>Code erreur Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Code erreur Linux %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Ligne de commande incorrecte : %x</target>
 
@@ -226,33 +232,6 @@
 <source>/sec</source>
 <target>/sec</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x heure</pluralform>
-<pluralform>%x heures</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x jour</pluralform>
-<pluralform>%x jours</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>S&auvegarder la configuration...</target>
 
@@ -417,12 +396,6 @@ La ligne de commande est exécutée chaque fois que :
 <source>Error traversing directory:</source>
 <target>Erreur lors du parcours du répertoire :</target>
 
-<source>Windows Error Code %x:</source>
-<target>Code erreur Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Code erreur Linux %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Erreur de paramétrage de privilège</target>
 
@@ -455,6 +428,33 @@ La ligne de commande est exécutée chaque fois que :
 
 <source>%x%</source>
 <target>%x %</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x heure</pluralform>
+<pluralform>%x heures</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x jour</pluralform>
+<pluralform>%x jours</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Impossible de lire les valeurs des noeuds XML suivants :</target>
@@ -654,10 +654,13 @@ La ligne de commande est exécutée chaque fois que :
 <source>&Cancel</source>
 <target>&Annuler</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Opération :</target>
+
+<source>Items found:</source>
 <target>Elements trouvés :</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Elements restants :</target>
 
 <source>Speed:</source>
@@ -668,9 +671,6 @@ La ligne de commande est exécutée chaque fois que :
 
 <source>Time elapsed:</source>
 <target>Temps écoulé :</target>
-
-<source>Operation:</source>
-<target>Opération :</target>
 
 <source>Select variant:</source>
 <target>Choisissez une variante :</target>
@@ -771,7 +771,7 @@ est identique
 <source>Synchronizing...</source>
 <target>Synchronisation en cours...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Elements traités :</target>
 
 <source>&Pause</source>
@@ -900,8 +900,8 @@ Exclude: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>Copie de fichiers transactionnelle</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>L'écriture préalable de fichiers dans un répertoire temporaire (*.ffs_tmp) avant de les renommer garantit la cohérence et la sécurité en cas d'erreur fatale.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Copier les fichiers verrouillés</target>
@@ -995,6 +995,18 @@ Transfert des attributs système des fichiers et des répertoires
 
 <source>Auto-adjust columns</source>
 <target>Auto-ajustement des colonnes</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Inclure toutes les lignes</target>

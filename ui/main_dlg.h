@@ -7,14 +7,14 @@
 #ifndef MAINDIALOG_H
 #define MAINDIALOG_H
 
-#include "gui_generated.h"
-#include <stack>
-#include "../library/process_xml.h"
 #include <memory>
 #include <map>
 #include <set>
 #include <wx/aui/aui.h>
-#include "../shared/int64.h"
+#include <zen/int64.h>
+#include <stack>
+#include "gui_generated.h"
+#include "../lib/process_xml.h"
 
 class FolderHistory;
 class CustomGrid;
@@ -38,10 +38,11 @@ class GridView;
 class MainDialog : public MainDialogGenerated
 {
 public:
-    MainDialog(const wxString& cfgFileName,
+    MainDialog(const std::vector<wxString>& cfgFileNames, //default behavior, application start
                xmlAccess::XmlGlobalSettings& settings);
 
-    MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
+    MainDialog(const std::vector<wxString>& referenceFiles,
+               const xmlAccess::XmlGuiConfig& guiCfg,
                xmlAccess::XmlGlobalSettings& settings,
                bool startComparison);
 
@@ -204,7 +205,6 @@ private:
     void refreshGridAfterFilterChange(int delay);
 
     void OnResize(              wxSizeEvent& event);
-    //void OnResizeTopButtons(    wxEvent& event);
     void OnResizeFolderPairs(   wxEvent& event);
     void OnResizeConfigPanel(   wxEvent& event);
     void OnResizeViewPanel(     wxEvent& event);

@@ -8,7 +8,7 @@
 </header>
 
 <source>Searching for directory %x...</source>
-<target></target>
+<target>Пошук каталогу  %x...</target>
 
 <source>Show in Explorer</source>
 <target>Показати у Провіднику</target>
@@ -25,17 +25,23 @@
 <source>Browse</source>
 <target>Переглянути</target>
 
+<source>Windows Error Code %x:</source>
+<target>Код помилки Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Код помилки Linux %x:</target>
+
 <source>Invalid command line: %x</source>
-<target></target>
+<target>Неправильний командний рядок: %x</target>
 
 <source>Error resolving symbolic link:</source>
 <target>Помилка при вирішені символічного посилання:</target>
 
 <source>Show pop-up</source>
-<target></target>
+<target>Показувати виринаючі вікна</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target></target>
+<target>Показувати виринаючі вікна при помилках та попередженнях</target>
 
 <source>Ignore errors</source>
 <target>Ігнорувати помилки</target>
@@ -50,7 +56,7 @@
 <target>Перервати синхронізацію негайно</target>
 
 <source>Select alternate comparison settings</source>
-<target></target>
+<target>Вибрати альтернативні налаштування порівняння</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Вибрати альтернативні налаштування синхронізації</target>
@@ -107,7 +113,7 @@
 <target>Знайти</target>
 
 <source>Select time span</source>
-<target></target>
+<target>Виберіть часовий інтервал</target>
 
 <source>%x MB</source>
 <target>%x МБ</target>
@@ -144,7 +150,7 @@
 <target>Повний шлях</target>
 
 <source>Filename</source>
-<target>Ім’я файла</target>
+<target>Ім’я файлу</target>
 
 <source>Relative path</source>
 <target>Відносний шлях</target>
@@ -165,19 +171,19 @@
 <target>Вступна синхронізація:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Файла бази даних FreeFileSync ще не існує:</target>
+<target>Файлу бази даних FreeFileSync ще не існує:</target>
 
 <source>Error reading from synchronization database:</source>
 <target>Помилка при читанні з бази даних синхронізації:</target>
 
 <source>Database files do not share a common synchronization session:</source>
-<target></target>
+<target>Файли бази даних не мають спільної сесії синхронізації</target>
 
 <source>An exception occurred!</source>
 <target>Відбулось виключення!</target>
 
 <source>Error reading file attributes:</source>
-<target>Помилка при читанні параметрів файла:</target>
+<target>Помилка при читанні параметрів файлу:</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Очікування зняття блокування з каталогу (%x)...</target>
@@ -211,7 +217,11 @@
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>[1 Нить виконання]</pluralform>
+<pluralform>[%x Ниті виконання]</pluralform>
+<pluralform>[%x Нитей виконання]</pluralform>
+</target>
 
 <source>Invalid FreeFileSync config file!</source>
 <target>Неправильний файл конфігурації FreeFileSync!</target>
@@ -220,40 +230,10 @@
 <target>Файл не існує:</target>
 
 <source>Error parsing configuration file:</source>
-<target>Помилка при анализі файла налаштувань синхронізації:</target>
+<target>Помилка при анализі файлу налаштувань синхронізації:</target>
 
 <source>/sec</source>
 <target>/сек</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x хв</pluralform>
-<pluralform>%x хв</pluralform>
-<pluralform>%x хв</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x година</pluralform>
-<pluralform>%x години</pluralform>
-<pluralform>%x годин</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x день</pluralform>
-<pluralform>%x дні</pluralform>
-<pluralform>%x днів</pluralform>
-</target>
 
 <source>S&ave configuration...</source>
 <target>Зберегти налаштування...</target>
@@ -360,10 +340,10 @@ The command line is executed each time:
 <target>Помилка перетворення:</target>
 
 <source>Error deleting file:</source>
-<target>Помилка при вилученні файла:</target>
+<target>Помилка при вилученні файлу:</target>
 
 <source>Error moving file:</source>
-<target>Помилка переміщення файла:</target>
+<target>Помилка переміщення файлу:</target>
 
 <source>Target file already existing!</source>
 <target>Кінцевий файл уже існує!</target>
@@ -378,7 +358,7 @@ The command line is executed each time:
 <target>Помилка при вилученні каталогу:</target>
 
 <source>Error changing modification time:</source>
-<target>Помилка при зміні часу модификації файла:</target>
+<target>Помилка при зміні часу модификації файлу:</target>
 
 <source>Error loading library function:</source>
 <target>Помилка при завантаженні функції бібліотеки:</target>
@@ -399,16 +379,16 @@ The command line is executed each time:
 <target>Помилка при копіюванні символьного посилання:</target>
 
 <source>Error copying file:</source>
-<target>Помилка при копіюванні файла:</target>
+<target>Помилка при копіюванні файлу:</target>
 
 <source>Error opening file:</source>
-<target>Помилка при відкриванні файла:</target>
+<target>Помилка при відкриванні файлу:</target>
 
 <source>Error writing file:</source>
-<target>Помилка при записі файла:</target>
+<target>Помилка при записі файлу:</target>
 
 <source>Error reading file:</source>
-<target>Помилка при читанні файла:</target>
+<target>Помилка при читанні файлу:</target>
 
 <source>Operation aborted!</source>
 <target>Операція відмінена!</target>
@@ -418,12 +398,6 @@ The command line is executed each time:
 
 <source>Error traversing directory:</source>
 <target>Помилка обходу каталогу:</target>
-
-<source>Windows Error Code %x:</source>
-<target>Код помилки Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Код помилки Linux %x:</target>
 
 <source>Error setting privilege:</source>
 <target>Помилка встановлення привилеїв:</target>
@@ -438,16 +412,16 @@ The command line is executed each time:
 <target>Помилка при записі у базу данних синхронізації:</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
-<target></target>
+<target>Помилка доступу до послуги Тіньового Копіювання Тому</target>
 
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Створення тіньових копій на WOW64 не підтримується. Будь ласка, використайте FreeFileSync 64-розрядної версії.</target>
 
 <source>Could not determine volume name for file:</source>
-<target>Не вдалося визначити назву тому для файла:</target>
+<target>Не вдалося визначити назву тому для файлу:</target>
 
 <source>Volume name %x not part of filename %y!</source>
-<target>Ім’я тому %x не є частиною імені файла %y!</target>
+<target>Ім’я тому %x не є частиною імені файлу %y!</target>
 
 <source>%x TB</source>
 <target>%x ТБ</target>
@@ -457,6 +431,36 @@ The command line is executed each time:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x хв</pluralform>
+<pluralform>%x хв</pluralform>
+<pluralform>%x хв</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x година</pluralform>
+<pluralform>%x години</pluralform>
+<pluralform>%x годин</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x день</pluralform>
+<pluralform>%x дні</pluralform>
+<pluralform>%x днів</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Не вдалося прочитати значення таких XML записів:</target>
@@ -585,7 +589,7 @@ The command line is executed each time:
 <target>Зберегти активні налаштування в файлі</target>
 
 <source>Load configuration from file</source>
-<target>Завантажити налаштування синхронізації з файла</target>
+<target>Завантажити налаштування синхронізації з файлу</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>
@@ -615,7 +619,7 @@ The command line is executed each time:
 <target>Пакетне завдання</target>
 
 <source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target></target>
+<target>Створіть пакетний файл для автоматичної синхронізації. Для виконання пакетної синхронізації просто двічі клацніть файл мишкою або скористайтесь командним рядком: FreeFileSync.exe <ffs_batch file>. Можна також використати планувальник завдань операційної системи</target>
 
 <source>Help</source>
 <target>Допомога</target>
@@ -639,7 +643,7 @@ The command line is executed each time:
 <target>Статус оберненого зв’язку</target>
 
 <source>Run minimized</source>
-<target></target>
+<target>Запустити згорнутим</target>
 
 <source>Maximum number of logfiles:</source>
 <target>Максимальна кількість лог-файлів:</target>
@@ -648,7 +652,7 @@ The command line is executed each time:
 <target>Виберіть каталог для лог-файлів:</target>
 
 <source>Batch settings</source>
-<target></target>
+<target>Налаштування пакетного завдання</target>
 
 <source>&Save</source>
 <target>&Зберегти</target>
@@ -659,10 +663,13 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>&Відмінити</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Операція:</target>
+
+<source>Items found:</source>
 <target>Елементів знайдено:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Елементів залишилось:</target>
 
 <source>Speed:</source>
@@ -673,9 +680,6 @@ The command line is executed each time:
 
 <source>Time elapsed:</source>
 <target>Пройшло часу:</target>
-
-<source>Operation:</source>
-<target>Операція:</target>
 
 <source>Select variant:</source>
 <target>Виберіть варіант:</target>
@@ -746,10 +750,15 @@ Files are found equal if
      - file size
 are the same
 </source>
-<target></target>
+<target>
+Файли вважаються однаковими якщо
+     - дата і час останнього запису
+     - розмір файлів
+співпадають
+</target>
 
 <source>File time and size</source>
-<target></target>
+<target>Дата та розмір файлу</target>
 
 <source>
 Files are found equal if
@@ -759,7 +768,7 @@ is the same
 <target>Файли вважаються рівними, якщо вміст файлів однаковий</target>
 
 <source>File content</source>
-<target>Вміст файла</target>
+<target>Вміст файлу</target>
 
 <source>Symbolic Link handling</source>
 <target>Обробка символьного посилання</target>
@@ -767,7 +776,7 @@ is the same
 <source>Synchronizing...</source>
 <target>Синхронізація...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Елементів оброблено:</target>
 
 <source>&Pause</source>
@@ -879,10 +888,10 @@ Exclude: \stuff\temp\*
 <target>Виключити</target>
 
 <source>Minimum file size</source>
-<target></target>
+<target>Мінімальний розмір файлу</target>
 
 <source>Maximum file size</source>
-<target></target>
+<target>Максимальний розмір файлу</target>
 
 <source>&Default</source>
 <target>&За замовчуванням</target>
@@ -894,10 +903,10 @@ Exclude: \stuff\temp\*
 <target>Перемістити донизу</target>
 
 <source>Transactional file copy</source>
-<target></target>
+<target>Копіювання файлів з використанням трансакцій</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target></target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target>Записати до тимчасового файлу (*.ffs_tmp), а потім перейменувати. Це гарантує збереження даних навіть при критичній помилці.</target>
 
 <source>Copy locked files</source>
 <target>Копіювати заблоковані файли</target>
@@ -913,14 +922,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 </target>
 
 <source>Copy file access permissions</source>
-<target></target>
+<target>Копіювати права доступу до файлу</target>
 
 <source>
 Transfer file and directory permissions
 (Requires Administrator rights)
 </source>
 <target>
-Передача прав доступу файла/каталогу
+Передача прав доступу файлу/каталогу
 (потрібні права Адміністратора)
 </target>
 
@@ -988,10 +997,22 @@ Transfer file and directory permissions
 <target>Вибрати колонки...</target>
 
 <source>Select time span...</source>
-<target></target>
+<target>Виберіть інтервал часу...</target>
 
 <source>Auto-adjust columns</source>
 <target>Автовирівнювання ширини колонок</target>
+
+<source>Icon size:</source>
+<target>Розмір іконки:</target>
+
+<source>Small</source>
+<target>Малий</target>
+
+<source>Medium</source>
+<target>середній</target>
+
+<source>Large</source>
+<target>великий</target>
 
 <source>Include all rows</source>
 <target>Відмінити всі</target>
@@ -1193,19 +1214,19 @@ Transfer file and directory permissions
 <target>Неактивний</target>
 
 <source>Last x hours</source>
-<target></target>
+<target>Останні x годин</target>
 
 <source>Today</source>
-<target></target>
+<target>Сьогодні</target>
 
 <source>This week</source>
-<target></target>
+<target>Цього тижня</target>
 
 <source>This month</source>
-<target></target>
+<target>Цього місяця</target>
 
 <source>This year</source>
-<target></target>
+<target>Цього року</target>
 
 <source>Byte</source>
 <target>Байт</target>
@@ -1232,13 +1253,13 @@ Transfer file and directory permissions
 <target>Послідовно</target>
 
 <source>Copy NTFS permissions</source>
-<target></target>
+<target>Копіювати права доступу NTFS</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Інтеграція зовнішніх додатків в контекстному меню. Доступні макроси:</target>
 
 <source>- full file or directory name</source>
-<target>- повне ім’я файла чи каталога</target>
+<target>- повне ім’я файлу чи каталога</target>
 
 <source>- directory part only</source>
 <target>- лише каталог</target>
@@ -1378,55 +1399,55 @@ Transfer file and directory permissions
 <target>Нічого не робити</target>
 
 <source>Copy file attributes only to left</source>
-<target>Зкопіювати ліворуч лише атрибути файла</target>
+<target>Зкопіювати ліворуч лише атрибути файлу</target>
 
 <source>Copy file attributes only to right</source>
-<target>Зкопіювати праворуч лише атрибути файла</target>
+<target>Зкопіювати праворуч лише атрибути файлу</target>
 
 <source>Deleting file %x</source>
-<target>Вилучення файла %x</target>
+<target>Вилучення файлу %x</target>
 
 <source>Deleting folder %x</source>
 <target>Вилучення папки %x</target>
 
 <source>Deleting symbolic link %x</source>
-<target></target>
+<target>Вилучення символьного посилання %x</target>
 
 <source>Moving file %x to recycle bin</source>
-<target></target>
+<target>Переміщення файлу %x у Корзину</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target></target>
+<target>Переміщення папки %x у Корзину</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target></target>
+<target>Переміщення символьного посилання %x у Корзину</target>
 
 <source>Moving file %x to %y</source>
-<target></target>
+<target>Переміщення файлу %x до %y</target>
 
 <source>Moving folder %x to %y</source>
-<target></target>
+<target>Переміщення папки %x до %y</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target></target>
+<target>Переміщення символьного посилання %x до %y</target>
 
 <source>Creating file %x</source>
-<target></target>
+<target>Створення файлу %x</target>
 
 <source>Creating symbolic link %x</source>
-<target></target>
+<target>Створення символьного посилання %x</target>
 
 <source>Creating folder %x</source>
 <target>Створення папки %x</target>
 
 <source>Overwriting file %x</source>
-<target></target>
+<target>Перезапис файлу %x</target>
 
 <source>Overwriting symbolic link %x</source>
-<target></target>
+<target>Перезапис символьного посилання %x</target>
 
 <source>Verifying file %x</source>
-<target>Перевірка файла %x</target>
+<target>Перевірка файлу %x</target>
 
 <source>Updating attributes of %x</source>
 <target>Оновлення атрибутів %x</target>
@@ -1435,7 +1456,7 @@ Transfer file and directory permissions
 <target>Кінцевий каталог не повинен бути порожнім</target>
 
 <source>User-defined directory for deletion was not specified!</source>
-<target>Каталог для вилучення користувачем вказана не була!</target>
+<target>Каталог для вилучення користувачем не був вказаний!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Каталог-джерело вже не існує:</target>
@@ -1462,7 +1483,7 @@ Transfer file and directory permissions
 <target>Доступно вільного місця на диску:</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target></target>
+<target>Корзина для цього шляху недоступна. Файли будуть вилучені назавжди:</target>
 
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Каталог, який є частиною декількох пар папок, буде змінений. Будь ласка, перевірте налаштування синхронізації!</target>
@@ -1477,7 +1498,7 @@ Transfer file and directory permissions
 <target>Нічого синхронізувати згідно з налаштуваннями синхронізації!</target>
 
 <source>Error copying locked file %x!</source>
-<target>Помилка при копіюванні заблокованого файла %x!</target>
+<target>Помилка при копіюванні заблокованого файлу %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Помилка перевірки даних: вхідний і вихідний файли мають різний вміст!</target>

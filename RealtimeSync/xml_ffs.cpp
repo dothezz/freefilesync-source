@@ -5,18 +5,17 @@
 // **************************************************************************
 
 #include "xml_ffs.h"
-#include "../shared/standard_paths.h"
-#include "../shared/zstring.h"
-#include "../shared/xml_base.h"
-#include "../shared/string_conv.h"
+#include "../lib/ffs_paths.h"
+#include <zen/zstring.h>
+#include <wx+/string_conv.h>
 
 //include FreeFileSync xml headers
-#include "../library/process_xml.h"
+#include "../lib/process_xml.h"
 
 using namespace zen;
 
 
-xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& batchCfg, const wxString& filename)
+xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& batchCfg, const Zstring& filename)
 {
     xmlAccess::XmlRealConfig output;
 
@@ -64,11 +63,11 @@ void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConf
     catch (const xmlAccess::FfsXmlError& e)
     {
         if (e.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-            config = convertBatchToReal(batchCfg, filename); //do work despite parsing errors, then re-throw
+            config = convertBatchToReal(batchCfg, toZ(filename)); //do work despite parsing errors, then re-throw
 
         throw;                                 //
     }
-    config = convertBatchToReal(batchCfg, filename);
+    config = convertBatchToReal(batchCfg, toZ(filename));
 }
 
 

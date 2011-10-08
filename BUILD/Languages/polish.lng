@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Przeglądaj</target>
 
+<source>Windows Error Code %x:</source>
+<target>Błąd systemu Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Błąd systemu linux %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Nieprawidłowa komenda: %x</target>
 
@@ -229,36 +235,6 @@
 <source>/sec</source>
 <target>/sekundę</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 minuta</pluralform>
-<pluralform>%x minuty</pluralform>
-<pluralform>%x minut</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 godzina</pluralform>
-<pluralform>%x godziny</pluralform>
-<pluralform>%x godzin</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dzień</pluralform>
-<pluralform>%x dni</pluralform>
-<pluralform>%x dni</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>Z&apisz konfigurację...</target>
 
@@ -417,26 +393,20 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Operation aborted!</source>
 <target>Operacja przerwana!</target>
 
-<source>Could not load a required DLL:</source>
-<target>Nie można załadować wymaganej biblioteki DLL:</target>
-
 <source>Endless loop when traversing directory:</source>
 <target>Zapętlenie podczas przeglądania katalogu:</target>
 
 <source>Error traversing directory:</source>
 <target>Błąd podczas odczytywania katalogu:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Błąd systemu Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Błąd systemu linux %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Błąd ustawiania uprawnień:</target>
 
 <source>Error moving to Recycle Bin:</source>
 <target>Błąd podczas przenoszenia do kosza:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Nie można załadować wymaganej biblioteki DLL:</target>
 
 <source>Error writing to synchronization database:</source>
 <target>Błąd zapisu do bazy danych synchronizacji:</target>
@@ -461,6 +431,36 @@ Komenda jest wykonwywana za każdym razem gdy:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 minuta</pluralform>
+<pluralform>%x minuty</pluralform>
+<pluralform>%x minut</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 godzina</pluralform>
+<pluralform>%x godziny</pluralform>
+<pluralform>%x godzin</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dzień</pluralform>
+<pluralform>%x dni</pluralform>
+<pluralform>%x dni</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Nie można odczytać wartości dla danych gałęzi XML:</target>
@@ -660,10 +660,13 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>&Cancel</source>
 <target>&Anuluj</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Operacja:</target>
+
+<source>Items found:</source>
 <target>Znalezione elementy:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Pozostałe elementy:</target>
 
 <source>Speed:</source>
@@ -674,9 +677,6 @@ Komenda jest wykonwywana za każdym razem gdy:
 
 <source>Time elapsed:</source>
 <target>Czas:</target>
-
-<source>Operation:</source>
-<target>Operacja:</target>
 
 <source>Select variant:</source>
 <target>Wybierz wariant:</target>
@@ -777,7 +777,7 @@ jest identyczna
 <source>Synchronizing...</source>
 <target>Synchronizuję...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Przetworzeone elementy:</target>
 
 <source>&Pause</source>
@@ -906,8 +906,8 @@ Wyklucz: \moje\temp\*
 <source>Transactional file copy</source>
 <target>Transakcyjne kopiowanie pliku</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>Zapisz pliki tymczasowo pod nazwą (*.ffs_tmp), a następnie zmień nazwę. Gwarantuje to spójność kopiowania nawat podczas awarii.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Kopiuj zablokowane pliki</target>
@@ -1001,6 +1001,18 @@ Transfer uprawnień plików i katalogów
 
 <source>Auto-adjust columns</source>
 <target>Autodopasowanie kolumn</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Dołącz wszystkie rzędy</target>

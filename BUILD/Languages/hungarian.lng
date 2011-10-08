@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Tallózás</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows hibakód %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux hibakód %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Érvénytelen parancssor: %x</target>
 
@@ -226,33 +232,6 @@
 <source>/sec</source>
 <target>/másodperc</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 perc</pluralform>
-<pluralform>%x perc</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 óra</pluralform>
-<pluralform>%x óra</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 nap</pluralform>
-<pluralform>%x nap</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>Beállítások mentés&e...</target>
 
@@ -411,26 +390,20 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Operation aborted!</source>
 <target>Művelet megszakítva!</target>
 
-<source>Could not load a required DLL:</source>
-<target>A szükséges DLL betöltése sikertelen:</target>
-
 <source>Endless loop when traversing directory:</source>
 <target>Végtelen hurok a mappák bejárásakor:</target>
 
 <source>Error traversing directory:</source>
 <target>A mappa átnézése sikertelen:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows hibakód %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux hibakód %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Hiba történt a jogok beállítása közben:</target>
 
 <source>Error moving to Recycle Bin:</source>
 <target>A Lomtárba (Recycle Bin) mozgatás sikertelen:</target>
+
+<source>Could not load a required DLL:</source>
+<target>A szükséges DLL betöltése sikertelen:</target>
 
 <source>Error writing to synchronization database:</source>
 <target>Hiba történt a szinkronizációs adatbázis írása közben:</target>
@@ -455,6 +428,33 @@ A parancssor végrehajtódik minden alkalommal, ha:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 perc</pluralform>
+<pluralform>%x perc</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 óra</pluralform>
+<pluralform>%x óra</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 nap</pluralform>
+<pluralform>%x nap</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>A következő XML-csomópontok értékének beolvasása sikertelen:</target>
@@ -654,10 +654,13 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>&Cancel</source>
 <target>&Mégsem</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Művelet:</target>
+
+<source>Items found:</source>
 <target>Talált elemek száma:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Hátralévő elemek száma:</target>
 
 <source>Speed:</source>
@@ -668,9 +671,6 @@ A parancssor végrehajtódik minden alkalommal, ha:
 
 <source>Time elapsed:</source>
 <target>Eltelt idő:</target>
-
-<source>Operation:</source>
-<target>Művelet:</target>
 
 <source>Select variant:</source>
 <target>Változat kiválasztása:</target>
@@ -769,7 +769,7 @@ A fájlok megegyeznek, ha megegyezik
 <source>Synchronizing...</source>
 <target>Szinkronizálás folyamatban...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Feldolgozott elemek száma:</target>
 
 <source>&Pause</source>
@@ -901,8 +901,8 @@ Kizárni: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>Tranzakciós fájlmásolás</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>A fájlok először ideglenes fájlokba (*.ffs_tmp) lesznek írva, majd azok át lesznek nevezve. Ez egyező állapotot garantál még végzetes hiba esetén is.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Zárolt fájlok másolása</target>

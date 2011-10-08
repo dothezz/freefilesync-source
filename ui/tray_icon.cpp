@@ -5,15 +5,14 @@
 // **************************************************************************
 
 #include "tray_icon.h"
-#include "../library/resources.h"
+#include "../lib/resources.h"
 #include "small_dlgs.h"
-#include "../shared/i18n.h"
 #include <wx/taskbar.h>
 #include <cmath>
 #include <wx/image.h>
 #include <wx/menu.h>
 #include <wx/icon.h> //req. by Linux
-#include "../shared/image_tools.h"
+#include <wx+/image_tools.h>
 
 
 const wxEventType FFS_REQUEST_RESUME_TRAY_EVENT = wxNewEventType();

@@ -9,9 +9,7 @@
 #include "msg_popup.h"
 #include "main_dlg.h"
 #include <wx/wupdlock.h>
-#include "../shared/global_func.h"
-#include "../shared/string_conv.h"
-#include "../shared/util.h"
+#include <wx+/string_conv.h>
 
 using namespace zen;
 using namespace xmlAccess;

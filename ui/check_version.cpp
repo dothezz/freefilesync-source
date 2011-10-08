@@ -12,12 +12,13 @@
 #include "../version/version.h"
 #include <wx/utils.h>
 #include <wx/timer.h>
-#include <string_tools.h>
+#include <zen/string_tools.h>
 #include "msg_popup.h"
-#include "../shared/standard_paths.h"
-#include "loki/ScopeGuard.h"
+#include "../lib/ffs_paths.h"
+#include <zen/scope_guard.h>
 #include <wx/tokenzr.h>
-#include "../shared/i18n.h"
+#include <zen/i18n.h>
+
 
 bool getOnlineVersion(wxString& version)
 {

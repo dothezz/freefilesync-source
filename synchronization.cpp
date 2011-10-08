@@ -12,26 +12,24 @@
 #include <wx/log.h>
 #include <wx/file.h>
 #include <boost/bind.hpp>
-#include "shared/string_conv.h"
-#include "shared/util.h"
-#include "shared/loki/ScopeGuard.h"
-#include "library/status_handler.h"
-#include "shared/file_handling.h"
-#include "shared/resolve_path.h"
-#include "shared/recycler.h"
-#include "shared/i18n.h"
-#include "shared/global_func.h"
-#include "shared/disable_standby.h"
-#include "library/db_file.h"
-#include "library/dir_exist_async.h"
-#include "library/cmp_filetime.h"
-#include "shared/file_io.h"
+#include <wx+/string_conv.h>
+#include <wx+/format_unit.h>
+#include <zen/scope_guard.h>
+#include "lib/status_handler.h"
+#include <zen/file_handling.h>
+#include "lib/resolve_path.h"
+#include "lib/recycler.h"
+#include <zen/disable_standby.h>
+#include "lib/db_file.h"
+#include "lib/dir_exist_async.h"
+#include "lib/cmp_filetime.h"
+#include <zen/file_io.h>
 
 #ifdef FFS_WIN
-#include "shared/long_path_prefix.h"
+#include <zen/long_path_prefix.h>
 #include <boost/scoped_ptr.hpp>
-#include "shared/perf.h"
-#include "shared/shadow.h"
+#include <zen/perf.h>
+#include "lib/shadow.h"
 #endif
 
 using namespace zen;
@@ -325,18 +323,6 @@ bool tryReportingError(ProcessCallback& handler, Function cmd) //return "true" o
 }
 
 
-namespace
-{
-template <class S, class T, class U> inline
-S replaceCpy(const S& str, const T& old, const U& replacement, bool replaceAll = true)
-{
-    S tmp = str;
-    zen::replace(tmp, old, replacement, replaceAll);
-    return tmp;
-}
-}
-
-
 /*
 add some postfix to alternate deletion directory: deletionDirectory\<prefix>2010-06-30 12-59-12\
 */
@@ -346,7 +332,7 @@ Zstring getSessionDeletionDir(const Zstring& deletionDirectory, const Zstring& p
     if (formattedDir.empty())
         return Zstring(); //no valid directory for deletion specified (checked later)
 
-    if (!formattedDir.EndsWith(FILE_NAME_SEPARATOR))
+    if (!endsWith(formattedDir, FILE_NAME_SEPARATOR))
         formattedDir += FILE_NAME_SEPARATOR;
 
     const wxString timeNow = replaceCpy(wxDateTime::Now().FormatISOTime(), L":", L"");
@@ -360,7 +346,7 @@ Zstring getSessionDeletionDir(const Zstring& deletionDirectory, const Zstring& p
 
     //ensure uniqueness
     for (int i = 1; zen::somethingExists(output); ++i)
-        output = formattedDir + Zchar('_') + Zstring::fromNumber(i);
+        output = formattedDir + Zchar('_') + toString<Zstring>(i);
 
     output += FILE_NAME_SEPARATOR;
     return output;
@@ -481,7 +467,7 @@ void DeletionHandling::tryCleanup() //throw FileError
     if (!cleanedUp)
     {
         if (deletionType == MOVE_TO_RECYCLE_BIN) //clean-up temporary directory (recycle bin)
-            zen::moveToRecycleBin(sessionDelDir.BeforeLast(FILE_NAME_SEPARATOR)); //throw FileError
+            zen::moveToRecycleBin(beforeLast(sessionDelDir, FILE_NAME_SEPARATOR)); //throw FileError
 
         cleanedUp = true;
     }
@@ -539,7 +525,7 @@ void DeletionHandling::removeFile(const Zstring& relativeName) const
             if (fileExists(fullName))
             {
                 const Zstring targetFile = sessionDelDir + relativeName; //altDeletionDir ends with path separator
-                const Zstring targetDir  = targetFile.BeforeLast(FILE_NAME_SEPARATOR);
+                const Zstring targetDir  = beforeLast(targetFile, FILE_NAME_SEPARATOR);
 
                 try //rename file: no copying!!!
                 {
@@ -561,7 +547,7 @@ void DeletionHandling::removeFile(const Zstring& relativeName) const
             if (fileExists(fullName))
             {
                 const Zstring targetFile = sessionDelDir + relativeName; //altDeletionDir ends with path separator
-                const Zstring targetDir  = targetFile.BeforeLast(FILE_NAME_SEPARATOR);
+                const Zstring targetDir  = beforeLast(targetFile, FILE_NAME_SEPARATOR);
 
                 if (!dirExists(targetDir))
                     createDirectory(targetDir); //throw FileError
@@ -591,7 +577,7 @@ void DeletionHandling::removeFolder(const Zstring& relativeName) const
             if (dirExists(fullName))
             {
                 const Zstring targetDir      = sessionDelDir + relativeName;
-                const Zstring targetSuperDir = targetDir.BeforeLast(FILE_NAME_SEPARATOR);
+                const Zstring targetSuperDir = beforeLast(targetDir, FILE_NAME_SEPARATOR);
 
                 try //rename directory: no copying!!!
                 {
@@ -613,7 +599,7 @@ void DeletionHandling::removeFolder(const Zstring& relativeName) const
             if (dirExists(fullName))
             {
                 const Zstring targetDir      = sessionDelDir + relativeName;
-                const Zstring targetSuperDir = targetDir.BeforeLast(FILE_NAME_SEPARATOR);
+                const Zstring targetSuperDir = beforeLast(targetDir, FILE_NAME_SEPARATOR);
 
                 if (!dirExists(targetSuperDir))
                     createDirectory(targetSuperDir); //throw FileError
@@ -886,8 +872,8 @@ void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
     std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
                   [&](DirMapping& dirObj)
     {
-        const bool letsDoThis = (pass == FIRST_PASS) == diskSpaceIsReduced(dirObj); //to be deleted files on first pass, rest on second!
-        if (letsDoThis) //running folder creation on first pass only, works, but looks strange for initial mirror sync when all folders are created at once
+        const bool letsDoThis = (pass == FIRST_PASS) == diskSpaceIsReduced(dirObj); //to be deleted dirs on first pass, rest on second!
+        if (letsDoThis) //if we created all folders on first pass it would look strange for initial mirror sync when all folders are created at once
             tryReportingError(procCallback_, [&]() { synchronizeFolder(dirObj); });
 
         //recursion!
@@ -1025,7 +1011,7 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
 
             if (fileObj.getShortName<LEFT_SIDE>() != fileObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
                 renameFile(fileObj.getFullName<LEFT_SIDE>(),
-                           fileObj.getFullName<LEFT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + fileObj.getShortName<RIGHT_SIDE>()); //throw FileError;
+                           beforeLast(fileObj.getFullName<LEFT_SIDE>(), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + fileObj.getShortName<RIGHT_SIDE>()); //throw FileError;
 
             if (!sameFileTime(fileObj.getLastWriteTime<LEFT_SIDE>(), fileObj.getLastWriteTime<RIGHT_SIDE>(), 2)) //respect 2 second FAT/FAT32 precision
                 setFileTime(fileObj.getFullName<LEFT_SIDE>(), fileObj.getLastWriteTime<RIGHT_SIDE>(), SYMLINK_FOLLOW); //throw FileError
@@ -1040,7 +1026,7 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
 
             if (fileObj.getShortName<LEFT_SIDE>() != fileObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
                 renameFile(fileObj.getFullName<RIGHT_SIDE>(),
-                           fileObj.getFullName<RIGHT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + fileObj.getShortName<LEFT_SIDE>()); //throw FileError;
+                           beforeLast(fileObj.getFullName<RIGHT_SIDE>(), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + fileObj.getShortName<LEFT_SIDE>()); //throw FileError;
 
             if (!sameFileTime(fileObj.getLastWriteTime<LEFT_SIDE>(), fileObj.getLastWriteTime<RIGHT_SIDE>(), 2)) //respect 2 second FAT/FAT32 precision
                 setFileTime(fileObj.getFullName<RIGHT_SIDE>(), fileObj.getLastWriteTime<LEFT_SIDE>(), SYMLINK_FOLLOW); //throw FileError
@@ -1170,7 +1156,7 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
 
             if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
                 renameFile(linkObj.getFullName<LEFT_SIDE>(),
-                           linkObj.getFullName<LEFT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + linkObj.getShortName<RIGHT_SIDE>()); //throw FileError;
+                           beforeLast(linkObj.getFullName<LEFT_SIDE>(), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + linkObj.getShortName<RIGHT_SIDE>()); //throw FileError;
 
             if (!sameFileTime(linkObj.getLastWriteTime<LEFT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>(), 2)) //respect 2 second FAT/FAT32 precision
                 setFileTime(linkObj.getFullName<LEFT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>(), SYMLINK_DIRECT); //throw FileError
@@ -1184,7 +1170,7 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
 
             if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
                 renameFile(linkObj.getFullName<RIGHT_SIDE>(),
-                           linkObj.getFullName<RIGHT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + linkObj.getShortName<LEFT_SIDE>()); //throw FileError;
+                           beforeLast(linkObj.getFullName<RIGHT_SIDE>(), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + linkObj.getShortName<LEFT_SIDE>()); //throw FileError;
 
             if (!sameFileTime(linkObj.getLastWriteTime<LEFT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>(), 2)) //respect 2 second FAT/FAT32 precision
                 setFileTime(linkObj.getFullName<RIGHT_SIDE>(), linkObj.getLastWriteTime<LEFT_SIDE>(), SYMLINK_DIRECT); //throw FileError
@@ -1269,7 +1255,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
 
             if (dirObj.getShortName<LEFT_SIDE>() != dirObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
                 renameFile(dirObj.getFullName<LEFT_SIDE>(),
-                           dirObj.getFullName<LEFT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + dirObj.getShortName<RIGHT_SIDE>()); //throw FileError;
+                           beforeLast(dirObj.getFullName<LEFT_SIDE>(), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + dirObj.getShortName<RIGHT_SIDE>()); //throw FileError;
             //copyFileTimes(dirObj.getFullName<RIGHT_SIDE>(), dirObj.getFullName<LEFT_SIDE>(), true); //throw FileError -> is executed after sub-objects have finished synchronization
 
             dirObj.copyTo<LEFT_SIDE>(); //-> both sides *should* be completely equal now...
@@ -1281,7 +1267,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
 
             if (dirObj.getShortName<LEFT_SIDE>() != dirObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
                 renameFile(dirObj.getFullName<RIGHT_SIDE>(),
-                           dirObj.getFullName<RIGHT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + dirObj.getShortName<LEFT_SIDE>()); //throw FileError;
+                           beforeLast(dirObj.getFullName<RIGHT_SIDE>(), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + dirObj.getShortName<LEFT_SIDE>()); //throw FileError;
             //copyFileTimes(dirObj.getFullName<LEFT_SIDE>(), dirObj.getFullName<RIGHT_SIDE>(), true); //throw FileError -> is executed after sub-objects have finished synchronization
 
             dirObj.copyTo<RIGHT_SIDE>(); //-> both sides *should* be completely equal now...
@@ -1648,8 +1634,8 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         for (auto i = diskSpaceMissing.begin(); i != diskSpaceMissing.end(); ++i)
             warningMessage += wxString(wxT("\n\n")) +
                               "\"" + i->first + "\"\n" +
-                              _("Free disk space required:")  + wxT(" ") + formatFilesizeToShortString(to<UInt64>(i->second.first))  + wxT("\n") +
-                              _("Free disk space available:") + wxT(" ") + formatFilesizeToShortString(to<UInt64>(i->second.second));
+                              _("Free disk space required:")  + wxT(" ") + filesizeToShortString(to<UInt64>(i->second.first))  + wxT("\n") +
+                              _("Free disk space available:") + wxT(" ") + filesizeToShortString(to<UInt64>(i->second.second));
 
         procCallback.reportWarning(warningMessage, m_warnings.warningNotEnoughDiskSpace);
     }
@@ -1695,7 +1681,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     try
     {
         //prevent shutdown while synchronization is in progress
-        util::DisableStandby dummy;
+        DisableStandby dummy;
         (void)dummy;
 
         //loop through all directory pairs
@@ -1727,14 +1713,14 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             //------------------------------------------------------------------------------------------
 
             //create base directories first (if not yet existing) -> no symlink or attribute copying! -> single error message instead of one per file (e.g. unplugged network drive)
-            const Zstring dirnameLeft = j->getBaseDirPf<LEFT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR);
-            if (!dirnameLeft.empty() && !dirExistsUpdating(dirnameLeft, procCallback))
+            const Zstring dirnameLeft = beforeLast(j->getBaseDirPf<LEFT_SIDE>(), FILE_NAME_SEPARATOR);
+            if (!dirnameLeft.empty() && !dirExistsUpdating(dirnameLeft, false, procCallback))
             {
                 if (!tryReportingError(procCallback, [&]() { createDirectory(dirnameLeft); })) //may throw in error-callback!
                 continue; //skip this folder pair
             }
-            const Zstring dirnameRight = j->getBaseDirPf<RIGHT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR);
-            if (!dirnameRight.empty() && !dirExistsUpdating(dirnameRight, procCallback))
+            const Zstring dirnameRight = beforeLast(j->getBaseDirPf<RIGHT_SIDE>(), FILE_NAME_SEPARATOR);
+            if (!dirnameRight.empty() && !dirExistsUpdating(dirnameRight, false, procCallback))
             {
                 if (!tryReportingError(procCallback, [&]() { createDirectory(dirnameRight); })) //may throw in error-callback!
                 continue; //skip this folder pair
@@ -1748,7 +1734,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
                 guardUpdateDb.reset(new EnforceUpdateDatabase(*j));
 
             //guarantee removal of invalid entries (where element on both sides is empty)
-            LOKI_ON_BLOCK_EXIT2(BaseDirMapping::removeEmpty(*j););
+            ZEN_ON_BLOCK_EXIT(BaseDirMapping::removeEmpty(*j););
 
             SynchronizeFolderPair syncFP(*this,
 #ifdef FFS_WIN
@@ -1826,7 +1812,7 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
         //start of (possibly) long-running copy process: ensure status updates are performed regularly
         UInt64 bytesReported;
         //in error situation: undo communication of processed amount of data
-        Loki::ScopeGuard guardStatistics = Loki::MakeGuard([&]() { procCallback_.updateProcessedData(0, -1 * to<Int64>(bytesReported)); });
+        zen::ScopeGuard guardStatistics = zen::makeGuard([&]() { procCallback_.updateProcessedData(0, -1 * to<Int64>(bytesReported)); });
 
         WhileCopying<DelTargetCommand> callback(bytesReported, procCallback_, cmd);
         FileAttrib fileAttr;
@@ -1844,7 +1830,7 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
         procCallback_.updateProcessedData(0, to<Int64>(totalBytesToCpy) - to<Int64>(bytesReported));
         bytesReported = totalBytesToCpy;
 
-        guardStatistics.Dismiss();
+        guardStatistics.dismiss();
     };
 
 #ifdef FFS_WIN
@@ -1879,13 +1865,13 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
     //#################### Verification #############################
     if (verifyCopiedFiles)
     {
-        Loki::ScopeGuard guardTarget = Loki::MakeGuard(&removeFile, target); //delete target if verification fails
-        Loki::ScopeGuard guardStatistics = Loki::MakeGuard([&]() { procCallback_.updateProcessedData(0, -1 * to<Int64>(totalBytesToCpy)); });
+        zen::ScopeGuard guardTarget     = zen::makeGuard([&]() { removeFile(target); }); //delete target if verification fails
+        zen::ScopeGuard guardStatistics = zen::makeGuard([&]() { procCallback_.updateProcessedData(0, -1 * to<Int64>(totalBytesToCpy)); });
 
         verifyFileCopy(source, target); //throw FileError
 
-        guardTarget.Dismiss();
-        guardStatistics.Dismiss();
+        guardTarget.dismiss();
+        guardStatistics.dismiss();
     }
 }
 

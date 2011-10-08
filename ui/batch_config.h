@@ -7,8 +7,8 @@
 #ifndef BATCHCONFIG_H_INCLUDED
 #define BATCHCONFIG_H_INCLUDED
 
-#include "../library/process_xml.h"
-#include "../shared/folder_history_box.h"
+#include "../lib/process_xml.h"
+#include "../lib/folder_history_box.h"
 
 namespace zen
 {

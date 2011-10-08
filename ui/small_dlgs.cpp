@@ -7,23 +7,21 @@
 #include "gui_generated.h"
 #include "small_dlgs.h"
 #include "msg_popup.h"
-#include "../library/resources.h"
+#include "../lib/resources.h"
 #include "../algorithm.h"
-#include "../shared/string_conv.h"
-#include "../shared/util.h"
-#include "../shared/wx_choice_enum.h"
+#include <wx+/string_conv.h>
+#include <wx+/format_unit.h>
+#include <wx+/choice_enum.h>
 #include "../synchronization.h"
-#include "../library/custom_grid.h"
-#include "../shared/custom_button.h"
-#include "../shared/i18n.h"
-#include "../shared/global_func.h"
-#include "../shared/build_info.h"
+#include "../lib/custom_grid.h"
+#include <wx+/button.h>
+#include <zen/build_info.h>
 #include <wx/wupdlock.h>
 #include <wx/msgdlg.h>
-#include "../shared/mouse_move_dlg.h"
-#include "../shared/help_provider.h"
-#include "../shared/image_tools.h"
-#include "../shared/stl_tools.h"
+#include <wx+/mouse_move_dlg.h>
+#include "../lib/help_provider.h"
+#include <wx+/image_tools.h>
+#include <zen/stl_tools.h>
 
 using namespace zen;
 
@@ -77,18 +75,18 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 #endif //wxUSE_UNICODE
 
     //compile time info about 32/64-bit build
-    if (util::is64BitBuild)
+    if (zen::is64BitBuild)
         build += wxT(" x64");
     else
         build += wxT(" x86");
-    assert_static(util::is32BitBuild || util::is64BitBuild);
+    assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
     wxString buildFormatted = _("(Build: %x)");
     buildFormatted.Replace(wxT("%x"), build);
 
     m_build->SetLabel(buildFormatted);
 
-    m_animationControl1->SetAnimation(*GlobalResources::instance().animationMoney);
+    m_animationControl1->SetAnimation(GlobalResources::instance().animationMoney);
     m_animationControl1->Play();
 
     m_buttonOkay->SetFocus();
@@ -384,7 +382,7 @@ void DeleteDialog::updateGui()
                     "Do you really want to delete the following %x objects?", delInfo.second);
         m_bitmap12->SetBitmap(GlobalResources::getImage(wxT("deleteFile")));
     }
-    header.Replace(wxT("%x"), toStringSep(delInfo.second));
+    replace(header, L"%x", toStringSep(delInfo.second));
     m_staticTextHeader->SetLabel(header);
 
     const wxString& filesToDelete = delInfo.first;
@@ -607,7 +605,7 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     m_bitmapData->SetBitmap(GlobalResources::getImage(wxT("data")));
 
     m_staticTextVariant->SetLabel(variantName);
-    m_textCtrlData->SetValue(zen::formatFilesizeToShortString(statistics.getDataToProcess()));
+    m_textCtrlData->SetValue(zen::filesizeToShortString(statistics.getDataToProcess()));
 
     m_textCtrlCreateL->SetValue(toStringSep(statistics.getCreate   <LEFT_SIDE>()));
     m_textCtrlUpdateL->SetValue(toStringSep(statistics.getOverwrite<LEFT_SIDE>()));

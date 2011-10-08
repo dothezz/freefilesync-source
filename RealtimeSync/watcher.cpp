@@ -5,14 +5,14 @@
 // **************************************************************************
 
 #include "watcher.h"
-#include "../shared/file_handling.h"
-#include "../shared/i18n.h"
-#include "../shared/stl_tools.h"
+#include <zen/file_handling.h>
+#include <zen/stl_tools.h>
 #include <set>
 #include <wx/timer.h>
-#include "../shared/resolve_path.h"
-#include "../shared/dir_watcher.h"
-#include "../shared/string_conv.h"
+#include "../lib/resolve_path.h"
+#include <zen/dir_watcher.h>
+#include <wx+/string_conv.h>
+#include <zen/thread.h>
 //#include "../library/db_file.h"     //SYNC_DB_FILE_ENDING -> complete file too much of a dependency; file ending too little to decouple into single header
 //#include "../library/lock_holder.h" //LOCK_FILE_ENDING
 #include <wx/msgdlg.h>
@@ -64,12 +64,15 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
         const Zstring& dirnameFmt = *iter;
         try
         {
-            watches.push_back(std::make_pair(dirnameFmt, std::make_shared<DirWatcher>(dirnameFmt))); //throw FileError
+            watches.push_back(std::make_pair(dirnameFmt, std::make_shared<DirWatcher>(dirnameFmt))); //throw FileError, ErrorNotExisting
         }
-        catch (FileError&)
+        catch (ErrorNotExisting&) //nice atomic behavior: *no* second directory existence check!!!
         {
-            //Note: checking for directory existence is NOT transactional!!!
-            if (!dirExists(dirnameFmt)) //that's no good locking behavior, but better than nothing
+            return CHANGE_DIR_MISSING;
+        }
+        catch (FileError&) //play safe: remedy potential FileErrors that should have been ErrorNotExisting (e.g. Linux: errors during directory traversing)
+        {
+            if (!dirExists(dirnameFmt)) //not an atomic behavior!!!
                 return CHANGE_DIR_MISSING;
             throw;
         }
@@ -102,10 +105,10 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
 
             try
             {
-                std::vector<Zstring> changedFiles = watcher.getChanges(); //throw FileError
+                std::vector<Zstring> changedFiles = watcher.getChanges(); //throw FileError, ErrorNotExisting
 
                 //remove to be ignored changes
-                vector_remove_if(changedFiles, [](const Zstring & name)
+                vector_remove_if(changedFiles, [](const Zstring& name)
                 {
                     return endsWith(name, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
                            endsWith(name, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
@@ -122,10 +125,13 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
                 }
 
             }
-            catch (FileError&)
+            catch (ErrorNotExisting&) //nice atomic behavior: *no* second directory existence check!!!
             {
-                //Note: checking for directory existence is NOT transactional!!!
-                if (!dirExists(dirname)) //catch errors related to directory removal, e.g. ERROR_NETNAME_DELETED
+                return CHANGE_DIR_MISSING;
+            }
+            catch (FileError&) //play safe: remedy potential FileErrors that should have been ErrorNotExisting (e.g. Linux: errors during directory traversing)
+            {
+                if (!dirExists(dirname)) //not an atomic behavior!!!
                     return CHANGE_DIR_MISSING;
                 throw;
             }
@@ -149,18 +155,36 @@ void rts::waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt, WaitCal
         {
             lastCheck = current;
 
-            if (std::find_if(dirNamesNonFmt.begin(), dirNamesNonFmt.end(),
-                             [&](const Zstring& dirnameNonFmt) -> bool
-        {
-            //support specifying volume by name => call getFormattedDirectoryName() repeatedly
-            const Zstring formattedDir = zen::getFormattedDirectoryName(dirnameNonFmt);
+            auto ftDirMissing = async([=]() -> bool
+            {
+                return std::find_if(dirNamesNonFmt.begin(), dirNamesNonFmt.end(),
+                [](const Zstring& dirnameNonFmt) -> bool
+                {
+                    //support specifying volume by name => call getFormattedDirectoryName() repeatedly
+                    const Zstring dirnameFmt = zen::getFormattedDirectoryName(dirnameNonFmt);
 
-                if (formattedDir.empty())
-                    throw zen::FileError(_("A directory input field is empty."));
+                    if (dirnameFmt.empty())
+                        throw zen::FileError(_("A directory input field is empty."));
+#ifdef FFS_WIN
+                    //1. login to network share, if necessary
+                    loginNetworkShare(dirnameFmt, false); //login networks shares, no PW prompt -> is this really RTS's task?
+#endif
+                    //2. check dir existence
+                    return !zen::dirExists(dirnameFmt);
+                }) != dirNamesNonFmt.end();
+            });
+            while (!ftDirMissing.timed_wait(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL)))
+                statusHandler->requestUiRefresh(); //may throw!
 
-                return !dirExists(formattedDir);
-            }) == dirNamesNonFmt.end())
-            return;
+            try
+            {
+                if (!ftDirMissing.get()) //throw X
+                    return;
+            }
+            catch (...) //boost::future seems to map async exceptions to "some" boost exception type -> migrate this for C++11
+            {
+                throw zen::FileError(_("A directory input field is empty."));
+            }
         }
 
         wxMilliSleep(rts::UI_UPDATE_INTERVAL);

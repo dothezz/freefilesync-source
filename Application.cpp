@@ -14,25 +14,23 @@
 #include "ui/batch_status_handler.h"
 #include "ui/check_version.h"
 #include <wx/file.h>
-#include "library/resources.h"
+#include "lib/resources.h"
 #include "ui/switch_to_gui.h"
-#include "shared/standard_paths.h"
-#include "shared/i18n.h"
-#include "shared/app_main.h"
+#include "lib/ffs_paths.h"
+#include <wx+/app_main.h>
 #include <wx/sound.h>
-#include "shared/file_handling.h"
-#include "shared/string_conv.h"
-#include "shared/util.h"
+#include <zen/file_handling.h>
+#include <wx+/string_conv.h>
 #include <wx/log.h>
-#include "library/lock_holder.h"
+#include "lib/lock_holder.h"
 
 #ifdef FFS_LINUX
 #include <gtkmm/main.h>
 #include <gtk/gtk.h>
 #endif
 
-
 using namespace zen;
+using namespace xmlAccess;
 
 
 IMPLEMENT_APP(Application)
@@ -53,25 +51,12 @@ bool Application::OnInit()
 
 void Application::OnStartApplication(wxIdleEvent&)
 {
-    using namespace zen;
-
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
 
-    struct HandleAppExit //wxWidgets app exit handling is a bit weird... we want the app to exit only if the logical main window is closed
-    {
-        HandleAppExit()
-        {
-            wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
-        }
-
-        ~HandleAppExit()
-        {
-            if (!zen::AppMainWindow::mainWindowWasSet())
-                wxTheApp->ExitMainLoop(); //quit application, if no main window was set (batch silent mode)
-        }
-
-    } dummy;
-
+    //wxWidgets app exit handling is quite weird... we want the app to exit only if the logical main window is closed
+    wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
+    wxApp* app = wxTheApp;
+    ZEN_ON_BLOCK_EXIT(if (!mainWindowWasSet()) app->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
 
     //if appname is not set, the default is the executable's name!
     SetAppName(wxT("FreeFileSync"));
@@ -79,7 +64,7 @@ void Application::OnStartApplication(wxIdleEvent&)
 #ifdef FFS_LINUX
     Gtk::Main::init_gtkmm_internals();
 
-    ::gtk_rc_parse((Zstring(zen::getResourceDir()) + "styles.rc").c_str()); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((Zstring(getResourceDir()) + "styles.rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
 
@@ -91,67 +76,117 @@ void Application::OnStartApplication(wxIdleEvent&)
 
     try //load global settings from XML: they are written on exit, so read them FIRST
     {
-        if (fileExists(toZ(xmlAccess::getGlobalConfigFile())))
-            xmlAccess::readConfig(globalSettings);
+        if (fileExists(toZ(getGlobalConfigFile())))
+            readConfig(globalSettings);
         //else: globalSettings already has default values
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
         //show messagebox and continue
-        if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
+        if (error.getSeverity() == FfsXmlError::WARNING)
             ; //wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
         else
             wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
     }
 
     //set program language
-    zen::setLanguage(globalSettings.programLanguage);
+    setLanguage(globalSettings.programLanguage);
 
 
     //test if FFS is to be started on UI with config file passed as commandline parameter
+    std::vector<wxString> commandArgs;
+    for (int i = 1; i < argc; ++i)
+        commandArgs.push_back(argv[i]);
 
-    //try to set config/batch-filename set by %1 parameter
-    wxString cfgFilename;
-    if (argc > 1)
+    bool gotDirNames = false;
+    for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
     {
-        const wxString arg1(argv[1]);
+        Zstring filename = toZ(*iter);
 
-        if (fileExists(toZ(arg1)))  //load file specified by %1 parameter:
-            cfgFilename = arg1;
-        else if (fileExists(toZ(arg1 + wxT(".ffs_batch"))))
-            cfgFilename = arg1 + wxT(".ffs_batch");
-        else if (fileExists(toZ(arg1 + wxT(".ffs_gui"))))
-            cfgFilename = arg1 + wxT(".ffs_gui");
-        else
+        if (iter == commandArgs.begin() && dirExists(filename)) //detect which "mode" by testing first command line argument
         {
-            wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + arg1 + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-            returnValue = -13;
-            return;
+            gotDirNames = true;
+            break;
+        }
+
+        if (!fileExists(filename)) //be a little tolerant
+        {
+            if (fileExists(filename + Zstr(".ffs_batch")))
+                filename = filename + Zstr(".ffs_batch");
+            else if (fileExists(filename + Zstr(".ffs_gui")))
+                filename = filename + Zstr(".ffs_gui");
+            else
+            {
+                wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                return;
+            }
         }
     }
 
-    if (!cfgFilename.empty())
-    {
-        //load file specified by %1 parameter:
-        const xmlAccess::XmlType xmlConfigType = xmlAccess::getXmlType(cfgFilename);
-        switch (xmlConfigType)
+    if (commandArgs.empty())
+        runGuiMode(commandArgs, globalSettings);
+    else if (gotDirNames) //mode 1: create temp configuration based on directory names passed
         {
-            case xmlAccess::XML_TYPE_GUI: //start in GUI mode (configuration file specified)
-                runGuiMode(cfgFilename, globalSettings);
-                break;
+            XmlGuiConfig guiCfg;
+            guiCfg.mainCfg.syncCfg.directionCfg.var = DirectionConfig::MIRROR;
 
-            case xmlAccess::XML_TYPE_BATCH: //start in commandline mode
-                runBatchMode(cfgFilename, globalSettings);
-                break;
+            for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
+            {
+                size_t index = iter - commandArgs.begin();
+                Zstring dirname = toZ(*iter);
 
-            case xmlAccess::XML_TYPE_GLOBAL:
-            case xmlAccess::XML_TYPE_OTHER:
-                wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + cfgFilename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-                break;
+                FolderPairEnh& fp = [&]() -> FolderPairEnh&
+                {
+                    if (index < 2)
+                        return guiCfg.mainCfg.firstPair;
+
+                    guiCfg.mainCfg.additionalPairs.resize((index - 2) / 2 + 1);
+                    return guiCfg.mainCfg.additionalPairs.back();
+                }();
+
+                if (index % 2 == 0)
+                    fp.leftDirectory = dirname;
+                else if (index % 2 == 1)
+                    fp.rightDirectory = dirname;
+            }
+
+            runGuiMode(guiCfg, globalSettings);
         }
-    }
-    else //start in GUI mode (standard)
-        runGuiMode(wxEmptyString, globalSettings);
+        else //mode 2: try to set config/batch-filename set by %1 parameter
+            switch (getMergeType(commandArgs)) //throw ()
+            {
+                case MERGE_BATCH: //pure batch config files
+                    if (commandArgs.size() == 1)
+                        runBatchMode(commandArgs[0], globalSettings);
+                    else
+                        runGuiMode(commandArgs, globalSettings);
+                    break;
+
+                case MERGE_GUI:       //pure gui config files
+                case MERGE_GUI_BATCH: //gui and batch files
+                    runGuiMode(commandArgs, globalSettings);
+                    break;
+
+                case MERGE_OTHER: //= none or unknown;
+                    //commandArgs are not empty and contain at least one non-gui/non-batch config file: find it!
+                    std::find_if(commandArgs.begin(), commandArgs.end(),
+                                 [](const wxString& filename) -> bool
+                    {
+                        switch (getXmlType(filename)) //throw()
+                        {
+                            case XML_TYPE_GLOBAL:
+                            case XML_TYPE_OTHER:
+                                wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                                return true;
+
+                            case XML_TYPE_GUI:
+                            case XML_TYPE_BATCH:
+                                break;
+                        }
+                        return false;
+                    });
+                    break;
+            }
 }
 
 
@@ -170,7 +205,7 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(zen::getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
         wxSafeShowMessage(_("An exception occurred!") + L" - FFS", wxString::FromAscii(e.what()));
@@ -178,7 +213,7 @@ int Application::OnRun()
     }
     catch (...) //catch the rest
     {
-        wxFile safeOutput(zen::getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxT("Unknown exception!"));
 
         wxSafeShowMessage(_("An exception occurred!"), wxT("Unknown exception!"));
@@ -192,7 +227,7 @@ int Application::OnRun()
 int Application::OnExit()
 {
     //get program language
-    globalSettings.programLanguage = zen::getLanguage();
+    globalSettings.programLanguage = getLanguage();
 
     try //save global settings to XML
     {
@@ -208,21 +243,29 @@ int Application::OnExit()
 }
 
 
-void Application::runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings& settings)
+void Application::runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, xmlAccess::XmlGlobalSettings& settings)
 {
-    MainDialog* frame = new MainDialog(cfgFileName, settings);
+    MainDialog* frame = new MainDialog(std::vector<wxString>(), guiCfg, settings, true);
     frame->Show();
 }
+
+
+void Application::runGuiMode(const std::vector<wxString>& cfgFileNames, xmlAccess::XmlGlobalSettings& settings)
+{
+    MainDialog* frame = new MainDialog(cfgFileNames, settings);
+    frame->Show();
+}
+
 
 void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings)
 {
     using namespace xmlAccess;
-
+    using namespace zen;
     //load XML settings
-    xmlAccess::XmlBatchConfig batchCfg;  //structure to receive gui settings
+    XmlBatchConfig batchCfg;  //structure to receive gui settings
     try
     {
-        xmlAccess::readConfig(filename, batchCfg);
+        readConfig(filename, batchCfg);
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
@@ -233,25 +276,36 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
     //regular check for program updates -> disabled for batch
     //if (!batchCfg.silent)
-    //    zen::checkForUpdatePeriodically(globSettings.lastUpdateCheck);
+    //    checkForUpdatePeriodically(globSettings.lastUpdateCheck);
 
     try //begin of synchronization process (all in one try-catch block)
     {
-        const SwitchToGui switchBatchToGui(batchCfg, globSettings); //prepare potential operational switch
+        const SwitchToGui switchBatchToGui(filename, batchCfg, globSettings); //prepare potential operational switch
 
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(batchCfg.silent,
-                                         zen::extractJobName(filename),
+                                         extractJobName(filename),
                                          batchCfg.logFileDirectory,
                                          batchCfg.logFileCountMax,
                                          batchCfg.handleError,
                                          switchBatchToGui,
                                          returnValue);
 
-        const std::vector<zen::FolderPairCfg> cmpConfig = zen::extractCompareCfg(batchCfg.mainCfg);
+        const std::vector<FolderPairCfg> cmpConfig = extractCompareCfg(batchCfg.mainCfg);
+
+        bool allowPwPrompt = false;
+        switch (batchCfg.handleError)
+        {
+            case ON_ERROR_POPUP:
+                allowPwPrompt = true;
+                break;
+            case ON_ERROR_IGNORE:
+            case ON_ERROR_EXIT:
+                break;
+        }
 
         //batch mode: place directory locks on directories during both comparison AND synchronization
-        LockHolder dummy;
+        LockHolder dummy(allowPwPrompt);
         std::for_each(cmpConfig.begin(), cmpConfig.end(),
                       [&](const FolderPairCfg& fpCfg)
         {
@@ -260,15 +314,16 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         });
 
         //COMPARE DIRECTORIES
-        zen::CompareProcess cmpProc(globSettings.fileTimeTolerance,
-                                    globSettings.optDialogs,
-                                    statusHandler);
+        CompareProcess cmpProc(globSettings.fileTimeTolerance,
+                               globSettings.optDialogs,
+                               allowPwPrompt,
+                               statusHandler);
 
-        zen::FolderComparison folderCmp;
+        FolderComparison folderCmp;
         cmpProc.startCompareProcess(cmpConfig, folderCmp);
 
         //START SYNCHRONIZATION
-        zen::SyncProcess syncProc(
+        SyncProcess syncProc(
             globSettings.optDialogs,
             globSettings.verifyFileCopy,
             globSettings.copyLockedFiles,
@@ -276,7 +331,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
             globSettings.transactionalFileCopy,
             statusHandler);
 
-        const std::vector<zen::FolderPairSyncCfg> syncProcessCfg = zen::extractSyncCfg(batchCfg.mainCfg);
+        const std::vector<FolderPairSyncCfg> syncProcessCfg = extractSyncCfg(batchCfg.mainCfg);
         assert(syncProcessCfg.size() == folderCmp.size());
 
         syncProc.startSynchronizationProcess(syncProcessCfg, folderCmp);
@@ -284,8 +339,8 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //play (optional) sound notification after sync has completed
         if (!batchCfg.silent)
         {
-            const wxString soundFile = zen::getResourceDir() + wxT("Sync_Complete.wav");
-            if (zen::fileExists(zen::toZ(soundFile)))
+            const wxString soundFile = getResourceDir() + wxT("Sync_Complete.wav");
+            if (fileExists(toZ(soundFile)))
                 wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as a service!
         }
     }

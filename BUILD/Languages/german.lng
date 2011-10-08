@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Auswählen</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows Fehlercode %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Fehlercode %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Ungültige Befehlszeile: %x</target>
 
@@ -226,33 +232,6 @@
 <source>/sec</source>
 <target>/s</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 Min.</pluralform>
-<pluralform>%x Min.</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 Stunde</pluralform>
-<pluralform>%x Stunden</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 Tag</pluralform>
-<pluralform>%x Tage</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>Konfiguration s&peichern...</target>
 
@@ -417,12 +396,6 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Error traversing directory:</source>
 <target>Fehler beim Durchsuchen des Verzeichnisses:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows Fehlercode %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Fehlercode %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Fehler beim Setzen des Privilegs:</target>
 
@@ -455,6 +428,33 @@ Die Befehlszeile wird ausgeführt wenn:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 Min.</pluralform>
+<pluralform>%x Min.</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 Stunde</pluralform>
+<pluralform>%x Stunden</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 Tag</pluralform>
+<pluralform>%x Tage</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Die folgenden XML Knoten konnten nicht gelesen werden:</target>
@@ -654,10 +654,13 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>&Cancel</source>
 <target>&Abbrechen</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Vorgang:</target>
+
+<source>Items found:</source>
 <target>Gefundene Elemente:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Verbleibende Elemente:</target>
 
 <source>Speed:</source>
@@ -668,9 +671,6 @@ Die Befehlszeile wird ausgeführt wenn:
 
 <source>Time elapsed:</source>
 <target>Vergangene Zeit:</target>
-
-<source>Operation:</source>
-<target>Vorgang:</target>
 
 <source>Select variant:</source>
 <target>Variante auswählen:</target>
@@ -771,7 +771,7 @@ gleich ist
 <source>Synchronizing...</source>
 <target>Synchronisiere...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Verarbeitete Elemente:</target>
 
 <source>&Pause</source>
@@ -900,7 +900,7 @@ Ausschließen: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>Kopiere Dateien als Transaktion</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Dateien zuerst temporär schreiben (*.ffs_tmp), anschließend umbenennen. Dadurch wird ein konsistenter Status auch im größten Fehlerfall sichergestellt.</target>
 
 <source>Copy locked files</source>
@@ -995,6 +995,18 @@ Transfer file and directory permissions
 
 <source>Auto-adjust columns</source>
 <target>Spalten automatisch ausrichten</target>
+
+<source>Icon size:</source>
+<target>Symbolgröße</target>
+
+<source>Small</source>
+<target>Klein</target>
+
+<source>Medium</source>
+<target>Mittel</target>
+
+<source>Large</source>
+<target>Groß</target>
 
 <source>Include all rows</source>
 <target>Alle Zeilen einschließen</target>

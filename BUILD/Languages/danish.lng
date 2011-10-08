@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Gennemse</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows Fejl kode %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Fejl kode %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Ugyldig kommando: %x</target>
 
@@ -226,33 +232,6 @@
 <source>/sec</source>
 <target>/sek</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 timer</pluralform>
-<pluralform>%x timer</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dag</pluralform>
-<pluralform>%x dage</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>G&em konfiguration...</target>
 
@@ -411,26 +390,20 @@ Kommando linjen bliver afviklet hver gang:
 <source>Operation aborted!</source>
 <target>Operation afbrudt!</target>
 
-<source>Could not load a required DLL:</source>
-<target>Kunne ikke hente en krævet DLL:</target>
-
 <source>Endless loop when traversing directory:</source>
 <target>Uendelig løkke ved gennemgang af bibliotek:</target>
 
 <source>Error traversing directory:</source>
 <target>Fejl i gennemgang af bibliotek:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows Fejl kode %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Fejl kode %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Fejl i at sætte privilegier:</target>
 
 <source>Error moving to Recycle Bin:</source>
 <target>Fejl i at flytte til skraldespand:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Kunne ikke hente en krævet DLL:</target>
 
 <source>Error writing to synchronization database:</source>
 <target>Fejl i skrivning til synkroniserings databasen:</target>
@@ -455,6 +428,33 @@ Kommando linjen bliver afviklet hver gang:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 timer</pluralform>
+<pluralform>%x timer</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dag</pluralform>
+<pluralform>%x dage</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Kunne ikke læse værdierne for følgende XML punkter:</target>
@@ -654,10 +654,13 @@ Kommando linjen bliver afviklet hver gang:
 <source>&Cancel</source>
 <target>&Anuller</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Igang:</target>
+
+<source>Items found:</source>
 <target>Enheder fundet:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Enheder tilbage:</target>
 
 <source>Speed:</source>
@@ -668,9 +671,6 @@ Kommando linjen bliver afviklet hver gang:
 
 <source>Time elapsed:</source>
 <target>Tid gået:</target>
-
-<source>Operation:</source>
-<target>Igang:</target>
 
 <source>Select variant:</source>
 <target>Vælg variant:</target>
@@ -771,7 +771,7 @@ er det samme
 <source>Synchronizing...</source>
 <target>Synkroniserer...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Enheder behandlet:</target>
 
 <source>&Pause</source>
@@ -900,8 +900,8 @@ Udeluk: \ting\temp\*
 <source>Transactional file copy</source>
 <target>Transaktionel fil kopiering</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>Skriv filer til en midlertidig (*.ffs_tmp) først og omdøb dem. Dette garanterer en sikkerhed, selv i situationer med fatale fejl.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Kopier låste filer</target>
@@ -995,6 +995,18 @@ Overfør fil og biblioteks tilladelser
 
 <source>Auto-adjust columns</source>
 <target>Auto-juster kolonner</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Inkluder alle rækker</target>

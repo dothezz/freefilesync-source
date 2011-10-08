@@ -8,7 +8,7 @@
 #define SMALLDIALOGS_H_INCLUDED
 
 #include "../file_hierarchy.h"
-#include "../library/process_xml.h"
+#include "../lib/process_xml.h"
 #include "../synchronization.h"
 
 namespace zen

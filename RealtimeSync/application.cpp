@@ -9,16 +9,20 @@
 #include <wx/event.h>
 #include "resources.h"
 #include <wx/msgdlg.h>
-#include "../shared/localization.h"
+#include "../lib/localization.h"
 #include "xml_ffs.h"
-#include "../shared/standard_paths.h"
+#include "../lib/ffs_paths.h"
 #include <wx/file.h>
-#include "../shared/string_conv.h"
+#include <wx+/string_conv.h>
 #include <wx/log.h>
+#include <zen/file_handling.h>
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
 #endif
+
+using namespace zen;
+
 
 IMPLEMENT_APP(Application);
 
@@ -49,28 +53,32 @@ void Application::OnStartApplication(wxIdleEvent& event)
     zen::setLanguage(rts::getProgramLanguage());
 
     //try to set config/batch-filename set by %1 parameter
-    wxString cfgFilename;
-    if (argc > 1)
+    std::vector<wxString> commandArgs;
+    for (int i = 1; i < argc; ++i)
     {
-        const wxString filename(argv[1]);
+        Zstring filename = toZ(argv[i]);
 
-        if (wxFileExists(filename))  //load file specified by %1 parameter:
-            cfgFilename = filename;
-        else if (wxFileExists(filename + wxT(".ffs_real")))
-            cfgFilename = filename + wxT(".ffs_real");
-        else if (wxFileExists(filename + wxT(".ffs_batch")))
-            cfgFilename = filename + wxT(".ffs_batch");
-        else
+        if (!fileExists(filename)) //be a little tolerant
         {
-            wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-            return;
+            if (fileExists(filename + Zstr(".ffs_real")))
+                filename = filename + Zstr(".ffs_real");
+            else if (fileExists(filename + Zstr(".ffs_batch")))
+                filename = filename + Zstr(".ffs_batch");
+            else
+            {
+                wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + toWx(filename) + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                return;
+            }
         }
+        commandArgs.push_back(toWx(filename));
     }
 
-    GlobalResources::getInstance().load(); //loads bitmap resources on program startup
+    wxString cfgFilename;
+    if (!commandArgs.empty())
+        cfgFilename = commandArgs[0];
 
     MainDialog* frame = new MainDialog(NULL, cfgFilename);
-    frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
+    frame->SetIcon(GlobalResources::instance().programIcon); //set application icon
     frame->Show();
 }
 

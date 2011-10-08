@@ -5,7 +5,6 @@
 // **************************************************************************
 
 #include "file_hierarchy.h"
-#include "shared/build_info.h"
 
 using namespace zen;
 

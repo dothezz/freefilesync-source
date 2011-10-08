@@ -100,13 +100,13 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\shared;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>$(ProjectDir)/../shared/pch.h</PrecompiledHeaderFile>
-      <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..;../zenXml;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>wx+/pch.h</PrecompiledHeaderFile>
+      <DisableSpecificWarnings>4100;4996;4267;4512</DisableSpecificWarnings>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;$(ProjectDir)/../shared/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>zen/warn_static.h;wx+/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -130,13 +130,13 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\shared;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>$(ProjectDir)/../shared/pch.h</PrecompiledHeaderFile>
-      <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..;../zenXml;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>wx+/pch.h</PrecompiledHeaderFile>
+      <DisableSpecificWarnings>4100;4996;4267;4512</DisableSpecificWarnings>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;$(ProjectDir)/../shared/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>zen/warn_static.h;wx+/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
@@ -163,13 +163,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\shared;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../zenXml;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4267;4512</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles>zen/warn_static.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -198,14 +198,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\shared;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../zenXml;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <DisableSpecificWarnings>4512;4996;4100;4127</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4996;4267;4512</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles>zen/warn_static.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -227,32 +227,28 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\library\process_xml.cpp" />
-    <ClCompile Include="..\shared\custom_button.cpp" />
-    <ClCompile Include="..\shared\dir_watcher.cpp" />
-    <ClCompile Include="..\shared\dir_name.cpp" />
-    <ClCompile Include="..\shared\dst_hack.cpp" />
-    <ClCompile Include="..\shared\file_handling.cpp" />
-    <ClCompile Include="..\shared\file_io.cpp" />
-    <ClCompile Include="..\shared\file_traverser.cpp" />
-    <ClCompile Include="..\shared\folder_history_box.cpp" />
-    <ClCompile Include="..\shared\help_provider.cpp" />
-    <ClCompile Include="..\shared\i18n.cpp" />
-    <ClCompile Include="..\shared\localization.cpp" />
-    <ClCompile Include="..\shared\mouse_move_dlg.cpp" />
-    <ClCompile Include="..\shared\notify_removal.cpp" />
-    <ClCompile Include="..\shared\privilege.cpp" />
-    <ClCompile Include="..\shared\resolve_path.cpp" />
-    <ClCompile Include="..\shared\standard_paths.cpp" />
-    <ClCompile Include="..\shared\last_error.cpp" />
-    <ClCompile Include="..\shared\util.cpp" />
-    <ClCompile Include="..\shared\xml_base.cpp" />
-    <ClCompile Include="..\shared\zstring.cpp" />
+    <ClCompile Include="..\lib\dir_name.cpp" />
+    <ClCompile Include="..\lib\folder_history_box.cpp" />
+    <ClCompile Include="..\lib\localization.cpp" />
+    <ClCompile Include="..\lib\process_xml.cpp" />
+    <ClCompile Include="..\lib\resolve_path.cpp" />
+    <ClCompile Include="..\lib\xml_base.cpp" />
     <ClCompile Include="..\structures.cpp" />
+    <ClCompile Include="..\wx+\button.cpp" />
+    <ClCompile Include="..\wx+\format_unit.cpp" />
+    <ClCompile Include="..\wx+\mouse_move_dlg.cpp" />
+    <ClCompile Include="..\zen\dir_watcher.cpp" />
+    <ClCompile Include="..\zen\dst_hack.cpp" />
+    <ClCompile Include="..\zen\file_handling.cpp" />
+    <ClCompile Include="..\zen\file_io.cpp" />
+    <ClCompile Include="..\zen\file_traverser.cpp" />
+    <ClCompile Include="..\zen\notify_removal.cpp" />
+    <ClCompile Include="..\zen\privilege.cpp" />
+    <ClCompile Include="..\zen\zstring.cpp" />
     <ClCompile Include="application.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/../shared/pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">wx+/pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="gui_generated.cpp" />
     <ClCompile Include="main_dlg.cpp" />
@@ -267,9 +263,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="WxWizDialog.fbp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="../shared/pch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

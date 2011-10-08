@@ -7,9 +7,9 @@
 #ifndef BATCHSTATUSHANDLER_H_INCLUDED
 #define BATCHSTATUSHANDLER_H_INCLUDED
 
-#include "../library/status_handler.h"
-#include "../library/process_xml.h"
-#include "../library/error_log.h"
+#include "../lib/status_handler.h"
+#include "../lib/process_xml.h"
+#include "../lib/error_log.h"
 #include "progress_indicator.h"
 #include "switch_to_gui.h"
 

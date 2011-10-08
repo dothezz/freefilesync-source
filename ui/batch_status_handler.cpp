@@ -8,14 +8,12 @@
 #include "msg_popup.h"
 #include <wx/ffile.h>
 #include <wx/msgdlg.h>
-#include "../shared/standard_paths.h"
-#include "../shared/file_handling.h"
-#include "../shared/resolve_path.h"
-#include "../shared/string_conv.h"
-#include "../shared/global_func.h"
-#include "../shared/app_main.h"
-#include "../shared/util.h"
-#include "../shared/file_traverser.h"
+#include "../lib/ffs_paths.h"
+#include <zen/file_handling.h>
+#include "../lib/resolve_path.h"
+#include <wx+/string_conv.h>
+#include <wx+/app_main.h>
+#include <zen/file_traverser.h>
 
 using namespace zen;
 
@@ -30,7 +28,7 @@ public:
     virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
     {
         const Zstring fileName(shortName);
-        if (fileName.StartsWith(prefix_) && fileName.EndsWith(Zstr(".log")))
+        if (startsWith(fileName, prefix_) && endsWith(fileName, Zstr(".log")))
             logfiles_.push_back(fullName);
     }
 
@@ -38,7 +36,7 @@ public:
 
     virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName)
     {
-        return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs
+        return Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs
     }
 
     virtual HandleError onError(const std::wstring& errorText) { return TRAV_ERROR_IGNORE; } //errors are not really critical in this context
@@ -127,8 +125,6 @@ public:
 private:
     static wxString findUniqueLogname(const wxString& logfileDirectory, const wxString& jobName)
     {
-        using namespace common;
-
         //create logfile directory
         Zstring logfileDir = logfileDirectory.empty() ?
                              toZ(zen::getConfigDir() + wxT("Logs")) :
@@ -138,7 +134,7 @@ private:
             zen::createDirectory(logfileDir); //create recursively if necessary: may throw (FileError&)
 
         //assemble logfile name
-        if (!logfileDir.EndsWith(FILE_NAME_SEPARATOR))
+        if (!endsWith(logfileDir, FILE_NAME_SEPARATOR))
             logfileDir += FILE_NAME_SEPARATOR;
 
         wxString logfileName = toWx(logfileDir);
@@ -232,13 +228,17 @@ BatchStatusHandler::~BatchStatusHandler()
     //decide whether to stay on status screen or exit immediately...
     if (switchToGuiRequested) //-> avoid recursive yield() calls, thous switch not before ending batch mode
     {
-        switchBatchToGui_.execute(); //open FreeFileSync GUI
+        try
+        {
+            switchBatchToGui_.execute(); //open FreeFileSync GUI
+        }
+        catch (...) {}
         syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
     }
     else if (!exitWhenFinished || syncStatusFrame.getAsWindow()->IsShown()) //warning: wxWindow::Show() is called within processHasFinished()!
     {
         //notify about (logical) application main window => program won't quit, but stay on this dialog
-        zen::AppMainWindow::setMainWindow(syncStatusFrame.getAsWindow());
+        zen::setMainWindow(syncStatusFrame.getAsWindow());
 
         //notify to syncStatusFrame that current process has ended
         if (abortIsRequested())

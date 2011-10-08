@@ -5,20 +5,19 @@
 // **************************************************************************
 
 #include "comparison.h"
-#include "library/parallel_scan.h"
-#include "shared/resolve_path.h"
-#include "shared/i18n.h"
+#include "lib/parallel_scan.h"
+#include "lib/resolve_path.h"
 #include <stdexcept>
-#include "library/dir_exist_async.h"
-#include "shared/string_conv.h"
-#include "shared/loki/ScopeGuard.h"
-#include "library/binary.h"
+#include "lib/dir_exist_async.h"
+#include <wx+/string_conv.h>
+#include <zen/scope_guard.h>
+#include "lib/binary.h"
 #include "algorithm.h"
-#include "shared/util.h"
-#include "library/cmp_filetime.h"
+#include <wx+/format_unit.h>
+#include "lib/cmp_filetime.h"
 
 #ifdef FFS_WIN
-#include "shared/perf.h"
+#include <zen/perf.h>
 #endif
 
 using namespace zen;
@@ -37,8 +36,11 @@ std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainC
     std::transform(allPairs.begin(), allPairs.end(), std::back_inserter(output),
                    [&](const FolderPairEnh& enhPair) -> FolderPairCfg
     {
-        return FolderPairCfg(getFormattedDirectoryName(enhPair.leftDirectory),  //ensure they end with FILE_NAME_SEPARATOR and replace macros
-        getFormattedDirectoryName(enhPair.rightDirectory),
+        const Zstring leftDirFmt  = getFormattedDirectoryName(enhPair.leftDirectory);  //ensure they end with FILE_NAME_SEPARATOR and replace macros
+        const Zstring rightDirFmt = getFormattedDirectoryName(enhPair.rightDirectory); //
+
+        return FolderPairCfg(leftDirFmt,
+        rightDirFmt,
 
         enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->compareVar     : mainCfg.cmpConfig.compareVar,
         enhPair.altCmpConfig.get() ? enhPair.altCmpConfig->handleSymlinks : mainCfg.cmpConfig.handleSymlinks,
@@ -90,6 +92,7 @@ void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, 
 
 void checkDirectoryExistence(const std::set<Zstring, LessFilename>& dirnames,
                              std::set<Zstring, LessFilename>& dirnamesExisting,
+                             bool allowUserInteraction,
                              ProcessCallback& procCallback)
 {
     std::for_each(dirnames.begin(), dirnames.end(),
@@ -97,7 +100,7 @@ void checkDirectoryExistence(const std::set<Zstring, LessFilename>& dirnames,
     {
         if (!dirname.empty())
         {
-            while (!dirExistsUpdating(dirname, procCallback))
+            while (!dirExistsUpdating(dirname, allowUserInteraction, procCallback))
             {
                 const std::wstring additionalInfo = _("You can ignore this error to consider the directory as empty.");
                 std::wstring errorMessage = _("Directory does not exist:") + "\n" + "\"" + dirname + "\"";
@@ -185,7 +188,7 @@ bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filen
     UInt64 bytesReported; //amount of bytes that have been compared and communicated to status handler
 
     //in error situation: undo communication of processed amount of data
-    Loki::ScopeGuard guardStatistics = Loki::MakeGuard([&]() { pc.updateProcessedData(0, -1 * to<Int64>(bytesReported)); });
+    zen::ScopeGuard guardStatistics = zen::makeGuard([&]() { pc.updateProcessedData(0, -1 * to<Int64>(bytesReported)); });
 
     CmpCallbackImpl callback(pc, bytesReported);
     bool sameContent = filesHaveSameContent(filename1, filename2, callback); //throw FileError
@@ -194,7 +197,7 @@ bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filen
     pc.updateProcessedData(0, to<Int64>(totalBytesToCmp) - to<Int64>(bytesReported));
     bytesReported = totalBytesToCmp;
 
-    guardStatistics.Dismiss();
+    guardStatistics.dismiss();
     return sameContent;
 }
 }
@@ -204,11 +207,13 @@ bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filen
 
 CompareProcess::CompareProcess(size_t fileTimeTol,
                                xmlAccess::OptionalDialogs& warnings,
+                               bool allowUserInteraction,
                                ProcessCallback& handler) :
     fileTimeTolerance(fileTimeTol),
     m_warnings(warnings),
+    allowUserInteraction_(allowUserInteraction),
     procCallback(handler),
-    txtComparingContentOfFiles(toZ(_("Comparing content of files %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""), false)) {}
+    txtComparingContentOfFiles(toZ(replaceCpy(_("Comparing content of files %x"), L"%x", L"\n\"%x\"", false))) {}
 
 
 void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgList, FolderComparison& output)
@@ -238,7 +243,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
             dirnames.insert(fpCfg.leftDirectoryFmt);
             dirnames.insert(fpCfg.rightDirectoryFmt);
         });
-        checkDirectoryExistence(dirnames, dirnamesExisting, procCallback);
+        checkDirectoryExistence(dirnames, dirnamesExisting, allowUserInteraction_, procCallback);
     }
     auto dirAvailable = [&](const Zstring& dirnameFmt) { return dirnamesExisting.find(dirnameFmt) != dirnamesExisting.end(); };
 
@@ -310,7 +315,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
         //-------------------------------------------------------------------------------------------
 
         //prevent shutdown while (binary) comparison is in progress
-        util::DisableStandby dummy2;
+        DisableStandby dummy2;
         (void)dummy2;
 
         //traverse/process folders
@@ -389,7 +394,7 @@ std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 {
     std::wstring msg = _("File %x has an invalid date!");
     replace(msg, L"%x", std::wstring(L"\"") + fileNameFull + "\"");
-    msg += L"\n\n" + _("Date") + ": " + utcTimeToLocalString(utcTime);
+    msg += L"\n\n" + _("Date") + ": " + utcToLocalTimeString(utcTime);
     return _("Conflict detected:") + "\n" + msg;
 }
 
@@ -403,7 +408,6 @@ void makeSameLength(wxString& first, wxString& second)
     first.Pad(maxPref - first.length(), wxT(' '), true);
     second.Pad(maxPref - second.length(), wxT(' '), true);
 }
-}
 
 
 //check for changed files with same modification date
@@ -412,11 +416,12 @@ std::wstring getConflictSameDateDiffSize(const FileMapping& fileObj)
     std::wstring msg = _("Files %x have the same date but a different size!");
     replace(msg, wxT("%x"), wxString(wxT("\"")) + fileObj.getRelativeName<LEFT_SIDE>() + "\"");
     msg += L"\n\n";
-    msg += L"<-- \t" + _("Date") + ": " + utcTimeToLocalString(fileObj.getLastWriteTime<LEFT_SIDE>()) +
+    msg += L"<-- \t" + _("Date") + ": " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE>()) +
            " \t" + _("Size") + ": " + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + wxT("\n");
-    msg += L"--> \t" + _("Date") + ": " + utcTimeToLocalString(fileObj.getLastWriteTime<RIGHT_SIDE>()) +
+    msg += L"--> \t" + _("Date") + ": " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) +
            " \t" + _("Size") + ": " + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
     return _("Conflict detected:") + "\n" + msg;
+}
 }
 
 
@@ -621,8 +626,7 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
     std::for_each(filesToCompareBytewise.begin(), filesToCompareBytewise.end(),
                   [&](FileMapping* fileObj)
     {
-        Zstring statusText = txtComparingContentOfFiles;
-        statusText.Replace(Zstr("%x"), fileObj->getRelativeName<LEFT_SIDE>(), false);
+        const Zstring statusText = replaceCpy(txtComparingContentOfFiles, Zstr("%x"), fileObj->getRelativeName<LEFT_SIDE>(), false);
         procCallback.reportStatus(utf8CvrtTo<wxString>(statusText));
 
         //check files that exist in left and right model but have different content

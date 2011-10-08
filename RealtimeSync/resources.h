@@ -7,29 +7,29 @@
 #ifndef RESOURCES_H_INCLUDED
 #define RESOURCES_H_INCLUDED
 
-#include <wx/bitmap.h>
-#include <wx/string.h>
 #include <map>
+#include <wx/bitmap.h>
+#include <wx/icon.h>
 
 
 class GlobalResources
 {
 public:
-    static const GlobalResources& getInstance();
+    static const GlobalResources& instance();
 
-    const wxBitmap& getImageByName(const wxString& imageName) const;
+    static const wxBitmap& getImage(const wxString& name) { return instance().getImageInt(name); }
 
     //image resource objects
-    wxIcon* programIcon;
-
-    void load() const; //loads bitmap resources on program startup: logical const!
+    wxIcon programIcon;
 
 private:
     GlobalResources();
-    ~GlobalResources();
+    GlobalResources(const GlobalResources&); //=delete
+    GlobalResources& operator=(const GlobalResources&); //=delete
 
-    //resource mapping
-    mutable std::map<wxString, wxBitmap*> bitmapResource;
+const wxBitmap& getImageInt(const wxString& name) const;
+
+    std::map<wxString, wxBitmap> bitmaps;
 };
 
 #endif // RESOURCES_H_INCLUDED

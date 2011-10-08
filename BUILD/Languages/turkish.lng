@@ -8,7 +8,7 @@
 </header>
 
 <source>Searching for directory %x...</source>
-<target></target>
+<target>%x klasörü aranıyor...</target>
 
 <source>Show in Explorer</source>
 <target>Tarayıcıda Göster</target>
@@ -22,44 +22,17 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Kendiliğinden Eşleştirme</target>
 
-<source>Browse</source>
-<target>Gözat</target>
-
-<source>Invalid command line: %x</source>
-<target></target>
-
-<source>Error resolving symbolic link:</source>
-<target>Sembolik bağlantı çözümlenirken hata:</target>
-
-<source>Show pop-up</source>
-<target></target>
-
-<source>Show pop-up on errors or warnings</source>
-<target></target>
-
-<source>Ignore errors</source>
-<target>Hataları yoksay</target>
-
-<source>Hide all error and warning messages</source>
-<target>Tüm hata ve uyarı iletilerini gizler</target>
-
-<source>Exit instantly</source>
-<target>Hemen çık</target>
-
-<source>Abort synchronization immediately</source>
-<target>Eşleştirmeyi hemen bırak</target>
-
 <source>Select alternate comparison settings</source>
-<target></target>
+<target>Alternatif karşılaştırma ayarlarını seçin</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Alternatif eşleştirme ayarlarını seçin</target>
 
 <source>No filter selected</source>
-<target>Hiç süzgeç seçilmedi</target>
+<target>Seçilmiş süzgeç yok</target>
 
 <source>Filter is active</source>
-<target>Etkin süzgeç</target>
+<target>Süzgeç etkin</target>
 
 <source>Remove alternate settings</source>
 <target>Alternatif ayarları sil</target>
@@ -68,7 +41,7 @@
 <target>Süzgeç ayarlarını temizle</target>
 
 <source>Create a batch job</source>
-<target>Toplu komut işi oluştur</target>
+<target>Toplu iş oluştur</target>
 
 <source>Synchronization settings</source>
 <target>Eşleştirme ayarları</target>
@@ -107,7 +80,46 @@
 <target>Bul</target>
 
 <source>Select time span</source>
-<target></target>
+<target>Zaman aralığı</target>
+
+<source>Show pop-up</source>
+<target>Açılır pencerede göster</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Hata ya da uyarıları açılır pencerede gösterir</target>
+
+<source>Ignore errors</source>
+<target>Hataları yoksay</target>
+
+<source>Hide all error and warning messages</source>
+<target>Tüm hata ve uyarı iletilerini gizler</target>
+
+<source>Exit instantly</source>
+<target>İşlemi sonlandır</target>
+
+<source>Abort synchronization immediately</source>
+<target>Eşleştirmeyi hemen bırakır</target>
+
+<source>Browse</source>
+<target>Gözat</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Eşleştirme veri tabanı okunurken hata:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Eşleştirme veri tabanına yazılırken hata:</target>
+
+<source>Invalid command line: %x</source>
+<target>Geçersiz komut satırı: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Windows Hata Kodu %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Hata Kodu %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Sembolik bağlantı çözümlenirken hata:</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -166,11 +178,8 @@
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync veritabanı dosyalarından biri henüz yok:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Eşleştirme veri tabanı okunurken hata:</target>
-
 <source>Database files do not share a common synchronization session:</source>
-<target></target>
+<target>Veritabanıdosyaları ortak bir eşleştirmeoturumunu paylaşmıyor:</target>
 
 <source>An exception occurred!</source>
 <target>Olağan dışı bir durum oluştu!</target>
@@ -193,11 +202,17 @@
 <pluralform>%x saniye</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Klasör ya da dosyaları buraya sürükleyip bırakabilirsiniz</target>
+
 <source>Info</source>
 <target>Bilgi</target>
 
 <source>Fatal Error</source>
 <target>Ölümcül Hata</target>
+
+<source>Error reading file:</source>
+<target>Dosya okunurken hata:</target>
 
 <source>Scanning:</source>
 <target>Taranıyor:</target>
@@ -209,7 +224,10 @@
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>[1 İş]</pluralform>
+<pluralform>[%x İş]</pluralform>
+</target>
 
 <source>Invalid FreeFileSync config file!</source>
 <target>Geçersiz FreeFileSync yapılandırma dosyası!</target>
@@ -220,35 +238,29 @@
 <source>Error parsing configuration file:</source>
 <target>Yapılandırma dosyası çözümlenirken hata:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Geri Dönüşüm Kutusu'na atılırken hata:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Gerekli bir DLL yüklenemedi:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Gölge Kopya Hizmetine erişilirken hata oldu!</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>WOW64 üzerinde gölge kopyalama desteklenmiyor. FreeFileSync 64-bit sürümünü kullanın</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Şu dosya için birim adı belirlenemedi:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>%x birim adı, %y dosya adının parçası değil!</target>
+
 <source>/sec</source>
 <target>/san</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 dakika</pluralform>
-<pluralform>%x dakika</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 saat</pluralform>
-<pluralform>%x saat</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 gün</pluralform>
-<pluralform>%x gün</pluralform>
-</target>
+<source>Could not read values for the following XML nodes:</source>
+<target>Şu XML düğümlerindeki değerler okunamadı:</target>
 
 <source>S&ave configuration...</source>
 <target>Y&apılandırmayı kaydet...</target>
@@ -342,131 +354,17 @@ Her seferinde çalıştırılacak komut satırı:
 <source>A directory input field is empty.</source>
 <target>Bir klasör giriş alanı boş</target>
 
-<source>Drag && drop</source>
-<target>Klasör ya da dosyaları buraya sürükleyip bırakabilirsiniz</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Klasör izlemesi başlatılamadı:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Klasörler izlenirken hata.</target>
-
-<source>Conversion error:</source>
-<target>Dönüştürme hatası:</target>
-
-<source>Error deleting file:</source>
-<target>Dosya silinirken hata:</target>
-
-<source>Error moving file:</source>
-<target>Dosya taşınırken hata:</target>
-
-<source>Target file already existing!</source>
-<target>Hedef dosya zaten var!</target>
-
-<source>Error moving directory:</source>
-<target>Klasör taşınırken hata:</target>
-
-<source>Target directory already existing!</source>
-<target>Hedef klasör zaten var!</target>
-
-<source>Error deleting directory:</source>
-<target>Klasör silinirken hata:</target>
-
-<source>Error changing modification time:</source>
-<target>Değişiklik tarihini değiştirirken hata:</target>
-
-<source>Error loading library function:</source>
-<target>Kütüphane işlevi yüklenirken hata:</target>
-
-<source>Error reading security context:</source>
-<target>Güüvenlik bağlamı okunurken hata:</target>
-
-<source>Error writing security context:</source>
-<target>Güvenlik bağlamı yazılırken hata:</target>
-
-<source>Error copying file permissions:</source>
-<target>Dosya izinleri kopyalanırken hata:</target>
-
-<source>Error creating directory:</source>
-<target>Klasör oluşturulurken hata:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Sembolik bağlantı kopyalanırken hata:</target>
-
-<source>Error copying file:</source>
-<target>Dosya kopyalanırken hata:</target>
-
-<source>Error opening file:</source>
-<target>Dosya açılırken hata:</target>
-
-<source>Error writing file:</source>
-<target>Dosya yazılırken hata:</target>
-
-<source>Error reading file:</source>
-<target>Dosya okunurken hata:</target>
-
-<source>Operation aborted!</source>
-<target>İşlemden vazgeçildi!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Klasörlerde dolaşırken sonsuz döngü:</target>
-
-<source>Error traversing directory:</source>
-<target>Klasörde dolaşırken hata:</target>
-
-<source>Windows Error Code %x:</source>
-<target>Windows Hata Kodu %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Hata Kodu %x:</target>
-
-<source>Error setting privilege:</source>
-<target>İzinler ayarlanırken hata:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Geri Dönüşüm Kutusu'na atılırken hata:</target>
-
-<source>Could not load a required DLL:</source>
-<target>Gerekli bir DLL yüklenemedi:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Eşleştirme veri tabanına yazılırken hata:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target></target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>WOW64 üzerinde gölge kopyalama desteklenmiyor. FreeFileSync 64-bit sürümünü kullanın</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Şu dosya için birim adı belirlenemedi:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>%x birim adı, %y dosya adının parçası değil!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Şu XML düğümlerindeki değerler okunamadı:</target>
-
 <source>Logging</source>
 <target>Günlükleme</target>
 
 <source>FreeFileSync batch file</source>
-<target>FreeFileSync toplu komut dosyası</target>
+<target>FreeFileSync toplu iş dosyası</target>
 
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync yapılandırması</target>
 
 <source>FreeFileSync Batch Job</source>
-<target>FreeFileSync Toplu Komut İşi</target>
+<target>FreeFileSync Toplu İşi</target>
 
 <source>Unable to create logfile!</source>
 <target>Günlük dosyası oluşturulamıyor!</target>
@@ -541,7 +439,7 @@ Her seferinde çalıştırılacak komut satırı:
 <target>&Genel ayarlar...</target>
 
 <source>&Create batch job...</source>
-<target>&Toplu komut işi oluştur...</target>
+<target>&Toplu iş oluştur...</target>
 
 <source>&Export file list...</source>
 <target>Dosya list&esini ver...</target>
@@ -577,10 +475,10 @@ Her seferinde çalıştırılacak komut satırı:
 <target>Sağ ve sol yanı değiştir</target>
 
 <source>Save current configuration to file</source>
-<target>Geçerli yapılandırmayı dosyaya kaydet</target>
+<target>Geçerli yapılandırmayı dosyaya kaydeder</target>
 
 <source>Load configuration from file</source>
-<target>Dosyadan yapılandırmayı yükle</target>
+<target>Yapılandırma dosyasından ayarları alır</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Son kullanılan yapılandırmalar (listeden silmek için DEL tuşuna basın)</target>
@@ -589,7 +487,7 @@ Her seferinde çalıştırılacak komut satırı:
 <target>Dışlanan ögeleri gizle</target>
 
 <source>Hide filtered or temporarily excluded files</source>
-<target>Süzülmüş ya da geçici olarak dışlanmış dosyaları gizle</target>
+<target>Süzülmüş ya da geçici olarak dışlanmış dosyaları gizler</target>
 
 <source>Number of files and directories that will be created</source>
 <target>Oluşturulacak dosya ve klasör sayısı</target>
@@ -604,10 +502,10 @@ Her seferinde çalıştırılacak komut satırı:
 <target>Aktarılacak toplam veri miktarı</target>
 
 <source>Batch job</source>
-<target>Toplu komut işi</target>
+<target>Toplu iş</target>
 
 <source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target></target>
+<target>Otomatik eşleştirme için bir toplu iş dosyası oluşturabilirsiniz. İşlemi başlatmak için dosyaya çift tıklayabilir ya da komut satırını " FreeFileSync.exe <ffs_iş dosyası>" şeklinde kullabilirsiniz. Ayrıca bu dosyayı işletim sisteminizin görev zamanlayıcısı ile istediğiniz zamanlarda çalıştırabilirsiniz.</target>
 
 <source>Help</source>
 <target>Yardım</target>
@@ -616,7 +514,7 @@ Her seferinde çalıştırılacak komut satırı:
 <target>Dosya süzgeci</target>
 
 <source>Error handling</source>
-<target>Hata olduğunda:</target>
+<target>Hata olursa:</target>
 
 <source>Left</source>
 <target>Sol</target>
@@ -625,22 +523,22 @@ Her seferinde çalıştırılacak komut satırı:
 <target>Sağ</target>
 
 <source>Overview</source>
-<target>Özet</target>
+<target>Genel</target>
 
 <source>Status feedback</source>
 <target>Durum geri bildirimi</target>
 
 <source>Run minimized</source>
-<target></target>
+<target>Görev çubuğunda başlat</target>
 
 <source>Maximum number of logfiles:</source>
-<target>En fazla günlük dosyası sayısı:</target>
+<target>Tutulacak en fazla günlük dosyası sayısı:</target>
 
 <source>Select logfile directory:</source>
-<target>Kayıt dosyası klasörünü seçin:</target>
+<target>Kayıt dosyası klasörü:</target>
 
 <source>Batch settings</source>
-<target></target>
+<target>İş ayarları</target>
 
 <source>&Save</source>
 <target>&Kaydet</target>
@@ -651,10 +549,13 @@ Her seferinde çalıştırılacak komut satırı:
 <source>&Cancel</source>
 <target>İ&ptal</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>İşlem:</target>
+
+<source>Items found:</source>
 <target>Bulunan bileşenler:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Kalan bileşenler:</target>
 
 <source>Speed:</source>
@@ -666,11 +567,8 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Time elapsed:</source>
 <target>Geçen zaman:</target>
 
-<source>Operation:</source>
-<target>İşlem:</target>
-
 <source>Select variant:</source>
-<target>Değişkeni seçin:</target>
+<target>Davranışı seçin:</target>
 
 <source><Automatic></source>
 <target><Kendiliğinden></target>
@@ -738,10 +636,15 @@ Files are found equal if
      - file size
 are the same
 </source>
-<target></target>
+<target>
+Dosyaların eşit sayılması için
+	 - son yazma tarih ve saati
+	 - dosya boyutu
+aynı olmalıdır
+</target>
 
 <source>File time and size</source>
-<target></target>
+<target>Dosya tarih ve saati</target>
 
 <source>
 Files are found equal if
@@ -749,9 +652,9 @@ Files are found equal if
 is the same
 </source>
 <target>
-Eşit dosyalar aranırken
+Dosyaların eşit sayılması için
      - dosya içeriği
-aynı olanlara bakılır
+aynı olmalıdır
 </target>
 
 <source>File content</source>
@@ -763,7 +666,7 @@ aynı olanlara bakılır
 <source>Synchronizing...</source>
 <target>Eşleştiriliyor...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>İşlenen bileşenler:</target>
 
 <source>&Pause</source>
@@ -773,7 +676,7 @@ aynı olanlara bakılır
 <target>Kaynak kodu C++ kullanılarak yazılmıştır:</target>
 
 <source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>FreeFileSync çevirisinden dolayı çok teşekkürler:</target>
+<target>FreeFileSync çevirmenlerine çok teşekkürler:</target>
 
 <source>Feedback and suggestions are welcome at:</source>
 <target>Geri bildirim ve önerileriniz için:</target>
@@ -794,10 +697,10 @@ aynı olanlara bakılır
 <target>E-posta</target>
 
 <source>Report translation error</source>
-<target>Çeviri hatasını bildir</target>
+<target>Çeviri hatası bildirin</target>
 
 <source>Published under the GNU General Public License:</source>
-<target>GNU Genel Kamu Lisansına şartları altında yayınlanmıştır:</target>
+<target>GNU Genel Kamu Lisansı şartları altında yayınlanmıştır:</target>
 
 <source>Ignore subsequent errors</source>
 <target>Sonraki hataları yoksay</target>
@@ -837,7 +740,7 @@ Only files/directories that match all filter settings will be selected for synch
 Note: The name filter must be specified relative(!) to main synchronization directories.
 </source>
 <target>
-Yalnızca tüm süzgeç koşullarına uyan dosya ve klasörler eşleştirilecek.
+Yalnızca tüm süzgeç koşullarına uyan dosya ve klasörler eşleştirilir.
 Not: Ad süzgeci kök eşleştirme klasörüne göre bağıl(!) olarak belirtilmelidir.
 </target>
 
@@ -875,10 +778,10 @@ Katma: \stuff\temp\*
 <target>Dışlanacaklar:</target>
 
 <source>Minimum file size</source>
-<target></target>
+<target>En küçük dosya boyutu</target>
 
 <source>Maximum file size</source>
-<target></target>
+<target>En büyük dosya boyutu</target>
 
 <source>&Default</source>
 <target>&Varsayılan</target>
@@ -890,10 +793,10 @@ Katma: \stuff\temp\*
 <target>Sütunu aşağı taşı</target>
 
 <source>Transactional file copy</source>
-<target></target>
+<target>Aşamalı kopyalama kullan</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target></target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target>Kopyalama önce geçici bir dosyaya (*.ffs_tmp) yapılır. Sonra dosya yeniden adlandırılır. Böylece hatalara karşı daha sağlıklı bir durum sağlanır</target>
 
 <source>Copy locked files</source>
 <target>Kilitli dosyaları da kopyala</target>
@@ -903,19 +806,19 @@ Copy shared or locked files using Volume Shadow Copy Service
 (Requires Administrator rights)
 </source>
 <target>
-Paylaşılmış ya da kilitli dosyaları Birim Gölge Kopya Hizmetini
- kullanarak kopyala (Yönetici izinlerine gerek duyar)
+Paylaşılan ya da kilitli dosyaları Gölge Kopya Hizmetini
+ kullanarak kopyalar (Yönetici izinlerine gerek duyar)
 </target>
 
 <source>Copy file access permissions</source>
-<target></target>
+<target>Dosya erişim izinlerini kopyala</target>
 
 <source>
 Transfer file and directory permissions
 (Requires Administrator rights)
 </source>
 <target>
-Dosya ve klasör izinlerini de aktar
+Dosya ve klasör izinlerini de aktarır
 (Yönetici izinlerine gerek duyar)
 </target>
 
@@ -948,6 +851,9 @@ Dosya ve klasör izinlerini de aktar
 
 <source>&Find next</source>
 <target>&Sonrakini bul</target>
+
+<source>Operation aborted!</source>
+<target>İşlemden vazgeçildi!</target>
 
 <source>Main bar</source>
 <target>Ana çubuk</target>
@@ -983,10 +889,22 @@ Dosya ve klasör izinlerini de aktar
 <target>Özelleştir...</target>
 
 <source>Select time span...</source>
-<target></target>
+<target>Zaman aralığını seçin...</target>
 
 <source>Auto-adjust columns</source>
 <target>Sütunları kendiliğinden hizala</target>
+
+<source>Icon size:</source>
+<target>Simge boyutu:</target>
+
+<source>Small</source>
+<target>Küçük</target>
+
+<source>Medium</source>
+<target>Orta</target>
+
+<source>Large</source>
+<target>Büyük</target>
 
 <source>Include all rows</source>
 <target>Tüm satırları kat</target>
@@ -1114,6 +1032,9 @@ Dosya ve klasör izinlerini de aktar
 <source>File list exported!</source>
 <target>Dosya listesi verilmiş!</target>
 
+<source>Error writing file:</source>
+<target>Dosya yazılırken hata:</target>
+
 <source>Batch file created successfully!</source>
 <target>Toplu komut dosyası sorunsuz oluşturuldu!</target>
 
@@ -1184,19 +1105,19 @@ Dosya ve klasör izinlerini de aktar
 <target>Devre dışı</target>
 
 <source>Last x hours</source>
-<target></target>
+<target>Son x saat</target>
 
 <source>Today</source>
-<target></target>
+<target>Bugün</target>
 
 <source>This week</source>
-<target></target>
+<target>Bu hafta</target>
 
 <source>This month</source>
-<target></target>
+<target>Bu ay</target>
 
 <source>This year</source>
-<target></target>
+<target>Bu yıl</target>
 
 <source>Byte</source>
 <target>Bayt</target>
@@ -1223,7 +1144,7 @@ Dosya ve klasör izinlerini de aktar
 <target>İzle</target>
 
 <source>Copy NTFS permissions</source>
-<target></target>
+<target>NTFS izinlerini de kopyala</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Dış uygulamaları sağ tuş menüsüne ekler. Şu makrolar kullanılabilir:</target>
@@ -1274,10 +1195,109 @@ Dosya ve klasör izinlerini de aktar
 <target>Dosya silme ve üzerine yazma sırasında Geri Dönüşüm Kutusu'nu kullanır</target>
 
 <source>Versioning</source>
-<target>Sürümlendirme</target>
+<target>Eski sürüm olarak sakla</target>
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>Dosyaları zaman damgasıyla bir alt klasöre taşır</target>
+
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 dakika</pluralform>
+<pluralform>%x dakika</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 saat</pluralform>
+<pluralform>%x saat</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 gün</pluralform>
+<pluralform>%x gün</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Klasör izlemesi başlatılamadı:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Klasörler izlenirken hata.</target>
+
+<source>Conversion error:</source>
+<target>Dönüştürme hatası:</target>
+
+<source>Error deleting file:</source>
+<target>Dosya silinirken hata:</target>
+
+<source>Error moving file:</source>
+<target>Dosya taşınırken hata:</target>
+
+<source>Target file already existing!</source>
+<target>Hedef dosya zaten var!</target>
+
+<source>Error moving directory:</source>
+<target>Klasör taşınırken hata:</target>
+
+<source>Target directory already existing!</source>
+<target>Hedef klasör zaten var!</target>
+
+<source>Error deleting directory:</source>
+<target>Klasör silinirken hata:</target>
+
+<source>Error changing modification time:</source>
+<target>Değişiklik tarihini değiştirirken hata:</target>
+
+<source>Error loading library function:</source>
+<target>Kütüphane işlevi yüklenirken hata:</target>
+
+<source>Error reading security context:</source>
+<target>Güüvenlik bağlamı okunurken hata:</target>
+
+<source>Error writing security context:</source>
+<target>Güvenlik bağlamı yazılırken hata:</target>
+
+<source>Error copying file permissions:</source>
+<target>Dosya izinleri kopyalanırken hata:</target>
+
+<source>Error creating directory:</source>
+<target>Klasör oluşturulurken hata:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Sembolik bağlantı kopyalanırken hata:</target>
+
+<source>Error copying file:</source>
+<target>Dosya kopyalanırken hata:</target>
+
+<source>Error opening file:</source>
+<target>Dosya açılırken hata:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Klasörlerde dolaşırken sonsuz döngü:</target>
+
+<source>Error traversing directory:</source>
+<target>Klasörde dolaşırken hata:</target>
+
+<source>Error setting privilege:</source>
+<target>İzinler ayarlanırken hata:</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Son eşleştirmeden bu yana iki yanın içeriği de değişmiş!</target>
@@ -1376,40 +1396,40 @@ Dosya ve klasör izinlerini de aktar
 <target>%x klasörü siliniyor</target>
 
 <source>Deleting symbolic link %x</source>
-<target></target>
+<target>%x sembolik bağlantısı siliniyor</target>
 
 <source>Moving file %x to recycle bin</source>
-<target></target>
+<target>%x dosyası geri dönüşüm kutusuna atılıyor</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target></target>
+<target>%x klasörü geri dönüşüm kutusuna atılıyor</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target></target>
+<target>%x sembolik bağlantısı geri dönüşüm kutusuna atılıyor</target>
 
 <source>Moving file %x to %y</source>
-<target></target>
+<target>%x dosyası %y içine taşınıyor</target>
 
 <source>Moving folder %x to %y</source>
-<target></target>
+<target>%x klasörü %y içine taşınıyor</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target></target>
+<target>%x sembolik bağlantısı %y içine taşınıyor</target>
 
 <source>Creating file %x</source>
-<target></target>
+<target>%x dosyası oluşturuluyor</target>
 
 <source>Creating symbolic link %x</source>
-<target></target>
+<target>%x sembolik bağlantısı oluşturuluyor</target>
 
 <source>Creating folder %x</source>
 <target>%x klasörü oluşturuluyor</target>
 
 <source>Overwriting file %x</source>
-<target></target>
+<target>%x dosyasının üzerine yazılıyor</target>
 
 <source>Overwriting symbolic link %x</source>
-<target></target>
+<target>%x sembolik bağlantısının üzerine yazılıyor</target>
 
 <source>Verifying file %x</source>
 <target>%x dosyası doğrulanıyor</target>
@@ -1448,7 +1468,7 @@ Dosya ve klasör izinlerini de aktar
 <target>Kullanılabilir disk alanı:</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target></target>
+<target>Şu yollar için geri dönüşüm kutusu kullanılamaz! Dosyalar anında ve tamamen silinir:</target>
 
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Çoklu klasör çiftlerinin bir parçası olduğan bir klasör düzenlenecek! Lütfen eşleştirme ayarlarınızı gözden geçirin!</target>

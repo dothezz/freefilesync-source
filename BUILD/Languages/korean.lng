@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>찾아보기</target>
 
+<source>Windows Error Code %x:</source>
+<target>윈도우 에러 코드 %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>리눅스 에러 코드 %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>잘못된 명령줄 : %x</target>
 
@@ -223,30 +229,6 @@
 <source>/sec</source>
 <target>/초</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x분</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x시간</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x일</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>설정 저장</target>
 
@@ -405,26 +387,20 @@ The command line is executed each time:
 <source>Operation aborted!</source>
 <target>작업 중단!</target>
 
-<source>Could not load a required DLL:</source>
-<target>필요한 DLL을 로드할 수 없습니다 :</target>
-
 <source>Endless loop when traversing directory:</source>
 <target>디렉토리 이동 중 무한 루프 발생 :</target>
 
 <source>Error traversing directory:</source>
 <target>디렉토리 이동 중 발생한 오류 :</target>
 
-<source>Windows Error Code %x:</source>
-<target>윈도우 에러 코드 %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>리눅스 에러 코드 %x:</target>
-
 <source>Error setting privilege:</source>
 <target>권한 설정 중 발생한 오류 :</target>
 
 <source>Error moving to Recycle Bin:</source>
 <target>휴지통으로 이동 중 발생한 오류 :</target>
+
+<source>Could not load a required DLL:</source>
+<target>필요한 DLL을 로드할 수 없습니다 :</target>
 
 <source>Error writing to synchronization database:</source>
 <target>동기화 데이터베이스에 쓰던 중 발생한 오류 :</target>
@@ -449,6 +425,30 @@ The command line is executed each time:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x분</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x시간</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x일</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>다음 XML 노드 값을 읽어 들일 수 없습니다 :</target>
@@ -648,10 +648,13 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>취소(&C)</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>작업 :</target>
+
+<source>Items found:</source>
 <target>발견된 요소 :</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>남은 요소 :</target>
 
 <source>Speed:</source>
@@ -662,9 +665,6 @@ The command line is executed each time:
 
 <source>Time elapsed:</source>
 <target>경과 시간 :</target>
-
-<source>Operation:</source>
-<target>작업 :</target>
 
 <source>Select variant:</source>
 <target>옵션 선택 :</target>
@@ -765,7 +765,7 @@ is the same
 <source>Synchronizing...</source>
 <target>동기화 작업 중...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>처리된 요소 :</target>
 
 <source>&Pause</source>
@@ -894,8 +894,8 @@ Exclude: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>트랜잭션 파일 복사</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>우선 임시 (*.ffs_tmp)에 파일을 작성하고 파일명을 변경하세요. 이 같은 조치는 치명적인 오류 상황에서도 일관성 있는 상태를 보장합니다.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>락 걸린 파일 복사</target>
@@ -989,6 +989,18 @@ Transfer file and directory permissions
 
 <source>Auto-adjust columns</source>
 <target>열 자동정렬</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>모든 행 포함</target>

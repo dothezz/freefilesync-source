@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Examinar</target>
 
+<source>Windows Error Code %x:</source>
+<target>Código de error de Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Código de error de Linux %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Línea de comandos errónea: %x</target>
 
@@ -226,33 +232,6 @@
 <source>/sec</source>
 <target>/seg</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 minuto</pluralform>
-<pluralform>%x minutos</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 hora</pluralform>
-<pluralform>%x horas</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 día</pluralform>
-<pluralform>%x días</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>G&uardar configuración...</target>
 
@@ -411,26 +390,20 @@ La línea de comandos se ejecuta cada vez:
 <source>Operation aborted!</source>
 <target>¡Operación abortada!</target>
 
-<source>Could not load a required DLL:</source>
-<target>No se ha podido cargar el DLL solicitado:</target>
-
 <source>Endless loop when traversing directory:</source>
 <target>Bucle infinito al buscar en el directorio:</target>
 
 <source>Error traversing directory:</source>
 <target>Error al buscar en el directorio:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Código de error de Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Código de error de Linux %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Error al establecer privilegios:</target>
 
 <source>Error moving to Recycle Bin:</source>
 <target>Error al mover a la Papelera de Reciclaje:</target>
+
+<source>Could not load a required DLL:</source>
+<target>No se ha podido cargar el DLL solicitado:</target>
 
 <source>Error writing to synchronization database:</source>
 <target>Error al escribir en la base de datos de sincronización:</target>
@@ -455,6 +428,33 @@ La línea de comandos se ejecuta cada vez:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 minuto</pluralform>
+<pluralform>%x minutos</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 hora</pluralform>
+<pluralform>%x horas</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 día</pluralform>
+<pluralform>%x días</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>No se ha podido leer los valores para los siguientes nodos XML:</target>
@@ -654,10 +654,13 @@ La línea de comandos se ejecuta cada vez:
 <source>&Cancel</source>
 <target>&Cancelar</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Operación:</target>
+
+<source>Items found:</source>
 <target>Elementos encontrados:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Elementos restantes:</target>
 
 <source>Speed:</source>
@@ -668,9 +671,6 @@ La línea de comandos se ejecuta cada vez:
 
 <source>Time elapsed:</source>
 <target>Tiempo transcurrido:</target>
-
-<source>Operation:</source>
-<target>Operación:</target>
 
 <source>Select variant:</source>
 <target>Seleccione un tipo:</target>
@@ -771,7 +771,7 @@ es el mismo
 <source>Synchronizing...</source>
 <target>Sincronizando...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Elementos procesados:</target>
 
 <source>&Pause</source>
@@ -900,8 +900,8 @@ Excluir: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>Copia de archivos transaccionales</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>Escribir archivos temporales (*.ffs_tmp) primero y reescribirlos después. Esto asegura un estado de consistencia incluso en situaciones de error fatal.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Copiar archivos bloqueados</target>

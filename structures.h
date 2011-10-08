@@ -9,10 +9,10 @@
 
 #include <wx/string.h>
 #include <vector>
-#include "shared/zstring.h"
-#include "shared/assert_static.h"
+#include <zen/zstring.h>
+#include <zen/assert_static.h>
 #include <memory>
-#include "shared/int64.h"
+#include <zen/int64.h>
 
 
 

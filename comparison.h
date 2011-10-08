@@ -8,12 +8,12 @@
 #define COMPARISON_H_INCLUDED
 
 #include "file_hierarchy.h"
-#include "library/process_xml.h"
-#include "library/status_handler.h"
+#include "lib/process_xml.h"
+#include "lib/status_handler.h"
 #include "structures.h"
-#include "shared/disable_standby.h"
-#include "library/norm_filter.h"
-#include "library/parallel_scan.h"
+#include <zen/disable_standby.h>
+#include "lib/norm_filter.h"
+#include "lib/parallel_scan.h"
 
 
 namespace zen
@@ -53,6 +53,7 @@ class CompareProcess
 public:
     CompareProcess(size_t fileTimeTol,
                    xmlAccess::OptionalDialogs& warnings,
+                   bool allowUserInteraction,
                    ProcessCallback& handler);
 
     void startCompareProcess(const std::vector<FolderPairCfg>& cfgList, FolderComparison& output);
@@ -79,6 +80,7 @@ private:
 
     xmlAccess::OptionalDialogs& m_warnings;
 
+    const bool allowUserInteraction_;
     ProcessCallback& procCallback;
     const Zstring txtComparingContentOfFiles;
 };

@@ -9,7 +9,7 @@
 #include <wx/msgdlg.h>
 #include <wx/utils.h>
 #include <utility>
-#include "../shared/mouse_move_dlg.h"
+#include <wx+/mouse_move_dlg.h>
 
 
 class SearchDlg : public SearchDialogGenerated

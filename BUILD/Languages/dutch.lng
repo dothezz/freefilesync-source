@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Verkennen</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows Fout Code %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Fout Code %x:</target>
+
 <source>Invalid command line: %x</source>
 <target></target>
 
@@ -223,33 +229,6 @@
 <source>/sec</source>
 <target>/sec</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 uur</pluralform>
-<pluralform>%x uren</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dag</pluralform>
-<pluralform>%x dagen</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>Sl&a configuratie op...</target>
 
@@ -414,12 +393,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Error traversing directory:</source>
 <target>Fout tijdens doorzoeken van map:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows Fout Code %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Fout Code %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Fout tijdens instellen van privileges:</target>
 
@@ -452,6 +425,33 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 uur</pluralform>
+<pluralform>%x uren</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dag</pluralform>
+<pluralform>%x dagen</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Kon geen waarden inlezen voor de volgende XML punten:</target>
@@ -651,10 +651,13 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>&Cancel</source>
 <target>&Annuleren</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Bewerking:</target>
+
+<source>Items found:</source>
 <target>Onderdelen gevonden:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Onderdelen te gaan:</target>
 
 <source>Speed:</source>
@@ -665,9 +668,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 
 <source>Time elapsed:</source>
 <target>Verstreken tijd:</target>
-
-<source>Operation:</source>
-<target>Bewerking:</target>
 
 <source>Select variant:</source>
 <target>Selecteer een variant:</target>
@@ -763,7 +763,7 @@ overeenkomt
 <source>Synchronizing...</source>
 <target>Synchroniseert...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Onderdelen verwerkt:</target>
 
 <source>&Pause</source>
@@ -892,7 +892,7 @@ Uitsluiten: \stuff\temp\*
 <source>Transactional file copy</source>
 <target></target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target></target>
 
 <source>Copy locked files</source>
@@ -987,6 +987,18 @@ Zet bestand en map permissies over
 
 <source>Auto-adjust columns</source>
 <target>Kolommen automatisch aanpassen</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Alle rijen opnemen</target>

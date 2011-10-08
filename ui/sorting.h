@@ -9,7 +9,7 @@
 
 #include "../file_hierarchy.h"
 #include "../synchronization.h"
-#include "../shared/assert_static.h"
+#include <zen/assert_static.h>
 
 
 namespace zen
@@ -87,12 +87,12 @@ bool lessRelativeName(const FileSystemObject& a, const FileSystemObject& b)
     const bool isDirectoryA = isDirectoryMapping(a);
     const Zstring& relDirNameA = isDirectoryA ?
                                  a.getObjRelativeName() : //directory
-                                 a.getObjRelativeName().BeforeLast(FILE_NAME_SEPARATOR); //returns empty string if ch not found
+                                 beforeLast(a.getObjRelativeName(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
 
     const bool isDirectoryB = isDirectoryMapping(b);
     const Zstring& relDirNameB = isDirectoryB ?
                                  b.getObjRelativeName() : //directory
-                                 b.getObjRelativeName().BeforeLast(FILE_NAME_SEPARATOR); //returns empty string if ch not found
+                                 beforeLast(b.getObjRelativeName(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
 
     //compare relative names without filenames first
     const int rv = cmpFileName(relDirNameA, relDirNameB);

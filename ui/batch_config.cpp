@@ -5,19 +5,19 @@
 // **************************************************************************
 
 #include "batch_config.h"
-#include "../shared/dir_picker_i18n.h"
+#include <wx+/dir_picker.h>
 #include "folder_pair.h"
 #include <iterator>
 #include <wx/wupdlock.h>
-#include "../shared/help_provider.h"
-#include "../shared/file_handling.h"
+#include "../lib/help_provider.h"
+#include <zen/file_handling.h>
 #include "msg_popup.h"
 #include "gui_generated.h"
 #include <wx/dnd.h>
 #include <wx/msgdlg.h>
-#include "../shared/custom_button.h"
-#include "../shared/wx_choice_enum.h"
-#include "../shared/mouse_move_dlg.h"
+#include <wx+/button.h>
+#include <wx+/choice_enum.h>
+#include <wx+/mouse_move_dlg.h>
 
 using namespace zen;
 
@@ -66,8 +66,6 @@ private:
 
     void updateGui(); //re-evaluate gui after config changes
 
-    void showNotebookpage(wxWindow* page, const wxString& pageName, bool show);
-
     //error handling
     //xmlAccess::OnError getSelectionHandleError() const; -> obsolete, use getEnumVal()
     void setSelectionHandleError(xmlAccess::OnError value);
@@ -80,7 +78,7 @@ private:
     void setConfig(const xmlAccess::XmlBatchConfig& batchCfg);
     xmlAccess::XmlBatchConfig getConfig() const;
 
-    std::shared_ptr<DirectoryPairBatchFirst> firstFolderPair; //always bound!!!
+    std::unique_ptr<DirectoryPairBatchFirst> firstFolderPair; //always bound!!!
     std::vector<DirectoryPairBatch*> additionalFolderPairs;
 
     //used when saving batch file
@@ -90,7 +88,7 @@ private:
 
     std::unique_ptr<wxMenu> contextMenu;
 
-    std::unique_ptr<DirectoryName<wxTextCtrl>> logfileDir;
+    std::unique_ptr<DirectoryName<FolderHistoryBox>> logfileDir;
 
     zen::EnumDescrList<xmlAccess::OnError> enumDescrMap;
 
@@ -268,7 +266,7 @@ BatchDialog::BatchDialog(wxWindow* window,
     setupFileDrop(*this);
     Connect(FFS_DROP_FILE_EVENT, FFSFileDropEventHandler(BatchDialog::OnFilesDropped), NULL, this);
 
-    logfileDir.reset(new DirectoryName<wxTextCtrl>(*m_panelBatchSettings, *m_dirPickerLogfileDir, *m_textCtrlLogfileDir));
+    logfileDir.reset(new DirectoryName<FolderHistoryBox>(*m_panelBatchSettings, *m_dirPickerLogfileDir, *m_comboBoxLogfileDir));
 
     //set icons for this dialog
     m_bpButtonAddPair->SetBitmapLabel(GlobalResources::getImage(wxT("addFolderPair")));
@@ -439,7 +437,7 @@ void BatchDialog::OnHelp(wxCommandEvent& event)
 #endif
 }
 
-
+/*
 void BatchDialog::showNotebookpage(wxWindow* page, const wxString& pageName, bool show)
 {
     int windowPosition = -1;
@@ -467,7 +465,7 @@ void BatchDialog::showNotebookpage(wxWindow* page, const wxString& pageName, boo
         }
     }
 }
-
+*/
 
 void BatchDialog::OnClose(wxCloseEvent&   event)
 {
@@ -857,22 +855,9 @@ void BatchDialog::clearAddFolderPairs()
 
 /*
 #ifdef FFS_WIN
-#include <wx/msw/wrapwin.h> //includes "windows.h"
+#include <zen/win.h> //includes "windows.h"
 #include <shlobj.h>
 #endif  // FFS_WIN
-
-template <typename T>
-struct CleanUp
-{
-    CleanUp(T* element) : m_element(element) {}
-
-    ~CleanUp()
-    {
-        m_element->Release();
-    }
-
-    T* m_element;
-};
 
 
 bool BatchDialog::createBatchFile(const wxString& filename)

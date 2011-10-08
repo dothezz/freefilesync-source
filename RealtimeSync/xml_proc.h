@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <wx/string.h>
-#include <xml_error.h>
+#include "../lib/xml_base.h"
 
 
 namespace xmlAccess

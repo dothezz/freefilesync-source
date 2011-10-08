@@ -7,21 +7,17 @@
 #include "algorithm.h"
 #include <iterator>
 #include <stdexcept>
-//#include <wx/log.h>
-#include "library/resources.h"
-#include "shared/file_handling.h"
-#include "shared/recycler.h"
+#include "lib/resources.h"
+#include <zen/file_handling.h>
+#include "lib/recycler.h"
 #include <wx/msgdlg.h>
-#include "library/norm_filter.h"
-#include "shared/string_conv.h"
-#include "shared/global_func.h"
-#include "shared/i18n.h"
-#include "shared/loki/TypeManip.h"
-#include "library/db_file.h"
-#include "shared/loki/ScopeGuard.h"
-#include "library/cmp_filetime.h"
-#include "shared/stl_tools.h"
-#include "library/norm_filter.h"
+#include "lib/norm_filter.h"
+#include <wx+/string_conv.h>
+#include "lib/db_file.h"
+#include <zen/scope_guard.h>
+#include "lib/cmp_filetime.h"
+#include <zen/stl_tools.h>
+#include "lib/norm_filter.h"
 
 using namespace zen;
 using namespace std::rel_ops;
@@ -52,13 +48,13 @@ public:
         switch (fileObj.getCategory())
         {
             case FILE_LEFT_SIDE_ONLY:
-                if (fileObj.getFullName<LEFT_SIDE>().EndsWith(zen::TEMP_FILE_ENDING))
+                if (endsWith(fileObj.getFullName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
                     fileObj.setSyncDir(SYNC_DIR_LEFT); //schedule potentially existing temporary files for deletion
                 else
                     fileObj.setSyncDir(dirCfg.exLeftSideOnly);
                 break;
             case FILE_RIGHT_SIDE_ONLY:
-                if (fileObj.getFullName<RIGHT_SIDE>().EndsWith(zen::TEMP_FILE_ENDING))
+                if (endsWith(fileObj.getFullName<RIGHT_SIDE>(), zen::TEMP_FILE_ENDING))
                     fileObj.setSyncDir(SYNC_DIR_RIGHT); //schedule potentially existing temporary files for deletion
                 else
                     fileObj.setSyncDir(dirCfg.exRightSideOnly);
@@ -202,12 +198,12 @@ public:
         fileSize      = fileDescr.fileSize;
     }
 
-    DataSetFile(const FileMapping& fileObj, Loki::Int2Type<LEFT_SIDE>)
+    DataSetFile(const FileMapping& fileObj, Int2Type<LEFT_SIDE>)
     {
         init<LEFT_SIDE>(fileObj);
     }
 
-    DataSetFile(const FileMapping& fileObj, Loki::Int2Type<RIGHT_SIDE>)
+    DataSetFile(const FileMapping& fileObj, Int2Type<RIGHT_SIDE>)
     {
         init<RIGHT_SIDE>(fileObj);
     }
@@ -269,12 +265,12 @@ public:
 #endif
     }
 
-    DataSetSymlink(const SymLinkMapping& linkObj, Loki::Int2Type<LEFT_SIDE>)
+    DataSetSymlink(const SymLinkMapping& linkObj, Int2Type<LEFT_SIDE>)
     {
         init<LEFT_SIDE>(linkObj);
     }
 
-    DataSetSymlink(const SymLinkMapping& linkObj, Loki::Int2Type<RIGHT_SIDE>)
+    DataSetSymlink(const SymLinkMapping& linkObj, Int2Type<RIGHT_SIDE>)
     {
         init<RIGHT_SIDE>(linkObj);
     }
@@ -338,10 +334,10 @@ public:
     DataSetDir(const Zstring& name) :
         shortName(name) {}
 
-    DataSetDir(const DirMapping& dirObj, Loki::Int2Type<LEFT_SIDE>) :
+    DataSetDir(const DirMapping& dirObj, Int2Type<LEFT_SIDE>) :
         shortName(dirObj.getShortName<LEFT_SIDE>()) {}
 
-    DataSetDir(const DirMapping& dirObj, Loki::Int2Type<RIGHT_SIDE>) :
+    DataSetDir(const DirMapping& dirObj, Int2Type<RIGHT_SIDE>) :
         shortName(dirObj.getShortName<RIGHT_SIDE>()) {}
 
     inline friend
@@ -389,7 +385,7 @@ std::pair<DataSetDir, const DirContainer*> retrieveDataSetDir(const Zstring& obj
             return std::make_pair(DataSetDir(iter->first), &iter->second);
     }
 
-    return std::make_pair(DataSetDir(), static_cast<const DirContainer*>(NULL)); //object not found
+    return std::make_pair(DataSetDir(), static_cast<DirContainer*>(NULL)); //object not found
 }
 
 //----------------------------------------------------------------------------------------------
@@ -505,12 +501,12 @@ private:
 
 
         //##################### schedule potentially existing temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && fileObj.getFullName<LEFT_SIDE>().EndsWith(zen::TEMP_FILE_ENDING))
+        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getFullName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_LEFT);
             return;
         }
-        else if (cat == FILE_RIGHT_SIDE_ONLY && fileObj.getFullName<RIGHT_SIDE>().EndsWith(zen::TEMP_FILE_ENDING))
+        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getFullName<RIGHT_SIDE>(), zen::TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_RIGHT);
             return;
@@ -534,8 +530,8 @@ private:
         const DataSetFile dataDbLeft  = retrieveDataSetFile(fileObj.getObjShortName(), dbDirectoryLeft);
         const DataSetFile dataDbRight = retrieveDataSetFile(fileObj.getObjShortName(), dbDirectoryRight);
 
-        const DataSetFile dataCurrentLeft( fileObj, Loki::Int2Type<LEFT_SIDE>());
-        const DataSetFile dataCurrentRight(fileObj, Loki::Int2Type<RIGHT_SIDE>());
+        const DataSetFile dataCurrentLeft( fileObj, Int2Type<LEFT_SIDE>());
+        const DataSetFile dataCurrentRight(fileObj, Int2Type<RIGHT_SIDE>());
 
         //evaluation
         const bool changeOnLeft  = dataDbLeft  != dataCurrentLeft;
@@ -600,8 +596,8 @@ private:
         const DataSetSymlink dataDbLeft  = retrieveDataSetSymlink(linkObj.getObjShortName(), dbDirectoryLeft);
         const DataSetSymlink dataDbRight = retrieveDataSetSymlink(linkObj.getObjShortName(), dbDirectoryRight);
 
-        const DataSetSymlink dataCurrentLeft( linkObj, Loki::Int2Type<LEFT_SIDE>());
-        const DataSetSymlink dataCurrentRight(linkObj, Loki::Int2Type<RIGHT_SIDE>());
+        const DataSetSymlink dataCurrentLeft( linkObj, Int2Type<LEFT_SIDE>());
+        const DataSetSymlink dataCurrentRight(linkObj, Int2Type<RIGHT_SIDE>());
 
         //evaluation
         const bool changeOnLeft  = dataDbLeft  != dataCurrentLeft;
@@ -665,8 +661,8 @@ private:
 
         if (cat != DIR_EQUAL)
         {
-            const DataSetDir dataCurrentLeft( dirObj, Loki::Int2Type<LEFT_SIDE>());
-            const DataSetDir dataCurrentRight(dirObj, Loki::Int2Type<RIGHT_SIDE>());
+            const DataSetDir dataCurrentLeft( dirObj, Int2Type<LEFT_SIDE>());
+            const DataSetDir dataCurrentRight(dirObj, Int2Type<RIGHT_SIDE>());
 
             //evaluation
             const bool changeOnLeft  = dataDbLeftStuff.first  != dataCurrentLeft;
@@ -1371,7 +1367,7 @@ void zen::deleteFromGridAndHD(std::vector<FileSystemObject*>& rowsToDeleteOnLeft
         baseDirCfgs[&** iter] = directCfgs[iter - folderCmp.begin()];
 
     //ensure cleanup: redetermination of sync-directions and removal of invalid rows
-    LOKI_ON_BLOCK_EXIT2( std::for_each(begin(folderCmp), end(folderCmp), BaseDirMapping::removeEmpty); );
+    ZEN_ON_BLOCK_EXIT( std::for_each(begin(folderCmp), end(folderCmp), BaseDirMapping::removeEmpty); );
 
     std::set<FileSystemObject*> deleteLeft (rowsToDeleteOnLeft .begin(), rowsToDeleteOnLeft .end());
     std::set<FileSystemObject*> deleteRight(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());

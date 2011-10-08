@@ -7,18 +7,16 @@
 #ifndef FILEHIERARCHY_H_INCLUDED
 #define FILEHIERARCHY_H_INCLUDED
 
-#include "shared/zstring.h"
 #include <map>
 #include <string>
 #include <unordered_set>
 #include <memory>
-#include "shared/fixed_list.h"
+#include <zen/zstring.h>
+#include <zen/fixed_list.h>
 #include "structures.h"
-#include "shared/guid.h"
-#include "shared/file_id.h"
-#include "shared/int64.h"
+#include <zen/int64.h>
 #include "structures.h"
-#include "library/hard_filter.h"
+#include "lib/hard_filter.h"
 
 
 namespace zen
@@ -782,7 +780,7 @@ void FileSystemObject::removeObject<LEFT_SIDE>()
     shortNameLeft_.clear();
     removeObjectL();
 
-	setSyncDir(SYNC_DIR_NONE); //calls notifySyncCfgChanged()
+    setSyncDir(SYNC_DIR_NONE); //calls notifySyncCfgChanged()
 }
 
 

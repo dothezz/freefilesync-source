@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>参照</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows エラーコード %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux エラーコード %x:</target>
+
 <source>Invalid command line: %x</source>
 <target></target>
 
@@ -221,30 +227,6 @@
 <source>/sec</source>
 <target>/秒</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x 分.</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x 時間</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x 日</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>構成設定を保存(&A)...</target>
 
@@ -409,12 +391,6 @@ The command line is executed each time:
 <source>Error traversing directory:</source>
 <target>ディレクトリの移動エラー:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows エラーコード %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux エラーコード %x:</target>
-
 <source>Error setting privilege:</source>
 <target>特権の設定エラー:</target>
 
@@ -447,6 +423,30 @@ The command line is executed each time:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x 分.</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x 時間</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x 日</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>以下の XMLノードの値を読み込むことが出来ません:</target>
@@ -646,10 +646,13 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>キャンセル(&C)</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>操作:</target>
+
+<source>Items found:</source>
 <target>見つかった要素:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>残りの要素:</target>
 
 <source>Speed:</source>
@@ -660,9 +663,6 @@ The command line is executed each time:
 
 <source>Time elapsed:</source>
 <target>経過時間:</target>
-
-<source>Operation:</source>
-<target>操作:</target>
 
 <source>Select variant:</source>
 <target>変数を選択:</target>
@@ -758,7 +758,7 @@ is the same
 <source>Synchronizing...</source>
 <target>同期処理中...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>処理された要素:</target>
 
 <source>&Pause</source>
@@ -887,7 +887,7 @@ Exclude: \stuff\temp\*
 <source>Transactional file copy</source>
 <target></target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target></target>
 
 <source>Copy locked files</source>
@@ -982,6 +982,18 @@ Transfer file and directory permissions
 
 <source>Auto-adjust columns</source>
 <target>列の自動調整</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>すべての行を含める</target>

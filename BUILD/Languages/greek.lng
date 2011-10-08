@@ -8,7 +8,7 @@
 </header>
 
 <source>Searching for directory %x...</source>
-<target></target>
+<target>Αναζήτηση υποκαταλόγου %x...</target>
 
 <source>Show in Explorer</source>
 <target>Εμφάνιση στην Εξερεύνηση</target>
@@ -22,35 +22,8 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Αυτοματοποιημένος Συγχρονισμός</target>
 
-<source>Browse</source>
-<target>Αναζήτηση</target>
-
-<source>Invalid command line: %x</source>
-<target></target>
-
-<source>Error resolving symbolic link:</source>
-<target>Σφάλμα κατά την επίλυση του συμβολικού δεσμού:</target>
-
-<source>Show pop-up</source>
-<target></target>
-
-<source>Show pop-up on errors or warnings</source>
-<target></target>
-
-<source>Ignore errors</source>
-<target>Παράβλεψη των σφαλμάτων</target>
-
-<source>Hide all error and warning messages</source>
-<target>Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων</target>
-
-<source>Exit instantly</source>
-<target>Άμεση έξοδος</target>
-
-<source>Abort synchronization immediately</source>
-<target>Άμεση ματαίωση του συγχρονισμού</target>
-
 <source>Select alternate comparison settings</source>
-<target></target>
+<target>Επιλογή διαφοροποιημένων ρυθμίσεων σύγκρισης</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Επιλογή διαφοροποιημένων ρυθμίσεων συγχρονισμού</target>
@@ -107,7 +80,46 @@
 <target>Αναζήτηση</target>
 
 <source>Select time span</source>
-<target></target>
+<target>Επιλογή χρονικού διαστήματος</target>
+
+<source>Show pop-up</source>
+<target>Εμφάνιση αναδυόμενου παράθυρου</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Εμφάνιση αναδυόμενου παράθυρου σε σφάλματα ή προειδοποιήσεις</target>
+
+<source>Ignore errors</source>
+<target>Παράβλεψη των σφαλμάτων</target>
+
+<source>Hide all error and warning messages</source>
+<target>Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων</target>
+
+<source>Exit instantly</source>
+<target>Άμεση έξοδος</target>
+
+<source>Abort synchronization immediately</source>
+<target>Άμεση ματαίωση του συγχρονισμού</target>
+
+<source>Browse</source>
+<target>Αναζήτηση</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Σφάλμα κατά την ανάγνωση από τη βάση δεδομένων συγχρονισμού:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Σφάλμα κατά την εγγραφή στη βάση δεδομένων συγχρονισμού:</target>
+
+<source>Invalid command line: %x</source>
+<target>Σφάλμα στη γραμμή εντολών: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Κωδικός Σφάλματος των Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Κωδικός Σφάλματος του Linux %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Σφάλμα κατά την επίλυση του συμβολικού δεσμού:</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -166,11 +178,8 @@
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Μια από τις βάσεις δεδομένων του FreeFileSync δεν υπάρχει ακόμα:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Σφάλμα κατά την ανάγνωση από τη βάση δεδομένων συγχρονισμού:</target>
-
 <source>Database files do not share a common synchronization session:</source>
-<target></target>
+<target>Οι βάσεις δεδομένων δεν έχουν δημιουργηθεί από τον ίδιο συγχρονισμό:</target>
 
 <source>An exception occurred!</source>
 <target>Παρουσιάστηκε σφάλμα!</target>
@@ -193,11 +202,17 @@
 <pluralform>%x δ/λεπτα</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Μεταφορά && Απόθεση</target>
+
 <source>Info</source>
 <target>Πληροφορίες</target>
 
 <source>Fatal Error</source>
 <target>Σημαντικό Σφάλμα</target>
+
+<source>Error reading file:</source>
+<target>Σφάλμα κατά την ανάγνωση του αρχείου:</target>
 
 <source>Scanning:</source>
 <target>Ανίχνευση:</target>
@@ -209,52 +224,49 @@
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>[1 Νήμα]</pluralform>
+<pluralform>[%x Νήματα]</pluralform>
+</target>
 
 <source>Invalid FreeFileSync config file!</source>
 <target>Το αρχείο διάταξης του FreeFileSync δεν είναι έγκυρο!</target>
 
-<source>File does not exist:</source>
-<target>Το αρχείο δεν υπάρχει:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Σφάλμα κατά την ανάλυση του αρχείου διάταξης:</target>
+
+<source>Error moving to Recycle Bin:</source>
+<target>Σφάλμα κατά τη μεταφορά στον Κάδο Ανακύκλωσης:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Δεν φορτώθηκε μια απαιτούμενη βιβλιοθήκη DLL:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Σφάλμα κατά την πρόσβαση στην υπηρεσία Volume Shadow Copy!</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Δεν είναι δυνατή η δημιουργία σκιώδους αντίγραφου σε WOW64. Χρησιμοποιείστε την 64-bit έκδοση του FreeFileSync.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Δεν ήταν δυνατό να προσδιοριστεί το όνομα τόμου για το αρχείο:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>Το όνομα τόμου %x δεν είναι μέρος του ονόματος του αρχείου %y!</target>
 
 <source>/sec</source>
 <target>/δευτερόλεπτο</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 λεπτό</pluralform>
-<pluralform>%x λεπτά</pluralform>
-</target>
+<source>File does not exist:</source>
+<target>Το αρχείο δεν υπάρχει:</target>
 
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 ώρα</pluralform>
-<pluralform>%x ώρες</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 μέρα</pluralform>
-<pluralform>%x μέρες</pluralform>
-</target>
+<source>Could not read values for the following XML nodes:</source>
+<target>Δεν αναγνώστηκαν τιμές για τους ακόλουθους κόμβους XML:</target>
 
 <source>S&ave configuration...</source>
 <target>Α&ποθήκευση διάταξης...</target>
 
 <source>&Load configuration...</source>
-<target>Ά&νοιγμα διάταξης...</target>
+<target>&Άνοιγμα διάταξης...</target>
 
 <source>&Quit</source>
 <target>&Έξοδος</target>
@@ -341,120 +353,6 @@ The command line is executed each time:
 
 <source>A directory input field is empty.</source>
 <target>Ένα πεδίο εισόδου είναι κενό.</target>
-
-<source>Drag && drop</source>
-<target>Μεταφορά && Απόθεση</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Δεν ήταν δυνατό να γίνει έναρξη παρακολούθησης του υποκαταλόγου:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Σφάλμα κατά την παρακολούθηση υποκαταλόγων.</target>
-
-<source>Conversion error:</source>
-<target>Σφάλμα μετατροπής:</target>
-
-<source>Error deleting file:</source>
-<target>Σφάλμα κατά τη διαγραφή του αρχείου:</target>
-
-<source>Error moving file:</source>
-<target>Σφάλμα κατά τη μεταφορά του αρχείου:</target>
-
-<source>Target file already existing!</source>
-<target>Το αρχείο προορισμού υπάρχει ήδη!</target>
-
-<source>Error moving directory:</source>
-<target>Σφάλμα κατά τη μεταφορά του υποκαταλόγου:</target>
-
-<source>Target directory already existing!</source>
-<target>Ο υποκατάλογος προορισμού υπάρχει ήδη!</target>
-
-<source>Error deleting directory:</source>
-<target>Σφάλμα κατά τη διαγραφή του υποκαταλόγου:</target>
-
-<source>Error changing modification time:</source>
-<target>Σφάλμα κατά την αλλαγή της ώρας τροποποίησης:</target>
-
-<source>Error loading library function:</source>
-<target>Σφάλμα κατά τη φόρτωση της συνάρτησης βιβλιοθήκης:</target>
-
-<source>Error reading security context:</source>
-<target>Σφάλμα κατά την ανάγνωση του πλαισίου ασφαλείας:</target>
-
-<source>Error writing security context:</source>
-<target>Σφάλμα κατά την εγγραφή του πλαισίου ασφάλειας:</target>
-
-<source>Error copying file permissions:</source>
-<target>Σφάλμα κατά την αντιγραφή των αδειών των αρχείων:</target>
-
-<source>Error creating directory:</source>
-<target>Σφάλμα κατά τη δημιουργία του υποκαταλόγου:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Σφάλμα κατά την αντιγραφή του συμβολικού δεσμού:</target>
-
-<source>Error copying file:</source>
-<target>Σφάλμα κατά την αντιγραφή του αρχείου:</target>
-
-<source>Error opening file:</source>
-<target>Σφάλμα κατά το άνοιγμα του αρχείου:</target>
-
-<source>Error writing file:</source>
-<target>Σφάλμα κατά την εγγραφή του αρχείου:</target>
-
-<source>Error reading file:</source>
-<target>Σφάλμα κατά την ανάγνωση του αρχείου:</target>
-
-<source>Operation aborted!</source>
-<target>Η λειτουργία ματαιώθηκε!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Ατέρμονος βρόχος κατά την την ανάλυση του υποκαταλόγου:</target>
-
-<source>Error traversing directory:</source>
-<target>Σφάλμα κατά την ανάλυση του υποκαταλόγου:</target>
-
-<source>Windows Error Code %x:</source>
-<target>Κωδικός Σφάλματος των Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Κωδικός Σφάλματος του Linux %x:</target>
-
-<source>Error setting privilege:</source>
-<target>Σφάλμα κατά τον ορισμό δικαιωμάτων:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Σφάλμα κατά τη μεταφορά στον Κάδο Ανακύκλωσης:</target>
-
-<source>Could not load a required DLL:</source>
-<target>Δεν φορτώθηκε μια απαιτούμενη βιβλιοθήκη DLL:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Σφάλμα κατά την εγγραφή στη βάση δεδομένων συγχρονισμού:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target></target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Δεν είναι δυνατή η δημιουργία σκιώδους αντίγραφου σε WOW64. Χρησιμοποιείστε την 64-bit έκδοση του FreeFileSync.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Δεν ήταν δυνατό να προσδιοριστεί το όνομα τόμου για το αρχείο:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>Το όνομα τόμου %x δεν είναι μέρος του ονόματος του αρχείου %y!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Δεν αναγνώστηκαν τιμές για τους ακόλουθους κόμβους XML:</target>
 
 <source>Logging</source>
 <target>Καταγραφή μηνυμάτων</target>
@@ -607,7 +505,7 @@ The command line is executed each time:
 <target>Δέσμη ενεργειών</target>
 
 <source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target></target>
+<target>Δημιουργία ενός αρχείου δέσμης ενεργειών για αυτόματο συγχρονισμό. Για την έναρξη σε λειτουργία δέσμης, απλά κάντε διπλό κλικ στο αρχείο ή εκτελέστε το μέσω της γραμμής εντολών: FreeFileSync.exe <αρχείο δέσμης>. Αυτή η λειτουργία μπορεί να προγραμματιστεί και στο χρονοδιάγραμμα εργασιών του λειτουργικού σας συστήματος.</target>
 
 <source>Help</source>
 <target>Βοήθεια</target>
@@ -631,16 +529,16 @@ The command line is executed each time:
 <target>Αναφορά κατάστασης</target>
 
 <source>Run minimized</source>
-<target></target>
+<target>Να εκτελεστεί ελαχιστοποιημένο</target>
 
 <source>Maximum number of logfiles:</source>
 <target>Μέγιστος αριθμός αρχείων καταγραφής:</target>
 
 <source>Select logfile directory:</source>
-<target>Επιλέξτε έναν κατάλογο για το αρχείο καταγραφής:</target>
+<target>Επιλέξτε έναν κατάλογο για τα αρχεία καταγραφής:</target>
 
 <source>Batch settings</source>
-<target></target>
+<target>Ρυθμίσεις δέσμης ενεργειών</target>
 
 <source>&Save</source>
 <target>&Αποθήκευση</target>
@@ -651,10 +549,13 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>&Άκυρο</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Λειτουργία:</target>
+
+<source>Items found:</source>
 <target>Βρέθηκαν στοιχεία:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Περισσεύουν στοιχεία:</target>
 
 <source>Speed:</source>
@@ -665,9 +566,6 @@ The command line is executed each time:
 
 <source>Time elapsed:</source>
 <target>Πέρασε χρόνος:</target>
-
-<source>Operation:</source>
-<target>Λειτουργία:</target>
 
 <source>Select variant:</source>
 <target>Επιλέξτε μια μέθοδο:</target>
@@ -738,10 +636,15 @@ Files are found equal if
      - file size
 are the same
 </source>
-<target></target>
+<target>
+Τα αρχεία θεωρούνται ίδια εάν
+     - η ημερομηνία και ώρα τελευταίας τροποποίησης
+     - το μέγεθός τους
+είναι ίδια
+</target>
 
 <source>File time and size</source>
-<target></target>
+<target>Ημερομηνία και μέγεθος αρχείων</target>
 
 <source>
 Files are found equal if
@@ -751,7 +654,7 @@ is the same
 <target>
 Τα αρχεία θεωρούνται ίδια, εάν
      - το περιεχόμενό τους
-είναι ίδιο.
+είναι ίδιο
 </target>
 
 <source>File content</source>
@@ -763,7 +666,7 @@ is the same
 <source>Synchronizing...</source>
 <target>Γίνεται συγχρονισμός...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Επεξεργάστηκαν στοιχεία:</target>
 
 <source>&Pause</source>
@@ -875,10 +778,10 @@ Exclude: \stuff\temp\*
 <target>Εξαίρεση</target>
 
 <source>Minimum file size</source>
-<target></target>
+<target>Ελάχιστο μέγεθος αρχείου</target>
 
 <source>Maximum file size</source>
-<target></target>
+<target>Μέγιστο μέγεθος αρχείου</target>
 
 <source>&Default</source>
 <target>&Προεπιλογή</target>
@@ -890,10 +793,10 @@ Exclude: \stuff\temp\*
 <target>Μετακίνηση της στήλης κάτω</target>
 
 <source>Transactional file copy</source>
-<target></target>
+<target>Συνδιαλλακτική αντιγραφή αρχείων</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target></target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target>Εγγραφή πρώτα σε προσωρινό αρχείο (*.ffs_tmp) και μετά μετονομασία του. Αυτή η ρύθμιση εγγυάται συνέπεια ακόμα και στην περίπτωση σοβαρού σφάλματος.</target>
 
 <source>Copy locked files</source>
 <target>Αντιγραφή κλειδωμένων αρχείων</target>
@@ -908,7 +811,7 @@ Copy shared or locked files using Volume Shadow Copy Service
 </target>
 
 <source>Copy file access permissions</source>
-<target></target>
+<target>Αντιγραφή των αδειών προσπέλασης των αρχείων</target>
 
 <source>
 Transfer file and directory permissions
@@ -949,6 +852,9 @@ Transfer file and directory permissions
 <source>&Find next</source>
 <target>&Εύρεση επομένου</target>
 
+<source>Operation aborted!</source>
+<target>Η λειτουργία ματαιώθηκε!</target>
+
 <source>Main bar</source>
 <target>Γραμμή εργαλείων</target>
 
@@ -983,10 +889,22 @@ Transfer file and directory permissions
 <target>Προσαρμογή...</target>
 
 <source>Select time span...</source>
-<target></target>
+<target>Επιλέξτε το χρονικό εύρος...</target>
 
 <source>Auto-adjust columns</source>
 <target>Αυτόματη προσαρμογή των στηλών</target>
+
+<source>Icon size:</source>
+<target>Μέγεθος εικονιδίων:</target>
+
+<source>Small</source>
+<target>Μικρό</target>
+
+<source>Medium</source>
+<target>Μεσαίο</target>
+
+<source>Large</source>
+<target>Μεγάλο</target>
 
 <source>Include all rows</source>
 <target>Συμπερίληψη όλων των γραμμών</target>
@@ -1114,6 +1032,9 @@ Transfer file and directory permissions
 <source>File list exported!</source>
 <target>Ο κατάλογος των αρχείων έχει εξαχθεί!</target>
 
+<source>Error writing file:</source>
+<target>Σφάλμα κατά την εγγραφή του αρχείου:</target>
+
 <source>Batch file created successfully!</source>
 <target>Το αρχείο δέσμης ενεργειών δημιουργήθηκε επιτυχώς!</target>
 
@@ -1184,19 +1105,19 @@ Transfer file and directory permissions
 <target>Ανενεργό</target>
 
 <source>Last x hours</source>
-<target></target>
+<target>Τελευταίες x ώρες</target>
 
 <source>Today</source>
-<target></target>
+<target>Σήμερα</target>
 
 <source>This week</source>
-<target></target>
+<target>Αυτήν την εβδομάδα</target>
 
 <source>This month</source>
-<target></target>
+<target>Αυτόν το μήνα</target>
 
 <source>This year</source>
-<target></target>
+<target>Αυτό το έτος</target>
 
 <source>Byte</source>
 <target>Byte</target>
@@ -1223,7 +1144,7 @@ Transfer file and directory permissions
 <target>Ως περιεχόμενο</target>
 
 <source>Copy NTFS permissions</source>
-<target></target>
+<target>Αντιγραφή αδειών προσπέλασης NTFS</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Ένταξη εξωτερικών εφαρμογών στο μενού περιβάλλοντος. Οι ακόλουθες μακροεντολές είναι διαθέσιμες:</target>
@@ -1278,6 +1199,105 @@ Transfer file and directory permissions
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>Μεταφορά των αρχείων σε έναν υποκατάλογο με ένδειξη ώρας</target>
+
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 λεπτό</pluralform>
+<pluralform>%x λεπτά</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 ώρα</pluralform>
+<pluralform>%x ώρες</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 μέρα</pluralform>
+<pluralform>%x μέρες</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Δεν ήταν δυνατό να γίνει έναρξη παρακολούθησης του υποκαταλόγου:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Σφάλμα κατά την παρακολούθηση υποκαταλόγων.</target>
+
+<source>Conversion error:</source>
+<target>Σφάλμα μετατροπής:</target>
+
+<source>Error deleting file:</source>
+<target>Σφάλμα κατά τη διαγραφή του αρχείου:</target>
+
+<source>Error moving file:</source>
+<target>Σφάλμα κατά τη μεταφορά του αρχείου:</target>
+
+<source>Target file already existing!</source>
+<target>Το αρχείο προορισμού υπάρχει ήδη!</target>
+
+<source>Error moving directory:</source>
+<target>Σφάλμα κατά τη μεταφορά του υποκαταλόγου:</target>
+
+<source>Target directory already existing!</source>
+<target>Ο υποκατάλογος προορισμού υπάρχει ήδη!</target>
+
+<source>Error deleting directory:</source>
+<target>Σφάλμα κατά τη διαγραφή του υποκαταλόγου:</target>
+
+<source>Error changing modification time:</source>
+<target>Σφάλμα κατά την αλλαγή της ώρας τροποποίησης:</target>
+
+<source>Error loading library function:</source>
+<target>Σφάλμα κατά τη φόρτωση της συνάρτησης βιβλιοθήκης:</target>
+
+<source>Error reading security context:</source>
+<target>Σφάλμα κατά την ανάγνωση του πλαισίου ασφαλείας:</target>
+
+<source>Error writing security context:</source>
+<target>Σφάλμα κατά την εγγραφή του πλαισίου ασφάλειας:</target>
+
+<source>Error copying file permissions:</source>
+<target>Σφάλμα κατά την αντιγραφή των αδειών των αρχείων:</target>
+
+<source>Error creating directory:</source>
+<target>Σφάλμα κατά τη δημιουργία του υποκαταλόγου:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Σφάλμα κατά την αντιγραφή του συμβολικού δεσμού:</target>
+
+<source>Error copying file:</source>
+<target>Σφάλμα κατά την αντιγραφή του αρχείου:</target>
+
+<source>Error opening file:</source>
+<target>Σφάλμα κατά το άνοιγμα του αρχείου:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Ατέρμονος βρόχος κατά την την ανάλυση του υποκαταλόγου:</target>
+
+<source>Error traversing directory:</source>
+<target>Σφάλμα κατά την ανάλυση του υποκαταλόγου:</target>
+
+<source>Error setting privilege:</source>
+<target>Σφάλμα κατά τον ορισμό δικαιωμάτων:</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Και οι δυο πλευρές έχουν αλλάξει από τον τελευταίο συγχρονισμό!</target>
@@ -1376,40 +1396,40 @@ Transfer file and directory permissions
 <target>Διαγραφή του υποκαταλόγου %x</target>
 
 <source>Deleting symbolic link %x</source>
-<target></target>
+<target>Διαγραφή του συμβολικού δεσμού %x</target>
 
 <source>Moving file %x to recycle bin</source>
-<target></target>
+<target>Μεταφορά του αρχείου %x στον κάδο ανακύκλωσης</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target></target>
+<target>Μεταφορά του υποκαταλόγου %x στον κάδο ανακύκλωσης</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target></target>
+<target>Μεταφορά του συμβολικού δεσμού %x στον κάδο ανακύκλωσης</target>
 
 <source>Moving file %x to %y</source>
-<target></target>
+<target>Μεταφορά του αρχείου %x στο %y</target>
 
 <source>Moving folder %x to %y</source>
-<target></target>
+<target>Μεταφορά του υποκαταλόγου %x στο %y</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target></target>
+<target>Μεταφορά του συμβολικού δεσμού %x στο %y</target>
 
 <source>Creating file %x</source>
-<target></target>
+<target>Δημιουργία του αρχείου %x</target>
 
 <source>Creating symbolic link %x</source>
-<target></target>
+<target>Δημιουργία του συμβολικού δεσμού %x</target>
 
 <source>Creating folder %x</source>
 <target>Δημιουργία του υποκαταλόγου %x</target>
 
 <source>Overwriting file %x</source>
-<target></target>
+<target>Αντικατάσταση του αρχείου %x</target>
 
 <source>Overwriting symbolic link %x</source>
-<target></target>
+<target>Αντικατάσταση του συμβολικού δεσμού %x</target>
 
 <source>Verifying file %x</source>
 <target>Επικύρωση του αρχείου %x</target>
@@ -1448,7 +1468,7 @@ Transfer file and directory permissions
 <target>Διαθέσιμος ελεύθερος χώρος δίσκου:</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target></target>
+<target>Ο Κάδος Ανακύκλωσης δεν είναι διαθέσιμος για τις ακόλουθες διαδρομές! Τα αρχεία θα διαγραφούν μόνιμα:</target>
 
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Θα τροποποιηθεί ένας υποκατάλογος που ανήκει σε πολλαπλά ζεύγη υποκαταλόγων! Παρακαλώ αναθεωρείστε τις ρυθμίσεις συγχρονισμού.</target>

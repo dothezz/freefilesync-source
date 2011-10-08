@@ -7,22 +7,35 @@
 #ifndef SWITCHTOGUI_H_INCLUDED
 #define SWITCHTOGUI_H_INCLUDED
 
-#include "../library/process_xml.h"
-
+#include "../lib/process_xml.h"
+#include "main_dlg.h" //in "application.cpp" we have this dependency anyway!
 
 namespace zen
 {
-
 //switch from FreeFileSync Batch to GUI modus: opens a new FreeFileSync GUI session asynchronously
 class SwitchToGui
 {
 public:
-    SwitchToGui(const xmlAccess::XmlBatchConfig& batchCfg, xmlAccess::XmlGlobalSettings& globalSettings); //prepare
-    void execute() const; //throw()
+    SwitchToGui(const wxString& referenceFile,
+                const xmlAccess::XmlBatchConfig& batchCfg,
+                xmlAccess::XmlGlobalSettings& globalSettings) :
+        guiCfg(xmlAccess::convertBatchToGui(batchCfg)),
+        globalSettings_(globalSettings)
+    {
+        referenceFiles.push_back(referenceFile);
+    }
+
+    void execute() const
+    {
+
+        MainDialog* frame = new MainDialog(referenceFiles, guiCfg, globalSettings_, true); //toplevel window
+        frame->Show();
+    }
 
 private:
-    xmlAccess::XmlGlobalSettings& globalSettings_;
+    std::vector<wxString> referenceFiles;
     const xmlAccess::XmlGuiConfig guiCfg;
+    xmlAccess::XmlGlobalSettings& globalSettings_;
 };
 }
 

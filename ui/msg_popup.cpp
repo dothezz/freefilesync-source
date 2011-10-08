@@ -5,8 +5,8 @@
 // **************************************************************************
 
 #include "msg_popup.h"
-#include "../library/resources.h"
-#include "../shared/mouse_move_dlg.h"
+#include "../lib/resources.h"
+#include <wx+/mouse_move_dlg.h>
 #include "gui_generated.h"
 
 
@@ -263,7 +263,6 @@ void QuestionDlg::OnCheckBoxDontShowAgain(wxCommandEvent& event)
 {
     event.Skip();
 }
-
 
 
 ReturnQuestionDlg::ButtonPressed zen::showQuestionDlg(int activeButtons, const wxString& messageText, bool* dontShowAgain)

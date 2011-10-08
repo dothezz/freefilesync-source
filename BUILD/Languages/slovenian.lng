@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Brskaj</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows koda napake %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux koda napake %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Napačna ukazna vrstica: %x</target>
 
@@ -232,39 +238,6 @@
 <source>/sec</source>
 <target>/sek</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-<pluralform>%x min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 ura</pluralform>
-<pluralform>%x uri</pluralform>
-<pluralform>%x ure</pluralform>
-<pluralform>%x ur</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dan</pluralform>
-<pluralform>%x dni</pluralform>
-<pluralform>%x dni</pluralform>
-<pluralform>%x dni</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>Shr&ani konfiguracijo...</target>
 
@@ -429,12 +402,6 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Error traversing directory:</source>
 <target>Napaka pri prehajanju imenika:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows koda napake %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux koda napake %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Napaka pri nastavljanju privilegija:</target>
 
@@ -467,6 +434,39 @@ Ukazna vrstica se izvrši vsakič ko:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+<pluralform>%x min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 ura</pluralform>
+<pluralform>%x uri</pluralform>
+<pluralform>%x ure</pluralform>
+<pluralform>%x ur</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dan</pluralform>
+<pluralform>%x dni</pluralform>
+<pluralform>%x dni</pluralform>
+<pluralform>%x dni</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Ne morem brati vrednosti za naslednja XML vozlišča:</target>
@@ -666,10 +666,13 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>&Cancel</source>
 <target>&Prekliči</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Operacija:</target>
+
+<source>Items found:</source>
 <target>Najdenih elementov:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Preostalih elementov:</target>
 
 <source>Speed:</source>
@@ -680,9 +683,6 @@ Ukazna vrstica se izvrši vsakič ko:
 
 <source>Time elapsed:</source>
 <target>Pretečen čas:</target>
-
-<source>Operation:</source>
-<target>Operacija:</target>
 
 <source>Select variant:</source>
 <target>Izberite varianto:</target>
@@ -783,7 +783,7 @@ enaka
 <source>Synchronizing...</source>
 <target>Sinhroniziram...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Obdelanih elementov:</target>
 
 <source>&Pause</source>
@@ -912,8 +912,8 @@ Izključi: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>Transakcijsko kopiranje datotek</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>Najprej zapisuj datoteke v začasno (*.ffs_tmp) in jih nato preimenuj. To zagotavlja konsistentno stanje celo v situacijah usodnih napak.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Kopiraj zaklenjene datoteke</target>
@@ -1007,6 +1007,18 @@ Prenesi dovoljenja datotek in imenikov
 
 <source>Auto-adjust columns</source>
 <target>Samo-prilagodi stolpce</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Vključi se vrstice</target>

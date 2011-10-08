@@ -6,10 +6,8 @@
 
 #include "xml_proc.h"
 #include <wx/filefn.h>
-#include "../shared/i18n.h"
-#include <file_handling.h>
-#include <string_conv.h>
-#include <xml_base.h>
+#include <zen/file_handling.h>
+#include <wx+/string_conv.h>
 
 using namespace zen;
 using namespace xmlAccess;
@@ -44,19 +42,19 @@ bool isXmlTypeRTS(const XmlDoc& doc) //throw()
 void xmlAccess::readRealConfig(const wxString& filename, XmlRealConfig& config)
 {
     if (!fileExists(toZ(filename)))
-        throw FfsXmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
+        throw FfsXmlError(_("File does not exist:") + "\n\"" + filename.c_str() + "\"");
 
     XmlDoc doc;
-    loadXmlDocument(filename, doc);  //throw (FfsXmlError)
+    loadXmlDocument(toZ(filename), doc);  //throw (FfsXmlError)
 
     if (!isXmlTypeRTS(doc))
-        throw FfsXmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
+        throw FfsXmlError(_("Error parsing configuration file:") + "\n\"" + filename.c_str() + "\"");
 
     XmlIn in(doc);
     ::readConfig(in, config);
 
     if (in.errorsOccured())
-        throw FfsXmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\"\n\n") +
+        throw FfsXmlError(_("Error parsing configuration file:") + "\n\"" + filename.c_str() + "\"\n\n" +
                           getErrorMessageFormatted(in), FfsXmlError::WARNING);
 }
 
@@ -80,5 +78,5 @@ void xmlAccess::writeRealConfig(const XmlRealConfig& config, const wxString& fil
     XmlOut out(doc);
     writeConfig(config, out);
 
-    saveXmlDocument(doc, filename); //throw (FfsXmlError)
+    saveXmlDocument(doc, toZ(filename)); //throw (FfsXmlError)
 }

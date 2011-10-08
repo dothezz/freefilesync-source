@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Bläddra</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows Felkod %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Felkod %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Ogiltig kommandorad: %x</target>
 
@@ -226,33 +232,6 @@
 <source>/sec</source>
 <target>/s</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 timma</pluralform>
-<pluralform>%x timmar</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dag</pluralform>
-<pluralform>%x dagar</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>S&para inställningar...</target>
 
@@ -417,12 +396,6 @@ Kommandot verkställes när:
 <source>Error traversing directory:</source>
 <target>Accessfel på katalog:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows Felkod %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Felkod %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Kan inte ange privilegie:</target>
 
@@ -455,6 +428,33 @@ Kommandot verkställes när:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 timma</pluralform>
+<pluralform>%x timmar</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dag</pluralform>
+<pluralform>%x dagar</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Kan inte läsa värden för följande XML-noder:</target>
@@ -654,10 +654,13 @@ Kommandot verkställes när:
 <source>&Cancel</source>
 <target>&Avbryt</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Arbetsuppgift:</target>
+
+<source>Items found:</source>
 <target>Funna poster:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Återstående poster:</target>
 
 <source>Speed:</source>
@@ -668,9 +671,6 @@ Kommandot verkställes när:
 
 <source>Time elapsed:</source>
 <target>Förfluten tid:</target>
-
-<source>Operation:</source>
-<target>Arbetsuppgift:</target>
 
 <source>Select variant:</source>
 <target>Välj variant:</target>
@@ -771,7 +771,7 @@ Filerna betecknas som lika om,
 <source>Synchronizing...</source>
 <target>Synkroniserar...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Processade poster</target>
 
 <source>&Pause</source>
@@ -900,8 +900,8 @@ Undanta: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>Transaktionell filkopiering</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>Skriver först filer till en temporär fil(*.ffs_tmp), och byter namn på dom. Detta garanterar ett konsekvent tillstånd även i situationer av allvarliga fel.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Kopiera låsta filer</target>
@@ -995,6 +995,18 @@ Transfer file and directory permissions
 
 <source>Auto-adjust columns</source>
 <target>Autojustera kollumner</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Inkludera alla rader</target>

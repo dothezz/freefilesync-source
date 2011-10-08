@@ -1,12 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Mar 22 2011)
+// C++ code generated with wxFormBuilder (version Jun 30 2011)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#include "../shared/custom_button.h"
-#include "../shared/dir_picker_i18n.h"
+#include "../ui/wx_form_build_hide_warnings.h"
+#include "../wx+/button.h"
+#include "../wx+/dir_picker.h"
 
 #include "gui_generated.h"
 
@@ -14,7 +15,7 @@
 
 MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
-    this->SetSizeHints( wxSize( 420, 440 ), wxDefaultSize );
+    this->SetSizeHints( wxSize( 420,440 ), wxDefaultSize );
 
     m_menubar1 = new wxMenuBar( 0 );
     m_menuFile = new wxMenu();
@@ -66,7 +67,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_staticText2->Wrap( -1 );
     m_staticText2->SetFont( wxFont( 10, 74, 90, 90, true, wxEmptyString ) );
 
-    sbSizer41->Add( m_staticText2, 0, wxBOTTOM | wxRIGHT | wxLEFT, 5 );
+    sbSizer41->Add( m_staticText2, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 
     m_staticText3 = new wxStaticText( m_panelMain, wxID_ANY, _("1. Select directories to monitor."), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText3->Wrap( -1 );
@@ -81,16 +82,16 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     sbSizer41->Add( m_staticText5, 0, wxLEFT, 10 );
 
     m_staticline3 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    sbSizer41->Add( m_staticline3, 0, wxEXPAND | wxTOP | wxBOTTOM, 5 );
+    sbSizer41->Add( m_staticline3, 0, wxEXPAND|wxTOP|wxBOTTOM, 5 );
 
     m_staticText21 = new wxStaticText( m_panelMain, wxID_ANY, _("The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText21->Wrap( -1 );
-    sbSizer41->Add( m_staticText21, 0, wxRIGHT | wxLEFT | wxEXPAND, 5 );
+    sbSizer41->Add( m_staticText21, 0, wxRIGHT|wxLEFT|wxEXPAND, 5 );
 
-    bSizer1->Add( sbSizer41, 0, wxALIGN_CENTER_HORIZONTAL | wxRIGHT | wxLEFT | wxEXPAND, 40 );
+    bSizer1->Add( sbSizer41, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT|wxEXPAND, 40 );
 
     m_staticline2 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    bSizer1->Add( m_staticline2, 0, wxTOP | wxBOTTOM | wxEXPAND, 10 );
+    bSizer1->Add( m_staticline2, 0, wxTOP|wxBOTTOM|wxEXPAND, 10 );
 
     wxBoxSizer* bSizer8;
     bSizer8 = new wxBoxSizer( wxVERTICAL );
@@ -104,22 +105,22 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     wxBoxSizer* bSizer781;
     bSizer781 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_bpButtonAddFolder = new wxBitmapButton( m_panelMainFolder, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 19, 21 ), wxBU_AUTODRAW );
+    m_bpButtonAddFolder = new wxBitmapButton( m_panelMainFolder, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 19,21 ), wxBU_AUTODRAW );
     m_bpButtonAddFolder->SetToolTip( _("Add folder") );
 
-    bSizer781->Add( m_bpButtonAddFolder, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer781->Add( m_bpButtonAddFolder, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_bpButtonRemoveTopFolder = new wxBitmapButton( m_panelMainFolder, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 19, 21 ), wxBU_AUTODRAW );
+    m_bpButtonRemoveTopFolder = new wxBitmapButton( m_panelMainFolder, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 19,21 ), wxBU_AUTODRAW );
     m_bpButtonRemoveTopFolder->SetToolTip( _("Remove folder") );
 
-    bSizer781->Add( m_bpButtonRemoveTopFolder, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer781->Add( m_bpButtonRemoveTopFolder, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
     bSizer114->Add( bSizer781, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
     m_txtCtrlDirectoryMain = new wxTextCtrl( m_panelMainFolder, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
     bSizer114->Add( m_txtCtrlDirectoryMain, 1, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_dirPickerMain = new FfsDirPickerCtrl( m_panelMainFolder, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_dirPickerMain = new zen::DirPickerCtrl( m_panelMainFolder, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
     m_dirPickerMain->SetToolTip( _("Select a folder") );
 
     bSizer114->Add( m_dirPickerMain, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -129,7 +130,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     bSizer114->Fit( m_panelMainFolder );
     sbSizerDirToWatch->Add( m_panelMainFolder, 0, wxEXPAND, 5 );
 
-    m_scrolledWinFolders = new wxScrolledWindow( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL );
+    m_scrolledWinFolders = new wxScrolledWindow( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
     m_scrolledWinFolders->SetScrollRate( 5, 5 );
     bSizerFolders = new wxBoxSizer( wxVERTICAL );
 
@@ -138,17 +139,17 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     bSizerFolders->Fit( m_scrolledWinFolders );
     sbSizerDirToWatch->Add( m_scrolledWinFolders, 0, wxEXPAND, 5 );
 
-    bSizer8->Add( sbSizerDirToWatch, 0, wxEXPAND | wxBOTTOM | wxRIGHT | wxLEFT, 5 );
+    bSizer8->Add( sbSizerDirToWatch, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 
-    bSizer1->Add( bSizer8, 1, wxEXPAND, 5 );
+    bSizer1->Add( bSizer8, 0, wxEXPAND, 5 );
 
     wxStaticBoxSizer* sbSizer3;
     sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Command line") ), wxVERTICAL );
 
     m_textCtrlCommand = new wxTextCtrl( m_panelMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-    sbSizer3->Add( m_textCtrlCommand, 0, wxEXPAND | wxBOTTOM, 5 );
+    sbSizer3->Add( m_textCtrlCommand, 0, wxEXPAND|wxBOTTOM, 5 );
 
-    bSizer1->Add( sbSizer3, 0, wxEXPAND | wxTOP | wxRIGHT | wxLEFT, 5 );
+    bSizer1->Add( sbSizer3, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
     wxStaticBoxSizer* sbSizer4;
     sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Minimum Idle Time [seconds]") ), wxVERTICAL );
@@ -156,20 +157,20 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_spinCtrlDelay = new wxSpinCtrl( m_panelMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 2000000000, 0 );
     m_spinCtrlDelay->SetToolTip( _("Idle time between detection of last change and execution of command line in seconds") );
 
-    sbSizer4->Add( m_spinCtrlDelay, 0, wxBOTTOM | wxRIGHT | wxLEFT | wxALIGN_CENTER_HORIZONTAL, 5 );
+    sbSizer4->Add( m_spinCtrlDelay, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    bSizer1->Add( sbSizer4, 0, wxEXPAND | wxRIGHT | wxLEFT, 5 );
+    bSizer1->Add( sbSizer4, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
 
     m_staticline1 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    bSizer1->Add( m_staticline1, 0, wxEXPAND | wxTOP | wxBOTTOM, 10 );
+    bSizer1->Add( m_staticline1, 0, wxEXPAND|wxTOP|wxBOTTOM, 10 );
 
-    m_buttonStart = new wxButtonWithImage( m_panelMain, wxID_ANY, _("Start"), wxDefaultPosition, wxSize( -1, 40 ), 0 );
+    m_buttonStart = new zen::BitmapButton( m_panelMain, wxID_ANY, _("Start"), wxDefaultPosition, wxSize( -1,40 ), 0 );
     m_buttonStart->SetDefault();
     m_buttonStart->SetFont( wxFont( 14, 74, 90, 92, false, wxT("Arial Black") ) );
 
-    bSizer1->Add( m_buttonStart, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer1->Add( m_buttonStart, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    m_buttonCancel = new wxButton( m_panelMain, wxID_CANCEL, _("dummy"), wxDefaultPosition, wxSize( 0, 0 ), 0 );
+    m_buttonCancel = new wxButton( m_panelMain, wxID_CANCEL, _("dummy"), wxDefaultPosition, wxSize( 0,0 ), 0 );
     bSizer1->Add( m_buttonCancel, 0, 0, 5 );
 
     m_panelMain->SetSizer( bSizer1 );
@@ -215,7 +216,7 @@ FolderGenerated::FolderGenerated( wxWindow* parent, wxWindowID id, const wxPoint
     wxBoxSizer* bSizer114;
     bSizer114 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_bpButtonRemoveFolder = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 19, 21 ), wxBU_AUTODRAW );
+    m_bpButtonRemoveFolder = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 19,21 ), wxBU_AUTODRAW );
     m_bpButtonRemoveFolder->SetToolTip( _("Remove folder") );
 
     bSizer114->Add( m_bpButtonRemoveFolder, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -226,7 +227,7 @@ FolderGenerated::FolderGenerated( wxWindow* parent, wxWindowID id, const wxPoint
     m_txtCtrlDirectory = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
     bSizer20->Add( m_txtCtrlDirectory, 1, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_dirPicker = new FfsDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_dirPicker = new zen::DirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
     m_dirPicker->SetToolTip( _("Select a folder") );
 
     bSizer20->Add( m_dirPicker, 0, wxALIGN_CENTER_VERTICAL, 5 );

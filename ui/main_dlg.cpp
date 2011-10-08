@@ -18,43 +18,42 @@
 #include <wx/app.h>
 #include <wx/dcmemory.h>
 #include <boost/bind.hpp>
-#include "../shared/folder_history_box.h"
-#include "../library/custom_grid.h"
-#include "../shared/custom_button.h"
-#include "../shared/dir_picker_i18n.h"
+#include "../lib/folder_history_box.h"
+#include "../lib/custom_grid.h"
+#include <wx+/button.h>
+#include <wx+/dir_picker.h>
 #include "../comparison.h"
 #include "../synchronization.h"
 #include "../algorithm.h"
-#include "../shared/app_main.h"
-#include "../shared/util.h"
+#include <wx+/app_main.h>
+#include <wx+/format_unit.h>
 #include "check_version.h"
 #include "gui_status_handler.h"
 #include "sync_cfg.h"
-#include "../shared/i18n.h"
-#include "../shared/string_conv.h"
+#include <wx+/string_conv.h>
 #include "small_dlgs.h"
-#include "../shared/mouse_move_dlg.h"
+#include <wx+/mouse_move_dlg.h>
 #include "progress_indicator.h"
 #include "msg_popup.h"
-#include "../shared/dir_name.h"
+#include "../lib/dir_name.h"
 #include "../structures.h"
 #include "grid_view.h"
-#include "../library/resources.h"
-#include "../shared/file_handling.h"
-#include "../shared/resolve_path.h"
-#include "../shared/recycler.h"
-#include "../shared/standard_paths.h"
-#include "../shared/toggle_button.h"
+#include "../lib/resources.h"
+#include <zen/file_handling.h>
+#include <zen/file_id.h>
+#include "../lib/resolve_path.h"
+#include "../lib/recycler.h"
+#include "../lib/ffs_paths.h"
+#include <wx+/toggle_button.h>
 #include "folder_pair.h"
-#include "../shared/global_func.h"
 #include "search.h"
-#include "../shared/help_provider.h"
+#include "../lib/help_provider.h"
 #include "batch_config.h"
-#include "../shared/check_exist.h"
-#include "../library/lock_holder.h"
-#include "../shared/shell_execute.h"
-#include "../shared/localization.h"
-#include "../shared/image_tools.h"
+#include <zen/thread.h>
+#include "../lib/lock_holder.h"
+#include <wx+/shell_execute.h>
+#include "../lib/localization.h"
+#include <wx+/image_tools.h>
 
 using namespace zen;
 using namespace std::rel_ops;
@@ -300,20 +299,6 @@ private:
 };
 
 
-struct DirNotFound
-{
-    bool operator()(const FolderPairEnh& fp) const
-    {
-        const Zstring dirFmtLeft  = zen::getFormattedDirectoryName(fp.leftDirectory);
-        const Zstring dirFmtRight = zen::getFormattedDirectoryName(fp.rightDirectory);
-
-        if (dirFmtLeft.empty() && dirFmtRight.empty())
-            return false;
-
-        return !dirExists(dirFmtLeft) || !dirExists(dirFmtRight);
-    }
-};
-
 
 #ifdef FFS_WIN
 class PanelMoveWindow : public MouseMoveWindow
@@ -342,22 +327,36 @@ private:
 
 
 //##################################################################################################################################
-MainDialog::MainDialog(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings& settings) :
+MainDialog::MainDialog(const std::vector<wxString>& cfgFileNames, xmlAccess::XmlGlobalSettings& settings) :
     MainDialogGenerated(NULL)
 {
     xmlAccess::XmlGuiConfig guiCfg;  //structure to receive gui settings, already defaulted!!
 
     std::vector<wxString> filenames;
-    if (!cfgFileName.empty()) //1. this one has priority
-        filenames.push_back(cfgFileName);
+    if (!cfgFileNames.empty()) //1. this one has priority
+        filenames = cfgFileNames;
     else //next: use last used selection
     {
         filenames = settings.gui.lastUsedConfigFiles; //2. now try last used files
 
+        //------------------------------------------------------------------------------------------
+        //check existence of all directories in parallel!
+        std::list<boost::unique_future<bool>> fileEx;
+
+        std::for_each(filenames.begin(), filenames.end(),
+                      [&fileEx](const wxString& filename)
+        {
+            const Zstring filenameFmt = toZ(filename); //convert to Zstring first: we don't want to pass wxString by value and risk MT issues!
+            fileEx.push_back(zen::async2<bool>([=]() { return !filenameFmt.empty() && zen::fileExists(filenameFmt); }));
+        });
+        //potentially slow network access: give all checks 500ms to finish
+        wait_for_all_timed(fileEx.begin(), fileEx.end(), boost::posix_time::milliseconds(500));
+        //------------------------------------------------------------------------------------------
+
         //check if one of the files is not existing (this shall not be an error!)
-        if (std::find_if(filenames.begin(), filenames.end(),
-        [](const wxString& filename) { return !fileExists(toZ(filename)); }) != filenames.end())
-        filenames.clear();
+        const bool allFilesExist = std::find_if(fileEx.begin(), fileEx.end(), [](boost::unique_future<bool>& ft) { return !ft.is_ready() || !ft.get(); }) == fileEx.end();
+        if (!allFilesExist)
+            filenames.clear();
 
         if (filenames.empty())
         {
@@ -382,7 +381,7 @@ MainDialog::MainDialog(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings
             else
                 wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
         }
-    const bool startComparisonImmediately = loadCfgSuccess && !cfgFileName.empty();
+    const bool startComparisonImmediately = !cfgFileNames.empty() && loadCfgSuccess;
 
     init(guiCfg,
          settings,
@@ -392,7 +391,8 @@ MainDialog::MainDialog(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings
 }
 
 
-MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
+MainDialog::MainDialog(const std::vector<wxString>& referenceFiles,
+                       const xmlAccess::XmlGuiConfig& guiCfg,
                        xmlAccess::XmlGlobalSettings& settings,
                        bool startComparison) :
     MainDialogGenerated(NULL)
@@ -401,7 +401,7 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
          settings,
          startComparison);
 
-    setLastUsedConfig(std::vector<wxString>(), guiCfg);
+    setLastUsedConfig(referenceFiles, guiCfg);
 }
 
 
@@ -464,7 +464,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
                    wxAuiPaneInfo().Name(wxT("Panel4")).Bottom().Row(1).Position(0).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_panelFilter,
-                   wxAuiPaneInfo().Name(wxT("Panel5")).Bottom().Row(1).Position(1).Caption(_("Filter files")).MinSize(-1, m_panelFilter->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(wxT("Panel5")).Bottom().Row(1).Position(1).Caption(_("Filter files")).MinSize(m_bpButtonFilter->GetSize().GetWidth(), m_panelFilter->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_panelViewFilter,
                    wxAuiPaneInfo().Name(wxT("Panel6")).Bottom().Row(1).Position(2).Caption(_("Select view")).MinSize(m_bpButtonSyncDirNone->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
@@ -510,10 +510,10 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
 
     syncPreview.reset(new SyncPreview(this));
 
-    SetIcon(*GlobalResources::instance().programIcon); //set application icon
+    SetIcon(GlobalResources::instance().programIcon); //set application icon
 
     //notify about (logical) application main window => program won't quit, but stay on this dialog
-    zen::AppMainWindow::setMainWindow(this);
+    zen::setMainWindow(this);
 
     //init handling of first folder pair
     firstFolderPair.reset(new DirectoryPairFirst(*this));
@@ -596,13 +596,11 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     m_panelTopLeft->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeFolderPairs), NULL, this);
 
     //dynamically change sizer direction depending on size
-    //m_panelTopButtons->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeTopButtons),      NULL, this);
     m_panelConfig    ->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeConfigPanel),     NULL, this);
     m_panelViewFilter->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeViewPanel),       NULL, this);
     m_panelStatistics->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeStatisticsPanel), NULL, this);
     wxSizeEvent dummy3;
-    //OnResizeTopButtons     (dummy3); //call once on window creation
-    OnResizeConfigPanel    (dummy3); //
+    OnResizeConfigPanel    (dummy3); //call once on window creation
     OnResizeViewPanel      (dummy3); //
     OnResizeStatisticsPanel(dummy3); //
 
@@ -630,17 +628,41 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     OnResizeFolderPairs(evtDummy); //
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------
-    //some convenience: if FFS is started with a *.ffs_gui file as commandline parameter AND all directories contained exist, comparison shall be started right off
+    //some convenience: if FFS is started with a *.ffs_gui file as commandline parameter AND all directories contained exist, comparison shall be started right away
     if (startComparison)
     {
         const zen::MainConfiguration currMainCfg = getConfig().mainCfg;
-        const bool allFoldersExist = !DirNotFound()(currMainCfg.firstPair) &&
-                                     std::find_if(currMainCfg.additionalPairs.begin(), currMainCfg.additionalPairs.end(),
-                                                  DirNotFound()) == currMainCfg.additionalPairs.end();
-        if (allFoldersExist)
+
+        //------------------------------------------------------------------------------------------
+        //check existence of all directories in parallel!
+        std::list<boost::unique_future<bool>> dirEx;
+
+        auto addDirCheck = [&dirEx](const FolderPairEnh& fp)
         {
-            wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED);
-            m_buttonCompare->GetEventHandler()->AddPendingEvent(dummy2); //simulate button click on "compare"
+            const Zstring dirFmtLeft  = zen::getFormattedDirectoryName(fp.leftDirectory);
+            const Zstring dirFmtRight = zen::getFormattedDirectoryName(fp.rightDirectory);
+
+            if (dirFmtLeft.empty() && dirFmtRight.empty()) //only skip check if both sides are empty!
+                return;
+
+            dirEx.push_back(zen::async2<bool>([=]() { return !dirFmtLeft .empty() && zen::dirExists(dirFmtLeft); }));
+            dirEx.push_back(zen::async2<bool>([=]() { return !dirFmtRight.empty() && zen::dirExists(dirFmtRight); }));
+        };
+        addDirCheck(currMainCfg.firstPair);
+        std::for_each(currMainCfg.additionalPairs.begin(), currMainCfg.additionalPairs.end(), addDirCheck);
+        if (!dirEx.empty())
+        {
+            //potentially slow network access: give all checks 500ms to finish
+            wait_for_all_timed(dirEx.begin(), dirEx.end(), boost::posix_time::milliseconds(500));
+            //------------------------------------------------------------------------------------------
+
+            const bool allFoldersExist = std::find_if(dirEx.begin(), dirEx.end(), [](boost::unique_future<bool>& ft) { return !ft.is_ready() || !ft.get(); }) == dirEx.end();
+
+            if (allFoldersExist)
+            {
+                wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED);
+                m_buttonCompare->GetEventHandler()->AddPendingEvent(dummy2); //simulate button click on "compare"
+            }
         }
     }
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -964,8 +986,8 @@ public:
 
         if (updateUiIsAllowed())  //test if specific time span between ui updates is over
         {
-            wxString statusMessage = _P("Object deleted successfully!", "%x objects deleted successfully!", deletionCount);
-            statusMessage.Replace(wxT("%x"), zen::toStringSep(deletionCount), false);
+            wxString statusMessage = replaceCpy(_P("Object deleted successfully!", "%x objects deleted successfully!", deletionCount),
+                                                L"%x", zen::toStringSep(deletionCount), false);
 
             if (mainDlg->m_staticTextStatusMiddle->GetLabel() != statusMessage)
             {
@@ -1287,12 +1309,6 @@ void updateSizerOrientation(wxBoxSizer& sizer, wxWindow& window)
 }
 }
 
-
-/*void MainDialog::OnResizeTopButtons(wxEvent& event)
-{
-    updateSizerOrientation(*bSizerTopButtons, *m_panelTopButtons);
-    event.Skip();
-}*/
 
 void MainDialog::OnResizeConfigPanel(wxEvent& event)
 {
@@ -1816,10 +1832,10 @@ void MainDialog::OnContextRim(wxGridEvent& event)
     //CONTEXT_EXCLUDE_EXT
     if (exFilterCandidateObj.size() > 0 && !exFilterCandidateObj.begin()->second) //non empty && no directory
     {
-        const Zstring filename = exFilterCandidateObj.begin()->first.AfterLast(FILE_NAME_SEPARATOR);
+        const Zstring filename = afterLast(exFilterCandidateObj.begin()->first, FILE_NAME_SEPARATOR);
         if (filename.find(Zchar('.')) !=  Zstring::npos) //be careful: AfterLast would return the whole string if '.' were not found!
         {
-            const Zstring extension = filename.AfterLast(Zchar('.'));
+            const Zstring extension = afterLast(filename, Zchar('.'));
 
             //add context menu item
             wxMenuItem* menuItemExclExt = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Exclude via filter:")) + " " + "*." + extension);
@@ -1839,7 +1855,7 @@ void MainDialog::OnContextRim(wxGridEvent& event)
     //CONTEXT_EXCLUDE_OBJ
     wxMenuItem* menuItemExclObj = NULL;
     if (exFilterCandidateObj.size() == 1)
-        menuItemExclObj = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Exclude via filter:")) + " " + exFilterCandidateObj.begin()->first.AfterLast(FILE_NAME_SEPARATOR));
+        menuItemExclObj = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Exclude via filter:")) + " " + afterLast(exFilterCandidateObj.begin()->first, FILE_NAME_SEPARATOR));
     else if (exFilterCandidateObj.size() > 1)
         menuItemExclObj = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Exclude via filter:")) + " " + _("<multiple selection>"));
 
@@ -1871,7 +1887,7 @@ void MainDialog::OnContextRim(wxGridEvent& event)
         {
             //some trick to translate default external apps on the fly: 1. "open in explorer" 2. "start directly"
             //wxString description = wxGetTranslation(i->first);
-            wxString description = zen::translate(i->first.c_str());
+            wxString description = zen::implementation::translate(i->first.c_str());
             if (description.empty())
                 description = wxT(" "); //wxWidgets doesn't like empty items
 
@@ -1920,7 +1936,7 @@ void MainDialog::OnContextExcludeExtension(wxCommandEvent& event)
 
         //add to filter config
         Zstring& excludeFilter = currentCfg.mainCfg.globalFilter.excludeFilter;
-        if (!excludeFilter.empty() && !excludeFilter.EndsWith(Zstr(";")))
+        if (!excludeFilter.empty() && !endsWith(excludeFilter, Zstr(";")))
             excludeFilter += Zstr("\n");
         excludeFilter += newExclude + Zstr(";"); //';' is appended to 'mark' that next exclude extension entry won't write to new line
 
@@ -1963,7 +1979,7 @@ void MainDialog::OnContextExcludeObject(wxCommandEvent& event)
 
             //add to filter config
             Zstring& excludeFilter = currentCfg.mainCfg.globalFilter.excludeFilter;
-            if (!excludeFilter.empty() && !excludeFilter.EndsWith(Zstr("\n")))
+            if (!excludeFilter.empty() && !endsWith(excludeFilter, Zstr("\n")))
                 excludeFilter += Zstr("\n");
             excludeFilter += newExclude;
 
@@ -2488,14 +2504,31 @@ wxString getFormattedHistoryElement(const wxString& filename)
 
 void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
 {
+    //check existence of all config files in parallel!
+    std::list<boost::unique_future<bool>> fileEx;
+    std::for_each(filenames.begin(), filenames.end(),
+                  [&](const wxString& filename)
+    {
+        const Zstring file = toZ(filename); //convert to Zstring first: we don't want to pass wxString by value and risk MT issues!
+        fileEx.push_back(zen::async2<bool>([=]() { return zen::fileExists(file); }));
+    });
+
+    //potentially slow network access: give all checks 500ms to finish
+    wait_for_all_timed(fileEx.begin(), fileEx.end(), boost::posix_time::milliseconds(500));
+    //------------------------------------------------------------------------------------------
+
+
     std::deque<bool> selections(m_listBoxHistory->GetCount());
 
-    std::for_each(filenames.begin(), filenames.end(),
-                  [&](wxString filename)
+    auto futIter = fileEx.begin();
+    for (auto iter = filenames.begin(); iter != filenames.end(); ++iter, ++futIter)
     {
         //only (still) existing files should be included in the list
-        if (util::fileExists(toZ(filename), 200) == util::EXISTING_FALSE) //potentially slow network access: wait 200ms
-            return;
+        if (futIter->is_ready() && !futIter->get())
+            continue;
+
+        const wxString& filename = *iter;
+        const Zstring file = toZ(filename);
 
         int posFound = -1;
 
@@ -2507,7 +2540,7 @@ void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
                 const wxString& filenameTmp = cData->name_;
 
                 //tests if the same filenames are specified, even if they are relative to the current working directory/include symlinks or \\?\ prefix
-                if (util::sameFileSpecified(toZ(filename), toZ(filenameTmp)))
+                if (zen::samePhysicalFile(toZ(filename), toZ(filenameTmp)))
                 {
                     posFound = i;
                     break;
@@ -2521,14 +2554,14 @@ void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
         {
             int newPos = -1;
             //the default config file should receive a different name on GUI
-            if (util::sameFileSpecified(toZ(lastRunConfigName()), toZ(filename)))
+            if (zen::samePhysicalFile(toZ(lastRunConfigName()), toZ(filename)))
                 newPos = m_listBoxHistory->Append(_("<Last session>"), new wxClientDataString(filename));
             else
                 newPos = m_listBoxHistory->Append(getFormattedHistoryElement(filename), new wxClientDataString(filename));
 
             selections.insert(selections.begin() + newPos, true);
         }
-    });
+    }
 
     assert(selections.size() == m_listBoxHistory->GetCount());
 
@@ -2835,7 +2868,8 @@ void MainDialog::setLastUsedConfig(const wxString& filename, const xmlAccess::Xm
 }
 
 
-void MainDialog::setLastUsedConfig(const std::vector<wxString>& filenames, const xmlAccess::XmlGuiConfig& guiConfig)
+void MainDialog::setLastUsedConfig(const std::vector<wxString>& filenames,
+                                   const xmlAccess::XmlGuiConfig& guiConfig)
 {
     activeConfigFiles = filenames;
     lastConfigurationSaved = guiConfig;
@@ -2875,8 +2909,8 @@ void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg)
                                currentCfg.mainCfg.firstPair.altSyncConfig,
                                currentCfg.mainCfg.firstPair.localFilter);
 
-    folderHistoryLeft->addItem(currentCfg.mainCfg.firstPair.leftDirectory);
-    folderHistoryRight->addItem(currentCfg.mainCfg.firstPair.rightDirectory);
+    //folderHistoryLeft->addItem(currentCfg.mainCfg.firstPair.leftDirectory);
+    //folderHistoryRight->addItem(currentCfg.mainCfg.firstPair.rightDirectory);
 
     //clear existing additional folder pairs
     clearAddFolderPairs();
@@ -3275,7 +3309,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         const std::vector<zen::FolderPairCfg> cmpConfig = zen::extractCompareCfg(getConfig().mainCfg);
 
         //GUI mode: place directory locks on directories isolated(!) during both comparison and synchronization
-        LockHolder dummy2;
+        LockHolder dummy2(true); //allow pw prompt
         for (std::vector<FolderPairCfg>::const_iterator i = cmpConfig.begin(); i != cmpConfig.end(); ++i)
         {
             dummy2.addDir(i->leftDirectoryFmt,  statusHandler);
@@ -3285,6 +3319,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         //begin comparison
         zen::CompareProcess compProc(globalSettings->fileTimeTolerance,
                                      globalSettings->optDialogs,
+                                     true, //allow pw prompt
                                      statusHandler);
 
         //technical representation of comparison data
@@ -3373,7 +3408,7 @@ void MainDialog::updateStatistics()
     const wxString toCreate = zen::toStringSep(st.getCreate());
     const wxString toUpdate = zen::toStringSep(st.getOverwrite());
     const wxString toDelete = zen::toStringSep(st.getDelete());
-    const wxString data     = zen::formatFilesizeToShortString(st.getDataToProcess());
+    const wxString data     = zen::filesizeToShortString(st.getDataToProcess());
 
     m_textCtrlCreate->SetValue(toCreate);
     m_textCtrlUpdate->SetValue(toUpdate);
@@ -3487,12 +3522,12 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         wxString activeFileName = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : wxString();
 
         //class handling status updates and error messages
-        SyncStatusHandler statusHandler(this, currentCfg.handleError, zen::extractJobName(activeFileName));
+        SyncStatusHandler statusHandler(this, currentCfg.handleError, xmlAccess::extractJobName(activeFileName));
 
         FolderComparison& dataToSync = gridDataView->getDataTentative();
 
         //GUI mode: place directory locks on directories isolated(!) during both comparison and synchronization
-        LockHolder dummy2;
+        LockHolder dummy2(true); //allow pw prompt
 
         for (auto i = begin(dataToSync); i != end(dataToSync); ++i)
         {
@@ -3879,9 +3914,7 @@ void MainDialog::updateGridViewData()
     //show status information on "root" level.
     if (foldersOnLeftView)
     {
-        wxString tmp = _P("1 directory", "%x directories", foldersOnLeftView);
-        tmp.Replace(wxT("%x"), zen::toStringSep(foldersOnLeftView), false);
-        statusLeftNew += tmp;
+        statusLeftNew += replaceCpy(_P("1 directory", "%x directories", foldersOnLeftView), L"%x", zen::toStringSep(foldersOnLeftView), false);
 
         if (filesOnLeftView)
             statusLeftNew += wxT(" - ");
@@ -3889,26 +3922,21 @@ void MainDialog::updateGridViewData()
 
     if (filesOnLeftView)
     {
-        wxString tmp = _P("1 file", "%x files", filesOnLeftView);
-        tmp.Replace(wxT("%x"), zen::toStringSep(filesOnLeftView), false);
-        statusLeftNew += tmp;
-
+        statusLeftNew += replaceCpy(_P("1 file", "%x files", filesOnLeftView), L"%x", zen::toStringSep(filesOnLeftView), false);
         statusLeftNew += wxT(" - ");
-        statusLeftNew += zen::formatFilesizeToShortString(filesizeLeftView);
+        statusLeftNew += zen::filesizeToShortString(filesizeLeftView);
     }
 
     {
         wxString tmp = _P("%x of 1 row in view", "%x of %y rows in view", gridDataView->rowsTotal());
-        tmp.Replace(wxT("%x"), toStringSep(gridDataView->rowsOnView()), false);
-        tmp.Replace(wxT("%y"), toStringSep(gridDataView->rowsTotal()), false);
+        replace(tmp, L"%x", toStringSep(gridDataView->rowsOnView()), false);
+        replace(tmp, L"%y", toStringSep(gridDataView->rowsTotal()), false);
         statusMiddleNew = tmp;
     }
 
     if (foldersOnRightView)
     {
-        wxString tmp = _P("1 directory", "%x directories", foldersOnRightView);
-        tmp.Replace(wxT("%x"), zen::toStringSep(foldersOnRightView), false);
-        statusRightNew += tmp;
+        statusRightNew += replaceCpy(_P("1 directory", "%x directories", foldersOnRightView), L"%x", zen::toStringSep(foldersOnRightView), false);
 
         if (filesOnRightView)
             statusRightNew += wxT(" - ");
@@ -3916,12 +3944,9 @@ void MainDialog::updateGridViewData()
 
     if (filesOnRightView)
     {
-        wxString tmp = _P("1 file", "%x files", filesOnRightView);
-        tmp.Replace(wxT("%x"), zen::toStringSep(filesOnRightView), false);
-        statusRightNew += tmp;
-
+        statusRightNew += replaceCpy(_P("1 file", "%x files", filesOnRightView), L"%x", zen::toStringSep(filesOnRightView), false);
         statusRightNew += wxT(" - ");
-        statusRightNew += zen::formatFilesizeToShortString(filesizeRightView);
+        statusRightNew += zen::filesizeToShortString(filesizeRightView);
     }
 
 
@@ -4104,52 +4129,42 @@ void MainDialog::addFolderPair(const std::vector<FolderPairEnh>& newPairs, bool 
     wxWindowUpdateLocker dummy(m_panelDirectoryPairs); //avoid display distortion
     wxWindowUpdateLocker dummy2(m_panelGrids);         //
 
-    if (!newPairs.empty())
+    std::for_each(newPairs.begin(), newPairs.end(),
+                  [&](const FolderPairEnh& enhPair)
     {
-        for (std::vector<FolderPairEnh>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
+        //add new folder pair
+        DirectoryPair* newPair = new DirectoryPair(m_scrolledWindowFolderPairs, *this);
+
+        //init dropdown history
+        newPair->m_directoryLeft ->init(folderHistoryLeft);
+        newPair->m_directoryRight->init(folderHistoryRight);
+
+        //set width of left folder panel
+        const int width = m_panelTopLeft->GetSize().GetWidth();
+        newPair->m_panelLeft->SetMinSize(wxSize(width, -1));
+
+
+        if (addFront)
         {
-            //add new folder pair
-            DirectoryPair* newPair = new DirectoryPair(m_scrolledWindowFolderPairs, *this);
-
-            //init dropdown history
-            newPair->m_directoryLeft ->init(folderHistoryLeft);
-            newPair->m_directoryRight->init(folderHistoryRight);
-
-            //set width of left folder panel
-            const int width = m_panelTopLeft->GetSize().GetWidth();
-            newPair->m_panelLeft->SetMinSize(wxSize(width, -1));
-
-
-            if (addFront)
-            {
-                bSizerAddFolderPairs->Insert(0, newPair, 0, wxEXPAND, 5);
-                additionalFolderPairs.insert(additionalFolderPairs.begin(), newPair);
-            }
-            else
-            {
-                bSizerAddFolderPairs->Add(newPair, 0, wxEXPAND, 5);
-                additionalFolderPairs.push_back(newPair);
-            }
-
-            //register events
-            newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnRemoveFolderPair), NULL, this);
-
-            //set alternate configuration
-            newPair->setValues(toWx(i->leftDirectory),
-                               toWx(i->rightDirectory),
-                               i->altCmpConfig,
-                               i->altSyncConfig,
-                               i->localFilter);
+            bSizerAddFolderPairs->Insert(0, newPair, 0, wxEXPAND, 5);
+            additionalFolderPairs.insert(additionalFolderPairs.begin(), newPair);
+        }
+        else
+        {
+            bSizerAddFolderPairs->Add(newPair, 0, wxEXPAND, 5);
+            additionalFolderPairs.push_back(newPair);
         }
 
-        //set size of scrolled window
-        //m_scrolledWindowFolderPairs->SetMinSize(wxSize( -1, pairHeight * static_cast<int>(visiblePairs)));
+        //register events
+        newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnRemoveFolderPair), NULL, this);
 
-        //update controls
-        //        m_scrolledWindowFolderPairs->Fit();    //adjust scrolled window size
-        //      m_scrolledWindowFolderPairs->Layout(); //adjust stuff inside scrolled window
-        //bSizer1->Layout();
-    }
+        //set alternate configuration
+        newPair->setValues(toWx(enhPair.leftDirectory),
+                           toWx(enhPair.rightDirectory),
+                           enhPair.altCmpConfig,
+                           enhPair.altSyncConfig,
+                           enhPair.localFilter);
+    });
 
     updateGuiForFolderPair();
 
@@ -4422,11 +4437,12 @@ void MainDialog::switchProgramLanguage(const int langID)
     zen::setLanguage(langID); //language is a global attribute
 
     const xmlAccess::XmlGuiConfig currentGuiCfg = getConfig();
+    auto activeFiles = activeConfigFiles;
 
     cleanUp(false); //destructor's code: includes updating global settings
 
     //create new main window and delete old one
-    MainDialog* frame = new MainDialog(currentGuiCfg, *globalSettings, false);
+    MainDialog* frame = new MainDialog(activeFiles, currentGuiCfg, *globalSettings, false);
     frame->Show();
 
     Destroy();

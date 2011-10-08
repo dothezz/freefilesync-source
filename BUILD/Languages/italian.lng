@@ -8,7 +8,7 @@
 </header>
 
 <source>Searching for directory %x...</source>
-<target></target>
+<target>Ricerca directory %x in corso...</target>
 
 <source>Show in Explorer</source>
 <target>Mostra in Esplora Risorse</target>
@@ -25,17 +25,23 @@
 <source>Browse</source>
 <target>Sfoglia</target>
 
+<source>Windows Error Code %x:</source>
+<target>Errore Windows Codice %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Errore Linux Codice %x:</target>
+
 <source>Invalid command line: %x</source>
-<target></target>
+<target>Linea di comando non valida: %x</target>
 
 <source>Error resolving symbolic link:</source>
 <target>Errore nella risoluzione di collegamento simbolico:</target>
 
 <source>Show pop-up</source>
-<target></target>
+<target>Mostra pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target></target>
+<target>Mostra pop-up di errori o avvisi</target>
 
 <source>Ignore errors</source>
 <target>Ignora gli errori</target>
@@ -50,7 +56,7 @@
 <target>Interrompi immediatamente la sincronizzazione</target>
 
 <source>Select alternate comparison settings</source>
-<target></target>
+<target>Seleziona impostazioni di comparazione alternative</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Seleziona impostazioni di sincronizzazione alternative</target>
@@ -107,7 +113,7 @@
 <target>Trova</target>
 
 <source>Select time span</source>
-<target></target>
+<target>Seleziona intervallo di tempo</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -170,7 +176,7 @@
 <target>Errore in lettura dal database di sincronizzione:</target>
 
 <source>Database files do not share a common synchronization session:</source>
-<target></target>
+<target>I file database non condividono una comune sessione di sincronizzazione:</target>
 
 <source>An exception occurred!</source>
 <target>Si è verificato un problema!</target>
@@ -209,7 +215,10 @@
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</target>
 
 <source>Invalid FreeFileSync config file!</source>
 <target>File di configurazione FreeFileSync non valido!</target>
@@ -222,33 +231,6 @@
 
 <source>/sec</source>
 <target>/sec</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 ora</pluralform>
-<pluralform>%x ore</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 giorno</pluralform>
-<pluralform>%x giorni</pluralform>
-</target>
 
 <source>S&ave configuration...</source>
 <target>S&alva la configurazione...</target>
@@ -414,12 +396,6 @@ La linea di comando è eseguita ogni volta che:
 <source>Error traversing directory:</source>
 <target>Errore nel percorso della directory:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Errore Windows Codice %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Errore Linux Codice %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Errore nell'impostazione dei privilegi:</target>
 
@@ -433,7 +409,7 @@ La linea di comando è eseguita ogni volta che:
 <target>Errore in scrittura sul database di sincronizzazione:</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
-<target></target>
+<target>Errore in accesso al Servizio Volume Shadow Copy</target>
 
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>La creazione di copie shadow su WOW64 non e' supportata. Utilizzare FreeFileSync in versione 64-bit.</target>
@@ -452,6 +428,33 @@ La linea di comando è eseguita ogni volta che:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 ora</pluralform>
+<pluralform>%x ore</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 giorno</pluralform>
+<pluralform>%x giorni</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Impossibile leggere i valori per i seguenti nodi XML:</target>
@@ -607,7 +610,7 @@ La linea di comando è eseguita ogni volta che:
 <target>Batch job</target>
 
 <source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target></target>
+<target>Crea un batch file per una sincronizzazione automatizzata. Per partire in modalità batch è sufficiente fare doppio click sul file o eseguire da linea di comando: FreeFileSync.exe <ffs_batch file>. Puoi anche schedulare l'esecuzione nelle operazioni pianificate del suo sistema operativo.</target>
 
 <source>Help</source>
 <target>Aiuto</target>
@@ -631,7 +634,7 @@ La linea di comando è eseguita ogni volta che:
 <target>Feedback di stato</target>
 
 <source>Run minimized</source>
-<target></target>
+<target>Avvia minimizzato</target>
 
 <source>Maximum number of logfiles:</source>
 <target>Numero massimo di logfiles:</target>
@@ -640,7 +643,7 @@ La linea di comando è eseguita ogni volta che:
 <target>Seleziona cartella per il file di log:</target>
 
 <source>Batch settings</source>
-<target></target>
+<target>Impostazioni Batch</target>
 
 <source>&Save</source>
 <target>&Salva</target>
@@ -651,10 +654,13 @@ La linea di comando è eseguita ogni volta che:
 <source>&Cancel</source>
 <target>&Annulla</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Operazione:</target>
+
+<source>Items found:</source>
 <target>Elementi trovati:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Elementi rimanenti:</target>
 
 <source>Speed:</source>
@@ -665,9 +671,6 @@ La linea di comando è eseguita ogni volta che:
 
 <source>Time elapsed:</source>
 <target>Tempo trascorso:</target>
-
-<source>Operation:</source>
-<target>Operazione:</target>
 
 <source>Select variant:</source>
 <target>Selezionare una variante:</target>
@@ -738,10 +741,15 @@ Files are found equal if
      - file size
 are the same
 </source>
-<target></target>
+<target>
+I file sono considerati identici se
+     - data e ora di ultima modifica
+     - dimensione
+sono identici
+</target>
 
 <source>File time and size</source>
-<target></target>
+<target>Ora e dimensione file</target>
 
 <source>
 Files are found equal if
@@ -763,7 +771,7 @@ I file sono considerati identici se
 <source>Synchronizing...</source>
 <target>Sincronizzazione in corso...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Elementi processati:</target>
 
 <source>&Pause</source>
@@ -875,10 +883,10 @@ Escludi: \stuff\temp\*
 <target>Escludi</target>
 
 <source>Minimum file size</source>
-<target></target>
+<target>Dimensione minima file</target>
 
 <source>Maximum file size</source>
-<target></target>
+<target>Dimensione massima file</target>
 
 <source>&Default</source>
 <target>&Default</target>
@@ -890,9 +898,9 @@ Escludi: \stuff\temp\*
 <target>Sposta colonna giu'</target>
 
 <source>Transactional file copy</source>
-<target></target>
+<target>Copia transazionale file</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target></target>
 
 <source>Copy locked files</source>
@@ -908,7 +916,7 @@ Copia file condivisi o bloccati usando il Servizio Volume Shadow Copy
 </target>
 
 <source>Copy file access permissions</source>
-<target></target>
+<target>Copia permessi di accesso file</target>
 
 <source>
 Transfer file and directory permissions
@@ -983,10 +991,22 @@ Trasferisci file e permessi sulle cartelle
 <target>Personalizza...</target>
 
 <source>Select time span...</source>
-<target></target>
+<target>Seleziona intervallo di tempo...</target>
 
 <source>Auto-adjust columns</source>
 <target>Larghezza automatica colonne</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Includi tutte le righe</target>
@@ -1184,19 +1204,19 @@ Trasferisci file e permessi sulle cartelle
 <target>Inattivo</target>
 
 <source>Last x hours</source>
-<target></target>
+<target>Ultime x ore</target>
 
 <source>Today</source>
-<target></target>
+<target>Oggi</target>
 
 <source>This week</source>
-<target></target>
+<target>Questa settimana</target>
 
 <source>This month</source>
-<target></target>
+<target>Questo mese</target>
 
 <source>This year</source>
-<target></target>
+<target>Quest'anno</target>
 
 <source>Byte</source>
 <target>Byte</target>
@@ -1223,7 +1243,7 @@ Trasferisci file e permessi sulle cartelle
 <target>Segui</target>
 
 <source>Copy NTFS permissions</source>
-<target></target>
+<target>Copia permessi NTFS</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integra applicazioni esterne nel menu contestuale. Sono disponibili le seguenti macro:</target>
@@ -1376,40 +1396,40 @@ Trasferisci file e permessi sulle cartelle
 <target>Eliminazione cartella %x</target>
 
 <source>Deleting symbolic link %x</source>
-<target></target>
+<target>Cancellazione link simbolico %x in corso</target>
 
 <source>Moving file %x to recycle bin</source>
-<target></target>
+<target>Spostamento file %x nel cestino in corso</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target></target>
+<target>Spostamento cartella %x nel cestino in corso</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target></target>
+<target>Spostamento link simbolico %x nel cestino in corso</target>
 
 <source>Moving file %x to %y</source>
-<target></target>
+<target>Spostamento file %x su %y</target>
 
 <source>Moving folder %x to %y</source>
-<target></target>
+<target>Spostamento cartella %x su %y</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target></target>
+<target>Spostamento link simbolico %x su %y</target>
 
 <source>Creating file %x</source>
-<target></target>
+<target>Creazione file %x</target>
 
 <source>Creating symbolic link %x</source>
-<target></target>
+<target>Creazione link simbolico %x</target>
 
 <source>Creating folder %x</source>
 <target>Creazione cartella %x</target>
 
 <source>Overwriting file %x</source>
-<target></target>
+<target>Sovrascrittura file %x</target>
 
 <source>Overwriting symbolic link %x</source>
-<target></target>
+<target>Sovrascrittura link simbolico %x</target>
 
 <source>Verifying file %x</source>
 <target>Verifica di file %x</target>
@@ -1448,7 +1468,7 @@ Trasferisci file e permessi sulle cartelle
 <target>Spazio libero su disco disponibile:</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target></target>
+<target>Cestino non disponibile per i seguenti percorsi! I file verranno cancellati in modo permanente:</target>
 
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Una directory che fa parte di più coppie di cartelle sarà modificata! Ricontrolla le impostazioni di sincronizzazione!</target>

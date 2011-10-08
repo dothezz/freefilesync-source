@@ -9,7 +9,6 @@
 
 #include <wx/string.h>
 
-
 namespace zen
 {
 struct ReturnErrorDlg

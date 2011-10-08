@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Explorează</target>
 
+<source>Windows Error Code %x:</source>
+<target>Codul Erorii Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Codul Erorii Linux %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Linie de comandă nevalidă: %x</target>
 
@@ -229,36 +235,6 @@
 <source>/sec</source>
 <target>/sec</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-<pluralform>%x de min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 oră</pluralform>
-<pluralform>%x ore</pluralform>
-<pluralform>%x de ore</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 zi</pluralform>
-<pluralform>%x zile</pluralform>
-<pluralform>%x de zile</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>S&alvează Configurația...</target>
 
@@ -417,26 +393,20 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Operation aborted!</source>
 <target>Operație abandonată!</target>
 
-<source>Could not load a required DLL:</source>
-<target>Nu pot încărca o filă DLL necesară:</target>
-
 <source>Endless loop when traversing directory:</source>
 <target>Buclă infinită la parcurgerea dosarului:</target>
 
 <source>Error traversing directory:</source>
 <target>Eroare la parcurgerea dosarului:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Codul Erorii Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Codul Erorii Linux %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Eroare la setarea privilegiului:</target>
 
 <source>Error moving to Recycle Bin:</source>
 <target>Eroare la mutarea în Reciclator:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Nu pot încărca o filă DLL necesară:</target>
 
 <source>Error writing to synchronization database:</source>
 <target>Eroare la scrierea în baza de date a sincronizării:</target>
@@ -461,6 +431,36 @@ Linia de comandă este executată de fiecare dată cînd:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+<pluralform>%x de min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 oră</pluralform>
+<pluralform>%x ore</pluralform>
+<pluralform>%x de ore</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 zi</pluralform>
+<pluralform>%x zile</pluralform>
+<pluralform>%x de zile</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Nu pot citi valorile pentru următoarele noduri XML:</target>
@@ -660,10 +660,13 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>&Cancel</source>
 <target>&Anulează</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Operație:</target>
+
+<source>Items found:</source>
 <target>Elemente Găsite:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Elemente Rămase:</target>
 
 <source>Speed:</source>
@@ -674,9 +677,6 @@ Linia de comandă este executată de fiecare dată cînd:
 
 <source>Time elapsed:</source>
 <target>Timp Scurs:</target>
-
-<source>Operation:</source>
-<target>Operație:</target>
 
 <source>Select variant:</source>
 <target>Selectează Varianta de Sincronizare:</target>
@@ -777,7 +777,7 @@ este același
 <source>Synchronizing...</source>
 <target>Sincronizare Aflată în Curs...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Elemente Procesate:</target>
 
 <source>&Pause</source>
@@ -906,8 +906,8 @@ Excluse: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>Copiere tranzacțională a filelor</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>Filele sînt scrise mai întîi cu un nume temporar (*.ffs_tmp), apoi renumite. Aceasta garantează consecvența stării lor chiar în situații de erori fatale.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Copiere și a filelor zăvorîte [locked]</target>
@@ -1001,6 +1001,18 @@ Transferă permisiunile filelor și dosarelor
 
 <source>Auto-adjust columns</source>
 <target>Autoajustează Coloanele</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Include Toate Rîndurile</target>

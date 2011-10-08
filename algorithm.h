@@ -8,7 +8,7 @@
 #define ALGORITHM_H_INCLUDED
 
 #include "file_hierarchy.h"
-#include "library/soft_filter.h"
+#include "lib/soft_filter.h"
 
 namespace zen
 {

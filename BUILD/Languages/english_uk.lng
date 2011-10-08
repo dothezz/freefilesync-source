@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Browse</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows Error Code %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Error Code %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Invalid command line: %x</target>
 
@@ -226,33 +232,6 @@
 <source>/sec</source>
 <target>/sec</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>S&ave configuration...</target>
 
@@ -417,12 +396,6 @@ The command line is executed each time:
 <source>Error traversing directory:</source>
 <target>Error traversing directory:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows Error Code %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Error Code %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Error setting privilege:</target>
 
@@ -455,6 +428,33 @@ The command line is executed each time:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Could not read values for the following XML nodes:</target>
@@ -654,10 +654,13 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>&Cancel</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Operation:</target>
+
+<source>Items found:</source>
 <target>Elements found:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Elements remaining:</target>
 
 <source>Speed:</source>
@@ -668,9 +671,6 @@ The command line is executed each time:
 
 <source>Time elapsed:</source>
 <target>Time elapsed:</target>
-
-<source>Operation:</source>
-<target>Operation:</target>
 
 <source>Select variant:</source>
 <target>Select variant:</target>
@@ -771,7 +771,7 @@ is the same
 <source>Synchronizing...</source>
 <target>Synchronising...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Elements processed:</target>
 
 <source>&Pause</source>
@@ -900,8 +900,8 @@ Exclude: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>Transactional file copy</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Copy locked files</target>
@@ -995,6 +995,18 @@ Transfer file and directory permissions
 
 <source>Auto-adjust columns</source>
 <target>Auto-adjust columns</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Include all rows</target>

@@ -8,8 +8,8 @@
 #define SYNCHRONIZATION_H_INCLUDED
 
 #include "file_hierarchy.h"
-#include "library/process_xml.h"
-#include "library/status_handler.h"
+#include "lib/process_xml.h"
+#include "lib/status_handler.h"
 
 
 namespace zen

@@ -20,11 +20,10 @@
 #include <wx/icon.h> //Linux needs this
 #include <wx/timer.h>
 #include "resources.h"
-#include "../shared/string_conv.h"
-#include "../shared/i18n.h"
-#include "../shared/assert_static.h"
-#include "../shared/build_info.h"
-#include "../shared/shell_execute.h"
+#include <wx+/string_conv.h>
+#include <zen/assert_static.h>
+#include <zen/build_info.h>
+#include <wx+/shell_execute.h>
 
 using namespace rts;
 using namespace zen;
@@ -148,9 +147,9 @@ void TrayIconHolder::showIconActive()
 {
     wxIcon realtimeIcon;
 #ifdef FFS_WIN
-    realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_win.png"))); //use a 16x16 bitmap
+    realtimeIcon.CopyFromBitmap(GlobalResources::getImage(wxT("RTS_tray_win.png"))); //use a 16x16 bitmap
 #elif defined FFS_LINUX
-    realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_linux.png"))); //use a 22x22 bitmap for perfect fit
+    realtimeIcon.CopyFromBitmap(GlobalResources::getImage(wxT("RTS_tray_linux.png"))); //use a 22x22 bitmap for perfect fit
 #endif
     const wxString postFix = jobName_.empty() ? wxString() : (wxT("\n\"") + jobName_ + wxT("\""));
     trayMenu->SetIcon(realtimeIcon, _("Monitoring active...") + postFix);
@@ -161,9 +160,9 @@ void TrayIconHolder::showIconWaiting()
 {
     wxIcon realtimeIcon;
 #ifdef FFS_WIN
-    realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_waiting_win.png"))); //use a 16x16 bitmap
+    realtimeIcon.CopyFromBitmap(GlobalResources::getImage(wxT("RTS_tray_waiting_win.png"))); //use a 16x16 bitmap
 #elif defined FFS_LINUX
-    realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_waiting_linux.png"))); //use a 22x22 bitmap for perfect fit
+    realtimeIcon.CopyFromBitmap(GlobalResources::getImage(wxT("RTS_tray_waiting_linux.png"))); //use a 22x22 bitmap for perfect fit
 #endif
     const wxString postFix = jobName_.empty() ? wxString() : (wxT("\n\"") + jobName_ + wxT("\""));
     trayMenu->SetIcon(realtimeIcon, _("Waiting for missing directories...") + postFix);
@@ -192,11 +191,11 @@ void TrayIconHolder::OnContextMenuSelection(wxCommandEvent& event)
 #endif //wxUSE_UNICODE
 
             //compile time info about 32/64-bit build
-            if (util::is64BitBuild)
+            if (zen::is64BitBuild)
                 build += wxT(" x64");
             else
                 build += wxT(" x86");
-            assert_static(util::is32BitBuild || util::is64BitBuild);
+            assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
             wxString buildFormatted = _("(Build: %x)");
             buildFormatted.Replace(wxT("%x"), build);
@@ -312,6 +311,7 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
         while (true)
         {
             ::wxSetEnv(L"changed_file", utf8CvrtTo<wxString>(lastFileChanged)); //some way to output what file changed to the user
+            lastFileChanged.clear(); //make sure old name is not shown again after a directory reappears
 
             //execute command
             zen::shellExecute(config.commandline, zen::EXEC_TYPE_SYNC);

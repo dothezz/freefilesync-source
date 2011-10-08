@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Procházet</target>
 
+<source>Windows Error Code %x:</source>
+<target>Chybový kód Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Chybový kód Linux %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Neplatný příkaz: %x</target>
 
@@ -229,36 +235,6 @@
 <source>/sec</source>
 <target>/s</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 minuta</pluralform>
-<pluralform>%x minuty</pluralform>
-<pluralform>%x minut</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 hodina</pluralform>
-<pluralform>%x hodiny</pluralform>
-<pluralform>%x hodin</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 den</pluralform>
-<pluralform>%x dny</pluralform>
-<pluralform>%x dnů</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>&Uložení konfigurace...</target>
 
@@ -423,12 +399,6 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Error traversing directory:</source>
 <target>Chyba procházení adresáře:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Chybový kód Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Chybový kód Linux %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Chyba nastavení práv:</target>
 
@@ -461,6 +431,36 @@ Příkazová řádka je spuštěna pokaždé když:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 minuta</pluralform>
+<pluralform>%x minuty</pluralform>
+<pluralform>%x minut</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 hodina</pluralform>
+<pluralform>%x hodiny</pluralform>
+<pluralform>%x hodin</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 den</pluralform>
+<pluralform>%x dny</pluralform>
+<pluralform>%x dnů</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Nelze načíst hodnoty následujících XML elementy:</target>
@@ -660,10 +660,13 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>&Cancel</source>
 <target>&Zrušit</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Operace:</target>
+
+<source>Items found:</source>
 <target>Nalezeno položek:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Zbývá položek:</target>
 
 <source>Speed:</source>
@@ -674,9 +677,6 @@ Příkazová řádka je spuštěna pokaždé když:
 
 <source>Time elapsed:</source>
 <target>Uplynulý čas:</target>
-
-<source>Operation:</source>
-<target>Operace:</target>
 
 <source>Select variant:</source>
 <target>Vyberte variantu:</target>
@@ -777,7 +777,7 @@ je stejný
 <source>Synchronizing...</source>
 <target>Synchronizuji...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Zpracováno položek:</target>
 
 <source>&Pause</source>
@@ -906,8 +906,8 @@ Vynechat: \někde\něco\*
 <source>Transactional file copy</source>
 <target>Bezpečné kopírování souborů</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>Kopíruje data nejprve do pomocného souboru (*.ffs_tmp) a poté teprve soubor přejmenuje. Tento postup zajišťuje bezpečné chování i v případě chyby během přenosu</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Kopírovat zamčené soubory</target>
@@ -1001,6 +1001,18 @@ Přenést přístupová oprávnění souborů a adresářů
 
 <source>Auto-adjust columns</source>
 <target>Automaticky přizpůsobit šířku</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Použít všechny řádky</target>

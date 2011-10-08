@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>Procurar</target>
 
+<source>Windows Error Code %x:</source>
+<target>Código de erro do Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Código de erro do Linux %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>Linha de comando inválida: %x</target>
 
@@ -226,33 +232,6 @@
 <source>/sec</source>
 <target>/seg</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x mins</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 hora</pluralform>
-<pluralform>%x horas</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dia</pluralform>
-<pluralform>%x dias</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>G&uardar a configuração...</target>
 
@@ -411,26 +390,20 @@ A linha de comandos é executada cada vez que:
 <source>Operation aborted!</source>
 <target>Operação abortada!</target>
 
-<source>Could not load a required DLL:</source>
-<target>Não foi possível carregar a DLL:</target>
-
 <source>Endless loop when traversing directory:</source>
 <target>Loop infinito ao percorrer directório:</target>
 
 <source>Error traversing directory:</source>
 <target>Erro ao percorrer a pasta:</target>
 
-<source>Windows Error Code %x:</source>
-<target>Código de erro do Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Código de erro do Linux %x:</target>
-
 <source>Error setting privilege:</source>
 <target>Erro ao estabelecer privilégios:</target>
 
 <source>Error moving to Recycle Bin:</source>
 <target>Erro ao mover para a Reciclagem:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Não foi possível carregar a DLL:</target>
 
 <source>Error writing to synchronization database:</source>
 <target>Erro na escrita da base de dados de sincronização:</target>
@@ -455,6 +428,33 @@ A linha de comandos é executada cada vez que:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x mins</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 hora</pluralform>
+<pluralform>%x horas</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dia</pluralform>
+<pluralform>%x dias</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Não foi possível ler os valores dos seguintes nós XML:</target>
@@ -654,10 +654,13 @@ A linha de comandos é executada cada vez que:
 <source>&Cancel</source>
 <target>&Cancelar</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>Operação:</target>
+
+<source>Items found:</source>
 <target>Elementos encontrados:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>Elementos restantes:</target>
 
 <source>Speed:</source>
@@ -668,9 +671,6 @@ A linha de comandos é executada cada vez que:
 
 <source>Time elapsed:</source>
 <target>Tempo passado:</target>
-
-<source>Operation:</source>
-<target>Operação:</target>
 
 <source>Select variant:</source>
 <target>Selecione uma variante:</target>
@@ -770,7 +770,7 @@ Os ficheiros são considerados iguais se
 <source>Synchronizing...</source>
 <target>A sincronizar...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>Elementos processados:</target>
 
 <source>&Pause</source>
@@ -899,8 +899,8 @@ Excluir: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>Copia ficheiro transacional</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>Escrever num ficheiro temporário (*.ffs_tmp) e renomear. Garante consistência mesmo em situações de falha crítica.</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>Copiar ficheiros bloqueados</target>
@@ -994,6 +994,18 @@ Transferir ficheiro e permissões
 
 <source>Auto-adjust columns</source>
 <target>Auto ajustar colunas</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>Incluir todas as linhas</target>

@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>עיין</target>
 
+<source>Windows Error Code %x:</source>
+<target>קוד שגיאת חלונות %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>קוד שגיאת לינוקס %x:</target>
+
 <source>Invalid command line: %x</source>
 <target>שורת פקודה בלתי חוקית: %x</target>
 
@@ -226,33 +232,6 @@
 <source>/sec</source>
 <target>/שנ</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 דקה</pluralform>
-<pluralform>%x דקות</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 שעה</pluralform>
-<pluralform>%x שעות</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 יום</pluralform>
-<pluralform>%x ימים</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>&שמור תצורה...</target>
 
@@ -411,26 +390,20 @@ The command line is executed each time:
 <source>Operation aborted!</source>
 <target>הפעולה בוטלה!</target>
 
-<source>Could not load a required DLL:</source>
-<target>:נדרש DLL לא יכל לטעון</target>
-
 <source>Endless loop when traversing directory:</source>
 <target>נוצרת לולאה אינסופית בחצית מחיצות</target>
 
 <source>Error traversing directory:</source>
 <target>שגיאה בהצלבת מחיצות</target>
 
-<source>Windows Error Code %x:</source>
-<target>קוד שגיאת חלונות %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>קוד שגיאת לינוקס %x:</target>
-
 <source>Error setting privilege:</source>
 <target>שגיאה בהשמת פריווילגיה</target>
 
 <source>Error moving to Recycle Bin:</source>
 <target>שגיאה בהעברה לסל המיחזור:</target>
+
+<source>Could not load a required DLL:</source>
+<target>:נדרש DLL לא יכל לטעון</target>
 
 <source>Error writing to synchronization database:</source>
 <target>שגיאה ברישום לבסיס נתוני סנכרון:</target>
@@ -455,6 +428,33 @@ The command line is executed each time:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 דקה</pluralform>
+<pluralform>%x דקות</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 שעה</pluralform>
+<pluralform>%x שעות</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 יום</pluralform>
+<pluralform>%x ימים</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>XML לא יכול לקרא ערכים מצמתי :</target>
@@ -654,10 +654,13 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>&בטל</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>פעולה:</target>
+
+<source>Items found:</source>
 <target>אלמנטים נמצאו:</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>אלמנתים נותרו:</target>
 
 <source>Speed:</source>
@@ -668,9 +671,6 @@ The command line is executed each time:
 
 <source>Time elapsed:</source>
 <target>זמן עבר:</target>
-
-<source>Operation:</source>
-<target>פעולה:</target>
 
 <source>Select variant:</source>
 <target>בחר משתנה:</target>
@@ -771,7 +771,7 @@ is the same
 <source>Synchronizing...</source>
 <target>מסנכרן...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>אלמנטים עובדו:</target>
 
 <source>&Pause</source>
@@ -900,8 +900,8 @@ Exclude: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>העתקת קובץ בעסקה</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>רשום קבצים כזמניים (*.ffs_tmp) ואח"כ שנה שמם. פעולה זו מבטיחה עקביות משתני נמצב גם במקרה של שגיאה קטלנית</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>העתק קבצים נעולים</target>
@@ -995,6 +995,18 @@ Transfer file and directory permissions
 
 <source>Auto-adjust columns</source>
 <target>עימוד אוטומטי</target>
+
+<source>Icon size:</source>
+<target></target>
+
+<source>Small</source>
+<target></target>
+
+<source>Medium</source>
+<target></target>
+
+<source>Large</source>
+<target></target>
 
 <source>Include all rows</source>
 <target>כלול את כל השורות</target>

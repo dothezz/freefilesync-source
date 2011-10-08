@@ -7,9 +7,9 @@
 #ifndef WATCHER_H_INCLUDED
 #define WATCHER_H_INCLUDED
 
-#include "../shared/zstring.h"
+#include <zen/zstring.h>
 #include <vector>
-#include "../shared/file_error.h"
+#include <zen/file_error.h>
 
 
 namespace rts

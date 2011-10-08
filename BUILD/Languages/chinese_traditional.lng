@@ -25,6 +25,12 @@
 <source>Browse</source>
 <target>瀏覽</target>
 
+<source>Windows Error Code %x:</source>
+<target>Windows 錯誤代碼 %x：</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux 錯誤代碼 %x：</target>
+
 <source>Invalid command line: %x</source>
 <target>無效的命令列：%x</target>
 
@@ -223,30 +229,6 @@
 <source>/sec</source>
 <target>/秒</target>
 
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x 分</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x 小時</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x 天</pluralform>
-</target>
-
 <source>S&ave configuration...</source>
 <target>儲存配置(&A)...</target>
 
@@ -411,12 +393,6 @@ The command line is executed each time:
 <source>Error traversing directory:</source>
 <target>遍歷目錄錯誤：</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows 錯誤代碼 %x：</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux 錯誤代碼 %x：</target>
-
 <source>Error setting privilege:</source>
 <target>設定權限錯誤：</target>
 
@@ -449,6 +425,30 @@ The command line is executed each time:
 
 <source>%x%</source>
 <target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x 分</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x 小時</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x 天</pluralform>
+</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>無法讀取 XML 之後節點的值：</target>
@@ -648,10 +648,13 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>取消(&C)</target>
 
-<source>Elements found:</source>
+<source>Operation:</source>
+<target>操作：</target>
+
+<source>Items found:</source>
 <target>尋找要素：</target>
 
-<source>Elements remaining:</source>
+<source>Items remaining:</source>
 <target>剩餘要素：</target>
 
 <source>Speed:</source>
@@ -662,9 +665,6 @@ The command line is executed each time:
 
 <source>Time elapsed:</source>
 <target>經過時間：</target>
-
-<source>Operation:</source>
-<target>操作：</target>
 
 <source>Select variant:</source>
 <target>選擇變數：</target>
@@ -756,7 +756,7 @@ is the same
 <source>Synchronizing...</source>
 <target>正在同步...</target>
 
-<source>Elements processed:</source>
+<source>Items processed:</source>
 <target>已處理要素：</target>
 
 <source>&Pause</source>
@@ -885,8 +885,8 @@ Exclude: \stuff\temp\*
 <source>Transactional file copy</source>
 <target>異動檔案副本</target>
 
-<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
-<target>第一次將檔寫入到一個暫存 (*.ffs_tmp) 順便將它們重新命名。即使在嚴重錯誤的情況下，還可確保一致的狀態。</target>
+<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<target></target>
 
 <source>Copy locked files</source>
 <target>複製被鎖定的檔案</target>

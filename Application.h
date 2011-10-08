@@ -8,7 +8,7 @@
 #define FREEFILESYNCAPP_H
 
 #include <wx/app.h>
-#include "library/process_xml.h"
+#include "lib/process_xml.h"
 
 
 class Application : public wxApp
@@ -21,7 +21,8 @@ public:
     void OnStartApplication(wxIdleEvent& event);
 
 private:
-    void runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings& settings);
+    void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, xmlAccess::XmlGlobalSettings& settings);
+    void runGuiMode(const std::vector<wxString>& cfgFileName, xmlAccess::XmlGlobalSettings& settings);
     void runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings);
 
     xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both

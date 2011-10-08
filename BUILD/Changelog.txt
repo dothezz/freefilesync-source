@@ -2,6 +2,24 @@
 |FreeFileSync|
 --------------
 
+Changelog v4.2
+---------------
+
+
+Changelog v4.1
+---------------
+Improved synchronization progress dialog
+Show all available aliases in directory history list
+Show password prompt when connecting to mapped network share
+Removed busy cursor after program startup
+RealtimeSync: atomically detect missing directories
+Handle not existing reference by volume name as an invalid path
+Improved startup responsiveness by checking dir/file existence asynchronously
+Fixed loading incorrect directory name when using multiple folder pairs
+Allow passing multiple configurations via command line
+Allow passing multiple directory names via command line
+
+
 Changelog v4.0
 ---------------
 Thumbnail list view

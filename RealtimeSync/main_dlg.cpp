@@ -6,22 +6,22 @@
 
 #include "main_dlg.h"
 #include "resources.h"
-#include "../shared/custom_button.h"
-#include "../shared/standard_paths.h"
+#include <wx+/button.h>
+#include "../lib/ffs_paths.h"
 #include <wx/msgdlg.h>
 #include <wx/wupdlock.h>
 #include "watcher.h"
 #include <wx/utils.h>
 #include "xml_proc.h"
 #include "tray_menu.h"
-#include "../shared/file_handling.h"
+#include <zen/file_handling.h>
 #include "xml_ffs.h"
-#include "../shared/string_conv.h"
-#include "../shared/assert_static.h"
-#include "../shared/build_info.h"
-#include "../shared/help_provider.h"
-#include "../shared/util.h"
-#include "../shared/mouse_move_dlg.h"
+#include <wx+/string_conv.h>
+#include <zen/assert_static.h>
+#include <zen/build_info.h>
+#include "../lib/help_provider.h"
+#include "../lib/process_xml.h"
+#include <wx+/mouse_move_dlg.h>
 
 using namespace zen;
 
@@ -34,9 +34,9 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     m_bpButtonRemoveTopFolder->Hide();
     m_panelMainFolder->Layout();
 
-    m_bpButtonAddFolder->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("addFolderPair")));
-    m_bpButtonRemoveTopFolder->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
-    m_buttonStart->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("startRed")));
+    m_bpButtonAddFolder->SetBitmapLabel(GlobalResources::getImage(wxT("addFolderPair")));
+    m_bpButtonRemoveTopFolder->SetBitmapLabel(GlobalResources::getImage(wxT("removeFolderPair")));
+    m_buttonStart->setBitmapFront(GlobalResources::getImage(wxT("startRed")));
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), NULL, this);
@@ -145,11 +145,11 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
 #endif //wxUSE_UNICODE
 
     //compile time info about 32/64-bit build
-    if (util::is64BitBuild)
+    if (zen::is64BitBuild)
         build += wxT(" x64");
     else
         build += wxT(" x86");
-    assert_static(util::is32BitBuild || util::is64BitBuild);
+    assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
     wxString buildFormatted = _("(Build: %x)");
     buildFormatted.Replace(wxT("%x"), build);
@@ -176,7 +176,7 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
     Hide();
 
-    switch (rts::startDirectoryMonitor(currentCfg, zen::extractJobName(currentConfigFileName)))
+    switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(currentConfigFileName)))
     {
         case rts::QUIT:
         {
@@ -378,7 +378,7 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
     {
         //add new folder pair
         DirectoryPanel* newFolder = new DirectoryPanel(m_scrolledWinFolders);
-        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
+        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(GlobalResources::getImage(wxT("removeFolderPair")));
 
         //get size of scrolled window
         folderHeight = newFolder->GetSize().GetHeight();

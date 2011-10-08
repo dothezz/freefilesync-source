@@ -5,41 +5,23 @@
 // **************************************************************************
 
 #include "resources.h"
+#include <memory>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 #include <wx/image.h>
-#include <wx/icon.h>
-#include <memory>
-#include "../shared/standard_paths.h"
+#include "../lib/ffs_paths.h"
 
 using namespace zen;
 
 
-const GlobalResources& GlobalResources::getInstance()
+const GlobalResources& GlobalResources::instance()
 {
-    static GlobalResources instance;
-    return instance;
+    static GlobalResources inst;
+    return inst;
 }
 
 
 GlobalResources::GlobalResources()
-{
-    programIcon = new wxIcon(wxNullIcon);
-}
-
-
-GlobalResources::~GlobalResources()
-{
-    //free bitmap resources
-    for (std::map<wxString, wxBitmap*>::iterator i = bitmapResource.begin(); i != bitmapResource.end(); ++i)
-        delete i->second;
-
-    //free other resources
-    delete programIcon;
-}
-
-
-void GlobalResources::load() const
 {
     wxFFileInputStream input(zen::getResourceDir() + wxT("Resources.zip"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
@@ -51,7 +33,7 @@ void GlobalResources::load() const
 
         while (true)
         {
-            std::auto_ptr<wxZipEntry> entry(resourceFile.GetNextEntry());
+            std::unique_ptr<wxZipEntry> entry(resourceFile.GetNextEntry());
             if (entry.get() == NULL)
                 break;
 
@@ -59,32 +41,31 @@ void GlobalResources::load() const
 
             //generic image loading
             if (name.EndsWith(wxT(".png")))
-            {
-                if (bitmapResource.find(name) == bitmapResource.end()) //avoid duplicate entry: prevent memory leak!
-                    bitmapResource[name] = new wxBitmap(wxImage(resourceFile, wxBITMAP_TYPE_PNG));
-            }
+                bitmaps.insert(std::make_pair(name, wxImage(resourceFile, wxBITMAP_TYPE_PNG)));
         }
     }
 
 #ifdef FFS_WIN
     //for compatibility it seems we need to stick with a "real" icon
-    *programIcon = wxIcon(wxT("A_PROGRAM_ICON"));
+    programIcon = wxIcon(wxT("A_PROGRAM_ICON"));
 #else
     //use big logo bitmap for better quality
-    programIcon->CopyFromBitmap(getImageByName(wxT("RealtimeSync.png")));
+    programIcon.CopyFromBitmap(getImageInt(wxT("RealtimeSync.png")));
 #endif
+
 }
 
 
-const wxBitmap& GlobalResources::getImageByName(const wxString& imageName) const
+const wxBitmap& GlobalResources::getImageInt(const wxString& name) const
 {
-    const std::map<wxString, wxBitmap*>::const_iterator bmp = imageName.Find(wxChar('.')) == wxNOT_FOUND ? //assume .png ending if nothing else specified
-                                                              bitmapResource.find(imageName + wxT(".png")) :
-                                                              bitmapResource.find(imageName);
-
-    if (bmp != bitmapResource.end())
-        return *bmp->second;
+    auto iter = bitmaps.find(name.Find(L'.') == wxNOT_FOUND ? //assume .png ending if nothing else specified
+                             name + wxT(".png") :
+                             name);
+    if (iter != bitmaps.end())
+        return iter->second;
     else
+    {
+        assert(false);
         return wxNullBitmap;
+    }
 }
-

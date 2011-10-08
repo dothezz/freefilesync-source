@@ -27,7 +27,7 @@
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
-					<Add library="libboost_thread-mgw45-mt-s-1_47.a" />
+					<Add library="libboost_thread-mgw46-mt-s-1_47.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
@@ -41,7 +41,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Winvalid-pch" />
-					<Add option='-include &quot;../shared/pch.h&quot;' />
+					<Add option='-include &quot;../wx+/pch.h&quot;' />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="C:\Program Files\C++\wxWidgets\lib\gcc_dll\mswud" />
 				</Compiler>
@@ -51,7 +51,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_47.a" />
+					<Add library="libboost_thread-mgw46-mt-sd-1_47.a" />
 					<Add directory="C:\Program Files\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -65,7 +65,7 @@
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
 			<Add option="-std=gnu++0x" />
-			<Add option='-include &quot;../shared/warn_static.h&quot;' />
+			<Add option='-include &quot;../zen/warn_static.h&quot;' />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DwxUSE_UNICODE" />
@@ -76,7 +76,7 @@
 			<Add option="-DWXINTL_NO_GETTEXT_MACRO" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Program Files\C++\Boost" />
-			<Add directory="..\shared" />
+			<Add directory="..\." />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
@@ -103,7 +103,6 @@
 		<Unit filename="gui_generated.h" />
 		<Unit filename="main_dlg.cpp" />
 		<Unit filename="main_dlg.h" />
-		<Unit filename="notify.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
@@ -117,51 +116,29 @@
 		<Unit filename="xml_ffs.h" />
 		<Unit filename="xml_proc.cpp" />
 		<Unit filename="xml_proc.h" />
-		<Unit filename="..\Shared\custom_button.cpp" />
-		<Unit filename="..\Shared\custom_button.h" />
-		<Unit filename="..\Shared\dir_name.cpp" />
-		<Unit filename="..\Shared\dir_name.h" />
-		<Unit filename="..\Shared\zstring.cpp" />
-		<Unit filename="..\Shared\zstring.h" />
-		<Unit filename="..\library\process_xml.cpp" />
-		<Unit filename="..\shared\dir_watcher.cpp" />
-		<Unit filename="..\shared\dir_watcher.h" />
-		<Unit filename="..\shared\dll_loader.h" />
-		<Unit filename="..\shared\dst_hack.cpp" />
-		<Unit filename="..\shared\dst_hack.h" />
-		<Unit filename="..\shared\file_error.h" />
-		<Unit filename="..\shared\file_handling.cpp" />
-		<Unit filename="..\shared\file_handling.h" />
-		<Unit filename="..\shared\file_id.cpp" />
-		<Unit filename="..\shared\file_io.cpp" />
-		<Unit filename="..\shared\file_traverser.cpp" />
-		<Unit filename="..\shared\folder_history_box.cpp" />
-		<Unit filename="..\shared\global_func.h" />
-		<Unit filename="..\shared\help_provider.cpp" />
-		<Unit filename="..\shared\i18n.cpp" />
-		<Unit filename="..\shared\i18n.h" />
-		<Unit filename="..\shared\last_error.cpp" />
-		<Unit filename="..\shared\last_error.h" />
-		<Unit filename="..\shared\localization.cpp" />
-		<Unit filename="..\shared\long_path_prefix.h" />
-		<Unit filename="..\shared\mouse_move_dlg.cpp" />
-		<Unit filename="..\shared\notify_removal.cpp" />
-		<Unit filename="..\shared\notify_removal.h" />
-		<Unit filename="..\shared\pch.h">
+		<Unit filename="..\lib\dir_name.cpp" />
+		<Unit filename="..\lib\folder_history_box.cpp" />
+		<Unit filename="..\lib\localization.cpp" />
+		<Unit filename="..\lib\process_xml.cpp" />
+		<Unit filename="..\lib\resolve_path.cpp" />
+		<Unit filename="..\lib\xml_base.cpp" />
+		<Unit filename="..\structures.cpp" />
+		<Unit filename="..\wx+\button.cpp" />
+		<Unit filename="..\wx+\format_unit.cpp" />
+		<Unit filename="..\wx+\mouse_move_dlg.cpp" />
+		<Unit filename="..\wx+\pch.h">
 			<Option compile="1" />
 			<Option weight="0" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="..\shared\privilege.cpp" />
-		<Unit filename="..\shared\resolve_path.cpp" />
-		<Unit filename="..\shared\resolve_path.h" />
-		<Unit filename="..\shared\shell_execute.h" />
-		<Unit filename="..\shared\standard_paths.cpp" />
-		<Unit filename="..\shared\standard_paths.h" />
-		<Unit filename="..\shared\util.cpp" />
-		<Unit filename="..\shared\xml_base.cpp" />
-		<Unit filename="..\shared\xml_base.h" />
-		<Unit filename="..\structures.cpp" />
+		<Unit filename="..\zen\dir_watcher.cpp" />
+		<Unit filename="..\zen\dst_hack.cpp" />
+		<Unit filename="..\zen\file_handling.cpp" />
+		<Unit filename="..\zen\file_io.cpp" />
+		<Unit filename="..\zen\file_traverser.cpp" />
+		<Unit filename="..\zen\notify_removal.cpp" />
+		<Unit filename="..\zen\privilege.cpp" />
+		<Unit filename="..\zen\zstring.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
