@@ -11,7 +11,6 @@
 #include <wx/msgdlg.h>
 #include <wx/log.h>
 #include <wx/file.h>
-#include <boost/bind.hpp>
 #include <wx+/string_conv.h>
 #include <wx+/format_unit.h>
 #include <zen/scope_guard.h>
@@ -19,15 +18,14 @@
 #include <zen/file_handling.h>
 #include "lib/resolve_path.h"
 #include "lib/recycler.h"
-#include <zen/disable_standby.h>
 #include "lib/db_file.h"
 #include "lib/dir_exist_async.h"
 #include "lib/cmp_filetime.h"
 #include <zen/file_io.h>
+#include <zen/time.h>
 
 #ifdef FFS_WIN
 #include <zen/long_path_prefix.h>
-#include <boost/scoped_ptr.hpp>
 #include <zen/perf.h>
 #include "lib/shadow.h"
 #endif
@@ -311,7 +309,7 @@ bool tryReportingError(ProcessCallback& handler, Function cmd) //return "true" o
         }
         catch (FileError& error)
         {
-            ProcessCallback::Response rv = handler.reportError(error.msg()); //may throw!
+            ProcessCallback::Response rv = handler.reportError(error.toString()); //may throw!
             if (rv == ProcessCallback::IGNORE_ERROR)
                 return false;
             else if (rv == ProcessCallback::RETRY)
@@ -335,11 +333,8 @@ Zstring getSessionDeletionDir(const Zstring& deletionDirectory, const Zstring& p
     if (!endsWith(formattedDir, FILE_NAME_SEPARATOR))
         formattedDir += FILE_NAME_SEPARATOR;
 
-    const wxString timeNow = replaceCpy(wxDateTime::Now().FormatISOTime(), L":", L"");
-
-    const wxString sessionName = wxDateTime::Now().FormatISODate() + wxChar(' ') + timeNow;
-    formattedDir += prefix + toZ(sessionName);
-
+    formattedDir += prefix;
+    formattedDir += formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"));
 
     //ensure that session directory does not yet exist (must be unique)
     Zstring output = formattedDir;
@@ -358,13 +353,18 @@ SyncProcess::SyncProcess(xmlAccess::OptionalDialogs& warnings,
                          bool copyLockedFiles,
                          bool copyFilePermissions,
                          bool transactionalFileCopy,
+                         bool runWithBackgroundPriority,
                          ProcessCallback& handler) :
     verifyCopiedFiles_(verifyCopiedFiles),
     copyLockedFiles_(copyLockedFiles),
     copyFilePermissions_(copyFilePermissions),
     transactionalFileCopy_(transactionalFileCopy),
     m_warnings(warnings),
-    procCallback(handler) {}
+    procCallback(handler)
+    {
+if (runWithBackgroundPriority)
+procBackground.reset(new ScheduleForBackgroundProcessing);
+    }
 //--------------------------------------------------------------------------------------------------------------
 
 namespace
@@ -458,7 +458,7 @@ DeletionHandling::~DeletionHandling()
 {
     //always (try to) clean up, even if synchronization is aborted!
     try { tryCleanup(); }
-    catch (...) {}   //make sure this stays non-blocking!
+    catch (...) {}     //make sure this stays non-blocking!
 }
 
 
@@ -705,7 +705,9 @@ private:
         //[...]
 
         //recurse into sub-dirs
-        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(), boost::bind(&DiskSpaceNeeded::processRecursively, this, _1));
+        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(), [&](const HierarchyObject& subDir) { this->processRecursively(subDir); });
+        //for (auto& subDir : hierObj.refSubDirs())
+        //      processRecursively(subDir);
     }
 
     const bool freeSpaceDelLeft_;
@@ -793,13 +795,13 @@ public:
         verifyCopiedFiles(syncProc.verifyCopiedFiles_),
         copyFilePermissions(syncProc.copyFilePermissions_),
         transactionalFileCopy(syncProc.transactionalFileCopy_),
-        txtCreatingFile     (replaceCpy(_("Creating file %x"            ), L"%x", L"\n\"%x\"", false)),
-        txtCreatingLink     (replaceCpy(_("Creating symbolic link %x"   ), L"%x", L"\n\"%x\"", false)),
-        txtCreatingFolder   (replaceCpy(_("Creating folder %x"          ), L"%x", L"\n\"%x\"", false)),
-        txtOverwritingFile  (replaceCpy(_("Overwriting file %x"         ), L"%x", L"\n\"%x\"", false)),
-        txtOverwritingLink  (replaceCpy(_("Overwriting symbolic link %x"), L"%x", L"\n\"%x\"", false)),
-        txtVerifying        (replaceCpy(_("Verifying file %x"           ), L"%x", L"\n\"%x\"", false)),
-        txtWritingAttributes(replaceCpy(_("Updating attributes of %x"   ), L"%x", L"\n\"%x\"", false)) {}
+        txtCreatingFile     (replaceCpy(_("Creating file %x"            ), L"%x", L"\"%x\"", false)),
+        txtCreatingLink     (replaceCpy(_("Creating symbolic link %x"   ), L"%x", L"\"%x\"", false)),
+        txtCreatingFolder   (replaceCpy(_("Creating folder %x"          ), L"%x", L"\"%x\"", false)),
+        txtOverwritingFile  (replaceCpy(_("Overwriting file %x"         ), L"%x", L"\"%x\"", false)),
+        txtOverwritingLink  (replaceCpy(_("Overwriting symbolic link %x"), L"%x", L"\"%x\"", false)),
+        txtVerifying        (replaceCpy(_("Verifying file %x"           ), L"%x", L"\"%x\"", false)),
+        txtWritingAttributes(replaceCpy(_("Updating attributes of %x"   ), L"%x", L"\"%x\"", false)) {}
 
     void startSync(BaseDirMapping& baseMap)
     {
@@ -1351,42 +1353,15 @@ struct EqualDependentDirectory : public std::binary_function<Zstring, Zstring, b
                                Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
     }
 };
-
-
-class EnforceUpdateDatabase
-{
-public:
-    EnforceUpdateDatabase(const BaseDirMapping& baseMap) :
-        dbWasWritten(false),
-        baseMap_(baseMap) {}
-
-    ~EnforceUpdateDatabase()
-    {
-        try
-        {
-            tryWriteDB(); //throw FileError, keep non-blocking!!!
-        }
-        catch (...) {}
-    }
-
-    void tryWriteDB() //(try to gracefully) write db file; throw FileError
-    {
-        if (!dbWasWritten)
-        {
-            zen::saveToDisk(baseMap_); //throw FileError
-            dbWasWritten = true;
-        }
-    }
-
-private:
-    bool dbWasWritten;
-    const BaseDirMapping& baseMap_;
-};
 }
 
 
 void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCfg>& syncConfig, FolderComparison& folderCmp)
 {
+        //prevent shutdown while synchronization is in progress
+        DisableStandby dummy;
+        (void)dummy;
+
 #ifdef NDEBUG
     wxLogNull noWxLogs; //prevent wxWidgets logging
 #endif
@@ -1536,7 +1511,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
             if (!missingSrcDir.empty())
             {
-                procCallback.reportFatalError(_("Source directory does not exist anymore:") + "\n\"" + missingSrcDir + "\"");
+                procCallback.reportFatalError(_("Source directory does not exist anymore:") + L"\n\"" + missingSrcDir + L"\"");
                 skipFolderPair[folderIndex] = true;
                 continue;
             }
@@ -1599,7 +1574,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             wxString conflictDescription = i->second;
             //conflictDescription.Replace(wxT("\n"), wxT(" ")); //remove line-breaks
 
-            warningMessage += wxString(L"\"") + i->first + L"\": " + conflictDescription + "\n\n";
+            warningMessage += std::wstring(L"\"") + i->first + L"\": " + conflictDescription + L"\n\n";
         }
 
         if (statisticsTotal.getConflict() > static_cast<int>(firstConflicts.size()))
@@ -1617,10 +1592,10 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         wxString warningMessage = _("Significant difference detected:");
 
         for (DirPairList::const_iterator i = significantDiff.begin(); i != significantDiff.end(); ++i)
-            warningMessage += wxString(wxT("\n\n")) +
-                              i->first + " <-> " + "\n" +
+            warningMessage += std::wstring(L"\n\n") +
+                              i->first + L" <-> " + L"\n" +
                               i->second;
-        warningMessage += wxString(wxT("\n\n")) + _("More than 50% of the total number of files will be copied or deleted!");
+        warningMessage += wxString(L"\n\n") + _("More than 50% of the total number of files will be copied or deleted!");
 
         procCallback.reportWarning(warningMessage, m_warnings.warningSignificantDifference);
     }
@@ -1632,9 +1607,9 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         wxString warningMessage = _("Not enough free disk space available in:");
 
         for (auto i = diskSpaceMissing.begin(); i != diskSpaceMissing.end(); ++i)
-            warningMessage += wxString(wxT("\n\n")) +
-                              "\"" + i->first + "\"\n" +
-                              _("Free disk space required:")  + wxT(" ") + filesizeToShortString(to<UInt64>(i->second.first))  + wxT("\n") +
+            warningMessage += std::wstring(L"\n\n") +
+                              L"\"" + i->first + L"\"\n" +
+                              _("Free disk space required:")  + wxT(" ") + filesizeToShortString(to<UInt64>(i->second.first))  + L"\n" +
                               _("Free disk space available:") + wxT(" ") + filesizeToShortString(to<UInt64>(i->second.second));
 
         procCallback.reportWarning(warningMessage, m_warnings.warningNotEnoughDiskSpace);
@@ -1666,8 +1641,8 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     {
         wxString warningMessage = wxString(_("A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!")) + wxT("\n");
         for (std::vector<Zstring>::const_iterator i = conflictDirs.begin(); i != conflictDirs.end(); ++i)
-            warningMessage += wxString(wxT("\n")) +
-                              "\"" + *i + "\"";
+            warningMessage += std::wstring(L"\n") +
+                              L"\"" + *i + L"\"";
         procCallback.reportWarning(warningMessage, m_warnings.warningMultiFolderWriteAccess);
     }
 
@@ -1680,10 +1655,6 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
     try
     {
-        //prevent shutdown while synchronization is in progress
-        DisableStandby dummy;
-        (void)dummy;
-
         //loop through all directory pairs
         for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
         {
@@ -1701,13 +1672,13 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
             //------------------------------------------------------------------------------------------
             //info about folder pair to be processed (useful for logfile)
-            std::wstring left  = _("Left")  + ": ";
-            std::wstring right = _("Right") + ": ";
+            std::wstring left  = _("Left")  + L": ";
+            std::wstring right = _("Right") + L": ";
             makeSameLength(left, right);
 
-            const std::wstring statusTxt = _("Processing folder pair:") + " \n" +
-                                           "\t" + left  + "\"" + j->getBaseDirPf<LEFT_SIDE>()  + "\"" + " \n" +
-                                           "\t" + right + "\"" + j->getBaseDirPf<RIGHT_SIDE>() + "\"";
+            const std::wstring statusTxt = _("Processing folder pair:") + L" \n" +
+                                           L"\t" + left  + L"\"" + j->getBaseDirPf<LEFT_SIDE>()  + L"\"" + L" \n" +
+                                           L"\t" + right + L"\"" + j->getBaseDirPf<RIGHT_SIDE>() + L"\"";
             procCallback.reportInfo(statusTxt);
 
             //------------------------------------------------------------------------------------------
@@ -1729,9 +1700,11 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             //execute synchronization recursively
 
             //update synchronization database (automatic sync only)
-            std::unique_ptr<EnforceUpdateDatabase> guardUpdateDb;
-            if (folderPairCfg.inAutomaticMode)
-                guardUpdateDb.reset(new EnforceUpdateDatabase(*j));
+            zen::ScopeGuard guardUpdateDb = zen::makeGuard([&]()
+            {
+                if (folderPairCfg.inAutomaticMode)
+                    zen::saveToDisk(*j); //throw FileError
+            });
 
             //guarantee removal of invalid entries (where element on both sides is empty)
             ZEN_ON_BLOCK_EXIT(BaseDirMapping::removeEmpty(*j););
@@ -1749,11 +1722,13 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             tryReportingError(procCallback, [&]() { delHandlerFp.second.tryCleanup(); }); //
 
             //(try to gracefully) write database file (will be done in ~EnforceUpdateDatabase anyway...)
-            if (guardUpdateDb.get())
+            if (folderPairCfg.inAutomaticMode)
             {
                 procCallback.reportStatus(_("Generating database..."));
                 procCallback.forceUiRefresh();
-                tryReportingError(procCallback, [&]() { guardUpdateDb->tryWriteDB(); });
+
+                tryReportingError(procCallback, [&]() { zen::saveToDisk(*j); }); //throw FileError
+                guardUpdateDb.dismiss();
             }
         }
 
@@ -1850,8 +1825,8 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
         }
         catch (const FileError& e)
         {
-            const std::wstring errorMsg = replaceCpy(_("Error copying locked file %x!"), L"%x", std::wstring(L"\"") + source + "\"");
-            throw FileError(errorMsg + "\n\n" + e.msg());
+            const std::wstring errorMsg = replaceCpy(_("Error copying locked file %x!"), L"%x", std::wstring(L"\"") + source + L"\"");
+            throw FileError(errorMsg + L"\n\n" + e.toString());
         }
 
         //now try again
@@ -1915,7 +1890,7 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& c
     wxFile file1(::open(source.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
     if (!file1.IsOpened())
-        throw FileError(_("Error opening file:") + " \"" + source + "\"");
+        throw FileError(_("Error opening file:") + L" \"" + source + L"\"");
 
 #ifdef FFS_WIN
     wxFile file2(applyLongPathPrefix(target).c_str(), wxFile::read); //don't use buffered file input for verification!
@@ -1923,27 +1898,27 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& c
     wxFile file2(::open(target.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
     if (!file2.IsOpened()) //NO cleanup necessary for (wxFile) file1
-        throw FileError(_("Error opening file:") + " \"" + target + "\"");
+        throw FileError(_("Error opening file:") + L" \"" + target + L"\"");
 
     do
     {
         const size_t length1 = file1.Read(&memory1[0], memory1.size());
         if (file1.Error())
-            throw FileError(_("Error reading file:") + " \"" + source + "\"");
+            throw FileError(_("Error reading file:") + L" \"" + source + L"\"");
         callback.updateStatus(); //send progress updates
 
         const size_t length2 = file2.Read(&memory2[0], memory2.size());
         if (file2.Error())
-            throw FileError(_("Error reading file:") + " \"" + target + "\"");
+            throw FileError(_("Error reading file:") + L" \"" + target + L"\"");
         callback.updateStatus(); //send progress updates
 
         if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
-            throw FileError(_("Data verification error: Source and target file have different content!") + "\n" + "\"" + source + "\" -> \n\"" + target + "\"");
+            throw FileError(_("Data verification error: Source and target file have different content!") + L"\n" + L"\"" + source + L"\" -> \n\"" + target + L"\"");
     }
     while (!file1.Eof());
 
     if (!file2.Eof())
-        throw FileError(_("Data verification error: Source and target file have different content!") + "\n" + "\"" + source + "\" -> \n\"" + target + "\"");
+        throw FileError(_("Data verification error: Source and target file have different content!") + L"\n" + L"\"" + source + L"\" -> \n\"" + target + L"\"");
 }
 
 

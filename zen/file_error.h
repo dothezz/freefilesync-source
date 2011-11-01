@@ -17,10 +17,10 @@ namespace zen
 class FileError //Exception base class used to notify file/directory copy/delete errors
 {
 public:
-    FileError(const std::wstring& message) : errorMessage(message) {}
+    explicit FileError(const std::wstring& message) : errorMessage(message) {}
     virtual ~FileError() {}
 
-    const std::wstring& msg() const { return errorMessage; }
+    const std::wstring& toString() const { return errorMessage; }
 
 private:
     std::wstring errorMessage;
@@ -38,11 +38,9 @@ DEFINE_NEW_FILE_ERROR(ErrorFileLocked);
 //----------- facilitate usage of std::wstring for error messages --------------------
 
 //allow implicit UTF8 conversion: since std::wstring models a GUI string, convenience is more important than performance
-inline std::wstring operator+(const std::wstring& lhs, const Zstring&      rhs) { return std::wstring(lhs) += zen::utf8CvrtTo<std::wstring>(rhs); }
+inline std::wstring operator+(const std::wstring& lhs, const Zstring& rhs) { return std::wstring(lhs) += zen::utf8CvrtTo<std::wstring>(rhs); }
 
 //we musn't put our overloads in namespace std, but namespace zen (+ using directive) is sufficient
-inline std::wstring operator+(const std::wstring& lhs, const char*         rhs) { return std::wstring(lhs) += utf8CvrtTo<std::wstring>(rhs); }
-inline std::wstring operator+(const std::wstring& lhs, const std::string&  rhs) { return std::wstring(lhs) += utf8CvrtTo<std::wstring>(rhs); }
 }
 
 #endif // FILEERROR_H_INCLUDED

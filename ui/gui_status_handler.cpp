@@ -311,6 +311,7 @@ ProcessCallback::Response SyncStatusHandler::reportError(const wxString& errorMe
         case ReturnErrorDlg::BUTTON_ABORT:
             errorLog.logMsg(errorMessage, TYPE_ERROR);
             abortThisProcess();
+            break;
     }
 
     assert (false);

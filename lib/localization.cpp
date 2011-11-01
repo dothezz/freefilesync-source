@@ -132,7 +132,7 @@ public:
     }
 
     virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
-    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName) { return Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); }
+    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName) { return nullptr; }
     virtual HandleError onError(const std::wstring& errorText) { return TRAV_ERROR_IGNORE; } //errors are not really critical in this context
 
 private:
@@ -180,7 +180,7 @@ ExistingTranslations::ExistingTranslations()
     std::vector<Zstring> lngFiles;
     FindLngfiles traverseCallback(lngFiles);
 
-    traverseFolder(toZ(zen::getResourceDir() +  wxT("Languages")), //throw();
+    traverseFolder(zen::getResourceDir() +  Zstr("Languages"), //throw();
                    false, //don't follow symlinks
                    traverseCallback);
 
@@ -193,6 +193,10 @@ ExistingTranslations::ExistingTranslations()
                 lngfile::TransHeader lngHeader;
                 lngfile::parseHeader(stream, lngHeader); //throw ParsingError
 
+                /*
+                There is some buggy behavior in wxWidgets which maps "zh_TW" to simplified chinese.
+                Fortunately locales can be also entered as description. I changed to "Chinese (Traditional)" which works fine.
+                */
                 const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utf8CvrtTo<wxString>(lngHeader.localeName));
                 if (locInfo)
                 {
@@ -374,10 +378,11 @@ void zen::setLanguage(int language)
 {
     //(try to) retrieve language file
     wxString languageFile;
-    for (std::vector<ExistingTranslations::Entry>::const_iterator i = ExistingTranslations::get().begin(); i != ExistingTranslations::get().end(); ++i)
-        if (i->languageID == language)
+
+    for (auto iter = ExistingTranslations::get().begin(); iter != ExistingTranslations::get().end(); ++iter)
+        if (iter->languageID == language)
         {
-            languageFile = i->languageFile;
+            languageFile = iter->languageFile;
             break;
         }
 

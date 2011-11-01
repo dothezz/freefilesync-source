@@ -40,7 +40,7 @@ private:
 };
 
 //set bitmap label flicker free!
-void setBitmapLabel(wxBitmapButton& button, const wxBitmap& bmp);
+void setImage(wxBitmapButton& button, const wxBitmap& bmp);
 }
 
 

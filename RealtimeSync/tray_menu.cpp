@@ -351,7 +351,7 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
     }
     catch (const zen::FileError& error)
     {
-        wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
         return RESUME;
     }
 

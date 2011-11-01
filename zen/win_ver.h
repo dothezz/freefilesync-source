@@ -37,7 +37,7 @@ bool win7OrLater();
 namespace impl
 {
 inline
-bool winXyOrLater(DWORD major, DWORD minor)
+bool winXyOrLater(DWORD major, DWORD minor) //migrate: hold version data as static variable, as soon as C++11 thread safe statics are available in VS
 {
     OSVERSIONINFO osvi = {};
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);

@@ -906,24 +906,20 @@ Excluir: \stuff\temp\*
 <target>Copiar ficheiros bloqueados</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Copiar ficheiros partilhados ou bloqueados usando o serviço Volume Shadow Copy
- (Requer direitos de administrador)
+Copiar ficheiros partilhados ou bloqueados usando o serviço Volume Shadow Copy (Requer direitos de administrador)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Copiar permissões de acesso do ficheiro</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Transferir ficheiro e permissões
-(Requer direitos de administrador)
+Transferir ficheiro e permissões (Requer direitos de administrador)
 </target>
 
 <source>Hidden dialogs:</source>

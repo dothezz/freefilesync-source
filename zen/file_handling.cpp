@@ -107,7 +107,7 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
     {
         const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(filename).c_str(), &fileInfo);
         if (searchHandle == INVALID_HANDLE_VALUE)
-            throw FileError(_("Error reading file attributes:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error reading file attributes:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted());
         ::FindClose(searchHandle);
     }
     //        WIN32_FILE_ATTRIBUTE_DATA sourceAttr = {};
@@ -144,12 +144,12 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
                                           FILE_FLAG_BACKUP_SEMANTICS,
                                           NULL);
         if (hFile == INVALID_HANDLE_VALUE)
-            throw FileError(_("Error reading file attributes:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error reading file attributes:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted());
         ZEN_ON_BLOCK_EXIT(::CloseHandle(hFile));
 
         BY_HANDLE_FILE_INFORMATION fileInfoHnd = {};
         if (!::GetFileInformationByHandle(hFile, &fileInfoHnd))
-            throw FileError(_("Error reading file attributes:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error reading file attributes:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted());
 
         attr.fileSize         = UInt64(fileInfoHnd.nFileSizeLow, fileInfoHnd.nFileSizeHigh);
         attr.modificationTime = toTimeT(fileInfoHnd.ftLastWriteTime);
@@ -162,7 +162,7 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
                    :: stat(filename.c_str(), &fileInfo) :
                    ::lstat(filename.c_str(), &fileInfo);
     if (rv != 0) //follow symbolic links
-        throw FileError(_("Error reading file attributes:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error reading file attributes:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted());
 
     attr.fileSize         = UInt64(fileInfo.st_size);
     attr.modificationTime = fileInfo.st_mtime;
@@ -287,7 +287,7 @@ bool zen::removeFile(const Zstring& filename) //throw FileError;
         if (!somethingExists(filename))
             return false; //neither file nor any other object (e.g. broken symlink) with that name existing
 
-        throw FileError(_("Error deleting file:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted(lastError));
+        throw FileError(_("Error deleting file:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted(lastError));
     }
     return true;
 }
@@ -343,7 +343,7 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
             }
         }
 
-        std::wstring errorMessage = _("Error moving file:") + "\n\"" + oldName +  "\" ->\n\"" + newName + "\"" + "\n\n" + getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error moving file:") + L"\n\"" + oldName +  L"\" ->\n\"" + newName + L"\"" + L"\n\n" + getLastErrorFormatted(lastError);
 
         if (lastError == ERROR_NOT_SAME_DEVICE)
             throw ErrorDifferentVolume(errorMessage);
@@ -358,7 +358,7 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
     {
         const int lastError = errno;
 
-        std::wstring errorMessage = _("Error moving file:") + "\n\"" + oldName +  "\" ->\n\"" + newName + "\"" + "\n\n" + getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error moving file:") + L"\n\"" + oldName +  L"\" ->\n\"" + newName + L"\"" + L"\n\n" + getLastErrorFormatted(lastError);
 
         if (lastError == EXDEV)
             throw ErrorDifferentVolume(errorMessage);
@@ -529,8 +529,8 @@ void zen::moveFile(const Zstring& sourceFile, const Zstring& targetFile, bool ig
     const bool targetExisting = fileExists(targetFile);
 
     if (targetExisting && !ignoreExisting) //test file existence: e.g. Linux might silently overwrite existing symlinks
-        throw FileError(_("Error moving file:") + "\n\"" + sourceFile +  "\" ->\n\"" + targetFile + "\"" +
-                        "\n\n" + _("Target file already existing!"));
+        throw FileError(_("Error moving file:") + L"\n\"" + sourceFile +  L"\" ->\n\"" + targetFile + L"\"" +
+                        L"\n\n" + _("Target file already existing!"));
 
     if (!targetExisting)
     {
@@ -583,10 +583,10 @@ public:
             files_.push_back(NamePair(shortName, fullName));
     }
 
-    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName)
+    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
     {
         dirs_.push_back(NamePair(shortName, fullName));
-        return Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs; moveDirectory works recursively!
+        return nullptr; //DON'T traverse into subdirs; moveDirectory works recursively!
     }
 
     virtual HandleError onError(const std::wstring& errorText) { throw FileError(errorText); }
@@ -629,8 +629,8 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
     const bool targetExisting = dirExists(targetDir);
 
     if (targetExisting && !ignoreExisting) //directory or symlink exists (or even a file... this error will be caught later)
-        throw FileError(_("Error moving directory:") + "\n\"" + sourceDir +  "\" ->\n\"" + targetDir + "\"" +
-                        "\n\n" + _("Target directory already existing!"));
+        throw FileError(_("Error moving directory:") + L"\n\"" + sourceDir +  L"\" ->\n\"" + targetDir + L"\"" +
+                        L"\n\n" + _("Target directory already existing!"));
 
     const bool isSymlink = symlinkExists(sourceDir);
 
@@ -722,10 +722,10 @@ public:
         else
             m_files.push_back(fullName);
     }
-    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName)
+    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(fullName);
-        return Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs; removeDirectory works recursively!
+        return nullptr; //DON'T traverse into subdirs; removeDirectory works recursively!
     }
     virtual HandleError onError(const std::wstring& errorText) { throw FileError(errorText); }
 
@@ -759,7 +759,7 @@ void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
 #elif defined FFS_LINUX
         if (::unlink(directory.c_str()) != 0)
 #endif
-            throw FileError(_("Error deleting directory:") + "\n\"" + directory + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error deleting directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + getLastErrorFormatted());
 
         if (callback)
             callback->notifyDirDeletion(directory); //once per symlink
@@ -792,7 +792,7 @@ void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
     if (::rmdir(directory.c_str()) != 0)
 #endif
     {
-        throw FileError(_("Error deleting directory:") + "\n\"" + directory + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error deleting directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + getLastErrorFormatted());
     }
     if (callback)
         callback->notifyDirDeletion(directory); //and once per folder
@@ -841,7 +841,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
     });
 
     if (targetHandle.get() == INVALID_HANDLE_VALUE)
-        throw FileError(_("Error changing modification time:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error changing modification time:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted());
 
     /*
     if (hTarget == INVALID_HANDLE_VALUE && ::GetLastError() == ERROR_SHARING_VIOLATION)
@@ -857,7 +857,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
                        isNullTime(creationTime) ? NULL : &creationTime,
                        NULL,
                        &lastWriteTime))
-        throw FileError(_("Error changing modification time:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error changing modification time:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted());
 
 #ifndef NDEBUG //dst hack: verify data written
     if (dst::isFatDrive(filename) && !dirExists(filename)) //throw()
@@ -881,7 +881,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
 
         // set new "last write time"
         if (::utime(filename.c_str(), &newTimes) != 0)
-            throw FileError(_("Error changing modification time:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error changing modification time:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted());
     }
     else
     {
@@ -893,7 +893,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
         newTimes[1].tv_usec = 0;
 
         if (::lutimes(filename.c_str(), newTimes) != 0)
-            throw FileError(_("Error changing modification time:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error changing modification time:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted());
     }
 #endif
 }
@@ -902,10 +902,10 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
 namespace
 {
 #ifdef FFS_WIN
-Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target path of symbolic link to a directory; throw (FileError)
+Zstring getSymlinkTargetPath(const Zstring& symlink) //throw FileError
 {
     //open handle to target of symbolic link
-    const HANDLE hDir = ::CreateFile(applyLongPathPrefix(dirLinkName).c_str(),
+    const HANDLE hDir = ::CreateFile(applyLongPathPrefix(symlink).c_str(),
                                      0,
                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                      0,
@@ -913,11 +913,8 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
                                      FILE_FLAG_BACKUP_SEMANTICS,  //needed to open a directory
                                      NULL);
     if (hDir == INVALID_HANDLE_VALUE)
-        throw FileError(_("Error resolving symbolic link:") + "\n\"" + dirLinkName + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error resolving symbolic link:") + L"\n\"" + symlink + L"\"" + L"\n\n" + getLastErrorFormatted());
     ZEN_ON_BLOCK_EXIT(::CloseHandle(hDir));
-
-    const DWORD BUFFER_SIZE = 10000;
-    std::vector<wchar_t> targetPath(BUFFER_SIZE);
 
     //dynamically load windows API function
     typedef DWORD (WINAPI *GetFinalPathNameByHandleWFunc)(HANDLE hFile,
@@ -926,15 +923,17 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
                                                           DWORD dwFlags);
     const SysDllFun<GetFinalPathNameByHandleWFunc> getFinalPathNameByHandle(L"kernel32.dll", "GetFinalPathNameByHandleW");
     if (!getFinalPathNameByHandle)
-        throw FileError(_("Error loading library function:") + "\n\"" + "GetFinalPathNameByHandleW" + "\"");
+        throw FileError(_("Error loading library function:") + L"\n\"" + L"GetFinalPathNameByHandleW" + L"\"");
 
+    const DWORD BUFFER_SIZE = 10000;
+    std::vector<wchar_t> targetPath(BUFFER_SIZE);
     const DWORD charsWritten = getFinalPathNameByHandle(hDir,                  //__in   HANDLE hFile,
                                                         &targetPath[0],        //__out  LPTSTR lpszFilePath,
                                                         BUFFER_SIZE,           //__in   DWORD cchFilePath,
                                                         FILE_NAME_NORMALIZED); //__in   DWORD dwFlags
     if (charsWritten >= BUFFER_SIZE || charsWritten == 0)
     {
-        std::wstring errorMessage = _("Error resolving symbolic link:") + "\n\"" + dirLinkName + "\"";
+        std::wstring errorMessage = _("Error resolving symbolic link:") + L"\n\"" + symlink + L"\"";
         if (charsWritten == 0)
             errorMessage += L"\n\n" + getLastErrorFormatted();
         throw FileError(errorMessage);
@@ -959,7 +958,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
             errno == EOPNOTSUPP) //extended attributes are not supported by the filesystem
             return;
 
-        throw FileError(_("Error reading security context:") + "\n\"" + source + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error reading security context:") + L"\n\"" + source + L"\"" + L"\n\n" + getLastErrorFormatted());
     }
     ZEN_ON_BLOCK_EXIT(::freecon(contextSource));
 
@@ -987,7 +986,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
                     ::setfilecon(target.c_str(), contextSource) :
                     ::lsetfilecon(target.c_str(), contextSource);
     if (rv3 < 0)
-        throw FileError(_("Error writing security context:") + "\n\"" + target + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error writing security context:") + L"\n\"" + target + L"\"" + L"\n\n" + getLastErrorFormatted());
 }
 #endif //HAVE_SELINUX
 
@@ -1010,16 +1009,65 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     }
     catch (const FileError& e)
     {
-        throw FileError(_("Error copying file permissions:") + "\n\"" + source +  "\" ->\n\"" + target + "\"" + "\n\n" + e.msg());
+        throw FileError(_("Error copying file permissions:") + L"\n\"" + source +  L"\" ->\n\"" + target + L"\"" + L"\n\n" + e.toString());
     }
 
+    //in contrast to ::SetSecurityInfo(), ::SetFileSecurity() seems to honor the "inherit DACL/SACL" flags
+
+    //NOTE: ::GetFileSecurity()/::SetFileSecurity() do NOT follow Symlinks!
+    const Zstring sourceResolved = procSl == SYMLINK_FOLLOW && symlinkExists(source) ? getSymlinkTargetPath(source) : source;
+    const Zstring targetResolved = procSl == SYMLINK_FOLLOW && symlinkExists(target) ? getSymlinkTargetPath(target) : target;
+
+    std::vector<char> buffer(10000); //example of actually required buffer size: 192 bytes
+    for (;;)
+    {
+        DWORD bytesNeeded = 0;
+        if (::GetFileSecurity(applyLongPathPrefix(sourceResolved).c_str(), //__in LPCTSTR lpFileName, -> long path prefix IS needed, although it is NOT mentioned on MSDN!!!
+                              OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION |
+                              DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION,  //__in       SECURITY_INFORMATION RequestedInformation,
+                              reinterpret_cast<PSECURITY_DESCRIPTOR>(&buffer[0]),     //__out_opt  PSECURITY_DESCRIPTOR pSecurityDescriptor,
+                              static_cast<DWORD>(buffer.size()), //__in       DWORD nLength,
+                              &bytesNeeded))                     //__out      LPDWORD lpnLengthNeeded
+            break;
+        //failure: ...
+        if (bytesNeeded > buffer.size())
+            buffer.resize(bytesNeeded);
+        else
+            throw FileError(_("Error copying file permissions:") + L"\n\"" + sourceResolved + L"\" ->\n\"" + targetResolved + L"\"" + L"\n\n" + getLastErrorFormatted() + L" (R)");
+    }
+    SECURITY_DESCRIPTOR& secDescr = reinterpret_cast<SECURITY_DESCRIPTOR&>(buffer[0]);
+
+    /*
+        SECURITY_DESCRIPTOR_CONTROL secCtrl = 0;
+        {
+            DWORD ctrlRev = 0;
+            if (!::GetSecurityDescriptorControl(&secDescr, // __in   PSECURITY_DESCRIPTOR pSecurityDescriptor,
+                                                &secCtrl,  // __out  PSECURITY_DESCRIPTOR_CONTROL pControl,
+                                                &ctrlRev)) //__out  LPDWORD lpdwRevision
+                throw FileError(_("Error copying file permissions:") + L"\n\"" + sourceResolved + L"\" ->\n\"" + targetResolved + L"\"" + L"\n\n" + getLastErrorFormatted() + L" (C)");
+       }
+    //interesting flags:
+    //#define SE_DACL_PRESENT                  (0x0004)
+    //#define SE_SACL_PRESENT                  (0x0010)
+    //#define SE_DACL_PROTECTED                (0x1000)
+    //#define SE_SACL_PROTECTED                (0x2000)
+    */
+
+    if (!::SetFileSecurity(applyLongPathPrefix(targetResolved).c_str(), //__in  LPCTSTR lpFileName, -> long path prefix IS needed, although it is NOT mentioned on MSDN!!!
+                           OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION |
+                           DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION, //__in  SECURITY_INFORMATION SecurityInformation,
+                           &secDescr)) //__in  PSECURITY_DESCRIPTOR pSecurityDescriptor
+        throw FileError(_("Error copying file permissions:") + L"\n\"" + sourceResolved + L"\" ->\n\"" + targetResolved + L"\"" + L"\n\n" + getLastErrorFormatted() + L" (W)");
+
+    /*
     PSECURITY_DESCRIPTOR buffer = NULL;
     PSID owner                  = NULL;
     PSID group                  = NULL;
     PACL dacl                   = NULL;
     PACL sacl                   = NULL;
 
-    //http://msdn.microsoft.com/en-us/library/aa364399(v=VS.85).aspx
+    //File Security and Access Rights:    http://msdn.microsoft.com/en-us/library/aa364399(v=VS.85).aspx
+    //SECURITY_INFORMATION Access Rights: http://msdn.microsoft.com/en-us/library/windows/desktop/aa379573(v=vs.85).aspx
     const HANDLE hSource = ::CreateFile(applyLongPathPrefix(source).c_str(),
                                         READ_CONTROL | ACCESS_SYSTEM_SECURITY, //ACCESS_SYSTEM_SECURITY required for SACL access
                                         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -1028,23 +1076,33 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
                                         FILE_FLAG_BACKUP_SEMANTICS | (procSl == SYMLINK_DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0), //FILE_FLAG_BACKUP_SEMANTICS needed to open a directory
                                         NULL);
     if (hSource == INVALID_HANDLE_VALUE)
-        throw FileError(_("Error copying file permissions:") + "\n\"" + source + "\" ->\n\"" + target + "\"" + "\n\n" + getLastErrorFormatted() + " (OR)");
+        throw FileError(_("Error copying file permissions:") + L"\n\"" + source + L"\" ->\n\"" + target + L"\"" + L"\n\n" + getLastErrorFormatted() + L" (OR)");
     ZEN_ON_BLOCK_EXIT(::CloseHandle(hSource));
 
     //  DWORD rc = ::GetNamedSecurityInfo(const_cast<WCHAR*>(applyLongPathPrefix(source).c_str()), -> does NOT dereference symlinks!
     DWORD rc = ::GetSecurityInfo(hSource,        //__in       LPTSTR pObjectName,
                                  SE_FILE_OBJECT, //__in       SE_OBJECT_TYPE ObjectType,
-                                 OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION,  //__in       SECURITY_INFORMATION SecurityInfo,
+                                 OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION |
+                                 DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION,  //__in       SECURITY_INFORMATION SecurityInfo,
                                  &owner,   //__out_opt  PSID *ppsidOwner,
                                  &group,   //__out_opt  PSID *ppsidGroup,
                                  &dacl,    //__out_opt  PACL *ppDacl,
                                  &sacl,    //__out_opt  PACL *ppSacl,
                                  &buffer); //__out_opt  PSECURITY_DESCRIPTOR *ppSecurityDescriptor
     if (rc != ERROR_SUCCESS)
-        throw FileError(_("Error copying file permissions:") + "\n\"" + source + "\" ->\n\"" + target + "\"" + "\n\n" + getLastErrorFormatted(rc) + " (R)");
+        throw FileError(_("Error copying file permissions:") + L"\n\"" + source + L"\" ->\n\"" + target + L"\"" + L"\n\n" + getLastErrorFormatted(rc) + L" (R)");
     ZEN_ON_BLOCK_EXIT(::LocalFree(buffer));
 
-    //may need to remove the readonly-attribute (e.g. FAT usb drives)
+    SECURITY_DESCRIPTOR_CONTROL secCtrl = 0;
+    {
+    DWORD ctrlRev = 0;
+    if (!::GetSecurityDescriptorControl(buffer, // __in   PSECURITY_DESCRIPTOR pSecurityDescriptor,
+    &secCtrl, // __out  PSECURITY_DESCRIPTOR_CONTROL pControl,
+    &ctrlRev))//__out  LPDWORD lpdwRevision
+        throw FileError(_("Error copying file permissions:") + L"\n\"" + source + L"\" ->\n\"" + target + L"\"" + L"\n\n" + getLastErrorFormatted(rc) + L" (C)");
+    }
+
+    //may need to remove the readonly-attribute
     FileUpdateHandle targetHandle(target, [ = ]()
     {
         return ::CreateFile(applyLongPathPrefix(target).c_str(),                              // lpFileName
@@ -1057,19 +1115,29 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     });
 
     if (targetHandle.get() == INVALID_HANDLE_VALUE)
-        throw FileError(_("Error copying file permissions:") + "\n\"" + source + "\" ->\n\"" + target + "\"" + "\n\n" + getLastErrorFormatted() + " (OW)");
+        throw FileError(_("Error copying file permissions:") + L"\n\"" + source + L"\" ->\n\"" + target + L"\"" + L"\n\n" + getLastErrorFormatted() + L" (OW)");
+
+    	SECURITY_INFORMATION secFlags = OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION;
+
+    	//SACL/DACL inheritence flag is NOT copied by default: we have to tell ::SetSecurityInfo(() to enable/disable it manually!
+    	//if (secCtrl & SE_DACL_PRESENT)
+    	secFlags |= (secCtrl & SE_DACL_PROTECTED) ? PROTECTED_DACL_SECURITY_INFORMATION : UNPROTECTED_DACL_SECURITY_INFORMATION;
+    	//if (secCtrl & SE_SACL_PRESENT)
+    	secFlags |= (secCtrl & SE_SACL_PROTECTED) ? PROTECTED_SACL_SECURITY_INFORMATION : UNPROTECTED_SACL_SECURITY_INFORMATION;
+
 
     //  rc = ::SetNamedSecurityInfo(const_cast<WCHAR*>(applyLongPathPrefix(target).c_str()), //__in      LPTSTR pObjectName, -> does NOT dereference symlinks!
     rc = ::SetSecurityInfo(targetHandle.get(), //__in      LPTSTR pObjectName,
                            SE_FILE_OBJECT,     //__in      SE_OBJECT_TYPE ObjectType,
-                           OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION,  //__in      SECURITY_INFORMATION SecurityInfo,
+                           secFlags, //__in      SECURITY_INFORMATION SecurityInfo,
                            owner, //__in_opt  PSID psidOwner,
                            group, //__in_opt  PSID psidGroup,
                            dacl,  //__in_opt  PACL pDacl,
                            sacl); //__in_opt  PACL pSacl
 
     if (rc != ERROR_SUCCESS)
-        throw FileError(_("Error copying file permissions:") + "\n\"" + source + "\" ->\n\"" + target + "\"" + "\n\n" + getLastErrorFormatted(rc) + " (W)");
+        throw FileError(_("Error copying file permissions:") + L"\n\"" + source + L"\" ->\n\"" + target + L"\"" + L"\n\n" + getLastErrorFormatted(rc) + L" (W)");
+    		*/
 
 #elif defined FFS_LINUX
 
@@ -1083,14 +1151,14 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
         if (::stat(source.c_str(), &fileInfo) != 0                        ||
             ::chown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0 || // may require admin rights!
             ::chmod(target.c_str(), fileInfo.st_mode) != 0)
-            throw FileError(_("Error copying file permissions:") + "\n\"" + source + "\" ->\n\"" + target + "\"" + "\n\n" + getLastErrorFormatted() + " (R)");
+            throw FileError(_("Error copying file permissions:") + L"\n\"" + source + L"\" ->\n\"" + target + L"\"" + L"\n\n" + getLastErrorFormatted() + L" (R)");
     }
     else
     {
         if (::lstat(source.c_str(), &fileInfo) != 0                        ||
             ::lchown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0 || // may require admin rights!
             (!symlinkExists(target) && ::chmod(target.c_str(), fileInfo.st_mode) != 0)) //setting access permissions doesn't make sense for symlinks on Linux: there is no lchmod()
-            throw FileError(_("Error copying file permissions:") + "\n\"" + source + "\" ->\n\"" + target + "\"" + "\n\n" + getLastErrorFormatted() + " (W)");
+            throw FileError(_("Error copying file permissions:") + L"\n\"" + source + L"\" ->\n\"" + target + L"\"" + L"\n\n" + getLastErrorFormatted() + L" (W)");
     }
 #endif
 }
@@ -1110,7 +1178,7 @@ void createDirectory_straight(const Zstring& directory, const Zstring& templateD
 #endif
     {
         if (level != 0) return;
-        throw FileError(_("Error creating directory:") + "\n\"" + directory + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error creating directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + getLastErrorFormatted());
     }
 
     if (!templateDir.empty())
@@ -1124,7 +1192,7 @@ void createDirectory_straight(const Zstring& directory, const Zstring& templateD
             try
             {
                 //get target directory of symbolic link
-                sourcePath = resolveDirectorySymlink(templateDir); //throw FileError
+                sourcePath = getSymlinkTargetPath(templateDir); //throw FileError
             }
             catch (FileError&) {} //dereferencing a symbolic link usually fails if it is located on network drive or client is XP: NOT really an error...
         }
@@ -1259,7 +1327,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
 
     const SysDllFun<CreateSymbolicLinkFunc> createSymbolicLink(L"kernel32.dll", "CreateSymbolicLinkW");
     if (!createSymbolicLink)
-        throw FileError(_("Error loading library function:") + "\n\"" + "CreateSymbolicLinkW" + "\"");
+        throw FileError(_("Error loading library function:") + L"\n\"" + L"CreateSymbolicLinkW" + L"\"");
 
     if (!createSymbolicLink(targetLink.c_str(), //__in  LPTSTR lpSymlinkFileName, - seems no long path prefix is required...
                             linkPath.c_str(),   //__in  LPTSTR lpTargetFileName,
@@ -1267,7 +1335,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
 #elif defined FFS_LINUX
     if (::symlink(linkPath.c_str(), targetLink.c_str()) != 0)
 #endif
-        throw FileError(_("Error copying symbolic link:") + "\n\"" + sourceLink + "\" ->\n\"" + targetLink + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error copying symbolic link:") + L"\n\"" + sourceLink + L"\" ->\n\"" + targetLink + L"\"" + L"\n\n" + getLastErrorFormatted());
 
     //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist
     zen::ScopeGuard guardNewDir = zen::makeGuard([&]()
@@ -1391,7 +1459,7 @@ DWORD CALLBACK copyCallbackInternal(
         BY_HANDLE_FILE_INFORMATION fileInfo = {};
         if (!::GetFileInformationByHandle(hSourceFile, &fileInfo))
         {
-            cbd.reportError(_("Error reading file attributes:") + "\n\"" + cbd.sourceFile_ + "\"" + "\n\n" + getLastErrorFormatted());
+            cbd.reportError(_("Error reading file attributes:") + L"\n\"" + cbd.sourceFile_ + L"\"" + L"\n\n" + getLastErrorFormatted());
             return PROGRESS_CANCEL;
         }
 
@@ -1410,7 +1478,7 @@ DWORD CALLBACK copyCallbackInternal(
                            NULL,          //__out_opt  LPFILETIME lpLastAccessTime,
                            NULL))         //__out_opt  LPFILETIME lpLastWriteTime
         {
-            cbd.reportError(_("Error reading file attributes:") + "\n\"" + cbd.sourceFile_ + "\"" + "\n\n" + getLastErrorFormatted());
+            cbd.reportError(_("Error reading file attributes:") + L"\n\"" + cbd.sourceFile_ + L"\"" + L"\n\n" + getLastErrorFormatted());
             return PROGRESS_CANCEL;
         }
 
@@ -1419,7 +1487,7 @@ DWORD CALLBACK copyCallbackInternal(
                            NULL,
                            NULL))
         {
-            cbd.reportError(_("Error changing modification time:") + "\n\"" + cbd.targetFile_ + "\"" + "\n\n" + getLastErrorFormatted());
+            cbd.reportError(_("Error changing modification time:") + L"\n\"" + cbd.targetFile_ + L"\"" + L"\n\n" + getLastErrorFormatted());
             return PROGRESS_CANCEL;
         }
         //##############################################################################
@@ -1498,8 +1566,8 @@ void rawCopyWinApi_sub(const Zstring& sourceFile,
         //don't suppress "lastError == ERROR_REQUEST_ABORTED": a user aborted operation IS an error condition!
 
         //assemble error message...
-        std::wstring errorMessage = _("Error copying file:") + "\n\"" + sourceFile + "\" ->\n\"" + targetFile + "\"" +
-                                    "\n\n" + getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error copying file:") + L"\n\"" + sourceFile + L"\" ->\n\"" + targetFile + L"\"" +
+                                    L"\n\n" + getLastErrorFormatted(lastError);
 
         //if file is locked (try to) use Windows Volume Shadow Copy Service
         if (lastError == ERROR_SHARING_VIOLATION ||
@@ -1946,7 +2014,7 @@ void rawCopyStream(const Zstring& sourceFile,
     {
         struct stat srcInfo = {};
         if (::stat(sourceFile.c_str(), &srcInfo) != 0) //read file attributes from source directory
-            throw FileError(_("Error reading file attributes:") + "\n\"" + sourceFile + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error reading file attributes:") + L"\n\"" + sourceFile + L"\"" + L"\n\n" + getLastErrorFormatted());
 
         if (sourceAttr)
         {
@@ -1960,7 +2028,7 @@ void rawCopyStream(const Zstring& sourceFile,
 
         //set new "last write time"
         if (::utime(targetFile.c_str(), &newTimes) != 0)
-            throw FileError(_("Error changing modification time:") + "\n\"" + targetFile + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error changing modification time:") + L"\n\"" + targetFile + L"\"" + L"\n\n" + getLastErrorFormatted());
     }
 
     guardTarget.dismiss(); //target has been created successfully!
@@ -2055,6 +2123,17 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
     {
         zen::ScopeGuard guardTargetFile = zen::makeGuard([&]() { removeFile(targetFile);});
         copyObjectPermissions(sourceFile, targetFile, SYMLINK_FOLLOW); //throw FileError
+
+
+        /*
+                warn_static("fix!!")
+                try
+                {
+                    copyObjectPermissions(targetFile, L"kfsdaj", SYMLINK_FOLLOW); //throw FileError
+                }
+                catch (...) {}
+        */
+
         guardTargetFile.dismiss(); //target has been created successfully!
     }
 }

@@ -907,24 +907,20 @@ Undanta: \stuff\temp\*
 <target>Kopiera låsta filer</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Kopiera delade eller låsta filer med hjälp av Volume Shadow Copy Service
-(Kräver administratörsrättighet)
+Kopiera delade eller låsta filer med hjälp av Volume Shadow Copy Service (Kräver administratörsrättighet)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Kopiera filåtkomstbehörigheter</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Överför fil- och katalogrättigheter
-(Kräver administratörsrättigheter)
+Överför fil- och katalogrättigheter (Kräver administratörsrättigheter)
 </target>
 
 <source>Hidden dialogs:</source>

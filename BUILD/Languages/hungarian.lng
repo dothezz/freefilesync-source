@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatikus szinkronizálás</target>
 
-<source>Browse</source>
-<target>Tallózás</target>
-
-<source>Windows Error Code %x:</source>
-<target>Windows hibakód %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux hibakód %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>Érvénytelen parancssor: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>A szimbolikus link feloldása sikertelen:</target>
-
-<source>Show pop-up</source>
-<target>Párbeszédablak mutatása</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Párbeszédablakok mutatása hiba vagy figyelmeztetés esetén</target>
-
-<source>Ignore errors</source>
-<target>Hibák figyelmen kívül hagyása</target>
-
-<source>Hide all error and warning messages</source>
-<target>Összes hibaüzenet és figyelmeztetés elrejtése</target>
-
-<source>Exit instantly</source>
-<target>Kilépés azonnal</target>
-
-<source>Abort synchronization immediately</source>
-<target>Szinkronizáció azonnali megszakítása</target>
-
 <source>Select alternate comparison settings</source>
 <target>Alternatív összehasonlítás beállításai</target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>Időintervallum kiválasztása</target>
 
+<source>Show pop-up</source>
+<target>Párbeszédablak mutatása</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Párbeszédablakok mutatása hiba vagy figyelmeztetés esetén</target>
+
+<source>Ignore errors</source>
+<target>Hibák figyelmen kívül hagyása</target>
+
+<source>Hide all error and warning messages</source>
+<target>Összes hibaüzenet és figyelmeztetés elrejtése</target>
+
+<source>Exit instantly</source>
+<target>Kilépés azonnal</target>
+
+<source>Abort synchronization immediately</source>
+<target>Szinkronizáció azonnali megszakítása</target>
+
+<source>Browse</source>
+<target>Tallózás</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Hiba történt a szinkronizációs adatbázis olvasása közben:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Hiba történt a szinkronizációs adatbázis írása közben:</target>
+
+<source>Invalid command line: %x</source>
+<target>Érvénytelen parancssor: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Windows hibakód %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux hibakód %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>A szimbolikus link feloldása sikertelen:</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -172,9 +178,6 @@
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>A FreeFileSync egyik adatbázisfájlja nem létezik:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Hiba történt a szinkronizációs adatbázis olvasása közben:</target>
-
 <source>Database files do not share a common synchronization session:</source>
 <target>Az adatbázisfájlok nem osztoznak egy közös szinkronizációs munkameneten:</target>
 
@@ -199,11 +202,17 @@
 <pluralform>%x másodperc</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Húzd && Ejtsd</target>
+
 <source>Info</source>
 <target>Információ</target>
 
 <source>Fatal Error</source>
 <target>Kritikus hiba</target>
+
+<source>Error reading file:</source>
+<target>A fájl olvasása sikertelen:</target>
 
 <source>Scanning:</source>
 <target>Vizsgálat:</target>
@@ -223,14 +232,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Érvénytelen a FreeFileSync beállításait tartalmazó fájl!</target>
 
-<source>File does not exist:</source>
-<target>A következő fájl nem létezik:</target>
-
 <source>Error parsing configuration file:</source>
 <target>A beállításokat tartalmazó fájl feldolgozása sikertelen:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>A Lomtárba (Recycle Bin) mozgatás sikertelen:</target>
+
+<source>Could not load a required DLL:</source>
+<target>A szükséges DLL betöltése sikertelen:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Hiba történt a Volume Shadow Copy szolgáltatás elérése közben!</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>A Shadow Copy a WOW64-en nem támogatott. Kérjük, használja a 64-bites FreeFileSync-et.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>A következő fájlnak nem lehet meghatározni a kötetnevét:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!</target>
+
 <source>/sec</source>
 <target>/másodperc</target>
+
+<source>File does not exist:</source>
+<target>A következő fájl nem létezik:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>A következő XML-csomópontok értékének beolvasása sikertelen:</target>
 
 <source>S&ave configuration...</source>
 <target>Beállítások mentés&e...</target>
@@ -323,141 +353,6 @@ A parancssor végrehajtódik minden alkalommal, ha:
 
 <source>A directory input field is empty.</source>
 <target>Valamelyik mappa megadására szolgáló mező üres.</target>
-
-<source>Drag && drop</source>
-<target>Húzd && Ejtsd</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>A mappafigyelés inicializálása sikertelen:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Hiba történt a mappák figyelése közben.</target>
-
-<source>Conversion error:</source>
-<target>Konverziós hiba:</target>
-
-<source>Error deleting file:</source>
-<target>A fájl törlése sikertelen:</target>
-
-<source>Error moving file:</source>
-<target>Hiba a fájl mozgatásakor:</target>
-
-<source>Target file already existing!</source>
-<target>A célként megadott fájl már létezik!</target>
-
-<source>Error moving directory:</source>
-<target>Hiba a mappa mozgatásakor:</target>
-
-<source>Target directory already existing!</source>
-<target>A célmappa már létezik!</target>
-
-<source>Error deleting directory:</source>
-<target>A mappa törlése sikertelen:</target>
-
-<source>Error changing modification time:</source>
-<target>Az utolsó változtatás dátumának módosítása sikertelen:</target>
-
-<source>Error loading library function:</source>
-<target>A könyvtári funkció betöltése sikertelen:</target>
-
-<source>Error reading security context:</source>
-<target>A biztonsági címke olvasása sikertelen:</target>
-
-<source>Error writing security context:</source>
-<target>A biztonsági címke írása sikertelen:</target>
-
-<source>Error copying file permissions:</source>
-<target>Hiba történt a fájl jogosultságainak másolása közben:</target>
-
-<source>Error creating directory:</source>
-<target>A mappa létrehozása sikertelen:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Hiba történt a szimbolikus link másolása közben:</target>
-
-<source>Error copying file:</source>
-<target>A fájl másolása sikertelen:</target>
-
-<source>Error opening file:</source>
-<target>A fájl megnyitása sikertelen:</target>
-
-<source>Error writing file:</source>
-<target>A fájl írása sikertelen:</target>
-
-<source>Error reading file:</source>
-<target>A fájl olvasása sikertelen:</target>
-
-<source>Operation aborted!</source>
-<target>Művelet megszakítva!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Végtelen hurok a mappák bejárásakor:</target>
-
-<source>Error traversing directory:</source>
-<target>A mappa átnézése sikertelen:</target>
-
-<source>Error setting privilege:</source>
-<target>Hiba történt a jogok beállítása közben:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>A Lomtárba (Recycle Bin) mozgatás sikertelen:</target>
-
-<source>Could not load a required DLL:</source>
-<target>A szükséges DLL betöltése sikertelen:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Hiba történt a szinkronizációs adatbázis írása közben:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Hiba történt a Volume Shadow Copy szolgáltatás elérése közben!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>A Shadow Copy a WOW64-en nem támogatott. Kérjük, használja a 64-bites FreeFileSync-et.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>A következő fájlnak nem lehet meghatározni a kötetnevét:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 perc</pluralform>
-<pluralform>%x perc</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 óra</pluralform>
-<pluralform>%x óra</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 nap</pluralform>
-<pluralform>%x nap</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>A következő XML-csomópontok értékének beolvasása sikertelen:</target>
 
 <source>Logging</source>
 <target>Naplózás</target>
@@ -907,26 +802,14 @@ Kizárni: \stuff\temp\*
 <source>Copy locked files</source>
 <target>Zárolt fájlok másolása</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
-</source>
-<target>
-A megosztott vagy zárolt fájlok másolása a Volume Shadow Copy szolgáltatással
-(Adminisztrátori jogok szükségesek)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>A megosztott vagy zárolt fájlok másolása a Volume Shadow Copy szolgáltatással (Adminisztrátori jogok szükségesek)</target>
 
 <source>Copy file access permissions</source>
 <target>Fájl hozzáférési jogosultságainak másolása</target>
 
-<source>
-Transfer file and directory permissions
-(Requires Administrator rights)
-</source>
-<target>
-Fájlok és mappák jogosultságainak átvitele
-(Adminisztrátori jogok szükségesek)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Fájlok és mappák jogosultságainak átvitele (Adminisztrátori jogok szükségesek)</target>
 
 <source>Hidden dialogs:</source>
 <target>Rejtett párbeszédablakok:</target>
@@ -957,6 +840,9 @@ Fájlok és mappák jogosultságainak átvitele
 
 <source>&Find next</source>
 <target>&Következő keresése</target>
+
+<source>Operation aborted!</source>
+<target>Művelet megszakítva!</target>
 
 <source>Main bar</source>
 <target>Fő panel</target>
@@ -1135,6 +1021,9 @@ Fájlok és mappák jogosultságainak átvitele
 <source>File list exported!</source>
 <target>A fájllista exportálása befejeződött!</target>
 
+<source>Error writing file:</source>
+<target>A fájl írása sikertelen:</target>
+
 <source>Batch file created successfully!</source>
 <target>A kötegelt feladat fájl létrehozása sikerült!</target>
 
@@ -1299,6 +1188,105 @@ Fájlok és mappák jogosultságainak átvitele
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>Fájlok másolása időbélyeggel ellátott almappába</target>
+
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 perc</pluralform>
+<pluralform>%x perc</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 óra</pluralform>
+<pluralform>%x óra</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 nap</pluralform>
+<pluralform>%x nap</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>A mappafigyelés inicializálása sikertelen:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Hiba történt a mappák figyelése közben.</target>
+
+<source>Conversion error:</source>
+<target>Konverziós hiba:</target>
+
+<source>Error deleting file:</source>
+<target>A fájl törlése sikertelen:</target>
+
+<source>Error moving file:</source>
+<target>Hiba a fájl mozgatásakor:</target>
+
+<source>Target file already existing!</source>
+<target>A célként megadott fájl már létezik!</target>
+
+<source>Error moving directory:</source>
+<target>Hiba a mappa mozgatásakor:</target>
+
+<source>Target directory already existing!</source>
+<target>A célmappa már létezik!</target>
+
+<source>Error deleting directory:</source>
+<target>A mappa törlése sikertelen:</target>
+
+<source>Error changing modification time:</source>
+<target>Az utolsó változtatás dátumának módosítása sikertelen:</target>
+
+<source>Error loading library function:</source>
+<target>A könyvtári funkció betöltése sikertelen:</target>
+
+<source>Error reading security context:</source>
+<target>A biztonsági címke olvasása sikertelen:</target>
+
+<source>Error writing security context:</source>
+<target>A biztonsági címke írása sikertelen:</target>
+
+<source>Error copying file permissions:</source>
+<target>Hiba történt a fájl jogosultságainak másolása közben:</target>
+
+<source>Error creating directory:</source>
+<target>A mappa létrehozása sikertelen:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Hiba történt a szimbolikus link másolása közben:</target>
+
+<source>Error copying file:</source>
+<target>A fájl másolása sikertelen:</target>
+
+<source>Error opening file:</source>
+<target>A fájl megnyitása sikertelen:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Végtelen hurok a mappák bejárásakor:</target>
+
+<source>Error traversing directory:</source>
+<target>A mappa átnézése sikertelen:</target>
+
+<source>Error setting privilege:</source>
+<target>Hiba történt a jogok beállítása közben:</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Mindkét oldal megváltozott az utolsó szikronizálás óta!</target>

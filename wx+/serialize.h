@@ -64,7 +64,7 @@ private:
 class ReadInputStream //throw FileError
 {
 protected:
-    ReadInputStream(wxInputStream& stream, const wxString& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
+    ReadInputStream(wxInputStream& stream, const Zstring& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
     T readNumberC() const; //throw FileError, checked read operation
@@ -81,14 +81,14 @@ protected:
 
 private:
     wxInputStream& stream_;
-    const wxString& errorObjName_; //used for error text only
+    const Zstring& errorObjName_; //used for error text only
 };
 
 
 class WriteOutputStream //throw FileError
 {
 protected:
-    WriteOutputStream(const wxString& errorObjName, wxOutputStream& stream) : stream_(stream), errorObjName_(errorObjName) {}
+    WriteOutputStream(const Zstring& errorObjName, wxOutputStream& stream) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
     void writeNumberC(T number) const; //throw FileError, checked write operation
@@ -104,7 +104,7 @@ protected:
 
 private:
     wxOutputStream& stream_;
-    const wxString& errorObjName_; //used for error text only!
+    const Zstring& errorObjName_; //used for error text only!
 };
 
 
@@ -185,7 +185,7 @@ inline
 void ReadInputStream::check() const
 {
     if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
-        throw zen::FileError(_("Error reading from synchronization database:") + " \n" + "\"" +  errorObjName_.c_str() + "\"");
+        throw zen::FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\"");
 }
 
 
@@ -210,7 +210,7 @@ S ReadInputStream::readStringC() const //checked read operation
     }
     catch (std::exception&)
     {
-        throw FileError(_("Error reading from synchronization database:") + " \n" + "\"" +  errorObjName_.c_str() + "\"");
+        throw FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\"");
     }
     return output;
 }
@@ -226,7 +226,7 @@ ReadInputStream::CharArray ReadInputStream::readArrayC() const
         stream_.Read(&(*buffer)[0], byteCount);
         check();
         if (stream_.LastRead() != byteCount) //some additional check
-            throw FileError(_("Error reading from synchronization database:") + " \n" + "\"" +  errorObjName_.c_str() + "\"");
+            throw FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\"");
     }
     return buffer;
 }
@@ -257,7 +257,7 @@ void WriteOutputStream::writeArrayC(const std::vector<char>& buffer) const
         stream_.Write(&buffer[0], buffer.size());
         check();
         if (stream_.LastWrite() != buffer.size()) //some additional check
-            throw FileError(_("Error writing to synchronization database:") + " \n" + "\"" + errorObjName_.c_str() + "\"");
+            throw FileError(_("Error writing to synchronization database:") + L" \n" + L"\"" + errorObjName_ + L"\"");
     }
 }
 
@@ -266,7 +266,7 @@ inline
 void WriteOutputStream::check() const
 {
     if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
-        throw FileError(_("Error writing to synchronization database:") + " \n" + "\"" + errorObjName_.c_str() + "\"");
+        throw FileError(_("Error writing to synchronization database:") + L" \n" + L"\"" + errorObjName_ + L"\"");
 }
 
 }

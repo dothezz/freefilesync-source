@@ -42,19 +42,19 @@ bool isXmlTypeRTS(const XmlDoc& doc) //throw()
 void xmlAccess::readRealConfig(const wxString& filename, XmlRealConfig& config)
 {
     if (!fileExists(toZ(filename)))
-        throw FfsXmlError(_("File does not exist:") + "\n\"" + filename.c_str() + "\"");
+        throw FfsXmlError(_("File does not exist:") + L"\n\"" + toZ(filename) + L"\"");
 
     XmlDoc doc;
     loadXmlDocument(toZ(filename), doc);  //throw (FfsXmlError)
 
     if (!isXmlTypeRTS(doc))
-        throw FfsXmlError(_("Error parsing configuration file:") + "\n\"" + filename.c_str() + "\"");
+        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + toZ(filename) + L"\"");
 
     XmlIn in(doc);
     ::readConfig(in, config);
 
     if (in.errorsOccured())
-        throw FfsXmlError(_("Error parsing configuration file:") + "\n\"" + filename.c_str() + "\"\n\n" +
+        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + toZ(filename) + L"\"\n\n" +
                           getErrorMessageFormatted(in), FfsXmlError::WARNING);
 }
 

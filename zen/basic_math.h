@@ -1,7 +1,8 @@
 // **************************************************************************
-// * This file is part of the FreeFileSync project. It is distributed under *
-// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * This file is part of the zenXML project. It is distributed under the   *
+// * Boost Software License, Version 1.0. See accompanying file             *
+// * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.       *
+// * Copyright (C) 2011 ZenJu (zhnmju123 AT gmx.de)                         *
 // **************************************************************************
 
 #ifndef BASIC_MATH_HEADER_34726398432

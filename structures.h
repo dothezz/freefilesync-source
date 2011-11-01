@@ -372,8 +372,9 @@ struct MainConfiguration
 \\$Recycle.Bin\\")) {}
 #elif defined FFS_LINUX
         globalFilter(Zstr("*"),
-                     Zstr("/.Trash-*/\n\
-                          /.recycle/")) {}
+                     Zstr("\
+/.Trash-*/\n\
+/.recycle/")) {}
 #endif
 
     CompConfig   cmpConfig;    //global compare settings:         may be overwritten by folder pair settings

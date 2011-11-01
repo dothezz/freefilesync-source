@@ -8,6 +8,7 @@
 
 #ifdef FFS_WIN
 #include "long_path_prefix.h"
+
 #elif defined FFS_LINUX
 #include <cerrno>
 #endif
@@ -61,7 +62,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
     {
         const DWORD lastError = ::GetLastError();
 
-        std::wstring errorMessage = _("Error opening file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error opening file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError);
 
         if (lastError == ERROR_FILE_NOT_FOUND ||
             lastError == ERROR_PATH_NOT_FOUND ||
@@ -78,7 +79,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
     {
         const int lastError = errno;
 
-        std::wstring errorMessage = _("Error opening file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error opening file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError);
 
         if (lastError == ENOENT)
             throw ErrorNotExisting(errorMessage);
@@ -112,7 +113,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0)
 #endif
-        throw FileError(_("Error reading file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted() + " (r)");
+        throw FileError(_("Error reading file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted() + L" (r)");
 
 #ifdef FFS_WIN
     if (bytesRead < bytesToRead) //falsify only!
@@ -122,7 +123,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
         eofReached = true;
 
     if (bytesRead > bytesToRead)
-        throw FileError(_("Error reading file:") + "\n\"" + filename_ + "\"" + "\n\n" + "buffer overflow");
+        throw FileError(_("Error reading file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + L"buffer overflow");
 
     return bytesRead;
 }
@@ -156,7 +157,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
         const DWORD lastError = ::GetLastError();
-        std::wstring errorMessage = _("Error writing file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error writing file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError);
 
         if (lastError == ERROR_FILE_EXISTS)
             throw ErrorTargetExisting(errorMessage);
@@ -174,7 +175,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
     if (fileHandle == NULL)
     {
         const int lastError = errno;
-        std::wstring errorMessage = _("Error writing file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error writing file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError);
         if (lastError == EEXIST)
             throw ErrorTargetExisting(errorMessage);
 
@@ -210,8 +211,8 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
     if (::ferror(fileHandle) != 0)
 #endif
-        throw FileError(_("Error writing file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted() + " (w)"); //w -> distinguish from fopen error message!
+        throw FileError(_("Error writing file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted() + L" (w)"); //w -> distinguish from fopen error message!
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
-        throw FileError(_("Error writing file:") + "\n\"" + filename_ + "\"" + "\n\n" + "incomplete write");
+        throw FileError(_("Error writing file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + L"incomplete write");
 }

@@ -802,13 +802,13 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     settings(globalSettings)
 {
 #ifdef FFS_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmapSettings->SetBitmap(GlobalResources::getImage(wxT("settings")));
+    m_bitmapSettings    ->SetBitmap     (GlobalResources::getImage(wxT("settings")));
     m_buttonResetDialogs->setBitmapFront(GlobalResources::getImage(wxT("warningSmall")), 5);
-    m_bpButtonAddRow->SetBitmapLabel(GlobalResources::getImage(wxT("addFolderPair")));
-    m_bpButtonRemoveRow->SetBitmapLabel(GlobalResources::getImage(wxT("removeFolderPair")));
+    m_bpButtonAddRow    ->SetBitmapLabel(GlobalResources::getImage(wxT("addFolderPair")));
+    m_bpButtonRemoveRow ->SetBitmapLabel(GlobalResources::getImage(wxT("removeFolderPair")));
 
     m_checkBoxCopyLocked     ->SetValue(globalSettings.copyLockedFiles);
     m_checkBoxTransCopy      ->SetValue(globalSettings.transactionalFileCopy);
@@ -818,6 +818,7 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     m_checkBoxCopyPermissions->SetLabel(_("Copy NTFS permissions"));
 #else
     m_checkBoxCopyLocked->Hide();
+    m_textCtrlCopyLocked->Hide();
 #endif
 
     set(globalSettings.gui.externelApplications);

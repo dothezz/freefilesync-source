@@ -907,24 +907,20 @@ Exclude: \stuff\temp\*
 <target>Copier les fichiers verrouillés</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-La copie des fichiers partagés ou verrouillés nécessite le Service Volume Shadow Copy
-(avec les droits administrateur)
+La copie des fichiers partagés ou verrouillés nécessite le Service Volume Shadow Copy (avec les droits administrateur)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Copie des droits d'accès aux fichiers</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Transfert des attributs système des fichiers et des répertoires
-(avec les droits administrateur)
+Transfert des attributs système des fichiers et des répertoires (avec les droits administrateur)
 </target>
 
 <source>Hidden dialogs:</source>

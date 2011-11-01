@@ -14,6 +14,7 @@
 #include <wx+/string_conv.h>
 #include <wx+/app_main.h>
 #include <zen/file_traverser.h>
+#include <zen/time.h>
 
 using namespace zen;
 
@@ -32,77 +33,58 @@ public:
             logfiles_.push_back(fullName);
     }
 
-    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
-
-    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName)
-    {
-        return Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs
-    }
-
-    virtual HandleError onError(const std::wstring& errorText) { return TRAV_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual std::shared_ptr<TraverseCallback>
+    onDir    (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
+    virtual void        onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
+    virtual HandleError onError  (const std::wstring& errorText) { return TRAV_ERROR_IGNORE; } //errors are not really critical in this context
 
 private:
     const Zstring prefix_;
     std::vector<Zstring>& logfiles_;
 };
-
-void removeFileNoThrow(const Zstring& filename)
-{
-    try
-    {
-        zen::removeFile(filename);
-    }
-    catch (...) {}
-}
 }
 
 
-class LogFile
+class LogFile //throw FileError
 {
 public:
-    LogFile(const wxString& logfileDirectory, const wxString& jobName) : jobName_(jobName) //throw FileError
+    LogFile(const Zstring& logfileDirectory, const wxString& jobName) :
+        jobName_(jobName), //throw FileError
+        logfileName(findUniqueLogname(logfileDirectory, jobName))
     {
-        logfileName = findUniqueLogname(logfileDirectory, jobName);
-
-        logFile.Open(logfileName, wxT("w"));
+        logFile.Open(toWx(logfileName), wxT("w"));
         if (!logFile.IsOpened())
-            throw FileError(_("Unable to create logfile!") + "\"" + logfileName.c_str() + "\"");
+            throw FileError(_("Unable to create logfile!") + L"\"" + logfileName + L"\"");
 
         //write header
-        wxString headerLine = L"FreeFileSync - " + _("Batch execution") +
-                              " (" + _("Date") + ": " + wxDateTime::Now().FormatDate() +  ")"; //"Date" is used at other places, too
+        wxString headerLine = wxString(L"FreeFileSync - ") + _("Batch execution") +
+                              L" (" + _("Date") + L": " + formatTime<wxString>(FORMAT_DATE) +  L")"; //"Date" is used at other places, too
 
         logFile.Write(headerLine + wxChar('\n'));
         logFile.Write(wxString().Pad(headerLine.Len(), wxChar('-')) + wxChar('\n') + wxChar('\n'));
 
-        /*
-        wxString caption = _("Log-messages:");
-        logFile.Write(caption + wxChar('\n'));
-        logFile.Write(wxString().Pad(caption.Len(), wxChar('-')) + wxChar('\n'));
-        */
-
-        logItemStart = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Start");
+        logItemStart = formatTime<wxString>(L"[%X] ") + _("Start");
 
         totalTime.Start(); //measure total time
     }
 
     void writeLog(const ErrorLogging& log, const wxString& finalStatus)
     {
-        logFile.Write(finalStatus + wxChar('\n') + wxChar('\n')); //highlight result by placing at beginning of file
+        logFile.Write(finalStatus + L"\n\n"); //highlight result by placing at beginning of file
 
-        logFile.Write(logItemStart + wxChar('\n') + wxChar('\n'));
+        logFile.Write(logItemStart + L"\n\n");
 
         //write actual logfile
         const std::vector<wxString>& messages = log.getFormattedMessages();
         for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
-            logFile.Write(*i + wxChar('\n'));
+            logFile.Write(*i + L'\n');
 
         //write ending
-        logFile.Write(wxChar('\n'));
+        logFile.Write(L'\n');
 
         const long time = totalTime.Time(); //retrieve total time
-        logFile.Write(wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] "));
-        logFile.Write(wxString(_("Stop")) + wxT(" (") + _("Total time:") + wxT(" ") + (wxTimeSpan::Milliseconds(time)).Format() + wxT(")"));
+
+        logFile.Write(wxString(L"[") + formatTime<wxString>(FORMAT_TIME) + L"] " + _("Stop") + L" (" + _("Total time:") + L" " + wxTimeSpan::Milliseconds(time).Format() + L")\n");
     }
 
     void limitLogfileCount(size_t maxCount) const
@@ -110,7 +92,7 @@ public:
         std::vector<Zstring> logFiles;
         FindLogfiles traverseCallback(toZ(jobName_), logFiles);
 
-        traverseFolder(beforeLast(toZ(logfileName), FILE_NAME_SEPARATOR), //throw();
+        traverseFolder(beforeLast(logfileName, FILE_NAME_SEPARATOR), //throw();
                        false, //don't follow symlinks
                        traverseCallback);
 
@@ -119,45 +101,40 @@ public:
 
         //delete oldest logfiles
         std::sort(logFiles.begin(), logFiles.end()); //take advantage of logfile naming convention to sort by age
-        std::for_each(logFiles.begin(), logFiles.end() - maxCount, ::removeFileNoThrow);
+
+        std::for_each(logFiles.begin(), logFiles.end() - maxCount,
+        [](const Zstring& filename) { try { zen::removeFile(filename); } catch (...) {} });
     }
 
+    //Zstring getLogfileName() const { return logfileName; }
+
 private:
-    static wxString findUniqueLogname(const wxString& logfileDirectory, const wxString& jobName)
+    static Zstring findUniqueLogname(const Zstring& logfileDirectory, const wxString& jobName)
     {
         //create logfile directory
         Zstring logfileDir = logfileDirectory.empty() ?
-                             toZ(zen::getConfigDir() + wxT("Logs")) :
-                             zen::getFormattedDirectoryName(toZ(logfileDirectory));
+                             zen::getConfigDir() + Zstr("Logs") :
+                             zen::getFormattedDirectoryName(logfileDirectory);
 
         if (!zen::dirExists(logfileDir))
-            zen::createDirectory(logfileDir); //create recursively if necessary: may throw (FileError&)
+            zen::createDirectory(logfileDir); //throw FileError; create recursively if necessary
 
         //assemble logfile name
         if (!endsWith(logfileDir, FILE_NAME_SEPARATOR))
             logfileDir += FILE_NAME_SEPARATOR;
 
-        wxString logfileName = toWx(logfileDir);
-
-        //add prefix
-        logfileName += jobName + wxT(" ");
-
-        //add timestamp
-        wxString timeNow = wxDateTime::Now().FormatISOTime();
-        timeNow.Replace(wxT(":"), wxT(""));
-        logfileName += wxDateTime::Now().FormatISODate() + wxChar(' ') + timeNow;
-
-        wxString output = logfileName + wxT(".log");
+        const Zstring logfileName = logfileDir + toZ(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"));
 
         //ensure uniqueness
-        for (int i = 1; zen::somethingExists(toZ(output)); ++i)
-            output = logfileName + wxChar('_') + zen::toString<wxString>(i) + wxT(".log");
+        Zstring output = logfileName + Zstr(".log");
 
+        for (int i = 1; zen::somethingExists(output); ++i)
+            output = logfileName + Zstr('_') + zen::toString<Zstring>(i) + Zstr(".log");
         return output;
     }
 
     const wxString jobName_;
-    wxString logfileName;
+    const Zstring logfileName;
     wxFFile logFile;
     wxStopWatch totalTime;
     wxString logItemStart;
@@ -184,15 +161,18 @@ BatchStatusHandler::BatchStatusHandler(bool runSilent,
     {
         try
         {
-            logFile = std::make_shared<LogFile>(logfileDirectory, jobName); //throw FileError
+            logFile = std::make_shared<LogFile>(toZ(logfileDirectory), jobName); //throw FileError
             logFile->limitLogfileCount(logFileCountMax); //throw FileError
         }
         catch (zen::FileError& error)
         {
-            wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+            if (handleError_ == xmlAccess::ON_ERROR_POPUP)
+                wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
             returnValue = -7;
             throw BatchAbortProcess();
         }
+
+        //::wxSetEnv(L"logfile", logFile->getLogfileName());
     }
 }
 
@@ -391,6 +371,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const wxString& errorM
         case xmlAccess::ON_ERROR_EXIT: //abort
             errorLog.logMsg(errorMessage, TYPE_ERROR);
             abortThisProcess();
+            break;
 
         case xmlAccess::ON_ERROR_IGNORE:
             errorLog.logMsg(errorMessage, TYPE_ERROR);

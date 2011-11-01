@@ -5,7 +5,7 @@
 // **************************************************************************
 
 #include "error_log.h"
-#include <wx/datetime.h>
+#include <zen/time.h>
 #include <zen/i18n.h>
 #include <algorithm>
 
@@ -16,7 +16,7 @@ void ErrorLogging::logMsg(const wxString& message, zen::MessageType type)
 {
     Entry newEntry;
     newEntry.type    = type;
-    newEntry.time    = wxDateTime::GetTimeNow();
+    newEntry.time    = std::time(NULL);
     newEntry.message = message;
 
     messages.push_back(newEntry);
@@ -76,11 +76,11 @@ wxString ErrorLogging::formatMessage(const Entry& msg)
             break;
     }
 
-    const wxString prefix = wxString(L"[") + wxDateTime(msg.time).FormatTime() + L"] " + typeName + L": ";
+    const wxString prefix = L"[" + formatTime<wxString>(FORMAT_TIME, localTime(msg.time)) + L"] " + typeName + L": ";
 
     wxString formattedText = prefix;
-    for (auto i = msg.message.begin(); i != msg.message.end(); ++i)
-        if (*i == wxChar('\n'))
+    for (auto iter = msg.message.begin(); iter != msg.message.end(); )
+        if (*iter == L'\n')
         {
             formattedText += L'\n';
 
@@ -88,12 +88,14 @@ wxString ErrorLogging::formatMessage(const Entry& msg)
             blanks.resize(prefix.size(), L' ');
             formattedText += blanks;
 
-            while (*++i == L'\n') //remove duplicate newlines
-                ;
-            --i;
+            do //remove duplicate newlines
+            {
+                ++iter;
+            }
+            while (iter != msg.message.end() && *iter == L'\n');
         }
         else
-            formattedText += *i;
+            formattedText += *iter++;
 
     return formattedText;
 }

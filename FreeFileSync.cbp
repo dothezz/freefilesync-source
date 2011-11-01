@@ -96,11 +96,13 @@
 			<Add option="-Wmissing-include-dirs" />
 			<Add option="-Wswitch-enum" />
 			<Add option="-Wmain" />
+			<Add option="-std=c++0x" />
 			<Add option="-Wall" />
-			<Add option="-std=gnu++0x" />
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
+			<Add option="-fno-omit-frame-pointer" />
 			<Add option='-include &quot;zen/warn_static.h&quot;' />
+			<Add option="-std=gnu++0x" />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DFFS_WIN" />
@@ -111,7 +113,6 @@
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Program Files\C++\Boost" />
 			<Add directory="." />
-			<Add directory=".\zenXml" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
@@ -401,7 +402,6 @@
 		<Unit filename="zen\assert_static.h" />
 		<Unit filename="zen\base64.h" />
 		<Unit filename="zen\build_info.h" />
-		<Unit filename="zen\c_dll.h" />
 		<Unit filename="zen\com_error.h" />
 		<Unit filename="zen\com_ptr.h" />
 		<Unit filename="zen\com_util.h" />

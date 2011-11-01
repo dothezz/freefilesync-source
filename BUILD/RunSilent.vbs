@@ -3,7 +3,7 @@ num = argIn.Count
 
 if num = 0 then
     WScript.Echo "Call a Windows batch file (*.cmd, *.bat) without showing the console window" & VbCrLf & VbCrLf &_
-                 "Command line:" & VbCrLf & "WScript Invisible.vbs MyBatchfile.cmd <command line arguments>"
+                 "Command line:" & VbCrLf & "WScript RunSilent.vbs MyBatchfile.cmd <command line arguments>"
     WScript.Quit 1
 end if
 

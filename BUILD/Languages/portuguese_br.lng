@@ -907,24 +907,20 @@ Excluir: \stuff\temp\*
 <target>Copiar arquivos bloqueados (em uso)</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Copia os arquivos compartilhados ou bloqueados (em uso) usando o Serviço de Cópia de Sombra de Volume
-(Requer direitos de Administrador)
+Copia os arquivos compartilhados ou bloqueados (em uso) usando o Serviço de Cópia de Sombra de Volume (Requer direitos de Administrador)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Copiar permissões de acesso aos arquivos</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Transfere as permissões de arquivos e diretórios
-(Requer direitos de Administrador)
+Transfere as permissões de arquivos e diretórios (Requer direitos de Administrador)
 </target>
 
 <source>Hidden dialogs:</source>

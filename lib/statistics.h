@@ -13,11 +13,12 @@
 #include <wx/defs.h>
 #include <wx/string.h>
 #include <wx/stopwatch.h>
+#include <zen/deprecate.h>
 
 class RetrieveStatistics
 {
 public:
-    wxDEPRECATED(~RetrieveStatistics()); //generate compiler warnings as a reminder to remove code after measurements
+    ZEN_DEPRECATE ~RetrieveStatistics(); //remove code after measurements!
     void writeEntry(double value, int objects);
 
 private:

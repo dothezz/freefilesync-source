@@ -35,7 +35,7 @@ wxHelpController& getHelpCtrl()
     if (!initialized)
     {
         initialized = true;
-        controller.Initialize(zen::getResourceDir() +
+        controller.Initialize(toWx(zen::getResourceDir()) +
 #ifdef FFS_WIN
                               L"FreeFileSync.chm");
 #elif defined FFS_LINUX

@@ -907,24 +907,20 @@ Udeluk: \ting\temp\*
 <target>Kopier låste filer</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Kopier delte eller låste filer ved hjælp af Drev Kopi Servicen
-(Kræver Administrator rettigheder)
+Kopier delte eller låste filer ved hjælp af Drev Kopi Servicen (Kræver Administrator rettigheder)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Kopier fil adgangs tilladelser</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Overfør fil og biblioteks tilladelser
-(Kræver Administrator rettigheder)
+Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 </target>
 
 <source>Hidden dialogs:</source>

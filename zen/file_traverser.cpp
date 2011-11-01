@@ -131,7 +131,7 @@ private:
         {
             if (level == 100) //notify endless recursion
             {
-                errorMsg = _("Endless loop when traversing directory:") + "\n\"" + directory + "\"";
+                errorMsg = _("Endless loop when traversing directory:") + L"\n\"" + directory + L"\"";
                 return false;
             }
             return true;
@@ -221,16 +221,9 @@ private:
                     }
                     else if (fileInfo.fileAttributes & FILE_ATTRIBUTE_DIRECTORY) //a directory... or symlink that needs to be followed (for directory symlinks this flag is set too!)
                     {
-                        const TraverseCallback::ReturnValDir rv = sink.onDir(shortName, fullName);
-                        switch (rv.returnCode)
-                        {
-                            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
-                                break;
-
-                            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
-                                traverse<followSymlinks_>(fullName, *rv.subDirCb, level + 1);
-                                break;
-                        }
+                        const std::shared_ptr<TraverseCallback> rv = sink.onDir(shortName, fullName);
+                        if (rv)
+                                traverse<followSymlinks_>(fullName, *rv, level + 1);
                     }
                     else //a file or symlink that is followed...
                     {
@@ -289,7 +282,7 @@ private:
                 //return true; //fine: empty directory
 
                 //else: we have a problem... report it:
-                errorMsg = _("Error traversing directory:") + "\n\"" + directory + "\"" + "\n\n" + zen::getLastErrorFormatted();
+                errorMsg = _("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted();
                 return false;
             }
             return true;
@@ -322,7 +315,7 @@ private:
                 {
                     (void)e;
 #ifndef NDEBUG       //show broken symlink / access errors in debug build!
-                    sink.onError(e.msg());
+                    sink.onError(e.toString());
 #endif
                 }
 
@@ -332,16 +325,9 @@ private:
             }
             else if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) //a directory... or symlink that needs to be followed (for directory symlinks this flag is set too!)
             {
-                const TraverseCallback::ReturnValDir rv = sink.onDir(shortName, fullName);
-                switch (rv.returnCode)
-                {
-                    case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
-                        break;
-
-                    case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
-                        traverse(fullName, *rv.subDirCb, level + 1);
-                        break;
-                }
+                const std::shared_ptr<TraverseCallback> rv = sink.onDir(shortName, fullName);
+                if (rv)
+                    traverse(fullName, *rv, level + 1);
             }
             else //a file or symlink that is followed...
             {
@@ -389,7 +375,7 @@ private:
                         return true;
 
                     //else we have a problem... report it:
-                    errorMsg = _("Error traversing directory:") + "\n\"" + directory + "\"" + "\n\n" + zen::getLastErrorFormatted();
+                    errorMsg = _("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted();
                     return false;
                 }
 
@@ -407,7 +393,7 @@ private:
         dirObj = ::opendir(directory.c_str()); //directory must NOT end with path separator, except "/"
             if (dirObj == NULL)
             {
-                errorMsg = _("Error traversing directory:") + "\n\"" + directory + "\"" + "\n\n" + zen::getLastErrorFormatted();
+                errorMsg = _("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted();
                 return false;
             }
             return true;
@@ -428,7 +414,7 @@ private:
                         return true; //everything okay, not more items
 
                     //else: we have a problem... report it:
-                    errorMsg = _("Error traversing directory:") + "\n\"" + directory + "\"" + "\n\n" + zen::getLastErrorFormatted();
+                    errorMsg = _("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted();
                     return false;
                 }
                 return true;
@@ -453,7 +439,7 @@ private:
         {
             if (::lstat(fullName.c_str(), &fileInfo) != 0) //lstat() does not resolve symlinks
                 {
-                    errorMsg = _("Error reading file attributes:") + "\n\"" + fullName + "\"" + "\n\n" + zen::getLastErrorFormatted();
+                    errorMsg = _("Error reading file attributes:") + L"\n\"" + fullName + L"\"" + L"\n\n" + zen::getLastErrorFormatted();
                     return false;
                 }
                 return true;
@@ -482,7 +468,7 @@ private:
                     catch (FileError& e)
                     {
 #ifndef NDEBUG       //show broken symlink / access errors in debug build!
-                        sink.onError(e.msg());
+                        sink.onError(e.toString());
 #endif
                     }
 
@@ -497,16 +483,9 @@ private:
 
             if (S_ISDIR(fileInfo.st_mode)) //a directory... cannot be a symlink on Linux in this case
             {
-                const TraverseCallback::ReturnValDir rv = sink.onDir(shortName, fullName);
-                switch (rv.returnCode)
-                {
-                    case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
-                        break;
-
-                    case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
-                        traverse(fullName, *rv.subDirCb, level + 1);
-                        break;
-                }
+                const std::shared_ptr<TraverseCallback> rv = sink.onDir(shortName, fullName);
+                if (rv)
+                    traverse(fullName, *rv, level + 1);
             }
             else //a file... (or symlink; pathological!)
             {

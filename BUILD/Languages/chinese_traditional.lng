@@ -892,24 +892,20 @@ Exclude: \stuff\temp\*
 <target>複製被鎖定的檔案</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-複製共用或鎖定檔案使用使用卷影複製服務
-(需要管理員權限)
+複製共用或鎖定檔案使用使用卷影複製服務(需要管理員權限)
 </target>
 
 <source>Copy file access permissions</source>
 <target>複製檔案系統權限</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-傳輸檔案和目錄權限
-(需要管理員權限)
+傳輸檔案和目錄權限(需要管理員權限)
 </target>
 
 <source>Hidden dialogs:</source>

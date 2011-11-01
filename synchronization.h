@@ -10,6 +10,7 @@
 #include "file_hierarchy.h"
 #include "lib/process_xml.h"
 #include "lib/status_handler.h"
+#include <zen/process_status.h>
 
 
 namespace zen
@@ -81,6 +82,7 @@ public:
                 bool copyLockedFiles,
                 bool copyFilePermissions,
                 bool transactionalFileCopy,
+                bool runWithBackgroundPriority,
                 ProcessCallback& handler);
 
     //CONTRACT: syncConfig must have SAME SIZE folderCmp and correspond row-wise!
@@ -99,8 +101,9 @@ private:
 
     //warnings
     xmlAccess::OptionalDialogs& m_warnings;
-
     ProcessCallback& procCallback;
+
+std::unique_ptr<ScheduleForBackgroundProcessing> procBackground;
 };
 
 

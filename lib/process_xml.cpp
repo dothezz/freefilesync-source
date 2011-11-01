@@ -74,7 +74,7 @@ void setXmlType(XmlDoc& doc, XmlType type) //throw()
 
 wxString xmlAccess::getGlobalConfigFile()
 {
-    return zen::getConfigDir() + wxT("GlobalSettings.xml");
+    return toWx(zen::getConfigDir()) + wxT("GlobalSettings.xml");
 }
 
 
@@ -810,6 +810,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inShared["CopyFilePermissions"  ](config.copyFilePermissions);
     inShared["TransactionalFileCopy"](config.transactionalFileCopy);
     inShared["VerifyCopiedFiles"    ](config.verifyFileCopy);
+    inShared["RunWithBackgroundPriority"](config.runWithBackgroundPriority);
 
     //max. allowed file time deviation
     inShared["FileTimeTolerance"](config.fileTimeTolerance);
@@ -888,13 +889,13 @@ void readConfig(const Zstring& filename, XmlType type, ConfigType& config)
     loadXmlDocument(filename, doc);  //throw FfsXmlError
 
     if (getXmlType(doc) != type) //throw()
-        throw FfsXmlError(_("Error parsing configuration file:") + "\n\"" + filename + "\"");
+        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + filename + L"\"");
 
     XmlIn in(doc);
     ::readConfig(in, config);
 
     if (in.errorsOccured())
-        throw FfsXmlError(_("Error parsing configuration file:") + "\n\"" + filename + "\"\n\n" +
+        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + filename + L"\"\n\n" +
                           getErrorMessageFormatted(in), FfsXmlError::WARNING);
 }
 }
@@ -1067,6 +1068,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outShared["CopyFilePermissions"  ](config.copyFilePermissions);
     outShared["TransactionalFileCopy"](config.transactionalFileCopy);
     outShared["VerifyCopiedFiles"    ](config.verifyFileCopy);
+    outShared["RunWithBackgroundPriority"](config.runWithBackgroundPriority);
 
     //max. allowed file time deviation
     outShared["FileTimeTolerance"](config.fileTimeTolerance);

@@ -355,12 +355,12 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
     //set filter icon
     if (isNullFilter(cfg.mainCfg.globalFilter))
     {
-        setBitmapLabel(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOff")));
+        setImage(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOff")));
         m_bpButtonFilter->SetToolTip(_("No filter selected"));
     }
     else
     {
-        setBitmapLabel(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOn")));
+        setImage(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOn")));
         m_bpButtonFilter->SetToolTip(_("Filter is active"));
     }
 
@@ -509,7 +509,7 @@ void BatchDialog::OnLoadBatchJob(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this,
                             wxEmptyString,
-                            beforeLast(proposedBatchFileName, FILE_NAME_SEPARATOR), //set default dir: empty string if "currentConfigFileName" is empty or has no path separator
+                            beforeLast(proposedBatchFileName, utf8CvrtTo<wxString>(FILE_NAME_SEPARATOR)), //set default dir: empty string if "currentConfigFileName" is empty or has no path separator
                             wxEmptyString,
                             wxString(_("FreeFileSync configuration")) + wxT(" (*.ffs_batch;*.ffs_gui)|*.ffs_batch;*.ffs_gui"),
                             wxFD_OPEN | wxFD_MULTIPLE); //creating this on freestore leads to memleak!
@@ -547,7 +547,7 @@ bool BatchDialog::saveBatchFile(const wxString& filename)
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
-        wxMessageBox(error.msg().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR);
         return false;
     }
 
@@ -583,10 +583,10 @@ void BatchDialog::loadBatchFile(const std::vector<wxString>& filenames)
     catch (const xmlAccess::FfsXmlError& error)
     {
         if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-            wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
+            wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
         else
         {
-            wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
             return;
         }
     }

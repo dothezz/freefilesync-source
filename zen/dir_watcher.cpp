@@ -52,7 +52,7 @@ public:
         else
         {
             const char* bufPos = &buffer[0];
-            for(;;)
+            for (;;)
             {
                 const FILE_NOTIFY_INFORMATION& notifyInfo = reinterpret_cast<const FILE_NOTIFY_INFORMATION&>(*bufPos);
 
@@ -115,7 +115,7 @@ public:
     void reportError(const std::wstring& msg, DWORD errorCode) //throw()
     {
         boost::lock_guard<boost::mutex> dummy(lockAccess);
-        errorMsg = std::make_pair(cvrtString<BasicWString>(msg), errorCode);
+        errorMsg = std::make_pair(copyStringTo<BasicWString>(msg), errorCode);
     }
 
 private:
@@ -157,7 +157,7 @@ public:
                             NULL);
         if (hDir == INVALID_HANDLE_VALUE )
         {
-            const std::wstring errorMsg = _("Could not initialize directory monitoring:") + "\n\"" + utf8CvrtTo<std::wstring>(dirname) + "\"" + "\n\n" + zen::getLastErrorFormatted();
+            const std::wstring errorMsg = _("Could not initialize directory monitoring:") + L"\n\"" + dirname + L"\"" + L"\n\n" + zen::getLastErrorFormatted();
             if (errorCodeForNotExisting(::GetLastError()))
                 throw ErrorNotExisting(errorMsg);
             throw FileError(errorMsg);
@@ -178,7 +178,7 @@ public:
         {
             std::vector<char> buffer(64 * 1024); //needs to be aligned on a DWORD boundary; maximum buffer size restricted by some networks protocols (according to docu)
 
-            for(;;)
+            for (;;)
             {
                 boost::this_thread::interruption_point();
 
@@ -189,7 +189,7 @@ public:
                                                   false, //__in      BOOL bInitialState,
                                                   NULL); //__in_opt  LPCTSTR lpName
                 if (overlapped.hEvent == NULL)
-                    return shared_->reportError(_("Error when monitoring directories.") + " (CreateEvent)" + "\n\n" + getLastErrorFormatted(), ::GetLastError());
+                    return shared_->reportError(_("Error when monitoring directories.") + L" (CreateEvent)" + L"\n\n" + getLastErrorFormatted(), ::GetLastError());
                 ZEN_ON_BLOCK_EXIT(::CloseHandle(overlapped.hEvent));
 
                 //asynchronous variant: runs on this thread's APC queue!
@@ -204,7 +204,7 @@ public:
                                              NULL,                          //  __out_opt    LPDWORD lpBytesReturned,
                                              &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
                                              NULL))                    //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
-                    return shared_->reportError(_("Error when monitoring directories.") + " (ReadDirectoryChangesW)" + "\n\n" + getLastErrorFormatted(), ::GetLastError());
+                    return shared_->reportError(_("Error when monitoring directories.") + L" (ReadDirectoryChangesW)" + L"\n\n" + getLastErrorFormatted(), ::GetLastError());
 
                 //async I/O is a resource that needs to be guarded since it will write to local variable "buffer"!
                 zen::ScopeGuard lockAio = zen::makeGuard([&]()
@@ -226,7 +226,7 @@ public:
                                               false))        //__in   BOOL bWait
                 {
                     if (::GetLastError() != ERROR_IO_INCOMPLETE)
-                        return shared_->reportError(_("Error when monitoring directories.") + " (GetOverlappedResult)" + "\n\n" + getLastErrorFormatted(), ::GetLastError());
+                        return shared_->reportError(_("Error when monitoring directories.") + L" (GetOverlappedResult)" + L"\n\n" + getLastErrorFormatted(), ::GetLastError());
 
                     //execute asynchronous procedure calls (APC) queued on this thread
                     ::SleepEx(50,    // __in  DWORD dwMilliseconds,
@@ -365,18 +365,20 @@ namespace
 class DirsOnlyTraverser : public zen::TraverseCallback
 {
 public:
-    DirsOnlyTraverser(std::vector<Zstring>& dirs) : dirs_(dirs) {}
+    DirsOnlyTraverser(std::vector<Zstring>& dirs,
+                      const std::shared_ptr<TraverseCallback>& otherMe) : otherMe_(otherMe), dirs_(dirs) {}
 
     virtual         void onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
     virtual         void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
-    virtual ReturnValDir onDir    (const Zchar* shortName, const Zstring& fullName)
+    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
     {
         dirs_.push_back(fullName);
-        return ReturnValDir(zen::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), *this);
+        return otherMe_;
     }
     virtual HandleError onError(const std::wstring& errorText) { throw FileError(errorText); }
 
 private:
+    const std::shared_ptr<TraverseCallback>& otherMe_; //lifetime management, two options: 1. use std::weak_ptr 2. ref to shared_ptr
     std::vector<Zstring>& dirs_;
 };
 }
@@ -394,13 +396,15 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
     std::vector<Zstring> fullDirList;
     fullDirList.push_back(dirname);
 
-    DirsOnlyTraverser traverser(fullDirList); //throw FileError
-    zen::traverseFolder(dirname, false, traverser); //don't traverse into symlinks (analog to windows build)
+    std::shared_ptr<TraverseCallback> traverser;
+    traverser = std::make_shared<DirsOnlyTraverser>(fullDirList, traverser); //throw FileError
+
+    zen::traverseFolder(dirname, false, *traverser); //don't traverse into symlinks (analog to windows build)
 
     //init
     pimpl_->notifDescr = ::inotify_init();
     if (pimpl_->notifDescr == -1)
-        throw FileError(_("Could not initialize directory monitoring:") + "\n\"" + dirname + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Could not initialize directory monitoring:") + L"\n\"" + dirname + L"\"" + L"\n\n" + getLastErrorFormatted());
 
     zen::ScopeGuard guardDescr = zen::makeGuard([&]() { ::close(pimpl_->notifDescr); });
 
@@ -411,7 +415,7 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
         initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
 
     if (!initSuccess)
-        throw FileError(_("Could not initialize directory monitoring:") + "\n\"" + dirname + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Could not initialize directory monitoring:") + L"\n\"" + dirname + L"\"" + L"\n\n" + getLastErrorFormatted());
 
     //add watches
     std::for_each(fullDirList.begin(), fullDirList.end(),
@@ -429,7 +433,7 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
                                      IN_MOVE_SELF);
         if (wd == -1)
         {
-            std::wstring errorMsg = _("Could not initialize directory monitoring:") + "\n\"" + subdir + "\"" + "\n\n" + getLastErrorFormatted();
+            std::wstring errorMsg = _("Could not initialize directory monitoring:") + L"\n\"" + subdir + L"\"" + L"\n\n" + getLastErrorFormatted();
             if (errno == ENOENT)
                 throw ErrorNotExisting(errorMsg);
             throw FileError(errorMsg);
@@ -463,7 +467,7 @@ std::vector<Zstring> DirWatcher::getChanges() //throw FileError
             errno == EAGAIN)  //Non-blocking I/O has been selected using O_NONBLOCK and no data was immediately available for reading
             return std::vector<Zstring>();
 
-        throw FileError(_("Error when monitoring directories.") + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error when monitoring directories.") + L"\n\n" + getLastErrorFormatted());
     }
 
     std::set<Zstring> tmp; //get rid of duplicate entries (actually occur!)

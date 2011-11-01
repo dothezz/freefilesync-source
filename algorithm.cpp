@@ -385,7 +385,7 @@ std::pair<DataSetDir, const DirContainer*> retrieveDataSetDir(const Zstring& obj
             return std::make_pair(DataSetDir(iter->first), &iter->second);
     }
 
-    return std::make_pair(DataSetDir(), static_cast<DirContainer*>(NULL)); //object not found
+    return std::make_pair(DataSetDir(), nullptr); //object not found
 }
 
 //----------------------------------------------------------------------------------------------
@@ -454,7 +454,7 @@ private:
         catch (FileErrorDatabaseNotExisting&) {} //let's ignore these errors for now...
         catch (FileError& error) //e.g. incompatible database version
         {
-            if (handler_) handler_->reportWarning(error.msg() + wxT(" \n\n") +
+            if (handler_) handler_->reportWarning(error.toString() + wxT(" \n\n") +
                                                       _("Setting default synchronization directions: Old files will be overwritten with newer files."));
         }
         return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
@@ -1248,7 +1248,7 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview( //assemble message con
         });
     }
 
-    return std::make_pair(cvrtString<wxString>(filesToDelete), totalDelCount);
+    return std::make_pair(copyStringTo<wxString>(filesToDelete), totalDelCount);
 }
 
 
@@ -1333,7 +1333,7 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
             }
             catch (const FileError& error)
             {
-                DeleteFilesHandler::Response rv = statusHandler.reportError(error.msg());
+                DeleteFilesHandler::Response rv = statusHandler.reportError(error.toString());
 
                 if (rv == DeleteFilesHandler::IGNORE_ERROR)
                     break;
@@ -1366,9 +1366,6 @@ void zen::deleteFromGridAndHD(std::vector<FileSystemObject*>& rowsToDeleteOnLeft
     for (auto iter = folderCmp.begin(); iter != folderCmp.end(); ++iter)
         baseDirCfgs[&** iter] = directCfgs[iter - folderCmp.begin()];
 
-    //ensure cleanup: redetermination of sync-directions and removal of invalid rows
-    ZEN_ON_BLOCK_EXIT( std::for_each(begin(folderCmp), end(folderCmp), BaseDirMapping::removeEmpty); );
-
     std::set<FileSystemObject*> deleteLeft (rowsToDeleteOnLeft .begin(), rowsToDeleteOnLeft .end());
     std::set<FileSystemObject*> deleteRight(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
 
@@ -1381,6 +1378,43 @@ void zen::deleteFromGridAndHD(std::vector<FileSystemObject*>& rowsToDeleteOnLeft
     set_remove_if(deleteLeft,  std::mem_fun(&FileSystemObject::isEmpty<LEFT_SIDE>));  //remove empty rows to ensure correct statistics
     set_remove_if(deleteRight, std::mem_fun(&FileSystemObject::isEmpty<RIGHT_SIDE>)); //
 
+    //ensure cleanup: redetermination of sync-directions and removal of invalid rows
+    auto updateDirection = [&]()
+    {
+        //update sync direction: we cannot do a full redetermination since the user may already have entered manual changes
+        std::set<FileSystemObject*> deletedTotal = deleteLeft;
+        deletedTotal.insert(deleteRight.begin(), deleteRight.end());
+
+        for (auto iter = deletedTotal.begin(); iter != deletedTotal.end(); ++iter)
+        {
+            FileSystemObject& fsObj = **iter; //all pointers are required(!) to be bound
+
+            if (fsObj.isEmpty<LEFT_SIDE>() != fsObj.isEmpty<RIGHT_SIDE>()) //make sure objects exists on one side only
+            {
+                auto cfgIter = baseDirCfgs.find(&fsObj.root());
+                if (cfgIter != baseDirCfgs.end())
+                {
+                    SyncDirection newDir = SYNC_DIR_NONE;
+
+                    if (cfgIter->second.var == DirectionConfig::AUTOMATIC)
+                        newDir = fsObj.isEmpty<LEFT_SIDE>() ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT;
+                    else
+                    {
+                        DirectionSet dirCfg = extractDirections(cfgIter->second);
+                        newDir = fsObj.isEmpty<LEFT_SIDE>() ? dirCfg.exRightSideOnly : dirCfg.exLeftSideOnly;
+                    }
+
+                    setSyncDirectionRec(newDir, fsObj); //set new direction (recursively)
+                }
+                else
+                    assert(!"this should not happen!");
+            }
+        }
+
+        //last step: cleanup empty rows: this one invalidates all pointers!
+        std::for_each(begin(folderCmp), end(folderCmp), BaseDirMapping::removeEmpty);
+    };
+    ZEN_ON_BLOCK_EXIT(updateDirection()); //MSVC: assert is a macro and it doesn't play nice with ZEN_ON_BLOCK_EXIT, surprise... wasn't there something about macros being "evil"?
 
     deleteFromGridAndHDOneSide<LEFT_SIDE>(deleteLeft.begin(), deleteLeft.end(),
                                           useRecycleBin,
@@ -1389,36 +1423,6 @@ void zen::deleteFromGridAndHD(std::vector<FileSystemObject*>& rowsToDeleteOnLeft
     deleteFromGridAndHDOneSide<RIGHT_SIDE>(deleteRight.begin(), deleteRight.end(),
                                            useRecycleBin,
                                            statusHandler);
-
-    //update sync direction: we cannot do a full redetermination since the user may have committed manual changes
-    std::set<FileSystemObject*> deletedTotal = deleteLeft;
-    deletedTotal.insert(deleteRight.begin(), deleteRight.end());
-
-    for (auto iter = deletedTotal.begin(); iter != deletedTotal.end(); ++iter)
-    {
-        FileSystemObject& fsObj = **iter; //all pointers are required(!) to be bound
-
-        if (fsObj.isEmpty<LEFT_SIDE>() != fsObj.isEmpty<RIGHT_SIDE>()) //make sure objects exists on one side only
-        {
-            auto cfgIter = baseDirCfgs.find(&fsObj.root());
-            if (cfgIter != baseDirCfgs.end())
-            {
-                SyncDirection newDir = SYNC_DIR_NONE;
-
-                if (cfgIter->second.var == DirectionConfig::AUTOMATIC)
-                    newDir = fsObj.isEmpty<LEFT_SIDE>() ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT;
-                else
-                {
-                    DirectionSet dirCfg = extractDirections(cfgIter->second);
-                    newDir = fsObj.isEmpty<LEFT_SIDE>() ? dirCfg.exRightSideOnly : dirCfg.exLeftSideOnly;
-                }
-
-                setSyncDirectionRec(newDir, fsObj); //set new direction (recursively)
-            }
-            else
-                assert(!"this should not happen!");
-        }
-    }
 }
 
 

@@ -77,8 +77,8 @@ void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, 
         while (true)
         {
             const std::wstring additionalInfo = _("You can ignore this error to consider the directory as empty.");
-            const ProcessCallback::Response rv = procCallback.reportError(_("A directory input field is empty.") + " \n\n" +
-                                                                          + "(" + additionalInfo + ")");
+            const ProcessCallback::Response rv = procCallback.reportError(_("A directory input field is empty.") + L" \n\n" +
+                                                                          + L"(" + additionalInfo + L")");
             if (rv == ProcessCallback::IGNORE_ERROR)
                 break;
             else if (rv == ProcessCallback::RETRY)
@@ -103,8 +103,8 @@ void checkDirectoryExistence(const std::set<Zstring, LessFilename>& dirnames,
             while (!dirExistsUpdating(dirname, allowUserInteraction, procCallback))
             {
                 const std::wstring additionalInfo = _("You can ignore this error to consider the directory as empty.");
-                std::wstring errorMessage = _("Directory does not exist:") + "\n" + "\"" + dirname + "\"";
-                ProcessCallback::Response rv = procCallback.reportError(errorMessage + "\n\n" + additionalInfo /* + " " + getLastErrorFormatted()*/);
+                std::wstring errorMessage = _("Directory does not exist:") + L"\n" + L"\"" + dirname + L"\"";
+                ProcessCallback::Response rv = procCallback.reportError(errorMessage + L"\n\n" + additionalInfo /* + L" " + getLastErrorFormatted()*/);
 
                 if (rv == ProcessCallback::IGNORE_ERROR)
                     return;
@@ -153,8 +153,8 @@ wxString checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm
         warningMsg = _("Directories are dependent! Be careful when setting up synchronization rules:");
         for (auto i = dependentDirs.begin(); i != dependentDirs.end(); ++i)
             warningMsg += wxString(L"\n\n") +
-                          "\"" + i->first  + "\"\n" +
-                          "\"" + i->second + "\"";
+                          L"\"" + i->first  + L"\"\n" +
+                          L"\"" + i->second + L"\"";
     }
     return warningMsg;
 }
@@ -208,23 +208,30 @@ bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filen
 CompareProcess::CompareProcess(size_t fileTimeTol,
                                xmlAccess::OptionalDialogs& warnings,
                                bool allowUserInteraction,
+                               bool runWithBackgroundPriority,
                                ProcessCallback& handler) :
     fileTimeTolerance(fileTimeTol),
     m_warnings(warnings),
     allowUserInteraction_(allowUserInteraction),
-    procCallback(handler),
-    txtComparingContentOfFiles(toZ(replaceCpy(_("Comparing content of files %x"), L"%x", L"\n\"%x\"", false))) {}
+    procCallback(handler)
+    {
+if (runWithBackgroundPriority)
+procBackground.reset(new ScheduleForBackgroundProcessing);
+    }
 
 
 void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgList, FolderComparison& output)
 {
+        //prevent shutdown while (binary) comparison is in progress
+        DisableStandby dummy2;
+        (void)dummy2;
+
     /*
     #ifdef NDEBUG
         wxLogNull noWxLogs; //hide wxWidgets log messages in release build
     #endif
     */
     //PERF_START;
-
 
     //init process: keep at beginning so that all gui elements are initialized properly
     procCallback.initNewProcess(-1, 0, ProcessCallback::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
@@ -314,10 +321,6 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
                    UI_UPDATE_INTERVAL / 4); //every ~25 ms
         //-------------------------------------------------------------------------------------------
 
-        //prevent shutdown while (binary) comparison is in progress
-        DisableStandby dummy2;
-        (void)dummy2;
-
         //traverse/process folders
         FolderComparison output_tmp; //write to output not before END of process!
 
@@ -379,11 +382,11 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
     }
     catch (const std::bad_alloc& e)
     {
-        procCallback.reportFatalError(_("Memory allocation failed!") + " " + e.what());
+        procCallback.reportFatalError(_("Memory allocation failed!") + L" " + utf8CvrtTo<std::wstring>(e.what()));
     }
     catch (const std::exception& e)
     {
-        procCallback.reportFatalError(wxString::FromAscii(e.what()));
+        procCallback.reportFatalError(utf8CvrtTo<std::wstring>(e.what()));
     }
 }
 
@@ -393,9 +396,9 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
 std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 {
     std::wstring msg = _("File %x has an invalid date!");
-    replace(msg, L"%x", std::wstring(L"\"") + fileNameFull + "\"");
-    msg += L"\n\n" + _("Date") + ": " + utcToLocalTimeString(utcTime);
-    return _("Conflict detected:") + "\n" + msg;
+    replace(msg, L"%x", std::wstring(L"\"") + fileNameFull + L"\"");
+    msg += L"\n\n" + _("Date") + L": " + utcToLocalTimeString(utcTime);
+    return _("Conflict detected:") + L"\n" + msg;
 }
 
 
@@ -414,13 +417,13 @@ void makeSameLength(wxString& first, wxString& second)
 std::wstring getConflictSameDateDiffSize(const FileMapping& fileObj)
 {
     std::wstring msg = _("Files %x have the same date but a different size!");
-    replace(msg, wxT("%x"), wxString(wxT("\"")) + fileObj.getRelativeName<LEFT_SIDE>() + "\"");
+    replace(msg, L"%x", std::wstring(L"\"") + fileObj.getRelativeName<LEFT_SIDE>() + L"\"");
     msg += L"\n\n";
-    msg += L"<-- \t" + _("Date") + ": " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE>()) +
-           " \t" + _("Size") + ": " + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + wxT("\n");
-    msg += L"--> \t" + _("Date") + ": " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) +
-           " \t" + _("Size") + ": " + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
-    return _("Conflict detected:") + "\n" + msg;
+    msg += L"<-- \t" + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE>()) +
+           L" \t" + _("Size") + L": " + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + L"\n";
+    msg += L"--> \t" + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) +
+           L" \t" + _("Size") + L": " + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
+    return _("Conflict detected:") + L"\n" + msg;
 }
 }
 
@@ -465,8 +468,8 @@ void CompareProcess::categorizeSymlinkByTime(SymLinkMapping& linkObj) const
             }
             else
             {
-                std::wstring conflictMsg = _("Conflict detected:") + "\n" + _("Symlinks %x have the same date but a different target!");
-                replace(conflictMsg, L"%x", std::wstring(L"\"") + linkObj.getRelativeName<LEFT_SIDE>() + "\"");
+                std::wstring conflictMsg = _("Conflict detected:") + L"\n" + _("Symlinks %x have the same date but a different target!");
+                replace(conflictMsg, L"%x", std::wstring(L"\"") + linkObj.getRelativeName<LEFT_SIDE>() + L"\"");
                 linkObj.setCategoryConflict(conflictMsg);
             }
             break;
@@ -622,12 +625,13 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
 
     const CmpFileTime timeCmp(fileTimeTolerance);
 
+const std::wstring txtComparingContentOfFiles = replaceCpy(_("Comparing content of files %x"), L"%x", L"\n\"%x\"", false);
+
     //compare files (that have same size) bytewise...
     std::for_each(filesToCompareBytewise.begin(), filesToCompareBytewise.end(),
                   [&](FileMapping* fileObj)
     {
-        const Zstring statusText = replaceCpy(txtComparingContentOfFiles, Zstr("%x"), fileObj->getRelativeName<LEFT_SIDE>(), false);
-        procCallback.reportStatus(utf8CvrtTo<wxString>(statusText));
+        procCallback.reportStatus(replaceCpy(txtComparingContentOfFiles, L"%x", utf8CvrtTo<std::wstring>(fileObj->getRelativeName<LEFT_SIDE>()), false));
 
         //check files that exist in left and right model but have different content
         while (true)
@@ -655,7 +659,7 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
             }
             catch (FileError& error)
             {
-                ProcessCallback::Response rv = procCallback.reportError(error.msg());
+                ProcessCallback::Response rv = procCallback.reportError(error.toString());
                 if (rv == ProcessCallback::IGNORE_ERROR)
                 {
                     fileObj->setCategoryConflict(_("Conflict detected:") + L"\n" + _("Comparing files by content failed."));

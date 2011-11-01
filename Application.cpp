@@ -22,6 +22,7 @@
 #include <zen/file_handling.h>
 #include <wx+/string_conv.h>
 #include <wx/log.h>
+#include <wx/tooltip.h> //wxWidgets v2.9
 #include "lib/lock_holder.h"
 
 #ifdef FFS_LINUX
@@ -36,8 +37,31 @@ using namespace xmlAccess;
 IMPLEMENT_APP(Application)
 
 
+#ifdef FFS_WIN
+namespace
+{
+const DWORD mainThreadId = ::GetCurrentThreadId();
+
+void onTerminationRequested()
+{
+    std::wstring msg = ::GetCurrentThreadId() == mainThreadId ?
+                       L"Termination requested in main thread!\n\n" :
+                       L"Termination requested in worker thread!\n\n";
+    msg += L"Please take a screenshot and file a bug report on: http://sourceforge.net/projects/freefilesync";
+
+    ::MessageBox(0, msg.c_str(), _("An exception occurred!").c_str(), 0);
+    std::abort();
+}
+}
+#endif
+
+
 bool Application::OnInit()
 {
+#ifdef FFS_WIN
+    std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
+#endif
+
     returnValue = 0;
     //do not call wxApp::OnInit() to avoid using default commandline parser
 
@@ -61,15 +85,22 @@ void Application::OnStartApplication(wxIdleEvent&)
     //if appname is not set, the default is the executable's name!
     SetAppName(wxT("FreeFileSync"));
 
-#ifdef FFS_LINUX
+#ifdef FFS_WIN
+    //Quote: "Best practice is that all applications call the process-wide SetErrorMode function with a parameter of
+    //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
+    ::SetErrorMode(SEM_FAILCRITICALERRORS);
+
+#elif defined FFS_LINUX
     Gtk::Main::init_gtkmm_internals();
 
-    ::gtk_rc_parse((Zstring(getResourceDir()) + "styles.rc").c_str()); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((utf8CvrtTo<Zstring>(getResourceDir()) + "styles.rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
 
 #if wxCHECK_VERSION(2, 9, 1)
-    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping
+#ifdef FFS_WIN
+    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only (as of 2.9.2)
+#endif
     wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
 #endif
 
@@ -84,9 +115,9 @@ void Application::OnStartApplication(wxIdleEvent&)
     {
         //show messagebox and continue
         if (error.getSeverity() == FfsXmlError::WARNING)
-            ; //wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
+            ; //wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
         else
-            wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
     }
 
     //set program language
@@ -117,7 +148,7 @@ void Application::OnStartApplication(wxIdleEvent&)
                 filename = filename + Zstr(".ffs_gui");
             else
             {
-                wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                wxMessageBox(_("File does not exist:") + L" \"" + filename + L"\"", _("Error"), wxOK | wxICON_ERROR);
                 return;
             }
         }
@@ -126,67 +157,67 @@ void Application::OnStartApplication(wxIdleEvent&)
     if (commandArgs.empty())
         runGuiMode(commandArgs, globalSettings);
     else if (gotDirNames) //mode 1: create temp configuration based on directory names passed
+    {
+        XmlGuiConfig guiCfg;
+        guiCfg.mainCfg.syncCfg.directionCfg.var = DirectionConfig::MIRROR;
+
+        for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
         {
-            XmlGuiConfig guiCfg;
-            guiCfg.mainCfg.syncCfg.directionCfg.var = DirectionConfig::MIRROR;
+            size_t index = iter - commandArgs.begin();
+            Zstring dirname = toZ(*iter);
 
-            for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
+            FolderPairEnh& fp = [&]() -> FolderPairEnh&
             {
-                size_t index = iter - commandArgs.begin();
-                Zstring dirname = toZ(*iter);
+                if (index < 2)
+                    return guiCfg.mainCfg.firstPair;
 
-                FolderPairEnh& fp = [&]() -> FolderPairEnh&
-                {
-                    if (index < 2)
-                        return guiCfg.mainCfg.firstPair;
+                guiCfg.mainCfg.additionalPairs.resize((index - 2) / 2 + 1);
+                return guiCfg.mainCfg.additionalPairs.back();
+            }();
 
-                    guiCfg.mainCfg.additionalPairs.resize((index - 2) / 2 + 1);
-                    return guiCfg.mainCfg.additionalPairs.back();
-                }();
-
-                if (index % 2 == 0)
-                    fp.leftDirectory = dirname;
-                else if (index % 2 == 1)
-                    fp.rightDirectory = dirname;
-            }
-
-            runGuiMode(guiCfg, globalSettings);
+            if (index % 2 == 0)
+                fp.leftDirectory = dirname;
+            else if (index % 2 == 1)
+                fp.rightDirectory = dirname;
         }
-        else //mode 2: try to set config/batch-filename set by %1 parameter
-            switch (getMergeType(commandArgs)) //throw ()
-            {
-                case MERGE_BATCH: //pure batch config files
-                    if (commandArgs.size() == 1)
-                        runBatchMode(commandArgs[0], globalSettings);
-                    else
-                        runGuiMode(commandArgs, globalSettings);
-                    break;
 
-                case MERGE_GUI:       //pure gui config files
-                case MERGE_GUI_BATCH: //gui and batch files
+        runGuiMode(guiCfg, globalSettings);
+    }
+    else //mode 2: try to set config/batch-filename set by %1 parameter
+        switch (getMergeType(commandArgs)) //throw ()
+        {
+            case MERGE_BATCH: //pure batch config files
+                if (commandArgs.size() == 1)
+                    runBatchMode(commandArgs[0], globalSettings);
+                else
                     runGuiMode(commandArgs, globalSettings);
-                    break;
+                break;
 
-                case MERGE_OTHER: //= none or unknown;
-                    //commandArgs are not empty and contain at least one non-gui/non-batch config file: find it!
-                    std::find_if(commandArgs.begin(), commandArgs.end(),
-                                 [](const wxString& filename) -> bool
+            case MERGE_GUI:       //pure gui config files
+            case MERGE_GUI_BATCH: //gui and batch files
+                runGuiMode(commandArgs, globalSettings);
+                break;
+
+            case MERGE_OTHER: //= none or unknown;
+                //commandArgs are not empty and contain at least one non-gui/non-batch config file: find it!
+                std::find_if(commandArgs.begin(), commandArgs.end(),
+                             [](const wxString& filename) -> bool
+                {
+                    switch (getXmlType(filename)) //throw()
                     {
-                        switch (getXmlType(filename)) //throw()
-                        {
-                            case XML_TYPE_GLOBAL:
-                            case XML_TYPE_OTHER:
-                                wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-                                return true;
+                        case XML_TYPE_GLOBAL:
+                        case XML_TYPE_OTHER:
+                            wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                            return true;
 
-                            case XML_TYPE_GUI:
-                            case XML_TYPE_BATCH:
-                                break;
-                        }
-                        return false;
-                    });
-                    break;
-            }
+                        case XML_TYPE_GUI:
+                        case XML_TYPE_BATCH:
+                            break;
+                    }
+                    return false;
+                });
+                break;
+        }
 }
 
 
@@ -205,7 +236,7 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(toWx(getConfigDir()) + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
         wxSafeShowMessage(_("An exception occurred!") + L" - FFS", wxString::FromAscii(e.what()));
@@ -213,7 +244,7 @@ int Application::OnRun()
     }
     catch (...) //catch the rest
     {
-        wxFile safeOutput(getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(toWx(getConfigDir()) + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxT("Unknown exception!"));
 
         wxSafeShowMessage(_("An exception occurred!"), wxT("Unknown exception!"));
@@ -269,7 +300,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
-        wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
+        wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
         return;
     }
     //all settings have been read successfully...
@@ -317,6 +348,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         CompareProcess cmpProc(globSettings.fileTimeTolerance,
                                globSettings.optDialogs,
                                allowPwPrompt,
+                               globSettings.runWithBackgroundPriority,
                                statusHandler);
 
         FolderComparison folderCmp;
@@ -329,6 +361,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
             globSettings.copyLockedFiles,
             globSettings.copyFilePermissions,
             globSettings.transactionalFileCopy,
+            globSettings.runWithBackgroundPriority,
             statusHandler);
 
         const std::vector<FolderPairSyncCfg> syncProcessCfg = extractSyncCfg(batchCfg.mainCfg);
@@ -339,7 +372,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //play (optional) sound notification after sync has completed
         if (!batchCfg.silent)
         {
-            const wxString soundFile = getResourceDir() + wxT("Sync_Complete.wav");
+            const wxString soundFile = toWx(getResourceDir()) + wxT("Sync_Complete.wav");
             if (fileExists(toZ(soundFile)))
                 wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as a service!
         }

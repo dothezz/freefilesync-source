@@ -78,7 +78,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
                                       FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
                                       NULL);
     if (hLink == INVALID_HANDLE_VALUE)
-        throw FileError(_("Error resolving symbolic link:") + "\n\"" + linkPath + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error resolving symbolic link:") + L"\n\"" + linkPath + L"\"" + L"\n\n" + getLastErrorFormatted());
     ZEN_ON_BLOCK_EXIT(::CloseHandle(hLink));
 
     //respect alignment issues...
@@ -94,7 +94,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
                            bufferSize,              //__in         DWORD nOutBufferSize,
                            &bytesReturned,          //__out_opt    LPDWORD lpBytesReturned,
                            NULL))                   //__inout_opt  LPOVERLAPPED lpOverlapped
-        throw FileError(_("Error resolving symbolic link:") + "\n\"" + linkPath + "\"" + "\n\n" + getLastErrorFormatted());
+        throw FileError(_("Error resolving symbolic link:") + L"\n\"" + linkPath + L"\"" + L"\n\n" + getLastErrorFormatted());
 
     REPARSE_DATA_BUFFER& reparseData = *reinterpret_cast<REPARSE_DATA_BUFFER*>(&buffer[0]); //REPARSE_DATA_BUFFER needs to be artificially enlarged!
 
@@ -110,7 +110,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
                          reparseData.MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
     }
     else
-        throw FileError(_("Error resolving symbolic link:") + "\n\"" + linkPath + "\"" + "\n\n" + "Not a symbolic link or junction!");
+        throw FileError(_("Error resolving symbolic link:") + L"\n\"" + linkPath + L"\"" + L"\n\n" + L"Not a symbolic link or junction!");
 
     //absolute symlinks and junctions technically start with \??\ while relative ones do not
     if (startsWith(output, Zstr("\\??\\")))
@@ -125,7 +125,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
     const int bytesWritten = ::readlink(linkPath.c_str(), &buffer[0], BUFFER_SIZE);
     if (bytesWritten < 0 || bytesWritten >= BUFFER_SIZE)
     {
-        std::wstring errorMessage = _("Error resolving symbolic link:") + "\n\"" + linkPath + "\"";
+        std::wstring errorMessage = _("Error resolving symbolic link:") + L"\n\"" + linkPath + L"\"";
         if (bytesWritten < 0)
             errorMessage += L"\n\n" + getLastErrorFormatted();
         throw FileError(errorMessage);

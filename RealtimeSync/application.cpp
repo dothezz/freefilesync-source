@@ -26,6 +26,7 @@ using namespace zen;
 
 IMPLEMENT_APP(Application);
 
+
 bool Application::OnInit()
 {
     //do not call wxApp::OnInit() to avoid using default commandline parser
@@ -45,7 +46,12 @@ void Application::OnStartApplication(wxIdleEvent& event)
     //if appname is not set, the default is the executable's name!
     SetAppName(wxT("FreeFileSync")); //use a different app name, to have "GetUserDataDir()" return the same directory as for FreeFileSync
 
-#ifdef FFS_LINUX
+#ifdef FFS_WIN
+    //Quote: "Best practice is that all applications call the process-wide SetErrorMode function with a parameter of
+    //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
+    ::SetErrorMode(SEM_FAILCRITICALERRORS);
+
+#elif defined FFS_LINUX
     ::gtk_rc_parse((zen::utf8CvrtTo<std::string>(zen::getResourceDir()) + "styles.rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
@@ -98,7 +104,7 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(zen::getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(toWx(zen::getConfigDir()) + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
         wxSafeShowMessage(_("An exception occurred!") + L" - RTS", wxString::FromAscii(e.what()));

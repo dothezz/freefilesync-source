@@ -8,7 +8,6 @@
 #define REALTIMESYNCAPP_H
 
 #include <wx/app.h>
-#include <memory>
 
 class Application : public wxApp
 {
@@ -19,12 +18,7 @@ public:
 
 private:
     void OnStartApplication(wxIdleEvent& event);
-
-    virtual wxLayoutDirection GetLayoutDirection() const //disable RTL languages for now...
-    {
-        return wxLayout_LeftToRight;
-    }
-
+    //virtual wxLayoutDirection GetLayoutDirection() const { return wxLayout_LeftToRight; }
 };
 
 #endif // REALTIMESYNCAPP_H

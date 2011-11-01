@@ -17,7 +17,6 @@
 #include <wx/display.h>
 #include <wx/app.h>
 #include <wx/dcmemory.h>
-#include <boost/bind.hpp>
 #include "../lib/folder_history_box.h"
 #include "../lib/custom_grid.h"
 #include <wx+/button.h>
@@ -54,6 +53,8 @@
 #include <wx+/shell_execute.h>
 #include "../lib/localization.h"
 #include <wx+/image_tools.h>
+#include <wx+/no_flicker.h>
+
 
 using namespace zen;
 using namespace std::rel_ops;
@@ -263,39 +264,45 @@ private:
 class MenuItemUpdater
 {
 public:
-    MenuItemUpdater(wxMenu* menuToUpdate) : menuToUpdate_(menuToUpdate) {}
+    MenuItemUpdater(wxMenu& menuToUpdate) : menuToUpdate_(menuToUpdate) {}
 
     ~MenuItemUpdater()
     {
-        //start updating menu icons
-        const wxMenuItemList& allItems = menuToUpdate_->GetMenuItems();
+        wxMenuItemList allItems = menuToUpdate_.GetMenuItems();
 
         //retrieve menu item positions: unfortunately wxMenu doesn't offer a better way
-        MenuItemMap::iterator j;
         int index = 0;
-        for (wxMenuItemList::const_iterator i = allItems.begin(); i != allItems.end(); ++i, ++index)
-            if ((j = menuItems.find(*i)) != menuItems.end())
-                j->second = index;
+        for (auto itemIter = allItems.begin(); itemIter != allItems.end(); ++itemIter, ++index) //wxMenuItemList + std::for_each screws up with VS2010!
+        {
+            wxMenuItem* item = *itemIter;
 
-        //finally update items
-        for (MenuItemMap::const_iterator i = menuItems.begin(); i != menuItems.end(); ++i)
-            if (i->second >= 0)
+            auto iter = menuItems.find(item);
+            if (iter != menuItems.end())
             {
-                menuToUpdate_->Remove(i->first);            //actual workaround
-                menuToUpdate_->Insert(i->second, i->first); //
+                /*
+                    menuToUpdate_.Remove(item);        ->this simple sequence crashes on Kubuntu x64, wxWidgets 2.9.2
+                    menuToUpdate_.Insert(index, item);
+                    */
+
+                const wxBitmap& bmp = iter->second;
+
+                wxMenuItem* newItem = new wxMenuItem(&menuToUpdate_, item->GetId(), item->GetItemLabel());
+                newItem->SetBitmap(bmp);
+
+                menuToUpdate_.Destroy(item);          //actual workaround
+                menuToUpdate_.Insert(index, newItem); //
             }
+        }
     }
 
-    void addForUpdate(wxMenuItem* newEntry, const wxBitmap& newBitmap)
+    void markForUpdate(wxMenuItem* newEntry, const wxBitmap& bmp)
     {
-        newEntry->SetBitmap(newBitmap);
-        menuItems.insert(std::pair<wxMenuItem*, int>(newEntry, -1));
+        menuItems.insert(std::make_pair(newEntry, bmp));
     }
 
 private:
-    typedef std::map<wxMenuItem*, int> MenuItemMap;
-    wxMenu* menuToUpdate_;
-    MenuItemMap menuItems;
+    wxMenu& menuToUpdate_;
+    std::map<wxMenuItem*, wxBitmap> menuItems;
 };
 
 
@@ -377,9 +384,9 @@ MainDialog::MainDialog(const std::vector<wxString>& cfgFileNames, xmlAccess::Xml
         catch (const xmlAccess::FfsXmlError& error)
         {
             if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-                wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
+                wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
             else
-                wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+                wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
         }
     const bool startComparisonImmediately = !cfgFileNames.empty() && loadCfgSuccess;
 
@@ -525,13 +532,23 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     setConfig(guiCfg);
 
     //set icons for this dialog
-    m_buttonCompare->setBitmapFront(GlobalResources::getImage(wxT("compare")));
+    m_buttonCompare     ->setBitmapFront(GlobalResources::getImage(wxT("compare")));
     m_bpButtonSyncConfig->SetBitmapLabel(GlobalResources::getImage(wxT("syncConfig")));
-    m_bpButtonCmpConfig->SetBitmapLabel(GlobalResources::getImage(wxT("cmpConfig")));
-    m_bpButtonSave->SetBitmapLabel(GlobalResources::getImage(wxT("save")));
-    m_bpButtonLoad->SetBitmapLabel(GlobalResources::getImage(wxT("load")));
-    m_bpButtonAddPair->SetBitmapLabel(GlobalResources::getImage(wxT("addFolderPair")));
-    m_bitmap15->SetBitmap(GlobalResources::getImage(wxT("statusEdge")));
+    m_bpButtonCmpConfig ->SetBitmapLabel(GlobalResources::getImage(wxT("cmpConfig")));
+    m_bpButtonSave      ->SetBitmapLabel(GlobalResources::getImage(wxT("save")));
+    m_bpButtonLoad      ->SetBitmapLabel(GlobalResources::getImage(wxT("load")));
+    m_bpButtonAddPair   ->SetBitmapLabel(GlobalResources::getImage(wxT("addFolderPair")));
+    m_bitmap15          ->SetBitmap(GlobalResources::getImage(wxT("statusEdge")));
+    {
+        IconBuffer tmp(IconBuffer::SIZE_SMALL);
+        const wxBitmap bmpFile = tmp.genericFileIcon();
+        const wxBitmap bmpDir  = tmp.genericDirIcon();
+
+        m_bitmapSmallDirectoryLeft ->SetBitmap(bmpDir);
+        m_bitmapSmallFileLeft      ->SetBitmap(bmpFile);
+        m_bitmapSmallDirectoryRight->SetBitmap(bmpDir);
+        m_bitmapSmallFileRight     ->SetBitmap(bmpFile);
+    }
 
     m_bitmapCreate->SetBitmap(GlobalResources::getImage(wxT("create")));
     m_bitmapUpdate->SetBitmap(GlobalResources::getImage(wxT("update")));
@@ -541,19 +558,19 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     m_panelTopButtons->Layout(); //wxButtonWithImage size might have changed
 
     //menu icons: workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
-    MenuItemUpdater updateMenuFile(m_menuFile);
-    updateMenuFile.addForUpdate(m_menuItem10,   GlobalResources::getImage(wxT("compareSmall")));
-    updateMenuFile.addForUpdate(m_menuItem11,   GlobalResources::getImage(wxT("syncSmall")));
-    updateMenuFile.addForUpdate(m_menuItemNew,  GlobalResources::getImage(wxT("newSmall")));
-    updateMenuFile.addForUpdate(m_menuItemSave, GlobalResources::getImage(wxT("saveSmall")));
-    updateMenuFile.addForUpdate(m_menuItemLoad, GlobalResources::getImage(wxT("loadSmall")));
+    MenuItemUpdater updateMenuFile(*m_menuFile);
+    updateMenuFile.markForUpdate(m_menuItem10,   GlobalResources::getImage(wxT("compareSmall")));
+    updateMenuFile.markForUpdate(m_menuItem11,   GlobalResources::getImage(wxT("syncSmall")));
+    updateMenuFile.markForUpdate(m_menuItemNew,  GlobalResources::getImage(wxT("newSmall")));
+    updateMenuFile.markForUpdate(m_menuItemSave, GlobalResources::getImage(wxT("saveSmall")));
+    updateMenuFile.markForUpdate(m_menuItemLoad, GlobalResources::getImage(wxT("loadSmall")));
 
-    MenuItemUpdater updateMenuAdv(m_menuAdvanced);
-    updateMenuAdv.addForUpdate(m_menuItemGlobSett, GlobalResources::getImage(wxT("settingsSmall")));
-    updateMenuAdv.addForUpdate(m_menuItem7, GlobalResources::getImage(wxT("batchSmall")));
+    MenuItemUpdater updateMenuAdv(*m_menuAdvanced);
+    updateMenuAdv.markForUpdate(m_menuItemGlobSett, GlobalResources::getImage(wxT("settingsSmall")));
+    updateMenuAdv.markForUpdate(m_menuItem7, GlobalResources::getImage(wxT("batchSmall")));
 
-    MenuItemUpdater updateMenuHelp(m_menuHelp);
-    updateMenuHelp.addForUpdate(m_menuItemAbout, GlobalResources::getImage(wxT("aboutSmall")));
+    MenuItemUpdater updateMenuHelp(*m_menuHelp);
+    updateMenuHelp.markForUpdate(m_menuItemAbout, GlobalResources::getImage(wxT("aboutSmall")));
 
 #ifdef FFS_LINUX
     if (!zen::isPortableVersion()) //disable update check for Linux installer-based version -> handled by .deb
@@ -885,7 +902,7 @@ void MainDialog::copySelectionToClipboard(CustomGrid& selectedGrid)
         {
             for (int k = 0; k < colCount; ++k)
             {
-                clipboardString += cvrtString<zxString>(selectedGrid.GetCellValue(static_cast<int>(*i), k));
+                clipboardString += copyStringTo<zxString>(selectedGrid.GetCellValue(static_cast<int>(*i), k));
                 if (k != colCount - 1)
                     clipboardString += wxT('\t');
             }
@@ -898,7 +915,7 @@ void MainDialog::copySelectionToClipboard(CustomGrid& selectedGrid)
             {
                 // these data objects are held by the clipboard,
                 // so do not delete them in the app.
-                wxTheClipboard->SetData(new wxTextDataObject(cvrtString<wxString>(clipboardString)));
+                wxTheClipboard->SetData(new wxTextDataObject(copyStringTo<wxString>(clipboardString)));
                 wxTheClipboard->Close();
             }
     }
@@ -1192,9 +1209,13 @@ void MainDialog::clearStatusBar()
         stackObjects.pop();
 
     m_staticTextStatusMiddle->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //reset color
-    m_staticTextStatusLeft  ->SetLabel(wxEmptyString);
+    bSizerStatusLeftDirectories->Show(false);
+    bSizerStatusLeftFiles      ->Show(false);
+
     m_staticTextStatusMiddle->SetLabel(wxEmptyString);
-    m_staticTextStatusRight ->SetLabel(wxEmptyString);
+
+    bSizerStatusRightDirectories->Show(false);
+    bSizerStatusRightFiles      ->Show(false);
 }
 
 
@@ -1838,7 +1859,7 @@ void MainDialog::OnContextRim(wxGridEvent& event)
             const Zstring extension = afterLast(filename, Zchar('.'));
 
             //add context menu item
-            wxMenuItem* menuItemExclExt = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Exclude via filter:")) + " " + "*." + extension);
+            wxMenuItem* menuItemExclExt = new wxMenuItem(contextMenu.get(), wxID_ANY, _("Exclude via filter:") + L" *." + extension);
             menuItemExclExt->SetBitmap(GlobalResources::getImage(wxT("filterSmall")));
             contextMenu->Append(menuItemExclExt);
 
@@ -1855,9 +1876,9 @@ void MainDialog::OnContextRim(wxGridEvent& event)
     //CONTEXT_EXCLUDE_OBJ
     wxMenuItem* menuItemExclObj = NULL;
     if (exFilterCandidateObj.size() == 1)
-        menuItemExclObj = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Exclude via filter:")) + " " + afterLast(exFilterCandidateObj.begin()->first, FILE_NAME_SEPARATOR));
+        menuItemExclObj = new wxMenuItem(contextMenu.get(), wxID_ANY, _("Exclude via filter:") + L" " + afterLast(exFilterCandidateObj.begin()->first, FILE_NAME_SEPARATOR));
     else if (exFilterCandidateObj.size() > 1)
-        menuItemExclObj = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Exclude via filter:")) + " " + _("<multiple selection>"));
+        menuItemExclObj = new wxMenuItem(contextMenu.get(), wxID_ANY, _("Exclude via filter:") + L" " + _("<multiple selection>"));
 
     if (menuItemExclObj != NULL)
     {
@@ -1887,7 +1908,7 @@ void MainDialog::OnContextRim(wxGridEvent& event)
         {
             //some trick to translate default external apps on the fly: 1. "open in explorer" 2. "start directly"
             //wxString description = wxGetTranslation(i->first);
-            wxString description = zen::implementation::translate(i->first.c_str());
+            wxString description = zen::implementation::translate(std::wstring(i->first.c_str()));
             if (description.empty())
                 description = wxT(" "); //wxWidgets doesn't like empty items
 
@@ -2495,9 +2516,9 @@ void MainDialog::OnDirSelected(wxFileDirPickerEvent& event)
 
 wxString getFormattedHistoryElement(const wxString& filename)
 {
-    wxString output = afterLast(filename, FILE_NAME_SEPARATOR);
+    wxString output = afterLast(filename, utf8CvrtTo<wxString>(FILE_NAME_SEPARATOR));
     if (endsWith(output, ".ffs_gui"))
-        output = beforeLast(output, '.');
+        output = beforeLast(output, L'.');
     return output;
 }
 
@@ -2613,7 +2634,7 @@ bool MainDialog::trySaveConfig() //return true if saved successfully
         }
         catch (const xmlAccess::FfsXmlError& error)
         {
-            wxMessageBox(error.msg().c_str(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR);
         }
     }
 
@@ -2625,7 +2646,7 @@ void MainDialog::OnLoadConfig(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this,
                             wxEmptyString,
-                            beforeLast(activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : wxString(), FILE_NAME_SEPARATOR), //set default dir: empty string if "activeConfigFiles" is empty or has no path separator
+                            beforeLast(activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : wxString(), utf8CvrtTo<wxString>(FILE_NAME_SEPARATOR)), //set default dir: empty string if "activeConfigFiles" is empty or has no path separator
                             wxEmptyString,
                             wxString(_("FreeFileSync configuration")) + wxT(" (*.ffs_gui;*.ffs_batch)|*.ffs_gui;*.ffs_batch"),
                             wxFD_OPEN | wxFD_MULTIPLE);
@@ -2743,11 +2764,11 @@ void MainDialog::loadConfiguration(const std::vector<wxString>& filenames)
         if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
         {
             setLastUsedConfig(filenames, xmlAccess::XmlGuiConfig()); //simulate changed config on parsing errors
-            wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
+            wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
         }
         else
         {
-            wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
             return;
         }
     }
@@ -2972,7 +2993,7 @@ xmlAccess::XmlGuiConfig MainDialog::getConfig() const
 
 const wxString& MainDialog::lastRunConfigName()
 {
-    static wxString instance = zen::getConfigDir() + wxT("LastRun.ffs_gui");
+    static wxString instance = toWx(zen::getConfigDir()) + wxT("LastRun.ffs_gui");
     return instance;
 }
 
@@ -3269,12 +3290,12 @@ void MainDialog::updateFilterButtons()
     //global filter: test for Null-filter
     if (isNullFilter(currentCfg.mainCfg.globalFilter))
     {
-        setBitmapLabel(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOff")));
+        setImage(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOff")));
         m_bpButtonFilter->SetToolTip(_("No filter selected"));
     }
     else
     {
-        setBitmapLabel(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOn")));
+        setImage(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOn")));
         m_bpButtonFilter->SetToolTip(_("Filter is active"));
     }
 
@@ -3320,6 +3341,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         zen::CompareProcess compProc(globalSettings->fileTimeTolerance,
                                      globalSettings->optDialogs,
                                      true, //allow pw prompt
+                                     globalSettings->runWithBackgroundPriority,
                                      statusHandler);
 
         //technical representation of comparison data
@@ -3329,7 +3351,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         gridDataView->setData(newCompareData); //newCompareData is invalidated after this call
 
         //play (optional) sound notification after sync has completed (GUI and batch mode)
-        const wxString soundFile = zen::getResourceDir() + wxT("Compare_Complete.wav");
+        const wxString soundFile = toWx(zen::getResourceDir()) + wxT("Compare_Complete.wav");
         if (fileExists(toZ(soundFile)))
             wxSound::Play(soundFile, wxSOUND_ASYNC);
     }
@@ -3541,6 +3563,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                                   globalSettings->copyLockedFiles,
                                   globalSettings->copyFilePermissions,
                                   globalSettings->transactionalFileCopy,
+                                  globalSettings->runWithBackgroundPriority,
                                   statusHandler);
 
         const std::vector<zen::FolderPairSyncCfg> syncProcessCfg = zen::extractSyncCfg(getConfig().mainCfg);
@@ -3552,7 +3575,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         syncProc.startSynchronizationProcess(syncProcessCfg, dataToSync);
 
         //play (optional) sound notification after sync has completed (GUI and batch mode)
-        const wxString soundFile = zen::getResourceDir() + wxT("Sync_Complete.wav");
+        const wxString soundFile = toWx(zen::getResourceDir()) + wxT("Sync_Complete.wav");
         if (fileExists(toZ(soundFile)))
             wxSound::Play(soundFile, wxSOUND_ASYNC);
     }
@@ -3904,59 +3927,30 @@ void MainDialog::updateGridViewData()
     //clear status information
     clearStatusBar();
 
-    wxString statusLeftNew;
-    wxString statusMiddleNew;
-    wxString statusRightNew;
-
     //#################################################
     //format numbers to text:
 
     //show status information on "root" level.
-    if (foldersOnLeftView)
-    {
-        statusLeftNew += replaceCpy(_P("1 directory", "%x directories", foldersOnLeftView), L"%x", zen::toStringSep(foldersOnLeftView), false);
+    bSizerStatusLeftDirectories->Show(foldersOnLeftView > 0);
+    bSizerStatusLeftFiles      ->Show(filesOnLeftView   > 0);
 
-        if (filesOnLeftView)
-            statusLeftNew += wxT(" - ");
-    }
-
-    if (filesOnLeftView)
-    {
-        statusLeftNew += replaceCpy(_P("1 file", "%x files", filesOnLeftView), L"%x", zen::toStringSep(filesOnLeftView), false);
-        statusLeftNew += wxT(" - ");
-        statusLeftNew += zen::filesizeToShortString(filesizeLeftView);
-    }
+    setText(*m_staticTextStatusLeftDirs,  replaceCpy(_P("1 directory", "%x directories", foldersOnLeftView), L"%x", zen::toStringSep(foldersOnLeftView), false));
+    setText(*m_staticTextStatusLeftFiles, replaceCpy(_P("1 file", "%x files", filesOnLeftView), L"%x", zen::toStringSep(filesOnLeftView), false));
+    setText(*m_staticTextStatusLeftBytes, zen::filesizeToShortString(filesizeLeftView));
 
     {
-        wxString tmp = _P("%x of 1 row in view", "%x of %y rows in view", gridDataView->rowsTotal());
-        replace(tmp, L"%x", toStringSep(gridDataView->rowsOnView()), false);
-        replace(tmp, L"%y", toStringSep(gridDataView->rowsTotal()), false);
-        statusMiddleNew = tmp;
+        wxString statusMiddleNew = _P("%x of 1 row in view", "%x of %y rows in view", gridDataView->rowsTotal());
+        replace(statusMiddleNew, L"%x", toStringSep(gridDataView->rowsOnView()), false);
+        replace(statusMiddleNew, L"%y", toStringSep(gridDataView->rowsTotal()), false);
+        setText(*m_staticTextStatusMiddle, statusMiddleNew);
     }
 
-    if (foldersOnRightView)
-    {
-        statusRightNew += replaceCpy(_P("1 directory", "%x directories", foldersOnRightView), L"%x", zen::toStringSep(foldersOnRightView), false);
+    bSizerStatusRightDirectories->Show(foldersOnRightView > 0);
+    bSizerStatusRightFiles      ->Show(filesOnRightView   > 0);
 
-        if (filesOnRightView)
-            statusRightNew += wxT(" - ");
-    }
-
-    if (filesOnRightView)
-    {
-        statusRightNew += replaceCpy(_P("1 file", "%x files", filesOnRightView), L"%x", zen::toStringSep(filesOnRightView), false);
-        statusRightNew += wxT(" - ");
-        statusRightNew += zen::filesizeToShortString(filesizeRightView);
-    }
-
-
-    //avoid screen flicker
-    if (m_staticTextStatusLeft->GetLabel() != statusLeftNew)
-        m_staticTextStatusLeft->SetLabel(statusLeftNew);
-    if (m_staticTextStatusMiddle->GetLabel() != statusMiddleNew)
-        m_staticTextStatusMiddle->SetLabel(statusMiddleNew);
-    if (m_staticTextStatusRight->GetLabel() != statusRightNew)
-        m_staticTextStatusRight->SetLabel(statusRightNew);
+    setText(*m_staticTextStatusRightDirs,  replaceCpy(_P("1 directory", "%x directories", foldersOnRightView), L"%x", zen::toStringSep(foldersOnRightView), false));
+    setText(*m_staticTextStatusRightFiles, replaceCpy(_P("1 file", "%x files", filesOnRightView), L"%x", zen::toStringSep(filesOnRightView), false));
+    setText(*m_staticTextStatusRightBytes, zen::filesizeToShortString(filesizeRightView));
 
     m_panelStatusBar->Layout();
 }
@@ -4078,7 +4072,7 @@ void MainDialog::updateGuiForFolderPair()
         m_bpButtonAltSyncCfg ->Hide();
         m_bpButtonLocalFilter->Hide();
 
-        setBitmapLabel(*m_bpButtonSwapSides, GlobalResources::getImage(wxT("swap")));
+        setImage(*m_bpButtonSwapSides, GlobalResources::getImage(wxT("swap")));
     }
     else
     {
@@ -4086,7 +4080,7 @@ void MainDialog::updateGuiForFolderPair()
         m_bpButtonAltSyncCfg ->Show();
         m_bpButtonLocalFilter->Show();
 
-        setBitmapLabel(*m_bpButtonSwapSides, GlobalResources::getImage(wxT("swapSlim")));
+        setImage(*m_bpButtonSwapSides, GlobalResources::getImage(wxT("swapSlim")));
     }
     m_panelTopMiddle->Layout();
 
@@ -4246,9 +4240,9 @@ inline
 void addCellValue(zxString& exportString, const wxString& cellVal)
 {
     if (cellVal.find(wxT(';')) != wxString::npos)
-        exportString += wxT('\"') + cvrtString<zxString>(cellVal) + wxT('\"');
+        exportString += wxT('\"') + copyStringTo<zxString>(cellVal) + wxT('\"');
     else
-        exportString += cvrtString<zxString>(cellVal);
+        exportString += copyStringTo<zxString>(cellVal);
 }
 }
 
@@ -4271,28 +4265,28 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
         zxString exportString; //perf: wxString doesn't model exponential growth and so is out
 
         //write legend
-        exportString +=  cvrtString<zxString>(_("Legend")) + wxT('\n');
+        exportString +=  copyStringTo<zxString>(_("Legend")) + wxT('\n');
         if (syncPreview->previewIsEnabled())
         {
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_CREATE_NEW_LEFT))     + wxT("\";") + cvrtString<zxString>(getSymbol(SO_CREATE_NEW_LEFT))     + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_CREATE_NEW_RIGHT))    + wxT("\";") + cvrtString<zxString>(getSymbol(SO_CREATE_NEW_RIGHT))    + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_DELETE_LEFT))         + wxT("\";") + cvrtString<zxString>(getSymbol(SO_DELETE_LEFT))         + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_DELETE_RIGHT))        + wxT("\";") + cvrtString<zxString>(getSymbol(SO_DELETE_RIGHT))        + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_OVERWRITE_LEFT))      + wxT("\";") + cvrtString<zxString>(getSymbol(SO_OVERWRITE_LEFT))      + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_OVERWRITE_RIGHT))     + wxT("\";") + cvrtString<zxString>(getSymbol(SO_OVERWRITE_RIGHT))     + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_DO_NOTHING))          + wxT("\";") + cvrtString<zxString>(getSymbol(SO_DO_NOTHING))          + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_EQUAL))               + wxT("\";") + cvrtString<zxString>(getSymbol(SO_EQUAL))               + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_UNRESOLVED_CONFLICT)) + wxT("\";") + cvrtString<zxString>(getSymbol(SO_UNRESOLVED_CONFLICT)) + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_CREATE_NEW_LEFT))     + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_CREATE_NEW_LEFT))     + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_CREATE_NEW_RIGHT))    + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_CREATE_NEW_RIGHT))    + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_DELETE_LEFT))         + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_DELETE_LEFT))         + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_DELETE_RIGHT))        + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_DELETE_RIGHT))        + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_OVERWRITE_LEFT))      + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_OVERWRITE_LEFT))      + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_OVERWRITE_RIGHT))     + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_OVERWRITE_RIGHT))     + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_DO_NOTHING))          + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_DO_NOTHING))          + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_EQUAL))               + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_EQUAL))               + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_UNRESOLVED_CONFLICT)) + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_UNRESOLVED_CONFLICT)) + wxT('\n');
         }
         else
         {
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_LEFT_SIDE_ONLY))  + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_LEFT_SIDE_ONLY))  + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_RIGHT_SIDE_ONLY)) + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_RIGHT_SIDE_ONLY)) + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_LEFT_NEWER))      + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_LEFT_NEWER))      + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_RIGHT_NEWER))     + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_RIGHT_NEWER))     + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_DIFFERENT))       + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_DIFFERENT))       + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_EQUAL))           + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_EQUAL))           + wxT('\n');
-            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_CONFLICT))        + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_CONFLICT))        + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_LEFT_SIDE_ONLY))  + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_LEFT_SIDE_ONLY))  + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_RIGHT_SIDE_ONLY)) + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_RIGHT_SIDE_ONLY)) + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_LEFT_NEWER))      + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_LEFT_NEWER))      + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_RIGHT_NEWER))     + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_RIGHT_NEWER))     + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_DIFFERENT))       + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_DIFFERENT))       + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_EQUAL))           + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_EQUAL))           + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_CONFLICT))        + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_CONFLICT))        + wxT('\n');
         }
         exportString += wxT('\n');
 

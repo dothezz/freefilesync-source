@@ -7,76 +7,93 @@
 #ifndef DEBUG_LOG_HEADER_017324601673246392184621895740256342
 #define DEBUG_LOG_HEADER_017324601673246392184621895740256342
 
-#include "zstring.h"
+#include <string>
+#include <cstdio>
+#include <memory>
+#include "deprecate.h"
+#include "string_tools.h"
+#include "time.h"
 
-cleanup this mess + remove any wxWidgets dependency!
 
 //small macro for writing debug information into a logfile
-#define WRITE_DEBUG_LOG(x) globalLogFile().write(getCodeLocation(__TFILE__, __LINE__) + x);
+#define WRITE_LOG(x) globalLogFile().write(__FILE__, __LINE__, x);
+
 //speed alternative: wxLogDebug(wxT("text")) + DebugView
+
+
+namespace zen
+{
+#ifdef FFS_WIN
+const char ZEN_FILE_NAME_SEPARATOR = '\\';
+
+#elif defined FFS_LINUX
+const char ZEN_FILE_NAME_SEPARATOR = '/';
+
+#else
+#error specify platform!
+#endif
 
 
 class DebugLog
 {
 public:
-    wxDEPRECATED(DebugLog(const wxString& filePrefix = wxString()))
-    prefix(filePrefix),
-           lineCount(0)
+    class LogError {};
+
+    ZEN_DEPRECATE
+    DebugLog(const std::string& filePrefix = std::string()) :
+        filename(filePrefix + "DEBUG_" + formatTime<std::string>("%Y-%m-%d %H%M%S") + ".log"),
+        rowCount(0),
+        handle(std::fopen(filename.c_str(), "w")) //Windows: non binary mode: automatically convert "\n" to "\r\n"; Linux: binary is default!
     {
-        logfileName = assembleFileName();
-        logFile.Open(logfileName, wxFile::write);
+        if (!handle)
+            throw LogError();
     }
 
-    void write(const std::string& logText)
+    ~DebugLog() { std::fclose(handle); }
+
+    void write(const std::string& sourceFile,
+               int sourceRow,
+               const std::string& message)
     {
-        todo;
+        const std::string logEntry = "[" + formatTime<std::string>(FORMAT_TIME()) + "] " + afterLast(sourceFile, ZEN_FILE_NAME_SEPARATOR) +
+                                     ", line " + toString<std::string>(sourceRow) + ": " + message + "\n";
+
+        const size_t bytesWritten = ::fwrite(logEntry.c_str(), 1, logEntry.size(), handle);
+        if (std::ferror(handle) != 0 || bytesWritten != logEntry.size())
+            throw LogError();
+
+        if (std::fflush(handle) != 0)
+            throw LogError();
+
+        ++rowCount;
     }
 
-    void write(const wxString& logText)
-    {
-        ++lineCount;
-        if (lineCount % 50000 == 0) //prevent logfile from becoming too big
-        {
-            logFile.Close();
-            wxRemoveFile(logfileName);
+    size_t getRows() const { return rowCount; }
 
-            logfileName = assembleFileName();
-            logFile.Open(logfileName, wxFile::write);
-        }
-
-ersetze wxDateTime::Now() durch eigene lib:
-        z.b. iso_time.h
-
-        logFile.Write(wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] "));
-        logFile.Write(logText + LINE_BREAK);
-    }
+    std::string getFileName() const { return filename; }
 
 private:
-    wxString assembleFileName()
-    {
-        wxString tmp = wxDateTime::Now().FormatISOTime();
-        tmp.Replace(wxT(":"), wxEmptyString);
-        return prefix + wxString(wxT("DEBUG_")) + wxDateTime::Now().FormatISODate() + wxChar('_') + tmp + wxT(".log");
-    }
-
-    wxString logfileName;
-    wxString prefix;
-    int lineCount;
-    wxFile logFile; //logFile.close(); <- not needed
+    std::string filename;
+    size_t rowCount;
+    FILE* handle;
 };
+
 
 inline
 DebugLog& globalLogFile()
 {
-    static DebugLog inst; //external linkage despite header definition!
-    return inst;
-}
+    static std::unique_ptr<DebugLog> inst(new DebugLog); //external linkage despite header definition!
 
-inline
-wxString getCodeLocation(const wxString& file, int line)
-{
-    return wxString(file).AfterLast(FILE_NAME_SEPARATOR) + wxT(", LINE ") + toString<wxString>(line) + wxT(" | ");
-}
+    if (inst->getRows() > 50000) //prevent logfile from becoming too big
+    {
+        const std::string oldName = inst->getFileName();
+        inst.reset();
+        std::remove(oldName.c_str()); //unchecked deletion!
+        inst.reset(new DebugLog);
+    }
 
+    return *inst;
+}
+}
 
 #endif //DEBUG_LOG_HEADER_017324601673246392184621895740256342

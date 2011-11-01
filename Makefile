@@ -4,17 +4,17 @@ BINDIR      = $(DESTDIR)$(prefix)/bin
 SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 
-COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -I./zenXml
+COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h"
 COMMON_LINK_FLAGS  = -O3 -pthread
 
 #default build
 FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
-LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes` -lboost_thread
+LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes` -lboost_thread
 
 #static build used for precompiled release
 ifeq ($(BUILD),release)
 FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
-LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
+LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
 endif
 #####################################################################################################
 

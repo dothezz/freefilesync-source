@@ -12,7 +12,6 @@
 #include <boost/thread/once.hpp>
 
 #ifdef FFS_WIN
-#include <zen/win.h> //includes "windows.h"
 #include <zen/dll.h>
 #include "Thumbnail/thumbnail.h"
 #include <zen/win_ver.h>
@@ -26,22 +25,24 @@
 using namespace zen;
 
 
+namespace
+{
 const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to buffer
 
 
-int zen::IconBuffer::cvrtSize(IconSize sz) //get size in pixel
+int cvrtSize(IconBuffer::IconSize sz) //get size in pixel
 {
     switch (sz)
     {
-        case SIZE_SMALL:
+        case IconBuffer::SIZE_SMALL:
 #ifdef FFS_WIN
             return 16;
 #elif defined FFS_LINUX
             return 24;
 #endif
-        case SIZE_MEDIUM:
+        case IconBuffer::SIZE_MEDIUM:
             return 48;
-        case SIZE_LARGE:
+        case IconBuffer::SIZE_LARGE:
             return 128;
     }
     assert(false);
@@ -69,9 +70,11 @@ public:
 #endif
                                                      ) {}
 
-    IconHolder& operator=(const IconHolder& other)
+    IconHolder(IconHolder&& other) : handle_(other.handle_) { other.handle_ = NULL; }
+
+    IconHolder& operator=(IconHolder other) //unifying assignment: no need for r-value reference optimization!
     {
-        IconHolder(other).swap(*this);
+        other.swap(*this);
         return *this;
     }
 
@@ -112,7 +115,7 @@ public:
                                 &bmpInfo) != 0)   // __out  LPVOID lpvObject
                 {
                     const int maxExtent = std::max(bmpInfo.bmWidth, bmpInfo.bmHeight);
-                    if (maxExtent > expectedSize)
+                    if (0 < expectedSize && expectedSize < maxExtent)
                     {
                         bmpInfo.bmWidth  = bmpInfo.bmWidth  * expectedSize / maxExtent; //scale those Vista jumbo 256x256 icons down!
                         bmpInfo.bmHeight = bmpInfo.bmHeight * expectedSize / maxExtent; //
@@ -142,8 +145,6 @@ public:
 
 
 #ifdef FFS_WIN
-namespace
-{
 Zstring getFileExtension(const Zstring& filename)
 {
     const Zstring shortName = afterLast(filename, Zchar('\\')); //warning: using windows file name separator!
@@ -175,17 +176,11 @@ bool isCheapExtension(const Zstring& extension)
 }
 
 
-bool wereVistaOrLater = false;
-boost::once_flag initVistaFlagOnce = BOOST_ONCE_INIT;
+const bool wereVistaOrLater = vistaOrLater(); //thread-safety: init at startup
 
 
 int getShilIconType(IconBuffer::IconSize sz)
 {
-    boost::call_once(initVistaFlagOnce, []()
-    {
-        wereVistaOrLater = vistaOrLater();
-    });
-
     switch (sz)
     {
         case IconBuffer::SIZE_SMALL:
@@ -234,8 +229,8 @@ IconHolder getAssociatedIconByExt(const Zstring& extension, IconBuffer::IconSize
 
 DllFun<thumb::GetThumbnailFct> getThumbnailIcon;
 boost::once_flag initThumbnailOnce = BOOST_ONCE_INIT;
-}
 #endif
+}
 //################################################################################################################################################
 
 
@@ -265,6 +260,51 @@ IconHolder getThumbnail(const Zstring& filename, int requestedSize) //return 0 o
 }
 
 
+const char* mimeFileIcons[] =
+{
+    "application-x-zerosize", //Kubuntu: /usr/share/icons/oxygen/48x48/mimetypes
+    "empty",            //
+    "gtk-file",         //Ubuntu: /usr/share/icons/Humanity/mimes/48
+    "gnome-fs-regular", //
+};
+
+
+IconHolder getGenericFileIcon(IconBuffer::IconSize sz)
+{
+#ifdef FFS_WIN
+    return getIconByAttribute(L"dummy", FILE_ATTRIBUTE_NORMAL, sz);
+
+#elif defined FFS_LINUX
+    const int requestedSize = cvrtSize(sz);
+    try
+    {
+        Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
+        if (iconTheme)
+        {
+            Glib::RefPtr<Gdk::Pixbuf> iconPixbuf;
+            std::find_if(mimeFileIcons, mimeFileIcons + sizeof(mimeFileIcons) / sizeof(mimeFileIcons[0]),
+                         [&](const char* mimeName) -> bool
+            {
+                try
+                {
+                    iconPixbuf = iconTheme->load_icon(mimeName, requestedSize, Gtk::ICON_LOOKUP_USE_BUILTIN);
+                }
+                catch (const Glib::Error&) { return false; }
+
+                return iconPixbuf;
+            }
+                        );
+            if (iconPixbuf)
+                return IconHolder(iconPixbuf->gobj_copy()); // transfer ownership!!
+        }
+    }
+    catch (const Glib::Error&) {}
+
+    return IconHolder();
+#endif
+}
+
+
 IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
 {
     //1. try to load thumbnails
@@ -275,7 +315,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
         case IconBuffer::SIZE_MEDIUM:
         case IconBuffer::SIZE_LARGE:
         {
-            IconHolder ico = getThumbnail(filename, IconBuffer::cvrtSize(sz));
+            IconHolder ico = getThumbnail(filename, cvrtSize(sz));
             if (ico)
                 return ico;
             //else: fallback to non-thumbnail icon
@@ -314,7 +354,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     return getIconByIndex ? static_cast<HICON>(getIconByIndex(fileInfo.iIcon, getShilIconType(sz))) : NULL;
 
 #elif defined FFS_LINUX
-    const int requestedSize = IconBuffer::cvrtSize(sz);
+    const int requestedSize = cvrtSize(sz);
     //call Gtk::Main::init_gtkmm_internals() on application startup!!
     try
     {
@@ -341,27 +381,23 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     }
     catch (const Glib::Error&) {}
 
-    try //fallback: icon lookup may fail because some icons are currently not present on system
-    {
-        Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
-        if (iconTheme)
-        {
-            Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconTheme->load_icon("misc", requestedSize, Gtk::ICON_LOOKUP_USE_BUILTIN);
-            if (!iconPixbuf)
-                iconPixbuf = iconTheme->load_icon("text-x-generic", requestedSize, Gtk::ICON_LOOKUP_USE_BUILTIN);
-            if (iconPixbuf)
-                return IconHolder(iconPixbuf->gobj_copy()); //copy and pass icon ownership (may be 0)
-        }
-    }
-    catch (const Glib::Error&) {}
-
-    //fallback fallback
-    return IconHolder();
+    //fallback: icon lookup may fail because some icons are currently not present on system
+    return ::getGenericFileIcon(sz);
 #endif
 }
 
+/* Dependency Diagram:
 
-IconHolder getDirectoryIcon(IconBuffer::IconSize sz)
+getGenericFileIcon()
+  /|\
+   |
+getAssociatedIcon()
+  /|\
+   |
+getGenericDirectoryIcon()
+*/
+
+IconHolder getGenericDirectoryIcon(IconBuffer::IconSize sz)
 {
 #ifdef FFS_WIN
     return getIconByAttribute(L"dummy", //Windows 7 doesn't like this parameter to be an empty string!
@@ -372,29 +408,6 @@ IconHolder getDirectoryIcon(IconBuffer::IconSize sz)
 }
 
 
-IconHolder getFileIcon(IconBuffer::IconSize sz)
-{
-#ifdef FFS_WIN
-    return getIconByAttribute(L"dummy", FILE_ATTRIBUTE_NORMAL, sz);
-#elif defined FFS_LINUX
-    const int requestedSize = IconBuffer::cvrtSize(sz);
-    try
-    {
-        Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
-        if (iconTheme)
-        {
-            Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconTheme->load_icon("misc", requestedSize, Gtk::ICON_LOOKUP_USE_BUILTIN);
-            if (!iconPixbuf)
-                iconPixbuf = iconTheme->load_icon("text-x-generic", requestedSize, Gtk::ICON_LOOKUP_USE_BUILTIN);
-            if (iconPixbuf)
-                return IconHolder(iconPixbuf->gobj_copy()); // transfer ownership!!
-        }
-    }
-    catch (const Glib::Error&) {}
-
-    return IconHolder();
-#endif
-}
 //################################################################################################################################################
 
 
@@ -546,8 +559,8 @@ struct IconBuffer::Pimpl
 IconBuffer::IconBuffer(IconSize sz) :
     pimpl(new Pimpl),
     icoSize(sz),
-    genDirIcon(::getDirectoryIcon(sz).toWxIcon(cvrtSize(icoSize))),
-    genFileIcon(::getFileIcon(sz).toWxIcon(cvrtSize(icoSize)))
+    genDirIcon(::getGenericDirectoryIcon(sz).toWxIcon(cvrtSize(icoSize))),
+    genFileIcon(::getGenericFileIcon(sz).toWxIcon(cvrtSize(icoSize)))
 {
     pimpl->worker = boost::thread(WorkerThread(pimpl->workload, pimpl->buffer, sz));
 }
@@ -558,6 +571,12 @@ IconBuffer::~IconBuffer()
     setWorkload(std::vector<Zstring>()); //make sure interruption point is always reached!
     pimpl->worker.interrupt();
     pimpl->worker.join();
+}
+
+
+int IconBuffer::getSize() const
+{
+    return cvrtSize(icoSize);
 }
 
 

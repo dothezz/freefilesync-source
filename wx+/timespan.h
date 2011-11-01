@@ -19,9 +19,9 @@
 namespace zen
 {
 inline
-wxEventType getEventType() //external linkage
+wxEventType getEventType()
 {
-    static wxEventType evt = wxNewEventType();
+    static wxEventType evt = wxNewEventType(); //external linkage!
     return evt;
 }
 const wxEventType wxEVT_TIMESPAN_CHANGE = getEventType();

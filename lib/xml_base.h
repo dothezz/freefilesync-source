@@ -24,9 +24,9 @@ public:
         FATAL
     };
 
-    FfsXmlError(const std::wstring& message, Severity sev = FATAL) : errorMessage(message), m_severity(sev) {}
+    explicit FfsXmlError(const std::wstring& message, Severity sev = FATAL) : errorMessage(message), m_severity(sev) {}
 
-    const std::wstring& msg() const { return errorMessage; }
+    const std::wstring& toString() const { return errorMessage; }
     Severity getSeverity() const { return m_severity; }
 private:
     const std::wstring errorMessage;

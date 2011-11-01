@@ -47,7 +47,6 @@ std::string zen::getFileID(const Zstring& filename)
         return extractFileID(fileInfo);
 #endif
 
-    assert(false);
     return std::string();
 }
 

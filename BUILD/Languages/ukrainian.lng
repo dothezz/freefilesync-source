@@ -912,25 +912,20 @@ Exclude: \stuff\temp\*
 <target>Копіювати заблоковані файли</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Копіювати спільних чи заблокованих файлів
-з використанням послуги Тіньового Копіювання Тому
-(потрібні права Адміністратора)
+Копіювати спільних чи заблокованих файлів з використанням послуги Тіньового Копіювання Тому (потрібні права Адміністратора)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Копіювати права доступу до файлу</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Передача прав доступу файлу/каталогу
-(потрібні права Адміністратора)
+Передача прав доступу файлу/каталогу (потрібні права Адміністратора)
 </target>
 
 <source>Hidden dialogs:</source>

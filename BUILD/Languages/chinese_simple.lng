@@ -901,24 +901,20 @@ Exclude: \stuff\temp\*
 <target>复制被锁定的文件</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-通过卷影复制服务复制共享或锁定的文件
-(需要管理员权限)
+通过卷影复制服务复制共享或锁定的文件(需要管理员权限)
 </target>
 
 <source>Copy file access permissions</source>
 <target>复制文件存取权限</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-转移文件和目录的权限
-(需要管理员权限)
+转移文件和目录的权限(需要管理员权限)
 </target>
 
 <source>Hidden dialogs:</source>

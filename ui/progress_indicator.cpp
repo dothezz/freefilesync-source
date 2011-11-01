@@ -22,6 +22,9 @@
 #include "taskbar.h"
 #include <wx+/image_tools.h>
 #include <wx+/graph.h>
+#include <wx+/no_flicker.h>
+#include <zen/basic_math.h>
+
 
 using namespace zen;
 
@@ -33,25 +36,6 @@ const int GAUGE_FULL_RANGE = 50000;
 //window size used for statistics in milliseconds
 const int windowSizeRemainingTime = 60000; //some usecases have dropouts of 40 seconds -> 60 sec. window size handles them well
 const int windowSizeBytesPerSec   =  5000; //
-
-
-void setNewText(const wxString& newText, wxTextCtrl& control, bool& updateLayout)
-{
-    if (control.GetValue().length() != newText.length())
-        updateLayout = true; //avoid screen flicker: apply only when necessary
-
-    if (control.GetValue() != newText)
-        control.ChangeValue(newText);
-}
-
-void setNewText(const wxString& newText, wxStaticText& control, bool& updateLayout)
-{
-    if (control.GetLabel().length() != newText.length())
-        updateLayout = true; //avoid screen flicker
-
-    if (control.GetLabel() != newText)
-        control.SetLabel(newText);
-}
 }
 
 
@@ -309,7 +293,7 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
                 break;
         }
 
-        bool updateLayout = false; //avoid screen flicker by calling layout() only if necessary
+        bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
 
         //remove linebreaks from currentStatusText
         wxString statusTextFmt = currentStatusText;
@@ -320,18 +304,18 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
             m_textCtrlStatus->ChangeValue(statusTextFmt);
 
         //nr of scanned objects
-        setNewText(toStringSep(scannedObjects), *m_staticTextScanned, updateLayout);
+        setText(*m_staticTextScanned, toStringSep(scannedObjects), &layoutChanged);
 
         //progress indicator for "compare file content"
         m_gauge2->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
 
         //remaining files left for file comparison
         const wxString filesToCompareTmp = toStringSep(totalObjects - currentObjects);
-        setNewText(filesToCompareTmp, *m_staticTextFilesRemaining, updateLayout);
+        setText(*m_staticTextFilesRemaining, filesToCompareTmp, &layoutChanged);
 
         //remaining bytes left for file comparison
         const wxString remainingBytesTmp = zen::filesizeToShortString(to<zen::UInt64>(totalData - currentData));
-        setNewText(remainingBytesTmp, *m_staticTextDataRemaining, updateLayout);
+        setText(*m_staticTextDataRemaining, remainingBytesTmp, &layoutChanged);
 
         if (statistics.get())
         {
@@ -342,23 +326,23 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
                 statistics->addMeasurement(currentObjects, to<double>(currentData));
 
                 //current speed
-                setNewText(statistics->getBytesPerSecond(), *m_staticTextSpeed, updateLayout);
+                setText(*m_staticTextSpeed, statistics->getBytesPerSecond(), &layoutChanged);
 
                 if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
                 {
                     lastStatCallRemTime = timeElapsed.Time();
 
                     //remaining time
-                    setNewText(statistics->getRemainingTime(), *m_staticTextRemTime, updateLayout);
+                    setText(*m_staticTextRemTime, statistics->getRemainingTime(), &layoutChanged);
                 }
             }
         }
 
         //time elapsed
-        setNewText(wxTimeSpan::Milliseconds(timeElapsed.Time()).Format(), *m_staticTextTimeElapsed, updateLayout);
+        setText(*m_staticTextTimeElapsed, wxTimeSpan::Milliseconds(timeElapsed.Time()).Format(), &layoutChanged);
 
         //do the ui update
-        if (updateLayout)
+        if (layoutChanged)
             bSizer42->Layout();
     }
     updateUiNow();
@@ -398,14 +382,14 @@ public:
         const int warningCount = log_.typeCount(TYPE_WARNING);
         const int infoCount    = log_.typeCount(TYPE_INFO);
 
-        m_bpButtonErrors->init(buttonPressed ("error"), _("Error") + wxString::Format(wxT(" (%d)"), errorCount),
-                               buttonReleased("error"), _("Error") + wxString::Format(wxT(" (%d)"), errorCount));
+        m_bpButtonErrors->init(buttonPressed ("error"), wxString(_("Error")) + wxString::Format(wxT(" (%d)"), errorCount),
+                               buttonReleased("error"), wxString(_("Error")) + wxString::Format(wxT(" (%d)"), errorCount));
 
-        m_bpButtonWarnings->init(buttonPressed ("warning"), _("Warning") + wxString::Format(wxT(" (%d)"), warningCount),
-                                 buttonReleased("warning"), _("Warning") + wxString::Format(wxT(" (%d)"), warningCount));
+        m_bpButtonWarnings->init(buttonPressed ("warning"), wxString(_("Warning")) + wxString::Format(wxT(" (%d)"), warningCount),
+                                 buttonReleased("warning"), wxString(_("Warning")) + wxString::Format(wxT(" (%d)"), warningCount));
 
-        m_bpButtonInfo->init(buttonPressed ("info"), _("Info") + wxString::Format(wxT(" (%d)"), infoCount),
-                             buttonReleased("info"), _("Info") + wxString::Format(wxT(" (%d)"), infoCount));
+        m_bpButtonInfo->init(buttonPressed ("info"), wxString(_("Info")) + wxString::Format(wxT(" (%d)"), infoCount),
+                             buttonReleased("info"), wxString(_("Info")) + wxString::Format(wxT(" (%d)"), infoCount));
 
         m_bpButtonErrors  ->setActive(true);
         m_bpButtonWarnings->setActive(true);
@@ -459,18 +443,18 @@ private:
         if (!messages.empty())
             for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
             {
-                newLogText += cvrtString<zxString>(*i);
-                newLogText += wxT("\n\n");
+                newLogText += copyStringTo<zxString>(*i);
+                newLogText += wxT("\n");
             }
         else //if no messages match selected view filter, show final status message at least
         {
             const std::vector<wxString>& allMessages = log_.getFormattedMessages();
             if (!allMessages.empty())
-                newLogText = cvrtString<zxString>(allMessages.back());
+                newLogText = copyStringTo<zxString>(allMessages.back());
         }
 
         wxWindowUpdateLocker dummy(m_textCtrlInfo);
-        m_textCtrlInfo->ChangeValue(cvrtString<wxString>(newLogText));
+        m_textCtrlInfo->ChangeValue(copyStringTo<wxString>(newLogText));
         m_textCtrlInfo->ShowPosition(m_textCtrlInfo->GetLastPosition());
     }
 
@@ -517,6 +501,10 @@ private:
 };
 
 
+inline
+double bestFit(double val, double low, double high) { return val < (high + low) / 2 ? low : high; }
+
+
 struct LabelFormatterBytes : public LabelFormatter
 {
     virtual double getOptimalBlockSize(double bytesProposed) const
@@ -527,16 +515,15 @@ struct LabelFormatterBytes : public LabelFormatter
 
         const double k = std::floor(std::log(bytesProposed) / std::log(2.0));
         const double e = std::pow(2.0, k);
+        if (numeric::isNull(e))
+            return 0;
         const double a = bytesProposed / e; //bytesProposed = a * 2^k with a in (1, 2)
-        return (a < 1.5 ? 1 : 2) * e;
+
+        return bestFit(a, 1, 2) * e;
     }
 
     virtual wxString formatText(double value, double optimalBlockSize) const { return filesizeToShortString(UInt64(value)); };
 };
-
-
-inline
-double bestFit(double val, double low, double high) { return val < (high + low) / 2 ? low : high; }
 
 
 struct LabelFormatterTimeElapsed : public LabelFormatter
@@ -765,9 +752,6 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     m_animationControl1->SetAnimation(GlobalResources::instance().animationSync);
     m_animationControl1->Play();
 
-    m_staticTextSpeed->SetLabel(wxT("-"));
-    m_staticTextRemTime->SetLabel(wxT("-"));
-
     //initialize gauge
     m_gauge1->SetRange(GAUGE_FULL_RANGE);
     m_gauge1->SetValue(0);
@@ -791,6 +775,9 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
 
     //hide "processed" statistics until end of process
     bSizerFinalStat->Show(false);
+    m_buttonOK->Show(false);
+    m_staticTextItemsProc->Show(false);
+    bSizerItemsProc->Show(false);
 
     SetIcon(GlobalResources::instance().programIcon); //set application icon
 
@@ -953,7 +940,7 @@ enum Zorder
     ZORDER_INDEFINITE,
 };
 
-Zorder validateZorder(const wxWindow& top, const wxWindow& bottom)
+Zorder evaluateZorder(const wxWindow& top, const wxWindow& bottom)
 {
     HWND hTop    = static_cast<HWND>(top.GetHWND());
     HWND hBottom = static_cast<HWND>(bottom.GetHWND());
@@ -987,16 +974,16 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
     switch (currentStatus)
     {
         case SyncStatus::SCANNING:
-            showProgressExternally(toStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
+            showProgressExternally(wxString() + toStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
             break;
         case SyncStatus::COMPARING_CONTENT:
-            showProgressExternally(percentageToShortString(fraction) + wxT(" - ") + _("Comparing content...") + postFix, fraction);
+            showProgressExternally(wxString() + percentageToShortString(fraction) + wxT(" - ") + _("Comparing content...") + postFix, fraction);
             break;
         case SyncStatus::SYNCHRONIZING:
-            showProgressExternally(percentageToShortString(fraction) + wxT(" - ") + _("Synchronizing...") + postFix, fraction);
+            showProgressExternally(wxString() + percentageToShortString(fraction) + wxT(" - ") + _("Synchronizing...") + postFix, fraction);
             break;
         case SyncStatus::PAUSE:
-            showProgressExternally(percentageToShortString(fraction) + wxT(" - ") + _("Paused") + postFix, fraction);
+            showProgressExternally(wxString() + percentageToShortString(fraction) + wxT(" - ") + _("Paused") + postFix, fraction);
             break;
         case SyncStatus::ABORTED:
             showProgressExternally(_("Aborted") + postFix, fraction);
@@ -1011,7 +998,7 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
     {
         //wxWindowUpdateLocker dummy(this); -> not needed
 
-        bool updateLayout = false; //avoid screen flicker by calling layout() only if necessary
+        bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
 
         //progress indicator
         switch (currentStatus)
@@ -1040,11 +1027,11 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
 
         //remaining objects
         const wxString remainingObjTmp = toStringSep(totalObjects - currentObjects);
-        setNewText(remainingObjTmp, *m_staticTextRemainingObj, updateLayout);
+        setText(*m_staticTextRemainingObj, remainingObjTmp, &layoutChanged);
 
         //remaining bytes left for copy
         const wxString remainingBytesTmp = zen::filesizeToShortString(to<zen::UInt64>(totalData - currentData));
-        setNewText(remainingBytesTmp, *m_staticTextDataRemaining, updateLayout);
+        setText(*m_staticTextDataRemaining, remainingBytesTmp, &layoutChanged);
 
         //statistics
         if (statistics.get())
@@ -1056,14 +1043,14 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
                 statistics->addMeasurement(currentObjects, to<double>(currentData));
 
                 //current speed
-                setNewText(statistics->getBytesPerSecond(), *m_staticTextSpeed, updateLayout);
+                setText(*m_staticTextSpeed, statistics->getBytesPerSecond(), &layoutChanged);
 
                 if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
                 {
                     lastStatCallRemTime = timeElapsed.Time();
 
                     //remaining time
-                    setNewText(statistics->getRemainingTime(), *m_staticTextRemTime, updateLayout);
+                    setText(*m_staticTextRemTime, statistics->getRemainingTime(), &layoutChanged);
                 }
             }
         }
@@ -1071,23 +1058,28 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
         m_panelGraph->Refresh();
 
         //time elapsed
-        const int timeElapSec = timeElapsed.Time() / 1000;
-        setNewText(timeElapSec < 3600 ?
-                   wxTimeSpan::Seconds(timeElapSec).Format(   L"%M:%S") :
-                   wxTimeSpan::Seconds(timeElapSec).Format(L"%H:%M:%S"), *m_staticTextTimeElapsed, updateLayout);
+        const long timeElapSec = timeElapsed.Time() / 1000;
+        setText(*m_staticTextTimeElapsed,
+                timeElapSec < 3600 ?
+                wxTimeSpan::Seconds(timeElapSec).Format(   L"%M:%S") :
+                wxTimeSpan::Seconds(timeElapSec).Format(L"%H:%M:%S"), &layoutChanged);
 
         //do the ui update
-        if (updateLayout)
+        if (layoutChanged)
         {
-            bSizerProgressStat->Layout();
-            bSizerProgressMain->Layout();
+            //            Layout();
+            //            bSizerItemsRem->Layout();
+            //            bSizer171->Layout();
+            bSizerProgressStat->Layout(); //
+            m_panelProgress->Layout();    //both needed
+            m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
         }
     }
 
 #ifdef FFS_WIN
     //workaround Windows 7 bug messing up z-order after temporary application hangs: https://sourceforge.net/tracker/index.php?func=detail&aid=3376523&group_id=234430&atid=1093080
     if (mainDialog)
-        if (validateZorder(*this, *mainDialog) == ZORDER_WRONG)
+        if (evaluateZorder(*this, *mainDialog) == ZORDER_WRONG)
         {
             HWND hProgress = static_cast<HWND>(GetHWND());
 
@@ -1104,17 +1096,11 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
         //support for pause button
         if (processPaused)
         {
-            if (statistics.get()) statistics->pauseTimer();
-            graphDataBytes->pauseTimer();
-
             while (processPaused && currentProcessIsRunning())
             {
                 wxMilliSleep(UI_UPDATE_INTERVAL);
                 updateUiNow();
             }
-
-            if (statistics.get()) statistics->resumeTimer();
-            graphDataBytes->resumeTimer();
         }
 
         /*
@@ -1174,7 +1160,8 @@ void SyncStatus::SyncStatusImpl::setCurrentStatus(SyncStatus::SyncStatusID id)
     }
 
     currentStatus = id;
-    Layout();
+
+    m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
 }
 
 
@@ -1207,35 +1194,42 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     //hide current operation status
     bSizerCurrentOperation->Show(false);
 
-    //hide progress statistics
-    bSizerProgressMain->Show(false);
-
     //show and prepare final statistics
     bSizerFinalStat->Show(true);
-    m_staticTextProcessedObj->SetLabel(toStringSep(currentObjects));
+
+    if (totalObjects == currentObjects &&  //if everything was processed successfully
+        totalData    == currentData)
+    {
+        m_staticTextItemsRem->Show(false);
+        bSizerItemsRem      ->Show(false);
+    }
+
+    m_staticTextItemsProc->Show(true);
+    bSizerItemsProc      ->Show(true);
+    m_staticTextProcessedObj ->SetLabel(toStringSep(currentObjects));
     m_staticTextDataProcessed->SetLabel(zen::filesizeToShortString(to<zen::UInt64>(currentData)));
 
-    m_staticTextTimeTotal->SetLabel(m_staticTextTimeElapsed->GetLabel());
-
-    //    if (totalObjects == currentObjects &&  ->if everything was processed successfully
-    //        totalData    == currentData)
-    //        ;
+    m_staticTextRemTimeDescr->Show(false);
+    m_staticTextRemTime     ->Show(false);
 
     updateStatusDialogNow(false); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
 
+    //changed meaning: overall speed: -> make sure to call after "updateStatusDialogNow"
+    const long timeElapMs = timeElapsed.Time();
+    m_staticTextSpeed->SetLabel(timeElapMs <= 0 ? L"-" : zen::filesizeToShortString(zen::to<UInt64>(currentData * 1000 / timeElapMs)) + _("/sec"));
+
     //fill result listbox:
-    //1. log file
+    //1. re-arrange graph into results listbook
+    bSizerTop->Detach(m_panelProgress);
+    m_panelProgress->Reparent(m_listbookResult);
+    m_listbookResult->AddPage(m_panelProgress, _("Statistics"), true);
+
+    //2. log file
     LogControl* logControl = new LogControl(m_listbookResult, log);
-    m_listbookResult->AddPage(logControl, _("Logging"), true);
+    m_listbookResult->AddPage(logControl, _("Logging"), false);
     //bSizerHoldStretch->Insert(0, logControl, 1, wxEXPAND);
 
-    //2. re-arrange graph into results listbook
-    bSizerProgressMain->Detach(m_panelGraph);
-    m_panelGraph->Reparent(m_listbookResult);
-    m_listbookResult->AddPage(m_panelGraph, _("Statistics"), false);
-
-    //fitHeight(*this);
-    Layout();
+    m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
 
     //Raise(); -> don't! user may be watching a movie in the meantime ;)
 }
@@ -1281,6 +1275,8 @@ void SyncStatus::SyncStatusImpl::OnPause(wxCommandEvent& event)
 
         //pause timers
         timeElapsed.Pause();
+        if (statistics.get()) statistics->pauseTimer();
+        graphDataBytes->pauseTimer();
     }
     else
     {
@@ -1291,6 +1287,8 @@ void SyncStatus::SyncStatusImpl::OnPause(wxCommandEvent& event)
 
         //resume timers
         timeElapsed.Resume();
+        if (statistics.get()) statistics->resumeTimer();
+        graphDataBytes->resumeTimer();
     }
 }
 

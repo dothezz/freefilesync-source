@@ -1,6 +1,6 @@
 #include "resolve_path.h"
 #include <wx/utils.h>
-#include <wx/datetime.h>
+#include <zen/time.h>
 #include <wx+/string_conv.h>
 #include <map>
 #include <set>
@@ -178,14 +178,13 @@ bool replaceMacro(wxString& macro) //macro without %-characters, return true if 
     //there are equally named environment variables %TIME%, %DATE% existing, so replace these first!
     if (macro.CmpNoCase(wxT("time")) == 0)
     {
-        macro = wxDateTime::Now().FormatISOTime();
-        macro.Replace(wxT(":"), wxT(""));
+        macro = formatTime<wxString>(L"%H%M%S");
         return true;
     }
 
     if (macro.CmpNoCase(wxT("date")) == 0)
     {
-        macro = wxDateTime::Now().FormatISODate();
+        macro = formatTime<wxString>(FORMAT_ISO_DATE);
         return true;
     }
 
@@ -193,7 +192,8 @@ bool replaceMacro(wxString& macro) //macro without %-characters, return true if 
     {
         if (macro.CmpNoCase(phrase) != 0)
             return false;
-        macro = wxDateTime::Now().Format(format);
+
+        macro = formatTime<wxString>(format);
         return true;
     };
 
@@ -272,10 +272,10 @@ public:
 
     virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
     virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
-    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName)
+    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
     {
         devices_.insert(std::make_pair(shortName, fullName));
-        return Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs
+        return nullptr; //DON'T traverse into subdirs
     }
     virtual HandleError onError(const std::wstring& errorText) { return TRAV_ERROR_IGNORE; }
 
@@ -379,18 +379,20 @@ void expandVolumeName(Zstring& text)  // [volname]:\folder       [volname]\folde
 {
     //this would be a nice job for a C++11 regex...
 
-    size_t posStart = text.find(Zstr("["));
-    if (posStart != Zstring::npos)
+
+    //we only expect the [.*] pattern at the beginning => do not touch dir names like "C:\somedir\[stuff]"
+    trim(text, true, false);
+
+    if (startsWith(text, Zstr("[")))
     {
-        size_t posEnd = text.find(Zstr("]"), posStart);
+        size_t posEnd = text.find(Zstr("]"));
         if (posEnd != Zstring::npos)
         {
-            Zstring before  = Zstring(text.c_str(), posStart);
-            Zstring volname = Zstring(text.c_str() + posStart + 1, posEnd - posStart - 1);
+            Zstring volname = Zstring(text.c_str() + 1, posEnd - 1);
             Zstring after   = Zstring(text.c_str() + posEnd + 1);
 
-            if (startsWith(after, ':'))
-                after = afterFirst(after, ':');
+            if (startsWith(after, Zstr(':')))
+                after = afterFirst(after, Zstr(':'));
             if (startsWith(after, FILE_NAME_SEPARATOR))
                 after = afterFirst(after, FILE_NAME_SEPARATOR);
 
@@ -403,7 +405,7 @@ void expandVolumeName(Zstring& text)  // [volname]:\folder       [volname]\folde
                     if (!endsWith(volPath, FILE_NAME_SEPARATOR))
                         volPath += FILE_NAME_SEPARATOR;
 
-                    text = before + volPath + after;
+                    text = volPath + after;
                     //successfully replaced pattern
                     return;
                 }

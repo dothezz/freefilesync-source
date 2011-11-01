@@ -7,7 +7,7 @@
 #ifndef FILE_HANDLING_H_INCLUDED
 #define FILE_HANDLING_H_INCLUDED
 
-#include "string.h"
+#include "zstring.h"
 #include "file_error.h"
 #include "int64.h"
 

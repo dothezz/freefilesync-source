@@ -14,7 +14,7 @@
 #include <cstdio>
 #endif
 
-#include "string.h"
+#include "zstring.h"
 #include "file_error.h"
 
 namespace zen

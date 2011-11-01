@@ -27,7 +27,7 @@ private:
     GlobalResources(const GlobalResources&); //=delete
     GlobalResources& operator=(const GlobalResources&); //=delete
 
-const wxBitmap& getImageInt(const wxString& name) const;
+    const wxBitmap& getImageInt(const wxString& name) const;
 
     std::map<wxString, wxBitmap> bitmaps;
 };

@@ -23,12 +23,12 @@ struct Type2Type {};
 
 //########## Control Structures ########################
 template <bool flag, class T, class U>
-struct Select
+struct SelectIf
 {
     typedef T Result;
 };
 template <class T, class U>
-struct Select<false, T, U>
+struct SelectIf<false, T, U>
 {
     typedef U Result;
 };
@@ -43,6 +43,15 @@ template <class T>
 struct IsSameType<T, T>
 {
     enum { result = true };
+};
+
+//------------------------------------------------------
+template <bool, class T = void>
+struct EnableIf {};
+template <class T>
+struct EnableIf<true, T>
+{
+    typedef T Result;
 };
 
 //########## Type Cleanup ##############################

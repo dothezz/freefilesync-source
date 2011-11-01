@@ -61,9 +61,11 @@
 			<Add option="-Winit-self" />
 			<Add option="-Wswitch-enum" />
 			<Add option="-Wmain" />
+			<Add option="-std=c++0x" />
 			<Add option="-Wall" />
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
+			<Add option="-fno-omit-frame-pointer" />
 			<Add option="-std=gnu++0x" />
 			<Add option='-include &quot;../zen/warn_static.h&quot;' />
 			<Add option="-D__GNUWIN32__" />

@@ -112,7 +112,7 @@ struct NumberN : public Expr<int>
 };
 
 
-typedef Zbase<char> Wstring;
+typedef zen::Zbase<char> Wstring;
 
 
 class PluralForm

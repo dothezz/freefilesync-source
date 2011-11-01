@@ -15,7 +15,7 @@
 using namespace zen;
 
 
-void zen::setBitmapLabel(wxBitmapButton& button, const wxBitmap& bmp)
+void zen::setImage(wxBitmapButton& button, const wxBitmap& bmp)
 {
     if (!isEqual(button.GetBitmapLabel(), bmp))
         button.SetBitmapLabel(bmp);

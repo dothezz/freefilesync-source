@@ -63,7 +63,7 @@ public:
         Read(formatDescr, sizeof(formatDescr)); //throw FileError
 
         if (!std::equal(FILE_FORMAT_DESCR, FILE_FORMAT_DESCR + sizeof(FILE_FORMAT_DESCR), formatDescr))
-            throw FileError(_("Incompatible synchronization database format:") + " \n" + "\"" + filename + "\"");
+            throw FileError(_("Incompatible synchronization database format:") + L" \n" + L"\"" + filename + L"\"");
     }
 
 private:
@@ -89,7 +89,7 @@ private:
 class ReadDirInfo : public zen::ReadInputStream
 {
 public:
-    ReadDirInfo(wxInputStream& stream, const wxString& errorObjName, DirInformation& dirInfo) : ReadInputStream(stream, errorObjName)
+    ReadDirInfo(wxInputStream& stream, const Zstring& errorObjName, DirInformation& dirInfo) : ReadInputStream(stream, errorObjName)
     {
         //|-------------------------------------------------------------------------------------
         //| ensure 32/64 bit portability: use fixed size data types only e.g. boost::uint32_t |
@@ -163,7 +163,7 @@ typedef std::map<UniqueId, MemoryStreamPtr> StreamMapping;    //list of streams 
 class ReadFileStream : public zen::ReadInputStream
 {
 public:
-    ReadFileStream(wxInputStream& stream, const wxString& filename, StreamMapping& streamList) : ReadInputStream(stream, filename)
+    ReadFileStream(wxInputStream& stream, const Zstring& filename, StreamMapping& streamList) : ReadInputStream(stream, filename)
     {
         //|-------------------------------------------------------------------------------------
         //| ensure 32/64 bit portability: used fixed size data types only e.g. boost::uint32_t |
@@ -172,7 +172,7 @@ public:
         std::int32_t version = readNumberC<std::int32_t>();
 
         if (version != FILE_FORMAT_VER) //read file format version
-            throw FileError(_("Incompatible synchronization database format:") + " \n" + "\"" + filename.c_str() + "\"");
+            throw FileError(_("Incompatible synchronization database format:") + L" \n" + L"\"" + filename + L"\"");
 
         streamList.clear();
 
@@ -195,9 +195,9 @@ namespace
 StreamMapping loadStreams(const Zstring& filename) //throw FileError
 {
     if (!zen::fileExists(filename))
-        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + " \n\n" +
-                                           _("One of the FreeFileSync database files is not yet existing:") + " \n" +
-                                           "\"" + filename + "\"");
+        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n\n" +
+                                           _("One of the FreeFileSync database files is not yet existing:") + L" \n" +
+                                           L"\"" + filename + L"\"");
 
     try
     {
@@ -207,12 +207,12 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError
         wxZlibInputStream input(uncompressed, wxZLIB_ZLIB);
 
         StreamMapping streamList;
-        ReadFileStream(input, toWx(filename), streamList);
+        ReadFileStream(input, filename, streamList);
         return streamList;
     }
     catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
     {
-        throw FileError(_("Error reading from synchronization database:") + " (bad_alloc)");
+        throw FileError(_("Error reading from synchronization database:") + L" (bad_alloc)");
     }
 }
 
@@ -224,12 +224,12 @@ DirInfoPtr parseStream(const std::vector<char>& stream, const Zstring& fileName)
         //read streams into DirInfo
         auto dirInfo = std::make_shared<DirInformation>();
         wxMemoryInputStream buffer(&stream[0], stream.size()); //convert char-array to inputstream: no copying, ownership not transferred
-        ReadDirInfo(buffer, toWx(fileName), *dirInfo); //throw FileError
+        ReadDirInfo(buffer, fileName, *dirInfo); //throw FileError
         return dirInfo;
     }
     catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
     {
-        throw FileError(_("Error reading from synchronization database:") + " (bad_alloc)");
+        throw FileError(_("Error reading from synchronization database:") + L" (bad_alloc)");
     }
 }
 }
@@ -262,10 +262,10 @@ std::pair<DirInfoPtr, DirInfoPtr> zen::loadFromDisk(const BaseDirMapping& baseMa
         streamRight == streamListRight.end() ||
         !streamLeft ->second.get() ||
         !streamRight->second.get())
-        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + " \n\n" +
-                                           _("Database files do not share a common synchronization session:") + " \n" +
-                                           "\"" + fileNameLeft  + "\"\n" +
-                                           "\"" + fileNameRight + "\"");
+        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n\n" +
+                                           _("Database files do not share a common synchronization session:") + L" \n" +
+                                           L"\"" + fileNameLeft  + L"\"\n" +
+                                           L"\"" + fileNameRight + L"\"");
     //read streams into DirInfo
     DirInfoPtr dirInfoLeft  = parseStream(*streamLeft ->second, fileNameLeft);  //throw FileError
     DirInfoPtr dirInfoRight = parseStream(*streamRight->second, fileNameRight); //throw FileError
@@ -279,7 +279,7 @@ template <SelectedSide side>
 class SaveDirInfo : public WriteOutputStream
 {
 public:
-    SaveDirInfo(const BaseDirMapping& baseMapping, const DirContainer* oldDirInfo, const wxString& errorObjName, wxOutputStream& stream) : WriteOutputStream(errorObjName, stream)
+    SaveDirInfo(const BaseDirMapping& baseMapping, const DirContainer* oldDirInfo, const Zstring& errorObjName, wxOutputStream& stream) : WriteOutputStream(errorObjName, stream)
     {
         //save filter settings
         baseMapping.getFilter()->saveFilter(getStream());
@@ -422,7 +422,7 @@ private:
 class WriteFileStream : public WriteOutputStream
 {
 public:
-    WriteFileStream(const StreamMapping& streamList, const wxString& filename, wxOutputStream& stream) : WriteOutputStream(filename, stream)
+    WriteFileStream(const StreamMapping& streamList, const Zstring& filename, wxOutputStream& stream) : WriteOutputStream(filename, stream)
     {
         //save file format version
         writeNumberC<std::int32_t>(FILE_FORMAT_VER);
@@ -456,7 +456,7 @@ void saveFile(const StreamMapping& streamList, const Zstring& filename) //throw 
         6                       1,77 MB -  613 ms
         9 (maximal compression) 1,74 MB - 3330 ms */
 
-        WriteFileStream(streamList, toWx(filename), output);
+        WriteFileStream(streamList, filename, output);
     }
     //(try to) hide database file
 #ifdef FFS_WIN
@@ -542,7 +542,7 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw FileError
     {
         wxMemoryOutputStream buffer;
         const DirContainer* oldDir = oldDirInfoLeft.get() ? &oldDirInfoLeft->baseDirContainer : NULL;
-        SaveDirInfo<LEFT_SIDE>(baseMapping, oldDir, toWx(dbNameLeft), buffer);
+        SaveDirInfo<LEFT_SIDE>(baseMapping, oldDir, dbNameLeft, buffer);
         newStreamLeft->resize(buffer.GetSize());               //convert output stream to char-array
         buffer.CopyTo(&(*newStreamLeft)[0], buffer.GetSize()); //
     }
@@ -551,7 +551,7 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw FileError
     {
         wxMemoryOutputStream buffer;
         const DirContainer* oldDir = oldDirInfoRight.get() ? &oldDirInfoRight->baseDirContainer : NULL;
-        SaveDirInfo<RIGHT_SIDE>(baseMapping, oldDir, toWx(dbNameRight), buffer);
+        SaveDirInfo<RIGHT_SIDE>(baseMapping, oldDir, dbNameRight, buffer);
         newStreamRight->resize(buffer.GetSize());               //convert output stream to char-array
         buffer.CopyTo(&(*newStreamRight)[0], buffer.GetSize()); //
     }

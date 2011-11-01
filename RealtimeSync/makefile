@@ -2,7 +2,7 @@ APPNAME = RealtimeSync
 prefix = /usr
 BINDIR = $(DESTDIR)$(prefix)/bin
 
-COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I.. -I../zenXml
+COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I.. -include "../zen/i18n.h"
 COMMON_LINK_FLAGS  = -O3 -pthread
 
 #default build

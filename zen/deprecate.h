@@ -4,18 +4,17 @@
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 
-#ifndef STRINGCONV_H_INCLUDED
-#define STRINGCONV_H_INCLUDED
+#ifndef DEPRECATE_HEADER_2348970348
+#define DEPRECATE_HEADER_2348970348
 
-#include <zen/utf8.h>
-#include <wx/string.h>
-#include <zen/zstring.h>
+#ifdef __GNUC__
+#define ZEN_DEPRECATE __attribute__ ((deprecated))
 
-namespace zen
-{
-//conversion between Zstring and wxString
-inline wxString toWx(const Zstring&  str) { return utf8CvrtTo<wxString>(str); }
-inline Zstring   toZ(const wxString& str) { return utf8CvrtTo<Zstring>(str); }
-}
+#elif defined _MSC_VER
+#define ZEN_DEPRECATE __declspec(deprecated)
 
-#endif // STRINGCONV_H_INCLUDED
+#else
+#error add your platform here!
+#endif
+
+#endif //DEPRECATE_HEADER_2348970348

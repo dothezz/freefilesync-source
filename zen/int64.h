@@ -52,7 +52,7 @@ public:
     Int64(const Int64&   rhs) : value(rhs.value) {}
     Int64(int            rhs) : value(rhs) {} //ambiguity intentional for types other than these
     Int64(long           rhs) : value(rhs) {}
-    Int64(Select<IsSameType<std::int64_t, long>::result, DummyClass, std::int64_t>::Result rhs) :
+    Int64(SelectIf<IsSameType<std::int64_t, long>::result, DummyClass, std::int64_t>::Result rhs) :
         value(rhs) {} //-> std::int64_t equals long int on x64 Linux! Still we want implicit behavior for all other systems!
 
     //unsafe explicit but checked conversion from arbitrary integer type
@@ -111,13 +111,13 @@ private:
     std::int64_t value;
 };
 
-inline Int64 operator+(const Int64& lhs, const Int64& rhs) { return Int64(lhs) += rhs; }
-inline Int64 operator-(const Int64& lhs, const Int64& rhs) { return Int64(lhs) -= rhs; }
-inline Int64 operator*(const Int64& lhs, const Int64& rhs) { return Int64(lhs) *= rhs; }
-inline Int64 operator/(const Int64& lhs, const Int64& rhs) { return Int64(lhs) /= rhs; }
-inline Int64 operator%(const Int64& lhs, const Int64& rhs) { return Int64(lhs) %= rhs; }
-inline Int64 operator&(const Int64& lhs, const Int64& rhs) { return Int64(lhs) &= rhs; }
-inline Int64 operator|(const Int64& lhs, const Int64& rhs) { return Int64(lhs) |= rhs; }
+inline Int64 operator+ (const Int64& lhs, const Int64& rhs) { return Int64(lhs) += rhs; }
+inline Int64 operator- (const Int64& lhs, const Int64& rhs) { return Int64(lhs) -= rhs; }
+inline Int64 operator* (const Int64& lhs, const Int64& rhs) { return Int64(lhs) *= rhs; }
+inline Int64 operator/ (const Int64& lhs, const Int64& rhs) { return Int64(lhs) /= rhs; }
+inline Int64 operator% (const Int64& lhs, const Int64& rhs) { return Int64(lhs) %= rhs; }
+inline Int64 operator& (const Int64& lhs, const Int64& rhs) { return Int64(lhs) &= rhs; }
+inline Int64 operator| (const Int64& lhs, const Int64& rhs) { return Int64(lhs) |= rhs; }
 inline Int64 operator<<(const Int64& lhs, int rhs) { return Int64(lhs) <<= rhs; }
 inline Int64 operator>>(const Int64& lhs, int rhs) { return Int64(lhs) >>= rhs; }
 
@@ -131,7 +131,7 @@ public:
     UInt64(const UInt64&   rhs) : value(rhs.value) {}
     UInt64(unsigned int    rhs) : value(rhs) {} //ambiguity intentional for types other than these
     UInt64(unsigned long   rhs) : value(rhs) {}
-    UInt64(Select<IsSameType<std::uint64_t, unsigned long>::result, DummyClass, std::uint64_t>::Result rhs) :
+    UInt64(SelectIf<IsSameType<std::uint64_t, unsigned long>::result, DummyClass, std::uint64_t>::Result rhs) :
         value(rhs) {} //-> std::uint64_t equals unsigned long int on x64 Linux! Still we want implicit behavior for all other systems!
 
     //unsafe explicit but checked conversion from arbitrary integer type
@@ -190,13 +190,13 @@ private:
     std::uint64_t value;
 };
 
-inline UInt64 operator+(const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) += rhs; }
-inline UInt64 operator-(const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) -= rhs; }
-inline UInt64 operator*(const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) *= rhs; }
-inline UInt64 operator/(const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) /= rhs; }
-inline UInt64 operator%(const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) %= rhs; }
-inline UInt64 operator&(const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) &= rhs; }
-inline UInt64 operator|(const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) |= rhs; }
+inline UInt64 operator+ (const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) += rhs; }
+inline UInt64 operator- (const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) -= rhs; }
+inline UInt64 operator* (const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) *= rhs; }
+inline UInt64 operator/ (const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) /= rhs; }
+inline UInt64 operator% (const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) %= rhs; }
+inline UInt64 operator& (const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) &= rhs; }
+inline UInt64 operator| (const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) |= rhs; }
 inline UInt64 operator<<(const UInt64& lhs, int rhs) { return UInt64(lhs) <<= rhs; }
 inline UInt64 operator>>(const UInt64& lhs, int rhs) { return UInt64(lhs) >>= rhs; }
 

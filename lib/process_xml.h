@@ -142,6 +142,7 @@ struct XmlGlobalSettings
         programLanguage(zen::retrieveSystemLanguage()),
         copyLockedFiles(true),
         copyFilePermissions(false),
+        runWithBackgroundPriority(false),
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS
         verifyFileCopy(false),
         transactionalFileCopy(true) {}
@@ -149,6 +150,8 @@ struct XmlGlobalSettings
     int programLanguage;
     bool copyLockedFiles;          //VSS usage
     bool copyFilePermissions;
+
+    bool runWithBackgroundPriority;
 
     size_t fileTimeTolerance; //max. allowed file time deviation
     bool verifyFileCopy;   //verify copied files
@@ -174,7 +177,7 @@ struct XmlGlobalSettings
 #elif defined FFS_LINUX
             textSearchRespectCase(true),
 #endif
-            iconSize(ICON_SIZE_MEDIUM),
+            iconSize(ICON_SIZE_SMALL),
             lastUpdateCheck(0)
         {
             //default external apps will be translated "on the fly"!!!

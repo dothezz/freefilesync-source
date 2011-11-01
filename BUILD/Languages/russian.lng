@@ -757,7 +757,7 @@ are the same
 </target>
 
 <source>File time and size</source>
-<target>Дата и разамер файла</target>
+<target>Дата и размер файла</target>
 
 <source>
 Files are found equal if
@@ -911,25 +911,20 @@ Exclude: \stuff\temp\*
 <target>Копирование заблокированных файлов</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Копирование общих или заблокированных файлов
-с использованием службы Теневого Копирования Тома
-(требуются права Администратора)
+Копирование общих или заблокированных файлов с использованием службы Теневого Копирования Тома (требуются права Администратора)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Копирование прав доступа к файлам</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Передача прав доступа к файлам/папкам
-(требуются права Администратора)
+Передача прав доступа к файлам/папкам (требуются права Администратора)
 </target>
 
 <source>Hidden dialogs:</source>

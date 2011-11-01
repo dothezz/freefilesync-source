@@ -6,7 +6,7 @@
 
 #include "zstring.h"
 #include <stdexcept>
-#include <boost/thread/once.hpp>
+#include <zen/stl_tools.h>
 
 #ifdef FFS_WIN
 #include "dll.h"
@@ -55,14 +55,14 @@ LeakChecker& LeakChecker::instance()
 //caveat: function scope static initialization is not thread-safe in VS 2010! => make sure to call at app start!
 namespace
 {
-struct Dummy { Dummy() { LeakChecker::instance(); }} blah;
+const LeakChecker& dummy = LeakChecker::instance();
 }
 
 
 std::string LeakChecker::rawMemToString(const void* ptr, size_t size)
 {
     std::string output = std::string(reinterpret_cast<const char*>(ptr), size);
-    output.erase(std::remove(output.begin(), output.end(), 0), output.end()); //remove intermediate 0-termination
+    vector_remove_if(output, [](char& c) { return c == 0; }); //remove intermediate 0-termination
     if (output.size() > 100)
         output.resize(100);
     return output;
@@ -102,15 +102,13 @@ typedef int (WINAPI* CompareStringOrdinalFunc)(LPCWSTR lpString1,
                                                LPCWSTR lpString2,
                                                int     cchCount2,
                                                BOOL    bIgnoreCase);
-SysDllFun<CompareStringOrdinalFunc> ordinalCompare; //caveat: function scope static initialization is not thread-safe in VS 2010!
-boost::once_flag initCmpStrOrdOnce = BOOST_ONCE_INIT;
+const SysDllFun<CompareStringOrdinalFunc> ordinalCompare = SysDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
 }
 
 
 int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA, size_t sizeB)
 {
-    boost::call_once(initCmpStrOrdOnce, []() { ordinalCompare = SysDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal"); });
-
+    //caveat: function scope static initialization is not thread-safe in VS 2010!
     if (ordinalCompare) //this additional test has no noticeable performance impact
     {
         const int rv = ordinalCompare(a,  	      //pointer to first string

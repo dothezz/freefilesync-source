@@ -11,7 +11,7 @@
 
 namespace zen
 {
-//std::list(C++11) compatible class supporting inplace element construction for non-copyable/movable types
+//std::list(C++11) compatible class for inplace element construction supporting non-copyable/movable types
 //may be replaced by C++11 std::list when available
 template <class T>
 class FixedList

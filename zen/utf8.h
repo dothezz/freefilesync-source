@@ -9,9 +9,7 @@
 #define STRING_UTF8_HEADER_01832479146991573473545
 
 #include <iterator>
-#include "string_tools.h"
-//#include "type_tools.h"
-//#include "string_traits.h"
+#include "string_tools.h" //copyStringTo
 
 namespace zen
 {
@@ -64,7 +62,7 @@ const char BYTE_ORDER_MARK_UTF8[] = "\xEF\xBB\xBF";
 //----------------------- implementation ----------------------------------
 namespace implementation
 {
-typedef unsigned int CodePoint;
+typedef unsigned int CodePoint; //must be at least four bytes
 
 const CodePoint CODE_POINT_MAX     = 0x10ffff;
 
@@ -265,7 +263,7 @@ WideString utf8ToWide(const CharString& str, Int2Type<4>) //other OS: convert ut
 {
     WideString output;
     utf8ToCodePoint(strBegin(str), strBegin(str) + strLength(str),
-    [&](CodePoint cp) { output += cp; });
+    [&](CodePoint cp) { output += static_cast<wchar_t>(cp); });
     return output;
 }
 
@@ -294,8 +292,8 @@ CharString wideToUtf8(const WideString& str, Int2Type<4>) //other OS: convert ut
 template <class WideString, class CharString> inline
 WideString utf8ToWide(const CharString& str)
 {
-    assert_static((IsSameType<typename StringTraits<CharString>::CharType, char   >::result));
-    assert_static((IsSameType<typename StringTraits<WideString>::CharType, wchar_t>::result));
+    assert_static((IsSameType<typename GetCharType<CharString>::Result, char   >::result));
+    assert_static((IsSameType<typename GetCharType<WideString>::Result, wchar_t>::result));
 
     return implementation::utf8ToWide<WideString>(str, Int2Type<sizeof(wchar_t)>());
 }
@@ -304,8 +302,8 @@ WideString utf8ToWide(const CharString& str)
 template <class CharString, class WideString> inline
 CharString wideToUtf8(const WideString& str)
 {
-    assert_static((IsSameType<typename StringTraits<CharString>::CharType, char   >::result));
-    assert_static((IsSameType<typename StringTraits<WideString>::CharType, wchar_t>::result));
+    assert_static((IsSameType<typename GetCharType<CharString>::Result, char   >::result));
+    assert_static((IsSameType<typename GetCharType<WideString>::Result, wchar_t>::result));
 
     return implementation::wideToUtf8<CharString>(str, Int2Type<sizeof(wchar_t)>());
 }
@@ -319,17 +317,17 @@ template <class TargetString, class SourceString> inline
 TargetString utf8CvrtTo(const SourceString& str, wchar_t, char) { return wideToUtf8<TargetString>(str); }
 
 template <class TargetString, class SourceString> inline
-TargetString utf8CvrtTo(const SourceString& str, char, char) { return cvrtString<TargetString>(str); }
+TargetString utf8CvrtTo(const SourceString& str, char, char) { return copyStringTo<TargetString>(str); }
 
 template <class TargetString, class SourceString> inline
-TargetString utf8CvrtTo(const SourceString& str, wchar_t, wchar_t) { return cvrtString<TargetString>(str); }
+TargetString utf8CvrtTo(const SourceString& str, wchar_t, wchar_t) { return copyStringTo<TargetString>(str); }
 
 template <class TargetString, class SourceString> inline
 TargetString utf8CvrtTo(const SourceString& str)
 {
     return utf8CvrtTo<TargetString>(str,
-                                    typename StringTraits<SourceString>::CharType(),
-                                    typename StringTraits<TargetString>::CharType());
+                                    typename GetCharType<SourceString>::Result(),
+                                    typename GetCharType<TargetString>::Result());
 }
 }
 

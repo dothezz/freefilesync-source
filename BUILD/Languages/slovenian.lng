@@ -919,24 +919,20 @@ Izključi: \stuff\temp\*
 <target>Kopiraj zaklenjene datoteke</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Shadow Copy
-(Zahteva pravice skrbnika)
+Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Shadow Copy (Zahteva pravice skrbnika)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Kopiraj dovoljenja dostopov datoteke</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Prenesi dovoljenja datotek in imenikov
-(Zahteva pravice skrbnika)
+Prenesi dovoljenja datotek in imenikov (Zahteva pravice skrbnika)
 </target>
 
 <source>Hidden dialogs:</source>

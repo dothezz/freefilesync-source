@@ -171,7 +171,7 @@ std::vector<std::set<DirectoryKey>> separateByDistinctDisk(const std::set<Direct
 typedef Zbase<wchar_t, StorageRefCountThreadSafe> BasicWString; //thread safe string class for UI texts
 
 
-class AsyncCallback
+class AsyncCallback //actor pattern
 {
 public:
     AsyncCallback() :
@@ -207,7 +207,7 @@ public:
         boost::lock_guard<boost::mutex> dummy(lockErrorMsg);
         if (!errorMsg.empty() && !errorResponse.get())
         {
-            FillBufferCallback::HandleError rv = callback.reportError(cvrtString<std::wstring>(errorMsg)); //throw!
+            FillBufferCallback::HandleError rv = callback.reportError(copyStringTo<std::wstring>(errorMsg)); //throw!
             errorResponse.reset(new FillBufferCallback::HandleError(rv));
 
             //dummy.unlock();
@@ -244,12 +244,12 @@ public:
             if (!currentFile.empty())
                 filename = utf8CvrtTo<std::wstring>(currentFile);
             else if (!currentStatus.empty())
-                statusMsg = cvrtString<std::wstring>(currentStatus);
+                statusMsg = copyStringTo<std::wstring>(currentStatus);
         }
 
         if (!filename.empty())
         {
-            std::wstring statusText = cvrtString<std::wstring>(textScanning);
+            std::wstring statusText = copyStringTo<std::wstring>(textScanning);
             const long activeCount = activeWorker;
             if (activeCount >= 2)
             {
@@ -293,8 +293,6 @@ private:
 };
 //-------------------------------------------------------------------------------------------------
 
-class DirCallback;
-
 struct TraverserShared
 {
 public:
@@ -308,9 +306,6 @@ public:
         failedReads_(failedReads),
         acb_(acb),
         threadID_(threadID) {}
-
-    typedef std::shared_ptr<DirCallback> CallbackPointer;
-    std::vector<CallbackPointer> callBackBox;  //collection of callback pointers to handle ownership
 
     const SymLinkHandling handleSymlinks_;
     const HardFilter::FilterRef filterInstance; //always bound!
@@ -332,10 +327,11 @@ public:
         relNameParentPf_(relNameParentPf),
         output_(output) {}
 
-    virtual void         onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details);
-    virtual void         onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details);
-    virtual ReturnValDir onDir    (const Zchar* shortName, const Zstring& fullName);
-    virtual HandleError  onError  (const std::wstring& errorText);
+    virtual std::shared_ptr<TraverseCallback>
+    onDir    (const Zchar* shortName, const Zstring& fullName);
+    virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details);
+    virtual void        onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details);
+    virtual HandleError onError  (const std::wstring& errorText);
 
 private:
     TraverserShared& cfg;
@@ -405,7 +401,7 @@ void DirCallback::onSymlink(const Zchar* shortName, const Zstring& fullName, con
 }
 
 
-TraverseCallback::ReturnValDir DirCallback::onDir(const Zchar* shortName, const Zstring& fullName)
+std::shared_ptr<TraverseCallback> DirCallback::onDir(const Zchar* shortName, const Zstring& fullName)
 {
     boost::this_thread::interruption_point();
 
@@ -419,16 +415,14 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const Zchar* shortName, const 
     bool subObjMightMatch = true;
     const bool passFilter = cfg.filterInstance->passDirFilter(relName, &subObjMightMatch);
     if (!passFilter && !subObjMightMatch)
-        return Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //do NOT traverse subdirs
+        return nullptr; //do NOT traverse subdirs
     //else: attention! ensure directory filtering is applied later to exclude actually filtered directories
 
     DirContainer& subDir = output_.addSubDir(shortName);
     if (passFilter)
         cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 
-    TraverserShared::CallbackPointer subDirCallback = std::make_shared<DirCallback>(cfg, relName + FILE_NAME_SEPARATOR, subDir);
-    cfg.callBackBox.push_back(subDirCallback); //handle lifetime
-    return ReturnValDir(Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), *subDirCallback);
+    return std::make_shared<DirCallback>(cfg, relName + FILE_NAME_SEPARATOR, subDir);
 }
 
 

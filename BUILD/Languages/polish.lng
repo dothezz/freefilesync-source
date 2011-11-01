@@ -913,24 +913,20 @@ Wyklucz: \moje\temp\*
 <target>Kopiuj zablokowane pliki</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Kopiuj pliki udostępnione i zablokowane używając usługi Volume Shadow Copy
- (Wymaga uprawnień administratora)
+Kopiuj pliki udostępnione i zablokowane używając usługi Volume Shadow Copy (Wymaga uprawnień administratora)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Kopiuj uprawnienia plików</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Transfer uprawnień plików i katalogów
-(Wymaga uprawnień Administratora)
+Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 </target>
 
 <source>Hidden dialogs:</source>

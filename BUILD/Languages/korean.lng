@@ -901,24 +901,20 @@ Exclude: \stuff\temp\*
 <target>락 걸린 파일 복사</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Volume Shadow Copy를 사용하여 공유 또는 락 걸린 파일을 복사
-(관리자 권한 필요)
+Volume Shadow Copy를 사용하여 공유 또는 락 걸린 파일을 복사 (관리자 권한 필요)
 </target>
 
 <source>Copy file access permissions</source>
 <target>파일 접근 권한 복사</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-파일 및 디렉토리 권한 전송
-(관리자 권한이 필요함)
+파일 및 디렉토리 권한 전송 (관리자 권한이 필요함)
 </target>
 
 <source>Hidden dialogs:</source>

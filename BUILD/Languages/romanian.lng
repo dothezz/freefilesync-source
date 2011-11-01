@@ -913,24 +913,20 @@ Excluse: \stuff\temp\*
 <target>Copiere și a filelor zăvorîte [locked]</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Copiază filele partajate sau zăvorîte folosind Serviciul de Conservare a Volumelor [Volume Shadow Copy]
-(Necesită drepturi de Administrator)
+Copiază filele partajate sau zăvorîte folosind Serviciul de Conservare a Volumelor [Volume Shadow Copy] (Necesită drepturi de Administrator)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Copiază permisiunile de acces ale filelor</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Transferă permisiunile filelor și dosarelor
-(Necesită drepturi de Administrator)
+Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrator)
 </target>
 
 <source>Hidden dialogs:</source>

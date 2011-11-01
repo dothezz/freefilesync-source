@@ -11,7 +11,7 @@
 #include "lib/process_xml.h"
 #include "lib/status_handler.h"
 #include "structures.h"
-#include <zen/disable_standby.h>
+#include <zen/process_status.h>
 #include "lib/norm_filter.h"
 #include "lib/parallel_scan.h"
 
@@ -47,6 +47,8 @@ struct FolderPairCfg
 std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg); //fill FolderPairCfg and resolve folder pairs
 
 
+//runComparison
+
 //class handling comparison process
 class CompareProcess
 {
@@ -54,6 +56,7 @@ public:
     CompareProcess(size_t fileTimeTol,
                    xmlAccess::OptionalDialogs& warnings,
                    bool allowUserInteraction,
+                   bool runWithBackgroundPriority,
                    ProcessCallback& handler);
 
     void startCompareProcess(const std::vector<FolderPairCfg>& cfgList, FolderComparison& output);
@@ -82,7 +85,7 @@ private:
 
     const bool allowUserInteraction_;
     ProcessCallback& procCallback;
-    const Zstring txtComparingContentOfFiles;
+    std::unique_ptr<ScheduleForBackgroundProcessing> procBackground;
 };
 }
 

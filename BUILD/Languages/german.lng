@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatisierte Synchronisation</target>
 
-<source>Browse</source>
-<target>Auswählen</target>
-
-<source>Windows Error Code %x:</source>
-<target>Windows Fehlercode %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Fehlercode %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>Ungültige Befehlszeile: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>Fehler beim Auflösen des Symbolischen Links:</target>
-
-<source>Show pop-up</source>
-<target>Pop-up zeigen</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Ein Auswahlfenster bei Fehlern oder Warnungen anzeigen</target>
-
-<source>Ignore errors</source>
-<target>Fehler ignorieren</target>
-
-<source>Hide all error and warning messages</source>
-<target>Alle Fehler- und Warnmeldungen unterdrücken</target>
-
-<source>Exit instantly</source>
-<target>Sofort beenden</target>
-
-<source>Abort synchronization immediately</source>
-<target>Synchronisation sofort abbrechen</target>
-
 <source>Select alternate comparison settings</source>
 <target>Alternative Vergleichseinstellungen auswählen</target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>Zeitspanne auswählen</target>
 
+<source>Show pop-up</source>
+<target>Pop-up zeigen</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Ein Auswahlfenster bei Fehlern oder Warnungen anzeigen</target>
+
+<source>Ignore errors</source>
+<target>Fehler ignorieren</target>
+
+<source>Hide all error and warning messages</source>
+<target>Alle Fehler- und Warnmeldungen unterdrücken</target>
+
+<source>Exit instantly</source>
+<target>Sofort beenden</target>
+
+<source>Abort synchronization immediately</source>
+<target>Synchronisation sofort abbrechen</target>
+
+<source>Browse</source>
+<target>Auswählen</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Fehler beim Lesen der Synchronisationsdatenbank:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Fehler beim Schreiben der Synchronisationsdatenbank:</target>
+
+<source>Invalid command line: %x</source>
+<target>Ungültige Befehlszeile: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Windows Fehlercode %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Fehlercode %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Fehler beim Auflösen des Symbolischen Links:</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -172,9 +178,6 @@
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Eine der FreeFileSync Datenbankdateien existiert noch nicht:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Fehler beim Lesen der Synchronisationsdatenbank:</target>
-
 <source>Database files do not share a common synchronization session:</source>
 <target>Die Datenbankdateien enthalten keine gemeinsame Synchronisationssitzung:</target>
 
@@ -199,11 +202,17 @@
 <pluralform>%x Sek.</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Drag && Drop</target>
+
 <source>Info</source>
 <target>Info</target>
 
 <source>Fatal Error</source>
 <target>Schwerer Fehler</target>
+
+<source>Error reading file:</source>
+<target>Fehler beim Lesen der Datei:</target>
 
 <source>Scanning:</source>
 <target>Suche Dateien:</target>
@@ -223,14 +232,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Ungültige FreeFileSync Konfigurationsdatei!</target>
 
-<source>File does not exist:</source>
-<target>Die Datei existiert nicht:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Fehler beim Auswerten der Konfigurationsdatei:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Fehler beim Verschieben in den Papierkorb:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Eine benötigte DLL konnte nicht geladen werden:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Fehler beim Zugriff auf den Volumenschattenkopiedienst!</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Das Erstellen von Schattenkopien unter WOW64 wird nicht unterstützt. Bitte benutzen Sie die FreeFileSync 64-Bit Version.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Der Laufwerksname für folgende Datei konnte nicht ermittelt werden:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>Laufwerksname %x ist kein Teil des Dateinamens %y!</target>
+
 <source>/sec</source>
 <target>/s</target>
+
+<source>File does not exist:</source>
+<target>Die Datei existiert nicht:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>Die folgenden XML Knoten konnten nicht gelesen werden:</target>
 
 <source>S&ave configuration...</source>
 <target>Konfiguration s&peichern...</target>
@@ -323,141 +353,6 @@ Die Befehlszeile wird ausgeführt wenn:
 
 <source>A directory input field is empty.</source>
 <target>Ein Verzeichniseingabefeld ist leer.</target>
-
-<source>Drag && drop</source>
-<target>Drag && Drop</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Die Verzeichnisüberwachung konnte nicht gestartet werden:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Fehler beim Überwachen der Verzeichnisse.</target>
-
-<source>Conversion error:</source>
-<target>Fehler bei Konvertierung:</target>
-
-<source>Error deleting file:</source>
-<target>Fehler beim Löschen der Datei:</target>
-
-<source>Error moving file:</source>
-<target>Fehler beim Verschieben der Datei:</target>
-
-<source>Target file already existing!</source>
-<target>Die Zieldatei existiert bereits!</target>
-
-<source>Error moving directory:</source>
-<target>Fehler beim Verschieben des Verzeichnisses:</target>
-
-<source>Target directory already existing!</source>
-<target>Zielverzeichnis existiert bereits!</target>
-
-<source>Error deleting directory:</source>
-<target>Fehler beim Löschen des Verzeichnisses:</target>
-
-<source>Error changing modification time:</source>
-<target>Fehler beim Setzen der Dateiänderungszeit:</target>
-
-<source>Error loading library function:</source>
-<target>Fehler beim Laden der Bibliotheksfunktion:</target>
-
-<source>Error reading security context:</source>
-<target>Fehler beim Lesen des Sicherheitskontextes:</target>
-
-<source>Error writing security context:</source>
-<target>Fehler beim Schreiben des Sicherheitskontextes:</target>
-
-<source>Error copying file permissions:</source>
-<target>Fehler beim Kopieren der Dateiberechtigungen:</target>
-
-<source>Error creating directory:</source>
-<target>Fehler beim Erstellen des Verzeichnisses:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Fehler beim Kopieren des Symbolischen Links:</target>
-
-<source>Error copying file:</source>
-<target>Fehler beim Kopieren der Datei:</target>
-
-<source>Error opening file:</source>
-<target>Fehler beim Öffnen der Datei:</target>
-
-<source>Error writing file:</source>
-<target>Fehler beim Schreiben der Datei:</target>
-
-<source>Error reading file:</source>
-<target>Fehler beim Lesen der Datei:</target>
-
-<source>Operation aborted!</source>
-<target>Vorgang abgebrochen!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Endlosschleife beim Lesen des Verzeichnisses:</target>
-
-<source>Error traversing directory:</source>
-<target>Fehler beim Durchsuchen des Verzeichnisses:</target>
-
-<source>Error setting privilege:</source>
-<target>Fehler beim Setzen des Privilegs:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Fehler beim Verschieben in den Papierkorb:</target>
-
-<source>Could not load a required DLL:</source>
-<target>Eine benötigte DLL konnte nicht geladen werden:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Fehler beim Schreiben der Synchronisationsdatenbank:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Fehler beim Zugriff auf den Volumenschattenkopiedienst!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Das Erstellen von Schattenkopien unter WOW64 wird nicht unterstützt. Bitte benutzen Sie die FreeFileSync 64-Bit Version.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Der Laufwerksname für folgende Datei konnte nicht ermittelt werden:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>Laufwerksname %x ist kein Teil des Dateinamens %y!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 Min.</pluralform>
-<pluralform>%x Min.</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 Stunde</pluralform>
-<pluralform>%x Stunden</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 Tag</pluralform>
-<pluralform>%x Tage</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Die folgenden XML Knoten konnten nicht gelesen werden:</target>
 
 <source>Logging</source>
 <target>Protokoll</target>
@@ -906,26 +801,14 @@ Ausschließen: \stuff\temp\*
 <source>Copy locked files</source>
 <target>Gesperrte Dateien kopieren</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
-</source>
-<target>
-Kopiere gesperrte Dateien mit Hilfe des Volumenschattenkopie-Dienstes
-(Benötigt Administratorrechte)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Kopiere gesperrte Dateien mit Hilfe des Volumenschattenkopie-Dienstes (Benötigt Administratorrechte)</target>
 
 <source>Copy file access permissions</source>
 <target>Dateizugriffsberechtigungen kopieren</target>
 
-<source>
-Transfer file and directory permissions
-(Requires Administrator rights)
-</source>
-<target>
-Übertrage Datei- und Verzeichnisberechtigungen
-(Benötigt Administratorrechte)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Übertrage Datei- und Verzeichnisberechtigungen (Benötigt Administratorrechte)</target>
 
 <source>Hidden dialogs:</source>
 <target>Versteckte Dialoge:</target>
@@ -956,6 +839,9 @@ Transfer file and directory permissions
 
 <source>&Find next</source>
 <target>&Weitersuchen</target>
+
+<source>Operation aborted!</source>
+<target>Vorgang abgebrochen!</target>
 
 <source>Main bar</source>
 <target>Hauptleiste</target>
@@ -1134,6 +1020,9 @@ Transfer file and directory permissions
 <source>File list exported!</source>
 <target>Dateiliste exportiert!</target>
 
+<source>Error writing file:</source>
+<target>Fehler beim Schreiben der Datei:</target>
+
 <source>Batch file created successfully!</source>
 <target>Batchdatei wurde erfolgreich erstellt!</target>
 
@@ -1298,6 +1187,105 @@ Transfer file and directory permissions
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>Verschiebe Dateien in ein Unterverzeichnis mit Zeitstempel</target>
+
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 Min.</pluralform>
+<pluralform>%x Min.</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 Stunde</pluralform>
+<pluralform>%x Stunden</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 Tag</pluralform>
+<pluralform>%x Tage</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Die Verzeichnisüberwachung konnte nicht gestartet werden:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Fehler beim Überwachen der Verzeichnisse.</target>
+
+<source>Conversion error:</source>
+<target>Fehler bei Konvertierung:</target>
+
+<source>Error deleting file:</source>
+<target>Fehler beim Löschen der Datei:</target>
+
+<source>Error moving file:</source>
+<target>Fehler beim Verschieben der Datei:</target>
+
+<source>Target file already existing!</source>
+<target>Die Zieldatei existiert bereits!</target>
+
+<source>Error moving directory:</source>
+<target>Fehler beim Verschieben des Verzeichnisses:</target>
+
+<source>Target directory already existing!</source>
+<target>Zielverzeichnis existiert bereits!</target>
+
+<source>Error deleting directory:</source>
+<target>Fehler beim Löschen des Verzeichnisses:</target>
+
+<source>Error changing modification time:</source>
+<target>Fehler beim Setzen der Dateiänderungszeit:</target>
+
+<source>Error loading library function:</source>
+<target>Fehler beim Laden der Bibliotheksfunktion:</target>
+
+<source>Error reading security context:</source>
+<target>Fehler beim Lesen des Sicherheitskontextes:</target>
+
+<source>Error writing security context:</source>
+<target>Fehler beim Schreiben des Sicherheitskontextes:</target>
+
+<source>Error copying file permissions:</source>
+<target>Fehler beim Kopieren der Dateiberechtigungen:</target>
+
+<source>Error creating directory:</source>
+<target>Fehler beim Erstellen des Verzeichnisses:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Fehler beim Kopieren des Symbolischen Links:</target>
+
+<source>Error copying file:</source>
+<target>Fehler beim Kopieren der Datei:</target>
+
+<source>Error opening file:</source>
+<target>Fehler beim Öffnen der Datei:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Endlosschleife beim Lesen des Verzeichnisses:</target>
+
+<source>Error traversing directory:</source>
+<target>Fehler beim Durchsuchen des Verzeichnisses:</target>
+
+<source>Error setting privilege:</source>
+<target>Fehler beim Setzen des Privilegs:</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Beide Seiten wurden seit der letzten Synchronisation verändert!</target>

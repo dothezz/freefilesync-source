@@ -45,37 +45,37 @@ public:
     {
         if (altCompConfig.get())
         {
-            setBitmapLabel(*basicPanel_.m_bpButtonAltCompCfg, GlobalResources::getImage(wxT("cmpConfigSmall")));
+            setImage(*basicPanel_.m_bpButtonAltCompCfg, GlobalResources::getImage(wxT("cmpConfigSmall")));
             basicPanel_.m_bpButtonAltCompCfg->SetToolTip(wxString(_("Select alternate comparison settings")) +  wxT(" \n") +
                                                          wxT("(") + getVariantName(altCompConfig->compareVar) + wxT(")"));
         }
         else
         {
-            setBitmapLabel(*basicPanel_.m_bpButtonAltCompCfg, GlobalResources::getImage(wxT("cmpConfigSmallGrey")));
+            setImage(*basicPanel_.m_bpButtonAltCompCfg, GlobalResources::getImage(wxT("cmpConfigSmallGrey")));
             basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Select alternate comparison settings"));
         }
 
         if (altSyncConfig.get())
         {
-            setBitmapLabel(*basicPanel_.m_bpButtonAltSyncCfg, GlobalResources::getImage(wxT("syncConfigSmall")));
+            setImage(*basicPanel_.m_bpButtonAltSyncCfg, GlobalResources::getImage(wxT("syncConfigSmall")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) +  wxT(" \n") +
                                                          wxT("(") + getVariantName(altSyncConfig->directionCfg.var) + wxT(")"));
         }
         else
         {
-            setBitmapLabel(*basicPanel_.m_bpButtonAltSyncCfg, GlobalResources::getImage(wxT("syncConfigSmallGrey")));
+            setImage(*basicPanel_.m_bpButtonAltSyncCfg, GlobalResources::getImage(wxT("syncConfigSmallGrey")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
         }
 
         //test for Null-filter
         if (isNullFilter(localFilter))
         {
-            setBitmapLabel(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::getImage(wxT("filterSmallGrey")));
+            setImage(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::getImage(wxT("filterSmallGrey")));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
         }
         else
         {
-            setBitmapLabel(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::getImage(wxT("filterSmall")));
+            setImage(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::getImage(wxT("filterSmall")));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter is active"));
         }
     }

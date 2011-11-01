@@ -65,8 +65,8 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw F
         const DllFun<GetLastErrorFct>     getLastError  (getDllName(), getLastErrorFctName);
 
         if (!moveToRecycler || !getLastError)
-            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileNames[0] + "\"" + //report first file only... better than nothing
-                            "\n\n" + _("Could not load a required DLL:") + " \"" + getDllName() + "\"");
+            throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + fileNames[0] + L"\"" + //report first file only... better than nothing
+                            L"\n\n" + _("Could not load a required DLL:") + L" \"" + getDllName() + L"\"");
 
         //#warning moving long file paths to recycler does not work! clarify!
         //        std::vector<Zstring> temp;
@@ -78,8 +78,8 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw F
         {
             wchar_t errorMessage[2000];
             getLastError(errorMessage, 2000);
-            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileNames[0] + "\"" + //report first file only... better than nothing
-                            "\n\n" + "(" + errorMessage + ")");
+            throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + fileNames[0] + L"\"" + //report first file only... better than nothing
+                            L"\n\n" + L"(" + errorMessage + L")");
         }
     }
     else //regular recycle bin usage: available since XP
@@ -106,7 +106,7 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw F
 
         if (::SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
         {
-            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + filenameDoubleNull + "\""); //report first file only... better than nothing
+            throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + filenameDoubleNull + L"\""); //report first file only... better than nothing
         }
     }
 }
@@ -132,8 +132,8 @@ bool zen::moveToRecycleBin(const Zstring& filename)  //throw FileError
     try
     {
         if (!fileObj->trash())
-            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + filename + "\"" +
-                            "\n\n" + "(unknown error)");
+            throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + filename + L"\"" +
+                            L"\n\n" + L"(unknown error)");
     }
     catch (const Glib::Error& errorObj)
     {
@@ -152,11 +152,11 @@ bool zen::moveToRecycleBin(const Zstring& filename)  //throw FileError
         }
 
         //assemble error message
-        const std::wstring errorMessage = L"Glib Error Code " + toString<std::wstring>(errorObj.code()) + /* ", " +
-                                          g_quark_to_string(errorObj.domain()) + */ ": " + errorObj.what();
+        const std::wstring errorMessage = L"Glib Error Code " + toString<std::wstring>(errorObj.code()) + /* L", " +
+                                          g_quark_to_string(errorObj.domain()) + */ L": " + utf8CvrtTo<std::wstring>(errorObj.what());
 
-        throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + filename + "\"" +
-                        "\n\n" + "(" + errorMessage + ")");
+        throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + filename + L"\"" +
+                        L"\n\n" + L"(" + errorMessage + L")");
     }
 #endif
     return true;

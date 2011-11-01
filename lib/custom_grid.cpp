@@ -1375,15 +1375,15 @@ void CustomGridRim::setTooltip(const wxMouseEvent& event)
 
                 virtual void visit(const FileMapping& fileObj)
                 {
-                    tipMsg_ = toWx(fileObj.getRelativeName<side>()) + "\n" +
-                              _("Size") + ": " + zen::filesizeToShortString(fileObj.getFileSize<side>()) + "\n" +
-                              _("Date") + ": " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
+                    tipMsg_ = copyStringTo<wxString>(std::wstring() + fileObj.getRelativeName<side>() + L"\n" +
+                                                     _("Size") + L": " + zen::filesizeToShortString(fileObj.getFileSize<side>()) + L"\n" +
+                                                     _("Date") + L": " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>()));
                 }
 
                 virtual void visit(const SymLinkMapping& linkObj)
                 {
-                    tipMsg_ = toWx(linkObj.getRelativeName<side>()) + "\n" +
-                              _("Date") + ": " + zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
+                    tipMsg_ = copyStringTo<wxString>(std::wstring() + linkObj.getRelativeName<side>() + L"\n" +
+                                                     _("Date") + L": " + zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>()));
                 }
 
                 virtual void visit(const DirMapping& dirObj)

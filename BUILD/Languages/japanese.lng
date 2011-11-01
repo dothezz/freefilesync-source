@@ -8,7 +8,7 @@
 </header>
 
 <source>Searching for directory %x...</source>
-<target></target>
+<target>ディレクトリ %x を検索中...</target>
 
 <source>Show in Explorer</source>
 <target>エクスプローラで表示</target>
@@ -22,41 +22,8 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>リアルタイム同期 - 自動同期</target>
 
-<source>Browse</source>
-<target>参照</target>
-
-<source>Windows Error Code %x:</source>
-<target>Windows エラーコード %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux エラーコード %x:</target>
-
-<source>Invalid command line: %x</source>
-<target></target>
-
-<source>Error resolving symbolic link:</source>
-<target>シンボリックリンクの解決に失敗:</target>
-
-<source>Show pop-up</source>
-<target></target>
-
-<source>Show pop-up on errors or warnings</source>
-<target></target>
-
-<source>Ignore errors</source>
-<target>エラーを無視</target>
-
-<source>Hide all error and warning messages</source>
-<target>すべてのエラーと警告メッセージを非表示</target>
-
-<source>Exit instantly</source>
-<target>すぐに終了</target>
-
-<source>Abort synchronization immediately</source>
-<target>今すぐに同期処理を中断</target>
-
 <source>Select alternate comparison settings</source>
-<target></target>
+<target>代替比較設定を選択</target>
 
 <source>Select alternate synchronization settings</source>
 <target>代替同期設定を選択</target>
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target></target>
 
+<source>Show pop-up</source>
+<target>ポップアップ表示</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>エラーと警告をポップアップで表示</target>
+
+<source>Ignore errors</source>
+<target>エラーを無視</target>
+
+<source>Hide all error and warning messages</source>
+<target>すべてのエラーと警告メッセージを非表示</target>
+
+<source>Exit instantly</source>
+<target>すぐに終了</target>
+
+<source>Abort synchronization immediately</source>
+<target>今すぐに同期処理を中断</target>
+
+<source>Browse</source>
+<target>参照</target>
+
+<source>Error reading from synchronization database:</source>
+<target>同期データベースからの読み込みエラー:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>同期データベースへの書き込みエラー:</target>
+
+<source>Invalid command line: %x</source>
+<target>無効なコマンドライン: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Windows エラーコード %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux エラーコード %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>シンボリックリンクの解決に失敗:</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -171,11 +177,8 @@
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync データベースファイルが存在しません:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>同期データベースからの読み込みエラー:</target>
-
 <source>Database files do not share a common synchronization session:</source>
-<target></target>
+<target>データベースファイルは一般的な同期セッションを共有しません:</target>
 
 <source>An exception occurred!</source>
 <target>例外が発生しました!</target>
@@ -197,11 +200,17 @@
 <pluralform>%x 秒.</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>ドラッグ && ドロップ</target>
+
 <source>Info</source>
 <target>情報</target>
 
 <source>Fatal Error</source>
 <target>致命的なエラー</target>
+
+<source>Error reading file:</source>
+<target>ファイル読み込みエラー:</target>
 
 <source>Scanning:</source>
 <target>スキャン:</target>
@@ -213,19 +222,42 @@
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>[%x スレッド]</pluralform>
+</target>
 
 <source>Invalid FreeFileSync config file!</source>
 <target>無効な FreeFileSync 構成ファイルです!</target>
 
-<source>File does not exist:</source>
-<target>ファイルが存在しません:</target>
-
 <source>Error parsing configuration file:</source>
 <target>構成ファイルの構文に誤りがあります:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>ゴミ箱への移動に失敗:</target>
+
+<source>Could not load a required DLL:</source>
+<target>必要なDLLを読み込めません:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target></target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>WOW64 では、ボリュームシャドウコピーに対応していません、FreeFileSync 64-bit 版をお試しください。</target>
+
+<source>Could not determine volume name for file:</source>
+<target>ファイルのボリューム名が決定されていません:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>ボリューム名 %x にファイル名 %y はありません!</target>
+
 <source>/sec</source>
 <target>/秒</target>
+
+<source>File does not exist:</source>
+<target>ファイルが存在しません:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>以下の XMLノードの値を読み込むことが出来ません:</target>
 
 <source>S&ave configuration...</source>
 <target>構成設定を保存(&A)...</target>
@@ -318,138 +350,6 @@ The command line is executed each time:
 
 <source>A directory input field is empty.</source>
 <target>ディレクトリが入力されていません</target>
-
-<source>Drag && drop</source>
-<target>ドラッグ && ドロップ</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>監視するディレクトリを初期化できません:</target>
-
-<source>Error when monitoring directories.</source>
-<target>ディレクトリの監視エラー</target>
-
-<source>Conversion error:</source>
-<target>変換エラー:</target>
-
-<source>Error deleting file:</source>
-<target>ファイルの削除エラー:</target>
-
-<source>Error moving file:</source>
-<target>ファイルの移動に失敗:</target>
-
-<source>Target file already existing!</source>
-<target>対象ファイルは既に存在します!</target>
-
-<source>Error moving directory:</source>
-<target>ディレクトリ移動に失敗:</target>
-
-<source>Target directory already existing!</source>
-<target>対象ディレクトリはすでに存在します!</target>
-
-<source>Error deleting directory:</source>
-<target>ディレクトリの削除エラー:</target>
-
-<source>Error changing modification time:</source>
-<target>時間の修正中のエラー:</target>
-
-<source>Error loading library function:</source>
-<target>ライブラリ読み込みエラー:</target>
-
-<source>Error reading security context:</source>
-<target>セキュリティ・コンテキストの読み取りエラー:</target>
-
-<source>Error writing security context:</source>
-<target>セキュリティ・コンテキストの書き込みエラー:</target>
-
-<source>Error copying file permissions:</source>
-<target>パーミッションコピー中のエラー</target>
-
-<source>Error creating directory:</source>
-<target>ディレクトリ作成エラー:</target>
-
-<source>Error copying symbolic link:</source>
-<target>シンボリックリンクのコピーに失敗:</target>
-
-<source>Error copying file:</source>
-<target>ファイルのコピーに失敗:</target>
-
-<source>Error opening file:</source>
-<target>ファイルのオープンに失敗:</target>
-
-<source>Error writing file:</source>
-<target>ファイル書き込みエラー:</target>
-
-<source>Error reading file:</source>
-<target>ファイル読み込みエラー:</target>
-
-<source>Operation aborted!</source>
-<target>操作の中断!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>ディレクトリ移動中に無限ループが発生:</target>
-
-<source>Error traversing directory:</source>
-<target>ディレクトリの移動エラー:</target>
-
-<source>Error setting privilege:</source>
-<target>特権の設定エラー:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>ゴミ箱への移動に失敗:</target>
-
-<source>Could not load a required DLL:</source>
-<target>必要なDLLを読み込めません:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>同期データベースへの書き込みエラー:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target></target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>WOW64 では、ボリュームシャドウコピーに対応していません、FreeFileSync 64-bit 版をお試しください。</target>
-
-<source>Could not determine volume name for file:</source>
-<target>ファイルのボリューム名が決定されていません:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>ボリューム名 %x にファイル名 %y はありません!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x 分.</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x 時間</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x 日</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>以下の XMLノードの値を読み込むことが出来ません:</target>
 
 <source>Logging</source>
 <target>ログ</target>
@@ -602,7 +502,7 @@ The command line is executed each time:
 <target>一括処理</target>
 
 <source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target></target>
+<target>同期を自動的に実行する一括バッチファイルを作成します。実行方法はファイルをダブルクリックするか、コマンドライン経由で実行します - 例: FreeFileSync.exe <ffs_batch file>. この処理はあなたのシステムのタスクスケジューラでも実行可能です。</target>
 
 <source>Help</source>
 <target>ヘルプ</target>
@@ -626,7 +526,7 @@ The command line is executed each time:
 <target>状態 フィードバック</target>
 
 <source>Run minimized</source>
-<target></target>
+<target>最小化で起動</target>
 
 <source>Maximum number of logfiles:</source>
 <target>ログファイルの最大数:</target>
@@ -635,7 +535,7 @@ The command line is executed each time:
 <target>ログファイルの保存先を選択:</target>
 
 <source>Batch settings</source>
-<target></target>
+<target>一括設定</target>
 
 <source>&Save</source>
 <target>保存(&S)</target>
@@ -733,10 +633,15 @@ Files are found equal if
      - file size
 are the same
 </source>
-<target></target>
+<target>
+ファイルが同様だった場合
+     - 最終書き込み時刻、日時
+     - ファイルサイズ
+で判断する
+</target>
 
 <source>File time and size</source>
-<target></target>
+<target>ファイル時刻とサイズ</target>
 
 <source>
 Files are found equal if
@@ -870,10 +775,10 @@ Exclude: \stuff\temp\*
 <target>除外</target>
 
 <source>Minimum file size</source>
-<target></target>
+<target>最小ファイルサイズ</target>
 
 <source>Maximum file size</source>
-<target></target>
+<target>最大ファイルサイズ</target>
 
 <source>&Default</source>
 <target>デフォルト(&D)</target>
@@ -885,33 +790,29 @@ Exclude: \stuff\temp\*
 <target>列を下に移動</target>
 
 <source>Transactional file copy</source>
-<target></target>
+<target>Transactional ファイルコピー</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>最初に一時ファイル(*.ffs_tmp)に書き込み、それをリネームします。これにより、致命的なエラーが起こっても状態は保証されます</target>
 
 <source>Copy locked files</source>
 <target>ロックされたファイルをコピー</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-ボリュームシャドーコピーを使用して共有/ロックされたファイルをコピー
-(管理者権限が必要)
+ボリュームシャドーコピーを使用して共有/ロックされたファイルをコピー(管理者権限が必要)
 </target>
 
 <source>Copy file access permissions</source>
-<target></target>
+<target>ファイルのアクセスパーミッションをコピー</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-ファイルとディレクトリのパーミッション転送
-(管理者権限が必要)
+ファイルとディレクトリのパーミッション転送(管理者権限が必要)
 </target>
 
 <source>Hidden dialogs:</source>
@@ -943,6 +844,9 @@ Transfer file and directory permissions
 
 <source>&Find next</source>
 <target>次を検索(&F)</target>
+
+<source>Operation aborted!</source>
+<target>操作の中断!</target>
 
 <source>Main bar</source>
 <target>メインバー</target>
@@ -978,22 +882,22 @@ Transfer file and directory permissions
 <target>カスタマイズ...</target>
 
 <source>Select time span...</source>
-<target></target>
+<target>タイムスパンを選択</target>
 
 <source>Auto-adjust columns</source>
 <target>列の自動調整</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>アイコンサイズ:</target>
 
 <source>Small</source>
-<target></target>
+<target>小</target>
 
 <source>Medium</source>
-<target></target>
+<target>中</target>
 
 <source>Large</source>
-<target></target>
+<target>大</target>
 
 <source>Include all rows</source>
 <target>すべての行を含める</target>
@@ -1121,6 +1025,9 @@ Transfer file and directory permissions
 <source>File list exported!</source>
 <target>ファイル一覧のエクスポートが完了!</target>
 
+<source>Error writing file:</source>
+<target>ファイル書き込みエラー:</target>
+
 <source>Batch file created successfully!</source>
 <target>バッチファイルが作成されました!</target>
 
@@ -1187,19 +1094,19 @@ Transfer file and directory permissions
 <target>非アクティブ</target>
 
 <source>Last x hours</source>
-<target></target>
+<target>最後の x 時間</target>
 
 <source>Today</source>
-<target></target>
+<target>今日</target>
 
 <source>This week</source>
-<target></target>
+<target>この週</target>
 
 <source>This month</source>
-<target></target>
+<target>この月</target>
 
 <source>This year</source>
-<target></target>
+<target>この年</target>
 
 <source>Byte</source>
 <target>バイト</target>
@@ -1226,7 +1133,7 @@ Transfer file and directory permissions
 <target>フォロー</target>
 
 <source>Copy NTFS permissions</source>
-<target></target>
+<target>NTFS パーミッションをコピー</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:</target>
@@ -1279,6 +1186,102 @@ Transfer file and directory permissions
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>ファイルをタイムスタンプ名のサブフォルダに移動</target>
+
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x 分.</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x 時間</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x 日</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>監視するディレクトリを初期化できません:</target>
+
+<source>Error when monitoring directories.</source>
+<target>ディレクトリの監視エラー</target>
+
+<source>Conversion error:</source>
+<target>変換エラー:</target>
+
+<source>Error deleting file:</source>
+<target>ファイルの削除エラー:</target>
+
+<source>Error moving file:</source>
+<target>ファイルの移動に失敗:</target>
+
+<source>Target file already existing!</source>
+<target>対象ファイルは既に存在します!</target>
+
+<source>Error moving directory:</source>
+<target>ディレクトリ移動に失敗:</target>
+
+<source>Target directory already existing!</source>
+<target>対象ディレクトリはすでに存在します!</target>
+
+<source>Error deleting directory:</source>
+<target>ディレクトリの削除エラー:</target>
+
+<source>Error changing modification time:</source>
+<target>時間の修正中のエラー:</target>
+
+<source>Error loading library function:</source>
+<target>ライブラリ読み込みエラー:</target>
+
+<source>Error reading security context:</source>
+<target>セキュリティ・コンテキストの読み取りエラー:</target>
+
+<source>Error writing security context:</source>
+<target>セキュリティ・コンテキストの書き込みエラー:</target>
+
+<source>Error copying file permissions:</source>
+<target>パーミッションコピー中のエラー</target>
+
+<source>Error creating directory:</source>
+<target>ディレクトリ作成エラー:</target>
+
+<source>Error copying symbolic link:</source>
+<target>シンボリックリンクのコピーに失敗:</target>
+
+<source>Error copying file:</source>
+<target>ファイルのコピーに失敗:</target>
+
+<source>Error opening file:</source>
+<target>ファイルのオープンに失敗:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>ディレクトリ移動中に無限ループが発生:</target>
+
+<source>Error traversing directory:</source>
+<target>ディレクトリの移動エラー:</target>
+
+<source>Error setting privilege:</source>
+<target>特権の設定エラー:</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>前回最後の同期処理以降、両側とも変更があります!</target>
@@ -1377,40 +1380,40 @@ Transfer file and directory permissions
 <target>フォルダ %x を削除中</target>
 
 <source>Deleting symbolic link %x</source>
-<target></target>
+<target>シンボリックリンク %x を削除中</target>
 
 <source>Moving file %x to recycle bin</source>
-<target></target>
+<target>ファイル %x をゴミ箱に移動中</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target></target>
+<target>フォルダ %x をゴミ箱に移動中</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target></target>
+<target>シンボリックリンク %x をゴミ箱に移動中</target>
 
 <source>Moving file %x to %y</source>
-<target></target>
+<target>ファイル %x を %y に移動中</target>
 
 <source>Moving folder %x to %y</source>
-<target></target>
+<target>フォルダ %x を %y に移動中</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target></target>
+<target>シンボリックリンク %x を %y に移動中</target>
 
 <source>Creating file %x</source>
-<target></target>
+<target>ファイル %x を作成中</target>
 
 <source>Creating symbolic link %x</source>
-<target></target>
+<target>シンボリックリンク %x を作成中</target>
 
 <source>Creating folder %x</source>
 <target>フォルダ %x を作成中</target>
 
 <source>Overwriting file %x</source>
-<target></target>
+<target>ファイル %x を上書き中</target>
 
 <source>Overwriting symbolic link %x</source>
-<target></target>
+<target>シンボリックリンク %x を上書き中</target>
 
 <source>Verifying file %x</source>
 <target>ファイル %x の検証中</target>
@@ -1449,7 +1452,7 @@ Transfer file and directory permissions
 <target>利用可能なディスク空き容量:</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target></target>
+<target>以下のパスにあるゴミ箱が利用できません! 代わりにファイルは完全削除されます:</target>
 
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>複数ペアのディレクトリ設定部分に変更された箇所があります! 同期設定を再確認してみてください!</target>

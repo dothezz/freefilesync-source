@@ -1,6 +1,9 @@
-#include <wx/string.h>
+#ifndef VERSION_HEADER_434343489702544325
+#define VERSION_HEADER_434343489702544325
 
 namespace zen
 {
-    const wxString currentVersion = wxT("4.2"); //internal linkage!
+const wchar_t currentVersion[] = L"4.2"; //internal linkage!
 }
+
+#endif

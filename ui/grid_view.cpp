@@ -7,7 +7,6 @@
 #include "grid_view.h"
 #include "sorting.h"
 #include "../synchronization.h"
-#include <boost/bind.hpp>
 #include <zen/stl_tools.h>
 
 using namespace zen;

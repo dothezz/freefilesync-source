@@ -802,24 +802,20 @@ Sulje pois: \stuff\temp\*
 <target>Kopioi lukitut tiedostot</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Kopioi jaetut/lukitut tiedostot Volume Shadow Copy prosessilla
-(Vaatii Järjestelmävalvojan oikeuksia)
+Kopioi jaetut/lukitut tiedostot Volume Shadow Copy prosessilla (Vaatii Järjestelmävalvojan oikeuksia)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Kopioi tiedoston käyttöoikeuksia</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Siirrä tiedosto- ja hakemisto-oikeuksia
-(Vaatii Järjestelmävalvojan oikeuksia)
+Siirrä tiedosto- ja hakemisto-oikeuksia (Vaatii Järjestelmävalvojan oikeuksia)
 </target>
 
 <source>Hidden dialogs:</source>

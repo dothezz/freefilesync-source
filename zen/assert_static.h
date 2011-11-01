@@ -25,8 +25,8 @@ template<>
 struct CompileTimeError<true> {};
 }
 
-#define LOKI_CONCAT( X, Y ) LOKI_CONCAT_SUB( X, Y )
-#define LOKI_CONCAT_SUB( X, Y ) X##Y
+#define LOKI_CONCAT(X, Y) LOKI_CONCAT_SUB(X, Y)
+#define LOKI_CONCAT_SUB(X, Y) X ## Y
 
 #define assert_static(expr)  \
     enum { LOKI_CONCAT(loki_enum_dummy_value, __LINE__) = sizeof(StaticCheckImpl::CompileTimeError<static_cast<bool>(expr) >) }
@@ -37,7 +37,7 @@ struct CompileTimeError<true> {};
 #endif
 */
 
-//C++11:
+//C++11: at least get rid of this pointless string literal requirement
 #define assert_static(X)  \
     static_assert(X, "Static assert has failed!");
 

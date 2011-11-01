@@ -31,7 +31,7 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
 
             if (!startsWith(fileBegin, xmlBegin) &&
                 !startsWith(fileBegin, zen::BYTE_ORDER_MARK_UTF8 + xmlBegin)) //respect BOM!
-                throw FfsXmlError(_("Error parsing configuration file:") + "\n\"" + filename + "\"");
+                throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + filename + L"\"");
         }
 
         const zen::UInt64 fs = zen::getFilesize(filename); //throw FileError
@@ -40,14 +40,14 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
         FileInput inputFile(filename); //throw FileError
         const size_t bytesRead = inputFile.read(&stream[0], stream.size()); //throw FileError
         if (bytesRead < to<size_t>(fs))
-            throw FfsXmlError(_("Error reading file:") + "\n\"" + filename + "\"");
+            throw FfsXmlError(_("Error reading file:") + L"\n\"" + filename + L"\"");
     }
     catch (const FileError& error)
     {
         if (!fileExists(filename))
-            throw FfsXmlError(_("File does not exist:") + "\n\"" + filename+ "\"");
+            throw FfsXmlError(_("File does not exist:") + L"\n\"" + filename+ L"\"");
 
-        throw FfsXmlError(error.msg());
+        throw FfsXmlError(error.toString());
     }
 
     try
@@ -56,14 +56,14 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
     }
     catch (const XmlParsingError&)
     {
-        throw FfsXmlError(_("Error parsing configuration file:") + "\n\"" + filename + "\"");
+        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + filename + L"\"");
     }
 }
 
 
 const std::wstring xmlAccess::getErrorMessageFormatted(const XmlIn& in)
 {
-    std::wstring errorMessage = _("Could not read values for the following XML nodes:") + "\n";
+    std::wstring errorMessage = _("Could not read values for the following XML nodes:") + L"\n";
 
     std::vector<std::wstring> failedNodes = in.getErrorsAs<std::wstring>();
     std::for_each(failedNodes.begin(), failedNodes.end(),
@@ -98,6 +98,6 @@ void xmlAccess::saveXmlDocument(const zen::XmlDoc& doc, const Zstring& filename)
         }
         catch (const FileError& error) //more detailed error messages than with wxWidgets
         {
-            throw FfsXmlError(error.msg());
+            throw FfsXmlError(error.toString());
         }
 }

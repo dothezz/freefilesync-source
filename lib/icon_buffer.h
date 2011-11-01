@@ -27,15 +27,13 @@ public:
     IconBuffer(IconSize sz);
     ~IconBuffer();
 
-    int getSize() const { return cvrtSize(icoSize); } //*maximum* icon size in pixel
-
-    const wxIcon& genericDirIcon () { return genDirIcon;  }
     const wxIcon& genericFileIcon() { return genFileIcon; }
+    const wxIcon& genericDirIcon () { return genDirIcon;  }
+
+    int getSize() const; //*maximum* icon size in pixel
 
     bool requestFileIcon(const Zstring& filename, wxIcon* icon = NULL); //returns false if icon is not in buffer
     void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
-
-    static int cvrtSize(IconSize sz);
 
 private:
     struct Pimpl;

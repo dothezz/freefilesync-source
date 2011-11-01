@@ -5,7 +5,6 @@
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 #include <memory>
-#include <boost/weak_ptr.hpp>
 #include <wx+/string_conv.h>
 #include <zen/last_error.h>
 #include <zen/thread.h> //includes <boost/thread.hpp>
@@ -63,7 +62,7 @@ public:
         }
         catch (const std::exception& e) //exceptions must be catched per thread
         {
-            wxSafeShowMessage(wxString(_("An exception occurred!")) + wxT("(Dirlock)"), wxString::FromAscii(e.what())); //simple wxMessageBox won't do for threads
+            wxSafeShowMessage(wxString(_("An exception occurred!")) + wxT("(Dirlock)"), utf8CvrtTo<wxString>(e.what())); //simple wxMessageBox won't do for threads
         }
     }
 
@@ -127,7 +126,7 @@ UInt64 getLockFileSize(const Zstring& filename) //throw FileError, ErrorNotExist
     {
         const DWORD lastError = ::GetLastError();
 
-        std::wstring errorMessage = _("Error reading file attributes:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error reading file attributes:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted(lastError);
 
         if (lastError == ERROR_FILE_NOT_FOUND ||
             lastError == ERROR_PATH_NOT_FOUND ||
@@ -148,7 +147,7 @@ UInt64 getLockFileSize(const Zstring& filename) //throw FileError, ErrorNotExist
     {
         const int lastError = errno;
 
-        std::wstring errorMessage = _("Error reading file attributes:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error reading file attributes:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted(lastError);
 
         if (lastError == ENOENT)
             throw ErrorNotExisting(errorMessage);
@@ -201,9 +200,9 @@ std::string getComputerId() //returns empty string on error
     const wxString fhn = ::wxGetFullHostName();
     if (fhn.empty()) return std::string();
 #ifdef FFS_WIN
-    return "Windows " + std::string(fhn.ToUTF8());
+    return "Windows " + utf8CvrtTo<std::string>(fhn);
 #elif defined FFS_LINUX
-    return "Linux " + std::string(fhn.ToUTF8());
+    return "Linux " + utf8CvrtTo<std::string>(fhn);
 #endif
 }
 
@@ -342,7 +341,7 @@ std::string retrieveLockId(const Zstring& lockfilename) //throw FileError, Error
 void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
 {
     std::wstring infoMsg = _("Waiting while directory is locked (%x)...");
-    replace(infoMsg, L"%x", std::wstring(L"\"") + lockfilename + "\"");
+    replace(infoMsg, L"%x", std::wstring(L"\"") + lockfilename + L"\"");
     if (callback)
         callback->reportInfo(infoMsg);
     //---------------------------------------------------------------
@@ -411,7 +410,7 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
 
                         std::wstring remSecMsg = _P("1 sec", "%x sec", remainingSeconds);
                         replace(remSecMsg, L"%x", toString<std::wstring>(remainingSeconds));
-                        callback->reportInfo(infoMsg + " " + remSecMsg);
+                        callback->reportInfo(infoMsg + L" " + remSecMsg);
                     }
                     else
                         callback->reportInfo(infoMsg); //emit a message in any case (might clear other one)
@@ -455,7 +454,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
         if (::GetLastError() == ERROR_FILE_EXISTS)
             return false;
         else
-            throw FileError(_("Error setting directory lock:") + "\n\"" + lockfilename + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error setting directory lock:") + L"\n\"" + lockfilename + L"\"" + L"\n\n" + getLastErrorFormatted());
     }
     ::CloseHandle(fileHandle);
 
@@ -468,7 +467,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
         if (errno == EEXIST)
             return false;
         else
-            throw FileError(_("Error setting directory lock:") + "\n\"" + lockfilename + "\"" + "\n\n" + getLastErrorFormatted());
+            throw FileError(_("Error setting directory lock:") + L"\n\"" + lockfilename + L"\"" + L"\n\n" + getLastErrorFormatted());
     }
     ::close(fileHandle);
 #endif
@@ -566,8 +565,7 @@ private:
     {
         UuidToLockMap::const_iterator iterLock = uuidToLock.find(lockId);
         return iterLock != uuidToLock.end() ?
-               iterLock->second.lock() : //try to get shared_ptr; throw()
-               std::shared_ptr<SharedDirLock>();
+               iterLock->second.lock() : nullptr; //try to get shared_ptr; throw()
     }
 
     typedef std::weak_ptr<SharedDirLock> SharedLock;

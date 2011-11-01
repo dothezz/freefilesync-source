@@ -100,7 +100,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;./zenXml;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>wx+\pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4996;4267;4512</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -134,7 +134,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;./zenXml;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>wx+\pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4996;4267;4512</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -168,7 +168,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;./zenXml;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4100;4996;4267;4512</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -202,7 +202,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;./zenXml;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4100;4996;4267;4512</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -280,7 +280,7 @@
     <ClCompile Include="wx+\graph.cpp" />
     <ClCompile Include="wx+\mouse_move_dlg.cpp" />
     <ClCompile Include="wx+\tooltip.cpp" />
-    <ClCompile Include="zenXml\zenxml\unit_test.cpp" />
+    <ClCompile Include="zenxml\unit_test.cpp" />
     <ClCompile Include="zen\dst_hack.cpp" />
     <ClCompile Include="zen\file_handling.cpp" />
     <ClCompile Include="zen\file_id.cpp" />

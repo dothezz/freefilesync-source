@@ -4,6 +4,16 @@
 
 Changelog v4.2
 ---------------
+Implemented workaround for compiler bug leading to uncaught exceptions (Windows 32 bit)
+Shadow Copy Service: Native support for Windows7/Server 2008
+Fixed reference by volume name parsing issue
+Rearranged synchronization progress dialog
+More concise log message format
+Fixed default file icon (Kubuntu)
+Support for wxWidgets 2.9 series (Ubuntu/Kubuntu)
+FAT 2 sec tolerance for files dated in the future
+Honor DACL/SACL inheritance flags when copying NTFS permissions (Windows)
+New option in GlobalSettings.xml: "RunWithBackgroundPriority" (Windows Vista and later)
 
 
 Changelog v4.1

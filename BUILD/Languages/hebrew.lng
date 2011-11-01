@@ -907,24 +907,20 @@ Exclude: \stuff\temp\*
 <target>העתק קבצים נעולים</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-העתק קבצים בשיתוף או נעולים באמצעות שרות Volume Shadow Copy Service
-(דורש הרשאות מנהל מערכת)
+העתק קבצים בשיתוף או נעולים באמצעות שרות Volume Shadow Copy Service (דורש הרשאות מנהל מערכת)
 </target>
 
 <source>Copy file access permissions</source>
 <target>העתק הרשאות גישה של הקובץ</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-העבר הרשאות קבצים ומחיצות
-(דורש הרשאות מנהל מערכת)
+העבר הרשאות קבצים ומחיצות (דורש הרשאות מנהל מערכת)
 </target>
 
 <source>Hidden dialogs:</source>

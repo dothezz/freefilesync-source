@@ -25,7 +25,7 @@ Example:
                                 setLabelX(Graph2D::POSLX_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
                                 setLabelY(Graph2D::POSLY_RIGHT,  60, std::make_shared<LabelFormatterBytes>()));
     //set graph data
-    std::shared_ptr<GraphData>() graphDataBytes = ...
+    std::shared_ptr<GraphData> graphDataBytes = ...
 	m_panelGraph->setData(graphDataBytes, Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0)));
 */
 
@@ -33,9 +33,9 @@ Example:
 struct GraphData
 {
     virtual ~GraphData() {}
-    virtual double getValue(double x) const = 0;
-    virtual double getXBegin()        const = 0;
-    virtual double getXEnd()          const = 0; //upper bound for x, getValue() is NOT evaluated at this position! Similar to std::vector::end()
+    virtual double getValue (double x) const = 0;
+    virtual double getXBegin()         const = 0;
+    virtual double getXEnd  ()         const = 0; //upper bound for x, getValue() is NOT evaluated at this position! Similar to std::vector::end()
 };
 
 
@@ -99,7 +99,7 @@ struct DecimalNumberFormatter : public LabelFormatter
 
 //------------------------------------------------------------------------------------------------------------
 //emit data selection event
-//usage: wnd.Connect(wxEVT_GRAPH_SELECTION, GraphSelectEventHandler(MyDlg::OnGraphSelection), NULL, this);
+//Usage: wnd.Connect(wxEVT_GRAPH_SELECTION, GraphSelectEventHandler(MyDlg::OnGraphSelection), NULL, this);
 //       void MyDlg::OnGraphSelection(GraphSelectEvent& event);
 
 

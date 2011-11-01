@@ -899,24 +899,20 @@ Uitsluiten: \stuff\temp\*
 <target>Kopieer vergrendelde bestanden</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Kopieer gedeelde of vergrendelde bestanden met Volume Shadow Copy Service
-(Vereist Administrator rechten)
+Kopieer gedeelde of vergrendelde bestanden met Volume Shadow Copy Service (Vereist Administrator rechten)
 </target>
 
 <source>Copy file access permissions</source>
 <target></target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Zet bestand en map permissies over
-(Vereist Administrator rechten)
+Zet bestand en map permissies over (Vereist Administrator rechten)
 </target>
 
 <source>Hidden dialogs:</source>

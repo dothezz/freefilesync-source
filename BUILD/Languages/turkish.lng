@@ -802,24 +802,20 @@ Katma: \stuff\temp\*
 <target>Kilitli dosyaları da kopyala</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Paylaşılan ya da kilitli dosyaları Gölge Kopya Hizmetini
- kullanarak kopyalar (Yönetici izinlerine gerek duyar)
+Paylaşılan ya da kilitli dosyaları Gölge Kopya Hizmetini kullanarak kopyalar (Yönetici izinlerine gerek duyar)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Dosya erişim izinlerini kopyala</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Dosya ve klasör izinlerini de aktarır
-(Yönetici izinlerine gerek duyar)
+Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)
 </target>
 
 <source>Hidden dialogs:</source>

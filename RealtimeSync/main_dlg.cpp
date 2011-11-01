@@ -65,9 +65,9 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
         catch (const xmlAccess::FfsXmlError& error)
         {
             if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-                wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
+                wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
             else
-                wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+                wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
         }
 
     const bool startWatchingImmediately = loadCfgSuccess && !cfgFileName.empty();
@@ -75,8 +75,14 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     setConfiguration(newConfig);
     setLastUsedConfig(currentConfigFile);
     //-----------------------------------------------------------------------------------------
+    //Layout();
+    //Fit();
 
-    Fit();
+    m_scrolledWinFolders->Fit(); //adjust scrolled window size
+    m_scrolledWinFolders->Layout(); //fix small layout problem
+    m_panelMain->Layout();       //adjust stuff inside scrolled window
+    Fit();                       //adapt dialog size
+
     Center();
 
     if (startWatchingImmediately) //start watch mode directly
@@ -100,7 +106,7 @@ MainDialog::~MainDialog()
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
-        wxMessageBox(error.msg().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR);
     }
 }
 
@@ -119,7 +125,7 @@ void MainDialog::OnQuit(wxCommandEvent& event)
 
 const wxString& MainDialog::lastConfigFileName()
 {
-    static wxString instance = zen::getConfigDir() + wxT("LastRun.ffs_real");
+    static wxString instance = toWx(zen::getConfigDir()) + wxT("LastRun.ffs_real");
     return instance;
 }
 
@@ -222,7 +228,7 @@ void MainDialog::OnSaveConfig(wxCommandEvent& event)
         }
         catch (const zen::FileError& error)
         {
-            wxMessageBox(error.msg().c_str(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR);
         }
     }
 }
@@ -239,10 +245,10 @@ void MainDialog::loadConfig(const wxString& filename)
     catch (const xmlAccess::FfsXmlError& error)
     {
         if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-            wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
+            wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
         else
         {
-            wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
             return;
         }
     }

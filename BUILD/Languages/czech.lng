@@ -913,24 +913,20 @@ Vynechat: \někde\něco\*
 <target>Kopírovat zamčené soubory</target>
 
 <source>
-Copy shared or locked files using Volume Shadow Copy Service
-(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
 </source>
 <target>
-Kopírovat sdílené nebo zamčené soubory pomocí Volume Shadow Copy Service
-(Vyžaduje administrátorské oprávnění)
+Kopírovat sdílené nebo zamčené soubory pomocí Volume Shadow Copy Service (Vyžaduje administrátorské oprávnění)
 </target>
 
 <source>Copy file access permissions</source>
 <target>Kopírovat přístupová oprávnění k souborům</target>
 
 <source>
-Transfer file and directory permissions
-(Requires Administrator rights)
+Transfer file and directory permissions (Requires Administrator rights)
 </source>
 <target>
-Přenést přístupová oprávnění souborů a adresářů
-(Vyžaduje administrátorké oprávnění)
+Přenést přístupová oprávnění souborů a adresářů (Vyžaduje administrátorké oprávnění)
 </target>
 
 <source>Hidden dialogs:</source>

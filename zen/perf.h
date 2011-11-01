@@ -8,14 +8,8 @@
 #define DEBUG_PERF_HEADER
 
 #include <sstream>
+#include "deprecate.h"
 #include "win.h" //includes "windows.h"
-
-#ifdef __MINGW32__
-#define DEPRECATED(x) x __attribute__ ((deprecated))
-#elif defined _MSC_VER
-#define DEPRECATED(x) __declspec(deprecated) x
-#endif
-
 
 //two macros for quick performance measurements
 #define PERF_START CpuTimer perfTest;
@@ -26,7 +20,8 @@ class CpuTimer
 public:
     class TimerError {};
 
-    DEPRECATED(CpuTimer()) : frequency(), startTime(), resultShown(false)
+    ZEN_DEPRECATE
+    CpuTimer() : frequency(), startTime(), resultShown(false)
     {
         SetThreadAffinity dummy;
         if (!::QueryPerformanceFrequency(&frequency)) throw TimerError();

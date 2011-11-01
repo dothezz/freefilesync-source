@@ -45,7 +45,7 @@ public:
         catch (const FileError& e)
         {
             bool dummy = false; //this warning shall not be shown but logged only
-            procCallback.reportWarning(e.msg(), dummy); //may throw!
+            procCallback.reportWarning(e.toString(), dummy); //may throw!
         }
     }
 

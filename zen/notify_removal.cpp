@@ -96,7 +96,7 @@ MessageProvider::MessageProvider() :
     windowHandle(NULL)
 {
     if (process == NULL)
-        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + "\n\n" + getLastErrorFormatted() + " (GetModuleHandle)");
+        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (GetModuleHandle)");
 
     //register the main window class
     WNDCLASS wc = {};
@@ -105,7 +105,7 @@ MessageProvider::MessageProvider() :
     wc.lpszClassName = WINDOW_NAME;
 
     if (::RegisterClass(&wc) == 0)
-        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + "\n\n" + getLastErrorFormatted() + " (RegisterClass)");
+        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (RegisterClass)");
 
     zen::ScopeGuard guardClass = zen::makeGuard([&]() { ::UnregisterClass(WINDOW_NAME, process); });
 
@@ -123,7 +123,7 @@ MessageProvider::MessageProvider() :
                        process, //HINSTANCE hInstance,
                        NULL);   //LPVOID lpParam
     if (windowHandle == NULL)
-        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + "\n\n" + getLastErrorFormatted() + " (CreateWindow)");
+        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (CreateWindow)");
 
     guardClass.dismiss();
 }
@@ -170,7 +170,7 @@ public:
             if (lastError != ERROR_CALL_NOT_IMPLEMENTED   && //fail on SAMBA share: this shouldn't be a showstopper!
                 lastError != ERROR_SERVICE_SPECIFIC_ERROR && //neither should be fail for "Pogoplug" mapped network drives
                 lastError != ERROR_INVALID_DATA)             //this seems to happen for a NetDrive-mapped FTP server
-                throw zen::FileError(std::wstring(L"Could not register device removal notifications:") + "\n\n" + getLastErrorFormatted(lastError));
+                throw zen::FileError(std::wstring(L"Could not register device removal notifications:") + L"\n\n" + getLastErrorFormatted(lastError));
         }
     }
 

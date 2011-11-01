@@ -10,7 +10,7 @@
 #include <numeric>
 #include <wx/bitmap.h>
 #include <wx/dcmemory.h>
-
+#include <zen/basic_math.h>
 
 namespace zen
 {
@@ -64,7 +64,8 @@ double getAvgBrightness(const wxImage& img)
 {
     const int pixelCount = img.GetWidth() * img.GetHeight();
     auto pixBegin = img.GetData();
-    if (pixBegin)
+
+    if (pixelCount > 0 && pixBegin)
     {
         auto pixEnd = pixBegin + 3 * pixelCount; //RGB
 
@@ -77,9 +78,9 @@ double getAvgBrightness(const wxImage& img)
             for (auto iter = pixBegin; iter != pixEnd; ++iter)
                 dividend += *iter * static_cast<double>(alphaFirst[(iter - pixBegin) / 3]);
 
-            const int divisor = 3.0 * std::accumulate(alphaFirst, alphaFirst + pixelCount, 0.0);
+            const double divisor = 3.0 * std::accumulate(alphaFirst, alphaFirst + pixelCount, 0.0);
 
-            return dividend / divisor;
+            return numeric::isNull(divisor) ? 0 : dividend / divisor;
         }
         else
             return std::accumulate(pixBegin, pixEnd, 0.0) / (3.0 * pixelCount);

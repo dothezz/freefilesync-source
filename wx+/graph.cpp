@@ -35,6 +35,8 @@ double zen::nextNiceNumber(double blockSize) //round to next number which is a c
 
     const double k = std::floor(std::log10(blockSize));
     const double e = std::pow(10, k);
+    if (isNull(e))
+        return 0;
     const double a = blockSize / e; //blockSize = a * 10^k with a in (1, 10)
 
     //have a look at leading two digits: "nice" numbers start with 1, 2, 2.5 and 5
@@ -90,13 +92,15 @@ wxColor getDefaultColor(size_t pos)
 void drawYLabel(wxDC& dc, double& yMin, double& yMax, const wxRect& clientArea, int labelWidth, bool drawLeft, const LabelFormatter& labelFmt) //clientArea := y-label + data window
 {
     //note: DON'T use wxDC::GetSize()! DC may be larger than visible area!
-    if (clientArea.GetHeight() <= 0 || clientArea.GetWidth() <= 0) return;
+    if (clientArea.GetHeight() <= 0 || clientArea.GetWidth() <= 0)
+        return;
 
     int optimalBlockHeight = 3 * dc.GetMultiLineTextExtent(wxT("1")).GetHeight();;
 
     double valRangePerBlock = (yMax - yMin) * optimalBlockHeight / clientArea.GetHeight();
     valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
-    if (numeric::isNull(valRangePerBlock)) return;
+    if (isNull(valRangePerBlock))
+        return;
 
     double yMinNew = std::floor(yMin / valRangePerBlock) * valRangePerBlock;
     double yMaxNew = std::ceil (yMax / valRangePerBlock) * valRangePerBlock;
@@ -139,18 +143,21 @@ void drawYLabel(wxDC& dc, double& yMin, double& yMax, const wxRect& clientArea, 
 void drawXLabel(wxDC& dc, double& xMin, double& xMax, const wxRect& clientArea, int labelHeight, bool drawBottom, const LabelFormatter& labelFmt) //clientArea := x-label + data window
 {
     //note: DON'T use wxDC::GetSize()! DC may be larger than visible area!
-    if (clientArea.GetHeight() <= 0 || clientArea.GetWidth() <= 0) return;
+    if (clientArea.GetHeight() <= 0 || clientArea.GetWidth() <= 0)
+        return;
 
     int optimalBlockWidth = dc.GetMultiLineTextExtent(wxT("100000000000000")).GetWidth();
 
     double valRangePerBlock = (xMax - xMin) * optimalBlockWidth / clientArea.GetWidth();
     valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
-    if (numeric::isNull(valRangePerBlock)) return;
+    if (isNull(valRangePerBlock))
+        return;
 
     double xMinNew = std::floor(xMin / valRangePerBlock) * valRangePerBlock;
     double xMaxNew = std::ceil (xMax / valRangePerBlock) * valRangePerBlock;
     int blockCount = numeric::round((xMaxNew - xMinNew) / valRangePerBlock);
-    if (blockCount == 0) return;
+    if (blockCount == 0)
+        return;
 
     xMin = xMinNew; //inform about adjusted x value range
     xMax = xMaxNew;
@@ -190,8 +197,8 @@ class ConvertCoord //convert between screen and actual coordinates
 public:
     ConvertCoord(double valMin, double valMax, size_t screenSize) :
         min_(valMin),
-        scaleToReal(screenSize == 0 ? 0 :                (valMax - valMin) / screenSize),
-        scaleToScr(numeric::isNull(valMax - valMin) ? 0 : screenSize / (valMax - valMin)) {}
+        scaleToReal(screenSize == 0 ? 0 : (valMax - valMin) / screenSize),
+        scaleToScr(isNull(valMax - valMin) ? 0 : screenSize / (valMax - valMin)) {}
 
     double screenToReal(double screenPos) const //input value: [0, screenSize - 1]
     {
@@ -333,8 +340,11 @@ void Graph2D::render(wxDC& dc) const
 {
     {
         //have everything including label background in natural window color by default (overwriting current background color)
-        DcBackgroundChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE)); //sigh, who *invents* this stuff??? -> workaround for issue with wxBufferedPaintDC
-        //wxDCBrushChanger dummy(dc, *wxTRANSPARENT_BRUSH);
+        const wxColor backColor = wxPanel::GetClassDefaultAttributes().colBg != wxNullColour ?
+                                  wxPanel::GetClassDefaultAttributes().colBg :
+                                  wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
+        //wxDCBrushChanger dummy(dc, *wxTRANSPARENT_BRUSH); //sigh, who *invents* this stuff??? -> workaround for issue with wxBufferedPaintDC
+        DcBackgroundChanger dummy(dc, backColor);
         dc.Clear();
     }
 
@@ -418,8 +428,8 @@ void Graph2D::render(wxDC& dc) const
         double maxWndY = attr.maxYauto ? -HUGE_VAL : attr.maxY; //
         if (!curves_.empty())
         {
-            const int avgFactor = 2; //some averaging of edgy input data to smoothen behavior on window resize
-            const ConvertCoord cvrtX(minWndX, maxWndX, dataArea.width * avgFactor);
+            const int AVG_FACTOR = 2; //some averaging of edgy input data to smoothen behavior on window resize
+            const ConvertCoord cvrtX(minWndX, maxWndX, dataArea.width * AVG_FACTOR);
 
             for (GraphList::const_iterator j = curves_.begin(); j != curves_.end(); ++j)
             {
@@ -430,13 +440,13 @@ void Graph2D::render(wxDC& dc) const
                 int& offset                  = yValuesList[j - curves_.begin()].second; //x-value offset in pixel
                 {
                     const int posFirst = std::max<int>(std::ceil(cvrtX.realToScreen(graph.getXBegin())), 0); //evaluate visible area only and make sure to not step one pixel before xbegin()!
-                    const int postLast = std::min<int>(std::floor(cvrtX.realToScreen(graph.getXEnd())), dataArea.width * avgFactor); //
+                    const int postLast = std::min<int>(std::floor(cvrtX.realToScreen(graph.getXEnd())), dataArea.width * AVG_FACTOR); //
 
                     for (int i = posFirst; i < postLast; ++i)
                         yValues.push_back(graph.getValue(cvrtX.screenToReal(i)));
 
-                    subsample(yValues, avgFactor);
-                    offset = posFirst / avgFactor;
+                    subsample(yValues, AVG_FACTOR);
+                    offset = posFirst / AVG_FACTOR;
                 }
 
                 if (!yValues.empty())

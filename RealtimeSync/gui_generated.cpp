@@ -88,13 +88,10 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_staticText21->Wrap( -1 );
     sbSizer41->Add( m_staticText21, 0, wxRIGHT|wxLEFT|wxEXPAND, 5 );
 
-    bSizer1->Add( sbSizer41, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT|wxEXPAND, 40 );
+    bSizer1->Add( sbSizer41, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT|wxEXPAND, 20 );
 
     m_staticline2 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizer1->Add( m_staticline2, 0, wxTOP|wxBOTTOM|wxEXPAND, 10 );
-
-    wxBoxSizer* bSizer8;
-    bSizer8 = new wxBoxSizer( wxVERTICAL );
 
     sbSizerDirToWatch = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Directories to watch") ), wxVERTICAL );
 
@@ -117,7 +114,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 
     bSizer114->Add( bSizer781, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_txtCtrlDirectoryMain = new wxTextCtrl( m_panelMainFolder, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+    m_txtCtrlDirectoryMain = new wxTextCtrl( m_panelMainFolder, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 300,-1 ), 0 );
     bSizer114->Add( m_txtCtrlDirectoryMain, 1, wxALIGN_CENTER_VERTICAL, 5 );
 
     m_dirPickerMain = new zen::DirPickerCtrl( m_panelMainFolder, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -139,9 +136,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     bSizerFolders->Fit( m_scrolledWinFolders );
     sbSizerDirToWatch->Add( m_scrolledWinFolders, 0, wxEXPAND, 5 );
 
-    bSizer8->Add( sbSizerDirToWatch, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-    bSizer1->Add( bSizer8, 0, wxEXPAND, 5 );
+    bSizer1->Add( sbSizerDirToWatch, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 
     wxStaticBoxSizer* sbSizer3;
     sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Command line") ), wxVERTICAL );
@@ -157,9 +152,9 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_spinCtrlDelay = new wxSpinCtrl( m_panelMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 2000000000, 0 );
     m_spinCtrlDelay->SetToolTip( _("Idle time between detection of last change and execution of command line in seconds") );
 
-    sbSizer4->Add( m_spinCtrlDelay, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxALIGN_CENTER_HORIZONTAL, 5 );
+    sbSizer4->Add( m_spinCtrlDelay, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    bSizer1->Add( sbSizer4, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
+    bSizer1->Add( sbSizer4, 0, wxRIGHT|wxLEFT|wxEXPAND, 5 );
 
     m_staticline1 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizer1->Add( m_staticline1, 0, wxEXPAND|wxTOP|wxBOTTOM, 10 );

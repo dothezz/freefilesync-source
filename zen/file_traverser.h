@@ -7,8 +7,8 @@
 #ifndef FILETRAVERSER_H_INCLUDED
 #define FILETRAVERSER_H_INCLUDED
 
+#include <memory>
 #include "zstring.h"
-#include "type_tools.h"
 #include "int64.h"
 
 //advanced file traverser returning metadata and hierarchical information on files and directories
@@ -28,24 +28,9 @@ public:
 
     struct SymlinkInfo
     {
-        Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
-        Zstring    targetPath;  //may be empty if something goes wrong
-        bool dirLink;           //"true": point to dir; "false": point to file (or broken Link on Linux)
-    };
-
-    struct ReturnValDir
-    {
-        enum ReturnValueEnh
-        {
-            TRAVERSING_DIR_IGNORE,
-            TRAVERSING_DIR_CONTINUE
-        };
-
-        ReturnValDir(Int2Type<TRAVERSING_DIR_IGNORE>) : returnCode(TRAVERSING_DIR_IGNORE), subDirCb(NULL) {}
-        ReturnValDir(Int2Type<TRAVERSING_DIR_CONTINUE>, TraverseCallback& subDirCallback) : returnCode(TRAVERSING_DIR_CONTINUE), subDirCb(&subDirCallback) {}
-
-        ReturnValueEnh returnCode;
-        TraverseCallback* subDirCb;
+        Int64   lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
+        Zstring targetPath;       //may be empty if something goes wrong
+        bool    dirLink;          //"true": point to dir; "false": point to file (or broken Link on Linux)
     };
 
     enum HandleError
@@ -55,10 +40,11 @@ public:
     };
 
     //overwrite these virtual methods
-    virtual void         onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo&    details) = 0;
-    virtual void         onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) = 0;
-    virtual ReturnValDir onDir    (const Zchar* shortName, const Zstring& fullName) = 0;
-    virtual HandleError  onError  (const std::wstring& errorText) = 0;
+    virtual std::shared_ptr<TraverseCallback>  //nullptr: ignore directory, non-nullptr: traverse into
+    /**/                onDir    (const Zchar* shortName, const Zstring& fullName) = 0;
+    virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo&    details) = 0;
+    virtual void        onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) = 0;
+    virtual HandleError onError  (const std::wstring& errorText) = 0;
 };
 
 

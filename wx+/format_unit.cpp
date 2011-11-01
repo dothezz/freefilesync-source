@@ -7,6 +7,7 @@
 #include "format_unit.h"
 #include <zen/basic_math.h>
 #include <zen/i18n.h>
+#include <zen/time.h>
 #include <cwchar>  //swprintf
 #include <ctime>
 #include <cstdio>
@@ -211,22 +212,17 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
             return _("Error");
     }
 
-    struct tm loc = {};
-    loc.tm_year = systemTimeLocal.wYear - 1900;
-    loc.tm_mon  = systemTimeLocal.wMonth - 1;
-    loc.tm_mday = systemTimeLocal.wDay;
-    loc.tm_hour = systemTimeLocal.wHour;
-    loc.tm_min  = systemTimeLocal.wMinute;
-    loc.tm_sec  = systemTimeLocal.wSecond;
-    const struct tm* timePtr = &loc;
+    zen::TimeComp loc;
+    loc.year   = systemTimeLocal.wYear;
+    loc.month  = systemTimeLocal.wMonth;
+    loc.day    = systemTimeLocal.wDay;
+    loc.hour   = systemTimeLocal.wHour;
+    loc.minute = systemTimeLocal.wMinute;
+    loc.second = systemTimeLocal.wSecond;
 
 #elif defined FFS_LINUX
-    const time_t fileTime = to<time_t>(utcTime);
-    const struct tm* timePtr = ::localtime(&fileTime); //convert to local time
+    zen::TimeComp loc = zen::localTime(to<time_t>(utcTime));
 #endif
 
-    wchar_t buffer[1000];
-    size_t charsWritten = std::wcsftime(buffer, 1000, L"%x  %X", timePtr);
-
-    return std::wstring(buffer, charsWritten);
+    return formatTime<std::wstring>(L"%x  %X", loc);
 }

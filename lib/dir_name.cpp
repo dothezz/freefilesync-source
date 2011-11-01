@@ -124,7 +124,7 @@ void DirectoryName<NameControl>::OnFilesDropped(FFSFileDropEvent& event)
             setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticBox_);
         else
         {
-            wxString parentName = beforeLast(fileName, FILE_NAME_SEPARATOR); //returns empty string if ch not found
+            wxString parentName = beforeLast(fileName, utf8CvrtTo<wxString>(FILE_NAME_SEPARATOR)); //returns empty string if ch not found
 #ifdef FFS_WIN
             if (endsWith(parentName, L":")) //volume name
                 parentName += FILE_NAME_SEPARATOR;
