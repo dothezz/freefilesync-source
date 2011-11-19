@@ -169,14 +169,14 @@
 <source>Comparison Result</source>
 <target>Αποτέλεσμα της σύγκρισης</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Η μορφή της βάσης δεδομένων συγχρονισμού δεν είναι συμβατή:</target>
-
 <source>Initial synchronization:</source>
 <target>Αρχικός συγχρονισμός:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Μια από τις βάσεις δεδομένων του FreeFileSync δεν υπάρχει ακόμα:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Η μορφή της βάσης δεδομένων συγχρονισμού δεν είναι συμβατή:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Οι βάσεις δεδομένων δεν έχουν δημιουργηθεί από τον ίδιο συγχρονισμό:</target>
@@ -206,7 +206,7 @@
 <target>Μεταφορά && Απόθεση</target>
 
 <source>Info</source>
-<target>Πληροφορίες</target>
+<target>Πληροφορία</target>
 
 <source>Fatal Error</source>
 <target>Σημαντικό Σφάλμα</target>
@@ -372,9 +372,6 @@ The command line is executed each time:
 <source>Batch execution</source>
 <target>Εκτέλεση δέσμης ενεργειών</target>
 
-<source>Log-messages:</source>
-<target>Αποθηκευμένα μηνύματα:</target>
-
 <source>Stop</source>
 <target>Λήξη</target>
 
@@ -501,6 +498,24 @@ The command line is executed each time:
 <source>Total amount of data that will be transferred</source>
 <target>Συνολικός όγκος δεδομένων που θα μεταφερθούν</target>
 
+<source>Operation:</source>
+<target>Λειτουργία:</target>
+
+<source>Items found:</source>
+<target>Βρέθηκαν στοιχεία:</target>
+
+<source>Items remaining:</source>
+<target>Περισσεύουν στοιχεία:</target>
+
+<source>Speed:</source>
+<target>Ταχύτητα:</target>
+
+<source>Time remaining:</source>
+<target>Απομένει χρόνος:</target>
+
+<source>Time elapsed:</source>
+<target>Πέρασε χρόνος:</target>
+
 <source>Batch job</source>
 <target>Δέσμη ενεργειών</target>
 
@@ -549,32 +564,14 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>&Άκυρο</target>
 
-<source>Operation:</source>
-<target>Λειτουργία:</target>
-
-<source>Items found:</source>
-<target>Βρέθηκαν στοιχεία:</target>
-
-<source>Items remaining:</source>
-<target>Περισσεύουν στοιχεία:</target>
-
-<source>Speed:</source>
-<target>Ταχύτητα:</target>
-
-<source>Time remaining:</source>
-<target>Απομένει χρόνος:</target>
-
-<source>Time elapsed:</source>
-<target>Πέρασε χρόνος:</target>
-
 <source>Select variant:</source>
 <target>Επιλέξτε μια μέθοδο:</target>
 
 <source><Automatic></source>
 <target><Αυτόματα></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Ανίχνευση και εφαρμογή των αλλαγών και στις δυο πλευρές με τη χρήση βάσης δεδομένων. Διαγραφές και διενέξεις ανιχνεύονται αυτόματα.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Αναγνώριση και αναπαραγωγή των αλλαγών και στις δύο πλευρές με τη χρήση μιας βάσης δεδομένων. Διαγραφές, μετονομασίες και διενέξεις ανιχνεύονται αυτόματα.</target>
 
 <source>Mirror ->></source>
 <target>Κατοπτρισμός ->></target>
@@ -1122,9 +1119,6 @@ Exclude: \stuff\temp\*
 <source>Filter: Single pair</source>
 <target>Φίλτρο: Ένα ζεύγος</target>
 
-<source>Ignore</source>
-<target>Παράβλεψη</target>
-
 <source>Direct</source>
 <target>Ως δεσμό</target>
 
@@ -1278,11 +1272,11 @@ Exclude: \stuff\temp\*
 <source>Error opening file:</source>
 <target>Σφάλμα κατά το άνοιγμα του αρχείου:</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Ατέρμονος βρόχος κατά την την ανάλυση του υποκαταλόγου:</target>
-
 <source>Error traversing directory:</source>
 <target>Σφάλμα κατά την ανάλυση του υποκαταλόγου:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Ατέρμονος βρόχος κατά την την ανάλυση του υποκαταλόγου:</target>
 
 <source>Error setting privilege:</source>
 <target>Σφάλμα κατά τον ορισμό δικαιωμάτων:</target>
@@ -1317,9 +1311,6 @@ Exclude: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Οι υποκατάλογοι είναι εξαρτώμενοι. Προσοχή κατά την εισαγωγή των κανόνων συγχρονισμού:</target>
 
-<source>Comparing content of files %x</source>
-<target>Σύγκριση του περιεχομένου των αρχείων %x</target>
-
 <source>Memory allocation failed!</source>
 <target>Η δέσμευση χώρου μνήμης απέτυχε!</target>
 
@@ -1335,14 +1326,14 @@ Exclude: \stuff\temp\*
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Οι συμβολικοί δεσμοί %x έχουν την ίδια ημερομηνία αλλά διαφορετικό προορισμό!</target>
 
+<source>Comparing content of files %x</source>
+<target>Σύγκριση του περιεχομένου των αρχείων %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>Η σύγκριση του περιεχομένου των αρχείων απέτυχε.</target>
 
 <source>Generating file list...</source>
 <target>Δημιουργία καταλόγου αρχείων...</target>
-
-<source>Multiple...</source>
-<target>Πολλαπλές ρυθμίσεις...</target>
 
 <source>Both sides are equal</source>
 <target>Οι δυο πλευρές είναι ίδιες</target>
@@ -1362,6 +1353,12 @@ Exclude: \stuff\temp\*
 <source>Delete right file/folder</source>
 <target>Διαγραφή του αρχείου/υποκαταλόγου στα δεξιά</target>
 
+<source>Move file on left</source>
+<target>Μεταφορά του αρχείου που βρίσκεται αριστερά</target>
+
+<source>Move file on right</source>
+<target>Μεταφορά του αρχείου που βρίσκεται δεξιά</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Αντικατάσταση του αρχείου/υποκαταλόγου στα αριστερά από το(ν) αντίστοιχο στα δεξιά</target>
 
@@ -1376,6 +1373,9 @@ Exclude: \stuff\temp\*
 
 <source>Copy file attributes only to right</source>
 <target>Αντιγραφή μόνο των χαρακτηριστικών του αρχείου στα δεξιά</target>
+
+<source>Multiple...</source>
+<target>Πολλαπλές ρυθμίσεις...</target>
 
 <source>Deleting file %x</source>
 <target>Διαγραφή του αρχείου %x</target>

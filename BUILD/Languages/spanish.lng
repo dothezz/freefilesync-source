@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronización Automática</target>
 
-<source>Browse</source>
-<target>Examinar</target>
-
-<source>Windows Error Code %x:</source>
-<target>Código de error de Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Código de error de Linux %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>Línea de comandos errónea: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>Error al resolver enlace simbólico:</target>
-
-<source>Show pop-up</source>
-<target>Mostrar ventana emergente</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Mostrar ventana emergente de errores o avisos</target>
-
-<source>Ignore errors</source>
-<target>Ignorar errores</target>
-
-<source>Hide all error and warning messages</source>
-<target>Ocultar todos los mensajes de error y aviso</target>
-
-<source>Exit instantly</source>
-<target>Salir inmediatamente</target>
-
-<source>Abort synchronization immediately</source>
-<target>Abortar sincronización inmediatamente</target>
-
 <source>Select alternate comparison settings</source>
 <target>Seleccionar opciones alternativas de comparación</target>
 
@@ -113,7 +80,46 @@
 <target>Buscar</target>
 
 <source>Select time span</source>
-<target></target>
+<target>Seleccionar duración</target>
+
+<source>Show pop-up</source>
+<target>Mostrar ventana emergente</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Mostrar ventana emergente de errores o avisos</target>
+
+<source>Ignore errors</source>
+<target>Ignorar errores</target>
+
+<source>Hide all error and warning messages</source>
+<target>Ocultar todos los mensajes de error y aviso</target>
+
+<source>Exit instantly</source>
+<target>Salir inmediatamente</target>
+
+<source>Abort synchronization immediately</source>
+<target>Abortar sincronización inmediatamente</target>
+
+<source>Browse</source>
+<target>Examinar</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Error al leer de la base de datos de sincronización:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Error al escribir en la base de datos de sincronización:</target>
+
+<source>Invalid command line: %x</source>
+<target>Línea de comandos errónea: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Código de error de Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Código de error de Linux %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Error al resolver enlace simbólico:</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -163,17 +169,14 @@
 <source>Comparison Result</source>
 <target>Resultado de la comparación</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Formato de base de datos de sincronización incompatible:</target>
-
 <source>Initial synchronization:</source>
 <target>Sincronización inicial:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Uno de los archivos de la base de datos de FreeFileSync aún no existe:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Error al leer de la base de datos de sincronización:</target>
+<source>Incompatible synchronization database format:</source>
+<target>Formato de base de datos de sincronización incompatible:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Archivos de base de datos no comparten la misma sesión de sincronización:</target>
@@ -199,11 +202,17 @@
 <pluralform>%x segundos</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Arrastrar y soltar</target>
+
 <source>Info</source>
 <target>Info</target>
 
 <source>Fatal Error</source>
 <target>Error fatal</target>
+
+<source>Error reading file:</source>
+<target>Error al leer archivo:</target>
 
 <source>Scanning:</source>
 <target>Escanear:</target>
@@ -223,14 +232,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>¡Archivo de configuración de FreeFileSync inválido!</target>
 
-<source>File does not exist:</source>
-<target>El archivo no existe:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Error al analizar el archivo de configuración:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Error al mover a la Papelera de Reciclaje:</target>
+
+<source>Could not load a required DLL:</source>
+<target>No se ha podido cargar el DLL solicitado:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>¡Error al acceder al servicio Volume Shadow Copy!</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>La realización de copias shadow en WOW64 no está soportado. Por favor, use la versión 64-bit de FreeFileSync.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>No se ha podido determinar el nombre del volumen para el archivo:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>El nombre del volumen %x no es una parte del nombre de archivo %y</target>
+
 <source>/sec</source>
 <target>/seg</target>
+
+<source>File does not exist:</source>
+<target>El archivo no existe:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>No se ha podido leer los valores para los siguientes nodos XML:</target>
 
 <source>S&ave configuration...</source>
 <target>G&uardar configuración...</target>
@@ -324,141 +354,6 @@ La línea de comandos se ejecuta cada vez:
 <source>A directory input field is empty.</source>
 <target>Un campo de directorio está vacío.</target>
 
-<source>Drag && drop</source>
-<target>Arrastrar y soltar</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>No se ha podido inicializar la visualización de directorios:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Error al visualizar los directorios.</target>
-
-<source>Conversion error:</source>
-<target>Error de conversión:</target>
-
-<source>Error deleting file:</source>
-<target>Error al borrar archivo:</target>
-
-<source>Error moving file:</source>
-<target>Error al mover archivo:</target>
-
-<source>Target file already existing!</source>
-<target>¡El archivo de destino ya existe!</target>
-
-<source>Error moving directory:</source>
-<target>Error al mover directorio:</target>
-
-<source>Target directory already existing!</source>
-<target>¡El directorio de destino ya existe!</target>
-
-<source>Error deleting directory:</source>
-<target>Error al borrar directorio:</target>
-
-<source>Error changing modification time:</source>
-<target>Error al cambiar hora de modificación:</target>
-
-<source>Error loading library function:</source>
-<target>Error al cargar la función de biblioteca:</target>
-
-<source>Error reading security context:</source>
-<target>Error al leer en contexto de seguridad:</target>
-
-<source>Error writing security context:</source>
-<target>Error al escribir en contexto de seguridad:</target>
-
-<source>Error copying file permissions:</source>
-<target>Error al copiar permisos del fichero:</target>
-
-<source>Error creating directory:</source>
-<target>Error al crear directorio:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Error al copiar enlace simbólico:</target>
-
-<source>Error copying file:</source>
-<target>Error al copiar archivo:</target>
-
-<source>Error opening file:</source>
-<target>Error al abrir archivo:</target>
-
-<source>Error writing file:</source>
-<target>Error al escribir archivo:</target>
-
-<source>Error reading file:</source>
-<target>Error al leer archivo:</target>
-
-<source>Operation aborted!</source>
-<target>¡Operación abortada!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Bucle infinito al buscar en el directorio:</target>
-
-<source>Error traversing directory:</source>
-<target>Error al buscar en el directorio:</target>
-
-<source>Error setting privilege:</source>
-<target>Error al establecer privilegios:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Error al mover a la Papelera de Reciclaje:</target>
-
-<source>Could not load a required DLL:</source>
-<target>No se ha podido cargar el DLL solicitado:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Error al escribir en la base de datos de sincronización:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>¡Error al acceder al servicio Volume Shadow Copy!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>La realización de copias shadow en WOW64 no está soportado. Por favor, use la versión 64-bit de FreeFileSync.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>No se ha podido determinar el nombre del volumen para el archivo:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>El nombre del volumen %x no es una parte del nombre de archivo %y</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 minuto</pluralform>
-<pluralform>%x minutos</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 hora</pluralform>
-<pluralform>%x horas</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 día</pluralform>
-<pluralform>%x días</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>No se ha podido leer los valores para los siguientes nodos XML:</target>
-
 <source>Logging</source>
 <target>Iniciando sesión</target>
 
@@ -476,9 +371,6 @@ La línea de comandos se ejecuta cada vez:
 
 <source>Batch execution</source>
 <target>Ejecución batch</target>
-
-<source>Log-messages:</source>
-<target>Registro de mensajes:</target>
 
 <source>Stop</source>
 <target>Detener</target>
@@ -606,6 +498,24 @@ La línea de comandos se ejecuta cada vez:
 <source>Total amount of data that will be transferred</source>
 <target>Cantidad total de datos que serán transferidos</target>
 
+<source>Operation:</source>
+<target>Operación:</target>
+
+<source>Items found:</source>
+<target>Elementos encontrados:</target>
+
+<source>Items remaining:</source>
+<target>Elementos restantes:</target>
+
+<source>Speed:</source>
+<target>Velocidad:</target>
+
+<source>Time remaining:</source>
+<target>Tiempo restante:</target>
+
+<source>Time elapsed:</source>
+<target>Tiempo transcurrido:</target>
+
 <source>Batch job</source>
 <target>Tarea batch</target>
 
@@ -654,32 +564,14 @@ La línea de comandos se ejecuta cada vez:
 <source>&Cancel</source>
 <target>&Cancelar</target>
 
-<source>Operation:</source>
-<target>Operación:</target>
-
-<source>Items found:</source>
-<target>Elementos encontrados:</target>
-
-<source>Items remaining:</source>
-<target>Elementos restantes:</target>
-
-<source>Speed:</source>
-<target>Velocidad:</target>
-
-<source>Time remaining:</source>
-<target>Tiempo restante:</target>
-
-<source>Time elapsed:</source>
-<target>Tiempo transcurrido:</target>
-
 <source>Select variant:</source>
 <target>Seleccione un tipo:</target>
 
 <source><Automatic></source>
 <target><Automático></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Identificar y aplicar cambios en ambos lados usando una base de datos. Las eliminaciones y los conflictos se detectan automáticamente.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Identificar y propagar cambios en ambos lados usando una base de datos. Borrados, renombraciones y conflictos son detectados automáticamente.</target>
 
 <source>Mirror ->></source>
 <target>Espejo ->></target>
@@ -901,27 +793,19 @@ Excluir: \stuff\temp\*
 <target>Copia de archivos transaccionales</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>Escribir en archivo temporal (*.ffs_tmp) primero y después renombrarlo. Esto garantiza un estado consistente incluso en caso de error fatal.</target>
 
 <source>Copy locked files</source>
 <target>Copiar archivos bloqueados</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Copiar archivos compartidos o bloqueados usando el servicio "Volume Shadow Copy" (Requiere derechos de administrador)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Copiar archivos compartidos o bloqueados usando el servicio "Volume Shadow Copy" (Requiere derechos de administrador)</target>
 
 <source>Copy file access permissions</source>
 <target>Copiar permisos de acceso al archivo</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Transferir permisos de archivo y directorio (Requiere derechos de administrador)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Transferir permisos de archivo y directorio (Requiere derechos de administrador)</target>
 
 <source>Hidden dialogs:</source>
 <target>Diálogos ocultos:</target>
@@ -952,6 +836,9 @@ Transferir permisos de archivo y directorio (Requiere derechos de administrador)
 
 <source>&Find next</source>
 <target>&Buscar siguiente</target>
+
+<source>Operation aborted!</source>
+<target>¡Operación abortada!</target>
 
 <source>Main bar</source>
 <target>Barra principal</target>
@@ -993,16 +880,16 @@ Transferir permisos de archivo y directorio (Requiere derechos de administrador)
 <target>Ajustar automáticamente las columnas</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>Tamaño del icono:</target>
 
 <source>Small</source>
-<target></target>
+<target>Pequeño</target>
 
 <source>Medium</source>
-<target></target>
+<target>Medio</target>
 
 <source>Large</source>
-<target></target>
+<target>Grande</target>
 
 <source>Include all rows</source>
 <target>Incluir todas las filas</target>
@@ -1130,6 +1017,9 @@ Transferir permisos de archivo y directorio (Requiere derechos de administrador)
 <source>File list exported!</source>
 <target>¡Lista de archivos exportada!</target>
 
+<source>Error writing file:</source>
+<target>Error al escribir archivo:</target>
+
 <source>Batch file created successfully!</source>
 <target>¡El archivo batch ha sido creado correctamente!</target>
 
@@ -1229,9 +1119,6 @@ Transferir permisos de archivo y directorio (Requiere derechos de administrador)
 <source>Filter: Single pair</source>
 <target>Filtro: Sólo un par</target>
 
-<source>Ignore</source>
-<target>Ignorar</target>
-
 <source>Direct</source>
 <target>Enviar</target>
 
@@ -1295,6 +1182,105 @@ Transferir permisos de archivo y directorio (Requiere derechos de administrador)
 <source>Move files into a time-stamped subdirectory</source>
 <target>Mover archivos a un subdirectorio con marca de tiempo</target>
 
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 minuto</pluralform>
+<pluralform>%x minutos</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 hora</pluralform>
+<pluralform>%x horas</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 día</pluralform>
+<pluralform>%x días</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>No se ha podido inicializar la visualización de directorios:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Error al visualizar los directorios.</target>
+
+<source>Conversion error:</source>
+<target>Error de conversión:</target>
+
+<source>Error deleting file:</source>
+<target>Error al borrar archivo:</target>
+
+<source>Error moving file:</source>
+<target>Error al mover archivo:</target>
+
+<source>Target file already existing!</source>
+<target>¡El archivo de destino ya existe!</target>
+
+<source>Error moving directory:</source>
+<target>Error al mover directorio:</target>
+
+<source>Target directory already existing!</source>
+<target>¡El directorio de destino ya existe!</target>
+
+<source>Error deleting directory:</source>
+<target>Error al borrar directorio:</target>
+
+<source>Error changing modification time:</source>
+<target>Error al cambiar hora de modificación:</target>
+
+<source>Error loading library function:</source>
+<target>Error al cargar la función de biblioteca:</target>
+
+<source>Error reading security context:</source>
+<target>Error al leer en contexto de seguridad:</target>
+
+<source>Error writing security context:</source>
+<target>Error al escribir en contexto de seguridad:</target>
+
+<source>Error copying file permissions:</source>
+<target>Error al copiar permisos del fichero:</target>
+
+<source>Error creating directory:</source>
+<target>Error al crear directorio:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Error al copiar enlace simbólico:</target>
+
+<source>Error copying file:</source>
+<target>Error al copiar archivo:</target>
+
+<source>Error opening file:</source>
+<target>Error al abrir archivo:</target>
+
+<source>Error traversing directory:</source>
+<target>Error al buscar en el directorio:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Bucle infinito al buscar en el directorio:</target>
+
+<source>Error setting privilege:</source>
+<target>Error al establecer privilegios:</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>¡Ambos lados han cambiado desde la última sincronizacion!</target>
 
@@ -1325,9 +1311,6 @@ Transferir permisos de archivo y directorio (Requiere derechos de administrador)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>¡Los directorios son dependientes! Tenga cuidado al establecer las reglas de sincronización:</target>
 
-<source>Comparing content of files %x</source>
-<target>Comparación del contenido de los archivos %x</target>
-
 <source>Memory allocation failed!</source>
 <target>¡La asignación de memoria ha fallado!</target>
 
@@ -1343,14 +1326,14 @@ Transferir permisos de archivo y directorio (Requiere derechos de administrador)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>¡Los enlaces simbólicos %x tienen la misma fecha pero un destino diferente!</target>
 
+<source>Comparing content of files %x</source>
+<target>Comparación del contenido de los archivos %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>La comparación de archivos por el contenido ha fallado.</target>
 
 <source>Generating file list...</source>
 <target>Generando lista de archivos...</target>
-
-<source>Multiple...</source>
-<target>Múltiple...</target>
 
 <source>Both sides are equal</source>
 <target>Ambos lados son iguales</target>
@@ -1370,6 +1353,12 @@ Transferir permisos de archivo y directorio (Requiere derechos de administrador)
 <source>Delete right file/folder</source>
 <target>Eliminar archivo/carpeta de la derecha</target>
 
+<source>Move file on left</source>
+<target>Mover archivo a la izquierda</target>
+
+<source>Move file on right</source>
+<target>Mover archivo a la derecha</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Sobreescribir archivo/carpeta de la izquierda por el de la derecha</target>
 
@@ -1384,6 +1373,9 @@ Transferir permisos de archivo y directorio (Requiere derechos de administrador)
 
 <source>Copy file attributes only to right</source>
 <target>Copiar sólo atributos del archivo a la derecha</target>
+
+<source>Multiple...</source>
+<target>Múltiple...</target>
 
 <source>Deleting file %x</source>
 <target>Borrar archivo %x</target>

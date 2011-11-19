@@ -7,11 +7,8 @@
 #ifndef SERIALIZE_H_INCLUDED
 #define SERIALIZE_H_INCLUDED
 
-#include <vector>
 #include <cstdint>
-#include <memory>
 #include <wx/stream.h>
-#include <zen/file_error.h>
 #include <zen/file_io.h>
 
 
@@ -26,18 +23,13 @@ template <class S> void writeString(wxOutputStream& stream, const S& str);
 
 
 //############# wxWidgets stream adapter #############
-// can be used as base classes (have virtual destructors)
 class FileInputStream : public wxInputStream
 {
 public:
-    FileInputStream(const Zstring& filename) : //throw FileError
-        fileObj(filename) {}
+    FileInputStream(const Zstring& filename) : fileObj(filename) {} //throw FileError
 
 private:
-    virtual size_t OnSysRead(void* buffer, size_t bufsize)
-    {
-        return fileObj.read(buffer, bufsize); //throw FileError
-    }
+    virtual size_t OnSysRead(void* buffer, size_t bufsize) { return fileObj.read(buffer, bufsize); } //throw FileError
 
     zen::FileInput fileObj;
 };
@@ -46,8 +38,7 @@ private:
 class FileOutputStream : public wxOutputStream
 {
 public:
-    FileOutputStream(const Zstring& filename) : //throw FileError
-        fileObj(filename, zen::FileOutput::ACC_OVERWRITE) {}
+    FileOutputStream(const Zstring& filename) : fileObj(filename, zen::FileOutput::ACC_OVERWRITE) {} //throw FileError
 
 private:
     virtual size_t OnSysWrite(const void* buffer, size_t bufsize)
@@ -60,11 +51,11 @@ private:
 };
 
 
-
-class ReadInputStream //throw FileError
+//wxInputStream proxy throwing FileError on error
+class CheckedReader
 {
-protected:
-    ReadInputStream(wxInputStream& stream, const Zstring& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
+public:
+    CheckedReader(wxInputStream& stream, const Zstring& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
     T readNumberC() const; //throw FileError, checked read operation
@@ -72,23 +63,19 @@ protected:
     template <class S>
     S readStringC() const; //throw FileError, checked read operation
 
-    typedef std::shared_ptr<std::vector<char> > CharArray; //there's no guarantee std::string has a ref-counted implementation... so use this "thing"
-    CharArray readArrayC() const; //throw FileError
-
+private:
     void check() const;
 
-    wxInputStream& getStream() { return stream_; }
-
-private:
     wxInputStream& stream_;
     const Zstring& errorObjName_; //used for error text only
 };
 
 
-class WriteOutputStream //throw FileError
+//wxOutputStream proxy throwing FileError on error
+class CheckedWriter
 {
-protected:
-    WriteOutputStream(const Zstring& errorObjName, wxOutputStream& stream) : stream_(stream), errorObjName_(errorObjName) {}
+public:
+    CheckedWriter(wxOutputStream& stream, const Zstring& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
     void writeNumberC(T number) const; //throw FileError, checked write operation
@@ -96,21 +83,12 @@ protected:
     template <class S>
     void writeStringC(const S& str) const; //throw FileError, checked write operation
 
-    void writeArrayC(const std::vector<char>& buffer) const; //throw FileError
-
+private:
     void check() const;
 
-    wxOutputStream& getStream() { return stream_; }
-
-private:
     wxOutputStream& stream_;
     const Zstring& errorObjName_; //used for error text only!
 };
-
-
-
-
-
 
 
 
@@ -155,21 +133,15 @@ void writePOD(wxOutputStream& stream, const T& pod)
 template <class S> inline
 S readString(wxInputStream& stream)
 {
+    //don't even consider UTF8 conversions here! "string" is expected to handle arbitrary binary data!
+
     typedef typename S::value_type CharType;
 
     const auto strLength = readPOD<std::uint32_t>(stream);
-    if (strLength <= 1000)
-    {
-        CharType buffer[1000];
-        stream.Read(buffer, sizeof(CharType) * strLength);
-        return S(buffer, strLength);
-    }
-    else
-    {
-        std::vector<CharType> buffer(strLength); //throw std::bad_alloc
-        stream.Read(&buffer[0], sizeof(CharType) * strLength);
-        return S(&buffer[0], strLength);
-    }
+    S output;
+    output.resize(strLength); //throw std::bad_alloc
+    stream.Read(&*output.begin(), sizeof(CharType) * strLength);
+    return output;
 }
 
 
@@ -182,7 +154,7 @@ void writeString(wxOutputStream& stream, const S& str)
 
 
 inline
-void ReadInputStream::check() const
+void CheckedReader::check() const
 {
     if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
         throw zen::FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\"");
@@ -191,7 +163,7 @@ void ReadInputStream::check() const
 
 template <class T>
 inline
-T ReadInputStream::readNumberC() const //checked read operation
+T CheckedReader::readNumberC() const //checked read operation
 {
     T output = readPOD<T>(stream_);
     check();
@@ -200,13 +172,15 @@ T ReadInputStream::readNumberC() const //checked read operation
 
 
 template <class S> inline
-S ReadInputStream::readStringC() const //checked read operation
+S CheckedReader::readStringC() const //checked read operation
 {
     S output;
     try
     {
-        output = readString<S>(stream_); //throw (std::bad_alloc)
+        output = readString<S>(stream_); //throw std::bad_alloc
         check();
+        if (stream_.LastRead() != output.length() * sizeof(typename S::value_type)) //some additional check
+            throw FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\"");
     }
     catch (std::exception&)
     {
@@ -216,24 +190,8 @@ S ReadInputStream::readStringC() const //checked read operation
 }
 
 
-inline
-ReadInputStream::CharArray ReadInputStream::readArrayC() const
-{
-    const std::uint32_t byteCount = readNumberC<std::uint32_t>();
-    CharArray buffer(new std::vector<char>(byteCount));
-    if (byteCount > 0)
-    {
-        stream_.Read(&(*buffer)[0], byteCount);
-        check();
-        if (stream_.LastRead() != byteCount) //some additional check
-            throw FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\"");
-    }
-    return buffer;
-}
-
-
 template <class T> inline
-void WriteOutputStream::writeNumberC(T number) const //checked write operation
+void CheckedWriter::writeNumberC(T number) const //checked write operation
 {
     writePOD<T>(stream_, number);
     check();
@@ -241,29 +199,17 @@ void WriteOutputStream::writeNumberC(T number) const //checked write operation
 
 
 template <class S> inline
-void WriteOutputStream::writeStringC(const S& str) const //checked write operation
+void CheckedWriter::writeStringC(const S& str) const //checked write operation
 {
     writeString(stream_, str);
     check();
+    if (stream_.LastWrite() != str.length() * sizeof(typename S::value_type)) //some additional check
+        throw FileError(_("Error writing to synchronization database:") + L" \n" + L"\"" + errorObjName_ + L"\"");
 }
 
 
 inline
-void WriteOutputStream::writeArrayC(const std::vector<char>& buffer) const
-{
-    writeNumberC<std::uint32_t>(static_cast<std::uint32_t>(buffer.size()));
-    if (buffer.size() > 0)
-    {
-        stream_.Write(&buffer[0], buffer.size());
-        check();
-        if (stream_.LastWrite() != buffer.size()) //some additional check
-            throw FileError(_("Error writing to synchronization database:") + L" \n" + L"\"" + errorObjName_ + L"\"");
-    }
-}
-
-
-inline
-void WriteOutputStream::check() const
+void CheckedWriter::check() const
 {
     if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
         throw FileError(_("Error writing to synchronization database:") + L" \n" + L"\"" + errorObjName_ + L"\"");

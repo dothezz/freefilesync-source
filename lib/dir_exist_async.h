@@ -20,9 +20,7 @@ bool dirExistsUpdating(const Zstring& dirname, bool allowUserInteraction, Proces
 {
     using namespace zen;
 
-    std::wstring statusText = _("Searching for directory %x...");
-    replace(statusText, L"%x", std::wstring(L"\"") + dirname + L"\"", false);
-    procCallback.reportStatus(statusText);
+    procCallback.reportStatus(replaceCpy(_("Searching for directory %x..."), L"%x", std::wstring(L"\"") + dirname + L"\"", false));
 
     auto ft = async([=]() -> bool
     {

@@ -2,8 +2,19 @@
 |FreeFileSync|
 --------------
 
+Changelog v4.3
+--------------
+Detection of moved and renamed files
+New database format for <Automatic> mode: a full sync is suggested before upgrading
+Fixed overwrite symlink with regular file
+Fixed synchronization result dialog GUI glitch (Windows XP)
+Fixed macro %weekday%
+RealtimeSync: Fixed support for manual volume unmount (Windows)
+Added Croatian language
+
+
 Changelog v4.2
----------------
+--------------
 Implemented workaround for compiler bug leading to uncaught exceptions (Windows 32 bit)
 Shadow Copy Service: Native support for Windows7/Server 2008
 Fixed reference by volume name parsing issue
@@ -17,7 +28,7 @@ New option in GlobalSettings.xml: "RunWithBackgroundPriority" (Windows Vista and
 
 
 Changelog v4.1
----------------
+--------------
 Improved synchronization progress dialog
 Show all available aliases in directory history list
 Show password prompt when connecting to mapped network share
@@ -31,7 +42,7 @@ Allow passing multiple directory names via command line
 
 
 Changelog v4.0
----------------
+--------------
 Thumbnail list view
 Option to specify comparison settings at folder pair level
 Correctly update parent-child relationship when changing sync directions

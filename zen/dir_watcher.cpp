@@ -134,7 +134,8 @@ public:
     ReadChangesAsync(const Zstring& directory, //make sure to not leak in thread-unsafe types!
                      const std::shared_ptr<SharedData>& shared) :
         shared_(shared),
-        dirname(directory)
+        dirname(directory),
+        hDir(INVALID_HANDLE_VALUE)
     {
         if (!endsWith(dirname, FILE_NAME_SEPARATOR))
             dirname += FILE_NAME_SEPARATOR;
@@ -143,8 +144,8 @@ public:
         //http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx
         try
         {
-            Privileges::getInstance().ensureActive(SE_BACKUP_NAME);  //throw FileError
-            Privileges::getInstance().ensureActive(SE_RESTORE_NAME); //
+            activatePrivilege(SE_BACKUP_NAME);  //throw FileError
+            activatePrivilege(SE_RESTORE_NAME); //
         }
         catch (const FileError&) {}
 
@@ -155,7 +156,7 @@ public:
                             OPEN_EXISTING,
                             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
                             NULL);
-        if (hDir == INVALID_HANDLE_VALUE )
+        if (hDir == INVALID_HANDLE_VALUE)
         {
             const std::wstring errorMsg = _("Could not initialize directory monitoring:") + L"\n\"" + dirname + L"\"" + L"\n\n" + zen::getLastErrorFormatted();
             if (errorCodeForNotExisting(::GetLastError()))
@@ -253,7 +254,7 @@ public:
         std::swap(hDir, other.hDir);
     }
 
-    HANDLE getDirHandle() const { return hDir; } //for reading purposes only, don't abuse (e.g. close handle)!
+    HANDLE getDirHandle() const { return hDir; } //for reading/monitoring purposes only, don't abuse (e.g. close handle)!
 
 private:
     //shared between main and worker:
@@ -268,13 +269,9 @@ class HandleVolumeRemoval : public NotifyRequestDeviceRemoval
 {
 public:
     HandleVolumeRemoval(HANDLE hDir,
-                        boost::thread& worker,
-                        const std::shared_ptr<SharedData>& shared,
-                        const Zstring& dirname) :
+                        boost::thread& worker) :
         NotifyRequestDeviceRemoval(hDir), //throw FileError
         worker_(worker),
-        shared_(shared),
-        dirname_(dirname),
         removalRequested(false),
         operationComplete(false) {}
 
@@ -291,16 +288,12 @@ private:
         worker_.join();
         //now hDir should have been released
 
-        //report removal as change to main directory
-        shared_->addChange(dirname_);
-
         removalRequested = true;
     } //don't throw!
+
     virtual void onRemovalFinished(HANDLE hnd, bool successful) { operationComplete = true; } //throw()!
 
     boost::thread& worker_;
-    std::shared_ptr<SharedData> shared_;
-    Zstring dirname_;
     bool removalRequested;
     bool operationComplete;
 };
@@ -312,6 +305,7 @@ struct DirWatcher::Pimpl
     boost::thread worker;
     std::shared_ptr<SharedData> shared;
 
+    Zstring dirname;
     std::unique_ptr<HandleVolumeRemoval> volRemoval;
 };
 
@@ -320,9 +314,10 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
     pimpl_(new Pimpl)
 {
     pimpl_->shared = std::make_shared<SharedData>();
+    pimpl_->dirname = directory;
 
     ReadChangesAsync reader(directory, pimpl_->shared); //throw FileError
-    pimpl_->volRemoval.reset(new HandleVolumeRemoval(reader.getDirHandle(), pimpl_->worker, pimpl_->shared, directory)); //throw FileError
+    pimpl_->volRemoval.reset(new HandleVolumeRemoval(reader.getDirHandle(), pimpl_->worker)); //throw FileError
     pimpl_->worker = boost::thread(std::move(reader));
 }
 
@@ -332,22 +327,29 @@ DirWatcher::~DirWatcher()
     pimpl_->worker.interrupt();
     //pimpl_->worker.join(); -> we don't have time to wait... will take ~50ms anyway
     //caveat: exitting the app may simply kill this thread!
-
-    //wait until device removal is confirmed, to (hopefully!) prevent locking hDir again by new watch!
-    if (pimpl_->volRemoval->requestReceived())
-    {
-        const boost::system_time maxwait = boost::get_system_time() + boost::posix_time::seconds(3); //HandleVolumeRemoval::finished() not guaranteed!
-
-        while (!pimpl_->volRemoval->finished() && boost::get_system_time() < maxwait)
-            boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
-    }
 }
 
 
-std::vector<Zstring> DirWatcher::getChanges() //throw FileError
+std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>& processGuiMessages) //throw FileError
 {
     std::vector<Zstring> output;
-    pimpl_->shared->getChanges(output); //throw FileError
+
+    //wait until device removal is confirmed, to prevent locking hDir again by some new watch!
+    if (pimpl_->volRemoval->requestReceived())
+    {
+        const boost::system_time maxwait = boost::get_system_time() + boost::posix_time::seconds(15);
+        //HandleVolumeRemoval::finished() not guaranteed! note: Windows gives unresponsive applications ca. 10 seconds until unmounting the usb stick in worst case
+
+        while (!pimpl_->volRemoval->finished() && boost::get_system_time() < maxwait)
+        {
+            processGuiMessages(); //DBT_DEVICEREMOVECOMPLETE message is sent here!
+            boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
+        }
+
+        output.push_back(pimpl_->dirname); //report removal as change to main directory
+    }
+    else //the normal case...
+        pimpl_->shared->getChanges(output); //throw FileError
     return output;
 }
 
@@ -454,7 +456,7 @@ DirWatcher::~DirWatcher()
 }
 
 
-std::vector<Zstring> DirWatcher::getChanges() //throw FileError
+std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>&) //throw FileError
 {
     std::vector<char> buffer(1024 * (sizeof(struct inotify_event) + 16));
 

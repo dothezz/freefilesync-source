@@ -5,16 +5,16 @@
 // **************************************************************************
 
 #include "comparison.h"
+#include <stdexcept>
+#include <zen/scope_guard.h>
+#include <wx+/string_conv.h>
+#include <wx+/format_unit.h>
 #include "lib/parallel_scan.h"
 #include "lib/resolve_path.h"
-#include <stdexcept>
 #include "lib/dir_exist_async.h"
-#include <wx+/string_conv.h>
-#include <zen/scope_guard.h>
 #include "lib/binary.h"
-#include "algorithm.h"
-#include <wx+/format_unit.h>
 #include "lib/cmp_filetime.h"
+#include "algorithm.h"
 
 #ifdef FFS_WIN
 #include <zen/perf.h>
@@ -120,39 +120,33 @@ void checkDirectoryExistence(const std::set<Zstring, LessFilename>& dirnames,
 }
 
 
-namespace
-{
-struct EqualDependentDirectory : public std::binary_function<Zstring, Zstring, bool>
-{
-    bool operator()(const Zstring& lhs, const Zstring& rhs) const
-    {
-        return EqualFilename()(Zstring(lhs.c_str(), std::min(lhs.length(), rhs.length())),
-                               Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
-    }
-};
-}
-
 //check whether one side is subdirectory of other side (folder pair wise!)
 //similar check if one directory is read/written by multiple pairs not before beginning of synchronization
-wxString checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm) //returns warning message, empty if all ok
+std::wstring checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm) //returns warning message, empty if all ok
 {
-    typedef std::vector<std::pair<wxString, wxString> > DirDirList;
+    typedef std::vector<std::pair<std::wstring, std::wstring> > DirDirList;
     DirDirList dependentDirs;
+
+    auto dependentDir = [](const Zstring& lhs, const Zstring& rhs)
+    {
+        return EqualFilename()(Zstring(lhs.c_str(), std::min(lhs.length(), rhs.length())), //note: this is NOT an equivalence relation!
+                               Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
+    };
 
     for (std::vector<FolderPairCfg>::const_iterator i = folderPairsForm.begin(); i != folderPairsForm.end(); ++i)
         if (!i->leftDirectoryFmt.empty() && !i->rightDirectoryFmt.empty()) //empty folders names may be accepted by user
         {
-            if (EqualDependentDirectory()(i->leftDirectoryFmt, i->rightDirectoryFmt)) //test wheter leftDirectory begins with rightDirectory or the other way round
-                dependentDirs.push_back(std::make_pair(toWx(i->leftDirectoryFmt), toWx(i->rightDirectoryFmt)));
+            if (dependentDir(i->leftDirectoryFmt, i->rightDirectoryFmt)) //test wheter leftDirectory begins with rightDirectory or the other way round
+                dependentDirs.push_back(std::make_pair(utf8CvrtTo<std::wstring>(i->leftDirectoryFmt), utf8CvrtTo<std::wstring>(i->rightDirectoryFmt)));
         }
 
-    wxString warningMsg;
+    std::wstring warningMsg;
 
     if (!dependentDirs.empty())
     {
         warningMsg = _("Directories are dependent! Be careful when setting up synchronization rules:");
         for (auto i = dependentDirs.begin(); i != dependentDirs.end(); ++i)
-            warningMsg += wxString(L"\n\n") +
+            warningMsg += std::wstring(L"\n\n") +
                           L"\"" + i->first  + L"\"\n" +
                           L"\"" + i->second + L"\"";
     }
@@ -214,17 +208,17 @@ CompareProcess::CompareProcess(size_t fileTimeTol,
     m_warnings(warnings),
     allowUserInteraction_(allowUserInteraction),
     procCallback(handler)
-    {
-if (runWithBackgroundPriority)
-procBackground.reset(new ScheduleForBackgroundProcessing);
-    }
+{
+    if (runWithBackgroundPriority)
+        procBackground.reset(new ScheduleForBackgroundProcessing);
+}
 
 
 void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgList, FolderComparison& output)
 {
-        //prevent shutdown while (binary) comparison is in progress
-        DisableStandby dummy2;
-        (void)dummy2;
+    //prevent shutdown while (binary) comparison is in progress
+    PreventStandby dummy2;
+    (void)dummy2;
 
     /*
     #ifdef NDEBUG
@@ -257,9 +251,9 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
 
     {
         //check if folders have dependencies
-        wxString warningMessage = checkFolderDependency(cfgList);
+        std::wstring warningMessage = checkFolderDependency(cfgList);
         if (!warningMessage.empty())
-            procCallback.reportWarning(warningMessage.c_str(), m_warnings.warningDependentFolders);
+            procCallback.reportWarning(warningMessage, m_warnings.warningDependentFolders);
     }
 
     //-------------------end of basic checks------------------------------------------
@@ -364,7 +358,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
                     warningSyncDatabase_(warningSyncDatabase),
                     procCallback_(procCallback) {}
 
-                virtual void reportWarning(const wxString& text)
+                virtual void reportWarning(const std::wstring& text)
                 {
                     procCallback_.reportWarning(text, warningSyncDatabase_);
                 }
@@ -404,25 +398,14 @@ std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 
 namespace
 {
-inline
-void makeSameLength(wxString& first, wxString& second)
-{
-    const size_t maxPref = std::max(first.length(), second.length());
-    first.Pad(maxPref - first.length(), wxT(' '), true);
-    second.Pad(maxPref - second.length(), wxT(' '), true);
-}
-
-
 //check for changed files with same modification date
 std::wstring getConflictSameDateDiffSize(const FileMapping& fileObj)
 {
     std::wstring msg = _("Files %x have the same date but a different size!");
     replace(msg, L"%x", std::wstring(L"\"") + fileObj.getRelativeName<LEFT_SIDE>() + L"\"");
     msg += L"\n\n";
-    msg += L"<-- \t" + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE>()) +
-           L" \t" + _("Size") + L": " + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + L"\n";
-    msg += L"--> \t" + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) +
-           L" \t" + _("Size") + L": " + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
+    msg += L"<--    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size") + L": " + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + L"\n";
+    msg += L"-->    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size") + L": " + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
     return _("Conflict detected:") + L"\n" + msg;
 }
 }
@@ -625,7 +608,7 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
 
     const CmpFileTime timeCmp(fileTimeTolerance);
 
-const std::wstring txtComparingContentOfFiles = replaceCpy(_("Comparing content of files %x"), L"%x", L"\n\"%x\"", false);
+    const std::wstring txtComparingContentOfFiles = replaceCpy(_("Comparing content of files %x"), L"%x", L"\n\"%x\"", false);
 
     //compare files (that have same size) bytewise...
     std::for_each(filesToCompareBytewise.begin(), filesToCompareBytewise.end(),
@@ -697,36 +680,19 @@ private:
 };
 
 
-template <>
-void MergeSides::fillOneSide<LEFT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
+template <SelectedSide side>
+void MergeSides::fillOneSide(const DirContainer& dirCont, HierarchyObject& output)
 {
-    for (DirContainer::FileList::const_iterator i = dirCont.files.begin(); i != dirCont.files.end(); ++i)
-        output.addSubFile(i->second, i->first);
+    for (auto iter = dirCont.files.cbegin(); iter != dirCont.files.cend(); ++iter)
+        output.addSubFile<side>(iter->first, iter->second);
 
-    for (DirContainer::LinkList::const_iterator i = dirCont.links.begin(); i != dirCont.links.end(); ++i)
-        output.addSubLink(i->second, i->first);
+    for (auto iter = dirCont.links.cbegin(); iter != dirCont.links.cend(); ++iter)
+        output.addSubLink<side>(iter->first, iter->second);
 
-    for (DirContainer::DirList::const_iterator i = dirCont.dirs.begin(); i != dirCont.dirs.end(); ++i)
+    for (auto iter = dirCont.dirs.cbegin(); iter != dirCont.dirs.cend(); ++iter)
     {
-        DirMapping& newDirMap = output.addSubDir(i->first, Zstring());
-        fillOneSide<LEFT_SIDE>(i->second, newDirMap); //recurse into subdirectories
-    }
-}
-
-
-template <>
-void MergeSides::fillOneSide<RIGHT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
-{
-    for (DirContainer::FileList::const_iterator i = dirCont.files.begin(); i != dirCont.files.end(); ++i)
-        output.addSubFile(i->first, i->second);
-
-    for (DirContainer::LinkList::const_iterator i = dirCont.links.begin(); i != dirCont.links.end(); ++i)
-        output.addSubLink(i->first, i->second);
-
-    for (DirContainer::DirList::const_iterator i = dirCont.dirs.begin(); i != dirCont.dirs.end(); ++i)
-    {
-        DirMapping& newDirMap = output.addSubDir(Zstring(), i->first);
-        fillOneSide<RIGHT_SIDE>(i->second, newDirMap); //recurse into subdirectories
+        DirMapping& newDirMap = output.addSubDir<side>(iter->first);
+        fillOneSide<side>(iter->second, newDirMap); //recurse
     }
 }
 
@@ -777,8 +743,8 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     typedef const DirContainer::FileList::value_type FileData;
 
     linearMerge(leftSide.files, rightSide.files,
-    [&](const FileData& fileLeft)  { output.addSubFile(fileLeft.second, fileLeft.first);   }, //left only
-    [&](const FileData& fileRight) { output.addSubFile(fileRight.first, fileRight.second); }, //right only
+    [&](const FileData& fileLeft)  { output.addSubFile<LEFT_SIDE> (fileLeft.first, fileLeft.second);   }, //left only
+    [&](const FileData& fileRight) { output.addSubFile<RIGHT_SIDE>(fileRight.first, fileRight.second); }, //right only
 
     [&](const FileData& fileLeft, const FileData& fileRight) //both sides
     {
@@ -794,8 +760,8 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     typedef const DirContainer::LinkList::value_type LinkData;
 
     linearMerge(leftSide.links, rightSide.links,
-    [&](const LinkData& linkLeft)  { output.addSubLink(linkLeft.second, linkLeft.first);   }, //left only
-    [&](const LinkData& linkRight) { output.addSubLink(linkRight.first, linkRight.second); }, //right only
+    [&](const LinkData& linkLeft)  { output.addSubLink<LEFT_SIDE >(linkLeft.first, linkLeft.second);   }, //left only
+    [&](const LinkData& linkRight) { output.addSubLink<RIGHT_SIDE>(linkRight.first, linkRight.second); }, //right only
 
     [&](const LinkData& linkLeft, const LinkData& linkRight) //both sides
     {
@@ -813,12 +779,12 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     linearMerge(leftSide.dirs, rightSide.dirs,
                 [&](const DirData& dirLeft) //left only
     {
-        DirMapping& newDirMap = output.addSubDir(dirLeft.first, Zstring());
+        DirMapping& newDirMap = output.addSubDir<LEFT_SIDE>(dirLeft.first);
         this->fillOneSide<LEFT_SIDE>(dirLeft.second, newDirMap); //recurse into subdirectories
     },
     [&](const DirData& dirRight) //right only
     {
-        DirMapping& newDirMap = output.addSubDir(Zstring(), dirRight.first);
+        DirMapping& newDirMap = output.addSubDir<RIGHT_SIDE>(dirRight.first);
         this->fillOneSide<RIGHT_SIDE>(dirRight.second, newDirMap); //recurse into subdirectories
     },
 
@@ -839,7 +805,7 @@ void processFilteredDirs(HierarchyObject& hierObj, const HardFilter& filterProc)
     std::for_each(subDirs.begin(), subDirs.end(),
                   [&](DirMapping& dirObj)
     {
-        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName().c_str(), NULL)); //subObjMightMatch is always true in this context!
+        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), NULL)); //subObjMightMatch is always true in this context!
         processFilteredDirs(dirObj, filterProc);
     });
 
@@ -878,7 +844,6 @@ void CompareProcess::performComparison(const FolderPairCfg& fpCfg,
     const DirectoryValue& bufValueRight = getDirValue(fpCfg.rightDirectoryFmt);
 
     procCallback.reportStatus(_("Generating file list..."));
-    procCallback.forceUiRefresh(); //keep total number of scanned files up to date
 
     //PERF_START;
     MergeSides(undefinedFiles, undefinedLinks).execute(bufValueLeft.dirCont, bufValueRight.dirCont, output);

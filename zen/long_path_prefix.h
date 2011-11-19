@@ -7,6 +7,7 @@
 #ifndef LONGPATHPREFIX_H_INCLUDED
 #define LONGPATHPREFIX_H_INCLUDED
 
+#include "win.h"
 #include "zstring.h"
 
 namespace zen

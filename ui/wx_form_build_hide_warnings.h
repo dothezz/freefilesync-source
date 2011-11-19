@@ -7,10 +7,14 @@
 #ifndef WX_FORM_BUILD_230948324234234
 #define WX_FORM_BUILD_230948324234234
 
-//hide compiler warnings in generated code
+//pamper over wxFormBuilder "sub-optimal" code
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+
+#elif defined _MSC_VER
+#pragma warning(disable: 4189)
 #endif
 
 #endif //WX_FORM_BUILD_230948324234234

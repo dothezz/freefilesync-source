@@ -34,13 +34,13 @@ public:
 
     virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
     virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
-    virtual void reportStatus(const wxString& text);
-    virtual void reportInfo(const wxString& text);
+    virtual void reportStatus(const std::wstring& text);
+    virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
 
-    virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
-    virtual Response reportError(const wxString& errorMessage);
-    virtual void reportFatalError(const wxString& errorMessage);
+    virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive);
+    virtual Response reportError(const std::wstring& errorMessage);
+    virtual void reportFatalError(const std::wstring& errorMessage);
 
 private:
     virtual void abortThisProcess();

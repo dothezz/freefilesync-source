@@ -169,14 +169,14 @@
 <source>Comparison Result</source>
 <target>Ergebnis des Vergleichs</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Inkompatibles Datenbankformat:</target>
-
 <source>Initial synchronization:</source>
 <target>Erstmalige Synchronisation:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Eine der FreeFileSync Datenbankdateien existiert noch nicht:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Inkompatibles Datenbankformat:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Die Datenbankdateien enthalten keine gemeinsame Synchronisationssitzung:</target>
@@ -372,9 +372,6 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Batch execution</source>
 <target>Batchlauf</target>
 
-<source>Log-messages:</source>
-<target>Meldungen:</target>
-
 <source>Stop</source>
 <target>Stop</target>
 
@@ -501,6 +498,24 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Total amount of data that will be transferred</source>
 <target>Gesamtmenge der zu übertragenden Daten</target>
 
+<source>Operation:</source>
+<target>Vorgang:</target>
+
+<source>Items found:</source>
+<target>Gefundene Elemente:</target>
+
+<source>Items remaining:</source>
+<target>Verbleibende Elemente:</target>
+
+<source>Speed:</source>
+<target>Geschwindigkeit:</target>
+
+<source>Time remaining:</source>
+<target>Verbleibende Zeit:</target>
+
+<source>Time elapsed:</source>
+<target>Vergangene Zeit:</target>
+
 <source>Batch job</source>
 <target>Batch-Job</target>
 
@@ -549,32 +564,14 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>&Cancel</source>
 <target>&Abbrechen</target>
 
-<source>Operation:</source>
-<target>Vorgang:</target>
-
-<source>Items found:</source>
-<target>Gefundene Elemente:</target>
-
-<source>Items remaining:</source>
-<target>Verbleibende Elemente:</target>
-
-<source>Speed:</source>
-<target>Geschwindigkeit:</target>
-
-<source>Time remaining:</source>
-<target>Verbleibende Zeit:</target>
-
-<source>Time elapsed:</source>
-<target>Vergangene Zeit:</target>
-
 <source>Select variant:</source>
 <target>Variante auswählen:</target>
 
 <source><Automatic></source>
 <target><Automatik></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Identifiziere und propagiere Änderungen auf beiden Seiten mit Hilfe einer Datenbank. Löschungen und Konflikte werden automatisch erkannt.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Identifiziere und propagiere Änderungen auf beiden Seiten mit Hilfe einer Datenbank. Löschungen, Umbenennungen und Konflikte werden automatisch erkannt.</target>
 
 <source>Mirror ->></source>
 <target>Spiegeln ->></target>
@@ -1122,9 +1119,6 @@ Ausschließen: \stuff\temp\*
 <source>Filter: Single pair</source>
 <target>Filter: Einzelnes Verzeichnispaar</target>
 
-<source>Ignore</source>
-<target>Ignorieren</target>
-
 <source>Direct</source>
 <target>Direkt</target>
 
@@ -1278,11 +1272,11 @@ Ausschließen: \stuff\temp\*
 <source>Error opening file:</source>
 <target>Fehler beim Öffnen der Datei:</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Endlosschleife beim Lesen des Verzeichnisses:</target>
-
 <source>Error traversing directory:</source>
 <target>Fehler beim Durchsuchen des Verzeichnisses:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Endlosschleife beim Lesen des Verzeichnisses:</target>
 
 <source>Error setting privilege:</source>
 <target>Fehler beim Setzen des Privilegs:</target>
@@ -1317,9 +1311,6 @@ Ausschließen: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationseinstellungen:</target>
 
-<source>Comparing content of files %x</source>
-<target>Vergleiche Inhalt der Dateien %x</target>
-
 <source>Memory allocation failed!</source>
 <target>Speicherallokation fehlgeschlagen!</target>
 
@@ -1335,14 +1326,14 @@ Ausschließen: \stuff\temp\*
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Die Symbolischen Links %x haben dasselbe Datum, aber ein unterschiedliches Ziel!</target>
 
+<source>Comparing content of files %x</source>
+<target>Vergleiche Inhalt der Dateien %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>Vergleich nach Dateiinhalt ist fehlgeschlagen.</target>
 
 <source>Generating file list...</source>
 <target>Erzeuge Dateiliste...</target>
-
-<source>Multiple...</source>
-<target>Verschiedene...</target>
 
 <source>Both sides are equal</source>
 <target>Beide Seiten sind gleich</target>
@@ -1362,6 +1353,12 @@ Ausschließen: \stuff\temp\*
 <source>Delete right file/folder</source>
 <target>Lösche rechte Datei</target>
 
+<source>Move file on left</source>
+<target>Verschiebe linke Datei</target>
+
+<source>Move file on right</source>
+<target>Verschiebe rechte Datei</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Überschreibe linke Datei mit rechter</target>
 
@@ -1376,6 +1373,9 @@ Ausschließen: \stuff\temp\*
 
 <source>Copy file attributes only to right</source>
 <target>Kopiere nur die Dateiattribute nach rechts</target>
+
+<source>Multiple...</source>
+<target>Verschiedene...</target>
 
 <source>Deleting file %x</source>
 <target>Lösche Datei %x</target>

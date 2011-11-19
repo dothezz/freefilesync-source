@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>실시간 동기화 - 자동 동기화</target>
 
-<source>Browse</source>
-<target>찾아보기</target>
-
-<source>Windows Error Code %x:</source>
-<target>윈도우 에러 코드 %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>리눅스 에러 코드 %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>잘못된 명령줄 : %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>심볼릭 링크를 해결하던 중 발생한 오류 :</target>
-
-<source>Show pop-up</source>
-<target>팝업 보이기</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>오류 또는 경고에 대한 팝업 보이기</target>
-
-<source>Ignore errors</source>
-<target>오류 무시</target>
-
-<source>Hide all error and warning messages</source>
-<target>모든 오류/경고 메세지 숨기기</target>
-
-<source>Exit instantly</source>
-<target>즉시 종료</target>
-
-<source>Abort synchronization immediately</source>
-<target>동기화 작업 즉시 중단</target>
-
 <source>Select alternate comparison settings</source>
 <target>대체 비교 설정 선택</target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>시간간격(타임스팬) 선택</target>
 
+<source>Show pop-up</source>
+<target>팝업 보이기</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>오류 또는 경고에 대한 팝업 보이기</target>
+
+<source>Ignore errors</source>
+<target>오류 무시</target>
+
+<source>Hide all error and warning messages</source>
+<target>모든 오류/경고 메세지 숨기기</target>
+
+<source>Exit instantly</source>
+<target>즉시 종료</target>
+
+<source>Abort synchronization immediately</source>
+<target>동기화 작업 즉시 중단</target>
+
+<source>Browse</source>
+<target>찾아보기</target>
+
+<source>Error reading from synchronization database:</source>
+<target>동기화 데이터베이스로부터 읽어 들이던 중 발생한 오류 :</target>
+
+<source>Error writing to synchronization database:</source>
+<target>동기화 데이터베이스에 쓰던 중 발생한 오류 :</target>
+
+<source>Invalid command line: %x</source>
+<target>잘못된 명령줄 : %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>윈도우 에러 코드 %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>리눅스 에러 코드 %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>심볼릭 링크를 해결하던 중 발생한 오류 :</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -162,17 +168,14 @@
 <source>Comparison Result</source>
 <target>비교 결과</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>호환되지 않는 동기화 데이터베이스 형식 :</target>
-
 <source>Initial synchronization:</source>
 <target>초기 동기화 :</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync 데이터베이스 파일 중 하나가 아직 존재하지 않습니다 :</target>
 
-<source>Error reading from synchronization database:</source>
-<target>동기화 데이터베이스로부터 읽어 들이던 중 발생한 오류 :</target>
+<source>Incompatible synchronization database format:</source>
+<target>호환되지 않는 동기화 데이터베이스 형식 :</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>데이터베이스 파일이 공통 동기화 세션을 공유하지 않습니다 :</target>
@@ -197,11 +200,17 @@
 <pluralform>%x초</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>드래그 && 드랍 (마우스로 파일 끌어다 놓기)</target>
+
 <source>Info</source>
 <target>정보</target>
 
 <source>Fatal Error</source>
 <target>치명적 오류</target>
+
+<source>Error reading file:</source>
+<target>파일을 읽던 중 발생한 오류 :</target>
 
 <source>Scanning:</source>
 <target>스캔 :</target>
@@ -220,14 +229,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>잘못된 FreeFileSync 설정 파일!</target>
 
-<source>File does not exist:</source>
-<target>파일이 존재하지 않습니다 :</target>
-
 <source>Error parsing configuration file:</source>
 <target>설정파일 분석 중 발생한 오류 :</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>휴지통으로 이동 중 발생한 오류 :</target>
+
+<source>Could not load a required DLL:</source>
+<target>필요한 DLL을 로드할 수 없습니다 :</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>볼륨 섀도 복사본 서비스에 액세스하던 중 오류 발생!</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>WOW64 에서의 Shadow Copy 는 지원하지 않습니다. FreeFileSync 64-bit 버전을 사용하세요.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>파일 볼륨 이름을 결정할 수 없습니다 :</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>볼륨 이름 %x 이(가) 파일 이름 %y 의 일부가 아닙니다!</target>
+
 <source>/sec</source>
 <target>/초</target>
+
+<source>File does not exist:</source>
+<target>파일이 존재하지 않습니다 :</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>다음 XML 노드 값을 읽어 들일 수 없습니다 :</target>
 
 <source>S&ave configuration...</source>
 <target>설정 저장</target>
@@ -321,138 +351,6 @@ The command line is executed each time:
 <source>A directory input field is empty.</source>
 <target>디렉토리 입력 필드가 비어 있습니다.</target>
 
-<source>Drag && drop</source>
-<target>드래그 && 드랍</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>디렉토리 모니터링을 초기화 할 수 없습니다 :</target>
-
-<source>Error when monitoring directories.</source>
-<target>디렉토리 모니터링 중 발생한 오류 :</target>
-
-<source>Conversion error:</source>
-<target>변환 오류 :</target>
-
-<source>Error deleting file:</source>
-<target>파일 삭제 중 발생한 오류 :</target>
-
-<source>Error moving file:</source>
-<target>파일 이동 중 발생한 오류 :</target>
-
-<source>Target file already existing!</source>
-<target>대상 파일이 이미 존재합니다!</target>
-
-<source>Error moving directory:</source>
-<target>디렉토리 이동 중 발생한 오류 :</target>
-
-<source>Target directory already existing!</source>
-<target>대상 디렉토리가 이미 존재합니다!</target>
-
-<source>Error deleting directory:</source>
-<target>디렉토리 삭제 중 발생한 오류 :</target>
-
-<source>Error changing modification time:</source>
-<target>시간 수정 중 발생한 오류 :</target>
-
-<source>Error loading library function:</source>
-<target>라이브러리 기능 로드 중 발생한 오류 :</target>
-
-<source>Error reading security context:</source>
-<target>보안 컨텍스트를 읽던 중 발생한 오류 :</target>
-
-<source>Error writing security context:</source>
-<target>보안 컨텍스트를 쓰던 중 발생한 오류 :</target>
-
-<source>Error copying file permissions:</source>
-<target>파일 권한 복사 중 발생한 오류 :</target>
-
-<source>Error creating directory:</source>
-<target>디렉토리 생성 중 발생한 오류 :</target>
-
-<source>Error copying symbolic link:</source>
-<target>심볼릭 링크 복사 중 발생한 오류 :</target>
-
-<source>Error copying file:</source>
-<target>파일 복사 중 발생한 오류 :</target>
-
-<source>Error opening file:</source>
-<target>파일을 열던 중 발생한 오류 :</target>
-
-<source>Error writing file:</source>
-<target>파일을 쓰던 중 발생한 오류 :</target>
-
-<source>Error reading file:</source>
-<target>파일을 읽던 중 발생한 오류 :</target>
-
-<source>Operation aborted!</source>
-<target>작업 중단!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>디렉토리 이동 중 무한 루프 발생 :</target>
-
-<source>Error traversing directory:</source>
-<target>디렉토리 이동 중 발생한 오류 :</target>
-
-<source>Error setting privilege:</source>
-<target>권한 설정 중 발생한 오류 :</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>휴지통으로 이동 중 발생한 오류 :</target>
-
-<source>Could not load a required DLL:</source>
-<target>필요한 DLL을 로드할 수 없습니다 :</target>
-
-<source>Error writing to synchronization database:</source>
-<target>동기화 데이터베이스에 쓰던 중 발생한 오류 :</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>볼륨 섀도 복사본 서비스에 액세스하던 중 오류 발생!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>WOW64 에서의 Shadow Copy 는 지원하지 않습니다. FreeFileSync 64-bit 버전을 사용하세요.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>파일 볼륨 이름을 결정할 수 없습니다 :</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>볼륨 이름 %x 이(가) 파일 이름 %y 의 일부가 아닙니다!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x분</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x시간</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x일</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>다음 XML 노드 값을 읽어 들일 수 없습니다 :</target>
-
 <source>Logging</source>
 <target>로그 중</target>
 
@@ -470,9 +368,6 @@ The command line is executed each time:
 
 <source>Batch execution</source>
 <target>일괄 실행</target>
-
-<source>Log-messages:</source>
-<target>로그 메세지 :</target>
 
 <source>Stop</source>
 <target>정지</target>
@@ -600,6 +495,24 @@ The command line is executed each time:
 <source>Total amount of data that will be transferred</source>
 <target>전송하게 될 전체 데이터 용량</target>
 
+<source>Operation:</source>
+<target>작업 :</target>
+
+<source>Items found:</source>
+<target>발견된 요소 :</target>
+
+<source>Items remaining:</source>
+<target>남은 요소 :</target>
+
+<source>Speed:</source>
+<target>속도 :</target>
+
+<source>Time remaining:</source>
+<target>남은 시간 :</target>
+
+<source>Time elapsed:</source>
+<target>경과 시간 :</target>
+
 <source>Batch job</source>
 <target>일괄 작업</target>
 
@@ -648,32 +561,14 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>취소(&C)</target>
 
-<source>Operation:</source>
-<target>작업 :</target>
-
-<source>Items found:</source>
-<target>발견된 요소 :</target>
-
-<source>Items remaining:</source>
-<target>남은 요소 :</target>
-
-<source>Speed:</source>
-<target>속도 :</target>
-
-<source>Time remaining:</source>
-<target>남은 시간 :</target>
-
-<source>Time elapsed:</source>
-<target>경과 시간 :</target>
-
 <source>Select variant:</source>
 <target>옵션 선택 :</target>
 
 <source><Automatic></source>
 <target><자동></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>데이터베이스를 사용하여, 양측 변경사항을 확인합니다. 삭제 및 충돌 내역은 자동 감지됩니다.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>데이터베이스를 활용하여 양측의 변경사항을 확인하고 반영합니다. 파일 삭제/명칭 변경/충돌은 자동으로 감지됩니다.</target>
 
 <source>Mirror ->></source>
 <target>미러 ->></target>
@@ -895,27 +790,19 @@ Exclude: \stuff\temp\*
 <target>트랜잭션 파일 복사</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>임시 파일 (*.ffs_tmp)로 우선 작성 후, 파일명을 변경합니다. 이러면 치명적인 오류가 발생하더라도 일관된 상태를 보장할 수 있습니다.</target>
 
 <source>Copy locked files</source>
 <target>락 걸린 파일 복사</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Volume Shadow Copy를 사용하여 공유 또는 락 걸린 파일을 복사 (관리자 권한 필요)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Volume Shadow Copy를 사용하여 공유 또는 락 걸린 파일을 복사 (관리자 권한 필요)</target>
 
 <source>Copy file access permissions</source>
 <target>파일 접근 권한 복사</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-파일 및 디렉토리 권한 전송 (관리자 권한이 필요함)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>파일 및 디렉토리 권한 전송 (관리자 권한이 필요함)</target>
 
 <source>Hidden dialogs:</source>
 <target>다이얼로그 숨기기</target>
@@ -946,6 +833,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>&Find next</source>
 <target>다음 검색(&F)</target>
+
+<source>Operation aborted!</source>
+<target>작업 중단!</target>
 
 <source>Main bar</source>
 <target>메인 바</target>
@@ -987,16 +877,16 @@ Transfer file and directory permissions (Requires Administrator rights)
 <target>열 자동정렬</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>아이콘 크기</target>
 
 <source>Small</source>
-<target></target>
+<target>작게</target>
 
 <source>Medium</source>
-<target></target>
+<target>중간</target>
 
 <source>Large</source>
-<target></target>
+<target>크게</target>
 
 <source>Include all rows</source>
 <target>모든 행 포함</target>
@@ -1124,6 +1014,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>File list exported!</source>
 <target>파일 리스트 내보내기 완료!</target>
 
+<source>Error writing file:</source>
+<target>파일을 쓰던 중 발생한 오류 :</target>
+
 <source>Batch file created successfully!</source>
 <target>일괄 파일이 성공적으로 생성 됐습니다!</target>
 
@@ -1219,9 +1112,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Filter: Single pair</source>
 <target>필터 : 단일 페어(짝)</target>
 
-<source>Ignore</source>
-<target>무시</target>
-
 <source>Direct</source>
 <target>다이렉트</target>
 
@@ -1283,6 +1173,102 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Move files into a time-stamped subdirectory</source>
 <target>파일을 타임스탬프 된 서브 폴더로 이동</target>
 
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x분</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x시간</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x일</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>디렉토리 모니터링을 초기화 할 수 없습니다 :</target>
+
+<source>Error when monitoring directories.</source>
+<target>디렉토리 모니터링 중 발생한 오류 :</target>
+
+<source>Conversion error:</source>
+<target>변환 오류 :</target>
+
+<source>Error deleting file:</source>
+<target>파일 삭제 중 발생한 오류 :</target>
+
+<source>Error moving file:</source>
+<target>파일 이동 중 발생한 오류 :</target>
+
+<source>Target file already existing!</source>
+<target>대상 파일이 이미 존재합니다!</target>
+
+<source>Error moving directory:</source>
+<target>디렉토리 이동 중 발생한 오류 :</target>
+
+<source>Target directory already existing!</source>
+<target>대상 디렉토리가 이미 존재합니다!</target>
+
+<source>Error deleting directory:</source>
+<target>디렉토리 삭제 중 발생한 오류 :</target>
+
+<source>Error changing modification time:</source>
+<target>시간 수정 중 발생한 오류 :</target>
+
+<source>Error loading library function:</source>
+<target>라이브러리 기능 로드 중 발생한 오류 :</target>
+
+<source>Error reading security context:</source>
+<target>보안 컨텍스트를 읽던 중 발생한 오류 :</target>
+
+<source>Error writing security context:</source>
+<target>보안 컨텍스트를 쓰던 중 발생한 오류 :</target>
+
+<source>Error copying file permissions:</source>
+<target>파일 권한 복사 중 발생한 오류 :</target>
+
+<source>Error creating directory:</source>
+<target>디렉토리 생성 중 발생한 오류 :</target>
+
+<source>Error copying symbolic link:</source>
+<target>심볼릭 링크 복사 중 발생한 오류 :</target>
+
+<source>Error copying file:</source>
+<target>파일 복사 중 발생한 오류 :</target>
+
+<source>Error opening file:</source>
+<target>파일을 열던 중 발생한 오류 :</target>
+
+<source>Error traversing directory:</source>
+<target>디렉토리 이동 중 발생한 오류 :</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>디렉토리 이동 중 무한 루프 발생 :</target>
+
+<source>Error setting privilege:</source>
+<target>권한 설정 중 발생한 오류 :</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>마지막 동기화 작업 이후, 양측 모두 변경 되었습니다!</target>
 
@@ -1313,9 +1299,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>디렉토리가 의존 관계에 있습니다. 동기화 규칙 설정시 주의하십시오.</target>
 
-<source>Comparing content of files %x</source>
-<target>파일 %x 내용 별 비교 중</target>
-
 <source>Memory allocation failed!</source>
 <target>메모리 할당 실패!</target>
 
@@ -1331,14 +1314,14 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>심링크 %x 의 날짜는 같으나, 대상이 다릅니다!</target>
 
+<source>Comparing content of files %x</source>
+<target>파일 %x 내용 별 비교 중</target>
+
 <source>Comparing files by content failed.</source>
 <target>내용 별 파일 비교 실패</target>
 
 <source>Generating file list...</source>
 <target>파일 리스트 생성 중...</target>
-
-<source>Multiple...</source>
-<target>다중처리 (멀티플) 작업...</target>
 
 <source>Both sides are equal</source>
 <target>양측이 같음</target>
@@ -1358,6 +1341,12 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Delete right file/folder</source>
 <target>우측 파일/폴더 삭제</target>
 
+<source>Move file on left</source>
+<target>좌측 파일 이동</target>
+
+<source>Move file on right</source>
+<target>우측 파일 이동</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>우측 파일/폴더로 좌측 파일/폴더 덮어쓰기</target>
 
@@ -1372,6 +1361,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>Copy file attributes only to right</source>
 <target>파일 속성만 우측으로 복사</target>
+
+<source>Multiple...</source>
+<target>다중처리 (멀티플) 작업...</target>
 
 <source>Deleting file %x</source>
 <target>파일 %x 삭제 중</target>

@@ -7,6 +7,7 @@
 #include "algorithm.h"
 #include <iterator>
 #include <stdexcept>
+#include <tuple>
 #include "lib/resources.h"
 #include <zen/file_handling.h>
 #include "lib/recycler.h"
@@ -34,9 +35,15 @@ void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp
 class Redetermine
 {
 public:
+    static void execute(const DirectionSet& dirCfgIn, HierarchyObject& hierObj)
+    {
+        Redetermine(dirCfgIn).recurse(hierObj);
+    }
+
+private:
     Redetermine(const DirectionSet& dirCfgIn) : dirCfg(dirCfgIn) {}
 
-    void execute(HierarchyObject& hierObj) const
+    void recurse(HierarchyObject& hierObj) const
     {
         std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
         std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
@@ -136,11 +143,9 @@ public:
                 break;
         }
 
-        //recursion
-        execute(dirObj);
+        recurse(dirObj);
     }
 
-private:
     const DirectionSet dirCfg;
 };
 
@@ -242,6 +247,8 @@ private:
     Zstring     shortName;     //empty if object not existing
     zen::Int64  lastWriteTime;
     zen::UInt64 fileSize;
+
+    //note: we do *not* consider FileId here, but are only interested in *visual* changes. Consider user moving data to some other medium, this is not a change!
 };
 
 
@@ -392,6 +399,12 @@ std::pair<DataSetDir, const DirContainer*> retrieveDataSetDir(const Zstring& obj
 class RedetermineAuto
 {
 public:
+    static void execute(BaseDirMapping& baseDirectory, DeterminationProblem* handler)
+    {
+        RedetermineAuto(baseDirectory, handler);
+    }
+
+private:
     RedetermineAuto(BaseDirMapping& baseDirectory,
                     DeterminationProblem* handler) :
         txtBothSidesChanged(_("Both sides have changed since last synchronization!")),
@@ -411,7 +424,7 @@ public:
             //set conservative "two-way" directions
             DirectionSet twoWayCfg = getTwoWaySet();
 
-            Redetermine(twoWayCfg).execute(baseDirectory);
+            Redetermine::execute(twoWayCfg, baseDirectory);
             return;
         }
 
@@ -428,13 +441,20 @@ public:
                 if (respectFiltering(baseDirectory, dirInfoRight))
                     dbFilterRight = dirInfoRight.filter.get();
         */
-        execute(baseDirectory,
+        recurse(baseDirectory,
                 &dirInfoLeft.baseDirContainer,
                 &dirInfoRight.baseDirContainer);
+
+        //----------- detect renamed files -----------------
+        if (!exLeftOnly.empty() && !exRightOnly.empty())
+        {
+            findEqualDbEntries(dirInfoLeft.baseDirContainer, //fill map "onceEqual"
+                               dirInfoRight.baseDirContainer);
+
+            detectRenamedFiles();
+        }
     }
 
-
-private:
     /*
     static bool respectFiltering(const BaseDirMapping& baseDirectory, const DirInformation& dirInfo)
     {
@@ -454,7 +474,7 @@ private:
         catch (FileErrorDatabaseNotExisting&) {} //let's ignore these errors for now...
         catch (FileError& error) //e.g. incompatible database version
         {
-            if (handler_) handler_->reportWarning(error.toString() + wxT(" \n\n") +
+            if (handler_) handler_->reportWarning(error.toString() + L" \n\n" +
                                                       _("Setting default synchronization directions: Old files will be overwritten with newer files."));
         }
         return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
@@ -477,7 +497,7 @@ private:
         }
     */
 
-    void execute(HierarchyObject& hierObj,
+    void recurse(HierarchyObject& hierObj,
                  const DirContainer* dbDirectoryLeft,
                  const DirContainer* dbDirectoryRight)
     {
@@ -499,6 +519,18 @@ private:
         if (cat == FILE_EQUAL)
             return;
 
+        //----------------- prepare detection of renamed files -----------------
+        if (cat == FILE_LEFT_SIDE_ONLY)
+        {
+            if (fileObj.getFileId<LEFT_SIDE>() != FileId())
+                exLeftOnly.push_back(&fileObj);
+        }
+        else if (cat == FILE_RIGHT_SIDE_ONLY)
+        {
+            if (fileObj.getFileId<RIGHT_SIDE>() != FileId())
+                exRightOnly.insert(std::make_pair(getAssocKey<RIGHT_SIDE>(fileObj), &fileObj));
+        }
+        //----------------------------------------------------------------------
 
         //##################### schedule potentially existing temporary files for deletion ####################
         if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getFullName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
@@ -530,14 +562,14 @@ private:
         const DataSetFile dataDbLeft  = retrieveDataSetFile(fileObj.getObjShortName(), dbDirectoryLeft);
         const DataSetFile dataDbRight = retrieveDataSetFile(fileObj.getObjShortName(), dbDirectoryRight);
 
-        const DataSetFile dataCurrentLeft( fileObj, Int2Type<LEFT_SIDE>());
+        const DataSetFile dataCurrentLeft (fileObj, Int2Type<LEFT_SIDE >());
         const DataSetFile dataCurrentRight(fileObj, Int2Type<RIGHT_SIDE>());
 
         //evaluation
         const bool changeOnLeft  = dataDbLeft  != dataCurrentLeft;
         const bool changeOnRight = dataDbRight != dataCurrentRight;
 
-        if (dataDbLeft == dataDbRight) //last sync seems to have been successful
+        if (dataDbLeft == dataDbRight) //we have a "last synchronous state" => last sync seems to have been successful
         {
             if (changeOnLeft)
             {
@@ -651,7 +683,7 @@ private:
                         ;
                     }
 
-                    SetDirChangedFilter().execute(dirObj); //filter issue for this directory => treat subfiles/-dirs the same
+                    SetDirChangedFilter().recurse(dirObj); //filter issue for this directory => treat subfiles/-dirs the same
                     return;
                 }
         */
@@ -711,18 +743,133 @@ private:
             }
         }
 
-        execute(dirObj, dataDbLeftStuff.second, dataDbRightStuff.second); //recursion
+        recurse(dirObj, dataDbLeftStuff.second, dataDbRightStuff.second); //recursion
     }
+
+
+    void findEqualDbEntries(const DirContainer& dbDirectoryLeft,
+                            const DirContainer& dbDirectoryRight)
+    {
+        //note: we cannot integrate this traversal into "recurse()" since it may take a *slightly* different path: e.g. file renamed on both sides
+
+        std::for_each(dbDirectoryLeft.files.begin(), dbDirectoryLeft.files.end(),
+                      [&](const DirContainer::FileList::value_type& entryLeft)
+        {
+            auto iterRight = dbDirectoryRight.files.find(entryLeft.first);
+            if (iterRight != dbDirectoryRight.files.end())
+            {
+                if (entryLeft. second.id != FileId() &&
+                    iterRight->second.id != FileId() &&
+                    DataSetFile(entryLeft.first, entryLeft.second) == DataSetFile(iterRight->first, iterRight->second))
+                    onceEqual.insert(std::make_pair(getAssocKey(entryLeft.second), getAssocKey(iterRight->second)));
+            }
+        });
+
+        std::for_each(dbDirectoryLeft.dirs.begin(), dbDirectoryLeft.dirs.end(),
+                      [&](const DirContainer::DirList::value_type& entryLeft)
+        {
+            auto iterRight = dbDirectoryRight.dirs.find(entryLeft.first);
+            if (iterRight != dbDirectoryRight.dirs.end())
+                findEqualDbEntries(entryLeft.second, iterRight->second);
+        });
+    }
+
+    typedef std::tuple<Int64, UInt64, FileId> AssocKey; //(date, size, file ID)
+
+
+    //modification date is *not* considered as part of container key, so check here!
+    template <class Container>
+    static typename Container::const_iterator findValue(const Container& cnt, const AssocKey& key)
+    {
+        auto iterPair = cnt.equal_range(key); //since file id is already unique, we expect a single-element range at most
+        auto iter = std::find_if(iterPair.first, iterPair.second,
+                                 [&](const typename Container::value_type& item)
+        {
+            return sameFileTime(std::get<0>(item.first), std::get<0>(key), 2); //respect 2 second FAT/FAT32 precision
+        });
+        return iter == iterPair.second ? cnt.end() : iter;
+    }
+
+    void detectRenamedFiles() const
+    {
+        std::for_each(exLeftOnly.begin(), exLeftOnly.end(),
+                      [&](FileMapping* fileLeftOnly)
+        {
+            const AssocKey& keyLeft = RedetermineAuto::getAssocKey<LEFT_SIDE>(*fileLeftOnly);
+
+            auto iter = findValue(onceEqual, keyLeft);
+            if (iter != onceEqual.end())
+            {
+                const AssocKey& keyRight = iter->second;
+
+                auto iter2 = findValue(exRightOnly, keyRight);
+                if (iter2 != exRightOnly.end())
+                {
+                    FileMapping* fileRightOnly = iter2->second;
+
+                    //found a pair, mark it!
+                    fileLeftOnly ->setMoveRef(fileRightOnly->getId());
+                    fileRightOnly->setMoveRef(fileLeftOnly ->getId());
+                }
+            }
+        });
+    }
+
 
     const std::wstring txtBothSidesChanged;
     const std::wstring txtNoSideChanged;
     const std::wstring txtFilterChanged;
     const std::wstring txtLastSyncFail;
 
-    //const HardFilter* dbFilterLeft;  //optional
-    //const HardFilter* dbFilterRight; //optional
-
     DeterminationProblem* const handler_;
+
+    //detection of renamed files
+    template <SelectedSide side>
+    static AssocKey getAssocKey(const FileMapping& fsObj) { return std::make_tuple(fsObj.getLastWriteTime<side>(), fsObj.getFileSize<side>(), fsObj.getFileId<side>()); }
+    static AssocKey getAssocKey(const FileDescriptor& fileDescr) { return std::make_tuple(fileDescr.lastWriteTimeRaw, fileDescr.fileSize, fileDescr.id); }
+
+    struct LessAssocKey
+    {
+        bool operator()(const AssocKey& lhs, const AssocKey& rhs) const
+        {
+            //caveat: *don't* allow 2 sec tolerance as container predicate!!
+            // => no strict weak ordering relation! reason: no transitivity of equivalence!
+
+            //-> bad: if (!sameFileTime(std::get<0>(lhs), std::get<0>(rhs), 2))
+            //    return std::get<0>(lhs) < std::get<0>(rhs);
+
+            if (std::get<1>(lhs) != std::get<1>(rhs)) //file size
+                return std::get<1>(lhs) < std::get<1>(rhs);
+
+            return std::get<2>(lhs) < std::get<2>(rhs); //file id
+        }
+    };
+
+    std::vector<FileMapping*> exLeftOnly;
+
+    std::multimap<AssocKey, AssocKey, LessAssocKey> onceEqual; //keys for left and right files which are considered "equal" by database
+
+    std::multimap<AssocKey, FileMapping*, LessAssocKey> exRightOnly;
+
+    /*
+    detect renamed files
+
+     X  ->  |_|      Create right
+    |_| ->   Y       Delete right
+
+    is detected as:
+
+    Rename Y to X on right
+
+    Algorithm:
+    ----------
+    DB-file left  --- name, size, date --->    DB-file right
+      /|\                                             |
+       |                                      file ID, size, date
+     file ID, size, date                              |
+       |                                             \|/
+       X                                              Y
+    */
 };
 
 
@@ -750,11 +897,11 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
 void zen::redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirMapping& baseDirectory, DeterminationProblem* handler)
 {
     if (directConfig.var == DirectionConfig::AUTOMATIC)
-        RedetermineAuto(baseDirectory, handler);
+        RedetermineAuto::execute(baseDirectory, handler);
     else
     {
         DirectionSet dirCfg = extractDirections(directConfig);
-        Redetermine(dirCfg).execute(baseDirectory);
+        Redetermine::execute(dirCfg, baseDirectory);
     }
 }
 

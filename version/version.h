@@ -3,7 +3,7 @@
 
 namespace zen
 {
-const wchar_t currentVersion[] = L"4.2"; //internal linkage!
+const wchar_t currentVersion[] = L"4.3"; //internal linkage!
 }
 
 #endif

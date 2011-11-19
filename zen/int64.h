@@ -56,7 +56,7 @@ public:
         value(rhs) {} //-> std::int64_t equals long int on x64 Linux! Still we want implicit behavior for all other systems!
 
     //unsafe explicit but checked conversion from arbitrary integer type
-    template <class T> explicit Int64(T rhs) : value(rhs) { checkRange<std::int64_t>(rhs); }
+    template <class T> explicit Int64(T rhs) : value(static_cast<std::int64_t>(rhs)) { checkRange<std::int64_t>(rhs); }
 
     Int64& operator=(const Int64& rhs) { value = rhs.value; return *this; }
 
@@ -135,7 +135,7 @@ public:
         value(rhs) {} //-> std::uint64_t equals unsigned long int on x64 Linux! Still we want implicit behavior for all other systems!
 
     //unsafe explicit but checked conversion from arbitrary integer type
-    template <class T> explicit UInt64(T rhs) : value(rhs) { checkRange<std::uint64_t>(rhs); }
+    template <class T> explicit UInt64(T rhs) : value(static_cast<std::uint64_t>(rhs)) { checkRange<std::uint64_t>(rhs); }
 
     UInt64& operator=(const UInt64& rhs) { value = rhs.value; return *this; }
 

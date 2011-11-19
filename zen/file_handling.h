@@ -10,6 +10,7 @@
 #include "zstring.h"
 #include "file_error.h"
 #include "int64.h"
+#include "file_id_def.h"
 
 namespace zen
 {
@@ -68,7 +69,9 @@ void createDirectory(const Zstring& directory); //throw FileError; -> function o
 struct FileAttrib
 {
     UInt64 fileSize;
-    Int64 modificationTime; //size_t UTC compatible
+    Int64 modificationTime; //time_t UTC compatible
+    FileId sourceFileId;
+    FileId targetFileId;
 };
 
 void copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissing, ErrorFileLocked (Windows-only)
@@ -76,7 +79,7 @@ void copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissi
               bool copyFilePermissions,
               bool transactionalCopy,
               CallbackCopyFile* callback, //may be NULL
-              FileAttrib* sourceAttr = NULL);  //return current attributes at the time of copy
+              FileAttrib* newAttrib = NULL);  //return current attributes at the time of copy
 //Note: it MAY happen that copyFile() leaves temp files behind, e.g. temporary network drop.
 // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
 const Zstring TEMP_FILE_ENDING = Zstr(".ffs_tmp");

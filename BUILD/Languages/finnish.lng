@@ -169,14 +169,14 @@
 <source>Comparison Result</source>
 <target>Vertailun tulos</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Täsmäytyksen tietokannan muoto on virheellinen:</target>
-
 <source>Initial synchronization:</source>
 <target>Ensi täsmäytys:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Jokin FreeFileSynk tietokannan tiedostoista puuttuu vielä:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Täsmäytyksen tietokannan muoto on virheellinen:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Kannan tiedostot ovat eri sessioista:</target>
@@ -232,9 +232,6 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Virheellinen FreeFileSync asetustiedosto!</target>
 
-<source>File does not exist:</source>
-<target>Tiedosto puuttuu:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Virhe jäsentäessä asetustiedostoa:</target>
 
@@ -258,6 +255,9 @@
 
 <source>/sec</source>
 <target>/s</target>
+
+<source>File does not exist:</source>
+<target>Tiedosto puuttuu:</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Tietoja lukeminen epäonnistui, XML jäsen:</target>
@@ -371,9 +371,6 @@ Komento suoritetaan kun:
 
 <source>Batch execution</source>
 <target>Eräajon suoritus</target>
-
-<source>Log-messages:</source>
-<target>Lokin viestit:</target>
 
 <source>Stop</source>
 <target>Seis</target>
@@ -501,6 +498,24 @@ Komento suoritetaan kun:
 <source>Total amount of data that will be transferred</source>
 <target>Siirrettävän datan määrä</target>
 
+<source>Operation:</source>
+<target>Toiminto:</target>
+
+<source>Items found:</source>
+<target>Osia löytyi:</target>
+
+<source>Items remaining:</source>
+<target>Osia jäljellä:</target>
+
+<source>Speed:</source>
+<target>Nopeus:</target>
+
+<source>Time remaining:</source>
+<target>Aikaa jäljellä:</target>
+
+<source>Time elapsed:</source>
+<target>Kulunut aika:</target>
+
 <source>Batch job</source>
 <target>Eräajo</target>
 
@@ -549,32 +564,14 @@ Komento suoritetaan kun:
 <source>&Cancel</source>
 <target>&Lopeta</target>
 
-<source>Operation:</source>
-<target>Toiminto:</target>
-
-<source>Items found:</source>
-<target>Osia löytyi:</target>
-
-<source>Items remaining:</source>
-<target>Osia jäljellä:</target>
-
-<source>Speed:</source>
-<target>Nopeus:</target>
-
-<source>Time remaining:</source>
-<target>Aikaa jäljellä:</target>
-
-<source>Time elapsed:</source>
-<target>Kulunut aika:</target>
-
 <source>Select variant:</source>
 <target>Valitse vaihtoehto:</target>
 
 <source><Automatic></source>
 <target><- Automaattinen -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Tunnista ja monista muutokset molemmilla puolilla tietokannalla. Poistot ja ristiriidat hoidetaan automaattisesti.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target></target>
 
 <source>Mirror ->></source>
 <target>Peilaava ->></target>
@@ -801,22 +798,14 @@ Sulje pois: \stuff\temp\*
 <source>Copy locked files</source>
 <target>Kopioi lukitut tiedostot</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Kopioi jaetut/lukitut tiedostot Volume Shadow Copy prosessilla (Vaatii Järjestelmävalvojan oikeuksia)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Kopioi jaetut/lukitut tiedostot Volume Shadow Copy prosessilla (Vaatii Järjestelmävalvojan oikeuksia)</target>
 
 <source>Copy file access permissions</source>
 <target>Kopioi tiedoston käyttöoikeuksia</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Siirrä tiedosto- ja hakemisto-oikeuksia (Vaatii Järjestelmävalvojan oikeuksia)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Siirrä tiedosto- ja hakemisto-oikeuksia (Vaatii Järjestelmävalvojan oikeuksia)</target>
 
 <source>Hidden dialogs:</source>
 <target>Piilotetut ikkunat:</target>
@@ -1130,9 +1119,6 @@ Siirrä tiedosto- ja hakemisto-oikeuksia (Vaatii Järjestelmävalvojan oikeuksia
 <source>Filter: Single pair</source>
 <target>Suodata: Yksi pari</target>
 
-<source>Ignore</source>
-<target>Sivuta</target>
-
 <source>Direct</source>
 <target>Suoraan</target>
 
@@ -1286,11 +1272,11 @@ Siirrä tiedosto- ja hakemisto-oikeuksia (Vaatii Järjestelmävalvojan oikeuksia
 <source>Error opening file:</source>
 <target>Virhe avatessa tiedostoa:</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Suorita hakemiston läpikulku jatkuvana:</target>
-
 <source>Error traversing directory:</source>
 <target>Virhe hakemistoa läpikäydessä:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Suorita hakemiston läpikulku jatkuvana:</target>
 
 <source>Error setting privilege:</source>
 <target>Virhe, asettaessa oikeuksia:</target>
@@ -1325,9 +1311,6 @@ Siirrä tiedosto- ja hakemisto-oikeuksia (Vaatii Järjestelmävalvojan oikeuksia
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Hakemistot riippuvuussuhteessa! Aseta täsmäyssääntöjä varovasti:</target>
 
-<source>Comparing content of files %x</source>
-<target>Vertaa tiedostojen %x tietosisältöä</target>
-
 <source>Memory allocation failed!</source>
 <target>Muistin varaus epäonnistui!</target>
 
@@ -1343,14 +1326,14 @@ Siirrä tiedosto- ja hakemisto-oikeuksia (Vaatii Järjestelmävalvojan oikeuksia
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Pikakuvakkeilla %x on sama päiväys mutta kohde on toinen!</target>
 
+<source>Comparing content of files %x</source>
+<target>Vertaa tiedostojen %x tietosisältöä</target>
+
 <source>Comparing files by content failed.</source>
 <target>Tietosisällön vertailu epäonnistui.</target>
 
 <source>Generating file list...</source>
 <target>Luodaan tiedostolista...</target>
-
-<source>Multiple...</source>
-<target>Moninkertainen...</target>
 
 <source>Both sides are equal</source>
 <target>Puolet ovat denttiset</target>
@@ -1370,6 +1353,12 @@ Siirrä tiedosto- ja hakemisto-oikeuksia (Vaatii Järjestelmävalvojan oikeuksia
 <source>Delete right file/folder</source>
 <target>Poista tiedosto/hakemisto oikealta</target>
 
+<source>Move file on left</source>
+<target></target>
+
+<source>Move file on right</source>
+<target></target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Ylikirjoita oikea tiedosto/hakemista vasemanpuolisella</target>
 
@@ -1384,6 +1373,9 @@ Siirrä tiedosto- ja hakemisto-oikeuksia (Vaatii Järjestelmävalvojan oikeuksia
 
 <source>Copy file attributes only to right</source>
 <target>Monista tiedosto-ominaisuudet oikealle</target>
+
+<source>Multiple...</source>
+<target>Moninkertainen...</target>
 
 <source>Deleting file %x</source>
 <target>Poista tiedosto %x</target>

@@ -6,24 +6,23 @@
 
 #include "progress_indicator.h"
 #include <memory>
-#include "gui_generated.h"
+#include <zen/basic_math.h>
+#include <wx/imaglist.h>
 #include <wx/stopwatch.h>
-#include "../lib/resources.h"
+#include <wx/wupdlock.h>
+#include <wx+/mouse_move_dlg.h>
+#include <wx+/toggle_button.h>
 #include <wx+/string_conv.h>
 #include <wx+/format_unit.h>
-#include "../lib/statistics.h"
-#include <wx/wupdlock.h>
-#include <zen/basic_math.h>
-#include "tray_icon.h"
-#include <memory>
-#include <wx+/mouse_move_dlg.h>
-#include "../lib/error_log.h"
-#include <wx+/toggle_button.h>
-#include "taskbar.h"
 #include <wx+/image_tools.h>
 #include <wx+/graph.h>
 #include <wx+/no_flicker.h>
-#include <zen/basic_math.h>
+#include "gui_generated.h"
+#include "../lib/resources.h"
+#include "../lib/error_log.h"
+#include "../lib/statistics.h"
+#include "tray_icon.h"
+#include "taskbar.h"
 
 
 using namespace zen;
@@ -289,7 +288,7 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
                 showProgressExternally(toStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
                 break;
             case COMPARING_CONTENT:
-                showProgressExternally(percentageToShortString(fraction) + wxT(" - ") + _("Comparing content..."), fraction);
+                showProgressExternally(fractionToShortString(fraction) + wxT(" - ") + _("Comparing content..."), fraction);
                 break;
         }
 
@@ -393,13 +392,15 @@ public:
 
         m_bpButtonErrors  ->setActive(true);
         m_bpButtonWarnings->setActive(true);
-        m_bpButtonInfo    ->setActive(false);
+        m_bpButtonInfo    ->setActive(errorCount + warningCount == 0);
 
         m_bpButtonErrors  ->Show(errorCount   != 0);
         m_bpButtonWarnings->Show(warningCount != 0);
         m_bpButtonInfo    ->Show(infoCount    != 0);
 
         updateLogText();
+
+        m_textCtrlInfo->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(LogControl::onKeyEvent), NULL, this);
     }
 
     virtual void OnErrors(wxCommandEvent& event)
@@ -421,6 +422,20 @@ public:
     }
 
 private:
+    void onKeyEvent(wxKeyEvent& event)
+    {
+        const int keyCode = event.GetKeyCode();
+
+        if (event.ControlDown())
+            switch (keyCode)
+            {
+                case 'A': //CTRL + A
+                    m_textCtrlInfo->SetSelection(-1, -1); //select all
+                    return;
+            }
+        event.Skip();
+    }
+
     void updateLogText()
     {
         int includedTypes = 0;
@@ -509,9 +524,12 @@ struct LabelFormatterBytes : public LabelFormatter
 {
     virtual double getOptimalBlockSize(double bytesProposed) const
     {
+        bytesProposed *= 2; //make blocks twice the default size
+
+        if (bytesProposed <= 1024 * 1024) //set 1 MB min size: reduce initial rapid changes in y-label
+            return 1024 * 1024;
+
         //round to next number which is a convenient to read block size
-        if (bytesProposed <= 0)
-            return 0;
 
         const double k = std::floor(std::log(bytesProposed) / std::log(2.0));
         const double e = std::pow(2.0, k);
@@ -530,8 +548,11 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
 {
     virtual double getOptimalBlockSize(double secProposed) const
     {
-        if (secProposed <= 5)
-            return 5; //minimum block size
+        if (secProposed <= 10)
+            return 10; //minimum block size
+
+        if (secProposed <= 20) //avoid flicker between 10<->15<->20 sec blocks
+            return bestFit(secProposed, 10, 20);
 
         //for seconds and minutes: nice numbers are 1, 5, 10, 15, 20, 30
         auto calcBlock = [](double val) -> double
@@ -803,10 +824,7 @@ SyncStatus::SyncStatusImpl::~SyncStatusImpl()
     if (mainDialog)
     {
         mainDialog->enableAllElements();
-
-        //restore title text
-        mainDialog->SetTitle(titelTextBackup);
-
+        mainDialog->SetTitle(titelTextBackup); //restore title text
         mainDialog->Raise();
         mainDialog->SetFocus();
     }
@@ -977,13 +995,13 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
             showProgressExternally(wxString() + toStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
             break;
         case SyncStatus::COMPARING_CONTENT:
-            showProgressExternally(wxString() + percentageToShortString(fraction) + wxT(" - ") + _("Comparing content...") + postFix, fraction);
+            showProgressExternally(wxString() + fractionToShortString(fraction) + wxT(" - ") + _("Comparing content...") + postFix, fraction);
             break;
         case SyncStatus::SYNCHRONIZING:
-            showProgressExternally(wxString() + percentageToShortString(fraction) + wxT(" - ") + _("Synchronizing...") + postFix, fraction);
+            showProgressExternally(wxString() + fractionToShortString(fraction) + wxT(" - ") + _("Synchronizing...") + postFix, fraction);
             break;
         case SyncStatus::PAUSE:
-            showProgressExternally(wxString() + percentageToShortString(fraction) + wxT(" - ") + _("Paused") + postFix, fraction);
+            showProgressExternally(wxString() + fractionToShortString(fraction) + wxT(" - ") + _("Paused") + postFix, fraction);
             break;
         case SyncStatus::ABORTED:
             showProgressExternally(_("Aborted") + postFix, fraction);
@@ -1219,10 +1237,17 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     m_staticTextSpeed->SetLabel(timeElapMs <= 0 ? L"-" : zen::filesizeToShortString(zen::to<UInt64>(currentData * 1000 / timeElapMs)) + _("/sec"));
 
     //fill result listbox:
+
+    //workaround wxListBox bug on Windows XP: labels are drawn on top of each other
+    assert(m_listbookResult->GetImageList()); //make sure listbook keeps *any* image list
+    //due to some crazy reasons that aren't worth debugging, this needs to be done directly in wxFormBuilder,
+    //the following call is *not* sufficient: m_listbookResult->AssignImageList(new wxImageList(0, 0));
+    //note: alternative solutions involving wxLC_LIST, wxLC_REPORT and SetWindowStyleFlag() do not work portably! wxListBook using wxLC_ICON is obviously a class invariant!
+
     //1. re-arrange graph into results listbook
     bSizerTop->Detach(m_panelProgress);
     m_panelProgress->Reparent(m_listbookResult);
-    m_listbookResult->AddPage(m_panelProgress, _("Statistics"), true);
+    m_listbookResult->AddPage(m_panelProgress, _("Statistics"), true); //AddPage() takes ownership!
 
     //2. log file
     LogControl* logControl = new LogControl(m_listbookResult, log);

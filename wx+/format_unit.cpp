@@ -135,7 +135,7 @@ std::wstring zen::remainingTimeToShortString(double timeInSec)
 }
 
 
-std::wstring zen::percentageToShortString(double fraction)
+std::wstring zen::fractionToShortString(double fraction)
 {
     return replaceCpy(_("%x%"), L"%x", printNumber<std::wstring>(L"%3.2f", fraction * 100.0), false);
 }

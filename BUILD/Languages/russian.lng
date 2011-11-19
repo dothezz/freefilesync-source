@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Автоматическая синхронизация</target>
 
-<source>Browse</source>
-<target>Обзор</target>
-
-<source>Windows Error Code %x:</source>
-<target>Код ошибки Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Код ошибки Linux %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>Неверная командная строка: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>Ошибка при решении символической ссылки:</target>
-
-<source>Show pop-up</source>
-<target>Показывать всплывающие окна</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Показывать всплывающие окна при ошибках и замечаниях</target>
-
-<source>Ignore errors</source>
-<target>Игнорировать ошибки</target>
-
-<source>Hide all error and warning messages</source>
-<target>Скрывать все ошибки и сообщения с предупреждениями</target>
-
-<source>Exit instantly</source>
-<target>Выйти немедленно</target>
-
-<source>Abort synchronization immediately</source>
-<target>Отменить синхронизацию немедленно</target>
-
 <source>Select alternate comparison settings</source>
 <target>Выбрать альтернативные настройки сравнения</target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>Выберите промежуток времени</target>
 
+<source>Show pop-up</source>
+<target>Показывать всплывающие окна</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Показывать всплывающие окна при ошибках и замечаниях</target>
+
+<source>Ignore errors</source>
+<target>Игнорировать ошибки</target>
+
+<source>Hide all error and warning messages</source>
+<target>Скрывать все ошибки и сообщения с предупреждениями</target>
+
+<source>Exit instantly</source>
+<target>Выйти немедленно</target>
+
+<source>Abort synchronization immediately</source>
+<target>Отменить синхронизацию немедленно</target>
+
+<source>Browse</source>
+<target>Обзор</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Ошибка при чтении из базы данных синхронизации:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Ошибка при записи в базу данных синхронизации:</target>
+
+<source>Invalid command line: %x</source>
+<target>Неверная командная строка: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Код ошибки Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Код ошибки Linux %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Ошибка при решении символической ссылки:</target>
+
 <source>%x MB</source>
 <target>%x МБ</target>
 
@@ -164,17 +170,14 @@
 <source>Comparison Result</source>
 <target>Результаты сравнения</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Несовместимый формат базы данных синхронизации:</target>
-
 <source>Initial synchronization:</source>
 <target>Первоначальная синхронизация:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Одного из файлов баз данных FreeFileSync еще не существует:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Ошибка при чтении из базы данных синхронизации:</target>
+<source>Incompatible synchronization database format:</source>
+<target>Несовместимый формат базы данных синхронизации:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Файлы баз данных не имеют общей сессии синхронизации:</target>
@@ -201,11 +204,17 @@
 <pluralform>%x секунд</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Drag && drop</target>
+
 <source>Info</source>
 <target>Информация</target>
 
 <source>Fatal Error</source>
 <target>Критическая ошибка</target>
+
+<source>Error reading file:</source>
+<target>Ошибка при чтении файла:</target>
 
 <source>Scanning:</source>
 <target>Сканирую:</target>
@@ -226,14 +235,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Неверный файл конфигурации FreeFileSync!</target>
 
-<source>File does not exist:</source>
-<target>Файл не существует:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Ошибка при анализе файла настроек синхронизации:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Ошибка при перемещении в "Корзину":</target>
+
+<source>Could not load a required DLL:</source>
+<target>Не удалось загрузить необходимые DLL:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Ошибка доступа к службе Теневого Копирования Тома!</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Создание теневых копий на WOW64 не поддерживается. Пожалуйста, используйте FreeFileSync 64-разрядной версии.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Не удалось определить название тома для файла:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>Имя тома %x не является частью имени файла %y!</target>
+
 <source>/sec</source>
 <target>/с</target>
+
+<source>File does not exist:</source>
+<target>Файл не существует:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>Не удалось прочитать значения для следующих XML записей:</target>
 
 <source>S&ave configuration...</source>
 <target>Сохранить настройки синхронизации...</target>
@@ -327,144 +357,6 @@ The command line is executed each time:
 <source>A directory input field is empty.</source>
 <target>Поле ввода пути папки пустое.</target>
 
-<source>Drag && drop</source>
-<target>Drag && drop</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Не удалось инициализировать папку для мониторинга:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Ошибка при мониторинге папок.</target>
-
-<source>Conversion error:</source>
-<target>Ошибка преобразования:</target>
-
-<source>Error deleting file:</source>
-<target>Ошибка при удалении файла:</target>
-
-<source>Error moving file:</source>
-<target>Ошибка перемещения файла:</target>
-
-<source>Target file already existing!</source>
-<target>Конечный файл уже существует!</target>
-
-<source>Error moving directory:</source>
-<target>Ошибка перемещения папки:</target>
-
-<source>Target directory already existing!</source>
-<target>Конечная папка уже существует!</target>
-
-<source>Error deleting directory:</source>
-<target>Ошибка при удалении папки:</target>
-
-<source>Error changing modification time:</source>
-<target>Ошибка при изменении времени модификации файла:</target>
-
-<source>Error loading library function:</source>
-<target>Ошибка при загрузке функции библиотеки:</target>
-
-<source>Error reading security context:</source>
-<target>Ошибка при чтении контекста безобасности:</target>
-
-<source>Error writing security context:</source>
-<target>Ошибка при записи контекста безобасности:</target>
-
-<source>Error copying file permissions:</source>
-<target>Ошибка при копировании прав доступа:</target>
-
-<source>Error creating directory:</source>
-<target>Ошибка при создании папки:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Ошибка при копировании символьной ссылки:</target>
-
-<source>Error copying file:</source>
-<target>Ошибка при копировании файла:</target>
-
-<source>Error opening file:</source>
-<target>Ошибка при открытии файла:</target>
-
-<source>Error writing file:</source>
-<target>Ошибка при записи файла:</target>
-
-<source>Error reading file:</source>
-<target>Ошибка при чтении файла:</target>
-
-<source>Operation aborted!</source>
-<target>Операция отменена!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Зацикливание при встрече пересекающихся путей:</target>
-
-<source>Error traversing directory:</source>
-<target>Ошибка при пересечении папок:</target>
-
-<source>Error setting privilege:</source>
-<target>Ошибка установки привилегий:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Ошибка при перемещении в "Корзину":</target>
-
-<source>Could not load a required DLL:</source>
-<target>Не удалось загрузить необходимые DLL:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Ошибка при записи в базу данных синхронизации:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Ошибка доступа к службе Теневого Копирования Тома!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Создание теневых копий на WOW64 не поддерживается. Пожалуйста, используйте FreeFileSync 64-разрядной версии.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Не удалось определить название тома для файла:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>Имя тома %x не является частью имени файла %y!</target>
-
-<source>%x TB</source>
-<target>%x ТБ</target>
-
-<source>%x PB</source>
-<target>%x ПБ</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x минута</pluralform>
-<pluralform>%x минуты</pluralform>
-<pluralform>%x минут</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x час</pluralform>
-<pluralform>%x часа</pluralform>
-<pluralform>%x часов</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x день</pluralform>
-<pluralform>%x дня</pluralform>
-<pluralform>%x дней</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Не удалось прочитать значения для следующих XML записей:</target>
-
 <source>Logging</source>
 <target>Лог-файлы</target>
 
@@ -482,9 +374,6 @@ The command line is executed each time:
 
 <source>Batch execution</source>
 <target>Выполнение пакетного задания</target>
-
-<source>Log-messages:</source>
-<target>Лог-сообщения:</target>
 
 <source>Stop</source>
 <target>Стоп</target>
@@ -615,6 +504,24 @@ The command line is executed each time:
 <source>Total amount of data that will be transferred</source>
 <target>Общий объем данных, который будет передаваться</target>
 
+<source>Operation:</source>
+<target>Операция:</target>
+
+<source>Items found:</source>
+<target>Элементов найдено:</target>
+
+<source>Items remaining:</source>
+<target>Элементов осталось:</target>
+
+<source>Speed:</source>
+<target>Скорость:</target>
+
+<source>Time remaining:</source>
+<target>Времени осталось:</target>
+
+<source>Time elapsed:</source>
+<target>Времени прошло:</target>
+
 <source>Batch job</source>
 <target>Пакетное задание</target>
 
@@ -663,32 +570,14 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>&Отмена</target>
 
-<source>Operation:</source>
-<target>Операция:</target>
-
-<source>Items found:</source>
-<target>Элементов найдено:</target>
-
-<source>Items remaining:</source>
-<target>Элементов осталось:</target>
-
-<source>Speed:</source>
-<target>Скорость:</target>
-
-<source>Time remaining:</source>
-<target>Времени осталось:</target>
-
-<source>Time elapsed:</source>
-<target>Времени прошло:</target>
-
 <source>Select variant:</source>
 <target>Выберите вариант:</target>
 
 <source><Automatic></source>
 <target><Автоматический></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Выявление и распространение изменений на обеих сторонах с использованием базы данных. Удаленные файлы и конфликты определяются автоматически.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Выявление и распространение изменений на обе стороны, используя базу данных. Удаленные, переименованные и конфликтные файлы определяются автоматически.</target>
 
 <source>Mirror ->></source>
 <target>Зеркало ->></target>
@@ -910,22 +799,14 @@ Exclude: \stuff\temp\*
 <source>Copy locked files</source>
 <target>Копирование заблокированных файлов</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Копирование общих или заблокированных файлов с использованием службы Теневого Копирования Тома (требуются права Администратора)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Копирование общих или заблокированных файлов с использованием службы Теневого Копирования Тома (требуются права Администратора)</target>
 
 <source>Copy file access permissions</source>
 <target>Копирование прав доступа к файлам</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Передача прав доступа к файлам/папкам (требуются права Администратора)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Передача прав доступа к файлам/папкам (требуются права Администратора)</target>
 
 <source>Hidden dialogs:</source>
 <target>Скрытые диалоги</target>
@@ -956,6 +837,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>&Find next</source>
 <target>&Найти далее</target>
+
+<source>Operation aborted!</source>
+<target>Операция отменена!</target>
 
 <source>Main bar</source>
 <target>Главная панель</target>
@@ -1134,6 +1018,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>File list exported!</source>
 <target>Список файлов экспортирован!</target>
 
+<source>Error writing file:</source>
+<target>Ошибка при записи файла:</target>
+
 <source>Batch file created successfully!</source>
 <target>Файл пакетного задания создан успешно!</target>
 
@@ -1237,9 +1124,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Filter: Single pair</source>
 <target>Фильтр: Одна пара</target>
 
-<source>Ignore</source>
-<target>Игнорировать</target>
-
 <source>Direct</source>
 <target>Прямое</target>
 
@@ -1308,6 +1192,108 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Move files into a time-stamped subdirectory</source>
 <target>Перемещать файлы в заданную папку (можно создавать архивные версии удаленных файлов)</target>
 
+<source>%x TB</source>
+<target>%x ТБ</target>
+
+<source>%x PB</source>
+<target>%x ПБ</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x минута</pluralform>
+<pluralform>%x минуты</pluralform>
+<pluralform>%x минут</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x час</pluralform>
+<pluralform>%x часа</pluralform>
+<pluralform>%x часов</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x день</pluralform>
+<pluralform>%x дня</pluralform>
+<pluralform>%x дней</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Не удалось инициализировать папку для мониторинга:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Ошибка при мониторинге папок.</target>
+
+<source>Conversion error:</source>
+<target>Ошибка преобразования:</target>
+
+<source>Error deleting file:</source>
+<target>Ошибка при удалении файла:</target>
+
+<source>Error moving file:</source>
+<target>Ошибка перемещения файла:</target>
+
+<source>Target file already existing!</source>
+<target>Конечный файл уже существует!</target>
+
+<source>Error moving directory:</source>
+<target>Ошибка перемещения папки:</target>
+
+<source>Target directory already existing!</source>
+<target>Конечная папка уже существует!</target>
+
+<source>Error deleting directory:</source>
+<target>Ошибка при удалении папки:</target>
+
+<source>Error changing modification time:</source>
+<target>Ошибка при изменении времени модификации файла:</target>
+
+<source>Error loading library function:</source>
+<target>Ошибка при загрузке функции библиотеки:</target>
+
+<source>Error reading security context:</source>
+<target>Ошибка при чтении контекста безобасности:</target>
+
+<source>Error writing security context:</source>
+<target>Ошибка при записи контекста безобасности:</target>
+
+<source>Error copying file permissions:</source>
+<target>Ошибка при копировании прав доступа:</target>
+
+<source>Error creating directory:</source>
+<target>Ошибка при создании папки:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Ошибка при копировании символьной ссылки:</target>
+
+<source>Error copying file:</source>
+<target>Ошибка при копировании файла:</target>
+
+<source>Error opening file:</source>
+<target>Ошибка при открытии файла:</target>
+
+<source>Error traversing directory:</source>
+<target>Ошибка при пересечении папок:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Зацикливание при встрече пересекающихся путей:</target>
+
+<source>Error setting privilege:</source>
+<target>Ошибка установки привилегий:</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>Со времени последней синхронизации с обеих сторон произошли изменения!</target>
 
@@ -1341,9 +1327,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Зависимые папки! Будьте внимательны при настройке правил синхронизации:</target>
 
-<source>Comparing content of files %x</source>
-<target>Сравнение содержания файлов %x</target>
-
 <source>Memory allocation failed!</source>
 <target>Ошибка выделения памяти! (Не хватает памяти)</target>
 
@@ -1359,14 +1342,14 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Символьная ссылка %x имеет ту же дату, но различное содержание!</target>
 
+<source>Comparing content of files %x</source>
+<target>Сравнение содержания файлов %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>Сравнение файлов по содержимому провалено.</target>
 
 <source>Generating file list...</source>
 <target>Создание списка файлов...</target>
-
-<source>Multiple...</source>
-<target>Различные варианты синхронизации</target>
 
 <source>Both sides are equal</source>
 <target>Обе стороны равны</target>
@@ -1386,6 +1369,12 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Delete right file/folder</source>
 <target>Удалить файл/папку справа</target>
 
+<source>Move file on left</source>
+<target>Переместить файл налево</target>
+
+<source>Move file on right</source>
+<target>Переместить файл направо</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Перезаписать файл/папку слева на аналогичную из правой части</target>
 
@@ -1400,6 +1389,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>Copy file attributes only to right</source>
 <target>Скопировать только атрибуты файла направо</target>
+
+<source>Multiple...</source>
+<target>Различные варианты синхронизации</target>
 
 <source>Deleting file %x</source>
 <target>Удаление файла %x</target>

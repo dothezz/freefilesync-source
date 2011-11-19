@@ -169,14 +169,14 @@
 <source>Comparison Result</source>
 <target>Az összehasonlítás eredménye</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Inkompatibilis szinkronizációs adatbázis formátum:</target>
-
 <source>Initial synchronization:</source>
 <target>Első szinkronizáció:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>A FreeFileSync egyik adatbázisfájlja nem létezik:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Inkompatibilis szinkronizációs adatbázis formátum:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Az adatbázisfájlok nem osztoznak egy közös szinkronizációs munkameneten:</target>
@@ -372,9 +372,6 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Batch execution</source>
 <target>Kötegelt végrehajtás</target>
 
-<source>Log-messages:</source>
-<target>Naplóbejegyzések:</target>
-
 <source>Stop</source>
 <target>Megállítás</target>
 
@@ -501,6 +498,24 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Total amount of data that will be transferred</source>
 <target>A mozgatandó adatok összmérete</target>
 
+<source>Operation:</source>
+<target>Művelet:</target>
+
+<source>Items found:</source>
+<target>Talált elemek száma:</target>
+
+<source>Items remaining:</source>
+<target>Hátralévő elemek száma:</target>
+
+<source>Speed:</source>
+<target>Sebesség:</target>
+
+<source>Time remaining:</source>
+<target>Hátralévő idő:</target>
+
+<source>Time elapsed:</source>
+<target>Eltelt idő:</target>
+
 <source>Batch job</source>
 <target>Kötegelt feladat</target>
 
@@ -549,32 +564,14 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>&Cancel</source>
 <target>&Mégsem</target>
 
-<source>Operation:</source>
-<target>Művelet:</target>
-
-<source>Items found:</source>
-<target>Talált elemek száma:</target>
-
-<source>Items remaining:</source>
-<target>Hátralévő elemek száma:</target>
-
-<source>Speed:</source>
-<target>Sebesség:</target>
-
-<source>Time remaining:</source>
-<target>Hátralévő idő:</target>
-
-<source>Time elapsed:</source>
-<target>Eltelt idő:</target>
-
 <source>Select variant:</source>
 <target>Változat kiválasztása:</target>
 
 <source><Automatic></source>
 <target><Automatikus></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Mindkét oldal változásainak azonosítása és tárolása adatbázis segítségével. A törlések és ütközések automatikusan észlelődnek.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target></target>
 
 <source>Mirror ->></source>
 <target>Tükrözés ->></target>
@@ -1123,9 +1120,6 @@ Kizárni: \stuff\temp\*
 <source>Filter: Single pair</source>
 <target>Szűrő: Egy pár</target>
 
-<source>Ignore</source>
-<target>Figyelmen kívül hagy</target>
-
 <source>Direct</source>
 <target>Közvetlen</target>
 
@@ -1279,11 +1273,11 @@ Kizárni: \stuff\temp\*
 <source>Error opening file:</source>
 <target>A fájl megnyitása sikertelen:</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Végtelen hurok a mappák bejárásakor:</target>
-
 <source>Error traversing directory:</source>
 <target>A mappa átnézése sikertelen:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Végtelen hurok a mappák bejárásakor:</target>
 
 <source>Error setting privilege:</source>
 <target>Hiba történt a jogok beállítása közben:</target>
@@ -1318,9 +1312,6 @@ Kizárni: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>A mappák függenek egymástól! Legyen óvatos, amikor megadja a szinkronizálási szabályokat:</target>
 
-<source>Comparing content of files %x</source>
-<target>%x fájlok tartalmának összehasonlítása</target>
-
 <source>Memory allocation failed!</source>
 <target>Sikertelen memóriafoglalás!</target>
 
@@ -1336,14 +1327,14 @@ Kizárni: \stuff\temp\*
 <source>Symlinks %x have the same date but a different target!</source>
 <target>A(z) %x symlinknek megegyezik a dátuma, de a célpontja nem!</target>
 
+<source>Comparing content of files %x</source>
+<target>%x fájlok tartalmának összehasonlítása</target>
+
 <source>Comparing files by content failed.</source>
 <target>Sikertelen a fájlok összehasonlítása tartalom alapján.</target>
 
 <source>Generating file list...</source>
 <target>Fájllista generálása...</target>
-
-<source>Multiple...</source>
-<target>Sokszorosítás</target>
 
 <source>Both sides are equal</source>
 <target>Mindkét oldal egyforma</target>
@@ -1363,6 +1354,12 @@ Kizárni: \stuff\temp\*
 <source>Delete right file/folder</source>
 <target>Jobb oldali fájl/mappa törlése</target>
 
+<source>Move file on left</source>
+<target></target>
+
+<source>Move file on right</source>
+<target></target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Bal oldali fájl/mappa felülírása a jobb oldalival</target>
 
@@ -1377,6 +1374,9 @@ Kizárni: \stuff\temp\*
 
 <source>Copy file attributes only to right</source>
 <target>Fájl attribútumok másolása csak a jobb oldalra</target>
+
+<source>Multiple...</source>
+<target>Sokszorosítás</target>
 
 <source>Deleting file %x</source>
 <target>Fájl törlése %x</target>

@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSynk - Automatisk Synkronisering</target>
 
-<source>Browse</source>
-<target>Gennemse</target>
-
-<source>Windows Error Code %x:</source>
-<target>Windows Fejl kode %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Fejl kode %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>Ugyldig kommando: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>Fejl i at finde link:</target>
-
-<source>Show pop-up</source>
-<target>Vis pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Vis pop-up ved fejl eller advarsler</target>
-
-<source>Ignore errors</source>
-<target>Ignorer fejl</target>
-
-<source>Hide all error and warning messages</source>
-<target>Skjul beskeder om fejl og advarsler</target>
-
-<source>Exit instantly</source>
-<target>Afslut med det samme</target>
-
-<source>Abort synchronization immediately</source>
-<target>Abort synkronisering med det samme</target>
-
 <source>Select alternate comparison settings</source>
 <target>Vælg alternative sammenlignings indstillinger</target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>Vælg tids område</target>
 
+<source>Show pop-up</source>
+<target>Vis pop-up</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Vis pop-up ved fejl eller advarsler</target>
+
+<source>Ignore errors</source>
+<target>Ignorer fejl</target>
+
+<source>Hide all error and warning messages</source>
+<target>Skjul beskeder om fejl og advarsler</target>
+
+<source>Exit instantly</source>
+<target>Afslut med det samme</target>
+
+<source>Abort synchronization immediately</source>
+<target>Abort synkronisering med det samme</target>
+
+<source>Browse</source>
+<target>Gennemse</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Fejl i læsning fra synkroniserings databasen:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Fejl i skrivning til synkroniserings databasen:</target>
+
+<source>Invalid command line: %x</source>
+<target>Ugyldig kommando: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Windows Fejl kode %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Fejl kode %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Fejl i at finde link:</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -163,17 +169,14 @@
 <source>Comparison Result</source>
 <target>Sammenlignings Resultat</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Ukompatibelt synkroniserings database format:</target>
-
 <source>Initial synchronization:</source>
 <target>Indledende synkronisering:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>En af FreeFileSync database filerne findes ikke endnu:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Fejl i læsning fra synkroniserings databasen:</target>
+<source>Incompatible synchronization database format:</source>
+<target>Ukompatibelt synkroniserings database format:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Database filer deler ikke en fælles synkroniserings session</target>
@@ -199,11 +202,17 @@
 <pluralform>%x sek</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Træk && slip</target>
+
 <source>Info</source>
 <target>Info</target>
 
 <source>Fatal Error</source>
 <target>Uoprettelig Fejl</target>
+
+<source>Error reading file:</source>
+<target>Fejl i læsning af fil:</target>
 
 <source>Scanning:</source>
 <target>Skanner:</target>
@@ -223,14 +232,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Ugyldig FreeFileSync config fil!</target>
 
-<source>File does not exist:</source>
-<target>Filen findes ikke:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Fejl i at lave konfigurations filen:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Fejl i at flytte til skraldespand:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Kunne ikke hente en krævet DLL:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Fejl i adgang til Enhedens Kopi Service</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>At lave spejl kopier af WOW64 er ikke understøttet. Brug venligst FreeFileSync 64-bit version.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Kunne ikke finde drev navn til filen:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>Drev navn %x ikke en del af filnavn %y!</target>
+
 <source>/sec</source>
 <target>/sek</target>
+
+<source>File does not exist:</source>
+<target>Filen findes ikke:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>Kunne ikke læse værdierne for følgende XML punkter:</target>
 
 <source>S&ave configuration...</source>
 <target>G&em konfiguration...</target>
@@ -324,141 +354,6 @@ Kommando linjen bliver afviklet hver gang:
 <source>A directory input field is empty.</source>
 <target>Et biblioteks felt er tomt.</target>
 
-<source>Drag && drop</source>
-<target>Træk && slip</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Kunne ikke initialiserer biblioteks overvågningen:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Fejl i overvågning af biblioteker.</target>
-
-<source>Conversion error:</source>
-<target>Konverterings fejl:</target>
-
-<source>Error deleting file:</source>
-<target>Fejl i sletning af fil:</target>
-
-<source>Error moving file:</source>
-<target>Fejl i flytning af fil:</target>
-
-<source>Target file already existing!</source>
-<target>Filen findes i forvejen!</target>
-
-<source>Error moving directory:</source>
-<target>Fejl i flytning af bibliotek:</target>
-
-<source>Target directory already existing!</source>
-<target>Bibliotek findes i forvejen!</target>
-
-<source>Error deleting directory:</source>
-<target>Fejl i sletning af bibliotek:</target>
-
-<source>Error changing modification time:</source>
-<target>Fejl i ændring af modificerings tiden:</target>
-
-<source>Error loading library function:</source>
-<target>Fejl i biblioteks funktionen:</target>
-
-<source>Error reading security context:</source>
-<target>Fejl i læsning af sikkerhedstilladelser:</target>
-
-<source>Error writing security context:</source>
-<target>Fejl i skrivning af sikkerhedstilladelser:</target>
-
-<source>Error copying file permissions:</source>
-<target>Fejl i kopiering af filtilladelser:</target>
-
-<source>Error creating directory:</source>
-<target>Fejl i oprettelse af bibliotek:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Fejl i kopiering af link:</target>
-
-<source>Error copying file:</source>
-<target>Fejl i kopiering af fil:</target>
-
-<source>Error opening file:</source>
-<target>Fejl i åbning af fil:</target>
-
-<source>Error writing file:</source>
-<target>Fejl i at skrive fil:</target>
-
-<source>Error reading file:</source>
-<target>Fejl i læsning af fil:</target>
-
-<source>Operation aborted!</source>
-<target>Operation afbrudt!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Uendelig løkke ved gennemgang af bibliotek:</target>
-
-<source>Error traversing directory:</source>
-<target>Fejl i gennemgang af bibliotek:</target>
-
-<source>Error setting privilege:</source>
-<target>Fejl i at sætte privilegier:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Fejl i at flytte til skraldespand:</target>
-
-<source>Could not load a required DLL:</source>
-<target>Kunne ikke hente en krævet DLL:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Fejl i skrivning til synkroniserings databasen:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Fejl i adgang til Enhedens Kopi Service</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>At lave spejl kopier af WOW64 er ikke understøttet. Brug venligst FreeFileSync 64-bit version.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Kunne ikke finde drev navn til filen:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>Drev navn %x ikke en del af filnavn %y!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 timer</pluralform>
-<pluralform>%x timer</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dag</pluralform>
-<pluralform>%x dage</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Kunne ikke læse værdierne for følgende XML punkter:</target>
-
 <source>Logging</source>
 <target>Logger</target>
 
@@ -476,9 +371,6 @@ Kommando linjen bliver afviklet hver gang:
 
 <source>Batch execution</source>
 <target>Batch afvikling</target>
-
-<source>Log-messages:</source>
-<target>Log-beskeder:</target>
 
 <source>Stop</source>
 <target>Stop</target>
@@ -606,6 +498,24 @@ Kommando linjen bliver afviklet hver gang:
 <source>Total amount of data that will be transferred</source>
 <target>Samlet antal data der vil blive overført</target>
 
+<source>Operation:</source>
+<target>Igang:</target>
+
+<source>Items found:</source>
+<target>Enheder fundet:</target>
+
+<source>Items remaining:</source>
+<target>Enheder tilbage:</target>
+
+<source>Speed:</source>
+<target>Hastighed:</target>
+
+<source>Time remaining:</source>
+<target>Tid tilbage:</target>
+
+<source>Time elapsed:</source>
+<target>Tid gået:</target>
+
 <source>Batch job</source>
 <target>Batch job</target>
 
@@ -654,32 +564,14 @@ Kommando linjen bliver afviklet hver gang:
 <source>&Cancel</source>
 <target>&Anuller</target>
 
-<source>Operation:</source>
-<target>Igang:</target>
-
-<source>Items found:</source>
-<target>Enheder fundet:</target>
-
-<source>Items remaining:</source>
-<target>Enheder tilbage:</target>
-
-<source>Speed:</source>
-<target>Hastighed:</target>
-
-<source>Time remaining:</source>
-<target>Tid tilbage:</target>
-
-<source>Time elapsed:</source>
-<target>Tid gået:</target>
-
 <source>Select variant:</source>
 <target>Vælg variant:</target>
 
 <source><Automatic></source>
 <target><Automatisk></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Indentifiser og udbred ændringer på begge sider via. database. Sletninger og konflikter opdages automatisk.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>find ændringer på begge sider via. database. Sletninger, omdøbninger og konflikter bliver automatisk fundet.</target>
 
 <source>Mirror ->></source>
 <target>Spejl ->></target>
@@ -901,27 +793,19 @@ Udeluk: \ting\temp\*
 <target>Transaktionel fil kopiering</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>Skriv til en midlertidig fil (*.ffs_tmp) først så omdøb den. Dette garanterer sikkerheden selv ved en kritisk fejl.</target>
 
 <source>Copy locked files</source>
 <target>Kopier låste filer</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Kopier delte eller låste filer ved hjælp af Drev Kopi Servicen (Kræver Administrator rettigheder)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Kopier delte eller låste filer ved hjælp af Drev Kopi Servicen (Kræver Administrator rettigheder)</target>
 
 <source>Copy file access permissions</source>
 <target>Kopier fil adgangs tilladelser</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)</target>
 
 <source>Hidden dialogs:</source>
 <target>Skjulte dialoger:</target>
@@ -952,6 +836,9 @@ Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 
 <source>&Find next</source>
 <target>&Find næste</target>
+
+<source>Operation aborted!</source>
+<target>Operation afbrudt!</target>
 
 <source>Main bar</source>
 <target>Hoved værktøjslinjen</target>
@@ -993,16 +880,16 @@ Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 <target>Auto-juster kolonner</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>Ikon størrelse:</target>
 
 <source>Small</source>
-<target></target>
+<target>Lille</target>
 
 <source>Medium</source>
-<target></target>
+<target>Mellem</target>
 
 <source>Large</source>
-<target></target>
+<target>Stor</target>
 
 <source>Include all rows</source>
 <target>Inkluder alle rækker</target>
@@ -1130,6 +1017,9 @@ Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 <source>File list exported!</source>
 <target>Fil listen er eksporteret!</target>
 
+<source>Error writing file:</source>
+<target>Fejl i at skrive fil:</target>
+
 <source>Batch file created successfully!</source>
 <target>Batch fil oprettet!</target>
 
@@ -1229,9 +1119,6 @@ Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 <source>Filter: Single pair</source>
 <target>Filter: Par</target>
 
-<source>Ignore</source>
-<target>Ignorer</target>
-
 <source>Direct</source>
 <target>Direkte</target>
 
@@ -1295,6 +1182,105 @@ Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 <source>Move files into a time-stamped subdirectory</source>
 <target>Flyt filer til et datomærket underbibliotek</target>
 
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 timer</pluralform>
+<pluralform>%x timer</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dag</pluralform>
+<pluralform>%x dage</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Kunne ikke initialiserer biblioteks overvågningen:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Fejl i overvågning af biblioteker.</target>
+
+<source>Conversion error:</source>
+<target>Konverterings fejl:</target>
+
+<source>Error deleting file:</source>
+<target>Fejl i sletning af fil:</target>
+
+<source>Error moving file:</source>
+<target>Fejl i flytning af fil:</target>
+
+<source>Target file already existing!</source>
+<target>Filen findes i forvejen!</target>
+
+<source>Error moving directory:</source>
+<target>Fejl i flytning af bibliotek:</target>
+
+<source>Target directory already existing!</source>
+<target>Bibliotek findes i forvejen!</target>
+
+<source>Error deleting directory:</source>
+<target>Fejl i sletning af bibliotek:</target>
+
+<source>Error changing modification time:</source>
+<target>Fejl i ændring af modificerings tiden:</target>
+
+<source>Error loading library function:</source>
+<target>Fejl i biblioteks funktionen:</target>
+
+<source>Error reading security context:</source>
+<target>Fejl i læsning af sikkerhedstilladelser:</target>
+
+<source>Error writing security context:</source>
+<target>Fejl i skrivning af sikkerhedstilladelser:</target>
+
+<source>Error copying file permissions:</source>
+<target>Fejl i kopiering af filtilladelser:</target>
+
+<source>Error creating directory:</source>
+<target>Fejl i oprettelse af bibliotek:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Fejl i kopiering af link:</target>
+
+<source>Error copying file:</source>
+<target>Fejl i kopiering af fil:</target>
+
+<source>Error opening file:</source>
+<target>Fejl i åbning af fil:</target>
+
+<source>Error traversing directory:</source>
+<target>Fejl i gennemgang af bibliotek:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Uendelig løkke ved gennemgang af bibliotek:</target>
+
+<source>Error setting privilege:</source>
+<target>Fejl i at sætte privilegier:</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>Begge sider er ændret siden sidste synkronisering!</target>
 
@@ -1325,9 +1311,6 @@ Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Biblioteker er afhængige! Vær forsigtig når du laver synkroniserings reglerne:</target>
 
-<source>Comparing content of files %x</source>
-<target>Sammenligner indhold af filer %x</target>
-
 <source>Memory allocation failed!</source>
 <target>Hukommelses fejl!</target>
 
@@ -1343,14 +1326,14 @@ Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Links %x har den samme dato men forskellige destinationerl!</target>
 
+<source>Comparing content of files %x</source>
+<target>Sammenligner indhold af filer %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>Fejl i sammenligning af filernes indhold.</target>
 
 <source>Generating file list...</source>
 <target>Laver fil liste...</target>
-
-<source>Multiple...</source>
-<target>Flere...</target>
 
 <source>Both sides are equal</source>
 <target>Begge sider er ens</target>
@@ -1370,6 +1353,12 @@ Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 <source>Delete right file/folder</source>
 <target>Slet højre fil/mappe</target>
 
+<source>Move file on left</source>
+<target>Flyt filen til venstre</target>
+
+<source>Move file on right</source>
+<target>flyt filen til højre</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Overskriv venstre fil/mappe med højre</target>
 
@@ -1384,6 +1373,9 @@ Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)
 
 <source>Copy file attributes only to right</source>
 <target>Kopiere fil attributter kun til højre</target>
+
+<source>Multiple...</source>
+<target>Flere...</target>
 
 <source>Deleting file %x</source>
 <target>Sletter fil %x</target>

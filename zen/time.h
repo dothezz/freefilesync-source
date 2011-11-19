@@ -175,7 +175,10 @@ String formatTime(const String2& format, const TimeComp& comp, UserDefinedFormat
 {
     typedef typename GetCharType<String>::Result CharType;
 
-    const struct std::tm& ctc = toClibTimeComponents(comp);
+    struct std::tm ctc = toClibTimeComponents(comp);
+    std::mktime (&ctc); // unfortunately std::strftime() needs all elements of "struct tm" filled, e.g. tm_wday, tm_yday
+    //note: although std::mktime() explicitly expects "local time", calculating weekday and day of year *should* be time-zone and DST independent
+
     CharType buffer[256];
     const size_t charsWritten = strftimeWrap(buffer, 256, strBegin(format), &ctc);
     return String(buffer, charsWritten);

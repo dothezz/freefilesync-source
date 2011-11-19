@@ -10,7 +10,7 @@
 #include <string>
 #include <boost/uuid/uuid.hpp>
 
-#ifdef __MINGW32__  //boost should start and clean up!
+#ifdef __MINGW32__  //boost should start cleaning this mess up
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 #pragma GCC diagnostic ignored "-Wuninitialized"

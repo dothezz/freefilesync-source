@@ -7,13 +7,11 @@
 #ifndef FREEFILESYNC_H_INCLUDED
 #define FREEFILESYNC_H_INCLUDED
 
-#include <wx/string.h>
 #include <vector>
+#include <memory>
 #include <zen/zstring.h>
 #include <zen/assert_static.h>
-#include <memory>
 #include <zen/int64.h>
-
 
 
 namespace zen
@@ -24,7 +22,7 @@ enum CompareVariant
     CMP_BY_CONTENT
 };
 
-wxString getVariantName(CompareVariant var);
+std::wstring getVariantName(CompareVariant var);
 
 enum SymLinkHandling
 {
@@ -89,8 +87,7 @@ CompareFilesResult convertToFilesResult(CompareSymlinkResult value)
 }
 
 
-wxString getDescription(CompareFilesResult cmpRes);
-wxString getSymbol(CompareFilesResult cmpRes);
+std::wstring getSymbol(CompareFilesResult cmpRes);
 
 
 enum SyncOperation
@@ -99,17 +96,24 @@ enum SyncOperation
     SO_CREATE_NEW_RIGHT,
     SO_DELETE_LEFT,
     SO_DELETE_RIGHT,
+
+    SO_MOVE_LEFT_SOURCE, //SO_DELETE_LEFT    - optimization!
+    SO_MOVE_LEFT_TARGET, //SO_CREATE_NEW_LEFT
+
+    SO_MOVE_RIGHT_SOURCE, //SO_DELETE_RIGHT    - optimization!
+    SO_MOVE_RIGHT_TARGET, //SO_CREATE_NEW_RIGHT
+
     SO_OVERWRITE_LEFT,
     SO_OVERWRITE_RIGHT,
     SO_COPY_METADATA_TO_LEFT, //objects are already equal: transfer metadata only
     SO_COPY_METADATA_TO_RIGHT, //
+
     SO_DO_NOTHING, //= both sides differ, but nothing will be synced
     SO_EQUAL,      //= both sides are equal, so nothing will be synced
     SO_UNRESOLVED_CONFLICT
 };
 
-wxString getDescription(SyncOperation op);
-wxString getSymbol(SyncOperation op);
+std::wstring getSymbol     (SyncOperation op); //method used for exporting .csv file only!
 
 
 struct DirectionSet
@@ -171,7 +175,7 @@ bool operator==(const DirectionConfig& lhs, const DirectionConfig& rhs)
 //get sync directions: DON'T call for variant AUTOMATIC!
 DirectionSet extractDirections(const DirectionConfig& cfg);
 
-wxString getVariantName(DirectionConfig::Variant var);
+std::wstring getVariantName(DirectionConfig::Variant var);
 
 
 
@@ -209,8 +213,8 @@ enum DeletionPolicy
 struct SyncConfig
 {
     SyncConfig(const DirectionConfig& directCfg,
-               const DeletionPolicy handleDel,
-               const wxString&      customDelDir) :
+               const DeletionPolicy   handleDel,
+               const Zstring&         customDelDir) :
         directionCfg(directCfg),
         handleDeletion(handleDel),
         customDeletionDirectory(customDelDir) {}
@@ -223,7 +227,7 @@ struct SyncConfig
 
     //misc options
     DeletionPolicy handleDeletion; //use Recycle, delete permanently or move to user-defined location
-    wxString customDeletionDirectory;
+    Zstring customDeletionDirectory;
 };
 
 inline
@@ -231,7 +235,7 @@ bool operator==(const SyncConfig& lhs, const SyncConfig& rhs)
 {
     return lhs.directionCfg            == rhs.directionCfg   &&
            lhs.handleDeletion          == rhs.handleDeletion &&
-           (lhs.handleDeletion != MOVE_TO_CUSTOM_DIRECTORY || //only cmp custom deletion directory if required!
+           (lhs.handleDeletion != MOVE_TO_CUSTOM_DIRECTORY || //only compare deletion directory if required!
             lhs.customDeletionDirectory == rhs.customDeletionDirectory);
 }
 
@@ -365,16 +369,14 @@ struct MainConfiguration
     MainConfiguration() :
 #ifdef FFS_WIN
         globalFilter(Zstr("*"),
-                     Zstr("\
-\\System Volume Information\\\n\
-\\RECYCLED\\\n\
-\\RECYCLER\\\n\
-\\$Recycle.Bin\\")) {}
+                     Zstr("\\System Volume Information\\\n")
+                     Zstr("\\RECYCLED\\\n")
+                     Zstr("\\RECYCLER\\\n")
+                     Zstr("\\$Recycle.Bin\\")) {}
 #elif defined FFS_LINUX
         globalFilter(Zstr("*"),
-                     Zstr("\
-/.Trash-*/\n\
-/.recycle/")) {}
+                     Zstr("/.Trash-*/\n")
+                     Zstr("/.recycle/")) {}
 #endif
 
     CompConfig   cmpConfig;    //global compare settings:         may be overwritten by folder pair settings
@@ -384,18 +386,18 @@ struct MainConfiguration
     FolderPairEnh firstPair; //there needs to be at least one pair!
     std::vector<FolderPairEnh> additionalPairs;
 
-    wxString getCompVariantName() const;
-    wxString getSyncVariantName() const;
+    std::wstring getCompVariantName() const;
+    std::wstring getSyncVariantName() const;
 };
 
 
 inline
 bool operator==(const MainConfiguration& lhs, const MainConfiguration& rhs)
 {
-    return lhs.cmpConfig       == rhs.cmpConfig       &&
-           lhs.globalFilter    == rhs.globalFilter    &&
-           lhs.syncCfg         == rhs.syncCfg         &&
-           lhs.firstPair       == rhs.firstPair       &&
+    return lhs.cmpConfig       == rhs.cmpConfig    &&
+           lhs.globalFilter    == rhs.globalFilter &&
+           lhs.syncCfg         == rhs.syncCfg      &&
+           lhs.firstPair       == rhs.firstPair    &&
            lhs.additionalPairs == rhs.additionalPairs;
 }
 

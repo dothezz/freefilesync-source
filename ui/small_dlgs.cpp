@@ -607,13 +607,13 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     m_staticTextVariant->SetLabel(variantName);
     m_textCtrlData->SetValue(zen::filesizeToShortString(statistics.getDataToProcess()));
 
-    m_textCtrlCreateL->SetValue(toStringSep(statistics.getCreate   <LEFT_SIDE>()));
-    m_textCtrlUpdateL->SetValue(toStringSep(statistics.getOverwrite<LEFT_SIDE>()));
-    m_textCtrlDeleteL->SetValue(toStringSep(statistics.getDelete   <LEFT_SIDE>()));
+    m_textCtrlCreateL->SetValue(toStringSep(statistics.getCreate<LEFT_SIDE>()));
+    m_textCtrlUpdateL->SetValue(toStringSep(statistics.getUpdate<LEFT_SIDE>()));
+    m_textCtrlDeleteL->SetValue(toStringSep(statistics.getDelete<LEFT_SIDE>()));
 
-    m_textCtrlCreateR->SetValue(toStringSep(statistics.getCreate   <RIGHT_SIDE>()));
-    m_textCtrlUpdateR->SetValue(toStringSep(statistics.getOverwrite<RIGHT_SIDE>()));
-    m_textCtrlDeleteR->SetValue(toStringSep(statistics.getDelete   <RIGHT_SIDE>()));
+    m_textCtrlCreateR->SetValue(toStringSep(statistics.getCreate<RIGHT_SIDE>()));
+    m_textCtrlUpdateR->SetValue(toStringSep(statistics.getUpdate<RIGHT_SIDE>()));
+    m_textCtrlDeleteR->SetValue(toStringSep(statistics.getDelete<RIGHT_SIDE>()));
 
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -694,7 +694,7 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
 #endif
 
     enumDescrHandleSyml.
-    add(SYMLINK_IGNORE,       _("Ignore")).
+    add(SYMLINK_IGNORE,       _("Exclude")).
     add(SYMLINK_USE_DIRECTLY, _("Direct")).
     add(SYMLINK_FOLLOW_LINK,  _("Follow"));
 
@@ -818,7 +818,7 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     m_checkBoxCopyPermissions->SetLabel(_("Copy NTFS permissions"));
 #else
     m_checkBoxCopyLocked->Hide();
-    m_textCtrlCopyLocked->Hide();
+    m_staticTextCopyLocked->Hide();
 #endif
 
     set(globalSettings.gui.externelApplications);

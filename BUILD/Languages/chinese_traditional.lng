@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>即時同步 - 自動同步</target>
 
-<source>Browse</source>
-<target>瀏覽</target>
-
-<source>Windows Error Code %x:</source>
-<target>Windows 錯誤代碼 %x：</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux 錯誤代碼 %x：</target>
-
-<source>Invalid command line: %x</source>
-<target>無效的命令列：%x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>解析錯誤的符號連結：</target>
-
-<source>Show pop-up</source>
-<target>顯示彈出視窗</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>在彈出視窗上顯示錯誤或警告訊息</target>
-
-<source>Ignore errors</source>
-<target>忽略錯誤</target>
-
-<source>Hide all error and warning messages</source>
-<target>隱藏所有錯誤和警告訊息</target>
-
-<source>Exit instantly</source>
-<target>立即退出</target>
-
-<source>Abort synchronization immediately</source>
-<target>立即中止同步</target>
-
 <source>Select alternate comparison settings</source>
 <target>選擇替代的比對設定</target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>選擇時間範圍</target>
 
+<source>Show pop-up</source>
+<target>顯示彈出視窗</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>在彈出視窗上顯示錯誤或警告訊息</target>
+
+<source>Ignore errors</source>
+<target>忽略錯誤</target>
+
+<source>Hide all error and warning messages</source>
+<target>隱藏所有錯誤和警告訊息</target>
+
+<source>Exit instantly</source>
+<target>立即退出</target>
+
+<source>Abort synchronization immediately</source>
+<target>立即中止同步</target>
+
+<source>Browse</source>
+<target>瀏覽</target>
+
+<source>Error reading from synchronization database:</source>
+<target>讀取同步資料庫錯誤：</target>
+
+<source>Error writing to synchronization database:</source>
+<target>寫入同步資料庫錯誤：</target>
+
+<source>Invalid command line: %x</source>
+<target>無效的命令列：%x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Windows 錯誤代碼 %x：</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux 錯誤代碼 %x：</target>
+
+<source>Error resolving symbolic link:</source>
+<target>解析錯誤的符號連結：</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -162,17 +168,14 @@
 <source>Comparison Result</source>
 <target>比對結果</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>同步資料庫格式不相容：</target>
-
 <source>Initial synchronization:</source>
 <target>初始化同步：</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>其中一個 FreeFileSync 資料庫檔案不存在：</target>
 
-<source>Error reading from synchronization database:</source>
-<target>讀取同步資料庫錯誤：</target>
+<source>Incompatible synchronization database format:</source>
+<target>同步資料庫格式不相容：</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>資料庫檔案不共享一個共同的同步連線：</target>
@@ -197,11 +200,17 @@
 <pluralform>%x 秒</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>拖放</target>
+
 <source>Info</source>
 <target>訊息</target>
 
 <source>Fatal Error</source>
 <target>嚴重錯誤</target>
+
+<source>Error reading file:</source>
+<target>讀取檔案錯誤：</target>
 
 <source>Scanning:</source>
 <target>正在掃瞄：</target>
@@ -220,14 +229,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>無效的 FreeFileSync 配置檔案！</target>
 
-<source>File does not exist:</source>
-<target>檔案不存在：</target>
-
 <source>Error parsing configuration file:</source>
 <target>分析配置檔案錯誤：</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>移動到資源回收筒錯誤：</target>
+
+<source>Could not load a required DLL:</source>
+<target>無法載入一個所需的DLL：</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>讀取卷影複製服務時錯誤！</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>不支援製作 WOW64 上的卷影副本。請使用 FreeFileSync 64位元版本。</target>
+
+<source>Could not determine volume name for file:</source>
+<target>無法判斷此檔案的卷標名稱：</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>卷名 %x 並非檔名 %y 的一部份！</target>
+
 <source>/sec</source>
 <target>/秒</target>
+
+<source>File does not exist:</source>
+<target>檔案不存在：</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>無法讀取 XML 之後節點的值：</target>
 
 <source>S&ave configuration...</source>
 <target>儲存配置(&A)...</target>
@@ -321,138 +351,6 @@ The command line is executed each time:
 <source>A directory input field is empty.</source>
 <target>目錄輸入的欄位為空</target>
 
-<source>Drag && drop</source>
-<target>拖放</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>無法初始化目錄監測：</target>
-
-<source>Error when monitoring directories.</source>
-<target>監測目錄錯誤。</target>
-
-<source>Conversion error:</source>
-<target>轉換錯誤：</target>
-
-<source>Error deleting file:</source>
-<target>刪除檔案錯誤：</target>
-
-<source>Error moving file:</source>
-<target>移動檔案錯誤：</target>
-
-<source>Target file already existing!</source>
-<target>目標檔案已存在！</target>
-
-<source>Error moving directory:</source>
-<target>移動目錄錯誤：</target>
-
-<source>Target directory already existing!</source>
-<target>目標目錄已存在！</target>
-
-<source>Error deleting directory:</source>
-<target>刪除目錄錯誤：</target>
-
-<source>Error changing modification time:</source>
-<target>變更修改時間錯誤：</target>
-
-<source>Error loading library function:</source>
-<target>載入函數庫錯誤：</target>
-
-<source>Error reading security context:</source>
-<target>讀取安全內文錯誤：</target>
-
-<source>Error writing security context:</source>
-<target>寫入安全性內容錯誤：</target>
-
-<source>Error copying file permissions:</source>
-<target>複製檔案權限錯誤：</target>
-
-<source>Error creating directory:</source>
-<target>新建目錄錯誤：</target>
-
-<source>Error copying symbolic link:</source>
-<target>複製符號連結錯誤：</target>
-
-<source>Error copying file:</source>
-<target>複製檔案錯誤：</target>
-
-<source>Error opening file:</source>
-<target>開啟檔案錯誤：</target>
-
-<source>Error writing file:</source>
-<target>寫入檔案錯誤：</target>
-
-<source>Error reading file:</source>
-<target>讀取檔案錯誤：</target>
-
-<source>Operation aborted!</source>
-<target>中止操作！</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>當遍歷目錄時無限循環：</target>
-
-<source>Error traversing directory:</source>
-<target>遍歷目錄錯誤：</target>
-
-<source>Error setting privilege:</source>
-<target>設定權限錯誤：</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>移動到資源回收筒錯誤：</target>
-
-<source>Could not load a required DLL:</source>
-<target>無法載入一個所需的DLL：</target>
-
-<source>Error writing to synchronization database:</source>
-<target>寫入同步資料庫錯誤：</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>讀取卷影複製服務時錯誤！</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>不支援製作 WOW64 上的卷影副本。請使用 FreeFileSync 64位元版本。</target>
-
-<source>Could not determine volume name for file:</source>
-<target>無法判斷此檔案的卷標名稱：</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>卷名 %x 並非檔名 %y 的一部份！</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x 分</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x 小時</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x 天</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>無法讀取 XML 之後節點的值：</target>
-
 <source>Logging</source>
 <target>日誌記錄</target>
 
@@ -470,9 +368,6 @@ The command line is executed each time:
 
 <source>Batch execution</source>
 <target>批次處理執行</target>
-
-<source>Log-messages:</source>
-<target>日誌訊息：</target>
 
 <source>Stop</source>
 <target>停止</target>
@@ -600,6 +495,24 @@ The command line is executed each time:
 <source>Total amount of data that will be transferred</source>
 <target>將要傳輸的全部資料量</target>
 
+<source>Operation:</source>
+<target>操作：</target>
+
+<source>Items found:</source>
+<target>尋找要素：</target>
+
+<source>Items remaining:</source>
+<target>剩餘要素：</target>
+
+<source>Speed:</source>
+<target>速度：</target>
+
+<source>Time remaining:</source>
+<target>剩餘時間：</target>
+
+<source>Time elapsed:</source>
+<target>經過時間：</target>
+
 <source>Batch job</source>
 <target>批次處理作業</target>
 
@@ -648,31 +561,13 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>取消(&C)</target>
 
-<source>Operation:</source>
-<target>操作：</target>
-
-<source>Items found:</source>
-<target>尋找要素：</target>
-
-<source>Items remaining:</source>
-<target>剩餘要素：</target>
-
-<source>Speed:</source>
-<target>速度：</target>
-
-<source>Time remaining:</source>
-<target>剩餘時間：</target>
-
-<source>Time elapsed:</source>
-<target>經過時間：</target>
-
 <source>Select variant:</source>
 <target>選擇變數：</target>
 
 <source><Automatic></source>
 <target><自動></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>對兩邊使用同一個資料庫的識別和傳送更改。自動檢測刪除和衝突部份。</target>
 
 <source>Mirror ->></source>
@@ -886,27 +781,19 @@ Exclude: \stuff\temp\*
 <target>異動檔案副本</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>第一次將檔寫入到一個暫存 (*.ffs_tmp) 順便將它們重新命名。即使在嚴重錯誤的情況下，還可確保一致的狀態。</target>
 
 <source>Copy locked files</source>
 <target>複製被鎖定的檔案</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-複製共用或鎖定檔案使用使用卷影複製服務(需要管理員權限)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>複製共用或鎖定檔案使用使用卷影複製服務(需要管理員權限)</target>
 
 <source>Copy file access permissions</source>
 <target>複製檔案系統權限</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-傳輸檔案和目錄權限(需要管理員權限)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>傳輸檔案和目錄權限(需要管理員權限)</target>
 
 <source>Hidden dialogs:</source>
 <target>隱藏對話框：</target>
@@ -937,6 +824,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>&Find next</source>
 <target>找下一個(&F)</target>
+
+<source>Operation aborted!</source>
+<target>中止操作！</target>
 
 <source>Main bar</source>
 <target>主欄位</target>
@@ -978,16 +868,16 @@ Transfer file and directory permissions (Requires Administrator rights)
 <target>自動調整欄寬</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>圖示大小：</target>
 
 <source>Small</source>
-<target></target>
+<target>小</target>
 
 <source>Medium</source>
-<target></target>
+<target>中</target>
 
 <source>Large</source>
-<target></target>
+<target>大</target>
 
 <source>Include all rows</source>
 <target>包括所有行</target>
@@ -1115,6 +1005,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>File list exported!</source>
 <target>檔案清單已匯出！</target>
 
+<source>Error writing file:</source>
+<target>寫入檔案錯誤：</target>
+
 <source>Batch file created successfully!</source>
 <target>批次檔新建成功！</target>
 
@@ -1131,7 +1024,7 @@ Transfer file and directory permissions (Requires Administrator rights)
 <pluralform>%x directories</pluralform>
 </source>
 <target>
-<pluralform>%x 目錄</pluralform>
+<pluralform>%x 個目錄</pluralform>
 </target>
 
 <source>
@@ -1139,7 +1032,7 @@ Transfer file and directory permissions (Requires Administrator rights)
 <pluralform>%x files</pluralform>
 </source>
 <target>
-<pluralform>%x 檔案</pluralform>
+<pluralform>%x 個檔案</pluralform>
 </target>
 
 <source>
@@ -1210,9 +1103,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Filter: Single pair</source>
 <target>篩選器：單對</target>
 
-<source>Ignore</source>
-<target>忽略</target>
-
 <source>Direct</source>
 <target>直接</target>
 
@@ -1274,6 +1164,102 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Move files into a time-stamped subdirectory</source>
 <target>移動檔案到一個時間標記的子目錄</target>
 
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x 分</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x 小時</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x 天</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>無法初始化目錄監測：</target>
+
+<source>Error when monitoring directories.</source>
+<target>監測目錄錯誤。</target>
+
+<source>Conversion error:</source>
+<target>轉換錯誤：</target>
+
+<source>Error deleting file:</source>
+<target>刪除檔案錯誤：</target>
+
+<source>Error moving file:</source>
+<target>移動檔案錯誤：</target>
+
+<source>Target file already existing!</source>
+<target>目標檔案已存在！</target>
+
+<source>Error moving directory:</source>
+<target>移動目錄錯誤：</target>
+
+<source>Target directory already existing!</source>
+<target>目標目錄已存在！</target>
+
+<source>Error deleting directory:</source>
+<target>刪除目錄錯誤：</target>
+
+<source>Error changing modification time:</source>
+<target>變更修改時間錯誤：</target>
+
+<source>Error loading library function:</source>
+<target>載入函數庫錯誤：</target>
+
+<source>Error reading security context:</source>
+<target>讀取安全內文錯誤：</target>
+
+<source>Error writing security context:</source>
+<target>寫入安全性內容錯誤：</target>
+
+<source>Error copying file permissions:</source>
+<target>複製檔案權限錯誤：</target>
+
+<source>Error creating directory:</source>
+<target>新建目錄錯誤：</target>
+
+<source>Error copying symbolic link:</source>
+<target>複製符號連結錯誤：</target>
+
+<source>Error copying file:</source>
+<target>複製檔案錯誤：</target>
+
+<source>Error opening file:</source>
+<target>開啟檔案錯誤：</target>
+
+<source>Error traversing directory:</source>
+<target>遍歷目錄錯誤：</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>當遍歷目錄時無限循環：</target>
+
+<source>Error setting privilege:</source>
+<target>設定權限錯誤：</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>自上次同步後，兩邊均已更改過！</target>
 
@@ -1304,9 +1290,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目錄有依靠性！請小心設定同步規則：</target>
 
-<source>Comparing content of files %x</source>
-<target>正在比對檔案内容的百分比 %x</target>
-
 <source>Memory allocation failed!</source>
 <target>記憶體分配失敗！</target>
 
@@ -1322,14 +1305,14 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>符號連結 %x 有相同日期但是不同目標！</target>
 
+<source>Comparing content of files %x</source>
+<target>正在比對檔案内容的百分比 %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>比對檔案內容失敗。</target>
 
 <source>Generating file list...</source>
 <target>產生檔案清單...</target>
-
-<source>Multiple...</source>
-<target>多個...</target>
 
 <source>Both sides are equal</source>
 <target>兩邊都相同</target>
@@ -1349,6 +1332,12 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Delete right file/folder</source>
 <target>刪除右邊檔案/資料夾</target>
 
+<source>Move file on left</source>
+<target>移動左邊的檔案</target>
+
+<source>Move file on right</source>
+<target>移動右邊的檔案</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>用適合檔案/資料夾覆蓋左邊檔案/資料夾</target>
 
@@ -1363,6 +1352,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>Copy file attributes only to right</source>
 <target>只複製檔案屬性到右邊</target>
+
+<source>Multiple...</source>
+<target>多個...</target>
 
 <source>Deleting file %x</source>
 <target>正在刪除檔案 %x</target>

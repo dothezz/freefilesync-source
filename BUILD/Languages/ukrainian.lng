@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Автоматична синхронізація</target>
 
-<source>Browse</source>
-<target>Переглянути</target>
-
-<source>Windows Error Code %x:</source>
-<target>Код помилки Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Код помилки Linux %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>Неправильний командний рядок: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>Помилка при вирішені символічного посилання:</target>
-
-<source>Show pop-up</source>
-<target>Показувати виринаючі вікна</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Показувати виринаючі вікна при помилках та попередженнях</target>
-
-<source>Ignore errors</source>
-<target>Ігнорувати помилки</target>
-
-<source>Hide all error and warning messages</source>
-<target>Приховати всі помилки і повідомлення з попередженнями</target>
-
-<source>Exit instantly</source>
-<target>Вийти негайно</target>
-
-<source>Abort synchronization immediately</source>
-<target>Перервати синхронізацію негайно</target>
-
 <source>Select alternate comparison settings</source>
 <target>Вибрати альтернативні налаштування порівняння</target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>Виберіть часовий інтервал</target>
 
+<source>Show pop-up</source>
+<target>Показувати виринаючі вікна</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Показувати виринаючі вікна при помилках та попередженнях</target>
+
+<source>Ignore errors</source>
+<target>Ігнорувати помилки</target>
+
+<source>Hide all error and warning messages</source>
+<target>Приховати всі помилки і повідомлення з попередженнями</target>
+
+<source>Exit instantly</source>
+<target>Вийти негайно</target>
+
+<source>Abort synchronization immediately</source>
+<target>Перервати синхронізацію негайно</target>
+
+<source>Browse</source>
+<target>Переглянути</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Помилка при читанні з бази даних синхронізації:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Помилка при записі у базу данних синхронізації:</target>
+
+<source>Invalid command line: %x</source>
+<target>Неправильний командний рядок: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Код помилки Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Код помилки Linux %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Помилка при вирішені символічного посилання:</target>
+
 <source>%x MB</source>
 <target>%x МБ</target>
 
@@ -164,17 +170,14 @@
 <source>Comparison Result</source>
 <target>Результати порівнювання</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Несумісний формат бази даних синхронізації:</target>
-
 <source>Initial synchronization:</source>
 <target>Вступна синхронізація:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Файлу бази даних FreeFileSync ще не існує:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Помилка при читанні з бази даних синхронізації:</target>
+<source>Incompatible synchronization database format:</source>
+<target>Несумісний формат бази даних синхронізації:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Файли бази даних не мають спільної сесії синхронізації</target>
@@ -201,11 +204,17 @@
 <pluralform>%x сек</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Drag && drop</target>
+
 <source>Info</source>
 <target>Інформація</target>
 
 <source>Fatal Error</source>
 <target>Критична помилка</target>
+
+<source>Error reading file:</source>
+<target>Помилка при читанні файлу:</target>
 
 <source>Scanning:</source>
 <target>Сканую:</target>
@@ -226,14 +235,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Неправильний файл конфігурації FreeFileSync!</target>
 
-<source>File does not exist:</source>
-<target>Файл не існує:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Помилка при анализі файлу налаштувань синхронізації:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Помилка переміщення в "Корзину":</target>
+
+<source>Could not load a required DLL:</source>
+<target>Не вдалося завантажити необхідні DLL:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Помилка доступу до послуги Тіньового Копіювання Тому</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Створення тіньових копій на WOW64 не підтримується. Будь ласка, використайте FreeFileSync 64-розрядної версії.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Не вдалося визначити назву тому для файлу:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>Ім’я тому %x не є частиною імені файлу %y!</target>
+
 <source>/sec</source>
 <target>/сек</target>
+
+<source>File does not exist:</source>
+<target>Файл не існує:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>Не вдалося прочитати значення таких XML записів:</target>
 
 <source>S&ave configuration...</source>
 <target>Зберегти налаштування...</target>
@@ -327,144 +357,6 @@ The command line is executed each time:
 <source>A directory input field is empty.</source>
 <target>Поле введення шляху каталога порожнє.</target>
 
-<source>Drag && drop</source>
-<target>Drag && drop</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Не вдалося ініціювати каталог для моніторингу:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Помилка моніторингу каталогу.</target>
-
-<source>Conversion error:</source>
-<target>Помилка перетворення:</target>
-
-<source>Error deleting file:</source>
-<target>Помилка при вилученні файлу:</target>
-
-<source>Error moving file:</source>
-<target>Помилка переміщення файлу:</target>
-
-<source>Target file already existing!</source>
-<target>Кінцевий файл уже існує!</target>
-
-<source>Error moving directory:</source>
-<target>Помилка переміщення каталогу:</target>
-
-<source>Target directory already existing!</source>
-<target>Кінцевий каталог вже існує!</target>
-
-<source>Error deleting directory:</source>
-<target>Помилка при вилученні каталогу:</target>
-
-<source>Error changing modification time:</source>
-<target>Помилка при зміні часу модификації файлу:</target>
-
-<source>Error loading library function:</source>
-<target>Помилка при завантаженні функції бібліотеки:</target>
-
-<source>Error reading security context:</source>
-<target>Помилка при читанні контексту безпеки:</target>
-
-<source>Error writing security context:</source>
-<target>Помилка при записі контексту безпеки:</target>
-
-<source>Error copying file permissions:</source>
-<target>Помилка при копіюванні прав доступу:</target>
-
-<source>Error creating directory:</source>
-<target>Помилка при створенні каталогу:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Помилка при копіюванні символьного посилання:</target>
-
-<source>Error copying file:</source>
-<target>Помилка при копіюванні файлу:</target>
-
-<source>Error opening file:</source>
-<target>Помилка при відкриванні файлу:</target>
-
-<source>Error writing file:</source>
-<target>Помилка при записі файлу:</target>
-
-<source>Error reading file:</source>
-<target>Помилка при читанні файлу:</target>
-
-<source>Operation aborted!</source>
-<target>Операція відмінена!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Зациклюванння при обході каталогу:</target>
-
-<source>Error traversing directory:</source>
-<target>Помилка обходу каталогу:</target>
-
-<source>Error setting privilege:</source>
-<target>Помилка встановлення привилеїв:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Помилка переміщення в "Корзину":</target>
-
-<source>Could not load a required DLL:</source>
-<target>Не вдалося завантажити необхідні DLL:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Помилка при записі у базу данних синхронізації:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Помилка доступу до послуги Тіньового Копіювання Тому</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Створення тіньових копій на WOW64 не підтримується. Будь ласка, використайте FreeFileSync 64-розрядної версії.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Не вдалося визначити назву тому для файлу:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>Ім’я тому %x не є частиною імені файлу %y!</target>
-
-<source>%x TB</source>
-<target>%x ТБ</target>
-
-<source>%x PB</source>
-<target>%x ПБ</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>%x хв</pluralform>
-<pluralform>%x хв</pluralform>
-<pluralform>%x хв</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>%x година</pluralform>
-<pluralform>%x години</pluralform>
-<pluralform>%x годин</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>%x день</pluralform>
-<pluralform>%x дні</pluralform>
-<pluralform>%x днів</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Не вдалося прочитати значення таких XML записів:</target>
-
 <source>Logging</source>
 <target>Лог-файли</target>
 
@@ -482,9 +374,6 @@ The command line is executed each time:
 
 <source>Batch execution</source>
 <target>Виконання пакетного завдання</target>
-
-<source>Log-messages:</source>
-<target>Лог-повідомлення:</target>
 
 <source>Stop</source>
 <target>Стоп</target>
@@ -615,6 +504,24 @@ The command line is executed each time:
 <source>Total amount of data that will be transferred</source>
 <target>Загальний об’єм даних, які будуть передаватися</target>
 
+<source>Operation:</source>
+<target>Операція:</target>
+
+<source>Items found:</source>
+<target>Елементів знайдено:</target>
+
+<source>Items remaining:</source>
+<target>Елементів залишилось:</target>
+
+<source>Speed:</source>
+<target>Швидкість:</target>
+
+<source>Time remaining:</source>
+<target>Залишилось часу:</target>
+
+<source>Time elapsed:</source>
+<target>Пройшло часу:</target>
+
 <source>Batch job</source>
 <target>Пакетне завдання</target>
 
@@ -663,32 +570,14 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>&Відмінити</target>
 
-<source>Operation:</source>
-<target>Операція:</target>
-
-<source>Items found:</source>
-<target>Елементів знайдено:</target>
-
-<source>Items remaining:</source>
-<target>Елементів залишилось:</target>
-
-<source>Speed:</source>
-<target>Швидкість:</target>
-
-<source>Time remaining:</source>
-<target>Залишилось часу:</target>
-
-<source>Time elapsed:</source>
-<target>Пройшло часу:</target>
-
 <source>Select variant:</source>
 <target>Виберіть варіант:</target>
 
 <source><Automatic></source>
 <target><Автоматичний></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Виявлення і поширення змін на обох сторінах з використанням бази даних. Вилучені файли і конфлікти визначаються автоматично.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Виявити та поширити зміни на обидві сторони використовуючи базу даних. Видалення, перейменування та конфлікти визначаються автоматично.</target>
 
 <source>Mirror ->></source>
 <target>Дзеркало ->></target>
@@ -911,22 +800,14 @@ Exclude: \stuff\temp\*
 <source>Copy locked files</source>
 <target>Копіювати заблоковані файли</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Копіювати спільних чи заблокованих файлів з використанням послуги Тіньового Копіювання Тому (потрібні права Адміністратора)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Копіювати спільних чи заблокованих файлів з використанням послуги Тіньового Копіювання Тому (потрібні права Адміністратора)</target>
 
 <source>Copy file access permissions</source>
 <target>Копіювати права доступу до файлу</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Передача прав доступу файлу/каталогу (потрібні права Адміністратора)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Передача прав доступу файлу/каталогу (потрібні права Адміністратора)</target>
 
 <source>Hidden dialogs:</source>
 <target>Приховані діалоги</target>
@@ -957,6 +838,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>&Find next</source>
 <target>&Знайти наступний</target>
+
+<source>Operation aborted!</source>
+<target>Операція відмінена!</target>
 
 <source>Main bar</source>
 <target>Головна панель</target>
@@ -1135,6 +1019,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>File list exported!</source>
 <target>Список файлів експортовано!</target>
 
+<source>Error writing file:</source>
+<target>Помилка при записі файлу:</target>
+
 <source>Batch file created successfully!</source>
 <target>Файл завдання успішно створений!</target>
 
@@ -1238,9 +1125,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Filter: Single pair</source>
 <target>Фільтр: Одна пара</target>
 
-<source>Ignore</source>
-<target>Ігнорувати</target>
-
 <source>Direct</source>
 <target>Прямо</target>
 
@@ -1306,6 +1190,108 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Move files into a time-stamped subdirectory</source>
 <target>Переміщати файли в підкатлог з часовою міткою</target>
 
+<source>%x TB</source>
+<target>%x ТБ</target>
+
+<source>%x PB</source>
+<target>%x ПБ</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>%x хв</pluralform>
+<pluralform>%x хв</pluralform>
+<pluralform>%x хв</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>%x година</pluralform>
+<pluralform>%x години</pluralform>
+<pluralform>%x годин</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>%x день</pluralform>
+<pluralform>%x дні</pluralform>
+<pluralform>%x днів</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Не вдалося ініціювати каталог для моніторингу:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Помилка моніторингу каталогу.</target>
+
+<source>Conversion error:</source>
+<target>Помилка перетворення:</target>
+
+<source>Error deleting file:</source>
+<target>Помилка при вилученні файлу:</target>
+
+<source>Error moving file:</source>
+<target>Помилка переміщення файлу:</target>
+
+<source>Target file already existing!</source>
+<target>Кінцевий файл уже існує!</target>
+
+<source>Error moving directory:</source>
+<target>Помилка переміщення каталогу:</target>
+
+<source>Target directory already existing!</source>
+<target>Кінцевий каталог вже існує!</target>
+
+<source>Error deleting directory:</source>
+<target>Помилка при вилученні каталогу:</target>
+
+<source>Error changing modification time:</source>
+<target>Помилка при зміні часу модификації файлу:</target>
+
+<source>Error loading library function:</source>
+<target>Помилка при завантаженні функції бібліотеки:</target>
+
+<source>Error reading security context:</source>
+<target>Помилка при читанні контексту безпеки:</target>
+
+<source>Error writing security context:</source>
+<target>Помилка при записі контексту безпеки:</target>
+
+<source>Error copying file permissions:</source>
+<target>Помилка при копіюванні прав доступу:</target>
+
+<source>Error creating directory:</source>
+<target>Помилка при створенні каталогу:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Помилка при копіюванні символьного посилання:</target>
+
+<source>Error copying file:</source>
+<target>Помилка при копіюванні файлу:</target>
+
+<source>Error opening file:</source>
+<target>Помилка при відкриванні файлу:</target>
+
+<source>Error traversing directory:</source>
+<target>Помилка обходу каталогу:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Зациклюванння при обході каталогу:</target>
+
+<source>Error setting privilege:</source>
+<target>Помилка встановлення привилеїв:</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>З моменту останньої синхронізації з обох сторін відбулися зміни!</target>
 
@@ -1339,9 +1325,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Залежні каталоги! Будьте уважні при налаштуванні правил синхронізації:</target>
 
-<source>Comparing content of files %x</source>
-<target>Порівнювання вмісту файлів %x</target>
-
 <source>Memory allocation failed!</source>
 <target>Помилка виділення пам’яті! (Не хватает памяти)</target>
 
@@ -1357,14 +1340,14 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Символьне посиланння %x має таку ж дату, але різний вміст!</target>
 
+<source>Comparing content of files %x</source>
+<target>Порівнювання вмісту файлів %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>Порівнювання файлів за вмістом не вдалося.</target>
 
 <source>Generating file list...</source>
 <target>Створення списку файлів...</target>
-
-<source>Multiple...</source>
-<target>Різні варіанти...</target>
 
 <source>Both sides are equal</source>
 <target>Сторони ідентичні</target>
@@ -1384,6 +1367,12 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Delete right file/folder</source>
 <target>Вилучити файл/папку праворуч</target>
 
+<source>Move file on left</source>
+<target>Перемістити файли ліворуч</target>
+
+<source>Move file on right</source>
+<target>Перемістити файли праворуч</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Перезаписати файл/папку ліворуч відповідником зправа</target>
 
@@ -1398,6 +1387,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>Copy file attributes only to right</source>
 <target>Зкопіювати праворуч лише атрибути файлу</target>
+
+<source>Multiple...</source>
+<target>Різні варіанти...</target>
 
 <source>Deleting file %x</source>
 <target>Вилучення файлу %x</target>

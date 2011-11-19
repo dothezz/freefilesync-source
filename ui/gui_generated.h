@@ -46,14 +46,15 @@ namespace zen { class Graph2D; }
 #include <wx/textctrl.h>
 #include <wx/statline.h>
 #include <wx/frame.h>
+#include <wx/gauge.h>
 #include <wx/choice.h>
 #include <wx/spinctrl.h>
 #include <wx/listbook.h>
 #include <wx/listctrl.h>
 #include <wx/dialog.h>
-#include <wx/gauge.h>
 #include <wx/radiobut.h>
 #include <wx/animate.h>
+#include <wx/imaglist.h>
 #include <wx/hyperlink.h>
 #include <wx/checklst.h>
 #include <wx/calctrl.h>
@@ -263,6 +264,43 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class CompareStatusGenerated
+///////////////////////////////////////////////////////////////////////////////
+class CompareStatusGenerated : public wxPanel
+{
+private:
+
+protected:
+    wxStaticText* m_staticText30;
+    wxTextCtrl* m_textCtrlStatus;
+    wxGauge* m_gauge2;
+    wxBoxSizer* bSizer42;
+    wxBoxSizer* bSizerFilesFound;
+    wxStaticText* m_staticText321;
+    wxStaticText* m_staticTextScanned;
+    wxBoxSizer* bSizerFilesRemaining;
+    wxStaticText* m_staticText46;
+    wxStaticText* m_staticTextFilesRemaining;
+    wxStaticText* m_staticText117;
+    wxStaticText* m_staticTextDataRemaining;
+    wxStaticText* m_staticText118;
+    wxBoxSizer* sSizerSpeed;
+    wxStaticText* m_staticText104;
+    wxStaticText* m_staticTextSpeed;
+    wxBoxSizer* sSizerTimeRemaining;
+    wxStaticText* m_staticTextTimeRemFixed;
+    wxStaticText* m_staticTextRemTime;
+    wxBoxSizer* sSizerTimeElapsed;
+    wxStaticText* m_staticTextTimeElapsed;
+
+public:
+
+    CompareStatusGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxRAISED_BORDER|wxTAB_TRAVERSAL );
+    ~CompareStatusGenerated();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class BatchDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
 class BatchDlgGenerated : public wxDialog
@@ -361,43 +399,6 @@ public:
 
     BatchFolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
     ~BatchFolderPairGenerated();
-
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class CompareStatusGenerated
-///////////////////////////////////////////////////////////////////////////////
-class CompareStatusGenerated : public wxPanel
-{
-private:
-
-protected:
-    wxStaticText* m_staticText30;
-    wxTextCtrl* m_textCtrlStatus;
-    wxGauge* m_gauge2;
-    wxBoxSizer* bSizer42;
-    wxBoxSizer* bSizerFilesFound;
-    wxStaticText* m_staticText321;
-    wxStaticText* m_staticTextScanned;
-    wxBoxSizer* bSizerFilesRemaining;
-    wxStaticText* m_staticText46;
-    wxStaticText* m_staticTextFilesRemaining;
-    wxStaticText* m_staticText117;
-    wxStaticText* m_staticTextDataRemaining;
-    wxStaticText* m_staticText118;
-    wxBoxSizer* sSizerSpeed;
-    wxStaticText* m_staticText104;
-    wxStaticText* m_staticTextSpeed;
-    wxBoxSizer* sSizerTimeRemaining;
-    wxStaticText* m_staticTextTimeRemFixed;
-    wxStaticText* m_staticTextRemTime;
-    wxBoxSizer* sSizerTimeElapsed;
-    wxStaticText* m_staticTextTimeElapsed;
-
-public:
-
-    CompareStatusGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxRAISED_BORDER|wxTAB_TRAVERSAL );
-    ~CompareStatusGenerated();
 
 };
 
@@ -582,22 +583,6 @@ public:
     SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 620,330 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
     ~SyncStatusDlgGenerated();
-
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class MyPanel5
-///////////////////////////////////////////////////////////////////////////////
-class MyPanel5 : public wxPanel
-{
-private:
-
-protected:
-
-public:
-
-    MyPanel5( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
-    ~MyPanel5();
 
 };
 
@@ -904,11 +889,11 @@ protected:
     wxPanel* m_panel8;
     wxStaticText* m_staticText56;
     wxCheckBox* m_checkBoxTransCopy;
-    wxTextCtrl* m_textCtrl22;
+    wxStaticText* m_staticText82;
     wxCheckBox* m_checkBoxCopyLocked;
-    wxTextCtrl* m_textCtrlCopyLocked;
+    wxStaticText* m_staticTextCopyLocked;
     wxCheckBox* m_checkBoxCopyPermissions;
-    wxTextCtrl* m_textCtrl2211;
+    wxStaticText* m_staticText8211;
     wxStaticText* m_staticText100;
     zen::BitmapButton* m_buttonResetDialogs;
     wxGrid* m_gridCustomCommand;

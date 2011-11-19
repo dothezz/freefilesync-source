@@ -13,7 +13,7 @@
 using namespace zen;
 
 
-wxString zen::getVariantName(CompareVariant var)
+std::wstring zen::getVariantName(CompareVariant var)
 {
     switch (var)
     {
@@ -22,13 +22,12 @@ wxString zen::getVariantName(CompareVariant var)
         case CMP_BY_TIME_SIZE:
             return _("File time and size");
     }
-
     assert(false);
-    return wxEmptyString;
+    return _("Error");
 }
 
 
-wxString zen::getVariantName(DirectionConfig::Variant var)
+std::wstring zen::getVariantName(DirectionConfig::Variant var)
 {
     switch (var)
     {
@@ -41,6 +40,7 @@ wxString zen::getVariantName(DirectionConfig::Variant var)
         case DirectionConfig::CUSTOM:
             return _("Custom");
     }
+    assert(false);
     return _("Error");
 }
 
@@ -92,7 +92,7 @@ DirectionSet zen::getTwoWaySet()
 }
 
 
-wxString MainConfiguration::getCompVariantName() const
+std::wstring MainConfiguration::getCompVariantName() const
 {
     const CompareVariant firstVariant = firstPair.altCmpConfig.get() ?
                                         firstPair.altCmpConfig->compareVar :
@@ -113,7 +113,7 @@ wxString MainConfiguration::getCompVariantName() const
 }
 
 
-wxString MainConfiguration::getSyncVariantName() const
+std::wstring MainConfiguration::getSyncVariantName() const
 {
     const DirectionConfig::Variant firstVariant = firstPair.altSyncConfig.get() ?
                                                   firstPair.altSyncConfig->directionCfg.var :
@@ -134,120 +134,64 @@ wxString MainConfiguration::getSyncVariantName() const
 }
 
 
-wxString zen::getDescription(CompareFilesResult cmpRes)
+std::wstring zen::getSymbol(CompareFilesResult cmpRes)
 {
     switch (cmpRes)
     {
         case FILE_LEFT_SIDE_ONLY:
-            return _("File/folder exists on left side only");
+            return L"only <-";
         case FILE_RIGHT_SIDE_ONLY:
-            return _("File/folder exists on right side only");
+            return L"only ->";
         case FILE_LEFT_NEWER:
-            return _("Left file is newer");
+            return L"newer <-";
         case FILE_RIGHT_NEWER:
-            return _("Right file is newer");
+            return L"newer ->";
         case FILE_DIFFERENT:
-            return _("Files have different content");
+            return L"!=";
         case FILE_EQUAL:
-            return _("Both sides are equal");
-        case FILE_DIFFERENT_METADATA:
-            return _("Files/folders differ in attributes only");
+            return L"'=="; //added quotation mark to avoid error in Excel cell when exporting to *.cvs
         case FILE_CONFLICT:
-            return _("Conflict/file cannot be categorized");
+        case FILE_DIFFERENT_METADATA:
+            return L"conflict";
     }
-
     assert(false);
-    return wxEmptyString;
+    return std::wstring();
 }
 
 
-wxString zen::getSymbol(CompareFilesResult cmpRes)
-{
-    switch (cmpRes)
-    {
-        case FILE_LEFT_SIDE_ONLY:
-            return wxT("<|");
-        case FILE_RIGHT_SIDE_ONLY:
-            return wxT("|>");
-        case FILE_LEFT_NEWER:
-            return wxT("<<");
-        case FILE_RIGHT_NEWER:
-            return wxT(">>");
-        case FILE_DIFFERENT:
-            return wxT("!=");
-        case FILE_EQUAL:
-            return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
-        case FILE_CONFLICT:
-        case FILE_DIFFERENT_METADATA:
-            return wxT("\\/\\->");
-    }
-
-    assert(false);
-    return wxEmptyString;
-}
-
-
-wxString zen::getDescription(SyncOperation op)
+std::wstring zen::getSymbol(SyncOperation op)
 {
     switch (op)
     {
         case SO_CREATE_NEW_LEFT:
-            return _("Copy new file/folder to left");
+            return L"create <-";
         case SO_CREATE_NEW_RIGHT:
-            return _("Copy new file/folder to right");
+            return L"create ->";
         case SO_DELETE_LEFT:
-            return _("Delete left file/folder");
+            return L"delete <-";
         case SO_DELETE_RIGHT:
-            return _("Delete right file/folder");
-        case SO_OVERWRITE_LEFT:
-            return _("Overwrite left file/folder with right one");
-        case SO_OVERWRITE_RIGHT:
-            return _("Overwrite right file/folder with left one");
-        case SO_DO_NOTHING:
-            return _("Do nothing");
-        case SO_EQUAL:
-            return _("Both sides are equal");
-        case SO_COPY_METADATA_TO_LEFT:
-            return _("Copy file attributes only to left");
-        case SO_COPY_METADATA_TO_RIGHT:
-            return _("Copy file attributes only to right");
-        case SO_UNRESOLVED_CONFLICT: //not used on GUI, but in .csv
-            return _("Conflict/file cannot be categorized");
-    };
-
-    assert(false);
-    return wxEmptyString;
-}
-
-
-wxString zen::getSymbol(SyncOperation op)
-{
-    switch (op)
-    {
-        case SO_CREATE_NEW_LEFT:
-            return wxT("*-");
-        case SO_CREATE_NEW_RIGHT:
-            return wxT("-*");
-        case SO_DELETE_LEFT:
-            return wxT("D-");
-        case SO_DELETE_RIGHT:
-            return wxT("-D");
+            return L"delete ->";
+        case SO_MOVE_LEFT_SOURCE:
+        case SO_MOVE_LEFT_TARGET:
+            return L"move <-";
+        case SO_MOVE_RIGHT_SOURCE:
+        case SO_MOVE_RIGHT_TARGET:
+            return L"move ->";
         case SO_OVERWRITE_LEFT:
         case SO_COPY_METADATA_TO_LEFT:
-            return wxT("<-");
+            return L"update <-";
         case SO_OVERWRITE_RIGHT:
         case SO_COPY_METADATA_TO_RIGHT:
-            return wxT("->");
+            return L"update ->";
         case SO_DO_NOTHING:
-            return wxT(" -");
+            return L" -";
         case SO_EQUAL:
-            return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
+            return L"'=="; //added quotation mark to avoid error in Excel cell when exporting to *.cvs
         case SO_UNRESOLVED_CONFLICT:
-            return wxT("\\/\\->");
+            return L"conflict";
     };
-
     assert(false);
-    return wxEmptyString;
+    return std::wstring();
 }
 
 
@@ -329,7 +273,7 @@ zen::Int64 resolve(size_t value, UnitTime unit, zen::Int64 defaultVal)
 
 zen::UInt64 resolve(size_t value, UnitSize unit, zen::UInt64 defaultVal)
 {
-    double out = value;
+    double out = 0;
     switch (unit)
     {
         case USIZE_NONE:
@@ -337,10 +281,10 @@ zen::UInt64 resolve(size_t value, UnitSize unit, zen::UInt64 defaultVal)
         case USIZE_BYTE:
             return value;
         case USIZE_KB:
-            out *= 1024;
+            out = 1024.0 * value;
             break;
         case USIZE_MB:
-            out *= 1024 * 1024;
+            out = 1024 * 1024.0 * value;
             break;
     }
     return out >= to<double>(std::numeric_limits<zen::UInt64>::max()) ? //prevent overflow!!!

@@ -15,7 +15,7 @@ namespace zen
 {
 std::wstring filesizeToShortString(UInt64 filesize);
 std::wstring remainingTimeToShortString(double timeInSec);
-std::wstring percentageToShortString(double fraction); //within [0, 1]
+std::wstring fractionToShortString(double fraction); //within [0, 1]
 
 template <class NumberType>
 std::wstring toStringSep(NumberType number); //convert number to std::wstring including thousands separator

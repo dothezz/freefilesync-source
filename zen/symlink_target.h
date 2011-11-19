@@ -66,7 +66,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
 
     try //reading certain symlinks/junctions requires admin rights! This shall not cause an error in user mode!
     {
-        Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw FileError
+        activatePrivilege(SE_BACKUP_NAME); //throw FileError
     }
     catch (...) {}
 

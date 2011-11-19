@@ -114,21 +114,21 @@ void CompareStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 
 }
 
 
-void CompareStatusHandler::reportStatus(const wxString& text)
+void CompareStatusHandler::reportStatus(const std::wstring& text)
 {
     mainDlg.compareStatus->setStatusText_NoUpdate(text);
     requestUiRefresh(); //throw AbortThisProcess
 }
 
 
-void CompareStatusHandler::reportInfo(const wxString& text)
+void CompareStatusHandler::reportInfo(const std::wstring& text)
 {
     mainDlg.compareStatus->setStatusText_NoUpdate(text);
     requestUiRefresh(); //throw AbortThisProcess
 }
 
 
-ProcessCallback::Response CompareStatusHandler::reportError(const wxString& message)
+ProcessCallback::Response CompareStatusHandler::reportError(const std::wstring& message)
 {
     if (ignoreErrors)
         return ProcessCallback::IGNORE_ERROR;
@@ -155,7 +155,7 @@ ProcessCallback::Response CompareStatusHandler::reportError(const wxString& mess
 }
 
 
-void CompareStatusHandler::reportFatalError(const wxString& errorMessage)
+void CompareStatusHandler::reportFatalError(const std::wstring& errorMessage)
 {
     forceUiRefresh();
 
@@ -165,7 +165,7 @@ void CompareStatusHandler::reportFatalError(const wxString& errorMessage)
 }
 
 
-void CompareStatusHandler::reportWarning(const wxString& warningMessage, bool& warningActive)
+void CompareStatusHandler::reportWarning(const std::wstring& warningMessage, bool& warningActive)
 {
     if (!warningActive || ignoreErrors) //if errors are ignored, then warnings should also
         return;
@@ -266,14 +266,14 @@ void SyncStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 dat
 }
 
 
-void SyncStatusHandler::reportStatus(const wxString& text)
+void SyncStatusHandler::reportStatus(const std::wstring& text)
 {
     syncStatusFrame.setStatusText_NoUpdate(text); //throw ()
     requestUiRefresh(); //throw AbortThisProccess
 }
 
 
-void SyncStatusHandler::reportInfo(const wxString& text)
+void SyncStatusHandler::reportInfo(const std::wstring& text)
 {
     errorLog.logMsg(text, TYPE_INFO);
 
@@ -282,7 +282,7 @@ void SyncStatusHandler::reportInfo(const wxString& text)
 }
 
 
-ProcessCallback::Response SyncStatusHandler::reportError(const wxString& errorMessage)
+ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& errorMessage)
 {
     switch (handleError_)
     {
@@ -320,13 +320,13 @@ ProcessCallback::Response SyncStatusHandler::reportError(const wxString& errorMe
 }
 
 
-void SyncStatusHandler::reportFatalError(const wxString& errorMessage)
+void SyncStatusHandler::reportFatalError(const std::wstring& errorMessage)
 {
     errorLog.logMsg(errorMessage, TYPE_FATAL_ERROR);
 }
 
 
-void SyncStatusHandler::reportWarning(const wxString& warningMessage, bool& warningActive)
+void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& warningActive)
 {
     errorLog.logMsg(warningMessage, TYPE_WARNING);
 

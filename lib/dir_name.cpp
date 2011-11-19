@@ -40,7 +40,7 @@ void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, w
     if (dirPicker && !dirFormatted.empty())
     {
         Zstring dir = toZ(dirFormatted); //convert to Zstring first: we don't want to pass wxString by value and risk MT issues!
-        auto ft = async([=]() { return zen::dirExists(dir); });
+        auto ft = async([=] { return zen::dirExists(dir); });
 
         if (ft.timed_wait(boost::posix_time::milliseconds(timeout)) && ft.get()) //potentially slow network access: wait 200ms at most
             dirPicker->SetPath(dirFormatted);

@@ -301,6 +301,7 @@ wxLanguage mapLanguageDialect(wxLanguage language)
             //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
             //case wxLANGUAGE_KOREAN:
             //case wxLANGUAGE_UKRAINIAN:
+            //case wxLANGUAGE_CROATIAN:
 
             //variants of wxLANGUAGE_ARABIC
         case wxLANGUAGE_ARABIC_ALGERIA:

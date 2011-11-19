@@ -28,11 +28,11 @@ void map_remove_if(M& map, Predicate p);
 template <class ForwardIterator, class T, typename Compare>
 ForwardIterator binary_search(ForwardIterator first, ForwardIterator last, const T& value, Compare comp);
 
-template<class BidirectionalIterator, class T>
+template <class BidirectionalIterator, class T>
 BidirectionalIterator find_last(BidirectionalIterator first, BidirectionalIterator last, const T& value);
 
 //replacement for std::find_end taking advantage of bidirectional iterators (and giving the algorithm a reasonable name)
-template<class BidirectionalIterator1, class BidirectionalIterator2>
+template <class BidirectionalIterator1, class BidirectionalIterator2>
 BidirectionalIterator1 search_last(BidirectionalIterator1 first1, BidirectionalIterator1 last1,
                                    BidirectionalIterator2 first2, BidirectionalIterator2 last2);
 
@@ -96,45 +96,47 @@ ForwardIterator binary_search(ForwardIterator first, ForwardIterator last, const
 }
 
 
-template<class BidirectionalIterator, class T> inline
+template <class BidirectionalIterator, class T> inline
 BidirectionalIterator find_last(const BidirectionalIterator first, BidirectionalIterator last, const T& value)
 {
+    //reverse iteration: 1. check 2. decrement 3. evaluate
     const BidirectionalIterator iterNotFound = last;
-    do
+    for (;;) //VS 2010 doesn't like "while (true)"
     {
         if (last == first)
             return iterNotFound;
         --last;
+
+        if (*last == value)
+            return last;
     }
-    while (!(*last == value)); //loop over "last":  1. check 2. decrement 3. evaluate
-    return last;
 }
 
 
-template<class BidirectionalIterator1, class BidirectionalIterator2> inline
+template <class BidirectionalIterator1, class BidirectionalIterator2> inline
 BidirectionalIterator1 search_last(const BidirectionalIterator1 first1, BidirectionalIterator1 last1,
                                    const BidirectionalIterator2 first2, BidirectionalIterator2 last2)
 {
-    if (first1 == last1 ||
-        first2 == last2)
-        return last1;
-
-    int diff = static_cast<int>(std::distance(first1, last1)) -
-               static_cast<int>(std::distance(first2, last2));
-
     const BidirectionalIterator1 iterNotFound = last1;
-    --last2;
 
-    while (diff-- >= 0) //loop over "last1":  1. check 2. decrement 3. evaluate
+    //reverse iteration: 1. check 2. decrement 3. evaluate
+    for (;;)
     {
-        --last1;
+        BidirectionalIterator1 it1 = last1;
+        BidirectionalIterator2 it2 = last2;
 
-        BidirectionalIterator1 iter1 = last1;
-        for (BidirectionalIterator2 iter2 = last2; *iter1 == *iter2; --iter1, --iter2)
-            if (iter2 == first2)
-                return iter1;
+        for (;;)
+        {
+            if (it2 == first2) return it1;
+            if (it1 == first1) return iterNotFound;
+
+            --it1;
+            --it2;
+
+            if (*it1 != *it2) break;
+        }
+        --last1;
     }
-    return iterNotFound;
 }
 }
 

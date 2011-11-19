@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatiserad synkronisering</target>
 
-<source>Browse</source>
-<target>Bläddra</target>
-
-<source>Windows Error Code %x:</source>
-<target>Windows Felkod %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Felkod %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>Ogiltig kommandorad: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>Kan inte tyda symbolisk länk:</target>
-
-<source>Show pop-up</source>
-<target>Visa pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Visa pop-up vid fel och varningar</target>
-
-<source>Ignore errors</source>
-<target>Ignorera fel</target>
-
-<source>Hide all error and warning messages</source>
-<target>Visa inte fel- och varningsmeddelanden</target>
-
-<source>Exit instantly</source>
-<target>Avsluta omedelbart</target>
-
-<source>Abort synchronization immediately</source>
-<target>Avbryt synkronisering omedelbart</target>
-
 <source>Select alternate comparison settings</source>
 <target>Välj alternativa jämförelseinställningar</target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>Välj tidsintervall</target>
 
+<source>Show pop-up</source>
+<target>Visa pop-up</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Visa pop-up vid fel och varningar</target>
+
+<source>Ignore errors</source>
+<target>Ignorera fel</target>
+
+<source>Hide all error and warning messages</source>
+<target>Visa inte fel- och varningsmeddelanden</target>
+
+<source>Exit instantly</source>
+<target>Avsluta omedelbart</target>
+
+<source>Abort synchronization immediately</source>
+<target>Avbryt synkronisering omedelbart</target>
+
+<source>Browse</source>
+<target>Bläddra</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Kan inte läsa från databasen:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Kan inte skriva till databas:</target>
+
+<source>Invalid command line: %x</source>
+<target>Ogiltig kommandorad: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Windows Felkod %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Felkod %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Kan inte tyda symbolisk länk:</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -163,17 +169,14 @@
 <source>Comparison Result</source>
 <target>Jämförelseresultat</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Inkompatibelt databasformat:</target>
-
 <source>Initial synchronization:</source>
 <target>Initial synkronisering:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>En av FreeFileSyncs databasfiler saknas:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Kan inte läsa från databasen:</target>
+<source>Incompatible synchronization database format:</source>
+<target>Inkompatibelt databasformat:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Databasfiler delar inte en gemensam synkroniseringssession:</target>
@@ -199,11 +202,17 @@
 <pluralform>%x sek</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Dra && släpp</target>
+
 <source>Info</source>
 <target>Info</target>
 
 <source>Fatal Error</source>
 <target>Allvarligt fel</target>
+
+<source>Error reading file:</source>
+<target>Kan inte läsa fil:</target>
 
 <source>Scanning:</source>
 <target>Skannar:</target>
@@ -223,14 +232,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Felaktig FreeFileSync konfigurationsfil!</target>
 
-<source>File does not exist:</source>
-<target>Filen finns inte:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Kan inte läsa in konfigurationsfil:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Kan inte flytta till papperskorgen:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Kan inte läsa in nödvändig DLL:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Kunde inte starta tjänsten Volume Shadow Copy (VSS)</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Skuggkopior av wow64 stöds ej. Använd FreeFileSync x64 istället!</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Kan inte bestämma volym för fil:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>Volymnamn %x saknas i filnamn %y!</target>
+
 <source>/sec</source>
 <target>/s</target>
+
+<source>File does not exist:</source>
+<target>Filen finns inte:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>Kan inte läsa värden för följande XML-noder:</target>
 
 <source>S&ave configuration...</source>
 <target>S&para inställningar...</target>
@@ -324,141 +354,6 @@ Kommandot verkställes när:
 <source>A directory input field is empty.</source>
 <target>Ett katalogfält är tomt</target>
 
-<source>Drag && drop</source>
-<target>Dra && släpp</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Kan inte initiera katalogskanner:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Fel vid övervakning av kataloger.</target>
-
-<source>Conversion error:</source>
-<target>Konversionsfel:</target>
-
-<source>Error deleting file:</source>
-<target>Kan inte ta bort fil:</target>
-
-<source>Error moving file:</source>
-<target>Kan inte flytta fil:</target>
-
-<source>Target file already existing!</source>
-<target>Filen finns redan!</target>
-
-<source>Error moving directory:</source>
-<target>Kan inte flytta katalog:</target>
-
-<source>Target directory already existing!</source>
-<target>Målkatalogen finns redan!</target>
-
-<source>Error deleting directory:</source>
-<target>Kan inte ta bort katalog:</target>
-
-<source>Error changing modification time:</source>
-<target>Kan inte modifiera tidsstämpel:</target>
-
-<source>Error loading library function:</source>
-<target>Kan inte starta biblioteksfunktion:</target>
-
-<source>Error reading security context:</source>
-<target>Kan inte läsa säkerhetskontext:</target>
-
-<source>Error writing security context:</source>
-<target>Kan inte skriva säkerhetskontext:</target>
-
-<source>Error copying file permissions:</source>
-<target>Kan inte kopiera filsystembehörighet:</target>
-
-<source>Error creating directory:</source>
-<target>Kan inte skapa katalog:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Kan inte kopiera symbolisk länk:</target>
-
-<source>Error copying file:</source>
-<target>Kan inte kopiera fil:</target>
-
-<source>Error opening file:</source>
-<target>Kan inte öppna fil:</target>
-
-<source>Error writing file:</source>
-<target>Kan inte skriva fil:</target>
-
-<source>Error reading file:</source>
-<target>Kan inte läsa fil:</target>
-
-<source>Operation aborted!</source>
-<target>Processen avbruten!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Oändlig loop vid accessförsök på katalog:</target>
-
-<source>Error traversing directory:</source>
-<target>Accessfel på katalog:</target>
-
-<source>Error setting privilege:</source>
-<target>Kan inte ange privilegie:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Kan inte flytta till papperskorgen:</target>
-
-<source>Could not load a required DLL:</source>
-<target>Kan inte läsa in nödvändig DLL:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Kan inte skriva till databas:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Kunde inte starta tjänsten Volume Shadow Copy (VSS)</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Skuggkopior av wow64 stöds ej. Använd FreeFileSync x64 istället!</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Kan inte bestämma volym för fil:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>Volymnamn %x saknas i filnamn %y!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 timma</pluralform>
-<pluralform>%x timmar</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dag</pluralform>
-<pluralform>%x dagar</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Kan inte läsa värden för följande XML-noder:</target>
-
 <source>Logging</source>
 <target>Loggar</target>
 
@@ -476,9 +371,6 @@ Kommandot verkställes när:
 
 <source>Batch execution</source>
 <target>Batch-körning</target>
-
-<source>Log-messages:</source>
-<target>Logg-meddelanden:</target>
 
 <source>Stop</source>
 <target>Stopp</target>
@@ -606,6 +498,24 @@ Kommandot verkställes när:
 <source>Total amount of data that will be transferred</source>
 <target>Total mängd data som kommer att överföras</target>
 
+<source>Operation:</source>
+<target>Arbetsuppgift:</target>
+
+<source>Items found:</source>
+<target>Funna poster:</target>
+
+<source>Items remaining:</source>
+<target>Återstående poster:</target>
+
+<source>Speed:</source>
+<target>Hastighet:</target>
+
+<source>Time remaining:</source>
+<target>Kvarvarande tid:</target>
+
+<source>Time elapsed:</source>
+<target>Förfluten tid:</target>
+
 <source>Batch job</source>
 <target>Batch-jobb</target>
 
@@ -654,32 +564,14 @@ Kommandot verkställes när:
 <source>&Cancel</source>
 <target>&Avbryt</target>
 
-<source>Operation:</source>
-<target>Arbetsuppgift:</target>
-
-<source>Items found:</source>
-<target>Funna poster:</target>
-
-<source>Items remaining:</source>
-<target>Återstående poster:</target>
-
-<source>Speed:</source>
-<target>Hastighet:</target>
-
-<source>Time remaining:</source>
-<target>Kvarvarande tid:</target>
-
-<source>Time elapsed:</source>
-<target>Förfluten tid:</target>
-
 <source>Select variant:</source>
 <target>Välj variant:</target>
 
 <source><Automatic></source>
 <target><Automatisk></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Identifiera och visa förändringar på båda sidor via databas. Borttagningar och konflikter upptäcks automatiskt.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Använd en databas för att identifiera och sprida ändringar på båda sidor. Borttagning, namnbyte och konflikter upptäcks automatiskt</target>
 
 <source>Mirror ->></source>
 <target>Spegla ->></target>
@@ -901,27 +793,19 @@ Undanta: \stuff\temp\*
 <target>Transaktionell filkopiering</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>Skriv först till en temporär fil (*.ffs_tmp) och byt sedan namn på den. Detta garanterar en konsistent status även vid allvarliga fel</target>
 
 <source>Copy locked files</source>
 <target>Kopiera låsta filer</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Kopiera delade eller låsta filer med hjälp av Volume Shadow Copy Service (Kräver administratörsrättighet)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Kopiera delade eller låsta filer med hjälp av Volume Shadow Copy Service (Kräver administratörsrättighet)</target>
 
 <source>Copy file access permissions</source>
 <target>Kopiera filåtkomstbehörigheter</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Överför fil- och katalogrättigheter (Kräver administratörsrättigheter)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Överför fil- och katalogrättigheter (Kräver administratörsrättigheter)</target>
 
 <source>Hidden dialogs:</source>
 <target>Dolda meddelanden:</target>
@@ -952,6 +836,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>&Find next</source>
 <target>&Sök nästa</target>
+
+<source>Operation aborted!</source>
+<target>Processen avbruten!</target>
 
 <source>Main bar</source>
 <target>Huvudfält</target>
@@ -993,16 +880,16 @@ Transfer file and directory permissions (Requires Administrator rights)
 <target>Autojustera kollumner</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>Ikonstorlek:</target>
 
 <source>Small</source>
-<target></target>
+<target>Liten</target>
 
 <source>Medium</source>
-<target></target>
+<target>Normal</target>
 
 <source>Large</source>
-<target></target>
+<target>Stor</target>
 
 <source>Include all rows</source>
 <target>Inkludera alla rader</target>
@@ -1130,6 +1017,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>File list exported!</source>
 <target>Fillista exporterad!</target>
 
+<source>Error writing file:</source>
+<target>Kan inte skriva fil:</target>
+
 <source>Batch file created successfully!</source>
 <target>Batch-filen skapades korrekt!</target>
 
@@ -1229,9 +1119,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Filter: Single pair</source>
 <target>Filter: Enstaka undantag</target>
 
-<source>Ignore</source>
-<target>Ignorera</target>
-
 <source>Direct</source>
 <target>Direkt</target>
 
@@ -1295,6 +1182,105 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Move files into a time-stamped subdirectory</source>
 <target>Flytta filer till en tidsstämplad underkatalog</target>
 
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 timma</pluralform>
+<pluralform>%x timmar</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dag</pluralform>
+<pluralform>%x dagar</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Kan inte initiera katalogskanner:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Fel vid övervakning av kataloger.</target>
+
+<source>Conversion error:</source>
+<target>Konversionsfel:</target>
+
+<source>Error deleting file:</source>
+<target>Kan inte ta bort fil:</target>
+
+<source>Error moving file:</source>
+<target>Kan inte flytta fil:</target>
+
+<source>Target file already existing!</source>
+<target>Filen finns redan!</target>
+
+<source>Error moving directory:</source>
+<target>Kan inte flytta katalog:</target>
+
+<source>Target directory already existing!</source>
+<target>Målkatalogen finns redan!</target>
+
+<source>Error deleting directory:</source>
+<target>Kan inte ta bort katalog:</target>
+
+<source>Error changing modification time:</source>
+<target>Kan inte modifiera tidsstämpel:</target>
+
+<source>Error loading library function:</source>
+<target>Kan inte starta biblioteksfunktion:</target>
+
+<source>Error reading security context:</source>
+<target>Kan inte läsa säkerhetskontext:</target>
+
+<source>Error writing security context:</source>
+<target>Kan inte skriva säkerhetskontext:</target>
+
+<source>Error copying file permissions:</source>
+<target>Kan inte kopiera filsystembehörighet:</target>
+
+<source>Error creating directory:</source>
+<target>Kan inte skapa katalog:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Kan inte kopiera symbolisk länk:</target>
+
+<source>Error copying file:</source>
+<target>Kan inte kopiera fil:</target>
+
+<source>Error opening file:</source>
+<target>Kan inte öppna fil:</target>
+
+<source>Error traversing directory:</source>
+<target>Accessfel på katalog:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Oändlig loop vid accessförsök på katalog:</target>
+
+<source>Error setting privilege:</source>
+<target>Kan inte ange privilegie:</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>Båda sidor har ändrats sedan senaste synkroniseringen!</target>
 
@@ -1325,9 +1311,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Kataloger är beroende! Var försiktig när du sätter upp synkroniseringsregler:</target>
 
-<source>Comparing content of files %x</source>
-<target>Jämför filinnehåll för %x</target>
-
 <source>Memory allocation failed!</source>
 <target>Minnesallokering misslyckades!</target>
 
@@ -1343,14 +1326,14 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Symbolisk länk %x har samma datum, men annat mål!</target>
 
+<source>Comparing content of files %x</source>
+<target>Jämför filinnehåll för %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>Kunde inte jämföra filinnehåll.</target>
 
 <source>Generating file list...</source>
 <target>Skapar fillista...</target>
-
-<source>Multiple...</source>
-<target>Multipla...</target>
 
 <source>Both sides are equal</source>
 <target>Bägge sidor är lika</target>
@@ -1370,6 +1353,12 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Delete right file/folder</source>
 <target>Ta bort höger fil/katalog</target>
 
+<source>Move file on left</source>
+<target>Flytta fil på vänster sida</target>
+
+<source>Move file on right</source>
+<target>Flytta fil på höger sida</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Skriv över vänster fil/katalog med den högra</target>
 
@@ -1384,6 +1373,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>Copy file attributes only to right</source>
 <target>Kopiera endast filattribut åt höger</target>
+
+<source>Multiple...</source>
+<target>Multipla...</target>
 
 <source>Deleting file %x</source>
 <target>Tar bort filen %x</target>

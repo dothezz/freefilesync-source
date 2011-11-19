@@ -74,11 +74,10 @@ private:
 const wchar_t MessageProvider::WINDOW_NAME[] = L"E6AD5EB1-527B-4EEF-AC75-27883B233380"; //random name
 
 
-LRESULT CALLBACK topWndProc(
-    HWND hwnd,        //handle to window
-    UINT uMsg,        //message identifier
-    WPARAM wParam,    //first message parameter
-    LPARAM lParam)    //second message parameter
+LRESULT CALLBACK topWndProc(HWND hwnd,        //handle to window
+                            UINT uMsg,        //message identifier
+                            WPARAM wParam,    //first message parameter
+                            LPARAM lParam)    //second message parameter
 {
     if (messageProviderConstructed) //attention: this callback is triggered in the middle of singleton construction! It is a bad idea to to call back at this time!
         try
@@ -110,18 +109,17 @@ MessageProvider::MessageProvider() :
     zen::ScopeGuard guardClass = zen::makeGuard([&]() { ::UnregisterClass(WINDOW_NAME, process); });
 
     //create dummy-window
-    windowHandle = ::CreateWindow(
-                       WINDOW_NAME, //LPCTSTR lpClassName OR ATOM in low-order word!
-                       NULL,        //LPCTSTR lpWindowName,
-                       0, //DWORD dwStyle,
-                       0, //int x,
-                       0, //int y,
-                       0, //int nWidth,
-                       0, //int nHeight,
-                       0, //note: we need a toplevel window to receive device arrival events, not a message-window (HWND_MESSAGE)!
-                       NULL,    //HMENU hMenu,
-                       process, //HINSTANCE hInstance,
-                       NULL);   //LPVOID lpParam
+    windowHandle = ::CreateWindow(WINDOW_NAME, //LPCTSTR lpClassName OR ATOM in low-order word!
+                                  NULL,        //LPCTSTR lpWindowName,
+                                  0, //DWORD dwStyle,
+                                  0, //int x,
+                                  0, //int y,
+                                  0, //int nWidth,
+                                  0, //int nHeight,
+                                  0, //note: we need a toplevel window to receive device arrival events, not a message-window (HWND_MESSAGE)!
+                                  NULL,    //HMENU hMenu,
+                                  process, //HINSTANCE hInstance,
+                                  NULL);   //LPVOID lpParam
     if (windowHandle == NULL)
         throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (CreateWindow)");
 
@@ -160,17 +158,16 @@ public:
         filter.dbch_devicetype = DBT_DEVTYP_HANDLE;
         filter.dbch_handle = hDir;
 
-        hNotification = ::RegisterDeviceNotification(
-                            MessageProvider::instance().getWnd(), //__in  HANDLE hRecipient,
-                            &filter,                              //__in  LPVOID NotificationFilter,
-                            DEVICE_NOTIFY_WINDOW_HANDLE);         //__in  DWORD Flags
+        hNotification = ::RegisterDeviceNotification(MessageProvider::instance().getWnd(), //__in  HANDLE hRecipient,
+                                                     &filter,                              //__in  LPVOID NotificationFilter,
+                                                     DEVICE_NOTIFY_WINDOW_HANDLE);         //__in  DWORD Flags
         if (hNotification == NULL)
         {
             const DWORD lastError = ::GetLastError();
             if (lastError != ERROR_CALL_NOT_IMPLEMENTED   && //fail on SAMBA share: this shouldn't be a showstopper!
                 lastError != ERROR_SERVICE_SPECIFIC_ERROR && //neither should be fail for "Pogoplug" mapped network drives
                 lastError != ERROR_INVALID_DATA)             //this seems to happen for a NetDrive-mapped FTP server
-                throw zen::FileError(std::wstring(L"Could not register device removal notifications:") + L"\n\n" + getLastErrorFormatted(lastError));
+                throw zen::FileError(L"Could not register device removal notifications:" L"\n\n" + getLastErrorFormatted(lastError));
         }
     }
 

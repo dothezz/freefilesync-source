@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronizare Inteligentă</target>
 
-<source>Browse</source>
-<target>Explorează</target>
-
-<source>Windows Error Code %x:</source>
-<target>Codul Erorii Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Codul Erorii Linux %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>Linie de comandă nevalidă: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>Eroare la rezolvarea legăturii simbolice:</target>
-
-<source>Show pop-up</source>
-<target>Este arătat un popîc</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Se afișează o fereastră popîc [popup] la erori sau avertizări</target>
-
-<source>Ignore errors</source>
-<target>Erorile sînt ignorate</target>
-
-<source>Hide all error and warning messages</source>
-<target>Sînt ascunse toate mesajele de eroare și de avertizare</target>
-
-<source>Exit instantly</source>
-<target>Ieși imediat</target>
-
-<source>Abort synchronization immediately</source>
-<target>Abandonează imediat sincronizarea</target>
-
 <source>Select alternate comparison settings</source>
 <target>Selectează setările alternative de comparare</target>
 
@@ -101,7 +68,7 @@
 <target>Configurează Filtrul</target>
 
 <source>Customize columns</source>
-<target>Personalizează coloanele</target>
+<target>Bifează coloanele de afișat</target>
 
 <source>Global settings</source>
 <target>Setări Globale</target>
@@ -114,6 +81,45 @@
 
 <source>Select time span</source>
 <target>Selectează intervalul de timp</target>
+
+<source>Show pop-up</source>
+<target>Este arătat un popîc</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Se afișează o fereastră popîc [popup] la erori sau avertizări</target>
+
+<source>Ignore errors</source>
+<target>Erorile sînt ignorate</target>
+
+<source>Hide all error and warning messages</source>
+<target>Sînt ascunse toate mesajele de eroare și de avertizare</target>
+
+<source>Exit instantly</source>
+<target>Ieși imediat</target>
+
+<source>Abort synchronization immediately</source>
+<target>Abandonează imediat sincronizarea</target>
+
+<source>Browse</source>
+<target>Explorează</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Eroare la citirea din baza de date a sincronizării:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Eroare la scrierea în baza de date a sincronizării:</target>
+
+<source>Invalid command line: %x</source>
+<target>Linie de comandă nevalidă: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Codul Erorii Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Codul Erorii Linux %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Eroare la rezolvarea legăturii simbolice:</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -147,7 +153,7 @@
 <target>Dată</target>
 
 <source>Full path</source>
-<target>Cale completă</target>
+<target>Calea Completă</target>
 
 <source>Filename</source>
 <target>Numele Elementului</target>
@@ -164,17 +170,14 @@
 <source>Comparison Result</source>
 <target>Rezultatul Comparării</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Format al bazei de date necompatibil cu versiunea softului:</target>
-
 <source>Initial synchronization:</source>
 <target>Sincronizare inițială:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Una dintre părți nu are o filă de tip bază de date FreeFileSync:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Eroare la citirea din baza de date a sincronizării:</target>
+<source>Incompatible synchronization database format:</source>
+<target>Format al bazei de date necompatibil cu versiunea softului:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Filele bază de date nu partajează o sesiune comună de sincronizare</target>
@@ -201,17 +204,23 @@
 <pluralform>%x de sec</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Trage și pune un dosar peste compartimentul de mai jos sau selectează-l cu butonul de explorare</target>
+
 <source>Info</source>
 <target>Informații</target>
 
 <source>Fatal Error</source>
 <target>Eroare Fatală</target>
 
+<source>Error reading file:</source>
+<target>Eroare la citirea filei:</target>
+
 <source>Scanning:</source>
 <target>Scanez:</target>
 
 <source>Encoding extended time information: %x</source>
-<target>Codarea informațiilor timpului extins: %x</target>
+<target>Codez informațiile extinse despre timp: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -226,14 +235,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Filă de configurare FreeFileSync nevalidă!</target>
 
-<source>File does not exist:</source>
-<target>Fila nu există:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Eroare la parsarea filei de configurare:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Eroare la mutarea în Reciclator:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Nu pot încărca o filă DLL necesară:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Eroare la accesarea Serviciului de Conservare a Volumelor [Volume Shadow Copy]!</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Realizarea de conservări (copii de rezervă) prin sistemul WOW64 nu este suportată. Folosește versiunea pe 64-biți a FreeFileSync.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Nu pot determina numele volumului pentru fila:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>Numele volumului %x nu face parte din numele filei %y !</target>
+
 <source>/sec</source>
 <target>/sec</target>
+
+<source>File does not exist:</source>
+<target>Fila nu există:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>Nu pot citi valorile pentru următoarele noduri XML:</target>
 
 <source>S&ave configuration...</source>
 <target>S&alvează Configurația...</target>
@@ -327,146 +357,8 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>A directory input field is empty.</source>
 <target>Cel puțin unul din dosarele de comparat este nespecificat.</target>
 
-<source>Drag && drop</source>
-<target>Trage și lasă un dosar peste compartimentul de mai jos sau selectează-l cu butonul de explorare</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Nu pot inițializa monitorizarea dosarelor:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Eroare la monitorizarea dosarelor.</target>
-
-<source>Conversion error:</source>
-<target>Eroare de convertire:</target>
-
-<source>Error deleting file:</source>
-<target>Eroare la ștergerea filei:</target>
-
-<source>Error moving file:</source>
-<target>Eroare la mutarea filei:</target>
-
-<source>Target file already existing!</source>
-<target>Fila țintă există deja!</target>
-
-<source>Error moving directory:</source>
-<target>Eroare la mutarea dosarului:</target>
-
-<source>Target directory already existing!</source>
-<target>Dosarul țintă există deja!</target>
-
-<source>Error deleting directory:</source>
-<target>Eroare la ștergerea dosarului:</target>
-
-<source>Error changing modification time:</source>
-<target>Eroare la schimbarea datei de modificare:</target>
-
-<source>Error loading library function:</source>
-<target>Eroare la încărcarea bibliotecii de funcții:</target>
-
-<source>Error reading security context:</source>
-<target>Eroare la citirea contextului de securitate:</target>
-
-<source>Error writing security context:</source>
-<target>Eroare la scrierea contextului de securitate:</target>
-
-<source>Error copying file permissions:</source>
-<target>Eroare la copierea permisiunilor filei:</target>
-
-<source>Error creating directory:</source>
-<target>Eroare la crearea dosarului:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Eroare la copierea legăturii simbolice:</target>
-
-<source>Error copying file:</source>
-<target>Eroare la copierea filei:</target>
-
-<source>Error opening file:</source>
-<target>Eroare la deschiderea filei:</target>
-
-<source>Error writing file:</source>
-<target>Eroare la scrierea filei:</target>
-
-<source>Error reading file:</source>
-<target>Eroare la citirea filei:</target>
-
-<source>Operation aborted!</source>
-<target>Operație abandonată!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Buclă infinită la parcurgerea dosarului:</target>
-
-<source>Error traversing directory:</source>
-<target>Eroare la parcurgerea dosarului:</target>
-
-<source>Error setting privilege:</source>
-<target>Eroare la setarea privilegiului:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Eroare la mutarea în Reciclator:</target>
-
-<source>Could not load a required DLL:</source>
-<target>Nu pot încărca o filă DLL necesară:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Eroare la scrierea în baza de date a sincronizării:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Eroare la accesarea Serviciului de Conservare a Volumelor [Volume Shadow Copy]!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Realizarea de conservări (copii de rezervă) prin sistemul WOW64 nu este suportată. Folosește versiunea pe 64-biți a FreeFileSync.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Nu pot determina numele volumului pentru fila:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>Numele volumului %x nu face parte din numele filei %y !</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-<pluralform>%x de min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 oră</pluralform>
-<pluralform>%x ore</pluralform>
-<pluralform>%x de ore</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 zi</pluralform>
-<pluralform>%x zile</pluralform>
-<pluralform>%x de zile</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Nu pot citi valorile pentru următoarele noduri XML:</target>
-
 <source>Logging</source>
-<target>Jurnalizez</target>
+<target>Jurnal</target>
 
 <source>FreeFileSync batch file</source>
 <target>Filă cu set de comenzi FreeFileSync</target>
@@ -482,9 +374,6 @@ Linia de comandă este executată de fiecare dată cînd:
 
 <source>Batch execution</source>
 <target>Execută Fila Set</target>
-
-<source>Log-messages:</source>
-<target>Mesaje de jurnalizare:</target>
 
 <source>Stop</source>
 <target>Oprește</target>
@@ -612,6 +501,24 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Total amount of data that will be transferred</source>
 <target>Volumul total de date care va fi transferat</target>
 
+<source>Operation:</source>
+<target>Operație:</target>
+
+<source>Items found:</source>
+<target>Elemente Găsite:</target>
+
+<source>Items remaining:</source>
+<target>Elemente Rămase:</target>
+
+<source>Speed:</source>
+<target>Viteză:</target>
+
+<source>Time remaining:</source>
+<target>Timp Rămas:</target>
+
+<source>Time elapsed:</source>
+<target>Timp Scurs:</target>
+
 <source>Batch job</source>
 <target>Sarcină Set</target>
 
@@ -660,32 +567,14 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>&Cancel</source>
 <target>&Anulează</target>
 
-<source>Operation:</source>
-<target>Operație:</target>
-
-<source>Items found:</source>
-<target>Elemente Găsite:</target>
-
-<source>Items remaining:</source>
-<target>Elemente Rămase:</target>
-
-<source>Speed:</source>
-<target>Viteză:</target>
-
-<source>Time remaining:</source>
-<target>Timp Rămas:</target>
-
-<source>Time elapsed:</source>
-<target>Timp Scurs:</target>
-
 <source>Select variant:</source>
 <target>Selectează Varianta de Sincronizare:</target>
 
 <source><Automatic></source>
 <target><Sincronizare Inteligentă></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Modificările din ambele părți sînt identificate și propagate folosind o bază de date. Ștergerile și conflictele sînt detectate automat.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Identificare și propagare a modificărilor din ambele părți folosind o bază de date. Ștergerile, renumirile și conflictele sînt detectate automat</target>
 
 <source>Mirror ->></source>
 <target>Clonare =>></target>
@@ -697,7 +586,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Actualizare =></target>
 
 <source>Copy new or updated files to right folder.</source>
-<target>Copiază în dosarul din dreapta filele actualizate sau noi.</target>
+<target>Copiere în dosarul din dreapta a filelor actualizate sau noi.</target>
 
 <source>Custom</source>
 <target>Sincronizare Personalizată</target>
@@ -907,27 +796,19 @@ Excluse: \stuff\temp\*
 <target>Copiere tranzacțională a filelor</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>Scrierea se face mai întîi într-o filă temporară (*.ffs_tmp), care e apoi renumită. Se garantează astfel consecvența stării filelor chiar și în cazul apariției de erori fatale.</target>
 
 <source>Copy locked files</source>
-<target>Copiere și a filelor zăvorîte [locked]</target>
+<target>Copiere a filelor partajate [shared] sau zăvorîte [locked]</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Copiază filele partajate sau zăvorîte folosind Serviciul de Conservare a Volumelor [Volume Shadow Copy] (Necesită drepturi de Administrator)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Filele partajate sau zăvorîte sînt copiate folosind Serviciul de Conservare a Volumelor din Windows [Volume Shadow Copy] (necesită drepturi de Administrator)</target>
 
 <source>Copy file access permissions</source>
 <target>Copiază permisiunile de acces ale filelor</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrator)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Transferă permisiunile filelor și dosarelor (necesită drepturi de Administrator)</target>
 
 <source>Hidden dialogs:</source>
 <target>Casete de dialog ascunse:</target>
@@ -948,7 +829,7 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 <target>Varianta Sincronizării</target>
 
 <source>Statistics</source>
-<target>Statistici</target>
+<target>Statis.</target>
 
 <source>Find what:</source>
 <target>Găsește Asta:</target>
@@ -958,6 +839,9 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 
 <source>&Find next</source>
 <target>&Găsește Următorul</target>
+
+<source>Operation aborted!</source>
+<target>Operație abandonată!</target>
 
 <source>Main bar</source>
 <target>Bara Principală</target>
@@ -996,19 +880,19 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 <target>Selectează intervalul de timp...</target>
 
 <source>Auto-adjust columns</source>
-<target>Autoajustează Coloanele</target>
+<target>Ajustează Automat Coloanele</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>Mărimea Icoanelor Elementelor:</target>
 
 <source>Small</source>
-<target></target>
+<target>Mică</target>
 
 <source>Medium</source>
-<target></target>
+<target>Medie</target>
 
 <source>Large</source>
-<target></target>
+<target>Mare</target>
 
 <source>Include all rows</source>
 <target>Include Toate Rîndurile</target>
@@ -1136,6 +1020,9 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 <source>File list exported!</source>
 <target>Lista de file a fost exportată!</target>
 
+<source>Error writing file:</source>
+<target>Eroare la scrierea filei:</target>
+
 <source>Batch file created successfully!</source>
 <target>Fila cu setul de comenzi a fost creată cu succces !</target>
 
@@ -1239,9 +1126,6 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 <source>Filter: Single pair</source>
 <target>Filtru: O singură pereche</target>
 
-<source>Ignore</source>
-<target>Ignoră</target>
-
 <source>Direct</source>
 <target>Direcționează</target>
 
@@ -1307,6 +1191,108 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 <source>Move files into a time-stamped subdirectory</source>
 <target>Filele sînt mutate într-un subdosar cu marcaj de timp</target>
 
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+<pluralform>%x de min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 oră</pluralform>
+<pluralform>%x ore</pluralform>
+<pluralform>%x de ore</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 zi</pluralform>
+<pluralform>%x zile</pluralform>
+<pluralform>%x de zile</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Nu pot inițializa monitorizarea dosarelor:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Eroare la monitorizarea dosarelor.</target>
+
+<source>Conversion error:</source>
+<target>Eroare de convertire:</target>
+
+<source>Error deleting file:</source>
+<target>Eroare la ștergerea filei:</target>
+
+<source>Error moving file:</source>
+<target>Eroare la mutarea filei:</target>
+
+<source>Target file already existing!</source>
+<target>Fila țintă există deja!</target>
+
+<source>Error moving directory:</source>
+<target>Eroare la mutarea dosarului:</target>
+
+<source>Target directory already existing!</source>
+<target>Dosarul țintă există deja!</target>
+
+<source>Error deleting directory:</source>
+<target>Eroare la ștergerea dosarului:</target>
+
+<source>Error changing modification time:</source>
+<target>Eroare la schimbarea datei de modificare:</target>
+
+<source>Error loading library function:</source>
+<target>Eroare la încărcarea bibliotecii de funcții:</target>
+
+<source>Error reading security context:</source>
+<target>Eroare la citirea contextului de securitate:</target>
+
+<source>Error writing security context:</source>
+<target>Eroare la scrierea contextului de securitate:</target>
+
+<source>Error copying file permissions:</source>
+<target>Eroare la copierea permisiunilor filei:</target>
+
+<source>Error creating directory:</source>
+<target>Eroare la crearea dosarului:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Eroare la copierea legăturii simbolice:</target>
+
+<source>Error copying file:</source>
+<target>Eroare la copierea filei:</target>
+
+<source>Error opening file:</source>
+<target>Eroare la deschiderea filei:</target>
+
+<source>Error traversing directory:</source>
+<target>Eroare la parcurgerea dosarului:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Buclă infinită la parcurgerea dosarului:</target>
+
+<source>Error setting privilege:</source>
+<target>Eroare la setarea privilegiului:</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>Ambele părți s-au modificat de la ultima sincronizare!</target>
 
@@ -1337,9 +1323,6 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Dosarele sînt interdependente! Atenție la setarea regulilor de sincronizare:</target>
 
-<source>Comparing content of files %x</source>
-<target>Compar conținutul filelor %x</target>
-
 <source>Memory allocation failed!</source>
 <target>Alocarea memoriei a eșuat!</target>
 
@@ -1355,14 +1338,14 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Simlegăturile %x au dată identică, dar ținte diferite!</target>
 
+<source>Comparing content of files %x</source>
+<target>Compar conținutul filelor %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>Compararea filelor după conținut a eșuat.</target>
 
 <source>Generating file list...</source>
 <target>Generez lista de file...</target>
-
-<source>Multiple...</source>
-<target>Multiplu...</target>
 
 <source>Both sides are equal</source>
 <target>Ambele părți sînt identice</target>
@@ -1382,6 +1365,12 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 <source>Delete right file/folder</source>
 <target>Șterge elementul drept</target>
 
+<source>Move file on left</source>
+<target>Mută fila în stînga</target>
+
+<source>Move file on right</source>
+<target>Mută fila în dreapta</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Suprascrie elementul stîng (fila/dosarul) cu cel drept</target>
 
@@ -1396,6 +1385,9 @@ Transferă permisiunile filelor și dosarelor (Necesită drepturi de Administrat
 
 <source>Copy file attributes only to right</source>
 <target>Copiază atributele filelor doar înspre dreapta</target>
+
+<source>Multiple...</source>
+<target>Multiplu...</target>
 
 <source>Deleting file %x</source>
 <target>Șterg fila %x</target>

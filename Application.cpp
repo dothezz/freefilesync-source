@@ -369,7 +369,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         syncProc.startSynchronizationProcess(syncProcessCfg, folderCmp);
 
-        //play (optional) sound notification after sync has completed
+        //play (optional) sound notification after sync has completed -> don't play in silent mode, consider RealtimeSync!
         if (!batchCfg.silent)
         {
             const wxString soundFile = toWx(getResourceDir()) + wxT("Sync_Complete.wav");

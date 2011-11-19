@@ -7,6 +7,7 @@
 #ifndef FILEID_H_INCLUDED
 #define FILEID_H_INCLUDED
 
+#include "file_id_def.h"
 #include "zstring.h"
 #include <string>
 
@@ -15,8 +16,8 @@
 namespace zen
 {
 //get unique file id (symbolic link handling: opens the link!!!)
-//returns empty string on error!
-std::string getFileID(const Zstring& filename);
+//returns initial FileId() on error!
+FileId getFileID(const Zstring& filename);
 
 //test whether two distinct paths point to the same file or directory:
 //      true: paths point to same files/dirs

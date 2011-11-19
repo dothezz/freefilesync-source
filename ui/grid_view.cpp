@@ -181,18 +181,22 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
             switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
             {
                 case SO_CREATE_NEW_LEFT:
+                case SO_MOVE_LEFT_TARGET:
                     output.existsSyncCreateLeft = true;
                     if (!syncCreateLeftActive) continue;
                     break;
                 case SO_CREATE_NEW_RIGHT:
+                case SO_MOVE_RIGHT_TARGET:
                     output.existsSyncCreateRight = true;
                     if (!syncCreateRightActive) continue;
                     break;
                 case SO_DELETE_LEFT:
+                case SO_MOVE_LEFT_SOURCE:
                     output.existsSyncDeleteLeft = true;
                     if (!syncDeleteLeftActive) continue;
                     break;
                 case SO_DELETE_RIGHT:
+                case SO_MOVE_RIGHT_SOURCE:
                     output.existsSyncDeleteRight = true;
                     if (!syncDeleteRightActive) continue;
                     break;

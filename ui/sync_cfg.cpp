@@ -5,6 +5,7 @@
 // **************************************************************************
 
 #include "sync_cfg.h"
+#include <memory>
 #include "../lib/resources.h"
 #include "../lib/dir_name.h"
 #include <wx/wupdlock.h>
@@ -12,10 +13,10 @@
 #include <wx+/string_conv.h>
 #include <wx+/dir_picker.h>
 #include "gui_generated.h"
-#include <memory>
 #include <wx+/choice_enum.h>
 #include "../lib/dir_name.h"
 #include <wx+/image_tools.h>
+#include "../file_hierarchy.h"
 
 using namespace zen;
 using namespace xmlAccess;
@@ -97,15 +98,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         {
             case SYNC_DIR_RIGHT:
                 buttonLeftOnly->SetBitmapLabel(GlobalResources::getImage(wxT("createRight")));
-                buttonLeftOnly->SetToolTip(getDescription(SO_CREATE_NEW_RIGHT));
+                buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
                 buttonLeftOnly->SetBitmapLabel(GlobalResources::getImage(wxT("deleteLeft")));
-                buttonLeftOnly->SetToolTip(getDescription(SO_DELETE_LEFT));
+                buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DELETE_LEFT));
                 break;
             case SYNC_DIR_NONE:
                 buttonLeftOnly->SetBitmapLabel(GlobalResources::getImage(wxT("none")));
-                buttonLeftOnly->SetToolTip(getDescription(SO_DO_NOTHING));
+                buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
 
@@ -113,15 +114,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         {
             case SYNC_DIR_RIGHT:
                 buttonRightOnly->SetBitmapLabel(GlobalResources::getImage(wxT("deleteRight")));
-                buttonRightOnly->SetToolTip(getDescription(SO_DELETE_RIGHT));
+                buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DELETE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
                 buttonRightOnly->SetBitmapLabel(GlobalResources::getImage(wxT("createLeft")));
-                buttonRightOnly->SetToolTip(getDescription(SO_CREATE_NEW_LEFT));
+                buttonRightOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_LEFT));
                 break;
             case SYNC_DIR_NONE:
                 buttonRightOnly->SetBitmapLabel(GlobalResources::getImage(wxT("none")));
-                buttonRightOnly->SetToolTip(getDescription(SO_DO_NOTHING));
+                buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
 
@@ -129,15 +130,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         {
             case SYNC_DIR_RIGHT:
                 buttonLeftNewer->SetBitmapLabel(GlobalResources::getImage(wxT("updateRight")));
-                buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+                buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
                 buttonLeftNewer->SetBitmapLabel(GlobalResources::getImage(wxT("updateLeft")));
-                buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+                buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
                 buttonLeftNewer->SetBitmapLabel(GlobalResources::getImage(wxT("none")));
-                buttonLeftNewer->SetToolTip(getDescription(SO_DO_NOTHING));
+                buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
 
@@ -145,15 +146,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         {
             case SYNC_DIR_RIGHT:
                 buttonRightNewer->SetBitmapLabel(GlobalResources::getImage(wxT("updateRight")));
-                buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+                buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
                 buttonRightNewer->SetBitmapLabel(GlobalResources::getImage(wxT("updateLeft")));
-                buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+                buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
                 buttonRightNewer->SetBitmapLabel(GlobalResources::getImage(wxT("none")));
-                buttonRightNewer->SetToolTip(getDescription(SO_DO_NOTHING));
+                buttonRightNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
 
@@ -161,15 +162,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         {
             case SYNC_DIR_RIGHT:
                 buttonDifferent->SetBitmapLabel(GlobalResources::getImage(wxT("updateRight")));
-                buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+                buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
                 buttonDifferent->SetBitmapLabel(GlobalResources::getImage(wxT("updateLeft")));
-                buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+                buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
                 buttonDifferent->SetBitmapLabel(GlobalResources::getImage(wxT("none")));
-                buttonDifferent->SetToolTip(getDescription(SO_DO_NOTHING));
+                buttonDifferent->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
 
@@ -177,11 +178,11 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         {
             case SYNC_DIR_RIGHT:
                 buttonConflict->SetBitmapLabel(GlobalResources::getImage(wxT("updateRight")));
-                buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+                buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
                 buttonConflict->SetBitmapLabel(GlobalResources::getImage(wxT("updateLeft")));
-                buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+                buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
                 buttonConflict->SetBitmapLabel(GlobalResources::getImage(wxT("conflict")));
@@ -219,7 +220,7 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
 
     //a proper set-method may be in order some time...
     setEnumVal(enumDelhandDescr, *m_choiceHandleDeletion, syncCfg.handleDeletion);
-    customDelFolder.setName(syncCfg.customDeletionDirectory);
+    customDelFolder.setName(toWx(syncCfg.customDeletionDirectory));
     updateGui();
 
     //error handling
@@ -330,7 +331,7 @@ void SyncCfgDialog::OnApply(wxCommandEvent& event)
     //write configuration to main dialog
     syncCfgOut.directionCfg            = currentDirectionCfg;
     syncCfgOut.handleDeletion          = getEnumVal(enumDelhandDescr, *m_choiceHandleDeletion);
-    syncCfgOut.customDeletionDirectory = customDelFolder.getName();
+    syncCfgOut.customDeletionDirectory = toZ(customDelFolder.getName());
 
     if (refHandleError)
         *refHandleError = getEnumVal(enumErrhandDescr, *m_choiceHandleError);

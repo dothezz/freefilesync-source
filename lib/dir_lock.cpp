@@ -74,10 +74,10 @@ public:
         //ATTENTION: setting file pointer IS required! => use CreateFile/FILE_GENERIC_WRITE + SetFilePointerEx!
         //although CreateFile/FILE_APPEND_DATA without SetFilePointerEx works locally, it MAY NOT work on some network shares creating a 4 gig file!!!
 
-        const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename_.c_str()).c_str(),
+        const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename_).c_str(),
                                                GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
                                                FILE_SHARE_READ,
-                                               0,
+                                               NULL,
                                                OPEN_EXISTING,
                                                FILE_ATTRIBUTE_NORMAL,
                                                NULL);
@@ -340,8 +340,8 @@ std::string retrieveLockId(const Zstring& lockfilename) //throw FileError, Error
 
 void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
 {
-    std::wstring infoMsg = _("Waiting while directory is locked (%x)...");
-    replace(infoMsg, L"%x", std::wstring(L"\"") + lockfilename + L"\"");
+    const std::wstring infoMsg = replaceCpy(_("Waiting while directory is locked (%x)..."), L"%x", std::wstring(L"\"") + lockfilename + L"\"");
+
     if (callback)
         callback->reportInfo(infoMsg);
     //---------------------------------------------------------------
@@ -408,8 +408,8 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                         long remainingSeconds = ((DETECT_EXITUS_INTERVAL - (wxGetLocalTimeMillis() - lockSilentStart)) / 1000).ToLong();
                         remainingSeconds = std::max(0L, remainingSeconds);
 
-                        std::wstring remSecMsg = _P("1 sec", "%x sec", remainingSeconds);
-                        replace(remSecMsg, L"%x", toString<std::wstring>(remainingSeconds));
+                        const std::wstring remSecMsg = replaceCpy(_P("1 sec", "%x sec", remainingSeconds), L"%x", toString<std::wstring>(remainingSeconds));
+
                         callback->reportInfo(infoMsg + L" " + remSecMsg);
                     }
                     else
@@ -441,7 +441,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
     const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename).c_str(),
                                            GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
                                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                           0,
+                                           NULL,
                                            CREATE_NEW,
                                            FILE_ATTRIBUTE_NORMAL,
                                            NULL);
@@ -472,7 +472,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
     ::close(fileHandle);
 #endif
 
-    zen::ScopeGuard guardLockFile = zen::makeGuard([&]() { zen::removeFile(lockfilename); });
+    ScopeGuard guardLockFile = zen::makeGuard([&] { zen::removeFile(lockfilename); });
 
     //write UUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks, etc.)
     writeLockInfo(lockfilename); //throw FileError

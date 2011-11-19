@@ -2,7 +2,7 @@
 	<language name>עברית</language name>
 	<translator>nitnit</translator>
 	<locale>he_IL</locale>
-	<flag file>isreal.png</flag file>
+	<flag file>israel.png</flag file>
 	<plural forms>2</plural forms>
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
@@ -21,39 +21,6 @@
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - סינכרון  אוטומטי</target>
-
-<source>Browse</source>
-<target>עיין</target>
-
-<source>Windows Error Code %x:</source>
-<target>קוד שגיאת חלונות %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>קוד שגיאת לינוקס %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>שורת פקודה בלתי חוקית: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>שגיאה בפענוח קישור סימבולי (Symbolic Link)</target>
-
-<source>Show pop-up</source>
-<target>הראה חלונות מוקפצים</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>הראה חלונות מוקפצים עבור שגיאות או אזהרות</target>
-
-<source>Ignore errors</source>
-<target>התעלם מטעויות</target>
-
-<source>Hide all error and warning messages</source>
-<target>הסתר את כל הודעות ההזהרה והשגיאה</target>
-
-<source>Exit instantly</source>
-<target>צא מידית</target>
-
-<source>Abort synchronization immediately</source>
-<target>הפסק סנכרון מידית</target>
 
 <source>Select alternate comparison settings</source>
 <target>בחר הגדרות השוואה חליפיות</target>
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>בחר תחום זמן</target>
 
+<source>Show pop-up</source>
+<target>הראה חלונות מוקפצים</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>הראה חלונות מוקפצים עבור שגיאות או אזהרות</target>
+
+<source>Ignore errors</source>
+<target>התעלם מטעויות</target>
+
+<source>Hide all error and warning messages</source>
+<target>הסתר את כל הודעות ההזהרה והשגיאה</target>
+
+<source>Exit instantly</source>
+<target>צא מידית</target>
+
+<source>Abort synchronization immediately</source>
+<target>הפסק סנכרון מידית</target>
+
+<source>Browse</source>
+<target>עיין</target>
+
+<source>Error reading from synchronization database:</source>
+<target>שגיאה בקריאה מבסיס הנתונים של הסנכרון:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>שגיאה ברישום לבסיס נתוני סנכרון:</target>
+
+<source>Invalid command line: %x</source>
+<target>שורת פקודה בלתי חוקית: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>קוד שגיאת חלונות %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>קוד שגיאת לינוקס %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>שגיאה בפענוח קישור סימבולי (Symbolic Link)</target>
+
 <source>%x MB</source>
 <target>%x מגה בייט</target>
 
@@ -163,17 +169,14 @@
 <source>Comparison Result</source>
 <target>תוצאות ההשוואה</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>מסד נתונים של הסנכרון לא תואם:</target>
-
 <source>Initial synchronization:</source>
 <target>סנכרון ראשוני:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>אחד מקובצי בסיס הנתונים הבא עדיין לא קיים</target>
 
-<source>Error reading from synchronization database:</source>
-<target>שגיאה בקריאה מבסיס הנתונים של הסנכרון:</target>
+<source>Incompatible synchronization database format:</source>
+<target>מסד נתונים של הסנכרון לא תואם:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>קבצי בסיס הנתונים אינם חולקים ארוע סנכרון משותף:</target>
@@ -199,11 +202,17 @@
 <pluralform>%x שניות</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>גרור והשלך</target>
+
 <source>Info</source>
 <target>מידע</target>
 
 <source>Fatal Error</source>
 <target>שגיאה פטלית</target>
+
+<source>Error reading file:</source>
+<target>שגיאה בקריאת קובץ:</target>
 
 <source>Scanning:</source>
 <target>סורק:</target>
@@ -223,14 +232,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>קובץ תצורה בלתי חוקי!</target>
 
-<source>File does not exist:</source>
-<target>קובץ לא קיים:</target>
-
 <source>Error parsing configuration file:</source>
 <target>שגיאה בניתוח קובץ תצורה:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>שגיאה בהעברה לסל המיחזור:</target>
+
+<source>Could not load a required DLL:</source>
+<target>:נדרש DLL לא יכל לטעון</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>שגיאה בגישה לשרות Volume Shadow Copy Service</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>לא נתמכת בגרסה זאת אנא התקן גרסה 64 WOW64 העתקת צל ב</target>
+
+<source>Could not determine volume name for file:</source>
+<target>לא יכול לקבוע שם כרך לקובץ:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>כנונן %x לא בנתיב של קובץ %y!</target>
+
 <source>/sec</source>
 <target>/שנ</target>
+
+<source>File does not exist:</source>
+<target>קובץ לא קיים:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>XML לא יכול לקרא ערכים מצמתי :</target>
 
 <source>S&ave configuration...</source>
 <target>&שמור תצורה...</target>
@@ -324,141 +354,6 @@ The command line is executed each time:
 <source>A directory input field is empty.</source>
 <target>שדה כניסת מחיצה ריק.</target>
 
-<source>Drag && drop</source>
-<target>גרור והשלך</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>לא יכול לאתחל ניטור מחיצה:</target>
-
-<source>Error when monitoring directories.</source>
-<target>שגיאה בזמן ניטור מחיצות.</target>
-
-<source>Conversion error:</source>
-<target>שגיאה בהסבה:</target>
-
-<source>Error deleting file:</source>
-<target>שגיאה במחיקת קובץ:</target>
-
-<source>Error moving file:</source>
-<target>שגיאה בהעברת קובץ:</target>
-
-<source>Target file already existing!</source>
-<target>קובץ מטרה כבר קיים!</target>
-
-<source>Error moving directory:</source>
-<target>שגיאה בהעברת מחיצה:</target>
-
-<source>Target directory already existing!</source>
-<target>מחיצת מטרה כבר קיימת!</target>
-
-<source>Error deleting directory:</source>
-<target>שגיאה במחיקת מחיצה:</target>
-
-<source>Error changing modification time:</source>
-<target>שגיאה בשינוי זמן:</target>
-
-<source>Error loading library function:</source>
-<target>שגיאה בטעינת ספרית פונקציות:</target>
-
-<source>Error reading security context:</source>
-<target>שגיאה בכתיבת הקשר בטיחות:</target>
-
-<source>Error writing security context:</source>
-<target>שגיאה בכתיבת הקשר בטיחות:</target>
-
-<source>Error copying file permissions:</source>
-<target>שגיאה בהעתקת הרשאות קובץ:</target>
-
-<source>Error creating directory:</source>
-<target>שגיאה ביצירת מחיצה:</target>
-
-<source>Error copying symbolic link:</source>
-<target>שגיאה בהעתקת קישור :</target>
-
-<source>Error copying file:</source>
-<target>שגיאה בהעתקת קובץ:</target>
-
-<source>Error opening file:</source>
-<target>שגיאה בפתיחת קובץ:</target>
-
-<source>Error writing file:</source>
-<target>שגיאה בכתיבת קובץ:</target>
-
-<source>Error reading file:</source>
-<target>שגיאה בקריאת קובץ:</target>
-
-<source>Operation aborted!</source>
-<target>הפעולה בוטלה!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>נוצרת לולאה אינסופית בחצית מחיצות</target>
-
-<source>Error traversing directory:</source>
-<target>שגיאה בהצלבת מחיצות</target>
-
-<source>Error setting privilege:</source>
-<target>שגיאה בהשמת פריווילגיה</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>שגיאה בהעברה לסל המיחזור:</target>
-
-<source>Could not load a required DLL:</source>
-<target>:נדרש DLL לא יכל לטעון</target>
-
-<source>Error writing to synchronization database:</source>
-<target>שגיאה ברישום לבסיס נתוני סנכרון:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>שגיאה בגישה לשרות Volume Shadow Copy Service</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>לא נתמכת בגרסה זאת אנא התקן גרסה 64 WOW64 העתקת צל ב</target>
-
-<source>Could not determine volume name for file:</source>
-<target>לא יכול לקבוע שם כרך לקובץ:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>כנונן %x לא בנתיב של קובץ %y!</target>
-
-<source>%x TB</source>
-<target>%x טרה בייט</target>
-
-<source>%x PB</source>
-<target>%x פטה בייט</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 דקה</pluralform>
-<pluralform>%x דקות</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 שעה</pluralform>
-<pluralform>%x שעות</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 יום</pluralform>
-<pluralform>%x ימים</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>XML לא יכול לקרא ערכים מצמתי :</target>
-
 <source>Logging</source>
 <target>רישום ביומן</target>
 
@@ -476,9 +371,6 @@ The command line is executed each time:
 
 <source>Batch execution</source>
 <target>פעולת אצווה</target>
-
-<source>Log-messages:</source>
-<target>הודעת יומן:</target>
 
 <source>Stop</source>
 <target>עצור</target>
@@ -606,6 +498,24 @@ The command line is executed each time:
 <source>Total amount of data that will be transferred</source>
 <target>סך הכל נתונים להעברה</target>
 
+<source>Operation:</source>
+<target>פעולה:</target>
+
+<source>Items found:</source>
+<target>אלמנטים נמצאו:</target>
+
+<source>Items remaining:</source>
+<target>אלמנתים נותרו:</target>
+
+<source>Speed:</source>
+<target>מהירות:</target>
+
+<source>Time remaining:</source>
+<target>זמן נותר:</target>
+
+<source>Time elapsed:</source>
+<target>זמן עבר:</target>
+
 <source>Batch job</source>
 <target>עבודת אצווה</target>
 
@@ -654,32 +564,14 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>&בטל</target>
 
-<source>Operation:</source>
-<target>פעולה:</target>
-
-<source>Items found:</source>
-<target>אלמנטים נמצאו:</target>
-
-<source>Items remaining:</source>
-<target>אלמנתים נותרו:</target>
-
-<source>Speed:</source>
-<target>מהירות:</target>
-
-<source>Time remaining:</source>
-<target>זמן נותר:</target>
-
-<source>Time elapsed:</source>
-<target>זמן עבר:</target>
-
 <source>Select variant:</source>
 <target>בחר משתנה:</target>
 
 <source><Automatic></source>
 <target><אוטומטי></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>זהה והפץ שינויים בשני הצדדים בעזרת בסיס נתונים. מחיקות וקונפליקטים מזוהים באופן אוטומטי.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>זהה והפץ שינויים בשני הצדדים באמצעות שימוש בבסיס נתונים. מחיקות, שינויי שמות וסתירות מתגלים באופן אוטומטי.</target>
 
 <source>Mirror ->></source>
 <target><<- מראה</target>
@@ -901,27 +793,19 @@ Exclude: \stuff\temp\*
 <target>העתקת קובץ בעסקה</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>רשום לקובץ זמני (*.ffs_tmp) תחילה ושנה שם. פעולה זו מבטיחה עקביות המצב גם במקרה של שגיאה חמורה.</target>
 
 <source>Copy locked files</source>
 <target>העתק קבצים נעולים</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-העתק קבצים בשיתוף או נעולים באמצעות שרות Volume Shadow Copy Service (דורש הרשאות מנהל מערכת)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>העתק קבצים בשיתוף או נעולים באמצעות שרות Volume Shadow Copy Service (דורש הרשאות מנהל מערכת)</target>
 
 <source>Copy file access permissions</source>
 <target>העתק הרשאות גישה של הקובץ</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-העבר הרשאות קבצים ומחיצות (דורש הרשאות מנהל מערכת)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>העבר הרשאות קבצים ומחיצות (דורש הרשאות מנהל מערכת)</target>
 
 <source>Hidden dialogs:</source>
 <target>דיאלוגים מוסתרים:</target>
@@ -952,6 +836,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>&Find next</source>
 <target>&מצא הבא</target>
+
+<source>Operation aborted!</source>
+<target>הפעולה בוטלה!</target>
 
 <source>Main bar</source>
 <target>סרגל ראשי</target>
@@ -993,16 +880,16 @@ Transfer file and directory permissions (Requires Administrator rights)
 <target>עימוד אוטומטי</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>גודל סמל:</target>
 
 <source>Small</source>
-<target></target>
+<target>קטן</target>
 
 <source>Medium</source>
-<target></target>
+<target>בינוני</target>
 
 <source>Large</source>
-<target></target>
+<target>גדול</target>
 
 <source>Include all rows</source>
 <target>כלול את כל השורות</target>
@@ -1130,6 +1017,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>File list exported!</source>
 <target>רשימת קבצים יוצאה!</target>
 
+<source>Error writing file:</source>
+<target>שגיאה בכתיבת קובץ:</target>
+
 <source>Batch file created successfully!</source>
 <target>קובץ אצווה נוצר בהצלחה!</target>
 
@@ -1229,9 +1119,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Filter: Single pair</source>
 <target>זוג אחד :מסונן</target>
 
-<source>Ignore</source>
-<target>התעלם</target>
-
 <source>Direct</source>
 <target>כוון</target>
 
@@ -1295,6 +1182,105 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Move files into a time-stamped subdirectory</source>
 <target>העבר קבצים לתוך מחיצות עם שם המכיל טביעת זמן ותאריך</target>
 
+<source>%x TB</source>
+<target>%x טרה בייט</target>
+
+<source>%x PB</source>
+<target>%x פטה בייט</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 דקה</pluralform>
+<pluralform>%x דקות</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 שעה</pluralform>
+<pluralform>%x שעות</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 יום</pluralform>
+<pluralform>%x ימים</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>לא יכול לאתחל ניטור מחיצה:</target>
+
+<source>Error when monitoring directories.</source>
+<target>שגיאה בזמן ניטור מחיצות.</target>
+
+<source>Conversion error:</source>
+<target>שגיאה בהסבה:</target>
+
+<source>Error deleting file:</source>
+<target>שגיאה במחיקת קובץ:</target>
+
+<source>Error moving file:</source>
+<target>שגיאה בהעברת קובץ:</target>
+
+<source>Target file already existing!</source>
+<target>קובץ מטרה כבר קיים!</target>
+
+<source>Error moving directory:</source>
+<target>שגיאה בהעברת מחיצה:</target>
+
+<source>Target directory already existing!</source>
+<target>מחיצת מטרה כבר קיימת!</target>
+
+<source>Error deleting directory:</source>
+<target>שגיאה במחיקת מחיצה:</target>
+
+<source>Error changing modification time:</source>
+<target>שגיאה בשינוי זמן:</target>
+
+<source>Error loading library function:</source>
+<target>שגיאה בטעינת ספרית פונקציות:</target>
+
+<source>Error reading security context:</source>
+<target>שגיאה בכתיבת הקשר בטיחות:</target>
+
+<source>Error writing security context:</source>
+<target>שגיאה בכתיבת הקשר בטיחות:</target>
+
+<source>Error copying file permissions:</source>
+<target>שגיאה בהעתקת הרשאות קובץ:</target>
+
+<source>Error creating directory:</source>
+<target>שגיאה ביצירת מחיצה:</target>
+
+<source>Error copying symbolic link:</source>
+<target>שגיאה בהעתקת קישור :</target>
+
+<source>Error copying file:</source>
+<target>שגיאה בהעתקת קובץ:</target>
+
+<source>Error opening file:</source>
+<target>שגיאה בפתיחת קובץ:</target>
+
+<source>Error traversing directory:</source>
+<target>שגיאה בהצלבת מחיצות</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>נוצרת לולאה אינסופית בחצית מחיצות</target>
+
+<source>Error setting privilege:</source>
+<target>שגיאה בהשמת פריווילגיה</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>שני הצדדים שונו מאז הסנכרון האחרון!</target>
 
@@ -1325,9 +1311,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>מחיצות תלויות! זהירות בהגדרת כללי סנכרון:</target>
 
-<source>Comparing content of files %x</source>
-<target>השווה תכולה של קבצים %x</target>
-
 <source>Memory allocation failed!</source>
 <target>הקצאת זכרון נכשלה!</target>
 
@@ -1343,14 +1326,14 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>קשור סימבולי %x בעל תאריך זהה אך מטרה שונה!</target>
 
+<source>Comparing content of files %x</source>
+<target>השווה תכולה של קבצים %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>השוואת קבצים באמצעות תכולה נכשלה.</target>
 
 <source>Generating file list...</source>
 <target>מייצר רשימת קבצים...</target>
-
-<source>Multiple...</source>
-<target>הכפל...</target>
 
 <source>Both sides are equal</source>
 <target>שני הצדדים שווים</target>
@@ -1370,6 +1353,12 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Delete right file/folder</source>
 <target>מחק קובץ\מחיצה בצד ימין</target>
 
+<source>Move file on left</source>
+<target>העבר קובץ בצד שמאל</target>
+
+<source>Move file on right</source>
+<target>העבר קובץ בצד ימין</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>העתק ודרוס קובץ\מחיצה מימין לשמאל</target>
 
@@ -1384,6 +1373,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>Copy file attributes only to right</source>
 <target>העתק תכונות קובץ בלבד משמאל לימין</target>
+
+<source>Multiple...</source>
+<target>הכפל...</target>
 
 <source>Deleting file %x</source>
 <target>מוחק קובץ %x</target>

@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <memory>
+#include <functional>
 #include "file_error.h"
 
 namespace zen
@@ -35,7 +36,7 @@ public:
     ~DirWatcher();
 
     //extract accumulated changes since last call
-    std::vector<Zstring> getChanges(); //throw FileError
+    std::vector<Zstring> getChanges(const std::function<void()>& processGuiMessages); //throw FileError
 
 private:
     DirWatcher(const DirWatcher&);

@@ -17,7 +17,7 @@ void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp);
 struct DeterminationProblem //callback
 {
     virtual ~DeterminationProblem() {}
-    virtual void reportWarning(const wxString& text) = 0;
+    virtual void reportWarning(const std::wstring& text) = 0;
 };
 std::vector<DirectionConfig> extractDirectionCfg(const MainConfiguration& mainCfg);
 
@@ -56,7 +56,7 @@ public:
         IGNORE_ERROR = 10,
         RETRY
     };
-    virtual Response reportError(const wxString& errorMessage) = 0;
+    virtual Response reportError(const std::wstring& errorMessage) = 0;
 
     //virtual void totalFilesToDelete(int objectsTotal) = 0; //informs about the total number of files to be deleted
     virtual void notifyDeletion(const Zstring& currentObject) = 0; //called for each file/folder that has been deleted

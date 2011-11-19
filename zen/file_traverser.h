@@ -10,6 +10,8 @@
 #include <memory>
 #include "zstring.h"
 #include "int64.h"
+#include "file_id_def.h"
+
 
 //advanced file traverser returning metadata and hierarchical information on files and directories
 
@@ -24,6 +26,7 @@ public:
     {
         UInt64 fileSize;        //unit: bytes!
         Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
+        FileId id;              //optional: may be initial!
     };
 
     struct SymlinkInfo
@@ -67,6 +70,10 @@ void traverseFolder(const Zstring& directory, //throw();
 //followSymlinks:
 //"true":  Symlinks dereferenced and reported via onFile() and onDir() => onSymlink not used!
 //"false": Symlinks directly reported via onSymlink(), directory symlinks are not followed
+
+
+//determine whether FileId can be expected to be retrieved
+bool supportForFileId(); //Linux: always; Windows: if FindFilePlus_Win32.dll was loaded correctly
 }
 
 #endif // FILETRAVERSER_H_INCLUDED

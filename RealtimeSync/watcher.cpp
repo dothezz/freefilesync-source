@@ -8,6 +8,7 @@
 #include <zen/file_handling.h>
 #include <zen/stl_tools.h>
 #include <set>
+#include <ctime>
 #include <wx/timer.h>
 #include "../lib/resolve_path.h"
 #include <zen/dir_watcher.h>
@@ -22,12 +23,14 @@ using namespace zen;
 
 bool rts::updateUiIsAllowed()
 {
-    static wxLongLong lastExec;
-    const wxLongLong  newExec = wxGetLocalTimeMillis();
+    const std::clock_t CLOCK_UPDATE_INTERVAL = UI_UPDATE_INTERVAL * CLOCKS_PER_SEC / 1000;
 
-    if (newExec - lastExec >= rts::UI_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
+    static std::clock_t lastExec = 0;
+    const std::clock_t now = std::clock(); //this is quite fast: 2 * 10^-5
+
+    if (now - lastExec >= CLOCK_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
     {
-        lastExec = newExec;
+        lastExec = now;
         return true;
     }
     return false;
@@ -105,7 +108,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
 
             try
             {
-                std::vector<Zstring> changedFiles = watcher.getChanges(); //throw FileError, ErrorNotExisting
+                std::vector<Zstring> changedFiles = watcher.getChanges([&] { statusHandler->requestUiRefresh(); }); //throw FileError, ErrorNotExisting
 
                 //remove to be ignored changes
                 vector_remove_if(changedFiles, [](const Zstring& name)

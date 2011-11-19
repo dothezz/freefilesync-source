@@ -7,11 +7,11 @@
 #ifndef COMPARISON_H_INCLUDED
 #define COMPARISON_H_INCLUDED
 
+#include <zen/process_status.h>
 #include "file_hierarchy.h"
 #include "lib/process_xml.h"
 #include "lib/status_handler.h"
 #include "structures.h"
-#include <zen/process_status.h>
 #include "lib/norm_filter.h"
 #include "lib/parallel_scan.h"
 

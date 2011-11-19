@@ -557,23 +557,24 @@ private:
                         case SO_CREATE_NEW_LEFT:
                         case SO_OVERWRITE_LEFT:
                         case SO_DELETE_LEFT:
+                        case SO_MOVE_LEFT_SOURCE:
+                        case SO_MOVE_LEFT_TARGET:
+                        case SO_COPY_METADATA_TO_LEFT:
                             result.first  = *wxBLACK;
                             result.second = COLOR_SYNC_BLUE;
                             break;
-                        case SO_COPY_METADATA_TO_LEFT:
-                            result.first  = *wxBLACK;
-                            result.second = COLOR_SYNC_BLUE_LIGHT;
+                            //                            result.second = COLOR_SYNC_BLUE_LIGHT;
                             break;
                         case SO_CREATE_NEW_RIGHT:
                         case SO_OVERWRITE_RIGHT:
                         case SO_DELETE_RIGHT:
+                        case SO_MOVE_RIGHT_SOURCE:
+                        case SO_MOVE_RIGHT_TARGET:
+                        case SO_COPY_METADATA_TO_RIGHT:
                             result.first  = *wxBLACK;
                             result.second = COLOR_SYNC_GREEN;
                             break;
-                        case SO_COPY_METADATA_TO_RIGHT:
-                            result.first  = *wxBLACK;
-                            result.second = COLOR_SYNC_GREEN_LIGHT;
-                            break;
+                            //                            result.second = COLOR_SYNC_GREEN_LIGHT;
                         case SO_UNRESOLVED_CONFLICT:
                             result.first  = *wxBLACK;
                             result.second = COLOR_YELLOW;
@@ -2038,70 +2039,77 @@ void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
 
     if (getGridDataTableMiddle()->syncPreviewIsActive()) //synchronization preview
     {
-        const SyncOperation syncOp = fsObj->getSyncOperation();
-        switch (syncOp)
+        const wchar_t* imageName = [&]() -> const wchar_t*
         {
-            case SO_CREATE_NEW_LEFT:
-                toolTip.show(getDescription(syncOp), pos, &GlobalResources::getImage(wxT("createLeft")));
-                break;
-            case SO_CREATE_NEW_RIGHT:
-                toolTip.show(getDescription(syncOp), pos, &GlobalResources::getImage(wxT("createRight")));
-                break;
-            case SO_DELETE_LEFT:
-                toolTip.show(getDescription(syncOp), pos, &GlobalResources::getImage(wxT("deleteLeft")));
-                break;
-            case SO_DELETE_RIGHT:
-                toolTip.show(getDescription(syncOp), pos, &GlobalResources::getImage(wxT("deleteRight")));
-                break;
-            case SO_OVERWRITE_LEFT:
-            case SO_COPY_METADATA_TO_LEFT:
-                toolTip.show(getDescription(syncOp), pos, &GlobalResources::getImage(wxT("updateLeft")));
-                break;
-            case SO_OVERWRITE_RIGHT:
-            case SO_COPY_METADATA_TO_RIGHT:
-                toolTip.show(getDescription(syncOp), pos, &GlobalResources::getImage(wxT("updateRight")));
-                break;
-            case SO_DO_NOTHING:
-                toolTip.show(getDescription(syncOp), pos, &GlobalResources::getImage(wxT("none")));
-                break;
-            case SO_EQUAL:
-                toolTip.show(getDescription(syncOp), pos, &GlobalResources::getImage(wxT("equal")));
-                break;
-            case SO_UNRESOLVED_CONFLICT:
-                toolTip.show(fsObj->getSyncOpConflict(), pos, &GlobalResources::getImage(wxT("conflict")));
-                break;
-        };
+            const SyncOperation syncOp = fsObj->getSyncOperation();
+            switch (syncOp)
+            {
+                case SO_CREATE_NEW_LEFT:
+                    return L"createLeft";
+                case SO_CREATE_NEW_RIGHT:
+                    return L"createRight";
+                case SO_DELETE_LEFT:
+                    return L"deleteLeft";
+                case SO_DELETE_RIGHT:
+                    return L"deleteRight";
+                case SO_MOVE_LEFT_SOURCE:
+                    return L"moveLeftSource";
+                case SO_MOVE_LEFT_TARGET:
+                    return L"moveLeftTarget";
+                case SO_MOVE_RIGHT_SOURCE:
+                    return L"moveRightSource";
+                case SO_MOVE_RIGHT_TARGET:
+                    return L"moveRightTarget";
+                case SO_OVERWRITE_LEFT:
+                    return L"updateLeft";
+                case SO_COPY_METADATA_TO_LEFT:
+                    return L"moveLeft";
+                case SO_OVERWRITE_RIGHT:
+                    return L"updateRight";
+                case SO_COPY_METADATA_TO_RIGHT:
+                    return L"moveRight";
+                case SO_DO_NOTHING:
+                    return L"none";
+                case SO_EQUAL:
+                    return L"equal";
+                case SO_UNRESOLVED_CONFLICT:
+                    return L"conflict";
+            };
+            assert(false);
+            return L"";
+        }();
+
+        toolTip.show(getSyncOpDescription(*fsObj), pos, &GlobalResources::getImage(imageName));
     }
     else
     {
-        const CompareFilesResult cmpRes = fsObj->getCategory();
-        switch (cmpRes)
+        const wchar_t* imageName = [&]() -> const wchar_t*
         {
-            case FILE_LEFT_SIDE_ONLY:
-                toolTip.show(getDescription(cmpRes), pos, &GlobalResources::getImage(wxT("leftOnly")));
-                break;
-            case FILE_RIGHT_SIDE_ONLY:
-                toolTip.show(getDescription(cmpRes), pos, &GlobalResources::getImage(wxT("rightOnly")));
-                break;
-            case FILE_LEFT_NEWER:
-                toolTip.show(getDescription(cmpRes), pos, &GlobalResources::getImage(wxT("leftNewer")));
-                break;
-            case FILE_RIGHT_NEWER:
-                toolTip.show(getDescription(cmpRes), pos, &GlobalResources::getImage(wxT("rightNewer")));
-                break;
-            case FILE_DIFFERENT:
-                toolTip.show(getDescription(cmpRes), pos, &GlobalResources::getImage(wxT("different")));
-                break;
-            case FILE_EQUAL:
-                toolTip.show(getDescription(cmpRes), pos, &GlobalResources::getImage(wxT("equal")));
-                break;
-            case FILE_DIFFERENT_METADATA:
-                toolTip.show(getDescription(cmpRes), pos, &GlobalResources::getImage(wxT("conflict")));
-                break;
-            case FILE_CONFLICT:
-                toolTip.show(fsObj->getCatConflict(), pos, &GlobalResources::getImage(wxT("conflict")));
-                break;
-        }
+            const CompareFilesResult cmpRes = fsObj->getCategory();
+            switch (cmpRes)
+            {
+                case FILE_LEFT_SIDE_ONLY:
+                    return L"leftOnly";
+                case FILE_RIGHT_SIDE_ONLY:
+                    return L"rightOnly";
+                case FILE_LEFT_NEWER:
+                    return L"leftNewer";
+                case FILE_RIGHT_NEWER:
+                    return L"rightNewer";
+                case FILE_DIFFERENT:
+                    return L"different";
+                case FILE_EQUAL:
+                    return L"equal";
+                case FILE_DIFFERENT_METADATA:
+                    return L"conflict";
+                case FILE_CONFLICT:
+                    return L"conflict";
+            }
+            assert(false);
+            return L"";
+        }();
+
+        toolTip.show(getCategoryDescription(*fsObj), pos, &GlobalResources::getImage(imageName));
     }
 }
 
@@ -2284,6 +2292,7 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                 //HIGHLIGHTNING (sync direction):
                 if (rowIsHighlighted &&
                     m_gridMiddle.highlightedPos != CustomGridMiddle::BLOCKPOS_CHECK_BOX) //don't allow changing direction for "=="-files
+
                     switch (m_gridMiddle.highlightedPos)
                     {
                         case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
@@ -2374,25 +2383,35 @@ const wxBitmap& zen::getSyncOpImage(SyncOperation syncOp)
     switch (syncOp) //evaluate comparison result and sync direction
     {
         case SO_CREATE_NEW_LEFT:
-            return GlobalResources::getImage(wxT("createLeftSmall"));
+            return GlobalResources::getImage(L"createLeftSmall");
         case SO_CREATE_NEW_RIGHT:
-            return GlobalResources::getImage(wxT("createRightSmall"));
+            return GlobalResources::getImage(L"createRightSmall");
         case SO_DELETE_LEFT:
-            return GlobalResources::getImage(wxT("deleteLeftSmall"));
+            return GlobalResources::getImage(L"deleteLeftSmall");
         case SO_DELETE_RIGHT:
-            return GlobalResources::getImage(wxT("deleteRightSmall"));
+            return GlobalResources::getImage(L"deleteRightSmall");
+        case SO_MOVE_LEFT_SOURCE:
+            return GlobalResources::getImage(L"moveLeftSourceSmall");
+        case SO_MOVE_LEFT_TARGET:
+            return GlobalResources::getImage(L"moveLeftTargetSmall");
+        case SO_MOVE_RIGHT_SOURCE:
+            return GlobalResources::getImage(L"moveRightSourceSmall");
+        case SO_MOVE_RIGHT_TARGET:
+            return GlobalResources::getImage(L"moveRightTargetSmall");
         case SO_OVERWRITE_RIGHT:
+            return GlobalResources::getImage(L"updateRightSmall");
         case SO_COPY_METADATA_TO_RIGHT:
-            return GlobalResources::getImage(wxT("updateRightSmall"));
+            return GlobalResources::getImage(L"moveRightSmall");
         case SO_OVERWRITE_LEFT:
+            return GlobalResources::getImage(L"updateLeftSmall");
         case SO_COPY_METADATA_TO_LEFT:
-            return GlobalResources::getImage(wxT("updateLeftSmall"));
+            return GlobalResources::getImage(L"moveLeftSmall");
         case SO_DO_NOTHING:
-            return GlobalResources::getImage(wxT("noneSmall"));
+            return GlobalResources::getImage(L"noneSmall");
         case SO_EQUAL:
-            return GlobalResources::getImage(wxT("equalSmall"));
+            return GlobalResources::getImage(L"equalSmall");
         case SO_UNRESOLVED_CONFLICT:
-            return GlobalResources::getImage(wxT("conflictSmall"));
+            return GlobalResources::getImage(L"conflictSmall");
     }
 
     return wxNullBitmap; //dummy

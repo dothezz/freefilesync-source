@@ -942,6 +942,167 @@ FolderPairGenerated::~FolderPairGenerated()
 {
 }
 
+CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+    wxBoxSizer* bSizer40;
+    bSizer40 = new wxBoxSizer( wxVERTICAL );
+
+
+    bSizer40->Add( 0, 0, 1, wxEXPAND, 5 );
+
+    wxBoxSizer* bSizer48;
+    bSizer48 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_staticText30 = new wxStaticText( this, wxID_ANY, _("Operation:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText30->Wrap( -1 );
+    m_staticText30->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
+
+    bSizer48->Add( m_staticText30, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_textCtrlStatus = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+    m_textCtrlStatus->SetBackgroundColour( wxColour( 208, 208, 208 ) );
+
+    bSizer48->Add( m_textCtrlStatus, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+
+    bSizer40->Add( bSizer48, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+
+    m_gauge2 = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxSize( -1,14 ), wxGA_HORIZONTAL|wxGA_SMOOTH );
+    bSizer40->Add( m_gauge2, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
+
+    bSizer42 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxBoxSizer* bSizer157;
+    bSizer157 = new wxBoxSizer( wxVERTICAL );
+
+    bSizerFilesFound = new wxBoxSizer( wxHORIZONTAL );
+
+    m_staticText321 = new wxStaticText( this, wxID_ANY, _("Items found:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText321->Wrap( -1 );
+    m_staticText321->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+
+    bSizerFilesFound->Add( m_staticText321, 0, wxALIGN_BOTTOM, 5 );
+
+    m_staticTextScanned = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextScanned->Wrap( -1 );
+    m_staticTextScanned->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
+
+    bSizerFilesFound->Add( m_staticTextScanned, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
+
+    bSizer157->Add( bSizerFilesFound, 0, 0, 5 );
+
+    bSizerFilesRemaining = new wxBoxSizer( wxHORIZONTAL );
+
+    m_staticText46 = new wxStaticText( this, wxID_ANY, _("Items remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText46->Wrap( -1 );
+    m_staticText46->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+
+    bSizerFilesRemaining->Add( m_staticText46, 0, wxALIGN_BOTTOM, 5 );
+
+    wxBoxSizer* bSizer154;
+    bSizer154 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_staticTextFilesRemaining = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextFilesRemaining->Wrap( -1 );
+    m_staticTextFilesRemaining->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
+
+    bSizer154->Add( m_staticTextFilesRemaining, 0, wxALIGN_BOTTOM, 5 );
+
+    m_staticText117 = new wxStaticText( this, wxID_ANY, _("("), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText117->Wrap( -1 );
+    m_staticText117->SetFont( wxFont( 9, 74, 90, 90, false, wxT("Arial") ) );
+
+    bSizer154->Add( m_staticText117, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
+
+    m_staticTextDataRemaining = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextDataRemaining->Wrap( -1 );
+    m_staticTextDataRemaining->SetFont( wxFont( 9, 74, 90, 90, false, wxT("Arial") ) );
+
+    bSizer154->Add( m_staticTextDataRemaining, 0, wxALIGN_BOTTOM, 5 );
+
+    m_staticText118 = new wxStaticText( this, wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText118->Wrap( -1 );
+    m_staticText118->SetFont( wxFont( 9, 74, 90, 90, false, wxT("Arial") ) );
+
+    bSizer154->Add( m_staticText118, 0, wxALIGN_BOTTOM, 5 );
+
+    bSizerFilesRemaining->Add( bSizer154, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
+
+    bSizer157->Add( bSizerFilesRemaining, 0, 0, 5 );
+
+    bSizer42->Add( bSizer157, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
+
+    sSizerSpeed = new wxBoxSizer( wxHORIZONTAL );
+
+    m_staticText104 = new wxStaticText( this, wxID_ANY, _("Speed:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText104->Wrap( -1 );
+    m_staticText104->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+
+    sSizerSpeed->Add( m_staticText104, 0, wxALIGN_BOTTOM, 5 );
+
+    m_staticTextSpeed = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextSpeed->Wrap( -1 );
+    m_staticTextSpeed->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
+
+    sSizerSpeed->Add( m_staticTextSpeed, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
+
+    bSizer42->Add( sSizerSpeed, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    bSizer42->Add( 10, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    sSizerTimeRemaining = new wxBoxSizer( wxHORIZONTAL );
+
+    m_staticTextTimeRemFixed = new wxStaticText( this, wxID_ANY, _("Time remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextTimeRemFixed->Wrap( -1 );
+    m_staticTextTimeRemFixed->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+
+    sSizerTimeRemaining->Add( m_staticTextTimeRemFixed, 0, wxALIGN_BOTTOM, 5 );
+
+    m_staticTextRemTime = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextRemTime->Wrap( -1 );
+    m_staticTextRemTime->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
+
+    sSizerTimeRemaining->Add( m_staticTextRemTime, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
+
+    bSizer42->Add( sSizerTimeRemaining, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+
+    bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
+
+    sSizerTimeElapsed = new wxBoxSizer( wxHORIZONTAL );
+
+    wxStaticText* m_staticText37;
+    m_staticText37 = new wxStaticText( this, wxID_ANY, _("Time elapsed:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText37->Wrap( -1 );
+    m_staticText37->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+
+    sSizerTimeElapsed->Add( m_staticText37, 0, wxALIGN_BOTTOM, 5 );
+
+    m_staticTextTimeElapsed = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextTimeElapsed->Wrap( -1 );
+    m_staticTextTimeElapsed->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
+
+    sSizerTimeElapsed->Add( m_staticTextTimeElapsed, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
+
+    bSizer42->Add( sSizerTimeElapsed, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    bSizer40->Add( bSizer42, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
+
+
+    bSizer40->Add( 0, 0, 1, wxEXPAND, 5 );
+
+    this->SetSizer( bSizer40 );
+    this->Layout();
+    bSizer40->Fit( this );
+}
+
+CompareStatusGenerated::~CompareStatusGenerated()
+{
+}
+
 BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
     this->SetSizeHints( wxSize( 560,320 ), wxDefaultSize );
@@ -1464,167 +1625,6 @@ BatchFolderPairGenerated::~BatchFolderPairGenerated()
 {
 }
 
-CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
-{
-    wxBoxSizer* bSizer40;
-    bSizer40 = new wxBoxSizer( wxVERTICAL );
-
-
-    bSizer40->Add( 0, 0, 1, wxEXPAND, 5 );
-
-    wxBoxSizer* bSizer48;
-    bSizer48 = new wxBoxSizer( wxHORIZONTAL );
-
-    m_staticText30 = new wxStaticText( this, wxID_ANY, _("Operation:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText30->Wrap( -1 );
-    m_staticText30->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
-
-    bSizer48->Add( m_staticText30, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5 );
-
-    m_textCtrlStatus = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-    m_textCtrlStatus->SetBackgroundColour( wxColour( 208, 208, 208 ) );
-
-    bSizer48->Add( m_textCtrlStatus, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-
-    bSizer40->Add( bSizer48, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-    m_gauge2 = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxSize( -1,14 ), wxGA_HORIZONTAL|wxGA_SMOOTH );
-    bSizer40->Add( m_gauge2, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
-
-    bSizer42 = new wxBoxSizer( wxHORIZONTAL );
-
-    wxBoxSizer* bSizer157;
-    bSizer157 = new wxBoxSizer( wxVERTICAL );
-
-    bSizerFilesFound = new wxBoxSizer( wxHORIZONTAL );
-
-    m_staticText321 = new wxStaticText( this, wxID_ANY, _("Items found:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText321->Wrap( -1 );
-    m_staticText321->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizerFilesFound->Add( m_staticText321, 0, wxALIGN_BOTTOM, 5 );
-
-    m_staticTextScanned = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextScanned->Wrap( -1 );
-    m_staticTextScanned->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
-
-    bSizerFilesFound->Add( m_staticTextScanned, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
-
-    bSizer157->Add( bSizerFilesFound, 0, 0, 5 );
-
-    bSizerFilesRemaining = new wxBoxSizer( wxHORIZONTAL );
-
-    m_staticText46 = new wxStaticText( this, wxID_ANY, _("Items remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText46->Wrap( -1 );
-    m_staticText46->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizerFilesRemaining->Add( m_staticText46, 0, wxALIGN_BOTTOM, 5 );
-
-    wxBoxSizer* bSizer154;
-    bSizer154 = new wxBoxSizer( wxHORIZONTAL );
-
-    m_staticTextFilesRemaining = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextFilesRemaining->Wrap( -1 );
-    m_staticTextFilesRemaining->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
-
-    bSizer154->Add( m_staticTextFilesRemaining, 0, wxALIGN_BOTTOM, 5 );
-
-    m_staticText117 = new wxStaticText( this, wxID_ANY, _("("), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText117->Wrap( -1 );
-    m_staticText117->SetFont( wxFont( 9, 74, 90, 90, false, wxT("Arial") ) );
-
-    bSizer154->Add( m_staticText117, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
-
-    m_staticTextDataRemaining = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextDataRemaining->Wrap( -1 );
-    m_staticTextDataRemaining->SetFont( wxFont( 9, 74, 90, 90, false, wxT("Arial") ) );
-
-    bSizer154->Add( m_staticTextDataRemaining, 0, wxALIGN_BOTTOM, 5 );
-
-    m_staticText118 = new wxStaticText( this, wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText118->Wrap( -1 );
-    m_staticText118->SetFont( wxFont( 9, 74, 90, 90, false, wxT("Arial") ) );
-
-    bSizer154->Add( m_staticText118, 0, wxALIGN_BOTTOM, 5 );
-
-    bSizerFilesRemaining->Add( bSizer154, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
-
-    bSizer157->Add( bSizerFilesRemaining, 0, 0, 5 );
-
-    bSizer42->Add( bSizer157, 0, wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
-
-    sSizerSpeed = new wxBoxSizer( wxHORIZONTAL );
-
-    m_staticText104 = new wxStaticText( this, wxID_ANY, _("Speed:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText104->Wrap( -1 );
-    m_staticText104->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    sSizerSpeed->Add( m_staticText104, 0, wxALIGN_BOTTOM, 5 );
-
-    m_staticTextSpeed = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextSpeed->Wrap( -1 );
-    m_staticTextSpeed->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
-
-    sSizerSpeed->Add( m_staticTextSpeed, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
-
-    bSizer42->Add( sSizerSpeed, 0, wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    bSizer42->Add( 10, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
-
-    sSizerTimeRemaining = new wxBoxSizer( wxHORIZONTAL );
-
-    m_staticTextTimeRemFixed = new wxStaticText( this, wxID_ANY, _("Time remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextTimeRemFixed->Wrap( -1 );
-    m_staticTextTimeRemFixed->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    sSizerTimeRemaining->Add( m_staticTextTimeRemFixed, 0, wxALIGN_BOTTOM, 5 );
-
-    m_staticTextRemTime = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextRemTime->Wrap( -1 );
-    m_staticTextRemTime->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
-
-    sSizerTimeRemaining->Add( m_staticTextRemTime, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
-
-    bSizer42->Add( sSizerTimeRemaining, 0, wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
-
-    sSizerTimeElapsed = new wxBoxSizer( wxHORIZONTAL );
-
-    wxStaticText* m_staticText37;
-    m_staticText37 = new wxStaticText( this, wxID_ANY, _("Time elapsed:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText37->Wrap( -1 );
-    m_staticText37->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    sSizerTimeElapsed->Add( m_staticText37, 0, wxALIGN_BOTTOM, 5 );
-
-    m_staticTextTimeElapsed = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextTimeElapsed->Wrap( -1 );
-    m_staticTextTimeElapsed->SetFont( wxFont( 9, 74, 90, 92, false, wxT("Arial") ) );
-
-    sSizerTimeElapsed->Add( m_staticTextTimeElapsed, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
-
-    bSizer42->Add( sSizerTimeElapsed, 0, wxALIGN_CENTER_VERTICAL, 5 );
-
-    bSizer40->Add( bSizer42, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
-
-
-    bSizer40->Add( 0, 0, 1, wxEXPAND, 5 );
-
-    this->SetSizer( bSizer40 );
-    this->Layout();
-    bSizer40->Fit( this );
-}
-
-CompareStatusGenerated::~CompareStatusGenerated()
-{
-}
-
 SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
     this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -1663,7 +1663,7 @@ SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const
 
     fgSizer1->Add( m_buttonAutomatic, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 
-    m_staticText81 = new wxStaticText( this, wxID_ANY, _("Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically."), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText81 = new wxStaticText( this, wxID_ANY, _("Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically."), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText81->Wrap( 400 );
     fgSizer1->Add( m_staticText81, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 
@@ -2282,12 +2282,12 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
     bSizerFinalStat = new wxBoxSizer( wxVERTICAL );
 
     m_listbookResult = new wxListbook( m_panelBackground, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLB_TOP );
-#ifndef __WXGTK__ // Small icon style not supported in GTK
-    wxListView* m_listbookResultListView = m_listbookResult->GetListView();
-    long m_listbookResultFlags = m_listbookResultListView->GetWindowStyleFlag();
-    m_listbookResultFlags = ( m_listbookResultFlags & ~wxLC_ICON ) | wxLC_SMALL_ICON;
-    m_listbookResultListView->SetWindowStyleFlag( m_listbookResultFlags );
-#endif
+    wxSize m_listbookResultImageSize = wxSize( 180,1 );
+    int m_listbookResultIndex = 0;
+    wxImageList* m_listbookResultImages = new wxImageList( m_listbookResultImageSize.GetWidth(), m_listbookResultImageSize.GetHeight() );
+    m_listbookResult->AssignImageList( m_listbookResultImages );
+    wxBitmap m_listbookResultBitmap;
+    wxImage m_listbookResultImage;
 
     bSizerFinalStat->Add( m_listbookResult, 1, wxEXPAND, 5 );
 
@@ -2349,14 +2349,6 @@ SyncStatusDlgGenerated::~SyncStatusDlgGenerated()
     m_buttonPause->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncStatusDlgGenerated::OnPause ), NULL, this );
     m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncStatusDlgGenerated::OnAbort ), NULL, this );
 
-}
-
-MyPanel5::MyPanel5( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
-{
-}
-
-MyPanel5::~MyPanel5()
-{
 }
 
 LogControlGenerated::LogControlGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -3420,30 +3412,29 @@ GlobalSettingsDlgGenerated::GlobalSettingsDlgGenerated( wxWindow* parent, wxWind
     m_checkBoxTransCopy = new wxCheckBox( this, wxID_ANY, _("Transactional file copy"), wxDefaultPosition, wxDefaultSize, 0 );
     sbSizer23->Add( m_checkBoxTransCopy, 0, wxEXPAND|wxALL, 5 );
 
-    m_textCtrl22 = new wxTextCtrl( this, wxID_ANY, _("Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_NO_VSCROLL|wxTE_READONLY|wxNO_BORDER );
-    m_textCtrl22->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
-    m_textCtrl22->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-    m_textCtrl22->SetMinSize( wxSize( 400,-1 ) );
+    m_staticText82 = new wxStaticText( this, wxID_ANY, _("Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error."), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText82->Wrap( 400 );
+    m_staticText82->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
 
-    sbSizer23->Add( m_textCtrl22, 0, wxLEFT|wxEXPAND, 20 );
+    sbSizer23->Add( m_staticText82, 0, wxLEFT, 20 );
 
     m_checkBoxCopyLocked = new wxCheckBox( this, wxID_ANY, _("Copy locked files"), wxDefaultPosition, wxDefaultSize, 0 );
     sbSizer23->Add( m_checkBoxCopyLocked, 0, wxALL|wxEXPAND, 5 );
 
-    m_textCtrlCopyLocked = new wxTextCtrl( this, wxID_ANY, _("Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_NO_VSCROLL|wxTE_READONLY|wxNO_BORDER );
-    m_textCtrlCopyLocked->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
-    m_textCtrlCopyLocked->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+    m_staticTextCopyLocked = new wxStaticText( this, wxID_ANY, _("Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextCopyLocked->Wrap( 400 );
+    m_staticTextCopyLocked->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
 
-    sbSizer23->Add( m_textCtrlCopyLocked, 0, wxLEFT|wxEXPAND, 20 );
+    sbSizer23->Add( m_staticTextCopyLocked, 0, wxLEFT|wxEXPAND, 20 );
 
     m_checkBoxCopyPermissions = new wxCheckBox( this, wxID_ANY, _("Copy file access permissions"), wxDefaultPosition, wxDefaultSize, 0 );
     sbSizer23->Add( m_checkBoxCopyPermissions, 0, wxALL|wxEXPAND, 5 );
 
-    m_textCtrl2211 = new wxTextCtrl( this, wxID_ANY, _("Transfer file and directory permissions (Requires Administrator rights)"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_NO_VSCROLL|wxTE_READONLY|wxNO_BORDER );
-    m_textCtrl2211->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
-    m_textCtrl2211->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+    m_staticText8211 = new wxStaticText( this, wxID_ANY, _("Transfer file and directory permissions (Requires Administrator rights)"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText8211->Wrap( 400 );
+    m_staticText8211->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
 
-    sbSizer23->Add( m_textCtrl2211, 0, wxLEFT|wxEXPAND, 20 );
+    sbSizer23->Add( m_staticText8211, 0, wxLEFT|wxEXPAND, 20 );
 
     bSizer95->Add( sbSizer23, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT|wxEXPAND, 5 );
 

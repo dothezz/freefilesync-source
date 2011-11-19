@@ -141,7 +141,7 @@ Windows 7:                                        Windows XP:
 1 Thread:          41s      |        13s             1 Thread:          45s      |        13s
 2 Threads:         42s      |        11s             2 Threads:         38s      |         8s
 
-=> Traversing does not take any advantage of file locality so that even multiple threads operating on the same disk impose no performance overhead!
+=> Traversing does not take any advantage of file locality so that even multiple threads operating on the same disk impose no performance overhead! (even faster on XP)
 */
 
 
@@ -196,7 +196,7 @@ public:
         errorMsg.clear();
         errorResponse.reset();
 
-        //dummy.unlock();
+        dummy.unlock(); //optimization for condition_variable::notify_one()
         conditionCanReportError.notify_one();
 
         return rv;
@@ -204,13 +204,13 @@ public:
 
     void processErrors(FillBufferCallback& callback) //context of main thread, call repreatedly
     {
-        boost::lock_guard<boost::mutex> dummy(lockErrorMsg);
+        boost::unique_lock<boost::mutex> dummy(lockErrorMsg);
         if (!errorMsg.empty() && !errorResponse.get())
         {
             FillBufferCallback::HandleError rv = callback.reportError(copyStringTo<std::wstring>(errorMsg)); //throw!
             errorResponse.reset(new FillBufferCallback::HandleError(rv));
 
-            //dummy.unlock();
+            dummy.unlock(); //optimization for condition_variable::notify_one()
             conditionGotResponse.notify_one();
         }
     }
@@ -293,6 +293,7 @@ private:
 };
 //-------------------------------------------------------------------------------------------------
 
+
 struct TraverserShared
 {
 public:
@@ -372,7 +373,7 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
     	Linux: retrieveFileID takes about 50% longer in VM! (avoidable because of redundant stat() call!)
     */
 
-    output_.addSubFile(fileNameShort, FileDescriptor(details.lastWriteTimeRaw, details.fileSize));
+    output_.addSubFile(fileNameShort, FileDescriptor(details.lastWriteTimeRaw, details.fileSize, details.id));
 
     cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 }
@@ -547,8 +548,8 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
 
     zen::ScopeGuard guardWorker = zen::makeGuard([&]()
     {
-        std::for_each(worker.begin(), worker.end(), std::mem_fun_ref(&boost::thread::interrupt)); //interrupt all at once, then join
-        std::for_each(worker.begin(), worker.end(), std::mem_fun_ref(&boost::thread::join));
+        std::for_each(worker.begin(), worker.end(), [](boost::thread& wt) { wt.interrupt(); }); //interrupt all at once, then join
+        std::for_each(worker.begin(), worker.end(), [](boost::thread& wt) { wt.join(); });
     });
 
     std::shared_ptr<AsyncCallback> acb = std::make_shared<AsyncCallback>();

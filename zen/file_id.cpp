@@ -5,7 +5,6 @@
 // **************************************************************************
 
 #include "file_id.h"
-#include "file_id_internal.h"
 
 #ifdef FFS_WIN
 #include "win.h" //includes "windows.h"
@@ -17,7 +16,7 @@
 #endif
 
 
-std::string zen::getFileID(const Zstring& filename)
+zen::FileId zen::getFileID(const Zstring& filename)
 {
 #ifdef FFS_WIN
     //WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is cheap!
@@ -43,11 +42,11 @@ std::string zen::getFileID(const Zstring& filename)
 
 #elif defined FFS_LINUX
     struct ::stat fileInfo = {};
-    if (::lstat(filename.c_str(), &fileInfo) == 0) //lstat() does not follow symlinks
+    if (::stat(filename.c_str(), &fileInfo) == 0) //stat() follows symlinks
         return extractFileID(fileInfo);
 #endif
 
-    return std::string();
+    return zen::FileId();
 }
 
 
@@ -56,10 +55,10 @@ bool zen::samePhysicalFile(const Zstring& file1, const Zstring& file2)
     if (EqualFilename()(file1, file2)) //quick check
         return true;
 
-    const std::string id1 = getFileID(file1);
-    const std::string id2 = getFileID(file2);
+    const auto id1 = getFileID(file1);
+    const auto id2 = getFileID(file2);
 
-    if (id1.empty() || id2.empty())
+    if (id1 == zen::FileId() || id2 == zen::FileId())
         return false;
 
     return id1 == id2;

@@ -80,7 +80,7 @@
 <target>検索</target>
 
 <source>Select time span</source>
-<target></target>
+<target>タイムスパンを選択</target>
 
 <source>Show pop-up</source>
 <target>ポップアップ表示</target>
@@ -148,7 +148,7 @@
 <target>サイズ</target>
 
 <source>Date</source>
-<target>データ</target>
+<target>日付</target>
 
 <source>Full path</source>
 <target>フルパス</target>
@@ -168,14 +168,14 @@
 <source>Comparison Result</source>
 <target>比較結果</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>同期データベースの書式に互換性がありません:</target>
-
 <source>Initial synchronization:</source>
 <target>同期処理の初期化:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync データベースファイルが存在しません:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>同期データベースの書式に互換性がありません:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>データベースファイルは一般的な同期セッションを共有しません:</target>
@@ -239,7 +239,7 @@
 <target>必要なDLLを読み込めません:</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
-<target></target>
+<target>ボリュームシャドウ・コピーサービスにアクセス出来ません!</target>
 
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>WOW64 では、ボリュームシャドウコピーに対応していません、FreeFileSync 64-bit 版をお試しください。</target>
@@ -369,9 +369,6 @@ The command line is executed each time:
 <source>Batch execution</source>
 <target>一括処理を実行</target>
 
-<source>Log-messages:</source>
-<target>ログメッセージ:</target>
-
 <source>Stop</source>
 <target>停止</target>
 
@@ -498,6 +495,24 @@ The command line is executed each time:
 <source>Total amount of data that will be transferred</source>
 <target>転送されたデータの総量</target>
 
+<source>Operation:</source>
+<target>操作:</target>
+
+<source>Items found:</source>
+<target>見つかった要素:</target>
+
+<source>Items remaining:</source>
+<target>残りの要素:</target>
+
+<source>Speed:</source>
+<target>速度:</target>
+
+<source>Time remaining:</source>
+<target>残り時間:</target>
+
+<source>Time elapsed:</source>
+<target>経過時間:</target>
+
 <source>Batch job</source>
 <target>一括処理</target>
 
@@ -546,32 +561,14 @@ The command line is executed each time:
 <source>&Cancel</source>
 <target>キャンセル(&C)</target>
 
-<source>Operation:</source>
-<target>操作:</target>
-
-<source>Items found:</source>
-<target>見つかった要素:</target>
-
-<source>Items remaining:</source>
-<target>残りの要素:</target>
-
-<source>Speed:</source>
-<target>速度:</target>
-
-<source>Time remaining:</source>
-<target>残り時間:</target>
-
-<source>Time elapsed:</source>
-<target>経過時間:</target>
-
 <source>Select variant:</source>
 <target>変数を選択:</target>
 
 <source><Automatic></source>
 <target><自動></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>データベースを使用して、両側アイテムの変更を特定します。 削除、競合は自動的に検出することができます。</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>両側の識別、プロパティの変更特定にデータベースを使用します。削除、リネーム及び競合などは自動的に検出されます</target>
 
 <source>Mirror ->></source>
 <target>ミラー >></target>
@@ -790,30 +787,22 @@ Exclude: \stuff\temp\*
 <target>列を下に移動</target>
 
 <source>Transactional file copy</source>
-<target>Transactional ファイルコピー</target>
+<target>トランザクション・コピーを使用</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>最初に一時ファイル(*.ffs_tmp)に書き込み、それをリネームします。これにより、致命的なエラーが起こっても状態は保証されます</target>
 
 <source>Copy locked files</source>
-<target>ロックされたファイルをコピー</target>
+<target>ロックされたファイルをコピーする</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-ボリュームシャドーコピーを使用して共有/ロックされたファイルをコピー(管理者権限が必要)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>ボリュームシャドーコピーを使用して共有/ロックされたファイルをコピー(管理者権限が必要)</target>
 
 <source>Copy file access permissions</source>
-<target>ファイルのアクセスパーミッションをコピー</target>
+<target>ファイルのアクセスパーミッションをコピーする</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-ファイルとディレクトリのパーミッション転送(管理者権限が必要)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>ファイルとディレクトリのパーミッション転送(管理者権限が必要)</target>
 
 <source>Hidden dialogs:</source>
 <target>ダイアログを隠す</target>
@@ -1123,9 +1112,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Filter: Single pair</source>
 <target>フィルター:単一ペア</target>
 
-<source>Ignore</source>
-<target>無視</target>
-
 <source>Direct</source>
 <target>方向</target>
 
@@ -1274,11 +1260,11 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Error opening file:</source>
 <target>ファイルのオープンに失敗:</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>ディレクトリ移動中に無限ループが発生:</target>
-
 <source>Error traversing directory:</source>
 <target>ディレクトリの移動エラー:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>ディレクトリ移動中に無限ループが発生:</target>
 
 <source>Error setting privilege:</source>
 <target>特権の設定エラー:</target>
@@ -1313,9 +1299,6 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>ディレクトリが依存関係にあります! 同期規則の設定時には注意してください:</target>
 
-<source>Comparing content of files %x</source>
-<target>ファイル %x の内容を比較中</target>
-
 <source>Memory allocation failed!</source>
 <target>メモリ割り当てに失敗!</target>
 
@@ -1331,14 +1314,14 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>シンボリックリンク %x の日付は同一ですが、異なる対象があります!</target>
 
+<source>Comparing content of files %x</source>
+<target>ファイル %x の内容を比較中</target>
+
 <source>Comparing files by content failed.</source>
 <target>ファイル内容の比較に失敗しました</target>
 
 <source>Generating file list...</source>
 <target>ファイル一覧を作成中...</target>
-
-<source>Multiple...</source>
-<target>複数処理...</target>
 
 <source>Both sides are equal</source>
 <target>両側とも等しく</target>
@@ -1358,6 +1341,12 @@ Transfer file and directory permissions (Requires Administrator rights)
 <source>Delete right file/folder</source>
 <target>右側のファイル/フォルダを削除</target>
 
+<source>Move file on left</source>
+<target>ファイルを左に移動</target>
+
+<source>Move file on right</source>
+<target>ファイルを右に移動</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>右側のものを左側のファイル/フォルダに上書き</target>
 
@@ -1372,6 +1361,9 @@ Transfer file and directory permissions (Requires Administrator rights)
 
 <source>Copy file attributes only to right</source>
 <target>ファイル属性のみ右側にコピー</target>
+
+<source>Multiple...</source>
+<target>複数処理...</target>
 
 <source>Deleting file %x</source>
 <target>ファイル %x を削除中</target>

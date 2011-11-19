@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Geautomatiseerde Synchronisatie</target>
 
-<source>Browse</source>
-<target>Verkennen</target>
-
-<source>Windows Error Code %x:</source>
-<target>Windows Fout Code %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Fout Code %x:</target>
-
-<source>Invalid command line: %x</source>
-<target></target>
-
-<source>Error resolving symbolic link:</source>
-<target>Fout tijdens opzoeken van symbolische koppeling:</target>
-
-<source>Show pop-up</source>
-<target></target>
-
-<source>Show pop-up on errors or warnings</source>
-<target></target>
-
-<source>Ignore errors</source>
-<target>Negeer foutmeldingen</target>
-
-<source>Hide all error and warning messages</source>
-<target>Verberg alle fout- en waarschuwingsberichten</target>
-
-<source>Exit instantly</source>
-<target>Sluit meteen af</target>
-
-<source>Abort synchronization immediately</source>
-<target>Stop synchronisatie onmiddelijk</target>
-
 <source>Select alternate comparison settings</source>
 <target></target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target></target>
 
+<source>Show pop-up</source>
+<target></target>
+
+<source>Show pop-up on errors or warnings</source>
+<target></target>
+
+<source>Ignore errors</source>
+<target>Negeer foutmeldingen</target>
+
+<source>Hide all error and warning messages</source>
+<target>Verberg alle fout- en waarschuwingsberichten</target>
+
+<source>Exit instantly</source>
+<target>Sluit meteen af</target>
+
+<source>Abort synchronization immediately</source>
+<target>Stop synchronisatie onmiddelijk</target>
+
+<source>Browse</source>
+<target>Verkennen</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Fout tijdens uitlezen van synchronisatie-database:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Fout tijdens schrijven naar synchronisatie-database:</target>
+
+<source>Invalid command line: %x</source>
+<target></target>
+
+<source>Windows Error Code %x:</source>
+<target>Windows Fout Code %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Linux Fout Code %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Fout tijdens opzoeken van symbolische koppeling:</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -163,17 +169,14 @@
 <source>Comparison Result</source>
 <target>Resultaat vergelijken</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Opmaak van synchronisatie-database komt niet overeen:</target>
-
 <source>Initial synchronization:</source>
 <target>Initiële  synchronisatie:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Eén van de FreeFileSync database bestanden bestaat nog niet:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Fout tijdens uitlezen van synchronisatie-database:</target>
+<source>Incompatible synchronization database format:</source>
+<target>Opmaak van synchronisatie-database komt niet overeen:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target></target>
@@ -199,11 +202,17 @@
 <pluralform>%x sec</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Drag en drop</target>
+
 <source>Info</source>
 <target>Info</target>
 
 <source>Fatal Error</source>
 <target>Fatale fout</target>
+
+<source>Error reading file:</source>
+<target>Fout tijdens lezen van bestand:</target>
 
 <source>Scanning:</source>
 <target>Doorzoekt:</target>
@@ -220,14 +229,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Foutief FreeFileSync configuratiebestand!</target>
 
-<source>File does not exist:</source>
-<target>Bestand bestaat niet:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Fout tijdens verwerking configuratiebestand:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Fout tijdens verplaatsen naar prullenbak:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Kon een benodigde DLL niet laden:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target></target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Het aanmaken van schaduwkopieën op WOW64 wordt niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Kon de schijfnaam niet vaststellen van bestand:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>Schijfnaam %x maakt geen deel uit van bestandsnaam %y!</target>
+
 <source>/sec</source>
 <target>/sec</target>
+
+<source>File does not exist:</source>
+<target>Bestand bestaat niet:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>Kon geen waarden inlezen voor de volgende XML punten:</target>
 
 <source>S&ave configuration...</source>
 <target>Sl&a configuratie op...</target>
@@ -321,141 +351,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>A directory input field is empty.</source>
 <target>Een tekstveld over de map is leeg.</target>
 
-<source>Drag && drop</source>
-<target>Drag en drop</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Initaliseren van map-observatie niet mogelijk:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Fout tijdens observeren van mappen.</target>
-
-<source>Conversion error:</source>
-<target>Converteer fout:</target>
-
-<source>Error deleting file:</source>
-<target>Fout tijdens verwijderen van bestand:</target>
-
-<source>Error moving file:</source>
-<target>Fout tijdens verplaatsen van bestand:</target>
-
-<source>Target file already existing!</source>
-<target>Doelbestand bestaat al!</target>
-
-<source>Error moving directory:</source>
-<target>Fout tijdens verplaatsen van map:</target>
-
-<source>Target directory already existing!</source>
-<target>Doelmap bestaat al!</target>
-
-<source>Error deleting directory:</source>
-<target>Fout tijdens het verwijderen van map:</target>
-
-<source>Error changing modification time:</source>
-<target>Fout tijdens aanpassing van de wijzigingstijd:</target>
-
-<source>Error loading library function:</source>
-<target>Fout tijdens laden van bibliotheek functie:</target>
-
-<source>Error reading security context:</source>
-<target>Fout tijdens lezen van beveiligingscontext:</target>
-
-<source>Error writing security context:</source>
-<target>Fout tijdens schrijven van beveiligingscontext:</target>
-
-<source>Error copying file permissions:</source>
-<target>Fout tijdens kopiëren van bestandspermissies:</target>
-
-<source>Error creating directory:</source>
-<target>Fout tijdens het aanmaken van map:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Fout tijdens kopiëren van symbolische koppeling:</target>
-
-<source>Error copying file:</source>
-<target>Fout tijdens kopiëren van bestand:</target>
-
-<source>Error opening file:</source>
-<target>Fout tijdens openen van bestand:</target>
-
-<source>Error writing file:</source>
-<target>Fout tijdens schrijven van bestand:</target>
-
-<source>Error reading file:</source>
-<target>Fout tijdens lezen van bestand:</target>
-
-<source>Operation aborted!</source>
-<target>Bewerking afgebroken!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Oneindige lus bij het doorlopen van map:</target>
-
-<source>Error traversing directory:</source>
-<target>Fout tijdens doorzoeken van map:</target>
-
-<source>Error setting privilege:</source>
-<target>Fout tijdens instellen van privileges:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Fout tijdens verplaatsen naar prullenbak:</target>
-
-<source>Could not load a required DLL:</source>
-<target>Kon een benodigde DLL niet laden:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Fout tijdens schrijven naar synchronisatie-database:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target></target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Het aanmaken van schaduwkopieën op WOW64 wordt niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Kon de schijfnaam niet vaststellen van bestand:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>Schijfnaam %x maakt geen deel uit van bestandsnaam %y!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 uur</pluralform>
-<pluralform>%x uren</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dag</pluralform>
-<pluralform>%x dagen</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Kon geen waarden inlezen voor de volgende XML punten:</target>
-
 <source>Logging</source>
 <target>Loggen</target>
 
@@ -473,9 +368,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 
 <source>Batch execution</source>
 <target>Taak uitvoeren</target>
-
-<source>Log-messages:</source>
-<target>Logberichten:</target>
 
 <source>Stop</source>
 <target>Stop</target>
@@ -603,6 +495,24 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Total amount of data that will be transferred</source>
 <target>Totale hoeveelheid data die verplaatst wordt</target>
 
+<source>Operation:</source>
+<target>Bewerking:</target>
+
+<source>Items found:</source>
+<target>Onderdelen gevonden:</target>
+
+<source>Items remaining:</source>
+<target>Onderdelen te gaan:</target>
+
+<source>Speed:</source>
+<target>Snelheid:</target>
+
+<source>Time remaining:</source>
+<target>Benodigde tijd:</target>
+
+<source>Time elapsed:</source>
+<target>Verstreken tijd:</target>
+
 <source>Batch job</source>
 <target>Taaklijst</target>
 
@@ -651,32 +561,14 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>&Cancel</source>
 <target>&Annuleren</target>
 
-<source>Operation:</source>
-<target>Bewerking:</target>
-
-<source>Items found:</source>
-<target>Onderdelen gevonden:</target>
-
-<source>Items remaining:</source>
-<target>Onderdelen te gaan:</target>
-
-<source>Speed:</source>
-<target>Snelheid:</target>
-
-<source>Time remaining:</source>
-<target>Benodigde tijd:</target>
-
-<source>Time elapsed:</source>
-<target>Verstreken tijd:</target>
-
 <source>Select variant:</source>
 <target>Selecteer een variant:</target>
 
 <source><Automatic></source>
 <target><Automatisch></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Identificeer en verwerk veranderingen aan beide zijdes dmv een database. Verwijderingen en conflicten worden automatisch gedetecteerd.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target></target>
 
 <source>Mirror ->></source>
 <target>Spiegelen ->></target>
@@ -898,22 +790,14 @@ Uitsluiten: \stuff\temp\*
 <source>Copy locked files</source>
 <target>Kopieer vergrendelde bestanden</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Kopieer gedeelde of vergrendelde bestanden met Volume Shadow Copy Service (Vereist Administrator rechten)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Kopieer gedeelde of vergrendelde bestanden met Volume Shadow Copy Service (Vereist Administrator rechten)</target>
 
 <source>Copy file access permissions</source>
 <target></target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Zet bestand en map permissies over (Vereist Administrator rechten)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Zet bestand en map permissies over (Vereist Administrator rechten)</target>
 
 <source>Hidden dialogs:</source>
 <target>Verborgen dialogen:</target>
@@ -944,6 +828,9 @@ Zet bestand en map permissies over (Vereist Administrator rechten)
 
 <source>&Find next</source>
 <target>&Vind volgende</target>
+
+<source>Operation aborted!</source>
+<target>Bewerking afgebroken!</target>
 
 <source>Main bar</source>
 <target>Hoofdbalk</target>
@@ -1122,6 +1009,9 @@ Zet bestand en map permissies over (Vereist Administrator rechten)
 <source>File list exported!</source>
 <target>Bestandslijst geëxporteerd!</target>
 
+<source>Error writing file:</source>
+<target>Fout tijdens schrijven van bestand:</target>
+
 <source>Batch file created successfully!</source>
 <target>Taakbestand is succesvol aangemaakt!</target>
 
@@ -1221,9 +1111,6 @@ Zet bestand en map permissies over (Vereist Administrator rechten)
 <source>Filter: Single pair</source>
 <target>Filter: Enkel paar</target>
 
-<source>Ignore</source>
-<target>Negeer</target>
-
 <source>Direct</source>
 <target>Direct</target>
 
@@ -1287,6 +1174,105 @@ Zet bestand en map permissies over (Vereist Administrator rechten)
 <source>Move files into a time-stamped subdirectory</source>
 <target>Verplaats de bestanden naar een tijd-gemarkeerde submap</target>
 
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 uur</pluralform>
+<pluralform>%x uren</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dag</pluralform>
+<pluralform>%x dagen</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Initaliseren van map-observatie niet mogelijk:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Fout tijdens observeren van mappen.</target>
+
+<source>Conversion error:</source>
+<target>Converteer fout:</target>
+
+<source>Error deleting file:</source>
+<target>Fout tijdens verwijderen van bestand:</target>
+
+<source>Error moving file:</source>
+<target>Fout tijdens verplaatsen van bestand:</target>
+
+<source>Target file already existing!</source>
+<target>Doelbestand bestaat al!</target>
+
+<source>Error moving directory:</source>
+<target>Fout tijdens verplaatsen van map:</target>
+
+<source>Target directory already existing!</source>
+<target>Doelmap bestaat al!</target>
+
+<source>Error deleting directory:</source>
+<target>Fout tijdens het verwijderen van map:</target>
+
+<source>Error changing modification time:</source>
+<target>Fout tijdens aanpassing van de wijzigingstijd:</target>
+
+<source>Error loading library function:</source>
+<target>Fout tijdens laden van bibliotheek functie:</target>
+
+<source>Error reading security context:</source>
+<target>Fout tijdens lezen van beveiligingscontext:</target>
+
+<source>Error writing security context:</source>
+<target>Fout tijdens schrijven van beveiligingscontext:</target>
+
+<source>Error copying file permissions:</source>
+<target>Fout tijdens kopiëren van bestandspermissies:</target>
+
+<source>Error creating directory:</source>
+<target>Fout tijdens het aanmaken van map:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Fout tijdens kopiëren van symbolische koppeling:</target>
+
+<source>Error copying file:</source>
+<target>Fout tijdens kopiëren van bestand:</target>
+
+<source>Error opening file:</source>
+<target>Fout tijdens openen van bestand:</target>
+
+<source>Error traversing directory:</source>
+<target>Fout tijdens doorzoeken van map:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Oneindige lus bij het doorlopen van map:</target>
+
+<source>Error setting privilege:</source>
+<target>Fout tijdens instellen van privileges:</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>Beide zijdes zijn veranderd sinds de laatste synchronisatie!</target>
 
@@ -1317,9 +1303,6 @@ Zet bestand en map permissies over (Vereist Administrator rechten)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:</target>
 
-<source>Comparing content of files %x</source>
-<target>De inhoud van %x bestanden wordt vergeleken</target>
-
 <source>Memory allocation failed!</source>
 <target>RAM geheugen error!</target>
 
@@ -1335,14 +1318,14 @@ Zet bestand en map permissies over (Vereist Administrator rechten)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Symbolische koppeling %x heeft dezelfde datum maar een ander doel!</target>
 
+<source>Comparing content of files %x</source>
+<target>De inhoud van %x bestanden wordt vergeleken</target>
+
 <source>Comparing files by content failed.</source>
 <target>Bestand-inhoudvergelijking mislukt.</target>
 
 <source>Generating file list...</source>
 <target>Genereren van bestandslijst...</target>
-
-<source>Multiple...</source>
-<target>Meerdere...</target>
 
 <source>Both sides are equal</source>
 <target>Beide kanten zijn gelijk</target>
@@ -1362,6 +1345,12 @@ Zet bestand en map permissies over (Vereist Administrator rechten)
 <source>Delete right file/folder</source>
 <target>Verwijder rechter bestand/map</target>
 
+<source>Move file on left</source>
+<target></target>
+
+<source>Move file on right</source>
+<target></target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Overschrijf linker bestand/map met de rechter</target>
 
@@ -1376,6 +1365,9 @@ Zet bestand en map permissies over (Vereist Administrator rechten)
 
 <source>Copy file attributes only to right</source>
 <target>Kopieer bestandsattributen allen naar rechts</target>
+
+<source>Multiple...</source>
+<target>Meerdere...</target>
 
 <source>Deleting file %x</source>
 <target>Verwijderen van bestand %x</target>

@@ -23,7 +23,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-static" />
-					<Add library="libboost_thread-mgw46-mt-s-1_47.a" />
+					<Add library="libboost_thread-mgw46-mt-s-1_48.a" />
 					<Add library="libwxmsw28u_aui.a" />
 					<Add library="libwxmsw28u_adv.a" />
 					<Add library="libwxmsw28u_core.a" />
@@ -50,7 +50,7 @@
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll\mswud" />
 				</Compiler>
 				<Linker>
-					<Add library="libboost_thread-mgw46-mt-sd-1_47.a" />
+					<Add library="libboost_thread-mgw46-mt-sd-1_48.a" />
 					<Add library="libwxmsw28ud_aui.a" />
 					<Add library="libwxmsw28ud_adv.a" />
 					<Add library="libwxmsw28ud_core.a" />
@@ -77,7 +77,7 @@
 					<Add directory="lib\gtest\include" />
 				</Compiler>
 				<Linker>
-					<Add library="libboost_thread-mgw46-mt-sd-1_47.a" />
+					<Add library="libboost_thread-mgw46-mt-sd-1_48.a" />
 					<Add library="libwxmsw28ud_adv.a" />
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />

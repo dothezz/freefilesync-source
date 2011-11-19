@@ -169,14 +169,14 @@
 <source>Comparison Result</source>
 <target>Karşılaştırma sonucu</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Uyumsuz eşleştirme veritabanı biçimi:</target>
-
 <source>Initial synchronization:</source>
 <target>Başlangıç eşleştirmesi:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync veritabanı dosyalarından biri henüz yok:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Uyumsuz eşleştirme veritabanı biçimi:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Veritabanıdosyaları ortak bir eşleştirmeoturumunu paylaşmıyor:</target>
@@ -232,9 +232,6 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Geçersiz FreeFileSync yapılandırma dosyası!</target>
 
-<source>File does not exist:</source>
-<target>Dosya bulunamadı:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Yapılandırma dosyası çözümlenirken hata:</target>
 
@@ -258,6 +255,9 @@
 
 <source>/sec</source>
 <target>/san</target>
+
+<source>File does not exist:</source>
+<target>Dosya bulunamadı:</target>
 
 <source>Could not read values for the following XML nodes:</source>
 <target>Şu XML düğümlerindeki değerler okunamadı:</target>
@@ -371,9 +371,6 @@ Her seferinde çalıştırılacak komut satırı:
 
 <source>Batch execution</source>
 <target>Toplu komut yürütme</target>
-
-<source>Log-messages:</source>
-<target>Günlük iletileri:</target>
 
 <source>Stop</source>
 <target>Durdur</target>
@@ -501,6 +498,24 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Total amount of data that will be transferred</source>
 <target>Aktarılacak toplam veri miktarı</target>
 
+<source>Operation:</source>
+<target>İşlem:</target>
+
+<source>Items found:</source>
+<target>Bulunan bileşenler:</target>
+
+<source>Items remaining:</source>
+<target>Kalan bileşenler:</target>
+
+<source>Speed:</source>
+<target>Hız:</target>
+
+<source>Time remaining:</source>
+<target>Kalan zaman:</target>
+
+<source>Time elapsed:</source>
+<target>Geçen zaman:</target>
+
 <source>Batch job</source>
 <target>Toplu iş</target>
 
@@ -549,32 +564,14 @@ Her seferinde çalıştırılacak komut satırı:
 <source>&Cancel</source>
 <target>İ&ptal</target>
 
-<source>Operation:</source>
-<target>İşlem:</target>
-
-<source>Items found:</source>
-<target>Bulunan bileşenler:</target>
-
-<source>Items remaining:</source>
-<target>Kalan bileşenler:</target>
-
-<source>Speed:</source>
-<target>Hız:</target>
-
-<source>Time remaining:</source>
-<target>Kalan zaman:</target>
-
-<source>Time elapsed:</source>
-<target>Geçen zaman:</target>
-
 <source>Select variant:</source>
 <target>Davranışı seçin:</target>
 
 <source><Automatic></source>
 <target><Kendiliğinden></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Bir veritabanı kullanarak iki yandaki değişiklikleri belirler ve günceller. Silinme ve tutarsızlıklar kendiliğinden algılanır.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>İki yandaki değişiklikleri bir veritabanı kullanarak belirle ve sakla. Silme, yeniden adlandırma ve çakışma işlemleri kendiliğinden algılanır.</target>
 
 <source>Mirror ->></source>
 <target>Yansı ->></target>
@@ -801,22 +798,14 @@ Katma: \stuff\temp\*
 <source>Copy locked files</source>
 <target>Kilitli dosyaları da kopyala</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Paylaşılan ya da kilitli dosyaları Gölge Kopya Hizmetini kullanarak kopyalar (Yönetici izinlerine gerek duyar)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Paylaşılan ya da kilitli dosyaları Gölge Kopya Hizmetini kullanarak kopyalar (Yönetici izinlerine gerek duyar)</target>
 
 <source>Copy file access permissions</source>
 <target>Dosya erişim izinlerini kopyala</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)</target>
 
 <source>Hidden dialogs:</source>
 <target>Gizlenmiş iletiler:</target>
@@ -1130,9 +1119,6 @@ Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)
 <source>Filter: Single pair</source>
 <target>Süzgeç: Tek çift</target>
 
-<source>Ignore</source>
-<target>Yoksay</target>
-
 <source>Direct</source>
 <target>Doğrudan</target>
 
@@ -1286,11 +1272,11 @@ Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)
 <source>Error opening file:</source>
 <target>Dosya açılırken hata:</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Klasörlerde dolaşırken sonsuz döngü:</target>
-
 <source>Error traversing directory:</source>
 <target>Klasörde dolaşırken hata:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Klasörlerde dolaşırken sonsuz döngü:</target>
 
 <source>Error setting privilege:</source>
 <target>İzinler ayarlanırken hata:</target>
@@ -1325,9 +1311,6 @@ Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Klasörler bağımlı! Eşleştirme kurallarını koyarken dikkatli olun:</target>
 
-<source>Comparing content of files %x</source>
-<target>%x dosyalarının içeriği karşılaştırılıyor</target>
-
 <source>Memory allocation failed!</source>
 <target>Bellek ayrılamadı!</target>
 
@@ -1343,14 +1326,14 @@ Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Sembolik bağlantılar %x aynı tarihli fakat hedefleri farklı!</target>
 
+<source>Comparing content of files %x</source>
+<target>%x dosyalarının içeriği karşılaştırılıyor</target>
+
 <source>Comparing files by content failed.</source>
 <target>Dosyaların içerikleri karşılaştırılamadı.</target>
 
 <source>Generating file list...</source>
 <target>Dosya listesi oluşturuluyor...</target>
-
-<source>Multiple...</source>
-<target>Çoklu...</target>
 
 <source>Both sides are equal</source>
 <target>İki tarafta aynı</target>
@@ -1370,6 +1353,12 @@ Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)
 <source>Delete right file/folder</source>
 <target>Sağdaki dosya/klasörleri sil</target>
 
+<source>Move file on left</source>
+<target>Soldaki dosyayı taşı</target>
+
+<source>Move file on right</source>
+<target>Sağdaki dosyayı taşı</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Soldaki dosya/klasörlerin üzerine sağdakileri yaz</target>
 
@@ -1384,6 +1373,9 @@ Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)
 
 <source>Copy file attributes only to right</source>
 <target>Dosya özniteliklerini yalnız sağa kopyalaya</target>
+
+<source>Multiple...</source>
+<target>Çoklu...</target>
 
 <source>Deleting file %x</source>
 <target>%x dosyası siliniyor</target>

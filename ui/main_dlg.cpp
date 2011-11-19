@@ -662,8 +662,8 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
             if (dirFmtLeft.empty() && dirFmtRight.empty()) //only skip check if both sides are empty!
                 return;
 
-            dirEx.push_back(zen::async2<bool>([=]() { return !dirFmtLeft .empty() && zen::dirExists(dirFmtLeft); }));
-            dirEx.push_back(zen::async2<bool>([=]() { return !dirFmtRight.empty() && zen::dirExists(dirFmtRight); }));
+            dirEx.push_back(zen::async2<bool>([=] { return !dirFmtLeft .empty() && zen::dirExists(dirFmtLeft); }));
+            dirEx.push_back(zen::async2<bool>([=] { return !dirFmtRight.empty() && zen::dirExists(dirFmtRight); }));
         };
         addDirCheck(currMainCfg.firstPair);
         std::for_each(currMainCfg.additionalPairs.begin(), currMainCfg.additionalPairs.end(), addDirCheck);
@@ -972,7 +972,7 @@ public:
         mainDlg->enableAllElements();
     }
 
-    virtual Response reportError(const wxString& errorMessage)
+    virtual Response reportError(const std::wstring& errorMessage)
     {
         if (abortRequested)
             throw AbortDeleteProcess();
@@ -1122,17 +1122,6 @@ wxString extractLastValidDir(const FileSystemObject& fsObj)
     return toWx(fullname);
 }
 
-bool tryReplace(const wxString& phrase, const wxString& replacement, wxString& command) //return false on error
-{
-    if (command.find(phrase) != wxString::npos)
-    {
-        if (replacement.empty())
-            return false;
-        replace(command, phrase,  replacement);
-    }
-    return true;
-}
-
 
 void MainDialog::openExternalApplication(size_t rowNumber, bool leftSide, const wxString& commandline)
 {
@@ -1163,10 +1152,22 @@ void MainDialog::openExternalApplication(size_t rowNumber, bool leftSide, const 
     }
 
     wxString command = commandline;
-    if (tryReplace(L"%nameCo", nameCo, command) && //attention: replace %nameCo, %dirCo BEFORE %name, %dir to handle dependency
-        tryReplace(L"%dirCo",  dirCo,  command) &&
-        tryReplace(L"%name",   name,   command) &&
-        tryReplace(L"%dir",    dir,    command))
+
+    auto tryReplace = [&](const wxString& phrase, const wxString& replacement) -> bool
+    {
+        if (command.find(phrase) != wxString::npos)
+        {
+            if (replacement.empty())
+                return false;
+            replace(command, phrase,  replacement);
+        }
+        return true;
+    };
+
+    if (tryReplace(L"%nameCo", nameCo) && //attention: replace %nameCo, %dirCo BEFORE %name, %dir to handle dependency
+        tryReplace(L"%dirCo",  dirCo ) &&
+        tryReplace(L"%name",   name  ) &&
+        tryReplace(L"%dir",    dir   ))
         zen::shellExecute(command);
     else //fallback
     {
@@ -1246,9 +1247,6 @@ void MainDialog::disableAllElements(bool enableAbort)
         if (m_buttonAbort->IsShownOnScreen()) m_buttonAbort->SetFocus();
         m_buttonCompare->Disable();
         m_buttonCompare->Hide();
-        m_bpButtonCmpConfig ->Disable();
-        m_bpButtonSyncConfig->Disable();
-        m_buttonStartSync   ->Disable();
         m_panelTopButtons->Layout();
     }
     else
@@ -1261,7 +1259,7 @@ void MainDialog::enableAllElements()
     EnableCloseButton(true);
 
     m_panelViewFilter    ->Enable();
-    m_bpButtonCmpConfig  ->Enable();
+    m_bpButtonCmpConfig  ->Enable(); //wxGTK bug: this line seems to move main dialog to top!!!!!!!
     m_panelFilter        ->Enable();
     m_panelConfig        ->Enable();
     m_bpButtonSyncConfig ->Enable();
@@ -1277,9 +1275,6 @@ void MainDialog::enableAllElements()
     m_buttonAbort->Hide();
     m_buttonCompare->Enable();
     m_buttonCompare->Show();
-    m_bpButtonCmpConfig ->Enable();
-    m_bpButtonSyncConfig->Enable();
-    m_buttonStartSync   ->Enable();
 
     m_panelTopButtons->Layout();
     m_panelTopButtons->Enable();
@@ -3428,7 +3423,7 @@ void MainDialog::updateStatistics()
     //update preview of bytes to be transferred:
     const SyncStatistics st(gridDataView->getDataTentative());
     const wxString toCreate = zen::toStringSep(st.getCreate());
-    const wxString toUpdate = zen::toStringSep(st.getOverwrite());
+    const wxString toUpdate = zen::toStringSep(st.getUpdate());
     const wxString toDelete = zen::toStringSep(st.getDelete());
     const wxString data     = zen::filesizeToShortString(st.getDataToProcess());
 
@@ -3977,7 +3972,7 @@ void MainDialog::applySyncConfig()
             warningSyncDatabase_(warningSyncDatabase),
             parent_(parent) {}
 
-        virtual void reportWarning(const wxString& text)
+        virtual void reportWarning(const std::wstring& text)
         {
             if (warningSyncDatabase_)
             {
@@ -4268,25 +4263,25 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
         exportString +=  copyStringTo<zxString>(_("Legend")) + wxT('\n');
         if (syncPreview->previewIsEnabled())
         {
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_CREATE_NEW_LEFT))     + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_CREATE_NEW_LEFT))     + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_CREATE_NEW_RIGHT))    + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_CREATE_NEW_RIGHT))    + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_DELETE_LEFT))         + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_DELETE_LEFT))         + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_DELETE_RIGHT))        + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_DELETE_RIGHT))        + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_OVERWRITE_LEFT))      + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_OVERWRITE_LEFT))      + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_OVERWRITE_RIGHT))     + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_OVERWRITE_RIGHT))     + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_DO_NOTHING))          + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_DO_NOTHING))          + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_EQUAL))               + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_EQUAL))               + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(SO_UNRESOLVED_CONFLICT)) + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_UNRESOLVED_CONFLICT)) + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getSyncOpDescription(SO_EQUAL))               + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_EQUAL))               + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getSyncOpDescription(SO_CREATE_NEW_LEFT))     + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_CREATE_NEW_LEFT))     + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getSyncOpDescription(SO_CREATE_NEW_RIGHT))    + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_CREATE_NEW_RIGHT))    + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getSyncOpDescription(SO_OVERWRITE_LEFT))      + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_OVERWRITE_LEFT))      + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getSyncOpDescription(SO_OVERWRITE_RIGHT))     + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_OVERWRITE_RIGHT))     + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getSyncOpDescription(SO_DELETE_LEFT))         + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_DELETE_LEFT))         + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getSyncOpDescription(SO_DELETE_RIGHT))        + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_DELETE_RIGHT))        + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getSyncOpDescription(SO_DO_NOTHING))          + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_DO_NOTHING))          + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getSyncOpDescription(SO_UNRESOLVED_CONFLICT)) + wxT("\";") + copyStringTo<zxString>(getSymbol(SO_UNRESOLVED_CONFLICT)) + wxT('\n');
         }
         else
         {
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_LEFT_SIDE_ONLY))  + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_LEFT_SIDE_ONLY))  + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_RIGHT_SIDE_ONLY)) + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_RIGHT_SIDE_ONLY)) + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_LEFT_NEWER))      + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_LEFT_NEWER))      + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_RIGHT_NEWER))     + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_RIGHT_NEWER))     + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_DIFFERENT))       + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_DIFFERENT))       + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_EQUAL))           + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_EQUAL))           + wxT('\n');
-            exportString += wxT("\"") + copyStringTo<zxString>(getDescription(FILE_CONFLICT))        + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_CONFLICT))        + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getCategoryDescription(FILE_EQUAL))           + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_EQUAL))           + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getCategoryDescription(FILE_DIFFERENT))       + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_DIFFERENT))       + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getCategoryDescription(FILE_LEFT_SIDE_ONLY))  + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_LEFT_SIDE_ONLY))  + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getCategoryDescription(FILE_RIGHT_SIDE_ONLY)) + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_RIGHT_SIDE_ONLY)) + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getCategoryDescription(FILE_LEFT_NEWER))      + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_LEFT_NEWER))      + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getCategoryDescription(FILE_RIGHT_NEWER))     + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_RIGHT_NEWER))     + wxT('\n');
+            exportString += wxT("\"") + copyStringTo<zxString>(getCategoryDescription(FILE_CONFLICT))        + wxT("\";") + copyStringTo<zxString>(getSymbol(FILE_CONFLICT))        + wxT('\n');
         }
         exportString += wxT('\n');
 

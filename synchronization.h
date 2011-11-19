@@ -21,19 +21,20 @@ class SyncStatistics
 public:
     SyncStatistics(const HierarchyObject&  hierObj);
     SyncStatistics(const FolderComparison& folderCmp);
+    SyncStatistics(const FileMapping& fileObj);
 
     int getCreate() const;
     template <SelectedSide side> int getCreate() const;
 
-    int getOverwrite() const;
-    template <SelectedSide side> int getOverwrite() const;
+    int getUpdate() const;
+    template <SelectedSide side> int getUpdate() const;
 
     int getDelete() const;
     template <SelectedSide side> int getDelete() const;
 
     int getConflict() const { return conflict; }
 
-    typedef std::vector<std::pair<Zstring, wxString> > ConflictTexts; // Pair(filename/conflict text)
+    typedef std::vector<std::pair<Zstring, std::wstring> > ConflictTexts; // Pair(filename/conflict text)
     const ConflictTexts& getFirstConflicts() const { return firstConflicts; }
 
     zen::UInt64 getDataToProcess() const { return dataToProcess; }
@@ -42,15 +43,15 @@ public:
 private:
     void init();
 
-    void getNumbersRecursively(const HierarchyObject& hierObj);
+    void recurse(const HierarchyObject& hierObj);
 
     void getFileNumbers(const FileMapping& fileObj);
     void getLinkNumbers(const SymLinkMapping& linkObj);
     void getDirNumbers(const DirMapping& dirObj);
 
-    int createLeft,    createRight;
-    int overwriteLeft, overwriteRight;
-    int deleteLeft,    deleteRight;
+    int createLeft, createRight;
+    int updateLeft, updateRight;
+    int deleteLeft, deleteRight;
     int conflict;
     ConflictTexts firstConflicts; //save the first few conflict texts to display as a warning message
     zen::UInt64 dataToProcess;
@@ -103,7 +104,7 @@ private:
     xmlAccess::OptionalDialogs& m_warnings;
     ProcessCallback& procCallback;
 
-std::unique_ptr<ScheduleForBackgroundProcessing> procBackground;
+    std::unique_ptr<ScheduleForBackgroundProcessing> procBackground;
 };
 
 
@@ -131,16 +132,14 @@ std::unique_ptr<ScheduleForBackgroundProcessing> procBackground;
 
 
 
-// inline implementation
-template <>
-inline
+// -----------  implementation ----------------
+template <> inline
 int SyncStatistics::getCreate<LEFT_SIDE>() const
 {
     return createLeft;
 }
 
-template <>
-inline
+template <> inline
 int SyncStatistics::getCreate<RIGHT_SIDE>() const
 {
     return createRight;
@@ -152,36 +151,32 @@ int SyncStatistics::getCreate() const
     return getCreate<LEFT_SIDE>() + getCreate<RIGHT_SIDE>();
 }
 
-template <>
-inline
-int SyncStatistics::getOverwrite<LEFT_SIDE>() const
+template <> inline
+int SyncStatistics::getUpdate<LEFT_SIDE>() const
 {
-    return overwriteLeft;
+    return updateLeft;
 }
 
-template <>
-inline
-int SyncStatistics::getOverwrite<RIGHT_SIDE>() const
+template <> inline
+int SyncStatistics::getUpdate<RIGHT_SIDE>() const
 {
-    return overwriteRight;
+    return updateRight;
 }
 
 inline
-int SyncStatistics::getOverwrite() const
+int SyncStatistics::getUpdate() const
 {
-    return getOverwrite<LEFT_SIDE>() + getOverwrite<RIGHT_SIDE>();
+    return getUpdate<LEFT_SIDE>() + getUpdate<RIGHT_SIDE>();
 }
 
 
-template <>
-inline
+template <> inline
 int SyncStatistics::getDelete<LEFT_SIDE>() const
 {
     return deleteLeft;
 }
 
-template <>
-inline
+template <> inline
 int SyncStatistics::getDelete<RIGHT_SIDE>() const
 {
     return deleteRight;

@@ -22,39 +22,6 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatyczna Synchronizacja</target>
 
-<source>Browse</source>
-<target>Przeglądaj</target>
-
-<source>Windows Error Code %x:</source>
-<target>Błąd systemu Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Błąd systemu linux %x:</target>
-
-<source>Invalid command line: %x</source>
-<target>Nieprawidłowa komenda: %x</target>
-
-<source>Error resolving symbolic link:</source>
-<target>Błąd odczytu dowiązania symbolicznego:</target>
-
-<source>Show pop-up</source>
-<target>Pokazuj okna pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Pokazuj okna pop-up dla błędów i ostrzeżeń</target>
-
-<source>Ignore errors</source>
-<target>Ignoruj błędy</target>
-
-<source>Hide all error and warning messages</source>
-<target>Ukryj wszystkie informacje błędach i ostrzeżeniach</target>
-
-<source>Exit instantly</source>
-<target>Wyjdź natychmiast</target>
-
-<source>Abort synchronization immediately</source>
-<target>Natychmiast zakończ synchronizację</target>
-
 <source>Select alternate comparison settings</source>
 <target>Określ alternatywne ustawienia porównywania</target>
 
@@ -115,6 +82,45 @@
 <source>Select time span</source>
 <target>Określ przedział czasowy</target>
 
+<source>Show pop-up</source>
+<target>Pokazuj okna pop-up</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>Pokazuj okna pop-up dla błędów i ostrzeżeń</target>
+
+<source>Ignore errors</source>
+<target>Ignoruj błędy</target>
+
+<source>Hide all error and warning messages</source>
+<target>Ukryj wszystkie informacje błędach i ostrzeżeniach</target>
+
+<source>Exit instantly</source>
+<target>Wyjdź natychmiast</target>
+
+<source>Abort synchronization immediately</source>
+<target>Natychmiast zakończ synchronizację</target>
+
+<source>Browse</source>
+<target>Przeglądaj</target>
+
+<source>Error reading from synchronization database:</source>
+<target>Błąd odczytu z bazy danych synchronizacji:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Błąd zapisu do bazy danych synchronizacji:</target>
+
+<source>Invalid command line: %x</source>
+<target>Nieprawidłowa komenda: %x</target>
+
+<source>Windows Error Code %x:</source>
+<target>Błąd systemu Windows %x:</target>
+
+<source>Linux Error Code %x:</source>
+<target>Błąd systemu linux %x:</target>
+
+<source>Error resolving symbolic link:</source>
+<target>Błąd odczytu dowiązania symbolicznego:</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -164,17 +170,14 @@
 <source>Comparison Result</source>
 <target>Rezultat porównywania</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Niepoprawny format bazy danych dla synchronizacji:</target>
-
 <source>Initial synchronization:</source>
 <target>Wstępna synchronizacja:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Jeden z plików bazy danych FreeFileSync nie istnieje:</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Błąd odczytu z bazy danych synchronizacji:</target>
+<source>Incompatible synchronization database format:</source>
+<target>Niepoprawny format bazy danych dla synchronizacji:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Pliki danych nie współdzielą wspólnej sesji synchronizacji:</target>
@@ -201,11 +204,17 @@
 <pluralform>%x sekund</pluralform>
 </target>
 
+<source>Drag && drop</source>
+<target>Drag && Drop</target>
+
 <source>Info</source>
 <target>Info</target>
 
 <source>Fatal Error</source>
 <target>Błąd krytyczny</target>
+
+<source>Error reading file:</source>
+<target>Błąd odczytu pliku:</target>
 
 <source>Scanning:</source>
 <target>Skanowanie:</target>
@@ -226,14 +235,35 @@
 <source>Invalid FreeFileSync config file!</source>
 <target>Nieprawidłowy plik konfiguracyjny!</target>
 
-<source>File does not exist:</source>
-<target>Plik nie istnieje:</target>
-
 <source>Error parsing configuration file:</source>
 <target>Błąd parsowania pliku konfiguracyjnego:</target>
 
+<source>Error moving to Recycle Bin:</source>
+<target>Błąd podczas przenoszenia do kosza:</target>
+
+<source>Could not load a required DLL:</source>
+<target>Nie można załadować wymaganej biblioteki DLL:</target>
+
+<source>Error accessing Volume Shadow Copy Service!</source>
+<target>Błąd podczas dostępdu do usługi Volume Shadow Copy!</target>
+
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.</target>
+
+<source>Could not determine volume name for file:</source>
+<target>Nie można określić nazwy dysku dla pliku:</target>
+
+<source>Volume name %x not part of filename %y!</source>
+<target>Dysk %x nie jest częścią pliku %y!</target>
+
 <source>/sec</source>
 <target>/sekundę</target>
+
+<source>File does not exist:</source>
+<target>Plik nie istnieje:</target>
+
+<source>Could not read values for the following XML nodes:</source>
+<target>Nie można odczytać wartości dla danych gałęzi XML:</target>
 
 <source>S&ave configuration...</source>
 <target>Z&apisz konfigurację...</target>
@@ -327,144 +357,6 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>A directory input field is empty.</source>
 <target>Pole ze ścieżką katalogu jest puste.</target>
 
-<source>Drag && drop</source>
-<target>Drag && Drop</target>
-
-<source>Could not initialize directory monitoring:</source>
-<target>Nie można uruchomić monitora katalogów:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Błąd podczas monitorowania katalogów.</target>
-
-<source>Conversion error:</source>
-<target>Błąd konwersji:</target>
-
-<source>Error deleting file:</source>
-<target>Błąd podczas usuwania pliku:</target>
-
-<source>Error moving file:</source>
-<target>Błąd podczas przenoszenia pliku:</target>
-
-<source>Target file already existing!</source>
-<target>Plik docelowy już istnieje!</target>
-
-<source>Error moving directory:</source>
-<target>Błąd podczas przenoszenia katalogu:</target>
-
-<source>Target directory already existing!</source>
-<target>Katalog docelowy już istnieje!</target>
-
-<source>Error deleting directory:</source>
-<target>Błąd podczas usuwania katalogu:</target>
-
-<source>Error changing modification time:</source>
-<target>Błąd zmiany godziny modyfikacji:</target>
-
-<source>Error loading library function:</source>
-<target>Błąd wczytywania funkcji:</target>
-
-<source>Error reading security context:</source>
-<target>Błąd odczytu kontekstu bezpieczeństwa:</target>
-
-<source>Error writing security context:</source>
-<target>Błąd zapisu kontekstu bezpieczeństwa:</target>
-
-<source>Error copying file permissions:</source>
-<target>Błąd podczas kopiowania uprawnień pliku:</target>
-
-<source>Error creating directory:</source>
-<target>Błąd podczas tworzenia katalogu:</target>
-
-<source>Error copying symbolic link:</source>
-<target>Błąd podczas kopiowania dowiązania symbolicznego (symlink)</target>
-
-<source>Error copying file:</source>
-<target>Błąd podczas kopiowania pliku:</target>
-
-<source>Error opening file:</source>
-<target>Błąd odczytu pliku:</target>
-
-<source>Error writing file:</source>
-<target>Błąd zapisu pliku:</target>
-
-<source>Error reading file:</source>
-<target>Błąd odczytu pliku:</target>
-
-<source>Operation aborted!</source>
-<target>Operacja przerwana!</target>
-
-<source>Endless loop when traversing directory:</source>
-<target>Zapętlenie podczas przeglądania katalogu:</target>
-
-<source>Error traversing directory:</source>
-<target>Błąd podczas odczytywania katalogu:</target>
-
-<source>Error setting privilege:</source>
-<target>Błąd ustawiania uprawnień:</target>
-
-<source>Error moving to Recycle Bin:</source>
-<target>Błąd podczas przenoszenia do kosza:</target>
-
-<source>Could not load a required DLL:</source>
-<target>Nie można załadować wymaganej biblioteki DLL:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Błąd zapisu do bazy danych synchronizacji:</target>
-
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Błąd podczas dostępdu do usługi Volume Shadow Copy!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.</target>
-
-<source>Could not determine volume name for file:</source>
-<target>Nie można określić nazwy dysku dla pliku:</target>
-
-<source>Volume name %x not part of filename %y!</source>
-<target>Dysk %x nie jest częścią pliku %y!</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 minuta</pluralform>
-<pluralform>%x minuty</pluralform>
-<pluralform>%x minut</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 godzina</pluralform>
-<pluralform>%x godziny</pluralform>
-<pluralform>%x godzin</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 dzień</pluralform>
-<pluralform>%x dni</pluralform>
-<pluralform>%x dni</pluralform>
-</target>
-
-<source>Could not read values for the following XML nodes:</source>
-<target>Nie można odczytać wartości dla danych gałęzi XML:</target>
-
 <source>Logging</source>
 <target>Tworzenie logów</target>
 
@@ -482,9 +374,6 @@ Komenda jest wykonwywana za każdym razem gdy:
 
 <source>Batch execution</source>
 <target>Uruchomienie pliku wsadowego</target>
-
-<source>Log-messages:</source>
-<target>Logi:</target>
 
 <source>Stop</source>
 <target>Zatrzymaj</target>
@@ -612,6 +501,24 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Total amount of data that will be transferred</source>
 <target>Liczba danych do przekopiowania</target>
 
+<source>Operation:</source>
+<target>Operacja:</target>
+
+<source>Items found:</source>
+<target>Znalezione elementy:</target>
+
+<source>Items remaining:</source>
+<target>Pozostałe elementy:</target>
+
+<source>Speed:</source>
+<target>Prędkość:</target>
+
+<source>Time remaining:</source>
+<target>Pozostały czas:</target>
+
+<source>Time elapsed:</source>
+<target>Czas:</target>
+
 <source>Batch job</source>
 <target>Plik wsadowy</target>
 
@@ -660,32 +567,14 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>&Cancel</source>
 <target>&Anuluj</target>
 
-<source>Operation:</source>
-<target>Operacja:</target>
-
-<source>Items found:</source>
-<target>Znalezione elementy:</target>
-
-<source>Items remaining:</source>
-<target>Pozostałe elementy:</target>
-
-<source>Speed:</source>
-<target>Prędkość:</target>
-
-<source>Time remaining:</source>
-<target>Pozostały czas:</target>
-
-<source>Time elapsed:</source>
-<target>Czas:</target>
-
 <source>Select variant:</source>
 <target>Wybierz wariant:</target>
 
 <source><Automatic></source>
 <target><Automatycznie></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
-<target>Wykryj i zastosuj zmiany po obu stronach używając bazy danych. Usunięcia i konflikty są wykrywane automatycznie.</target>
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Znajdź i zastosuj zmiany po obu stronach przy pomocy bazy danych. Usunięnia, zmiany nazwy plików oraz konflikty są usuwane automatycznie.</target>
 
 <source>Mirror ->></source>
 <target>Lustrzana ->></target>
@@ -907,27 +796,19 @@ Wyklucz: \moje\temp\*
 <target>Transakcyjne kopiowanie pliku</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>Stwórz tymczasowy plik (*.ffs_tmp) następnie zamień jego nazwę. Gwarantuje to spójność nawet po wystąpieniu błędu.</target>
 
 <source>Copy locked files</source>
 <target>Kopiuj zablokowane pliki</target>
 
-<source>
-Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)
-</source>
-<target>
-Kopiuj pliki udostępnione i zablokowane używając usługi Volume Shadow Copy (Wymaga uprawnień administratora)
-</target>
+<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
+<target>Kopiuj pliki udostępnione i zablokowane używając usługi Volume Shadow Copy (Wymaga uprawnień administratora)</target>
 
 <source>Copy file access permissions</source>
 <target>Kopiuj uprawnienia plików</target>
 
-<source>
-Transfer file and directory permissions (Requires Administrator rights)
-</source>
-<target>
-Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
-</target>
+<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<target>Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)</target>
 
 <source>Hidden dialogs:</source>
 <target>Ukryte dialogi:</target>
@@ -958,6 +839,9 @@ Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 
 <source>&Find next</source>
 <target>&Znajdź następny</target>
+
+<source>Operation aborted!</source>
+<target>Operacja przerwana!</target>
 
 <source>Main bar</source>
 <target>Główny pasek</target>
@@ -999,16 +883,16 @@ Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 <target>Autodopasowanie kolumn</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>Rozmiar ikony:</target>
 
 <source>Small</source>
-<target></target>
+<target>Mały</target>
 
 <source>Medium</source>
-<target></target>
+<target>Średni</target>
 
 <source>Large</source>
-<target></target>
+<target>Duży</target>
 
 <source>Include all rows</source>
 <target>Dołącz wszystkie rzędy</target>
@@ -1136,6 +1020,9 @@ Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 <source>File list exported!</source>
 <target>Lista plików wyeksportowana!</target>
 
+<source>Error writing file:</source>
+<target>Błąd zapisu pliku:</target>
+
 <source>Batch file created successfully!</source>
 <target>Plik wsadowy utworzony pomyślnie!</target>
 
@@ -1239,9 +1126,6 @@ Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 <source>Filter: Single pair</source>
 <target>Filtr: Pojedyńcza para</target>
 
-<source>Ignore</source>
-<target>Ignoruj</target>
-
 <source>Direct</source>
 <target>Bezpośrednio</target>
 
@@ -1307,6 +1191,108 @@ Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 <source>Move files into a time-stamped subdirectory</source>
 <target>Przenieś pliki do oznaczonego podkatalogu</target>
 
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 minuta</pluralform>
+<pluralform>%x minuty</pluralform>
+<pluralform>%x minut</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 godzina</pluralform>
+<pluralform>%x godziny</pluralform>
+<pluralform>%x godzin</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dzień</pluralform>
+<pluralform>%x dni</pluralform>
+<pluralform>%x dni</pluralform>
+</target>
+
+<source>Could not initialize directory monitoring:</source>
+<target>Nie można uruchomić monitora katalogów:</target>
+
+<source>Error when monitoring directories.</source>
+<target>Błąd podczas monitorowania katalogów.</target>
+
+<source>Conversion error:</source>
+<target>Błąd konwersji:</target>
+
+<source>Error deleting file:</source>
+<target>Błąd podczas usuwania pliku:</target>
+
+<source>Error moving file:</source>
+<target>Błąd podczas przenoszenia pliku:</target>
+
+<source>Target file already existing!</source>
+<target>Plik docelowy już istnieje!</target>
+
+<source>Error moving directory:</source>
+<target>Błąd podczas przenoszenia katalogu:</target>
+
+<source>Target directory already existing!</source>
+<target>Katalog docelowy już istnieje!</target>
+
+<source>Error deleting directory:</source>
+<target>Błąd podczas usuwania katalogu:</target>
+
+<source>Error changing modification time:</source>
+<target>Błąd zmiany godziny modyfikacji:</target>
+
+<source>Error loading library function:</source>
+<target>Błąd wczytywania funkcji:</target>
+
+<source>Error reading security context:</source>
+<target>Błąd odczytu kontekstu bezpieczeństwa:</target>
+
+<source>Error writing security context:</source>
+<target>Błąd zapisu kontekstu bezpieczeństwa:</target>
+
+<source>Error copying file permissions:</source>
+<target>Błąd podczas kopiowania uprawnień pliku:</target>
+
+<source>Error creating directory:</source>
+<target>Błąd podczas tworzenia katalogu:</target>
+
+<source>Error copying symbolic link:</source>
+<target>Błąd podczas kopiowania dowiązania symbolicznego (symlink)</target>
+
+<source>Error copying file:</source>
+<target>Błąd podczas kopiowania pliku:</target>
+
+<source>Error opening file:</source>
+<target>Błąd odczytu pliku:</target>
+
+<source>Error traversing directory:</source>
+<target>Błąd podczas odczytywania katalogu:</target>
+
+<source>Endless loop when traversing directory:</source>
+<target>Zapętlenie podczas przeglądania katalogu:</target>
+
+<source>Error setting privilege:</source>
+<target>Błąd ustawiania uprawnień:</target>
+
 <source>Both sides have changed since last synchronization!</source>
 <target>Obie strony uległy zmianie od ostatniej synchronizacji!</target>
 
@@ -1337,9 +1323,6 @@ Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Katalogi są zależne! Pamiętaj o tym podczas ustawiania zasad synchronizacji:</target>
 
-<source>Comparing content of files %x</source>
-<target>Porównywanie zawartości plików %x</target>
-
 <source>Memory allocation failed!</source>
 <target>Błąd alokacji zasobów!</target>
 
@@ -1355,14 +1338,14 @@ Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 <source>Symlinks %x have the same date but a different target!</source>
 <target>Dowiązanie symboliczne %x ma te same dane, ale inny cel!</target>
 
+<source>Comparing content of files %x</source>
+<target>Porównywanie zawartości plików %x</target>
+
 <source>Comparing files by content failed.</source>
 <target>Porównywanie przez zawartość zakończone niepowodzeniem.</target>
 
 <source>Generating file list...</source>
 <target>Generowanie listy plików...</target>
-
-<source>Multiple...</source>
-<target>Wiele...</target>
 
 <source>Both sides are equal</source>
 <target>Obie strony są równe</target>
@@ -1382,6 +1365,12 @@ Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 <source>Delete right file/folder</source>
 <target>Usuń plik/katalog po prawej stronie</target>
 
+<source>Move file on left</source>
+<target>Przenieś plik na lewą stronę</target>
+
+<source>Move file on right</source>
+<target>Przenieś plik na prawą stronę</target>
+
 <source>Overwrite left file/folder with right one</source>
 <target>Nadpisz plik/katalog po lewej stronie tym po prawej</target>
 
@@ -1396,6 +1385,9 @@ Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)
 
 <source>Copy file attributes only to right</source>
 <target>Kopiuj atrybuty plików tylko na prawą stronę</target>
+
+<source>Multiple...</source>
+<target>Wiele...</target>
 
 <source>Deleting file %x</source>
 <target>Usuwanie pliku %x</target>

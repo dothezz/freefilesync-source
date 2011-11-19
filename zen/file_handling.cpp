@@ -15,7 +15,7 @@
 #include "assert_static.h"
 #include <boost/thread/tss.hpp>
 #include <boost/thread/once.hpp>
-#include "file_id_internal.h"
+#include "file_id_def.h"
 
 #ifdef FFS_WIN
 #include "privilege.h"
@@ -194,12 +194,15 @@ namespace
 #ifdef FFS_WIN
 DWORD retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
 {
-    std::vector<wchar_t> buffer(10000);
+    //note: this even works for network shares: \\share\dirname
+
+    const DWORD BUFFER_SIZE = 10000;
+    std::vector<wchar_t> buffer(BUFFER_SIZE);
 
     //full pathName need not yet exist!
     if (!::GetVolumePathName(pathName.c_str(), //__in   LPCTSTR lpszFileName,
                              &buffer[0],       //__out  LPTSTR lpszVolumePathName,
-                             static_cast<DWORD>(buffer.size()))) //__in   DWORD cchBufferLength
+                             BUFFER_SIZE))     //__in   DWORD cchBufferLength
         return 0;
 
     Zstring volumePath = &buffer[0];
@@ -608,7 +611,7 @@ struct RemoveCallbackImpl : public CallbackRemoveDir
         moveCallback_(moveCallback) {}
 
     virtual void notifyFileDeletion(const Zstring& filename) { moveCallback_.requestUiRefresh(sourceDir_); }
-    virtual void notifyDirDeletion(const Zstring& dirname) { moveCallback_.requestUiRefresh(sourceDir_); }
+    virtual void notifyDirDeletion (const Zstring& dirname ) { moveCallback_.requestUiRefresh(sourceDir_); }
 
 private:
     RemoveCallbackImpl(const RemoveCallbackImpl&);
@@ -620,7 +623,7 @@ private:
 }
 
 
-void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExisting, CallbackMoveFile* callback)   //throw FileError;
+void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExisting, CallbackMoveFile* callback) //throw FileError
 {
     //call back once per folder
     if (callback)
@@ -683,7 +686,7 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
 }
 
 
-void zen::moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExisting, CallbackMoveFile* callback)   //throw FileError;
+void zen::moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExisting, CallbackMoveFile* callback) //throw FileError
 {
 #ifdef FFS_WIN
     const Zstring& sourceDirFormatted = sourceDir;
@@ -999,13 +1002,13 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     try
     {
         //enable privilege: required to read/write SACL information
-        Privileges::getInstance().ensureActive(SE_SECURITY_NAME); //polling allowed...
+        activatePrivilege(SE_SECURITY_NAME); //polling allowed...
 
         //enable privilege: required to copy owner information
-        Privileges::getInstance().ensureActive(SE_RESTORE_NAME);
+        activatePrivilege(SE_RESTORE_NAME);
 
         //the following privilege may be required according to http://msdn.microsoft.com/en-us/library/aa364399(VS.85).aspx (although not needed nor active in my tests)
-        Privileges::getInstance().ensureActive(SE_BACKUP_NAME);
+        activatePrivilege(SE_BACKUP_NAME);
     }
     catch (const FileError& e)
     {
@@ -1416,14 +1419,19 @@ public:
             throw FileError(errorMsg);
     }
 
-    void       setSrcAttr(const FileAttrib& attr) { sourceAttr = attr; }
-    FileAttrib getSrcAttr() const { assert(sourceAttr.modificationTime != 0); return sourceAttr; }
+    void setNewAttr(const FileAttrib& attr) { newAttrib = attr; }
+
+    FileAttrib getSrcAttr() const
+    {
+        assert(newAttrib.modificationTime != 0);
+        return newAttrib;
+    }
 
 private:
     CallbackData(const CallbackData&);
     CallbackData& operator=(const CallbackData&);
 
-    FileAttrib sourceAttr;
+    FileAttrib newAttrib;
     std::wstring errorMsg;        //
     bool exceptionInUserCallback; //these two are exclusive!
     UInt64 bytesTransferredOnException;
@@ -1456,19 +1464,27 @@ DWORD CALLBACK copyCallbackInternal(
     //#################### return source file attributes ################################
     if (dwCallbackReason == CALLBACK_STREAM_SWITCH) //called up front for every file (even if 0-sized)
     {
-        BY_HANDLE_FILE_INFORMATION fileInfo = {};
-        if (!::GetFileInformationByHandle(hSourceFile, &fileInfo))
+        BY_HANDLE_FILE_INFORMATION fileInfoSrc = {};
+        if (!::GetFileInformationByHandle(hSourceFile, &fileInfoSrc))
         {
             cbd.reportError(_("Error reading file attributes:") + L"\n\"" + cbd.sourceFile_ + L"\"" + L"\n\n" + getLastErrorFormatted());
             return PROGRESS_CANCEL;
         }
 
-        const FileAttrib attr = { UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh),
-                                  toTimeT(fileInfo.ftLastWriteTime)
-                                };
-        //extractFileID(fileInfo));
+        BY_HANDLE_FILE_INFORMATION fileInfoTrg = {};
+        if (!::GetFileInformationByHandle(hDestinationFile, &fileInfoTrg))
+        {
+            cbd.reportError(_("Error reading file attributes:") + L"\n\"" + cbd.targetFile_ + L"\"" + L"\n\n" + getLastErrorFormatted());
+            return PROGRESS_CANCEL;
+        }
 
-        cbd.setSrcAttr(attr);
+        FileAttrib attr;
+        attr.fileSize         = UInt64(fileInfoSrc.nFileSizeLow, fileInfoSrc.nFileSizeHigh);
+        attr.modificationTime = toTimeT(fileInfoSrc.ftLastWriteTime);
+        attr.sourceFileId     = extractFileID(fileInfoSrc);
+        attr.targetFileId     = extractFileID(fileInfoTrg);
+
+        cbd.setNewAttr(attr);
 
         //#################### copy file creation time ################################
         FILETIME creationTime = {};
@@ -1527,7 +1543,7 @@ DWORD CALLBACK copyCallbackInternal(
 void rawCopyWinApi_sub(const Zstring& sourceFile,
                        const Zstring& targetFile,
                        CallbackCopyFile* callback,
-                       FileAttrib* sourceAttr) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+                       FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
 {
     zen::ScopeGuard guardTarget = zen::makeGuard([&]() { removeFile(targetFile); }); //transactional behavior: guard just before starting copy, we don't trust ::CopyFileEx(), do we ;)
 
@@ -1601,8 +1617,8 @@ void rawCopyWinApi_sub(const Zstring& sourceFile,
         throw FileError(errorMessage);
     }
 
-    if (sourceAttr)
-        *sourceAttr = cbd.getSrcAttr();
+    if (newAttrib)
+        *newAttrib = cbd.getSrcAttr();
 
     {
         const Int64 modTime = getFileTime(sourceFile, SYMLINK_FOLLOW); //throw FileError
@@ -1972,7 +1988,7 @@ void rawCopyWinApi(const Zstring& sourceFile,
 void rawCopyStream(const Zstring& sourceFile,
                    const Zstring& targetFile,
                    CallbackCopyFile* callback,
-                   FileAttrib* sourceAttr) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+                   FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 {
     zen::ScopeGuard guardTarget = zen::makeGuard([&]() { removeFile(targetFile); }); //transactional behavior: place guard before lifetime of FileOutput
     try
@@ -2012,23 +2028,29 @@ void rawCopyStream(const Zstring& sourceFile,
 
     //adapt file modification time:
     {
-        struct stat srcInfo = {};
+        struct ::stat srcInfo = {};
         if (::stat(sourceFile.c_str(), &srcInfo) != 0) //read file attributes from source directory
             throw FileError(_("Error reading file attributes:") + L"\n\"" + sourceFile + L"\"" + L"\n\n" + getLastErrorFormatted());
 
-        if (sourceAttr)
-        {
-            sourceAttr->fileSize = UInt64(srcInfo.st_size);
-            sourceAttr->modificationTime = srcInfo.st_mtime;
-        }
-
-        struct utimbuf newTimes = {};
+        struct ::utimbuf newTimes = {};
         newTimes.actime  = srcInfo.st_atime;
         newTimes.modtime = srcInfo.st_mtime;
 
         //set new "last write time"
         if (::utime(targetFile.c_str(), &newTimes) != 0)
             throw FileError(_("Error changing modification time:") + L"\n\"" + targetFile + L"\"" + L"\n\n" + getLastErrorFormatted());
+
+        if (newAttrib)
+        {
+            struct ::stat trgInfo = {};
+            if (::stat(targetFile.c_str(), &trgInfo) != 0) //read file attributes from source directory
+                throw FileError(_("Error reading file attributes:") + L"\n\"" + targetFile + L"\"" + L"\n\n" + getLastErrorFormatted());
+
+            newAttrib->fileSize         = UInt64(srcInfo.st_size);
+            newAttrib->modificationTime = srcInfo.st_mtime;
+            newAttrib->sourceFileId     = extractFileID(srcInfo);
+            newAttrib->targetFileId     = extractFileID(trgInfo);
+        }
     }
 
     guardTarget.dismiss(); //target has been created successfully!

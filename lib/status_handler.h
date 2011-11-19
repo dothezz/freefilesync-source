@@ -7,7 +7,6 @@
 #ifndef STATUSHANDLER_H_INCLUDED
 #define STATUSHANDLER_H_INCLUDED
 
-#include <wx/string.h>
 #include <string>
 #include <zen/int64.h>
 
@@ -45,21 +44,18 @@ struct ProcessCallback
 
     //note: this one must NOT throw in order to properly allow undoing setting of statistics!
     //it is in general paired with a call to requestUiRefresh() to compensate!
-    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed) = 0; //throw()
+    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed) = 0; //throw()!!
 
     //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
     virtual void requestUiRefresh() = 0; //throw ?
 
-    //this method is triggered repeatedly by requestUiRefresh() and can be used to refresh the ui by dispatching pending events
-    virtual void forceUiRefresh() = 0;
+    //called periodically after data was processed: expected(!) to request GUI update
+    virtual void reportStatus(const std::wstring& text) = 0; //status info only, should not be logged!
 
     //called periodically after data was processed: expected(!) to request GUI update
-    virtual void reportStatus(const wxString& text) = 0; //status info only, should not be logged!
+    virtual void reportInfo(const std::wstring& text) = 0;
 
-    //called periodically after data was processed: expected(!) to request GUI update
-    virtual void reportInfo(const wxString& text) = 0;
-
-    virtual void reportWarning(const wxString& warningMessage, bool& warningActive) = 0;
+    virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive) = 0;
 
     //error handling:
     enum Response
@@ -67,8 +63,8 @@ struct ProcessCallback
         IGNORE_ERROR = 10,
         RETRY
     };
-    virtual Response reportError     (const wxString& errorMessage) = 0; //recoverable error situation
-    virtual void     reportFatalError(const wxString& errorMessage) = 0; //non-recoverable error situation
+    virtual Response reportError     (const std::wstring& errorMessage) = 0; //recoverable error situation
+    virtual void     reportFatalError(const std::wstring& errorMessage) = 0; //non-recoverable error situation
 };
 
 
@@ -85,6 +81,8 @@ class StatusHandler : public ProcessCallback, public AbortCallback
 {
 public:
     StatusHandler() : abortRequested(false) {}
+
+    virtual void forceUiRefresh() = 0;
 
     virtual void requestUiRefresh()
     {

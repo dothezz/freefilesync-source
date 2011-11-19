@@ -278,14 +278,14 @@ void BatchStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 da
 }
 
 
-void BatchStatusHandler::reportStatus(const wxString& text)
+void BatchStatusHandler::reportStatus(const std::wstring& text)
 {
     syncStatusFrame.setStatusText_NoUpdate(text);
     requestUiRefresh(); //throw AbortThisProcess
 }
 
 
-void BatchStatusHandler::reportInfo(const wxString& text)
+void BatchStatusHandler::reportInfo(const std::wstring& text)
 {
     errorLog.logMsg(text, TYPE_INFO);
 
@@ -294,7 +294,7 @@ void BatchStatusHandler::reportInfo(const wxString& text)
 }
 
 
-void BatchStatusHandler::reportWarning(const wxString& warningMessage, bool& warningActive)
+void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool& warningActive)
 {
     errorLog.logMsg(warningMessage, TYPE_WARNING);
 
@@ -339,7 +339,7 @@ void BatchStatusHandler::reportWarning(const wxString& warningMessage, bool& war
 }
 
 
-ProcessCallback::Response BatchStatusHandler::reportError(const wxString& errorMessage)
+ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& errorMessage)
 {
     switch (handleError_)
     {
@@ -384,7 +384,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const wxString& errorM
 }
 
 
-void BatchStatusHandler::reportFatalError(const wxString& errorMessage)
+void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
 {
     if (handleError_ == xmlAccess::ON_ERROR_POPUP)
         exitWhenFinished = false; //log fatal error and show it on status dialog
