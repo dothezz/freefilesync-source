@@ -1256,10 +1256,12 @@ void MainDialog::disableAllElements(bool enableAbort)
 
 void MainDialog::enableAllElements()
 {
+    //wxGTK, yet another QOI issue: some stupid bug, keeps moving main dialog to top!!
+
     EnableCloseButton(true);
 
     m_panelViewFilter    ->Enable();
-    m_bpButtonCmpConfig  ->Enable(); //wxGTK bug: this line seems to move main dialog to top!!!!!!!
+    m_bpButtonCmpConfig  ->Enable();
     m_panelFilter        ->Enable();
     m_panelConfig        ->Enable();
     m_bpButtonSyncConfig ->Enable();
@@ -1762,21 +1764,21 @@ void MainDialog::OnContextRim(wxGridEvent& event)
             //CONTEXT_SYNC_DIR_LEFT
             wxMenuItem* menuItemSyncDirLeft = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Set direction:")) +
                                                              wxT(" <-") + wxT("\tAlt - Left")); //Linux needs a direction, "<-", because it has no context menu icons!
-            menuItemSyncDirLeft->SetBitmap(getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_LEFT)));
+            menuItemSyncDirLeft->SetBitmap(getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_LEFT, true)));
             contextMenu->Append(menuItemSyncDirLeft);
             contextMenu->Connect(menuItemSyncDirLeft->GetId(),  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextSyncDirLeft),      NULL, this);
 
             //CONTEXT_SYNC_DIR_NONE
             wxMenuItem* menuItemSyncDirNone = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Set direction:")) +
                                                              wxT(" -") + wxT("\tAlt - Up"));
-            menuItemSyncDirNone->SetBitmap(getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_NONE)));
+            menuItemSyncDirNone->SetBitmap(getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_NONE, true)));
             contextMenu->Append(menuItemSyncDirNone);
             contextMenu->Connect(menuItemSyncDirNone->GetId(),  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextSyncDirNone),      NULL, this);
 
             //CONTEXT_SYNC_DIR_RIGHT
             wxMenuItem* menuItemSyncDirRight = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Set direction:")) +
                                                               wxT(" ->") + wxT("\tAlt - Right"));
-            menuItemSyncDirRight->SetBitmap(getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_RIGHT)));
+            menuItemSyncDirRight->SetBitmap(getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_RIGHT, true)));
             contextMenu->Append(menuItemSyncDirRight);
             contextMenu->Connect(menuItemSyncDirRight->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextSyncDirRight),     NULL, this);
 

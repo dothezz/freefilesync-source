@@ -117,15 +117,15 @@ bool hasDirectChild(const HierarchyObject& hierObj, Predicate p)
 }
 
 
-SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir) const
+SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir, bool enabled) const
 {
-    return proposedSyncOperation(getCategory(), selectedForSynchronization, testSyncDir, syncDirConflict);
+    return proposedSyncOperation(getCategory(), enabled, testSyncDir, syncDirConflict);
 }
 
 
 SyncOperation FileSystemObject::getSyncOperation() const
 {
-    return FileSystemObject::testSyncOperation(syncDir);
+    return FileSystemObject::testSyncOperation(syncDir, selectedForSynchronization);
     //no *not* make a virtual call to testSyncOperation()! See FileMapping::testSyncOperation()!
 }
 
@@ -205,9 +205,9 @@ SyncOperation DirMapping::getSyncOperation() const
 }
 
 
-SyncOperation FileMapping::testSyncOperation(SyncDirection testSyncDir) const
+SyncOperation FileMapping::testSyncOperation(SyncDirection testSyncDir, bool enabled) const
 {
-    SyncOperation op = FileSystemObject::testSyncOperation(testSyncDir);
+    SyncOperation op = FileSystemObject::testSyncOperation(testSyncDir, enabled);
 
     /*
         check whether we can optimize "create + delete" via "move":
@@ -236,7 +236,7 @@ SyncOperation FileMapping::testSyncOperation(SyncDirection testSyncDir) const
 
 SyncOperation FileMapping::getSyncOperation() const
 {
-    return FileMapping::testSyncOperation(getSyncDir());
+    return FileMapping::testSyncOperation(getSyncDir(), isActive());
 }
 
 

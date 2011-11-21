@@ -1001,8 +1001,10 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     //setting privileges requires admin rights!
     try
     {
-        //enable privilege: required to read/write SACL information
+        //enable privilege: required to read/write SACL information (only)
         activatePrivilege(SE_SECURITY_NAME); //polling allowed...
+        //Note: trying to copy SACL (SACL_SECURITY_INFORMATION) may return ERROR_PRIVILEGE_NOT_HELD (1314) on Samba shares. This is not due to missing privileges!
+        //However, this is okay, since copying NTFS permissions doesn't make sense in this case anyway
 
         //enable privilege: required to copy owner information
         activatePrivilege(SE_RESTORE_NAME);
@@ -1027,7 +1029,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
         DWORD bytesNeeded = 0;
         if (::GetFileSecurity(applyLongPathPrefix(sourceResolved).c_str(), //__in LPCTSTR lpFileName, -> long path prefix IS needed, although it is NOT mentioned on MSDN!!!
                               OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION |
-                              DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION,  //__in       SECURITY_INFORMATION RequestedInformation,
+                              DACL_SECURITY_INFORMATION  | SACL_SECURITY_INFORMATION, //__in       SECURITY_INFORMATION RequestedInformation,
                               reinterpret_cast<PSECURITY_DESCRIPTOR>(&buffer[0]),     //__out_opt  PSECURITY_DESCRIPTOR pSecurityDescriptor,
                               static_cast<DWORD>(buffer.size()), //__in       DWORD nLength,
                               &bytesNeeded))                     //__out      LPDWORD lpnLengthNeeded
@@ -1058,7 +1060,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
 
     if (!::SetFileSecurity(applyLongPathPrefix(targetResolved).c_str(), //__in  LPCTSTR lpFileName, -> long path prefix IS needed, although it is NOT mentioned on MSDN!!!
                            OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION |
-                           DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION, //__in  SECURITY_INFORMATION SecurityInformation,
+                           DACL_SECURITY_INFORMATION  | SACL_SECURITY_INFORMATION, //__in  SECURITY_INFORMATION SecurityInformation,
                            &secDescr)) //__in  PSECURITY_DESCRIPTOR pSecurityDescriptor
         throw FileError(_("Error copying file permissions:") + L"\n\"" + sourceResolved + L"\" ->\n\"" + targetResolved + L"\"" + L"\n\n" + getLastErrorFormatted() + L" (W)");
 
@@ -1396,8 +1398,8 @@ public:
     const Zstring& targetFile_;
     const bool osIsvistaOrLater_;
 
-    //there is some mixed responsibility in this class, pure read-only data and abstraction for error reporting
-    //however we need to keep it at one place as ::CopyFileEx() requires!
+    //there is mixed responsibility in this class, pure read-only data and abstraction for error reporting
+    //however we need to keep it together as ::CopyFileEx() requires!
 
     void reportUserException(const UInt64& bytesTransferred)
     {
@@ -1438,32 +1440,39 @@ private:
 };
 
 
-DWORD CALLBACK copyCallbackInternal(
-    LARGE_INTEGER totalFileSize,
-    LARGE_INTEGER totalBytesTransferred,
-    LARGE_INTEGER streamSize,
-    LARGE_INTEGER streamBytesTransferred,
-    DWORD dwStreamNumber,
-    DWORD dwCallbackReason,
-    HANDLE hSourceFile,
-    HANDLE hDestinationFile,
-    LPVOID lpData)
+DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
+                                    LARGE_INTEGER totalBytesTransferred,
+                                    LARGE_INTEGER streamSize,
+                                    LARGE_INTEGER streamBytesTransferred,
+                                    DWORD dwStreamNumber,
+                                    DWORD dwCallbackReason,
+                                    HANDLE hSourceFile,
+                                    HANDLE hDestinationFile,
+                                    LPVOID lpData)
 {
-    //this callback is invoked for block sizes managed by Windows, these may vary from e.g. 64 kB up to 1MB. It seems this is dependent from file size amongst others.
+    /*
+    this callback is invoked for block sizes managed by Windows, these may vary from e.g. 64 kB up to 1MB. It seems this depends on file size amongst others.
 
-    //symlink handling:
-    //if source is a symlink and COPY_FILE_COPY_SYMLINK is     specified, this callback is NOT invoked!
-    //if source is a symlink and COPY_FILE_COPY_SYMLINK is NOT specified, this callback is called and hSourceFile is a handle to the *target* of the link!
+    symlink handling:
+        if source is a symlink and COPY_FILE_COPY_SYMLINK is     specified, this callback is NOT invoked!
+        if source is a symlink and COPY_FILE_COPY_SYMLINK is NOT specified, this callback is called and hSourceFile is a handle to the *target* of the link!
 
-    //file time handling:
-    //::CopyFileEx() will copy file modification time (only) over from source file AFTER the last inocation of this callback
-    //=> it is possible to adapt file creation time of target in here, but NOT file modification time!
+    file time handling:
+        ::CopyFileEx() will copy file modification time (only) over from source file AFTER the last inocation of this callback
+        => it is possible to adapt file creation time of target in here, but NOT file modification time!
+
+    alternate data stream handling:
+        CopyFileEx() processes multiple streams one after another, stream 1 is the file data stream and always available!
+        Each stream is initialized with CALLBACK_STREAM_SWITCH and provides *new* hSourceFile, hDestinationFile.
+        Calling GetFileInformationByHandle() on hDestinationFile for stream > 1 results in ERROR_ACCESS_DENIED!
+    */
 
     CallbackData& cbd = *static_cast<CallbackData*>(lpData);
 
-    //#################### return source file attributes ################################
-    if (dwCallbackReason == CALLBACK_STREAM_SWITCH) //called up front for every file (even if 0-sized)
+    if (dwCallbackReason == CALLBACK_STREAM_SWITCH &&  //called up-front for every file (even if 0-sized)
+        dwStreamNumber == 1) //ADS!
     {
+        //#################### return source file attributes ################################
         BY_HANDLE_FILE_INFORMATION fileInfoSrc = {};
         if (!::GetFileInformationByHandle(hSourceFile, &fileInfoSrc))
         {
@@ -1480,7 +1489,7 @@ DWORD CALLBACK copyCallbackInternal(
 
         FileAttrib attr;
         attr.fileSize         = UInt64(fileInfoSrc.nFileSizeLow, fileInfoSrc.nFileSizeHigh);
-        attr.modificationTime = toTimeT(fileInfoSrc.ftLastWriteTime);
+        attr.modificationTime = toTimeT(fileInfoSrc.ftLastWriteTime); //no DST hack (yet)
         attr.sourceFileId     = extractFileID(fileInfoSrc);
         attr.targetFileId     = extractFileID(fileInfoTrg);
 
@@ -1498,18 +1507,12 @@ DWORD CALLBACK copyCallbackInternal(
             return PROGRESS_CANCEL;
         }
 
-        if (!::SetFileTime(hDestinationFile,
-                           &creationTime,
-                           NULL,
-                           NULL))
-        {
-            cbd.reportError(_("Error changing modification time:") + L"\n\"" + cbd.targetFile_ + L"\"" + L"\n\n" + getLastErrorFormatted());
-            return PROGRESS_CANCEL;
-        }
+        ::SetFileTime(hDestinationFile, &creationTime, NULL, NULL); //no error handling!
         //##############################################################################
     }
 
-    //if (totalFileSize.QuadPart == totalBytesTransferred.QuadPart) {} //called after copy operation is finished - note: for 0-sized files this callback is invoked just ONCE!
+    //called after copy operation is finished - note: for 0-sized files this callback is invoked just ONCE!
+    //if (totalFileSize.QuadPart == totalBytesTransferred.QuadPart && dwStreamNumber == 1) {}
 
     if (cbd.userCallback)
     {
@@ -1621,8 +1624,13 @@ void rawCopyWinApi_sub(const Zstring& sourceFile,
         *newAttrib = cbd.getSrcAttr();
 
     {
+        //DST hack
         const Int64 modTime = getFileTime(sourceFile, SYMLINK_FOLLOW); //throw FileError
         setFileTime(targetFile, modTime, SYMLINK_FOLLOW); //throw FileError
+
+        if (newAttrib)
+            newAttrib->modificationTime = modTime;
+
         //note: this sequence leads to a loss of precision of up to 1 sec!
         //perf-loss on USB sticks with many small files of about 30%! damn!
     }
@@ -1990,7 +1998,7 @@ void rawCopyStream(const Zstring& sourceFile,
                    CallbackCopyFile* callback,
                    FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 {
-    zen::ScopeGuard guardTarget = zen::makeGuard([&]() { removeFile(targetFile); }); //transactional behavior: place guard before lifetime of FileOutput
+    zen::ScopeGuard guardTarget = zen::makeGuard([&] { removeFile(targetFile); }); //transactional behavior: place guard before lifetime of FileOutput
     try
     {
         //open sourceFile for reading
@@ -1999,10 +2007,13 @@ void rawCopyStream(const Zstring& sourceFile,
         //create targetFile and open it for writing
         FileOutput fileOut(targetFile, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 
-        static boost::thread_specific_ptr<std::vector<char>> cpyBuf;
+        std::vector<char>& buffer = []() -> std::vector<char>&
+       {
+               static boost::thread_specific_ptr<std::vector<char>> cpyBuf;
         if (!cpyBuf.get())
             cpyBuf.reset(new std::vector<char>(512 * 1024)); //512 kb seems to be a reasonable buffer size
-        std::vector<char>& buffer = *cpyBuf;
+            return *cpyBuf;
+       }();
 
         //copy contents of sourceFile to targetFile
         UInt64 totalBytesTransferred;
@@ -2140,21 +2151,12 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
         	-> higher performance on non-buffered drives (e.g. usb sticks)
     */
 
-    //set file permissions
+    //file permissions
     if (copyFilePermissions)
     {
-        zen::ScopeGuard guardTargetFile = zen::makeGuard([&]() { removeFile(targetFile);});
+        zen::ScopeGuard guardTargetFile = zen::makeGuard([&] { removeFile(targetFile);});
+
         copyObjectPermissions(sourceFile, targetFile, SYMLINK_FOLLOW); //throw FileError
-
-
-        /*
-                warn_static("fix!!")
-                try
-                {
-                    copyObjectPermissions(targetFile, L"kfsdaj", SYMLINK_FOLLOW); //throw FileError
-                }
-                catch (...) {}
-        */
 
         guardTargetFile.dismiss(); //target has been created successfully!
     }

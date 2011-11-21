@@ -229,7 +229,7 @@ private:
     {
     public:
         Parser(const Wstring& phrase, //in
-               const Expr<int>*& expr, int& n, PluralForm::DumpList& dump) ://out
+               const Expr<int>*& expr, int& n, PluralForm::DumpList& dump) : //out
             scn(phrase),
             tk(scn.nextToken()),
             n_(n),

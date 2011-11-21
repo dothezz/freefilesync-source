@@ -126,7 +126,7 @@ struct X //see "policy based design"
 {
 typedef ... Handle;
 typedef ... FindData;
-static Handle create(const Zstring& directoryPf, FindData& fileInfo); //throw FileError
+static Handle create(const Zstring& directoryPf, FindData& fileInfo); //throw FileError - concession to FindFirstFile(): implement two operations: 1. open handle, 2. retrieve first data set
 static void destroy(Handle hnd); //throw()
 static bool next(Handle hnd, const Zstring& directory, WIN32_FIND_DATA& fileInfo) //throw FileError
 

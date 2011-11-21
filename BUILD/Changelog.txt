@@ -2,6 +2,11 @@
 |FreeFileSync|
 --------------
 
+Changelog v4.4
+--------------
+Fixed error copying files containing alternate data streams (Windows)
+
+
 Changelog v4.3
 --------------
 Detection of moved and renamed files
@@ -11,6 +16,7 @@ Fixed synchronization result dialog GUI glitch (Windows XP)
 Fixed macro %weekday%
 RealtimeSync: Fixed support for manual volume unmount (Windows)
 Added Croatian language
+Updated translation files
 
 
 Changelog v4.2

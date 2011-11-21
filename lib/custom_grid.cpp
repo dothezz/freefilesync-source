@@ -2298,13 +2298,13 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                         case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
                             break;
                         case CustomGridMiddle::BLOCKPOS_LEFT:
-                            dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_LEFT)), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                            dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_LEFT, true)), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                             break;
                         case CustomGridMiddle::BLOCKPOS_MIDDLE:
-                            dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_NONE)), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                            dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_NONE, true)), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                             break;
                         case CustomGridMiddle::BLOCKPOS_RIGHT:
-                            dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_RIGHT)), rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+                            dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_RIGHT, true)), rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
                             break;
                     }
                 else //default

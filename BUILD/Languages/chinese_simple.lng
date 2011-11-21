@@ -499,10 +499,10 @@ The command line is executed each time:
 <target>操作:</target>
 
 <source>Items found:</source>
-<target>已找到的元素:</target>
+<target>已找到的项目:</target>
 
 <source>Items remaining:</source>
-<target>剩余的元素:</target>
+<target>剩余的项目:</target>
 
 <source>Speed:</source>
 <target>速度:</target>
@@ -568,7 +568,7 @@ The command line is executed each time:
 <target><自动></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target></target>
+<target>使用一个数据库来识别和传播两边的改变. 删除，重命名和冲突会自动检测.</target>
 
 <source>Mirror ->></source>
 <target>镜像 ->></target>
@@ -661,7 +661,7 @@ is the same
 <target>同步中...</target>
 
 <source>Items processed:</source>
-<target>已处理的元素:</target>
+<target>已处理的项目:</target>
 
 <source>&Pause</source>
 <target>暂停(&P)</target>
@@ -790,7 +790,7 @@ Exclude: \stuff\temp\*
 <target>事务文件复制</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>首先写入到一个临时文件(*.ffs_tmp)然后再重命名. 这样即使出现致命错误也能保持一致的状态.</target>
 
 <source>Copy locked files</source>
 <target>复制被锁定的文件</target>
@@ -877,16 +877,16 @@ Exclude: \stuff\temp\*
 <target>自动调整栏宽</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>图标大小:</target>
 
 <source>Small</source>
-<target></target>
+<target>小</target>
 
 <source>Medium</source>
-<target></target>
+<target>中</target>
 
 <source>Large</source>
-<target></target>
+<target>大</target>
 
 <source>Include all rows</source>
 <target>包括所有行</target>
@@ -1342,10 +1342,10 @@ Exclude: \stuff\temp\*
 <target>删除右侧文件/文件夹</target>
 
 <source>Move file on left</source>
-<target></target>
+<target>移动左侧的文件</target>
 
 <source>Move file on right</source>
-<target></target>
+<target>移动右侧的文件</target>
 
 <source>Overwrite left file/folder with right one</source>
 <target>从右侧覆盖左侧的文件/文件夹</target>
