@@ -29,13 +29,16 @@ FileId extractFileID(const BY_HANDLE_FILE_INFORMATION& fileInfo)
     ULARGE_INTEGER uint = {};
     uint.HighPart = fileInfo.nFileIndexHigh;
     uint.LowPart  = fileInfo.nFileIndexLow;
-    return std::make_pair(fileInfo.dwVolumeSerialNumber, uint.QuadPart);
+
+    return fileInfo.dwVolumeSerialNumber != 0 && uint.QuadPart != 0 ?
+           FileId(fileInfo.dwVolumeSerialNumber, uint.QuadPart) : FileId();
 }
 
 inline
 FileId extractFileID(DWORD dwVolumeSerialNumber, ULARGE_INTEGER fileId)
 {
-    return std::make_pair(dwVolumeSerialNumber, fileId.QuadPart);
+    return dwVolumeSerialNumber != 0 && fileId.QuadPart != 0 ?
+           FileId(dwVolumeSerialNumber, fileId.QuadPart) : FileId();
 }
 
 namespace impl
@@ -57,7 +60,8 @@ typedef std::pair<decltype(impl::StatDummy::st_dev), decltype(impl::StatDummy::s
 inline
 FileId extractFileID(const struct stat& fileInfo)
 {
-    return std::make_pair(fileInfo.st_dev, fileInfo.st_ino);
+    return fileInfo.st_dev != 0 && fileInfo.st_ino != 0 ?
+           FileId(fileInfo.st_dev, fileInfo.st_ino) : FileId();
 }
 #endif
 }

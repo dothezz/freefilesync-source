@@ -60,8 +60,8 @@ void FolderHistoryBox::OnHideDropDown(wxCommandEvent& event)
 }
 #endif
 
-
-void FolderHistoryBox::update(const wxString& dirname)
+//set value and update list are technically entangled: see potential bug description below
+void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
 {
     //it may be a little lame to update the list on each mouse-button click, but it should be working and we dont't have to manipulate wxComboBox internals
 
@@ -69,8 +69,7 @@ void FolderHistoryBox::update(const wxString& dirname)
 
     //add some aliases to allow user changing to volume name and back, if possible
 #ifdef FFS_WIN
-    const Zstring activePath = toZ(GetValue());
-    std::vector<Zstring> aliases = getDirectoryAliases(activePath);
+    std::vector<Zstring> aliases = getDirectoryAliases(toZ(dirname));
     dirList.insert(dirList.end(), aliases.begin(), aliases.end());
 #endif
 

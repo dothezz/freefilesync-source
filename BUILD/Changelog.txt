@@ -2,6 +2,14 @@
 |FreeFileSync|
 --------------
 
+Changelog v4.5
+--------------
+Fixed "Windows Error Code 50: The request is not supported"
+Fixed "Windows Error Code 124: The system call level is not correct"
+Fixed config load performance problem if network drive is not reachable
+Support traversing truly empty directories (no ., ..) (Windows)
+
+
 Changelog v4.4
 --------------
 Fixed error copying files containing alternate data streams (Windows)

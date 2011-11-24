@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <zen/scope_guard.h>
+#include <zen/thread.h>
 
 #ifdef FFS_WIN
 #include <zen/dll.h>
@@ -354,6 +355,7 @@ Zstring volumenNameToPath(const Zstring& volumeName) //return empty string on er
 
 
 #ifdef FFS_WIN
+//attention: this call may seriously block if network volume is not available!!!
 Zstring volumePathToName(const Zstring& volumePath) //return empty string on error
 {
     const DWORD bufferSize = MAX_PATH + 1;
@@ -440,9 +442,14 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         dirname[1] == L':' &&
         dirname[2] == L'\\')
     {
-        Zstring volname = volumePathToName(Zstring(dirname.c_str(), 3));
-        if (!volname.empty())
-            output.insert(L"[" + volname + L"]" + Zstring(dirname.c_str() + 2));
+        //attention: "volumePathToName()" will seriously block if network volume is not available!!!
+        boost::unique_future<Zstring> futVolName = zen::async([=] { return volumePathToName(Zstring(dirname.c_str(), 3)); });
+        if (futVolName.timed_wait(boost::posix_time::seconds(1)))
+        {
+            Zstring volname = futVolName.get();
+            if (!volname.empty())
+                output.insert(L"[" + volname + L"]" + Zstring(dirname.c_str() + 2));
+        }
     }
 
     //2. replace volume name by volume path: [SYSTEM]\dirname -> c:\dirname

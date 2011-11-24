@@ -571,7 +571,7 @@ Komento suoritetaan kun:
 <target><- Automaattinen -></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target></target>
+<target>Tunnista ja monista muutokset tietokannalla molemmille puolille. Poisto/Poikkeama/Uudelleen nimeäminan tunnistetaan automaattisesti.</target>
 
 <source>Mirror ->></source>
 <target>Peilaava ->></target>
@@ -1089,9 +1089,6 @@ Sulje pois: \stuff\temp\*
 <source>Inactive</source>
 <target>Lepotilassa</target>
 
-<source>Last x hours</source>
-<target>Viimeiset x tuntia</target>
-
 <source>Today</source>
 <target>Tänään</target>
 
@@ -1354,10 +1351,10 @@ Sulje pois: \stuff\temp\*
 <target>Poista tiedosto/hakemisto oikealta</target>
 
 <source>Move file on left</source>
-<target></target>
+<target>Siirä vasen tiedosto</target>
 
 <source>Move file on right</source>
-<target></target>
+<target>Siirrä oikea tiedosto</target>
 
 <source>Overwrite left file/folder with right one</source>
 <target>Ylikirjoita oikea tiedosto/hakemista vasemanpuolisella</target>

@@ -80,7 +80,7 @@ public:
 
     void setValue(const wxString& dirname)
     {
-        update(dirname); //required for setting value correctly + Linux to ensure the dropdown is shown as being populated
+        setValueAndUpdateList(dirname); //required for setting value correctly + Linux to ensure the dropdown is shown as being populated
     }
 
     // GetValue
@@ -88,9 +88,9 @@ public:
 private:
     void OnKeyEvent(wxKeyEvent& event);
     void OnSelection(wxCommandEvent& event);
-    void OnUpdateList(wxEvent& event) { update(GetValue()); event.Skip(); }
+    void OnUpdateList(wxEvent& event) { setValueAndUpdateList(GetValue()); event.Skip(); }
 
-    void update(const wxString& dirname);
+    void setValueAndUpdateList(const wxString& dirname);
 
 #if wxCHECK_VERSION(2, 9, 1)
     void OnShowDropDown(wxCommandEvent& event);

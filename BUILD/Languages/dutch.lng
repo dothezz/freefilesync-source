@@ -1,6 +1,6 @@
 <header>
 	<language name>Nederlands</language name>
-	<translator>Rogier Wijker</translator>
+	<translator>Edwin Dierssen</translator>
 	<locale>nl_NL</locale>
 	<flag file>holland.png</flag file>
 	<plural forms>2</plural forms>
@@ -8,7 +8,7 @@
 </header>
 
 <source>Searching for directory %x...</source>
-<target></target>
+<target>Zoeken naar map %x...</target>
 
 <source>Show in Explorer</source>
 <target>Toon in de verkenner</target>
@@ -23,7 +23,7 @@
 <target>RealtimeSync - Geautomatiseerde Synchronisatie</target>
 
 <source>Select alternate comparison settings</source>
-<target></target>
+<target>Selecteer alternatieve vergelijkings instellingen</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Selecteer alternatieve synchronisatie instellingen</target>
@@ -80,13 +80,13 @@
 <target>Vind</target>
 
 <source>Select time span</source>
-<target></target>
+<target>Selecteer tijdsspanne</target>
 
 <source>Show pop-up</source>
-<target></target>
+<target>Laat pop-up zien</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target></target>
+<target>Laat pop-up zien bij foutmeldingen of waarschuwingen</target>
 
 <source>Ignore errors</source>
 <target>Negeer foutmeldingen</target>
@@ -110,7 +110,7 @@
 <target>Fout tijdens schrijven naar synchronisatie-database:</target>
 
 <source>Invalid command line: %x</source>
-<target></target>
+<target>Ongeldige opdrachtregel: %x</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows Fout Code %x:</target>
@@ -119,7 +119,7 @@
 <target>Linux Fout Code %x:</target>
 
 <source>Error resolving symbolic link:</source>
-<target>Fout tijdens opzoeken van symbolische koppeling:</target>
+<target>Fout tijdens opzoeken van snelkoppeling:</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -179,7 +179,7 @@
 <target>Opmaak van synchronisatie-database komt niet overeen:</target>
 
 <source>Database files do not share a common synchronization session:</source>
-<target></target>
+<target>Database bestanden delen geen gezamelijke synchronisatie sessie:</target>
 
 <source>An exception occurred!</source>
 <target>Er heeft een uitzondering plaatsgevonden!</target>
@@ -224,7 +224,10 @@
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</target>
 
 <source>Invalid FreeFileSync config file!</source>
 <target>Foutief FreeFileSync configuratiebestand!</target>
@@ -239,7 +242,7 @@
 <target>Kon een benodigde DLL niet laden:</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
-<target></target>
+<target>Fout bij toegang tot Volume Schaduwkopie Service!</target>
 
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Het aanmaken van schaduwkopieën op WOW64 wordt niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.</target>
@@ -517,7 +520,7 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <target>Taaklijst</target>
 
 <source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target></target>
+<target>Maak een batch bestand voor automatische synchronisatie. Om te starten in batch mode kunt u simpel dubbelklikken op het bestand of uitvoeren via de opdrachtregel: FreeFileSync.exe <ffs_batchbestand>. Dit kan ook worden gepland in de taakplanner van uw besturingssysteem.</target>
 
 <source>Help</source>
 <target>Help</target>
@@ -541,7 +544,7 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <target>Status terugkoppeling</target>
 
 <source>Run minimized</source>
-<target></target>
+<target>Geminimaliseerd uitvoeren</target>
 
 <source>Maximum number of logfiles:</source>
 <target>Maximale aantal van logbestanden:</target>
@@ -550,7 +553,7 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <target>Selecteer een map voor het logbestand:</target>
 
 <source>Batch settings</source>
-<target></target>
+<target>Batch instellingen</target>
 
 <source>&Save</source>
 <target>&Opslaan</target>
@@ -568,19 +571,19 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <target><Automatisch></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target></target>
+<target>Identificeer en verspreid veranderingen aan beide kanten met behulp van een database. Verwijderingen, hernoemingen en conflicten worden automatisch gedetecteerd.</target>
 
 <source>Mirror ->></source>
 <target>Spiegelen ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Spiegel backup van linker map. Rechter map is bewerk om precies hetzelfde te hebben na synchronisatie.</target>
+<target>Spiegel backup van linker map. Rechter map is bewerkt om na synchronisatie een exacte kopie te zijn van de linker map.</target>
 
 <source>Update -></source>
 <target>Bijwerken -></target>
 
 <source>Copy new or updated files to right folder.</source>
-<target>Kopieer nieuwe of geupdate bestanden naar de rechter map.</target>
+<target>Kopiëer nieuwe of geupdate bestanden naar de rechter map.</target>
 
 <source>Custom</source>
 <target>Aangepast</target>
@@ -630,10 +633,15 @@ Files are found equal if
      - file size
 are the same
 </source>
-<target></target>
+<target>
+Bestanden worden als gelijk bevonden indien,
+     - de laatste schrijf tijd en datum
+     - de bestandsgrootte
+gelijk zijn
+</target>
 
 <source>File time and size</source>
-<target></target>
+<target>Bestands tijd-en grootte</target>
 
 <source>
 Files are found equal if
@@ -650,7 +658,7 @@ overeenkomt
 <target>Bestandsinhoud</target>
 
 <source>Symbolic Link handling</source>
-<target>Symbolische Koppeling afhandeling</target>
+<target>Afhandeling van snelkoppelingen</target>
 
 <source>Synchronizing...</source>
 <target>Synchroniseert...</target>
@@ -767,10 +775,10 @@ Uitsluiten: \stuff\temp\*
 <target>Uitsluiten</target>
 
 <source>Minimum file size</source>
-<target></target>
+<target>Minimale bestandsgrootte</target>
 
 <source>Maximum file size</source>
-<target></target>
+<target>Maximale bestandsgrootte</target>
 
 <source>&Default</source>
 <target>&Standaard</target>
@@ -782,19 +790,19 @@ Uitsluiten: \stuff\temp\*
 <target>Verplaats kolom naar beneden</target>
 
 <source>Transactional file copy</source>
-<target></target>
+<target>Transactionele bestands kopie</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>Schrijf eerst naar een tijdelijk bestand (*.ffs_tmp) en hernoem dan. Dit garandeert een consistente toestand, zelfs in het geval van een fatale fout.</target>
 
 <source>Copy locked files</source>
-<target>Kopieer vergrendelde bestanden</target>
+<target>Kopiëer vergrendelde bestanden</target>
 
 <source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Kopieer gedeelde of vergrendelde bestanden met Volume Shadow Copy Service (Vereist Administrator rechten)</target>
+<target>Kopiëer gedeelde of vergrendelde bestanden met Volume Shadow Copy Service (Vereist Administrator rechten)</target>
 
 <source>Copy file access permissions</source>
-<target></target>
+<target>Kopiëer toegangsrechten van bestand.</target>
 
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Zet bestand en map permissies over (Vereist Administrator rechten)</target>
@@ -866,22 +874,22 @@ Uitsluiten: \stuff\temp\*
 <target>Aanpassen...</target>
 
 <source>Select time span...</source>
-<target></target>
+<target>Selecteer tijdsspanne...</target>
 
 <source>Auto-adjust columns</source>
 <target>Kolommen automatisch aanpassen</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>Icoon grootte:</target>
 
 <source>Small</source>
-<target></target>
+<target>Klein</target>
 
 <source>Medium</source>
-<target></target>
+<target>Middel</target>
 
 <source>Large</source>
-<target></target>
+<target>Groot</target>
 
 <source>Include all rows</source>
 <target>Alle rijen opnemen</target>
@@ -989,10 +997,10 @@ Uitsluiten: \stuff\temp\*
 <target>Toon bestanden die aan de rechterzijde overschreven zullen worden</target>
 
 <source>Hide files that won't be copied</source>
-<target>Verberg bestanden die niet zullen worden gekopieerd</target>
+<target>Verberg bestanden die niet zullen worden gekopiëerd</target>
 
 <source>Show files that won't be copied</source>
-<target>Toon bestanden die niet gekopieerd zullen worden</target>
+<target>Toon bestanden die niet gekopiëerd zullen worden</target>
 
 <source>All directories in sync!</source>
 <target>Alle mappen zijn gesynchroniseerd!</target>
@@ -1081,20 +1089,17 @@ Uitsluiten: \stuff\temp\*
 <source>Inactive</source>
 <target>Niet actief</target>
 
-<source>Last x hours</source>
-<target></target>
-
 <source>Today</source>
-<target></target>
+<target>Vandaag</target>
 
 <source>This week</source>
-<target></target>
+<target>Deze week</target>
 
 <source>This month</source>
-<target></target>
+<target>Deze maand</target>
 
 <source>This year</source>
-<target></target>
+<target>Dit jaar</target>
 
 <source>Byte</source>
 <target>Byte</target>
@@ -1118,7 +1123,7 @@ Uitsluiten: \stuff\temp\*
 <target>Volg</target>
 
 <source>Copy NTFS permissions</source>
-<target></target>
+<target>Kopiëer NTFS permissies</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:</target>
@@ -1256,7 +1261,7 @@ Uitsluiten: \stuff\temp\*
 <target>Fout tijdens het aanmaken van map:</target>
 
 <source>Error copying symbolic link:</source>
-<target>Fout tijdens kopiëren van symbolische koppeling:</target>
+<target>Fout tijdens kopiëren van snelkoppeling:</target>
 
 <source>Error copying file:</source>
 <target>Fout tijdens kopiëren van bestand:</target>
@@ -1316,7 +1321,7 @@ Uitsluiten: \stuff\temp\*
 <target>Bestanden %x hebben dezelfde datums maar een afwijkende grootte!</target>
 
 <source>Symlinks %x have the same date but a different target!</source>
-<target>Symbolische koppeling %x heeft dezelfde datum maar een ander doel!</target>
+<target>Snelkoppeling %x heeft dezelfde datum maar een ander doel!</target>
 
 <source>Comparing content of files %x</source>
 <target>De inhoud van %x bestanden wordt vergeleken</target>
@@ -1334,10 +1339,10 @@ Uitsluiten: \stuff\temp\*
 <target>Bestanden/Mappen verschillen alleen in attributen</target>
 
 <source>Copy new file/folder to left</source>
-<target>Kopieer nieuw bestand/map naar links</target>
+<target>Kopiëer nieuw bestand/map naar links</target>
 
 <source>Copy new file/folder to right</source>
-<target>Kopieer nieuw bestand/map naar rechts</target>
+<target>Kopiëer nieuw bestand/map naar rechts</target>
 
 <source>Delete left file/folder</source>
 <target>Verwijder linker bestand/map</target>
@@ -1346,10 +1351,10 @@ Uitsluiten: \stuff\temp\*
 <target>Verwijder rechter bestand/map</target>
 
 <source>Move file on left</source>
-<target></target>
+<target>Verplaats bestand aan de linkerkant</target>
 
 <source>Move file on right</source>
-<target></target>
+<target>Verplaats bestand aan de rechterkant</target>
 
 <source>Overwrite left file/folder with right one</source>
 <target>Overschrijf linker bestand/map met de rechter</target>
@@ -1361,10 +1366,10 @@ Uitsluiten: \stuff\temp\*
 <target>Geen actie ondernemen</target>
 
 <source>Copy file attributes only to left</source>
-<target>Kopieer bestandsattributen alleen naar links</target>
+<target>Kopiëer bestandsattributen alleen naar links</target>
 
 <source>Copy file attributes only to right</source>
-<target>Kopieer bestandsattributen allen naar rechts</target>
+<target>Kopiëer bestandsattributen alleen naar rechts</target>
 
 <source>Multiple...</source>
 <target>Meerdere...</target>
@@ -1376,40 +1381,40 @@ Uitsluiten: \stuff\temp\*
 <target>Verwijderen van map %x</target>
 
 <source>Deleting symbolic link %x</source>
-<target></target>
+<target>Verwijderen van snelkoppeling %x</target>
 
 <source>Moving file %x to recycle bin</source>
-<target></target>
+<target>Bezig met verplaatsen van bestand %x naar prullenbak</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target></target>
+<target>Bezig met verplaatsen van map %x naar prullenbak</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target></target>
+<target>Bezig met verplaatsen van snelkoppeling %x naar prullenbak</target>
 
 <source>Moving file %x to %y</source>
-<target></target>
+<target>Bezig met verplaatsen van bestand %x naar %y</target>
 
 <source>Moving folder %x to %y</source>
-<target></target>
+<target>Bezig met verplaatsen van map %x naar %y</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target></target>
+<target>Bezig met verplaatsen van snelkoppeling %x naar %y</target>
 
 <source>Creating file %x</source>
-<target></target>
+<target>Bestand %x wordt aangemaakt</target>
 
 <source>Creating symbolic link %x</source>
-<target></target>
+<target>Snelkoppeling %x wordt aangemaakt</target>
 
 <source>Creating folder %x</source>
 <target>Map %x wordt aangemaakt</target>
 
 <source>Overwriting file %x</source>
-<target></target>
+<target>Bezig met overschrijven van bestand %x</target>
 
 <source>Overwriting symbolic link %x</source>
-<target></target>
+<target>Bezig met overschrijven van snelkoppeling %x</target>
 
 <source>Verifying file %x</source>
 <target>Verifieert bestand %x</target>
@@ -1436,7 +1441,7 @@ Uitsluiten: \stuff\temp\*
 <target>Significant verschil gedetecteerd:</target>
 
 <source>More than 50% of the total number of files will be copied or deleted!</source>
-<target>Meer dan 50% van alle bestanden zal gekopieerd of verwijderd worden!</target>
+<target>Meer dan 50% van alle bestanden zal gekopiëerd of verwijderd worden!</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Niet genoeg vrije schijfruimte beschikbaar op:</target>
@@ -1448,7 +1453,7 @@ Uitsluiten: \stuff\temp\*
 <target>Beschikbare vrije schijfruimte :</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target></target>
+<target>Prullenbak is niet beschikbaar voor de volgende locaties! De bestanden worden permanent verwijderd:</target>
 
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Een map wordt bewerkt die deel is van meerdere mappen! Controleer de synchronisatie instellingen!</target>

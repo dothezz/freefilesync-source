@@ -31,13 +31,13 @@ namespace
 //implement "retry" in a generic way:
 
 template <class Command> inline //function object expecting to throw FileError if operation fails
-void tryReportingError(Command cmd, zen::TraverseCallback& callback)
+bool tryReportingError(Command cmd, zen::TraverseCallback& callback) //return "true" on success, "false" if error was ignored
 {
     for (;;)
         try
         {
             cmd();
-            return;
+            return true;
         }
         catch (const FileError& e)
         {
@@ -46,7 +46,7 @@ void tryReportingError(Command cmd, zen::TraverseCallback& callback)
                 case TraverseCallback::TRAV_ERROR_RETRY:
                     break;
                 case TraverseCallback::TRAV_ERROR_IGNORE:
-                    return;
+                    return false;
                 default:
                     assert(false);
                     break;
@@ -119,18 +119,17 @@ const DllFun<findplus::OpenDirFunc>  openDir (findplus::getDllName(), findplus::
 const DllFun<findplus::ReadDirFunc>  readDir (findplus::getDllName(), findplus::readDirFuncName ); //load at startup: avoid pre C++11 static initialization MT issues
 const DllFun<findplus::CloseDirFunc> closeDir(findplus::getDllName(), findplus::closeDirFuncName); //
 
-
 /*
 Common C-style interface for Win32 FindFirstFile(), FindNextFile() and FileFilePlus openDir(), closeDir():
-struct X //see "policy based design"
+struct TraverserPolicy //see "policy based design"
 {
-typedef ... Handle;
+typedef ... DirHandle;
 typedef ... FindData;
-static Handle create(const Zstring& directoryPf, FindData& fileInfo); //throw FileError - concession to FindFirstFile(): implement two operations: 1. open handle, 2. retrieve first data set
-static void destroy(Handle hnd); //throw()
-static bool next(Handle hnd, const Zstring& directory, WIN32_FIND_DATA& fileInfo) //throw FileError
+static void create(const Zstring& directory, DirHandle& hnd); //throw FileError - *no* concession to FindFirstFile(): open handle only, *no* return of data!
+static void destroy(DirHandle hnd); //throw()
+static bool getEntry(DirHandle hnd, const Zstring& directory, FindData& fileInfo) //throw FileError
 
-//helper routines
+//FindData "member" functions
 static void extractFileInfo            (const FindData& fileInfo, const DWORD* volumeSerial, TraverseCallback::FileInfo& output);
 static Int64 getModTime                (const FindData& fileInfo);
 static const FILETIME& getModTimeRaw   (const FindData& fileInfo); //yet another concession to DST hack
@@ -140,35 +139,54 @@ static bool isDirectory                (const FindData& fileInfo);
 static bool isSymlink                  (const FindData& fileInfo);
 }
 
-Note: Win32 FindFirstFile(), FindNextFile() is a weaker abstraction than FileFilePlus openDir(), readDir(), closeDir() and Unix opendir(), closedir(), stat(),
-      so unfortunately we have to use former as a greatest common divisor
+Note: Win32 FindFirstFile(), FindNextFile() is a weaker abstraction than FileFilePlus openDir(), readDir(), closeDir() and Unix opendir(), closedir(), stat()
 */
 
 
 struct Win32Traverser
 {
-    typedef HANDLE Handle;
+    struct DirHandle
+    {
+        DirHandle() : searchHandle(NULL), firstRead(true) {}
+
+        HANDLE searchHandle;
+        bool firstRead;
+        WIN32_FIND_DATA firstData;
+    };
+
     typedef WIN32_FIND_DATA FindData;
 
-    static Handle create(const Zstring& directory, FindData& fileInfo) //throw FileError
+    static void create(const Zstring& directory, DirHandle& hnd) //throw FileError
     {
         const Zstring& directoryPf = endsWith(directory, FILE_NAME_SEPARATOR) ?
                                      directory :
                                      directory + FILE_NAME_SEPARATOR;
 
-        HANDLE output = ::FindFirstFile(applyLongPathPrefix(directoryPf + L'*').c_str(), &fileInfo);
+        hnd.searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryPf + L'*').c_str(), &hnd.firstData);
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
-        if (output == INVALID_HANDLE_VALUE)
+        if (hnd.searchHandle == INVALID_HANDLE_VALUE)
             throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
-        //::GetLastError() == ERROR_FILE_NOT_FOUND -> actually NOT okay, even for an empty directory this should not occur (., ..)
-        return output;
+
+        //::GetLastError() == ERROR_FILE_NOT_FOUND -> *usually* NOT okay:
+        //however it is unclear whether this indicates a missing directory or a completely empty directory
+        //      note: not all directories contain "., .." entries! E.g. a drive's root directory or NetDrive + ftp.gnu.org\CRYPTO.README"
+        //      -> addon: this is NOT a directory, it looks like one in NetDrive, but it's a file in Opera!
+        //we have to guess it's former and let the error propagate
+        // -> FindFirstFile() is a nice example of violation of API design principle of single responsibility and its consequences
     }
 
-    static void destroy(Handle hnd) { ::FindClose(hnd); } //throw()
+    static void destroy(const DirHandle& hnd) { ::FindClose(hnd.searchHandle); } //throw()
 
-    static bool next(Handle hnd, const Zstring& directory, FindData& fileInfo) //throw FileError
+    static bool getEntry(DirHandle& hnd, const Zstring& directory, FindData& fileInfo) //throw FileError
     {
-        if (!::FindNextFile(hnd, &fileInfo))
+        if (hnd.firstRead)
+        {
+            hnd.firstRead = false;
+            ::memcpy(&fileInfo, &hnd.firstData, sizeof(fileInfo));
+            return true;
+        }
+
+        if (!::FindNextFile(hnd.searchHandle, &fileInfo))
         {
             if (::GetLastError() == ERROR_NO_MORE_FILES) //not an error situation
                 return false;
@@ -178,7 +196,6 @@ struct Win32Traverser
         return true;
     }
 
-    //helper routines
     template <class FindData>
     static void extractFileInfo(const FindData& fileInfo, const DWORD* volumeSerial, TraverseCallback::FileInfo& output)
     {
@@ -208,27 +225,27 @@ struct Win32Traverser
 
 struct FilePlusTraverser
 {
-    typedef findplus::FindHandle Handle;
+    struct DirHandle
+    {
+        DirHandle() : searchHandle(NULL) {}
+
+        findplus::FindHandle searchHandle;
+    };
+
     typedef findplus::FileInformation FindData;
 
-    static Handle create(const Zstring& directory, FindData& fileInfo) //throw FileError
+    static void create(const Zstring& directory, DirHandle& hnd) //throw FileError
     {
-        Handle output = ::openDir(applyLongPathPrefix(directory).c_str());
-        if (output == NULL)
+        hnd.searchHandle = ::openDir(applyLongPathPrefix(directory).c_str());
+        if (hnd.searchHandle == NULL)
             throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
-
-        bool rv = next(output, directory, fileInfo); //throw FileError
-        if (!rv) //we expect at least two successful reads, even for an empty directory: ., ..
-            throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted(ERROR_NO_MORE_FILES));
-
-        return output;
     }
 
-    static void destroy(Handle hnd) { ::closeDir(hnd); } //throw()
+    static void destroy(DirHandle hnd) { ::closeDir(hnd.searchHandle); } //throw()
 
-    static bool next(Handle hnd, const Zstring& directory, FindData& fileInfo) //throw FileError
+    static bool getEntry(DirHandle hnd, const Zstring& directory, FindData& fileInfo) //throw FileError
     {
-        if (!::readDir(hnd, fileInfo))
+        if (!::readDir(hnd.searchHandle, fileInfo))
         {
             if (::GetLastError() == ERROR_NO_MORE_FILES) //not an error situation
                 return false;
@@ -238,7 +255,6 @@ struct FilePlusTraverser
         return true;
     }
 
-    //helper routines
     template <class FindData>
     static void extractFileInfo(const FindData& fileInfo, const DWORD* volumeSerial, TraverseCallback::FileInfo& output)
     {
@@ -305,31 +321,43 @@ private:
                 throw FileError(_("Endless loop when traversing directory:") + L"\n\"" + directory + L"\"");
         }, sink);
 
-        typename Trav::FindData fileInfo = {};
+        typename Trav::DirHandle searchHandle;
 
-        typename Trav::Handle searchHandle = 0;
-
-        tryReportingError([&]
+        const bool openSuccess = tryReportingError([&]
         {
             typedef Trav Trav; //f u VS!
-            searchHandle = Trav::create(directory, fileInfo); //throw FileError
+            Trav::create(directory, searchHandle); //throw FileError
         }, sink);
 
-        if (searchHandle == 0)
+        if (!openSuccess)
             return; //ignored error
         ZEN_ON_BLOCK_EXIT(typedef Trav Trav; Trav::destroy(searchHandle));
 
-        do
+        typename Trav::FindData fileInfo = {};
+
+        while ([&]() -> bool
+    {
+        bool moreData = false;
+
+        typedef Trav Trav1; //f u VS!
+        tryReportingError([&]
         {
-            //don't return "." and ".."
+            typedef Trav1 Trav; //f u VS!
+            moreData = Trav::getEntry(searchHandle, directory, fileInfo); //throw FileError
+            }, sink);
+
+            return moreData;
+        }())
+        {
+            //skip "." and ".."
             const Zchar* const shortName = Trav::getShortName(fileInfo);
             if (shortName[0] == L'.' &&
-                (shortName[1] == L'\0' || (shortName[1] == L'.' && shortName[2] == L'\0')))
+            (shortName[1] == L'\0' || (shortName[1] == L'.' && shortName[2] == L'\0')))
                 continue;
 
             const Zstring& fullName = endsWith(directory, FILE_NAME_SEPARATOR) ?
-                                      directory + shortName :
-                                      directory + FILE_NAME_SEPARATOR + shortName;
+            directory + shortName :
+            directory + FILE_NAME_SEPARATOR + shortName;
 
             if (Trav::isSymlink(fileInfo) && !followSymlinks_) //evaluate symlink directly
             {
@@ -383,19 +411,6 @@ private:
                 sink.onFile(shortName, fullName, details);
             }
         }
-        while ([&]() -> bool
-    {
-        bool moreData = false;
-
-        typedef Trav Trav1; //f u VS!
-        tryReportingError([&]
-        {
-            typedef Trav1 Trav; //f u VS!
-            moreData = Trav::next(searchHandle, directory, fileInfo); //throw FileError
-            }, sink);
-
-            return moreData;
-        }());
     }
 
 

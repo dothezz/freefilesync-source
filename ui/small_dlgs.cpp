@@ -160,7 +160,6 @@ FilterDlg::FilterDlg(wxWindow* parent,
 
     enumTimeDescr.
     add(UTIME_NONE, _("Inactive")).
-    //add(UTIME_LAST_X_HOURS, _("Last x hours")). //better: "Last %x hour" ?
     add(UTIME_TODAY,        _("Today")).
     add(UTIME_THIS_WEEK,    _("This week")).
     add(UTIME_THIS_MONTH,   _("This month")).

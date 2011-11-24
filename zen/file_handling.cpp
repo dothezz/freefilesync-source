@@ -2008,12 +2008,12 @@ void rawCopyStream(const Zstring& sourceFile,
         FileOutput fileOut(targetFile, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 
         std::vector<char>& buffer = []() -> std::vector<char>&
-       {
-               static boost::thread_specific_ptr<std::vector<char>> cpyBuf;
-        if (!cpyBuf.get())
-            cpyBuf.reset(new std::vector<char>(512 * 1024)); //512 kb seems to be a reasonable buffer size
+        {
+            static boost::thread_specific_ptr<std::vector<char>> cpyBuf;
+            if (!cpyBuf.get())
+                cpyBuf.reset(new std::vector<char>(512 * 1024)); //512 kb seems to be a reasonable buffer size
             return *cpyBuf;
-       }();
+        }();
 
         //copy contents of sourceFile to targetFile
         UInt64 totalBytesTransferred;

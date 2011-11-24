@@ -348,7 +348,7 @@ public:
     virtual CompareFilesResult getCategory() const = 0;
     virtual std::wstring getCatConflict() const = 0; //only filled if getCategory() == FILE_CONFLICT
     //sync operation
-    virtual SyncOperation testSyncOperation(SyncDirection testSyncDir, bool enabled) const;
+    virtual SyncOperation testSyncOperation(SyncDirection testSyncDir, bool active) const;
     virtual SyncOperation getSyncOperation() const;
     std::wstring getSyncOpConflict() const; //return conflict when determining sync direction or during categorization
 
@@ -491,7 +491,7 @@ public:
     virtual CompareFilesResult getCategory() const;
     virtual std::wstring getCatConflict() const;
 
-    virtual SyncOperation testSyncOperation(SyncDirection testSyncDir, bool enabled) const;
+    virtual SyncOperation testSyncOperation(SyncDirection testSyncDir, bool active) const;
     virtual SyncOperation getSyncOperation() const;
 
     template <SelectedSide side> void syncTo(const FileDescriptor& descrTarget, const FileDescriptor* descrSource = NULL); //copy + update file attributes (optional)

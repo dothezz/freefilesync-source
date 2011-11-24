@@ -117,9 +117,9 @@ bool hasDirectChild(const HierarchyObject& hierObj, Predicate p)
 }
 
 
-SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir, bool enabled) const
+SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir, bool active) const
 {
-    return proposedSyncOperation(getCategory(), enabled, testSyncDir, syncDirConflict);
+    return proposedSyncOperation(getCategory(), active, testSyncDir, syncDirConflict);
 }
 
 
@@ -205,15 +205,15 @@ SyncOperation DirMapping::getSyncOperation() const
 }
 
 
-SyncOperation FileMapping::testSyncOperation(SyncDirection testSyncDir, bool enabled) const
+SyncOperation FileMapping::testSyncOperation(SyncDirection testSyncDir, bool active) const
 {
-    SyncOperation op = FileSystemObject::testSyncOperation(testSyncDir, enabled);
+    SyncOperation op = FileSystemObject::testSyncOperation(testSyncDir, active);
 
     /*
         check whether we can optimize "create + delete" via "move":
         note: as long as we consider "create + delete" cases only, detection of renamed files, should be fine even for "binary" comparison variant!
     */
-    if (const FileMapping* refFile = dynamic_cast<const FileMapping*>(FileSystemObject::retrieve(moveFileRef)))
+    if (const FileSystemObject* refFile = dynamic_cast<const FileMapping*>(FileSystemObject::retrieve(moveFileRef))) //we expect a "FileMapping", but only need a "FileSystemObject"
     {
         SyncOperation opRef = refFile->FileSystemObject::getSyncOperation(); //do *not* make a virtual call!
 
