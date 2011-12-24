@@ -6,7 +6,8 @@
 
 #include "folder_history_box.h"
 #include <list>
-#include "resolve_path.h"
+#include <wx/scrolwin.h>
+#include "../lib/resolve_path.h"
 
 using namespace zen;
 
@@ -30,13 +31,10 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
     /*##*/ SetMinSize(wxSize(150, -1)); //## workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
     //#####################################
 
-    //register key event to enable item deletion
-    Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(FolderHistoryBox::OnKeyEvent), NULL, this);
-
-    //refresh history list on mouse click
-    Connect(wxEVT_LEFT_DOWN, wxEventHandler(FolderHistoryBox::OnUpdateList), NULL, this);
-
-    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(FolderHistoryBox::OnSelection), NULL, this);
+    Connect(wxEVT_KEY_DOWN,                      wxKeyEventHandler(FolderHistoryBox::OnKeyEvent  ), NULL, this);
+    Connect(wxEVT_LEFT_DOWN,                        wxEventHandler(FolderHistoryBox::OnUpdateList), NULL, this);
+    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(FolderHistoryBox::OnSelection ), NULL, this);
+    Connect(wxEVT_MOUSEWHEEL,                  wxMouseEventHandler(FolderHistoryBox::OnMouseWheel), NULL, this);
 
 #if wxCHECK_VERSION(2, 9, 1)
     Connect(wxEVT_COMMAND_COMBOBOX_DROPDOWN, wxCommandEventHandler(FolderHistoryBox::OnShowDropDown), NULL, this);
@@ -138,4 +136,28 @@ void FolderHistoryBox::OnKeyEvent(wxKeyEvent& event)
         }
     }
     event.Skip();
+}
+
+
+void FolderHistoryBox::OnMouseWheel(wxMouseEvent& event)
+{
+    //although switching to available items is wxWidgets default, this is NOT windows default, e.g. explorer
+    //additionally this will delete manual entries, although all the users wanted is scroll the parent window!
+
+    //redirect to parent scrolled window!
+    wxWindow* wnd = this;
+    for (;;)
+    {
+        wnd = wnd->GetParent();
+        if (!wnd)
+            break;
+
+        if (dynamic_cast<wxScrolledWindow*>(wnd) != NULL)
+        {
+            wnd->GetEventHandler()->AddPendingEvent(event);
+            break;
+        }
+    }
+
+    //	event.Skip();
 }

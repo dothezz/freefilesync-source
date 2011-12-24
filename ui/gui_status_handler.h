@@ -27,8 +27,9 @@ public:
     CompareStatusHandler(MainDialog& dlg);
     ~CompareStatusHandler();
 
-    virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
+    virtual void initNewProcess     (int objectsTotal, zen::Int64 dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
+    virtual void updateTotalData    (int objectsDelta, zen::Int64 dataDelta);
     virtual void reportStatus(const std::wstring& text);
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
@@ -51,11 +52,16 @@ private:
 class SyncStatusHandler : public StatusHandler
 {
 public:
-    SyncStatusHandler(MainDialog* parentDlg, xmlAccess::OnGuiError handleError, const wxString& jobName);
+    SyncStatusHandler(MainDialog* parentDlg,
+                      xmlAccess::OnGuiError handleError,
+                      const wxString& jobName,
+                      const std::wstring& execWhenFinished,
+                      std::vector<std::wstring>& execFinishedHistory);
     ~SyncStatusHandler();
 
-    virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
+    virtual void initNewProcess     (int objectsTotal, zen::Int64 dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
+    virtual void updateTotalData    (int objectsDelta, zen::Int64 dataDelta);
     virtual void reportStatus(const std::wstring& text);
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();

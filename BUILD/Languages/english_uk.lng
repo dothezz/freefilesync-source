@@ -202,9 +202,6 @@
 <pluralform>%x sec</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Drag && drop</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -366,8 +363,8 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Batch Job</target>
 
-<source>Unable to create logfile!</source>
-<target>Unable to create logfile!</target>
+<source>Unable to create log file!</source>
+<target>Unable to create log file!</target>
 
 <source>Batch execution</source>
 <target>Batch execution</target>
@@ -413,6 +410,24 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Requires an Internet connection!)</target>
+
+<source>Drag && drop</source>
+<target>Drag && drop</target>
+
+<source>Close progress dialog</source>
+<target>Close progress dialog</target>
+
+<source>Shut down</source>
+<target>Shut down</target>
+
+<source>Log off</source>
+<target>Log off</target>
+
+<source>Standby</source>
+<target>Standby</target>
+
+<source>Hibernate</source>
+<target>Hibernate</target>
 
 <source>1. &Compare</source>
 <target>1. &Compare</target>
@@ -528,9 +543,6 @@ The command line is executed each time:
 <source>Filter files</source>
 <target>Filter files</target>
 
-<source>Error handling</source>
-<target>Error handling</target>
-
 <source>Left</source>
 <target>Left</target>
 
@@ -543,14 +555,17 @@ The command line is executed each time:
 <source>Status feedback</source>
 <target>Status feedback</target>
 
-<source>Run minimized</source>
-<target>Run minimised</target>
+<source>Show progress dialog</source>
+<target>Show progress dialog</target>
 
-<source>Maximum number of logfiles:</source>
-<target>Maximum number of logfiles:</target>
+<source>Error handling</source>
+<target>Error handling</target>
 
-<source>Select logfile directory:</source>
-<target>Select logfile directory:</target>
+<source>Maximum number of log files:</source>
+<target>Maximum number of log files:</target>
+
+<source>Select log file directory:</source>
+<target>Select log file directory:</target>
 
 <source>Batch settings</source>
 <target>Batch settings</target>
@@ -594,8 +609,8 @@ The command line is executed each time:
 <source>Deletion handling</source>
 <target>Deletion handling</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>On completion:</target>
 
 <source>Configuration</source>
 <target>Configuration</target>
@@ -623,6 +638,9 @@ The command line is executed each time:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Conflict/file cannot be categorised</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Compare by...</target>
@@ -1077,20 +1095,17 @@ Exclude: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Abort requested: Waiting for current operation to finish...</target>
 
-<source>Continue</source>
-<target>Continue</target>
-
 <source>Pause</source>
 <target>Pause</target>
+
+<source>Continue</source>
+<target>Continue</target>
 
 <source>Cannot find %x</source>
 <target>Cannot find %x</target>
 
 <source>Inactive</source>
 <target>Inactive</target>
-
-<source>Last x hours</source>
-<target>Last x hours</target>
 
 <source>Today</source>
 <target>Today</target>
@@ -1407,11 +1422,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Creating file %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Creating symbolic link %x</target>
-
 <source>Creating folder %x</source>
 <target>Creating folder %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Creating symbolic link %x</target>
 
 <source>Overwriting file %x</source>
 <target>Overwriting file %x</target>

@@ -18,7 +18,9 @@ public:
     int  OnRun();
     int  OnExit();
     bool OnExceptionInMainLoop();
+
     void OnStartApplication(wxIdleEvent& event);
+    void OnQueryEndSession(wxEvent& event);
 
 private:
     void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, xmlAccess::XmlGlobalSettings& settings);

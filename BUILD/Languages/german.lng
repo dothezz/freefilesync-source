@@ -202,9 +202,6 @@
 <pluralform>%x Sek.</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Drag && Drop</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -366,7 +363,7 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Batch-Job</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Die Protokolldatei konnte nicht erstellt werden!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ Die Befehlszeile wird ausgeführt wenn:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Eine Internetverbindung wird benötigt!)</target>
+
+<source>Drag && drop</source>
+<target>Drag && Drop</target>
+
+<source>Close progress dialog</source>
+<target>Schließe Fortschrittsdialog</target>
+
+<source>Shut down</source>
+<target>Herunterfahren</target>
+
+<source>Log off</source>
+<target>Abmelden</target>
+
+<source>Standby</source>
+<target>Energie sparen</target>
+
+<source>Hibernate</source>
+<target>Ruhezustand</target>
 
 <source>1. &Compare</source>
 <target>1. &Vergleichen</target>
@@ -528,9 +543,6 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Filter files</source>
 <target>Dateien filtern</target>
 
-<source>Error handling</source>
-<target>Fehlerbehandlung</target>
-
 <source>Left</source>
 <target>Links</target>
 
@@ -543,13 +555,16 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Status feedback</source>
 <target>Statusrückmeldung</target>
 
-<source>Run minimized</source>
-<target>Minimiert ausführen</target>
+<source>Show progress dialog</source>
+<target>Zeige Fortschrittsdialog</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Fehlerbehandlung</target>
+
+<source>Maximum number of log files:</source>
 <target>Maximale Anzahl an Logdateien:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Verzeichnis für Logdatei wählen:</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Deletion handling</source>
 <target>Behandlung von Löschungen</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>Nach Abschluss:</target>
 
 <source>Configuration</source>
 <target>Konfiguration</target>
@@ -623,6 +638,9 @@ Die Befehlszeile wird ausgeführt wenn:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikt/Datei, die nicht eingeordnet werden kann</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Vergleichen nach...</target>
@@ -1077,20 +1095,17 @@ Ausschließen: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Abbruch initiiert: Warte, bis aktuelle Operation beendet ist...</target>
 
-<source>Continue</source>
-<target>Fortfahren</target>
-
 <source>Pause</source>
 <target>Pause</target>
+
+<source>Continue</source>
+<target>Fortfahren</target>
 
 <source>Cannot find %x</source>
 <target>%x wurde nicht gefunden.</target>
 
 <source>Inactive</source>
 <target>Inaktiv</target>
-
-<source>Last x hours</source>
-<target>Letzte x Stunden</target>
 
 <source>Today</source>
 <target>Heute</target>
@@ -1407,11 +1422,11 @@ Ausschließen: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Erstelle Datei %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Erstelle Symbolischen Link %x</target>
-
 <source>Creating folder %x</source>
 <target>Erstelle Verzeichnis %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Erstelle Symbolischen Link %x</target>
 
 <source>Overwriting file %x</source>
 <target>Überschreibe Datei %x</target>

@@ -244,7 +244,7 @@ zen::Int64 resolve(size_t value, UnitTime unit, zen::Int64 defaultVal)
             localTimeFmt->tm_sec  = 0; //0-61
             localTimeFmt->tm_min  = 0; //0-59
             localTimeFmt->tm_hour = 0; //0-23
-            size_t timeFrom = ::mktime(localTimeFmt);
+            const time_t timeFrom = ::mktime(localTimeFmt);
 
             int dayOfWeek = (localTimeFmt->tm_wday + 6) % 7; //tm_wday := days since Sunday	0-6
             // +6 == -1 in Z_7
@@ -395,7 +395,7 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
 
     //merge folder pair config
     std::vector<FolderPairEnh> fpMerged;
-    for (std::vector<MainConfiguration>::const_iterator iterMain = mainCfgs.begin(); iterMain != mainCfgs.end(); ++iterMain)
+    for (auto iterMain = mainCfgs.begin(); iterMain != mainCfgs.end(); ++iterMain)
     {
         std::vector<FolderPairEnh> fpTmp;
 
@@ -469,7 +469,7 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
         globalFilter = fpMerged[0].localFilter;
 
     //strip redundancy...
-    for (std::vector<FolderPairEnh>::iterator fp = fpMerged.begin(); fp != fpMerged.end(); ++fp)
+    for (auto fp = fpMerged.begin(); fp != fpMerged.end(); ++fp)
     {
         //if local config matches output global config we don't need local one
         if (fp->altCmpConfig &&
@@ -486,11 +486,12 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
 
     //final assembly
     zen::MainConfiguration cfgOut;
-    cfgOut.cmpConfig = cmpCfgHead;
-    cfgOut.syncCfg   = syncCfgHead;
+    cfgOut.cmpConfig    = cmpCfgHead;
+    cfgOut.syncCfg      = syncCfgHead;
     cfgOut.globalFilter = globalFilter;
     cfgOut.firstPair    = fpMerged[0];
     cfgOut.additionalPairs.assign(fpMerged.begin() + 1, fpMerged.end());
+    cfgOut.onCompletion = mainCfgs[0].onCompletion;
 
     return cfgOut;
 }

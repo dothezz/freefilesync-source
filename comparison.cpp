@@ -57,22 +57,23 @@ namespace
 {
 void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, ProcessCallback& procCallback)
 {
-    bool nonEmptyPairFound = false; //check if user entered at least one folder pair
-    bool partiallyFilledPairFound = false;
+    int partiallyFilledPairs = 0;
+    int totallyFilledPairs   = 0;
 
     std::for_each(folderPairsForm.begin(), folderPairsForm.end(),
                   [&](const FolderPairCfg& fpCfg)
     {
-        if (!fpCfg.leftDirectoryFmt.empty() || !fpCfg.rightDirectoryFmt.empty()) //may be partially filled though
-            nonEmptyPairFound = true;
+        if (fpCfg.leftDirectoryFmt.empty() != fpCfg.rightDirectoryFmt.empty())
+            ++partiallyFilledPairs;
 
-        if ((fpCfg.leftDirectoryFmt.empty() && !fpCfg.rightDirectoryFmt.empty()) ||
-            (!fpCfg.leftDirectoryFmt.empty() && fpCfg.rightDirectoryFmt.empty()))
-            partiallyFilledPairFound = true;
+        if (!fpCfg.leftDirectoryFmt.empty() && !fpCfg.rightDirectoryFmt.empty())
+            ++totallyFilledPairs;
     });
 
     //check for empty entries
-    if (!nonEmptyPairFound || partiallyFilledPairFound)
+    if ((totallyFilledPairs + partiallyFilledPairs == 0) || //all empty
+        (partiallyFilledPairs > 0 && //partial entry is invalid
+         !(totallyFilledPairs == 0 && partiallyFilledPairs == 1))) //exception: one partial pair okay: one-dir only scenario
     {
         while (true)
         {
@@ -328,8 +329,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
             output_tmp.push_back(std::make_shared<BaseDirMapping>(fpCfg.leftDirectoryFmt,
                                                                   dirAvailable(fpCfg.leftDirectoryFmt),
                                                                   fpCfg.rightDirectoryFmt,
-                                                                  dirAvailable(fpCfg.rightDirectoryFmt),
-                                                                  fpCfg.filter.nameFilter));
+                                                                  dirAvailable(fpCfg.rightDirectoryFmt)));
             switch (fpCfg.compareVar)
             {
                 case CMP_BY_TIME_SIZE:
@@ -820,6 +820,7 @@ void processFilteredDirs(HierarchyObject& hierObj, const HardFilter& filterProc)
     });
 }
 }
+
 
 //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedLinks are appended!
 void CompareProcess::performComparison(const FolderPairCfg& fpCfg,

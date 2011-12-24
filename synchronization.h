@@ -16,8 +16,9 @@
 namespace zen
 {
 
-class SyncStatistics
+class SyncStatistics //this class counts logical operations (create, update, delete) + bytes
 {
+    //-> note the fundamental difference to counting disk accesses!
 public:
     SyncStatistics(const HierarchyObject&  hierObj);
     SyncStatistics(const FolderComparison& folderCmp);
@@ -37,8 +38,8 @@ public:
     typedef std::vector<std::pair<Zstring, std::wstring> > ConflictTexts; // Pair(filename/conflict text)
     const ConflictTexts& getFirstConflicts() const { return firstConflicts; }
 
-    zen::UInt64 getDataToProcess() const { return dataToProcess; }
-    size_t      getRowCount()      const { return rowsTotal; }
+    zen::Int64 getDataToProcess() const { return dataToProcess; }
+    size_t     getRowCount()      const { return rowsTotal; }
 
 private:
     void init();
@@ -54,7 +55,7 @@ private:
     int deleteLeft, deleteRight;
     int conflict;
     ConflictTexts firstConflicts; //save the first few conflict texts to display as a warning message
-    zen::UInt64 dataToProcess;
+    zen::Int64 dataToProcess;
     size_t rowsTotal;
 };
 

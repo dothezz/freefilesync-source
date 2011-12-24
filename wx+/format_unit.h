@@ -13,7 +13,7 @@
 
 namespace zen
 {
-std::wstring filesizeToShortString(UInt64 filesize);
+std::wstring filesizeToShortString(Int64 filesize);
 std::wstring remainingTimeToShortString(double timeInSec);
 std::wstring fractionToShortString(double fraction); //within [0, 1]
 

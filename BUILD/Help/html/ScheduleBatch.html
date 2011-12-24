@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20110830;15010600">
+	<META NAME="CHANGED" CONTENT="20111206;16050900">
 	<STYLE TYPE="text/css">
 	<!--
 		@page { margin: 2cm }
@@ -19,7 +19,7 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="de-DE" DIR="LTR">
-<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Schedule Batch
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Schedule a Batch
 Job</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
@@ -29,14 +29,21 @@ Job</FONT></H3>
 	dialog:<BR></FONT><FONT FACE="Tahoma, sans-serif"><I>Menu-&gt;Advanced-&gt;Create
 	batch job</I></FONT> <FONT FACE="Tahoma, sans-serif">and save it,
 	for example, as &quot;</FONT><FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">&quot;.<BR>&nbsp;</FONT></P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Enable
-	checkbox &quot;<I>Run miminized</I>&quot; to avoid blocking while
-	showing a status dialog at the end of the process.<BR><IMG SRC="../img/RunMinimized.png" NAME="Grafik3" ALIGN=BOTTOM WIDTH=709 HEIGHT=332 BORDER=0></FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
+	the batch job shall run without user interaction or as part of a
+	batch script, make sure that no popup dialog stops the progress:
+	Disable checkbox &quot;<I>Show progress dialog</I>&quot; to avoid
+	blocking while showing the result after synchronization.
+	Alternatively you can select the &quot;On completion&quot; action
+	&quot;Close progress dialog&quot; located in synchronization
+	settings. Note that even if the progress is not shown initially it
+	can be displayed interactively at any time during synchronization,
+	by double-clicking the corresponding systray icon.<BR><IMG SRC="../img/SetupBatch.png" NAME="Grafik3" ALIGN=BOTTOM WIDTH=548 HEIGHT=319 BORDER=0></FONT></P>
 	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
 	order to prevent error or warning popup messages from stopping
 	progress, set &quot;<I>Error handling</I>&quot; to either &quot;<I>Ignore
-	errors</I>&quot; or &quot;<I>Exit instantly</I>&quot;.<BR><IMG SRC="../img/ErrorHandling.png" NAME="Grafik4" ALIGN=BOTTOM WIDTH=313 HEIGHT=331 BORDER=0></FONT></P>
+	errors</I>&quot; or &quot;<I>Exit instantly</I>&quot;.</FONT></P>
 	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Setup
 	your operating system's scheduler</FONT></P>

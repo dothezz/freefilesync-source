@@ -16,7 +16,10 @@ using namespace zen;
 class ErrorDlg : public ErrorDlgGenerated
 {
 public:
-    ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString& messageText, bool& ignoreNextErrors);
+    ErrorDlg(wxWindow* parentWindow,
+             int activeButtons,
+             const wxString& messageText,
+             bool* ignoreNextErrors);
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -24,11 +27,11 @@ private:
     void OnRetry(wxCommandEvent& event);
     void OnAbort(wxCommandEvent& event);
 
-    bool& ignoreErrors;
+    bool* ignoreErrors;
 };
 
 
-ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString& messageText, bool& ignoreNextErrors) :
+ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString& messageText, bool* ignoreNextErrors) :
     ErrorDlgGenerated(parentWindow),
     ignoreErrors(ignoreNextErrors)
 {
@@ -38,7 +41,11 @@ ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxStri
 
     m_bitmap10->SetBitmap(GlobalResources::getImage(wxT("error")));
     m_textCtrl8->SetValue(messageText);
-    m_checkBoxIgnoreErrors->SetValue(ignoreNextErrors);
+
+    if (ignoreNextErrors)
+        m_checkBoxIgnoreErrors->SetValue(*ignoreNextErrors);
+    else
+        m_checkBoxIgnoreErrors->Hide();
 
     if (~activeButtons & ReturnErrorDlg::BUTTON_IGNORE)
     {
@@ -70,26 +77,26 @@ void ErrorDlg::OnClose(wxCloseEvent& event)
 
 void ErrorDlg::OnIgnore(wxCommandEvent& event)
 {
-    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
+    if (ignoreErrors) *ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
     EndModal(ReturnErrorDlg::BUTTON_IGNORE);
 }
 
 
 void ErrorDlg::OnRetry(wxCommandEvent& event)
 {
-    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
+    if (ignoreErrors) *ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
     EndModal(ReturnErrorDlg::BUTTON_RETRY);
 }
 
 
 void ErrorDlg::OnAbort(wxCommandEvent& event)
 {
-    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
+    if (ignoreErrors) *ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
     EndModal(ReturnErrorDlg::BUTTON_ABORT);
 }
 
 
-ReturnErrorDlg::ButtonPressed zen::showErrorDlg(int activeButtons, const wxString& messageText, bool& ignoreNextErrors)
+ReturnErrorDlg::ButtonPressed zen::showErrorDlg(int activeButtons, const wxString& messageText, bool* ignoreNextErrors)
 {
     ErrorDlg errorDlg(NULL, activeButtons, messageText, ignoreNextErrors);
     errorDlg.Raise();

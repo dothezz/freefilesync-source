@@ -202,9 +202,6 @@
 <pluralform>%x s</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Vedä ja pudota</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -366,7 +363,7 @@ Komento suoritetaan kun:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Eräajo</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Lokitiedostoa ei pystytä luomaan!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ Komento suoritetaan kun:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Vaatii Internet-yhteyden!)</target>
+
+<source>Drag && drop</source>
+<target>Vedä ja pudota</target>
+
+<source>Close progress dialog</source>
+<target></target>
+
+<source>Shut down</source>
+<target></target>
+
+<source>Log off</source>
+<target></target>
+
+<source>Standby</source>
+<target></target>
+
+<source>Hibernate</source>
+<target></target>
 
 <source>1. &Compare</source>
 <target>1. &Vertaa</target>
@@ -528,9 +543,6 @@ Komento suoritetaan kun:
 <source>Filter files</source>
 <target>Suodata tiedostot</target>
 
-<source>Error handling</source>
-<target>Virhe käsitellessä</target>
-
 <source>Left</source>
 <target>Vasen</target>
 
@@ -543,13 +555,16 @@ Komento suoritetaan kun:
 <source>Status feedback</source>
 <target>Tilan palaute</target>
 
-<source>Run minimized</source>
-<target>Suorita pienennettynä</target>
+<source>Show progress dialog</source>
+<target></target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Virhe käsitellessä</target>
+
+<source>Maximum number of log files:</source>
 <target>Lokitiedostojen enimmäismäärä:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Hakemisto lokitiedostoille:</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ Komento suoritetaan kun:
 <source>Deletion handling</source>
 <target>Poistotapa</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target></target>
 
 <source>Configuration</source>
 <target>Asetukset</target>
@@ -623,6 +638,9 @@ Komento suoritetaan kun:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Poikkeaman/tiedoston luokittelu ei onnistu</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Vertaile...</target>
@@ -1077,11 +1095,11 @@ Sulje pois: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Keskeytys pyydetty: Odotetaan toiminnon loppumista...</target>
 
-<source>Continue</source>
-<target>Jatka</target>
-
 <source>Pause</source>
 <target>Tauko</target>
+
+<source>Continue</source>
+<target>Jatka</target>
 
 <source>Cannot find %x</source>
 <target>En löydä %x</target>
@@ -1404,11 +1422,11 @@ Sulje pois: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Luodaan tiedosto %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Luodaan pikakuvake %x</target>
-
 <source>Creating folder %x</source>
 <target>Luo hakemisto %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Luodaan pikakuvake %x</target>
 
 <source>Overwriting file %x</source>
 <target>Korvaa tiedosto %x</target>

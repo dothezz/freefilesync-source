@@ -202,9 +202,6 @@
 <pluralform>%x שניות</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>גרור והשלך</target>
-
 <source>Info</source>
 <target>מידע</target>
 
@@ -366,8 +363,8 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync עבודת אצווה</target>
 
-<source>Unable to create logfile!</source>
-<target>לא מסוגל ליצור יומן!</target>
+<source>Unable to create log file!</source>
+<target>לא מסוגל ליצור קובץ יומן!</target>
 
 <source>Batch execution</source>
 <target>פעולת אצווה</target>
@@ -413,6 +410,24 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(מחייב קישור אינטרנטי פעיל!)</target>
+
+<source>Drag && drop</source>
+<target>גרור והשלך</target>
+
+<source>Close progress dialog</source>
+<target>סגור שיח התקדמות</target>
+
+<source>Shut down</source>
+<target>כבה מחשב</target>
+
+<source>Log off</source>
+<target>התנתק כמשתמש</target>
+
+<source>Standby</source>
+<target>עבור למצב המתנה</target>
+
+<source>Hibernate</source>
+<target>עבור למצב שינה</target>
 
 <source>1. &Compare</source>
 <target>1. &השווה</target>
@@ -528,9 +543,6 @@ The command line is executed each time:
 <source>Filter files</source>
 <target>קבצי המסנן</target>
 
-<source>Error handling</source>
-<target>טיפול בשגיאות</target>
-
 <source>Left</source>
 <target>שמאל</target>
 
@@ -543,13 +555,16 @@ The command line is executed each time:
 <source>Status feedback</source>
 <target>משוב מצב</target>
 
-<source>Run minimized</source>
-<target>הרץ במצב מוקטן</target>
+<source>Show progress dialog</source>
+<target>הראה שיח התקדמות</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>טיפול בשגיאות</target>
+
+<source>Maximum number of log files:</source>
 <target>מספר מכסימלי של קבצי יומן</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>בחר מחיצה לקבצי יומן</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ The command line is executed each time:
 <source>Deletion handling</source>
 <target>טיפול במחיקות</target>
 
-<source>&OK</source>
-<target>&אשר</target>
+<source>On completion:</source>
+<target>לאחר סיום:</target>
 
 <source>Configuration</source>
 <target>תצורה</target>
@@ -623,6 +638,9 @@ The command line is executed each time:
 
 <source>Conflict/file cannot be categorized</source>
 <target>קונפליקט\קובץ אינו יכול לקבל סיווג</target>
+
+<source>&OK</source>
+<target>&אשר</target>
 
 <source>Compare by...</source>
 <target>השווה ע"י...</target>
@@ -1077,20 +1095,17 @@ Exclude: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>התקבלה בקשת ביטול: מחכה לפעולה הנוכחית להסתיים...</target>
 
-<source>Continue</source>
-<target>המשך</target>
-
 <source>Pause</source>
 <target>עצור</target>
+
+<source>Continue</source>
+<target>המשך</target>
 
 <source>Cannot find %x</source>
 <target>לא מוצא %x</target>
 
 <source>Inactive</source>
 <target>בלתי פעיל</target>
-
-<source>Last x hours</source>
-<target>x שעות אחרונות</target>
 
 <source>Today</source>
 <target>היום</target>
@@ -1407,11 +1422,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>יוצר קובץ %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>יוצר קישור סימבולי %x</target>
-
 <source>Creating folder %x</source>
 <target>יוצר מחיצה %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>יוצר קישור סימבולי %x</target>
 
 <source>Overwriting file %x</source>
 <target>דורס קובץ %x</target>

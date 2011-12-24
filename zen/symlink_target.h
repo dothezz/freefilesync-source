@@ -68,7 +68,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
     {
         activatePrivilege(SE_BACKUP_NAME); //throw FileError
     }
-    catch (...) {}
+    catch (FileError&) {}
 
     const HANDLE hLink = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),
                                       GENERIC_READ,

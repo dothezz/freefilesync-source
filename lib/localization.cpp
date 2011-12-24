@@ -28,8 +28,6 @@ using namespace zen;
 namespace
 {
 //global objects
-std::wstring THOUSANDS_SEPARATOR = L",";
-
 
 class FFSLocale : public TranslationHandler
 {
@@ -37,8 +35,6 @@ public:
     FFSLocale(const wxString& filename, wxLanguage languageId); //throw (lngfile::ParsingError, PluralForm::ParsingError)
 
     wxLanguage langId() const { return langId_; }
-
-    virtual std::wstring thousandsSeparator() { return THOUSANDS_SEPARATOR; };
 
     virtual std::wstring translate(const std::wstring& text)
     {
@@ -352,23 +348,13 @@ public:
         const wxLanguageInfo* sysLngInfo = wxLocale::GetLanguageInfo(wxLocale::GetSystemLanguage());
         const wxLanguageInfo* selLngInfo = wxLocale::GetLanguageInfo(selectedLng);
 
-        bool sysLangIsRTL      = sysLngInfo ? sysLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
-        bool selectedLangIsRTL = selLngInfo ? selLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
+        const bool sysLangIsRTL      = sysLngInfo ? sysLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
+        const bool selectedLangIsRTL = selLngInfo ? selLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
 
         if (sysLangIsRTL == selectedLangIsRTL)
             loc.Init(wxLANGUAGE_DEFAULT); //use sys-lang to preserve sub-language specific rules (e.g. german swiss number punctation)
         else
             loc.Init(selectedLng);
-
-        //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
-        const lconv* localInfo = ::localeconv();
-
-        //actually these two parameters are language dependent, but we take system setting to handle all kinds of language derivations
-        THOUSANDS_SEPARATOR = utf8CvrtTo<wxString>(localInfo->thousands_sep);
-
-        // why not working?
-        // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
-        // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
     }
 private:
     wxLocale loc; //required for RTL language support (and nothing else)

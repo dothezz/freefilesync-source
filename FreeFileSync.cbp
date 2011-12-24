@@ -131,6 +131,7 @@
 			<Add library="libwinspool.a" />
 			<Add library="libwinmm.a" />
 			<Add library="libmpr.a" />
+			<Add library="libuxtheme.a" />
 			<Add directory="C:\Program Files\C++\Boost\stage\lib" />
 		</Linker>
 		<Unit filename="WxWizFrame.fbp">
@@ -160,13 +161,10 @@
 		<Unit filename="lib\dir_exist_async.h" />
 		<Unit filename="lib\dir_lock.cpp" />
 		<Unit filename="lib\dir_lock.h" />
-		<Unit filename="lib\dir_name.cpp" />
 		<Unit filename="lib\dir_name.h" />
 		<Unit filename="lib\error_log.cpp" />
 		<Unit filename="lib\error_log.h" />
 		<Unit filename="lib\ffs_paths.h" />
-		<Unit filename="lib\folder_history_box.cpp" />
-		<Unit filename="lib\folder_history_box.h" />
 		<Unit filename="lib\gtest\main.cpp">
 			<Option target="Unit Test" />
 		</Unit>
@@ -242,7 +240,32 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\check_version.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\dir_name.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\dir_name.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\exec_finished_box.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\exec_finished_box.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\folder_history_box.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\folder_history_box.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\folder_pair.h">
 			<Option target="Release" />
@@ -253,28 +276,32 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\grid_view.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\gui_generated.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\gui_generated.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\gui_status_handler.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\gui_status_handler.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\main_dlg.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\main_dlg.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\msg_popup.cpp">
 			<Option target="Release" />
@@ -296,10 +323,12 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\small_dlgs.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\sorting.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\switch_to_gui.h">
 			<Option target="Release" />
@@ -320,6 +349,10 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\tray_icon.h" />
+		<Unit filename="ui\wx_form_build_hide_warnings.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
 		<Unit filename="wx+\app_main.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -396,6 +429,10 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="wx+\tooltip.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="wx+\tree_list.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>

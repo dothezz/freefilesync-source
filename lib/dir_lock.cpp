@@ -447,10 +447,6 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
                                            NULL);
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
-#ifndef _MSC_VER
-#warning fix this problem!
-        //read-only FTP may return: ERROR_FILE_EXISTS (NetDrive @ GNU)
-#endif
         if (::GetLastError() == ERROR_FILE_EXISTS)
             return false;
         else
@@ -545,7 +541,7 @@ public:
                 return activeLock;
             }
         }
-        catch (...) {} //catch everything, let SharedDirLock constructor deal with errors, e.g. 0-sized/corrupted lock file
+        catch (FileError&) {} //catch everything, let SharedDirLock constructor deal with errors, e.g. 0-sized/corrupted lock file
 
         //not yet in buffer, so create a new directory lock
         std::shared_ptr<SharedDirLock> newLock(new SharedDirLock(lockfilename, callback)); //throw FileError

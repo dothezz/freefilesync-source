@@ -7,21 +7,19 @@
 #include "sync_cfg.h"
 #include <memory>
 #include "../lib/resources.h"
-#include "../lib/dir_name.h"
+#include "dir_name.h"
 #include <wx/wupdlock.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/string_conv.h>
 #include <wx+/dir_picker.h>
 #include "gui_generated.h"
 #include <wx+/choice_enum.h>
-#include "../lib/dir_name.h"
 #include <wx+/image_tools.h>
 #include "../file_hierarchy.h"
+#include "exec_finished_box.h"
 
 using namespace zen;
 using namespace xmlAccess;
-
-
 
 
 class SyncCfgDialog : public SyncCfgDlgGenerated
@@ -30,7 +28,8 @@ public:
     SyncCfgDialog(wxWindow* window,
                   CompareVariant compareVar,
                   SyncConfig&    syncCfg,
-                  xmlAccess::OnGuiError* handleError); //optional input parameter
+                  xmlAccess::OnGuiError* handleError,     //
+                  ExecWhenFinishedCfg* execWhenFinished); //optional input parameter
 
 private:
     virtual void OnSyncAutomatic(   wxCommandEvent& event);
@@ -67,6 +66,7 @@ private:
     //changing data
     SyncConfig&            syncCfgOut;
     xmlAccess::OnGuiError* refHandleError;
+    ExecWhenFinishedCfg*   refExecWhenFinished;
 
     DirectoryName<FolderHistoryBox> customDelFolder;
 
@@ -196,12 +196,14 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
 SyncCfgDialog::SyncCfgDialog(wxWindow* window,
                              CompareVariant compareVar,
                              SyncConfig&    syncCfg,
-                             xmlAccess::OnGuiError* handleError) : //optional input parameter
+                             xmlAccess::OnGuiError* handleError,
+                             ExecWhenFinishedCfg* execWhenFinished) :
     SyncCfgDlgGenerated(window),
     cmpVariant(compareVar),
     currentDirectionCfg(syncCfg.directionCfg),  //make working copy
     syncCfgOut(syncCfg),
     refHandleError(handleError),
+    refExecWhenFinished(execWhenFinished),
     customDelFolder(*m_panelCustomDeletionDir, *m_dirPickerCustomDelFolder, *m_customDelFolder)
 {
 #ifdef FFS_WIN
@@ -232,16 +234,27 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
         Layout();
     }
 
+    if (execWhenFinished)
+    {
+        m_comboBoxExecFinished->setHistoryRef(*execWhenFinished->history);
+        m_comboBoxExecFinished->setValue(*execWhenFinished->command);
+    }
+    else
+    {
+        sbSizerExecFinished->Show(false);
+        Layout();
+    }
+
     //set sync config icons
     updateGui();
 
     //set icons for this dialog
-    m_bitmapLeftOnly  ->SetBitmap(greyScale(GlobalResources::getImage(L"leftOnly")));
-    m_bitmapRightOnly ->SetBitmap(greyScale(GlobalResources::getImage(L"rightOnly")));
-    m_bitmapLeftNewer ->SetBitmap(greyScale(GlobalResources::getImage(L"leftNewer")));
+    m_bitmapLeftOnly  ->SetBitmap(greyScale(GlobalResources::getImage(L"leftOnly"  )));
+    m_bitmapRightOnly ->SetBitmap(greyScale(GlobalResources::getImage(L"rightOnly" )));
+    m_bitmapLeftNewer ->SetBitmap(greyScale(GlobalResources::getImage(L"leftNewer" )));
     m_bitmapRightNewer->SetBitmap(greyScale(GlobalResources::getImage(L"rightNewer")));
-    m_bitmapDifferent ->SetBitmap(greyScale(GlobalResources::getImage(L"different")));
-    m_bitmapConflict  ->SetBitmap(greyScale(GlobalResources::getImage(L"conflict")));
+    m_bitmapDifferent ->SetBitmap(greyScale(GlobalResources::getImage(L"different" )));
+    m_bitmapConflict  ->SetBitmap(greyScale(GlobalResources::getImage(L"conflict"  )));
     m_bitmapDatabase  ->SetBitmap(GlobalResources::getImage(wxT("database")));
 
     bSizer201->Layout(); //wxButtonWithImage size might have changed
@@ -335,6 +348,12 @@ void SyncCfgDialog::OnApply(wxCommandEvent& event)
 
     if (refHandleError)
         *refHandleError = getEnumVal(enumErrhandDescr, *m_choiceHandleError);
+
+    if (refExecWhenFinished)
+    {
+        *refExecWhenFinished->command = m_comboBoxExecFinished->getValue();
+        addValueToHistory(*refExecWhenFinished->command, *refExecWhenFinished->history, refExecWhenFinished->historyMax);
+    }
 
     EndModal(ReturnSyncConfig::BUTTON_OKAY);
 }
@@ -509,15 +528,16 @@ void SyncCfgDialog::OnConflict(wxCommandEvent& event)
 }
 
 
-
 ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(CompareVariant compareVar,
                                                        SyncConfig&    syncCfg,
-                                                       xmlAccess::OnGuiError* handleError) //optional input parameter
+                                                       xmlAccess::OnGuiError* handleError,    //
+                                                       ExecWhenFinishedCfg* execWhenFinished) //optional input parameter
 {
     SyncCfgDialog syncDlg(NULL,
                           compareVar,
                           syncCfg,
-                          handleError);
+                          handleError,
+                          execWhenFinished);
 
     return static_cast<ReturnSyncConfig::ButtonPressed>(syncDlg.ShowModal());
 }

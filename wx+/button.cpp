@@ -175,7 +175,7 @@ wxBitmap BitmapButton::createBitmapFromText(const wxString& text)
 
 
 //copy one image into another, allowing arbitrary overlapping! (pos may contain negative numbers)
-void writeToImage(const wxImage& source, const wxPoint pos, wxImage& target)
+void writeToImage(const wxImage& source, const wxPoint& pos, wxImage& target)
 {
     //determine startpositions in source and target image, as well as width and height to be copied
     wxPoint posSrc, posTrg;

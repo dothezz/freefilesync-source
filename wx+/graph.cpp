@@ -1,8 +1,7 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
-// * Boost Software License, Version 1.0. See accompanying file             *
-// * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.       *
-// * Copyright (C) 2011 ZenJu (zhnmju123 AT gmx.de)                         *
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 
 #include "graph.h"
@@ -401,8 +400,8 @@ void Graph2D::render(wxDC& dc) const
     }
 
     //detect x value range
-    double minWndX = attr.minXauto ?  HUGE_VAL : attr.minX; //automatic: ensure values are initialized by first curve
-    double maxWndX = attr.maxXauto ? -HUGE_VAL : attr.maxX; //
+    double minWndX = attr.minXauto ?  std::numeric_limits<double>::infinity() : attr.minX; //automatic: ensure values are initialized by first curve
+    double maxWndX = attr.maxXauto ? -std::numeric_limits<double>::infinity() : attr.maxX; //
     if (!curves_.empty())
     {
         for (GraphList::const_iterator j = curves_.begin(); j != curves_.end(); ++j)
@@ -424,8 +423,8 @@ void Graph2D::render(wxDC& dc) const
     {
         //detect y value range
         std::vector<std::pair<std::vector<double>, int>> yValuesList(curves_.size());
-        double minWndY = attr.minYauto ?  HUGE_VAL : attr.minY; //automatic: ensure values are initialized by first curve
-        double maxWndY = attr.maxYauto ? -HUGE_VAL : attr.maxY; //
+        double minWndY = attr.minYauto ?  std::numeric_limits<double>::infinity() : attr.minY; //automatic: ensure values are initialized by first curve
+        double maxWndY = attr.maxYauto ? -std::numeric_limits<double>::infinity() : attr.maxY; //
         if (!curves_.empty())
         {
             const int AVG_FACTOR = 2; //some averaging of edgy input data to smoothen behavior on window resize
@@ -433,14 +432,17 @@ void Graph2D::render(wxDC& dc) const
 
             for (GraphList::const_iterator j = curves_.begin(); j != curves_.end(); ++j)
             {
-                if (!j->first.get()) continue;
+                if (!j->first) continue;
                 const GraphData& graph = *j->first;
 
                 std::vector<double>& yValues = yValuesList[j - curves_.begin()].first;  //actual y-values
                 int& offset                  = yValuesList[j - curves_.begin()].second; //x-value offset in pixel
                 {
-                    const int posFirst = std::max<int>(std::ceil(cvrtX.realToScreen(graph.getXBegin())), 0); //evaluate visible area only and make sure to not step one pixel before xbegin()!
-                    const int postLast = std::min<int>(std::floor(cvrtX.realToScreen(graph.getXEnd())), dataArea.width * AVG_FACTOR); //
+                    const double xBegin = graph.getXBegin();
+                    const double xEnd   = graph.getXEnd();
+
+                    const int posFirst = std::ceil (cvrtX.realToScreen(std::max(xBegin, minWndX))); //evaluate visible area only and make sure to not step one pixel before xbegin()!
+                    const int postLast = std::floor(cvrtX.realToScreen(std::min(xEnd,   maxWndX))); //apply min/max *before* calling realToScreen()!
 
                     for (int i = posFirst; i < postLast; ++i)
                         yValues.push_back(graph.getValue(cvrtX.screenToReal(i)));

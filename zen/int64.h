@@ -33,7 +33,8 @@ zen::Int64/zen::UInt64: wrapper classes around std::int64_t/std::uint64_t
 
 namespace zen
 {
-template <class T, class U> inline void checkRange(U value)
+template <class T, class U> inline
+void checkRange(U value)
 {
     //caveat: std::numeric_limits<T>::min returns minimum positive(!) number for T = double, while behaving correctly for integer types... sigh
     assert(double(std::numeric_limits<T>::lowest()) <= double(value) && //new with C++11!
@@ -93,6 +94,7 @@ public:
     Int64& operator|=(const Int64& rhs) {                                                      value |= rhs.value; return *this;}
     Int64& operator<<=(int rhs) { assert(rhs < 0 || (value << rhs) >> rhs == value);           value <<= rhs; return *this; }
     Int64& operator>>=(int rhs) { assert(rhs > 0 || (value >> rhs) << rhs == value);           value >>= rhs; return *this; }
+    Int64  operator-() const { return -value; }
 
     inline friend bool operator==(const Int64& lhs, const Int64& rhs) { return lhs.value == rhs.value; }
     inline friend bool operator!=(const Int64& lhs, const Int64& rhs) { return lhs.value != rhs.value; }

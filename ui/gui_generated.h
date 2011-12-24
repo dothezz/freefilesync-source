@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun 30 2011)
+// C++ code generated with wxFormBuilder (version Dec  2 2011)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -14,12 +14,13 @@
 class CustomGridLeft;
 class CustomGridMiddle;
 class CustomGridRight;
+class ExecFinishedBox;
 class FolderHistoryBox;
 class ToggleButton;
 class wxStaticText;
-namespace zen { class BitmapButton; }
-namespace zen { class DirPickerCtrl; }
-namespace zen { class Graph2D; }
+namespace zen{ class BitmapButton; }
+namespace zen{ class DirPickerCtrl; }
+namespace zen{ class Graph2D; }
 
 #include <wx/string.h>
 #include <wx/bitmap.h>
@@ -67,974 +68,977 @@ namespace zen { class Graph2D; }
 ///////////////////////////////////////////////////////////////////////////////
 /// Class MainDialogGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class MainDialogGenerated : public wxFrame
+class MainDialogGenerated : public wxFrame 
 {
-private:
-
-protected:
-    wxMenuBar* m_menubar1;
-    wxMenu* m_menuFile;
-    wxMenuItem* m_menuItem10;
-    wxMenuItem* m_menuItem11;
-    wxMenuItem* m_menuItemSwitchView;
-    wxMenuItem* m_menuItemNew;
-    wxMenuItem* m_menuItemSave;
-    wxMenuItem* m_menuItemLoad;
-    wxMenu* m_menuAdvanced;
-    wxMenu* m_menuLanguages;
-    wxMenuItem* m_menuItemGlobSett;
-    wxMenuItem* m_menuItem7;
-    wxMenu* m_menuHelp;
-    wxMenuItem* m_menuItemCheckVer;
-    wxMenuItem* m_menuItemAbout;
-    wxBoxSizer* bSizerPanelHolder;
-    wxPanel* m_panelTopButtons;
-    wxBoxSizer* bSizerTopButtons;
-    wxStaticText* m_staticTextCmpVariant;
-    zen::BitmapButton* m_buttonCompare;
-    wxButton* m_buttonAbort;
-    wxBitmapButton* m_bpButtonCmpConfig;
-    wxStaticText* m_staticTextSyncVariant;
-    wxBitmapButton* m_bpButtonSyncConfig;
-    zen::BitmapButton* m_buttonStartSync;
-    wxPanel* m_panelDirectoryPairs;
-    wxStaticBoxSizer* sbSizerDirLeft;
-    wxBitmapButton* m_bpButtonAddPair;
-    wxPanel* m_panelTopMiddle;
-    wxBitmapButton* m_bpButtonSwapSides;
-    wxStaticBoxSizer* sbSizerDirRight;
-    wxScrolledWindow* m_scrolledWindowFolderPairs;
-    wxBoxSizer* bSizerAddFolderPairs;
-    wxPanel* m_panelGrids;
-    wxBoxSizer* bSizerGridHolder;
-    CustomGridLeft* m_gridLeft;
-    wxPanel* m_panelMiddle;
-    CustomGridMiddle* m_gridMiddle;
-    CustomGridRight* m_gridRight;
-    wxPanel* m_panelConfig;
-    wxBoxSizer* bSizerConfig;
-    wxBitmapButton* m_bpButtonSave;
-    wxBitmapButton* m_bpButtonLoad;
-    wxListBox* m_listBoxHistory;
-    wxPanel* m_panelFilter;
-    wxBitmapButton* m_bpButtonFilter;
-    wxCheckBox* m_checkBoxHideFilt;
-    wxPanel* m_panelStatistics;
-    wxBoxSizer* bSizerStatistics;
-    wxStaticBitmap* m_bitmapCreate;
-    wxTextCtrl* m_textCtrlCreate;
-    wxStaticBitmap* m_bitmapUpdate;
-    wxTextCtrl* m_textCtrlUpdate;
-    wxStaticBitmap* m_bitmapDelete;
-    wxTextCtrl* m_textCtrlDelete;
-    wxStaticBitmap* m_bitmapData;
-    wxTextCtrl* m_textCtrlData;
-    wxPanel* m_panelViewFilter;
-    wxBoxSizer* bSizerViewFilter;
-    ToggleButton* m_bpButtonSyncCreateLeft;
-    ToggleButton* m_bpButtonSyncDirOverwLeft;
-    ToggleButton* m_bpButtonSyncDeleteLeft;
-    ToggleButton* m_bpButtonLeftOnly;
-    ToggleButton* m_bpButtonLeftNewer;
-    ToggleButton* m_bpButtonEqual;
-    ToggleButton* m_bpButtonDifferent;
-    ToggleButton* m_bpButtonSyncDirNone;
-    ToggleButton* m_bpButtonRightNewer;
-    ToggleButton* m_bpButtonRightOnly;
-    ToggleButton* m_bpButtonSyncDeleteRight;
-    ToggleButton* m_bpButtonSyncDirOverwRight;
-    ToggleButton* m_bpButtonSyncCreateRight;
-    ToggleButton* m_bpButtonConflict;
-    wxPanel* m_panelStatusBar;
-    wxBoxSizer* bSizerStatusLeftDirectories;
-    wxStaticBitmap* m_bitmapSmallDirectoryLeft;
-    wxStaticText* m_staticTextStatusLeftDirs;
-    wxBoxSizer* bSizerStatusLeftFiles;
-    wxStaticBitmap* m_bitmapSmallFileLeft;
-    wxStaticText* m_staticTextStatusLeftFiles;
-    wxStaticText* m_staticTextStatusLeftBytes;
-    wxStaticLine* m_staticline9;
-    wxStaticText* m_staticTextStatusMiddle;
-    wxStaticLine* m_staticline10;
-    wxBoxSizer* bSizerStatusRightDirectories;
-    wxStaticBitmap* m_bitmapSmallDirectoryRight;
-    wxStaticText* m_staticTextStatusRightDirs;
-    wxBoxSizer* bSizerStatusRightFiles;
-    wxStaticBitmap* m_bitmapSmallFileRight;
-    wxStaticText* m_staticTextStatusRightFiles;
-    wxStaticText* m_staticTextStatusRightBytes;
-    wxStaticBitmap* m_bitmap15;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnCompare( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnStartSync( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSwitchView( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnNewConfig( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSaveConfig( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnLoadConfig( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnMenuQuit( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnMenuGlobalSettings( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnMenuBatchJob( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnMenuExportFileList( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnMenuCheckVersion( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCmpSettings( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncSettings( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnAddFolderPair( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnRemoveTopFolderPair( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDirSelected( wxFileDirPickerEvent& event ) { event.Skip(); }
-    virtual void OnSwapSides( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnLeftGridDoubleClick( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnContextRim( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnSortLeftGrid( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnContextRimLabelLeft( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnContextMiddle( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnSortMiddleGrid( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnContextMiddleLabel( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnRightGridDoubleClick( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnSortRightGrid( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnContextRimLabelRight( wxGridEvent& event ) { event.Skip(); }
-    virtual void OnCfgHistoryKeyEvent( wxKeyEvent& event ) { event.Skip(); }
-    virtual void OnLoadFromHistory( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnHideFilteredButton( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncCreateLeft( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDirLeft( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDeleteLeft( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnLeftOnlyFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnLeftNewerFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnEqualFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDifferentFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDirNone( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnRightNewerFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnRightOnlyFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDeleteRight( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDirRight( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncCreateRight( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnConflictFiles( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-    wxPanel* m_panelTopLeft;
-    wxBitmapButton* m_bpButtonRemovePair;
-    FolderHistoryBox* m_directoryLeft;
-    zen::DirPickerCtrl* m_dirPickerLeft;
-    wxBitmapButton* m_bpButtonAltCompCfg;
-    wxBitmapButton* m_bpButtonLocalFilter;
-    wxBitmapButton* m_bpButtonAltSyncCfg;
-    wxPanel* m_panelTopRight;
-    FolderHistoryBox* m_directoryRight;
-    zen::DirPickerCtrl* m_dirPickerRight;
-    wxPanel* m_panelLeft;
-    wxPanel* m_panelRight;
-
-    MainDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-
-    ~MainDialogGenerated();
-
+	private:
+	
+	protected:
+		wxMenuBar* m_menubar1;
+		wxMenu* m_menuFile;
+		wxMenuItem* m_menuItem10;
+		wxMenuItem* m_menuItem11;
+		wxMenuItem* m_menuItemSwitchView;
+		wxMenuItem* m_menuItemNew;
+		wxMenuItem* m_menuItemSave;
+		wxMenuItem* m_menuItemLoad;
+		wxMenu* m_menuAdvanced;
+		wxMenu* m_menuLanguages;
+		wxMenuItem* m_menuItemGlobSett;
+		wxMenuItem* m_menuItem7;
+		wxMenu* m_menuHelp;
+		wxMenuItem* m_menuItemCheckVer;
+		wxMenuItem* m_menuItemAbout;
+		wxBoxSizer* bSizerPanelHolder;
+		wxPanel* m_panelTopButtons;
+		wxBoxSizer* bSizerTopButtons;
+		wxStaticText* m_staticTextCmpVariant;
+		zen::BitmapButton* m_buttonCompare;
+		wxButton* m_buttonAbort;
+		wxBitmapButton* m_bpButtonCmpConfig;
+		wxStaticText* m_staticTextSyncVariant;
+		wxBitmapButton* m_bpButtonSyncConfig;
+		zen::BitmapButton* m_buttonStartSync;
+		wxPanel* m_panelDirectoryPairs;
+		wxStaticBoxSizer* sbSizerDirLeft;
+		wxBitmapButton* m_bpButtonAddPair;
+		wxPanel* m_panelTopMiddle;
+		wxBitmapButton* m_bpButtonSwapSides;
+		wxStaticBoxSizer* sbSizerDirRight;
+		wxScrolledWindow* m_scrolledWindowFolderPairs;
+		wxBoxSizer* bSizerAddFolderPairs;
+		wxPanel* m_panelGrids;
+		wxBoxSizer* bSizerGridHolder;
+		CustomGridLeft* m_gridLeft;
+		wxPanel* m_panelMiddle;
+		CustomGridMiddle* m_gridMiddle;
+		CustomGridRight* m_gridRight;
+		wxPanel* m_panelConfig;
+		wxBoxSizer* bSizerConfig;
+		wxBitmapButton* m_bpButtonSave;
+		wxBitmapButton* m_bpButtonLoad;
+		wxListBox* m_listBoxHistory;
+		wxPanel* m_panelFilter;
+		wxBitmapButton* m_bpButtonFilter;
+		wxCheckBox* m_checkBoxHideFilt;
+		wxPanel* m_panelStatistics;
+		wxBoxSizer* bSizerStatistics;
+		wxStaticBitmap* m_bitmapCreate;
+		wxTextCtrl* m_textCtrlCreate;
+		wxStaticBitmap* m_bitmapUpdate;
+		wxTextCtrl* m_textCtrlUpdate;
+		wxStaticBitmap* m_bitmapDelete;
+		wxTextCtrl* m_textCtrlDelete;
+		wxStaticBitmap* m_bitmapData;
+		wxTextCtrl* m_textCtrlData;
+		wxPanel* m_panelViewFilter;
+		wxBoxSizer* bSizerViewFilter;
+		ToggleButton* m_bpButtonSyncCreateLeft;
+		ToggleButton* m_bpButtonSyncDirOverwLeft;
+		ToggleButton* m_bpButtonSyncDeleteLeft;
+		ToggleButton* m_bpButtonLeftOnly;
+		ToggleButton* m_bpButtonLeftNewer;
+		ToggleButton* m_bpButtonEqual;
+		ToggleButton* m_bpButtonDifferent;
+		ToggleButton* m_bpButtonSyncDirNone;
+		ToggleButton* m_bpButtonRightNewer;
+		ToggleButton* m_bpButtonRightOnly;
+		ToggleButton* m_bpButtonSyncDeleteRight;
+		ToggleButton* m_bpButtonSyncDirOverwRight;
+		ToggleButton* m_bpButtonSyncCreateRight;
+		ToggleButton* m_bpButtonConflict;
+		wxPanel* m_panelStatusBar;
+		wxBoxSizer* bSizerStatusLeftDirectories;
+		wxStaticBitmap* m_bitmapSmallDirectoryLeft;
+		wxStaticText* m_staticTextStatusLeftDirs;
+		wxBoxSizer* bSizerStatusLeftFiles;
+		wxStaticBitmap* m_bitmapSmallFileLeft;
+		wxStaticText* m_staticTextStatusLeftFiles;
+		wxStaticText* m_staticTextStatusLeftBytes;
+		wxStaticLine* m_staticline9;
+		wxStaticText* m_staticTextStatusMiddle;
+		wxStaticLine* m_staticline10;
+		wxBoxSizer* bSizerStatusRightDirectories;
+		wxStaticBitmap* m_bitmapSmallDirectoryRight;
+		wxStaticText* m_staticTextStatusRightDirs;
+		wxBoxSizer* bSizerStatusRightFiles;
+		wxStaticBitmap* m_bitmapSmallFileRight;
+		wxStaticText* m_staticTextStatusRightFiles;
+		wxStaticText* m_staticTextStatusRightBytes;
+		wxStaticBitmap* m_bitmap15;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnCompare( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnStartSync( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSwitchView( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnNewConfig( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSaveConfig( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLoadConfig( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMenuQuit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMenuGlobalSettings( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMenuBatchJob( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMenuExportFileList( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMenuCheckVersion( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCmpSettings( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncSettings( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddFolderPair( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveTopFolderPair( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDirSelected( wxFileDirPickerEvent& event ) { event.Skip(); }
+		virtual void OnSwapSides( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLeftGridDoubleClick( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnContextRim( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnSortLeftGrid( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnContextRimLabelLeft( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnContextMiddle( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnSortMiddleGrid( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnContextMiddleLabel( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnRightGridDoubleClick( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnSortRightGrid( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnContextRimLabelRight( wxGridEvent& event ) { event.Skip(); }
+		virtual void OnCfgHistoryKeyEvent( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnLoadFromHistory( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHideFilteredButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncCreateLeft( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncDirLeft( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncDeleteLeft( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLeftOnlyFiles( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLeftNewerFiles( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEqualFiles( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDifferentFiles( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncDirNone( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRightNewerFiles( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRightOnlyFiles( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncDeleteRight( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncDirRight( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncCreateRight( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnConflictFiles( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		wxPanel* m_panelTopLeft;
+		wxBitmapButton* m_bpButtonRemovePair;
+		FolderHistoryBox* m_directoryLeft;
+		zen::DirPickerCtrl* m_dirPickerLeft;
+		wxBitmapButton* m_bpButtonAltCompCfg;
+		wxBitmapButton* m_bpButtonLocalFilter;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
+		wxPanel* m_panelTopRight;
+		FolderHistoryBox* m_directoryRight;
+		zen::DirPickerCtrl* m_dirPickerRight;
+		wxPanel* m_panelLeft;
+		wxPanel* m_panelRight;
+		
+		MainDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		
+		~MainDialogGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FolderPairGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class FolderPairGenerated : public wxPanel
+class FolderPairGenerated : public wxPanel 
 {
-private:
-
-protected:
-
-public:
-    wxPanel* m_panelLeft;
-    wxBitmapButton* m_bpButtonRemovePair;
-    FolderHistoryBox* m_directoryLeft;
-    zen::DirPickerCtrl* m_dirPickerLeft;
-    wxPanel* m_panel20;
-    wxBitmapButton* m_bpButtonAltCompCfg;
-    wxBitmapButton* m_bpButtonLocalFilter;
-    wxBitmapButton* m_bpButtonAltSyncCfg;
-    wxPanel* m_panelRight;
-    FolderHistoryBox* m_directoryRight;
-    zen::DirPickerCtrl* m_dirPickerRight;
-
-    FolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
-    ~FolderPairGenerated();
-
+	private:
+	
+	protected:
+	
+	public:
+		wxPanel* m_panelLeft;
+		wxBitmapButton* m_bpButtonRemovePair;
+		FolderHistoryBox* m_directoryLeft;
+		zen::DirPickerCtrl* m_dirPickerLeft;
+		wxPanel* m_panel20;
+		wxBitmapButton* m_bpButtonAltCompCfg;
+		wxBitmapButton* m_bpButtonLocalFilter;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
+		wxPanel* m_panelRight;
+		FolderHistoryBox* m_directoryRight;
+		zen::DirPickerCtrl* m_dirPickerRight;
+		
+		FolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~FolderPairGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class CompareStatusGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class CompareStatusGenerated : public wxPanel
+class CompareStatusGenerated : public wxPanel 
 {
-private:
-
-protected:
-    wxStaticText* m_staticText30;
-    wxTextCtrl* m_textCtrlStatus;
-    wxGauge* m_gauge2;
-    wxBoxSizer* bSizer42;
-    wxBoxSizer* bSizerFilesFound;
-    wxStaticText* m_staticText321;
-    wxStaticText* m_staticTextScanned;
-    wxBoxSizer* bSizerFilesRemaining;
-    wxStaticText* m_staticText46;
-    wxStaticText* m_staticTextFilesRemaining;
-    wxStaticText* m_staticText117;
-    wxStaticText* m_staticTextDataRemaining;
-    wxStaticText* m_staticText118;
-    wxBoxSizer* sSizerSpeed;
-    wxStaticText* m_staticText104;
-    wxStaticText* m_staticTextSpeed;
-    wxBoxSizer* sSizerTimeRemaining;
-    wxStaticText* m_staticTextTimeRemFixed;
-    wxStaticText* m_staticTextRemTime;
-    wxBoxSizer* sSizerTimeElapsed;
-    wxStaticText* m_staticTextTimeElapsed;
-
-public:
-
-    CompareStatusGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxRAISED_BORDER|wxTAB_TRAVERSAL );
-    ~CompareStatusGenerated();
-
+	private:
+	
+	protected:
+		wxStaticText* m_staticText30;
+		wxTextCtrl* m_textCtrlStatus;
+		wxGauge* m_gauge2;
+		wxBoxSizer* bSizer42;
+		wxBoxSizer* bSizerFilesFound;
+		wxStaticText* m_staticText321;
+		wxStaticText* m_staticTextScanned;
+		wxBoxSizer* bSizerFilesRemaining;
+		wxStaticText* m_staticText46;
+		wxStaticText* m_staticTextFilesRemaining;
+		wxStaticText* m_staticText117;
+		wxStaticText* m_staticTextDataRemaining;
+		wxStaticText* m_staticText118;
+		wxBoxSizer* sSizerSpeed;
+		wxStaticText* m_staticText104;
+		wxStaticText* m_staticTextSpeed;
+		wxBoxSizer* sSizerTimeRemaining;
+		wxStaticText* m_staticTextTimeRemFixed;
+		wxStaticText* m_staticTextRemTime;
+		wxBoxSizer* sSizerTimeElapsed;
+		wxStaticText* m_staticTextTimeElapsed;
+	
+	public:
+		
+		CompareStatusGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxRAISED_BORDER|wxTAB_TRAVERSAL ); 
+		~CompareStatusGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class BatchDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class BatchDlgGenerated : public wxDialog
+class BatchDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxStaticBitmap* m_bitmap27;
-    wxPanel* m_panel8;
-    wxStaticText* m_staticText56;
-    wxStaticText* m_staticText44;
-    wxBitmapButton* m_bpButtonHelp;
-    wxListbook* m_listbook1;
-    wxPanel* m_panelOverview;
-    wxBitmapButton* m_bpButtonCmpConfig;
-    wxStaticText* m_staticTextCmpVariant;
-    wxBitmapButton* m_bpButtonFilter;
-    wxStaticText* m_staticTextSyncVariant;
-    wxBitmapButton* m_bpButtonSyncConfig;
-    wxChoice* m_choiceHandleError;
-    wxBoxSizer* sbSizerMainPair;
-    wxPanel* m_panelMainPair;
-    wxStaticText* m_staticText532;
-    wxStaticText* m_staticText5411;
-    wxBoxSizer* bSizerAddFolderPairs;
-    wxPanel* m_panelBatchSettings;
-    wxCheckBox* m_checkBoxSilent;
-    wxStaticBoxSizer* sbSizerLogfileDir;
-    wxStaticText* m_staticText96;
-    wxSpinCtrl* m_spinCtrlLogCountMax;
-    wxPanel* m_panelLogfile;
-    wxStaticText* m_staticText94;
-    zen::DirPickerCtrl* m_dirPickerLogfileDir;
-    wxButton* m_buttonSave;
-    wxButton* m_buttonLoad;
-    wxButton* m_button6;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCmpSettings( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncSettings( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnChangeErrorHandling( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnAddFolderPair( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnRemoveTopFolderPair( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnChangeMaxLogCountTxt( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSaveBatchJob( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnLoadBatchJob( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-    wxScrolledWindow* m_scrolledWindow6;
-    wxBitmapButton* m_bpButtonAddPair;
-    wxBitmapButton* m_bpButtonRemovePair;
-    wxPanel* m_panelLeft;
-    FolderHistoryBox* m_directoryLeft;
-    zen::DirPickerCtrl* m_dirPickerLeft;
-    wxPanel* m_panelRight;
-    FolderHistoryBox* m_directoryRight;
-    zen::DirPickerCtrl* m_dirPickerRight;
-    wxBitmapButton* m_bpButtonAltCompCfg;
-    wxBitmapButton* m_bpButtonLocalFilter;
-    wxBitmapButton* m_bpButtonAltSyncCfg;
-    FolderHistoryBox* m_comboBoxLogfileDir;
-
-    BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create a batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-    ~BatchDlgGenerated();
-
+	private:
+	
+	protected:
+		wxStaticBitmap* m_bitmap27;
+		wxPanel* m_panel8;
+		wxStaticText* m_staticText56;
+		wxStaticText* m_staticText44;
+		wxBitmapButton* m_bpButtonHelp;
+		wxListbook* m_listbook1;
+		wxPanel* m_panelOverview;
+		wxBitmapButton* m_bpButtonCmpConfig;
+		wxStaticText* m_staticTextCmpVariant;
+		wxBitmapButton* m_bpButtonFilter;
+		wxStaticText* m_staticTextSyncVariant;
+		wxBitmapButton* m_bpButtonSyncConfig;
+		wxBoxSizer* sbSizerMainPair;
+		wxPanel* m_panelMainPair;
+		wxStaticText* m_staticText532;
+		wxStaticText* m_staticText5411;
+		wxBoxSizer* bSizerAddFolderPairs;
+		wxPanel* m_panelBatchSettings;
+		wxCheckBox* m_checkBoxShowProgress;
+		wxChoice* m_choiceHandleError;
+		wxStaticBoxSizer* sbSizerLogfileDir;
+		wxStaticText* m_staticText96;
+		wxSpinCtrl* m_spinCtrlLogCountMax;
+		wxPanel* m_panelLogfile;
+		wxStaticText* m_staticText94;
+		zen::DirPickerCtrl* m_dirPickerLogfileDir;
+		wxButton* m_buttonSave;
+		wxButton* m_buttonLoad;
+		wxButton* m_button6;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCmpSettings( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncSettings( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddFolderPair( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveTopFolderPair( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnChangeErrorHandling( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnChangeMaxLogCountTxt( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSaveBatchJob( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLoadBatchJob( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		wxScrolledWindow* m_scrolledWindow6;
+		wxBitmapButton* m_bpButtonAddPair;
+		wxBitmapButton* m_bpButtonRemovePair;
+		wxPanel* m_panelLeft;
+		FolderHistoryBox* m_directoryLeft;
+		zen::DirPickerCtrl* m_dirPickerLeft;
+		wxPanel* m_panelRight;
+		FolderHistoryBox* m_directoryRight;
+		zen::DirPickerCtrl* m_dirPickerRight;
+		wxBitmapButton* m_bpButtonAltCompCfg;
+		wxBitmapButton* m_bpButtonLocalFilter;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
+		FolderHistoryBox* m_comboBoxLogfileDir;
+		
+		BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create a batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		~BatchDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class BatchFolderPairGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class BatchFolderPairGenerated : public wxPanel
+class BatchFolderPairGenerated : public wxPanel 
 {
-private:
-
-protected:
-    wxPanel* m_panel32;
-    wxStaticText* m_staticText53;
-    wxStaticText* m_staticText541;
-    wxPanel* m_panelLeft;
-    wxPanel* m_panelRight;
-
-public:
-    wxBitmapButton* m_bpButtonRemovePair;
-    FolderHistoryBox* m_directoryLeft;
-    zen::DirPickerCtrl* m_dirPickerLeft;
-    FolderHistoryBox* m_directoryRight;
-    zen::DirPickerCtrl* m_dirPickerRight;
-    wxBitmapButton* m_bpButtonAltCompCfg;
-    wxBitmapButton* m_bpButtonLocalFilter;
-    wxBitmapButton* m_bpButtonAltSyncCfg;
-
-    BatchFolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
-    ~BatchFolderPairGenerated();
-
+	private:
+	
+	protected:
+		wxPanel* m_panel32;
+		wxStaticText* m_staticText53;
+		wxStaticText* m_staticText541;
+		wxPanel* m_panelLeft;
+		wxPanel* m_panelRight;
+	
+	public:
+		wxBitmapButton* m_bpButtonRemovePair;
+		FolderHistoryBox* m_directoryLeft;
+		zen::DirPickerCtrl* m_dirPickerLeft;
+		FolderHistoryBox* m_directoryRight;
+		zen::DirPickerCtrl* m_dirPickerRight;
+		wxBitmapButton* m_bpButtonAltCompCfg;
+		wxBitmapButton* m_bpButtonLocalFilter;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
+		
+		BatchFolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~BatchFolderPairGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SyncCfgDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class SyncCfgDlgGenerated : public wxDialog
+class SyncCfgDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxStaticText* m_staticText1;
-    wxRadioButton* m_radioBtnAutomatic;
-    wxButton* m_buttonAutomatic;
-    wxStaticText* m_staticText81;
-    wxRadioButton* m_radioBtnMirror;
-    wxButton* m_buttonOneWay;
-    wxStaticText* m_staticText8;
-    wxRadioButton* m_radioBtnUpdate;
-    wxButton* m_buttonUpdate;
-    wxStaticText* m_staticText101;
-    wxRadioButton* m_radioBtnCustom;
-    wxButton* m_buttonUpdate1;
-    wxStaticText* m_staticText9;
-    wxBoxSizer* bSizer201;
-    wxStaticBoxSizer* sbSizerErrorHandling;
-    wxChoice* m_choiceHandleError;
-    wxStaticBoxSizer* sbSizerCustDelDir;
-    wxChoice* m_choiceHandleDeletion;
-    wxPanel* m_panelCustomDeletionDir;
-    FolderHistoryBox* m_customDelFolder;
-    zen::DirPickerCtrl* m_dirPickerCustomDelFolder;
-    wxButton* m_buttonOK;
-    wxButton* m_button16;
-    wxStaticBitmap* m_bitmapDatabase;
-    wxBoxSizer* sbSizerSyncDirections;
-    wxStaticText* m_staticText21;
-    wxStaticText* m_staticText31;
-    wxStaticLine* m_staticline3;
-    wxBoxSizer* bSizerLeftOnly;
-    wxStaticBitmap* m_bitmapLeftOnly;
-    wxBitmapButton* m_bpButtonLeftOnly;
-    wxBoxSizer* bSizerRightOnly;
-    wxStaticBitmap* m_bitmapRightOnly;
-    wxBitmapButton* m_bpButtonRightOnly;
-    wxBoxSizer* bSizerLeftNewer;
-    wxStaticBitmap* m_bitmapLeftNewer;
-    wxBitmapButton* m_bpButtonLeftNewer;
-    wxBoxSizer* bSizerRightNewer;
-    wxStaticBitmap* m_bitmapRightNewer;
-    wxBitmapButton* m_bpButtonRightNewer;
-    wxBoxSizer* bSizerDifferent;
-    wxStaticBitmap* m_bitmapDifferent;
-    wxBitmapButton* m_bpButtonDifferent;
-    wxBoxSizer* bSizerConflict;
-    wxStaticBitmap* m_bitmapConflict;
-    wxBitmapButton* m_bpButtonConflict;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnSyncAutomatic( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncAutomaticDouble( wxMouseEvent& event ) { event.Skip(); }
-    virtual void OnSyncMirror( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncMirrorDouble( wxMouseEvent& event ) { event.Skip(); }
-    virtual void OnSyncUpdate( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncUpdateDouble( wxMouseEvent& event ) { event.Skip(); }
-    virtual void OnSyncCustom( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncCustomDouble( wxMouseEvent& event ) { event.Skip(); }
-    virtual void OnChangeErrorHandling( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnChangeDeletionHandling( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnApply( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnExLeftSideOnly( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnExRightSideOnly( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnLeftNewer( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnRightNewer( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDifferent( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnConflict( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
-    ~SyncCfgDlgGenerated();
-
+	private:
+	
+	protected:
+		wxRadioButton* m_radioBtnAutomatic;
+		wxButton* m_buttonAutomatic;
+		wxStaticText* m_staticText81;
+		wxRadioButton* m_radioBtnMirror;
+		wxButton* m_buttonOneWay;
+		wxStaticText* m_staticText8;
+		wxRadioButton* m_radioBtnUpdate;
+		wxButton* m_buttonUpdate;
+		wxStaticText* m_staticText101;
+		wxRadioButton* m_radioBtnCustom;
+		wxButton* m_buttonUpdate1;
+		wxStaticText* m_staticText9;
+		wxStaticBoxSizer* sbSizerCustDelDir;
+		wxChoice* m_choiceHandleDeletion;
+		wxPanel* m_panelCustomDeletionDir;
+		FolderHistoryBox* m_customDelFolder;
+		zen::DirPickerCtrl* m_dirPickerCustomDelFolder;
+		wxBoxSizer* bSizer201;
+		wxStaticBoxSizer* sbSizerErrorHandling;
+		wxChoice* m_choiceHandleError;
+		wxStaticBoxSizer* sbSizerExecFinished;
+		ExecFinishedBox* m_comboBoxExecFinished;
+		wxStaticBitmap* m_bitmapDatabase;
+		wxBoxSizer* sbSizerSyncDirections;
+		wxStaticText* m_staticText21;
+		wxStaticText* m_staticText31;
+		wxBoxSizer* bSizerLeftOnly;
+		wxStaticBitmap* m_bitmapLeftOnly;
+		wxBitmapButton* m_bpButtonLeftOnly;
+		wxBoxSizer* bSizerRightOnly;
+		wxStaticBitmap* m_bitmapRightOnly;
+		wxBitmapButton* m_bpButtonRightOnly;
+		wxBoxSizer* bSizerLeftNewer;
+		wxStaticBitmap* m_bitmapLeftNewer;
+		wxBitmapButton* m_bpButtonLeftNewer;
+		wxBoxSizer* bSizerRightNewer;
+		wxStaticBitmap* m_bitmapRightNewer;
+		wxBitmapButton* m_bpButtonRightNewer;
+		wxBoxSizer* bSizerDifferent;
+		wxStaticBitmap* m_bitmapDifferent;
+		wxBitmapButton* m_bpButtonDifferent;
+		wxBoxSizer* bSizerConflict;
+		wxStaticBitmap* m_bitmapConflict;
+		wxBitmapButton* m_bpButtonConflict;
+		wxButton* m_buttonOK;
+		wxButton* m_button16;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnSyncAutomatic( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncAutomaticDouble( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnSyncMirror( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncMirrorDouble( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnSyncUpdate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncUpdateDouble( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnSyncCustom( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSyncCustomDouble( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnChangeDeletionHandling( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnChangeErrorHandling( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExLeftSideOnly( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExRightSideOnly( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLeftNewer( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRightNewer( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDifferent( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnConflict( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnApply( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~SyncCfgDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class CmpCfgDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class CmpCfgDlgGenerated : public wxDialog
+class CmpCfgDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxRadioButton* m_radioBtnSizeDate;
-    wxStaticBitmap* m_bitmapByTime;
-    wxButton* m_buttonTimeSize;
-    wxRadioButton* m_radioBtnContent;
-    wxStaticBitmap* m_bitmapByContent;
-    wxButton* m_buttonContent;
-    wxChoice* m_choiceHandleSymlinks;
-    wxBitmapButton* m_bpButtonHelp;
-    wxButton* m_button10;
-    wxButton* m_button6;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnTimeSize( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnTimeSizeDouble( wxMouseEvent& event ) { event.Skip(); }
-    virtual void OnContent( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnContentDouble( wxMouseEvent& event ) { event.Skip(); }
-    virtual void OnChangeErrorHandling( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    CmpCfgDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Comparison settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
-    ~CmpCfgDlgGenerated();
-
+	private:
+	
+	protected:
+		wxRadioButton* m_radioBtnSizeDate;
+		wxStaticBitmap* m_bitmapByTime;
+		wxButton* m_buttonTimeSize;
+		wxRadioButton* m_radioBtnContent;
+		wxStaticBitmap* m_bitmapByContent;
+		wxButton* m_buttonContent;
+		wxChoice* m_choiceHandleSymlinks;
+		wxBitmapButton* m_bpButtonHelp;
+		wxButton* m_button10;
+		wxButton* m_button6;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnTimeSize( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTimeSizeDouble( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnContent( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnContentDouble( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnChangeErrorHandling( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		CmpCfgDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Comparison settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~CmpCfgDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SyncStatusDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class SyncStatusDlgGenerated : public wxFrame
+class SyncStatusDlgGenerated : public wxFrame 
 {
-private:
-
-protected:
-    wxPanel* m_panelBackground;
-    wxBoxSizer* bSizerTop;
-    wxStaticBitmap* m_bitmapStatus;
-    wxStaticText* m_staticTextStatus;
-    wxAnimationCtrl* m_animationControl1;
-    wxBoxSizer* bSizerCurrentOperation;
-    wxStaticText* m_staticText2511;
-    wxTextCtrl* m_textCtrlInfo;
-    wxPanel* m_panelProgress;
-    wxBoxSizer* bSizer171;
-    wxStaticBoxSizer* bSizerProgressStat;
-    wxStaticText* m_staticTextItemsRem;
-    wxBoxSizer* bSizerItemsRem;
-    wxStaticText* m_staticTextRemainingObj;
-    wxStaticText* m_staticText96;
-    wxStaticText* m_staticTextDataRemaining;
-    wxStaticText* m_staticText97;
-    wxStaticText* m_staticTextItemsProc;
-    wxBoxSizer* bSizerItemsProc;
-    wxStaticText* m_staticTextProcessedObj;
-    wxStaticText* m_staticText98;
-    wxStaticText* m_staticTextDataProcessed;
-    wxStaticText* m_staticText99;
-    wxStaticText* m_staticTextSpeedDescr;
-    wxStaticText* m_staticTextSpeed;
-    wxStaticText* m_staticText55;
-    wxStaticText* m_staticTextTimeElapsed;
-    wxStaticText* m_staticTextRemTimeDescr;
-    wxStaticText* m_staticTextRemTime;
-    zen::Graph2D* m_panelGraph;
-    wxBoxSizer* bSizerFinalStat;
-    wxListbook* m_listbookResult;
-    wxBoxSizer* bSizer28;
-    wxButton* m_buttonOK;
-    wxButton* m_buttonPause;
-    wxButton* m_buttonAbort;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnIconize( wxIconizeEvent& event ) { event.Skip(); }
-    virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnPause( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnAbort( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-    wxGauge* m_gauge1;
-
-    SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 620,330 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-
-    ~SyncStatusDlgGenerated();
-
+	private:
+	
+	protected:
+		wxPanel* m_panelBackground;
+		wxBoxSizer* bSizerTop;
+		wxStaticBitmap* m_bitmapStatus;
+		wxStaticText* m_staticTextStatus;
+		wxAnimationCtrl* m_animationControl1;
+		wxBoxSizer* bSizerCurrentOperation;
+		wxStaticText* m_staticText2511;
+		wxTextCtrl* m_textCtrlInfo;
+		wxPanel* m_panelProgress;
+		wxBoxSizer* bSizer171;
+		wxStaticBoxSizer* bSizerProgressStat;
+		wxStaticText* m_staticTextItemsRem;
+		wxBoxSizer* bSizerItemsRem;
+		wxStaticText* m_staticTextRemainingObj;
+		wxStaticText* m_staticText96;
+		wxStaticText* m_staticTextDataRemaining;
+		wxStaticText* m_staticText97;
+		wxStaticText* m_staticTextItemsProc;
+		wxBoxSizer* bSizerItemsProc;
+		wxStaticText* m_staticTextProcessedObj;
+		wxStaticText* m_staticText98;
+		wxStaticText* m_staticTextDataProcessed;
+		wxStaticText* m_staticText99;
+		wxStaticText* m_staticTextSpeedDescr;
+		wxStaticText* m_staticTextSpeed;
+		wxStaticText* m_staticText55;
+		wxStaticText* m_staticTextTimeElapsed;
+		wxStaticText* m_staticTextRemTimeDescr;
+		wxStaticText* m_staticTextRemTime;
+		zen::Graph2D* m_panelGraph;
+		wxBoxSizer* bSizerFinalStat;
+		wxListbook* m_listbookResult;
+		wxBoxSizer* bSizerExecFinished;
+		wxStaticText* m_staticText87;
+		ExecFinishedBox* m_comboBoxExecFinished;
+		wxBoxSizer* bSizer28;
+		wxButton* m_buttonOK;
+		wxButton* m_buttonPause;
+		wxButton* m_buttonAbort;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnIconize( wxIconizeEvent& event ) { event.Skip(); }
+		virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPause( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAbort( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		wxGauge* m_gauge1;
+		
+		SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 640,350 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		
+		~SyncStatusDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LogControlGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class LogControlGenerated : public wxPanel
+class LogControlGenerated : public wxPanel 
 {
-private:
-
-protected:
-    ToggleButton* m_bpButtonErrors;
-    ToggleButton* m_bpButtonWarnings;
-    ToggleButton* m_bpButtonInfo;
-    wxTextCtrl* m_textCtrlInfo;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnErrors( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnWarnings( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnInfo( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    LogControlGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
-    ~LogControlGenerated();
-
+	private:
+	
+	protected:
+		ToggleButton* m_bpButtonErrors;
+		ToggleButton* m_bpButtonWarnings;
+		ToggleButton* m_bpButtonInfo;
+		wxTextCtrl* m_textCtrlInfo;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnErrors( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnWarnings( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnInfo( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		LogControlGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~LogControlGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class AboutDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class AboutDlgGenerated : public wxDialog
+class AboutDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxPanel* m_panel5;
-    wxStaticBitmap* m_bitmap11;
-    wxStaticText* m_build;
-    wxPanel* m_panel33;
-    wxBoxSizer* bSizerCodeInfo;
-    wxStaticText* m_staticText72;
-    wxHyperlinkCtrl* m_hyperlink9;
-    wxHyperlinkCtrl* m_hyperlink11;
-    wxHyperlinkCtrl* m_hyperlink10;
-    wxHyperlinkCtrl* m_hyperlink13;
-    wxHyperlinkCtrl* m_hyperlink7;
-    wxHyperlinkCtrl* m_hyperlink16;
-    wxHyperlinkCtrl* m_hyperlink8;
-    wxHyperlinkCtrl* m_hyperlink15;
-    wxHyperlinkCtrl* m_hyperlink12;
-    wxHyperlinkCtrl* m_hyperlink18;
-    wxHyperlinkCtrl* m_hyperlink14;
-    wxHyperlinkCtrl* m_hyperlink21;
-    wxScrolledWindow* m_scrolledWindowTranslators;
-    wxBoxSizer* bSizerTranslators;
-    wxStaticText* m_staticText54;
-    wxFlexGridSizer* fgSizerTranslators;
-    wxStaticLine* m_staticline3;
-    wxStaticText* m_staticText131;
-    wxStaticLine* m_staticline12;
-    wxStaticBitmap* m_bitmap9;
-    wxHyperlinkCtrl* m_hyperlink1;
-    wxHyperlinkCtrl* m_hyperlink3;
-    wxAnimationCtrl* m_animationControl1;
-    wxStaticBitmap* m_bitmap10;
-    wxHyperlinkCtrl* m_hyperlink2;
-    wxHyperlinkCtrl* m_hyperlink6;
-    wxStaticBitmap* m_bitmapTransl;
-    wxStaticLine* m_staticline2;
-    wxStaticBitmap* m_bitmap13;
-    wxHyperlinkCtrl* m_hyperlink5;
-    wxButton* m_buttonOkay;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    AboutDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
-    ~AboutDlgGenerated();
-
+	private:
+	
+	protected:
+		wxPanel* m_panel5;
+		wxStaticBitmap* m_bitmap11;
+		wxStaticText* m_build;
+		wxPanel* m_panel33;
+		wxBoxSizer* bSizerCodeInfo;
+		wxStaticText* m_staticText72;
+		wxHyperlinkCtrl* m_hyperlink9;
+		wxHyperlinkCtrl* m_hyperlink11;
+		wxHyperlinkCtrl* m_hyperlink10;
+		wxHyperlinkCtrl* m_hyperlink13;
+		wxHyperlinkCtrl* m_hyperlink7;
+		wxHyperlinkCtrl* m_hyperlink16;
+		wxHyperlinkCtrl* m_hyperlink8;
+		wxHyperlinkCtrl* m_hyperlink15;
+		wxHyperlinkCtrl* m_hyperlink12;
+		wxHyperlinkCtrl* m_hyperlink18;
+		wxHyperlinkCtrl* m_hyperlink14;
+		wxHyperlinkCtrl* m_hyperlink21;
+		wxScrolledWindow* m_scrolledWindowTranslators;
+		wxBoxSizer* bSizerTranslators;
+		wxStaticText* m_staticText54;
+		wxFlexGridSizer* fgSizerTranslators;
+		wxStaticLine* m_staticline3;
+		wxStaticText* m_staticText131;
+		wxStaticLine* m_staticline12;
+		wxStaticBitmap* m_bitmap9;
+		wxHyperlinkCtrl* m_hyperlink1;
+		wxHyperlinkCtrl* m_hyperlink3;
+		wxAnimationCtrl* m_animationControl1;
+		wxStaticBitmap* m_bitmap10;
+		wxHyperlinkCtrl* m_hyperlink2;
+		wxHyperlinkCtrl* m_hyperlink6;
+		wxStaticBitmap* m_bitmapTransl;
+		wxStaticLine* m_staticline2;
+		wxStaticBitmap* m_bitmap13;
+		wxHyperlinkCtrl* m_hyperlink5;
+		wxButton* m_buttonOkay;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		AboutDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~AboutDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ErrorDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class ErrorDlgGenerated : public wxDialog
+class ErrorDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxStaticBitmap* m_bitmap10;
-    wxTextCtrl* m_textCtrl8;
-    wxCheckBox* m_checkBoxIgnoreErrors;
-    wxButton* m_buttonIgnore;
-    wxButton* m_buttonRetry;
-    wxButton* m_buttonAbort;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnIgnore( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnRetry( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnAbort( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
-    ~ErrorDlgGenerated();
-
+	private:
+	
+	protected:
+		wxStaticBitmap* m_bitmap10;
+		wxTextCtrl* m_textCtrl8;
+		wxCheckBox* m_checkBoxIgnoreErrors;
+		wxButton* m_buttonIgnore;
+		wxButton* m_buttonRetry;
+		wxButton* m_buttonAbort;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnIgnore( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRetry( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAbort( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
+		~ErrorDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class WarningDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class WarningDlgGenerated : public wxDialog
+class WarningDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxTextCtrl* m_textCtrl8;
-    wxCheckBox* m_checkBoxDontShowAgain;
-    wxButton* m_buttonIgnore;
-    wxButton* m_buttonSwitch;
-    wxButton* m_buttonAbort;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnIgnore( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSwitch( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnAbort( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-    wxStaticBitmap* m_bitmap10;
-
-    WarningDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Warning"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
-    ~WarningDlgGenerated();
-
+	private:
+	
+	protected:
+		wxTextCtrl* m_textCtrl8;
+		wxCheckBox* m_checkBoxDontShowAgain;
+		wxButton* m_buttonIgnore;
+		wxButton* m_buttonSwitch;
+		wxButton* m_buttonAbort;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnIgnore( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSwitch( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAbort( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		wxStaticBitmap* m_bitmap10;
+		
+		WarningDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Warning"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
+		~WarningDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class QuestionDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class QuestionDlgGenerated : public wxDialog
+class QuestionDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxStaticBitmap* m_bitmap10;
-    wxTextCtrl* m_textCtrl8;
-    wxCheckBox* m_checkBoxDontAskAgain;
-    wxButton* m_buttonYes;
-    wxButton* m_buttonNo;
-    wxButton* m_buttonCancel;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnCheckBoxDontShowAgain( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnYes( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnNo( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    QuestionDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Question"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,198 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
-    ~QuestionDlgGenerated();
-
+	private:
+	
+	protected:
+		wxStaticBitmap* m_bitmap10;
+		wxTextCtrl* m_textCtrl8;
+		wxCheckBox* m_checkBoxDontAskAgain;
+		wxButton* m_buttonYes;
+		wxButton* m_buttonNo;
+		wxButton* m_buttonCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnCheckBoxDontShowAgain( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnYes( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnNo( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		QuestionDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Question"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,198 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
+		~QuestionDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class DeleteDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class DeleteDlgGenerated : public wxDialog
+class DeleteDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxStaticBitmap* m_bitmap12;
-    wxStaticText* m_staticTextHeader;
-    wxCheckBox* m_checkBoxDeleteBothSides;
-    wxCheckBox* m_checkBoxUseRecycler;
-    wxTextCtrl* m_textCtrlMessage;
-    wxButton* m_buttonOK;
-    wxButton* m_buttonCancel;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnDelOnBothSides( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnUseRecycler( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    DeleteDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Confirm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 553,336 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
-    ~DeleteDlgGenerated();
-
+	private:
+	
+	protected:
+		wxStaticBitmap* m_bitmap12;
+		wxStaticText* m_staticTextHeader;
+		wxTextCtrl* m_textCtrlMessage;
+		wxCheckBox* m_checkBoxDeleteBothSides;
+		wxCheckBox* m_checkBoxUseRecycler;
+		wxButton* m_buttonOK;
+		wxButton* m_buttonCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnDelOnBothSides( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUseRecycler( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		DeleteDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Confirm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 553,336 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
+		~DeleteDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FilterDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class FilterDlgGenerated : public wxDialog
+class FilterDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxStaticBitmap* m_bitmap26;
-    wxPanel* m_panel8;
-    wxStaticText* m_staticTexHeader;
-    wxStaticText* m_staticText44;
-    wxBitmapButton* m_bpButtonHelp;
-    wxPanel* m_panel13;
-    wxStaticLine* m_staticline10;
-    wxStaticText* m_staticText45;
-    wxStaticText* m_staticText83;
-    wxStaticText* m_staticText84;
-    wxStaticText* m_staticText85;
-    wxStaticText* m_staticText181;
-    wxStaticText* m_staticText1811;
-    wxStaticBitmap* m_bitmapInclude;
-    wxTextCtrl* m_textCtrlInclude;
-    wxStaticBitmap* m_bitmapExclude;
-    wxTextCtrl* m_textCtrlExclude;
-    wxStaticBitmap* m_bitmapFilterDate;
-    wxStaticText* m_staticText103;
-    wxChoice* m_choiceUnitTimespan;
-    wxSpinCtrl* m_spinCtrlTimespan;
-    wxStaticBitmap* m_bitmapFilterSize;
-    wxStaticText* m_staticText101;
-    wxSpinCtrl* m_spinCtrlMinSize;
-    wxChoice* m_choiceUnitMinSize;
-    wxStaticText* m_staticText102;
-    wxSpinCtrl* m_spinCtrlMaxSize;
-    wxChoice* m_choiceUnitMaxSize;
-    wxButton* m_button9;
-    wxButton* m_button10;
-    wxButton* m_button17;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnUpdateNameFilter( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnUpdateChoice( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDefault( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnApply( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-    ~FilterDlgGenerated();
-
+	private:
+	
+	protected:
+		wxStaticBitmap* m_bitmap26;
+		wxPanel* m_panel8;
+		wxStaticText* m_staticTexHeader;
+		wxStaticText* m_staticText44;
+		wxBitmapButton* m_bpButtonHelp;
+		wxPanel* m_panel13;
+		wxStaticLine* m_staticline10;
+		wxStaticText* m_staticText45;
+		wxStaticText* m_staticText83;
+		wxStaticText* m_staticText84;
+		wxStaticText* m_staticText85;
+		wxStaticText* m_staticText181;
+		wxStaticText* m_staticText1811;
+		wxStaticBitmap* m_bitmapInclude;
+		wxTextCtrl* m_textCtrlInclude;
+		wxStaticBitmap* m_bitmapExclude;
+		wxTextCtrl* m_textCtrlExclude;
+		wxStaticBitmap* m_bitmapFilterDate;
+		wxStaticText* m_staticText103;
+		wxChoice* m_choiceUnitTimespan;
+		wxSpinCtrl* m_spinCtrlTimespan;
+		wxStaticBitmap* m_bitmapFilterSize;
+		wxStaticText* m_staticText101;
+		wxSpinCtrl* m_spinCtrlMinSize;
+		wxChoice* m_choiceUnitMinSize;
+		wxStaticText* m_staticText102;
+		wxSpinCtrl* m_spinCtrlMaxSize;
+		wxChoice* m_choiceUnitMaxSize;
+		wxButton* m_button9;
+		wxButton* m_button10;
+		wxButton* m_button17;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateNameFilter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateChoice( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDefault( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnApply( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		~FilterDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class CustomizeColsDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class CustomizeColsDlgGenerated : public wxDialog
+class CustomizeColsDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxCheckListBox* m_checkListColumns;
-    wxBitmapButton* m_bpButton29;
-    wxBitmapButton* m_bpButton30;
-    wxButton* m_button9;
-    wxButton* m_button28;
-    wxButton* m_button29;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnMoveUp( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnMoveDown( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDefault( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    CustomizeColsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Customize columns"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
-    ~CustomizeColsDlgGenerated();
-
+	private:
+	
+	protected:
+		wxCheckListBox* m_checkListColumns;
+		wxBitmapButton* m_bpButton29;
+		wxBitmapButton* m_bpButton30;
+		wxButton* m_button9;
+		wxButton* m_button28;
+		wxButton* m_button29;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnMoveUp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMoveDown( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDefault( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		CustomizeColsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Customize columns"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~CustomizeColsDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GlobalSettingsDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class GlobalSettingsDlgGenerated : public wxDialog
+class GlobalSettingsDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxStaticBitmap* m_bitmapSettings;
-    wxPanel* m_panel8;
-    wxStaticText* m_staticText56;
-    wxCheckBox* m_checkBoxTransCopy;
-    wxStaticText* m_staticText82;
-    wxCheckBox* m_checkBoxCopyLocked;
-    wxStaticText* m_staticTextCopyLocked;
-    wxCheckBox* m_checkBoxCopyPermissions;
-    wxStaticText* m_staticText8211;
-    wxStaticText* m_staticText100;
-    zen::BitmapButton* m_buttonResetDialogs;
-    wxGrid* m_gridCustomCommand;
-    wxBitmapButton* m_bpButtonAddRow;
-    wxBitmapButton* m_bpButtonRemoveRow;
-    wxButton* m_button9;
-    wxButton* m_buttonOkay;
-    wxButton* m_button29;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnResetDialogs( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnAddRow( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnRemoveRow( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDefault( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    GlobalSettingsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Global settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-    ~GlobalSettingsDlgGenerated();
-
+	private:
+	
+	protected:
+		wxStaticBitmap* m_bitmapSettings;
+		wxPanel* m_panel8;
+		wxStaticText* m_staticText56;
+		wxCheckBox* m_checkBoxTransCopy;
+		wxStaticText* m_staticText82;
+		wxCheckBox* m_checkBoxCopyLocked;
+		wxStaticText* m_staticTextCopyLocked;
+		wxCheckBox* m_checkBoxCopyPermissions;
+		wxStaticText* m_staticText8211;
+		wxStaticText* m_staticText100;
+		zen::BitmapButton* m_buttonResetDialogs;
+		wxGrid* m_gridCustomCommand;
+		wxBitmapButton* m_bpButtonAddRow;
+		wxBitmapButton* m_bpButtonRemoveRow;
+		wxButton* m_button9;
+		wxButton* m_buttonOkay;
+		wxButton* m_button29;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnResetDialogs( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddRow( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveRow( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDefault( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		GlobalSettingsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Global settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		~GlobalSettingsDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SyncPreviewDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class SyncPreviewDlgGenerated : public wxDialog
+class SyncPreviewDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    zen::BitmapButton* m_buttonStartSync;
-    wxStaticLine* m_staticline16;
-    wxStaticText* m_staticTextVariant;
-    wxStaticLine* m_staticline14;
-    wxStaticText* m_staticText94;
-    wxStaticBitmap* m_bitmapCreate;
-    wxTextCtrl* m_textCtrlCreateL;
-    wxStaticBitmap* m_bitmapUpdate;
-    wxTextCtrl* m_textCtrlUpdateL;
-    wxStaticBitmap* m_bitmapDelete;
-    wxTextCtrl* m_textCtrlDeleteL;
-    wxStaticText* m_staticText95;
-    wxTextCtrl* m_textCtrlCreateR;
-    wxTextCtrl* m_textCtrlUpdateR;
-    wxTextCtrl* m_textCtrlDeleteR;
-    wxStaticBitmap* m_bitmapData;
-    wxTextCtrl* m_textCtrlData;
-    wxStaticLine* m_staticline12;
-    wxCheckBox* m_checkBoxDontShowAgain;
-    wxButton* m_button16;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnStartSync( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization Preview"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
-    ~SyncPreviewDlgGenerated();
-
+	private:
+	
+	protected:
+		zen::BitmapButton* m_buttonStartSync;
+		wxStaticLine* m_staticline16;
+		wxStaticText* m_staticTextVariant;
+		wxStaticLine* m_staticline14;
+		wxStaticText* m_staticText94;
+		wxStaticBitmap* m_bitmapCreate;
+		wxTextCtrl* m_textCtrlCreateL;
+		wxStaticBitmap* m_bitmapUpdate;
+		wxTextCtrl* m_textCtrlUpdateL;
+		wxStaticBitmap* m_bitmapDelete;
+		wxTextCtrl* m_textCtrlDeleteL;
+		wxStaticText* m_staticText95;
+		wxTextCtrl* m_textCtrlCreateR;
+		wxTextCtrl* m_textCtrlUpdateR;
+		wxTextCtrl* m_textCtrlDeleteR;
+		wxStaticBitmap* m_bitmapData;
+		wxTextCtrl* m_textCtrlData;
+		wxStaticLine* m_staticline12;
+		wxCheckBox* m_checkBoxDontShowAgain;
+		wxButton* m_button16;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnStartSync( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization Preview"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~SyncPreviewDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class PopupFrameGenerated1
 ///////////////////////////////////////////////////////////////////////////////
-class PopupFrameGenerated1 : public wxFrame
+class PopupFrameGenerated1 : public wxFrame 
 {
-private:
-
-protected:
-
-public:
-    wxStaticBitmap* m_bitmapLeft;
-    wxStaticText* m_staticTextMain;
-
-    PopupFrameGenerated1( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxFRAME_NO_TASKBAR|wxSTAY_ON_TOP|wxSTATIC_BORDER );
-
-    ~PopupFrameGenerated1();
-
+	private:
+	
+	protected:
+	
+	public:
+		wxStaticBitmap* m_bitmapLeft;
+		wxStaticText* m_staticTextMain;
+		
+		PopupFrameGenerated1( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxFRAME_NO_TASKBAR|wxSTAY_ON_TOP|wxSTATIC_BORDER );
+		
+		~PopupFrameGenerated1();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SearchDialogGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class SearchDialogGenerated : public wxDialog
+class SearchDialogGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxStaticText* m_staticText101;
-    wxTextCtrl* m_textCtrlSearchTxt;
-    wxCheckBox* m_checkBoxMatchCase;
-    wxButton* m_buttonFindNext;
-    wxButton* m_button29;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnText( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnFindNext( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    SearchDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
-    ~SearchDialogGenerated();
-
+	private:
+	
+	protected:
+		wxStaticText* m_staticText101;
+		wxTextCtrl* m_textCtrlSearchTxt;
+		wxCheckBox* m_checkBoxMatchCase;
+		wxButton* m_buttonFindNext;
+		wxButton* m_button29;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFindNext( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SearchDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~SearchDialogGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SelectTimespanDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class SelectTimespanDlgGenerated : public wxDialog
+class SelectTimespanDlgGenerated : public wxDialog 
 {
-private:
-
-protected:
-    wxCalendarCtrl* m_calendarFrom;
-    wxCalendarCtrl* m_calendarTo;
-    wxButton* m_buttonOkay;
-    wxButton* m_button29;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnChangeSelectionFrom( wxCalendarEvent& event ) { event.Skip(); }
-    virtual void OnChangeSelectionTo( wxCalendarEvent& event ) { event.Skip(); }
-    virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-
-
-public:
-
-    SelectTimespanDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Select time span"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
-    ~SelectTimespanDlgGenerated();
-
+	private:
+	
+	protected:
+		wxCalendarCtrl* m_calendarFrom;
+		wxCalendarCtrl* m_calendarTo;
+		wxButton* m_buttonOkay;
+		wxButton* m_button29;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnChangeSelectionFrom( wxCalendarEvent& event ) { event.Skip(); }
+		virtual void OnChangeSelectionTo( wxCalendarEvent& event ) { event.Skip(); }
+		virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SelectTimespanDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Select time span"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~SelectTimespanDlgGenerated();
+	
 };
 
 #endif //__GUI_GENERATED_H__

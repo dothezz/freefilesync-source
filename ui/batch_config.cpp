@@ -36,7 +36,9 @@ public:
                 const wxString& referenceFile,
                 const xmlAccess::XmlBatchConfig& batchCfg,
                 const std::shared_ptr<FolderHistory>& folderHistLeft,
-                const std::shared_ptr<FolderHistory>& folderHistRight);
+                const std::shared_ptr<FolderHistory>& folderHistRight,
+                std::vector<std::wstring>& onCompletionHistory,
+                size_t onCompletionHistoryMax);
 
 private:
     virtual void OnCmpSettings(        wxCommandEvent& event);
@@ -92,8 +94,10 @@ private:
 
     zen::EnumDescrList<xmlAccess::OnError> enumDescrMap;
 
-    std::shared_ptr<FolderHistory> folderHistLeft_;
-    std::shared_ptr<FolderHistory> folderHistRight_;
+    const std::shared_ptr<FolderHistory> folderHistLeft_;
+    const std::shared_ptr<FolderHistory> folderHistRight_;
+    std::vector<std::wstring>& onCompletionHistory_;
+    size_t onCompletionHistoryMax_;
 };
 
 //###################################################################################################################################
@@ -232,10 +236,14 @@ BatchDialog::BatchDialog(wxWindow* window,
                          const wxString& referenceFile,
                          const xmlAccess::XmlBatchConfig& batchCfg,
                          const std::shared_ptr<FolderHistory>& folderHistLeft,
-                         const std::shared_ptr<FolderHistory>& folderHistRight) :
+                         const std::shared_ptr<FolderHistory>& folderHistRight,
+                         std::vector<std::wstring>& onCompletionHistory,
+                         size_t onCompletionHistoryMax) :
     BatchDlgGenerated(window),
     folderHistLeft_(folderHistLeft),
-    folderHistRight_(folderHistRight)
+    folderHistRight_(folderHistRight),
+    onCompletionHistory_(onCompletionHistory),
+    onCompletionHistoryMax_(onCompletionHistoryMax)
 {
     m_directoryLeft ->init(folderHistLeft_);
     m_directoryRight->init(folderHistRight_);
@@ -319,9 +327,15 @@ void BatchDialog::OnCmpSettings(wxCommandEvent& event)
 
 void BatchDialog::OnSyncSettings(wxCommandEvent& event)
 {
+    ExecWhenFinishedCfg ewfCfg = { &localBatchCfg.mainCfg.onCompletion,
+                                   &onCompletionHistory_,
+                                   onCompletionHistoryMax_
+                                 };
+
     if (showSyncConfigDlg(localBatchCfg.mainCfg.cmpConfig.compareVar,
                           localBatchCfg.mainCfg.syncCfg,
-                          NULL) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
+                          NULL,
+                          &ewfCfg) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
     {
         updateGui();
     }
@@ -347,10 +361,10 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
     m_panelLogfile->Enable(cfg.logFileCountMax > 0);
 
     //update compare variant name
-    m_staticTextCmpVariant->SetLabel(wxString(wxT("(")) + cfg.mainCfg.getCompVariantName() + wxT(")"));
+    m_staticTextCmpVariant->SetLabel(cfg.mainCfg.getCompVariantName());
 
     //update sync variant name
-    m_staticTextSyncVariant->SetLabel(wxString(wxT("(")) + cfg.mainCfg.getSyncVariantName() + wxT(")"));
+    m_staticTextSyncVariant->SetLabel(cfg.mainCfg.getSyncVariantName());
 
     //set filter icon
     if (isNullFilter(cfg.mainCfg.globalFilter))
@@ -364,7 +378,7 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
         m_bpButtonFilter->SetToolTip(_("Filter is active"));
     }
 
-    m_panelOverview->Layout(); //adjust stuff inside scrolled window
+    m_panelOverview->Layout (); //adjust stuff inside scrolled window
     m_panelOverview->Refresh(); //refresh filter button (if nothing else)
 }
 
@@ -493,7 +507,7 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
                             wxEmptyString,
                             defaultFileName,
                             wxString(_("FreeFileSync batch file")) + wxT(" (*.ffs_batch)|*.ffs_batch"),
-                            wxFD_SAVE | wxFD_OVERWRITE_PROMPT); //creating this on freestore leads to memleak!
+                            wxFD_SAVE /*| wxFD_OVERWRITE_PROMPT*/); //creating this on freestore leads to memleak!
     if (filePicker.ShowModal() == wxID_OK)
     {
         const wxString newFileName = filePicker.GetPath();
@@ -611,9 +625,9 @@ void BatchDialog::setConfig(const xmlAccess::XmlBatchConfig& batchCfg)
     //make working copy
     localBatchCfg = batchCfg;
 
-    m_checkBoxSilent->SetValue(batchCfg.silent);
+    m_checkBoxShowProgress->SetValue(batchCfg.showProgress);
 
-    //error handling is dependent from m_checkBoxSilent! /|\   \|/
+    //error handling is dependent from m_checkBoxShowProgress! /|\   \|/
     setSelectionHandleError(batchCfg.handleError);
 
     logfileDir->setName(batchCfg.logFileDirectory);
@@ -660,7 +674,7 @@ xmlAccess::XmlBatchConfig BatchDialog::getConfig() const
 
 
     //load structure with batch settings "batchCfg"
-    batchCfg.silent           = m_checkBoxSilent->GetValue();
+    batchCfg.showProgress     = m_checkBoxShowProgress->GetValue();
     batchCfg.logFileDirectory = logfileDir->getName();
     batchCfg.logFileCountMax  = m_spinCtrlLogCountMax->GetValue();
     batchCfg.handleError      = getEnumVal(enumDescrMap, *m_choiceHandleError);
@@ -833,7 +847,7 @@ void BatchDialog::removeAddFolderPair(const int pos)
         additionalFolderPairs.erase(additionalFolderPairs.begin() + pos); //remove last element in vector
 
         //after changing folder pairs window focus is lost: results in scrolled window scrolling to top each time window is shown: we don't want this
-        m_bpButtonCmpConfig->SetFocus();
+        m_bpButtonRemovePair->SetFocus();
     }
 
     updateGuiForFolderPair();
@@ -913,8 +927,10 @@ bool BatchDialog::createBatchFile(const wxString& filename)
 ReturnBatchConfig::ButtonPressed zen::showSyncBatchDlg(const wxString& referenceFile,
                                                        const xmlAccess::XmlBatchConfig& batchCfg,
                                                        const std::shared_ptr<FolderHistory>& folderHistLeft,
-                                                       const std::shared_ptr<FolderHistory>& folderHistRight)
+                                                       const std::shared_ptr<FolderHistory>& folderHistRight,
+                                                       std::vector<std::wstring>& execFinishedhistory,
+                                                       size_t execFinishedhistoryMax)
 {
-    BatchDialog batchDlg(NULL, referenceFile, batchCfg, folderHistLeft, folderHistRight);
+    BatchDialog batchDlg(NULL, referenceFile, batchCfg, folderHistLeft, folderHistRight, execFinishedhistory, execFinishedhistoryMax);
     return static_cast<ReturnBatchConfig::ButtonPressed>(batchDlg.ShowModal());
 }

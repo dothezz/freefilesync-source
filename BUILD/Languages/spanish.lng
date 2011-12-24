@@ -202,9 +202,6 @@
 <pluralform>%x segundos</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Arrastrar y soltar</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -366,7 +363,7 @@ La línea de comandos se ejecuta cada vez:
 <source>FreeFileSync Batch Job</source>
 <target>Tarea batch de FreeFileSync</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>¡Incapaz de crear un archivo de registro!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ La línea de comandos se ejecuta cada vez:
 
 <source>(Requires an Internet connection!)</source>
 <target>(¡Conexión a Internet necesaria!)</target>
+
+<source>Drag && drop</source>
+<target>Arrastrar y soltar</target>
+
+<source>Close progress dialog</source>
+<target>Cerrar diálogo de progreso</target>
+
+<source>Shut down</source>
+<target>Apagar</target>
+
+<source>Log off</source>
+<target>Finalizar sesión</target>
+
+<source>Standby</source>
+<target>Suspender</target>
+
+<source>Hibernate</source>
+<target>Hibernar</target>
 
 <source>1. &Compare</source>
 <target>1. &Comparar</target>
@@ -528,9 +543,6 @@ La línea de comandos se ejecuta cada vez:
 <source>Filter files</source>
 <target>Filtrar archivos</target>
 
-<source>Error handling</source>
-<target>Gestión de errores</target>
-
 <source>Left</source>
 <target>Izquierda</target>
 
@@ -543,13 +555,16 @@ La línea de comandos se ejecuta cada vez:
 <source>Status feedback</source>
 <target>Status feedback</target>
 
-<source>Run minimized</source>
-<target>Ejectuar minimizado</target>
+<source>Show progress dialog</source>
+<target>Mostrar diálogo de progreso</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Gestión de errores</target>
+
+<source>Maximum number of log files:</source>
 <target>Número máximo de archivos de registro:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Seleccione directorio para el archivo de registro:</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ La línea de comandos se ejecuta cada vez:
 <source>Deletion handling</source>
 <target>Gestión de borrado</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>Al completarse:</target>
 
 <source>Configuration</source>
 <target>Configuración</target>
@@ -623,6 +638,9 @@ La línea de comandos se ejecuta cada vez:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Conflicto/el achivo no puede ser categorizado</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Comparar por...</target>
@@ -826,7 +844,7 @@ Excluir: \stuff\temp\*
 <target>Tipo</target>
 
 <source>Statistics</source>
-<target>Estadística</target>
+<target>Estadísticas</target>
 
 <source>Find what:</source>
 <target>Buscar:</target>
@@ -847,7 +865,7 @@ Excluir: \stuff\temp\*
 <target>Pares de carpetas</target>
 
 <source>Select view</source>
-<target>Sellecione vista</target>
+<target>Seleccione vista</target>
 
 <source>Set direction:</source>
 <target>Indicar dirección:</target>
@@ -1077,20 +1095,17 @@ Excluir: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Solicitud de aborto: Esperando a que la operación actual finalice...</target>
 
-<source>Continue</source>
-<target>Continuar</target>
-
 <source>Pause</source>
 <target>Pausa</target>
+
+<source>Continue</source>
+<target>Continuar</target>
 
 <source>Cannot find %x</source>
 <target>No se puede encontrar %x</target>
 
 <source>Inactive</source>
 <target>Inactivo</target>
-
-<source>Last x hours</source>
-<target>Últimas x horas</target>
 
 <source>Today</source>
 <target>Hoy</target>
@@ -1407,11 +1422,11 @@ Excluir: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Creando archivo %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Creando enlace simbólico %x</target>
-
 <source>Creating folder %x</source>
 <target>Creando carpeta %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Creando enlace simbólico %x</target>
 
 <source>Overwriting file %x</source>
 <target>Sobreescribir archivo %x</target>

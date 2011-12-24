@@ -9,6 +9,8 @@
 
 #include <string>
 #include <memory>
+#include <clocale> //thousands separator
+#include "utf8.h"  //
 
 //thin layer to enable localization - without platform/library dependencies!
 #ifndef WXINTL_NO_GETTEXT_MACRO
@@ -27,7 +29,6 @@ struct TranslationHandler
 {
     virtual ~TranslationHandler() {}
 
-    virtual std::wstring thousandsSeparator() = 0;
     virtual std::wstring translate(const std::wstring& text) = 0; //simple translation
     virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, int n) = 0;
 };
@@ -35,8 +36,9 @@ struct TranslationHandler
 void setTranslator(TranslationHandler* newHandler = NULL); //takes ownership
 TranslationHandler* getTranslator();
 
-inline
-std::wstring getThousandsSeparator() { return getTranslator() ? getTranslator()->thousandsSeparator() : L","; };
+std::wstring getThousandsSeparator();
+
+
 
 
 
@@ -91,6 +93,18 @@ void setTranslator(TranslationHandler* newHandler) { implementation::globalHandl
 
 inline
 TranslationHandler* getTranslator() { return implementation::globalHandler().get(); }
+
+
+inline
+std::wstring getThousandsSeparator() //consistency with sprintf(): just use the same values the C-runtime uses!!!
+{
+    //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
+    const lconv* localInfo = ::localeconv(); //always bound according to doc
+    return utf8CvrtTo<std::wstring>(localInfo->thousands_sep);
+    // why not working?
+    // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
+    // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
+}
 }
 
 #endif //I18_N_HEADER_3843489325045

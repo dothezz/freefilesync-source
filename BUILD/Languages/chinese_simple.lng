@@ -200,9 +200,6 @@
 <pluralform>%x 秒</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>拖放</target>
-
 <source>Info</source>
 <target>信息</target>
 
@@ -363,7 +360,7 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync 批处理作业</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>无法创建日志!</target>
 
 <source>Batch execution</source>
@@ -406,10 +403,28 @@ The command line is executed each time:
 <target>FreeFileSync 已是最新!</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
-<target>要让 FreeFileSync 保持每周检查一次更新吗?></target>
+<target>要让 FreeFileSync 保持每周检查一次更新吗?</target>
 
 <source>(Requires an Internet connection!)</source>
 <target>(需要因特网连接!)</target>
+
+<source>Drag && drop</source>
+<target>拖放</target>
+
+<source>Close progress dialog</source>
+<target>关闭进度对话框</target>
+
+<source>Shut down</source>
+<target>关机</target>
+
+<source>Log off</source>
+<target>注销</target>
+
+<source>Standby</source>
+<target>待机</target>
+
+<source>Hibernate</source>
+<target>休眠</target>
 
 <source>1. &Compare</source>
 <target>1. 比较(&C)</target>
@@ -525,9 +540,6 @@ The command line is executed each time:
 <source>Filter files</source>
 <target>过滤文件</target>
 
-<source>Error handling</source>
-<target>错误处理</target>
-
 <source>Left</source>
 <target>左侧</target>
 
@@ -540,13 +552,16 @@ The command line is executed each time:
 <source>Status feedback</source>
 <target>状况反馈</target>
 
-<source>Run minimized</source>
-<target>以最小化运行</target>
+<source>Show progress dialog</source>
+<target>显示进度对话框</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>错误处理</target>
+
+<source>Maximum number of log files:</source>
 <target>最大的日志文件数:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>选择日志保存位置:</target>
 
 <source>Batch settings</source>
@@ -591,8 +606,8 @@ The command line is executed each time:
 <source>Deletion handling</source>
 <target>删除处理</target>
 
-<source>&OK</source>
-<target>确定(&O)</target>
+<source>On completion:</source>
+<target>完成时:</target>
 
 <source>Configuration</source>
 <target>配置</target>
@@ -620,6 +635,9 @@ The command line is executed each time:
 
 <source>Conflict/file cannot be categorized</source>
 <target>冲突/文件不能被分类</target>
+
+<source>&OK</source>
+<target>确定(&O)</target>
 
 <source>Compare by...</source>
 <target>比较选项...</target>
@@ -1070,20 +1088,17 @@ Exclude: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>取消请求: 正在等待当前操作完成...</target>
 
-<source>Continue</source>
-<target>继续</target>
-
 <source>Pause</source>
 <target>暂停</target>
+
+<source>Continue</source>
+<target>继续</target>
 
 <source>Cannot find %x</source>
 <target>找不到 %x</target>
 
 <source>Inactive</source>
 <target>不使用</target>
-
-<source>Last x hours</source>
-<target>最后 x 小时</target>
 
 <source>Today</source>
 <target>今天</target>
@@ -1395,11 +1410,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>正在创建文件 %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>正在创建符号连接 %x</target>
-
 <source>Creating folder %x</source>
 <target>正创建文件夹 %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>正在创建符号连接 %x</target>
 
 <source>Overwriting file %x</source>
 <target>正在覆盖文件 %x</target>

@@ -60,7 +60,7 @@
 			<param name="Local" value="html\Macros.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Schedule Batch Job">
+			<param name="Name" value="Schedule a Batch Job">
 			<param name="Local" value="html\ScheduleBatch.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">

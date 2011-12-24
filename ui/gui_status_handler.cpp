@@ -10,6 +10,8 @@
 #include "main_dlg.h"
 #include <wx/wupdlock.h>
 #include <wx+/string_conv.h>
+#include "exec_finished_box.h"
+#include <wx+/shell_execute.h>
 
 using namespace zen;
 using namespace xmlAccess;
@@ -94,15 +96,15 @@ void CompareStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal
 }
 
 
-void CompareStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed)
+void CompareStatusHandler::updateProcessedData(int objectsDelta, zen::Int64 dataDelta)
 {
     switch (currentProcess)
     {
         case StatusHandler::PROCESS_SCANNING:
-            mainDlg.compareStatus->incScannedObjects_NoUpdate(objectsProcessed); //throw ()
+            mainDlg.compareStatus->incScannedObjects_NoUpdate(objectsDelta); //throw ()
             break;
         case StatusHandler::PROCESS_COMPARING_CONTENT:
-            mainDlg.compareStatus->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed); //throw ()
+            mainDlg.compareStatus->incProcessedCmpData_NoUpdate(objectsDelta, dataDelta); //throw ()
             break;
         case StatusHandler::PROCESS_SYNCHRONIZING:
         case StatusHandler::PROCESS_NONE:
@@ -110,7 +112,14 @@ void CompareStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 
             break;
     }
 
-    //note: this method should NOT throw in order to properly allow undoing setting of statistics!
+    //note: this method must NOT throw in order to properly allow undoing setting of statistics!
+}
+
+
+void CompareStatusHandler::updateTotalData(int objectsDelta, Int64 dataDelta)
+{
+    assert(currentProcess != PROCESS_SCANNING);
+    mainDlg.compareStatus->incTotalCmpData_NoUpdate(objectsDelta, dataDelta);
 }
 
 
@@ -137,7 +146,7 @@ ProcessCallback::Response CompareStatusHandler::reportError(const std::wstring& 
 
     bool ignoreNextErrors = false;
     switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
-                         message, ignoreNextErrors))
+                         message, &ignoreNextErrors))
     {
         case ReturnErrorDlg::BUTTON_IGNORE:
             ignoreErrors = ignoreNextErrors;
@@ -159,9 +168,8 @@ void CompareStatusHandler::reportFatalError(const std::wstring& errorMessage)
 {
     forceUiRefresh();
 
-    bool dummy = false;
     showErrorDlg(ReturnErrorDlg::BUTTON_ABORT,
-                 errorMessage, dummy);
+                 errorMessage, NULL);
 }
 
 
@@ -211,9 +219,13 @@ void CompareStatusHandler::abortThisProcess()
 //########################################################################################################
 
 
-SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg, OnGuiError handleError, const wxString& jobName) :
+SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg,
+                                     OnGuiError handleError,
+                                     const wxString& jobName,
+                                     const std::wstring& execWhenFinished,
+                                     std::vector<std::wstring>& execFinishedHistory) :
     parentDlg_(parentDlg),
-    syncStatusFrame(*this, parentDlg, SyncStatus::SYNCHRONIZING, false, jobName),
+    syncStatusFrame(*this, parentDlg, SyncStatus::SYNCHRONIZING, true, jobName, execWhenFinished, execFinishedHistory),
     handleError_(handleError)
 {
 }
@@ -231,13 +243,30 @@ SyncStatusHandler::~SyncStatusHandler()
     else
         errorLog.logMsg(_("Synchronization completed successfully!"), TYPE_INFO);
 
+    bool showFinalResults = true;
+
+    //execute "on completion" command (even in case of ignored errors)
+    if (!abortIsRequested()) //if aborted (manually), we don't execute the command
+    {
+        const std::wstring finalCommand = syncStatusFrame.getExecWhenFinishedCommand(); //final value (after possible user modification)
+        if (isCloseProgressDlgCommand(finalCommand))
+            showFinalResults = false; //take precedence over current visibility status
+        else if (!finalCommand.empty())
+            shellExecute(finalCommand);
+    }
+
     //notify to syncStatusFrame that current process has ended
-    if (abortIsRequested())
-        syncStatusFrame.processHasFinished(SyncStatus::ABORTED, errorLog);  //enable okay and close events
-    else if (totalErrors > 0)
-        syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, errorLog);
+    if (showFinalResults)
+    {
+        if (abortIsRequested())
+            syncStatusFrame.processHasFinished(SyncStatus::ABORTED, errorLog);  //enable okay and close events
+        else if (totalErrors > 0)
+            syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, errorLog);
+        else
+            syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, errorLog);
+    }
     else
-        syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, errorLog);
+        syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
 }
 
 
@@ -246,8 +275,7 @@ void SyncStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, P
     switch (processID)
     {
         case StatusHandler::PROCESS_SYNCHRONIZING:
-            syncStatusFrame.resetGauge(objectsTotal, dataTotal);
-            syncStatusFrame.setCurrentStatus(SyncStatus::SYNCHRONIZING);
+            syncStatusFrame.initNewProcess(SyncStatus::SYNCHRONIZING, objectsTotal, dataTotal);
             break;
         case StatusHandler::PROCESS_SCANNING:
         case StatusHandler::PROCESS_COMPARING_CONTENT:
@@ -258,11 +286,17 @@ void SyncStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, P
 }
 
 
-void SyncStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed)
+void SyncStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
 {
-    syncStatusFrame.incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed); //throw ()
+    syncStatusFrame.incProcessedData_NoUpdate(objectsDelta, dataDelta); //throw ()
 
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!
+}
+
+
+void SyncStatusHandler::updateTotalData(int objectsDelta, Int64 dataDelta)
+{
+    syncStatusFrame.incTotalData_NoUpdate(objectsDelta, dataDelta); //throw ()
 }
 
 
@@ -293,15 +327,17 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
             return ProcessCallback::IGNORE_ERROR;
     }
 
+    PauseTimers dummy(syncStatusFrame);
     forceUiRefresh();
 
     bool ignoreNextErrors = false;
     switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
                          errorMessage,
-                         ignoreNextErrors))
+                         &ignoreNextErrors))
     {
         case ReturnErrorDlg::BUTTON_IGNORE:
-            handleError_ = ignoreNextErrors ? ON_GUIERROR_IGNORE : ON_GUIERROR_POPUP;
+            if (ignoreNextErrors) //falsify only
+                handleError_ = ON_GUIERROR_IGNORE;
             errorLog.logMsg(errorMessage, TYPE_ERROR);
             return ProcessCallback::IGNORE_ERROR;
 
@@ -323,6 +359,37 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
 void SyncStatusHandler::reportFatalError(const std::wstring& errorMessage)
 {
     errorLog.logMsg(errorMessage, TYPE_FATAL_ERROR);
+
+    switch (handleError_)
+    {
+        case ON_GUIERROR_POPUP:
+        {
+            PauseTimers dummy(syncStatusFrame);
+            forceUiRefresh();
+
+            bool ignoreNextErrors = false;
+            switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_ABORT,
+                                 errorMessage,
+                                 &ignoreNextErrors))
+            {
+                case ReturnErrorDlg::BUTTON_IGNORE:
+                    if (ignoreNextErrors) //falsify only
+                        handleError_ = ON_GUIERROR_IGNORE;
+                    break;
+
+                case ReturnErrorDlg::BUTTON_ABORT:
+                    abortThisProcess();
+                    break;
+
+                case ReturnErrorDlg::BUTTON_RETRY:
+                    assert(false);
+            }
+        }
+        break;
+
+        case ON_GUIERROR_IGNORE:
+            break;
+    }
 }
 
 
@@ -340,6 +407,7 @@ void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& 
     if (!warningActive)
         return;
 
+    PauseTimers dummy(syncStatusFrame);
     forceUiRefresh();
 
     bool dontWarnAgain = false;

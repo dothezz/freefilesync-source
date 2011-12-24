@@ -206,9 +206,6 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Povleci && spusti</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -372,7 +369,7 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Paketno opravilo</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Ne morem ustvariti datoteko za beleženje!</target>
 
 <source>Batch execution</source>
@@ -419,6 +416,24 @@ Ukazna vrstica se izvrši vsakič ko:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Zahteva povezavo z Internetom!)</target>
+
+<source>Drag && drop</source>
+<target>Povleci && spusti</target>
+
+<source>Close progress dialog</source>
+<target>Zapri pogovorno okno z napredkom</target>
+
+<source>Shut down</source>
+<target>Ugasni</target>
+
+<source>Log off</source>
+<target>Odjavi</target>
+
+<source>Standby</source>
+<target>V pripravljenost</target>
+
+<source>Hibernate</source>
+<target>Hibernacija</target>
 
 <source>1. &Compare</source>
 <target>1. &Primerjaj</target>
@@ -534,9 +549,6 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Filter files</source>
 <target>Filtriraj datoteke</target>
 
-<source>Error handling</source>
-<target>Napaka pri obravnavanju</target>
-
 <source>Left</source>
 <target>Levo</target>
 
@@ -549,13 +561,16 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Status feedback</source>
 <target>Povratne informacije statusa</target>
 
-<source>Run minimized</source>
-<target>Poženi pomanjšano</target>
+<source>Show progress dialog</source>
+<target>Prikazuj pogovorno okno z napredkom</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Napaka pri obravnavanju</target>
+
+<source>Maximum number of log files:</source>
 <target>Maksimalno število datotek beleženja:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Izberite imenik za datoteko beleženja:</target>
 
 <source>Batch settings</source>
@@ -600,8 +615,8 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Deletion handling</source>
 <target>Ravnanje pri brisanju</target>
 
-<source>&OK</source>
-<target>&V redu</target>
+<source>On completion:</source>
+<target>Ob zaključku:</target>
 
 <source>Configuration</source>
 <target>Konfiguracija</target>
@@ -629,6 +644,9 @@ Ukazna vrstica se izvrši vsakič ko:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Spor/datoteka ne more biti kategorizirana</target>
+
+<source>&OK</source>
+<target>&V redu</target>
 
 <source>Compare by...</source>
 <target>Primerjaj po...</target>
@@ -1091,20 +1109,17 @@ Izključi: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...</target>
 
-<source>Continue</source>
-<target>Nadaljuj</target>
-
 <source>Pause</source>
 <target>Premor</target>
+
+<source>Continue</source>
+<target>Nadaljuj</target>
 
 <source>Cannot find %x</source>
 <target>Ne najdem %x</target>
 
 <source>Inactive</source>
 <target>Neaktivno</target>
-
-<source>Last x hours</source>
-<target>Zadnjih x ur</target>
 
 <source>Today</source>
 <target>Danes</target>
@@ -1431,11 +1446,11 @@ Izključi: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Ustvarjam datoteko %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Ustvarjam simbolično povezavo %x</target>
-
 <source>Creating folder %x</source>
 <target>Ustvarjam mapo %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Ustvarjam simbolično povezavo %x</target>
 
 <source>Overwriting file %x</source>
 <target>Prepisujem datoteko %x</target>

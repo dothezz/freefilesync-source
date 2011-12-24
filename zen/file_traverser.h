@@ -70,10 +70,6 @@ void traverseFolder(const Zstring& directory, //throw();
 //followSymlinks:
 //"true":  Symlinks dereferenced and reported via onFile() and onDir() => onSymlink not used!
 //"false": Symlinks directly reported via onSymlink(), directory symlinks are not followed
-
-
-//determine whether FileId can be expected to be retrieved
-bool supportForFileId(); //Linux: always; Windows: if FindFilePlus_Win32.dll was loaded correctly
 }
 
 #endif // FILETRAVERSER_H_INCLUDED

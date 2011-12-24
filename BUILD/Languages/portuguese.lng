@@ -202,9 +202,6 @@
 <pluralform>%x segs</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Arrastar && Largar</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -366,7 +363,7 @@ A linha de comandos é executada cada vez que:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync ficheiro batch</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Não é possível criar ficheiro log!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ A linha de comandos é executada cada vez que:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Necessita acesso à Internet!)</target>
+
+<source>Drag && drop</source>
+<target>Arrastar && Largar</target>
+
+<source>Close progress dialog</source>
+<target>Fechar diálogo de progresso</target>
+
+<source>Shut down</source>
+<target>Desligar</target>
+
+<source>Log off</source>
+<target>Terminar sessão</target>
+
+<source>Standby</source>
+<target>Standby</target>
+
+<source>Hibernate</source>
+<target>Hibernar</target>
 
 <source>1. &Compare</source>
 <target>1. &Comparar</target>
@@ -528,9 +543,6 @@ A linha de comandos é executada cada vez que:
 <source>Filter files</source>
 <target>Filtrar ficheiros</target>
 
-<source>Error handling</source>
-<target>Controlador de erros</target>
-
 <source>Left</source>
 <target>Esquerda</target>
 
@@ -543,13 +555,16 @@ A linha de comandos é executada cada vez que:
 <source>Status feedback</source>
 <target>Retorno de estado</target>
 
-<source>Run minimized</source>
-<target>Correr minimizado</target>
+<source>Show progress dialog</source>
+<target>Mostrar diálogo de progresso</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Controlador de erros</target>
+
+<source>Maximum number of log files:</source>
 <target>Número máximo de ficheiros log:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Selecione directório para ficheiro log:</target>
 
 <source>Batch settings</source>
@@ -571,7 +586,7 @@ A linha de comandos é executada cada vez que:
 <target><Automático></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target></target>
+<target>Identificar e propagar mudanças em ambos os lados utilizando base de dados. Eliminar, renomear e conflitos são detetados automaticamente.</target>
 
 <source>Mirror ->></source>
 <target>Espelhar ->></target>
@@ -594,8 +609,8 @@ A linha de comandos é executada cada vez que:
 <source>Deletion handling</source>
 <target>Controlo eliminação</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>Ao concluir:</target>
 
 <source>Configuration</source>
 <target>Configuração</target>
@@ -623,6 +638,9 @@ A linha de comandos é executada cada vez que:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Ficheiro/conflito não pode ser categorizado</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Comparar por...</target>
@@ -792,7 +810,7 @@ Excluir: \stuff\temp\*
 <target>Copia ficheiro transacional</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>Escrever para um ficheiro temporário (*.ffs_tmp) primeiro, depois renomear. Isto garante consistência mesmo em caso de erro fatal.</target>
 
 <source>Copy locked files</source>
 <target>Copiar ficheiros bloqueados</target>
@@ -879,16 +897,16 @@ Excluir: \stuff\temp\*
 <target>Auto ajustar colunas</target>
 
 <source>Icon size:</source>
-<target></target>
+<target>Tamanho ícone:</target>
 
 <source>Small</source>
-<target></target>
+<target>Pequeno</target>
 
 <source>Medium</source>
-<target></target>
+<target>Médio</target>
 
 <source>Large</source>
-<target></target>
+<target>Grande</target>
 
 <source>Include all rows</source>
 <target>Incluir todas as linhas</target>
@@ -1008,7 +1026,7 @@ Excluir: \stuff\temp\*
 <target>Use Comparar antes da primeira sincronização!</target>
 
 <source>Comma separated list</source>
-<target>Lista de itens separados por virgula</target>
+<target>Lista de itens separados por virgulas</target>
 
 <source>Legend</source>
 <target>Legenda</target>
@@ -1076,20 +1094,17 @@ Excluir: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Abortar pedido: À espera do fim da operação atual...</target>
 
-<source>Continue</source>
-<target>Continuar</target>
-
 <source>Pause</source>
 <target>Pausa</target>
+
+<source>Continue</source>
+<target>Continuar</target>
 
 <source>Cannot find %x</source>
 <target>Não é possível descobrir %x</target>
 
 <source>Inactive</source>
 <target>Inactivo</target>
-
-<source>Last x hours</source>
-<target>Demora x horas</target>
 
 <source>Today</source>
 <target>Hoje</target>
@@ -1353,10 +1368,10 @@ Excluir: \stuff\temp\*
 <target>Eliminar ficheiro/pasta à direita</target>
 
 <source>Move file on left</source>
-<target></target>
+<target>Mover ficheiro à esquerda</target>
 
 <source>Move file on right</source>
-<target></target>
+<target>Mover ficheiro à direita</target>
 
 <source>Overwrite left file/folder with right one</source>
 <target>Substituir ficheiro/pasta da esquerda (pelo da direita)</target>
@@ -1406,11 +1421,11 @@ Excluir: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Criar ficheiro %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Criar link simbólico %x</target>
-
 <source>Creating folder %x</source>
 <target>Criar pasta %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Criar link simbólico %x</target>
 
 <source>Overwriting file %x</source>
 <target>Substituir ficheiro %x</target>

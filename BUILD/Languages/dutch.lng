@@ -202,9 +202,6 @@
 <pluralform>%x sec</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Drag en drop</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -366,7 +363,7 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Taaklijst</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Niet in staat om een logbestand aan te maken!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Vereist een internetverbinding!)</target>
+
+<source>Drag && drop</source>
+<target>Drag en drop</target>
+
+<source>Close progress dialog</source>
+<target>Sluit proce dialoog</target>
+
+<source>Shut down</source>
+<target>Afsluiten</target>
+
+<source>Log off</source>
+<target>Afmelden</target>
+
+<source>Standby</source>
+<target>Stand-by</target>
+
+<source>Hibernate</source>
+<target>Slaapstand</target>
 
 <source>1. &Compare</source>
 <target>1. &Vergelijk</target>
@@ -528,9 +543,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Filter files</source>
 <target>Filter bestanden</target>
 
-<source>Error handling</source>
-<target>Fout afhandeling</target>
-
 <source>Left</source>
 <target>Links</target>
 
@@ -543,13 +555,16 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Status feedback</source>
 <target>Status terugkoppeling</target>
 
-<source>Run minimized</source>
-<target>Geminimaliseerd uitvoeren</target>
+<source>Show progress dialog</source>
+<target>Toon voortgangsdialoogvenster</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Fout afhandeling</target>
+
+<source>Maximum number of log files:</source>
 <target>Maximale aantal van logbestanden:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Selecteer een map voor het logbestand:</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Deletion handling</source>
 <target>Verwijder-afhandeling</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>Bij voltooiing</target>
 
 <source>Configuration</source>
 <target>Configuratie</target>
@@ -623,6 +638,9 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Conflict/Bestand kan niet worden gecategoriseerd</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Vergelijk met...</target>
@@ -1077,11 +1095,11 @@ Uitsluiten: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Bezig met afbreken: Wacht op beëindiging huidige bewerking...</target>
 
-<source>Continue</source>
-<target>Doorgaan</target>
-
 <source>Pause</source>
 <target>Pauze</target>
+
+<source>Continue</source>
+<target>Doorgaan</target>
 
 <source>Cannot find %x</source>
 <target>Kan %x niet vinden</target>
@@ -1404,11 +1422,11 @@ Uitsluiten: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Bestand %x wordt aangemaakt</target>
 
-<source>Creating symbolic link %x</source>
-<target>Snelkoppeling %x wordt aangemaakt</target>
-
 <source>Creating folder %x</source>
 <target>Map %x wordt aangemaakt</target>
+
+<source>Creating symbolic link %x</source>
+<target>Snelkoppeling %x wordt aangemaakt</target>
 
 <source>Overwriting file %x</source>
 <target>Bezig met overschrijven van bestand %x</target>

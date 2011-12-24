@@ -31,7 +31,8 @@ public:
 
     void switchToCompareBytewise(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
     void incScannedObjects_NoUpdate(int number);
-    void incProcessedCmpData_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
+    void incProcessedCmpData_NoUpdate(int objectsDelta, zen::Int64 dataDelta);
+    void incTotalCmpData_NoUpdate    (int objectsDelta, zen::Int64 dataDelta);
     void setStatusText_NoUpdate(const wxString& text);
     void updateStatusPanelNow();
 
@@ -58,19 +59,26 @@ public:
     SyncStatus(AbortCallback& abortCb,
                MainDialog* parentWindow, //may be NULL
                SyncStatusID startStatus,
-               bool startSilent,
-               const wxString& jobName);
+               bool showProgress,
+               const wxString& jobName,
+               const std::wstring& execWhenFinished,
+               std::vector<std::wstring>& execFinishedHistory); //changing parameter!
     ~SyncStatus();
 
     wxWindow* getAsWindow(); //convenience! don't abuse!
 
-    void resetGauge(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
+    void initNewProcess(SyncStatusID id, int totalObjectsToProcess, zen::Int64 totalDataToProcess);
+
     void incScannedObjects_NoUpdate(int number);
-    void incProgressIndicator_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
+    void incProcessedData_NoUpdate(int objectsDelta, zen::Int64 dataDelta);
+    void incTotalData_NoUpdate    (int objectsDelta, zen::Int64 dataDelta);
     void setStatusText_NoUpdate(const wxString& text);
     void updateStatusDialogNow();
 
-    void setCurrentStatus(SyncStatusID id);
+    std::wstring getExecWhenFinishedCommand() const; //final value (after possible user modification)
+
+    void stopTimer();   //halt all internal counters!
+    void resumeTimer(); //
 
     //essential to call one of these two methods in StatusUpdater derived class destructor at the LATEST(!)
     //to prevent access to callback to updater (e.g. request abort)
@@ -81,5 +89,16 @@ private:
     class SyncStatusImpl;
     SyncStatusImpl* const pimpl;
 };
+
+
+class PauseTimers
+{
+public:
+    PauseTimers(SyncStatus& ss) : ss_(ss) { ss_.stopTimer(); }
+    ~PauseTimers() { ss_.resumeTimer(); }
+private:
+    SyncStatus& ss_;
+};
+
 
 #endif // PROGRESSINDICATOR_H_INCLUDED

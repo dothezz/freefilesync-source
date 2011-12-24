@@ -8,6 +8,7 @@
 #define FILEHIERARCHY_H_INCLUDED
 
 #include <map>
+#include <set>
 #include <string>
 #include <unordered_set>
 #include <memory>
@@ -17,7 +18,7 @@
 #include <zen/int64.h>
 #include <zen/file_id_def.h>
 #include "structures.h"
-#include "lib/hard_filter.h"
+//#include "lib/hard_filter.h"
 
 
 namespace zen
@@ -82,6 +83,7 @@ class FileMapping;
 class SymLinkMapping;
 class FileSystemObject;
 
+
 //------------------------------------------------------------------
 /*
 ERD:
@@ -106,7 +108,8 @@ struct DirContainer
     DirContainer& addSubDir(const Zstring& shortName)
     {
         //use C++11 emplace when available
-        return dirs.insert(std::make_pair(shortName, DirContainer())).first->second;
+        return dirs[shortName]; //value default-construction is okay here
+        //return dirs.insert(std::make_pair(shortName, DirContainer())).first->second;
     }
 
     void addSubFile(const Zstring& shortName, const FileDescriptor& fileData)
@@ -218,10 +221,8 @@ public:
     BaseDirMapping(const Zstring& dirPostfixedLeft,
                    bool dirExistsLeft,
                    const Zstring& dirPostfixedRight,
-                   bool dirExistsRight,
-                   const HardFilter::FilterRef& filterIn) :
+                   bool dirExistsRight) :
         HierarchyObject(Zstring(), *this),
-        filter(filterIn),
         baseDirPfL(dirPostfixedLeft),
         baseDirPfR(dirPostfixedRight),
         dirExistsLeft_(dirExistsLeft),
@@ -230,7 +231,6 @@ public:
     template <SelectedSide side> const Zstring& getBaseDirPf() const; //base sync directory postfixed with FILE_NAME_SEPARATOR
     static void removeEmpty(BaseDirMapping& baseDir) { baseDir.removeEmptyRec(); }; //physically remove all invalid entries (where both sides are empty) recursively
 
-    const HardFilter::FilterRef& getFilter() const;
     template <SelectedSide side> bool wasExisting() const; //status of directory existence at the time of comparison!
 
     virtual void flip();
@@ -238,9 +238,6 @@ public:
 private:
     BaseDirMapping(const BaseDirMapping&);            //this class is referenced by HierarchyObject => make it non-copyable/movable!
     BaseDirMapping& operator=(const BaseDirMapping&); //
-
-    //this member is currently not used by the business logic -> may be removed!
-    HardFilter::FilterRef filter;
 
     Zstring baseDirPfL; //base sync dir postfixed
     Zstring baseDirPfR; //
@@ -294,7 +291,7 @@ public:
     virtual ~FSObjectVisitor() {}
     virtual void visit(const FileMapping&    fileObj) = 0;
     virtual void visit(const SymLinkMapping& linkObj) = 0;
-    virtual void visit(const DirMapping&     dirObj)  = 0;
+    virtual void visit(const DirMapping&      dirObj) = 0;
 };
 
 //inherit from this class to allow safe random access by id instead of unsafe raw pointer
@@ -323,11 +320,12 @@ private:
     ObjectMgr(const ObjectMgr& rhs);            //
     ObjectMgr& operator=(const ObjectMgr& rhs); //it's not well-defined what coping an objects means regarding object-identity in this context
 
-    static std::unordered_set<ObjectMgr*>& activeObjects()
-    {
-        static std::unordered_set<ObjectMgr*> inst; //external linkage (even if in header file!)
-        return inst;
-    }
+#if defined _MSC_VER && _MSC_VER <= 1600 //VS2010 performance bug in std::unordered_set<>: http://drdobbs.com/blogs/cpp/232200410 -> should be fixed in VS11
+    //compiler macros: http://predef.sourceforge.net/precomp.html
+    static std::set<ObjectMgr*>& activeObjects() { static std::set<ObjectMgr*> inst; return inst; }
+#else
+    static std::unordered_set<ObjectMgr*>& activeObjects() { static std::unordered_set<ObjectMgr*> inst; return inst; } //external linkage (even in header file!)
+#endif
 };
 //------------------------------------------------------------------
 
@@ -339,7 +337,7 @@ public:
     Zstring getObjShortName   () const; //same as getShortName() but also returns value if either side is empty
     Zstring getObjRelativeName() const; //same as getRelativeName() but also returns value if either side is empty
     template <SelectedSide side>           bool isEmpty()         const;
-    template <SelectedSide side> const Zstring& getShortName()    const;
+    template <SelectedSide side> const Zstring& getShortName()    const; //case sensitive!
     template <SelectedSide side>       Zstring  getRelativeName() const; //get name relative to base sync dir without FILE_NAME_SEPARATOR prefix
     template <SelectedSide side> const Zstring& getBaseDirPf()    const; //base sync directory postfixed with FILE_NAME_SEPARATOR
     template <SelectedSide side>       Zstring  getFullName()     const; //getFullName() == getBaseDirPf() + getRelativeName()
@@ -397,7 +395,8 @@ private:
 
     bool selectedForSynchronization;
     SyncDirection syncDir;
-    std::wstring syncDirConflict; //non-empty if we have a conflict setting sync-direction
+    std::unique_ptr<std::wstring> syncDirConflict; //non-empty if we have a conflict setting sync-direction
+    //get rid of std::wstring small string optimization (consumes 32/48 byte on VS2010 x86/x64!)
 
     Zstring shortNameLeft_;   //slightly redundant under linux, but on windows the "same" filenames can differ in case
     Zstring shortNameRight_;  //use as indicator: an empty name means: not existing!
@@ -508,7 +507,7 @@ private:
 
     //categorization
     CompareFilesResult cmpResult;
-    std::wstring cmpConflictDescr; //only filled if cmpResult == FILE_CONFLICT
+    std::unique_ptr<std::wstring> cmpConflictDescr; //only filled if cmpResult == FILE_CONFLICT
 
     FileDescriptor dataLeft;
     FileDescriptor dataRight;
@@ -558,7 +557,7 @@ private:
 
     //categorization
     CompareSymlinkResult cmpResult;
-    std::wstring cmpConflictDescr; //only filled if cmpResult == SYMLINK_CONFLICT
+    std::unique_ptr<std::wstring> cmpConflictDescr; //only filled if cmpResult == SYMLINK_CONFLICT
 
     LinkDescriptor dataLeft;
     LinkDescriptor dataRight;
@@ -638,7 +637,7 @@ CompareFilesResult FileMapping::getCategory() const
 inline
 std::wstring FileMapping::getCatConflict() const
 {
-    return cmpConflictDescr;
+    return cmpConflictDescr ? *cmpConflictDescr : std::wstring();
 }
 
 
@@ -667,7 +666,7 @@ inline
 void FileSystemObject::setSyncDir(SyncDirection newDir)
 {
     syncDir = newDir; //should be safe by design
-    syncDirConflict.clear();
+    syncDirConflict.reset();
 
     notifySyncCfgChanged();
 }
@@ -677,7 +676,7 @@ inline
 void FileSystemObject::setSyncDirConflict(const std::wstring& description)
 {
     syncDir = SYNC_DIR_NONE;
-    syncDirConflict = description;
+    syncDirConflict.reset(new std::wstring(description));
 
     notifySyncCfgChanged();
 }
@@ -686,7 +685,7 @@ void FileSystemObject::setSyncDirConflict(const std::wstring& description)
 inline
 std::wstring FileSystemObject::getSyncOpConflict() const
 {
-    return syncDirConflict;
+    return syncDirConflict ? *syncDirConflict : std::wstring();
 }
 
 
@@ -929,6 +928,7 @@ void BaseDirMapping::flip()
 {
     HierarchyObject::flip();
     std::swap(baseDirPfL, baseDirPfR);
+    std::swap(dirExistsLeft_, dirExistsRight_);
 }
 
 
@@ -972,13 +972,6 @@ void DirMapping::removeObjectR()
     std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
     std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
     std::for_each(refSubDirs(). begin(), refSubDirs(). end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
-}
-
-
-inline
-const HardFilter::FilterRef& BaseDirMapping::getFilter() const
-{
-    return filter;
 }
 
 
@@ -1041,7 +1034,7 @@ inline
 void FileMapping::setCategoryConflict(const std::wstring& description)
 {
     cmpResult = FILE_CONFLICT;
-    cmpConflictDescr = description;
+    cmpConflictDescr.reset(new std::wstring(description));
 }
 
 
@@ -1235,7 +1228,7 @@ CompareSymlinkResult SymLinkMapping::getLinkCategory() const
 inline
 std::wstring SymLinkMapping::getCatConflict() const
 {
-    return cmpConflictDescr;
+    return cmpConflictDescr ? *cmpConflictDescr : std::wstring();
 }
 
 
@@ -1300,7 +1293,7 @@ inline
 void SymLinkMapping::setCategoryConflict(const std::wstring& description)
 {
     cmpResult = SYMLINK_CONFLICT;
-    cmpConflictDescr = description;
+    cmpConflictDescr.reset(new std::wstring(description));
 }
 }
 

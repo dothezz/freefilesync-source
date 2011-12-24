@@ -67,7 +67,9 @@ bool Application::OnInit()
 
     //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: batch mode requires the wxApp eventhandler to be established
     //for UI update events. This is not the case at the time of OnInit().
-    Connect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
+    Connect(wxEVT_IDLE,              wxIdleEventHandler(Application::OnStartApplication), NULL, this);
+    Connect(wxEVT_QUERY_END_SESSION, wxEventHandler    (Application::OnQueryEndSession ), NULL, this);
+    Connect(wxEVT_END_SESSION,       wxEventHandler    (Application::OnQueryEndSession ), NULL, this);
 
     return true;
 }
@@ -274,6 +276,19 @@ int Application::OnExit()
 }
 
 
+void Application::OnQueryEndSession(wxEvent& event)
+{
+    //alas wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/3069
+
+    MainDialog* mainWin = dynamic_cast<MainDialog*>(GetTopWindow());
+    if (mainWin)
+        mainWin->onQueryEndSession();
+    OnExit();
+    //wxEntryCleanup(); -> gives popup "dll init failed" on XP
+    std::exit(returnValue); //Windows will terminate anyway: destruct global objects
+}
+
+
 void Application::runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, xmlAccess::XmlGlobalSettings& settings)
 {
     MainDialog* frame = new MainDialog(std::vector<wxString>(), guiCfg, settings, true);
@@ -306,7 +321,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
     //all settings have been read successfully...
 
     //regular check for program updates -> disabled for batch
-    //if (!batchCfg.silent)
+    //if (batchCfg.showProgress)
     //    checkForUpdatePeriodically(globSettings.lastUpdateCheck);
 
     try //begin of synchronization process (all in one try-catch block)
@@ -314,13 +329,15 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         const SwitchToGui switchBatchToGui(filename, batchCfg, globSettings); //prepare potential operational switch
 
         //class handling status updates and error messages
-        BatchStatusHandler statusHandler(batchCfg.silent,
+        BatchStatusHandler statusHandler(batchCfg.showProgress,
                                          extractJobName(filename),
                                          batchCfg.logFileDirectory,
                                          batchCfg.logFileCountMax,
                                          batchCfg.handleError,
                                          switchBatchToGui,
-                                         returnValue);
+                                         returnValue,
+                                         batchCfg.mainCfg.onCompletion,
+                                         globSettings.gui.onCompletionHistory);
 
         const std::vector<FolderPairCfg> cmpConfig = extractCompareCfg(batchCfg.mainCfg);
 
@@ -370,7 +387,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         syncProc.startSynchronizationProcess(syncProcessCfg, folderCmp);
 
         //play (optional) sound notification after sync has completed -> don't play in silent mode, consider RealtimeSync!
-        if (!batchCfg.silent)
+        if (batchCfg.showProgress)
         {
             const wxString soundFile = toWx(getResourceDir()) + wxT("Sync_Complete.wav");
             if (fileExists(toZ(soundFile)))

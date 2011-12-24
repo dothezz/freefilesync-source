@@ -79,6 +79,13 @@ void Statistics::addMeasurement(int objectsCurrent, double dataCurrent)
 }
 
 
+void Statistics::setNewTotal(int totalObjectCount, double totalDataAmount)
+{
+    objectsTotal = totalObjectCount;
+    dataTotal    = totalDataAmount;
+}
+
+
 wxString Statistics::getRemainingTime() const
 {
     if (!measurements.empty())
@@ -92,12 +99,14 @@ wxString Statistics::getRemainingTime() const
 
         const TimeRecordMap::value_type& frontRecord = *windowBegin;
         //-----------------------------------------------------------------------------------------------
-        const double timeDelta = backRecord.first       - frontRecord.first;
+        const double timeDelta = backRecord.first - frontRecord.first;
         const double dataDelta = backRecord.second.data - frontRecord.second.data;
 
         const double dataRemaining = dataTotal - backRecord.second.data;
+        //objects do *NOT* correspond to disk accesses, so we better play safe and use "bytes" only!
+        //https://sourceforge.net/tracker/index.php?func=detail&aid=3452469&group_id=234430&atid=1093083
 
-        if (!numeric::isNull(dataDelta))
+        if (!numeric::isNull(dataDelta)) //sign(dataRemaining) != sign(dataDelta) usually an error, so show it!
         {
             int remTimeSec = dataRemaining * timeDelta / (1000.0 * dataDelta);
             return zen::remainingTimeToShortString(remTimeSec);
@@ -126,7 +135,7 @@ wxString Statistics::getBytesPerSecond() const
 
         if (!numeric::isNull(timeDelta))
             if (dataDelta > 0) //may be negative if user cancels copying
-                return zen::filesizeToShortString(zen::UInt64(dataDelta * 1000 / timeDelta)) + _("/sec");
+                return zen::filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
     }
 
     return wxT("-"); //fallback

@@ -7,6 +7,7 @@
 #ifndef GRIDVIEW_H_INCLUDED
 #define GRIDVIEW_H_INCLUDED
 
+#include <set>
 #include "../file_hierarchy.h"
 
 
@@ -127,12 +128,7 @@ private:
         FileSystemObject::ObjectID objId;
     };
 
-    FileSystemObject* getReferencedRow(const RefIndex& ref); //returns NULL if not found
-    const FileSystemObject* getReferencedRow(const RefIndex& ref) const; //returns NULL if not found
-    bool isInvalidRow(const RefIndex& ref) const;
-
-
-    std::vector<RefIndex> viewRef;  //partial view on sortedRef
+    std::vector<FileSystemObject::ObjectID> viewRef;  //partial view on sortedRef
     //              |
     //              | (update...)
     //             \|/
@@ -144,9 +140,6 @@ private:
 
 
     //sorting classes
-    template <bool ascending>
-    class LessDirectoryPair;
-
     template <bool ascending>
     class LessRelativeName;
 
@@ -185,7 +178,7 @@ inline
 const FileSystemObject* GridView::getObject(size_t row) const
 {
     if (row < rowsOnView())
-        return getReferencedRow(viewRef[row]);
+        return FileSystemObject::retrieve(viewRef[row]);
     else
         return NULL;
 }
@@ -215,20 +208,6 @@ inline
 size_t GridView::rowsTotal() const //total number of rows available
 {
     return sortedRef.size();
-}
-
-
-inline
-const zen::FileSystemObject* GridView::getReferencedRow(const RefIndex& ref) const
-{
-    return FileSystemObject::retrieve(ref.objId);
-}
-
-
-inline
-zen::FileSystemObject* GridView::getReferencedRow(const RefIndex& ref)
-{
-    return FileSystemObject::retrieve(ref.objId);
 }
 }
 

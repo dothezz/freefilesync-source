@@ -11,7 +11,7 @@
 #include <wx/statbox.h>
 #include <zen/thread.h>
 #include <zen/file_handling.h>
-#include "resolve_path.h"
+#include "../lib/resolve_path.h"
 #include <wx+/string_conv.h>
 #include "folder_history_box.h"
 

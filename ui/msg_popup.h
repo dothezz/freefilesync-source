@@ -20,7 +20,7 @@ struct ReturnErrorDlg
         BUTTON_ABORT  = 4
     };
 };
-ReturnErrorDlg::ButtonPressed showErrorDlg(int activeButtons, const wxString& messageText, bool& ignoreNextErrors);
+ReturnErrorDlg::ButtonPressed showErrorDlg(int activeButtons, const wxString& messageText, bool* ignoreNextErrors); //ignoreNextErrors may be NULL
 
 
 struct ReturnWarningDlg

@@ -23,14 +23,24 @@ bool mainWindowWasSet();
 
 
 
+
+
+
+
 //######################## implementation ########################
 inline
-bool& getMainWndStatus()
+bool& refMainWndStatus()
 {
     static bool status = false; //external linkage!
     return status;
 }
 
+inline
+bool& refQueryEnd()
+{
+    static bool status = false; //external linkage!
+    return status;
+}
 
 inline
 void setMainWindow(wxWindow* window)
@@ -38,12 +48,10 @@ void setMainWindow(wxWindow* window)
     wxTheApp->SetTopWindow(window);
     wxTheApp->SetExitOnFrameDelete(true);
 
-    getMainWndStatus() = true;
+    refMainWndStatus() = true;
 }
 
-
-inline
-bool mainWindowWasSet() { return getMainWndStatus(); }
+inline bool mainWindowWasSet() { return refMainWndStatus(); }
 }
 
 #endif // APPMAIN_H_INCLUDED

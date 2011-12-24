@@ -160,7 +160,7 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
     wxString buildFormatted = _("(Build: %x)");
     buildFormatted.Replace(wxT("%x"), build);
 
-    wxMessageDialog* aboutDlg = new wxMessageDialog(this, wxString(wxT("RealtimeSync")) + wxT("\n\n") + buildFormatted, _("About"), wxOK);
+    wxMessageDialog* aboutDlg = new wxMessageDialog(this, wxString(L"RealtimeSync") + L"\n\n" + buildFormatted, _("About"), wxOK);
     aboutDlg->ShowModal();
 }
 
@@ -423,11 +423,11 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
 }
 
 
-void MainDialog::removeAddFolder(const int pos)
+void MainDialog::removeAddFolder(int pos)
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-    if (0 <= pos && pos < int(dirNamesExtra.size()))
+    if (0 <= pos && pos < static_cast<int>(dirNamesExtra.size()))
     {
         //remove folder pairs from window
         DirectoryPanel* dirToDelete = dirNamesExtra[pos];

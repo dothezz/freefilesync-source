@@ -128,41 +128,41 @@ int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA
 
         const int minSize = std::min<int>(sizeA, sizeB);
 
-        if (minSize == 0) //LCMapString does not allow input sizes of 0!
-            return static_cast<int>(sizeA) - static_cast<int>(sizeB);
-
-        int rv = 0; //always initialize...
-        if (minSize <= 5000) //performance optimization: stack
+        int rv = 0;
+        if (minSize != 0) //LCMapString does not allow input sizes of 0!
         {
-            wchar_t bufferA[5000];
-            wchar_t bufferB[5000];
+            if (minSize <= 5000) //performance optimization: stack
+            {
+                wchar_t bufferA[5000];
+                wchar_t bufferB[5000];
 
-            //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
-            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
-                              LCMAP_UPPERCASE,          //__in   DWORD dwMapFlags,
-                              a,                        //__in   LPCTSTR lpSrcStr,
-                              minSize,                  //__in   int cchSrc,
-                              bufferA,                  //__out  LPTSTR lpDestStr,
-                              5000) == 0)               //__in   int cchDest
-                throw std::runtime_error("Error comparing strings! (LCMapString)");
+                //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
+                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
+                                  LCMAP_UPPERCASE,          //__in   DWORD dwMapFlags,
+                                  a,                        //__in   LPCTSTR lpSrcStr,
+                                  minSize,                  //__in   int cchSrc,
+                                  bufferA,                  //__out  LPTSTR lpDestStr,
+                                  5000) == 0)               //__in   int cchDest
+                    throw std::runtime_error("Error comparing strings! (LCMapString)");
 
-            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, minSize, bufferB, 5000) == 0)
-                throw std::runtime_error("Error comparing strings! (LCMapString)");
+                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, minSize, bufferB, 5000) == 0)
+                    throw std::runtime_error("Error comparing strings! (LCMapString)");
 
-            rv = ::wmemcmp(bufferA, bufferB, minSize);
-        }
-        else //use freestore
-        {
-            std::vector<wchar_t> bufferA(minSize);
-            std::vector<wchar_t> bufferB(minSize);
+                rv = ::wmemcmp(bufferA, bufferB, minSize);
+            }
+            else //use freestore
+            {
+                std::vector<wchar_t> bufferA(minSize);
+                std::vector<wchar_t> bufferB(minSize);
 
-            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, a, minSize, &bufferA[0], minSize) == 0)
-                throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
+                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, a, minSize, &bufferA[0], minSize) == 0)
+                    throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
-            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, minSize, &bufferB[0], minSize) == 0)
-                throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
+                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, minSize, &bufferB[0], minSize) == 0)
+                    throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
-            rv = ::wmemcmp(&bufferA[0], &bufferB[0], minSize);
+                rv = ::wmemcmp(&bufferA[0], &bufferB[0], minSize);
+            }
         }
 
         return rv == 0 ?

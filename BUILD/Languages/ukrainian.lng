@@ -204,9 +204,6 @@
 <pluralform>%x сек</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Drag && drop</target>
-
 <source>Info</source>
 <target>Інформація</target>
 
@@ -369,7 +366,7 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>Пакетне завдання FreeFileSync</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Не можна створити лог-файл!</target>
 
 <source>Batch execution</source>
@@ -416,6 +413,24 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Необхідне підключення до Інтернету!)</target>
+
+<source>Drag && drop</source>
+<target>Drag && drop</target>
+
+<source>Close progress dialog</source>
+<target>Закрити вікно прогресу</target>
+
+<source>Shut down</source>
+<target>Вимкнути комп'ютер</target>
+
+<source>Log off</source>
+<target>Вилогувати</target>
+
+<source>Standby</source>
+<target>Сплячий режим</target>
+
+<source>Hibernate</source>
+<target>Гібернація</target>
 
 <source>1. &Compare</source>
 <target>1. &Порівняти</target>
@@ -534,9 +549,6 @@ The command line is executed each time:
 <source>Filter files</source>
 <target>Фільтр файлів</target>
 
-<source>Error handling</source>
-<target>Обробка помилок</target>
-
 <source>Left</source>
 <target>Ліворуч</target>
 
@@ -549,13 +561,16 @@ The command line is executed each time:
 <source>Status feedback</source>
 <target>Статус оберненого зв’язку</target>
 
-<source>Run minimized</source>
-<target>Запустити згорнутим</target>
+<source>Show progress dialog</source>
+<target>Показувати вікно прогресу</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Обробка помилок</target>
+
+<source>Maximum number of log files:</source>
 <target>Максимальна кількість лог-файлів:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Виберіть каталог для лог-файлів:</target>
 
 <source>Batch settings</source>
@@ -600,8 +615,8 @@ The command line is executed each time:
 <source>Deletion handling</source>
 <target>Налаштування вилучення</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>Закінчивши:</target>
 
 <source>Configuration</source>
 <target>Налаштування</target>
@@ -629,6 +644,9 @@ The command line is executed each time:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Не можна категоризувати конфлікт/файл</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Критерії порівнювання</target>
@@ -1072,7 +1090,7 @@ Exclude: \stuff\temp\*
 <target>Порівнювання вмісту...</target>
 
 <source>Paused</source>
-<target>Ппризупинено</target>
+<target>Призупинено</target>
 
 <source>Aborted</source>
 <target>Перервано</target>
@@ -1083,20 +1101,17 @@ Exclude: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Запит переривання: В очікуванні завершення поточної операції...</target>
 
-<source>Continue</source>
-<target>Далі</target>
-
 <source>Pause</source>
 <target>Пауза</target>
+
+<source>Continue</source>
+<target>Далі</target>
 
 <source>Cannot find %x</source>
 <target>Не можна знайти %x</target>
 
 <source>Inactive</source>
 <target>Неактивний</target>
-
-<source>Last x hours</source>
-<target>Останні x годин</target>
 
 <source>Today</source>
 <target>Сьогодні</target>
@@ -1421,11 +1436,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Створення файлу %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Створення символьного посилання %x</target>
-
 <source>Creating folder %x</source>
 <target>Створення папки %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Створення символьного посилання %x</target>
 
 <source>Overwriting file %x</source>
 <target>Перезапис файлу %x</target>

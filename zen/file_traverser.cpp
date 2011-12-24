@@ -16,6 +16,7 @@
 #include "file_update_handle.h"
 #include "dll.h"
 #include "FindFilePlus/find_file_plus.h"
+#include <zen/win_ver.h>
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -36,7 +37,7 @@ bool tryReportingError(Command cmd, zen::TraverseCallback& callback) //return "t
     for (;;)
         try
         {
-            cmd();
+            cmd(); //throw FileError
             return true;
         }
         catch (const FileError& e)
@@ -47,9 +48,9 @@ bool tryReportingError(Command cmd, zen::TraverseCallback& callback) //return "t
                     break;
                 case TraverseCallback::TRAV_ERROR_IGNORE:
                     return false;
-                default:
-                    assert(false);
-                    break;
+                    //default:
+                    //  assert(false);
+                    //break;
             }
         }
 }
@@ -78,14 +79,54 @@ bool extractFileInfoFromSymlink(const Zstring& linkName, zen::TraverseCallback::
     //write output
     output.fileSize         = zen::UInt64(fileInfoByHandle.nFileSizeLow, fileInfoByHandle.nFileSizeHigh);
     output.lastWriteTimeRaw = toTimeT(fileInfoByHandle.ftLastWriteTime);
-    //output.id               = extractFileID(fileInfoByHandle); -> id from dereferenced symlink is problematic, since renaming will consider the link, not the target!
+    output.id = FileId(); //= extractFileID(fileInfoByHandle); -> id from dereferenced symlink is problematic, since renaming will consider the link, not the target!
     return true;
 }
 
 
-DWORD retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
+DWORD retrieveVolumeSerial(const Zstring& pathName) //returns 0 on error or if serial is not supported!
 {
-    //note: this even works for network shares: \\share\dirname
+    //this works for:
+    //- root paths "C:\", "D:\"
+    //- network shares: \\share\dirname
+    //- indirection: subst S: %USERPROFILE%
+    //                  -> GetVolumePathName() on the other hand resolves "S:\Desktop\somedir" to "S:\Desktop\" - nice try...
+
+    //dynamically load windows API function (existing since Windows XP)
+    typedef BOOL (WINAPI *GetFileInformationByHandleFunc)(HANDLE hFile,
+                                                          LPBY_HANDLE_FILE_INFORMATION lpFileInformation);
+
+    const SysDllFun<GetFileInformationByHandleFunc> getFileInformationByHandle(L"kernel32.dll", "GetFileInformationByHandle");
+    if (!getFileInformationByHandle)
+    {
+        assert(false);
+        return 0;
+    }
+
+    const HANDLE hDir = ::CreateFile(zen::applyLongPathPrefix(pathName).c_str(),
+                                     0,
+                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                     NULL,
+                                     OPEN_EXISTING,
+                                     FILE_FLAG_BACKUP_SEMANTICS /*needed to open a directory*/ /*| FILE_FLAG_OPEN_REPARSE_POINT -> no, we follow symlinks!*/ ,
+                                     NULL);
+    if (hDir == INVALID_HANDLE_VALUE)
+        return 0;
+    ZEN_ON_BLOCK_EXIT(::CloseHandle(hDir));
+
+    BY_HANDLE_FILE_INFORMATION fileInfo = {};
+    if (!getFileInformationByHandle(hDir,       //__in   HANDLE hFile,
+                                    &fileInfo)) //__out  LPBY_HANDLE_FILE_INFORMATION lpFileInformation
+        return 0;
+
+    return fileInfo.dwVolumeSerialNumber;
+}
+
+
+/*
+DWORD retrieveVolumeSerial(const Zstring& pathName) //returns 0 on error!
+{
+    //note: this works for network shares: \\share\dirname, but not "subst"!
 
     const DWORD BUFFER_SIZE = 10000;
     std::vector<wchar_t> buffer(BUFFER_SIZE);
@@ -113,11 +154,14 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
 
     return volumeSerial;
 }
+*/
 
 
-const DllFun<findplus::OpenDirFunc>  openDir (findplus::getDllName(), findplus::openDirFuncName ); //
-const DllFun<findplus::ReadDirFunc>  readDir (findplus::getDllName(), findplus::readDirFuncName ); //load at startup: avoid pre C++11 static initialization MT issues
-const DllFun<findplus::CloseDirFunc> closeDir(findplus::getDllName(), findplus::closeDirFuncName); //
+const bool isXpOrLater = winXpOrLater(); //VS2010 compiled DLLs are not supported on Win 2000: Popup dialog "DecodePointer not found"
+
+const DllFun<findplus::OpenDirFunc>  openDir = isXpOrLater ? DllFun<findplus::OpenDirFunc >(findplus::getDllName(), findplus::openDirFuncName ) : DllFun<findplus::OpenDirFunc >(); //
+const DllFun<findplus::ReadDirFunc>  readDir = isXpOrLater ? DllFun<findplus::ReadDirFunc >(findplus::getDllName(), findplus::readDirFuncName ) : DllFun<findplus::ReadDirFunc >(); //load at startup: avoid pre C++11 static initialization MT issues
+const DllFun<findplus::CloseDirFunc> closeDir= isXpOrLater ? DllFun<findplus::CloseDirFunc>(findplus::getDllName(), findplus::closeDirFuncName) : DllFun<findplus::CloseDirFunc>(); //
 
 /*
 Common C-style interface for Win32 FindFirstFile(), FindNextFile() and FileFilePlus openDir(), closeDir():
@@ -125,12 +169,15 @@ struct TraverserPolicy //see "policy based design"
 {
 typedef ... DirHandle;
 typedef ... FindData;
+
 static void create(const Zstring& directory, DirHandle& hnd); //throw FileError - *no* concession to FindFirstFile(): open handle only, *no* return of data!
 static void destroy(DirHandle hnd); //throw()
-static bool getEntry(DirHandle hnd, const Zstring& directory, FindData& fileInfo) //throw FileError
+
+template <class FallbackFun>
+static bool getEntry(DirHandle hnd, const Zstring& directory, FindData& fileInfo, FallbackFun fb) //throw FileError -> fb: fallback to FindFirstFile()/FindNextFile()
 
 //FindData "member" functions
-static void extractFileInfo            (const FindData& fileInfo, const DWORD* volumeSerial, TraverseCallback::FileInfo& output);
+static void extractFileInfo            (const FindData& fileInfo, DWORD volumeSerial, TraverseCallback::FileInfo& output); //volumeSerial may be 0 if not available!
 static Int64 getModTime                (const FindData& fileInfo);
 static const FILETIME& getModTimeRaw   (const FindData& fileInfo); //yet another concession to DST hack
 static const FILETIME& getCreateTimeRaw(const FindData& fileInfo); //
@@ -177,7 +224,8 @@ struct Win32Traverser
 
     static void destroy(const DirHandle& hnd) { ::FindClose(hnd.searchHandle); } //throw()
 
-    static bool getEntry(DirHandle& hnd, const Zstring& directory, FindData& fileInfo) //throw FileError
+    template <class FallbackFun>
+    static bool getEntry(DirHandle& hnd, const Zstring& directory, FindData& fileInfo, FallbackFun) //throw FileError
     {
         if (hnd.firstRead)
         {
@@ -197,10 +245,11 @@ struct Win32Traverser
     }
 
     template <class FindData>
-    static void extractFileInfo(const FindData& fileInfo, const DWORD* volumeSerial, TraverseCallback::FileInfo& output)
+    static void extractFileInfo(const FindData& fileInfo, DWORD volumeSerial, TraverseCallback::FileInfo& output)
     {
-        output.lastWriteTimeRaw = getModTime(fileInfo);
         output.fileSize         = UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
+        output.lastWriteTimeRaw = getModTime(fileInfo);
+        output.id = FileId();
     }
 
     template <class FindData>
@@ -243,12 +292,40 @@ struct FilePlusTraverser
 
     static void destroy(DirHandle hnd) { ::closeDir(hnd.searchHandle); } //throw()
 
-    static bool getEntry(DirHandle hnd, const Zstring& directory, FindData& fileInfo) //throw FileError
+    template <class FallbackFun>
+    static bool getEntry(DirHandle hnd, const Zstring& directory, FindData& fileInfo, FallbackFun fb) //throw FileError
     {
         if (!::readDir(hnd.searchHandle, fileInfo))
         {
-            if (::GetLastError() == ERROR_NO_MORE_FILES) //not an error situation
+            const DWORD lastError = ::GetLastError();
+            if (lastError == ERROR_NO_MORE_FILES) //not an error situation
                 return false;
+
+            /*
+            fallback to default directory query method, if FileIdBothDirectoryInformation is not properly implemented
+            this is required for NetDrive mounted Webdav, e.g. www.box.net and NT4, 2000 remote drives, et al.
+
+            NT status code                  |  Win32 error code
+            -----------------------------------------------------------
+            STATUS_INVALID_LEVEL            | ERROR_INVALID_LEVEL
+            STATUS_NOT_SUPPORTED            | ERROR_NOT_SUPPORTED
+            STATUS_INVALID_PARAMETER        | ERROR_INVALID_PARAMETER
+            STATUS_INVALID_NETWORK_RESPONSE | ERROR_BAD_NET_RESP
+            STATUS_INVALID_INFO_CLASS       | ERROR_INVALID_PARAMETER
+            STATUS_UNSUCCESSFUL             | ERROR_GEN_FAILURE
+            STATUS_ACCESS_VIOLATION         | ERROR_NOACCESS       ->FileIdBothDirectoryInformation on XP accessing UDF
+            */
+            if (lastError == ERROR_INVALID_LEVEL     ||
+                lastError == ERROR_NOT_SUPPORTED     ||
+                lastError == ERROR_INVALID_PARAMETER ||
+                lastError == ERROR_BAD_NET_RESP      ||
+                lastError == ERROR_GEN_FAILURE       ||
+                lastError == ERROR_NOACCESS)
+            {
+                fb(); //fallback should apply to whole directory sub-tree!
+                return false;
+            }
+
             //else we have a problem... report it:
             throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
         }
@@ -256,12 +333,11 @@ struct FilePlusTraverser
     }
 
     template <class FindData>
-    static void extractFileInfo(const FindData& fileInfo, const DWORD* volumeSerial, TraverseCallback::FileInfo& output)
+    static void extractFileInfo(const FindData& fileInfo, DWORD volumeSerial, TraverseCallback::FileInfo& output)
     {
         output.fileSize         = UInt64(fileInfo.fileSize.QuadPart);
         output.lastWriteTimeRaw = getModTime(fileInfo);
-        if (volumeSerial)
-            output.id = extractFileID(*volumeSerial, fileInfo.fileId);
+        output.id               = extractFileID(volumeSerial, fileInfo.fileId);
     }
 
     template <class FindData>
@@ -296,7 +372,7 @@ public:
         {
             activatePrivilege(SE_BACKUP_NAME); //throw FileError
         }
-        catch (...) {} //don't cause issues in user mode
+        catch (FileError&) {} //don't cause issues in user mode
 
         if (::openDir && ::readDir && ::closeDir)
             traverse<FilePlusTraverser>(baseDirectory, sink, 0);
@@ -335,24 +411,26 @@ private:
 
         typename Trav::FindData fileInfo = {};
 
+        auto fallback = [&] { this->traverse<Win32Traverser>(directory, sink, level); }; //help VS2010 a little by avoiding too deeply nested lambdas
+
         while ([&]() -> bool
     {
-        bool moreData = false;
+        bool gotEntry = false;
 
         typedef Trav Trav1; //f u VS!
         tryReportingError([&]
         {
             typedef Trav1 Trav; //f u VS!
-            moreData = Trav::getEntry(searchHandle, directory, fileInfo); //throw FileError
+            gotEntry = Trav::getEntry(searchHandle, directory, fileInfo, fallback); //throw FileError
             }, sink);
 
-            return moreData;
+            return gotEntry;
         }())
         {
             //skip "." and ".."
             const Zchar* const shortName = Trav::getShortName(fileInfo);
             if (shortName[0] == L'.' &&
-            (shortName[1] == L'\0' || (shortName[1] == L'.' && shortName[2] == L'\0')))
+            (shortName[1] == 0 || (shortName[1] == L'.' && shortName[2] == 0)))
                 continue;
 
             const Zstring& fullName = endsWith(directory, FILE_NAME_SEPARATOR) ?
@@ -393,7 +471,7 @@ private:
                 }
                 else
                 {
-                    Trav::extractFileInfo(fileInfo, volumeSerial != 0 ? &volumeSerial : nullptr, details); //make optional character of volumeSerial explicit in the interface
+                    Trav::extractFileInfo(fileInfo, volumeSerial, details); //make optional character of volumeSerial explicit in the interface
 
                     //####################################### DST hack ###########################################
                     if (isFatFileSystem)
@@ -553,7 +631,7 @@ private:
             //don't return "." and ".."
             const char* const shortName = dirEntry->d_name; //evaluate dirEntry *before* going into recursion => we use a single "buffer"!
             if (shortName[0] == '.' &&
-                (shortName[1] == '\0' || (shortName[1] == '.' && shortName[2] == '\0')))
+                (shortName[1] == 0 || (shortName[1] == '.' && shortName[2] == 0)))
                 continue;
 
             const Zstring& fullName = endsWith(directory, FILE_NAME_SEPARATOR) ? //e.g. "/"
@@ -636,15 +714,4 @@ private:
 void zen::traverseFolder(const Zstring& directory, bool followSymlinks, TraverseCallback& sink, DstHackCallback* dstCallback)
 {
     DirTraverser(directory, followSymlinks, sink, dstCallback);
-}
-
-
-bool zen::supportForFileId() //Linux: always; Windows: if FindFilePlus_Win32.dll was loaded correctly
-{
-#ifdef FFS_WIN
-    return ::openDir && ::readDir && ::closeDir;
-
-#elif defined FFS_LINUX
-    return true;
-#endif
 }

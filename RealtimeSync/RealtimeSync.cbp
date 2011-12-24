@@ -96,6 +96,7 @@
 			<Add library="libws2_32.a" />
 			<Add library="libwinspool.a" />
 			<Add library="libmpr.a" />
+			<Add library="libuxtheme.a" />
 			<Add directory="C:\Program Files\C++\Boost\stage\lib" />
 		</Linker>
 		<Unit filename="WxWizDialog.fbp" />
@@ -118,13 +119,15 @@
 		<Unit filename="xml_ffs.h" />
 		<Unit filename="xml_proc.cpp" />
 		<Unit filename="xml_proc.h" />
-		<Unit filename="..\lib\dir_name.cpp" />
-		<Unit filename="..\lib\folder_history_box.cpp" />
 		<Unit filename="..\lib\localization.cpp" />
 		<Unit filename="..\lib\process_xml.cpp" />
 		<Unit filename="..\lib\resolve_path.cpp" />
 		<Unit filename="..\lib\xml_base.cpp" />
 		<Unit filename="..\structures.cpp" />
+		<Unit filename="..\ui\dir_name.cpp" />
+		<Unit filename="..\ui\dir_name.h" />
+		<Unit filename="..\ui\folder_history_box.cpp" />
+		<Unit filename="..\ui\folder_history_box.h" />
 		<Unit filename="..\wx+\button.cpp" />
 		<Unit filename="..\wx+\format_unit.cpp" />
 		<Unit filename="..\wx+\mouse_move_dlg.cpp" />

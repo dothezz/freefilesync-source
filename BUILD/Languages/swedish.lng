@@ -202,9 +202,6 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Dra && släpp</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -366,7 +363,7 @@ Kommandot verkställes när:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Batch-jobb</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Kan inte skapa loggfil!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ Kommandot verkställes när:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Kräver Internetuppkoppling!)</target>
+
+<source>Drag && drop</source>
+<target>Dra && släpp</target>
+
+<source>Close progress dialog</source>
+<target>Stäng förloppsindikator</target>
+
+<source>Shut down</source>
+<target>Stäng av datorn</target>
+
+<source>Log off</source>
+<target>Logga ut</target>
+
+<source>Standby</source>
+<target>Strömsparläge</target>
+
+<source>Hibernate</source>
+<target>Viloläge</target>
 
 <source>1. &Compare</source>
 <target>1. &Jämför</target>
@@ -528,9 +543,6 @@ Kommandot verkställes när:
 <source>Filter files</source>
 <target>Undantag</target>
 
-<source>Error handling</source>
-<target>Felhantering</target>
-
 <source>Left</source>
 <target>Vänster</target>
 
@@ -543,13 +555,16 @@ Kommandot verkställes när:
 <source>Status feedback</source>
 <target>Status</target>
 
-<source>Run minimized</source>
-<target>Kör minimerad</target>
+<source>Show progress dialog</source>
+<target>Visa förloppsindikator</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Felhantering</target>
+
+<source>Maximum number of log files:</source>
 <target>Max antal loggfiler:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Välj loggfilskatalog:</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ Kommandot verkställes när:
 <source>Deletion handling</source>
 <target>Borttagning</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>Vid slutfört:</target>
 
 <source>Configuration</source>
 <target>Inställningar</target>
@@ -623,6 +638,9 @@ Kommandot verkställes när:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikt/Fil kan inte kategoriseras</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Jämför...</target>
@@ -1077,20 +1095,17 @@ Undanta: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Avbryter: Väntar på att aktuell process skall slutföras...</target>
 
-<source>Continue</source>
-<target>Fortsätt</target>
-
 <source>Pause</source>
 <target>Paus</target>
+
+<source>Continue</source>
+<target>Fortsätt</target>
 
 <source>Cannot find %x</source>
 <target>Kan inte hitta %x</target>
 
 <source>Inactive</source>
 <target>Inaktiv</target>
-
-<source>Last x hours</source>
-<target>Senaste x timmarna</target>
 
 <source>Today</source>
 <target>Idag</target>
@@ -1407,11 +1422,11 @@ Undanta: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Skapar fil %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Skapar den symboliska länken %x</target>
-
 <source>Creating folder %x</source>
 <target>Skapar katalog %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Skapar den symboliska länken %x</target>
 
 <source>Overwriting file %x</source>
 <target>Skriver över filen %x</target>

@@ -345,7 +345,7 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
 {
     boost::this_thread::interruption_point();
 
-    const Zstring fileNameShort = shortName;
+    const Zstring fileNameShort(shortName);
 
     //do not list the database file(s) sync.ffs_db, sync.x64.ffs_db, etc. or lock files
     if (endsWith(fileNameShort, SYNC_DB_FILE_ENDING) ||

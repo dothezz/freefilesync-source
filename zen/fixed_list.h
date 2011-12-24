@@ -82,7 +82,9 @@ public:
     void remove_if(Predicate pred)
     {
         Node* prev = NULL;
-        for (auto ptr = first; ptr;)
+        Node* ptr = first;
+
+        while (ptr)
             if (pred(ptr->val))
             {
                 Node* tmp = ptr->next;

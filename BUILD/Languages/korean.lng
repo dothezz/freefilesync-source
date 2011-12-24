@@ -200,9 +200,6 @@
 <pluralform>%x초</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>드래그 && 드랍 (마우스로 파일 끌어다 놓기)</target>
-
 <source>Info</source>
 <target>정보</target>
 
@@ -363,7 +360,7 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync 일괄 작업</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>로그파일 생성을 할 수 없습니다!</target>
 
 <source>Batch execution</source>
@@ -410,6 +407,24 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(인터넷 연결이 필요합니다!)</target>
+
+<source>Drag && drop</source>
+<target>드래그 && 드랍 (마우스로 파일 끌어다 놓기)</target>
+
+<source>Close progress dialog</source>
+<target>프로그레스 다이얼로그 (진행창) 닫기</target>
+
+<source>Shut down</source>
+<target>종료</target>
+
+<source>Log off</source>
+<target>로그오프</target>
+
+<source>Standby</source>
+<target>대기</target>
+
+<source>Hibernate</source>
+<target>최대절전모드</target>
 
 <source>1. &Compare</source>
 <target>1. 비교</target>
@@ -525,9 +540,6 @@ The command line is executed each time:
 <source>Filter files</source>
 <target>파일 필터</target>
 
-<source>Error handling</source>
-<target>오류 발생시 :</target>
-
 <source>Left</source>
 <target>좌측</target>
 
@@ -540,13 +552,16 @@ The command line is executed each time:
 <source>Status feedback</source>
 <target>상태 피드백</target>
 
-<source>Run minimized</source>
-<target>최소화 실행</target>
+<source>Show progress dialog</source>
+<target>프로그레스 다이얼로그 (진행창) 보기</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>오류 발생시 :</target>
+
+<source>Maximum number of log files:</source>
 <target>최대 로그파일 개수 :</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>로그파일 디렉토리 선택 :</target>
 
 <source>Batch settings</source>
@@ -591,8 +606,8 @@ The command line is executed each time:
 <source>Deletion handling</source>
 <target>삭제 처리 옵션</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>완료 :</target>
 
 <source>Configuration</source>
 <target>구성 설정</target>
@@ -620,6 +635,9 @@ The command line is executed each time:
 
 <source>Conflict/file cannot be categorized</source>
 <target>충돌/파일 분류 불가능</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>대상 별 비교...</target>
@@ -1070,20 +1088,17 @@ Exclude: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>사용자에 의한 작업 중단 : 현재 작업 종료 대기 중...</target>
 
-<source>Continue</source>
-<target>계속</target>
-
 <source>Pause</source>
 <target>일시정지</target>
+
+<source>Continue</source>
+<target>계속</target>
 
 <source>Cannot find %x</source>
 <target>%x 을(를) 찾을 수 없습니다.</target>
 
 <source>Inactive</source>
 <target>비활성화</target>
-
-<source>Last x hours</source>
-<target>최근 x 시간</target>
 
 <source>Today</source>
 <target>오늘</target>
@@ -1395,11 +1410,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>파일 %x 생성 중</target>
 
-<source>Creating symbolic link %x</source>
-<target>심볼릭 링크 %x 생성 중</target>
-
 <source>Creating folder %x</source>
 <target>폴더 %x 생성 중</target>
+
+<source>Creating symbolic link %x</source>
+<target>심볼릭 링크 %x 생성 중</target>
 
 <source>Overwriting file %x</source>
 <target>파일 %x 덮어쓰는 중</target>

@@ -27,7 +27,7 @@ zen::FileId zen::getFileID(const Zstring& filename)
     const HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
                                       0,
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      0,
+                                      NULL,
                                       OPEN_EXISTING,
                                       FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, //FILE_FLAG_BACKUP_SEMANTICS needed to open a directory
                                       NULL);

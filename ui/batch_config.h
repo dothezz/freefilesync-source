@@ -8,7 +8,7 @@
 #define BATCHCONFIG_H_INCLUDED
 
 #include "../lib/process_xml.h"
-#include "../lib/folder_history_box.h"
+#include "folder_history_box.h"
 
 namespace zen
 {
@@ -24,7 +24,9 @@ struct ReturnBatchConfig
 ReturnBatchConfig::ButtonPressed showSyncBatchDlg(const wxString& referenceFile,
                                                   const xmlAccess::XmlBatchConfig& batchCfg,
                                                   const std::shared_ptr<FolderHistory>& folderHistLeft,
-                                                  const std::shared_ptr<FolderHistory>& folderHistRight);
+                                                  const std::shared_ptr<FolderHistory>& folderHistRight,
+                                                  std::vector<std::wstring>& execFinishedhistory,
+                                                  size_t execFinishedhistoryMax);
 }
 
 

@@ -51,6 +51,8 @@ public:
     void disableAllElements(bool enableAbort); //dis-/enables all elements (except abort button) that might receive user input
     void enableAllElements();                   //during long-running processes: comparison, deletion
 
+    void onQueryEndSession(); //last chance to do something before getting killed!
+
 private:
     friend class CompareStatusHandler;
     friend class SyncStatusHandler;
@@ -63,11 +65,9 @@ private:
 
     MainDialog();
 
-    void init(const xmlAccess::XmlGuiConfig guiCfg,
+    void init(const xmlAccess::XmlGuiConfig& guiCfg,
               xmlAccess::XmlGlobalSettings& settings,
               bool startComparison);
-
-    void cleanUp(bool saveLastUsedConfig);
 
     //configuration load/save
     void setLastUsedConfig(const wxString& filename, const xmlAccess::XmlGuiConfig& guiConfig);
@@ -79,7 +79,7 @@ private:
     void loadConfiguration(const wxString& filename);
     void loadConfiguration(const std::vector<wxString>& filenames);
 
-    bool trySaveConfig(); //return true if saved successfully
+    bool trySaveConfig(const wxString* fileName); //return true if saved successfully
     bool saveOldConfig(); //return false on user abort
 
     static const wxString& lastRunConfigName();

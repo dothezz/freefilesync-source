@@ -95,7 +95,7 @@ void zen::checkForUpdateNow()
     {
         const int rv = wxMessageBox(wxString(_("A newer version of FreeFileSync is available:"))  + wxT(" v") + onlineVersion + wxT(". ") + _("Download now?"), _("Information"), wxYES_NO | wxICON_QUESTION);
         if (rv == wxYES)
-            wxLaunchDefaultBrowser(wxT("http://sourceforge.net/projects/freefilesync/files/"));
+            wxLaunchDefaultBrowser(wxString(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v") + onlineVersion + L"/");
     }
     else
         wxMessageBox(_("FreeFileSync is up to date!"), _("Information"), wxICON_INFORMATION);
@@ -137,7 +137,7 @@ void zen::checkForUpdatePeriodically(long& lastUpdateCheck)
             {
                 const int rv = wxMessageBox(wxString(_("A newer version of FreeFileSync is available:"))  + wxT(" v") + onlineVersion + wxT(". ") + _("Download now?"), _("Information"), wxYES_NO | wxICON_QUESTION);
                 if (rv == wxYES)
-                    wxLaunchDefaultBrowser(wxT("http://sourceforge.net/projects/freefilesync/files/"));
+                    wxLaunchDefaultBrowser(wxString(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v") + onlineVersion + L"/");
             }
         }
     }

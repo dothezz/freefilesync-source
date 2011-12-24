@@ -204,9 +204,6 @@
 <pluralform>%x sekund</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Drag && Drop</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -358,7 +355,7 @@ Příkazová řádka je spuštěna pokaždé když:
 <target>Není zadán vstupní adresář.</target>
 
 <source>Logging</source>
-<target>Zaznamenávání</target>
+<target>Záznam zpracování</target>
 
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync dávkový soubor</target>
@@ -369,8 +366,8 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Dávkové zpracování</target>
 
-<source>Unable to create logfile!</source>
-<target>není možné vytvořit záznamový soubor!</target>
+<source>Unable to create log file!</source>
+<target>Není možné vytvořit záznamový soubor!</target>
 
 <source>Batch execution</source>
 <target>Spuštění dávky</target>
@@ -416,6 +413,24 @@ Příkazová řádka je spuštěna pokaždé když:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Vyžaduje připojení k internetu!)</target>
+
+<source>Drag && drop</source>
+<target>Drag && Drop</target>
+
+<source>Close progress dialog</source>
+<target>Zavřít průběh zpracování</target>
+
+<source>Shut down</source>
+<target>Vypnout počítač</target>
+
+<source>Log off</source>
+<target>Odhlásit uživatele</target>
+
+<source>Standby</source>
+<target>Přepnout do úsporného režimu</target>
+
+<source>Hibernate</source>
+<target>Přepnout do režimu spánku</target>
 
 <source>1. &Compare</source>
 <target>1. &Porovnat</target>
@@ -531,9 +546,6 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Filter files</source>
 <target>Filtr souborů</target>
 
-<source>Error handling</source>
-<target>Zpracování chyb</target>
-
 <source>Left</source>
 <target>Levý</target>
 
@@ -546,13 +558,16 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Status feedback</source>
 <target>Běh programu</target>
 
-<source>Run minimized</source>
-<target>Minimalizovat</target>
+<source>Show progress dialog</source>
+<target>Zobrazit průběh zpracování</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Zpracování chyb</target>
+
+<source>Maximum number of log files:</source>
 <target>Maximální počet záznamových souborů:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Vyberte adresář pro záznamové soubory:</target>
 
 <source>Batch settings</source>
@@ -597,8 +612,8 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Deletion handling</source>
 <target>Nastavení mazání</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>Po dokončení:</target>
 
 <source>Configuration</source>
 <target>Konfigurace</target>
@@ -626,6 +641,9 @@ Příkazová řádka je spuštěna pokaždé když:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikty/soubory které nelze zařadit</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Porovnat ...</target>
@@ -1084,20 +1102,17 @@ Vynechat: \někde\něco\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Požadavek na přerušení: Čekání na ukončení aktuální operace...</target>
 
-<source>Continue</source>
-<target>Pokračovat</target>
-
 <source>Pause</source>
 <target>Pauza</target>
+
+<source>Continue</source>
+<target>Pokračovat</target>
 
 <source>Cannot find %x</source>
 <target>Nelze najít %x</target>
 
 <source>Inactive</source>
 <target>Vypnuto</target>
-
-<source>Last x hours</source>
-<target>Posledních x hodin</target>
 
 <source>Today</source>
 <target>Dnes</target>
@@ -1419,11 +1434,11 @@ Vynechat: \někde\něco\*
 <source>Creating file %x</source>
 <target>Vytváření souboru %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Vytváření symbolického odkazu %x</target>
-
 <source>Creating folder %x</source>
 <target>Vytváření adresáře %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Vytváření symbolického odkazu %x</target>
 
 <source>Overwriting file %x</source>
 <target>Přepisování souboru %x</target>

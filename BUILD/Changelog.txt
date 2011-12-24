@@ -2,6 +2,25 @@
 |FreeFileSync|
 --------------
 
+Changelog v4.6
+--------------
+Execute user-defined command after synchronization
+Option to automatically close synchronization progress dialog
+Automatically adjust statistics during sync if changes happened after comparison
+Fixed "DecodePointer could not be located in KERNEL32.dll" (Windows 2000)
+Fixed "Windows Error Code 31: A device attached to the system is not functioning"
+Mouse wheel will scroll list of folder pairs instead of toggle through directory history
+No error message when scanning a single directory
+Minimized disk accesses when deleting files
+Less mouse-clicks required when overwriting configuration
+Pause timers while showing error messages
+Show error message for malformed external commands
+Support detection of moved files over "subst" alias
+New default font: Segoe UI (Windows Vista and later)
+Save settings before forced exit due to shutdown or logoff
+Updated translation files
+
+
 Changelog v4.5
 --------------
 Fixed "Windows Error Code 50: The request is not supported"

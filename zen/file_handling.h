@@ -47,7 +47,7 @@ void setFileTime(const Zstring& filename, const Int64& modificationTime, ProcSym
 UInt64 getFilesize(const Zstring& filename); //throw FileError
 
 //file handling
-bool removeFile(const Zstring& filename); //return "true" if file was actually deleted; throw (FileError)
+bool removeFile(const Zstring& filename); //return "true" if file was actually deleted; throw FileError
 void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = NULL); //throw FileError
 
 
@@ -93,8 +93,8 @@ void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copy
 struct CallbackRemoveDir
 {
     virtual ~CallbackRemoveDir() {}
-    virtual void notifyFileDeletion(const Zstring& filename) = 0;
-    virtual void notifyDirDeletion(const Zstring& dirname) = 0;
+    virtual void notifyFileDeletion(const Zstring& filename) = 0; //one call for each (existing) object!
+    virtual void notifyDirDeletion (const Zstring& dirname ) = 0; //
 };
 
 
@@ -115,8 +115,14 @@ struct CallbackCopyFile //callback functionality
 
 struct CallbackMoveFile //callback functionality
 {
-    virtual ~CallbackMoveFile() {}
-    virtual void requestUiRefresh(const Zstring& currentObject) = 0; //see CallbackCopyFile!
+    virtual ~CallbackMoveFile() {} //see CallbackCopyFile for limitations when trowing exceptions!
+
+    virtual void onBeforeFileMove(const Zstring& fileFrom, const Zstring& fileTo) = 0; //one call before each (planned) move
+    virtual void onBeforeDirMove (const Zstring& dirFrom,  const Zstring& dirTo ) = 0; //
+    virtual void objectProcessed() = 0; //one call after each completed move (count objects total)
+
+    //called frequently if move has to revert to copy + delete:
+    virtual void updateStatus(Int64 bytesDelta) = 0;
 };
 }
 

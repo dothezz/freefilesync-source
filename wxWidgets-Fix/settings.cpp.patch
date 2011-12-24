@@ -1,0 +1,50 @@
+--- src\msw\settings.cpp.old	2011-03-22 10:36:54.000000000 +0100
++++ src\msw\settings.cpp	2011-12-14 21:58:59.642200200 +0100
+@@ -40,6 +40,12 @@
+ #endif
+ 
+ #include "wx/fontutil.h"
++//#include <vssym32.h>
++#include <Uxtheme.h>
++
++#ifdef _MSC_VER
++#pragma comment(lib, "UxTheme.lib")
++#endif
+ 
+ // ----------------------------------------------------------------------------
+ // private classes
+@@ -261,6 +267,34 @@
+     return font;
+ }
+ 
++#ifndef TMT_MSGBOXFONT 
++#define TMT_MSGBOXFONT 805 //why is this constant missing from Uxtheme.h???
++#endif
++
++struct InitFont //(try to) initialize default font, before wxWidgets gets chance to screw up
++{
++    InitFont()
++    {
++        HTHEME theme = ::OpenThemeData(NULL, //__in  HWND hwnd,
++                                       L"WINDOW"); //__in  LPCWSTR pszClassList
++
++        LOGFONT lfont = {};
++        if (::GetThemeSysFont(theme,           //__in   HTHEME hTheme,
++                              TMT_MSGBOXFONT,  //__in   int iFontID,
++                              &lfont) == S_OK) // __out  LOGFONTW *plf
++        {
++            wxNativeFontInfo native;
++            native.lf = lfont;
++            delete gs_fontDefault;
++            gs_fontDefault = wxFontBase::New(native);
++        }
++
++        if (theme != NULL)
++            ::CloseThemeData(theme);
++    }
++} dummy;
++
++
+ wxFont wxSystemSettingsNative::GetFont(wxSystemFont index)
+ {
+ #ifdef __WXWINCE__

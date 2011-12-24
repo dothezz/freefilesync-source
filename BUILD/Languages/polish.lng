@@ -204,9 +204,6 @@
 <pluralform>%x sekund</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Drag && Drop</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -369,7 +366,7 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync plik wsadowy</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Nie można utworzyć pliku z logami!</target>
 
 <source>Batch execution</source>
@@ -416,6 +413,24 @@ Komenda jest wykonwywana za każdym razem gdy:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Wymaga połączenia z Internetem!)</target>
+
+<source>Drag && drop</source>
+<target>Drag && Drop</target>
+
+<source>Close progress dialog</source>
+<target></target>
+
+<source>Shut down</source>
+<target></target>
+
+<source>Log off</source>
+<target></target>
+
+<source>Standby</source>
+<target></target>
+
+<source>Hibernate</source>
+<target></target>
 
 <source>1. &Compare</source>
 <target>1. &Porównaj</target>
@@ -531,9 +546,6 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Filter files</source>
 <target>Filtruj pliki</target>
 
-<source>Error handling</source>
-<target>Obsługa błędów</target>
-
 <source>Left</source>
 <target>Lewy</target>
 
@@ -546,13 +558,16 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Status feedback</source>
 <target>Opinia statusu</target>
 
-<source>Run minimized</source>
-<target>Uruchom zminimalizowane</target>
+<source>Show progress dialog</source>
+<target></target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Obsługa błędów</target>
+
+<source>Maximum number of log files:</source>
 <target>Maksymalna liczba plików z logami:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Wybierz katalog z logami:</target>
 
 <source>Batch settings</source>
@@ -597,8 +612,8 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Deletion handling</source>
 <target>Obsługa usuwania</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target></target>
 
 <source>Configuration</source>
 <target>Konfiguracja</target>
@@ -626,6 +641,9 @@ Komenda jest wykonwywana za każdym razem gdy:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikt/plik nie może zostać skategoryzowany</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Porównaj przez...</target>
@@ -1084,20 +1102,17 @@ Wyklucz: \moje\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Żądanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...</target>
 
-<source>Continue</source>
-<target>Kontynuuj</target>
-
 <source>Pause</source>
 <target>Pauza</target>
+
+<source>Continue</source>
+<target>Kontynuuj</target>
 
 <source>Cannot find %x</source>
 <target>Nie można znaleźć %x</target>
 
 <source>Inactive</source>
 <target>Nieaktywny</target>
-
-<source>Last x hours</source>
-<target>Ostatnie x godzin</target>
 
 <source>Today</source>
 <target>Dzisiaj</target>
@@ -1419,11 +1434,11 @@ Wyklucz: \moje\temp\*
 <source>Creating file %x</source>
 <target>Tworzenie pliku %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Tworzenie dowiązania symbolicznego %x</target>
-
 <source>Creating folder %x</source>
 <target>Tworzenie folderu %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Tworzenie dowiązania symbolicznego %x</target>
 
 <source>Overwriting file %x</source>
 <target>Nadpisywanie pliku %x</target>

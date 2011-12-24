@@ -204,9 +204,6 @@
 <pluralform>%x секунд</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Drag && drop</target>
-
 <source>Info</source>
 <target>Информация</target>
 
@@ -369,7 +366,7 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>Пакетное задание FreeFileSync</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Невозможно создать лог-файл!</target>
 
 <source>Batch execution</source>
@@ -416,6 +413,24 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(требуется подключение к Интернету!)</target>
+
+<source>Drag && drop</source>
+<target>Drag && drop</target>
+
+<source>Close progress dialog</source>
+<target>Закрыть окно процесса</target>
+
+<source>Shut down</source>
+<target>Выключить компьютер</target>
+
+<source>Log off</source>
+<target>Выйти из системы (разлогиниться)</target>
+
+<source>Standby</source>
+<target>Перейти в оджидание</target>
+
+<source>Hibernate</source>
+<target>Гибернация</target>
 
 <source>1. &Compare</source>
 <target>1. &Сравнить</target>
@@ -534,9 +549,6 @@ The command line is executed each time:
 <source>Filter files</source>
 <target>Фильтр файлов</target>
 
-<source>Error handling</source>
-<target>Обработка ошибок</target>
-
 <source>Left</source>
 <target>Слева</target>
 
@@ -549,13 +561,16 @@ The command line is executed each time:
 <source>Status feedback</source>
 <target>Статус обратной связи</target>
 
-<source>Run minimized</source>
-<target>Запустить свернутым</target>
+<source>Show progress dialog</source>
+<target>Показать диалог (окно) прогресса</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Обработка ошибок</target>
+
+<source>Maximum number of log files:</source>
 <target>Максимальное количество лог-файлов:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Выберите папку для лог-файлов:</target>
 
 <source>Batch settings</source>
@@ -571,7 +586,7 @@ The command line is executed each time:
 <target>&Отмена</target>
 
 <source>Select variant:</source>
-<target>Выберите вариант:</target>
+<target>Варианты синхронизации</target>
 
 <source><Automatic></source>
 <target><Автоматический></target>
@@ -600,8 +615,8 @@ The command line is executed each time:
 <source>Deletion handling</source>
 <target>Настройки удаления</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>По окончании работы</target>
 
 <source>Configuration</source>
 <target>Настройки</target>
@@ -629,6 +644,9 @@ The command line is executed each time:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Конфликт/файл не может быть отнесен к какой-либо категории</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Критерии сравнения</target>
@@ -854,10 +872,10 @@ Exclude: \stuff\temp\*
 <target>Выберите направление:</target>
 
 <source>Exclude temporarily</source>
-<target>Исключить</target>
+<target>Временно исключить</target>
 
 <source>Include temporarily</source>
-<target>Включить</target>
+<target>Временно включить</target>
 
 <source>Exclude via filter:</source>
 <target>Исключить через фильтр:</target>
@@ -1082,20 +1100,17 @@ Exclude: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Запрос отмены: Ожидайте, пока текущая операция завершится...</target>
 
-<source>Continue</source>
-<target>Продолжить</target>
-
 <source>Pause</source>
 <target>Пауза</target>
+
+<source>Continue</source>
+<target>Продолжить</target>
 
 <source>Cannot find %x</source>
 <target>Невозможно найти %x</target>
 
 <source>Inactive</source>
 <target>---</target>
-
-<source>Last x hours</source>
-<target>посление x часов</target>
 
 <source>Today</source>
 <target>сегодня</target>
@@ -1423,11 +1438,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Создание файла %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Создание символьной ссылки %x</target>
-
 <source>Creating folder %x</source>
 <target>Создание папки %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Создание символьной ссылки %x</target>
 
 <source>Overwriting file %x</source>
 <target>Перезапись файла %x</target>

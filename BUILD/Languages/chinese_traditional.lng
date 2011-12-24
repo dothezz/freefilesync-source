@@ -178,7 +178,7 @@
 <target>同步資料庫格式不相容：</target>
 
 <source>Database files do not share a common synchronization session:</source>
-<target>資料庫檔案不共享一個共同的同步連線：</target>
+<target>資料庫檔案不要共享一個共同的同步連線：</target>
 
 <source>An exception occurred!</source>
 <target>發生異常！</target>
@@ -199,9 +199,6 @@
 <target>
 <pluralform>%x 秒</pluralform>
 </target>
-
-<source>Drag && drop</source>
-<target>拖放</target>
 
 <source>Info</source>
 <target>訊息</target>
@@ -236,7 +233,7 @@
 <target>移動到資源回收筒錯誤：</target>
 
 <source>Could not load a required DLL:</source>
-<target>無法載入一個所需的DLL：</target>
+<target>無法載入一個必要的DLL：</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>讀取卷影複製服務時錯誤！</target>
@@ -363,7 +360,7 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync 批次處理作業</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>無法新建日誌檔！</target>
 
 <source>Batch execution</source>
@@ -410,6 +407,24 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(需要連接到網際網路！)</target>
+
+<source>Drag && drop</source>
+<target>拖放</target>
+
+<source>Close progress dialog</source>
+<target>關閉進度對話框</target>
+
+<source>Shut down</source>
+<target>關機</target>
+
+<source>Log off</source>
+<target>登出</target>
+
+<source>Standby</source>
+<target>待機</target>
+
+<source>Hibernate</source>
+<target>休眠</target>
 
 <source>1. &Compare</source>
 <target>1. 比對(&C)</target>
@@ -499,10 +514,10 @@ The command line is executed each time:
 <target>操作：</target>
 
 <source>Items found:</source>
-<target>尋找要素：</target>
+<target>尋找項目：</target>
 
 <source>Items remaining:</source>
-<target>剩餘要素：</target>
+<target>剩餘項目：</target>
 
 <source>Speed:</source>
 <target>速度：</target>
@@ -525,9 +540,6 @@ The command line is executed each time:
 <source>Filter files</source>
 <target>篩選檔案</target>
 
-<source>Error handling</source>
-<target>錯誤處理</target>
-
 <source>Left</source>
 <target>左邊</target>
 
@@ -540,13 +552,16 @@ The command line is executed each time:
 <source>Status feedback</source>
 <target>狀態回報</target>
 
-<source>Run minimized</source>
-<target>執行最小化</target>
+<source>Show progress dialog</source>
+<target>顯示進度對話框</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>錯誤處理</target>
+
+<source>Maximum number of log files:</source>
 <target>日誌檔的最大數目：</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>選擇日誌檔目錄：</target>
 
 <source>Batch settings</source>
@@ -591,8 +606,8 @@ The command line is executed each time:
 <source>Deletion handling</source>
 <target>刪除處理</target>
 
-<source>&OK</source>
-<target>確定(&O)</target>
+<source>On completion:</source>
+<target>完成後：</target>
 
 <source>Configuration</source>
 <target>配置</target>
@@ -620,6 +635,9 @@ The command line is executed each time:
 
 <source>Conflict/file cannot be categorized</source>
 <target>衝突/檔案無法分類</target>
+
+<source>&OK</source>
+<target>確定(&O)</target>
 
 <source>Compare by...</source>
 <target>比對選項...</target>
@@ -652,7 +670,7 @@ is the same
 <target>正在同步...</target>
 
 <source>Items processed:</source>
-<target>已處理要素：</target>
+<target>已處理項目：</target>
 
 <source>&Pause</source>
 <target>暫停(&P)</target>
@@ -826,7 +844,7 @@ Exclude: \stuff\temp\*
 <target>找下一個(&F)</target>
 
 <source>Operation aborted!</source>
-<target>中止操作！</target>
+<target>操作已中止！</target>
 
 <source>Main bar</source>
 <target>主欄位</target>
@@ -1056,25 +1074,22 @@ Exclude: \stuff\temp\*
 <target>已中止</target>
 
 <source>Completed</source>
-<target>完成</target>
+<target>已完成</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>中止請求：正在等待目前操作完成...</target>
 
-<source>Continue</source>
-<target>繼續</target>
-
 <source>Pause</source>
 <target>暫停</target>
+
+<source>Continue</source>
+<target>繼續</target>
 
 <source>Cannot find %x</source>
 <target>找不到 %x</target>
 
 <source>Inactive</source>
 <target>停用</target>
-
-<source>Last x hours</source>
-<target>最後 x 小時</target>
 
 <source>Today</source>
 <target>今日</target>
@@ -1231,7 +1246,7 @@ Exclude: \stuff\temp\*
 <target>載入函數庫錯誤：</target>
 
 <source>Error reading security context:</source>
-<target>讀取安全內文錯誤：</target>
+<target>讀取安全性內容錯誤：</target>
 
 <source>Error writing security context:</source>
 <target>寫入安全性內容錯誤：</target>
@@ -1306,13 +1321,13 @@ Exclude: \stuff\temp\*
 <target>符號連結 %x 有相同日期但是不同目標！</target>
 
 <source>Comparing content of files %x</source>
-<target>正在比對檔案内容的百分比 %x</target>
+<target>正在比對檔案内容 %x</target>
 
 <source>Comparing files by content failed.</source>
 <target>比對檔案內容失敗。</target>
 
 <source>Generating file list...</source>
-<target>產生檔案清單...</target>
+<target>正在產生檔案清單...</target>
 
 <source>Both sides are equal</source>
 <target>兩邊都相同</target>
@@ -1386,11 +1401,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>正在新建檔案 %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>正在新建符號連結 %x</target>
-
 <source>Creating folder %x</source>
 <target>正在新建資料夾 %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>正在新建符號連結 %x</target>
 
 <source>Overwriting file %x</source>
 <target>正在覆蓋檔案 %x</target>
@@ -1444,7 +1459,7 @@ Exclude: \stuff\temp\*
 <target>處理一對資料夾：</target>
 
 <source>Generating database...</source>
-<target>產生資料庫...</target>
+<target>正在產生資料庫...</target>
 
 <source>Nothing to synchronize according to configuration!</source>
 <target>根據配置没有任何同步！</target>

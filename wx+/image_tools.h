@@ -9,6 +9,7 @@
 
 #include <numeric>
 #include <wx/bitmap.h>
+#include <wx/image.h>
 #include <wx/dcmemory.h>
 #include <zen/basic_math.h>
 
@@ -24,7 +25,7 @@ void brighten(wxImage& img, int level); //level: delta per channel in points
 
 bool isEqual(const wxBitmap& lhs, const wxBitmap& rhs); //pixel-wise equality (respecting alpha channel)
 
-
+wxColor gradient(const wxColor& from, const wxColor& to, double fraction); //maps fraction within [0, 1] to an intermediate color
 
 
 
@@ -151,6 +152,17 @@ bool isEqual(const wxBitmap& lhs, const wxBitmap& rhs)
     }
 
     return std::equal(imLhs.GetData(), imLhs.GetData() + pixelCount * 3, imRhs.GetData());
+}
+
+inline
+wxColor gradient(const wxColor& from, const wxColor& to, double fraction)
+{
+    fraction = std::max(0.0, fraction);
+    fraction = std::min(1.0, fraction);
+    return wxColor(from.Red  () + (to.Red  () - from.Red  ()) * fraction,
+                   from.Green() + (to.Green() - from.Green()) * fraction,
+                   from.Blue () + (to.Blue () - from.Blue ()) * fraction,
+                   from.Alpha() + (to.Alpha() - from.Alpha()) * fraction);
 }
 }
 

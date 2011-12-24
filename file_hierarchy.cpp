@@ -119,7 +119,7 @@ bool hasDirectChild(const HierarchyObject& hierObj, Predicate p)
 
 SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir, bool active) const
 {
-    return proposedSyncOperation(getCategory(), active, testSyncDir, syncDirConflict);
+    return proposedSyncOperation(getCategory(), active, testSyncDir, getSyncOpConflict());
 }
 
 

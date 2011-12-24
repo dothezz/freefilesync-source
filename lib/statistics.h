@@ -42,6 +42,8 @@ public:
                unsigned windowSizeBytesPerSecond); //time in ms
 
     void addMeasurement(int objectsCurrent, double dataCurrent);
+    void setNewTotal(int totalObjectCount, double totalDataAmount); //may change during sync!
+
     wxString getRemainingTime() const; //returns the remaining time in milliseconds
     wxString getBytesPerSecond() const;
 
@@ -49,12 +51,12 @@ public:
     void resumeTimer();
 
 private:
-    const int      objectsTotal;
-    const double   dataTotal;
+    int    objectsTotal;
+    double dataTotal;
 
-    const unsigned windowSizeRemTime; //"window width" of statistics used for calculation of remaining time in ms
-    const unsigned windowSizeBPS;     //
-    const unsigned windowMax;
+    const unsigned int windowSizeRemTime; //"window width" of statistics used for calculation of remaining time in ms
+    const unsigned int windowSizeBPS;     //
+    const unsigned int windowMax;
 
     struct Record
     {

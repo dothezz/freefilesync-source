@@ -86,7 +86,7 @@
 <target>Este arătat un popîc</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target>Se afișează o fereastră popîc [popup] la erori sau avertizări</target>
+<target>Va fi afișată o fereastră popîc [popup] la erori sau avertizări</target>
 
 <source>Ignore errors</source>
 <target>Erorile sînt ignorate</target>
@@ -203,9 +203,6 @@
 <pluralform>%x sec</pluralform>
 <pluralform>%x de sec</pluralform>
 </target>
-
-<source>Drag && drop</source>
-<target>Trage și pune un dosar peste compartimentul de mai jos sau selectează-l cu butonul de explorare</target>
 
 <source>Info</source>
 <target>Informații</target>
@@ -369,7 +366,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>FreeFileSync Batch Job</source>
 <target>Sarcină cu set de comenzi FreeFileSync</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Fila jurnal nu poate fi creată!</target>
 
 <source>Batch execution</source>
@@ -416,6 +413,24 @@ Linia de comandă este executată de fiecare dată cînd:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Necesită o conexiune la internet!)</target>
+
+<source>Drag && drop</source>
+<target>Trage și pune un dosar peste compartimentul de mai jos sau folosește butonul de explorare</target>
+
+<source>Close progress dialog</source>
+<target>Închide Fereastra cu Progresul Sincronizării</target>
+
+<source>Shut down</source>
+<target>Închide Calculatorul [Shut down]</target>
+
+<source>Log off</source>
+<target>Deloghează Utilizatorul [Log off]</target>
+
+<source>Standby</source>
+<target>Pune Calculatorul în Stare de Veghe [Stand-by]</target>
+
+<source>Hibernate</source>
+<target>Pune Calculatorul în Hibernare</target>
 
 <source>1. &Compare</source>
 <target>1. &Compară</target>
@@ -531,9 +546,6 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Filter files</source>
 <target>Filtru de Elemente</target>
 
-<source>Error handling</source>
-<target>Gestionarea Erorilor</target>
-
 <source>Left</source>
 <target>Stînga</target>
 
@@ -546,13 +558,16 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Status feedback</source>
 <target>Afișarea Stării</target>
 
-<source>Run minimized</source>
-<target>Rulare minimizată</target>
+<source>Show progress dialog</source>
+<target>Arată caseta de dialog cu progresul</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Gestionarea Erorilor</target>
+
+<source>Maximum number of log files:</source>
 <target>Numărul maxim de file jurnal:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Selectează un dosar pentru fila .log:</target>
 
 <source>Batch settings</source>
@@ -597,8 +612,8 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Deletion handling</source>
 <target>Gestionarea Ștergerii</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>La Terminare:</target>
 
 <source>Configuration</source>
 <target>Configurație</target>
@@ -626,6 +641,9 @@ Linia de comandă este executată de fiecare dată cînd:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Conflictul de file nu poate fi inclus într-o anumită categorie</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Compară după:</target>
@@ -829,7 +847,7 @@ Excluse: \stuff\temp\*
 <target>Varianta Sincronizării</target>
 
 <source>Statistics</source>
-<target>Statis.</target>
+<target>Statistici</target>
 
 <source>Find what:</source>
 <target>Găsește Asta:</target>
@@ -1084,20 +1102,17 @@ Excluse: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Abandonare solicitată: Se așteaptă terminarea operației în curs...</target>
 
-<source>Continue</source>
-<target>Continuă</target>
-
 <source>Pause</source>
 <target>Pauzează</target>
+
+<source>Continue</source>
+<target>Continuă</target>
 
 <source>Cannot find %x</source>
 <target>Nu pot găsi %x</target>
 
 <source>Inactive</source>
 <target>Dezactivat</target>
-
-<source>Last x hours</source>
-<target>Ultimele x ore</target>
 
 <source>Today</source>
 <target>Azi</target>
@@ -1180,16 +1195,16 @@ Excluse: \stuff\temp\*
 <target>Ștergere definitivă</target>
 
 <source>Delete or overwrite files permanently</source>
-<target>Filele sînt șterse sau suprascrise în mod definitiv</target>
+<target>Filele sînt șterse sau suprascrise în mod definitiv, fără a mai putea fi recuperate</target>
 
 <source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Se folosește Reciclatorul [Recycle Bin] cu ocazia ștergerii sau suprascrierii filelor</target>
+<target>Filele șterse sau suprascrise sînt puse în Reciclator [Recycle Bin], de unde pot fi recuperate la nevoie</target>
 
 <source>Versioning</source>
 <target>Versionare</target>
 
 <source>Move files into a time-stamped subdirectory</source>
-<target>Filele sînt mutate într-un subdosar cu marcaj de timp</target>
+<target>Filele sînt mutate într-un subdosar special cu marcaj de timp</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1419,11 +1434,11 @@ Excluse: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Creez fila %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Creez legătura simbolică %x</target>
-
 <source>Creating folder %x</source>
 <target>Creez dosarul %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Creez legătura simbolică %x</target>
 
 <source>Overwriting file %x</source>
 <target>Suprascriu fila %x</target>

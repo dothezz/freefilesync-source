@@ -93,13 +93,13 @@ struct XmlGuiConfig
 struct XmlBatchConfig
 {
     XmlBatchConfig() :
-        silent(false),
+        showProgress(true),
         logFileCountMax(200),
         handleError(ON_ERROR_POPUP) {}
 
     zen::MainConfiguration mainCfg;
 
-    bool silent;
+    bool showProgress;
     wxString logFileDirectory;
     size_t logFileCountMax;
     OnError handleError;       //reaction on error situation during synchronization
@@ -160,9 +160,9 @@ struct XmlGlobalSettings
     OptionalDialogs optDialogs;
 
     //---------------------------------------------------------------------
-    struct _Gui
+    struct Gui
     {
-        _Gui() :
+        Gui() :
             dlgPos(wxDefaultCoord, wxDefaultCoord),
             dlgSize(wxDefaultCoord, wxDefaultCoord),
             isMaximized(false),
@@ -170,6 +170,7 @@ struct XmlGlobalSettings
             autoAdjustColumnsLeft(false),
             autoAdjustColumnsRight(false),
             folderHistMax(15),
+            onCompletionHistoryMax(8),
             deleteOnBothSides(false),
             useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
 #ifdef FFS_WIN
@@ -180,17 +181,17 @@ struct XmlGlobalSettings
             iconSize(ICON_SIZE_SMALL),
             lastUpdateCheck(0)
         {
-            //default external apps will be translated "on the fly"!!!
+            //default external apps will be translated "on the fly"!!! First entry will be used for [Enter] or mouse double-click!
 #ifdef FFS_WIN
-            externelApplications.push_back(std::make_pair(wxT("Show in Explorer"), //mark for extraction: _("Show in Explorer")
-                                                          wxT("explorer /select, \"%name\"")));
-            externelApplications.push_back(std::make_pair(wxT("Open with default application"), //mark for extraction: _("Open with default application")
-                                                          wxT("\"%name\"")));
+            externelApplications.push_back(std::make_pair(L"Show in Explorer", //mark for extraction: _("Show in Explorer")
+                                                          L"explorer /select, \"%name\""));
+            externelApplications.push_back(std::make_pair(L"Open with default application", //mark for extraction: _("Open with default application")
+                                                          L"\"%name\""));
 #elif defined FFS_LINUX
-            externelApplications.push_back(std::make_pair(wxT("Browse directory"), //mark for extraction: _("Browse directory")
-                                                          wxT("xdg-open \"%dir\"")));
-            externelApplications.push_back(std::make_pair(wxT("Open with default application"), //mark for extraction: _("Open with default application")
-                                                          wxT("xdg-open \"%name\"")));
+            externelApplications.push_back(std::make_pair(L"Browse directory", //mark for extraction: _("Browse directory")
+                                                          L"xdg-open \"%dir\""));
+            externelApplications.push_back(std::make_pair(L"Open with default application", //mark for extraction: _("Open with default application")
+                                                          L"xdg-open \"%name\""));
 #endif
         }
 
@@ -215,6 +216,9 @@ struct XmlGlobalSettings
         std::vector<Zstring> folderHistoryRight;
         unsigned int folderHistMax;
 
+        std::vector<std::wstring> onCompletionHistory;
+        size_t onCompletionHistoryMax;
+
         bool deleteOnBothSides;
         bool useRecyclerForManualDeletion;
         bool textSearchRespectCase;
@@ -227,7 +231,7 @@ struct XmlGlobalSettings
     } gui;
 
     //---------------------------------------------------------------------
-    //struct _Batch
+    //struct Batch
 };
 
 

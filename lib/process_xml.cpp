@@ -736,27 +736,24 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
 void readConfig(const XmlIn& in, MainConfiguration& mainCfg)
 {
     //read compare settings
-    XmlIn inCmp = in["MainConfig"]["Comparison"];
+    XmlIn inMain = in["MainConfig"];
 
-    readConfig(inCmp, mainCfg.cmpConfig);
+    readConfig(inMain["Comparison"], mainCfg.cmpConfig);
     //###########################################################
-
-    XmlIn inSync = in["MainConfig"]["SyncConfig"];
 
     //read sync configuration
-    readConfig(inSync, mainCfg.syncCfg);
+    readConfig(inMain["SyncConfig"], mainCfg.syncCfg);
     //###########################################################
 
-    XmlIn inFilter = in["MainConfig"]["GlobalFilter"];
     //read filter settings
-    readConfig(inFilter, mainCfg.globalFilter);
+    readConfig(inMain["GlobalFilter"], mainCfg.globalFilter);
 
     //###########################################################
     //read all folder pairs
     mainCfg.additionalPairs.clear();
 
     bool firstIter = true;
-    for (XmlIn inPair = in["MainConfig"]["FolderPairs"]["Pair"]; inPair; inPair.next())
+    for (XmlIn inPair = inMain["FolderPairs"]["Pair"]; inPair; inPair.next())
     {
         FolderPairEnh newPair;
         readConfig(inPair, newPair);
@@ -769,6 +766,8 @@ void readConfig(const XmlIn& in, MainConfiguration& mainCfg)
         else
             mainCfg.additionalPairs.push_back(newPair); //set additional folder pairs
     }
+
+    inMain["ExecuteWhenFinished"](mainCfg.onCompletion);
 }
 
 
@@ -792,7 +791,16 @@ void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
     //read GUI specific config data
     XmlIn inBatchCfg = in["BatchConfig"];
 
-    inBatchCfg["Silent"          ](config.silent);
+    //-----------------------------------------------------------------------------
+    if (inBatchCfg["Silent"])
+    {
+        inBatchCfg["Silent"](config.showProgress);
+        config.showProgress = !config.showProgress;
+    }
+    else
+        //-----------------------------------------------------------------------------
+
+        inBatchCfg["ShowProgress"    ](config.showProgress);
     inBatchCfg["LogfileDirectory"](config.logFileDirectory);
     inBatchCfg["LogfileCountMax" ](config.logFileCountMax);
     inBatchCfg["HandleError"     ](config.handleError);
@@ -828,14 +836,20 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     //gui specific global settings (optional)
     XmlIn inGui = in["Gui"];
-    XmlIn inWnd = inGui["Windows"]["Main"];
+    XmlIn inWnd = inGui["MainDialog"];
 
     //read application window size and position
-    inWnd["Width"    ](config.gui.dlgSize.x);
-    inWnd["Height"   ](config.gui.dlgSize.y);
-    inWnd["PosX"     ](config.gui.dlgPos.x);
-    inWnd["PosY"     ](config.gui.dlgPos.y);
-    inWnd["Maximized"](config.gui.isMaximized);
+    inWnd.attribute("Width",     config.gui.dlgSize.x);
+    inWnd.attribute("Height",    config.gui.dlgSize.y);
+    inWnd.attribute("PosX",      config.gui.dlgPos.x);
+    inWnd.attribute("PosY",      config.gui.dlgPos.y);
+    inWnd.attribute("Maximized", config.gui.isMaximized);
+
+    //    inWnd["Width"    ](config.gui.dlgSize.x);
+    //    inWnd["Height"   ](config.gui.dlgSize.y);
+    //    inWnd["PosX"     ](config.gui.dlgPos.x);
+    //    inWnd["PosY"     ](config.gui.dlgPos.y);
+    //    inWnd["Maximized"](config.gui.isMaximized);
 
     inWnd["MaxFolderPairsVisible"](config.gui.maxFolderPairsVisible);
 
@@ -862,10 +876,14 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     for (size_t i = 0; i < config.gui.columnAttribRight.size(); ++i)
         config.gui.columnAttribRight[i].position = i;
 
-    inWnd["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
-    inWnd["FolderHistoryRight"](config.gui.folderHistoryRight);
-    inWnd["MaximumHistorySize"](config.gui.folderHistMax);
     inWnd["Perspective"       ](config.gui.guiPerspectiveLast);
+
+    inGui["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
+    inGui["FolderHistoryRight"](config.gui.folderHistoryRight);
+    inGui["FolderHistoryLeft"].attribute("MaxSize", config.gui.folderHistMax);
+
+    inGui["OnCompletionHistory"](config.gui.onCompletionHistory);
+    inGui["OnCompletionHistory"].attribute("MaxSize", config.gui.onCompletionHistoryMax);
 
     //external applications
     inGui["ExternalApplications"](config.gui.externelApplications);
@@ -1002,24 +1020,26 @@ void writeConfigFolderPair(const FolderPairEnh& enhPair, XmlOut& out)
 
 void writeConfig(const MainConfiguration& mainCfg, XmlOut& out)
 {
-    XmlOut outCmp = out["MainConfig"]["Comparison"];
+    XmlOut outMain = out["MainConfig"];
+
+    XmlOut outCmp = outMain["Comparison"];
 
     writeConfig(mainCfg.cmpConfig, outCmp);
     //###########################################################
 
-    XmlOut outSync = out["MainConfig"]["SyncConfig"];
+    XmlOut outSync = outMain["SyncConfig"];
 
     writeConfig(mainCfg.syncCfg, outSync);
     //###########################################################
 
-    XmlOut outFilter = out["MainConfig"]["GlobalFilter"];
+    XmlOut outFilter = outMain["GlobalFilter"];
     //write filter settings
     writeConfig(mainCfg.globalFilter, outFilter);
 
     //###########################################################
     //write all folder pairs
 
-    XmlOut outFp = out["MainConfig"]["FolderPairs"];
+    XmlOut outFp = outMain["FolderPairs"];
 
     //write first folder pair
     writeConfigFolderPair(mainCfg.firstPair, outFp);
@@ -1027,6 +1047,8 @@ void writeConfig(const MainConfiguration& mainCfg, XmlOut& out)
     //write additional folder pairs
     std::for_each(mainCfg.additionalPairs.begin(), mainCfg.additionalPairs.end(),
     [&](const FolderPairEnh& fp) { writeConfigFolderPair(fp, outFp); });
+
+    outMain["ExecuteWhenFinished"](mainCfg.onCompletion);
 }
 
 
@@ -1050,7 +1072,7 @@ void writeConfig(const XmlBatchConfig& config, XmlOut& out)
     //write GUI specific config data
     XmlOut outBatchCfg = out["BatchConfig"];
 
-    outBatchCfg["Silent"          ](config.silent);
+    outBatchCfg["ShowProgress"    ](config.showProgress);
     outBatchCfg["LogfileDirectory"](config.logFileDirectory);
     outBatchCfg["LogfileCountMax" ](config.logFileCountMax);
     outBatchCfg["HandleError"     ](config.handleError);
@@ -1077,23 +1099,23 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outOpt["CheckForDependentFolders"     ](config.optDialogs.warningDependentFolders);
     outOpt["CheckForMultipleWriteAccess"  ](config.optDialogs.warningMultiFolderWriteAccess);
     outOpt["CheckForSignificantDifference"](config.optDialogs.warningSignificantDifference);
-    outOpt["CheckForFreeDiskSpace"](config.optDialogs.warningNotEnoughDiskSpace);
-    outOpt["CheckForUnresolvedConflicts"](config.optDialogs.warningUnresolvedConflicts);
-    outOpt["NotifyDatabaseError"](config.optDialogs.warningSyncDatabase);
-    outOpt["CheckMissingRecycleBin"](config.optDialogs.warningRecyclerMissing);
-    outOpt["PopupOnConfigChange"](config.optDialogs.popupOnConfigChange);
-    outOpt["SummaryBeforeSync"  ](config.optDialogs.showSummaryBeforeSync);
+    outOpt["CheckForFreeDiskSpace"        ](config.optDialogs.warningNotEnoughDiskSpace);
+    outOpt["CheckForUnresolvedConflicts"  ](config.optDialogs.warningUnresolvedConflicts);
+    outOpt["NotifyDatabaseError"          ](config.optDialogs.warningSyncDatabase);
+    outOpt["CheckMissingRecycleBin"       ](config.optDialogs.warningRecyclerMissing);
+    outOpt["PopupOnConfigChange"          ](config.optDialogs.popupOnConfigChange);
+    outOpt["SummaryBeforeSync"            ](config.optDialogs.showSummaryBeforeSync);
 
     //gui specific global settings (optional)
     XmlOut outGui = out["Gui"];
-    XmlOut outWnd = outGui["Windows"]["Main"];
+    XmlOut outWnd = outGui["MainDialog"];
 
     //write application window size and position
-    outWnd["Width"    ](config.gui.dlgSize.x);
-    outWnd["Height"   ](config.gui.dlgSize.y);
-    outWnd["PosX"     ](config.gui.dlgPos.x);
-    outWnd["PosY"     ](config.gui.dlgPos.y);
-    outWnd["Maximized"](config.gui.isMaximized);
+    outWnd.attribute("Width",     config.gui.dlgSize.x);
+    outWnd.attribute("Height",    config.gui.dlgSize.y);
+    outWnd.attribute("PosX",      config.gui.dlgPos.x);
+    outWnd.attribute("PosY",      config.gui.dlgPos.y);
+    outWnd.attribute("Maximized", config.gui.isMaximized);
 
     outWnd["MaxFolderPairsVisible"](config.gui.maxFolderPairsVisible);
 
@@ -1107,27 +1129,29 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
     //write column attributes
     XmlOut outColLeft = outWnd["LeftColumns"];
-    outColLeft.attribute("AutoAdjust",    config.gui.autoAdjustColumnsLeft);
-
+    outColLeft.attribute("AutoAdjust", config.gui.autoAdjustColumnsLeft);
     outColLeft(config.gui.columnAttribLeft);
 
     //###########################################################
     XmlOut outColRight = outWnd["RightColumns"];
-    outColRight.attribute("AutoAdjust",    config.gui.autoAdjustColumnsRight);
-
+    outColRight.attribute("AutoAdjust", config.gui.autoAdjustColumnsRight);
     outColRight(config.gui.columnAttribRight);
 
-    outWnd["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
-    outWnd["FolderHistoryRight"](config.gui.folderHistoryRight);
-    outWnd["MaximumHistorySize"](config.gui.folderHistMax);
     outWnd["Perspective"       ](config.gui.guiPerspectiveLast);
+
+    outGui["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
+    outGui["FolderHistoryRight"](config.gui.folderHistoryRight);
+    outGui["FolderHistoryLeft" ].attribute("MaxSize", config.gui.folderHistMax);
+
+    outGui["OnCompletionHistory"](config.gui.onCompletionHistory);
+    outGui["OnCompletionHistory"].attribute("MaxSize", config.gui.onCompletionHistoryMax);
 
     //external applications
     outGui["ExternalApplications"](config.gui.externelApplications);
 
     //load config file history
     outGui["LastConfigActive"](config.gui.lastUsedConfigFiles);
-    outGui["ConfigHistory"](config.gui.cfgFileHistory);
+    outGui["ConfigHistory"   ](config.gui.cfgFileHistory);
 
     //last update check
     outGui["LastUpdateCheck"](config.gui.lastUpdateCheck);

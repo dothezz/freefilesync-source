@@ -28,11 +28,11 @@ size_t getDigitCount(size_t number)
 }
 
 
-std::wstring zen::filesizeToShortString(UInt64 size)
+std::wstring zen::filesizeToShortString(Int64 size)
 {
-    if (to<Int64>(size) < 0) return _("Error");
+    //if (to<Int64>(size) < 0) return _("Error"); -> really? there's one exceptional case: a failed rename operation falls-back to copy + delete, reducing "bytes transferred" to potentially < 0!
 
-    if (size <= 999U)
+    if (numeric::abs(size) <= 999)
         return replaceCpy(_P("1 Byte", "%x Bytes", to<int>(size)),
                           L"%x",
                           toString<std::wstring>(size));
@@ -42,19 +42,19 @@ std::wstring zen::filesizeToShortString(UInt64 size)
 
         filesize /= 1024;
         std::wstring output = _("%x KB");
-        if (filesize > 999)
+        if (numeric::abs(filesize) > 999)
         {
             filesize /= 1024;
             output = _("%x MB");
-            if (filesize > 999)
+            if (numeric::abs(filesize) > 999)
             {
                 filesize /= 1024;
                 output = _("%x GB");
-                if (filesize > 999)
+                if (numeric::abs(filesize) > 999)
                 {
                     filesize /= 1024;
                     output = _("%x TB");
-                    if (filesize > 999)
+                    if (numeric::abs(filesize) > 999)
                     {
                         filesize /= 1024;
                         output = _("%x PB");
@@ -63,13 +63,13 @@ std::wstring zen::filesizeToShortString(UInt64 size)
             }
         }
         //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
-        const size_t leadDigitCount = getDigitCount(static_cast<size_t>(filesize)); //number of digits before decimal point
+        const size_t leadDigitCount = getDigitCount(static_cast<size_t>(numeric::abs(filesize))); //number of digits before decimal point
         if (leadDigitCount == 0 || leadDigitCount > 3)
             return _("Error");
 
         wchar_t buffer[50];
 #ifdef __MINGW32__
-        int charsWritten = ::snwprintf(buffer, 50, L"%.*f", static_cast<int>(3 - leadDigitCount), filesize); //MinGW does not comply to the C standard here
+        int charsWritten =   ::snwprintf(buffer, 50, L"%.*f", static_cast<int>(3 - leadDigitCount), filesize); //MinGW does not comply to the C standard here
 #else
         int charsWritten = std::swprintf(buffer, 50, L"%.*f", static_cast<int>(3 - leadDigitCount), filesize);
 #endif
@@ -144,9 +144,16 @@ std::wstring zen::fractionToShortString(double fraction)
 std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 {
     std::wstring output(number);
-    for (size_t i = output.size(); i > 3; i -= 3)
-        output.insert(i - 3, zen::getThousandsSeparator());
-
+    size_t i = output.size();
+    for (;;)
+    {
+        if (i <= 3)
+            break;
+        i -= 3;
+        if (!cStringIsDigit(output[i - 1]))
+            break;
+        output.insert(i, zen::getThousandsSeparator());
+    }
     return output;
 }
 

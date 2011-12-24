@@ -202,9 +202,6 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Træk && slip</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -366,7 +363,7 @@ Kommando linjen bliver afviklet hver gang:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Batch Job</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Kan ikke oprette logfil!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ Kommando linjen bliver afviklet hver gang:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Kræver en Internet forbindelse!)</target>
+
+<source>Drag && drop</source>
+<target>Træk && slip</target>
+
+<source>Close progress dialog</source>
+<target>Luk dialog boksen</target>
+
+<source>Shut down</source>
+<target>Luk ned</target>
+
+<source>Log off</source>
+<target>Log af</target>
+
+<source>Standby</source>
+<target>Standby</target>
+
+<source>Hibernate</source>
+<target>Dvale</target>
 
 <source>1. &Compare</source>
 <target>1. &Sammenlign</target>
@@ -528,9 +543,6 @@ Kommando linjen bliver afviklet hver gang:
 <source>Filter files</source>
 <target>Filter filer</target>
 
-<source>Error handling</source>
-<target>Fejl håndtering</target>
-
 <source>Left</source>
 <target>Venstre</target>
 
@@ -543,13 +555,16 @@ Kommando linjen bliver afviklet hver gang:
 <source>Status feedback</source>
 <target>Status feedback</target>
 
-<source>Run minimized</source>
-<target>Kør minimeret</target>
+<source>Show progress dialog</source>
+<target>Vis dialog boks</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Fejl håndtering</target>
+
+<source>Maximum number of log files:</source>
 <target>Maksimalt antal log filer:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Vælg log fil bibliotek:</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ Kommando linjen bliver afviklet hver gang:
 <source>Deletion handling</source>
 <target>Slette håndtering</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>Før færdiggørelse:</target>
 
 <source>Configuration</source>
 <target>Konfiguration</target>
@@ -623,6 +638,9 @@ Kommando linjen bliver afviklet hver gang:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikt/filen kan ikke kategoriseres</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Sammenlign ved...</target>
@@ -1077,20 +1095,17 @@ Udeluk: \ting\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Afbrydelse: Venter på nuværende opgave afsluttes...</target>
 
-<source>Continue</source>
-<target>Fortsæt</target>
-
 <source>Pause</source>
 <target>Pause</target>
+
+<source>Continue</source>
+<target>Fortsæt</target>
 
 <source>Cannot find %x</source>
 <target>Kan ikke finde %x</target>
 
 <source>Inactive</source>
 <target>Inaktiv</target>
-
-<source>Last x hours</source>
-<target>Sidste x timer</target>
 
 <source>Today</source>
 <target>Idag</target>
@@ -1407,11 +1422,11 @@ Udeluk: \ting\temp\*
 <source>Creating file %x</source>
 <target>Opretter filen %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Opretter linket %x</target>
-
 <source>Creating folder %x</source>
 <target>Opretter mappe %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Opretter linket %x</target>
 
 <source>Overwriting file %x</source>
 <target>Overskriver filen %x</target>

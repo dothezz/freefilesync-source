@@ -87,6 +87,7 @@ public:
 
 private:
     void OnKeyEvent(wxKeyEvent& event);
+    void OnMouseWheel(wxMouseEvent& event);
     void OnSelection(wxCommandEvent& event);
     void OnUpdateList(wxEvent& event) { setValueAndUpdateList(GetValue()); event.Skip(); }
 

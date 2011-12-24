@@ -202,9 +202,6 @@
 <pluralform>%x másodperc</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Húzd && Ejtsd</target>
-
 <source>Info</source>
 <target>Információ</target>
 
@@ -366,7 +363,7 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync kötegelt feladat</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Nem lehet létrehozni a naplófájlt!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ A parancssor végrehajtódik minden alkalommal, ha:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Internetkapcsolat szükséges!)</target>
+
+<source>Drag && drop</source>
+<target>Húzd && Ejtsd</target>
+
+<source>Close progress dialog</source>
+<target></target>
+
+<source>Shut down</source>
+<target></target>
+
+<source>Log off</source>
+<target></target>
+
+<source>Standby</source>
+<target></target>
+
+<source>Hibernate</source>
+<target></target>
 
 <source>1. &Compare</source>
 <target>1. &Összehasonlítás</target>
@@ -528,9 +543,6 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Filter files</source>
 <target>Fájlok szűrése</target>
 
-<source>Error handling</source>
-<target>Hibakezelés</target>
-
 <source>Left</source>
 <target>Bal oldal</target>
 
@@ -543,13 +555,16 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Status feedback</source>
 <target>Státusz visszajelzés</target>
 
-<source>Run minimized</source>
-<target>Indítás lekicsinyítve</target>
+<source>Show progress dialog</source>
+<target></target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Hibakezelés</target>
+
+<source>Maximum number of log files:</source>
 <target>Naplófájlok maximális száma:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Naplófájl mappájának kiválasztása:</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Deletion handling</source>
 <target>Törlések kezelése</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target></target>
 
 <source>Configuration</source>
 <target>Beállítás</target>
@@ -623,6 +638,9 @@ A parancssor végrehajtódik minden alkalommal, ha:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Kategorizálhatatlan ütközések/fájlok</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Összehasonlítás</target>
@@ -1078,20 +1096,17 @@ Kizárni: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Megszakítási kérelem: Várakozás a folyamatban lévő művelet befejezésére...</target>
 
-<source>Continue</source>
-<target>Folytatás</target>
-
 <source>Pause</source>
 <target>Szünet</target>
+
+<source>Continue</source>
+<target>Folytatás</target>
 
 <source>Cannot find %x</source>
 <target>Nem található: %x</target>
 
 <source>Inactive</source>
 <target>Inaktív</target>
-
-<source>Last x hours</source>
-<target>Utolsó x óra</target>
 
 <source>Today</source>
 <target>Mai</target>
@@ -1408,11 +1423,11 @@ Kizárni: \stuff\temp\*
 <source>Creating file %x</source>
 <target>%x fájl létrehozása</target>
 
-<source>Creating symbolic link %x</source>
-<target>%x symlink létrehozása</target>
-
 <source>Creating folder %x</source>
 <target>%x mappa létrehozása</target>
+
+<source>Creating symbolic link %x</source>
+<target>%x symlink létrehozása</target>
 
 <source>Overwriting file %x</source>
 <target>%x fájl felülírása</target>

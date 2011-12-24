@@ -10,7 +10,7 @@
 #include "gui_generated.h"
 #include <vector>
 #include <memory>
-#include "../lib/dir_name.h"
+#include "../ui/dir_name.h"
 #include <wx+/dir_picker.h>
 
 namespace xmlAccess
@@ -64,7 +64,7 @@ private:
 
     void addFolder(const wxString& dirname, bool addFront = false);
     void addFolder(const std::vector<wxString>& newFolders, bool addFront = false);
-    void removeAddFolder(const int pos); //keep it an int, allow negative values!
+    void removeAddFolder(int pos); //keep it an int, allow negative values!
     void clearAddFolders();
 
     static const wxString& lastConfigFileName();

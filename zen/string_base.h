@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include "string_tools.h"
 #include <boost/detail/atomic_count.hpp>
 
@@ -76,7 +77,7 @@ protected:
         newDescr->length   = size;
         newDescr->capacity = newCapacity;
 
-        return reinterpret_cast<Char*>(newDescr + 1);
+        return reinterpret_cast<Char*>(newDescr + 1); //alignment note: "newDescr + 1" is Descriptor-aligned, which is larger than alignment for Char-array! => no problem!
     }
 
     static Char* clone(Char* ptr)
@@ -101,8 +102,8 @@ protected:
 private:
     struct Descriptor
     {
-        size_t length;
-        size_t capacity; //allocated size without null-termination
+        std::uint32_t length;
+        std::uint32_t capacity; //allocated size without null-termination
     };
 
     static       Descriptor* descr(      Char* ptr) { return reinterpret_cast<      Descriptor*>(ptr) - 1; }
@@ -173,8 +174,8 @@ private:
         Descriptor(long rc, size_t len, size_t cap) : refCount(rc), length(len), capacity(cap) {}
 
         boost::detail::atomic_count refCount; //practically no perf loss: ~0.2%! (FFS comparison)
-        size_t length;
-        size_t capacity; //allocated size without null-termination
+        std::uint32_t length;
+        std::uint32_t capacity; //allocated size without null-termination
     };
 
     static       Descriptor* descr(      Char* ptr) { return reinterpret_cast<      Descriptor*>(ptr) - 1; }

@@ -8,7 +8,7 @@
 #define FOLDERPAIR_H_INCLUDED
 
 #include "../structures.h"
-#include "../lib/dir_name.h"
+#include "dir_name.h"
 #include "../lib/resources.h"
 #include "small_dlgs.h"
 #include "sync_cfg.h"
@@ -189,6 +189,7 @@ private:
 
         if (showSyncConfigDlg(cmpCfg.compareVar,
                               syncCfg,
+                              NULL,
                               NULL) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
         {
             altSyncConfig = std::make_shared<SyncConfig>(syncCfg);

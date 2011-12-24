@@ -22,6 +22,7 @@
 #include "../lib/help_provider.h"
 #include <wx+/image_tools.h>
 #include <zen/stl_tools.h>
+#include "../lib/hard_filter.h"
 
 using namespace zen;
 
@@ -788,6 +789,7 @@ private:
     void OnClose(wxCloseEvent& event);
     void OnAddRow(wxCommandEvent& event);
     void OnRemoveRow(wxCommandEvent& event);
+    void OnResize(wxSizeEvent& event);
 
     void set(const xmlAccess::ExternalApps& extApp);
     xmlAccess::ExternalApps getExtApp();
@@ -830,10 +832,33 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
 
     m_gridCustomCommand->GetGridWindow()->SetToolTip(toolTip);
     m_gridCustomCommand->GetGridColLabelWindow()->SetToolTip(toolTip);
+    m_gridCustomCommand->SetMargins(0, 0);
 
     m_buttonOkay->SetFocus();
-
     Fit();
+
+    //automatically fit column width to match totl grid width
+    Connect(wxEVT_SIZE, wxSizeEventHandler(GlobalSettingsDlg::OnResize), NULL, this);
+    wxSizeEvent dummy;
+    OnResize(dummy);
+}
+
+
+void GlobalSettingsDlg::OnResize(wxSizeEvent& event)
+{
+    const int widthTotal = m_gridCustomCommand->GetGridWindow()->GetClientSize().GetWidth() - 20;
+
+    if (widthTotal >= 0 && m_gridCustomCommand->GetCols() == 2)
+    {
+        const int w0 = widthTotal / 2;
+        const int w1 = widthTotal - w0;
+        m_gridCustomCommand->SetColumnWidth(0, w0);
+        m_gridCustomCommand->SetColumnWidth(1, w1);
+
+        m_gridCustomCommand->Refresh(); //required on Ubuntu
+    }
+
+    event.Skip();
 }
 
 
@@ -898,7 +923,7 @@ void GlobalSettingsDlg::set(const xmlAccess::ExternalApps& extApp)
         m_gridCustomCommand->SetCellValue(row, 0, iter->first);  //description
         m_gridCustomCommand->SetCellValue(row, 1, iter->second); //commandline
     }
-    Fit();
+    //Fit();
 }
 
 
@@ -925,8 +950,7 @@ void GlobalSettingsDlg::OnAddRow(wxCommandEvent& event)
         m_gridCustomCommand->InsertRows(selectedRow);
     else
         m_gridCustomCommand->AppendRows();
-
-    Fit();
+    //Fit();
 }
 
 
@@ -941,8 +965,7 @@ void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
             m_gridCustomCommand->DeleteRows(selectedRow);
         else
             m_gridCustomCommand->DeleteRows(m_gridCustomCommand->GetNumberRows() - 1);
-
-        Fit();
+        //Fit();
     }
 }
 

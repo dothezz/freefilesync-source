@@ -15,6 +15,8 @@
 #include <wx+/app_main.h>
 #include <zen/file_traverser.h>
 #include <zen/time.h>
+#include "exec_finished_box.h"
+#include <wx+/shell_execute.h>
 
 using namespace zen;
 
@@ -54,11 +56,10 @@ public:
     {
         logFile.Open(toWx(logfileName), wxT("w"));
         if (!logFile.IsOpened())
-            throw FileError(_("Unable to create logfile!") + L"\"" + logfileName + L"\"");
+            throw FileError(_("Unable to create log file!") + L"\"" + logfileName + L"\"");
 
         //write header
-        wxString headerLine = wxString(L"FreeFileSync - ") + _("Batch execution") +
-                              L" (" + _("Date") + L": " + formatTime<wxString>(FORMAT_DATE) +  L")"; //"Date" is used at other places, too
+        wxString headerLine = wxString(L"FreeFileSync - ") + _("Batch execution") + L" - " + formatTime<wxString>(FORMAT_DATE);
 
         logFile.Write(headerLine + wxChar('\n'));
         logFile.Write(wxString().Pad(headerLine.Len(), wxChar('-')) + wxChar('\n') + wxChar('\n'));
@@ -103,7 +104,7 @@ public:
         std::sort(logFiles.begin(), logFiles.end()); //take advantage of logfile naming convention to sort by age
 
         std::for_each(logFiles.begin(), logFiles.end() - maxCount,
-        [](const Zstring& filename) { try { zen::removeFile(filename); } catch (...) {} });
+        [](const Zstring& filename) { try { zen::removeFile(filename); } catch (FileError&) {} });
     }
 
     //Zstring getLogfileName() const { return logfileName; }
@@ -142,20 +143,22 @@ private:
 
 
 //##############################################################################################################################
-BatchStatusHandler::BatchStatusHandler(bool runSilent,
+BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        const wxString& jobName,
                                        const wxString& logfileDirectory,
                                        size_t logFileCountMax,
                                        const xmlAccess::OnError handleError,
                                        const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
-                                       int& returnVal) :
+                                       int& returnVal,
+                                       const std::wstring& execWhenFinished,
+                                       std::vector<std::wstring>& execFinishedHistory) :
     switchBatchToGui_(switchBatchToGui),
-    exitWhenFinished(runSilent), //=> exit immediately when finished
+    showFinalResults(showProgress), //=> exit immediately or wait when finished
     switchToGuiRequested(false),
     handleError_(handleError),
     currentProcess(StatusHandler::PROCESS_NONE),
     returnValue(returnVal),
-    syncStatusFrame(*this, NULL, SyncStatus::SCANNING, runSilent, jobName)
+    syncStatusFrame(*this, NULL, SyncStatus::SCANNING, showProgress, jobName, execWhenFinished, execFinishedHistory)
 {
     if (logFileCountMax > 0)
     {
@@ -215,21 +218,38 @@ BatchStatusHandler::~BatchStatusHandler()
         catch (...) {}
         syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
     }
-    else if (!exitWhenFinished || syncStatusFrame.getAsWindow()->IsShown()) //warning: wxWindow::Show() is called within processHasFinished()!
-    {
-        //notify about (logical) application main window => program won't quit, but stay on this dialog
-        zen::setMainWindow(syncStatusFrame.getAsWindow());
-
-        //notify to syncStatusFrame that current process has ended
-        if (abortIsRequested())
-            syncStatusFrame.processHasFinished(SyncStatus::ABORTED, errorLog);  //enable okay and close events
-        else if (totalErrors > 0)
-            syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, errorLog);
-        else
-            syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, errorLog);
-    }
     else
-        syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
+    {
+        if (syncStatusFrame.getAsWindow()->IsShown())
+            showFinalResults = true;
+
+        //execute "on completion" command (even in case of ignored errors)
+        if (!abortIsRequested()) //if aborted (manually), we don't execute the command
+        {
+            const std::wstring finalCommand = syncStatusFrame.getExecWhenFinishedCommand(); //final value (after possible user modification)
+            if (isCloseProgressDlgCommand(finalCommand))
+                showFinalResults = false; //take precedence over current visibility status
+            else if (!finalCommand.empty())
+                shellExecute(finalCommand);
+        }
+
+
+        if (showFinalResults) //warning: wxWindow::Show() is called within processHasFinished()!
+        {
+            //notify about (logical) application main window => program won't quit, but stay on this dialog
+            zen::setMainWindow(syncStatusFrame.getAsWindow());
+
+            //notify to syncStatusFrame that current process has ended
+            if (abortIsRequested())
+                syncStatusFrame.processHasFinished(SyncStatus::ABORTED, errorLog);  //enable okay and close events
+            else if (totalErrors > 0)
+                syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, errorLog);
+            else
+                syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, errorLog);
+        }
+        else
+            syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
+    }
 }
 
 
@@ -240,16 +260,13 @@ void BatchStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, 
     switch (currentProcess)
     {
         case StatusHandler::PROCESS_SCANNING:
-            syncStatusFrame.resetGauge(0, 0); //initialize some gui elements (remaining time, speed)
-            syncStatusFrame.setCurrentStatus(SyncStatus::SCANNING);
+            syncStatusFrame.initNewProcess(SyncStatus::SCANNING, 0, 0); //initialize some gui elements (remaining time, speed)
             break;
         case StatusHandler::PROCESS_COMPARING_CONTENT:
-            syncStatusFrame.resetGauge(objectsTotal, dataTotal);
-            syncStatusFrame.setCurrentStatus(SyncStatus::COMPARING_CONTENT);
+            syncStatusFrame.initNewProcess(SyncStatus::COMPARING_CONTENT, objectsTotal, dataTotal);
             break;
         case StatusHandler::PROCESS_SYNCHRONIZING:
-            syncStatusFrame.resetGauge(objectsTotal, dataTotal);
-            syncStatusFrame.setCurrentStatus(SyncStatus::SYNCHRONIZING);
+            syncStatusFrame.initNewProcess(SyncStatus::SYNCHRONIZING, objectsTotal, dataTotal);
             break;
         case StatusHandler::PROCESS_NONE:
             assert(false);
@@ -258,16 +275,16 @@ void BatchStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, 
 }
 
 
-void BatchStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed)
+void BatchStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
 {
     switch (currentProcess)
     {
         case StatusHandler::PROCESS_SCANNING:
-            syncStatusFrame.incScannedObjects_NoUpdate(objectsProcessed); //throw ()
+            syncStatusFrame.incScannedObjects_NoUpdate(objectsDelta); //throw ()
             break;
         case StatusHandler::PROCESS_COMPARING_CONTENT:
         case StatusHandler::PROCESS_SYNCHRONIZING:
-            syncStatusFrame.incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
+            syncStatusFrame.incProcessedData_NoUpdate(objectsDelta, dataDelta);
             break;
         case StatusHandler::PROCESS_NONE:
             assert(false);
@@ -275,6 +292,13 @@ void BatchStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 da
     }
 
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!
+}
+
+
+void BatchStatusHandler::updateTotalData(int objectsDelta, Int64 dataDelta)
+{
+    assert(currentProcess != PROCESS_SCANNING);
+    syncStatusFrame.incTotalData_NoUpdate(objectsDelta, dataDelta);
 }
 
 
@@ -305,6 +329,7 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
     {
         case xmlAccess::ON_ERROR_POPUP:
         {
+            PauseTimers dummy(syncStatusFrame);
             forceUiRefresh();
 
             bool dontWarnAgain = false;
@@ -345,12 +370,13 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
     {
         case xmlAccess::ON_ERROR_POPUP:
         {
+            PauseTimers dummy(syncStatusFrame);
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
             switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
                                  errorMessage,
-                                 ignoreNextErrors))
+                                 &ignoreNextErrors))
             {
                 case ReturnErrorDlg::BUTTON_IGNORE:
                     if (ignoreNextErrors) //falsify only
@@ -380,16 +406,47 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
 
     assert(false);
     return ProcessCallback::IGNORE_ERROR; //dummy value
-
 }
 
 
 void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
 {
-    if (handleError_ == xmlAccess::ON_ERROR_POPUP)
-        exitWhenFinished = false; //log fatal error and show it on status dialog
-
     errorLog.logMsg(errorMessage, TYPE_FATAL_ERROR);
+
+    switch (handleError_)
+    {
+        case xmlAccess::ON_ERROR_POPUP:
+        {
+            PauseTimers dummy(syncStatusFrame);
+            forceUiRefresh();
+
+            bool ignoreNextErrors = false;
+            switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_ABORT,
+                                 errorMessage,
+                                 &ignoreNextErrors))
+            {
+                case ReturnErrorDlg::BUTTON_IGNORE:
+                    if (ignoreNextErrors) //falsify only
+                        handleError_ = xmlAccess::ON_ERROR_IGNORE;
+                    break;
+
+                case ReturnErrorDlg::BUTTON_ABORT:
+                    abortThisProcess();
+                    break;
+
+                case ReturnErrorDlg::BUTTON_RETRY:
+                    assert(false);
+            }
+        }
+        break;
+
+        case xmlAccess::ON_ERROR_EXIT: //abort
+            abortThisProcess();
+            break;
+
+        case xmlAccess::ON_ERROR_IGNORE:
+            break;
+    }
 }
 
 

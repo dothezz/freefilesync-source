@@ -7,6 +7,7 @@
 #ifndef DEPRECATE_HEADER_2348970348
 #define DEPRECATE_HEADER_2348970348
 
+//compiler macros: http://predef.sourceforge.net/precomp.html
 #ifdef __GNUC__
 #define ZEN_DEPRECATE __attribute__ ((deprecated))
 

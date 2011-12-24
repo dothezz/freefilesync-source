@@ -200,9 +200,6 @@
 <pluralform>%x 秒.</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>ドラッグ && ドロップ</target>
-
 <source>Info</source>
 <target>情報</target>
 
@@ -346,7 +343,7 @@ The command line is executed each time:
 <target>監視を開始します...</target>
 
 <source>Waiting for missing directories...</source>
-<target>見失ったディレクトリの待機中</target>
+<target>見失ったディレクトリの待機中...</target>
 
 <source>A directory input field is empty.</source>
 <target>ディレクトリが入力されていません</target>
@@ -363,7 +360,7 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync 一括ジョブ</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>ログファイルを作成出来ません!</target>
 
 <source>Batch execution</source>
@@ -410,6 +407,24 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(インターネット接続を必要とします!)</target>
+
+<source>Drag && drop</source>
+<target>ドラッグ && ドロップ</target>
+
+<source>Close progress dialog</source>
+<target>進捗ダイアログを閉じる</target>
+
+<source>Shut down</source>
+<target>シャットダウン</target>
+
+<source>Log off</source>
+<target>ログオフ</target>
+
+<source>Standby</source>
+<target>スタンバイ</target>
+
+<source>Hibernate</source>
+<target>休止状態</target>
 
 <source>1. &Compare</source>
 <target>1. 比較(&C)</target>
@@ -525,9 +540,6 @@ The command line is executed each time:
 <source>Filter files</source>
 <target>ファイルフィルター</target>
 
-<source>Error handling</source>
-<target>ハンドリングのエラー時:</target>
-
 <source>Left</source>
 <target>左側</target>
 
@@ -540,13 +552,16 @@ The command line is executed each time:
 <source>Status feedback</source>
 <target>状態 フィードバック</target>
 
-<source>Run minimized</source>
-<target>最小化で起動</target>
+<source>Show progress dialog</source>
+<target>進捗ダイアログを表示</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>ハンドリングのエラー時:</target>
+
+<source>Maximum number of log files:</source>
 <target>ログファイルの最大数:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>ログファイルの保存先を選択:</target>
 
 <source>Batch settings</source>
@@ -591,8 +606,8 @@ The command line is executed each time:
 <source>Deletion handling</source>
 <target>削除の取り扱い</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>完了時:</target>
 
 <source>Configuration</source>
 <target>構成設定</target>
@@ -620,6 +635,9 @@ The command line is executed each time:
 
 <source>Conflict/file cannot be categorized</source>
 <target>競合があるため分類できません</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>比較対象...</target>
@@ -655,7 +673,7 @@ is the same
 <target>ファイルの内容</target>
 
 <source>Symbolic Link handling</source>
-<target>シンボリックリンク・リンクの取り扱い</target>
+<target>シンボリック・リンクの取り扱い</target>
 
 <source>Synchronizing...</source>
 <target>同期処理中...</target>
@@ -694,7 +712,7 @@ is the same
 <target>翻訳エラーの詳細</target>
 
 <source>Published under the GNU General Public License:</source>
-<target>Published under the GNU General Public License:</target>
+<target>Published under the GNU General Public Licence:</target>
 
 <source>Ignore subsequent errors</source>
 <target>以降のエラーを無視</target>
@@ -805,7 +823,7 @@ Exclude: \stuff\temp\*
 <target>ファイルとディレクトリのパーミッション転送(管理者権限が必要)</target>
 
 <source>Hidden dialogs:</source>
-<target>ダイアログを隠す</target>
+<target>ダイアログを隠す:</target>
 
 <source>Reset</source>
 <target>リセット</target>
@@ -871,7 +889,7 @@ Exclude: \stuff\temp\*
 <target>カスタマイズ...</target>
 
 <source>Select time span...</source>
-<target>タイムスパンを選択</target>
+<target>タイムスパンを選択...</target>
 
 <source>Auto-adjust columns</source>
 <target>列の自動調整</target>
@@ -1070,20 +1088,17 @@ Exclude: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>ユーザによる中断: 現在の処理を終了しています.. お待ちください...</target>
 
-<source>Continue</source>
-<target>続行</target>
-
 <source>Pause</source>
 <target>一時停止</target>
+
+<source>Continue</source>
+<target>続行</target>
 
 <source>Cannot find %x</source>
 <target>%x は見つかりません</target>
 
 <source>Inactive</source>
 <target>非アクティブ</target>
-
-<source>Last x hours</source>
-<target>最後の x 時間</target>
 
 <source>Today</source>
 <target>今日</target>
@@ -1395,11 +1410,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>ファイル %x を作成中</target>
 
-<source>Creating symbolic link %x</source>
-<target>シンボリックリンク %x を作成中</target>
-
 <source>Creating folder %x</source>
 <target>フォルダ %x を作成中</target>
+
+<source>Creating symbolic link %x</source>
+<target>シンボリックリンク %x を作成中</target>
 
 <source>Overwriting file %x</source>
 <target>ファイル %x を上書き中</target>

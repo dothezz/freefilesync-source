@@ -86,7 +86,7 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
 
     for (std::vector<RefIndex>::const_iterator j = sortedRef.begin(); j != sortedRef.end(); ++j)
     {
-        const FileSystemObject* fsObj = getReferencedRow(*j);
+        const FileSystemObject* fsObj = FileSystemObject::retrieve(j->objId);
         if (fsObj)
         {
             //hide filtered row, if corresponding option is set
@@ -129,7 +129,7 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
             //calculate total number of bytes for each side
             getNumbers(*fsObj, output);
 
-            viewRef.push_back(*j);
+            viewRef.push_back(j->objId);
         }
     }
 
@@ -171,7 +171,7 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
 
     for (std::vector<RefIndex>::const_iterator j = sortedRef.begin(); j != sortedRef.end(); ++j)
     {
-        const FileSystemObject* fsObj = getReferencedRow(*j);
+        const FileSystemObject* fsObj = FileSystemObject::retrieve(j->objId);
         if (fsObj)
         {
             //hide filtered row, if corresponding option is set
@@ -227,7 +227,7 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
             //calculate total number of bytes for each side
             getNumbers(*fsObj, output);
 
-            viewRef.push_back(*j);
+            viewRef.push_back(j->objId);
         }
     }
 
@@ -241,19 +241,14 @@ void GridView::getAllFileRef(const std::set<size_t>& guiRows, std::vector<FileSy
 
     output.clear();
     output.reserve(guiRows.size());
-    for (std::set<size_t>::const_iterator i = guiRows.begin(); i != upperEnd; ++i)
+
+    std::for_each(guiRows.begin(), upperEnd,
+                  [&](size_t pos)
     {
-        FileSystemObject* fsObj = getReferencedRow(viewRef[*i]);
+        FileSystemObject* fsObj = FileSystemObject::retrieve(viewRef[pos]);
         if (fsObj)
             output.push_back(fsObj);
-    }
-}
-
-
-inline
-bool GridView::isInvalidRow(const RefIndex& ref) const
-{
-    return getReferencedRow(ref) == NULL;
+    });
 }
 
 
@@ -262,14 +257,14 @@ void GridView::removeInvalidRows()
     viewRef.clear();
 
     //remove rows that have been deleted meanwhile
-    vector_remove_if(sortedRef, [&](const RefIndex& refIdx) { return this->isInvalidRow(refIdx); });
+    vector_remove_if(sortedRef, [&](const RefIndex& refIdx) { return FileSystemObject::retrieve(refIdx.objId) == NULL; });
 }
 
 
 void GridView::clearAllRows()
 {
-    viewRef.clear();
-    sortedRef.clear();
+    std::vector<FileSystemObject::ObjectID>().swap(viewRef);   //free mem
+    std::vector<RefIndex>().swap(sortedRef); //
     folderCmp.clear();
 }
 
@@ -312,8 +307,8 @@ private:
 
 void GridView::setData(FolderComparison& newData)
 {
-    viewRef.clear();
-    sortedRef.clear();
+    clearAllRows();
+
     folderCmp.swap(newData);
 
     //fill sortedRef
@@ -324,24 +319,9 @@ void GridView::setData(FolderComparison& newData)
 
 //------------------------------------ SORTING TEMPLATES ------------------------------------------------
 template <bool ascending>
-class GridView::LessDirectoryPair : public std::binary_function<RefIndex, RefIndex, bool>
-{
-public:
-    bool operator()(const RefIndex a, const RefIndex b) const
-    {
-        return ascending ?
-               a.folderIndex < b.folderIndex :
-               a.folderIndex > b.folderIndex;
-    }
-};
-
-
-template <bool ascending>
 class GridView::LessRelativeName : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    LessRelativeName(const GridView& view) : m_view(view) {}
-
     bool operator()(const RefIndex a, const RefIndex b) const
     {
         //presort by folder pair
@@ -350,8 +330,8 @@ public:
                    a.folderIndex < b.folderIndex :
                    a.folderIndex > b.folderIndex;
 
-        const FileSystemObject* fsObjA = m_view.getReferencedRow(a);
-        const FileSystemObject* fsObjB = m_view.getReferencedRow(b);
+        const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
+        const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
         if (fsObjA == NULL) //invalid rows shall appear at the end
             return false;
         else if (fsObjB == NULL)
@@ -359,8 +339,6 @@ public:
 
         return lessRelativeName<ascending>(*fsObjA, *fsObjB);
     }
-private:
-    const GridView& m_view;
 };
 
 
@@ -368,12 +346,10 @@ template <bool ascending, zen::SelectedSide side>
 class GridView::LessShortFileName : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    LessShortFileName(const GridView& view) : m_view(view) {}
-
     bool operator()(const RefIndex a, const RefIndex b) const
     {
-        const FileSystemObject* fsObjA = m_view.getReferencedRow(a);
-        const FileSystemObject* fsObjB = m_view.getReferencedRow(b);
+        const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
+        const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
         if (fsObjA == NULL) //invalid rows shall appear at the end
             return false;
         else if (fsObjB == NULL)
@@ -381,8 +357,6 @@ public:
 
         return lessShortFileName<ascending, side>(*fsObjA, *fsObjB);
     }
-private:
-    const GridView& m_view;
 };
 
 
@@ -390,12 +364,10 @@ template <bool ascending, zen::SelectedSide side>
 class GridView::LessFilesize : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    LessFilesize(const GridView& view) : m_view(view) {}
-
     bool operator()(const RefIndex a, const RefIndex b) const
     {
-        const FileSystemObject* fsObjA = m_view.getReferencedRow(a);
-        const FileSystemObject* fsObjB = m_view.getReferencedRow(b);
+        const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
+        const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
         if (fsObjA == NULL) //invalid rows shall appear at the end
             return false;
         else if (fsObjB == NULL)
@@ -403,8 +375,6 @@ public:
 
         return lessFilesize<ascending, side>(*fsObjA, *fsObjB);
     }
-private:
-    const GridView& m_view;
 };
 
 
@@ -412,12 +382,10 @@ template <bool ascending, zen::SelectedSide side>
 class GridView::LessFiletime : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    LessFiletime(const GridView& view) : m_view(view) {}
-
     bool operator()(const RefIndex a, const RefIndex b) const
     {
-        const FileSystemObject* fsObjA = m_view.getReferencedRow(a);
-        const FileSystemObject* fsObjB = m_view.getReferencedRow(b);
+        const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
+        const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
         if (fsObjA == NULL) //invalid rows shall appear at the end
             return false;
         else if (fsObjB == NULL)
@@ -425,8 +393,6 @@ public:
 
         return lessFiletime<ascending, side>(*fsObjA, *fsObjB);
     }
-private:
-    const GridView& m_view;
 };
 
 
@@ -434,12 +400,10 @@ template <bool ascending, zen::SelectedSide side>
 class GridView::LessExtension : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    LessExtension(const GridView& view) : m_view(view) {}
-
     bool operator()(const RefIndex a, const RefIndex b) const
     {
-        const FileSystemObject* fsObjA = m_view.getReferencedRow(a);
-        const FileSystemObject* fsObjB = m_view.getReferencedRow(b);
+        const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
+        const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
         if (fsObjA == NULL) //invalid rows shall appear at the end
             return false;
         else if (fsObjB == NULL)
@@ -447,8 +411,6 @@ public:
 
         return lessExtension<ascending, side>(*fsObjA, *fsObjB);
     }
-private:
-    const GridView& m_view;
 };
 
 
@@ -456,12 +418,10 @@ template <bool ascending>
 class GridView::LessCmpResult : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    LessCmpResult(const GridView& view) : m_view(view) {}
-
     bool operator()(const RefIndex a, const RefIndex b) const
     {
-        const FileSystemObject* fsObjA = m_view.getReferencedRow(a);
-        const FileSystemObject* fsObjB = m_view.getReferencedRow(b);
+        const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
+        const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
         if (fsObjA == NULL) //invalid rows shall appear at the end
             return false;
         else if (fsObjB == NULL)
@@ -469,8 +429,6 @@ public:
 
         return lessCmpResult<ascending>(*fsObjA, *fsObjB);
     }
-private:
-    const GridView& m_view;
 };
 
 
@@ -478,12 +436,10 @@ template <bool ascending>
 class GridView::LessSyncDirection : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    LessSyncDirection(const GridView& view) : m_view(view) {}
-
     bool operator()(const RefIndex a, const RefIndex b) const
     {
-        const FileSystemObject* fsObjA = m_view.getReferencedRow(a);
-        const FileSystemObject* fsObjB = m_view.getReferencedRow(b);
+        const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
+        const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
         if (fsObjA == NULL) //invalid rows shall appear at the end
             return false;
         else if (fsObjB == NULL)
@@ -491,8 +447,6 @@ public:
 
         return lessSyncDirection<ascending>(*fsObjA, *fsObjB);
     }
-private:
-    const GridView& m_view;
 };
 
 //-------------------------------------------------------------------------------------------------------
@@ -524,44 +478,44 @@ void GridView::sortView(SortType type, bool onLeft, bool ascending)
     switch (type)
     {
         case SORT_BY_REL_NAME:
-            if      ( ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<true>(*this));
-            else if (!ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<false>(*this));
+            if      ( ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<true>());
+            else if (!ascending) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<false>());
             break;
         case SORT_BY_FILENAME:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  LEFT_SIDE >(*this));
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, RIGHT_SIDE>(*this));
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  LEFT_SIDE >());
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  RIGHT_SIDE>());
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, LEFT_SIDE >());
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, RIGHT_SIDE>());
             break;
         case SORT_BY_FILESIZE:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  LEFT_SIDE >(*this));
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, RIGHT_SIDE>(*this));
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  LEFT_SIDE >());
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  RIGHT_SIDE>());
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, LEFT_SIDE >());
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, RIGHT_SIDE>());
             break;
         case SORT_BY_DATE:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  LEFT_SIDE >(*this));
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, RIGHT_SIDE>(*this));
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  LEFT_SIDE >());
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  RIGHT_SIDE>());
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, LEFT_SIDE >());
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, RIGHT_SIDE>());
             break;
         case SORT_BY_EXTENSION:
-            if      ( ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  LEFT_SIDE >(*this));
-            else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, RIGHT_SIDE>(*this));
+            if      ( ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  LEFT_SIDE >());
+            else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  RIGHT_SIDE>());
+            else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, LEFT_SIDE >());
+            else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, RIGHT_SIDE>());
             break;
         case SORT_BY_CMP_RESULT:
-            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<true >(*this));
-            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<false>(*this));
+            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<true >());
+            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<false>());
             break;
         case SORT_BY_SYNC_DIRECTION:
-            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<true >(*this));
-            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<false>(*this));
+            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<true >());
+            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<false>());
             break;
         case SORT_BY_DIRECTORY:
-            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessDirectoryPair<true>());
-            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessDirectoryPair<false>());
+            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex < b.folderIndex; });
+            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), [](const RefIndex a, const RefIndex b) { return a.folderIndex > b.folderIndex; });
             break;
     }
 }

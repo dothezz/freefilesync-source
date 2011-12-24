@@ -1080,20 +1080,23 @@ void CustomGridRim::updateGridSizes()
     CustomGrid::updateGridSizes();
 
     //set row label size
+    if (GetRowLabelSize() > 0)
+    {
+        //SetRowLabelSize(wxGRID_AUTOSIZE); -> we can do better
+        wxClientDC dc(GetGridRowLabelWindow());
+        dc.SetFont(GetLabelFont());
 
-    //SetRowLabelSize(wxGRID_AUTOSIZE); -> we can do better
-    wxClientDC dc(GetGridRowLabelWindow());
-    dc.SetFont(GetLabelFont());
+        wxArrayString lines;
+        lines.push_back(GetRowLabelValue(GetNumberRows()));
 
-    wxArrayString lines;
-    lines.push_back(GetRowLabelValue(GetNumberRows()));
+        long width = 0;
+        long dummy = 0;
+        GetTextBoxSize(dc, lines, &width, &dummy);
 
-    long width = 0;
-    long dummy = 0;
-    GetTextBoxSize(dc, lines, &width, &dummy);
+        width += 8;
 
-    width += 8;
-    SetRowLabelSize(width);
+        SetRowLabelSize(width);
+    }
 }
 
 
@@ -1377,7 +1380,7 @@ void CustomGridRim::setTooltip(const wxMouseEvent& event)
                 virtual void visit(const FileMapping& fileObj)
                 {
                     tipMsg_ = copyStringTo<wxString>(std::wstring() + fileObj.getRelativeName<side>() + L"\n" +
-                                                     _("Size") + L": " + zen::filesizeToShortString(fileObj.getFileSize<side>()) + L"\n" +
+                                                     _("Size") + L": " + zen::filesizeToShortString(to<Int64>(fileObj.getFileSize<side>())) + L"\n" +
                                                      _("Date") + L": " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>()));
                 }
 
@@ -1449,7 +1452,7 @@ xmlAccess::ColumnAttributes CustomGridRim::getDefaultColumnAttributes()
 
     newEntry.type     = xmlAccess::SIZE;
     newEntry.position = 4;
-    newEntry.width    = 70;
+    newEntry.width    = 80;
     defaultColumnSettings.push_back(newEntry);
 
     newEntry.type     = xmlAccess::DATE;

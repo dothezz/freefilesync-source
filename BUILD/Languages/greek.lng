@@ -202,9 +202,6 @@
 <pluralform>%x δ/λεπτα</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Μεταφορά && Απόθεση</target>
-
 <source>Info</source>
 <target>Πληροφορία</target>
 
@@ -366,7 +363,7 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Δέσμη Ενεργειών</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Δεν είναι δυνατή η δημιουργία ενός αρχείου καταγραφής!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Απαιτεί σύνδεση με το Internet)</target>
+
+<source>Drag && drop</source>
+<target>Μεταφορά && Απόθεση</target>
+
+<source>Close progress dialog</source>
+<target>Κλείσιμο του παράθυρου αναφοράς</target>
+
+<source>Shut down</source>
+<target>Τερματισμός λειτουργίας</target>
+
+<source>Log off</source>
+<target>Αποσύνδεση</target>
+
+<source>Standby</source>
+<target>Αναστολή λειτουργίας</target>
+
+<source>Hibernate</source>
+<target>Αδρανοποίηση</target>
 
 <source>1. &Compare</source>
 <target>1. &Σύγκριση</target>
@@ -528,9 +543,6 @@ The command line is executed each time:
 <source>Filter files</source>
 <target>Φιλτράρισμα</target>
 
-<source>Error handling</source>
-<target>Διαχείριση σφαλμάτων</target>
-
 <source>Left</source>
 <target>Αριστερά</target>
 
@@ -543,13 +555,16 @@ The command line is executed each time:
 <source>Status feedback</source>
 <target>Αναφορά κατάστασης</target>
 
-<source>Run minimized</source>
-<target>Να εκτελεστεί ελαχιστοποιημένο</target>
+<source>Show progress dialog</source>
+<target>Εμφάνιση της αναφοράς προόδου</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Διαχείριση σφαλμάτων</target>
+
+<source>Maximum number of log files:</source>
 <target>Μέγιστος αριθμός αρχείων καταγραφής:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Επιλέξτε έναν κατάλογο για τα αρχεία καταγραφής:</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ The command line is executed each time:
 <source>Deletion handling</source>
 <target>Διαχείριση των διαγραφών</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target>Μετά την ολοκλήρωση:</target>
 
 <source>Configuration</source>
 <target>Διάταξη</target>
@@ -623,6 +638,9 @@ The command line is executed each time:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Η διένεξη / το αρχείο δεν μπορεί να κατηγοριοποιηθεί</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Σύγκριση με βάση το...</target>
@@ -1077,20 +1095,17 @@ Exclude: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Ζητήθηκε ματαίωση: Αναμονή για την λήξη της τρέχουσας εργασίας...</target>
 
-<source>Continue</source>
-<target>Συνέχεια</target>
-
 <source>Pause</source>
 <target>Παύση</target>
+
+<source>Continue</source>
+<target>Συνέχεια</target>
 
 <source>Cannot find %x</source>
 <target>Δεν μπορεί να βρεθεί το %x</target>
 
 <source>Inactive</source>
 <target>Ανενεργό</target>
-
-<source>Last x hours</source>
-<target>Τελευταίες x ώρες</target>
 
 <source>Today</source>
 <target>Σήμερα</target>
@@ -1407,11 +1422,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Δημιουργία του αρχείου %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Δημιουργία του συμβολικού δεσμού %x</target>
-
 <source>Creating folder %x</source>
 <target>Δημιουργία του υποκαταλόγου %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Δημιουργία του συμβολικού δεσμού %x</target>
 
 <source>Overwriting file %x</source>
 <target>Αντικατάσταση του αρχείου %x</target>

@@ -202,9 +202,6 @@
 <pluralform>%x sec</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Glisser && Déposer</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -366,7 +363,7 @@ La ligne de commande est exécutée chaque fois que :
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Fichier de commandes</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Impossible de créer un fichier log !</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ La ligne de commande est exécutée chaque fois que :
 
 <source>(Requires an Internet connection!)</source>
 <target>(Nécessite une connexion Internet)</target>
+
+<source>Drag && drop</source>
+<target>Glisser && Déposer</target>
+
+<source>Close progress dialog</source>
+<target></target>
+
+<source>Shut down</source>
+<target></target>
+
+<source>Log off</source>
+<target></target>
+
+<source>Standby</source>
+<target></target>
+
+<source>Hibernate</source>
+<target></target>
 
 <source>1. &Compare</source>
 <target>1. &Comparer</target>
@@ -528,9 +543,6 @@ La ligne de commande est exécutée chaque fois que :
 <source>Filter files</source>
 <target>Filtrage des fichiers</target>
 
-<source>Error handling</source>
-<target>Erreur de gestion de fichiers</target>
-
 <source>Left</source>
 <target>Gauche</target>
 
@@ -543,13 +555,16 @@ La ligne de commande est exécutée chaque fois que :
 <source>Status feedback</source>
 <target>Retour d'informations</target>
 
-<source>Run minimized</source>
-<target>Lancer em affichage réduit</target>
+<source>Show progress dialog</source>
+<target></target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Erreur de gestion de fichiers</target>
+
+<source>Maximum number of log files:</source>
 <target>Nombre maximum de fichiers Log</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Choisissez un dossier pour le fichier .log :</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ La ligne de commande est exécutée chaque fois que :
 <source>Deletion handling</source>
 <target>Gestion des suppressions</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target></target>
 
 <source>Configuration</source>
 <target>Configuration</target>
@@ -623,6 +638,9 @@ La ligne de commande est exécutée chaque fois que :
 
 <source>Conflict/file cannot be categorized</source>
 <target>Conflit ou fichier indéterminé</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Comparaison par...</target>
@@ -1077,20 +1095,17 @@ Exclude: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Abandon demandé : En attente de la fin de l'opération en cours...</target>
 
-<source>Continue</source>
-<target>Continuer</target>
-
 <source>Pause</source>
 <target>Pause</target>
+
+<source>Continue</source>
+<target>Continuer</target>
 
 <source>Cannot find %x</source>
 <target>Impossible de trouver %x</target>
 
 <source>Inactive</source>
 <target>Inactif</target>
-
-<source>Last x hours</source>
-<target>Dernières x heures</target>
 
 <source>Today</source>
 <target>Aujourd'hui</target>
@@ -1407,11 +1422,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Création du fichier %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Création du lien symbolique %x</target>
-
 <source>Creating folder %x</source>
 <target>Création du dossier %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Création du lien symbolique %x</target>
 
 <source>Overwriting file %x</source>
 <target>Remplacement du fichier %x</target>

@@ -94,7 +94,7 @@ bool dst::isFatDrive(HANDLE hFile) //throw()
                                                              LPWSTR  lpFileSystemNameBuffer,
                                                              DWORD   nFileSystemNameSize);
 
-    const DllFun<GetVolumeInformationByHandleWFunc> getVolumeInformationByHandle(L"kernel32.dll", "GetVolumeInformationByHandleW");
+    const SysDllFun<GetVolumeInformationByHandleWFunc> getVolumeInformationByHandle(L"kernel32.dll", "GetVolumeInformationByHandleW");
     if (!getVolumeInformationByHandle)
     {
         assert(false);

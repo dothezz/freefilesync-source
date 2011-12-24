@@ -34,7 +34,7 @@ enum SymLinkHandling
 
 enum SyncDirection
 {
-    SYNC_DIR_LEFT  = 0,
+    SYNC_DIR_LEFT = 0,
     SYNC_DIR_RIGHT,
     SYNC_DIR_NONE
 };
@@ -386,6 +386,8 @@ struct MainConfiguration
     FolderPairEnh firstPair; //there needs to be at least one pair!
     std::vector<FolderPairEnh> additionalPairs;
 
+    std::wstring onCompletion; //user-defined command line
+
     std::wstring getCompVariantName() const;
     std::wstring getSyncVariantName() const;
 };
@@ -394,11 +396,12 @@ struct MainConfiguration
 inline
 bool operator==(const MainConfiguration& lhs, const MainConfiguration& rhs)
 {
-    return lhs.cmpConfig       == rhs.cmpConfig    &&
-           lhs.globalFilter    == rhs.globalFilter &&
-           lhs.syncCfg         == rhs.syncCfg      &&
-           lhs.firstPair       == rhs.firstPair    &&
-           lhs.additionalPairs == rhs.additionalPairs;
+    return lhs.cmpConfig        == rhs.cmpConfig       &&
+           lhs.globalFilter     == rhs.globalFilter    &&
+           lhs.syncCfg          == rhs.syncCfg         &&
+           lhs.firstPair        == rhs.firstPair       &&
+           lhs.additionalPairs  == rhs.additionalPairs &&
+           lhs.onCompletion     == rhs.onCompletion;
 }
 
 //facilitate drag & drop config merge:

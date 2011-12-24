@@ -44,7 +44,15 @@ struct ProcessCallback
 
     //note: this one must NOT throw in order to properly allow undoing setting of statistics!
     //it is in general paired with a call to requestUiRefresh() to compensate!
-    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed) = 0; //throw()!!
+    virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta) = 0; //throw()!!
+    virtual void updateTotalData    (int objectsDelta, zen::Int64 dataDelta) = 0; //
+    /*the estimated total may change *during* sync:
+    		1. move file -> fallback to copy + delete
+    		2. file copy, actual size changed after comparison
+            3. auto-resolution for failed create operations due to missing source
+    		4. directory deletion: may contain more items than scanned by FFS: excluded by filter
+    		5. delete directory to recycler or move to user-defined dir on same volume: no matter how many sub-elements exist, this is only 1 object to process!
+    		6. user-defined deletion directory on different volume: full file copy required (instead of move) */
 
     //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
     virtual void requestUiRefresh() = 0; //throw ?

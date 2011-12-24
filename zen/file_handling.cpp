@@ -505,13 +505,19 @@ void zen::renameFile(const Zstring& oldName, const Zstring& newName) //throw Fil
 class CopyCallbackImpl : public zen::CallbackCopyFile //callback functionality
 {
 public:
-    CopyCallbackImpl(const Zstring& sourceFile, CallbackMoveFile& callback) : sourceFile_(sourceFile), moveCallback(callback) {}
+    CopyCallbackImpl(const Zstring& sourceFile,
+                     const Zstring& targetFile,
+                     CallbackMoveFile& callback) : sourceFile_(sourceFile),
+        targetFile_(targetFile),
+        moveCallback(callback) {}
 
     virtual void deleteTargetFile(const Zstring& targetFile) { assert(!fileExists(targetFile)); }
 
     virtual void updateCopyStatus(UInt64 totalBytesTransferred)
     {
-        moveCallback.requestUiRefresh(sourceFile_);
+        const Int64 delta = to<Int64>(totalBytesTransferred) - bytesReported;
+        moveCallback.updateStatus(delta);
+        bytesReported += delta;
     }
 
 private:
@@ -519,15 +525,15 @@ private:
     CopyCallbackImpl& operator=(const CopyCallbackImpl&);
 
     const Zstring sourceFile_;
+    const Zstring targetFile_;
     CallbackMoveFile& moveCallback;
+    Int64 bytesReported;
 };
 
 
 void zen::moveFile(const Zstring& sourceFile, const Zstring& targetFile, bool ignoreExisting, CallbackMoveFile* callback)   //throw FileError;
 {
-    //call back once per file (moveFile() is called by moveDirectory())
-    if (callback)
-        callback->requestUiRefresh(sourceFile);
+    if (callback) callback->onBeforeFileMove(sourceFile, targetFile); //call back once *after* work was done
 
     const bool targetExisting = fileExists(targetFile);
 
@@ -541,24 +547,28 @@ void zen::moveFile(const Zstring& sourceFile, const Zstring& targetFile, bool ig
         try
         {
             renameFile(sourceFile, targetFile); //throw FileError, ErrorDifferentVolume
-            return; //great, we get away cheaply!
+            //great, we get away cheaply!
+            if (callback) callback->objectProcessed();
+            return;
         }
         //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
         catch (const ErrorDifferentVolume&) {}
 
         //file is on a different volume: let's copy it
-        std::unique_ptr<CopyCallbackImpl> copyCallback(callback != NULL ? new CopyCallbackImpl(sourceFile, *callback) : NULL);
-
         if (symlinkExists(sourceFile))
             copySymlink(sourceFile, targetFile, false); //throw FileError; don't copy filesystem permissions
         else
+        {
+            std::unique_ptr<CopyCallbackImpl> copyCallback(callback != NULL ? new CopyCallbackImpl(sourceFile, targetFile, *callback) : NULL);
             copyFile(sourceFile, targetFile, false, true, copyCallback.get()); //throw FileError;
+        }
 
         //attention: if copy-operation was cancelled an exception is thrown => sourcefile is not deleted, as we wish!
     }
 
     removeFile(sourceFile); //throw FileError
     //note: copying file is NOT undone in case of exception: currently this function is called in context of user-defined deletion dir, where this behavior is fine
+    if (callback) callback->objectProcessed();
 }
 
 namespace
@@ -605,19 +615,15 @@ private:
 
 struct RemoveCallbackImpl : public CallbackRemoveDir
 {
-    RemoveCallbackImpl(const Zstring& sourceDir,
-                       CallbackMoveFile& moveCallback) :
-        sourceDir_(sourceDir),
-        moveCallback_(moveCallback) {}
+    RemoveCallbackImpl(CallbackMoveFile& moveCallback) : moveCallback_(moveCallback) {}
 
-    virtual void notifyFileDeletion(const Zstring& filename) { moveCallback_.requestUiRefresh(sourceDir_); }
-    virtual void notifyDirDeletion (const Zstring& dirname ) { moveCallback_.requestUiRefresh(sourceDir_); }
+    virtual void notifyFileDeletion(const Zstring& filename) { moveCallback_.updateStatus(0); }
+    virtual void notifyDirDeletion (const Zstring& dirname ) { moveCallback_.updateStatus(0); }
 
 private:
     RemoveCallbackImpl(const RemoveCallbackImpl&);
     RemoveCallbackImpl& operator=(const RemoveCallbackImpl&);
 
-    const Zstring sourceDir_;
     CallbackMoveFile& moveCallback_;
 };
 }
@@ -625,9 +631,7 @@ private:
 
 void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExisting, CallbackMoveFile* callback) //throw FileError
 {
-    //call back once per folder
-    if (callback)
-        callback->requestUiRefresh(sourceDir);
+    if (callback) callback->onBeforeDirMove(sourceDir, targetDir); //call back once *after* work was done
 
     const bool targetExisting = dirExists(targetDir);
 
@@ -643,7 +647,9 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
         try
         {
             renameFile(sourceDir, targetDir); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
-            return; //great, we get away cheaply!
+            //great, we get away cheaply!
+            if (callback) callback->objectProcessed();
+            return;
         }
         //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the directory)
         catch (const ErrorDifferentVolume&) {}
@@ -681,8 +687,10 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
     }
 
     //delete source
-    std::unique_ptr<RemoveCallbackImpl> removeCallback(callback != NULL ? new RemoveCallbackImpl(sourceDir, *callback) : NULL);
+    std::unique_ptr<RemoveCallbackImpl> removeCallback(callback != NULL ? new RemoveCallbackImpl(*callback) : NULL);
     removeDirectory(sourceDir, removeCallback.get()); //throw FileError;
+
+    if (callback) callback->objectProcessed();
 }
 
 
@@ -1458,7 +1466,7 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         if source is a symlink and COPY_FILE_COPY_SYMLINK is NOT specified, this callback is called and hSourceFile is a handle to the *target* of the link!
 
     file time handling:
-        ::CopyFileEx() will copy file modification time (only) over from source file AFTER the last inocation of this callback
+        ::CopyFileEx() will copy file modification time (only) over from source file AFTER the last invokation of this callback
         => it is possible to adapt file creation time of target in here, but NOT file modification time!
 
     alternate data stream handling:

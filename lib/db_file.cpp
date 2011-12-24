@@ -37,9 +37,9 @@ typedef Zbase<char> MemoryStream;                       //ref-counted byte strea
 typedef std::map<UniqueId, MemoryStream> StreamMapping; //list of streams ordered by session UUID
 
 
-//------------------------------------------------------------------------------------
-//| ensure 32/64 bit portability: used fixed size data types only e.g. std::uint32_t |
-//------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------
+//| ensure 32/64 bit portability: use fixed size data types only e.g. std::uint32_t |
+//-----------------------------------------------------------------------------------
 
 
 template <SelectedSide side> inline
@@ -48,7 +48,7 @@ Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
     //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity?
     //however 32 and 64 bit db files *are* designed to be binary compatible!
     //Give db files different names.
-    //make sure they end with ".ffs_db". These files will not be included into comparison when located in base sync directories
+    //make sure they end with ".ffs_db". These files will not be included into comparison 
 #ifdef FFS_WIN
     Zstring dbname = Zstring(Zstr("sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
 #elif defined FFS_LINUX

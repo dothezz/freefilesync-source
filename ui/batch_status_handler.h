@@ -23,17 +23,20 @@ class BatchAbortProcess {};
 class BatchStatusHandler : public StatusHandler
 {
 public:
-    BatchStatusHandler(bool runSilent, //defines: -start minimized and -quit immediately when finished
+    BatchStatusHandler(bool showProgress, //defines: -start minimized and -quit immediately when finished
                        const wxString& jobName,
                        const wxString& logfileDirectory,
                        size_t logFileCountMax, //0 if logging shall be inactive
                        const xmlAccess::OnError handleError,
                        const zen::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
-                       int& returnVal);
+                       int& returnVal,
+                       const std::wstring& execWhenFinished,
+                       std::vector<std::wstring>& execFinishedHistory);
     ~BatchStatusHandler();
 
-    virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
+    virtual void initNewProcess     (int objectsTotal, zen::Int64 dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
+    virtual void updateTotalData    (int objectsDelta, zen::Int64 dataDelta);
     virtual void reportStatus(const std::wstring& text);
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
@@ -46,7 +49,7 @@ private:
     virtual void abortThisProcess();
 
     const zen::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
-    bool exitWhenFinished;
+    bool showFinalResults;
     bool switchToGuiRequested;
     xmlAccess::OnError handleError_;
     zen::ErrorLogging errorLog; //list of non-resolved errors and warnings

@@ -204,9 +204,6 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Povuci && ispusti</target>
-
 <source>Info</source>
 <target>Info</target>
 
@@ -369,7 +366,7 @@ Naredba će biti izvršena kada:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Batch zadatak</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Nemogu napraviti zapisnik!</target>
 
 <source>Batch execution</source>
@@ -416,6 +413,24 @@ Naredba će biti izvršena kada:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Zahtjeva vezu na Internet!)</target>
+
+<source>Drag && drop</source>
+<target>Povuci && ispusti</target>
+
+<source>Close progress dialog</source>
+<target>Zatvori prozor zadatka</target>
+
+<source>Shut down</source>
+<target>Isključi računalo</target>
+
+<source>Log off</source>
+<target>Odlogiraj se</target>
+
+<source>Standby</source>
+<target>Spavaj</target>
+
+<source>Hibernate</source>
+<target>Hibernacija</target>
 
 <source>1. &Compare</source>
 <target>1. &Usporedi</target>
@@ -531,9 +546,6 @@ Naredba će biti izvršena kada:
 <source>Filter files</source>
 <target>Filtriraj datoteke</target>
 
-<source>Error handling</source>
-<target>Greška pri obradi</target>
-
 <source>Left</source>
 <target>Lijevo</target>
 
@@ -546,13 +558,16 @@ Naredba će biti izvršena kada:
 <source>Status feedback</source>
 <target>Status veze</target>
 
-<source>Run minimized</source>
-<target>Pokreni minimizirano</target>
+<source>Show progress dialog</source>
+<target>Prikaži napredak</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Greška pri obradi</target>
+
+<source>Maximum number of log files:</source>
 <target>Maksimalan broj izvješća:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Odaberite direktorij izvješća:</target>
 
 <source>Batch settings</source>
@@ -597,8 +612,8 @@ Naredba će biti izvršena kada:
 <source>Deletion handling</source>
 <target>Upravljanje pri brisanju</target>
 
-<source>&OK</source>
-<target>&U redu</target>
+<source>On completion:</source>
+<target>Pri završetku</target>
 
 <source>Configuration</source>
 <target>Postavke</target>
@@ -626,6 +641,9 @@ Naredba će biti izvršena kada:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikt/datoteka ne more biti kategorizirana</target>
+
+<source>&OK</source>
+<target>&U redu</target>
 
 <source>Compare by...</source>
 <target>Usporedi prema...</target>
@@ -1084,20 +1102,17 @@ Isključi: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Prekid zahtjevan: čekam da se trenutna akcija završi...</target>
 
-<source>Continue</source>
-<target>Nastavi</target>
-
 <source>Pause</source>
 <target>Pauziraj</target>
+
+<source>Continue</source>
+<target>Nastavi</target>
 
 <source>Cannot find %x</source>
 <target>Nemogu pronać %x</target>
 
 <source>Inactive</source>
 <target>Neaktivno</target>
-
-<source>Last x hours</source>
-<target>Zadnjih x sati</target>
 
 <source>Today</source>
 <target>Danas</target>
@@ -1419,11 +1434,11 @@ Isključi: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Izrađujem datoteku %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Izrađujem simboličnu poveznicu %x</target>
-
 <source>Creating folder %x</source>
 <target>Izrađujem mapu %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Izrađujem simboličnu poveznicu %x</target>
 
 <source>Overwriting file %x</source>
 <target>Prepisujem datoteku %x</target>

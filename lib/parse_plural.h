@@ -212,7 +212,7 @@ private:
     private:
         bool startsWith(const Wstring& prefix) const
         {
-            if (stream.end() - pos < static_cast<int>(prefix.size()))
+            if (stream.end() - pos < static_cast<ptrdiff_t>(prefix.size()))
                 return false;
             return std::equal(prefix.begin(), prefix.end(), pos);
         }

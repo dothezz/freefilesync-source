@@ -202,9 +202,6 @@
 <pluralform>%x seg</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Arrastar && Soltar</target>
-
 <source>Info</source>
 <target>Informações</target>
 
@@ -366,7 +363,7 @@ A linha de comando é executada cada vez que:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Arquivo batch</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Não foi possível criar arquivo de log!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ A linha de comando é executada cada vez que:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Requer conexão com a Internet!)</target>
+
+<source>Drag && drop</source>
+<target>Arrastar && Soltar</target>
+
+<source>Close progress dialog</source>
+<target></target>
+
+<source>Shut down</source>
+<target></target>
+
+<source>Log off</source>
+<target></target>
+
+<source>Standby</source>
+<target></target>
+
+<source>Hibernate</source>
+<target></target>
 
 <source>1. &Compare</source>
 <target>1. C&omparar</target>
@@ -528,9 +543,6 @@ A linha de comando é executada cada vez que:
 <source>Filter files</source>
 <target>Filtrar arquivos</target>
 
-<source>Error handling</source>
-<target>Tratamento de erros</target>
-
 <source>Left</source>
 <target>Esquerda</target>
 
@@ -543,13 +555,16 @@ A linha de comando é executada cada vez que:
 <source>Status feedback</source>
 <target>Informação do Status</target>
 
-<source>Run minimized</source>
-<target>Executar minimizado</target>
+<source>Show progress dialog</source>
+<target></target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Tratamento de erros</target>
+
+<source>Maximum number of log files:</source>
 <target>Número máximo de arquivos de log:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Escolha um diretório para salvar o arquivo de log:</target>
 
 <source>Batch settings</source>
@@ -594,8 +609,8 @@ A linha de comando é executada cada vez que:
 <source>Deletion handling</source>
 <target>Tratamento da exclusão</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>On completion:</source>
+<target></target>
 
 <source>Configuration</source>
 <target>Configuração</target>
@@ -623,6 +638,9 @@ A linha de comando é executada cada vez que:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Conflito/arquivo não pode ser categorizado</target>
+
+<source>&OK</source>
+<target>&OK</target>
 
 <source>Compare by...</source>
 <target>Comparar por...</target>
@@ -1077,20 +1095,17 @@ Excluir: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Cancelar solicitado: Esperando fim da operação...</target>
 
-<source>Continue</source>
-<target>Continuar</target>
-
 <source>Pause</source>
 <target>Pausar</target>
+
+<source>Continue</source>
+<target>Continuar</target>
 
 <source>Cannot find %x</source>
 <target>Não foi possível encontrar %x</target>
 
 <source>Inactive</source>
 <target>Inativo</target>
-
-<source>Last x hours</source>
-<target>Últimas x horas</target>
 
 <source>Today</source>
 <target>Hoje</target>
@@ -1407,11 +1422,11 @@ Excluir: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Criando arquivo %x</target>
 
-<source>Creating symbolic link %x</source>
-<target>Criando link simbólico %x</target>
-
 <source>Creating folder %x</source>
 <target>Criando pasta %x</target>
+
+<source>Creating symbolic link %x</source>
+<target>Criando link simbólico %x</target>
 
 <source>Overwriting file %x</source>
 <target>Substituindo arquivo %x</target>

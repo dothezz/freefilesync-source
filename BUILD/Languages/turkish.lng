@@ -202,9 +202,6 @@
 <pluralform>%x saniye</pluralform>
 </target>
 
-<source>Drag && drop</source>
-<target>Klasör ya da dosyaları buraya sürükleyip bırakabilirsiniz</target>
-
 <source>Info</source>
 <target>Bilgi</target>
 
@@ -366,7 +363,7 @@ Her seferinde çalıştırılacak komut satırı:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Toplu İşi</target>
 
-<source>Unable to create logfile!</source>
+<source>Unable to create log file!</source>
 <target>Günlük dosyası oluşturulamıyor!</target>
 
 <source>Batch execution</source>
@@ -413,6 +410,24 @@ Her seferinde çalıştırılacak komut satırı:
 
 <source>(Requires an Internet connection!)</source>
 <target>(İnternet bağlantısı gereklidir!)</target>
+
+<source>Drag && drop</source>
+<target>Klasör ya da dosyaları buraya sürükleyip bırakabilirsiniz</target>
+
+<source>Close progress dialog</source>
+<target>İşlem penceresini kapat</target>
+
+<source>Shut down</source>
+<target>Bilgisayarı kapat</target>
+
+<source>Log off</source>
+<target>Oturumu kapat</target>
+
+<source>Standby</source>
+<target>Uykuya dal</target>
+
+<source>Hibernate</source>
+<target>Hazırda beklet</target>
 
 <source>1. &Compare</source>
 <target>1. &Karşılaştır</target>
@@ -526,10 +541,7 @@ Her seferinde çalıştırılacak komut satırı:
 <target>Yardım</target>
 
 <source>Filter files</source>
-<target>Dosya süzgeci</target>
-
-<source>Error handling</source>
-<target>Hata olursa:</target>
+<target>Dosyaları süz</target>
 
 <source>Left</source>
 <target>Sol</target>
@@ -543,13 +555,16 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Status feedback</source>
 <target>Durum geri bildirimi</target>
 
-<source>Run minimized</source>
-<target>Görev çubuğunda başlat</target>
+<source>Show progress dialog</source>
+<target>İşlem penceresini göster</target>
 
-<source>Maximum number of logfiles:</source>
+<source>Error handling</source>
+<target>Hata olursa:</target>
+
+<source>Maximum number of log files:</source>
 <target>Tutulacak en fazla günlük dosyası sayısı:</target>
 
-<source>Select logfile directory:</source>
+<source>Select log file directory:</source>
 <target>Kayıt dosyası klasörü:</target>
 
 <source>Batch settings</source>
@@ -571,13 +586,13 @@ Her seferinde çalıştırılacak komut satırı:
 <target><Kendiliğinden></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>İki yandaki değişiklikleri bir veritabanı kullanarak belirle ve sakla. Silme, yeniden adlandırma ve çakışma işlemleri kendiliğinden algılanır.</target>
+<target>İki yandaki değişiklikleri bir veritabanı kullanarak belirler ve sakla. Silme, yeniden adlandırma ve çakışma işlemleri kendiliğinden algılanır.</target>
 
 <source>Mirror ->></source>
 <target>Yansı ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Sol klasörün yansı yedeği. Eşleştirmeden sonra sağ klasör, sol klasörün tamamen aynısı olacak.</target>
+<target>Sol klasörün yansı yedeği. Eşleştirmeden sonra sağ klasör, sol klasörün tamamen aynısı olur.</target>
 
 <source>Update -></source>
 <target>Güncelle -></target>
@@ -594,8 +609,8 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Deletion handling</source>
 <target>Silme eyleminde:</target>
 
-<source>&OK</source>
-<target>&Tamam</target>
+<source>On completion:</source>
+<target>İşlem tamamlandığında:</target>
 
 <source>Configuration</source>
 <target>Yapılandırma</target>
@@ -623,6 +638,9 @@ Her seferinde çalıştırılacak komut satırı:
 
 <source>Conflict/file cannot be categorized</source>
 <target>Çatışma/dosya kategorize edilemedi</target>
+
+<source>&OK</source>
+<target>&Tamam</target>
 
 <source>Compare by...</source>
 <target>Karşılaştırma ölçütünü seçin:</target>
@@ -1077,20 +1095,17 @@ Katma: \stuff\temp\*
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Vazgeçildi: Yürürlükteki işlemin bitmesi bekleniyor...</target>
 
-<source>Continue</source>
-<target>Devam et</target>
-
 <source>Pause</source>
 <target>Duraklat</target>
+
+<source>Continue</source>
+<target>Devam et</target>
 
 <source>Cannot find %x</source>
 <target>%x bulunamadı</target>
 
 <source>Inactive</source>
 <target>Devre dışı</target>
-
-<source>Last x hours</source>
-<target>Son x saat</target>
 
 <source>Today</source>
 <target>Bugün</target>
@@ -1407,11 +1422,11 @@ Katma: \stuff\temp\*
 <source>Creating file %x</source>
 <target>%x dosyası oluşturuluyor</target>
 
-<source>Creating symbolic link %x</source>
-<target>%x sembolik bağlantısı oluşturuluyor</target>
-
 <source>Creating folder %x</source>
 <target>%x klasörü oluşturuluyor</target>
+
+<source>Creating symbolic link %x</source>
+<target>%x sembolik bağlantısı oluşturuluyor</target>
 
 <source>Overwriting file %x</source>
 <target>%x dosyasının üzerine yazılıyor</target>
