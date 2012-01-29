@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef WX_PLOT_HEADER_2344252459
@@ -279,7 +279,8 @@ private:
 
     void onPaintEvent(wxPaintEvent& evt)
     {
-        wxAutoBufferedPaintDC dc(this); //double-buffer only on systems that require it
+        wxAutoBufferedPaintDC dc(this); //this one happily fucks up for RTL layout by not drawing the first column (x = 0)!
+        //wxPaintDC dc(this);
         render(dc);
     }
 

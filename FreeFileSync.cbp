@@ -151,17 +151,11 @@
 		<Unit filename="lib\binary.cpp" />
 		<Unit filename="lib\binary.h" />
 		<Unit filename="lib\cmp_filetime.h" />
-		<Unit filename="lib\custom_grid.cpp">
-			<Option target="Release" />
-			<Option target="Debug-DLL" />
-		</Unit>
-		<Unit filename="lib\custom_grid.h" />
 		<Unit filename="lib\db_file.cpp" />
 		<Unit filename="lib\db_file.h" />
 		<Unit filename="lib\dir_exist_async.h" />
 		<Unit filename="lib\dir_lock.cpp" />
 		<Unit filename="lib\dir_lock.h" />
-		<Unit filename="lib\dir_name.h" />
 		<Unit filename="lib\error_log.cpp" />
 		<Unit filename="lib\error_log.h" />
 		<Unit filename="lib\ffs_paths.h" />
@@ -240,6 +234,14 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\check_version.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\custom_grid.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\custom_grid.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
@@ -349,6 +351,14 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\tray_icon.h" />
+		<Unit filename="ui\tree_view.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\tree_view.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
 		<Unit filename="ui\wx_form_build_hide_warnings.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -387,6 +397,14 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="wx+\graph.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="wx+\grid.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="wx+\grid.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
@@ -432,10 +450,6 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\tree_list.h">
-			<Option target="Release" />
-			<Option target="Debug-DLL" />
-		</Unit>
 		<Unit filename="zen\assert_static.h" />
 		<Unit filename="zen\base64.h" />
 		<Unit filename="zen\build_info.h" />
@@ -444,7 +458,6 @@
 		<Unit filename="zen\com_util.h" />
 		<Unit filename="zen\debug_log.h" />
 		<Unit filename="zen\dir_watcher.h" />
-		<Unit filename="zen\disable_standby.h" />
 		<Unit filename="zen\dll.h" />
 		<Unit filename="zen\dst_hack.cpp" />
 		<Unit filename="zen\dst_hack.h" />
@@ -453,7 +466,6 @@
 		<Unit filename="zen\file_handling.h" />
 		<Unit filename="zen\file_id.cpp" />
 		<Unit filename="zen\file_id.h" />
-		<Unit filename="zen\file_id_internal.h" />
 		<Unit filename="zen\file_io.cpp" />
 		<Unit filename="zen\file_io.h" />
 		<Unit filename="zen\file_traverser.cpp" />

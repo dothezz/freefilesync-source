@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef ZSTRING_H_INCLUDED
@@ -24,7 +24,7 @@ public:
     {
         boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (activeStrings.find(ptr) != activeStrings.end())
-            reportProblem(std::string("Fatal Error: New memory points into occupied space: ") + rawMemToString(ptr, size));
+            reportProblem("Fatal Error: New memory points into occupied space: " + rawMemToString(ptr, size));
 
         activeStrings[ptr] = size;
     }
@@ -33,7 +33,7 @@ public:
     {
         boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (activeStrings.find(ptr) == activeStrings.end())
-            reportProblem(std::string("Fatal Error: No memory available for deallocation at this location!"));
+            reportProblem("Fatal Error: No memory available for deallocation at this location!");
 
         activeStrings.erase(ptr);
     }
@@ -50,8 +50,7 @@ private:
     void reportProblem(const std::string& message); //throw (std::logic_error)
 
     boost::mutex lockActStrings;
-    typedef std::map<const void*, size_t> VoidPtrSizeMap;
-    VoidPtrSizeMap activeStrings;
+    zen::hash_map<const void*, size_t> activeStrings;
 };
 #endif //NDEBUG
 

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef FFS_LARGE_64_BIT_INTEGER_H_INCLUDED
@@ -14,6 +14,7 @@
 #include <ostream>
 #include "assert_static.h"
 #include "type_tools.h"
+#include "type_traits.h"
 
 #ifdef FFS_WIN
 #include "win.h"
@@ -46,18 +47,15 @@ void checkRange(U value)
 
 class Int64
 {
-    struct DummyClass { operator int() { return 0; } };
 public:
     //safe implicit conversions
     Int64()                   : value(0) {}
     Int64(const Int64&   rhs) : value(rhs.value) {}
-    Int64(int            rhs) : value(rhs) {} //ambiguity intentional for types other than these
-    Int64(long           rhs) : value(rhs) {}
-    Int64(SelectIf<IsSameType<std::int64_t, long>::result, DummyClass, std::int64_t>::Result rhs) :
-        value(rhs) {} //-> std::int64_t equals long int on x64 Linux! Still we want implicit behavior for all other systems!
+	template <class T> 
+	Int64(T rhs, typename EnableIf<IsSignedInt<T>::result && sizeof(T) <= sizeof(std::int64_t)>::Result* = NULL) : value(static_cast<std::int64_t>(rhs)) {}
 
-    //unsafe explicit but checked conversion from arbitrary integer type
-    template <class T> explicit Int64(T rhs) : value(static_cast<std::int64_t>(rhs)) { checkRange<std::int64_t>(rhs); }
+    //unsafe explicit but checked conversion for all other integer types
+    template <class T> explicit Int64(T rhs, typename EnableIf<!(IsSignedInt<T>::result && sizeof(T) <= sizeof(std::int64_t))>::Result* = NULL) : value(static_cast<std::int64_t>(rhs)) { checkRange<std::int64_t>(rhs); }
 
     Int64& operator=(const Int64& rhs) { value = rhs.value; return *this; }
 
@@ -126,18 +124,15 @@ inline Int64 operator>>(const Int64& lhs, int rhs) { return Int64(lhs) >>= rhs; 
 
 class UInt64
 {
-    struct DummyClass { operator size_t() { return 0U; } };
 public:
     //safe implicit conversions
     UInt64()                    : value(0) {}
     UInt64(const UInt64&   rhs) : value(rhs.value) {}
-    UInt64(unsigned int    rhs) : value(rhs) {} //ambiguity intentional for types other than these
-    UInt64(unsigned long   rhs) : value(rhs) {}
-    UInt64(SelectIf<IsSameType<std::uint64_t, unsigned long>::result, DummyClass, std::uint64_t>::Result rhs) :
-        value(rhs) {} //-> std::uint64_t equals unsigned long int on x64 Linux! Still we want implicit behavior for all other systems!
+	template <class T> 
+	UInt64(T rhs, typename EnableIf<IsUnsignedInt<T>::result && sizeof(T) <= sizeof(std::uint64_t)>::Result* = NULL) : value(static_cast<std::uint64_t>(rhs)) {}
 
-    //unsafe explicit but checked conversion from arbitrary integer type
-    template <class T> explicit UInt64(T rhs) : value(static_cast<std::uint64_t>(rhs)) { checkRange<std::uint64_t>(rhs); }
+    //unsafe explicit but checked conversion for all other integer types
+    template <class T> explicit UInt64(T rhs, typename EnableIf<!(IsUnsignedInt<T>::result && sizeof(T) <= sizeof(std::uint64_t))>::Result* = NULL) : value(static_cast<std::uint64_t>(rhs)) { checkRange<std::uint64_t>(rhs); }
 
     UInt64& operator=(const UInt64& rhs) { value = rhs.value; return *this; }
 

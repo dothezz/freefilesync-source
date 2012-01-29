@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "gui_generated.h"
@@ -13,12 +13,13 @@
 #include <wx+/format_unit.h>
 #include <wx+/choice_enum.h>
 #include "../synchronization.h"
-#include "../lib/custom_grid.h"
+#include "custom_grid.h"
 #include <wx+/button.h>
 #include <zen/build_info.h>
 #include <wx/wupdlock.h>
 #include <wx/msgdlg.h>
 #include <wx+/mouse_move_dlg.h>
+#include <wx+/rtl.h>
 #include "../lib/help_provider.h"
 #include <wx+/image_tools.h>
 #include <zen/stl_tools.h>
@@ -40,28 +41,29 @@ private:
 
 AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 {
-    m_bitmap9->SetBitmap(GlobalResources::getImage(wxT("website")));
-    m_bitmap10->SetBitmap(GlobalResources::getImage(wxT("email")));
-    m_bitmap11->SetBitmap(GlobalResources::getImage(wxT("logo")));
-    m_bitmap13->SetBitmap(GlobalResources::getImage(wxT("gpl")));
-    m_bitmapTransl->SetBitmap(GlobalResources::getImage(wxT("translation")));
+    m_bitmap9 ->SetBitmap(GlobalResources::getImage(L"website"));
+    m_bitmap10->SetBitmap(GlobalResources::getImage(L"email"));
+    m_bitmap11->SetBitmap(GlobalResources::getImage(L"logo"));
+    m_bitmap13->SetBitmap(GlobalResources::getImage(L"gpl"));
+    //m_bitmapTransl->SetBitmap(GlobalResources::getImage(wxT("translation")));
+    m_bitmapPaypal->SetBitmap(GlobalResources::getImage(L"paypal"));
 
     //create language credits
-    for (std::vector<ExistingTranslations::Entry>::const_iterator i = ExistingTranslations::get().begin(); i != ExistingTranslations::get().end(); ++i)
+    for (auto iter = ExistingTranslations::get().begin(); iter != ExistingTranslations::get().end(); ++iter)
     {
         //flag
-        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::getImage(i->languageFlag), wxDefaultPosition, wxSize(-1, 11), 0 );
-        fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL, 5 );
+        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::getImage(iter->languageFlag), wxDefaultPosition, wxSize(-1, 11), 0 );
+        fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER);
 
         //language name
-        wxStaticText* staticTextLanguage = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, i->languageName, wxDefaultPosition, wxDefaultSize, 0 );
-        staticTextLanguage->Wrap( -1 );
-        fgSizerTranslators->Add(staticTextLanguage, 0, wxALIGN_CENTER_VERTICAL, 5);
+        wxStaticText* staticTextLanguage = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, iter->languageName, wxDefaultPosition, wxDefaultSize, 0 );
+        staticTextLanguage->Wrap(-1);
+        fgSizerTranslators->Add(staticTextLanguage, 0, wxALIGN_CENTER_VERTICAL);
 
         //translator name
-        wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, i->translatorName, wxDefaultPosition, wxDefaultSize, 0 );
-        staticTextTranslator->Wrap( -1 );
-        fgSizerTranslators->Add(staticTextTranslator, 0, wxALIGN_CENTER_VERTICAL, 5);
+        wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, iter->translatorName, wxDefaultPosition, wxDefaultSize, 0 );
+        staticTextTranslator->Wrap(-1);
+        fgSizerTranslators->Add(staticTextTranslator, 0, wxALIGN_CENTER_VERTICAL);
     }
 
     bSizerTranslators->Fit(m_scrolledWindowTranslators);
@@ -87,8 +89,8 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
     m_build->SetLabel(buildFormatted);
 
-    m_animationControl1->SetAnimation(GlobalResources::instance().animationMoney);
-    m_animationControl1->Play();
+    //m_animationControl1->SetAnimation(GlobalResources::instance().animationMoney);
+    //m_animationControl1->Play();
 
     m_buttonOkay->SetFocus();
     Fit();
@@ -434,139 +436,8 @@ ReturnSmallDlg::ButtonPressed zen::showDeleteDialog(const std::vector<zen::FileS
                                  useRecycleBin);
     return static_cast<ReturnSmallDlg::ButtonPressed>(confirmDeletion.ShowModal());
 }
+
 //########################################################################################
-
-
-class CustomizeColsDlg : public CustomizeColsDlgGenerated
-{
-public:
-    CustomizeColsDlg(wxWindow* parent, xmlAccess::ColumnAttributes& attr);
-
-private:
-    void OnOkay(wxCommandEvent& event);
-    void OnDefault(wxCommandEvent& event);
-    void OnCancel(wxCommandEvent& event);
-    void OnClose(wxCloseEvent& event);
-
-    void OnMoveUp(wxCommandEvent& event);
-    void OnMoveDown(wxCommandEvent& event);
-
-    xmlAccess::ColumnAttributes& output;
-};
-
-
-CustomizeColsDlg::CustomizeColsDlg(wxWindow* parent, xmlAccess::ColumnAttributes& attr) :
-    CustomizeColsDlgGenerated(parent),
-    output(attr)
-{
-#ifdef FFS_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
-#endif
-
-    m_bpButton29->SetBitmapLabel(GlobalResources::getImage(wxT("moveUp")));
-    m_bpButton30->SetBitmapLabel(GlobalResources::getImage(wxT("moveDown")));
-
-    xmlAccess::ColumnAttributes columnSettings = attr;
-
-    sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionOnly);
-
-    for (xmlAccess::ColumnAttributes::const_iterator i = columnSettings.begin(); i != columnSettings.end(); ++i) //love these iterators!
-    {
-        m_checkListColumns->Append(CustomGridRim::getTypeName(i->type));
-        m_checkListColumns->Check(i - columnSettings.begin(), i->visible);
-    }
-
-    m_checkListColumns->SetSelection(0);
-    Fit();
-}
-
-
-void CustomizeColsDlg::OnOkay(wxCommandEvent& event)
-{
-    for (int i = 0; i < int(m_checkListColumns->GetCount()); ++i)
-    {
-        const wxString label = m_checkListColumns->GetString(i);
-        for (xmlAccess::ColumnAttributes::iterator j = output.begin(); j != output.end(); ++j)
-        {
-            if (CustomGridRim::getTypeName(j->type) == label) //not nice but short and no performance issue
-            {
-                j->position = i;
-                j->visible  = m_checkListColumns->IsChecked(i);;
-                break;
-            }
-        }
-    }
-
-    EndModal(ReturnSmallDlg::BUTTON_OKAY);
-}
-
-
-void CustomizeColsDlg::OnDefault(wxCommandEvent& event)
-{
-    xmlAccess::ColumnAttributes defaultColumnAttr = CustomGridRim::getDefaultColumnAttributes();
-
-    m_checkListColumns->Clear();
-    for (xmlAccess::ColumnAttributes::const_iterator i = defaultColumnAttr.begin(); i != defaultColumnAttr.end(); ++i)
-    {
-        m_checkListColumns->Append(CustomGridRim::getTypeName(i->type));
-        m_checkListColumns->Check(i - defaultColumnAttr.begin(), i->visible);
-    }
-}
-
-
-void CustomizeColsDlg::OnCancel(wxCommandEvent& event)
-{
-    EndModal(0);
-}
-
-
-void CustomizeColsDlg::OnClose(wxCloseEvent& event)
-{
-    EndModal(0);
-}
-
-
-void CustomizeColsDlg::OnMoveUp(wxCommandEvent& event)
-{
-    const int pos = m_checkListColumns->GetSelection();
-    if (1 <= pos && pos < int(m_checkListColumns->GetCount()))
-    {
-        const bool checked    = m_checkListColumns->IsChecked(pos);
-        const wxString label  = m_checkListColumns->GetString(pos);
-
-        m_checkListColumns->SetString(pos, m_checkListColumns->GetString(pos - 1));
-        m_checkListColumns->Check(pos, m_checkListColumns->IsChecked(pos - 1));
-        m_checkListColumns->SetString(pos - 1, label);
-        m_checkListColumns->Check(pos - 1, checked);
-        m_checkListColumns->Select(pos - 1);
-    }
-}
-
-
-void CustomizeColsDlg::OnMoveDown(wxCommandEvent& event)
-{
-    const int pos = m_checkListColumns->GetSelection();
-    if (0 <= pos && pos < int(m_checkListColumns->GetCount()) - 1)
-    {
-        const bool checked    = m_checkListColumns->IsChecked(pos);
-        const wxString label  = m_checkListColumns->GetString(pos);
-
-        m_checkListColumns->SetString(pos, m_checkListColumns->GetString(pos + 1));
-        m_checkListColumns->Check(pos, m_checkListColumns->IsChecked(pos + 1));
-        m_checkListColumns->SetString(pos + 1, label);
-        m_checkListColumns->Check(pos + 1, checked);
-        m_checkListColumns->Select(pos + 1);
-    }
-}
-
-
-ReturnSmallDlg::ButtonPressed zen::showCustomizeColsDlg(xmlAccess::ColumnAttributes& attr)
-{
-    CustomizeColsDlg customizeDlg(NULL, attr);
-    return static_cast<ReturnSmallDlg::ButtonPressed>(customizeDlg.ShowModal());
-}
-//########################################################################################
-
 
 class SyncPreviewDlg : public SyncPreviewDlgGenerated
 {
@@ -599,10 +470,11 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     using zen::toStringSep;
 
     m_buttonStartSync->setBitmapFront(GlobalResources::getImage(wxT("startSync")));
-    m_bitmapCreate->SetBitmap(GlobalResources::getImage(wxT("create")));
-    m_bitmapUpdate->SetBitmap(GlobalResources::getImage(wxT("update")));
-    m_bitmapDelete->SetBitmap(GlobalResources::getImage(wxT("delete")));
-    m_bitmapData->SetBitmap(GlobalResources::getImage(wxT("data")));
+
+    m_bitmapCreate->SetBitmap(mirrorIfRtl(GlobalResources::getImage(L"create")));
+    m_bitmapUpdate->SetBitmap(mirrorIfRtl(GlobalResources::getImage(L"update")));
+    m_bitmapDelete->SetBitmap(mirrorIfRtl(GlobalResources::getImage(L"delete")));
+    m_bitmapData  ->SetBitmap(mirrorIfRtl(GlobalResources::getImage(L"data")));
 
     m_staticTextVariant->SetLabel(variantName);
     m_textCtrlData->SetValue(zen::filesizeToShortString(statistics.getDataToProcess()));

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef PTR_WRAP_012384670856841394535
@@ -36,7 +36,16 @@ public:
         lastInsert(NULL),
         sz(0) {}
 
-    ~FixedList() { clear(); }
+    ~FixedList()
+    {
+        Node* ptr = first;
+        while (ptr)
+        {
+            Node* tmp = ptr;
+            ptr = ptr->next;
+            delete tmp;
+        }
+    }
 
     template <class NodeT, class U>
     class ListIterator : public std::iterator<std::forward_iterator_tag, U>

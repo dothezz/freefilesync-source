@@ -1,30 +1,32 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef GRIDVIEW_H_INCLUDED
 #define GRIDVIEW_H_INCLUDED
 
 #include <set>
+#include "column_attr.h"
 #include "../file_hierarchy.h"
 
 
 namespace zen
 {
-//gui view of FolderComparison
+//grid view of FolderComparison
 class GridView
 {
 public:
     //direct data access via row number
-    const FileSystemObject* getObject(size_t row) const;  //returns NULL if object is not found; logarithmic complexity
-    FileSystemObject* getObject(size_t row);              //
-    size_t rowsOnView() const; //only the currently visible elements
-    size_t rowsTotal() const;  //total number of rows available
+    const FileSystemObject* getObject(size_t row) const;  //returns NULL if object is not found; complexity: constant!
+    /**/
+    FileSystemObject* getObject(size_t row);        //
+    size_t rowsOnView() const { return viewRef  .size(); } //only visible elements
+    size_t rowsTotal () const { return sortedRef.size(); } //total rows available
 
     //get references to FileSystemObject: no NULL-check needed! Everything's bound.
-    void getAllFileRef(const std::set<size_t>& guiRows, std::vector<FileSystemObject*>& output);
+    void getAllFileRef(const std::set<size_t>& rows, std::vector<FileSystemObject*>& output);
 
     struct StatusCmpResult
     {
@@ -92,52 +94,55 @@ public:
                                         bool syncEqualActive,
                                         bool conflictFilesActive);
 
-
-
-    FolderComparison& getDataTentative();    //get data for operation that does NOT add or reorder rows! (deletion is okay)
-    void setData(FolderComparison& newData); //set data, taking ownership: warning std::swap() is used!!!
-    void removeInvalidRows();                 //remove rows that have been deleted meanwhile: call after manual deletion and synchronization!
-    void clearAllRows();                      //clears everything
+    void setData(FolderComparison& newData);
+    void removeInvalidRows();                //remove rows that have been deleted meanwhile: call after manual deletion and synchronization!
 
     //sorting...
-    enum SortType
+    bool static getDefaultSortDirection(zen::ColumnTypeRim type); //true: ascending; false: descending
+
+    void sortView(zen::ColumnTypeRim type, bool onLeft, bool ascending); //always call this method for sorting, never sort externally!
+
+    struct SortInfo
     {
-        SORT_BY_REL_NAME,
-        SORT_BY_FILENAME,
-        SORT_BY_FILESIZE,
-        SORT_BY_DATE,
-        SORT_BY_EXTENSION,
-        SORT_BY_CMP_RESULT,
-        SORT_BY_DIRECTORY,
-        SORT_BY_SYNC_DIRECTION
+        SortInfo(zen::ColumnTypeRim type, bool onLeft, bool ascending) : type_(type), onLeft_(onLeft), ascending_(ascending) {}
+        zen::ColumnTypeRim type_;
+        bool onLeft_;
+        bool ascending_;
     };
+    const SortInfo* getSortInfo() const { return currentSort.get(); } //return NULL if currently not sorted
 
-    bool static getDefaultDirection(SortType type); //true: ascending; false: descending
-
-    void sortView(SortType type, bool onLeft, bool ascending); //always call this method for sorting, never sort externally!
+    int findRowDirect(FileSystemObject::ObjectIdConst objId) const; // find an object's row position on view list directly, return < 0 if not found
+    int findRowFirstChild(const HierarchyObject* hierObj)    const; // find first child of DirMapping or BaseDirMapping *on sorted sub view*
+    //"hierObj" may be invalid, it is NOT dereferenced, return < 0 if not found
 
 private:
-    class SerializeHierarchy;
-
     struct RefIndex
     {
-        RefIndex(size_t folderInd, FileSystemObject::ObjectID id) :
+        RefIndex(unsigned int folderInd, FileSystemObject::ObjectId id) :
             folderIndex(folderInd),
             objId(id) {}
-        size_t folderIndex;
-        FileSystemObject::ObjectID objId;
+        unsigned int folderIndex;
+        FileSystemObject::ObjectId objId;
     };
 
-    std::vector<FileSystemObject::ObjectID> viewRef;  //partial view on sortedRef
-    //              |
-    //              | (update...)
-    //             \|/
-    std::vector<RefIndex> sortedRef; //equivalent to folderCmp, but may be sorted
-    //              |
-    //              | (setData)
-    //             \|/
-    FolderComparison folderCmp; //actual comparison data: owned by GridView!
+    template <class Predicate> void updateView(Predicate pred);
 
+
+    zen::hash_map<FileSystemObject::ObjectIdConst, size_t> rowPositions; //find row positions on sortedRef directly
+    zen::hash_map<const HierarchyObject*, size_t> rowPositionsFirstChild; //find first child on sortedRef of a hierarchy object
+    //NEVER DEREFERENCE HierarchyObject*!!! lookup only!
+
+    std::vector<FileSystemObject::ObjectId> viewRef;  //partial view on sortedRef
+    /*             /|\
+                    | (update...)
+                    |                         */
+    std::vector<RefIndex> sortedRef; //flat view of weak pointers on folderCmp; may be sorted
+    /*             /|\
+                    | (setData...)
+                    |                         */
+    //std::shared_ptr<FolderComparison> folderCmp; //actual comparison data: owned by GridView!
+
+    class SerializeHierarchy;
 
     //sorting classes
     template <bool ascending>
@@ -160,6 +165,8 @@ private:
 
     template <bool ascending>
     class LessSyncDirection;
+
+    std::unique_ptr<SortInfo> currentSort;
 };
 
 
@@ -188,26 +195,6 @@ FileSystemObject* GridView::getObject(size_t row)
 {
     //code re-use of const method: see Meyers Effective C++
     return const_cast<FileSystemObject*>(static_cast<const GridView&>(*this).getObject(row));
-}
-
-
-inline
-size_t GridView::rowsOnView() const
-{
-    return viewRef.size();
-}
-
-
-inline
-FolderComparison& GridView::getDataTentative()
-{
-    return folderCmp;
-}
-
-inline
-size_t GridView::rowsTotal() const //total number of rows available
-{
-    return sortedRef.size();
 }
 }
 

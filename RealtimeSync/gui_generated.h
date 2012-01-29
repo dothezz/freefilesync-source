@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun 30 2011)
+// C++ code generated with wxFormBuilder (version Dec  2 2011)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -11,7 +11,6 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-class wxStaticText;
 namespace zen { class BitmapButton; }
 namespace zen { class DirPickerCtrl; }
 
@@ -25,9 +24,9 @@ namespace zen { class DirPickerCtrl; }
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/stattext.h>
-#include <wx/statline.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
+#include <wx/statline.h>
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
@@ -55,15 +54,14 @@ protected:
     wxMenuItem* m_menuItemAbout;
     wxBoxSizer* bSizerMain;
     wxPanel* m_panelMain;
-    wxStaticText* m_staticText2;
     wxStaticText* m_staticText3;
     wxStaticText* m_staticText4;
     wxStaticText* m_staticText5;
-    wxStaticLine* m_staticline3;
     wxStaticText* m_staticText21;
     wxStaticLine* m_staticline2;
-    wxStaticBoxSizer* sbSizerDirToWatch;
+    wxStaticBoxSizer* sbSizerDirToWatch2;
     wxPanel* m_panelMainFolder;
+    wxStaticText* m_staticTextFinalPath;
     wxBitmapButton* m_bpButtonAddFolder;
     wxBitmapButton* m_bpButtonRemoveTopFolder;
     wxTextCtrl* m_txtCtrlDirectoryMain;
@@ -71,7 +69,6 @@ protected:
     wxBoxSizer* bSizerFolders;
     wxTextCtrl* m_textCtrlCommand;
     wxSpinCtrl* m_spinCtrlDelay;
-    wxStaticLine* m_staticline1;
     zen::BitmapButton* m_buttonStart;
     wxButton* m_buttonCancel;
 

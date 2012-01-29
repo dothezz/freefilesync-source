@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "graph.h"
@@ -145,7 +145,7 @@ void drawXLabel(wxDC& dc, double& xMin, double& xMax, const wxRect& clientArea, 
     if (clientArea.GetHeight() <= 0 || clientArea.GetWidth() <= 0)
         return;
 
-    int optimalBlockWidth = dc.GetMultiLineTextExtent(wxT("100000000000000")).GetWidth();
+    const int optimalBlockWidth = dc.GetMultiLineTextExtent(wxT("100000000000000")).GetWidth();
 
     double valRangePerBlock = (xMax - xMin) * optimalBlockWidth / clientArea.GetWidth();
     valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
@@ -244,6 +244,8 @@ Graph2D::Graph2D(wxWindow* parent,
     //http://wiki.wxwidgets.org/Flicker-Free_Drawing
     Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Graph2D::onEraseBackGround), NULL, this);
 
+    //SetDoubleBuffered(true); slow as hell!
+
 #if wxCHECK_VERSION(2, 9, 1)
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 #else
@@ -338,7 +340,7 @@ private:
 void Graph2D::render(wxDC& dc) const
 {
     {
-        //have everything including label background in natural window color by default (overwriting current background color)
+        //draw everything including label background in natural window color by default (overwriting current background color)
         const wxColor backColor = wxPanel::GetClassDefaultAttributes().colBg != wxNullColour ?
                                   wxPanel::GetClassDefaultAttributes().colBg :
                                   wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
@@ -403,24 +405,25 @@ void Graph2D::render(wxDC& dc) const
     double minWndX = attr.minXauto ?  std::numeric_limits<double>::infinity() : attr.minX; //automatic: ensure values are initialized by first curve
     double maxWndX = attr.maxXauto ? -std::numeric_limits<double>::infinity() : attr.maxX; //
     if (!curves_.empty())
-    {
-        for (GraphList::const_iterator j = curves_.begin(); j != curves_.end(); ++j)
-        {
-            if (!j->first.get()) continue;
-            const GraphData& graph = *j->first;
-            assert(graph.getXBegin() <= graph.getXEnd());
+        for (auto iter = curves_.begin(); iter != curves_.end(); ++iter)
+            if (iter->first.get())
+            {
+                const GraphData& graph = *iter->first;
+                assert(graph.getXBegin() <= graph.getXEnd());
 
-            if (attr.minXauto)
-                minWndX = std::min(minWndX, graph.getXBegin());
-            if (attr.maxXauto)
-                maxWndX = std::max(maxWndX, graph.getXEnd());
-        }
+                if (attr.minXauto)
+                    minWndX = std::min(minWndX, graph.getXBegin());
+                if (attr.maxXauto)
+                    maxWndX = std::max(maxWndX, graph.getXEnd());
+            }
+
+    if (minWndX < maxWndX && maxWndX - minWndX < std::numeric_limits<double>::infinity()) //valid x-range
+    {
         if (attr.labelposX != X_LABEL_NONE && //minWndX, maxWndX are just a suggestion, drawXLabel may enlarge them!
             attr.labelFmtX.get())
             drawXLabel(dc, minWndX, maxWndX, xLabelArea, attr.labelHeightX, attr.labelposX == X_LABEL_BOTTOM, *attr.labelFmtX);
-    }
-    if (minWndX < maxWndX) //valid x-range
-    {
+
+
         //detect y value range
         std::vector<std::pair<std::vector<double>, int>> yValuesList(curves_.size());
         double minWndY = attr.minYauto ?  std::numeric_limits<double>::infinity() : attr.minY; //automatic: ensure values are initialized by first curve
@@ -480,11 +483,11 @@ void Graph2D::render(wxDC& dc) const
                 wxPoint currentPos = activeSel->refCurrentPos() - dataOrigin;
 
                 //normalize positions
-                confine(startPos  .x, 0, dataArea.width); //allow for one past the end(!) to enable "full range selections"
-                confine(currentPos.x, 0, dataArea.width); //
+                restrict(startPos  .x, 0, dataArea.width); //allow for one past the end(!) to enable "full range selections"
+                restrict(currentPos.x, 0, dataArea.width); //
 
-                confine(startPos  .y, 0, dataArea.height); //
-                confine(currentPos.y, 0, dataArea.height); //
+                restrict(startPos  .y, 0, dataArea.height); //
+                restrict(currentPos.y, 0, dataArea.height); //
 
                 //save current selection as double coordinates
                 activeSel->refSelection().from = SelectionBlock::Point(cvrtX.screenToReal(startPos.x + 0.5), //+0.5 start selection in the middle of a pixel
@@ -533,7 +536,7 @@ void Graph2D::render(wxDC& dc) const
             //finally draw curves
             for (GraphList::const_iterator j = curves_.begin(); j != curves_.end(); ++j)
             {
-                std::vector<double>& yValues = yValuesList[j - curves_.begin()].first; //actual y-values
+                std::vector<double>& yValues = yValuesList[j - curves_.begin()].first;  //actual y-values
                 int offset                   = yValuesList[j - curves_.begin()].second; //x-value offset in pixel
 
                 std::vector<wxPoint> curve;

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "main_dlg.h"
@@ -34,15 +34,15 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     m_bpButtonRemoveTopFolder->Hide();
     m_panelMainFolder->Layout();
 
-    m_bpButtonAddFolder->SetBitmapLabel(GlobalResources::getImage(wxT("addFolderPair")));
-    m_bpButtonRemoveTopFolder->SetBitmapLabel(GlobalResources::getImage(wxT("removeFolderPair")));
-    m_buttonStart->setBitmapFront(GlobalResources::getImage(wxT("startRed")));
+    m_bpButtonAddFolder      ->SetBitmapLabel(GlobalResources::getImage(L"addFolderPair"));
+    m_bpButtonRemoveTopFolder->SetBitmapLabel(GlobalResources::getImage(L"removeFolderPair"));
+    m_buttonStart            ->setBitmapFront(GlobalResources::getImage(L"startRed"));
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), NULL, this);
 
     //prepare drag & drop
-    dirNameFirst.reset(new DirectoryName<wxTextCtrl>(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, sbSizerDirToWatch));
+    dirNameFirst.reset(new DirectoryName<wxTextCtrl>(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath));
 
 
 #ifdef FFS_WIN

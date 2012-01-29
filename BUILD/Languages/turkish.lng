@@ -139,36 +139,6 @@
 <pluralform>%x Bayt</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Smblkbağlantı></target>
-
-<source><Directory></source>
-<target><Klasör></target>
-
-<source>Size</source>
-<target>Boyut</target>
-
-<source>Date</source>
-<target>Tarih</target>
-
-<source>Full path</source>
-<target>Tam yol</target>
-
-<source>Filename</source>
-<target>Dosya adı</target>
-
-<source>Relative path</source>
-<target>Bağıl klasör yolu</target>
-
-<source>Directory</source>
-<target>Klasör</target>
-
-<source>Extension</source>
-<target>Uzantı</target>
-
-<source>Comparison Result</source>
-<target>Karşılaştırma sonucu</target>
-
 <source>Initial synchronization:</source>
 <target>Başlangıç eşleştirmesi:</target>
 
@@ -354,6 +324,24 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Logging</source>
 <target>Günlükleme</target>
 
+<source>File time and size</source>
+<target>Dosya tarih ve saati</target>
+
+<source>File content</source>
+<target>Dosya içeriği</target>
+
+<source><Automatic></source>
+<target><Kendiliğinden></target>
+
+<source>Mirror ->></source>
+<target>Yansı ->></target>
+
+<source>Update -></source>
+<target>Güncelle -></target>
+
+<source>Custom</source>
+<target>Özel</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync toplu iş dosyası</target>
 
@@ -410,6 +398,36 @@ Her seferinde çalıştırılacak komut satırı:
 
 <source>(Requires an Internet connection!)</source>
 <target>(İnternet bağlantısı gereklidir!)</target>
+
+<source><Symlink></source>
+<target><Smblkbağlantı></target>
+
+<source><Directory></source>
+<target><Klasör></target>
+
+<source>Full path</source>
+<target>Tam yol</target>
+
+<source>Name</source>
+<target>Ad</target>
+
+<source>Relative path</source>
+<target>Bağıl klasör yolu</target>
+
+<source>Directory</source>
+<target>Klasör</target>
+
+<source>Size</source>
+<target>Boyut</target>
+
+<source>Date</source>
+<target>Tarih</target>
+
+<source>Extension</source>
+<target>Uzantı</target>
+
+<source>Comparison Result</source>
+<target>Karşılaştırma sonucu</target>
 
 <source>Drag && drop</source>
 <target>Klasör ya da dosyaları buraya sürükleyip bırakabilirsiniz</target>
@@ -582,26 +600,14 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Select variant:</source>
 <target>Davranışı seçin:</target>
 
-<source><Automatic></source>
-<target><Kendiliğinden></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>İki yandaki değişiklikleri bir veritabanı kullanarak belirler ve sakla. Silme, yeniden adlandırma ve çakışma işlemleri kendiliğinden algılanır.</target>
-
-<source>Mirror ->></source>
-<target>Yansı ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Sol klasörün yansı yedeği. Eşleştirmeden sonra sağ klasör, sol klasörün tamamen aynısı olur.</target>
 
-<source>Update -></source>
-<target>Güncelle -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Yalnız yeni ya da güncellenmiş dosyalar soldan sağa kopyalanır.</target>
-
-<source>Custom</source>
-<target>Özel</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Buradan kendi eşleştirme kurallarınızı yapılandırabilirsiniz.</target>
@@ -658,9 +664,6 @@ Dosyaların eşit sayılması için
 aynı olmalıdır
 </target>
 
-<source>File time and size</source>
-<target>Dosya tarih ve saati</target>
-
 <source>
 Files are found equal if
      - file content
@@ -671,9 +674,6 @@ Dosyaların eşit sayılması için
      - dosya içeriği
 aynı olmalıdır
 </target>
-
-<source>File content</source>
-<target>Dosya içeriği</target>
 
 <source>Symbolic Link handling</source>
 <target>Sembolik bağlantı işleme</target>
@@ -690,32 +690,29 @@ aynı olmalıdır
 <source>Source code written in C++ utilizing:</source>
 <target>Kaynak kodu C++ kullanılarak yazılmıştır:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>FreeFileSync çevirmenlerine çok teşekkürler:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Geri bildirim ve önerileriniz için:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>Sourceforge sitesinde FreeFileSync</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Öneri ve geri bildirimlerinizi bekleriz</target>
 
 <source>Homepage</source>
 <target>Ana sayfa</target>
 
-<source>If you like FFS</source>
-<target>FFS’i beğendiyseniz</target>
-
-<source>Donate with PayPal</source>
-<target>PayPal ile bağış yapın</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>Sourceforge sitesinde FreeFileSync</target>
 
 <source>Email</source>
 <target>E-posta</target>
 
-<source>Report translation error</source>
-<target>Çeviri hatası bildirin</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>FreeFileSync çevirmenlerine çok teşekkürler:</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>GNU Genel Kamu Lisansı şartları altında yayınlanmıştır:</target>
+<source>If you like FreeFileSync</source>
+<target>FreeFileSync’i beğendiyseniz</target>
+
+<source>Donate with PayPal</source>
+<target>PayPal ile bağış yapın</target>
+
+<source>Published under the GNU General Public License</source>
+<target>GNU Genel Kamu Lisansı şartları altında yayınlanmıştır</target>
 
 <source>Ignore subsequent errors</source>
 <target>Sonraki hataları yoksay</target>
@@ -864,6 +861,9 @@ Katma: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Klasör çiftleri</target>
 
+<source>Compressed view</source>
+<target>Sıkıştırılmış görünüm</target>
+
 <source>Select view</source>
 <target>Görünümü seçin</target>
 
@@ -882,20 +882,14 @@ Katma: \stuff\temp\*
 <source><multiple selection></source>
 <target><çoklu seçim></target>
 
-<source>D-Click</source>
-<target>D-Tuşu</target>
-
 <source>Delete</source>
 <target>Sil</target>
 
-<source>Customize...</source>
-<target>Özelleştir...</target>
+<source>Include all</source>
+<target>Tümünü kat</target>
 
-<source>Select time span...</source>
-<target>Zaman aralığını seçin...</target>
-
-<source>Auto-adjust columns</source>
-<target>Sütunları kendiliğinden hizala</target>
+<source>Exclude all</source>
+<target>Tümünü dışla</target>
 
 <source>Icon size:</source>
 <target>Simge boyutu:</target>
@@ -909,14 +903,11 @@ Katma: \stuff\temp\*
 <source>Large</source>
 <target>Büyük</target>
 
-<source>Include all rows</source>
-<target>Tüm satırları kat</target>
+<source>Select time span...</source>
+<target>Zaman aralığını seçin...</target>
 
-<source>Exclude all rows</source>
-<target>Tüm satırları dışla</target>
-
-<source>Reset view</source>
-<target>Görünümü sıfırla</target>
+<source>Default view</source>
+<target>Varsayılan görünüm</target>
 
 <source>Show "%x"</source>
 <target>"%x" panelini göster</target>
@@ -1197,6 +1188,12 @@ Katma: \stuff\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>Dosyaları zaman damgasıyla bir alt klasöre taşır</target>
 
+<source>Files</source>
+<target>Dosyalar</target>
+
+<source>Percentage</source>
+<target>Yüzde</target>
+
 <source>%x TB</source>
 <target>%x TB</target>
 
@@ -1326,6 +1323,9 @@ Katma: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Klasörler bağımlı! Eşleştirme kurallarını koyarken dikkatli olun:</target>
 
+<source>Preparing synchronization...</source>
+<target>Eşleştirmeye hazırlanıyor...</target>
+
 <source>Memory allocation failed!</source>
 <target>Bellek ayrılamadı!</target>
 
@@ -1443,8 +1443,8 @@ Katma: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Hedef klasör adı boş olamaz!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>Silme için kullanıcının belirttiği dizin belirtilmemiş!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Dosya sürümlemesi için klasör desteklenmiyor!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Kaynak klasör artık yok:</target>
@@ -1474,7 +1474,7 @@ Katma: \stuff\temp\*
 <target>Şu yollar için geri dönüşüm kutusu kullanılamaz! Dosyalar anında ve tamamen silinir:</target>
 
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Çoklu klasör çiftlerinin bir parçası olduğan bir klasör düzenlenecek! Lütfen eşleştirme ayarlarınızı gözden geçirin!</target>
+<target>Bir klasör, çoklu klasör çiftlerinin bir parçası olduğundan değiştirilecek! Lütfen eşleştirme ayarlarınızı gözden geçirin!</target>
 
 <source>Processing folder pair:</source>
 <target>İşlenen klasör çifti:</target>

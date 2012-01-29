@@ -312,7 +312,7 @@ Zstring volumenNameToPath(const Zstring& volumeName) //return empty string on er
                 if (EqualFilename()(volumeName, Zstring(&volName[0])))
                 {
                     //GetVolumePathNamesForVolumeName is not available for Windows 2000!
-                    typedef	BOOL (WINAPI *GetVolumePathNamesForVolumeNameWFunc)(LPCWSTR lpszVolumeName,
+                    typedef	BOOL (WINAPI* GetVolumePathNamesForVolumeNameWFunc)(LPCWSTR lpszVolumeName,
                                                                                 LPWCH lpszVolumePathNames,
                                                                                 DWORD cchBufferLength,
                                                                                 PDWORD lpcchReturnLength);

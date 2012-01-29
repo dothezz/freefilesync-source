@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "tooltip.h"
@@ -9,6 +9,8 @@
 #include <wx/sizer.h>
 #include <wx/statbmp.h>
 #include <wx/settings.h>
+#include <wx/app.h>
+#include <wx+/image_tools.h>
 
 using namespace zen;
 
@@ -46,7 +48,7 @@ public:
 };
 
 
-Tooltip::Tooltip() : tipWindow(new PopupFrameGenerated(NULL)), lastBmp(NULL)
+Tooltip::Tooltip() : tipWindow(new PopupFrameGenerated(NULL))
 {
 #ifdef FFS_WIN //neither looks good nor works at all on Linux
     tipWindow->Disable(); //prevent window stealing focus!
@@ -61,13 +63,12 @@ Tooltip::~Tooltip()
 }
 
 
-void Tooltip::show(const wxString& text, wxPoint pos, const wxBitmap* bmp)
+void Tooltip::show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp)
 {
-    if (bmp != lastBmp)
-    {
-        lastBmp = bmp;
-        tipWindow->m_bitmapLeft->SetBitmap(bmp == NULL ? wxNullBitmap : *bmp);
-    }
+    const wxBitmap& newBmp = bmp ? *bmp : wxNullBitmap;
+
+    if (!isEqual(tipWindow->m_bitmapLeft->GetBitmap(), newBmp))
+        tipWindow->m_bitmapLeft->SetBitmap(newBmp);
 
     if (text != tipWindow->m_staticTextMain->GetLabel())
     {
@@ -75,14 +76,16 @@ void Tooltip::show(const wxString& text, wxPoint pos, const wxBitmap* bmp)
         tipWindow->m_staticTextMain->Wrap(600);
     }
 
-#ifdef FFS_LINUX
-    tipWindow->Fit(); //Alas Fit() seems to be somewhat broken => this needs to be called EVERY time inside show, not only if text or bmp change.
-#endif
+    tipWindow->Fit(); //Linux: Fit() seems to be somewhat broken => this needs to be called EVERY time inside show, not only if text or bmp change
 
-    if (pos != tipWindow->GetScreenPosition())
-        tipWindow->SetSize(pos.x + 30, pos.y, wxDefaultCoord, wxDefaultCoord);
+    const wxPoint newPos = wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft ?
+                           mousePos - wxPoint(30 + tipWindow->GetSize().GetWidth(), 0) :
+                           mousePos + wxPoint(30, 0);
+
+    if (newPos != tipWindow->GetScreenPosition())
+        tipWindow->SetSize(newPos.x, newPos.y, wxDefaultCoord, wxDefaultCoord);
     //attention!!! possible endless loop: mouse pointer must NOT be within tipWindow!
-    //Else it will trigger a wxEVT_LEAVE_WINDOW which will hide the window, causing the window to be shown again via this method, etc.
+    //else it will trigger a wxEVT_LEAVE_WINDOW on middle grid which will hide the window, causing the window to be shown again via this method, etc.
 
     if (!tipWindow->IsShown())
         tipWindow->Show();

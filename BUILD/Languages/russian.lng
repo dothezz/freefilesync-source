@@ -140,36 +140,6 @@
 <pluralform>%x Байт</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Символьная ссылка></target>
-
-<source><Directory></source>
-<target><Папка></target>
-
-<source>Size</source>
-<target>Размер</target>
-
-<source>Date</source>
-<target>Дата</target>
-
-<source>Full path</source>
-<target>Полный путь</target>
-
-<source>Filename</source>
-<target>Имя файла</target>
-
-<source>Relative path</source>
-<target>Относительный путь</target>
-
-<source>Directory</source>
-<target>Папка</target>
-
-<source>Extension</source>
-<target>Расширение</target>
-
-<source>Comparison Result</source>
-<target>Результаты сравнения</target>
-
 <source>Initial synchronization:</source>
 <target>Первоначальная синхронизация:</target>
 
@@ -357,6 +327,24 @@ The command line is executed each time:
 <source>Logging</source>
 <target>Лог-файлы</target>
 
+<source>File time and size</source>
+<target>Дата и размер файла</target>
+
+<source>File content</source>
+<target>Содержимое файла</target>
+
+<source><Automatic></source>
+<target><Автоматический></target>
+
+<source>Mirror ->></source>
+<target>Зеркало ->></target>
+
+<source>Update -></source>
+<target>Обновить -></target>
+
+<source>Custom</source>
+<target>Выборочно</target>
+
 <source>FreeFileSync batch file</source>
 <target>Файл пакетного задания FreeFileSync</target>
 
@@ -414,6 +402,36 @@ The command line is executed each time:
 <source>(Requires an Internet connection!)</source>
 <target>(требуется подключение к Интернету!)</target>
 
+<source><Symlink></source>
+<target><Символьная ссылка></target>
+
+<source><Directory></source>
+<target><Папка></target>
+
+<source>Full path</source>
+<target>Полный путь</target>
+
+<source>Name</source>
+<target>Имя</target>
+
+<source>Relative path</source>
+<target>Относительный путь</target>
+
+<source>Directory</source>
+<target>Папка</target>
+
+<source>Size</source>
+<target>Размер</target>
+
+<source>Date</source>
+<target>Дата</target>
+
+<source>Extension</source>
+<target>Расширение</target>
+
+<source>Comparison Result</source>
+<target>Результаты сравнения</target>
+
 <source>Drag && drop</source>
 <target>Drag && drop</target>
 
@@ -437,9 +455,6 @@ The command line is executed each time:
 
 <source>2. &Synchronize...</source>
 <target>2. &Синхронизировать</target>
-
-<source>S&witch view</source>
-<target>Переключить вид</target>
 
 <source>&New</source>
 <target>&Новая</target>
@@ -588,26 +603,14 @@ The command line is executed each time:
 <source>Select variant:</source>
 <target>Варианты синхронизации</target>
 
-<source><Automatic></source>
-<target><Автоматический></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Выявление и распространение изменений на обе стороны, используя базу данных. Удаленные, переименованные и конфликтные файлы определяются автоматически.</target>
-
-<source>Mirror ->></source>
-<target>Зеркало ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Зеркальная (резервная) копия левой части. В результате синхронизации правая папка будет изменена до полного соответствия левой.</target>
 
-<source>Update -></source>
-<target>Обновить -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Копировать новые или обновлять файлы на правой стороне.</target>
-
-<source>Custom</source>
-<target>Выборочно</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Настроить свои собственные правила синхронизации.</target>
@@ -663,18 +666,12 @@ are the same
  - размер файла
 </target>
 
-<source>File time and size</source>
-<target>Дата и размер файла</target>
-
 <source>
 Files are found equal if
      - file content
 is the same
 </source>
 <target>Файлы считаются равными, если содержание файлов одинаковое</target>
-
-<source>File content</source>
-<target>Содержимое файла</target>
 
 <source>Symbolic Link handling</source>
 <target>Обращение к символьной ссылке</target>
@@ -691,32 +688,29 @@ is the same
 <source>Source code written in C++ utilizing:</source>
 <target>Исходный код написан на C++ с использованием:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Большое спасибо за перевод FreeFileSync:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Отзывы и предложения присылайте по адресу:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync на Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Замечания и предложения приветствуются</target>
 
 <source>Homepage</source>
 <target>Оф.сайт</target>
 
-<source>If you like FFS</source>
-<target>Если Вам понравился FFS</target>
-
-<source>Donate with PayPal</source>
-<target>Отправить деньги через PayPal</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync на Sourceforge</target>
 
 <source>Email</source>
 <target>Почта</target>
 
-<source>Report translation error</source>
-<target>Сообщить об ошибке перевода</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Большое спасибо за перевод FreeFileSync:</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>Издается под лицензией GNU General Public License:</target>
+<source>If you like FreeFileSync</source>
+<target>Если Вам понравился FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Отправить деньги через PayPal</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Издается под лицензией GNU General Public License</target>
 
 <source>Ignore subsequent errors</source>
 <target>Игнорировать последующие ошибки</target>
@@ -865,6 +859,9 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Пары папок для синхронизации</target>
 
+<source>Compressed view</source>
+<target>Компактный вид</target>
+
 <source>Select view</source>
 <target>Вид списка файлов</target>
 
@@ -883,20 +880,14 @@ Exclude: \stuff\temp\*
 <source><multiple selection></source>
 <target><групповое выделение></target>
 
-<source>D-Click</source>
-<target>Двойной клик</target>
-
 <source>Delete</source>
 <target>Удалить</target>
 
-<source>Customize...</source>
-<target>Выбрать колонки...</target>
+<source>Include all</source>
+<target>Включить все</target>
 
-<source>Select time span...</source>
-<target>Выберите промежуток времени...</target>
-
-<source>Auto-adjust columns</source>
-<target>Автовыравнивание ширины колонок</target>
+<source>Exclude all</source>
+<target>Исключить все</target>
 
 <source>Icon size:</source>
 <target>Размер иконок:</target>
@@ -910,14 +901,11 @@ Exclude: \stuff\temp\*
 <source>Large</source>
 <target>- большой</target>
 
-<source>Include all rows</source>
-<target>Отметить все</target>
+<source>Select time span...</source>
+<target>Выберите промежуток времени...</target>
 
-<source>Exclude all rows</source>
-<target>Не отмечать ничего</target>
-
-<source>Reset view</source>
-<target>Сброс настроек вида</target>
+<source>Default view</source>
+<target>Стандартный вид</target>
 
 <source>Show "%x"</source>
 <target>Показать "%x"</target>
@@ -1202,10 +1190,16 @@ Exclude: \stuff\temp\*
 <target>Использовать "Корзину" при удалении или перезаписи файлов</target>
 
 <source>Versioning</source>
-<target>Перемещать удаляемые файлы в заданную папку</target>
+<target>Перемещать старые версии файлов в заданную папку</target>
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>Перемещать файлы в заданную папку (можно создавать архивные версии удаленных файлов)</target>
+
+<source>Files</source>
+<target>Файлы</target>
+
+<source>Percentage</source>
+<target>Проценты</target>
 
 <source>%x TB</source>
 <target>%x ТБ</target>
@@ -1342,6 +1336,9 @@ Exclude: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Зависимые папки! Будьте внимательны при настройке правил синхронизации:</target>
 
+<source>Preparing synchronization...</source>
+<target>Подготовка к синхронизации...</target>
+
 <source>Memory allocation failed!</source>
 <target>Ошибка выделения памяти! (Не хватает памяти)</target>
 
@@ -1459,8 +1456,8 @@ Exclude: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Путь целевой папки не должен быть пустым!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>Пользовательская папка для удаления не была указана!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Папка для старых версий файлов не была указана!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Исходная папка больше не существует:</target>

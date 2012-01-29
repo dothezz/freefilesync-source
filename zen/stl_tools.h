@@ -2,13 +2,21 @@
 // * This file is part of the zenXML project. It is distributed under the   *
 // * Boost Software License, Version 1.0. See accompanying file             *
 // * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.       *
-// * Copyright (C) 2011 ZenJu (zhnmju123 AT gmx.de)                         *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef STL_TOOLS_HEADER_84567184321434
 #define STL_TOOLS_HEADER_84567184321434
 
-//no need to drag in any STL includes
+#include <memory>
+#if defined _MSC_VER && _MSC_VER <= 1600
+#include <set>
+#include <map>
+#else
+#include <unordered_set>
+#include <unordered_map>
+#endif
+
 
 
 //enhancements for <algorithm>
@@ -36,8 +44,12 @@ template <class BidirectionalIterator1, class BidirectionalIterator2>
 BidirectionalIterator1 search_last(BidirectionalIterator1 first1, BidirectionalIterator1 last1,
                                    BidirectionalIterator2 first2, BidirectionalIterator2 last2);
 
+//hash container: proper name + mitigate MSVC performance bug
+template <class T> class hash_set;
+template <class K, class V> class hash_map;
 
-
+template<typename T, typename Arg1>
+std::unique_ptr<T> make_unique(Arg1&& arg1); //should eventually make it into the std at some time
 
 
 
@@ -138,6 +150,28 @@ BidirectionalIterator1 search_last(const BidirectionalIterator1 first1, Bidirect
         --last1;
     }
 }
+
+
+#if defined _MSC_VER && _MSC_VER <= 1600 //VS2010 performance bug in std::unordered_set<>: http://drdobbs.com/blogs/cpp/232200410 -> should be fixed in VS11
+template <class T>          class hash_set : public std::set<T> {};
+template <class K, class V> class hash_map : public std::map<K, V> {};
+#else
+template <class T>          class hash_set : public std::unordered_set<T> {};
+template <class K, class V> class hash_map : public std::unordered_map<K, V> {};
+#endif
+
+//as long as variadic templates are not available in MSVC
+template<class T, class Arg1>                                                 inline std::unique_ptr<T> make_unique(Arg1&& arg1)                                                     { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1))); }
+template<class T, class Arg1, class Arg2>                                     inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2)                                        { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2))); }
+template<class T, class Arg1, class Arg2, class Arg3>                         inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3)                           { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3))); }
+template<class T, class Arg1, class Arg2, class Arg3, class Arg4>             inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4)              { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4))); }
+template<class T, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5> inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4, Arg5&& arg5) { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4), std::forward<Arg5>(arg5))); }
+
+//template<typename T, typename ...Args> inline
+//std::unique_ptr<T> make_unique(Args&& ...args)
+//{
+//    return std::unique_ptr<T>(new T( std::forward<Args>(args)... ));
+//}
 }
 
 #endif //STL_TOOLS_HEADER_84567184321434

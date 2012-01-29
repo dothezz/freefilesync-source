@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "gui_status_handler.h"
@@ -237,7 +237,7 @@ SyncStatusHandler::~SyncStatusHandler()
 
     //finalize error log
     if (abortIsRequested())
-        errorLog.logMsg(_("Synchronization aborted!"), TYPE_ERROR);
+        errorLog.logMsg(_("Synchronization aborted!"), TYPE_FATAL_ERROR);
     else if (totalErrors > 0)
         errorLog.logMsg(_("Synchronization completed with errors!"), TYPE_WARNING);
     else

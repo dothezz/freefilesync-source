@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "format_unit.h"
@@ -137,7 +137,8 @@ std::wstring zen::remainingTimeToShortString(double timeInSec)
 
 std::wstring zen::fractionToShortString(double fraction)
 {
-    return replaceCpy(_("%x%"), L"%x", printNumber<std::wstring>(L"%3.2f", fraction * 100.0), false);
+    //return replaceCpy(_("%x%"), L"%x", printNumber<std::wstring>(L"%3.2f", fraction * 100.0), false);
+    return printNumber<std::wstring>(L"%3.2f", fraction * 100.0) + L'%'; //no need to internationalize faction!?
 }
 
 

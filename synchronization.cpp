@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "synchronization.h"
@@ -866,34 +866,37 @@ private:
 class zen::SynchronizeFolderPair
 {
 public:
-    SynchronizeFolderPair(const SyncProcess& syncProc,
+    SynchronizeFolderPair(ProcessCallback& procCallback,
+                          bool verifyCopiedFiles,
+                          bool copyFilePermissions,
+                          bool transactionalFileCopy,
 #ifdef FFS_WIN
                           shadow::ShadowCopy* shadowCopyHandler,
 #endif
                           const DeletionHandling& delHandlingLeft,
                           const DeletionHandling& delHandlingRight) :
-        procCallback_(syncProc.procCallback),
+        procCallback_(procCallback),
 #ifdef FFS_WIN
         shadowCopyHandler_(shadowCopyHandler),
 #endif
         delHandlingLeft_(delHandlingLeft),
         delHandlingRight_(delHandlingRight),
-        verifyCopiedFiles(syncProc.verifyCopiedFiles_),
-        copyFilePermissions(syncProc.copyFilePermissions_),
-        transactionalFileCopy(syncProc.transactionalFileCopy_),
-        txtCreatingFile     (replaceCpy(_("Creating file %x"            ), L"%x", L"\"%x\"", false)),
+        verifyCopiedFiles_(verifyCopiedFiles),
+        copyFilePermissions_(copyFilePermissions),
+        transactionalFileCopy_(transactionalFileCopy),
+        txtCreatingFile     (replaceCpy(_("Creating file %x"            ), L"%x", L"\"%x\"", false)), //harmonize with duplicates in CallbackMoveFileImpl!!!
         txtCreatingLink     (replaceCpy(_("Creating symbolic link %x"   ), L"%x", L"\"%x\"", false)),
-        txtCreatingFolder   (replaceCpy(_("Creating folder %x"          ), L"%x", L"\"%x\"", false)),
+        txtCreatingFolder   (replaceCpy(_("Creating folder %x"          ), L"%x", L"\"%x\"", false)), //
         txtOverwritingFile  (replaceCpy(_("Overwriting file %x"         ), L"%x", L"\"%x\"", false)),
         txtOverwritingLink  (replaceCpy(_("Overwriting symbolic link %x"), L"%x", L"\"%x\"", false)),
         txtVerifying        (replaceCpy(_("Verifying file %x"           ), L"%x", L"\"%x\"", false)),
         txtWritingAttributes(replaceCpy(_("Updating attributes of %x"   ), L"%x", L"\"%x\"", false)),
-        txtMovingFile       (replaceCpy(replaceCpy(_("Moving file %x to %y"), L"%x", L"\"%x\"", false), L"%y", L"\"%y\"", false)) {}
-    //harmonize with duplicates in CallbackMoveFileImpl!!!
+        txtMovingFile       (replaceCpy(replaceCpy(_("Moving file %x to %y"), L"%x", L"\"%x\"", false), L"%y", L"\"%y\"", false))
+    {}
 
     void startSync(BaseDirMapping& baseMap)
     {
-        runZeroPass(baseMap);          //first process file moves
+        runZeroPass(baseMap);       //first process file moves
         runPass<PASS_ONE>(baseMap); //delete files (or overwrite big ones with smaller ones)
         runPass<PASS_TWO>(baseMap); //copy rest
     }
@@ -947,9 +950,9 @@ private:
     const DeletionHandling& delHandlingLeft_;
     const DeletionHandling& delHandlingRight_;
 
-    const bool verifyCopiedFiles;
-    const bool copyFilePermissions;
-    const bool transactionalFileCopy;
+    const bool verifyCopiedFiles_;
+    const bool copyFilePermissions_;
+    const bool transactionalFileCopy_;
 
     //preload status texts
     const std::wstring txtCreatingFile;
@@ -1569,7 +1572,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
 
             try
             {
-                zen::copySymlink(linkObj.getFullName<sideSrc>(), target, copyFilePermissions); //throw FileError
+                zen::copySymlink(linkObj.getFullName<sideSrc>(), target, copyFilePermissions_); //throw FileError
                 procCallback_.updateProcessedData(1, 0);
 
                 linkObj.copyTo<sideTrg>(); //update SymLinkMapping
@@ -1608,7 +1611,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
             linkObj.removeObject<sideTrg>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
 
             reportStatus(txtOverwritingLink, target); //restore status text
-            zen::copySymlink(linkObj.getFullName<sideSrc>(), target, copyFilePermissions); //throw FileError
+            zen::copySymlink(linkObj.getFullName<sideSrc>(), target, copyFilePermissions_); //throw FileError
             linkObj.copyTo<sideTrg>(); //update SymLinkMapping
 
             procCallback_.updateProcessedData(1, 0);
@@ -1677,7 +1680,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
                 const Zstring& target = dirObj.getBaseDirPf<sideTrg>() + dirObj.getRelativeName<sideSrc>();
 
                 reportInfo(txtCreatingFolder, target);
-                createDirectory(target, dirObj.getFullName<sideSrc>(), copyFilePermissions); //no symlink copying!
+                createDirectory(target, dirObj.getFullName<sideSrc>(), copyFilePermissions_); //no symlink copying!
                 dirObj.copyTo<sideTrg>(); //update DirMapping
 
                 procCallback_.updateProcessedData(1, 0);
@@ -1843,10 +1846,10 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         }
     };
 
-    typedef std::vector<std::pair<Zstring, Zstring> > DirPairList;
+    typedef std::vector<std::pair<Zstring, Zstring>> DirPairList;
     DirPairList significantDiff;
 
-    typedef std::vector<std::pair<Zstring, std::pair<zen::Int64, zen::Int64> > > DirSpaceRequAvailList; //dirname / space required / space available
+    typedef std::vector<std::pair<Zstring, std::pair<Int64, Int64>>> DirSpaceRequAvailList; //dirname / space required / space available
     DirSpaceRequAvailList diskSpaceMissing;
 
     std::set<Zstring> recyclMissing;
@@ -1925,7 +1928,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
                 //check if user-defined directory for deletion was specified
                 if (folderPairCfg.custDelFolder.empty())
                 {
-                    procCallback.reportFatalError(_("User-defined directory for deletion was not specified!"));
+                    procCallback.reportFatalError(_("Directory for file versioning was not supplied!"));
                     skipFolderPair[folderIndex] = true;
                     continue;
                 }
@@ -1956,28 +1959,24 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         if (significantDifferenceDetected(folderPairStat))
             significantDiff.push_back(std::make_pair(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()));
 
-        //check for sufficient free diskspace in left directory
+        //check for sufficient free diskspace
+        auto checkSpace = [&](const Zstring& baseDirPf, const Int64& spaceRequired)
+        {
+            wxLongLong freeDiskSpace;
+            if (wxGetDiskSpace(toWx(baseDirPf), NULL, &freeDiskSpace))
+            {
+                if (0 < freeDiskSpace && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
+                    freeDiskSpace.GetValue() < spaceRequired)
+                    diskSpaceMissing.push_back(std::make_pair(baseDirPf, std::make_pair(spaceRequired, freeDiskSpace.GetValue())));
+            }
+        };
         const std::pair<Int64, Int64> spaceNeeded = DiskSpaceNeeded::calculate(*j, delHandlerFp.first.deletionFreesSpace(),
                                                                                delHandlerFp.second.deletionFreesSpace());
-        wxLongLong freeDiskSpaceLeft;
-        if (wxGetDiskSpace(toWx(j->getBaseDirPf<LEFT_SIDE>()), NULL, &freeDiskSpaceLeft))
-        {
-            if (0 < freeDiskSpaceLeft && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
-                freeDiskSpaceLeft.ToDouble() < to<double>(spaceNeeded.first))
-                diskSpaceMissing.push_back(std::make_pair(j->getBaseDirPf<LEFT_SIDE>(), std::make_pair(spaceNeeded.first, freeDiskSpaceLeft.ToDouble())));
-        }
+        checkSpace(j->getBaseDirPf<LEFT_SIDE >(), spaceNeeded.first);
+        checkSpace(j->getBaseDirPf<RIGHT_SIDE>(), spaceNeeded.second);
 
-        //check for sufficient free diskspace in right directory
-        wxLongLong freeDiskSpaceRight;
-        if (wxGetDiskSpace(toWx(j->getBaseDirPf<RIGHT_SIDE>()), NULL, &freeDiskSpaceRight))
-        {
-            if (0 < freeDiskSpaceRight && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
-                freeDiskSpaceRight.ToDouble() < to<double>(spaceNeeded.second))
-                diskSpaceMissing.push_back(std::make_pair(j->getBaseDirPf<RIGHT_SIDE>(), std::make_pair(spaceNeeded.second, freeDiskSpaceRight.ToDouble())));
-        }
-
-        //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
 #ifdef FFS_WIN
+        //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
         if (folderPairCfg.handleDeletion == MOVE_TO_RECYCLE_BIN)
         {
             if (folderPairStat.getUpdate<LEFT_SIDE>() +
@@ -2138,7 +2137,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             //execute synchronization recursively
 
             //update synchronization database (automatic sync only)
-            zen::ScopeGuard guardUpdateDb = zen::makeGuard([&]()
+            zen::ScopeGuard guardUpdateDb = zen::makeGuard([&]
             {
                 if (folderPairCfg.inAutomaticMode)
                     zen::saveToDisk(*j); //throw FileError
@@ -2147,7 +2146,15 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             //guarantee removal of invalid entries (where element on both sides is empty)
             ZEN_ON_BLOCK_EXIT(BaseDirMapping::removeEmpty(*j););
 
-            SynchronizeFolderPair syncFP(*this,
+            bool copyPermissionsFp = false;
+            tryReportingError(procCallback, [&]
+            {
+                copyPermissionsFp = copyFilePermissions_ && //copy permissions only if asked for and supported by *both* sides!
+                supportsPermissions(beforeLast(j->getBaseDirPf<LEFT_SIDE >(), FILE_NAME_SEPARATOR)) && //throw FileError
+                supportsPermissions(beforeLast(j->getBaseDirPf<RIGHT_SIDE>(), FILE_NAME_SEPARATOR));
+            }); //show error dialog if necessary
+
+            SynchronizeFolderPair syncFP(procCallback, verifyCopiedFiles_, copyPermissionsFp, transactionalFileCopy_,
 #ifdef FFS_WIN
                                          shadowCopyHandler.get(),
 #endif
@@ -2156,13 +2163,14 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             syncFP.startSync(*j);
 
             //(try to gracefully) cleanup temporary folders (Recycle bin optimization) -> will be done in ~DeletionHandling anyway...
-            tryReportingError(procCallback, [&]() { delHandlerFp.first .tryCleanup(); }); //show error dialog if necessary
-            tryReportingError(procCallback, [&]() { delHandlerFp.second.tryCleanup(); }); //
+            tryReportingError(procCallback, [&] { delHandlerFp.first .tryCleanup(); }); //show error dialog if necessary
+            tryReportingError(procCallback, [&] { delHandlerFp.second.tryCleanup(); }); //
 
             //(try to gracefully) write database file (will be done in ~EnforceUpdateDatabase anyway...)
             if (folderPairCfg.inAutomaticMode)
             {
                 procCallback.reportStatus(_("Generating database..."));
+                procCallback.forceUiRefresh();
 
                 tryReportingError(procCallback, [&]() { zen::saveToDisk(*j); }); //throw FileError
                 guardUpdateDb.dismiss();
@@ -2236,8 +2244,8 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
 
         zen::copyFile(source, //type File implicitly means symlinks need to be dereferenced!
         target,
-        copyFilePermissions,
-        transactionalFileCopy,
+        copyFilePermissions_,
+        transactionalFileCopy_,
         &callback,
         &newAttr); //throw FileError, ErrorFileLocked
 
@@ -2280,7 +2288,7 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
 
 
     //#################### Verification #############################
-    if (verifyCopiedFiles)
+    if (verifyCopiedFiles_)
     {
         zen::ScopeGuard guardTarget     = zen::makeGuard([&] { removeFile(target); }); //delete target if verification fails
         zen::ScopeGuard guardStatistics = zen::makeGuard([&]

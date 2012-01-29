@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "file_traverser.h"
@@ -93,7 +93,7 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //returns 0 on error or if s
     //                  -> GetVolumePathName() on the other hand resolves "S:\Desktop\somedir" to "S:\Desktop\" - nice try...
 
     //dynamically load windows API function (existing since Windows XP)
-    typedef BOOL (WINAPI *GetFileInformationByHandleFunc)(HANDLE hFile,
+    typedef BOOL (WINAPI* GetFileInformationByHandleFunc)(HANDLE hFile,
                                                           LPBY_HANDLE_FILE_INFORMATION lpFileInformation);
 
     const SysDllFun<GetFileInformationByHandleFunc> getFileInformationByHandle(L"kernel32.dll", "GetFileInformationByHandle");
@@ -335,7 +335,7 @@ struct FilePlusTraverser
     template <class FindData>
     static void extractFileInfo(const FindData& fileInfo, DWORD volumeSerial, TraverseCallback::FileInfo& output)
     {
-        output.fileSize         = UInt64(fileInfo.fileSize.QuadPart);
+        output.fileSize         = fileInfo.fileSize.QuadPart;
         output.lastWriteTimeRaw = getModTime(fileInfo);
         output.id               = extractFileID(volumeSerial, fileInfo.fileId);
     }

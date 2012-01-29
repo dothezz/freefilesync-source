@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "structures.h"
@@ -237,7 +237,7 @@ zen::Int64 resolve(size_t value, UnitTime unit, zen::Int64 defaultVal)
             localTimeFmt->tm_sec  = 0; //0-61
             localTimeFmt->tm_min  = 0; //0-59
             localTimeFmt->tm_hour = 0; //0-23
-            return Int64(::mktime(localTimeFmt)); //convert local time back to UTC
+            return ::mktime(localTimeFmt); //convert local time back to UTC
 
         case UTIME_THIS_WEEK:
         {
@@ -256,7 +256,7 @@ zen::Int64 resolve(size_t value, UnitTime unit, zen::Int64 defaultVal)
             localTimeFmt->tm_min  = 0; //0-59
             localTimeFmt->tm_hour = 0; //0-23
             localTimeFmt->tm_mday = 1; //1-31
-            return Int64(::mktime(localTimeFmt)); //convert local time back to UTC
+            return ::mktime(localTimeFmt); //convert local time back to UTC
 
         case UTIME_THIS_YEAR:
             localTimeFmt->tm_sec  = 0; //0-61
@@ -264,7 +264,7 @@ zen::Int64 resolve(size_t value, UnitTime unit, zen::Int64 defaultVal)
             localTimeFmt->tm_hour = 0; //0-23
             localTimeFmt->tm_mday = 1; //1-31
             localTimeFmt->tm_mon  = 0; //0-11
-            return Int64(::mktime(localTimeFmt)); //convert local time back to UTC
+            return ::mktime(localTimeFmt); //convert local time back to UTC
     }
 
     assert(false);

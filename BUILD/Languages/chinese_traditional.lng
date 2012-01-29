@@ -113,10 +113,10 @@
 <target>無效的命令列：%x</target>
 
 <source>Windows Error Code %x:</source>
-<target>Windows 錯誤代碼 %x：</target>
+<target>Windows錯誤代碼 %x：</target>
 
 <source>Linux Error Code %x:</source>
-<target>Linux 錯誤代碼 %x：</target>
+<target>Linux錯誤代碼 %x：</target>
 
 <source>Error resolving symbolic link:</source>
 <target>解析錯誤的符號連結：</target>
@@ -138,41 +138,11 @@
 <pluralform>%x 位元組</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><符號連結></target>
-
-<source><Directory></source>
-<target><目錄></target>
-
-<source>Size</source>
-<target>大小</target>
-
-<source>Date</source>
-<target>日期</target>
-
-<source>Full path</source>
-<target>完整路徑</target>
-
-<source>Filename</source>
-<target>檔案名稱</target>
-
-<source>Relative path</source>
-<target>相對路徑</target>
-
-<source>Directory</source>
-<target>目錄</target>
-
-<source>Extension</source>
-<target>擴展</target>
-
-<source>Comparison Result</source>
-<target>比對結果</target>
-
 <source>Initial synchronization:</source>
 <target>初始化同步：</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
-<target>其中一個 FreeFileSync 資料庫檔案不存在：</target>
+<target>其中一個FreeFileSync資料庫檔案不存在：</target>
 
 <source>Incompatible synchronization database format:</source>
 <target>同步資料庫格式不相容：</target>
@@ -224,7 +194,7 @@
 </target>
 
 <source>Invalid FreeFileSync config file!</source>
-<target>無效的 FreeFileSync 配置檔案！</target>
+<target>無效的FreeFileSync配置檔案！</target>
 
 <source>Error parsing configuration file:</source>
 <target>分析配置檔案錯誤：</target>
@@ -239,7 +209,7 @@
 <target>讀取卷影複製服務時錯誤！</target>
 
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>不支援製作 WOW64 上的卷影副本。請使用 FreeFileSync 64位元版本。</target>
+<target>不支援製作WOW64上的卷影副本。請使用FreeFileSync 64位元版本。</target>
 
 <source>Could not determine volume name for file:</source>
 <target>無法判斷此檔案的卷標名稱：</target>
@@ -254,7 +224,7 @@
 <target>檔案不存在：</target>
 
 <source>Could not read values for the following XML nodes:</source>
-<target>無法讀取 XML 之後節點的值：</target>
+<target>無法讀取XML之後節點的值：</target>
 
 <source>S&ave configuration...</source>
 <target>儲存配置(&A)...</target>
@@ -351,14 +321,32 @@ The command line is executed each time:
 <source>Logging</source>
 <target>日誌記錄</target>
 
+<source>File time and size</source>
+<target>檔案大小和日期</target>
+
+<source>File content</source>
+<target>檔案内容</target>
+
+<source><Automatic></source>
+<target><自動></target>
+
+<source>Mirror ->></source>
+<target>鏡像 ->></target>
+
+<source>Update -></source>
+<target>更新 -></target>
+
+<source>Custom</source>
+<target>自訂</target>
+
 <source>FreeFileSync batch file</source>
-<target>FreeFileSync 批次檔</target>
+<target>FreeFileSync批次檔</target>
 
 <source>FreeFileSync configuration</source>
-<target>FreeFileSync 配置</target>
+<target>FreeFileSync配置</target>
 
 <source>FreeFileSync Batch Job</source>
-<target>FreeFileSync 批次處理作業</target>
+<target>FreeFileSync批次處理作業</target>
 
 <source>Unable to create log file!</source>
 <target>無法新建日誌檔！</target>
@@ -382,16 +370,16 @@ The command line is executed each time:
 <target>已成功的完成同步！</target>
 
 <source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>按下 "切換" 開啟 FreeFileSync 圖形介面操作方式。</target>
+<target>按下 "切換" 開啟FreeFileSync圖形介面操作方式。</target>
 
 <source>Switching to FreeFileSync GUI mode...</source>
-<target>切換 FreeFileSync 圖形介面操作方式...</target>
+<target>切換FreeFileSync圖形介面操作方式...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
-<target>無法連接到 sourceforge.net！</target>
+<target>無法連接到sourceforge.net！</target>
 
 <source>A newer version of FreeFileSync is available:</source>
-<target>有較新版本的 FreeFileSync 可用：</target>
+<target>有較新版本的FreeFileSync可用：</target>
 
 <source>Download now?</source>
 <target>要立即下載嗎？</target>
@@ -400,13 +388,43 @@ The command line is executed each time:
 <target>訊息</target>
 
 <source>FreeFileSync is up to date!</source>
-<target>FreeFileSync 已經是最新版本！</target>
+<target>FreeFileSync已經是最新版本！</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
-<target>要每週自動檢查更新 FreeFileSync 嗎？</target>
+<target>要每週自動檢查更新FreeFileSync嗎？</target>
 
 <source>(Requires an Internet connection!)</source>
 <target>(需要連接到網際網路！)</target>
+
+<source><Symlink></source>
+<target><符號連結></target>
+
+<source><Directory></source>
+<target><目錄></target>
+
+<source>Full path</source>
+<target>完整路徑</target>
+
+<source>Name</source>
+<target>名稱</target>
+
+<source>Relative path</source>
+<target>相對路徑</target>
+
+<source>Directory</source>
+<target>目錄</target>
+
+<source>Size</source>
+<target>大小</target>
+
+<source>Date</source>
+<target>日期</target>
+
+<source>Extension</source>
+<target>擴展</target>
+
+<source>Comparison Result</source>
+<target>比對結果</target>
 
 <source>Drag && drop</source>
 <target>拖放</target>
@@ -431,9 +449,6 @@ The command line is executed each time:
 
 <source>2. &Synchronize...</source>
 <target>2. 同步(&S)...</target>
-
-<source>S&witch view</source>
-<target>切換檢視(&W)</target>
 
 <source>&New</source>
 <target>新增專案(&N)</target>
@@ -508,7 +523,7 @@ The command line is executed each time:
 <target>一些檔案和目錄將被刪除</target>
 
 <source>Total amount of data that will be transferred</source>
-<target>將要傳輸的全部資料量</target>
+<target>將被傳輸的總資料量</target>
 
 <source>Operation:</source>
 <target>操作：</target>
@@ -579,26 +594,14 @@ The command line is executed each time:
 <source>Select variant:</source>
 <target>選擇變數：</target>
 
-<source><Automatic></source>
-<target><自動></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>對兩邊使用同一個資料庫的識別和傳送更改。自動檢測刪除和衝突部份。</target>
-
-<source>Mirror ->></source>
-<target>鏡像 ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>鏡像備份的左邊的資料夾。同步後，右邊的資料夾進行修改以完全相配左邊的資料夾。</target>
 
-<source>Update -></source>
-<target>更新 -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>將新的或更新過的檔案複製到右邊的資料夾中。</target>
-
-<source>Custom</source>
-<target>自訂</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>配置你自己的同步規則。</target>
@@ -650,18 +653,12 @@ are the same
 </source>
 <target>如果檔案大小和最後修改時間和日期相同則判斷兩者相同</target>
 
-<source>File time and size</source>
-<target>檔案大小和日期</target>
-
 <source>
 Files are found equal if
      - file content
 is the same
 </source>
 <target>如果檔案内容相同則判斷兩者相同</target>
-
-<source>File content</source>
-<target>檔案内容</target>
 
 <source>Symbolic Link handling</source>
 <target>符號連結處理</target>
@@ -678,32 +675,29 @@ is the same
 <source>Source code written in C++ utilizing:</source>
 <target>使用C++編寫的原始碼</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>非常感謝 FreeFileSync 當地語系化的工作人員：</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>歡迎在下面提出回報和建議：</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync 在 Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>歡迎反饋意見和建議</target>
 
 <source>Homepage</source>
 <target>首頁</target>
 
-<source>If you like FFS</source>
-<target>如果你喜歡 FFS</target>
-
-<source>Donate with PayPal</source>
-<target>使用 PayPal 捐贈</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync在Sourceforge</target>
 
 <source>Email</source>
 <target>信箱</target>
 
-<source>Report translation error</source>
-<target>回報翻譯錯誤</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>非常感謝FreeFileSync當地語系化的工作人員：</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>在GNU通用公共許可證下發佈：</target>
+<source>If you like FreeFileSync</source>
+<target>如果你喜歡FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>使用PayPal捐款</target>
+
+<source>Published under the GNU General Public License</source>
+<target>在GNU通用公共許可證下發佈</target>
 
 <source>Ignore subsequent errors</source>
 <target>忽略後續錯誤</target>
@@ -772,7 +766,7 @@ Exclude: \stuff\temp\*
 </target>
 
 <source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>同步所有 .doc, .zip 和 .exe 檔案，除了"temp"子資料夾中的所有檔案。</target>
+<target>同步所有 .doc、.zip 和 .exe 檔案，除了 "temp" 子資料夾中的所有檔案。</target>
 
 <source>Include</source>
 <target>包括</target>
@@ -799,7 +793,7 @@ Exclude: \stuff\temp\*
 <target>異動檔案副本</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>第一次將檔寫入到一個暫存 (*.ffs_tmp) 順便將它們重新命名。即使在嚴重錯誤的情況下，還可確保一致的狀態。</target>
+<target>第一次將檔寫入到一個暫存(*.ffs_tmp)，順便將它們重新命名。即使在嚴重錯誤的情況下，還可確保一致的狀態。</target>
 
 <source>Copy locked files</source>
 <target>複製被鎖定的檔案</target>
@@ -852,6 +846,9 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>資料夾對</target>
 
+<source>Compressed view</source>
+<target>壓縮檢視</target>
+
 <source>Select view</source>
 <target>選擇檢視</target>
 
@@ -870,20 +867,14 @@ Exclude: \stuff\temp\*
 <source><multiple selection></source>
 <target><多重選擇></target>
 
-<source>D-Click</source>
-<target>點兩下</target>
-
 <source>Delete</source>
 <target>刪除</target>
 
-<source>Customize...</source>
-<target>自訂...</target>
+<source>Include all</source>
+<target>包括所有</target>
 
-<source>Select time span...</source>
-<target>選擇時間範圍...</target>
-
-<source>Auto-adjust columns</source>
-<target>自動調整欄寬</target>
+<source>Exclude all</source>
+<target>排除所有</target>
 
 <source>Icon size:</source>
 <target>圖示大小：</target>
@@ -897,14 +888,11 @@ Exclude: \stuff\temp\*
 <source>Large</source>
 <target>大</target>
 
-<source>Include all rows</source>
-<target>包括所有行</target>
+<source>Select time span...</source>
+<target>選擇時間範圍...</target>
 
-<source>Exclude all rows</source>
-<target>排除所有行</target>
-
-<source>Reset view</source>
-<target>重置檢視</target>
+<source>Default view</source>
+<target>預設檢視</target>
 
 <source>Show "%x"</source>
 <target>顯示 "%x"</target>
@@ -1125,7 +1113,7 @@ Exclude: \stuff\temp\*
 <target>遵循</target>
 
 <source>Copy NTFS permissions</source>
-<target>複製 NTFS 權限</target>
+<target>複製NTFS權限</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>整合上下文功能表中的外部應用程式。可以使用下面的巨集：</target>
@@ -1178,6 +1166,12 @@ Exclude: \stuff\temp\*
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>移動檔案到一個時間標記的子目錄</target>
+
+<source>Files</source>
+<target>檔案</target>
+
+<source>Percentage</source>
+<target>百分比</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1305,6 +1299,9 @@ Exclude: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目錄有依靠性！請小心設定同步規則：</target>
 
+<source>Preparing synchronization...</source>
+<target>正在準備同步...</target>
+
 <source>Memory allocation failed!</source>
 <target>記憶體分配失敗！</target>
 
@@ -1422,8 +1419,8 @@ Exclude: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>目標目錄名稱不能空白！</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>未指定要刪除的自定義目錄！</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>版本控制檔的目錄不提供！</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>來源目錄不存在：</target>

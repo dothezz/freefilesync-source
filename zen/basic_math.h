@@ -2,7 +2,7 @@
 // * This file is part of the zenXML project. It is distributed under the   *
 // * Boost Software License, Version 1.0. See accompanying file             *
 // * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.       *
-// * Copyright (C) 2011 ZenJu (zhnmju123 AT gmx.de)                         *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef BASIC_MATH_HEADER_34726398432
@@ -32,7 +32,7 @@ template <class T>
 const T& max(const T& a, const T& b, const T& c);
 
 template <class T>
-void confine(T& val, const T& minVal, const T& maxVal); //make sure minVal <= val && val <= maxVal
+void restrict(T& val, const T& minVal, const T& maxVal); //make sure minVal <= val && val <= maxVal
 
 template <class InputIterator>
 std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last);
@@ -131,7 +131,7 @@ const T& max(const T& a, const T& b, const T& c)
 
 
 template <class T> inline
-void confine(T& val, const T& minVal, const T& maxVal)
+void restrict(T& val, const T& minVal, const T& maxVal)
 {
     assert(minVal <= maxVal);
     if (val < minVal)
@@ -260,19 +260,6 @@ double median(RandomAccessIterator first, RandomAccessIterator last) //note: inv
 }
 
 
-class LessMinusMedAbs : public std::binary_function<double, double, bool>
-{
-public:
-    LessMinusMedAbs(double median) : median_(median) {}
-    bool operator()(double lhs, double rhs) const
-    {
-        return abs(lhs - median_) < abs(rhs - median_);
-    }
-private:
-    double median_;
-};
-
-
 template <class RandomAccessIterator> inline
 double mad(RandomAccessIterator first, RandomAccessIterator last) //note: invalidates input range!
 {
@@ -285,14 +272,16 @@ double mad(RandomAccessIterator first, RandomAccessIterator last) //note: invali
 
         //the second median needs to operate on absolute residuals => avoid transforming input range as it may decrease precision!
 
-        std::nth_element(first, first + n / 2, last, LessMinusMedAbs(m)); //complexity: O(n)
+        auto lessMedAbs = [m](double lhs, double rhs) { return abs(lhs - m) < abs(rhs - m); };
+
+        std::nth_element(first, first + n / 2, last, lessMedAbs); //complexity: O(n)
         const double midVal = abs(*(first + n / 2) - m);
 
         if (n % 2 != 0)
             return midVal;
         else //n is even and >= 2 in this context: return mean of two middle values
         {
-            const double midVal2 = abs(*std::max_element(first, first + n / 2, LessMinusMedAbs(m)) - m);
+            const double midVal2 = abs(*std::max_element(first, first + n / 2, lessMedAbs) - m);
             return 0.5 * (midVal2 + midVal);
         }
     }

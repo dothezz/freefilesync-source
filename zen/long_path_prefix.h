@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef LONGPATHPREFIX_H_INCLUDED
@@ -55,6 +55,7 @@ template <size_t max_path> inline
 Zstring applyLongPathPrefixImpl(const Zstring& path)
 {
     assert(!path.empty()); //nicely check almost all WinAPI accesses!
+    assert(!zen::cStringIsWhiteSpace(path[0]));
 
     if (path.length() >= max_path &&    //maximum allowed path length without prefix is (MAX_PATH - 1)
         !zen::startsWith(path, LONG_PATH_PREFIX))

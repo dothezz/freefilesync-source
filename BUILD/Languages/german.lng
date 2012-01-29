@@ -139,36 +139,6 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Symlink></target>
-
-<source><Directory></source>
-<target><Verzeichnis></target>
-
-<source>Size</source>
-<target>Größe</target>
-
-<source>Date</source>
-<target>Datum</target>
-
-<source>Full path</source>
-<target>Absoluter Pfad</target>
-
-<source>Filename</source>
-<target>Dateiname</target>
-
-<source>Relative path</source>
-<target>Relativer Pfad</target>
-
-<source>Directory</source>
-<target>Verzeichnis</target>
-
-<source>Extension</source>
-<target>Dateiendung</target>
-
-<source>Comparison Result</source>
-<target>Ergebnis des Vergleichs</target>
-
 <source>Initial synchronization:</source>
 <target>Erstmalige Synchronisation:</target>
 
@@ -354,6 +324,24 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Logging</source>
 <target>Protokoll</target>
 
+<source>File time and size</source>
+<target>Datum und Größe</target>
+
+<source>File content</source>
+<target>Dateiinhalt</target>
+
+<source><Automatic></source>
+<target><Automatik></target>
+
+<source>Mirror ->></source>
+<target>Spiegeln ->></target>
+
+<source>Update -></source>
+<target>Aktualisieren -></target>
+
+<source>Custom</source>
+<target>Eigene</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync Batchdatei</target>
 
@@ -391,7 +379,7 @@ Die Befehlszeile wird ausgeführt wenn:
 <target>Wechsle in die graphische Ansicht...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
-<target>Es konnte keine Verbindung zu sourceforge.net aufgebaut werden!</target>
+<target>Es konnte keine Verbindung zu Sourceforge.net aufgebaut werden!</target>
 
 <source>A newer version of FreeFileSync is available:</source>
 <target>Eine neuere Version von FreeFileSync ist verfügbar:</target>
@@ -410,6 +398,36 @@ Die Befehlszeile wird ausgeführt wenn:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Eine Internetverbindung wird benötigt!)</target>
+
+<source><Symlink></source>
+<target><Symlink></target>
+
+<source><Directory></source>
+<target><Verzeichnis></target>
+
+<source>Full path</source>
+<target>Absoluter Pfad</target>
+
+<source>Name</source>
+<target>Name</target>
+
+<source>Relative path</source>
+<target>Relativer Pfad</target>
+
+<source>Directory</source>
+<target>Verzeichnis</target>
+
+<source>Size</source>
+<target>Größe</target>
+
+<source>Date</source>
+<target>Datum</target>
+
+<source>Extension</source>
+<target>Dateiendung</target>
+
+<source>Comparison Result</source>
+<target>Ergebnis des Vergleichs</target>
 
 <source>Drag && drop</source>
 <target>Drag && Drop</target>
@@ -582,26 +600,14 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Select variant:</source>
 <target>Variante auswählen:</target>
 
-<source><Automatic></source>
-<target><Automatik></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identifiziere und propagiere Änderungen auf beiden Seiten mit Hilfe einer Datenbank. Löschungen, Umbenennungen und Konflikte werden automatisch erkannt.</target>
-
-<source>Mirror ->></source>
-<target>Spiegeln ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Spiegelkopie des linken Verzeichnisses erstellen. Das rechte Verzeichnis wird dem linken exakt angeglichen.</target>
 
-<source>Update -></source>
-<target>Aktualisieren -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Neue oder aktualisierte Dateien vom linken in das rechte Verzeichnis kopieren.</target>
-
-<source>Custom</source>
-<target>Eigene</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Eigene Synchronisationsregeln definieren.</target>
@@ -658,9 +664,6 @@ Dateien gelten als gleich, wenn
 gleich sind
 </target>
 
-<source>File time and size</source>
-<target>Dateizeit und -größe</target>
-
 <source>
 Files are found equal if
      - file content
@@ -671,9 +674,6 @@ Dateien gelten als gleich, wenn
      - der Inhalt
 gleich ist
 </target>
-
-<source>File content</source>
-<target>Dateiinhalt</target>
 
 <source>Symbolic Link handling</source>
 <target>Behandlung Symbolischer Links</target>
@@ -690,32 +690,29 @@ gleich ist
 <source>Source code written in C++ utilizing:</source>
 <target>Sourcecode in C++ geschrieben mit Hilfe von:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Vielen Dank für die Lokalisation von FreeFileSync an:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Feedback und Vorschläge sind willkommen unter:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync auf Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Feedback und Vorschläge sind willkommen</target>
 
 <source>Homepage</source>
 <target>Homepage</target>
 
-<source>If you like FFS</source>
-<target>FFS unterstützen</target>
-
-<source>Donate with PayPal</source>
-<target>Mit PayPal spenden</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync auf Sourceforge</target>
 
 <source>Email</source>
 <target>Email</target>
 
-<source>Report translation error</source>
-<target>Übersetzungsfehler melden</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Vielen Dank für die Lokalisation von FreeFileSync an:</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>Veröffentlicht unter der GNU General Public License:</target>
+<source>If you like FreeFileSync</source>
+<target>Wenn Sie FreeFileSync mögen</target>
+
+<source>Donate with PayPal</source>
+<target>Mit PayPal spenden</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Veröffentlicht unter der Allgemeinen Öffentlichen GNU-Lizenz</target>
 
 <source>Ignore subsequent errors</source>
 <target>Nachfolgende Fehler ignorieren</target>
@@ -808,10 +805,10 @@ Ausschließen: \stuff\temp\*
 <target>Spalte nach unten verschieben</target>
 
 <source>Transactional file copy</source>
-<target>Kopiere Dateien als Transaktion</target>
+<target>Dateien als Transaktion kopieren</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Dateien zuerst temporär schreiben (*.ffs_tmp), anschließend umbenennen. Dadurch wird ein konsistenter Status auch im größten Fehlerfall sichergestellt.</target>
+<target>Schreibe zunächst in eine temporäre Datei (*.ffs_tmp) und benenne diese anschließend um. Dadurch wird ein konsistenter Status auch im größten Fehlerfall sichergestellt.</target>
 
 <source>Copy locked files</source>
 <target>Gesperrte Dateien kopieren</target>
@@ -864,6 +861,9 @@ Ausschließen: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Verzeichnispaare</target>
 
+<source>Compressed view</source>
+<target>Komprimierte Ansicht</target>
+
 <source>Select view</source>
 <target>Ansicht auswählen</target>
 
@@ -882,20 +882,14 @@ Ausschließen: \stuff\temp\*
 <source><multiple selection></source>
 <target><Mehrfachauswahl></target>
 
-<source>D-Click</source>
-<target>D-Klick</target>
-
 <source>Delete</source>
 <target>Löschen</target>
 
-<source>Customize...</source>
-<target>Anpassen...</target>
+<source>Include all</source>
+<target>Alle einschließen</target>
 
-<source>Select time span...</source>
-<target>Zeitspanne auswählen...</target>
-
-<source>Auto-adjust columns</source>
-<target>Spalten automatisch ausrichten</target>
+<source>Exclude all</source>
+<target>Alle ausschließen</target>
 
 <source>Icon size:</source>
 <target>Symbolgröße</target>
@@ -909,14 +903,11 @@ Ausschließen: \stuff\temp\*
 <source>Large</source>
 <target>Groß</target>
 
-<source>Include all rows</source>
-<target>Alle Zeilen einschließen</target>
+<source>Select time span...</source>
+<target>Zeitspanne auswählen...</target>
 
-<source>Exclude all rows</source>
-<target>Alle Zeilen ausschließen</target>
-
-<source>Reset view</source>
-<target>Ansicht zurücksetzen</target>
+<source>Default view</source>
+<target>Standardansicht</target>
 
 <source>Show "%x"</source>
 <target>Zeige "%x"</target>
@@ -1027,7 +1018,7 @@ Ausschließen: \stuff\temp\*
 <target>Vor der Synchronisation bitte zuerst einen Vergleich ausführen!</target>
 
 <source>Comma separated list</source>
-<target>Kommagetrennte Liste</target>
+<target>Durch Komma getrennte Liste</target>
 
 <source>Legend</source>
 <target>Legende</target>
@@ -1073,8 +1064,8 @@ Ausschließen: \stuff\temp\*
 <pluralform>%x of %y rows in view</pluralform>
 </source>
 <target>
-<pluralform>%x von 1 Zeile zur Ansicht</pluralform>
-<pluralform>%x von %y Zeilen zur Ansicht</pluralform>
+<pluralform>Zeige %x von 1 Zeile</pluralform>
+<pluralform>Zeige %x von %y Zeilen</pluralform>
 </target>
 
 <source>Scanning...</source>
@@ -1196,6 +1187,12 @@ Ausschließen: \stuff\temp\*
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>Verschiebe Dateien in ein Unterverzeichnis mit Zeitstempel</target>
+
+<source>Files</source>
+<target>Dateien</target>
+
+<source>Percentage</source>
+<target>Prozent</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1326,6 +1323,9 @@ Ausschließen: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationseinstellungen:</target>
 
+<source>Preparing synchronization...</source>
+<target>Bereite Synchronisation vor...</target>
+
 <source>Memory allocation failed!</source>
 <target>Speicherallokation fehlgeschlagen!</target>
 
@@ -1443,8 +1443,8 @@ Ausschließen: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Der Zielverzeichnisname darf nicht leer sein!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>Kein benutzerdefiniertes Verzeichnis zum Löschen angegeben!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Das Verzeichnis für die Versionierung wurde nicht angegeben!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Quellverzeichnis existiert nicht mehr:</target>

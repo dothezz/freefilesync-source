@@ -1,7 +1,7 @@
 ﻿// **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "process_xml.h"
@@ -70,7 +70,6 @@ void setXmlType(XmlDoc& doc, XmlType type) //throw()
     }
 }
 //################################################################################################################
-
 
 wxString xmlAccess::getGlobalConfigFile()
 {
@@ -539,15 +538,29 @@ bool readText(const std::string& input, UnitTime& value)
 
 
 template <> inline
-void writeText(const ColumnTypes& value, std::string& output)
+void writeText(const ColumnTypeRim& value, std::string& output)
 {
     output = toString<std::string>(value);
 }
 
 template <> inline
-bool readText(const std::string& input, ColumnTypes& value)
+bool readText(const std::string& input, ColumnTypeRim& value)
 {
-    value = static_cast<ColumnTypes>(toNumber<int>(input));
+    value = static_cast<ColumnTypeRim>(toNumber<int>(input));
+    return true;
+}
+
+
+template <> inline
+void writeText(const ColumnTypeNavi& value, std::string& output)
+{
+    output = toString<std::string>(value);
+}
+
+template <> inline
+bool readText(const std::string& input, ColumnTypeNavi& value)
+{
+    value = static_cast<ColumnTypeNavi>(toNumber<int>(input));
     return true;
 }
 
@@ -631,23 +644,42 @@ bool readText(const std::string& input, DirectionConfig::Variant& value)
 
 
 template <> inline
-bool readValue(const XmlElement& input, ColumnAttrib& value)
+bool readValue(const XmlElement& input, ColumnAttributeRim& value)
 {
     XmlIn in(input);
-    bool rv1 = in.attribute("Type",    value.type);
-    bool rv2 = in.attribute("Visible", value.visible);
-    bool rv3 = in.attribute("Width",   value.width);
-    value.position = 0;
+    bool rv1 = in.attribute("Type",    value.type_);
+    bool rv2 = in.attribute("Visible", value.visible_);
+    bool rv3 = in.attribute("Width",   value.width_);
     return rv1 && rv2 && rv3;
 }
 
 template <> inline
-void writeValue(const ColumnAttrib& value, XmlElement& output)
+void writeValue(const ColumnAttributeRim& value, XmlElement& output)
 {
     XmlOut out(output);
-    out.attribute("Type",    value.type);
-    out.attribute("Visible", value.visible);
-    out.attribute("Width",   value.width);
+    out.attribute("Type",    value.type_);
+    out.attribute("Visible", value.visible_);
+    out.attribute("Width",   value.width_);
+}
+
+
+template <> inline
+bool readValue(const XmlElement& input, ColumnAttributeNavi& value)
+{
+    XmlIn in(input);
+    bool rv1 = in.attribute("Type",    value.type_);
+    bool rv2 = in.attribute("Visible", value.visible_);
+    bool rv3 = in.attribute("Width",   value.width_);
+    return rv1 && rv2 && rv3;
+}
+
+template <> inline
+void writeValue(const ColumnAttributeNavi& value, XmlElement& output)
+{
+    XmlOut out(output);
+    out.attribute("Type",    value.type_);
+    out.attribute("Visible", value.visible_);
+    out.attribute("Width",   value.width_);
 }
 }
 
@@ -791,16 +823,7 @@ void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
     //read GUI specific config data
     XmlIn inBatchCfg = in["BatchConfig"];
 
-    //-----------------------------------------------------------------------------
-    if (inBatchCfg["Silent"])
-    {
-        inBatchCfg["Silent"](config.showProgress);
-        config.showProgress = !config.showProgress;
-    }
-    else
-        //-----------------------------------------------------------------------------
-
-        inBatchCfg["ShowProgress"    ](config.showProgress);
+    inBatchCfg["ShowProgress"    ](config.showProgress);
     inBatchCfg["LogfileDirectory"](config.logFileDirectory);
     inBatchCfg["LogfileCountMax" ](config.logFileCountMax);
     inBatchCfg["HandleError"     ](config.handleError);
@@ -845,12 +868,6 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inWnd.attribute("PosY",      config.gui.dlgPos.y);
     inWnd.attribute("Maximized", config.gui.isMaximized);
 
-    //    inWnd["Width"    ](config.gui.dlgSize.x);
-    //    inWnd["Height"   ](config.gui.dlgSize.y);
-    //    inWnd["PosX"     ](config.gui.dlgPos.x);
-    //    inWnd["PosY"     ](config.gui.dlgPos.y);
-    //    inWnd["Maximized"](config.gui.isMaximized);
-
     inWnd["MaxFolderPairsVisible"](config.gui.maxFolderPairsVisible);
 
     inWnd["ManualDeletionOnBothSides"](config.gui.deleteOnBothSides);
@@ -861,22 +878,21 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     //###########################################################
     //read column attributes
-    XmlIn inColLeft = inWnd["LeftColumns"];
-    inColLeft.attribute("AutoAdjust",    config.gui.autoAdjustColumnsLeft);
+    XmlIn inColNavi = inWnd["CompressedView"];
+    inColNavi(config.gui.columnAttribNavi);
 
+    inColNavi.attribute("ShowPercentage", config.gui.showPercentBar);
+    inColNavi.attribute("SortByColumn", config.gui.naviLastSortColumn);
+    inColNavi.attribute("SortAscending", config.gui.naviLastSortAscending);
+
+    XmlIn inColLeft = inWnd["ColumnsLeft"];
     inColLeft(config.gui.columnAttribLeft);
-    for (size_t i = 0; i < config.gui.columnAttribLeft.size(); ++i)
-        config.gui.columnAttribLeft[i].position = i;
 
-    //###########################################################
-    XmlIn inColRight = inWnd["RightColumns"];
-    inColRight.attribute("AutoAdjust",    config.gui.autoAdjustColumnsRight);
-
+    XmlIn inColRight = inWnd["ColumnsRight"];
     inColRight(config.gui.columnAttribRight);
-    for (size_t i = 0; i < config.gui.columnAttribRight.size(); ++i)
-        config.gui.columnAttribRight[i].position = i;
+    //###########################################################
 
-    inWnd["Perspective"       ](config.gui.guiPerspectiveLast);
+    inWnd["Layout"](config.gui.guiPerspectiveLast);
 
     inGui["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
     inGui["FolderHistoryRight"](config.gui.folderHistoryRight);
@@ -1126,18 +1142,22 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outWnd["IconSize"](config.gui.iconSize);
 
     //###########################################################
-
     //write column attributes
-    XmlOut outColLeft = outWnd["LeftColumns"];
-    outColLeft.attribute("AutoAdjust", config.gui.autoAdjustColumnsLeft);
+    XmlOut outColNavi = outWnd["CompressedView"];
+    outColNavi(config.gui.columnAttribNavi);
+
+    outColNavi.attribute("ShowPercentage", config.gui.showPercentBar);
+    outColNavi.attribute("SortByColumn", config.gui.naviLastSortColumn);
+    outColNavi.attribute("SortAscending", config.gui.naviLastSortAscending);
+
+    XmlOut outColLeft = outWnd["ColumnsLeft"];
     outColLeft(config.gui.columnAttribLeft);
 
-    //###########################################################
-    XmlOut outColRight = outWnd["RightColumns"];
-    outColRight.attribute("AutoAdjust", config.gui.autoAdjustColumnsRight);
+    XmlOut outColRight = outWnd["ColumnsRight"];
     outColRight(config.gui.columnAttribRight);
+    //###########################################################
 
-    outWnd["Perspective"       ](config.gui.guiPerspectiveLast);
+    outWnd["Layout"](config.gui.guiPerspectiveLast);
 
     outGui["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
     outGui["FolderHistoryRight"](config.gui.folderHistoryRight);

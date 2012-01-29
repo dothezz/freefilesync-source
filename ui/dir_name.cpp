@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "dir_name.h"
@@ -20,13 +20,13 @@ using namespace zen;
 
 namespace
 {
-void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, wxWindow& tooltipWnd, wxStaticBoxSizer* staticBox, size_t timeout)
+void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, wxWindow& tooltipWnd, wxStaticText* staticText, size_t timeout)
 {
     const wxString dirFormatted = toWx(getFormattedDirectoryName(toZ(dirname)));
 
     tooltipWnd.SetToolTip(dirFormatted); //wxComboBox bug: the edit control is not updated... http://trac.wxwidgets.org/ticket/12659
 
-    if (staticBox)
+    if (staticText)
     {
         //change static box label only if there is a real difference to what is shown in wxTextCtrl anyway
         wxString dirNormalized = dirname;
@@ -34,7 +34,7 @@ void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, w
         if (!dirNormalized.empty() && !endsWith(dirNormalized, FILE_NAME_SEPARATOR))
             dirNormalized += FILE_NAME_SEPARATOR;
 
-        staticBox->GetStaticBox()->SetLabel(dirNormalized == dirFormatted ? wxString(_("Drag && drop")) : dirFormatted);
+        staticText->SetLabel(dirNormalized == dirFormatted ? wxString(_("Drag && drop")) : dirFormatted);
     }
 
     if (dirPicker && !dirFormatted.empty())
@@ -52,12 +52,12 @@ void setDirectoryName(const wxString&  dirname,
                       wxTextCtrl*      txtCtrl,
                       wxDirPickerCtrl* dirPicker,
                       wxWindow&        tooltipWnd,
-                      wxStaticBoxSizer* staticBox,
+                      wxStaticText*    staticText,
                       size_t           timeout = 200) //pointers are optional
 {
     if (txtCtrl)
         txtCtrl->ChangeValue(dirname);
-    setDirectoryNameImpl(dirname, dirPicker, tooltipWnd, staticBox, timeout);
+    setDirectoryNameImpl(dirname, dirPicker, tooltipWnd, staticText, timeout);
 }
 
 
@@ -65,12 +65,12 @@ void setDirectoryName(const wxString&   dirname,
                       FolderHistoryBox* comboBox,
                       wxDirPickerCtrl*  dirPicker,
                       wxWindow&         tooltipWnd,
-                      wxStaticBoxSizer* staticBox,
+                      wxStaticText*    staticText,
                       size_t            timeout = 200) //pointers are optional
 {
     if (comboBox)
         comboBox->setValue(dirname);
-    setDirectoryNameImpl(dirname, dirPicker, tooltipWnd, staticBox, timeout);
+    setDirectoryNameImpl(dirname, dirPicker, tooltipWnd, staticText, timeout);
 }
 }
 //##############################################################################################################
@@ -79,23 +79,23 @@ template <class NameControl>
 DirectoryName<NameControl>::DirectoryName(wxWindow&        dropWindow,
                                           wxDirPickerCtrl& dirPicker,
                                           NameControl&     dirName,
-                                          wxStaticBoxSizer* staticBox,
+                                          wxStaticText*    staticText,
                                           wxWindow*        dropWindow2) :
     dropWindow_(dropWindow),
     dropWindow2_(dropWindow2),
     dirPicker_(dirPicker),
     dirName_(dirName),
-    staticBox_(staticBox)
+    staticText_(staticText)
 {
     //prepare drag & drop
     setupFileDrop(dropWindow);
-    if (dropWindow2)
-        setupFileDrop(*dropWindow2);
+    dropWindow.Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), NULL, this);
 
-    //redirect drag & drop event back to this class
-    dropWindow.Connect(FFS_DROP_FILE_EVENT, FFSFileDropEventHandler(DirectoryName::OnFilesDropped), NULL, this);
     if (dropWindow2)
-        dropWindow2->Connect(FFS_DROP_FILE_EVENT, FFSFileDropEventHandler(DirectoryName::OnFilesDropped), NULL, this);
+    {
+        setupFileDrop(*dropWindow2);
+        dropWindow2->Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), NULL, this);
+    }
 
     //keep dirPicker and dirName synchronous
     dirName_  .Connect(wxEVT_COMMAND_TEXT_UPDATED,      wxCommandEventHandler(      DirectoryName::OnWriteDirManually), NULL, this);
@@ -112,16 +112,17 @@ DirectoryName<NameControl>::~DirectoryName()
 
 
 template <class NameControl>
-void DirectoryName<NameControl>::OnFilesDropped(FFSFileDropEvent& event)
+void DirectoryName<NameControl>::OnFilesDropped(FileDropEvent& event)
 {
-    if (event.getFiles().empty())
+    const auto& files = event.getFiles();
+    if (files.empty())
         return;
 
-    if (acceptDrop(event.getFiles()))
+    if (acceptDrop(files, event.getDropPosition(), event.getDropWindow()))
     {
         const wxString fileName = event.getFiles()[0];
         if (dirExists(toZ(fileName)))
-            setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticBox_);
+            setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticText_);
         else
         {
             wxString parentName = beforeLast(fileName, utf8CvrtTo<wxString>(FILE_NAME_SEPARATOR)); //returns empty string if ch not found
@@ -130,18 +131,20 @@ void DirectoryName<NameControl>::OnFilesDropped(FFSFileDropEvent& event)
                 parentName += FILE_NAME_SEPARATOR;
 #endif
             if (dirExists(toZ(parentName)))
-                setDirectoryName(parentName, &dirName_, &dirPicker_, dirName_, staticBox_);
+                setDirectoryName(parentName, &dirName_, &dirPicker_, dirName_, staticText_);
             else //set original name unconditionally: usecase: inactive mapped network shares
-                setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticBox_);
+                setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticText_);
         }
     }
+    else
+        event.Skip(); //let other handlers try!!!
 }
 
 
 template <class NameControl>
 void DirectoryName<NameControl>::OnWriteDirManually(wxCommandEvent& event)
 {
-    setDirectoryName(event.GetString(), static_cast<NameControl*>(NULL), &dirPicker_, dirName_, staticBox_, 100); //potentially slow network access: wait 100 ms at most
+    setDirectoryName(event.GetString(), static_cast<NameControl*>(NULL), &dirPicker_, dirName_, staticText_, 100); //potentially slow network access: wait 100 ms at most
     event.Skip();
 }
 
@@ -150,7 +153,7 @@ template <class NameControl>
 void DirectoryName<NameControl>::OnDirSelected(wxFileDirPickerEvent& event)
 {
     const wxString newPath = event.GetPath();
-    setDirectoryName(newPath, &dirName_, NULL, dirName_, staticBox_);
+    setDirectoryName(newPath, &dirName_, NULL, dirName_, staticText_);
     event.Skip();
 }
 
@@ -165,7 +168,7 @@ wxString DirectoryName<NameControl>::getName() const
 template <class NameControl>
 void DirectoryName<NameControl>::setName(const wxString& dirname)
 {
-    setDirectoryName(dirname, &dirName_, &dirPicker_, dirName_, staticBox_);
+    setDirectoryName(dirname, &dirName_, &dirPicker_, dirName_, staticText_);
 }
 
 

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef STATUSHANDLER_H_INCLUDED
@@ -56,6 +56,7 @@ struct ProcessCallback
 
     //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
     virtual void requestUiRefresh() = 0; //throw ?
+    virtual void forceUiRefresh  () = 0; //throw ? - call before starting long running task which doesn't update regularly
 
     //called periodically after data was processed: expected(!) to request GUI update
     virtual void reportStatus(const std::wstring& text) = 0; //status info only, should not be logged!
@@ -89,8 +90,6 @@ class StatusHandler : public ProcessCallback, public AbortCallback
 {
 public:
     StatusHandler() : abortRequested(false) {}
-
-    virtual void forceUiRefresh() = 0;
 
     virtual void requestUiRefresh()
     {

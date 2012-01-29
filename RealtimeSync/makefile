@@ -9,62 +9,53 @@ COMMON_LINK_FLAGS  = -O3 -pthread
 FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
 LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes` -lboost_thread
 
-#static build used for precompiled release
+#static std library linkage used for precompiled release
 ifeq ($(BUILD),release)
 FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
 LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
 endif
 
-FILE_LIST=    #internal list of all *.cpp files needed for compilation
-FILE_LIST+=application.cpp
-FILE_LIST+=gui_generated.cpp
-FILE_LIST+=main_dlg.cpp
-FILE_LIST+=resources.cpp
-FILE_LIST+=tray_menu.cpp
-FILE_LIST+=watcher.cpp
-FILE_LIST+=xml_ffs.cpp
-FILE_LIST+=xml_proc.cpp
-FILE_LIST+=../ui/dir_name.cpp
-FILE_LIST+=../lib/localization.cpp
-FILE_LIST+=../lib/process_xml.cpp
-FILE_LIST+=../lib/resolve_path.cpp
-FILE_LIST+=../lib/xml_base.cpp
-FILE_LIST+=../ui/folder_history_box.cpp
-FILE_LIST+=../structures.cpp
-FILE_LIST+=../wx+/button.cpp
-FILE_LIST+=../wx+/format_unit.cpp
-FILE_LIST+=../zen/dir_watcher.cpp
-FILE_LIST+=../zen/file_handling.cpp
-FILE_LIST+=../zen/file_io.cpp
-FILE_LIST+=../zen/file_traverser.cpp
-FILE_LIST+=../zen/zstring.cpp
+CPP_LIST= #internal list of all *.cpp files needed for compilation
+CPP_LIST+=application.cpp
+CPP_LIST+=gui_generated.cpp
+CPP_LIST+=main_dlg.cpp
+CPP_LIST+=resources.cpp
+CPP_LIST+=tray_menu.cpp
+CPP_LIST+=watcher.cpp
+CPP_LIST+=xml_ffs.cpp
+CPP_LIST+=xml_proc.cpp
+CPP_LIST+=../structures.cpp
+CPP_LIST+=../ui/dir_name.cpp
+CPP_LIST+=../ui/folder_history_box.cpp
+CPP_LIST+=../lib/localization.cpp
+CPP_LIST+=../lib/process_xml.cpp
+CPP_LIST+=../lib/resolve_path.cpp
+CPP_LIST+=../lib/xml_base.cpp
+CPP_LIST+=../zen/dir_watcher.cpp
+CPP_LIST+=../zen/file_handling.cpp
+CPP_LIST+=../zen/file_io.cpp
+CPP_LIST+=../zen/file_traverser.cpp
+CPP_LIST+=../zen/zstring.cpp
+CPP_LIST+=../wx+/button.cpp
+CPP_LIST+=../wx+/format_unit.cpp
 
 #list of all *.o files
-OBJECT_LIST=$(foreach file, $(FILE_LIST), ../OBJ/RTS_Release_GCC_Make/$(subst .cpp,.o,$(notdir $(file))))
-
-#build list of all dependencies
-DEP_LIST=$(foreach file, $(FILE_LIST), $(subst .cpp,.dep,$(file)))
-
+OBJECT_LIST=$(CPP_LIST:%.cpp=../OBJ/RTS_Release_GCC_Make/RTS/%.o)
 
 all: RealtimeSync
 
-init: 
-	if [ ! -d ../OBJ ]; then mkdir ../OBJ; fi
-	if [ ! -d ../OBJ/RTS_Release_GCC_Make ]; then mkdir ../OBJ/RTS_Release_GCC_Make; fi
+../OBJ/RTS_Release_GCC_Make/RTS/%.o : %.cpp
+	mkdir -p $(dir $@)
+	g++ $(FFS_CPPFLAGS) -c $< -o $@
 
-%.dep : %.cpp 
- #strip path information
-	g++ $(FFS_CPPFLAGS) -c $< -o ../OBJ/RTS_Release_GCC_Make/$(subst .cpp,.o,$(notdir $<))
-
-RealtimeSync: init $(DEP_LIST)
-#respect linker order: wxWidgets libraries last
+RealtimeSync: $(OBJECT_LIST)
 	g++ -o ../BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:
-	rm -rf ../OBJ/RTS_Release_GCC_Make
+#-f doesn't work when deleting directories
+	if [ -d ../OBJ/RTS_Release_GCC_Make ]; then rm -rf ../OBJ/RTS_Release_GCC_Make; fi
 	rm -f ../BUILD/$(APPNAME)
 
 install:
-	if [ ! -d $(BINDIR) ] ; then mkdir -p $(BINDIR); fi
-
+	mkdir -p $(BINDIR)
 	cp ../BUILD/$(APPNAME) $(BINDIR)

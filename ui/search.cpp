@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "search.h"
@@ -10,6 +10,8 @@
 #include <wx/utils.h>
 #include <utility>
 #include <wx+/mouse_move_dlg.h>
+
+using namespace zen;
 
 
 class SearchDlg : public SearchDialogGenerated
@@ -23,8 +25,8 @@ public:
     };
 
 private:
-    void OnClose(wxCloseEvent& event);
-    void OnCancel(wxCommandEvent& event);
+    void OnClose (wxCloseEvent&   event) { EndModal(0); }
+    void OnCancel(wxCommandEvent& event) { EndModal(0); }
     void OnFindNext(wxCommandEvent& event);
     void OnText(wxCommandEvent& event);
 
@@ -50,18 +52,6 @@ SearchDlg::SearchDlg(wxWindow& parentWindow, wxString& searchText, bool& respect
 }
 
 
-void SearchDlg::OnClose(wxCloseEvent& event)
-{
-    EndModal(0);
-}
-
-
-void SearchDlg::OnCancel(wxCommandEvent& event)
-{
-    EndModal(0);
-}
-
-
 void SearchDlg::OnFindNext(wxCommandEvent& event)
 {
     respectCase_ = m_checkBoxMatchCase->GetValue();
@@ -81,13 +71,15 @@ void SearchDlg::OnText(wxCommandEvent& event)
 }
 //###########################################################################################
 
+template <bool respectCase>
+class FindInText;
 
 template <bool respectCase>
 class FindInText
 {
 public:
-    FindInText(const wxString& textToFind);
-    bool found(const wxString& phrase) const;
+    FindInText(const wxString& textToFind) : textToFind_(textToFind) {}
+    bool found(const wxString& phrase) const { return phrase.Find(textToFind_) != wxNOT_FOUND; }
 
 private:
     wxString textToFind_;
@@ -95,104 +87,58 @@ private:
 
 
 template <>
-FindInText<true>::FindInText(const wxString& textToFind) :
-    textToFind_(textToFind) {}
-
-
-template <>
-inline
-bool FindInText<true>::found(const wxString& phrase) const
+class FindInText<false>
 {
-    return phrase.Find(textToFind_) != wxNOT_FOUND;
-}
+public:
+    FindInText(const wxString& textToFind) : textToFind_(textToFind) { textToFind_.MakeUpper(); }
+    bool found(wxString&& phrase) const
+    {
+        //wxWidgets::MakeUpper() is inefficient! But performance is not THAT important for this high-level search functionality
+        phrase.MakeUpper();
+        return phrase.Find(textToFind_) != wxNOT_FOUND;
+    }
 
+private:
+    wxString textToFind_;
+};
 
-template <>
-FindInText<false>::FindInText(const wxString& textToFind) :
-    textToFind_(textToFind)
-{
-    textToFind_.MakeUpper();
-}
-
-
-template <>
-inline
-bool FindInText<false>::found(const wxString& phrase) const
-{
-    wxString phraseTmp = phrase; //wxWidgets::MakeUpper() is inefficient!
-    phraseTmp.MakeUpper();       //But performance is not THAT important for this high-level search functionality
-    return phraseTmp.Find(textToFind_) != wxNOT_FOUND;
-}
 //###########################################################################################
 
 
 template <bool respectCase>
-std::pair<int, int> searchGrid(const wxGrid& grid,
-                               const wxString& searchString,
-                               bool fromBeginToCursor, //specify area to search
-                               bool afterCursorToEnd)  //
+int findRow(const Grid& grid, //return -1 if no matching row found
+            size_t compPos,
+            const wxString& searchString,
+            int rowFirst, //specify area to search:
+            int rowLast)  // [rowFirst, rowLast)
 {
-    const int rowCount    = const_cast<wxGrid&>(grid).GetNumberRows();
-    const int columnCount = const_cast<wxGrid&>(grid).GetNumberCols();
-
-    //consistency checks on ints: wxGrid uses ints, so we have to use them, too
-    if (rowCount <= 0 || columnCount <= 0)
-        return std::make_pair(-1, -1);
-
-    int cursorRow    = const_cast<wxGrid&>(grid).GetGridCursorRow();
-    int cursorColumn = const_cast<wxGrid&>(grid).GetGridCursorCol();
-
-    if (cursorRow    < 0         ||
-        cursorRow    >= rowCount ||
-        cursorColumn < 0         ||
-        cursorColumn >= columnCount)
+    auto prov = grid.getDataProvider(compPos);
+    std::vector<Grid::ColumnAttribute> colAttr = grid.getColumnConfig(compPos);
+    vector_remove_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
+    if (!colAttr.empty() && prov)
     {
-        //cursor not on valid position...
-        cursorRow    = 0;
-        cursorColumn = 0;
+        const FindInText<respectCase> searchTxt(searchString);
+
+        for (int row = rowFirst; row < rowLast; ++row)
+            for (auto iterCol = colAttr.begin(); iterCol != colAttr.end(); ++iterCol)
+                if (searchTxt.found(prov->getValue(row, iterCol->type_)))
+                    return row;
     }
-
-    const FindInText<respectCase> searchTxt(searchString);
-
-    if (fromBeginToCursor)
-    {
-        for (int row = 0; row < cursorRow; ++row)
-            for (int col = 0; col < columnCount; ++col)
-                if (searchTxt.found(const_cast<wxGrid&>(grid).GetCellValue(row, col)))
-                    return std::make_pair(row, col);
-
-        for (int col = 0; col <= cursorColumn; ++col)
-            if (searchTxt.found(const_cast<wxGrid&>(grid).GetCellValue(cursorRow, col)))
-                return std::make_pair(cursorRow, col);
-    }
-
-    if (afterCursorToEnd)
-    {
-        //begin search after cursor cell...
-        for (int col = cursorColumn + 1; col < columnCount; ++col)
-            if (searchTxt.found(const_cast<wxGrid&>(grid).GetCellValue(cursorRow, col)))
-                return std::make_pair(cursorRow, col);
-
-        for (int row = cursorRow + 1; row < rowCount; ++row)
-            for (int col = 0; col < columnCount; ++col)
-                if (searchTxt.found(const_cast<wxGrid&>(grid).GetCellValue(row, col)))
-                    return std::make_pair(row, col);
-    }
-
-    return std::make_pair(-1, -1);
+    return -1;
 }
 
 
 //syntactic sugar...
-std::pair<int, int> searchGrid(const wxGrid& grid,
-                               bool respectCase,
-                               const wxString& searchString,
-                               bool fromBeginToCursor, //specify area to search
-                               bool afterCursorToEnd)  //
+int findRow(const Grid& grid,
+            size_t compPos,
+            bool respectCase,
+            const wxString& searchString,
+            int rowFirst, //specify area to search:
+            int rowLast)  // [rowFirst, rowLast)
 {
     return respectCase ?
-           searchGrid<true>( grid, searchString, fromBeginToCursor, afterCursorToEnd) :
-           searchGrid<false>(grid, searchString, fromBeginToCursor, afterCursorToEnd);
+           findRow<true>( grid, compPos, searchString, rowFirst, rowLast) :
+           findRow<false>(grid, compPos, searchString, rowFirst, rowLast);
 }
 
 
@@ -202,8 +148,8 @@ wxString lastSearchString; //this variable really is conceptionally global...
 void executeSearch(bool forceShowDialog,
                    bool& respectCase,
                    wxWindow& parentWindow,
-                   wxGrid& leftGrid,
-                   wxGrid& rightGrid)
+                   Grid& grid,
+                   size_t compPosLeft, size_t compPosRight)
 {
     bool searchDialogWasShown = false;
 
@@ -216,61 +162,57 @@ void executeSearch(bool forceShowDialog,
         searchDialogWasShown = true;
     }
 
-    wxGrid* targetGrid = NULL;     //filled if match is found
-    std::pair<int, int> targetPos; //
+    const int rowCount = grid.getRowCount();
+    auto cursorPos = grid.getGridCursor(); //(row, component pos)
+
+    int cursorRow = cursorPos.first;
+    if (cursorRow < 0 || cursorRow >= rowCount)
+        cursorRow = 0;
+
+    if (cursorPos.second == compPosRight)
+        std::swap(compPosLeft, compPosRight); //select side to start with
+    else if (cursorPos.second != compPosLeft)
+        cursorRow = 0;
+
     {
         wxBusyCursor showHourGlass;
 
-        const bool startLeft = wxWindow::FindFocus() != rightGrid.GetGridWindow();
-        wxGrid& firstGrid  = startLeft ? leftGrid  : rightGrid;
-        wxGrid& secondGrid = startLeft ? rightGrid : leftGrid;
-
-        //begin with first grid after cursor
-        targetGrid = &firstGrid;
-        targetPos  = searchGrid(firstGrid, respectCase, lastSearchString, false, true);
-        if (targetPos.first == -1)
+        auto finishSearch = [&](size_t compPos, int rowFirst, int rowLast) -> bool
         {
-            //scan second grid completely
-            targetGrid = &secondGrid;
-            targetPos  = searchGrid(secondGrid, respectCase, lastSearchString, true, true);
-
-            //scan first grid up to cursor
-            if (targetPos.first == -1)
+            const int targetRow = findRow(grid, compPos, respectCase, lastSearchString, rowFirst, rowLast);
+            if (targetRow >= 0)
             {
-                targetGrid = &firstGrid;
-                targetPos  = searchGrid(firstGrid, respectCase, lastSearchString, true, false);
+                grid.setGridCursor(targetRow, compPos);
+                grid.SetFocus();
+                return true;
             }
-        }
+            return false;
+        };
+
+        if (finishSearch(compPosLeft , cursorRow + 1, rowCount) ||
+            finishSearch(compPosRight, 0, rowCount)             ||
+            finishSearch(compPosLeft , 0, cursorRow + 1))
+            return;
     }
 
-    if (targetPos.first != -1 && targetPos.second != -1) //new position found
-    {
-        targetGrid->SetFocus();
-        targetGrid->SetGridCursor(  targetPos.first, targetPos.second);
-        targetGrid->SelectRow(      targetPos.first);
-        targetGrid->MakeCellVisible(targetPos.first, targetPos.second);
-    }
-    else
-    {
-        wxString messageNotFound = _("Cannot find %x");
-        messageNotFound.Replace(wxT("%x"), wxString(wxT("\"")) + lastSearchString + wxT("\""), false);
-        wxMessageBox(messageNotFound, _("Find"), wxOK);
+    wxString messageNotFound = _("Cannot find %x");
+    messageNotFound.Replace(wxT("%x"), wxString(wxT("\"")) + lastSearchString + wxT("\""), false);
+    wxMessageBox(messageNotFound, _("Find"), wxOK);
 
-        //show search dialog again
-        if (searchDialogWasShown)
-            executeSearch(true, respectCase, parentWindow, leftGrid, rightGrid);
-    }
+    //show search dialog again
+    if (searchDialogWasShown)
+        executeSearch(true, respectCase, parentWindow, grid, compPosLeft, compPosRight);
 }
 //###########################################################################################
 
 
-void zen::startFind(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase) //Strg + F
+void zen::startFind(wxWindow& parentWindow, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase) //Strg + F
 {
-    executeSearch(true, respectCase, parentWindow, leftGrid, rightGrid);
+    executeSearch(true, respectCase, parentWindow, grid, compPosLeft, compPosRight);
 }
 
 
-void zen::findNext(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase)  //F3
+void zen::findNext(wxWindow& parentWindow, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase)  //F3
 {
-    executeSearch(false, respectCase, parentWindow, leftGrid, rightGrid);
+    executeSearch(false, respectCase, parentWindow, grid, compPosLeft, compPosRight);
 }

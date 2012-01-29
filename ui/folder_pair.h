@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef FOLDERPAIR_H_INCLUDED
@@ -13,6 +13,7 @@
 #include "small_dlgs.h"
 #include "sync_cfg.h"
 #include <wx/event.h>
+#include <wx+/context_menu.h>
 #include <wx/menu.h>
 #include <wx+/string_conv.h>
 #include "../lib/norm_filter.h"
@@ -85,76 +86,55 @@ protected:
         basicPanel_(basicPanel)
     {
         //register events for removal of alternate configuration
-        basicPanel_.m_bpButtonAltCompCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfgRemove    ), NULL, this);
-        basicPanel_.m_bpButtonAltSyncCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgRemove    ), NULL, this);
-        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgRemove), NULL, this);
+        basicPanel_.m_bpButtonAltCompCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfgContext    ), NULL, this);
+        basicPanel_.m_bpButtonAltSyncCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgContext    ), NULL, this);
+        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgContext), NULL, this);
 
         basicPanel_.m_bpButtonAltCompCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfg    ), NULL, this);
         basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg    ), NULL, this);
         basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), NULL, this);
 
-        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(GlobalResources::getImage(wxT("removeFolderPair")));
+        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(GlobalResources::getImage(L"removeFolderPair"));
     }
 
-    virtual void OnAltCompCfgRemoveConfirm(wxCommandEvent& event)
+    virtual void removeAltCompCfg()
     {
         altCompConfig.reset();
         refreshButtons();
     }
 
-    virtual void OnAltSyncCfgRemoveConfirm(wxCommandEvent& event)
+    virtual void removeAltSyncCfg()
     {
         altSyncConfig.reset();
         refreshButtons();
     }
 
-    virtual void OnLocalFilterCfgRemoveConfirm(wxCommandEvent& event)
+    virtual void removeLocalFilterCfg()
     {
         localFilter = FilterConfig();
         refreshButtons();
     }
 
 private:
-    void OnAltCompCfgRemove(wxCommandEvent& event)
+    void OnAltCompCfgContext(wxCommandEvent& event)
     {
-        contextMenu.reset(new wxMenu); //re-create context menu
-
-        wxMenuItem* itemRemove = new wxMenuItem(contextMenu.get(), wxID_ANY, _("Remove alternate settings"));
-        contextMenu->Append(itemRemove);
-        contextMenu->Connect(itemRemove->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfgRemoveConfirm), NULL, this);
-
-        if (!altCompConfig.get())
-            contextMenu->Enable(itemRemove->GetId(), false); //disable menu item, if clicking wouldn't make sense anyway
-
-        basicPanel_.PopupMenu(contextMenu.get()); //show context menu
+        ContextMenu menu;
+        menu.addItem(_("Remove alternate settings"), [this] { this->removeAltCompCfg(); }, NULL, altCompConfig.get() != NULL);
+        menu.popup(basicPanel_);
     }
 
-    void OnAltSyncCfgRemove(wxCommandEvent& event)
+    void OnAltSyncCfgContext(wxCommandEvent& event)
     {
-        contextMenu.reset(new wxMenu); //re-create context menu
-
-        wxMenuItem* itemRemove = new wxMenuItem(contextMenu.get(), wxID_ANY, _("Remove alternate settings"));
-        contextMenu->Append(itemRemove);
-        contextMenu->Connect(itemRemove->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgRemoveConfirm), NULL, this);
-
-        if (!altSyncConfig.get())
-            contextMenu->Enable(itemRemove->GetId(), false); //disable menu item, if clicking wouldn't make sense anyway
-
-        basicPanel_.PopupMenu(contextMenu.get()); //show context menu
+        ContextMenu menu;
+        menu.addItem(_("Remove alternate settings"), [this] { this->removeAltSyncCfg(); }, NULL, altSyncConfig.get() != NULL);
+        menu.popup(basicPanel_);
     }
 
-    void OnLocalFilterCfgRemove(wxCommandEvent& event)
+    void OnLocalFilterCfgContext(wxCommandEvent& event)
     {
-        contextMenu.reset(new wxMenu); //re-create context menu
-
-        wxMenuItem* itemClear = new wxMenuItem(contextMenu.get(), wxID_ANY, _("Clear filter settings"));
-        contextMenu->Append(itemClear);
-        contextMenu->Connect(itemClear->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgRemoveConfirm), NULL, this);
-
-        if (isNullFilter(localFilter))
-            contextMenu->Enable(itemClear->GetId(), false); //disable menu item, if clicking wouldn't make sense anyway
-
-        basicPanel_.PopupMenu(contextMenu.get()); //show context menu
+        ContextMenu menu;
+        menu.addItem(_("Clear filter settings"), [this] { this->removeLocalFilterCfg(); }, NULL, !isNullFilter(localFilter));
+        menu.popup(basicPanel_);
     }
 
 
@@ -219,8 +199,6 @@ private:
     AltCompCfgPtr altCompConfig; //optional: present if non-NULL
     AltSyncCfgPtr altSyncConfig; //
     FilterConfig  localFilter;
-
-    std::unique_ptr<wxMenu> contextMenu;
 };
 }
 

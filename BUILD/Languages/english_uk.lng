@@ -139,36 +139,6 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Symlink></target>
-
-<source><Directory></source>
-<target><Directory></target>
-
-<source>Size</source>
-<target>Size</target>
-
-<source>Date</source>
-<target>Date</target>
-
-<source>Full path</source>
-<target>Full path</target>
-
-<source>Filename</source>
-<target>Filename</target>
-
-<source>Relative path</source>
-<target>Relative path</target>
-
-<source>Directory</source>
-<target>Directory</target>
-
-<source>Extension</source>
-<target>Extension</target>
-
-<source>Comparison Result</source>
-<target>Comparison Result</target>
-
 <source>Initial synchronization:</source>
 <target>Initial synchronisation:</target>
 
@@ -354,6 +324,24 @@ The command line is executed each time:
 <source>Logging</source>
 <target>Logging</target>
 
+<source>File time and size</source>
+<target>File time and size</target>
+
+<source>File content</source>
+<target>File content</target>
+
+<source><Automatic></source>
+<target><Automatic></target>
+
+<source>Mirror ->></source>
+<target>Mirror ->></target>
+
+<source>Update -></source>
+<target>Update -></target>
+
+<source>Custom</source>
+<target>Custom</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync batch file</target>
 
@@ -410,6 +398,36 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(Requires an Internet connection!)</target>
+
+<source><Symlink></source>
+<target><Symlink></target>
+
+<source><Directory></source>
+<target><Directory></target>
+
+<source>Full path</source>
+<target>Full path</target>
+
+<source>Name</source>
+<target>Name</target>
+
+<source>Relative path</source>
+<target>Relative path</target>
+
+<source>Directory</source>
+<target>Directory</target>
+
+<source>Size</source>
+<target>Size</target>
+
+<source>Date</source>
+<target>Date</target>
+
+<source>Extension</source>
+<target>Extension</target>
+
+<source>Comparison Result</source>
+<target>Comparison Result</target>
 
 <source>Drag && drop</source>
 <target>Drag && drop</target>
@@ -582,26 +600,14 @@ The command line is executed each time:
 <source>Select variant:</source>
 <target>Select variant:</target>
 
-<source><Automatic></source>
-<target><Automatic></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</target>
-
-<source>Mirror ->></source>
-<target>Mirror ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronisation.</target>
 
-<source>Update -></source>
-<target>Update -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Copy new or updated files to right folder.</target>
-
-<source>Custom</source>
-<target>Custom</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configure your own synchronisation rules.</target>
@@ -658,9 +664,6 @@ Files are found equal if
 are the same
 </target>
 
-<source>File time and size</source>
-<target>File time and size</target>
-
 <source>
 Files are found equal if
      - file content
@@ -671,9 +674,6 @@ Files are found equal if
      - file content
 is the same
 </target>
-
-<source>File content</source>
-<target>File content</target>
 
 <source>Symbolic Link handling</source>
 <target>Symbolic Link handling</target>
@@ -690,32 +690,29 @@ is the same
 <source>Source code written in C++ utilizing:</source>
 <target>Source code written in C++ utilising:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Big thanks for localising FreeFileSync goes out to:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Feedback and suggestions are welcome at:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync at Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Feedback and suggestions are welcome</target>
 
 <source>Homepage</source>
 <target>Homepage</target>
 
-<source>If you like FFS</source>
-<target>If you like FFS</target>
-
-<source>Donate with PayPal</source>
-<target>Donate with PayPal</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync at Sourceforge</target>
 
 <source>Email</source>
 <target>E-mail</target>
 
-<source>Report translation error</source>
-<target>Report translation error</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Big thanks for localising FreeFileSync goes out to:</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>Published under the GNU General Public Licence:</target>
+<source>If you like FreeFileSync</source>
+<target>If you like FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Donate with PayPal</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Published under the GNU General Public Licence</target>
 
 <source>Ignore subsequent errors</source>
 <target>Ignore subsequent errors</target>
@@ -864,6 +861,9 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Folder pairs</target>
 
+<source>Compressed view</source>
+<target>Compressed view</target>
+
 <source>Select view</source>
 <target>Select view</target>
 
@@ -882,20 +882,14 @@ Exclude: \stuff\temp\*
 <source><multiple selection></source>
 <target><multiple selection></target>
 
-<source>D-Click</source>
-<target>D-Click</target>
-
 <source>Delete</source>
 <target>Delete</target>
 
-<source>Customize...</source>
-<target>Customise...</target>
+<source>Include all</source>
+<target>Include all</target>
 
-<source>Select time span...</source>
-<target>Select time span...</target>
-
-<source>Auto-adjust columns</source>
-<target>Auto-adjust columns</target>
+<source>Exclude all</source>
+<target>Exclude all</target>
 
 <source>Icon size:</source>
 <target>Icon size:</target>
@@ -909,14 +903,11 @@ Exclude: \stuff\temp\*
 <source>Large</source>
 <target>Large</target>
 
-<source>Include all rows</source>
-<target>Include all rows</target>
+<source>Select time span...</source>
+<target>Select time span...</target>
 
-<source>Exclude all rows</source>
-<target>Exclude all rows</target>
-
-<source>Reset view</source>
-<target>Reset view</target>
+<source>Default view</source>
+<target>Default view</target>
 
 <source>Show "%x"</source>
 <target>Show "%x"</target>
@@ -1197,6 +1188,12 @@ Exclude: \stuff\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>Move files into a time-stamped subdirectory</target>
 
+<source>Files</source>
+<target>Files</target>
+
+<source>Percentage</source>
+<target>Percentage</target>
+
 <source>%x TB</source>
 <target>%x TB</target>
 
@@ -1326,6 +1323,9 @@ Exclude: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Directories are dependent! Be careful when setting up synchronisation rules:</target>
 
+<source>Preparing synchronization...</source>
+<target>Preparing synchronisation...</target>
+
 <source>Memory allocation failed!</source>
 <target>Memory allocation failed!</target>
 
@@ -1443,8 +1443,8 @@ Exclude: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Target directory name must not be empty!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>User-defined directory for deletion was not specified!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Directory for file versioning was not supplied!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Source directory does not exist anymore:</target>

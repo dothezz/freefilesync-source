@@ -139,36 +139,6 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Link Simbólico></target>
-
-<source><Directory></source>
-<target><Directório></target>
-
-<source>Size</source>
-<target>Tamanho</target>
-
-<source>Date</source>
-<target>Data</target>
-
-<source>Full path</source>
-<target>Caminho completo</target>
-
-<source>Filename</source>
-<target>Nome do ficheiro</target>
-
-<source>Relative path</source>
-<target>Caminho</target>
-
-<source>Directory</source>
-<target>Directório</target>
-
-<source>Extension</source>
-<target>Extensão</target>
-
-<source>Comparison Result</source>
-<target>Resultados da comparação</target>
-
 <source>Initial synchronization:</source>
 <target>Sincronização inicial:</target>
 
@@ -354,6 +324,24 @@ A linha de comandos é executada cada vez que:
 <source>Logging</source>
 <target>A escrever em log</target>
 
+<source>File time and size</source>
+<target>Data e tamanho do ficheiro</target>
+
+<source>File content</source>
+<target>Conteúdo do ficheiro</target>
+
+<source><Automatic></source>
+<target><Automático></target>
+
+<source>Mirror ->></source>
+<target>Espelhar ->></target>
+
+<source>Update -></source>
+<target>Actualizar -></target>
+
+<source>Custom</source>
+<target>Personalizado</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync ficheiro batch</target>
 
@@ -411,6 +399,36 @@ A linha de comandos é executada cada vez que:
 <source>(Requires an Internet connection!)</source>
 <target>(Necessita acesso à Internet!)</target>
 
+<source><Symlink></source>
+<target><Link Simbólico></target>
+
+<source><Directory></source>
+<target><Directório></target>
+
+<source>Full path</source>
+<target>Caminho completo</target>
+
+<source>Name</source>
+<target>Nome</target>
+
+<source>Relative path</source>
+<target>Caminho</target>
+
+<source>Directory</source>
+<target>Directório</target>
+
+<source>Size</source>
+<target>Tamanho</target>
+
+<source>Date</source>
+<target>Data</target>
+
+<source>Extension</source>
+<target>Extensão</target>
+
+<source>Comparison Result</source>
+<target>Resultados da comparação</target>
+
 <source>Drag && drop</source>
 <target>Arrastar && Largar</target>
 
@@ -434,9 +452,6 @@ A linha de comandos é executada cada vez que:
 
 <source>2. &Synchronize...</source>
 <target>2. &Sincronizar...</target>
-
-<source>S&witch view</source>
-<target>&Mudar vista</target>
 
 <source>&New</source>
 <target>&Novo</target>
@@ -582,26 +597,14 @@ A linha de comandos é executada cada vez que:
 <source>Select variant:</source>
 <target>Selecione uma variante:</target>
 
-<source><Automatic></source>
-<target><Automático></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identificar e propagar mudanças em ambos os lados utilizando base de dados. Eliminar, renomear e conflitos são detetados automaticamente.</target>
-
-<source>Mirror ->></source>
-<target>Espelhar ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Cópia de segurança do directório à esquerda. O directório da direita é alterado para ficar igual ao da esquerda após sincronização.</target>
 
-<source>Update -></source>
-<target>Actualizar -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Copiar ficheiros novos ou actualizados para a direita</target>
-
-<source>Custom</source>
-<target>Personalizado</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configure as suas regras de sincronização.</target>
@@ -658,9 +661,6 @@ Ficheiros considerados iguais se
 são iguais
 </target>
 
-<source>File time and size</source>
-<target>Data e tamanho do ficheiro</target>
-
 <source>
 Files are found equal if
      - file content
@@ -670,9 +670,6 @@ is the same
 Os ficheiros são considerados iguais se
      - o conteúdo é o mesmo
 </target>
-
-<source>File content</source>
-<target>Conteúdo do ficheiro</target>
 
 <source>Symbolic Link handling</source>
 <target>Tratamento de links simbólicos</target>
@@ -689,32 +686,29 @@ Os ficheiros são considerados iguais se
 <source>Source code written in C++ utilizing:</source>
 <target>Código fonte escrito em C++ usando:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Pela tradução de FreeFileSync, um agradecimento a:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Comentários e sugestões são benvindos em:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync na Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Comentários e sugestões são apreciados</target>
 
 <source>Homepage</source>
 <target>Site</target>
 
-<source>If you like FFS</source>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync na Sourceforge</target>
+
+<source>Email</source>
+<target>Email</target>
+
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Pela tradução de FreeFileSync, um agradecimento a:</target>
+
+<source>If you like FreeFileSync</source>
 <target>Se gosta do FreeFileSync</target>
 
 <source>Donate with PayPal</source>
 <target>Doar usando PayPal</target>
 
-<source>Email</source>
-<target>Email</target>
-
-<source>Report translation error</source>
-<target>Informar um erro de tradução</target>
-
-<source>Published under the GNU General Public License:</source>
-<target>Publicado sobre GNU General Public License:</target>
+<source>Published under the GNU General Public License</source>
+<target>Publicado sobre GNU General Public License</target>
 
 <source>Ignore subsequent errors</source>
 <target>Ignorar erros subsequentes</target>
@@ -863,6 +857,9 @@ Excluir: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Par de directório</target>
 
+<source>Compressed view</source>
+<target>Vista compacta</target>
+
 <source>Select view</source>
 <target>Seleccionar vista</target>
 
@@ -881,20 +878,14 @@ Excluir: \stuff\temp\*
 <source><multiple selection></source>
 <target><selecção múltipla></target>
 
-<source>D-Click</source>
-<target>Duplo Clique</target>
-
 <source>Delete</source>
 <target>Eliminar</target>
 
-<source>Customize...</source>
-<target>Personalizar...</target>
+<source>Include all</source>
+<target>Incluir tudo</target>
 
-<source>Select time span...</source>
-<target>Selecione intervalo de tempo...</target>
-
-<source>Auto-adjust columns</source>
-<target>Auto ajustar colunas</target>
+<source>Exclude all</source>
+<target>Excluir tudo</target>
 
 <source>Icon size:</source>
 <target>Tamanho ícone:</target>
@@ -908,14 +899,11 @@ Excluir: \stuff\temp\*
 <source>Large</source>
 <target>Grande</target>
 
-<source>Include all rows</source>
-<target>Incluir todas as linhas</target>
+<source>Select time span...</source>
+<target>Selecione intervalo de tempo...</target>
 
-<source>Exclude all rows</source>
-<target>Excluir todas linhas</target>
-
-<source>Reset view</source>
-<target>Restaurar vista</target>
+<source>Default view</source>
+<target>Vista normal</target>
 
 <source>Show "%x"</source>
 <target>Mostrar "%x"</target>
@@ -1196,6 +1184,12 @@ Excluir: \stuff\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>Mover ficheiros para uma subpasta datada</target>
 
+<source>Files</source>
+<target>Ficheiros</target>
+
+<source>Percentage</source>
+<target>Percentagem</target>
+
 <source>%x TB</source>
 <target>%x TB</target>
 
@@ -1325,6 +1319,9 @@ Excluir: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Directórios são dependentes! Cuidado ao definir as regras de sincronização:</target>
 
+<source>Preparing synchronization...</source>
+<target>A preparar sincronização...</target>
+
 <source>Memory allocation failed!</source>
 <target>Alocação de memória falhou!</target>
 
@@ -1442,8 +1439,8 @@ Excluir: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Nome do directório de destino não pode estar vazio!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>Directório para eliminação não foi especificado!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Diretório para armazenar versões não foi definido!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>A pasta de origem já não existe:</target>

@@ -141,36 +141,6 @@
 <pluralform>%x Bajtov</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Simbolična povezava></target>
-
-<source><Directory></source>
-<target><Imenik></target>
-
-<source>Size</source>
-<target>Velikost</target>
-
-<source>Date</source>
-<target>Datum</target>
-
-<source>Full path</source>
-<target>Polna pot</target>
-
-<source>Filename</source>
-<target>Ime datoteke</target>
-
-<source>Relative path</source>
-<target>Relativna pot</target>
-
-<source>Directory</source>
-<target>Imenik</target>
-
-<source>Extension</source>
-<target>Razširitev</target>
-
-<source>Comparison Result</source>
-<target>Rezultati primerjave</target>
-
 <source>Initial synchronization:</source>
 <target>Začetna sinhronizacija:</target>
 
@@ -360,6 +330,24 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Logging</source>
 <target>Beleženje</target>
 
+<source>File time and size</source>
+<target>Čas in velikost datoteke</target>
+
+<source>File content</source>
+<target>Vsebini datoteke</target>
+
+<source><Automatic></source>
+<target><Samodejno></target>
+
+<source>Mirror ->></source>
+<target>Zrcalno ->></target>
+
+<source>Update -></source>
+<target>Posodobi -></target>
+
+<source>Custom</source>
+<target>Po meri</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync paketna datoteka</target>
 
@@ -417,6 +405,36 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>(Requires an Internet connection!)</source>
 <target>(Zahteva povezavo z Internetom!)</target>
 
+<source><Symlink></source>
+<target><Simbolična povezava></target>
+
+<source><Directory></source>
+<target><Imenik></target>
+
+<source>Full path</source>
+<target>Polna pot</target>
+
+<source>Name</source>
+<target>Ime</target>
+
+<source>Relative path</source>
+<target>Relativna pot</target>
+
+<source>Directory</source>
+<target>Imenik</target>
+
+<source>Size</source>
+<target>Velikost</target>
+
+<source>Date</source>
+<target>Datum</target>
+
+<source>Extension</source>
+<target>Razširitev</target>
+
+<source>Comparison Result</source>
+<target>Rezultati primerjave</target>
+
 <source>Drag && drop</source>
 <target>Povleci && spusti</target>
 
@@ -440,9 +458,6 @@ Ukazna vrstica se izvrši vsakič ko:
 
 <source>2. &Synchronize...</source>
 <target>2. &Sinhroniziraj...</target>
-
-<source>S&witch view</source>
-<target>Sp&remeni pogled</target>
 
 <source>&New</source>
 <target>&Novo</target>
@@ -588,26 +603,14 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Select variant:</source>
 <target>Izberite varianto:</target>
 
-<source><Automatic></source>
-<target><Samodejno></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identificiraj in promoviraj spremembe na obeh straneh z uporabo podatkovne baze. Izbrisi, preimenovanja in spori so samodejno zaznani.</target>
-
-<source>Mirror ->></source>
-<target>Zrcalno ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Zrcalna varnostna kopija leve mape. Desna mapa bo spremenjena, da se bo natančno ujemala z levo mapo po sinhronizaciji.</target>
 
-<source>Update -></source>
-<target>Posodobi -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Kopiraj nove ali posodobljene datoteke v desno mapo.</target>
-
-<source>Custom</source>
-<target>Po meri</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Konfigurirajte vaša lastna sinhronizacijska pravila.</target>
@@ -664,9 +667,6 @@ Datoteki sta enaki, če sta
 enaka
 </target>
 
-<source>File time and size</source>
-<target>Čas in velikost datoteke</target>
-
 <source>
 Files are found equal if
      - file content
@@ -677,9 +677,6 @@ Datoteki sta enaki, če
      - je vsebina datoteke
 enaka
 </target>
-
-<source>File content</source>
-<target>Vsebini datoteke</target>
 
 <source>Symbolic Link handling</source>
 <target>Rokovanje s simboličnimi povezavami</target>
@@ -696,32 +693,29 @@ enaka
 <source>Source code written in C++ utilizing:</source>
 <target>Izvorna koda napisana v C++ z uporabo:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Zahvale za prevod FreeFileSync gredo:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Povratne informacije in predlogi so dobrodošli na:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync na Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Povratne informacije in predlogi so dobrodošli</target>
 
 <source>Homepage</source>
 <target>Domača stran</target>
 
-<source>If you like FFS</source>
-<target>Če vam je FFS všeč</target>
-
-<source>Donate with PayPal</source>
-<target>Doniraj s PayPal</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync na Sourceforge</target>
 
 <source>Email</source>
 <target>Email</target>
 
-<source>Report translation error</source>
-<target>Poročaj o napaki prevoda</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Zahvale za prevod FreeFileSync gredo:</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>Objavljeno pod licenco GNU General Public:</target>
+<source>If you like FreeFileSync</source>
+<target>Če vam je FreeFileSync všeč</target>
+
+<source>Donate with PayPal</source>
+<target>Doniraj s PayPal</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Objavljeno pod licenco GNU General Public</target>
 
 <source>Ignore subsequent errors</source>
 <target>Ignoriraj vse nadaljnje napake</target>
@@ -870,6 +864,9 @@ Izključi: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Pari map</target>
 
+<source>Compressed view</source>
+<target>Stisnjeni pogled</target>
+
 <source>Select view</source>
 <target>Izberite pogled</target>
 
@@ -888,20 +885,14 @@ Izključi: \stuff\temp\*
 <source><multiple selection></source>
 <target><mnogokratna izbira></target>
 
-<source>D-Click</source>
-<target>D-Klik</target>
-
 <source>Delete</source>
 <target>Izbriši</target>
 
-<source>Customize...</source>
-<target>Prilagodi...</target>
+<source>Include all</source>
+<target>Vključi vse</target>
 
-<source>Select time span...</source>
-<target>Izberite časovni okvir...</target>
-
-<source>Auto-adjust columns</source>
-<target>Samo-prilagodi stolpce</target>
+<source>Exclude all</source>
+<target>Izključi vse</target>
 
 <source>Icon size:</source>
 <target>Velikost ikone:</target>
@@ -915,14 +906,11 @@ Izključi: \stuff\temp\*
 <source>Large</source>
 <target>Velika</target>
 
-<source>Include all rows</source>
-<target>Vključi se vrstice</target>
+<source>Select time span...</source>
+<target>Izberite časovni okvir...</target>
 
-<source>Exclude all rows</source>
-<target>Izključi vse vrstice</target>
-
-<source>Reset view</source>
-<target>Ponastavi pogled</target>
+<source>Default view</source>
+<target>Privzeti pogled</target>
 
 <source>Show "%x"</source>
 <target>Prikaži "%x"</target>
@@ -1215,6 +1203,12 @@ Izključi: \stuff\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>Premakni datoteke v časovno-označen podimenik</target>
 
+<source>Files</source>
+<target>Datoteke</target>
+
+<source>Percentage</source>
+<target>Odstotek</target>
+
 <source>%x TB</source>
 <target>%x TB</target>
 
@@ -1350,6 +1344,9 @@ Izključi: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Imeniki so v odvisnosti! Bodite pozorni, ko nastavljate sinhronizacijska pravila:</target>
 
+<source>Preparing synchronization...</source>
+<target>Pripravljam sinhronizacijo...</target>
+
 <source>Memory allocation failed!</source>
 <target>Neuspešno dodeljevanje pomnilnika!</target>
 
@@ -1467,8 +1464,8 @@ Izključi: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Ime ciljnega imenika ne sme biti prazno!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>Uporabniško-določen imenik za brisanje ni bil naveden!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Imenik za upravljanje z datotečnimi raličicami ni bil podan!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Izvorni imenik ne obstaja več:</target>

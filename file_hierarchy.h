@@ -1,24 +1,22 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef FILEHIERARCHY_H_INCLUDED
 #define FILEHIERARCHY_H_INCLUDED
 
 #include <map>
-#include <set>
 #include <string>
-#include <unordered_set>
 #include <memory>
 #include <zen/zstring.h>
 #include <zen/fixed_list.h>
+#include <zen/stl_tools.h>
 #include "structures.h"
 #include <zen/int64.h>
 #include <zen/file_id_def.h>
 #include "structures.h"
-//#include "lib/hard_filter.h"
 
 
 namespace zen
@@ -222,7 +220,13 @@ public:
                    bool dirExistsLeft,
                    const Zstring& dirPostfixedRight,
                    bool dirExistsRight) :
+#ifdef _MSC_VER
+#pragma warning(disable : 4355) //"The this pointer is valid only within nonstatic member functions. It cannot be used in the initializer list for a base class."
+#endif
         HierarchyObject(Zstring(), *this),
+#ifdef _MSC_VER
+#pragma warning(default : 4355)
+#endif
         baseDirPfL(dirPostfixedLeft),
         baseDirPfR(dirPostfixedRight),
         dirExistsLeft_(dirExistsLeft),
@@ -300,32 +304,28 @@ template <class T>
 class ObjectMgr
 {
 public:
-    typedef const ObjectMgr* ObjectID;
+    typedef       ObjectMgr* ObjectId;
+    typedef const ObjectMgr* ObjectIdConst;
 
-    ObjectID getId() { activeObjects().insert(this); return this; }
-    //unfortunately we need to keep this method non-const to get non-const "this" pointer
-    //we could instead put this into the constructor, but temporaries created by STL could lead to some overhead
+    ObjectIdConst  getId() const { return this; }
+    /**/  ObjectId getId()       { return this; }
 
-    static T* retrieve(ObjectID id) //returns NULL if object is not valid anymore
+    static const T* retrieve(ObjectIdConst id) //returns NULL if object is not valid anymore
     {
-        auto iter = activeObjects().find(const_cast<ObjectMgr*>(id));
-        return static_cast<T*>(iter == activeObjects().end() ? NULL : *iter); //static down-cast
+        auto iter = activeObjects().find(id);
+        return static_cast<const T*>(iter == activeObjects().end() ? NULL : *iter);
     }
+    static T* retrieve(ObjectId id) { return const_cast<T*>(retrieve(static_cast<ObjectIdConst>(id))); }
 
 protected:
-    ObjectMgr() {}
-    ~ObjectMgr() { activeObjects().erase(this); }
+    ObjectMgr () { activeObjects().insert(this); }
+    ~ObjectMgr() { activeObjects().erase (this); }
 
 private:
     ObjectMgr(const ObjectMgr& rhs);            //
     ObjectMgr& operator=(const ObjectMgr& rhs); //it's not well-defined what coping an objects means regarding object-identity in this context
 
-#if defined _MSC_VER && _MSC_VER <= 1600 //VS2010 performance bug in std::unordered_set<>: http://drdobbs.com/blogs/cpp/232200410 -> should be fixed in VS11
-    //compiler macros: http://predef.sourceforge.net/precomp.html
-    static std::set<ObjectMgr*>& activeObjects() { static std::set<ObjectMgr*> inst; return inst; }
-#else
-    static std::unordered_set<ObjectMgr*>& activeObjects() { static std::unordered_set<ObjectMgr*> inst; return inst; } //external linkage (even in header file!)
-#endif
+    static zen::hash_set<const ObjectMgr*>& activeObjects() { static zen::hash_set<const ObjectMgr*> inst; return inst; } //external linkage (even in header file!)
 };
 //------------------------------------------------------------------
 
@@ -484,8 +484,8 @@ public:
     template <SelectedSide side> FileId getFileId       () const;
     template <SelectedSide side> const Zstring getExtension() const;
 
-    void setMoveRef(ObjectID refId) { moveFileRef = refId; } //reference to corresponding renamed file
-    ObjectID getMoveRef() const { return moveFileRef; } //may be NULL
+    void setMoveRef(ObjectId refId) { moveFileRef = refId; } //reference to corresponding renamed file
+    ObjectId getMoveRef() const { return moveFileRef; } //may be NULL
 
     virtual CompareFilesResult getCategory() const;
     virtual std::wstring getCatConflict() const;
@@ -512,7 +512,7 @@ private:
     FileDescriptor dataLeft;
     FileDescriptor dataRight;
 
-    ObjectID moveFileRef;
+    ObjectId moveFileRef;
 };
 
 //------------------------------------------------------------------

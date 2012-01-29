@@ -140,36 +140,6 @@
 <pluralform>%x de Baiți</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Simlegătură></target>
-
-<source><Directory></source>
-<target><Dosar></target>
-
-<source>Size</source>
-<target>Mărime</target>
-
-<source>Date</source>
-<target>Dată</target>
-
-<source>Full path</source>
-<target>Calea Completă</target>
-
-<source>Filename</source>
-<target>Numele Elementului</target>
-
-<source>Relative path</source>
-<target>Calea Relativă</target>
-
-<source>Directory</source>
-<target>Dosar</target>
-
-<source>Extension</source>
-<target>Extensie</target>
-
-<source>Comparison Result</source>
-<target>Rezultatul Comparării</target>
-
 <source>Initial synchronization:</source>
 <target>Sincronizare inițială:</target>
 
@@ -239,7 +209,7 @@
 <target>Eroare la mutarea în Reciclator:</target>
 
 <source>Could not load a required DLL:</source>
-<target>Nu pot încărca o filă DLL necesară:</target>
+<target>Nu pot deschide o filă DLL necesară:</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Eroare la accesarea Serviciului de Conservare a Volumelor [Volume Shadow Copy]!</target>
@@ -357,6 +327,24 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Logging</source>
 <target>Jurnal</target>
 
+<source>File time and size</source>
+<target>Timpul și Mărimea Filelor</target>
+
+<source>File content</source>
+<target>Conținutul Filelor</target>
+
+<source><Automatic></source>
+<target><Sincronizare Inteligentă></target>
+
+<source>Mirror ->></source>
+<target>Clonare =>></target>
+
+<source>Update -></source>
+<target>Actualizare =></target>
+
+<source>Custom</source>
+<target>Sincronizare Personalizată</target>
+
 <source>FreeFileSync batch file</source>
 <target>Filă cu set de comenzi FreeFileSync</target>
 
@@ -414,8 +402,38 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>(Requires an Internet connection!)</source>
 <target>(Necesită o conexiune la internet!)</target>
 
+<source><Symlink></source>
+<target><Simlegătură></target>
+
+<source><Directory></source>
+<target><Dosar></target>
+
+<source>Full path</source>
+<target>Cale Completă</target>
+
+<source>Name</source>
+<target>Nume</target>
+
+<source>Relative path</source>
+<target>Cale Relativă</target>
+
+<source>Directory</source>
+<target>Dosar</target>
+
+<source>Size</source>
+<target>Mărime</target>
+
+<source>Date</source>
+<target>Dată</target>
+
+<source>Extension</source>
+<target>Extensie</target>
+
+<source>Comparison Result</source>
+<target>Rezultatul Comparării</target>
+
 <source>Drag && drop</source>
-<target>Trage și pune un dosar peste compartimentul de mai jos sau folosește butonul de explorare</target>
+<target>Trage și pune un dosar în cîmpul de mai jos sau folosește butonul de explorare</target>
 
 <source>Close progress dialog</source>
 <target>Închide Fereastra cu Progresul Sincronizării</target>
@@ -585,26 +603,14 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Select variant:</source>
 <target>Selectează Varianta de Sincronizare:</target>
 
-<source><Automatic></source>
-<target><Sincronizare Inteligentă></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identificare și propagare a modificărilor din ambele părți folosind o bază de date. Ștergerile, renumirile și conflictele sînt detectate automat</target>
-
-<source>Mirror ->></source>
-<target>Clonare =>></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Conservare [backup] în oglindă a dosarului stîng. Dosarul drept e modificat pentru a fi identic după sincronizare cu cel stîng.</target>
 
-<source>Update -></source>
-<target>Actualizare =></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Copiere în dosarul din dreapta a filelor actualizate sau noi.</target>
-
-<source>Custom</source>
-<target>Sincronizare Personalizată</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Reguli de sincronizare definite de utilizator pentru fiecare situație.</target>
@@ -661,9 +667,6 @@ Filele sînt considerate identice dacă
 sînt aceleași
 </target>
 
-<source>File time and size</source>
-<target>Timpul și Mărimea Filelor</target>
-
 <source>
 Files are found equal if
      - file content
@@ -674,9 +677,6 @@ Filele sînt considerate identice dacă
      - conținutul filelor
 este același
 </target>
-
-<source>File content</source>
-<target>Conținutul Filelor</target>
 
 <source>Symbolic Link handling</source>
 <target>Prelucrarea Legăturilor Simbolice (Simlegături)</target>
@@ -693,32 +693,29 @@ este același
 <source>Source code written in C++ utilizing:</source>
 <target>Cod sursă scris în C++ folosind:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Mulțumiri pentru traducerea FreeFileSync:</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Opiniile și sugestiile despre program sînt binevenite</target>
 
-<source>Feedback and suggestions are welcome at:</source>
-<target>Opiniile și sugestiile sînt binevenite:</target>
+<source>Homepage</source>
+<target>Situl Softului</target>
 
 <source>FreeFileSync at Sourceforge</source>
 <target>FreeFileSync la Sourceforge</target>
 
-<source>Homepage</source>
-<target>Sit</target>
+<source>Email</source>
+<target>Adresa Autorului</target>
 
-<source>If you like FFS</source>
-<target>Donează pentru FFS</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Mulțumiri pentru traducerea FreeFileSync:</target>
+
+<source>If you like FreeFileSync</source>
+<target>Donează pentru FreeFileSync</target>
 
 <source>Donate with PayPal</source>
 <target>Donează prin PayPal</target>
 
-<source>Email</source>
-<target>Adresă</target>
-
-<source>Report translation error</source>
-<target>Raportează erori de trad.</target>
-
-<source>Published under the GNU General Public License:</source>
-<target>Publicat sub licența GNU GPL:</target>
+<source>Published under the GNU General Public License</source>
+<target>Publicat sub licența GNU GPL</target>
 
 <source>Ignore subsequent errors</source>
 <target>Ignoră (nu lua în seamă) erorile ulterioare</target>
@@ -802,7 +799,7 @@ Excluse: \stuff\temp\*
 <target>Mărimea maximă a filei</target>
 
 <source>&Default</source>
-<target>&Implicite</target>
+<target>Coloanele &Implicite</target>
 
 <source>Move column up</source>
 <target>Mută coloana în sus</target>
@@ -811,13 +808,13 @@ Excluse: \stuff\temp\*
 <target>Mută coloana în jos</target>
 
 <source>Transactional file copy</source>
-<target>Copiere tranzacțională a filelor</target>
+<target>Copiază filele în mod tranzacțional</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Scrierea se face mai întîi într-o filă temporară (*.ffs_tmp), care e apoi renumită. Se garantează astfel consecvența stării filelor chiar și în cazul apariției de erori fatale.</target>
 
 <source>Copy locked files</source>
-<target>Copiere a filelor partajate [shared] sau zăvorîte [locked]</target>
+<target>Copiază filele partajate [shared] sau zăvorîte [locked]</target>
 
 <source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
 <target>Filele partajate sau zăvorîte sînt copiate folosind Serviciul de Conservare a Volumelor din Windows [Volume Shadow Copy] (necesită drepturi de Administrator)</target>
@@ -826,7 +823,7 @@ Excluse: \stuff\temp\*
 <target>Copiază permisiunile de acces ale filelor</target>
 
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Transferă permisiunile filelor și dosarelor (necesită drepturi de Administrator)</target>
+<target>Permisiunile filelor și dosarelor sînt și ele transferate (necesită drepturi de Administrator)</target>
 
 <source>Hidden dialogs:</source>
 <target>Casete de dialog ascunse:</target>
@@ -867,6 +864,9 @@ Excluse: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Perechi de Dosare</target>
 
+<source>Compressed view</source>
+<target>Vedere Comprimată</target>
+
 <source>Select view</source>
 <target>Selectează Vederea</target>
 
@@ -885,20 +885,14 @@ Excluse: \stuff\temp\*
 <source><multiple selection></source>
 <target><selectare multiplă></target>
 
-<source>D-Click</source>
-<target>Clic-Dreapta</target>
-
 <source>Delete</source>
 <target>Șterge</target>
 
-<source>Customize...</source>
-<target>Personalizează...</target>
+<source>Include all</source>
+<target>Include Tot</target>
 
-<source>Select time span...</source>
-<target>Selectează intervalul de timp...</target>
-
-<source>Auto-adjust columns</source>
-<target>Ajustează Automat Coloanele</target>
+<source>Exclude all</source>
+<target>Exclude Tot</target>
 
 <source>Icon size:</source>
 <target>Mărimea Icoanelor Elementelor:</target>
@@ -912,14 +906,11 @@ Excluse: \stuff\temp\*
 <source>Large</source>
 <target>Mare</target>
 
-<source>Include all rows</source>
-<target>Include Toate Rîndurile</target>
+<source>Select time span...</source>
+<target>Selectează intervalul de timp...</target>
 
-<source>Exclude all rows</source>
-<target>Exclude Toate Rîndurile</target>
-
-<source>Reset view</source>
-<target>Resetează Vederea</target>
+<source>Default view</source>
+<target>Vedere Implicită</target>
 
 <source>Show "%x"</source>
 <target>Arată "%x"</target>
@@ -934,7 +925,7 @@ Excluse: \stuff\temp\*
 <target>Vrei să salvezi modificările configurației curente?</target>
 
 <source>Configuration loaded!</source>
-<target>Configurație încărcată !</target>
+<target>Configurație deschisă !</target>
 
 <source>Folder Comparison and Synchronization</source>
 <target>Comparare și Sincronizare de Dosare</target>
@@ -1148,7 +1139,7 @@ Excluse: \stuff\temp\*
 <target>Urmărește</target>
 
 <source>Copy NTFS permissions</source>
-<target>Copiere a permisiunilor NTFS</target>
+<target>Copiază permisiunile NTFS</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Comenzi pentru aplicații externe incluse în meniul contextual al softului. Sînt disponibile următoarele macrocomenzi:</target>
@@ -1205,6 +1196,12 @@ Excluse: \stuff\temp\*
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>Filele sînt mutate într-un subdosar special cu marcaj de timp</target>
+
+<source>Files</source>
+<target>File</target>
+
+<source>Percentage</source>
+<target>Procent</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1276,7 +1273,7 @@ Excluse: \stuff\temp\*
 <target>Eroare la schimbarea datei de modificare:</target>
 
 <source>Error loading library function:</source>
-<target>Eroare la încărcarea bibliotecii de funcții:</target>
+<target>Eroare la deschiderea bibliotecii de funcții:</target>
 
 <source>Error reading security context:</source>
 <target>Eroare la citirea contextului de securitate:</target>
@@ -1337,6 +1334,9 @@ Excluse: \stuff\temp\*
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Dosarele sînt interdependente! Atenție la setarea regulilor de sincronizare:</target>
+
+<source>Preparing synchronization...</source>
+<target>Pregătesc sincronizarea...</target>
 
 <source>Memory allocation failed!</source>
 <target>Alocarea memoriei a eșuat!</target>
@@ -1455,8 +1455,8 @@ Excluse: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Numele dosarului țintă nu poate să lipsească!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>Dosarul ales de utilizator pentru ștergere nu a fost specificat !</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Dosarul pentru versionarea filelor n-a fost specificat!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Dosarul sursă nu mai există:</target>

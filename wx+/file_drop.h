@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef FILE_DROP_H_INCLUDED
@@ -14,15 +14,15 @@ namespace zen
 {
 //register simple file drop event (without issue of freezing dialogs and without wxFileDropTarget overdesign)
 
-//1. setup a window to emit FFS_DROP_FILE_EVENT
+//1. setup a window to emit EVENT_DROP_FILE
 void setupFileDrop(wxWindow& wnd);
 
 //2. register events:
-//wnd.Connect   (FFS_DROP_FILE_EVENT, FFSFileDropEventHandler(MyDlg::OnFilesDropped), NULL, this);
-//wnd.Disconnect(FFS_DROP_FILE_EVENT, FFSFileDropEventHandler(MyDlg::OnFilesDropped), NULL, this);
+//wnd.Connect   (EVENT_DROP_FILE, FileDropEventHandler(MyDlg::OnFilesDropped), NULL, this);
+//wnd.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(MyDlg::OnFilesDropped), NULL, this);
 
 //3. do something:
-//void MyDlg::OnFilesDropped(FFSFileDropEvent& event);
+//void MyDlg::OnFilesDropped(FileDropEvent& event);
 
 
 
@@ -49,21 +49,18 @@ wxEventType createNewEventType()
 }
 
 //define new event type
-const wxEventType FFS_DROP_FILE_EVENT = createNewEventType();
+const wxEventType EVENT_DROP_FILE = createNewEventType();
 
-class FFSFileDropEvent : public wxCommandEvent
+class FileDropEvent : public wxCommandEvent
 {
 public:
-    FFSFileDropEvent(const std::vector<wxString>& filesDropped, const wxWindow& dropWindow, wxPoint dropPos) :
-        wxCommandEvent(FFS_DROP_FILE_EVENT),
+    FileDropEvent(const std::vector<wxString>& filesDropped, const wxWindow& dropWindow, wxPoint dropPos) :
+        wxCommandEvent(EVENT_DROP_FILE),
         filesDropped_(filesDropped),
         dropWindow_(dropWindow),
         dropPos_(dropPos) {}
 
-    virtual wxEvent* Clone() const
-    {
-        return new FFSFileDropEvent(filesDropped_, dropWindow_, dropPos_);
-    }
+    virtual wxEvent* Clone() const { return new FileDropEvent(*this); }
 
     const std::vector<wxString>& getFiles()        const { return filesDropped_; }
     const wxWindow&              getDropWindow()   const { return dropWindow_;   }
@@ -72,13 +69,13 @@ public:
 private:
     const std::vector<wxString> filesDropped_;
     const wxWindow& dropWindow_;
-    wxPoint dropPos_;
+    const wxPoint dropPos_;
 };
 
-typedef void (wxEvtHandler::*FFSFileDropEventFunction)(FFSFileDropEvent&);
+typedef void (wxEvtHandler::*FileDropEventFunction)(FileDropEvent&);
 
-#define FFSFileDropEventHandler(func) \
-    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(FFSFileDropEventFunction, &func)
+#define FileDropEventHandler(func) \
+    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(FileDropEventFunction, &func)
 
 
 class WindowDropTarget : public wxFileDropTarget
@@ -86,19 +83,21 @@ class WindowDropTarget : public wxFileDropTarget
 public:
     WindowDropTarget(wxWindow& dropWindow) : dropWindow_(dropWindow) {}
 
+private:
     virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& fileArray)
     {
         std::vector<wxString> filenames(fileArray.begin(), fileArray.end());
         if (!filenames.empty())
         {
             //create a custom event on drop window: execute event after file dropping is completed! (after mouse is released)
-            FFSFileDropEvent evt(filenames, dropWindow_, wxPoint(x, y));
-            dropWindow_.GetEventHandler()->AddPendingEvent(evt);
+            FileDropEvent evt(filenames, dropWindow_, wxPoint(x, y));
+            auto handler = dropWindow_.GetEventHandler();
+            if (handler)
+                handler->AddPendingEvent(evt);
         }
         return true;
     }
 
-private:
     wxWindow& dropWindow_;
 };
 

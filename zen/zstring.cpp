@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "zstring.h"
@@ -24,15 +24,13 @@ using namespace zen;
 #ifndef NDEBUG
 LeakChecker::~LeakChecker()
 {
-    if (activeStrings.size() > 0)
+    if (!activeStrings.empty())
     {
-        int rowCount = 0;
         std::string leakingStrings;
 
-        for (VoidPtrSizeMap::const_iterator i = activeStrings.begin();
-             i != activeStrings.end() && ++rowCount <= 20;
-             ++i)
-            leakingStrings += "\"" + rawMemToString(i->first, i->second) + "\"\n";
+        int items = 0;
+        for (auto iter = activeStrings.begin(); iter != activeStrings.end() && items < 20; ++iter, ++items)
+            leakingStrings += "\"" + rawMemToString(iter->first, iter->second) + "\"\n";
 
         const std::string message = std::string("Memory leak detected!") + "\n\n"
                                     + "Candidates:\n" + leakingStrings;

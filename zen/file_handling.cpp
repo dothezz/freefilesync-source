@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "file_handling.h"
@@ -910,6 +910,53 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
 }
 
 
+bool zen::supportsPermissions(const Zstring& dirname) //throw FileError
+{
+#ifdef FFS_WIN
+    const HANDLE hDir = ::CreateFile(zen::applyLongPathPrefix(dirname).c_str(),
+                                     0,
+                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                     NULL,
+                                     OPEN_EXISTING,
+                                     FILE_FLAG_BACKUP_SEMANTICS, // | FILE_FLAG_OPEN_REPARSE_POINT -> follow symlinks
+                                     NULL);
+    if (hDir == INVALID_HANDLE_VALUE)
+        throw FileError(_("Error reading file attributes:") + L"\n\"" + dirname + L"\"" + L"\n\n" + getLastErrorFormatted());
+    ZEN_ON_BLOCK_EXIT(::CloseHandle(hDir));
+
+    //dynamically load windows API function (existing since Windows XP)
+    typedef BOOL (WINAPI* GetVolumeInformationByHandleWFun)(HANDLE hFile,
+                                                            LPWSTR  lpVolumeNameBuffer,
+                                                            DWORD   nVolumeNameSize,
+                                                            LPDWORD lpVolumeSerialNumber,
+                                                            LPDWORD lpMaximumComponentLength,
+                                                            LPDWORD lpFileSystemFlags,
+                                                            LPWSTR  lpFileSystemNameBuffer,
+                                                            DWORD   nFileSystemNameSize);
+
+    const SysDllFun<GetVolumeInformationByHandleWFun> getVolumeInformationByHandleW(L"kernel32.dll", "GetVolumeInformationByHandleW");
+    if (!getVolumeInformationByHandleW)
+        throw FileError(_("Error loading library function:") + L"\n\"" + L"GetVolumeInformationByHandleW" + L"\"");
+
+    DWORD fileSystemFlags = 0;
+    if (!getVolumeInformationByHandleW(hDir,  //__in       HANDLE  hFile,
+                                       NULL,  //__out_opt  LPTSTR  lpVolumeNameBuffer,
+                                       0,     //__in       DWORD   nVolumeNameSize,
+                                       NULL,  //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                       NULL,  //__out_opt  LPDWORD lpMaximumComponentLength,
+                                       &fileSystemFlags, //__out_opt  LPDWORD lpFileSystemFlags,
+                                       NULL,  //__out      LPTSTR  lpFileSystemNameBuffer,
+                                       0))    //__in       DWORD   nFileSystemNameSize
+        throw FileError(_("Error reading file attributes:") + L"\n\"" + dirname + L"\"" + L"\n\n" + getLastErrorFormatted());
+
+    return (fileSystemFlags & FILE_PERSISTENT_ACLS) != 0;
+
+#elif defined FFS_LINUX
+    return true;
+#endif
+}
+
+
 namespace
 {
 #ifdef FFS_WIN
@@ -928,7 +975,7 @@ Zstring getSymlinkTargetPath(const Zstring& symlink) //throw FileError
     ZEN_ON_BLOCK_EXIT(::CloseHandle(hDir));
 
     //dynamically load windows API function
-    typedef DWORD (WINAPI *GetFinalPathNameByHandleWFunc)(HANDLE hFile,
+    typedef DWORD (WINAPI* GetFinalPathNameByHandleWFunc)(HANDLE hFile,
                                                           LPTSTR lpszFilePath,
                                                           DWORD cchFilePath,
                                                           DWORD dwFlags);
@@ -1026,6 +1073,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     }
 
     //in contrast to ::SetSecurityInfo(), ::SetFileSecurity() seems to honor the "inherit DACL/SACL" flags
+    //CAVEAT: if a file system does not support ACLs, GetFileSecurity() will return successfully with a *valid* security descriptor containing *no* ACL entries!
 
     //NOTE: ::GetFileSecurity()/::SetFileSecurity() do NOT follow Symlinks!
     const Zstring sourceResolved = procSl == SYMLINK_FOLLOW && symlinkExists(source) ? getSymlinkTargetPath(source) : source;
@@ -1336,7 +1384,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     }();
 
     //dynamically load windows API function
-    typedef BOOLEAN (WINAPI *CreateSymbolicLinkFunc)(LPCTSTR lpSymlinkFileName, LPCTSTR lpTargetFileName, DWORD dwFlags);
+    typedef BOOLEAN (WINAPI* CreateSymbolicLinkFunc)(LPCTSTR lpSymlinkFileName, LPCTSTR lpTargetFileName, DWORD dwFlags);
 
     const SysDllFun<CreateSymbolicLinkFunc> createSymbolicLink(L"kernel32.dll", "CreateSymbolicLinkW");
     if (!createSymbolicLink)

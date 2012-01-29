@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef MAINDIALOG_H
@@ -15,24 +15,14 @@
 #include <stack>
 #include "gui_generated.h"
 #include "../lib/process_xml.h"
+#include "custom_grid.h"
+#include "tree_view.h"
+#include <wx+/file_drop.h>
 
 class FolderHistory;
-class CustomGrid;
-class FFSCheckRowsEvent;
-class FFSSyncDirectionEvent;
-class IconUpdater;
 class DirectoryPair;
-class DirectoryPairFirst;
 class CompareStatus;
-class SyncStatusHandler;
-class PanelMoveWindow;
-
-
-namespace zen
-{
-class CustomLocale;
-class GridView;
-}
+class DirectoryPairFirst;
 
 
 class MainDialog : public MainDialogGenerated
@@ -103,19 +93,20 @@ private:
     void updateGuiForFolderPair(); //helper method: add usability by showing/hiding buttons related to folder pairs
 
     //main method for putting gridDataView on UI: updates data respecting current view settings
-    void updateGuiGrid();
+    void updateGui();
     void updateGridViewData();
 
     //context menu functions
-    std::set<size_t> getSelectedRows(const CustomGrid* grid) const;
-    std::set<size_t> getSelectedRows() const;
-    void setSyncDirManually(const std::set<size_t>& rowsToSetOnUiTable, const zen::SyncDirection dir);
-    void filterRangeManually(const std::set<size_t>& rowsToFilterOnUiTable, int leadingRow);
-    void copySelectionToClipboard(CustomGrid& selectedGrid);
-    void deleteSelectedFiles(const std::set<size_t>& viewSelectionLeft, const std::set<size_t>& viewSelectionRight);
+    std::vector<zen::FileSystemObject*> getGridSelection(bool fromLeft = true, bool fromRight = true) const;
+    std::vector<zen::FileSystemObject*> getTreeSelection() const;
 
-    void openExternalApplication(const wxString& commandline);
-    void openExternalApplication(size_t rowNumber, bool leftSide, const wxString& commandline);
+    void setSyncDirManually(const std::vector<zen::FileSystemObject*>& selection, zen::SyncDirection direction);
+    void setManualFilter(const std::vector<zen::FileSystemObject*>& selection, bool setIncluded);
+    void copySelectionToClipboard();
+    void deleteSelectedFiles(const std::vector<zen::FileSystemObject*>& selectionLeft,
+                             const std::vector<zen::FileSystemObject*>& selectionRight);
+
+    void openExternalApplication(const zen::FileSystemObject* fsObj, bool leftSide, const wxString& commandline); //fsObj is optional!
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
@@ -125,57 +116,32 @@ private:
     void clearStatusBar();
 
     //events
-    void onGridLeftButtonEvent(        wxKeyEvent& event);
-    void onGridRightButtonEvent(       wxKeyEvent& event);
-    void onGridMiddleButtonEvent(      wxKeyEvent& event);
-    void OnContextRimLabelLeft(        wxGridEvent& event);
-    void OnContextRimLabelRight(       wxGridEvent& event);
-    void OnContextMiddle(              wxGridEvent& event);
-    void OnContextMiddleLabel(         wxGridEvent& event);
-    void OnContextSetLayout(           wxMouseEvent& event);
-    void OnGlobalKeyEvent(             wxKeyEvent& event);
+    void onGridButtonEvent         (wxKeyEvent& event);
+    void onTreeButtonEvent         (wxKeyEvent& event);
+    void OnContextSetLayout        (wxMouseEvent& event);
+    void OnGlobalKeyEvent          (wxKeyEvent& event);
 
-    void OnContextSelectCompVariant(      wxMouseEvent& event);
-    void OnContextSelectSyncVariant(      wxMouseEvent& event);
+    void OnCompSettingsContext(wxMouseEvent& event);
+    void OnSyncSettingsContext(wxMouseEvent& event);
+    void OnGlobalFilterContext(wxCommandEvent& event);
 
-    void applyCompareConfig(bool globalLevel = true);
-
-    void OnSetCompVariant(wxCommandEvent& event);
-    void OnSetSyncVariant(wxCommandEvent& event);
+    void applyCompareConfig(bool changePreviewStatus = true);
 
     //context menu handler methods
-    void OnContextFilterTemp        (wxCommandEvent& event);
-    void OnContextExcludeExtension  (wxCommandEvent& event);
-    void OnContextExcludeObject     (wxCommandEvent& event);
-    void OnContextOpenWith          (wxCommandEvent& event);
-    void OnContextDeleteFiles       (wxCommandEvent& event);
-    void OnContextSyncDirLeft       (wxCommandEvent& event);
-    void OnContextSyncDirNone       (wxCommandEvent& event);
-    void OnContextSyncDirRight      (wxCommandEvent& event);
-    void OnContextCustColumnLeft    (wxCommandEvent& event);
-    void OnContextCustColumnRight   (wxCommandEvent& event);
-    void OnContextSelectTimeSpan    (wxCommandEvent& event);
-    void OnContextAutoAdjustLeft    (wxCommandEvent& event);
-    void OnContextAutoAdjustRight   (wxCommandEvent& event);
-    void OnContextSetIconSize    (wxCommandEvent& event);
-    void OnContextIncludeAll        (wxCommandEvent& event);
-    void OnContextExcludeAll        (wxCommandEvent& event);
-    void OnContextComparisonView    (wxCommandEvent& event);
-    void OnContextSyncView          (wxCommandEvent& event);
-    void OnContextSetLayoutReset    (wxCommandEvent& event);
-    void OnContextSetLayoutShowPanel(wxCommandEvent& event);
+    void onMainGridContext(zen::GridClickEvent& event);
+    void onNaviGridContext(zen::GridClickEvent& event);
 
-    void OnContextRim(wxGridEvent& event);
+    void onNaviSelection(zen::GridRangeSelectEvent& event);
+
+    void onNaviPanelFilesDropped(zen::FileDropEvent& event);
     void OnDirSelected(wxFileDirPickerEvent& event);
 
-    void OnCheckRows(FFSCheckRowsEvent& event);
-    void OnSetSyncDirection(FFSSyncDirectionEvent& event);
+    void onCheckRows       (zen::CheckRowsEvent&     event);
+    void onSetSyncDirection(zen::SyncDirectionEvent& event);
 
-    void OnLeftGridDoubleClick( wxGridEvent& event);
-    void OnRightGridDoubleClick(wxGridEvent& event);
-    void OnSortLeftGrid(        wxGridEvent& event);
-    void OnSortMiddleGrid(      wxGridEvent& event);
-    void OnSortRightGrid(       wxGridEvent& event);
+    void onGridDoubleClick    (zen::GridClickEvent& event);
+    void onGridLabelLeftClick (zen::GridClickEvent& event);
+    void onGridLabelContext(zen::GridClickEvent& event);
 
     void OnLeftOnlyFiles(       wxCommandEvent& event);
     void OnRightOnlyFiles(      wxCommandEvent& event);
@@ -202,8 +168,6 @@ private:
     void OnRegularUpdateCheck(  wxIdleEvent& event);
     void OnLayoutWindowAsync(   wxIdleEvent& event);
 
-    void refreshGridAfterFilterChange(int delay);
-
     void OnResize(              wxSizeEvent& event);
     void OnResizeFolderPairs(   wxEvent& event);
     void OnResizeConfigPanel(   wxEvent& event);
@@ -213,22 +177,25 @@ private:
     void OnConfigureFilter(     wxCommandEvent& event);
     void OnSwapSides(           wxCommandEvent& event);
     void OnCompare(             wxCommandEvent& event);
-    void OnSwitchView(          wxCommandEvent& event);
     void OnSyncSettings(        wxCommandEvent& event);
     void OnCmpSettings(         wxCommandEvent& event);
     void OnStartSync(           wxCommandEvent& event);
     void OnClose(               wxCloseEvent&   event);
 
-    void OnGlobalFilterOpenContext(wxCommandEvent& event);
-    void OnGlobalFilterRemConfirm(wxCommandEvent& event);
+    void updateGuiAfterFilterChange(int delay);
+
+    void excludeExtension(const Zstring& extension);
+    void excludeItems(const std::vector<zen::FileSystemObject*>& selection);
 
     void updateStatistics();
+
+    void updateSyncEnabledStatus();
 
     void OnAddFolderPair(       wxCommandEvent& event);
     void OnRemoveFolderPair(    wxCommandEvent& event);
     void OnRemoveTopFolderPair( wxCommandEvent& event);
 
-    void updateFilterConfig();
+    void applyFilterConfig();
     void applySyncConfig();
 
     //menu events
@@ -251,10 +218,16 @@ private:
     //application variables are stored here:
 
     //global settings used by GUI and batch mode
-    xmlAccess::XmlGlobalSettings* globalSettings; //always bound
+    xmlAccess::XmlGlobalSettings* globalSettings; //always bound!
 
-    //UI view of FolderComparison structure
-    std::unique_ptr<zen::GridView> gridDataView;
+    //UI view of FolderComparison structure (partially owns folderCmp)
+    std::shared_ptr<zen::GridView> gridDataView; //always bound!
+    std::shared_ptr<zen::TreeView> treeDataView; //
+
+    //the prime data structure of this tool *bling*:
+    zen::FolderComparison folderCmp; //optional!: sync button not available if empty
+
+    void clearGrid(bool refreshGrid = true);
 
     //-------------------------------------
     //functional configuration
@@ -267,8 +240,6 @@ private:
 
 
     //***********************************************
-    std::unique_ptr<wxMenu> contextMenu;
-
     //status information
     wxLongLong lastStatusChange;
     std::stack<wxString> stackObjects;
@@ -278,33 +249,11 @@ private:
 
     bool cleanedUp;
 
-    //remember last sort executed (for determination of sort order)
-    int lastSortColumn;
-    const wxGrid* lastSortGrid;
-
-    //update icons periodically: one updater instance for both left and right grids
-    std::unique_ptr<IconUpdater> updateFileIcons;
-
     bool processingGlobalKeyEvent; //indicator to notify recursion in OnGlobalKeyEvent()
 
-    //encapsulation of handling of sync preview
-    class SyncPreview //encapsulates MainDialog functionality for synchronization preview (friend class)
-    {
-    public:
-        SyncPreview(MainDialog* mainDlg);
-
-        void enablePreview(bool value);
-        bool previewIsEnabled() const;
-
-        void enableSynchronization(bool value);
-        bool synchronizationIsEnabled() const;
-
-    private:
-        MainDialog* mainDlg_;
-        bool syncPreviewEnabled; //toggle to display configuration preview instead of comparison result
-        bool synchronizationEnabled; //determines whether synchronization should be allowed
-    };
-    std::unique_ptr<SyncPreview> syncPreview; //always bound
+    bool syncPreviewEnabled; //toggle to display configuration preview instead of comparison result
+    //use this methods when changing values!
+    void enablePreview(bool value);
 
     wxAuiManager auiMgr; //implement dockable GUI design
 

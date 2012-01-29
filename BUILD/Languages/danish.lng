@@ -139,36 +139,6 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Symlink></target>
-
-<source><Directory></source>
-<target><Directory></target>
-
-<source>Size</source>
-<target>Størrelse</target>
-
-<source>Date</source>
-<target>Dato</target>
-
-<source>Full path</source>
-<target>Fuld Sti</target>
-
-<source>Filename</source>
-<target>Filnavne</target>
-
-<source>Relative path</source>
-<target>Filsti</target>
-
-<source>Directory</source>
-<target>Bibliotek</target>
-
-<source>Extension</source>
-<target>Udvidelse</target>
-
-<source>Comparison Result</source>
-<target>Sammenlignings Resultat</target>
-
 <source>Initial synchronization:</source>
 <target>Indledende synkronisering:</target>
 
@@ -354,6 +324,24 @@ Kommando linjen bliver afviklet hver gang:
 <source>Logging</source>
 <target>Logger</target>
 
+<source>File time and size</source>
+<target>Fil tid og størrelse</target>
+
+<source>File content</source>
+<target>Fil indhold</target>
+
+<source><Automatic></source>
+<target><Automatisk></target>
+
+<source>Mirror ->></source>
+<target>Spejl ->></target>
+
+<source>Update -></source>
+<target>Opdater -></target>
+
+<source>Custom</source>
+<target>Brugerdefineret</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync batch fil</target>
 
@@ -411,6 +399,36 @@ Kommando linjen bliver afviklet hver gang:
 <source>(Requires an Internet connection!)</source>
 <target>(Kræver en Internet forbindelse!)</target>
 
+<source><Symlink></source>
+<target><Symlink></target>
+
+<source><Directory></source>
+<target><Directory></target>
+
+<source>Full path</source>
+<target>Fuld Sti</target>
+
+<source>Name</source>
+<target>Navn</target>
+
+<source>Relative path</source>
+<target>Filsti</target>
+
+<source>Directory</source>
+<target>Bibliotek</target>
+
+<source>Size</source>
+<target>Størrelse</target>
+
+<source>Date</source>
+<target>Dato</target>
+
+<source>Extension</source>
+<target>Udvidelse</target>
+
+<source>Comparison Result</source>
+<target>Sammenlignings Resultat</target>
+
 <source>Drag && drop</source>
 <target>Træk && slip</target>
 
@@ -434,9 +452,6 @@ Kommando linjen bliver afviklet hver gang:
 
 <source>2. &Synchronize...</source>
 <target>2. &Synkroniser...</target>
-
-<source>S&witch view</source>
-<target>S&kift udseende</target>
 
 <source>&New</source>
 <target>&Ny</target>
@@ -582,26 +597,14 @@ Kommando linjen bliver afviklet hver gang:
 <source>Select variant:</source>
 <target>Vælg variant:</target>
 
-<source><Automatic></source>
-<target><Automatisk></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>find ændringer på begge sider via. database. Sletninger, omdøbninger og konflikter bliver automatisk fundet.</target>
-
-<source>Mirror ->></source>
-<target>Spejl ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Spejling af venstre mappe. Højre mappe tilpasses så den ligner den venstre efter synkronisering.</target>
 
-<source>Update -></source>
-<target>Opdater -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Kopier nye eller opdaterede filer til højre mappe.</target>
-
-<source>Custom</source>
-<target>Brugerdefineret</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Konfigurer dine egne synkroniserings regler.</target>
@@ -658,9 +661,6 @@ Filer bliver set som ens hvis
 er ens
 </target>
 
-<source>File time and size</source>
-<target>Fil tid og størrelse</target>
-
 <source>
 Files are found equal if
      - file content
@@ -671,9 +671,6 @@ Filer er ens hvis
      - fil indhold
 er det samme
 </target>
-
-<source>File content</source>
-<target>Fil indhold</target>
 
 <source>Symbolic Link handling</source>
 <target>Link håndtering</target>
@@ -690,32 +687,29 @@ er det samme
 <source>Source code written in C++ utilizing:</source>
 <target>Source code skrevet i C++:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Stor tak for lokalisering af FreeFileSync går til:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Feedback og forslag er velkommen på:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync på Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Feedback og forslag er velkomne</target>
 
 <source>Homepage</source>
 <target>Hjemmeside</target>
 
-<source>If you like FFS</source>
-<target>Hvis du kan lide FFS</target>
-
-<source>Donate with PayPal</source>
-<target>Doner med PayPal</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync på Sourceforge</target>
 
 <source>Email</source>
 <target>E-mail</target>
 
-<source>Report translation error</source>
-<target>Rapporter oversættelses fejl</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Stor tak for lokalisering af FreeFileSync går til:</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>Udgivet under GNU General Public Licence:</target>
+<source>If you like FreeFileSync</source>
+<target>Hvis du kan lide FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Doner med PayPal</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Udgivet under GNU General Public Licence</target>
 
 <source>Ignore subsequent errors</source>
 <target>Ignorer underliggende fejl</target>
@@ -864,6 +858,9 @@ Udeluk: \ting\temp\*
 <source>Folder pairs</source>
 <target>Mappe par</target>
 
+<source>Compressed view</source>
+<target>Komprimmeret tilstand</target>
+
 <source>Select view</source>
 <target>Vælg udseende</target>
 
@@ -882,20 +879,14 @@ Udeluk: \ting\temp\*
 <source><multiple selection></source>
 <target><flere valg></target>
 
-<source>D-Click</source>
-<target>Dobbelt-klik</target>
-
 <source>Delete</source>
 <target>Slet</target>
 
-<source>Customize...</source>
-<target>Tilpas...</target>
+<source>Include all</source>
+<target>Vælg alle</target>
 
-<source>Select time span...</source>
-<target>Vælg tidsområde...</target>
-
-<source>Auto-adjust columns</source>
-<target>Auto-juster kolonner</target>
+<source>Exclude all</source>
+<target>Fravælg alle</target>
 
 <source>Icon size:</source>
 <target>Ikon størrelse:</target>
@@ -909,14 +900,11 @@ Udeluk: \ting\temp\*
 <source>Large</source>
 <target>Stor</target>
 
-<source>Include all rows</source>
-<target>Inkluder alle rækker</target>
+<source>Select time span...</source>
+<target>Vælg tidsområde...</target>
 
-<source>Exclude all rows</source>
-<target>Ekskluder alle rækker</target>
-
-<source>Reset view</source>
-<target>Nulstil udseende</target>
+<source>Default view</source>
+<target>Standard tilstand</target>
 
 <source>Show "%x"</source>
 <target>Vis "%x"</target>
@@ -1197,6 +1185,12 @@ Udeluk: \ting\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>Flyt filer til et datomærket underbibliotek</target>
 
+<source>Files</source>
+<target>Filer</target>
+
+<source>Percentage</source>
+<target>Procent</target>
+
 <source>%x TB</source>
 <target>%x TB</target>
 
@@ -1326,6 +1320,9 @@ Udeluk: \ting\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Biblioteker er afhængige! Vær forsigtig når du laver synkroniserings reglerne:</target>
 
+<source>Preparing synchronization...</source>
+<target>Forbereder synkronisering...</target>
+
 <source>Memory allocation failed!</source>
 <target>Hukommelses fejl!</target>
 
@@ -1443,8 +1440,8 @@ Udeluk: \ting\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Navnet på destinations biblioteket må ikke være tomt!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>Bruger-defineret bibliotek til sletning ikke defineret!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Fil versions biblioteket blev ikke angivet!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Kilde biblioteket findes ikke mere:</target>

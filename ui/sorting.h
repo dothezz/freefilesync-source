@@ -1,15 +1,16 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef SORTING_H_INCLUDED
 #define SORTING_H_INCLUDED
 
-#include "../file_hierarchy.h"
-#include "../synchronization.h"
 #include <zen/assert_static.h>
+#include "../file_hierarchy.h"
+#include <zen/type_tools.h>
+//#include "../synchronization.h"
 
 
 namespace zen
@@ -18,9 +19,9 @@ namespace
 {
 struct CompileTimeReminder : public FSObjectVisitor
 {
-    virtual void visit(const FileMapping& fileObj) {}
+    virtual void visit(const FileMapping& fileObj   ) {}
     virtual void visit(const SymLinkMapping& linkObj) {}
-    virtual void visit(const DirMapping& dirObj) {}
+    virtual void visit(const DirMapping& dirObj     ) {}
 } checkDymanicCasts; //just a compile-time reminder to check dynamic casts in this file
 }
 
@@ -29,28 +30,6 @@ bool isDirectoryMapping(const FileSystemObject& fsObj)
 {
     return dynamic_cast<const DirMapping*>(&fsObj) != NULL;
 }
-
-
-template <bool ascending>
-struct Compare
-{
-    template <class T>
-    bool isSmallerThan(T a, T b)
-    {
-        assert_static(sizeof(T) <= 2 * sizeof(int)); //use for comparing (small) INTEGRAL types only!
-        return a < b;
-    }
-};
-template <>
-struct Compare<false>
-{
-    template <class T>
-    bool isSmallerThan(T a, T b)
-    {
-        assert_static(sizeof(T) <= 2 * sizeof(int)); //use for comparing (small) INTEGRAL types only!
-        return a > b;
-    }
-};
 
 
 template <bool ascending, SelectedSide side> inline
@@ -75,8 +54,7 @@ bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
         if (isDirectoryMapping(b))
             return true;
         else
-            return Compare<ascending>().isSmallerThan(
-                       cmpFileName(a.getShortName<side>(), b.getShortName<side>()), 0);
+            return makeSortDirection(LessFilename(), Int2Type<ascending>())(a.getShortName<side>(), b.getShortName<side>());
     }
 }
 
@@ -97,7 +75,7 @@ bool lessRelativeName(const FileSystemObject& a, const FileSystemObject& b)
     //compare relative names without filenames first
     const int rv = cmpFileName(relDirNameA, relDirNameB);
     if (rv != 0)
-        return Compare<ascending>().isSmallerThan(rv, 0);
+        return makeSortDirection(std::less<int>(), Int2Type<ascending>())(rv, 0);
     else //compare the filenames
     {
         if (isDirectoryB) //directories shall appear before files
@@ -138,7 +116,7 @@ bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
         return true;
 
     //return list beginning with largest files first
-    return Compare<ascending>().isSmallerThan(fileObjA->getFileSize<side>(), fileObjB->getFileSize<side>());
+    return makeSortDirection(std::less<UInt64>(), Int2Type<ascending>())(fileObjA->getFileSize<side>(), fileObjB->getFileSize<side>());
 }
 
 
@@ -166,7 +144,7 @@ bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
     zen::Int64 dateB = fileObjB ? fileObjB->getLastWriteTime<side>() : linkObjB->getLastWriteTime<side>();
 
     //return list beginning with newest files first
-    return Compare<ascending>().isSmallerThan(dateA, dateB);
+    return makeSortDirection(std::less<Int64>(), Int2Type<ascending>())(dateA, dateB);
 }
 
 
@@ -187,7 +165,7 @@ bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
     else if (fileObjB == NULL)
         return true;  //directories last
 
-    return Compare<ascending>().isSmallerThan(cmpFileName(fileObjA->getExtension<side>(), fileObjB->getExtension<side>()), 0);
+    return makeSortDirection(LessFilename(), Int2Type<ascending>())(fileObjA->getExtension<side>(), fileObjB->getExtension<side>());
 }
 
 
@@ -200,14 +178,14 @@ bool lessCmpResult(const FileSystemObject& a, const FileSystemObject& b)
     if (b.getCategory() == FILE_EQUAL)
         return true;
 
-    return Compare<ascending>().isSmallerThan(a.getCategory(), b.getCategory());
+    return makeSortDirection(std::less<CompareFilesResult>(), Int2Type<ascending>())(a.getCategory(), b.getCategory());
 }
 
 
 template <bool ascending> inline
 bool lessSyncDirection(const FileSystemObject& a, const FileSystemObject& b)
 {
-    return Compare<ascending>().isSmallerThan(a.getSyncOperation(), b.getSyncOperation());
+    return makeSortDirection(std::less<SyncOperation>(), Int2Type<ascending>())(a.getSyncOperation(), b.getSyncOperation());
 }
 }
 

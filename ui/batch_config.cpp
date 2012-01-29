@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "batch_config.h"
@@ -9,6 +9,7 @@
 #include "folder_pair.h"
 #include <iterator>
 #include <wx/wupdlock.h>
+#include <wx+/context_menu.h>
 #include "../lib/help_provider.h"
 #include <zen/file_handling.h>
 #include "msg_popup.h"
@@ -44,11 +45,11 @@ private:
     virtual void OnCmpSettings(        wxCommandEvent& event);
     virtual void OnSyncSettings(       wxCommandEvent& event);
     virtual void OnConfigureFilter(    wxCommandEvent& event);
-
     virtual void OnHelp(               wxCommandEvent& event);
 
-    void OnGlobalFilterOpenContext(wxCommandEvent& event);
-    void OnGlobalFilterRemConfirm(wxCommandEvent& event);
+    void OnCompSettingsContext(wxCommandEvent& event);
+    void OnSyncSettingsContext(wxCommandEvent& event);
+    void OnGlobalFilterContext(wxCommandEvent& event);
     virtual void OnCheckSaveLog(        wxCommandEvent& event);
     virtual void OnChangeMaxLogCountTxt(wxCommandEvent& event);
     virtual void OnClose(              wxCloseEvent&   event);
@@ -58,7 +59,7 @@ private:
     virtual void OnAddFolderPair(      wxCommandEvent& event);
     virtual void OnRemoveFolderPair(   wxCommandEvent& event);
     virtual void OnRemoveTopFolderPair(wxCommandEvent& event);
-    void OnFilesDropped(FFSFileDropEvent& event);
+    void OnFilesDropped(FileDropEvent& event);
 
     void addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
     void removeAddFolderPair(const int pos);
@@ -87,8 +88,6 @@ private:
     wxString proposedBatchFileName;
 
     xmlAccess::XmlBatchConfig localBatchCfg;
-
-    std::unique_ptr<wxMenu> contextMenu;
 
     std::unique_ptr<DirectoryName<FolderHistoryBox>> logfileDir;
 
@@ -146,16 +145,16 @@ private:
         batchDlg.updateGui();
     }
 
-    virtual void OnAltCompCfgRemoveConfirm(wxCommandEvent& event)
+    virtual void removeAltCompCfg()
     {
-        FolderPairPanelBasic<GuiPanel>::OnAltCompCfgRemoveConfirm(event);
+        FolderPairPanelBasic<GuiPanel>::removeAltCompCfg();
         batchDlg.updateGui();
     }
 
 
-    virtual void OnAltSyncCfgRemoveConfirm(wxCommandEvent& event)
+    virtual void removeAltSyncCfg()
     {
-        FolderPairPanelBasic<GuiPanel>::OnAltSyncCfgRemoveConfirm(event);
+        FolderPairPanelBasic<GuiPanel>::removeAltSyncCfg();
         batchDlg.updateGui();
     }
 
@@ -268,11 +267,13 @@ BatchDialog::BatchDialog(wxWindow* window,
     //init handling of first folder pair
     firstFolderPair.reset(new DirectoryPairBatchFirst(*this));
 
-    m_bpButtonFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnGlobalFilterOpenContext), NULL, this);
+    m_bpButtonCmpConfig ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnCompSettingsContext), NULL, this);
+    m_bpButtonSyncConfig->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnSyncSettingsContext), NULL, this);
+    m_bpButtonFilter    ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnGlobalFilterContext), NULL, this);
 
     //prepare drag & drop for loading of *.ffs_batch files
     setupFileDrop(*this);
-    Connect(FFS_DROP_FILE_EVENT, FFSFileDropEventHandler(BatchDialog::OnFilesDropped), NULL, this);
+    Connect(EVENT_DROP_FILE, FileDropEventHandler(BatchDialog::OnFilesDropped), NULL, this);
 
     logfileDir.reset(new DirectoryName<FolderHistoryBox>(*m_panelBatchSettings, *m_dirPickerLogfileDir, *m_comboBoxLogfileDir));
 
@@ -383,25 +384,59 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
 }
 
 
-void BatchDialog::OnGlobalFilterOpenContext(wxCommandEvent& event)
+void BatchDialog::OnCompSettingsContext(wxCommandEvent& event)
 {
-    contextMenu.reset(new wxMenu); //re-create context menu
+    ContextMenu menu;
 
-    wxMenuItem* itemClear = new wxMenuItem(contextMenu.get(), wxID_ANY, _("Clear filter settings"));
-    contextMenu->Append(itemClear);
-    contextMenu->Connect(itemClear->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(BatchDialog::OnGlobalFilterRemConfirm), NULL, this);
+    auto setVariant = [&](CompareVariant var)
+    {
+        localBatchCfg.mainCfg.cmpConfig.compareVar = var;
+        updateGui();
+    };
 
-    if (isNullFilter(localBatchCfg.mainCfg.globalFilter))
-        contextMenu->Enable(itemClear->GetId(), false); //disable menu item, if clicking wouldn't make sense anyway
+    auto currentVar = localBatchCfg.mainCfg.cmpConfig.compareVar;
 
-    PopupMenu(contextMenu.get()); //show context menu
+    menu.addRadio(_("File time and size"), [&] { setVariant(CMP_BY_TIME_SIZE); }, currentVar == CMP_BY_TIME_SIZE);
+    menu.addRadio(_("File content"      ), [&] { setVariant(CMP_BY_CONTENT);   }, currentVar == CMP_BY_CONTENT);
+
+    menu.popup(*this);
 }
 
 
-void BatchDialog::OnGlobalFilterRemConfirm(wxCommandEvent& event)
+void BatchDialog::OnSyncSettingsContext(wxCommandEvent& event)
 {
-    localBatchCfg.mainCfg.globalFilter = FilterConfig();
-    updateGui();
+
+    ContextMenu menu;
+
+    auto setVariant = [&](DirectionConfig::Variant var)
+    {
+        localBatchCfg.mainCfg.syncCfg.directionCfg.var = var;
+        updateGui();
+    };
+
+    const auto currentVar = localBatchCfg.mainCfg.syncCfg.directionCfg.var;
+
+    menu.addRadio(_("<Automatic>"), [&] { setVariant(DirectionConfig::AUTOMATIC); }, currentVar == DirectionConfig::AUTOMATIC);
+    menu.addRadio(_("Mirror ->>") , [&] { setVariant(DirectionConfig::MIRROR);    }, currentVar == DirectionConfig::MIRROR);
+    menu.addRadio(_("Update ->")  , [&] { setVariant(DirectionConfig::UPDATE);    }, currentVar == DirectionConfig::UPDATE);
+    menu.addRadio(_("Custom")     , [&] { setVariant(DirectionConfig::CUSTOM);    }, currentVar == DirectionConfig::CUSTOM);
+
+    menu.popup(*this);
+}
+
+
+void BatchDialog::OnGlobalFilterContext(wxCommandEvent& event)
+{
+    ContextMenu menu;
+
+    auto clearFilter = [&]
+    {
+        localBatchCfg.mainCfg.globalFilter = FilterConfig();
+        updateGui();
+    };
+    menu.addItem( _("Clear filter settings"), clearFilter, NULL, !isNullFilter(localBatchCfg.mainCfg.globalFilter));
+
+    menu.popup(*this);
 }
 
 
@@ -420,7 +455,7 @@ void BatchDialog::OnChangeMaxLogCountTxt(wxCommandEvent& event)
 }
 
 
-void BatchDialog::OnFilesDropped(FFSFileDropEvent& event)
+void BatchDialog::OnFilesDropped(FileDropEvent& event)
 {
     if (event.getFiles().empty())
         return;
@@ -720,7 +755,7 @@ void BatchDialog::OnRemoveFolderPair(wxCommandEvent& event)
 
 void BatchDialog::OnRemoveTopFolderPair(wxCommandEvent& event)
 {
-    if (additionalFolderPairs.size() > 0)
+    if (!additionalFolderPairs.empty())
     {
         //get settings from second folder pair
         const FolderPairEnh cfgSecond = getEnhancedPair(additionalFolderPairs[0]);
@@ -740,13 +775,13 @@ void BatchDialog::OnRemoveTopFolderPair(wxCommandEvent& event)
 void BatchDialog::updateGuiForFolderPair()
 {
     //adapt delete top folder pair button
-    if (additionalFolderPairs.size() == 0)
+    if (additionalFolderPairs.empty())
         m_bpButtonRemovePair->Hide();
     else
         m_bpButtonRemovePair->Show();
 
     //adapt local filter and sync cfg for first folder pair
-    if (additionalFolderPairs.size() == 0 &&
+    if (additionalFolderPairs.empty() &&
         firstFolderPair->getAltCompConfig().get() == NULL &&
         firstFolderPair->getAltSyncConfig().get() == NULL &&
         isNullFilter(firstFolderPair->getAltFilterConfig()))
@@ -766,7 +801,7 @@ void BatchDialog::updateGuiForFolderPair()
     const int maxAddFolderPairsVisible = 2;
 
     int pairHeight = sbSizerMainPair->GetSize().GetHeight(); //respect height of main pair
-    if (additionalFolderPairs.size() > 0)
+    if (!additionalFolderPairs.empty())
         pairHeight += std::min<double>(maxAddFolderPairsVisible + 0.5, additionalFolderPairs.size()) * //have 0.5 * height indicate that more folders are there
                       additionalFolderPairs[0]->GetSize().GetHeight();
 

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef PROCESSXML_H_INCLUDED
@@ -11,6 +11,7 @@
 #include "../structures.h"
 #include "xml_base.h"
 #include "localization.h"
+#include "../ui/column_attr.h"
 
 namespace xmlAccess
 {
@@ -37,28 +38,6 @@ enum OnGuiError
     ON_GUIERROR_POPUP,
     ON_GUIERROR_IGNORE
 };
-
-enum ColumnTypes
-{
-    DIRECTORY, //this needs to begin with 0 and be continuous (some code relies on it)
-    FULL_PATH,
-    REL_PATH,
-    FILENAME,
-    SIZE,
-    DATE,
-    EXTENSION
-};
-const size_t COLUMN_TYPE_COUNT = 7;
-
-struct ColumnAttrib
-{
-    ColumnTypes type;
-    bool         visible;
-    size_t       position;
-    int          width;
-};
-typedef std::vector<ColumnAttrib> ColumnAttributes;
-
 
 typedef wxString Description;
 typedef wxString Commandline;
@@ -167,8 +146,12 @@ struct XmlGlobalSettings
             dlgSize(wxDefaultCoord, wxDefaultCoord),
             isMaximized(false),
             maxFolderPairsVisible(6),
-            autoAdjustColumnsLeft(false),
-            autoAdjustColumnsRight(false),
+            columnAttribNavi (zen::getDefaultColumnAttributesNavi()),
+            columnAttribLeft (zen::getDefaultColumnAttributesLeft()),
+            columnAttribRight(zen::getDefaultColumnAttributesRight()),
+            naviLastSortColumn(zen::defaultValueLastSortColumn),
+            naviLastSortAscending(zen::defaultValueLastSortAscending),
+            showPercentBar(zen::defaultValueShowPercentage),
             folderHistMax(15),
             onCompletionHistoryMax(8),
             deleteOnBothSides(false),
@@ -201,11 +184,14 @@ struct XmlGlobalSettings
 
         int maxFolderPairsVisible;
 
-        ColumnAttributes columnAttribLeft;
-        ColumnAttributes columnAttribRight;
+        std::vector<zen::ColumnAttributeNavi> columnAttribNavi; //compressed view/navigation
+        std::vector<zen::ColumnAttributeRim>  columnAttribLeft;
+        std::vector<zen::ColumnAttributeRim>  columnAttribRight;
 
-        bool autoAdjustColumnsLeft;
-        bool autoAdjustColumnsRight;
+        zen::ColumnTypeNavi naviLastSortColumn; //remember sort on navigation panel
+        bool naviLastSortAscending; //
+
+        bool showPercentBar; //in navigation panel
 
         ExternalApps externelApplications;
 
@@ -233,31 +219,6 @@ struct XmlGlobalSettings
     //---------------------------------------------------------------------
     //struct Batch
 };
-
-
-inline
-bool sortByType(const ColumnAttrib& a, const ColumnAttrib& b)
-{
-    return a.type < b.type;
-}
-
-
-inline
-bool sortByPositionOnly(const ColumnAttrib& a, const ColumnAttrib& b)
-{
-    return a.position < b.position;
-}
-
-
-inline
-bool sortByPositionAndVisibility(const ColumnAttrib& a, const ColumnAttrib& b)
-{
-    if (a.visible == false) //hidden elements shall appear at end of vector
-        return false;
-    if (b.visible == false)
-        return true;
-    return a.position < b.position;
-}
 
 void readConfig(const wxString& filename, XmlGuiConfig&      config); //throw xmlAccess::FfsXmlError
 void readConfig(const wxString& filename, XmlBatchConfig&    config); //throw xmlAccess::FfsXmlError

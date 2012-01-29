@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "db_file.h"
@@ -48,7 +48,7 @@ Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
     //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity?
     //however 32 and 64 bit db files *are* designed to be binary compatible!
     //Give db files different names.
-    //make sure they end with ".ffs_db". These files will not be included into comparison 
+    //make sure they end with ".ffs_db". These files will not be included into comparison
 #ifdef FFS_WIN
     Zstring dbname = Zstring(Zstr("sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
 #elif defined FFS_LINUX

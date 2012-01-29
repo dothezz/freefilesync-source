@@ -139,36 +139,6 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Symlink></target>
-
-<source><Directory></source>
-<target><Map></target>
-
-<source>Size</source>
-<target>Grootte</target>
-
-<source>Date</source>
-<target>Datum</target>
-
-<source>Full path</source>
-<target>Volledig pad</target>
-
-<source>Filename</source>
-<target>Bestandsnaam</target>
-
-<source>Relative path</source>
-<target>Relatief pad</target>
-
-<source>Directory</source>
-<target>Map</target>
-
-<source>Extension</source>
-<target>Extensie</target>
-
-<source>Comparison Result</source>
-<target>Resultaat vergelijken</target>
-
 <source>Initial synchronization:</source>
 <target>Initiële  synchronisatie:</target>
 
@@ -354,6 +324,24 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Logging</source>
 <target>Loggen</target>
 
+<source>File time and size</source>
+<target>Bestands tijd-en grootte</target>
+
+<source>File content</source>
+<target>Bestandsinhoud</target>
+
+<source><Automatic></source>
+<target><Automatisch></target>
+
+<source>Mirror ->></source>
+<target>Spiegelen ->></target>
+
+<source>Update -></source>
+<target>Bijwerken -></target>
+
+<source>Custom</source>
+<target>Aangepast</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync taakbestand</target>
 
@@ -411,6 +399,36 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>(Requires an Internet connection!)</source>
 <target>(Vereist een internetverbinding!)</target>
 
+<source><Symlink></source>
+<target><Symlink></target>
+
+<source><Directory></source>
+<target><Map></target>
+
+<source>Full path</source>
+<target>Volledig pad</target>
+
+<source>Name</source>
+<target>Naam</target>
+
+<source>Relative path</source>
+<target>Relatief pad</target>
+
+<source>Directory</source>
+<target>Map</target>
+
+<source>Size</source>
+<target>Grootte</target>
+
+<source>Date</source>
+<target>Datum</target>
+
+<source>Extension</source>
+<target>Extensie</target>
+
+<source>Comparison Result</source>
+<target>Resultaat vergelijken</target>
+
 <source>Drag && drop</source>
 <target>Drag en drop</target>
 
@@ -434,9 +452,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 
 <source>2. &Synchronize...</source>
 <target>2. &Synchroniseer...</target>
-
-<source>S&witch view</source>
-<target>&Wijzig weergave</target>
 
 <source>&New</source>
 <target>&Nieuw</target>
@@ -582,26 +597,14 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Select variant:</source>
 <target>Selecteer een variant:</target>
 
-<source><Automatic></source>
-<target><Automatisch></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identificeer en verspreid veranderingen aan beide kanten met behulp van een database. Verwijderingen, hernoemingen en conflicten worden automatisch gedetecteerd.</target>
-
-<source>Mirror ->></source>
-<target>Spiegelen ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Spiegel backup van linker map. Rechter map is bewerkt om na synchronisatie een exacte kopie te zijn van de linker map.</target>
 
-<source>Update -></source>
-<target>Bijwerken -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Kopiëer nieuwe of geupdate bestanden naar de rechter map.</target>
-
-<source>Custom</source>
-<target>Aangepast</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configureer uw eigen synchronisatieregels.</target>
@@ -658,9 +661,6 @@ Bestanden worden als gelijk bevonden indien,
 gelijk zijn
 </target>
 
-<source>File time and size</source>
-<target>Bestands tijd-en grootte</target>
-
 <source>
 Files are found equal if
      - file content
@@ -671,9 +671,6 @@ Bestanden worden als gelijk beschouwd indien,
      - de bestandsinhoud
 overeenkomt
 </target>
-
-<source>File content</source>
-<target>Bestandsinhoud</target>
 
 <source>Symbolic Link handling</source>
 <target>Afhandeling van snelkoppelingen</target>
@@ -690,32 +687,29 @@ overeenkomt
 <source>Source code written in C++ utilizing:</source>
 <target>Broncode geschreven in C++ met behulp van:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Extra dank voor het vertalen van FreeFileSync gaat naar:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Tips en suggesties zijn welkom op:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync op Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Feedback en suggesties zijn welkom</target>
 
 <source>Homepage</source>
 <target>Homepage</target>
 
-<source>If you like FFS</source>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync op Sourceforge</target>
+
+<source>Email</source>
+<target>E-mail</target>
+
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Extra dank voor het vertalen van FreeFileSync gaat naar:</target>
+
+<source>If you like FreeFileSync</source>
 <target>Indien FreeFileSync u bevalt</target>
 
 <source>Donate with PayPal</source>
 <target>Doneer met PayPal</target>
 
-<source>Email</source>
-<target>E-mail</target>
-
-<source>Report translation error</source>
-<target>Rapporteer een vertaalfout</target>
-
-<source>Published under the GNU General Public License:</source>
-<target>Gepubliceerd onder de GNU General Public License:</target>
+<source>Published under the GNU General Public License</source>
+<target>Gepubliceerd onder de GNU General Public License</target>
 
 <source>Ignore subsequent errors</source>
 <target>Negeer erop volgende foutmeldingen</target>
@@ -864,8 +858,11 @@ Uitsluiten: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Map paren</target>
 
+<source>Compressed view</source>
+<target>Compacte weergave</target>
+
 <source>Select view</source>
-<target>Kies weergave</target>
+<target>Selecteer weergave</target>
 
 <source>Set direction:</source>
 <target>Stel richting in:</target>
@@ -882,20 +879,14 @@ Uitsluiten: \stuff\temp\*
 <source><multiple selection></source>
 <target><meervoudige selectie></target>
 
-<source>D-Click</source>
-<target>Dubbele klik</target>
-
 <source>Delete</source>
 <target>Verwijderen</target>
 
-<source>Customize...</source>
-<target>Aanpassen...</target>
+<source>Include all</source>
+<target>Alles insluiten</target>
 
-<source>Select time span...</source>
-<target>Selecteer tijdsspanne...</target>
-
-<source>Auto-adjust columns</source>
-<target>Kolommen automatisch aanpassen</target>
+<source>Exclude all</source>
+<target>Alles uitsluiten</target>
 
 <source>Icon size:</source>
 <target>Icoon grootte:</target>
@@ -909,14 +900,11 @@ Uitsluiten: \stuff\temp\*
 <source>Large</source>
 <target>Groot</target>
 
-<source>Include all rows</source>
-<target>Alle rijen opnemen</target>
+<source>Select time span...</source>
+<target>Selecteer tijdsspanne...</target>
 
-<source>Exclude all rows</source>
-<target>Sluit alle rijen uit</target>
-
-<source>Reset view</source>
-<target>Stel weergave opnieuw in</target>
+<source>Default view</source>
+<target>Standaard weergave</target>
 
 <source>Show "%x"</source>
 <target>Toon "%x"</target>
@@ -1197,6 +1185,12 @@ Uitsluiten: \stuff\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>Verplaats de bestanden naar een tijd-gemarkeerde submap</target>
 
+<source>Files</source>
+<target>Bestanden</target>
+
+<source>Percentage</source>
+<target>Percentage</target>
+
 <source>%x TB</source>
 <target>%x TB</target>
 
@@ -1326,6 +1320,9 @@ Uitsluiten: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:</target>
 
+<source>Preparing synchronization...</source>
+<target>Synchronisatie voorbereiden</target>
+
 <source>Memory allocation failed!</source>
 <target>RAM geheugen error!</target>
 
@@ -1443,8 +1440,8 @@ Uitsluiten: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Doel mapnaam mag niet leeg zijn!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>De door de gebruiker gedefinieerde map ter verwijdering was niet opgegeven!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Map voor bestands versiebeheer is niet ingegeven!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Bronmap bestaat niet meer:</target>

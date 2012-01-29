@@ -139,36 +139,6 @@
 <pluralform>%x Byte</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Symlink></target>
-
-<source><Directory></source>
-<target><Directory></target>
-
-<source>Size</source>
-<target>Dimensione</target>
-
-<source>Date</source>
-<target>Data</target>
-
-<source>Full path</source>
-<target>Percorso completo</target>
-
-<source>Filename</source>
-<target>Nome del file</target>
-
-<source>Relative path</source>
-<target>Percorso relativo</target>
-
-<source>Directory</source>
-<target>Directory</target>
-
-<source>Extension</source>
-<target>Estensione</target>
-
-<source>Comparison Result</source>
-<target>Risultato della comparazione</target>
-
 <source>Initial synchronization:</source>
 <target>Prima sincronizzazione:</target>
 
@@ -354,6 +324,24 @@ La linea di comando è eseguita ogni volta che:
 <source>Logging</source>
 <target>Logging</target>
 
+<source>File time and size</source>
+<target>Ora e dimensione file</target>
+
+<source>File content</source>
+<target>Contenuto del file</target>
+
+<source><Automatic></source>
+<target><Automatico></target>
+
+<source>Mirror ->></source>
+<target>Mirror ->></target>
+
+<source>Update -></source>
+<target>Aggiorna -></target>
+
+<source>Custom</source>
+<target>Personalizza</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync batch file</target>
 
@@ -411,32 +399,59 @@ La linea di comando è eseguita ogni volta che:
 <source>(Requires an Internet connection!)</source>
 <target>(Richiede una connessione Internet!)</target>
 
+<source><Symlink></source>
+<target><Symlink></target>
+
+<source><Directory></source>
+<target><Directory></target>
+
+<source>Full path</source>
+<target>Percorso completo</target>
+
+<source>Name</source>
+<target>Nome</target>
+
+<source>Relative path</source>
+<target>Percorso relativo</target>
+
+<source>Directory</source>
+<target>Directory</target>
+
+<source>Size</source>
+<target>Dimensione</target>
+
+<source>Date</source>
+<target>Data</target>
+
+<source>Extension</source>
+<target>Estensione</target>
+
+<source>Comparison Result</source>
+<target>Risultato della comparazione</target>
+
 <source>Drag && drop</source>
 <target>Drag && drop</target>
 
 <source>Close progress dialog</source>
-<target></target>
+<target>Chiudi stato di avanzamento</target>
 
 <source>Shut down</source>
-<target></target>
+<target>Arresta</target>
 
 <source>Log off</source>
-<target></target>
+<target>Termina sessione</target>
 
 <source>Standby</source>
-<target></target>
+<target>Sospendi</target>
 
 <source>Hibernate</source>
-<target></target>
+<target>Iberna</target>
 
 <source>1. &Compare</source>
 <target>1. &Compara</target>
 
 <source>2. &Synchronize...</source>
 <target>2. &Sincronizza...</target>
-
-<source>S&witch view</source>
-<target>C&ommuta vista</target>
 
 <source>&New</source>
 <target>&Nuovo</target>
@@ -556,7 +571,7 @@ La linea di comando è eseguita ogni volta che:
 <target>Feedback di stato</target>
 
 <source>Show progress dialog</source>
-<target></target>
+<target>Mostra stato di avanzamento</target>
 
 <source>Error handling</source>
 <target>Gestione degli errori</target>
@@ -582,26 +597,14 @@ La linea di comando è eseguita ogni volta che:
 <source>Select variant:</source>
 <target>Selezionare una variante:</target>
 
-<source><Automatic></source>
-<target><Automatico></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identifica e propaga modifiche su entrambi i lati usando un database. Cancellazioni, ridenominazioni e conflitti sono rilevati automaticamente.</target>
-
-<source>Mirror ->></source>
-<target>Mirror ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Mirror backup della cartella di sinistra. La cartella destra verrà modificata per corrispondere esattamente alla cartella di sinistra dopo la sincronizzazione.</target>
 
-<source>Update -></source>
-<target>Aggiorna -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Copia file nuovi o aggiornati nella cartella di destra.</target>
-
-<source>Custom</source>
-<target>Personalizza</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configura le tue regole di sincronizzazione.</target>
@@ -610,7 +613,7 @@ La linea di comando è eseguita ogni volta che:
 <target>Gestione cancellazione</target>
 
 <source>On completion:</source>
-<target></target>
+<target>In completamento:</target>
 
 <source>Configuration</source>
 <target>Configurazione</target>
@@ -658,9 +661,6 @@ I file sono considerati identici se
 sono identici
 </target>
 
-<source>File time and size</source>
-<target>Ora e dimensione file</target>
-
 <source>
 Files are found equal if
      - file content
@@ -671,9 +671,6 @@ I file sono considerati identici se
      - il contenuto
 è identico
 </target>
-
-<source>File content</source>
-<target>Contenuto del file</target>
 
 <source>Symbolic Link handling</source>
 <target>Gestione Link Simbolico</target>
@@ -690,32 +687,29 @@ I file sono considerati identici se
 <source>Source code written in C++ utilizing:</source>
 <target>Codice sorgente scritto in C++ utilizzando:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Per la traduzione di FreeFileSync, un grazie va a:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Commenti e suggerimenti sono i benvenuti:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync su Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Ogni commento o suggerimento è ben accetto</target>
 
 <source>Homepage</source>
 <target>Homepage</target>
 
-<source>If you like FFS</source>
-<target>Se ti piace FFS</target>
-
-<source>Donate with PayPal</source>
-<target>Fai una donazione con PayPal</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync su Sourceforge</target>
 
 <source>Email</source>
 <target>Email</target>
 
-<source>Report translation error</source>
-<target>Segnala errori di traduzione</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Per la traduzione di FreeFileSync, un grazie va a:</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>Pubblicato sotto licenza GNU General Public:</target>
+<source>If you like FreeFileSync</source>
+<target>Se ti piace FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Fai una donazione con PayPal</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Pubblicato sotto licenza GNU General Public</target>
 
 <source>Ignore subsequent errors</source>
 <target>Ignora gli errori successivi</target>
@@ -864,6 +858,9 @@ Escludi: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Coppia di cartelle</target>
 
+<source>Compressed view</source>
+<target>Vista compressa</target>
+
 <source>Select view</source>
 <target>Seleziona vista</target>
 
@@ -882,20 +879,14 @@ Escludi: \stuff\temp\*
 <source><multiple selection></source>
 <target><selezione multipla></target>
 
-<source>D-Click</source>
-<target>D-Click</target>
-
 <source>Delete</source>
 <target>Cancella</target>
 
-<source>Customize...</source>
-<target>Personalizza...</target>
+<source>Include all</source>
+<target>Includi tutto</target>
 
-<source>Select time span...</source>
-<target>Seleziona intervallo di tempo...</target>
-
-<source>Auto-adjust columns</source>
-<target>Larghezza automatica colonne</target>
+<source>Exclude all</source>
+<target>Escludi tutto</target>
 
 <source>Icon size:</source>
 <target>Dimensione icona:</target>
@@ -909,14 +900,11 @@ Escludi: \stuff\temp\*
 <source>Large</source>
 <target>Grande</target>
 
-<source>Include all rows</source>
-<target>Includi tutte le righe</target>
+<source>Select time span...</source>
+<target>Seleziona intervallo di tempo...</target>
 
-<source>Exclude all rows</source>
-<target>Escludi tutte le righe</target>
-
-<source>Reset view</source>
-<target>Resetta vista</target>
+<source>Default view</source>
+<target>Vista normale</target>
 
 <source>Show "%x"</source>
 <target>Mostra "%x"</target>
@@ -1197,6 +1185,12 @@ Escludi: \stuff\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>Sposta file in una sotto-cartella datata</target>
 
+<source>Files</source>
+<target>Files</target>
+
+<source>Percentage</source>
+<target>Percentuale</target>
+
 <source>%x TB</source>
 <target>%x TB</target>
 
@@ -1326,6 +1320,9 @@ Escludi: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Le directory sono dipendenti! Fai attenzione quando configuri le regole di sincronizzazione:</target>
 
+<source>Preparing synchronization...</source>
+<target>Preparazione sincronizzazione...</target>
+
 <source>Memory allocation failed!</source>
 <target>Allocazione di memoria fallita!</target>
 
@@ -1443,8 +1440,8 @@ Escludi: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Il nome della cartella di destinazione non può essere nullo!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>Directory personalizzata per la cancellazione non specificata!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Non è stata indicata una cartella per il file delle versioni!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>La directory sorgente non è più esistente:</target>

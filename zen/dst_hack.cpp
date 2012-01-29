@@ -85,7 +85,7 @@ bool dst::isFatDrive(const Zstring& fileName) //throw()
 bool dst::isFatDrive(HANDLE hFile) //throw()
 {
     //dynamically load windows API function
-    typedef BOOL (WINAPI *GetVolumeInformationByHandleWFunc)(HANDLE  hFile,
+    typedef BOOL (WINAPI* GetVolumeInformationByHandleWFunc)(HANDLE  hFile,
                                                              LPWSTR  lpVolumeNameBuffer,
                                                              DWORD   nVolumeNameSize,
                                                              LPDWORD lpVolumeSerialNumber,

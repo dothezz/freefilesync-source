@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "icon_buffer.h"
@@ -522,7 +522,7 @@ void WorkerThread::operator()() //thread entry
     ZEN_ON_BLOCK_EXIT(::CoUninitialize());
 
     //2. Initialize system image list
-    typedef BOOL (WINAPI *FileIconInitFun)(BOOL fRestoreCache);
+    typedef BOOL (WINAPI* FileIconInitFun)(BOOL fRestoreCache);
     const SysDllFun<FileIconInitFun> fileIconInit(L"Shell32.dll", reinterpret_cast<LPCSTR>(660));
     assert(fileIconInit);
     if (fileIconInit)

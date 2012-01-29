@@ -2,7 +2,7 @@
 // * This file is part of the zenXML project. It is distributed under the   *
 // * Boost Software License, Version 1.0. See accompanying file             *
 // * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.       *
-// * Copyright (C) 2011 ZenJu (zhnmju123 AT gmx.de)                         *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef TYPE_TOOLS_HEADER_45237590734254545
@@ -78,6 +78,36 @@ struct RemoveArray { typedef T Result; };
 
 template <class T, int N>
 struct RemoveArray<T[N]> { typedef T Result; };
+
+//########## Sorting ##############################
+/*
+Generate a descending binary predicate at compile time!
+
+Usage:
+    static const bool ascending = ...
+    makeSortDirection(old binary predicate, Int2Type<ascending>()) -> new binary predicate
+
+or directly;
+    makeDescending(old binary predicate) -> new binary predicate
+*/
+
+template <class Predicate>
+struct LessDescending
+{
+    LessDescending(Predicate lessThan) : lessThan_(lessThan) {}
+    template <class T> bool operator()(const T& lhs, const T& rhs) const { return lessThan_(rhs, lhs); }
+private:
+    Predicate lessThan_;
+};
+
+template <class Predicate> inline
+/**/           Predicate  makeSortDirection(Predicate pred, Int2Type<true>) { return pred; }
+
+template <class Predicate> inline
+LessDescending<Predicate> makeSortDirection(Predicate pred, Int2Type<false>) { return pred; }
+
+template <class Predicate> inline
+LessDescending<Predicate> makeDescending(Predicate pred) { return pred; }
 }
 
 #endif //TYPE_TOOLS_HEADER_45237590734254545

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "comparison.h"
@@ -351,23 +351,10 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
             const FolderPairCfg& fpCfg = cfgList[j - output_tmp.begin()];
 
             //set initial sync-direction
-            class RedetermineCallback : public DeterminationProblem
-            {
-            public:
-                RedetermineCallback(bool& warningSyncDatabase, ProcessCallback& procCallback) :
-                    warningSyncDatabase_(warningSyncDatabase),
-                    procCallback_(procCallback) {}
-
-                virtual void reportWarning(const std::wstring& text)
-                {
-                    procCallback_.reportWarning(text, warningSyncDatabase_);
-                }
-            private:
-                bool& warningSyncDatabase_;
-                ProcessCallback& procCallback_;
-            } redetCallback(m_warnings.warningSyncDatabase, procCallback);
-
-            zen::redetermineSyncDirection(fpCfg.directionCfg, *j, &redetCallback);
+            procCallback.reportStatus(_("Preparing synchronization..."));
+            procCallback.forceUiRefresh();
+            zen::redetermineSyncDirection(fpCfg.directionCfg, *j,
+            [&](const std::wstring& warning) { procCallback.reportWarning(warning, m_warnings.warningSyncDatabase); });
         }
 
         //only if everything was processed correctly output is written to!
@@ -706,8 +693,8 @@ void linearMerge(const MapType& mapLeft, const MapType& mapRight, ProcessLeftOnl
     auto iterLeft  = mapLeft .begin();
     auto iterRight = mapRight.begin();
 
-    auto finishLeft  = [&]() { std::for_each(iterLeft,  mapLeft .end(), lo); };
-    auto finishRight = [&]() { std::for_each(iterRight, mapRight.end(), ro); };
+    auto finishLeft  = [&] { std::for_each(iterLeft,  mapLeft .end(), lo); };
+    auto finishRight = [&] { std::for_each(iterRight, mapRight.end(), ro); };
 
     if (iterLeft  == mapLeft .end()) return finishRight();
     if (iterRight == mapRight.end()) return finishLeft();
@@ -845,6 +832,7 @@ void CompareProcess::performComparison(const FolderPairCfg& fpCfg,
     const DirectoryValue& bufValueRight = getDirValue(fpCfg.rightDirectoryFmt);
 
     procCallback.reportStatus(_("Generating file list..."));
+    procCallback.forceUiRefresh();
 
     //PERF_START;
     MergeSides(undefinedFiles, undefinedLinks).execute(bufValueLeft.dirCont, bufValueRight.dirCont, output);

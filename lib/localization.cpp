@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "localization.h"
@@ -32,7 +32,7 @@ namespace
 class FFSLocale : public TranslationHandler
 {
 public:
-    FFSLocale(const wxString& filename, wxLanguage languageId); //throw (lngfile::ParsingError, PluralForm::ParsingError)
+    FFSLocale(const wxString& filename, wxLanguage languageId); //throw lngfile::ParsingError, PluralForm::ParsingError
 
     wxLanguage langId() const { return langId_; }
 
@@ -71,7 +71,7 @@ private:
 
 
 
-FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(languageId) //throw (lngfile::ParsingError, PluralForm::ParsingError)
+FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(languageId) //throw lngfile::ParsingError, PluralForm::ParsingError
 {
     std::string inputStream;
     try
@@ -111,7 +111,7 @@ FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(
         transMappingPl.insert(std::make_pair(std::make_pair(singular, plural), plFormsWide));
     }
 
-    pluralParser.reset(new PluralForm(header.pluralDefinition.c_str())); //throw PluralForm::ParsingError
+    pluralParser.reset(new PluralForm(copyStringTo<Wstring>(header.pluralDefinition))); //throw PluralForm::ParsingError
 }
 }
 
@@ -205,7 +205,7 @@ ExistingTranslations::ExistingTranslations()
                     locMapping.push_back(newEntry);
                 }
             }
-            catch (lngfile::ParsingError&) {}
+            catch (lngfile::ParsingError&) {} //better not show an error message here; scenario: batch jobs
         }
         catch (...) {}
 
@@ -388,7 +388,7 @@ void zen::setLanguage(int language)
     {
         try
         {
-            zen::setTranslator(new FFSLocale(languageFile, static_cast<wxLanguage>(language))); //throw (lngfile::ParsingError, PluralForm::ParsingError)
+            zen::setTranslator(new FFSLocale(languageFile, static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, PluralForm::ParsingError
         }
         catch (lngfile::ParsingError& e)
         {

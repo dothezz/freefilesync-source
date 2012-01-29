@@ -38,7 +38,7 @@
 <target>Supprimer les paramètres de rechange</target>
 
 <source>Clear filter settings</source>
-<target>Effecer la configuration du filtrage</target>
+<target>Effacer la configuration du filtrage</target>
 
 <source>Create a batch job</source>
 <target>Créer un traitement batch</target>
@@ -80,7 +80,7 @@
 <target>Chercher</target>
 
 <source>Select time span</source>
-<target>choisir un intervalle de temps</target>
+<target>Choisir un intervalle de temps</target>
 
 <source>Show pop-up</source>
 <target>Montrer les boîtes de dialogue</target>
@@ -113,10 +113,10 @@
 <target>Ligne de commande incorrecte : %x</target>
 
 <source>Windows Error Code %x:</source>
-<target>Code erreur Windows %x:</target>
+<target>Code erreur Windows %x :</target>
 
 <source>Linux Error Code %x:</source>
-<target>Code erreur Linux %x:</target>
+<target>Code erreur Linux %x :</target>
 
 <source>Error resolving symbolic link:</source>
 <target>Erreur lors de la résolution du lien symbolique :</target>
@@ -138,36 +138,6 @@
 <pluralform>%x octet</pluralform>
 <pluralform>%x octets</pluralform>
 </target>
-
-<source><Symlink></source>
-<target><Lien_symbolique></target>
-
-<source><Directory></source>
-<target><Répertoire></target>
-
-<source>Size</source>
-<target>Taille</target>
-
-<source>Date</source>
-<target>Date</target>
-
-<source>Full path</source>
-<target>Chemin complet</target>
-
-<source>Filename</source>
-<target>Nom du fichier</target>
-
-<source>Relative path</source>
-<target>Chemin relatif</target>
-
-<source>Directory</source>
-<target>Répertoire</target>
-
-<source>Extension</source>
-<target>Extension</target>
-
-<source>Comparison Result</source>
-<target>Résultat de la comparaison</target>
 
 <source>Initial synchronization:</source>
 <target>Première synchronisation :</target>
@@ -354,6 +324,24 @@ La ligne de commande est exécutée chaque fois que :
 <source>Logging</source>
 <target>Connexion</target>
 
+<source>File time and size</source>
+<target>Date et heure de modification du fichier</target>
+
+<source>File content</source>
+<target>Contenu du fichier</target>
+
+<source><Automatic></source>
+<target><Automatique></target>
+
+<source>Mirror ->></source>
+<target>Miroir ->></target>
+
+<source>Update -></source>
+<target>Mise à Jour -></target>
+
+<source>Custom</source>
+<target>Personnaliser</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync fichier de commandes</target>
 
@@ -411,32 +399,59 @@ La ligne de commande est exécutée chaque fois que :
 <source>(Requires an Internet connection!)</source>
 <target>(Nécessite une connexion Internet)</target>
 
+<source><Symlink></source>
+<target><Lien_symbolique></target>
+
+<source><Directory></source>
+<target><Répertoire></target>
+
+<source>Full path</source>
+<target>Chemin complet</target>
+
+<source>Name</source>
+<target>Nom</target>
+
+<source>Relative path</source>
+<target>Chemin relatif</target>
+
+<source>Directory</source>
+<target>Répertoire</target>
+
+<source>Size</source>
+<target>Taille</target>
+
+<source>Date</source>
+<target>Date</target>
+
+<source>Extension</source>
+<target>Extension</target>
+
+<source>Comparison Result</source>
+<target>Résultat de la comparaison</target>
+
 <source>Drag && drop</source>
 <target>Glisser && Déposer</target>
 
 <source>Close progress dialog</source>
-<target></target>
+<target>Fermer la fenêtre de progression</target>
 
 <source>Shut down</source>
-<target></target>
+<target>Arrêter</target>
 
 <source>Log off</source>
-<target></target>
+<target>Quitter</target>
 
 <source>Standby</source>
-<target></target>
+<target>Pause</target>
 
 <source>Hibernate</source>
-<target></target>
+<target>Figer</target>
 
 <source>1. &Compare</source>
 <target>1. &Comparer</target>
 
 <source>2. &Synchronize...</source>
 <target>2. &Synchroniser...</target>
-
-<source>S&witch view</source>
-<target>Changer de &vue</target>
 
 <source>&New</source>
 <target>&Nouveau</target>
@@ -556,7 +571,7 @@ La ligne de commande est exécutée chaque fois que :
 <target>Retour d'informations</target>
 
 <source>Show progress dialog</source>
-<target></target>
+<target>Montrer la fenêtre de prograssion</target>
 
 <source>Error handling</source>
 <target>Erreur de gestion de fichiers</target>
@@ -582,26 +597,14 @@ La ligne de commande est exécutée chaque fois que :
 <source>Select variant:</source>
 <target>Choisissez une variante :</target>
 
-<source><Automatic></source>
-<target><Automatique></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target></target>
-
-<source>Mirror ->></source>
-<target>Miroir ->></target>
+<target>Identifie et propage les modifications des deux côtés à l'aide d'une base de données. Les suppressions, renommage et conflits sont détectés automatiquement.</target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Copie miroir du dossier de gauche. Le dossier de droite est modifié pour être strictement identique après la synchronisation.</target>
 
-<source>Update -></source>
-<target>Mise à Jour -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Copie les fichiers nouveaux ou modifiés dans le dossier de droite.</target>
-
-<source>Custom</source>
-<target>Personnaliser</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Paramétrage de vos règles de synchronisation.</target>
@@ -610,7 +613,7 @@ La ligne de commande est exécutée chaque fois que :
 <target>Gestion des suppressions</target>
 
 <source>On completion:</source>
-<target></target>
+<target>A la fin :</target>
 
 <source>Configuration</source>
 <target>Configuration</target>
@@ -658,9 +661,6 @@ Les fichiers sont considérés comme identiques si
 sont les mêmes
 </target>
 
-<source>File time and size</source>
-<target>Date et heure de modification du fichier</target>
-
 <source>
 Files are found equal if
      - file content
@@ -671,9 +671,6 @@ Les fichiers sont considérés comme identiques si
      - leur contenu
 est identique
 </target>
-
-<source>File content</source>
-<target>Contenu du fichier</target>
 
 <source>Symbolic Link handling</source>
 <target>Gestion des Liens Symboliques</target>
@@ -690,32 +687,29 @@ est identique
 <source>Source code written in C++ utilizing:</source>
 <target>Code source écrit en C++ utilisant :</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Pour les traductions de FreeFileSync, un grand merci à :</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>Commentaires et suggestions sont les bienvenus à :</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync par Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>Vos commentaires et vos suggestions sont les bienvenus</target>
 
 <source>Homepage</source>
 <target>Accueil</target>
 
-<source>If you like FFS</source>
-<target>Si vous aimez FFS</target>
-
-<source>Donate with PayPal</source>
-<target>Faites un don avec PayPal</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync par Sourceforge</target>
 
 <source>Email</source>
 <target>Email</target>
 
-<source>Report translation error</source>
-<target>Etat des erreurs de transfert</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Pour les traductions de FreeFileSync, un grand merci à :</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>Publié sous licence GNU General Public License :</target>
+<source>If you like FreeFileSync</source>
+<target>Si vous aimez FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Faites un don avec PayPal</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Publié sous licence GNU General Public License</target>
 
 <source>Ignore subsequent errors</source>
 <target>Ignorer les erreurs ultérieures</target>
@@ -811,7 +805,7 @@ Exclude: \stuff\temp\*
 <target>Copie de fichiers transactionnelle</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>Ecrit d'abord dans un fichier temporaire (*.ffs_tmp), puis le renomme. Ceci guarantit la cohérence des données même en cas d'erreur fatale.</target>
 
 <source>Copy locked files</source>
 <target>Copier les fichiers verrouillés</target>
@@ -864,6 +858,9 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Paires de dossiers</target>
 
+<source>Compressed view</source>
+<target>Vue compressé</target>
+
 <source>Select view</source>
 <target>Choisissez une vue</target>
 
@@ -882,41 +879,32 @@ Exclude: \stuff\temp\*
 <source><multiple selection></source>
 <target><sélection multiple></target>
 
-<source>D-Click</source>
-<target>Clic Droit</target>
-
 <source>Delete</source>
 <target>Supprimer</target>
 
-<source>Customize...</source>
-<target>Personnaliser...</target>
+<source>Include all</source>
+<target>Inclure tout</target>
+
+<source>Exclude all</source>
+<target>Exclure tout</target>
+
+<source>Icon size:</source>
+<target>Taille des icônes :</target>
+
+<source>Small</source>
+<target>Petit</target>
+
+<source>Medium</source>
+<target>Moyen</target>
+
+<source>Large</source>
+<target>Grand</target>
 
 <source>Select time span...</source>
 <target>choisir un intervalle de temps...</target>
 
-<source>Auto-adjust columns</source>
-<target>Auto-ajustement des colonnes</target>
-
-<source>Icon size:</source>
-<target></target>
-
-<source>Small</source>
-<target></target>
-
-<source>Medium</source>
-<target></target>
-
-<source>Large</source>
-<target></target>
-
-<source>Include all rows</source>
-<target>Inclure toutes les lignes</target>
-
-<source>Exclude all rows</source>
-<target>Exclure toutes les lignes</target>
-
-<source>Reset view</source>
-<target>Réinitialiser la vue</target>
+<source>Default view</source>
+<target>Vue par défaut</target>
 
 <source>Show "%x"</source>
 <target>Afficher "%x"</target>
@@ -1197,6 +1185,12 @@ Exclude: \stuff\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>Déplacer les fichiers vers un sous-répertoire daté</target>
 
+<source>Files</source>
+<target>Fichiers</target>
+
+<source>Percentage</source>
+<target>Pourcentage</target>
+
 <source>%x TB</source>
 <target>%x To</target>
 
@@ -1326,6 +1320,9 @@ Exclude: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Les répertoires sont imbriqués ! Attention à la mise à jour des règles de synchronisation :</target>
 
+<source>Preparing synchronization...</source>
+<target>Synchronisation en cours de préparation ...</target>
+
 <source>Memory allocation failed!</source>
 <target>Erreur d'allocation de mémoire!</target>
 
@@ -1369,10 +1366,10 @@ Exclude: \stuff\temp\*
 <target>Supprimer les fichiers/dossiers de droite</target>
 
 <source>Move file on left</source>
-<target></target>
+<target>Déplacer les fichiers à gauche</target>
 
 <source>Move file on right</source>
-<target></target>
+<target>Déplacer les fichiers à droite</target>
 
 <source>Overwrite left file/folder with right one</source>
 <target>Remplacer le fichier/dossier de gauche avec celui de droite</target>
@@ -1443,8 +1440,8 @@ Exclude: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>Le répertoire destination ne doit pas être vide !</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>Le répertoire défini par l'utilisateur pour la suppression n'a pas été indiqué !</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Le répertoire des versions de fichiers n'a pas été indiqué !</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Le répertoire source n'existe plus :</target>

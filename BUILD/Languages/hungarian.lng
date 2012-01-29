@@ -139,36 +139,6 @@
 <pluralform>%x Bájt</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><Symlink></target>
-
-<source><Directory></source>
-<target><Mappa></target>
-
-<source>Size</source>
-<target>Méret</target>
-
-<source>Date</source>
-<target>Dátum</target>
-
-<source>Full path</source>
-<target>Teljes elérési útvonal</target>
-
-<source>Filename</source>
-<target>Fájlnév</target>
-
-<source>Relative path</source>
-<target>Relatív útvonal</target>
-
-<source>Directory</source>
-<target>Mappa</target>
-
-<source>Extension</source>
-<target>Kiterjesztés</target>
-
-<source>Comparison Result</source>
-<target>Az összehasonlítás eredménye</target>
-
 <source>Initial synchronization:</source>
 <target>Első szinkronizáció:</target>
 
@@ -354,6 +324,24 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Logging</source>
 <target>Naplózás</target>
 
+<source>File time and size</source>
+<target>Fájl dátuma és mérete</target>
+
+<source>File content</source>
+<target>fájl tartalma alapján</target>
+
+<source><Automatic></source>
+<target><Automatikus></target>
+
+<source>Mirror ->></source>
+<target>Tükrözés ->></target>
+
+<source>Update -></source>
+<target>Frissítés -></target>
+
+<source>Custom</source>
+<target>Egyedi</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync kötegelt fájl</target>
 
@@ -411,32 +399,59 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>(Requires an Internet connection!)</source>
 <target>(Internetkapcsolat szükséges!)</target>
 
+<source><Symlink></source>
+<target><Symlink></target>
+
+<source><Directory></source>
+<target><Mappa></target>
+
+<source>Full path</source>
+<target>Teljes elérési útvonal</target>
+
+<source>Name</source>
+<target>Név</target>
+
+<source>Relative path</source>
+<target>Relatív útvonal</target>
+
+<source>Directory</source>
+<target>Mappa</target>
+
+<source>Size</source>
+<target>Méret</target>
+
+<source>Date</source>
+<target>Dátum</target>
+
+<source>Extension</source>
+<target>Kiterjesztés</target>
+
+<source>Comparison Result</source>
+<target>Az összehasonlítás eredménye</target>
+
 <source>Drag && drop</source>
 <target>Húzd && Ejtsd</target>
 
 <source>Close progress dialog</source>
-<target></target>
+<target>Folyamatjelző párbeszédablak bezárása</target>
 
 <source>Shut down</source>
-<target></target>
+<target>Gép leállítása</target>
 
 <source>Log off</source>
-<target></target>
+<target>Kijelentkezés</target>
 
 <source>Standby</source>
-<target></target>
+<target>Készenléti állapot</target>
 
 <source>Hibernate</source>
-<target></target>
+<target>Hibernálás</target>
 
 <source>1. &Compare</source>
 <target>1. &Összehasonlítás</target>
 
 <source>2. &Synchronize...</source>
 <target>2. &Szinkronizálás</target>
-
-<source>S&witch view</source>
-<target>Nézet v&áltása</target>
 
 <source>&New</source>
 <target>&Új</target>
@@ -556,7 +571,7 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <target>Státusz visszajelzés</target>
 
 <source>Show progress dialog</source>
-<target></target>
+<target>Folyamatjelző párbeszédablak mutatása</target>
 
 <source>Error handling</source>
 <target>Hibakezelés</target>
@@ -582,26 +597,14 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Select variant:</source>
 <target>Változat kiválasztása:</target>
 
-<source><Automatic></source>
-<target><Automatikus></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target></target>
-
-<source>Mirror ->></source>
-<target>Tükrözés ->></target>
+<target>Változások azonosítása és végrehajtása mindkét oldalon adatbázis segítségével. Automatikusan felismerődnek a törlések, átnevezések és ütközések.</target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>A bal oldali mappa tükrözött másolata. A jobb oldali mappa úgy lesz megváltoztatva, hogy a szinkronizáció után pontosan megegyezzen a bal oldalival.</target>
 
-<source>Update -></source>
-<target>Frissítés -></target>
-
 <source>Copy new or updated files to right folder.</source>
 <target>Új vagy frissített fájlok másolása a jobb oldali mappába.</target>
-
-<source>Custom</source>
-<target>Egyedi</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Saját szinkronizálási szabályok beállítása.</target>
@@ -610,7 +613,7 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <target>Törlések kezelése</target>
 
 <source>On completion:</source>
-<target></target>
+<target>Végrehajtás után:</target>
 
 <source>Configuration</source>
 <target>Beállítás</target>
@@ -657,9 +660,6 @@ A fájlok egyezőnek tekintendők, ha megegyezik
      - a fájlméret
 </target>
 
-<source>File time and size</source>
-<target>Fájl dátuma és mérete</target>
-
 <source>
 Files are found equal if
      - file content
@@ -669,9 +669,6 @@ is the same
 A fájlok megegyeznek, ha megegyezik
   - a fájlok tartalma
 </target>
-
-<source>File content</source>
-<target>fájl tartalma alapján</target>
 
 <source>Symbolic Link handling</source>
 <target>Symlink kezelés</target>
@@ -688,35 +685,32 @@ A fájlok megegyeznek, ha megegyezik
 <source>Source code written in C++ utilizing:</source>
 <target>A programot C++-ban fejlesztették a következők felhasználásával:</target>
 
+<source>Feedback and suggestions are welcome</source>
+<target>Várjuk a visszajelzéseket és az ötleteket</target>
+
+<source>Homepage</source>
+<target>Honlap</target>
+
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync a Sourceforge-on</target>
+
+<source>Email</source>
+<target>E-mail</target>
+
 <source>Big thanks for localizing FreeFileSync goes out to:</source>
 <target>
 Nagy köszönet a FreeFileSync lokalizációjáért
 a következő személyeknek:
 </target>
 
-<source>Feedback and suggestions are welcome at:</source>
-<target>A visszajelzéseket és javaslatokat ide várjuk:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync a Sourceforge-on</target>
-
-<source>Homepage</source>
-<target>Honlap</target>
-
-<source>If you like FFS</source>
-<target>FFS támogatása</target>
+<source>If you like FreeFileSync</source>
+<target>FreeFileSync támogatása</target>
 
 <source>Donate with PayPal</source>
 <target>Ha szereted a FreeFileSync-et, támogasd a PayPal segítségével.</target>
 
-<source>Email</source>
-<target>E-mail</target>
-
-<source>Report translation error</source>
-<target>Fordítói hiba bejelentése</target>
-
-<source>Published under the GNU General Public License:</source>
-<target>Kiadva a GNU General Public License alatt:</target>
+<source>Published under the GNU General Public License</source>
+<target>Kiadva a GNU General Public License alatt</target>
 
 <source>Ignore subsequent errors</source>
 <target>Későbbi hibák figyelmen kívül hagyása</target>
@@ -812,7 +806,7 @@ Kizárni: \stuff\temp\*
 <target>Tranzakciós fájlmásolás</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target></target>
+<target>Írás egy ideiglenes fájlba (*.ffs_tmp), majd annak átnevezése. Ez egyező állapotot garantál még végzetes hiba esetén is.</target>
 
 <source>Copy locked files</source>
 <target>Zárolt fájlok másolása</target>
@@ -865,6 +859,9 @@ Kizárni: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Mappa párok</target>
 
+<source>Compressed view</source>
+<target>Tömörített nézet</target>
+
 <source>Select view</source>
 <target>Nézet kiválasztása</target>
 
@@ -883,41 +880,32 @@ Kizárni: \stuff\temp\*
 <source><multiple selection></source>
 <target><többszörös kijelölés></target>
 
-<source>D-Click</source>
-<target>D-Klikk</target>
-
 <source>Delete</source>
 <target>Törlés</target>
 
-<source>Customize...</source>
-<target>Testreszabás...</target>
+<source>Include all</source>
+<target>Csatolni az összeset</target>
+
+<source>Exclude all</source>
+<target>Kizárni az összeset</target>
+
+<source>Icon size:</source>
+<target>Ikon mérete:</target>
+
+<source>Small</source>
+<target>Kicsi</target>
+
+<source>Medium</source>
+<target>Közepes</target>
+
+<source>Large</source>
+<target>Nagy</target>
 
 <source>Select time span...</source>
 <target>Időintervallum kiválasztása...</target>
 
-<source>Auto-adjust columns</source>
-<target>Oszlopok automatikus igazítása</target>
-
-<source>Icon size:</source>
-<target></target>
-
-<source>Small</source>
-<target></target>
-
-<source>Medium</source>
-<target></target>
-
-<source>Large</source>
-<target></target>
-
-<source>Include all rows</source>
-<target>Minden sort csatolni</target>
-
-<source>Exclude all rows</source>
-<target>Minden sor kizárása</target>
-
-<source>Reset view</source>
-<target>Nézet visszaállítása</target>
+<source>Default view</source>
+<target>Alapértelmezett nézet</target>
 
 <source>Show "%x"</source>
 <target>"%x" mutatása</target>
@@ -1198,6 +1186,12 @@ Kizárni: \stuff\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>Fájlok másolása időbélyeggel ellátott almappába</target>
 
+<source>Files</source>
+<target>Fájlok</target>
+
+<source>Percentage</source>
+<target>Százalék</target>
+
 <source>%x TB</source>
 <target>%x TB</target>
 
@@ -1327,6 +1321,9 @@ Kizárni: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>A mappák függenek egymástól! Legyen óvatos, amikor megadja a szinkronizálási szabályokat:</target>
 
+<source>Preparing synchronization...</source>
+<target>Szinkronizálás előkészítése...</target>
+
 <source>Memory allocation failed!</source>
 <target>Sikertelen memóriafoglalás!</target>
 
@@ -1370,10 +1367,10 @@ Kizárni: \stuff\temp\*
 <target>Jobb oldali fájl/mappa törlése</target>
 
 <source>Move file on left</source>
-<target></target>
+<target>Bal oldali fájl mozgatása</target>
 
 <source>Move file on right</source>
-<target></target>
+<target>Jobb oldali fájl mozgatása</target>
 
 <source>Overwrite left file/folder with right one</source>
 <target>Bal oldali fájl/mappa felülírása a jobb oldalival</target>
@@ -1444,8 +1441,8 @@ Kizárni: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>A célmappa neve nem lehet üres!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>A törléshez nem lett mappa megadva a felhasználó által!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>Nem lett megadva mappa a fájlok verziókezeléséhez!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>A forrásként megadott mappa többé nem létezik:</target>

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "algorithm.h"
@@ -27,7 +27,7 @@ using namespace std::rel_ops;
 void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
     std::for_each(begin(folderCmp), end(folderCmp), std::mem_fun_ref(&BaseDirMapping::flip));
-    redetermineSyncDirection(config, folderCmp, NULL);
+    redetermineSyncDirection(config, folderCmp, [](const std::wstring&) {});
 }
 
 
@@ -55,13 +55,13 @@ private:
         switch (fileObj.getCategory())
         {
             case FILE_LEFT_SIDE_ONLY:
-                if (endsWith(fileObj.getFullName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
+                if (endsWith(fileObj.getShortName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
                     fileObj.setSyncDir(SYNC_DIR_LEFT); //schedule potentially existing temporary files for deletion
                 else
                     fileObj.setSyncDir(dirCfg.exLeftSideOnly);
                 break;
             case FILE_RIGHT_SIDE_ONLY:
-                if (endsWith(fileObj.getFullName<RIGHT_SIDE>(), zen::TEMP_FILE_ENDING))
+                if (endsWith(fileObj.getShortName<RIGHT_SIDE>(), zen::TEMP_FILE_ENDING))
                     fileObj.setSyncDir(SYNC_DIR_RIGHT); //schedule potentially existing temporary files for deletion
                 else
                     fileObj.setSyncDir(dirCfg.exRightSideOnly);
@@ -399,19 +399,18 @@ std::pair<DataSetDir, const DirContainer*> retrieveDataSetDir(const Zstring& obj
 class RedetermineAuto
 {
 public:
-    static void execute(BaseDirMapping& baseDirectory, DeterminationProblem* handler)
+    static void execute(BaseDirMapping& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
     {
-        RedetermineAuto(baseDirectory, handler);
+        RedetermineAuto(baseDirectory, reportWarning);
     }
 
 private:
-    RedetermineAuto(BaseDirMapping& baseDirectory,
-                    DeterminationProblem* handler) :
+    RedetermineAuto(BaseDirMapping& baseDirectory, std::function<void(const std::wstring&)> reportWarning) :
         txtBothSidesChanged(_("Both sides have changed since last synchronization!")),
         txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization!")),
         txtFilterChanged(_("Cannot determine sync-direction:") + L" \n" + _("Filter settings have changed!")),
         txtLastSyncFail (_("Cannot determine sync-direction:") + L" \n" + _("The file was not processed by last synchronization!")),
-        handler_(handler)
+        reportWarning_(reportWarning)
     {
         if (allElementsEqual(baseDirectory)) //nothing to do: abort and don't show any nag-screens
             return;
@@ -474,8 +473,8 @@ private:
         catch (FileErrorDatabaseNotExisting&) {} //let's ignore these errors for now...
         catch (FileError& error) //e.g. incompatible database version
         {
-            if (handler_) handler_->reportWarning(error.toString() + L" \n\n" +
-                                                      _("Setting default synchronization directions: Old files will be overwritten with newer files."));
+            reportWarning_(error.toString() + L" \n\n" +
+                           _("Setting default synchronization directions: Old files will be overwritten with newer files."));
         }
         return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
     }
@@ -533,12 +532,12 @@ private:
         //----------------------------------------------------------------------
 
         //##################### schedule potentially existing temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getFullName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
+        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_LEFT);
             return;
         }
-        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getFullName<RIGHT_SIDE>(), zen::TEMP_FILE_ENDING))
+        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), zen::TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_RIGHT);
             return;
@@ -821,7 +820,7 @@ private:
     const std::wstring txtFilterChanged;
     const std::wstring txtLastSyncFail;
 
-    DeterminationProblem* const handler_;
+    std::function<void(const std::wstring&)> reportWarning_;
 
     //detection of renamed files
     template <SelectedSide side>
@@ -894,10 +893,10 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
 }
 
 
-void zen::redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirMapping& baseDirectory, DeterminationProblem* handler)
+void zen::redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirMapping& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
 {
     if (directConfig.var == DirectionConfig::AUTOMATIC)
-        RedetermineAuto::execute(baseDirectory, handler);
+        RedetermineAuto::execute(baseDirectory, reportWarning);
     else
     {
         DirectionSet dirCfg = extractDirections(directConfig);
@@ -906,9 +905,9 @@ void zen::redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirM
 }
 
 
-void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderComparison& folderCmp, DeterminationProblem* handler)
+void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderComparison& folderCmp, std::function<void(const std::wstring&)> reportWarning)
 {
-    if (folderCmp.size() == 0)
+    if (folderCmp.empty())
         return;
 
     std::vector<DirectionConfig> directCfgs = extractDirectionCfg(mainCfg);
@@ -919,7 +918,7 @@ void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderCompa
     for (auto iter = folderCmp.begin(); iter != folderCmp.end(); ++iter)
     {
         const DirectionConfig& cfg = directCfgs[iter - folderCmp.begin()];
-        redetermineSyncDirection(cfg, **iter, handler);
+        redetermineSyncDirection(cfg, **iter, reportWarning);
     }
 }
 
@@ -1337,10 +1336,9 @@ void zen::applyTimeSpanFilter(FolderComparison& folderCmp, const Int64& timeFrom
 
 
 //############################################################################################################
-std::pair<wxString, int> zen::deleteFromGridAndHDPreview( //assemble message containing all files to be deleted
-    const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,
-    const std::vector<FileSystemObject*>& rowsToDeleteOnRight,
-    bool deleteOnBothSides)
+std::pair<wxString, int> zen::deleteFromGridAndHDPreview(const std::vector<FileSystemObject*>& selectionLeft,
+                                                         const std::vector<FileSystemObject*>& selectionRight,
+                                                         bool deleteOnBothSides)
 {
     //fast replacement for wxString modelling exponential growth
     typedef Zbase<wchar_t> zxString; //for use with UI texts
@@ -1350,46 +1348,50 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview( //assemble message con
 
     if (deleteOnBothSides)
     {
-        //mix selected rows from left and right
-        std::set<FileSystemObject*> rowsToDelete(rowsToDeleteOnLeft.begin(), rowsToDeleteOnLeft.end());
-        rowsToDelete.insert(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
+        //mix selected rows from left and right (without changing order)
+        std::vector<FileSystemObject*> selection;
+        {
+            hash_set<FileSystemObject*> objectsUsed;
+            std::copy_if(selectionLeft .begin(), selectionLeft .end(), std::back_inserter(selection), [&](FileSystemObject* fsObj) { return objectsUsed.insert(fsObj).second; });
+            std::copy_if(selectionRight.begin(), selectionRight.end(), std::back_inserter(selection), [&](FileSystemObject* fsObj) { return objectsUsed.insert(fsObj).second; });
+        }
 
-        std::for_each(rowsToDelete.begin(), rowsToDelete.end(),
+        std::for_each(selection.begin(), selection.end(),
                       [&](const FileSystemObject* fsObj)
         {
             if (!fsObj->isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + wxT("\n");
+                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + L'\n';
                 ++totalDelCount;
             }
 
             if (!fsObj->isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + wxT("\n");
+                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + L'\n';
                 ++totalDelCount;
             }
 
-            filesToDelete += wxT("\n");
+            filesToDelete += L'\n';
         });
     }
     else //delete selected files only
     {
-        std::for_each(rowsToDeleteOnLeft.begin(), rowsToDeleteOnLeft.end(),
+        std::for_each(selectionLeft.begin(), selectionLeft.end(),
                       [&](const FileSystemObject* fsObj)
         {
             if (!fsObj->isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + wxT("\n");
+                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + L'\n';
                 ++totalDelCount;
             }
         });
 
-        std::for_each(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end(),
+        std::for_each(selectionRight.begin(), selectionRight.end(),
                       [&](const FileSystemObject* fsObj)
         {
             if (!fsObj->isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + wxT("\n");
+                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + L'\n';
                 ++totalDelCount;
             }
         });
@@ -1495,15 +1497,15 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
 }
 
 
-void zen::deleteFromGridAndHD(std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
-                              std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
+void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
+                              const std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
                               FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
                               const std::vector<DirectionConfig>& directCfgs,
                               bool deleteOnBothSides,
                               bool useRecycleBin,
                               DeleteFilesHandler& statusHandler)
 {
-    if (folderCmp.size() == 0)
+    if (folderCmp.empty())
         return;
     else if (folderCmp.size() != directCfgs.size())
         throw std::logic_error("Programming Error: Contract violation!");

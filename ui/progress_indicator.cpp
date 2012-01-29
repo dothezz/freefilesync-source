@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "progress_indicator.h"
@@ -396,7 +396,7 @@ class LogControl : public LogControlGenerated
 public:
     LogControl(wxWindow* parent, const ErrorLogging& log) : LogControlGenerated(parent), log_(log)
     {
-        const int errorCount   = log_.typeCount(TYPE_ERROR) + log_.typeCount(TYPE_FATAL_ERROR);
+        const int errorCount   = log_.typeCount(TYPE_ERROR | TYPE_FATAL_ERROR);
         const int warningCount = log_.typeCount(TYPE_WARNING);
         const int infoCount    = log_.typeCount(TYPE_INFO);
 
@@ -812,6 +812,9 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
 
     //Fit() height only:
     //fitHeight(*this);
+
+    m_staticTextSpeed  ->SetLabel(L""); //clear "dummy" values
+    m_staticTextRemTime->SetLabel(L""); //
 }
 
 
@@ -1211,6 +1214,8 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     //at the LATEST(!) to prevent access to currentStatusHandler
     //enable okay and close events; may be set in this method ONLY
 
+    wxWindowUpdateLocker dummy(this); //badly needed
+
     abortCb_ = NULL; //avoid callback to (maybe) deleted parent process
 
     setCurrentStatus(id);
@@ -1257,7 +1262,7 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
 
     updateStatusDialogNow(false); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
 
-    //changed meaning: overall speed: -> make sure to call after "updateStatusDialogNow"
+    //changed meaning: from current to overall speed: -> make sure to call after "updateStatusDialogNow"
     const long timeElapMs = timeElapsed.Time();
     m_staticTextSpeed->SetLabel(timeElapMs <= 0 ? L"-" : zen::filesizeToShortString(currentData * 1000 / timeElapMs) + _("/sec"));
 
@@ -1275,9 +1280,14 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     m_listbookResult->AddPage(m_panelProgress, _("Statistics"), true); //AddPage() takes ownership!
 
     //2. log file
+    const size_t posLog = 1;
     LogControl* logControl = new LogControl(m_listbookResult, log);
     m_listbookResult->AddPage(logControl, _("Logging"), false);
     //bSizerHoldStretch->Insert(0, logControl, 1, wxEXPAND);
+
+    //show log instead of graph if fatal errors occured! (not required for ignored warnings or errors!)
+    if (log.typeCount(TYPE_FATAL_ERROR) > 0)
+        m_listbookResult->ChangeSelection(posLog);
 
     m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
 
@@ -1435,6 +1445,7 @@ SyncStatus::SyncStatus(AbortCallback& abortCb,
     {
         pimpl->Show();
         pimpl->updateStatusDialogNow(false); //update visual statistics to get rid of "dummy" texts
+        pimpl->Update(); //don't wait until next idle event (who knows what blocking process comes next?)
     }
     else
         pimpl->minimizeToTray();

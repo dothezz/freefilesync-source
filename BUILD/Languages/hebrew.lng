@@ -139,36 +139,6 @@
 <pluralform>%x בייט</pluralform>
 </target>
 
-<source><Symlink></source>
-<target><קשור סימבולי></target>
-
-<source><Directory></source>
-<target><מחיצה></target>
-
-<source>Size</source>
-<target>גודל</target>
-
-<source>Date</source>
-<target>תארין</target>
-
-<source>Full path</source>
-<target>נתיב מלא</target>
-
-<source>Filename</source>
-<target>שם קובץ</target>
-
-<source>Relative path</source>
-<target>נתיב יחסי</target>
-
-<source>Directory</source>
-<target>מחיצה</target>
-
-<source>Extension</source>
-<target>סיומת</target>
-
-<source>Comparison Result</source>
-<target>תוצאות ההשוואה</target>
-
 <source>Initial synchronization:</source>
 <target>סנכרון ראשוני:</target>
 
@@ -354,6 +324,24 @@ The command line is executed each time:
 <source>Logging</source>
 <target>רישום ביומן</target>
 
+<source>File time and size</source>
+<target>זמן וגודל קובץ</target>
+
+<source>File content</source>
+<target>תכולת הקובץ</target>
+
+<source><Automatic></source>
+<target><אוטומטי></target>
+
+<source>Mirror ->></source>
+<target>מראה ->></target>
+
+<source>Update -></source>
+<target>שדרג -></target>
+
+<source>Custom</source>
+<target>מותאם</target>
+
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync קובץ אצווה</target>
 
@@ -410,6 +398,36 @@ The command line is executed each time:
 
 <source>(Requires an Internet connection!)</source>
 <target>(מחייב קישור אינטרנטי פעיל!)</target>
+
+<source><Symlink></source>
+<target><קשור סימבולי></target>
+
+<source><Directory></source>
+<target><מחיצה></target>
+
+<source>Full path</source>
+<target>נתיב מלא</target>
+
+<source>Name</source>
+<target>שם</target>
+
+<source>Relative path</source>
+<target>נתיב יחסי</target>
+
+<source>Directory</source>
+<target>מחיצה</target>
+
+<source>Size</source>
+<target>גודל</target>
+
+<source>Date</source>
+<target>תארין</target>
+
+<source>Extension</source>
+<target>סיומת</target>
+
+<source>Comparison Result</source>
+<target>תוצאות ההשוואה</target>
 
 <source>Drag && drop</source>
 <target>גרור והשלך</target>
@@ -544,10 +562,10 @@ The command line is executed each time:
 <target>קבצי המסנן</target>
 
 <source>Left</source>
-<target>שמאל</target>
+<target>ימין</target>
 
 <source>Right</source>
-<target>ימין</target>
+<target>שמאל</target>
 
 <source>Overview</source>
 <target>מבט כללי</target>
@@ -582,26 +600,14 @@ The command line is executed each time:
 <source>Select variant:</source>
 <target>בחר משתנה:</target>
 
-<source><Automatic></source>
-<target><אוטומטי></target>
-
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>זהה והפץ שינויים בשני הצדדים באמצעות שימוש בבסיס נתונים. מחיקות, שינויי שמות וסתירות מתגלים באופן אוטומטי.</target>
 
-<source>Mirror ->></source>
-<target><<- מראה</target>
-
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>גיבוי מראה של מחיצה שמאלית. מחיצה ימנית תהיה זהה לשמאלית לאחר הסינכרון.</target>
-
-<source>Update -></source>
-<target><- שדרג</target>
+<target>גיבוי מראה של מחיצה ימנית. מחיצה שמאלית תתעדכן ותהיה זהה לימנית לאחר הסינכרון.</target>
 
 <source>Copy new or updated files to right folder.</source>
-<target>העתק קבצים חדשים או מעודכנים למחיצה הימנית.</target>
-
-<source>Custom</source>
-<target>מותאם</target>
+<target>העתק קבצים חדשים או מעודכנים למחיצה השמאלית.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>סדר את כללי הסנכרון שלך.</target>
@@ -622,16 +628,16 @@ The command line is executed each time:
 <target>פעולה</target>
 
 <source>File/folder exists on left side only</source>
-<target>קובץ\מחיצה קיים בצד שמאל בלבד</target>
-
-<source>File/folder exists on right side only</source>
 <target>קובץ\מחיצה קיים בצד ימין בלבד</target>
 
+<source>File/folder exists on right side only</source>
+<target>קובץ\מחיצה קיים בצד שמאל בלבד</target>
+
 <source>Left file is newer</source>
-<target>צד שמאל חדש יותר</target>
+<target>קובץ בצד ימין חדש יותר</target>
 
 <source>Right file is newer</source>
-<target>צד ימין חדש יותר</target>
+<target>צד שמאל חדש יותר</target>
 
 <source>Files have different content</source>
 <target>הקבצים בעלי תכולה שונה</target>
@@ -658,9 +664,6 @@ are the same
 הם זהים
 </target>
 
-<source>File time and size</source>
-<target>זמן וגודל קובץ</target>
-
 <source>
 Files are found equal if
      - file content
@@ -671,9 +674,6 @@ is the same
      - תכולת הקובץ
 היא זהה
 </target>
-
-<source>File content</source>
-<target>תכולת הקובץ</target>
 
 <source>Symbolic Link handling</source>
 <target>טיפול בקישור סימבולי</target>
@@ -690,32 +690,29 @@ is the same
 <source>Source code written in C++ utilizing:</source>
 <target>קוד מקור נכתב ב- C++ באמצעות:</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>תודות עבור עבודות התרגום של תוכנת הסנכרון:</target>
-
-<source>Feedback and suggestions are welcome at:</source>
-<target>תגובות והצעות ותקבלו בברכה:</target>
-
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync ב Sourceforge</target>
+<source>Feedback and suggestions are welcome</source>
+<target>משוב והצעות יתקבלו בברכה</target>
 
 <source>Homepage</source>
 <target>אתר-הבית:</target>
 
-<source>If you like FFS</source>
-<target>במידה ו-FFS מוצאת חן בעינכם</target>
-
-<source>Donate with PayPal</source>
-<target>תרום עם פייפל</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync ב Sourceforge</target>
 
 <source>Email</source>
 <target>דוא"ל:</target>
 
-<source>Report translation error</source>
-<target>דווח שגיאת תרגום:</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>תודות עבור עבודות התרגום של תוכנת הסנכרון:</target>
 
-<source>Published under the GNU General Public License:</source>
-<target>מפורסם במסגרת GNU General Public License:</target>
+<source>If you like FreeFileSync</source>
+<target>במידה ו-FreeFileSync מוצאת חן בעינכם</target>
+
+<source>Donate with PayPal</source>
+<target>תרום עם פייפל</target>
+
+<source>Published under the GNU General Public License</source>
+<target>מפורסם במסגרת GNU General Public License</target>
 
 <source>Ignore subsequent errors</source>
 <target>התעלם משגיאות נישנות</target>
@@ -864,6 +861,9 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>זוגות מחיצות</target>
 
+<source>Compressed view</source>
+<target>תצוגה מכווצת</target>
+
 <source>Select view</source>
 <target>בחר תצוגה</target>
 
@@ -882,20 +882,14 @@ Exclude: \stuff\temp\*
 <source><multiple selection></source>
 <target><בחירה מרובה></target>
 
-<source>D-Click</source>
-<target>לחיצה-כפולה</target>
-
 <source>Delete</source>
 <target>מחק</target>
 
-<source>Customize...</source>
-<target>מותאם אישית...</target>
+<source>Include all</source>
+<target>הכלל הכל</target>
 
-<source>Select time span...</source>
-<target>בחר תחום זמן...</target>
-
-<source>Auto-adjust columns</source>
-<target>עימוד אוטומטי</target>
+<source>Exclude all</source>
+<target>הוצא מן הכלל הכל</target>
 
 <source>Icon size:</source>
 <target>גודל סמל:</target>
@@ -909,14 +903,11 @@ Exclude: \stuff\temp\*
 <source>Large</source>
 <target>גדול</target>
 
-<source>Include all rows</source>
-<target>כלול את כל השורות</target>
+<source>Select time span...</source>
+<target>בחר תחום זמן...</target>
 
-<source>Exclude all rows</source>
-<target>אל תכלול את כל השורות</target>
-
-<source>Reset view</source>
-<target>אפס תצוגה</target>
+<source>Default view</source>
+<target>תצוגה בתצורת ברירת מחדל</target>
 
 <source>Show "%x"</source>
 <target>הראה "%x"</target>
@@ -937,28 +928,28 @@ Exclude: \stuff\temp\*
 <target>סנכרון קבצים ומחיצות</target>
 
 <source>Hide files that exist on left side only</source>
-<target>הסתר קבצים הקימים אך ורק בצד שמאל</target>
-
-<source>Show files that exist on left side only</source>
-<target>הראה קבצים הנמצאים אך ורק בצד שמאל</target>
-
-<source>Hide files that exist on right side only</source>
 <target>הסתר קבצים הקימים אך ורק בצד ימין</target>
 
-<source>Show files that exist on right side only</source>
+<source>Show files that exist on left side only</source>
 <target>הראה קבצים הנמצאים אך ורק בצד ימין</target>
 
+<source>Hide files that exist on right side only</source>
+<target>הסתר קבצים הקימים אך ורק בצד שמאל</target>
+
+<source>Show files that exist on right side only</source>
+<target>הראה קבצים הנמצאים אך ורק בצד שמאל</target>
+
 <source>Hide files that are newer on left</source>
-<target>הסתר קבצים חדשים יותר בצד שמאל</target>
-
-<source>Show files that are newer on left</source>
-<target>הראה קבצים חדשים יותר בצד שמאל</target>
-
-<source>Hide files that are newer on right</source>
 <target>הסתר קבצים חדשים יותר בצד ימין</target>
 
-<source>Show files that are newer on right</source>
+<source>Show files that are newer on left</source>
 <target>הראה קבצים חדשים יותר בצד ימין</target>
+
+<source>Hide files that are newer on right</source>
+<target>הסתר קבצים חדשים יותר בצד שמאל</target>
+
+<source>Show files that are newer on right</source>
+<target>הראה קבצים חדשים יותר בצד שמאל</target>
 
 <source>Hide files that are equal</source>
 <target>הסתר קבצים שאינם שווים</target>
@@ -979,40 +970,40 @@ Exclude: \stuff\temp\*
 <target>הראה קונפליקטים</target>
 
 <source>Hide files that will be created on the left side</source>
-<target>הסתר קבצים שייוצרו בצד שמאל</target>
-
-<source>Show files that will be created on the left side</source>
-<target>הראה קבצים שיווצרו בצד שמאל</target>
-
-<source>Hide files that will be created on the right side</source>
 <target>הסתר קבצים שייוצרו בצד ימין</target>
 
-<source>Show files that will be created on the right side</source>
+<source>Show files that will be created on the left side</source>
 <target>הראה קבצים שיווצרו בצד ימין</target>
 
+<source>Hide files that will be created on the right side</source>
+<target>הסתר קבצים שייוצרו בצד שמאל</target>
+
+<source>Show files that will be created on the right side</source>
+<target>הראה קבצים שיווצרו בצד שמאל</target>
+
 <source>Hide files that will be deleted on the left side</source>
-<target>הסתר קבצים שימחקו בצד שמאל</target>
-
-<source>Show files that will be deleted on the left side</source>
-<target>הראה קבצים שימחקו בצד שמאל</target>
-
-<source>Hide files that will be deleted on the right side</source>
 <target>הסתר קבצים שימחקו בצד ימין</target>
 
-<source>Show files that will be deleted on the right side</source>
+<source>Show files that will be deleted on the left side</source>
 <target>הראה קבצים שימחקו בצד ימין</target>
 
+<source>Hide files that will be deleted on the right side</source>
+<target>הסתר קבצים שימחקו בצד שמאל</target>
+
+<source>Show files that will be deleted on the right side</source>
+<target>הראה קבצים שימחקו בצד שמאל</target>
+
 <source>Hide files that will be overwritten on left side</source>
-<target>הסתר קבצים שידרסו בצד שמאל</target>
-
-<source>Show files that will be overwritten on left side</source>
-<target>הראה קבצים שידרסו בצד שמאל</target>
-
-<source>Hide files that will be overwritten on right side</source>
 <target>הסתר קבצים שידרסו בצד ימין</target>
 
-<source>Show files that will be overwritten on right side</source>
+<source>Show files that will be overwritten on left side</source>
 <target>הראה קבצים שידרסו בצד ימין</target>
+
+<source>Hide files that will be overwritten on right side</source>
+<target>הסתר קבצים שידרסו בצד שמאל</target>
+
+<source>Show files that will be overwritten on right side</source>
+<target>הראה קבצים שידרסו בצד שמאל</target>
 
 <source>Hide files that won't be copied</source>
 <target>הסתר קבצים אשר לא יועתקו</target>
@@ -1197,6 +1188,12 @@ Exclude: \stuff\temp\*
 <source>Move files into a time-stamped subdirectory</source>
 <target>העבר קבצים לתוך מחיצות עם שם המכיל טביעת זמן ותאריך</target>
 
+<source>Files</source>
+<target>קבצים</target>
+
+<source>Percentage</source>
+<target>אחוז</target>
+
 <source>%x TB</source>
 <target>%x טרה בייט</target>
 
@@ -1326,6 +1323,9 @@ Exclude: \stuff\temp\*
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>מחיצות תלויות! זהירות בהגדרת כללי סנכרון:</target>
 
+<source>Preparing synchronization...</source>
+<target>מכין סינכרון...</target>
+
 <source>Memory allocation failed!</source>
 <target>הקצאת זכרון נכשלה!</target>
 
@@ -1357,37 +1357,37 @@ Exclude: \stuff\temp\*
 <target>קבצים\מחיצות שונים בערכי התכונות בלבד</target>
 
 <source>Copy new file/folder to left</source>
-<target>העתק קובץ\מחיצה חדש\ה מימין לשמאל</target>
-
-<source>Copy new file/folder to right</source>
 <target>העתק קובץ\מחיצה חדש\ה משמאל לימין</target>
 
-<source>Delete left file/folder</source>
-<target>מחק קובץ\מחיצה בצד שמאל</target>
+<source>Copy new file/folder to right</source>
+<target>העתק קובץ\מחיצה חדש\ה מימין לשמאל</target>
 
-<source>Delete right file/folder</source>
+<source>Delete left file/folder</source>
 <target>מחק קובץ\מחיצה בצד ימין</target>
 
-<source>Move file on left</source>
-<target>העבר קובץ בצד שמאל</target>
+<source>Delete right file/folder</source>
+<target>מחק קובץ\מחיצה בצד שמאל</target>
 
-<source>Move file on right</source>
+<source>Move file on left</source>
 <target>העבר קובץ בצד ימין</target>
 
+<source>Move file on right</source>
+<target>העבר קובץ בצד שמאל</target>
+
 <source>Overwrite left file/folder with right one</source>
-<target>העתק ודרוס קובץ\מחיצה מימין לשמאל</target>
+<target>העתק ודרוס קובץ\מחיצה משמאל לימין</target>
 
 <source>Overwrite right file/folder with left one</source>
-<target>העתק ודרוס קובץ\מחיצה משמאל לימין</target>
+<target>העתק ודרוס קובץ\מחיצה מימין לשמאל</target>
 
 <source>Do nothing</source>
 <target>אל תעשה כלום</target>
 
 <source>Copy file attributes only to left</source>
-<target>העתק תכונות קובץ בלבד מימין לשמאל</target>
+<target>העתק תכונות קובץ בלבד משמאל לימין</target>
 
 <source>Copy file attributes only to right</source>
-<target>העתק תכונות קובץ בלבד משמאל לימין</target>
+<target>העתק תכונות קובץ בלבד מימין לשמאל</target>
 
 <source>Multiple...</source>
 <target>הכפל...</target>
@@ -1443,8 +1443,8 @@ Exclude: \stuff\temp\*
 <source>Target directory name must not be empty!</source>
 <target>שם של מחיצת מטרה אינו יכול להיות ריק!</target>
 
-<source>User-defined directory for deletion was not specified!</source>
-<target>מחיצה מוגדרת משתמש למחיקה לא מוגדרת!</target>
+<source>Directory for file versioning was not supplied!</source>
+<target>לא סופקה מחיצה לרישום גרסאות קבצים</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>מחיצת המקור לא נמצאת:</target>

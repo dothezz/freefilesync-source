@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #include "file_hierarchy.h"
@@ -38,7 +38,7 @@ namespace
 SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
                                     bool selectedForSynchronization,
                                     SyncDirection syncDir,
-                                    const std::wstring& syncDirConflict)
+                                    bool haveDirConflict) //perf: std::wstring was wasteful here
 {
     if (!selectedForSynchronization)
         return cmpResult == FILE_EQUAL ?
@@ -55,7 +55,7 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
                 case SYNC_DIR_RIGHT:
                     return SO_CREATE_NEW_RIGHT; //copy files to right
                 case SYNC_DIR_NONE:
-                    return syncDirConflict.empty() ? SO_DO_NOTHING : SO_UNRESOLVED_CONFLICT;
+                    return haveDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
             }
             break;
 
@@ -67,7 +67,7 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
                 case SYNC_DIR_RIGHT:
                     return SO_DELETE_RIGHT; //delete files on right
                 case SYNC_DIR_NONE:
-                    return syncDirConflict.empty() ? SO_DO_NOTHING : SO_UNRESOLVED_CONFLICT;
+                    return haveDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
             }
             break;
 
@@ -82,7 +82,7 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
                 case SYNC_DIR_RIGHT:
                     return SO_OVERWRITE_RIGHT; //copy from left to right
                 case SYNC_DIR_NONE:
-                    return syncDirConflict.empty() ? SO_DO_NOTHING : SO_UNRESOLVED_CONFLICT;
+                    return haveDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
             }
             break;
 
@@ -94,7 +94,7 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
                 case SYNC_DIR_RIGHT:
                     return SO_COPY_METADATA_TO_RIGHT;
                 case SYNC_DIR_NONE:
-                    return syncDirConflict.empty() ? SO_DO_NOTHING : SO_UNRESOLVED_CONFLICT;
+                    return haveDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
             }
             break;
 
@@ -119,7 +119,7 @@ bool hasDirectChild(const HierarchyObject& hierObj, Predicate p)
 
 SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir, bool active) const
 {
-    return proposedSyncOperation(getCategory(), active, testSyncDir, getSyncOpConflict());
+    return proposedSyncOperation(getCategory(), active, testSyncDir, syncDirConflict.get() != NULL);
 }
 
 
@@ -307,7 +307,7 @@ std::wstring zen::getSyncOpDescription(SyncOperation op)
         case SO_COPY_METADATA_TO_RIGHT:
             return _("Copy file attributes only to right");
         case SO_UNRESOLVED_CONFLICT: //not used on GUI, but in .csv
-            _("Conflict/file cannot be categorized");
+            return _("Conflict/file cannot be categorized");
     }
     assert(false);
     return std::wstring();

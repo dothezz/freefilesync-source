@@ -2,6 +2,14 @@
 |FreeFileSync|
 --------------
 
+Changelog v5.0
+--------------
+New grid control
+New tree control
+Revised Right to Left layout for Hebrew
+Updated translation files
+
+
 Changelog v4.6
 --------------
 Execute user-defined command after synchronization

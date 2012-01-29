@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef FILE_HANDLING_H_INCLUDED
@@ -62,6 +62,8 @@ void moveFile(const Zstring& sourceFile, const Zstring& targetFile, bool ignoreE
 //"ignoreExisting": existing directories and files will be enriched
 void moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExisting, CallbackMoveFile* callback); //throw FileError;
 
+bool supportsPermissions(const Zstring& dirname); //throw FileError, derefernces symlinks
+
 //creates superdirectories automatically:
 void createDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //throw FileError;
 void createDirectory(const Zstring& directory); //throw FileError; -> function overload avoids default parameter ambiguity issues!
@@ -85,7 +87,6 @@ void copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissi
 const Zstring TEMP_FILE_ENDING = Zstr(".ffs_tmp");
 
 void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions); //throw FileError
-
 
 
 

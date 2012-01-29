@@ -2,7 +2,7 @@
 // * This file is part of the zenXML project. It is distributed under the   *
 // * Boost Software License, Version 1.0. See accompanying file             *
 // * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.       *
-// * Copyright (C) 2011 ZenJu (zhnmju123 AT gmx.de)                         *
+// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
 #ifndef ZEN_SCOPEGUARD_8971632487321434
