@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20110903;15175900">
+	<META NAME="CHANGED" CONTENT="20120217;11243000">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -29,9 +29,12 @@
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
 following step-by-step guide describes how to setup RealtimeSync (or
-any other application) as a Windows Service. This can be useful if
-the tool shall run on a SYSTEM account without necessarily requiring
-a user to log in.</FONT></P>
+any other application) as a Windows Service. This is necessary if the
+tool shall run on the SYSTEM account independent from currently
+logged-in users. If you are the only user and all you want is to
+start RealtimeSync automatically then it's better to place a link
+into Windows' Autostart folder, specifying RealtimeSync.exe and the
+.ffs_batch or .ffs_real file as argument.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">1. Get
@@ -75,18 +78,23 @@ service is now ready for operation!</FONT></P>
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif"><B>Attention:</B><BR>When running
 	RealtimeSync as a service the application has no means to interact
-	with the user. Therefore any popup dialog will stop the process
-	flow! Consider the following options when setting up a FreeFileSync
-	batch job:</FONT></P>
+	with the user. Therefore any popup dialog will halt the process!
+	Consider the following options when setting up a FreeFileSync batch
+	job:</FONT></P>
 	<UL>
-		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Enable
-		checkbox &quot;<I>Run minimized</I>&quot; to prevent showing the
-		results dialog after synchronization.</FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Disable
+		checkbox &quot;<I>Show progress dialog</I>&quot; or automatically
+		close it after synchronization.</FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Set
 		&quot;<I>Error handling</I>&quot; to either &quot;<I>Exit
 		instantly</I>&quot; or &quot;<I>Ignore errors</I>&quot;.</FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">At
+		least for debugging purposes or initial setup &quot;Allow service
+		to interact with desktop&quot;. The may show error dialogs
+		otherwise hidden by the SYSTEM account.</FONT></P>
 	</UL>
-</SPAN><BR CLEAR=LEFT><BR>
+</SPAN><BR CLEAR=LEFT><BR><IMG SRC="../img/RunAsService_html_13819326743214.png" NAME="Grafik2" ALIGN=TEXTTOP WIDTH=535 HEIGHT=589 BORDER=0></P>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><BR>
 </P>
 <P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><BR>
 </P>

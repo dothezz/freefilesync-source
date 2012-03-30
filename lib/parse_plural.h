@@ -9,6 +9,7 @@
 
 #include <list>
 #include <memory>
+#include <functional>
 #include <zen/string_base.h>
 
 
@@ -185,7 +186,7 @@ private:
         Token nextToken()
         {
             //skip whitespace
-            pos = std::find_if(pos, stream.end(), std::not1(std::ptr_fun(std::iswspace)));
+            pos = std::find_if(pos, stream.end(), [](char c) { return !zen::isWhiteSpace(c); });
 
             if (pos == stream.end()) return Token(Token::TK_END);
 
@@ -196,12 +197,12 @@ private:
                     return Token(i->second);
                 }
 
-            Wstring::const_iterator digitEnd = std::find_if(pos, stream.end(), std::not1(std::ptr_fun(std::iswdigit)));
+            Wstring::const_iterator digitEnd = std::find_if(pos, stream.end(), [](char c) { return !zen::isDigit(c); });
             int digitCount = digitEnd - pos;
             if (digitCount != 0)
             {
                 Token out(Token::TK_NUMBER);
-                out.number = zen::toNumber<int>(Wstring(&*pos, digitCount));
+                out.number = zen::stringTo<int>(Wstring(&*pos, digitCount));
                 pos += digitCount;
                 return out;
             }
@@ -391,8 +392,7 @@ private:
         template <class T>
         const T& manageObj(const T& obj)
         {
-            std::shared_ptr<Expression> newEntry(new T(obj));
-            dump_.push_back(newEntry);
+            dump_.push_back(std::make_shared<T>(obj));
             return static_cast<T&>(*dump_.back());
         }
 

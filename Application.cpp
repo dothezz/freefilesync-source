@@ -26,13 +26,11 @@
 #include "lib/lock_holder.h"
 
 #ifdef FFS_LINUX
-#include <gtkmm/main.h>
 #include <gtk/gtk.h>
 #endif
 
 using namespace zen;
 using namespace xmlAccess;
-
 
 IMPLEMENT_APP(Application)
 
@@ -67,9 +65,9 @@ bool Application::OnInit()
 
     //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: batch mode requires the wxApp eventhandler to be established
     //for UI update events. This is not the case at the time of OnInit().
-    Connect(wxEVT_IDLE,              wxIdleEventHandler(Application::OnStartApplication), NULL, this);
-    Connect(wxEVT_QUERY_END_SESSION, wxEventHandler    (Application::OnQueryEndSession ), NULL, this);
-    Connect(wxEVT_END_SESSION,       wxEventHandler    (Application::OnQueryEndSession ), NULL, this);
+    Connect(wxEVT_IDLE,              wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
+    Connect(wxEVT_QUERY_END_SESSION, wxEventHandler    (Application::OnQueryEndSession ), nullptr, this);
+    Connect(wxEVT_END_SESSION,       wxEventHandler    (Application::OnQueryEndSession ), nullptr, this);
 
     return true;
 }
@@ -77,12 +75,12 @@ bool Application::OnInit()
 
 void Application::OnStartApplication(wxIdleEvent&)
 {
-    Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
+    Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
 
     //wxWidgets app exit handling is quite weird... we want the app to exit only if the logical main window is closed
     wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
     wxApp* app = wxTheApp;
-    ZEN_ON_BLOCK_EXIT(if (!mainWindowWasSet()) app->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
+    ZEN_ON_SCOPE_EXIT(if (!mainWindowWasSet()) app->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
 
     //if appname is not set, the default is the executable's name!
     SetAppName(wxT("FreeFileSync"));
@@ -93,9 +91,9 @@ void Application::OnStartApplication(wxIdleEvent&)
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
 #elif defined FFS_LINUX
-    Gtk::Main::init_gtkmm_internals();
+    gtk_init(nullptr, nullptr);
 
-    ::gtk_rc_parse((utf8CvrtTo<Zstring>(getResourceDir()) + "styles.rc").c_str()); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((getResourceDir() + "styles.rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
 
@@ -126,100 +124,99 @@ void Application::OnStartApplication(wxIdleEvent&)
     setLanguage(globalSettings.programLanguage);
 
 
-    //test if FFS is to be started on UI with config file passed as commandline parameter
-    std::vector<wxString> commandArgs;
-    for (int i = 1; i < argc; ++i)
+    //determine FFS mode of operation
+    std::vector<wxString> commandArgs; //wxWidgets screws up once again making "argv implicitly convertible to a wxChar**" in 2.9.3,
+    for (int i = 1; i < argc; ++i)     //so we are forced to use this pitiful excuse for a range construction!!
         commandArgs.push_back(argv[i]);
-
-    bool gotDirNames = false;
-    for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
-    {
-        Zstring filename = toZ(*iter);
-
-        if (iter == commandArgs.begin() && dirExists(filename)) //detect which "mode" by testing first command line argument
-        {
-            gotDirNames = true;
-            break;
-        }
-
-        if (!fileExists(filename)) //be a little tolerant
-        {
-            if (fileExists(filename + Zstr(".ffs_batch")))
-                filename = filename + Zstr(".ffs_batch");
-            else if (fileExists(filename + Zstr(".ffs_gui")))
-                filename = filename + Zstr(".ffs_gui");
-            else
-            {
-                wxMessageBox(_("File does not exist:") + L" \"" + filename + L"\"", _("Error"), wxOK | wxICON_ERROR);
-                return;
-            }
-        }
-    }
 
     if (commandArgs.empty())
         runGuiMode(commandArgs, globalSettings);
-    else if (gotDirNames) //mode 1: create temp configuration based on directory names passed
+    else
     {
-        XmlGuiConfig guiCfg;
-        guiCfg.mainCfg.syncCfg.directionCfg.var = DirectionConfig::MIRROR;
-
-        for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
+        const bool gotDirNames = std::any_of(commandArgs.begin(), commandArgs.end(), [](const wxString& dirname) { return dirExists(toZ(dirname)); });
+        if (gotDirNames) //mode 1: create temp configuration based on directory names passed
         {
-            size_t index = iter - commandArgs.begin();
-            Zstring dirname = toZ(*iter);
+            XmlGuiConfig guiCfg;
+            guiCfg.mainCfg.syncCfg.directionCfg.var = DirectionConfig::MIRROR;
 
-            FolderPairEnh& fp = [&]() -> FolderPairEnh&
+            for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
             {
-                if (index < 2)
-                    return guiCfg.mainCfg.firstPair;
+                size_t index = iter - commandArgs.begin();
+                Zstring dirname = toZ(*iter);
 
-                guiCfg.mainCfg.additionalPairs.resize((index - 2) / 2 + 1);
-                return guiCfg.mainCfg.additionalPairs.back();
-            }();
-
-            if (index % 2 == 0)
-                fp.leftDirectory = dirname;
-            else if (index % 2 == 1)
-                fp.rightDirectory = dirname;
-        }
-
-        runGuiMode(guiCfg, globalSettings);
-    }
-    else //mode 2: try to set config/batch-filename set by %1 parameter
-        switch (getMergeType(commandArgs)) //throw ()
-        {
-            case MERGE_BATCH: //pure batch config files
-                if (commandArgs.size() == 1)
-                    runBatchMode(commandArgs[0], globalSettings);
-                else
-                    runGuiMode(commandArgs, globalSettings);
-                break;
-
-            case MERGE_GUI:       //pure gui config files
-            case MERGE_GUI_BATCH: //gui and batch files
-                runGuiMode(commandArgs, globalSettings);
-                break;
-
-            case MERGE_OTHER: //= none or unknown;
-                //commandArgs are not empty and contain at least one non-gui/non-batch config file: find it!
-                std::find_if(commandArgs.begin(), commandArgs.end(),
-                             [](const wxString& filename) -> bool
+                FolderPairEnh& fp = [&]() -> FolderPairEnh&
                 {
-                    switch (getXmlType(filename)) //throw()
-                    {
-                        case XML_TYPE_GLOBAL:
-                        case XML_TYPE_OTHER:
-                            wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-                            return true;
+                    if (index < 2)
+                        return guiCfg.mainCfg.firstPair;
 
-                        case XML_TYPE_GUI:
-                        case XML_TYPE_BATCH:
-                            break;
-                    }
-                    return false;
-                });
-                break;
+                    guiCfg.mainCfg.additionalPairs.resize((index - 2) / 2 + 1);
+                    return guiCfg.mainCfg.additionalPairs.back();
+                }();
+
+                if (index % 2 == 0)
+                    fp.leftDirectory = dirname;
+                else if (index % 2 == 1)
+                    fp.rightDirectory = dirname;
+            }
+
+            runGuiMode(guiCfg, globalSettings);
         }
+        else //mode 2: try to set config/batch-filename set by %1 parameter
+        {
+            for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
+            {
+                wxString& filename = *iter;
+
+                if (!fileExists(toZ(filename))) //be a little tolerant
+                {
+                    if (fileExists(toZ(filename) + Zstr(".ffs_batch")))
+                        filename += L".ffs_batch";
+                    else if (fileExists(toZ(filename) + Zstr(".ffs_gui")))
+                        filename += L".ffs_gui";
+                    else
+                    {
+                        wxMessageBox(_("File does not exist:") + L" \"" + filename + L"\"", _("Error"), wxOK | wxICON_ERROR);
+                        return;
+                    }
+                }
+            }
+
+            switch (getMergeType(commandArgs)) //throw ()
+            {
+                case MERGE_BATCH: //pure batch config files
+                    if (commandArgs.size() == 1)
+                        runBatchMode(commandArgs[0], globalSettings);
+                    else
+                        runGuiMode(commandArgs, globalSettings);
+                    break;
+
+                case MERGE_GUI:       //pure gui config files
+                case MERGE_GUI_BATCH: //gui and batch files
+                    runGuiMode(commandArgs, globalSettings);
+                    break;
+
+                case MERGE_OTHER: //= none or unknown;
+                    //commandArgs are not empty and contain at least one non-gui/non-batch config file: find it!
+                    std::find_if(commandArgs.begin(), commandArgs.end(),
+                                 [](const wxString& filename) -> bool
+                    {
+                        switch (getXmlType(filename)) //throw()
+                        {
+                            case XML_TYPE_GLOBAL:
+                            case XML_TYPE_OTHER:
+                                wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                                return true;
+
+                            case XML_TYPE_GUI:
+                            case XML_TYPE_BATCH:
+                                break;
+                        }
+                        return false;
+                    });
+                    break;
+            }
+        }
+    }
 }
 
 
@@ -238,18 +235,18 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(toWx(getConfigDir()) + wxT("LastError.txt"), wxFile::write);
-        safeOutput.Write(wxString::FromAscii(e.what()));
+        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
+        safeOutput.Write(utf8CvrtTo<wxString>(e.what()));
 
-        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", wxString::FromAscii(e.what()));
+        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", utf8CvrtTo<wxString>(e.what()));
         return -9;
     }
     catch (...) //catch the rest
     {
-        wxFile safeOutput(toWx(getConfigDir()) + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
         safeOutput.Write(wxT("Unknown exception!"));
 
-        wxSafeShowMessage(_("An exception occurred!"), wxT("Unknown exception!"));
+        wxSafeShowMessage(_("An exception occurred!"), L"Unknown exception!");
         return -9;
     }
 
@@ -279,9 +276,7 @@ int Application::OnExit()
 void Application::OnQueryEndSession(wxEvent& event)
 {
     //alas wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/3069
-
-    MainDialog* mainWin = dynamic_cast<MainDialog*>(GetTopWindow());
-    if (mainWin)
+    if (auto mainWin = dynamic_cast<MainDialog*>(GetTopWindow()))
         mainWin->onQueryEndSession();
     OnExit();
     //wxEntryCleanup(); -> gives popup "dll init failed" on XP

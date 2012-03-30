@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>תצורת מסנן</target>
 
-<source>Customize columns</source>
-<target>סדר עמודות</target>
-
 <source>Global settings</source>
 <target>משתנים גלובליים</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>עיין</target>
 
-<source>Error reading from synchronization database:</source>
-<target>שגיאה בקריאה מבסיס הנתונים של הסנכרון:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>שגיאה ברישום לבסיס נתוני סנכרון:</target>
-
 <source>Invalid command line: %x</source>
 <target>שורת פקודה בלתי חוקית: %x</target>
+
+<source>Info</source>
+<target>מידע</target>
+
+<source>Fatal Error</source>
+<target>שגיאה פטלית</target>
 
 <source>Windows Error Code %x:</source>
 <target>קוד שגיאת חלונות %x:</target>
@@ -139,14 +136,20 @@
 <pluralform>%x בייט</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>שגיאה בקריאה מבסיס הנתונים של הסנכרון:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>שגיאה ברישום לבסיס נתוני סנכרון:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>מסד נתונים של הסנכרון לא תואם:</target>
+
 <source>Initial synchronization:</source>
 <target>סנכרון ראשוני:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>אחד מקובצי בסיס הנתונים הבא עדיין לא קיים</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>מסד נתונים של הסנכרון לא תואם:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>קבצי בסיס הנתונים אינם חולקים ארוע סנכרון משותף:</target>
@@ -172,12 +175,6 @@
 <pluralform>%x שניות</pluralform>
 </target>
 
-<source>Info</source>
-<target>מידע</target>
-
-<source>Fatal Error</source>
-<target>שגיאה פטלית</target>
-
 <source>Error reading file:</source>
 <target>שגיאה בקריאת קובץ:</target>
 
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>שגיאה בניתוח קובץ תצורה:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>שגיאה בהעברה לסל המיחזור:</target>
+<source>Configuration loaded partially only:</source>
+<target>תצורה נטענה חלקית בלבד:</target>
 
-<source>Could not load a required DLL:</source>
-<target>:נדרש DLL לא יכל לטעון</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>לא יכול להעביר את %x לסל המיחזור!</target>
+
+<source>Cannot load file %x.</source>
+<target>לא יכול לטעון קובץ %x!</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>שגיאה בגישה לשרות Volume Shadow Copy Service</target>
@@ -214,11 +214,11 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>לא נתמכת בגרסה זאת אנא התקן גרסה 64 WOW64 העתקת צל ב</target>
 
-<source>Could not determine volume name for file:</source>
-<target>לא יכול לקבוע שם כרך לקובץ:</target>
+<source>Cannot determine volume name for file:</source>
+<target>לא יכול לקבוע שם כונן עבור קובץ:</target>
 
-<source>Volume name %x not part of filename %y!</source>
-<target>כנונן %x לא בנתיב של קובץ %y!</target>
+<source>Volume name %x not part of file name %y!</source>
+<target>ככונן %x לא בנתיב של קובץ %y!</target>
 
 <source>/sec</source>
 <target>/שנ</target>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>קובץ לא קיים:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>XML לא יכול לקרא ערכים מצמתי :</target>
+<source>Cannot read the following XML elements:</source>
+<target>לא יכול לקרוא את שמות צמתי XML:</target>
 
 <source>S&ave configuration...</source>
 <target>&שמור תצורה...</target>
@@ -453,9 +453,6 @@ The command line is executed each time:
 <source>2. &Synchronize...</source>
 <target>2. &סנכרן...</target>
 
-<source>S&witch view</source>
-<target>החל&ף תצוגה</target>
-
 <source>&New</source>
 <target>&חדש</target>
 
@@ -543,17 +540,17 @@ The command line is executed each time:
 <source>Speed:</source>
 <target>מהירות:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>זמן נותר:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>זמן עבר:</target>
 
 <source>Batch job</source>
 <target>עבודת אצווה</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>צור קובץ אצווה לסינכרון אוטומטי. הפעל באמצעות הקשה כפולה על הקובץ או באמצעות שורת פקודה: FreeFileSync <ffs_batch_file>. ההפעלה ניתנת לתזמון במתזמן המשימות של המערכת.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>צור קובץ אצווה ומכן הסינכרון. הפעל באמצעות הקשה כפולה על שם הקובץ או הפעל שורת פקודה: FreeFileSync.exe <ffs_batch file>. ההפעלה ניתנת לתזמון במתזמן המשימות של מערכת ההפעלה.</target>
 
 <source>Help</source>
 <target>עזרה</target>
@@ -566,9 +563,6 @@ The command line is executed each time:
 
 <source>Right</source>
 <target>שמאל</target>
-
-<source>Overview</source>
-<target>מבט כללי</target>
 
 <source>Status feedback</source>
 <target>משוב מצב</target>
@@ -714,8 +708,8 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>מפורסם במסגרת GNU General Public License</target>
 
-<source>Ignore subsequent errors</source>
-<target>התעלם משגיאות נישנות</target>
+<source>Ignore further errors</source>
+<target>התעלם משגיאות נוספות</target>
 
 <source>Hide further error messages during the current process</source>
 <target>הסתר הודעות שגיאה נוספות בהמשך התהליך הנוכחי</target>
@@ -738,22 +732,22 @@ is the same
 <source>&No</source>
 <target>&לא</target>
 
+<source>Use Recycle Bin</source>
+<target>השתמש בסל המיחזור</target>
+
 <source>Delete on both sides</source>
 <target>מחק בשני הצדדים</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>מחק בשני הצדדים אף אם הקובץ נבחר בצד אחד בלבד</target>
 
-<source>Use Recycle Bin</source>
-<target>השתמש בסל המיחזור</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-רק קבצים\מחיצות המתאימים לכל הגדרות המסנן יסומנו לסינכרון.
-הערה: השם לסינון חייב להיות מוגדר באוםן יחסי (!) למחיצות הראשיות לסינכרון.
+רק קבצים המתאימים לכל הגדרות המסנן יסונכרנו.
+הערה: שמות קבצים חייבים להיות מוגדרים באופן יחסי למחיצות הראשיות!
 </target>
 
 <source>Hints:</source>
@@ -789,20 +783,20 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>אל תכלול</target>
 
-<source>Minimum file size</source>
-<target>גודל קובץ מינימלי</target>
+<source>Time span</source>
+<target>תחום זמן</target>
 
-<source>Maximum file size</source>
-<target>גודל קובץ מקסימלי</target>
+<source>File size</source>
+<target>גודל קובץ</target>
+
+<source>Minimum</source>
+<target>מינימום</target>
+
+<source>Maximum</source>
+<target>מקסימום</target>
 
 <source>&Default</source>
 <target>&ברירת מחדל</target>
-
-<source>Move column up</source>
-<target>העלה עמודה</target>
-
-<source>Move column down</source>
-<target>הורד עמודה</target>
 
 <source>Transactional file copy</source>
 <target>העתקת קובץ בעסקה</target>
@@ -822,14 +816,8 @@ Exclude: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>העבר הרשאות קבצים ומחיצות (דורש הרשאות מנהל מערכת)</target>
 
-<source>Hidden dialogs:</source>
-<target>דיאלוגים מוסתרים:</target>
-
-<source>Reset</source>
-<target>אפס</target>
-
-<source>Show hidden dialogs</source>
-<target>הראה דיאלוגים נסתרים</target>
+<source>Restore hidden dialogs</source>
+<target>שחזר דיאלוגים מוסתרים</target>
 
 <source>External applications</source>
 <target>תוכנה חיצונית</target>
@@ -861,8 +849,8 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>זוגות מחיצות</target>
 
-<source>Compressed view</source>
-<target>תצוגה מכווצת</target>
+<source>Overview</source>
+<target>מבט כללי</target>
 
 <source>Select view</source>
 <target>בחר תצוגה</target>
@@ -891,8 +879,8 @@ Exclude: \stuff\temp\*
 <source>Exclude all</source>
 <target>הוצא מן הכלל הכל</target>
 
-<source>Icon size:</source>
-<target>גודל סמל:</target>
+<source>Show icons:</source>
+<target>הצג סמלים:</target>
 
 <source>Small</source>
 <target>קטן</target>
@@ -917,6 +905,9 @@ Exclude: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>תצורה נשמרה!</target>
+
+<source>Never save changes</source>
+<target>אל תשמור שינויים לעולם</target>
 
 <source>Save changes to current configuration?</source>
 <target>שמור שינויים לתצורה נוכחית?</target>
@@ -1029,9 +1020,6 @@ Exclude: \stuff\temp\*
 <source>Error writing file:</source>
 <target>שגיאה בכתיבת קובץ:</target>
 
-<source>Batch file created successfully!</source>
-<target>קובץ אצווה נוצר בהצלחה!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1110,6 +1098,9 @@ Exclude: \stuff\temp\*
 <source>This year</source>
 <target>בשנה הנוכחית</target>
 
+<source>Last x days</source>
+<target>x ימים אחרונים</target>
+
 <source>Byte</source>
 <target>בייט</target>
 
@@ -1119,11 +1110,8 @@ Exclude: \stuff\temp\*
 <source>MB</source>
 <target>מגה-בייט</target>
 
-<source>Filter: All pairs</source>
-<target>כל הזוגות :מסונן</target>
-
-<source>Filter: Single pair</source>
-<target>זוג אחד :מסונן</target>
+<source>Filter</source>
+<target>מסנן</target>
 
 <source>Direct</source>
 <target>כוון</target>
@@ -1149,8 +1137,8 @@ Exclude: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- הצד השני מקביל ל- %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>שחזר כל הדיאלוגים הנסתרים?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>להפוך דיאלוגים מוסתרים לגלויים שוב?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1281,9 +1269,6 @@ Exclude: \stuff\temp\*
 <source>Error copying file:</source>
 <target>שגיאה בהעתקת קובץ:</target>
 
-<source>Error opening file:</source>
-<target>שגיאה בפתיחת קובץ:</target>
-
 <source>Error traversing directory:</source>
 <target>שגיאה בהצלבת מחיצות</target>
 
@@ -1326,8 +1311,8 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>מכין סינכרון...</target>
 
-<source>Memory allocation failed!</source>
-<target>הקצאת זכרון נכשלה!</target>
+<source>Out of memory!</source>
+<target>תם הזכרון!</target>
 
 <source>File %x has an invalid date!</source>
 <target>קובץ %x מכיל תאריך שגוי!</target>
@@ -1482,11 +1467,11 @@ Exclude: \stuff\temp\*
 <source>Generating database...</source>
 <target>מיצר בסיס נתונים...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>אין מה לסנכרן ע"פ הקונפיגורציה!</target>
+<source>Nothing to synchronize!</source>
+<target>אין מה לסנכרן!</target>
 
-<source>Error copying locked file %x!</source>
-<target>שגיאה בהעתקת קובץ נעול %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>לא ניתן להעתיק קובץ נעול %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>שגיאה של אימות נתונים קובץ מקור ומטרה בעלי תכולת נתונים שונה!</target>

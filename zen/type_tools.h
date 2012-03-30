@@ -8,11 +8,12 @@
 #ifndef TYPE_TOOLS_HEADER_45237590734254545
 #define TYPE_TOOLS_HEADER_45237590734254545
 
+#include "type_traits.h"
+
 namespace zen
 {
 //########## Strawman Classes ##########################
-struct EmptyType {};
-struct NullType {};
+struct NullType {}; //:= no type here
 
 //########## Type Mapping ##############################
 template <int n>
@@ -23,61 +24,47 @@ struct Type2Type {};
 
 //########## Control Structures ########################
 template <bool flag, class T, class U>
-struct SelectIf
-{
-    typedef T Result;
-};
+struct SelectIf : ResultType<T> {};
+
 template <class T, class U>
-struct SelectIf<false, T, U>
-{
-    typedef U Result;
-};
+struct SelectIf<false, T, U> : ResultType<U> {};
 //------------------------------------------------------
 template <class T, class U>
-struct IsSameType
-{
-    enum { result = false };
-};
+struct IsSameType : StaticBool<false> {};
 
 template <class T>
-struct IsSameType<T, T>
-{
-    enum { result = true };
-};
+struct IsSameType<T, T> : StaticBool<true> {};
 
 //------------------------------------------------------
 template <bool, class T = void>
 struct EnableIf {};
-template <class T>
-struct EnableIf<true, T>
-{
-    typedef T Result;
-};
 
+template <class T>
+struct EnableIf<true, T> : ResultType<T> {};
 //########## Type Cleanup ##############################
 template <class T>
-struct RemoveRef { typedef T Result; };
+struct RemoveRef : ResultType<T> {};
 
 template <class T>
-struct RemoveRef<T&> { typedef T Result; };
+struct RemoveRef<T&> : ResultType<T> {};
 //------------------------------------------------------
 template <class T>
-struct RemoveConst { typedef T Result; };
+struct RemoveConst : ResultType<T> {};
 
 template <class T>
-struct RemoveConst<const T> { typedef T Result; };
+struct RemoveConst<const T> : ResultType<T> {};
 //------------------------------------------------------
 template <class T>
-struct RemovePointer { typedef T Result; };
+struct RemovePointer : ResultType<T> {};
 
 template <class T>
-struct RemovePointer<T*> { typedef T Result; };
+struct RemovePointer<T*> : ResultType<T> {};
 //------------------------------------------------------
 template <class T>
-struct RemoveArray { typedef T Result; };
+struct RemoveArray : ResultType<T> {};
 
 template <class T, int N>
-struct RemoveArray<T[N]> { typedef T Result; };
+struct RemoveArray<T[N]> : ResultType<T> {};
 
 //########## Sorting ##############################
 /*

@@ -9,7 +9,6 @@
 #define STRING_TRAITS_HEADER_813274321443234
 
 #include "type_tools.h"
-#include "type_traits.h"
 #include "assert_static.h"
 
 
@@ -17,13 +16,13 @@
 namespace zen
 {
 /*
-IsStringLike<>::result:
-    IsStringLike<const wchar_t*>::result; //equals "true"
-	IsStringLike<const int*>    ::result; //equals "false"
+IsStringLike<>::value:
+    IsStringLike<const wchar_t*>::value; //equals "true"
+	IsStringLike<const int*>    ::value; //equals "false"
 
-GetCharType<>::Result:
-	GetCharType<std::wstring>::Result  //equals wchar_t
-	GetCharType<wchar_t[5]>  ::Result  //equals wchar_t
+GetCharType<>::Type:
+	GetCharType<std::wstring>::Type  //equals wchar_t
+	GetCharType<wchar_t[5]>  ::Type  //equals wchar_t
 
 strBegin():
 	std::wstring str(L"dummy");
@@ -67,21 +66,6 @@ private:
 //---------------------- implementation ----------------------
 namespace implementation
 {
-ZEN_INIT_DETECT_MEMBER(c_str)   //we don't know the exact declaration of the member attribute and it may be in a base class!
-ZEN_INIT_DETECT_MEMBER(length)  //
-
-template<typename T, bool isClassType>
-struct HasStringMembers { enum { result = false }; };
-
-template<typename T>
-struct HasStringMembers<T, true> //Note: we can apply non-typed member-check on class types only!
-{
-    enum { result = HasMember_c_str <T>::result &&
-                    HasMember_length<T>::result
-         };
-};
-
-
 template<class S, class Char> //test if result of S::c_str() can convert to const Char*
 class HasConversion
 {
@@ -91,63 +75,69 @@ class HasConversion
     static Yes& hasConversion(const Char*);
     static  No& hasConversion(...);
 
-    static S createInstance();
+    static S& createInstance();
 
 public:
-    enum { result = sizeof(hasConversion(createInstance().c_str())) == sizeof(Yes) };
+    enum { value = sizeof(hasConversion(createInstance().c_str())) == sizeof(Yes) };
 };
 
 
-template <class S, bool isStringClass>  struct GetCharTypeImpl { typedef EmptyType Result; };
-template <class S>                      struct GetCharTypeImpl<S, true >
+template <class S, bool isStringClass>  struct GetCharTypeImpl : ResultType<NullType> {};
+template <class S>
+struct GetCharTypeImpl<S, true> :
+        ResultType<
+        typename SelectIf<HasConversion<S, wchar_t>::value, wchar_t,
+        typename SelectIf<HasConversion<S, char   >::value, char, NullType>::Type
+        >::Type>
 {
-    //typedef typename S::value_type Result;
+    //typedef typename S::value_type Type;
     /*DON'T use S::value_type:
         1. support Glib::ustring: value_type is "unsigned int" but c_str() returns "const char*"
         2. wxString, wxWidgets v2.9, has some questionable string design: wxString::c_str() returns a proxy (wxCStrData) which
            is implicitly convertible to *both* "const char*" and "const wchar_t*" while wxString::value_type is a wrapper around an unsigned int
     */
-    typedef typename SelectIf<HasConversion<S, wchar_t>::result, wchar_t,
-            typename SelectIf<HasConversion<S, char>::result, char, EmptyType>::Result
-            >::Result Result;
 };
 
-
-template <> struct GetCharTypeImpl<char,    false> { typedef char    Result; };
-template <> struct GetCharTypeImpl<wchar_t, false> { typedef wchar_t Result; };
+template <> struct GetCharTypeImpl<char,    false> : ResultType<char   > {};
+template <> struct GetCharTypeImpl<wchar_t, false> : ResultType<wchar_t> {};
 
 ZEN_INIT_DETECT_MEMBER_TYPE(value_type);
+ZEN_INIT_DETECT_MEMBER(c_str);  //we don't know the exact declaration of the member attribute and it may be in a base class!
+ZEN_INIT_DETECT_MEMBER(length); //
 
 template <class S>
 class StringTraits
 {
-    typedef typename RemoveRef    <S           >::Result NonRefType;
-    typedef typename RemoveConst  <NonRefType  >::Result NonConstType;
-    typedef typename RemoveArray  <NonConstType>::Result NonArrayType;
-    typedef typename RemovePointer<NonArrayType>::Result NonPtrType;
-    typedef typename RemoveConst  <NonPtrType  >::Result UndecoratedType; //handle "const char* const"
+    typedef typename RemoveRef    <S           >::Type NonRefType;
+    typedef typename RemoveConst  <NonRefType  >::Type NonConstType;
+    typedef typename RemoveArray  <NonConstType>::Type NonArrayType;
+    typedef typename RemovePointer<NonArrayType>::Type NonPtrType;
+    typedef typename RemoveConst  <NonPtrType  >::Type UndecoratedType; //handle "const char* const"
 
 public:
     enum
     {
-        isStringClass = HasStringMembers<NonConstType, HasMemberType_value_type<NonConstType>::result>::result
+        isStringClass = HasMemberType_value_type<NonConstType>::value &&
+                        HasMember_c_str         <NonConstType>::value &&
+                        HasMember_length        <NonConstType>::value
     };
 
-    typedef typename GetCharTypeImpl<UndecoratedType, isStringClass>::Result CharType;
+    typedef typename GetCharTypeImpl<UndecoratedType, isStringClass>::Type CharType;
 
     enum
     {
-        isStringLike = IsSameType<CharType, char>::result ||
-        IsSameType<CharType, wchar_t>::result
+        isStringLike =
+            IsSameType<CharType, char   >::value ||
+        IsSameType<CharType, wchar_t>::value
     };
 };
 }
 
 template <class T>
-struct IsStringLike { enum { result = implementation::StringTraits<T>::isStringLike }; };
+struct IsStringLike : StaticBool<implementation::StringTraits<T>::isStringLike> {};
 
 template <class T>
-struct GetCharType { typedef typename implementation::StringTraits<T>::CharType Result; };
+struct GetCharType : ResultType<typename implementation::StringTraits<T>::CharType> {};
 
 
 namespace implementation
@@ -155,7 +145,7 @@ namespace implementation
 template <class C> inline
 size_t cStringLength(const C* str) //strlen()
 {
-    assert_static((IsSameType<C, char>::result || IsSameType<C, wchar_t>::result));
+    assert_static((IsSameType<C, char>::value || IsSameType<C, wchar_t>::value));
     size_t len = 0;
     while (*str++ != 0)
         ++len;
@@ -165,7 +155,7 @@ size_t cStringLength(const C* str) //strlen()
 
 
 template <class S> inline
-const typename GetCharType<S>::Result* strBegin(const S& str, typename EnableIf<implementation::StringTraits<S>::isStringClass>::Result* = NULL) //SFINAE: T must be a "string"
+const typename GetCharType<S>::Type* strBegin(const S& str, typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type* = nullptr) //SFINAE: T must be a "string"
 {
     return str.c_str();
 }
@@ -177,7 +167,7 @@ inline const wchar_t* strBegin(const wchar_t& ch)  { return &ch; }
 
 
 template <class S> inline
-size_t strLength(const S& str, typename EnableIf<implementation::StringTraits<S>::isStringClass>::Result* = NULL) //SFINAE: T must be a "string"
+size_t strLength(const S& str, typename EnableIf<implementation::StringTraits<S>::isStringClass>::Type* = nullptr) //SFINAE: T must be a "string"
 {
     return str.length();
 }

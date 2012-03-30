@@ -66,7 +66,7 @@ struct DstHackCallback; //DST hack not required on Linux
 void traverseFolder(const Zstring& directory, //throw();
                     bool followSymlinks,
                     TraverseCallback& sink,
-                    DstHackCallback* dstCallback = NULL); //apply DST hack if callback is supplied
+                    DstHackCallback* dstCallback = nullptr); //apply DST hack if callback is supplied
 //followSymlinks:
 //"true":  Symlinks dereferenced and reported via onFile() and onDir() => onSymlink not used!
 //"false": Symlinks directly reported via onSymlink(), directory symlinks are not followed

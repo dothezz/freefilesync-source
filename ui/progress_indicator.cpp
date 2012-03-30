@@ -19,7 +19,6 @@
 #include <wx+/no_flicker.h>
 #include "gui_generated.h"
 #include "../lib/resources.h"
-#include "../lib/error_log.h"
 #include "../lib/statistics.h"
 #include "tray_icon.h"
 #include "taskbar.h"
@@ -394,11 +393,11 @@ wxBitmap buttonReleased(const std::string& name)
 class LogControl : public LogControlGenerated
 {
 public:
-    LogControl(wxWindow* parent, const ErrorLogging& log) : LogControlGenerated(parent), log_(log)
+    LogControl(wxWindow* parent, const ErrorLog& log) : LogControlGenerated(parent), log_(log)
     {
-        const int errorCount   = log_.typeCount(TYPE_ERROR | TYPE_FATAL_ERROR);
-        const int warningCount = log_.typeCount(TYPE_WARNING);
-        const int infoCount    = log_.typeCount(TYPE_INFO);
+        const int errorCount   = log_.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR);
+        const int warningCount = log_.getItemCount(TYPE_WARNING);
+        const int infoCount    = log_.getItemCount(TYPE_INFO);
 
         m_bpButtonErrors->init(buttonPressed ("error"), wxString(_("Error")) + wxString::Format(wxT(" (%d)"), errorCount),
                                buttonReleased("error"), wxString(_("Error")) + wxString::Format(wxT(" (%d)"), errorCount));
@@ -419,7 +418,7 @@ public:
 
         updateLogText();
 
-        m_textCtrlInfo->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(LogControl::onKeyEvent), NULL, this);
+        m_textCtrlInfo->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(LogControl::onKeyEvent), nullptr, this);
     }
 
     virtual void OnErrors(wxCommandEvent& event)
@@ -467,32 +466,28 @@ private:
         if (m_bpButtonInfo->isActive())
             includedTypes |= TYPE_INFO;
 
-        const std::vector<wxString>& messages = log_.getFormattedMessages(includedTypes);
-
         //fast replacement for wxString modelling exponential growth
         typedef Zbase<wchar_t> zxString;
+        zxString logText;
 
-        zxString newLogText; //perf: wxString doesn't model exponential growth and so is out
-
-        if (!messages.empty())
-            for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
+        const auto& entries = log_.getEntries();
+        for (auto iter = entries.begin(); iter != entries.end(); ++iter)
+            if (iter->type & includedTypes)
             {
-                newLogText += copyStringTo<zxString>(*i);
-                newLogText += wxT("\n");
+                logText += copyStringTo<zxString>(formatMessage(*iter));
+                logText += L'\n';
             }
-        else //if no messages match selected view filter, show final status message at least
-        {
-            const std::vector<wxString>& allMessages = log_.getFormattedMessages();
-            if (!allMessages.empty())
-                newLogText = copyStringTo<zxString>(allMessages.back());
-        }
+
+        if (logText.empty()) //if no messages match selected view filter, show final status message at least
+            if (!entries.empty())
+                logText = copyStringTo<zxString>(formatMessage(entries.back()));
 
         wxWindowUpdateLocker dummy(m_textCtrlInfo);
-        m_textCtrlInfo->ChangeValue(copyStringTo<wxString>(newLogText));
+        m_textCtrlInfo->ChangeValue(copyStringTo<wxString>(logText));
         m_textCtrlInfo->ShowPosition(m_textCtrlInfo->GetLastPosition());
     }
 
-    const ErrorLogging log_;
+    const ErrorLog log_;
 };
 
 
@@ -589,15 +584,20 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
     {
         if (secProposed <= 10)
             return 10; //minimum block size
-
         if (secProposed <= 20) //avoid flicker between 10<->15<->20 sec blocks
             return bestFit(secProposed, 10, 20);
+        if (secProposed <= 30)
+            return bestFit(secProposed, 20, 30);
+        if (secProposed <= 60)
+            return bestFit(secProposed, 30, 60);
 
-        //for seconds and minutes: nice numbers are 1, 5, 10, 15, 20, 30
+        //for minutes: nice numbers are 1, 2, 5, 10, 15, 20, 30
         auto calcBlock = [](double val) -> double
         {
+            if (val <= 2)
+                return bestFit(val, 1, 2); //
             if (val <= 5)
-                return bestFit(val, 1, 5); //
+                return bestFit(val, 2, 5); //
             if (val <= 10)
                 return bestFit(val, 5, 10); // a good candidate for a variadic template!
             if (val <= 15)
@@ -608,15 +608,13 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
                 return bestFit(val, 20, 30);
             return bestFit(val, 30, 60);
         };
-
-        if (secProposed <= 60)
-            return calcBlock(secProposed);
-        else if (secProposed <= 3600)
+        if (secProposed <= 3600)
             return calcBlock(secProposed / 60) * 60;
-        else if (secProposed <= 3600 * 24)
+
+        if (secProposed <= 3600 * 24)
             return nextNiceNumber(secProposed / 3600) * 3600;
-        else
-            return nextNiceNumber(secProposed / (24 * 3600)) * 24 * 3600; //round up to full days
+
+        return nextNiceNumber(secProposed / (24 * 3600)) * 24 * 3600; //round up to full days
     }
 
     virtual wxString formatText(double timeElapsed, double optimalBlockSize) const
@@ -662,7 +660,7 @@ public:
     void setStatusText_NoUpdate(const wxString& text);
     void updateStatusDialogNow(bool allowYield = true);
 
-    void processHasFinished(SyncStatus::SyncStatusID id, const ErrorLogging& log);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
+    void processHasFinished(SyncStatus::SyncStatusID id, const ErrorLog& log);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
 
     std::wstring getExecWhenFinishedCommand() const;
 
@@ -776,20 +774,20 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
 
     try //try to get access to Windows 7/Ubuntu taskbar
     {
-        taskbar_.reset(new Taskbar(mainDialog != NULL ? *static_cast<wxTopLevelWindow*>(mainDialog) : *this));
+        taskbar_.reset(new Taskbar(mainDialog ? *static_cast<wxTopLevelWindow*>(mainDialog) : *this));
     }
     catch (const TaskbarNotAvailable&) {}
 
     //hide "processed" statistics until end of process
-    bSizerFinalStat      ->Show(false);
-    m_buttonOK           ->Show(false);
-    m_staticTextItemsProc->Show(false);
-    bSizerItemsProc      ->Show(false);
+    bSizerFinalStat           ->Show(false);
+    m_buttonOK                ->Show(false);
+    m_staticTextLabelItemsProc->Show(false);
+    bSizerItemsProc           ->Show(false);
 
     SetIcon(GlobalResources::instance().programIcon); //set application icon
 
     //register key event
-    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncStatusImpl::OnKeyPressed), NULL, this);
+    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncStatusImpl::OnKeyPressed), nullptr, this);
 
     setCurrentStatus(startStatus); //first state: will be shown while waiting for dir locks (if at all)
 
@@ -919,7 +917,7 @@ void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progress
 {
     //write status information to systray, if window is minimized
     if (trayIcon.get())
-        trayIcon->setToolTip2(progressText, fraction);
+        trayIcon->setToolTip(progressText, fraction);
 
     wxString progressTextFmt = progressText;
     progressTextFmt.Replace(wxT("\n"), wxT(" - "));
@@ -1123,7 +1121,6 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
         if (evaluateZorder(*this, *mainDialog) == ZORDER_WRONG)
         {
             HWND hProgress = static_cast<HWND>(GetHWND());
-
             if (::IsWindowVisible(hProgress))
             {
                 ::ShowWindow(hProgress, SW_HIDE); //make Windows recalculate z-order
@@ -1148,12 +1145,14 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
         */
         updateUiNow();
     }
+    else
+        Update(); //don't wait until next idle event (who knows what blocking process comes next?)
 }
 
 
 bool SyncStatus::SyncStatusImpl::currentProcessIsRunning()
 {
-    return abortCb_ != NULL;
+    return abortCb_ != nullptr;
 }
 
 
@@ -1209,14 +1208,14 @@ void SyncStatus::SyncStatusImpl::setCurrentStatus(SyncStatus::SyncStatusID id)
 }
 
 
-void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id, const ErrorLogging& log) //essential to call this in StatusHandler derived class destructor
+void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id, const ErrorLog& log) //essential to call this in StatusHandler derived class destructor
 {
     //at the LATEST(!) to prevent access to currentStatusHandler
     //enable okay and close events; may be set in this method ONLY
 
     wxWindowUpdateLocker dummy(this); //badly needed
 
-    abortCb_ = NULL; //avoid callback to (maybe) deleted parent process
+    abortCb_ = nullptr; //avoid callback to (maybe) deleted parent process
 
     setCurrentStatus(id);
 
@@ -1248,16 +1247,18 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     if (totalObjects == currentObjects &&  //if everything was processed successfully
         totalData    == currentData)
     {
-        m_staticTextItemsRem->Show(false);
-        bSizerItemsRem      ->Show(false);
+        m_staticTextLabelItemsRem->Show(false);
+        bSizerItemsRem           ->Show(false);
     }
 
-    m_staticTextItemsProc->Show(true);
-    bSizerItemsProc      ->Show(true);
+    m_staticTextLabelItemsProc->Show(true);
+    bSizerItemsProc           ->Show(true);
     m_staticTextProcessedObj ->SetLabel(toStringSep(currentObjects));
     m_staticTextDataProcessed->SetLabel(zen::filesizeToShortString(currentData));
 
-    m_staticTextRemTimeDescr->Show(false);
+    m_staticTextLabelElapsedTime->SetLabel(_("Total time:")); //it's not "elapsed time" anymore
+
+    m_staticTextLabelRemTime->Show(false);
     m_staticTextRemTime     ->Show(false);
 
     updateStatusDialogNow(false); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
@@ -1285,8 +1286,8 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     m_listbookResult->AddPage(logControl, _("Logging"), false);
     //bSizerHoldStretch->Insert(0, logControl, 1, wxEXPAND);
 
-    //show log instead of graph if fatal errors occured! (not required for ignored warnings or errors!)
-    if (log.typeCount(TYPE_FATAL_ERROR) > 0)
+    //show log instead of graph if errors occured! (not required for ignored warnings)
+    if (log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR) > 0)
         m_listbookResult->ChangeSelection(posLog);
 
     m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
@@ -1394,11 +1395,11 @@ void SyncStatus::SyncStatusImpl::minimizeToTray()
     if (!trayIcon.get())
     {
         trayIcon.reset(new FfsTrayIcon);
-        trayIcon->Connect(FFS_REQUEST_RESUME_TRAY_EVENT, wxCommandEventHandler(SyncStatus::SyncStatusImpl::OnResumeFromTray), NULL, this);
+        trayIcon->Connect(FFS_REQUEST_RESUME_TRAY_EVENT, wxCommandEventHandler(SyncStatus::SyncStatusImpl::OnResumeFromTray), nullptr, this);
         //tray icon has shorter lifetime than this => no need to disconnect event later
     }
 
-    updateStatusDialogNow(false); //set tooltip: in pause mode there is no statistics update, so this is the only chance
+    updateStatusDialogNow(false); //set tooltip: e.g. in pause mode there was no GUI update, so this is the last chance
 
     Hide();
     if (mainDialog)
@@ -1444,8 +1445,7 @@ SyncStatus::SyncStatus(AbortCallback& abortCb,
     if (showProgress)
     {
         pimpl->Show();
-        pimpl->updateStatusDialogNow(false); //update visual statistics to get rid of "dummy" texts
-        pimpl->Update(); //don't wait until next idle event (who knows what blocking process comes next?)
+        pimpl->updateStatusDialogNow(false); //clear gui flicker: window must be visible to make this work!
     }
     else
         pimpl->minimizeToTray();
@@ -1506,7 +1506,7 @@ void SyncStatus::resumeTimer()
     return pimpl->resumeTimer();
 }
 
-void SyncStatus::processHasFinished(SyncStatusID id, const ErrorLogging& log)
+void SyncStatus::processHasFinished(SyncStatusID id, const ErrorLog& log)
 {
     pimpl->processHasFinished(id, log);
 }

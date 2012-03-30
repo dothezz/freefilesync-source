@@ -63,13 +63,17 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
 
 const std::wstring xmlAccess::getErrorMessageFormatted(const XmlIn& in)
 {
-    std::wstring errorMessage = _("Could not read values for the following XML nodes:") + L"\n";
+    std::wstring msg;
 
-    std::vector<std::wstring> failedNodes = in.getErrorsAs<std::wstring>();
-    std::for_each(failedNodes.begin(), failedNodes.end(),
-    [&](const std::wstring& str) { errorMessage += str + L'\n'; });
+    const auto& failedElements = in.getErrorsAs<std::wstring>();
+    if (!failedElements.empty())
+    {
+        msg = _("Cannot read the following XML elements:") + L"\n";
+        std::for_each(failedElements.begin(), failedElements.end(),
+        [&](const std::wstring& str) { msg += str + L'\n'; });
+    }
 
-    return errorMessage;
+    return msg;
 }
 
 

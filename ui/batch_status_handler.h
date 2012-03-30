@@ -7,9 +7,9 @@
 #ifndef BATCHSTATUSHANDLER_H_INCLUDED
 #define BATCHSTATUSHANDLER_H_INCLUDED
 
+#include <zen/error_log.h>
 #include "../lib/status_handler.h"
 #include "../lib/process_xml.h"
-#include "../lib/error_log.h"
 #include "progress_indicator.h"
 #include "switch_to_gui.h"
 
@@ -52,7 +52,7 @@ private:
     bool showFinalResults;
     bool switchToGuiRequested;
     xmlAccess::OnError handleError_;
-    zen::ErrorLogging errorLog; //list of non-resolved errors and warnings
+    zen::ErrorLog errorLog; //list of non-resolved errors and warnings
     Process currentProcess;
     int& returnValue;
 

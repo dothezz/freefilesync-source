@@ -2,18 +2,23 @@ APPNAME = RealtimeSync
 prefix = /usr
 BINDIR = $(DESTDIR)$(prefix)/bin
 
-COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I.. -include "../zen/i18n.h"
-COMMON_LINK_FLAGS  = -O3 -pthread
+COMMON_COMPILE_FLAGS = -Wall -pipe -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I.. -include "../zen/i18n.h"
+COMMON_LINK_FLAGS    = -pthread
 
 #default build
-FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
-LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes` -lboost_thread
+CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
+LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes` -lboost_thread
 
 #static std library linkage used for precompiled release
 ifeq ($(BUILD),release)
-FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
-LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
+CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
+LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
 endif
+#####################################################################################################
+
+#Gtk - no button border
+CPPFLAGS  += `pkg-config --cflags gtk+-2.0`
+LINKFLAGS += `pkg-config --libs gtk+-2.0`
 
 CPP_LIST= #internal list of all *.cpp files needed for compilation
 CPP_LIST+=application.cpp
@@ -46,7 +51,7 @@ all: RealtimeSync
 
 ../OBJ/RTS_Release_GCC_Make/RTS/%.o : %.cpp
 	mkdir -p $(dir $@)
-	g++ $(FFS_CPPFLAGS) -c $< -o $@
+	g++ $(CPPFLAGS) -c $< -o $@
 
 RealtimeSync: $(OBJECT_LIST)
 	g++ -o ../BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)

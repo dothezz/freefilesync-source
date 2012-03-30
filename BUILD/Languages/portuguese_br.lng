@@ -41,7 +41,7 @@
 <target>Limpar configurações do filtro</target>
 
 <source>Create a batch job</source>
-<target>Criar arquivo batch</target>
+<target>Criar arquivo de lote</target>
 
 <source>Synchronization settings</source>
 <target>Parâmetros de sincronização</target>
@@ -66,9 +66,6 @@
 
 <source>Configure filter</source>
 <target>Configurar filtros</target>
-
-<source>Customize columns</source>
-<target>Personalizar colunas</target>
 
 <source>Global settings</source>
 <target>Configurações</target>
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Procurar</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Erro ao ler do banco de dados de sincronização:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Erro ao escrever no banco de dados de sincronização:</target>
-
 <source>Invalid command line: %x</source>
 <target>Linha de comando inválida: %x</target>
+
+<source>Info</source>
+<target>Informações</target>
+
+<source>Fatal Error</source>
+<target>Erro fatal</target>
 
 <source>Windows Error Code %x:</source>
 <target>Código de Erro do Windows %x:</target>
@@ -125,7 +122,7 @@
 <target>%x MB</target>
 
 <source>%x KB</source>
-<target>%x KB</target>
+<target>%x kB</target>
 
 <source>%x GB</source>
 <target>%x GB</target>
@@ -139,14 +136,20 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Erro ao ler do banco de dados de sincronização:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Erro ao escrever no banco de dados de sincronização:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Formato de banco de dados de sincronização incompatível:</target>
+
 <source>Initial synchronization:</source>
 <target>Sincronização inicial:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Um dos arquivos de banco de dados do FreeFileSync ainda não existe:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Formato de banco de dados de sincronização incompatível:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Arquivos de banco de dados não compartilham uma sessão de sincronização comum:</target>
@@ -172,12 +175,6 @@
 <pluralform>%x seg</pluralform>
 </target>
 
-<source>Info</source>
-<target>Informações</target>
-
-<source>Fatal Error</source>
-<target>Erro fatal</target>
-
 <source>Error reading file:</source>
 <target>Erro ao ler arquivo:</target>
 
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>Erro de leitura do arquivo de configuração:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Erro ao mover para a Lixeira:</target>
+<source>Configuration loaded partially only:</source>
+<target>A configuração foi carregada parcialmente apenas:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Não foi possível carregar uma DLL requerida:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Não foi possível mover %x para a Lixeira!</target>
+
+<source>Cannot load file %x.</source>
+<target>Não foi possível carregar o aquivo %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Erro ao acessar o Serviço de Cópia de Sombra de Volume!</target>
@@ -214,10 +214,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Cópias de sombra no WOW64 não são suportadas. Por favor use a versão 64-bits do FreeFileSync.</target>
 
-<source>Could not determine volume name for file:</source>
+<source>Cannot determine volume name for file:</source>
 <target>Não foi possível determinar o nome do volume para o arquivo:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Nome do volume %x não é parte do arquivo %y!</target>
 
 <source>/sec</source>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>O arquivo não existe:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Não foi possível ler os valores para os seguintes nós XML:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Não foi possível ler os seguintes elementos XML:</target>
 
 <source>S&ave configuration...</source>
 <target>S&alvar configuração...</target>
@@ -322,7 +322,7 @@ A linha de comando é executada cada vez que:
 <target>Um campo de entrada de diretório está vazio.</target>
 
 <source>Logging</source>
-<target>Log</target>
+<target>Ver Log</target>
 
 <source>File time and size</source>
 <target>Data e tamanho do arquivo</target>
@@ -343,19 +343,19 @@ A linha de comando é executada cada vez que:
 <target>Personalizado</target>
 
 <source>FreeFileSync batch file</source>
-<target>FreeFileSync arquivo batch</target>
+<target>Arquivo de lote do FreeFileSync</target>
 
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync configuração</target>
 
 <source>FreeFileSync Batch Job</source>
-<target>FreeFileSync Arquivo batch</target>
+<target>Tarefa em lote do FreeFileSync</target>
 
 <source>Unable to create log file!</source>
 <target>Não foi possível criar arquivo de log!</target>
 
 <source>Batch execution</source>
-<target>Execução do batch</target>
+<target>Execução da tarefa em lote</target>
 
 <source>Stop</source>
 <target>Parar</target>
@@ -466,7 +466,7 @@ A linha de comando é executada cada vez que:
 <target>&Configurações...</target>
 
 <source>&Create batch job...</source>
-<target>C&riar um arquivo batch...</target>
+<target>C&riar um arquivo de lote...</target>
 
 <source>&Export file list...</source>
 <target>&Exportar lista de arquivos...</target>
@@ -540,17 +540,17 @@ A linha de comando é executada cada vez que:
 <source>Speed:</source>
 <target>Velocidade:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Tempo restante:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Tempo decorrido:</target>
 
 <source>Batch job</source>
-<target>Arquivo Batch</target>
+<target>Tarefa em lote</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Cria um arquivo batch para sincronização automática. Para iniciar o modo batch, simplesmente dê um click-duplo no arquivo ou execute via linha de comando: FreeFileSync.exe <arquivo ffs_batch>. Também pode ser agendado no Agendador de Tarefas do sistema operacional.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Cria um arquivo de lote e automatiza a sincronização. Para iniciar em modo de lote, simplesmente dê um clique-duplo neste arquivo ou execute o comando: FreeFileSync.exe SyncJob.ffs_batch. Também pode ser agendado pelo Agendador de Tarefas do sistema operacional.</target>
 
 <source>Help</source>
 <target>Ajuda</target>
@@ -563,9 +563,6 @@ A linha de comando é executada cada vez que:
 
 <source>Right</source>
 <target>Direita</target>
-
-<source>Overview</source>
-<target>Parâmetros</target>
 
 <source>Status feedback</source>
 <target>Informação do Status</target>
@@ -583,7 +580,7 @@ A linha de comando é executada cada vez que:
 <target>Escolha um diretório para salvar o arquivo de log:</target>
 
 <source>Batch settings</source>
-<target>Configurações</target>
+<target>Configurações da tarefa em lote</target>
 
 <source>&Save</source>
 <target>&Salvar</target>
@@ -711,7 +708,7 @@ Os arquivos são considerados iguais se
 <source>Published under the GNU General Public License</source>
 <target>Publicado sobre a GNU General Public License</target>
 
-<source>Ignore subsequent errors</source>
+<source>Ignore further errors</source>
 <target>Ignorar erros subsequentes</target>
 
 <source>Hide further error messages during the current process</source>
@@ -724,7 +721,7 @@ Os arquivos são considerados iguais se
 <target>&Tentar Novamente</target>
 
 <source>Do not show this dialog again</source>
-<target>Não mostrar esse diálogo novamente</target>
+<target>Não mostrar este diálogo novamente</target>
 
 <source>&Switch</source>
 <target>&Alterar</target>
@@ -735,22 +732,22 @@ Os arquivos são considerados iguais se
 <source>&No</source>
 <target>&Não</target>
 
+<source>Use Recycle Bin</source>
+<target>Utilizar Lixeira</target>
+
 <source>Delete on both sides</source>
 <target>Apagar em ambos os lados</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Apagar em ambos os lados mesmo se o arquivo está selecionado só em um lado</target>
 
-<source>Use Recycle Bin</source>
-<target>Utilizar Lixeira</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Apenas arquivos/diretórios que satisfazem todos as configurações dos filtros serão selecionados para sincronização.
-Nota: O nome do filtro deve ser especificado relativo(!) ao diretório principal de sincronização.
+Apenas arquivos que correspondem a todas as configurações do filtro serão sincronizados.
+Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 </target>
 
 <source>Hints:</source>
@@ -786,20 +783,20 @@ Excluir: \stuff\temp\*
 <source>Exclude</source>
 <target>Excluir</target>
 
-<source>Minimum file size</source>
-<target>Tamanho mínimo do arquivo</target>
+<source>Time span</source>
+<target>Intervalo de tempo</target>
 
-<source>Maximum file size</source>
-<target>Tamanho máximo do arquivo</target>
+<source>File size</source>
+<target>Tamanho do arquivo</target>
+
+<source>Minimum</source>
+<target>Mínimo</target>
+
+<source>Maximum</source>
+<target>Máximo</target>
 
 <source>&Default</source>
 <target>&Config. Padrão</target>
-
-<source>Move column up</source>
-<target>Mover coluna para cima</target>
-
-<source>Move column down</source>
-<target>Mover coluna para baixo</target>
 
 <source>Transactional file copy</source>
 <target>Cópia de arquivo transacional</target>
@@ -819,14 +816,8 @@ Excluir: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Transfere as permissões de arquivos e diretórios (Requer direitos de Administrador)</target>
 
-<source>Hidden dialogs:</source>
-<target>Diálogos ocultados:</target>
-
-<source>Reset</source>
-<target>Restaurar</target>
-
-<source>Show hidden dialogs</source>
-<target>Mostrar diálogos ocultados</target>
+<source>Restore hidden dialogs</source>
+<target>Restaurar diálogos ocultados</target>
 
 <source>External applications</source>
 <target>Aplicações externas</target>
@@ -858,8 +849,8 @@ Excluir: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Pares de pastas</target>
 
-<source>Compressed view</source>
-<target>Visualização compacta</target>
+<source>Overview</source>
+<target>Parâmetros</target>
 
 <source>Select view</source>
 <target>Selecionar visualização</target>
@@ -888,8 +879,8 @@ Excluir: \stuff\temp\*
 <source>Exclude all</source>
 <target>Excluir todos</target>
 
-<source>Icon size:</source>
-<target>Tamanho do ícone:</target>
+<source>Show icons:</source>
+<target>Mostrar ícones:</target>
 
 <source>Small</source>
 <target>Pequeno</target>
@@ -914,6 +905,9 @@ Excluir: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Configuração salva!</target>
+
+<source>Never save changes</source>
+<target>Nunca salvar alterações</target>
 
 <source>Save changes to current configuration?</source>
 <target>Salvar modificações para a configuração atual?</target>
@@ -1026,9 +1020,6 @@ Excluir: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Erro ao escrever arquivo:</target>
 
-<source>Batch file created successfully!</source>
-<target>Arquivo batch criado com sucesso!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1107,20 +1098,20 @@ Excluir: \stuff\temp\*
 <source>This year</source>
 <target>Este ano</target>
 
+<source>Last x days</source>
+<target>Últimos x dias</target>
+
 <source>Byte</source>
 <target>Byte</target>
 
 <source>KB</source>
-<target>KB</target>
+<target>kB</target>
 
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filtro: Todos os pares</target>
-
-<source>Filter: Single pair</source>
-<target>Filtro: Apenas um par</target>
+<source>Filter</source>
+<target>Filtro</target>
 
 <source>Direct</source>
 <target>Direcionar</target>
@@ -1146,8 +1137,8 @@ Excluir: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Correspondente do outro lado a %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Restaurar todos os diálogos ocultados?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Fazer com que os diálogos ocultados e mensagens de alerta fiquem visíveis novamente?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1278,9 +1269,6 @@ Excluir: \stuff\temp\*
 <source>Error copying file:</source>
 <target>Erro ao copiar arquivo:</target>
 
-<source>Error opening file:</source>
-<target>Erro ao abrir arquivo:</target>
-
 <source>Error traversing directory:</source>
 <target>Erro ao percorrer diretório:</target>
 
@@ -1323,8 +1311,8 @@ Excluir: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Preparando sincronização...</target>
 
-<source>Memory allocation failed!</source>
-<target>Alocação de memória falhou!</target>
+<source>Out of memory!</source>
+<target>Falta de memória!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Arquivo %x tem uma data inválida!</target>
@@ -1479,11 +1467,11 @@ Excluir: \stuff\temp\*
 <source>Generating database...</source>
 <target>Gerando banco de dados...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Nada para sincronizar de acordo com a configuração!</target>
+<source>Nothing to synchronize!</source>
+<target>Nada para sincronizar!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Erro ao copiar arquivo bloqueado %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Não foi possível copiar o arquivo bloqueado %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Erro de verificação de dados: Arquivo de origem e destino têm o mesmo conteúdo!</target>

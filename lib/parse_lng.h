@@ -213,15 +213,6 @@ private:
     TokenMap tokens;
 };
 
-struct IsWhiteSpace : public std::unary_function<char, bool>
-{
-    bool operator()(char c) const
-    {
-        const unsigned char usc = c; //caveat 1: std::isspace() takes an int, but expects an unsigned char
-        return usc < 128 &&          //caveat 2: some parts of UTF-8 chars are erroneously seen as whitespace, e.g. the a0 from "\xec\x8b\a0" (MSVC)
-               std::isspace(usc) != 0; //[!]
-    }
-};
 
 class Scanner
 {
@@ -231,7 +222,7 @@ public:
     Token nextToken()
     {
         //skip whitespace
-        pos = std::find_if(pos, stream.end(), std::not1(IsWhiteSpace()));
+        pos = std::find_if(pos, stream.end(), [](char c) { return !zen::isWhiteSpace(c); });
 
         if (pos == stream.end())
             return Token(Token::TK_END);
@@ -289,7 +280,7 @@ private:
     static void normalize(std::string& text)
     {
         //remmove whitespace from end
-        while (!text.empty() && IsWhiteSpace()(*text.rbegin()))
+        while (!text.empty() && zen::isWhiteSpace(*text.rbegin()))
             text.resize(text.size() - 1);
 
         //ensure c-style line breaks

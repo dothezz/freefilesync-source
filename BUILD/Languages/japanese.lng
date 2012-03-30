@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>フィルター設定</target>
 
-<source>Customize columns</source>
-<target>列の調整</target>
-
 <source>Global settings</source>
 <target>全般的な設定</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>参照</target>
 
-<source>Error reading from synchronization database:</source>
-<target>同期データベースからの読み込みエラー:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>同期データベースへの書き込みエラー:</target>
-
 <source>Invalid command line: %x</source>
 <target>無効なコマンドライン: %x</target>
+
+<source>Info</source>
+<target>情報</target>
+
+<source>Fatal Error</source>
+<target>致命的なエラー</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows エラーコード %x:</target>
@@ -138,14 +135,20 @@
 <pluralform>%x バイト</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>同期データベースからの読み込みエラー:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>同期データベースへの書き込みエラー:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>同期データベースの書式に互換性がありません:</target>
+
 <source>Initial synchronization:</source>
 <target>同期処理の初期化:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync データベースファイルが存在しません:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>同期データベースの書式に互換性がありません:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>データベースファイルは一般的な同期セッションを共有しません:</target>
@@ -170,12 +173,6 @@
 <pluralform>%x 秒.</pluralform>
 </target>
 
-<source>Info</source>
-<target>情報</target>
-
-<source>Fatal Error</source>
-<target>致命的なエラー</target>
-
 <source>Error reading file:</source>
 <target>ファイル読み込みエラー:</target>
 
@@ -199,11 +196,14 @@
 <source>Error parsing configuration file:</source>
 <target>構成ファイルの構文に誤りがあります:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>ゴミ箱への移動に失敗:</target>
+<source>Configuration loaded partially only:</source>
+<target>部分的のみ読み込まれた構成:</target>
 
-<source>Could not load a required DLL:</source>
-<target>必要なDLLを読み込めません:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>%x をゴミ箱に移動できません!</target>
+
+<source>Cannot load file %x.</source>
+<target>ファイル %x を読み込めません.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>ボリュームシャドウ・コピーサービスにアクセス出来ません!</target>
@@ -211,10 +211,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>WOW64 では、ボリュームシャドウコピーに対応していません、FreeFileSync 64-bit 版をお試しください。</target>
 
-<source>Could not determine volume name for file:</source>
-<target>ファイルのボリューム名が決定されていません:</target>
+<source>Cannot determine volume name for file:</source>
+<target>ファイルのボリューム名を解決出来ません:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>ボリューム名 %x にファイル名 %y はありません!</target>
 
 <source>/sec</source>
@@ -223,8 +223,8 @@
 <source>File does not exist:</source>
 <target>ファイルが存在しません:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>以下の XMLノードの値を読み込むことが出来ません:</target>
+<source>Cannot read the following XML elements:</source>
+<target>次の XML要素を読み込めません:</target>
 
 <source>S&ave configuration...</source>
 <target>構成設定を保存(&A)...</target>
@@ -450,9 +450,6 @@ The command line is executed each time:
 <source>2. &Synchronize...</source>
 <target>2. 同期処理(&S)...</target>
 
-<source>S&witch view</source>
-<target>表示切り替え(&W)</target>
-
 <source>&New</source>
 <target>新規(&N)</target>
 
@@ -540,17 +537,17 @@ The command line is executed each time:
 <source>Speed:</source>
 <target>速度:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>残り時間:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>経過時間:</target>
 
 <source>Batch job</source>
 <target>一括処理</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>同期を自動的に実行する一括バッチファイルを作成します。実行方法はファイルをダブルクリックするか、コマンドライン経由で実行します - 例: FreeFileSync.exe <ffs_batch file>. この処理はあなたのシステムのタスクスケジューラでも実行可能です。</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>一括バッチファイルを作成して、同期を自動化します、開始方法はバッチファイルをダブルクリックするか次のコマンドを実行します:FreeFileSync.exe SyncJob.ffs_batch. またこの操作はシステムのタスクから実行することも出来ます.</target>
 
 <source>Help</source>
 <target>ヘルプ</target>
@@ -564,8 +561,8 @@ The command line is executed each time:
 <source>Right</source>
 <target>右側</target>
 
-<source>Overview</source>
-<target>概要</target>
+<source>Sync setttings</source>
+<target>同期設定</target>
 
 <source>Status feedback</source>
 <target>状態 フィードバック</target>
@@ -711,7 +708,7 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>GNU 一般共有使用許諾に基づき公開されています</target>
 
-<source>Ignore subsequent errors</source>
+<source>Ignore further errors</source>
 <target>以降のエラーを無視</target>
 
 <source>Hide further error messages during the current process</source>
@@ -735,22 +732,22 @@ is the same
 <source>&No</source>
 <target>いいえ(&N)</target>
 
+<source>Use Recycle Bin</source>
+<target>ゴミ箱を使用</target>
+
 <source>Delete on both sides</source>
 <target>両方を削除</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>片側のペインのみ選択されている場合でも両方を削除する</target>
 
-<source>Use Recycle Bin</source>
-<target>ゴミ箱を使用</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-すべてのフィルター設定に適合するファイル/ディレクトリのみが同期対象に選択されます。
-注意: 名前フィルターは、メイン同期ディレクトリと同様の名前に適用
+すべてのフィルターに合致するファイルのみが同期されます.
+注意: ファイル名は基準ディレクトリに比例する必要があります!
 </target>
 
 <source>Hints:</source>
@@ -786,20 +783,20 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>除外</target>
 
-<source>Minimum file size</source>
-<target>最小ファイルサイズ</target>
+<source>Time span</source>
+<target>時間間隔</target>
 
-<source>Maximum file size</source>
-<target>最大ファイルサイズ</target>
+<source>File size</source>
+<target>ファイルサイズ</target>
+
+<source>Minimum</source>
+<target>最小</target>
+
+<source>Maximum</source>
+<target>最大</target>
 
 <source>&Default</source>
 <target>デフォルト(&D)</target>
-
-<source>Move column up</source>
-<target>列を上に移動</target>
-
-<source>Move column down</source>
-<target>列を下に移動</target>
 
 <source>Transactional file copy</source>
 <target>トランザクション・コピーを使用</target>
@@ -819,14 +816,8 @@ Exclude: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>ファイルとディレクトリのパーミッション転送(管理者権限が必要)</target>
 
-<source>Hidden dialogs:</source>
-<target>ダイアログを隠す:</target>
-
-<source>Reset</source>
-<target>リセット</target>
-
-<source>Show hidden dialogs</source>
-<target>非表示ダイアログを表示</target>
+<source>Restore hidden dialogs</source>
+<target>隠したダイアログを復帰</target>
 
 <source>External applications</source>
 <target>外部アプリケーション</target>
@@ -858,8 +849,8 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>フォルダ・ペア</target>
 
-<source>Compressed view</source>
-<target>簡易表示</target>
+<source>Overview</source>
+<target>概要</target>
 
 <source>Select view</source>
 <target>表示選択</target>
@@ -888,8 +879,8 @@ Exclude: \stuff\temp\*
 <source>Exclude all</source>
 <target>すべて除外</target>
 
-<source>Icon size:</source>
-<target>アイコンサイズ:</target>
+<source>Show icons:</source>
+<target>アイコン表示:</target>
 
 <source>Small</source>
 <target>小</target>
@@ -914,6 +905,9 @@ Exclude: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>構成設定は保存されました!</target>
+
+<source>Never save changes</source>
+<target>変更を保存しない</target>
 
 <source>Save changes to current configuration?</source>
 <target>現在の構成の変更を保存しますか?</target>
@@ -1026,9 +1020,6 @@ Exclude: \stuff\temp\*
 <source>Error writing file:</source>
 <target>ファイル書き込みエラー:</target>
 
-<source>Batch file created successfully!</source>
-<target>バッチファイルが作成されました!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1103,6 +1094,9 @@ Exclude: \stuff\temp\*
 <source>This year</source>
 <target>この年</target>
 
+<source>Last x days</source>
+<target>最後の x 日</target>
+
 <source>Byte</source>
 <target>バイト</target>
 
@@ -1112,11 +1106,8 @@ Exclude: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>フィルター:すべてのペア</target>
-
-<source>Filter: Single pair</source>
-<target>フィルター:単一ペア</target>
+<source>Filter</source>
+<target>フィルター</target>
 
 <source>Direct</source>
 <target>方向</target>
@@ -1142,8 +1133,8 @@ Exclude: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- %dir の反対側の対象</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>非表示ダイアログをすべて戻しますか?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>現在隠されたダイアログと警告メッセージを再表示しますか?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1314,8 +1305,8 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>同期処理の準備中...</target>
 
-<source>Memory allocation failed!</source>
-<target>メモリ割り当てに失敗!</target>
+<source>Out of memory!</source>
+<target>メモリが足りません!</target>
 
 <source>File %x has an invalid date!</source>
 <target>ファイル %x の日付は無効なものです!</target>
@@ -1470,11 +1461,11 @@ Exclude: \stuff\temp\*
 <source>Generating database...</source>
 <target>データベースを作成中...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>構成設定に対応する同期がみつかりません!</target>
+<source>Nothing to synchronize!</source>
+<target>同期対象がありません!</target>
 
-<source>Error copying locked file %x!</source>
-<target>コピーに失敗! ファイル%x はロックされています!</target>
+<source>Unable to copy locked file %x!</source>
+<target>ファイル %x はコピーできません!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>データ検証エラー: ソースと対象ファイルに異なる内容が含まれています!</target>

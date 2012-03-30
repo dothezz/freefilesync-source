@@ -94,13 +94,13 @@ void GridView::updateView(Predicate pred)
 }
 
 
-int GridView::findRowDirect(FileSystemObject::ObjectIdConst objId) const
+ptrdiff_t GridView::findRowDirect(FileSystemObject::ObjectIdConst objId) const
 {
     auto iter = rowPositions.find(objId);
     return iter != rowPositions.end() ? iter->second : -1;
 }
 
-int GridView::findRowFirstChild(const HierarchyObject* hierObj) const
+ptrdiff_t GridView::findRowFirstChild(const HierarchyObject* hierObj) const
 {
     auto iter = rowPositionsFirstChild.find(hierObj);
     return iter != rowPositionsFirstChild.end() ? iter->second : -1;
@@ -289,7 +289,7 @@ void GridView::removeInvalidRows()
     rowPositionsFirstChild.clear();
 
     //remove rows that have been deleted meanwhile
-    vector_remove_if(sortedRef, [&](const RefIndex& refIdx) { return FileSystemObject::retrieve(refIdx.objId) == NULL; });
+    vector_remove_if(sortedRef, [&](const RefIndex& refIdx) { return FileSystemObject::retrieve(refIdx.objId) == nullptr; });
 }
 
 
@@ -356,9 +356,9 @@ public:
 
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
         const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
-        if (fsObjA == NULL) //invalid rows shall appear at the end
+        if (!fsObjA) //invalid rows shall appear at the end
             return false;
-        else if (fsObjB == NULL)
+        else if (!fsObjB)
             return true;
 
         return lessRelativeName<ascending>(*fsObjA, *fsObjB);
@@ -374,9 +374,9 @@ public:
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
         const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
-        if (fsObjA == NULL) //invalid rows shall appear at the end
+        if (!fsObjA) //invalid rows shall appear at the end
             return false;
-        else if (fsObjB == NULL)
+        else if (!fsObjB)
             return true;
 
         return lessShortFileName<ascending, side>(*fsObjA, *fsObjB);
@@ -392,9 +392,9 @@ public:
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
         const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
-        if (fsObjA == NULL) //invalid rows shall appear at the end
+        if (!fsObjA) //invalid rows shall appear at the end
             return false;
-        else if (fsObjB == NULL)
+        else if (!fsObjB)
             return true;
 
         return lessFilesize<ascending, side>(*fsObjA, *fsObjB);
@@ -410,9 +410,9 @@ public:
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
         const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
-        if (fsObjA == NULL) //invalid rows shall appear at the end
+        if (!fsObjA) //invalid rows shall appear at the end
             return false;
-        else if (fsObjB == NULL)
+        else if (!fsObjB)
             return true;
 
         return lessFiletime<ascending, side>(*fsObjA, *fsObjB);
@@ -428,9 +428,9 @@ public:
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
         const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
-        if (fsObjA == NULL) //invalid rows shall appear at the end
+        if (!fsObjA) //invalid rows shall appear at the end
             return false;
-        else if (fsObjB == NULL)
+        else if (!fsObjB)
             return true;
 
         return lessExtension<ascending, side>(*fsObjA, *fsObjB);
@@ -446,9 +446,9 @@ public:
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
         const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
-        if (fsObjA == NULL) //invalid rows shall appear at the end
+        if (!fsObjA) //invalid rows shall appear at the end
             return false;
-        else if (fsObjB == NULL)
+        else if (!fsObjB)
             return true;
 
         return lessCmpResult<ascending>(*fsObjA, *fsObjB);
@@ -464,9 +464,9 @@ public:
     {
         const FileSystemObject* fsObjA = FileSystemObject::retrieve(a.objId);
         const FileSystemObject* fsObjB = FileSystemObject::retrieve(b.objId);
-        if (fsObjA == NULL) //invalid rows shall appear at the end
+        if (!fsObjA) //invalid rows shall appear at the end
             return false;
-        else if (fsObjB == NULL)
+        else if (!fsObjB)
             return true;
 
         return lessSyncDirection<ascending>(*fsObjA, *fsObjB);

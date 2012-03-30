@@ -24,7 +24,8 @@ void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, w
 {
     const wxString dirFormatted = toWx(getFormattedDirectoryName(toZ(dirname)));
 
-    tooltipWnd.SetToolTip(dirFormatted); //wxComboBox bug: the edit control is not updated... http://trac.wxwidgets.org/ticket/12659
+    tooltipWnd.SetToolTip(nullptr); //workaround wxComboBox bug http://trac.wxwidgets.org/ticket/10512 / http://trac.wxwidgets.org/ticket/12659
+    tooltipWnd.SetToolTip(dirFormatted); //only lord knows when the real bugfix reaches mere mortals via an official release
 
     if (staticText)
     {
@@ -89,25 +90,25 @@ DirectoryName<NameControl>::DirectoryName(wxWindow&        dropWindow,
 {
     //prepare drag & drop
     setupFileDrop(dropWindow);
-    dropWindow.Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), NULL, this);
+    dropWindow.Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
 
     if (dropWindow2)
     {
         setupFileDrop(*dropWindow2);
-        dropWindow2->Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), NULL, this);
+        dropWindow2->Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
     }
 
     //keep dirPicker and dirName synchronous
-    dirName_  .Connect(wxEVT_COMMAND_TEXT_UPDATED,      wxCommandEventHandler(      DirectoryName::OnWriteDirManually), NULL, this);
-    dirPicker_.Connect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(DirectoryName::OnDirSelected     ), NULL, this);
+    dirName_  .Connect(wxEVT_COMMAND_TEXT_UPDATED,      wxCommandEventHandler(      DirectoryName::OnWriteDirManually), nullptr, this);
+    dirPicker_.Connect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(DirectoryName::OnDirSelected     ), nullptr, this);
 }
 
 
 template <class NameControl>
 DirectoryName<NameControl>::~DirectoryName()
 {
-    dirName_  .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,      wxCommandEventHandler(      DirectoryName::OnWriteDirManually), NULL, this);
-    dirPicker_.Disconnect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(DirectoryName::OnDirSelected     ), NULL, this);
+    dirName_  .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,      wxCommandEventHandler(      DirectoryName::OnWriteDirManually), nullptr, this);
+    dirPicker_.Disconnect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(DirectoryName::OnDirSelected     ), nullptr, this);
 }
 
 
@@ -144,7 +145,7 @@ void DirectoryName<NameControl>::OnFilesDropped(FileDropEvent& event)
 template <class NameControl>
 void DirectoryName<NameControl>::OnWriteDirManually(wxCommandEvent& event)
 {
-    setDirectoryName(event.GetString(), static_cast<NameControl*>(NULL), &dirPicker_, dirName_, staticText_, 100); //potentially slow network access: wait 100 ms at most
+    setDirectoryName(event.GetString(), static_cast<NameControl*>(nullptr), &dirPicker_, dirName_, staticText_, 100); //potentially slow network access: wait 100 ms at most
     event.Skip();
 }
 
@@ -153,7 +154,7 @@ template <class NameControl>
 void DirectoryName<NameControl>::OnDirSelected(wxFileDirPickerEvent& event)
 {
     const wxString newPath = event.GetPath();
-    setDirectoryName(newPath, &dirName_, NULL, dirName_, staticText_);
+    setDirectoryName(newPath, &dirName_, nullptr, dirName_, staticText_);
     event.Skip();
 }
 

@@ -31,11 +31,12 @@ CompareStatusHandler::CompareStatusHandler(MainDialog& dlg) :
     //display status panel during compare
     mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Show();
     mainDlg.auiMgr.Update();
+    mainDlg.compareStatus->updateStatusPanelNow(); //clear gui flicker: window must be visible to make this work!
 
     //register abort button
-    mainDlg.m_buttonAbort->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), NULL, this);
+    mainDlg.m_buttonAbort->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
     //register key event
-    mainDlg.Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), NULL, this);
+    mainDlg.Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
 }
 
 
@@ -54,8 +55,8 @@ CompareStatusHandler::~CompareStatusHandler()
         mainDlg.pushStatusInformation(_("Operation aborted!"));
 
     //de-register keys
-    mainDlg.Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), NULL, this);
-    mainDlg.m_buttonAbort->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), NULL, this);
+    mainDlg.Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
+    mainDlg.m_buttonAbort->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
 }
 
 
@@ -169,7 +170,7 @@ void CompareStatusHandler::reportFatalError(const std::wstring& errorMessage)
     forceUiRefresh();
 
     showErrorDlg(ReturnErrorDlg::BUTTON_ABORT,
-                 errorMessage, NULL);
+                 errorMessage, nullptr);
 }
 
 
@@ -233,7 +234,7 @@ SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg,
 
 SyncStatusHandler::~SyncStatusHandler()
 {
-    const int totalErrors = errorLog.typeCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
+    const int totalErrors = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
 
     //finalize error log
     if (abortIsRequested())

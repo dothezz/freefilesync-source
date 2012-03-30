@@ -29,12 +29,13 @@ GlobalResources::GlobalResources()
         //activate support for .png files
         wxImage::AddHandler(new wxPNGHandler); //ownership passed
 
-        wxZipInputStream resourceFile(input);
+        wxZipInputStream resourceFile(input, wxConvUTF8);
+        //do NOT rely on wxConvLocal! May result in "Cannot convert from the charset 'Unknown encoding (-1)'!"
 
         while (true)
         {
             std::unique_ptr<wxZipEntry> entry(resourceFile.GetNextEntry());
-            if (entry.get() == NULL)
+            if (entry.get() == nullptr)
                 break;
 
             const wxString name = entry->GetName();

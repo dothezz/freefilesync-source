@@ -15,14 +15,14 @@ namespace
 {
 LONG WINAPI writeDumpOnException(EXCEPTION_POINTERS* pExceptionInfo)
 {
-    HANDLE hFile = ::CreateFile(L"exception.dmp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hFile = ::CreateFile(L"exception.dmp", GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (hFile != INVALID_HANDLE_VALUE)
     {
         MINIDUMP_EXCEPTION_INFORMATION exInfo = {};
         exInfo.ThreadId          = ::GetCurrentThreadId();
         exInfo.ExceptionPointers = pExceptionInfo;
 
-        MINIDUMP_EXCEPTION_INFORMATION* exceptParam = pExceptionInfo ? &exInfo : NULL;
+        MINIDUMP_EXCEPTION_INFORMATION* exceptParam = pExceptionInfo ? &exInfo : nullptr;
 
         /*bool rv = */
         ::MiniDumpWriteDump(::GetCurrentProcess(),   //__in  HANDLE hProcess,
@@ -30,8 +30,8 @@ LONG WINAPI writeDumpOnException(EXCEPTION_POINTERS* pExceptionInfo)
                             hFile,                   //__in  HANDLE hFile,
                             MiniDumpWithDataSegs,    //__in  MINIDUMP_TYPE DumpType,  ->Standard: MiniDumpNormal, Medium: MiniDumpWithDataSegs, Full: MiniDumpWithFullMemory
                             exceptParam,             //__in  PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-                            NULL,                    //__in  PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-                            NULL);                   //__in  PMINIDUMP_CALLBACK_INFORMATION CallbackParam
+                            nullptr,                 //__in  PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+                            nullptr);                //__in  PMINIDUMP_CALLBACK_INFORMATION CallbackParam
 
         ::CloseHandle(hFile);
     }
@@ -45,5 +45,5 @@ struct Dummy { Dummy() { ::SetUnhandledExceptionFilter(writeDumpOnException); }}
 
 void mem_check::writeMinidump()
 {
-    writeDumpOnException(NULL);
+    writeDumpOnException(nullptr);
 }

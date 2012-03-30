@@ -34,9 +34,13 @@ template <class T>
 class Opt
 {
 public:
-    Opt()             : valid(false), value()    {}
-    Opt(NoValue)      : valid(false), value()    {}
-    Opt(const T& val) : valid(true ), value(val) {}
+    Opt()             : value()   , valid(false) {}
+    Opt(NoValue)      : value()   , valid(false) {}
+    Opt(const T& val) : value(val), valid(true ) {}
+
+    //rvalue optimization: only basic exception safety:
+    Opt(Opt&& tmp) : value(std::move(tmp.value)), valid(tmp.valid) {}
+    Opt& operator=(const Opt& tmp) { value = std::move(tmp.value); valid = tmp.valid; }
 
 #ifdef _MSC_VER
 private:
@@ -52,9 +56,11 @@ public:
 
     const T* operator->() const { return &value; }
     /**/  T* operator->()       { return &value; }
+
+    void reset() { valid = false; }
 private:
-    const bool valid;
     T value;
+    bool valid;
 };
 
 }

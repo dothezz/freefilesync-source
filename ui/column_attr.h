@@ -110,7 +110,7 @@ std::vector<ColumnAttributeNavi> getDefaultColumnAttributesNavi()
 
     newEntry.type_    = COL_TYPE_NAVI_BYTES;
     newEntry.visible_ = true;
-    newEntry.width_   = 55;
+    newEntry.width_   = 60; //GTK needs a few pixels more
     attr.push_back(newEntry);
 
     return attr;

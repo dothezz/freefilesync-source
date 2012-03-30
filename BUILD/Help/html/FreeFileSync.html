@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20110903;14244700">
+	<META NAME="CHANGED" CONTENT="20120229;11541300">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -13,7 +13,6 @@
 	<STYLE TYPE="text/css">
 	<!--
 		@page { margin: 2cm }
-		TD P { margin-bottom: 0.21cm }
 		P { margin-bottom: 0.21cm }
 		H3 { margin-bottom: 0.21cm }
 		H3.western { font-family: "Arial", sans-serif }
@@ -33,7 +32,7 @@ Folder Comparison and Synchronization -</SPAN></I></FONT></H3>
 	left and right directories.<BR></FONT><IMG SRC="../img/SourceTarget.png" NAME="Grafik4" ALIGN=TEXTTOP WIDTH=427 HEIGHT=52 BORDER=0></P>
 	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">&quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Compare</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
-	them.<BR></FONT><IMG SRC="../img/CompareButton.png" NAME="Grafik1" ALIGN=BOTTOM WIDTH=178 HEIGHT=39 BORDER=0></P>
+	them.<BR></FONT><IMG SRC="../img/CompareButton.png" NAME="Grafik1" ALIGN=BOTTOM WIDTH=178 HEIGHT=40 BORDER=0></P>
 	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Select
 	synchronization settings.<BR></FONT><IMG SRC="../img/SyncConfigButton.png" NAME="Grafik3" ALIGN=BOTTOM WIDTH=46 HEIGHT=40 BORDER=0></P>
@@ -71,7 +70,7 @@ Dialog:</FONT></H3>
 	left and right directories</FONT></FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4>Save/load
 	configuration</FONT></FONT></P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4>Exclude
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4>Filter
 	files</FONT></FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4>Specify
 	category for display</FONT></FONT></P>
@@ -83,111 +82,56 @@ Dialog:</FONT></H3>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<H3 CLASS="western" STYLE="page-break-before: always"><FONT FACE="Tahoma, sans-serif">Menu
-bar:</FONT></H3>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<TABLE WIDTH=908 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 RULES=NONE STYLE="page-break-inside: avoid">
-	<COL WIDTH=678>
-	<COL WIDTH=212>
-	<TR>
-		<TD WIDTH=678 VALIGN=TOP>
-			<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Menu
-			&quot;F<SPAN STYLE="font-style: normal">ile&quot;</SPAN></B></FONT></P>
-			<UL>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>1.
-				Compare</B><BR>Start comparing both sides according to comparison
-				settings (compare by filesize and date or by content).</FONT></P>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>2.
-				Synchronize...</B><BR>Begin synchronization and copy files as
-				seen on the middle grid of the main dialog.</FONT></P>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>Switch
-				View</B><BR>After comparison has finished the relation between
-				files on left and right side can be visualized by two views: </FONT>
-				</P>
-			</UL>
-			<P STYLE="margin-left: 2cm; margin-bottom: 0cm; font-style: normal">
-			<FONT FACE="Tahoma, sans-serif">1. &bdquo;Comparison Result&ldquo;
-			shows a category for each row like &bdquo;existing on left side
-			only&ldquo; or &bdquo;left file is newer&ldquo;.</FONT></P>
-			<P STYLE="margin-left: 2cm; margin-bottom: 0cm; font-style: normal">
-			<FONT FACE="Tahoma, sans-serif">2. &bdquo;Synchronization Preview&ldquo;
-			is the result of the synchronization configuration applied on each
-			category. The effective directions in which the files will be
-			copied are shown.</FONT></P>
-			<UL>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>New</B><BR>Clears
-				all configuration data and restores an initial state.</FONT></P>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>Save
-				Configuration...</B><BR>Save the current settings into a file.</FONT></P>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>Load
-				Configuration...</B><BR>Load configuration from file.</FONT></P>
-				<LI><P STYLE="font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>Quit</B><BR>Exit
-				FreeFileSync.</FONT></P>
-			</UL>
-		</TD>
-		<TD WIDTH=212>
-			<P><IMG SRC="../img/menuFile.png" NAME="Grafik7" ALIGN=MIDDLE WIDTH=211 HEIGHT=196 BORDER=0></P>
-		</TD>
-	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<TABLE WIDTH=855 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 RULES=NONE STYLE="page-break-inside: avoid">
-	<COL WIDTH=680>
-	<COL WIDTH=157>
-	<TR>
-		<TD WIDTH=680 VALIGN=TOP>
-			<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Menu
-			&quot;Advanced&quot;</B></FONT></P>
-			<UL>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>Language</B><BR>Change
-				the language of the tool.</FONT></P>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>Global
-				Settings...</B><BR>A number of settings that have a global status
-				in the sense that they will be applied to all GUI and batch
-				configurations (*.ffs_gui and *.ffs_batch).</FONT></P>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>Create
-				Batch Job</B><BR>Creates a FreeFileSync batch file (*.ffs_batch)
-				that executes a predefined synchronization without user
-				intervention.</FONT></P>
-				<LI><P><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Export
-				File List...</B></SPAN><SPAN STYLE="font-style: normal"><BR>Export
-				all data that </SPAN>is currently shown on the main grids as a
-				*.csv file that can be imported into Excel.</FONT></P>
-			</UL>
-		</TD>
-		<TD WIDTH=157>
-			<P><IMG SRC="../img/menuAdv.png" NAME="Grafik11" ALIGN=MIDDLE WIDTH=159 HEIGHT=112 BORDER=0></P>
-		</TD>
-	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<TABLE WIDTH=772 BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 RULES=NONE STYLE="page-break-inside: avoid">
-	<COL WIDTH=552>
-	<COL WIDTH=202>
-	<TR>
-		<TD WIDTH=552 VALIGN=TOP>
-			<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Menu
-			&quot;Help&quot;</B></FONT></P>
-			<UL>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>Content</B><BR>Show
-				this helpfile.</FONT></P>
-				<LI><P STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>Check
-				for new version</B><BR>Check online whether a more recent version
-				of FreeFileSync is existing.</FONT></P>
-				<LI><P STYLE="font-style: normal"><FONT FACE="Tahoma, sans-serif"><B>About...</B><BR>Credits.</FONT></P>
-			</UL>
-		</TD>
-		<TD WIDTH=202>
-			<P><IMG SRC="../img/menuHelp.png" NAME="Grafik8" ALIGN=BOTTOM WIDTH=202 HEIGHT=90 BORDER=0></P>
-		</TD>
-	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
+<H3 CLASS="western" STYLE="page-break-before: always"><FONT FACE="Tahoma, sans-serif">Key
+Features</FONT></H3>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Detect
+	moved and renamed files and folders</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Copy
+	locked files (Volume Shadow Copy Service)</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Detect
+	conflicts and propagate deletions</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Binary
+	comparison</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Full
+	support for Symbolic Links</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Run
+	as a batch job</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Multiple
+	folder pairs</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Support
+	very long path names &gt; 260 characters</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Transactional
+	file copy</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Cross-platform:
+	Windows/Linux</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Expand
+	environment variables like %USERPROFILE%</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Access
+	variable drive letters by volume name (USB sticks)</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Native
+	32 and 64-bit builds</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Versioning
+	of deleted files</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Optimal
+	sync sequence prevents disc space bottlenecks</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Full
+	unicode support</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Highly
+	optimized performance</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Include/exclude
+	files via filter</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Local
+	or portable installation</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Handle
+	daylight saving time changes on FAT/FAT32</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Use
+	macros %time%, %date%, et al. for recurring backups</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Case
+	sensitive synchronization</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Built-in
+	locking serializes multiple jobs running against the same network
+	share</FONT></P>
+</OL>
 </BODY>
 </HTML>

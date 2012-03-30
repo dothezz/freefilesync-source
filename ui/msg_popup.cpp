@@ -98,7 +98,7 @@ void ErrorDlg::OnAbort(wxCommandEvent& event)
 
 ReturnErrorDlg::ButtonPressed zen::showErrorDlg(int activeButtons, const wxString& messageText, bool* ignoreNextErrors)
 {
-    ErrorDlg errorDlg(NULL, activeButtons, messageText, ignoreNextErrors);
+    ErrorDlg errorDlg(nullptr, activeButtons, messageText, ignoreNextErrors);
     errorDlg.Raise();
     return static_cast<ReturnErrorDlg::ButtonPressed>(errorDlg.ShowModal());
 }
@@ -180,7 +180,7 @@ void WarningDlg::OnAbort(wxCommandEvent& event)
 
 ReturnWarningDlg::ButtonPressed zen::showWarningDlg(int activeButtons, const wxString& messageText, bool& dontShowAgain)
 {
-    WarningDlg warningDlg(NULL, activeButtons, messageText, dontShowAgain);
+    WarningDlg warningDlg(nullptr, activeButtons, messageText, dontShowAgain);
     warningDlg.Raise();
     return static_cast<ReturnWarningDlg::ButtonPressed>(warningDlg.ShowModal());
 }
@@ -190,42 +190,42 @@ ReturnWarningDlg::ButtonPressed zen::showWarningDlg(int activeButtons, const wxS
 class QuestionDlg : public QuestionDlgGenerated
 {
 public:
-    QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString& messageText, bool* dontShowAgain = NULL);
+    QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString& messageText, CheckBox* checkbox);
 
 private:
-    void OnClose(wxCloseEvent& event);
-    void OnCancel(wxCommandEvent& event);
+    void OnClose (wxCloseEvent&   event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
+    void OnCancel(wxCommandEvent& event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
     void OnYes(wxCommandEvent& event);
-    void OnNo(wxCommandEvent& event);
-    void OnCheckBoxDontShowAgain(wxCommandEvent& event);
+    void OnNo (wxCommandEvent& event);
 
-    bool* dontShowAgain; //optional
+    CheckBox* checkbox_; //optional
 };
 
 
-QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString& messageText, bool* dontShowDlgAgain) :
+QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString& messageText, CheckBox* checkbox) :
     QuestionDlgGenerated(parentWindow),
-    dontShowAgain(dontShowDlgAgain)
+    checkbox_(checkbox)
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmap10->SetBitmap(GlobalResources::getImage(wxT("question")));
+    m_bitmap10->SetBitmap(GlobalResources::getImage(L"question"));
     m_textCtrl8->SetValue(messageText);
-    if (dontShowAgain)
-        m_checkBoxDontAskAgain->SetValue(*dontShowAgain);
+
+    if (checkbox_)
+    {
+        m_checkBox->SetValue(checkbox_->value_);
+        m_checkBox->SetLabel(checkbox_->label_);
+    }
     else
-        m_checkBoxDontAskAgain->Hide();
+        m_checkBox->Hide();
 
     if (~activeButtons & ReturnQuestionDlg::BUTTON_YES)
         m_buttonYes->Hide();
 
     if (~activeButtons & ReturnQuestionDlg::BUTTON_NO)
-    {
         m_buttonNo->Hide();
-        m_checkBoxDontAskAgain->Hide();
-    }
 
     if (~activeButtons & ReturnQuestionDlg::BUTTON_CANCEL)
         m_buttonCancel->Hide();
@@ -239,42 +239,23 @@ QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxStri
         m_buttonNo->SetFocus();
 }
 
-
-void QuestionDlg::OnClose(wxCloseEvent& event)
-{
-    EndModal(ReturnQuestionDlg::BUTTON_CANCEL);
-}
-
-
-void QuestionDlg::OnCancel(wxCommandEvent& event)
-{
-    EndModal(ReturnQuestionDlg::BUTTON_CANCEL);
-}
-
-
 void QuestionDlg::OnYes(wxCommandEvent& event)
 {
-    if (dontShowAgain)
-        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
+    if (checkbox_)
+        checkbox_->value_ = m_checkBox->GetValue();
     EndModal(ReturnQuestionDlg::BUTTON_YES);
 }
 
 void QuestionDlg::OnNo(wxCommandEvent& event)
 {
-    if (dontShowAgain)
-        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
+    if (checkbox_)
+        checkbox_->value_ = m_checkBox->GetValue();
     EndModal(ReturnQuestionDlg::BUTTON_NO);
 }
 
-void QuestionDlg::OnCheckBoxDontShowAgain(wxCommandEvent& event)
+ReturnQuestionDlg::ButtonPressed zen::showQuestionDlg(int activeButtons, const wxString& messageText, CheckBox* checkbox)
 {
-    event.Skip();
-}
-
-
-ReturnQuestionDlg::ButtonPressed zen::showQuestionDlg(int activeButtons, const wxString& messageText, bool* dontShowAgain)
-{
-    QuestionDlg qtnDlg(NULL, activeButtons, messageText, dontShowAgain);
+    QuestionDlg qtnDlg(nullptr, activeButtons, messageText, checkbox);
     qtnDlg.Raise();
     return static_cast<ReturnQuestionDlg::ButtonPressed>(qtnDlg.ShowModal());
 }

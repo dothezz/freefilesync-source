@@ -35,7 +35,7 @@ extern const wxEventType EVENT_GRID_SELECT_RANGE; //generates: GridRangeSelectEv
 //NOTE: neither first nor second row need to match EVENT_GRID_MOUSE_LEFT_DOWN/EVENT_GRID_MOUSE_LEFT_UP: user holding SHIFT; moving out of window...
 //=> range always specifies *valid* rows
 
-//example: wnd.Connect(EVENT_GRID_COL_LABEL_LEFT_CLICK, GridClickEventHandler(MyDlg::OnLeftClick), NULL, this);
+//example: wnd.Connect(EVENT_GRID_COL_LABEL_LEFT_CLICK, GridClickEventHandler(MyDlg::OnLeftClick), nullptr, this);
 
 
 struct GridClickEvent : public wxMouseEvent
@@ -96,11 +96,11 @@ public:
     virtual size_t getRowCount() const = 0; //if there are multiple grid components, only the first one will be polled for row count!
 
     //grid area
-    virtual wxString getValue(int row, ColumnType colType) const = 0;
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, int row, bool enabled, bool selected, bool hasFocus); //default implementation
-    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, int row, ColumnType colType); //
-    virtual size_t getBestSize(wxDC& dc, int row, ColumnType colType); //must correspond to renderCell()!
-    virtual wxString getToolTip(int row, ColumnType colType) const { return wxString(); }
+    virtual wxString getValue(size_t row, ColumnType colType) const = 0;
+    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus); //default implementation
+    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType); //
+    virtual size_t getBestSize(wxDC& dc, size_t row, ColumnType colType); //must correspond to renderCell()!
+    virtual wxString getToolTip(size_t row, ColumnType colType) const { return wxString(); }
 
     //label area
     virtual wxString getColumnLabel(ColumnType colType) const = 0;
@@ -130,7 +130,7 @@ public:
 
     size_t getRowCount() const;
 
-    void setRowHeight(int height);
+    void setRowHeight(size_t height);
 
     //grid component := a grid is divided into multiple components each of which is essentially a set of connected columns
     void setComponentCount(size_t count) { comp.resize(count); updateWindowSizes(); }
@@ -148,8 +148,8 @@ public:
     std::vector<ColumnAttribute> getColumnConfig(size_t compPos = 0) const;
 
     void setDataProvider(const std::shared_ptr<GridData>& dataView, size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].dataView_ = dataView; }
-    /**/  GridData* getDataProvider(size_t compPos = 0)       { return compPos < comp.size() ? comp[compPos].dataView_.get() : NULL; }
-    const GridData* getDataProvider(size_t compPos = 0) const { return compPos < comp.size() ? comp[compPos].dataView_.get() : NULL; }
+    /**/  GridData* getDataProvider(size_t compPos = 0)       { return compPos < comp.size() ? comp[compPos].dataView_.get() : nullptr; }
+    const GridData* getDataProvider(size_t compPos = 0) const { return compPos < comp.size() ? comp[compPos].dataView_.get() : nullptr; }
     //-----------------------------------------------------------------------------
 
     void setColumnLabelHeight(int height);
@@ -157,7 +157,7 @@ public:
 
     void showScrollBars(bool horizontal, bool vertical);
 
-    std::vector<int> getSelectedRows(size_t compPos = 0) const;
+    std::vector<size_t> getSelectedRows(size_t compPos = 0) const;
     void clearSelection(size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].selection.clear(); }
 
     void scrollDelta(int deltaX, int deltaY); //in scroll units
@@ -167,20 +167,20 @@ public:
     wxWindow& getColLabelWin();
     wxWindow& getMainWin    ();
 
-    int getRowAtPos(int posY) const; //returns < 0 if column not found; absolute coordinates!
+    ptrdiff_t getRowAtPos(int posY) const; //returns < 0 if column not found; absolute coordinates!
     Opt<std::pair<ColumnType, size_t>> getColumnAtPos(int posX) const; //returns (column type, component pos)
 
-    wxRect getCellArea(int row, ColumnType colType, size_t compPos = 0) const; //returns empty rect if column not found; absolute coordinates!
+    wxRect getCellArea(size_t row, ColumnType colType, size_t compPos = 0) const; //returns empty rect if column not found; absolute coordinates!
 
     void enableColumnMove  (bool value, size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].allowColumnMove   = value; }
     void enableColumnResize(bool value, size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].allowColumnResize = value; }
 
-    void setGridCursor(int row, size_t compPos = 0); //set + show + select cursor
-    std::pair<int, size_t> getGridCursor() const; //(row, component pos) row == -1 if none
+    void setGridCursor(size_t row, size_t compPos = 0); //set + show + select cursor
+    std::pair<size_t, size_t> getGridCursor() const; //(row, component pos)
 
-    void scrollTo(int row);
+    void scrollTo(size_t row);
 
-    virtual void Refresh(bool eraseBackground = true, const wxRect* rect = NULL);
+    virtual void Refresh(bool eraseBackground = true, const wxRect* rect = nullptr);
     virtual bool Enable( bool enable = true) { Refresh(); return wxScrolledWindow::Enable(enable); }
     void autoSizeColumns(size_t compPos = 0);
 
@@ -198,7 +198,7 @@ private:
     void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh); //get rid of scrollbars, but preserve scrolling behavior!
 #endif
 
-    int getBestColumnSize(size_t col, size_t compPos) const; //return -1 on error
+    ptrdiff_t getBestColumnSize(size_t col, size_t compPos) const; //return -1 on error
 
     friend class GridData;
     class SubWindow;
@@ -212,9 +212,9 @@ private:
     public:
         void init(size_t rowCount) { rowSelectionValue.resize(rowCount); clear(); }
 
-        std::vector<int> get() const
+        std::vector<size_t> get() const
         {
-            std::vector<int> selection;
+            std::vector<size_t> selection;
             for (auto iter = rowSelectionValue.begin(); iter != rowSelectionValue.end(); ++iter)
                 if (*iter != 0)
                     selection.push_back(iter - rowSelectionValue.begin());
@@ -225,13 +225,13 @@ private:
 
         bool isSelected(size_t row) const { return row < rowSelectionValue.size() ? rowSelectionValue[row] != 0 : false; }
 
-        void selectRange(int rowFrom, int rowTo, bool positive = true) //select [rowFrom, rowTo], very tolerant: trims and swaps if required!
+        void selectRange(ptrdiff_t rowFrom, ptrdiff_t rowTo, bool positive = true) //select [rowFrom, rowTo], very tolerant: trims and swaps if required!
         {
-            int rowFirst = std::min(rowFrom, rowTo);
-            int rowLast  = std::max(rowFrom, rowTo) + 1;
+            auto rowFirst = std::min(rowFrom, rowTo);
+            auto rowLast  = std::max(rowFrom, rowTo) + 1;
 
-            numeric::restrict(rowFirst, 0, static_cast<int>(rowSelectionValue.size()));
-            numeric::restrict(rowLast,  0, static_cast<int>(rowSelectionValue.size()));
+            numeric::confine<ptrdiff_t>(rowFirst, 0, rowSelectionValue.size());
+            numeric::confine<ptrdiff_t>(rowLast,  0, rowSelectionValue.size());
 
             std::fill(rowSelectionValue.begin() + rowFirst, rowSelectionValue.begin() + rowLast, positive);
         }
@@ -242,9 +242,9 @@ private:
 
     struct VisibleColumn
     {
-        VisibleColumn(ColumnType type, int width) : type_(type), width_(width) {}
+        VisibleColumn(ColumnType type, ptrdiff_t width) : type_(type), width_(width) {}
         ColumnType type_;
-        int width_; //may be NEGATIVE => treat as proportional stretch! use getAbsoluteWidths() to evaluate!!!
+        ptrdiff_t width_; //may be NEGATIVE => treat as proportional stretch! use getAbsoluteWidths() to evaluate!!!
     };
 
     struct Component
@@ -260,7 +260,7 @@ private:
         std::vector<ColumnAttribute> oldColAttributes; //visible + nonvisible columns; use for conversion in setColumnConfig()/getColumnConfig() *only*!
     };
 
-    int getMinAbsoluteWidthTotal() const; //assigns minimum width to stretched columns
+    ptrdiff_t getMinAbsoluteWidthTotal() const; //assigns minimum width to stretched columns
     std::vector<std::vector<VisibleColumn>> getAbsoluteWidths() const; //evaluate negative widths as stretched absolute values! structure matches "comp"
 
     Opt<size_t> getAbsoluteWidth(size_t col, size_t compPos) const //resolve stretched columns
@@ -271,7 +271,7 @@ private:
         return NoValue();
     }
 
-    void setColWidth(size_t col, size_t compPos, int width) //width may be >= 0: absolute, or < 0: stretched
+    void setColWidth(size_t col, size_t compPos, ptrdiff_t width) //width may be >= 0: absolute, or < 0: stretched
     {
         if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
             comp[compPos].visibleCols[col].width_ = width;
@@ -279,10 +279,11 @@ private:
 
     wxRect getColumnLabelArea(ColumnType colType, size_t compPos) const; //returns empty rect if column not found
 
-    void selectRange(int rowFrom, int rowTo, size_t compPos, bool positive = true); //select range + notify event!
+    void selectRange(ptrdiff_t rowFrom, ptrdiff_t rowTo, size_t compPos, bool positive = true); //select range + notify event!
+
     void clearSelectionAll(); //clear selection + notify event
 
-    bool isSelected(int row, size_t compPos) const { return compPos < comp.size() ? comp[compPos].selection.isSelected(row) : false; }
+    bool isSelected(size_t row, size_t compPos) const { return compPos < comp.size() ? comp[compPos].selection.isSelected(row) : false; }
 
     bool columnMoveAllowed  (size_t compPos) const { return compPos < comp.size() ? comp[compPos].allowColumnMove   : false; }
     bool columnResizeAllowed(size_t compPos) const { return compPos < comp.size() ? comp[compPos].allowColumnResize : false; }
@@ -295,10 +296,9 @@ private:
     };
     Opt<ColAction> clientPosToColumnAction(const wxPoint& pos) const;
     void moveColumn(size_t colFrom, size_t colTo, size_t compPos);
-    int clientPosToMoveTargetColumn(const wxPoint& pos, size_t compPos) const;
+    ptrdiff_t clientPosToMoveTargetColumn(const wxPoint& pos, size_t compPos) const; //return < 0 on error
 
     Opt<ColumnType> colToType(size_t col, size_t compPos) const;
-
 
     /*
     Visual layout:

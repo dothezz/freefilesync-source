@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Konfiguruj filtr</target>
 
-<source>Customize columns</source>
-<target>Dostosuj kolumny</target>
-
 <source>Global settings</source>
 <target>Ustawienia programu</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Przeglądaj</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Błąd odczytu z bazy danych synchronizacji:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Błąd zapisu do bazy danych synchronizacji:</target>
-
 <source>Invalid command line: %x</source>
 <target>Nieprawidłowa komenda: %x</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Fatal Error</source>
+<target>Błąd krytyczny</target>
 
 <source>Windows Error Code %x:</source>
 <target>Błąd systemu Windows %x:</target>
@@ -140,14 +137,20 @@
 <pluralform>%x Bajtów</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Błąd odczytu z bazy danych synchronizacji:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Błąd zapisu do bazy danych synchronizacji:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Niepoprawny format bazy danych dla synchronizacji:</target>
+
 <source>Initial synchronization:</source>
 <target>Wstępna synchronizacja:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Jeden z plików bazy danych FreeFileSync nie istnieje:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Niepoprawny format bazy danych dla synchronizacji:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Pliki danych nie współdzielą wspólnej sesji synchronizacji:</target>
@@ -174,12 +177,6 @@
 <pluralform>%x sekund</pluralform>
 </target>
 
-<source>Info</source>
-<target>Info</target>
-
-<source>Fatal Error</source>
-<target>Błąd krytyczny</target>
-
 <source>Error reading file:</source>
 <target>Błąd odczytu pliku:</target>
 
@@ -205,11 +202,14 @@
 <source>Error parsing configuration file:</source>
 <target>Błąd parsowania pliku konfiguracyjnego:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Błąd podczas przenoszenia do kosza:</target>
+<source>Configuration loaded partially only:</source>
+<target></target>
 
-<source>Could not load a required DLL:</source>
-<target>Nie można załadować wymaganej biblioteki DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target></target>
+
+<source>Cannot load file %x.</source>
+<target></target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Błąd podczas dostępdu do usługi Volume Shadow Copy!</target>
@@ -217,10 +217,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Nie można określić nazwy dysku dla pliku:</target>
+<source>Cannot determine volume name for file:</source>
+<target></target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Dysk %x nie jest częścią pliku %y!</target>
 
 <source>/sec</source>
@@ -229,8 +229,8 @@
 <source>File does not exist:</source>
 <target>Plik nie istnieje:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Nie można odczytać wartości dla danych gałęzi XML:</target>
+<source>Cannot read the following XML elements:</source>
+<target></target>
 
 <source>S&ave configuration...</source>
 <target>Z&apisz konfigurację...</target>
@@ -543,17 +543,17 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Speed:</source>
 <target>Prędkość:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Pozostały czas:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Czas:</target>
 
 <source>Batch job</source>
 <target>Plik wsadowy</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Utwórz plik wsadowy do automatycznej synchronizacji. Aby uruchomić zadanie w trybie wsadowym, kliknij dwa razy na plik. Możesz je również wywołać z konsoli poleceniem FreeFileSync.exe <ffs_batch file>. Plik wsadowy może być również wywoływany przez planer zadań w Twoim systemie.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target></target>
 
 <source>Help</source>
 <target>Pomoc</target>
@@ -567,8 +567,8 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Right</source>
 <target>Prawy</target>
 
-<source>Overview</source>
-<target>Przegląd</target>
+<source>Sync setttings</source>
+<target></target>
 
 <source>Status feedback</source>
 <target>Opinia statusu</target>
@@ -714,8 +714,8 @@ jest identyczna
 <source>Published under the GNU General Public License</source>
 <target>Udostępnione na zasadach licencji GNU General Public License</target>
 
-<source>Ignore subsequent errors</source>
-<target>Ignoruj kolejne błędy</target>
+<source>Ignore further errors</source>
+<target></target>
 
 <source>Hide further error messages during the current process</source>
 <target>Ukryj kolejne informacje o błędach dla tego zadania</target>
@@ -738,23 +738,20 @@ jest identyczna
 <source>&No</source>
 <target>&Nie</target>
 
+<source>Use Recycle Bin</source>
+<target>Użyj kosza</target>
+
 <source>Delete on both sides</source>
 <target>Usuń po obu stronach</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Usuń po obu stronach nawet jeżeli plik zaznaczony jest tylko po jednej stronie</target>
 
-<source>Use Recycle Bin</source>
-<target>Użyj kosza</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
-<target>
-Tylko pliki i katalogi, które spełniły wszystkie kryteria filtrów będą poddane synchronizacji.
-Uwaga: Podana nazwa musi być relatywną ścieżką względem synchronizowanych katalogów.
-</target>
+<target></target>
 
 <source>Hints:</source>
 <target>Wskazówki:</target>
@@ -789,20 +786,20 @@ Wyklucz: \moje\temp\*
 <source>Exclude</source>
 <target>Wyklucz</target>
 
-<source>Minimum file size</source>
-<target>Minimalny rozmiar pliku</target>
+<source>Time span</source>
+<target></target>
 
-<source>Maximum file size</source>
-<target>Maksymalny rozmiar pliku</target>
+<source>File size</source>
+<target></target>
+
+<source>Minimum</source>
+<target></target>
+
+<source>Maximum</source>
+<target></target>
 
 <source>&Default</source>
 <target>&Domyślne</target>
-
-<source>Move column up</source>
-<target>Przesuń kolumnę do góry</target>
-
-<source>Move column down</source>
-<target>Przesuń kolumnę w dół</target>
 
 <source>Transactional file copy</source>
 <target>Transakcyjne kopiowanie pliku</target>
@@ -822,14 +819,8 @@ Wyklucz: \moje\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)</target>
 
-<source>Hidden dialogs:</source>
-<target>Ukryte dialogi:</target>
-
-<source>Reset</source>
-<target>Resetuj</target>
-
-<source>Show hidden dialogs</source>
-<target>Pokaż ukryte dialogi</target>
+<source>Restore hidden dialogs</source>
+<target></target>
 
 <source>External applications</source>
 <target>Aplikacje zewnętrzne</target>
@@ -861,8 +852,8 @@ Wyklucz: \moje\temp\*
 <source>Folder pairs</source>
 <target>Pary folderów</target>
 
-<source>Compressed view</source>
-<target>Widok skompresowany</target>
+<source>Overview</source>
+<target>Przegląd</target>
 
 <source>Select view</source>
 <target>Określ widok</target>
@@ -891,8 +882,8 @@ Wyklucz: \moje\temp\*
 <source>Exclude all</source>
 <target>Odznacz wszystko</target>
 
-<source>Icon size:</source>
-<target>Rozmiar ikony:</target>
+<source>Show icons:</source>
+<target></target>
 
 <source>Small</source>
 <target>Mały</target>
@@ -917,6 +908,9 @@ Wyklucz: \moje\temp\*
 
 <source>Configuration saved!</source>
 <target>Konfiguracja zapisana!</target>
+
+<source>Never save changes</source>
+<target></target>
 
 <source>Save changes to current configuration?</source>
 <target>Zapisać zmiany obecnej konfiguracji?</target>
@@ -1029,9 +1023,6 @@ Wyklucz: \moje\temp\*
 <source>Error writing file:</source>
 <target>Błąd zapisu pliku:</target>
 
-<source>Batch file created successfully!</source>
-<target>Plik wsadowy utworzony pomyślnie!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1114,6 +1105,9 @@ Wyklucz: \moje\temp\*
 <source>This year</source>
 <target>W tym roku</target>
 
+<source>Last x days</source>
+<target></target>
+
 <source>Byte</source>
 <target>Bajtów</target>
 
@@ -1123,11 +1117,8 @@ Wyklucz: \moje\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filtr: Wszystkie pary</target>
-
-<source>Filter: Single pair</source>
-<target>Filtr: Pojedyńcza para</target>
+<source>Filter</source>
+<target></target>
 
 <source>Direct</source>
 <target>Bezpośrednio</target>
@@ -1153,8 +1144,8 @@ Wyklucz: \moje\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Odpowiednik %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Przywrócić wszystkie ukryte dialogi?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target></target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1335,8 +1326,8 @@ Wyklucz: \moje\temp\*
 <source>Preparing synchronization...</source>
 <target>Przygotowywanie synchronizacji...</target>
 
-<source>Memory allocation failed!</source>
-<target>Błąd alokacji zasobów!</target>
+<source>Out of memory!</source>
+<target></target>
 
 <source>File %x has an invalid date!</source>
 <target>Plik %x ma nieprawidłową datę!</target>
@@ -1491,11 +1482,11 @@ Wyklucz: \moje\temp\*
 <source>Generating database...</source>
 <target>Generowanie bazy danych...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Brak elementów do synchronizacji!</target>
+<source>Nothing to synchronize!</source>
+<target></target>
 
-<source>Error copying locked file %x!</source>
-<target>Błąd podczas kopiowania zablokowanego pliku %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target></target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Błąd weryfikacji danych: Plik źródłowy i docelowy różnią się zawartością!</target>

@@ -57,7 +57,7 @@ std::wstring includeNumberSeparator(const std::wstring& number);
 template <class NumberType> inline
 std::wstring toStringSep(NumberType number)
 {
-    return ffs_Impl::includeNumberSeparator(zen::toString<std::wstring>(number));
+    return ffs_Impl::includeNumberSeparator(zen::numberTo<std::wstring>(number));
 }
 }
 

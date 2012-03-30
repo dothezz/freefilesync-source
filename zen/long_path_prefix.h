@@ -55,7 +55,7 @@ template <size_t max_path> inline
 Zstring applyLongPathPrefixImpl(const Zstring& path)
 {
     assert(!path.empty()); //nicely check almost all WinAPI accesses!
-    assert(!zen::cStringIsWhiteSpace(path[0]));
+    assert(!zen::isWhiteSpace(path[0]));
 
     if (path.length() >= max_path &&    //maximum allowed path length without prefix is (MAX_PATH - 1)
         !zen::startsWith(path, LONG_PATH_PREFIX))

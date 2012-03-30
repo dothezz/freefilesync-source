@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <functional>
 #include <zen/zstring.h>
 #include <zen/fixed_list.h>
 #include <zen/stl_tools.h>
@@ -310,10 +311,10 @@ public:
     ObjectIdConst  getId() const { return this; }
     /**/  ObjectId getId()       { return this; }
 
-    static const T* retrieve(ObjectIdConst id) //returns NULL if object is not valid anymore
+    static const T* retrieve(ObjectIdConst id) //returns nullptr if object is not valid anymore
     {
         auto iter = activeObjects().find(id);
-        return static_cast<const T*>(iter == activeObjects().end() ? NULL : *iter);
+        return static_cast<const T*>(iter == activeObjects().end() ? nullptr : *iter);
     }
     static T* retrieve(ObjectId id) { return const_cast<T*>(retrieve(static_cast<ObjectIdConst>(id))); }
 
@@ -346,9 +347,9 @@ public:
     virtual CompareFilesResult getCategory() const = 0;
     virtual std::wstring getCatConflict() const = 0; //only filled if getCategory() == FILE_CONFLICT
     //sync operation
-    virtual SyncOperation testSyncOperation(SyncDirection testSyncDir, bool active) const;
+    virtual SyncOperation testSyncOperation(SyncDirection testSyncDir) const; //semantics: "what if"! assumes "active, no conflict, no recursion (directory)!
     virtual SyncOperation getSyncOperation() const;
-    std::wstring getSyncOpConflict() const; //return conflict when determining sync direction or during categorization
+    std::wstring getSyncOpConflict() const; //return conflict when determining sync direction or (still unresolved) conflict during categorization
 
     //sync settings
     void setSyncDir(SyncDirection newDir);
@@ -381,7 +382,6 @@ protected:
 
     ~FileSystemObject() {} //don't need polymorphic deletion
     //mustn't call parent here, it is already partially destroyed and nothing more than a pure HierarchyObject!
-
 
     virtual void flip();
     virtual void notifySyncCfgChanged() { parent().notifySyncCfgChanged(); /*propagate!*/ }
@@ -477,7 +477,7 @@ public:
         cmpResult(defaultCmpResult),
         dataLeft(left),
         dataRight(right),
-        moveFileRef(NULL) {}
+        moveFileRef(nullptr) {}
 
     template <SelectedSide side> Int64  getLastWriteTime() const;
     template <SelectedSide side> UInt64 getFileSize     () const;
@@ -485,20 +485,22 @@ public:
     template <SelectedSide side> const Zstring getExtension() const;
 
     void setMoveRef(ObjectId refId) { moveFileRef = refId; } //reference to corresponding renamed file
-    ObjectId getMoveRef() const { return moveFileRef; } //may be NULL
+    ObjectId getMoveRef() const { return moveFileRef; } //may be nullptr
 
     virtual CompareFilesResult getCategory() const;
     virtual std::wstring getCatConflict() const;
 
-    virtual SyncOperation testSyncOperation(SyncDirection testSyncDir, bool active) const;
+    virtual SyncOperation testSyncOperation(SyncDirection testSyncDir) const; //semantics: "what if"! assumes "active, no conflict, no recursion (directory)!
     virtual SyncOperation getSyncOperation() const;
 
-    template <SelectedSide side> void syncTo(const FileDescriptor& descrTarget, const FileDescriptor* descrSource = NULL); //copy + update file attributes (optional)
+    template <SelectedSide side> void syncTo(const FileDescriptor& descrTarget, const FileDescriptor* descrSource = nullptr); //copy + update file attributes (optional)
 
 private:
     template <CompareFilesResult res>
     void setCategory();
     void setCategoryConflict(const std::wstring& description);
+
+    SyncOperation applyMoveOptimization(SyncOperation op) const;
 
     virtual void flip();
     virtual void removeObjectL();
@@ -512,7 +514,7 @@ private:
     FileDescriptor dataLeft;
     FileDescriptor dataRight;
 
-    ObjectId moveFileRef;
+    ObjectId moveFileRef; //optional, filled by redetermineSyncDirection()
 };
 
 //------------------------------------------------------------------
@@ -1116,7 +1118,7 @@ void FileMapping::syncTo<LEFT_SIDE>(const FileDescriptor& descrTarget, const Fil
     if (descrSource)
         dataRight = *descrSource;
 
-    moveFileRef = NULL;
+    moveFileRef = nullptr;
     cmpResult = FILE_EQUAL;
     copyToL(); //copy FileSystemObject specific part
 }
@@ -1129,7 +1131,7 @@ void FileMapping::syncTo<RIGHT_SIDE>(const FileDescriptor& descrTarget, const Fi
     if (descrSource)
         dataLeft = *descrSource;
 
-    moveFileRef = NULL;
+    moveFileRef = nullptr;
     cmpResult = FILE_EQUAL;
     copyToR(); //copy FileSystemObject specific part
 }

@@ -14,7 +14,7 @@
 <target>탐색기에 표시</target>
 
 <source>Open with default application</source>
-<target>기본값 애플리케이션으로 열기</target>
+<target>기본값 응용 프로그램으로 열기</target>
 
 <source>Browse directory</source>
 <target>디렉토리 찾아보기</target>
@@ -50,7 +50,7 @@
 <target>비교 설정</target>
 
 <source>About</source>
-<target>상세정보</target>
+<target>상세 정보</target>
 
 <source>Error</source>
 <target>오류</target>
@@ -66,9 +66,6 @@
 
 <source>Configure filter</source>
 <target>필터 설정</target>
-
-<source>Customize columns</source>
-<target>개인 설정 - 열(세로칸) 조정</target>
 
 <source>Global settings</source>
 <target>전체 설정</target>
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>찾아보기</target>
 
-<source>Error reading from synchronization database:</source>
-<target>동기화 데이터베이스로부터 읽어 들이던 중 발생한 오류 :</target>
-
-<source>Error writing to synchronization database:</source>
-<target>동기화 데이터베이스에 쓰던 중 발생한 오류 :</target>
-
 <source>Invalid command line: %x</source>
 <target>잘못된 명령줄 : %x</target>
+
+<source>Info</source>
+<target>정보</target>
+
+<source>Fatal Error</source>
+<target>치명적 오류</target>
 
 <source>Windows Error Code %x:</source>
 <target>윈도우 에러 코드 %x:</target>
@@ -138,14 +135,20 @@
 <pluralform>%x 바이트</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>동기화 데이터베이스로부터 읽어 들이던 중 발생한 오류 :</target>
+
+<source>Error writing to synchronization database:</source>
+<target>동기화 데이터베이스에 쓰던 중 발생한 오류 :</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>호환되지 않는 동기화 데이터베이스 형식 :</target>
+
 <source>Initial synchronization:</source>
 <target>초기 동기화 :</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync 데이터베이스 파일 중 하나가 아직 존재하지 않습니다 :</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>호환되지 않는 동기화 데이터베이스 형식 :</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>데이터베이스 파일이 공통 동기화 세션을 공유하지 않습니다 :</target>
@@ -170,12 +173,6 @@
 <pluralform>%x초</pluralform>
 </target>
 
-<source>Info</source>
-<target>정보</target>
-
-<source>Fatal Error</source>
-<target>치명적 오류</target>
-
 <source>Error reading file:</source>
 <target>파일을 읽던 중 발생한 오류 :</target>
 
@@ -199,11 +196,14 @@
 <source>Error parsing configuration file:</source>
 <target>설정파일 분석 중 발생한 오류 :</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>휴지통으로 이동 중 발생한 오류 :</target>
+<source>Configuration loaded partially only:</source>
+<target>구성이 부분적으로만 로드 됐습니다 :</target>
 
-<source>Could not load a required DLL:</source>
-<target>필요한 DLL을 로드할 수 없습니다 :</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>%x 을(를) 휴지통으로 이동할 수 없습니다!</target>
+
+<source>Cannot load file %x.</source>
+<target>파일 %x 을(를) 로드할 수 없습니다.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>볼륨 섀도 복사본 서비스에 액세스하던 중 오류 발생!</target>
@@ -211,10 +211,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>WOW64 에서의 Shadow Copy 는 지원하지 않습니다. FreeFileSync 64-bit 버전을 사용하세요.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>파일 볼륨 이름을 결정할 수 없습니다 :</target>
+<source>Cannot determine volume name for file:</source>
+<target>파일의 볼륨 이름을 결정할 수 없습니다 :</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>볼륨 이름 %x 이(가) 파일 이름 %y 의 일부가 아닙니다!</target>
 
 <source>/sec</source>
@@ -223,8 +223,8 @@
 <source>File does not exist:</source>
 <target>파일이 존재하지 않습니다 :</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>다음 XML 노드 값을 읽어 들일 수 없습니다 :</target>
+<source>Cannot read the following XML elements:</source>
+<target>다음 XML 요소를 읽을 수 없습니다 :</target>
 
 <source>S&ave configuration...</source>
 <target>설정 저장</target>
@@ -266,7 +266,7 @@ The command line is executed each time:
 </source>
 <target>
 명령줄은 다음과 같은 경우에 매번 실행 됩니다:
-- 모든 디렉토리가 사용 가능할 경우 (예. USB 스틱 삽입시) 
+- 모든 디렉토리가 사용 가능할 경우 (예 : USB 스틱 삽입시) 
 - 해당 디렉토리 또는 서브디렉토리 내의 파일이 변경될 경우
 </target>
 
@@ -319,7 +319,7 @@ The command line is executed each time:
 <target>디렉토리 입력 필드가 비어 있습니다.</target>
 
 <source>Logging</source>
-<target>로그 중</target>
+<target>로깅</target>
 
 <source>File time and size</source>
 <target>파일 시간 및 크기</target>
@@ -508,7 +508,7 @@ The command line is executed each time:
 <target>마지막으로 사용한 설정 (DEL 키를 누르면 리스트에서 삭제)</target>
 
 <source>Hide excluded items</source>
-<target>제외 아이템 숨기기</target>
+<target>제외된 항목 숨기기</target>
 
 <source>Hide filtered or temporarily excluded files</source>
 <target>필터링 되거나 임시 제외될 파일 숨기기</target>
@@ -529,25 +529,25 @@ The command line is executed each time:
 <target>작업 :</target>
 
 <source>Items found:</source>
-<target>발견된 요소 :</target>
+<target>발견된 항목 :</target>
 
 <source>Items remaining:</source>
-<target>남은 요소 :</target>
+<target>남은 항목 :</target>
 
 <source>Speed:</source>
 <target>속도 :</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>남은 시간 :</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>경과 시간 :</target>
 
 <source>Batch job</source>
 <target>일괄 작업</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>자동 동기화를 위한 일괄 파일 생성. 일괄모드 시작을 원할 경우, 해당 파일을 더블클릭하거나 명령줄: FreeFileSync.exe <ffs_batch file>을 실행하십시오. 이 작업은 운영체제 작업관리 기능에서도 예약 가능합니다.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>일괄 파일 생성 및 자동 동기화. 배치모드 시작은 본 파일을 더블클릭하거나 다음 명령을 실행 : FreeFileSync.exe SyncJob.ffs_batch. 이 작업은 운영체제 작업관리 기능에서도 예약 가능합니다.</target>
 
 <source>Help</source>
 <target>도움말</target>
@@ -561,8 +561,8 @@ The command line is executed each time:
 <source>Right</source>
 <target>우측</target>
 
-<source>Overview</source>
-<target>개요</target>
+<source>Sync setttings</source>
+<target>싱크(동기화) 설정</target>
 
 <source>Status feedback</source>
 <target>상태 피드백</target>
@@ -676,7 +676,7 @@ is the same
 <target>동기화 작업 중...</target>
 
 <source>Items processed:</source>
-<target>처리된 요소 :</target>
+<target>처리된 항목 :</target>
 
 <source>&Pause</source>
 <target>일시정지(&P)</target>
@@ -708,8 +708,8 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>GNU 일반 공용 라이센스에 의한 출시</target>
 
-<source>Ignore subsequent errors</source>
-<target>이후 일어나는 오류 무시</target>
+<source>Ignore further errors</source>
+<target>더 이상의 오류는 무시</target>
 
 <source>Hide further error messages during the current process</source>
 <target>현재 처리과정 동안 추가오류 메세지 숨기기</target>
@@ -732,22 +732,22 @@ is the same
 <source>&No</source>
 <target>아니오(&N)</target>
 
+<source>Use Recycle Bin</source>
+<target>휴지통 사용</target>
+
 <source>Delete on both sides</source>
 <target>양측 모두 삭제</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>어느 한쪽의 파일만 선택하더라도 양측 모두 삭제</target>
 
-<source>Use Recycle Bin</source>
-<target>휴지통 사용</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-모든 필터 설정과 일치하는 파일/디렉토리 만을 동기화 대상으로 선택합니다.
-참고 : 메인 동기화 디렉토리와 대비하여 필터 이름을 지정해야 합니다.
+모든 필터 설정과 일치하는 파일만 동기화 됩니다.
+참고 : 파일 이름은 기본 디렉토리와 상응해야 합니다!
 </target>
 
 <source>Hints:</source>
@@ -783,20 +783,20 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>제외</target>
 
-<source>Minimum file size</source>
-<target>최소 파일 크기</target>
+<source>Time span</source>
+<target>시간간격(타임스팬)</target>
 
-<source>Maximum file size</source>
-<target>최대 파일 크기</target>
+<source>File size</source>
+<target>파일 크기</target>
+
+<source>Minimum</source>
+<target>최소</target>
+
+<source>Maximum</source>
+<target>최대</target>
 
 <source>&Default</source>
 <target>기본 설정/값(&D)</target>
-
-<source>Move column up</source>
-<target>열 위로 이동</target>
-
-<source>Move column down</source>
-<target>열 아래로 이동</target>
 
 <source>Transactional file copy</source>
 <target>트랜잭션 파일 복사</target>
@@ -816,17 +816,11 @@ Exclude: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>파일 및 디렉토리 권한 전송 (관리자 권한이 필요함)</target>
 
-<source>Hidden dialogs:</source>
-<target>다이얼로그 숨기기</target>
-
-<source>Reset</source>
-<target>리셋</target>
-
-<source>Show hidden dialogs</source>
-<target>숨긴 다이얼로그 표시</target>
+<source>Restore hidden dialogs</source>
+<target>숨겨진 대화창 복원</target>
 
 <source>External applications</source>
-<target>외부 애플리케이션</target>
+<target>외부 응용 프로그램</target>
 
 <source>Description</source>
 <target>설명</target>
@@ -855,8 +849,8 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>폴더 페어(짝)</target>
 
-<source>Compressed view</source>
-<target>압축 보기</target>
+<source>Overview</source>
+<target>개요</target>
 
 <source>Select view</source>
 <target>보기 선택</target>
@@ -885,8 +879,8 @@ Exclude: \stuff\temp\*
 <source>Exclude all</source>
 <target>모두 제외</target>
 
-<source>Icon size:</source>
-<target>아이콘 크기</target>
+<source>Show icons:</source>
+<target>아이콘 표시 :</target>
 
 <source>Small</source>
 <target>작게</target>
@@ -911,6 +905,9 @@ Exclude: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>설정 저장 완료!</target>
+
+<source>Never save changes</source>
+<target>변경사항 절대 저장 안 함.</target>
 
 <source>Save changes to current configuration?</source>
 <target>현재 설정의 변경 내용을 저장하시겠습니까?</target>
@@ -1023,9 +1020,6 @@ Exclude: \stuff\temp\*
 <source>Error writing file:</source>
 <target>파일을 쓰던 중 발생한 오류 :</target>
 
-<source>Batch file created successfully!</source>
-<target>일괄 파일이 성공적으로 생성 됐습니다!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1100,6 +1094,9 @@ Exclude: \stuff\temp\*
 <source>This year</source>
 <target>올해</target>
 
+<source>Last x days</source>
+<target>최근 x일</target>
+
 <source>Byte</source>
 <target>바이트</target>
 
@@ -1109,11 +1106,8 @@ Exclude: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>필터 : 모든 페어(짝)</target>
-
-<source>Filter: Single pair</source>
-<target>필터 : 단일 페어(짝)</target>
+<source>Filter</source>
+<target>필터</target>
 
 <source>Direct</source>
 <target>다이렉트</target>
@@ -1125,7 +1119,7 @@ Exclude: \stuff\temp\*
 <target>NTFS 권한 복사</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
-<target>외부 애플리케이션을 Context Menu에 통합. 다음 매크로가 사용 가능합니다 :</target>
+<target>외부 응용 프로그램을 Context Menu에 통합. 다음 매크로가 사용 가능합니다 :</target>
 
 <source>- full file or directory name</source>
 <target>- 전체 파일 또는 디렉토리 이름</target>
@@ -1139,8 +1133,8 @@ Exclude: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- %dir 의 반대측 대상</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>모든 숨긴 다이얼로그를 복원 하시겠습니까?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>숨겨진 대화창이나 경고 메세지를 다시 보이게 하시겠습니까?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1311,8 +1305,8 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>동기화 준비 중...</target>
 
-<source>Memory allocation failed!</source>
-<target>메모리 할당 실패!</target>
+<source>Out of memory!</source>
+<target>메모리 부족!</target>
 
 <source>File %x has an invalid date!</source>
 <target>파일 %x 의 날짜가 유효하지 않습니다!</target>
@@ -1467,11 +1461,11 @@ Exclude: \stuff\temp\*
 <source>Generating database...</source>
 <target>데이터베이스 생성 중...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>구성 설정에 따라 동기화 할 내용이 없습니다!</target>
+<source>Nothing to synchronize!</source>
+<target>동기화 할 항목이 없습니다!</target>
 
-<source>Error copying locked file %x!</source>
-<target>복사 실패! 파일 %x 에 락이 걸려 있습니다.</target>
+<source>Unable to copy locked file %x!</source>
+<target>잠겨진 파일 %x 을(를) 복사할 수 없습니다!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>데이터 확인 오류 : 소스 및 타겟 파일의 내용이 다릅니다!</target>

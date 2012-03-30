@@ -49,13 +49,15 @@ class Int64
 {
 public:
     //safe implicit conversions
-    Int64()                   : value(0) {}
-    Int64(const Int64&   rhs) : value(rhs.value) {}
-	template <class T> 
-	Int64(T rhs, typename EnableIf<IsSignedInt<T>::result && sizeof(T) <= sizeof(std::int64_t)>::Result* = NULL) : value(static_cast<std::int64_t>(rhs)) {}
+    Int64()                 : value(0) {}
+    Int64(const Int64& rhs) : value(rhs.value) {}
+    template <class T>
+    Int64(T rhs, typename EnableIf<IsSignedInt<T>::value && sizeof(T) <= sizeof(std::int64_t)>::Type* = nullptr) :
+        value(static_cast<std::int64_t>(rhs)) {}
 
     //unsafe explicit but checked conversion for all other integer types
-    template <class T> explicit Int64(T rhs, typename EnableIf<!(IsSignedInt<T>::result && sizeof(T) <= sizeof(std::int64_t))>::Result* = NULL) : value(static_cast<std::int64_t>(rhs)) { checkRange<std::int64_t>(rhs); }
+    template <class T> explicit Int64(T rhs, typename EnableIf<!(IsSignedInt<T>::value && sizeof(T) <= sizeof(std::int64_t))>::Type* = nullptr) :
+        value(static_cast<std::int64_t>(rhs)) { checkRange<std::int64_t>(rhs); }
 
     Int64& operator=(const Int64& rhs) { value = rhs.value; return *this; }
 
@@ -126,13 +128,15 @@ class UInt64
 {
 public:
     //safe implicit conversions
-    UInt64()                    : value(0) {}
-    UInt64(const UInt64&   rhs) : value(rhs.value) {}
-	template <class T> 
-	UInt64(T rhs, typename EnableIf<IsUnsignedInt<T>::result && sizeof(T) <= sizeof(std::uint64_t)>::Result* = NULL) : value(static_cast<std::uint64_t>(rhs)) {}
+    UInt64()                  : value(0) {}
+    UInt64(const UInt64& rhs) : value(rhs.value) {}
+    template <class T>
+    UInt64(T rhs, typename EnableIf<IsUnsignedInt<T>::value && sizeof(T) <= sizeof(std::uint64_t)>::Type* = nullptr) :
+        value(static_cast<std::uint64_t>(rhs)) {}
 
     //unsafe explicit but checked conversion for all other integer types
-    template <class T> explicit UInt64(T rhs, typename EnableIf<!(IsUnsignedInt<T>::result && sizeof(T) <= sizeof(std::uint64_t))>::Result* = NULL) : value(static_cast<std::uint64_t>(rhs)) { checkRange<std::uint64_t>(rhs); }
+    template <class T> explicit UInt64(T rhs, typename EnableIf<!(IsUnsignedInt<T>::value && sizeof(T) <= sizeof(std::uint64_t))>::Type* = nullptr) :
+        value(static_cast<std::uint64_t>(rhs)) { checkRange<std::uint64_t>(rhs); }
 
     UInt64& operator=(const UInt64& rhs) { value = rhs.value; return *this; }
 
@@ -248,8 +252,8 @@ public:
 //specialize zen type trait
 namespace zen -> we cannot mix signed/unsigned in general arithmetic operations -> we'll use the ostream-approach
 {
-template <> struct IsUnsignedInt<UInt64> { enum { result = true }; };
-template <> struct IsSignedInt  <Int64> { enum { result = true }; };
+template <> struct IsUnsignedInt<UInt64> : StaticBool<true> {};
+template <> struct IsSignedInt  <Int64>  : StaticBool<true> {};
 }
 */
 #endif //FFS_LARGE_64_BIT_INTEGER_H_INCLUDED

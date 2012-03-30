@@ -63,7 +63,7 @@ std::vector<size_t> parseVersion(const wxString& version)
     while (tkz.HasMoreTokens())
     {
         const wxString& token = tkz.GetNextToken();
-        output.push_back(zen::toNumber<size_t>(token));
+        output.push_back(zen::stringTo<size_t>(token));
     }
     return output;
 }
@@ -114,7 +114,7 @@ void zen::checkForUpdatePeriodically(long& lastUpdateCheck)
         if (lastUpdateCheck == 0)
         {
             const bool checkRegularly = showQuestionDlg(ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO,
-                                                        wxString(_("Do you want FreeFileSync to automatically check for updates every week?")) + wxT("\n") +
+                                                        _("Do you want FreeFileSync to automatically check for updates every week?") + L"\n" +
                                                         _("(Requires an Internet connection!)")) == ReturnQuestionDlg::BUTTON_YES;
             if (checkRegularly)
             {

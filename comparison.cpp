@@ -6,6 +6,8 @@
 
 #include "comparison.h"
 #include <stdexcept>
+#include <numeric>
+#include <zen/perf.h>
 #include <zen/scope_guard.h>
 #include <wx+/string_conv.h>
 #include <wx+/format_unit.h>
@@ -15,10 +17,7 @@
 #include "lib/binary.h"
 #include "lib/cmp_filetime.h"
 #include "algorithm.h"
-
-#ifdef FFS_WIN
-#include <zen/perf.h>
-#endif
+#include "lib/status_handler_impl.h"
 
 using namespace zen;
 
@@ -71,50 +70,33 @@ void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, 
     });
 
     //check for empty entries
-    if ((totallyFilledPairs + partiallyFilledPairs == 0) || //all empty
-        (partiallyFilledPairs > 0 && //partial entry is invalid
-         !(totallyFilledPairs == 0 && partiallyFilledPairs == 1))) //exception: one partial pair okay: one-dir only scenario
+    tryReportingError([&]
     {
-        while (true)
-        {
-            const std::wstring additionalInfo = _("You can ignore this error to consider the directory as empty.");
-            const ProcessCallback::Response rv = procCallback.reportError(_("A directory input field is empty.") + L" \n\n" +
-                                                                          + L"(" + additionalInfo + L")");
-            if (rv == ProcessCallback::IGNORE_ERROR)
-                break;
-            else if (rv == ProcessCallback::RETRY)
-                ;  //continue with loop
-            else
-                throw std::logic_error("Programming Error: Unknown return value! (1)");
-        }
-    }
+        if ((totallyFilledPairs + partiallyFilledPairs == 0) || //all empty
+        (partiallyFilledPairs > 0 && //partial entry is invalid
+        !(totallyFilledPairs == 0 && partiallyFilledPairs == 1))) //exception: one partial pair okay: one-dir only scenario
+            throw FileError(_("A directory input field is empty.") + L" \n\n" +
+            _("You can ignore this error to consider the directory as empty."));
+    }, procCallback);
 }
 
 
-void checkDirectoryExistence(const std::set<Zstring, LessFilename>& dirnames,
-                             std::set<Zstring, LessFilename>& dirnamesExisting,
-                             bool allowUserInteraction,
-                             ProcessCallback& procCallback)
+void determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
+                           std::set<Zstring, LessFilename>& dirnamesExisting,
+                           bool allowUserInteraction,
+                           ProcessCallback& procCallback)
 {
     std::for_each(dirnames.begin(), dirnames.end(),
                   [&](const Zstring& dirname)
     {
         if (!dirname.empty())
         {
-            while (!dirExistsUpdating(dirname, allowUserInteraction, procCallback))
-            {
-                const std::wstring additionalInfo = _("You can ignore this error to consider the directory as empty.");
-                std::wstring errorMessage = _("Directory does not exist:") + L"\n" + L"\"" + dirname + L"\"";
-                ProcessCallback::Response rv = procCallback.reportError(errorMessage + L"\n\n" + additionalInfo /* + L" " + getLastErrorFormatted()*/);
-
-                if (rv == ProcessCallback::IGNORE_ERROR)
-                    return;
-                else if (rv == ProcessCallback::RETRY)
-                    ;  //continue with loop
-                else
-                    throw std::logic_error("Programming Error: Unknown return value! (2)");
-            }
-
+            if (tryReportingError([&]
+        {
+            if (!dirExistsUpdating(dirname, allowUserInteraction, procCallback))
+                    throw FileError(_("Directory does not exist:") + L"\n" + L"\"" + dirname + L"\"" + L" \n\n" +
+                    _("You can ignore this error to consider the directory as empty."));
+            }, procCallback))
             dirnamesExisting.insert(dirname);
         }
     });
@@ -178,12 +160,12 @@ private:
 };
 
 
-bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filename2, UInt64 totalBytesToCmp, ProcessCallback& pc)
+bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filename2, UInt64 totalBytesToCmp, ProcessCallback& pc) //throw FileError
 {
     UInt64 bytesReported; //amount of bytes that have been compared and communicated to status handler
 
     //in error situation: undo communication of processed amount of data
-    zen::ScopeGuard guardStatistics = zen::makeGuard([&]() { pc.updateProcessedData(0, -1 * to<Int64>(bytesReported)); });
+    zen::ScopeGuard guardStatistics = zen::makeGuard([&] { pc.updateProcessedData(0, -1 * to<Int64>(bytesReported)); });
 
     CmpCallbackImpl callback(pc, bytesReported);
     bool sameContent = filesHaveSameContent(filename1, filename2, callback); //throw FileError
@@ -245,7 +227,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
             dirnames.insert(fpCfg.leftDirectoryFmt);
             dirnames.insert(fpCfg.rightDirectoryFmt);
         });
-        checkDirectoryExistence(dirnames, dirnamesExisting, allowUserInteraction_, procCallback);
+        determineExistentDirs(dirnames, dirnamesExisting, allowUserInteraction_, procCallback);
     }
     auto dirAvailable = [&](const Zstring& dirnameFmt) { return dirnamesExisting.find(dirnameFmt) != dirnamesExisting.end(); };
 
@@ -363,7 +345,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
     }
     catch (const std::bad_alloc& e)
     {
-        procCallback.reportFatalError(_("Memory allocation failed!") + L" " + utf8CvrtTo<std::wstring>(e.what()));
+        procCallback.reportFatalError(_("Out of memory!") + L" " + utf8CvrtTo<std::wstring>(e.what()));
     }
     catch (const std::exception& e)
     {
@@ -515,17 +497,6 @@ void CompareProcess::compareByTimeSize(const FolderPairCfg& fpConfig, BaseDirMap
 }
 
 
-UInt64 getBytesToCompare(const std::vector<FileMapping*>& rowsToCompare)
-{
-    UInt64 dataTotal;
-
-    for (auto j = rowsToCompare.begin(); j != rowsToCompare.end(); ++j)
-        dataTotal += (*j)->getFileSize<LEFT_SIDE>();  //left and right filesizes should be the same
-
-    return dataTotal * 2U;
-}
-
-
 void CompareProcess::categorizeSymlinkByContent(SymLinkMapping& linkObj) const
 {
     //categorize symlinks that exist on both sides
@@ -587,7 +558,9 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
     });
 
     const size_t objectsTotal = filesToCompareBytewise.size() * 2;
-    const UInt64 bytesTotal   = getBytesToCompare(filesToCompareBytewise);
+    const UInt64 bytesTotal   =  //left and right filesizes should be the same
+        2U * std::accumulate(filesToCompareBytewise.begin(), filesToCompareBytewise.end(), static_cast<UInt64>(0),
+    [](UInt64 sum, FileMapping* fsObj) { return sum + fsObj->getFileSize<LEFT_SIDE>(); });
 
     procCallback.initNewProcess(static_cast<int>(objectsTotal),
                                 to<Int64>(bytesTotal),
@@ -604,44 +577,29 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
         procCallback.reportStatus(replaceCpy(txtComparingContentOfFiles, L"%x", utf8CvrtTo<std::wstring>(fileObj->getRelativeName<LEFT_SIDE>()), false));
 
         //check files that exist in left and right model but have different content
-        while (true)
-        {
-            try
-            {
-                if (filesHaveSameContentUpdating(fileObj->getFullName<LEFT_SIDE>(),
-                                                 fileObj->getFullName<RIGHT_SIDE>(),
-                                                 fileObj->getFileSize<LEFT_SIDE>() * 2U,
-                                                 procCallback))
-                {
-                    if (fileObj->getShortName<LEFT_SIDE>() == fileObj->getShortName<RIGHT_SIDE>() &&
-                        timeCmp.getResult(fileObj->getLastWriteTime<LEFT_SIDE>(),
-                                          fileObj->getLastWriteTime<RIGHT_SIDE>()) == CmpFileTime::TIME_EQUAL)
-                        fileObj->setCategory<FILE_EQUAL>();
-                    else
-                        fileObj->setCategory<FILE_DIFFERENT_METADATA>();
-                }
-                else
-                    fileObj->setCategory<FILE_DIFFERENT>();
 
-                procCallback.updateProcessedData(2, 0); //processed data is communicated in subfunctions!
-                procCallback.requestUiRefresh(); //may throw
-                break;
-            }
-            catch (FileError& error)
+        if (!tryReportingError([&]
+    {
+        if (filesHaveSameContentUpdating(fileObj->getFullName<LEFT_SIDE>(), //throw FileError
+            fileObj->getFullName<RIGHT_SIDE>(),
+            fileObj->getFileSize<LEFT_SIDE>() * 2U,
+            procCallback))
             {
-                ProcessCallback::Response rv = procCallback.reportError(error.toString());
-                if (rv == ProcessCallback::IGNORE_ERROR)
-                {
-                    fileObj->setCategoryConflict(_("Conflict detected:") + L"\n" + _("Comparing files by content failed."));
-                    break;
-                }
-
-                else if (rv == ProcessCallback::RETRY)
-                    ;   //continue with loop
+                if (fileObj->getShortName<LEFT_SIDE>() == fileObj->getShortName<RIGHT_SIDE>() &&
+                timeCmp.getResult(fileObj->getLastWriteTime<LEFT_SIDE>(),
+                fileObj->getLastWriteTime<RIGHT_SIDE>()) == CmpFileTime::TIME_EQUAL)
+                    fileObj->setCategory<FILE_EQUAL>();
                 else
-                    throw std::logic_error("Programming Error: Unknown return value!");
+                    fileObj->setCategory<FILE_DIFFERENT_METADATA>();
             }
-        }
+            else
+                fileObj->setCategory<FILE_DIFFERENT>();
+
+            procCallback.updateProcessedData(2, 0); //processed data is communicated in subfunctions!
+            procCallback.requestUiRefresh(); //may throw
+
+        }, procCallback))
+        fileObj->setCategoryConflict(_("Conflict detected:") + L"\n" + _("Comparing files by content failed."));
     });
 }
 
@@ -730,7 +688,7 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     typedef const DirContainer::FileList::value_type FileData;
 
     linearMerge(leftSide.files, rightSide.files,
-    [&](const FileData& fileLeft)  { output.addSubFile<LEFT_SIDE> (fileLeft.first, fileLeft.second);   }, //left only
+    [&](const FileData& fileLeft ) { output.addSubFile<LEFT_SIDE >(fileLeft .first, fileLeft .second); }, //left only
     [&](const FileData& fileRight) { output.addSubFile<RIGHT_SIDE>(fileRight.first, fileRight.second); }, //right only
 
     [&](const FileData& fileLeft, const FileData& fileRight) //both sides
@@ -792,7 +750,7 @@ void processFilteredDirs(HierarchyObject& hierObj, const HardFilter& filterProc)
     std::for_each(subDirs.begin(), subDirs.end(),
                   [&](DirMapping& dirObj)
     {
-        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), NULL)); //subObjMightMatch is always true in this context!
+        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), nullptr)); //subObjMightMatch is always true in this context!
         processFilteredDirs(dirObj, filterProc);
     });
 

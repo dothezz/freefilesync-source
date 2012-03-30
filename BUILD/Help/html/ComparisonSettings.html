@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20111117;19373200">
+	<META NAME="CHANGED" CONTENT="20120227;12315700">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -29,9 +29,9 @@ Settings</FONT></H3>
 <H3 CLASS="western" STYLE="page-break-after: avoid"><FONT FACE="Tahoma, sans-serif">I.
 Compare by &quot;File time and size&quot;</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">This
-variant evaluates two equally named files as being equal when they
-have the same modification time <B>and</B> file size. When the
-comparison is started, the following decision tree is processed:</FONT></P>
+variant considers two files with the same name as equal when
+modification time <B>and</B> file size match. The following cases are
+distinguished:</FONT></P>
 <OL TYPE=i>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>file
 	exists on one side only</B></FONT></P>
@@ -63,8 +63,6 @@ comparison is started, the following decision tree is processed:</FONT></P>
 		</UL>
 	</OL>
 </OL>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">This
 results into the following categories:</FONT></P>
 <UL>
@@ -85,10 +83,10 @@ results into the following categories:</FONT></P>
 <H3 CLASS="western" STYLE="page-break-after: avoid"><FONT FACE="Tahoma, sans-serif">II.
 Compare by &quot;File content&quot;</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Two
-files which have the same name are marked as equal if and only if
-they have the same content. This option is more useful for
-consistency checks rather than backup operations for reasons of
-speed. The file modification time is not taken into account at all.</FONT></P>
+files with the same name are marked as equal if and only if they have
+the same content. This option is more useful for consistency checks
+rather than backup operations since it is naturally slower. The file
+modification time is not taken into account at all.</FONT></P>
 <OL TYPE=i>
 	<LI VALUE=1><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>file
 	exists on one side only</B></FONT></P>
@@ -128,23 +126,21 @@ handling</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
-offers three options to configure processing of symbolic links (also
+offers three options to configure handling of symbolic links (also
 called symlinks or soft links):</FONT></P>
 <OL>
 	<LI><P STYLE="margin-bottom: 0cm"><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Exclude:</B></SPAN></FONT></SPAN>
-	<FONT FACE="Tahoma, sans-serif">skips symbolic links while scanning
-	input directories.<BR></FONT>&nbsp;</P>
+	S<FONT FACE="Tahoma, sans-serif">kip symbolic links while scanning
+	directories.<BR></FONT>&nbsp;</P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Direct:</B></FONT>
-	<FONT FACE="Tahoma, sans-serif">configures synchronization of the
-	symbolic link object itself and not its target. symbolic links will
-	be visible on main grid as a separate entity with corresponding meta
-	data. Links pointing to directories are not traversed and the link
-	object is copied directly during synchronization. <BR></FONT>&nbsp;</P>
+	<FONT FACE="Tahoma, sans-serif">Evaluate the symbolic link object
+	directly. Symbolic links will be shown as a separate entity on grid.
+	Links pointing to directories are not traversed and the link object
+	is copied directly during synchronization. <BR></FONT>&nbsp;</P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Follow:</B></SPAN>
-	dereferences symbolic links, i.e. they are treated like their target
-	objects. Links pointing to directories are traversed like ordinary
-	folders and the target of each link is copied during
-	synchronization.</FONT></P>
+	Treat symbolic links like the object they are pointing to. Links
+	pointing to directories are traversed like ordinary directories and
+	the target of each link is copied during synchronization.</FONT></P>
 </OL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
@@ -153,15 +149,12 @@ called symlinks or soft links):</FONT></P>
 	<FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT></P>
 	<UL>
 		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
-		Windows the options described above always apply to </FONT><FONT FACE="Tahoma, sans-serif"><I>&quot;Reparse
+		Windows the symbolic link options apply to </FONT><FONT FACE="Tahoma, sans-serif"><I>&quot;Reparse
 		Points&quot;</I></FONT><FONT FACE="Tahoma, sans-serif">. Reparse
-		Points are a more general concept including for example symbolic
-		links, junctions and mount points. The term </FONT><FONT FACE="Tahoma, sans-serif"><I>&quot;symbolic
-		link&quot; </I></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal">has
-		been retained nevertheless for harmonization with Linux.</SPAN></FONT></P>
+		Points are a more general concept including symbolic links,
+		junctions and mount points.</FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif">Copying
-		symbolic links requires the application to be started with
-		administrator rights.</FONT></P>
+		symbolic links requires administrator rights.</FONT></P>
 	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>

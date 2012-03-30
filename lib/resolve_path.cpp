@@ -30,17 +30,17 @@ namespace
 Zstring resolveRelativePath(Zstring relativeName) //note: ::GetFullPathName() is documented not threadsafe!
 {
     const DWORD bufferSize = 10000;
-    std::vector<Zchar> fullPath(bufferSize);
+    std::vector<wchar_t> buffer(bufferSize);
 
-    const DWORD rv = ::GetFullPathName(applyLongPathPrefix(relativeName).c_str(), //__in   LPCTSTR lpFileName,
-                                       bufferSize,   //__in   DWORD nBufferLength,
-                                       &fullPath[0], //__out  LPTSTR lpBuffer,
-                                       NULL);        //__out  LPTSTR *lpFilePart
-    if (rv == 0 || rv >= bufferSize) //theoretically, rv can never be == bufferSize
+    const DWORD charsWritten = ::GetFullPathName(applyLongPathPrefix(relativeName).c_str(), //__in   LPCTSTR lpFileName,
+                                                 bufferSize, //__in   DWORD nBufferLength,
+                                                 &buffer[0], //__out  LPTSTR lpBuffer,
+                                                 nullptr);   //__out  LPTSTR *lpFilePart
+    if (charsWritten == 0 || charsWritten >= bufferSize) //theoretically, charsWritten can never be == bufferSize
         //ERROR! Don't do anything
         return relativeName;
 
-    return Zstring(&fullPath[0], rv);
+    return Zstring(&buffer[0], charsWritten);
 }
 
 #elif defined FFS_LINUX
@@ -52,7 +52,7 @@ Zstring resolveRelativePath(const Zstring& relativeName)
     if (!startsWith(relativeName, FILE_NAME_SEPARATOR)) //absolute names are exactly those starting with a '/'
     {
         std::vector<char> buffer(10000);
-        if (::getcwd(&buffer[0], buffer.size()) != NULL)
+        if (::getcwd(&buffer[0], buffer.size()) != nullptr)
         {
             Zstring workingDir = &buffer[0];
             if (!endsWith(workingDir, FILE_NAME_SEPARATOR))
@@ -64,10 +64,10 @@ Zstring resolveRelativePath(const Zstring& relativeName)
     return relativeName;
 
     /*
-        char* absPath = ::realpath(relativeName.c_str(), NULL);
+        char* absPath = ::realpath(relativeName.c_str(), nullptr);
         if (!absPath)
             return relativeName; //ERROR! Don't do anything
-        ZEN_ON_BLOCK_EXIT(::free(absPath));
+        ZEN_ON_SCOPE_EXIT(::free(absPath));
 
         return Zstring(absPath);
         */
@@ -93,9 +93,9 @@ private:
         auto addCsidl = [&](int csidl, const Zstring& paramName)
         {
             wchar_t buffer[MAX_PATH];
-            if (SUCCEEDED(::SHGetFolderPath(NULL,                           //__in   HWND hwndOwner,
+            if (SUCCEEDED(::SHGetFolderPath(nullptr,                        //__in   HWND hwndOwner,
                                             csidl | CSIDL_FLAG_DONT_VERIFY, //__in   int nFolder,
-                                            NULL,						    //__in   HANDLE hToken,
+                                            nullptr,				        //__in   HANDLE hToken,
                                             0 /* == SHGFP_TYPE_CURRENT*/,   //__in   DWORD dwFlags,
                                             buffer)))					  	//__out  LPTSTR pszPath
             {
@@ -294,41 +294,44 @@ Zstring volumenNameToPath(const Zstring& volumeName) //return empty string on er
     HANDLE hVol = ::FindFirstVolume(&volGuid[0], static_cast<DWORD>(volGuid.size()));
     if (hVol != INVALID_HANDLE_VALUE)
     {
-        ZEN_ON_BLOCK_EXIT(::FindVolumeClose(hVol));
+        ZEN_ON_SCOPE_EXIT(::FindVolumeClose(hVol));
 
         do
         {
             std::vector<wchar_t> volName(MAX_PATH + 1);
 
-            if (::GetVolumeInformation(&volGuid[0],    //__in_opt   LPCTSTR lpRootPathName,
-                                       &volName[0],    //__out      LPTSTR lpVolumeNameBuffer,
+            if (::GetVolumeInformation(&volGuid[0], //__in_opt   LPCTSTR lpRootPathName,
+                                       &volName[0], //__out      LPTSTR lpVolumeNameBuffer,
                                        static_cast<DWORD>(volName.size()), //__in       DWORD nVolumeNameSize,
-                                       NULL,           //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                       NULL,           //__out_opt  LPDWORD lpMaximumComponentLength,
-                                       NULL,           //__out_opt  LPDWORD lpFileSystemFlags,
-                                       NULL,           //__out      LPTSTR lpFileSystemNameBuffer,
-                                       0))             //__in       DWORD nFileSystemNameSize
+                                       nullptr,     //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                       nullptr,     //__out_opt  LPDWORD lpMaximumComponentLength,
+                                       nullptr,     //__out_opt  LPDWORD lpFileSystemFlags,
+                                       nullptr,     //__out      LPTSTR lpFileSystemNameBuffer,
+                                       0))          //__in       DWORD nFileSystemNameSize
             {
                 if (EqualFilename()(volumeName, Zstring(&volName[0])))
                 {
                     //GetVolumePathNamesForVolumeName is not available for Windows 2000!
                     typedef	BOOL (WINAPI* GetVolumePathNamesForVolumeNameWFunc)(LPCWSTR lpszVolumeName,
-                                                                                LPWCH lpszVolumePathNames,
-                                                                                DWORD cchBufferLength,
+                                                                                LPWCH  lpszVolumePathNames,
+                                                                                DWORD  cchBufferLength,
                                                                                 PDWORD lpcchReturnLength);
 
                     const SysDllFun<GetVolumePathNamesForVolumeNameWFunc> getVolumePathNamesForVolumeName(L"kernel32.dll", "GetVolumePathNamesForVolumeNameW");
                     if (getVolumePathNamesForVolumeName)
                     {
-                        std::vector<wchar_t> volPath(10000);
-
+                        std::vector<wchar_t> buffer(10000);
                         DWORD returnedLen = 0;
-                        if (getVolumePathNamesForVolumeName(&volGuid[0],     //__in   LPCTSTR lpszVolumeName,
-                                                            &volPath[0],     //__out  LPTSTR lpszVolumePathNames,
-                                                            static_cast<DWORD>(volPath.size()), //__in   DWORD cchBufferLength,
-                                                            &returnedLen))  //__out  PDWORD lpcchReturnLength
+                        if (getVolumePathNamesForVolumeName(&volGuid[0],   //__in   LPCTSTR lpszVolumeName,
+                                                            &buffer[0],    //__out  LPTSTR lpszVolumePathNames,
+                                                            static_cast<DWORD>(buffer.size()), //__in   DWORD cchBufferLength,
+                                                            &returnedLen)) //__out  PDWORD lpcchReturnLength
                         {
-                            return &volPath[0]; //return first path name in double-null terminated list!
+                            //Attention: in contrast to documentation, this function may write a *single* 0 into
+                            //buffer if volGuid does not have any associated volume paths (e.g. a hidden volume)
+                            const Zstring volPath(&buffer[0]);
+                            if (!volPath.empty())
+                                return volPath; //return first path name in double-null terminated list!
                         }
                     }
                     return &volGuid[0]; //GUID looks ugly, but should be working correctly
@@ -364,10 +367,10 @@ Zstring volumePathToName(const Zstring& volumePath) //return empty string on err
     if (::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
                                &volName[0],        //__out      LPTSTR lpVolumeNameBuffer,
                                bufferSize,         //__in       DWORD nVolumeNameSize,
-                               NULL,               //__out_opt  LPDWORD lpVolumeSerialNumber,
-                               NULL,               //__out_opt  LPDWORD lpMaximumComponentLength,
-                               NULL,               //__out_opt  LPDWORD lpFileSystemFlags,
-                               NULL,               //__out      LPTSTR lpFileSystemNameBuffer,
+                               nullptr,            //__out_opt  LPDWORD lpVolumeSerialNumber,
+                               nullptr,            //__out_opt  LPDWORD lpMaximumComponentLength,
+                               nullptr,            //__out_opt  LPDWORD lpFileSystemFlags,
+                               nullptr,            //__out      LPTSTR lpFileSystemNameBuffer,
                                0))                 //__in       DWORD nFileSystemNameSize
     {
         return &volName[0];
@@ -612,8 +615,8 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
 
                     //note: following function call may block heavily if network is not reachable!!!
                     DWORD rv2 = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
-                                                     NULL,    // __in  LPCTSTR lpPassword,
-                                                     NULL,    // __in  LPCTSTR lpUsername,
+                                                     nullptr, // __in  LPCTSTR lpPassword,
+                                                     nullptr, // __in  LPCTSTR lpUsername,
                                                      allowUserInteraction ? CONNECT_INTERACTIVE : 0); //__in  DWORD dwFlags
                     if (rv2 == NO_ERROR)
                         return; //mapping reestablished
@@ -647,8 +650,8 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
 
             //note: following function call may block heavily if network is not reachable!!!
             DWORD rv2 = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
-                                             NULL,    // __in  LPCTSTR lpPassword,
-                                             NULL,    // __in  LPCTSTR lpUsername,
+                                             nullptr, // __in  LPCTSTR lpPassword,
+                                             nullptr, // __in  LPCTSTR lpUsername,
                                              allowUserInteraction ? CONNECT_INTERACTIVE : 0); //__in  DWORD dwFlags
             if (rv2 == NO_ERROR)
                 return; //mapping reestablished
@@ -661,7 +664,7 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
             DWORD bufferSize = sizeof(NETRESOURCE) + 20000;
             std::vector<char> buffer(bufferSize);
 
-            LPTSTR relPath = NULL;
+            LPTSTR relPath = nullptr;
 
             //note: following function call may block heavily if network is not reachable!!!
             const DWORD rv = WNetGetResourceInformation(&nr,         // __in     LPNETRESOURCE lpNetResource,
@@ -680,8 +683,8 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
             {
             //note: following function call may block heavily if network is not reachable!!!
             DWORD rv2 = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
-                                             NULL,    // __in  LPCTSTR lpPassword,
-                                             NULL,    // __in  LPCTSTR lpUsername,
+                                             nullptr,    // __in  LPCTSTR lpPassword,
+                                             nullptr,    // __in  LPCTSTR lpUsername,
                                              allowUserInteraction ? CONNECT_INTERACTIVE : 0); //__in  DWORD dwFlags
             if (rv2 == NO_ERROR)
                 return; //mapping reestablished

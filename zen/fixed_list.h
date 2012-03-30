@@ -18,13 +18,13 @@ class FixedList
 {
     struct Node
     {
-        Node() : next(NULL), val() {}
-        template <class A>                                              Node(A&& a)                                    : next(NULL), val(a) {}
-        template <class A, class B>                                     Node(A&& a, B&& b)                             : next(NULL), val(a, b) {}
-        template <class A, class B, class C>                            Node(A&& a, B&& b, C&& c)                      : next(NULL), val(a, b, c) {}
-        template <class A, class B, class C, class D>                   Node(A&& a, B&& b, C&& c, D&& d)               : next(NULL), val(a, b, c, d) {}
-        template <class A, class B, class C, class D, class E>          Node(A&& a, B&& b, C&& c, D&& d, E&& e)        : next(NULL), val(a, b, c, d, e) {}
-        template <class A, class B, class C, class D, class E, class F> Node(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f) : next(NULL), val(a, b, c, d, e, f) {}
+        Node() : next(nullptr), val() {}
+        template <class A>                                              Node(A&& a)                                    : next(nullptr), val(a) {}
+        template <class A, class B>                                     Node(A&& a, B&& b)                             : next(nullptr), val(a, b) {}
+        template <class A, class B, class C>                            Node(A&& a, B&& b, C&& c)                      : next(nullptr), val(a, b, c) {}
+        template <class A, class B, class C, class D>                   Node(A&& a, B&& b, C&& c, D&& d)               : next(nullptr), val(a, b, c, d) {}
+        template <class A, class B, class C, class D, class E>          Node(A&& a, B&& b, C&& c, D&& d, E&& e)        : next(nullptr), val(a, b, c, d, e) {}
+        template <class A, class B, class C, class D, class E, class F> Node(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f) : next(nullptr), val(a, b, c, d, e, f) {}
 
         Node* next; //singly linked list is sufficient
         T val;
@@ -32,8 +32,8 @@ class FixedList
 
 public:
     FixedList() :
-        first(NULL),
-        lastInsert(NULL),
+        first(nullptr),
+        lastInsert(nullptr),
         sz(0) {}
 
     ~FixedList()
@@ -51,7 +51,7 @@ public:
     class ListIterator : public std::iterator<std::forward_iterator_tag, U>
     {
     public:
-        ListIterator(NodeT* it = NULL) : iter(it) {}
+        ListIterator(NodeT* it = nullptr) : iter(it) {}
         ListIterator& operator++() { iter = iter->next; return *this; }
         inline friend bool operator==(const ListIterator& lhs, const ListIterator& rhs) { return lhs.iter == rhs.iter; }
         inline friend bool operator!=(const ListIterator& lhs, const ListIterator& rhs) { return !(lhs == rhs); }
@@ -90,7 +90,7 @@ public:
     template <class Predicate>
     void remove_if(Predicate pred)
     {
-        Node* prev = NULL;
+        Node* prev = nullptr;
         Node* ptr = first;
 
         while (ptr)
@@ -102,7 +102,7 @@ public:
                     prev->next = ptr = tmp;
                 else
                     first = ptr = tmp;
-                if (tmp == NULL)
+                if (!tmp)
                     lastInsert = prev;
             }
             else
@@ -113,7 +113,7 @@ public:
     }
 
     void clear() { remove_if([](T&) { return true; }); }
-    bool empty() const { return first == NULL; }
+    bool empty() const { return first == nullptr; }
     size_t size() const { return sz; }
 
 private:
@@ -123,14 +123,14 @@ private:
     void pushNode(Node* newNode)
     {
         ++sz;
-        if (lastInsert == NULL)
+        if (lastInsert == nullptr)
         {
-            assert(first == NULL);
+            assert(first == nullptr);
             first = lastInsert = newNode;
         }
         else
         {
-            assert(lastInsert->next == NULL);
+            assert(lastInsert->next == nullptr);
             lastInsert->next = newNode;
             lastInsert = newNode;
         }

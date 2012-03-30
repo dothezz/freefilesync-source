@@ -168,7 +168,6 @@ private:
     void OnRegularUpdateCheck(  wxIdleEvent& event);
     void OnLayoutWindowAsync(   wxIdleEvent& event);
 
-    void OnResize(              wxSizeEvent& event);
     void OnResizeFolderPairs(   wxEvent& event);
     void OnResizeConfigPanel(   wxEvent& event);
     void OnResizeViewPanel(     wxEvent& event);

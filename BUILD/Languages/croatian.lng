@@ -41,7 +41,7 @@
 <target>Počisti postavke filtera</target>
 
 <source>Create a batch job</source>
-<target>Izradi batch zadatak</target>
+<target>Izradi slijedni zadatak</target>
 
 <source>Synchronization settings</source>
 <target>Postavke sinkronizacije</target>
@@ -66,9 +66,6 @@
 
 <source>Configure filter</source>
 <target>Konfiguriraj filter</target>
-
-<source>Customize columns</source>
-<target>Uredi stupce</target>
 
 <source>Global settings</source>
 <target>Globalne postavke</target>
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Odaberi</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Greška pri čitanju iz sinkronizacijske baze:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Greška pri pisanju u sinkronizacijsku bazu:</target>
-
 <source>Invalid command line: %x</source>
 <target>Netočna naredba: %x</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Fatal Error</source>
+<target>Kritična greška</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows greška %x:</target>
@@ -140,14 +137,20 @@
 <pluralform>%x Bajtova</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Greška pri čitanju iz sinkronizacijske baze:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Greška pri pisanju u sinkronizacijsku bazu:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Nekompatibilan format sinkronizacijske podatkovne baze:</target>
+
 <source>Initial synchronization:</source>
 <target>Početna sinkronizacija:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Jedna od FreeFileSync datoteka podatkovne baze još ne postoji:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Nekompatibilan format sinkronizacijske podatkovne baze:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Datoteke podatkovne baze ne dijele zajedničke sinkronizacijske sesije:</target>
@@ -174,12 +177,6 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Info</source>
-<target>Info</target>
-
-<source>Fatal Error</source>
-<target>Kritična greška</target>
-
 <source>Error reading file:</source>
 <target>Greška pri čitanju datoteke:</target>
 
@@ -205,11 +202,14 @@
 <source>Error parsing configuration file:</source>
 <target>Greška pri raščlanjivanju datoteke postavki:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Greška pri premještanju u Koš za smeće:</target>
+<source>Configuration loaded partially only:</source>
+<target>Konfiguracija učitala samo djelomično:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Nemože se pokrenuti potrebni DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Nije moguće prebaciti u Koš za smeće</target>
+
+<source>Cannot load file %x.</source>
+<target>Ne mogu učitati datoteku %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Greška pri pristupu servisu particijskog kopiranja!</target>
@@ -217,10 +217,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Stvaranje sjeničnih kopija na WOW63 nije podržano. Molimo koristite 64-bitnu FreeFileSync inačnicu.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Nemože se odrediti naziv particije za datoteku:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Nemože se ustanoviti naziv datoteke</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Naziv particije %x dio naziva datoteke %y!</target>
 
 <source>/sec</source>
@@ -229,8 +229,8 @@
 <source>File does not exist:</source>
 <target>Datoteka ne postoji:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Nemogu pročitati vrijednosti iz slijedećih XML središta:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Ne mogu čitati slijedeće XML elemente</target>
 
 <source>S&ave configuration...</source>
 <target>&Spremi postavke...</target>
@@ -346,19 +346,19 @@ Naredba će biti izvršena kada:
 <target>Uobičajeno</target>
 
 <source>FreeFileSync batch file</source>
-<target>FreeFileSync batch datoteka</target>
+<target>FreeFileSync slijedna datoteka</target>
 
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync postavke</target>
 
 <source>FreeFileSync Batch Job</source>
-<target>FreeFileSync Batch zadatak</target>
+<target>FreeFileSync Slijedni zadatak</target>
 
 <source>Unable to create log file!</source>
 <target>Nemogu napraviti zapisnik!</target>
 
 <source>Batch execution</source>
-<target>Batch izvršavanje</target>
+<target>Slijedno izvršavanje</target>
 
 <source>Stop</source>
 <target>Zaustavi</target>
@@ -469,7 +469,7 @@ Naredba će biti izvršena kada:
 <target>&Globalne postavke...</target>
 
 <source>&Create batch job...</source>
-<target>&Izradi batch zadatak...</target>
+<target>&Izradi slijedni zadatak...</target>
 
 <source>&Export file list...</source>
 <target>&Izvoz liste datoteka...</target>
@@ -543,17 +543,17 @@ Naredba će biti izvršena kada:
 <source>Speed:</source>
 <target>Brzina:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Vremena preostalo:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Vremena prošlo:</target>
 
 <source>Batch job</source>
-<target>Batch zadatak</target>
+<target>Slijedni zadatak</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Napravite batch datoteku za automatsku sinkronizaciju. Da bi započeli batch mod dvostruki-klik na fajl ili izvršite pomoću komandne linije: FreeFileSync.exe <ffs_batch datoteka>. Ovo se također može zadati u planeru operacijskog sustava.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Izradi slijednu datoteku i automatiziraj sinkronizaciju. Za započeti u slijednom modu dvostruki klik na ovu datoteku ili pokrenuti naredbu: FreeFileSync.exe SyncJob.ffs_batch. Ovo također može biti zadano u vašem sistemskom planeru zadataka</target>
 
 <source>Help</source>
 <target>Pomoć</target>
@@ -566,9 +566,6 @@ Naredba će biti izvršena kada:
 
 <source>Right</source>
 <target>Desno</target>
-
-<source>Overview</source>
-<target>Pregled</target>
 
 <source>Status feedback</source>
 <target>Status veze</target>
@@ -586,7 +583,7 @@ Naredba će biti izvršena kada:
 <target>Odaberite direktorij izvješća:</target>
 
 <source>Batch settings</source>
-<target>Batch postavke</target>
+<target>Slijedne postavke</target>
 
 <source>&Save</source>
 <target>&Spremi</target>
@@ -714,8 +711,8 @@ jednak
 <source>Published under the GNU General Public License</source>
 <target>Objavljeno pod licencom GNU General Public</target>
 
-<source>Ignore subsequent errors</source>
-<target>Ignoriraj naknadne greške</target>
+<source>Ignore further errors</source>
+<target>Zanemari buduće greške</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Sakrij iduće poruke grešaka tokom slijedećeg procesa</target>
@@ -738,22 +735,22 @@ jednak
 <source>&No</source>
 <target>&Ne</target>
 
+<source>Use Recycle Bin</source>
+<target>Uporabi Koš za smeće</target>
+
 <source>Delete on both sides</source>
 <target>Izbriši na obje strane</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Izbriši na obje strane iako je označena datoteka samo na jednoj strani</target>
 
-<source>Use Recycle Bin</source>
-<target>Uporabi Koš za smeće</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Samo datoteke/direktorije koji odgovaraju svim filterskim postavkama će biti odabrane za sinkronizaciju.
-Napomena: Ime filtra mora biti određeno relativno(!) prema glavnim sinkronizacijskim direktorijima.
+Samo datoteke koje odgovaraju svim filterskim postavkama će biti sinkronizirane.
+Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 </target>
 
 <source>Hints:</source>
@@ -789,20 +786,20 @@ Isključi: \stuff\temp\*
 <source>Exclude</source>
 <target>Isključi</target>
 
-<source>Minimum file size</source>
-<target>Minimalna veličina datoteke</target>
+<source>Time span</source>
+<target>Vremensko ograničenje</target>
 
-<source>Maximum file size</source>
-<target>Maksimalna veličina datoteke</target>
+<source>File size</source>
+<target>Veličina datoteke</target>
+
+<source>Minimum</source>
+<target>Minimum</target>
+
+<source>Maximum</source>
+<target>Maksimum</target>
 
 <source>&Default</source>
 <target>&Zadano</target>
-
-<source>Move column up</source>
-<target>Premakni stupac gore</target>
-
-<source>Move column down</source>
-<target>Premakni stupac dolje</target>
 
 <source>Transactional file copy</source>
 <target>Transakcijsko kopiranje datoteke</target>
@@ -822,13 +819,7 @@ Isključi: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Prebaci datotečna dopuštenja (Zahtjeva Administratorske ovlasti)</target>
 
-<source>Hidden dialogs:</source>
-<target>Skriveni prozori:</target>
-
-<source>Reset</source>
-<target>Resetiraj</target>
-
-<source>Show hidden dialogs</source>
+<source>Restore hidden dialogs</source>
 <target>Prikaži skrivene prozore</target>
 
 <source>External applications</source>
@@ -861,8 +852,8 @@ Isključi: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Par mape</target>
 
-<source>Compressed view</source>
-<target>Prikaz zauzeća</target>
+<source>Overview</source>
+<target>Pregled</target>
 
 <source>Select view</source>
 <target>Izaberite pogled</target>
@@ -891,8 +882,8 @@ Isključi: \stuff\temp\*
 <source>Exclude all</source>
 <target>Izdvoji sve</target>
 
-<source>Icon size:</source>
-<target>Veličina Ikone</target>
+<source>Show icons:</source>
+<target>Prikaži ikone:</target>
 
 <source>Small</source>
 <target>Malo</target>
@@ -917,6 +908,9 @@ Isključi: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Postavke spremljene!</target>
+
+<source>Never save changes</source>
+<target>Nikad ne spremaj promjene</target>
 
 <source>Save changes to current configuration?</source>
 <target>Spremiti promjene na trenutne postavke?</target>
@@ -1029,9 +1023,6 @@ Isključi: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Napaka pri pisanju datoteke:</target>
 
-<source>Batch file created successfully!</source>
-<target>Batch datoteka uspješno izrađena!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1114,6 +1105,9 @@ Isključi: \stuff\temp\*
 <source>This year</source>
 <target>Ove godine</target>
 
+<source>Last x days</source>
+<target>Zadnjih x dana</target>
+
 <source>Byte</source>
 <target>Bajt</target>
 
@@ -1123,11 +1117,8 @@ Isključi: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filtriraj: Sve parove</target>
-
-<source>Filter: Single pair</source>
-<target>Filtriraj: Sam par</target>
+<source>Filter</source>
+<target>Filtriranje</target>
 
 <source>Direct</source>
 <target>Neposredno</target>
@@ -1153,8 +1144,8 @@ Isključi: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Duplikat s druge strane k %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Vrati sve skrivene prozore?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Učini skrivene prozore i upozorenja ponovno vidljivima</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1290,9 +1281,6 @@ Isključi: \stuff\temp\*
 <source>Error copying file:</source>
 <target>Greška pri kopiranju datoteke:</target>
 
-<source>Error opening file:</source>
-<target>Greška pri otvaranju datoteke:</target>
-
 <source>Error traversing directory:</source>
 <target>Greška pri prelasku direktorija:</target>
 
@@ -1335,8 +1323,8 @@ Isključi: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Pripremam sinkronizaciju</target>
 
-<source>Memory allocation failed!</source>
-<target>Neuspješno dodjeljivanje memorije!</target>
+<source>Out of memory!</source>
+<target>Nedostatak memorije</target>
 
 <source>File %x has an invalid date!</source>
 <target>Datoteka %x ima nevaljan datum!</target>
@@ -1491,11 +1479,11 @@ Isključi: \stuff\temp\*
 <source>Generating database...</source>
 <target>Izrađujem bazu podataka...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Po trenutnim postavkama nema ništa za sinkroniziranje!</target>
+<source>Nothing to synchronize!</source>
+<target>Ništa za sinkronizirati!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Greška pri kopiranju zaključane datoteke %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Nemoguće kopirati blokiranu datoteku %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Greška pri provjeravanju podataka: Izvorna i ciljna datoteka imaju različit sadržaj!</target>

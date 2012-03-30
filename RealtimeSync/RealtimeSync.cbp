@@ -27,9 +27,12 @@
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
-					<Add library="libboost_thread-mgw46-mt-s-1_48.a" />
+					<Add library="libboost_thread-mgw46-mt-s-1_49.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
+				<ExtraCommands>
+					<Add after='&quot;C:\Program Files\C++\CodeSigning\SignCode.cmd&quot; &quot;$(PROJECT_DIR)$(TARGET_OUTPUT_FILE)&quot;' />
+				</ExtraCommands>
 			</Target>
 			<Target title="Debug-DLL">
 				<Option output="..\BUILD\Bin\RealtimeSync_Debug" prefix_auto="1" extension_auto="1" />
@@ -51,7 +54,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw46-mt-sd-1_48.a" />
+					<Add library="libboost_thread-mgw46-mt-sd-1_49.a" />
 					<Add directory="C:\Program Files\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -99,26 +102,6 @@
 			<Add library="libuxtheme.a" />
 			<Add directory="C:\Program Files\C++\Boost\stage\lib" />
 		</Linker>
-		<Unit filename="WxWizDialog.fbp" />
-		<Unit filename="application.cpp" />
-		<Unit filename="application.h" />
-		<Unit filename="gui_generated.cpp" />
-		<Unit filename="gui_generated.h" />
-		<Unit filename="main_dlg.cpp" />
-		<Unit filename="main_dlg.h" />
-		<Unit filename="resource.rc">
-			<Option compilerVar="WINDRES" />
-		</Unit>
-		<Unit filename="resources.cpp" />
-		<Unit filename="resources.h" />
-		<Unit filename="tray_menu.cpp" />
-		<Unit filename="tray_menu.h" />
-		<Unit filename="watcher.cpp" />
-		<Unit filename="watcher.h" />
-		<Unit filename="xml_ffs.cpp" />
-		<Unit filename="xml_ffs.h" />
-		<Unit filename="xml_proc.cpp" />
-		<Unit filename="xml_proc.h" />
 		<Unit filename="..\lib\localization.cpp" />
 		<Unit filename="..\lib\process_xml.cpp" />
 		<Unit filename="..\lib\resolve_path.cpp" />
@@ -144,6 +127,26 @@
 		<Unit filename="..\zen\notify_removal.cpp" />
 		<Unit filename="..\zen\privilege.cpp" />
 		<Unit filename="..\zen\zstring.cpp" />
+		<Unit filename="WxWizDialog.fbp" />
+		<Unit filename="application.cpp" />
+		<Unit filename="application.h" />
+		<Unit filename="gui_generated.cpp" />
+		<Unit filename="gui_generated.h" />
+		<Unit filename="main_dlg.cpp" />
+		<Unit filename="main_dlg.h" />
+		<Unit filename="resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="resources.cpp" />
+		<Unit filename="resources.h" />
+		<Unit filename="tray_menu.cpp" />
+		<Unit filename="tray_menu.h" />
+		<Unit filename="watcher.cpp" />
+		<Unit filename="watcher.h" />
+		<Unit filename="xml_ffs.cpp" />
+		<Unit filename="xml_ffs.h" />
+		<Unit filename="xml_proc.cpp" />
+		<Unit filename="xml_proc.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

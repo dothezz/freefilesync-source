@@ -12,7 +12,7 @@
 namespace zen
 {
 inline
-void setText(wxTextCtrl& control, const wxString& newText, bool* additionalLayoutChange = NULL)
+void setText(wxTextCtrl& control, const wxString& newText, bool* additionalLayoutChange = nullptr)
 {
     if (additionalLayoutChange && !*additionalLayoutChange) //never revert from true to false!
         *additionalLayoutChange = control.GetValue().length() != newText.length(); //avoid screen flicker: update layout only when necessary
@@ -22,7 +22,7 @@ void setText(wxTextCtrl& control, const wxString& newText, bool* additionalLayou
 }
 
 inline
-void setText(wxStaticText& control, const wxString& newText, bool* additionalLayoutChange = NULL)
+void setText(wxStaticText& control, const wxString& newText, bool* additionalLayoutChange = nullptr)
 {
     if (additionalLayoutChange && !*additionalLayoutChange)
         *additionalLayoutChange = control.GetLabel().length() != newText.length(); //avoid screen flicker: update layout only when necessary

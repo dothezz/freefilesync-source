@@ -48,7 +48,7 @@ public:
 };
 
 
-Tooltip::Tooltip() : tipWindow(new PopupFrameGenerated(NULL))
+Tooltip::Tooltip() : tipWindow(new PopupFrameGenerated(nullptr))
 {
 #ifdef FFS_WIN //neither looks good nor works at all on Linux
     tipWindow->Disable(); //prevent window stealing focus!
@@ -94,5 +94,12 @@ void Tooltip::show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp)
 
 void Tooltip::hide()
 {
+#ifdef FFS_LINUX
+    //on wxGTK the tip window occassionally goes blank and stays that way. This is somehow triggered by wxWindow::Hide() and doesn't seem to be a wxWidgets bug (=> GTK?)
+    //apply brute force:
+    tipWindow->Destroy();
+    tipWindow = new PopupFrameGenerated(nullptr);
+#endif
+
     tipWindow->Hide();
 }

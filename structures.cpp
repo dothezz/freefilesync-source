@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <ctime>
 #include <zen/i18n.h>
+#include <zen/time.h>
 
 using namespace zen;
 
@@ -220,58 +221,63 @@ int daysSinceBeginOfWeek(int dayOfWeek) //0-6, 0=Monday, 6=Sunday
         return dayOfWeek; //let all weeks begin with monday
 }
 
-zen::Int64 resolve(size_t value, UnitTime unit, zen::Int64 defaultVal)
+
+Int64 resolve(size_t value, UnitTime unit, Int64 defaultVal)
 {
-    const time_t utcTimeNow = ::time(NULL);
-    struct tm* localTimeFmt = ::localtime (&utcTimeNow); //utc to local
+    TimeComp locTimeStruc = zen::localTime();
 
     switch (unit)
     {
         case UTIME_NONE:
             return defaultVal;
-
-            //        case UTIME_LAST_X_HOURS:
-            //           return Int64(utcTimeNow) - Int64(value) * 3600;
-
+			 
         case UTIME_TODAY:
-            localTimeFmt->tm_sec  = 0; //0-61
-            localTimeFmt->tm_min  = 0; //0-59
-            localTimeFmt->tm_hour = 0; //0-23
-            return ::mktime(localTimeFmt); //convert local time back to UTC
+            locTimeStruc.second = 0; //0-61
+            locTimeStruc.minute = 0; //0-59
+            locTimeStruc.hour   = 0; //0-23
+            return localToTimeT(locTimeStruc); //convert local time back to UTC
 
-        case UTIME_THIS_WEEK:
-        {
-            localTimeFmt->tm_sec  = 0; //0-61
-            localTimeFmt->tm_min  = 0; //0-59
-            localTimeFmt->tm_hour = 0; //0-23
-            const time_t timeFrom = ::mktime(localTimeFmt);
+            //case UTIME_THIS_WEEK:
+            //{
+            //    localTimeFmt->tm_sec  = 0; //0-61
+            //    localTimeFmt->tm_min  = 0; //0-59
+            //    localTimeFmt->tm_hour = 0; //0-23
+            //    const time_t timeFrom = ::mktime(localTimeFmt);
 
-            int dayOfWeek = (localTimeFmt->tm_wday + 6) % 7; //tm_wday := days since Sunday	0-6
-            // +6 == -1 in Z_7
+            //    int dayOfWeek = (localTimeFmt->tm_wday + 6) % 7; //tm_wday := days since Sunday	0-6
+            //    // +6 == -1 in Z_7
 
-            return Int64(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;
-        }
+            //    return Int64(timeFrom) - daysSinceBeginOfWeek(dayOfWeek) * 24 * 3600;
+            //}
+
         case UTIME_THIS_MONTH:
-            localTimeFmt->tm_sec  = 0; //0-61
-            localTimeFmt->tm_min  = 0; //0-59
-            localTimeFmt->tm_hour = 0; //0-23
-            localTimeFmt->tm_mday = 1; //1-31
-            return ::mktime(localTimeFmt); //convert local time back to UTC
+            locTimeStruc.second = 0; //0-61
+            locTimeStruc.minute = 0; //0-59
+            locTimeStruc.hour   = 0; //0-23
+            locTimeStruc.day    = 1; //1-31
+            return localToTimeT(locTimeStruc);
 
         case UTIME_THIS_YEAR:
-            localTimeFmt->tm_sec  = 0; //0-61
-            localTimeFmt->tm_min  = 0; //0-59
-            localTimeFmt->tm_hour = 0; //0-23
-            localTimeFmt->tm_mday = 1; //1-31
-            localTimeFmt->tm_mon  = 0; //0-11
-            return ::mktime(localTimeFmt); //convert local time back to UTC
+            locTimeStruc.second = 0; //0-61
+            locTimeStruc.minute = 0; //0-59
+            locTimeStruc.hour   = 0; //0-23
+            locTimeStruc.day    = 1; //1-31
+            locTimeStruc.month  = 1; //1-12
+            return localToTimeT(locTimeStruc);
+
+        case UTIME_LAST_X_DAYS:
+            locTimeStruc.second = 0; //0-61
+            locTimeStruc.minute = 0; //0-59
+            locTimeStruc.hour   = 0; //0-23
+            return localToTimeT(locTimeStruc) - Int64(value) * 24 * 3600;
     }
 
     assert(false);
-    return utcTimeNow;
+    return localToTimeT(locTimeStruc);
 }
 
-zen::UInt64 resolve(size_t value, UnitSize unit, zen::UInt64 defaultVal)
+
+UInt64 resolve(size_t value, UnitSize unit, UInt64 defaultVal)
 {
     double out = 0;
     switch (unit)

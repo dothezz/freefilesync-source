@@ -29,7 +29,7 @@ NormalizedFilter normalizeFilters(const FilterConfig& global, const FilterConfig
 inline
 bool isNullFilter(const FilterConfig& filterCfg)
 {
-    return NameFilter(filterCfg.includeFilter, filterCfg.excludeFilter).isNull() &&
+    return NameFilter::isNull(filterCfg.includeFilter, filterCfg.excludeFilter) &&
            SoftFilter(filterCfg.timeSpan, filterCfg.unitTimeSpan,
                       filterCfg.sizeMin,  filterCfg.unitSizeMin,
                       filterCfg.sizeMax,  filterCfg.unitSizeMax).isNull();

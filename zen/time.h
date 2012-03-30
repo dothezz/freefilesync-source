@@ -25,16 +25,16 @@ struct TimeComp //replaces "struct std::tm" and SYSTEMTIME
     int second; //0-61
 };
 
-TimeComp localTime   (time_t utc = std::time(NULL)); //convert time_t (UTC) to local time components
+TimeComp localTime   (time_t utc = std::time(nullptr)); //convert time_t (UTC) to local time components
 time_t   localToTimeT(const TimeComp& comp);         //convert local time components to time_t (UTC), returns -1 on error
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
 /*
 format (current) date and time; example:
-        formatTime<std::wstring>(L"%Y*%m*%d");           -> "2011*10*29"
-        formatTime<std::wstring>(FORMAT_DATE);           -> "2011-10-29"
-        formatTime<std::wstring>(FORMAT_TIME);           -> "17:55:34"
+        formatTime<std::wstring>(L"%Y*%m*%d");     -> "2011*10*29"
+        formatTime<std::wstring>(FORMAT_DATE);     -> "2011-10-29"
+        formatTime<std::wstring>(FORMAT_TIME);     -> "17:55:34"
 */
 template <class String, class String2>
 String formatTime(const String2& format, const TimeComp& comp = localTime()); //format as specified by "std::strftime", returns empty string on failure
@@ -82,6 +82,12 @@ namespace implementation
 inline
 struct std::tm toClibTimeComponents(const TimeComp& comp)
 {
+    assert(1 <= comp.month  && comp.month  <= 12 &&
+           1 <= comp.day    && comp.day    <= 31 &&
+           0 <= comp.hour   && comp.hour   <= 23 &&
+           0 <= comp.minute && comp.minute <= 59 &&
+           0 <= comp.second && comp.second <= 61);
+
     struct std::tm ctc = {};
     ctc.tm_year  = comp.year - 1900; //years since 1900
     ctc.tm_mon   = comp.month - 1;   //0-11
@@ -90,6 +96,7 @@ struct std::tm toClibTimeComponents(const TimeComp& comp)
     ctc.tm_min   = comp.minute;      //0-59
     ctc.tm_sec   = comp.second;      //0-61
     ctc.tm_isdst = -1;               //> 0 if DST is active, == 0 if DST is not active, < 0 if the information is not available
+
     return ctc;
 }
 
@@ -132,14 +139,14 @@ struct GetFormat<FormatDateTimeTag> //%c - locale dependent date and time:      
 };
 
 template <>
-struct GetFormat<FormatIsoDateTag> //%Y-%m-%d          - e.g. 2001-08-23
+struct GetFormat<FormatIsoDateTag> //%Y-%m-%d - e.g. 2001-08-23
 {
     const char*    format(char)    const { return  "%Y-%m-%d"; }
     const wchar_t* format(wchar_t) const { return L"%Y-%m-%d"; }
 };
 
 template <>
-struct GetFormat<FormatIsoTimeTag> //%H:%M:%S          - e.g. 14:55:02
+struct GetFormat<FormatIsoTimeTag> //%H:%M:%S - e.g. 14:55:02
 {
     const char*    format(char)    const { return  "%H:%M:%S"; }
     const wchar_t* format(wchar_t) const { return L"%H:%M:%S"; }
@@ -173,10 +180,10 @@ struct PredefinedFormatTag  {};
 template <class String, class String2> inline
 String formatTime(const String2& format, const TimeComp& comp, UserDefinedFormatTag) //format as specified by "std::strftime", returns empty string on failure
 {
-    typedef typename GetCharType<String>::Result CharType;
+    typedef typename GetCharType<String>::Type CharType;
 
     struct std::tm ctc = toClibTimeComponents(comp);
-    std::mktime (&ctc); // unfortunately std::strftime() needs all elements of "struct tm" filled, e.g. tm_wday, tm_yday
+    std::mktime(&ctc); // unfortunately std::strftime() needs all elements of "struct tm" filled, e.g. tm_wday, tm_yday
     //note: although std::mktime() explicitly expects "local time", calculating weekday and day of year *should* be time-zone and DST independent
 
     CharType buffer[256];
@@ -187,7 +194,7 @@ String formatTime(const String2& format, const TimeComp& comp, UserDefinedFormat
 template <class String, class FormatType> inline
 String formatTime(FormatType, const TimeComp& comp, PredefinedFormatTag)
 {
-    typedef typename GetCharType<String>::Result CharType;
+    typedef typename GetCharType<String>::Type CharType;
     return formatTime<String>(GetFormat<FormatType>().format(CharType()), comp, UserDefinedFormatTag());
 }
 }
@@ -196,7 +203,14 @@ String formatTime(FormatType, const TimeComp& comp, PredefinedFormatTag)
 inline
 TimeComp localTime(time_t utc)
 {
-    return implementation::toZenTimeComponents(*std::localtime (&utc));
+#ifdef _MSC_VER
+    struct tm lt = {};
+    /*errno_t rv = */
+    ::localtime_s(&lt, &utc); //more secure?
+    return implementation::toZenTimeComponents(lt);
+#else
+    return implementation::toZenTimeComponents(*std::localtime(&utc));
+#endif
 }
 
 
@@ -212,12 +226,12 @@ template <class String, class String2> inline
 String formatTime(const String2& format, const TimeComp& comp)
 {
     typedef typename SelectIf<
-    IsSameType<String2, FormatDateTag       >::result ||
-    IsSameType<String2, FormatTimeTag       >::result ||
-    IsSameType<String2, FormatDateTimeTag   >::result ||
-    IsSameType<String2, FormatIsoDateTag    >::result ||
-    IsSameType<String2, FormatIsoTimeTag    >::result ||
-    IsSameType<String2, FormatIsoDateTimeTag>::result, implementation::PredefinedFormatTag, implementation::UserDefinedFormatTag>::Result FormatTag;
+    IsSameType<String2, FormatDateTag       >::value ||
+    IsSameType<String2, FormatTimeTag       >::value ||
+    IsSameType<String2, FormatDateTimeTag   >::value ||
+    IsSameType<String2, FormatIsoDateTag    >::value ||
+    IsSameType<String2, FormatIsoTimeTag    >::value ||
+    IsSameType<String2, FormatIsoDateTimeTag>::value, implementation::PredefinedFormatTag, implementation::UserDefinedFormatTag>::Type FormatTag;
 
     return implementation::formatTime<String>(format, comp, FormatTag());
 }
@@ -226,7 +240,7 @@ String formatTime(const String2& format, const TimeComp& comp)
 template <class String>
 bool parseTime(const String& format, const String& str, TimeComp& comp) //return true on success
 {
-    typedef typename GetCharType<String>::Result CharType;
+    typedef typename GetCharType<String>::Type CharType;
 
     const CharType*       iterFmt = strBegin(format);
     const CharType* const fmtLast = iterFmt + strLength(format);
@@ -239,10 +253,10 @@ bool parseTime(const String& format, const String& str, TimeComp& comp) //return
         if (strLast - iterStr < digitCount)
             return false;
 
-        if (std::find_if(iterStr, iterStr + digitCount, [](CharType c) { return !cStringIsDigit(c); }) != str.end())
+        if (std::any_of(iterStr, iterStr + digitCount, [](CharType c) { return !isDigit(c); }))
         return false;
 
-        result = zen::toNumber<int>(StringProxy<CharType>(iterStr, digitCount));
+        result = zen::stringTo<int>(StringProxy<CharType>(iterStr, digitCount));
         iterStr += digitCount;
         return true;
     };
@@ -287,9 +301,9 @@ bool parseTime(const String& format, const String& str, TimeComp& comp) //return
                     return false;
             }
         }
-        else if (cStringIsWhiteSpace(fmt)) //single whitespace in format => skip 0..n whitespace chars
+        else if (isWhiteSpace(fmt)) //single whitespace in format => skip 0..n whitespace chars
         {
-            while (iterStr != strLast && cStringIsWhiteSpace(*iterStr))
+            while (iterStr != strLast && isWhiteSpace(*iterStr))
                 ++iterStr;
         }
         else

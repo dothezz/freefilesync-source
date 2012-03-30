@@ -24,18 +24,18 @@ public:
                  const wxValidator& validator = wxDefaultValidator,
                  const wxString& name         = wxButtonNameStr);
 
-    void setBitmapFront(const wxBitmap& bitmap, unsigned spaceAfter = 0);
+    void setBitmapFront(const wxBitmap& bitmap, size_t spaceAfter = 0);
     void setTextLabel(  const wxString& text);
-    void setBitmapBack( const wxBitmap& bitmap, unsigned spaceBefore = 0);
+    void setBitmapBack( const wxBitmap& bitmap, size_t spaceBefore = 0);
 
 private:
     wxBitmap createBitmapFromText(const wxString& text);
     void refreshButtonLabel();
 
     wxBitmap bitmapFront;
-    unsigned m_spaceAfter;
+    unsigned int m_spaceAfter;
     wxString textLabel;
-    unsigned m_spaceBefore;
+    unsigned int m_spaceBefore;
     wxBitmap bitmapBack;
 };
 

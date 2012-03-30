@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>配置篩選</target>
 
-<source>Customize columns</source>
-<target>自訂列</target>
-
 <source>Global settings</source>
 <target>整體設定</target>
 
@@ -80,7 +77,7 @@
 <target>尋找</target>
 
 <source>Select time span</source>
-<target>選擇時間範圍</target>
+<target>選擇時間間隔</target>
 
 <source>Show pop-up</source>
 <target>顯示彈出視窗</target>
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>瀏覽</target>
 
-<source>Error reading from synchronization database:</source>
-<target>讀取同步資料庫錯誤：</target>
-
-<source>Error writing to synchronization database:</source>
-<target>寫入同步資料庫錯誤：</target>
-
 <source>Invalid command line: %x</source>
 <target>無效的命令列：%x</target>
+
+<source>Info</source>
+<target>訊息</target>
+
+<source>Fatal Error</source>
+<target>嚴重錯誤</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows錯誤代碼 %x：</target>
@@ -138,14 +135,20 @@
 <pluralform>%x 位元組</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>讀取同步資料庫錯誤：</target>
+
+<source>Error writing to synchronization database:</source>
+<target>寫入同步資料庫錯誤：</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>同步資料庫格式不相容：</target>
+
 <source>Initial synchronization:</source>
 <target>初始化同步：</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>其中一個FreeFileSync資料庫檔案不存在：</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>同步資料庫格式不相容：</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>資料庫檔案不要共享一個共同的同步連線：</target>
@@ -157,7 +160,7 @@
 <target>讀取檔案屬性錯誤：</target>
 
 <source>Waiting while directory is locked (%x)...</source>
-<target>等待目錄被鎖定(%x)...</target>
+<target>等待同時目錄被鎖定(%x)...</target>
 
 <source>Error setting directory lock:</source>
 <target>設定目錄鎖錯誤：</target>
@@ -169,12 +172,6 @@
 <target>
 <pluralform>%x 秒</pluralform>
 </target>
-
-<source>Info</source>
-<target>訊息</target>
-
-<source>Fatal Error</source>
-<target>嚴重錯誤</target>
 
 <source>Error reading file:</source>
 <target>讀取檔案錯誤：</target>
@@ -199,22 +196,25 @@
 <source>Error parsing configuration file:</source>
 <target>分析配置檔案錯誤：</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>移動到資源回收筒錯誤：</target>
+<source>Configuration loaded partially only:</source>
+<target>只載入部分配置：</target>
 
-<source>Could not load a required DLL:</source>
-<target>無法載入一個必要的DLL：</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>無法將 %x 移動到資源回收筒！</target>
+
+<source>Cannot load file %x.</source>
+<target>無法載入檔案 %x。</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>讀取卷影複製服務時錯誤！</target>
 
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>不支援製作WOW64上的卷影副本。請使用FreeFileSync 64位元版本。</target>
+<target>不支援WOW64製作卷影副本。請使用FreeFileSync 64位元版本。</target>
 
-<source>Could not determine volume name for file:</source>
-<target>無法判斷此檔案的卷標名稱：</target>
+<source>Cannot determine volume name for file:</source>
+<target>無法判斷檔案卷名：</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>卷名 %x 並非檔名 %y 的一部份！</target>
 
 <source>/sec</source>
@@ -223,8 +223,8 @@
 <source>File does not exist:</source>
 <target>檔案不存在：</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>無法讀取XML之後節點的值：</target>
+<source>Cannot read the following XML elements:</source>
+<target>無法讀取下列XML元素：</target>
 
 <source>S&ave configuration...</source>
 <target>儲存配置(&A)...</target>
@@ -266,7 +266,7 @@ The command line is executed each time:
 </source>
 <target>
 命令列每次執行：
-- 可用的目錄(例如插入USB隨身碟)
+- 所有目錄為可用(例如插入USB隨身碟)
 - 檔案在這些目錄或子目錄會被修改
 </target>
 
@@ -289,7 +289,7 @@ The command line is executed each time:
 <target>最小閒置時間 [秒]</target>
 
 <source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>上次更改的檢測和執行命令列之間以秒為單位的閒置時間</target>
+<target>在幾秒鐘內檢測上次更改和執行命令列之間的閒置時間</target>
 
 <source>Start</source>
 <target>開始</target>
@@ -304,7 +304,7 @@ The command line is executed each time:
 <target>檔案已存在，要覆蓋嗎？</target>
 
 <source>&Restore</source>
-<target>回復(&R)</target>
+<target>還原(&R)</target>
 
 <source>&Exit</source>
 <target>結束(&E)</target>
@@ -537,17 +537,17 @@ The command line is executed each time:
 <source>Speed:</source>
 <target>速度：</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>剩餘時間：</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>經過時間：</target>
 
 <source>Batch job</source>
 <target>批次處理作業</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>新建一個自動同步的批次檔。若要開始批次處理模式只需按兩下此檔或通過命令列執行：FreeFileSync.exe <ffs_batch file>。還可以安排在您的作業系統的任務計畫中。</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>新建一個批次檔，並自動執行同步。若要開始批次處理模式只需按兩下此檔或通過命令列執行：FreeFileSync.exe SyncJob.ffs批次處理。還可以安排在您的作業系統的任務計畫中。</target>
 
 <source>Help</source>
 <target>說明</target>
@@ -561,8 +561,8 @@ The command line is executed each time:
 <source>Right</source>
 <target>右邊</target>
 
-<source>Overview</source>
-<target>摘要</target>
+<source>Sync setttings</source>
+<target>同步設定</target>
 
 <source>Status feedback</source>
 <target>狀態回報</target>
@@ -595,7 +595,7 @@ The command line is executed each time:
 <target>選擇變數：</target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>對兩邊使用同一個資料庫的識別和傳送更改。自動檢測刪除和衝突部份。</target>
+<target>對兩邊使用同一個資料庫來識別和傳送更改。自動檢測刪除、重新命名和衝突部份。</target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>鏡像備份的左邊的資料夾。同步後，右邊的資料夾進行修改以完全相配左邊的資料夾。</target>
@@ -699,8 +699,8 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>在GNU通用公共許可證下發佈</target>
 
-<source>Ignore subsequent errors</source>
-<target>忽略後續錯誤</target>
+<source>Ignore further errors</source>
+<target>忽略進一步錯誤</target>
 
 <source>Hide further error messages during the current process</source>
 <target>在目前進程中隱藏進一步的錯誤訊息</target>
@@ -723,22 +723,22 @@ is the same
 <source>&No</source>
 <target>否(&N)</target>
 
+<source>Use Recycle Bin</source>
+<target>使用資源回收筒</target>
+
 <source>Delete on both sides</source>
 <target>兩邊都刪除</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>即使只在一邊中選好檔案，還是會刪除兩邊檔案。</target>
 
-<source>Use Recycle Bin</source>
-<target>使用資源回收筒</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-只有被選中篩選的檔案/目錄會進行同步。
-注意：篩選器將套用到基本同步目錄的相對名稱。
+只有符合所有篩選器設定的檔案才會被同步。
+注意：檔名必須相對到基本目錄！
 </target>
 
 <source>Hints:</source>
@@ -774,20 +774,20 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>排除</target>
 
-<source>Minimum file size</source>
-<target>最小檔案大小</target>
+<source>Time span</source>
+<target>時間間隔</target>
 
-<source>Maximum file size</source>
-<target>最大檔案大小</target>
+<source>File size</source>
+<target>檔案大小</target>
+
+<source>Minimum</source>
+<target>最小</target>
+
+<source>Maximum</source>
+<target>最大</target>
 
 <source>&Default</source>
 <target>預設(&D)</target>
-
-<source>Move column up</source>
-<target>上移一行</target>
-
-<source>Move column down</source>
-<target>下移一行</target>
 
 <source>Transactional file copy</source>
 <target>異動檔案副本</target>
@@ -807,14 +807,8 @@ Exclude: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>傳輸檔案和目錄權限(需要管理員權限)</target>
 
-<source>Hidden dialogs:</source>
-<target>隱藏對話框：</target>
-
-<source>Reset</source>
-<target>重置</target>
-
-<source>Show hidden dialogs</source>
-<target>顯示隱藏的對話框</target>
+<source>Restore hidden dialogs</source>
+<target>還原隱藏的對話框</target>
 
 <source>External applications</source>
 <target>外部應用程式</target>
@@ -846,8 +840,8 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>資料夾對</target>
 
-<source>Compressed view</source>
-<target>壓縮檢視</target>
+<source>Overview</source>
+<target>摘要</target>
 
 <source>Select view</source>
 <target>選擇檢視</target>
@@ -876,8 +870,8 @@ Exclude: \stuff\temp\*
 <source>Exclude all</source>
 <target>排除所有</target>
 
-<source>Icon size:</source>
-<target>圖示大小：</target>
+<source>Show icons:</source>
+<target>顯示圖示：</target>
 
 <source>Small</source>
 <target>小</target>
@@ -889,7 +883,7 @@ Exclude: \stuff\temp\*
 <target>大</target>
 
 <source>Select time span...</source>
-<target>選擇時間範圍...</target>
+<target>選擇時間間隔...</target>
 
 <source>Default view</source>
 <target>預設檢視</target>
@@ -902,6 +896,9 @@ Exclude: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>配置已儲存！</target>
+
+<source>Never save changes</source>
+<target>從不儲存更改</target>
 
 <source>Save changes to current configuration?</source>
 <target>要儲存目前配置的更改嗎？</target>
@@ -1014,9 +1011,6 @@ Exclude: \stuff\temp\*
 <source>Error writing file:</source>
 <target>寫入檔案錯誤：</target>
 
-<source>Batch file created successfully!</source>
-<target>批次檔新建成功！</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1053,7 +1047,7 @@ Exclude: \stuff\temp\*
 <target>正在掃瞄...</target>
 
 <source>Comparing content...</source>
-<target>正在比對檔案内容...</target>
+<target>正在比對内容...</target>
 
 <source>Paused</source>
 <target>已暫停</target>
@@ -1091,6 +1085,9 @@ Exclude: \stuff\temp\*
 <source>This year</source>
 <target>今年</target>
 
+<source>Last x days</source>
+<target>最後 x 天</target>
+
 <source>Byte</source>
 <target>位元組</target>
 
@@ -1100,11 +1097,8 @@ Exclude: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>篩選器：所有對</target>
-
-<source>Filter: Single pair</source>
-<target>篩選器：單對</target>
+<source>Filter</source>
+<target>篩選器</target>
 
 <source>Direct</source>
 <target>直接</target>
@@ -1130,8 +1124,8 @@ Exclude: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- 另一邊對應到 %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>要還原全部隱藏的對話框嗎？</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>讓隱藏的對話框和警告訊息再被看見嗎？</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1276,7 +1270,7 @@ Exclude: \stuff\temp\*
 <target>無法判斷同步方向：</target>
 
 <source>No change since last synchronization!</source>
-<target>自上次同步以來都沒有變更！</target>
+<target>自上次同步以來都沒有更改！</target>
 
 <source>Filter settings have changed!</source>
 <target>篩選器設定已更改！</target>
@@ -1302,8 +1296,8 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>正在準備同步...</target>
 
-<source>Memory allocation failed!</source>
-<target>記憶體分配失敗！</target>
+<source>Out of memory!</source>
+<target>記憶體不足！</target>
 
 <source>File %x has an invalid date!</source>
 <target>檔案 %x 的日期無效！</target>
@@ -1414,7 +1408,7 @@ Exclude: \stuff\temp\*
 <target>正在驗證檔案 %x</target>
 
 <source>Updating attributes of %x</source>
-<target>正在更新 %x 個的屬性</target>
+<target>正在更新 %x 個屬性</target>
 
 <source>Target directory name must not be empty!</source>
 <target>目標目錄名稱不能空白！</target>
@@ -1458,11 +1452,11 @@ Exclude: \stuff\temp\*
 <source>Generating database...</source>
 <target>正在產生資料庫...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>根據配置没有任何同步！</target>
+<source>Nothing to synchronize!</source>
+<target>沒有什麼東西可同步！</target>
 
-<source>Error copying locked file %x!</source>
-<target>複製已鎖定檔案錯誤 %x！</target>
+<source>Unable to copy locked file %x!</source>
+<target>無法複製被鎖定的檔案 %X！</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>資料驗證錯誤：來源和目標檔案內容不同！</target>

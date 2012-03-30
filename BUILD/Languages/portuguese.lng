@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Configurar filtros</target>
 
-<source>Customize columns</source>
-<target>Personalizar colunas</target>
-
 <source>Global settings</source>
 <target>Opções</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Procurar</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Erro ao ler a base de dados de sincronização:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Erro na escrita da base de dados de sincronização:</target>
-
 <source>Invalid command line: %x</source>
 <target>Linha de comando inválida: %x</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Fatal Error</source>
+<target>Erro crítico</target>
 
 <source>Windows Error Code %x:</source>
 <target>Código de erro do Windows %x:</target>
@@ -139,14 +136,20 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Erro ao ler a base de dados de sincronização:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Erro na escrita da base de dados de sincronização:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Formato de base de dados de sincronização incompatível:</target>
+
 <source>Initial synchronization:</source>
 <target>Sincronização inicial:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Um dos ficheiros da base de dados não existe:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Formato de base de dados de sincronização incompatível:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Bases de dados não partilham a mesma sessão de sincronização:</target>
@@ -172,12 +175,6 @@
 <pluralform>%x segs</pluralform>
 </target>
 
-<source>Info</source>
-<target>Info</target>
-
-<source>Fatal Error</source>
-<target>Erro crítico</target>
-
 <source>Error reading file:</source>
 <target>Erro de leitura de ficheiro:</target>
 
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>Erro de leitura do ficheiro de configuração:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Erro ao mover para a Reciclagem:</target>
+<source>Configuration loaded partially only:</source>
+<target>Configuração carregada parcialmente:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Não foi possível carregar a DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Não é possível mover %x para a Reciclagem!</target>
+
+<source>Cannot load file %x.</source>
+<target>Não é possível carregar o ficheiro %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Erro no acesso ao serviço Volume Shadow Copy!</target>
@@ -214,10 +214,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Fazer cópias fantasma em WOW64 não é suportado. Por favor usar a versão 64-bit.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Não é possível determinar o nome do volume para o ficheiro:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Não é possível obter o nome do volume para o ficheiro:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Nome do volume %x não faz parte do ficheiro %y!</target>
 
 <source>/sec</source>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>O ficheiro não existe:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Não foi possível ler os valores dos seguintes nós XML:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Não é possível ler os elementos XML:</target>
 
 <source>S&ave configuration...</source>
 <target>G&uardar a configuração...</target>
@@ -540,17 +540,17 @@ A linha de comandos é executada cada vez que:
 <source>Speed:</source>
 <target>Velocidade:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Tempo restante:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Tempo passado:</target>
 
 <source>Batch job</source>
 <target>Ficheiro Batch</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Criar ficheiro batch para sincronização automática. Para iniciar em modo batch, faço duplo-clique sobre o ficheiro ou execute via linha de comando: FreeFileSync.exe <ficheiro ffs_batch>. Também pode ser programado no gestor de tarefas do sistema operativo.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Criar um ficheiro batch e automatizar a sincronização. Para iniciar o batch, fazer duplo-clique no ficheiro ou correr o comando: FreeFileSync.exe SyncJob.ffs_batch. Também pode ser adicionado no planeador de tarefas do sistema.</target>
 
 <source>Help</source>
 <target>Ajuda</target>
@@ -563,9 +563,6 @@ A linha de comandos é executada cada vez que:
 
 <source>Right</source>
 <target>Direita</target>
-
-<source>Overview</source>
-<target>Vista</target>
 
 <source>Status feedback</source>
 <target>Retorno de estado</target>
@@ -710,8 +707,8 @@ Os ficheiros são considerados iguais se
 <source>Published under the GNU General Public License</source>
 <target>Publicado sobre GNU General Public License</target>
 
-<source>Ignore subsequent errors</source>
-<target>Ignorar erros subsequentes</target>
+<source>Ignore further errors</source>
+<target>Ignorar erros seguintes</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Ocultar próximas mensagens de erro durante este processo</target>
@@ -734,22 +731,22 @@ Os ficheiros são considerados iguais se
 <source>&No</source>
 <target>&Não</target>
 
+<source>Use Recycle Bin</source>
+<target>Utilizar Reciclagem</target>
+
 <source>Delete on both sides</source>
 <target>Eliminar em ambos os lados</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Eliminar em ambos os lados mesmo se o ficheiro só está seleccionado num lado</target>
 
-<source>Use Recycle Bin</source>
-<target>Utilizar Reciclagem</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Apenas ficheiros/directórios que coincidam com as opções de filtros vão ser selecionados para sincronização.
-Nota: Os filtros devem ser especificados em relação aos directórios principais de sincronização.
+Apenas ficheiros que condigam com todos os filtros serão sincronizados.
+Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 </target>
 
 <source>Hints:</source>
@@ -785,20 +782,20 @@ Excluir: \stuff\temp\*
 <source>Exclude</source>
 <target>Excluir</target>
 
-<source>Minimum file size</source>
-<target>Tamanho ficheiro mínimo</target>
+<source>Time span</source>
+<target>Intervalo de tempo</target>
 
-<source>Maximum file size</source>
-<target>Tamanho ficheiro máximo</target>
+<source>File size</source>
+<target>Tamanho ficheiro</target>
+
+<source>Minimum</source>
+<target>Mínimo</target>
+
+<source>Maximum</source>
+<target>Máximo</target>
 
 <source>&Default</source>
 <target>&Config. Iniciais</target>
-
-<source>Move column up</source>
-<target>Mover coluna para cima</target>
-
-<source>Move column down</source>
-<target>Mover coluna para baixo</target>
 
 <source>Transactional file copy</source>
 <target>Copia ficheiro transacional</target>
@@ -818,14 +815,8 @@ Excluir: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Transferir ficheiro e permissões (Requer direitos de administrador)</target>
 
-<source>Hidden dialogs:</source>
-<target>Diálogos ocultos:</target>
-
-<source>Reset</source>
-<target>Reiniciar</target>
-
-<source>Show hidden dialogs</source>
-<target>Mostrar diálogos ocultos</target>
+<source>Restore hidden dialogs</source>
+<target>Restaurar diálogos escondidos</target>
 
 <source>External applications</source>
 <target>Aplicações externas</target>
@@ -857,8 +848,8 @@ Excluir: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Par de directório</target>
 
-<source>Compressed view</source>
-<target>Vista compacta</target>
+<source>Overview</source>
+<target>Vista</target>
 
 <source>Select view</source>
 <target>Seleccionar vista</target>
@@ -876,7 +867,7 @@ Excluir: \stuff\temp\*
 <target>Excluir por filtro:</target>
 
 <source><multiple selection></source>
-<target><selecção múltipla></target>
+<target><seleção múltipla></target>
 
 <source>Delete</source>
 <target>Eliminar</target>
@@ -887,8 +878,8 @@ Excluir: \stuff\temp\*
 <source>Exclude all</source>
 <target>Excluir tudo</target>
 
-<source>Icon size:</source>
-<target>Tamanho ícone:</target>
+<source>Show icons:</source>
+<target>Mostrar ícones:</target>
 
 <source>Small</source>
 <target>Pequeno</target>
@@ -913,6 +904,9 @@ Excluir: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Configuração guardada!</target>
+
+<source>Never save changes</source>
+<target>Nunca guardar alterações</target>
 
 <source>Save changes to current configuration?</source>
 <target>Guardar alterações à configuração?</target>
@@ -1025,9 +1019,6 @@ Excluir: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Erro de escrita no ficheiro:</target>
 
-<source>Batch file created successfully!</source>
-<target>Ficheiro batch criado com sucesso!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1106,6 +1097,9 @@ Excluir: \stuff\temp\*
 <source>This year</source>
 <target>Este ano</target>
 
+<source>Last x days</source>
+<target>Últimos x dias</target>
+
 <source>Byte</source>
 <target>Byte</target>
 
@@ -1115,11 +1109,8 @@ Excluir: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filtro: Todos os pares</target>
-
-<source>Filter: Single pair</source>
-<target>Filtro: Par simples</target>
+<source>Filter</source>
+<target>Filtro</target>
 
 <source>Direct</source>
 <target>Direto</target>
@@ -1145,8 +1136,8 @@ Excluir: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Contrapartida de %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Restaurar os diálogos escondidos?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Tornar visíveis diálogos e mensagens de aviso novamente?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1277,9 +1268,6 @@ Excluir: \stuff\temp\*
 <source>Error copying file:</source>
 <target>Erro ao copiar ficheiro:</target>
 
-<source>Error opening file:</source>
-<target>Erro ao abrir ficheiro:</target>
-
 <source>Error traversing directory:</source>
 <target>Erro ao percorrer a pasta:</target>
 
@@ -1322,8 +1310,8 @@ Excluir: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>A preparar sincronização...</target>
 
-<source>Memory allocation failed!</source>
-<target>Alocação de memória falhou!</target>
+<source>Out of memory!</source>
+<target>Sem memória disponível!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Ficheiro %x tem data inválida!</target>
@@ -1478,11 +1466,11 @@ Excluir: \stuff\temp\*
 <source>Generating database...</source>
 <target>A gerar base de dados...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Nada a sincronizar de acordo com a configuração!</target>
+<source>Nothing to synchronize!</source>
+<target>Nada a sincronizar!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Erro ao copiar ficheiro bloqueado %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Não é possível copiar o ficheiro bloqueado %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Erro na verificação de dados: ficheiro fonte e de destino têm conteúdo diferente!</target>

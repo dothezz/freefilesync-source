@@ -88,22 +88,22 @@ DiskInfo retrieveDiskInfo(const Zstring& pathName)
                                   0,
                                   OPEN_EXISTING,
                                   0,
-                                  NULL);
+                                  nullptr);
     if (hVolume == INVALID_HANDLE_VALUE)
         return output;
-    ZEN_ON_BLOCK_EXIT(::CloseHandle(hVolume));
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(hVolume));
 
     std::vector<char> buffer(sizeof(VOLUME_DISK_EXTENTS) + sizeof(DISK_EXTENT)); //reserve buffer for at most one disk! call below will then fail if volume spans multiple disks!
 
     DWORD bytesReturned = 0;
     if (!::DeviceIoControl(hVolume,                              // handle to device
                            IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, // dwIoControlCode
-                           NULL,                                 // lpInBuffer
+                           nullptr,                                 // lpInBuffer
                            0,                                    // nInBufferSize
                            &buffer[0],                           // output buffer
                            static_cast<DWORD>(buffer.size()),    // size of output buffer
                            &bytesReturned,                       // number of bytes returned
-                           NULL))                                // OVERLAPPED structure
+                           nullptr))                                // OVERLAPPED structure
         return output;
 
     const VOLUME_DISK_EXTENTS& volDisks = *reinterpret_cast<VOLUME_DISK_EXTENTS*>(&buffer[0]);
@@ -254,7 +254,7 @@ public:
             if (activeCount >= 2)
             {
                 statusText += L" " + _P("[1 Thread]", "[%x Threads]", activeCount);
-                replace(statusText, L"%x", toString<std::wstring>(activeCount));
+                replace(statusText, L"%x", numberTo<std::wstring>(activeCount));
             }
             statusText += std::wstring(L" \n") + L'\"' + filename + L'\"';
             return statusText;
@@ -481,7 +481,7 @@ public:
     void operator()() //thread entry
     {
         acb_->incActiveWorker();
-        ZEN_ON_BLOCK_EXIT(acb_->decActiveWorker(););
+        ZEN_ON_SCOPE_EXIT(acb_->decActiveWorker(););
 
         std::for_each(workload_.begin(), workload_.end(),
                       [&](std::pair<DirectoryKey, DirectoryValue*>& item)
@@ -515,7 +515,7 @@ public:
                     break;
             }
 
-            DstHackCallback* dstCallbackPtr = NULL;
+            DstHackCallback* dstCallbackPtr = nullptr;
 #ifdef FFS_WIN
             DstHackCallbackImpl dstCallback(*acb_, threadID_);
             dstCallbackPtr = &dstCallback;
@@ -546,7 +546,7 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
     std::vector<boost::thread> worker; //note: GCC doesn't allow to construct an array of empty threads since they would be initialized by const boost::thread&
     worker.reserve(buckets.size());
 
-    zen::ScopeGuard guardWorker = zen::makeGuard([&]()
+    zen::ScopeGuard guardWorker = zen::makeGuard([&]
     {
         std::for_each(worker.begin(), worker.end(), [](boost::thread& wt) { wt.interrupt(); }); //interrupt all at once, then join
         std::for_each(worker.begin(), worker.end(), [](boost::thread& wt) { wt.join(); });

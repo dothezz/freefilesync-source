@@ -51,9 +51,9 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
     if (!argv.empty())
     {
         filename = argv[0];
-        for (std::vector<std::wstring>::const_iterator i = argv.begin() + 1; i != argv.end(); ++i)
-            arguments += (i != argv.begin() ? L" " : L"") +
-                         (i->empty() || std::find_if(i->begin(), i->end(), &cStringIsWhiteSpace<wchar_t>) != i->end() ? L"\"" + *i + L"\"" : *i);
+        for (auto iter = argv.begin() + 1; iter != argv.end(); ++iter)
+            arguments += (iter != argv.begin() ? L" " : L"") +
+                         (iter->empty() || std::any_of(iter->begin(), iter->end(), &isWhiteSpace<wchar_t>) ? L"\"" + *iter + L"\"" : *iter);
     }
 
     SHELLEXECUTEINFO execInfo = {};

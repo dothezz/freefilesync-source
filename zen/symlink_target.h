@@ -76,10 +76,10 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
                                       0,
                                       OPEN_EXISTING,
                                       FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-                                      NULL);
+                                      nullptr);
     if (hLink == INVALID_HANDLE_VALUE)
         throw FileError(_("Error resolving symbolic link:") + L"\n\"" + linkPath + L"\"" + L"\n\n" + getLastErrorFormatted());
-    ZEN_ON_BLOCK_EXIT(::CloseHandle(hLink));
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(hLink));
 
     //respect alignment issues...
     const DWORD bufferSize = REPARSE_DATA_BUFFER_HEADER_SIZE + MAXIMUM_REPARSE_DATA_BUFFER_SIZE;
@@ -88,12 +88,12 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
     DWORD bytesReturned; //dummy value required by FSCTL_GET_REPARSE_POINT!
     if (!::DeviceIoControl(hLink,                   //__in         HANDLE hDevice,
                            FSCTL_GET_REPARSE_POINT, //__in         DWORD dwIoControlCode,
-                           NULL,                    //__in_opt     LPVOID lpInBuffer,
+                           nullptr,                 //__in_opt     LPVOID lpInBuffer,
                            0,                       //__in         DWORD nInBufferSize,
                            &buffer[0],              //__out_opt    LPVOID lpOutBuffer,
                            bufferSize,              //__in         DWORD nOutBufferSize,
                            &bytesReturned,          //__out_opt    LPDWORD lpBytesReturned,
-                           NULL))                   //__inout_opt  LPOVERLAPPED lpOverlapped
+                           nullptr))                //__inout_opt  LPOVERLAPPED lpOverlapped
         throw FileError(_("Error resolving symbolic link:") + L"\n\"" + linkPath + L"\"" + L"\n\n" + getLastErrorFormatted());
 
     REPARSE_DATA_BUFFER& reparseData = *reinterpret_cast<REPARSE_DATA_BUFFER*>(&buffer[0]); //REPARSE_DATA_BUFFER needs to be artificially enlarged!

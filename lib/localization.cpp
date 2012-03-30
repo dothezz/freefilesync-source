@@ -183,7 +183,7 @@ ExistingTranslations::ExistingTranslations()
     for (auto i = lngFiles.begin(); i != lngFiles.end(); ++i)
         try
         {
-            std::string stream = loadStream(*i);; //throw XmlFileError
+            std::string stream = loadStream(*i); //throw XmlFileError
             try
             {
                 lngfile::TransHeader lngHeader;
@@ -193,8 +193,7 @@ ExistingTranslations::ExistingTranslations()
                 There is some buggy behavior in wxWidgets which maps "zh_TW" to simplified chinese.
                 Fortunately locales can be also entered as description. I changed to "Chinese (Traditional)" which works fine.
                 */
-                const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utf8CvrtTo<wxString>(lngHeader.localeName));
-                if (locInfo)
+                if (const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utf8CvrtTo<wxString>(lngHeader.localeName)))
                 {
                     ExistingTranslations::Entry newEntry;
                     newEntry.languageID     = locInfo->Language;

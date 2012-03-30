@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Filter configuratie</target>
 
-<source>Customize columns</source>
-<target>Aanpassen kolommen</target>
-
 <source>Global settings</source>
 <target>Algemene instellingen</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Verkennen</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Fout tijdens uitlezen van synchronisatie-database:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Fout tijdens schrijven naar synchronisatie-database:</target>
-
 <source>Invalid command line: %x</source>
 <target>Ongeldige opdrachtregel: %x</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Fatal Error</source>
+<target>Fatale fout</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows Fout Code %x:</target>
@@ -139,14 +136,20 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Fout tijdens uitlezen van synchronisatie-database:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Fout tijdens schrijven naar synchronisatie-database:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Opmaak van synchronisatie-database komt niet overeen:</target>
+
 <source>Initial synchronization:</source>
 <target>Initiële  synchronisatie:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Eén van de FreeFileSync database bestanden bestaat nog niet:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Opmaak van synchronisatie-database komt niet overeen:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Database bestanden delen geen gezamelijke synchronisatie sessie:</target>
@@ -172,12 +175,6 @@
 <pluralform>%x sec</pluralform>
 </target>
 
-<source>Info</source>
-<target>Info</target>
-
-<source>Fatal Error</source>
-<target>Fatale fout</target>
-
 <source>Error reading file:</source>
 <target>Fout tijdens lezen van bestand:</target>
 
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>Fout tijdens verwerking configuratiebestand:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Fout tijdens verplaatsen naar prullenbak:</target>
+<source>Configuration loaded partially only:</source>
+<target>Configuratie alleen gedeeltelijk geladen:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Kon een benodigde DLL niet laden:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Niet mogelijk om %x naar de Prullenbak te verplaatsen!</target>
+
+<source>Cannot load file %x.</source>
+<target>Kan bestand %x niet laden.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Fout bij toegang tot Volume Schaduwkopie Service!</target>
@@ -214,10 +214,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Het aanmaken van schaduwkopieën op WOW64 wordt niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Kon de schijfnaam niet vaststellen van bestand:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Kan volumenaam niet bepalen voor bestand:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Schijfnaam %x maakt geen deel uit van bestandsnaam %y!</target>
 
 <source>/sec</source>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>Bestand bestaat niet:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Kon geen waarden inlezen voor de volgende XML punten:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Kan de volgende XML elementen niet lezen:</target>
 
 <source>S&ave configuration...</source>
 <target>Sl&a configuratie op...</target>
@@ -433,7 +433,7 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <target>Drag en drop</target>
 
 <source>Close progress dialog</source>
-<target>Sluit proce dialoog</target>
+<target>Sluit voortgangsvenster</target>
 
 <source>Shut down</source>
 <target>Afsluiten</target>
@@ -540,17 +540,17 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Speed:</source>
 <target>Snelheid:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Benodigde tijd:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Verstreken tijd:</target>
 
 <source>Batch job</source>
 <target>Taaklijst</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Maak een batch bestand voor automatische synchronisatie. Om te starten in batch mode kunt u simpel dubbelklikken op het bestand of uitvoeren via de opdrachtregel: FreeFileSync.exe <ffs_batchbestand>. Dit kan ook worden gepland in de taakplanner van uw besturingssysteem.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Maak een batch bestand en automatiseer synchronisatie. Om te starten in batch modus dubbelklik je op dit bestand of voer het volgende commando uit: FreeFileSync.exe SyncJob.ffs_batch. Dit kan ook worden gepland in uw taakplanner van uw systeem.</target>
 
 <source>Help</source>
 <target>Help</target>
@@ -563,9 +563,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 
 <source>Right</source>
 <target>Rechts</target>
-
-<source>Overview</source>
-<target>Overzicht</target>
 
 <source>Status feedback</source>
 <target>Status terugkoppeling</target>
@@ -711,8 +708,8 @@ overeenkomt
 <source>Published under the GNU General Public License</source>
 <target>Gepubliceerd onder de GNU General Public License</target>
 
-<source>Ignore subsequent errors</source>
-<target>Negeer erop volgende foutmeldingen</target>
+<source>Ignore further errors</source>
+<target>Negeer verdere foutmeldingen</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Verberg eventuele foutmeldingen gedurende de huidige bewerking</target>
@@ -735,22 +732,22 @@ overeenkomt
 <source>&No</source>
 <target>&Nee</target>
 
+<source>Use Recycle Bin</source>
+<target>Gebruik de prullenbak</target>
+
 <source>Delete on both sides</source>
 <target>Verwijder aan beide zijdes</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Verwijder aan beide zijdes ook al is het bestand maar aan één zijde geselecteerd</target>
 
-<source>Use Recycle Bin</source>
-<target>Gebruik de prullenbak</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Alleen bestanden/mappen die overeenkomen met de filter instellingen worden geselecteerd voor synchronisatie.
-Aantekening: De naam van de filter moet relatief gespecificeerd zijn (!) aan de hoofd synchronisatie map.
+Alleen bestanden die met alle filter instellingen overeen komen worden gesynchroniseerd.
+Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 </target>
 
 <source>Hints:</source>
@@ -786,20 +783,20 @@ Uitsluiten: \stuff\temp\*
 <source>Exclude</source>
 <target>Uitsluiten</target>
 
-<source>Minimum file size</source>
-<target>Minimale bestandsgrootte</target>
+<source>Time span</source>
+<target>Tijdspanne</target>
 
-<source>Maximum file size</source>
-<target>Maximale bestandsgrootte</target>
+<source>File size</source>
+<target>Bestandsgrootte</target>
+
+<source>Minimum</source>
+<target>Minimum</target>
+
+<source>Maximum</source>
+<target>Maximum</target>
 
 <source>&Default</source>
 <target>&Standaard</target>
-
-<source>Move column up</source>
-<target>Verplaats kolom naar boven</target>
-
-<source>Move column down</source>
-<target>Verplaats kolom naar beneden</target>
 
 <source>Transactional file copy</source>
 <target>Transactionele bestands kopie</target>
@@ -819,14 +816,8 @@ Uitsluiten: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Zet bestand en map permissies over (Vereist Administrator rechten)</target>
 
-<source>Hidden dialogs:</source>
-<target>Verborgen dialogen:</target>
-
-<source>Reset</source>
-<target>Opnieuw instellen</target>
-
-<source>Show hidden dialogs</source>
-<target>Toon verborgen dialogen</target>
+<source>Restore hidden dialogs</source>
+<target>Herstel verborgen dialogen</target>
 
 <source>External applications</source>
 <target>Externe applicaties</target>
@@ -858,8 +849,8 @@ Uitsluiten: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Map paren</target>
 
-<source>Compressed view</source>
-<target>Compacte weergave</target>
+<source>Overview</source>
+<target>Overzicht</target>
 
 <source>Select view</source>
 <target>Selecteer weergave</target>
@@ -888,8 +879,8 @@ Uitsluiten: \stuff\temp\*
 <source>Exclude all</source>
 <target>Alles uitsluiten</target>
 
-<source>Icon size:</source>
-<target>Icoon grootte:</target>
+<source>Show icons:</source>
+<target>Laat pictogrammen zien:</target>
 
 <source>Small</source>
 <target>Klein</target>
@@ -914,6 +905,9 @@ Uitsluiten: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Configuratie opgeslagen!</target>
+
+<source>Never save changes</source>
+<target>Veranderingen nooit opslaan</target>
 
 <source>Save changes to current configuration?</source>
 <target>Veranderingen opslaan in de huidige configuratie?</target>
@@ -1026,9 +1020,6 @@ Uitsluiten: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Fout tijdens schrijven van bestand:</target>
 
-<source>Batch file created successfully!</source>
-<target>Taakbestand is succesvol aangemaakt!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1107,6 +1098,9 @@ Uitsluiten: \stuff\temp\*
 <source>This year</source>
 <target>Dit jaar</target>
 
+<source>Last x days</source>
+<target>Laatste x dagen</target>
+
 <source>Byte</source>
 <target>Byte</target>
 
@@ -1116,17 +1110,14 @@ Uitsluiten: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filter: Alle paren</target>
-
-<source>Filter: Single pair</source>
-<target>Filter: Enkel paar</target>
+<source>Filter</source>
+<target>Filter</target>
 
 <source>Direct</source>
 <target>Direct</target>
 
 <source>Follow</source>
-<target>Volg</target>
+<target>Volgen</target>
 
 <source>Copy NTFS permissions</source>
 <target>Kopiëer NTFS permissies</target>
@@ -1146,8 +1137,8 @@ Uitsluiten: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Tegenhanger andere zijde naar %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Alle verborgen dialogen herstellen?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Maak verborgen dialogen en waarschuwings berichten opnieuw zichtbaar?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1180,7 +1171,7 @@ Uitsluiten: \stuff\temp\*
 <target>Gebruik de prullenbak bij verwijderen of overschrijven van bestanden</target>
 
 <source>Versioning</source>
-<target>Versieën</target>
+<target>Versiebeheer</target>
 
 <source>Move files into a time-stamped subdirectory</source>
 <target>Verplaats de bestanden naar een tijd-gemarkeerde submap</target>
@@ -1278,9 +1269,6 @@ Uitsluiten: \stuff\temp\*
 <source>Error copying file:</source>
 <target>Fout tijdens kopiëren van bestand:</target>
 
-<source>Error opening file:</source>
-<target>Fout tijdens openen van bestand:</target>
-
 <source>Error traversing directory:</source>
 <target>Fout tijdens doorzoeken van map:</target>
 
@@ -1323,8 +1311,8 @@ Uitsluiten: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Synchronisatie voorbereiden</target>
 
-<source>Memory allocation failed!</source>
-<target>RAM geheugen error!</target>
+<source>Out of memory!</source>
+<target>Onvoldoende geheugen!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Bestand %x heeft een ongeldige datum!</target>
@@ -1479,11 +1467,11 @@ Uitsluiten: \stuff\temp\*
 <source>Generating database...</source>
 <target>Genereren van database...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Volgens de configuratie hoeft er niets gesynchroniseerd te worden!</target>
+<source>Nothing to synchronize!</source>
+<target>Niks om te synchroniseren!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Fout tijdens kopiëren van vergrendeld bestand %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Niet in staat om vergrendeld bestand %x te synchroniseren!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Dataverificatie-fout: Bron en doelbestand hebben verschillende inhoud!</target>

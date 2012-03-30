@@ -28,15 +28,6 @@ using namespace zen;
 #ifdef FFS_WIN
 namespace
 {
-inline
-bool errorCodeForNotExisting(const DWORD lastError)
-{
-    return lastError == ERROR_PATH_NOT_FOUND ||
-           lastError == ERROR_BAD_NETPATH    ||
-           lastError == ERROR_NETNAME_DELETED;
-}
-
-
 class SharedData
 {
 public:
@@ -152,13 +143,13 @@ public:
         hDir = ::CreateFile(applyLongPathPrefix(dirname.c_str()).c_str(),
                             FILE_LIST_DIRECTORY,
                             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                            NULL,
+                            nullptr,
                             OPEN_EXISTING,
                             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-                            NULL);
+                            nullptr);
         if (hDir == INVALID_HANDLE_VALUE)
         {
-            const std::wstring errorMsg = _("Could not initialize directory monitoring:") + L"\n\"" + dirname + L"\"" + L"\n\n" + zen::getLastErrorFormatted();
+            const std::wstring errorMsg = _("Could not initialize directory monitoring:") + L"\n\"" + dirname + L"\"" L"\n\n" + zen::getLastErrorFormatted();
             if (errorCodeForNotExisting(::GetLastError()))
                 throw ErrorNotExisting(errorMsg);
             throw FileError(errorMsg);
@@ -185,30 +176,30 @@ public:
 
                 //actual work
                 OVERLAPPED overlapped = {};
-                overlapped.hEvent = ::CreateEvent(NULL,  //__in_opt  LPSECURITY_ATTRIBUTES lpEventAttributes,
-                                                  true,  //__in      BOOL bManualReset,
-                                                  false, //__in      BOOL bInitialState,
-                                                  NULL); //__in_opt  LPCTSTR lpName
-                if (overlapped.hEvent == NULL)
-                    return shared_->reportError(_("Error when monitoring directories.") + L" (CreateEvent)" + L"\n\n" + getLastErrorFormatted(), ::GetLastError());
-                ZEN_ON_BLOCK_EXIT(::CloseHandle(overlapped.hEvent));
+                overlapped.hEvent = ::CreateEvent(nullptr,  //__in_opt  LPSECURITY_ATTRIBUTES lpEventAttributes,
+                                                  true,     //__in      BOOL bManualReset,
+                                                  false,    //__in      BOOL bInitialState,
+                                                  nullptr); //__in_opt  LPCTSTR lpName
+                if (overlapped.hEvent == nullptr)
+                    return shared_->reportError(_("Error when monitoring directories.") + L" (CreateEvent)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+                ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
 
                 //asynchronous variant: runs on this thread's APC queue!
-                if (!::ReadDirectoryChangesW(hDir,                          //  __in         HANDLE hDirectory,
-                                             &buffer[0],                    //  __out        LPVOID lpBuffer,
+                if (!::ReadDirectoryChangesW(hDir,                              //  __in         HANDLE hDirectory,
+                                             &buffer[0],                        //  __out        LPVOID lpBuffer,
                                              static_cast<DWORD>(buffer.size()), //  __in         DWORD nBufferLength,
-                                             true,                          //  __in         BOOL bWatchSubtree,
+                                             true,                              //  __in         BOOL bWatchSubtree,
                                              FILE_NOTIFY_CHANGE_FILE_NAME |
                                              FILE_NOTIFY_CHANGE_DIR_NAME  |
                                              FILE_NOTIFY_CHANGE_SIZE      |
                                              FILE_NOTIFY_CHANGE_LAST_WRITE, //  __in         DWORD dwNotifyFilter,
-                                             NULL,                          //  __out_opt    LPDWORD lpBytesReturned,
+                                             nullptr,                       //  __out_opt    LPDWORD lpBytesReturned,
                                              &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
-                                             NULL))                    //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
-                    return shared_->reportError(_("Error when monitoring directories.") + L" (ReadDirectoryChangesW)" + L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+                                             nullptr))                      //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
+                    return shared_->reportError(_("Error when monitoring directories.") + L" (ReadDirectoryChangesW)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
 
                 //async I/O is a resource that needs to be guarded since it will write to local variable "buffer"!
-                zen::ScopeGuard lockAio = zen::makeGuard([&]()
+                zen::ScopeGuard guardAio = zen::makeGuard([&]
                 {
                     //http://msdn.microsoft.com/en-us/library/aa363789(v=vs.85).aspx
                     if (::CancelIo(hDir) == TRUE) //cancel all async I/O related to this handle and thread
@@ -218,16 +209,15 @@ public:
                     }
                 });
 
-                DWORD bytesWritten = 0;
-
                 //wait for results
+                DWORD bytesWritten = 0;
                 while (!::GetOverlappedResult(hDir,          //__in   HANDLE hFile,
                                               &overlapped,   //__in   LPOVERLAPPED lpOverlapped,
                                               &bytesWritten, //__out  LPDWORD lpNumberOfBytesTransferred,
                                               false))        //__in   BOOL bWait
                 {
                     if (::GetLastError() != ERROR_IO_INCOMPLETE)
-                        return shared_->reportError(_("Error when monitoring directories.") + L" (GetOverlappedResult)" + L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+                        return shared_->reportError(_("Error when monitoring directories.") + L" (GetOverlappedResult)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
 
                     //execute asynchronous procedure calls (APC) queued on this thread
                     ::SleepEx(50,    // __in  DWORD dwMilliseconds,
@@ -235,7 +225,7 @@ public:
 
                     boost::this_thread::interruption_point();
                 }
-                lockAio.dismiss();
+                guardAio.dismiss();
 
                 shared_->addChanges(&buffer[0], bytesWritten, dirname); //throw ()
             }
@@ -370,8 +360,8 @@ public:
     DirsOnlyTraverser(std::vector<Zstring>& dirs,
                       const std::shared_ptr<TraverseCallback>& otherMe) : otherMe_(otherMe), dirs_(dirs) {}
 
-    virtual         void onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
-    virtual         void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
+    virtual void onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
+    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
     {
         dirs_.push_back(fullName);

@@ -11,7 +11,7 @@
 <target>Caut dosarul %x...</target>
 
 <source>Show in Explorer</source>
-<target>Arată în Explorator</target>
+<target>Arată în Exploratorul de File</target>
 
 <source>Open with default application</source>
 <target>Deschide cu Aplicația Implicită</target>
@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Configurează Filtrul</target>
 
-<source>Customize columns</source>
-<target>Bifează coloanele de afișat</target>
-
 <source>Global settings</source>
 <target>Setări Globale</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Explorează</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Eroare la citirea din baza de date a sincronizării:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Eroare la scrierea în baza de date a sincronizării:</target>
-
 <source>Invalid command line: %x</source>
 <target>Linie de comandă nevalidă: %x</target>
+
+<source>Info</source>
+<target>Informații</target>
+
+<source>Fatal Error</source>
+<target>Eroare Fatală</target>
 
 <source>Windows Error Code %x:</source>
 <target>Codul Erorii Windows %x:</target>
@@ -140,14 +137,20 @@
 <pluralform>%x de Baiți</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Eroare la citirea din baza de date a sincronizării:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Eroare la scrierea în baza de date a sincronizării:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Format al bazei de date necompatibil cu versiunea softului:</target>
+
 <source>Initial synchronization:</source>
 <target>Sincronizare inițială:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Una dintre părți nu are o filă de tip bază de date FreeFileSync:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Format al bazei de date necompatibil cu versiunea softului:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Filele bază de date nu partajează o sesiune comună de sincronizare</target>
@@ -174,12 +177,6 @@
 <pluralform>%x de sec</pluralform>
 </target>
 
-<source>Info</source>
-<target>Informații</target>
-
-<source>Fatal Error</source>
-<target>Eroare Fatală</target>
-
 <source>Error reading file:</source>
 <target>Eroare la citirea filei:</target>
 
@@ -205,11 +202,14 @@
 <source>Error parsing configuration file:</source>
 <target>Eroare la parsarea filei de configurare:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Eroare la mutarea în Reciclator:</target>
+<source>Configuration loaded partially only:</source>
+<target>Configuraţie doar parțial deschisă</target>
 
-<source>Could not load a required DLL:</source>
-<target>Nu pot deschide o filă DLL necesară:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Nu pot muta %x în Reciclator!</target>
+
+<source>Cannot load file %x.</source>
+<target>Nu pot deschide fila %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Eroare la accesarea Serviciului de Conservare a Volumelor [Volume Shadow Copy]!</target>
@@ -217,10 +217,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Realizarea de conservări (copii de rezervă) prin sistemul WOW64 nu este suportată. Folosește versiunea pe 64-biți a FreeFileSync.</target>
 
-<source>Could not determine volume name for file:</source>
+<source>Cannot determine volume name for file:</source>
 <target>Nu pot determina numele volumului pentru fila:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Numele volumului %x nu face parte din numele filei %y !</target>
 
 <source>/sec</source>
@@ -229,8 +229,8 @@
 <source>File does not exist:</source>
 <target>Fila nu există:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Nu pot citi valorile pentru următoarele noduri XML:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Nu pot citi următoarele elemente XML:</target>
 
 <source>S&ave configuration...</source>
 <target>S&alvează Configurația...</target>
@@ -433,7 +433,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Rezultatul Comparării</target>
 
 <source>Drag && drop</source>
-<target>Trage și pune un dosar în cîmpul de mai jos sau folosește butonul de explorare</target>
+<target>Trage și pune un dosar mai jos sau explorează către el</target>
 
 <source>Close progress dialog</source>
 <target>Închide Fereastra cu Progresul Sincronizării</target>
@@ -455,9 +455,6 @@ Linia de comandă este executată de fiecare dată cînd:
 
 <source>2. &Synchronize...</source>
 <target>2. &Sincronizează...</target>
-
-<source>S&witch view</source>
-<target>Schimbă &Vederea</target>
 
 <source>&New</source>
 <target>Configurație &Nouă</target>
@@ -546,17 +543,17 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Speed:</source>
 <target>Viteză:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Timp Rămas:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Timp Scurs:</target>
 
 <source>Batch job</source>
 <target>Sarcină Set</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Crearea unei file set [batch file] pentru sincronizarea inteligentă (automatizată). Pentru a porni în modul set de comenzi, trebuie dublu-clicată fila sau executată prin linia de comandă următoare: FreeFileSync.exe <ffs_batch file>. Operația poate fi de asemenea planificată cu ajutorul Planificatorului de Sarcini [Task Scheduler] din sistemul de operare.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Creează o filă set [batch] și automatizează sincronizarea. Pentru a porni în modul set dublu-clichează această filă sau rulează comanda: FreeFileSync.exe SyncJob.ffs_batch. Operația poate fi de asemenea planificată folosind planificatorul de sarcini al sistemului.</target>
 
 <source>Help</source>
 <target>Ajutor</target>
@@ -569,9 +566,6 @@ Linia de comandă este executată de fiecare dată cînd:
 
 <source>Right</source>
 <target>Dreapta</target>
-
-<source>Overview</source>
-<target>Panoramă</target>
 
 <source>Status feedback</source>
 <target>Afișarea Stării</target>
@@ -717,8 +711,8 @@ este același
 <source>Published under the GNU General Public License</source>
 <target>Publicat sub licența GNU GPL</target>
 
-<source>Ignore subsequent errors</source>
-<target>Ignoră (nu lua în seamă) erorile ulterioare</target>
+<source>Ignore further errors</source>
+<target>Ignoră erorile ulterioare</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Ascunde mesajele de eroare apărute ulterior în timpul acestui proces</target>
@@ -741,22 +735,22 @@ este același
 <source>&No</source>
 <target>&Nu</target>
 
+<source>Use Recycle Bin</source>
+<target>Mutare în Reciclator</target>
+
 <source>Delete on both sides</source>
 <target>Șterge din ambele părți</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Șterge din ambele părți, chiar dacă fila e selecționată într-o singură parte</target>
 
-<source>Use Recycle Bin</source>
-<target>Mutare în Reciclator</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Doar filele/folderele care îndeplinesc toate condițiile filtrului vor fi selectate pentru sincronizare.
-Notă: Filtrul de nume este pus în relație cu calea dosarelor principale sincronizate (elementele filtrate au specificată o cale relativă).
+Doar filele care se potrivesc cu toate setările de filtrare vor fi sincronizate.
+Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 </target>
 
 <source>Hints:</source>
@@ -792,20 +786,20 @@ Excluse: \stuff\temp\*
 <source>Exclude</source>
 <target>Excluse</target>
 
-<source>Minimum file size</source>
-<target>Mărimea minimă a filei</target>
+<source>Time span</source>
+<target>Intervalul de Timp</target>
 
-<source>Maximum file size</source>
-<target>Mărimea maximă a filei</target>
+<source>File size</source>
+<target>Mărimea Filei</target>
+
+<source>Minimum</source>
+<target>Minim</target>
+
+<source>Maximum</source>
+<target>Maxim</target>
 
 <source>&Default</source>
 <target>Coloanele &Implicite</target>
-
-<source>Move column up</source>
-<target>Mută coloana în sus</target>
-
-<source>Move column down</source>
-<target>Mută coloana în jos</target>
 
 <source>Transactional file copy</source>
 <target>Copiază filele în mod tranzacțional</target>
@@ -825,14 +819,8 @@ Excluse: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Permisiunile filelor și dosarelor sînt și ele transferate (necesită drepturi de Administrator)</target>
 
-<source>Hidden dialogs:</source>
-<target>Casete de dialog ascunse:</target>
-
-<source>Reset</source>
-<target>Resetează</target>
-
-<source>Show hidden dialogs</source>
-<target>Arată casetele de dialog ascunse</target>
+<source>Restore hidden dialogs</source>
+<target>Restaurează Dialogurile Ascunse</target>
 
 <source>External applications</source>
 <target>Aplicații Externe</target>
@@ -864,8 +852,8 @@ Excluse: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Perechi de Dosare</target>
 
-<source>Compressed view</source>
-<target>Vedere Comprimată</target>
+<source>Overview</source>
+<target>Panoramă</target>
 
 <source>Select view</source>
 <target>Selectează Vederea</target>
@@ -894,17 +882,17 @@ Excluse: \stuff\temp\*
 <source>Exclude all</source>
 <target>Exclude Tot</target>
 
-<source>Icon size:</source>
-<target>Mărimea Icoanelor Elementelor:</target>
+<source>Show icons:</source>
+<target>Arată Icoane:</target>
 
 <source>Small</source>
-<target>Mică</target>
+<target>Mici</target>
 
 <source>Medium</source>
-<target>Medie</target>
+<target>Medii</target>
 
 <source>Large</source>
-<target>Mare</target>
+<target>Mari</target>
 
 <source>Select time span...</source>
 <target>Selectează intervalul de timp...</target>
@@ -920,6 +908,9 @@ Excluse: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Configurație salvată !</target>
+
+<source>Never save changes</source>
+<target>Nu salva niciodată modificările</target>
 
 <source>Save changes to current configuration?</source>
 <target>Vrei să salvezi modificările configurației curente?</target>
@@ -1032,9 +1023,6 @@ Excluse: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Eroare la scrierea filei:</target>
 
-<source>Batch file created successfully!</source>
-<target>Fila cu setul de comenzi a fost creată cu succces !</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1109,13 +1097,16 @@ Excluse: \stuff\temp\*
 <target>Azi</target>
 
 <source>This week</source>
-<target>Săptămîna Asta</target>
+<target>Săptămîna asta</target>
 
 <source>This month</source>
-<target>Luna Asta</target>
+<target>Luna asta</target>
 
 <source>This year</source>
-<target>Anul Ăsta</target>
+<target>Anul ăsta</target>
+
+<source>Last x days</source>
+<target>Ultimele x zile</target>
 
 <source>Byte</source>
 <target>Baiți</target>
@@ -1126,11 +1117,8 @@ Excluse: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filtru: Toate perechile</target>
-
-<source>Filter: Single pair</source>
-<target>Filtru: O singură pereche</target>
+<source>Filter</source>
+<target>Filtrează</target>
 
 <source>Direct</source>
 <target>Direcționează</target>
@@ -1156,8 +1144,8 @@ Excluse: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- corespondentul din partea opusă al lui %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Restaurezi toate casetele de dialog ascunse?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Vrei ca dialogurile ascunse și mesajele de avertizare să fie vizibile din nou?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1293,9 +1281,6 @@ Excluse: \stuff\temp\*
 <source>Error copying file:</source>
 <target>Eroare la copierea filei:</target>
 
-<source>Error opening file:</source>
-<target>Eroare la deschiderea filei:</target>
-
 <source>Error traversing directory:</source>
 <target>Eroare la parcurgerea dosarului:</target>
 
@@ -1338,8 +1323,8 @@ Excluse: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Pregătesc sincronizarea...</target>
 
-<source>Memory allocation failed!</source>
-<target>Alocarea memoriei a eșuat!</target>
+<source>Out of memory!</source>
+<target>Memorie epuizată!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Fila %x are o dată nevalidă !</target>
@@ -1494,11 +1479,11 @@ Excluse: \stuff\temp\*
 <source>Generating database...</source>
 <target>Generez baza de date...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Nu este nimic de sincronizat conform configurației!</target>
+<source>Nothing to synchronize!</source>
+<target>Nu e nimic de sincronizat!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Eroare la copierea filei zăvorîte %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Nu pot copia fila zăvorîtă %x</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Eroare la verificarea datelor: Filele sursă și țintă au conținut diferit!</target>

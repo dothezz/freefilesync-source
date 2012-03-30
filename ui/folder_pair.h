@@ -71,12 +71,12 @@ public:
         //test for Null-filter
         if (isNullFilter(localFilter))
         {
-            setImage(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::getImage(wxT("filterSmallGrey")));
+            setImage(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::getImage(L"filterOffSmall"));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
         }
         else
         {
-            setImage(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::getImage(wxT("filterSmall")));
+            setImage(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::getImage(L"filterOnSmall"));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter is active"));
         }
     }
@@ -86,13 +86,13 @@ protected:
         basicPanel_(basicPanel)
     {
         //register events for removal of alternate configuration
-        basicPanel_.m_bpButtonAltCompCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfgContext    ), NULL, this);
-        basicPanel_.m_bpButtonAltSyncCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgContext    ), NULL, this);
-        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgContext), NULL, this);
+        basicPanel_.m_bpButtonAltCompCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfgContext    ), nullptr, this);
+        basicPanel_.m_bpButtonAltSyncCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgContext    ), nullptr, this);
+        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgContext), nullptr, this);
 
-        basicPanel_.m_bpButtonAltCompCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfg    ), NULL, this);
-        basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg    ), NULL, this);
-        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), NULL, this);
+        basicPanel_.m_bpButtonAltCompCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfg    ), nullptr, this);
+        basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg    ), nullptr, this);
+        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), nullptr, this);
 
         basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(GlobalResources::getImage(L"removeFolderPair"));
     }
@@ -119,21 +119,21 @@ private:
     void OnAltCompCfgContext(wxCommandEvent& event)
     {
         ContextMenu menu;
-        menu.addItem(_("Remove alternate settings"), [this] { this->removeAltCompCfg(); }, NULL, altCompConfig.get() != NULL);
+        menu.addItem(_("Remove alternate settings"), [this] { this->removeAltCompCfg(); }, nullptr, altCompConfig.get() != nullptr);
         menu.popup(basicPanel_);
     }
 
     void OnAltSyncCfgContext(wxCommandEvent& event)
     {
         ContextMenu menu;
-        menu.addItem(_("Remove alternate settings"), [this] { this->removeAltSyncCfg(); }, NULL, altSyncConfig.get() != NULL);
+        menu.addItem(_("Remove alternate settings"), [this] { this->removeAltSyncCfg(); }, nullptr, altSyncConfig.get() != nullptr);
         menu.popup(basicPanel_);
     }
 
     void OnLocalFilterCfgContext(wxCommandEvent& event)
     {
         ContextMenu menu;
-        menu.addItem(_("Clear filter settings"), [this] { this->removeLocalFilterCfg(); }, NULL, !isNullFilter(localFilter));
+        menu.addItem(_("Clear filter settings"), [this] { this->removeLocalFilterCfg(); }, nullptr, !isNullFilter(localFilter));
         menu.popup(basicPanel_);
     }
 
@@ -169,8 +169,8 @@ private:
 
         if (showSyncConfigDlg(cmpCfg.compareVar,
                               syncCfg,
-                              NULL,
-                              NULL) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
+                              nullptr,
+                              nullptr) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
         {
             altSyncConfig = std::make_shared<SyncConfig>(syncCfg);
             refreshButtons();
@@ -196,7 +196,7 @@ private:
     GuiPanel& basicPanel_; //panel to be enhanced by this template
 
     //alternate configuration attached to it
-    AltCompCfgPtr altCompConfig; //optional: present if non-NULL
+    AltCompCfgPtr altCompConfig; //optional
     AltSyncCfgPtr altSyncConfig; //
     FilterConfig  localFilter;
 };

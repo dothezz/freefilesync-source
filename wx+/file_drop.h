@@ -18,8 +18,8 @@ namespace zen
 void setupFileDrop(wxWindow& wnd);
 
 //2. register events:
-//wnd.Connect   (EVENT_DROP_FILE, FileDropEventHandler(MyDlg::OnFilesDropped), NULL, this);
-//wnd.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(MyDlg::OnFilesDropped), NULL, this);
+//wnd.Connect   (EVENT_DROP_FILE, FileDropEventHandler(MyDlg::OnFilesDropped), nullptr, this);
+//wnd.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(MyDlg::OnFilesDropped), nullptr, this);
 
 //3. do something:
 //void MyDlg::OnFilesDropped(FileDropEvent& event);

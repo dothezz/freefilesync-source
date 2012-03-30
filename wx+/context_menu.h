@@ -27,12 +27,12 @@ namespace zen
 class ContextMenu : private wxEvtHandler
 {
 public:
-    void addItem(const wxString& label, const std::function<void()>& command, const wxBitmap* bmp = NULL, bool enabled = true)
+    void addItem(const wxString& label, const std::function<void()>& command, const wxBitmap* bmp = nullptr, bool enabled = true)
     {
         wxMenuItem* newItem = new wxMenuItem(&menu, wxID_ANY, label);
-        if (bmp) newItem->SetBitmap(*bmp);
-        if (!enabled) newItem->Enable(false);
-        menu.Append(newItem); //do NOT append item before setting bitmap! wxWidgets screws up for yet another crappy reason
+        if (bmp) newItem->SetBitmap(*bmp); //do not set AFTER appending item! wxWidgets screws up for yet another crappy reason
+        menu.Append(newItem);
+        if (!enabled) newItem->Enable(false); //do not enable BEFORE appending item! wxWidgets screws up for yet another crappy reason
         menu.Connect(newItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ContextMenu::onSelection), new GenericCommand(command), /*pass ownership*/ this);
     }
 

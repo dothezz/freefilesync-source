@@ -12,6 +12,7 @@
 #include <iterator>
 #include <limits>
 #include <functional>
+#include <cassert>
 
 
 namespace numeric
@@ -32,7 +33,7 @@ template <class T>
 const T& max(const T& a, const T& b, const T& c);
 
 template <class T>
-void restrict(T& val, const T& minVal, const T& maxVal); //make sure minVal <= val && val <= maxVal
+void confine(T& val, const T& minVal, const T& maxVal); //make sure minVal <= val && val <= maxVal
 
 template <class InputIterator>
 std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last);
@@ -57,12 +58,11 @@ template <class RandomAccessIterator>
 double median(RandomAccessIterator first, RandomAccessIterator last); //note: invalidates input range!
 
 template <class InputIterator>
-double stdDeviation(InputIterator first, InputIterator last, double* mean = NULL); //estimate standard deviation (and thereby arithmetic mean)
+double stdDeviation(InputIterator first, InputIterator last, double* mean = nullptr); //estimate standard deviation (and thereby arithmetic mean)
 
 //median absolute deviation: "mad / 0.6745" is a robust measure for standard deviation of a normal distribution
 template <class RandomAccessIterator>
 double mad(RandomAccessIterator first, RandomAccessIterator last); //note: invalidates input range!
-
 
 template <class InputIterator>
 double norm2(InputIterator first, InputIterator last);
@@ -99,7 +99,10 @@ const double ln2   = 0.693147180559945309417;
 template <class T> inline
 T abs(T value)
 {
-    return value < 0 ? -1 * value : value;
+    if (value < 0)
+        return -value; // operator "?:" caveat: may be different type than "value"
+    else
+        return value;
 }
 
 template <class T> inline
@@ -131,7 +134,7 @@ const T& max(const T& a, const T& b, const T& c)
 
 
 template <class T> inline
-void restrict(T& val, const T& minVal, const T& maxVal)
+void confine(T& val, const T& minVal, const T& maxVal)
 {
     assert(minVal <= maxVal);
     if (val < minVal)
@@ -142,19 +145,36 @@ void restrict(T& val, const T& minVal, const T& maxVal)
 
 
 template <class InputIterator, class Compare> inline
-std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last, Compare comp)
+std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last, Compare compLess)
 {
+    //by factor 1.5 to 3 faster than boost::minmax_element (=two-step algorithm) for built-in types!
+
     InputIterator lowest  = first;
     InputIterator largest = first;
 
     if (first != last)
-        while (++first != last)
+    {
+        auto minVal = *lowest;  //nice speedup on 64 bit!
+        auto maxVal = *largest; //
+        for (;;)
         {
-            if (comp(*largest, *first))    // or: if (comp(*largest,*lowest)) for the comp version
+            ++first;
+            if (first == last)
+                break;
+            const auto val = *first;
+
+            if (compLess(maxVal, val))
+            {
                 largest = first;
-            else if (comp(*first, *lowest))
+                maxVal  = val;
+            }
+            else if (compLess(val, minVal))
+            {
                 lowest = first;
+                minVal = val;
+            }
         }
+    }
     return std::make_pair(lowest, largest);
 }
 
@@ -207,10 +227,10 @@ template <class T>
 struct PowerImpl<10, T>; //not defined: invalidates power<N> for N >= 10
 }
 
-template <size_t N, class T> inline
+template <size_t n, class T> inline
 T power(const T& value)
 {
-    return PowerImpl<N, T>::result(value);
+    return PowerImpl<n, T>::result(value);
 }
 
 
@@ -231,8 +251,7 @@ double degToRad(double degree)
 template <class InputIterator> inline
 double arithmeticMean(InputIterator first, InputIterator last)
 {
-    //low level implementation to avoid random-access requirement on iterator
-    size_t n      = 0;
+    size_t n      = 0; //avoid random-access requirement for iterator!
     double sum_xi = 0;
 
     for (; first != last; ++first, ++n)
@@ -280,10 +299,7 @@ double mad(RandomAccessIterator first, RandomAccessIterator last) //note: invali
         if (n % 2 != 0)
             return midVal;
         else //n is even and >= 2 in this context: return mean of two middle values
-        {
-            const double midVal2 = abs(*std::max_element(first, first + n / 2, lessMedAbs) - m);
-            return 0.5 * (midVal2 + midVal);
-        }
+            return 0.5 * (abs(*std::max_element(first, first + n / 2, lessMedAbs) - m) + midVal);
     }
     return 0;
 }

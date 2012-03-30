@@ -19,16 +19,16 @@ namespace
 {
 struct CompileTimeReminder : public FSObjectVisitor
 {
-    virtual void visit(const FileMapping& fileObj   ) {}
+    virtual void visit(const FileMapping&    fileObj) {}
     virtual void visit(const SymLinkMapping& linkObj) {}
-    virtual void visit(const DirMapping& dirObj     ) {}
+    virtual void visit(const DirMapping&     dirObj ) {}
 } checkDymanicCasts; //just a compile-time reminder to check dynamic casts in this file
 }
 
 inline
 bool isDirectoryMapping(const FileSystemObject& fsObj)
 {
-    return dynamic_cast<const DirMapping*>(&fsObj) != NULL;
+    return dynamic_cast<const DirMapping*>(&fsObj) != nullptr;
 }
 
 
@@ -97,8 +97,8 @@ bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;
 
-    const bool isDirA = dynamic_cast<const DirMapping*>(&a) != NULL;
-    const bool isDirB = dynamic_cast<const DirMapping*>(&b) != NULL;
+    const bool isDirA = dynamic_cast<const DirMapping*>(&a) != nullptr;
+    const bool isDirB = dynamic_cast<const DirMapping*>(&b) != nullptr;
 
     //directories second last
     if (isDirA)
@@ -110,9 +110,9 @@ bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
     const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
 
     //then symlinks
-    if (fileObjA == NULL)
+    if (!fileObjA)
         return false;
-    else if (fileObjB == NULL)
+    else if (!fileObjB)
         return true;
 
     //return list beginning with largest files first
@@ -160,9 +160,9 @@ bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
     const FileMapping* fileObjA = dynamic_cast<const FileMapping*>(&a);
     const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
 
-    if (fileObjA == NULL)
+    if (!fileObjA)
         return false; //directories last
-    else if (fileObjB == NULL)
+    else if (!fileObjB)
         return true;  //directories last
 
     return makeSortDirection(LessFilename(), Int2Type<ascending>())(fileObjA->getExtension<side>(), fileObjB->getExtension<side>());

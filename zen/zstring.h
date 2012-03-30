@@ -151,7 +151,7 @@ typedef zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, AllocatorFreeStoreChec
 #if defined(FFS_WIN) || defined(FFS_LINUX)
 namespace z_impl
 {
-int compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA, size_t sizeB);
+int compareFilenamesWin(const wchar_t* lhs, const wchar_t* rhs, size_t sizeLhs, size_t sizeRhs);
 void makeUpperCaseWin(wchar_t* str, size_t size);
 }
 

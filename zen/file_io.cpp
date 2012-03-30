@@ -8,9 +8,6 @@
 
 #ifdef FFS_WIN
 #include "long_path_prefix.h"
-
-#elif defined FFS_LINUX
-#include <cerrno>
 #endif
 
 using namespace zen;
@@ -57,36 +54,21 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
 
                               for FFS most comparisons are probably between different disks => let's use FILE_FLAG_SEQUENTIAL_SCAN
                                */
-                              NULL);
+                              nullptr);
     if (fileHandle == INVALID_HANDLE_VALUE)
-    {
-        const DWORD lastError = ::GetLastError();
-
-        std::wstring errorMessage = _("Error opening file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError);
-
-        if (lastError == ERROR_FILE_NOT_FOUND ||
-            lastError == ERROR_PATH_NOT_FOUND ||
-            lastError == ERROR_BAD_NETPATH    ||
-            lastError == ERROR_NETNAME_DELETED)
-            throw ErrorNotExisting(errorMessage);
-
-        throw FileError(errorMessage);
-    }
-
 #elif defined FFS_LINUX
     fileHandle = ::fopen(filename.c_str(), "r,type=record,noseek"); //utilize UTF-8 filename
-    if (fileHandle == NULL)
+    if (!fileHandle)
+#endif
     {
-        const int lastError = errno;
+        const ErrorCode lastError = getLastError();
+        std::wstring errorMessage = _("Error reading file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError) + L" (open)";
 
-        std::wstring errorMessage = _("Error opening file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError);
-
-        if (lastError == ENOENT)
+        if (errorCodeForNotExisting(lastError))
             throw ErrorNotExisting(errorMessage);
 
         throw FileError(errorMessage);
     }
-#endif
 }
 
 
@@ -95,7 +77,7 @@ FileInput::~FileInput()
 #ifdef FFS_WIN
     ::CloseHandle(fileHandle);
 #elif defined FFS_LINUX
-    ::fclose(fileHandle); //NEVER allow passing NULL to fclose! -> crash!; fileHandle != NULL in this context!
+    ::fclose(fileHandle); //NEVER allow passing nullptr to fclose! -> crash!; fileHandle != nullptr in this context!
 #endif
 }
 
@@ -108,15 +90,15 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
                     buffer,        //__out        LPVOID lpBuffer,
                     static_cast<DWORD>(bytesToRead), //__in         DWORD nNumberOfBytesToRead,
                     &bytesRead,    //__out_opt    LPDWORD lpNumberOfBytesRead,
-                    NULL))         //__inout_opt  LPOVERLAPPED lpOverlapped
+                    nullptr))      //__inout_opt  LPOVERLAPPED lpOverlapped
 #elif defined FFS_LINUX
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0)
 #endif
-        throw FileError(_("Error reading file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted() + L" (r)");
+        throw FileError(_("Error reading file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted() + L" (read)");
 
 #ifdef FFS_WIN
-    if (bytesRead < bytesToRead) //falsify only!
+    if (bytesRead < bytesToRead) //verify only!
 #elif defined FFS_LINUX
     if (::feof(fileHandle) != 0)
 #endif
@@ -153,11 +135,11 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
                               0,
                               access == ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW,
                               FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
-                              NULL);
+                              nullptr);
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
         const DWORD lastError = ::GetLastError();
-        std::wstring errorMessage = _("Error writing file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error writing file:") + L"\n\"" + filename_ + L"\"" L"\n\n" + zen::getLastErrorFormatted(lastError);
 
         if (lastError == ERROR_FILE_EXISTS)
             throw ErrorTargetExisting(errorMessage);
@@ -172,10 +154,10 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
     fileHandle = ::fopen(filename.c_str(),
                          //GNU extension: https://www.securecoding.cert.org/confluence/display/cplusplus/FIO03-CPP.+Do+not+make+assumptions+about+fopen()+and+file+creation
                          access == ACC_OVERWRITE ? "w,type=record,noseek" : "wx,type=record,noseek");
-    if (fileHandle == NULL)
+    if (!fileHandle)
     {
         const int lastError = errno;
-        std::wstring errorMessage = _("Error writing file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error writing file:") + L"\n\"" + filename_ + L"\"" L"\n\n" + zen::getLastErrorFormatted(lastError);
         if (lastError == EEXIST)
             throw ErrorTargetExisting(errorMessage);
 
@@ -193,7 +175,7 @@ FileOutput::~FileOutput()
 #ifdef FFS_WIN
     ::CloseHandle(fileHandle);
 #elif defined FFS_LINUX
-    ::fclose(fileHandle); //NEVER allow passing NULL to fclose! -> crash!
+    ::fclose(fileHandle); //NEVER allow passing nullptr to fclose! -> crash!
 #endif
 }
 
@@ -206,13 +188,13 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
                      buffer,        //__out        LPVOID lpBuffer,
                      static_cast<DWORD>(bytesToWrite),  //__in         DWORD nNumberOfBytesToWrite,
                      &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
-                     NULL))          //__inout_opt  LPOVERLAPPED lpOverlapped
+                     nullptr))      //__inout_opt  LPOVERLAPPED lpOverlapped
 #elif defined FFS_LINUX
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
     if (::ferror(fileHandle) != 0)
 #endif
-        throw FileError(_("Error writing file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted() + L" (w)"); //w -> distinguish from fopen error message!
+        throw FileError(_("Error writing file:") + L"\n\"" + filename_ + L"\"" L"\n\n" + zen::getLastErrorFormatted() + L" (w)"); //w -> distinguish from fopen error message!
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
-        throw FileError(_("Error writing file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + L"incomplete write");
+        throw FileError(_("Error writing file:") + L"\n\"" + filename_ + L"\"" L"\n\n" + L"incomplete write");
 }

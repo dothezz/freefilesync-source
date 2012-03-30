@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>配置过滤</target>
 
-<source>Customize columns</source>
-<target>自定义栏</target>
-
 <source>Global settings</source>
 <target>全局设置</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>浏览</target>
 
-<source>Error reading from synchronization database:</source>
-<target>从同步数据库中读取时出错:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>向同步数据库中写入时出错:</target>
-
 <source>Invalid command line: %x</source>
 <target>无效的命令行: %x</target>
+
+<source>Info</source>
+<target>信息</target>
+
+<source>Fatal Error</source>
+<target>致命错误</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows错误代码 %x:</target>
@@ -138,14 +135,20 @@
 <pluralform>%x 字节</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>从同步数据库中读取时出错:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>向同步数据库中写入时出错:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>不兼容的同步数据库格式:</target>
+
 <source>Initial synchronization:</source>
 <target>初始化同步:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync数据库文件其中一个不存在:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>不兼容的同步数据库格式:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>数据库文件没不共享一个公共的同步段</target>
@@ -170,12 +173,6 @@
 <pluralform>%x 秒</pluralform>
 </target>
 
-<source>Info</source>
-<target>信息</target>
-
-<source>Fatal Error</source>
-<target>致命错误</target>
-
 <source>Error reading file:</source>
 <target>读取文件出错:</target>
 
@@ -199,11 +196,14 @@
 <source>Error parsing configuration file:</source>
 <target>分析配置文件出错:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>移动到回收站出错:</target>
+<source>Configuration loaded partially only:</source>
+<target>只部分载入配置文件:</target>
 
-<source>Could not load a required DLL:</source>
-<target>不能加载所需的动态连接库:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>无法移动 %x 到回收站!</target>
+
+<source>Cannot load file %x.</source>
+<target>不能载入文件 %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>使用卷影复制服务时出错!</target>
@@ -211,10 +211,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>不支持在WOW64上使用卷影复制. 请使用 FreeFileSync 64位版本.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>不能确定此文件的卷名称:</target>
+<source>Cannot determine volume name for file:</source>
+<target>不能确定文件的卷名:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>卷名 %x 并非文件名 %y 的一部分!</target>
 
 <source>/sec</source>
@@ -223,8 +223,8 @@
 <source>File does not exist:</source>
 <target>文件不存在:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>不能从如下XML节点读取数值:</target>
+<source>Cannot read the following XML elements:</source>
+<target>无法读取如下XML元素:</target>
 
 <source>S&ave configuration...</source>
 <target>保存配置(&A)...</target>
@@ -450,9 +450,6 @@ The command line is executed each time:
 <source>2. &Synchronize...</source>
 <target>2. 同步(&S)...</target>
 
-<source>S&witch view</source>
-<target>切换视图(&W)</target>
-
 <source>&New</source>
 <target>新建(&N)</target>
 
@@ -540,17 +537,17 @@ The command line is executed each time:
 <source>Speed:</source>
 <target>速度:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>剩余时间:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>已用时间:</target>
 
 <source>Batch job</source>
 <target>批处理作业</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>创建一个用于自动同步的批处理文件. 要开始批处理模式只需简单地双击此文件或通过命令行执行: FreeFileSync.exe <ffs_batch 文件>. 此文件还可以用于你操作系统的计划任务中.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>创建批处理文件并自动同步. 要在批处理模式下开始, 只需简单双击此文件或运行如下命令: FreeFileSync.exe SyncJob.ffs_batch. 此外也可在你系统中的计划任务里面执行.</target>
 
 <source>Help</source>
 <target>帮助</target>
@@ -564,8 +561,8 @@ The command line is executed each time:
 <source>Right</source>
 <target>右侧</target>
 
-<source>Overview</source>
-<target>摘要</target>
+<source>Sync setttings</source>
+<target>同步设置</target>
 
 <source>Status feedback</source>
 <target>状况反馈</target>
@@ -711,8 +708,8 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>在GNU通用公共许可下发布</target>
 
-<source>Ignore subsequent errors</source>
-<target>忽略随后的错误</target>
+<source>Ignore further errors</source>
+<target>忽略之后出现的错误</target>
 
 <source>Hide further error messages during the current process</source>
 <target>在当前进程中隐藏进一步的错误信息</target>
@@ -735,22 +732,22 @@ is the same
 <source>&No</source>
 <target>否(&N)</target>
 
+<source>Use Recycle Bin</source>
+<target>使用回收站</target>
+
 <source>Delete on both sides</source>
 <target>从两侧删除</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>从两侧删除(即使仅在一侧选择文件)</target>
 
-<source>Use Recycle Bin</source>
-<target>使用回收站</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-只有匹配所有过滤器设置的文件/目录会被选择用于同步.
-备注:文件名过滤器必须指定为同步主目录的相对路径.
+只有匹配所有过滤器的文件会被同步.
+注:文件名必须是主目录的相对路径!
 </target>
 
 <source>Hints:</source>
@@ -786,20 +783,20 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>排除</target>
 
-<source>Minimum file size</source>
-<target>最小文件大小</target>
+<source>Time span</source>
+<target>时间跨度</target>
 
-<source>Maximum file size</source>
-<target>最大文件大小</target>
+<source>File size</source>
+<target>文件大小</target>
+
+<source>Minimum</source>
+<target>最小</target>
+
+<source>Maximum</source>
+<target>最大</target>
 
 <source>&Default</source>
 <target>默认(&D)</target>
-
-<source>Move column up</source>
-<target>上移一行</target>
-
-<source>Move column down</source>
-<target>下移一行</target>
 
 <source>Transactional file copy</source>
 <target>事务文件复制</target>
@@ -819,14 +816,8 @@ Exclude: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>转移文件和目录的权限(需要管理员权限)</target>
 
-<source>Hidden dialogs:</source>
-<target>隐藏对话框:</target>
-
-<source>Reset</source>
-<target>重置</target>
-
-<source>Show hidden dialogs</source>
-<target>显示隐藏的对话框</target>
+<source>Restore hidden dialogs</source>
+<target>恢复被隐藏的对话框</target>
 
 <source>External applications</source>
 <target>外部应用程序</target>
@@ -858,8 +849,8 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>文件夹对</target>
 
-<source>Compressed view</source>
-<target>压缩视图</target>
+<source>Overview</source>
+<target>摘要</target>
 
 <source>Select view</source>
 <target>选择视图</target>
@@ -888,8 +879,8 @@ Exclude: \stuff\temp\*
 <source>Exclude all</source>
 <target>排除所有</target>
 
-<source>Icon size:</source>
-<target>图标大小:</target>
+<source>Show icons:</source>
+<target>显示图标:</target>
 
 <source>Small</source>
 <target>小</target>
@@ -914,6 +905,9 @@ Exclude: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>配置已保存!</target>
+
+<source>Never save changes</source>
+<target>永不保存更改</target>
 
 <source>Save changes to current configuration?</source>
 <target>保存更改到当前配置?</target>
@@ -1026,9 +1020,6 @@ Exclude: \stuff\temp\*
 <source>Error writing file:</source>
 <target>写入文件出错:</target>
 
-<source>Batch file created successfully!</source>
-<target>批处理文件创建成功!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1103,6 +1094,9 @@ Exclude: \stuff\temp\*
 <source>This year</source>
 <target>今年</target>
 
+<source>Last x days</source>
+<target>最后 x 天</target>
+
 <source>Byte</source>
 <target>字节</target>
 
@@ -1112,11 +1106,8 @@ Exclude: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>过滤器:所有的配对</target>
-
-<source>Filter: Single pair</source>
-<target>过滤器:单一的配对</target>
+<source>Filter</source>
+<target>过滤器</target>
 
 <source>Direct</source>
 <target>直接</target>
@@ -1142,8 +1133,8 @@ Exclude: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- 另一侧参照 %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>恢复所有被隐藏的对话框?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>重新让被隐藏的对话框和警告信息变为可见?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1314,8 +1305,8 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>正在准备同步...</target>
 
-<source>Memory allocation failed!</source>
-<target>内存分配失败!</target>
+<source>Out of memory!</source>
+<target>内存不足!</target>
 
 <source>File %x has an invalid date!</source>
 <target>文件 %x 的日期非法!</target>
@@ -1470,11 +1461,11 @@ Exclude: \stuff\temp\*
 <source>Generating database...</source>
 <target>正在生成数据库...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>根据配置没有任何同步!</target>
+<source>Nothing to synchronize!</source>
+<target>没有什么可同步!</target>
 
-<source>Error copying locked file %x!</source>
-<target>复制已锁定的文件时出错 %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>无法复制已锁定文件 %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>数据校验错误:源文件和目标文件内容不同!</target>

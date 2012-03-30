@@ -19,13 +19,13 @@ class GridView
 {
 public:
     //direct data access via row number
-    const FileSystemObject* getObject(size_t row) const;  //returns NULL if object is not found; complexity: constant!
+    const FileSystemObject* getObject(size_t row) const;  //returns nullptr if object is not found; complexity: constant!
     /**/
     FileSystemObject* getObject(size_t row);        //
     size_t rowsOnView() const { return viewRef  .size(); } //only visible elements
     size_t rowsTotal () const { return sortedRef.size(); } //total rows available
 
-    //get references to FileSystemObject: no NULL-check needed! Everything's bound.
+    //get references to FileSystemObject: no nullptr-check needed! Everything's bound.
     void getAllFileRef(const std::set<size_t>& rows, std::vector<FileSystemObject*>& output);
 
     struct StatusCmpResult
@@ -109,17 +109,17 @@ public:
         bool onLeft_;
         bool ascending_;
     };
-    const SortInfo* getSortInfo() const { return currentSort.get(); } //return NULL if currently not sorted
+    const SortInfo* getSortInfo() const { return currentSort.get(); } //return nullptr if currently not sorted
 
-    int findRowDirect(FileSystemObject::ObjectIdConst objId) const; // find an object's row position on view list directly, return < 0 if not found
-    int findRowFirstChild(const HierarchyObject* hierObj)    const; // find first child of DirMapping or BaseDirMapping *on sorted sub view*
+    ptrdiff_t findRowDirect(FileSystemObject::ObjectIdConst objId) const; // find an object's row position on view list directly, return < 0 if not found
+    ptrdiff_t findRowFirstChild(const HierarchyObject* hierObj)    const; // find first child of DirMapping or BaseDirMapping *on sorted sub view*
     //"hierObj" may be invalid, it is NOT dereferenced, return < 0 if not found
 
 private:
     struct RefIndex
     {
-        RefIndex(unsigned int folderInd, FileSystemObject::ObjectId id) :
-            folderIndex(folderInd),
+        RefIndex(size_t folderInd, FileSystemObject::ObjectId id) :
+            folderIndex(static_cast<unsigned int>(folderInd)),
             objId(id) {}
         unsigned int folderIndex;
         FileSystemObject::ObjectId objId;
@@ -184,10 +184,8 @@ private:
 inline
 const FileSystemObject* GridView::getObject(size_t row) const
 {
-    if (row < rowsOnView())
-        return FileSystemObject::retrieve(viewRef[row]);
-    else
-        return NULL;
+    return row < rowsOnView() ?
+           FileSystemObject::retrieve(viewRef[row]) : nullptr;
 }
 
 inline

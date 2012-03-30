@@ -7,10 +7,10 @@
 #ifndef GUISTATUSHANDLER_H_INCLUDED
 #define GUISTATUSHANDLER_H_INCLUDED
 
-#include "../lib/status_handler.h"
 #include <wx/event.h>
-#include "../lib/error_log.h"
+#include <zen/error_log.h>
 #include "progress_indicator.h"
+#include "../lib/status_handler.h"
 #include "../lib/process_xml.h"
 #include "main_dlg.h"
 
@@ -76,7 +76,7 @@ private:
     MainDialog* parentDlg_;
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
     xmlAccess::OnGuiError handleError_;
-    zen::ErrorLogging errorLog;
+    zen::ErrorLog errorLog;
 };
 
 

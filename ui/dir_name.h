@@ -25,8 +25,8 @@ public:
     DirectoryName(wxWindow&        dropWindow,
                   wxDirPickerCtrl& dirPicker,
                   NameControl&     dirName,
-                  wxStaticText*    staticText = NULL,
-                  wxWindow*        dropWindow2 = NULL); //optional
+                  wxStaticText*    staticText = nullptr,
+                  wxWindow*        dropWindow2 = nullptr); //optional
 
     ~DirectoryName();
 

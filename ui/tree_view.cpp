@@ -19,6 +19,21 @@
 using namespace zen;
 
 
+inline
+void TreeView::compressNode(Container& cont) //remove single-element sub-trees -> gain clarity + usability (call *after* inclusion check!!!)
+{
+    if (cont.subDirs.empty() || //single files node or...
+        (cont.firstFile == nullptr &&   //single dir node...
+         cont.subDirs.size() == 1 && //
+         cont.subDirs[0].firstFile == nullptr && //...that is empty
+         cont.subDirs[0].subDirs.empty()))    //
+    {
+        cont.subDirs.clear();
+        cont.firstFile = nullptr;
+    }
+}
+
+
 template <class Function> //(const FileSystemObject&) -> bool
 void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
                                      TreeView::Container& cont, //out
@@ -41,7 +56,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
     };
 
 
-    cont.firstFile = NULL;
+    cont.firstFile = nullptr;
     std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
                   [&](FileMapping& fileObj)
     {
@@ -80,15 +95,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
         if (pred(subDirObj) || subDirView.firstFile || !subDirView.subDirs.empty())
         {
             subDirView.objId = subDirObj.getId();
-
-            //------------------- small hack --------------------------------------------
-            //remove single-element sub-trees (*after* inclusion check!!!)
-            if (subDirView.subDirs.empty() ||
-                (subDirView.firstFile == NULL && subDirView.subDirs.size() == 1 && subDirView.subDirs[0].subDirs.empty() && subDirView.subDirs[0].firstFile == NULL))
-            {
-                subDirView.subDirs.clear();
-                subDirView.firstFile = NULL;
-            }
+            compressNode(subDirView);
         }
         else
             cont.subDirs.pop_back();
@@ -98,16 +105,15 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
 
 namespace
 {
-//generate nice percentage numbers which sum up to 100
+//generate nice percentage numbers which precisely sum up to 100
 void calcPercentage(std::vector<std::pair<UInt64, int*>>& workList)
 {
     const UInt64 total = std::accumulate(workList.begin(), workList.end(), UInt64(),
-    [](UInt64 val, const std::pair<UInt64, int*>& pair) { return val + pair.first; });
+    [](UInt64 sum, const std::pair<UInt64, int*>& pair) { return sum + pair.first; });
 
     if (total == 0U) //this case doesn't work with the error minimizing algorithm below
     {
-        std::for_each(workList.begin(), workList.end(),
-        [&](std::pair<UInt64, int*>& pair) { *pair.second = 0; });
+        std::for_each(workList.begin(), workList.end(), [](std::pair<UInt64, int*>& pair) { *pair.second = 0; });
         return;
     }
 
@@ -119,18 +125,20 @@ void calcPercentage(std::vector<std::pair<UInt64, int*>>& workList)
         remainingPercent -= *pair.second;
     });
 
-    //sort descending by absolute error
-    std::sort(workList.begin(), workList.end(),
-              [&](const std::pair<UInt64, int*>& lhs, const std::pair<UInt64, int*>& rhs)
+    //find #remainingPercent items with largest absolute error
+    remainingPercent = std::min(remainingPercent, static_cast<int>(workList.size()));
+    if (remainingPercent > 0)
     {
-        //return std::abs(*lhs.second - to<double>(lhs.first) * 100 / total) > std::abs(*rhs.second - to<double>(rhs.first) * 100 / total);
-        return (to<double>(lhs.first) - to<double>(rhs.first)) * 100 / to<double>(total) > *lhs.second - *rhs.second;
-    });
+        std::nth_element(workList.begin(), workList.begin() + remainingPercent - 1, workList.end(),
+                         [total](const std::pair<UInt64, int*>& lhs, const std::pair<UInt64, int*>& rhs)
+        {
+            //return std::abs(*lhs.second - to<double>(lhs.first) * 100 / total) > std::abs(*rhs.second - to<double>(rhs.first) * 100 / total);
+            return (to<double>(lhs.first) - to<double>(rhs.first)) * 100 / to<double>(total) > *lhs.second - *rhs.second;
+        });
 
-    //distribute remaining percent so that overall error is minimized as much as possible
-    remainingPercent = std::min(std::max(0, remainingPercent), static_cast<int>(workList.size()));
-    std::for_each(workList.begin(), workList.begin() + remainingPercent,
-    [&](std::pair<UInt64, int*>& pair) { ++*pair.second; });
+        //distribute remaining percent so that overall error is minimized as much as possible
+        std::for_each(workList.begin(), workList.begin() + remainingPercent, [&](std::pair<UInt64, int*>& pair) { ++*pair.second; });
+    }
 }
 }
 
@@ -253,7 +261,7 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
             case TreeView::TYPE_FILES:
                 break; //none!!!
         }
-        return NULL;
+        return nullptr;
     };
 
     zen::hash_set<const HierarchyObject*> expandedNodes;
@@ -272,8 +280,11 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
     //set default flat tree
     flatTree.clear();
 
-    if (folderCmpView.size() == 1)
-        getChildren(folderCmpView[0], 0, flatTree); //do not show root
+    if (folderCmp.size() == 1) //single folder pair case (empty pairs were already removed!) do NOT use folderCmpView for this check!
+    {
+        if (!folderCmpView.empty()) //it may really be!
+            getChildren(folderCmpView[0], 0, flatTree); //do not show root
+    }
     else
     {
         std::vector<std::pair<UInt64, int*>> workList;
@@ -316,13 +327,19 @@ void TreeView::updateView(Predicate pred)
     std::for_each(folderCmp.begin(), folderCmp.end(),
                   [&](const std::shared_ptr<BaseDirMapping>& baseObj)
     {
-        if (!baseObj->getBaseDirPf<LEFT_SIDE>().empty() || !baseObj->getBaseDirPf<RIGHT_SIDE>().empty())
+        newView.push_back(TreeView::RootNodeImpl());
+        RootNodeImpl& root = newView.back();
+        this->extractVisibleSubtree(*baseObj, root, pred); //"this->" is bogus for a static method, but GCC screws this one up
+
+        //warning: the following lines are almost 1:1 copy from extractVisibleSubtree:
+        //however we *cannot* reuse code here; this were only possible if we could replace "std::vector<RootNodeImpl>" by "Container"!
+        if (root.firstFile || !root.subDirs.empty())
         {
-            newView.push_back(TreeView::RootNodeImpl());
-            RootNodeImpl& root = newView.back();
             root.baseMap = baseObj;
-            this->extractVisibleSubtree(*baseObj, root, pred); //"this->" is bogus for a static method, but GCC screws this one up
+            compressNode(root);
         }
+        else
+            newView.pop_back();
     });
 
     applySubView(std::move(newView));
@@ -419,15 +436,15 @@ void TreeView::reduceNode(size_t row)
 }
 
 
-int TreeView::getParent(size_t row) const
+ptrdiff_t TreeView::getParent(size_t row) const
 {
     if (row < flatTree.size())
     {
         const size_t level = flatTree[row].level_;
 
-        for (; row > 0; --row)
-            if (flatTree[row - 1].level_ < level)
-                return row - 1;
+        while (row-- > 0)
+            if (flatTree[row].level_ < level)
+                return row;
     }
     return -1;
 }
@@ -525,6 +542,13 @@ void TreeView::setData(FolderComparison& newData)
     std::vector<TreeLine    >().swap(flatTree);      //free mem
     std::vector<RootNodeImpl>().swap(folderCmpView); //
     folderCmp = newData;
+
+    //remove truly empty folder pairs as early as this: we want to distinguish single/multiple folder pair cases by looking at "folderCmp"
+    vector_remove_if(folderCmp, [](const std::shared_ptr<BaseDirMapping>& baseObj)
+    {
+        return baseObj->getBaseDirPf<LEFT_SIDE >().empty() &&
+               baseObj->getBaseDirPf<RIGHT_SIDE>().empty();
+    });
 }
 
 
@@ -561,7 +585,7 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
             break;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 //##########################################################################################################
@@ -606,11 +630,11 @@ public:
         grid_(grid),
         showPercentBar(true)
     {
-        grid.getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(GridDataNavi::onKeyDown), NULL, this);
-        grid.Connect(EVENT_GRID_MOUSE_LEFT_DOWN,       GridClickEventHandler(GridDataNavi::onMouseLeft          ), NULL, this);
-        grid.Connect(EVENT_GRID_MOUSE_LEFT_DOUBLE,     GridClickEventHandler(GridDataNavi::onMouseLeftDouble    ), NULL, this);
-        grid.Connect(EVENT_GRID_COL_LABEL_MOUSE_RIGHT, GridClickEventHandler(GridDataNavi::onGridLabelContext), NULL, this );
-        grid.Connect(EVENT_GRID_COL_LABEL_MOUSE_LEFT,  GridClickEventHandler(GridDataNavi::onGridLabelLeftClick ), NULL, this );
+        grid.getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(GridDataNavi::onKeyDown), nullptr, this);
+        grid.Connect(EVENT_GRID_MOUSE_LEFT_DOWN,       GridClickEventHandler(GridDataNavi::onMouseLeft          ), nullptr, this);
+        grid.Connect(EVENT_GRID_MOUSE_LEFT_DOUBLE,     GridClickEventHandler(GridDataNavi::onMouseLeftDouble    ), nullptr, this);
+        grid.Connect(EVENT_GRID_COL_LABEL_MOUSE_RIGHT, GridClickEventHandler(GridDataNavi::onGridLabelContext), nullptr, this );
+        grid.Connect(EVENT_GRID_COL_LABEL_MOUSE_LEFT,  GridClickEventHandler(GridDataNavi::onGridLabelLeftClick ), nullptr, this );
     }
 
     void setShowPercentage(bool value) { showPercentBar = value; grid_.Refresh(); }
@@ -619,7 +643,7 @@ public:
 private:
     virtual size_t getRowCount() const { return treeDataView_ ? treeDataView_->linesTotal() : 0; }
 
-    virtual wxString getValue(int row, ColumnType colType) const
+    virtual wxString getValue(size_t row, ColumnType colType) const
     {
         if (treeDataView_)
         {
@@ -677,7 +701,7 @@ private:
 
     static const int CELL_BORDER = 2;
 
-    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, int row, bool enabled, bool selected, bool hasFocus)
+    virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus)
     {
         if (enabled)
         {
@@ -691,7 +715,7 @@ private:
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     }
 
-    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, int row, ColumnType colType)
+    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
     {
         //wxRect rectTmp= drawCellBorder(dc, rect);
         wxRect rectTmp = rect;
@@ -714,8 +738,8 @@ private:
                 //                         rect.height)), wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 
                 //consume space
-                rectTmp.x     += node->level_ * widthLevelStep;
-                rectTmp.width -= node->level_ * widthLevelStep;
+                rectTmp.x     += static_cast<int>(node->level_) * widthLevelStep;
+                rectTmp.width -= static_cast<int>(node->level_) * widthLevelStep;
 
                 rectTmp.x     += CELL_BORDER;
                 rectTmp.width -= CELL_BORDER;
@@ -777,7 +801,7 @@ private:
                             dc.SetBrush(*wxTRANSPARENT_BRUSH);
                             dc.DrawRectangle(areaPerc);
                         }
-                        dc.DrawLabel(toString<wxString>(node->percent_) + L"%", areaPerc, wxALIGN_CENTER);
+                        dc.DrawLabel(numberTo<wxString>(node->percent_) + L"%", areaPerc, wxALIGN_CENTER);
 
                         rectTmp.x     += widthPercentBar + 2 * CELL_BORDER;
                         rectTmp.width -= widthPercentBar + 2 * CELL_BORDER;
@@ -867,7 +891,7 @@ private:
         }
     }
 
-    virtual size_t getBestSize(wxDC& dc, int row, ColumnType colType)
+    virtual size_t getBestSize(wxDC& dc, size_t row, ColumnType colType)
     {
         // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
 
@@ -910,7 +934,7 @@ private:
                     if (cellArea.width > 0 && cellArea.height > 0)
                     {
                         const int tolerance = 1;
-                        const int xNodeStatusFirst = -tolerance + cellArea.x + node->level_ * widthLevelStep + CELL_BORDER + (showPercentBar ? widthPercentBar + 2 * CELL_BORDER : 0);
+                        const int xNodeStatusFirst = -tolerance + cellArea.x + static_cast<int>(node->level_) * widthLevelStep + CELL_BORDER + (showPercentBar ? widthPercentBar + 2 * CELL_BORDER : 0);
                         const int xNodeStatusLast  = xNodeStatusFirst + widthNodeStatus + 2 * tolerance;
                         // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
 
@@ -964,54 +988,49 @@ private:
                 keyCode = WXK_NUMPAD_LEFT;
         }
 
-        int row =  grid_.getGridCursor().first;
-        if (row < 0)
-        {
-            row = 0;
-            grid_.setGridCursor(0);
-        }
+        const size_t rowCount = grid_.getRowCount();
+        if (rowCount == 0) return;
+
+        size_t row =  grid_.getGridCursor().first;
+        if (event.ShiftDown())
+            ;
+        else if (event.ControlDown())
+            ;
         else
-        {
-            if (event.ShiftDown())
-                ;
-            else if (event.ControlDown())
-                ;
-            else
-                switch (keyCode)
-                {
-                    case WXK_LEFT:
-                    case WXK_NUMPAD_LEFT:
-                        if (treeDataView_)
-                            switch (treeDataView_->getStatus(row))
-                            {
-                                case TreeView::STATUS_EXPANDED:
-                                    return reduceNode(row);
-                                case TreeView::STATUS_REDUCED:
-                                case TreeView::STATUS_EMPTY:
+            switch (keyCode)
+            {
+                case WXK_LEFT:
+                case WXK_NUMPAD_LEFT:
+                    if (treeDataView_)
+                        switch (treeDataView_->getStatus(row))
+                        {
+                            case TreeView::STATUS_EXPANDED:
+                                return reduceNode(row);
+                            case TreeView::STATUS_REDUCED:
+                            case TreeView::STATUS_EMPTY:
 
-                                    const int parentRow = treeDataView_->getParent(row);
-                                    if (parentRow >= 0)
-                                        grid_.setGridCursor(parentRow);
-                                    break;
-                            }
-                        return; //swallow event
+                                const int parentRow = treeDataView_->getParent(row);
+                                if (parentRow >= 0)
+                                    grid_.setGridCursor(parentRow);
+                                break;
+                        }
+                    return; //swallow event
 
-                    case WXK_RIGHT:
-                    case WXK_NUMPAD_RIGHT:
-                        if (treeDataView_)
-                            switch (treeDataView_->getStatus(row))
-                            {
-                                case TreeView::STATUS_EXPANDED:
-                                    grid_.setGridCursor(std::min(static_cast<int>(grid_.getRowCount()) - 1, row + 1));
-                                    break;
-                                case TreeView::STATUS_REDUCED:
-                                    return expandNode(row);
-                                case TreeView::STATUS_EMPTY:
-                                    break;
-                            }
-                        return; //swallow event
-                }
-        }
+                case WXK_RIGHT:
+                case WXK_NUMPAD_RIGHT:
+                    if (treeDataView_)
+                        switch (treeDataView_->getStatus(row))
+                        {
+                            case TreeView::STATUS_EXPANDED:
+                                grid_.setGridCursor(std::min(rowCount - 1, row + 1));
+                                break;
+                            case TreeView::STATUS_REDUCED:
+                                return expandNode(row);
+                            case TreeView::STATUS_EMPTY:
+                                break;
+                        }
+                    return; //swallow event
+            }
 
         event.Skip();
     }
@@ -1076,7 +1095,7 @@ private:
         }
     }
 
-    void expandNode(int row)
+    void expandNode(size_t row)
     {
         treeDataView_->expandNode(row);
         grid_.Refresh(); //this one clears selection (changed row count)
@@ -1084,7 +1103,7 @@ private:
         //grid_.autoSizeColumns(); -> doesn't look as good as expected
     }
 
-    void reduceNode(int row)
+    void reduceNode(size_t row)
     {
         treeDataView_->reduceNode(row);
         grid_.Refresh(); //this one clears selection (changed row count)

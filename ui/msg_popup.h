@@ -20,7 +20,7 @@ struct ReturnErrorDlg
         BUTTON_ABORT  = 4
     };
 };
-ReturnErrorDlg::ButtonPressed showErrorDlg(int activeButtons, const wxString& messageText, bool* ignoreNextErrors); //ignoreNextErrors may be NULL
+ReturnErrorDlg::ButtonPressed showErrorDlg(int activeButtons, const wxString& messageText, bool* ignoreNextErrors); //ignoreNextErrors may be nullptr
 
 
 struct ReturnWarningDlg
@@ -44,7 +44,16 @@ struct ReturnQuestionDlg
         BUTTON_CANCEL = 4
     };
 };
-ReturnQuestionDlg::ButtonPressed showQuestionDlg(int activeButtons, const wxString& messageText, bool* dontShowAgain = NULL);
+
+struct CheckBox
+{
+    CheckBox(const wxString& label, bool& value) : label_(label), value_(value) {}
+
+    wxString label_; //in
+    bool& value_;    //in/out
+};
+
+ReturnQuestionDlg::ButtonPressed showQuestionDlg(int activeButtons, const wxString& messageText, CheckBox* checkbox = nullptr);
 }
 
 

@@ -33,7 +33,7 @@ struct TranslationHandler
     virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, int n) = 0;
 };
 
-void setTranslator(TranslationHandler* newHandler = NULL); //takes ownership
+void setTranslator(TranslationHandler* newHandler = nullptr); //takes ownership
 TranslationHandler* getTranslator();
 
 std::wstring getThousandsSeparator();

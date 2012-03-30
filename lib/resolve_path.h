@@ -12,6 +12,7 @@
 
 namespace zen
 {
+//resolve environment variables, relative paths, ect. and append file name separator
 Zstring getFormattedDirectoryName(const Zstring& dirString); //throw() - non-blocking! no I/O!
 
 #ifdef FFS_WIN

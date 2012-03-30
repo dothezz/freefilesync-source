@@ -106,11 +106,11 @@ private:
 
 
 template <bool respectCase>
-int findRow(const Grid& grid, //return -1 if no matching row found
-            size_t compPos,
-            const wxString& searchString,
-            int rowFirst, //specify area to search:
-            int rowLast)  // [rowFirst, rowLast)
+ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
+                  size_t compPos,
+                  const wxString& searchString,
+                  size_t rowFirst, //specify area to search:
+                  size_t rowLast)  // [rowFirst, rowLast)
 {
     auto prov = grid.getDataProvider(compPos);
     std::vector<Grid::ColumnAttribute> colAttr = grid.getColumnConfig(compPos);
@@ -119,7 +119,7 @@ int findRow(const Grid& grid, //return -1 if no matching row found
     {
         const FindInText<respectCase> searchTxt(searchString);
 
-        for (int row = rowFirst; row < rowLast; ++row)
+        for (size_t row = rowFirst; row < rowLast; ++row)
             for (auto iterCol = colAttr.begin(); iterCol != colAttr.end(); ++iterCol)
                 if (searchTxt.found(prov->getValue(row, iterCol->type_)))
                     return row;
@@ -129,12 +129,12 @@ int findRow(const Grid& grid, //return -1 if no matching row found
 
 
 //syntactic sugar...
-int findRow(const Grid& grid,
-            size_t compPos,
-            bool respectCase,
-            const wxString& searchString,
-            int rowFirst, //specify area to search:
-            int rowLast)  // [rowFirst, rowLast)
+ptrdiff_t findRow(const Grid& grid,
+                  size_t compPos,
+                  bool respectCase,
+                  const wxString& searchString,
+                  size_t rowFirst, //specify area to search:
+                  size_t rowLast)  // [rowFirst, rowLast)
 {
     return respectCase ?
            findRow<true>( grid, compPos, searchString, rowFirst, rowLast) :
@@ -162,11 +162,11 @@ void executeSearch(bool forceShowDialog,
         searchDialogWasShown = true;
     }
 
-    const int rowCount = grid.getRowCount();
+    const size_t rowCount = grid.getRowCount();
     auto cursorPos = grid.getGridCursor(); //(row, component pos)
 
-    int cursorRow = cursorPos.first;
-    if (cursorRow < 0 || cursorRow >= rowCount)
+    size_t cursorRow = cursorPos.first;
+    if (cursorRow >= rowCount)
         cursorRow = 0;
 
     if (cursorPos.second == compPosRight)
@@ -177,9 +177,9 @@ void executeSearch(bool forceShowDialog,
     {
         wxBusyCursor showHourGlass;
 
-        auto finishSearch = [&](size_t compPos, int rowFirst, int rowLast) -> bool
+        auto finishSearch = [&](size_t compPos, size_t rowFirst, size_t rowLast) -> bool
         {
-            const int targetRow = findRow(grid, compPos, respectCase, lastSearchString, rowFirst, rowLast);
+            const ptrdiff_t targetRow = findRow(grid, compPos, respectCase, lastSearchString, rowFirst, rowLast);
             if (targetRow >= 0)
             {
                 grid.setGridCursor(targetRow, compPos);

@@ -46,18 +46,19 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation& anim)
 
 GlobalResources::GlobalResources()
 {
-    wxFFileInputStream input(toWx(zen::getResourceDir()) + wxT("Resources.zip"));
+    wxFFileInputStream input(toWx(zen::getResourceDir()) + L"Resources.zip");
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
         wxImage::AddHandler(new wxPNGHandler); //ownership passed
 
-        wxZipInputStream resourceFile(input);
+        wxZipInputStream resourceFile(input, wxConvUTF8);
+        //do NOT rely on wxConvLocal! May result in "Cannot convert from the charset 'Unknown encoding (-1)'!"
 
         while (true)
         {
             std::unique_ptr<wxZipEntry> entry(resourceFile.GetNextEntry()); //take ownership!
-            if (entry.get() == NULL)
+            if (entry.get() == nullptr)
                 break;
 
             const wxString name = entry->GetName();

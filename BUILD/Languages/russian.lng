@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Настройки фильтра</target>
 
-<source>Customize columns</source>
-<target>Выбор колонок</target>
-
 <source>Global settings</source>
 <target>Глобальные настройки</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Обзор</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Ошибка при чтении из базы данных синхронизации:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Ошибка при записи в базу данных синхронизации:</target>
-
 <source>Invalid command line: %x</source>
 <target>Неверная командная строка: %x</target>
+
+<source>Info</source>
+<target>Информация</target>
+
+<source>Fatal Error</source>
+<target>Критическая ошибка</target>
 
 <source>Windows Error Code %x:</source>
 <target>Код ошибки Windows %x:</target>
@@ -140,14 +137,20 @@
 <pluralform>%x Байт</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Ошибка при чтении из базы данных синхронизации:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Ошибка при записи в базу данных синхронизации:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Несовместимый формат базы данных синхронизации:</target>
+
 <source>Initial synchronization:</source>
 <target>Первоначальная синхронизация:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Одного из файлов баз данных FreeFileSync еще не существует:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Несовместимый формат базы данных синхронизации:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Файлы баз данных не имеют общей сессии синхронизации:</target>
@@ -174,12 +177,6 @@
 <pluralform>%x секунд</pluralform>
 </target>
 
-<source>Info</source>
-<target>Информация</target>
-
-<source>Fatal Error</source>
-<target>Критическая ошибка</target>
-
 <source>Error reading file:</source>
 <target>Ошибка при чтении файла:</target>
 
@@ -205,11 +202,14 @@
 <source>Error parsing configuration file:</source>
 <target>Ошибка при анализе файла настроек синхронизации:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Ошибка при перемещении в "Корзину":</target>
+<source>Configuration loaded partially only:</source>
+<target>Конфигурация загрузилась частично:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Не удалось загрузить необходимые DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Невозможно переместить %x в "Корзину"!</target>
+
+<source>Cannot load file %x.</source>
+<target>Не удается загрузить файл %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Ошибка доступа к службе Теневого Копирования Тома!</target>
@@ -217,10 +217,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Создание теневых копий на WOW64 не поддерживается. Пожалуйста, используйте FreeFileSync 64-разрядной версии.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Не удалось определить название тома для файла:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Невозможно определить имя тома для файла:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Имя тома %x не является частью имени файла %y!</target>
 
 <source>/sec</source>
@@ -229,8 +229,8 @@
 <source>File does not exist:</source>
 <target>Файл не существует:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Не удалось прочитать значения для следующих XML записей:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Невозможно прочитать следующие XML элементы:</target>
 
 <source>S&ave configuration...</source>
 <target>Сохранить настройки синхронизации...</target>
@@ -546,32 +546,29 @@ The command line is executed each time:
 <source>Speed:</source>
 <target>Скорость:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Времени осталось:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Времени прошло:</target>
 
 <source>Batch job</source>
 <target>Пакетное задание</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Создайте файл пакетного задания для автоматической синхронизации. Для запуска в пакетном режиме просто дважды щелкните по файлу или выполните командную строку: FreeFileSync.exe <ffs_batch file>. Также запуск можно запланировать в планировщике задач операционной системы.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Создайте файл пакетного задания для автоматической синхронизации. Для запуска в пакетном режиме просто дважды щелкните по файлу или выполните командную строку: FreeFileSync.exe SyncJob.ffs_batch. Также запуск можно запланировать в планировщике задач операционной системы.</target>
 
 <source>Help</source>
 <target>Помощь</target>
 
 <source>Filter files</source>
-<target>Фильтр файлов</target>
+<target>Фильтр</target>
 
 <source>Left</source>
 <target>Слева</target>
 
 <source>Right</source>
 <target>Справа</target>
-
-<source>Overview</source>
-<target>Главная</target>
 
 <source>Status feedback</source>
 <target>Статус обратной связи</target>
@@ -712,7 +709,7 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>Издается под лицензией GNU General Public License</target>
 
-<source>Ignore subsequent errors</source>
+<source>Ignore further errors</source>
 <target>Игнорировать последующие ошибки</target>
 
 <source>Hide further error messages during the current process</source>
@@ -736,22 +733,22 @@ is the same
 <source>&No</source>
 <target>&Нет</target>
 
+<source>Use Recycle Bin</source>
+<target>Использовать "Корзину"</target>
+
 <source>Delete on both sides</source>
 <target>Удалить с обеих сторон</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Удалить с обеих сторон, если даже файл выделен только на одной стороне</target>
 
-<source>Use Recycle Bin</source>
-<target>Использовать "Корзину"</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Только файлы/папки, соответствующие всем настройкам фильтра, будут выбраны для синхронизации.
-Примечание: Фильтр имен должен быть задан относительно основных папок синхронизации.
+Только файлы, соответствующие всем настройкам фильтра, будут синхронизированы.
+Примечание: Файлы должны относиться к синхронизируемым папкам!
 </target>
 
 <source>Hints:</source>
@@ -787,20 +784,20 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>Исключить</target>
 
-<source>Minimum file size</source>
-<target>Минимальный размер файла</target>
+<source>Time span</source>
+<target>Промежуток времени</target>
 
-<source>Maximum file size</source>
-<target>Максимальный размер файла</target>
+<source>File size</source>
+<target>Размер файла</target>
+
+<source>Minimum</source>
+<target>минимум</target>
+
+<source>Maximum</source>
+<target>максимум</target>
 
 <source>&Default</source>
 <target>&По-умолчанию</target>
-
-<source>Move column up</source>
-<target>Переместить вверх</target>
-
-<source>Move column down</source>
-<target>Переместить вниз</target>
 
 <source>Transactional file copy</source>
 <target>Безопасное копирование файлов</target>
@@ -820,14 +817,8 @@ Exclude: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Передача прав доступа к файлам/папкам (требуются права Администратора)</target>
 
-<source>Hidden dialogs:</source>
-<target>Скрытые диалоги</target>
-
-<source>Reset</source>
-<target>Сбросить</target>
-
-<source>Show hidden dialogs</source>
-<target>Показать скрытые диалоги</target>
+<source>Restore hidden dialogs</source>
+<target>Восстановить скрытые диалоговые окна?</target>
 
 <source>External applications</source>
 <target>Внешние приложения</target>
@@ -859,8 +850,8 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Пары папок для синхронизации</target>
 
-<source>Compressed view</source>
-<target>Компактный вид</target>
+<source>Overview</source>
+<target>Главная</target>
 
 <source>Select view</source>
 <target>Вид списка файлов</target>
@@ -889,17 +880,17 @@ Exclude: \stuff\temp\*
 <source>Exclude all</source>
 <target>Исключить все</target>
 
-<source>Icon size:</source>
-<target>Размер иконок:</target>
+<source>Show icons:</source>
+<target>Отображать иконки:</target>
 
 <source>Small</source>
-<target>- маленький</target>
+<target>- маленькие</target>
 
 <source>Medium</source>
-<target>- средний</target>
+<target>- средние</target>
 
 <source>Large</source>
-<target>- большой</target>
+<target>- большие</target>
 
 <source>Select time span...</source>
 <target>Выберите промежуток времени...</target>
@@ -915,6 +906,9 @@ Exclude: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Настройки синхронизации сохранены!</target>
+
+<source>Never save changes</source>
+<target>Никогда не сохранять изменения</target>
 
 <source>Save changes to current configuration?</source>
 <target>Сохранить изменения в текущих настройках синхронизации?</target>
@@ -1027,9 +1021,6 @@ Exclude: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Ошибка при записи файла:</target>
 
-<source>Batch file created successfully!</source>
-<target>Файл пакетного задания создан успешно!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1112,6 +1103,9 @@ Exclude: \stuff\temp\*
 <source>This year</source>
 <target>в этом году</target>
 
+<source>Last x days</source>
+<target>последние х дня(ей)</target>
+
 <source>Byte</source>
 <target>Байт</target>
 
@@ -1121,11 +1115,8 @@ Exclude: \stuff\temp\*
 <source>MB</source>
 <target>МБ</target>
 
-<source>Filter: All pairs</source>
-<target>Фильтр: Все пары</target>
-
-<source>Filter: Single pair</source>
-<target>Фильтр: Одна пара</target>
+<source>Filter</source>
+<target>Фильтр</target>
 
 <source>Direct</source>
 <target>Прямое</target>
@@ -1154,8 +1145,8 @@ Exclude: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- аналогичная папка с другой стороны</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Отображать все скрытые диалоговые окна?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Сделать скрытые диалоги и предупреждения видимыми вновь?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1291,9 +1282,6 @@ Exclude: \stuff\temp\*
 <source>Error copying file:</source>
 <target>Ошибка при копировании файла:</target>
 
-<source>Error opening file:</source>
-<target>Ошибка при открытии файла:</target>
-
 <source>Error traversing directory:</source>
 <target>Ошибка при пересечении папок:</target>
 
@@ -1339,8 +1327,8 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Подготовка к синхронизации...</target>
 
-<source>Memory allocation failed!</source>
-<target>Ошибка выделения памяти! (Не хватает памяти)</target>
+<source>Out of memory!</source>
+<target>Недостаточно памяти!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Файл %x имеет недействительную дату!</target>
@@ -1495,11 +1483,11 @@ Exclude: \stuff\temp\*
 <source>Generating database...</source>
 <target>Создание базы данных...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Ничего нет для синхронизации в соответствии с настройками синхронизации!</target>
+<source>Nothing to synchronize!</source>
+<target>Ничего нет для синхронизации!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Ошибка при копировании заблокированного файла %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Невозможно скопировать заблокированный файл %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Ошибка проверки данных: исходный и конечный файлы имеют разное содержание!</target>

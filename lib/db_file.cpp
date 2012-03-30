@@ -60,16 +60,36 @@ Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
 }
 
 
+class CheckedDbReader : public CheckedReader
+{
+public:
+    CheckedDbReader(wxInputStream& stream, const Zstring& errorObjName) : CheckedReader(stream), errorObjName_(errorObjName) {}
+
+private:
+    virtual void throwException() const { throw FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\""); }
+
+    const Zstring errorObjName_;
+};
+
+
+class CheckedDbWriter : public CheckedWriter
+{
+public:
+    CheckedDbWriter(wxOutputStream& stream, const Zstring& errorObjName) : CheckedWriter(stream), errorObjName_(errorObjName) {}
+
+    virtual void throwException() const { throw FileError(_("Error writing to synchronization database:") + L" \n" + L"\"" + errorObjName_ + L"\""); }
+
+    const Zstring errorObjName_;
+};
+
+
+
 StreamMapping loadStreams(const Zstring& filename) //throw FileError
 {
-    if (!zen::fileExists(filename))
-        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n\n" +
-                                           _("One of the FreeFileSync database files is not yet existing:") + L" \n" +
-                                           L"\"" + filename + L"\"");
     try
     {
         //read format description (uncompressed)
-        FileInputStream rawStream(filename); //throw FileError
+        FileInputStream rawStream(filename); //throw FileError, ErrorNotExisting
 
         //read FreeFileSync file identifier
         char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
@@ -80,25 +100,31 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError
 
         wxZlibInputStream decompressed(rawStream, wxZLIB_ZLIB);
 
-        CheckedReader cr(decompressed, filename);
+        CheckedDbReader cr(decompressed, filename);
 
-        std::int32_t version = cr.readNumberC<std::int32_t>();
+        std::int32_t version = cr.readPOD<std::int32_t>();
         if (version != FILE_FORMAT_VER) //read file format version#
             throw FileError(_("Incompatible synchronization database format:") + L" \n" + L"\"" + filename + L"\"");
 
         //read stream lists
         StreamMapping output;
 
-        std::uint32_t dbCount = cr.readNumberC<std::uint32_t>(); //number of databases: one for each sync-pair
+        std::uint32_t dbCount = cr.readPOD<std::uint32_t>(); //number of databases: one for each sync-pair
         while (dbCount-- != 0)
         {
             //DB id of partner databases
-            const std::string sessionID = cr.readStringC<std::string>();
-            const MemoryStream stream = cr.readStringC<MemoryStream>(); //read db-entry stream (containing DirInformation)
+            const std::string sessionID = cr.readString<std::string>();
+            const MemoryStream stream = cr.readString<MemoryStream>(); //read db-entry stream (containing DirInformation)
 
             output.insert(std::make_pair(sessionID, stream));
         }
         return output;
+    }
+    catch (ErrorNotExisting&)
+    {
+        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n\n" +
+                                           _("One of the FreeFileSync database files is not yet existing:") + L" \n" +
+                                           L"\"" + filename + L"\"");
     }
     catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
     {
@@ -107,7 +133,7 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError
 }
 
 
-class StreamParser : private CheckedReader
+class StreamParser : private CheckedDbReader
 {
 public:
     static DirInfoPtr execute(const MemoryStream& stream, const Zstring& fileName) //throw FileError -> return value always bound!
@@ -127,14 +153,14 @@ public:
     }
 
 private:
-    StreamParser(wxInputStream& stream, const Zstring& errorObjName, DirInformation& dirInfo) : CheckedReader(stream, errorObjName)
+    StreamParser(wxInputStream& stream, const Zstring& errorObjName, DirInformation& dirInfo) : CheckedDbReader(stream, errorObjName)
     {
         recurse(dirInfo.baseDirContainer);
     }
 
     Zstring readStringUtf8() const
     {
-        return utf8CvrtTo<Zstring>(readStringC<Zbase<char>>());
+        return utf8CvrtTo<Zstring>(readString<Zbase<char>>());
     }
 
     FileId readFileId() const
@@ -142,39 +168,39 @@ private:
         assert_static(sizeof(FileId().first ) <= sizeof(std::uint64_t));
         assert_static(sizeof(FileId().second) <= sizeof(std::uint64_t));
 
-        const auto devId = static_cast<decltype(FileId().first )>(readNumberC<std::uint64_t>()); //
-        const auto fId   = static_cast<decltype(FileId().second)>(readNumberC<std::uint64_t>()); //silence "loss of precision" compiler warnings
+        const auto devId = static_cast<decltype(FileId().first )>(readPOD<std::uint64_t>()); //
+        const auto fId   = static_cast<decltype(FileId().second)>(readPOD<std::uint64_t>()); //silence "loss of precision" compiler warnings
         return std::make_pair(devId, fId);
     }
 
     void recurse(DirContainer& dirCont) const
     {
-        while (readNumberC<bool>()) //files
+        while (readPOD<bool>()) //files
         {
             //attention: order of function argument evaluation is undefined! So do it one after the other...
             const Zstring shortName = readStringUtf8(); //file name
 
-            const std::int64_t  modTime  = readNumberC<std::int64_t>();
-            const std::uint64_t fileSize = readNumberC<std::uint64_t>();
+            const std::int64_t  modTime  = readPOD<std::int64_t>();
+            const std::uint64_t fileSize = readPOD<std::uint64_t>();
             const FileId        fileID   = readFileId();
 
             dirCont.addSubFile(shortName,
                                FileDescriptor(modTime, fileSize, fileID));
         }
 
-        while (readNumberC<bool>()) //symlinks
+        while (readPOD<bool>()) //symlinks
         {
             //attention: order of function argument evaluation is undefined! So do it one after the other...
             const Zstring      shortName  = readStringUtf8(); //file name
-            const std::int64_t modTime    = readNumberC<std::int64_t>();
+            const std::int64_t modTime    = readPOD<std::int64_t>();
             const Zstring      targetPath = readStringUtf8(); //file name
-            const LinkDescriptor::LinkType linkType = static_cast<LinkDescriptor::LinkType>(readNumberC<std::int32_t>());
+            const LinkDescriptor::LinkType linkType = static_cast<LinkDescriptor::LinkType>(readPOD<std::int32_t>());
 
             dirCont.addSubLink(shortName,
                                LinkDescriptor(modTime, targetPath, linkType));
         }
 
-        while (readNumberC<bool>()) //directories
+        while (readPOD<bool>()) //directories
         {
             const Zstring shortName = readStringUtf8(); //directory name
             DirContainer& subDir = dirCont.addSubDir(shortName);
@@ -201,29 +227,28 @@ void saveFile(const StreamMapping& streamList, const Zstring& filename) //throw 
         6                       1,77 MB -  613 ms
         9 (maximal compression) 1,74 MB - 3330 ms */
 
-        CheckedWriter cw(compressed, filename);
+        CheckedDbWriter cw(compressed, filename);
 
         //save file format version
-        cw.writeNumberC<std::int32_t>(FILE_FORMAT_VER);
+        cw.writePOD<std::int32_t>(FILE_FORMAT_VER);
 
         //save stream list
-        cw.writeNumberC<std::uint32_t>(static_cast<std::uint32_t>(streamList.size())); //number of database records: one for each sync-pair
+        cw.writePOD<std::uint32_t>(static_cast<std::uint32_t>(streamList.size())); //number of database records: one for each sync-pair
 
         for (auto iter = streamList.begin(); iter != streamList.end(); ++iter)
         {
-            cw.writeStringC<std::string >(iter->first ); //sync session id
-            cw.writeStringC<MemoryStream>(iter->second); //DirInformation stream
+            cw.writeString<std::string >(iter->first ); //sync session id
+            cw.writeString<MemoryStream>(iter->second); //DirInformation stream
         }
     }
-    //(try to) hide database file
 #ifdef FFS_WIN
-    ::SetFileAttributes(zen::applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_HIDDEN);
+    ::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide database file
 #endif
 }
 
 
 template <SelectedSide side>
-class StreamGenerator : private CheckedWriter
+class StreamGenerator : private CheckedDbWriter
 {
 public:
     static MemoryStream execute(const BaseDirMapping& baseMapping, const DirContainer* oldDirInfo, const Zstring& errorObjName)
@@ -238,7 +263,7 @@ public:
     }
 
 private:
-    StreamGenerator(const BaseDirMapping& baseMapping, const DirContainer* oldDirInfo, const Zstring& errorObjName, wxOutputStream& stream) : CheckedWriter(stream, errorObjName)
+    StreamGenerator(const BaseDirMapping& baseMapping, const DirContainer* oldDirInfo, const Zstring& errorObjName, wxOutputStream& stream) : CheckedDbWriter(stream, errorObjName)
     {
         recurse(baseMapping, oldDirInfo);
     }
@@ -247,21 +272,25 @@ private:
     {
         // for (const auto& fileMap : hierObj.refSubFiles()) { processFile(fileMap, oldDirInfo); }); !
 
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](const FileMapping& fileMap) { this->processFile(fileMap, oldDirInfo); });
-        writeNumberC<bool>(false); //mark last entry
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](const FileMapping&    fileMap) { this->processFile(fileMap, oldDirInfo); });
+        writePOD<bool>(false); //mark last entry
         std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](const SymLinkMapping& linkObj) { this->processLink(linkObj, oldDirInfo); });
-        writeNumberC<bool>(false); //mark last entry
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](const DirMapping& dirMap) { this->processDir(dirMap, oldDirInfo); });
-        writeNumberC<bool>(false); //mark last entry
+        writePOD<bool>(false); //mark last entry
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](const DirMapping&      dirMap) { this->processDir (dirMap,  oldDirInfo); });
+        writePOD<bool>(false); //mark last entry
     }
 
-    void writeStringUtf8(const Zstring& str) { writeStringC(utf8CvrtTo<Zbase<char>>(str)); }
+    void writeStringUtf8(const Zstring& str) { writeString(utf8CvrtTo<Zbase<char>>(str)); }
 
     void writeFileId(const FileId& id)
     {
-        writeNumberC<std::uint64_t>(id.first ); //device id
-        writeNumberC<std::uint64_t>(id.second); //file id
+        writePOD<std::uint64_t>(id.first ); //device id
+        writePOD<std::uint64_t>(id.second); //file id
     }
+
+#ifdef _MSC_VER
+    warn_static("support multiple folder pairs that differ in hard filter only?")
+#endif
 
     void processFile(const FileMapping& fileMap, const DirContainer* oldParentDir)
     {
@@ -269,10 +298,10 @@ private:
         {
             if (!fileMap.isEmpty<side>())
             {
-                writeNumberC<bool>(true); //mark beginning of entry
+                writePOD<bool>(true); //mark beginning of entry
                 writeStringUtf8(fileMap.getShortName<side>()); //save respecting case! (Windows)
-                writeNumberC<std:: int64_t>(to<std:: int64_t>(fileMap.getLastWriteTime<side>()));
-                writeNumberC<std::uint64_t>(to<std::uint64_t>(fileMap.getFileSize<side>()));
+                writePOD<std:: int64_t>(to<std:: int64_t>(fileMap.getLastWriteTime<side>()));
+                writePOD<std::uint64_t>(to<std::uint64_t>(fileMap.getFileSize<side>()));
                 writeFileId(fileMap.getFileId<side>());
             }
         }
@@ -283,10 +312,10 @@ private:
                 auto iter = oldParentDir->files.find(fileMap.getObjShortName());
                 if (iter != oldParentDir->files.end())
                 {
-                    writeNumberC<bool>(true); //mark beginning of entry
+                    writePOD<bool>(true); //mark beginning of entry
                     writeStringUtf8(iter->first); //save respecting case! (Windows)
-                    writeNumberC<std:: int64_t>(to<std:: int64_t>(iter->second.lastWriteTimeRaw));
-                    writeNumberC<std::uint64_t>(to<std::uint64_t>(iter->second.fileSize));
+                    writePOD<std:: int64_t>(to<std:: int64_t>(iter->second.lastWriteTimeRaw));
+                    writePOD<std::uint64_t>(to<std::uint64_t>(iter->second.fileSize));
                     writeFileId(iter->second.id);
                 }
             }
@@ -299,11 +328,11 @@ private:
         {
             if (!linkObj.isEmpty<side>())
             {
-                writeNumberC<bool>(true); //mark beginning of entry
+                writePOD<bool>(true); //mark beginning of entry
                 writeStringUtf8(linkObj.getShortName<side>()); //save respecting case! (Windows)
-                writeNumberC<std::int64_t>(to<std::int64_t>(linkObj.getLastWriteTime<side>()));
+                writePOD<std::int64_t>(to<std::int64_t>(linkObj.getLastWriteTime<side>()));
                 writeStringUtf8(linkObj.getTargetPath<side>());
-                writeNumberC<std::int32_t>(linkObj.getLinkType<side>());
+                writePOD<std::int32_t>(linkObj.getLinkType<side>());
             }
         }
         else //not in sync: reuse last synchronous state
@@ -313,11 +342,11 @@ private:
                 auto iter = oldParentDir->links.find(linkObj.getObjShortName());
                 if (iter != oldParentDir->links.end())
                 {
-                    writeNumberC<bool>(true); //mark beginning of entry
+                    writePOD<bool>(true); //mark beginning of entry
                     writeStringUtf8(iter->first); //save respecting case! (Windows)
-                    writeNumberC<std::int64_t>(to<std::int64_t>(iter->second.lastWriteTimeRaw));
+                    writePOD<std::int64_t>(to<std::int64_t>(iter->second.lastWriteTimeRaw));
                     writeStringUtf8(iter->second.targetPath);
-                    writeNumberC<std::int32_t>(iter->second.type);
+                    writePOD<std::int32_t>(iter->second.type);
                 }
             }
         }
@@ -325,8 +354,8 @@ private:
 
     void processDir(const DirMapping& dirMap, const DirContainer* oldParentDir)
     {
-        const DirContainer* oldDir     = NULL;
-        const Zstring*      oldDirName = NULL;
+        const DirContainer* oldDir     = nullptr;
+        const Zstring*      oldDirName = nullptr;
         if (oldParentDir) //no data is also a "synchronous state"!
         {
             auto iter = oldParentDir->dirs.find(dirMap.getObjShortName());
@@ -343,7 +372,7 @@ private:
         {
             if (!dirMap.isEmpty<side>())
             {
-                writeNumberC<bool>(true); //mark beginning of entry
+                writePOD<bool>(true); //mark beginning of entry
                 writeStringUtf8(dirMap.getShortName<side>()); //save respecting case! (Windows)
                 recurse(dirMap, oldDir);
             }
@@ -352,7 +381,7 @@ private:
         {
             if (oldDir)
             {
-                writeNumberC<bool>(true);  //mark beginning of entry
+                writePOD<bool>(true);  //mark beginning of entry
                 writeStringUtf8(*oldDirName); //save respecting case! (Windows)
                 recurse(dirMap, oldDir);
                 return;
@@ -372,7 +401,7 @@ private:
                     assert(false);
                     break;
                 case DIR_DIFFERENT_METADATA:
-                    writeNumberC<bool>(true);
+                    writePOD<bool>(true);
                     writeStringUtf8(dirMap.getShortName<side>());
                     //ATTENTION: strictly this is a violation of the principle of reporting last synchronous state!
                     //however in this case this will result in "last sync unsuccessful" for this directory within <automatic> algorithm, which is fine
@@ -396,30 +425,23 @@ std::pair<DirInfoPtr, DirInfoPtr> zen::loadFromDisk(const BaseDirMapping& baseMa
     const StreamMapping streamListRight = ::loadStreams(fileNameRight); //throw FileError
 
     //find associated session: there can be at most one session within intersection of left and right ids
-    StreamMapping::const_iterator streamLeft  = streamListLeft .end();
-    StreamMapping::const_iterator streamRight = streamListRight.end();
     for (auto iterLeft = streamListLeft.begin(); iterLeft != streamListLeft.end(); ++iterLeft)
     {
         auto iterRight = streamListRight.find(iterLeft->first);
         if (iterRight != streamListRight.end())
         {
-            streamLeft  = iterLeft;
-            streamRight = iterRight;
-            break;
+            //read streams into DirInfo
+            DirInfoPtr dirInfoLeft  = StreamParser::execute(iterLeft ->second, fileNameLeft);  //throw FileError
+            DirInfoPtr dirInfoRight = StreamParser::execute(iterRight->second, fileNameRight); //throw FileError
+
+            return std::make_pair(dirInfoLeft, dirInfoRight);
         }
     }
 
-    if (streamLeft  == streamListLeft .end() ||
-        streamRight == streamListRight.end())
-        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n\n" +
-                                           _("Database files do not share a common synchronization session:") + L" \n" +
-                                           L"\"" + fileNameLeft  + L"\"\n" +
-                                           L"\"" + fileNameRight + L"\"");
-    //read streams into DirInfo
-    DirInfoPtr dirInfoLeft  = StreamParser::execute(streamLeft ->second, fileNameLeft);  //throw FileError
-    DirInfoPtr dirInfoRight = StreamParser::execute(streamRight->second, fileNameRight); //throw FileError
-
-    return std::make_pair(dirInfoLeft, dirInfoRight);
+    throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n\n" +
+                                       _("Database files do not share a common synchronization session:") + L" \n" +
+                                       L"\"" + fileNameLeft  + L"\"\n" +
+                                       L"\"" + fileNameRight + L"\"");
 }
 
 
@@ -440,75 +462,65 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw FileError
     StreamMapping streamListLeft;
     StreamMapping streamListRight;
 
-    try //read file data: list of session ID + DirInfo-stream
-    {
-        streamListLeft = ::loadStreams(dbNameLeft);
-    }
-    catch (FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
-    try
-    {
-        streamListRight = ::loadStreams(dbNameRight);
-    }
+    //read file data: list of session ID + DirInfo-stream
+    try { streamListLeft  = ::loadStreams(dbNameLeft ); }
     catch (FileError&) {}
+    try { streamListRight = ::loadStreams(dbNameRight); }
+    catch (FileError&) {}
+    //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
 
     //find associated session: there can be at most one session within intersection of left and right ids
-    StreamMapping::iterator streamLeft  = streamListLeft .end();
-    StreamMapping::iterator streamRight = streamListRight.end();
+    auto streamLeftOld  = streamListLeft .cend();
+    auto streamRightOld = streamListRight.cend();
     for (auto iterLeft = streamListLeft.begin(); iterLeft != streamListLeft.end(); ++iterLeft)
     {
         auto iterRight = streamListRight.find(iterLeft->first);
         if (iterRight != streamListRight.end())
         {
-            streamLeft  = iterLeft;
-            streamRight = iterRight;
+            streamLeftOld  = iterLeft;
+            streamRightOld = iterRight;
             break;
         }
     }
 
     //(try to) read old DirInfo
-    DirInfoPtr oldDirInfoLeft;
-    DirInfoPtr oldDirInfoRight;
-    try
-    {
-        if (streamLeft  != streamListLeft .end() &&
-            streamRight != streamListRight.end())
+    DirInfoPtr dirInfoLeftOld;
+    DirInfoPtr dirInfoRightOld;
+    if (streamLeftOld  != streamListLeft .end() &&
+        streamRightOld != streamListRight.end())
+        try
         {
-            oldDirInfoLeft  = StreamParser::execute(streamLeft ->second, dbNameLeft ); //throw FileError
-            oldDirInfoRight = StreamParser::execute(streamRight->second, dbNameRight); //throw FileError
+            dirInfoLeftOld  = StreamParser::execute(streamLeftOld ->second, dbNameLeft ); //throw FileError
+            dirInfoRightOld = StreamParser::execute(streamRightOld->second, dbNameRight); //throw FileError
         }
-    }
-    catch (FileError&)
-    {
-        //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
-        oldDirInfoLeft .reset(); //read both or none!
-        oldDirInfoRight.reset(); //
-    }
+        catch (FileError&)
+        {
+            //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
+            dirInfoLeftOld .reset(); //read both or none!
+            dirInfoRightOld.reset(); //
+        }
 
     //create new database entries
-    MemoryStream newStreamLeft  = StreamGenerator<LEFT_SIDE >::execute(baseMapping, oldDirInfoLeft .get() ? &oldDirInfoLeft ->baseDirContainer : NULL, dbNameLeft);
-    MemoryStream newStreamRight = StreamGenerator<RIGHT_SIDE>::execute(baseMapping, oldDirInfoRight.get() ? &oldDirInfoRight->baseDirContainer : NULL, dbNameRight);
+    MemoryStream rawStreamLeftNew  = StreamGenerator<LEFT_SIDE >::execute(baseMapping, dirInfoLeftOld .get() ? &dirInfoLeftOld ->baseDirContainer : nullptr, dbNameLeft);
+    MemoryStream rawStreamRightNew = StreamGenerator<RIGHT_SIDE>::execute(baseMapping, dirInfoRightOld.get() ? &dirInfoRightOld->baseDirContainer : nullptr, dbNameRight);
 
     //check if there is some work to do at all
-    {
-        const bool updateRequiredLeft  = streamLeft  == streamListLeft .end() || newStreamLeft  != streamLeft ->second;
-        const bool updateRequiredRight = streamRight == streamListRight.end() || newStreamRight != streamRight->second;
-        //some users monitor the *.ffs_db file with RTS => don't touch the file if it isnt't strictly needed
-        if (!updateRequiredLeft && !updateRequiredRight)
-            return;
-    }
-
-    //create/update DirInfo-streams
-    std::string sessionID = zen::generateGUID();
+    if (streamLeftOld  != streamListLeft .end() && rawStreamLeftNew  == streamLeftOld ->second &&
+        streamRightOld != streamListRight.end() && rawStreamRightNew == streamRightOld->second)
+        return; //some users monitor the *.ffs_db file with RTS => don't touch the file if it isnt't strictly needed
 
     //erase old session data
-    if (streamLeft != streamListLeft.end())
-        streamListLeft.erase(streamLeft);
-    if (streamRight != streamListRight.end())
-        streamListRight.erase(streamRight);
+    if (streamLeftOld != streamListLeft.end())
+        streamListLeft.erase(streamLeftOld);
+    if (streamRightOld != streamListRight.end())
+        streamListRight.erase(streamRightOld);
+
+    //create/update DirInfo-streams
+    const std::string sessionID = zen::generateGUID();
 
     //fill in new
-    streamListLeft .insert(std::make_pair(sessionID, newStreamLeft));
-    streamListRight.insert(std::make_pair(sessionID, newStreamRight));
+    streamListLeft .insert(std::make_pair(sessionID, rawStreamLeftNew));
+    streamListRight.insert(std::make_pair(sessionID, rawStreamRightNew));
 
     //write (temp-) files...
     zen::ScopeGuard guardTempFileLeft = zen::makeGuard([&] {zen::removeFile(dbNameLeftTmp); });

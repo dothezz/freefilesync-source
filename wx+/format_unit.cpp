@@ -35,7 +35,7 @@ std::wstring zen::filesizeToShortString(Int64 size)
     if (numeric::abs(size) <= 999)
         return replaceCpy(_P("1 Byte", "%x Bytes", to<int>(size)),
                           L"%x",
-                          toString<std::wstring>(size));
+                          numberTo<std::wstring>(size));
     else
     {
         double filesize = to<double>(size);
@@ -131,7 +131,7 @@ std::wstring zen::remainingTimeToShortString(double timeInSec)
             output = _P("1 day", "%x days", formattedTime);
             break;
     }
-    return replaceCpy(output, L"%x", zen::toString<std::wstring>(formattedTime));
+    return replaceCpy(output, L"%x", zen::numberTo<std::wstring>(formattedTime));
 }
 
 
@@ -151,7 +151,7 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
         if (i <= 3)
             break;
         i -= 3;
-        if (!cStringIsDigit(output[i - 1]))
+        if (!isDigit(output[i - 1]))
             break;
         output.insert(i, zen::getThousandsSeparator());
     }
@@ -164,10 +164,10 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 void zen::scrollToBottom(wxScrolledWindow* scrWindow)
 {
     int height = 0;
-    scrWindow->GetClientSize(NULL, &height);
+    scrWindow->GetClientSize(nullptr, &height);
 
     int pixelPerLine = 0;
-    scrWindow->GetScrollPixelsPerUnit(NULL, &pixelPerLine);
+    scrWindow->GetScrollPixelsPerUnit(nullptr, &pixelPerLine);
 
     if (height > 0 && pixelPerLine > 0)
     {
@@ -203,7 +203,7 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
                                     &systemTimeUtc))   //__out  LPSYSTEMTIME lpSystemTime
             return _("Error");
 
-        if (!::SystemTimeToTzSpecificLocalTime(NULL,              //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
+        if (!::SystemTimeToTzSpecificLocalTime(nullptr,              //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
                                                &systemTimeUtc,    //__in      LPSYSTEMTIME lpUniversalTime,
                                                &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
             return _("Error");

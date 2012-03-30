@@ -20,6 +20,8 @@ using namespace numeric;
 
 const wxEventType zen::wxEVT_GRAPH_SELECTION = wxNewEventType();
 
+const std::shared_ptr<LabelFormatter> Graph2D::GraphAttributes::defaultFormat = std::make_shared<DecimalNumberFormatter>(); //for some buggy reason MSVC isn't able to use a temporary as a default argument instead
+
 namespace
 {
 inline
@@ -239,10 +241,10 @@ Graph2D::Graph2D(wxWindow* parent,
                  const wxString& name) :
     wxPanel(parent, winid, pos, size, style, name)
 {
-    Connect(wxEVT_PAINT, wxPaintEventHandler(Graph2D::onPaintEvent), NULL, this);
-    Connect(wxEVT_SIZE, wxEventHandler(Graph2D::onRefreshRequired),  NULL, this);
+    Connect(wxEVT_PAINT, wxPaintEventHandler(Graph2D::onPaintEvent), nullptr, this);
+    Connect(wxEVT_SIZE, wxEventHandler(Graph2D::onRefreshRequired),  nullptr, this);
     //http://wiki.wxwidgets.org/Flicker-Free_Drawing
-    Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Graph2D::onEraseBackGround), NULL, this);
+    Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Graph2D::onEraseBackGround), nullptr, this);
 
     //SetDoubleBuffered(true); slow as hell!
 
@@ -252,10 +254,10 @@ Graph2D::Graph2D(wxWindow* parent,
     SetBackgroundStyle(wxBG_STYLE_CUSTOM);
 #endif
 
-    Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(Graph2D::OnMouseLeftDown), NULL, this);
-    Connect(wxEVT_MOTION,    wxMouseEventHandler(Graph2D::OnMouseMovement), NULL, this);
-    Connect(wxEVT_LEFT_UP,   wxMouseEventHandler(Graph2D::OnMouseLeftUp),   NULL, this);
-    Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(Graph2D::OnMouseCaptureLost), NULL, this);
+    Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(Graph2D::OnMouseLeftDown), nullptr, this);
+    Connect(wxEVT_MOTION,    wxMouseEventHandler(Graph2D::OnMouseMovement), nullptr, this);
+    Connect(wxEVT_LEFT_UP,   wxMouseEventHandler(Graph2D::OnMouseLeftUp),   nullptr, this);
+    Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(Graph2D::OnMouseCaptureLost), nullptr, this);
 }
 
 
@@ -483,11 +485,11 @@ void Graph2D::render(wxDC& dc) const
                 wxPoint currentPos = activeSel->refCurrentPos() - dataOrigin;
 
                 //normalize positions
-                restrict(startPos  .x, 0, dataArea.width); //allow for one past the end(!) to enable "full range selections"
-                restrict(currentPos.x, 0, dataArea.width); //
+                confine(startPos  .x, 0, dataArea.width); //allow for one past the end(!) to enable "full range selections"
+                confine(currentPos.x, 0, dataArea.width); //
 
-                restrict(startPos  .y, 0, dataArea.height); //
-                restrict(currentPos.y, 0, dataArea.height); //
+                confine(startPos  .y, 0, dataArea.height); //
+                confine(currentPos.y, 0, dataArea.height); //
 
                 //save current selection as double coordinates
                 activeSel->refSelection().from = SelectionBlock::Point(cvrtX.screenToReal(startPos.x + 0.5), //+0.5 start selection in the middle of a pixel
@@ -547,7 +549,7 @@ void Graph2D::render(wxDC& dc) const
                 if (!curve.empty())
                 {
                     dc.SetPen(wxPen(j->second.color, j->second.lineWidth));
-                    dc.DrawLines(curve.size(), &curve[0]);
+                    dc.DrawLines(static_cast<int>(curve.size()), &curve[0]);
                 }
             }
         }

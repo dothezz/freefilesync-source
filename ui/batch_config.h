@@ -12,21 +12,12 @@
 
 namespace zen
 {
-struct ReturnBatchConfig
-{
-    enum ButtonPressed
-    {
-        BUTTON_CANCEL,
-        BATCH_FILE_SAVED = 1
-    };
-};
-
-ReturnBatchConfig::ButtonPressed showSyncBatchDlg(const wxString& referenceFile,
-                                                  const xmlAccess::XmlBatchConfig& batchCfg,
-                                                  const std::shared_ptr<FolderHistory>& folderHistLeft,
-                                                  const std::shared_ptr<FolderHistory>& folderHistRight,
-                                                  std::vector<std::wstring>& execFinishedhistory,
-                                                  size_t execFinishedhistoryMax);
+void showSyncBatchDlg(const wxString& referenceFile,
+                      const xmlAccess::XmlBatchConfig& batchCfg,
+                      const std::shared_ptr<FolderHistory>& folderHistLeft,
+                      const std::shared_ptr<FolderHistory>& folderHistRight,
+                      std::vector<std::wstring>& execFinishedhistory,
+                      size_t execFinishedhistoryMax);
 }
 
 

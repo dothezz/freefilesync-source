@@ -33,7 +33,7 @@ bool Application::OnInit()
 
     //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
     //for UI update events. This is not the case at the time of OnInit().
-    Connect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
+    Connect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
 
     return true;
 }
@@ -41,7 +41,7 @@ bool Application::OnInit()
 
 void Application::OnStartApplication(wxIdleEvent& event)
 {
-    Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
+    Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
 
     //if appname is not set, the default is the executable's name!
     SetAppName(wxT("FreeFileSync")); //use a different app name, to have "GetUserDataDir()" return the same directory as for FreeFileSync
@@ -83,7 +83,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
     if (!commandArgs.empty())
         cfgFilename = commandArgs[0];
 
-    MainDialog* frame = new MainDialog(NULL, cfgFilename);
+    MainDialog* frame = new MainDialog(nullptr, cfgFilename);
     frame->SetIcon(GlobalResources::instance().programIcon); //set application icon
     frame->Show();
 }

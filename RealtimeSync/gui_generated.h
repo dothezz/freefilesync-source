@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec  2 2011)
+// C++ code generated with wxFormBuilder (version Feb  9 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -11,9 +11,8 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-namespace zen { class BitmapButton; }
-namespace zen { class DirPickerCtrl; }
-
+#include "../wx+/dir_picker.h"
+#include "../wx+/button.h"
 #include <wx/string.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>

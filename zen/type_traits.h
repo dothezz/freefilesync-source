@@ -8,10 +8,34 @@
 #ifndef TYPE_TRAITS_HEADER_3425628658765467
 #define TYPE_TRAITS_HEADER_3425628658765467
 
+#include <type_traits> //all we need is std::is_class!! 
+
 namespace zen
 {
+//################# TMP compile time return values: "inherit to return compile-time result" ##############
+template <int i>
+struct StaticInt
+{
+    enum { value = i };
+};
+
+template <bool b>
+struct StaticBool : StaticInt<b> {};
+
+template <class EnumType, EnumType val>
+struct StaticEnum
+{
+    static const EnumType value = val;
+};
+//---------------------------------------------------------
+template <class T>
+struct ResultType
+{
+    typedef T Type;
+};
+
 //################# Built-in Types  ########################
-//Example: "IsSignedInt<int>::result" evaluates to "true"
+//Example: "IsSignedInt<int>::value" evaluates to "true"
 
 template <class T> struct IsUnsignedInt;
 template <class T> struct IsSignedInt;
@@ -22,27 +46,25 @@ template <class T> struct IsArithmetic; //IsInteger or IsFloat
 //remaining non-arithmetic types: bool, char, wchar_t
 
 //optional: specialize new types like:
-//template <> struct IsUnsignedInt<UInt64> { enum { result = true }; };
+//template <> struct IsUnsignedInt<UInt64> : StaticBool<true> {};
 
 //################# Class Members ########################
 
 /*  Detect data or function members of a class by name: ZEN_INIT_DETECT_MEMBER + HasMember_
-	!!! Note: this may ONLY be used for class types: fails to compile for non-class types !!!
-
 	Example: 1. ZEN_INIT_DETECT_MEMBER(c_str);
-	         2. HasMember_c_str<T>::result     -> use as boolean
+	         2. HasMember_c_str<T>::value     -> use as boolean
 */
 
-/*  Detect data or function members of a class by name and type: ZEN_INIT_DETECT_MEMBER2 + HasMember_
+/*  Detect data or function members of a class by name *and* type: ZEN_INIT_DETECT_MEMBER2 + HasMember_
 
 	Example: 1. ZEN_INIT_DETECT_MEMBER2(size, size_t (T::*)() const);
-	         2. HasMember_size<T>::result     -> use as boolean
+	         2. HasMember_size<T>::value     -> use as boolean
 */
 
 /*  Detect member type of a class: ZEN_INIT_DETECT_MEMBER_TYPE + HasMemberType_
 
 	Example: 1. ZEN_INIT_DETECT_MEMBER_TYPE(value_type);
-	         2. HasMemberType_value_type<T>::result     -> use as boolean
+	         2. HasMemberType_value_type<T>::value     -> use as boolean
 */
 
 
@@ -65,10 +87,10 @@ template <class T> struct IsArithmetic; //IsInteger or IsFloat
 
 
 //################ implementation ######################
-#define ZEN_SPECIALIZE_TRAIT(X, Y) template <> struct X<Y> { enum { result = true }; };
+#define ZEN_SPECIALIZE_TRAIT(X, Y) template <> struct X<Y> : StaticBool<true> {};
 
 template <class T>
-struct IsUnsignedInt { enum { result = false }; };
+struct IsUnsignedInt : StaticBool<false> {};
 
 ZEN_SPECIALIZE_TRAIT(IsUnsignedInt, unsigned char);
 ZEN_SPECIALIZE_TRAIT(IsUnsignedInt, unsigned short int);
@@ -78,7 +100,7 @@ ZEN_SPECIALIZE_TRAIT(IsUnsignedInt, unsigned long long int); //new with C++11 - 
 //------------------------------------------------------
 
 template <class T>
-struct IsSignedInt { enum { result = false }; };
+struct IsSignedInt : StaticBool<false> {};
 
 ZEN_SPECIALIZE_TRAIT(IsSignedInt, signed char);
 ZEN_SPECIALIZE_TRAIT(IsSignedInt, short int);
@@ -88,7 +110,7 @@ ZEN_SPECIALIZE_TRAIT(IsSignedInt, long long int); //new with C++11 - same type a
 //------------------------------------------------------
 
 template <class T>
-struct IsFloat { enum { result = false }; };
+struct IsFloat : StaticBool<false> {};
 
 ZEN_SPECIALIZE_TRAIT(IsFloat, float);
 ZEN_SPECIALIZE_TRAIT(IsFloat, double);
@@ -98,31 +120,40 @@ ZEN_SPECIALIZE_TRAIT(IsFloat, long double);
 #undef ZEN_SPECIALIZE_TRAIT
 
 template <class T>
-struct IsInteger { enum { result = IsUnsignedInt<T>::result || IsSignedInt<T>::result }; };
+struct IsInteger : StaticBool<IsUnsignedInt<T>::value || IsSignedInt<T>::value> {};
 
 template <class T>
-struct IsArithmetic { enum { result = IsInteger<T>::result || IsFloat<T>::result }; };
+struct IsArithmetic : StaticBool<IsInteger<T>::value || IsFloat<T>::value> {};
 //####################################################################
 
 #define ZEN_INIT_DETECT_MEMBER(NAME) 		\
     \
-    template<typename T>					\
-    class HasMember_##NAME					\
-    {										\
+    template<bool isClass, class T>			\
+    struct HasMemberImpl_##NAME				\
+    {		                                \
+    private:                                \
         typedef char Yes[1];				\
         typedef char No [2];				\
         \
-        template <typename U, U t> class Helper {};		\
-        struct Fallback { int NAME; };					\
+        template <typename U, U t>          \
+        class Helper {};		            \
+        struct Fallback { int NAME; };		\
         \
-        template <class U>								\
-        struct Helper2 : public U, public Fallback {};	\
+        template <class U>					\
+        struct Helper2 : public U, public Fallback {};	/*this works only for class types!!!*/  \
         \
         template <class U> static  No& hasMember(Helper<int Fallback::*, &Helper2<U>::NAME>*);	\
         template <class U> static Yes& hasMember(...);											\
     public:																						\
-        enum { result = sizeof(hasMember<T>(NULL)) == sizeof(Yes) };							\
-    };
+        enum { value = sizeof(hasMember<T>(nullptr)) == sizeof(Yes) };							    \
+    };                                                                                          \
+    \
+    template<class T>					                          \
+    struct HasMemberImpl_##NAME<false, T> : StaticBool<false> {}; \
+    \
+    template<typename T>                                          \
+    struct HasMember_##NAME : StaticBool<HasMemberImpl_##NAME<std::is_class<T>::value, T>::value> {};
+
 //####################################################################
 
 #define ZEN_INIT_DETECT_MEMBER2(NAME, TYPE) 		\
@@ -138,7 +169,7 @@ struct IsArithmetic { enum { result = IsInteger<T>::result || IsFloat<T>::result
         template <class T> static Yes& hasMember(Helper<TYPE, &T::NAME>*); 	\
         template <class T> static  No& hasMember(...); 					  	\
     public:																	\
-        enum { result = sizeof(hasMember<U>(NULL)) == sizeof(Yes) };		\
+        enum { value = sizeof(hasMember<U>(nullptr)) == sizeof(Yes) };         \
     };
 //####################################################################
 
@@ -155,7 +186,7 @@ struct IsArithmetic { enum { result = IsInteger<T>::result || IsFloat<T>::result
         template <class U> static Yes& hasMemberType(Helper<typename U::TYPENAME>*); \
         template <class U> static  No& hasMemberType(...); 							 \
     public:          																 \
-        enum { result = sizeof(hasMemberType<T>(NULL)) == sizeof(Yes) };			 \
+        enum { value = sizeof(hasMemberType<T>(nullptr)) == sizeof(Yes) };			     \
     };
 }
 

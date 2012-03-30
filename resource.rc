@@ -19,11 +19,11 @@ BEGIN
   BEGIN
     BLOCK "FFFF04B0"
     BEGIN
-      VALUE "FileDescription", "FreeFileSync - Open Source Synchronization Software\0"
+      VALUE "FileDescription", "Folder Comparison and Synchronization\0"
       VALUE "FileVersion",     VER_FREEFILESYNC_STR
       VALUE "ProductName",     "FreeFileSync\0"
       VALUE "ProductVersion",  VER_FREEFILESYNC_STR
-      VALUE "LegalCopyright",  "(c) 2008 - 2011 ZenJu\0"
+      VALUE "LegalCopyright",  "ZenJu - All Rights Reserved\0"
     END
   END
   BLOCK "VarFileInfo"

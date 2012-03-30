@@ -32,7 +32,7 @@ public:
 
     int getSize() const; //*maximum* icon size in pixel
 
-    bool requestFileIcon(const Zstring& filename, wxIcon* icon = NULL); //returns false if icon is not in buffer
+    bool requestFileIcon(const Zstring& filename, wxIcon* icon = nullptr); //returns false if icon is not in buffer
     void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
 
 private:

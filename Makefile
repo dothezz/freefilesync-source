@@ -5,37 +5,36 @@ SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 DOCSHAREDIR = $(SHAREDIR)/doc/$(APPNAME)
 
-COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h"
-COMMON_LINK_FLAGS  = -O3 -pthread
+COMMON_COMPILE_FLAGS = -Wall -pipe -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h"
+COMMON_LINK_FLAGS    = -pthread
 
 #default build
-FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
-LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes` -lboost_thread
+CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
+LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes` -lboost_thread
 
 #static std library linkage used for precompiled release
 ifeq ($(BUILD),release)
-FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
-LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
+CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
+LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
 endif
 #####################################################################################################
 
-
-#support for GTKMM
-FFS_CPPFLAGS += `pkg-config --cflags gtkmm-2.4`
-LINKFLAGS += `pkg-config --libs gtkmm-2.4`
+#Gtk - recycler/icon loading
+CPPFLAGS  += `pkg-config --cflags gtk+-2.0`
+LINKFLAGS += `pkg-config --libs gtk+-2.0`
 
 #support for SELinux (optional)
 SELINUX_EXISTING=$(shell pkg-config --exists libselinux && echo YES)
 ifeq ($(SELINUX_EXISTING),YES)
-FFS_CPPFLAGS += `pkg-config --cflags libselinux ` -DHAVE_SELINUX
-LINKFLAGS    += `pkg-config --libs libselinux`
+CPPFLAGS  += `pkg-config --cflags libselinux` -DHAVE_SELINUX
+LINKFLAGS += `pkg-config --libs libselinux`
 endif
 
 #support for Ubuntu Unity (optional)
 UNITY_EXISTING=$(shell pkg-config --exists unity && echo YES)
 ifeq ($(UNITY_EXISTING),YES)
-FFS_CPPFLAGS += `pkg-config --cflags unity` -DHAVE_UBUNTU_UNITY
-LINKFLAGS    += `pkg-config --libs unity`
+CPPFLAGS  += `pkg-config --cflags unity` -DHAVE_UBUNTU_UNITY
+LINKFLAGS += `pkg-config --libs unity`
 endif
 
 CPP_LIST= #internal list of all *.cpp files needed for compilation
@@ -67,7 +66,6 @@ CPP_LIST+=ui/tray_icon.cpp
 CPP_LIST+=lib/binary.cpp
 CPP_LIST+=lib/db_file.cpp
 CPP_LIST+=lib/dir_lock.cpp
-CPP_LIST+=lib/error_log.cpp
 CPP_LIST+=lib/hard_filter.cpp
 CPP_LIST+=lib/icon_buffer.cpp
 CPP_LIST+=lib/localization.cpp
@@ -97,7 +95,7 @@ all: FreeFileSync
 
 OBJ/FFS_Release_GCC_Make/%.o : %.cpp
 	mkdir -p $(dir $@)
-	g++ $(FFS_CPPFLAGS) -c $< -o $@
+	g++ $(CPPFLAGS) -c $< -o $@
 
 FreeFileSync: $(OBJECT_LIST)
 	g++ -o ./BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)

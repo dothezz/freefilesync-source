@@ -13,12 +13,12 @@ using namespace zen;
 
 void HierarchyObject::removeEmptyRec()
 {
-    bool haveEmpty = false;
+    bool emptyExisting = false;
     auto isEmpty = [&](const FileSystemObject& fsObj) -> bool
     {
-        bool objEmpty = fsObj.isEmpty();
+        const bool objEmpty = fsObj.isEmpty();
         if (objEmpty)
-            haveEmpty = true;
+            emptyExisting = true;
         return objEmpty;
     };
 
@@ -26,19 +26,20 @@ void HierarchyObject::removeEmptyRec()
     refSubLinks().remove_if(isEmpty);
     refSubDirs ().remove_if(isEmpty);
 
-    if (haveEmpty) //notify if actual deletion happened
+    if (emptyExisting) //notify if actual deletion happened
         notifySyncCfgChanged(); //mustn't call this in ~FileSystemObject(), since parent, usually a DirMapping, is already partially destroyed and existing as a pure HierarchyObject!
 
-    //recurse
+    //	for (auto& subDir : refSubDirs())
+    //      subDir.removeEmptyRec(); //recurse
     std::for_each(refSubDirs().begin(), refSubDirs().end(), std::mem_fun_ref(&HierarchyObject::removeEmptyRec));
 }
 
 namespace
 {
-SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
-                                    bool selectedForSynchronization,
-                                    SyncDirection syncDir,
-                                    bool haveDirConflict) //perf: std::wstring was wasteful here
+SyncOperation getIsolatedSyncOperation(CompareFilesResult cmpResult,
+                                       bool selectedForSynchronization,
+                                       SyncDirection syncDir,
+                                       bool hasDirConflict) //perf: std::wstring was wasteful here
 {
     if (!selectedForSynchronization)
         return cmpResult == FILE_EQUAL ?
@@ -55,7 +56,7 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
                 case SYNC_DIR_RIGHT:
                     return SO_CREATE_NEW_RIGHT; //copy files to right
                 case SYNC_DIR_NONE:
-                    return haveDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
+                    return hasDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
             }
             break;
 
@@ -67,7 +68,7 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
                 case SYNC_DIR_RIGHT:
                     return SO_DELETE_RIGHT; //delete files on right
                 case SYNC_DIR_NONE:
-                    return haveDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
+                    return hasDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
             }
             break;
 
@@ -82,7 +83,7 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
                 case SYNC_DIR_RIGHT:
                     return SO_OVERWRITE_RIGHT; //copy from left to right
                 case SYNC_DIR_NONE:
-                    return haveDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
+                    return hasDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
             }
             break;
 
@@ -94,7 +95,7 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
                 case SYNC_DIR_RIGHT:
                     return SO_COPY_METADATA_TO_RIGHT;
                 case SYNC_DIR_NONE:
-                    return haveDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
+                    return hasDirConflict ? SO_UNRESOLVED_CONFLICT : SO_DO_NOTHING;
             }
             break;
 
@@ -103,6 +104,7 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
             return SO_EQUAL;
     }
 
+    assert(false);
     return SO_DO_NOTHING; //dummy
 }
 
@@ -110,27 +112,27 @@ SyncOperation proposedSyncOperation(CompareFilesResult cmpResult,
 template <class Predicate> inline
 bool hasDirectChild(const HierarchyObject& hierObj, Predicate p)
 {
-    return std::find_if(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), p) != hierObj.refSubFiles().end() ||
-           std::find_if(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), p) != hierObj.refSubLinks().end() ||
-           std::find_if(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), p) != hierObj.refSubDirs ().end();
+    return std::any_of(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), p) ||
+           std::any_of(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), p) ||
+           std::any_of(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), p);
 }
 }
 
 
-SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir, bool active) const
+SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir) const //semantics: "what if"! assumes "active, no conflict, no recursion (directory)!
 {
-    return proposedSyncOperation(getCategory(), active, testSyncDir, syncDirConflict.get() != NULL);
+    return getIsolatedSyncOperation(getCategory(), true, testSyncDir, false);
 }
 
 
 SyncOperation FileSystemObject::getSyncOperation() const
 {
-    return FileSystemObject::testSyncOperation(syncDir, selectedForSynchronization);
-    //no *not* make a virtual call to testSyncOperation()! See FileMapping::testSyncOperation()!
+    return getIsolatedSyncOperation(getCategory(), selectedForSynchronization, syncDir, syncDirConflict.get() != nullptr);
+    //no *not* make a virtual call to testSyncOperation()! See FileMapping::testSyncOperation()! <- better not implement one in terms of the other!!!
 }
 
 
-//SyncOperation DirMapping::testSyncOperation() const -> not required: we do NOT want to consider child elements when testing!
+//SyncOperation DirMapping::testSyncOperation() const -> no recursion: we do NOT want to consider child elements when testing!
 
 
 SyncOperation DirMapping::getSyncOperation() const
@@ -163,80 +165,99 @@ SyncOperation DirMapping::getSyncOperation() const
             case SO_DELETE_RIGHT:
             case SO_DO_NOTHING:
             case SO_UNRESOLVED_CONFLICT:
-            {
                 if (isEmpty<LEFT_SIDE>())
                 {
                     //1. if at least one child-element is to be created, make sure parent folder is created also
                     //note: this automatically fulfills "create parent folders even if excluded";
                     //see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080
                     if (hasDirectChild(*this,
-                                       [](const FileSystemObject& fsObj) -> bool { const SyncOperation op = fsObj.getSyncOperation(); return  op == SO_CREATE_NEW_LEFT || op == SO_MOVE_LEFT_TARGET; }))
-                        syncOpBuffered = SO_CREATE_NEW_LEFT;
+                                       [](const FileSystemObject& fsObj) -> bool
+                {
+                    const SyncOperation op = fsObj.getSyncOperation();
+                        return  op == SO_CREATE_NEW_LEFT ||
+                        op == SO_MOVE_LEFT_TARGET;
+                    }))
+                    syncOpBuffered = SO_CREATE_NEW_LEFT;
                     //2. cancel parent deletion if only a single child is not also scheduled for deletion
                     else if (syncOpBuffered == SO_DELETE_RIGHT &&
                              hasDirectChild(*this,
                                             [](const FileSystemObject& fsObj) -> bool
                 {
-                    if (fsObj.isEmpty()) return false; //fsObj may already be empty because it once contained a "move source"
-                        const SyncOperation op = fsObj.getSyncOperation(); return op != SO_DELETE_RIGHT && op != SO_MOVE_RIGHT_SOURCE;
+                    if (fsObj.isEmpty())
+                            return false; //fsObj may already be empty because it once contained a "move source"
+                        const SyncOperation op = fsObj.getSyncOperation();
+                        return op != SO_DELETE_RIGHT &&
+                        op != SO_MOVE_RIGHT_SOURCE;
                     }))
                     syncOpBuffered = SO_DO_NOTHING;
                 }
                 else if (isEmpty<RIGHT_SIDE>())
                 {
                     if (hasDirectChild(*this,
-                                       [](const FileSystemObject& fsObj) -> bool  { const SyncOperation op = fsObj.getSyncOperation();  return  op == SO_CREATE_NEW_RIGHT || op == SO_MOVE_RIGHT_TARGET;  }))
-                        syncOpBuffered = SO_CREATE_NEW_RIGHT;
+                                       [](const FileSystemObject& fsObj) -> bool
+                {
+                    const SyncOperation op = fsObj.getSyncOperation();
+                        return  op == SO_CREATE_NEW_RIGHT ||
+                        op == SO_MOVE_RIGHT_TARGET;
+                    }))
+                    syncOpBuffered = SO_CREATE_NEW_RIGHT;
                     else if (syncOpBuffered == SO_DELETE_LEFT &&
                              hasDirectChild(*this,
                                             [](const FileSystemObject& fsObj) -> bool
                 {
-                    if (fsObj.isEmpty()) return false;
+                    if (fsObj.isEmpty())
+                            return false;
                         const SyncOperation op = fsObj.getSyncOperation();
-                        return op != SO_DELETE_LEFT && op != SO_MOVE_LEFT_SOURCE;
+                        return op != SO_DELETE_LEFT &&
+                        op != SO_MOVE_LEFT_SOURCE;
                     }))
                     syncOpBuffered = SO_DO_NOTHING;
                 }
-            }
-            break;
+                break;
         }
     }
     return syncOpBuffered;
 }
 
 
-SyncOperation FileMapping::testSyncOperation(SyncDirection testSyncDir, bool active) const
+inline //it's private!
+SyncOperation FileMapping::applyMoveOptimization(SyncOperation op) const
 {
-    SyncOperation op = FileSystemObject::testSyncOperation(testSyncDir, active);
-
     /*
         check whether we can optimize "create + delete" via "move":
         note: as long as we consider "create + delete" cases only, detection of renamed files, should be fine even for "binary" comparison variant!
     */
-    if (const FileSystemObject* refFile = dynamic_cast<const FileMapping*>(FileSystemObject::retrieve(moveFileRef))) //we expect a "FileMapping", but only need a "FileSystemObject"
-    {
-        SyncOperation opRef = refFile->FileSystemObject::getSyncOperation(); //do *not* make a virtual call!
+    if (moveFileRef)
+        if (auto refFile = dynamic_cast<const FileMapping*>(FileSystemObject::retrieve(moveFileRef))) //we expect a "FileMapping", but only need a "FileSystemObject"
+        {
+            SyncOperation opRef = refFile->FileSystemObject::getSyncOperation(); //do *not* make a virtual call!
 
-        if (op    == SO_CREATE_NEW_LEFT &&
-            opRef == SO_DELETE_LEFT)
-            op = SO_MOVE_LEFT_TARGET;
-        else if (op    == SO_DELETE_LEFT &&
-                 opRef == SO_CREATE_NEW_LEFT)
-            op = SO_MOVE_LEFT_SOURCE;
-        else if (op    == SO_CREATE_NEW_RIGHT &&
-                 opRef == SO_DELETE_RIGHT)
-            op = SO_MOVE_RIGHT_TARGET;
-        else if (op    == SO_DELETE_RIGHT &&
-                 opRef == SO_CREATE_NEW_RIGHT)
-            op = SO_MOVE_RIGHT_SOURCE;
-    }
+            if (op    == SO_CREATE_NEW_LEFT &&
+                opRef == SO_DELETE_LEFT)
+                op = SO_MOVE_LEFT_TARGET;
+            else if (op    == SO_DELETE_LEFT &&
+                     opRef == SO_CREATE_NEW_LEFT)
+                op = SO_MOVE_LEFT_SOURCE;
+            else if (op    == SO_CREATE_NEW_RIGHT &&
+                     opRef == SO_DELETE_RIGHT)
+                op = SO_MOVE_RIGHT_TARGET;
+            else if (op    == SO_DELETE_RIGHT &&
+                     opRef == SO_CREATE_NEW_RIGHT)
+                op = SO_MOVE_RIGHT_SOURCE;
+        }
     return op;
+}
+
+
+SyncOperation FileMapping::testSyncOperation(SyncDirection testSyncDir) const
+{
+    return applyMoveOptimization(FileSystemObject::testSyncOperation(testSyncDir));
 }
 
 
 SyncOperation FileMapping::getSyncOperation() const
 {
-    return FileMapping::testSyncOperation(getSyncDir(), isActive());
+    return applyMoveOptimization(FileSystemObject::getSyncOperation());
 }
 
 

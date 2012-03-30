@@ -35,7 +35,7 @@ LeakChecker::~LeakChecker()
         const std::string message = std::string("Memory leak detected!") + "\n\n"
                                     + "Candidates:\n" + leakingStrings;
 #ifdef FFS_WIN
-        MessageBoxA(NULL, message.c_str(), "Error", 0);
+        MessageBoxA(nullptr, message.c_str(), "Error", 0);
 #else
         std::cerr << message;
         std::abort();
@@ -70,7 +70,7 @@ std::string LeakChecker::rawMemToString(const void* ptr, size_t size)
 void LeakChecker::reportProblem(const std::string& message) //throw (std::logic_error)
 {
 #ifdef FFS_WIN
-    ::MessageBoxA(NULL, message.c_str(), "Error", 0);
+    ::MessageBoxA(nullptr, message.c_str(), "Error", 0);
 #else
     std::cerr << message;
 #endif
@@ -100,20 +100,20 @@ typedef int (WINAPI* CompareStringOrdinalFunc)(LPCWSTR lpString1,
                                                LPCWSTR lpString2,
                                                int     cchCount2,
                                                BOOL    bIgnoreCase);
-const SysDllFun<CompareStringOrdinalFunc> ordinalCompare = SysDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
+const SysDllFun<CompareStringOrdinalFunc> compareStringOrdinal = SysDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
 }
 
 
-int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA, size_t sizeB)
+int z_impl::compareFilenamesWin(const wchar_t* lhs, const wchar_t* rhs, size_t sizeLhs, size_t sizeRhs)
 {
     //caveat: function scope static initialization is not thread-safe in VS 2010!
-    if (ordinalCompare) //this additional test has no noticeable performance impact
+    if (compareStringOrdinal) //this additional test has no noticeable performance impact
     {
-        const int rv = ordinalCompare(a,  	      //pointer to first string
-                                      static_cast<int>(sizeA),	  //size, in bytes or characters, of first string
-                                      b,	      //pointer to second string
-                                      static_cast<int>(sizeB),     //size, in bytes or characters, of second string
-                                      true); 	  //ignore case
+        const int rv = compareStringOrdinal(lhs,                       //__in  LPCWSTR lpString1,
+                                            static_cast<int>(sizeLhs), //__in  int cchCount1,
+                                            rhs,                       //__in  LPCWSTR lpString2,
+                                            static_cast<int>(sizeRhs), //__in  int cchCount2,
+                                            true);                     //__in  BOOL bIgnoreCase
         if (rv == 0)
             throw std::runtime_error("Error comparing strings (ordinal)!");
         else
@@ -124,26 +124,26 @@ int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA
         //do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiß" == "weiss"!!!
         //the only reliable way to compare filenames (with XP) is to call "CharUpper" or "LCMapString":
 
-        const int minSize = std::min<int>(sizeA, sizeB);
+        const auto minSize = static_cast<unsigned int>(std::min(sizeLhs, sizeRhs));
 
         int rv = 0;
-        if (minSize != 0) //LCMapString does not allow input sizes of 0!
+        if (minSize >= 0) //LCMapString does not allow input sizes of 0!
         {
-            if (minSize <= 5000) //performance optimization: stack
+            if (minSize <= MAX_PATH) //performance optimization: stack
             {
-                wchar_t bufferA[5000];
-                wchar_t bufferB[5000];
+                wchar_t bufferA[MAX_PATH];
+                wchar_t bufferB[MAX_PATH];
 
                 //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
                 if (::LCMapString(ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
                                   LCMAP_UPPERCASE,          //__in   DWORD dwMapFlags,
-                                  a,                        //__in   LPCTSTR lpSrcStr,
+                                  lhs,                      //__in   LPCTSTR lpSrcStr,
                                   minSize,                  //__in   int cchSrc,
                                   bufferA,                  //__out  LPTSTR lpDestStr,
-                                  5000) == 0)               //__in   int cchDest
+                                  MAX_PATH) == 0)           //__in   int cchDest
                     throw std::runtime_error("Error comparing strings! (LCMapString)");
 
-                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, minSize, bufferB, 5000) == 0)
+                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, rhs, minSize, bufferB, MAX_PATH) == 0)
                     throw std::runtime_error("Error comparing strings! (LCMapString)");
 
                 rv = ::wmemcmp(bufferA, bufferB, minSize);
@@ -153,10 +153,10 @@ int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA
                 std::vector<wchar_t> bufferA(minSize);
                 std::vector<wchar_t> bufferB(minSize);
 
-                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, a, minSize, &bufferA[0], minSize) == 0)
+                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, lhs, minSize, &bufferA[0], minSize) == 0)
                     throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
-                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, minSize, &bufferB[0], minSize) == 0)
+                if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, rhs, minSize, &bufferB[0], minSize) == 0)
                     throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
                 rv = ::wmemcmp(&bufferA[0], &bufferB[0], minSize);
@@ -164,7 +164,7 @@ int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA
         }
 
         return rv == 0 ?
-               static_cast<int>(sizeA) - static_cast<int>(sizeB) :
+               static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs) :
                rv;
     }
 

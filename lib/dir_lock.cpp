@@ -28,7 +28,6 @@
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
-#include <cerrno>
 #include <unistd.h>
 #endif
 
@@ -76,24 +75,24 @@ public:
         const char buffer[1] = {' '};
 
 #ifdef FFS_WIN
-        //ATTENTION: setting file pointer IS required! => use CreateFile/FILE_GENERIC_WRITE + SetFilePointerEx!
+        //ATTENTION: setting file pointer IS required! => use CreateFile/GENERIC_WRITE + SetFilePointerEx!
         //although CreateFile/FILE_APPEND_DATA without SetFilePointerEx works locally, it MAY NOT work on some network shares creating a 4 gig file!!!
 
         const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename_).c_str(),
                                                GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
                                                FILE_SHARE_READ,
-                                               NULL,
+                                               nullptr,
                                                OPEN_EXISTING,
                                                FILE_ATTRIBUTE_NORMAL,
-                                               NULL);
+                                               nullptr);
         if (fileHandle == INVALID_HANDLE_VALUE)
             return;
-        ZEN_ON_BLOCK_EXIT(::CloseHandle(fileHandle));
+        ZEN_ON_SCOPE_EXIT(::CloseHandle(fileHandle));
 
         const LARGE_INTEGER moveDist = {};
         if (!::SetFilePointerEx(fileHandle, //__in       HANDLE hFile,
                                 moveDist,   //__in       LARGE_INTEGER liDistanceToMove,
-                                NULL,       //__out_opt  PLARGE_INTEGER lpNewFilePointer,
+                                nullptr,    //__out_opt  PLARGE_INTEGER lpNewFilePointer,
                                 FILE_END))  //__in       DWORD dwMoveMethod
             return;
 
@@ -102,13 +101,13 @@ public:
                     buffer,        //__out        LPVOID lpBuffer,
                     1,             //__in         DWORD nNumberOfBytesToRead,
                     &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
-                    NULL);         //__inout_opt  LPOVERLAPPED lpOverlapped
+                    nullptr);      //__inout_opt  LPOVERLAPPED lpOverlapped
 
 #elif defined FFS_LINUX
-        const int fileHandle = ::open(lockfilename_.c_str(), O_WRONLY | O_APPEND); //O_EXCL contains a race condition on NFS file systems: http://linux.die.net/man/2/open
+        const int fileHandle = ::open(lockfilename_.c_str(), O_WRONLY | O_APPEND);
         if (fileHandle == -1)
             return;
-        ZEN_ON_BLOCK_EXIT(::close(fileHandle));
+        ZEN_ON_SCOPE_EXIT(::close(fileHandle));
 
         const ssize_t bytesWritten = ::write(fileHandle, buffer, 1);
         (void)bytesWritten;
@@ -127,41 +126,25 @@ UInt64 getLockFileSize(const Zstring& filename) //throw FileError, ErrorNotExist
 #ifdef FFS_WIN
     WIN32_FIND_DATA fileInfo = {};
     const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(filename).c_str(), &fileInfo);
-    if (searchHandle == INVALID_HANDLE_VALUE)
+    if (searchHandle != INVALID_HANDLE_VALUE)
     {
-        const DWORD lastError = ::GetLastError();
-
-        std::wstring errorMessage = _("Error reading file attributes:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted(lastError);
-
-        if (lastError == ERROR_FILE_NOT_FOUND ||
-            lastError == ERROR_PATH_NOT_FOUND ||
-            lastError == ERROR_BAD_NETPATH    ||
-            lastError == ERROR_NETNAME_DELETED)
-            throw ErrorNotExisting(errorMessage);
-        else
-            throw FileError(errorMessage);
+        ::FindClose(searchHandle);
+        return zen::UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
     }
-
-    ::FindClose(searchHandle);
-
-    return zen::UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
 
 #elif defined FFS_LINUX
     struct ::stat fileInfo = {};
-    if (::stat(filename.c_str(), &fileInfo) != 0) //follow symbolic links
-    {
-        const int lastError = errno;
-
-        std::wstring errorMessage = _("Error reading file attributes:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted(lastError);
-
-        if (lastError == ENOENT)
-            throw ErrorNotExisting(errorMessage);
-        else
-            throw FileError(errorMessage);
-    }
-
-    return zen::UInt64(fileInfo.st_size);
+    if (::stat(filename.c_str(), &fileInfo) == 0) //follow symbolic links
+        return zen::UInt64(fileInfo.st_size);
 #endif
+
+    const ErrorCode lastError = getLastError();
+    const std::wstring errorMessage = _("Error reading file attributes:") + L"\n\"" + filename + L"\"" + L"\n\n" + getLastErrorFormatted(lastError);
+
+    if (errorCodeForNotExisting(lastError))
+        throw ErrorNotExisting(errorMessage);
+    else
+        throw FileError(errorMessage);
 }
 
 
@@ -177,29 +160,6 @@ Zstring deleteAbandonedLockName(const Zstring& lockfilename) //make sure to NOT 
 
 namespace
 {
-//read string from file stream
-inline
-std::string readString(wxInputStream& stream)  //throw std::exception
-{
-    const auto strLength = readPOD<std::uint32_t>(stream);
-    std::string output;
-    if (strLength > 0)
-    {
-        output.resize(strLength); //throw std::bad_alloc
-        stream.Read(&output[0], strLength);
-    }
-    return output;
-}
-
-
-inline
-void writeString(wxOutputStream& stream, const std::string& str)  //write string to filestream
-{
-    writePOD(stream, static_cast<std::uint32_t>(str.length()));
-    stream.Write(str.c_str(), str.length());
-}
-
-
 std::string getComputerId() //returns empty string on error
 {
     const wxString fhn = ::wxGetFullHostName();
@@ -234,9 +194,9 @@ struct LockInformation
 
         //some format checking here?
 
-        lockId = readString(stream);
+        lockId = readString<std::string>(stream);
         procDescr.processId  = static_cast<ProcessId>(readPOD<std::uint64_t>(stream)); //possible loss of precision (32/64 bit process) covered by buildId
-        procDescr.computerId = readString(stream);
+        procDescr.computerId = readString<std::string>(stream);
     }
 
     void toStream(wxOutputStream& stream) const //write
@@ -282,7 +242,7 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
         return PROC_STATUS_NO_IDEA; //lock owned by different computer
 
 #ifdef FFS_WIN
-    if (procDescr.processId == ::GetCurrentProcessId()) //may seem obscure, but it's possible: a lock file is "stolen" and put back while the program is running
+    if (procDescr.processId == ::GetCurrentProcessId()) //may seem obscure, but it's possible: deletion failed or a lock file is "stolen" and put back while the program is running
         return PROC_STATUS_ITS_US;
 
     //note: ::OpenProcess() is no option as it may successfully return for crashed processes!
@@ -291,7 +251,7 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
                           0);                 //__in  DWORD th32ProcessID
     if (snapshot == INVALID_HANDLE_VALUE)
         return PROC_STATUS_NO_IDEA;
-    ZEN_ON_BLOCK_EXIT(::CloseHandle(snapshot));
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(snapshot));
 
     PROCESSENTRY32 processEntry = {};
     processEntry.dwSize = sizeof(processEntry);
@@ -315,7 +275,7 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
     if (procDescr.processId <= 0 || procDescr.processId >= 65536)
         return PROC_STATUS_NO_IDEA; //invalid process id
 
-    return zen::dirExists(Zstr("/proc/") + zen::toString<Zstring>(procDescr.processId)) ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
+    return zen::dirExists(Zstr("/proc/") + zen::numberTo<Zstring>(procDescr.processId)) ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
 #endif
 }
 
@@ -374,9 +334,8 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
             const zen::UInt64 fileSizeNew = ::getLockFileSize(lockfilename); //throw FileError, ErrorNotExisting
             wxLongLong currentTime = wxGetLocalTimeMillis();
 
-            if (fileSizeNew != fileSizeOld)
+            if (fileSizeNew != fileSizeOld) //received life sign from lock
             {
-                //received life sign from lock
                 fileSizeOld     = fileSizeNew;
                 lockSilentStart = currentTime;
             }
@@ -413,7 +372,7 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                         long remainingSeconds = ((DETECT_EXITUS_INTERVAL - (wxGetLocalTimeMillis() - lockSilentStart)) / 1000).ToLong();
                         remainingSeconds = std::max(0L, remainingSeconds);
 
-                        const std::wstring remSecMsg = replaceCpy(_P("1 sec", "%x sec", remainingSeconds), L"%x", toString<std::wstring>(remainingSeconds));
+                        const std::wstring remSecMsg = replaceCpy(_P("1 sec", "%x sec", remainingSeconds), L"%x", numberTo<std::wstring>(remainingSeconds));
 
                         callback->reportInfo(infoMsg + L" " + remSecMsg);
                     }
@@ -446,10 +405,10 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
     const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename).c_str(),
                                            GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
                                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                           NULL,
+                                           nullptr,
                                            CREATE_NEW,
                                            FILE_ATTRIBUTE_NORMAL,
-                                           NULL);
+                                           nullptr);
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
         if (::GetLastError() == ERROR_FILE_EXISTS)
@@ -473,7 +432,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
     ::close(fileHandle);
 #endif
 
-    ScopeGuard guardLockFile = zen::makeGuard([&] { zen::removeFile(lockfilename); });
+    ScopeGuard guardLockFile = zen::makeGuard([&] { removeFile(lockfilename); });
 
     //write UUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks, etc.)
     writeLockInfo(lockfilename); //throw FileError
@@ -487,7 +446,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
 class DirLock::SharedDirLock
 {
 public:
-    SharedDirLock(const Zstring& lockfilename, DirLockCallback* callback = NULL) : //throw FileError
+    SharedDirLock(const Zstring& lockfilename, DirLockCallback* callback = nullptr) : //throw FileError
         lockfilename_(lockfilename)
     {
         while (!::tryLock(lockfilename))             //throw FileError
@@ -530,17 +489,14 @@ public:
         FileToUuidMap::const_iterator iterUuid = fileToUuid.find(lockfilename);
         if (iterUuid != fileToUuid.end())
         {
-            const std::shared_ptr<SharedDirLock>& activeLock = findActive(iterUuid->second); //returns null-lock if not found
-            if (activeLock)
+            if (const std::shared_ptr<SharedDirLock>& activeLock = findActive(iterUuid->second)) //returns null-lock if not found
                 return activeLock; //SharedDirLock is still active -> enlarge circle of shared ownership
         }
 
         try //actual check based on lock UUID, deadlock prevention: "lockfilename" may be an alternative name for an already active lock
         {
             const std::string lockId = retrieveLockId(lockfilename); //throw FileError, ErrorNotExisting
-
-            const std::shared_ptr<SharedDirLock>& activeLock = findActive(lockId); //returns null-lock if not found
-            if (activeLock)
+            if (const std::shared_ptr<SharedDirLock>& activeLock = findActive(lockId)) //returns null-lock if not found
             {
                 fileToUuid[lockfilename] = lockId; //perf-optimization: update relation
                 return activeLock;
@@ -549,8 +505,8 @@ public:
         catch (FileError&) {} //catch everything, let SharedDirLock constructor deal with errors, e.g. 0-sized/corrupted lock file
 
         //not yet in buffer, so create a new directory lock
-        std::shared_ptr<SharedDirLock> newLock(new SharedDirLock(lockfilename, callback)); //throw FileError
-        const std::string newLockId = retrieveLockId(lockfilename); //throw FileError, ErrorNotExisting
+        auto newLock = std::make_shared<SharedDirLock>(lockfilename, callback); //throw FileError
+        const std::string& newLockId = retrieveLockId(lockfilename); //throw FileError, ErrorNotExisting
 
         //update registry
         fileToUuid[lockfilename] = newLockId; //throw()
@@ -564,16 +520,14 @@ private:
 
     std::shared_ptr<SharedDirLock> findActive(const std::string& lockId) //returns null-lock if not found
     {
-        UuidToLockMap::const_iterator iterLock = uuidToLock.find(lockId);
+        auto iterLock = uuidToLock.find(lockId);
         return iterLock != uuidToLock.end() ?
                iterLock->second.lock() : nullptr; //try to get shared_ptr; throw()
     }
 
-    typedef std::weak_ptr<SharedDirLock> SharedLock;
-
     typedef std::string UniqueId;
-    typedef std::map<Zstring, UniqueId, LessFilename> FileToUuidMap; //n:1 handle uppper/lower case correctly
-    typedef std::map<UniqueId, SharedLock>            UuidToLockMap; //1:1
+    typedef std::map<Zstring, UniqueId, LessFilename>        FileToUuidMap; //n:1 handle uppper/lower case correctly
+    typedef std::map<UniqueId, std::weak_ptr<SharedDirLock>> UuidToLockMap; //1:1
 
     FileToUuidMap fileToUuid; //lockname |-> UUID; locks can be referenced by a lockfilename or alternatively a UUID
     UuidToLockMap uuidToLock; //UUID |-> "shared lock ownership"
@@ -583,7 +537,7 @@ private:
 DirLock::DirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
 {
 #ifdef FFS_WIN
-    const DWORD bufferSize = std::max(lockfilename.size(), static_cast<size_t>(10000));
+    const DWORD bufferSize = 10000;
     std::vector<wchar_t> volName(bufferSize);
     if (::GetVolumePathName(lockfilename.c_str(), //__in   LPCTSTR lpszFileName,
                             &volName[0],          //__out  LPTSTR lpszVolumePathName,

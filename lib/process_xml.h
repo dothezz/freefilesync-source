@@ -161,6 +161,7 @@ struct XmlGlobalSettings
 #elif defined FFS_LINUX
             textSearchRespectCase(true),
 #endif
+            showIcons(true),
             iconSize(ICON_SIZE_SMALL),
             lastUpdateCheck(0)
         {
@@ -209,6 +210,7 @@ struct XmlGlobalSettings
         bool useRecyclerForManualDeletion;
         bool textSearchRespectCase;
 
+        bool showIcons;
         FileIconSize iconSize;
 
         long lastUpdateCheck;          //time of last update check

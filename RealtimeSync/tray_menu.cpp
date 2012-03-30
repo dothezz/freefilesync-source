@@ -76,14 +76,14 @@ public:
 
     void parentHasDied() //call before tray icon is marked for deferred deletion
     {
-        parent_ = NULL;
+        parent_ = nullptr;
     }
 
 private:
     virtual wxMenu* CreatePopupMenu()
     {
         if (!parent_)
-            return NULL;
+            return nullptr;
 
         wxMenu* contextMenu = new wxMenu;
         contextMenu->Append(CONTEXT_RESTORE, _("&Restore"));
@@ -91,7 +91,7 @@ private:
         contextMenu->AppendSeparator();
         contextMenu->Append(CONTEXT_ABORT, _("&Exit"));
         //event handling
-        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TrayIconHolder::OnContextMenuSelection), NULL, parent_);
+        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TrayIconHolder::OnContextMenuSelection), nullptr, parent_);
 
         return contextMenu; //ownership transferred to caller
     }
@@ -127,13 +127,13 @@ TrayIconHolder::TrayIconHolder(const wxString& jobname) :
     showIconActive();
 
     //register double-click
-    trayMenu->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(TrayIconHolder::OnRequestResume), NULL, this);
+    trayMenu->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(TrayIconHolder::OnRequestResume), nullptr, this);
 }
 
 
 TrayIconHolder::~TrayIconHolder()
 {
-    trayMenu->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(TrayIconHolder::OnRequestResume), NULL, this);
+    trayMenu->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(TrayIconHolder::OnRequestResume), nullptr, this);
     trayMenu->RemoveIcon(); //(try to) hide icon until final deletion takes place
     trayMenu->parentHasDied();
 
@@ -200,7 +200,7 @@ void TrayIconHolder::OnContextMenuSelection(wxCommandEvent& event)
             wxString buildFormatted = _("(Build: %x)");
             buildFormatted.Replace(wxT("%x"), build);
 
-            wxMessageDialog aboutDlg(NULL, wxString(wxT("RealtimeSync")) + wxT("\n\n") + buildFormatted, _("About"), wxOK);
+            wxMessageDialog aboutDlg(nullptr, wxString(wxT("RealtimeSync")) + wxT("\n\n") + buildFormatted, _("About"), wxOK);
             aboutDlg.ShowModal();
         }
         break;

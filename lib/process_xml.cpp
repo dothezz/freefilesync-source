@@ -79,15 +79,15 @@ wxString xmlAccess::getGlobalConfigFile()
 
 void xmlAccess::OptionalDialogs::resetDialogs()
 {
-    warningDependentFolders        = true;
-    warningMultiFolderWriteAccess  = true;
-    warningSignificantDifference   = true;
-    warningNotEnoughDiskSpace      = true;
-    warningUnresolvedConflicts     = true;
-    warningSyncDatabase            = true;
-    warningRecyclerMissing         = true;
-    popupOnConfigChange            = true;
-    showSummaryBeforeSync          = true;
+    warningDependentFolders       = true;
+    warningMultiFolderWriteAccess = true;
+    warningSignificantDifference  = true;
+    warningNotEnoughDiskSpace     = true;
+    warningUnresolvedConflicts    = true;
+    warningSyncDatabase           = true;
+    warningRecyclerMissing        = true;
+    popupOnConfigChange           = true;
+    showSummaryBeforeSync         = true;
 }
 
 
@@ -496,20 +496,20 @@ void writeText(const UnitTime& value, std::string& output)
         case UTIME_NONE:
             output = "Inactive";
             break;
-            //        case UTIME_LAST_X_HOURS:
-            //          output = "x-hours";
-            //        break;
         case UTIME_TODAY:
             output = "Today";
             break;
-        case UTIME_THIS_WEEK:
-            output = "Week";
-            break;
+            //case UTIME_THIS_WEEK:
+            //    output = "Week";
+            //    break;
         case UTIME_THIS_MONTH:
             output = "Month";
             break;
         case UTIME_THIS_YEAR:
             output = "Year";
+            break;
+        case UTIME_LAST_X_DAYS:
+            output = "x-days";
             break;
     }
 }
@@ -521,16 +521,16 @@ bool readText(const std::string& input, UnitTime& value)
     zen::trim(tmp);
     if (tmp == "Inactive")
         value = UTIME_NONE;
-    //    else if (tmp == "x-hours")
-    //      value = UTIME_LAST_X_HOURS;
     else if (tmp == "Today")
         value = UTIME_TODAY;
-    else if (tmp == "Week")
-        value = UTIME_THIS_WEEK;
+    //else if (tmp == "Week")
+    //    value = UTIME_THIS_WEEK;
     else if (tmp == "Month")
         value = UTIME_THIS_MONTH;
     else if (tmp == "Year")
         value = UTIME_THIS_YEAR;
+    else if (tmp == "x-days")
+        value = UTIME_LAST_X_DAYS;
     else
         return false;
     return true;
@@ -540,13 +540,13 @@ bool readText(const std::string& input, UnitTime& value)
 template <> inline
 void writeText(const ColumnTypeRim& value, std::string& output)
 {
-    output = toString<std::string>(value);
+    output = numberTo<std::string>(value);
 }
 
 template <> inline
 bool readText(const std::string& input, ColumnTypeRim& value)
 {
-    value = static_cast<ColumnTypeRim>(toNumber<int>(input));
+    value = static_cast<ColumnTypeRim>(stringTo<int>(input));
     return true;
 }
 
@@ -554,13 +554,13 @@ bool readText(const std::string& input, ColumnTypeRim& value)
 template <> inline
 void writeText(const ColumnTypeNavi& value, std::string& output)
 {
-    output = toString<std::string>(value);
+    output = numberTo<std::string>(value);
 }
 
 template <> inline
 bool readText(const std::string& input, ColumnTypeNavi& value)
 {
-    value = static_cast<ColumnTypeNavi>(toNumber<int>(input));
+    value = static_cast<ColumnTypeNavi>(stringTo<int>(input));
     return true;
 }
 
@@ -740,8 +740,7 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
 
     //###########################################################
     //alternate comp configuration (optional)
-    XmlIn inAltCmp = in["CompareConfig"];
-    if (inAltCmp)
+    if (XmlIn inAltCmp = in["CompareConfig"])
     {
         CompConfig altCmpCfg;
         readConfig(inAltCmp, altCmpCfg);
@@ -750,8 +749,7 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
     }
     //###########################################################
     //alternate sync configuration (optional)
-    XmlIn inAltSync = in["SyncConfig"];
-    if (inAltSync)
+    if (XmlIn inAltSync = in["SyncConfig"])
     {
         SyncConfig altSyncCfg;
         readConfig(inAltSync, altSyncCfg);
@@ -874,6 +872,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inWnd["ManualDeletionUseRecycler"](config.gui.useRecyclerForManualDeletion);
     inWnd["RespectCaseOnSearch"      ](config.gui.textSearchRespectCase);
 
+    inWnd["ShowIcons"](config.gui.showIcons);
     inWnd["IconSize"](config.gui.iconSize);
 
     //###########################################################
@@ -929,7 +928,7 @@ void readConfig(const Zstring& filename, XmlType type, ConfigType& config)
     ::readConfig(in, config);
 
     if (in.errorsOccured())
-        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + filename + L"\"\n\n" +
+        throw FfsXmlError(_("Configuration loaded partially only:") + L"\n\"" + filename + L"\"\n\n" +
                           getErrorMessageFormatted(in), FfsXmlError::WARNING);
 }
 }
@@ -1139,6 +1138,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outWnd["ManualDeletionUseRecycler"](config.gui.useRecyclerForManualDeletion);
     outWnd["RespectCaseOnSearch"      ](config.gui.textSearchRespectCase);
 
+    outWnd["ShowIcons"](config.gui.showIcons);
     outWnd["IconSize"](config.gui.iconSize);
 
     //###########################################################

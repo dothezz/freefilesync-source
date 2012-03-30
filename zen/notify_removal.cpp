@@ -91,10 +91,10 @@ LRESULT CALLBACK topWndProc(HWND hwnd,        //handle to window
 
 
 MessageProvider::MessageProvider() :
-    process(::GetModuleHandle(NULL)), //get program's module handle
-    windowHandle(NULL)
+    process(::GetModuleHandle(nullptr)), //get program's module handle
+    windowHandle(nullptr)
 {
-    if (process == NULL)
+    if (!process)
         throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (GetModuleHandle)");
 
     //register the main window class
@@ -110,17 +110,17 @@ MessageProvider::MessageProvider() :
 
     //create dummy-window
     windowHandle = ::CreateWindow(WINDOW_NAME, //LPCTSTR lpClassName OR ATOM in low-order word!
-                                  NULL,        //LPCTSTR lpWindowName,
+                                  nullptr,     //LPCTSTR lpWindowName,
                                   0, //DWORD dwStyle,
                                   0, //int x,
                                   0, //int y,
                                   0, //int nWidth,
                                   0, //int nHeight,
                                   0, //note: we need a toplevel window to receive device arrival events, not a message-window (HWND_MESSAGE)!
-                                  NULL,    //HMENU hMenu,
-                                  process, //HINSTANCE hInstance,
-                                  NULL);   //LPVOID lpParam
-    if (windowHandle == NULL)
+                                  nullptr,  //HMENU hMenu,
+                                  process,  //HINSTANCE hInstance,
+                                  nullptr); //LPVOID lpParam
+    if (!windowHandle)
         throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (CreateWindow)");
 
     guardClass.dismiss();
@@ -161,7 +161,7 @@ public:
         hNotification = ::RegisterDeviceNotification(MessageProvider::instance().getWnd(), //__in  HANDLE hRecipient,
                                                      &filter,                              //__in  LPVOID NotificationFilter,
                                                      DEVICE_NOTIFY_WINDOW_HANDLE);         //__in  DWORD Flags
-        if (hNotification == NULL)
+        if (!hNotification)
         {
             const DWORD lastError = ::GetLastError();
             if (lastError != ERROR_CALL_NOT_IMPLEMENTED   && //fail on SAMBA share: this shouldn't be a showstopper!

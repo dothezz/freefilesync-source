@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Konfiguriere Filter</target>
 
-<source>Customize columns</source>
-<target>Spalten anpassen</target>
-
 <source>Global settings</source>
 <target>Globale Einstellungen</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Auswählen</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Fehler beim Lesen der Synchronisationsdatenbank:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Fehler beim Schreiben der Synchronisationsdatenbank:</target>
-
 <source>Invalid command line: %x</source>
 <target>Ungültige Befehlszeile: %x</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Fatal Error</source>
+<target>Schwerer Fehler</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows Fehlercode %x:</target>
@@ -139,14 +136,20 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Fehler beim Lesen der Synchronisationsdatenbank:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Fehler beim Schreiben der Synchronisationsdatenbank:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Inkompatibles Datenbankformat:</target>
+
 <source>Initial synchronization:</source>
 <target>Erstmalige Synchronisation:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Eine der FreeFileSync Datenbankdateien existiert noch nicht:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Inkompatibles Datenbankformat:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Die Datenbankdateien enthalten keine gemeinsame Synchronisationssitzung:</target>
@@ -172,12 +175,6 @@
 <pluralform>%x Sek.</pluralform>
 </target>
 
-<source>Info</source>
-<target>Info</target>
-
-<source>Fatal Error</source>
-<target>Schwerer Fehler</target>
-
 <source>Error reading file:</source>
 <target>Fehler beim Lesen der Datei:</target>
 
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>Fehler beim Auswerten der Konfigurationsdatei:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Fehler beim Verschieben in den Papierkorb:</target>
+<source>Configuration loaded partially only:</source>
+<target>Die Konfiguration wurde nur teilweise geladen:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Eine benötigte DLL konnte nicht geladen werden:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>%x kann nicht in den Papierkorb verschoben werden!</target>
+
+<source>Cannot load file %x.</source>
+<target>Die Datei %x kann nicht geladen werden.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Fehler beim Zugriff auf den Volumenschattenkopiedienst!</target>
@@ -214,10 +214,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Das Erstellen von Schattenkopien unter WOW64 wird nicht unterstützt. Bitte benutzen Sie die FreeFileSync 64-Bit Version.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Der Laufwerksname für folgende Datei konnte nicht ermittelt werden:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Laufwerksname der Datei kann nicht ermittelt werden:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Laufwerksname %x ist kein Teil des Dateinamens %y!</target>
 
 <source>/sec</source>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>Die Datei existiert nicht:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Die folgenden XML Knoten konnten nicht gelesen werden:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Die folgenden XML-Elemente können nicht gelesen werden:</target>
 
 <source>S&ave configuration...</source>
 <target>Konfiguration s&peichern...</target>
@@ -453,9 +453,6 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>2. &Synchronize...</source>
 <target>2. &Synchronisieren...</target>
 
-<source>S&witch view</source>
-<target>Ansicht &wechseln</target>
-
 <source>&New</source>
 <target>&Neu</target>
 
@@ -543,17 +540,17 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Speed:</source>
 <target>Geschwindigkeit:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Verbleibende Zeit:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Vergangene Zeit:</target>
 
 <source>Batch job</source>
 <target>Batch-Job</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Erzeuge eine Batchdatei für die automatisierte Synchronisation. Um den Batchmodus zu starten, einfach auf die Datei doppelklicken oder über die Befehlszeile ausführen: FreeFileSync.exe <ffs_batch-Datei>. Dies kann auch in den Taskplaner des Betriebssystems eingetragen werden.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Erzeuge eine Batchdatei für die automatisierte Synchronisation. Um den Batchmodus zu starten, einfach auf diese Datei doppelklicken oder den Befehl ausführen: FreeFileSync.exe SyncJob.ffs_batch. Dies kann auch in den Taskplaner des Betriebssystems eingetragen werden.</target>
 
 <source>Help</source>
 <target>Hilfe</target>
@@ -567,8 +564,8 @@ Die Befehlszeile wird ausgeführt wenn:
 <source>Right</source>
 <target>Rechts</target>
 
-<source>Overview</source>
-<target>Übersicht</target>
+<source>Sync setttings</source>
+<target>Synchronisationseinstellungen</target>
 
 <source>Status feedback</source>
 <target>Statusrückmeldung</target>
@@ -714,8 +711,8 @@ gleich ist
 <source>Published under the GNU General Public License</source>
 <target>Veröffentlicht unter der Allgemeinen Öffentlichen GNU-Lizenz</target>
 
-<source>Ignore subsequent errors</source>
-<target>Nachfolgende Fehler ignorieren</target>
+<source>Ignore further errors</source>
+<target>Weitere Fehler ignorieren</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Weitere Fehlermeldungen während des laufenden Prozesses ausblenden</target>
@@ -738,22 +735,22 @@ gleich ist
 <source>&No</source>
 <target>&Nein</target>
 
+<source>Use Recycle Bin</source>
+<target>Papierkorb verwenden</target>
+
 <source>Delete on both sides</source>
 <target>Auf beiden Seiten löschen</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Lösche auf beiden Seiten, auch wenn die Datei nur auf einer Seite markiert ist</target>
 
-<source>Use Recycle Bin</source>
-<target>Papierkorb verwenden</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Für die Synchronisation werden nur Dateien/Verzeichnisse berücksichtigt, die zu allen Filtereinstellungen passen.
-Achtung: Der Namensfilter muss relativ zu den Hauptsynchronisationsverzeichnissen eingegeben werden.
+Nur Dateien, die zu allen Filtereinstellungen passen, werden synchronisiert.
+Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 </target>
 
 <source>Hints:</source>
@@ -789,20 +786,20 @@ Ausschließen: \stuff\temp\*
 <source>Exclude</source>
 <target>Ausschließen</target>
 
-<source>Minimum file size</source>
-<target>Minimale Dateigröße</target>
+<source>Time span</source>
+<target>Zeitspanne</target>
 
-<source>Maximum file size</source>
-<target>Maximale Dateigröße</target>
+<source>File size</source>
+<target>Dateigröße</target>
+
+<source>Minimum</source>
+<target>Minimum</target>
+
+<source>Maximum</source>
+<target>Maximum</target>
 
 <source>&Default</source>
 <target>&Standard</target>
-
-<source>Move column up</source>
-<target>Spalte nach oben verschieben</target>
-
-<source>Move column down</source>
-<target>Spalte nach unten verschieben</target>
 
 <source>Transactional file copy</source>
 <target>Dateien als Transaktion kopieren</target>
@@ -822,14 +819,8 @@ Ausschließen: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Übertrage Datei- und Verzeichnisberechtigungen (Benötigt Administratorrechte)</target>
 
-<source>Hidden dialogs:</source>
-<target>Versteckte Dialoge:</target>
-
-<source>Reset</source>
-<target>Zurücksetzen</target>
-
-<source>Show hidden dialogs</source>
-<target>Zeige versteckte Dialoge</target>
+<source>Restore hidden dialogs</source>
+<target>Versteckte Dialoge wiederherstellen</target>
 
 <source>External applications</source>
 <target>Externe Anwendungen</target>
@@ -861,8 +852,8 @@ Ausschließen: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Verzeichnispaare</target>
 
-<source>Compressed view</source>
-<target>Komprimierte Ansicht</target>
+<source>Overview</source>
+<target>Übersicht</target>
 
 <source>Select view</source>
 <target>Ansicht auswählen</target>
@@ -891,8 +882,8 @@ Ausschließen: \stuff\temp\*
 <source>Exclude all</source>
 <target>Alle ausschließen</target>
 
-<source>Icon size:</source>
-<target>Symbolgröße</target>
+<source>Show icons:</source>
+<target>Symbole anzeigen:</target>
 
 <source>Small</source>
 <target>Klein</target>
@@ -917,6 +908,9 @@ Ausschließen: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Konfiguration gespeichert!</target>
+
+<source>Never save changes</source>
+<target>Änderungen niemals speichern</target>
 
 <source>Save changes to current configuration?</source>
 <target>Änderungen der aktuellen Konfiguration sichern?</target>
@@ -1029,9 +1023,6 @@ Ausschließen: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Fehler beim Schreiben der Datei:</target>
 
-<source>Batch file created successfully!</source>
-<target>Batchdatei wurde erfolgreich erstellt!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1110,6 +1101,9 @@ Ausschließen: \stuff\temp\*
 <source>This year</source>
 <target>Dieses Jahr</target>
 
+<source>Last x days</source>
+<target>Letzte x Tage</target>
+
 <source>Byte</source>
 <target>Byte</target>
 
@@ -1119,11 +1113,8 @@ Ausschließen: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filter: Alle Verzeichnispaare</target>
-
-<source>Filter: Single pair</source>
-<target>Filter: Einzelnes Verzeichnispaar</target>
+<source>Filter</source>
+<target>Filter</target>
 
 <source>Direct</source>
 <target>Direkt</target>
@@ -1149,8 +1140,8 @@ Ausschließen: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Entsprechung der anderen Seite zu %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Alle versteckten Dialoge wieder sichtbar machen?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Versteckte Dialoge und Warnungen wieder sichtbar machen?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1321,13 +1312,13 @@ Ausschließen: \stuff\temp\*
 <target>Das Verzeichnis existiert nicht:</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
-<target>Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationseinstellungen:</target>
+<target>Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationsregeln:</target>
 
 <source>Preparing synchronization...</source>
 <target>Bereite Synchronisation vor...</target>
 
-<source>Memory allocation failed!</source>
-<target>Speicherallokation fehlgeschlagen!</target>
+<source>Out of memory!</source>
+<target>Nicht genügend Arbeitsspeicher!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Die Datei %x hat ein ungültiges Datum!</target>
@@ -1474,7 +1465,7 @@ Ausschließen: \stuff\temp\*
 <target>Der Papierkorb ist auf nachfolgenden Verzeichnissen nicht verfügbar! Die Dateien werden stattdessen permanent gelöscht:</target>
 
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Es wird ein Verzeichnis verändert werden, das Teil mehrerer Verzeichnispaare ist! Bitte die Synchronisationseinstellungen prüfen!</target>
+<target>Ein Verzeichnis wird verändert werden, das Teil mehrerer Verzeichnispaare ist! Bitte überprüfen Sie die Synchronisationseinstellungen!</target>
 
 <source>Processing folder pair:</source>
 <target>Bearbeite Verzeichnispaar:</target>
@@ -1482,11 +1473,11 @@ Ausschließen: \stuff\temp\*
 <source>Generating database...</source>
 <target>Erzeuge Synchronisationsdatenbank...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Nichts zu synchronisieren gemäß den aktuellen Einstellungen!</target>
+<source>Nothing to synchronize!</source>
+<target>Nichts zu synchronisieren!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Fehler beim Kopieren der gesperrten Datei %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Die gesperrte Datei %x kann nicht kopiert werden!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Verifizierungsfehler: Quell- und Zieldatei haben unterschiedlichen Inhalt!</target>

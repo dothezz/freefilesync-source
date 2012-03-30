@@ -38,12 +38,12 @@ BitmapButton::BitmapButton(wxWindow* parent,
 }
 
 
-void BitmapButton::setBitmapFront(const wxBitmap& bitmap, unsigned spaceAfter)
+void BitmapButton::setBitmapFront(const wxBitmap& bitmap, size_t spaceAfter)
 {
     if (!isEqual(bitmap, bitmapFront) || spaceAfter != m_spaceAfter) //avoid flicker
     {
         bitmapFront  = bitmap;
-        m_spaceAfter = spaceAfter;
+        m_spaceAfter = static_cast<unsigned int>(spaceAfter);
         refreshButtonLabel();
     }
 }
@@ -60,12 +60,12 @@ void BitmapButton::setTextLabel(const wxString& text)
 }
 
 
-void BitmapButton::setBitmapBack(const wxBitmap& bitmap, unsigned spaceBefore)
+void BitmapButton::setBitmapBack(const wxBitmap& bitmap, size_t spaceBefore)
 {
     if (!isEqual(bitmap, bitmapBack) || spaceBefore != m_spaceBefore) //avoid flicker
     {
         bitmapBack    = bitmap;
-        m_spaceBefore = spaceBefore;
+        m_spaceBefore = static_cast<unsigned int>(spaceBefore);
         refreshButtonLabel();
     }
 }
@@ -106,7 +106,7 @@ wxSize getSizeNeeded(const wxString& text, wxFont& font)
 
     wxString textFormatted = text;
     textFormatted.Replace(wxT("&"), wxT(""), false); //remove accelerator
-    dc.GetMultiLineTextExtent(textFormatted, &width, &height , NULL, &font);
+    dc.GetMultiLineTextExtent(textFormatted, &width, &height, nullptr, &font);
     return wxSize(width, height);
 }
 

@@ -7,15 +7,11 @@
 #ifndef PROGRESSINDICATOR_H_INCLUDED
 #define PROGRESSINDICATOR_H_INCLUDED
 
+#include <zen/error_log.h>
 #include <zen/zstring.h>
 #include <wx/toplevel.h>
 #include "../lib/status_handler.h"
 #include "main_dlg.h"
-
-namespace zen
-{
-class ErrorLogging;
-}
 
 
 class CompareStatus
@@ -57,7 +53,7 @@ public:
     };
 
     SyncStatus(AbortCallback& abortCb,
-               MainDialog* parentWindow, //may be NULL
+               MainDialog* parentWindow, //may be nullptr
                SyncStatusID startStatus,
                bool showProgress,
                const wxString& jobName,
@@ -82,7 +78,7 @@ public:
 
     //essential to call one of these two methods in StatusUpdater derived class destructor at the LATEST(!)
     //to prevent access to callback to updater (e.g. request abort)
-    void processHasFinished(SyncStatusID id, const zen::ErrorLogging& log);
+    void processHasFinished(SyncStatusID id, const zen::ErrorLog& log);
     void closeWindowDirectly(); //don't wait for user
 
 private:

@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20110906;23572100">
+	<META NAME="CHANGED" CONTENT="20120324;18334600">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -28,14 +28,11 @@
 Automated Synchronization -</SPAN></I></FONT></H3>
 <P ALIGN=LEFT><BR><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">RealtimeSync's
-primary function is to trigger synchronization immediately after
-files in a source directory have changed. However its implementation
-is more flexible to cover an even broader range of use: A list of
-directories provided by the user is monitored for changes. Whenever a
-file within these directories or sub directories is modified OR the
-directory becomes available (e. g. insert of a USB-stick),
-RealtimeSync responds by executing the user-specified command line.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">RealtimeSync
+is a small tool which executes a command line each time it detects
+changes in one of the monitored directories <SPAN STYLE="font-style: normal"><B>or</B></SPAN>
+a directory becomes available (e. g. insert of a USB-stick). Usually
+this command line will simply trigger a FreeFileSync batch job.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
@@ -44,11 +41,11 @@ combination with FreeFileSync</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">First
 start up RealtimeSync.exe located in FreeFileSync's installation
 directory. Then specify all directories that shall be monitored.
-Instead of doing this manually you can simply import a </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
+Instead of doing this manually you can import a </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
 <FONT FACE="Tahoma, sans-serif">file via </FONT><FONT FACE="Tahoma, sans-serif"><I>Menu
 -&gt; File -&gt; Load configuration</I></FONT><FONT FACE="Tahoma, sans-serif">.
 This not only extracts all directories relevant for synchronization
-but also sets up the command-line to execute the </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
+but also sets up the command line to execute the </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
 <FONT FACE="Tahoma, sans-serif">file each time changes are detected.
 Now press &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Start</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
 to begin monitoring.</FONT></P>
@@ -68,7 +65,7 @@ to begin monitoring.</FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
 		settings dialog can be skipped by passing a RealtimeSync
 		configuration file (<FONT FACE="Courier New, monospace">*.ffs_real</FONT>)
-		OR a FreeFileSync batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
+		<B>or</B> a FreeFileSync batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
 		as first command-line argument to RealtimeSync.exe. This allows for
 		integration with the operating system's auto start
 		facility:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Courier New, monospace">&quot;C:\Program
@@ -124,7 +121,7 @@ directories. (Windows)</FONT></P>
 	<P><SPAN ID="Rahmen4" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 		<UL>
 			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace"><FONT FACE="Tahoma, sans-serif">Show
-			which file or directory has triggered a change. Enter into command
+			which file or directory has triggered a change. Enter command
 			line:</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo
 			&quot;%changed_file%&quot; &amp; pause<BR><BR><FONT FACE="Tahoma, sans-serif">Write
 			a list of all changes to a logfile:</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;cmd
@@ -133,7 +130,7 @@ directories. (Windows)</FONT></P>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
 </UL>
-<P STYLE="margin-bottom: 0cm; text-decoration: none"><BR>
+<P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Tahoma, sans-serif">Limitations:</FONT></P>
 <UL>

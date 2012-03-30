@@ -51,43 +51,54 @@ private:
 };
 
 
-//wxInputStream proxy throwing FileError on error
-class CheckedReader
+class CheckedIo
 {
-public:
-    CheckedReader(wxInputStream& stream, const Zstring& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
+protected:
+    CheckedIo(wxStreamBase& stream) : stream_(stream) {}
 
-    template <class T>
-    T readNumberC() const; //throw FileError, checked read operation
-
-    template <class S>
-    S readStringC() const; //throw FileError, checked read operation
+    void check() const
+    {
+        if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
+            throwException();
+    }
+    virtual void throwException() const = 0;
 
 private:
-    void check() const;
+    wxStreamBase& stream_;
+};
 
+
+//wxInputStream proxy throwing exception on error
+class CheckedReader : private CheckedIo
+{
+public:
+    CheckedReader(wxInputStream& stream) : CheckedIo(stream), stream_(stream) {}
+
+    template <class T>
+    T readPOD() const; //throw!
+
+    template <class S>
+    S readString() const; //throw!
+
+private:
     wxInputStream& stream_;
-    const Zstring& errorObjName_; //used for error text only
 };
 
 
 //wxOutputStream proxy throwing FileError on error
-class CheckedWriter
+class CheckedWriter : private CheckedIo
 {
 public:
-    CheckedWriter(wxOutputStream& stream, const Zstring& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
+    CheckedWriter(wxOutputStream& stream) : CheckedIo(stream), stream_(stream) {}
 
     template <class T>
-    void writeNumberC(T number) const; //throw FileError, checked write operation
+    void writePOD(T number) const; //throw!
 
     template <class S>
-    void writeStringC(const S& str) const; //throw FileError, checked write operation
+    void writeString(const S& str) const; //throw!
 
 private:
-    void check() const;
-
     wxOutputStream& stream_;
-    const Zstring& errorObjName_; //used for error text only!
 };
 
 
@@ -139,8 +150,11 @@ S readString(wxInputStream& stream)
 
     const auto strLength = readPOD<std::uint32_t>(stream);
     S output;
-    output.resize(strLength); //throw std::bad_alloc
-    stream.Read(&*output.begin(), sizeof(CharType) * strLength);
+    if (strLength > 0)
+    {
+        output.resize(strLength); //throw std::bad_alloc
+        stream.Read(&*output.begin(), sizeof(CharType) * strLength);
+    }
     return output;
 }
 
@@ -153,68 +167,49 @@ void writeString(wxOutputStream& stream, const S& str)
 }
 
 
-inline
-void CheckedReader::check() const
-{
-    if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
-        throw zen::FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\"");
-}
-
-
 template <class T>
 inline
-T CheckedReader::readNumberC() const //checked read operation
+T CheckedReader::readPOD() const //checked read operation
 {
-    T output = readPOD<T>(stream_);
+    T output = zen::readPOD<T>(stream_);
     check();
     return output;
 }
 
 
 template <class S> inline
-S CheckedReader::readStringC() const //checked read operation
+S CheckedReader::readString() const //checked read operation
 {
     S output;
     try
     {
-        output = readString<S>(stream_); //throw std::bad_alloc
-        check();
-        if (stream_.LastRead() != output.length() * sizeof(typename S::value_type)) //some additional check
-            throw FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\"");
+        output = zen::readString<S>(stream_); //throw std::bad_alloc
     }
-    catch (std::exception&)
-    {
-        throw FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\"");
-    }
+    catch (std::exception&) { throwException(); }
+
+    check();
+    if (stream_.LastRead() != output.length() * sizeof(typename S::value_type)) //some additional check
+        throwException();
     return output;
 }
 
 
 template <class T> inline
-void CheckedWriter::writeNumberC(T number) const //checked write operation
+void CheckedWriter::writePOD(T number) const //checked write operation
 {
-    writePOD<T>(stream_, number);
+    zen::writePOD<T>(stream_, number);
     check();
 }
 
 
 template <class S> inline
-void CheckedWriter::writeStringC(const S& str) const //checked write operation
+void CheckedWriter::writeString(const S& str) const //checked write operation
 {
-    writeString(stream_, str);
+    zen::writeString(stream_, str);
     check();
     if (stream_.LastWrite() != str.length() * sizeof(typename S::value_type)) //some additional check
-        throw FileError(_("Error writing to synchronization database:") + L" \n" + L"\"" + errorObjName_ + L"\"");
+        throwException();
 }
-
-
-inline
-void CheckedWriter::check() const
-{
-    if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
-        throw FileError(_("Error writing to synchronization database:") + L" \n" + L"\"" + errorObjName_ + L"\"");
-}
-
 }
 
 #endif //SERIALIZE_H_INCLUDED

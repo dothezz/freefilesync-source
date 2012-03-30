@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Налаштування фільтра</target>
 
-<source>Customize columns</source>
-<target>Вибір колонок</target>
-
 <source>Global settings</source>
 <target>Глобальні налаштування</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Переглянути</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Помилка при читанні з бази даних синхронізації:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Помилка при записі у базу данних синхронізації:</target>
-
 <source>Invalid command line: %x</source>
 <target>Неправильний командний рядок: %x</target>
+
+<source>Info</source>
+<target>Інформація</target>
+
+<source>Fatal Error</source>
+<target>Критична помилка</target>
 
 <source>Windows Error Code %x:</source>
 <target>Код помилки Windows %x:</target>
@@ -140,14 +137,20 @@
 <pluralform>%x байтів</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Помилка при читанні з бази даних синхронізації:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Помилка при записі у базу данних синхронізації:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Несумісний формат бази даних синхронізації:</target>
+
 <source>Initial synchronization:</source>
 <target>Вступна синхронізація:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Файлу бази даних FreeFileSync ще не існує:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Несумісний формат бази даних синхронізації:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Файли бази даних не мають спільної сесії синхронізації</target>
@@ -174,12 +177,6 @@
 <pluralform>%x сек</pluralform>
 </target>
 
-<source>Info</source>
-<target>Інформація</target>
-
-<source>Fatal Error</source>
-<target>Критична помилка</target>
-
 <source>Error reading file:</source>
 <target>Помилка при читанні файлу:</target>
 
@@ -205,11 +202,14 @@
 <source>Error parsing configuration file:</source>
 <target>Помилка при анализі файлу налаштувань синхронізації:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Помилка переміщення в "Корзину":</target>
+<source>Configuration loaded partially only:</source>
+<target>Конфігурація завантажена лише частково</target>
 
-<source>Could not load a required DLL:</source>
-<target>Не вдалося завантажити необхідні DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Не вдається перенести %x до Корзини!</target>
+
+<source>Cannot load file %x.</source>
+<target>Не вдається завантажити файл %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Помилка доступу до послуги Тіньового Копіювання Тому</target>
@@ -217,10 +217,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Створення тіньових копій на WOW64 не підтримується. Будь ласка, використайте FreeFileSync 64-розрядної версії.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Не вдалося визначити назву тому для файлу:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Не вдається визначити назву тому для файла:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Ім’я тому %x не є частиною імені файлу %y!</target>
 
 <source>/sec</source>
@@ -229,8 +229,8 @@
 <source>File does not exist:</source>
 <target>Файл не існує:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Не вдалося прочитати значення таких XML записів:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Не вдається прочитати такі елементи XML:</target>
 
 <source>S&ave configuration...</source>
 <target>Зберегти налаштування...</target>
@@ -412,7 +412,7 @@ The command line is executed each time:
 <target>Повний шлях</target>
 
 <source>Name</source>
-<target></target>
+<target>Назва</target>
 
 <source>Relative path</source>
 <target>Відносний шлях</target>
@@ -455,9 +455,6 @@ The command line is executed each time:
 
 <source>2. &Synchronize...</source>
 <target>2. &Синхронізувати</target>
-
-<source>S&witch view</source>
-<target>Змінити відображення</target>
 
 <source>&New</source>
 <target>&Нова</target>
@@ -549,17 +546,17 @@ The command line is executed each time:
 <source>Speed:</source>
 <target>Швидкість:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Залишилось часу:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Пройшло часу:</target>
 
 <source>Batch job</source>
 <target>Пакетне завдання</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Створіть пакетний файл для автоматичної синхронізації. Для виконання пакетної синхронізації просто двічі клацніть файл мишкою або скористайтесь командним рядком: FreeFileSync.exe <ffs_batch file>. Можна також використати планувальник завдань операційної системи</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Створити комакндний файл і автоматизувати синхронізацію. Для виконання пакетної синхронізації просто двічі клацніть файл мишкою або скористайтесь командним рядком: FreeFileSync.exe <ffs_batch file>. Можна також використати планувальник завдань операційної системи</target>
 
 <source>Help</source>
 <target>Допомога</target>
@@ -572,9 +569,6 @@ The command line is executed each time:
 
 <source>Right</source>
 <target>Праворуч</target>
-
-<source>Overview</source>
-<target>Головна</target>
 
 <source>Status feedback</source>
 <target>Статус оберненого зв’язку</target>
@@ -693,7 +687,7 @@ is the same
 <target>Код програми написаний на C++ з використанням:</target>
 
 <source>Feedback and suggestions are welcome</source>
-<target></target>
+<target>Відгуки та пропозиції вітаються</target>
 
 <source>Homepage</source>
 <target>Оф.сайт</target>
@@ -716,8 +710,8 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>Видано за ліцензією GNU General Public License</target>
 
-<source>Ignore subsequent errors</source>
-<target>Ігнорувати наступні помилки</target>
+<source>Ignore further errors</source>
+<target>Ігнорувати майбутні помилки</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Приховати наступні помилки підчас цього процесу</target>
@@ -740,22 +734,22 @@ is the same
 <source>&No</source>
 <target>&Ні</target>
 
+<source>Use Recycle Bin</source>
+<target>Використовувати "Корзину"</target>
+
 <source>Delete on both sides</source>
 <target>Вилучити з обох сторін</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Вилучити з обох сторін, навіть якщо файл виділений тільки з однієї сторони</target>
 
-<source>Use Recycle Bin</source>
-<target>Використовувати "Корзину"</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Тільки файли/каталоги, які пройдуть фільтрацію будуть відібрані для синхронізації. 
-Фільтр буде застосовуватися до імен відносно(!) основних синхронізованих папок.
+Тільки файли, які задовільняють всім налаштуванням фільтра будуть синхронізовані. 
+Увага: Назви файлів вказуються відносно базових каталогів.
 </target>
 
 <source>Hints:</source>
@@ -791,20 +785,20 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>Виключити</target>
 
-<source>Minimum file size</source>
-<target>Мінімальний розмір файлу</target>
+<source>Time span</source>
+<target>Часовий інтервал</target>
 
-<source>Maximum file size</source>
-<target>Максимальний розмір файлу</target>
+<source>File size</source>
+<target>Розмір файла</target>
+
+<source>Minimum</source>
+<target>Мінімум</target>
+
+<source>Maximum</source>
+<target>Максимум</target>
 
 <source>&Default</source>
 <target>&За замовчуванням</target>
-
-<source>Move column up</source>
-<target>Перемістити догори</target>
-
-<source>Move column down</source>
-<target>Перемістити донизу</target>
 
 <source>Transactional file copy</source>
 <target>Копіювання файлів з використанням трансакцій</target>
@@ -824,14 +818,8 @@ Exclude: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Передача прав доступу файлу/каталогу (потрібні права Адміністратора)</target>
 
-<source>Hidden dialogs:</source>
-<target>Приховані діалоги</target>
-
-<source>Reset</source>
-<target>Скинути</target>
-
-<source>Show hidden dialogs</source>
-<target>Показати приховані діалоги</target>
+<source>Restore hidden dialogs</source>
+<target>Відновити сховані діалоги</target>
 
 <source>External applications</source>
 <target>Зовнішні програми</target>
@@ -863,8 +851,8 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Пари папок</target>
 
-<source>Compressed view</source>
-<target></target>
+<source>Overview</source>
+<target>Головна</target>
 
 <source>Select view</source>
 <target>Список файлів</target>
@@ -888,13 +876,13 @@ Exclude: \stuff\temp\*
 <target>Видалити</target>
 
 <source>Include all</source>
-<target></target>
+<target>Включити все</target>
 
 <source>Exclude all</source>
-<target></target>
+<target>Виключити все</target>
 
-<source>Icon size:</source>
-<target>Розмір іконки:</target>
+<source>Show icons:</source>
+<target>Показати іконки:</target>
 
 <source>Small</source>
 <target>Малий</target>
@@ -909,7 +897,7 @@ Exclude: \stuff\temp\*
 <target>Виберіть інтервал часу...</target>
 
 <source>Default view</source>
-<target></target>
+<target>Вигляд за замовчуванням</target>
 
 <source>Show "%x"</source>
 <target>Показати "%x"</target>
@@ -919,6 +907,9 @@ Exclude: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Налаштування синхронізації збережено!</target>
+
+<source>Never save changes</source>
+<target>Ніколи не зберігати змін</target>
 
 <source>Save changes to current configuration?</source>
 <target>Зберегти зміни в активних налаштуваннях?</target>
@@ -1031,9 +1022,6 @@ Exclude: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Помилка при записі файлу:</target>
 
-<source>Batch file created successfully!</source>
-<target>Файл завдання успішно створений!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1116,6 +1104,9 @@ Exclude: \stuff\temp\*
 <source>This year</source>
 <target>Цього року</target>
 
+<source>Last x days</source>
+<target>Останні x днів</target>
+
 <source>Byte</source>
 <target>Байт</target>
 
@@ -1125,11 +1116,8 @@ Exclude: \stuff\temp\*
 <source>MB</source>
 <target>МБ</target>
 
-<source>Filter: All pairs</source>
-<target>Фільтр: Всі пари</target>
-
-<source>Filter: Single pair</source>
-<target>Фільтр: Одна пара</target>
+<source>Filter</source>
+<target>Фільтр</target>
 
 <source>Direct</source>
 <target>Прямо</target>
@@ -1155,8 +1143,8 @@ Exclude: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- аналогічна папка з другої сторони</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Відновити всі приховані діалогові вікна?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Зробити приховані діалоги та попередження знову видимими?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1197,10 +1185,10 @@ Exclude: \stuff\temp\*
 <target>Переміщати файли в підкатлог з часовою міткою</target>
 
 <source>Files</source>
-<target></target>
+<target>Файли</target>
 
 <source>Percentage</source>
-<target></target>
+<target>Проценти</target>
 
 <source>%x TB</source>
 <target>%x ТБ</target>
@@ -1292,9 +1280,6 @@ Exclude: \stuff\temp\*
 <source>Error copying file:</source>
 <target>Помилка при копіюванні файлу:</target>
 
-<source>Error opening file:</source>
-<target>Помилка при відкриванні файлу:</target>
-
 <source>Error traversing directory:</source>
 <target>Помилка обходу каталогу:</target>
 
@@ -1338,10 +1323,10 @@ Exclude: \stuff\temp\*
 <target>Залежні каталоги! Будьте уважні при налаштуванні правил синхронізації:</target>
 
 <source>Preparing synchronization...</source>
-<target></target>
+<target>Підготовка до синхронізації...</target>
 
-<source>Memory allocation failed!</source>
-<target>Помилка виділення пам’яті! (Не хватает памяти)</target>
+<source>Out of memory!</source>
+<target>Бракує пам'яті!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Файл %x має неіснуючу дату!</target>
@@ -1458,7 +1443,7 @@ Exclude: \stuff\temp\*
 <target>Кінцевий каталог не повинен бути порожнім</target>
 
 <source>Directory for file versioning was not supplied!</source>
-<target></target>
+<target>Не вказаний каталог для старих версій файлів!</target>
 
 <source>Source directory does not exist anymore:</source>
 <target>Каталог-джерело вже не існує:</target>
@@ -1496,11 +1481,11 @@ Exclude: \stuff\temp\*
 <source>Generating database...</source>
 <target>Створення бази даних...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Нічого синхронізувати згідно з налаштуваннями синхронізації!</target>
+<source>Nothing to synchronize!</source>
+<target>Нічого синхронізувати!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Помилка при копіюванні заблокованого файлу %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Не можу зкопіювати заблокований файл %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Помилка перевірки даних: вхідний і вихідний файли мають різний вміст!</target>

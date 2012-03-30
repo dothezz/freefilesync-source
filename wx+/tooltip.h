@@ -17,7 +17,7 @@ public:
     Tooltip();
     ~Tooltip();
 
-    void show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp = NULL); //absolute screen coordinates
+    void show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp = nullptr); //absolute screen coordinates
     void hide();
 
 private:

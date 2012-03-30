@@ -21,7 +21,7 @@
 namespace zen
 {
 #ifdef FFS_WIN
-typedef std::pair<decltype(BY_HANDLE_FILE_INFORMATION().dwVolumeSerialNumber), decltype(ULARGE_INTEGER().QuadPart)> FileId; //(volume serial number, file ID)
+typedef std::pair<DWORD, ULONGLONG> FileId; //(volume serial number, file ID)
 
 inline
 FileId extractFileID(const BY_HANDLE_FILE_INFORMATION& fileInfo)
@@ -41,16 +41,10 @@ FileId extractFileID(DWORD dwVolumeSerialNumber, ULARGE_INTEGER fileId)
            FileId(dwVolumeSerialNumber, fileId.QuadPart) : FileId();
 }
 
-namespace impl
-{
-inline
-void validate(const FileId& id, const BY_HANDLE_FILE_INFORMATION& fileInfo)
-{
-    assert_static(sizeof(id.second) == sizeof(fileInfo.nFileIndexHigh) + sizeof(fileInfo.nFileIndexLow));
-    assert_static(sizeof(id.first ) == sizeof(DWORD));
-    assert_static(sizeof(id.second) == sizeof(ULARGE_INTEGER));
-}
-}
+assert_static(sizeof(FileId().first ) == sizeof(BY_HANDLE_FILE_INFORMATION().dwVolumeSerialNumber));
+assert_static(sizeof(FileId().second) == sizeof(BY_HANDLE_FILE_INFORMATION().nFileIndexHigh) + sizeof(BY_HANDLE_FILE_INFORMATION().nFileIndexLow));
+assert_static(sizeof(FileId().second) == sizeof(ULARGE_INTEGER));
+
 
 #elif defined FFS_LINUX
 namespace impl { typedef struct ::stat StatDummy; } //sigh...
@@ -58,7 +52,7 @@ namespace impl { typedef struct ::stat StatDummy; } //sigh...
 typedef std::pair<decltype(impl::StatDummy::st_dev), decltype(impl::StatDummy::st_ino)> FileId; //(device id, inode)
 
 inline
-FileId extractFileID(const struct stat& fileInfo)
+FileId extractFileID(const struct ::stat& fileInfo)
 {
     return fileInfo.st_dev != 0 && fileInfo.st_ino != 0 ?
            FileId(fileInfo.st_dev, fileInfo.st_ino) : FileId();

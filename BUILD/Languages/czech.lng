@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Nastavení filtru</target>
 
-<source>Customize columns</source>
-<target>Vlastní sloupce</target>
-
 <source>Global settings</source>
 <target>Nastavení programu</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Procházet</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Chyba čtení synchronizační databáze:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Chyba zápisu synchronizační databáze:</target>
-
 <source>Invalid command line: %x</source>
 <target>Neplatný příkaz: %x</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Fatal Error</source>
+<target>Závažná chyba</target>
 
 <source>Windows Error Code %x:</source>
 <target>Chybový kód Windows %x:</target>
@@ -119,7 +116,7 @@
 <target>Chybový kód Linux %x:</target>
 
 <source>Error resolving symbolic link:</source>
-<target>Chyba odkazu zástupce:</target>
+<target>Nelze najít odkaz zástupce:</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -140,14 +137,20 @@
 <pluralform>%x B</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Nelze číst ze synchronizační databáze:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Nelze zapsat do synchronizační databáze:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Chybný formát synchronizační databáze:</target>
+
 <source>Initial synchronization:</source>
 <target>Prvotní synchronizace:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Některý z databázových souborů FreeFileSync neexistuje:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Chyba formátu synchronizační databáze:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Databázové soubory nejsou navzájem komplementární</target>
@@ -156,13 +159,13 @@
 <target>Vyskytla se chyba!</target>
 
 <source>Error reading file attributes:</source>
-<target>Chyba čtení atributů souboru:</target>
+<target>Nelze číst atributy souboru:</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Čekání na uzamčení adresáře (%x)</target>
 
 <source>Error setting directory lock:</source>
-<target>Chyba nastavení zámku adresáře:</target>
+<target>Nelze nastavit zámek adresáře:</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -174,14 +177,8 @@
 <pluralform>%x sekund</pluralform>
 </target>
 
-<source>Info</source>
-<target>Info</target>
-
-<source>Fatal Error</source>
-<target>Závažná chyba</target>
-
 <source>Error reading file:</source>
-<target>Chyba čtení souboru:</target>
+<target>Nelze číst soubor:</target>
 
 <source>Scanning:</source>
 <target>Zpracováváno:</target>
@@ -203,24 +200,27 @@
 <target>Chybný konfigurační soubor FreeFileSync!</target>
 
 <source>Error parsing configuration file:</source>
-<target>Chyba zpracování konfigurace:</target>
+<target>Nelze zpracovat konfigurační soubor:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Chyba přesunu do Koše:</target>
+<source>Configuration loaded partially only:</source>
+<target>Konfigurace byla načtena jen částečně:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Nelze načíst požadovanou knihovnu DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Není možné přesunout %x do Koše!</target>
+
+<source>Cannot load file %x.</source>
+<target>Nelze načíst soubor %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
-<target>Chyba přístupu ke službě Volume Shadow Copy Service!</target>
+<target>Nepodařil se přístup ke službě Volume Shadow Copy Service!</target>
 
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Vytváření stínových kopií na WOW64 není podporováno. Prosím použijte 64 bitovou verzi FreeFileSync.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Není možné zjistit jméno jednotky souboru:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Nelze zjistit jméno jednotky souboru:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Disk %x není součástí jména souboru %y!</target>
 
 <source>/sec</source>
@@ -229,8 +229,8 @@
 <source>File does not exist:</source>
 <target>Soubor neexistuje:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Nelze načíst hodnoty následujících XML elementy:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Nelze načíst následující XML elementy:</target>
 
 <source>S&ave configuration...</source>
 <target>&Uložení konfigurace...</target>
@@ -456,9 +456,6 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>2. &Synchronize...</source>
 <target>2. &Synchronizovat...</target>
 
-<source>S&witch view</source>
-<target>&Změnit zobrazení</target>
-
 <source>&New</source>
 <target>&Nový</target>
 
@@ -546,16 +543,16 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Speed:</source>
 <target>Rychlost:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Zbývající čas:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Uplynulý čas:</target>
 
 <source>Batch job</source>
 <target>Dávkový soubor</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
 <target>Vytvoří dávkový souboru pro automatický provoz. Ke spuštění dávky jednoduše poklikejte na vytvořený soubor nebo jeho jméno zadejte jako parametr při spuštění FreeFileSync: FreeFileSync.exe <jméno_souboru>. Stejně tak můžete ke spuštění využít plánovač úloh vašeho operačního systému.</target>
 
 <source>Help</source>
@@ -569,9 +566,6 @@ Příkazová řádka je spuštěna pokaždé když:
 
 <source>Right</source>
 <target>Pravý</target>
-
-<source>Overview</source>
-<target>Přehled</target>
 
 <source>Status feedback</source>
 <target>Běh programu</target>
@@ -717,7 +711,7 @@ je stejný
 <source>Published under the GNU General Public License</source>
 <target>Vydáno pod GNU General Public License (GPL)</target>
 
-<source>Ignore subsequent errors</source>
+<source>Ignore further errors</source>
 <target>Přeskočit další chyby</target>
 
 <source>Hide further error messages during the current process</source>
@@ -741,22 +735,22 @@ je stejný
 <source>&No</source>
 <target>&Ne</target>
 
+<source>Use Recycle Bin</source>
+<target>Použít Koš</target>
+
 <source>Delete on both sides</source>
 <target>Smazat z obou stran</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Smazat na obou stranách i když je soubor vybrán pouze na jedné z nich</target>
 
-<source>Use Recycle Bin</source>
-<target>Použít Koš</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Pouze soubory/adresáře odpovídající nastavenému filtru budou vybrány pro synchronizaci.
-Poznámka: Filtr je aplikován relativně(!) k cestě synchronizovaných adresářů.
+Pouze soubory odpovídající nastavenému filtru budou vybrány pro synchronizaci.
+Poznámka: Filtr je aplikován relativně k základním adresářům.
 </target>
 
 <source>Hints:</source>
@@ -792,20 +786,20 @@ Vynechat: \někde\něco\*
 <source>Exclude</source>
 <target>Vynechat</target>
 
-<source>Minimum file size</source>
-<target>Minimální velikost souboru:</target>
+<source>Time span</source>
+<target>Časové rozmezí</target>
 
-<source>Maximum file size</source>
-<target>Maximální velikost souboru:</target>
+<source>File size</source>
+<target>Velikost souboru</target>
+
+<source>Minimum</source>
+<target>Od</target>
+
+<source>Maximum</source>
+<target>Do</target>
 
 <source>&Default</source>
 <target>&Předdefinované</target>
-
-<source>Move column up</source>
-<target>Přesunout sloupec nahoru</target>
-
-<source>Move column down</source>
-<target>Přesunout sloupec dolů</target>
 
 <source>Transactional file copy</source>
 <target>Bezpečné kopírování souborů</target>
@@ -825,14 +819,8 @@ Vynechat: \někde\něco\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Přenést přístupová oprávnění souborů a adresářů (Vyžaduje administrátorké oprávnění)</target>
 
-<source>Hidden dialogs:</source>
-<target>Skryté dialogy:</target>
-
-<source>Reset</source>
-<target>Resetovat</target>
-
-<source>Show hidden dialogs</source>
-<target>Zobrazit skryté dialogy</target>
+<source>Restore hidden dialogs</source>
+<target>Obnovit skryté dialogy</target>
 
 <source>External applications</source>
 <target>Externí aplikace</target>
@@ -864,7 +852,7 @@ Vynechat: \někde\něco\*
 <source>Folder pairs</source>
 <target>Adresářové páry</target>
 
-<source>Compressed view</source>
+<source>Overview</source>
 <target>Navigační zobrazení</target>
 
 <source>Select view</source>
@@ -894,8 +882,8 @@ Vynechat: \někde\něco\*
 <source>Exclude all</source>
 <target>Vynechat vše</target>
 
-<source>Icon size:</source>
-<target>Velikost ikon:</target>
+<source>Show icons:</source>
+<target>Ikony:</target>
 
 <source>Small</source>
 <target>Malé</target>
@@ -920,6 +908,9 @@ Vynechat: \někde\něco\*
 
 <source>Configuration saved!</source>
 <target>Konfigurace uložena.</target>
+
+<source>Never save changes</source>
+<target>Nikdy neukládat změny</target>
 
 <source>Save changes to current configuration?</source>
 <target>Uložit změny do aktuální konfigurace?</target>
@@ -1030,10 +1021,7 @@ Vynechat: \někde\něco\*
 <target>Seznam souborů exportován!</target>
 
 <source>Error writing file:</source>
-<target>Chyba zápisu souboru:</target>
-
-<source>Batch file created successfully!</source>
-<target>Dávka úspěšně vytvořena!</target>
+<target>Nelze zapsat souboru:</target>
 
 <source>
 <pluralform>Object deleted successfully!</pluralform>
@@ -1117,6 +1105,9 @@ Vynechat: \někde\něco\*
 <source>This year</source>
 <target>Tento rok</target>
 
+<source>Last x days</source>
+<target>Za posledních x dní</target>
+
 <source>Byte</source>
 <target>Byte</target>
 
@@ -1126,11 +1117,8 @@ Vynechat: \někde\něco\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filtr: Všechny páry</target>
-
-<source>Filter: Single pair</source>
-<target>Filtr: Jeden pár</target>
+<source>Filter</source>
+<target>Filtr</target>
 
 <source>Direct</source>
 <target>Zachovat</target>
@@ -1156,8 +1144,8 @@ Vynechat: \někde\něco\*
 <source>- Other side's counterpart to %dir</source>
 <target>- pouze cesta z opačného panelu</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Obnovit všechny skryté dialogy?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Povolit opět zobrazování skrytých dialogů a hlášení?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1246,64 +1234,61 @@ Vynechat: \někde\něco\*
 <target>Nelze nastavit monitorování adresáře:</target>
 
 <source>Error when monitoring directories.</source>
-<target>Chyba při sledování adresářů.</target>
+<target>Nelze pokračovat ve sledování adresářů.</target>
 
 <source>Conversion error:</source>
 <target>Chyba konverze:</target>
 
 <source>Error deleting file:</source>
-<target>Chyba mazání souboru:</target>
+<target>Nelze smazat soubor:</target>
 
 <source>Error moving file:</source>
-<target>Chyba přesouvání souboru:</target>
+<target>Nelze přesunout soubor:</target>
 
 <source>Target file already existing!</source>
 <target>Cílový soubor již existuje!</target>
 
 <source>Error moving directory:</source>
-<target>Chyba přesouvání adresáře:</target>
+<target>Nelze přesunout adresář:</target>
 
 <source>Target directory already existing!</source>
 <target>Cílový adresář již existuje!</target>
 
 <source>Error deleting directory:</source>
-<target>Chyba mazání adresáře:</target>
+<target>Nelze smazat adresář:</target>
 
 <source>Error changing modification time:</source>
-<target>Chyba nastavení času změny:</target>
+<target>Nelze nastavit atribut času změny:</target>
 
 <source>Error loading library function:</source>
-<target>Chyba načtení knihovny funkcí:</target>
+<target>Nepodařilo se načíst funkci z knihovny:</target>
 
 <source>Error reading security context:</source>
-<target>Chyba při čtení přístupových práv:</target>
+<target>Nelze číst přístupová práva:</target>
 
 <source>Error writing security context:</source>
-<target>Chyba při zápisu přístupových práv:</target>
+<target>Nelze zapsat přístupová práva:</target>
 
 <source>Error copying file permissions:</source>
-<target>Chyba kopírování oprávnění souborů:</target>
+<target>Nelze kopírovat oprávnění souboru:</target>
 
 <source>Error creating directory:</source>
-<target>Chyba vytvoření adresáře:</target>
+<target>Nelze vytvořit adresář:</target>
 
 <source>Error copying symbolic link:</source>
-<target>Chyba kopírování zástupce:</target>
+<target>Nelze kopírovat zástupce:</target>
 
 <source>Error copying file:</source>
-<target>Chyba kopírování souboru:</target>
-
-<source>Error opening file:</source>
-<target>Chyba otevření souboru:</target>
+<target>Nelze kopírovat souboru:</target>
 
 <source>Error traversing directory:</source>
-<target>Chyba procházení adresáře:</target>
+<target>Nelze procházet adresář:</target>
 
 <source>Endless loop when traversing directory:</source>
 <target>Zacyklení při procházení adresáře:</target>
 
 <source>Error setting privilege:</source>
-<target>Chyba nastavení práv:</target>
+<target>Nelze nastavit práva:</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Došlo ke změně obou stran od poslední synchronizace!</target>
@@ -1338,8 +1323,8 @@ Vynechat: \někde\něco\*
 <source>Preparing synchronization...</source>
 <target>Příprava synchronizace...</target>
 
-<source>Memory allocation failed!</source>
-<target>Chyba přidělení paměti!</target>
+<source>Out of memory!</source>
+<target>Nedostatek pracovní paměti!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Soubor %x má chybné datum!</target>
@@ -1494,12 +1479,12 @@ Vynechat: \někde\něco\*
 <source>Generating database...</source>
 <target>Vytváření databáze...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Podle dané konfigurace není co synchronizovat!</target>
+<source>Nothing to synchronize!</source>
+<target>Není co synchronizovat!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Chyba kopírování zamčeného souboru %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Nelze kopírovat zamčený souboru %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
-<target>Chyba verifikace dat: Zdrojový a cílový soubor mají rozdílný obsah!</target>
+<target>Nezdařila se verifikace dat: Zdrojový a cílový soubor mají rozdílný obsah!</target>
 

@@ -39,7 +39,7 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     m_buttonStart            ->setBitmapFront(GlobalResources::getImage(L"startRed"));
 
     //register key event
-    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), NULL, this);
+    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), nullptr, this);
 
     //prepare drag & drop
     dirNameFirst.reset(new DirectoryName<wxTextCtrl>(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath));
@@ -401,7 +401,7 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
         }
 
         //register events
-        newFolder->m_bpButtonRemoveFolder->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnRemoveFolder), NULL, this );
+        newFolder->m_bpButtonRemoveFolder->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnRemoveFolder), nullptr, this );
 
         //insert directory name
         newFolder->setName(*i);

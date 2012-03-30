@@ -27,13 +27,13 @@ zen::FileId zen::getFileID(const Zstring& filename)
     const HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
                                       0,
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      NULL,
+                                      nullptr,
                                       OPEN_EXISTING,
                                       FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, //FILE_FLAG_BACKUP_SEMANTICS needed to open a directory
-                                      NULL);
+                                      nullptr);
     if (hFile != INVALID_HANDLE_VALUE)
     {
-        ZEN_ON_BLOCK_EXIT(::CloseHandle(hFile));
+        ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
         BY_HANDLE_FILE_INFORMATION fileInfo = {};
         if (::GetFileInformationByHandle(hFile, &fileInfo))

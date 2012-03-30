@@ -34,8 +34,8 @@ public:
     AboutDlg(wxWindow* parent);
 
 private:
-    void OnClose(wxCloseEvent& event);
-    void OnOK(wxCommandEvent& event);
+    void OnClose(wxCloseEvent&   event) { EndModal(0); }
+    void OnOK   (wxCommandEvent& event) { EndModal(0); }
 };
 
 
@@ -101,21 +101,9 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 }
 
 
-void AboutDlg::OnClose(wxCloseEvent& event)
-{
-    EndModal(0);
-}
-
-
-void AboutDlg::OnOK(wxCommandEvent& event)
-{
-    EndModal(0);
-}
-
-
 void zen::showAboutDialog()
 {
-    AboutDlg aboutDlg(NULL);
+    AboutDlg aboutDlg(nullptr);
     aboutDlg.ShowModal();
 }
 //########################################################################################
@@ -130,17 +118,18 @@ public:
     ~FilterDlg() {}
 
 private:
-    void OnClose       (wxCloseEvent& event);
+    void OnClose       (  wxCloseEvent& event) { EndModal(0); }
+    void OnCancel      (wxCommandEvent& event) { EndModal(0); }
     void OnHelp        (wxCommandEvent& event);
     void OnDefault     (wxCommandEvent& event);
     void OnApply       (wxCommandEvent& event);
-    void OnCancel      (wxCommandEvent& event);
     void OnUpdateChoice(wxCommandEvent& event) { updateGui(); }
     void OnUpdateNameFilter(wxCommandEvent& event) { updateGui(); }
 
     void updateGui();
     void setFilter(const FilterConfig& filter);
     FilterConfig getFilter() const;
+    void onKeyEvent(wxKeyEvent& event);
 
     const bool isGlobalFilter_;
     FilterConfig& outputRef;
@@ -161,12 +150,19 @@ FilterDlg::FilterDlg(wxWindow* parent,
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
+    m_textCtrlInclude->SetMaxLength(0); //allow large filter entries!
+    m_textCtrlExclude->SetMaxLength(0); //
+
+    m_textCtrlInclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(FilterDlg::onKeyEvent), nullptr, this);
+    m_textCtrlExclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(FilterDlg::onKeyEvent), nullptr, this);
+
     enumTimeDescr.
-    add(UTIME_NONE, _("Inactive")).
-    add(UTIME_TODAY,        _("Today")).
-    add(UTIME_THIS_WEEK,    _("This week")).
-    add(UTIME_THIS_MONTH,   _("This month")).
-    add(UTIME_THIS_YEAR,    _("This year"));
+    add(UTIME_NONE,        _("Inactive")).
+    add(UTIME_TODAY,       _("Today")).
+    //    add(UTIME_THIS_WEEK,   _("This week")).
+    add(UTIME_THIS_MONTH,  _("This month")).
+    add(UTIME_THIS_YEAR,   _("This year")).
+    add(UTIME_LAST_X_DAYS, _("Last x days"));
 
     enumSizeDescr.
     add(USIZE_NONE, _("Inactive")).
@@ -174,8 +170,8 @@ FilterDlg::FilterDlg(wxWindow* parent,
     add(USIZE_KB,   _("KB")).
     add(USIZE_MB,   _("MB"));
 
-    m_bitmap26->SetBitmap(GlobalResources::getImage(wxT("filterOn")));
-    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getImage(wxT("help")));
+    m_bitmap26->SetBitmap(GlobalResources::getImage(L"filterOn"));
+    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getImage(L"help"));
 
     setFilter(filter);
 
@@ -183,12 +179,32 @@ FilterDlg::FilterDlg(wxWindow* parent,
     m_button10->SetFocus();
 
     //adapt header for global/local dialog
-    if (isGlobalFilter_)
-        m_staticTexHeader->SetLabel(_("Filter: All pairs"));
-    else
-        m_staticTexHeader->SetLabel(_("Filter: Single pair"));
+    //    if (isGlobalFilter_)
+    //        m_staticTexHeader->SetLabel("Filter all folder pairs"));
+    //    else
+    //        m_staticTexHeader->SetLabel("Filter single folder pair"));
+    //
+    m_staticTexHeader->SetLabel(_("Filter"));
 
     Fit();
+}
+
+
+void FilterDlg::onKeyEvent(wxKeyEvent& event)
+{
+    const int keyCode = event.GetKeyCode();
+
+    if (event.ControlDown())
+        switch (keyCode)
+        {
+            case 'A': //CTRL + A
+            {
+                if (auto textCtrl = dynamic_cast<wxTextCtrl*>(event.GetEventObject()))
+                    textCtrl->SetSelection(-1, -1); //select all
+                return;
+            }
+        }
+    event.Skip();
 }
 
 
@@ -197,27 +213,27 @@ void FilterDlg::updateGui()
     FilterConfig activeCfg = getFilter();
 
     m_bitmapInclude->SetBitmap(
-        !NameFilter(activeCfg.includeFilter, FilterConfig().excludeFilter).isNull() ?
-        GlobalResources::getImage(wxT("include")) :
-        greyScale(GlobalResources::getImage(wxT("include"))));
+        !NameFilter::isNull(activeCfg.includeFilter, FilterConfig().excludeFilter) ?
+        GlobalResources::getImage(L"include") :
+        greyScale(GlobalResources::getImage(L"include")));
 
     m_bitmapExclude->SetBitmap(
-        !NameFilter(FilterConfig().includeFilter, activeCfg.excludeFilter).isNull() ?
-        GlobalResources::getImage(wxT("exclude")) :
-        greyScale(GlobalResources::getImage(wxT("exclude"))));
+        !NameFilter::isNull(FilterConfig().includeFilter, activeCfg.excludeFilter) ?
+        GlobalResources::getImage(L"exclude") :
+        greyScale(GlobalResources::getImage(L"exclude")));
 
     m_bitmapFilterDate->SetBitmap(
         activeCfg.unitTimeSpan != UTIME_NONE ?
-        GlobalResources::getImage(wxT("clock")) :
-        greyScale(GlobalResources::getImage(wxT("clock"))));
+        GlobalResources::getImage(L"clock") :
+        greyScale(GlobalResources::getImage(L"clock")));
 
     m_bitmapFilterSize->SetBitmap(
         activeCfg.unitSizeMin != USIZE_NONE ||
         activeCfg.unitSizeMax != USIZE_NONE ?
-        GlobalResources::getImage(wxT("size")) :
-        greyScale(GlobalResources::getImage(wxT("size"))));
+        GlobalResources::getImage(L"size") :
+        greyScale(GlobalResources::getImage(L"size")));
 
-    //m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan == UTIME_LAST_X_HOURS);
+    m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan == UTIME_LAST_X_DAYS);
     m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != USIZE_NONE);
     m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax != USIZE_NONE);
 }
@@ -286,22 +302,9 @@ void FilterDlg::OnApply(wxCommandEvent& event)
 }
 
 
-void FilterDlg::OnCancel(wxCommandEvent& event)
-{
-    EndModal(0);
-}
-
-
-void FilterDlg::OnClose(wxCloseEvent& event)
-{
-    EndModal(0);
-}
-
-
-
 ReturnSmallDlg::ButtonPressed zen::showFilterDialog(bool isGlobalFilter, FilterConfig& filter)
 {
-    FilterDlg filterDlg(NULL,
+    FilterDlg filterDlg(nullptr,
                         isGlobalFilter, //is main filter dialog
                         filter);
     return static_cast<ReturnSmallDlg::ButtonPressed>(filterDlg.ShowModal());
@@ -320,8 +323,8 @@ public:
 
 private:
     void OnOK(wxCommandEvent& event);
-    void OnCancel(wxCommandEvent& event);
-    void OnClose(wxCloseEvent& event);
+    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnDelOnBothSides(wxCommandEvent& event);
     void OnUseRecycler(wxCommandEvent& event);
 
@@ -403,16 +406,6 @@ void DeleteDialog::OnOK(wxCommandEvent& event)
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
-void DeleteDialog::OnCancel(wxCommandEvent& event)
-{
-    EndModal(ReturnSmallDlg::BUTTON_CANCEL);
-}
-
-void DeleteDialog::OnClose(wxCloseEvent& event)
-{
-    EndModal(ReturnSmallDlg::BUTTON_CANCEL);
-}
-
 void DeleteDialog::OnDelOnBothSides(wxCommandEvent& event)
 {
     updateGui();
@@ -429,7 +422,7 @@ ReturnSmallDlg::ButtonPressed zen::showDeleteDialog(const std::vector<zen::FileS
                                                     bool& deleteOnBothSides,
                                                     bool& useRecycleBin)
 {
-    DeleteDialog confirmDeletion(NULL,
+    DeleteDialog confirmDeletion(nullptr,
                                  rowsOnLeft,
                                  rowsOnRight,
                                  deleteOnBothSides,
@@ -518,7 +511,7 @@ ReturnSmallDlg::ButtonPressed zen::showSyncPreviewDlg(
     const zen::SyncStatistics& statistics,
     bool& dontShowAgain)
 {
-    SyncPreviewDlg preview(NULL,
+    SyncPreviewDlg preview(nullptr,
                            variantName,
                            statistics,
                            dontShowAgain);
@@ -641,7 +634,7 @@ void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 
 ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(CompConfig& cmpConfig)
 {
-    CompareCfgDialog syncDlg(NULL, cmpConfig);
+    CompareCfgDialog syncDlg(nullptr, cmpConfig);
 
     return static_cast<ReturnSmallDlg::ButtonPressed>(syncDlg.ShowModal());
 }
@@ -710,7 +703,7 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     Fit();
 
     //automatically fit column width to match totl grid width
-    Connect(wxEVT_SIZE, wxSizeEventHandler(GlobalSettingsDlg::OnResize), NULL, this);
+    Connect(wxEVT_SIZE, wxSizeEventHandler(GlobalSettingsDlg::OnResize), nullptr, this);
     wxSizeEvent dummy;
     OnResize(dummy);
 }
@@ -749,7 +742,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
     if (showQuestionDlg(ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                        _("Restore all hidden dialogs?")) == ReturnQuestionDlg::BUTTON_YES)
+                        _("Make hidden dialogs and warning messages visible again?")) == ReturnQuestionDlg::BUTTON_YES)
         settings.optDialogs.resetDialogs();
 }
 
@@ -844,7 +837,7 @@ void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
 
 ReturnSmallDlg::ButtonPressed zen::showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings)
 {
-    GlobalSettingsDlg settingsDlg(NULL, globalSettings);
+    GlobalSettingsDlg settingsDlg(nullptr, globalSettings);
     return static_cast<ReturnSmallDlg::ButtonPressed>(settingsDlg.ShowModal());
 }
 //########################################################################################
@@ -897,7 +890,7 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    long style = wxCAL_SHOW_HOLIDAYS;
+    long style = wxCAL_SHOW_HOLIDAYS | wxCAL_SHOW_SURROUNDING_WEEKS;
 
 #ifdef FFS_WIN
     DWORD firstDayOfWeek = 0;
@@ -925,6 +918,13 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
     m_calendarTo  ->SetDate(utcToLocalDateTime(to<time_t>(timeTo_)));
 
     m_buttonOkay->SetFocus();
+
+    //wxDatePickerCtrl::BestSize() does not respect year field and trims it, both wxMSW/wxGTK - why isn't there anybody testing this wxWidgets stuff???
+    wxSize minSz = m_calendarFrom->GetBestSize();
+    minSz.x += 30;
+    m_calendarFrom->SetMinSize(minSz);
+    m_calendarTo  ->SetMinSize(minSz);
+
     Fit();
 }
 
@@ -962,6 +962,6 @@ void SelectTimespanDlg::OnOkay(wxCommandEvent& event)
 
 ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(Int64& timeFrom, Int64& timeTo)
 {
-    SelectTimespanDlg timeSpanDlg(NULL, timeFrom, timeTo);
+    SelectTimespanDlg timeSpanDlg(nullptr, timeFrom, timeTo);
     return static_cast<ReturnSmallDlg::ButtonPressed>(timeSpanDlg.ShowModal());
 }

@@ -118,11 +118,7 @@ class StorageRefCountThreadSafe : public AP
 protected:
     ~StorageRefCountThreadSafe() {}
 
-    static Char* create(size_t size)
-    {
-        return create(size, size);
-    }
-
+    static Char* create(size_t size) { return create(size, size); }
     static Char* create(size_t size, size_t minCapacity)
     {
         const size_t newCapacity = AP::calcCapacity(minCapacity);
@@ -157,23 +153,24 @@ protected:
         return descr(ptr)->refCount == 1 && minCapacity <= descr(ptr)->capacity;
     }
 
-    static size_t length(const Char* ptr)
-    {
-        return descr(ptr)->length;
-    }
+    static size_t length(const Char* ptr) { return descr(ptr)->length; }
 
     static void setLength(Char* ptr, size_t newLength)
     {
         assert(canWrite(ptr, newLength));
-        descr(ptr)->length = newLength;
+        descr(ptr)->length = static_cast<std::uint32_t>(newLength);
     }
 
 private:
     struct Descriptor
     {
-        Descriptor(long rc, size_t len, size_t cap) : refCount(rc), length(len), capacity(cap) {}
+        Descriptor(long rc, size_t len, size_t cap) :
+            refCount(rc),
+            length(static_cast<std::uint32_t>(len)),
+            capacity(static_cast<std::uint32_t>(cap)) {}
 
         boost::detail::atomic_count refCount; //practically no perf loss: ~0.2%! (FFS comparison)
+        //replace by #include <atomic> std::atomic_int when finally getting rid of VS2010
         std::uint32_t length;
         std::uint32_t capacity; //allocated size without null-termination
     };
@@ -197,7 +194,7 @@ public:
     Zbase(const Char* source, size_t length);
     Zbase(const Zbase& source);
     Zbase(Zbase&& tmp);
-    explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; Zbase name = buffer; ups...
+    explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups...
     //allow explicit construction from different string type, prevent ambiguity via SFINAE
     template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
     ~Zbase();
@@ -217,15 +214,15 @@ public:
 
     //std::string functions
     size_t length() const;
-    size_t size() const;
-    const Char* c_str() const; //C-string format with NULL-termination
-    const Char* data()  const; //internal representation, NULL-termination not guaranteed
+    size_t size  () const { return length(); }
+    const Char* c_str() const { return rawStr; }; //C-string format with 0-termination
+    const Char* data()  const { return rawStr; }; //internal representation, 0-termination not guaranteed
     const Char operator[](size_t pos) const;
-    bool empty() const;
+    bool empty() const { return length() == 0; }
     void clear();
     size_t find (const Zbase& str, size_t pos = 0)    const; //
-    size_t find (const Char* str,  size_t pos = 0)    const; //returns "npos" if not found
-    size_t find (Char  ch,         size_t pos = 0)    const; //
+    size_t find (const Char* str,  size_t pos = 0)    const; //
+    size_t find (Char  ch,         size_t pos = 0)    const; //returns "npos" if not found
     size_t rfind(Char  ch,         size_t pos = npos) const; //
     size_t rfind(const Char* str,  size_t pos = npos) const; //
     Zbase& replace(size_t pos1, size_t n1, const Zbase& str);
@@ -234,7 +231,7 @@ public:
     Zbase& append(const Char* source, size_t len);
     void resize(size_t newSize, Char fillChar = 0);
     void swap(Zbase& other);
-    void push_back(Char val); //STL access
+    void push_back(Char val) { operator+=(val); } //STL access
 
     Zbase& operator=(Zbase source);
     Zbase& operator=(const Char* source);
@@ -254,26 +251,24 @@ private:
     Char* rawStr;
 };
 
-template <class Char, template <class, class> class SP, class AP> bool operator==(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs);
-template <class Char, template <class, class> class SP, class AP> bool operator==(const Zbase<Char, SP, AP>& lhs, const Char*                rhs);
-template <class Char, template <class, class> class SP, class AP> bool operator==(const Char*                lhs, const Zbase<Char, SP, AP>& rhs);
+template <class Char, template <class, class> class SP, class AP>        bool operator==(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs);
+template <class Char, template <class, class> class SP, class AP>        bool operator==(const Zbase<Char, SP, AP>& lhs, const Char*                rhs);
+template <class Char, template <class, class> class SP, class AP> inline bool operator==(const Char*                lhs, const Zbase<Char, SP, AP>& rhs) { return operator==(rhs, lhs); }
 
-template <class Char, template <class, class> class SP, class AP> bool operator!=(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs);
-template <class Char, template <class, class> class SP, class AP> bool operator!=(const Zbase<Char, SP, AP>& lhs, const Char*                rhs);
-template <class Char, template <class, class> class SP, class AP> bool operator!=(const Char*                lhs, const Zbase<Char, SP, AP>& rhs);
+template <class Char, template <class, class> class SP, class AP> inline bool operator!=(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs) { return !operator==(lhs, rhs); }
+template <class Char, template <class, class> class SP, class AP> inline bool operator!=(const Zbase<Char, SP, AP>& lhs, const Char*                rhs) { return !operator==(lhs, rhs); }
+template <class Char, template <class, class> class SP, class AP> inline bool operator!=(const Char*                lhs, const Zbase<Char, SP, AP>& rhs) { return !operator==(lhs, rhs); }
 
-template <class Char, template <class, class> class SP, class AP> bool operator< (const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs);
-template <class Char, template <class, class> class SP, class AP> bool operator< (const Zbase<Char, SP, AP>& lhs, const Char*                rhs);
-template <class Char, template <class, class> class SP, class AP> bool operator< (const Char*                lhs, const Zbase<Char, SP, AP>& rhs);
+template <class Char, template <class, class> class SP, class AP> bool operator<(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs);
+template <class Char, template <class, class> class SP, class AP> bool operator<(const Zbase<Char, SP, AP>& lhs, const Char*                rhs);
+template <class Char, template <class, class> class SP, class AP> bool operator<(const Char*                lhs, const Zbase<Char, SP, AP>& rhs);
 
-template <class Char, template <class, class> class SP, class AP> const Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs);
-template <class Char, template <class, class> class SP, class AP> const Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs, const Char*                rhs);
-template <class Char, template <class, class> class SP, class AP> const Zbase<Char, SP, AP> operator+(const Char*                lhs, const Zbase<Char, SP, AP>& rhs);
-template <class Char, template <class, class> class SP, class AP> const Zbase<Char, SP, AP> operator+(      Char                 lhs, const Zbase<Char, SP, AP>& rhs);
-template <class Char, template <class, class> class SP, class AP> const Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs,       Char                 rhs);
-
-
-
+//rvalue references: unified first argument!
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP> lhs, const Zbase<Char, SP, AP>& rhs) { return lhs += rhs; }
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP> lhs, const Char*                rhs) { return lhs += rhs; }
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP> lhs,       Char                 rhs) { return lhs += rhs; }
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(      Char          lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Char*         lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
 
 
 
@@ -301,14 +296,7 @@ template <class Char, template <class, class> class SP, class AP> const Zbase<Ch
 
 
 
-
-
-
-
-
-
-
-//################################# inline implementation ########################################
+//################################# implementation ########################################
 template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>::Zbase()
 {
@@ -355,7 +343,16 @@ Zbase<Char, SP, AP>::Zbase(const Zbase<Char, SP, AP>& source)
 template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>::Zbase(Zbase<Char, SP, AP>&& tmp)
 {
-    rawStr = this->clone(tmp.rawStr); //for a ref-counting string there probably isn't a faster way, even with r-value references
+    //rawStr = this->clone(tmp.rawStr); NO! do not increment ref-count of a potentially unshared string! We'd lose optimization opportunity of reusing it!
+    //instead create a dummy string and swap:
+    if (canWrite(tmp.rawStr, 0)) //perf: this check saves about 4%
+    {
+        rawStr    = this->create(0); //no perf issue! see comment in default constructor
+        rawStr[0] = 0;
+        swap(tmp);
+    }
+    else //shared representation: yet another "add ref" won't hurt
+        rawStr = this->clone(tmp.rawStr);
 }
 
 
@@ -524,34 +521,6 @@ bool operator==(const Zbase<Char, SP, AP>& lhs, const Char* rhs)
 
 
 template <class Char, template <class, class> class SP, class AP> inline
-bool operator==(const Char* lhs, const Zbase<Char, SP, AP>& rhs)
-{
-    return operator==(rhs, lhs);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-bool operator!=(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs)
-{
-    return !operator==(lhs, rhs);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-bool operator!=(const Zbase<Char, SP, AP>& lhs, const Char* rhs)
-{
-    return !operator==(lhs, rhs);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-bool operator!=(const Char* lhs, const Zbase<Char, SP, AP>& rhs)
-{
-    return !operator==(lhs, rhs);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
 bool operator<(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs)
 {
     return std::lexicographical_compare(lhs.begin(), lhs.end(), //respect embedded 0
@@ -579,27 +548,6 @@ template <class Char, template <class, class> class SP, class AP> inline
 size_t Zbase<Char, SP, AP>::length() const
 {
     return SP<Char, AP>::length(rawStr);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-size_t Zbase<Char, SP, AP>::size() const
-{
-    return length();
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-const Char* Zbase<Char, SP, AP>::c_str() const
-{
-    return rawStr;
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-const Char* Zbase<Char, SP, AP>::data() const
-{
-    return rawStr;
 }
 
 
@@ -641,20 +589,6 @@ Char* Zbase<Char, SP, AP>::end()
 
 
 template <class Char, template <class, class> class SP, class AP> inline
-void Zbase<Char, SP, AP>::push_back(Char val)
-{
-    operator+=(val);
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-bool Zbase<Char, SP, AP>::empty() const
-{
-    return length() == 0;
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
 void Zbase<Char, SP, AP>::clear()
 {
     if (!empty())
@@ -667,41 +601,6 @@ void Zbase<Char, SP, AP>::clear()
         else
             *this = Zbase();
     }
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-const Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs)
-{
-    return Zbase<Char, SP, AP>(lhs) += rhs;
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-const Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs, const Char* rhs)
-{
-    return Zbase<Char, SP, AP>(lhs) += rhs;
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-const Zbase<Char, SP, AP> operator+(const Char* lhs, const Zbase<Char, SP, AP>& rhs)
-{
-    return Zbase<Char, SP, AP>(lhs) += rhs;
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-const Zbase<Char, SP, AP> operator+(Char lhs, const Zbase<Char, SP, AP>& rhs)
-{
-    return Zbase<Char, SP, AP>(lhs) += rhs;
-}
-
-
-template <class Char, template <class, class> class SP, class AP> inline
-const Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs, Char rhs)
-{
-    return Zbase<Char, SP, AP>(lhs) += rhs;
 }
 
 
@@ -719,7 +618,7 @@ void Zbase<Char, SP, AP>::reserve(size_t minCapacity) //make unshared and check 
     {
         //allocate a new string
         Char* newStr = create(length(), std::max(minCapacity, length())); //reserve() must NEVER shrink the string: logical const!
-        std::copy(rawStr, rawStr + length() + 1, newStr); //include NULL-termination
+        std::copy(rawStr, rawStr + length() + 1, newStr); //include 0-termination
 
         destroy(rawStr);
         rawStr = newStr;

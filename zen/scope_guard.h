@@ -8,6 +8,8 @@
 #ifndef ZEN_SCOPEGUARD_8971632487321434
 #define ZEN_SCOPEGUARD_8971632487321434
 
+#include <cassert>
+
 //best of Zen, Loki and C++11
 
 namespace zen
@@ -21,7 +23,7 @@ namespace zen
 
 //Scope Exit
 /*
-	ZEN_ON_BLOCK_EXIT(::CloseHandle(hDir));
+	ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
 */
 
 class ScopeGuardBase
@@ -56,7 +58,7 @@ public:
             {
                 fun_();
             }
-            catch (...) {}
+            catch (...) { assert(false); }
     }
 
 private:
@@ -72,6 +74,6 @@ ScopeGuardImpl<F> makeGuard(F fun) { return ScopeGuardImpl<F>(fun); }
 #define ZEN_CONCAT_SUB(X, Y) X ## Y
 #define ZEN_CONCAT(X, Y) ZEN_CONCAT_SUB(X, Y)
 
-#define ZEN_ON_BLOCK_EXIT(X) zen::ScopeGuard ZEN_CONCAT(dummy, __LINE__) = zen::makeGuard([&](){X;}); (void)ZEN_CONCAT(dummy, __LINE__);
+#define ZEN_ON_SCOPE_EXIT(X) zen::ScopeGuard ZEN_CONCAT(dummy, __LINE__) = zen::makeGuard([&]{ X; }); (void)ZEN_CONCAT(dummy, __LINE__);
 
 #endif //ZEN_SCOPEGUARD_8971632487321434

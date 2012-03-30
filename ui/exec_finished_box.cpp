@@ -108,19 +108,19 @@ ExecFinishedBox::ExecFinishedBox(wxWindow* parent,
                                  const wxValidator& validator,
                                  const wxString& name) :
     wxComboBox(parent, id, value, pos, size, n, choices, style, validator, name),
-    history_(NULL),
+    history_(nullptr),
     defaultCommands(getDefaultCommands())
 {
     //#####################################
     /*##*/ SetMinSize(wxSize(150, -1)); //## workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
     //#####################################
 
-    Connect(wxEVT_KEY_DOWN,                  wxKeyEventHandler    (ExecFinishedBox::OnKeyEvent  ), NULL, this);
-    Connect(wxEVT_LEFT_DOWN,                 wxEventHandler       (ExecFinishedBox::OnUpdateList), NULL, this);
-    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ExecFinishedBox::OnSelection ), NULL, this);
-    Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler  (ExecFinishedBox::OnMouseWheel), NULL, this);
+    Connect(wxEVT_KEY_DOWN,                  wxKeyEventHandler    (ExecFinishedBox::OnKeyEvent  ), nullptr, this);
+    Connect(wxEVT_LEFT_DOWN,                 wxEventHandler       (ExecFinishedBox::OnUpdateList), nullptr, this);
+    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ExecFinishedBox::OnSelection ), nullptr, this);
+    Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler  (ExecFinishedBox::OnMouseWheel), nullptr, this);
 
-    Connect(wxEVT_REPLACE_BUILT_IN_COMMANDS, wxCommandEventHandler(ExecFinishedBox::OnReplaceBuiltInCmds), NULL, this);
+    Connect(wxEVT_REPLACE_BUILT_IN_COMMANDS, wxCommandEventHandler(ExecFinishedBox::OnReplaceBuiltInCmds), nullptr, this);
 }
 
 

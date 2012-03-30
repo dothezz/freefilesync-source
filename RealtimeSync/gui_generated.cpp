@@ -1,12 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec  2 2011)
+// C++ code generated with wxFormBuilder (version Feb  9 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
-
-#include "../wx+/button.h"
-#include "../wx+/dir_picker.h"
 
 #include "gui_generated.h"
 
@@ -26,8 +23,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_menuItem13 = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("&Load configuration...") ) + wxT('\t') + wxT("CTRL+L"), wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItem13 );
 
-    wxMenuItem* m_separator1;
-    m_separator1 = m_menuFile->AppendSeparator();
+    m_menuFile->AppendSeparator();
 
     wxMenuItem* m_menuItem4;
     m_menuItem4 = new wxMenuItem( m_menuFile, wxID_EXIT, wxString( _("&Quit") ) + wxT('\t') + wxT("CTRL+Q"), wxEmptyString, wxITEM_NORMAL );
@@ -37,11 +33,10 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 
     m_menuHelp = new wxMenu();
     wxMenuItem* m_menuItemContent;
-    m_menuItemContent = new wxMenuItem( m_menuHelp, wxID_ANY, wxString( _("&Content") ) + wxT('\t') + wxT("F1"), wxEmptyString, wxITEM_NORMAL );
+    m_menuItemContent = new wxMenuItem( m_menuHelp, wxID_HELP, wxString( _("&Content") ) + wxT('\t') + wxT("F1"), wxEmptyString, wxITEM_NORMAL );
     m_menuHelp->Append( m_menuItemContent );
 
-    wxMenuItem* m_separator2;
-    m_separator2 = m_menuHelp->AppendSeparator();
+    m_menuHelp->AppendSeparator();
 
     m_menuItemAbout = new wxMenuItem( m_menuHelp, wxID_ABOUT, wxString( _("&About...") ) + wxT('\t') + wxT("SHIFT+F1"), wxEmptyString, wxITEM_NORMAL );
     m_menuHelp->Append( m_menuItemAbout );
@@ -81,6 +76,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_staticText21->Wrap( -1 );
     sbSizer41->Add( m_staticText21, 0, wxRIGHT|wxLEFT|wxEXPAND, 5 );
 
+
     bSizer1->Add( sbSizer41, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxRIGHT|wxLEFT, 20 );
 
     m_staticline2 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
@@ -101,6 +97,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_staticTextFinalPath = new wxStaticText( m_panelMainFolder, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextFinalPath->Wrap( -1 );
     bSizer11->Add( m_staticTextFinalPath, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 2 );
+
 
     bSizer10->Add( bSizer11, 0, 0, 5 );
 
@@ -125,7 +122,9 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 
     bSizer781->Add( m_dirPickerMain, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
+
     bSizer10->Add( bSizer781, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+
 
     m_panelMainFolder->SetSizer( bSizer10 );
     m_panelMainFolder->Layout();
@@ -136,10 +135,12 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_scrolledWinFolders->SetScrollRate( 5, 5 );
     bSizerFolders = new wxBoxSizer( wxVERTICAL );
 
+
     m_scrolledWinFolders->SetSizer( bSizerFolders );
     m_scrolledWinFolders->Layout();
     bSizerFolders->Fit( m_scrolledWinFolders );
     sbSizerDirToWatch2->Add( m_scrolledWinFolders, 0, wxEXPAND, 5 );
+
 
     bSizer1->Add( sbSizerDirToWatch2, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
 
@@ -148,6 +149,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 
     m_textCtrlCommand = new wxTextCtrl( m_panelMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
     sbSizer3->Add( m_textCtrlCommand, 0, wxEXPAND|wxBOTTOM, 5 );
+
 
     bSizer1->Add( sbSizer3, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
@@ -158,6 +160,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_spinCtrlDelay->SetToolTip( _("Idle time between detection of last change and execution of command line in seconds") );
 
     sbSizer4->Add( m_spinCtrlDelay, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+
 
     bSizer1->Add( sbSizer4, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
@@ -170,10 +173,12 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_buttonCancel = new wxButton( m_panelMain, wxID_CANCEL, _("dummy"), wxDefaultPosition, wxSize( 0,0 ), 0 );
     bSizer1->Add( m_buttonCancel, 0, 0, 5 );
 
+
     m_panelMain->SetSizer( bSizer1 );
     m_panelMain->Layout();
     bSizer1->Fit( m_panelMain );
     bSizerMain->Add( m_panelMain, 1, wxEXPAND, 5 );
+
 
     this->SetSizer( bSizerMain );
     this->Layout();
@@ -199,7 +204,7 @@ MainDlgGenerated::~MainDlgGenerated()
     this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnSaveConfig ) );
     this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnLoadConfig ) );
     this->Disconnect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnQuit ) );
-    this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnShowHelp ) );
+    this->Disconnect( wxID_HELP, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnShowHelp ) );
     this->Disconnect( wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnMenuAbout ) );
     m_bpButtonAddFolder->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDlgGenerated::OnAddFolder ), NULL, this );
     m_bpButtonRemoveTopFolder->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDlgGenerated::OnRemoveTopFolder ), NULL, this );
@@ -229,7 +234,9 @@ FolderGenerated::FolderGenerated( wxWindow* parent, wxWindowID id, const wxPoint
 
     bSizer20->Add( m_dirPicker, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
+
     bSizer114->Add( bSizer20, 1, wxALIGN_CENTER_VERTICAL, 5 );
+
 
     this->SetSizer( bSizer114 );
     this->Layout();

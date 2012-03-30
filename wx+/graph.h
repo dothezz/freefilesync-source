@@ -93,12 +93,12 @@ double nextNiceNumber(double blockSize); //round to next number which is conveni
 struct DecimalNumberFormatter : public LabelFormatter
 {
     virtual double getOptimalBlockSize(double sizeProposed) const { return nextNiceNumber(sizeProposed); }
-    virtual wxString formatText(double value, double optimalBlockSize) const { return zen::toString<wxString>(value); }
+    virtual wxString formatText(double value, double optimalBlockSize) const { return zen::numberTo<wxString>(value); }
 };
 
 //------------------------------------------------------------------------------------------------------------
 //emit data selection event
-//Usage: wnd.Connect(wxEVT_GRAPH_SELECTION, GraphSelectEventHandler(MyDlg::OnGraphSelection), NULL, this);
+//Usage: wnd.Connect(wxEVT_GRAPH_SELECTION, GraphSelectEventHandler(MyDlg::OnGraphSelection), nullptr, this);
 //       void MyDlg::OnGraphSelection(GraphSelectEvent& event);
 
 
@@ -154,14 +154,14 @@ public:
         LineAttributes() : autoColor(true), lineWidth(2) {}
 
         LineAttributes& setColor(const wxColour& col) { color = col; autoColor = false; return *this; }
-        LineAttributes& setLineWidth(size_t width) { lineWidth = width; return *this; }
+        LineAttributes& setLineWidth(size_t width) { lineWidth = static_cast<int>(width); return *this; }
 
     private:
         friend class Graph2D;
 
         bool     autoColor;
         wxColour color;
-        size_t   lineWidth;
+        int      lineWidth;
     };
 
     void setData(const std::shared_ptr<GraphData>& data, const LineAttributes& attr = LineAttributes());
@@ -218,17 +218,19 @@ public:
 
         GraphAttributes& setAutoSize() { minXauto = true; maxXauto = true; minYauto = true; maxYauto = true; return *this; }
 
-        GraphAttributes& setLabelX(PosLabelX posX, size_t height = 25, const std::shared_ptr<LabelFormatter>& newLabelFmt = std::shared_ptr<LabelFormatter>(new DecimalNumberFormatter()))
+        static const std::shared_ptr<LabelFormatter> defaultFormat;
+
+        GraphAttributes& setLabelX(PosLabelX posX, size_t height = 25, const std::shared_ptr<LabelFormatter>& newLabelFmt = defaultFormat)
         {
             labelposX    = posX;
-            labelHeightX = height;
+            labelHeightX = static_cast<int>(height);
             labelFmtX    = newLabelFmt;
             return *this;
         }
-        GraphAttributes& setLabelY(PosLabelY posY, size_t width = 60, const std::shared_ptr<LabelFormatter>& newLabelFmt = std::shared_ptr<LabelFormatter>(new DecimalNumberFormatter()))
+        GraphAttributes& setLabelY(PosLabelY posY, size_t width = 60, const std::shared_ptr<LabelFormatter>& newLabelFmt = defaultFormat)
         {
             labelposY    = posY;
-            labelWidthY  = width;
+            labelWidthY  = static_cast<int>(width);
             labelFmtY    = newLabelFmt;
             return *this;
         }
@@ -249,11 +251,11 @@ public:
         double maxY;
 
         PosLabelX labelposX;
-        size_t    labelHeightX;
+        int labelHeightX;
         std::shared_ptr<LabelFormatter> labelFmtX;
 
         PosLabelY labelposY;
-        size_t    labelWidthY;
+        int labelWidthY;
         std::shared_ptr<LabelFormatter> labelFmtY;
 
         SelMode mouseSelMode;

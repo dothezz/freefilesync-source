@@ -162,20 +162,20 @@ class FfsTrayIcon::TaskBarImpl : public wxTaskBarIcon
 public:
     TaskBarImpl(FfsTrayIcon& parent) : parent_(&parent) {}
 
-    void parentHasDied() { parent_ = NULL; }
+    void parentHasDied() { parent_ = nullptr; }
 
 private:
     virtual wxMenu* CreatePopupMenu()
     {
         if (!parent_)
-            return NULL;
+            return nullptr;
 
         wxMenu* contextMenu = new wxMenu;
         contextMenu->Append(CONTEXT_ABOUT, _("&About..."));
         contextMenu->AppendSeparator();
         contextMenu->Append(CONTEXT_RESTORE, _("&Restore"));
         //event handling
-        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FfsTrayIcon::OnContextMenuSelection), NULL, parent_);
+        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FfsTrayIcon::OnContextMenuSelection), nullptr, parent_);
 
         return contextMenu; //ownership transferred to caller
     }
@@ -188,14 +188,14 @@ FfsTrayIcon::FfsTrayIcon() :
     trayIcon(new TaskBarImpl(*this))
 {
     trayIcon->SetIcon(generateIcon(0), wxT("FreeFileSync"));
-    trayIcon->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(FfsTrayIcon::OnDoubleClick), NULL, this); //register double-click
+    trayIcon->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(FfsTrayIcon::OnDoubleClick), nullptr, this); //register double-click
 }
 
 
 FfsTrayIcon::~FfsTrayIcon()
 {
     trayIcon->RemoveIcon(); //hide icon until final deletion takes place
-    trayIcon->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(FfsTrayIcon::OnDoubleClick), NULL, this);
+    trayIcon->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(FfsTrayIcon::OnDoubleClick), nullptr, this);
     trayIcon->parentHasDied(); //TaskBarImpl (potentially) has longer lifetime than FfsTrayIcon: avoid callback!
 
     //use wxWidgets delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
@@ -204,7 +204,7 @@ FfsTrayIcon::~FfsTrayIcon()
 }
 
 
-void FfsTrayIcon::setToolTip2(const wxString& toolTipText, double fraction)
+void FfsTrayIcon::setToolTip(const wxString& toolTipText, double fraction)
 {
     trayIcon->SetIcon(generateIcon(fraction), toolTipText);
 }

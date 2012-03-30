@@ -9,6 +9,7 @@
 #define STL_TOOLS_HEADER_84567184321434
 
 #include <memory>
+#include <algorithm>
 #if defined _MSC_VER && _MSC_VER <= 1600
 #include <set>
 #include <map>
@@ -111,17 +112,14 @@ ForwardIterator binary_search(ForwardIterator first, ForwardIterator last, const
 template <class BidirectionalIterator, class T> inline
 BidirectionalIterator find_last(const BidirectionalIterator first, BidirectionalIterator last, const T& value)
 {
-    //reverse iteration: 1. check 2. decrement 3. evaluate
-    const BidirectionalIterator iterNotFound = last;
-    for (;;) //VS 2010 doesn't like "while (true)"
+    for (BidirectionalIterator iter = last; iter != first;) //reverse iteration: 1. check 2. decrement 3. evaluate
     {
-        if (last == first)
-            return iterNotFound;
-        --last;
+        --iter; //
 
-        if (*last == value)
-            return last;
+        if (*iter == value)
+            return iter;
     }
+    return last;
 }
 
 

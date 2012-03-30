@@ -17,9 +17,7 @@
 #include <zen/win_ver.h>
 
 #elif defined FFS_LINUX
-#include <giomm/file.h>
-#include <gtkmm/icontheme.h>
-#include <gtkmm/main.h>
+#include <gtk/gtk.h>
 #endif
 
 using namespace zen;
@@ -59,10 +57,10 @@ public:
     typedef GdkPixbuf* HandleType;
 #endif
 
-    IconHolder(HandleType handle = 0) : handle_(handle) {} //take ownership!
+    explicit IconHolder(HandleType handle = 0) : handle_(handle) {} //take ownership!
 
     //icon holder has value semantics!
-    IconHolder(const IconHolder& other) : handle_(other.handle_ == NULL ? NULL :
+    IconHolder(const IconHolder& other) : handle_(other.handle_ == nullptr ? nullptr :
 #ifdef FFS_WIN
                                                       ::CopyIcon(other.handle_)
 #elif defined FFS_LINUX
@@ -70,7 +68,7 @@ public:
 #endif
                                                      ) {}
 
-    IconHolder(IconHolder&& other) : handle_(other.handle_) { other.handle_ = NULL; }
+    IconHolder(IconHolder&& other) : handle_(other.handle_) { other.handle_ = nullptr; }
 
     IconHolder& operator=(IconHolder other) //unifying assignment: no need for r-value reference optimization!
     {
@@ -80,11 +78,11 @@ public:
 
     ~IconHolder()
     {
-        if (handle_ != NULL)
+        if (handle_ != nullptr)
 #ifdef FFS_WIN
             ::DestroyIcon(handle_);
 #elif defined FFS_LINUX
-            ::g_object_unref(handle_);
+            ::g_object_unref(handle_); //superseedes "::gdk_pixbuf_unref"!
 #endif
     }
 
@@ -92,7 +90,7 @@ public:
 
     wxIcon toWxIcon(int expectedSize) const //copy HandleType, caller needs to take ownership!
     {
-        if (handle_ == NULL)
+        if (handle_ == nullptr)
             return wxNullIcon;
 
         IconHolder clone(*this);
@@ -107,7 +105,7 @@ public:
             if (::GetIconInfo(clone.handle_, &icoInfo))
             {
                 ::DeleteObject(icoInfo.hbmMask); //nice potential for a GDI leak!
-                ZEN_ON_BLOCK_EXIT(::DeleteObject(icoInfo.hbmColor)); //
+                ZEN_ON_SCOPE_EXIT(::DeleteObject(icoInfo.hbmColor)); //
 
                 BITMAP bmpInfo = {};
                 if (::GetObject(icoInfo.hbmColor, //__in   HGDIOBJ hgdiobj,
@@ -130,7 +128,7 @@ public:
 #elif defined FFS_LINUX                   //
         newIcon.SetPixbuf(clone.handle_); // transfer ownership!!
 #endif                                    //
-        clone.handle_ = NULL;             //
+        clone.handle_ = nullptr;             //
         return newIcon;
     }
 
@@ -140,7 +138,7 @@ private:
 
 public:
     //use member pointer as implicit conversion to bool (C++ Templates - Vandevoorde/Josuttis; chapter 20)
-    operator int ConversionToBool::* () const { return handle_ != NULL ? &ConversionToBool::dummy : NULL; }
+    operator int ConversionToBool::* () const { return handle_ != nullptr ? &ConversionToBool::dummy : nullptr; }
 };
 
 
@@ -210,13 +208,13 @@ IconHolder getIconByAttribute(LPCWSTR pszPath, DWORD dwFileAttributes, IconBuffe
                                         SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
     //no need to IUnknown::Release() imgList!
     if (!imgList)
-        return NULL;
+        return IconHolder();
 
     boost::call_once(initGetIconByIndexOnce, []() //thread-safe init
     {
         getIconByIndex = DllFun<thumb::GetIconByIndexFct>(thumb::getDllName(), thumb::getIconByIndexFctName);
     });
-    return getIconByIndex ? static_cast<HICON>(getIconByIndex(fileInfo.iIcon, getShilIconType(sz))) : NULL;
+    return IconHolder(getIconByIndex ? static_cast<HICON>(getIconByIndex(fileInfo.iIcon, getShilIconType(sz))) : nullptr);
 }
 
 
@@ -243,19 +241,11 @@ IconHolder getThumbnail(const Zstring& filename, int requestedSize) //return 0 o
     {
         getThumbnailIcon = DllFun<GetThumbnailFct>(getDllName(), getThumbnailFctName);
     });
-    return getThumbnailIcon ? static_cast< ::HICON>(getThumbnailIcon(filename.c_str(), requestedSize)) : NULL;
+    return IconHolder(getThumbnailIcon ? static_cast< ::HICON>(getThumbnailIcon(filename.c_str(), requestedSize)) : nullptr);
 
 #elif defined FFS_LINUX
-    //call Gtk::Main::init_gtkmm_internals() on application startup!!
-    try
-    {
-        Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = Gdk::Pixbuf::create_from_file(filename.c_str(), requestedSize, requestedSize);
-        if (iconPixbuf)
-            return IconHolder(iconPixbuf->gobj_copy()); //copy and pass icon ownership (may be 0)
-    }
-    catch (const Glib::Error&) {}
-
-    return IconHolder();
+    GdkPixbuf* pixBuf = gdk_pixbuf_new_from_file_at_size(filename.c_str(), requestedSize, requestedSize, nullptr);
+    return IconHolder(pixBuf); //pass ownership (may be 0)
 #endif
 }
 
@@ -276,30 +266,11 @@ IconHolder getGenericFileIcon(IconBuffer::IconSize sz)
 
 #elif defined FFS_LINUX
     const int requestedSize = cvrtSize(sz);
-    try
-    {
-        Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
-        if (iconTheme)
-        {
-            Glib::RefPtr<Gdk::Pixbuf> iconPixbuf;
-            std::find_if(mimeFileIcons, mimeFileIcons + sizeof(mimeFileIcons) / sizeof(mimeFileIcons[0]),
-                         [&](const char* mimeName) -> bool
-            {
-                try
-                {
-                    iconPixbuf = iconTheme->load_icon(mimeName, requestedSize, Gtk::ICON_LOOKUP_USE_BUILTIN);
-                }
-                catch (const Glib::Error&) { return false; }
 
-                return iconPixbuf;
-            }
-                        );
-            if (iconPixbuf)
-                return IconHolder(iconPixbuf->gobj_copy()); // transfer ownership!!
-        }
-    }
-    catch (const Glib::Error&) {}
-
+    if (GtkIconTheme* defaultTheme = gtk_icon_theme_get_default()) //not owned!
+        for (auto iter = std::begin(mimeFileIcons); iter != std::end(mimeFileIcons); ++iter)
+            if (GdkPixbuf* pixBuf = gtk_icon_theme_load_icon(defaultTheme, *iter, requestedSize, GTK_ICON_LOOKUP_USE_BUILTIN, nullptr))
+                return IconHolder(pixBuf); //pass ownership (may be nullptr)
     return IconHolder();
 #endif
 }
@@ -343,44 +314,35 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     //http://msdn.microsoft.com/en-us/library/windows/desktop/bb762185(v=vs.85).aspx
 
     if (!imgList)
-        return NULL;
+        return IconHolder();
     //imgList->Release(); //empiric study: crash on XP if we release this! Seems we do not own it... -> also no GDI leak on Win7 -> okay
     //another comment on http://msdn.microsoft.com/en-us/library/bb762179(v=VS.85).aspx describes exact same behavior on Win7/XP
 
-    boost::call_once(initGetIconByIndexOnce, []() //thread-safe init
+    boost::call_once(initGetIconByIndexOnce, [] //thread-safe init
     {
         getIconByIndex = DllFun<thumb::GetIconByIndexFct>(thumb::getDllName(), thumb::getIconByIndexFctName);
     });
-    return getIconByIndex ? static_cast<HICON>(getIconByIndex(fileInfo.iIcon, getShilIconType(sz))) : NULL;
+    return IconHolder(getIconByIndex ? static_cast<HICON>(getIconByIndex(fileInfo.iIcon, getShilIconType(sz))) : nullptr);
 
 #elif defined FFS_LINUX
     const int requestedSize = cvrtSize(sz);
-    //call Gtk::Main::init_gtkmm_internals() on application startup!!
-    try
-    {
-        Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(filename.c_str()); //never fails
-        Glib::RefPtr<Gio::FileInfo> fileInfo = fileObj->query_info(G_FILE_ATTRIBUTE_STANDARD_ICON);
-        if (fileInfo)
-        {
-            Glib::RefPtr<Gio::Icon> gicon = fileInfo->get_icon();
-            if (gicon)
-            {
-                Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
-                if (iconTheme)
-                {
-                    Gtk::IconInfo iconInfo = iconTheme->lookup_icon(gicon, requestedSize, Gtk::ICON_LOOKUP_USE_BUILTIN); //this may fail if icon is not installed on system
-                    if (iconInfo)
-                    {
-                        Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconInfo.load_icon(); //render icon into Pixbuf
-                        if (iconPixbuf)
-                            return IconHolder(iconPixbuf->gobj_copy()); //copy and pass icon ownership (may be 0)
-                    }
-                }
-            }
-        }
-    }
-    catch (const Glib::Error&) {}
 
+    GFile* file = g_file_new_for_path(filename.c_str()); //never fails
+    ZEN_ON_SCOPE_EXIT(g_object_unref(file);)
+
+    if (GFileInfo* fileInfo = g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_ICON, G_FILE_QUERY_INFO_NONE, nullptr, nullptr))
+    {
+        ZEN_ON_SCOPE_EXIT(g_object_unref(fileInfo);)
+
+        if (GIcon* gicon = g_file_info_get_icon(fileInfo)) //not owned!
+            if (GtkIconTheme* defaultTheme = gtk_icon_theme_get_default()) //not owned!
+                if (GtkIconInfo* iconInfo = gtk_icon_theme_lookup_by_gicon(defaultTheme, gicon, requestedSize, GTK_ICON_LOOKUP_USE_BUILTIN)) //this may fail if icon is not installed on system
+                {
+                    ZEN_ON_SCOPE_EXIT(gtk_icon_info_free(iconInfo);)
+                    if (GdkPixbuf* pixBuf = gtk_icon_info_load_icon(iconInfo, nullptr))
+                        return IconHolder(pixBuf); //pass ownership (may be nullptr)
+                }
+    }
     //fallback: icon lookup may fail because some icons are currently not present on system
     return ::getGenericFileIcon(sz);
 #endif
@@ -450,14 +412,14 @@ typedef std::queue<Zstring> IconDbSequence; //entryName
 class Buffer
 {
 public:
-    bool requestFileIcon(const Zstring& fileName, IconHolder* icon = NULL)
+    bool requestFileIcon(const Zstring& fileName, IconHolder* icon = nullptr)
     {
         boost::lock_guard<boost::mutex> dummy(lockBuffer);
 
         auto iter = iconMappping.find(fileName);
         if (iter != iconMappping.end())
         {
-            if (icon != NULL)
+            if (icon != nullptr)
                 *icon = iter->second;
             return true;
         }
@@ -518,8 +480,8 @@ void WorkerThread::operator()() //thread entry
     //Prerequisites, see thumbnail.h
 
     //1. Initialize COM
-    ::CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-    ZEN_ON_BLOCK_EXIT(::CoUninitialize());
+    ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    ZEN_ON_SCOPE_EXIT(::CoUninitialize());
 
     //2. Initialize system image list
     typedef BOOL (WINAPI* FileIconInitFun)(BOOL fRestoreCache);

@@ -251,11 +251,11 @@ enum UnitSize
 enum UnitTime
 {
     UTIME_NONE,
-    //UTIME_LAST_X_HOURS,
     UTIME_TODAY,
-    UTIME_THIS_WEEK,
+    //    UTIME_THIS_WEEK,
     UTIME_THIS_MONTH,
-    UTIME_THIS_YEAR
+    UTIME_THIS_YEAR,
+    UTIME_LAST_X_DAYS
 };
 
 struct FilterConfig

@@ -17,6 +17,7 @@
 #include <zen/time.h>
 #include "exec_finished_box.h"
 #include <wx+/shell_execute.h>
+#include "../lib/status_handler_impl.h"
 
 using namespace zen;
 
@@ -36,7 +37,7 @@ public:
     }
 
     virtual std::shared_ptr<TraverseCallback>
-    onDir    (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
+    onDir (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
     virtual void        onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
     virtual HandleError onError  (const std::wstring& errorText) { return TRAV_ERROR_IGNORE; } //errors are not really critical in this context
 
@@ -54,7 +55,7 @@ public:
         jobName_(jobName), //throw FileError
         logfileName(findUniqueLogname(logfileDirectory, jobName))
     {
-        logFile.Open(toWx(logfileName), wxT("w"));
+        logFile.Open(toWx(logfileName), L"w");
         if (!logFile.IsOpened())
             throw FileError(_("Unable to create log file!") + L"\"" + logfileName + L"\"");
 
@@ -62,33 +63,39 @@ public:
         wxString headerLine = wxString(L"FreeFileSync - ") + _("Batch execution") + L" - " + formatTime<wxString>(FORMAT_DATE);
 
         logFile.Write(headerLine + wxChar('\n'));
-        logFile.Write(wxString().Pad(headerLine.Len(), wxChar('-')) + wxChar('\n') + wxChar('\n'));
+        logFile.Write(wxString().Pad(headerLine.Len(), L'=') + L'\n');
 
         logItemStart = formatTime<wxString>(L"[%X] ") + _("Start");
 
         totalTime.Start(); //measure total time
     }
 
-    void writeLog(const ErrorLogging& log, const wxString& finalStatus)
+    void writeLog(const ErrorLog& log, const std::wstring& finalStatus)
     {
-        logFile.Write(finalStatus + L"\n\n"); //highlight result by placing at beginning of file
+        const size_t sepLineLen = finalStatus.size();
+
+        //result + statistics
+        logFile.Write(wxString().Pad(sepLineLen, L'_') + L'\n');
+        logFile.Write(L"\n" + finalStatus + L"\n");
+        logFile.Write(wxString().Pad(sepLineLen, L'_') + L"\n\n");
 
         logFile.Write(logItemStart + L"\n\n");
 
         //write actual logfile
-        const std::vector<wxString>& messages = log.getFormattedMessages();
-        for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
-            logFile.Write(*i + L'\n');
+        const auto& entries = log.getEntries();
+        for (auto iter = entries.begin(); iter != entries.end(); ++iter)
+        {
+            const std::string& msg = utf8CvrtTo<std::string>(formatMessage(*iter));
+            logFile.Write(msg.c_str(), msg.size()); //better do UTF8 conversion ourselves rather than to rely on wxWidgets
+            logFile.Write(L'\n');
+        }
 
-        //write ending
+        //write footer
         logFile.Write(L'\n');
-
-        const long time = totalTime.Time(); //retrieve total time
-
-        logFile.Write(wxString(L"[") + formatTime<wxString>(FORMAT_TIME) + L"] " + _("Stop") + L" (" + _("Total time:") + L" " + wxTimeSpan::Milliseconds(time).Format() + L")\n");
+        logFile.Write(formatTime<wxString>(L"[%X] ") + _("Stop") + L" (" + _("Total time:") + L" " + wxTimeSpan::Milliseconds(totalTime.Time()).Format() + L")\n");
     }
 
-    void limitLogfileCount(size_t maxCount) const
+    void limitLogfileCount(size_t maxCount) const //throw()
     {
         std::vector<Zstring> logFiles;
         FindLogfiles traverseCallback(toZ(jobName_), logFiles);
@@ -101,7 +108,7 @@ public:
             return;
 
         //delete oldest logfiles
-        std::sort(logFiles.begin(), logFiles.end()); //take advantage of logfile naming convention to sort by age
+        std::nth_element(logFiles.begin(), logFiles.end() - maxCount, logFiles.end()); //take advantage of logfile naming convention to find oldest files
 
         std::for_each(logFiles.begin(), logFiles.end() - maxCount,
         [](const Zstring& filename) { try { zen::removeFile(filename); } catch (FileError&) {} });
@@ -130,7 +137,7 @@ private:
         Zstring output = logfileName + Zstr(".log");
 
         for (int i = 1; zen::somethingExists(output); ++i)
-            output = logfileName + Zstr('_') + zen::toString<Zstring>(i) + Zstr(".log");
+            output = logfileName + Zstr('_') + zen::numberTo<Zstring>(i) + Zstr(".log");
         return output;
     }
 
@@ -158,34 +165,31 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     handleError_(handleError),
     currentProcess(StatusHandler::PROCESS_NONE),
     returnValue(returnVal),
-    syncStatusFrame(*this, NULL, SyncStatus::SCANNING, showProgress, jobName, execWhenFinished, execFinishedHistory)
+    syncStatusFrame(*this, nullptr, SyncStatus::SCANNING, showProgress, jobName, execWhenFinished, execFinishedHistory)
 {
     if (logFileCountMax > 0)
     {
-        try
+        if (!tryReportingError([&]
+    {
+        logFile = std::make_shared<LogFile>(toZ(logfileDirectory), jobName); //throw FileError
+            logFile->limitLogfileCount(logFileCountMax); //throw()
+        }, *this))
         {
-            logFile = std::make_shared<LogFile>(toZ(logfileDirectory), jobName); //throw FileError
-            logFile->limitLogfileCount(logFileCountMax); //throw FileError
-        }
-        catch (zen::FileError& error)
-        {
-            if (handleError_ == xmlAccess::ON_ERROR_POPUP)
-                wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
             returnValue = -7;
             throw BatchAbortProcess();
         }
-
-        //::wxSetEnv(L"logfile", logFile->getLogfileName());
     }
+
+    //::wxSetEnv(L"logfile", logFile->getLogfileName());
 }
 
 
 BatchStatusHandler::~BatchStatusHandler()
 {
-    const int totalErrors = errorLog.typeCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
+    const int totalErrors = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
 
     //finalize error log
-    wxString finalStatus;
+    std::wstring finalStatus;
     if (abortIsRequested())
     {
         returnValue = -4;
@@ -345,7 +349,7 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
                     break;
 
                 case ReturnWarningDlg::BUTTON_SWITCH:
-                    errorLog.logMsg(_("Switching to FreeFileSync GUI mode..."), TYPE_WARNING);
+                    errorLog.logMsg(_("Switching to FreeFileSync GUI mode..."), TYPE_INFO);
                     switchToGuiRequested = true;
                     abortThisProcess();
                     break;

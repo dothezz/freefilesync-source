@@ -19,12 +19,14 @@ namespace zen
 
 Windows
 -------
-Recycler always available: during runtime either SHFileOperation or (since Vista) IFileOperation will be dynamically selected
+Recycler API always available: during runtime either SHFileOperation or IFileOperation (since Vista) will be dynamically selected
 
 Linux
 -----
-Compiler flag: `pkg-config --cflags gtkmm-2.4`
-Linker   flag: `pkg-config --libs gtkmm-2.4`
+Compiler flags: `pkg-config --cflags gio-2.0`
+Linker   flags: `pkg-config --libs gio-2.0`
+
+Already included in package "gtk+-2.0"!
 */
 
 //move a file or folder to Recycle Bin (deletes permanently if recycle is not available)

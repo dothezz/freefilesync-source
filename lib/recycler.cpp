@@ -22,8 +22,9 @@
 #include "IFileOperation/file_op.h"
 
 #elif defined FFS_LINUX
+#include <zen/scope_guard.h>
 #include <sys/stat.h>
-#include <giomm/file.h>
+#include <gio/gio.h>
 #endif
 
 using namespace zen;
@@ -52,7 +53,7 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw F
 
     static bool useIFileOperation = false;
     static boost::once_flag once = BOOST_ONCE_INIT; //caveat: function scope static initialization is not thread-safe in VS 2010!
-    boost::call_once(once, []() { useIFileOperation = vistaOrLater(); });
+    boost::call_once(once, [] { useIFileOperation = vistaOrLater(); });
 
     if (useIFileOperation) //new recycle bin usage: available since Vista
     {
@@ -65,8 +66,8 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw F
         const DllFun<GetLastErrorFct>     getLastError  (getDllName(), getLastErrorFctName);
 
         if (!moveToRecycler || !getLastError)
-            throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + fileNames[0] + L"\"" + //report first file only... better than nothing
-                            L"\n\n" + _("Could not load a required DLL:") + L" \"" + getDllName() + L"\"");
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", std::wstring(L"\"") + fileNames[0] + L"\"") + L"\n\n" + //report first file only... better than nothing
+                            replaceCpy(_("Cannot load file %x."), L"%x", std::wstring(L"\"") + getDllName() + L"\""));
 
         //#warning moving long file paths to recycler does not work! clarify!
         //        std::vector<Zstring> temp;
@@ -76,10 +77,11 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw F
         if (!moveToRecycler(&fileNames[0], //array must not be empty
                             fileNames.size()))
         {
-            wchar_t errorMessage[2000];
-            getLastError(errorMessage, 2000);
-            throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + fileNames[0] + L"\"" + //report first file only... better than nothing
-                            L"\n\n" + L"(" + errorMessage + L")");
+            std::vector<wchar_t> msgBuffer(2000);
+            getLastError(&msgBuffer[0], msgBuffer.size());
+
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", std::wstring(L"\"") + fileNames[0] + L"\"") + L"\n\n" + //report first file only... better than nothing
+                            &msgBuffer[0]);
         }
     }
     else //regular recycle bin usage: available since XP
@@ -95,18 +97,18 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw F
         }
 
         SHFILEOPSTRUCT fileOp = {};
-        fileOp.hwnd   = NULL;
+        fileOp.hwnd   = nullptr;
         fileOp.wFunc  = FO_DELETE;
         fileOp.pFrom  = filenameDoubleNull.c_str();
-        fileOp.pTo    = NULL;
+        fileOp.pTo    = nullptr;
         fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI;
         fileOp.fAnyOperationsAborted = false;
-        fileOp.hNameMappings         = NULL;
-        fileOp.lpszProgressTitle     = NULL;
+        fileOp.hNameMappings         = nullptr;
+        fileOp.lpszProgressTitle     = nullptr;
 
         if (::SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
         {
-            throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + filenameDoubleNull + L"\""); //report first file only... better than nothing
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", std::wstring(L"\"") + filenameDoubleNull.c_str() + L"\"")); //report first file only... better than nothing
         }
     }
 }
@@ -128,17 +130,20 @@ bool zen::moveToRecycleBin(const Zstring& filename)  //throw FileError
     ::moveToWindowsRecycler(fileNames);  //throw FileError
 
 #elif defined FFS_LINUX
-    Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(filename.c_str()); //never fails
-    try
+    GFile* file = g_file_new_for_path(filename.c_str()); //never fails according to docu
+    ZEN_ON_SCOPE_EXIT(g_object_unref(file);)
+
+    GError* error = nullptr;
+    ZEN_ON_SCOPE_EXIT(if (error) g_error_free(error););
+
+    if (!g_file_trash(file, nullptr, &error))
     {
-        if (!fileObj->trash())
-            throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + filename + L"\"" +
-                            L"\n\n" + L"(unknown error)");
-    }
-    catch (const Glib::Error& errorObj)
-    {
+        if (!error)
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", L"\"" + filename + L"\"") + L"\n\n" +
+                            L"Unknown error.");
+
         //implement same behavior as in Windows: if recycler is not existing, delete permanently
-        if (errorObj.code() == G_IO_ERROR_NOT_SUPPORTED)
+        if (error->code == G_IO_ERROR_NOT_SUPPORTED)
         {
             struct stat fileInfo = {};
             if (::lstat(filename.c_str(), &fileInfo) != 0)
@@ -152,11 +157,11 @@ bool zen::moveToRecycleBin(const Zstring& filename)  //throw FileError
         }
 
         //assemble error message
-        const std::wstring errorMessage = L"Glib Error Code " + toString<std::wstring>(errorObj.code()) + /* L", " +
-                                          g_quark_to_string(errorObj.domain()) + */ L": " + utf8CvrtTo<std::wstring>(errorObj.what());
+        const std::wstring errorMessage = L"Glib Error Code " + numberTo<std::wstring>(error->code) + /* L", " +
+                                          g_quark_to_string(error->domain) + */ L": " + utf8CvrtTo<std::wstring>(error->message);
 
-        throw FileError(_("Error moving to Recycle Bin:") + L"\n\"" + filename + L"\"" +
-                        L"\n\n" + L"(" + errorMessage + L")");
+        throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", L"\"" + filename + L"\"") + L"\n\n" +
+                        errorMessage);
     }
 #endif
     return true;
@@ -166,10 +171,11 @@ bool zen::moveToRecycleBin(const Zstring& filename)  //throw FileError
 #ifdef FFS_WIN
 zen::StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
 {
-    std::vector<wchar_t> buffer(MAX_PATH + 1);
-    if (::GetVolumePathName(applyLongPathPrefix(pathName).c_str(), //__in   LPCTSTR lpszFileName,
-                            &buffer[0],                            //__out  LPTSTR lpszVolumePathName,
-                            static_cast<DWORD>(buffer.size())))    //__in   DWORD cchBufferLength
+    const DWORD bufferSize = MAX_PATH + 1;
+    std::vector<wchar_t> buffer(bufferSize);
+    if (::GetVolumePathName(pathName.c_str(), //__in   LPCTSTR lpszFileName,
+                            &buffer[0],       //__out  LPTSTR lpszVolumePathName,
+                            bufferSize))      //__in   DWORD cchBufferLength
     {
         Zstring rootPath = &buffer[0];
         if (!endsWith(rootPath, FILE_NAME_SEPARATOR)) //a trailing backslash is required

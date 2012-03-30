@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Ρύθμιση του φίλτρου</target>
 
-<source>Customize columns</source>
-<target>Προσαρμογή στηλών</target>
-
 <source>Global settings</source>
 <target>Γενικές ρυθμίσεις</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Αναζήτηση</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Σφάλμα κατά την ανάγνωση από τη βάση δεδομένων συγχρονισμού:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Σφάλμα κατά την εγγραφή στη βάση δεδομένων συγχρονισμού:</target>
-
 <source>Invalid command line: %x</source>
 <target>Σφάλμα στη γραμμή εντολών: %x</target>
+
+<source>Info</source>
+<target>Πληροφορία</target>
+
+<source>Fatal Error</source>
+<target>Σημαντικό Σφάλμα</target>
 
 <source>Windows Error Code %x:</source>
 <target>Κωδικός Σφάλματος των Windows %x:</target>
@@ -139,14 +136,20 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Σφάλμα κατά την ανάγνωση από τη βάση δεδομένων συγχρονισμού:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Σφάλμα κατά την εγγραφή στη βάση δεδομένων συγχρονισμού:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Η μορφή της βάσης δεδομένων συγχρονισμού δεν είναι συμβατή:</target>
+
 <source>Initial synchronization:</source>
 <target>Αρχικός συγχρονισμός:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Μια από τις βάσεις δεδομένων του FreeFileSync δεν υπάρχει ακόμα:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Η μορφή της βάσης δεδομένων συγχρονισμού δεν είναι συμβατή:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Οι βάσεις δεδομένων δεν έχουν δημιουργηθεί από τον ίδιο συγχρονισμό:</target>
@@ -172,12 +175,6 @@
 <pluralform>%x δ/λεπτα</pluralform>
 </target>
 
-<source>Info</source>
-<target>Πληροφορία</target>
-
-<source>Fatal Error</source>
-<target>Σημαντικό Σφάλμα</target>
-
 <source>Error reading file:</source>
 <target>Σφάλμα κατά την ανάγνωση του αρχείου:</target>
 
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>Σφάλμα κατά την ανάλυση του αρχείου διάταξης:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Σφάλμα κατά τη μεταφορά στον Κάδο Ανακύκλωσης:</target>
+<source>Configuration loaded partially only:</source>
+<target>Μόνο ένα τμήμα του αρχείου διάταξης φορτώθηκε:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Δεν φορτώθηκε μια απαιτούμενη βιβλιοθήκη DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Δεν ήταν δυνατό να μεταφερθεί το %x στον Κάδο Ανακύκλωσης!</target>
+
+<source>Cannot load file %x.</source>
+<target>Το αρχείο %x δεν ήταν δυνατόν να φορτωθεί.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Σφάλμα κατά την πρόσβαση στην υπηρεσία Volume Shadow Copy!</target>
@@ -214,10 +214,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Δεν είναι δυνατή η δημιουργία σκιώδους αντίγραφου σε WOW64. Χρησιμοποιείστε την 64-bit έκδοση του FreeFileSync.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Δεν ήταν δυνατό να προσδιοριστεί το όνομα τόμου για το αρχείο:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Δεν ήταν δυνατό να βρεθεί το όνομα τόμου για το αρχείο:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Το όνομα τόμου %x δεν είναι μέρος του ονόματος του αρχείου %y!</target>
 
 <source>/sec</source>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>Το αρχείο δεν υπάρχει:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Δεν αναγνώστηκαν τιμές για τους ακόλουθους κόμβους XML:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Δεν ήταν δυνατό να αναγνωσθούν τα ακόλουθα στοιχεία XML:</target>
 
 <source>S&ave configuration...</source>
 <target>Α&ποθήκευση διάταξης...</target>
@@ -540,17 +540,17 @@ The command line is executed each time:
 <source>Speed:</source>
 <target>Ταχύτητα:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Απομένει χρόνος:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Πέρασε χρόνος:</target>
 
 <source>Batch job</source>
 <target>Δέσμη ενεργειών</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Δημιουργία ενός αρχείου δέσμης ενεργειών για αυτόματο συγχρονισμό. Για την έναρξη σε λειτουργία δέσμης, απλά κάντε διπλό κλικ στο αρχείο ή εκτελέστε το μέσω της γραμμής εντολών: FreeFileSync.exe <αρχείο δέσμης>. Αυτή η λειτουργία μπορεί να προγραμματιστεί και στο χρονοδιάγραμμα εργασιών του λειτουργικού σας συστήματος.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Δημιουργία μιας δέσμης ενεργειών που αυτοματοποιεί το συγχρονισμό. Για να ξεκινήσετε τη λειτουργία δέσμης, απλώς κάντε διπλό κλικ στο αρχείο δέσμης ή πληκτρολογείστε την εντολή: FreeFileSync.exe SyncJob.ffs_batch. Επίσης η ενέργεια αυτή μπορεί να προγραμματιστεί στο χρονοδιάγραμμα εργασιών του υπολογιστή σας.</target>
 
 <source>Help</source>
 <target>Βοήθεια</target>
@@ -563,9 +563,6 @@ The command line is executed each time:
 
 <source>Right</source>
 <target>Δεξιά</target>
-
-<source>Overview</source>
-<target>Σύνοψη</target>
 
 <source>Status feedback</source>
 <target>Αναφορά κατάστασης</target>
@@ -711,8 +708,8 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>Διανέμεται υπό την Γενική Άδεια Δημόσιας Χρήσης GNU</target>
 
-<source>Ignore subsequent errors</source>
-<target>Παράβλεψη των επόμενων σφαλμάτων</target>
+<source>Ignore further errors</source>
+<target>Αγνόηση επόμενων σφαλμάτων</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Απόκρυψη επόμενων μηνυμάτων σφάλματος στην τρέχουσα διαδικασία</target>
@@ -735,22 +732,22 @@ is the same
 <source>&No</source>
 <target>&Όχι</target>
 
+<source>Use Recycle Bin</source>
+<target>Χρήση του Κάδου Ανακύκλωσης</target>
+
 <source>Delete on both sides</source>
 <target>Διαγραφή και στις δυο πλευρές</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Διαγραφή και στις δυο πλευρές, ακόμα κι αν το αρχείο έχει επιλεχθεί μόνο στη μια πλευρά</target>
 
-<source>Use Recycle Bin</source>
-<target>Χρήση του Κάδου Ανακύκλωσης</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Μόνον αρχεία/υποκατάλογοι που ταιριάζουν με όλες τις ρυθμίσεις φίλτρου θα επιλεχθούν για συγχρονισμό.
-Σημείωση: Το φίλτρο ονόματος πρέπει να οριστεί σε σχέση(!) με τους κύριους υποκαταλόγους συγχρονισμού.
+Θα συγχρονιστούν μόνον όσα αρχεία πληρούν όλες τις απαιτήσεις των φίλτρων.
+Σημείωση: Πρέπει να χρησιμοποιούνται οι σχετικές διαδρομές των αρχείων ως προς τους υποκαταλόγους που συγχρονίζονται.
 </target>
 
 <source>Hints:</source>
@@ -786,20 +783,20 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>Εξαίρεση</target>
 
-<source>Minimum file size</source>
-<target>Ελάχιστο μέγεθος αρχείου</target>
+<source>Time span</source>
+<target>Εύρος χρόνου</target>
 
-<source>Maximum file size</source>
-<target>Μέγιστο μέγεθος αρχείου</target>
+<source>File size</source>
+<target>Μέγεθος αρχείου</target>
+
+<source>Minimum</source>
+<target>Ελάχιστο</target>
+
+<source>Maximum</source>
+<target>Μέγιστο</target>
 
 <source>&Default</source>
 <target>&Προεπιλογή</target>
-
-<source>Move column up</source>
-<target>Μετακίνηση της στήλης πάνω</target>
-
-<source>Move column down</source>
-<target>Μετακίνηση της στήλης κάτω</target>
 
 <source>Transactional file copy</source>
 <target>Συνδιαλλακτική αντιγραφή αρχείων</target>
@@ -819,14 +816,8 @@ Exclude: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Μεταφορά των αδειών για τα αρχεία και τους υποκαταλόγους (Απαιτεί δικαιώματα Aministrator)</target>
 
-<source>Hidden dialogs:</source>
-<target>Κρυμμένα παράθυρα διαλόγου:</target>
-
-<source>Reset</source>
-<target>Επανεμφάνιση</target>
-
-<source>Show hidden dialogs</source>
-<target>Επανεμφάνιση των κρυμμένων παραθύρων διαλόγου</target>
+<source>Restore hidden dialogs</source>
+<target>Επανεμφάνιση κρυμμένων μηνυμάτων</target>
 
 <source>External applications</source>
 <target>Εξωτερικές εφαρμογές</target>
@@ -858,8 +849,8 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Ζεύγη υποκαταλόγων</target>
 
-<source>Compressed view</source>
-<target>Συμπιεσμένη εμφάνιση</target>
+<source>Overview</source>
+<target>Σύνοψη</target>
 
 <source>Select view</source>
 <target>Επιλογή εμφάνισης</target>
@@ -888,8 +879,8 @@ Exclude: \stuff\temp\*
 <source>Exclude all</source>
 <target>Εξαίρεση όλων</target>
 
-<source>Icon size:</source>
-<target>Μέγεθος εικονιδίων:</target>
+<source>Show icons:</source>
+<target>Εμφάνιση εικονιδίων:</target>
 
 <source>Small</source>
 <target>Μικρό</target>
@@ -914,6 +905,9 @@ Exclude: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Η διάταξη αποθηκεύτηκε!</target>
+
+<source>Never save changes</source>
+<target>Να μην αποθηκεύονται οι αλλαγές</target>
 
 <source>Save changes to current configuration?</source>
 <target>Να αποθηκευτούν οι αλλαγές στην τρέχουσα διάταξη;</target>
@@ -1026,9 +1020,6 @@ Exclude: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Σφάλμα κατά την εγγραφή του αρχείου:</target>
 
-<source>Batch file created successfully!</source>
-<target>Το αρχείο δέσμης ενεργειών δημιουργήθηκε επιτυχώς!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1107,6 +1098,9 @@ Exclude: \stuff\temp\*
 <source>This year</source>
 <target>Αυτό το έτος</target>
 
+<source>Last x days</source>
+<target>Τελευταίες x ημέρες</target>
+
 <source>Byte</source>
 <target>Byte</target>
 
@@ -1116,11 +1110,8 @@ Exclude: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Φίλτρο: Όλα τα ζεύγη</target>
-
-<source>Filter: Single pair</source>
-<target>Φίλτρο: Ένα ζεύγος</target>
+<source>Filter</source>
+<target>Φίλτρο</target>
 
 <source>Direct</source>
 <target>Ως δεσμό</target>
@@ -1146,8 +1137,8 @@ Exclude: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Ο αντίστοιχος %dir της άλλης πλευράς</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Επανεμφάνιση των κρυμμένων παραθύρων διαλόγου;</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Να φαίνονται τα παράθυρα και οι αναφορές σφαλμάτων που είχατε διαλέξει να μην εμφανίζονται;</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1278,9 +1269,6 @@ Exclude: \stuff\temp\*
 <source>Error copying file:</source>
 <target>Σφάλμα κατά την αντιγραφή του αρχείου:</target>
 
-<source>Error opening file:</source>
-<target>Σφάλμα κατά το άνοιγμα του αρχείου:</target>
-
 <source>Error traversing directory:</source>
 <target>Σφάλμα κατά την ανάλυση του υποκαταλόγου:</target>
 
@@ -1323,8 +1311,8 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Προετοιμασία του συγχρονισμού...</target>
 
-<source>Memory allocation failed!</source>
-<target>Η δέσμευση χώρου μνήμης απέτυχε!</target>
+<source>Out of memory!</source>
+<target>Ανεπαρκής μνήμη!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Το αρχείο %x δεν έχει έγκυρη ημερομηνία!</target>
@@ -1479,11 +1467,11 @@ Exclude: \stuff\temp\*
 <source>Generating database...</source>
 <target>Δημιουργία βάσης δεδομένων...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Τίποτα προς συγχρονισμό με βάση τη διάταξη!</target>
+<source>Nothing to synchronize!</source>
+<target>Δεν υπάρχει τίποτα προς συγχρονισμό!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Σφάλμα κατά την αντιγραφή του κλειδωμένου αρχείου %x !</target>
+<source>Unable to copy locked file %x!</source>
+<target>Δεν ήταν δυνατό να αντιγραφεί το κλειδωμένο αρχείο %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Σφάλμα επικύρωσης δεδομένων: Τα αρχεία προέλευσης και προορισμού έχουν διαφορετικό περιεχόμενο!</target>

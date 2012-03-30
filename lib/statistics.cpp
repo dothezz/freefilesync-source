@@ -6,14 +6,13 @@
 
 #include "statistics.h"
 
-#include <wx/ffile.h>
-#include <zen/basic_math.h>
-#include "status_handler.h"
-#include <wx+/format_unit.h>
 #include <limits>
+#include <wx/ffile.h>
 #include <wx/stopwatch.h>
+#include <zen/basic_math.h>
 #include <zen/assert_static.h>
 #include <zen/i18n.h>
+#include <wx+/format_unit.h>
 
 
 using namespace zen;
@@ -29,11 +28,11 @@ RetrieveStatistics::~RetrieveStatistics()
     std::for_each(data.begin(), data.end(),
                   [&](const StatEntry& entry)
     {
-        outputFile.Write(toString<wxString>(entry.time));
+        outputFile.Write(numberTo<wxString>(entry.time));
         outputFile.Write(wxT(";"));
-        outputFile.Write(toString<wxString>(entry.objects));
+        outputFile.Write(numberTo<wxString>(entry.objects));
         outputFile.Write(wxT(";"));
-        outputFile.Write(toString<wxString>(entry.value));
+        outputFile.Write(numberTo<wxString>(entry.value));
         outputFile.Write(wxT("\n"));
     });
 }

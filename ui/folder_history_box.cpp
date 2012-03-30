@@ -31,14 +31,14 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
     /*##*/ SetMinSize(wxSize(150, -1)); //## workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
     //#####################################
 
-    Connect(wxEVT_KEY_DOWN,                      wxKeyEventHandler(FolderHistoryBox::OnKeyEvent  ), NULL, this);
-    Connect(wxEVT_LEFT_DOWN,                        wxEventHandler(FolderHistoryBox::OnUpdateList), NULL, this);
-    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(FolderHistoryBox::OnSelection ), NULL, this);
-    Connect(wxEVT_MOUSEWHEEL,                  wxMouseEventHandler(FolderHistoryBox::OnMouseWheel), NULL, this);
+    Connect(wxEVT_KEY_DOWN,                      wxKeyEventHandler(FolderHistoryBox::OnKeyEvent  ), nullptr, this);
+    Connect(wxEVT_LEFT_DOWN,                        wxEventHandler(FolderHistoryBox::OnUpdateList), nullptr, this);
+    Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(FolderHistoryBox::OnSelection ), nullptr, this);
+    Connect(wxEVT_MOUSEWHEEL,                  wxMouseEventHandler(FolderHistoryBox::OnMouseWheel), nullptr, this);
 
 #if wxCHECK_VERSION(2, 9, 1)
-    Connect(wxEVT_COMMAND_COMBOBOX_DROPDOWN, wxCommandEventHandler(FolderHistoryBox::OnShowDropDown), NULL, this);
-    Connect(wxEVT_COMMAND_COMBOBOX_CLOSEUP, wxCommandEventHandler(FolderHistoryBox::OnHideDropDown), NULL, this);
+    Connect(wxEVT_COMMAND_COMBOBOX_DROPDOWN, wxCommandEventHandler(FolderHistoryBox::OnShowDropDown), nullptr, this);
+    Connect(wxEVT_COMMAND_COMBOBOX_CLOSEUP, wxCommandEventHandler(FolderHistoryBox::OnHideDropDown), nullptr, this);
 #endif
 }
 
@@ -152,7 +152,7 @@ void FolderHistoryBox::OnMouseWheel(wxMouseEvent& event)
         if (!wnd)
             break;
 
-        if (dynamic_cast<wxScrolledWindow*>(wnd) != NULL)
+        if (dynamic_cast<wxScrolledWindow*>(wnd) != nullptr)
         {
             wnd->GetEventHandler()->AddPendingEvent(event);
             break;

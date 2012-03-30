@@ -29,10 +29,7 @@ bool isXmlTypeRTS(const XmlDoc& doc) //throw()
     {
         std::string type;
         if (doc.root().getAttribute("XmlType", type))
-        {
-            if (type == "REAL")
-                return true;
-        }
+            return type == "REAL";
     }
     return false;
 }
@@ -54,7 +51,7 @@ void xmlAccess::readRealConfig(const wxString& filename, XmlRealConfig& config)
     ::readConfig(in, config);
 
     if (in.errorsOccured())
-        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + toZ(filename) + L"\"\n\n" +
+        throw FfsXmlError(_("Configuration loaded partially only:") + L"\n\"" + toZ(filename) + L"\"\n\n" +
                           getErrorMessageFormatted(in), FfsXmlError::WARNING);
 }
 

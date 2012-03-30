@@ -17,9 +17,9 @@ namespace
 Zstring getVolumeName(const Zstring& filename)
 {
     //this call is expensive: ~1.5 ms!
-    //    if (!::GetVolumePathName(applyLongPathPrefix(filename).c_str(), //__in   LPCTSTR lpszFileName,
-    //                             fsName,                                     //__out  LPTSTR lpszVolumePathName,
-    //                             BUFFER_SIZE))                               //__in   DWORD cchBufferLength
+    //    if (!::GetVolumePathName(filename.c_str(), //__in   LPCTSTR lpszFileName,
+    //                             fsName,           //__out  LPTSTR lpszVolumePathName,
+    //                             BUFFER_SIZE))     //__in   DWORD cchBufferLength
     // ...
     //    Zstring volumePath = fsName;
     //    if (!volumePath.EndsWith(FILE_NAME_SEPARATOR)) //a trailing backslash is required
@@ -65,11 +65,11 @@ bool dst::isFatDrive(const Zstring& fileName) //throw()
 
     //suprisingly fast: ca. 0.03 ms per call!
     if (!::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
-                                NULL,               //__out      LPTSTR lpVolumeNameBuffer,
+                                nullptr,            //__out      LPTSTR lpVolumeNameBuffer,
                                 0,                  //__in       DWORD nVolumeNameSize,
-                                NULL,               //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                NULL,               //__out_opt  LPDWORD lpMaximumComponentLength,
-                                NULL,               //__out_opt  LPDWORD lpFileSystemFlags,
+                                nullptr,            //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                nullptr,            //__out_opt  LPDWORD lpMaximumComponentLength,
+                                nullptr,            //__out_opt  LPDWORD lpFileSystemFlags,
                                 fsName,             //__out      LPTSTR lpFileSystemNameBuffer,
                                 BUFFER_SIZE))       //__in       DWORD nFileSystemNameSize
     {
@@ -105,11 +105,11 @@ bool dst::isFatDrive(HANDLE hFile) //throw()
     wchar_t fsName[BUFFER_SIZE];
 
     if (!getVolumeInformationByHandle(hFile,        //__in       HANDLE hFile,
-                                      NULL,         //__out      LPTSTR lpVolumeNameBuffer,
+                                      nullptr,      //__out      LPTSTR lpVolumeNameBuffer,
                                       0,            //__in       DWORD nVolumeNameSize,
-                                      NULL,         //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                      NULL,         //__out_opt  LPDWORD lpMaximumComponentLength,
-                                      NULL,         //__out_opt  LPDWORD lpFileSystemFlags,
+                                      nullptr,      //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                      nullptr,      //__out_opt  LPDWORD lpMaximumComponentLength,
+                                      nullptr,      //__out_opt  LPDWORD lpFileSystemFlags,
                                       fsName,       //__out      LPTSTR lpFileSystemNameBuffer,
                                       BUFFER_SIZE)) //__in       DWORD nFileSystemNameSize
     {
@@ -158,6 +158,7 @@ Int64 toInt64(const FILETIME& fileTime)
 }
 
 
+inline
 FILETIME utcToLocal(const FILETIME& utcTime) //throw (std::runtime_error)
 {
     //treat binary local time representation (which is invariant under DST time zone shift) as logical UTC:
@@ -167,14 +168,15 @@ FILETIME utcToLocal(const FILETIME& utcTime) //throw (std::runtime_error)
             &localTime)) //__out  LPFILETIME lpLocalFileTime
     {
         const std::wstring errorMessage = _("Conversion error:") + L" FILETIME -> local FILETIME: " + L"(" +
-                                          L"High: " + toString<std::wstring>(utcTime.dwHighDateTime) + L" " +
-                                          L"Low: "  + toString<std::wstring>(utcTime.dwLowDateTime) + L") " + L"\n\n" + getLastErrorFormatted();
+                                          L"High: " + numberTo<std::wstring>(utcTime.dwHighDateTime) + L" " +
+                                          L"Low: "  + numberTo<std::wstring>(utcTime.dwLowDateTime) + L") " + L"\n\n" + getLastErrorFormatted();
         throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
     }
     return localTime;
 }
 
 
+inline
 FILETIME localToUtc(const FILETIME& localTime) //throw (std::runtime_error)
 {
     //treat binary local time representation (which is invariant under DST time zone shift) as logical UTC:
@@ -184,8 +186,8 @@ FILETIME localToUtc(const FILETIME& localTime) //throw (std::runtime_error)
             &utcTime))  //__out  LPFILETIME lpFileTime
     {
         const std::wstring errorMessage = _("Conversion error:") + L" local FILETIME -> FILETIME: " + L"(" +
-                                          L"High: " + toString<std::wstring>(localTime.dwHighDateTime) + L" " +
-                                          L"Low: "  + toString<std::wstring>(localTime.dwLowDateTime) + L") " + L"\n\n" + getLastErrorFormatted();
+                                          L"High: " + numberTo<std::wstring>(localTime.dwHighDateTime) + L" " +
+                                          L"Low: "  + numberTo<std::wstring>(localTime.dwLowDateTime) + L") " + L"\n\n" + getLastErrorFormatted();
         throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
     }
     return utcTime;
@@ -214,7 +216,7 @@ const size_t UTC_LOCAL_OFFSET_BITS = 7;
 const size_t WRITE_TIME_HASH_BITS = CREATE_TIME_INFO_BITS - INDICATOR_EXISTING_BITS - UTC_LOCAL_OFFSET_BITS;
 
 
-template <size_t precision>
+template <size_t precision> inline
 FILETIME encodeRawInformation(UInt64 rawInfo)
 {
     rawInfo *= precision;
@@ -225,7 +227,7 @@ FILETIME encodeRawInformation(UInt64 rawInfo)
 }
 
 
-template <size_t precision>
+template <size_t precision> inline
 UInt64 extractRawInformation(const FILETIME& createTime)
 {
     assert(toUInt64(FAT_MIN_TIME) <= toUInt64(createTime));
@@ -243,6 +245,7 @@ UInt64 extractRawInformation(const FILETIME& createTime)
 
 
 //convert write time to it's minimal representation (no restriction to FAT range "1980 - 2107")
+inline
 UInt64 extractRawWriteTime(const FILETIME& writeTime)
 {
     UInt64 rawInfo = toUInt64(writeTime);
@@ -253,6 +256,7 @@ UInt64 extractRawWriteTime(const FILETIME& writeTime)
 
 
 //files with different resolution than 2 seconds are rounded up when written to FAT
+inline
 FILETIME roundToFatWriteTime(const FILETIME& writeTime)
 {
     UInt64 rawData = toUInt64(writeTime);
@@ -284,7 +288,7 @@ std::bitset<UTC_LOCAL_OFFSET_BITS> getUtcLocalShift()
         timeShiftSec % (60 * 15) != 0) //all known time shift have at least 15 minute granularity!
     {
         const std::wstring errorMessage = _("Conversion error:") + L" Unexpected UTC <-> local time shift: " +
-                                          L"(" + toString<std::wstring>(timeShiftSec) + L") " + L"\n\n" + getLastErrorFormatted();
+                                          L"(" + numberTo<std::wstring>(timeShiftSec) + L") " + L"\n\n" + getLastErrorFormatted();
         throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
     }
 

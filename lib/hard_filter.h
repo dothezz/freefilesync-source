@@ -7,7 +7,7 @@
 #ifndef FFS_FILTER_H_INCLUDED
 #define FFS_FILTER_H_INCLUDED
 
-#include <set>
+#include <vector>
 #include <memory>
 #include <wx/stream.h>
 #include <zen/zstring.h>
@@ -88,7 +88,9 @@ public:
 
     virtual bool passFileFilter(const Zstring& relFilename) const;
     virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
+
     virtual bool isNull() const;
+    static bool isNull(const Zstring& includeFilter, const Zstring& excludeFilter); //*fast* check without expensively constructing NameFilter instance!
 
 private:
     friend class HardFilter;
@@ -97,10 +99,10 @@ private:
     static FilterRef load(wxInputStream& stream); //"serial constructor"
     virtual bool cmpLessSameType(const HardFilter& other) const;
 
-    std::set<Zstring> filterFileIn;   //upper case (windows)
-    std::set<Zstring> filterFolderIn; //
-    std::set<Zstring> filterFileEx;   //
-    std::set<Zstring> filterFolderEx; //
+    std::vector<Zstring> filterFileIn;   //
+    std::vector<Zstring> filterFolderIn; //upper case (windows) + unique items by construction
+    std::vector<Zstring> filterFileEx;   //
+    std::vector<Zstring> filterFolderEx; //
 
     const Zstring includeFilterTmp; //save constructor arguments for serialization
     const Zstring excludeFilterTmp; //
@@ -162,7 +164,7 @@ bool NullFilter::passFileFilter(const Zstring& relFilename) const
 inline
 bool NullFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const
 {
-    assert(subObjMightMatch == NULL || *subObjMightMatch == true); //check correct usage
+    assert(!subObjMightMatch || *subObjMightMatch == true); //check correct usage
     return true;
 }
 

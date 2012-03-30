@@ -48,7 +48,7 @@ UInt64 getFilesize(const Zstring& filename); //throw FileError
 
 //file handling
 bool removeFile(const Zstring& filename); //return "true" if file was actually deleted; throw FileError
-void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = NULL); //throw FileError
+void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = nullptr); //throw FileError
 
 
 //rename file or directory: no copying!!!
@@ -80,8 +80,8 @@ void copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPathMissi
               const Zstring& targetFile, //symlink handling: dereference source
               bool copyFilePermissions,
               bool transactionalCopy,
-              CallbackCopyFile* callback, //may be NULL
-              FileAttrib* newAttrib = NULL);  //return current attributes at the time of copy
+              CallbackCopyFile* callback, //may be nullptr
+              FileAttrib* newAttrib = nullptr);  //return current attributes at the time of copy
 //Note: it MAY happen that copyFile() leaves temp files behind, e.g. temporary network drop.
 // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
 const Zstring TEMP_FILE_ENDING = Zstr(".ffs_tmp");

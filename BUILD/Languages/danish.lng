@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Indstil filter</target>
 
-<source>Customize columns</source>
-<target>Rediger kolonner</target>
-
 <source>Global settings</source>
 <target>Fælles indstillinger</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Gennemse</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Fejl i læsning fra synkroniserings databasen:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Fejl i skrivning til synkroniserings databasen:</target>
-
 <source>Invalid command line: %x</source>
 <target>Ugyldig kommando: %x</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Fatal Error</source>
+<target>Uoprettelig Fejl</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows Fejl kode %x:</target>
@@ -139,14 +136,20 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Fejl i læsning fra synkroniserings databasen:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Fejl i skrivning til synkroniserings databasen:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Ukompatibelt synkroniserings database format:</target>
+
 <source>Initial synchronization:</source>
 <target>Indledende synkronisering:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>En af FreeFileSync database filerne findes ikke endnu:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Ukompatibelt synkroniserings database format:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Database filer deler ikke en fælles synkroniserings session</target>
@@ -172,12 +175,6 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Info</source>
-<target>Info</target>
-
-<source>Fatal Error</source>
-<target>Uoprettelig Fejl</target>
-
 <source>Error reading file:</source>
 <target>Fejl i læsning af fil:</target>
 
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>Fejl i at lave konfigurations filen:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Fejl i at flytte til skraldespand:</target>
+<source>Configuration loaded partially only:</source>
+<target>Konfiguration kun delvist hentet:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Kunne ikke hente en krævet DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Ude af stand til at flytte %x til skraldespanden!</target>
+
+<source>Cannot load file %x.</source>
+<target>Kan ikke læse filen %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Fejl i adgang til Enhedens Kopi Service</target>
@@ -214,10 +214,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>At lave spejl kopier af WOW64 er ikke understøttet. Brug venligst FreeFileSync 64-bit version.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Kunne ikke finde drev navn til filen:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Kan ikke bestemme drev navn for filen:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Drev navn %x ikke en del af filnavn %y!</target>
 
 <source>/sec</source>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>Filen findes ikke:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Kunne ikke læse værdierne for følgende XML punkter:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Kan ikke læse følgende XML emner:</target>
 
 <source>S&ave configuration...</source>
 <target>G&em konfiguration...</target>
@@ -540,17 +540,17 @@ Kommando linjen bliver afviklet hver gang:
 <source>Speed:</source>
 <target>Hastighed:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Tid tilbage:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Tid gået:</target>
 
 <source>Batch job</source>
 <target>Batch job</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Lav en batch til til automatiseret synkronisering. For at starte i batch mode dobbelt-klik på filen eller afvikle via. kommando linjen: FreeFileSync.exe <ffs_batch file>. Dette kan også planlægges i dit operativsystems opgavestyring.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Lav en batch fil og automatiser synkronisering. For at starte i batch mode dobbelt-klik på filen eller kør kommandoen: FreeFileSync.exe SyncJob.ffs_batch. Dette kan også planlægges i dit systems opgavestyring.</target>
 
 <source>Help</source>
 <target>Hjælp</target>
@@ -564,8 +564,8 @@ Kommando linjen bliver afviklet hver gang:
 <source>Right</source>
 <target>Højre</target>
 
-<source>Overview</source>
-<target>Overblik</target>
+<source>Sync setttings</source>
+<target>Synkroniser indstillinger</target>
 
 <source>Status feedback</source>
 <target>Status feedback</target>
@@ -711,8 +711,8 @@ er det samme
 <source>Published under the GNU General Public License</source>
 <target>Udgivet under GNU General Public Licence</target>
 
-<source>Ignore subsequent errors</source>
-<target>Ignorer underliggende fejl</target>
+<source>Ignore further errors</source>
+<target>Ignorer fremtidige fejl</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Skjul yderligere fejl beskeder under nuværende opgave</target>
@@ -735,22 +735,22 @@ er det samme
 <source>&No</source>
 <target>&Nej</target>
 
+<source>Use Recycle Bin</source>
+<target>Brug skraldespanden</target>
+
 <source>Delete on both sides</source>
 <target>Slet på begge sider</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Slet på begge sider selvom der kun er valgt en side</target>
 
-<source>Use Recycle Bin</source>
-<target>Brug skraldespanden</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Kun filer/biblioteker der passer til alle filter indstillinger vil blive valgt til synkronisering.
-Bemærk: Navnefilteret skal være faktisk specificeret(!) til hoved synkroniserings bibliotekerne.
+Synkroniserer kun filer der passer alle filtre.
+Note: Fil navne må skal passe til grund bibliotekerne!
 </target>
 
 <source>Hints:</source>
@@ -786,20 +786,20 @@ Udeluk: \ting\temp\*
 <source>Exclude</source>
 <target>Udeluk</target>
 
-<source>Minimum file size</source>
-<target>Minimum fil størrelse</target>
+<source>Time span</source>
+<target>Tidsrum</target>
 
-<source>Maximum file size</source>
-<target>Maksimum fil størrelse</target>
+<source>File size</source>
+<target>Fil Størrelse</target>
+
+<source>Minimum</source>
+<target>Minimum</target>
+
+<source>Maximum</source>
+<target>Maksimum</target>
 
 <source>&Default</source>
 <target>&Standard</target>
-
-<source>Move column up</source>
-<target>Flyt kolonne op</target>
-
-<source>Move column down</source>
-<target>Flyt kolonne ned</target>
 
 <source>Transactional file copy</source>
 <target>Transaktionel fil kopiering</target>
@@ -819,14 +819,8 @@ Udeluk: \ting\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Overfør fil og biblioteks tilladelser (Kræver Administrator rettigheder)</target>
 
-<source>Hidden dialogs:</source>
-<target>Skjulte dialoger:</target>
-
-<source>Reset</source>
-<target>Nulstil</target>
-
-<source>Show hidden dialogs</source>
-<target>Vi skjulte dialoger</target>
+<source>Restore hidden dialogs</source>
+<target>Gendan skjulte dialoger</target>
 
 <source>External applications</source>
 <target>Eksterne programmer</target>
@@ -858,8 +852,8 @@ Udeluk: \ting\temp\*
 <source>Folder pairs</source>
 <target>Mappe par</target>
 
-<source>Compressed view</source>
-<target>Komprimmeret tilstand</target>
+<source>Overview</source>
+<target>Overblik</target>
 
 <source>Select view</source>
 <target>Vælg udseende</target>
@@ -888,8 +882,8 @@ Udeluk: \ting\temp\*
 <source>Exclude all</source>
 <target>Fravælg alle</target>
 
-<source>Icon size:</source>
-<target>Ikon størrelse:</target>
+<source>Show icons:</source>
+<target>Vis ikoner:</target>
 
 <source>Small</source>
 <target>Lille</target>
@@ -914,6 +908,9 @@ Udeluk: \ting\temp\*
 
 <source>Configuration saved!</source>
 <target>Konfiguration gemt!</target>
+
+<source>Never save changes</source>
+<target>Gem aldrig ændringer</target>
 
 <source>Save changes to current configuration?</source>
 <target>Gem ændringer til nuværende konfiguration?</target>
@@ -1026,9 +1023,6 @@ Udeluk: \ting\temp\*
 <source>Error writing file:</source>
 <target>Fejl i at skrive fil:</target>
 
-<source>Batch file created successfully!</source>
-<target>Batch fil oprettet!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1107,6 +1101,9 @@ Udeluk: \ting\temp\*
 <source>This year</source>
 <target>Dette år</target>
 
+<source>Last x days</source>
+<target>Sidste x dage</target>
+
 <source>Byte</source>
 <target>Byte</target>
 
@@ -1116,11 +1113,8 @@ Udeluk: \ting\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filter: Alle par</target>
-
-<source>Filter: Single pair</source>
-<target>Filter: Par</target>
+<source>Filter</source>
+<target>Filter</target>
 
 <source>Direct</source>
 <target>Direkte</target>
@@ -1146,8 +1140,8 @@ Udeluk: \ting\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Modsatte sides modpart til %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Gendan alle skjulte dialoger?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Lav skjulte dialoger og advarselsbeskeder synlige igen?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1323,8 +1317,8 @@ Udeluk: \ting\temp\*
 <source>Preparing synchronization...</source>
 <target>Forbereder synkronisering...</target>
 
-<source>Memory allocation failed!</source>
-<target>Hukommelses fejl!</target>
+<source>Out of memory!</source>
+<target>Ude af hukommelse!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Filen %x har en ugyldig dato!</target>
@@ -1479,11 +1473,11 @@ Udeluk: \ting\temp\*
 <source>Generating database...</source>
 <target>Opretter database...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Intet at synkroniserer ifølge dokumentationen!</target>
+<source>Nothing to synchronize!</source>
+<target>Intet at synkronisere!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Fejl i kopiering af låst fil %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Ude af stand til at kopiere låst fil %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Data godkendelses fejl: Kilde og destinations fil har forskelligt indhold!</target>

@@ -20,16 +20,19 @@
 #endif
 
 
-
 namespace zen
 {
 //evaluate GetLastError()/errno and assemble specific error message
 #ifdef FFS_WIN
-std::wstring getLastErrorFormatted(DWORD lastError = 0);
+typedef DWORD ErrorCode;
 #elif defined FFS_LINUX
-std::wstring getLastErrorFormatted(int lastError = 0);
+typedef int ErrorCode;
 #endif
 
+std::wstring getLastErrorFormatted(ErrorCode lastError = 0);
+ErrorCode getLastError();
+
+bool errorCodeForNotExisting(ErrorCode lastError); //check for "not existing" aliases
 
 
 
@@ -56,24 +59,43 @@ std::wstring getLastErrorFormatted(int lastError = 0);
 
 
 
-//######################## Implementation ########################
 
-#ifdef FFS_WIN
+
+
+
+
+
+
+
+
+
+//######################## implementation ########################
 inline
-std::wstring getLastErrorFormatted(DWORD lastError) //try to get additional Windows error information
+ErrorCode getLastError()
 {
+#ifdef FFS_WIN
+    return ::GetLastError();
+#elif defined FFS_LINUX
+    return errno;
+#endif
+}
+
+inline
+std::wstring getLastErrorFormatted(ErrorCode lastError)
+{
+#ifdef FFS_WIN
     //determine error code if none was specified
     if (lastError == 0)
         lastError = ::GetLastError();
 
     std::wstring output = _("Windows Error Code %x:");
-    replace(output, L"%x", toString<std::wstring>(lastError));
+    replace(output, L"%x", numberTo<std::wstring>(lastError));
 
-    LPWSTR buffer = NULL;
+    LPWSTR buffer = nullptr;
     if (::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM    |
                         FORMAT_MESSAGE_MAX_WIDTH_MASK |
                         FORMAT_MESSAGE_IGNORE_INSERTS | //important: without this flag ::FormatMessage() will fail if message contains placeholders
-                        FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, lastError, 0, reinterpret_cast<LPWSTR>(&buffer), 0, NULL) != 0)
+                        FORMAT_MESSAGE_ALLOCATE_BUFFER, nullptr, lastError, 0, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr) != 0)
     {
         if (buffer) //just to be sure
         {
@@ -84,27 +106,37 @@ std::wstring getLastErrorFormatted(DWORD lastError) //try to get additional Wind
     }
     ::SetLastError(lastError); //restore last error
     return output;
-}
 
 #elif defined FFS_LINUX
-inline
-std::wstring getLastErrorFormatted(int lastError) //try to get additional Linux error information
-{
     //determine error code if none was specified
     if (lastError == 0)
         lastError = errno; //don't use "::", errno is a macro!
 
     std::wstring output = _("Linux Error Code %x:");
-    replace(output, L"%x", toString<std::wstring>(lastError));
+    replace(output, L"%x", numberTo<std::wstring>(lastError));
 
     output += L" ";
     output += utf8CvrtTo<std::wstring>(::strerror(lastError));
 
     errno = lastError; //restore errno
     return output;
-}
 #endif
 }
 
+
+inline
+bool errorCodeForNotExisting(ErrorCode lastError)
+{
+#ifdef FFS_WIN
+    return lastError == ERROR_FILE_NOT_FOUND ||
+           lastError == ERROR_PATH_NOT_FOUND ||
+           lastError == ERROR_BAD_NETPATH    ||
+           lastError == ERROR_NETNAME_DELETED;
+
+#elif defined FFS_LINUX
+    return lastError == ENOENT;
+#endif
+}
+}
 
 #endif // SYSTEMFUNCTIONS_H_INCLUDED

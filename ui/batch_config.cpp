@@ -14,7 +14,7 @@
 #include <zen/file_handling.h>
 #include "msg_popup.h"
 #include "gui_generated.h"
-#include <wx/dnd.h>
+//#include <wx/dnd.h>
 #include <wx/msgdlg.h>
 #include <wx+/button.h>
 #include <wx+/choice_enum.h>
@@ -28,7 +28,7 @@ class DirectoryPairBatch;
 
 class BatchDialog: public BatchDlgGenerated
 {
-    friend class BatchFileDropEvent;
+    //    friend class BatchFileDropEvent;
     template <class GuiPanel>
     friend class FolderPairCallback;
 
@@ -52,8 +52,8 @@ private:
     void OnGlobalFilterContext(wxCommandEvent& event);
     virtual void OnCheckSaveLog(        wxCommandEvent& event);
     virtual void OnChangeMaxLogCountTxt(wxCommandEvent& event);
-    virtual void OnClose(              wxCloseEvent&   event);
-    virtual void OnCancel(             wxCommandEvent& event);
+    virtual void OnClose(              wxCloseEvent&   event) { EndModal(0); }
+    virtual void OnCancel(             wxCommandEvent& event) { EndModal(0); }
     virtual void OnSaveBatchJob(       wxCommandEvent& event);
     virtual void OnLoadBatchJob(       wxCommandEvent& event);
     virtual void OnAddFolderPair(      wxCommandEvent& event);
@@ -151,7 +151,6 @@ private:
         batchDlg.updateGui();
     }
 
-
     virtual void removeAltSyncCfg()
     {
         FolderPairPanelBasic<GuiPanel>::removeAltSyncCfg();
@@ -159,7 +158,6 @@ private:
     }
 
     virtual void OnLocalFilterCfgChange() {}
-
 
     BatchDialog& batchDlg;
 };
@@ -267,13 +265,13 @@ BatchDialog::BatchDialog(wxWindow* window,
     //init handling of first folder pair
     firstFolderPair.reset(new DirectoryPairBatchFirst(*this));
 
-    m_bpButtonCmpConfig ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnCompSettingsContext), NULL, this);
-    m_bpButtonSyncConfig->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnSyncSettingsContext), NULL, this);
-    m_bpButtonFilter    ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnGlobalFilterContext), NULL, this);
+    m_bpButtonCmpConfig ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnCompSettingsContext), nullptr, this);
+    m_bpButtonSyncConfig->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnSyncSettingsContext), nullptr, this);
+    m_bpButtonFilter    ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnGlobalFilterContext), nullptr, this);
 
     //prepare drag & drop for loading of *.ffs_batch files
     setupFileDrop(*this);
-    Connect(EVENT_DROP_FILE, FileDropEventHandler(BatchDialog::OnFilesDropped), NULL, this);
+    Connect(EVENT_DROP_FILE, FileDropEventHandler(BatchDialog::OnFilesDropped), nullptr, this);
 
     logfileDir.reset(new DirectoryName<FolderHistoryBox>(*m_panelBatchSettings, *m_dirPickerLogfileDir, *m_comboBoxLogfileDir));
 
@@ -335,7 +333,7 @@ void BatchDialog::OnSyncSettings(wxCommandEvent& event)
 
     if (showSyncConfigDlg(localBatchCfg.mainCfg.cmpConfig.compareVar,
                           localBatchCfg.mainCfg.syncCfg,
-                          NULL,
+                          nullptr,
                           &ewfCfg) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
     {
         updateGui();
@@ -434,7 +432,7 @@ void BatchDialog::OnGlobalFilterContext(wxCommandEvent& event)
         localBatchCfg.mainCfg.globalFilter = FilterConfig();
         updateGui();
     };
-    menu.addItem( _("Clear filter settings"), clearFilter, NULL, !isNullFilter(localBatchCfg.mainCfg.globalFilter));
+    menu.addItem( _("Clear filter settings"), clearFilter, nullptr, !isNullFilter(localBatchCfg.mainCfg.globalFilter));
 
     menu.popup(*this);
 }
@@ -516,40 +514,28 @@ void BatchDialog::showNotebookpage(wxWindow* page, const wxString& pageName, boo
 }
 */
 
-void BatchDialog::OnClose(wxCloseEvent&   event)
-{
-    EndModal(ReturnBatchConfig::BUTTON_CANCEL);
-}
-
-
-void BatchDialog::OnCancel(wxCommandEvent& event)
-{
-    EndModal(ReturnBatchConfig::BUTTON_CANCEL);
-}
-
-
 void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 {
     //get a filename
     wxString defaultFileName = proposedBatchFileName.empty() ? wxT("SyncJob.ffs_batch") : proposedBatchFileName;
 
     //attention: proposedBatchFileName may be an imported *.ffs_gui file! We don't want to overwrite it with a BATCH config!
-    if (defaultFileName.EndsWith(wxT(".ffs_gui")))
-        defaultFileName.Replace(wxT(".ffs_gui"), wxT(".ffs_batch"), false);
+    if (endsWith(defaultFileName, L".ffs_gui"))
+        replace(defaultFileName, L".ffs_gui", L".ffs_batch");
 
     wxFileDialog filePicker(this,
                             wxEmptyString,
                             wxEmptyString,
                             defaultFileName,
-                            wxString(_("FreeFileSync batch file")) + wxT(" (*.ffs_batch)|*.ffs_batch"),
+                            wxString(_("FreeFileSync batch file")) + L" (*.ffs_batch)|*.ffs_batch",
                             wxFD_SAVE /*| wxFD_OVERWRITE_PROMPT*/); //creating this on freestore leads to memleak!
     if (filePicker.ShowModal() == wxID_OK)
     {
         const wxString newFileName = filePicker.GetPath();
 
-        //create batch file
-        if (saveBatchFile(newFileName))
-            EndModal(ReturnBatchConfig::BATCH_FILE_SAVED);
+        saveBatchFile(newFileName);
+        //if ()
+        //    EndModal(ReturnBatchConfig::BATCH_FILE_SAVED);
     }
 }
 
@@ -782,8 +768,8 @@ void BatchDialog::updateGuiForFolderPair()
 
     //adapt local filter and sync cfg for first folder pair
     if (additionalFolderPairs.empty() &&
-        firstFolderPair->getAltCompConfig().get() == NULL &&
-        firstFolderPair->getAltSyncConfig().get() == NULL &&
+        firstFolderPair->getAltCompConfig().get() == nullptr &&
+        firstFolderPair->getAltSyncConfig().get() == nullptr &&
         isNullFilter(firstFolderPair->getAltFilterConfig()))
     {
         m_bpButtonAltCompCfg ->Hide();
@@ -830,7 +816,7 @@ void BatchDialog::addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs,
         //add folder pairs
         for (std::vector<zen::FolderPairEnh>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
         {
-            DirectoryPairBatch* newPair = new DirectoryPairBatch(m_scrolledWindow6, *this);
+            DirectoryPairBatch* newPair = new DirectoryPairBatch(m_scrolledWindow6, *this); //owned by m_scrolledWindow6!
 
             //init dropdown history
             newPair->m_directoryLeft ->init(folderHistLeft_);
@@ -848,7 +834,7 @@ void BatchDialog::addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs,
             }
 
             //register events
-            newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BatchDialog::OnRemoveFolderPair), NULL, this );
+            newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BatchDialog::OnRemoveFolderPair), nullptr, this );
 
             //set alternate configuration
             newPair->setValues(toWx(i->leftDirectory),
@@ -913,10 +899,10 @@ bool BatchDialog::createBatchFile(const wxString& filename)
 {
     //create shell link (instead of batch file) for full Unicode support
     HRESULT hResult = E_FAIL;
-    IShellLink* pShellLink = NULL;
+    IShellLink* pShellLink = nullptr;
 
     if (FAILED(CoCreateInstance(CLSID_ShellLink,       //class identifier
-                                NULL,                  //object isn't part of an aggregate
+                                nullptr,                  //object isn't part of an aggregate
                                 CLSCTX_INPROC_SERVER,  //context for running executable code
                                 IID_IShellLink,        //interface identifier
                                 (void**)&pShellLink))) //pointer to storage of interface pointer
@@ -936,7 +922,7 @@ bool BatchDialog::createBatchFile(const wxString& filename)
     if (FAILED(pShellLink->SetDescription(_("FreeFileSync Batch Job"))))
         return false;
 
-    IPersistFile*  pPersistFile = NULL;
+    IPersistFile*  pPersistFile = nullptr;
     if (FAILED(pShellLink->QueryInterface(IID_IPersistFile, (void**)&pPersistFile)))
         return false;
     CleanUp<IPersistFile> cleanOnExit2(pPersistFile);
@@ -959,13 +945,13 @@ bool BatchDialog::createBatchFile(const wxString& filename)
 */
 
 
-ReturnBatchConfig::ButtonPressed zen::showSyncBatchDlg(const wxString& referenceFile,
-                                                       const xmlAccess::XmlBatchConfig& batchCfg,
-                                                       const std::shared_ptr<FolderHistory>& folderHistLeft,
-                                                       const std::shared_ptr<FolderHistory>& folderHistRight,
-                                                       std::vector<std::wstring>& execFinishedhistory,
-                                                       size_t execFinishedhistoryMax)
+void zen::showSyncBatchDlg(const wxString& referenceFile,
+                           const xmlAccess::XmlBatchConfig& batchCfg,
+                           const std::shared_ptr<FolderHistory>& folderHistLeft,
+                           const std::shared_ptr<FolderHistory>& folderHistRight,
+                           std::vector<std::wstring>& execFinishedhistory,
+                           size_t execFinishedhistoryMax)
 {
-    BatchDialog batchDlg(NULL, referenceFile, batchCfg, folderHistLeft, folderHistRight, execFinishedhistory, execFinishedhistoryMax);
-    return static_cast<ReturnBatchConfig::ButtonPressed>(batchDlg.ShowModal());
+    BatchDialog batchDlg(nullptr, referenceFile, batchCfg, folderHistLeft, folderHistRight, execFinishedhistory, execFinishedhistoryMax);
+    batchDlg.ShowModal();
 }

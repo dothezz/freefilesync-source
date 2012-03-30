@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Filterinställningar</target>
 
-<source>Customize columns</source>
-<target>Anpassa kollumner</target>
-
 <source>Global settings</source>
 <target>Allmäna inställningar</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Bläddra</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Kan inte läsa från databasen:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Kan inte skriva till databas:</target>
-
 <source>Invalid command line: %x</source>
 <target>Ogiltig kommandorad: %x</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Fatal Error</source>
+<target>Allvarligt fel</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows Felkod %x:</target>
@@ -139,14 +136,20 @@
 <pluralform>%x Byte</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Kan inte läsa från databasen:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Kan inte skriva till databas:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Inkompatibelt databasformat:</target>
+
 <source>Initial synchronization:</source>
 <target>Initial synkronisering:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>En av FreeFileSyncs databasfiler saknas:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Inkompatibelt databasformat:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Databasfiler delar inte en gemensam synkroniseringssession:</target>
@@ -172,14 +175,8 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Info</source>
-<target>Info</target>
-
-<source>Fatal Error</source>
-<target>Allvarligt fel</target>
-
 <source>Error reading file:</source>
-<target>Kan inte läsa fil:</target>
+<target>Kan inte läsa filen:</target>
 
 <source>Scanning:</source>
 <target>Skannar:</target>
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>Kan inte läsa in konfigurationsfil:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Kan inte flytta till papperskorgen:</target>
+<source>Configuration loaded partially only:</source>
+<target>Konfigurationsfilen endast delvis inläst</target>
 
-<source>Could not load a required DLL:</source>
-<target>Kan inte läsa in nödvändig DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Kan inte flytta %x till Papperskorgen</target>
+
+<source>Cannot load file %x.</source>
+<target>Kan inte läsa in %x</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Kunde inte starta tjänsten Volume Shadow Copy (VSS)</target>
@@ -214,10 +214,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Skuggkopior av wow64 stöds ej. Använd FreeFileSync x64 istället!</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Kan inte bestämma volym för fil:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Kan inte bestämma volymnamn för filen:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>Volymnamn %x saknas i filnamn %y!</target>
 
 <source>/sec</source>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>Filen finns inte:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Kan inte läsa värden för följande XML-noder:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Kan inte läsa följande XML-element:</target>
 
 <source>S&ave configuration...</source>
 <target>S&para inställningar...</target>
@@ -453,9 +453,6 @@ Kommandot verkställes när:
 <source>2. &Synchronize...</source>
 <target>2. &Synkronisera...</target>
 
-<source>S&witch view</source>
-<target>V&äxla sida</target>
-
 <source>&New</source>
 <target>&Nytt</target>
 
@@ -543,17 +540,17 @@ Kommandot verkställes när:
 <source>Speed:</source>
 <target>Hastighet:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Kvarvarande tid:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Förfluten tid:</target>
 
 <source>Batch job</source>
 <target>Batch-jobb</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Skapa en batch-fil för automatisk synkronisering. För att starta i batch-läge dubbelklickar du på filen eller startar den med kommandoraden: FreeFileSync.exe <ffs_batch file>. Batch-filen kan också schemaläggas i Windows schemaläggare</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Skapa en batch-fil och automatisera synkroniseringen. För att starta i batch-läge dubbelklickar du på den skapade filen, eller kör följande kommando: FreeFileSync.exe SyncJob.ffs_batch. Detta kan också schemaläggas i systemets schemaläggare.</target>
 
 <source>Help</source>
 <target>Hjälp</target>
@@ -567,8 +564,8 @@ Kommandot verkställes när:
 <source>Right</source>
 <target>Höger</target>
 
-<source>Overview</source>
-<target>Översikt</target>
+<source>Sync setttings</source>
+<target>Synkroniseringsinställningar</target>
 
 <source>Status feedback</source>
 <target>Status</target>
@@ -714,8 +711,8 @@ Filerna betecknas som lika om,
 <source>Published under the GNU General Public License</source>
 <target>Publiserad under GNU General Public License</target>
 
-<source>Ignore subsequent errors</source>
-<target>Ignorera följdfel</target>
+<source>Ignore further errors</source>
+<target>Ignorera ytterligare fel</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Dölj vidare felmeddelanden under aktuell process</target>
@@ -738,22 +735,22 @@ Filerna betecknas som lika om,
 <source>&No</source>
 <target>&Nej</target>
 
+<source>Use Recycle Bin</source>
+<target>Använd papperskorgen</target>
+
 <source>Delete on both sides</source>
 <target>Ta bort på båda sidor</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Ta bort på båda sidor, även om filen är markerad på endast en sida</target>
 
-<source>Use Recycle Bin</source>
-<target>Använd papperskorgen</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Endast filer/kataloger som matchar alla filterinställningar, kommer att väljas ut för synkronisering
-Notis: Namnfiltret måste specificeras relativt(!) till överordnade synkroniseringskataloger
+Endast filer som matchar alla filterinställningar kommer att synkroniseras.
+OBS! Filnamnen måste anges relativt till baskataloger
 </target>
 
 <source>Hints:</source>
@@ -789,20 +786,20 @@ Undanta: \stuff\temp\*
 <source>Exclude</source>
 <target>Undanta</target>
 
-<source>Minimum file size</source>
-<target>Minimum filstorlek</target>
+<source>Time span</source>
+<target>Tidsintervall</target>
 
-<source>Maximum file size</source>
-<target>Maximum filstorlek</target>
+<source>File size</source>
+<target>Filstorlek</target>
+
+<source>Minimum</source>
+<target>Minimum</target>
+
+<source>Maximum</source>
+<target>Maximum</target>
 
 <source>&Default</source>
 <target>&Standard</target>
-
-<source>Move column up</source>
-<target>Flytta upp kollumn</target>
-
-<source>Move column down</source>
-<target>Flytta ner kollumn</target>
 
 <source>Transactional file copy</source>
 <target>Transaktionell filkopiering</target>
@@ -822,14 +819,8 @@ Undanta: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Överför fil- och katalogrättigheter (Kräver administratörsrättigheter)</target>
 
-<source>Hidden dialogs:</source>
-<target>Dolda meddelanden:</target>
-
-<source>Reset</source>
-<target>Återställ</target>
-
-<source>Show hidden dialogs</source>
-<target>Visa dolda meddelanden</target>
+<source>Restore hidden dialogs</source>
+<target>Återställ dolda dialoger</target>
 
 <source>External applications</source>
 <target>Externa program</target>
@@ -861,8 +852,8 @@ Undanta: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Katalogpar</target>
 
-<source>Compressed view</source>
-<target>Komprimerad vy</target>
+<source>Overview</source>
+<target>Översikt</target>
 
 <source>Select view</source>
 <target>Välj vy</target>
@@ -891,8 +882,8 @@ Undanta: \stuff\temp\*
 <source>Exclude all</source>
 <target>Exkludera alla</target>
 
-<source>Icon size:</source>
-<target>Ikonstorlek:</target>
+<source>Show icons:</source>
+<target>Visa ikoner</target>
 
 <source>Small</source>
 <target>Liten</target>
@@ -917,6 +908,9 @@ Undanta: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Inställningar sparade!</target>
+
+<source>Never save changes</source>
+<target>Spara aldrig ändringar</target>
 
 <source>Save changes to current configuration?</source>
 <target>Vill du spara ändringarna i aktuella inställningar?</target>
@@ -1029,9 +1023,6 @@ Undanta: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Kan inte skriva fil:</target>
 
-<source>Batch file created successfully!</source>
-<target>Batch-filen skapades korrekt!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1110,6 +1101,9 @@ Undanta: \stuff\temp\*
 <source>This year</source>
 <target>I år</target>
 
+<source>Last x days</source>
+<target>Senaste x dagarna</target>
+
 <source>Byte</source>
 <target>Byte</target>
 
@@ -1119,11 +1113,8 @@ Undanta: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filter: Generella undantag</target>
-
-<source>Filter: Single pair</source>
-<target>Filter: Enstaka undantag</target>
+<source>Filter</source>
+<target>Filter</target>
 
 <source>Direct</source>
 <target>Direkt</target>
@@ -1149,8 +1140,8 @@ Undanta: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Andra sidans motsvarighet till %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Vill du återställa alla dolda dialoger?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Vill du göra dolda dialoger och varningsmeddelanden synliga igen?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1326,8 +1317,8 @@ Undanta: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Förbereder synkronisering...</target>
 
-<source>Memory allocation failed!</source>
-<target>Minnesallokering misslyckades!</target>
+<source>Out of memory!</source>
+<target>Minnesbrist!</target>
 
 <source>File %x has an invalid date!</source>
 <target>Filen %x har ett ogiltigt datum!</target>
@@ -1482,11 +1473,11 @@ Undanta: \stuff\temp\*
 <source>Generating database...</source>
 <target>Skapar databas...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Inget att synkronisera enligt aktuella inställningar!</target>
+<source>Nothing to synchronize!</source>
+<target>Det finns inget att synkronisera!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Kan inte kopiera låst fil %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Kan inte kopiera den låsta filen %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Verifikationsfel: Källfil och målfil har olika innehåll!</target>

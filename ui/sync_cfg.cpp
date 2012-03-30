@@ -534,7 +534,7 @@ ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(CompareVariant compareVar
                                                        xmlAccess::OnGuiError* handleError,    //
                                                        ExecWhenFinishedCfg* execWhenFinished) //optional input parameter
 {
-    SyncCfgDialog syncDlg(NULL,
+    SyncCfgDialog syncDlg(nullptr,
                           compareVar,
                           syncCfg,
                           handleError,

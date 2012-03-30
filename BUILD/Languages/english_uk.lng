@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Configure filter</target>
 
-<source>Customize columns</source>
-<target>Customise columns</target>
-
 <source>Global settings</source>
 <target>Global settings</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Browse</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Error reading from synchronisation database:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Error writing to synchronisation database:</target>
-
 <source>Invalid command line: %x</source>
 <target>Invalid command line: %x</target>
+
+<source>Info</source>
+<target>Info</target>
+
+<source>Fatal Error</source>
+<target>Fatal Error</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows Error Code %x:</target>
@@ -139,14 +136,20 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Error reading from synchronisation database:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Error writing to synchronisation database:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Incompatible synchronisation database format:</target>
+
 <source>Initial synchronization:</source>
 <target>Initial synchronisation:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>One of the FreeFileSync database files is not yet existing:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Incompatible synchronisation database format:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Database files do not share a common synchronisation session:</target>
@@ -172,12 +175,6 @@
 <pluralform>%x sec</pluralform>
 </target>
 
-<source>Info</source>
-<target>Info</target>
-
-<source>Fatal Error</source>
-<target>Fatal Error</target>
-
 <source>Error reading file:</source>
 <target>Error reading file:</target>
 
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>Error parsing configuration file:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>Error moving to Recycle Bin:</target>
+<source>Configuration loaded partially only:</source>
+<target>Configuration loaded partially only:</target>
 
-<source>Could not load a required DLL:</source>
-<target>Could not load a required DLL:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Unable to move %x to the Recycle Bin!</target>
+
+<source>Cannot load file %x.</source>
+<target>Cannot load file %x.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Error accessing Volume Shadow Copy Service!</target>
@@ -214,11 +214,11 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>Could not determine volume name for file:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Cannot determine volume name for file:</target>
 
-<source>Volume name %x not part of filename %y!</source>
-<target>Volume name %x not part of filename %y!</target>
+<source>Volume name %x not part of file name %y!</source>
+<target>Volume name %x not part of file name %y!</target>
 
 <source>/sec</source>
 <target>/sec</target>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>File does not exist:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>Could not read values for the following XML nodes:</target>
+<source>Cannot read the following XML elements:</source>
+<target>Cannot read the following XML elements:</target>
 
 <source>S&ave configuration...</source>
 <target>S&ave configuration...</target>
@@ -453,9 +453,6 @@ The command line is executed each time:
 <source>2. &Synchronize...</source>
 <target>2. &Synchronise...</target>
 
-<source>S&witch view</source>
-<target>S&witch view</target>
-
 <source>&New</source>
 <target>&New</target>
 
@@ -543,17 +540,17 @@ The command line is executed each time:
 <source>Speed:</source>
 <target>Speed:</target>
 
-<source>Time remaining:</source>
-<target>Time remaining:</target>
+<source>Remaining time:</source>
+<target>Remaining time:</target>
 
-<source>Time elapsed:</source>
-<target>Time elapsed:</target>
+<source>Elapsed time:</source>
+<target>Elapsed time:</target>
 
 <source>Batch job</source>
 <target>Batch job</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Create a batch file for automated synchronisation. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Create a batch file and automate synchronisation. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</target>
 
 <source>Help</source>
 <target>Help</target>
@@ -567,8 +564,8 @@ The command line is executed each time:
 <source>Right</source>
 <target>Right</target>
 
-<source>Overview</source>
-<target>Overview</target>
+<source>Sync setttings</source>
+<target>Sync setttings</target>
 
 <source>Status feedback</source>
 <target>Status feedback</target>
@@ -714,8 +711,8 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>Published under the GNU General Public Licence</target>
 
-<source>Ignore subsequent errors</source>
-<target>Ignore subsequent errors</target>
+<source>Ignore further errors</source>
+<target>Ignore further errors</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Hide further error messages during the current process</target>
@@ -738,22 +735,22 @@ is the same
 <source>&No</source>
 <target>&No</target>
 
+<source>Use Recycle Bin</source>
+<target>Use Recycle Bin</target>
+
 <source>Delete on both sides</source>
 <target>Delete on both sides</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Delete on both sides even if the file is selected on one side only</target>
 
-<source>Use Recycle Bin</source>
-<target>Use Recycle Bin</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Only files/directories that match all filter settings will be selected for synchronisation.
-Note: The name filter must be specified relative(!) to main synchronisation directories.
+Only files that match all filter settings will be synchronised.
+Note: File names must be relative to base directories!
 </target>
 
 <source>Hints:</source>
@@ -789,20 +786,20 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>Exclude</target>
 
-<source>Minimum file size</source>
-<target>Minimum file size</target>
+<source>Time span</source>
+<target>Time span</target>
 
-<source>Maximum file size</source>
-<target>Maximum file size</target>
+<source>File size</source>
+<target>File size</target>
+
+<source>Minimum</source>
+<target>Minimum</target>
+
+<source>Maximum</source>
+<target>Maximum</target>
 
 <source>&Default</source>
 <target>&Default</target>
-
-<source>Move column up</source>
-<target>Move column up</target>
-
-<source>Move column down</source>
-<target>Move column down</target>
 
 <source>Transactional file copy</source>
 <target>Transactional file copy</target>
@@ -822,14 +819,8 @@ Exclude: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Transfer file and directory permissions (Requires Administrator rights)</target>
 
-<source>Hidden dialogs:</source>
-<target>Hidden dialogues:</target>
-
-<source>Reset</source>
-<target>Reset</target>
-
-<source>Show hidden dialogs</source>
-<target>Show hidden dialogues</target>
+<source>Restore hidden dialogs</source>
+<target>Restore hidden dialogs</target>
 
 <source>External applications</source>
 <target>External applications</target>
@@ -861,8 +852,8 @@ Exclude: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Folder pairs</target>
 
-<source>Compressed view</source>
-<target>Compressed view</target>
+<source>Overview</source>
+<target>Overview</target>
 
 <source>Select view</source>
 <target>Select view</target>
@@ -891,8 +882,8 @@ Exclude: \stuff\temp\*
 <source>Exclude all</source>
 <target>Exclude all</target>
 
-<source>Icon size:</source>
-<target>Icon size:</target>
+<source>Show icons:</source>
+<target>Show icons:</target>
 
 <source>Small</source>
 <target>Small</target>
@@ -917,6 +908,9 @@ Exclude: \stuff\temp\*
 
 <source>Configuration saved!</source>
 <target>Configuration saved!</target>
+
+<source>Never save changes</source>
+<target>Never save changes</target>
 
 <source>Save changes to current configuration?</source>
 <target>Save changes to current configuration?</target>
@@ -1029,9 +1023,6 @@ Exclude: \stuff\temp\*
 <source>Error writing file:</source>
 <target>Error writing file:</target>
 
-<source>Batch file created successfully!</source>
-<target>Batch file created successfully!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1110,6 +1101,9 @@ Exclude: \stuff\temp\*
 <source>This year</source>
 <target>This year</target>
 
+<source>Last x days</source>
+<target>Last x days</target>
+
 <source>Byte</source>
 <target>Byte</target>
 
@@ -1119,11 +1113,8 @@ Exclude: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Filter: All pairs</target>
-
-<source>Filter: Single pair</source>
-<target>Filter: Single pair</target>
+<source>Filter</source>
+<target>Filter</target>
 
 <source>Direct</source>
 <target>Direct</target>
@@ -1149,8 +1140,8 @@ Exclude: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- Other side's counterpart to %dir</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Restore all hidden dialogs?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>Make hidden dialogs and warning messages visible again?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1326,8 +1317,8 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Preparing synchronisation...</target>
 
-<source>Memory allocation failed!</source>
-<target>Memory allocation failed!</target>
+<source>Out of memory!</source>
+<target>Out of memory!</target>
 
 <source>File %x has an invalid date!</source>
 <target>File %x has an invalid date!</target>
@@ -1482,11 +1473,11 @@ Exclude: \stuff\temp\*
 <source>Generating database...</source>
 <target>Generating database...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>Nothing to synchronise according to configuration!</target>
+<source>Nothing to synchronize!</source>
+<target>Nothing to synchronise!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Error copying locked file %x!</target>
+<source>Unable to copy locked file %x!</source>
+<target>Unable to copy locked file %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Data verification error: Source and target file have different content!</target>

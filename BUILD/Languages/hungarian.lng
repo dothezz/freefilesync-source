@@ -67,9 +67,6 @@
 <source>Configure filter</source>
 <target>Szűrő beállítása</target>
 
-<source>Customize columns</source>
-<target>Oszlopok testreszabása</target>
-
 <source>Global settings</source>
 <target>Globális beállítások</target>
 
@@ -103,14 +100,14 @@
 <source>Browse</source>
 <target>Tallózás</target>
 
-<source>Error reading from synchronization database:</source>
-<target>Hiba történt a szinkronizációs adatbázis olvasása közben:</target>
-
-<source>Error writing to synchronization database:</source>
-<target>Hiba történt a szinkronizációs adatbázis írása közben:</target>
-
 <source>Invalid command line: %x</source>
 <target>Érvénytelen parancssor: %x</target>
+
+<source>Info</source>
+<target>Információ</target>
+
+<source>Fatal Error</source>
+<target>Kritikus hiba</target>
 
 <source>Windows Error Code %x:</source>
 <target>Windows hibakód %x:</target>
@@ -139,14 +136,20 @@
 <pluralform>%x Bájt</pluralform>
 </target>
 
+<source>Error reading from synchronization database:</source>
+<target>Hiba történt a szinkronizációs adatbázis olvasása közben:</target>
+
+<source>Error writing to synchronization database:</source>
+<target>Hiba történt a szinkronizációs adatbázis írása közben:</target>
+
+<source>Incompatible synchronization database format:</source>
+<target>Inkompatibilis szinkronizációs adatbázis formátum:</target>
+
 <source>Initial synchronization:</source>
 <target>Első szinkronizáció:</target>
 
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>A FreeFileSync egyik adatbázisfájlja nem létezik:</target>
-
-<source>Incompatible synchronization database format:</source>
-<target>Inkompatibilis szinkronizációs adatbázis formátum:</target>
 
 <source>Database files do not share a common synchronization session:</source>
 <target>Az adatbázisfájlok nem osztoznak egy közös szinkronizációs munkameneten:</target>
@@ -172,12 +175,6 @@
 <pluralform>%x másodperc</pluralform>
 </target>
 
-<source>Info</source>
-<target>Információ</target>
-
-<source>Fatal Error</source>
-<target>Kritikus hiba</target>
-
 <source>Error reading file:</source>
 <target>A fájl olvasása sikertelen:</target>
 
@@ -202,11 +199,14 @@
 <source>Error parsing configuration file:</source>
 <target>A beállításokat tartalmazó fájl feldolgozása sikertelen:</target>
 
-<source>Error moving to Recycle Bin:</source>
-<target>A Lomtárba (Recycle Bin) mozgatás sikertelen:</target>
+<source>Configuration loaded partially only:</source>
+<target>A beállításokat csak részben sikerült betölteni:</target>
 
-<source>Could not load a required DLL:</source>
-<target>A szükséges DLL betöltése sikertelen:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>%x Lomtárba helyezése sikertelen!</target>
+
+<source>Cannot load file %x.</source>
+<target>%x fájl betöltése sikertelen.</target>
 
 <source>Error accessing Volume Shadow Copy Service!</source>
 <target>Hiba történt a Volume Shadow Copy szolgáltatás elérése közben!</target>
@@ -214,10 +214,10 @@
 <source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
 <target>A Shadow Copy a WOW64-en nem támogatott. Kérjük, használja a 64-bites FreeFileSync-et.</target>
 
-<source>Could not determine volume name for file:</source>
-<target>A következő fájlnak nem lehet meghatározni a kötetnevét:</target>
+<source>Cannot determine volume name for file:</source>
+<target>Nem lehet meghatározni a kötetnevet a következő fájlhoz:</target>
 
-<source>Volume name %x not part of filename %y!</source>
+<source>Volume name %x not part of file name %y!</source>
 <target>A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!</target>
 
 <source>/sec</source>
@@ -226,8 +226,8 @@
 <source>File does not exist:</source>
 <target>A következő fájl nem létezik:</target>
 
-<source>Could not read values for the following XML nodes:</source>
-<target>A következő XML-csomópontok értékének beolvasása sikertelen:</target>
+<source>Cannot read the following XML elements:</source>
+<target>A következő XML elemek olvasása sikertelen:</target>
 
 <source>S&ave configuration...</source>
 <target>Beállítások mentés&e...</target>
@@ -540,17 +540,17 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Speed:</source>
 <target>Sebesség:</target>
 
-<source>Time remaining:</source>
+<source>Remaining time:</source>
 <target>Hátralévő idő:</target>
 
-<source>Time elapsed:</source>
+<source>Elapsed time:</source>
 <target>Eltelt idő:</target>
 
 <source>Batch job</source>
 <target>Kötegelt feladat</target>
 
-<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <ffs_batch file>. This can also be scheduled in your operating system's task planner.</source>
-<target>Kötegelt feladat fájl létrehozása automatikus szinkronizációhoz. Kötegelt módban történő indításhoz duplán kell kattintani a fájlon, vagy végre kell hajttatni a parancssorból: FreeFileSync.exe <kötegelt feladat fájl>. Az operációs rendszer feladatütemezőjével ez akár ütemezhető is.</target>
+<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
+<target>Kötegelt feladat fájl létrehozása és automatikus szinkronizálás. A kötegelt feladat módban való indításhoz csak egyszerűen kattints duplát a fájlon vagy futtasd a következő parancsot: FreeFileSync.exe SzinkFeladat.ffs_batch. Ez ütemezhető is az operációs rendszer ütemezőjének a segítségével.</target>
 
 <source>Help</source>
 <target>Súgó</target>
@@ -563,9 +563,6 @@ A parancssor végrehajtódik minden alkalommal, ha:
 
 <source>Right</source>
 <target>Jobb oldal</target>
-
-<source>Overview</source>
-<target>Összefoglaló</target>
 
 <source>Status feedback</source>
 <target>Státusz visszajelzés</target>
@@ -712,8 +709,8 @@ a következő személyeknek:
 <source>Published under the GNU General Public License</source>
 <target>Kiadva a GNU General Public License alatt</target>
 
-<source>Ignore subsequent errors</source>
-<target>Későbbi hibák figyelmen kívül hagyása</target>
+<source>Ignore further errors</source>
+<target>További hibák figyelmen kívül hagyása</target>
 
 <source>Hide further error messages during the current process</source>
 <target>A további hibaüzenetek elrejtése az aktuális folyamat során</target>
@@ -736,22 +733,22 @@ a következő személyeknek:
 <source>&No</source>
 <target>&Nem</target>
 
+<source>Use Recycle Bin</source>
+<target>Lomtár (Recycle Bin) használata</target>
+
 <source>Delete on both sides</source>
 <target>Törlés mindkét oldalon</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Törlés mindkét oldalon, még akkor is, ha csak egyik oldalon lett kijelölve</target>
 
-<source>Use Recycle Bin</source>
-<target>Lomtár (Recycle Bin) használata</target>
-
 <source>
-Only files/directories that match all filter settings will be selected for synchronization.
-Note: The name filter must be specified relative(!) to main synchronization directories.
+Only files that match all filter settings will be synchronized.
+Note: File names must be relative to base directories!
 </source>
 <target>
-Csak azok a fájlok/mappák lesznek kiválasztva a szinkronizáláshoz, amelyek minden szűrőbeállításnak megfelelnek.
-Megjegyzés: A névszűrésnek relatívnak(!) kell lennie a fő szinkronizációs mappához képest.
+Csak azok a fájlok lesznek szinkronizálva, amelyek megfelelnek az összes szűrő beállításnak.
+Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszonyítva!
 </target>
 
 <source>Hints:</source>
@@ -787,20 +784,20 @@ Kizárni: \stuff\temp\*
 <source>Exclude</source>
 <target>Kizárni</target>
 
-<source>Minimum file size</source>
-<target>Legkisebb fájlméret</target>
+<source>Time span</source>
+<target>Időtartam</target>
 
-<source>Maximum file size</source>
-<target>Legnagyobb fájlméret</target>
+<source>File size</source>
+<target>Fájlméret</target>
+
+<source>Minimum</source>
+<target>Minimum</target>
+
+<source>Maximum</source>
+<target>Maximum</target>
 
 <source>&Default</source>
 <target>&Alapértelmezett</target>
-
-<source>Move column up</source>
-<target>Oszlop mozgatása felfelé</target>
-
-<source>Move column down</source>
-<target>Oszlop mozgatása lefelé</target>
 
 <source>Transactional file copy</source>
 <target>Tranzakciós fájlmásolás</target>
@@ -820,14 +817,8 @@ Kizárni: \stuff\temp\*
 <source>Transfer file and directory permissions (Requires Administrator rights)</source>
 <target>Fájlok és mappák jogosultságainak átvitele (Adminisztrátori jogok szükségesek)</target>
 
-<source>Hidden dialogs:</source>
-<target>Rejtett párbeszédablakok:</target>
-
-<source>Reset</source>
-<target>Helyreállítás</target>
-
-<source>Show hidden dialogs</source>
-<target>Rejtett párbeszédablakok mutatása</target>
+<source>Restore hidden dialogs</source>
+<target>Rejtett párbeszédablakok visszaállítása</target>
 
 <source>External applications</source>
 <target>Külső alkalmazások</target>
@@ -859,8 +850,8 @@ Kizárni: \stuff\temp\*
 <source>Folder pairs</source>
 <target>Mappa párok</target>
 
-<source>Compressed view</source>
-<target>Tömörített nézet</target>
+<source>Overview</source>
+<target>Összefoglaló</target>
 
 <source>Select view</source>
 <target>Nézet kiválasztása</target>
@@ -889,8 +880,8 @@ Kizárni: \stuff\temp\*
 <source>Exclude all</source>
 <target>Kizárni az összeset</target>
 
-<source>Icon size:</source>
-<target>Ikon mérete:</target>
+<source>Show icons:</source>
+<target>Ikonok mutatása:</target>
 
 <source>Small</source>
 <target>Kicsi</target>
@@ -916,8 +907,11 @@ Kizárni: \stuff\temp\*
 <source>Configuration saved!</source>
 <target>Beállítások elmentve!</target>
 
+<source>Never save changes</source>
+<target>Változtatások figyelmen kívül hagyása</target>
+
 <source>Save changes to current configuration?</source>
-<target>Mentsük a beállítások változásait?</target>
+<target>Mentsük az aktuális beállítások változásait?</target>
 
 <source>Configuration loaded!</source>
 <target>Beállítások betöltve!</target>
@@ -1027,9 +1021,6 @@ Kizárni: \stuff\temp\*
 <source>Error writing file:</source>
 <target>A fájl írása sikertelen:</target>
 
-<source>Batch file created successfully!</source>
-<target>A kötegelt feladat fájl létrehozása sikerült!</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1108,6 +1099,9 @@ Kizárni: \stuff\temp\*
 <source>This year</source>
 <target>Idei</target>
 
+<source>Last x days</source>
+<target>Utolsó x nap</target>
+
 <source>Byte</source>
 <target>Bájt</target>
 
@@ -1117,11 +1111,8 @@ Kizárni: \stuff\temp\*
 <source>MB</source>
 <target>MB</target>
 
-<source>Filter: All pairs</source>
-<target>Szűrő: Minden pár</target>
-
-<source>Filter: Single pair</source>
-<target>Szűrő: Egy pár</target>
+<source>Filter</source>
+<target>Szűrő</target>
 
 <source>Direct</source>
 <target>Közvetlen</target>
@@ -1147,8 +1138,8 @@ Kizárni: \stuff\temp\*
 <source>- Other side's counterpart to %dir</source>
 <target>- A %dir másik oldalon szereplő párja</target>
 
-<source>Restore all hidden dialogs?</source>
-<target>Az összes rejtett párbeszédablakot visszaállítsuk?</target>
+<source>Make hidden dialogs and warning messages visible again?</source>
+<target>A rejtett párbeszédablakok és figyelmeztető üzenetek újra legyenek láthatóak?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1279,9 +1270,6 @@ Kizárni: \stuff\temp\*
 <source>Error copying file:</source>
 <target>A fájl másolása sikertelen:</target>
 
-<source>Error opening file:</source>
-<target>A fájl megnyitása sikertelen:</target>
-
 <source>Error traversing directory:</source>
 <target>A mappa átnézése sikertelen:</target>
 
@@ -1324,8 +1312,8 @@ Kizárni: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Szinkronizálás előkészítése...</target>
 
-<source>Memory allocation failed!</source>
-<target>Sikertelen memóriafoglalás!</target>
+<source>Out of memory!</source>
+<target>Elfogyott a szabad memória!</target>
 
 <source>File %x has an invalid date!</source>
 <target>A(z) %x fájlnak érvénytelen a dátuma!</target>
@@ -1480,11 +1468,11 @@ Kizárni: \stuff\temp\*
 <source>Generating database...</source>
 <target>Adatbázis generálása...</target>
 
-<source>Nothing to synchronize according to configuration!</source>
-<target>A beállításoknak megfelelően nincs mit szinkronizálni!</target>
+<source>Nothing to synchronize!</source>
+<target>Nincs mit szinkronizálni!</target>
 
-<source>Error copying locked file %x!</source>
-<target>Hiba történt a(z) %x zárolt fájl másolása közben!</target>
+<source>Unable to copy locked file %x!</source>
+<target>A zárolt %x fájl másolása sikertelen!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Adatellenőrzési hiba: A forrás és cél fájl tartalma különbözik!</target>

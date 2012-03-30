@@ -23,9 +23,8 @@
 //enhance arbitray string class with useful non-member functions:
 namespace zen
 {
-template <class Char> bool cStringIsWhiteSpace(Char ch);
-template <class Char> bool cStringIsDigit     (Char ch); //not exactly the same as "std::isdigit" -> we consider '0'-'9' only!
-
+template <class Char> bool isWhiteSpace(Char ch);
+template <class Char> bool isDigit     (Char ch); //not exactly the same as "std::isdigit" -> we consider '0'-'9' only!
 
 template <class S, class T> bool startsWith(const S& str, const T& prefix);  //both S and T can be strings or char/wchar_t arrays or simple char/wchar_t
 template <class S, class T> bool endsWith  (const S& str, const T& postfix); //
@@ -36,7 +35,6 @@ template <class S, class T> S afterFirst (const S& str, const T& ch); //returns 
 template <class S, class T> S beforeFirst(const S& str, const T& ch); //returns the whole string if ch not found
 
 template <class S, class T> std::vector<S> split(const S& str, const T& delimiter);
-template <class S> void truncate(S& str, size_t newLen);
 template <class S> void trim(S& str, bool fromLeft = true, bool fromRight = true);
 template <class S, class T, class U> void replace   (      S& str, const T& oldOne, const U& newOne, bool replaceAll = true);
 template <class S, class T, class U> S    replaceCpy(const S& str, const T& oldOne, const U& newOne, bool replaceAll = true);
@@ -44,8 +42,8 @@ template <class S, class T, class U> S    replaceCpy(const S& str, const T& oldO
 //high-performance conversion between numbers and strings
 template <class S, class T, class Num> S printNumber(const T& format, const Num& number); //format a single number using std::snprintf()
 
-template <class S,   class Num> S   toString(const Num& number);
-template <class Num, class S  > Num toNumber(const S&   str);
+template <class S,   class Num> S   numberTo(const Num& number);
+template <class Num, class S  > Num stringTo(const S&   str);
 
 //string to string conversion: converts string-like type into char-compatible target string class
 template <class T, class S> T copyStringTo(const S& str);
@@ -83,7 +81,7 @@ template <class T, class S> T copyStringTo(const S& str);
 
 //---------------------- implementation ----------------------
 template <> inline
-bool cStringIsWhiteSpace(char ch)
+bool isWhiteSpace(char ch)
 {
     //caveat 1: std::isspace() takes an int, but expects an unsigned char
     //caveat 2: some parts of UTF-8 chars are erroneously seen as whitespace, e.g. the a0 from "\xec\x8b\xa0" (MSVC)
@@ -91,13 +89,13 @@ bool cStringIsWhiteSpace(char ch)
            std::isspace(static_cast<unsigned char>(ch)) != 0;
 }
 
-template <> inline bool cStringIsWhiteSpace(wchar_t ch) { return std::iswspace(ch) != 0; }
+template <> inline bool isWhiteSpace(wchar_t ch) { return std::iswspace(ch) != 0; }
 
 
 template <class Char> inline
-bool cStringIsDigit(Char ch) //similar to implmenetation of std::::isdigit()!
+bool isDigit(Char ch) //similar to implmenetation of std::::isdigit()!
 {
-    assert_static((IsSameType<Char, char>::result || IsSameType<Char, wchar_t>::result));
+    assert_static((IsSameType<Char, char>::value || IsSameType<Char, wchar_t>::value));
     return static_cast<Char>('0') <= ch && ch <= static_cast<Char>('9');
 }
 
@@ -105,9 +103,8 @@ bool cStringIsDigit(Char ch) //similar to implmenetation of std::::isdigit()!
 template <class S, class T> inline
 bool startsWith(const S& str, const T& prefix)
 {
-    assert_static(IsStringLike<S>::result);
-    assert_static(IsStringLike<T>::result);
-    typedef typename GetCharType<S>::Result CharType;
+    assert_static(IsStringLike<S>::value && IsStringLike<T>::value);
+    typedef typename GetCharType<S>::Type CharType;
 
     const size_t pfLength = strLength(prefix);
     if (strLength(str) < pfLength)
@@ -122,9 +119,8 @@ bool startsWith(const S& str, const T& prefix)
 template <class S, class T> inline
 bool endsWith(const S& str, const T& postfix)
 {
-    assert_static(IsStringLike<S>::result);
-    assert_static(IsStringLike<T>::result);
-    typedef typename GetCharType<S>::Result CharType;
+    assert_static(IsStringLike<S>::value && IsStringLike<T>::value);
+    typedef typename GetCharType<S>::Type CharType;
 
     const size_t strLen = strLength(str);
     const size_t pfLen  = strLength(postfix);
@@ -141,8 +137,8 @@ bool endsWith(const S& str, const T& postfix)
 template <class S, class T> inline
 S afterLast(const S& str, const T& ch)
 {
-    assert_static(IsStringLike<T>::result);
-    typedef typename GetCharType<S>::Result CharType;
+    assert_static(IsStringLike<T>::value);
+    typedef typename GetCharType<S>::Type CharType;
 
     const size_t chLen = strLength(ch);
 
@@ -164,8 +160,8 @@ S afterLast(const S& str, const T& ch)
 template <class S, class T> inline
 S beforeLast(const S& str, const T& ch)
 {
-    assert_static(IsStringLike<T>::result);
-    typedef typename GetCharType<S>::Result CharType;
+    assert_static(IsStringLike<T>::value);
+    typedef typename GetCharType<S>::Type CharType;
 
     const CharType* const strFirst = strBegin(str);
     const CharType* const strLast  = strFirst + strLength(str);
@@ -184,8 +180,8 @@ S beforeLast(const S& str, const T& ch)
 template <class S, class T> inline
 S afterFirst(const S& str, const T& ch)
 {
-    assert_static(IsStringLike<T>::result);
-    typedef typename GetCharType<S>::Result CharType;
+    assert_static(IsStringLike<T>::value);
+    typedef typename GetCharType<S>::Type CharType;
 
     const size_t chLen = strLength(ch);
     const CharType* const strFirst = strBegin(str);
@@ -206,8 +202,8 @@ S afterFirst(const S& str, const T& ch)
 template <class S, class T> inline
 S beforeFirst(const S& str, const T& ch)
 {
-    assert_static(IsStringLike<T>::result);
-    typedef typename GetCharType<S>::Result CharType;
+    assert_static(IsStringLike<T>::value);
+    typedef typename GetCharType<S>::Type CharType;
 
     const CharType* const strFirst = strBegin(str);
     const CharType* const chFirst  = strBegin(ch);
@@ -220,8 +216,8 @@ S beforeFirst(const S& str, const T& ch)
 template <class S, class T> inline
 std::vector<S> split(const S& str, const T& delimiter)
 {
-    assert_static(IsStringLike<T>::result);
-    typedef typename GetCharType<S>::Result CharType;
+    assert_static(IsStringLike<T>::value);
+    typedef typename GetCharType<S>::Type CharType;
 
     std::vector<S> output;
 
@@ -252,34 +248,25 @@ std::vector<S> split(const S& str, const T& delimiter)
 }
 
 
-template <class S> inline
-void truncate(S& str, size_t newLen)
-{
-    if (newLen < str.length())
-        str.resize(newLen);
-}
-
-
 namespace implementation
 {
 ZEN_INIT_DETECT_MEMBER(append);
 
 //either call operator+=(S(str, len)) or append(str, len)
 template <class S, class Char> inline
-typename EnableIf<HasMember_append<S>::result>::Result stringAppend(S& str, const Char* other, size_t len) { str.append(other, len); }
+typename EnableIf<HasMember_append<S>::value>::Type stringAppend(S& str, const Char* other, size_t len) { str.append(other, len); }
 
 template <class S, class Char> inline
-typename EnableIf<!HasMember_append<S>::result>::Result stringAppend(S& str, const Char* other, size_t len) { str += S(other, len); }
+typename EnableIf<!HasMember_append<S>::value>::Type stringAppend(S& str, const Char* other, size_t len) { str += S(other, len); }
 }
 
 
 template <class S, class T, class U> inline
 S replaceCpy(const S& str, const T& oldOne, const U& newOne, bool replaceAll)
 {
-    assert_static(IsStringLike<T>::result);
-    assert_static(IsStringLike<U>::result);
+    assert_static(IsStringLike<T>::value && IsStringLike<U>::value);
 
-    typedef typename GetCharType<S>::Result CharType;
+    typedef typename GetCharType<S>::Type CharType;
 
     const size_t oldLen = strLength(oldOne);
     const size_t newLen = strLength(newOne);
@@ -324,29 +311,24 @@ template <class S> inline
 void trim(S& str, bool fromLeft, bool fromRight)
 {
     assert(fromLeft || fromRight);
-
-    typedef typename GetCharType<S>::Result CharType; //don't use value_type! (wxString, Glib::ustring)
+    typedef typename GetCharType<S>::Type CharType; //don't use value_type! (wxString, Glib::ustring)
 
     const CharType* const oldBegin = str.c_str();
     const CharType* newBegin = oldBegin;
     const CharType* newEnd   = oldBegin + str.length();
 
     if (fromRight)
-        while (newBegin != newEnd && cStringIsWhiteSpace(newEnd[-1]))
+        while (newBegin != newEnd && isWhiteSpace(newEnd[-1]))
             --newEnd;
 
     if (fromLeft)
-        while (newBegin != newEnd && cStringIsWhiteSpace(*newBegin))
+        while (newBegin != newEnd && isWhiteSpace(*newBegin))
             ++newBegin;
 
-    const size_t newLength = newEnd - newBegin;
-    if (newLength != str.length())
-    {
-        if (newBegin != oldBegin)
-            str = S(newBegin, newLength); //minor inefficiency: in case "str" is not shared, we could save an allocation and do a memory move only
-        else
-            str.resize(newLength);
-    }
+    if (newBegin != oldBegin)
+        str = S(newBegin, newEnd - newBegin); //minor inefficiency: in case "str" is not shared, we could save an allocation and do a memory move only
+    else
+        str.resize(newEnd - newBegin);
 }
 
 
@@ -374,8 +356,8 @@ namespace implementation
 template <class Num> inline
 int saferPrintf(char* buffer, size_t bufferSize, const char* format, const Num& number) //there is no such thing as a "safe" printf ;)
 {
-#ifdef _MSC_VER
-    return ::_snprintf(buffer, bufferSize, format, number); //VS2010 doesn't respect ISO C
+#if defined _MSC_VER || defined __MINGW32__
+    return ::_snprintf(buffer, bufferSize, format, number); //by factor 10 faster than "std::snprintf" on Mingw and on par with std::sprintf()!!!
 #else
     return std::snprintf(buffer, bufferSize, format, number); //C99
 #endif
@@ -385,7 +367,7 @@ template <class Num> inline
 int saferPrintf(wchar_t* buffer, size_t bufferSize, const wchar_t* format, const Num& number)
 {
 #ifdef __MINGW32__
-    return ::snwprintf(buffer, bufferSize, format, number); //MinGW doesn't respect ISO C
+    return ::_snwprintf(buffer, bufferSize, format, number); //MinGW doesn't respect ISO C
 #else
     return std::swprintf(buffer, bufferSize, format, number); //C99
 #endif
@@ -395,12 +377,12 @@ int saferPrintf(wchar_t* buffer, size_t bufferSize, const wchar_t* format, const
 template <class S, class T, class Num> inline
 S printNumber(const T& format, const Num& number) //format a single number using ::sprintf
 {
-    assert_static(IsStringLike<T>::result);
+    assert_static(IsStringLike<T>::value);
     assert_static((IsSameType<
-                   typename GetCharType<S>::Result,
-                   typename GetCharType<T>::Result>::result));
+                   typename GetCharType<S>::Type,
+                   typename GetCharType<T>::Type>::value));
 
-    typedef typename GetCharType<S>::Result CharType;
+    typedef typename GetCharType<S>::Type CharType;
 
     const int BUFFER_SIZE = 128;
     CharType buffer[BUFFER_SIZE];
@@ -422,9 +404,9 @@ enum NumberType
 
 
 template <class S, class Num> inline
-S toString(const Num& number, Int2Type<NUM_TYPE_OTHER>) //default number to string conversion using streams: convenient, but SLOW, SLOW, SLOW!!!! (~ factor of 20)
+S numberTo(const Num& number, Int2Type<NUM_TYPE_OTHER>) //default number to string conversion using streams: convenient, but SLOW, SLOW, SLOW!!!! (~ factor of 20)
 {
-    typedef typename GetCharType<S>::Result CharType;
+    typedef typename GetCharType<S>::Type CharType;
 
     std::basic_ostringstream<CharType> ss;
     ss << number;
@@ -436,9 +418,9 @@ template <class S, class Num> inline S floatToString(const Num& number, char   )
 template <class S, class Num> inline S floatToString(const Num& number, wchar_t) { return printNumber<S>(L"%g", static_cast<double>(number)); }
 
 template <class S, class Num> inline
-S toString(const Num& number, Int2Type<NUM_TYPE_FLOATING_POINT>)
+S numberTo(const Num& number, Int2Type<NUM_TYPE_FLOATING_POINT>)
 {
-    return floatToString<S>(number, typename GetCharType<S>::Result());
+    return floatToString<S>(number, typename GetCharType<S>::Type());
 }
 
 
@@ -452,32 +434,37 @@ perf: integer to string: (executed 10 mio. times)
 template <class S, class Num> inline
 S formatInteger(Num n, bool hasMinus)
 {
-    typedef typename GetCharType<S>::Result CharType;
-
     assert(n >= 0);
-    S output;
+    typedef typename GetCharType<S>::Type CharType;
+
+    const size_t bufferSize = 100; //sufficient for signed 256-bit numbers
+    CharType buffer[bufferSize]; //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
+    assert_static(2 + 5 * sizeof(n) / 2 <= bufferSize);
+    //minimum required chars (+ sign char): 1 + ceil(ln_10 (256^sizeof(n))) =~ 1 + ceil(sizeof(n) * 2.4082) <= 2 + floor(sizeof(n) * 2.5)
+
+    size_t startPos = bufferSize;
     do
     {
-        output += static_cast<CharType>('0' + n % 10);
+        buffer[--startPos] = static_cast<char>('0' + n % 10);
         n /= 10;
     }
     while (n != 0);
-    if (hasMinus)
-        output += static_cast<CharType>('-');
 
-    std::reverse(output.begin(), output.end());
-    return output;
+    if (hasMinus)
+        buffer[--startPos] = static_cast<CharType>('-');
+
+    return S(buffer + startPos, bufferSize - startPos);
 }
 
 template <class S, class Num> inline
-S toString(const Num& number, Int2Type<NUM_TYPE_SIGNED_INT>)
+S numberTo(const Num& number, Int2Type<NUM_TYPE_SIGNED_INT>)
 {
     return formatInteger<S>(number < 0 ? -number : number, number < 0);
 }
 
 
 template <class S, class Num> inline
-S toString(const Num& number, Int2Type<NUM_TYPE_UNSIGNED_INT>)
+S numberTo(const Num& number, Int2Type<NUM_TYPE_UNSIGNED_INT>)
 {
     return formatInteger<S>(number, false);
 }
@@ -486,20 +473,20 @@ S toString(const Num& number, Int2Type<NUM_TYPE_UNSIGNED_INT>)
 
 
 template <class Num, class S> inline
-Num toNumber(const S& str, Int2Type<NUM_TYPE_OTHER>) //default string to number conversion using streams: convenient, but SLOW
+Num stringTo(const S& str, Int2Type<NUM_TYPE_OTHER>) //default string to number conversion using streams: convenient, but SLOW
 {
-    typedef typename GetCharType<S>::Result CharType;
+    typedef typename GetCharType<S>::Type CharType;
     Num number = 0;
     std::basic_istringstream<CharType>(copyStringTo<std::basic_string<CharType> >(str)) >> number;
     return number;
 }
 
 
-template <class Num> inline Num stringToFloat(const char*    str) { return std::strtod(str, NULL); }
-template <class Num> inline Num stringToFloat(const wchar_t* str) { return std::wcstod(str, NULL); }
+template <class Num> inline Num stringToFloat(const char*    str) { return std::strtod(str, nullptr); }
+template <class Num> inline Num stringToFloat(const wchar_t* str) { return std::wcstod(str, nullptr); }
 
 template <class Num, class S> inline
-Num toNumber(const S& str, Int2Type<NUM_TYPE_FLOATING_POINT>)
+Num stringTo(const S& str, Int2Type<NUM_TYPE_FLOATING_POINT>)
 {
     return stringToFloat<Num>(strBegin(str));
 }
@@ -507,12 +494,12 @@ Num toNumber(const S& str, Int2Type<NUM_TYPE_FLOATING_POINT>)
 template <class Num, class S>
 Num extractInteger(const S& str, bool& hasMinusSign) //very fast conversion to integers: slightly faster than std::atoi, but more importantly: generic
 {
-    typedef typename GetCharType<S>::Result CharType;
+    typedef typename GetCharType<S>::Type CharType;
 
     const CharType* first = strBegin(str);
     const CharType* last  = first + strLength(str);
 
-    while (first != last && cStringIsWhiteSpace(*first)) //skip leading whitespace
+    while (first != last && isWhiteSpace(*first)) //skip leading whitespace
         ++first;
 
     //handle minus sign
@@ -540,7 +527,7 @@ Num extractInteger(const S& str, bool& hasMinusSign) //very fast conversion to i
         else
         {
             //rest of string should contain whitespace only
-            //assert(std::find_if(iter, last, std::not1(std::ptr_fun(&cStringIsWhiteSpace<CharType>))) == last); -> this is NO assert situation
+            //assert(std::all_of(iter, last, &isWhiteSpace<CharType>)); -> this is NO assert situation
             break;
         }
     }
@@ -549,7 +536,7 @@ Num extractInteger(const S& str, bool& hasMinusSign) //very fast conversion to i
 
 
 template <class Num, class S> inline
-Num toNumber(const S& str, Int2Type<NUM_TYPE_SIGNED_INT>)
+Num stringTo(const S& str, Int2Type<NUM_TYPE_SIGNED_INT>)
 {
     bool hasMinusSign = false; //handle minus sign
     const Num number = extractInteger<Num>(str, hasMinusSign);
@@ -558,7 +545,7 @@ Num toNumber(const S& str, Int2Type<NUM_TYPE_SIGNED_INT>)
 
 
 template <class Num, class S> inline
-Num toNumber(const S& str, Int2Type<NUM_TYPE_UNSIGNED_INT>) //very fast conversion to integers: slightly faster than std::atoi, but more importantly: generic
+Num stringTo(const S& str, Int2Type<NUM_TYPE_UNSIGNED_INT>) //very fast conversion to integers: slightly faster than std::atoi, but more importantly: generic
 {
     bool hasMinusSign = false; //handle minus sign
     const Num number = extractInteger<Num>(str, hasMinusSign);
@@ -573,28 +560,28 @@ Num toNumber(const S& str, Int2Type<NUM_TYPE_UNSIGNED_INT>) //very fast conversi
 
 
 template <class S, class Num> inline
-S toString(const Num& number) //convert number to string the C++ way
+S numberTo(const Num& number)
 {
     typedef Int2Type<
-    IsSignedInt  <Num>::result ? implementation::NUM_TYPE_SIGNED_INT :
-    IsUnsignedInt<Num>::result ? implementation::NUM_TYPE_UNSIGNED_INT :
-    IsFloat      <Num>::result ? implementation::NUM_TYPE_FLOATING_POINT :
+    IsSignedInt  <Num>::value ? implementation::NUM_TYPE_SIGNED_INT :
+    IsUnsignedInt<Num>::value ? implementation::NUM_TYPE_UNSIGNED_INT :
+    IsFloat      <Num>::value ? implementation::NUM_TYPE_FLOATING_POINT :
     implementation::NUM_TYPE_OTHER> TypeTag;
 
-    return implementation::toString<S>(number, TypeTag());
+    return implementation::numberTo<S>(number, TypeTag());
 }
 
 
 template <class Num, class S> inline
-Num toNumber(const S& str) //convert string to number the C++ way
+Num stringTo(const S& str)
 {
     typedef Int2Type<
-    IsSignedInt  <Num>::result ? implementation::NUM_TYPE_SIGNED_INT :
-    IsUnsignedInt<Num>::result ? implementation::NUM_TYPE_UNSIGNED_INT :
-    IsFloat      <Num>::result ? implementation::NUM_TYPE_FLOATING_POINT :
+    IsSignedInt  <Num>::value ? implementation::NUM_TYPE_SIGNED_INT :
+    IsUnsignedInt<Num>::value ? implementation::NUM_TYPE_UNSIGNED_INT :
+    IsFloat      <Num>::value ? implementation::NUM_TYPE_FLOATING_POINT :
     implementation::NUM_TYPE_OTHER> TypeTag;
 
-    return implementation::toNumber<Num>(str, TypeTag());
+    return implementation::stringTo<Num>(str, TypeTag());
 }
 
 }

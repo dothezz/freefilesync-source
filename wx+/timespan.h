@@ -52,10 +52,10 @@ public:
         Layout();
 
         //connect events
-        m_spinBtn ->Connect(wxEVT_SCROLL_LINEUP,   wxEventHandler     (TimeSpanCtrl::OnSpinUp),      NULL, this);
-        m_spinBtn ->Connect(wxEVT_SCROLL_LINEDOWN, wxEventHandler     (TimeSpanCtrl::OnSpinDown),    NULL, this);
-        m_textCtrl->Connect(wxEVT_KEY_DOWN,        wxKeyEventHandler  (TimeSpanCtrl::OnKeyPress),    NULL, this);
-        m_textCtrl->Connect(wxEVT_MOUSEWHEEL,      wxMouseEventHandler(TimeSpanCtrl::OnMouseAction), NULL, this);
+        m_spinBtn ->Connect(wxEVT_SCROLL_LINEUP,   wxEventHandler     (TimeSpanCtrl::OnSpinUp),      nullptr, this);
+        m_spinBtn ->Connect(wxEVT_SCROLL_LINEDOWN, wxEventHandler     (TimeSpanCtrl::OnSpinDown),    nullptr, this);
+        m_textCtrl->Connect(wxEVT_KEY_DOWN,        wxKeyEventHandler  (TimeSpanCtrl::OnKeyPress),    nullptr, this);
+        m_textCtrl->Connect(wxEVT_MOUSEWHEEL,      wxMouseEventHandler(TimeSpanCtrl::OnMouseAction), nullptr, this);
 
         setValue(0);
     }
@@ -94,7 +94,7 @@ public:
         textVal.Trim(false);
 
         wxDateTime tmp(time_t(0));
-        if (tmp.ParseFormat(textVal, FORMAT_TIMESPAN, wxDateTime(tmp)) == NULL)
+        if (tmp.ParseFormat(textVal, FORMAT_TIMESPAN, wxDateTime(tmp)) == nullptr)
             return 0;
 
         return (isNegative ? -1 : 1) *

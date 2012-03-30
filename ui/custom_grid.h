@@ -28,7 +28,7 @@ std::vector<ColumnAttributeRim>    convertConfig(const std::vector<Grid::ColumnA
 
 void setSyncPreviewActive(Grid& grid, bool value);
 
-void setIconSize(Grid& grid, IconBuffer::IconSize sz);
+void setupIcons(Grid& grid, bool show, IconBuffer::IconSize sz);
 
 void clearSelection(Grid& grid); //clear all components
 
@@ -51,22 +51,22 @@ extern const wxEventType EVENT_GRID_SYNC_DIRECTION;
 
 struct CheckRowsEvent : public wxCommandEvent
 {
-    CheckRowsEvent(int rowFrom, int rowTo, bool setIncluded) : wxCommandEvent(EVENT_GRID_CHECK_ROWS), rowFrom_(rowFrom), rowTo_(rowTo), setIncluded_(setIncluded) {}
+    CheckRowsEvent(ptrdiff_t rowFrom, ptrdiff_t rowTo, bool setIncluded) : wxCommandEvent(EVENT_GRID_CHECK_ROWS), rowFrom_(rowFrom), rowTo_(rowTo), setIncluded_(setIncluded) {}
     virtual wxEvent* Clone() const { return new CheckRowsEvent(*this); }
 
-    const int rowFrom_;
-    const int rowTo_;
+    const ptrdiff_t rowFrom_;
+    const ptrdiff_t rowTo_;
     const bool setIncluded_;
 };
 
 
 struct SyncDirectionEvent : public wxCommandEvent
 {
-    SyncDirectionEvent(int rowFrom, int rowTo, SyncDirection direction) : wxCommandEvent(EVENT_GRID_SYNC_DIRECTION), rowFrom_(rowFrom), rowTo_(rowTo), direction_(direction) {}
+    SyncDirectionEvent(ptrdiff_t rowFrom, ptrdiff_t rowTo, SyncDirection direction) : wxCommandEvent(EVENT_GRID_SYNC_DIRECTION), rowFrom_(rowFrom), rowTo_(rowTo), direction_(direction) {}
     virtual wxEvent* Clone() const { return new SyncDirectionEvent(*this); }
 
-    const int rowFrom_;
-    const int rowTo_;
+    const ptrdiff_t rowFrom_;
+    const ptrdiff_t rowTo_;
     const SyncDirection direction_;
 };
 

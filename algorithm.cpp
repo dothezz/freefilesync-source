@@ -5,6 +5,7 @@
 // **************************************************************************
 
 #include "algorithm.h"
+#include <set>
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
@@ -151,42 +152,30 @@ private:
 
 
 //---------------------------------------------------------------------------------------------------------------
-class HaveNonEqual //test if non-equal items exist in scanned data
+struct AllEqual //test if non-equal items exist in scanned data
 {
-public:
     bool operator()(const HierarchyObject& hierObj) const
     {
-        return std::find_if(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-                            [](const FileMapping& fileObj)
-        {
-            return fileObj.getCategory() != FILE_EQUAL;
-        }) != hierObj.refSubFiles().end() || //files
+        return std::all_of(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
+        [](const FileMapping& fileObj) { return fileObj.getCategory() == FILE_EQUAL; }) && //files
 
-               std::find_if(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-                            [](const SymLinkMapping& linkObj)
-        {
-            return linkObj.getLinkCategory() != SYMLINK_EQUAL;
-        }) != hierObj.refSubLinks().end() || //symlinks
+               std::all_of(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
+        [](const SymLinkMapping& linkObj) { return linkObj.getLinkCategory() == SYMLINK_EQUAL; }) && //symlinks
 
-               std::find_if(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(),
-                            [](const DirMapping& dirObj) -> bool
+               std::all_of(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(),
+                           [](const DirMapping& dirObj) -> bool
         {
             if (dirObj.getDirCategory() != DIR_EQUAL)
-                return true;
-            return HaveNonEqual()(dirObj); //recursion
-        }) != hierObj.refSubDirs ().end();    //directories
+                return false;
+            return AllEqual()(dirObj); //recurse
+        });    //directories
     }
 };
-
-bool allElementsEqual(const BaseDirMapping& baseMap)
-{
-    return !HaveNonEqual()(baseMap);
-}
 
 
 bool zen::allElementsEqual(const FolderComparison& folderCmp)
 {
-    return std::find_if(begin(folderCmp), end(folderCmp), HaveNonEqual()) == end(folderCmp);
+    return std::all_of(begin(folderCmp), end(folderCmp), AllEqual());
 }
 //---------------------------------------------------------------------------------------------------------------
 
@@ -412,13 +401,13 @@ private:
         txtLastSyncFail (_("Cannot determine sync-direction:") + L" \n" + _("The file was not processed by last synchronization!")),
         reportWarning_(reportWarning)
     {
-        if (allElementsEqual(baseDirectory)) //nothing to do: abort and don't show any nag-screens
+        if (AllEqual()(baseDirectory)) //nothing to do: abort and don't show any nag-screens
             return;
 
         //try to load sync-database files
         std::pair<DirInfoPtr, DirInfoPtr> dirInfo = loadDBFile(baseDirectory);
-        if (dirInfo.first.get()  == NULL ||
-            dirInfo.second.get() == NULL)
+        if (dirInfo.first.get()  == nullptr ||
+            dirInfo.second.get() == nullptr)
         {
             //set conservative "two-way" directions
             DirectionSet twoWayCfg = getTwoWaySet();
@@ -464,7 +453,7 @@ private:
     }
     */
 
-    std::pair<DirInfoPtr, DirInfoPtr> loadDBFile(const BaseDirMapping& baseDirectory) //return NULL on failure
+    std::pair<DirInfoPtr, DirInfoPtr> loadDBFile(const BaseDirMapping& baseDirectory) //return nullptr on failure
     {
         try
         {
@@ -476,7 +465,7 @@ private:
             reportWarning_(error.toString() + L" \n\n" +
                            _("Setting default synchronization directions: Old files will be overwritten with newer files."));
         }
-        return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
+        return std::pair<DirInfoPtr, DirInfoPtr>();
     }
 
     /*
@@ -491,8 +480,8 @@ private:
         bool filterDirConflictFound(const Zstring& relativeName) const
         {
             //if filtering would have excluded directory during database creation, then we can't say anything about its former state
-            return (dbFilterLeft  && !dbFilterLeft ->passDirFilter(relativeName, NULL)) ||
-                   (dbFilterRight && !dbFilterRight->passDirFilter(relativeName, NULL));
+            return (dbFilterLeft  && !dbFilterLeft ->passDirFilter(relativeName, nullptr)) ||
+                   (dbFilterRight && !dbFilterRight->passDirFilter(relativeName, nullptr));
         }
     */
 
@@ -868,6 +857,10 @@ private:
      file ID, size, date                              |
        |                                             \|/
        X                                              Y
+
+       FAT caveat: File Ids are generally not stable when file is either moved or renamed!
+       => 1. Move/rename operations on FAT cannot be detected.
+       => 2. database generally contains wrong file ID on FAT after renaming from .ffs_tmp files => correct file Ids in database after next sync
     */
 };
 
@@ -1166,7 +1159,7 @@ private:
             else
             {
                 //the only case with partially unclear semantics:
-                //file and time filters may match on one side, leaving a total of 16 combinations for both sides!
+                //file and time filters may match or not match on each side, leaving a total of 16 combinations for both sides!
                 /*
                                ST S T -         ST := match size and time
                                ---------         S := match size only
@@ -1563,7 +1556,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
         //last step: cleanup empty rows: this one invalidates all pointers!
         std::for_each(begin(folderCmp), end(folderCmp), BaseDirMapping::removeEmpty);
     };
-    ZEN_ON_BLOCK_EXIT(updateDirection()); //MSVC: assert is a macro and it doesn't play nice with ZEN_ON_BLOCK_EXIT, surprise... wasn't there something about macros being "evil"?
+    ZEN_ON_SCOPE_EXIT(updateDirection()); //MSVC: assert is a macro and it doesn't play nice with ZEN_ON_SCOPE_EXIT, surprise... wasn't there something about macros being "evil"?
 
     deleteFromGridAndHDOneSide<LEFT_SIDE>(deleteLeft.begin(), deleteLeft.end(),
                                           useRecycleBin,

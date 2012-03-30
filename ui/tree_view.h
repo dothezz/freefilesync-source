@@ -84,13 +84,13 @@ public:
         BaseDirMapping& baseMap_;
     };
 
-    std::unique_ptr<Node> getLine(size_t row) const; //return NULL on error
+    std::unique_ptr<Node> getLine(size_t row) const; //return nullptr on error
     size_t linesTotal() const { return flatTree.size(); }
 
     void expandNode(size_t row);
     void reduceNode(size_t row);
     NodeStatus getStatus(size_t row) const;
-    int getParent(size_t row) const; //return < 0 if none
+    ptrdiff_t getParent(size_t row) const; //return < 0 if none
 
     void setSortDirection(ColumnTypeNavi colType, bool ascending); //apply permanently!
     std::pair<ColumnTypeNavi, bool> getSortDirection() { return std::make_pair(sortColumn, sortAscending); }
@@ -101,7 +101,7 @@ private:
 
     struct Container
     {
-        Container() : firstFile(NULL) {}
+        Container() : firstFile(nullptr) {}
         UInt64 bytesGross;
         UInt64 bytesNet;  //files in this directory only
         std::vector<DirNodeImpl> subDirs;
@@ -110,7 +110,7 @@ private:
 
     struct DirNodeImpl : public Container
     {
-        DirNodeImpl() : objId(NULL) {}
+        DirNodeImpl() : objId(nullptr) {}
         FileSystemObject::ObjectId objId; //weak pointer to DirMapping
     };
 
@@ -129,14 +129,15 @@ private:
 
     struct TreeLine
     {
-        TreeLine(unsigned int level, int percent, const Container* node, enum NodeType type) : level_(level), percent_(percent), node_(node), type_(type) {}
+        TreeLine(size_t level, int percent, const Container* node, enum NodeType type) : level_(level), percent_(percent), node_(node), type_(type) {}
 
-        unsigned int level_;
+        size_t level_;
         int percent_;      //[0, 100]
         const Container* node_; //
         NodeType type_;    //we choose to increase size of "flatTree" rather than "folderCmpView" by not using dynamic polymorphism!
     };
 
+    static void compressNode(Container& cont);
     template <class Function>
     static void extractVisibleSubtree(HierarchyObject& hierObj, Container& cont, Function includeObject);
     void getChildren(const Container& cont,  size_t level, std::vector<TreeLine>& output);
