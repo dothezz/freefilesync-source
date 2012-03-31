@@ -2,6 +2,11 @@
 |FreeFileSync|
 --------------
 
+Changelog v5.2
+--------------
+Fixed runtime error "Error comparing strings! (LCMapString)" (Windows XP only)
+
+
 Changelog v5.1
 --------------
 New category for time span filter: last x days

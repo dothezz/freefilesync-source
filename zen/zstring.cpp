@@ -127,7 +127,7 @@ int z_impl::compareFilenamesWin(const wchar_t* lhs, const wchar_t* rhs, size_t s
         const auto minSize = static_cast<unsigned int>(std::min(sizeLhs, sizeRhs));
 
         int rv = 0;
-        if (minSize >= 0) //LCMapString does not allow input sizes of 0!
+        if (minSize > 0) //LCMapString does not allow input sizes of 0!
         {
             if (minSize <= MAX_PATH) //performance optimization: stack
             {
