@@ -15,10 +15,12 @@
 namespace zen
 {
 //unchecked, unformatted serialization
-template <class T> T    readPOD (wxInputStream&  stream);
+template <class T> T readPOD (wxInputStream&  stream);
+template <class T> void readPOD (wxInputStream&  stream, T& pod);
 template <class T> void writePOD(wxOutputStream& stream, const T& pod);
 
 template <class S> S    readString (wxInputStream&  stream);
+template <class S> void readString (wxInputStream&  stream, S& str);
 template <class S> void writeString(wxOutputStream& stream, const S& str);
 
 
@@ -53,6 +55,9 @@ private:
 
 class CheckedIo
 {
+public:
+    virtual void throwException() const = 0;
+
 protected:
     CheckedIo(wxStreamBase& stream) : stream_(stream) {}
 
@@ -61,7 +66,6 @@ protected:
         if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
             throwException();
     }
-    virtual void throwException() const = 0;
 
 private:
     wxStreamBase& stream_;
@@ -69,7 +73,7 @@ private:
 
 
 //wxInputStream proxy throwing exception on error
-class CheckedReader : private CheckedIo
+class CheckedReader : public CheckedIo
 {
 public:
     CheckedReader(wxInputStream& stream) : CheckedIo(stream), stream_(stream) {}
@@ -77,8 +81,16 @@ public:
     template <class T>
     T readPOD() const; //throw!
 
+    template <class T>
+    void readPOD(T& pod) const; //throw!
+
     template <class S>
     S readString() const; //throw!
+
+    template <class S>
+    void readString(S& str) const; //throw!
+
+    void readArray(void* data, size_t len) const; //throw!
 
 private:
     wxInputStream& stream_;
@@ -86,16 +98,18 @@ private:
 
 
 //wxOutputStream proxy throwing FileError on error
-class CheckedWriter : private CheckedIo
+class CheckedWriter : public CheckedIo
 {
 public:
     CheckedWriter(wxOutputStream& stream) : CheckedIo(stream), stream_(stream) {}
 
     template <class T>
-    void writePOD(T number) const; //throw!
+    void writePOD(const T& pod) const; //throw!
 
     template <class S>
     void writeString(const S& str) const; //throw!
+
+    void writeArray(const void* data, size_t len) const; //throw!
 
 private:
     wxOutputStream& stream_;
@@ -129,8 +143,15 @@ template <class T> inline
 T readPOD(wxInputStream& stream)
 {
     T pod = 0;
-    stream.Read(reinterpret_cast<char*>(&pod), sizeof(T));
+    readPOD(stream, pod);
     return pod;
+}
+
+
+template <class T> inline
+void readPOD(wxInputStream& stream, T& pod)
+{
+    stream.Read(reinterpret_cast<char*>(&pod), sizeof(T));
 }
 
 
@@ -144,61 +165,93 @@ void writePOD(wxOutputStream& stream, const T& pod)
 template <class S> inline
 S readString(wxInputStream& stream)
 {
+    S str;
+    readString(stream, str);
+    return str;
+}
+
+
+template <class S> inline
+void readString(wxInputStream& stream, S& str)
+{
     //don't even consider UTF8 conversions here! "string" is expected to handle arbitrary binary data!
 
-    typedef typename S::value_type CharType;
-
     const auto strLength = readPOD<std::uint32_t>(stream);
-    S output;
+    str.resize(strLength); //throw std::bad_alloc
     if (strLength > 0)
-    {
-        output.resize(strLength); //throw std::bad_alloc
-        stream.Read(&*output.begin(), sizeof(CharType) * strLength);
-    }
-    return output;
+        stream.Read(&*str.begin(), sizeof(typename S::value_type) * strLength);
 }
 
 
 template <class S> inline
 void writeString(wxOutputStream& stream, const S& str)
 {
-    writePOD(stream, static_cast<std::uint32_t>(str.length()));
-    stream.Write(str.c_str(), sizeof(typename S::value_type) * str.length());
+    const auto strLength = str.length();
+    writePOD(stream, static_cast<std::uint32_t>(strLength));
+    if (strLength > 0)
+        stream.Write(&*str.begin(), sizeof(typename S::value_type) * strLength); //don't use c_str(), but access uniformly		 via STL interface
 }
 
 
-template <class T>
 inline
+void CheckedReader::readArray(void* data, size_t len) const //throw!
+{
+    stream_.Read(data, len);
+    check();
+}
+
+
+template <class T> inline
 T CheckedReader::readPOD() const //checked read operation
 {
-    T output = zen::readPOD<T>(stream_);
-    check();
-    return output;
+    T pod = 0;
+    readPOD(pod);
+    return pod;
+}
+
+
+template <class T> inline
+void CheckedReader::readPOD(T& pod) const //checked read operation
+{
+    readArray(&pod, sizeof(T));
 }
 
 
 template <class S> inline
 S CheckedReader::readString() const //checked read operation
 {
-    S output;
+    S str;
+    readString(str);
+    return str;
+}
+
+
+template <class S> inline
+void CheckedReader::readString(S& str) const //checked read operation
+{
     try
     {
-        output = zen::readString<S>(stream_); //throw std::bad_alloc
+        zen::readString<S>(stream_, str); //throw std::bad_alloc
     }
     catch (std::exception&) { throwException(); }
-
     check();
-    if (stream_.LastRead() != output.length() * sizeof(typename S::value_type)) //some additional check
+    if (stream_.LastRead() != str.length() * sizeof(typename S::value_type)) //some additional check
         throwException();
-    return output;
+}
+
+
+inline
+void CheckedWriter::writeArray(const void* data, size_t len) const //throw!
+{
+    stream_.Write(data, len);
+    check();
 }
 
 
 template <class T> inline
-void CheckedWriter::writePOD(T number) const //checked write operation
+void CheckedWriter::writePOD(const T& pod) const //checked write opera
 {
-    zen::writePOD<T>(stream_, number);
-    check();
+    writeArray(&pod, sizeof(T));
 }
 
 

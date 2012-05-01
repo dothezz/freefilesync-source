@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>ディレクトリを参照</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>ユーザによる中断: 現在の処理を終了しています.. お待ちください...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>リアルタイム同期 - 自動同期</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux エラーコード %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>シンボリックリンクの解決に失敗:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>シンボリックリンク %x を解決できません.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -135,35 +138,41 @@
 <pluralform>%x バイト</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>同期データベースからの読み込みエラー:</target>
+<source>Cannot read file %x.</source>
+<target>ファイル %x を読み込めません.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>同期データベースへの書き込みエラー:</target>
+<source>Cannot write file %x.</source>
+<target>ファイル %x に書き込めません.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>同期データベースの書式に互換性がありません:</target>
+<source>Database file %x is incompatible.</source>
+<target>データベース %x とは互換性がありません.</target>
 
 <source>Initial synchronization:</source>
 <target>同期処理の初期化:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>FreeFileSync データベースファイルが存在しません:</target>
+<source>Database file %x does not yet exist.</source>
+<target>データベース %x は存在しません.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>データベースファイルは一般的な同期セッションを共有しません:</target>
+<source>Out of memory!</source>
+<target>メモリが足りません!</target>
+
+<source>Database files do not share a common session.</source>
+<target>データベースは一般セッションで共有できません.</target>
 
 <source>An exception occurred!</source>
 <target>例外が発生しました!</target>
 
-<source>Error reading file attributes:</source>
-<target>ファイル属性の取得に失敗:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>%x のファイル属性を読み込めません.</target>
+
+<source>Cannot get process information.</source>
+<target>プロセス情報を取得できません.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>待機時間中ディレクトリはロックされます(%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>ディレクトリ設定に失敗(ロック):</target>
+<source>Cannot set directory lock %x.</source>
+<target>%x のロックをセットできません.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -173,8 +182,8 @@
 <pluralform>%x 秒.</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>ファイル読み込みエラー:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>ファイル %x の構文解析エラー, 行 %y, 列 %z.</target>
 
 <source>Scanning:</source>
 <target>スキャン:</target>
@@ -190,38 +199,32 @@
 <pluralform>[%x スレッド]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>無効な FreeFileSync 構成ファイルです!</target>
+<source>/sec</source>
+<target>/秒</target>
 
-<source>Error parsing configuration file:</source>
-<target>構成ファイルの構文に誤りがあります:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>ファイル %x には有効な構成が含まれていません.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>部分的のみ読み込まれた構成:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>構成ファイル %x は部分的のみ読み込まれます.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>%x をゴミ箱に移動できません!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>ﾎﾞﾘｭｰﾑｼｬﾄﾞｳｺﾋﾟｰｻｰﾋﾞｽにアクセス出来ません.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>FreeFileSync 64-bit 版を使用してこのシステムにシャドウコピーを作成してください.</target>
 
 <source>Cannot load file %x.</source>
 <target>ファイル %x を読み込めません.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>ボリュームシャドウ・コピーサービスにアクセス出来ません!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>WOW64 では、ボリュームシャドウコピーに対応していません、FreeFileSync 64-bit 版をお試しください。</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>ファイルのボリューム名を解決出来ません:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>パス %x にはボリューム名が含まれていません.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>ボリューム名 %x にファイル名 %y はありません!</target>
 
-<source>/sec</source>
-<target>/秒</target>
-
-<source>File does not exist:</source>
-<target>ファイルが存在しません:</target>
+<source>Cannot find file %x.</source>
+<target>ファイル %x がみつかりません.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>次の XML要素を読み込めません:</target>
@@ -300,9 +303,6 @@ The command line is executed each time:
 <source>RealtimeSync configuration</source>
 <target>リアルタイム同期の構成設定</target>
 
-<source>File already exists. Overwrite?</source>
-<target>ファイルは存在します、上書きしますか?</target>
-
 <source>&Restore</source>
 <target>修復(&R)</target>
 
@@ -345,20 +345,20 @@ The command line is executed each time:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync 構成設定</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync 一括ジョブ</target>
-
-<source>Unable to create log file!</source>
-<target>ログファイルを作成出来ません!</target>
-
 <source>Batch execution</source>
 <target>一括処理を実行</target>
 
-<source>Stop</source>
-<target>停止</target>
+<source>Items processed:</source>
+<target>処理された要素:</target>
+
+<source>Items remaining:</source>
+<target>残りの要素:</target>
 
 <source>Total time:</source>
 <target>合計時間:</target>
+
+<source>Stop</source>
+<target>停止</target>
 
 <source>Synchronization aborted!</source>
 <target>同期処理を中断!</target>
@@ -366,14 +366,17 @@ The command line is executed each time:
 <source>Synchronization completed with errors!</source>
 <target>同期処理は、エラーで終了しています!</target>
 
+<source>Nothing to synchronize!</source>
+<target>同期対象がありません!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>同期処理はすべて正常に完了しました!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>"切り替え" を押すと FreeFileSync GUI モードで開きます</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>"切り替え"を押すと FreeFileSync ダイアログの問題を解決します.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>FreeFileSync GUI モードの切り替え中...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>FreeFileSync メインダイアログを切替中...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Sourceforge.net に接続できません!</target>
@@ -531,9 +534,6 @@ The command line is executed each time:
 <source>Items found:</source>
 <target>見つかった要素:</target>
 
-<source>Items remaining:</source>
-<target>残りの要素:</target>
-
 <source>Speed:</source>
 <target>速度:</target>
 
@@ -561,9 +561,6 @@ The command line is executed each time:
 <source>Right</source>
 <target>右側</target>
 
-<source>Sync setttings</source>
-<target>同期設定</target>
-
 <source>Status feedback</source>
 <target>状態 フィードバック</target>
 
@@ -588,8 +585,8 @@ The command line is executed each time:
 <source>&Load</source>
 <target>読み込み(&L)</target>
 
-<source>&Cancel</source>
-<target>キャンセル(&C)</target>
+<source>Cancel</source>
+<target>キャンセル</target>
 
 <source>Select variant:</source>
 <target>変数を選択:</target>
@@ -639,8 +636,8 @@ The command line is executed each time:
 <source>Conflict/file cannot be categorized</source>
 <target>競合があるため分類できません</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>比較対象...</target>
@@ -674,9 +671,6 @@ is the same
 
 <source>Synchronizing...</source>
 <target>同期処理中...</target>
-
-<source>Items processed:</source>
-<target>処理された要素:</target>
 
 <source>&Pause</source>
 <target>一時停止(&P)</target>
@@ -1017,9 +1011,6 @@ Exclude: \stuff\temp\*
 <source>File list exported!</source>
 <target>ファイル一覧のエクスポートが完了!</target>
 
-<source>Error writing file:</source>
-<target>ファイル書き込みエラー:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1061,20 +1052,20 @@ Exclude: \stuff\temp\*
 <source>Paused</source>
 <target>一時停止中</target>
 
+<source>Initializing...</source>
+<target>初期化中...</target>
+
 <source>Aborted</source>
 <target>中断</target>
 
 <source>Completed</source>
 <target>完了しました</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>ユーザによる中断: 現在の処理を終了しています.. お待ちください...</target>
+<source>Continue</source>
+<target>続行</target>
 
 <source>Pause</source>
 <target>一時停止</target>
-
-<source>Continue</source>
-<target>続行</target>
 
 <source>Cannot find %x</source>
 <target>%x は見つかりません</target>
@@ -1209,68 +1200,65 @@ Exclude: \stuff\temp\*
 <pluralform>%x 日</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>監視するディレクトリを初期化できません:</target>
-
-<source>Error when monitoring directories.</source>
-<target>ディレクトリの監視エラー</target>
+<source>Cannot monitor directory %x.</source>
+<target>ディレクトリ %x を監視できません.</target>
 
 <source>Conversion error:</source>
 <target>変換エラー:</target>
 
-<source>Error deleting file:</source>
-<target>ファイルの削除エラー:</target>
+<source>Cannot delete file %x.</source>
+<target>ファイル %x を削除出来ません.</target>
 
-<source>Error moving file:</source>
-<target>ファイルの移動に失敗:</target>
+<source>The file is locked by another process:</source>
+<target>次のファイルは別のプロセスで使用中です:</target>
 
-<source>Target file already existing!</source>
-<target>対象ファイルは既に存在します!</target>
+<source>Cannot move file %x to %y.</source>
+<target>ファイル %x を %y に移動できません.</target>
 
-<source>Error moving directory:</source>
-<target>ディレクトリ移動に失敗:</target>
+<source>Cannot delete directory %x.</source>
+<target>ディレクトリ %x を削除できません.</target>
 
-<source>Target directory already existing!</source>
-<target>対象ディレクトリはすでに存在します!</target>
+<source>Cannot write modification time of %x.</source>
+<target>%x の更新時刻を書き込めませんでした.</target>
 
-<source>Error deleting directory:</source>
-<target>ディレクトリの削除エラー:</target>
+<source>Cannot find system function %x.</source>
+<target>システム関数 %x がみつかりません.</target>
 
-<source>Error changing modification time:</source>
-<target>時間の修正中のエラー:</target>
+<source>Cannot read security context of %x.</source>
+<target>%x のｾｷｭﾘﾃｨｺﾝﾃｷｽﾄを読み込めません.</target>
 
-<source>Error loading library function:</source>
-<target>ライブラリ読み込みエラー:</target>
+<source>Cannot write security context of %x.</source>
+<target>>%x のｾｷｭﾘﾃｨｺﾝﾃｷｽﾄを書き込めません.</target>
 
-<source>Error reading security context:</source>
-<target>セキュリティ・コンテキストの読み取りエラー:</target>
+<source>Cannot read permissions of %x.</source>
+<target>>%x のﾊﾟｰﾐｯｼｮﾝを読み込めません.</target>
 
-<source>Error writing security context:</source>
-<target>セキュリティ・コンテキストの書き込みエラー:</target>
+<source>Cannot write permissions of %x.</source>
+<target>%x のﾊﾟｰﾐｯｼｮﾝを書き込めません.</target>
 
-<source>Error copying file permissions:</source>
-<target>パーミッションコピー中のエラー</target>
+<source>Cannot create directory %x.</source>
+<target>ディレクトリ %x を作成出来ません.</target>
 
-<source>Error creating directory:</source>
-<target>ディレクトリ作成エラー:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>S リンクを %x から %y にコピーできません.</target>
 
-<source>Error copying symbolic link:</source>
-<target>シンボリックリンクのコピーに失敗:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>%x のファイル属性を書き込めません.</target>
 
-<source>Error copying file:</source>
-<target>ファイルのコピーに失敗:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>%x から %y にコピーできません.</target>
 
-<source>Error opening file:</source>
-<target>ファイルのオープンに失敗:</target>
+<source>Cannot read directory %x.</source>
+<target>ディレクトリ %x を読み込めません.</target>
 
-<source>Error traversing directory:</source>
-<target>ディレクトリの移動エラー:</target>
+<source>Endless loop.</source>
+<target>エンドレスループ</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>ディレクトリ移動中に無限ループが発生:</target>
+<source>Cannot set privilege %x.</source>
+<target>%x の特権をセットできません.</target>
 
-<source>Error setting privilege:</source>
-<target>特権の設定エラー:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>%x をゴミ箱に移動できません!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>前回最後の同期処理以降、両側とも変更があります!</target>
@@ -1296,8 +1284,8 @@ Exclude: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>ディレクトリが空と考慮する場合、このエラーは無視できます。</target>
 
-<source>Directory does not exist:</source>
-<target>ディレクトリが存在しません:</target>
+<source>Cannot find directory %x.</source>
+<target>ディレクトリ %x がみつかりません.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>ディレクトリが依存関係にあります! 同期規則の設定時には注意してください:</target>
@@ -1305,20 +1293,17 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>同期処理の準備中...</target>
 
-<source>Out of memory!</source>
-<target>メモリが足りません!</target>
+<source>Conflict detected:</source>
+<target>検出された競合:</target>
 
 <source>File %x has an invalid date!</source>
 <target>ファイル %x の日付は無効なものです!</target>
 
-<source>Conflict detected:</source>
-<target>検出された競合:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>ファイル %x は、同じ時間ですがサイズが異なっています!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>シンボリックリンク %x の日付は同一ですが、異なる対象があります!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>シンボリックリンク %x の日付は同じですが、対象が異なっています.</target>
 
 <source>Comparing content of files %x</source>
 <target>ファイル %x の内容を比較中</target>
@@ -1401,11 +1386,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>ファイル %x を作成中</target>
 
-<source>Creating folder %x</source>
-<target>フォルダ %x を作成中</target>
-
 <source>Creating symbolic link %x</source>
 <target>シンボリックリンク %x を作成中</target>
+
+<source>Creating folder %x</source>
+<target>フォルダ %x を作成中</target>
 
 <source>Overwriting file %x</source>
 <target>ファイル %x を上書き中</target>
@@ -1425,8 +1410,8 @@ Exclude: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>ファイルバージョンが利用できないディレクトリです!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>ソースディレクトリが存在しません:</target>
+<source>Source directory %x not found.</source>
+<target>ソースディレクトリ %x がみつかりません.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>未解決の不一致があります!</target>
@@ -1460,12 +1445,6 @@ Exclude: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>データベースを作成中...</target>
-
-<source>Nothing to synchronize!</source>
-<target>同期対象がありません!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>ファイル %x はコピーできません!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>データ検証エラー: ソースと対象ファイルに異なる内容が含まれています!</target>

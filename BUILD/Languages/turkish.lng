@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>Klasöre gözat</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Vazgeçildi: Yürürlükteki işlemin bitmesi bekleniyor...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Kendiliğinden Eşleştirme</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux Hata Kodu %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Sembolik bağlantı çözümlenirken hata:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>%x simge bağlantısı çözümlenemedi</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -136,35 +139,41 @@
 <pluralform>%x Bayt</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Eşleştirme veri tabanı okunurken hata:</target>
+<source>Cannot read file %x.</source>
+<target>%x dosyası okunamadı.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Eşleştirme veri tabanına yazılırken hata:</target>
+<source>Cannot write file %x.</source>
+<target>%x dosyası yazılamadı.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Uyumsuz eşleştirme veritabanı biçimi:</target>
+<source>Database file %x is incompatible.</source>
+<target>%x veritabanı dosyası uyumsuz</target>
 
 <source>Initial synchronization:</source>
 <target>Başlangıç eşleştirmesi:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>FreeFileSync veritabanı dosyalarından biri henüz yok:</target>
+<source>Database file %x does not yet exist.</source>
+<target>%x veritabanı dosyası henüz yok.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Veritabanıdosyaları ortak bir eşleştirmeoturumunu paylaşmıyor:</target>
+<source>Out of memory!</source>
+<target>Bellek yetersiz!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Veritabanı dosyaları ortak bir oturumu paylaşamaz.</target>
 
 <source>An exception occurred!</source>
 <target>Olağan dışı bir durum oluştu!</target>
 
-<source>Error reading file attributes:</source>
-<target>Dosya öznitelikleri okunurken hata:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>%x dosyasının özellikleri okunamadı.</target>
+
+<source>Cannot get process information.</source>
+<target>İşlem bilgisi alınamadı.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Klasör kilitli olduğundan bekleniyor (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Klasör kilitlenirken hata:</target>
+<source>Cannot set directory lock %x.</source>
+<target>%x klasörü kilitlenemedi.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -175,8 +184,8 @@
 <pluralform>%x saniye</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Dosya okunurken hata:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>%x dosyası işlenirken hata, satır %y, sütun %z.</target>
 
 <source>Scanning:</source>
 <target>Taranıyor:</target>
@@ -193,38 +202,32 @@
 <pluralform>[%x İş]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Geçersiz FreeFileSync yapılandırma dosyası!</target>
+<source>/sec</source>
+<target>/san</target>
 
-<source>Error parsing configuration file:</source>
-<target>Yapılandırma dosyası çözümlenirken hata:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>%x dosyası geçerli bir yapılandırma bilgisi içermiyor.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Yapılandırma yalnız kısmen yüklendi:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>%x yapılandırma dosyası tamamen yüklenemedi.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>%x Geri Dönüşüm Kutusuna gönderilemedi</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Birim Gölge Kopya hizmetine erişilemedi.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Bu sistem üzerinde gölge kopyalar oluşturmak için FreeFileSync 64-bit sürümünü kullanın.</target>
 
 <source>Cannot load file %x.</source>
 <target>%x dosyası yüklenemedi.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Gölge Kopya Hizmetine erişilirken hata oldu!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>WOW64 üzerinde gölge kopyalama desteklenmiyor. FreeFileSync 64-bit sürümünü kullanın</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Dosya için birim adı belirlenemedi:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>%x yolu bir birim adı içermiyor.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>%x birim adı, %y dosya adının parçası değil!</target>
 
-<source>/sec</source>
-<target>/san</target>
-
-<source>File does not exist:</source>
-<target>Dosya bulunamadı:</target>
+<source>Cannot find file %x.</source>
+<target>%x dosyası bulunamadı.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Şu XML elemanları okunamadı:</target>
@@ -303,9 +306,6 @@ Her seferinde çalıştırılacak komut satırı:
 <source>RealtimeSync configuration</source>
 <target>RealtimeSync yapılandırması</target>
 
-<source>File already exists. Overwrite?</source>
-<target>Dosya zaten var. Üzerine yazılsın mı?</target>
-
 <source>&Restore</source>
 <target>Ge&ri yükle</target>
 
@@ -348,20 +348,20 @@ Her seferinde çalıştırılacak komut satırı:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync yapılandırması</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync Toplu İşi</target>
-
-<source>Unable to create log file!</source>
-<target>Günlük dosyası oluşturulamıyor!</target>
-
 <source>Batch execution</source>
 <target>Toplu komut yürütme</target>
 
-<source>Stop</source>
-<target>Durdur</target>
+<source>Items processed:</source>
+<target>İşlenen bileşenler:</target>
+
+<source>Items remaining:</source>
+<target>Kalan bileşenler:</target>
 
 <source>Total time:</source>
 <target>Toplam zaman:</target>
+
+<source>Stop</source>
+<target>Durdur</target>
 
 <source>Synchronization aborted!</source>
 <target>Eşleştirme durduruldu!</target>
@@ -369,14 +369,17 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Synchronization completed with errors!</source>
 <target>Eşleştirme hatalarla tamamlandı!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Eşleştirilecek bir şey yok!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Eşleştirme sorunsuz tamamlandı!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>FreeFileSync grafik kullanıcı arayüzünü açmak için "Geç" düğmesine tıklayın</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>FreeFileSync ana penceresindeki sorunları çözmek için "Değiştir" düğmesine tıklayın.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>FreeFileSync grafik kullanıcı arayüzüne geçiliyor...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>FreeFileSync ana penceresine geçiliyor...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>sourceforge.net sitesine bağlanılamıyor!</target>
@@ -534,9 +537,6 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Items found:</source>
 <target>Bulunan bileşenler:</target>
 
-<source>Items remaining:</source>
-<target>Kalan bileşenler:</target>
-
 <source>Speed:</source>
 <target>Hız:</target>
 
@@ -588,8 +588,8 @@ Her seferinde çalıştırılacak komut satırı:
 <source>&Load</source>
 <target>Yük&le</target>
 
-<source>&Cancel</source>
-<target>İ&ptal</target>
+<source>Cancel</source>
+<target>İptal</target>
 
 <source>Select variant:</source>
 <target>Davranışı seçin:</target>
@@ -639,8 +639,8 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Conflict/file cannot be categorized</source>
 <target>Çatışma/dosya kategorize edilemedi</target>
 
-<source>&OK</source>
-<target>&Tamam</target>
+<source>OK</source>
+<target>Tamam</target>
 
 <source>Compare by...</source>
 <target>Karşılaştırma ölçütünü seçin:</target>
@@ -674,9 +674,6 @@ aynı olmalıdır
 
 <source>Synchronizing...</source>
 <target>Eşleştiriliyor...</target>
-
-<source>Items processed:</source>
-<target>İşlenen bileşenler:</target>
 
 <source>&Pause</source>
 <target>&Duraklat</target>
@@ -1017,9 +1014,6 @@ Katma: \stuff\temp\*
 <source>File list exported!</source>
 <target>Dosya listesi verilmiş!</target>
 
-<source>Error writing file:</source>
-<target>Dosya yazılırken hata:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1065,20 +1059,20 @@ Katma: \stuff\temp\*
 <source>Paused</source>
 <target>Duraklatıldı</target>
 
+<source>Initializing...</source>
+<target>Başlatılıyor...</target>
+
 <source>Aborted</source>
 <target>Vazgeçildi</target>
 
 <source>Completed</source>
 <target>Tamamlandı</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Vazgeçildi: Yürürlükteki işlemin bitmesi bekleniyor...</target>
+<source>Continue</source>
+<target>Devam et</target>
 
 <source>Pause</source>
 <target>Duraklat</target>
-
-<source>Continue</source>
-<target>Devam et</target>
 
 <source>Cannot find %x</source>
 <target>%x bulunamadı</target>
@@ -1218,65 +1212,65 @@ Katma: \stuff\temp\*
 <pluralform>%x gün</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Klasör izlemesi başlatılamadı:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Klasörler izlenirken hata.</target>
+<source>Cannot monitor directory %x.</source>
+<target>%x klasörü izlenemiyor.</target>
 
 <source>Conversion error:</source>
 <target>Dönüştürme hatası:</target>
 
-<source>Error deleting file:</source>
-<target>Dosya silinirken hata:</target>
+<source>Cannot delete file %x.</source>
+<target>%x dosyası silinemiyor.</target>
 
-<source>Error moving file:</source>
-<target>Dosya taşınırken hata:</target>
+<source>The file is locked by another process:</source>
+<target>Dosya başka bir işlem tarafından kilitlenmiş:</target>
 
-<source>Target file already existing!</source>
-<target>Hedef dosya zaten var!</target>
+<source>Cannot move file %x to %y.</source>
+<target>%x dosyası %y olarak taşınamadı.</target>
 
-<source>Error moving directory:</source>
-<target>Klasör taşınırken hata:</target>
+<source>Cannot delete directory %x.</source>
+<target>%x klasörü silinemedi.</target>
 
-<source>Target directory already existing!</source>
-<target>Hedef klasör zaten var!</target>
+<source>Cannot write modification time of %x.</source>
+<target>%x son değişiklik zamanı yazılamadı.</target>
 
-<source>Error deleting directory:</source>
-<target>Klasör silinirken hata:</target>
+<source>Cannot find system function %x.</source>
+<target>%x sistem işlevi bulunamadı.</target>
 
-<source>Error changing modification time:</source>
-<target>Değişiklik tarihini değiştirirken hata:</target>
+<source>Cannot read security context of %x.</source>
+<target>%x için güvenlik bağlamı okunamadı.</target>
 
-<source>Error loading library function:</source>
-<target>Kütüphane işlevi yüklenirken hata:</target>
+<source>Cannot write security context of %x.</source>
+<target>%x için güvenlik bağlamı yazılamadı.</target>
 
-<source>Error reading security context:</source>
-<target>Güüvenlik bağlamı okunurken hata:</target>
+<source>Cannot read permissions of %x.</source>
+<target>%x izinleri okunamadı.</target>
 
-<source>Error writing security context:</source>
-<target>Güvenlik bağlamı yazılırken hata:</target>
+<source>Cannot write permissions of %x.</source>
+<target>%x izinleri yazılamadı.</target>
 
-<source>Error copying file permissions:</source>
-<target>Dosya izinleri kopyalanırken hata:</target>
+<source>Cannot create directory %x.</source>
+<target>%x dosyası oluşturulamadı.</target>
 
-<source>Error creating directory:</source>
-<target>Klasör oluşturulurken hata:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>%x simgesel bağlantısı %y olarak kopyalanamadı.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Sembolik bağlantı kopyalanırken hata:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>%x dosya öznitelikleri yazılamadı.</target>
 
-<source>Error copying file:</source>
-<target>Dosya kopyalanırken hata:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>%x dosyası %y olarak kopyalanamadı.</target>
 
-<source>Error traversing directory:</source>
-<target>Klasörde dolaşırken hata:</target>
+<source>Cannot read directory %x.</source>
+<target>%x klasörü okunamadı.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Klasörlerde dolaşırken sonsuz döngü:</target>
+<source>Endless loop.</source>
+<target>Sonsuz çevrim.</target>
 
-<source>Error setting privilege:</source>
-<target>İzinler ayarlanırken hata:</target>
+<source>Cannot set privilege %x.</source>
+<target>%x izni verilemedi.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>%x Geri Dönüşüm Kutusuna gönderilemedi</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Son eşleştirmeden bu yana iki yanın içeriği de değişmiş!</target>
@@ -1302,8 +1296,8 @@ Katma: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Bu hatayı, klasörü boş sayacak şekilde yok sayabilirsiniz.</target>
 
-<source>Directory does not exist:</source>
-<target>Klasör bulunamadı:</target>
+<source>Cannot find directory %x.</source>
+<target>%x klasörü bulunamadı.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Klasörler bağımlı! Eşleştirme kurallarını koyarken dikkatli olun:</target>
@@ -1311,20 +1305,17 @@ Katma: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Eşleştirmeye hazırlanıyor...</target>
 
-<source>Out of memory!</source>
-<target>Bellek yetersiz!</target>
+<source>Conflict detected:</source>
+<target>Çelişki bulundu:</target>
 
 <source>File %x has an invalid date!</source>
 <target>%x dosyasının tarihi geçersiz!</target>
 
-<source>Conflict detected:</source>
-<target>Çelişki bulundu:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>%x dosyalarının tarihleri aynı fakat boyutları farklı!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Sembolik bağlantılar %x aynı tarihli fakat hedefleri farklı!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>%x simgesel bağlantıları aynı tarihe sahip ancak hedef yolları farklı.</target>
 
 <source>Comparing content of files %x</source>
 <target>%x dosyalarının içeriği karşılaştırılıyor</target>
@@ -1407,11 +1398,11 @@ Katma: \stuff\temp\*
 <source>Creating file %x</source>
 <target>%x dosyası oluşturuluyor</target>
 
-<source>Creating folder %x</source>
-<target>%x klasörü oluşturuluyor</target>
-
 <source>Creating symbolic link %x</source>
 <target>%x sembolik bağlantısı oluşturuluyor</target>
+
+<source>Creating folder %x</source>
+<target>%x klasörü oluşturuluyor</target>
 
 <source>Overwriting file %x</source>
 <target>%x dosyasının üzerine yazılıyor</target>
@@ -1431,8 +1422,8 @@ Katma: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Dosya sürümlemesi için klasör desteklenmiyor!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Kaynak klasör artık yok:</target>
+<source>Source directory %x not found.</source>
+<target>%x kaynak klasörü bulunamadı.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Çözülmemiş tutarsızlıklar var!</target>
@@ -1466,12 +1457,6 @@ Katma: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Veri tabanı oluşturuluyor...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Eşleştirilecek bir şey yok!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>%x dosyası kilitli olduğundan kopyalanamıyor!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Veri doğrulama hatası: Kaynak ve hedef dosyası içeriği farklı!</target>

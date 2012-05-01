@@ -4,104 +4,72 @@
 // * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
-#include "statistics.h"
+#include "perf_check.h"
 
 #include <limits>
-#include <wx/ffile.h>
-#include <wx/stopwatch.h>
+//#include <wx/ffile.h>
 #include <zen/basic_math.h>
-#include <zen/assert_static.h>
 #include <zen/i18n.h>
 #include <wx+/format_unit.h>
-
 
 using namespace zen;
 
 
-RetrieveStatistics::~RetrieveStatistics()
-{
-    //write statistics to a file
-    wxFFile outputFile(wxT("statistics.dat"), wxT("w"));
-
-    outputFile.Write(wxT("Time(ms);Objects;Data\n"));
-
-    std::for_each(data.begin(), data.end(),
-                  [&](const StatEntry& entry)
-    {
-        outputFile.Write(numberTo<wxString>(entry.time));
-        outputFile.Write(wxT(";"));
-        outputFile.Write(numberTo<wxString>(entry.objects));
-        outputFile.Write(wxT(";"));
-        outputFile.Write(numberTo<wxString>(entry.value));
-        outputFile.Write(wxT("\n"));
-    });
-}
-
-
-void RetrieveStatistics::writeEntry(double value, int objects)
-{
-    StatEntry newEntry;
-    newEntry.value   = value;
-    newEntry.objects = objects;
-    newEntry.time    = timer.Time();
-    data.push_back(newEntry);
-}
-
-
-//########################################################################################
-Statistics::Statistics(int totalObjectCount,
-                       double totalDataAmount,
-                       unsigned windowSizeRemainingTime,
-                       unsigned windowSizeBytesPerSecond) :
-    objectsTotal(totalObjectCount),
-    dataTotal(totalDataAmount),
+PerfCheck::PerfCheck(unsigned windowSizeRemainingTime,
+                     unsigned windowSizeBytesPerSecond) :
     windowSizeRemTime(windowSizeRemainingTime),
     windowSizeBPS(windowSizeBytesPerSecond),
     windowMax(std::max(windowSizeRemainingTime, windowSizeBytesPerSecond)) {}
 
 
-void Statistics::addMeasurement(int objectsCurrent, double dataCurrent)
+PerfCheck::~PerfCheck()
 {
-    Record newRecord;
-    newRecord.objects = objectsCurrent;
-    newRecord.data    = dataCurrent;
+    /*
+    //write samples to a file
+    wxFFile outputFile(wxT("statistics.dat"), wxT("w"));
 
-    const long now = timer.Time();
+    outputFile.Write(wxT("Time(ms);Objects;Data\n"));
 
-    measurements.insert(measurements.end(), std::make_pair(now, newRecord)); //use fact that time is monotonously ascending
+    for (auto iter = samples.begin(); iter != samples.end(); ++iter)
+    {
+        outputFile.Write(numberTo<wxString>(iter->first));
+        outputFile.Write(wxT(";"));
+        outputFile.Write(numberTo<wxString>(iter->second.objCount_));
+        outputFile.Write(wxT(";"));
+    	outputFile.Write(numberTo<wxString>(iter->second.data_));
+        outputFile.Write(wxT("\n"));
+    }
+    */
+}
+
+
+void PerfCheck::addSample(int objectsCurrent, double dataCurrent, long timeMs)
+{
+    samples.insert(samples.end(), std::make_pair(timeMs, Record(objectsCurrent, dataCurrent))); //use fact that time is monotonously ascending
 
     //remove all records earlier than "now - windowMax"
-    const long newBegin = now - windowMax;
-    TimeRecordMap::iterator windowBegin = measurements.upper_bound(newBegin);
-    if (windowBegin != measurements.begin())
-        measurements.erase(measurements.begin(), --windowBegin); //retain one point before newBegin in order to handle "measurement holes"
+    const long newBegin = timeMs - windowMax;
+    auto iterWindowBegin = samples.upper_bound(newBegin);
+    if (iterWindowBegin != samples.begin())
+        samples.erase(samples.begin(), --iterWindowBegin); //keep one point before newBegin in order to handle "measurement holes"
 }
 
 
-void Statistics::setNewTotal(int totalObjectCount, double totalDataAmount)
+wxString PerfCheck::getRemainingTime(double dataRemaining) const
 {
-    objectsTotal = totalObjectCount;
-    dataTotal    = totalDataAmount;
-}
-
-
-wxString Statistics::getRemainingTime() const
-{
-    if (!measurements.empty())
+    if (!samples.empty())
     {
-        const TimeRecordMap::value_type& backRecord = *measurements.rbegin();
+        const auto& recordBack = *samples.rbegin();
         //find start of records "window"
-        const long frontTime = backRecord.first - windowSizeRemTime;
-        TimeRecordMap::const_iterator windowBegin = measurements.upper_bound(frontTime);
-        if (windowBegin != measurements.begin())
-            --windowBegin; //one point before window begin in order to handle "measurement holes"
+        auto iterFront = samples.upper_bound(recordBack.first - windowSizeRemTime);
+        if (iterFront != samples.begin())
+            --iterFront; //one point before window begin in order to handle "measurement holes"
 
-        const TimeRecordMap::value_type& frontRecord = *windowBegin;
+        const auto& recordFront = *iterFront;
         //-----------------------------------------------------------------------------------------------
-        const double timeDelta = backRecord.first - frontRecord.first;
-        const double dataDelta = backRecord.second.data - frontRecord.second.data;
+        const double timeDelta = recordBack.first        - recordFront.first;
+        const double dataDelta = recordBack.second.data_ - recordFront.second.data_;
 
-        const double dataRemaining = dataTotal - backRecord.second.data;
         //objects do *NOT* correspond to disk accesses, so we better play safe and use "bytes" only!
         //https://sourceforge.net/tracker/index.php?func=detail&aid=3452469&group_id=234430&atid=1093083
 
@@ -111,46 +79,50 @@ wxString Statistics::getRemainingTime() const
             return zen::remainingTimeToShortString(remTimeSec);
         }
     }
-
     return wxT("-"); //fallback
 }
 
 
-wxString Statistics::getBytesPerSecond() const
+wxString PerfCheck::getBytesPerSecond() const
 {
-    if (!measurements.empty())
+    if (!samples.empty())
     {
-        const TimeRecordMap::value_type& backRecord = *measurements.rbegin();
+        const auto& recordBack = *samples.rbegin();
         //find start of records "window"
-        const long frontTime = backRecord.first - windowSizeBPS;
-        TimeRecordMap::const_iterator windowBegin = measurements.upper_bound(frontTime);
-        if (windowBegin != measurements.begin())
-            --windowBegin; //one point before window begin in order to handle "measurement holes"
+        auto iterFront = samples.upper_bound(recordBack.first - windowSizeBPS);
+        if (iterFront != samples.begin())
+            --iterFront; //one point before window begin in order to handle "measurement holes"
 
-        const TimeRecordMap::value_type& frontRecord = *windowBegin;
+        const auto& recordFront = *iterFront;
         //-----------------------------------------------------------------------------------------------
-        const double timeDelta = backRecord.first       - frontRecord.first;
-        const double dataDelta = backRecord.second.data - frontRecord.second.data;
+        const double timeDelta = recordBack.first        - recordFront.first;
+        const double dataDelta = recordBack.second.data_ - recordFront.second.data_;
 
         if (!numeric::isNull(timeDelta))
             if (dataDelta > 0) //may be negative if user cancels copying
                 return zen::filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
     }
-
     return wxT("-"); //fallback
 }
 
 
-void Statistics::pauseTimer()
+wxString PerfCheck::getOverallBytesPerSecond() const //for all samples
 {
-    timer.Pause();
+    if (!samples.empty())
+    {
+        const auto& recordBack  = *samples.rbegin();
+        const auto& recordFront = *samples.begin();
+        //-----------------------------------------------------------------------------------------------
+        const double timeDelta = recordBack.first        - recordFront.first;
+        const double dataDelta = recordBack.second.data_ - recordFront.second.data_;
+
+        if (!numeric::isNull(timeDelta))
+            if (dataDelta > 0) //may be negative if user cancels copying
+                return zen::filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
+    }
+    return wxT("-"); //fallback
 }
 
-
-void Statistics::resumeTimer()
-{
-    timer.Resume();
-}
 
 /*
 class for calculation of remaining time:

@@ -184,6 +184,7 @@ private:
     void updateGuiAfterFilterChange(int delay);
 
     void excludeExtension(const Zstring& extension);
+    void excludeShortname(const zen::FileSystemObject& fsObj);
     void excludeItems(const std::vector<zen::FileSystemObject*>& selection);
 
     void updateStatistics();

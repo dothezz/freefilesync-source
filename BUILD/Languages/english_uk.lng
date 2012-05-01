@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>Browse directory</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Abort requested: Waiting for current operation to finish...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automated Synchronisation</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux Error Code %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Error resolving symbolic link:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Cannot resolve symbolic link %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -136,35 +139,41 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Error reading from synchronisation database:</target>
+<source>Cannot read file %x.</source>
+<target>Cannot read file %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Error writing to synchronisation database:</target>
+<source>Cannot write file %x.</source>
+<target>Cannot write file %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Incompatible synchronisation database format:</target>
+<source>Database file %x is incompatible.</source>
+<target>Database file %x is incompatible.</target>
 
 <source>Initial synchronization:</source>
 <target>Initial synchronisation:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>One of the FreeFileSync database files is not yet existing:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Database file %x does not yet exist.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Database files do not share a common synchronisation session:</target>
+<source>Out of memory!</source>
+<target>Out of memory!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Database files do not share a common session.</target>
 
 <source>An exception occurred!</source>
 <target>An exception occurred!</target>
 
-<source>Error reading file attributes:</source>
-<target>Error reading file attributes:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Cannot read file attributes of %x.</target>
+
+<source>Cannot get process information.</source>
+<target>Cannot get process information.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Waiting while directory is locked (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Error setting directory lock:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Cannot set directory lock %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -175,8 +184,8 @@
 <pluralform>%x sec</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Error reading file:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Error parsing file %x, row %y, column %z.</target>
 
 <source>Scanning:</source>
 <target>Scanning:</target>
@@ -193,38 +202,32 @@
 <pluralform>[%x Threads]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Invalid FreeFileSync config file!</target>
+<source>/sec</source>
+<target>/sec</target>
 
-<source>Error parsing configuration file:</source>
-<target>Error parsing configuration file:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>File %x does not contain a valid configuration.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Configuration loaded partially only:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Configuration file %x loaded partially only.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>Unable to move %x to the Recycle Bin!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Cannot access Volume Shadow Copy Service.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Please use FreeFileSync 64-bit version to create shadow copies on this system.</target>
 
 <source>Cannot load file %x.</source>
 <target>Cannot load file %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Error accessing Volume Shadow Copy Service!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Cannot determine volume name for file:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>Path %x does not contain a volume name.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Volume name %x not part of file name %y!</target>
 
-<source>/sec</source>
-<target>/sec</target>
-
-<source>File does not exist:</source>
-<target>File does not exist:</target>
+<source>Cannot find file %x.</source>
+<target>Cannot find file %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Cannot read the following XML elements:</target>
@@ -303,9 +306,6 @@ The command line is executed each time:
 <source>RealtimeSync configuration</source>
 <target>RealtimeSync configuration</target>
 
-<source>File already exists. Overwrite?</source>
-<target>File already exists. Overwrite?</target>
-
 <source>&Restore</source>
 <target>&Restore</target>
 
@@ -351,17 +351,20 @@ The command line is executed each time:
 <source>FreeFileSync Batch Job</source>
 <target>FreeFileSync Batch Job</target>
 
-<source>Unable to create log file!</source>
-<target>Unable to create log file!</target>
-
 <source>Batch execution</source>
 <target>Batch execution</target>
 
-<source>Stop</source>
-<target>Stop</target>
+<source>Items processed:</source>
+<target>Elements processed:</target>
+
+<source>Items remaining:</source>
+<target>Elements remaining:</target>
 
 <source>Total time:</source>
 <target>Total time:</target>
+
+<source>Stop</source>
+<target>Stop</target>
 
 <source>Synchronization aborted!</source>
 <target>Synchronisation aborted!</target>
@@ -369,14 +372,17 @@ The command line is executed each time:
 <source>Synchronization completed with errors!</source>
 <target>Synchronisation completed with errors!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Nothing to synchronise!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Synchronisation completed successfully!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Press "Switch" to open FreeFileSync GUI mode.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Press "Switch" to resolve issues in FreeFileSync main dialog.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Switching to FreeFileSync GUI mode...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Switching to FreeFileSync main dialog...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Unable to connect to sourceforge.net!</target>
@@ -534,9 +540,6 @@ The command line is executed each time:
 <source>Items found:</source>
 <target>Elements found:</target>
 
-<source>Items remaining:</source>
-<target>Elements remaining:</target>
-
 <source>Speed:</source>
 <target>Speed:</target>
 
@@ -564,9 +567,6 @@ The command line is executed each time:
 <source>Right</source>
 <target>Right</target>
 
-<source>Sync setttings</source>
-<target>Sync setttings</target>
-
 <source>Status feedback</source>
 <target>Status feedback</target>
 
@@ -591,8 +591,8 @@ The command line is executed each time:
 <source>&Load</source>
 <target>&Load</target>
 
-<source>&Cancel</source>
-<target>&Cancel</target>
+<source>Cancel</source>
+<target>Cancel</target>
 
 <source>Select variant:</source>
 <target>Select variant:</target>
@@ -642,8 +642,8 @@ The command line is executed each time:
 <source>Conflict/file cannot be categorized</source>
 <target>Conflict/file cannot be categorised</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Compare by...</target>
@@ -677,9 +677,6 @@ is the same
 
 <source>Synchronizing...</source>
 <target>Synchronising...</target>
-
-<source>Items processed:</source>
-<target>Elements processed:</target>
 
 <source>&Pause</source>
 <target>&Pause</target>
@@ -1020,9 +1017,6 @@ Exclude: \stuff\temp\*
 <source>File list exported!</source>
 <target>File list exported!</target>
 
-<source>Error writing file:</source>
-<target>Error writing file:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1068,20 +1062,20 @@ Exclude: \stuff\temp\*
 <source>Paused</source>
 <target>Paused</target>
 
+<source>Initializing...</source>
+<target>Initialising...</target>
+
 <source>Aborted</source>
 <target>Aborted</target>
 
 <source>Completed</source>
 <target>Completed</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Abort requested: Waiting for current operation to finish...</target>
+<source>Continue</source>
+<target>Continue</target>
 
 <source>Pause</source>
 <target>Pause</target>
-
-<source>Continue</source>
-<target>Continue</target>
 
 <source>Cannot find %x</source>
 <target>Cannot find %x</target>
@@ -1221,68 +1215,65 @@ Exclude: \stuff\temp\*
 <pluralform>%x days</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Could not initialise directory monitoring:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Error when monitoring directories.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Cannot monitor directory %x.</target>
 
 <source>Conversion error:</source>
 <target>Conversion error:</target>
 
-<source>Error deleting file:</source>
-<target>Error deleting file:</target>
+<source>Cannot delete file %x.</source>
+<target>Cannot delete file %x.</target>
 
-<source>Error moving file:</source>
-<target>Error moving file:</target>
+<source>The file is locked by another process:</source>
+<target>The file is locked by another process:</target>
 
-<source>Target file already existing!</source>
-<target>Target file already existing!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Cannot move file %x to %y.</target>
 
-<source>Error moving directory:</source>
-<target>Error moving directory:</target>
+<source>Cannot delete directory %x.</source>
+<target>Cannot delete directory %x.</target>
 
-<source>Target directory already existing!</source>
-<target>Target directory already existing!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Cannot write modification time of %x.</target>
 
-<source>Error deleting directory:</source>
-<target>Error deleting directory:</target>
+<source>Cannot find system function %x.</source>
+<target>Cannot find system function %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Error changing modification time:</target>
+<source>Cannot read security context of %x.</source>
+<target>Cannot read security context of %x.</target>
 
-<source>Error loading library function:</source>
-<target>Error loading library function:</target>
+<source>Cannot write security context of %x.</source>
+<target>Cannot write security context of %x.</target>
 
-<source>Error reading security context:</source>
-<target>Error reading security context:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Cannot read permissions of %x.</target>
 
-<source>Error writing security context:</source>
-<target>Error writing security context:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Cannot write permissions of %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Error copying file permissions:</target>
+<source>Cannot create directory %x.</source>
+<target>Cannot create directory %x.</target>
 
-<source>Error creating directory:</source>
-<target>Error creating directory:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Cannot copy symbolic link %x to %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Error copying symbolic link:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Cannot write file attributes of %x.</target>
 
-<source>Error copying file:</source>
-<target>Error copying file:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Cannot copy file %x to %y.</target>
 
-<source>Error opening file:</source>
-<target>Error opening file:</target>
+<source>Cannot read directory %x.</source>
+<target>Cannot read directory %x.</target>
 
-<source>Error traversing directory:</source>
-<target>Error traversing directory:</target>
+<source>Endless loop.</source>
+<target>Endless loop.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Endless loop when traversing directory:</target>
+<source>Cannot set privilege %x.</source>
+<target>Cannot set privilege %x.</target>
 
-<source>Error setting privilege:</source>
-<target>Error setting privilege:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Unable to move %x to the Recycle Bin!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Both sides have changed since last synchronisation!</target>
@@ -1308,8 +1299,8 @@ Exclude: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>You can ignore this error to consider the directory as empty.</target>
 
-<source>Directory does not exist:</source>
-<target>Directory does not exist:</target>
+<source>Cannot find directory %x.</source>
+<target>Cannot find directory %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Directories are dependent! Be careful when setting up synchronisation rules:</target>
@@ -1317,20 +1308,17 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Preparing synchronisation...</target>
 
-<source>Out of memory!</source>
-<target>Out of memory!</target>
+<source>Conflict detected:</source>
+<target>Conflict detected:</target>
 
 <source>File %x has an invalid date!</source>
 <target>File %x has an invalid date!</target>
 
-<source>Conflict detected:</source>
-<target>Conflict detected:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Files %x have the same date but a different size!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Symlinks %x have the same date but a different target!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Symbolic links %x have the same date but a different target.</target>
 
 <source>Comparing content of files %x</source>
 <target>Comparing content of files %x</target>
@@ -1413,11 +1401,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Creating file %x</target>
 
-<source>Creating folder %x</source>
-<target>Creating folder %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Creating symbolic link %x</target>
+
+<source>Creating folder %x</source>
+<target>Creating folder %x</target>
 
 <source>Overwriting file %x</source>
 <target>Overwriting file %x</target>
@@ -1437,8 +1425,8 @@ Exclude: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Directory for file versioning was not supplied!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Source directory does not exist anymore:</target>
+<source>Source directory %x not found.</source>
+<target>Source directory %x not found.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Unresolved conflicts existing!</target>
@@ -1472,12 +1460,6 @@ Exclude: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Generating database...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Nothing to synchronise!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>Unable to copy locked file %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Data verification error: Source and target file have different content!</target>

@@ -24,7 +24,7 @@ using namespace zen;
 using namespace tbseven;
 
 
-class Taskbar::Pimpl //throw (TaskbarNotAvailable)
+class Taskbar::Pimpl //throw TaskbarNotAvailable
 {
 public:
     Pimpl(const wxTopLevelWindow& window) :
@@ -145,7 +145,7 @@ public:
 
 //########################################################################################################
 Taskbar::Taskbar(const wxTopLevelWindow& window) : pimpl_(new Pimpl(window)) {} //throw TaskbarNotAvailable
-Taskbar::~Taskbar() {} //std::unique_ptr ...
+Taskbar::~Taskbar() {}
 
 void Taskbar::setStatus(Status status) { pimpl_->setStatus(status); }
 void Taskbar::setProgress(double fraction) { pimpl_->setProgress(fraction); }

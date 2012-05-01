@@ -19,8 +19,14 @@
 <source>Browse directory</source>
 <target>Examinar directorio</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Solicitud de aborto: Esperando a que la operación actual finalice...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronización Automática</target>
+
+<source>Error</source>
+<target>Error</target>
 
 <source>Select alternate comparison settings</source>
 <target>Seleccionar opciones alternativas de comparación</target>
@@ -51,9 +57,6 @@
 
 <source>About</source>
 <target>Acerca de</target>
-
-<source>Error</source>
-<target>Error</target>
 
 <source>Warning</source>
 <target>Atención</target>
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Código de error de Linux %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Error al resolver enlace simbólico:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>No se puede resolver el enlace simbólico %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -136,35 +139,41 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Error al leer de la base de datos de sincronización:</target>
+<source>Cannot read file %x.</source>
+<target>No se puede leer el archivo %x</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Error al escribir en la base de datos de sincronización:</target>
+<source>Cannot write file %x.</source>
+<target>No se puede escribir el archivo %x</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Formato de base de datos de sincronización incompatible:</target>
+<source>Database file %x is incompatible.</source>
+<target>El archivo de base de datos %x es incompatible</target>
 
 <source>Initial synchronization:</source>
 <target>Sincronización inicial:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Uno de los archivos de la base de datos de FreeFileSync aún no existe:</target>
+<source>Database file %x does not yet exist.</source>
+<target>El archivo de base de datos %x aún no existe</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Archivos de base de datos no comparten la misma sesión de sincronización:</target>
+<source>Out of memory!</source>
+<target>¡Sin memoria!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Los archivos de base de datos no comparten una sesión común</target>
 
 <source>An exception occurred!</source>
 <target>¡Ha ocurrido una excepción!</target>
 
-<source>Error reading file attributes:</source>
-<target>Error al leer atributos del archivo:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>No se puede leer archivo de atributos de %x</target>
+
+<source>Cannot get process information.</source>
+<target>No se puede obtener información del proceso.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Esperando mientras el directorio se encuentre bloqueado (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Error al establecer bloqueo del directorio:</target>
+<source>Cannot set directory lock %x.</source>
+<target>No se puede establecer el directorio de bloqueo %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -175,8 +184,8 @@
 <pluralform>%x segundos</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Error al leer archivo:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Error analizando archivo %x, fila %y, columna %z.</target>
 
 <source>Scanning:</source>
 <target>Escanear:</target>
@@ -193,38 +202,32 @@
 <pluralform>[%x Hilos]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>¡Archivo de configuración de FreeFileSync inválido!</target>
+<source>/sec</source>
+<target>/seg</target>
 
-<source>Error parsing configuration file:</source>
-<target>Error al analizar el archivo de configuración:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>El archivo %x no contiene una configuración válida.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Configuración cargada sólo parcialmente:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Archivo de configuración %x cargado sólo parcialmente.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>¡Incapaz de mover %x a la Papelera de reciclaje!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>No se puede acceder al servicio de copia Volume Shadow.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Por favor, use la versión de 64 bits de FreeFileSync para crear copias de Shadow en el sistema.</target>
 
 <source>Cannot load file %x.</source>
 <target>No se ha podido cargar el archivo %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>¡Error al acceder al servicio Volume Shadow Copy!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>La realización de copias shadow en WOW64 no está soportado. Por favor, use la versión 64-bit de FreeFileSync.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Incapaz de determinar nombre de volumen para el archivo:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>La ruta %x no contiene un nombre de volumen.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>El nombre del volumen %x no es una parte del nombre de archivo %y</target>
 
-<source>/sec</source>
-<target>/seg</target>
-
-<source>File does not exist:</source>
-<target>El archivo no existe:</target>
+<source>Cannot find file %x.</source>
+<target>No se puede encontrar el archivo %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Incapaz de leer los siguientes elementos XML:</target>
@@ -297,14 +300,17 @@ La línea de comandos se ejecuta cada vez:
 <source>Start</source>
 <target>Iniciar</target>
 
+<source>&Retry</source>
+<target>&Reintentar</target>
+
+<source>Cancel</source>
+<target>Cancelar</target>
+
 <source>(Build: %x)</source>
 <target>(Completado: %x)</target>
 
 <source>RealtimeSync configuration</source>
 <target>Configuración de RealtimeSync</target>
-
-<source>File already exists. Overwrite?</source>
-<target>El archivo ya existe. ¿Quiere sobreescribirlo?</target>
 
 <source>&Restore</source>
 <target>&Restaurar</target>
@@ -322,7 +328,7 @@ La línea de comandos se ejecuta cada vez:
 <target>Un campo de directorio está vacío.</target>
 
 <source>Logging</source>
-<target>Iniciando sesión</target>
+<target>Registro</target>
 
 <source>File time and size</source>
 <target>Fecha y tamaño del archivo</target>
@@ -348,20 +354,20 @@ La línea de comandos se ejecuta cada vez:
 <source>FreeFileSync configuration</source>
 <target>Configuración de FreeFileSync</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>Tarea por lotes de FreeFileSync</target>
-
-<source>Unable to create log file!</source>
-<target>¡Incapaz de crear un archivo de registro!</target>
-
 <source>Batch execution</source>
 <target>Ejecución por lotes</target>
 
-<source>Stop</source>
-<target>Detener</target>
+<source>Items processed:</source>
+<target>Elementos procesados:</target>
+
+<source>Items remaining:</source>
+<target>Elementos restantes:</target>
 
 <source>Total time:</source>
 <target>Tiempo total:</target>
+
+<source>Stop</source>
+<target>Detener</target>
 
 <source>Synchronization aborted!</source>
 <target>¡Sincronización abortada!</target>
@@ -369,14 +375,17 @@ La línea de comandos se ejecuta cada vez:
 <source>Synchronization completed with errors!</source>
 <target>¡Sincronización completada con errores!</target>
 
+<source>Nothing to synchronize!</source>
+<target>¡Nada que sincronizar!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>¡Sincronización completada con éxito!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Presionar "Cambiar" para abrir el modo GUI de FreeFileSync.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Presione "Cambiar" para resolver los problemas en el diálogo principal de FreeFileSync.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Cambiando al modo GUI de FreeFileSync...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Cambiando al diálogo principal de FreeFileSync...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>¡Incapaz de conectar con sourceforge.net!</target>
@@ -534,9 +543,6 @@ La línea de comandos se ejecuta cada vez:
 <source>Items found:</source>
 <target>Elementos encontrados:</target>
 
-<source>Items remaining:</source>
-<target>Elementos restantes:</target>
-
 <source>Speed:</source>
 <target>Velocidad:</target>
 
@@ -588,9 +594,6 @@ La línea de comandos se ejecuta cada vez:
 <source>&Load</source>
 <target>&Cargar</target>
 
-<source>&Cancel</source>
-<target>&Cancelar</target>
-
 <source>Select variant:</source>
 <target>Seleccione un tipo:</target>
 
@@ -639,8 +642,8 @@ La línea de comandos se ejecuta cada vez:
 <source>Conflict/file cannot be categorized</source>
 <target>Conflicto/el achivo no puede ser categorizado</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Comparar por...</target>
@@ -674,9 +677,6 @@ es el mismo
 
 <source>Synchronizing...</source>
 <target>Sincronizando...</target>
-
-<source>Items processed:</source>
-<target>Elementos procesados:</target>
 
 <source>&Pause</source>
 <target>&Pausa</target>
@@ -716,9 +716,6 @@ es el mismo
 
 <source>&Ignore</source>
 <target>&Ignorar</target>
-
-<source>&Retry</source>
-<target>&Reintentar</target>
 
 <source>Do not show this dialog again</source>
 <target>No volver a mostrar este diálogo</target>
@@ -1017,9 +1014,6 @@ Excluir: \stuff\temp\*
 <source>File list exported!</source>
 <target>¡Lista de archivos exportada!</target>
 
-<source>Error writing file:</source>
-<target>Error al escribir archivo:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1065,20 +1059,20 @@ Excluir: \stuff\temp\*
 <source>Paused</source>
 <target>Pausado</target>
 
+<source>Initializing...</source>
+<target>Inicializando...</target>
+
 <source>Aborted</source>
 <target>Abortado</target>
 
 <source>Completed</source>
 <target>Terminado</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Solicitud de aborto: Esperando a que la operación actual finalice...</target>
+<source>Continue</source>
+<target>Continuar</target>
 
 <source>Pause</source>
 <target>Pausa</target>
-
-<source>Continue</source>
-<target>Continuar</target>
 
 <source>Cannot find %x</source>
 <target>No se puede encontrar %x</target>
@@ -1218,65 +1212,65 @@ Excluir: \stuff\temp\*
 <pluralform>%x días</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>No se ha podido inicializar la visualización de directorios:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Error al visualizar los directorios.</target>
+<source>Cannot monitor directory %x.</source>
+<target>No se puede monitorizar el directorio %x.</target>
 
 <source>Conversion error:</source>
 <target>Error de conversión:</target>
 
-<source>Error deleting file:</source>
-<target>Error al borrar archivo:</target>
+<source>Cannot delete file %x.</source>
+<target>No se puede eliminar el archivo %x.</target>
 
-<source>Error moving file:</source>
-<target>Error al mover archivo:</target>
+<source>The file is locked by another process:</source>
+<target>El archivo está bloqueado por otro proceso:</target>
 
-<source>Target file already existing!</source>
-<target>¡El archivo de destino ya existe!</target>
+<source>Cannot move file %x to %y.</source>
+<target>No se puede mover el archivo %x a %y.</target>
 
-<source>Error moving directory:</source>
-<target>Error al mover directorio:</target>
+<source>Cannot delete directory %x.</source>
+<target>No se puede eliminar el directorio %x.</target>
 
-<source>Target directory already existing!</source>
-<target>¡El directorio de destino ya existe!</target>
+<source>Cannot write modification time of %x.</source>
+<target>No se puede escribir el tiempo de modificación de %x.</target>
 
-<source>Error deleting directory:</source>
-<target>Error al borrar directorio:</target>
+<source>Cannot find system function %x.</source>
+<target>No se puede encontrar la función del sistema %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Error al cambiar hora de modificación:</target>
+<source>Cannot read security context of %x.</source>
+<target>No se puede leer el contexto de seguridad de %x.</target>
 
-<source>Error loading library function:</source>
-<target>Error al cargar la función de biblioteca:</target>
+<source>Cannot write security context of %x.</source>
+<target>No se puede escribir el contexto de seguridad de %x.</target>
 
-<source>Error reading security context:</source>
-<target>Error al leer en contexto de seguridad:</target>
+<source>Cannot read permissions of %x.</source>
+<target>No se pueden leer los permisos de %x.</target>
 
-<source>Error writing security context:</source>
-<target>Error al escribir en contexto de seguridad:</target>
+<source>Cannot write permissions of %x.</source>
+<target>No se pueden escribir los permisos de %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Error al copiar permisos del fichero:</target>
+<source>Cannot create directory %x.</source>
+<target>No se puede crear el directorio %x.</target>
 
-<source>Error creating directory:</source>
-<target>Error al crear directorio:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>No se puede copiar el enlance simbólico %x a %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Error al copiar enlace simbólico:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>No se pueden escribir los atributos de archivo de %x.</target>
 
-<source>Error copying file:</source>
-<target>Error al copiar archivo:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>No se puede copiar el archivo %x a %y.</target>
 
-<source>Error traversing directory:</source>
-<target>Error al buscar en el directorio:</target>
+<source>Cannot read directory %x.</source>
+<target>No se puede leer el directorio %x.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Bucle infinito al buscar en el directorio:</target>
+<source>Endless loop.</source>
+<target>Bucle infinito.</target>
 
-<source>Error setting privilege:</source>
-<target>Error al establecer privilegios:</target>
+<source>Cannot set privilege %x.</source>
+<target>No se puede</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>¡Incapaz de mover %x a la Papelera de reciclaje!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>¡Ambos lados han cambiado desde la última sincronizacion!</target>
@@ -1302,8 +1296,8 @@ Excluir: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Puede ignorar este error al considerar el directorio como vacío.</target>
 
-<source>Directory does not exist:</source>
-<target>El directorio no existe:</target>
+<source>Cannot find directory %x.</source>
+<target>No se puede encontrar el directorio %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>¡Los directorios son dependientes! Tenga cuidado al establecer las reglas de sincronización:</target>
@@ -1311,20 +1305,17 @@ Excluir: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Preparando sincronización...</target>
 
-<source>Out of memory!</source>
-<target>¡Sin memoria!</target>
+<source>Conflict detected:</source>
+<target>Conflicto detectado:</target>
 
 <source>File %x has an invalid date!</source>
 <target>¡El archivo %x tiene una fecha inválida!</target>
 
-<source>Conflict detected:</source>
-<target>Conflicto detectado:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>¡Los archivos %x tienen la misma fecha pero un tamaño diferente!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>¡Los enlaces simbólicos %x tienen la misma fecha pero un destino diferente!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Los enlaces simbólicos %x tienen la misma fecha pero un destino diferente.</target>
 
 <source>Comparing content of files %x</source>
 <target>Comparación del contenido de los archivos %x</target>
@@ -1407,11 +1398,11 @@ Excluir: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Creando archivo %x</target>
 
-<source>Creating folder %x</source>
-<target>Creando carpeta %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Creando enlace simbólico %x</target>
+
+<source>Creating folder %x</source>
+<target>Creando carpeta %x</target>
 
 <source>Overwriting file %x</source>
 <target>Sobreescribir archivo %x</target>
@@ -1431,8 +1422,8 @@ Excluir: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>¡El directorio para el versionamiento de archivo no ha sido especificado!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>El directorio origen ya no existe:</target>
+<source>Source directory %x not found.</source>
+<target>Directorio fuente %x no encontrado.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>¡Existen conflictos sin resolver!</target>
@@ -1466,12 +1457,6 @@ Excluir: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Generando base de datos...</target>
-
-<source>Nothing to synchronize!</source>
-<target>¡Nada que sincronizar!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>¡Incapaz de copiar el archivo bloqueado %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Error de verificación de datos: ¡Los archivos de origen y destino tienen un contenido diferente!</target>

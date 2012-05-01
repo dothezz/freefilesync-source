@@ -6,7 +6,6 @@
 
 #include "grid.h"
 #include <cassert>
-#include <ctime>
 #include <set>
 #include <wx/dcbuffer.h> //for macro: wxALWAYS_NATIVE_DOUBLE_BUFFER
 #include <wx/settings.h>
@@ -14,6 +13,7 @@
 #include <wx/tooltip.h>
 #include <wx/timer.h>
 #include <wx/utils.h>
+#include <zen/tick_count.h>
 #include <zen/string_tools.h>
 #include <zen/scope_guard.h>
 #include "format_unit.h"
@@ -1257,7 +1257,9 @@ private:
     {
     public:
         MouseSelection(MainWin& wnd, ptrdiff_t rowStart, size_t compPos, bool positiveSelect) :
-            wnd_(wnd), rowStart_(rowStart), compPos_(compPos), rowCurrent_(rowStart), positiveSelect_(positiveSelect), toScrollX(0), toScrollY(0), tickCountLast(clock())
+            wnd_(wnd), rowStart_(rowStart), compPos_(compPos), rowCurrent_(rowStart), positiveSelect_(positiveSelect), toScrollX(0), toScrollY(0),
+            tickCountLast(getTicks()),
+            ticksPerSec_(ticksPerSec())
         {
             wnd_.CaptureMouse();
             timer.Connect(wxEVT_TIMER, wxEventHandler(MouseSelection::onTimer), nullptr, this);
@@ -1273,9 +1275,13 @@ private:
 
         void evalMousePos()
         {
-            const clock_t now = std::clock();
-            const double deltaTime = static_cast<double>(now - tickCountLast) / CLOCKS_PER_SEC; //unit: [sec]
-            tickCountLast = now;
+            double deltaTime = 0;
+            if (ticksPerSec_ > 0)
+            {
+                const TickVal now = getTicks(); //0 on error
+                deltaTime = static_cast<double>(now - tickCountLast) / ticksPerSec_; //unit: [sec]
+                tickCountLast = now;
+            }
 
             wxMouseState mouseState = wxGetMouseState();
             const wxPoint clientPos = wnd_.ScreenToClient(wxPoint(mouseState.GetX(), mouseState.GetY()));
@@ -1345,7 +1351,8 @@ private:
         wxTimer timer;
         double toScrollX; //count outstanding scroll units to scroll while dragging mouse
         double toScrollY; //
-        clock_t tickCountLast;
+        TickVal tickCountLast;
+        const std::int64_t ticksPerSec_;
     };
 
     virtual void ScrollWindow(int dx, int dy, const wxRect* rect)
@@ -1853,6 +1860,8 @@ void Grid::selectRange(ptrdiff_t rowFrom, ptrdiff_t rowTo, size_t compPos, bool 
         GridRangeSelectEvent selectionEvent(rowFrom, rowTo, compPos, positive);
         if (wxEvtHandler* evtHandler = GetEventHandler())
             evtHandler->ProcessEvent(selectionEvent);
+
+        mainWin_->Refresh();
     }
 }
 

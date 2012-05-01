@@ -79,14 +79,7 @@ Zstring getResourceDir()
     if (isPortableVersion())
         return impl::getBinaryDir();
     else //use OS' standard paths
-    {
-        Zstring resourceDir = toZ(wxStandardPathsBase::Get().GetResourcesDir());
-
-        if (!endsWith(resourceDir, FILE_NAME_SEPARATOR))
-            resourceDir += FILE_NAME_SEPARATOR;
-
-        return resourceDir;
-    }
+        return appendSeparator(toZ(wxStandardPathsBase::Get().GetResourcesDir()));
 #endif
 }
 
@@ -113,10 +106,7 @@ Zstring getConfigDir()
             }
             catch (const FileError&) {}
 
-        if (!endsWith(userDirectory, FILE_NAME_SEPARATOR))
-            userDirectory += FILE_NAME_SEPARATOR;
-
-        return userDirectory;
+        return appendSeparator(userDirectory);
     }
 }
 

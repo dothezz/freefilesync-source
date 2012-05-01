@@ -151,7 +151,7 @@ private:
     /*             /|\
                     | (update...)
                     |                         */
-    std::vector<RootNodeImpl> folderCmpView; //partial view on folderCmp -> unsorted(cannot be, because of files!)
+    std::vector<RootNodeImpl> folderCmpView; //partial view on folderCmp -> unsorted (cannot be, because files are not a separate entity)
     /*             /|\
                     | (update...)
                     |                         */

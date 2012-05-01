@@ -17,16 +17,17 @@ using namespace zen;
 class SearchDlg : public SearchDialogGenerated
 {
 public:
-    SearchDlg(wxWindow& parentWindow, wxString& searchText, bool& respectCase);
+    SearchDlg(wxWindow* parent, wxString& searchText, bool& respectCase);
 
     enum ReturnCodes
     {
-        BUTTON_OKAY = 1 //mustn't be 0
+        BUTTON_CANCEL,
+        BUTTON_OKAY
     };
 
 private:
-    void OnClose (wxCloseEvent&   event) { EndModal(0); }
-    void OnCancel(wxCommandEvent& event) { EndModal(0); }
+    void OnClose (wxCloseEvent&   event) { EndModal(BUTTON_CANCEL); }
+    void OnCancel(wxCommandEvent& event) { EndModal(BUTTON_CANCEL); }
     void OnFindNext(wxCommandEvent& event);
     void OnText(wxCommandEvent& event);
 
@@ -35,8 +36,8 @@ private:
 };
 
 
-SearchDlg::SearchDlg(wxWindow& parentWindow, wxString& searchText, bool& respectCase) :
-    SearchDialogGenerated(&parentWindow),
+SearchDlg::SearchDlg(wxWindow* parent, wxString& searchText, bool& respectCase) :
+    SearchDialogGenerated(parent),
     searchText_(searchText),
     respectCase_(respectCase)
 {
@@ -47,7 +48,6 @@ SearchDlg::SearchDlg(wxWindow& parentWindow, wxString& searchText, bool& respect
     m_checkBoxMatchCase->SetValue(respectCase_);
     m_textCtrlSearchTxt->SetValue(searchText_);
 
-    CentreOnParent(); //this requires a parent window!
     m_textCtrlSearchTxt->SetFocus();
 }
 
@@ -79,7 +79,7 @@ class FindInText
 {
 public:
     FindInText(const wxString& textToFind) : textToFind_(textToFind) {}
-    bool found(const wxString& phrase) const { return phrase.Find(textToFind_) != wxNOT_FOUND; }
+    bool found(const wxString& phrase) const { return contains(phrase, textToFind_); }
 
 private:
     wxString textToFind_;
@@ -95,7 +95,7 @@ public:
     {
         //wxWidgets::MakeUpper() is inefficient! But performance is not THAT important for this high-level search functionality
         phrase.MakeUpper();
-        return phrase.Find(textToFind_) != wxNOT_FOUND;
+        return contains(phrase, textToFind_);
     }
 
 private:
@@ -147,7 +147,7 @@ wxString lastSearchString; //this variable really is conceptionally global...
 
 void executeSearch(bool forceShowDialog,
                    bool& respectCase,
-                   wxWindow& parentWindow,
+                   wxWindow* parent,
                    Grid& grid,
                    size_t compPosLeft, size_t compPosRight)
 {
@@ -155,7 +155,7 @@ void executeSearch(bool forceShowDialog,
 
     if (forceShowDialog || lastSearchString.IsEmpty())
     {
-        SearchDlg searchDlg(parentWindow, lastSearchString, respectCase); //wxWidgets deletion handling -> deleted by parentWindow
+        SearchDlg searchDlg(parent, lastSearchString, respectCase); //wxWidgets deletion handling -> deleted by parentWindow
         if (static_cast<SearchDlg::ReturnCodes>(searchDlg.ShowModal()) != SearchDlg::BUTTON_OKAY)
             return;
 
@@ -195,24 +195,22 @@ void executeSearch(bool forceShowDialog,
             return;
     }
 
-    wxString messageNotFound = _("Cannot find %x");
-    messageNotFound.Replace(wxT("%x"), wxString(wxT("\"")) + lastSearchString + wxT("\""), false);
-    wxMessageBox(messageNotFound, _("Find"), wxOK);
+    wxMessageBox(replaceCpy(_("Cannot find %x"), L"%x", L"\"" + lastSearchString + L"\"", false), _("Find"), wxOK, parent);
 
     //show search dialog again
     if (searchDialogWasShown)
-        executeSearch(true, respectCase, parentWindow, grid, compPosLeft, compPosRight);
+        executeSearch(true, respectCase, parent, grid, compPosLeft, compPosRight);
 }
 //###########################################################################################
 
 
-void zen::startFind(wxWindow& parentWindow, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase) //Strg + F
+void zen::startFind(wxWindow* parent, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase) //Strg + F
 {
-    executeSearch(true, respectCase, parentWindow, grid, compPosLeft, compPosRight);
+    executeSearch(true, respectCase, parent, grid, compPosLeft, compPosRight);
 }
 
 
-void zen::findNext(wxWindow& parentWindow, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase)  //F3
+void zen::findNext(wxWindow* parent, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase)  //F3
 {
-    executeSearch(false, respectCase, parentWindow, grid, compPosLeft, compPosRight);
+    executeSearch(false, respectCase, parent, grid, compPosLeft, compPosRight);
 }

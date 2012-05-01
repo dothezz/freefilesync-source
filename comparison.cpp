@@ -94,7 +94,7 @@ void determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
             if (tryReportingError([&]
         {
             if (!dirExistsUpdating(dirname, allowUserInteraction, procCallback))
-                    throw FileError(_("Directory does not exist:") + L"\n" + L"\"" + dirname + L"\"" + L" \n\n" +
+                    throw FileError(replaceCpy(_("Cannot find directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" +
                     _("You can ignore this error to consider the directory as empty."));
             }, procCallback))
             dirnamesExisting.insert(dirname);
@@ -107,8 +107,7 @@ void determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
 //similar check if one directory is read/written by multiple pairs not before beginning of synchronization
 std::wstring checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm) //returns warning message, empty if all ok
 {
-    typedef std::vector<std::pair<std::wstring, std::wstring> > DirDirList;
-    DirDirList dependentDirs;
+    std::vector<std::pair<Zstring, Zstring>> dependentDirs;
 
     auto dependentDir = [](const Zstring& lhs, const Zstring& rhs)
     {
@@ -120,7 +119,7 @@ std::wstring checkFolderDependency(const std::vector<FolderPairCfg>& folderPairs
         if (!i->leftDirectoryFmt.empty() && !i->rightDirectoryFmt.empty()) //empty folders names may be accepted by user
         {
             if (dependentDir(i->leftDirectoryFmt, i->rightDirectoryFmt)) //test wheter leftDirectory begins with rightDirectory or the other way round
-                dependentDirs.push_back(std::make_pair(utf8CvrtTo<std::wstring>(i->leftDirectoryFmt), utf8CvrtTo<std::wstring>(i->rightDirectoryFmt)));
+                dependentDirs.push_back(std::make_pair(i->leftDirectoryFmt, i->rightDirectoryFmt));
         }
 
     std::wstring warningMsg;
@@ -129,9 +128,9 @@ std::wstring checkFolderDependency(const std::vector<FolderPairCfg>& folderPairs
     {
         warningMsg = _("Directories are dependent! Be careful when setting up synchronization rules:");
         for (auto i = dependentDirs.begin(); i != dependentDirs.end(); ++i)
-            warningMsg += std::wstring(L"\n\n") +
-                          L"\"" + i->first  + L"\"\n" +
-                          L"\"" + i->second + L"\"";
+            warningMsg += L"\n\n" +
+                          fmtFileName(i->first) + L"\n" +
+                          fmtFileName(i->second);
     }
     return warningMsg;
 }
@@ -145,11 +144,11 @@ public:
         pc_(pc),
         bytesReported_(bytesReported) {}
 
-    virtual void updateCompareStatus(UInt64 totalBytesTransferred)
+    virtual void updateCompareStatus(UInt64 totalBytes)
     {
         //inform about the (differential) processed amount of data
-        pc_.updateProcessedData(0, to<Int64>(totalBytesTransferred) - to<Int64>(bytesReported_)); //throw()! -> this ensures client and service provider are in sync!
-        bytesReported_ = totalBytesTransferred;                                                   //
+        pc_.updateProcessedData(0, to<Int64>(totalBytes) - to<Int64>(bytesReported_)); //throw()! -> this ensures client and service provider are in sync!
+        bytesReported_ = totalBytes;                                                   //
 
         pc_.requestUiRefresh(); //may throw
     }
@@ -203,15 +202,10 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
     PreventStandby dummy2;
     (void)dummy2;
 
-    /*
-    #ifdef NDEBUG
-        wxLogNull noWxLogs; //hide wxWidgets log messages in release build
-    #endif
-    */
     //PERF_START;
 
     //init process: keep at beginning so that all gui elements are initialized properly
-    procCallback.initNewProcess(-1, 0, ProcessCallback::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
+    procCallback.initNewPhase(-1, 0, ProcessCallback::PHASE_SCANNING); //it's not known how many files will be scanned => -1 objects
 
     //-------------------some basic checks:------------------------------------------
 
@@ -358,10 +352,9 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
 //check for very old dates or date2s in the future
 std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 {
-    std::wstring msg = _("File %x has an invalid date!");
-    replace(msg, L"%x", std::wstring(L"\"") + fileNameFull + L"\"");
-    msg += L"\n\n" + _("Date") + L": " + utcToLocalTimeString(utcTime);
-    return _("Conflict detected:") + L"\n" + msg;
+    return _("Conflict detected:") + L"\n" +
+           replaceCpy(_("File %x has an invalid date!"), L"%x", fmtFileName(fileNameFull)) + L"\n\n" +
+           _("Date") + L": " + utcToLocalTimeString(utcTime);
 }
 
 
@@ -370,12 +363,10 @@ namespace
 //check for changed files with same modification date
 std::wstring getConflictSameDateDiffSize(const FileMapping& fileObj)
 {
-    std::wstring msg = _("Files %x have the same date but a different size!");
-    replace(msg, L"%x", std::wstring(L"\"") + fileObj.getRelativeName<LEFT_SIDE>() + L"\"");
-    msg += L"\n\n";
-    msg += L"<--    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size") + L": " + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + L"\n";
-    msg += L"-->    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size") + L": " + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
-    return _("Conflict detected:") + L"\n" + msg;
+    return _("Conflict detected:") + L"\n" +
+           replaceCpy(_("Files %x have the same date but a different size!"), L"%x", fmtFileName(fileObj.getObjRelativeName())) + L"\n\n" +
+           L"<--    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size") + L": " + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
+           L"-->    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size") + L": " + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
 }
 }
 
@@ -419,11 +410,8 @@ void CompareProcess::categorizeSymlinkByTime(SymLinkMapping& linkObj) const
                     linkObj.setCategory<SYMLINK_DIFFERENT_METADATA>();
             }
             else
-            {
-                std::wstring conflictMsg = _("Conflict detected:") + L"\n" + _("Symlinks %x have the same date but a different target!");
-                replace(conflictMsg, L"%x", std::wstring(L"\"") + linkObj.getRelativeName<LEFT_SIDE>() + L"\"");
-                linkObj.setCategoryConflict(conflictMsg);
-            }
+                linkObj.setCategoryConflict(_("Conflict detected:") + L"\n" +
+                                            replaceCpy(_("Symbolic links %x have the same date but a different target."), L"%x", fmtFileName(linkObj.getObjRelativeName())));
             break;
 
         case CmpFileTime::TIME_LEFT_NEWER:
@@ -557,24 +545,24 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
             filesToCompareBytewise.push_back(fileObj);
     });
 
-    const size_t objectsTotal = filesToCompareBytewise.size() * 2;
-    const UInt64 bytesTotal   =  //left and right filesizes should be the same
-        2U * std::accumulate(filesToCompareBytewise.begin(), filesToCompareBytewise.end(), static_cast<UInt64>(0),
+    const size_t objectsTotal = filesToCompareBytewise.size();
+    const UInt64 bytesTotal   =  //left and right filesizes are equal
+        std::accumulate(filesToCompareBytewise.begin(), filesToCompareBytewise.end(), static_cast<UInt64>(0),
     [](UInt64 sum, FileMapping* fsObj) { return sum + fsObj->getFileSize<LEFT_SIDE>(); });
 
-    procCallback.initNewProcess(static_cast<int>(objectsTotal),
-                                to<Int64>(bytesTotal),
-                                ProcessCallback::PROCESS_COMPARING_CONTENT);
+    procCallback.initNewPhase(static_cast<int>(objectsTotal),
+                              to<Int64>(bytesTotal),
+                              ProcessCallback::PHASE_COMPARING_CONTENT);
 
     const CmpFileTime timeCmp(fileTimeTolerance);
 
-    const std::wstring txtComparingContentOfFiles = replaceCpy(_("Comparing content of files %x"), L"%x", L"\n\"%x\"", false);
+    const std::wstring txtComparingContentOfFiles = replaceCpy(_("Comparing content of files %x"), L"%x", L"\n%x", false);
 
     //compare files (that have same size) bytewise...
     std::for_each(filesToCompareBytewise.begin(), filesToCompareBytewise.end(),
                   [&](FileMapping* fileObj)
     {
-        procCallback.reportStatus(replaceCpy(txtComparingContentOfFiles, L"%x", utf8CvrtTo<std::wstring>(fileObj->getRelativeName<LEFT_SIDE>()), false));
+        procCallback.reportStatus(replaceCpy(txtComparingContentOfFiles, L"%x", fmtFileName(fileObj->getObjRelativeName()), false));
 
         //check files that exist in left and right model but have different content
 
@@ -582,7 +570,7 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
     {
         if (filesHaveSameContentUpdating(fileObj->getFullName<LEFT_SIDE>(), //throw FileError
             fileObj->getFullName<RIGHT_SIDE>(),
-            fileObj->getFileSize<LEFT_SIDE>() * 2U,
+            fileObj->getFileSize<LEFT_SIDE >(),
             procCallback))
             {
                 if (fileObj->getShortName<LEFT_SIDE>() == fileObj->getShortName<RIGHT_SIDE>() &&
@@ -595,11 +583,12 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
             else
                 fileObj->setCategory<FILE_DIFFERENT>();
 
-            procCallback.updateProcessedData(2, 0); //processed data is communicated in subfunctions!
-            procCallback.requestUiRefresh(); //may throw
+            procCallback.updateProcessedData(1, 0); //processed data is communicated in subfunctions!
 
         }, procCallback))
         fileObj->setCategoryConflict(_("Conflict detected:") + L"\n" + _("Comparing files by content failed."));
+
+        procCallback.requestUiRefresh(); //may throw
     });
 }
 

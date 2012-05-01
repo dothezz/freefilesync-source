@@ -16,6 +16,14 @@ namespace zen
 //conversion between Zstring and wxString
 inline wxString toWx(const Zstring&  str) { return utf8CvrtTo<wxString>(str); }
 inline Zstring   toZ(const wxString& str) { return utf8CvrtTo<Zstring>(str); }
+
+inline std::vector<Zstring> toZ(const std::vector<wxString>& strList)
+{
+    std::vector<Zstring> tmp;
+    std::transform(strList.begin(), strList.end(), std::back_inserter(tmp), [](const wxString& str) { return toZ(str); });
+    return tmp;
+}
+
 }
 
 #endif // STRINGCONV_H_INCLUDED

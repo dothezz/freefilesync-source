@@ -11,7 +11,7 @@
 <target>Szukanie katalogu %x...</target>
 
 <source>Show in Explorer</source>
-<target>Wyświetl w Exlporerze</target>
+<target>Wyświetl w Explorerze</target>
 
 <source>Open with default application</source>
 <target>Otwórz za pomocą domyślnej aplikacji</target>
@@ -19,8 +19,14 @@
 <source>Browse directory</source>
 <target>Przeglądaj katalog</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Żądanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatyczna Synchronizacja</target>
+
+<source>Error</source>
+<target>Błąd</target>
 
 <source>Select alternate comparison settings</source>
 <target>Określ alternatywne ustawienia porównywania</target>
@@ -52,11 +58,8 @@
 <source>About</source>
 <target>O Programie</target>
 
-<source>Error</source>
-<target>Błąd</target>
-
 <source>Warning</source>
-<target>Ostrzerzenie</target>
+<target>Ostrzeżenie</target>
 
 <source>Question</source>
 <target>Pytanie</target>
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Błąd systemu linux %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Błąd odczytu dowiązania symbolicznego:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Nie można określić położenia dowiązania symbolicznego %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -137,35 +140,41 @@
 <pluralform>%x Bajtów</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Błąd odczytu z bazy danych synchronizacji:</target>
+<source>Cannot read file %x.</source>
+<target>Nie można odczytać pliku %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Błąd zapisu do bazy danych synchronizacji:</target>
+<source>Cannot write file %x.</source>
+<target>Nie można zapisać pliku %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Niepoprawny format bazy danych dla synchronizacji:</target>
+<source>Database file %x is incompatible.</source>
+<target>Plika bazy danych %x nie jest kompatybilny.</target>
 
 <source>Initial synchronization:</source>
 <target>Wstępna synchronizacja:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Jeden z plików bazy danych FreeFileSync nie istnieje:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Plik bazy danych %x nie istnieje.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Pliki danych nie współdzielą wspólnej sesji synchronizacji:</target>
+<source>Out of memory!</source>
+<target>Brak wolnej pamięci!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Pliki bazy danych nie współdzielą sesji.</target>
 
 <source>An exception occurred!</source>
 <target>Wystąpił wyjątek!</target>
 
-<source>Error reading file attributes:</source>
-<target>Błąd odczytu atrybutów pliku:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Nie można odczytać atrybutów pliku %x.</target>
+
+<source>Cannot get process information.</source>
+<target>Nie można uzyskać informacji dla procesu.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Blokada katalogu (%x), oczekiwanie...</target>
 
-<source>Error setting directory lock:</source>
-<target>Błąd ustawiania blokady katalogu:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Nie można zablokować katalogu %x do zapisu.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -177,8 +186,8 @@
 <pluralform>%x sekund</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Błąd odczytu pliku:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Błąd podczas parsowania pliku %x, rząd %y, kolumna %z.</target>
 
 <source>Scanning:</source>
 <target>Skanowanie:</target>
@@ -196,41 +205,35 @@
 <pluralform>[%x Wątków]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Nieprawidłowy plik konfiguracyjny!</target>
+<source>/sec</source>
+<target>/sekundę</target>
 
-<source>Error parsing configuration file:</source>
-<target>Błąd parsowania pliku konfiguracyjnego:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>Plik %x nie zawiera prawidłowej konfiguracji</target>
 
-<source>Configuration loaded partially only:</source>
-<target></target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Plik konfiguracyjny %x wczytany tylko częściowo.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target></target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Nie można uzyskać dostępu do usługi Volume Shadow Copy.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Usługa shadow copy jest aktywna tylko w wersji 64 bitowej programu FreeFileSync.</target>
 
 <source>Cannot load file %x.</source>
-<target></target>
+<target>Nie można wczytać pliku %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Błąd podczas dostępdu do usługi Volume Shadow Copy!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target></target>
+<source>Path %x does not contain a volume name.</source>
+<target>Ścieżka %x nie zawiera poprawnej etykiety dysku.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Dysk %x nie jest częścią pliku %y!</target>
 
-<source>/sec</source>
-<target>/sekundę</target>
-
-<source>File does not exist:</source>
-<target>Plik nie istnieje:</target>
+<source>Cannot find file %x.</source>
+<target>Nie można znaleźć pliku %x.</target>
 
 <source>Cannot read the following XML elements:</source>
-<target></target>
+<target>Nie można odczytać elementu XML:</target>
 
 <source>S&ave configuration...</source>
 <target>Z&apisz konfigurację...</target>
@@ -271,7 +274,7 @@ The command line is executed each time:
 - files within these directories or subdirectories are modified
 </source>
 <target>
-Komenda jest wykonwywana za każdym razem gdy:
+Komenda jest wykonywana za każdym razem gdy:
 - wszystkie katalogi będą dostępne (np. włożenie USB)
 - pliki w obrębie tych katalogów i podkatalogów ulegną zmianie
 </target>
@@ -295,19 +298,22 @@ Komenda jest wykonwywana za każdym razem gdy:
 <target>Minimalny czas bezczynności [sekundy]</target>
 
 <source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Odstęp czasu w sekundach pomiędzy pomiędzy ostatnią wykrytą zmianą, a wykonaniem komendy</target>
+<target>Odstęp czasu w sekundach pomiędzy ostatnią wykrytą zmianą, a wykonaniem komendy</target>
 
 <source>Start</source>
 <target>Rozpocznij</target>
+
+<source>&Retry</source>
+<target>&Powtórz</target>
+
+<source>Cancel</source>
+<target>Anuluj</target>
 
 <source>(Build: %x)</source>
 <target>(Zbudowano: %x)</target>
 
 <source>RealtimeSync configuration</source>
-<target>RealtimeSync konfiguracja</target>
-
-<source>File already exists. Overwrite?</source>
-<target>Nadpisać istniejący już plik?</target>
+<target>Konfiguracja RealtimeSync</target>
 
 <source>&Restore</source>
 <target>&Przywróć</target>
@@ -346,25 +352,25 @@ Komenda jest wykonwywana za każdym razem gdy:
 <target>Własne</target>
 
 <source>FreeFileSync batch file</source>
-<target>FreeFileSync plik wsadowy</target>
+<target>Plik wsadowy FreeFileSync</target>
 
 <source>FreeFileSync configuration</source>
 <target>Konfiguracja FreeFileSync</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync plik wsadowy</target>
-
-<source>Unable to create log file!</source>
-<target>Nie można utworzyć pliku z logami!</target>
-
 <source>Batch execution</source>
 <target>Uruchomienie pliku wsadowego</target>
 
-<source>Stop</source>
-<target>Zatrzymaj</target>
+<source>Items processed:</source>
+<target>Przetworzeone elementy:</target>
+
+<source>Items remaining:</source>
+<target>Pozostałe elementy:</target>
 
 <source>Total time:</source>
 <target>Całkowity czas:</target>
+
+<source>Stop</source>
+<target>Zatrzymaj</target>
 
 <source>Synchronization aborted!</source>
 <target>Synchronizacja przerwana!</target>
@@ -372,14 +378,17 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Synchronization completed with errors!</source>
 <target>Synchronizacja zakończona z błędami.</target>
 
+<source>Nothing to synchronize!</source>
+<target>Brak plików do synchronizacji!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Synchronizacja zakończona pomyślnie!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Naciśnij "Przełącz" aby otworzyć moduł GUI.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Wciśnij "Przełącz" aby rozwiązać wszystkie problemy w głównym oknie FreeFileSync.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Przełączanie do trybu GUI FreeFileSync</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Przełączanie do głównego okna FreeFileSync...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Nie można się połączyć z sourceforge.net!</target>
@@ -394,7 +403,7 @@ Komenda jest wykonwywana za każdym razem gdy:
 <target>Informacja</target>
 
 <source>FreeFileSync is up to date!</source>
-<target>FreeFileSync jest już uaktualniony!</target>
+<target>Posiadasz aktualną wersję FreeFileSync!</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Czy chcesz aby FreeFileSync sprawdzał uaktualnienia co tydzień?</target>
@@ -409,7 +418,7 @@ Komenda jest wykonwywana za każdym razem gdy:
 <target><Katalog></target>
 
 <source>Full path</source>
-<target>Pełna scieżka</target>
+<target>Pełna ścieżka</target>
 
 <source>Name</source>
 <target>Nazwa</target>
@@ -537,9 +546,6 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Items found:</source>
 <target>Znalezione elementy:</target>
 
-<source>Items remaining:</source>
-<target>Pozostałe elementy:</target>
-
 <source>Speed:</source>
 <target>Prędkość:</target>
 
@@ -553,7 +559,7 @@ Komenda jest wykonwywana za każdym razem gdy:
 <target>Plik wsadowy</target>
 
 <source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target></target>
+<target>Utwórz plik wsadowy aby zautomatyzować proces synchronizacji. Aby uruchomić synchronizację w trybie wsadowym kliknij dwa razy kliknij na ten plik lub wykonaj komendę: FreeFileSync.exe SyncJob.ffs_batch. Możesz to również wykorzystać w swoim harmonogramie zadań.</target>
 
 <source>Help</source>
 <target>Pomoc</target>
@@ -566,9 +572,6 @@ Komenda jest wykonwywana za każdym razem gdy:
 
 <source>Right</source>
 <target>Prawy</target>
-
-<source>Sync setttings</source>
-<target></target>
 
 <source>Status feedback</source>
 <target>Opinia statusu</target>
@@ -593,9 +596,6 @@ Komenda jest wykonwywana za każdym razem gdy:
 
 <source>&Load</source>
 <target>&Wczytaj</target>
-
-<source>&Cancel</source>
-<target>&Anuluj</target>
 
 <source>Select variant:</source>
 <target>Wybierz wariant:</target>
@@ -645,8 +645,8 @@ Komenda jest wykonwywana za każdym razem gdy:
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikt/plik nie może zostać skategoryzowany</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Porównaj przez...</target>
@@ -681,9 +681,6 @@ jest identyczna
 <source>Synchronizing...</source>
 <target>Synchronizuję...</target>
 
-<source>Items processed:</source>
-<target>Przetworzeone elementy:</target>
-
 <source>&Pause</source>
 <target>&Pauza</target>
 
@@ -715,16 +712,13 @@ jest identyczna
 <target>Udostępnione na zasadach licencji GNU General Public License</target>
 
 <source>Ignore further errors</source>
-<target></target>
+<target>Ignoruj kolejne błędy</target>
 
 <source>Hide further error messages during the current process</source>
 <target>Ukryj kolejne informacje o błędach dla tego zadania</target>
 
 <source>&Ignore</source>
 <target>&Ignoruj</target>
-
-<source>&Retry</source>
-<target>&Powtórz</target>
 
 <source>Do not show this dialog again</source>
 <target>Nie pokazuj tego okna ponownie</target>
@@ -751,13 +745,16 @@ jest identyczna
 Only files that match all filter settings will be synchronized.
 Note: File names must be relative to base directories!
 </source>
-<target></target>
+<target>
+Tylko pliki pasujące do wszystkich filtrów będą synchronizowane.
+Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowego.
+</target>
 
 <source>Hints:</source>
 <target>Wskazówki:</target>
 
 <source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Wprowdź relatywne scieżki do plików lub katalogów oddzielone ';' lub nową linią.</target>
+<target>1. Wprowadź relatywne scieżki do plików lub katalogów oddzielone ';' lub nową linią.</target>
 
 <source>2. Use wildcard characters '*' and '?'.</source>
 <target>2. Użyj wieloznacznika (wildcard) '*' i '?'.</target>
@@ -787,16 +784,16 @@ Wyklucz: \moje\temp\*
 <target>Wyklucz</target>
 
 <source>Time span</source>
-<target></target>
+<target>Przedział czasowy</target>
 
 <source>File size</source>
-<target></target>
+<target>Rozmiar pliku</target>
 
 <source>Minimum</source>
-<target></target>
+<target>Minimum</target>
 
 <source>Maximum</source>
-<target></target>
+<target>Maksimum</target>
 
 <source>&Default</source>
 <target>&Domyślne</target>
@@ -820,7 +817,7 @@ Wyklucz: \moje\temp\*
 <target>Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)</target>
 
 <source>Restore hidden dialogs</source>
-<target></target>
+<target>Przywróc ukryte dialogi</target>
 
 <source>External applications</source>
 <target>Aplikacje zewnętrzne</target>
@@ -883,7 +880,7 @@ Wyklucz: \moje\temp\*
 <target>Odznacz wszystko</target>
 
 <source>Show icons:</source>
-<target></target>
+<target>Pokaż ikony:</target>
 
 <source>Small</source>
 <target>Mały</target>
@@ -910,7 +907,7 @@ Wyklucz: \moje\temp\*
 <target>Konfiguracja zapisana!</target>
 
 <source>Never save changes</source>
-<target></target>
+<target>Nigdy nie zapisuj zmian</target>
 
 <source>Save changes to current configuration?</source>
 <target>Zapisać zmiany obecnej konfiguracji?</target>
@@ -1020,9 +1017,6 @@ Wyklucz: \moje\temp\*
 <source>File list exported!</source>
 <target>Lista plików wyeksportowana!</target>
 
-<source>Error writing file:</source>
-<target>Błąd zapisu pliku:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1072,20 +1066,20 @@ Wyklucz: \moje\temp\*
 <source>Paused</source>
 <target>Pauza</target>
 
+<source>Initializing...</source>
+<target>Inicjalizacja...</target>
+
 <source>Aborted</source>
 <target>Przerwana</target>
 
 <source>Completed</source>
 <target>Zakończono</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Żądanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...</target>
+<source>Continue</source>
+<target>Kontynuuj</target>
 
 <source>Pause</source>
 <target>Pauza</target>
-
-<source>Continue</source>
-<target>Kontynuuj</target>
 
 <source>Cannot find %x</source>
 <target>Nie można znaleźć %x</target>
@@ -1106,7 +1100,7 @@ Wyklucz: \moje\temp\*
 <target>W tym roku</target>
 
 <source>Last x days</source>
-<target></target>
+<target>Ostatnie x dni</target>
 
 <source>Byte</source>
 <target>Bajtów</target>
@@ -1118,13 +1112,13 @@ Wyklucz: \moje\temp\*
 <target>MB</target>
 
 <source>Filter</source>
-<target></target>
+<target>Filtr</target>
 
 <source>Direct</source>
 <target>Bezpośrednio</target>
 
 <source>Follow</source>
-<target>Podąrzaj</target>
+<target>Podążaj</target>
 
 <source>Copy NTFS permissions</source>
 <target>Kopiuj uprawnienia NTFS</target>
@@ -1145,7 +1139,7 @@ Wyklucz: \moje\temp\*
 <target>- Odpowiednik %dir</target>
 
 <source>Make hidden dialogs and warning messages visible again?</source>
-<target></target>
+<target>Czy chcesz ponownie aktywować ukryte powiadomienia i ostrzeżenia?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1230,68 +1224,65 @@ Wyklucz: \moje\temp\*
 <pluralform>%x dni</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Nie można uruchomić monitora katalogów:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Błąd podczas monitorowania katalogów.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Nie można monitorować katalogu %x.</target>
 
 <source>Conversion error:</source>
 <target>Błąd konwersji:</target>
 
-<source>Error deleting file:</source>
-<target>Błąd podczas usuwania pliku:</target>
+<source>Cannot delete file %x.</source>
+<target>Nie można usunąć pliku %x.</target>
 
-<source>Error moving file:</source>
-<target>Błąd podczas przenoszenia pliku:</target>
+<source>The file is locked by another process:</source>
+<target>Plik jest zablokowany przez inny proces:</target>
 
-<source>Target file already existing!</source>
-<target>Plik docelowy już istnieje!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Nie można przenieść pliku %x do %y.</target>
 
-<source>Error moving directory:</source>
-<target>Błąd podczas przenoszenia katalogu:</target>
+<source>Cannot delete directory %x.</source>
+<target>Nie można usunąć katalogu %x.</target>
 
-<source>Target directory already existing!</source>
-<target>Katalog docelowy już istnieje!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Nie można zapisać czasu modyfikacji %x.</target>
 
-<source>Error deleting directory:</source>
-<target>Błąd podczas usuwania katalogu:</target>
+<source>Cannot find system function %x.</source>
+<target>Nie można odnaleźć funkcji systemowej %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Błąd zmiany godziny modyfikacji:</target>
+<source>Cannot read security context of %x.</source>
+<target>Nie można odczytać ustawień bezpieczeństwa %x.</target>
 
-<source>Error loading library function:</source>
-<target>Błąd wczytywania funkcji:</target>
+<source>Cannot write security context of %x.</source>
+<target>Nie można zapisać ustawień bezpieczeństwa %x.</target>
 
-<source>Error reading security context:</source>
-<target>Błąd odczytu kontekstu bezpieczeństwa:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Nie można odczytać uprawnień %x.</target>
 
-<source>Error writing security context:</source>
-<target>Błąd zapisu kontekstu bezpieczeństwa:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Nie można zapisać uprawnień %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Błąd podczas kopiowania uprawnień pliku:</target>
+<source>Cannot create directory %x.</source>
+<target>Nie można utworzyć katalogu %x.</target>
 
-<source>Error creating directory:</source>
-<target>Błąd podczas tworzenia katalogu:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Nie można skopiować dowiązania symbolicznego %x do %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Błąd podczas kopiowania dowiązania symbolicznego (symlink)</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Nie można zapisać atrybutów %x.</target>
 
-<source>Error copying file:</source>
-<target>Błąd podczas kopiowania pliku:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Nie można skopiować pliku %x do %y.</target>
 
-<source>Error opening file:</source>
-<target>Błąd odczytu pliku:</target>
+<source>Cannot read directory %x.</source>
+<target>Nie można odczytać katalogu %x.</target>
 
-<source>Error traversing directory:</source>
-<target>Błąd podczas odczytywania katalogu:</target>
+<source>Endless loop.</source>
+<target>Nieskończona pętla.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Zapętlenie podczas przeglądania katalogu:</target>
+<source>Cannot set privilege %x.</source>
+<target>Nie można ustawić uprawnień %x.</target>
 
-<source>Error setting privilege:</source>
-<target>Błąd ustawiania uprawnień:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Nie można przenieść %x do kosza!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Obie strony uległy zmianie od ostatniej synchronizacji!</target>
@@ -1317,8 +1308,8 @@ Wyklucz: \moje\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Możesz zignorować ten błąd uznająć jeden z katalogów jako pusty.</target>
 
-<source>Directory does not exist:</source>
-<target>Katalog nie istnieje:</target>
+<source>Cannot find directory %x.</source>
+<target>Nie można znaleźć katalogu %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Katalogi są zależne! Pamiętaj o tym podczas ustawiania zasad synchronizacji:</target>
@@ -1326,20 +1317,17 @@ Wyklucz: \moje\temp\*
 <source>Preparing synchronization...</source>
 <target>Przygotowywanie synchronizacji...</target>
 
-<source>Out of memory!</source>
-<target></target>
+<source>Conflict detected:</source>
+<target>Wykryto konflikt:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Plik %x ma nieprawidłową datę!</target>
 
-<source>Conflict detected:</source>
-<target>Wykryto konflikt:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Pliki %x mają tą samą datę lecz różne rozmiary!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Dowiązanie symboliczne %x ma te same dane, ale inny cel!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Dowiązania symboliczne %x mają tą samą datę, ale różne źródła.</target>
 
 <source>Comparing content of files %x</source>
 <target>Porównywanie zawartości plików %x</target>
@@ -1422,11 +1410,11 @@ Wyklucz: \moje\temp\*
 <source>Creating file %x</source>
 <target>Tworzenie pliku %x</target>
 
-<source>Creating folder %x</source>
-<target>Tworzenie folderu %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Tworzenie dowiązania symbolicznego %x</target>
+
+<source>Creating folder %x</source>
+<target>Tworzenie folderu %x</target>
 
 <source>Overwriting file %x</source>
 <target>Nadpisywanie pliku %x</target>
@@ -1446,8 +1434,8 @@ Wyklucz: \moje\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Nie określono katalogu do wersjonowania plików!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Katalog źródłowy nie istnieje:</target>
+<source>Source directory %x not found.</source>
+<target>Katalog źródłowy %x nie istnieje.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Istnieją nierozwiązane konflikty!</target>
@@ -1481,12 +1469,6 @@ Wyklucz: \moje\temp\*
 
 <source>Generating database...</source>
 <target>Generowanie bazy danych...</target>
-
-<source>Nothing to synchronize!</source>
-<target></target>
-
-<source>Unable to copy locked file %x!</source>
-<target></target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Błąd weryfikacji danych: Plik źródłowy i docelowy różnią się zawartością!</target>

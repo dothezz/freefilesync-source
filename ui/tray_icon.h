@@ -19,7 +19,8 @@ public:
     FfsTrayIcon();
     ~FfsTrayIcon();
 
-    void setToolTip(const wxString& toolTipText, double fraction = 0); //number between [0, 1], for small progress indicator
+    void setToolTip(const wxString& toolTip);
+    void setProgress(double fraction); //number between [0, 1], for small progress indicator
 
 private:
     FfsTrayIcon(const FfsTrayIcon&);
@@ -30,6 +31,9 @@ private:
 
     class TaskBarImpl;
     TaskBarImpl* trayIcon; //actual tray icon (don't use inheritance to enable delayed deletion)
+
+    wxString toolTipLast;
+    double fractionLast;
 };
 
 #endif // TRAYICON_H_INCLUDED

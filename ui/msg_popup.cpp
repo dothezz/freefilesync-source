@@ -16,7 +16,7 @@ using namespace zen;
 class ErrorDlg : public ErrorDlgGenerated
 {
 public:
-    ErrorDlg(wxWindow* parentWindow,
+    ErrorDlg(wxWindow* parent,
              int activeButtons,
              const wxString& messageText,
              bool* ignoreNextErrors);
@@ -31,15 +31,15 @@ private:
 };
 
 
-ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString& messageText, bool* ignoreNextErrors) :
-    ErrorDlgGenerated(parentWindow),
+ErrorDlg::ErrorDlg(wxWindow* parent, const int activeButtons, const wxString& messageText, bool* ignoreNextErrors) :
+    ErrorDlgGenerated(parent),
     ignoreErrors(ignoreNextErrors)
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmap10->SetBitmap(GlobalResources::getImage(wxT("error")));
+    m_bitmap10->SetBitmap(GlobalResources::getImage(L"error"));
     m_textCtrl8->SetValue(messageText);
 
     if (ignoreNextErrors)
@@ -96,9 +96,9 @@ void ErrorDlg::OnAbort(wxCommandEvent& event)
 }
 
 
-ReturnErrorDlg::ButtonPressed zen::showErrorDlg(int activeButtons, const wxString& messageText, bool* ignoreNextErrors)
+ReturnErrorDlg::ButtonPressed zen::showErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageText, bool* ignoreNextErrors)
 {
-    ErrorDlg errorDlg(nullptr, activeButtons, messageText, ignoreNextErrors);
+    ErrorDlg errorDlg(parent, activeButtons, messageText, ignoreNextErrors);
     errorDlg.Raise();
     return static_cast<ReturnErrorDlg::ButtonPressed>(errorDlg.ShowModal());
 }
@@ -108,7 +108,7 @@ ReturnErrorDlg::ButtonPressed zen::showErrorDlg(int activeButtons, const wxStrin
 class WarningDlg : public WarningDlgGenerated
 {
 public:
-    WarningDlg(wxWindow* parentWindow, int activeButtons, const wxString& messageText, bool& dontShowAgain);
+    WarningDlg(wxWindow* parent, int activeButtons, const wxString& messageText, bool& dontShowAgain);
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -119,15 +119,15 @@ private:
 };
 
 
-WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxString& messageText, bool& dontShowDlgAgain) :
-    WarningDlgGenerated(parentWindow),
+WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& messageText, bool& dontShowDlgAgain) :
+    WarningDlgGenerated(parent),
     dontShowAgain(dontShowDlgAgain)
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmap10->SetBitmap(GlobalResources::getImage(wxT("warning")));
+    m_bitmap10->SetBitmap(GlobalResources::getImage(L"warning"));
     m_textCtrl8->SetValue(messageText);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -178,9 +178,9 @@ void WarningDlg::OnAbort(wxCommandEvent& event)
 }
 
 
-ReturnWarningDlg::ButtonPressed zen::showWarningDlg(int activeButtons, const wxString& messageText, bool& dontShowAgain)
+ReturnWarningDlg::ButtonPressed zen::showWarningDlg(wxWindow* parent, int activeButtons, const wxString& messageText, bool& dontShowAgain)
 {
-    WarningDlg warningDlg(nullptr, activeButtons, messageText, dontShowAgain);
+    WarningDlg warningDlg(parent, activeButtons, messageText, dontShowAgain);
     warningDlg.Raise();
     return static_cast<ReturnWarningDlg::ButtonPressed>(warningDlg.ShowModal());
 }
@@ -190,7 +190,7 @@ ReturnWarningDlg::ButtonPressed zen::showWarningDlg(int activeButtons, const wxS
 class QuestionDlg : public QuestionDlgGenerated
 {
 public:
-    QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString& messageText, CheckBox* checkbox);
+    QuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, CheckBox* checkbox);
 
 private:
     void OnClose (wxCloseEvent&   event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
@@ -202,8 +202,8 @@ private:
 };
 
 
-QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString& messageText, CheckBox* checkbox) :
-    QuestionDlgGenerated(parentWindow),
+QuestionDlg::QuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, CheckBox* checkbox) :
+    QuestionDlgGenerated(parent),
     checkbox_(checkbox)
 {
 #ifdef FFS_WIN
@@ -253,9 +253,9 @@ void QuestionDlg::OnNo(wxCommandEvent& event)
     EndModal(ReturnQuestionDlg::BUTTON_NO);
 }
 
-ReturnQuestionDlg::ButtonPressed zen::showQuestionDlg(int activeButtons, const wxString& messageText, CheckBox* checkbox)
+ReturnQuestionDlg::ButtonPressed zen::showQuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, CheckBox* checkbox)
 {
-    QuestionDlg qtnDlg(nullptr, activeButtons, messageText, checkbox);
+    QuestionDlg qtnDlg(parent, activeButtons, messageText, checkbox);
     qtnDlg.Raise();
     return static_cast<ReturnQuestionDlg::ButtonPressed>(qtnDlg.ShowModal());
 }

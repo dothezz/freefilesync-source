@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>Gennemse Bibliotek</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Afbrydelse: Venter på nuværende opgave afsluttes...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSynk - Automatisk Synkronisering</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux Fejl kode %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Fejl i at finde link:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Kan ikke følge linket %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -136,35 +139,41 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Fejl i læsning fra synkroniserings databasen:</target>
+<source>Cannot read file %x.</source>
+<target>Kan ikke læse filen %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Fejl i skrivning til synkroniserings databasen:</target>
+<source>Cannot write file %x.</source>
+<target>Kan ikke skrive filen %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Ukompatibelt synkroniserings database format:</target>
+<source>Database file %x is incompatible.</source>
+<target>Database filen %x er ikke kompatibel.</target>
 
 <source>Initial synchronization:</source>
 <target>Indledende synkronisering:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>En af FreeFileSync database filerne findes ikke endnu:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Database filen %x findes ikke.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Database filer deler ikke en fælles synkroniserings session</target>
+<source>Out of memory!</source>
+<target>Ude af hukommelse!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Database filen kan ikke deles.</target>
 
 <source>An exception occurred!</source>
 <target>En undtagelse er opstået!</target>
 
-<source>Error reading file attributes:</source>
-<target>Fejl i læsning af atributter:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Kan ikke læse fil attributterne på %x.</target>
+
+<source>Cannot get process information.</source>
+<target>Kan ikke lave informationer over processen.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Venter mens biblioteket er låst (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Fejl i at låse bibliotek:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Kan ikke låse biblioteket %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -175,8 +184,8 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Fejl i læsning af fil:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Fejl i videregivelse af filen %x, række %y, kolonne %z.</target>
 
 <source>Scanning:</source>
 <target>Skanner:</target>
@@ -193,38 +202,32 @@
 <pluralform>[%x Tråde]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Ugyldig FreeFileSync config fil!</target>
+<source>/sec</source>
+<target>/sek</target>
 
-<source>Error parsing configuration file:</source>
-<target>Fejl i at lave konfigurations filen:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>%x indeholder ikke en gyldig konfiguration.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Konfiguration kun delvist hentet:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Konfigurationsfilen %x er kun delvist hentet.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>Ude af stand til at flytte %x til skraldespanden!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Kan ikke få adgang til Drev Kopi Servicen.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Brug venligst FreeFileSync 64-bit version for at lave en drev kopi på dette system.</target>
 
 <source>Cannot load file %x.</source>
 <target>Kan ikke læse filen %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Fejl i adgang til Enhedens Kopi Service</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>At lave spejl kopier af WOW64 er ikke understøttet. Brug venligst FreeFileSync 64-bit version.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Kan ikke bestemme drev navn for filen:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>Stien %x indeholder ikke et drev navn.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Drev navn %x ikke en del af filnavn %y!</target>
 
-<source>/sec</source>
-<target>/sek</target>
-
-<source>File does not exist:</source>
-<target>Filen findes ikke:</target>
+<source>Cannot find file %x.</source>
+<target>Kan ikke finde filen %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Kan ikke læse følgende XML emner:</target>
@@ -303,9 +306,6 @@ Kommando linjen bliver afviklet hver gang:
 <source>RealtimeSync configuration</source>
 <target>RealtimeSynk konfiguration</target>
 
-<source>File already exists. Overwrite?</source>
-<target>Filen findes. Overskriv?</target>
-
 <source>&Restore</source>
 <target>&Gendan</target>
 
@@ -348,20 +348,20 @@ Kommando linjen bliver afviklet hver gang:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync konfiguration</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync Batch Job</target>
-
-<source>Unable to create log file!</source>
-<target>Kan ikke oprette logfil!</target>
-
 <source>Batch execution</source>
 <target>Batch afvikling</target>
 
-<source>Stop</source>
-<target>Stop</target>
+<source>Items processed:</source>
+<target>Enheder behandlet:</target>
+
+<source>Items remaining:</source>
+<target>Enheder tilbage:</target>
 
 <source>Total time:</source>
 <target>Samlet tid:</target>
+
+<source>Stop</source>
+<target>Stop</target>
 
 <source>Synchronization aborted!</source>
 <target>Synkronisering afbrudt!</target>
@@ -369,14 +369,17 @@ Kommando linjen bliver afviklet hver gang:
 <source>Synchronization completed with errors!</source>
 <target>Synkronisering afsluttet med fejl!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Intet at synkronisere!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Synkronisering afsluttet uden fejl!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Tryk "Skift" for at åbne FreeFileSync i GUI mode.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Tryk "Skift" for at løse problemer i hoved vinduet.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Skifter til FreeFileSync GUI mode...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Skift til hoved vinduet...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Kan ikke forbinde til sourceforge.net!</target>
@@ -534,9 +537,6 @@ Kommando linjen bliver afviklet hver gang:
 <source>Items found:</source>
 <target>Enheder fundet:</target>
 
-<source>Items remaining:</source>
-<target>Enheder tilbage:</target>
-
 <source>Speed:</source>
 <target>Hastighed:</target>
 
@@ -564,9 +564,6 @@ Kommando linjen bliver afviklet hver gang:
 <source>Right</source>
 <target>Højre</target>
 
-<source>Sync setttings</source>
-<target>Synkroniser indstillinger</target>
-
 <source>Status feedback</source>
 <target>Status feedback</target>
 
@@ -591,8 +588,8 @@ Kommando linjen bliver afviklet hver gang:
 <source>&Load</source>
 <target>&Hent</target>
 
-<source>&Cancel</source>
-<target>&Anuller</target>
+<source>Cancel</source>
+<target>Anuller</target>
 
 <source>Select variant:</source>
 <target>Vælg variant:</target>
@@ -642,8 +639,8 @@ Kommando linjen bliver afviklet hver gang:
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikt/filen kan ikke kategoriseres</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Sammenlign ved...</target>
@@ -677,9 +674,6 @@ er det samme
 
 <source>Synchronizing...</source>
 <target>Synkroniserer...</target>
-
-<source>Items processed:</source>
-<target>Enheder behandlet:</target>
 
 <source>&Pause</source>
 <target>&Pause</target>
@@ -1020,9 +1014,6 @@ Udeluk: \ting\temp\*
 <source>File list exported!</source>
 <target>Fil listen er eksporteret!</target>
 
-<source>Error writing file:</source>
-<target>Fejl i at skrive fil:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1068,20 +1059,20 @@ Udeluk: \ting\temp\*
 <source>Paused</source>
 <target>Pauset</target>
 
+<source>Initializing...</source>
+<target>Initialiserer...</target>
+
 <source>Aborted</source>
 <target>Afbrudt</target>
 
 <source>Completed</source>
 <target>Fuldført</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Afbrydelse: Venter på nuværende opgave afsluttes...</target>
+<source>Continue</source>
+<target>Fortsæt</target>
 
 <source>Pause</source>
 <target>Pause</target>
-
-<source>Continue</source>
-<target>Fortsæt</target>
 
 <source>Cannot find %x</source>
 <target>Kan ikke finde %x</target>
@@ -1221,68 +1212,65 @@ Udeluk: \ting\temp\*
 <pluralform>%x dage</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Kunne ikke initialiserer biblioteks overvågningen:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Fejl i overvågning af biblioteker.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Kan ikke overvåge biblioteket %x.</target>
 
 <source>Conversion error:</source>
 <target>Konverterings fejl:</target>
 
-<source>Error deleting file:</source>
-<target>Fejl i sletning af fil:</target>
+<source>Cannot delete file %x.</source>
+<target>Kan ikke slette filen %x.</target>
 
-<source>Error moving file:</source>
-<target>Fejl i flytning af fil:</target>
+<source>The file is locked by another process:</source>
+<target>Filen er låst af en anden process:</target>
 
-<source>Target file already existing!</source>
-<target>Filen findes i forvejen!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Kan ikke flytte filen %x til %y.</target>
 
-<source>Error moving directory:</source>
-<target>Fejl i flytning af bibliotek:</target>
+<source>Cannot delete directory %x.</source>
+<target>Kan ikke slette biblioteket %x.</target>
 
-<source>Target directory already existing!</source>
-<target>Bibliotek findes i forvejen!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Kan ikke opdatere ændringstiden på %x.</target>
 
-<source>Error deleting directory:</source>
-<target>Fejl i sletning af bibliotek:</target>
+<source>Cannot find system function %x.</source>
+<target>Kan ikke finde systemfunktionen %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Fejl i ændring af modificerings tiden:</target>
+<source>Cannot read security context of %x.</source>
+<target>Kan ikke læse sikkerhedsindstillingerne på %x.</target>
 
-<source>Error loading library function:</source>
-<target>Fejl i biblioteks funktionen:</target>
+<source>Cannot write security context of %x.</source>
+<target>Kan ikke skrive sikkerhedsindstillingerne på %x.</target>
 
-<source>Error reading security context:</source>
-<target>Fejl i læsning af sikkerhedstilladelser:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Kan ikke læse tilladelserne på %x.</target>
 
-<source>Error writing security context:</source>
-<target>Fejl i skrivning af sikkerhedstilladelser:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Kan ikke skrive tilladelserne til %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Fejl i kopiering af filtilladelser:</target>
+<source>Cannot create directory %x.</source>
+<target>Kan ikke oprette biblioteket %x.</target>
 
-<source>Error creating directory:</source>
-<target>Fejl i oprettelse af bibliotek:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Kan ikke kopiere linket %x til %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Fejl i kopiering af link:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Kan ikke skrive fil attributter til %x.</target>
 
-<source>Error copying file:</source>
-<target>Fejl i kopiering af fil:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Kan ikke kopiere filen %x til %y.</target>
 
-<source>Error opening file:</source>
-<target>Fejl i åbning af fil:</target>
+<source>Cannot read directory %x.</source>
+<target>Kan ikke læse biblioteket %x.</target>
 
-<source>Error traversing directory:</source>
-<target>Fejl i gennemgang af bibliotek:</target>
+<source>Endless loop.</source>
+<target>Uendelig løkke.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Uendelig løkke ved gennemgang af bibliotek:</target>
+<source>Cannot set privilege %x.</source>
+<target>Kan ikke sætte privilegier til %x.</target>
 
-<source>Error setting privilege:</source>
-<target>Fejl i at sætte privilegier:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Ude af stand til at flytte %x til skraldespanden!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Begge sider er ændret siden sidste synkronisering!</target>
@@ -1308,8 +1296,8 @@ Udeluk: \ting\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Du kan ignorer denne fejl, og opfatte biblioteket som tomt.</target>
 
-<source>Directory does not exist:</source>
-<target>Biblioteket findes ikke:</target>
+<source>Cannot find directory %x.</source>
+<target>Kan ikke finde biblioteket %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Biblioteker er afhængige! Vær forsigtig når du laver synkroniserings reglerne:</target>
@@ -1317,20 +1305,17 @@ Udeluk: \ting\temp\*
 <source>Preparing synchronization...</source>
 <target>Forbereder synkronisering...</target>
 
-<source>Out of memory!</source>
-<target>Ude af hukommelse!</target>
+<source>Conflict detected:</source>
+<target>Konflik fundet:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Filen %x har en ugyldig dato!</target>
 
-<source>Conflict detected:</source>
-<target>Konflik fundet:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Filerne %x har den samme dato men forskellig størrelse!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Links %x har den samme dato men forskellige destinationerl!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Linksene %x har samme dato men forskellige mål.</target>
 
 <source>Comparing content of files %x</source>
 <target>Sammenligner indhold af filer %x</target>
@@ -1413,11 +1398,11 @@ Udeluk: \ting\temp\*
 <source>Creating file %x</source>
 <target>Opretter filen %x</target>
 
-<source>Creating folder %x</source>
-<target>Opretter mappe %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Opretter linket %x</target>
+
+<source>Creating folder %x</source>
+<target>Opretter mappe %x</target>
 
 <source>Overwriting file %x</source>
 <target>Overskriver filen %x</target>
@@ -1437,8 +1422,8 @@ Udeluk: \ting\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Fil versions biblioteket blev ikke angivet!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Kilde biblioteket findes ikke mere:</target>
+<source>Source directory %x not found.</source>
+<target>Kildebiblioteket %x blev ikke fundet.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Er er uløste konflikter!</target>
@@ -1472,12 +1457,6 @@ Udeluk: \ting\temp\*
 
 <source>Generating database...</source>
 <target>Opretter database...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Intet at synkronisere!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>Ude af stand til at kopiere låst fil %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Data godkendelses fejl: Kilde og destinations fil har forskelligt indhold!</target>

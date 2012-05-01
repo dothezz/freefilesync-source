@@ -47,7 +47,7 @@ private:
     ~LeakChecker();
 
     static std::string rawMemToString(const void* ptr, size_t size);
-    void reportProblem(const std::string& message); //throw (std::logic_error)
+    void reportProblem(const std::string& message); //throw std::logic_error
 
     boost::mutex lockActStrings;
     zen::hash_map<const void*, size_t> activeStrings;
@@ -58,7 +58,7 @@ private:
 class AllocatorFreeStoreChecked
 {
 public:
-    static void* allocate(size_t size) //throw (std::bad_alloc)
+    static void* allocate(size_t size) //throw std::bad_alloc
     {
 #ifndef NDEBUG
         void* newMem = ::operator new(size);
@@ -115,18 +115,19 @@ typedef char Zchar;
 const Zchar FILE_NAME_SEPARATOR = '/';
 
 #else
-#error define platform you are in: FFS_WIN or FFS_LINUX
+#error define your platform: FFS_WIN or FFS_LINUX
 #endif
 
 //"The reason for all the fuss above" - Loki/SmartPtr
-//a high-performant string for use as file name in multithreaded contexts
+//a high-performance string for use as file name in multithreaded contexts
 typedef zen::Zbase<Zchar, zen::StorageRefCountThreadSafe, AllocatorFreeStoreChecked> Zstring;
 
 
-
-
-
-
+inline
+Zstring appendSeparator(Zstring path) //support rvalue references!
+{
+    return endsWith(path, FILE_NAME_SEPARATOR) ? path : (path += FILE_NAME_SEPARATOR);
+}
 
 
 

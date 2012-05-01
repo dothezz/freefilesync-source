@@ -5,18 +5,17 @@
 // **************************************************************************
 
 #include "batch_status_handler.h"
-#include "msg_popup.h"
 #include <wx/ffile.h>
-#include <wx/msgdlg.h>
-#include "../lib/ffs_paths.h"
 #include <zen/file_handling.h>
-#include "../lib/resolve_path.h"
+#include <zen/file_traverser.h>
 #include <wx+/string_conv.h>
 #include <wx+/app_main.h>
-#include <zen/file_traverser.h>
-#include <zen/time.h>
-#include "exec_finished_box.h"
+#include <wx+/format_unit.h>
 #include <wx+/shell_execute.h>
+#include "msg_popup.h"
+#include "exec_finished_box.h"
+#include "../lib/ffs_paths.h"
+#include "../lib/resolve_path.h"
 #include "../lib/status_handler_impl.h"
 
 using namespace zen;
@@ -24,7 +23,7 @@ using namespace zen;
 
 namespace
 {
-class FindLogfiles : public zen::TraverseCallback
+class FindLogfiles : public TraverseCallback
 {
 public:
     FindLogfiles(const Zstring& prefix, std::vector<Zstring>& logfiles) : prefix_(prefix), logfiles_(logfiles) {}
@@ -57,31 +56,47 @@ public:
     {
         logFile.Open(toWx(logfileName), L"w");
         if (!logFile.IsOpened())
-            throw FileError(_("Unable to create log file!") + L"\"" + logfileName + L"\"");
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(logfileName)));
 
         //write header
-        wxString headerLine = wxString(L"FreeFileSync - ") + _("Batch execution") + L" - " + formatTime<wxString>(FORMAT_DATE);
-
-        logFile.Write(headerLine + wxChar('\n'));
+        const wxString& headerLine = wxString(L"FreeFileSync - ") + _("Batch execution") + L" - " + formatTime<wxString>(FORMAT_DATE);
+        logFile.Write(headerLine + L'\n');
         logFile.Write(wxString().Pad(headerLine.Len(), L'=') + L'\n');
 
-        logItemStart = formatTime<wxString>(L"[%X] ") + _("Start");
+        //logItemStart = formatTime<wxString>(L"[%X] ") + _("Start");
 
         totalTime.Start(); //measure total time
     }
 
-    void writeLog(const ErrorLog& log, const std::wstring& finalStatus)
+    void writeLog(const ErrorLog& log, const std::wstring& finalStatus,
+                  int itemsSynced, Int64 dataSynced,
+                  int itemsTotal,  Int64 dataTotal)
     {
-        const size_t sepLineLen = finalStatus.size();
+        //assemble results box
+        std::vector<wxString> results;
+        results.push_back(finalStatus);
+        results.push_back(L"");
+        if (itemsTotal != 0 || dataTotal != 0) //=: sync phase was reached and there were actual items to sync
+        {
+            results.push_back(L"    " + _("Items processed:") + L" " + toStringSep(itemsSynced) + L" (" + filesizeToShortString(dataSynced) + L")");
 
-        //result + statistics
-        logFile.Write(wxString().Pad(sepLineLen, L'_') + L'\n');
-        logFile.Write(L"\n" + finalStatus + L"\n");
+            if (itemsSynced != itemsTotal ||
+                dataSynced  != dataTotal)
+                results.push_back(L"    " + _("Items remaining:") + L" " + toStringSep(itemsTotal - itemsSynced) + L" (" + filesizeToShortString(dataTotal - dataSynced) + L")");
+        }
+        results.push_back(L"    " + _("Total time:") + L" " + wxTimeSpan::Milliseconds(totalTime.Time()).Format());
+
+        //write results box
+        size_t sepLineLen = 0;
+        std::for_each(results.begin(), results.end(), [&](const wxString& str) { sepLineLen = std::max(sepLineLen, str.size()); });
+
+        logFile.Write(wxString().Pad(sepLineLen, L'_') + L"\n\n");
+        std::for_each(results.begin(), results.end(), [&](const wxString& str) { logFile.Write(str + L'\n'); });
         logFile.Write(wxString().Pad(sepLineLen, L'_') + L"\n\n");
 
-        logFile.Write(logItemStart + L"\n\n");
+        //logFile.Write(logItemStart + L"\n\n");
 
-        //write actual logfile
+        //write log items
         const auto& entries = log.getEntries();
         for (auto iter = entries.begin(); iter != entries.end(); ++iter)
         {
@@ -90,9 +105,9 @@ public:
             logFile.Write(L'\n');
         }
 
-        //write footer
-        logFile.Write(L'\n');
-        logFile.Write(formatTime<wxString>(L"[%X] ") + _("Stop") + L" (" + _("Total time:") + L" " + wxTimeSpan::Milliseconds(totalTime.Time()).Format() + L")\n");
+        ////write footer
+        //logFile.Write(L'\n');
+        //logFile.Write(formatTime<wxString>(L"[%X] ") + _("Stop") + L" (" + _("Total time:") + L" " + wxTimeSpan::Milliseconds(totalTime.Time()).Format() + L")\n");
     }
 
     void limitLogfileCount(size_t maxCount) const //throw()
@@ -111,7 +126,7 @@ public:
         std::nth_element(logFiles.begin(), logFiles.end() - maxCount, logFiles.end()); //take advantage of logfile naming convention to find oldest files
 
         std::for_each(logFiles.begin(), logFiles.end() - maxCount,
-        [](const Zstring& filename) { try { zen::removeFile(filename); } catch (FileError&) {} });
+        [](const Zstring& filename) { try { removeFile(filename); } catch (FileError&) {} });
     }
 
     //Zstring getLogfileName() const { return logfileName; }
@@ -121,23 +136,20 @@ private:
     {
         //create logfile directory
         Zstring logfileDir = logfileDirectory.empty() ?
-                             zen::getConfigDir() + Zstr("Logs") :
-                             zen::getFormattedDirectoryName(logfileDirectory);
+                             getConfigDir() + Zstr("Logs") :
+                             getFormattedDirectoryName(logfileDirectory);
 
-        if (!zen::dirExists(logfileDir))
-            zen::createDirectory(logfileDir); //throw FileError; create recursively if necessary
+        if (!dirExists(logfileDir))
+            createDirectory(logfileDir); //throw FileError; create recursively if necessary
 
         //assemble logfile name
-        if (!endsWith(logfileDir, FILE_NAME_SEPARATOR))
-            logfileDir += FILE_NAME_SEPARATOR;
-
-        const Zstring logfileName = logfileDir + toZ(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"));
+        const Zstring logfileName = appendSeparator(logfileDir) + toZ(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"));
 
         //ensure uniqueness
         Zstring output = logfileName + Zstr(".log");
 
-        for (int i = 1; zen::somethingExists(output); ++i)
-            output = logfileName + Zstr('_') + zen::numberTo<Zstring>(i) + Zstr(".log");
+        for (int i = 1; somethingExists(output); ++i)
+            output = logfileName + Zstr('_') + numberTo<Zstring>(i) + Zstr(".log");
         return output;
     }
 
@@ -145,7 +157,6 @@ private:
     const Zstring logfileName;
     wxFFile logFile;
     wxStopWatch totalTime;
-    wxString logItemStart;
 };
 
 
@@ -163,21 +174,18 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     showFinalResults(showProgress), //=> exit immediately or wait when finished
     switchToGuiRequested(false),
     handleError_(handleError),
-    currentProcess(StatusHandler::PROCESS_NONE),
     returnValue(returnVal),
-    syncStatusFrame(*this, nullptr, SyncStatus::SCANNING, showProgress, jobName, execWhenFinished, execFinishedHistory)
+    syncStatusFrame(*this, *this, nullptr, showProgress, jobName, execWhenFinished, execFinishedHistory)
 {
-    if (logFileCountMax > 0)
-    {
+    if (logFileCountMax > 0) //init log file: starts internal timer!
         if (!tryReportingError([&]
     {
-        logFile = std::make_shared<LogFile>(toZ(logfileDirectory), jobName); //throw FileError
+        logFile.reset(new LogFile(toZ(logfileDirectory), jobName)); //throw FileError
             logFile->limitLogfileCount(logFileCountMax); //throw()
         }, *this))
-        {
-            returnValue = -7;
-            throw BatchAbortProcess();
-        }
+    {
+        returnValue = -7;
+        throw BatchAbortProcess();
     }
 
     //::wxSetEnv(L"logfile", logFile->getLogfileName());
@@ -194,7 +202,7 @@ BatchStatusHandler::~BatchStatusHandler()
     {
         returnValue = -4;
         finalStatus = _("Synchronization aborted!");
-        errorLog.logMsg(finalStatus, TYPE_FATAL_ERROR);
+        errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalErrors > 0)
     {
@@ -204,14 +212,20 @@ BatchStatusHandler::~BatchStatusHandler()
     }
     else
     {
-        finalStatus = _("Synchronization completed successfully!");
+        if (getObjectsTotal(PHASE_SYNCHRONIZING) == 0 && //we're past "initNewPhase(PHASE_SYNCHRONIZING)" at this point!
+            getDataTotal   (PHASE_SYNCHRONIZING) == 0)
+            finalStatus = _("Nothing to synchronize!"); //even if "ignored conflicts" occurred!
+        else
+            finalStatus = _("Synchronization completed successfully!");
         errorLog.logMsg(finalStatus, TYPE_INFO);
     }
 
     //print the results list: logfile
     if (logFile.get())
     {
-        logFile->writeLog(errorLog, finalStatus);
+        logFile->writeLog(errorLog, finalStatus,
+                          getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
+                          getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING));
         logFile.reset(); //close file now: user may do something with it in "on completion"
     }
 
@@ -240,19 +254,18 @@ BatchStatusHandler::~BatchStatusHandler()
                 shellExecute(finalCommand);
         }
 
-
         if (showFinalResults) //warning: wxWindow::Show() is called within processHasFinished()!
         {
             //notify about (logical) application main window => program won't quit, but stay on this dialog
-            zen::setMainWindow(syncStatusFrame.getAsWindow());
+            setMainWindow(syncStatusFrame.getAsWindow());
 
             //notify to syncStatusFrame that current process has ended
             if (abortIsRequested())
-                syncStatusFrame.processHasFinished(SyncStatus::ABORTED, errorLog);  //enable okay and close events
+                syncStatusFrame.processHasFinished(SyncStatus::RESULT_ABORTED, errorLog);  //enable okay and close events
             else if (totalErrors > 0)
-                syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, errorLog);
+                syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_ERROR, errorLog);
             else
-                syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, errorLog);
+                syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_SUCCESS, errorLog);
         }
         else
             syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
@@ -260,68 +273,36 @@ BatchStatusHandler::~BatchStatusHandler()
 }
 
 
-void BatchStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, StatusHandler::Process processID)
+void BatchStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, ProcessCallback::Phase phaseID)
 {
-    currentProcess = processID;
-
-    switch (currentProcess)
-    {
-        case StatusHandler::PROCESS_SCANNING:
-            syncStatusFrame.initNewProcess(SyncStatus::SCANNING, 0, 0); //initialize some gui elements (remaining time, speed)
-            break;
-        case StatusHandler::PROCESS_COMPARING_CONTENT:
-            syncStatusFrame.initNewProcess(SyncStatus::COMPARING_CONTENT, objectsTotal, dataTotal);
-            break;
-        case StatusHandler::PROCESS_SYNCHRONIZING:
-            syncStatusFrame.initNewProcess(SyncStatus::SYNCHRONIZING, objectsTotal, dataTotal);
-            break;
-        case StatusHandler::PROCESS_NONE:
-            assert(false);
-            break;
-    }
+    StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
+    syncStatusFrame.initNewPhase(); //call after "StatusHandler::initNewPhase"
 }
 
 
 void BatchStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
 {
-    switch (currentProcess)
+    StatusHandler::updateProcessedData(objectsDelta, dataDelta);
+
+    switch (currentPhase())
     {
-        case StatusHandler::PROCESS_SCANNING:
-            syncStatusFrame.incScannedObjects_NoUpdate(objectsDelta); //throw ()
-            break;
-        case StatusHandler::PROCESS_COMPARING_CONTENT:
-        case StatusHandler::PROCESS_SYNCHRONIZING:
-            syncStatusFrame.incProcessedData_NoUpdate(objectsDelta, dataDelta);
-            break;
-        case StatusHandler::PROCESS_NONE:
+        case ProcessCallback::PHASE_NONE:
             assert(false);
+        case ProcessCallback::PHASE_SCANNING:
+            break;
+        case ProcessCallback::PHASE_COMPARING_CONTENT:
+        case ProcessCallback::PHASE_SYNCHRONIZING:
+            syncStatusFrame.reportCurrentBytes(getDataCurrent(currentPhase()));
             break;
     }
-
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!
-}
-
-
-void BatchStatusHandler::updateTotalData(int objectsDelta, Int64 dataDelta)
-{
-    assert(currentProcess != PROCESS_SCANNING);
-    syncStatusFrame.incTotalData_NoUpdate(objectsDelta, dataDelta);
-}
-
-
-void BatchStatusHandler::reportStatus(const std::wstring& text)
-{
-    syncStatusFrame.setStatusText_NoUpdate(text);
-    requestUiRefresh(); //throw AbortThisProcess
 }
 
 
 void BatchStatusHandler::reportInfo(const std::wstring& text)
 {
+    StatusHandler::reportInfo(text);
     errorLog.logMsg(text, TYPE_INFO);
-
-    syncStatusFrame.setStatusText_NoUpdate(text);
-    requestUiRefresh(); //throw AbortThisProcess
 }
 
 
@@ -340,8 +321,9 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
             forceUiRefresh();
 
             bool dontWarnAgain = false;
-            switch (showWarningDlg(ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_SWITCH | ReturnWarningDlg::BUTTON_ABORT,
-                                   warningMessage + wxT("\n\n") + _("Press \"Switch\" to open FreeFileSync GUI mode."),
+            switch (showWarningDlg(syncStatusFrame.getAsWindow(),
+                                   ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_SWITCH | ReturnWarningDlg::BUTTON_ABORT,
+                                   warningMessage + L"\n\n" + _("Press \"Switch\" to resolve issues in FreeFileSync main dialog."),
                                    dontWarnAgain))
             {
                 case ReturnWarningDlg::BUTTON_ABORT:
@@ -349,7 +331,7 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
                     break;
 
                 case ReturnWarningDlg::BUTTON_SWITCH:
-                    errorLog.logMsg(_("Switching to FreeFileSync GUI mode..."), TYPE_INFO);
+                    errorLog.logMsg(_("Switching to FreeFileSync main dialog..."), TYPE_INFO);
                     switchToGuiRequested = true;
                     abortThisProcess();
                     break;
@@ -365,7 +347,7 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
             abortThisProcess();
             break;
 
-        case xmlAccess::ON_ERROR_IGNORE: //no unhandled error situation!
+        case xmlAccess::ON_ERROR_IGNORE:
             break;
     }
 }
@@ -381,9 +363,9 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
-                                 errorMessage,
-                                 &ignoreNextErrors))
+            switch (showErrorDlg(syncStatusFrame.getAsWindow(),
+                                 ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
+                                 errorMessage, &ignoreNextErrors))
             {
                 case ReturnErrorDlg::BUTTON_IGNORE:
                     if (ignoreNextErrors) //falsify only
@@ -428,9 +410,9 @@ void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_ABORT,
-                                 errorMessage,
-                                 &ignoreNextErrors))
+            switch (showErrorDlg(syncStatusFrame.getAsWindow(),
+                                 ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_ABORT,
+                                 errorMessage, &ignoreNextErrors))
             {
                 case ReturnErrorDlg::BUTTON_IGNORE:
                     if (ignoreNextErrors) //falsify only
@@ -459,12 +441,12 @@ void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
 
 void BatchStatusHandler::forceUiRefresh()
 {
-    syncStatusFrame.updateStatusDialogNow();
+    syncStatusFrame.updateProgress();
 }
 
 
 void BatchStatusHandler::abortThisProcess()
 {
-    requestAbortion();
+    requestAbortion(); //just make sure...
     throw BatchAbortProcess();  //abort can be triggered by syncStatusFrame
 }

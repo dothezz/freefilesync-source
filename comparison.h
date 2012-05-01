@@ -7,7 +7,7 @@
 #ifndef COMPARISON_H_INCLUDED
 #define COMPARISON_H_INCLUDED
 
-#include <zen/process_status.h>
+#include <zen/process_priority.h>
 #include "file_hierarchy.h"
 #include "lib/process_xml.h"
 #include "process_callback.h"

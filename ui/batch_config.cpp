@@ -33,7 +33,7 @@ class BatchDialog: public BatchDlgGenerated
     friend class FolderPairCallback;
 
 public:
-    BatchDialog(wxWindow* window,
+    BatchDialog(wxWindow* parent,
                 const wxString& referenceFile,
                 const xmlAccess::XmlBatchConfig& batchCfg,
                 const std::shared_ptr<FolderHistory>& folderHistLeft,
@@ -42,23 +42,23 @@ public:
                 size_t onCompletionHistoryMax);
 
 private:
-    virtual void OnCmpSettings(        wxCommandEvent& event);
-    virtual void OnSyncSettings(       wxCommandEvent& event);
-    virtual void OnConfigureFilter(    wxCommandEvent& event);
-    virtual void OnHelp(               wxCommandEvent& event);
+    virtual void OnCmpSettings    (wxCommandEvent& event);
+    virtual void OnSyncSettings   (wxCommandEvent& event);
+    virtual void OnConfigureFilter(wxCommandEvent& event);
+    virtual void OnHelp           (wxCommandEvent& event);
 
     void OnCompSettingsContext(wxCommandEvent& event);
     void OnSyncSettingsContext(wxCommandEvent& event);
     void OnGlobalFilterContext(wxCommandEvent& event);
-    virtual void OnCheckSaveLog(        wxCommandEvent& event);
+    virtual void OnCheckSaveLog        (wxCommandEvent& event);
     virtual void OnChangeMaxLogCountTxt(wxCommandEvent& event);
-    virtual void OnClose(              wxCloseEvent&   event) { EndModal(0); }
-    virtual void OnCancel(             wxCommandEvent& event) { EndModal(0); }
-    virtual void OnSaveBatchJob(       wxCommandEvent& event);
-    virtual void OnLoadBatchJob(       wxCommandEvent& event);
-    virtual void OnAddFolderPair(      wxCommandEvent& event);
-    virtual void OnRemoveFolderPair(   wxCommandEvent& event);
-    virtual void OnRemoveTopFolderPair(wxCommandEvent& event);
+    virtual void OnClose               (wxCloseEvent&   event) { EndModal(0); }
+    virtual void OnCancel              (wxCommandEvent& event) { EndModal(0); }
+    virtual void OnSaveBatchJob        (wxCommandEvent& event);
+    virtual void OnLoadBatchJob        (wxCommandEvent& event);
+    virtual void OnAddFolderPair       (wxCommandEvent& event);
+    virtual void OnRemoveFolderPair    (wxCommandEvent& event);
+    virtual void OnRemoveTopFolderPair (wxCommandEvent& event);
     void OnFilesDropped(FileDropEvent& event);
 
     void addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
@@ -229,14 +229,14 @@ private:
 //###################################################################################################################################
 
 
-BatchDialog::BatchDialog(wxWindow* window,
+BatchDialog::BatchDialog(wxWindow* parent,
                          const wxString& referenceFile,
                          const xmlAccess::XmlBatchConfig& batchCfg,
                          const std::shared_ptr<FolderHistory>& folderHistLeft,
                          const std::shared_ptr<FolderHistory>& folderHistRight,
                          std::vector<std::wstring>& onCompletionHistory,
                          size_t onCompletionHistoryMax) :
-    BatchDlgGenerated(window),
+    BatchDlgGenerated(parent),
     folderHistLeft_(folderHistLeft),
     folderHistRight_(folderHistRight),
     onCompletionHistory_(onCompletionHistory),
@@ -317,7 +317,7 @@ void BatchDialog::OnCmpSettings(wxCommandEvent& event)
     //wxPoint windowPos = m_bpButtonCmpConfig->GetScreenPosition();
     //windowPos.x += m_bpButtonCmpConfig->GetSize().GetWidth() + 5;
 
-    if (zen::showCompareCfgDialog(localBatchCfg.mainCfg.cmpConfig) == ReturnSmallDlg::BUTTON_OKAY)
+    if (zen::showCompareCfgDialog(this,localBatchCfg.mainCfg.cmpConfig) == ReturnSmallDlg::BUTTON_OKAY)
     {
         updateGui();
     }
@@ -331,7 +331,8 @@ void BatchDialog::OnSyncSettings(wxCommandEvent& event)
                                    onCompletionHistoryMax_
                                  };
 
-    if (showSyncConfigDlg(localBatchCfg.mainCfg.cmpConfig.compareVar,
+    if (showSyncConfigDlg(this,
+                          localBatchCfg.mainCfg.cmpConfig.compareVar,
                           localBatchCfg.mainCfg.syncCfg,
                           nullptr,
                           &ewfCfg) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
@@ -343,7 +344,8 @@ void BatchDialog::OnSyncSettings(wxCommandEvent& event)
 
 void BatchDialog::OnConfigureFilter(wxCommandEvent& event)
 {
-    if (showFilterDialog(true, //is main filter dialog
+    if (showFilterDialog(this,
+                         true, //is main filter dialog
                          localBatchCfg.mainCfg.globalFilter) == ReturnSmallDlg::BUTTON_OKAY)
     {
         updateGui();
@@ -455,23 +457,7 @@ void BatchDialog::OnChangeMaxLogCountTxt(wxCommandEvent& event)
 
 void BatchDialog::OnFilesDropped(FileDropEvent& event)
 {
-    if (event.getFiles().empty())
-        return;
-
-    const std::vector<wxString>& fileList = event.getFiles();
-
-    switch (xmlAccess::getMergeType(fileList))   //throw ()
-    {
-        case xmlAccess::MERGE_BATCH:
-        case xmlAccess::MERGE_GUI:
-        case xmlAccess::MERGE_GUI_BATCH:
-            loadBatchFile(fileList);
-            break;
-
-        case xmlAccess::MERGE_OTHER:
-            wxMessageBox(_("Invalid FreeFileSync config file!"), _("Error"), wxOK | wxICON_ERROR);
-            break;
-    }
+    loadBatchFile(event.getFiles());
 }
 
 
@@ -578,11 +564,11 @@ bool BatchDialog::saveBatchFile(const wxString& filename)
     //write config to XML
     try
     {
-        xmlAccess::writeConfig(batchCfg, filename);
+        xmlAccess::writeConfig(batchCfg, toZ(filename));
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
-        wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR, this);
         return false;
     }
 
@@ -611,17 +597,17 @@ void BatchDialog::loadBatchFile(const std::vector<wxString>& filenames)
     try
     {
         //open a *.ffs_gui or *.ffs_batch file!
-        xmlAccess::convertConfig(filenames, batchCfg); //throw (xmlAccess::FfsXmlError)
+        xmlAccess::convertConfig(toZ(filenames), batchCfg); //throw FfsXmlError
 
         //xmlAccess::readConfig(filename, batchCfg);
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
         if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-            wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
+            wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING, this);
         else
         {
-            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR, this);
             return;
         }
     }
@@ -888,70 +874,14 @@ void BatchDialog::clearAddFolderPairs()
 }
 
 
-/*
-#ifdef FFS_WIN
-#include <zen/win.h> //includes "windows.h"
-#include <shlobj.h>
-#endif  // FFS_WIN
-
-
-bool BatchDialog::createBatchFile(const wxString& filename)
-{
-    //create shell link (instead of batch file) for full Unicode support
-    HRESULT hResult = E_FAIL;
-    IShellLink* pShellLink = nullptr;
-
-    if (FAILED(CoCreateInstance(CLSID_ShellLink,       //class identifier
-                                nullptr,                  //object isn't part of an aggregate
-                                CLSCTX_INPROC_SERVER,  //context for running executable code
-                                IID_IShellLink,        //interface identifier
-                                (void**)&pShellLink))) //pointer to storage of interface pointer
-        return false;
-    CleanUp<IShellLink> cleanOnExit(pShellLink);
-
-    wxString freeFileSyncExe = wxStandardPaths::Get().GetExecutablePath();
-    if (FAILED(pShellLink->SetPath(freeFileSyncExe.c_str())))
-        return false;
-
-    if (FAILED(pShellLink->SetArguments(getCommandlineArguments().c_str())))
-        return false;
-
-    if (FAILED(pShellLink->SetIconLocation(freeFileSyncExe.c_str(), 1))) //second icon from executable file is used
-        return false;
-
-    if (FAILED(pShellLink->SetDescription(_("FreeFileSync Batch Job"))))
-        return false;
-
-    IPersistFile*  pPersistFile = nullptr;
-    if (FAILED(pShellLink->QueryInterface(IID_IPersistFile, (void**)&pPersistFile)))
-        return false;
-    CleanUp<IPersistFile> cleanOnExit2(pPersistFile);
-
-    //pPersistFile->Save accepts unicode input only
-#ifdef _UNICODE
-    hResult = pPersistFile->Save(filename.c_str(), TRUE);
-#else
-    WCHAR wszTemp [MAX_PATH];
-    if (MultiByteToWideChar(CP_ACP, 0, filename.c_str(), -1, wszTemp, MAX_PATH) == 0)
-        return false;
-
-    hResult = pPersistFile->Save(wszTemp, TRUE);
-#endif
-    if (FAILED(hResult))
-        return false;
-
-    return true;
-}
-*/
-
-
-void zen::showSyncBatchDlg(const wxString& referenceFile,
+void zen::showSyncBatchDlg(wxWindow* parent,
+                           const wxString& referenceFile,
                            const xmlAccess::XmlBatchConfig& batchCfg,
                            const std::shared_ptr<FolderHistory>& folderHistLeft,
                            const std::shared_ptr<FolderHistory>& folderHistRight,
                            std::vector<std::wstring>& execFinishedhistory,
                            size_t execFinishedhistoryMax)
 {
-    BatchDialog batchDlg(nullptr, referenceFile, batchCfg, folderHistLeft, folderHistRight, execFinishedhistory, execFinishedhistoryMax);
+    BatchDialog batchDlg(parent, referenceFile, batchCfg, folderHistLeft, folderHistRight, execFinishedhistory, execFinishedhistoryMax);
     batchDlg.ShowModal();
 }

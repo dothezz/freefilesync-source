@@ -27,9 +27,9 @@ public:
     }
 
     void init(const wxBitmap& activeBmp,
-              const wxString& activeTooltip,
               const wxBitmap& inactiveBmp,
-              const wxString& inactiveTooltip);
+              const wxString& activeTooltip,
+              const wxString& inactiveTooltip = wxString());
 
     void setActive(bool value);
     bool isActive() const { return active; }
@@ -60,14 +60,14 @@ private:
 //######################## implementation ########################
 inline
 void ToggleButton::init(const wxBitmap& activeBmp,
-                        const wxString& activeTooltip,
                         const wxBitmap& inactiveBmp,
+                        const wxString& activeTooltip,
                         const wxString& inactiveTooltip)
 {
     m_activeBmp       = activeBmp;
     m_activeTooltip   = activeTooltip;
     m_inactiveBmp     = inactiveBmp;
-    m_inactiveTooltip = inactiveTooltip;
+    m_inactiveTooltip = inactiveTooltip.empty() ? activeTooltip : inactiveTooltip;
 
     //load resources
     setActive(active);

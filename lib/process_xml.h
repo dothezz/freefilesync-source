@@ -23,7 +23,7 @@ enum XmlType
     XML_TYPE_OTHER
 };
 
-XmlType getXmlType(const wxString& filename); //throw()
+XmlType getXmlType(const Zstring& filename); //throw()
 
 
 enum OnError
@@ -124,7 +124,8 @@ struct XmlGlobalSettings
         runWithBackgroundPriority(false),
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS
         verifyFileCopy(false),
-        transactionalFileCopy(true) {}
+        transactionalFileCopy(true),
+        createLockFile(true) {}
 
     int programLanguage;
     bool copyLockedFiles;          //VSS usage
@@ -135,6 +136,7 @@ struct XmlGlobalSettings
     size_t fileTimeTolerance; //max. allowed file time deviation
     bool verifyFileCopy;   //verify copied files
     bool transactionalFileCopy;
+    bool createLockFile;
 
     OptionalDialogs optDialogs;
 
@@ -222,17 +224,17 @@ struct XmlGlobalSettings
     //struct Batch
 };
 
-void readConfig(const wxString& filename, XmlGuiConfig&      config); //throw xmlAccess::FfsXmlError
-void readConfig(const wxString& filename, XmlBatchConfig&    config); //throw xmlAccess::FfsXmlError
-void readConfig(                          XmlGlobalSettings& config); //throw xmlAccess::FfsXmlError
+void readConfig(const Zstring& filename, XmlGuiConfig&      config); //throw FfsXmlError
+void readConfig(const Zstring& filename, XmlBatchConfig&    config); //throw FfsXmlError
+void readConfig(                         XmlGlobalSettings& config); //throw FfsXmlError
 
-void writeConfig(const XmlGuiConfig&      config, const wxString& filename); //throw xmlAccess::FfsXmlError
-void writeConfig(const XmlBatchConfig&    config, const wxString& filename); //throw xmlAccess::FfsXmlError
-void writeConfig(const XmlGlobalSettings& config);                           //throw xmlAccess::FfsXmlError
+void writeConfig(const XmlGuiConfig&      config, const Zstring& filename); //throw FfsXmlError
+void writeConfig(const XmlBatchConfig&    config, const Zstring& filename); //throw FfsXmlError
+void writeConfig(const XmlGlobalSettings& config);                          //throw FfsXmlError
 
 //config conversion utilities
 XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg);
-XmlBatchConfig convertGuiToBatch(const XmlGuiConfig& guiCfg, const wxString& referenceFile);
+XmlBatchConfig convertGuiToBatch(const XmlGuiConfig& guiCfg, const Zstring& referenceFile);
 
 
 //convert (multiple) *.ffs_gui, *.ffs_batch files or combinations of both into target config structure:
@@ -243,10 +245,10 @@ enum MergeType
     MERGE_GUI_BATCH, //gui and batch files
     MERGE_OTHER
 };
-MergeType getMergeType(const std::vector<wxString>& filenames);   //throw ()
+MergeType getMergeType(const std::vector<Zstring>& filenames);   //throw ()
 
-void convertConfig(const std::vector<wxString>& filenames, XmlGuiConfig&   config); //throw xmlAccess::FfsXmlError
-void convertConfig(const std::vector<wxString>& filenames, XmlBatchConfig& config); //throw xmlAccess::FfsXmlError
+void convertConfig(const std::vector<Zstring>& filenames, XmlGuiConfig&   config); //throw xmlAccess::FfsXmlError
+void convertConfig(const std::vector<Zstring>& filenames, XmlBatchConfig& config); //throw xmlAccess::FfsXmlError
 
 wxString extractJobName(const wxString& configFilename);
 }

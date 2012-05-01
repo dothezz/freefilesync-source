@@ -21,17 +21,13 @@ class wxCommandEvent;
 class GuiAbortProcess {};
 
 //classes handling sync and compare error as well as status information
-class CompareStatusHandler : private wxEvtHandler, public StatusHandler
+class CompareStatusHandler : private wxEvtHandler, public zen::StatusHandler
 {
 public:
     CompareStatusHandler(MainDialog& dlg);
     ~CompareStatusHandler();
 
-    virtual void initNewProcess     (int objectsTotal, zen::Int64 dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
-    virtual void updateTotalData    (int objectsDelta, zen::Int64 dataDelta);
-    virtual void reportStatus(const std::wstring& text);
-    virtual void reportInfo(const std::wstring& text);
+    virtual void initNewPhase     (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
     virtual void forceUiRefresh();
 
     virtual Response reportError(const std::wstring& text);
@@ -41,15 +37,14 @@ public:
 private:
     void OnKeyPressed(wxKeyEvent& event);
     void OnAbortCompare(wxCommandEvent& event); //handle abort button click
-    virtual void abortThisProcess();
+    virtual void abortThisProcess(); //throw GuiAbortProcess
 
     MainDialog& mainDlg;
     bool ignoreErrors;
-    Process currentProcess;
 };
 
 
-class SyncStatusHandler : public StatusHandler
+class SyncStatusHandler : public zen::StatusHandler
 {
 public:
     SyncStatusHandler(MainDialog* parentDlg,
@@ -59,10 +54,8 @@ public:
                       std::vector<std::wstring>& execFinishedHistory);
     ~SyncStatusHandler();
 
-    virtual void initNewProcess     (int objectsTotal, zen::Int64 dataTotal, Process processID);
+    virtual void initNewPhase     (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
     virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
-    virtual void updateTotalData    (int objectsDelta, zen::Int64 dataDelta);
-    virtual void reportStatus(const std::wstring& text);
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
 
@@ -71,7 +64,7 @@ public:
     virtual void reportWarning(const std::wstring& warningMessage, bool& warningActive);
 
 private:
-    virtual void abortThisProcess();
+    virtual void abortThisProcess(); //throw GuiAbortProcess
 
     MainDialog* parentDlg_;
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!

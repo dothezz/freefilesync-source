@@ -228,9 +228,9 @@ public:
 #ifdef _MSC_VER
 #pragma warning(default : 4355)
 #endif
-        baseDirPfL(dirPostfixedLeft),
-        baseDirPfR(dirPostfixedRight),
-        dirExistsLeft_(dirExistsLeft),
+        baseDirPfL     (dirPostfixedLeft ),
+        baseDirPfR     (dirPostfixedRight),
+        dirExistsLeft_ (dirExistsLeft    ),
         dirExistsRight_(dirExistsRight) {}
 
     template <SelectedSide side> const Zstring& getBaseDirPf() const; //base sync directory postfixed with FILE_NAME_SEPARATOR
@@ -482,7 +482,6 @@ public:
     template <SelectedSide side> Int64  getLastWriteTime() const;
     template <SelectedSide side> UInt64 getFileSize     () const;
     template <SelectedSide side> FileId getFileId       () const;
-    template <SelectedSide side> const Zstring getExtension() const;
 
     void setMoveRef(ObjectId refId) { moveFileRef = refId; } //reference to corresponding renamed file
     ObjectId getMoveRef() const { return moveFileRef; } //may be nullptr
@@ -1095,19 +1094,6 @@ template <> inline
 FileId FileMapping::getFileId<RIGHT_SIDE>() const
 {
     return dataRight.id;
-}
-
-
-template <SelectedSide side> inline
-const Zstring FileMapping::getExtension() const
-{
-    //attention: Zstring::AfterLast() returns whole string if char not found! -> don't use
-    const Zstring& shortName = getShortName<side>();
-
-    const size_t pos = shortName.rfind(Zchar('.'));
-    return pos == Zstring::npos ?
-           Zstring() :
-           Zstring(shortName.c_str() + pos + 1);
 }
 
 

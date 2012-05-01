@@ -26,7 +26,7 @@ using namespace xmlAccess;
 class SyncCfgDialog : public SyncCfgDlgGenerated
 {
 public:
-    SyncCfgDialog(wxWindow* window,
+    SyncCfgDialog(wxWindow* parent,
                   CompareVariant compareVar,
                   SyncConfig&    syncCfg,
                   xmlAccess::OnGuiError* handleError,     //
@@ -50,9 +50,9 @@ private:
     virtual void OnDifferent(       wxCommandEvent& event);
     virtual void OnConflict(        wxCommandEvent& event);
 
-    virtual void OnClose(           wxCloseEvent&   event) { EndModal(0); }
-    virtual void OnCancel(          wxCommandEvent& event) { EndModal(0); }
-    virtual void OnApply(           wxCommandEvent& event);
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
+    virtual void OnApply (wxCommandEvent& event);
 
     void updateGui();
 
@@ -194,12 +194,12 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
 }
 
 
-SyncCfgDialog::SyncCfgDialog(wxWindow* window,
+SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
                              CompareVariant compareVar,
                              SyncConfig&    syncCfg,
                              xmlAccess::OnGuiError* handleError,
                              ExecWhenFinishedCfg* execWhenFinished) :
-    SyncCfgDlgGenerated(window),
+    SyncCfgDlgGenerated(parent),
     cmpVariant(compareVar),
     currentDirectionCfg(syncCfg.directionCfg),  //make working copy
     syncCfgOut(syncCfg),
@@ -529,12 +529,13 @@ void SyncCfgDialog::OnConflict(wxCommandEvent& event)
 }
 
 
-ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(CompareVariant compareVar,
+ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(wxWindow* parent,
+                                                       CompareVariant compareVar,
                                                        SyncConfig&    syncCfg,
                                                        xmlAccess::OnGuiError* handleError,    //
                                                        ExecWhenFinishedCfg* execWhenFinished) //optional input parameter
 {
-    SyncCfgDialog syncDlg(nullptr,
+    SyncCfgDialog syncDlg(parent,
                           compareVar,
                           syncCfg,
                           handleError,

@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>Обзор папок</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Запрос отмены: Ожидайте, пока текущая операция завершится...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Автоматическая синхронизация</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Код ошибки Linux %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Ошибка при решении символической ссылки:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Не удается разрешить символическую ссылку %x.</target>
 
 <source>%x MB</source>
 <target>%x МБ</target>
@@ -137,35 +140,41 @@
 <pluralform>%x Байт</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Ошибка при чтении из базы данных синхронизации:</target>
+<source>Cannot read file %x.</source>
+<target>Не удается прочитать файл %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Ошибка при записи в базу данных синхронизации:</target>
+<source>Cannot write file %x.</source>
+<target>Не удается записать файл %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Несовместимый формат базы данных синхронизации:</target>
+<source>Database file %x is incompatible.</source>
+<target>Файл базы данных %x несовместим.</target>
 
 <source>Initial synchronization:</source>
 <target>Первоначальная синхронизация:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Одного из файлов баз данных FreeFileSync еще не существует:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Файл базы данных %x еще не существует.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Файлы баз данных не имеют общей сессии синхронизации:</target>
+<source>Out of memory!</source>
+<target>Недостаточно памяти!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Файлы баз данных не имеют общей сессии.</target>
 
 <source>An exception occurred!</source>
 <target>Исключение произошло!</target>
 
-<source>Error reading file attributes:</source>
-<target>Ошибка при чтении параметров файла:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Не удается прочитать атрибуты файла %x.</target>
+
+<source>Cannot get process information.</source>
+<target>Не удается получить информацию о процессе.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
-<target>Ожидание снятия блокировки с папки (%x)...</target>
+<target>Ожидание снятия блокировки с папки %x...</target>
 
-<source>Error setting directory lock:</source>
-<target>Ошибка блокировки папки:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Не удается установить блокировку папка %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -177,8 +186,8 @@
 <pluralform>%x секунд</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Ошибка при чтении файла:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Ошибка при разборе файла %x, строка %y, колонка %z.</target>
 
 <source>Scanning:</source>
 <target>Сканирую:</target>
@@ -196,38 +205,32 @@
 <pluralform>[%x потоков]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Неверный файл конфигурации FreeFileSync!</target>
+<source>/sec</source>
+<target>/с</target>
 
-<source>Error parsing configuration file:</source>
-<target>Ошибка при анализе файла настроек синхронизации:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>Файл %x не содержит действительной конфигурации.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Конфигурация загрузилась частично:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Файл конфигурации %x загрузился частично.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>Невозможно переместить %x в "Корзину"!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Не удается получить доступ к службе Теневого Копирования Тома.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Пожалуйста, используйте 64-разрядную версию FreeFileSync для создания теневых копий на этой системе.</target>
 
 <source>Cannot load file %x.</source>
 <target>Не удается загрузить файл %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Ошибка доступа к службе Теневого Копирования Тома!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Создание теневых копий на WOW64 не поддерживается. Пожалуйста, используйте FreeFileSync 64-разрядной версии.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Невозможно определить имя тома для файла:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>Путь %x не содержит имя тома.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Имя тома %x не является частью имени файла %y!</target>
 
-<source>/sec</source>
-<target>/с</target>
-
-<source>File does not exist:</source>
-<target>Файл не существует:</target>
+<source>Cannot find file %x.</source>
+<target>Не удается найти файл %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Невозможно прочитать следующие XML элементы:</target>
@@ -257,7 +260,7 @@
 <target>Инструкция:</target>
 
 <source>1. Select directories to monitor.</source>
-<target>1. Выберите папки для мониторинга;</target>
+<target>1. Выберите папки для наблюдения;</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Введите командную строку;</target>
@@ -306,9 +309,6 @@ The command line is executed each time:
 <source>RealtimeSync configuration</source>
 <target>Настройка RealtimeSync</target>
 
-<source>File already exists. Overwrite?</source>
-<target>Файл уже существует. Перезаписать?</target>
-
 <source>&Restore</source>
 <target>&Восстановить</target>
 
@@ -316,7 +316,7 @@ The command line is executed each time:
 <target>&Выход</target>
 
 <source>Monitoring active...</source>
-<target>Мониторинг включен...</target>
+<target>Наблюдение включено...</target>
 
 <source>Waiting for missing directories...</source>
 <target>Ожидание пропущенных папок...</target>
@@ -351,20 +351,20 @@ The command line is executed each time:
 <source>FreeFileSync configuration</source>
 <target>Настройка FreeFileSync</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>Пакетное задание FreeFileSync</target>
-
-<source>Unable to create log file!</source>
-<target>Невозможно создать лог-файл!</target>
-
 <source>Batch execution</source>
 <target>Выполнение пакетного задания</target>
 
-<source>Stop</source>
-<target>Стоп</target>
+<source>Items processed:</source>
+<target>Элементов обработано:</target>
+
+<source>Items remaining:</source>
+<target>Элементов осталось:</target>
 
 <source>Total time:</source>
 <target>Общее время:</target>
+
+<source>Stop</source>
+<target>Стоп</target>
 
 <source>Synchronization aborted!</source>
 <target>Синхронизация отменена!</target>
@@ -372,14 +372,17 @@ The command line is executed each time:
 <source>Synchronization completed with errors!</source>
 <target>Синхронизация закончена с ошибками!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Ничего нет для синхронизации!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Синхронизация прошла успешно!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Нажмите "Переключить" для открытия пользовательского графического интерфейса FreeFileSync.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Нажмите "Переключить" для продолжения работы в главном окне FreeFileSync.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Переключение на пользовательский графический интерфейс FreeFileSync...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Переключение на главное окно FreeFileSync...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Невозможно соединиться с sourceforge.net!</target>
@@ -540,9 +543,6 @@ The command line is executed each time:
 <source>Items found:</source>
 <target>Элементов найдено:</target>
 
-<source>Items remaining:</source>
-<target>Элементов осталось:</target>
-
 <source>Speed:</source>
 <target>Скорость:</target>
 
@@ -594,8 +594,8 @@ The command line is executed each time:
 <source>&Load</source>
 <target>&Загрузить</target>
 
-<source>&Cancel</source>
-<target>&Отмена</target>
+<source>Cancel</source>
+<target>Отмена</target>
 
 <source>Select variant:</source>
 <target>Варианты синхронизации</target>
@@ -645,8 +645,8 @@ The command line is executed each time:
 <source>Conflict/file cannot be categorized</source>
 <target>Конфликт/файл не может быть отнесен к какой-либо категории</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Критерии сравнения</target>
@@ -675,9 +675,6 @@ is the same
 
 <source>Synchronizing...</source>
 <target>Синхронизация...</target>
-
-<source>Items processed:</source>
-<target>Элементов обработано:</target>
 
 <source>&Pause</source>
 <target>&Пауза</target>
@@ -1018,9 +1015,6 @@ Exclude: \stuff\temp\*
 <source>File list exported!</source>
 <target>Список файлов экспортирован!</target>
 
-<source>Error writing file:</source>
-<target>Ошибка при записи файла:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1070,20 +1064,20 @@ Exclude: \stuff\temp\*
 <source>Paused</source>
 <target>Пауза</target>
 
+<source>Initializing...</source>
+<target>Инициализация...</target>
+
 <source>Aborted</source>
 <target>Отменено</target>
 
 <source>Completed</source>
 <target>Завершено</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Запрос отмены: Ожидайте, пока текущая операция завершится...</target>
+<source>Continue</source>
+<target>Продолжить</target>
 
 <source>Pause</source>
 <target>Пауза</target>
-
-<source>Continue</source>
-<target>Продолжить</target>
 
 <source>Cannot find %x</source>
 <target>Невозможно найти %x</target>
@@ -1231,65 +1225,65 @@ Exclude: \stuff\temp\*
 <pluralform>%x дней</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Не удалось инициализировать папку для мониторинга:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Ошибка при мониторинге папок.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Не удается наблюдать папку %x.</target>
 
 <source>Conversion error:</source>
 <target>Ошибка преобразования:</target>
 
-<source>Error deleting file:</source>
-<target>Ошибка при удалении файла:</target>
+<source>Cannot delete file %x.</source>
+<target>Не удается удалить файл %x.</target>
 
-<source>Error moving file:</source>
-<target>Ошибка перемещения файла:</target>
+<source>The file is locked by another process:</source>
+<target>Файл заблокирован другим процессом:</target>
 
-<source>Target file already existing!</source>
-<target>Конечный файл уже существует!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Не удается перенести файл %x в %y.</target>
 
-<source>Error moving directory:</source>
-<target>Ошибка перемещения папки:</target>
+<source>Cannot delete directory %x.</source>
+<target>Не удается удалить папку %x.</target>
 
-<source>Target directory already existing!</source>
-<target>Конечная папка уже существует!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Не удается записать время модификации файла %x.</target>
 
-<source>Error deleting directory:</source>
-<target>Ошибка при удалении папки:</target>
+<source>Cannot find system function %x.</source>
+<target>Не удается найти системную функцию %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Ошибка при изменении времени модификации файла:</target>
+<source>Cannot read security context of %x.</source>
+<target>Не удается прочитать контекст безобасности %x.</target>
 
-<source>Error loading library function:</source>
-<target>Ошибка при загрузке функции библиотеки:</target>
+<source>Cannot write security context of %x.</source>
+<target>Не удается записать контекст безобасности %x.</target>
 
-<source>Error reading security context:</source>
-<target>Ошибка при чтении контекста безобасности:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Не удается прочитать права доступа %x.</target>
 
-<source>Error writing security context:</source>
-<target>Ошибка при записи контекста безобасности:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Не удается записать права доступа %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Ошибка при копировании прав доступа:</target>
+<source>Cannot create directory %x.</source>
+<target>Не удается создать папку %x.</target>
 
-<source>Error creating directory:</source>
-<target>Ошибка при создании папки:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Не удается скопировать символьную ссылку %x в %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Ошибка при копировании символьной ссылки:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Не удается записать атрибуты файла %x.</target>
 
-<source>Error copying file:</source>
-<target>Ошибка при копировании файла:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Не удается скопировать файл %x в %y.</target>
 
-<source>Error traversing directory:</source>
-<target>Ошибка при пересечении папок:</target>
+<source>Cannot read directory %x.</source>
+<target>Не удается прочесть папку %x.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Зацикливание при встрече пересекающихся путей:</target>
+<source>Endless loop.</source>
+<target>Бесконечный цикл.</target>
 
-<source>Error setting privilege:</source>
-<target>Ошибка установки привилегий:</target>
+<source>Cannot set privilege %x.</source>
+<target>Не удается установить привелегии %x.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Невозможно переместить %x в "Корзину"!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Со времени последней синхронизации с обеих сторон произошли изменения!</target>
@@ -1318,8 +1312,8 @@ Exclude: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Вы можете проигнорировать ошибку, приняв папку за пустую.</target>
 
-<source>Directory does not exist:</source>
-<target>Папка не существует:</target>
+<source>Cannot find directory %x.</source>
+<target>Не удается найти папку %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Зависимые папки! Будьте внимательны при настройке правил синхронизации:</target>
@@ -1327,20 +1321,17 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Подготовка к синхронизации...</target>
 
-<source>Out of memory!</source>
-<target>Недостаточно памяти!</target>
+<source>Conflict detected:</source>
+<target>Обнаружен конфликт:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Файл %x имеет недействительную дату!</target>
 
-<source>Conflict detected:</source>
-<target>Обнаружен конфликт:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Файлы %x имеют одинаковую дату, но различаются по размеру!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Символьная ссылка %x имеет ту же дату, но различное содержание!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Символьная ссылка %x имеет ту же дату, но отличающуюся цель.</target>
 
 <source>Comparing content of files %x</source>
 <target>Сравнение содержания файлов %x</target>
@@ -1423,11 +1414,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Создание файла %x</target>
 
-<source>Creating folder %x</source>
-<target>Создание папки %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Создание символьной ссылки %x</target>
+
+<source>Creating folder %x</source>
+<target>Создание папки %x</target>
 
 <source>Overwriting file %x</source>
 <target>Перезапись файла %x</target>
@@ -1447,8 +1438,8 @@ Exclude: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Папка для старых версий файлов не была указана!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Исходная папка больше не существует:</target>
+<source>Source directory %x not found.</source>
+<target>Исходная папка %x не найдена.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Существуют нерешенные конфликты</target>
@@ -1482,12 +1473,6 @@ Exclude: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Создание базы данных...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Ничего нет для синхронизации!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>Невозможно скопировать заблокированный файл %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Ошибка проверки данных: исходный и конечный файлы имеют разное содержание!</target>

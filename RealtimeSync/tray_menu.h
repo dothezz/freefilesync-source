@@ -13,13 +13,12 @@
 
 namespace rts
 {
-enum MonitorResponse
+enum AbortReason
 {
-    RESUME,
-    QUIT
+    SHOW_GUI,
+    EXIT_APP
 };
-
-MonitorResponse startDirectoryMonitor(const xmlAccess::XmlRealConfig& config, const wxString& jobname); //jobname may be empty
+AbortReason startDirectoryMonitor(const xmlAccess::XmlRealConfig& config, const wxString& jobname); //jobname may be empty
 }
 
 

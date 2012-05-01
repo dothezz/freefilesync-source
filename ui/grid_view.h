@@ -18,6 +18,8 @@ namespace zen
 class GridView
 {
 public:
+    GridView() : folderPairCount(0) {}
+
     //direct data access via row number
     const FileSystemObject* getObject(size_t row) const;  //returns nullptr if object is not found; complexity: constant!
     /**/
@@ -26,7 +28,7 @@ public:
     size_t rowsTotal () const { return sortedRef.size(); } //total rows available
 
     //get references to FileSystemObject: no nullptr-check needed! Everything's bound.
-    void getAllFileRef(const std::set<size_t>& rows, std::vector<FileSystemObject*>& output);
+    std::vector<FileSystemObject*> getAllFileRef(const std::set<size_t>& rows);
 
     struct StatusCmpResult
     {
@@ -115,6 +117,8 @@ public:
     ptrdiff_t findRowFirstChild(const HierarchyObject* hierObj)    const; // find first child of DirMapping or BaseDirMapping *on sorted sub view*
     //"hierObj" may be invalid, it is NOT dereferenced, return < 0 if not found
 
+    size_t getFolderPairCount() const { return folderPairCount; } //count non-empty pairs to distinguish single/multiple folder pair cases
+
 private:
     struct RefIndex
     {
@@ -129,8 +133,8 @@ private:
 
 
     zen::hash_map<FileSystemObject::ObjectIdConst, size_t> rowPositions; //find row positions on sortedRef directly
-    zen::hash_map<const HierarchyObject*, size_t> rowPositionsFirstChild; //find first child on sortedRef of a hierarchy object
-    //NEVER DEREFERENCE HierarchyObject*!!! lookup only!
+    zen::hash_map<const void*, size_t> rowPositionsFirstChild; //find first child on sortedRef of a hierarchy object
+    //void* instead of HierarchyObject*: these are weak pointers and should *never be dereferenced*!
 
     std::vector<FileSystemObject::ObjectId> viewRef;  //partial view on sortedRef
     /*             /|\
@@ -141,6 +145,8 @@ private:
                     | (setData...)
                     |                         */
     //std::shared_ptr<FolderComparison> folderCmp; //actual comparison data: owned by GridView!
+    size_t folderPairCount; //number of non-empty folder pairs
+
 
     class SerializeHierarchy;
 

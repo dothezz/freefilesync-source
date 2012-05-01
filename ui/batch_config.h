@@ -10,15 +10,16 @@
 #include "../lib/process_xml.h"
 #include "folder_history_box.h"
 
+
 namespace zen
 {
-void showSyncBatchDlg(const wxString& referenceFile,
+void showSyncBatchDlg(wxWindow* parent,
+                      const wxString& referenceFile,
                       const xmlAccess::XmlBatchConfig& batchCfg,
                       const std::shared_ptr<FolderHistory>& folderHistLeft,
                       const std::shared_ptr<FolderHistory>& folderHistRight,
                       std::vector<std::wstring>& execFinishedhistory,
                       size_t execFinishedhistoryMax);
 }
-
 
 #endif // BATCHCONFIG_H_INCLUDED

@@ -14,13 +14,12 @@
 #include "switch_to_gui.h"
 
 class LogFile;
-class SyncStatus;
 
 //Exception class used to abort the "compare" and "sync" process
 class BatchAbortProcess {};
 
 
-class BatchStatusHandler : public StatusHandler
+class BatchStatusHandler : public zen::StatusHandler
 {
 public:
     BatchStatusHandler(bool showProgress, //defines: -start minimized and -quit immediately when finished
@@ -34,10 +33,8 @@ public:
                        std::vector<std::wstring>& execFinishedHistory);
     ~BatchStatusHandler();
 
-    virtual void initNewProcess     (int objectsTotal, zen::Int64 dataTotal, Process processID);
+    virtual void initNewPhase     (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
     virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
-    virtual void updateTotalData    (int objectsDelta, zen::Int64 dataDelta);
-    virtual void reportStatus(const std::wstring& text);
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
 
@@ -46,18 +43,17 @@ public:
     virtual void reportFatalError(const std::wstring& errorMessage);
 
 private:
-    virtual void abortThisProcess();
+    virtual void abortThisProcess(); //throw BatchAbortProcess
 
     const zen::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
     bool showFinalResults;
     bool switchToGuiRequested;
     xmlAccess::OnError handleError_;
     zen::ErrorLog errorLog; //list of non-resolved errors and warnings
-    Process currentProcess;
     int& returnValue;
 
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
-    std::shared_ptr<LogFile> logFile; //optional!
+    std::unique_ptr<LogFile> logFile; //optional!
 };
 
 

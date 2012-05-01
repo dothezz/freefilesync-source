@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>디렉토리 찾아보기</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>사용자에 의한 작업 중단 : 현재 작업 종료 대기 중...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>실시간 동기화 - 자동 동기화</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>리눅스 에러 코드 %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>심볼릭 링크를 해결하던 중 발생한 오류 :</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>심볼릭 링크 %x 을(를) 해결할 수 없습니다.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -135,35 +138,41 @@
 <pluralform>%x 바이트</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>동기화 데이터베이스로부터 읽어 들이던 중 발생한 오류 :</target>
+<source>Cannot read file %x.</source>
+<target>파일 %x 을(를) 읽을 수 없습니다.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>동기화 데이터베이스에 쓰던 중 발생한 오류 :</target>
+<source>Cannot write file %x.</source>
+<target>파일 %x 을(를) 쓸 수 없습니다.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>호환되지 않는 동기화 데이터베이스 형식 :</target>
+<source>Database file %x is incompatible.</source>
+<target>데이터베이스 파일 %x 은(는) 호환 불가능합니다.</target>
 
 <source>Initial synchronization:</source>
 <target>초기 동기화 :</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>FreeFileSync 데이터베이스 파일 중 하나가 아직 존재하지 않습니다 :</target>
+<source>Database file %x does not yet exist.</source>
+<target>데이터베이스 파일 %x 은(는) 아직 존재하지 않습니다.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>데이터베이스 파일이 공통 동기화 세션을 공유하지 않습니다 :</target>
+<source>Out of memory!</source>
+<target>메모리 부족!</target>
+
+<source>Database files do not share a common session.</source>
+<target>데이터베이스 파일이 일반/공동 세션을 공유하지 않습니다.</target>
 
 <source>An exception occurred!</source>
 <target>예외 발생!</target>
 
-<source>Error reading file attributes:</source>
-<target>파일 속성을 읽던 중 발생한 오류 :</target>
+<source>Cannot read file attributes of %x.</source>
+<target>%x의 파일 속성을 읽을 수 없습니다.</target>
+
+<source>Cannot get process information.</source>
+<target>프로세스 정보를 얻을 수 없습니다.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>디렉토리 잠금 대기 중 (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>디렉토리 잠금 설정 중 발생한 오류 :</target>
+<source>Cannot set directory lock %x.</source>
+<target>디렉토리 잠금 %x 을(를) 설정할 수 없습니다.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -173,8 +182,8 @@
 <pluralform>%x초</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>파일을 읽던 중 발생한 오류 :</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>분석 오류 - 파일: %x, 행: %y, 열: %z</target>
 
 <source>Scanning:</source>
 <target>스캔 :</target>
@@ -190,38 +199,32 @@
 <pluralform>[%x 스레드]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>잘못된 FreeFileSync 설정 파일!</target>
+<source>/sec</source>
+<target>/초</target>
 
-<source>Error parsing configuration file:</source>
-<target>설정파일 분석 중 발생한 오류 :</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>파일 %x 의 구성이 유효하지 않습니다.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>구성이 부분적으로만 로드 됐습니다 :</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>구성 파일 %x 이(가) 부분적으로만 로드 되었음.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>%x 을(를) 휴지통으로 이동할 수 없습니다!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Volume Shadow Copy Service 접근 불가</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>본 운영체제에서의 Shadow Copy 생성은 FreeFileSync 64-비트 버전을 사용하세요.</target>
 
 <source>Cannot load file %x.</source>
 <target>파일 %x 을(를) 로드할 수 없습니다.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>볼륨 섀도 복사본 서비스에 액세스하던 중 오류 발생!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>WOW64 에서의 Shadow Copy 는 지원하지 않습니다. FreeFileSync 64-bit 버전을 사용하세요.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>파일의 볼륨 이름을 결정할 수 없습니다 :</target>
+<source>Path %x does not contain a volume name.</source>
+<target>경로 %x에 볼륨 이름이 없습니다.</target>
 
 <source>Volume name %x not part of file name %y!</source>
-<target>볼륨 이름 %x 이(가) 파일 이름 %y 의 일부가 아닙니다!</target>
+<target>볼륨 이름 %x 은(는) 파일 이름 %y 의 일부가 아님!</target>
 
-<source>/sec</source>
-<target>/초</target>
-
-<source>File does not exist:</source>
-<target>파일이 존재하지 않습니다 :</target>
+<source>Cannot find file %x.</source>
+<target>파일 %x 을(를) 찾을 수 없습니다.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>다음 XML 요소를 읽을 수 없습니다 :</target>
@@ -300,9 +303,6 @@ The command line is executed each time:
 <source>RealtimeSync configuration</source>
 <target>실시간 동기화 설정</target>
 
-<source>File already exists. Overwrite?</source>
-<target>파일이 이미 존재합니다. 덮어 쓰시겠습니까?</target>
-
 <source>&Restore</source>
 <target>복원(&R)</target>
 
@@ -345,20 +345,20 @@ The command line is executed each time:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync 구성 설정</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync 일괄 작업</target>
-
-<source>Unable to create log file!</source>
-<target>로그파일 생성을 할 수 없습니다!</target>
-
 <source>Batch execution</source>
 <target>일괄 실행</target>
 
-<source>Stop</source>
-<target>정지</target>
+<source>Items processed:</source>
+<target>처리된 항목 :</target>
+
+<source>Items remaining:</source>
+<target>남은 항목 :</target>
 
 <source>Total time:</source>
 <target>전체 시간 :</target>
+
+<source>Stop</source>
+<target>정지</target>
 
 <source>Synchronization aborted!</source>
 <target>동기화 중단!</target>
@@ -366,14 +366,17 @@ The command line is executed each time:
 <source>Synchronization completed with errors!</source>
 <target>동기화가 완료되긴 했으나, 오류가 있습니다!</target>
 
+<source>Nothing to synchronize!</source>
+<target>동기화 할 항목이 없습니다!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>동기화가 성공적으로 완료 됐습니다!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>FreeFileSync GUI 모드는 "전환" 을 누르면 열립니다.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>FreeFileSync 메인 다이얼로그에서 문제 해결을 하려면 "Switch" [전환]을 누르십시오.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>FreeFileSync GUI 모드로 전환 중...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>FreeFileSync 메인 다이얼로그로 전환 중...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Sourceforge.net에 접속할 수 없습니다!</target>
@@ -531,9 +534,6 @@ The command line is executed each time:
 <source>Items found:</source>
 <target>발견된 항목 :</target>
 
-<source>Items remaining:</source>
-<target>남은 항목 :</target>
-
 <source>Speed:</source>
 <target>속도 :</target>
 
@@ -561,9 +561,6 @@ The command line is executed each time:
 <source>Right</source>
 <target>우측</target>
 
-<source>Sync setttings</source>
-<target>싱크(동기화) 설정</target>
-
 <source>Status feedback</source>
 <target>상태 피드백</target>
 
@@ -588,8 +585,8 @@ The command line is executed each time:
 <source>&Load</source>
 <target>로드(&L)</target>
 
-<source>&Cancel</source>
-<target>취소(&C)</target>
+<source>Cancel</source>
+<target>취소</target>
 
 <source>Select variant:</source>
 <target>옵션 선택 :</target>
@@ -639,8 +636,8 @@ The command line is executed each time:
 <source>Conflict/file cannot be categorized</source>
 <target>충돌/파일 분류 불가능</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>대상 별 비교...</target>
@@ -674,9 +671,6 @@ is the same
 
 <source>Synchronizing...</source>
 <target>동기화 작업 중...</target>
-
-<source>Items processed:</source>
-<target>처리된 항목 :</target>
 
 <source>&Pause</source>
 <target>일시정지(&P)</target>
@@ -808,7 +802,7 @@ Exclude: \stuff\temp\*
 <target>락 걸린 파일 복사</target>
 
 <source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Volume Shadow Copy를 사용하여 공유 또는 락 걸린 파일을 복사 (관리자 권한 필요)</target>
+<target>Volume Shadow Copy Service를 사용하여 공유 또는 락 걸린 파일을 복사 (관리자 권한 필요)</target>
 
 <source>Copy file access permissions</source>
 <target>파일 접근 권한 복사</target>
@@ -1017,9 +1011,6 @@ Exclude: \stuff\temp\*
 <source>File list exported!</source>
 <target>파일 리스트 내보내기 완료!</target>
 
-<source>Error writing file:</source>
-<target>파일을 쓰던 중 발생한 오류 :</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1061,20 +1052,20 @@ Exclude: \stuff\temp\*
 <source>Paused</source>
 <target>일시정지 중</target>
 
+<source>Initializing...</source>
+<target>초기화 작업 중...</target>
+
 <source>Aborted</source>
 <target>중단됨</target>
 
 <source>Completed</source>
 <target>완료</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>사용자에 의한 작업 중단 : 현재 작업 종료 대기 중...</target>
+<source>Continue</source>
+<target>계속</target>
 
 <source>Pause</source>
 <target>일시정지</target>
-
-<source>Continue</source>
-<target>계속</target>
 
 <source>Cannot find %x</source>
 <target>%x 을(를) 찾을 수 없습니다.</target>
@@ -1174,7 +1165,7 @@ Exclude: \stuff\temp\*
 <target>파일</target>
 
 <source>Percentage</source>
-<target>퍼센티지(백분율)</target>
+<target>백분율(%)</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1209,68 +1200,65 @@ Exclude: \stuff\temp\*
 <pluralform>%x일</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>디렉토리 모니터링을 초기화 할 수 없습니다 :</target>
-
-<source>Error when monitoring directories.</source>
-<target>디렉토리 모니터링 중 발생한 오류 :</target>
+<source>Cannot monitor directory %x.</source>
+<target>디렉토리 %x 을(를) 모니터링 할 수 없습니다.</target>
 
 <source>Conversion error:</source>
 <target>변환 오류 :</target>
 
-<source>Error deleting file:</source>
-<target>파일 삭제 중 발생한 오류 :</target>
+<source>Cannot delete file %x.</source>
+<target>파일 %x 을(를) 삭제할 수 없습니다.</target>
 
-<source>Error moving file:</source>
-<target>파일 이동 중 발생한 오류 :</target>
+<source>The file is locked by another process:</source>
+<target>파일이 다른 프로세스에 의해 잠겨 있습니다 :</target>
 
-<source>Target file already existing!</source>
-<target>대상 파일이 이미 존재합니다!</target>
+<source>Cannot move file %x to %y.</source>
+<target>파일 %x 을(를) %y (으)로 이동할 수 없습니다.</target>
 
-<source>Error moving directory:</source>
-<target>디렉토리 이동 중 발생한 오류 :</target>
+<source>Cannot delete directory %x.</source>
+<target>디렉토리 %x 을(를) 삭제할 수 없습니다.</target>
 
-<source>Target directory already existing!</source>
-<target>대상 디렉토리가 이미 존재합니다!</target>
+<source>Cannot write modification time of %x.</source>
+<target>%x의 수정 시간을 쓸 수 없습니다.</target>
 
-<source>Error deleting directory:</source>
-<target>디렉토리 삭제 중 발생한 오류 :</target>
+<source>Cannot find system function %x.</source>
+<target>시스템 함수 %x 을(를) 찾을 수 없습니다.</target>
 
-<source>Error changing modification time:</source>
-<target>시간 수정 중 발생한 오류 :</target>
+<source>Cannot read security context of %x.</source>
+<target>%x의 보안 컨텍스트를 읽을 수 없습니다.</target>
 
-<source>Error loading library function:</source>
-<target>라이브러리 기능 로드 중 발생한 오류 :</target>
+<source>Cannot write security context of %x.</source>
+<target>%x의 보안 컨텍스트를 쓸 수 없습니다.</target>
 
-<source>Error reading security context:</source>
-<target>보안 컨텍스트를 읽던 중 발생한 오류 :</target>
+<source>Cannot read permissions of %x.</source>
+<target>%x의 권한을 읽을 수 없습니다.</target>
 
-<source>Error writing security context:</source>
-<target>보안 컨텍스트를 쓰던 중 발생한 오류 :</target>
+<source>Cannot write permissions of %x.</source>
+<target>%x의 권한을 쓸 수 없습니다.</target>
 
-<source>Error copying file permissions:</source>
-<target>파일 권한 복사 중 발생한 오류 :</target>
+<source>Cannot create directory %x.</source>
+<target>디렉토리 %x 을(를) 생성할 수 없습니다.</target>
 
-<source>Error creating directory:</source>
-<target>디렉토리 생성 중 발생한 오류 :</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>심볼릭 링크 %x 을(를) %y (으)로 복사할 수 없습니다.</target>
 
-<source>Error copying symbolic link:</source>
-<target>심볼릭 링크 복사 중 발생한 오류 :</target>
+<source>Cannot write file attributes of %x.</source>
+<target>%x의 파일 속성을 쓸 수 없습니다.</target>
 
-<source>Error copying file:</source>
-<target>파일 복사 중 발생한 오류 :</target>
+<source>Cannot copy file %x to %y.</source>
+<target>파일 %x 을(를) %y (으)로 복사할 수 없습니다.</target>
 
-<source>Error opening file:</source>
-<target>파일을 열던 중 발생한 오류 :</target>
+<source>Cannot read directory %x.</source>
+<target>디렉토리 %x 을(를) 읽을 수 없습니다.</target>
 
-<source>Error traversing directory:</source>
-<target>디렉토리 이동 중 발생한 오류 :</target>
+<source>Endless loop.</source>
+<target>무한 루프</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>디렉토리 이동 중 무한 루프 발생 :</target>
+<source>Cannot set privilege %x.</source>
+<target>권한 %x 을(를) 설정할 수 없습니다.</target>
 
-<source>Error setting privilege:</source>
-<target>권한 설정 중 발생한 오류 :</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>%x 을(를) 휴지통으로 이동할 수 없습니다!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>마지막 동기화 작업 이후, 양측 모두 변경 되었습니다!</target>
@@ -1296,8 +1284,8 @@ Exclude: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>디렉토리가 비었다는 오류는 무시 가능합니다.</target>
 
-<source>Directory does not exist:</source>
-<target>디렉토리가 존재하지 않습니다 :</target>
+<source>Cannot find directory %x.</source>
+<target>디렉토리 %x 을(를) 찾을 수 없습니다.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>디렉토리가 의존 관계에 있습니다. 동기화 규칙 설정시 주의하십시오.</target>
@@ -1305,20 +1293,17 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>동기화 준비 중...</target>
 
-<source>Out of memory!</source>
-<target>메모리 부족!</target>
+<source>Conflict detected:</source>
+<target>탐지된 충돌/불일치 :</target>
 
 <source>File %x has an invalid date!</source>
 <target>파일 %x 의 날짜가 유효하지 않습니다!</target>
 
-<source>Conflict detected:</source>
-<target>탐지된 충돌/불일치 :</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>파일 %x 의 날짜는 같으나, 크기가 다릅니다!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>심링크 %x 의 날짜는 같으나, 대상이 다릅니다!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>심볼릭 링크 %x 의 날짜는 같으나, 타겟이 다릅니다.</target>
 
 <source>Comparing content of files %x</source>
 <target>파일 %x 내용 별 비교 중</target>
@@ -1381,31 +1366,31 @@ Exclude: \stuff\temp\*
 <target>심볼릭 링크 %x 삭제 중</target>
 
 <source>Moving file %x to recycle bin</source>
-<target>파일 %x를(을) 휴지통으로 이동 중</target>
+<target>파일 %x을(를) 휴지통으로 이동 중</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target>폴더 %x를(을) 휴지통으로 이동 중</target>
+<target>폴더 %x을(를) 휴지통으로 이동 중</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target>심볼릭 링크 %x를(을) 휴지통으로 이동 중</target>
+<target>심볼릭 링크 %x을(를) 휴지통으로 이동 중</target>
 
 <source>Moving file %x to %y</source>
-<target>파일 %x를(을) %y(으)로 이동 중</target>
+<target>파일 %x을(를) %y(으)로 이동 중</target>
 
 <source>Moving folder %x to %y</source>
-<target>폴더 %x를(을) %y(으)로 이동 중</target>
+<target>폴더 %x을(를) %y(으)로 이동 중</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target>심볼릭 링크 %x를(을) %y(으)로 이동 중</target>
+<target>심볼릭 링크 %x을(를) %y(으)로 이동 중</target>
 
 <source>Creating file %x</source>
 <target>파일 %x 생성 중</target>
 
-<source>Creating folder %x</source>
-<target>폴더 %x 생성 중</target>
-
 <source>Creating symbolic link %x</source>
 <target>심볼릭 링크 %x 생성 중</target>
+
+<source>Creating folder %x</source>
+<target>폴더 %x 생성 중</target>
 
 <source>Overwriting file %x</source>
 <target>파일 %x 덮어쓰는 중</target>
@@ -1425,8 +1410,8 @@ Exclude: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>파일 버저닝을 위한 디렉토리가 제공되지 않았습니다!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>소스 디렉토리가 더 이상 존재하지 않습니다 :</target>
+<source>Source directory %x not found.</source>
+<target>소스 디렉토리 %x 을(를) 찾을 수 없습니다.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>해결되지 않은 충돌이 있습니다!</target>
@@ -1460,12 +1445,6 @@ Exclude: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>데이터베이스 생성 중...</target>
-
-<source>Nothing to synchronize!</source>
-<target>동기화 할 항목이 없습니다!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>잠겨진 파일 %x 을(를) 복사할 수 없습니다!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>데이터 확인 오류 : 소스 및 타겟 파일의 내용이 다릅니다!</target>

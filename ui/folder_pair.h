@@ -151,7 +151,7 @@ private:
 
         CompConfig cmpCfg = altCompConfig.get() ? *altCompConfig : mainCfg.cmpConfig;
 
-        if (showCompareCfgDialog(cmpCfg) == ReturnSmallDlg::BUTTON_OKAY)
+        if (showCompareCfgDialog(getParentWindow(), cmpCfg) == ReturnSmallDlg::BUTTON_OKAY)
         {
             altCompConfig = std::make_shared<CompConfig>(cmpCfg);
             refreshButtons();
@@ -167,7 +167,8 @@ private:
         CompConfig cmpCfg  = altCompConfig.get() ? *altCompConfig : mainCfg.cmpConfig;
         SyncConfig syncCfg = altSyncConfig.get() ? *altSyncConfig : mainCfg.syncCfg;
 
-        if (showSyncConfigDlg(cmpCfg.compareVar,
+        if (showSyncConfigDlg(getParentWindow(),
+                              cmpCfg.compareVar,
                               syncCfg,
                               nullptr,
                               nullptr) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
@@ -183,7 +184,8 @@ private:
     {
         FilterConfig localFiltTmp = localFilter;
 
-        if (showFilterDialog(false, //is local filter dialog
+        if (showFilterDialog(getParentWindow(),
+                             false, //is local filter dialog
                              localFiltTmp) == ReturnSmallDlg::BUTTON_OKAY)
         {
             localFilter = localFiltTmp;

@@ -14,8 +14,7 @@
 
 namespace rts
 {
-const int UI_UPDATE_INTERVAL = 100; //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
-
+const int UI_UPDATE_INTERVAL = 100; //unit: [ms]; perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
 bool updateUiIsAllowed();
 
 
@@ -33,19 +32,22 @@ enum ChangeType
     CHANGE_DETECTED,
     CHANGE_DIR_MISSING
 };
+
 struct WaitResult
 {
-    WaitResult(ChangeType tp, const Zstring& chgFile = Zstring()) : type(tp), filename(chgFile) {}
+    WaitResult(ChangeType tp, const Zstring& chgFile) : type(tp), filename(chgFile) {}
 
     ChangeType type;
-    Zstring filename; //filled if type == CHANGE_DETECTED
+    Zstring filename; //file or directory name
 };
-WaitResult waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, //non-formatted dir names that yet require call to getFormattedDirectoryName()
-                          WaitCallback* statusHandler); //throw(FileError)
+
+WaitResult waitForChanges(const std::vector<Zstring>& dirNamesNonFmt,
+                          //non-formatted dirnames that yet require call to getFormattedDirectoryName(); empty directories must be checked by caller!
+                          WaitCallback& statusHandler); //throw FileError
 
 //wait until all directories become available (again)
 void waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt,
-                        WaitCallback* statusHandler); //throw(FileError)
+                        WaitCallback& statusHandler); //throw FileError
 }
 
 #endif // WATCHER_H_INCLUDED

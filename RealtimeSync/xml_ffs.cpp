@@ -46,7 +46,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 }
 
 
-void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config)  //throw xmlAccess::FfsXmlError;
+void rts::readRealOrBatchConfig(const Zstring& filename, xmlAccess::XmlRealConfig& config)  //throw xmlAccess::FfsXmlError;
 {
     if (xmlAccess::getXmlType(filename) != xmlAccess::XML_TYPE_BATCH)
     {
@@ -63,11 +63,11 @@ void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConf
     catch (const xmlAccess::FfsXmlError& e)
     {
         if (e.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-            config = convertBatchToReal(batchCfg, toZ(filename)); //do work despite parsing errors, then re-throw
+            config = convertBatchToReal(batchCfg, filename); //do work despite parsing errors, then re-throw
 
         throw;                                 //
     }
-    config = convertBatchToReal(batchCfg, toZ(filename));
+    config = convertBatchToReal(batchCfg, filename);
 }
 
 

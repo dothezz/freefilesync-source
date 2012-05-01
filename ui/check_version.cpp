@@ -82,27 +82,30 @@ bool newerVersionExists(const wxString& onlineVersion)
 }
 
 
-void zen::checkForUpdateNow()
+void zen::checkForUpdateNow(wxWindow* parent)
 {
     wxString onlineVersion;
     if (!getOnlineVersion(onlineVersion))
     {
-        wxMessageBox(_("Unable to connect to sourceforge.net!"), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(_("Unable to connect to sourceforge.net!"), _("Error"), wxOK | wxICON_ERROR, parent);
         return;
     }
 
     if (newerVersionExists(onlineVersion))
     {
-        const int rv = wxMessageBox(wxString(_("A newer version of FreeFileSync is available:"))  + wxT(" v") + onlineVersion + wxT(". ") + _("Download now?"), _("Information"), wxYES_NO | wxICON_QUESTION);
+        const int rv = wxMessageBox(_("A newer version of FreeFileSync is available:")  + L" v" + onlineVersion + L". " + _("Download now?"),
+                                    _("Information"),
+                                    wxYES_NO | wxICON_QUESTION,
+                                    parent);
         if (rv == wxYES)
             wxLaunchDefaultBrowser(wxString(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v") + onlineVersion + L"/");
     }
     else
-        wxMessageBox(_("FreeFileSync is up to date!"), _("Information"), wxICON_INFORMATION);
+        wxMessageBox(_("FreeFileSync is up to date!"), _("Information"), wxICON_INFORMATION, parent);
 }
 
 
-void zen::checkForUpdatePeriodically(long& lastUpdateCheck)
+void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
 {
 #ifdef FFS_LINUX
     if (!zen::isPortableVersion()) //don't check for updates in installer version -> else: handled by .deb
@@ -113,14 +116,14 @@ void zen::checkForUpdatePeriodically(long& lastUpdateCheck)
     {
         if (lastUpdateCheck == 0)
         {
-            const bool checkRegularly = showQuestionDlg(ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO,
+            const bool checkRegularly = showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO,
                                                         _("Do you want FreeFileSync to automatically check for updates every week?") + L"\n" +
                                                         _("(Requires an Internet connection!)")) == ReturnQuestionDlg::BUTTON_YES;
             if (checkRegularly)
             {
                 lastUpdateCheck = 123; //some old date (few seconds after 1970)
 
-                checkForUpdatePeriodically(lastUpdateCheck); //check for updates now
+                checkForUpdatePeriodically(parent, lastUpdateCheck); //check for updates now
             }
             else
                 lastUpdateCheck = -1; //don't check for updates anymore
@@ -135,7 +138,10 @@ void zen::checkForUpdatePeriodically(long& lastUpdateCheck)
 
             if (newerVersionExists(onlineVersion))
             {
-                const int rv = wxMessageBox(wxString(_("A newer version of FreeFileSync is available:"))  + wxT(" v") + onlineVersion + wxT(". ") + _("Download now?"), _("Information"), wxYES_NO | wxICON_QUESTION);
+                const int rv = wxMessageBox(_("A newer version of FreeFileSync is available:")  + L" v" + onlineVersion + L". " + _("Download now?"),
+                                            _("Information"),
+                                            wxYES_NO | wxICON_QUESTION,
+                                            parent);
                 if (rv == wxYES)
                     wxLaunchDefaultBrowser(wxString(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v") + onlineVersion + L"/");
             }

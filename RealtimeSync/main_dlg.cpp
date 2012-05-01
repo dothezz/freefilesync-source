@@ -59,15 +59,15 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     if (!cfgFileName.empty() || wxFileExists(lastConfigFileName()))
         try
         {
-            rts::readRealOrBatchConfig(currentConfigFile, newConfig);
+            rts::readRealOrBatchConfig(toZ(currentConfigFile), newConfig);
             loadCfgSuccess = true;
         }
         catch (const xmlAccess::FfsXmlError& error)
         {
             if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-                wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
+                wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING, this);
             else
-                wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
+                wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR, this);
         }
 
     const bool startWatchingImmediately = loadCfgSuccess && !cfgFileName.empty();
@@ -102,30 +102,18 @@ MainDialog::~MainDialog()
 
     try //write config to XML
     {
-        writeRealConfig(currentCfg, lastConfigFileName());
+        writeRealConfig(currentCfg, toZ(lastConfigFileName()));
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
-        wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR, this);
     }
-}
-
-
-void MainDialog::OnClose(wxCloseEvent& event)
-{
-    Destroy();
-}
-
-
-void MainDialog::OnQuit(wxCommandEvent& event)
-{
-    Destroy();
 }
 
 
 const wxString& MainDialog::lastConfigFileName()
 {
-    static wxString instance = toWx(zen::getConfigDir()) + wxT("LastRun.ffs_real");
+    static wxString instance = toWx(zen::getConfigDir()) + L"LastRun.ffs_real";
     return instance;
 }
 
@@ -145,23 +133,19 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
     //build information
     wxString build = __TDATE__;
 #if wxUSE_UNICODE
-    build += wxT(" - Unicode");
+    build += L" - Unicode";
 #else
-    build += wxT(" - ANSI");
+    build += L" - ANSI";
 #endif //wxUSE_UNICODE
 
     //compile time info about 32/64-bit build
     if (zen::is64BitBuild)
-        build += wxT(" x64");
+        build += L" x64";
     else
-        build += wxT(" x86");
+        build += L" x86";
     assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
-    wxString buildFormatted = _("(Build: %x)");
-    buildFormatted.Replace(wxT("%x"), build);
-
-    wxMessageDialog* aboutDlg = new wxMessageDialog(this, wxString(L"RealtimeSync") + L"\n\n" + buildFormatted, _("About"), wxOK);
-    aboutDlg->ShowModal();
+    wxMessageBox(L"RealtimeSync" L"\n\n" + replaceCpy(_("(Build: %x)"), L"%x", build), _("About"), wxOK, this);
 }
 
 
@@ -170,7 +154,7 @@ void MainDialog::OnKeyPressed(wxKeyEvent& event)
     const int keyCode = event.GetKeyCode();
 
     if (keyCode == WXK_ESCAPE)
-        Destroy();
+        Close();
 
     event.Skip();
 }
@@ -184,52 +168,43 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
     switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(currentConfigFileName)))
     {
-        case rts::QUIT:
-        {
-            Destroy();
+        case rts::EXIT_APP:
+            Close();
             return;
-        }
-        break;
 
-        case rts::RESUME:
+        case rts::SHOW_GUI:
             break;
     }
-
-    Show();
+    Show(); //don't show for EXIT_APP
 }
 
 
 void MainDialog::OnSaveConfig(wxCommandEvent& event)
 {
-    wxString defaultFileName = currentConfigFileName.empty() ? wxT("Realtime.ffs_real") : currentConfigFileName;
+    wxString defaultFileName = currentConfigFileName.empty() ? L"Realtime.ffs_real" : currentConfigFileName;
     //attention: currentConfigFileName may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
-    if (defaultFileName.EndsWith(wxT(".ffs_batch")))
-        defaultFileName.Replace(wxT(".ffs_batch"), wxT(".ffs_real"), false);
+    if (endsWith(defaultFileName, L".ffs_batch"))
+        replace(defaultFileName, L".ffs_batch", L".ffs_real", false);
 
 
-    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, defaultFileName, wxString(_("RealtimeSync configuration")) + wxT(" (*.ffs_real)|*.ffs_real"), wxFD_SAVE);
-    if (filePicker->ShowModal() == wxID_OK)
+    wxFileDialog filePicker(this, wxEmptyString, wxEmptyString, defaultFileName,
+                            _("RealtimeSync configuration") + L" (*.ffs_real)|*.ffs_real",
+                            wxFD_SAVE /*| wxFD_OVERWRITE_PROMPT*/);
+    if (filePicker.ShowModal() != wxID_OK)
+        return;
+
+    const wxString newFileName = filePicker.GetPath();
+
+    //write config to XML
+    const xmlAccess::XmlRealConfig currentCfg = getConfiguration();
+    try
     {
-        const wxString newFileName = filePicker->GetPath();
-
-        if (wxFileExists(newFileName))
-        {
-            wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + newFileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
-            if (messageDlg->ShowModal() != wxID_OK)
-                return OnSaveConfig(event); //retry
-        }
-
-        //write config to XML
-        const xmlAccess::XmlRealConfig currentCfg = getConfiguration();
-        try
-        {
-            writeRealConfig(currentCfg, newFileName);
-            setLastUsedConfig(newFileName);
-        }
-        catch (const zen::FileError& error)
-        {
-            wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR);
-        }
+        writeRealConfig(currentCfg, toZ(newFileName)); //throw FfsXmlError
+        setLastUsedConfig(newFileName);
+    }
+    catch (const xmlAccess::FfsXmlError& e)
+    {
+        wxMessageBox(e.toString().c_str(), _("Error"), wxOK | wxICON_ERROR, this);
     }
 }
 
@@ -240,7 +215,7 @@ void MainDialog::loadConfig(const wxString& filename)
 
     try
     {
-        rts::readRealOrBatchConfig(filename, newConfig);
+        rts::readRealOrBatchConfig(toZ(filename), newConfig);
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
@@ -276,11 +251,11 @@ void MainDialog::setLastUsedConfig(const wxString& filename)
 
 void MainDialog::OnLoadConfig(wxCommandEvent& event)
 {
-    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, wxEmptyString,
-                                                wxString(_("RealtimeSync configuration")) + wxT(" (*.ffs_real;*.ffs_batch)|*.ffs_real;*.ffs_batch"),
-                                                wxFD_OPEN);
-    if (filePicker->ShowModal() == wxID_OK)
-        loadConfig(filePicker->GetPath());
+    wxFileDialog filePicker(this, wxEmptyString, wxEmptyString, wxEmptyString,
+                            _("RealtimeSync configuration") + L" (*.ffs_real;*.ffs_batch)|*.ffs_real;*.ffs_batch",
+                            wxFD_OPEN);
+    if (filePicker.ShowModal() == wxID_OK)
+        loadConfig(filePicker.GetPath());
 }
 
 
@@ -342,13 +317,11 @@ void MainDialog::OnRemoveFolder(wxCommandEvent& event)
     //find folder pair originating the event
     const wxObject* const eventObj = event.GetEventObject();
     for (std::vector<DirectoryPanel*>::const_iterator i = dirNamesExtra.begin(); i != dirNamesExtra.end(); ++i)
-    {
         if (eventObj == static_cast<wxObject*>((*i)->m_bpButtonRemoveFolder))
         {
             removeAddFolder(i - dirNamesExtra.begin());
             return;
         }
-    }
 }
 
 

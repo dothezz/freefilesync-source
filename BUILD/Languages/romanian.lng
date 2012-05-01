@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>Explorează Dosarul</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Abandonare solicitată: Se așteaptă terminarea operației în curs...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronizare Inteligentă</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Codul Erorii Linux %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Eroare la rezolvarea legăturii simbolice:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Nu pot rezolva legătura simbolică %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -137,35 +140,41 @@
 <pluralform>%x de Baiți</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Eroare la citirea din baza de date a sincronizării:</target>
+<source>Cannot read file %x.</source>
+<target>Nu pot citi fila %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Eroare la scrierea în baza de date a sincronizării:</target>
+<source>Cannot write file %x.</source>
+<target>Nu pot scrie fila %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Format al bazei de date necompatibil cu versiunea softului:</target>
+<source>Database file %x is incompatible.</source>
+<target>Fila cu baza de date %x este incompatibilă.</target>
 
 <source>Initial synchronization:</source>
 <target>Sincronizare inițială:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Una dintre părți nu are o filă de tip bază de date FreeFileSync:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Fila cu baza de date %x nu există încă.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Filele bază de date nu partajează o sesiune comună de sincronizare</target>
+<source>Out of memory!</source>
+<target>Memorie epuizată!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Filele cu baze de date nu partajează o sesiune comună.</target>
 
 <source>An exception occurred!</source>
 <target>A apărut o excepție !</target>
 
-<source>Error reading file attributes:</source>
-<target>Eroare la citirea atributelor filei:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Nu pot citi atributele filei %x.</target>
+
+<source>Cannot get process information.</source>
+<target>Nu pot obține informații despre proces.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Aștept ca dosarul să fie zăvorît (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Eroare la efectuarea zăvorîrii dosarului:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Nu pot seta zăvorîrea dosarului %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -177,8 +186,8 @@
 <pluralform>%x de sec</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Eroare la citirea filei:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Eroare la parsarea filei %x, rîndul %y, coloana %z.</target>
 
 <source>Scanning:</source>
 <target>Scanez:</target>
@@ -196,38 +205,32 @@
 <pluralform>[%x de Fire]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Filă de configurare FreeFileSync nevalidă!</target>
+<source>/sec</source>
+<target>/sec</target>
 
-<source>Error parsing configuration file:</source>
-<target>Eroare la parsarea filei de configurare:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>Fila %x nu conține o configurație validă.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Configuraţie doar parțial deschisă</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Fila de configurație %x a fost deschisă doar parțial.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>Nu pot muta %x în Reciclator!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Nu pot accesa Serviciul de Conservare a Volumelor [Volume Shadow Copy].</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Folosește versiunea pe 64-biți a FreeFileSync pentru a crea conservări (copii de rezervă) pe acest sistem.</target>
 
 <source>Cannot load file %x.</source>
 <target>Nu pot deschide fila %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Eroare la accesarea Serviciului de Conservare a Volumelor [Volume Shadow Copy]!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Realizarea de conservări (copii de rezervă) prin sistemul WOW64 nu este suportată. Folosește versiunea pe 64-biți a FreeFileSync.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Nu pot determina numele volumului pentru fila:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>Calea %x nu conține un nume de volum valid.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Numele volumului %x nu face parte din numele filei %y !</target>
 
-<source>/sec</source>
-<target>/sec</target>
-
-<source>File does not exist:</source>
-<target>Fila nu există:</target>
+<source>Cannot find file %x.</source>
+<target>Nu pot găsi fila %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Nu pot citi următoarele elemente XML:</target>
@@ -306,9 +309,6 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>RealtimeSync configuration</source>
 <target>Configurația RealtimeSync</target>
 
-<source>File already exists. Overwrite?</source>
-<target>Fila există deja. Vrei s-o suprascrii?</target>
-
 <source>&Restore</source>
 <target>&Restaurează</target>
 
@@ -351,20 +351,20 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>FreeFileSync configuration</source>
 <target>Configurație FreeFileSync</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>Sarcină cu set de comenzi FreeFileSync</target>
-
-<source>Unable to create log file!</source>
-<target>Fila jurnal nu poate fi creată!</target>
-
 <source>Batch execution</source>
 <target>Execută Fila Set</target>
 
-<source>Stop</source>
-<target>Oprește</target>
+<source>Items processed:</source>
+<target>Elemente Procesate:</target>
+
+<source>Items remaining:</source>
+<target>Elemente Rămase:</target>
 
 <source>Total time:</source>
 <target>Timp Total:</target>
+
+<source>Stop</source>
+<target>Oprește</target>
 
 <source>Synchronization aborted!</source>
 <target>Sincronizare abandonată!</target>
@@ -372,14 +372,17 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Synchronization completed with errors!</source>
 <target>Sincronizare terminată cu erori!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Nu e nimic de sincronizat!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Sincronizare terminată cu succes!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Apasă "Comută" pentru a deschide modul grafic al FreeFileSync</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Apasă "Comută" pentru a rezolva problemele din dialogul principal FreeFileSync.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Comut la modul grafic al FreeFileSync...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Comut la dialogul principal FreeFileSync...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Conectarea la situl sourceforge.net nu poate fi realizată!</target>
@@ -537,9 +540,6 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Items found:</source>
 <target>Elemente Găsite:</target>
 
-<source>Items remaining:</source>
-<target>Elemente Rămase:</target>
-
 <source>Speed:</source>
 <target>Viteză:</target>
 
@@ -591,8 +591,8 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>&Load</source>
 <target>&Deschide</target>
 
-<source>&Cancel</source>
-<target>&Anulează</target>
+<source>Cancel</source>
+<target>Anulează</target>
 
 <source>Select variant:</source>
 <target>Selectează Varianta de Sincronizare:</target>
@@ -642,8 +642,8 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Conflict/file cannot be categorized</source>
 <target>Conflictul de file nu poate fi inclus într-o anumită categorie</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Compară după:</target>
@@ -677,9 +677,6 @@ este același
 
 <source>Synchronizing...</source>
 <target>Sincronizare Aflată în Curs...</target>
-
-<source>Items processed:</source>
-<target>Elemente Procesate:</target>
 
 <source>&Pause</source>
 <target>&Pauzează</target>
@@ -716,9 +713,6 @@ este același
 
 <source>Hide further error messages during the current process</source>
 <target>Ascunde mesajele de eroare apărute ulterior în timpul acestui proces</target>
-
-<source>&Ignore</source>
-<target>&OK</target>
 
 <source>&Retry</source>
 <target>&Reîncearcă</target>
@@ -1020,9 +1014,6 @@ Excluse: \stuff\temp\*
 <source>File list exported!</source>
 <target>Lista de file a fost exportată!</target>
 
-<source>Error writing file:</source>
-<target>Eroare la scrierea filei:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1072,20 +1063,20 @@ Excluse: \stuff\temp\*
 <source>Paused</source>
 <target>Sincronizare Pauzată</target>
 
+<source>Initializing...</source>
+<target>Inițializez...</target>
+
 <source>Aborted</source>
 <target>Sincronizare Abandonată</target>
 
 <source>Completed</source>
 <target>Sincronizare Terminată</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Abandonare solicitată: Se așteaptă terminarea operației în curs...</target>
+<source>Continue</source>
+<target>Continuă</target>
 
 <source>Pause</source>
 <target>Pauzează</target>
-
-<source>Continue</source>
-<target>Continuă</target>
 
 <source>Cannot find %x</source>
 <target>Nu pot găsi %x</target>
@@ -1230,65 +1221,65 @@ Excluse: \stuff\temp\*
 <pluralform>%x de zile</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Nu pot inițializa monitorizarea dosarelor:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Eroare la monitorizarea dosarelor.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Nu pot monitoriza dosarul %x.</target>
 
 <source>Conversion error:</source>
 <target>Eroare de convertire:</target>
 
-<source>Error deleting file:</source>
-<target>Eroare la ștergerea filei:</target>
+<source>Cannot delete file %x.</source>
+<target>Nu pot șterge fila %x.</target>
 
-<source>Error moving file:</source>
-<target>Eroare la mutarea filei:</target>
+<source>The file is locked by another process:</source>
+<target>Fila este zăvorîtă [locked] de alt proces:</target>
 
-<source>Target file already existing!</source>
-<target>Fila țintă există deja!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Nu pot muta fila %x în %y.</target>
 
-<source>Error moving directory:</source>
-<target>Eroare la mutarea dosarului:</target>
+<source>Cannot delete directory %x.</source>
+<target>Nu pot șterge dosarul %x.</target>
 
-<source>Target directory already existing!</source>
-<target>Dosarul țintă există deja!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Nu pot scrie modificarea timpului pentru %x.</target>
 
-<source>Error deleting directory:</source>
-<target>Eroare la ștergerea dosarului:</target>
+<source>Cannot find system function %x.</source>
+<target>Nu pot găsi funcția de sistem %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Eroare la schimbarea datei de modificare:</target>
+<source>Cannot read security context of %x.</source>
+<target>Nu pot citi contextul de securitate pentru %x.</target>
 
-<source>Error loading library function:</source>
-<target>Eroare la deschiderea bibliotecii de funcții:</target>
+<source>Cannot write security context of %x.</source>
+<target>Nu pot scrie contextul de securitate pentru %x.</target>
 
-<source>Error reading security context:</source>
-<target>Eroare la citirea contextului de securitate:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Nu pot citi permisiunile lui %x.</target>
 
-<source>Error writing security context:</source>
-<target>Eroare la scrierea contextului de securitate:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Nu pot scrie permisiunile lui %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Eroare la copierea permisiunilor filei:</target>
+<source>Cannot create directory %x.</source>
+<target>Nu pot crea dosarul %x.</target>
 
-<source>Error creating directory:</source>
-<target>Eroare la crearea dosarului:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Nu pot copia legătura simbolică %x în %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Eroare la copierea legăturii simbolice:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Nu pot scrie atributele de filă ale lui %x.</target>
 
-<source>Error copying file:</source>
-<target>Eroare la copierea filei:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Nu pot copia fila %x în %y.</target>
 
-<source>Error traversing directory:</source>
-<target>Eroare la parcurgerea dosarului:</target>
+<source>Cannot read directory %x.</source>
+<target>Nu pot citi dosarul %x.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Buclă infinită la parcurgerea dosarului:</target>
+<source>Endless loop.</source>
+<target>Buclă infinită.</target>
 
-<source>Error setting privilege:</source>
-<target>Eroare la setarea privilegiului:</target>
+<source>Cannot set privilege %x.</source>
+<target>Nu pot seta privilegiul %x.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Nu pot muta %x în Reciclator!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Ambele părți s-au modificat de la ultima sincronizare!</target>
@@ -1314,8 +1305,8 @@ Excluse: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Poți ignora această eroare dacă vrei ca dosarul să fie considerat gol.</target>
 
-<source>Directory does not exist:</source>
-<target>Dosarul nu există:</target>
+<source>Cannot find directory %x.</source>
+<target>Nu pot găsi dosarul %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Dosarele sînt interdependente! Atenție la setarea regulilor de sincronizare:</target>
@@ -1323,20 +1314,17 @@ Excluse: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Pregătesc sincronizarea...</target>
 
-<source>Out of memory!</source>
-<target>Memorie epuizată!</target>
+<source>Conflict detected:</source>
+<target>Conflict detectat:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Fila %x are o dată nevalidă !</target>
 
-<source>Conflict detected:</source>
-<target>Conflict detectat:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Filele %x au dată identică, dar mărime diferită!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Simlegăturile %x au dată identică, dar ținte diferite!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Legăturile simbolice %x au aceeași dată, dar ținte diferite.</target>
 
 <source>Comparing content of files %x</source>
 <target>Compar conținutul filelor %x</target>
@@ -1419,11 +1407,11 @@ Excluse: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Creez fila %x</target>
 
-<source>Creating folder %x</source>
-<target>Creez dosarul %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Creez legătura simbolică %x</target>
+
+<source>Creating folder %x</source>
+<target>Creez dosarul %x</target>
 
 <source>Overwriting file %x</source>
 <target>Suprascriu fila %x</target>
@@ -1443,8 +1431,8 @@ Excluse: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Dosarul pentru versionarea filelor n-a fost specificat!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Dosarul sursă nu mai există:</target>
+<source>Source directory %x not found.</source>
+<target>Dosarul sursă %x nu a fost găsit.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Există conflicte nerezolvate!</target>
@@ -1478,12 +1466,6 @@ Excluse: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Generez baza de date...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Nu e nimic de sincronizat!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>Nu pot copia fila zăvorîtă %x</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Eroare la verificarea datelor: Filele sursă și țintă au conținut diferit!</target>

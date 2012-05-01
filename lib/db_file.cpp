@@ -66,7 +66,7 @@ public:
     CheckedDbReader(wxInputStream& stream, const Zstring& errorObjName) : CheckedReader(stream), errorObjName_(errorObjName) {}
 
 private:
-    virtual void throwException() const { throw FileError(_("Error reading from synchronization database:") + L" \n" + L"\"" +  errorObjName_ + L"\""); }
+    virtual void throwException() const { throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(errorObjName_))); }
 
     const Zstring errorObjName_;
 };
@@ -77,7 +77,8 @@ class CheckedDbWriter : public CheckedWriter
 public:
     CheckedDbWriter(wxOutputStream& stream, const Zstring& errorObjName) : CheckedWriter(stream), errorObjName_(errorObjName) {}
 
-    virtual void throwException() const { throw FileError(_("Error writing to synchronization database:") + L" \n" + L"\"" + errorObjName_ + L"\""); }
+private:
+    virtual void throwException() const { throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(errorObjName_))); }
 
     const Zstring errorObjName_;
 };
@@ -96,7 +97,7 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError
         rawStream.Read(formatDescr, sizeof(formatDescr)); //throw FileError
 
         if (!std::equal(FILE_FORMAT_DESCR, FILE_FORMAT_DESCR + sizeof(FILE_FORMAT_DESCR), formatDescr))
-            throw FileError(_("Incompatible synchronization database format:") + L" \n" + L"\"" + filename + L"\"");
+            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
 
         wxZlibInputStream decompressed(rawStream, wxZLIB_ZLIB);
 
@@ -104,7 +105,7 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError
 
         std::int32_t version = cr.readPOD<std::int32_t>();
         if (version != FILE_FORMAT_VER) //read file format version#
-            throw FileError(_("Incompatible synchronization database format:") + L" \n" + L"\"" + filename + L"\"");
+            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
 
         //read stream lists
         StreamMapping output;
@@ -122,13 +123,12 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError
     }
     catch (ErrorNotExisting&)
     {
-        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n\n" +
-                                           _("One of the FreeFileSync database files is not yet existing:") + L" \n" +
-                                           L"\"" + filename + L"\"");
+        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
+                                           replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filename)));
     }
-    catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
+    catch (const std::bad_alloc& e)
     {
-        throw FileError(_("Error reading from synchronization database:") + L" (bad alloc)");
+        throw FileError(_("Out of memory!") + L" " + utf8CvrtTo<std::wstring>(e.what()));
     }
 }
 
@@ -146,9 +146,9 @@ public:
             StreamParser(buffer, fileName, *dirInfo); //throw FileError
             return dirInfo;
         }
-        catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
+        catch (const std::bad_alloc& e)
         {
-            throw FileError(_("Error reading from synchronization database:") + L" (bad alloc)");
+            throw FileError(_("Out of memory!") + L" " + utf8CvrtTo<std::wstring>(e.what()));
         }
     }
 
@@ -168,9 +168,9 @@ private:
         assert_static(sizeof(FileId().first ) <= sizeof(std::uint64_t));
         assert_static(sizeof(FileId().second) <= sizeof(std::uint64_t));
 
-        const auto devId = static_cast<decltype(FileId().first )>(readPOD<std::uint64_t>()); //
-        const auto fId   = static_cast<decltype(FileId().second)>(readPOD<std::uint64_t>()); //silence "loss of precision" compiler warnings
-        return std::make_pair(devId, fId);
+        const auto deviceId = static_cast<decltype(FileId().first )>(readPOD<std::uint64_t>()); //
+        const auto fileId   = static_cast<decltype(FileId().second)>(readPOD<std::uint64_t>()); //silence "loss of precision" compiler warnings
+        return std::make_pair(deviceId, fileId);
     }
 
     void recurse(DirContainer& dirCont) const
@@ -438,10 +438,8 @@ std::pair<DirInfoPtr, DirInfoPtr> zen::loadFromDisk(const BaseDirMapping& baseMa
         }
     }
 
-    throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n\n" +
-                                       _("Database files do not share a common synchronization session:") + L" \n" +
-                                       L"\"" + fileNameLeft  + L"\"\n" +
-                                       L"\"" + fileNameRight + L"\"");
+    throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
+                                       _("Database files do not share a common session."));
 }
 
 

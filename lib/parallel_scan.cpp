@@ -85,7 +85,7 @@ DiskInfo retrieveDiskInfo(const Zstring& pathName)
     HANDLE hVolume = ::CreateFile(volnameFmt.c_str(),
                                   0,
                                   FILE_SHARE_READ | FILE_SHARE_WRITE,
-                                  0,
+                                  nullptr,
                                   OPEN_EXISTING,
                                   0,
                                   nullptr);
@@ -237,12 +237,12 @@ public:
 
     std::wstring getCurrentStatus() //context of main thread, call repreatedly
     {
-        std::wstring filename;
+        Zstring filename;
         std::wstring statusMsg;
         {
             boost::lock_guard<boost::mutex> dummy(lockCurrentStatus);
             if (!currentFile.empty())
-                filename = utf8CvrtTo<std::wstring>(currentFile);
+                filename = currentFile;
             else if (!currentStatus.empty())
                 statusMsg = copyStringTo<std::wstring>(currentStatus);
         }
@@ -252,11 +252,9 @@ public:
             std::wstring statusText = copyStringTo<std::wstring>(textScanning);
             const long activeCount = activeWorker;
             if (activeCount >= 2)
-            {
-                statusText += L" " + _P("[1 Thread]", "[%x Threads]", activeCount);
-                replace(statusText, L"%x", numberTo<std::wstring>(activeCount));
-            }
-            statusText += std::wstring(L" \n") + L'\"' + filename + L'\"';
+                statusText += L" " + replaceCpy(_P("[1 Thread]", "[%x Threads]", activeCount), L"%x", numberTo<std::wstring>(activeCount));
+
+            statusText += L" " + fmtFileName(filename);
             return statusText;
         }
         else
@@ -451,18 +449,17 @@ public:
     DstHackCallbackImpl(AsyncCallback& acb, int threadID) :
         acb_(acb),
         threadID_(threadID),
-        textApplyingDstHack(toZ(replaceCpy(_("Encoding extended time information: %x"), L"%x", L"\n\"%x\""))) {}
+        textApplyingDstHack(replaceCpy(_("Encoding extended time information: %x"), L"%x", L"\n%x")) {}
 
 private:
     virtual void requestUiRefresh(const Zstring& filename) //applying DST hack imposes significant one-time performance drawback => callback to inform user
     {
-        const Zstring statusText = replaceCpy(textApplyingDstHack, Zstr("%x"), filename);
-        acb_.reportCurrentStatus(utf8CvrtTo<std::wstring>(statusText), threadID_);
+        acb_.reportCurrentStatus(replaceCpy(textApplyingDstHack, L"%x", fmtFileName(filename)), threadID_);
     }
 
     AsyncCallback& acb_;
     int threadID_;
-    const Zstring textApplyingDstHack;
+    const std::wstring textApplyingDstHack;
 };
 #endif
 //------------------------------------------------------------------------------------------

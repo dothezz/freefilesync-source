@@ -45,6 +45,7 @@ void setFileTime(const Zstring& filename, const Int64& modificationTime, ProcSym
 
 //symlink handling: always evaluate target
 UInt64 getFilesize(const Zstring& filename); //throw FileError
+UInt64 getFreeDiskSpace(const Zstring& path); //throw FileError
 
 //file handling
 bool removeFile(const Zstring& filename); //return "true" if file was actually deleted; throw FileError
@@ -54,13 +55,10 @@ void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = nul
 //rename file or directory: no copying!!!
 void renameFile(const Zstring& oldName, const Zstring& newName); //throw FileError;
 
-//move source to target; expectations: all super-directories of target exist
-//"ignoreExisting": if target already exists, source is deleted
-void moveFile(const Zstring& sourceFile, const Zstring& targetFile, bool ignoreExisting, CallbackMoveFile* callback); //throw FileError;
-
-//move source to target including subdirectories
-//"ignoreExisting": existing directories and files will be enriched
-void moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExisting, CallbackMoveFile* callback); //throw FileError;
+//move source to target across volumes; prerequisite: all super-directories of target exist
+//if target already contains some files/dirs they are seen as remnants of a previous incomplete move - see comment in moveDirectoryImpl
+void moveFile(const Zstring& sourceFile, const Zstring& targetFile, CallbackMoveFile* callback); //throw FileError
+void moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, CallbackMoveFile* callback); //throw FileError
 
 bool supportsPermissions(const Zstring& dirname); //throw FileError, derefernces symlinks
 
@@ -109,7 +107,7 @@ struct CallbackCopyFile //callback functionality
 
     //may throw:
     //Linux:   unconditionally
-    //Windows: first exception is swallowed, requestUiRefresh() is then called again where it should throw again and exception will propagate as expected
+    //Windows: first exception is swallowed, updateCopyStatus() is then called again where it should throw again and exception will propagate as expected
     virtual void updateCopyStatus(UInt64 totalBytesTransferred) = 0;
 };
 

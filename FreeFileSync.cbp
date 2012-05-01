@@ -159,7 +159,6 @@
 		<Unit filename="lib\dir_exist_async.h" />
 		<Unit filename="lib\dir_lock.cpp" />
 		<Unit filename="lib\dir_lock.h" />
-		<Unit filename="lib\error_log.h" />
 		<Unit filename="lib\ffs_paths.h" />
 		<Unit filename="lib\gtest\main.cpp">
 			<Option target="Unit Test" />
@@ -192,10 +191,16 @@
 		<Unit filename="lib\parallel_scan.h" />
 		<Unit filename="lib\parse_lng.h" />
 		<Unit filename="lib\parse_plural.h" />
+		<Unit filename="lib\perf_check.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="lib\perf_check.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
 		<Unit filename="lib\process_xml.cpp" />
 		<Unit filename="lib\process_xml.h" />
-		<Unit filename="lib\recycler.cpp" />
-		<Unit filename="lib\recycler.h" />
 		<Unit filename="lib\resolve_path.cpp" />
 		<Unit filename="lib\resolve_path.h" />
 		<Unit filename="lib\resources.cpp" />
@@ -203,8 +208,6 @@
 		<Unit filename="lib\shadow.cpp" />
 		<Unit filename="lib\shadow.h" />
 		<Unit filename="lib\soft_filter.h" />
-		<Unit filename="lib\statistics.cpp" />
-		<Unit filename="lib\statistics.h" />
 		<Unit filename="lib\status_handler.cpp" />
 		<Unit filename="lib\status_handler.h" />
 		<Unit filename="lib\xml_base.cpp" />
@@ -484,12 +487,15 @@
 		<Unit filename="zen\privilege.cpp" />
 		<Unit filename="zen\privilege.h" />
 		<Unit filename="zen\read_txt.h" />
+		<Unit filename="zen\recycler.cpp" />
+		<Unit filename="zen\recycler.h" />
 		<Unit filename="zen\stl_tools.h" />
 		<Unit filename="zen\string_base.h" />
 		<Unit filename="zen\string_tools.h" />
 		<Unit filename="zen\string_traits.h" />
 		<Unit filename="zen\symlink_target.h" />
 		<Unit filename="zen\thread.h" />
+		<Unit filename="zen\tick_count.h" />
 		<Unit filename="zen\utf8.h" />
 		<Unit filename="zen\warn_static.h" />
 		<Unit filename="zen\win.h" />

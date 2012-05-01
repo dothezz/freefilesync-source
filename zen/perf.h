@@ -8,116 +8,66 @@
 #define DEBUG_PERF_HEADER
 
 #include "deprecate.h"
+#include "tick_count.h"
 
 #ifdef FFS_WIN
 #include <sstream>
-#include "win.h" //includes "windows.h"
 #else
 #include <iostream>
-#include <time.h>
 #endif
 
-//two macros for quick performance measurements
-#define PERF_START CpuTimer perfTest;
+//############# two macros for quick performance measurements ###############
+#define PERF_START zen::PerfTimer perfTest;
 #define PERF_STOP  perfTest.showResult();
+//###########################################################################
 
-#ifdef FFS_WIN
-class CpuTimer
+namespace zen
+{
+class PerfTimer
 {
 public:
     class TimerError {};
 
     ZEN_DEPRECATE
-    CpuTimer() : frequency(), startTime(), resultShown(false)
+    PerfTimer() : ticksPerSec_(ticksPerSec()), startTime(), resultShown(false)
     {
-        SetThreadAffinity dummy;
-        if (!::QueryPerformanceFrequency(&frequency))
-            throw TimerError();
-        if (!::QueryPerformanceCounter  (&startTime))
+        //std::clock() - "counts CPU time in C and wall time in VC++" - WTF!???
+#ifdef FFS_WIN
+        if (::SetThreadAffinityMask(::GetCurrentThread(), 1) == 0) throw TimerError(); //"should not be required unless there are bugs in BIOS or HAL" - msdn, QueryPerformanceCounter
+#endif
+        startTime = getTicks();
+        if (ticksPerSec_ == 0 || !startTime.isValid())
             throw TimerError();
     }
 
-    ~CpuTimer()
-    {
-        if (!resultShown)
-            showResult();
-    }
+    ~PerfTimer() { if (!resultShown) showResult(); }
 
     void showResult()
     {
-        SetThreadAffinity dummy;
-        LARGE_INTEGER currentTime = {};
-        if (!::QueryPerformanceCounter(&currentTime))
+        const TickVal now = getTicks();
+        if (!now.isValid())
             throw TimerError();
 
-        const auto delta = static_cast<long>(1000.0 * (currentTime.QuadPart - startTime.QuadPart) / frequency.QuadPart);
+        const auto delta = static_cast<long>(1000.0 * (now - startTime) / ticksPerSec_);
+#ifdef FFS_WIN
         std::ostringstream ss;
         ss << delta << " ms";
-
         ::MessageBoxA(nullptr, ss.str().c_str(), "Timer", 0);
-        resultShown = true;
-
-        if (!::QueryPerformanceCounter(&startTime))
-            throw TimerError(); //don't include call to MessageBox()!
-    }
-
-private:
-    class SetThreadAffinity
-    {
-    public:
-        SetThreadAffinity() : oldmask(::SetThreadAffinityMask(::GetCurrentThread(), 1)) { if (oldmask == 0) throw TimerError(); }
-        ~SetThreadAffinity() { ::SetThreadAffinityMask(::GetCurrentThread(), oldmask); }
-    private:
-        SetThreadAffinity(const SetThreadAffinity&);
-        SetThreadAffinity& operator=(const SetThreadAffinity&);
-        const DWORD_PTR oldmask;
-    };
-
-    LARGE_INTEGER frequency;
-    LARGE_INTEGER startTime;
-    bool resultShown;
-};
-
-
 #else
-class CpuTimer
-{
-public:
-    class TimerError {};
-
-    ZEN_DEPRECATE
-    CpuTimer() : startTime(), resultShown(false)
-    {
-        //clock() seems to give grossly incorrect results: multi core issue?
-        //gettimeofday() seems fine but is deprecated
-        if (::clock_gettime(CLOCK_MONOTONIC_RAW, &startTime) != 0) //CLOCK_MONOTONIC measures time reliably across processors!
-            throw TimerError();
-    }
-
-    ~CpuTimer()
-    {
-        if (!resultShown)
-            showResult();
-    }
-
-    void showResult()
-    {
-        timespec currentTime = {};
-        if (::clock_gettime(CLOCK_MONOTONIC_RAW, &currentTime) != 0)
-            throw TimerError();
-
-        const auto delta = static_cast<long>((currentTime.tv_sec - startTime.tv_sec) * 1000.0 + (currentTime.tv_nsec - startTime.tv_nsec) / 1000000.0);
         std::clog << "Perf: duration: " << delta << " ms\n";
+#endif
         resultShown = true;
 
-        if (::clock_gettime(CLOCK_MONOTONIC_RAW, &startTime) != 0)
+        startTime = getTicks(); //don't include call to MessageBox()!
+        if (!startTime.isValid())
             throw TimerError();
     }
 
 private:
-    timespec startTime;
+    const std::int64_t ticksPerSec_;
+    TickVal startTime;
     bool resultShown;
 };
-#endif
+}
 
 #endif //DEBUG_PERF_HEADER

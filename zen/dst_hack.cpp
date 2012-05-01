@@ -21,13 +21,9 @@ Zstring getVolumeName(const Zstring& filename)
     //                             fsName,           //__out  LPTSTR lpszVolumePathName,
     //                             BUFFER_SIZE))     //__in   DWORD cchBufferLength
     // ...
-    //    Zstring volumePath = fsName;
-    //    if (!volumePath.EndsWith(FILE_NAME_SEPARATOR)) //a trailing backslash is required
-    //        volumePath += FILE_NAME_SEPARATOR;
+    //    Zstring volumePath = appendSeparator(fsName);
 
-    Zstring nameFmt = removeLongPathPrefix(filename); //throw()
-    if (!endsWith(nameFmt, FILE_NAME_SEPARATOR))
-        nameFmt += FILE_NAME_SEPARATOR; //GetVolumeInformation expects trailing backslash
+    const Zstring nameFmt = appendSeparator(removeLongPathPrefix(filename)); //throw()
 
     if (startsWith(nameFmt, Zstr("\\\\"))) //UNC path: "\\ComputerName\SharedFolder\"
     {
@@ -82,8 +78,10 @@ bool dst::isFatDrive(const Zstring& fileName) //throw()
 }
 
 
+/*
 bool dst::isFatDrive(HANDLE hFile) //throw()
 {
+Requires Windows Vista!
     //dynamically load windows API function
     typedef BOOL (WINAPI* GetVolumeInformationByHandleWFunc)(HANDLE  hFile,
                                                              LPWSTR  lpVolumeNameBuffer,
@@ -120,6 +118,7 @@ bool dst::isFatDrive(HANDLE hFile) //throw()
     return fsName == Zstring(L"FAT") ||
            fsName == Zstring(L"FAT32");
 }
+*/
 
 
 namespace
@@ -159,7 +158,7 @@ Int64 toInt64(const FILETIME& fileTime)
 
 
 inline
-FILETIME utcToLocal(const FILETIME& utcTime) //throw (std::runtime_error)
+FILETIME utcToLocal(const FILETIME& utcTime) //throw std::runtime_error
 {
     //treat binary local time representation (which is invariant under DST time zone shift) as logical UTC:
     FILETIME localTime = {};
@@ -177,7 +176,7 @@ FILETIME utcToLocal(const FILETIME& utcTime) //throw (std::runtime_error)
 
 
 inline
-FILETIME localToUtc(const FILETIME& localTime) //throw (std::runtime_error)
+FILETIME localToUtc(const FILETIME& localTime) //throw std::runtime_error
 {
     //treat binary local time representation (which is invariant under DST time zone shift) as logical UTC:
     FILETIME utcTime = {};
@@ -330,7 +329,7 @@ bool dst::fatHasUtcEncoded(const RawTime& rawTime) //"createTimeRaw" as retrieve
 }
 
 
-dst::RawTime dst::fatEncodeUtcTime(const FILETIME& writeTimeRealUtc) //throw (std::runtime_error)
+dst::RawTime dst::fatEncodeUtcTime(const FILETIME& writeTimeRealUtc) //throw std::runtime_error
 {
     const FILETIME fatWriteTimeUtc = roundToFatWriteTime(writeTimeRealUtc); //writeTimeRealUtc may have incompatible precision (NTFS)
 

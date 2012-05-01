@@ -67,12 +67,12 @@ void Application::OnStartApplication(wxIdleEvent& event)
         if (!fileExists(filename)) //be a little tolerant
         {
             if (fileExists(filename + Zstr(".ffs_real")))
-                filename = filename + Zstr(".ffs_real");
+                filename += Zstr(".ffs_real");
             else if (fileExists(filename + Zstr(".ffs_batch")))
-                filename = filename + Zstr(".ffs_batch");
+                filename += Zstr(".ffs_batch");
             else
             {
-                wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + toWx(filename) + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                wxMessageBox(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)), _("Error"), wxOK | wxICON_ERROR);
                 return;
             }
         }
@@ -103,11 +103,21 @@ int Application::OnRun()
     }
     catch (const std::exception& e) //catch all STL exceptions
     {
-        //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(toWx(zen::getConfigDir()) + wxT("LastError.txt"), wxFile::write);
-        safeOutput.Write(wxString::FromAscii(e.what()));
+        //it's not always possible to display a message box, e.g. corrupted stack, however (non-stream) file output works!
+        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
+        safeOutput.Write(utf8CvrtTo<wxString>(e.what()));
 
-        wxSafeShowMessage(_("An exception occurred!") + L" - RTS", wxString::FromAscii(e.what()));
+        wxSafeShowMessage(_("An exception occurred!") + L" - RTS", utf8CvrtTo<wxString>(e.what()));
+        return -9;
+    }
+    catch (...) //catch the rest
+    {
+        const wxString& msg = L"Unknown error.";
+
+        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
+        safeOutput.Write(msg);
+
+        wxSafeShowMessage(_("An exception occurred!"), msg);
         return -9;
     }
 

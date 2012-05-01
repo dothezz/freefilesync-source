@@ -5,30 +5,31 @@
 // **************************************************************************
 
 #include "watcher.h"
+#include <set>
+#include <zen/tick_count.h>
 #include <zen/file_handling.h>
 #include <zen/stl_tools.h>
-#include <set>
-#include <ctime>
+#include <zen/dir_watcher.h>
+#include <zen/thread.h>
+#include <zen/assert_static.h>
+#include <wx+/string_conv.h>
 #include <wx/timer.h>
 #include "../lib/resolve_path.h"
-#include <zen/dir_watcher.h>
-#include <wx+/string_conv.h>
-#include <zen/thread.h>
 //#include "../library/db_file.h"     //SYNC_DB_FILE_ENDING -> complete file too much of a dependency; file ending too little to decouple into single header
 //#include "../library/lock_holder.h" //LOCK_FILE_ENDING
-#include <wx/msgdlg.h>
 
 using namespace zen;
 
+namespace
+{
+const std::int64_t TICKS_UPDATE_INTERVAL = rts::UI_UPDATE_INTERVAL* ticksPerSec() / 1000;
+TickVal lastExec = getTicks();
+};
 
 bool rts::updateUiIsAllowed()
 {
-    const std::clock_t CLOCK_UPDATE_INTERVAL = UI_UPDATE_INTERVAL * CLOCKS_PER_SEC / 1000;
-
-    static std::clock_t lastExec = 0;
-    const std::clock_t now = std::clock(); //this is quite fast: 2 * 10^-5
-
-    if (now - lastExec >= CLOCK_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
+    const TickVal now = getTicks(); //0 on error
+    if (now - lastExec >= TICKS_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
     {
         lastExec = now;
         return true;
@@ -36,28 +37,29 @@ bool rts::updateUiIsAllowed()
     return false;
 }
 
+
 namespace
 {
 const int CHECK_DIR_INTERVAL = 1000; //1 second interval
+
+
+std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& dirs) //throw FileError
+{
+    std::set<Zstring, LessFilename> tmp; //make unique
+
+    std::transform(dirs.begin(), dirs.end(), std::inserter(tmp, tmp.end()),
+    [](const Zstring& dirnameNonFmt) { return getFormattedDirectoryName(dirnameNonFmt); });
+
+    return std::vector<Zstring>(tmp.begin(), tmp.end());
+}
 }
 
 
-rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, WaitCallback* statusHandler) //throw FileError
+rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, WaitCallback& statusHandler) //throw FileError
 {
-    std::set<Zstring, LessFilename> dirNamesFmt;
-
-    std::for_each(dirNamesNonFmt.begin(), dirNamesNonFmt.end(),
-                  [&](const Zstring& dirnameNonFmt)
-    {
-        const Zstring& dirnameFmt = zen::getFormattedDirectoryName(dirnameNonFmt);
-
-        if (dirnameFmt.empty())
-            throw zen::FileError(_("A directory input field is empty."));
-        dirNamesFmt.insert(dirnameFmt);
-    });
+    const std::vector<Zstring> dirNamesFmt = getFormattedDirs(dirNamesNonFmt); //throw FileError
     if (dirNamesFmt.empty()) //pathological case, but check is needed nevertheless
-        throw zen::FileError(_("A directory input field is empty."));
-
+        throw zen::FileError(_("A directory input field is empty.")); //should have been checked by caller!
 
     //detect when volumes are removed/are not available anymore
     std::vector<std::pair<Zstring, std::shared_ptr<DirWatcher>>> watches;
@@ -67,16 +69,24 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
         const Zstring& dirnameFmt = *iter;
         try
         {
+            //a non-existent network path may block, so check existence asynchronously!
+            auto ftDirExists = async([=] { return zen::dirExists(dirnameFmt); });
+            while (!ftDirExists.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL)))
+                statusHandler.requestUiRefresh(); //may throw!
+            if (!ftDirExists.get())
+                return WaitResult(CHANGE_DIR_MISSING, dirnameFmt);
+
+
             watches.push_back(std::make_pair(dirnameFmt, std::make_shared<DirWatcher>(dirnameFmt))); //throw FileError, ErrorNotExisting
         }
         catch (ErrorNotExisting&) //nice atomic behavior: *no* second directory existence check!!!
         {
-            return CHANGE_DIR_MISSING;
+            return WaitResult(CHANGE_DIR_MISSING, dirnameFmt);
         }
         catch (FileError&) //play safe: remedy potential FileErrors that should have been ErrorNotExisting (e.g. Linux: errors during directory traversing)
         {
-            if (!dirExists(dirnameFmt)) //not an atomic behavior!!!
-                return CHANGE_DIR_MISSING;
+            if (!dirExists(dirnameFmt)) //file system race condition!!
+                return WaitResult(CHANGE_DIR_MISSING, dirnameFmt);
             throw;
         }
     }
@@ -104,11 +114,11 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
             //IMPORTANT CHECK: dirwatcher has problems detecting removal of top watched directories!
             if (checkDirExistNow)
                 if (!dirExists(dirname)) //catch errors related to directory removal, e.g. ERROR_NETNAME_DELETED
-                    return CHANGE_DIR_MISSING;
+                    return WaitResult(CHANGE_DIR_MISSING, dirname);
 
             try
             {
-                std::vector<Zstring> changedFiles = watcher.getChanges([&] { statusHandler->requestUiRefresh(); }); //throw FileError, ErrorNotExisting
+                std::vector<Zstring> changedFiles = watcher.getChanges([&] { statusHandler.requestUiRefresh(); }); //throw FileError, ErrorNotExisting
 
                 //remove to be ignored changes
                 vector_remove_if(changedFiles, [](const Zstring& name)
@@ -130,67 +140,61 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
             }
             catch (ErrorNotExisting&) //nice atomic behavior: *no* second directory existence check!!!
             {
-                return CHANGE_DIR_MISSING;
+                return WaitResult(CHANGE_DIR_MISSING, dirname);
             }
             catch (FileError&) //play safe: remedy potential FileErrors that should have been ErrorNotExisting (e.g. Linux: errors during directory traversing)
             {
-                if (!dirExists(dirname)) //not an atomic behavior!!!
-                    return CHANGE_DIR_MISSING;
+                if (!dirExists(dirname)) //file system race condition!!
+                    return WaitResult(CHANGE_DIR_MISSING, dirname);
                 throw;
             }
         }
 
-        wxMilliSleep(rts::UI_UPDATE_INTERVAL);
-        statusHandler->requestUiRefresh();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL));
+        statusHandler.requestUiRefresh();
     }
 }
 
 
 //support for monitoring newly connected directories volumes (e.g.: USB-sticks)
-void rts::waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt, WaitCallback* statusHandler) //throw FileError
+void rts::waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt, WaitCallback& statusHandler) //throw FileError
 {
-    wxLongLong lastCheck;
-
     while (true)
     {
-        const wxLongLong current = wxGetLocalTimeMillis();
-        if (current - lastCheck >= CHECK_DIR_INTERVAL)
+        //support specifying volume by name => call getFormattedDirectoryName() repeatedly
+        const std::vector<Zstring>& dirNamesFmt = getFormattedDirs(dirNamesNonFmt); //throw FileError
+
+        bool allExisting = true;
+        for (auto iter = dirNamesFmt.begin(); iter != dirNamesFmt.end(); ++iter)
         {
-            lastCheck = current;
-
-            auto ftDirMissing = async([=]() -> bool
+            const Zstring dirnameFmt = *iter;
+            auto ftDirExisting = async([=]() -> bool
             {
-                return std::find_if(dirNamesNonFmt.begin(), dirNamesNonFmt.end(),
-                [](const Zstring& dirnameNonFmt) -> bool
-                {
-                    //support specifying volume by name => call getFormattedDirectoryName() repeatedly
-                    const Zstring dirnameFmt = zen::getFormattedDirectoryName(dirnameNonFmt);
-
-                    if (dirnameFmt.empty())
-                        throw zen::FileError(_("A directory input field is empty."));
 #ifdef FFS_WIN
-                    //1. login to network share, if necessary
-                    loginNetworkShare(dirnameFmt, false); //login networks shares, no PW prompt -> is this really RTS's task?
+                //1. login to network share, if necessary -> we probably do NOT want multiple concurrent runs: GUI!?
+                loginNetworkShare(dirnameFmt, false); //login networks shares, no PW prompt -> is this really RTS's job?
 #endif
-                    //2. check dir existence
-                    return !zen::dirExists(dirnameFmt);
-                }) != dirNamesNonFmt.end();
+                //2. check dir existence
+                return zen::dirExists(dirnameFmt);
             });
-            while (!ftDirMissing.timed_wait(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL)))
-                statusHandler->requestUiRefresh(); //may throw!
+            while (!ftDirExisting.timed_wait(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL)))
+                statusHandler.requestUiRefresh(); //may throw!
 
-            try
+            if (!ftDirExisting.get())
             {
-                if (!ftDirMissing.get()) //throw X
-                    return;
-            }
-            catch (...) //boost::future seems to map async exceptions to "some" boost exception type -> migrate this for C++11
-            {
-                throw zen::FileError(_("A directory input field is empty."));
+                allExisting = false;
+                break;
             }
         }
+        if (allExisting)
+            return;
 
-        wxMilliSleep(rts::UI_UPDATE_INTERVAL);
-        statusHandler->requestUiRefresh();
+        //wait some time...
+        assert_static(CHECK_DIR_INTERVAL % UI_UPDATE_INTERVAL == 0);
+        for (int i = 0; i < CHECK_DIR_INTERVAL / UI_UPDATE_INTERVAL; ++i)
+        {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
+            statusHandler.requestUiRefresh();
+        }
     }
 }

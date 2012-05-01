@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>Procházet adresář</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Požadavek na přerušení: Čekání na ukončení aktuální operace...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatická synchronizace</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Chybový kód Linux %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Nelze najít odkaz zástupce:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Nelze najít odkaz zástupce %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -137,35 +140,41 @@
 <pluralform>%x B</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Nelze číst ze synchronizační databáze:</target>
+<source>Cannot read file %x.</source>
+<target>Nelze číst soubor %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Nelze zapsat do synchronizační databáze:</target>
+<source>Cannot write file %x.</source>
+<target>Nelze zapsat soubor %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Chybný formát synchronizační databáze:</target>
+<source>Database file %x is incompatible.</source>
+<target>Chybný formát databáze %x.</target>
 
 <source>Initial synchronization:</source>
 <target>Prvotní synchronizace:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Některý z databázových souborů FreeFileSync neexistuje:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Databázový soubor %x neexistuje.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Databázové soubory nejsou navzájem komplementární</target>
+<source>Out of memory!</source>
+<target>Nedostatek pracovní paměti!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Databázové soubory nejsou navzájem komplementární.</target>
 
 <source>An exception occurred!</source>
 <target>Vyskytla se chyba!</target>
 
-<source>Error reading file attributes:</source>
-<target>Nelze číst atributy souboru:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Nelze číst atributy souboru %x.</target>
+
+<source>Cannot get process information.</source>
+<target>Nelze získat informace procesu.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Čekání na uzamčení adresáře (%x)</target>
 
-<source>Error setting directory lock:</source>
-<target>Nelze nastavit zámek adresáře:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Nelze nastavit zámek adresáře %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -177,8 +186,8 @@
 <pluralform>%x sekund</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Nelze číst soubor:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Chyba zpracování souboru %x: na řádku %y ve sloupci %z</target>
 
 <source>Scanning:</source>
 <target>Zpracováváno:</target>
@@ -196,38 +205,32 @@
 <pluralform>[%x procesů]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Chybný konfigurační soubor FreeFileSync!</target>
+<source>/sec</source>
+<target>/s</target>
 
-<source>Error parsing configuration file:</source>
-<target>Nelze zpracovat konfigurační soubor:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>Soubor %x neobsahuje platnou konfiguraci.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Konfigurace byla načtena jen částečně:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Konfigurace ze souboru %x byla načtena jen částečně.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>Není možné přesunout %x do Koše!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Nepodařil se přístup ke službě Volume Shadow Copy Service.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Prosím použijte FreeFileSync 64-bitovou verzi pro použití služby Volume Shadow Copy.</target>
 
 <source>Cannot load file %x.</source>
 <target>Nelze načíst soubor %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Nepodařil se přístup ke službě Volume Shadow Copy Service!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Vytváření stínových kopií na WOW64 není podporováno. Prosím použijte 64 bitovou verzi FreeFileSync.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Nelze zjistit jméno jednotky souboru:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>>Nelze zjistit jméno jednotky souboru %x.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Disk %x není součástí jména souboru %y!</target>
 
-<source>/sec</source>
-<target>/s</target>
-
-<source>File does not exist:</source>
-<target>Soubor neexistuje:</target>
+<source>Cannot find file %x.</source>
+<target>Nalze najít soubor %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Nelze načíst následující XML elementy:</target>
@@ -306,9 +309,6 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>RealtimeSync configuration</source>
 <target>Konfigurace RealtimeSync</target>
 
-<source>File already exists. Overwrite?</source>
-<target>Soubor již existuje. Přepsat?</target>
-
 <source>&Restore</source>
 <target>&Obnovit</target>
 
@@ -351,20 +351,20 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>FreeFileSync configuration</source>
 <target>Konfigurace FreeFileSync</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync Dávkové zpracování</target>
-
-<source>Unable to create log file!</source>
-<target>Není možné vytvořit záznamový soubor!</target>
-
 <source>Batch execution</source>
 <target>Spuštění dávky</target>
 
-<source>Stop</source>
-<target>Stop</target>
+<source>Items processed:</source>
+<target>Zpracováno položek:</target>
+
+<source>Items remaining:</source>
+<target>Zbývá položek:</target>
 
 <source>Total time:</source>
 <target>Celkový čas:</target>
+
+<source>Stop</source>
+<target>Stop</target>
 
 <source>Synchronization aborted!</source>
 <target>Synchronizace zrušena!</target>
@@ -372,14 +372,17 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Synchronization completed with errors!</source>
 <target>Synchronizace dokončena s chybami.</target>
 
+<source>Nothing to synchronize!</source>
+<target>Není co synchronizovat!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Synchronizace dokončena úspěšně!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Talčítkem "Přepnout" otevřete okno FreeFileSync.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Použijte tlačítko "Přepnout" k vyřešení problému pomocí hlavního okna FreeFileSync.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Otevírání okna FreeFileSync...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Přepínání do hlavního okna FreeFileSync...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Není možné se připojit k sourceforge.net!</target>
@@ -537,9 +540,6 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Items found:</source>
 <target>Nalezeno položek:</target>
 
-<source>Items remaining:</source>
-<target>Zbývá položek:</target>
-
 <source>Speed:</source>
 <target>Rychlost:</target>
 
@@ -591,8 +591,8 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>&Load</source>
 <target>&Načíst</target>
 
-<source>&Cancel</source>
-<target>&Zrušit</target>
+<source>Cancel</source>
+<target>Zrušit</target>
 
 <source>Select variant:</source>
 <target>Vyberte variantu:</target>
@@ -642,8 +642,8 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikty/soubory které nelze zařadit</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Porovnat ...</target>
@@ -677,9 +677,6 @@ je stejný
 
 <source>Synchronizing...</source>
 <target>Synchronizuji...</target>
-
-<source>Items processed:</source>
-<target>Zpracováno položek:</target>
 
 <source>&Pause</source>
 <target>&Pauza</target>
@@ -1020,9 +1017,6 @@ Vynechat: \někde\něco\*
 <source>File list exported!</source>
 <target>Seznam souborů exportován!</target>
 
-<source>Error writing file:</source>
-<target>Nelze zapsat souboru:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1072,20 +1066,20 @@ Vynechat: \někde\něco\*
 <source>Paused</source>
 <target>Pauza</target>
 
+<source>Initializing...</source>
+<target>Inicializace...</target>
+
 <source>Aborted</source>
 <target>Přerušeno</target>
 
 <source>Completed</source>
 <target>Hotovo</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Požadavek na přerušení: Čekání na ukončení aktuální operace...</target>
+<source>Continue</source>
+<target>Pokračovat</target>
 
 <source>Pause</source>
 <target>Pauza</target>
-
-<source>Continue</source>
-<target>Pokračovat</target>
 
 <source>Cannot find %x</source>
 <target>Nelze najít %x</target>
@@ -1230,65 +1224,65 @@ Vynechat: \někde\něco\*
 <pluralform>%x dnů</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Nelze nastavit monitorování adresáře:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Nelze pokračovat ve sledování adresářů.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Nelze nastavit monitorování adresáře %x.</target>
 
 <source>Conversion error:</source>
 <target>Chyba konverze:</target>
 
-<source>Error deleting file:</source>
-<target>Nelze smazat soubor:</target>
+<source>Cannot delete file %x.</source>
+<target>Nelze smazat soubor %x.</target>
 
-<source>Error moving file:</source>
-<target>Nelze přesunout soubor:</target>
+<source>The file is locked by another process:</source>
+<target>Soubor je uzamčen jiným procesem:</target>
 
-<source>Target file already existing!</source>
-<target>Cílový soubor již existuje!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Nelze přesunout soubor %x do %y.</target>
 
-<source>Error moving directory:</source>
-<target>Nelze přesunout adresář:</target>
+<source>Cannot delete directory %x.</source>
+<target>Nelze smazat adresář %x.</target>
 
-<source>Target directory already existing!</source>
-<target>Cílový adresář již existuje!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Nelze nastavit atribut času změny pro %x.</target>
 
-<source>Error deleting directory:</source>
-<target>Nelze smazat adresář:</target>
+<source>Cannot find system function %x.</source>
+<target>Nelze najít systémovou funkci %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Nelze nastavit atribut času změny:</target>
+<source>Cannot read security context of %x.</source>
+<target>Nelze číst přístupová práva pro %x.</target>
 
-<source>Error loading library function:</source>
-<target>Nepodařilo se načíst funkci z knihovny:</target>
+<source>Cannot write security context of %x.</source>
+<target>Nelze zapsat přístupová práva pro %x.</target>
 
-<source>Error reading security context:</source>
-<target>Nelze číst přístupová práva:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Nelze číst oprávnění pro %x.</target>
 
-<source>Error writing security context:</source>
-<target>Nelze zapsat přístupová práva:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Nelze zapsat oprávnění pro %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Nelze kopírovat oprávnění souboru:</target>
+<source>Cannot create directory %x.</source>
+<target>Nelze vytvořit adresář %x.</target>
 
-<source>Error creating directory:</source>
-<target>Nelze vytvořit adresář:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Nelze kopítovat zástupce %x do %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Nelze kopírovat zástupce:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Nelze zapsat atributy souboru %x.</target>
 
-<source>Error copying file:</source>
-<target>Nelze kopírovat souboru:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Nelze kopírovat soubor %x do %y.</target>
 
-<source>Error traversing directory:</source>
-<target>Nelze procházet adresář:</target>
+<source>Cannot read directory %x.</source>
+<target>Nelze číst adresář %x.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Zacyklení při procházení adresáře:</target>
+<source>Endless loop.</source>
+<target>Nekonečná smyčka.</target>
 
-<source>Error setting privilege:</source>
-<target>Nelze nastavit práva:</target>
+<source>Cannot set privilege %x.</source>
+<target>Nelze nastavit práva pro %x.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Není možné přesunout %x do Koše!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Došlo ke změně obou stran od poslední synchronizace!</target>
@@ -1314,8 +1308,8 @@ Vynechat: \někde\něco\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Tuto chybu můžete přeskočit a považovat neexistující adresář jako prázdný.</target>
 
-<source>Directory does not exist:</source>
-<target>Adresář neexistuje:</target>
+<source>Cannot find directory %x.</source>
+<target>Nelze najít adresář %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Adresáře jsou závislé! Buďte opatrní s definicí synchronizačních pravidel:</target>
@@ -1323,20 +1317,17 @@ Vynechat: \někde\něco\*
 <source>Preparing synchronization...</source>
 <target>Příprava synchronizace...</target>
 
-<source>Out of memory!</source>
-<target>Nedostatek pracovní paměti!</target>
+<source>Conflict detected:</source>
+<target>Zaznamenán konflikt:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Soubor %x má chybné datum!</target>
 
-<source>Conflict detected:</source>
-<target>Zaznamenán konflikt:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Soubory %x mají stejné datum a čas ale rozdílnou velikost!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Symbolický odkaz %x má stejné datum ale jiný cíl!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Symbolický odkaz %x má stejné datum ale jiný cíl.</target>
 
 <source>Comparing content of files %x</source>
 <target>Porovnávání obsahu souborů %x</target>
@@ -1419,11 +1410,11 @@ Vynechat: \někde\něco\*
 <source>Creating file %x</source>
 <target>Vytváření souboru %x</target>
 
-<source>Creating folder %x</source>
-<target>Vytváření adresáře %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Vytváření symbolického odkazu %x</target>
+
+<source>Creating folder %x</source>
+<target>Vytváření adresáře %x</target>
 
 <source>Overwriting file %x</source>
 <target>Přepisování souboru %x</target>
@@ -1443,8 +1434,8 @@ Vynechat: \někde\něco\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Nebyl zadán adresář pro verzování souborů!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Zdrojový adresář již neexistuje:</target>
+<source>Source directory %x not found.</source>
+<target>Zdrojový adresář %x nelze najít.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Nevyřešené konflikty!</target>
@@ -1478,12 +1469,6 @@ Vynechat: \někde\něco\*
 
 <source>Generating database...</source>
 <target>Vytváření databáze...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Není co synchronizovat!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>Nelze kopírovat zamčený souboru %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Nezdařila se verifikace dat: Zdrojový a cílový soubor mají rozdílný obsah!</target>

@@ -7,6 +7,7 @@
 #include "file_hierarchy.h"
 #include <zen/i18n.h>
 #include <zen/utf8.h>
+#include <zen/file_error.h>
 
 using namespace zen;
 
@@ -373,11 +374,11 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
                     return getSyncOpDescription(op) + L"\n" +
                            (EqualFilename()(beforeLast(relSource, FILE_NAME_SEPARATOR), beforeLast(relTarget, FILE_NAME_SEPARATOR)) ? //returns empty string if ch not found
                             //detected pure "rename"
-                            L"\"" + utf8CvrtTo<std::wstring>(afterLast(relSource, FILE_NAME_SEPARATOR)) + L"\"" + L" ->\n" + //show short name only
-                            L"\"" + utf8CvrtTo<std::wstring>(afterLast(relTarget, FILE_NAME_SEPARATOR)) + L"\"" :
+                            fmtFileName(afterLast(relSource, FILE_NAME_SEPARATOR)) + L" ->\n" + //show short name only
+                            fmtFileName(afterLast(relTarget, FILE_NAME_SEPARATOR)) :
                             //"move" or "move + rename"
-                            L"\"" + utf8CvrtTo<std::wstring>(relSource) + L"\"" + L" ->\n" +
-                            L"\"" + utf8CvrtTo<std::wstring>(relTarget) + L"\"");
+                            fmtFileName(relSource) + L" ->\n" +
+                            fmtFileName(relTarget));
                     //attention: ::SetWindowText() doesn't handle tab characters correctly in combination with certain file names, so don't use them
                 }
             break;

@@ -81,7 +81,7 @@
 			<Add option="-DWXINTL_NO_GETTEXT_MACRO" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Program Files\C++\Boost" />
-			<Add directory="..\." />
+			<Add directory=".." />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />

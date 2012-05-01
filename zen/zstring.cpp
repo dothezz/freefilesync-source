@@ -67,7 +67,7 @@ std::string LeakChecker::rawMemToString(const void* ptr, size_t size)
 }
 
 
-void LeakChecker::reportProblem(const std::string& message) //throw (std::logic_error)
+void LeakChecker::reportProblem(const std::string& message) //throw std::logic_error
 {
 #ifdef FFS_WIN
     ::MessageBoxA(nullptr, message.c_str(), "Error", 0);

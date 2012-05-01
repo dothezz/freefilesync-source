@@ -21,7 +21,7 @@ namespace zen
 /*
 Allocator Policy:
 -----------------
-    void* allocate(size_t size) //throw (std::bad_alloc)
+    void* allocate(size_t size) //throw std::bad_alloc
     void deallocate(void* ptr)
     size_t calcCapacity(size_t length)
 */
@@ -29,7 +29,7 @@ class AllocatorOptimalSpeed //exponential growth + min size
 {
 public:
     //::operator new/ ::operator delete show same performance characterisics like malloc()/free()!
-    static void* allocate(size_t size) { return ::operator new(size); } //throw (std::bad_alloc)
+    static void* allocate(size_t size) { return ::operator new(size); } //throw std::bad_alloc
     static void  deallocate(void* ptr) { ::operator delete(ptr); }
     static size_t calcCapacity(size_t length) { return std::max<size_t>(16, length + length / 2); } //any growth rate should not exceed golden ratio: 1.618033989
 };
@@ -38,7 +38,7 @@ public:
 class AllocatorOptimalMemory //no wasted memory, but more reallocations required when manipulating string
 {
 public:
-    static void* allocate(size_t size) { return ::operator new(size); } //throw (std::bad_alloc)
+    static void* allocate(size_t size) { return ::operator new(size); } //throw std::bad_alloc
     static void  deallocate(void* ptr) { ::operator delete(ptr); }
     static size_t calcCapacity(size_t length) { return length; }
 };
@@ -194,7 +194,7 @@ public:
     Zbase(const Char* source, size_t length);
     Zbase(const Zbase& source);
     Zbase(Zbase&& tmp);
-    explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups...
+    explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups... forgot &, but no error
     //allow explicit construction from different string type, prevent ambiguity via SFINAE
     template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
     ~Zbase();

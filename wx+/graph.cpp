@@ -411,7 +411,8 @@ void Graph2D::render(wxDC& dc) const
             if (iter->first.get())
             {
                 const GraphData& graph = *iter->first;
-                assert(graph.getXBegin() <= graph.getXEnd());
+                assert(graph.getXBegin() <= graph.getXEnd() + 1.0e-9);
+                //GCC fucks up bad when comparing two *binary identical* doubles and finds "begin > end" with diff of 1e-18
 
                 if (attr.minXauto)
                     minWndX = std::min(minWndX, graph.getXBegin());

@@ -284,11 +284,16 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_SWEDISH_FINLAND:
             return wxLANGUAGE_SWEDISH;
 
+            //variants of wxLANGUAGE_NORWEGIAN_BOKMAL
+        case wxLANGUAGE_NORWEGIAN_NYNORSK:
+            return wxLANGUAGE_NORWEGIAN_BOKMAL;
+
             //case wxLANGUAGE_CZECH:
             //case wxLANGUAGE_DANISH:
             //case wxLANGUAGE_FINNISH:
             //case wxLANGUAGE_GREEK:
             //case wxLANGUAGE_JAPANESE:
+            //case wxLANGUAGE_LITHUANIAN:
             //case wxLANGUAGE_POLISH:
             //case wxLANGUAGE_SLOVENIAN:
             //case wxLANGUAGE_HUNGARIAN:
@@ -384,22 +389,21 @@ void zen::setLanguage(int language)
 
     //load language file into buffer
     if (!languageFile.empty()) //if languageFile is empty texts will be english per default
-    {
         try
         {
             zen::setTranslator(new FFSLocale(languageFile, static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, PluralForm::ParsingError
         }
         catch (lngfile::ParsingError& e)
         {
-            wxMessageBox(wxString(_("Error reading file:")) + wxT(" \"") + languageFile + wxT("\"") + wxT("\n\n") +
-                         wxT("Row: ")    + zen::toStringSep(e.row) + wxT("\n") +
-                         wxT("Column: ") + zen::toStringSep(e.col) + wxT("\n"), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
+                                                          L"%x", fmtFileName(toZ(languageFile))),
+                                               L"%y", numberTo<std::wstring>(e.row)),
+                                    L"%z", numberTo<std::wstring>(e.col)), _("Error"), wxOK | wxICON_ERROR);
         }
         catch (PluralForm::ParsingError&)
         {
-            wxMessageBox(wxT("Invalid Plural Form"), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(L"Invalid Plural Form", _("Error"), wxOK | wxICON_ERROR);
         }
-    }
 }
 
 

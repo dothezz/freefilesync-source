@@ -11,6 +11,7 @@
 #include <ctime>
 #include "string_tools.h"
 
+
 namespace zen
 {
 struct TimeComp //replaces "struct std::tm" and SYSTEMTIME
@@ -26,7 +27,7 @@ struct TimeComp //replaces "struct std::tm" and SYSTEMTIME
 };
 
 TimeComp localTime   (time_t utc = std::time(nullptr)); //convert time_t (UTC) to local time components
-time_t   localToTimeT(const TimeComp& comp);         //convert local time components to time_t (UTC), returns -1 on error
+time_t   localToTimeT(const TimeComp& comp);            //convert local time components to time_t (UTC), returns -1 on error
 
 //----------------------------------------------------------------------------------------------------------------------------------
 
@@ -52,6 +53,9 @@ const struct FormatIsoDateTimeTag {} FORMAT_ISO_DATE_TIME = {}; //%Y-%m-%d %H:%M
 
 template <class String>
 bool parseTime(const String& format, const String& str, TimeComp& comp); //similar to ::strptime(), return true on success
+
+//----------------------------------------------------------------------------------------------------------------------------------
+
 
 
 

@@ -9,7 +9,7 @@
 #include <set>
 #include <zen/thread.h> //includes <boost/thread.hpp>
 #include <zen/scope_guard.h>
-#include <boost/thread/once.hpp>
+//#include <boost/thread/once.hpp>
 
 #ifdef FFS_WIN
 #include <zen/dll.h>
@@ -147,7 +147,7 @@ Zstring getFileExtension(const Zstring& filename)
 {
     const Zstring shortName = afterLast(filename, Zchar('\\')); //warning: using windows file name separator!
 
-    return shortName.find(Zchar('.')) != Zstring::npos ?
+    return contains(shortName, Zchar('.')) ?
            afterLast(filename, Zchar('.')) :
            Zstring();
 }
@@ -193,7 +193,7 @@ int getShilIconType(IconBuffer::IconSize sz)
 }
 
 
-DllFun<thumb::GetIconByIndexFct> getIconByIndex;
+DllFun<thumb::FunType_getIconByIndex> getIconByIndex;
 boost::once_flag initGetIconByIndexOnce = BOOST_ONCE_INIT;
 
 
@@ -210,9 +210,10 @@ IconHolder getIconByAttribute(LPCWSTR pszPath, DWORD dwFileAttributes, IconBuffe
     if (!imgList)
         return IconHolder();
 
-    boost::call_once(initGetIconByIndexOnce, []() //thread-safe init
+    boost::call_once(initGetIconByIndexOnce, [] //thread-safe init
     {
-        getIconByIndex = DllFun<thumb::GetIconByIndexFct>(thumb::getDllName(), thumb::getIconByIndexFctName);
+        using namespace thumb;
+        getIconByIndex = DllFun<FunType_getIconByIndex>(getDllName(), funName_getIconByIndex);
     });
     return IconHolder(getIconByIndex ? static_cast<HICON>(getIconByIndex(fileInfo.iIcon, getShilIconType(sz))) : nullptr);
 }
@@ -221,11 +222,11 @@ IconHolder getIconByAttribute(LPCWSTR pszPath, DWORD dwFileAttributes, IconBuffe
 IconHolder getAssociatedIconByExt(const Zstring& extension, IconBuffer::IconSize sz)
 {
     //no read-access to disk! determine icon by extension
-    return getIconByAttribute((Zstr("dummy.") + extension).c_str(), FILE_ATTRIBUTE_NORMAL, sz);
+    return getIconByAttribute((L"dummy." + extension).c_str(), FILE_ATTRIBUTE_NORMAL, sz);
 }
 
 
-DllFun<thumb::GetThumbnailFct> getThumbnailIcon;
+DllFun<thumb::FunType_getThumbnail> getThumbnailIcon;
 boost::once_flag initThumbnailOnce = BOOST_ONCE_INIT;
 #endif
 }
@@ -235,11 +236,10 @@ boost::once_flag initThumbnailOnce = BOOST_ONCE_INIT;
 IconHolder getThumbnail(const Zstring& filename, int requestedSize) //return 0 on failure
 {
 #ifdef FFS_WIN
-    using namespace thumb;
-
-    boost::call_once(initThumbnailOnce, []() //note: "getThumbnail" function itself is already thread-safe
+    boost::call_once(initThumbnailOnce, [] //note: "getThumbnail" function itself is already thread-safe
     {
-        getThumbnailIcon = DllFun<GetThumbnailFct>(getDllName(), getThumbnailFctName);
+        using namespace thumb;
+        getThumbnailIcon = DllFun<FunType_getThumbnail>(getDllName(), funName_getThumbnail);
     });
     return IconHolder(getThumbnailIcon ? static_cast< ::HICON>(getThumbnailIcon(filename.c_str(), requestedSize)) : nullptr);
 
@@ -253,6 +253,7 @@ IconHolder getThumbnail(const Zstring& filename, int requestedSize) //return 0 o
 const char* mimeFileIcons[] =
 {
     "application-x-zerosize", //Kubuntu: /usr/share/icons/oxygen/48x48/mimetypes
+    "text-x-generic",         //http://live.gnome.org/GnomeArt/Tutorials/IconThemes
     "empty",            //
     "gtk-file",         //Ubuntu: /usr/share/icons/Humanity/mimes/48
     "gnome-fs-regular", //
@@ -320,7 +321,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
 
     boost::call_once(initGetIconByIndexOnce, [] //thread-safe init
     {
-        getIconByIndex = DllFun<thumb::GetIconByIndexFct>(thumb::getDllName(), thumb::getIconByIndexFctName);
+        getIconByIndex = DllFun<thumb::FunType_getIconByIndex>(thumb::getDllName(), thumb::funName_getIconByIndex);
     });
     return IconHolder(getIconByIndex ? static_cast<HICON>(getIconByIndex(fileInfo.iIcon, getShilIconType(sz))) : nullptr);
 
@@ -382,7 +383,7 @@ public:
         boost::unique_lock<boost::mutex> dummy(lockFiles);
 
         while (filesToLoad.empty())
-            conditionNewFiles.timed_wait(dummy, boost::get_system_time() + boost::posix_time::milliseconds(50)); //interruption point!
+            conditionNewFiles.timed_wait(dummy, boost::posix_time::milliseconds(50)); //interruption point!
 
         Zstring fileName = filesToLoad.back();
         filesToLoad.pop_back();

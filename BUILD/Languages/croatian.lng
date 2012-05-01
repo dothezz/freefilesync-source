@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>Odaberi direktorij</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Prekid zahtjevan: čekam da se trenutna akcija završi...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatska Sinkronizacija</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux greška %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Pogreška pri otvaranju poveznice simbola:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Ne mogu riješiti simboličnu poveznicu</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -137,35 +140,41 @@
 <pluralform>%x Bajtova</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Greška pri čitanju iz sinkronizacijske baze:</target>
+<source>Cannot read file %x.</source>
+<target>Ne mogu čitati datoteku</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Greška pri pisanju u sinkronizacijsku bazu:</target>
+<source>Cannot write file %x.</source>
+<target>Ne mogu zapisati datoteku</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Nekompatibilan format sinkronizacijske podatkovne baze:</target>
+<source>Database file %x is incompatible.</source>
+<target>Datoteka baze %x je nekompatibilna</target>
 
 <source>Initial synchronization:</source>
 <target>Početna sinkronizacija:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Jedna od FreeFileSync datoteka podatkovne baze još ne postoji:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Datoteka baze %x još ne postoji</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Datoteke podatkovne baze ne dijele zajedničke sinkronizacijske sesije:</target>
+<source>Out of memory!</source>
+<target>Nedostatak memorije</target>
+
+<source>Database files do not share a common session.</source>
+<target>Datoteke baze ne dijele zajednički protokol</target>
 
 <source>An exception occurred!</source>
 <target>Dogodilo se izuzeće!</target>
 
-<source>Error reading file attributes:</source>
-<target>Greška pri čitanju atributa datoteke:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Ne mogu pročitati osobine od %x.</target>
+
+<source>Cannot get process information.</source>
+<target>Ne mogu dobit iniformacije o procesu</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Čekam dok se direktorij zaključava (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Greška pri postavljanju zaključenja direktorija:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Ne mogu zaključati direktorij %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -177,8 +186,8 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Greška pri čitanju datoteke:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Greška u analizi datoteke %x, red %y, stupac %z.</target>
 
 <source>Scanning:</source>
 <target>Pretražujem:</target>
@@ -196,38 +205,32 @@
 <pluralform>% Stavki</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Nevaljana FreeFileSync konfiguracijska datoteka!</target>
+<source>/sec</source>
+<target>/sek</target>
 
-<source>Error parsing configuration file:</source>
-<target>Greška pri raščlanjivanju datoteke postavki:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>Datoteka %x ne sadrži valjanu konfiguraciju</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Konfiguracija učitala samo djelomično:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Datoteka postavki %x učitana samo djelomično</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>Nije moguće prebaciti u Koš za smeće</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Ne mogu pristupiti Volume Shadow Copy Servisu</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Molimo koristite FreeFileSync 64-bitnu verziju za izradu shadow kopija na ovom sustavu</target>
 
 <source>Cannot load file %x.</source>
 <target>Ne mogu učitati datoteku %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Greška pri pristupu servisu particijskog kopiranja!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Stvaranje sjeničnih kopija na WOW63 nije podržano. Molimo koristite 64-bitnu FreeFileSync inačnicu.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Nemože se ustanoviti naziv datoteke</target>
+<source>Path %x does not contain a volume name.</source>
+<target>Putanja %x ne sadrži naziv particije</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Naziv particije %x dio naziva datoteke %y!</target>
 
-<source>/sec</source>
-<target>/sek</target>
-
-<source>File does not exist:</source>
-<target>Datoteka ne postoji:</target>
+<source>Cannot find file %x.</source>
+<target>Ne mogu pronaći datoteku %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Ne mogu čitati slijedeće XML elemente</target>
@@ -306,9 +309,6 @@ Naredba će biti izvršena kada:
 <source>RealtimeSync configuration</source>
 <target>RealtimeSync postavke</target>
 
-<source>File already exists. Overwrite?</source>
-<target>Datoteka već postoji. Prepisati?</target>
-
 <source>&Restore</source>
 <target>&Vrati</target>
 
@@ -351,20 +351,20 @@ Naredba će biti izvršena kada:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync postavke</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync Slijedni zadatak</target>
-
-<source>Unable to create log file!</source>
-<target>Nemogu napraviti zapisnik!</target>
-
 <source>Batch execution</source>
 <target>Slijedno izvršavanje</target>
 
-<source>Stop</source>
-<target>Zaustavi</target>
+<source>Items processed:</source>
+<target>Obrađeni elementi:</target>
+
+<source>Items remaining:</source>
+<target>Preostale stavke:</target>
 
 <source>Total time:</source>
 <target>Ukupno vrijeme:</target>
+
+<source>Stop</source>
+<target>Zaustavi</target>
 
 <source>Synchronization aborted!</source>
 <target>Sinkronizacija prekinuta!</target>
@@ -372,14 +372,17 @@ Naredba će biti izvršena kada:
 <source>Synchronization completed with errors!</source>
 <target>Sinkronizacija završena s greškama!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Ništa za sinkronizirati!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Sinkronizacija uspješno završena!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Pretisnite "Zamjena", da otvorite FreeFileSync GUI način.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Preisni "Zamjeni" za riješavanje problema u FreeFileSync glavnom dijaloškom okviru</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Prelazim na FreeFileSync GUI način...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Prebacujem u FreeFileSync glavni dijaloški okvir</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Ne mogu se povezati na sourceforge.net!</target>
@@ -537,9 +540,6 @@ Naredba će biti izvršena kada:
 <source>Items found:</source>
 <target>Pronađene stavke:</target>
 
-<source>Items remaining:</source>
-<target>Preostale stavke:</target>
-
 <source>Speed:</source>
 <target>Brzina:</target>
 
@@ -591,8 +591,8 @@ Naredba će biti izvršena kada:
 <source>&Load</source>
 <target>&Uvezi</target>
 
-<source>&Cancel</source>
-<target>&Odustani</target>
+<source>Cancel</source>
+<target>Odustani</target>
 
 <source>Select variant:</source>
 <target>Izaberite varijantu:</target>
@@ -642,8 +642,8 @@ Naredba će biti izvršena kada:
 <source>Conflict/file cannot be categorized</source>
 <target>Konflikt/datoteka ne more biti kategorizirana</target>
 
-<source>&OK</source>
-<target>&U redu</target>
+<source>OK</source>
+<target>U redu</target>
 
 <source>Compare by...</source>
 <target>Usporedi prema...</target>
@@ -677,9 +677,6 @@ jednak
 
 <source>Synchronizing...</source>
 <target>Sinkroniziram...</target>
-
-<source>Items processed:</source>
-<target>Obrađeni elementi:</target>
 
 <source>&Pause</source>
 <target>&Pauziraj</target>
@@ -1020,9 +1017,6 @@ Isključi: \stuff\temp\*
 <source>File list exported!</source>
 <target>Datotečna lista izvezena!</target>
 
-<source>Error writing file:</source>
-<target>Napaka pri pisanju datoteke:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1072,20 +1066,20 @@ Isključi: \stuff\temp\*
 <source>Paused</source>
 <target>Pauzirano</target>
 
+<source>Initializing...</source>
+<target>Učitavam</target>
+
 <source>Aborted</source>
 <target>Prekinuto</target>
 
 <source>Completed</source>
 <target>Završeno</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Prekid zahtjevan: čekam da se trenutna akcija završi...</target>
+<source>Continue</source>
+<target>Nastavi</target>
 
 <source>Pause</source>
 <target>Pauziraj</target>
-
-<source>Continue</source>
-<target>Nastavi</target>
 
 <source>Cannot find %x</source>
 <target>Nemogu pronać %x</target>
@@ -1230,65 +1224,65 @@ Isključi: \stuff\temp\*
 <pluralform>%x dana</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Ne mogu započeti nadziranje direktorija:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Greška pri nadziranju direktorija.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Ne mogu posmatrati direktorij %x.</target>
 
 <source>Conversion error:</source>
 <target>Greška pri pretvorbi:</target>
 
-<source>Error deleting file:</source>
-<target>Greška pri brisanju datoteke:</target>
+<source>Cannot delete file %x.</source>
+<target>Ne mogu izbrisati datoteku %x.</target>
 
-<source>Error moving file:</source>
-<target>Greška pri premještanju datoteke:</target>
+<source>The file is locked by another process:</source>
+<target>Datoteka je blokirana drugim procesom:</target>
 
-<source>Target file already existing!</source>
-<target>Ciljna datoteka već postoji!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Ne mogu premjestiti datoteku %x u %y.</target>
 
-<source>Error moving directory:</source>
-<target>Greška pri premještanju direktorija:</target>
+<source>Cannot delete directory %x.</source>
+<target>Ne mogu izbrisati mapu %x.</target>
 
-<source>Target directory already existing!</source>
-<target>Ciljni direktorij već postoji!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Ne mogu zapisati vrijeme izmjene %x.</target>
 
-<source>Error deleting directory:</source>
-<target>Greška pri brisanju direktorija:</target>
+<source>Cannot find system function %x.</source>
+<target>Ne mogu pronaći sistemsku funkciju %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Greška pri promjeni vremena izmjene:</target>
+<source>Cannot read security context of %x.</source>
+<target>Ne mogu čitati zaštićeni sadržaj %x.</target>
 
-<source>Error loading library function:</source>
-<target>Greška pri zadavanju funkcije iz knjižnice:</target>
+<source>Cannot write security context of %x.</source>
+<target>Ne mogu zapisati zaštićeni sadržaj %x.</target>
 
-<source>Error reading security context:</source>
-<target>Greška pri čitanju zaštićenog sadržaja:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Ne mogu čitati dopuštenja od %x.</target>
 
-<source>Error writing security context:</source>
-<target>Greška pri pisanju zaštićenog sadržaja:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Ne mogu zapisati dopuštenja za %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Greška pri kopiranju datotečnih dopuštenja:</target>
+<source>Cannot create directory %x.</source>
+<target>Ne mogu izraditi mapu %x.</target>
 
-<source>Error creating directory:</source>
-<target>Greška pri izradi direktorija:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Ne mogu kopirati simboličnu poveznicu %x na %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Greška pri kopiranju poveznice simbola:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Ne mogu zapisati svojstva od %x.</target>
 
-<source>Error copying file:</source>
-<target>Greška pri kopiranju datoteke:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Ne mogu kopirati datoteku %x na %y.</target>
 
-<source>Error traversing directory:</source>
-<target>Greška pri prelasku direktorija:</target>
+<source>Cannot read directory %x.</source>
+<target>Ne mogu čitati mapu %x.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Beskonačna petlja pri prelasku direktorija:</target>
+<source>Endless loop.</source>
+<target>Beskrajna petlja</target>
 
-<source>Error setting privilege:</source>
-<target>Greška pri postavljanju dopuštenja:</target>
+<source>Cannot set privilege %x.</source>
+<target>Ne mogu postaviti prava za %x.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Nije moguće prebaciti u Koš za smeće</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Obje su strane promjenjene od posljednje sinkronizacije!</target>
@@ -1314,8 +1308,8 @@ Isključi: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Možete ignorirati ovu grešku uzimajući datoteku kao praznu .</target>
 
-<source>Directory does not exist:</source>
-<target>Direktorij ne postoji:</target>
+<source>Cannot find directory %x.</source>
+<target>Ne mogu pronaći mapu %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Direktoriji su u ovisnosti! Budite oprezni pri postavljanju sinkronizacijskih pravila:</target>
@@ -1323,20 +1317,17 @@ Isključi: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Pripremam sinkronizaciju</target>
 
-<source>Out of memory!</source>
-<target>Nedostatak memorije</target>
+<source>Conflict detected:</source>
+<target>Sukob pronađen:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Datoteka %x ima nevaljan datum!</target>
 
-<source>Conflict detected:</source>
-<target>Sukob pronađen:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Datoteke %x imaju isti datum ali drugačiju veličinu!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Simbolične poveznice %x imaju isti datum ali drugačiji cilj!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Simbolične poveznice %x imaju isti datum ali drugačiji cilj</target>
 
 <source>Comparing content of files %x</source>
 <target>Uspoređujem sadržaj datoteka %x</target>
@@ -1419,11 +1410,11 @@ Isključi: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Izrađujem datoteku %x</target>
 
-<source>Creating folder %x</source>
-<target>Izrađujem mapu %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Izrađujem simboličnu poveznicu %x</target>
+
+<source>Creating folder %x</source>
+<target>Izrađujem mapu %x</target>
 
 <source>Overwriting file %x</source>
 <target>Prepisujem datoteku %x</target>
@@ -1443,8 +1434,8 @@ Isključi: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Mapa za ovakvu datoteku nije isporučena</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Izvorni direktorij više ne postoji:</target>
+<source>Source directory %x not found.</source>
+<target>Izvorna mapa %x nije pronađena</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Nerješivi sukob postoji!</target>
@@ -1478,12 +1469,6 @@ Isključi: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Izrađujem bazu podataka...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Ništa za sinkronizirati!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>Nemoguće kopirati blokiranu datoteku %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Greška pri provjeravanju podataka: Izvorna i ciljna datoteka imaju različit sadržaj!</target>

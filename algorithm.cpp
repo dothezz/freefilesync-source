@@ -11,7 +11,7 @@
 #include <tuple>
 #include "lib/resources.h"
 #include <zen/file_handling.h>
-#include "lib/recycler.h"
+#include <zen/recycler.h>
 #include <wx/msgdlg.h>
 #include "lib/norm_filter.h"
 #include <wx+/string_conv.h>
@@ -207,18 +207,13 @@ public:
     {
         if (lhs.shortName.empty())
             return rhs.shortName.empty();
-        else
-        {
-            if (rhs.shortName.empty())
-                return false;
-            else
-            {
-                return lhs.shortName == rhs.shortName && //detect changes in case (windows)
-                       //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
-                       sameFileTime(lhs.lastWriteTime, rhs.lastWriteTime, 2) &&
-                       lhs.fileSize == rhs.fileSize;
-            }
-        }
+        else if (rhs.shortName.empty())
+            return false;
+
+        return lhs.shortName == rhs.shortName && //detect changes in case (windows)
+               //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
+               sameFileTime(lhs.lastWriteTime, rhs.lastWriteTime, 2) &&
+               lhs.fileSize == rhs.fileSize;
     }
 
 private:
@@ -276,21 +271,16 @@ public:
     {
         if (lhs.shortName.empty()) //test if object is existing at all
             return rhs.shortName.empty();
-        else
-        {
-            if (rhs.shortName.empty())
-                return false;
-            else
-            {
-                return lhs.shortName == rhs.shortName &&
-                       //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
-                       sameFileTime(lhs.lastWriteTime, rhs.lastWriteTime, 2) &&
+        else if (rhs.shortName.empty())
+            return false;
+
+        return lhs.shortName == rhs.shortName &&
+               //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
+               sameFileTime(lhs.lastWriteTime, rhs.lastWriteTime, 2) &&
 #ifdef FFS_WIN //comparison of symbolic link type is relevant for Windows only
-                       lhs.type == rhs.type &&
+               lhs.type == rhs.type &&
 #endif
-                       lhs.targetPath == rhs.targetPath;
-            }
-        }
+               lhs.targetPath == rhs.targetPath;
     }
 
 private:
@@ -436,7 +426,7 @@ private:
         //----------- detect renamed files -----------------
         if (!exLeftOnly.empty() && !exRightOnly.empty())
         {
-            findEqualDbEntries(dirInfoLeft.baseDirContainer, //fill map "onceEqual"
+            findEqualDbEntries(dirInfoLeft .baseDirContainer, //fill map "onceEqual"
                                dirInfoRight.baseDirContainer);
 
             detectRenamedFiles();
@@ -516,7 +506,7 @@ private:
         else if (cat == FILE_RIGHT_SIDE_ONLY)
         {
             if (fileObj.getFileId<RIGHT_SIDE>() != FileId())
-                exRightOnly.insert(std::make_pair(getAssocKey<RIGHT_SIDE>(fileObj), &fileObj));
+                exRightOnly.insert(std::make_pair(getFileIdKey<RIGHT_SIDE>(fileObj), &fileObj));
         }
         //----------------------------------------------------------------------
 
@@ -749,7 +739,7 @@ private:
                 if (entryLeft. second.id != FileId() &&
                     iterRight->second.id != FileId() &&
                     DataSetFile(entryLeft.first, entryLeft.second) == DataSetFile(iterRight->first, iterRight->second))
-                    onceEqual.insert(std::make_pair(getAssocKey(entryLeft.second), getAssocKey(iterRight->second)));
+                    onceEqual.insert(std::make_pair(getFileIdKey(entryLeft.second), getFileIdKey(iterRight->second)));
             }
         });
 
@@ -762,12 +752,12 @@ private:
         });
     }
 
-    typedef std::tuple<Int64, UInt64, FileId> AssocKey; //(date, size, file ID)
+    typedef std::tuple<Int64, UInt64, FileId> FileIdKey; //(date, size, file ID)
 
 
     //modification date is *not* considered as part of container key, so check here!
     template <class Container>
-    static typename Container::const_iterator findValue(const Container& cnt, const AssocKey& key)
+    static typename Container::const_iterator findValue(const Container& cnt, const FileIdKey& key)
     {
         auto iterPair = cnt.equal_range(key); //since file id is already unique, we expect a single-element range at most
         auto iter = std::find_if(iterPair.first, iterPair.second,
@@ -783,12 +773,12 @@ private:
         std::for_each(exLeftOnly.begin(), exLeftOnly.end(),
                       [&](FileMapping* fileLeftOnly)
         {
-            const AssocKey& keyLeft = RedetermineAuto::getAssocKey<LEFT_SIDE>(*fileLeftOnly);
+            const FileIdKey& keyLeft = RedetermineAuto::getFileIdKey<LEFT_SIDE>(*fileLeftOnly);
 
             auto iter = findValue(onceEqual, keyLeft);
             if (iter != onceEqual.end())
             {
-                const AssocKey& keyRight = iter->second;
+                const FileIdKey& keyRight = iter->second;
 
                 auto iter2 = findValue(exRightOnly, keyRight);
                 if (iter2 != exRightOnly.end())
@@ -813,12 +803,12 @@ private:
 
     //detection of renamed files
     template <SelectedSide side>
-    static AssocKey getAssocKey(const FileMapping& fsObj) { return std::make_tuple(fsObj.getLastWriteTime<side>(), fsObj.getFileSize<side>(), fsObj.getFileId<side>()); }
-    static AssocKey getAssocKey(const FileDescriptor& fileDescr) { return std::make_tuple(fileDescr.lastWriteTimeRaw, fileDescr.fileSize, fileDescr.id); }
+    static FileIdKey getFileIdKey(const FileMapping& fsObj) { return std::make_tuple(fsObj.getLastWriteTime<side>(), fsObj.getFileSize<side>(), fsObj.getFileId<side>()); }
+    static FileIdKey getFileIdKey(const FileDescriptor& fileDescr) { return std::make_tuple(fileDescr.lastWriteTimeRaw, fileDescr.fileSize, fileDescr.id); }
 
-    struct LessAssocKey
+    struct LessFileIdKey
     {
-        bool operator()(const AssocKey& lhs, const AssocKey& rhs) const
+        bool operator()(const FileIdKey& lhs, const FileIdKey& rhs) const
         {
             //caveat: *don't* allow 2 sec tolerance as container predicate!!
             // => no strict weak ordering relation! reason: no transitivity of equivalence!
@@ -835,9 +825,9 @@ private:
 
     std::vector<FileMapping*> exLeftOnly;
 
-    std::multimap<AssocKey, AssocKey, LessAssocKey> onceEqual; //keys for left and right files which are considered "equal" by database
+    std::multimap<FileIdKey, FileIdKey, LessFileIdKey> onceEqual; //associates left and right database entries which are considered "equal" := "same name, size, date"
 
-    std::multimap<AssocKey, FileMapping*, LessAssocKey> exRightOnly;
+    std::multimap<FileIdKey, FileMapping*, LessFileIdKey> exRightOnly;
 
     /*
     detect renamed files
@@ -851,15 +841,14 @@ private:
 
     Algorithm:
     ----------
-    DB-file left  --- name, size, date --->    DB-file right
+    DB-file left  --- (name, size, date) --->    DB-file right
       /|\                                             |
-       |                                      file ID, size, date
-     file ID, size, date                              |
+       |  (file ID, size, date)                       |  (file ID, size, date)
        |                                             \|/
-       X                                              Y
+    file left only                               file right only
 
        FAT caveat: File Ids are generally not stable when file is either moved or renamed!
-       => 1. Move/rename operations on FAT cannot be detected.
+       => 1. Move/rename operations on FAT cannot be detected reliably.
        => 2. database generally contains wrong file ID on FAT after renaming from .ffs_tmp files => correct file Ids in database after next sync
     */
 };

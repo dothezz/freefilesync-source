@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb  9 2012)
+// C++ code generated with wxFormBuilder (version Apr 10 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -164,7 +164,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 
     bSizer1->Add( sbSizer4, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
-    m_buttonStart = new zen::BitmapButton( m_panelMain, wxID_ANY, _("Start"), wxDefaultPosition, wxSize( -1,40 ), 0 );
+    m_buttonStart = new zen::BitmapButton( m_panelMain, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,40 ), 0 );
     m_buttonStart->SetDefault();
     m_buttonStart->SetFont( wxFont( 14, 74, 90, 92, false, wxT("Arial Black") ) );
 
@@ -245,4 +245,66 @@ FolderGenerated::FolderGenerated( wxWindow* parent, wxWindowID id, const wxPoint
 
 FolderGenerated::~FolderGenerated()
 {
+}
+
+ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+    this->SetSizeHints( wxSize( 300,160 ), wxDefaultSize );
+
+    wxBoxSizer* bSizer24;
+    bSizer24 = new wxBoxSizer( wxVERTICAL );
+
+
+    bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
+
+    wxBoxSizer* bSizer26;
+    bSizer26 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_bitmap10 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), 0 );
+    bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
+    m_textCtrl8->SetBackgroundColour( wxColour( 224, 224, 224 ) );
+
+    bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
+
+
+    bSizer24->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+
+    wxBoxSizer* bSizer25;
+    bSizer25 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_buttonRetry = new wxButton( this, wxID_RETRY, _("&Retry"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonRetry->SetDefault();
+    m_buttonRetry->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+
+    bSizer25->Add( m_buttonRetry, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_buttonAbort = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonAbort->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+
+    bSizer25->Add( m_buttonAbort, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
+
+
+    bSizer24->Add( bSizer25, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+
+
+    this->SetSizer( bSizer24 );
+    this->Layout();
+
+    this->Centre( wxBOTH );
+
+    // Connect Events
+    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ErrorDlgGenerated::OnClose ) );
+    m_buttonRetry->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnRetry ), NULL, this );
+    m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnAbort ), NULL, this );
+}
+
+ErrorDlgGenerated::~ErrorDlgGenerated()
+{
+    // Disconnect Events
+    this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ErrorDlgGenerated::OnClose ) );
+    m_buttonRetry->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnRetry ), NULL, this );
+    m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnAbort ), NULL, this );
+
 }

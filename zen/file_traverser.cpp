@@ -63,7 +63,7 @@ bool extractFileInfoFromSymlink(const Zstring& linkName, zen::TraverseCallback::
     HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(linkName).c_str(),
                                 0,
                                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                0,
+                                nullptr,
                                 OPEN_EXISTING,
                                 FILE_FLAG_BACKUP_SEMANTICS,
                                 nullptr);
@@ -76,7 +76,7 @@ bool extractFileInfoFromSymlink(const Zstring& linkName, zen::TraverseCallback::
         return false;
 
     //write output
-    output.fileSize         = zen::UInt64(fileInfoByHandle.nFileSizeLow, fileInfoByHandle.nFileSizeHigh);
+    output.fileSize         = UInt64(fileInfoByHandle.nFileSizeLow, fileInfoByHandle.nFileSizeHigh);
     output.lastWriteTimeRaw = toTimeT(fileInfoByHandle.ftLastWriteTime);
     output.id = FileId(); //= extractFileID(fileInfoByHandle); -> id from dereferenced symlink is problematic, since renaming will consider the link, not the target!
     return true;
@@ -91,16 +91,6 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //returns 0 on error or if s
     //- indirection: subst S: %USERPROFILE%
     //                  -> GetVolumePathName() on the other hand resolves "S:\Desktop\somedir" to "S:\Desktop\" - nice try...
 
-    typedef BOOL (WINAPI* GetFileInformationByHandleFunc)(HANDLE hFile,
-                                                          LPBY_HANDLE_FILE_INFORMATION lpFileInformation);
-
-    const SysDllFun<GetFileInformationByHandleFunc> getFileInformationByHandle(L"kernel32.dll", "GetFileInformationByHandle"); //available since Windows XP
-    if (!getFileInformationByHandle)
-    {
-        assert(false);
-        return 0;
-    }
-
     const HANDLE hDir = ::CreateFile(zen::applyLongPathPrefix(pathName).c_str(),
                                      0,
                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -113,8 +103,7 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //returns 0 on error or if s
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
 
     BY_HANDLE_FILE_INFORMATION fileInfo = {};
-    if (!getFileInformationByHandle(hDir,       //__in   HANDLE hFile,
-                                    &fileInfo)) //__out  LPBY_HANDLE_FILE_INFORMATION lpFileInformation
+    if (!::GetFileInformationByHandle(hDir, &fileInfo))
         return 0;
 
     return fileInfo.dwVolumeSerialNumber;
@@ -135,18 +124,16 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //returns 0 on error!
                              BUFFER_SIZE))     //__in   DWORD cchBufferLength
         return 0;
 
-    Zstring volumePath = &buffer[0];
-    if (!endsWith(volumePath, FILE_NAME_SEPARATOR))
-        volumePath += FILE_NAME_SEPARATOR;
+    Zstring volumePath = appendSeparator(&buffer[0]);
 
     DWORD volumeSerial = 0;
     if (!::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
-                                nullptr,               //__out      LPTSTR lpVolumeNameBuffer,
+                                nullptr,            //__out      LPTSTR lpVolumeNameBuffer,
                                 0,                  //__in       DWORD nVolumeNameSize,
                                 &volumeSerial,      //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                nullptr,               //__out_opt  LPDWORD lpMaximumComponentLength,
-                                nullptr,               //__out_opt  LPDWORD lpFileSystemFlags,
-                                nullptr,               //__out      LPTSTR lpFileSystemNameBuffer,
+                                nullptr,            //__out_opt  LPDWORD lpMaximumComponentLength,
+                                nullptr,            //__out_opt  LPDWORD lpFileSystemFlags,
+                                nullptr,            //__out      LPTSTR lpFileSystemNameBuffer,
                                 0))                 //__in       DWORD nFileSystemNameSize
         return 0;
 
@@ -157,9 +144,9 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //returns 0 on error!
 
 const bool isXpOrLater = winXpOrLater(); //VS2010 compiled DLLs are not supported on Win 2000: Popup dialog "DecodePointer not found"
 
-const DllFun<findplus::OpenDirFunc>  openDir = isXpOrLater ? DllFun<findplus::OpenDirFunc >(findplus::getDllName(), findplus::openDirFuncName ) : DllFun<findplus::OpenDirFunc >(); //
-const DllFun<findplus::ReadDirFunc>  readDir = isXpOrLater ? DllFun<findplus::ReadDirFunc >(findplus::getDllName(), findplus::readDirFuncName ) : DllFun<findplus::ReadDirFunc >(); //load at startup: avoid pre C++11 static initialization MT issues
-const DllFun<findplus::CloseDirFunc> closeDir= isXpOrLater ? DllFun<findplus::CloseDirFunc>(findplus::getDllName(), findplus::closeDirFuncName) : DllFun<findplus::CloseDirFunc>(); //
+const auto openDir = isXpOrLater ? DllFun<findplus::FunType_openDir >(findplus::getDllName(), findplus::funName_openDir ) : DllFun<findplus::FunType_openDir >(); //
+const auto readDir = isXpOrLater ? DllFun<findplus::FunType_readDir >(findplus::getDllName(), findplus::funName_readDir ) : DllFun<findplus::FunType_readDir >(); //load at startup: avoid pre C++11 static initialization MT issues
+const auto closeDir= isXpOrLater ? DllFun<findplus::FunType_closeDir>(findplus::getDllName(), findplus::funName_closeDir) : DllFun<findplus::FunType_closeDir>(); //
 
 /*
 Common C-style interface for Win32 FindFirstFile(), FindNextFile() and FileFilePlus openDir(), closeDir():
@@ -203,21 +190,17 @@ struct Win32Traverser
 
     static void create(const Zstring& directory, DirHandle& hnd) //throw FileError
     {
-        const Zstring& directoryPf = endsWith(directory, FILE_NAME_SEPARATOR) ?
-                                     directory :
-                                     directory + FILE_NAME_SEPARATOR;
+        const Zstring& directoryPf = appendSeparator(directory);
 
         hnd.searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryPf + L'*').c_str(), &hnd.firstData);
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
         if (hnd.searchHandle == INVALID_HANDLE_VALUE)
-            throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
 
         //::GetLastError() == ERROR_FILE_NOT_FOUND -> *usually* NOT okay:
-        //however it is unclear whether this indicates a missing directory or a completely empty directory
-        //      note: not all directories contain "., .." entries! E.g. a drive's root directory or NetDrive + ftp.gnu.org\CRYPTO.README"
-        //      -> addon: this is NOT a directory, it looks like one in NetDrive, but it's a file in Opera!
-        //we have to guess it's former and let the error propagate
-        // -> FindFirstFile() is a nice example of violation of API design principle of single responsibility and its consequences
+        //directory may not exist *or* it is completely empty: not all directories contain "., .." entries, e.g. a drive's root directory
+        //usually a directory is never completely empty due to "sync.ffs_lock", so we assume it's not existing and let the error propagate
+        // -> FindFirstFile() is a nice example of violation of API design principle of single responsibility
     }
 
     static void destroy(const DirHandle& hnd) { ::FindClose(hnd.searchHandle); } //throw()
@@ -237,7 +220,7 @@ struct Win32Traverser
             if (::GetLastError() == ERROR_NO_MORE_FILES) //not an error situation
                 return false;
             //else we have a problem... report it:
-            throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
         }
         return true;
     }
@@ -285,7 +268,7 @@ struct FilePlusTraverser
     {
         hnd.searchHandle = ::openDir(applyLongPathPrefix(directory).c_str());
         if (hnd.searchHandle == nullptr)
-            throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
     }
 
     static void destroy(DirHandle hnd) { ::closeDir(hnd.searchHandle); } //throw()
@@ -304,7 +287,7 @@ struct FilePlusTraverser
             this is required for NetDrive mounted Webdav, e.g. www.box.net and NT4, 2000 remote drives, et al.
 
             NT status code                  |  Win32 error code
-            -----------------------------------------------------------
+            --------------------------------|--------------------------
             STATUS_INVALID_LEVEL            | ERROR_INVALID_LEVEL
             STATUS_NOT_SUPPORTED            | ERROR_NOT_SUPPORTED
             STATUS_INVALID_PARAMETER        | ERROR_INVALID_PARAMETER
@@ -327,7 +310,7 @@ struct FilePlusTraverser
             }
 
             //else we have a problem... report it:
-            throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
         }
         return true;
     }
@@ -394,7 +377,7 @@ private:
         tryReportingError([&]
         {
             if (level == 100) //notify endless recursion
-                throw FileError(_("Endless loop when traversing directory:") + L"\n\"" + directory + L"\"");
+                throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + _("Endless loop."));
         }, sink);
 
         typename Trav::DirHandle searchHandle;
@@ -433,9 +416,7 @@ private:
             (shortName[1] == 0 || (shortName[1] == L'.' && shortName[2] == 0)))
                 continue;
 
-            const Zstring& fullName = endsWith(directory, FILE_NAME_SEPARATOR) ?
-            directory + shortName :
-            directory + FILE_NAME_SEPARATOR + shortName;
+            const Zstring& fullName = appendSeparator(directory) + shortName;
 
             if (Trav::isSymlink(fileInfo) && !followSymlinks_) //evaluate symlink directly
             {
@@ -477,7 +458,7 @@ private:
                     {
                         const dst::RawTime rawTime(Trav::getCreateTimeRaw(fileInfo), Trav::getModTimeRaw(fileInfo));
 
-                        if (dst::fatHasUtcEncoded(rawTime)) //throw (std::runtime_error)
+                        if (dst::fatHasUtcEncoded(rawTime)) //throw std::runtime_error
                             details.lastWriteTimeRaw = toTimeT(dst::fatDecodeUtcTime(rawTime)); //return real UTC time; throw (std::runtime_error)
                         else
                             markForDstHack.push_back(std::make_pair(fullName, Trav::getModTimeRaw(fileInfo)));
@@ -504,7 +485,7 @@ private:
 
             dstCallback.requestUiRefresh(i->first);
 
-            const dst::RawTime encodedTime = dst::fatEncodeUtcTime(i->second); //throw (std::runtime_error)
+            const dst::RawTime encodedTime = dst::fatEncodeUtcTime(i->second); //throw std::runtime_error
             {
                 //may need to remove the readonly-attribute (e.g. FAT usb drives)
                 FileUpdateHandle updateHandle(i->first, [=]
@@ -512,7 +493,7 @@ private:
                     return ::CreateFile(zen::applyLongPathPrefix(i->first).c_str(),
                     GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                    0,
+                    nullptr,
                     OPEN_EXISTING,
                     FILE_FLAG_BACKUP_SEMANTICS,
                     nullptr);
@@ -599,7 +580,7 @@ private:
         tryReportingError([&]
         {
             if (level == 100) //notify endless recursion
-                throw FileError(_("Endless loop when traversing directory:") + L"\n\"" + directory + L"\"");
+                throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + _("Endless loop."));
         }, sink);
 
 
@@ -608,7 +589,7 @@ private:
         {
             dirObj = ::opendir(directory.c_str()); //directory must NOT end with path separator, except "/"
             if (!dirObj)
-                throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
+                throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
         }, sink);
 
         if (!dirObj)
@@ -621,7 +602,7 @@ private:
             tryReportingError([&]
             {
                 if (::readdir_r(dirObj, reinterpret_cast< ::dirent*>(&buffer[0]), &dirEntry) != 0)
-                    throw FileError(_("Error traversing directory:") + L"\n\"" + directory + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
+                    throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
             }, sink);
             if (!dirEntry) //no more items or ignore error
                 return;
@@ -633,16 +614,14 @@ private:
                 (shortName[1] == 0 || (shortName[1] == '.' && shortName[2] == 0)))
                 continue;
 
-            const Zstring& fullName = endsWith(directory, FILE_NAME_SEPARATOR) ? //e.g. "/"
-                                      directory + shortName :
-                                      directory + FILE_NAME_SEPARATOR + shortName;
+            const Zstring& fullName = appendSeparator(directory) + shortName;
 
             struct ::stat fileInfo = {};
             bool haveData = false;
             tryReportingError([&]
             {
                 if (::lstat(fullName.c_str(), &fileInfo) != 0) //lstat() does not resolve symlinks
-                    throw FileError(_("Error reading file attributes:") + L"\n\"" + fullName + L"\"" + L"\n\n" + zen::getLastErrorFormatted());
+                    throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(fullName)) + L"\n\n" + getLastErrorFormatted());
                 haveData = true;
             }, sink);
             if (!haveData)

@@ -19,8 +19,14 @@
 <source>Browse directory</source>
 <target>瀏覽目錄</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>中止請求：正在等待目前操作完成...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>即時同步 - 自動同步</target>
+
+<source>Error</source>
+<target>錯誤</target>
 
 <source>Select alternate comparison settings</source>
 <target>選擇替代的比對設定</target>
@@ -51,9 +57,6 @@
 
 <source>About</source>
 <target>關於</target>
-
-<source>Error</source>
-<target>錯誤</target>
 
 <source>Warning</source>
 <target>警告</target>
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux錯誤代碼 %x：</target>
 
-<source>Error resolving symbolic link:</source>
-<target>解析錯誤的符號連結：</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>無法解析符號連結 %X。</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -135,35 +138,41 @@
 <pluralform>%x 位元組</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>讀取同步資料庫錯誤：</target>
+<source>Cannot read file %x.</source>
+<target>無法讀取檔案 %X。</target>
 
-<source>Error writing to synchronization database:</source>
-<target>寫入同步資料庫錯誤：</target>
+<source>Cannot write file %x.</source>
+<target>無法寫入檔案 %X。</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>同步資料庫格式不相容：</target>
+<source>Database file %x is incompatible.</source>
+<target>資料庫檔案 %x 是不相容的。</target>
 
 <source>Initial synchronization:</source>
 <target>初始化同步：</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>其中一個FreeFileSync資料庫檔案不存在：</target>
+<source>Database file %x does not yet exist.</source>
+<target>資料庫檔案 %x 並不存在。</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>資料庫檔案不要共享一個共同的同步連線：</target>
+<source>Out of memory!</source>
+<target>記憶體不足！</target>
+
+<source>Database files do not share a common session.</source>
+<target>資料庫檔案不會共享一個共同的連線。</target>
 
 <source>An exception occurred!</source>
 <target>發生異常！</target>
 
-<source>Error reading file attributes:</source>
-<target>讀取檔案屬性錯誤：</target>
+<source>Cannot read file attributes of %x.</source>
+<target>無法讀取 %x 的檔案屬性。</target>
+
+<source>Cannot get process information.</source>
+<target>無法得到進程資訊。</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>等待同時目錄被鎖定(%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>設定目錄鎖錯誤：</target>
+<source>Cannot set directory lock %x.</source>
+<target>無法設定目錄鎖 %x。</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -173,8 +182,8 @@
 <pluralform>%x 秒</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>讀取檔案錯誤：</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>解析檔案 %x、行 %y、列 %z 時出現錯誤。</target>
 
 <source>Scanning:</source>
 <target>正在掃瞄：</target>
@@ -190,38 +199,32 @@
 <pluralform>[%x 個執行緒]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>無效的FreeFileSync配置檔案！</target>
+<source>/sec</source>
+<target>/秒</target>
 
-<source>Error parsing configuration file:</source>
-<target>分析配置檔案錯誤：</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>檔案 %x 不包含一個有效的配置。</target>
 
-<source>Configuration loaded partially only:</source>
-<target>只載入部分配置：</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>只載入設定檔 %x 的一部份。</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>無法將 %x 移動到資源回收筒！</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>無法讀取卷影複製服務。</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>請在此系統上使用FreeFileSync 64位元版本來新建卷影副本。</target>
 
 <source>Cannot load file %x.</source>
 <target>無法載入檔案 %x。</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>讀取卷影複製服務時錯誤！</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>不支援WOW64製作卷影副本。請使用FreeFileSync 64位元版本。</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>無法判斷檔案卷名：</target>
+<source>Path %x does not contain a volume name.</source>
+<target>路徑 %x 不包含卷名。</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>卷名 %x 並非檔名 %y 的一部份！</target>
 
-<source>/sec</source>
-<target>/秒</target>
-
-<source>File does not exist:</source>
-<target>檔案不存在：</target>
+<source>Cannot find file %x.</source>
+<target>找不到檔案 %x。</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>無法讀取下列XML元素：</target>
@@ -294,14 +297,17 @@ The command line is executed each time:
 <source>Start</source>
 <target>開始</target>
 
+<source>&Retry</source>
+<target>重試(&R)</target>
+
+<source>Cancel</source>
+<target>取消</target>
+
 <source>(Build: %x)</source>
 <target>(建立：%x)</target>
 
 <source>RealtimeSync configuration</source>
 <target>即時同步配置</target>
-
-<source>File already exists. Overwrite?</source>
-<target>檔案已存在，要覆蓋嗎？</target>
 
 <source>&Restore</source>
 <target>還原(&R)</target>
@@ -345,20 +351,20 @@ The command line is executed each time:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync配置</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync批次處理作業</target>
-
-<source>Unable to create log file!</source>
-<target>無法新建日誌檔！</target>
-
 <source>Batch execution</source>
 <target>批次處理執行</target>
 
-<source>Stop</source>
-<target>停止</target>
+<source>Items processed:</source>
+<target>已處理項目：</target>
+
+<source>Items remaining:</source>
+<target>剩餘項目：</target>
 
 <source>Total time:</source>
 <target>全部時間：</target>
+
+<source>Stop</source>
+<target>停止</target>
 
 <source>Synchronization aborted!</source>
 <target>同步已中止！</target>
@@ -366,14 +372,17 @@ The command line is executed each time:
 <source>Synchronization completed with errors!</source>
 <target>同步完成但有錯誤！</target>
 
+<source>Nothing to synchronize!</source>
+<target>沒有什麼東西可同步！</target>
+
 <source>Synchronization completed successfully!</source>
 <target>已成功的完成同步！</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>按下 "切換" 開啟FreeFileSync圖形介面操作方式。</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>在FreeFileSync主對話框，按下"切換"來解決問題。</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>切換FreeFileSync圖形介面操作方式...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>切換到FreeFileSync主對話框...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>無法連接到sourceforge.net！</target>
@@ -531,9 +540,6 @@ The command line is executed each time:
 <source>Items found:</source>
 <target>尋找項目：</target>
 
-<source>Items remaining:</source>
-<target>剩餘項目：</target>
-
 <source>Speed:</source>
 <target>速度：</target>
 
@@ -561,9 +567,6 @@ The command line is executed each time:
 <source>Right</source>
 <target>右邊</target>
 
-<source>Sync setttings</source>
-<target>同步設定</target>
-
 <source>Status feedback</source>
 <target>狀態回報</target>
 
@@ -587,9 +590,6 @@ The command line is executed each time:
 
 <source>&Load</source>
 <target>載入(&L)</target>
-
-<source>&Cancel</source>
-<target>取消(&C)</target>
 
 <source>Select variant:</source>
 <target>選擇變數：</target>
@@ -639,8 +639,8 @@ The command line is executed each time:
 <source>Conflict/file cannot be categorized</source>
 <target>衝突/檔案無法分類</target>
 
-<source>&OK</source>
-<target>確定(&O)</target>
+<source>OK</source>
+<target>確定</target>
 
 <source>Compare by...</source>
 <target>比對選項...</target>
@@ -665,9 +665,6 @@ is the same
 
 <source>Synchronizing...</source>
 <target>正在同步...</target>
-
-<source>Items processed:</source>
-<target>已處理項目：</target>
 
 <source>&Pause</source>
 <target>暫停(&P)</target>
@@ -707,9 +704,6 @@ is the same
 
 <source>&Ignore</source>
 <target>忽略(&I)</target>
-
-<source>&Retry</source>
-<target>重試(&R)</target>
 
 <source>Do not show this dialog again</source>
 <target>不要再顯示此對話框</target>
@@ -1008,9 +1002,6 @@ Exclude: \stuff\temp\*
 <source>File list exported!</source>
 <target>檔案清單已匯出！</target>
 
-<source>Error writing file:</source>
-<target>寫入檔案錯誤：</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1052,20 +1043,20 @@ Exclude: \stuff\temp\*
 <source>Paused</source>
 <target>已暫停</target>
 
+<source>Initializing...</source>
+<target>正在初始化...</target>
+
 <source>Aborted</source>
 <target>已中止</target>
 
 <source>Completed</source>
 <target>已完成</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>中止請求：正在等待目前操作完成...</target>
+<source>Continue</source>
+<target>繼續</target>
 
 <source>Pause</source>
 <target>暫停</target>
-
-<source>Continue</source>
-<target>繼續</target>
 
 <source>Cannot find %x</source>
 <target>找不到 %x</target>
@@ -1200,68 +1191,65 @@ Exclude: \stuff\temp\*
 <pluralform>%x 天</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>無法初始化目錄監測：</target>
-
-<source>Error when monitoring directories.</source>
-<target>監測目錄錯誤。</target>
+<source>Cannot monitor directory %x.</source>
+<target>無法監測目錄 %x。</target>
 
 <source>Conversion error:</source>
 <target>轉換錯誤：</target>
 
-<source>Error deleting file:</source>
-<target>刪除檔案錯誤：</target>
+<source>Cannot delete file %x.</source>
+<target>無法刪除目錄 %x。</target>
 
-<source>Error moving file:</source>
-<target>移動檔案錯誤：</target>
+<source>The file is locked by another process:</source>
+<target>檔案被另一個進程鎖定：</target>
 
-<source>Target file already existing!</source>
-<target>目標檔案已存在！</target>
+<source>Cannot move file %x to %y.</source>
+<target>無法移動檔案 %x 到 %y。</target>
 
-<source>Error moving directory:</source>
-<target>移動目錄錯誤：</target>
+<source>Cannot delete directory %x.</source>
+<target>無法刪除目錄 %x。</target>
 
-<source>Target directory already existing!</source>
-<target>目標目錄已存在！</target>
+<source>Cannot write modification time of %x.</source>
+<target>無法寫入 %x 的修改時間。</target>
 
-<source>Error deleting directory:</source>
-<target>刪除目錄錯誤：</target>
+<source>Cannot find system function %x.</source>
+<target>找不到系統函數 %x。</target>
 
-<source>Error changing modification time:</source>
-<target>變更修改時間錯誤：</target>
+<source>Cannot read security context of %x.</source>
+<target>無法讀取 %x 的安全上下文。</target>
 
-<source>Error loading library function:</source>
-<target>載入函數庫錯誤：</target>
+<source>Cannot write security context of %x.</source>
+<target>無法寫入 %x 的安全上下文。</target>
 
-<source>Error reading security context:</source>
-<target>讀取安全性內容錯誤：</target>
+<source>Cannot read permissions of %x.</source>
+<target>無法讀取 %x 的權限。</target>
 
-<source>Error writing security context:</source>
-<target>寫入安全性內容錯誤：</target>
+<source>Cannot write permissions of %x.</source>
+<target>無法寫入 %x 的權限。</target>
 
-<source>Error copying file permissions:</source>
-<target>複製檔案權限錯誤：</target>
+<source>Cannot create directory %x.</source>
+<target>無法新建目錄 %x。</target>
 
-<source>Error creating directory:</source>
-<target>新建目錄錯誤：</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>無法複製符號連結 %x 到 %y。</target>
 
-<source>Error copying symbolic link:</source>
-<target>複製符號連結錯誤：</target>
+<source>Cannot write file attributes of %x.</source>
+<target>無法寫入 %x 的檔案屬性。</target>
 
-<source>Error copying file:</source>
-<target>複製檔案錯誤：</target>
+<source>Cannot copy file %x to %y.</source>
+<target>無法複製檔案 %x 到 %y。</target>
 
-<source>Error opening file:</source>
-<target>開啟檔案錯誤：</target>
+<source>Cannot read directory %x.</source>
+<target>無法讀取目錄 %x。</target>
 
-<source>Error traversing directory:</source>
-<target>遍歷目錄錯誤：</target>
+<source>Endless loop.</source>
+<target>無限迴圈。</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>當遍歷目錄時無限循環：</target>
+<source>Cannot set privilege %x.</source>
+<target>無法設定權限 %x。</target>
 
-<source>Error setting privilege:</source>
-<target>設定權限錯誤：</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>無法將 %x 移動到資源回收筒！</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>自上次同步後，兩邊均已更改過！</target>
@@ -1287,8 +1275,8 @@ Exclude: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>您可以忽略此錯誤，考慮該目錄為空。</target>
 
-<source>Directory does not exist:</source>
-<target>目錄不存在：</target>
+<source>Cannot find directory %x.</source>
+<target>找不到目錄 %x。</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目錄有依靠性！請小心設定同步規則：</target>
@@ -1296,20 +1284,17 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>正在準備同步...</target>
 
-<source>Out of memory!</source>
-<target>記憶體不足！</target>
+<source>Conflict detected:</source>
+<target>檢測到衝突：</target>
 
 <source>File %x has an invalid date!</source>
 <target>檔案 %x 的日期無效！</target>
 
-<source>Conflict detected:</source>
-<target>檢測到衝突：</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>檔案 %x 日期相同但大小不同！</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>符號連結 %x 有相同日期但是不同目標！</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>%x 的符號連結具有相同的日期，但不同的目標。</target>
 
 <source>Comparing content of files %x</source>
 <target>正在比對檔案内容 %x</target>
@@ -1392,11 +1377,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>正在新建檔案 %x</target>
 
-<source>Creating folder %x</source>
-<target>正在新建資料夾 %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>正在新建符號連結 %x</target>
+
+<source>Creating folder %x</source>
+<target>正在新建資料夾 %x</target>
 
 <source>Overwriting file %x</source>
 <target>正在覆蓋檔案 %x</target>
@@ -1416,8 +1401,8 @@ Exclude: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>版本控制檔的目錄不提供！</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>來源目錄不存在：</target>
+<source>Source directory %x not found.</source>
+<target>來源目錄 %x 找不到。</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>存在未解決的衝突！</target>
@@ -1451,12 +1436,6 @@ Exclude: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>正在產生資料庫...</target>
-
-<source>Nothing to synchronize!</source>
-<target>沒有什麼東西可同步！</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>無法複製被鎖定的檔案 %X！</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>資料驗證錯誤：來源和目標檔案內容不同！</target>

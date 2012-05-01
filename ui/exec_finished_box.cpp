@@ -192,7 +192,8 @@ void ExecFinishedBox::setValueAndUpdateList(const std::wstring& value)
 void ExecFinishedBox::OnSelection(wxCommandEvent& event)
 {
     wxCommandEvent dummy2(wxEVT_REPLACE_BUILT_IN_COMMANDS); //we cannot replace built-in commands at this position in call stack, so defer to a later time!
-    GetEventHandler()->AddPendingEvent(dummy2);             //
+    if (auto handler = GetEventHandler())
+        handler->AddPendingEvent(dummy2);
 
     event.Skip();
 }

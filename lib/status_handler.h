@@ -10,9 +10,10 @@
 #include "../process_callback.h"
 #include <string>
 #include <zen/int64.h>
+#include <zen/i18n.h>
 
-const int UI_UPDATE_INTERVAL = 100; //unit: [ms]; perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
-
+namespace zen
+{
 bool updateUiIsAllowed(); //test if a specific amount of time is over
 void updateUiNow();       //do the updating
 
@@ -31,11 +32,42 @@ struct AbortCallback
 };
 
 
-//actual callback implementation will have to satisfy "process" and "gui"
-class StatusHandler : public ProcessCallback, public AbortCallback
+//common statistics "everybody" needs
+struct Statistics
+{
+    virtual ~Statistics() {}
+
+    virtual ProcessCallback::Phase currentPhase() const = 0;
+
+    virtual int getObjectsCurrent(ProcessCallback::Phase phaseId) const = 0;
+    virtual int getObjectsTotal  (ProcessCallback::Phase phaseId) const = 0;
+
+    virtual Int64 getDataCurrent(ProcessCallback::Phase phaseId) const = 0;
+    virtual Int64 getDataTotal  (ProcessCallback::Phase phaseId) const = 0;
+
+    virtual const std::wstring& currentStatusText() const = 0;
+};
+
+
+//partial callback implementation with common functionality for "batch", "GUI/Compare" and "GUI/Sync"
+class StatusHandler : public ProcessCallback, public AbortCallback, public Statistics
 {
 public:
-    StatusHandler() : abortRequested(false) {}
+    StatusHandler() : currentPhase_(PHASE_NONE),
+        numbersCurrent_(4), //init with phase count
+        numbersTotal_  (4), //
+        abortRequested(false) {}
+
+protected:
+    //implement parts of ProcessCallback
+    virtual void initNewPhase(int objectsTotal, Int64 dataTotal, Phase phaseId)
+    {
+        currentPhase_ = phaseId;
+        refNumbers(numbersTotal_, currentPhase_) = std::make_pair(objectsTotal, dataTotal);
+    }
+
+    virtual void updateProcessedData(int objectsDelta, Int64 dataDelta) { updateData(numbersCurrent_, objectsDelta, dataDelta); } //note: these methods should NOT throw in order
+    virtual void updateTotalData    (int objectsDelta, Int64 dataDelta) { updateData(numbersTotal_  , objectsDelta, dataDelta); } //to properly allow undoing setting of statistics!
 
     virtual void requestUiRefresh()
     {
@@ -46,12 +78,68 @@ public:
             abortThisProcess();  //abort can be triggered by requestAbortion()
     }
 
+    virtual void reportStatus(const std::wstring& text) { statusText_ = text; requestUiRefresh(); /*throw AbortThisProcess */ }
+    virtual void reportInfo  (const std::wstring& text) { statusText_ = text; requestUiRefresh(); /*throw AbortThisProcess */ } //log text in derived class
+
+    //implement AbortCallback
+    virtual void requestAbortion()
+    {
+        abortRequested = true;
+        statusText_ =_("Abort requested: Waiting for current operation to finish...");
+    } //this does NOT call abortThisProcess immediately, but when we're out of the C GUI call stack
+
+    //implement Statistics
+    virtual Phase currentPhase() const { return currentPhase_; }
+
+    virtual int getObjectsCurrent(Phase phaseId) const {                                    return refNumbers(numbersCurrent_, phaseId).first; }
+    virtual int getObjectsTotal  (Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).first; }
+
+    virtual Int64 getDataCurrent(Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersCurrent_, phaseId).second; }
+    virtual Int64 getDataTotal  (Phase phaseId) const { assert(phaseId != PHASE_SCANNING); return refNumbers(numbersTotal_  , phaseId).second; }
+
+    virtual const std::wstring& currentStatusText() const { return statusText_; }
+
+    //enrich this interface
     virtual void abortThisProcess() = 0;
-    virtual void requestAbortion() { abortRequested = true; } //this does NOT call abortThisProcess immediately, but when appropriate (e.g. async. processes finished)
-    bool abortIsRequested() { return abortRequested; }
+
+    bool abortIsRequested() const { return abortRequested; }
 
 private:
+    typedef std::vector<std::pair<int, Int64>> StatNumbers;
+
+    void updateData(StatNumbers& num, int objectsDelta, Int64 dataDelta)
+    {
+        auto& st = refNumbers(num, currentPhase_);
+        st.first  += objectsDelta;
+        st.second += dataDelta;
+    }
+
+    static const std::pair<int, Int64>& refNumbers(const StatNumbers& num, Phase phaseId)
+    {
+        switch (phaseId)
+        {
+            case PHASE_SCANNING:
+                return num[0];
+            case PHASE_COMPARING_CONTENT:
+                return num[1];
+            case PHASE_SYNCHRONIZING:
+                return num[2];
+            case PHASE_NONE:
+                break;
+        }
+        assert(false);
+        return num[3]; //dummy entry!
+    }
+
+    static std::pair<int, Int64>& refNumbers(StatNumbers& num, Phase phaseId) { return const_cast<std::pair<int, Int64>&>(refNumbers(static_cast<const StatNumbers&>(num), phaseId)); }
+
+    Phase currentPhase_;
+    StatNumbers numbersCurrent_;
+    StatNumbers numbersTotal_;
+    std::wstring statusText_;
+
     bool abortRequested;
 };
+}
 
 #endif // STATUSHANDLER_H_INCLUDED

@@ -9,7 +9,8 @@
 
 #include <zen/thread.h>
 #include <zen/file_handling.h>
-#include "status_handler.h"
+//#include "status_handler.h"
+#include "process_callback.h"
 #include <zen/file_error.h>
 #include "resolve_path.h"
 
@@ -20,7 +21,7 @@ bool dirExistsUpdating(const Zstring& dirname, bool allowUserInteraction, Proces
 {
     using namespace zen;
 
-    procCallback.reportStatus(replaceCpy(_("Searching for directory %x..."), L"%x", std::wstring(L"\"") + dirname + L"\"", false));
+    procCallback.reportStatus(replaceCpy(_("Searching for directory %x..."), L"%x", fmtFileName(dirname), false));
 
     auto ft = async([=]() -> bool
     {

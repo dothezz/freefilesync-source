@@ -6,9 +6,12 @@
 
 #include "status_handler.h"
 #include <wx/app.h>
-#include <ctime>
+#include <zen/tick_count.h>
 
-void updateUiNow()
+using namespace zen;
+
+
+void zen::updateUiNow()
 {
     //process UI events and prevent application from "not responding"   -> NO performance issue!
     wxTheApp->Yield();
@@ -17,15 +20,16 @@ void updateUiNow()
     //        wxTheApp->Dispatch();
 }
 
-
-bool updateUiIsAllowed()
+namespace
 {
-    const std::clock_t CLOCK_UPDATE_INTERVAL = UI_UPDATE_INTERVAL * CLOCKS_PER_SEC / 1000;
+const std::int64_t TICKS_UPDATE_INTERVAL = UI_UPDATE_INTERVAL* ticksPerSec() / 1000;
+TickVal lastExec = getTicks();
+};
 
-    static std::clock_t lastExec = 0;
-    const std::clock_t now = std::clock(); //this is quite fast: 2 * 10^-5
-
-    if (now - lastExec >= CLOCK_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
+bool zen::updateUiIsAllowed()
+{
+    const TickVal now = getTicks(); //0 on error
+    if (now - lastExec >= TICKS_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
     {
         lastExec = now;
         return true;

@@ -12,19 +12,6 @@
 
 using namespace zen;
 
-/*
-//convert bitmask into "real" drive-letter
-Zstring getDriveFromMask(ULONG unitmask)
-{
-    for (int i = 0; i < 26; ++i)
-    {
-        if (unitmask & 0x1)
-            return Zstring() + static_cast<DefaultChar>(DefaultChar('A') + i) + DefaultStr(":\\");
-        unitmask >>= 1;
-    }
-    return Zstring();
-}
-*/
 
 namespace
 {
@@ -64,7 +51,7 @@ private:
     friend LRESULT CALLBACK topWndProc(HWND, UINT, WPARAM, LPARAM);
     void processMessage(UINT message, WPARAM wParam, LPARAM lParam);
 
-    const HINSTANCE process;
+    const HINSTANCE hMainModule;
     HWND windowHandle;
 
     std::set<Listener*> listener;
@@ -74,39 +61,39 @@ private:
 const wchar_t MessageProvider::WINDOW_NAME[] = L"E6AD5EB1-527B-4EEF-AC75-27883B233380"; //random name
 
 
-LRESULT CALLBACK topWndProc(HWND hwnd,        //handle to window
-                            UINT uMsg,        //message identifier
-                            WPARAM wParam,    //first message parameter
-                            LPARAM lParam)    //second message parameter
+LRESULT CALLBACK topWndProc(HWND hwnd,     //handle to window
+                            UINT uMsg,     //message identifier
+                            WPARAM wParam, //first message parameter
+                            LPARAM lParam) //second message parameter
 {
     if (messageProviderConstructed) //attention: this callback is triggered in the middle of singleton construction! It is a bad idea to to call back at this time!
         try
         {
             MessageProvider::instance().processMessage(uMsg, wParam, lParam); //not supposed to throw
         }
-        catch (...) {}
+        catch (...) { assert(false); }
 
     return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 
 MessageProvider::MessageProvider() :
-    process(::GetModuleHandle(nullptr)), //get program's module handle
+    hMainModule(::GetModuleHandle(nullptr)), //get program's module handle
     windowHandle(nullptr)
 {
-    if (!process)
+    if (!hMainModule)
         throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (GetModuleHandle)");
 
     //register the main window class
     WNDCLASS wc = {};
     wc.lpfnWndProc   = topWndProc;
-    wc.hInstance     = process;
+    wc.hInstance     = hMainModule;
     wc.lpszClassName = WINDOW_NAME;
 
     if (::RegisterClass(&wc) == 0)
         throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (RegisterClass)");
 
-    zen::ScopeGuard guardClass = zen::makeGuard([&]() { ::UnregisterClass(WINDOW_NAME, process); });
+    ScopeGuard guardClass = makeGuard([&] { ::UnregisterClass(WINDOW_NAME, hMainModule); });
 
     //create dummy-window
     windowHandle = ::CreateWindow(WINDOW_NAME, //LPCTSTR lpClassName OR ATOM in low-order word!
@@ -117,9 +104,9 @@ MessageProvider::MessageProvider() :
                                   0, //int nWidth,
                                   0, //int nHeight,
                                   0, //note: we need a toplevel window to receive device arrival events, not a message-window (HWND_MESSAGE)!
-                                  nullptr,  //HMENU hMenu,
-                                  process,  //HINSTANCE hInstance,
-                                  nullptr); //LPVOID lpParam
+                                  nullptr,     //HMENU hMenu,
+                                  hMainModule, //HINSTANCE hInstance,
+                                  nullptr);    //LPVOID lpParam
     if (!windowHandle)
         throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (CreateWindow)");
 
@@ -132,7 +119,7 @@ MessageProvider::~MessageProvider()
     //clean-up in reverse order
     ::DestroyWindow(windowHandle);
     ::UnregisterClass(WINDOW_NAME, //LPCTSTR lpClassName OR ATOM in low-order word!
-                      process); //HINSTANCE hInstance
+                      hMainModule); //HINSTANCE hInstance
 }
 
 
@@ -147,10 +134,10 @@ void MessageProvider::processMessage(UINT message, WPARAM wParam, LPARAM lParam)
 class NotifyRequestDeviceRemoval::Pimpl : private MessageProvider::Listener
 {
 public:
-    Pimpl(NotifyRequestDeviceRemoval& parent, HANDLE hDir) : //throw (FileError)
+    Pimpl(NotifyRequestDeviceRemoval& parent, HANDLE hDir) : //throw FileError
         parent_(parent)
     {
-        MessageProvider::instance().registerListener(*this); //throw (FileError)
+        MessageProvider::instance().registerListener(*this); //throw FileError
 
         //register handles to receive notifications
         DEV_BROADCAST_HANDLE filter = {};

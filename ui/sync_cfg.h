@@ -7,7 +7,9 @@
 #ifndef SYNCCONFIG_H_INCLUDED
 #define SYNCCONFIG_H_INCLUDED
 
+#include <wx/window.h>
 #include "../lib/process_xml.h"
+
 
 namespace zen
 {
@@ -16,7 +18,7 @@ struct ReturnSyncConfig
     enum ButtonPressed
     {
         BUTTON_CANCEL,
-        BUTTON_OKAY = 1
+        BUTTON_OKAY
     };
 };
 
@@ -28,7 +30,8 @@ struct ExecWhenFinishedCfg
 };
 
 
-ReturnSyncConfig::ButtonPressed showSyncConfigDlg(CompareVariant compareVar,
+ReturnSyncConfig::ButtonPressed showSyncConfigDlg(wxWindow* parent,
+                                                  CompareVariant compareVar,
                                                   SyncConfig&    syncCfg,
                                                   xmlAccess::OnGuiError* handleError,     //
                                                   ExecWhenFinishedCfg* execWhenFinished); //optional input parameter

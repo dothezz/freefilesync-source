@@ -44,17 +44,17 @@ public:
     void loadConfig(const wxString& filename);
 
 private:
-    virtual void OnClose(           wxCloseEvent& event);
-    virtual void OnQuit(            wxCommandEvent& event);
-    virtual void OnShowHelp(        wxCommandEvent& event);
-    virtual void OnMenuAbout(       wxCommandEvent& event);
-    virtual void OnAddFolder(       wxCommandEvent& event);
-    virtual void OnRemoveFolder(    wxCommandEvent& event);
-    virtual void OnRemoveTopFolder( wxCommandEvent& event);
-    virtual void OnKeyPressed(      wxKeyEvent& event);
-    virtual void OnStart(           wxCommandEvent& event);
-    virtual void OnSaveConfig(      wxCommandEvent& event);
-    virtual void OnLoadConfig(      wxCommandEvent& event);
+    virtual void OnClose          (wxCloseEvent& event)   { Destroy(); }
+    virtual void OnQuit           (wxCommandEvent& event) { Destroy(); }
+    virtual void OnShowHelp       (wxCommandEvent& event);
+    virtual void OnMenuAbout      (wxCommandEvent& event);
+    virtual void OnAddFolder      (wxCommandEvent& event);
+    virtual void OnRemoveFolder   (wxCommandEvent& event);
+    virtual void OnRemoveTopFolder(wxCommandEvent& event);
+    virtual void OnKeyPressed     (wxKeyEvent& event);
+    virtual void OnStart          (wxCommandEvent& event);
+    virtual void OnSaveConfig     (wxCommandEvent& event);
+    virtual void OnLoadConfig     (wxCommandEvent& event);
 
     void setConfiguration(const xmlAccess::XmlRealConfig& cfg);
     xmlAccess::XmlRealConfig getConfiguration();

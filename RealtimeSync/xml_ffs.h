@@ -8,13 +8,14 @@
 #define XMLFREEFILESYNC_H_INCLUDED
 
 #include "xml_proc.h"
+#include <zen/zstring.h>
 
 
 //reuse (some of) FreeFileSync's xml files
 
 namespace rts
 {
-void readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config);  //throw (xmlAccess::FfsXmlError);
+void readRealOrBatchConfig(const Zstring& filename, xmlAccess::XmlRealConfig& config);  //throw FfsXmlError
 
 int getProgramLanguage();
 }

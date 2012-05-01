@@ -11,8 +11,8 @@
 
 namespace zen
 {
-void startFind(wxWindow& parentWindow, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase); //Strg + F
-void findNext( wxWindow& parentWindow, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase); //F3
+void startFind(wxWindow* parent, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase); //Strg + F
+void findNext( wxWindow* parent, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase); //F3
 }
 
 #endif // SEARCH_H_INCLUDED

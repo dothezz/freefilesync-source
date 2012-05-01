@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb  9 2012)
+// C++ code generated with wxFormBuilder (version Apr 10 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -34,6 +34,8 @@
 #include <wx/scrolwin.h>
 #include <wx/spinctrl.h>
 #include <wx/frame.h>
+#include <wx/statbmp.h>
+#include <wx/dialog.h>
 
 #include "../zen/i18n.h"
 
@@ -108,6 +110,32 @@ public:
 
     FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
     ~FolderGenerated();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ErrorDlgGenerated
+///////////////////////////////////////////////////////////////////////////////
+class ErrorDlgGenerated : public wxDialog
+{
+private:
+
+protected:
+    wxStaticBitmap* m_bitmap10;
+    wxTextCtrl* m_textCtrl8;
+    wxButton* m_buttonRetry;
+    wxButton* m_buttonAbort;
+
+    // Virtual event handlers, overide them in your derived class
+    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+    virtual void OnRetry( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnAbort( wxCommandEvent& event ) { event.Skip(); }
+
+
+public:
+
+    ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
+    ~ErrorDlgGenerated();
 
 };
 

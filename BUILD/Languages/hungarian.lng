@@ -19,8 +19,14 @@
 <source>Browse directory</source>
 <target>Mappa tallózása</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Megszakítási kérelem: Várakozás a folyamatban lévő művelet befejezésére...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatikus szinkronizálás</target>
+
+<source>Error</source>
+<target>Hiba</target>
 
 <source>Select alternate comparison settings</source>
 <target>Alternatív összehasonlítás beállításai</target>
@@ -51,9 +57,6 @@
 
 <source>About</source>
 <target>A programról</target>
-
-<source>Error</source>
-<target>Hiba</target>
 
 <source>Warning</source>
 <target>Figyelem</target>
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux hibakód %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>A szimbolikus link feloldása sikertelen:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Sikertelen a következő symlink feloldása: %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -136,35 +139,41 @@
 <pluralform>%x Bájt</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Hiba történt a szinkronizációs adatbázis olvasása közben:</target>
+<source>Cannot read file %x.</source>
+<target>A következő fájl olvasása sikertelen: %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Hiba történt a szinkronizációs adatbázis írása közben:</target>
+<source>Cannot write file %x.</source>
+<target>A következő fájl írása sikertelen: %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Inkompatibilis szinkronizációs adatbázis formátum:</target>
+<source>Database file %x is incompatible.</source>
+<target>Inkompatibilis adatbázisfájl: %x.</target>
 
 <source>Initial synchronization:</source>
 <target>Első szinkronizáció:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>A FreeFileSync egyik adatbázisfájlja nem létezik:</target>
+<source>Database file %x does not yet exist.</source>
+<target>A következő adatbázisfájl nem létezik: %x.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Az adatbázisfájlok nem osztoznak egy közös szinkronizációs munkameneten:</target>
+<source>Out of memory!</source>
+<target>Elfogyott a szabad memória!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Az adatbázisfájlok nem osztanak meg közös munkamenetet.</target>
 
 <source>An exception occurred!</source>
 <target>Kivétel keletkezett!</target>
 
-<source>Error reading file attributes:</source>
-<target>A fájl attribútumainak olvasása sikertelen:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>A következő fájl attribútumainak olvasása sikertelen: %x.</target>
+
+<source>Cannot get process information.</source>
+<target>A processzinformációk lekérdezése sikertelen.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Várakozás a mappa zárolásának a feloldására (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Hiba történt a mappa zárolása közben:</target>
+<source>Cannot set directory lock %x.</source>
+<target>A következő mappa zárolása sikertelen: %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -175,8 +184,8 @@
 <pluralform>%x másodperc</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>A fájl olvasása sikertelen:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Hiba történt a fájl feldolgozása közben: %x fájl, %y sor, %z oszlop.</target>
 
 <source>Scanning:</source>
 <target>Vizsgálat:</target>
@@ -193,38 +202,32 @@
 <pluralform>[%x szál]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Érvénytelen a FreeFileSync beállításait tartalmazó fájl!</target>
+<source>/sec</source>
+<target>/másodperc</target>
 
-<source>Error parsing configuration file:</source>
-<target>A beállításokat tartalmazó fájl feldolgozása sikertelen:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>A következő fájl nem tartalmaz érvényes beállításokat: %x.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>A beállításokat csak részben sikerült betölteni:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Csak részlegesen töltődött be a következő beállításokat tartalmazó fájl: %x.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>%x Lomtárba helyezése sikertelen!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>A Volume Shadow Copy szolgáltatás elérése sikertelen.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Kérjük, használd a FreeFileSync 64 bites verzióját a shadow másolatok készítéséhez ezen a rendszeren.</target>
 
 <source>Cannot load file %x.</source>
 <target>%x fájl betöltése sikertelen.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Hiba történt a Volume Shadow Copy szolgáltatás elérése közben!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>A Shadow Copy a WOW64-en nem támogatott. Kérjük, használja a 64-bites FreeFileSync-et.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Nem lehet meghatározni a kötetnevet a következő fájlhoz:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>A következő útvonal nem tartalmaz kötetnevet: %x.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!</target>
 
-<source>/sec</source>
-<target>/másodperc</target>
-
-<source>File does not exist:</source>
-<target>A következő fájl nem létezik:</target>
+<source>Cannot find file %x.</source>
+<target>Nem található a következő fájl: %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>A következő XML elemek olvasása sikertelen:</target>
@@ -297,14 +300,17 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Start</source>
 <target>Indítás</target>
 
+<source>&Retry</source>
+<target>&Ismét</target>
+
+<source>Cancel</source>
+<target>Mégsem</target>
+
 <source>(Build: %x)</source>
 <target>(Build: %x)</target>
 
 <source>RealtimeSync configuration</source>
 <target>RealtimeSync beállítások</target>
-
-<source>File already exists. Overwrite?</source>
-<target>A fájl már létezik. Felülírjuk?</target>
 
 <source>&Restore</source>
 <target>&Visszaállítás</target>
@@ -348,20 +354,20 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync beállítások</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync kötegelt feladat</target>
-
-<source>Unable to create log file!</source>
-<target>Nem lehet létrehozni a naplófájlt!</target>
-
 <source>Batch execution</source>
 <target>Kötegelt végrehajtás</target>
 
-<source>Stop</source>
-<target>Megállítás</target>
+<source>Items processed:</source>
+<target>Feldolgozott elemek száma:</target>
+
+<source>Items remaining:</source>
+<target>Hátralévő elemek száma:</target>
 
 <source>Total time:</source>
 <target>Becsült idő:</target>
+
+<source>Stop</source>
+<target>Megállítás</target>
 
 <source>Synchronization aborted!</source>
 <target>A szinkronizáció megszakítva!</target>
@@ -369,14 +375,17 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Synchronization completed with errors!</source>
 <target>A szinkronizáció befejeződött, de akadtak hibák!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Nincs mit szinkronizálni!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>A szinkronizáció sikeresen befejeződött!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Kérjük, nyomja meg a "Váltás" gombot a GUI mód megnyitásához.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Nyomg meg a "Váltás" gombot az események kezeléséhez a FreeFileSync fő párbeszédablakában.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Váltás a FreeFileSync GUI módjára...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Váltás a FreeFileSync fő párbeszédablakára...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>A csatlakozás a sourceforge.net-hez sikertelen!</target>
@@ -534,9 +543,6 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Items found:</source>
 <target>Talált elemek száma:</target>
 
-<source>Items remaining:</source>
-<target>Hátralévő elemek száma:</target>
-
 <source>Speed:</source>
 <target>Sebesség:</target>
 
@@ -588,9 +594,6 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>&Load</source>
 <target>&Betöltés</target>
 
-<source>&Cancel</source>
-<target>&Mégsem</target>
-
 <source>Select variant:</source>
 <target>Változat kiválasztása:</target>
 
@@ -639,8 +642,8 @@ A parancssor végrehajtódik minden alkalommal, ha:
 <source>Conflict/file cannot be categorized</source>
 <target>Kategorizálhatatlan ütközések/fájlok</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Összehasonlítás</target>
@@ -672,9 +675,6 @@ A fájlok megegyeznek, ha megegyezik
 
 <source>Synchronizing...</source>
 <target>Szinkronizálás folyamatban...</target>
-
-<source>Items processed:</source>
-<target>Feldolgozott elemek száma:</target>
 
 <source>&Pause</source>
 <target>&Szünet</target>
@@ -717,9 +717,6 @@ a következő személyeknek:
 
 <source>&Ignore</source>
 <target>&Kihagy</target>
-
-<source>&Retry</source>
-<target>&Ismét</target>
 
 <source>Do not show this dialog again</source>
 <target>Ne mutasd újra ezt a párbeszédablakot</target>
@@ -1018,9 +1015,6 @@ Kizárni: \stuff\temp\*
 <source>File list exported!</source>
 <target>A fájllista exportálása befejeződött!</target>
 
-<source>Error writing file:</source>
-<target>A fájl írása sikertelen:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1066,20 +1060,20 @@ Kizárni: \stuff\temp\*
 <source>Paused</source>
 <target>Szüneteltetve</target>
 
+<source>Initializing...</source>
+<target>Inicializálás...</target>
+
 <source>Aborted</source>
 <target>Megszakítva</target>
 
 <source>Completed</source>
 <target>Befejezve</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Megszakítási kérelem: Várakozás a folyamatban lévő művelet befejezésére...</target>
+<source>Continue</source>
+<target>Folytatás</target>
 
 <source>Pause</source>
 <target>Szünet</target>
-
-<source>Continue</source>
-<target>Folytatás</target>
 
 <source>Cannot find %x</source>
 <target>Nem található: %x</target>
@@ -1219,65 +1213,65 @@ Kizárni: \stuff\temp\*
 <pluralform>%x nap</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>A mappafigyelés inicializálása sikertelen:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Hiba történt a mappák figyelése közben.</target>
+<source>Cannot monitor directory %x.</source>
+<target>A következő mappa monitorozása sikertelen: %x.</target>
 
 <source>Conversion error:</source>
 <target>Konverziós hiba:</target>
 
-<source>Error deleting file:</source>
-<target>A fájl törlése sikertelen:</target>
+<source>Cannot delete file %x.</source>
+<target>A következő fájl törlése sikertelen: %x.</target>
 
-<source>Error moving file:</source>
-<target>Hiba a fájl mozgatásakor:</target>
+<source>The file is locked by another process:</source>
+<target>A fájl zárolva van egy másik processz által:</target>
 
-<source>Target file already existing!</source>
-<target>A célként megadott fájl már létezik!</target>
+<source>Cannot move file %x to %y.</source>
+<target>%x fájl mozgatása %y fájlba sikertelen.</target>
 
-<source>Error moving directory:</source>
-<target>Hiba a mappa mozgatásakor:</target>
+<source>Cannot delete directory %x.</source>
+<target>A következő mappa törlése sikertelen: %x.</target>
 
-<source>Target directory already existing!</source>
-<target>A célmappa már létezik!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Az utolsó módosítás dátumának a beállítása sikertelen a következő fájlnál: %x.</target>
 
-<source>Error deleting directory:</source>
-<target>A mappa törlése sikertelen:</target>
+<source>Cannot find system function %x.</source>
+<target>Nem található a következő rendszerfunkció: %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Az utolsó változtatás dátumának módosítása sikertelen:</target>
+<source>Cannot read security context of %x.</source>
+<target>A következő fájl biztonsági tulajdonságainak olvasása sikertelen: %x.</target>
 
-<source>Error loading library function:</source>
-<target>A könyvtári funkció betöltése sikertelen:</target>
+<source>Cannot write security context of %x.</source>
+<target>A következő fájl biztonsági tulajdonságainak írása sikertelen: %x.</target>
 
-<source>Error reading security context:</source>
-<target>A biztonsági címke olvasása sikertelen:</target>
+<source>Cannot read permissions of %x.</source>
+<target>A következő fájl jogosultságainak az olvasása sikertelen: %x.</target>
 
-<source>Error writing security context:</source>
-<target>A biztonsági címke írása sikertelen:</target>
+<source>Cannot write permissions of %x.</source>
+<target>A következő fájl jogosultságainak az írása sikertelen: %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Hiba történt a fájl jogosultságainak másolása közben:</target>
+<source>Cannot create directory %x.</source>
+<target>A következő mappa létrehozása sikertelen: %x.</target>
 
-<source>Error creating directory:</source>
-<target>A mappa létrehozása sikertelen:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>%x symlink másolása a(z) %y symlinkbe sikertelen.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Hiba történt a szimbolikus link másolása közben:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>A következő fájl attribútumainak írása sikertelen: %x.</target>
 
-<source>Error copying file:</source>
-<target>A fájl másolása sikertelen:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>%x fájl másolása a(z) %y fájlba sikertelen.</target>
 
-<source>Error traversing directory:</source>
-<target>A mappa átnézése sikertelen:</target>
+<source>Cannot read directory %x.</source>
+<target>A következő mappa olvasása sikertelen: %x.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Végtelen hurok a mappák bejárásakor:</target>
+<source>Endless loop.</source>
+<target>Végtelen hurok.</target>
 
-<source>Error setting privilege:</source>
-<target>Hiba történt a jogok beállítása közben:</target>
+<source>Cannot set privilege %x.</source>
+<target>A következő privilégium beállítása sikertelen: %x.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>%x Lomtárba helyezése sikertelen!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Mindkét oldal megváltozott az utolsó szikronizálás óta!</target>
@@ -1303,8 +1297,8 @@ Kizárni: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Figyelmen kívül hagyhatod ezt a hibát, üresnek tekintve a mappát.</target>
 
-<source>Directory does not exist:</source>
-<target>A mappa nem létezik:</target>
+<source>Cannot find directory %x.</source>
+<target>Nem található a következő mappa: %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>A mappák függenek egymástól! Legyen óvatos, amikor megadja a szinkronizálási szabályokat:</target>
@@ -1312,20 +1306,17 @@ Kizárni: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Szinkronizálás előkészítése...</target>
 
-<source>Out of memory!</source>
-<target>Elfogyott a szabad memória!</target>
+<source>Conflict detected:</source>
+<target>Ütközés történt:</target>
 
 <source>File %x has an invalid date!</source>
 <target>A(z) %x fájlnak érvénytelen a dátuma!</target>
 
-<source>Conflict detected:</source>
-<target>Ütközés történt:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>A(z) %x fájlok dátuma megegyezik, de a mérete nem!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>A(z) %x symlinknek megegyezik a dátuma, de a célpontja nem!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>A következő symlinkeknek megegyezik a dátuma, de a célpontjuk különböző: %x.</target>
 
 <source>Comparing content of files %x</source>
 <target>%x fájlok tartalmának összehasonlítása</target>
@@ -1408,11 +1399,11 @@ Kizárni: \stuff\temp\*
 <source>Creating file %x</source>
 <target>%x fájl létrehozása</target>
 
-<source>Creating folder %x</source>
-<target>%x mappa létrehozása</target>
-
 <source>Creating symbolic link %x</source>
 <target>%x symlink létrehozása</target>
+
+<source>Creating folder %x</source>
+<target>%x mappa létrehozása</target>
 
 <source>Overwriting file %x</source>
 <target>%x fájl felülírása</target>
@@ -1432,8 +1423,8 @@ Kizárni: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Nem lett megadva mappa a fájlok verziókezeléséhez!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>A forrásként megadott mappa többé nem létezik:</target>
+<source>Source directory %x not found.</source>
+<target>Nem található a következő forrásmappa: %x.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Feloldatlan ütközések vannak!</target>
@@ -1467,12 +1458,6 @@ Kizárni: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Adatbázis generálása...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Nincs mit szinkronizálni!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>A zárolt %x fájl másolása sikertelen!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Adatellenőrzési hiba: A forrás és cél fájl tartalma különbözik!</target>

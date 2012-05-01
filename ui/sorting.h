@@ -156,16 +156,19 @@ bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;  //empty rows always last
 
-
-    const FileMapping* fileObjA = dynamic_cast<const FileMapping*>(&a);
-    const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
-
-    if (!fileObjA)
+    if (dynamic_cast<const DirMapping*>(&a))
         return false; //directories last
-    else if (!fileObjB)
+    else if (dynamic_cast<const DirMapping*>(&b))
         return true;  //directories last
 
-    return makeSortDirection(LessFilename(), Int2Type<ascending>())(fileObjA->getExtension<side>(), fileObjB->getExtension<side>());
+    auto getExtension = [&](const FileSystemObject& fsObj) -> Zstring
+    {
+        const Zstring& shortName = fsObj.getShortName<side>();
+        const size_t pos = shortName.rfind(Zchar('.'));
+        return pos == Zstring::npos ? Zstring() : Zstring(shortName.c_str() + pos + 1);
+    };
+
+    return makeSortDirection(LessFilename(), Int2Type<ascending>())(getExtension(a), getExtension(b));
 }
 
 

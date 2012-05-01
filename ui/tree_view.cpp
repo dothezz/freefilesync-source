@@ -23,10 +23,10 @@ inline
 void TreeView::compressNode(Container& cont) //remove single-element sub-trees -> gain clarity + usability (call *after* inclusion check!!!)
 {
     if (cont.subDirs.empty() || //single files node or...
-        (cont.firstFile == nullptr &&   //single dir node...
-         cont.subDirs.size() == 1 && //
+        (cont.firstFile == nullptr && //single dir node...
+         cont.subDirs.size() == 1  && //
          cont.subDirs[0].firstFile == nullptr && //...that is empty
-         cont.subDirs[0].subDirs.empty()))    //
+         cont.subDirs[0].subDirs.empty()))       //
     {
         cont.subDirs.clear();
         cont.firstFile = nullptr;
@@ -624,7 +624,7 @@ public:
         fileIcon(IconBuffer(IconBuffer::SIZE_SMALL).genericFileIcon()),
         dirIcon (IconBuffer(IconBuffer::SIZE_SMALL).genericDirIcon ()),
         rootBmp(GlobalResources::getImage(L"rootFolder").ConvertToImage().Scale(fileIcon.GetWidth(), fileIcon.GetHeight(), wxIMAGE_QUALITY_HIGH)),
-        widthNodeIcon(fileIcon.GetWidth()),
+        widthNodeIcon(dirIcon.GetWidth()),
         widthLevelStep(widthNodeIcon),
         widthNodeStatus(GlobalResources::getImage(L"nodeExpanded").GetWidth()),
         grid_(grid),

@@ -5,13 +5,11 @@
 // **************************************************************************
 
 #include "gui_status_handler.h"
-#include "small_dlgs.h"
+#include <wx/wupdlock.h>
+#include <wx+/shell_execute.h>
 #include "msg_popup.h"
 #include "main_dlg.h"
-#include <wx/wupdlock.h>
-#include <wx+/string_conv.h>
 #include "exec_finished_box.h"
-#include <wx+/shell_execute.h>
 
 using namespace zen;
 using namespace xmlAccess;
@@ -19,24 +17,24 @@ using namespace xmlAccess;
 
 CompareStatusHandler::CompareStatusHandler(MainDialog& dlg) :
     mainDlg(dlg),
-    ignoreErrors(false),
-    currentProcess(StatusHandler::PROCESS_NONE)
+    ignoreErrors(false)
 {
-    wxWindowUpdateLocker dummy(&mainDlg); //avoid display distortion
+    {
+        wxWindowUpdateLocker dummy(&mainDlg); //avoid display distortion
 
-    //prevent user input during "compare", do not disable maindialog since abort-button would also be disabled
-    mainDlg.disableAllElements(true);
-    mainDlg.compareStatus->init(); //clear old values
+        //prevent user input during "compare", do not disable maindialog since abort-button would also be disabled
+        mainDlg.disableAllElements(true);
 
-    //display status panel during compare
-    mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Show();
-    mainDlg.auiMgr.Update();
-    mainDlg.compareStatus->updateStatusPanelNow(); //clear gui flicker: window must be visible to make this work!
+        //display status panel during compare
+        mainDlg.compareStatus->init(*this); //clear old values before showing panel
+        mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Show();
+        mainDlg.auiMgr.Update();
 
-    //register abort button
-    mainDlg.m_buttonAbort->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
-    //register key event
-    mainDlg.Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
+        //register keys
+        mainDlg.Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
+        mainDlg.m_buttonAbort->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
+    }
+    mainDlg.Update(); //don't wait until idle event!
 }
 
 
@@ -46,17 +44,17 @@ CompareStatusHandler::~CompareStatusHandler()
 
     //reenable complete main dialog
     mainDlg.enableAllElements();
-    mainDlg.compareStatus->finalize();
 
+    mainDlg.compareStatus->finalize();
     mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Hide();
     mainDlg.auiMgr.Update();
 
-    if (abortIsRequested())
-        mainDlg.pushStatusInformation(_("Operation aborted!"));
-
-    //de-register keys
+    //unregister keys
     mainDlg.Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
     mainDlg.m_buttonAbort->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
+
+    if (abortIsRequested())
+        mainDlg.pushStatusInformation(_("Operation aborted!"));
 }
 
 
@@ -73,68 +71,26 @@ void CompareStatusHandler::OnKeyPressed(wxKeyEvent& event)
 }
 
 
-void CompareStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID)
+void CompareStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase phaseID)
 {
-    currentProcess = processID;
+    StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
 
-    switch (currentProcess)
+    switch (currentPhase())
     {
-        case StatusHandler::PROCESS_SCANNING:
+        case PHASE_NONE:
+        case PHASE_SYNCHRONIZING:
+            assert(false);
+        case PHASE_SCANNING:
             break;
-        case StatusHandler::PROCESS_COMPARING_CONTENT:
+        case PHASE_COMPARING_CONTENT:
         {
             wxWindowUpdateLocker dummy(&mainDlg);
-            mainDlg.compareStatus->switchToCompareBytewise(objectsTotal, dataTotal);
+            mainDlg.compareStatus->switchToCompareBytewise();
             mainDlg.Layout();  //show progress bar...
             mainDlg.Refresh(); //remove distortion...
         }
         break;
-        case StatusHandler::PROCESS_SYNCHRONIZING:
-        case StatusHandler::PROCESS_NONE:
-            assert(false);
-            break;
     }
-}
-
-
-void CompareStatusHandler::updateProcessedData(int objectsDelta, zen::Int64 dataDelta)
-{
-    switch (currentProcess)
-    {
-        case StatusHandler::PROCESS_SCANNING:
-            mainDlg.compareStatus->incScannedObjects_NoUpdate(objectsDelta); //throw ()
-            break;
-        case StatusHandler::PROCESS_COMPARING_CONTENT:
-            mainDlg.compareStatus->incProcessedCmpData_NoUpdate(objectsDelta, dataDelta); //throw ()
-            break;
-        case StatusHandler::PROCESS_SYNCHRONIZING:
-        case StatusHandler::PROCESS_NONE:
-            assert(false);
-            break;
-    }
-
-    //note: this method must NOT throw in order to properly allow undoing setting of statistics!
-}
-
-
-void CompareStatusHandler::updateTotalData(int objectsDelta, Int64 dataDelta)
-{
-    assert(currentProcess != PROCESS_SCANNING);
-    mainDlg.compareStatus->incTotalCmpData_NoUpdate(objectsDelta, dataDelta);
-}
-
-
-void CompareStatusHandler::reportStatus(const std::wstring& text)
-{
-    mainDlg.compareStatus->setStatusText_NoUpdate(text);
-    requestUiRefresh(); //throw AbortThisProcess
-}
-
-
-void CompareStatusHandler::reportInfo(const std::wstring& text)
-{
-    mainDlg.compareStatus->setStatusText_NoUpdate(text);
-    requestUiRefresh(); //throw AbortThisProcess
 }
 
 
@@ -146,7 +102,8 @@ ProcessCallback::Response CompareStatusHandler::reportError(const std::wstring& 
     forceUiRefresh();
 
     bool ignoreNextErrors = false;
-    switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
+    switch (showErrorDlg(&mainDlg,
+                         ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
                          message, &ignoreNextErrors))
     {
         case ReturnErrorDlg::BUTTON_IGNORE:
@@ -169,8 +126,7 @@ void CompareStatusHandler::reportFatalError(const std::wstring& errorMessage)
 {
     forceUiRefresh();
 
-    showErrorDlg(ReturnErrorDlg::BUTTON_ABORT,
-                 errorMessage, nullptr);
+    showErrorDlg(&mainDlg, ReturnErrorDlg::BUTTON_ABORT, errorMessage, nullptr);
 }
 
 
@@ -183,9 +139,9 @@ void CompareStatusHandler::reportWarning(const std::wstring& warningMessage, boo
 
     //show pop-up and ask user how to handle warning
     bool dontWarnAgain = false;
-    switch (showWarningDlg(ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_ABORT,
-                           warningMessage,
-                           dontWarnAgain))
+    switch (showWarningDlg(&mainDlg,
+                           ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_ABORT,
+                           warningMessage, dontWarnAgain))
     {
         case ReturnWarningDlg::BUTTON_IGNORE:
             warningActive = !dontWarnAgain;
@@ -214,7 +170,7 @@ void CompareStatusHandler::OnAbortCompare(wxCommandEvent& event)
 
 void CompareStatusHandler::abortThisProcess()
 {
-    requestAbortion();
+    requestAbortion(); //just make sure...
     throw GuiAbortProcess();
 }
 //########################################################################################################
@@ -226,7 +182,7 @@ SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg,
                                      const std::wstring& execWhenFinished,
                                      std::vector<std::wstring>& execFinishedHistory) :
     parentDlg_(parentDlg),
-    syncStatusFrame(*this, parentDlg, SyncStatus::SYNCHRONIZING, true, jobName, execWhenFinished, execFinishedHistory),
+    syncStatusFrame(*this, *this, parentDlg, true, jobName, execWhenFinished, execFinishedHistory),
     handleError_(handleError)
 {
 }
@@ -238,11 +194,17 @@ SyncStatusHandler::~SyncStatusHandler()
 
     //finalize error log
     if (abortIsRequested())
-        errorLog.logMsg(_("Synchronization aborted!"), TYPE_FATAL_ERROR);
+        errorLog.logMsg(_("Synchronization aborted!"), TYPE_ERROR);
     else if (totalErrors > 0)
         errorLog.logMsg(_("Synchronization completed with errors!"), TYPE_WARNING);
     else
-        errorLog.logMsg(_("Synchronization completed successfully!"), TYPE_INFO);
+    {
+        if (getObjectsTotal(PHASE_SYNCHRONIZING) == 0 && //we're past "initNewPhase(PHASE_SYNCHRONIZING)" at this point!
+            getDataTotal   (PHASE_SYNCHRONIZING) == 0)
+            errorLog.logMsg(_("Nothing to synchronize!"), TYPE_INFO); //even if "ignored conflicts" occurred!
+        else
+            errorLog.logMsg(_("Synchronization completed successfully!"), TYPE_INFO);
+    }
 
     bool showFinalResults = true;
 
@@ -260,60 +222,37 @@ SyncStatusHandler::~SyncStatusHandler()
     if (showFinalResults)
     {
         if (abortIsRequested())
-            syncStatusFrame.processHasFinished(SyncStatus::ABORTED, errorLog);  //enable okay and close events
+            syncStatusFrame.processHasFinished(SyncStatus::RESULT_ABORTED, errorLog);  //enable okay and close events
         else if (totalErrors > 0)
-            syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, errorLog);
+            syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_ERROR, errorLog);
         else
-            syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, errorLog);
+            syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_SUCCESS, errorLog);
     }
     else
         syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
 }
 
 
-void SyncStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID)
+void SyncStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase phaseID)
 {
-    switch (processID)
-    {
-        case StatusHandler::PROCESS_SYNCHRONIZING:
-            syncStatusFrame.initNewProcess(SyncStatus::SYNCHRONIZING, objectsTotal, dataTotal);
-            break;
-        case StatusHandler::PROCESS_SCANNING:
-        case StatusHandler::PROCESS_COMPARING_CONTENT:
-        case StatusHandler::PROCESS_NONE:
-            assert(false);
-            break;
-    }
+    assert(phaseID == PHASE_SYNCHRONIZING);
+    StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
+    syncStatusFrame.initNewPhase(); //call after "StatusHandler::initNewPhase"
 }
 
 
 void SyncStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
 {
-    syncStatusFrame.incProcessedData_NoUpdate(objectsDelta, dataDelta); //throw ()
-
+    StatusHandler::updateProcessedData(objectsDelta, dataDelta);
+    syncStatusFrame.reportCurrentBytes(getDataCurrent(currentPhase())); //throw ()
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!
-}
-
-
-void SyncStatusHandler::updateTotalData(int objectsDelta, Int64 dataDelta)
-{
-    syncStatusFrame.incTotalData_NoUpdate(objectsDelta, dataDelta); //throw ()
-}
-
-
-void SyncStatusHandler::reportStatus(const std::wstring& text)
-{
-    syncStatusFrame.setStatusText_NoUpdate(text); //throw ()
-    requestUiRefresh(); //throw AbortThisProccess
 }
 
 
 void SyncStatusHandler::reportInfo(const std::wstring& text)
 {
+    StatusHandler::reportInfo(text);
     errorLog.logMsg(text, TYPE_INFO);
-
-    syncStatusFrame.setStatusText_NoUpdate(text); //throw ()
-    requestUiRefresh(); //throw AbortThisProccess
 }
 
 
@@ -332,7 +271,8 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
     forceUiRefresh();
 
     bool ignoreNextErrors = false;
-    switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
+    switch (showErrorDlg(parentDlg_,
+                         ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
                          errorMessage,
                          &ignoreNextErrors))
     {
@@ -351,9 +291,8 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
             break;
     }
 
-    assert (false);
-    errorLog.logMsg(errorMessage, TYPE_ERROR);
-    return ProcessCallback::IGNORE_ERROR;
+    assert(false);
+    return ProcessCallback::IGNORE_ERROR; //dummy value
 }
 
 
@@ -369,9 +308,9 @@ void SyncStatusHandler::reportFatalError(const std::wstring& errorMessage)
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_ABORT,
-                                 errorMessage,
-                                 &ignoreNextErrors))
+            switch (showErrorDlg(parentDlg_,
+                                 ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_ABORT,
+                                 errorMessage, &ignoreNextErrors))
             {
                 case ReturnErrorDlg::BUTTON_IGNORE:
                     if (ignoreNextErrors) //falsify only
@@ -398,47 +337,48 @@ void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& 
 {
     errorLog.logMsg(warningMessage, TYPE_WARNING);
 
-    switch (handleError_)
-    {
-        case ON_GUIERROR_POPUP:
-            break;
-        case ON_GUIERROR_IGNORE:
-            return; //if errors are ignored, then warnings should also
-    }
     if (!warningActive)
         return;
 
-    PauseTimers dummy(syncStatusFrame);
-    forceUiRefresh();
-
-    bool dontWarnAgain = false;
-    switch (showWarningDlg(ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_ABORT,
-                           warningMessage,
-                           dontWarnAgain))
+    switch (handleError_)
     {
-        case ReturnWarningDlg::BUTTON_IGNORE: //no unhandled error situation!
-            warningActive = !dontWarnAgain;
-            return;
+        case ON_GUIERROR_POPUP:
+        {
+            PauseTimers dummy(syncStatusFrame);
+            forceUiRefresh();
 
-        case ReturnWarningDlg::BUTTON_SWITCH:
-            assert(false);
-        case ReturnWarningDlg::BUTTON_ABORT:
-            abortThisProcess();
-            return;
+            bool dontWarnAgain = false;
+            switch (showWarningDlg(parentDlg_,
+                                   ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_ABORT,
+                                   warningMessage, dontWarnAgain))
+            {
+                case ReturnWarningDlg::BUTTON_IGNORE: //no unhandled error situation!
+                    warningActive = !dontWarnAgain;
+                    break;
+
+                case ReturnWarningDlg::BUTTON_SWITCH:
+                    assert(false);
+                case ReturnWarningDlg::BUTTON_ABORT:
+                    abortThisProcess();
+                    break;
+            }
+        }
+        break;
+
+        case ON_GUIERROR_IGNORE:
+            break; //if errors are ignored, then warnings should be, too
     }
-
-    assert(false);
 }
 
 
 void SyncStatusHandler::forceUiRefresh()
 {
-    syncStatusFrame.updateStatusDialogNow();
+    syncStatusFrame.updateProgress();
 }
 
 
 void SyncStatusHandler::abortThisProcess()
 {
-    requestAbortion();
+    requestAbortion(); //just make sure...
     throw GuiAbortProcess();  //abort can be triggered by syncStatusFrame
 }

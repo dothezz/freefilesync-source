@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Mar 17 2012)
+// C++ code generated with wxFormBuilder (version Apr 10 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -262,9 +262,7 @@ protected:
     wxBoxSizer* bSizerFilesRemaining;
     wxStaticText* m_staticText46;
     wxStaticText* m_staticTextFilesRemaining;
-    wxStaticText* m_staticText117;
     wxStaticText* m_staticTextDataRemaining;
-    wxStaticText* m_staticText118;
     wxBoxSizer* sSizerSpeed;
     wxStaticText* m_staticText104;
     wxStaticText* m_staticTextSpeed;
@@ -527,21 +525,17 @@ protected:
     wxStaticText* m_staticTextLabelItemsProc;
     wxBoxSizer* bSizerItemsProc;
     wxStaticText* m_staticTextProcessedObj;
-    wxStaticText* m_staticText98;
     wxStaticText* m_staticTextDataProcessed;
-    wxStaticText* m_staticText99;
     wxStaticText* m_staticTextLabelItemsRem;
     wxBoxSizer* bSizerItemsRem;
     wxStaticText* m_staticTextRemainingObj;
-    wxStaticText* m_staticText96;
     wxStaticText* m_staticTextDataRemaining;
-    wxStaticText* m_staticText97;
-    wxStaticText* m_staticTextLabelElapsedTime;
-    wxStaticText* m_staticTextTimeElapsed;
-    wxStaticText* m_staticTextLabelRemTime;
-    wxStaticText* m_staticTextRemTime;
     wxStaticText* m_staticText84;
     wxStaticText* m_staticTextSpeed;
+    wxStaticText* m_staticTextLabelRemTime;
+    wxStaticText* m_staticTextRemTime;
+    wxStaticText* m_staticTextLabelElapsedTime;
+    wxStaticText* m_staticTextTimeElapsed;
     zen::Graph2D* m_panelGraph;
     wxBoxSizer* bSizerFinalStat;
     wxListbook* m_listbookResult;
@@ -948,7 +942,7 @@ protected:
 
 public:
 
-    SearchDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+    SearchDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 384,97 ), long style = wxDEFAULT_DIALOG_STYLE );
     ~SearchDialogGenerated();
 
 };

@@ -19,7 +19,7 @@ class CompareCallback
 {
 public:
     virtual ~CompareCallback() {}
-    virtual void updateCompareStatus(zen::UInt64 totalBytesTransferred) = 0;
+    virtual void updateCompareStatus(zen::UInt64 totalBytes) = 0;
 };
 
 bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback); //throw FileError

@@ -113,12 +113,12 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
         if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
             return false;
 
-        bytesCompared += length1 * 2;
+        bytesCompared += length1;
         callback.updateCompareStatus(bytesCompared); //send progress updates
     }
     while (!file1.eof());
 
-    if (!file2.eof()) //highly unlikely, but theoretically possible! (but then again, not in this context where both files have same size...)
+    if (!file2.eof()) //highly unlikely, but possible! (but then again, not in this context where both files have same size...)
         return false;
 
     return true;

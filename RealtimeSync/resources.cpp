@@ -23,7 +23,7 @@ const GlobalResources& GlobalResources::instance()
 
 GlobalResources::GlobalResources()
 {
-    wxFFileInputStream input(toWx(zen::getResourceDir()) + wxT("Resources.zip"));
+    wxFFileInputStream input(toWx(zen::getResourceDir()) + L"Resources.zip");
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
@@ -41,17 +41,17 @@ GlobalResources::GlobalResources()
             const wxString name = entry->GetName();
 
             //generic image loading
-            if (name.EndsWith(wxT(".png")))
+            if (endsWith(name, L".png"))
                 bitmaps.insert(std::make_pair(name, wxImage(resourceFile, wxBITMAP_TYPE_PNG)));
         }
     }
 
 #ifdef FFS_WIN
     //for compatibility it seems we need to stick with a "real" icon
-    programIcon = wxIcon(wxT("A_PROGRAM_ICON"));
+    programIcon = wxIcon(L"A_PROGRAM_ICON");
 #else
     //use big logo bitmap for better quality
-    programIcon.CopyFromBitmap(getImageInt(wxT("RealtimeSync.png")));
+    programIcon.CopyFromBitmap(getImageInt(L"RealtimeSync.png"));
 #endif
 
 }
@@ -59,8 +59,8 @@ GlobalResources::GlobalResources()
 
 const wxBitmap& GlobalResources::getImageInt(const wxString& name) const
 {
-    auto iter = bitmaps.find(name.Find(L'.') == wxNOT_FOUND ? //assume .png ending if nothing else specified
-                             name + wxT(".png") :
+    auto iter = bitmaps.find(!contains(name, L'.') ? //assume .png ending if nothing else specified
+                             name + L".png" :
                              name);
     if (iter != bitmaps.end())
         return iter->second;

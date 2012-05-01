@@ -64,21 +64,21 @@ GlobalResources::GlobalResources()
             const wxString name = entry->GetName();
 
             //generic image loading
-            if (name.EndsWith(wxT(".png")))
+            if (name.EndsWith(L".png"))
                 bitmaps.insert(std::make_pair(name, wxImage(resourceFile, wxBITMAP_TYPE_PNG)));
-            //else if (name == wxT("money.gif"))
+            //else if (name == L"money.gif")
             //    loadAnimFromZip(resourceFile, animationMoney);
-            else if (name == wxT("working.gif"))
+            else if (name == L"working.gif")
                 loadAnimFromZip(resourceFile, animationSync);
         }
     }
 
 #ifdef FFS_WIN
     //for compatibility it seems we need to stick with a "real" icon
-    programIcon = wxIcon(wxT("A_PROGRAM_ICON"));
+    programIcon = wxIcon(L"A_PROGRAM_ICON");
 #else
     //use big logo bitmap for better quality
-    programIcon.CopyFromBitmap(getImageInt(wxT("FreeFileSync.png")));
+    programIcon.CopyFromBitmap(getImageInt(L"FreeFileSync.png"));
     //attention: this is the reason we need a member getImage -> it must not implicitly create static object instance!!!
     //erroneously calling static object constructor twice will deadlock on Linux!!
 #endif
@@ -87,8 +87,8 @@ GlobalResources::GlobalResources()
 
 const wxBitmap& GlobalResources::getImageInt(const wxString& imageName) const
 {
-    auto iter = bitmaps.find(imageName.Find(L'.') == wxNOT_FOUND ? //assume .png ending if nothing else specified
-                             imageName + wxT(".png") :
+    auto iter = bitmaps.find(!contains(imageName, L'.') ? //assume .png ending if nothing else specified
+                             imageName + L".png" :
                              imageName);
     if (iter != bitmaps.end())
         return iter->second;

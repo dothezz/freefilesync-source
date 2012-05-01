@@ -38,9 +38,22 @@ DEFINE_NEW_FILE_ERROR(ErrorFileLocked);
 //----------- facilitate usage of std::wstring for error messages --------------------
 
 //allow implicit UTF8 conversion: since std::wstring models a GUI string, convenience is more important than performance
-inline std::wstring operator+(const std::wstring& lhs, const Zstring& rhs) { return std::wstring(lhs) += zen::utf8CvrtTo<std::wstring>(rhs); }
+inline
+std::wstring operator+(const std::wstring& lhs, const Zstring& rhs) { return std::wstring(lhs) += utf8CvrtTo<std::wstring>(rhs); }
 
 //we musn't put our overloads in namespace std, but namespace zen (+ using directive) is sufficient
+
+
+inline
+std::wstring fmtFileName(const Zstring& filename)
+{
+    std::wstring output;
+    output.reserve(filename.size() + 2);
+    output += L'\"';
+    output += utf8CvrtTo<std::wstring>(filename);
+    output += L'\"';
+    return output;
+}
 }
 
 #endif // FILEERROR_H_INCLUDED

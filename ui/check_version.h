@@ -7,12 +7,14 @@
 #ifndef UPDATEVERSION_H_INCLUDED
 #define UPDATEVERSION_H_INCLUDED
 
+#include <wx/window.h>
+
 
 namespace zen
 {
-void checkForUpdateNow();
+void checkForUpdateNow(wxWindow* parent);
 
-void checkForUpdatePeriodically(long& lastUpdateCheck);
+void checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck);
 }
 
 #endif // UPDATEVERSION_H_INCLUDED

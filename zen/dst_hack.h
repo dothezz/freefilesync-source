@@ -19,8 +19,6 @@ Solve DST +-1h and time zone shift issues on FAT drives
 */
 
 bool isFatDrive(const Zstring& fileName); //throw ()
-bool isFatDrive(HANDLE hFile); //throw() -> call ONLY if vistaOrLater() == true!
-bool vistaOrLater();
 
 //all subsequent functions may throw the std::runtime_error exception!
 
@@ -31,10 +29,10 @@ struct RawTime //time as retrieved by ::FindFirstFile() and ::GetFileAttributesE
     FILETIME writeTimeRaw;
 };
 //save UTC time resistant against DST/time zone shifts
-bool fatHasUtcEncoded(const RawTime& rawTime);      //as retrieved by ::FindFirstFile() and ::GetFileAttributesEx(); throw (std::runtime_error)
+bool fatHasUtcEncoded(const RawTime& rawTime); //throw std::runtime_error; as retrieved by ::FindFirstFile() and ::GetFileAttributesEx()
 
-RawTime fatEncodeUtcTime(const FILETIME& writeTimeRealUtc); //throw (std::runtime_error)
-FILETIME fatDecodeUtcTime(const RawTime& rawTime); //return last write time in real UTC; throw (std::runtime_error)
+RawTime fatEncodeUtcTime(const FILETIME& writeTimeRealUtc); //throw std::runtime_error
+FILETIME fatDecodeUtcTime(const RawTime& rawTime); //throw std::runtime_error; return last write time in real UTC
 }
 
 #endif // DST_HACK_H_INCLUDED

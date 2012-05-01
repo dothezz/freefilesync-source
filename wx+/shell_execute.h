@@ -14,10 +14,12 @@
 #include <zen/string_tools.h>
 #include <zen/i18n.h>
 #include <zen/win.h> //includes "windows.h"
+//#include <zen/scope_guard.h>
 
 #elif defined FFS_LINUX
 #include <stdlib.h>
 #include <wx/utils.h>
+#include <wx/log.h>
 #endif
 
 
@@ -38,11 +40,10 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
 #ifdef FFS_WIN
     //parse commandline
     std::vector<std::wstring> argv;
+    int argc = 0;
+    if (LPWSTR* tmp = ::CommandLineToArgvW(command.c_str(), &argc))
     {
-        int argc = 0;
-        LPWSTR* tmp = ::CommandLineToArgvW(command.c_str(), &argc);
-        for (int i = 0; i < argc; ++i)
-            argv.push_back(tmp[i]);
+        std::copy(tmp, tmp + argc, std::back_inserter(argv));
         ::LocalFree(tmp);
     }
 
@@ -57,44 +58,38 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
     }
 
     SHELLEXECUTEINFO execInfo = {};
-    execInfo.cbSize       = sizeof(execInfo);
+    execInfo.cbSize = sizeof(execInfo);
 
     //SEE_MASK_NOASYNC is equal to SEE_MASK_FLAG_DDEWAIT, but former is defined not before Win SDK 6.0
     execInfo.fMask        = type == EXEC_TYPE_SYNC ? (SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_DDEWAIT) : 0; //don't use SEE_MASK_ASYNCOK -> returns successful despite errors!
     execInfo.fMask       |= SEE_MASK_UNICODE | SEE_MASK_FLAG_NO_UI; //::ShellExecuteEx() shows a non-blocking pop-up dialog on errors -> we want a blocking one
-    execInfo.lpVerb       = L"open";
+    execInfo.lpVerb       = nullptr;
     execInfo.lpFile       = filename.c_str();
     execInfo.lpParameters = arguments.c_str();
     execInfo.nShow        = SW_SHOWNORMAL;
 
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
     {
-        wxString errorMsg = _("Invalid command line: %x");
-        wxString cmdFmt = wxString(L"\nFile: ") + filename + L"\nArg: " + arguments;
-
-        errorMsg.Replace(L"%x", cmdFmt);
-        wxMessageBox(errorMsg + L"\n\n" + getLastErrorFormatted());
+        wxString cmdFmt = L"File: " + filename + L"\nArg: " + arguments;
+        wxMessageBox(replaceCpy(_("Invalid command line: %x"), L"%x", L"\n" + cmdFmt) + L"\n\n" + getLastErrorFormatted());
         return;
     }
 
-    if (type == EXEC_TYPE_SYNC)
+    if (execInfo.hProcess)
     {
-        if (execInfo.hProcess != 0)
-        {
+        if (type == EXEC_TYPE_SYNC)
             ::WaitForSingleObject(execInfo.hProcess, INFINITE);
-            ::CloseHandle(execInfo.hProcess);
-        }
+        ::CloseHandle(execInfo.hProcess);
     }
 
 #elif defined FFS_LINUX
     if (type == EXEC_TYPE_SYNC)
     {
+        //Posix::system - execute a shell command
         int rv = ::system(utf8CvrtTo<std::string>(command).c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
         if (rv == -1 || WEXITSTATUS(rv) == 127) //http://linux.die.net/man/3/system    "In case /bin/sh could not be executed, the exit status will be that of a command that does exit(127)"
         {
-            wxString errorMsg = _("Invalid command line: %x");
-            replace(errorMsg, L"%x", L"\n" + command);
-            wxMessageBox(errorMsg);
+            wxMessageBox(replaceCpy(_("Invalid command line: %x"), L"%x", L"\n" + command));
             return;
         }
     }
@@ -103,9 +98,10 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
         // ! unfortunately it seems there is no way on Linux to get a failure notification for calling an invalid command line asynchronously !
 
         //by default wxExecute uses a zero sized dummy window as a hack to keep focus which leaves a useless empty icon in ALT-TAB list
-        //=> use wxEXEC_NODISABLE and roll our own window disabler!                   (see comment in  app.cpp: void *wxGUIAppTraits::BeforeChildWaitLoop())
+        //=> use wxEXEC_NODISABLE and roll our own window disabler! (see comment in  app.cpp: void *wxGUIAppTraits::BeforeChildWaitLoop())
         wxWindowDisabler dummy; //disables all top level windows
         wxExecute(command, wxEXEC_ASYNC | wxEXEC_NODISABLE);
+        wxLog::FlushActive(); //show wxWidgets error messages (if any)
     }
 #endif
 }

@@ -82,7 +82,7 @@ struct BinaryExp : public Expr<typename StlOp::result_type>
 
 template <class StlOp>
 inline
-BinaryExp<StlOp> makeBiExp(const Expression& lhs, const Expression& rhs, StlOp biop) //throw (std::bad_cast)
+BinaryExp<StlOp> makeBiExp(const Expression& lhs, const Expression& rhs, StlOp biop) //throw std::bad_cast
 {
     return BinaryExp<StlOp>(dynamic_cast<const Expr<typename StlOp::first_argument_type >&>(lhs),
                             dynamic_cast<const Expr<typename StlOp::second_argument_type>&>(rhs), biop);

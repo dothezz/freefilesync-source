@@ -267,10 +267,9 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
 }
 
 
-void GridView::getAllFileRef(const std::set<size_t>& rows, std::vector<FileSystemObject*>& output)
+std::vector<FileSystemObject*> GridView::getAllFileRef(const std::set<size_t>& rows)
 {
-    output.clear();
-    output.reserve(rows.size());
+    std::vector<FileSystemObject*> output;
 
     auto iterLast = rows.lower_bound(rowsOnView()); //loop over valid rows only!
     std::for_each(rows.begin(), iterLast,
@@ -279,6 +278,7 @@ void GridView::getAllFileRef(const std::set<size_t>& rows, std::vector<FileSyste
         if (FileSystemObject* fsObj = FileSystemObject::retrieve(viewRef[pos]))
             output.push_back(fsObj);
     });
+    return output;
 }
 
 
@@ -335,6 +335,13 @@ void GridView::setData(FolderComparison& folderCmp)
     std::vector<FileSystemObject::ObjectId>().swap(viewRef); //free mem
     std::vector<RefIndex>().swap(sortedRef);                 //
     currentSort.reset();
+
+    folderPairCount = std::count_if(begin(folderCmp), end(folderCmp),
+                                    [](const BaseDirMapping& baseObj) //count non-empty pairs to distinguish single/multiple folder pair cases
+    {
+        return !baseObj.getBaseDirPf<LEFT_SIDE >().empty() ||
+               !baseObj.getBaseDirPf<RIGHT_SIDE>().empty();
+    });
 
     for (auto iter = begin(folderCmp); iter != end(folderCmp); ++iter)
         SerializeHierarchy(sortedRef, iter - begin(folderCmp)).execute(*iter);
@@ -499,7 +506,7 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
     viewRef.clear();
     rowPositions.clear();
     rowPositionsFirstChild.clear();
-    currentSort.reset(new SortInfo(type, onLeft, ascending));
+    currentSort = make_unique<SortInfo>(type, onLeft, ascending);
 
     switch (type)
     {

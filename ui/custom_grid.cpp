@@ -91,6 +91,12 @@ std::pair<ptrdiff_t, ptrdiff_t> getVisibleRows(Grid& grid) //returns range [from
 }
 
 
+Zstring getExtension(const Zstring& shortName)
+{
+    return contains(shortName, Zchar('.')) ? afterLast(shortName, Zchar('.')) : Zstring();
+};
+
+
 class IconUpdater;
 class GridEventManager;
 
@@ -121,7 +127,6 @@ private:
     Grid& grid_;
 
 };
-
 //########################################################################################################
 
 template <SelectedSide side>
@@ -254,6 +259,7 @@ private:
             struct GetTextValue : public FSObjectVisitor
             {
                 GetTextValue(ColumnTypeRim colType, const FileSystemObject& fso) : colType_(colType), fsObj_(fso) {}
+
                 virtual void visit(const FileMapping& fileObj)
                 {
                     switch (colType_)
@@ -279,7 +285,7 @@ private:
                                 value = zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
                             break;
                         case COL_TYPE_EXTENSION: //file extension
-                            value = toWx(fileObj.getExtension<side>());
+                            value = toWx(getExtension(fileObj.getShortName<side>()));
                             break;
                     }
                 }
@@ -309,7 +315,7 @@ private:
                                 value = zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
                             break;
                         case COL_TYPE_EXTENSION: //file extension
-                            value = wxEmptyString;
+                            value = toWx(getExtension(linkObj.getShortName<side>()));
                             break;
                     }
                 }
@@ -543,30 +549,32 @@ private:
     virtual wxString getToolTip(size_t row, ColumnType colType) const
     {
         wxString toolTip;
+
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj && !fsObj->isEmpty<side>())
         {
+            toolTip = toWx(gridDataView_->getFolderPairCount() > 1 ? //gridDataView_ bound in this path
+                           fsObj->getFullName<side>() :
+                           fsObj->getRelativeName<side>());
+
             struct AssembleTooltip : public FSObjectVisitor
             {
                 AssembleTooltip(wxString& tipMsg) : tipMsg_(tipMsg) {}
 
                 virtual void visit(const FileMapping& fileObj)
                 {
-                    tipMsg_ = copyStringTo<wxString>(std::wstring() + fileObj.getRelativeName<side>() + L"\n" +
-                                                     _("Size") + L": " + zen::filesizeToShortString(to<Int64>(fileObj.getFileSize<side>())) + L"\n" +
-                                                     _("Date") + L": " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>()));
+                    tipMsg_ += L"\n" +
+                               _("Size") + L": " + zen::filesizeToShortString(to<Int64>(fileObj.getFileSize<side>())) + L"\n" +
+                               _("Date") + L": " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
                 }
 
                 virtual void visit(const SymLinkMapping& linkObj)
                 {
-                    tipMsg_ = copyStringTo<wxString>(std::wstring() + linkObj.getRelativeName<side>() + L"\n" +
-                                                     _("Date") + L": " + zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>()));
+                    tipMsg_ += L"\n" +
+                               _("Date") + L": " + zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
                 }
 
-                virtual void visit(const DirMapping& dirObj)
-                {
-                    tipMsg_ = toWx(dirObj.getRelativeName<side>());
-                }
+                virtual void visit(const DirMapping& dirObj) {}
 
                 wxString& tipMsg_;
             } assembler(toolTip);
@@ -700,7 +708,7 @@ public:
                     {
                         case BLOCKPOS_CHECK_BOX:
                         {
-                            const FileSystemObject* fsObj = getRawData(rowFrom);
+                            const FileSystemObject* fsObj = getRawData(dragSelection->first);
                             const bool setIncluded = fsObj ? !fsObj->isActive() : true;
 
                             CheckRowsEvent evt(rowFrom, rowTo, setIncluded);

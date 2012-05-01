@@ -13,6 +13,8 @@
 
 namespace zen
 {
+//parent window, optional: support correct dialog placement above parent on multiple monitor systems
+
 struct ReturnSmallDlg
 {
     enum ButtonPressed
@@ -22,27 +24,26 @@ struct ReturnSmallDlg
     };
 };
 
+void showAboutDialog(wxWindow* parent);
 
-void showAboutDialog();
+ReturnSmallDlg::ButtonPressed showFilterDialog(wxWindow* parent, bool isGlobalFilter, FilterConfig& filter);
 
-ReturnSmallDlg::ButtonPressed showFilterDialog(bool isGlobalFilter, FilterConfig& filter);
+ReturnSmallDlg::ButtonPressed showDeleteDialog(wxWindow* parent,
+                                               const std::vector<FileSystemObject*>& rowsOnLeft,
+                                               const std::vector<FileSystemObject*>& rowsOnRight,
+                                               bool& deleteOnBothSides,
+                                               bool& useRecycleBin);
 
-ReturnSmallDlg::ButtonPressed showDeleteDialog(
-    const std::vector<FileSystemObject*>& rowsOnLeft,
-    const std::vector<FileSystemObject*>& rowsOnRight,
-    bool& deleteOnBothSides,
-    bool& useRecycleBin);
+ReturnSmallDlg::ButtonPressed showSyncPreviewDlg(wxWindow* parent,
+                                                 const wxString& variantName,
+                                                 const SyncStatistics& statistics,
+                                                 bool& dontShowAgain);
 
-ReturnSmallDlg::ButtonPressed showSyncPreviewDlg(
-    const wxString& variantName,
-    const SyncStatistics& statistics,
-    bool& dontShowAgain);
+ReturnSmallDlg::ButtonPressed showCompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig);
 
-ReturnSmallDlg::ButtonPressed showCompareCfgDialog(CompConfig& cmpConfig);
+ReturnSmallDlg::ButtonPressed showGlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
-ReturnSmallDlg::ButtonPressed showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings);
-
-ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(Int64& timeFrom, Int64& timeTo);
+ReturnSmallDlg::ButtonPressed showSelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo);
 }
 
 #endif // SMALLDIALOGS_H_INCLUDED

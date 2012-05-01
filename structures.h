@@ -370,13 +370,13 @@ struct MainConfiguration
 #ifdef FFS_WIN
         globalFilter(Zstr("*"),
                      Zstr("\\System Volume Information\\\n")
-                     Zstr("\\RECYCLED\\\n")
+                     Zstr("\\$Recycle.Bin\\\n")
                      Zstr("\\RECYCLER\\\n")
-                     Zstr("\\$Recycle.Bin\\")) {}
+                     Zstr("\\RECYCLED\\\n")) {}
 #elif defined FFS_LINUX
         globalFilter(Zstr("*"),
                      Zstr("/.Trash-*/\n")
-                     Zstr("/.recycle/")) {}
+                     Zstr("/.recycle/\n")) {}
 #endif
 
     CompConfig   cmpConfig;    //global compare settings:         may be overwritten by folder pair settings

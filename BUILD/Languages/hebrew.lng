@@ -19,8 +19,14 @@
 <source>Browse directory</source>
 <target>עיין במחיצה</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>התקבלה בקשת ביטול: מחכה לפעולה הנוכחית להסתיים...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - סינכרון  אוטומטי</target>
+
+<source>Error</source>
+<target>שגיאה</target>
 
 <source>Select alternate comparison settings</source>
 <target>בחר הגדרות השוואה חליפיות</target>
@@ -51,9 +57,6 @@
 
 <source>About</source>
 <target>אודות</target>
-
-<source>Error</source>
-<target>שגיאה</target>
 
 <source>Warning</source>
 <target>אזהרה</target>
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>קוד שגיאת לינוקס %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>שגיאה בפענוח קישור סימבולי (Symbolic Link)</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>לא יכול לפענח את הקישור הסימבולי %x.</target>
 
 <source>%x MB</source>
 <target>%x מגה בייט</target>
@@ -136,35 +139,41 @@
 <pluralform>%x בייט</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>שגיאה בקריאה מבסיס הנתונים של הסנכרון:</target>
+<source>Cannot read file %x.</source>
+<target>לא יכול לקרוא קובץ %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>שגיאה ברישום לבסיס נתוני סנכרון:</target>
+<source>Cannot write file %x.</source>
+<target>לא יכול לכתוב קובץ %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>מסד נתונים של הסנכרון לא תואם:</target>
+<source>Database file %x is incompatible.</source>
+<target>קובץ בסיס נתונים %x אינו במבנה מתאים.</target>
 
 <source>Initial synchronization:</source>
 <target>סנכרון ראשוני:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>אחד מקובצי בסיס הנתונים הבא עדיין לא קיים</target>
+<source>Database file %x does not yet exist.</source>
+<target>קובץ בסיס נתונים %x אינו קיים עדיין.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>קבצי בסיס הנתונים אינם חולקים ארוע סנכרון משותף:</target>
+<source>Out of memory!</source>
+<target>תם הזכרון!</target>
+
+<source>Database files do not share a common session.</source>
+<target>קבצי הנתונים אינם כוללים מופע פעילות משותף.</target>
 
 <source>An exception occurred!</source>
 <target>אירוע חריג!</target>
 
-<source>Error reading file attributes:</source>
-<target>שגיאה בקריאת תכונות קובץ:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>לא יכול לקרוא תכונות של קובץ %x.</target>
+
+<source>Cannot get process information.</source>
+<target>לא יכול לקבל את נתוני התהליך.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>ממתין כאשר  מחיצה נעולה (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>שגיאה בנעילת מחיצה:</target>
+<source>Cannot set directory lock %x.</source>
+<target>לא יכול להגדיר את נעילת מחיצה %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -175,8 +184,8 @@
 <pluralform>%x שניות</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>שגיאה בקריאת קובץ:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>שגיאה בפענוח קובץ %x, שורה %y, טור %z.</target>
 
 <source>Scanning:</source>
 <target>סורק:</target>
@@ -193,38 +202,32 @@
 <pluralform>[%x תהליכונים]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>קובץ תצורה בלתי חוקי!</target>
+<source>/sec</source>
+<target>/שנ</target>
 
-<source>Error parsing configuration file:</source>
-<target>שגיאה בניתוח קובץ תצורה:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>קובץ %x אינו כולל תצורה תקינה.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>תצורה נטענה חלקית בלבד:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>קובץ תצורה %x נטען חלקית בלבד.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>לא יכול להעביר את %x לסל המיחזור!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>לא יכול לגשת אל volume shadow copy service.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>אנא השתמש בגירסת 64-bit של FreeFileSync על מנת ליצר shadow copies במערכת הפעלה זו.</target>
 
 <source>Cannot load file %x.</source>
 <target>לא יכול לטעון קובץ %x!</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>שגיאה בגישה לשרות Volume Shadow Copy Service</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>לא נתמכת בגרסה זאת אנא התקן גרסה 64 WOW64 העתקת צל ב</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>לא יכול לקבוע שם כונן עבור קובץ:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>נתיב %x אינו כולל שם כרך.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>ככונן %x לא בנתיב של קובץ %y!</target>
 
-<source>/sec</source>
-<target>/שנ</target>
-
-<source>File does not exist:</source>
-<target>קובץ לא קיים:</target>
+<source>Cannot find file %x.</source>
+<target>לא יכול למצוא קובץ %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>לא יכול לקרוא את שמות צמתי XML:</target>
@@ -297,14 +300,17 @@ The command line is executed each time:
 <source>Start</source>
 <target>התחל</target>
 
+<source>&Retry</source>
+<target>&נסה שנית</target>
+
+<source>Cancel</source>
+<target>בטל</target>
+
 <source>(Build: %x)</source>
 <target>(מבנה: %x)</target>
 
 <source>RealtimeSync configuration</source>
 <target>RealtimeSync בקרת תצורה</target>
-
-<source>File already exists. Overwrite?</source>
-<target>קובץ קיים האם לדרוס?</target>
 
 <source>&Restore</source>
 <target>&טען מחדש</target>
@@ -348,20 +354,20 @@ The command line is executed each time:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync הגדרות</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync עבודת אצווה</target>
-
-<source>Unable to create log file!</source>
-<target>לא מסוגל ליצור קובץ יומן!</target>
-
 <source>Batch execution</source>
 <target>פעולת אצווה</target>
 
-<source>Stop</source>
-<target>עצור</target>
+<source>Items processed:</source>
+<target>אלמנטים עובדו:</target>
+
+<source>Items remaining:</source>
+<target>אלמנתים נותרו:</target>
 
 <source>Total time:</source>
 <target>זמן כולל:</target>
+
+<source>Stop</source>
+<target>עצור</target>
 
 <source>Synchronization aborted!</source>
 <target>סינכרון בוטל!</target>
@@ -369,14 +375,17 @@ The command line is executed each time:
 <source>Synchronization completed with errors!</source>
 <target>סנכרון הושלם עם שגיאות!</target>
 
+<source>Nothing to synchronize!</source>
+<target>אין מה לסנכרן!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>סינכרון הושלם בהצלחה!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>"לחץ" לפתיחת FreeFileSync בממשק גרפי.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>לחץ על "החלפה" בכדי לפתור בעיות בדיאלוג הראשי.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>החלף לתצורת ממשק חזותי...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>עובר לדיאלוג הראשי של FreeFileSync</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>אין תקשורת ל sourceforge.net!</target>
@@ -534,9 +543,6 @@ The command line is executed each time:
 <source>Items found:</source>
 <target>אלמנטים נמצאו:</target>
 
-<source>Items remaining:</source>
-<target>אלמנתים נותרו:</target>
-
 <source>Speed:</source>
 <target>מהירות:</target>
 
@@ -588,9 +594,6 @@ The command line is executed each time:
 <source>&Load</source>
 <target>&טען</target>
 
-<source>&Cancel</source>
-<target>&בטל</target>
-
 <source>Select variant:</source>
 <target>בחר משתנה:</target>
 
@@ -639,8 +642,8 @@ The command line is executed each time:
 <source>Conflict/file cannot be categorized</source>
 <target>קונפליקט\קובץ אינו יכול לקבל סיווג</target>
 
-<source>&OK</source>
-<target>&אשר</target>
+<source>OK</source>
+<target>אשר</target>
 
 <source>Compare by...</source>
 <target>השווה ע"י...</target>
@@ -674,9 +677,6 @@ is the same
 
 <source>Synchronizing...</source>
 <target>מסנכרן...</target>
-
-<source>Items processed:</source>
-<target>אלמנטים עובדו:</target>
 
 <source>&Pause</source>
 <target>&עצור</target>
@@ -716,9 +716,6 @@ is the same
 
 <source>&Ignore</source>
 <target>&התעלם</target>
-
-<source>&Retry</source>
-<target>&נסה שנית</target>
 
 <source>Do not show this dialog again</source>
 <target>אל תראה מסך זה שנית</target>
@@ -1017,9 +1014,6 @@ Exclude: \stuff\temp\*
 <source>File list exported!</source>
 <target>רשימת קבצים יוצאה!</target>
 
-<source>Error writing file:</source>
-<target>שגיאה בכתיבת קובץ:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1065,20 +1059,20 @@ Exclude: \stuff\temp\*
 <source>Paused</source>
 <target>עצור</target>
 
+<source>Initializing...</source>
+<target>מאתחל ...</target>
+
 <source>Aborted</source>
 <target>הופסק</target>
 
 <source>Completed</source>
 <target>הושלם</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>התקבלה בקשת ביטול: מחכה לפעולה הנוכחית להסתיים...</target>
+<source>Continue</source>
+<target>המשך</target>
 
 <source>Pause</source>
 <target>עצור</target>
-
-<source>Continue</source>
-<target>המשך</target>
 
 <source>Cannot find %x</source>
 <target>לא מוצא %x</target>
@@ -1218,65 +1212,65 @@ Exclude: \stuff\temp\*
 <pluralform>%x ימים</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>לא יכול לאתחל ניטור מחיצה:</target>
-
-<source>Error when monitoring directories.</source>
-<target>שגיאה בזמן ניטור מחיצות.</target>
+<source>Cannot monitor directory %x.</source>
+<target>לא יכול לנטר מחיצה %x.</target>
 
 <source>Conversion error:</source>
 <target>שגיאה בהסבה:</target>
 
-<source>Error deleting file:</source>
-<target>שגיאה במחיקת קובץ:</target>
+<source>Cannot delete file %x.</source>
+<target>לא יכול למחוק קובץ %x.</target>
 
-<source>Error moving file:</source>
-<target>שגיאה בהעברת קובץ:</target>
+<source>The file is locked by another process:</source>
+<target>הקובץ נעול ע"י תהליך:</target>
 
-<source>Target file already existing!</source>
-<target>קובץ מטרה כבר קיים!</target>
+<source>Cannot move file %x to %y.</source>
+<target>לא יכול להעביר קובץ %x אל %y.</target>
 
-<source>Error moving directory:</source>
-<target>שגיאה בהעברת מחיצה:</target>
+<source>Cannot delete directory %x.</source>
+<target>לא יכול למחוק מחיצה %x.</target>
 
-<source>Target directory already existing!</source>
-<target>מחיצת מטרה כבר קיימת!</target>
+<source>Cannot write modification time of %x.</source>
+<target>לא יכול לרשום זמן שינוי של %x.</target>
 
-<source>Error deleting directory:</source>
-<target>שגיאה במחיקת מחיצה:</target>
+<source>Cannot find system function %x.</source>
+<target>לא יכול למצוא פונקצית מערכת %x.</target>
 
-<source>Error changing modification time:</source>
-<target>שגיאה בשינוי זמן:</target>
+<source>Cannot read security context of %x.</source>
+<target>לא יכול לקרוא הקשר בטיחות של %x.</target>
 
-<source>Error loading library function:</source>
-<target>שגיאה בטעינת ספרית פונקציות:</target>
+<source>Cannot write security context of %x.</source>
+<target>לא יכול לכתוב הקשר בטיחות של %x.</target>
 
-<source>Error reading security context:</source>
-<target>שגיאה בכתיבת הקשר בטיחות:</target>
+<source>Cannot read permissions of %x.</source>
+<target>לא יכול לקרוא הרשאות של %x.</target>
 
-<source>Error writing security context:</source>
-<target>שגיאה בכתיבת הקשר בטיחות:</target>
+<source>Cannot write permissions of %x.</source>
+<target>לא יכול לכתוב הרשאות של %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>שגיאה בהעתקת הרשאות קובץ:</target>
+<source>Cannot create directory %x.</source>
+<target>לא יכול ליצור מחיצה %x.</target>
 
-<source>Error creating directory:</source>
-<target>שגיאה ביצירת מחיצה:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>לא יכול להעתיק קישור סימבולי %x אל %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>שגיאה בהעתקת קישור :</target>
+<source>Cannot write file attributes of %x.</source>
+<target>לא יכול לכתוב תכונות קובץ של %x.</target>
 
-<source>Error copying file:</source>
-<target>שגיאה בהעתקת קובץ:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>לא יכול להעתיק קובץ %x  אל %y.</target>
 
-<source>Error traversing directory:</source>
-<target>שגיאה בהצלבת מחיצות</target>
+<source>Cannot read directory %x.</source>
+<target>לא יכול לקרוא מחיצה %x.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>נוצרת לולאה אינסופית בחצית מחיצות</target>
+<source>Endless loop.</source>
+<target>לולאה אינסופית.</target>
 
-<source>Error setting privilege:</source>
-<target>שגיאה בהשמת פריווילגיה</target>
+<source>Cannot set privilege %x.</source>
+<target>לא יכול להגדיר זבות %x.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>לא יכול להעביר את %x לסל המיחזור!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>שני הצדדים שונו מאז הסנכרון האחרון!</target>
@@ -1302,8 +1296,8 @@ Exclude: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>אפשר להתעלם משגיאה זו ולהניח כי המחיצה ריקה.</target>
 
-<source>Directory does not exist:</source>
-<target>מחיצה לא קיימת:</target>
+<source>Cannot find directory %x.</source>
+<target>לא יכול למצוא מחיצה %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>מחיצות תלויות! זהירות בהגדרת כללי סנכרון:</target>
@@ -1311,20 +1305,17 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>מכין סינכרון...</target>
 
-<source>Out of memory!</source>
-<target>תם הזכרון!</target>
+<source>Conflict detected:</source>
+<target>התגלה קונפליקט:</target>
 
 <source>File %x has an invalid date!</source>
 <target>קובץ %x מכיל תאריך שגוי!</target>
 
-<source>Conflict detected:</source>
-<target>התגלה קונפליקט:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>קובץ %x בעל תאריך זהה אך גודל שונה!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>קשור סימבולי %x בעל תאריך זהה אך מטרה שונה!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>לקישורים סימבוליים %x יש תאריך זהה אבל יעד שונה.</target>
 
 <source>Comparing content of files %x</source>
 <target>השווה תכולה של קבצים %x</target>
@@ -1407,11 +1398,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>יוצר קובץ %x</target>
 
-<source>Creating folder %x</source>
-<target>יוצר מחיצה %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>יוצר קישור סימבולי %x</target>
+
+<source>Creating folder %x</source>
+<target>יוצר מחיצה %x</target>
 
 <source>Overwriting file %x</source>
 <target>דורס קובץ %x</target>
@@ -1431,8 +1422,8 @@ Exclude: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>לא סופקה מחיצה לרישום גרסאות קבצים</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>מחיצת המקור לא נמצאת:</target>
+<source>Source directory %x not found.</source>
+<target>מחיצת מקור %x לא נמצאה.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>קיים קונפליקט לא פתור!</target>
@@ -1466,12 +1457,6 @@ Exclude: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>מיצר בסיס נתונים...</target>
-
-<source>Nothing to synchronize!</source>
-<target>אין מה לסנכרן!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>לא ניתן להעתיק קובץ נעול %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>שגיאה של אימות נתונים קובץ מקור ומטרה בעלי תכולת נתונים שונה!</target>

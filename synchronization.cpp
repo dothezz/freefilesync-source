@@ -8,15 +8,13 @@
 #include <memory>
 #include <deque>
 #include <stdexcept>
-#include <wx/utils.h>
-#include <wx/log.h>
-#include <wx/file.h>
+#include <wx/file.h> //get rid!?
 #include <wx+/string_conv.h>
 #include <wx+/format_unit.h>
 #include <zen/scope_guard.h>
 #include <zen/file_handling.h>
+#include <zen/recycler.h>
 #include "lib/resolve_path.h"
-#include "lib/recycler.h"
 #include "lib/db_file.h"
 #include "lib/dir_exist_async.h"
 #include "lib/cmp_filetime.h"
@@ -294,38 +292,24 @@ std::vector<zen::FolderPairSyncCfg> zen::extractSyncCfg(const MainConfiguration&
 }
 //------------------------------------------------------------------------------------------------------------
 
-namespace
-{
-bool synchronizationNeeded(const SyncStatistics& statisticsTotal)
-{
-    return statisticsTotal.getCreate() +
-           statisticsTotal.getUpdate() +
-           statisticsTotal.getDelete() +
-           //conflicts (unless excluded) justify a sync! Also note: if this method returns false, no warning about unresolved conflicts were shown!
-           statisticsTotal.getConflict() != 0;
-}
-}
-
 
 //test if user accidentally tries to sync the wrong folders
 bool significantDifferenceDetected(const SyncStatistics& folderPairStat)
 {
     //initial file copying shall not be detected as major difference
-    if (folderPairStat.getCreate<LEFT_SIDE>()  == 0 &&
-        folderPairStat.getUpdate  ()           == 0 &&
-        folderPairStat.getDelete  ()           == 0 &&
-        folderPairStat.getConflict()           == 0) return false;
-    if (folderPairStat.getCreate<RIGHT_SIDE>() == 0 &&
-        folderPairStat.getUpdate  ()           == 0 &&
-        folderPairStat.getDelete  ()           == 0 &&
-        folderPairStat.getConflict()           == 0) return false;
+    if ((folderPairStat.getCreate<LEFT_SIDE >() == 0 ||
+         folderPairStat.getCreate<RIGHT_SIDE>() == 0) &&
+        folderPairStat.getUpdate  () == 0 &&
+        folderPairStat.getDelete  () == 0 &&
+        folderPairStat.getConflict() == 0)
+        return false;
 
-    const int changedRows = folderPairStat.getCreate  () +
-                            folderPairStat.getUpdate  () +
-                            folderPairStat.getDelete  () +
-                            folderPairStat.getConflict();
+    const int nonMatchingRows = folderPairStat.getCreate() +
+                                //folderPairStat.getUpdate() +  -> not relevant when testing for "wrong folder selected"
+                                folderPairStat.getDelete  () +
+                                folderPairStat.getConflict(); //?
 
-    return changedRows >= 10 && changedRows > 0.5 * folderPairStat.getRowCount();
+    return nonMatchingRows >= 10 && nonMatchingRows > 0.5 * folderPairStat.getRowCount();
 }
 //#################################################################################################################
 
@@ -343,20 +327,13 @@ add some postfix to alternate deletion directory: deletionDirectory\<prefix>2010
 */
 Zstring getSessionDeletionDir(const Zstring& deletionDirectory, const Zstring& prefix = Zstring())
 {
-    Zstring formattedDir = deletionDirectory;
-    if (formattedDir.empty())
+    if (deletionDirectory.empty())
         return Zstring(); //no valid directory for deletion specified (checked later)
 
-    if (!endsWith(formattedDir, FILE_NAME_SEPARATOR))
-        formattedDir += FILE_NAME_SEPARATOR;
-
-    formattedDir += prefix;
-    formattedDir += formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"));
+    const Zstring formattedDir = appendSeparator(deletionDirectory) + prefix + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"));
 
     //ensure that session directory does not yet exist (must be unique)
     Zstring output = formattedDir;
-
-    //ensure uniqueness
     for (int i = 1; zen::somethingExists(output); ++i)
         output = formattedDir + Zchar('_') + numberTo<Zstring>(i);
 
@@ -438,32 +415,32 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel,
 {
 #ifdef FFS_WIN
     if (baseDirPf.empty() ||
-        (deletionType == MOVE_TO_RECYCLE_BIN && recycleBinStatus(baseDirPf) != STATUS_REC_EXISTS))
+        (deletionType == MOVE_TO_RECYCLE_BIN && recycleBinStatus(baseDirPf) == STATUS_REC_MISSING))
         deletionType = DELETE_PERMANENTLY; //Windows' ::SHFileOperation() will do this anyway, but we have a better and faster deletion routine (e.g. on networks)
 #endif
 
     switch (deletionType)
     {
         case DELETE_PERMANENTLY:
-            txtRemovingFile      = replaceCpy(_("Deleting file %x"         ), L"%x", L"\"%x\"", false);
-            txtRemovingDirectory = replaceCpy(_("Deleting folder %x"       ), L"%x", L"\"%x\"", false);
-            txtRemovingSymlink   = replaceCpy(_("Deleting symbolic link %x"), L"%x", L"\"%x\"", false);
+            txtRemovingFile      = _("Deleting file %x"         );
+            txtRemovingDirectory = _("Deleting folder %x"       );
+            txtRemovingSymlink   = _("Deleting symbolic link %x");
             break;
 
         case MOVE_TO_RECYCLE_BIN:
             sessionDelDir = getSessionDeletionDir(baseDirPf_, Zstr("FFS "));
 
-            txtRemovingFile      = replaceCpy(_("Moving file %x to recycle bin"         ), L"%x", L"\"%x\"", false);
-            txtRemovingDirectory = replaceCpy(_("Moving folder %x to recycle bin"       ), L"%x", L"\"%x\"", false);
-            txtRemovingSymlink   = replaceCpy(_("Moving symbolic link %x to recycle bin"), L"%x", L"\"%x\"", false);
+            txtRemovingFile      = _("Moving file %x to recycle bin"         );
+            txtRemovingDirectory = _("Moving folder %x to recycle bin"       );
+            txtRemovingSymlink   = _("Moving symbolic link %x to recycle bin");
             break;
 
         case MOVE_TO_CUSTOM_DIRECTORY:
             sessionDelDir = getSessionDeletionDir(custDelFolder);
 
-            txtRemovingFile      = replaceCpy(replaceCpy(_("Moving file %x to %y"         ), L"%x", L"\"%x\"", false), L"%y", L"\"" + utf8CvrtTo<std::wstring>(custDelFolder) + L"\"", false);
-            txtRemovingDirectory = replaceCpy(replaceCpy(_("Moving folder %x to %y"       ), L"%x", L"\"%x\"", false), L"%y", L"\"" + utf8CvrtTo<std::wstring>(custDelFolder) + L"\"", false);
-            txtRemovingSymlink   = replaceCpy(replaceCpy(_("Moving symbolic link %x to %y"), L"%x", L"\"%x\"", false), L"%y", L"\"" + utf8CvrtTo<std::wstring>(custDelFolder) + L"\"", false);
+            txtRemovingFile      = replaceCpy(_("Moving file %x to %y"         ), L"%y", fmtFileName(custDelFolder));
+            txtRemovingDirectory = replaceCpy(_("Moving folder %x to %y"       ), L"%y", fmtFileName(custDelFolder));
+            txtRemovingSymlink   = replaceCpy(_("Moving symbolic link %x to %y"), L"%y", fmtFileName(custDelFolder));
             break;
     }
 }
@@ -500,13 +477,11 @@ public:
         statusHandler_  (statusHandler),
         delHandling_    (delHandling),
         objectsReported_(objectsReported),
-        txtCreatingFile  (replaceCpy(_("Creating file %x"                 ), L"%x", L"\"%x\"", false)),
-        txtCreatingFolder(replaceCpy(_("Creating folder %x"               ), L"%x", L"\"%x\"", false)),
-        txtMovingFile    (replaceCpy(replaceCpy(_("Moving file %x to %y"  ), L"%x", L"\"%x\"", false), L"%y", L"\"%y\"", false)),
-        txtMovingFolder  (replaceCpy(replaceCpy(_("Moving folder %x to %y"), L"%x", L"\"%x\"", false), L"%y", L"\"%y\"", false))  {}
+        txtMovingFile    (_("Moving file %x to %y"  )),
+        txtMovingFolder  (_("Moving folder %x to %y"))  {}
 
-    virtual void onBeforeFileMove(const Zstring& fileFrom, const Zstring& fileTo) { reportStatus(replaceCpy(txtMovingFile,   L"%y", utf8CvrtTo<std::wstring>(fileTo)), fileFrom); }
-    virtual void onBeforeDirMove (const Zstring& dirFrom,  const Zstring& dirTo ) { reportStatus(replaceCpy(txtMovingFolder, L"%y", utf8CvrtTo<std::wstring>(dirTo )), dirFrom ); }
+    virtual void onBeforeFileMove(const Zstring& fileFrom, const Zstring& fileTo) { reportStatus(txtMovingFile, fileFrom, fileTo); }
+    virtual void onBeforeDirMove (const Zstring& dirFrom,  const Zstring& dirTo ) { reportStatus(txtMovingFolder, dirFrom, dirTo); }
     virtual void objectProcessed() //one call after each processed move
     {
         if (objectsReported_)
@@ -525,14 +500,15 @@ public:
     }
 
 private:
-    void reportStatus(const std::wstring& rawText, const Zstring& objname) const { statusHandler_.reportStatus(replaceCpy(rawText, L"%x", utf8CvrtTo<std::wstring>(objname))); };
+    void reportStatus(const std::wstring& rawText, const Zstring& fileFrom, const Zstring& fileTo) const
+    {
+        statusHandler_.reportStatus(replaceCpy(replaceCpy(rawText, L"%x", fmtFileName(fileFrom)), L"%y", fmtFileName(fileTo)));
+    };
 
     ProcessCallback& statusHandler_;
     const DeletionHandling& delHandling_;
     int* objectsReported_; //optional
 
-    const std::wstring txtCreatingFile;
-    const std::wstring txtCreatingFolder;
     const std::wstring txtMovingFile;
     const std::wstring txtMovingFolder;
 };
@@ -553,7 +529,7 @@ struct CallbackRemoveDirImpl : public CallbackRemoveDir
 private:
     void processSingleObject(const Zstring& objName, const std::wstring& statusText)
     {
-        statusHandler_.reportStatus(replaceCpy(statusText, L"%x", utf8CvrtTo<std::wstring>(objName)));
+        statusHandler_.reportStatus(replaceCpy(statusText, L"%x", fmtFileName(objName)));
 
         if (objectsReported_)
         {
@@ -616,7 +592,7 @@ void DeletionHandling::removeFile(const Zstring& relativeName) const
 
             try //... to get away cheaply!
             {
-                moveFile(fullName, targetFile, true, &callBack); //throw FileError
+                moveFile(fullName, targetFile, &callBack); //throw FileError
             }
             catch (FileError&)
             {
@@ -624,10 +600,12 @@ void DeletionHandling::removeFile(const Zstring& relativeName) const
                 {
                     const Zstring targetDir = beforeLast(targetFile, FILE_NAME_SEPARATOR);
                     if (!dirExists(targetDir))
+                    {
                         createDirectory(targetDir); //throw FileError
+                        moveFile(fullName, targetFile, &callBack); //throw FileError -> this should work now!
+                    }
                     else
                         throw;
-                    moveFile(fullName, targetFile, true, &callBack); //throw FileError -> this should work now!
                 }
             }
         }
@@ -696,7 +674,7 @@ void DeletionHandling::removeFolderInt(const Zstring& relativeName, const int* o
 
             try //... to get away cheaply!
             {
-                moveDirectory(fullName, targetDir, true, &callBack); //throw FileError
+                moveDirectory(fullName, targetDir, &callBack); //throw FileError
             }
             catch (FileError&)
             {
@@ -704,10 +682,12 @@ void DeletionHandling::removeFolderInt(const Zstring& relativeName, const int* o
                 {
                     const Zstring targetSuperDir = beforeLast(targetDir, FILE_NAME_SEPARATOR);
                     if (!dirExists(targetSuperDir))
+                    {
                         createDirectory(targetSuperDir); //throw FileError
+                        moveDirectory(fullName, targetDir, &callBack); //throw FileError -> this should work now!
+                    }
                     else
                         throw;
-                    moveDirectory(fullName, targetDir, true, &callBack); //throw FileError -> this should work now!
                 }
             }
         }
@@ -859,14 +839,14 @@ public:
         verifyCopiedFiles_(verifyCopiedFiles),
         copyFilePermissions_(copyFilePermissions),
         transactionalFileCopy_(transactionalFileCopy),
-        txtCreatingFile     (replaceCpy(_("Creating file %x"            ), L"%x", L"\"%x\"", false)), //harmonize with duplicates in CallbackMoveFileImpl!!!
-        txtCreatingLink     (replaceCpy(_("Creating symbolic link %x"   ), L"%x", L"\"%x\"", false)),
-        txtCreatingFolder   (replaceCpy(_("Creating folder %x"          ), L"%x", L"\"%x\"", false)), //
-        txtOverwritingFile  (replaceCpy(_("Overwriting file %x"         ), L"%x", L"\"%x\"", false)),
-        txtOverwritingLink  (replaceCpy(_("Overwriting symbolic link %x"), L"%x", L"\"%x\"", false)),
-        txtVerifying        (replaceCpy(_("Verifying file %x"           ), L"%x", L"\"%x\"", false)),
-        txtWritingAttributes(replaceCpy(_("Updating attributes of %x"   ), L"%x", L"\"%x\"", false)),
-        txtMovingFile       (replaceCpy(replaceCpy(_("Moving file %x to %y"), L"%x", L"\"%x\"", false), L"%y", L"\"%y\"", false))
+        txtCreatingFile     (_("Creating file %x"            )),
+        txtCreatingLink     (_("Creating symbolic link %x"   )),
+        txtCreatingFolder   (_("Creating folder %x"          )),
+        txtOverwritingFile  (_("Overwriting file %x"         )),
+        txtOverwritingLink  (_("Overwriting symbolic link %x")),
+        txtVerifying        (_("Verifying file %x"           )),
+        txtWritingAttributes(_("Updating attributes of %x"   )),
+        txtMovingFile       (_("Moving file %x to %y"))
     {}
 
     void startSync(BaseDirMapping& baseMap)
@@ -907,8 +887,8 @@ private:
     void synchronizeFolder(DirMapping& dirObj)  const;
     template <SelectedSide sideTrg> void synchronizeFolderInt(DirMapping& dirObj, SyncOperation syncOp) const;
 
-    void reportInfo  (const std::wstring& rawText, const Zstring& objname) const { procCallback_.reportInfo  (replaceCpy(rawText, L"%x", utf8CvrtTo<std::wstring>(objname))); };
-    void reportStatus(const std::wstring& rawText, const Zstring& objname) const { procCallback_.reportStatus(replaceCpy(rawText, L"%x", utf8CvrtTo<std::wstring>(objname))); };
+    void reportInfo  (const std::wstring& rawText, const Zstring& objname) const { procCallback_.reportInfo  (replaceCpy(rawText, L"%x", fmtFileName(objname))); };
+    void reportStatus(const std::wstring& rawText, const Zstring& objname) const { procCallback_.reportStatus(replaceCpy(rawText, L"%x", fmtFileName(objname))); };
 
     //more low level helper
     template <SelectedSide side, class DelTargetCommand>
@@ -1012,7 +992,7 @@ void SynchronizeFolderPair::prepare2StepMove(FileMapping& sourceObj,
     //the very same (.ffs_tmp) name and is copied before the second step of the move is executed
     //good news: even in this pathologic case, this may only prevent the copy of the other file, but not the move
 
-    reportInfo(replaceCpy(txtMovingFile, L"%y", utf8CvrtTo<std::wstring>(tmpTarget)), source);
+    reportInfo(replaceCpy(txtMovingFile, L"%y", fmtFileName(tmpTarget)), source);
 
     renameFile(source, tmpTarget); //throw FileError;
 
@@ -1432,7 +1412,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
                 const Zstring& source = sourceObj->getFullName<sideTrg>();
                 const Zstring& target = targetObj->getBaseDirPf<sideTrg>() + targetObj->getRelativeName<sideSrc>();
 
-                reportInfo(replaceCpy(txtMovingFile, L"%y", utf8CvrtTo<std::wstring>(target)), source);
+                reportInfo(replaceCpy(txtMovingFile, L"%y", fmtFileName(target)), source);
 
                 renameFile(source, target); //throw FileError;
 
@@ -1668,7 +1648,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
             }
             else //source deleted meanwhile...nothing was done (logical point of view!)
             {
-                // throw FileError(_ ("Source directory does not exist anymore:") + "\n\"" + dirObj.getFullName<sideSrc>() + "\"");
+                // throw FileError
                 const SyncStatistics subStats(dirObj);
                 procCallback_.updateTotalData(-getCUD(subStats) - 1, -subStats.getDataToProcess());
 
@@ -1757,10 +1737,6 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     PreventStandby dummy;
     (void)dummy;
 
-#ifdef NDEBUG
-    wxLogNull noWxLogs; //prevent wxWidgets logging
-#endif
-
     //PERF_START;
 
     if (syncConfig.size() != folderCmp.size())
@@ -1770,9 +1746,9 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     const SyncStatistics statisticsTotal(folderCmp);
 
     //keep at beginning so that all gui elements are initialized properly
-    procCallback.initNewProcess(getCUD(statisticsTotal),
-                                statisticsTotal.getDataToProcess(),
-                                ProcessCallback::PROCESS_SYNCHRONIZING);
+    procCallback.initNewPhase(getCUD(statisticsTotal),
+                              statisticsTotal.getDataToProcess(),
+                              ProcessCallback::PHASE_SYNCHRONIZING);
 
 
     std::deque<bool> skipFolderPair(folderCmp.size()); //folder pairs may be skipped after fatal errors were found
@@ -1930,7 +1906,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
             if (!missingSrcDir.empty())
             {
-                procCallback.reportFatalError(_("Source directory does not exist anymore:") + L"\n\"" + missingSrcDir + L"\"");
+                procCallback.reportFatalError(replaceCpy(_("Source directory %x not found."), L"%x", fmtFileName(missingSrcDir)));
                 skipFolderPair[folderIndex] = true;
                 continue;
             }
@@ -1943,13 +1919,15 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         //check for sufficient free diskspace
         auto checkSpace = [&](const Zstring& baseDirPf, const Int64& spaceRequired)
         {
-            wxLongLong freeDiskSpace;
-            if (wxGetDiskSpace(toWx(baseDirPf), nullptr, &freeDiskSpace))
+            try
             {
-                if (0 < freeDiskSpace && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
-                    freeDiskSpace.GetValue() < spaceRequired)
-                    diskSpaceMissing.push_back(std::make_pair(baseDirPf, std::make_pair(spaceRequired, freeDiskSpace.GetValue())));
+                Int64 freeSpace = to<Int64>(getFreeDiskSpace(baseDirPf)); //throw FileError
+
+                if (0 < freeSpace && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
+                    freeSpace < spaceRequired)
+                    diskSpaceMissing.push_back(std::make_pair(baseDirPf, std::make_pair(spaceRequired, freeSpace)));
             }
+            catch (FileError&) {}
         };
         const std::pair<Int64, Int64> spaceNeeded = DiskSpaceNeeded::calculate(*j, delHandlerFp.first.deletionFreesSpace(),
                                                                                delHandlerFp.second.deletionFreesSpace());
@@ -1982,14 +1960,9 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         std::wstring warningMessage = _("Unresolved conflicts existing!") +
                                       L" (" + toStringSep(statisticsTotal.getConflict()) + L")\n\n";
 
-        const SyncStatistics::ConflictTexts& firstConflicts = statisticsTotal.getFirstConflicts(); //get first few sync conflicts
-        for (SyncStatistics::ConflictTexts::const_iterator i = firstConflicts.begin(); i != firstConflicts.end(); ++i)
-        {
-            std::wstring conflictDescription = i->second;
-            //conflictDescription.Replace(wxT("\n"), wxT(" ")); //remove line-breaks
-
-            warningMessage += std::wstring(L"\"") + i->first + L"\": " + conflictDescription + L"\n\n";
-        }
+        const auto& firstConflicts = statisticsTotal.getFirstConflicts(); //get first few sync conflicts
+        for (auto iter = firstConflicts.begin(); iter != firstConflicts.end(); ++iter)
+            warningMessage += fmtFileName(iter->first) + L": " + iter->second + L"\n\n";
 
         if (statisticsTotal.getConflict() > static_cast<int>(firstConflicts.size()))
             warningMessage += L"[...]\n\n";
@@ -2000,15 +1973,15 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     }
 
 
-    //check if more than 50% of total number of files/dirs are to be created/overwritten/deleted
+    //check if user accidentally selected wrong directories for sync
     if (!significantDiff.empty())
     {
         std::wstring warningMessage = _("Significant difference detected:");
 
-        for (DirPairList::const_iterator i = significantDiff.begin(); i != significantDiff.end(); ++i)
+        for (auto iter = significantDiff.begin(); iter != significantDiff.end(); ++iter)
             warningMessage += std::wstring(L"\n\n") +
-                              i->first + L" <-> " + L"\n" +
-                              i->second;
+                              iter->first + L" <-> " + L"\n" +
+                              iter->second;
         warningMessage += L"\n\n";
         warningMessage += _("More than 50% of the total number of files will be copied or deleted!");
 
@@ -2023,7 +1996,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
         for (auto i = diskSpaceMissing.begin(); i != diskSpaceMissing.end(); ++i)
             warningMessage += std::wstring(L"\n\n") +
-                              L"\"" + i->first + L"\"\n" +
+                              fmtFileName(i->first) + L"\n" +
                               _("Free disk space required:")  + L" " + filesizeToShortString(i->second.first)  + L"\n" +
                               _("Free disk space available:") + L" " + filesizeToShortString(i->second.second);
 
@@ -2059,8 +2032,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     {
         std::wstring warningMessage = _("A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!") + L"\n";
         for (auto i = conflictDirs.begin(); i != conflictDirs.end(); ++i)
-            warningMessage += std::wstring(L"\n") +
-                              L"\"" + *i + L"\"";
+            warningMessage += L"\n" + fmtFileName(*i);
         procCallback.reportWarning(warningMessage, m_warnings.warningMultiFolderWriteAccess);
     }
 
@@ -2095,8 +2067,8 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             makeSameLength(left, right);
 
             const std::wstring statusTxt = _("Processing folder pair:") + L" \n" +
-                                           L"    " + left  + L"\"" + j->getBaseDirPf<LEFT_SIDE >() + L"\"" + L" \n" +
-                                           L"    " + right + L"\"" + j->getBaseDirPf<RIGHT_SIDE>() + L"\"";
+                                           L"    " + left  + fmtFileName(j->getBaseDirPf<LEFT_SIDE >()) + L" \n" +
+                                           L"    " + right + fmtFileName(j->getBaseDirPf<RIGHT_SIDE>());
             procCallback.reportInfo(statusTxt);
 
             //------------------------------------------------------------------------------------------
@@ -2158,9 +2130,6 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
                 guardUpdateDb.dismiss();
             }
         }
-
-        if (!synchronizationNeeded(statisticsTotal))
-            procCallback.reportInfo(_("Nothing to synchronize!")); //inform about this special case
     }
     catch (const std::exception& e)
     {
@@ -2245,7 +2214,7 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
     {
         copyOperation();
     }
-    catch (ErrorFileLocked&)
+    catch (ErrorFileLocked& e1)
     {
         //if file is locked (try to) use Windows Volume Shadow Copy Service
         if (!shadowCopyHandler_)
@@ -2255,9 +2224,9 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
             //contains prefix: E.g. "\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Program Files\FFS\sample.dat"
             source = shadowCopyHandler_->makeShadowCopy(source); //throw FileError
         }
-        catch (const FileError& e)
+        catch (const FileError& e2)
         {
-            throw FileError(replaceCpy(_("Unable to copy locked file %x!"), L"%x", std::wstring(L"\"") + source + L"\"") + L"\n\n" + e.toString());
+            throw FileError(e1.toString() + L"\n\n" + e2.toString());
         }
 
         //now try again
@@ -2307,7 +2276,7 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& c
     wxFile file1(::open(source.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
     if (!file1.IsOpened())
-        throw FileError(_("Error reading file:") + L" \"" + source + L"\"");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(source)));
 
 #ifdef FFS_WIN
     wxFile file2(applyLongPathPrefix(target).c_str(), wxFile::read); //don't use buffered file input for verification!
@@ -2315,27 +2284,27 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& c
     wxFile file2(::open(target.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
     if (!file2.IsOpened()) //NO cleanup necessary for (wxFile) file1
-        throw FileError(_("Error reading file:") + L" \"" + target + L"\"");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(target)));
 
     do
     {
         const size_t length1 = file1.Read(&memory1[0], memory1.size());
         if (file1.Error())
-            throw FileError(_("Error reading file:") + L" \"" + source + L"\"" + L" (r)");
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(source)) + L" (r)");
         callback.updateStatus(); //send progress updates
 
         const size_t length2 = file2.Read(&memory2[0], memory2.size());
         if (file2.Error())
-            throw FileError(_("Error reading file:") + L" \"" + target + L"\"" + L" (r)");
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(target)) + L" (r)");
         callback.updateStatus(); //send progress updates
 
         if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
-            throw FileError(_("Data verification error: Source and target file have different content!") + L"\n" + L"\"" + source + L"\" -> \n\"" + target + L"\"");
+            throw FileError(_("Data verification error: Source and target file have different content!") + L"\n" + fmtFileName(source) + L" -> \n" + fmtFileName(target));
     }
     while (!file1.Eof());
 
     if (!file2.Eof())
-        throw FileError(_("Data verification error: Source and target file have different content!") + L"\n" + L"\"" + source + L"\" -> \n\"" + target + L"\"");
+        throw FileError(_("Data verification error: Source and target file have different content!") + L"\n" + fmtFileName(source) + L" -> \n" + fmtFileName(target));
 }
 
 
@@ -2353,7 +2322,7 @@ private:
 
 void SynchronizeFolderPair::verifyFileCopy(const Zstring& source, const Zstring& target) const
 {
-    procCallback_.reportInfo(replaceCpy(txtVerifying, L"%x", utf8CvrtTo<std::wstring>(target)));
+    procCallback_.reportInfo(replaceCpy(txtVerifying, L"%x", fmtFileName(target)));
 
     VerifyStatusUpdater callback(procCallback_);
 

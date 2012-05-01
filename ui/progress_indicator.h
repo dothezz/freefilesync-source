@@ -18,18 +18,13 @@ class CompareStatus
 {
 public:
     CompareStatus(wxTopLevelWindow& parentWindow); //CompareStatus will be owned by parentWindow!
-    ~CompareStatus();
 
     wxWindow* getAsWindow(); //convenience! don't abuse!
 
-    void init();     //make visible, initialize all status values
-    void finalize(); //hide again
+    void init(const zen::Statistics& syncStat); //begin of sync: make visible, set pointer to "syncStat", initialize all status values
+    void finalize(); //end of sync: hide again, clear pointer to "syncStat"
 
-    void switchToCompareBytewise(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
-    void incScannedObjects_NoUpdate(int number);
-    void incProcessedCmpData_NoUpdate(int objectsDelta, zen::Int64 dataDelta);
-    void incTotalCmpData_NoUpdate    (int objectsDelta, zen::Int64 dataDelta);
-    void setStatusText_NoUpdate(const wxString& text);
+    void switchToCompareBytewise();
     void updateStatusPanelNow();
 
 private:
@@ -41,20 +36,9 @@ private:
 class SyncStatus
 {
 public:
-    enum SyncStatusID
-    {
-        ABORTED,
-        FINISHED_WITH_SUCCESS,
-        FINISHED_WITH_ERROR,
-        PAUSE,
-        SCANNING,
-        COMPARING_CONTENT,
-        SYNCHRONIZING
-    };
-
-    SyncStatus(AbortCallback& abortCb,
+    SyncStatus(zen::AbortCallback& abortCb,
+               const zen::Statistics& syncStat,
                MainDialog* parentWindow, //may be nullptr
-               SyncStatusID startStatus,
                bool showProgress,
                const wxString& jobName,
                const std::wstring& execWhenFinished,
@@ -63,22 +47,25 @@ public:
 
     wxWindow* getAsWindow(); //convenience! don't abuse!
 
-    void initNewProcess(SyncStatusID id, int totalObjectsToProcess, zen::Int64 totalDataToProcess);
+    void initNewPhase(); //call after "StatusHandler::initNewPhase"
 
-    void incScannedObjects_NoUpdate(int number);
-    void incProcessedData_NoUpdate(int objectsDelta, zen::Int64 dataDelta);
-    void incTotalData_NoUpdate    (int objectsDelta, zen::Int64 dataDelta);
-    void setStatusText_NoUpdate(const wxString& text);
-    void updateStatusDialogNow();
+    void reportCurrentBytes(zen::Int64 currentData); //throw (), required by graph!
+    void updateProgress();
 
     std::wstring getExecWhenFinishedCommand() const; //final value (after possible user modification)
 
     void stopTimer();   //halt all internal counters!
     void resumeTimer(); //
 
+    enum SyncResult
+    {
+        RESULT_ABORTED,
+        RESULT_FINISHED_WITH_ERROR,
+        RESULT_FINISHED_WITH_SUCCESS
+    };
     //essential to call one of these two methods in StatusUpdater derived class destructor at the LATEST(!)
     //to prevent access to callback to updater (e.g. request abort)
-    void processHasFinished(SyncStatusID id, const zen::ErrorLog& log);
+    void processHasFinished(SyncResult resultId, const zen::ErrorLog& log); //sync finished, still dialog may live on
     void closeWindowDirectly(); //don't wait for user
 
 private:

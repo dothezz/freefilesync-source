@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>浏览目录</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>取消请求: 正在等待当前操作完成...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>实时同步 - 自动同步</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux错误代码 %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>解决符号链接出错:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>无法解决 %x 的符号连接.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -135,35 +138,41 @@
 <pluralform>%x 字节</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>从同步数据库中读取时出错:</target>
+<source>Cannot read file %x.</source>
+<target>无法读取文件 %x .</target>
 
-<source>Error writing to synchronization database:</source>
-<target>向同步数据库中写入时出错:</target>
+<source>Cannot write file %x.</source>
+<target>无法写入文件 %x .</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>不兼容的同步数据库格式:</target>
+<source>Database file %x is incompatible.</source>
+<target>数据库文件 %x 不兼容.</target>
 
 <source>Initial synchronization:</source>
 <target>初始化同步:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>FreeFileSync数据库文件其中一个不存在:</target>
+<source>Database file %x does not yet exist.</source>
+<target>数据库文件 %x 还未存在.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>数据库文件没不共享一个公共的同步段</target>
+<source>Out of memory!</source>
+<target>内存不足!</target>
+
+<source>Database files do not share a common session.</source>
+<target>数据库文件并未共享一个公共会话.</target>
 
 <source>An exception occurred!</source>
 <target>发生异常!</target>
 
-<source>Error reading file attributes:</source>
-<target>读取文件属性出错:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>无法读取 %x 的文件属性.</target>
+
+<source>Cannot get process information.</source>
+<target>无法取得进程信息.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>由于目录已锁定而正在等待(%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>设置目录锁定时出错:</target>
+<source>Cannot set directory lock %x.</source>
+<target>无法设置目录锁定 %x .</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -173,8 +182,8 @@
 <pluralform>%x 秒</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>读取文件出错:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>当分析文件 %x , 行 %y, 列 %z 时出错.</target>
 
 <source>Scanning:</source>
 <target>扫描中:</target>
@@ -190,38 +199,32 @@
 <pluralform>[%x 线程]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>无效的 FreeFileSync 配置文件!</target>
+<source>/sec</source>
+<target>/秒</target>
 
-<source>Error parsing configuration file:</source>
-<target>分析配置文件出错:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>文件 %x 并未包含合法的配置.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>只部分载入配置文件:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>配置文件 %x 只是部分载入.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>无法移动 %x 到回收站!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>无法访问卷影复制服务.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>请使用 FreeFileSync 64位版本来在这个系统上创建卷影复制.</target>
 
 <source>Cannot load file %x.</source>
 <target>不能载入文件 %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>使用卷影复制服务时出错!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>不支持在WOW64上使用卷影复制. 请使用 FreeFileSync 64位版本.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>不能确定文件的卷名:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>路径 %x 并未包含一个卷名.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>卷名 %x 并非文件名 %y 的一部分!</target>
 
-<source>/sec</source>
-<target>/秒</target>
-
-<source>File does not exist:</source>
-<target>文件不存在:</target>
+<source>Cannot find file %x.</source>
+<target>无法找到文件 %x .</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>无法读取如下XML元素:</target>
@@ -300,9 +303,6 @@ The command line is executed each time:
 <source>RealtimeSync configuration</source>
 <target>实时同步配置</target>
 
-<source>File already exists. Overwrite?</source>
-<target>文件已经存在.覆盖?</target>
-
 <source>&Restore</source>
 <target>恢复(&R)</target>
 
@@ -345,20 +345,20 @@ The command line is executed each time:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync 配置</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync 批处理作业</target>
-
-<source>Unable to create log file!</source>
-<target>无法创建日志!</target>
-
 <source>Batch execution</source>
 <target>批处理执行</target>
 
-<source>Stop</source>
-<target>停止</target>
+<source>Items processed:</source>
+<target>已处理的项目:</target>
+
+<source>Items remaining:</source>
+<target>剩余的项目:</target>
 
 <source>Total time:</source>
 <target>总共时间:</target>
+
+<source>Stop</source>
+<target>停止</target>
 
 <source>Synchronization aborted!</source>
 <target>同步已放弃!</target>
@@ -366,14 +366,17 @@ The command line is executed each time:
 <source>Synchronization completed with errors!</source>
 <target>同步已完成但有错误.</target>
 
+<source>Nothing to synchronize!</source>
+<target>没有什么可同步!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>同步成功完成!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>按"切换"可打开FreeFileSync图形用户界面模块.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>请按下"切换"来解决 FreeFileSync主对话框上的问题.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>切换至FreeFileSync图形用户界面模块...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>正在切换到 FreeFileSync 主对话框...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>无法链接到 Sourceforge.net!</target>
@@ -531,9 +534,6 @@ The command line is executed each time:
 <source>Items found:</source>
 <target>已找到的项目:</target>
 
-<source>Items remaining:</source>
-<target>剩余的项目:</target>
-
 <source>Speed:</source>
 <target>速度:</target>
 
@@ -561,9 +561,6 @@ The command line is executed each time:
 <source>Right</source>
 <target>右侧</target>
 
-<source>Sync setttings</source>
-<target>同步设置</target>
-
 <source>Status feedback</source>
 <target>状况反馈</target>
 
@@ -588,8 +585,8 @@ The command line is executed each time:
 <source>&Load</source>
 <target>加载(&L)</target>
 
-<source>&Cancel</source>
-<target>取消(&C)</target>
+<source>Cancel</source>
+<target>取消</target>
 
 <source>Select variant:</source>
 <target>选择变化的:</target>
@@ -639,8 +636,8 @@ The command line is executed each time:
 <source>Conflict/file cannot be categorized</source>
 <target>冲突/文件不能被分类</target>
 
-<source>&OK</source>
-<target>确定(&O)</target>
+<source>OK</source>
+<target>确定</target>
 
 <source>Compare by...</source>
 <target>比较选项...</target>
@@ -674,9 +671,6 @@ is the same
 
 <source>Synchronizing...</source>
 <target>同步中...</target>
-
-<source>Items processed:</source>
-<target>已处理的项目:</target>
 
 <source>&Pause</source>
 <target>暂停(&P)</target>
@@ -1017,9 +1011,6 @@ Exclude: \stuff\temp\*
 <source>File list exported!</source>
 <target>文件清单已经导出!</target>
 
-<source>Error writing file:</source>
-<target>写入文件出错:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1061,20 +1052,20 @@ Exclude: \stuff\temp\*
 <source>Paused</source>
 <target>已暂停</target>
 
+<source>Initializing...</source>
+<target>正在初始化...</target>
+
 <source>Aborted</source>
 <target>已取消</target>
 
 <source>Completed</source>
 <target>完成</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>取消请求: 正在等待当前操作完成...</target>
+<source>Continue</source>
+<target>继续</target>
 
 <source>Pause</source>
 <target>暂停</target>
-
-<source>Continue</source>
-<target>继续</target>
 
 <source>Cannot find %x</source>
 <target>找不到 %x</target>
@@ -1209,68 +1200,65 @@ Exclude: \stuff\temp\*
 <pluralform>%x 天</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>不能初始化目录监视:</target>
-
-<source>Error when monitoring directories.</source>
-<target>监视目录时出错.</target>
+<source>Cannot monitor directory %x.</source>
+<target>无法监视目录 %x.</target>
 
 <source>Conversion error:</source>
 <target>转换错误:</target>
 
-<source>Error deleting file:</source>
-<target>删除文件出错:</target>
+<source>Cannot delete file %x.</source>
+<target>无法删除文件 %x.</target>
 
-<source>Error moving file:</source>
-<target>移动文件时出错:</target>
+<source>The file is locked by another process:</source>
+<target>此文件被另一进程锁定:</target>
 
-<source>Target file already existing!</source>
-<target>目标文件已经存在!</target>
+<source>Cannot move file %x to %y.</source>
+<target>无法移动文件 %x 到 %y.</target>
 
-<source>Error moving directory:</source>
-<target>移动目录时出错:</target>
+<source>Cannot delete directory %x.</source>
+<target>无法删除目录 %x.</target>
 
-<source>Target directory already existing!</source>
-<target>目标目录已经存在!</target>
+<source>Cannot write modification time of %x.</source>
+<target>无法写入 %x 的最后修改时间.</target>
 
-<source>Error deleting directory:</source>
-<target>删除目录出错:</target>
+<source>Cannot find system function %x.</source>
+<target>无法找到系统功能 %x.</target>
 
-<source>Error changing modification time:</source>
-<target>改变修改时间时出错:</target>
+<source>Cannot read security context of %x.</source>
+<target>无法读取 %x 的安全上下文.</target>
 
-<source>Error loading library function:</source>
-<target>加载库函数出错:</target>
+<source>Cannot write security context of %x.</source>
+<target>无法写入 %x 的安全上下文.</target>
 
-<source>Error reading security context:</source>
-<target>读取安全上下文时出错:</target>
+<source>Cannot read permissions of %x.</source>
+<target>无法读取 %x 的权限.</target>
 
-<source>Error writing security context:</source>
-<target>写入安全上下文时出错:</target>
+<source>Cannot write permissions of %x.</source>
+<target>无法写入 %x 的权限.</target>
 
-<source>Error copying file permissions:</source>
-<target>复制文件权限时出错:</target>
+<source>Cannot create directory %x.</source>
+<target>无法创建目录 %x.</target>
 
-<source>Error creating directory:</source>
-<target>创建目录出错:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>无法复制符号连接 %x 到 %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>复制符号链接时出错:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>无法写入 %x 的文件属性.</target>
 
-<source>Error copying file:</source>
-<target>复制文件出错:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>无法复制文件 %x 到 %y.</target>
 
-<source>Error opening file:</source>
-<target>打开文件出错:</target>
+<source>Cannot read directory %x.</source>
+<target>无法读取目录 %x.</target>
 
-<source>Error traversing directory:</source>
-<target>遍历目录出错:</target>
+<source>Endless loop.</source>
+<target>无限循环.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>遍历目录时出现无限循环:</target>
+<source>Cannot set privilege %x.</source>
+<target>无法设置 %x 的特权.</target>
 
-<source>Error setting privilege:</source>
-<target>设置权限时出错:</target>
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>无法移动 %x 到回收站!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>在最后的同步之后两边均已改变!</target>
@@ -1296,8 +1284,8 @@ Exclude: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>你可以忽略这个错误而认为目录是空的.</target>
 
-<source>Directory does not exist:</source>
-<target>目录不存在:</target>
+<source>Cannot find directory %x.</source>
+<target>无法找到目录 %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目录有依赖性！在设立同步规则时请小心:</target>
@@ -1305,20 +1293,17 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>正在准备同步...</target>
 
-<source>Out of memory!</source>
-<target>内存不足!</target>
+<source>Conflict detected:</source>
+<target>检测到冲突:</target>
 
 <source>File %x has an invalid date!</source>
 <target>文件 %x 的日期非法!</target>
 
-<source>Conflict detected:</source>
-<target>检测到冲突:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>文件 %x 日期相同但大小不同!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>符号连接 %x 有相同的日期但目标不同!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>符号连接 %x 有相同的日期但目标不同.</target>
 
 <source>Comparing content of files %x</source>
 <target>正在比较文件 %x 的内容</target>
@@ -1401,11 +1386,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>正在创建文件 %x</target>
 
-<source>Creating folder %x</source>
-<target>正创建文件夹 %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>正在创建符号连接 %x</target>
+
+<source>Creating folder %x</source>
+<target>正创建文件夹 %x</target>
 
 <source>Overwriting file %x</source>
 <target>正在覆盖文件 %x</target>
@@ -1425,8 +1410,8 @@ Exclude: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>用于保存文件历史版本的目录没有提供!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>源目录已经不存在:</target>
+<source>Source directory %x not found.</source>
+<target>来源目录 %x 无法找到.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>存在不可解决的冲突!</target>
@@ -1460,12 +1445,6 @@ Exclude: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>正在生成数据库...</target>
-
-<source>Nothing to synchronize!</source>
-<target>没有什么可同步!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>无法复制已锁定文件 %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>数据校验错误:源文件和目标文件内容不同!</target>

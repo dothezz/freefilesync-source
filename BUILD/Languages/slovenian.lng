@@ -19,6 +19,9 @@
 <source>Browse directory</source>
 <target>Brskaj po imeniku</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Avtomatizirana sinhronizacija</target>
 
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux koda napake %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Napaka pri razreševanju simbolične povezave:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Ne morem razrešiti simbolične povezave %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -138,35 +141,41 @@
 <pluralform>%x Bajtov</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Napaka pri branju iz sinhronizacijske podatkovne baze:</target>
+<source>Cannot read file %x.</source>
+<target>Ne morem prebrati datoteke %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Napaka pri pisanju v sinhronizacijsko podatkovno bazo:</target>
+<source>Cannot write file %x.</source>
+<target>Ne morem zapisati datoteke %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Nekompatibilen format sinhronizacijske podatkovne baze:</target>
+<source>Database file %x is incompatible.</source>
+<target>Datoteka podatkovne baze %x je nekopatibilna.</target>
 
 <source>Initial synchronization:</source>
 <target>Začetna sinhronizacija:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Ena od FreeFileSync datotek podatkovne baze še en obstaja:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Datoteka podatkovne baze %x še ne obstaja.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Datoteke podatkovne baze si ne delijo skupne sinhronizacijske seje:</target>
+<source>Out of memory!</source>
+<target>Zmanjkalo pomnilnika!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Datoteke podatkovne baze si ne delijo skupne seje.</target>
 
 <source>An exception occurred!</source>
 <target>Zgodila se je napaka!</target>
 
-<source>Error reading file attributes:</source>
-<target>Napaka pri branju atributov datoteke:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Ne morem brati datotečnih atributov od %x.</target>
+
+<source>Cannot get process information.</source>
+<target>Ne morem pridobiti informacij o procesu.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Čakam, medtem ko se zaklepa imenik (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Napaka pri nastavljanju zaklepanja imenika:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Ne morem nastaviti zaklepanja imenika %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -179,8 +188,8 @@
 <pluralform>%x sek</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Napaka pri branju datoteke:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Napaka pri razčlenjevanju datoteke %x, vrstica %y, stolpec %z.</target>
 
 <source>Scanning:</source>
 <target>Pregledujem:</target>
@@ -199,38 +208,32 @@
 <pluralform>[%x niti]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Neveljavna FreeFileSync nastavitvena datoteka!</target>
+<source>/sec</source>
+<target>/sek</target>
 
-<source>Error parsing configuration file:</source>
-<target>Napaka pri preverjanju konfiguracijske datoteke:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>Datoteka %x ne vsebuje veljavnih nastavitev</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Nastavitev naložena samo delno:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Nastavitvena datoteka %x naložena samo delno.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>Ne morem premakniti %x v Koš</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Ne morem dostopati do servisa Volume Shadow Copy</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Prosimo uporabite 64-bitno različico FreeFileSync za ustvarjanje senčnih kopij na tem sistemu.</target>
 
 <source>Cannot load file %x.</source>
 <target>Ne morem naložiti datoteko %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Napaka pri dostopu do servisa senčnih kopij!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Ustvarjanje senčnih kopij na WOW63 ni podprto. Prosimo uporabite 64-bitno FreeFileSync različico.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Ne morem določiti imena volumna za datoteko:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>Pot %x ne vsebuje ime volumna.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Ime volumna %x ni del imena datoteke %y!</target>
 
-<source>/sec</source>
-<target>/sek</target>
-
-<source>File does not exist:</source>
-<target>Datoteka ne obstaja:</target>
+<source>Cannot find file %x.</source>
+<target>Ne morem najti datoteke %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Ne morem brati naslednje XML elemente:</target>
@@ -309,9 +312,6 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>RealtimeSync configuration</source>
 <target>RealtimeSync nastavitve</target>
 
-<source>File already exists. Overwrite?</source>
-<target>Datoteka že obstaja. Prepišem?</target>
-
 <source>&Restore</source>
 <target>&Obnovi</target>
 
@@ -354,20 +354,20 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync konfiguracija</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync Paketno opravilo</target>
-
-<source>Unable to create log file!</source>
-<target>Ne morem ustvariti datoteko za beleženje!</target>
-
 <source>Batch execution</source>
 <target>Paketno izvajanje</target>
 
-<source>Stop</source>
-<target>Ustavi</target>
+<source>Items processed:</source>
+<target>Obdelanih elementov:</target>
+
+<source>Items remaining:</source>
+<target>Preostalih elementov:</target>
 
 <source>Total time:</source>
 <target>Celoten čas:</target>
+
+<source>Stop</source>
+<target>Ustavi</target>
 
 <source>Synchronization aborted!</source>
 <target>Sinhronizacija prekinjena!</target>
@@ -375,14 +375,17 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Synchronization completed with errors!</source>
 <target>Sinhronizacija se je končala z napakami!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Nič za sinhronizirati!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Sinhronizacija uspešno zaključena!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Pritisnite "Zamenjaj", da odprete FreeFileSync GUI način.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Pritisnite "Preklopi", da razrešite vprašanja v glavnem pogovornem oknu FreeFileSync.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Preklapljam v FreeFileSync GUI način...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Preklapljam na FreeFileSync glavno pogovorno okno...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Ne morem se povezati na sourceforge.net!</target>
@@ -540,9 +543,6 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Items found:</source>
 <target>Najdenih elementov:</target>
 
-<source>Items remaining:</source>
-<target>Preostalih elementov:</target>
-
 <source>Speed:</source>
 <target>Hitrost:</target>
 
@@ -594,8 +594,8 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>&Load</source>
 <target>&Naloži</target>
 
-<source>&Cancel</source>
-<target>&Prekliči</target>
+<source>Cancel</source>
+<target>Prekliči</target>
 
 <source>Select variant:</source>
 <target>Izberite varianto:</target>
@@ -645,8 +645,8 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Conflict/file cannot be categorized</source>
 <target>Spor/datoteka ne more biti kategorizirana</target>
 
-<source>&OK</source>
-<target>&V redu</target>
+<source>OK</source>
+<target>V redu</target>
 
 <source>Compare by...</source>
 <target>Primerjaj po...</target>
@@ -680,9 +680,6 @@ enaka
 
 <source>Synchronizing...</source>
 <target>Sinhroniziram...</target>
-
-<source>Items processed:</source>
-<target>Obdelanih elementov:</target>
 
 <source>&Pause</source>
 <target>&Premor</target>
@@ -730,7 +727,7 @@ enaka
 <target>Ne prikaži več tega pogovornega okna</target>
 
 <source>&Switch</source>
-<target>&Zamenjaj</target>
+<target>&Preklopi</target>
 
 <source>&Yes</source>
 <target>&Da</target>
@@ -1023,9 +1020,6 @@ Izključi: \stuff\temp\*
 <source>File list exported!</source>
 <target>Seznam datotek je bil izvožen!</target>
 
-<source>Error writing file:</source>
-<target>Napaka pri pisanju datoteke:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1079,20 +1073,20 @@ Izključi: \stuff\temp\*
 <source>Paused</source>
 <target>Na premoru</target>
 
+<source>Initializing...</source>
+<target>Inicializiram...</target>
+
 <source>Aborted</source>
 <target>Prekinitev uspela</target>
 
 <source>Completed</source>
 <target>Zaključeno</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...</target>
+<source>Continue</source>
+<target>Nadaljuj</target>
 
 <source>Pause</source>
 <target>Premor</target>
-
-<source>Continue</source>
-<target>Nadaljuj</target>
 
 <source>Cannot find %x</source>
 <target>Ne najdem %x</target>
@@ -1242,65 +1236,65 @@ Izključi: \stuff\temp\*
 <pluralform>%x dni</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Ne morem začeti nadzorovanja imenikov:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Napaka pri nadzorovanju imenikov.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Ne morem nadzorovati imenika %x.</target>
 
 <source>Conversion error:</source>
 <target>Napaka pri pretvorbi:</target>
 
-<source>Error deleting file:</source>
-<target>Napaka pri brisanju datoteke:</target>
+<source>Cannot delete file %x.</source>
+<target>Ne morem izbrisati datoteke %x.</target>
 
-<source>Error moving file:</source>
-<target>Napaka pri premikanju datoteke:</target>
+<source>The file is locked by another process:</source>
+<target>Datoteka je zaklenjena s strani drugega procesa:</target>
 
-<source>Target file already existing!</source>
-<target>Ciljna datoteka že obstaja!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Ne morem premakniti datoteko %x v %y.</target>
 
-<source>Error moving directory:</source>
-<target>Napaka pri premikanju imenika:</target>
+<source>Cannot delete directory %x.</source>
+<target>Ne morem izbrisati imenika %x.</target>
 
-<source>Target directory already existing!</source>
-<target>Ciljni imenik že obstaja!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Ne morem zapisati časa spremembe od %x.</target>
 
-<source>Error deleting directory:</source>
-<target>Napaka pri brisanju imenika:</target>
+<source>Cannot find system function %x.</source>
+<target>Ne morem najti sistemske funkcije %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Napaka pri spreminjanju časa modifikacije:</target>
+<source>Cannot read security context of %x.</source>
+<target>Ne morem prebrati varnostnega konteksta od %x.</target>
 
-<source>Error loading library function:</source>
-<target>Napaka pri nalaganju funkcije iz knjižnice:</target>
+<source>Cannot write security context of %x.</source>
+<target>Ne morem zapisati varnostni kontekst od %x</target>
 
-<source>Error reading security context:</source>
-<target>Napaka pri branju varnostne skladnosti:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Ne morem prebrati dovoljenja od %x.</target>
 
-<source>Error writing security context:</source>
-<target>Napaka pri pisanju varnostne skladnosti:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Ne morem zapisati dovoljenj od %x.</target>
 
-<source>Error copying file permissions:</source>
-<target>Napaka pri kopiranju datotečnih dovoljenj:</target>
+<source>Cannot create directory %x.</source>
+<target>Ne morem ustvariti imenika %x.</target>
 
-<source>Error creating directory:</source>
-<target>Napaka pri ustvarjanju imenika:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Ne morem kopirati simboličnih povezav %x v %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Napaka pri kopiranju simboličnih povezav:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Ne morem zapisati datotečnih atributov od %x.</target>
 
-<source>Error copying file:</source>
-<target>Napaka pri kopiranju datoteke:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Ne morem kopirati datoteke %x v %y.</target>
 
-<source>Error traversing directory:</source>
-<target>Napaka pri prehajanju imenika:</target>
+<source>Cannot read directory %x.</source>
+<target>Ne morem prebrati imenika %x.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Neskončna zanka pri prehodu imenika:</target>
+<source>Endless loop.</source>
+<target>Neskončno zazankano</target>
 
-<source>Error setting privilege:</source>
-<target>Napaka pri nastavljanju privilegija:</target>
+<source>Cannot set privilege %x.</source>
+<target>Ne morem nastaviti privilegija %x.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Ne morem premakniti %x v Koš</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Obe strani sta se spremenili od zadnje sinhronizacije!</target>
@@ -1326,8 +1320,8 @@ Izključi: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>To napako z obravnavanjem imenika kot praznega lahko ignorirate.</target>
 
-<source>Directory does not exist:</source>
-<target>Imenik ne obstaja:</target>
+<source>Cannot find directory %x.</source>
+<target>Ne morem najti imenika %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Imeniki so v odvisnosti! Bodite pozorni, ko nastavljate sinhronizacijska pravila:</target>
@@ -1335,20 +1329,17 @@ Izključi: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Pripravljam sinhronizacijo...</target>
 
-<source>Out of memory!</source>
-<target>Zmanjkalo pomnilnika!</target>
+<source>Conflict detected:</source>
+<target>Zaznan spor:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Datoteka %x ima neveljaven datum!</target>
 
-<source>Conflict detected:</source>
-<target>Zaznan spor:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Datoteki %x imata enak datum ampak različno velikost!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Simbolične povezave %x imajo isti datum, vendar različni cilj!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Simbolične povezave %x imajo isti datum, vendar različno tarčo.</target>
 
 <source>Comparing content of files %x</source>
 <target>Primerjam vsebino datotek %x</target>
@@ -1431,11 +1422,11 @@ Izključi: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Ustvarjam datoteko %x</target>
 
-<source>Creating folder %x</source>
-<target>Ustvarjam mapo %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Ustvarjam simbolično povezavo %x</target>
+
+<source>Creating folder %x</source>
+<target>Ustvarjam mapo %x</target>
 
 <source>Overwriting file %x</source>
 <target>Prepisujem datoteko %x</target>
@@ -1455,8 +1446,8 @@ Izključi: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Imenik za upravljanje z datotečnimi raličicami ni bil podan!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Izvorni imenik ne obstaja več:</target>
+<source>Source directory %x not found.</source>
+<target>Izvorni imenik %x ni bil najden.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Obstajajo nerešeni spori!</target>
@@ -1465,7 +1456,7 @@ Izključi: \stuff\temp\*
 <target>Lahko ignorirate spore in nadaljujete s sinhronizacijo.</target>
 
 <source>Significant difference detected:</source>
-<target>Zaznana je važna razlika:</target>
+<target>Zaznana je pomembna razlika:</target>
 
 <source>More than 50% of the total number of files will be copied or deleted!</source>
 <target>Več kot 50% od celotnega števila datotek bo kopiranih ali izbrisanih!</target>
@@ -1490,12 +1481,6 @@ Izključi: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Ustvarjam podatkovno bazo...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Nič za sinhronizirati!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>Ne morem kopirati zaklenjeno datoteko %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Napaka pri preverjanju podatkov: izvorna in ciljna datoteka imata različno vsebino!</target>

@@ -27,7 +27,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
     fileHandle = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
                               GENERIC_READ,
                               FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read open files that are shared by other applications
-                              0,
+                              nullptr,
                               OPEN_EXISTING,
                               FILE_FLAG_SEQUENTIAL_SCAN,
                               /* possible values: (Reference http://msdn.microsoft.com/en-us/library/aa363858(VS.85).aspx#caching_behavior)
@@ -62,7 +62,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
 #endif
     {
         const ErrorCode lastError = getLastError();
-        std::wstring errorMessage = _("Error reading file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted(lastError) + L" (open)";
+        std::wstring errorMessage = replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (open)";
 
         if (errorCodeForNotExisting(lastError))
             throw ErrorNotExisting(errorMessage);
@@ -95,7 +95,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0)
 #endif
-        throw FileError(_("Error reading file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + zen::getLastErrorFormatted() + L" (read)");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted() + L" (read)");
 
 #ifdef FFS_WIN
     if (bytesRead < bytesToRead) //verify only!
@@ -105,7 +105,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
         eofReached = true;
 
     if (bytesRead > bytesToRead)
-        throw FileError(_("Error reading file:") + L"\n\"" + filename_ + L"\"" + L"\n\n" + L"buffer overflow");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + L"buffer overflow");
 
     return bytesRead;
 }
@@ -132,16 +132,17 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
                                      The resulting code is faster, because the redirector can use the cache manager and send fewer SMBs with more data.
                                      This combination also avoids an issue where writing to a file across a network can occasionally return ERROR_ACCESS_DENIED. */
                               FILE_SHARE_READ | FILE_SHARE_DELETE, //note: FILE_SHARE_DELETE is required to rename file while handle is open!
-                              0,
+                              nullptr,
                               access == ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW,
                               FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
                               nullptr);
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
         const DWORD lastError = ::GetLastError();
-        std::wstring errorMessage = _("Error writing file:") + L"\n\"" + filename_ + L"\"" L"\n\n" + zen::getLastErrorFormatted(lastError);
+        const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + zen::getLastErrorFormatted(lastError);
 
-        if (lastError == ERROR_FILE_EXISTS)
+        if (lastError == ERROR_FILE_EXISTS || //confirmed to be used
+            lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
             throw ErrorTargetExisting(errorMessage);
 
         if (lastError == ERROR_PATH_NOT_FOUND)
@@ -157,7 +158,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
     if (!fileHandle)
     {
         const int lastError = errno;
-        std::wstring errorMessage = _("Error writing file:") + L"\n\"" + filename_ + L"\"" L"\n\n" + zen::getLastErrorFormatted(lastError);
+        const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + zen::getLastErrorFormatted(lastError);
         if (lastError == EEXIST)
             throw ErrorTargetExisting(errorMessage);
 
@@ -193,8 +194,8 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
     if (::ferror(fileHandle) != 0)
 #endif
-        throw FileError(_("Error writing file:") + L"\n\"" + filename_ + L"\"" L"\n\n" + zen::getLastErrorFormatted() + L" (w)"); //w -> distinguish from fopen error message!
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted() + L" (w)"); //w -> distinguish from fopen error message!
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
-        throw FileError(_("Error writing file:") + L"\n\"" + filename_ + L"\"" L"\n\n" + L"incomplete write");
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + L"(incomplete write)");
 }

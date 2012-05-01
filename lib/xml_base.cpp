@@ -31,7 +31,7 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
 
             if (!startsWith(fileBegin, xmlBegin) &&
                 !startsWith(fileBegin, zen::BYTE_ORDER_MARK_UTF8 + xmlBegin)) //respect BOM!
-                throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + filename + L"\"");
+                throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
         }
 
         const zen::UInt64 fs = zen::getFilesize(filename); //throw FileError
@@ -40,12 +40,12 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
         FileInput inputFile(filename); //throw FileError
         const size_t bytesRead = inputFile.read(&stream[0], stream.size()); //throw FileError
         if (bytesRead < to<size_t>(fs))
-            throw FfsXmlError(_("Error reading file:") + L"\n\"" + filename + L"\"");
+            throw FfsXmlError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename)));
     }
     catch (const FileError& error)
     {
         if (!fileExists(filename))
-            throw FfsXmlError(_("File does not exist:") + L"\n\"" + filename+ L"\"");
+            throw FfsXmlError(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)));
 
         throw FfsXmlError(error.toString());
     }
@@ -54,9 +54,13 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
     {
         zen::parse(stream, doc); //throw XmlParsingError
     }
-    catch (const XmlParsingError&)
+    catch (const XmlParsingError& e)
     {
-        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + filename + L"\"");
+        throw FfsXmlError(
+            replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
+                                             L"%x", fmtFileName(filename)),
+                                  L"%y", numberTo<std::wstring>(e.row)),
+                       L"%z", numberTo<std::wstring>(e.col)));
     }
 }
 
@@ -77,7 +81,7 @@ const std::wstring xmlAccess::getErrorMessageFormatted(const XmlIn& in)
 }
 
 
-void xmlAccess::saveXmlDocument(const zen::XmlDoc& doc, const Zstring& filename) //throw (FfsXmlError)
+void xmlAccess::saveXmlDocument(const zen::XmlDoc& doc, const Zstring& filename) //throw FfsXmlError
 {
     std::string stream = serialize(doc); //throw ()
 
@@ -98,7 +102,7 @@ void xmlAccess::saveXmlDocument(const zen::XmlDoc& doc, const Zstring& filename)
         try
         {
             FileOutput outputFile(filename, FileOutput::ACC_OVERWRITE); //throw FileError
-            outputFile.write(stream.c_str(), stream.length());                 //
+            outputFile.write(stream.c_str(), stream.length());          //
         }
         catch (const FileError& error) //more detailed error messages than with wxWidgets
         {

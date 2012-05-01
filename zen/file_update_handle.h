@@ -24,7 +24,7 @@ public:
         const DWORD lastError = ::GetLastError();
         if (lastError == ERROR_ACCESS_DENIED) //function fails if file is read-only
         {
-            zen::ScopeGuard guardErrorCode = zen::makeGuard([&]() { ::SetLastError(lastError); }); //transactional behavior: ensure cleanup (e.g. network drop) -> cref [!]
+            //zen::ScopeGuard guardErrorCode = zen::makeGuard([&] { ::SetLastError(lastError); }); //transactional behavior: ensure cleanup (e.g. network drop) -> cref [!]
 
             //read-only file attribute may cause trouble: temporarily reset it
             const DWORD tmpAttr = ::GetFileAttributes(filenameFmt.c_str());
@@ -32,7 +32,7 @@ public:
             {
                 if (::SetFileAttributes(filenameFmt.c_str(), FILE_ATTRIBUTE_NORMAL))
                 {
-                    guardErrorCode.dismiss();
+                    //guardErrorCode.dismiss();
                     attr = tmpAttr; //"create" guard on read-only attribute
 
                     //now try again

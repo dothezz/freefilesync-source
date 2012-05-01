@@ -35,13 +35,13 @@ XmlType getXmlType(const zen::XmlDoc& doc) //throw()
 }
 
 
-XmlType xmlAccess::getXmlType(const wxString& filename) //throw()
+XmlType xmlAccess::getXmlType(const Zstring& filename) //throw()
 {
     XmlDoc doc;
     try
     {
         //do NOT use zen::loadStream as it will superfluously load even huge files!
-        loadXmlDocument(toZ(filename), doc); //throw FfsXmlError, quick exit if file is not an FFS XML
+        loadXmlDocument(filename, doc); //throw FfsXmlError, quick exit if file is not an FFS XML
     }
     catch (const FfsXmlError&)
     {
@@ -110,7 +110,7 @@ xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchCo
 }
 
 
-xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg, const wxString& referenceFile)
+xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg, const Zstring& referenceFile)
 {
     //try to take over batch-specific settings from reference
     if (!referenceFile.empty() && getXmlType(referenceFile) == XML_TYPE_BATCH)
@@ -118,7 +118,7 @@ xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiCo
         {
             XmlBatchConfig output;
 
-            std::vector<wxString> filenames;
+            std::vector<Zstring> filenames;
             filenames.push_back(referenceFile);
             convertConfig(filenames, output); //throw xmlAccess::FfsXmlError
 
@@ -144,7 +144,7 @@ xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiCo
 }
 
 
-xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<wxString>& filenames)   //throw ()
+xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<Zstring>& filenames)  //throw()
 {
     bool guiCfgExists   = false;
     bool batchCfgExists = false;
@@ -181,7 +181,7 @@ xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<wxString>& filena
 namespace
 {
 template <class XmlCfg>
-XmlCfg loadCfgImpl(const wxString& filename, std::unique_ptr<xmlAccess::FfsXmlError>& exeption) //throw xmlAccess::FfsXmlError
+XmlCfg loadCfgImpl(const Zstring& filename, std::unique_ptr<xmlAccess::FfsXmlError>& exeption) //throw xmlAccess::FfsXmlError
 {
     XmlCfg cfg;
     try
@@ -200,7 +200,7 @@ XmlCfg loadCfgImpl(const wxString& filename, std::unique_ptr<xmlAccess::FfsXmlEr
 
 
 template <class XmlCfg>
-void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config)   //throw xmlAccess::FfsXmlError
+void mergeConfigFilesImpl(const std::vector<Zstring>& filenames, XmlCfg& config) //throw xmlAccess::FfsXmlError
 {
     assert(!filenames.empty());
     if (filenames.empty())
@@ -208,9 +208,10 @@ void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config
 
     std::vector<zen::MainConfiguration> mainCfgs;
     std::unique_ptr<FfsXmlError> savedException;
+    Zstring invalidFile;
 
     std::for_each(filenames.begin(), filenames.end(),
-                  [&](const wxString& filename)
+                  [&](const Zstring& filename)
     {
         switch (getXmlType(filename))
         {
@@ -224,12 +225,13 @@ void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config
 
             case XML_TYPE_GLOBAL:
             case XML_TYPE_OTHER:
+                invalidFile = filename;
                 break;
         }
     });
 
     if (mainCfgs.empty())
-        throw FfsXmlError(_("Invalid FreeFileSync config file!"));
+        throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(invalidFile)));
 
     try //...to init all non-"mainCfg" settings with first config file
     {
@@ -245,15 +247,15 @@ void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config
 }
 
 
-void xmlAccess::convertConfig(const std::vector<wxString>& filenames, XmlGuiConfig& config)   //throw (xmlAccess::FfsXmlError)
+void xmlAccess::convertConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config) //throw FfsXmlError
 {
-    mergeConfigFilesImpl(filenames, config);   //throw (xmlAccess::FfsXmlError)
+    mergeConfigFilesImpl(filenames, config); //throw FfsXmlError
 }
 
 
-void xmlAccess::convertConfig(const std::vector<wxString>& filenames, XmlBatchConfig& config) //throw (xmlAccess::FfsXmlError);
+void xmlAccess::convertConfig(const std::vector<Zstring>& filenames, XmlBatchConfig& config) //throw FfsXmlError
 {
-    mergeConfigFilesImpl(filenames, config);   //throw (xmlAccess::FfsXmlError)
+    mergeConfigFilesImpl(filenames, config);   //throw FfsXmlError
 }
 
 
@@ -838,7 +840,8 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inShared["CopyLockedFiles"      ](config.copyLockedFiles);
     inShared["CopyFilePermissions"  ](config.copyFilePermissions);
     inShared["TransactionalFileCopy"](config.transactionalFileCopy);
-    inShared["VerifyCopiedFiles"    ](config.verifyFileCopy);
+    inShared["LockDirectoriesDuringSync"](config.createLockFile);
+    inShared["VerifyCopiedFiles"        ](config.verifyFileCopy);
     inShared["RunWithBackgroundPriority"](config.runWithBackgroundPriority);
 
     //max. allowed file time deviation
@@ -866,28 +869,30 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inWnd.attribute("PosY",      config.gui.dlgPos.y);
     inWnd.attribute("Maximized", config.gui.isMaximized);
 
+    XmlIn inManualDel = inWnd["ManualDeletion"];
+    inManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
+    inManualDel.attribute("UseRecycler"      , config.gui.useRecyclerForManualDeletion);
+
+    inWnd["CaseSensitiveSearch"    ](config.gui.textSearchRespectCase);
     inWnd["MaxFolderPairsVisible"](config.gui.maxFolderPairsVisible);
-
-    inWnd["ManualDeletionOnBothSides"](config.gui.deleteOnBothSides);
-    inWnd["ManualDeletionUseRecycler"](config.gui.useRecyclerForManualDeletion);
-    inWnd["RespectCaseOnSearch"      ](config.gui.textSearchRespectCase);
-
-    inWnd["ShowIcons"](config.gui.showIcons);
-    inWnd["IconSize"](config.gui.iconSize);
 
     //###########################################################
     //read column attributes
-    XmlIn inColNavi = inWnd["CompressedView"];
+    XmlIn inColNavi = inWnd["OverviewColumns"];
     inColNavi(config.gui.columnAttribNavi);
 
     inColNavi.attribute("ShowPercentage", config.gui.showPercentBar);
     inColNavi.attribute("SortByColumn", config.gui.naviLastSortColumn);
     inColNavi.attribute("SortAscending", config.gui.naviLastSortAscending);
 
-    XmlIn inColLeft = inWnd["ColumnsLeft"];
+    XmlIn inMainGrid = inWnd["MainGrid"];
+    inMainGrid.attribute("ShowIcons", config.gui.showIcons);
+    inMainGrid.attribute("IconSize", config.gui.iconSize);
+
+    XmlIn inColLeft = inMainGrid["ColumnsLeft"];
     inColLeft(config.gui.columnAttribLeft);
 
-    XmlIn inColRight = inWnd["ColumnsRight"];
+    XmlIn inColRight = inMainGrid["ColumnsRight"];
     inColRight(config.gui.columnAttribRight);
     //###########################################################
 
@@ -922,27 +927,27 @@ void readConfig(const Zstring& filename, XmlType type, ConfigType& config)
     loadXmlDocument(filename, doc);  //throw FfsXmlError
 
     if (getXmlType(doc) != type) //throw()
-        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + filename + L"\"");
+        throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
 
     XmlIn in(doc);
     ::readConfig(in, config);
 
     if (in.errorsOccured())
-        throw FfsXmlError(_("Configuration loaded partially only:") + L"\n\"" + filename + L"\"\n\n" +
+        throw FfsXmlError(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filename)) + L"\n\n" +
                           getErrorMessageFormatted(in), FfsXmlError::WARNING);
 }
 }
 
 
-void xmlAccess::readConfig(const wxString& filename, xmlAccess::XmlGuiConfig& config)
+void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlGuiConfig& config)
 {
-    ::readConfig(toZ(filename), XML_TYPE_GUI, config);
+    ::readConfig(filename, XML_TYPE_GUI, config);
 }
 
 
-void xmlAccess::readConfig(const wxString& filename, xmlAccess::XmlBatchConfig& config)
+void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlBatchConfig& config)
 {
-    ::readConfig(toZ(filename), XML_TYPE_BATCH, config);
+    ::readConfig(filename, XML_TYPE_BATCH, config);
 }
 
 
@@ -1104,7 +1109,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outShared["CopyLockedFiles"      ](config.copyLockedFiles);
     outShared["CopyFilePermissions"  ](config.copyFilePermissions);
     outShared["TransactionalFileCopy"](config.transactionalFileCopy);
-    outShared["VerifyCopiedFiles"    ](config.verifyFileCopy);
+    outShared["LockDirectoriesDuringSync"](config.createLockFile);
+    outShared["VerifyCopiedFiles"        ](config.verifyFileCopy);
     outShared["RunWithBackgroundPriority"](config.runWithBackgroundPriority);
 
     //max. allowed file time deviation
@@ -1132,28 +1138,30 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outWnd.attribute("PosY",      config.gui.dlgPos.y);
     outWnd.attribute("Maximized", config.gui.isMaximized);
 
+    XmlOut outManualDel = outWnd["ManualDeletion"];
+    outManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
+    outManualDel.attribute("UseRecycler"      , config.gui.useRecyclerForManualDeletion);
+
+    outWnd["CaseSensitiveSearch"     ](config.gui.textSearchRespectCase);
     outWnd["MaxFolderPairsVisible"](config.gui.maxFolderPairsVisible);
-
-    outWnd["ManualDeletionOnBothSides"](config.gui.deleteOnBothSides);
-    outWnd["ManualDeletionUseRecycler"](config.gui.useRecyclerForManualDeletion);
-    outWnd["RespectCaseOnSearch"      ](config.gui.textSearchRespectCase);
-
-    outWnd["ShowIcons"](config.gui.showIcons);
-    outWnd["IconSize"](config.gui.iconSize);
 
     //###########################################################
     //write column attributes
-    XmlOut outColNavi = outWnd["CompressedView"];
+    XmlOut outColNavi = outWnd["OverviewColumns"];
     outColNavi(config.gui.columnAttribNavi);
 
     outColNavi.attribute("ShowPercentage", config.gui.showPercentBar);
     outColNavi.attribute("SortByColumn", config.gui.naviLastSortColumn);
     outColNavi.attribute("SortAscending", config.gui.naviLastSortAscending);
 
-    XmlOut outColLeft = outWnd["ColumnsLeft"];
+    XmlOut outMainGrid = outWnd["MainGrid"];
+    outMainGrid.attribute("ShowIcons", config.gui.showIcons);
+    outMainGrid.attribute("IconSize", config.gui.iconSize);
+
+    XmlOut outColLeft = outMainGrid["ColumnsLeft"];
     outColLeft(config.gui.columnAttribLeft);
 
-    XmlOut outColRight = outWnd["ColumnsRight"];
+    XmlOut outColRight = outMainGrid["ColumnsRight"];
     outColRight(config.gui.columnAttribRight);
     //###########################################################
 
@@ -1182,7 +1190,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
 
 template <class ConfigType>
-void writeConfig(const ConfigType& config, XmlType type, const wxString& filename)
+void writeConfig(const ConfigType& config, XmlType type, const Zstring& filename)
 {
     XmlDoc doc("FreeFileSync");
     setXmlType(doc, type); //throw()
@@ -1190,17 +1198,17 @@ void writeConfig(const ConfigType& config, XmlType type, const wxString& filenam
     XmlOut out(doc);
     writeConfig(config, out);
 
-    saveXmlDocument(doc, toZ(filename)); //throw FfsXmlError
+    saveXmlDocument(doc, filename); //throw FfsXmlError
 }
 }
 
-void xmlAccess::writeConfig(const XmlGuiConfig& config, const wxString& filename)
+void xmlAccess::writeConfig(const XmlGuiConfig& config, const Zstring& filename)
 {
     ::writeConfig(config, XML_TYPE_GUI, filename); //throw FfsXmlError
 }
 
 
-void xmlAccess::writeConfig(const XmlBatchConfig& config, const wxString& filename)
+void xmlAccess::writeConfig(const XmlBatchConfig& config, const Zstring& filename)
 {
     ::writeConfig(config, XML_TYPE_BATCH, filename); //throw FfsXmlError
 }
@@ -1208,13 +1216,13 @@ void xmlAccess::writeConfig(const XmlBatchConfig& config, const wxString& filena
 
 void xmlAccess::writeConfig(const XmlGlobalSettings& config)
 {
-    ::writeConfig(config, XML_TYPE_GLOBAL, getGlobalConfigFile()); //throw FfsXmlError
+    ::writeConfig(config, XML_TYPE_GLOBAL, toZ(getGlobalConfigFile())); //throw FfsXmlError
 }
 
 
 wxString xmlAccess::extractJobName(const wxString& configFilename)
 {
-    const wxString shortName = configFilename.AfterLast(FILE_NAME_SEPARATOR); //returns the whole string if seperator not found
-    const wxString jobName = shortName.BeforeLast(wxChar('.')); //returns empty string if seperator not found
+    const wxString shortName = afterLast(configFilename, utf8CvrtTo<wxString>(FILE_NAME_SEPARATOR)); //returns the whole string if separator not found
+    const wxString jobName = beforeLast(shortName, L'.'); //returns empty string if seperator not found
     return jobName.IsEmpty() ? shortName : jobName;
 }

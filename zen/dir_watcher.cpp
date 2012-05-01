@@ -50,7 +50,7 @@ public:
                 const Zstring fullname = dirname + Zstring(notifyInfo.FileName, notifyInfo.FileNameLength / sizeof(WCHAR));
 
                 //skip modifications sent by changed directories: reason for change, child element creation/deletion, will notify separately!
-                [&]()
+                [&]
                 {
                     if (notifyInfo.Action == FILE_ACTION_RENAMED_OLD_NAME) //reporting FILE_ACTION_RENAMED_NEW_NAME should suffice
                         return;
@@ -125,12 +125,9 @@ public:
     ReadChangesAsync(const Zstring& directory, //make sure to not leak in thread-unsafe types!
                      const std::shared_ptr<SharedData>& shared) :
         shared_(shared),
-        dirname(directory),
+        dirnamePf(appendSeparator(directory)),
         hDir(INVALID_HANDLE_VALUE)
     {
-        if (!endsWith(dirname, FILE_NAME_SEPARATOR))
-            dirname += FILE_NAME_SEPARATOR;
-
         //these two privileges are required by ::CreateFile FILE_FLAG_BACKUP_SEMANTICS according to
         //http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx
         try
@@ -140,7 +137,7 @@ public:
         }
         catch (const FileError&) {}
 
-        hDir = ::CreateFile(applyLongPathPrefix(dirname.c_str()).c_str(),
+        hDir = ::CreateFile(applyLongPathPrefix(dirnamePf.c_str()).c_str(),
                             FILE_LIST_DIRECTORY,
                             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                             nullptr,
@@ -149,8 +146,9 @@ public:
                             nullptr);
         if (hDir == INVALID_HANDLE_VALUE)
         {
-            const std::wstring errorMsg = _("Could not initialize directory monitoring:") + L"\n\"" + dirname + L"\"" L"\n\n" + zen::getLastErrorFormatted();
-            if (errorCodeForNotExisting(::GetLastError()))
+            const DWORD lastError = ::GetLastError();
+            const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted(lastError);
+            if (errorCodeForNotExisting(lastError))
                 throw ErrorNotExisting(errorMsg);
             throw FileError(errorMsg);
         }
@@ -181,14 +179,15 @@ public:
                                                   false,    //__in      BOOL bInitialState,
                                                   nullptr); //__in_opt  LPCTSTR lpName
                 if (overlapped.hEvent == nullptr)
-                    return shared_->reportError(_("Error when monitoring directories.") + L" (CreateEvent)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)) + L" (CreateEvent)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+
                 ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
 
                 //asynchronous variant: runs on this thread's APC queue!
-                if (!::ReadDirectoryChangesW(hDir,                              //  __in         HANDLE hDirectory,
-                                             &buffer[0],                        //  __out        LPVOID lpBuffer,
-                                             static_cast<DWORD>(buffer.size()), //  __in         DWORD nBufferLength,
-                                             true,                              //  __in         BOOL bWatchSubtree,
+                if (!::ReadDirectoryChangesW(hDir,                              //  __in   HANDLE hDirectory,
+                                             &buffer[0],                        //  __out  LPVOID lpBuffer,
+                                             static_cast<DWORD>(buffer.size()), //  __in   DWORD nBufferLength,
+                                             true,                              //  __in   BOOL bWatchSubtree,
                                              FILE_NOTIFY_CHANGE_FILE_NAME |
                                              FILE_NOTIFY_CHANGE_DIR_NAME  |
                                              FILE_NOTIFY_CHANGE_SIZE      |
@@ -196,7 +195,7 @@ public:
                                              nullptr,                       //  __out_opt    LPDWORD lpBytesReturned,
                                              &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
                                              nullptr))                      //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
-                    return shared_->reportError(_("Error when monitoring directories.") + L" (ReadDirectoryChangesW)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)) + L" (ReadDirectoryChangesW)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
 
                 //async I/O is a resource that needs to be guarded since it will write to local variable "buffer"!
                 zen::ScopeGuard guardAio = zen::makeGuard([&]
@@ -217,7 +216,7 @@ public:
                                               false))        //__in   BOOL bWait
                 {
                     if (::GetLastError() != ERROR_IO_INCOMPLETE)
-                        return shared_->reportError(_("Error when monitoring directories.") + L" (GetOverlappedResult)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+                        return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)) + L" (GetOverlappedResult)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
 
                     //execute asynchronous procedure calls (APC) queued on this thread
                     ::SleepEx(50,    // __in  DWORD dwMilliseconds,
@@ -227,7 +226,7 @@ public:
                 }
                 guardAio.dismiss();
 
-                shared_->addChanges(&buffer[0], bytesWritten, dirname); //throw ()
+                shared_->addChanges(&buffer[0], bytesWritten, dirnamePf); //throw ()
             }
         }
         catch (boost::thread_interrupted&)
@@ -236,21 +235,24 @@ public:
         }
     }
 
-    ReadChangesAsync(ReadChangesAsync && other) :
+    ReadChangesAsync(ReadChangesAsync&& other) :
         hDir(INVALID_HANDLE_VALUE)
     {
-        shared_ = std::move(other.shared_);
-        dirname = std::move(other.dirname);
+        shared_   = std::move(other.shared_);
+        dirnamePf = std::move(other.dirnamePf);
         std::swap(hDir, other.hDir);
     }
 
     HANDLE getDirHandle() const { return hDir; } //for reading/monitoring purposes only, don't abuse (e.g. close handle)!
 
 private:
+    ReadChangesAsync(const ReadChangesAsync&);
+    ReadChangesAsync& operator=(const ReadChangesAsync&);
+
     //shared between main and worker:
     std::shared_ptr<SharedData> shared_;
     //worker thread only:
-    Zstring dirname; //thread safe!
+    Zstring dirnamePf; //thread safe!
     HANDLE hDir;
 };
 
@@ -347,8 +349,9 @@ std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>& process
 #elif defined FFS_LINUX
 struct DirWatcher::Pimpl
 {
+    Zstring dirname;
     int notifDescr;
-    std::map<int, Zstring> watchDescrs; //watch descriptor and corresponding directory name (postfixed with separator!)
+    std::map<int, Zstring> watchDescrs; //watch descriptor and corresponding (sub-)directory name (postfixed with separator!)
 };
 
 
@@ -394,11 +397,12 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
     zen::traverseFolder(dirname, false, *traverser); //don't traverse into symlinks (analog to windows build)
 
     //init
+    pimpl_->dirname    = directory;
     pimpl_->notifDescr = ::inotify_init();
     if (pimpl_->notifDescr == -1)
-        throw FileError(_("Could not initialize directory monitoring:") + L"\n\"" + dirname + L"\"" + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
 
-    zen::ScopeGuard guardDescr = zen::makeGuard([&]() { ::close(pimpl_->notifDescr); });
+    zen::ScopeGuard guardDescr = zen::makeGuard([&] { ::close(pimpl_->notifDescr); });
 
     //set non-blocking mode
     bool initSuccess = false;
@@ -407,7 +411,7 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
         initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
 
     if (!initSuccess)
-        throw FileError(_("Could not initialize directory monitoring:") + L"\n\"" + dirname + L"\"" + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
 
     //add watches
     std::for_each(fullDirList.begin(), fullDirList.end(),
@@ -425,15 +429,13 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
                                      IN_MOVE_SELF);
         if (wd == -1)
         {
-            std::wstring errorMsg = _("Could not initialize directory monitoring:") + L"\n\"" + subdir + L"\"" + L"\n\n" + getLastErrorFormatted();
-            if (errno == ENOENT)
+            const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir)) + L"\n\n" + getLastErrorFormatted();
+            if (errorCodeForNotExisting(errno))
                 throw ErrorNotExisting(errorMsg);
             throw FileError(errorMsg);
         }
 
-        if (!endsWith(subdir, FILE_NAME_SEPARATOR))
-            subdir += FILE_NAME_SEPARATOR;
-        pimpl_->watchDescrs.insert(std::make_pair(wd, subdir));
+        pimpl_->watchDescrs.insert(std::make_pair(wd, appendSeparator(subdir)));
     });
 
     guardDescr.dismiss();
@@ -448,9 +450,8 @@ DirWatcher::~DirWatcher()
 
 std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>&) //throw FileError
 {
-    std::vector<char> buffer(1024 * (sizeof(struct inotify_event) + 16));
-
     //non-blocking call, see O_NONBLOCK
+    std::vector<char> buffer(1024 * (sizeof(struct inotify_event) + 16));
     ssize_t bytesRead = ::read(pimpl_->notifDescr, &buffer[0], buffer.size());
 
     if (bytesRead == -1)
@@ -459,7 +460,7 @@ std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>&) //thro
             errno == EAGAIN)  //Non-blocking I/O has been selected using O_NONBLOCK and no data was immediately available for reading
             return std::vector<Zstring>();
 
-        throw FileError(_("Error when monitoring directories.") + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->dirname)) + L"\n\n" + getLastErrorFormatted());
     }
 
     std::set<Zstring> tmp; //get rid of duplicate entries (actually occur!)

@@ -34,8 +34,8 @@ public:
     AboutDlg(wxWindow* parent);
 
 private:
-    void OnClose(wxCloseEvent&   event) { EndModal(0); }
-    void OnOK   (wxCommandEvent& event) { EndModal(0); }
+    void OnClose(wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnOK   (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_OKAY); }
 };
 
 
@@ -72,22 +72,19 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     //build information
     wxString build = __TDATE__;
 #if wxUSE_UNICODE
-    build += wxT(" - Unicode");
+    build += L" - Unicode";
 #else
-    build += wxT(" - ANSI");
+    build += L" - ANSI";
 #endif //wxUSE_UNICODE
 
     //compile time info about 32/64-bit build
     if (zen::is64BitBuild)
-        build += wxT(" x64");
+        build += L" x64";
     else
-        build += wxT(" x86");
+        build += L" x86";
     assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
-    wxString buildFormatted = _("(Build: %x)");
-    buildFormatted.Replace(wxT("%x"), build);
-
-    m_build->SetLabel(buildFormatted);
+    m_build->SetLabel(replaceCpy(_("(Build: %x)"), L"%x", build));
 
     //m_animationControl1->SetAnimation(GlobalResources::instance().animationMoney);
     //m_animationControl1->Play();
@@ -101,9 +98,9 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 }
 
 
-void zen::showAboutDialog()
+void zen::showAboutDialog(wxWindow* parent)
 {
-    AboutDlg aboutDlg(nullptr);
+    AboutDlg aboutDlg(parent);
     aboutDlg.ShowModal();
 }
 //########################################################################################
@@ -118,8 +115,8 @@ public:
     ~FilterDlg() {}
 
 private:
-    void OnClose       (  wxCloseEvent& event) { EndModal(0); }
-    void OnCancel      (wxCommandEvent& event) { EndModal(0); }
+    void OnClose       (  wxCloseEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnCancel      (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnHelp        (wxCommandEvent& event);
     void OnDefault     (wxCommandEvent& event);
     void OnApply       (wxCommandEvent& event);
@@ -302,9 +299,9 @@ void FilterDlg::OnApply(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showFilterDialog(bool isGlobalFilter, FilterConfig& filter)
+ReturnSmallDlg::ButtonPressed zen::showFilterDialog(wxWindow* parent, bool isGlobalFilter, FilterConfig& filter)
 {
-    FilterDlg filterDlg(nullptr,
+    FilterDlg filterDlg(parent,
                         isGlobalFilter, //is main filter dialog
                         filter);
     return static_cast<ReturnSmallDlg::ButtonPressed>(filterDlg.ShowModal());
@@ -417,12 +414,13 @@ void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showDeleteDialog(const std::vector<zen::FileSystemObject*>& rowsOnLeft,
+ReturnSmallDlg::ButtonPressed zen::showDeleteDialog(wxWindow* parent,
+                                                    const std::vector<zen::FileSystemObject*>& rowsOnLeft,
                                                     const std::vector<zen::FileSystemObject*>& rowsOnRight,
                                                     bool& deleteOnBothSides,
                                                     bool& useRecycleBin)
 {
-    DeleteDialog confirmDeletion(nullptr,
+    DeleteDialog confirmDeletion(parent,
                                  rowsOnLeft,
                                  rowsOnRight,
                                  deleteOnBothSides,
@@ -440,13 +438,12 @@ public:
                    const zen::SyncStatistics& statistics,
                    bool& dontShowAgain);
 private:
-    void OnClose(wxCloseEvent& event);
-    void OnCancel(wxCommandEvent& event);
+    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnStartSync(wxCommandEvent& event);
 
     bool& m_dontShowAgain;
 };
-
 
 
 SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
@@ -487,18 +484,6 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
 }
 
 
-void SyncPreviewDlg::OnClose(wxCloseEvent& event)
-{
-    EndModal(ReturnSmallDlg::BUTTON_CANCEL);
-}
-
-
-void SyncPreviewDlg::OnCancel(wxCommandEvent& event)
-{
-    EndModal(ReturnSmallDlg::BUTTON_CANCEL);
-}
-
-
 void SyncPreviewDlg::OnStartSync(wxCommandEvent& event)
 {
     m_dontShowAgain = m_checkBoxDontShowAgain->GetValue();
@@ -506,12 +491,12 @@ void SyncPreviewDlg::OnStartSync(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showSyncPreviewDlg(
-    const wxString& variantName,
-    const zen::SyncStatistics& statistics,
-    bool& dontShowAgain)
+ReturnSmallDlg::ButtonPressed zen::showSyncPreviewDlg(wxWindow* parent,
+                                                      const wxString& variantName,
+                                                      const zen::SyncStatistics& statistics,
+                                                      bool& dontShowAgain)
 {
-    SyncPreviewDlg preview(nullptr,
+    SyncPreviewDlg preview(parent,
                            variantName,
                            statistics,
                            dontShowAgain);
@@ -524,13 +509,12 @@ ReturnSmallDlg::ButtonPressed zen::showSyncPreviewDlg(
 class CompareCfgDialog : public CmpCfgDlgGenerated
 {
 public:
-    CompareCfgDialog(wxWindow* parent,
-                     CompConfig& cmpConfig);
+    CompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig);
 
 private:
     void OnOkay(wxCommandEvent& event);
-    void OnClose(wxCloseEvent& event) { EndModal(0); }
-    void OnCancel(wxCommandEvent& event) { EndModal(0); }
+    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnShowHelp(wxCommandEvent& event);
 
     void OnTimeSize(wxCommandEvent& event) { m_radioBtnSizeDate->SetValue(true); }
@@ -632,10 +616,9 @@ void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(CompConfig& cmpConfig)
+ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig)
 {
-    CompareCfgDialog syncDlg(nullptr, cmpConfig);
-
+    CompareCfgDialog syncDlg(parent, cmpConfig);
     return static_cast<ReturnSmallDlg::ButtonPressed>(syncDlg.ShowModal());
 }
 //########################################################################################
@@ -650,8 +633,8 @@ private:
     void OnOkay(wxCommandEvent& event);
     void OnResetDialogs(wxCommandEvent& event);
     void OnDefault(wxCommandEvent& event);
-    void OnCancel(wxCommandEvent& event);
-    void OnClose(wxCloseEvent& event);
+    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnAddRow(wxCommandEvent& event);
     void OnRemoveRow(wxCommandEvent& event);
     void OnResize(wxSizeEvent& event);
@@ -741,7 +724,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 
 void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
-    if (showQuestionDlg(ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+    if (showQuestionDlg(this, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
                         _("Make hidden dialogs and warning messages visible again?")) == ReturnQuestionDlg::BUTTON_YES)
         settings.optDialogs.resetDialogs();
 }
@@ -755,18 +738,6 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
     m_checkBoxTransCopy      ->SetValue(defaultCfg.transactionalFileCopy);
     m_checkBoxCopyPermissions->SetValue(defaultCfg.copyFilePermissions);
     set(defaultCfg.gui.externelApplications);
-}
-
-
-void GlobalSettingsDlg::OnCancel(wxCommandEvent& event)
-{
-    EndModal(0);
-}
-
-
-void GlobalSettingsDlg::OnClose(wxCloseEvent& event)
-{
-    EndModal(0);
 }
 
 
@@ -835,9 +806,9 @@ void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings)
+ReturnSmallDlg::ButtonPressed zen::showGlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings)
 {
-    GlobalSettingsDlg settingsDlg(nullptr, globalSettings);
+    GlobalSettingsDlg settingsDlg(parent, globalSettings);
     return static_cast<ReturnSmallDlg::ButtonPressed>(settingsDlg.ShowModal());
 }
 //########################################################################################
@@ -850,8 +821,8 @@ public:
 
 private:
     void OnOkay(wxCommandEvent& event);
-    void OnCancel(wxCommandEvent& event) { EndModal(0); }
-    void OnClose(wxCloseEvent& event) { EndModal(0); }
+    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
 
     virtual void OnChangeSelectionFrom(wxCalendarEvent& event)
     {
@@ -960,8 +931,8 @@ void SelectTimespanDlg::OnOkay(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(Int64& timeFrom, Int64& timeTo)
+ReturnSmallDlg::ButtonPressed zen::showSelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo)
 {
-    SelectTimespanDlg timeSpanDlg(nullptr, timeFrom, timeTo);
+    SelectTimespanDlg timeSpanDlg(parent, timeFrom, timeTo);
     return static_cast<ReturnSmallDlg::ButtonPressed>(timeSpanDlg.ShowModal());
 }

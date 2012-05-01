@@ -19,8 +19,14 @@
 <source>Browse directory</source>
 <target>Verken map</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Bezig met afbreken: Wacht op beëindiging huidige bewerking...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Geautomatiseerde Synchronisatie</target>
+
+<source>Error</source>
+<target>Fout</target>
 
 <source>Select alternate comparison settings</source>
 <target>Selecteer alternatieve vergelijkings instellingen</target>
@@ -51,9 +57,6 @@
 
 <source>About</source>
 <target>Informatie</target>
-
-<source>Error</source>
-<target>Fout</target>
 
 <source>Warning</source>
 <target>Waarschuwing</target>
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Linux Fout Code %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Fout tijdens opzoeken van snelkoppeling:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Kan snelkoppeling %x niet vinden.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -136,35 +139,41 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Fout tijdens uitlezen van synchronisatie-database:</target>
+<source>Cannot read file %x.</source>
+<target>Kan bestand %x niet vinden.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Fout tijdens schrijven naar synchronisatie-database:</target>
+<source>Cannot write file %x.</source>
+<target>Kan bestand %x niet schrijven.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Opmaak van synchronisatie-database komt niet overeen:</target>
+<source>Database file %x is incompatible.</source>
+<target>Database bestand %x is niet compatibel.</target>
 
 <source>Initial synchronization:</source>
 <target>Initiële  synchronisatie:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Eén van de FreeFileSync database bestanden bestaat nog niet:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Database bestand %x bestaat nog niet.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Database bestanden delen geen gezamelijke synchronisatie sessie:</target>
+<source>Out of memory!</source>
+<target>Onvoldoende geheugen!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Database bestanden delen geen gezamelijke sessie.</target>
 
 <source>An exception occurred!</source>
 <target>Er heeft een uitzondering plaatsgevonden!</target>
 
-<source>Error reading file attributes:</source>
-<target>Fout tijdens lezen van bestandsattributen</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Kan bestandskenmerken van %x niet uitlezen.</target>
+
+<source>Cannot get process information.</source>
+<target>Kan geen procesinformatie verkrijgen.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Wacht totdat map is vergrendeld (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Fout tijdens mapvergrendeling:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Kan directory %x niet sluiten.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -175,8 +184,8 @@
 <pluralform>%x sec</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Fout tijdens lezen van bestand:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Fout bij het parsen van bestand %x, rij %y, kolom %z.</target>
 
 <source>Scanning:</source>
 <target>Doorzoekt:</target>
@@ -193,38 +202,32 @@
 <pluralform>[%x Threads]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Foutief FreeFileSync configuratiebestand!</target>
+<source>/sec</source>
+<target>/sec</target>
 
-<source>Error parsing configuration file:</source>
-<target>Fout tijdens verwerking configuratiebestand:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>Bestand %x bevat geen valide configuratie.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Configuratie alleen gedeeltelijk geladen:</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Configuratie bestand %x alleen deels geladen.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>Niet mogelijk om %x naar de Prullenbak te verplaatsen!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Kan de Volume Schaduwkopie Service niet benaderen.</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Gebruik alstublieft de FreeFileSync 64-bit versie om schaduwkopieën te maken op dit systeem.</target>
 
 <source>Cannot load file %x.</source>
 <target>Kan bestand %x niet laden.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Fout bij toegang tot Volume Schaduwkopie Service!</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Het aanmaken van schaduwkopieën op WOW64 wordt niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Kan volumenaam niet bepalen voor bestand:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>Het pad %x bevat geen schijfnaam.</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Schijfnaam %x maakt geen deel uit van bestandsnaam %y!</target>
 
-<source>/sec</source>
-<target>/sec</target>
-
-<source>File does not exist:</source>
-<target>Bestand bestaat niet:</target>
+<source>Cannot find file %x.</source>
+<target>Kan bestand %x niet vinden.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Kan de volgende XML elementen niet lezen:</target>
@@ -297,14 +300,17 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Start</source>
 <target>Start</target>
 
+<source>&Retry</source>
+<target>&Opnieuw proberen</target>
+
+<source>Cancel</source>
+<target>Annuleren</target>
+
 <source>(Build: %x)</source>
 <target>(Build: %x)</target>
 
 <source>RealtimeSync configuration</source>
 <target>RealtimeSync configuratie</target>
-
-<source>File already exists. Overwrite?</source>
-<target>Bestand bestaat al. Overschrijven?</target>
 
 <source>&Restore</source>
 <target>&Herstellen</target>
@@ -348,20 +354,20 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>FreeFileSync configuration</source>
 <target>FreeFileSync configuratie</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>FreeFileSync Taaklijst</target>
-
-<source>Unable to create log file!</source>
-<target>Niet in staat om een logbestand aan te maken!</target>
-
 <source>Batch execution</source>
 <target>Taak uitvoeren</target>
 
-<source>Stop</source>
-<target>Stop</target>
+<source>Items processed:</source>
+<target>Onderdelen verwerkt:</target>
+
+<source>Items remaining:</source>
+<target>Onderdelen te gaan:</target>
 
 <source>Total time:</source>
 <target>Totale tijd:</target>
+
+<source>Stop</source>
+<target>Stop</target>
 
 <source>Synchronization aborted!</source>
 <target>Synchronisatie afgebroken!</target>
@@ -369,14 +375,17 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Synchronization completed with errors!</source>
 <target>Synchronisatie is met fouten afgerond!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Niks om te synchroniseren!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Synchronisatie succesvol afgerond!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Toets "Switch" om FreeFileSync GUI mode te openen.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Druk op "Omschakelen" om problemen op te lossen in het hoofdscherm van FreeFileSync.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Schakelt over naar FreeFileSync GUI mode...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Bezig met omschakelen naar het FreeFileSync hoofdscherm.</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Niet in staat verbinding te maken met sourceforge.net!</target>
@@ -534,9 +543,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Items found:</source>
 <target>Onderdelen gevonden:</target>
 
-<source>Items remaining:</source>
-<target>Onderdelen te gaan:</target>
-
 <source>Speed:</source>
 <target>Snelheid:</target>
 
@@ -588,9 +594,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>&Load</source>
 <target>&Laden</target>
 
-<source>&Cancel</source>
-<target>&Annuleren</target>
-
 <source>Select variant:</source>
 <target>Selecteer een variant:</target>
 
@@ -639,8 +642,8 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Conflict/file cannot be categorized</source>
 <target>Conflict/Bestand kan niet worden gecategoriseerd</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Vergelijk met...</target>
@@ -674,9 +677,6 @@ overeenkomt
 
 <source>Synchronizing...</source>
 <target>Synchroniseert...</target>
-
-<source>Items processed:</source>
-<target>Onderdelen verwerkt:</target>
 
 <source>&Pause</source>
 <target>&Pauze</target>
@@ -717,14 +717,11 @@ overeenkomt
 <source>&Ignore</source>
 <target>&Negeren</target>
 
-<source>&Retry</source>
-<target>&Opnieuw proberen</target>
-
 <source>Do not show this dialog again</source>
 <target>Toon deze melding niet meer</target>
 
 <source>&Switch</source>
-<target>&Verander</target>
+<target>&Omschakelen</target>
 
 <source>&Yes</source>
 <target>&Ja</target>
@@ -1017,9 +1014,6 @@ Uitsluiten: \stuff\temp\*
 <source>File list exported!</source>
 <target>Bestandslijst geëxporteerd!</target>
 
-<source>Error writing file:</source>
-<target>Fout tijdens schrijven van bestand:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1065,20 +1059,20 @@ Uitsluiten: \stuff\temp\*
 <source>Paused</source>
 <target>Gepauzeerd</target>
 
+<source>Initializing...</source>
+<target>Initialiseren...</target>
+
 <source>Aborted</source>
 <target>Afgebroken</target>
 
 <source>Completed</source>
 <target>Volbracht</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Bezig met afbreken: Wacht op beëindiging huidige bewerking...</target>
+<source>Continue</source>
+<target>Doorgaan</target>
 
 <source>Pause</source>
 <target>Pauze</target>
-
-<source>Continue</source>
-<target>Doorgaan</target>
 
 <source>Cannot find %x</source>
 <target>Kan %x niet vinden</target>
@@ -1218,65 +1212,65 @@ Uitsluiten: \stuff\temp\*
 <pluralform>%x dagen</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Initaliseren van map-observatie niet mogelijk:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Fout tijdens observeren van mappen.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Kan locatie %x niet controleren.</target>
 
 <source>Conversion error:</source>
 <target>Converteer fout:</target>
 
-<source>Error deleting file:</source>
-<target>Fout tijdens verwijderen van bestand:</target>
+<source>Cannot delete file %x.</source>
+<target>Kan bestand %x niet verwijderen.</target>
 
-<source>Error moving file:</source>
-<target>Fout tijdens verplaatsen van bestand:</target>
+<source>The file is locked by another process:</source>
+<target>Het bestand is op afgesloten door een ander proces:</target>
 
-<source>Target file already existing!</source>
-<target>Doelbestand bestaat al!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Kan bestand %x niet verplaatsen naar %y.</target>
 
-<source>Error moving directory:</source>
-<target>Fout tijdens verplaatsen van map:</target>
+<source>Cannot delete directory %x.</source>
+<target>Kan bestand %x niet verwijderen.</target>
 
-<source>Target directory already existing!</source>
-<target>Doelmap bestaat al!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Kan wijzigings tijd van %x niet toevoegen.</target>
 
-<source>Error deleting directory:</source>
-<target>Fout tijdens het verwijderen van map:</target>
+<source>Cannot find system function %x.</source>
+<target>Kan systeemfunctie %x niet vinden.</target>
 
-<source>Error changing modification time:</source>
-<target>Fout tijdens aanpassing van de wijzigingstijd:</target>
+<source>Cannot read security context of %x.</source>
+<target>Kan de beveiligingscontext van %x niet lezen.</target>
 
-<source>Error loading library function:</source>
-<target>Fout tijdens laden van bibliotheek functie:</target>
+<source>Cannot write security context of %x.</source>
+<target>Kan de beveiligingscontext van %x niet schrijven.</target>
 
-<source>Error reading security context:</source>
-<target>Fout tijdens lezen van beveiligingscontext:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Kan de bevoegdheden van %x niet lezen.</target>
 
-<source>Error writing security context:</source>
-<target>Fout tijdens schrijven van beveiligingscontext:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Kan de bevoegdheden van %x niet schrijven.</target>
 
-<source>Error copying file permissions:</source>
-<target>Fout tijdens kopiëren van bestandspermissies:</target>
+<source>Cannot create directory %x.</source>
+<target>Kan map %x niet aanmaken.</target>
 
-<source>Error creating directory:</source>
-<target>Fout tijdens het aanmaken van map:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Kan snelkoppeling %x niet kopiëren naar %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Fout tijdens kopiëren van snelkoppeling:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Kan bestandskenmerken van %x niet schrijven.</target>
 
-<source>Error copying file:</source>
-<target>Fout tijdens kopiëren van bestand:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Kan bestand %x niet kopiëren naar %y.</target>
 
-<source>Error traversing directory:</source>
-<target>Fout tijdens doorzoeken van map:</target>
+<source>Cannot read directory %x.</source>
+<target>Kan map %x niet lezen.</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Oneindige lus bij het doorlopen van map:</target>
+<source>Endless loop.</source>
+<target>Oneindige loop.</target>
 
-<source>Error setting privilege:</source>
-<target>Fout tijdens instellen van privileges:</target>
+<source>Cannot set privilege %x.</source>
+<target>Kan privilege %x niet instellen.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Niet mogelijk om %x naar de Prullenbak te verplaatsen!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Beide zijdes zijn veranderd sinds de laatste synchronisatie!</target>
@@ -1302,8 +1296,8 @@ Uitsluiten: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Je kan deze error negeren als de map leeg is.</target>
 
-<source>Directory does not exist:</source>
-<target>Map bestaat niet:</target>
+<source>Cannot find directory %x.</source>
+<target>Kan map %x niet vinden.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:</target>
@@ -1311,20 +1305,17 @@ Uitsluiten: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Synchronisatie voorbereiden</target>
 
-<source>Out of memory!</source>
-<target>Onvoldoende geheugen!</target>
+<source>Conflict detected:</source>
+<target>Conflict gedetecteerd:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Bestand %x heeft een ongeldige datum!</target>
 
-<source>Conflict detected:</source>
-<target>Conflict gedetecteerd:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Bestanden %x hebben dezelfde datums maar een afwijkende grootte!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Snelkoppeling %x heeft dezelfde datum maar een ander doel!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Snelkoppelingen %x hebben dezelfde datum maar een verschillend doel.</target>
 
 <source>Comparing content of files %x</source>
 <target>De inhoud van %x bestanden wordt vergeleken</target>
@@ -1407,11 +1398,11 @@ Uitsluiten: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Bestand %x wordt aangemaakt</target>
 
-<source>Creating folder %x</source>
-<target>Map %x wordt aangemaakt</target>
-
 <source>Creating symbolic link %x</source>
 <target>Snelkoppeling %x wordt aangemaakt</target>
+
+<source>Creating folder %x</source>
+<target>Map %x wordt aangemaakt</target>
 
 <source>Overwriting file %x</source>
 <target>Bezig met overschrijven van bestand %x</target>
@@ -1431,8 +1422,8 @@ Uitsluiten: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Map voor bestands versiebeheer is niet ingegeven!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Bronmap bestaat niet meer:</target>
+<source>Source directory %x not found.</source>
+<target>Bronmap %x niet gevonden.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Er bestaan onopgeloste conflicten!</target>
@@ -1466,12 +1457,6 @@ Uitsluiten: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Genereren van database...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Niks om te synchroniseren!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>Niet in staat om vergrendeld bestand %x te synchroniseren!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Dataverificatie-fout: Bron en doelbestand hebben verschillende inhoud!</target>

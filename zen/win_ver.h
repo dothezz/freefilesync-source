@@ -27,27 +27,7 @@ bool win7OrLater();
 
 
 
-
-
-
-
-
-
 //######################### implementation #########################
-namespace impl
-{
-inline
-bool winXyOrLater(DWORD major, DWORD minor) //migrate: hold version data as static variable, as soon as C++11 thread safe statics are available in VS
-{
-    OSVERSIONINFO osvi = {};
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if (::GetVersionEx(&osvi))
-        return osvi.dwMajorVersion > major ||
-               (osvi.dwMajorVersion == major && osvi.dwMinorVersion >= minor);
-    return false;
-}
-}
-
 //version overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
 
 //2000        is version 5.0
@@ -55,6 +35,20 @@ bool winXyOrLater(DWORD major, DWORD minor) //migrate: hold version data as stat
 //Server 2003 is version 5.2
 //Vista       is version 6.0
 //Seven       is version 6.1
+
+namespace impl
+{
+inline
+bool winXyOrLater(DWORD major, DWORD minor)
+{
+    OSVERSIONINFO osvi = {};
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    if (::GetVersionEx(&osvi)) //38 ns per call! (yes, that's nano!) -> we do NOT miss C++11 thread safe statics right now...
+        return osvi.dwMajorVersion > major ||
+               (osvi.dwMajorVersion == major && osvi.dwMinorVersion >= minor);
+    return false;
+}
+}
 
 inline
 bool winXpOrLater() { return impl::winXyOrLater(5, 1); }

@@ -37,8 +37,7 @@ Zstring resolveRelativePath(Zstring relativeName) //note: ::GetFullPathName() is
                                                  &buffer[0], //__out  LPTSTR lpBuffer,
                                                  nullptr);   //__out  LPTSTR *lpFilePart
     if (charsWritten == 0 || charsWritten >= bufferSize) //theoretically, charsWritten can never be == bufferSize
-        //ERROR! Don't do anything
-        return relativeName;
+        return relativeName; //ERROR! Don't do anything
 
     return Zstring(&buffer[0], charsWritten);
 }
@@ -53,13 +52,7 @@ Zstring resolveRelativePath(const Zstring& relativeName)
     {
         std::vector<char> buffer(10000);
         if (::getcwd(&buffer[0], buffer.size()) != nullptr)
-        {
-            Zstring workingDir = &buffer[0];
-            if (!endsWith(workingDir, FILE_NAME_SEPARATOR))
-                workingDir += FILE_NAME_SEPARATOR;
-
-            return workingDir + relativeName;
-        }
+            return appendSeparator(&buffer[0]) + relativeName;
     }
     return relativeName;
 
@@ -177,13 +170,13 @@ bool replaceMacro(wxString& macro) //macro without %-characters, return true if 
         return false;
 
     //there are equally named environment variables %TIME%, %DATE% existing, so replace these first!
-    if (macro.CmpNoCase(wxT("time")) == 0)
+    if (macro.CmpNoCase(L"time") == 0)
     {
         macro = formatTime<wxString>(L"%H%M%S");
         return true;
     }
 
-    if (macro.CmpNoCase(wxT("date")) == 0)
+    if (macro.CmpNoCase(L"date") == 0)
     {
         macro = formatTime<wxString>(FORMAT_ISO_DATE);
         return true;
@@ -234,32 +227,27 @@ bool replaceMacro(wxString& macro) //macro without %-characters, return true if 
 }
 
 
-void expandMacros(wxString& text)
+//returns expanded or original string
+wxString expandMacros(const wxString& text)
 {
-    const wxChar SEPARATOR = '%';
+    const wxChar SEPARATOR = L'%';
 
-    if (text.Find(SEPARATOR) != wxNOT_FOUND)
+    if (contains(text, SEPARATOR))
     {
-        wxString prefix  = text.BeforeFirst(SEPARATOR);
-        wxString postfix = text.AfterFirst(SEPARATOR);
-        if (postfix.Find(SEPARATOR) != wxNOT_FOUND)
+        wxString prefix = text.BeforeFirst(SEPARATOR);
+        wxString rest   = text.AfterFirst(SEPARATOR);
+        if (contains(rest, SEPARATOR))
         {
-            wxString potentialMacro = postfix.BeforeFirst(SEPARATOR);
-            wxString rest           = postfix.AfterFirst(SEPARATOR); //text == prefix + SEPARATOR + potentialMacro + SEPARATOR + rest
+            wxString potentialMacro = beforeFirst(rest, SEPARATOR);
+            wxString postfix        = afterFirst (rest, SEPARATOR); //text == prefix + SEPARATOR + potentialMacro + SEPARATOR + postfix
 
             if (replaceMacro(potentialMacro))
-            {
-                expandMacros(rest);
-                text = prefix + potentialMacro + rest;
-            }
+                return prefix + potentialMacro + expandMacros(postfix);
             else
-            {
-                rest = SEPARATOR + rest;
-                expandMacros(rest);
-                text = prefix + SEPARATOR + potentialMacro + rest;
-            }
+                return prefix + SEPARATOR + potentialMacro + expandMacros(SEPARATOR + postfix);
         }
     }
+    return text;
 }
 
 
@@ -286,59 +274,52 @@ private:
 #endif
 
 
+//networks and cdrom excluded - this should not block
 Zstring volumenNameToPath(const Zstring& volumeName) //return empty string on error
 {
 #ifdef FFS_WIN
-    std::vector<wchar_t> volGuid(10000);
+    //FindFirstVolume(): traverses volumes on local hard disks only!
+    //GetLogicalDriveStrings(): traverses all *logical* volumes, including CD-ROM, FreeOTFE virtual volumes
 
-    HANDLE hVol = ::FindFirstVolume(&volGuid[0], static_cast<DWORD>(volGuid.size()));
-    if (hVol != INVALID_HANDLE_VALUE)
+    const DWORD bufferSize = ::GetLogicalDriveStrings(0, nullptr);
+    std::vector<wchar_t> buffer(bufferSize);
+
+    const DWORD rv = ::GetLogicalDriveStrings(bufferSize,  //__in   DWORD nBufferLength,
+                                              &buffer[0]); //__out  LPTSTR lpBuffer
+    if (0 < rv && rv < bufferSize)
     {
-        ZEN_ON_SCOPE_EXIT(::FindVolumeClose(hVol));
+        //search for matching path in parallel until first hit
+        RunUntilFirstHit<Zstring> findFirstMatch;
 
-        do
+        for (const wchar_t* iter = &buffer[0]; *iter != 0; iter += strLength(iter) + 1) //list terminated by empty c-string
         {
-            std::vector<wchar_t> volName(MAX_PATH + 1);
+            const Zstring path = iter;
 
-            if (::GetVolumeInformation(&volGuid[0], //__in_opt   LPCTSTR lpRootPathName,
-                                       &volName[0], //__out      LPTSTR lpVolumeNameBuffer,
-                                       static_cast<DWORD>(volName.size()), //__in       DWORD nVolumeNameSize,
-                                       nullptr,     //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                       nullptr,     //__out_opt  LPDWORD lpMaximumComponentLength,
-                                       nullptr,     //__out_opt  LPDWORD lpFileSystemFlags,
-                                       nullptr,     //__out      LPTSTR lpFileSystemNameBuffer,
-                                       0))          //__in       DWORD nFileSystemNameSize
+            findFirstMatch.addJob([path, volumeName]() -> std::unique_ptr<Zstring>
             {
-                if (EqualFilename()(volumeName, Zstring(&volName[0])))
-                {
-                    //GetVolumePathNamesForVolumeName is not available for Windows 2000!
-                    typedef	BOOL (WINAPI* GetVolumePathNamesForVolumeNameWFunc)(LPCWSTR lpszVolumeName,
-                                                                                LPWCH  lpszVolumePathNames,
-                                                                                DWORD  cchBufferLength,
-                                                                                PDWORD lpcchReturnLength);
+                UINT type = ::GetDriveType(path.c_str()); //non-blocking call!
+                if (type == DRIVE_REMOTE ||
+                type == DRIVE_CDROM)
+                    return nullptr;
 
-                    const SysDllFun<GetVolumePathNamesForVolumeNameWFunc> getVolumePathNamesForVolumeName(L"kernel32.dll", "GetVolumePathNamesForVolumeNameW");
-                    if (getVolumePathNamesForVolumeName)
-                    {
-                        std::vector<wchar_t> buffer(10000);
-                        DWORD returnedLen = 0;
-                        if (getVolumePathNamesForVolumeName(&volGuid[0],   //__in   LPCTSTR lpszVolumeName,
-                                                            &buffer[0],    //__out  LPTSTR lpszVolumePathNames,
-                                                            static_cast<DWORD>(buffer.size()), //__in   DWORD cchBufferLength,
-                                                            &returnedLen)) //__out  PDWORD lpcchReturnLength
-                        {
-                            //Attention: in contrast to documentation, this function may write a *single* 0 into
-                            //buffer if volGuid does not have any associated volume paths (e.g. a hidden volume)
-                            const Zstring volPath(&buffer[0]);
-                            if (!volPath.empty())
-                                return volPath; //return first path name in double-null terminated list!
-                        }
-                    }
-                    return &volGuid[0]; //GUID looks ugly, but should be working correctly
-                }
-            }
+                //next call seriously blocks for non-existing network drives!
+                std::vector<wchar_t> volName(MAX_PATH + 1); //docu says so
+
+                if (::GetVolumeInformation(path.c_str(),        //__in_opt   LPCTSTR lpRootPathName,
+                &volName[0], //__out      LPTSTR lpVolumeNameBuffer,
+                static_cast<DWORD>(volName.size()), //__in       DWORD nVolumeNameSize,
+                nullptr,     //__out_opt  LPDWORD lpVolumeSerialNumber,
+                nullptr,     //__out_opt  LPDWORD lpMaximumComponentLength,
+                nullptr,     //__out_opt  LPDWORD lpFileSystemFlags,
+                nullptr,     //__out      LPTSTR lpFileSystemNameBuffer,
+                0))          //__in       DWORD nFileSystemNameSize
+                    if (EqualFilename()(volumeName, Zstring(&volName[0])))
+                        return zen::make_unique<Zstring>(path);
+                return nullptr;
+            });
         }
-        while (::FindNextVolume(hVol, &volGuid[0], static_cast<DWORD>(volGuid.size())));
+        if (auto result = findFirstMatch.get()) //blocks until ready
+            return *result;
     }
 
 #elif defined FFS_LINUX
@@ -358,62 +339,58 @@ Zstring volumenNameToPath(const Zstring& volumeName) //return empty string on er
 
 
 #ifdef FFS_WIN
-//attention: this call may seriously block if network volume is not available!!!
+//networks and cdrom excluded - this should not block
 Zstring volumePathToName(const Zstring& volumePath) //return empty string on error
 {
-    const DWORD bufferSize = MAX_PATH + 1;
-    std::vector<wchar_t> volName(bufferSize);
-
-    if (::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
-                               &volName[0],        //__out      LPTSTR lpVolumeNameBuffer,
-                               bufferSize,         //__in       DWORD nVolumeNameSize,
-                               nullptr,            //__out_opt  LPDWORD lpVolumeSerialNumber,
-                               nullptr,            //__out_opt  LPDWORD lpMaximumComponentLength,
-                               nullptr,            //__out_opt  LPDWORD lpFileSystemFlags,
-                               nullptr,            //__out      LPTSTR lpFileSystemNameBuffer,
-                               0))                 //__in       DWORD nFileSystemNameSize
+    UINT rv = ::GetDriveType(volumePath.c_str()); //non-blocking call!
+    if (rv != DRIVE_REMOTE &&
+        rv != DRIVE_CDROM)
     {
-        return &volName[0];
+        std::vector<wchar_t> buffer(MAX_PATH + 1);
+
+        if (::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
+                                   &buffer[0],         //__out      LPTSTR lpVolumeNameBuffer,
+                                   static_cast<DWORD>(buffer.size()), //__in       DWORD nVolumeNameSize,
+                                   nullptr,            //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                   nullptr,            //__out_opt  LPDWORD lpMaximumComponentLength,
+                                   nullptr,            //__out_opt  LPDWORD lpFileSystemFlags,
+                                   nullptr,            //__out      LPTSTR lpFileSystemNameBuffer,
+                                   0))                 //__in       DWORD nFileSystemNameSize
+            return &buffer[0];
     }
     return Zstring();
 }
 #endif
 
 
-void expandVolumeName(Zstring& text)  // [volname]:\folder       [volname]\folder       [volname]folder     -> C:\folder
+//expand volume name if possible, return original input otherwise
+Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volname]\folder       [volname]folder     -> C:\folder
 {
     //this would be a nice job for a C++11 regex...
 
-
     //we only expect the [.*] pattern at the beginning => do not touch dir names like "C:\somedir\[stuff]"
-    trim(text, true, false);
+    Zstring textTmp = text;
+    trim(textTmp, true, false);
 
-    if (startsWith(text, Zstr("[")))
+    if (startsWith(textTmp, Zstr("[")))
     {
-        size_t posEnd = text.find(Zstr("]"));
+        size_t posEnd = textTmp.find(Zstr("]"));
         if (posEnd != Zstring::npos)
         {
-            Zstring volname = Zstring(text.c_str() + 1, posEnd - 1);
-            Zstring after   = Zstring(text.c_str() + posEnd + 1);
+            Zstring volname = Zstring(textTmp.c_str() + 1, posEnd - 1);
+            Zstring rest    = Zstring(textTmp.c_str() + posEnd + 1);
 
-            if (startsWith(after, Zstr(':')))
-                after = afterFirst(after, Zstr(':'));
-            if (startsWith(after, FILE_NAME_SEPARATOR))
-                after = afterFirst(after, FILE_NAME_SEPARATOR);
+            if (startsWith(rest, Zstr(':')))
+                rest = afterFirst(rest, Zstr(':'));
+            if (startsWith(rest, FILE_NAME_SEPARATOR))
+                rest = afterFirst(rest, FILE_NAME_SEPARATOR);
 
             //[.*] pattern was found...
             if (!volname.empty())
             {
-                Zstring volPath = volumenNameToPath(volname); //return empty string on error
+                Zstring volPath = volumenNameToPath(volname); //should not block?!
                 if (!volPath.empty())
-                {
-                    if (!endsWith(volPath, FILE_NAME_SEPARATOR))
-                        volPath += FILE_NAME_SEPARATOR;
-
-                    text = volPath + after;
-                    //successfully replaced pattern
-                    return;
-                }
+                    return appendSeparator(volPath) + rest; //successfully replaced pattern
             }
             //error: did not find corresponding volume name:
 
@@ -425,13 +402,13 @@ void expandVolumeName(Zstring& text)  // [volname]:\folder       [volname]\folde
                C:\Program Files\FreeFileSync\[FFS USB]\FreeFileSync\
                                                                                         */
 #ifdef FFS_WIN
-            text = L"?:\\[" + volname + L"]\\" + after;
+            return L"?:\\[" + volname + L"]\\" + rest;
 #elif defined FFS_LINUX
-            text = "/.../[" + volname + "]/" + after;
+            return "/.../[" + volname + "]/" + rest;
 #endif
-            return;
         }
     }
+    return text;
 }
 }
 
@@ -445,20 +422,14 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         dirname[1] == L':' &&
         dirname[2] == L'\\')
     {
-        //attention: "volumePathToName()" will seriously block if network volume is not available!!!
-        boost::unique_future<Zstring> futVolName = zen::async([=] { return volumePathToName(Zstring(dirname.c_str(), 3)); });
-        if (futVolName.timed_wait(boost::posix_time::seconds(1)))
-        {
-            Zstring volname = futVolName.get();
-            if (!volname.empty())
-                output.insert(L"[" + volname + L"]" + Zstring(dirname.c_str() + 2));
-        }
+        Zstring volname = volumePathToName(Zstring(dirname.c_str(), 3)); //should not block
+        if (!volname.empty())
+            output.insert(L"[" + volname + L"]" + Zstring(dirname.c_str() + 2));
     }
 
     //2. replace volume name by volume path: [SYSTEM]\dirname -> c:\dirname
     {
-        Zstring testVolname = dirname;
-        expandVolumeName(testVolname);
+        Zstring testVolname = expandVolumeName(dirname); //should not block
         if (testVolname != dirname)
             if (output.insert(testVolname).second)
                 getDirectoryAliasesRecursive(testVolname, output); //recurse!
@@ -504,11 +475,10 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
 
     //4. replace (all) macros: %USERPROFILE% -> C:\Users\username
     {
-        wxString testMacros = toWx(dirname);
-        expandMacros(testMacros);
-        if (toZ(testMacros) != dirname)
-            if (output.insert(toZ(testMacros)).second)
-                getDirectoryAliasesRecursive(toZ(testMacros), output); //recurse!
+        Zstring testMacros = toZ(expandMacros(toWx(dirname)));
+        if (testMacros != dirname)
+            if (output.insert(testMacros).second)
+                getDirectoryAliasesRecursive(testMacros, output); //recurse!
     }
 }
 
@@ -535,19 +505,16 @@ Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()
 {
     //Formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
 
-    wxString dirnameTmp = toWx(dirString);
-    expandMacros(dirnameTmp);
+    Zstring dirname = toZ(expandMacros(toWx(dirString)));
 
-    Zstring output = toZ(dirnameTmp);
-
-    expandVolumeName(output);
+    dirname = expandVolumeName(dirname); //should not block
 
     //remove leading/trailing whitespace
-    trim(output, true, false);
-    while (endsWith(output, " ")) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
-        output.resize(output.size() - 1);
+    trim(dirname, true, false);
+    while (endsWith(dirname, " ")) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
+        dirname.resize(dirname.size() - 1);
 
-    if (output.empty()) //an empty string would later be resolved as "\"; this is not desired
+    if (dirname.empty()) //an empty string would later be resolved as "\"; this is not desired
         return Zstring();
 
     /*
@@ -560,12 +527,9 @@ Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()
     WINDOWS/LINUX:
      - detection of dependent directories, e.g. "\" and "C:\test"
      */
-    output = resolveRelativePath(output);
+    dirname = resolveRelativePath(dirname);
 
-    if (!endsWith(output, FILE_NAME_SEPARATOR))
-        output += FILE_NAME_SEPARATOR;
-
-    return output;
+    return appendSeparator(dirname);
 }
 
 
@@ -585,7 +549,8 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
 
     //if (::GetFileAttributes((driveLetter + L'\\').c_str()) == INVALID_FILE_ATTRIBUTES) <- this will seriously block if network is not reachable!!!
 
-    const Zstring dirname = removeLongPathPrefix(dirnameOrig);
+    Zstring dirname = removeLongPathPrefix(dirnameOrig);
+    trim(dirname, true, false);
 
     //1. local path
     if (dirname.size() >= 2 && iswalpha(dirname[0]) && dirname[1] == L':')

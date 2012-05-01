@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <wx/string.h>
+#include <zen/zstring.h>
 #include "../lib/xml_base.h"
 
 
@@ -22,8 +23,8 @@ struct XmlRealConfig
     size_t delay;
 };
 
-void readRealConfig(const wxString& filename, XmlRealConfig& config);        //throw (xmlAccess::FfsXmlError);
-void writeRealConfig(const XmlRealConfig& config, const wxString& filename); //throw (xmlAccess::FfsXmlError);
+void readRealConfig(const Zstring& filename, XmlRealConfig& config);        //throw FfsXmlError
+void writeRealConfig(const XmlRealConfig& config, const Zstring& filename); //throw FfsXmlError
 }
 
 #endif // XMLPROCESSING_H_INCLUDED

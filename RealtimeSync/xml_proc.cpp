@@ -36,22 +36,22 @@ bool isXmlTypeRTS(const XmlDoc& doc) //throw()
 }
 
 
-void xmlAccess::readRealConfig(const wxString& filename, XmlRealConfig& config)
+void xmlAccess::readRealConfig(const Zstring& filename, XmlRealConfig& config)
 {
-    if (!fileExists(toZ(filename)))
-        throw FfsXmlError(_("File does not exist:") + L"\n\"" + toZ(filename) + L"\"");
+    if (!fileExists(filename))
+        throw FfsXmlError(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)));
 
     XmlDoc doc;
-    loadXmlDocument(toZ(filename), doc);  //throw (FfsXmlError)
+    loadXmlDocument(filename, doc); //throw FfsXmlError
 
     if (!isXmlTypeRTS(doc))
-        throw FfsXmlError(_("Error parsing configuration file:") + L"\n\"" + toZ(filename) + L"\"");
+        throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
 
     XmlIn in(doc);
     ::readConfig(in, config);
 
     if (in.errorsOccured())
-        throw FfsXmlError(_("Configuration loaded partially only:") + L"\n\"" + toZ(filename) + L"\"\n\n" +
+        throw FfsXmlError(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filename)) + L"\n\n" +
                           getErrorMessageFormatted(in), FfsXmlError::WARNING);
 }
 
@@ -67,7 +67,7 @@ void writeConfig(const XmlRealConfig& config, XmlOut& out)
 }
 
 
-void xmlAccess::writeRealConfig(const XmlRealConfig& config, const wxString& filename)
+void xmlAccess::writeRealConfig(const XmlRealConfig& config, const Zstring& filename)
 {
     XmlDoc doc("FreeFileSync");
     doc.root().setAttribute("XmlType", "REAL");
@@ -75,5 +75,5 @@ void xmlAccess::writeRealConfig(const XmlRealConfig& config, const wxString& fil
     XmlOut out(doc);
     writeConfig(config, out);
 
-    saveXmlDocument(doc, toZ(filename)); //throw (FfsXmlError)
+    saveXmlDocument(doc, filename); //throw (FfsXmlError)
 }

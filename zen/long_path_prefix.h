@@ -12,7 +12,7 @@
 
 namespace zen
 {
-//handle filenames longer-equal 260 (== MAX_PATH) characters by applying \\?\-prefix (Reference: http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath)
+//handle filenames longer-equal 260 (== MAX_PATH) characters by applying \\?\-prefix; see: http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
 /*
 1. path must be absolute
 2. if path is smaller than MAX_PATH nothing is changed!

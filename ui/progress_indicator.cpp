@@ -6,20 +6,19 @@
 
 #include "progress_indicator.h"
 #include <memory>
-#include <zen/basic_math.h>
 #include <wx/imaglist.h>
 #include <wx/stopwatch.h>
 #include <wx/wupdlock.h>
+#include <zen/basic_math.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/toggle_button.h>
-#include <wx+/string_conv.h>
 #include <wx+/format_unit.h>
 #include <wx+/image_tools.h>
 #include <wx+/graph.h>
 #include <wx+/no_flicker.h>
 #include "gui_generated.h"
 #include "../lib/resources.h"
-#include "../lib/statistics.h"
+#include "../lib/perf_check.h"
 #include "tray_icon.h"
 #include "taskbar.h"
 #include "exec_finished_box.h"
@@ -32,8 +31,8 @@ namespace
 const int GAUGE_FULL_RANGE = 50000;
 
 //window size used for statistics in milliseconds
-const int windowSizeRemainingTime = 60000; //some usecases have dropouts of 40 seconds -> 60 sec. window size handles them well
-const int windowSizeBytesPerSec   =  5000; //
+const int WINDOW_REMAINING_TIME = 60000; //some usecases have dropouts of 40 seconds -> 60 sec. window size handles them well
+const int WINDOW_BYTES_PER_SEC  =  5000; //
 }
 
 
@@ -42,49 +41,24 @@ class CompareStatus::CompareStatusImpl : public CompareStatusGenerated
 public:
     CompareStatusImpl(wxTopLevelWindow& parentWindow);
 
-    void init();     //constructor/destructor semantics, but underlying Window is reused
+    void init(const Statistics& syncStat); //constructor/destructor semantics, but underlying Window is reused
     void finalize(); //
 
-    void switchToCompareBytewise(int totalObjectsToProcess, Int64 totalDataToProcess);
-    void incScannedObjects_NoUpdate(int number);
-    void incProcessedCmpData_NoUpdate(int objectsProcessed, Int64 dataProcessed);
-    void incTotalCmpData_NoUpdate    (int objectsProcessed, Int64 dataProcessed);
-
-    void setStatusText_NoUpdate(const wxString& text);
+    void switchToCompareBytewise();
     void updateStatusPanelNow();
 
 private:
     wxTopLevelWindow& parentWindow_;
     wxString titleTextBackup;
 
-    //status variables
-    size_t scannedObjects;
-    wxString currentStatusText;
-
     wxStopWatch timeElapsed;
 
-    //gauge variables
-    int   totalObjects;   //file/dir/symlink/operation count
-    Int64 totalData;      //unit: [bytes]
-    int   currentObjects;
-    Int64 currentData;
-
-    void showProgressExternally(const wxString& progressText, double fraction = 0); //between [0, 1]
-
-    enum CurrentStatus
-    {
-        SCANNING,
-        COMPARING_CONTENT,
-    };
-
-    CurrentStatus status;
+    const Statistics* syncStat_; //only bound while sync is running
 
     std::unique_ptr<Taskbar> taskbar_;
+    std::unique_ptr<PerfCheck> perf; //estimate remaining time
 
-    //remaining time
-    std::unique_ptr<Statistics> statistics;
-
-    long lastStatCallSpeed;   //used for calculating intervals between statistics update
+    long lastStatCallSpeed;   //used for calculating intervals between showing and collecting perf samples
     long lastStatCallRemTime; //
 };
 
@@ -92,21 +66,17 @@ private:
 CompareStatus::CompareStatusImpl::CompareStatusImpl(wxTopLevelWindow& parentWindow) :
     CompareStatusGenerated(&parentWindow),
     parentWindow_(parentWindow),
-    scannedObjects(0),
-    totalObjects(0),
-    totalData(0),
-    currentObjects(0),
-    currentData(0),
-    status(SCANNING),
-    lastStatCallSpeed(-1000000), //some big number
+    syncStat_(nullptr),
+    lastStatCallSpeed  (-1000000), //some big number
     lastStatCallRemTime(-1000000)
 {
-    init();
+    //init(); -> needed?
 }
 
 
-void CompareStatus::CompareStatusImpl::init()
+void CompareStatus::CompareStatusImpl::init(const Statistics& syncStat)
 {
+    syncStat_ = &syncStat;
     titleTextBackup = parentWindow_.GetTitle();
 
     try //try to get access to Windows 7/Ubuntu taskbar
@@ -115,11 +85,12 @@ void CompareStatus::CompareStatusImpl::init()
     }
     catch (const TaskbarNotAvailable&) {}
 
-    status = SCANNING;
-
     //initialize gauge
     m_gauge2->SetRange(GAUGE_FULL_RANGE);
     m_gauge2->SetValue(0);
+
+    perf.reset();
+    timeElapsed.Start(); //measure total time
 
     //initially hide status that's relevant for comparing bytewise only
     bSizerFilesFound    ->Show(true);
@@ -127,53 +98,34 @@ void CompareStatus::CompareStatusImpl::init()
     sSizerSpeed         ->Show(false);
     sSizerTimeRemaining ->Show(false);
 
-    m_gauge2->Hide();
-    bSizer42->Layout();
-
-    scannedObjects = 0;
-    currentStatusText.clear();
-
-    totalObjects   = 0;
-    totalData      = 0;
-    currentObjects = 0;
-    currentData    = 0;
-
-    statistics.reset();
-
-    timeElapsed.Start(); //measure total time
-
     updateStatusPanelNow();
 
+    m_gauge2->Hide();
+    bSizer42->Layout();
     Layout();
 }
 
 
 void CompareStatus::CompareStatusImpl::finalize()
 {
-    taskbar_.reset();
+    syncStat_ = nullptr;
     parentWindow_.SetTitle(titleTextBackup);
+    taskbar_.reset();
 }
 
 
-void CompareStatus::CompareStatusImpl::switchToCompareBytewise(int totalObjectsToProcess, Int64 totalDataToProcess)
+void CompareStatus::CompareStatusImpl::switchToCompareBytewise()
 {
-    status = COMPARING_CONTENT;
-
-    currentData    = 0;
-    currentObjects = 0;
-    totalData      = totalDataToProcess;
-    totalObjects   = totalObjectsToProcess;
-
-    //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
-    statistics.reset(new Statistics(totalObjectsToProcess, to<double>(totalDataToProcess), windowSizeRemainingTime, windowSizeBytesPerSec));
+    //start to measure perf
+    perf.reset(new PerfCheck(WINDOW_REMAINING_TIME, WINDOW_BYTES_PER_SEC));
     lastStatCallSpeed   = -1000000; //some big number
     lastStatCallRemTime = -1000000;
 
     //show status for comparing bytewise
-    bSizerFilesFound->Show(false);
+    bSizerFilesFound    ->Show(false);
     bSizerFilesRemaining->Show(true);
-    sSizerSpeed->Show(true);
-    sSizerTimeRemaining->Show(true);
+    sSizerSpeed         ->Show(true);
+    sSizerTimeRemaining ->Show(true);
 
     m_gauge2->Show();
     bSizer42->Layout();
@@ -181,154 +133,119 @@ void CompareStatus::CompareStatusImpl::switchToCompareBytewise(int totalObjectsT
 }
 
 
-void CompareStatus::CompareStatusImpl::incScannedObjects_NoUpdate(int number)
-{
-    scannedObjects += number;
-}
-
-
-void CompareStatus::CompareStatusImpl::incProcessedCmpData_NoUpdate(int objectsDelta, Int64 dataDelta)
-{
-    currentData    +=    dataDelta;
-    currentObjects += objectsDelta;
-}
-
-
-void CompareStatus::CompareStatusImpl::incTotalCmpData_NoUpdate(int objectsDelta, Int64 dataDelta)
-{
-    totalData    +=    dataDelta;
-    totalObjects += objectsDelta;
-
-    if (statistics)
-        statistics->setNewTotal(totalObjects, to<double>(totalData));
-}
-
-
-void CompareStatus::CompareStatusImpl::setStatusText_NoUpdate(const wxString& text)
-{
-    currentStatusText = text;
-}
-
-
-void CompareStatus::CompareStatusImpl::showProgressExternally(const wxString& progressText, double fraction)
-{
-    if (parentWindow_.GetTitle() != progressText)
-        parentWindow_.SetTitle(progressText);
-
-    //show progress on Windows 7 taskbar
-
-    if (taskbar_.get())
-        switch (status)
-        {
-            case SCANNING:
-                taskbar_->setStatus(Taskbar::STATUS_INDETERMINATE);
-                break;
-            case COMPARING_CONTENT:
-                taskbar_->setProgress(fraction);
-                taskbar_->setStatus(Taskbar::STATUS_NORMAL);
-                break;
-        }
-}
-
-
 void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
 {
-    //static RetrieveStatistics statistic;
-    //statistic.writeEntry(currentData.ToDouble(), currentObjects);
+    if (!syncStat_) //no comparison running!!
+        return;
+
+    //wxWindowUpdateLocker dummy(this) -> not needed
+
+    const wxString& scannedObjects = toStringSep(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING));
+
+    auto setTitle = [&](const wxString& title)
     {
-        //wxWindowUpdateLocker dummy(this) -> not needed
+        if (parentWindow_.GetTitle() != title)
+            parentWindow_.SetTitle(title);
+    };
 
-        //add both data + obj-count, to handle "deletion-only" cases
-        const double fraction = totalData + totalObjects == 0 ? 0 : std::max(0.0, to<double>(currentData + currentObjects) / to<double>(totalData + totalObjects));
+    bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
 
-        //write status information to taskbar, parent title ect.
-        switch (status)
+    //status texts
+    setText(*m_textCtrlStatus, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
+
+    //write status information to taskbar, parent title ect.
+    switch (syncStat_->currentPhase())
+    {
+        case ProcessCallback::PHASE_NONE:
+        case ProcessCallback::PHASE_SCANNING:
+            //dialog caption, taskbar
+            setTitle(scannedObjects + L" - " + _("Scanning..."));
+            if (taskbar_.get()) //support Windows 7 taskbar
+                taskbar_->setStatus(Taskbar::STATUS_INDETERMINATE);
+            break;
+
+        case ProcessCallback::PHASE_COMPARING_CONTENT:
         {
-            case SCANNING:
-                showProgressExternally(toStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
-                break;
-            case COMPARING_CONTENT:
-                showProgressExternally(fractionToShortString(fraction) + wxT(" - ") + _("Comparing content..."), fraction);
-                break;
-        }
+            auto objectsCurrent = syncStat_->getObjectsCurrent(ProcessCallback::PHASE_COMPARING_CONTENT);
+            auto objectsTotal   = syncStat_->getObjectsTotal  (ProcessCallback::PHASE_COMPARING_CONTENT);
+            auto dataCurrent    = syncStat_->getDataCurrent   (ProcessCallback::PHASE_COMPARING_CONTENT);
+            auto dataTotal      = syncStat_->getDataTotal     (ProcessCallback::PHASE_COMPARING_CONTENT);
 
-        bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
+            //add both data + obj-count, to handle "deletion-only" cases
+            const double fraction = dataTotal + objectsTotal == 0 ? 0 : std::max(0.0, to<double>(dataCurrent + objectsCurrent) / to<double>(dataTotal + objectsTotal));
 
-        //remove linebreaks from currentStatusText
-        wxString statusTextFmt = currentStatusText;
-        replace(statusTextFmt, L'\n', L' ');
-
-        //status texts
-        if (m_textCtrlStatus->GetValue() != statusTextFmt) //no layout update for status texts!
-            m_textCtrlStatus->ChangeValue(statusTextFmt);
-
-        //nr of scanned objects
-        setText(*m_staticTextScanned, toStringSep(scannedObjects), &layoutChanged);
-
-        //progress indicator for "compare file content"
-        m_gauge2->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
-
-        //remaining files left for file comparison
-        const wxString filesToCompareTmp = toStringSep(totalObjects - currentObjects);
-        setText(*m_staticTextFilesRemaining, filesToCompareTmp, &layoutChanged);
-
-        //remaining bytes left for file comparison
-        const wxString remainingBytesTmp = zen::filesizeToShortString(totalData - currentData);
-        setText(*m_staticTextDataRemaining, remainingBytesTmp, &layoutChanged);
-
-        if (statistics.get())
-        {
-            if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
+            //dialog caption, taskbar
+            setTitle(fractionToShortString(fraction) + wxT(" - ") + _("Comparing content..."));
+            if (taskbar_.get())
             {
-                lastStatCallSpeed = timeElapsed.Time();
-
-                statistics->addMeasurement(currentObjects, to<double>(currentData));
-
-                //current speed
-                setText(*m_staticTextSpeed, statistics->getBytesPerSecond(), &layoutChanged);
-
-                if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
-                {
-                    lastStatCallRemTime = timeElapsed.Time();
-
-                    //remaining time
-                    setText(*m_staticTextRemTime, statistics->getRemainingTime(), &layoutChanged);
-                }
+                taskbar_->setProgress(fraction);
+                taskbar_->setStatus(Taskbar::STATUS_NORMAL);
             }
+
+            //progress indicator, shown for binary comparison only
+            m_gauge2->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
+
+            //remaining objects and bytes for file comparison
+            setText(*m_staticTextFilesRemaining, toStringSep(objectsTotal - objectsCurrent), &layoutChanged);
+            setText(*m_staticTextDataRemaining, L"(" + filesizeToShortString(dataTotal - dataCurrent) + L")", &layoutChanged);
+
+            //remaining time and speed: only visible during binary comparison
+            if (perf)
+                if (timeElapsed.Time() - lastStatCallSpeed >= 500) //-> Win 7 copy uses 1 sec update interval
+                {
+                    lastStatCallSpeed = timeElapsed.Time();
+
+                    perf->addSample(objectsCurrent, to<double>(dataCurrent), timeElapsed.Time());
+
+                    //current speed
+                    setText(*m_staticTextSpeed, perf->getBytesPerSecond(), &layoutChanged);
+
+                    if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //update GUI every 2 sec
+                    {
+                        lastStatCallRemTime = timeElapsed.Time();
+
+                        //remaining time
+                        setText(*m_staticTextRemTime, perf->getRemainingTime(to<double>(dataTotal - dataCurrent)), &layoutChanged);
+                    }
+                }
         }
+        break;
 
-        //time elapsed
-        const long timeElapSec = timeElapsed.Time() / 1000;
-        setText(*m_staticTextTimeElapsed,
-                timeElapSec < 3600 ?
-                wxTimeSpan::Seconds(timeElapSec).Format(   L"%M:%S") :
-                wxTimeSpan::Seconds(timeElapSec).Format(L"%H:%M:%S"), &layoutChanged);
-
-        //do the ui update
-        if (layoutChanged)
-            bSizer42->Layout();
+        case ProcessCallback::PHASE_SYNCHRONIZING:
+            assert(false);
+            break;
     }
+
+    //nr of scanned objects
+    setText(*m_staticTextScanned, scannedObjects, &layoutChanged);
+
+    //time elapsed
+    const long timeElapSec = timeElapsed.Time() / 1000;
+    setText(*m_staticTextTimeElapsed,
+            timeElapSec < 3600 ?
+            wxTimeSpan::Seconds(timeElapSec).Format(   L"%M:%S") :
+            wxTimeSpan::Seconds(timeElapSec).Format(L"%H:%M:%S"), &layoutChanged);
+
+    //do the ui update
+    if (layoutChanged)
+        bSizer42->Layout();
+
     updateUiNow();
 }
 //########################################################################################
 
 //redirect to implementation
 CompareStatus::CompareStatus(wxTopLevelWindow& parentWindow) :
-    pimpl(new CompareStatusImpl(parentWindow)) {}
-
-CompareStatus::~CompareStatus()
-{
-    //DON'T delete pimpl! it relies on wxWidgets destruction (parent window destroys child windows!)
-}
+    pimpl(new CompareStatusImpl(parentWindow)) {} //owned by parentWindow
 
 wxWindow* CompareStatus::getAsWindow()
 {
     return pimpl;
 }
 
-void CompareStatus::init()
+void CompareStatus::init(const Statistics& syncStat)
 {
-    pimpl->init();
+    pimpl->init(syncStat);
 }
 
 void CompareStatus::finalize()
@@ -336,29 +253,9 @@ void CompareStatus::finalize()
     pimpl->finalize();
 }
 
-void CompareStatus::switchToCompareBytewise(int totalObjectsToProcess, zen::Int64 totalDataToProcess)
+void CompareStatus::switchToCompareBytewise()
 {
-    pimpl->switchToCompareBytewise(totalObjectsToProcess, totalDataToProcess);
-}
-
-void CompareStatus::incScannedObjects_NoUpdate(int number)
-{
-    pimpl->incScannedObjects_NoUpdate(number);
-}
-
-void CompareStatus::incProcessedCmpData_NoUpdate(int objectsDelta, Int64 dataDelta)
-{
-    pimpl->incProcessedCmpData_NoUpdate(objectsDelta, dataDelta);
-}
-
-void CompareStatus::incTotalCmpData_NoUpdate(int objectsDelta, Int64 dataDelta)
-{
-    pimpl->incTotalCmpData_NoUpdate(objectsDelta, dataDelta);
-}
-
-void CompareStatus::setStatusText_NoUpdate(const wxString& text)
-{
-    pimpl->setStatusText_NoUpdate(text);
+    pimpl->switchToCompareBytewise();
 }
 
 void CompareStatus::updateStatusPanelNow()
@@ -399,14 +296,9 @@ public:
         const int warningCount = log_.getItemCount(TYPE_WARNING);
         const int infoCount    = log_.getItemCount(TYPE_INFO);
 
-        m_bpButtonErrors->init(buttonPressed ("error"), wxString(_("Error")) + wxString::Format(wxT(" (%d)"), errorCount),
-                               buttonReleased("error"), wxString(_("Error")) + wxString::Format(wxT(" (%d)"), errorCount));
-
-        m_bpButtonWarnings->init(buttonPressed ("warning"), wxString(_("Warning")) + wxString::Format(wxT(" (%d)"), warningCount),
-                                 buttonReleased("warning"), wxString(_("Warning")) + wxString::Format(wxT(" (%d)"), warningCount));
-
-        m_bpButtonInfo->init(buttonPressed ("info"), wxString(_("Info")) + wxString::Format(wxT(" (%d)"), infoCount),
-                             buttonReleased("info"), wxString(_("Info")) + wxString::Format(wxT(" (%d)"), infoCount));
+        m_bpButtonErrors  ->init(buttonPressed ("error"  ), buttonReleased("error"  ), _("Error"  ) + wxString::Format(L" (%d)", errorCount  ));
+        m_bpButtonWarnings->init(buttonPressed ("warning"), buttonReleased("warning"), _("Warning") + wxString::Format(L" (%d)", warningCount));
+        m_bpButtonInfo    ->init(buttonPressed ("info"   ), buttonReleased("info"   ), _("Info"   ) + wxString::Format(L" (%d)", infoCount   ));
 
         m_bpButtonErrors  ->setActive(true);
         m_bpButtonWarnings->setActive(true);
@@ -421,6 +313,7 @@ public:
         m_textCtrlInfo->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(LogControl::onKeyEvent), nullptr, this);
     }
 
+private:
     virtual void OnErrors(wxCommandEvent& event)
     {
         m_bpButtonErrors->toggle();
@@ -439,7 +332,6 @@ public:
         updateLogText();
     }
 
-private:
     void onKeyEvent(wxKeyEvent& event)
     {
         const int keyCode = event.GetKeyCode();
@@ -478,7 +370,7 @@ private:
                 logText += L'\n';
             }
 
-        if (logText.empty()) //if no messages match selected view filter, show final status message at least
+        if (logText.empty()) //if no messages match selected view filter, at least show final status message
             if (!entries.empty())
                 logText = copyStringTo<zxString>(formatMessage(entries.back()));
 
@@ -490,7 +382,6 @@ private:
     const ErrorLog log_;
 };
 
-
 //########################################################################################
 
 namespace
@@ -498,20 +389,19 @@ namespace
 class GraphDataBytes : public GraphData
 {
 public:
-    void addCurrentValue(double dataCurrent)
+    void addRecord(double dataCurrent, long timeMs)
     {
-        data.insert(data.end(), std::make_pair(timer.Time(), dataCurrent));
+        data.insert(data.end(), std::make_pair(timeMs, dataCurrent));
         //documentation differs about whether "hint" should be before or after the to be inserted element!
         //however "std::map<>::end()" is interpreted correctly by GCC and VS2010
 
-        if (data.size() > MAX_BUFFER_SIZE) //guard against too large a buffer
+        if (data.size() > MAX_BUFFER_SIZE) //limit buffer size
             data.erase(data.begin());
     }
 
-    void pauseTimer () { timer.Pause();  }
-    void resumeTimer() { timer.Resume(); }
+    void clear() { data.clear(); }
 
-    virtual double getXBegin() const { return 0; } //{ return data.empty() ? 0 : data.begin()->first / 1000.0; }
+    virtual double getXBegin() const { return data.empty() ? 0 : data.begin()->first / 1000.0; } //need not start with 0, e.g. "binary comparison, graph reset, followed by sync"
     virtual double getXEnd  () const { return data.empty() ? 0 : (--data.end())->first / 1000.0; }
 
 private:
@@ -526,7 +416,6 @@ private:
     }
     //example: two-element range is accessible within [0, 2)
 
-    wxStopWatch timer;
     std::map<long, double> data;
 };
 
@@ -560,11 +449,7 @@ struct LabelFormatterBytes : public LabelFormatter
 
         bytesProposed *= 1.5; //enlarge block default size
 
-        //if (bytesProposed <= 1024 * 1024) //set 1 MB min size: reduce initial rapid changes in y-label
-        //  return 1024 * 1024;
-
         //round to next number which is a convenient to read block size
-
         const double k = std::floor(std::log(bytesProposed) / std::log(2.0));
         const double e = std::pow(2.0, k);
         if (numeric::isNull(e))
@@ -644,131 +529,124 @@ class SyncStatus::SyncStatusImpl : public SyncStatusDlgGenerated
 {
 public:
     SyncStatusImpl(AbortCallback& abortCb,
+                   const Statistics& syncStat,
                    MainDialog* parentWindow,
-                   SyncStatusID startStatus,
                    const wxString& jobName,
                    const std::wstring& execWhenFinished,
                    std::vector<std::wstring>& execFinishedHistory);
     ~SyncStatusImpl();
 
-    void initNewProcess(SyncStatusID id, int totalObjectsToProcess, Int64 totalDataToProcess);
+    void initNewPhase();
+    void reportCurrentBytes(Int64 currentData);
+    void updateProgress(bool allowYield = true);
 
-    void incScannedObjects_NoUpdate(int number);
-    void incProcessedData_NoUpdate(int objectsDelta, Int64 dataDelta);
-    void incTotalData_NoUpdate    (int objectsDelta, Int64 dataDelta);
-
-    void setStatusText_NoUpdate(const wxString& text);
-    void updateStatusDialogNow(bool allowYield = true);
-
-    void processHasFinished(SyncStatus::SyncStatusID id, const ErrorLog& log);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
+    //call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
+    void processHasFinished(SyncResult resultId, const ErrorLog& log);
+    void closeWindowDirectly();
 
     std::wstring getExecWhenFinishedCommand() const;
 
-    void stopTimer();   //halt all internal counters!
-    void resumeTimer(); //
+    void stopTimer() //halt all internal counters!
+    {
+        m_animationControl1->Stop();
+        timeElapsed.Pause ();
+    }
+    void resumeTimer()
+    {
+        m_animationControl1->Play();
+        timeElapsed.Resume();
+    }
 
     void minimizeToTray();
 
 private:
     void OnKeyPressed(wxKeyEvent& event);
-    virtual void OnOkay(wxCommandEvent& event);
-    virtual void OnPause(wxCommandEvent& event);
-    virtual void OnAbort(wxCommandEvent& event);
-    virtual void OnClose(wxCloseEvent& event);
+    virtual void OnOkay   (wxCommandEvent& event);
+    virtual void OnPause  (wxCommandEvent& event);
+    virtual void OnAbort  (wxCommandEvent& event);
+    virtual void OnClose  (wxCloseEvent& event);
     virtual void OnIconize(wxIconizeEvent& event);
 
-    void setCurrentStatus(SyncStatus::SyncStatusID id);
+    void updateDialogStatus();
 
     void resumeFromSystray();
     void OnResumeFromTray(wxCommandEvent& event);
 
-    bool currentProcessIsRunning();
-    void showProgressExternally(const wxString& progressText, double fraction = 0); //between [0, 1]
+    void setExternalStatus(const wxString& status, const wxString& progress); //progress may be empty!
 
     const wxString jobName_;
     wxStopWatch timeElapsed;
 
-    AbortCallback* abortCb_; //temporarily bound
     MainDialog* mainDialog; //optional
 
-    //gauge variables
-    int   totalObjects;   //file/dir/symlink/operation count
-    Int64 totalData;      //unit: [bytes]
-    int   currentObjects;
-    Int64 currentData;
-
     //status variables
-    size_t scannedObjects;
-    wxString currentStatusText;
+    AbortCallback*    abortCb_;  //temporarily bound while sync is running
+    const Statistics* syncStat_; //
+    bool paused_; //valid only while sync is running
+    SyncResult finalResult; //set after sync
 
-    SyncStatus::SyncStatusID currentStatus;
-    SyncStatus::SyncStatusID previousStatus; //save old status if "currentStatus == SyncStatus::PAUSED"
-
-    std::unique_ptr<Taskbar> taskbar_;
+    bool isZombie; //wxGTK sends iconize event *after* wxWindow::Destroy, sigh...
 
     //remaining time
-    std::unique_ptr<Statistics> statistics;
-    long lastStatCallSpeed;   //used for calculating intervals between statistics update
+    std::unique_ptr<PerfCheck> perf;
+    long lastStatCallSpeed;   //used for calculating intervals between collecting perf samples
     long lastStatCallRemTime; //
 
     std::shared_ptr<GraphDataBytes> graphDataBytes;
-    //std::shared_ptr<GraphDataConstLine> graphDataBytesCurrent;
     std::shared_ptr<GraphDataConstLine> graphDataBytesTotal;
 
     wxString titelTextBackup;
-
     std::unique_ptr<FfsTrayIcon> trayIcon; //optional: if filled all other windows should be hidden and conversely
+    std::unique_ptr<Taskbar> taskbar_;
 };
 
 
 SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
+                                           const Statistics& syncStat,
                                            MainDialog* parentWindow,
-                                           SyncStatusID startStatus,
                                            const wxString& jobName,
                                            const std::wstring& execWhenFinished,
                                            std::vector<std::wstring>& execFinishedHistory) :
     SyncStatusDlgGenerated(parentWindow,
                            wxID_ANY,
-                           parentWindow ? wxString(wxEmptyString) : (wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization")),
+                           parentWindow ? wxString() : (wxString(L"FreeFileSync - ") + _("Folder Comparison and Synchronization")),
                            wxDefaultPosition, wxSize(640, 350),
                            parentWindow ?
                            wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL | wxFRAME_NO_TASKBAR | wxFRAME_FLOAT_ON_PARENT : //wxTAB_TRAVERSAL is needed for standard button handling: wxID_OK/wxID_CANCEL
                            wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
-    jobName_(jobName),
-    abortCb_(&abortCb),
+    jobName_  (jobName),
     mainDialog(parentWindow),
-    totalObjects(0),
-    totalData(0),
-    currentObjects(0),
-    currentData(0),
-    scannedObjects(0),
-    currentStatus (SyncStatus::ABORTED),
-    previousStatus(SyncStatus::ABORTED),
-    lastStatCallSpeed(-1000000), //some big number
+    abortCb_  (&abortCb),
+    syncStat_ (&syncStat),
+    paused_   (false),
+    finalResult(RESULT_ABORTED), //dummy value
+    isZombie(false),
+    lastStatCallSpeed  (-1000000), //some big number
     lastStatCallRemTime(-1000000)
 {
 #ifdef FFS_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
+    new MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    if (mainDialog) //save old title (will be used as progress indicator)
-        titelTextBackup = mainDialog->GetTitle();
+    if (mainDialog)
+    {
+        titelTextBackup = mainDialog->GetTitle(); //save old title (will be used as progress indicator)
+        mainDialog->disableAllElements(false); //disable all child elements
+    }
 
     m_animationControl1->SetAnimation(GlobalResources::instance().animationSync);
     m_animationControl1->Play();
+
+    SetIcon(GlobalResources::instance().programIcon);
 
     //initialize gauge
     m_gauge1->SetRange(GAUGE_FULL_RANGE);
     m_gauge1->SetValue(0);
 
-
     EnableCloseButton(false);
 
     if (IsShown()) //don't steal focus when starting in sys-tray!
         m_buttonAbort->SetFocus();
-
-    if (mainDialog)
-        mainDialog->disableAllElements(false); //disable all child elements
 
     timeElapsed.Start(); //measure total time
 
@@ -780,39 +658,29 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
 
     //hide "processed" statistics until end of process
     bSizerFinalStat           ->Show(false);
-    m_buttonOK                ->Show(false);
     m_staticTextLabelItemsProc->Show(false);
     bSizerItemsProc           ->Show(false);
-
-    SetIcon(GlobalResources::instance().programIcon); //set application icon
+    m_buttonOK                ->Show(false);
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncStatusImpl::OnKeyPressed), nullptr, this);
 
-    setCurrentStatus(startStatus); //first state: will be shown while waiting for dir locks (if at all)
-
     //init graph
-    graphDataBytes        = std::make_shared<GraphDataBytes>();
-    //graphDataBytesCurrent = std::make_shared<GraphDataConstLine>();
-    graphDataBytesTotal   = std::make_shared<GraphDataConstLine>();
+    graphDataBytes      = std::make_shared<GraphDataBytes>();
+    graphDataBytesTotal = std::make_shared<GraphDataConstLine>();
 
     m_panelGraph->setAttributes(Graph2D::GraphAttributes().
                                 setLabelX(Graph2D::X_LABEL_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
                                 setLabelY(Graph2D::Y_LABEL_RIGHT,  60, std::make_shared<LabelFormatterBytes>()));
 
-    m_panelGraph->setData(graphDataBytesTotal,   Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0, 64, 0))); //green
-    //m_panelGraph->addData(graphDataBytesCurrent, Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0, 128, 0))); //green
-    m_panelGraph->addData(graphDataBytes, Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0))); //medium green
+    m_panelGraph->setData(graphDataBytesTotal, Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0,  64, 0))); //green
+    m_panelGraph->addData(graphDataBytes,      Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0))); //medium green
 
     //allow changing on completion command
-    m_comboBoxExecFinished->setValue(execWhenFinished);
+    m_comboBoxExecFinished->setValue     (execWhenFinished);
     m_comboBoxExecFinished->setHistoryRef(execFinishedHistory);
 
-    //Fit() height only:
-    //fitHeight(*this);
-
-    m_staticTextSpeed  ->SetLabel(L""); //clear "dummy" values
-    m_staticTextRemTime->SetLabel(L""); //
+    updateDialogStatus(); //null-status will be shown while waiting for dir locks (if at all)
 }
 
 
@@ -838,12 +706,14 @@ void SyncStatus::SyncStatusImpl::OnKeyPressed(wxKeyEvent& event)
         //simulate click on abort button
         if (m_buttonAbort->IsShown()) //delegate to "abort" button if available
         {
-            m_buttonAbort->GetEventHandler()->ProcessEvent(dummy);
+            if (wxEvtHandler* handler = m_buttonAbort->GetEventHandler())
+                handler->ProcessEvent(dummy);
             return;
         }
-        else if (m_buttonOK->IsShown()) //delegate to "abort" button if available
+        else if (m_buttonOK->IsShown())
         {
-            m_buttonOK->GetEventHandler()->ProcessEvent(dummy);
+            if (wxEvtHandler* handler = m_buttonOK->GetEventHandler())
+                handler->ProcessEvent(dummy);
             return;
         }
     }
@@ -852,119 +722,37 @@ void SyncStatus::SyncStatusImpl::OnKeyPressed(wxKeyEvent& event)
 }
 
 
-void SyncStatus::SyncStatusImpl::initNewProcess(SyncStatusID id, int totalObjectsToProcess, Int64 totalDataToProcess)
+void SyncStatus::SyncStatusImpl::initNewPhase()
 {
-    setCurrentStatus(id);
+    updateDialogStatus(); //evaluates "syncStat_->currentPhase()"
 
-    currentData    = 0;
-    currentObjects = 0;
-    totalData      = totalDataToProcess;
-    totalObjects   = totalObjectsToProcess;
+    //reset graph (e.g. after binary comparison)
+    graphDataBytes->clear();
+    reportCurrentBytes(0);
 
-    incProcessedData_NoUpdate(0, 0); //update graph
-    incTotalData_NoUpdate    (0, 0); //
-
-    //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
-    statistics.reset(new Statistics(totalObjectsToProcess, to<double>(totalDataToProcess), windowSizeRemainingTime, windowSizeBytesPerSec));
-
+    //start new measurement
+    perf.reset(new PerfCheck(WINDOW_REMAINING_TIME, WINDOW_BYTES_PER_SEC));
     lastStatCallSpeed   = -1000000; //some big number
     lastStatCallRemTime = -1000000;
 
     //set to 0 even if totalDataToProcess is 0: due to a bug in wxGauge::SetValue, it doesn't change to determinate mode when setting the old value again
-    //so give updateStatusDialogNow() a chance to set a different value
+    //so give updateProgress() a chance to set a different value
     m_gauge1->SetValue(0);
 
-    updateStatusDialogNow(false); //get rid of "dummy" texts!
+    updateProgress(false);
 }
 
 
-void SyncStatus::SyncStatusImpl::incProcessedData_NoUpdate(int objectsDelta, Int64 dataDelta)
+void SyncStatus::SyncStatusImpl::reportCurrentBytes(Int64 currentData)
 {
-    currentData    +=    dataDelta;
-    currentObjects += objectsDelta;
-
-    //update graph data
-    graphDataBytes->addCurrentValue(to<double>(currentData));
+    //add sample for perf measurements + calc. of remaining time
+    graphDataBytes->addRecord(to<double>(currentData), timeElapsed.Time());
 }
 
 
-void SyncStatus::SyncStatusImpl::incTotalData_NoUpdate(int objectsDelta, Int64 dataDelta)
-{
-    totalData    +=    dataDelta;
-    totalObjects += objectsDelta;
-
-    if (statistics)
-        statistics->setNewTotal(totalObjects, to<double>(totalData));
-
-    graphDataBytesTotal->setValue(to<double>(totalData));
-    //m_panelGraph->setAttributes(m_panelGraph->getAttributes().setMaxY(to<double>(totalDataToProcess)));
-}
-
-
-void SyncStatus::SyncStatusImpl::incScannedObjects_NoUpdate(int number)
-{
-    scannedObjects += number;
-}
-
-
-void SyncStatus::SyncStatusImpl::setStatusText_NoUpdate(const wxString& text)
-{
-    currentStatusText = text;
-}
-
-
-void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progressText, double fraction)
-{
-    //write status information to systray, if window is minimized
-    if (trayIcon.get())
-        trayIcon->setToolTip(progressText, fraction);
-
-    wxString progressTextFmt = progressText;
-    progressTextFmt.Replace(wxT("\n"), wxT(" - "));
-
-    if (mainDialog) //show percentage in maindialog title (and thereby in taskbar)
-    {
-        if (mainDialog->GetTitle() != progressTextFmt)
-            mainDialog->SetTitle(progressTextFmt);
-    }
-    else //show percentage in this dialog's title (and thereby in taskbar)
-    {
-        if (this->GetTitle() != progressTextFmt)
-            this->SetTitle(progressTextFmt);
-    }
-
-
-    //show progress on Windows 7 taskbar
-    if (taskbar_.get())
-    {
-        switch (currentStatus)
-        {
-            case SyncStatus::SCANNING:
-                taskbar_->setStatus(Taskbar::STATUS_INDETERMINATE);
-                break;
-            case SyncStatus::FINISHED_WITH_SUCCESS:
-            case SyncStatus::COMPARING_CONTENT:
-            case SyncStatus::SYNCHRONIZING:
-                taskbar_->setProgress(fraction);
-                taskbar_->setStatus(Taskbar::STATUS_NORMAL);
-                break;
-            case SyncStatus::PAUSE:
-                taskbar_->setProgress(fraction);
-                taskbar_->setStatus(Taskbar::STATUS_PAUSED);
-                break;
-            case SyncStatus::ABORTED:
-            case SyncStatus::FINISHED_WITH_ERROR:
-                taskbar_->setProgress(fraction);
-                taskbar_->setStatus(Taskbar::STATUS_ERROR);
-                break;
-        }
-    }
-}
-
-
-#ifdef FFS_WIN
 namespace
 {
+#ifdef FFS_WIN
 enum Zorder
 {
     ZORDER_CORRECT,
@@ -988,131 +776,183 @@ Zorder evaluateZorder(const wxWindow& top, const wxWindow& bottom)
 
     return ZORDER_INDEFINITE;
 }
-}
 #endif
 
 
-void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
+std::wstring getDialogStatusText(const Statistics* syncStat, bool paused, SyncStatus::SyncResult finalResult)
 {
-    //static RetrieveStatistics statistic;
-    //statistic.writeEntry(currentData.ToDouble(), currentObjects);
-
-    //add both data + obj-count, to handle "deletion-only" cases
-    const double fraction = totalData + totalObjects == 0 ? 1 : std::max(0.0, to<double>(currentData + currentObjects) / to<double>(totalData + totalObjects));
-    //yes, this may legitimately become < 0: failed rename operation falls-back to copy + delete, reducing "currentData" to potentially < 0!
-
-    //write status information to systray, taskbar, parent title ect.
-
-    const wxString postFix = jobName_.empty() ? wxString() : (wxT("\n\"") + jobName_ + wxT("\""));
-    switch (currentStatus)
+    if (syncStat) //sync running
     {
-        case SyncStatus::SCANNING:
-            showProgressExternally(wxString() + toStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
+        if (paused)
+            return _("Paused");
+        else
+            switch (syncStat->currentPhase())
+            {
+                case ProcessCallback::PHASE_NONE:
+                    return _("Initializing..."); //dialog is shown *before* sync starts, so this text may be visible!
+                case ProcessCallback::PHASE_SCANNING:
+                    return _("Scanning...");
+                case ProcessCallback::PHASE_COMPARING_CONTENT:
+                    return _("Comparing content...");
+                case ProcessCallback::PHASE_SYNCHRONIZING:
+                    return _("Synchronizing...");
+            }
+    }
+    else //sync finished
+        switch (finalResult)
+        {
+            case SyncStatus::RESULT_ABORTED:
+                return _("Aborted");
+            case SyncStatus::RESULT_FINISHED_WITH_ERROR:
+            case SyncStatus::RESULT_FINISHED_WITH_SUCCESS:
+                return _("Completed");
+        }
+    return std::wstring();
+}
+}
+
+
+void SyncStatus::SyncStatusImpl::setExternalStatus(const wxString& status, const wxString& progress) //progress may be empty!
+{
+    //sys tray: order "top-down": jobname, status, progress
+    wxString newTrayInfo = jobName_.empty() ? status : L"\"" + jobName_ + L"\"\n" + status;
+    if (!progress.empty())
+        newTrayInfo += L" " + progress;
+
+    //window caption/taskbar; inverse order: progress, status, jobname
+    wxString newCaption = progress.empty() ? status : progress + L" - " + status;
+    if (!jobName_.empty())
+        newCaption += L" - \"" + jobName_ + L"\"";
+
+    //systray tooltip, if window is minimized
+    if (trayIcon.get())
+        trayIcon->setToolTip(newTrayInfo);
+
+    //show text in dialog title (and at the same time in taskbar)
+    if (mainDialog)
+    {
+        if (mainDialog->GetTitle() != newCaption)
+            mainDialog->SetTitle(newCaption);
+    }
+    else
+    {
+        if (this->GetTitle() != newCaption)
+            this->SetTitle(newCaption);
+    }
+}
+
+
+void SyncStatus::SyncStatusImpl::updateProgress(bool allowYield)
+{
+    assert(syncStat_);
+    if (!syncStat_) //no sync running!!
+        return;
+
+    //wxWindowUpdateLocker dummy(this); -> not needed
+
+    bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
+
+    //sync status text
+    setText(*m_textCtrlInfo, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
+
+    switch (syncStat_->currentPhase()) //no matter if paused or not
+    {
+        case ProcessCallback::PHASE_NONE:
+        case ProcessCallback::PHASE_SCANNING:
+            //dialog caption, taskbar, systray tooltip
+            setExternalStatus(getDialogStatusText(syncStat_, paused_, finalResult), toStringSep(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING))); //status text may be "paused"!
+
+            //progress indicators
+            m_gauge1->Pulse();
+            if (trayIcon.get()) trayIcon->setProgress(1); //1 = regular FFS logo
+
+            //taskbar_ status is Taskbar::STATUS_INDETERMINATE
+
+            //constant line graph
+            graphDataBytesTotal->setValue(0);
+
+            //remaining objects and data
+            setText(*m_staticTextRemainingObj , L"-", &layoutChanged);
+            setText(*m_staticTextDataRemaining, L"", &layoutChanged);
+
+            //remaining time and speed
+            setText(*m_staticTextSpeed,   L"-", &layoutChanged);
+            setText(*m_staticTextRemTime, L"-", &layoutChanged);
             break;
-        case SyncStatus::COMPARING_CONTENT:
-            showProgressExternally(wxString() + fractionToShortString(fraction) + wxT(" - ") + _("Comparing content...") + postFix, fraction);
-            break;
-        case SyncStatus::SYNCHRONIZING:
-            showProgressExternally(wxString() + fractionToShortString(fraction) + wxT(" - ") + _("Synchronizing...") + postFix, fraction);
-            break;
-        case SyncStatus::PAUSE:
-            showProgressExternally(wxString() + fractionToShortString(fraction) + wxT(" - ") + _("Paused") + postFix, fraction);
-            break;
-        case SyncStatus::ABORTED:
-            showProgressExternally(_("Aborted") + postFix, fraction);
-            break;
-        case SyncStatus::FINISHED_WITH_SUCCESS:
-        case SyncStatus::FINISHED_WITH_ERROR:
-            showProgressExternally(_("Completed") + postFix, fraction);
-            break;
+
+        case ProcessCallback::PHASE_COMPARING_CONTENT:
+        case ProcessCallback::PHASE_SYNCHRONIZING:
+        {
+            auto objectsCurrent = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
+            auto objectsTotal   = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
+            auto dataCurrent    = syncStat_->getDataCurrent   (syncStat_->currentPhase());
+            auto dataTotal      = syncStat_->getDataTotal     (syncStat_->currentPhase());
+
+            //add both data + obj-count, to handle "deletion-only" cases
+            const double fraction = dataTotal + objectsTotal == 0 ? 1 : std::max(0.0, to<double>(dataCurrent + objectsCurrent) / to<double>(dataTotal + objectsTotal));
+            //yes, this may legitimately become < 0: failed rename operation falls-back to copy + delete, reducing "dataCurrent" to potentially < 0!
+            //----------------------------------------------------------------------------------------------------
+
+            //dialog caption, taskbar, systray tooltip
+            setExternalStatus(getDialogStatusText(syncStat_, paused_, finalResult), fractionToShortString(fraction)); //status text may be "paused"!
+
+            //progress indicators
+            m_gauge1->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
+            if (trayIcon.get()) trayIcon->setProgress(fraction);
+            if (taskbar_.get()) taskbar_->setProgress(fraction);
+
+            //constant line graph
+            graphDataBytesTotal->setValue(to<double>(dataTotal));
+
+            //remaining objects and data
+            setText(*m_staticTextRemainingObj, toStringSep(objectsTotal - objectsCurrent), &layoutChanged);
+            setText(*m_staticTextDataRemaining, L"(" + filesizeToShortString(dataTotal - dataCurrent) + L")", &layoutChanged);
+
+            //remaining time and speed
+            assert(perf);
+            if (perf)
+                if (timeElapsed.Time() - lastStatCallSpeed >= 500) //-> Win 7 copy uses 1 sec update interval
+                {
+                    lastStatCallSpeed = timeElapsed.Time();
+
+                    perf->addSample(objectsCurrent, to<double>(dataCurrent), timeElapsed.Time());
+
+                    //current speed
+                    setText(*m_staticTextSpeed, perf->getBytesPerSecond(), &layoutChanged);
+
+                    if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //update GUI every 2 sec
+                    {
+                        lastStatCallRemTime = timeElapsed.Time();
+
+                        //remaining time
+                        setText(*m_staticTextRemTime, perf->getRemainingTime(to<double>(dataTotal - dataCurrent)), &layoutChanged);
+                    }
+                }
+        }
+        break;
     }
 
-    //write regular status information (whether dialog is visible or not)
+    m_panelGraph->setAttributes(m_panelGraph->getAttributes().setMinX(graphDataBytes->getXBegin()));
+    m_panelGraph->setAttributes(m_panelGraph->getAttributes().setMaxX(graphDataBytes->getXEnd()));
+    m_panelGraph->Refresh();
+
+    //time elapsed
+    const long timeElapSec = timeElapsed.Time() / 1000;
+    setText(*m_staticTextTimeElapsed,
+            timeElapSec < 3600 ?
+            wxTimeSpan::Seconds(timeElapSec).Format(   L"%M:%S") :
+            wxTimeSpan::Seconds(timeElapSec).Format(L"%H:%M:%S"), &layoutChanged);
+
+    //do the ui update
+    if (layoutChanged)
     {
-        //wxWindowUpdateLocker dummy(this); -> not needed
-
-        bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
-
-        //progress indicator
-        switch (currentStatus)
-        {
-            case SyncStatus::SCANNING:
-                m_gauge1->Pulse();
-                break;
-            case SyncStatus::COMPARING_CONTENT:
-            case SyncStatus::SYNCHRONIZING:
-            case SyncStatus::FINISHED_WITH_SUCCESS:
-            case SyncStatus::FINISHED_WITH_ERROR:
-            case SyncStatus::ABORTED:
-                m_gauge1->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
-                break;
-            case SyncStatus::PAUSE: //no change to gauge: don't switch between indeterminate/determinate modus
-                break;
-        }
-
-
-        wxString statusTextFmt = currentStatusText;  //remove linebreaks
-        replace(statusTextFmt, L'\n', L' ');         //
-
-        //status text
-        if (m_textCtrlInfo->GetValue() != statusTextFmt) //no layout update for status texts!
-            m_textCtrlInfo->ChangeValue(statusTextFmt);
-
-        //remaining objects
-        const wxString remainingObjTmp = toStringSep(totalObjects - currentObjects);
-        setText(*m_staticTextRemainingObj, remainingObjTmp, &layoutChanged);
-
-        //remaining bytes left for copy
-        const wxString remainingBytesTmp = zen::filesizeToShortString(totalData - currentData);
-        setText(*m_staticTextDataRemaining, remainingBytesTmp, &layoutChanged);
-
-        //statistics
-        if (statistics.get())
-        {
-            if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
-            {
-                lastStatCallSpeed = timeElapsed.Time();
-
-                statistics->addMeasurement(currentObjects, to<double>(currentData));
-
-                //current speed
-                setText(*m_staticTextSpeed, statistics->getBytesPerSecond(), &layoutChanged);
-
-                if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
-                {
-                    lastStatCallRemTime = timeElapsed.Time();
-
-                    //remaining time
-                    setText(*m_staticTextRemTime, statistics->getRemainingTime(), &layoutChanged);
-                }
-            }
-        }
-
-        {
-            m_panelGraph->setAttributes(m_panelGraph->getAttributes().setMinX(graphDataBytes->getXBegin()));
-            m_panelGraph->setAttributes(m_panelGraph->getAttributes().setMaxX(graphDataBytes->getXEnd()));
-
-            m_panelGraph->Refresh();
-        }
-
-        //time elapsed
-        const long timeElapSec = timeElapsed.Time() / 1000;
-        setText(*m_staticTextTimeElapsed,
-                timeElapSec < 3600 ?
-                wxTimeSpan::Seconds(timeElapSec).Format(   L"%M:%S") :
-                wxTimeSpan::Seconds(timeElapSec).Format(L"%H:%M:%S"), &layoutChanged);
-
-        //do the ui update
-        if (layoutChanged)
-        {
-            //            Layout();
-            //            bSizerItemsRem->Layout();
-            //            bSizer171->Layout();
-            bSizerProgressStat->Layout(); //
-            m_panelProgress->Layout();    //both needed
-            //m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
-            //-> it seems this layout is not required, and even harmful: resets m_comboBoxExecFinished dropdown while user is selecting!
-        }
+        //            Layout();
+        //            bSizerItemsRem->Layout();
+        //            bSizer171->Layout();
+        bSizerProgressStat->Layout(); //
+        m_panelProgress->Layout();    //both needed
+        //m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
+        //-> it seems this layout is not required, and even harmful: resets m_comboBoxExecFinished dropdown while user is selecting!
     }
 
 #ifdef FFS_WIN
@@ -1132,27 +972,25 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
     if (allowYield)
     {
         //support for pause button
-        while (currentStatus == SyncStatus::PAUSE && currentProcessIsRunning())
+        if (paused_)
         {
-            wxMilliSleep(UI_UPDATE_INTERVAL);
-            updateUiNow();
+            stopTimer();
+            while (paused_)
+            {
+                wxMilliSleep(UI_UPDATE_INTERVAL);
+                updateUiNow(); //receive UI message that ends pause
+            }
+            resumeTimer();
         }
-
         /*
             /|\
-             |   keep this order to ensure one full statistics update before entering pause mode
+             |   keep this sequence to ensure one full progress update before entering pause mode!
             \|/
         */
-        updateUiNow();
+        updateUiNow(); //receive UI message that sets pause status
     }
     else
         Update(); //don't wait until next idle event (who knows what blocking process comes next?)
-}
-
-
-bool SyncStatus::SyncStatusImpl::currentProcessIsRunning()
-{
-    return abortCb_ != nullptr;
 }
 
 
@@ -1162,62 +1000,167 @@ std::wstring SyncStatus::SyncStatusImpl::getExecWhenFinishedCommand() const
 }
 
 
-void SyncStatus::SyncStatusImpl::setCurrentStatus(SyncStatus::SyncStatusID id)
+void SyncStatus::SyncStatusImpl::updateDialogStatus() //depends on "syncStat_, paused_, finalResult"
 {
-    switch (id)
+    m_staticTextStatus->SetLabel(getDialogStatusText(syncStat_, paused_, finalResult));
+
+    if (syncStat_) //sync running
     {
-        case SyncStatus::ABORTED:
-            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusError")));
-            m_staticTextStatus->SetLabel(_("Aborted"));
-            break;
+        if (paused_)
+            m_buttonPause->SetLabel(_("Continue"));
+        else
+            m_buttonPause->SetLabel(_("Pause"));
 
-        case SyncStatus::FINISHED_WITH_SUCCESS:
-            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusSuccess")));
-            m_staticTextStatus->SetLabel(_("Completed"));
-            break;
+        if (paused_)
+            m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusPause"));
+        else
+            switch (syncStat_->currentPhase())
+            {
+                case ProcessCallback::PHASE_NONE:
+                    break;
 
-        case SyncStatus::FINISHED_WITH_ERROR:
-            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusWarning")));
-            m_staticTextStatus->SetLabel(_("Completed"));
-            break;
+                case ProcessCallback::PHASE_SCANNING:
+                    m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusScanning"));
+                    break;
 
-        case SyncStatus::PAUSE:
-            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusPause")));
-            m_staticTextStatus->SetLabel(_("Paused"));
-            break;
+                case ProcessCallback::PHASE_COMPARING_CONTENT:
+                    m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusBinaryCompare"));
+                    break;
 
-        case SyncStatus::SCANNING:
-            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusScanning")));
-            m_staticTextStatus->SetLabel(_("Scanning..."));
-            break;
-
-        case SyncStatus::COMPARING_CONTENT:
-            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusBinaryCompare")));
-            m_staticTextStatus->SetLabel(_("Comparing content..."));
-            break;
-
-        case SyncStatus::SYNCHRONIZING:
-            m_bitmapStatus->SetBitmap(GlobalResources::getImage(wxT("statusSyncing")));
-            m_staticTextStatus->SetLabel(_("Synchronizing..."));
-            break;
+                case ProcessCallback::PHASE_SYNCHRONIZING:
+                    m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusSyncing"));
+                    break;
+            }
     }
+    else //sync finished
+        switch (finalResult)
+        {
+            case RESULT_ABORTED:
+                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusError"));
+                break;
 
-    currentStatus = id;
+            case RESULT_FINISHED_WITH_ERROR:
+                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusWarning"));
+                break;
+
+            case RESULT_FINISHED_WITH_SUCCESS:
+                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusSuccess"));
+                break;
+        }
+
+    //show status on Windows 7 taskbar
+    if (taskbar_.get())
+    {
+        if (syncStat_) //sync running
+        {
+            if (paused_)
+                taskbar_->setStatus(Taskbar::STATUS_PAUSED);
+            else
+                switch (syncStat_->currentPhase())
+                {
+                    case ProcessCallback::PHASE_NONE:
+                    case ProcessCallback::PHASE_SCANNING:
+                        taskbar_->setStatus(Taskbar::STATUS_INDETERMINATE);
+                        break;
+
+                    case ProcessCallback::PHASE_COMPARING_CONTENT:
+                    case ProcessCallback::PHASE_SYNCHRONIZING:
+                        taskbar_->setStatus(Taskbar::STATUS_NORMAL);
+                        break;
+                }
+        }
+        else //sync finished
+            switch (finalResult)
+            {
+                case RESULT_ABORTED:
+                case RESULT_FINISHED_WITH_ERROR:
+                    taskbar_->setStatus(Taskbar::STATUS_ERROR);
+                    break;
+
+                case RESULT_FINISHED_WITH_SUCCESS:
+                    taskbar_->setStatus(Taskbar::STATUS_NORMAL);
+                    break;
+            }
+    }
 
     m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
 }
 
 
-void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id, const ErrorLog& log) //essential to call this in StatusHandler derived class destructor
+void SyncStatus::SyncStatusImpl::closeWindowDirectly() //this should really be called: do not call back + schedule deletion
+{
+    paused_ = false; //you never know?
+
+    //ATTENTION: dialog may live a little longer, so cut callbacks!
+    //e.g. wxGTK calls OnIconize after wxWindow::Close() (better not ask why) and before physical destruction! => indirectly calls updateDialogStatus(), which reads syncStat_!!!
+
+    //------- change class state -------
+    abortCb_  = nullptr; //avoid callback to (maybe) deleted parent process
+    syncStat_ = nullptr; //set *after* last call to "updateProgress"
+    //----------------------------------
+
+    Close();
+}
+
+
+void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const ErrorLog& log) //essential to call this in StatusHandler derived class destructor
 {
     //at the LATEST(!) to prevent access to currentStatusHandler
     //enable okay and close events; may be set in this method ONLY
 
     wxWindowUpdateLocker dummy(this); //badly needed
 
-    abortCb_ = nullptr; //avoid callback to (maybe) deleted parent process
+    paused_ = false; //you never know?
 
-    setCurrentStatus(id);
+    //update numbers one last time (as if sync were still running)
+    updateProgress(false);
+
+    switch (syncStat_->currentPhase()) //no matter if paused or not
+    {
+        case ProcessCallback::PHASE_NONE:
+        case ProcessCallback::PHASE_SCANNING:
+            //set overall speed -> not needed
+            //items processed -> not needed
+            break;
+
+        case ProcessCallback::PHASE_COMPARING_CONTENT:
+        case ProcessCallback::PHASE_SYNCHRONIZING:
+        {
+            auto objectsCurrent = syncStat_->getObjectsCurrent(syncStat_->currentPhase());
+            auto objectsTotal   = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
+            auto dataCurrent    = syncStat_->getDataCurrent   (syncStat_->currentPhase());
+            auto dataTotal      = syncStat_->getDataTotal     (syncStat_->currentPhase());
+
+            //set overall speed (instead of current speed)
+            assert(perf);
+            if (perf)
+                m_staticTextSpeed->SetLabel(perf->getOverallBytesPerSecond()); //note: we can't simply divide "sync total bytes" by "timeElapsed"
+
+            //show new element "items processed"
+            m_staticTextLabelItemsProc->Show(true);
+            bSizerItemsProc           ->Show(true);
+            m_staticTextProcessedObj ->SetLabel(toStringSep(objectsCurrent));
+            m_staticTextDataProcessed->SetLabel(L"(" + filesizeToShortString(dataCurrent) + L")");
+
+            //hide remaining elements...
+            if (objectsCurrent == objectsTotal && //...if everything was processed successfully
+                dataCurrent    == dataTotal)
+            {
+                m_staticTextLabelItemsRem->Show(false);
+                bSizerItemsRem           ->Show(false);
+            }
+        }
+        break;
+    }
+
+    //------- change class state -------
+    abortCb_    = nullptr; //avoid callback to (maybe) deleted parent process
+    syncStat_   = nullptr; //set *after* last call to "updateProgress"
+    finalResult = resultId;
+    //----------------------------------
+
+    updateDialogStatus();
+    setExternalStatus(getDialogStatusText(syncStat_, paused_, finalResult), wxString());
 
     resumeFromSystray(); //if in tray mode...
 
@@ -1244,45 +1187,30 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     //show and prepare final statistics
     bSizerFinalStat->Show(true);
 
-    if (totalObjects == currentObjects &&  //if everything was processed successfully
-        totalData    == currentData)
-    {
-        m_staticTextLabelItemsRem->Show(false);
-        bSizerItemsRem           ->Show(false);
-    }
-
-    m_staticTextLabelItemsProc->Show(true);
-    bSizerItemsProc           ->Show(true);
-    m_staticTextProcessedObj ->SetLabel(toStringSep(currentObjects));
-    m_staticTextDataProcessed->SetLabel(zen::filesizeToShortString(currentData));
-
+    //show total time
     m_staticTextLabelElapsedTime->SetLabel(_("Total time:")); //it's not "elapsed time" anymore
 
+    //hide remaining time
     m_staticTextLabelRemTime->Show(false);
     m_staticTextRemTime     ->Show(false);
-
-    updateStatusDialogNow(false); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
-
-    //changed meaning: from current to overall speed: -> make sure to call after "updateStatusDialogNow"
-    const long timeElapMs = timeElapsed.Time();
-    m_staticTextSpeed->SetLabel(timeElapMs <= 0 ? L"-" : zen::filesizeToShortString(currentData * 1000 / timeElapMs) + _("/sec"));
-
-    //fill result listbox:
 
     //workaround wxListBox bug on Windows XP: labels are drawn on top of each other
     assert(m_listbookResult->GetImageList()); //make sure listbook keeps *any* image list
     //due to some crazy reasons that aren't worth debugging, this needs to be done directly in wxFormBuilder,
-    //the following call is *not* sufficient: m_listbookResult->AssignImageList(new wxImageList(0, 0));
+    //the following call is *not* sufficient: m_listbookResult->AssignImageList(new wxImageList(180, 1));
     //note: alternative solutions involving wxLC_LIST, wxLC_REPORT and SetWindowStyleFlag() do not work portably! wxListBook using wxLC_ICON is obviously a class invariant!
 
     //1. re-arrange graph into results listbook
     bSizerTop->Detach(m_panelProgress);
     m_panelProgress->Reparent(m_listbookResult);
+#ifdef FFS_LINUX
+    wxYield(); //wxGTK 2.9.3 fails miserably at "reparent" whithout this
+#endif
     m_listbookResult->AddPage(m_panelProgress, _("Statistics"), true); //AddPage() takes ownership!
 
     //2. log file
     const size_t posLog = 1;
-    LogControl* logControl = new LogControl(m_listbookResult, log);
+    LogControl* logControl = new LogControl(m_listbookResult, log); //owned by m_listbookResult
     m_listbookResult->AddPage(logControl, _("Logging"), false);
     //bSizerHoldStretch->Insert(0, logControl, 1, wxEXPAND);
 
@@ -1304,62 +1232,19 @@ void SyncStatus::SyncStatusImpl::OnOkay(wxCommandEvent& event)
 
 void SyncStatus::SyncStatusImpl::OnAbort(wxCommandEvent& event)
 {
-    if (currentStatus == SyncStatus::PAUSE)
-    {
-        wxCommandEvent dummy;
-        OnPause(dummy);
-    }
+    paused_ = false;
+    updateDialogStatus(); //update status + pause button
 
-    if (currentProcessIsRunning())
-    {
-        m_buttonAbort->Disable();
-        m_buttonAbort->Hide();
-        m_buttonPause->Disable();
-        m_buttonPause->Hide();
-
-        setStatusText_NoUpdate(_("Abort requested: Waiting for current operation to finish..."));
-        //no Layout() or UI-update here to avoid cascaded Yield()-call
-
+    //no Layout() or UI-update here to avoid cascaded Yield()-call
+    if (abortCb_)
         abortCb_->requestAbortion();
-    }
-}
-
-
-void SyncStatus::SyncStatusImpl::stopTimer()
-{
-    timeElapsed.Pause();
-    if (statistics.get()) statistics->pauseTimer();
-    graphDataBytes->pauseTimer();
-}
-
-
-void SyncStatus::SyncStatusImpl::resumeTimer()
-{
-    timeElapsed.Resume();
-    if (statistics.get()) statistics->resumeTimer();
-    graphDataBytes->resumeTimer();
 }
 
 
 void SyncStatus::SyncStatusImpl::OnPause(wxCommandEvent& event)
 {
-    if (currentStatus == SyncStatus::PAUSE)
-    {
-        resumeTimer();
-        setCurrentStatus(previousStatus);
-
-        m_buttonPause->SetLabel(_("Pause"));
-        m_animationControl1->Play();
-    }
-    else
-    {
-        stopTimer();
-        previousStatus = currentStatus; //save current status
-        setCurrentStatus(SyncStatus::PAUSE);
-
-        m_buttonPause->SetLabel(_("Continue"));
-        m_animationControl1->Stop();
-    }
+    paused_ = !paused_;
+    updateDialogStatus(); //update status + pause button
 }
 
 
@@ -1367,16 +1252,19 @@ void SyncStatus::SyncStatusImpl::OnClose(wxCloseEvent& event)
 {
     //this event handler may be called due to a system shutdown DURING synchronization!
     //try to stop sync gracefully and cross fingers:
-    if (currentProcessIsRunning())
+    if (abortCb_)
         abortCb_->requestAbortion();
-    //Note: we must NOT veto dialog destruction, else we will cancel system shutdown if this dialog is application main window (like in batch mode)
+    //Note: we must NOT veto dialog destruction, else we will cancel system shutdown if this dialog is application main window (as in batch mode)
 
+    isZombie = true; //it "lives" until cleanup in next idle event
     Destroy();
 }
 
 
 void SyncStatus::SyncStatusImpl::OnIconize(wxIconizeEvent& event)
 {
+    if (isZombie) return; //wxGTK sends iconize event *after* wxWindow::Destroy, sigh...
+
     if (event.IsIconized()) //ATTENTION: iconize event is also triggered on "Restore"! (at least under Linux)
         minimizeToTray();
     else
@@ -1399,7 +1287,8 @@ void SyncStatus::SyncStatusImpl::minimizeToTray()
         //tray icon has shorter lifetime than this => no need to disconnect event later
     }
 
-    updateStatusDialogNow(false); //set tooltip: e.g. in pause mode there was no GUI update, so this is the last chance
+    if (syncStat_)
+        updateProgress(false); //set tray tooltip + progress: e.g. no updates while paused
 
     Hide();
     if (mainDialog)
@@ -1425,7 +1314,9 @@ void SyncStatus::SyncStatusImpl::resumeFromSystray()
     Raise();
     SetFocus();
 
-    updateStatusDialogNow(false); //restore Windows 7 task bar status (e.g. required in pause mode)
+    updateDialogStatus(); //restore Windows 7 task bar status (e.g. required in pause mode)
+    if (syncStat_)
+        updateProgress(false); //restore Windows 7 task bar progress (e.g. required in pause mode)
 }
 
 
@@ -1434,18 +1325,18 @@ void SyncStatus::SyncStatusImpl::resumeFromSystray()
 
 //redirect to implementation
 SyncStatus::SyncStatus(AbortCallback& abortCb,
+                       const Statistics& syncStat,
                        MainDialog* parentWindow,
-                       SyncStatusID startStatus,
                        bool showProgress,
                        const wxString& jobName,
                        const std::wstring& execWhenFinished,
                        std::vector<std::wstring>& execFinishedHistory) :
-    pimpl(new SyncStatusImpl(abortCb, parentWindow, startStatus, jobName, execWhenFinished, execFinishedHistory))
+    pimpl(new SyncStatusImpl(abortCb, syncStat, parentWindow, jobName, execWhenFinished, execFinishedHistory))
 {
     if (showProgress)
     {
         pimpl->Show();
-        pimpl->updateStatusDialogNow(false); //clear gui flicker: window must be visible to make this work!
+        pimpl->updateProgress(false); //clear gui flicker, remove dummy texts: window must be visible to make this work!
     }
     else
         pimpl->minimizeToTray();
@@ -1461,34 +1352,19 @@ wxWindow* SyncStatus::getAsWindow()
     return pimpl;
 }
 
-void SyncStatus::initNewProcess(SyncStatusID id, int totalObjectsToProcess, Int64 totalDataToProcess)
+void SyncStatus::initNewPhase()
 {
-    pimpl->initNewProcess(id, totalObjectsToProcess, totalDataToProcess);
+    pimpl->initNewPhase();
 }
 
-void SyncStatus::incScannedObjects_NoUpdate(int number)
+void SyncStatus::reportCurrentBytes(Int64 currentData)
 {
-    pimpl->incScannedObjects_NoUpdate(number);
+    pimpl->reportCurrentBytes(currentData);
 }
 
-void SyncStatus::incProcessedData_NoUpdate(int objectsDelta, Int64 dataDelta)
+void SyncStatus::updateProgress()
 {
-    pimpl->incProcessedData_NoUpdate(objectsDelta, dataDelta);
-}
-
-void SyncStatus::incTotalData_NoUpdate(int objectsDelta, Int64 dataDelta)
-{
-    pimpl->incTotalData_NoUpdate(objectsDelta, dataDelta);
-}
-
-void SyncStatus::setStatusText_NoUpdate(const wxString& text)
-{
-    pimpl->setStatusText_NoUpdate(text);
-}
-
-void SyncStatus::updateStatusDialogNow()
-{
-    pimpl->updateStatusDialogNow();
+    pimpl->updateProgress();
 }
 
 std::wstring SyncStatus::getExecWhenFinishedCommand() const
@@ -1506,12 +1382,12 @@ void SyncStatus::resumeTimer()
     return pimpl->resumeTimer();
 }
 
-void SyncStatus::processHasFinished(SyncStatusID id, const ErrorLog& log)
+void SyncStatus::processHasFinished(SyncResult resultId, const ErrorLog& log)
 {
-    pimpl->processHasFinished(id, log);
+    pimpl->processHasFinished(resultId, log);
 }
 
 void SyncStatus::closeWindowDirectly() //don't wait for user (silent mode)
 {
-    pimpl->Destroy();
+    pimpl->closeWindowDirectly();
 }

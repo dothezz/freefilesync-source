@@ -8,7 +8,7 @@
 #define STATUSHANDLER_IMPL_H_INCLUDED
 
 #include <zen/file_error.h>
-#include "status_handler.h"
+#include "process_callback.h"
 
 template <typename Function> inline
 bool tryReportingError(Function cmd, ProcessCallback& handler) //return "true" on success, "false" if error was ignored

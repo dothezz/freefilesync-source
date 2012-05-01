@@ -19,8 +19,14 @@
 <source>Browse directory</source>
 <target>Переглянути каталог</target>
 
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Запит переривання: В очікуванні завершення поточної операції...</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Автоматична синхронізація</target>
+
+<source>Error</source>
+<target>Помилка</target>
 
 <source>Select alternate comparison settings</source>
 <target>Вибрати альтернативні налаштування порівняння</target>
@@ -51,9 +57,6 @@
 
 <source>About</source>
 <target>Про</target>
-
-<source>Error</source>
-<target>Помилка</target>
 
 <source>Warning</source>
 <target>Увага</target>
@@ -115,8 +118,8 @@
 <source>Linux Error Code %x:</source>
 <target>Код помилки Linux %x:</target>
 
-<source>Error resolving symbolic link:</source>
-<target>Помилка при вирішені символічного посилання:</target>
+<source>Cannot resolve symbolic link %x.</source>
+<target>Не вдається вирішити символьне посилання %x.</target>
 
 <source>%x MB</source>
 <target>%x МБ</target>
@@ -137,35 +140,41 @@
 <pluralform>%x байтів</pluralform>
 </target>
 
-<source>Error reading from synchronization database:</source>
-<target>Помилка при читанні з бази даних синхронізації:</target>
+<source>Cannot read file %x.</source>
+<target>Не вдається прочитати файл %x.</target>
 
-<source>Error writing to synchronization database:</source>
-<target>Помилка при записі у базу данних синхронізації:</target>
+<source>Cannot write file %x.</source>
+<target>Не вдається записати файл %x.</target>
 
-<source>Incompatible synchronization database format:</source>
-<target>Несумісний формат бази даних синхронізації:</target>
+<source>Database file %x is incompatible.</source>
+<target>Несумісний файл бази даних %x.</target>
 
 <source>Initial synchronization:</source>
 <target>Вступна синхронізація:</target>
 
-<source>One of the FreeFileSync database files is not yet existing:</source>
-<target>Файлу бази даних FreeFileSync ще не існує:</target>
+<source>Database file %x does not yet exist.</source>
+<target>Файл бази даних %x ще не існує.</target>
 
-<source>Database files do not share a common synchronization session:</source>
-<target>Файли бази даних не мають спільної сесії синхронізації</target>
+<source>Out of memory!</source>
+<target>Бракує пам'яті!</target>
+
+<source>Database files do not share a common session.</source>
+<target>Файли баз даних не поділяють спільну сесію.</target>
 
 <source>An exception occurred!</source>
 <target>Відбулось виключення!</target>
 
-<source>Error reading file attributes:</source>
-<target>Помилка при читанні параметрів файлу:</target>
+<source>Cannot read file attributes of %x.</source>
+<target>Не вдається прочитати атрибути файла %х.</target>
+
+<source>Cannot get process information.</source>
+<target>Не вдається отримати інформацію процесу</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Очікування зняття блокування з каталогу (%x)...</target>
 
-<source>Error setting directory lock:</source>
-<target>Помилка блокування каталогу:</target>
+<source>Cannot set directory lock %x.</source>
+<target>Не вдається встановити блокування каталога %х.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -177,8 +186,8 @@
 <pluralform>%x сек</pluralform>
 </target>
 
-<source>Error reading file:</source>
-<target>Помилка при читанні файлу:</target>
+<source>Error parsing file %x, row %y, column %z.</source>
+<target>Помилка розбору файла %x, рядок %y, колонка %z.</target>
 
 <source>Scanning:</source>
 <target>Сканую:</target>
@@ -196,38 +205,32 @@
 <pluralform>[%x Нитей виконання]</pluralform>
 </target>
 
-<source>Invalid FreeFileSync config file!</source>
-<target>Неправильний файл конфігурації FreeFileSync!</target>
+<source>/sec</source>
+<target>/сек</target>
 
-<source>Error parsing configuration file:</source>
-<target>Помилка при анализі файлу налаштувань синхронізації:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>Файл %x не містить правильної конфігурації.</target>
 
-<source>Configuration loaded partially only:</source>
-<target>Конфігурація завантажена лише частково</target>
+<source>Configuration file %x loaded partially only.</source>
+<target>Файл конфігурації %x завантажено лише частково.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>Не вдається перенести %x до Корзини!</target>
+<source>Cannot access Volume Shadow Copy Service.</source>
+<target>Не вдається отримати доступ до послуги тіньового копіювання тому</target>
+
+<source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
+<target>Будь ласка, використовуйте 64-розрядну версію FreeFileSync для створення тіньових копій у цій системі.</target>
 
 <source>Cannot load file %x.</source>
 <target>Не вдається завантажити файл %x.</target>
 
-<source>Error accessing Volume Shadow Copy Service!</source>
-<target>Помилка доступу до послуги Тіньового Копіювання Тому</target>
-
-<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
-<target>Створення тіньових копій на WOW64 не підтримується. Будь ласка, використайте FreeFileSync 64-розрядної версії.</target>
-
-<source>Cannot determine volume name for file:</source>
-<target>Не вдається визначити назву тому для файла:</target>
+<source>Path %x does not contain a volume name.</source>
+<target>Шлях %x не містить імені тому</target>
 
 <source>Volume name %x not part of file name %y!</source>
 <target>Ім’я тому %x не є частиною імені файлу %y!</target>
 
-<source>/sec</source>
-<target>/сек</target>
-
-<source>File does not exist:</source>
-<target>Файл не існує:</target>
+<source>Cannot find file %x.</source>
+<target>Не вдається знайти файлу %x.</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Не вдається прочитати такі елементи XML:</target>
@@ -300,14 +303,17 @@ The command line is executed each time:
 <source>Start</source>
 <target>Старт</target>
 
+<source>&Retry</source>
+<target>&Повторити</target>
+
+<source>Cancel</source>
+<target>Відмінити</target>
+
 <source>(Build: %x)</source>
 <target>(компіляція %x)</target>
 
 <source>RealtimeSync configuration</source>
 <target>Налаштування RealtimeSync</target>
-
-<source>File already exists. Overwrite?</source>
-<target>Файл уже існує. Перезаписати?</target>
 
 <source>&Restore</source>
 <target>&Відновити</target>
@@ -351,20 +357,20 @@ The command line is executed each time:
 <source>FreeFileSync configuration</source>
 <target>Налаштування FreeFileSync</target>
 
-<source>FreeFileSync Batch Job</source>
-<target>Пакетне завдання FreeFileSync</target>
-
-<source>Unable to create log file!</source>
-<target>Не можна створити лог-файл!</target>
-
 <source>Batch execution</source>
 <target>Виконання пакетного завдання</target>
 
-<source>Stop</source>
-<target>Стоп</target>
+<source>Items processed:</source>
+<target>Елементів оброблено:</target>
+
+<source>Items remaining:</source>
+<target>Елементів залишилось:</target>
 
 <source>Total time:</source>
 <target>Загальний час:</target>
+
+<source>Stop</source>
+<target>Стоп</target>
 
 <source>Synchronization aborted!</source>
 <target>Синхронізація припинена!</target>
@@ -372,14 +378,17 @@ The command line is executed each time:
 <source>Synchronization completed with errors!</source>
 <target>Синхронізація закінчилася з помилками!</target>
 
+<source>Nothing to synchronize!</source>
+<target>Нічого синхронізувати!</target>
+
 <source>Synchronization completed successfully!</source>
 <target>Синхронізація пройшла успішно!</target>
 
-<source>Press "Switch" to open FreeFileSync GUI mode.</source>
-<target>Натисніть "Змінити" для відкриття графічного інтерфейсу FreeFileSync.</target>
+<source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
+<target>Натисніть "Змінити" для вирішення питань у головному вікні FreeFileSync.</target>
 
-<source>Switching to FreeFileSync GUI mode...</source>
-<target>Перехід до графічного інтерфейсу FreeFileSync...</target>
+<source>Switching to FreeFileSync main dialog...</source>
+<target>Перехід до головного діалогу FreeFileSync...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Не можна з’єднатися з sourceforge.net!</target>
@@ -540,9 +549,6 @@ The command line is executed each time:
 <source>Items found:</source>
 <target>Елементів знайдено:</target>
 
-<source>Items remaining:</source>
-<target>Елементів залишилось:</target>
-
 <source>Speed:</source>
 <target>Швидкість:</target>
 
@@ -594,9 +600,6 @@ The command line is executed each time:
 <source>&Load</source>
 <target>&Завантажити</target>
 
-<source>&Cancel</source>
-<target>&Відмінити</target>
-
 <source>Select variant:</source>
 <target>Виберіть варіант:</target>
 
@@ -645,8 +648,8 @@ The command line is executed each time:
 <source>Conflict/file cannot be categorized</source>
 <target>Не можна категоризувати конфлікт/файл</target>
 
-<source>&OK</source>
-<target>&OK</target>
+<source>OK</source>
+<target>OK</target>
 
 <source>Compare by...</source>
 <target>Критерії порівнювання</target>
@@ -676,9 +679,6 @@ is the same
 
 <source>Synchronizing...</source>
 <target>Синхронізація...</target>
-
-<source>Items processed:</source>
-<target>Елементів оброблено:</target>
 
 <source>&Pause</source>
 <target>&Пауза</target>
@@ -718,9 +718,6 @@ is the same
 
 <source>&Ignore</source>
 <target>&Ігнорувати</target>
-
-<source>&Retry</source>
-<target>&Повторити</target>
 
 <source>Do not show this dialog again</source>
 <target>Надалі не показувати це вікно</target>
@@ -1019,9 +1016,6 @@ Exclude: \stuff\temp\*
 <source>File list exported!</source>
 <target>Список файлів експортовано!</target>
 
-<source>Error writing file:</source>
-<target>Помилка при записі файлу:</target>
-
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
@@ -1071,20 +1065,20 @@ Exclude: \stuff\temp\*
 <source>Paused</source>
 <target>Призупинено</target>
 
+<source>Initializing...</source>
+<target>Ініціалізація...</target>
+
 <source>Aborted</source>
 <target>Перервано</target>
 
 <source>Completed</source>
 <target>Завершено</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Запит переривання: В очікуванні завершення поточної операції...</target>
+<source>Continue</source>
+<target>Далі</target>
 
 <source>Pause</source>
 <target>Пауза</target>
-
-<source>Continue</source>
-<target>Далі</target>
 
 <source>Cannot find %x</source>
 <target>Не можна знайти %x</target>
@@ -1229,65 +1223,65 @@ Exclude: \stuff\temp\*
 <pluralform>%x днів</pluralform>
 </target>
 
-<source>Could not initialize directory monitoring:</source>
-<target>Не вдалося ініціювати каталог для моніторингу:</target>
-
-<source>Error when monitoring directories.</source>
-<target>Помилка моніторингу каталогу.</target>
+<source>Cannot monitor directory %x.</source>
+<target>Не вдається контролювати каталог %x.</target>
 
 <source>Conversion error:</source>
 <target>Помилка перетворення:</target>
 
-<source>Error deleting file:</source>
-<target>Помилка при вилученні файлу:</target>
+<source>Cannot delete file %x.</source>
+<target>Не вдається видалити файл %х.</target>
 
-<source>Error moving file:</source>
-<target>Помилка переміщення файлу:</target>
+<source>The file is locked by another process:</source>
+<target>Файл заблоковано іншим процесом:</target>
 
-<source>Target file already existing!</source>
-<target>Кінцевий файл уже існує!</target>
+<source>Cannot move file %x to %y.</source>
+<target>Не вдається перемістити файл %x до %y.</target>
 
-<source>Error moving directory:</source>
-<target>Помилка переміщення каталогу:</target>
+<source>Cannot delete directory %x.</source>
+<target>Не вдається видалити каталог х%.</target>
 
-<source>Target directory already existing!</source>
-<target>Кінцевий каталог вже існує!</target>
+<source>Cannot write modification time of %x.</source>
+<target>Не вдається записати часу модифікації %х.</target>
 
-<source>Error deleting directory:</source>
-<target>Помилка при вилученні каталогу:</target>
+<source>Cannot find system function %x.</source>
+<target>Не вдається знайти системної функції %x.</target>
 
-<source>Error changing modification time:</source>
-<target>Помилка при зміні часу модификації файлу:</target>
+<source>Cannot read security context of %x.</source>
+<target>Не вдається прочитати контексту безпеки %х.</target>
 
-<source>Error loading library function:</source>
-<target>Помилка при завантаженні функції бібліотеки:</target>
+<source>Cannot write security context of %x.</source>
+<target>Не вдається записати контексту безпеки %х.</target>
 
-<source>Error reading security context:</source>
-<target>Помилка при читанні контексту безпеки:</target>
+<source>Cannot read permissions of %x.</source>
+<target>Не вдається прочитати дозволів %х.</target>
 
-<source>Error writing security context:</source>
-<target>Помилка при записі контексту безпеки:</target>
+<source>Cannot write permissions of %x.</source>
+<target>Не вдається записати дозволів %х.</target>
 
-<source>Error copying file permissions:</source>
-<target>Помилка при копіюванні прав доступу:</target>
+<source>Cannot create directory %x.</source>
+<target>Не вдається створити каталогу %x.</target>
 
-<source>Error creating directory:</source>
-<target>Помилка при створенні каталогу:</target>
+<source>Cannot copy symbolic link %x to %y.</source>
+<target>Не вдається зкопіювати символьне посилання %х в %y.</target>
 
-<source>Error copying symbolic link:</source>
-<target>Помилка при копіюванні символьного посилання:</target>
+<source>Cannot write file attributes of %x.</source>
+<target>Не вдається записати атрибути файла %x.</target>
 
-<source>Error copying file:</source>
-<target>Помилка при копіюванні файлу:</target>
+<source>Cannot copy file %x to %y.</source>
+<target>Не вдається зкопіювати файл %х до %y.</target>
 
-<source>Error traversing directory:</source>
-<target>Помилка обходу каталогу:</target>
+<source>Cannot read directory %x.</source>
+<target>Не вдається прочитати каталог %x</target>
 
-<source>Endless loop when traversing directory:</source>
-<target>Зациклюванння при обході каталогу:</target>
+<source>Endless loop.</source>
+<target>Нескінченний цикл.</target>
 
-<source>Error setting privilege:</source>
-<target>Помилка встановлення привилеїв:</target>
+<source>Cannot set privilege %x.</source>
+<target>Не вдається встановити привілеї %х.</target>
+
+<source>Unable to move %x to the Recycle Bin!</source>
+<target>Не вдається перенести %x до Корзини!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>З моменту останньої синхронізації з обох сторін відбулися зміни!</target>
@@ -1316,8 +1310,8 @@ Exclude: \stuff\temp\*
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Ви можете проігнорувати помилку, вважаючи каталог порожнім.</target>
 
-<source>Directory does not exist:</source>
-<target>Каталог не існує:</target>
+<source>Cannot find directory %x.</source>
+<target>Не вдається знайти каталог х%.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Залежні каталоги! Будьте уважні при налаштуванні правил синхронізації:</target>
@@ -1325,20 +1319,17 @@ Exclude: \stuff\temp\*
 <source>Preparing synchronization...</source>
 <target>Підготовка до синхронізації...</target>
 
-<source>Out of memory!</source>
-<target>Бракує пам'яті!</target>
+<source>Conflict detected:</source>
+<target>Виявлено конфлікт:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Файл %x має неіснуючу дату!</target>
 
-<source>Conflict detected:</source>
-<target>Виявлено конфлікт:</target>
-
 <source>Files %x have the same date but a different size!</source>
 <target>Файли %x мають однакову дату, але різні за розміром!</target>
 
-<source>Symlinks %x have the same date but a different target!</source>
-<target>Символьне посиланння %x має таку ж дату, але різний вміст!</target>
+<source>Symbolic links %x have the same date but a different target.</source>
+<target>Символьні посилання %х мають таку ж дату, але різні цілі.</target>
 
 <source>Comparing content of files %x</source>
 <target>Порівнювання вмісту файлів %x</target>
@@ -1421,11 +1412,11 @@ Exclude: \stuff\temp\*
 <source>Creating file %x</source>
 <target>Створення файлу %x</target>
 
-<source>Creating folder %x</source>
-<target>Створення папки %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Створення символьного посилання %x</target>
+
+<source>Creating folder %x</source>
+<target>Створення папки %x</target>
 
 <source>Overwriting file %x</source>
 <target>Перезапис файлу %x</target>
@@ -1445,8 +1436,8 @@ Exclude: \stuff\temp\*
 <source>Directory for file versioning was not supplied!</source>
 <target>Не вказаний каталог для старих версій файлів!</target>
 
-<source>Source directory does not exist anymore:</source>
-<target>Каталог-джерело вже не існує:</target>
+<source>Source directory %x not found.</source>
+<target>Вихідний каталог %x не знайдено.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Є невирішені конфлікти</target>
@@ -1480,12 +1471,6 @@ Exclude: \stuff\temp\*
 
 <source>Generating database...</source>
 <target>Створення бази даних...</target>
-
-<source>Nothing to synchronize!</source>
-<target>Нічого синхронізувати!</target>
-
-<source>Unable to copy locked file %x!</source>
-<target>Не можу зкопіювати заблокований файл %x!</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Помилка перевірки даних: вхідний і вихідний файли мають різний вміст!</target>

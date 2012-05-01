@@ -7,10 +7,14 @@
 #ifndef MESSAGEPOPUP_H_INCLUDED
 #define MESSAGEPOPUP_H_INCLUDED
 
+#include <wx/window.h>
 #include <wx/string.h>
+
 
 namespace zen
 {
+//parent window, optional: support correct dialog placement above parent on multiple monitor systems
+
 struct ReturnErrorDlg
 {
     enum ButtonPressed
@@ -20,7 +24,7 @@ struct ReturnErrorDlg
         BUTTON_ABORT  = 4
     };
 };
-ReturnErrorDlg::ButtonPressed showErrorDlg(int activeButtons, const wxString& messageText, bool* ignoreNextErrors); //ignoreNextErrors may be nullptr
+ReturnErrorDlg::ButtonPressed showErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageText, bool* ignoreNextErrors); //ignoreNextErrors may be nullptr
 
 
 struct ReturnWarningDlg
@@ -32,7 +36,7 @@ struct ReturnWarningDlg
         BUTTON_ABORT   = 4
     };
 };
-ReturnWarningDlg::ButtonPressed showWarningDlg(int activeButtons, const wxString& messageText, bool& dontShowAgain);
+ReturnWarningDlg::ButtonPressed showWarningDlg(wxWindow* parent, int activeButtons, const wxString& messageText, bool& dontShowAgain);
 
 
 struct ReturnQuestionDlg
@@ -53,8 +57,7 @@ struct CheckBox
     bool& value_;    //in/out
 };
 
-ReturnQuestionDlg::ButtonPressed showQuestionDlg(int activeButtons, const wxString& messageText, CheckBox* checkbox = nullptr);
+ReturnQuestionDlg::ButtonPressed showQuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, CheckBox* checkbox = nullptr);
 }
-
 
 #endif // MESSAGEPOPUP_H_INCLUDED

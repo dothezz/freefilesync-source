@@ -185,9 +185,10 @@ private:
 
 
 FfsTrayIcon::FfsTrayIcon() :
-    trayIcon(new TaskBarImpl(*this))
+    trayIcon(new TaskBarImpl(*this)),
+    fractionLast(1) //show FFS logo by default
 {
-    trayIcon->SetIcon(generateIcon(0), wxT("FreeFileSync"));
+    trayIcon->SetIcon(generateIcon(fractionLast), L"FreeFileSync");
     trayIcon->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(FfsTrayIcon::OnDoubleClick), nullptr, this); //register double-click
 }
 
@@ -204,23 +205,30 @@ FfsTrayIcon::~FfsTrayIcon()
 }
 
 
-void FfsTrayIcon::setToolTip(const wxString& toolTipText, double fraction)
+void FfsTrayIcon::setToolTip(const wxString& toolTip)
 {
-    trayIcon->SetIcon(generateIcon(fraction), toolTipText);
+    toolTipLast = toolTip;
+    trayIcon->SetIcon(generateIcon(fractionLast), toolTip); //another wxWidgets design bug: non-orthogonal method!
+}
+
+
+void FfsTrayIcon::setProgress(double fraction)
+{
+    fractionLast = fraction;
+    trayIcon->SetIcon(generateIcon(fraction), toolTipLast);
 }
 
 
 void FfsTrayIcon::OnContextMenuSelection(wxCommandEvent& event)
 {
-    const Selection eventId = static_cast<Selection>(event.GetId());
-    switch (eventId)
+    switch (static_cast<Selection>(event.GetId()))
     {
         case CONTEXT_ABOUT:
         {
             //ATTENTION: the modal dialog below does NOT disable all GUI input, e.g. user may still double-click on tray icon
             //which will implicitly destroy the tray icon while still showing the modal dialog
             trayIcon->SetEvtHandlerEnabled(false);
-            zen::showAboutDialog();
+            zen::showAboutDialog(nullptr);
             trayIcon->SetEvtHandlerEnabled(true);
         }
         break;

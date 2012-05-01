@@ -45,7 +45,7 @@ void onTerminationRequested()
     std::wstring msg = ::GetCurrentThreadId() == mainThreadId ?
                        L"Termination requested in main thread!\n\n" :
                        L"Termination requested in worker thread!\n\n";
-    msg += L"Please take a screenshot and file a bug report on: http://sourceforge.net/projects/freefilesync";
+    msg += L"Please take a screenshot and file a bug report at: http://sourceforge.net/projects/freefilesync";
 
     ::MessageBox(0, msg.c_str(), _("An exception occurred!").c_str(), 0);
     std::abort();
@@ -77,13 +77,13 @@ void Application::OnStartApplication(wxIdleEvent&)
 {
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
 
-    //wxWidgets app exit handling is quite weird... we want the app to exit only if the logical main window is closed
+    //wxWidgets app exit handling is weird... we want the app to exit only if the logical main window is closed
     wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
-    wxApp* app = wxTheApp;
+	auto app = wxTheApp; //fix lambda/wxWigets/VC fuck up
     ZEN_ON_SCOPE_EXIT(if (!mainWindowWasSet()) app->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
 
     //if appname is not set, the default is the executable's name!
-    SetAppName(wxT("FreeFileSync"));
+    SetAppName(L"FreeFileSync");
 
 #ifdef FFS_WIN
     //Quote: "Best practice is that all applications call the process-wide SetErrorMode function with a parameter of
@@ -91,11 +91,9 @@ void Application::OnStartApplication(wxIdleEvent&)
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
 #elif defined FFS_LINUX
-    gtk_init(nullptr, nullptr);
-
+    ::gtk_init(nullptr, nullptr);
     ::gtk_rc_parse((getResourceDir() + "styles.rc").c_str()); //remove inner border from bitmap buttons
 #endif
-
 
 #if wxCHECK_VERSION(2, 9, 1)
 #ifdef FFS_WIN
@@ -103,7 +101,6 @@ void Application::OnStartApplication(wxIdleEvent&)
 #endif
     wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
 #endif
-
 
     try //load global settings from XML: they are written on exit, so read them FIRST
     {
@@ -123,7 +120,6 @@ void Application::OnStartApplication(wxIdleEvent&)
     //set program language
     setLanguage(globalSettings.programLanguage);
 
-
     //determine FFS mode of operation
     std::vector<wxString> commandArgs; //wxWidgets screws up once again making "argv implicitly convertible to a wxChar**" in 2.9.3,
     for (int i = 1; i < argc; ++i)     //so we are forced to use this pitiful excuse for a range construction!!
@@ -142,7 +138,6 @@ void Application::OnStartApplication(wxIdleEvent&)
             for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
             {
                 size_t index = iter - commandArgs.begin();
-                Zstring dirname = toZ(*iter);
 
                 FolderPairEnh& fp = [&]() -> FolderPairEnh&
                 {
@@ -154,9 +149,9 @@ void Application::OnStartApplication(wxIdleEvent&)
                 }();
 
                 if (index % 2 == 0)
-                    fp.leftDirectory = dirname;
+                    fp.leftDirectory = toZ(*iter);
                 else if (index % 2 == 1)
-                    fp.rightDirectory = dirname;
+                    fp.rightDirectory = toZ(*iter);
             }
 
             runGuiMode(guiCfg, globalSettings);
@@ -165,23 +160,23 @@ void Application::OnStartApplication(wxIdleEvent&)
         {
             for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
             {
-                wxString& filename = *iter;
+                const Zstring& filename = toZ(*iter);
 
-                if (!fileExists(toZ(filename))) //be a little tolerant
+                if (!fileExists(filename)) //be a little tolerant
                 {
-                    if (fileExists(toZ(filename) + Zstr(".ffs_batch")))
-                        filename += L".ffs_batch";
-                    else if (fileExists(toZ(filename) + Zstr(".ffs_gui")))
-                        filename += L".ffs_gui";
+                    if (fileExists(filename + Zstr(".ffs_batch")))
+                        *iter += L".ffs_batch";
+                    else if (fileExists(filename + Zstr(".ffs_gui")))
+                        *iter += L".ffs_gui";
                     else
                     {
-                        wxMessageBox(_("File does not exist:") + L" \"" + filename + L"\"", _("Error"), wxOK | wxICON_ERROR);
+                        wxMessageBox(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)), _("Error"), wxOK | wxICON_ERROR);
                         return;
                     }
                 }
             }
 
-            switch (getMergeType(commandArgs)) //throw ()
+            switch (getMergeType(toZ(commandArgs))) //throw ()
             {
                 case MERGE_BATCH: //pure batch config files
                     if (commandArgs.size() == 1)
@@ -200,11 +195,11 @@ void Application::OnStartApplication(wxIdleEvent&)
                     std::find_if(commandArgs.begin(), commandArgs.end(),
                                  [](const wxString& filename) -> bool
                     {
-                        switch (getXmlType(filename)) //throw()
+                        switch (getXmlType(toZ(filename))) //throw()
                         {
                             case XML_TYPE_GLOBAL:
                             case XML_TYPE_OTHER:
-                                wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                                wxMessageBox(_("The file does not contain a valid configuration:") + L" " + fmtFileName(toZ(filename)), _("Error"), wxOK | wxICON_ERROR);
                                 return true;
 
                             case XML_TYPE_GUI:
@@ -234,7 +229,7 @@ int Application::OnRun()
     }
     catch (const std::exception& e) //catch all STL exceptions
     {
-        //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
+        //it's not always possible to display a message box, e.g. corrupted stack, however (non-stream) file output works!
         wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
         safeOutput.Write(utf8CvrtTo<wxString>(e.what()));
 
@@ -243,10 +238,12 @@ int Application::OnRun()
     }
     catch (...) //catch the rest
     {
-        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
-        safeOutput.Write(wxT("Unknown exception!"));
+        const wxString& msg = L"Unknown error.";
 
-        wxSafeShowMessage(_("An exception occurred!"), L"Unknown exception!");
+        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
+        safeOutput.Write(msg);
+
+        wxSafeShowMessage(_("An exception occurred!"), msg);
         return -9;
     }
 
@@ -306,7 +303,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
     XmlBatchConfig batchCfg;  //structure to receive gui settings
     try
     {
-        readConfig(filename, batchCfg);
+        readConfig(toZ(filename), batchCfg);
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
@@ -348,13 +345,18 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         }
 
         //batch mode: place directory locks on directories during both comparison AND synchronization
-        LockHolder dummy(allowPwPrompt);
-        std::for_each(cmpConfig.begin(), cmpConfig.end(),
-                      [&](const FolderPairCfg& fpCfg)
+
+        std::unique_ptr<LockHolder> dummy;
+        if (globSettings.createLockFile)
         {
-            dummy.addDir(fpCfg.leftDirectoryFmt,  statusHandler);
-            dummy.addDir(fpCfg.rightDirectoryFmt, statusHandler);
-        });
+            dummy.reset(new LockHolder(allowPwPrompt));
+            std::for_each(cmpConfig.begin(), cmpConfig.end(),
+                          [&](const FolderPairCfg& fpCfg)
+            {
+                dummy->addDir(fpCfg.leftDirectoryFmt,  statusHandler);
+                dummy->addDir(fpCfg.rightDirectoryFmt, statusHandler);
+            });
+        }
 
         //COMPARE DIRECTORIES
         CompareProcess cmpProc(globSettings.fileTimeTolerance,

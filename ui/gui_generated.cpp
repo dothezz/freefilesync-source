@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Mar 17 2012)
+// C++ code generated with wxFormBuilder (version Apr 10 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -928,23 +928,11 @@ CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id,
 
     bSizer154->Add( m_staticTextFilesRemaining, 0, wxALIGN_BOTTOM, 5 );
 
-    m_staticText117 = new wxStaticText( this, wxID_ANY, _("("), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText117->Wrap( -1 );
-    m_staticText117->SetFont( wxFont( 9, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizer154->Add( m_staticText117, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
-
     m_staticTextDataRemaining = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextDataRemaining->Wrap( -1 );
     m_staticTextDataRemaining->SetFont( wxFont( 9, 70, 90, 90, false, wxEmptyString ) );
 
-    bSizer154->Add( m_staticTextDataRemaining, 0, wxALIGN_BOTTOM, 5 );
-
-    m_staticText118 = new wxStaticText( this, wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText118->Wrap( -1 );
-    m_staticText118->SetFont( wxFont( 9, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizer154->Add( m_staticText118, 0, wxALIGN_BOTTOM, 5 );
+    bSizer154->Add( m_staticTextDataRemaining, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
 
 
     bSizerFilesRemaining->Add( bSizer154, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
@@ -1413,7 +1401,7 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer68->Add( m_buttonLoad, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_button6 = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button6 = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button6->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer68->Add( m_button6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
@@ -1881,13 +1869,13 @@ SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const
     wxBoxSizer* bSizer291;
     bSizer291 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonOK = new wxButton( this, wxID_OK, _("&OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonOK = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonOK->SetDefault();
     m_buttonOK->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
 
     bSizer291->Add( m_buttonOK, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
-    m_button16 = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button16 = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button16->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer291->Add( m_button16, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
@@ -2042,13 +2030,13 @@ CmpCfgDlgGenerated::CmpCfgDlgGenerated( wxWindow* parent, wxWindowID id, const w
     wxBoxSizer* bSizer22;
     bSizer22 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_button10 = new wxButton( this, wxID_OK, _("&OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button10 = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button10->SetDefault();
     m_button10->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
 
     bSizer22->Add( m_button10, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
-    m_button6 = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button6 = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button6->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer22->Add( m_button6, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
@@ -2063,6 +2051,8 @@ CmpCfgDlgGenerated::CmpCfgDlgGenerated( wxWindow* parent, wxWindowID id, const w
     this->SetSizer( bSizer136 );
     this->Layout();
     bSizer136->Fit( this );
+
+    this->Centre( wxBOTH );
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( CmpCfgDlgGenerated::OnClose ) );
@@ -2168,23 +2158,11 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 
     bSizerItemsProc->Add( m_staticTextProcessedObj, 0, wxALIGN_BOTTOM, 5 );
 
-    m_staticText98 = new wxStaticText( m_panelProgress, wxID_ANY, _("("), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText98->Wrap( -1 );
-    m_staticText98->SetFont( wxFont( 9, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizerItemsProc->Add( m_staticText98, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
-
     m_staticTextDataProcessed = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextDataProcessed->Wrap( -1 );
     m_staticTextDataProcessed->SetFont( wxFont( 9, 70, 90, 90, false, wxEmptyString ) );
 
-    bSizerItemsProc->Add( m_staticTextDataProcessed, 0, wxALIGN_BOTTOM, 5 );
-
-    m_staticText99 = new wxStaticText( m_panelProgress, wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText99->Wrap( -1 );
-    m_staticText99->SetFont( wxFont( 9, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizerItemsProc->Add( m_staticText99, 0, wxALIGN_BOTTOM, 5 );
+    bSizerItemsProc->Add( m_staticTextDataProcessed, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
 
 
     fgSizer10->Add( bSizerItemsProc, 0, wxALIGN_BOTTOM, 5 );
@@ -2203,38 +2181,26 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 
     bSizerItemsRem->Add( m_staticTextRemainingObj, 0, wxALIGN_BOTTOM, 5 );
 
-    m_staticText96 = new wxStaticText( m_panelProgress, wxID_ANY, _("("), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText96->Wrap( -1 );
-    m_staticText96->SetFont( wxFont( 9, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizerItemsRem->Add( m_staticText96, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
-
     m_staticTextDataRemaining = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextDataRemaining->Wrap( -1 );
     m_staticTextDataRemaining->SetFont( wxFont( 9, 70, 90, 90, false, wxEmptyString ) );
 
-    bSizerItemsRem->Add( m_staticTextDataRemaining, 0, wxALIGN_BOTTOM, 5 );
-
-    m_staticText97 = new wxStaticText( m_panelProgress, wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText97->Wrap( -1 );
-    m_staticText97->SetFont( wxFont( 9, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizerItemsRem->Add( m_staticText97, 0, wxALIGN_BOTTOM, 5 );
+    bSizerItemsRem->Add( m_staticTextDataRemaining, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
 
 
     fgSizer10->Add( bSizerItemsRem, 0, wxALIGN_BOTTOM, 5 );
 
-    m_staticTextLabelElapsedTime = new wxStaticText( m_panelProgress, wxID_ANY, _("Elapsed time:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextLabelElapsedTime->Wrap( -1 );
-    m_staticTextLabelElapsedTime->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+    m_staticText84 = new wxStaticText( m_panelProgress, wxID_ANY, _("Speed:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText84->Wrap( -1 );
+    m_staticText84->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
-    fgSizer10->Add( m_staticTextLabelElapsedTime, 0, wxALIGN_BOTTOM, 5 );
+    fgSizer10->Add( m_staticText84, 0, wxALIGN_BOTTOM, 5 );
 
-    m_staticTextTimeElapsed = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextTimeElapsed->Wrap( -1 );
-    m_staticTextTimeElapsed->SetFont( wxFont( 9, 70, 90, 92, false, wxEmptyString ) );
+    m_staticTextSpeed = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextSpeed->Wrap( -1 );
+    m_staticTextSpeed->SetFont( wxFont( 9, 70, 90, 92, false, wxEmptyString ) );
 
-    fgSizer10->Add( m_staticTextTimeElapsed, 0, wxALIGN_BOTTOM, 5 );
+    fgSizer10->Add( m_staticTextSpeed, 0, wxALIGN_BOTTOM, 5 );
 
     m_staticTextLabelRemTime = new wxStaticText( m_panelProgress, wxID_ANY, _("Remaining time:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextLabelRemTime->Wrap( -1 );
@@ -2248,17 +2214,17 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 
     fgSizer10->Add( m_staticTextRemTime, 0, wxALIGN_BOTTOM, 5 );
 
-    m_staticText84 = new wxStaticText( m_panelProgress, wxID_ANY, _("Speed:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText84->Wrap( -1 );
-    m_staticText84->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+    m_staticTextLabelElapsedTime = new wxStaticText( m_panelProgress, wxID_ANY, _("Elapsed time:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextLabelElapsedTime->Wrap( -1 );
+    m_staticTextLabelElapsedTime->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
-    fgSizer10->Add( m_staticText84, 0, wxALIGN_BOTTOM, 5 );
+    fgSizer10->Add( m_staticTextLabelElapsedTime, 0, wxALIGN_BOTTOM, 5 );
 
-    m_staticTextSpeed = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextSpeed->Wrap( -1 );
-    m_staticTextSpeed->SetFont( wxFont( 9, 70, 90, 92, false, wxEmptyString ) );
+    m_staticTextTimeElapsed = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextTimeElapsed->Wrap( -1 );
+    m_staticTextTimeElapsed->SetFont( wxFont( 9, 70, 90, 92, false, wxEmptyString ) );
 
-    fgSizer10->Add( m_staticTextSpeed, 0, wxALIGN_BOTTOM, 5 );
+    fgSizer10->Add( m_staticTextTimeElapsed, 0, wxALIGN_BOTTOM, 5 );
 
 
     bSizerProgressStat->Add( fgSizer10, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
@@ -2320,7 +2286,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 
     bSizer28->Add( 0, 0, 1, 0, 5 );
 
-    m_buttonOK = new wxButton( m_panelBackground, wxID_OK, _("&OK"), wxDefaultPosition, wxSize( 100,30 ), 0 );
+    m_buttonOK = new wxButton( m_panelBackground, wxID_OK, _("OK"), wxDefaultPosition, wxSize( 100,30 ), 0 );
     m_buttonOK->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
     m_buttonOK->Enable( false );
 
@@ -2331,7 +2297,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 
     bSizer28->Add( m_buttonPause, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-    m_buttonAbort = new wxButton( m_panelBackground, wxID_CANCEL, _("&Abort"), wxDefaultPosition, wxSize( 100,30 ), 0 );
+    m_buttonAbort = new wxButton( m_panelBackground, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( 100,30 ), 0 );
     m_buttonAbort->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer28->Add( m_buttonAbort, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
@@ -2675,7 +2641,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer31->Add( sbSizer14, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
 
-    m_buttonOkay = new wxButton( this, wxID_OK, _("&OK"), wxDefaultPosition, wxSize( 100,30 ), 0 );
+    m_buttonOkay = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( 100,30 ), 0 );
     m_buttonOkay->SetDefault();
     m_buttonOkay->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
@@ -2744,7 +2710,7 @@ ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer25->Add( m_buttonRetry, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_buttonAbort = new wxButton( this, wxID_CANCEL, _("&Abort"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonAbort = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonAbort->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer25->Add( m_buttonAbort, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
@@ -2755,6 +2721,8 @@ ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     this->SetSizer( bSizer24 );
     this->Layout();
+
+    this->Centre( wxBOTH );
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ErrorDlgGenerated::OnClose ) );
@@ -2814,7 +2782,7 @@ WarningDlgGenerated::WarningDlgGenerated( wxWindow* parent, wxWindowID id, const
 
     bSizer25->Add( m_buttonSwitch, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
 
-    m_buttonAbort = new wxButton( this, wxID_CANCEL, _("&Abort"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonAbort = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonAbort->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer25->Add( m_buttonAbort, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
@@ -2825,6 +2793,8 @@ WarningDlgGenerated::WarningDlgGenerated( wxWindow* parent, wxWindowID id, const
 
     this->SetSizer( bSizer24 );
     this->Layout();
+
+    this->Centre( wxBOTH );
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WarningDlgGenerated::OnClose ) );
@@ -2884,7 +2854,7 @@ QuestionDlgGenerated::QuestionDlgGenerated( wxWindow* parent, wxWindowID id, con
 
     bSizer25->Add( m_buttonNo, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonCancel->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer25->Add( m_buttonCancel, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
@@ -2895,6 +2865,8 @@ QuestionDlgGenerated::QuestionDlgGenerated( wxWindow* parent, wxWindowID id, con
 
     this->SetSizer( bSizer24 );
     this->Layout();
+
+    this->Centre( wxBOTH );
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( QuestionDlgGenerated::OnClose ) );
@@ -2963,13 +2935,13 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
     wxBoxSizer* bSizer25;
     bSizer25 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonOK = new wxButton( this, wxID_OK, _("&OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonOK = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonOK->SetDefault();
     m_buttonOK->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
 
     bSizer25->Add( m_buttonOK, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
 
-    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonCancel->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer25->Add( m_buttonCancel, 0, wxALL, 5 );
@@ -2983,6 +2955,8 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
 
     this->SetSizer( bSizer24 );
     this->Layout();
+
+    this->Centre( wxBOTH );
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( DeleteDlgGenerated::OnClose ) );
@@ -3254,13 +3228,13 @@ FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const w
 
     bSizer22->Add( 0, 0, 1, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_button10 = new wxButton( this, wxID_OK, _("&OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button10 = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button10->SetDefault();
     m_button10->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
 
     bSizer22->Add( m_button10, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
-    m_button17 = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button17 = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button17->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer22->Add( m_button17, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
@@ -3441,13 +3415,13 @@ GlobalSettingsDlgGenerated::GlobalSettingsDlgGenerated( wxWindow* parent, wxWind
 
     bSizer97->Add( 0, 0, 1, 0, 5 );
 
-    m_buttonOkay = new wxButton( this, wxID_OK, _("&OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonOkay = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonOkay->SetDefault();
     m_buttonOkay->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
 
     bSizer97->Add( m_buttonOkay, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_button29 = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button29 = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button29->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer97->Add( m_button29, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
@@ -3459,6 +3433,8 @@ GlobalSettingsDlgGenerated::GlobalSettingsDlgGenerated( wxWindow* parent, wxWind
     this->SetSizer( bSizer95 );
     this->Layout();
     bSizer95->Fit( this );
+
+    this->Centre( wxBOTH );
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GlobalSettingsDlgGenerated::OnClose ) );
@@ -3493,7 +3469,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
     wxBoxSizer* bSizer158;
     bSizer158 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonStartSync = new zen::BitmapButton( this, wxID_ANY, _("Start"), wxDefaultPosition, wxSize( -1,40 ), 0 );
+    m_buttonStartSync = new zen::BitmapButton( this, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,40 ), 0 );
     m_buttonStartSync->SetDefault();
     m_buttonStartSync->SetFont( wxFont( 14, 70, 90, 92, false, wxEmptyString ) );
     m_buttonStartSync->SetToolTip( _("Start synchronization") );
@@ -3659,7 +3635,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 
     bSizer142->Add( 10, 0, 1, 0, 5 );
 
-    m_button16 = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button16 = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button16->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer142->Add( m_button16, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
@@ -3671,6 +3647,8 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
     this->SetSizer( bSizer134 );
     this->Layout();
     bSizer134->Fit( this );
+
+    this->Centre( wxBOTH );
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncPreviewDlgGenerated::OnClose ) );
@@ -3752,7 +3730,7 @@ SearchDialogGenerated::SearchDialogGenerated( wxWindow* parent, wxWindowID id, c
 
     bSizer97->Add( m_buttonFindNext, 0, wxEXPAND|wxTOP|wxRIGHT, 5 );
 
-    m_button29 = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button29 = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button29->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer97->Add( m_button29, 0, wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT, 5 );
@@ -3763,7 +3741,8 @@ SearchDialogGenerated::SearchDialogGenerated( wxWindow* parent, wxWindowID id, c
 
     this->SetSizer( bSizer161 );
     this->Layout();
-    bSizer161->Fit( this );
+
+    this->Centre( wxBOTH );
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SearchDialogGenerated::OnClose ) );
@@ -3807,13 +3786,13 @@ SelectTimespanDlgGenerated::SelectTimespanDlgGenerated( wxWindow* parent, wxWind
 
     bSizer97->Add( 0, 0, 1, wxEXPAND, 5 );
 
-    m_buttonOkay = new wxButton( this, wxID_ANY, _("&OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonOkay = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonOkay->SetDefault();
     m_buttonOkay->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
 
     bSizer97->Add( m_buttonOkay, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_button29 = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_button29 = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button29->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
     bSizer97->Add( m_button29, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
@@ -3828,6 +3807,8 @@ SelectTimespanDlgGenerated::SelectTimespanDlgGenerated( wxWindow* parent, wxWind
     this->SetSizer( bSizer96 );
     this->Layout();
     bSizer96->Fit( this );
+
+    this->Centre( wxBOTH );
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SelectTimespanDlgGenerated::OnClose ) );

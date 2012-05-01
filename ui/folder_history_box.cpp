@@ -146,18 +146,12 @@ void FolderHistoryBox::OnMouseWheel(wxMouseEvent& event)
 
     //redirect to parent scrolled window!
     wxWindow* wnd = this;
-    for (;;)
-    {
-        wnd = wnd->GetParent();
-        if (!wnd)
-            break;
-
+    while ((wnd = wnd->GetParent()) != nullptr) //silence MSVC warning
         if (dynamic_cast<wxScrolledWindow*>(wnd) != nullptr)
         {
             wnd->GetEventHandler()->AddPendingEvent(event);
             break;
         }
-    }
 
     //	event.Skip();
 }
