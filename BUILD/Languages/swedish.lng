@@ -7,8 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>Söker efter katalogen</target>
+<source>Searching for folder %x...</source>
+<target>Söker efter mappen %x...</target>
 
 <source>Show in Explorer</source>
 <target>Visa i Utforskaren</target>
@@ -17,7 +17,7 @@
 <target>Öppna med standardprogram</target>
 
 <source>Browse directory</source>
-<target>Sök upp katalog</target>
+<target>Sök upp mapp</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Avbryter: Väntar på att aktuell process skall slutföras...</target>
@@ -25,17 +25,20 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatiserad synkronisering</target>
 
+<source>Error</source>
+<target>Fel</target>
+
 <source>Select alternate comparison settings</source>
 <target>Välj alternativa jämförelseinställningar</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Välj alternativa synkroniseringsinställningar</target>
 
-<source>No filter selected</source>
-<target>Inga filter aktiverade</target>
-
 <source>Filter is active</source>
 <target>Filter är aktiverat</target>
+
+<source>No filter selected</source>
+<target>Inga filter aktiverade</target>
 
 <source>Remove alternate settings</source>
 <target>Ta bort alternativa inställningar</target>
@@ -55,9 +58,6 @@
 <source>About</source>
 <target>Om</target>
 
-<source>Error</source>
-<target>Fel</target>
-
 <source>Warning</source>
 <target>Varning</target>
 
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Allmäna inställningar</target>
 
-<source>Synchronization Preview</source>
-<target>Förhandsvisning</target>
+<source>Summary</source>
+<target>Sammanställning</target>
 
 <source>Find</source>
 <target>Sök</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Bläddra</target>
 
-<source>Invalid command line: %x</source>
-<target>Ogiltig kommandorad: %x</target>
+<source>Invalid command line:</source>
+<target>Ogiltig kommandorad:</target>
 
 <source>Info</source>
 <target>Info</target>
@@ -170,10 +170,10 @@
 <target>Processinformation kan inte inhämtas</target>
 
 <source>Waiting while directory is locked (%x)...</source>
-<target>Väntar medan katalogen låses (%x)...</target>
+<target>Väntar medan mappen låses (%x)...</target>
 
 <source>Cannot set directory lock %x.</source>
-<target>Kan inte låsa katalogen %x.</target>
+<target>Kan inte låsa mappen %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -232,23 +232,23 @@
 <source>Cannot read the following XML elements:</source>
 <target>Kan inte läsa följande XML-element:</target>
 
-<source>S&ave configuration...</source>
-<target>S&para inställningar...</target>
+<source>&Open...</source>
+<target>&Öppna...</target>
 
-<source>&Load configuration...</source>
-<target>&Hämta inställningar från fil...</target>
+<source>&Save...</source>
+<target>&Spara...</target>
 
 <source>&Quit</source>
 <target>&Avsluta</target>
 
-<source>&File</source>
-<target>&Arkiv</target>
+<source>&Program</source>
+<target>&Program</target>
 
 <source>&Content</source>
 <target>&Innehåll</target>
 
-<source>&About...</source>
-<target>&Om...</target>
+<source>&About</source>
+<target>&Om</target>
 
 <source>&Help</source>
 <target>&Hjälp</target>
@@ -256,8 +256,8 @@
 <source>Usage:</source>
 <target>Användning:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. Välj kataloger att övervaka.</target>
+<source>1. Select folders to watch.</source>
+<target>1. Välj mapp att bevaka.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Mata in ett kommando.</target>
@@ -265,40 +265,49 @@
 <source>3. Press 'Start'.</source>
 <target>3. Tryck 'Start'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-Kommandot verkställes när:
-- alla berörda kataloger blir tillgängliga (t.ex om USB-minne ansluts)
-- filer i berörda kataloger eller underkataloger ändras
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>Importera en .ffs_batch-fil för att komma igång</target>
 
-<source>Directories to watch</source>
-<target>Kataloger att övervaka</target>
+<source>Folders to watch</source>
+<target>Mappar att bevaka</target>
 
 <source>Add folder</source>
-<target>Lägg till katalog</target>
+<target>Lägg till mapp</target>
 
 <source>Remove folder</source>
-<target>Ta bort katalog</target>
+<target>Ta bort mapp</target>
 
 <source>Select a folder</source>
-<target>Markera en katalog</target>
+<target>Markera en mapp</target>
+
+<source>Delay [seconds]</source>
+<target>Fördröjning [sekunder]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Väntetid mellan senast upptäckta förändring och kommandoexekvering</target>
 
 <source>Command line</source>
 <target>Kommandofält</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Minsta ledig tid [sekunder]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Väntetid mellan upptäckt av senaste ändring och verkställande av kommando, i sekunder</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+Kommandot triggas om:
+- filer eller undermappar förändras
+- nya mappar upptäcks (ex. USB-minne ansluts)
+</target>
 
 <source>Start</source>
 <target>Start</target>
+
+<source>&Retry</source>
+<target>&Försök igen</target>
+
+<source>Cancel</source>
+<target>Avbryt</target>
 
 <source>(Build: %x)</source>
 <target>(Bygge: %x)</target>
@@ -318,8 +327,8 @@ Kommandot verkställes när:
 <source>Waiting for missing directories...</source>
 <target>Väntar på saknade destinationer...</target>
 
-<source>A directory input field is empty.</source>
-<target>Ett katalogfält är tomt</target>
+<source>An input folder name is empty.</source>
+<target>Det saknas ett källmappsnamn</target>
 
 <source>Logging</source>
 <target>Loggar</target>
@@ -405,8 +414,8 @@ Kommandot verkställes när:
 <source><Symlink></source>
 <target><Symboliska länkar></target>
 
-<source><Directory></source>
-<target><Katalog></target>
+<source><Folder></source>
+<target>Mapp</target>
 
 <source>Full path</source>
 <target>Fullständig sökväg</target>
@@ -417,8 +426,8 @@ Kommandot verkställes när:
 <source>Relative path</source>
 <target>Sökväg</target>
 
-<source>Directory</source>
-<target>Katalog</target>
+<source>Base folder</source>
+<target>Basmapp</target>
 
 <source>Size</source>
 <target>Storlek</target>
@@ -429,8 +438,11 @@ Kommandot verkställes när:
 <source>Extension</source>
 <target>Filformat</target>
 
-<source>Comparison Result</source>
-<target>Jämförelseresultat</target>
+<source>Action</source>
+<target>Aktivitet</target>
+
+<source>Category</source>
+<target>Kategori</target>
 
 <source>Drag && drop</source>
 <target>Dra && släpp</target>
@@ -438,14 +450,14 @@ Kommandot verkställes när:
 <source>Close progress dialog</source>
 <target>Stäng förloppsindikator</target>
 
-<source>Shut down</source>
-<target>Stäng av datorn</target>
+<source>Standby</source>
+<target>Strömsparläge</target>
 
 <source>Log off</source>
 <target>Logga ut</target>
 
-<source>Standby</source>
-<target>Strömsparläge</target>
+<source>Shut down</source>
+<target>Stäng av datorn</target>
 
 <source>Hibernate</source>
 <target>Viloläge</target>
@@ -453,14 +465,11 @@ Kommandot verkställes när:
 <source>1. &Compare</source>
 <target>1. &Jämför</target>
 
-<source>2. &Synchronize...</source>
-<target>2. &Synkronisera...</target>
+<source>2. &Synchronize</source>
+<target>2. &Synkronisera</target>
 
 <source>&New</source>
 <target>&Nytt</target>
-
-<source>&Program</source>
-<target>&Program</target>
 
 <source>&Language</source>
 <target>&Språk</target>
@@ -489,26 +498,26 @@ Kommandot verkställes när:
 <source>&Abort</source>
 <target>&Avbryt</target>
 
-<source>Synchronize...</source>
+<source>Synchronize</source>
 <target>Synkronisera</target>
 
 <source>Start synchronization</source>
 <target>Starta synkronisering</target>
 
 <source>Add folder pair</source>
-<target>Lägg till katalogpar</target>
+<target>Lägg till mapp-par</target>
 
 <source>Remove folder pair</source>
-<target>Ta bort katalogpar</target>
+<target>Ta bort mapp-par</target>
 
 <source>Swap sides</source>
 <target>Byt sida</target>
 
-<source>Save current configuration to file</source>
-<target>Spara aktuella inställningar till fil</target>
-
 <source>Load configuration from file</source>
 <target>Hämta inställningar från fil</target>
+
+<source>Save current configuration to file</source>
+<target>Spara aktuella inställningar till fil</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Senast använda konfigurationer (Tryck DEL för att ta bort)</target>
@@ -519,14 +528,14 @@ Kommandot verkställes när:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Visa inte filtrerade eller temporärt undantagna filer</target>
 
-<source>Number of files and directories that will be created</source>
-<target>Antal filer och kataloger som kommer att skapas</target>
+<source>Number of files and folders that will be created</source>
+<target>Antal filer och mappar som kommer att skapas</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Antal filer som kommer att skrivas över</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>Antal filer och kataloger som kommer att tas bort</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Antal filer och mappar som kommer att tas bort</target>
 
 <source>Total amount of data that will be transferred</source>
 <target>Total mängd data som kommer att överföras</target>
@@ -549,8 +558,8 @@ Kommandot verkställes när:
 <source>Batch job</source>
 <target>Batch-jobb</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Skapa en batch-fil och automatisera synkroniseringen. För att starta i batch-läge dubbelklickar du på den skapade filen, eller kör följande kommando: FreeFileSync.exe SyncJob.ffs_batch. Detta kan också schemaläggas i systemets schemaläggare.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Skapa en batch-fil för att automatisera synkroniseringen. Dubbelklicka på filen, eller använd systemets schemaläggare och schemalägg: FreeFileSync.exe <filnamn>.ffs_batch</target>
 
 <source>Help</source>
 <target>Hjälp</target>
@@ -576,20 +585,11 @@ Kommandot verkställes när:
 <source>Maximum number of log files:</source>
 <target>Max antal loggfiler:</target>
 
-<source>Select log file directory:</source>
-<target>Välj loggfilskatalog:</target>
+<source>Select folder to save log files:</source>
+<target>Välj mapp, att spara loggfiler i</target>
 
 <source>Batch settings</source>
 <target>Batch-inställningar</target>
-
-<source>&Save</source>
-<target>&Spara</target>
-
-<source>&Load</source>
-<target>&Läs in</target>
-
-<source>Cancel</source>
-<target>Avbryt</target>
 
 <source>Select variant:</source>
 <target>Välj variant:</target>
@@ -598,10 +598,10 @@ Kommandot verkställes när:
 <target>Använd en databas för att identifiera och sprida ändringar på båda sidor. Borttagning, namnbyte och konflikter upptäcks automatiskt</target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Speglar säkerhetskopia av vänster katalog. Höger katalog ändras för att exakt matcha vänster efter synkroniseringen.</target>
+<target>Speglar säkerhetskopia av vänster mapp. Höger mapp ändras för att exakt matcha vänster efter synkroniseringen.</target>
 
 <source>Copy new or updated files to right folder.</source>
-<target>Kopiera nya och uppdaterade filer till höger katalog.</target>
+<target>Kopiera nya och uppdaterade filer till höger mapp.</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Konfigurera dina egna synkroniseringsregler.</target>
@@ -615,29 +615,23 @@ Kommandot verkställes när:
 <source>Configuration</source>
 <target>Inställningar</target>
 
-<source>Category</source>
-<target>Kategori</target>
+<source>Item exists on left side only</source>
+<target>Objektet finns bara på vänster sida</target>
 
-<source>Action</source>
-<target>Aktivitet</target>
+<source>Item exists on right side only</source>
+<target>Objektet finns bara på höger sida</target>
 
-<source>File/folder exists on left side only</source>
-<target>Fil/katalog finns bara på vänster sida</target>
+<source>Left side is newer</source>
+<target>Vänster sida är nyare</target>
 
-<source>File/folder exists on right side only</source>
-<target>Fil/katalog finns bara på höger sida</target>
+<source>Right side is newer</source>
+<target>Höger sida är nyare</target>
 
-<source>Left file is newer</source>
-<target>Vänster fil är nyare</target>
+<source>Items have different content</source>
+<target>Objekten har olika innehåll</target>
 
-<source>Right file is newer</source>
-<target>Höger fil är nyare</target>
-
-<source>Files have different content</source>
-<target>Filerna har olika innehåll</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Konflikt/Fil kan inte kategoriseras</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Konflikten/Objektet kan inte kategoriseras</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -714,9 +708,6 @@ Filerna betecknas som lika om,
 <source>&Ignore</source>
 <target>&Ignorera</target>
 
-<source>&Retry</source>
-<target>&Försök igen</target>
-
 <source>Do not show this dialog again</source>
 <target>Visa inte den här dialogrutan igen</target>
 
@@ -744,35 +735,8 @@ Note: File names must be relative to base directories!
 </source>
 <target>
 Endast filer som matchar alla filterinställningar kommer att synkroniseras.
-OBS! Filnamnen måste anges relativt till baskataloger
+OBS! Filnamnen måste anges relativt till basmappar
 </target>
-
-<source>Hints:</source>
-<target>Tips:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Ange fil- eller katalognamn separerade med "," eller ny rad</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Använd jokertecknen '*' och '?' .</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Undanta filer direkt i huvudfönstret, via högerklicksmenyn.</target>
-
-<source>Example</source>
-<target>Exempel</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Inkludera: *.doc;*.zip;*.exe
-Undanta: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Synkronisera alla .doc-, .zip- och .exe-filer, men utelämna allt i underkatalog "temp".</target>
 
 <source>Include</source>
 <target>Inkludera</target>
@@ -795,8 +759,8 @@ Undanta: \stuff\temp\*
 <source>&Default</source>
 <target>&Standard</target>
 
-<source>Transactional file copy</source>
-<target>Transaktionell filkopiering</target>
+<source>Fail-safe file copy</source>
+<target>Felsäker filkopiering</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Skriv först till en temporär fil (*.ffs_tmp) och byt sedan namn på den. Detta garanterar en konsistent status även vid allvarliga fel</target>
@@ -810,8 +774,8 @@ Undanta: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>Kopiera filåtkomstbehörigheter</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Överför fil- och katalogrättigheter (Kräver administratörsrättigheter)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>Överför behörigheter för filer och mappar (Kräver administratörsrättigheter)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Återställ dolda dialoger</target>
@@ -844,7 +808,7 @@ Undanta: \stuff\temp\*
 <target>Huvudfält</target>
 
 <source>Folder pairs</source>
-<target>Katalogpar</target>
+<target>Mapp-par</target>
 
 <source>Overview</source>
 <target>Översikt</target>
@@ -913,7 +877,7 @@ Undanta: \stuff\temp\*
 <target>Inställningar inlästa!</target>
 
 <source>Folder Comparison and Synchronization</source>
-<target>Katalogjämförelse och synkronisering</target>
+<target>Mappjämförelse och synkronisering</target>
 
 <source>Hide files that exist on left side only</source>
 <target>Visa inte filer som endast finns till vänster</target>
@@ -1000,7 +964,7 @@ Undanta: \stuff\temp\*
 <target>Visa filer som inte kommer att kopieras</target>
 
 <source>All directories in sync!</source>
-<target>Alla kataloger synkade!</target>
+<target>Alla mappar synkroniserade!</target>
 
 <source>Please run a Compare first before synchronizing!</source>
 <target>Du måste trycka "Jämför" innan du kan synkronisera.</target>
@@ -1028,8 +992,8 @@ Undanta: \stuff\temp\*
 <pluralform>%x directories</pluralform>
 </source>
 <target>
-<pluralform>1 katalog</pluralform>
-<pluralform>%x kataloger</pluralform>
+<pluralform>1 mapp</pluralform>
+<pluralform>%x mappar</pluralform>
 </target>
 
 <source>
@@ -1119,11 +1083,11 @@ Undanta: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integrera externa program i högerklicksmeny. Följande variabler finns tillgängliga:</target>
 
-<source>- full file or directory name</source>
-<target>- Full sökväg</target>
+<source>- full file or folder name</source>
+<target>- fullständigt fil- eller mappnamn</target>
 
-<source>- directory part only</source>
-<target>- Endast fil-/katalognamn</target>
+<source>- folder part only</source>
+<target>- endast mappdelen</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- Andra sidans motsvarighet till %name</target>
@@ -1167,8 +1131,8 @@ Undanta: \stuff\temp\*
 <source>Versioning</source>
 <target>Versionshantering</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Flytta filer till en tidsstämplad underkatalog</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>Flytta filer till en tidsstämplad undermapp</target>
 
 <source>Files</source>
 <target>Filer</target>
@@ -1213,7 +1177,7 @@ Undanta: \stuff\temp\*
 </target>
 
 <source>Cannot monitor directory %x.</source>
-<target>Katalogen %x kan inte övervakas.</target>
+<target>Mappen %x kan inte övervakas.</target>
 
 <source>Conversion error:</source>
 <target>Konversionsfel:</target>
@@ -1228,7 +1192,7 @@ Undanta: \stuff\temp\*
 <target>Kan inte flytta filen %x till %y.</target>
 
 <source>Cannot delete directory %x.</source>
-<target>Kan inte ta bort katalogen %x.</target>
+<target>Kan inte ta bort mappen %x.</target>
 
 <source>Cannot write modification time of %x.</source>
 <target>Kan inte ändra tidsangivelsen för %x.</target>
@@ -1249,7 +1213,7 @@ Undanta: \stuff\temp\*
 <target>Kan inte skriva behörigheter för %x.</target>
 
 <source>Cannot create directory %x.</source>
-<target>Kan inte skapa katalogen %x.</target>
+<target>Kan inte skapa mappen %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Kan inte kopiera den symboliska länken %x till %y.</target>
@@ -1261,10 +1225,10 @@ Undanta: \stuff\temp\*
 <target>Kan inte kopiera filen %x till %y.</target>
 
 <source>Cannot read directory %x.</source>
-<target>Kan inte läsa in katalogen %x.</target>
+<target>Kan inte läsa in mappen %x.</target>
 
-<source>Endless loop.</source>
-<target>Oändlig loop.</target>
+<source>Detected endless directory recursion.</source>
+<target>Upptäckte ändlös mapprekursion</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Kan inte att ange behörigheten %x.</target>
@@ -1273,10 +1237,10 @@ Undanta: \stuff\temp\*
 <target>Kan inte flytta %x till Papperskorgen</target>
 
 <source>Both sides have changed since last synchronization!</source>
-<target>Båda sidor har ändrats sedan senaste synkroniseringen!</target>
+<target>Bägge sidor har ändrats sedan senaste synkroniseringen!</target>
 
 <source>Cannot determine sync-direction:</source>
-<target>Kan inte bestämma synk-riktning:</target>
+<target>Kan inte bestämma synkroniseringsriktning:</target>
 
 <source>No change since last synchronization!</source>
 <target>Inga ändringar sedan senaste synkronisering!</target>
@@ -1290,17 +1254,14 @@ Undanta: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Standardsynkronisering: Gamla filer kommer att skrivas över av nyare versioner.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Filen är ingen giltig konfigureringsfil:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>Du kan ignorera detta fel och betrakta mappen som tom</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>Du kan bortse från det här felet och utgå ifrån att katalogen är tom</target>
-
-<source>Cannot find directory %x.</source>
-<target>Kan inte hitta katalogen  %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Kan inte hitta mappen %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
-<target>Kataloger är beroende! Var försiktig när du sätter upp synkroniseringsregler:</target>
+<target>Mappar är beroende! Var försiktig när du sätter upp synkroniseringsregler:</target>
 
 <source>Preparing synchronization...</source>
 <target>Förbereder synkronisering...</target>
@@ -1329,20 +1290,20 @@ Undanta: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>Bägge sidor är lika</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Endast attributskillnader i filer/kataloger</target>
+<source>Items have different attributes</source>
+<target>Objekten har olika attribut</target>
 
-<source>Copy new file/folder to left</source>
-<target>Kopiera ny fil/katalog åt vänster</target>
+<source>Copy new item to left</source>
+<target>Kopiera nytt objekt åt vänster</target>
 
-<source>Copy new file/folder to right</source>
-<target>Kopiera ny fil/katalog åt höger</target>
+<source>Copy new item to right</source>
+<target>Kopiera nytt objekt åt höger</target>
 
-<source>Delete left file/folder</source>
-<target>Ta bort vänster fil/katalog</target>
+<source>Delete left item</source>
+<target>Ta bort vänster objekt</target>
 
-<source>Delete right file/folder</source>
-<target>Ta bort höger fil/katalog</target>
+<source>Delete right item</source>
+<target>Ta bort höger objekt</target>
 
 <source>Move file on left</source>
 <target>Flytta fil på vänster sida</target>
@@ -1350,29 +1311,29 @@ Undanta: \stuff\temp\*
 <source>Move file on right</source>
 <target>Flytta fil på höger sida</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Skriv över vänster fil/katalog med den högra</target>
+<source>Overwrite left item</source>
+<target>Skriv över vänster objekt</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Skriv över höger fil/katalog med den vänstra</target>
+<source>Overwrite right item</source>
+<target>Skriv över höger objekt</target>
 
 <source>Do nothing</source>
 <target>Gör ingenting</target>
 
-<source>Copy file attributes only to left</source>
-<target>Kopiera endast filattribut åt vänster</target>
+<source>Update attributes on left</source>
+<target>Uppdatera attribut på vänster sida</target>
 
-<source>Copy file attributes only to right</source>
-<target>Kopiera endast filattribut åt höger</target>
+<source>Update attributes on right</source>
+<target>Uppdatera attribut på höger sida</target>
 
 <source>Multiple...</source>
-<target>Multipla...</target>
+<target>Flera...</target>
 
 <source>Deleting file %x</source>
 <target>Tar bort filen %x</target>
 
 <source>Deleting folder %x</source>
-<target>Tar bort katalogen %x</target>
+<target>Tar bort mappen %x</target>
 
 <source>Deleting symbolic link %x</source>
 <target>Tar bort den symboliska länken %x</target>
@@ -1381,7 +1342,7 @@ Undanta: \stuff\temp\*
 <target>Flyttar filen %x till papperskorgen</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target>Flyttar katalogen %x till papperskorgen</target>
+<target>Flyttar mappen %x till papperskorgen</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
 <target>Flyttar den symboliska länken %x till papperskorgen</target>
@@ -1390,7 +1351,7 @@ Undanta: \stuff\temp\*
 <target>Flyttar filen %x till %y</target>
 
 <source>Moving folder %x to %y</source>
-<target>Flyttar katalogen %x till %y</target>
+<target>Flyttar mappen %x till %y</target>
 
 <source>Moving symbolic link %x to %y</source>
 <target>Flyttar den symboliska länken %x till %y</target>
@@ -1402,7 +1363,7 @@ Undanta: \stuff\temp\*
 <target>Skapar den symboliska länken %x</target>
 
 <source>Creating folder %x</source>
-<target>Skapar katalog %x</target>
+<target>Skapar mappen %x</target>
 
 <source>Overwriting file %x</source>
 <target>Skriver över filen %x</target>
@@ -1416,14 +1377,14 @@ Undanta: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>Uppdaterar attribut för %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Målkatalogens namn måste anges</target>
+<source>Target folder name must not be empty.</source>
+<target>Målmappens namn saknas.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Katalog för versionshantering har inte specificerats</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>Mappnamn för versionshantering saknas.</target>
 
 <source>Source directory %x not found.</source>
-<target>Källkatalogen %x hittas inte</target>
+<target>Källmappen %x hittas inte</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Obehandlad konflikt upptäckt!</target>
@@ -1449,11 +1410,11 @@ Undanta: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Papperskorgen är inte tillgänglig för följande sökvägar! Filerna tas i stället bort permanent.</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>En katalog som är en del av flera katalogpar kommer att ändras! Kontrollera synkroniseringsinställningarna</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>En mapp som tillhör flera mapp-par är på väg att ändras. Kontrollera synkroniseringsinställningarna</target>
 
 <source>Processing folder pair:</source>
-<target>Processar katalogpar:</target>
+<target>Bearbetar mapp-paret:</target>
 
 <source>Generating database...</source>
 <target>Skapar databas...</target>

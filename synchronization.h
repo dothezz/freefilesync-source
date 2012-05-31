@@ -15,8 +15,7 @@
 
 namespace zen
 {
-
-class SyncStatistics //this class counts logical operations (create, update, delete) + bytes
+class SyncStatistics //this class counts *logical* operations, (create, update, delete + bytes), *not* disk accesses!
 {
     //-> note the fundamental difference to counting disk accesses!
 public:
@@ -46,9 +45,9 @@ private:
 
     void recurse(const HierarchyObject& hierObj);
 
-    void getFileNumbers(const FileMapping& fileObj);
-    void getLinkNumbers(const SymLinkMapping& linkObj);
-    void getDirNumbers(const DirMapping& dirObj);
+    void calcStats(const FileMapping& fileObj);
+    void calcStats(const SymLinkMapping& linkObj);
+    void calcStats(const DirMapping& dirObj);
 
     int createLeft, createRight;
     int updateLeft, updateRight;
@@ -79,7 +78,9 @@ std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 class SyncProcess
 {
 public:
-    SyncProcess(xmlAccess::OptionalDialogs& warnings,
+    SyncProcess(const std::wstring& jobName, //may be empty
+                const std::wstring& timestamp,
+                xmlAccess::OptionalDialogs& warnings,
                 bool verifyCopiedFiles,
                 bool copyLockedFiles,
                 bool copyFilePermissions,
@@ -87,7 +88,7 @@ public:
                 bool runWithBackgroundPriority,
                 ProcessCallback& handler);
 
-    //CONTRACT: syncConfig must have SAME SIZE folderCmp and correspond row-wise!
+    //CONTRACT: syncConfig must have SAME SIZE as folderCmp and correspond row-wise!
     void startSynchronizationProcess(const std::vector<FolderPairSyncCfg>& syncConfig, FolderComparison& folderCmp);
 
 private:
@@ -106,6 +107,7 @@ private:
     ProcessCallback& procCallback;
 
     std::unique_ptr<ScheduleForBackgroundProcessing> procBackground;
+    const Zstring custDelDirShortname; //e.g. "SyncJob 2012-05-15 131513"
 };
 
 

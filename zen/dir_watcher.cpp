@@ -22,8 +22,8 @@
 #include "file_traverser.h"
 #endif
 
-
 using namespace zen;
+
 
 #ifdef FFS_WIN
 namespace
@@ -128,16 +128,7 @@ public:
         dirnamePf(appendSeparator(directory)),
         hDir(INVALID_HANDLE_VALUE)
     {
-        //these two privileges are required by ::CreateFile FILE_FLAG_BACKUP_SEMANTICS according to
-        //http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx
-        try
-        {
-            activatePrivilege(SE_BACKUP_NAME);  //throw FileError
-            activatePrivilege(SE_RESTORE_NAME); //
-        }
-        catch (const FileError&) {}
-
-        hDir = ::CreateFile(applyLongPathPrefix(dirnamePf.c_str()).c_str(),
+        hDir = ::CreateFile(applyLongPathPrefix(dirnamePf).c_str(),
                             FILE_LIST_DIRECTORY,
                             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                             nullptr,
@@ -158,7 +149,7 @@ public:
 
     ~ReadChangesAsync()
     {
-        if (hDir != INVALID_HANDLE_VALUE)
+        if (hDir != INVALID_HANDLE_VALUE) //valid hDir is NOT an invariant, see move constructor!
             ::CloseHandle(hDir);
     }
 
@@ -201,7 +192,7 @@ public:
                 zen::ScopeGuard guardAio = zen::makeGuard([&]
                 {
                     //http://msdn.microsoft.com/en-us/library/aa363789(v=vs.85).aspx
-                    if (::CancelIo(hDir) == TRUE) //cancel all async I/O related to this handle and thread
+                    if (::CancelIo(hDir) != FALSE) //cancel all async I/O related to this handle and thread
                     {
                         DWORD bytesWritten = 0;
                         ::GetOverlappedResult(hDir, &overlapped, &bytesWritten, true); //wait until cancellation is complete
@@ -364,7 +355,7 @@ public:
                       const std::shared_ptr<TraverseCallback>& otherMe) : otherMe_(otherMe), dirs_(dirs) {}
 
     virtual void onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
-    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
+    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
     {
         dirs_.push_back(fullName);
@@ -394,7 +385,7 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
     std::shared_ptr<TraverseCallback> traverser;
     traverser = std::make_shared<DirsOnlyTraverser>(fullDirList, traverser); //throw FileError
 
-    zen::traverseFolder(dirname, false, *traverser); //don't traverse into symlinks (analog to windows build)
+    zen::traverseFolder(dirname, *traverser); //don't traverse into symlinks (analog to windows build)
 
     //init
     pimpl_->dirname    = directory;

@@ -96,7 +96,7 @@ void drawYLabel(wxDC& dc, double& yMin, double& yMax, const wxRect& clientArea, 
     if (clientArea.GetHeight() <= 0 || clientArea.GetWidth() <= 0)
         return;
 
-    int optimalBlockHeight = 3 * dc.GetMultiLineTextExtent(wxT("1")).GetHeight();;
+    int optimalBlockHeight = 3 * dc.GetMultiLineTextExtent(L"1").GetHeight();;
 
     double valRangePerBlock = (yMax - yMin) * optimalBlockHeight / clientArea.GetHeight();
     valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
@@ -114,7 +114,8 @@ void drawYLabel(wxDC& dc, double& yMin, double& yMax, const wxRect& clientArea, 
     //draw labels
     {
         wxDCPenChanger dummy(dc, wxPen(wxColor(192, 192, 192))); //light grey
-        dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Arial") ));
+        wxDCTextColourChanger dummy2(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
+        dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial"));
 
         const int posLabel      = drawLeft ? 0 : clientArea.GetWidth() - labelWidth;
         const int posDataArea   = drawLeft ? labelWidth : 0;
@@ -147,7 +148,7 @@ void drawXLabel(wxDC& dc, double& xMin, double& xMax, const wxRect& clientArea, 
     if (clientArea.GetHeight() <= 0 || clientArea.GetWidth() <= 0)
         return;
 
-    const int optimalBlockWidth = dc.GetMultiLineTextExtent(wxT("100000000000000")).GetWidth();
+    const int optimalBlockWidth = dc.GetMultiLineTextExtent(L"100000000000000").GetWidth();
 
     double valRangePerBlock = (xMax - xMin) * optimalBlockWidth / clientArea.GetWidth();
     valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
@@ -166,7 +167,8 @@ void drawXLabel(wxDC& dc, double& xMin, double& xMax, const wxRect& clientArea, 
     //draw labels
     {
         wxDCPenChanger dummy(dc, wxPen(wxColor(192, 192, 192))); //light grey
-        dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Arial") ));
+        wxDCTextColourChanger dummy2(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
+        dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial"));
 
         const int posLabel       = drawBottom ? clientArea.GetHeight() - labelHeight : 0;
         const int posDataArea    = drawBottom ? 0 : labelHeight;
@@ -290,7 +292,8 @@ void Graph2D::OnMouseLeftUp(wxMouseEvent& event)
         {
             //fire off GraphSelectEvent
             GraphSelectEvent evt(activeSel->refSelection());
-            GetEventHandler()->AddPendingEvent(evt);
+            if (wxEvtHandler* evtHandler = GetEventHandler())
+                evtHandler->AddPendingEvent(evt);
 
             oldSel.push_back(activeSel->refSelection());
         }
@@ -342,10 +345,12 @@ private:
 void Graph2D::render(wxDC& dc) const
 {
     {
-        //draw everything including label background in natural window color by default (overwriting current background color)
-        const wxColor backColor = wxPanel::GetClassDefaultAttributes().colBg != wxNullColour ?
-                                  wxPanel::GetClassDefaultAttributes().colBg :
-                                  wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
+        //clear everything, set label background color
+        //        const wxColor backColor = wxPanel::GetClassDefaultAttributes().colBg != wxNullColour ?
+        //                                  wxPanel::GetClassDefaultAttributes().colBg :
+        //                                  wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
+        const wxColor backColor = GetBackgroundColour(); //user-configurable!
+
         //wxDCBrushChanger dummy(dc, *wxTRANSPARENT_BRUSH); //sigh, who *invents* this stuff??? -> workaround for issue with wxBufferedPaintDC
         DcBackgroundChanger dummy(dc, backColor);
         dc.Clear();
@@ -395,8 +400,8 @@ void Graph2D::render(wxDC& dc) const
     }
 
     {
-        //paint actual graph background (without labels) using window background color
-        DcBackgroundChanger dummy(dc, GetBackgroundColour());
+        //paint actual graph background (without labels)
+        DcBackgroundChanger dummy(dc, *wxWHITE); //accessibility: we have to set both back- and foreground colors or none at all!
         wxDCPenChanger dummy2(dc, wxColour(130, 135, 144)); //medium grey, the same Win7 uses for other frame borders
         //dc.DrawRectangle(static_cast<const wxRect&>(dataArea).Inflate(1, 1)); //correct wxWidgets design mistakes
         dc.DrawRectangle(dataArea);
@@ -507,10 +512,7 @@ void Graph2D::render(wxDC& dc) const
                 //wxDCBrushChanger dummy(dc, *wxTRANSPARENT_BRUSH);
                 wxDCBrushChanger dummy(dc, colSelect); //alpha channel (not yet) supported on wxMSW, so draw selection before graphs
 
-                wxPen selPen(colSelect);
-                //wxPen selPen(*wxBLACK);
-                //selPen.SetStyle(wxSHORT_DASH);
-                wxDCPenChanger dummy2(dc, selPen);
+                wxDCPenChanger dummy2(dc, colSelect);
 
                 for (auto i = allSelections.begin(); i != allSelections.end(); ++i)
                 {

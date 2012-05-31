@@ -66,7 +66,7 @@ private:
 
         wxMenu* contextMenu = new wxMenu;
         contextMenu->Append(CONTEXT_RESTORE, _("&Restore"));
-        contextMenu->Append(CONTEXT_ABOUT, _("&About..."));
+        contextMenu->Append(CONTEXT_ABOUT, _("&About"));
         contextMenu->AppendSeparator();
         contextMenu->Append(CONTEXT_ABORT, _("&Exit"));
         //event handling
@@ -206,7 +206,7 @@ public:
     void clearSchedule() { nextSyncStart_ = std::numeric_limits<long>::max(); }
 
     //implement WaitCallback
-    virtual void requestUiRefresh() //throw StartSyncNowException, AbortMonitoring
+    virtual void requestUiRefresh(bool readyForSync) //throw StartSyncNowException, AbortMonitoring
     {
         if (resumeRequested)
             throw AbortMonitoring(SHOW_GUI);
@@ -214,8 +214,9 @@ public:
         if (abortRequested)
             throw AbortMonitoring(EXIT_APP);
 
-        if (nextSyncStart_ <= wxGetLocalTime())
-            throw StartSyncNowException(); //abort wait and start sync
+        if (readyForSync)
+            if (nextSyncStart_ <= wxGetLocalTime())
+                throw StartSyncNowException(); //abort wait and start sync
 
         if (updateUiIsAllowed())
             trayIcon.doUiRefreshNow();
@@ -252,6 +253,8 @@ public:
         timer.Connect(wxEVT_TIMER, wxEventHandler(ErrorDlgWithTimeout::OnTimerEvent), nullptr, this);
         timer.Start(1000); //timer interval in ms
         updateButtonLabel();
+
+        Fit(); //child-element widths have changed: image was set
     }
 
     enum ButtonPressed
@@ -325,12 +328,12 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
 
     if (cmdLine.empty())
     {
-        wxMessageBox(replaceCpy(_("Invalid command line: %x"), L"%x", L"\"\""), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(_("Invalid command line:") + L" \"\"", _("Error"), wxOK | wxICON_ERROR);
         return SHOW_GUI;
     }
     if (dirList.empty() || std::any_of(dirList.begin(), dirList.end(), [](Zstring str) -> bool { trim(str); return str.empty(); }))
     {
-        wxMessageBox(_("A directory input field is empty."), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(_("An input folder name is empty."), _("Error"), wxOK | wxICON_ERROR);
         return SHOW_GUI;
     }
 
@@ -341,13 +344,12 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
 
         auto execMonitoring = [&] //throw FileError, AbortMonitoring
         {
-            callback.clearSchedule();
-
             callback.notifyDirectoryMissing();
+            callback.clearSchedule();
             waitForMissingDirs(dirList, callback); //throw FileError, StartSyncNowException(not scheduled yet), AbortMonitoring
             callback.notifyAllDirectoriesExist();
 
-            //schedule initial execution only AFTER waitForMissingDirs(), else StartSyncNowException might be thrown while directory checking hangs
+            //schedule initial execution (*after* all directories have arrived, which could take some time which we don't want to include)
             callback.scheduleNextSync(wxGetLocalTime() + static_cast<long>(config.delay));
 
             while (true)
@@ -361,9 +363,8 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                         switch (res.type)
                         {
                             case CHANGE_DIR_MISSING: //don't execute the commandline before all directories are available!
-                                callback.clearSchedule();
-
                                 callback.notifyDirectoryMissing();
+                                callback.clearSchedule();
                                 waitForMissingDirs(dirList, callback); //throw FileError, StartSyncNowException(not scheduled yet), AbortMonitoring
                                 callback.notifyAllDirectoriesExist();
                                 break;
@@ -377,7 +378,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                 }
                 catch (StartSyncNowException&) {}
 
-                ::wxSetEnv(L"changed_file", utf8CvrtTo<wxString>(lastFileChanged)); //some way to output what file changed to the user
+                ::wxSetEnv(L"changed_file", utfCvrtTo<wxString>(lastFileChanged)); //some way to output what file changed to the user
                 lastFileChanged.clear(); //make sure old name is not shown again after a directory reappears
 
                 //execute command

@@ -7,8 +7,8 @@
 	<plural definition>n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>Szukanie katalogu %x...</target>
+<source>Searching for folder %x...</source>
+<target>Wyszukiwanie katalogu %x...</target>
 
 <source>Show in Explorer</source>
 <target>Wyświetl w Explorerze</target>
@@ -34,11 +34,11 @@
 <source>Select alternate synchronization settings</source>
 <target>Stwórz alternatywne reguły synchronizacji</target>
 
-<source>No filter selected</source>
-<target>Nie wybrano żadnego filtra</target>
-
 <source>Filter is active</source>
 <target>Filtr jest aktywny</target>
+
+<source>No filter selected</source>
+<target>Nie wybrano żadnego filtra</target>
 
 <source>Remove alternate settings</source>
 <target>Usuń alternatywne ustawienia</target>
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Ustawienia programu</target>
 
-<source>Synchronization Preview</source>
-<target>Podgląd synchronizacji</target>
+<source>Summary</source>
+<target>Podsumowanie</target>
 
 <source>Find</source>
 <target>Znajdź</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Przeglądaj</target>
 
-<source>Invalid command line: %x</source>
-<target>Nieprawidłowa komenda: %x</target>
+<source>Invalid command line:</source>
+<target>Nieprawidłowa komenda:</target>
 
 <source>Info</source>
 <target>Info</target>
@@ -229,29 +229,29 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>Dysk %x nie jest częścią pliku %y!</target>
 
-<source>Cannot find file %x.</source>
-<target>Nie można znaleźć pliku %x.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Nie można odczytać elementu XML:</target>
 
-<source>S&ave configuration...</source>
-<target>Z&apisz konfigurację...</target>
+<source>Cannot find file %x.</source>
+<target>Nie można znaleźć pliku %x.</target>
 
-<source>&Load configuration...</source>
-<target>&Wczytaj konfigurację...</target>
+<source>&Open...</source>
+<target>&Otwórz...</target>
+
+<source>&Save...</source>
+<target>&Zapisz</target>
 
 <source>&Quit</source>
 <target>&Zamknij</target>
 
-<source>&File</source>
-<target>&Plik</target>
+<source>&Program</source>
+<target>&Program</target>
 
 <source>&Content</source>
 <target>&Zawartość</target>
 
-<source>&About...</source>
-<target>&O Programie...</target>
+<source>&About</source>
+<target>&O Programie</target>
 
 <source>&Help</source>
 <target>&Pomoc</target>
@@ -259,8 +259,8 @@
 <source>Usage:</source>
 <target>Użycie:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. Wprowadź katalogi do nadzorowania</target>
+<source>1. Select folders to watch.</source>
+<target>1. Określ obserwowane katalogi.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Wprowadź komendę.</target>
@@ -268,19 +268,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. Wciśnij 'Start'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-Komenda jest wykonywana za każdym razem gdy:
-- wszystkie katalogi będą dostępne (np. włożenie USB)
-- pliki w obrębie tych katalogów i podkatalogów ulegną zmianie
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>Aby rozpocząć po prostu zaimportuj plik .ffs_batch</target>
 
-<source>Directories to watch</source>
-<target>Katalogi do obserwacji</target>
+<source>Folders to watch</source>
+<target>Obserwowane katalogi</target>
 
 <source>Add folder</source>
 <target>Dodaj folder</target>
@@ -291,14 +283,25 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Select a folder</source>
 <target>Wybierz folder</target>
 
+<source>Delay [seconds]</source>
+<target>Opóźnienie [sekundy]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Czas pomiędzy ostatnią wykrytą zmianą, a uruchomieniem komendy</target>
+
 <source>Command line</source>
 <target>Linia komend</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Minimalny czas bezczynności [sekundy]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Odstęp czasu w sekundach pomiędzy ostatnią wykrytą zmianą, a wykonaniem komendy</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+Komenda jest wykonywana gdy:
+- pliki lub podkatalogi ulegną zmianie
+- zostaną utworzony nowe katalogi (n.p włożenie pamięci USB)
+</target>
 
 <source>Start</source>
 <target>Rozpocznij</target>
@@ -327,8 +330,8 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Waiting for missing directories...</source>
 <target>Oczekiwanie na brakujące katalogi...</target>
 
-<source>A directory input field is empty.</source>
-<target>Pole ze ścieżką katalogu jest puste.</target>
+<source>An input folder name is empty.</source>
+<target>Nazwa katalogu jest pusta.</target>
 
 <source>Logging</source>
 <target>Tworzenie logów</target>
@@ -414,7 +417,7 @@ Komenda jest wykonywana za każdym razem gdy:
 <source><Symlink></source>
 <target><Dowiązanie symboliczne></target>
 
-<source><Directory></source>
+<source><Folder></source>
 <target><Katalog></target>
 
 <source>Full path</source>
@@ -426,8 +429,8 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Relative path</source>
 <target>Relatywna ścieżka</target>
 
-<source>Directory</source>
-<target>Katalog</target>
+<source>Base folder</source>
+<target>Katalog bazowy</target>
 
 <source>Size</source>
 <target>Rozmiar</target>
@@ -438,8 +441,11 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Extension</source>
 <target>Rozszerzenie</target>
 
-<source>Comparison Result</source>
-<target>Rezultat porównywania</target>
+<source>Action</source>
+<target>Akcja</target>
+
+<source>Category</source>
+<target>Kategoria</target>
 
 <source>Drag && drop</source>
 <target>Drag && Drop</target>
@@ -447,14 +453,14 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Close progress dialog</source>
 <target>Zamknij okno postępu</target>
 
-<source>Shut down</source>
-<target>Wyłącz komputer</target>
+<source>Standby</source>
+<target>Przejdź w stan uśpienia</target>
 
 <source>Log off</source>
 <target>Wyloguj użytkownika</target>
 
-<source>Standby</source>
-<target>Przejdź w stan uśpienia</target>
+<source>Shut down</source>
+<target>Wyłącz komputer</target>
 
 <source>Hibernate</source>
 <target>Przejdź w stan hibernacji</target>
@@ -462,14 +468,11 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>1. &Compare</source>
 <target>1. &Porównaj</target>
 
-<source>2. &Synchronize...</source>
-<target>2. &Synchronizuj...</target>
+<source>2. &Synchronize</source>
+<target>2. &Synchronizuj</target>
 
 <source>&New</source>
 <target>&Nowy</target>
-
-<source>&Program</source>
-<target>&Program</target>
 
 <source>&Language</source>
 <target>&Język</target>
@@ -498,8 +501,8 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>&Abort</source>
 <target>&Przerwij</target>
 
-<source>Synchronize...</source>
-<target>Synchronizuj...</target>
+<source>Synchronize</source>
+<target>Synchronizuj</target>
 
 <source>Start synchronization</source>
 <target>Rozpocznij synchronizację</target>
@@ -513,11 +516,11 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Swap sides</source>
 <target>Zamień stronami</target>
 
-<source>Save current configuration to file</source>
-<target>Zapisz aktualny plik konfiguracyjny</target>
-
 <source>Load configuration from file</source>
 <target>Wczytaj konfigurację z pliku</target>
+
+<source>Save current configuration to file</source>
+<target>Zapisz aktualny plik konfiguracyjny</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Ostatnio użyta konfiguracja (naciśnij DEL żeby usunąć z listy)</target>
@@ -528,13 +531,13 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Ukryj pliki filtrowane lub tymczasowo wykluczone</target>
 
-<source>Number of files and directories that will be created</source>
+<source>Number of files and folders that will be created</source>
 <target>Liczba plików i katalogów, które zostaną utworzone</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Liczba plików, które zostaną nadpisane</target>
 
-<source>Number of files and directories that will be deleted</source>
+<source>Number of files and folders that will be deleted</source>
 <target>Liczba plików i katalogów, które zostaną usunięte</target>
 
 <source>Total amount of data that will be transferred</source>
@@ -558,8 +561,8 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Batch job</source>
 <target>Plik wsadowy</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Utwórz plik wsadowy aby zautomatyzować proces synchronizacji. Aby uruchomić synchronizację w trybie wsadowym kliknij dwa razy kliknij na ten plik lub wykonaj komendę: FreeFileSync.exe SyncJob.ffs_batch. Możesz to również wykorzystać w swoim harmonogramie zadań.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Utwórz plik wsadowy aby zautomatyzować proces synchronizacji. Kliknij dwa razy na ten plik lub dodaj go do menadżera zadań w swoim systemie: FreeFileSync.exe <nazwa_pliku>.ffs_batch</target>
 
 <source>Help</source>
 <target>Pomoc</target>
@@ -585,17 +588,11 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Maximum number of log files:</source>
 <target>Maksymalna liczba plików z logami:</target>
 
-<source>Select log file directory:</source>
-<target>Wybierz katalog z logami:</target>
+<source>Select folder to save log files:</source>
+<target>Wybierz katalog, do które będą zapisywane logi:</target>
 
 <source>Batch settings</source>
 <target>Ustawienia trybu wsadowego</target>
-
-<source>&Save</source>
-<target>&Zapisz</target>
-
-<source>&Load</source>
-<target>&Wczytaj</target>
 
 <source>Select variant:</source>
 <target>Wybierz wariant:</target>
@@ -621,29 +618,23 @@ Komenda jest wykonywana za każdym razem gdy:
 <source>Configuration</source>
 <target>Konfiguracja</target>
 
-<source>Category</source>
-<target>Kategoria</target>
+<source>Item exists on left side only</source>
+<target>Element istnieje tylko po lewej stronie</target>
 
-<source>Action</source>
-<target>Akcja</target>
+<source>Item exists on right side only</source>
+<target>Element istnieje tylko po prawej stronie</target>
 
-<source>File/folder exists on left side only</source>
-<target>Plik/folder istnieje tylko po lewej stronie</target>
+<source>Left side is newer</source>
+<target>Lewa strona jest nowsza</target>
 
-<source>File/folder exists on right side only</source>
-<target>Plik/folder istnieje tylko po prawej stronie</target>
+<source>Right side is newer</source>
+<target>Prawa strona jest nowsza</target>
 
-<source>Left file is newer</source>
-<target>Lewy plik jest nowszy</target>
+<source>Items have different content</source>
+<target><Elementy różnią się zawartością</target>
 
-<source>Right file is newer</source>
-<target>Prawy plik jest nowszy</target>
-
-<source>Files have different content</source>
-<target>Pliki różnią się zawartością</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Konflikt/plik nie może zostać skategoryzowany</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Konflikt/element nie może zostać skategoryzowany</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -750,33 +741,6 @@ Tylko pliki pasujące do wszystkich filtrów będą synchronizowane.
 Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowego.
 </target>
 
-<source>Hints:</source>
-<target>Wskazówki:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Wprowadź relatywne scieżki do plików lub katalogów oddzielone ';' lub nową linią.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Użyj wieloznacznika (wildcard) '*' i '?'.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Wyklucz pliki i foldery używając prawego przycisku myszki.</target>
-
-<source>Example</source>
-<target>Przykład</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Uwzględnik: *.doc;*zip*.exe
-Wyklucz: \moje\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Synchronizuj wszystkie pliki .doc, .zip i exe z wyjątkiem folderu "temp"</target>
-
 <source>Include</source>
 <target>Dołącz</target>
 
@@ -798,8 +762,8 @@ Wyklucz: \moje\temp\*
 <source>&Default</source>
 <target>&Domyślne</target>
 
-<source>Transactional file copy</source>
-<target>Transakcyjne kopiowanie pliku</target>
+<source>Fail-safe file copy</source>
+<target>Bezpieczne kopiowanie</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Stwórz tymczasowy plik (*.ffs_tmp) następnie zamień jego nazwę. Gwarantuje to spójność nawet po wystąpieniu błędu.</target>
@@ -813,8 +777,8 @@ Wyklucz: \moje\temp\*
 <source>Copy file access permissions</source>
 <target>Kopiuj uprawnienia plików</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Transfer uprawnień plików i katalogów (Wymaga uprawnień Administratora)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>Kopiuj uprawnienia plików i katalogów (Wymaga uprawnień Administratora)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Przywróc ukryte dialogi</target>
@@ -1126,10 +1090,10 @@ Wyklucz: \moje\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne macra:</target>
 
-<source>- full file or directory name</source>
+<source>- full file or folder name</source>
 <target>- pełna nazwa pliku lub katalogu</target>
 
-<source>- directory part only</source>
+<source>- folder part only</source>
 <target>- tylko część katalogu</target>
 
 <source>- Other side's counterpart to %name</source>
@@ -1176,8 +1140,8 @@ Wyklucz: \moje\temp\*
 <source>Versioning</source>
 <target>Wersjonowanie</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Przenieś pliki do oznaczonego podkatalogu</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>Przenieś pliki do podkatalogu ze zmodyfikowanym czasem.</target>
 
 <source>Files</source>
 <target>Pliki</target>
@@ -1275,8 +1239,8 @@ Wyklucz: \moje\temp\*
 <source>Cannot read directory %x.</source>
 <target>Nie można odczytać katalogu %x.</target>
 
-<source>Endless loop.</source>
-<target>Nieskończona pętla.</target>
+<source>Detected endless directory recursion.</source>
+<target>Wykryto nieskończoną pętlę katalogów</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Nie można ustawić uprawnień %x.</target>
@@ -1302,13 +1266,10 @@ Wyklucz: \moje\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Ustawianie domyślnego kierunku synchronizacji: Stare pliki zostaną nadpisane nowszymi.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Nieprawidłowy format pliku:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>Możesz zignorować ten błąd traktując katalog jako pusty.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>Możesz zignorować ten błąd uznająć jeden z katalogów jako pusty.</target>
-
-<source>Cannot find directory %x.</source>
+<source>Cannot find folder %x.</source>
 <target>Nie można znaleźć katalogu %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
@@ -1341,20 +1302,20 @@ Wyklucz: \moje\temp\*
 <source>Both sides are equal</source>
 <target>Obie strony są równe</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Pliki/foldery różnią się tylko atrybutami</target>
+<source>Items have different attributes</source>
+<target>Elementy mają różne atrybuty</target>
 
-<source>Copy new file/folder to left</source>
-<target>Skopiuj nowy plik/katalog na lewą stroną</target>
+<source>Copy new item to left</source>
+<target>Kopiuj nowy element na lewą stronę</target>
 
-<source>Copy new file/folder to right</source>
-<target>Skopiuj nowy plik/katalog na prawą stroną</target>
+<source>Copy new item to right</source>
+<target>Kopiuj nowy element na prawą stronę</target>
 
-<source>Delete left file/folder</source>
-<target>Usuń plik/katalog po lewej stronie</target>
+<source>Delete left item</source>
+<target>Usuń lewy element</target>
 
-<source>Delete right file/folder</source>
-<target>Usuń plik/katalog po prawej stronie</target>
+<source>Delete right item</source>
+<target>Usuń prawy element</target>
 
 <source>Move file on left</source>
 <target>Przenieś plik na lewą stronę</target>
@@ -1362,20 +1323,20 @@ Wyklucz: \moje\temp\*
 <source>Move file on right</source>
 <target>Przenieś plik na prawą stronę</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Nadpisz plik/katalog po lewej stronie tym po prawej</target>
+<source>Overwrite left item</source>
+<target>Nadpisz lewy element</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Nadpisz plik/katalog po prawej stronie tym po lewej</target>
+<source>Overwrite right item</source>
+<target>Nadpisz prawy element</target>
 
 <source>Do nothing</source>
 <target>Nic nie rób</target>
 
-<source>Copy file attributes only to left</source>
-<target>Kopiuj atrybuty plików tylko na lewą stronę</target>
+<source>Update attributes on left</source>
+<target>Aktualizuj atrybuty po lewej stronie</target>
 
-<source>Copy file attributes only to right</source>
-<target>Kopiuj atrybuty plików tylko na prawą stronę</target>
+<source>Update attributes on right</source>
+<target>Aktualizuj atrybuty po prawej stronie</target>
 
 <source>Multiple...</source>
 <target>Wiele...</target>
@@ -1428,11 +1389,11 @@ Wyklucz: \moje\temp\*
 <source>Updating attributes of %x</source>
 <target>Aktualizowanie atrybutów %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Katalog docelowy nie może być pusty!</target>
+<source>Target folder name must not be empty.</source>
+<target>Katalog docelowy nie może być pusty.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Nie określono katalogu do wersjonowania plików!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>Nazwa katalogu do wersjonowania plików nie może być pusta.</target>
 
 <source>Source directory %x not found.</source>
 <target>Katalog źródłowy %x nie istnieje.</target>
@@ -1461,8 +1422,8 @@ Wyklucz: \moje\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Kosz nie jest dostępny dla określonych ścieżek! Pliki zostaną nieodwracalnie usuniętę:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Katalog zostanie zmodyfikowany w efekcie synchronizacji wielu par folderów! Zweryfikuj ustawienia synchronizacji!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>Katalog zostanie zmodyfikowany w związku z synchronizacją wielu katalogów. Zweryfikuj ustawienia synchronizacji.</target>
 
 <source>Processing folder pair:</source>
 <target>Przetwarzanie folderów:</target>

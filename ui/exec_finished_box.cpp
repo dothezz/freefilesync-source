@@ -31,24 +31,24 @@ std::vector<std::pair<std::wstring, std::wstring>> getDefaultCommands() //(gui n
 #ifdef FFS_WIN
     if (zen::vistaOrLater())
     {
-        addEntry(_("Shut down"), L"shutdown /s /t 60");
-        addEntry(_("Log off"  ), L"shutdown /l");
         addEntry(_("Standby"  ), L"rundll32.exe powrprof.dll,SetSuspendState Sleep"); //suspend/Suspend to RAM/sleep
+        addEntry(_("Log off"  ), L"shutdown /l");
+        addEntry(_("Shut down"), L"shutdown /s /t 60");
         //addEntry(_("Hibernate"), L"shutdown /h"); //Suspend to disk -> Standby is better anyway
     }
     else //XP
     {
-        addEntry(_("Shut down"), L"shutdown -s -t 60");
-        addEntry(_("Log off"  ), L"shutdown -l");
-        //no suspend on XP?
         addEntry(_("Standby"), L"rundll32.exe powrprof.dll,SetSuspendState"); //this triggers standby OR hibernate, depending on whether hibernate setting is active!
+        addEntry(_("Log off"  ), L"shutdown -l");
+        addEntry(_("Shut down"), L"shutdown -s -t 60");
+        //no suspend on XP?
     }
 
 #elif defined FFS_LINUX
+    addEntry(_("Standby"  ), L"sudo pm-suspend");
+    addEntry(_("Log off"  ), L"gnome-session-quit"); //alternative requiring admin: sudo killall Xorg
     addEntry(_("Shut down"), L"dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.RequestShutdown");
     //alternative requiring admin: sudo shutdown -h 1
-    addEntry(_("Log off"  ), L"gnome-session-quit"); //alternative requiring admin: sudo killall Xorg
-    addEntry(_("Standby"  ), L"sudo pm-suspend");
     //addEntry(_("Hibernate"), L"sudo pm-hibernate");
     //alternative: "pmi action suspend" and "pmi action hibernate", require "sudo apt-get install powermanagement-interaface"
 

@@ -35,7 +35,7 @@ public:
     ~FileInput();
 
     size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns actual number of bytes read
-    bool eof(); //end of file reached
+    bool eof() { return eofReached; } //end of file reached
 
 private:
     FileInput(const FileInput&);

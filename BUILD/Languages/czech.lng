@@ -7,8 +7,8 @@
 	<plural definition>n==1 ? 0 : n>=2 && n<=4 ? 1 : 2</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>Otevírání adresáře %x</target>
+<source>Searching for folder %x...</source>
+<target>Otevírání složky %x</target>
 
 <source>Show in Explorer</source>
 <target>Zobrazit v Průzkumníkovi</target>
@@ -25,17 +25,20 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatická synchronizace</target>
 
+<source>Error</source>
+<target>Chyba</target>
+
 <source>Select alternate comparison settings</source>
 <target>Změnit nastavení porovnání</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Změnit nastavení synchronizace</target>
 
-<source>No filter selected</source>
-<target>Není vybrán žádný filtr</target>
-
 <source>Filter is active</source>
 <target>Filtr je zapnutý</target>
+
+<source>No filter selected</source>
+<target>Není vybrán žádný filtr</target>
 
 <source>Remove alternate settings</source>
 <target>Zrušit jiné nastavení</target>
@@ -55,9 +58,6 @@
 <source>About</source>
 <target>O Programu</target>
 
-<source>Error</source>
-<target>Chyba</target>
-
 <source>Warning</source>
 <target>Varování</target>
 
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Nastavení programu</target>
 
-<source>Synchronization Preview</source>
-<target>Náhled synchronizace</target>
+<source>Summary</source>
+<target>Přehled</target>
 
 <source>Find</source>
 <target>Najít</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Procházet</target>
 
-<source>Invalid command line: %x</source>
-<target>Neplatný příkaz: %x</target>
+<source>Invalid command line:</source>
+<target>Neplatný příkaz:</target>
 
 <source>Info</source>
 <target>Info</target>
@@ -235,23 +235,23 @@
 <source>Cannot read the following XML elements:</source>
 <target>Nelze načíst následující XML elementy:</target>
 
-<source>S&ave configuration...</source>
-<target>&Uložení konfigurace...</target>
+<source>&Open...</source>
+<target>&Otevřít...</target>
 
-<source>&Load configuration...</source>
-<target>&Načíst konfiguraci...</target>
+<source>&Save...</source>
+<target>&Uložit</target>
 
 <source>&Quit</source>
 <target>U&končit</target>
 
-<source>&File</source>
-<target>&Soubor</target>
+<source>&Program</source>
+<target>&Nástroje</target>
 
 <source>&Content</source>
 <target>&Obsah</target>
 
-<source>&About...</source>
-<target>&O Programu...</target>
+<source>&About</source>
+<target>O &Programu</target>
 
 <source>&Help</source>
 <target>&Pomoc</target>
@@ -259,8 +259,8 @@
 <source>Usage:</source>
 <target>Použití:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. Vyberte adresáře pro sledování.</target>
+<source>1. Select folders to watch.</source>
+<target>1. Vyberte složku ke sledování.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Zadejte příkazovou řádku.</target>
@@ -268,19 +268,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. Zmáčkněte 'Start'</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-Příkazová řádka je spuštěna pokaždé když:
-- jsou k dispozici všechny adresáře (např. vložením USB disku)
-- dojde ke změně souborů v adresáři nebo podadresářích
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>Můžete načíst také konfigurační soubor soubor .ffs_batch</target>
 
-<source>Directories to watch</source>
-<target>Sledované adresáře</target>
+<source>Folders to watch</source>
+<target>Složka ke sledování</target>
 
 <source>Add folder</source>
 <target>Přidat adresář</target>
@@ -291,17 +283,34 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Select a folder</source>
 <target>Vyberte adresář</target>
 
+<source>Delay [seconds]</source>
+<target>Prodleva (v sekundách)</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Prodleva mezi zjištěním poslední změny a spuštěním příkazu</target>
+
 <source>Command line</source>
 <target>Příkazová řádka</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Minimální čas prodlevy [v sekundách]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Prodleva mezi detekcí poslední změny a spuštěním příkazu (v sekundách)</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+Příkaz je spuštěn když:
+- dojde ke změně v souboru nebo ve složce
+- je zjištěna nová složka (např. vložením USB disku)
+</target>
 
 <source>Start</source>
 <target>Start</target>
+
+<source>&Retry</source>
+<target>&Opakovat</target>
+
+<source>Cancel</source>
+<target>Zrušit</target>
 
 <source>(Build: %x)</source>
 <target>(Build: %x)</target>
@@ -321,8 +330,8 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Waiting for missing directories...</source>
 <target>Čekání na nedostupné adresáře...</target>
 
-<source>A directory input field is empty.</source>
-<target>Není zadán vstupní adresář.</target>
+<source>An input folder name is empty.</source>
+<target>Není zadána vstupní složka.</target>
 
 <source>Logging</source>
 <target>Záznam zpracování</target>
@@ -408,8 +417,8 @@ Příkazová řádka je spuštěna pokaždé když:
 <source><Symlink></source>
 <target><Symlink></target>
 
-<source><Directory></source>
-<target><Adresář></target>
+<source><Folder></source>
+<target><Složka></target>
 
 <source>Full path</source>
 <target>Plná cesta</target>
@@ -420,8 +429,8 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Relative path</source>
 <target>Relativní cesta</target>
 
-<source>Directory</source>
-<target>Adresář</target>
+<source>Base folder</source>
+<target>Složka</target>
 
 <source>Size</source>
 <target>Velikost</target>
@@ -432,23 +441,26 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Extension</source>
 <target>Přípona</target>
 
-<source>Comparison Result</source>
-<target>Výsledek porovnání</target>
+<source>Action</source>
+<target>Akce</target>
+
+<source>Category</source>
+<target>Kategorie</target>
 
 <source>Drag && drop</source>
-<target>Drag && Drop</target>
+<target>Přetáhni sem && pusť</target>
 
 <source>Close progress dialog</source>
 <target>Zavřít průběh zpracování</target>
 
-<source>Shut down</source>
-<target>Vypnout počítač</target>
+<source>Standby</source>
+<target>Přepnout do úsporného režimu</target>
 
 <source>Log off</source>
 <target>Odhlásit uživatele</target>
 
-<source>Standby</source>
-<target>Přepnout do úsporného režimu</target>
+<source>Shut down</source>
+<target>Vypnout počítač</target>
 
 <source>Hibernate</source>
 <target>Přepnout do režimu spánku</target>
@@ -456,14 +468,11 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>1. &Compare</source>
 <target>1. &Porovnat</target>
 
-<source>2. &Synchronize...</source>
-<target>2. &Synchronizovat...</target>
+<source>2. &Synchronize</source>
+<target>2. &Synchronizovat</target>
 
 <source>&New</source>
 <target>&Nový</target>
-
-<source>&Program</source>
-<target>&Nástroje</target>
 
 <source>&Language</source>
 <target>&Jazyk</target>
@@ -492,7 +501,7 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>&Abort</source>
 <target>&Ukončit</target>
 
-<source>Synchronize...</source>
+<source>Synchronize</source>
 <target>Synchronizace</target>
 
 <source>Start synchronization</source>
@@ -507,11 +516,11 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Swap sides</source>
 <target>Změna stran</target>
 
-<source>Save current configuration to file</source>
-<target>Uložit změny do konfiguračního souboru</target>
-
 <source>Load configuration from file</source>
 <target>Načíst konfiguraci ze souboru</target>
+
+<source>Save current configuration to file</source>
+<target>Uložit změny do konfiguračního souboru</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Posledně použité konfigurace (pomocí DEL můžete položku smazat)</target>
@@ -522,14 +531,14 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Skrýt filtrované nebo dočasně vynechané soubory</target>
 
-<source>Number of files and directories that will be created</source>
-<target>Počet souborů a adresářů k vytvoření</target>
+<source>Number of files and folders that will be created</source>
+<target>Počet souborů a složek k vytvoření</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Počet souborů a adresářů k přepsání</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>Počet souborů a adresářů ke smazání</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Počet souborů a složek ke smazání</target>
 
 <source>Total amount of data that will be transferred</source>
 <target>Celkový objem dat, který bude přenesen</target>
@@ -552,8 +561,8 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Batch job</source>
 <target>Dávkový soubor</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Vytvoří dávkový souboru pro automatický provoz. Ke spuštění dávky jednoduše poklikejte na vytvořený soubor nebo jeho jméno zadejte jako parametr při spuštění FreeFileSync: FreeFileSync.exe <jméno_souboru>. Stejně tak můžete ke spuštění využít plánovač úloh vašeho operačního systému.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Vytvoří dávkový souboru pro automatickou synchronizaci. Ke spuštění dávky jednoduše poklikejte na vytvořený soubor nebo jeho jméno zadejte jako parametr při spuštění FreeFileSync: FreeFileSync.exe <jméno_souboru>. Stejně tak můžete ke spuštění využít plánovač úloh vašeho operačního systému.</target>
 
 <source>Help</source>
 <target>Nápověda</target>
@@ -579,20 +588,11 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Maximum number of log files:</source>
 <target>Maximální počet záznamových souborů:</target>
 
-<source>Select log file directory:</source>
-<target>Vyberte adresář pro záznamové soubory:</target>
+<source>Select folder to save log files:</source>
+<target>Vyberte složku pro záznamové soubory:</target>
 
 <source>Batch settings</source>
 <target>Nastavení</target>
-
-<source>&Save</source>
-<target>&Uložit</target>
-
-<source>&Load</source>
-<target>&Načíst</target>
-
-<source>Cancel</source>
-<target>Zrušit</target>
 
 <source>Select variant:</source>
 <target>Vyberte variantu:</target>
@@ -618,29 +618,23 @@ Příkazová řádka je spuštěna pokaždé když:
 <source>Configuration</source>
 <target>Konfigurace</target>
 
-<source>Category</source>
-<target>Kategorie</target>
+<source>Item exists on left side only</source>
+<target>Položky existující pouze vlevo</target>
 
-<source>Action</source>
-<target>Akce</target>
+<source>Item exists on right side only</source>
+<target>Položky existující pouze vpravo</target>
 
-<source>File/folder exists on left side only</source>
-<target>Soubory/adresáře, které existují pouze vlevo</target>
+<source>Left side is newer</source>
+<target>Vlevo je novější</target>
 
-<source>File/folder exists on right side only</source>
-<target>Soubory/adresáře, které existují pouze vpravo</target>
+<source>Right side is newer</source>
+<target>Vpravo je novější</target>
 
-<source>Left file is newer</source>
-<target>Levý soubor je novější</target>
+<source>Items have different content</source>
+<target>Obsah položek je rozdílný</target>
 
-<source>Right file is newer</source>
-<target>Pravý soubor je novější</target>
-
-<source>Files have different content</source>
-<target>Soubory, které mají rozdílný obsah</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Konflikty/soubory které nelze zařadit</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Konflikty/položky které nelze zařadit</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -717,9 +711,6 @@ je stejný
 <source>&Ignore</source>
 <target>&Pokračovat</target>
 
-<source>&Retry</source>
-<target>&Opakovat</target>
-
 <source>Do not show this dialog again</source>
 <target>Tento dialog již nezobrazovat</target>
 
@@ -750,33 +741,6 @@ Pouze soubory odpovídající nastavenému filtru budou vybrány pro synchroniza
 Poznámka: Filtr je aplikován relativně k základním adresářům.
 </target>
 
-<source>Hints:</source>
-<target>Nápověda:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Můžete použít relativní cesty k souboru nebo adresáři oddělené ';' nebo řádkem.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Můžete použít zástupné znaky (wildcard) '*' a '?'.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Můžete použít pro vynechávání souborů přímo kontextového menu.</target>
-
-<source>Example</source>
-<target>Příklad</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Přidat: *.doc;*.zip;*.exe
-Vynechat: \někde\něco\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Synchronizovat všechny soubory .doc, .zip a .exe s výjimkou všeho v podadresáři "někde\něco"</target>
-
 <source>Include</source>
 <target>Přidat</target>
 
@@ -798,7 +762,7 @@ Vynechat: \někde\něco\*
 <source>&Default</source>
 <target>&Předdefinované</target>
 
-<source>Transactional file copy</source>
+<source>Fail-safe file copy</source>
 <target>Bezpečné kopírování souborů</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
@@ -813,8 +777,8 @@ Vynechat: \někde\něco\*
 <source>Copy file access permissions</source>
 <target>Kopírovat přístupová oprávnění k souborům</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Přenést přístupová oprávnění souborů a adresářů (Vyžaduje administrátorké oprávnění)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>Přenést přístupová oprávnění souborů a složek (Vyžaduje administrátorké oprávnění)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Obnovit skryté dialogy</target>
@@ -1126,10 +1090,10 @@ Vynechat: \někde\něco\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:</target>
 
-<source>- full file or directory name</source>
+<source>- full file or folder name</source>
 <target>- celá cesta nebo jméno souboru</target>
 
-<source>- directory part only</source>
+<source>- folder part only</source>
 <target>- pouze cesta</target>
 
 <source>- Other side's counterpart to %name</source>
@@ -1176,8 +1140,8 @@ Vynechat: \někde\něco\*
 <source>Versioning</source>
 <target>Verzování</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Přesunout soubory do časově označeného podadresáře</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>Přesunout soubory do časově označené podsložky</target>
 
 <source>Files</source>
 <target>Soubory</target>
@@ -1275,8 +1239,8 @@ Vynechat: \někde\něco\*
 <source>Cannot read directory %x.</source>
 <target>Nelze číst adresář %x.</target>
 
-<source>Endless loop.</source>
-<target>Nekonečná smyčka.</target>
+<source>Detected endless directory recursion.</source>
+<target>Nalezena nekonečná adresářová smyčka.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Nelze nastavit práva pro %x.</target>
@@ -1302,14 +1266,11 @@ Vynechat: \někde\něco\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Nastaven výchozí způsob synchronizace: Staré soubory budou nahrazeny novými.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Soubor neobsahuje platnou konfiguraci:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>Tuto chybu můžete přeskočit a považovat neexistující složku jako prázdnou.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>Tuto chybu můžete přeskočit a považovat neexistující adresář jako prázdný.</target>
-
-<source>Cannot find directory %x.</source>
-<target>Nelze najít adresář %x.</target>
+<source>Cannot find folder %x.</source>
+<target>>Nelze najít složku %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Adresáře jsou závislé! Buďte opatrní s definicí synchronizačních pravidel:</target>
@@ -1341,20 +1302,20 @@ Vynechat: \někde\něco\*
 <source>Both sides are equal</source>
 <target>Obě strany jsou shodné</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Soubory/adresáře se liší pouze ve vlastnostech</target>
+<source>Items have different attributes</source>
+<target>Položky se liší ve vlastnostech</target>
 
-<source>Copy new file/folder to left</source>
-<target>Kopírovat nový soubor/adresář do leva</target>
+<source>Copy new item to left</source>
+<target>Kopírovat novou položku do leva</target>
 
-<source>Copy new file/folder to right</source>
-<target>Kopírovat nový soubor/adresář do prava</target>
+<source>Copy new item to right</source>
+<target>Kopírovat novou položku do prava</target>
 
-<source>Delete left file/folder</source>
-<target>Smazat soubor/adresář z leva</target>
+<source>Delete left item</source>
+<target>Smazat položku z leva</target>
 
-<source>Delete right file/folder</source>
-<target>Smazat soubor/adresáře z prava</target>
+<source>Delete right item</source>
+<target>Smazat položku z prava</target>
 
 <source>Move file on left</source>
 <target>Přesunout soubor nalevo</target>
@@ -1362,20 +1323,20 @@ Vynechat: \někde\něco\*
 <source>Move file on right</source>
 <target>Přesunout soubor napravo</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Přepsat levý soubor/adresář tím z prava</target>
+<source>Overwrite left item</source>
+<target>Přepsat levou položku tou z prava</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Přepsat pravý soubor/adresář tím z leva</target>
+<source>Overwrite right item</source>
+<target>Přepsat pravou položku tou z leva</target>
 
 <source>Do nothing</source>
 <target>Nic nedělat</target>
 
-<source>Copy file attributes only to left</source>
-<target>Kopírovat vlastnosti souboru pouze do leva</target>
+<source>Update attributes on left</source>
+<target>Nastavit vlastnosti v levo</target>
 
-<source>Copy file attributes only to right</source>
-<target>Kopírovat vlastnosti souboru pouze do prava</target>
+<source>Update attributes on right</source>
+<target>Nastavit vlastnoti v pravo</target>
 
 <source>Multiple...</source>
 <target>Různé...</target>
@@ -1428,11 +1389,11 @@ Vynechat: \někde\něco\*
 <source>Updating attributes of %x</source>
 <target>Aktualizace atributů souboru %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Není zadán cílový adresář!</target>
+<source>Target folder name must not be empty.</source>
+<target>Cílová složka nesmí být prázdná.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Nebyl zadán adresář pro verzování souborů!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>Složka pro verzování souborů nesmí být prázdná.</target>
 
 <source>Source directory %x not found.</source>
 <target>Zdrojový adresář %x nelze najít.</target>
@@ -1461,8 +1422,8 @@ Vynechat: \někde\něco\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Nelze použít Koš pro následující umístění! Soubory budou odstraněny trvale:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Bude změně adresář, který je součástí adresářového páru vícenásobného porovnání! Prosím zkontrolujte si nastavení synchronizace!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>Bude změněna složka, která je součástí adresářového páru vícenásobného porovnání. Prosím zkontrolujte si nastavení synchronizacem.</target>
 
 <source>Processing folder pair:</source>
 <target>Zpracovávání adresářové páru:</target>

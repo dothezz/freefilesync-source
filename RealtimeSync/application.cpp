@@ -52,7 +52,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
 #elif defined FFS_LINUX
-    ::gtk_rc_parse((zen::utf8CvrtTo<std::string>(zen::getResourceDir()) + "styles.rc").c_str()); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((zen::getResourceDir() + "styles.rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
     //set program language
@@ -105,9 +105,9 @@ int Application::OnRun()
     {
         //it's not always possible to display a message box, e.g. corrupted stack, however (non-stream) file output works!
         wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
-        safeOutput.Write(utf8CvrtTo<wxString>(e.what()));
+        safeOutput.Write(utfCvrtTo<wxString>(e.what()));
 
-        wxSafeShowMessage(_("An exception occurred!") + L" - RTS", utf8CvrtTo<wxString>(e.what()));
+        wxSafeShowMessage(_("An exception occurred!") + L" - RTS", utfCvrtTo<wxString>(e.what()));
         return -9;
     }
     catch (...) //catch the rest
@@ -121,6 +121,6 @@ int Application::OnRun()
         return -9;
     }
 
-    return 0; //program's return value
+    return 0; //program's return code
 }
 

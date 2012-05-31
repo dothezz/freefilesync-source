@@ -7,7 +7,7 @@
 	<plural definition>n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
+<source>Searching for folder %x...</source>
 <target>Caut dosarul %x...</target>
 
 <source>Show in Explorer</source>
@@ -25,17 +25,20 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronizare Inteligentă</target>
 
+<source>Error</source>
+<target>Eroare</target>
+
 <source>Select alternate comparison settings</source>
 <target>Selectează setările alternative de comparare</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Selectează o altă configurație a sincronizării</target>
 
+<source>Filter is active</source>
+<target>Filtrul de elemente este activ</target>
+
 <source>No filter selected</source>
 <target>Nu a fost selectat nici un filtru</target>
-
-<source>Filter is active</source>
-<target>Filtrul este activ</target>
 
 <source>Remove alternate settings</source>
 <target>Înlătură setările alternative</target>
@@ -44,7 +47,7 @@
 <target>Curăță Setările Filtrului</target>
 
 <source>Create a batch job</source>
-<target>Creează o Sarcină Set</target>
+<target>Creează o Sarcină Set [Batch Job]</target>
 
 <source>Synchronization settings</source>
 <target>Setările Sincronizării</target>
@@ -54,9 +57,6 @@
 
 <source>About</source>
 <target>Despre</target>
-
-<source>Error</source>
-<target>Eroare</target>
 
 <source>Warning</source>
 <target>Atenție</target>
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Setări Globale</target>
 
-<source>Synchronization Preview</source>
-<target>Previzionarea Sincronizării</target>
+<source>Summary</source>
+<target>Sumar</target>
 
 <source>Find</source>
 <target>Găsește</target>
@@ -83,13 +83,13 @@
 <target>Selectează intervalul de timp</target>
 
 <source>Show pop-up</source>
-<target>Este arătat un popîc</target>
+<target>Arată un popîc</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Va fi afișată o fereastră popîc [popup] la erori sau avertizări</target>
 
 <source>Ignore errors</source>
-<target>Erorile sînt ignorate</target>
+<target>Ignoră erorile</target>
 
 <source>Hide all error and warning messages</source>
 <target>Sînt ascunse toate mesajele de eroare și de avertizare</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Explorează</target>
 
-<source>Invalid command line: %x</source>
-<target>Linie de comandă nevalidă: %x</target>
+<source>Invalid command line:</source>
+<target>Linie de comandă nevalidă:</target>
 
 <source>Info</source>
 <target>Informații</target>
@@ -229,29 +229,29 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>Numele volumului %x nu face parte din numele filei %y !</target>
 
-<source>Cannot find file %x.</source>
-<target>Nu pot găsi fila %x.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Nu pot citi următoarele elemente XML:</target>
 
-<source>S&ave configuration...</source>
-<target>S&alvează Configurația...</target>
+<source>Cannot find file %x.</source>
+<target>Nu pot găsi fila %x.</target>
 
-<source>&Load configuration...</source>
-<target>&Deschide Configurația...</target>
+<source>&Open...</source>
+<target>&Deschide...</target>
+
+<source>&Save...</source>
+<target>&Salvează...</target>
 
 <source>&Quit</source>
 <target>&Ieși</target>
 
-<source>&File</source>
-<target>&Filă</target>
+<source>&Program</source>
+<target>&Program</target>
 
 <source>&Content</source>
 <target>&Conținut</target>
 
-<source>&About...</source>
-<target>&Despre...</target>
+<source>&About</source>
+<target>&Despre</target>
 
 <source>&Help</source>
 <target>&Ajutor</target>
@@ -259,7 +259,7 @@
 <source>Usage:</source>
 <target>Utilizare:</target>
 
-<source>1. Select directories to monitor.</source>
+<source>1. Select folders to watch.</source>
 <target>1. Selectează dosarele de monitorizat.</target>
 
 <source>2. Enter a command line.</source>
@@ -268,19 +268,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. Apasă 'Pornește'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-Linia de comandă este executată de fiecare dată cînd:
-- toate dosarele devin disponibile (de ex. se introduce un dispozitiv USB)
-- filele conținute în aceste dosare sau subdosare sînt modificate
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>Pentru a începe, importă o filă de tipul .ffs_batch.</target>
 
-<source>Directories to watch</source>
-<target>Dosare de monitorizat</target>
+<source>Folders to watch</source>
+<target>Dosare de Monitorizat</target>
 
 <source>Add folder</source>
 <target>Adaugă Dosar</target>
@@ -291,17 +283,34 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Select a folder</source>
 <target>Selectează un Dosar</target>
 
+<source>Delay [seconds]</source>
+<target>Întîrziere [secunde]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Timpul de inactivitate între ultima schimbare detectată și executarea comenzii</target>
+
 <source>Command line</source>
 <target>Linie de comandă</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Timp Minim de Inactivitate [secunde]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Timp de inactivitate (în secunde) între detectarea ultimei modificări și executarea liniei de comandă</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+Comanda este declanșată dacă:
+- sînt modificate filele sau subdosarele
+- apar dosare noi (de ex. prin atașarea unui dispozitiv USB)
+</target>
 
 <source>Start</source>
 <target>Pornește</target>
+
+<source>&Retry</source>
+<target>&Reîncearcă</target>
+
+<source>Cancel</source>
+<target>Anulează</target>
 
 <source>(Build: %x)</source>
 <target>(Compilația: %x)</target>
@@ -321,8 +330,8 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Waiting for missing directories...</source>
 <target>Aștept ca dosarele lipsă să devină disponibile...</target>
 
-<source>A directory input field is empty.</source>
-<target>Cel puțin unul din dosarele de comparat este nespecificat.</target>
+<source>An input folder name is empty.</source>
+<target>Un cîmp de introducere a numelui de dosar este gol.</target>
 
 <source>Logging</source>
 <target>Jurnal</target>
@@ -346,7 +355,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Sincronizare Personalizată</target>
 
 <source>FreeFileSync batch file</source>
-<target>Filă cu set de comenzi FreeFileSync</target>
+<target>Filă Set FreeFileSync</target>
 
 <source>FreeFileSync configuration</source>
 <target>Configurație FreeFileSync</target>
@@ -408,7 +417,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <source><Symlink></source>
 <target><Simlegătură></target>
 
-<source><Directory></source>
+<source><Folder></source>
 <target><Dosar></target>
 
 <source>Full path</source>
@@ -420,8 +429,8 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Relative path</source>
 <target>Cale Relativă</target>
 
-<source>Directory</source>
-<target>Dosar</target>
+<source>Base folder</source>
+<target>Dosar Bază (Rădăcină)</target>
 
 <source>Size</source>
 <target>Mărime</target>
@@ -432,8 +441,11 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Extension</source>
 <target>Extensie</target>
 
-<source>Comparison Result</source>
-<target>Rezultatul Comparării</target>
+<source>Action</source>
+<target>Acțiune</target>
+
+<source>Category</source>
+<target>Categorie</target>
 
 <source>Drag && drop</source>
 <target>Trage și pune un dosar mai jos sau explorează către el</target>
@@ -441,14 +453,14 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Close progress dialog</source>
 <target>Închide Fereastra cu Progresul Sincronizării</target>
 
-<source>Shut down</source>
-<target>Închide Calculatorul [Shut down]</target>
+<source>Standby</source>
+<target>Pune Calculatorul în Stare de Veghe [Stand-by]</target>
 
 <source>Log off</source>
 <target>Deloghează Utilizatorul [Log off]</target>
 
-<source>Standby</source>
-<target>Pune Calculatorul în Stare de Veghe [Stand-by]</target>
+<source>Shut down</source>
+<target>Închide Calculatorul [Shut down]</target>
 
 <source>Hibernate</source>
 <target>Pune Calculatorul în Hibernare</target>
@@ -456,14 +468,11 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>1. &Compare</source>
 <target>1. &Compară</target>
 
-<source>2. &Synchronize...</source>
-<target>2. &Sincronizează...</target>
+<source>2. &Synchronize</source>
+<target>2. &Sincronizează</target>
 
 <source>&New</source>
 <target>Configurație &Nouă</target>
-
-<source>&Program</source>
-<target>&Program</target>
 
 <source>&Language</source>
 <target>&Limbă</target>
@@ -492,7 +501,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>&Abort</source>
 <target>&Anulează</target>
 
-<source>Synchronize...</source>
+<source>Synchronize</source>
 <target>Sincronizează</target>
 
 <source>Start synchronization</source>
@@ -507,11 +516,11 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Swap sides</source>
 <target>Schimbă compartimentele stîng și drept între ele</target>
 
-<source>Save current configuration to file</source>
-<target>Salvează într-o filă modificările configurației curente</target>
-
 <source>Load configuration from file</source>
 <target>Deschide configurația dintr-o filă</target>
+
+<source>Save current configuration to file</source>
+<target>Salvează într-o filă modificările configurației curente</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Ultimele configurații utilizate (apasă tasta DEL pentru a înlătura din listă)</target>
@@ -522,13 +531,13 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Ascunde elementele (file/dosare) filtrate sau excluse temporar</target>
 
-<source>Number of files and directories that will be created</source>
+<source>Number of files and folders that will be created</source>
 <target>Numărul de file și dosare care vor fi create</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Numărul de file care vor fi suprascrise</target>
 
-<source>Number of files and directories that will be deleted</source>
+<source>Number of files and folders that will be deleted</source>
 <target>Numărul de file și dosare care vor fi șterse</target>
 
 <source>Total amount of data that will be transferred</source>
@@ -552,14 +561,14 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Batch job</source>
 <target>Sarcină Set</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Creează o filă set [batch] și automatizează sincronizarea. Pentru a porni în modul set dublu-clichează această filă sau rulează comanda: FreeFileSync.exe SyncJob.ffs_batch. Operația poate fi de asemenea planificată folosind planificatorul de sarcini al sistemului.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Automatizează sincronizarea prin crearea unei file set [batch file]. Pentru efectuarea sincronizării, dublu-clichează această filă sau programează sarcina următoare în Planificatorul de Sarcini [Task Scheduler] al SO: FreeFileSync.exe <numele filei>.ffs_batch</target>
 
 <source>Help</source>
 <target>Ajutor</target>
 
 <source>Filter files</source>
-<target>Filtru de Elemente</target>
+<target>Filtru</target>
 
 <source>Left</source>
 <target>Stînga</target>
@@ -571,7 +580,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Afișarea Stării</target>
 
 <source>Show progress dialog</source>
-<target>Arată caseta de dialog cu progresul</target>
+<target>Arată progresul sincronizării</target>
 
 <source>Error handling</source>
 <target>Gestionarea Erorilor</target>
@@ -579,20 +588,11 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Maximum number of log files:</source>
 <target>Numărul maxim de file jurnal:</target>
 
-<source>Select log file directory:</source>
-<target>Selectează un dosar pentru fila .log:</target>
+<source>Select folder to save log files:</source>
+<target>Selectează dosarul unde să fie salvate filele jurnal [log files]</target>
 
 <source>Batch settings</source>
-<target>Setările Setului de Comenzi</target>
-
-<source>&Save</source>
-<target>&Salvează</target>
-
-<source>&Load</source>
-<target>&Deschide</target>
-
-<source>Cancel</source>
-<target>Anulează</target>
+<target>Setările Setului</target>
 
 <source>Select variant:</source>
 <target>Selectează Varianta de Sincronizare:</target>
@@ -618,29 +618,23 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Configuration</source>
 <target>Configurație</target>
 
-<source>Category</source>
-<target>Categorie</target>
+<source>Item exists on left side only</source>
+<target>Elementul există doar în partea stîngă</target>
 
-<source>Action</source>
-<target>Acțiune</target>
+<source>Item exists on right side only</source>
+<target>Elementul există doar în partea dreaptă</target>
 
-<source>File/folder exists on left side only</source>
-<target>Fila/Dosarul există doar în partea stîngă</target>
+<source>Left side is newer</source>
+<target>Elementul din partea stîngă e mai nou</target>
 
-<source>File/folder exists on right side only</source>
-<target>Fila/Dosarul există doar în partea dreaptă</target>
+<source>Right side is newer</source>
+<target>Elementul din partea dreaptă e mai nou</target>
 
-<source>Left file is newer</source>
-<target>Fila stîngă e mai nouă</target>
+<source>Items have different content</source>
+<target>Elementele au conținut diferit</target>
 
-<source>Right file is newer</source>
-<target>Fila dreaptă e mai nouă</target>
-
-<source>Files have different content</source>
-<target>Filele au conținut diferit</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Conflictul de file nu poate fi inclus într-o anumită categorie</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Conflictul/elementul nu poate fi inclus într-o anumită categorie</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -673,7 +667,7 @@ este același
 </target>
 
 <source>Symbolic Link handling</source>
-<target>Prelucrarea Legăturilor Simbolice (Simlegături)</target>
+<target>Gestionarea Legăturilor Simbolice (Simleg.)</target>
 
 <source>Synchronizing...</source>
 <target>Sincronizare Aflată în Curs...</target>
@@ -714,8 +708,8 @@ este același
 <source>Hide further error messages during the current process</source>
 <target>Ascunde mesajele de eroare apărute ulterior în timpul acestui proces</target>
 
-<source>&Retry</source>
-<target>&Reîncearcă</target>
+<source>&Ignore</source>
+<target>&Ignoră</target>
 
 <source>Do not show this dialog again</source>
 <target>Nu arăta acest dialog din nou</target>
@@ -730,7 +724,7 @@ este același
 <target>&Nu</target>
 
 <source>Use Recycle Bin</source>
-<target>Mutare în Reciclator</target>
+<target>Mută în Reciclator</target>
 
 <source>Delete on both sides</source>
 <target>Șterge din ambele părți</target>
@@ -746,33 +740,6 @@ Note: File names must be relative to base directories!
 Doar filele care se potrivesc cu toate setările de filtrare vor fi sincronizate.
 Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 </target>
-
-<source>Hints:</source>
-<target>Sfaturi:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Scrie numele relative ale filelor sau dosarelor, separate de semnul ';' sau de un rînd nou.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Folosește metacaracterele '*' și '?' (asterisc și semn de întrebare).</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Exclude filele și dosarele direct de pe grila principală, cu ajutorul meniului contextual.</target>
-
-<source>Example</source>
-<target>Exemplu</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Incluse: *.doc;*.zip;*.exe
-Excluse: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Sincronizează filele .doc, .zip și .exe, cu excepția celor din subdosarul "temp".</target>
 
 <source>Include</source>
 <target>Incluse</target>
@@ -795,8 +762,8 @@ Excluse: \stuff\temp\*
 <source>&Default</source>
 <target>Coloanele &Implicite</target>
 
-<source>Transactional file copy</source>
-<target>Copiază filele în mod tranzacțional</target>
+<source>Fail-safe file copy</source>
+<target>Copiază filele în modul protejat la eșec [fail-safe]</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Scrierea se face mai întîi într-o filă temporară (*.ffs_tmp), care e apoi renumită. Se garantează astfel consecvența stării filelor chiar și în cazul apariției de erori fatale.</target>
@@ -810,7 +777,7 @@ Excluse: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>Copiază permisiunile de acces ale filelor</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
 <target>Permisiunile filelor și dosarelor sînt și ele transferate (necesită drepturi de Administrator)</target>
 
 <source>Restore hidden dialogs</source>
@@ -1109,7 +1076,7 @@ Excluse: \stuff\temp\*
 <target>MB</target>
 
 <source>Filter</source>
-<target>Filtrează</target>
+<target>Filtru</target>
 
 <source>Direct</source>
 <target>Direcționează</target>
@@ -1123,11 +1090,11 @@ Excluse: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Comenzi pentru aplicații externe incluse în meniul contextual al softului. Sînt disponibile următoarele macrocomenzi:</target>
 
-<source>- full file or directory name</source>
+<source>- full file or folder name</source>
 <target>- numele complet al filei sau dosarului</target>
 
-<source>- directory part only</source>
-<target>- doar dosarele</target>
+<source>- folder part only</source>
+<target>- doar pentru partea dosarului</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- corespondentul din partea opusă al lui %name</target>
@@ -1162,7 +1129,7 @@ Excluse: \stuff\temp\*
 <target>Lasă ca Conflict Nerezolvat</target>
 
 <source>Delete permanently</source>
-<target>Ștergere definitivă</target>
+<target>Șterge definitiv</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Filele sînt șterse sau suprascrise în mod definitiv, fără a mai putea fi recuperate</target>
@@ -1171,10 +1138,10 @@ Excluse: \stuff\temp\*
 <target>Filele șterse sau suprascrise sînt puse în Reciclator [Recycle Bin], de unde pot fi recuperate la nevoie</target>
 
 <source>Versioning</source>
-<target>Versionare</target>
+<target>Versionează</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Filele sînt mutate într-un subdosar special cu marcaj de timp</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>Filele sînt mutate într-un subdosar cu marcaj de timp</target>
 
 <source>Files</source>
 <target>File</target>
@@ -1272,8 +1239,8 @@ Excluse: \stuff\temp\*
 <source>Cannot read directory %x.</source>
 <target>Nu pot citi dosarul %x.</target>
 
-<source>Endless loop.</source>
-<target>Buclă infinită.</target>
+<source>Detected endless directory recursion.</source>
+<target>A fost detectată o recursivitate infinită a dosarului.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Nu pot seta privilegiul %x.</target>
@@ -1299,13 +1266,10 @@ Excluse: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Baza de date existentă va fi făcută compatibilă cu versiunea softului și apoi va fi setat sensul implicit de sincronizare: Filele vechi vor fi suprascrise de cele noi.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Fila nu conține o configurație validă:</target>
-
-<source>You can ignore this error to consider the directory as empty.</source>
+<source>You can ignore this error to consider the folder as empty.</source>
 <target>Poți ignora această eroare dacă vrei ca dosarul să fie considerat gol.</target>
 
-<source>Cannot find directory %x.</source>
+<source>Cannot find folder %x.</source>
 <target>Nu pot găsi dosarul %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
@@ -1338,19 +1302,19 @@ Excluse: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>Ambele părți sînt identice</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>File/Dosarele diferă doar prin atributele lor</target>
+<source>Items have different attributes</source>
+<target>Elementele au atribute diferite</target>
 
-<source>Copy new file/folder to left</source>
+<source>Copy new item to left</source>
 <target>Copiază elementul nou în stînga</target>
 
-<source>Copy new file/folder to right</source>
+<source>Copy new item to right</source>
 <target>Copiază elementul nou în dreapta</target>
 
-<source>Delete left file/folder</source>
+<source>Delete left item</source>
 <target>Șterge elementul stîng</target>
 
-<source>Delete right file/folder</source>
+<source>Delete right item</source>
 <target>Șterge elementul drept</target>
 
 <source>Move file on left</source>
@@ -1359,20 +1323,20 @@ Excluse: \stuff\temp\*
 <source>Move file on right</source>
 <target>Mută fila în dreapta</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Suprascrie elementul stîng (fila/dosarul) cu cel drept</target>
+<source>Overwrite left item</source>
+<target>Suprascrie elementul stîng cu cel drept</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Suprascrie elementul drept (fila/dosarul) cu cel stîng</target>
+<source>Overwrite right item</source>
+<target>Suprascrie elementul drept cu cel stîng</target>
 
 <source>Do nothing</source>
 <target>Nici o Acțiune</target>
 
-<source>Copy file attributes only to left</source>
-<target>Copiază atributele filelor doar înspre stînga</target>
+<source>Update attributes on left</source>
+<target>Actualizează atributele în partea stîngă</target>
 
-<source>Copy file attributes only to right</source>
-<target>Copiază atributele filelor doar înspre dreapta</target>
+<source>Update attributes on right</source>
+<target>Actualizează atributele în partea dreaptă</target>
 
 <source>Multiple...</source>
 <target>Multiplu...</target>
@@ -1425,11 +1389,11 @@ Excluse: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>Actualizez atributele lui %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Numele dosarului țintă nu poate să lipsească!</target>
+<source>Target folder name must not be empty.</source>
+<target>Numele dosarului țintă nu poate să lipsească.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Dosarul pentru versionarea filelor n-a fost specificat!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>Numele dosarului pentru versionarea filelor nu poate să lipsească.</target>
 
 <source>Source directory %x not found.</source>
 <target>Dosarul sursă %x nu a fost găsit.</target>
@@ -1458,7 +1422,7 @@ Excluse: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Reciclatorul nu este disponibil pentru căile următoare! Filele vor fi deci șterse definitiv:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Va fi modificat un dosar care face parte din mai multe perechi de dosare! Reverifică setările de sincronizare!</target>
 
 <source>Processing folder pair:</source>

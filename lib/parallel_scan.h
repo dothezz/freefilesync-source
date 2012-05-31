@@ -56,11 +56,11 @@ public:
 
     enum HandleError
     {
-        TRAV_ERROR_RETRY,
-        TRAV_ERROR_IGNORE
+        ON_ERROR_RETRY,
+        ON_ERROR_IGNORE
     };
-    virtual HandleError reportError (const std::wstring& errorText) = 0;                //may throw!
-    virtual void        reportStatus(const std::wstring& statusMsg, int itemTotal) = 0; //
+    virtual HandleError reportError (const std::wstring& errorText) = 0;                 //may throw!
+    virtual void        reportStatus(const std::wstring& statusMsg, int itemsTotal) = 0; //
 };
 
 //attention: ensure directory filtering is applied later to exclude filtered directories which have been kept as parent folders

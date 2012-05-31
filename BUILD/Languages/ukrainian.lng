@@ -7,7 +7,7 @@
 	<plural definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
+<source>Searching for folder %x...</source>
 <target>Пошук каталогу  %x...</target>
 
 <source>Show in Explorer</source>
@@ -34,11 +34,11 @@
 <source>Select alternate synchronization settings</source>
 <target>Вибрати альтернативні налаштування синхронізації</target>
 
-<source>No filter selected</source>
-<target>Не вибрано жодного фільтра</target>
-
 <source>Filter is active</source>
 <target>Фільтр активний</target>
+
+<source>No filter selected</source>
+<target>Не вибрано жодного фільтра</target>
 
 <source>Remove alternate settings</source>
 <target>Вилучити альтернативні налаштування</target>
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Глобальні налаштування</target>
 
-<source>Synchronization Preview</source>
-<target>Попередній огляд синхронізації</target>
+<source>Summary</source>
+<target>Підсумок</target>
 
 <source>Find</source>
 <target>Знайти</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Переглянути</target>
 
-<source>Invalid command line: %x</source>
-<target>Неправильний командний рядок: %x</target>
+<source>Invalid command line:</source>
+<target>Неправильний командний рядок:</target>
 
 <source>Info</source>
 <target>Інформація</target>
@@ -229,38 +229,38 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>Ім’я тому %x не є частиною імені файлу %y!</target>
 
-<source>Cannot find file %x.</source>
-<target>Не вдається знайти файлу %x.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Не вдається прочитати такі елементи XML:</target>
 
-<source>S&ave configuration...</source>
-<target>Зберегти налаштування...</target>
+<source>Cannot find file %x.</source>
+<target>Не вдається знайти файлу %x.</target>
 
-<source>&Load configuration...</source>
-<target>&Завантажити налаштування...</target>
+<source>&Open...</source>
+<target>Відкрити...</target>
+
+<source>&Save...</source>
+<target>Зберегти...</target>
 
 <source>&Quit</source>
-<target>&Вихід</target>
+<target>Вихід</target>
 
-<source>&File</source>
-<target>&Файл</target>
+<source>&Program</source>
+<target>Програма</target>
 
 <source>&Content</source>
-<target>&Зміст</target>
+<target>Зміст</target>
 
-<source>&About...</source>
-<target>&Про програму...</target>
+<source>&About</source>
+<target>Про програму</target>
 
 <source>&Help</source>
-<target>&Допомога</target>
+<target>Допомога</target>
 
 <source>Usage:</source>
 <target>Використання:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. Виберіть каталоги для моніторингу;</target>
+<source>1. Select folders to watch.</source>
+<target>1. Виберіть папки для моніторингу;</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Уведіть рядок команди;</target>
@@ -268,19 +268,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. Натисніть 'Старт'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-Командний рядок виконується щоразу, коли:
-- всі каталоги стають доступні (наприклад, під’єднання переносного носія)
-- файли в каталогах чи підкаталогах змінені
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>Щоб розпочати імпортуйте .ffs_batch файл.</target>
 
-<source>Directories to watch</source>
-<target>Каталоги для спостереження</target>
+<source>Folders to watch</source>
+<target>Папки для спостереження</target>
 
 <source>Add folder</source>
 <target>Додати папку</target>
@@ -291,14 +283,25 @@ The command line is executed each time:
 <source>Select a folder</source>
 <target>Вибрати папку</target>
 
+<source>Delay [seconds]</source>
+<target>Затримка [секунд]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Час простою між виявленням останньої зміни та виконанням команди</target>
+
 <source>Command line</source>
 <target>Командний рядок</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Мінімальний час простою [секунд]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Час простою між виявленням останньої зміни та виконанням командного рядка в секундах</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+Команда спрацьовує, якщо:
+- змінилися файли або вкладені папки
+- появилися нові папки (наприклад, підключена USB-пам'ять)
+</target>
 
 <source>Start</source>
 <target>Старт</target>
@@ -327,8 +330,8 @@ The command line is executed each time:
 <source>Waiting for missing directories...</source>
 <target>Очікування пропущених каталогів...</target>
 
-<source>A directory input field is empty.</source>
-<target>Поле введення шляху каталога порожнє.</target>
+<source>An input folder name is empty.</source>
+<target>Назва вхідної папки порожня.</target>
 
 <source>Logging</source>
 <target>Лог-файли</target>
@@ -399,11 +402,11 @@ The command line is executed each time:
 <source>Download now?</source>
 <target>Завантажити зараз?</target>
 
-<source>Information</source>
-<target>Інформація</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>У Вас найновіша версія FreeFileSync!</target>
+
+<source>Information</source>
+<target>Інформація</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Ви хочете, щоб FreeFileSync автоматично перевіряв наявність оновлень щотижня?</target>
@@ -414,8 +417,8 @@ The command line is executed each time:
 <source><Symlink></source>
 <target><Символьне посилання></target>
 
-<source><Directory></source>
-<target><Каталог></target>
+<source><Folder></source>
+<target><Папка></target>
 
 <source>Full path</source>
 <target>Повний шлях</target>
@@ -426,8 +429,8 @@ The command line is executed each time:
 <source>Relative path</source>
 <target>Відносний шлях</target>
 
-<source>Directory</source>
-<target>Каталог</target>
+<source>Base folder</source>
+<target>Базова папка</target>
 
 <source>Size</source>
 <target>Розмір</target>
@@ -438,8 +441,11 @@ The command line is executed each time:
 <source>Extension</source>
 <target>Розширення</target>
 
-<source>Comparison Result</source>
-<target>Результати порівнювання</target>
+<source>Action</source>
+<target>Дія</target>
+
+<source>Category</source>
+<target>Категорія</target>
 
 <source>Drag && drop</source>
 <target>Drag && drop</target>
@@ -447,14 +453,14 @@ The command line is executed each time:
 <source>Close progress dialog</source>
 <target>Закрити вікно прогресу</target>
 
-<source>Shut down</source>
-<target>Вимкнути комп'ютер</target>
+<source>Standby</source>
+<target>Сплячий режим</target>
 
 <source>Log off</source>
 <target>Вилогувати</target>
 
-<source>Standby</source>
-<target>Сплячий режим</target>
+<source>Shut down</source>
+<target>Вимкнути комп'ютер</target>
 
 <source>Hibernate</source>
 <target>Гібернація</target>
@@ -462,14 +468,11 @@ The command line is executed each time:
 <source>1. &Compare</source>
 <target>1. &Порівняти</target>
 
-<source>2. &Synchronize...</source>
+<source>2. &Synchronize</source>
 <target>2. &Синхронізувати</target>
 
 <source>&New</source>
 <target>&Нова</target>
-
-<source>&Program</source>
-<target>&Програма</target>
 
 <source>&Language</source>
 <target>&Мова</target>
@@ -498,7 +501,7 @@ The command line is executed each time:
 <source>&Abort</source>
 <target>&Припинити</target>
 
-<source>Synchronize...</source>
+<source>Synchronize</source>
 <target>Синхронізувати</target>
 
 <source>Start synchronization</source>
@@ -513,11 +516,11 @@ The command line is executed each time:
 <source>Swap sides</source>
 <target>Поміняти місцями</target>
 
-<source>Save current configuration to file</source>
-<target>Зберегти активні налаштування в файлі</target>
-
 <source>Load configuration from file</source>
 <target>Завантажити налаштування синхронізації з файлу</target>
+
+<source>Save current configuration to file</source>
+<target>Зберегти активні налаштування в файлі</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>
@@ -531,20 +534,17 @@ The command line is executed each time:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Приховати відфільтровані чи тимчасово виключені файли</target>
 
-<source>Number of files and directories that will be created</source>
-<target>Число файлів і каталогів, які будуть створені</target>
+<source>Number of files and folders that will be created</source>
+<target>Кількість файлів і папок, які будуть створені</target>
 
 <source>Number of files that will be overwritten</source>
-<target>Число файлів, які будуть перезаписані</target>
+<target>Кількість файлів, які будуть перезаписані</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>Число файлів і каталогів, які будуть вилучені</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Кількість файлів і папок, які будуть вилучені</target>
 
 <source>Total amount of data that will be transferred</source>
 <target>Загальний об’єм даних, які будуть передаватися</target>
-
-<source>Operation:</source>
-<target>Операція:</target>
 
 <source>Items found:</source>
 <target>Елементів знайдено:</target>
@@ -561,8 +561,8 @@ The command line is executed each time:
 <source>Batch job</source>
 <target>Пакетне завдання</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Створити комакндний файл і автоматизувати синхронізацію. Для виконання пакетної синхронізації просто двічі клацніть файл мишкою або скористайтесь командним рядком: FreeFileSync.exe <ffs_batch file>. Можна також використати планувальник завдань операційної системи</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Для автоматизації синхронізації створіть пакетний файл. Двічі клацніть цей файл чи впишіть до системного планувальника завдань:  FreeFileSync.exe <назва завдання>.ffs_batch</target>
 
 <source>Help</source>
 <target>Допомога</target>
@@ -588,17 +588,11 @@ The command line is executed each time:
 <source>Maximum number of log files:</source>
 <target>Максимальна кількість лог-файлів:</target>
 
-<source>Select log file directory:</source>
-<target>Виберіть каталог для лог-файлів:</target>
+<source>Select folder to save log files:</source>
+<target>Вибрати папку для лог-файлу</target>
 
 <source>Batch settings</source>
 <target>Налаштування пакетного завдання</target>
-
-<source>&Save</source>
-<target>&Зберегти</target>
-
-<source>&Load</source>
-<target>&Завантажити</target>
 
 <source>Select variant:</source>
 <target>Виберіть варіант:</target>
@@ -607,7 +601,7 @@ The command line is executed each time:
 <target>Виявити та поширити зміни на обидві сторони використовуючи базу даних. Видалення, перейменування та конфлікти визначаються автоматично.</target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Дзеркальна (резервна) копія лівої частини. В результаті синхронізації права папка змінюється до полної відповідності лівій.</target>
+<target>Дзеркальна (резервна) копія лівої частини. В результаті синхронізації права папка змінюється до повної відповідності лівій.</target>
 
 <source>Copy new or updated files to right folder.</source>
 <target>Копіювати нові чи оновлювати файли з правої сторони.</target>
@@ -624,29 +618,23 @@ The command line is executed each time:
 <source>Configuration</source>
 <target>Налаштування</target>
 
-<source>Category</source>
-<target>Категорія</target>
+<source>Item exists on left side only</source>
+<target>Елемент існує тільки ліворуч</target>
 
-<source>Action</source>
-<target>Дія</target>
+<source>Item exists on right side only</source>
+<target>Елемент існує тільки праворуч</target>
 
-<source>File/folder exists on left side only</source>
-<target>Файл/папка існує тільки ліворуч</target>
+<source>Left side is newer</source>
+<target>Ліва сторона новіша</target>
 
-<source>File/folder exists on right side only</source>
-<target>Файл/папка існує тільки праворуч</target>
+<source>Right side is newer</source>
+<target>Права сторона новіша</target>
 
-<source>Left file is newer</source>
-<target>Файл ліворуч є новішим</target>
+<source>Items have different content</source>
+<target>Елементи мають різний вміст</target>
 
-<source>Right file is newer</source>
-<target>Файл праворуч є новішим</target>
-
-<source>Files have different content</source>
-<target>Файли відрізняються вмістом</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Не можна категоризувати конфлікт/файл</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Не вдається категоризувати конфлікт/елемент</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -749,33 +737,6 @@ Note: File names must be relative to base directories!
 Увага: Назви файлів вказуються відносно базових каталогів.
 </target>
 
-<source>Hints:</source>
-<target>Підказка:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Уведіть імена файлів чи каталогів, розділяючи знаком ';' чи з нового рядка.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Використайте символи '*' і '?'.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Виключіть файли безпосередньо у головному вікні через контекстне меню.</target>
-
-<source>Example</source>
-<target>Приклад</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Включити: *.doc;*.zip;*.exe
-Виключити: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Синхронізувати всі .doc, .zip і .exe файли, за винятком всіх файлів з подкаталогу "temp"</target>
-
 <source>Include</source>
 <target>Включити</target>
 
@@ -797,8 +758,8 @@ Exclude: \stuff\temp\*
 <source>&Default</source>
 <target>&За замовчуванням</target>
 
-<source>Transactional file copy</source>
-<target>Копіювання файлів з використанням трансакцій</target>
+<source>Fail-safe file copy</source>
+<target>Безпечне копіювання файлів</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Записати до тимчасового файлу (*.ffs_tmp), а потім перейменувати. Це гарантує збереження даних навіть при критичній помилці.</target>
@@ -812,8 +773,8 @@ Exclude: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>Копіювати права доступу до файлу</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Передача прав доступу файлу/каталогу (потрібні права Адміністратора)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>Дозволи переносу файлів та папок (Вимагає прав Адміністратора)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Відновити сховані діалоги</target>
@@ -915,7 +876,7 @@ Exclude: \stuff\temp\*
 <target>Налаштування синхронізації загружено!</target>
 
 <source>Folder Comparison and Synchronization</source>
-<target>Порівнювання і синхронізація папок</target>
+<target>Порівнювання та Синхронізація папок</target>
 
 <source>Hide files that exist on left side only</source>
 <target>Приховати файли, які є тільки ліворуч</target>
@@ -1125,17 +1086,17 @@ Exclude: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Інтеграція зовнішніх додатків в контекстному меню. Доступні макроси:</target>
 
-<source>- full file or directory name</source>
-<target>- повне ім’я файлу чи каталога</target>
+<source>- full file or folder name</source>
+<target>- повна назва файлу або папки</target>
 
-<source>- directory part only</source>
-<target>- лише каталог</target>
+<source>- folder part only</source>
+<target>- тільки папка</target>
 
 <source>- Other side's counterpart to %name</source>
-<target>- аналогічний файл з другої сторони</target>
+<target>- файл-відповідник %name з протилежної сторони</target>
 
 <source>- Other side's counterpart to %dir</source>
-<target>- аналогічна папка з другої сторони</target>
+<target>- папка-відповідник %dir з протилежної сторони</target>
 
 <source>Make hidden dialogs and warning messages visible again?</source>
 <target>Зробити приховані діалоги та попередження знову видимими?</target>
@@ -1173,10 +1134,10 @@ Exclude: \stuff\temp\*
 <target>Використовувати "Корзину" при вилученні чи перезаписі файлів</target>
 
 <source>Versioning</source>
-<target>Переміщати файли, які вилучаються, в задану папку</target>
+<target>Запис версій</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Переміщати файли в підкатлог з часовою міткою</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>Перемістити файли в означену датою підпапку</target>
 
 <source>Files</source>
 <target>Файли</target>
@@ -1274,8 +1235,8 @@ Exclude: \stuff\temp\*
 <source>Cannot read directory %x.</source>
 <target>Не вдається прочитати каталог %x</target>
 
-<source>Endless loop.</source>
-<target>Нескінченний цикл.</target>
+<source>Detected endless directory recursion.</source>
+<target>Виявлено нескінченну рекурсію каталогів.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Не вдається встановити привілеї %х.</target>
@@ -1304,14 +1265,11 @@ Exclude: \stuff\temp\*
 Старі файли будуть замінені новішими файлами.
 </target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Файл не містить правильних налаштувань синхронізації:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>Ви можете ігнорувати цю помилку вважаючи папку порожньою.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>Ви можете проігнорувати помилку, вважаючи каталог порожнім.</target>
-
-<source>Cannot find directory %x.</source>
-<target>Не вдається знайти каталог х%.</target>
+<source>Cannot find folder %x.</source>
+<target>Не вдається знайти папку %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Залежні каталоги! Будьте уважні при налаштуванні правил синхронізації:</target>
@@ -1343,20 +1301,20 @@ Exclude: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>Сторони ідентичні</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Файли/папки відрізняються лише атрибутами</target>
+<source>Items have different attributes</source>
+<target>Елементи мають різні атрибути</target>
 
-<source>Copy new file/folder to left</source>
-<target>Зкопіювати новий файл/папку ліворуч</target>
+<source>Copy new item to left</source>
+<target>Копіювати нові елементи ліворуч</target>
 
-<source>Copy new file/folder to right</source>
-<target>Зкопіювати новий файл/папку праворуч</target>
+<source>Copy new item to right</source>
+<target>Копіювати нові елементи праворуч</target>
 
-<source>Delete left file/folder</source>
-<target>Вилучити файл/папку ліворуч</target>
+<source>Delete left item</source>
+<target>Вилучити елемент ліворуч</target>
 
-<source>Delete right file/folder</source>
-<target>Вилучити файл/папку праворуч</target>
+<source>Delete right item</source>
+<target>Вилучити елемент праворуч</target>
 
 <source>Move file on left</source>
 <target>Перемістити файли ліворуч</target>
@@ -1364,20 +1322,20 @@ Exclude: \stuff\temp\*
 <source>Move file on right</source>
 <target>Перемістити файли праворуч</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Перезаписати файл/папку ліворуч відповідником зправа</target>
+<source>Overwrite left item</source>
+<target>Перезаписати елемент ліворуч</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Перезаписати файл/папку праворуч відповідником зліва</target>
+<source>Overwrite right item</source>
+<target>Перезаписати елемент праворуч</target>
 
 <source>Do nothing</source>
 <target>Нічого не робити</target>
 
-<source>Copy file attributes only to left</source>
-<target>Зкопіювати ліворуч лише атрибути файлу</target>
+<source>Update attributes on left</source>
+<target>Оновити атрибути ліворуч</target>
 
-<source>Copy file attributes only to right</source>
-<target>Зкопіювати праворуч лише атрибути файлу</target>
+<source>Update attributes on right</source>
+<target>Оновити атрибути праворуч</target>
 
 <source>Multiple...</source>
 <target>Різні варіанти...</target>
@@ -1430,11 +1388,11 @@ Exclude: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>Оновлення атрибутів %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Кінцевий каталог не повинен бути порожнім</target>
+<source>Target folder name must not be empty.</source>
+<target>Назва цільової папки не повинна бути порожньою.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Не вказаний каталог для старих версій файлів!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>Назва папки для версій файлів не повинна бути порожньою.</target>
 
 <source>Source directory %x not found.</source>
 <target>Вихідний каталог %x не знайдено.</target>
@@ -1463,8 +1421,8 @@ Exclude: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Корзина для цього шляху недоступна. Файли будуть вилучені назавжди:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Каталог, який є частиною декількох пар папок, буде змінений. Будь ласка, перевірте налаштування синхронізації!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>Буде змінена папка, яка є частиною кількох пар папок. Будь ласка, перегляньте налаштування синхронізації.</target>
 
 <source>Processing folder pair:</source>
 <target>Обробка пари папок:</target>

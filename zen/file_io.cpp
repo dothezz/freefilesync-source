@@ -26,7 +26,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
 #ifdef FFS_WIN
     fileHandle = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
                               GENERIC_READ,
-                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read open files that are shared by other applications
+                              FILE_SHARE_READ | FILE_SHARE_DELETE,
                               nullptr,
                               OPEN_EXISTING,
                               FILE_FLAG_SEQUENTIAL_SCAN,
@@ -62,12 +62,11 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
 #endif
     {
         const ErrorCode lastError = getLastError();
-        std::wstring errorMessage = replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (open)";
 
         if (errorCodeForNotExisting(lastError))
-            throw ErrorNotExisting(errorMessage);
+            throw ErrorNotExisting(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted(lastError));
 
-        throw FileError(errorMessage);
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (open)");
     }
 }
 
@@ -93,27 +92,27 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
                     nullptr))      //__inout_opt  LPOVERLAPPED lpOverlapped
 #elif defined FFS_LINUX
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
-    if (::ferror(fileHandle) != 0)
+    if (::ferror(fileHandle) != 0) //checks status of stream, not fread()!
 #endif
         throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted() + L" (read)");
 
 #ifdef FFS_WIN
     if (bytesRead < bytesToRead) //verify only!
+        eofReached = true;
+
 #elif defined FFS_LINUX
     if (::feof(fileHandle) != 0)
-#endif
         eofReached = true;
+
+    if (bytesRead < bytesToRead)
+        if (!eofReached) //pathologic!?
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + L"Incomplete read!");
+#endif
 
     if (bytesRead > bytesToRead)
         throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + L"buffer overflow");
 
     return bytesRead;
-}
-
-
-bool FileInput::eof() //end of file reached
-{
-    return eofReached;
 }
 
 
@@ -131,7 +130,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
                                      to use GENERIC_READ | GENERIC_WRITE for dwDesiredAccess than to use GENERIC_WRITE alone.
                                      The resulting code is faster, because the redirector can use the cache manager and send fewer SMBs with more data.
                                      This combination also avoids an issue where writing to a file across a network can occasionally return ERROR_ACCESS_DENIED. */
-                              FILE_SHARE_READ | FILE_SHARE_DELETE, //note: FILE_SHARE_DELETE is required to rename file while handle is open!
+                              FILE_SHARE_DELETE, //FILE_SHARE_DELETE is required to rename file while handle is open!
                               nullptr,
                               access == ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW,
                               FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
@@ -192,10 +191,10 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
                      nullptr))      //__inout_opt  LPOVERLAPPED lpOverlapped
 #elif defined FFS_LINUX
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
-    if (::ferror(fileHandle) != 0)
+    if (::ferror(fileHandle) != 0) //checks status of stream, not fwrite()!
 #endif
         throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted() + L" (w)"); //w -> distinguish from fopen error message!
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + L"(incomplete write)");
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + L"Incomplete write!");
 }

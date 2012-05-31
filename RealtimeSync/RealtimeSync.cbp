@@ -127,7 +127,7 @@
 		<Unit filename="..\zen\notify_removal.cpp" />
 		<Unit filename="..\zen\privilege.cpp" />
 		<Unit filename="..\zen\zstring.cpp" />
-		<Unit filename="WxWizDialog.fbp" />
+		<Unit filename="WxWizFrame.fbp" />
 		<Unit filename="application.cpp" />
 		<Unit filename="application.h" />
 		<Unit filename="gui_generated.cpp" />

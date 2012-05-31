@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20120324;18334600">
+	<META NAME="CHANGED" CONTENT="20120511;21275200">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -38,36 +38,37 @@ this command line will simply trigger a FreeFileSync batch job.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
 <FONT FACE="Tahoma, sans-serif">Real time synchronization - in
 combination with FreeFileSync</FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">First
-start up RealtimeSync.exe located in FreeFileSync's installation
-directory. Then specify all directories that shall be monitored.
-Instead of doing this manually you can import a </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Start
+RealtimeSync.exe located in FreeFileSync's installation directory.
+Then specify all folders that shall be monitored. Instead of doing
+this manually you can import a </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
 <FONT FACE="Tahoma, sans-serif">file via </FONT><FONT FACE="Tahoma, sans-serif"><I>Menu
--&gt; File -&gt; Load configuration</I></FONT><FONT FACE="Tahoma, sans-serif">.
+-&gt; Program -&gt; Open</I></FONT><FONT FACE="Tahoma, sans-serif">.
 This not only extracts all directories relevant for synchronization
 but also sets up the command line to execute the </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
 <FONT FACE="Tahoma, sans-serif">file each time changes are detected.
 Now press &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Start</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
 to begin monitoring.</FONT></P>
 <UL>
-	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/RealtimeSync.png" NAME="Grafik3" ALIGN=MIDDLE WIDTH=420 HEIGHT=480 BORDER=0></P>
+	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/RealtimeSync.png" NAME="Grafik3" ALIGN=MIDDLE WIDTH=461 HEIGHT=446 BORDER=0></P>
 </UL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 	<UL>
-		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
-		command-line should <B>not</B> <B>block</B> the progress. If a
-		FreeFileSync batch file is called make sure it is running
-		&quot;minimized&quot; and &quot;error handling&rdquo; is set to
-		&quot;ignore errors&quot; or &quot;exit instantly<SPAN STYLE="text-decoration: none">&quot;.<BR>&nbsp;</SPAN></FONT></P>
+		command should </FONT><FONT FACE="Tahoma, sans-serif"><B>not</B></FONT><FONT FACE="Tahoma, sans-serif">
+		</FONT><FONT FACE="Tahoma, sans-serif"><B>block</B></FONT><FONT FACE="Tahoma, sans-serif">
+		progress. Make sure the FreeFileSync batch job does not show any
+		popup dialogs. See notes in <A HREF="Batch%20Scripting.html">Batch
+		Scripting</A>.</FONT><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></SPAN></P>
 		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
 		settings dialog can be skipped by passing a RealtimeSync
 		configuration file (<FONT FACE="Courier New, monospace">*.ffs_real</FONT>)
 		<B>or</B> a FreeFileSync batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
-		as first command-line argument to RealtimeSync.exe. This allows for
-		integration with the operating system's auto start
+		as first command-line argument to RealtimeSync.exe. This can be
+		integrated into the operating system's auto start
 		facility:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Courier New, monospace">&quot;C:\Program
 		Files\FreeFileSync\RealtimeSync.exe&quot;
 		&quot;C:\MyConfig.ffs_real&quot;<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Courier New, monospace">&quot;C:\Program
@@ -75,10 +76,7 @@ to begin monitoring.</FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Using
 		RealtimeSync is not restricted to starting FreeFileSync. It can
 		also be used in other scenarios, like sending an email whenever a
-		certain directory is modified.<BR>&nbsp;</FONT></P>
-		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
-		you schedule a Windows batch file (.bat, .cmd), see notes in <A HREF="Batch%20Scripting.html">Batch
-		Scripting</A>.</FONT></P>
+		certain directory is modified.</FONT></P>
 	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
@@ -87,12 +85,12 @@ to begin monitoring.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
 <FONT FACE="Tahoma, sans-serif">Automatic synchronization when USB
 stick is inserted</FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Save
-the relevant configuration on the USB stick's root directory to have
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Save a
+ffs_batch configuration into the USB stick's root directory and have
 it called when the stick is mounted. Then configure RealtimeSync as
 shown in the following:</FONT></P>
 <UL>
-	<P><IMG SRC="../img/WatchUsbInsert.png" NAME="Grafik2" ALIGN=BOTTOM WIDTH=436 HEIGHT=447 BORDER=0></P>
+	<P><IMG SRC="../img/WatchUsbInsert.png" NAME="Grafik2" ALIGN=BOTTOM WIDTH=442 HEIGHT=440 BORDER=0></P>
 </UL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
@@ -107,7 +105,7 @@ files are modified in &quot;</FONT><FONT FACE="Courier New, monospace">H:\Data</
 </P>
 <P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 	<UL>
-		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note:<BR></B></FONT><FONT FACE="Tahoma, sans-serif">The
+		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note<BR></B></FONT><FONT FACE="Tahoma, sans-serif">The
 		n</FONT><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif">ame
 		of the last changed file is written to an environment variable
 		named </FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace">&quot;changed_file&quot;.</FONT></SPAN></P>
@@ -130,6 +128,21 @@ directories. (Windows)</FONT></P>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
 </UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+	<UL>
+		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note<BR></B></FONT><FONT FACE="Tahoma, sans-serif">During
+		execution of a Windows Batch file (*.bat/*.cmd) a black console
+		window is shown. You can hide it using the Visual Basic script
+		&quot;HideConsole.vbs&quot; located in FreeFileSync's installation
+		directory:</FONT></P>
+		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace"><B>wscript
+		&quot;C:\Program files\FreeFileSync\HideConsole.vbs&quot;
+		C:\MyBatchFile.cmd</B></FONT></P>
+	</UL>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Tahoma, sans-serif">Limitations:</FONT></P>

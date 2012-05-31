@@ -140,7 +140,7 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
 
     //wxWindowUpdateLocker dummy(this) -> not needed
 
-    const wxString& scannedObjects = toStringSep(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING));
+    const wxString& scannedObjects = toGuiString(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING));
 
     auto setTitle = [&](const wxString& title)
     {
@@ -186,7 +186,7 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
             m_gauge2->SetValue(numeric::round(fraction * GAUGE_FULL_RANGE));
 
             //remaining objects and bytes for file comparison
-            setText(*m_staticTextFilesRemaining, toStringSep(objectsTotal - objectsCurrent), &layoutChanged);
+            setText(*m_staticTextFilesRemaining, toGuiString(objectsTotal - objectsCurrent), &layoutChanged);
             setText(*m_staticTextDataRemaining, L"(" + filesizeToShortString(dataTotal - dataCurrent) + L")", &layoutChanged);
 
             //remaining time and speed: only visible during binary comparison
@@ -270,15 +270,15 @@ inline
 wxBitmap buttonPressed(const std::string& name)
 {
     wxBitmap background = GlobalResources::getImage(wxT("log button pressed"));
-    return layOver(GlobalResources::getImage(utf8CvrtTo<wxString>(name)), background);
+    return layOver(GlobalResources::getImage(utfCvrtTo<wxString>(name)), background);
 }
 
 
 inline
 wxBitmap buttonReleased(const std::string& name)
 {
-    wxImage output = greyScale(GlobalResources::getImage(utf8CvrtTo<wxString>(name))).ConvertToImage();
-    //GlobalResources::getImage(utf8CvrtTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
+    wxImage output = greyScale(GlobalResources::getImage(utfCvrtTo<wxString>(name))).ConvertToImage();
+    //GlobalResources::getImage(utfCvrtTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
     //brighten(output, 30);
 
     zen::move(output, 0, -1); //move image right one pixel
@@ -307,6 +307,8 @@ public:
         m_bpButtonErrors  ->Show(errorCount   != 0);
         m_bpButtonWarnings->Show(warningCount != 0);
         m_bpButtonInfo    ->Show(infoCount    != 0);
+
+        m_textCtrlInfo->SetMaxLength(0); //allow large entries!
 
         updateLogText();
 
@@ -661,6 +663,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     m_staticTextLabelItemsProc->Show(false);
     bSizerItemsProc           ->Show(false);
     m_buttonOK                ->Show(false);
+    m_panelFooter->Layout();
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncStatusImpl::OnKeyPressed), nullptr, this);
@@ -681,6 +684,8 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     m_comboBoxExecFinished->setHistoryRef(execFinishedHistory);
 
     updateDialogStatus(); //null-status will be shown while waiting for dir locks (if at all)
+
+    Fit();
 }
 
 
@@ -834,11 +839,10 @@ void SyncStatus::SyncStatusImpl::setExternalStatus(const wxString& status, const
         if (mainDialog->GetTitle() != newCaption)
             mainDialog->SetTitle(newCaption);
     }
-    else
-    {
-        if (this->GetTitle() != newCaption)
-            this->SetTitle(newCaption);
-    }
+
+    //always set a title: we don't wxGTK to show "nameless window" instead
+    if (this->GetTitle() != newCaption)
+        this->SetTitle(newCaption);
 }
 
 
@@ -853,14 +857,14 @@ void SyncStatus::SyncStatusImpl::updateProgress(bool allowYield)
     bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
 
     //sync status text
-    setText(*m_textCtrlInfo, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
+    setText(*m_textCtrlStatus, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
 
     switch (syncStat_->currentPhase()) //no matter if paused or not
     {
         case ProcessCallback::PHASE_NONE:
         case ProcessCallback::PHASE_SCANNING:
             //dialog caption, taskbar, systray tooltip
-            setExternalStatus(getDialogStatusText(syncStat_, paused_, finalResult), toStringSep(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING))); //status text may be "paused"!
+            setExternalStatus(getDialogStatusText(syncStat_, paused_, finalResult), toGuiString(syncStat_->getObjectsCurrent(ProcessCallback::PHASE_SCANNING))); //status text may be "paused"!
 
             //progress indicators
             m_gauge1->Pulse();
@@ -905,7 +909,7 @@ void SyncStatus::SyncStatusImpl::updateProgress(bool allowYield)
             graphDataBytesTotal->setValue(to<double>(dataTotal));
 
             //remaining objects and data
-            setText(*m_staticTextRemainingObj, toStringSep(objectsTotal - objectsCurrent), &layoutChanged);
+            setText(*m_staticTextRemainingObj, toGuiString(objectsTotal - objectsCurrent), &layoutChanged);
             setText(*m_staticTextDataRemaining, L"(" + filesizeToShortString(dataTotal - dataCurrent) + L")", &layoutChanged);
 
             //remaining time and speed
@@ -949,7 +953,7 @@ void SyncStatus::SyncStatusImpl::updateProgress(bool allowYield)
         //            Layout();
         //            bSizerItemsRem->Layout();
         //            bSizer171->Layout();
-        bSizerProgressStat->Layout(); //
+        //bSizerProgressStat->Layout(); //
         m_panelProgress->Layout();    //both needed
         //m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
         //-> it seems this layout is not required, and even harmful: resets m_comboBoxExecFinished dropdown while user is selecting!
@@ -1083,7 +1087,8 @@ void SyncStatus::SyncStatusImpl::updateDialogStatus() //depends on "syncStat_, p
             }
     }
 
-    m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
+    m_panelHeader->Layout();
+    Layout();
 }
 
 
@@ -1139,7 +1144,7 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const E
             //show new element "items processed"
             m_staticTextLabelItemsProc->Show(true);
             bSizerItemsProc           ->Show(true);
-            m_staticTextProcessedObj ->SetLabel(toStringSep(objectsCurrent));
+            m_staticTextProcessedObj ->SetLabel(toGuiString(objectsCurrent));
             m_staticTextDataProcessed->SetLabel(L"(" + filesizeToShortString(dataCurrent) + L")");
 
             //hide remaining elements...
@@ -1180,7 +1185,8 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const E
     m_animationControl1->Hide();
 
     //hide current operation status
-    bSizerCurrentOperation->Show(false);
+    m_staticlineHeader ->Hide();
+    m_textCtrlStatus   ->Hide();
 
     bSizerExecFinished->Show(false);
 
@@ -1218,7 +1224,8 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const E
     if (log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR) > 0)
         m_listbookResult->ChangeSelection(posLog);
 
-    m_panelBackground->Layout(); //we use a dummy panel as actual background: replaces simple "Layout()" call
+    m_panelFooter->Layout();
+    Layout();
 
     //Raise(); -> don't! user may be watching a movie in the meantime ;)
 }

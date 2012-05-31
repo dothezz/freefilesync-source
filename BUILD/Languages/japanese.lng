@@ -7,8 +7,8 @@
 	<plural definition>0</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>ディレクトリ %x を検索中...</target>
+<source>Searching for folder %x...</source>
+<target>フォルダ %x を検索中...</target>
 
 <source>Show in Explorer</source>
 <target>エクスプローラで表示</target>
@@ -25,17 +25,20 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>リアルタイム同期 - 自動同期</target>
 
+<source>Error</source>
+<target>エラー</target>
+
 <source>Select alternate comparison settings</source>
 <target>代替比較設定を選択</target>
 
 <source>Select alternate synchronization settings</source>
 <target>代替同期設定を選択</target>
 
-<source>No filter selected</source>
-<target>フィルター選択なし</target>
-
 <source>Filter is active</source>
 <target>フィルターを有効化</target>
+
+<source>No filter selected</source>
+<target>フィルター選択なし</target>
 
 <source>Remove alternate settings</source>
 <target>代替設定を除去</target>
@@ -55,9 +58,6 @@
 <source>About</source>
 <target>情報</target>
 
-<source>Error</source>
-<target>エラー</target>
-
 <source>Warning</source>
 <target>警告</target>
 
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>全般的な設定</target>
 
-<source>Synchronization Preview</source>
-<target>同期処理のプレビュー</target>
+<source>Summary</source>
+<target>概要</target>
 
 <source>Find</source>
 <target>検索</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>参照</target>
 
-<source>Invalid command line: %x</source>
-<target>無効なコマンドライン: %x</target>
+<source>Invalid command line:</source>
+<target>無効なコマンドライン:</target>
 
 <source>Info</source>
 <target>情報</target>
@@ -229,23 +229,23 @@
 <source>Cannot read the following XML elements:</source>
 <target>次の XML要素を読み込めません:</target>
 
-<source>S&ave configuration...</source>
-<target>構成設定を保存(&A)...</target>
+<source>&Open...</source>
+<target>開く(&O)...</target>
 
-<source>&Load configuration...</source>
-<target>構成設定の読み込み(&L)...</target>
+<source>&Save...</source>
+<target>保存(&S)...</target>
 
 <source>&Quit</source>
-<target>終了(&Q)</target>
+<target>終了(&Q)(&Q)</target>
 
-<source>&File</source>
-<target>ファイル(&F)</target>
+<source>&Program</source>
+<target>プログラム(&P)</target>
 
 <source>&Content</source>
 <target>トピック(&C)</target>
 
-<source>&About...</source>
-<target>情報(&A)...</target>
+<source>&About</source>
+<target>情報(&A)</target>
 
 <source>&Help</source>
 <target>ヘルプ(&H)</target>
@@ -253,8 +253,8 @@
 <source>Usage:</source>
 <target>使用方法:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. 監視するディレクトリを選択</target>
+<source>1. Select folders to watch.</source>
+<target>1. 監視するフォルダを選択</target>
 
 <source>2. Enter a command line.</source>
 <target>2. コマンドラインを入力</target>
@@ -262,19 +262,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. 'スタート'をクリック</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-これらのコマンドはその都度実行されます:
-- すべてのディレクトリで利用可能です (例. USB スティックの挿入時)
-- ディレクトリ、またはサブディレクトリ内のファイルは更新されます。
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>一括ファイル(.ffs)からインポートして開始</target>
 
-<source>Directories to watch</source>
-<target>ディレクトリを監視</target>
+<source>Folders to watch</source>
+<target>監視するフォルダ</target>
 
 <source>Add folder</source>
 <target>フォルダを追加</target>
@@ -285,17 +277,34 @@ The command line is executed each time:
 <source>Select a folder</source>
 <target>フォルダを選択</target>
 
+<source>Delay [seconds]</source>
+<target>遅延[秒]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>最後にコマンドを実行してから、次に変更を検出するまでの待機時間</target>
+
 <source>Command line</source>
 <target>コマンドライン</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>最小待機時間[秒]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>最後の変更の検出から、次にコマンドラインを実行するまでの待機時間(秒)</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+このコマンドのトリガ条件:
+- ファイルまたはサブフォルダの変更
+- 新規フォルダの追加 (例. USB の挿入)
+</target>
 
 <source>Start</source>
 <target>開始</target>
+
+<source>&Retry</source>
+<target>再試行(&R)</target>
+
+<source>Cancel</source>
+<target>キャンセル</target>
 
 <source>(Build: %x)</source>
 <target>(ビルド: %x)</target>
@@ -315,8 +324,8 @@ The command line is executed each time:
 <source>Waiting for missing directories...</source>
 <target>見失ったディレクトリの待機中...</target>
 
-<source>A directory input field is empty.</source>
-<target>ディレクトリが入力されていません</target>
+<source>An input folder name is empty.</source>
+<target>空のフォルダ名入力</target>
 
 <source>Logging</source>
 <target>ログ</target>
@@ -402,8 +411,8 @@ The command line is executed each time:
 <source><Symlink></source>
 <target><シンボリックリンク></target>
 
-<source><Directory></source>
-<target><ディレクトリ></target>
+<source><Folder></source>
+<target><フォルダ></target>
 
 <source>Full path</source>
 <target>フルパス</target>
@@ -414,8 +423,8 @@ The command line is executed each time:
 <source>Relative path</source>
 <target>相対パス</target>
 
-<source>Directory</source>
-<target>ディレクトリ</target>
+<source>Base folder</source>
+<target>基準フォルダ</target>
 
 <source>Size</source>
 <target>サイズ</target>
@@ -426,8 +435,11 @@ The command line is executed each time:
 <source>Extension</source>
 <target>拡張子</target>
 
-<source>Comparison Result</source>
-<target>比較結果</target>
+<source>Action</source>
+<target>操作</target>
+
+<source>Category</source>
+<target>カテゴリ</target>
 
 <source>Drag && drop</source>
 <target>ドラッグ && ドロップ</target>
@@ -435,14 +447,14 @@ The command line is executed each time:
 <source>Close progress dialog</source>
 <target>進捗ダイアログを閉じる</target>
 
-<source>Shut down</source>
-<target>シャットダウン</target>
+<source>Standby</source>
+<target>スタンバイ</target>
 
 <source>Log off</source>
 <target>ログオフ</target>
 
-<source>Standby</source>
-<target>スタンバイ</target>
+<source>Shut down</source>
+<target>シャットダウン</target>
 
 <source>Hibernate</source>
 <target>休止状態</target>
@@ -450,14 +462,11 @@ The command line is executed each time:
 <source>1. &Compare</source>
 <target>1. 比較(&C)</target>
 
-<source>2. &Synchronize...</source>
-<target>2. 同期処理(&S)...</target>
+<source>2. &Synchronize</source>
+<target>2. 同期処理(&S)</target>
 
 <source>&New</source>
 <target>新規(&N)</target>
-
-<source>&Program</source>
-<target>プログラム(&P)</target>
 
 <source>&Language</source>
 <target>使用言語(&L)</target>
@@ -486,8 +495,8 @@ The command line is executed each time:
 <source>&Abort</source>
 <target>情報(&A)</target>
 
-<source>Synchronize...</source>
-<target>同期処理...</target>
+<source>Synchronize</source>
+<target>同期処理</target>
 
 <source>Start synchronization</source>
 <target>同期の開始</target>
@@ -501,11 +510,11 @@ The command line is executed each time:
 <source>Swap sides</source>
 <target>パネルを入れ替え</target>
 
-<source>Save current configuration to file</source>
-<target>現在の設定をファイルに保存</target>
-
 <source>Load configuration from file</source>
 <target>外部ファイルから構成設定を読み込みます</target>
+
+<source>Save current configuration to file</source>
+<target>現在の設定をファイルに保存</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>前回使用した構成設定(DEL キーでリストから除去します)</target>
@@ -516,14 +525,14 @@ The command line is executed each time:
 <source>Hide filtered or temporarily excluded files</source>
 <target>フィルター、または一時除外ファイルを隠す</target>
 
-<source>Number of files and directories that will be created</source>
-<target>作成されたファイルとディレクトリ数</target>
+<source>Number of files and folders that will be created</source>
+<target>作成されたファイル、およびフォルダの数</target>
 
 <source>Number of files that will be overwritten</source>
 <target>上書きされたファイル数</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>削除されたファイルとディレクトリ数</target>
+<source>Number of files and folders that will be deleted</source>
+<target>削除されたファイル、およびフォルダの数</target>
 
 <source>Total amount of data that will be transferred</source>
 <target>転送されたデータの総量</target>
@@ -546,14 +555,14 @@ The command line is executed each time:
 <source>Batch job</source>
 <target>一括処理</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>一括バッチファイルを作成して、同期を自動化します、開始方法はバッチファイルをダブルクリックするか次のコマンドを実行します:FreeFileSync.exe SyncJob.ffs_batch. またこの操作はシステムのタスクから実行することも出来ます.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>同期処理を自動的に行うための一括ファイルを作成します。ファイルをダブルクリック,または次のコマンドをタスクから実行:FreeFileSync.exe <ジョブ名>.ffs_batch</target>
 
 <source>Help</source>
 <target>ヘルプ</target>
 
 <source>Filter files</source>
-<target>ファイルフィルター</target>
+<target>ﾌｧｲﾙﾌｨﾙﾀｰ</target>
 
 <source>Left</source>
 <target>左側</target>
@@ -573,20 +582,11 @@ The command line is executed each time:
 <source>Maximum number of log files:</source>
 <target>ログファイルの最大数:</target>
 
-<source>Select log file directory:</source>
-<target>ログファイルの保存先を選択:</target>
+<source>Select folder to save log files:</source>
+<target>ログファイル保存先フォルダを選択:</target>
 
 <source>Batch settings</source>
 <target>一括設定</target>
-
-<source>&Save</source>
-<target>保存(&S)</target>
-
-<source>&Load</source>
-<target>読み込み(&L)</target>
-
-<source>Cancel</source>
-<target>キャンセル</target>
 
 <source>Select variant:</source>
 <target>変数を選択:</target>
@@ -612,29 +612,23 @@ The command line is executed each time:
 <source>Configuration</source>
 <target>構成設定</target>
 
-<source>Category</source>
-<target>カテゴリ</target>
+<source>Item exists on left side only</source>
+<target>左側のみに存在する項目</target>
 
-<source>Action</source>
-<target>操作</target>
+<source>Item exists on right side only</source>
+<target>右側のみに存在する項目</target>
 
-<source>File/folder exists on left side only</source>
-<target>左側のみに存在するファイル/フォルダ</target>
+<source>Left side is newer</source>
+<target>左側がより新しい</target>
 
-<source>File/folder exists on right side only</source>
-<target>右側のみに存在するファイル/フォルダ</target>
+<source>Right side is newer</source>
+<target>右側がより新しい</target>
 
-<source>Left file is newer</source>
-<target>左側の新しいファイル</target>
+<source>Items have different content</source>
+<target>内容が異なる項目</target>
 
-<source>Right file is newer</source>
-<target>右側の新しいファイル</target>
-
-<source>Files have different content</source>
-<target>ファイル内容は異なります</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>競合があるため分類できません</target>
+<source>Conflict/item cannot be categorized</source>
+<target>競合/項目を分類化できません</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -711,9 +705,6 @@ is the same
 <source>&Ignore</source>
 <target>無視(&I)</target>
 
-<source>&Retry</source>
-<target>再試行(&R)</target>
-
 <source>Do not show this dialog again</source>
 <target>次回から表示しない</target>
 
@@ -744,33 +735,6 @@ Note: File names must be relative to base directories!
 注意: ファイル名は基準ディレクトリに比例する必要があります!
 </target>
 
-<source>Hints:</source>
-<target>ヒント:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. 相対ファイル、またはディレクトリを ';' または 改行で区切って入力</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. ワイルドカードに ' * ' と ' ? ' を使用出来ます。</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. コンテキストメニューから直接ファイルを除外出来ます。</target>
-
-<source>Example</source>
-<target>例</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-含める: *.doc;*.zip;*.exe
-除外: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>"temp" のサブフォルダを除いて、すべての.doc、.zip、および.exeファイルを同期</target>
-
 <source>Include</source>
 <target>含める</target>
 
@@ -792,8 +756,8 @@ Exclude: \stuff\temp\*
 <source>&Default</source>
 <target>デフォルト(&D)</target>
 
-<source>Transactional file copy</source>
-<target>トランザクション・コピーを使用</target>
+<source>Fail-safe file copy</source>
+<target>ファイルコピーの失敗</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>最初に一時ファイル(*.ffs_tmp)に書き込み、それをリネームします。これにより、致命的なエラーが起こっても状態は保証されます</target>
@@ -807,8 +771,8 @@ Exclude: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>ファイルのアクセスパーミッションをコピーする</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>ファイルとディレクトリのパーミッション転送(管理者権限が必要)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>転送ファイルとフォルダのパーミッション(管理者権限が必要)</target>
 
 <source>Restore hidden dialogs</source>
 <target>隠したダイアログを復帰</target>
@@ -1112,11 +1076,11 @@ Exclude: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:</target>
 
-<source>- full file or directory name</source>
-<target>- 完全なファイル/フォルダ名</target>
+<source>- full file or folder name</source>
+<target>- ファイル、フォルダの完全な名前</target>
 
-<source>- directory part only</source>
-<target>- ディレクトリ部のみ</target>
+<source>- folder part only</source>
+<target>- フォルダ部分のみ</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- %name の反対側の対象</target>
@@ -1158,8 +1122,8 @@ Exclude: \stuff\temp\*
 <source>Versioning</source>
 <target>バージョン付け</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>ファイルをタイムスタンプ名のサブフォルダに移動</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>サブフォルダのタイムスタンプでファイルを移動</target>
 
 <source>Files</source>
 <target>ファイル</target>
@@ -1251,8 +1215,8 @@ Exclude: \stuff\temp\*
 <source>Cannot read directory %x.</source>
 <target>ディレクトリ %x を読み込めません.</target>
 
-<source>Endless loop.</source>
-<target>エンドレスループ</target>
+<source>Detected endless directory recursion.</source>
+<target>ディレクトリ再帰処理でループを検出</target>
 
 <source>Cannot set privilege %x.</source>
 <target>%x の特権をセットできません.</target>
@@ -1278,14 +1242,11 @@ Exclude: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>同期方向のデフォルト設定: 古いファイルに新しいファイルを上書き</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>このファイルには有効な構成が含まれていません:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>フォルダを空と想定する場合は、このエラーは無視できます.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>ディレクトリが空と考慮する場合、このエラーは無視できます。</target>
-
-<source>Cannot find directory %x.</source>
-<target>ディレクトリ %x がみつかりません.</target>
+<source>Cannot find folder %x.</source>
+<target>フォルダ %x がみつかりません.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>ディレクトリが依存関係にあります! 同期規則の設定時には注意してください:</target>
@@ -1317,20 +1278,20 @@ Exclude: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>両側とも等しく</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>属性の異なるファイル/フォルダのみ</target>
+<source>Items have different attributes</source>
+<target>属性が異なる項目</target>
 
-<source>Copy new file/folder to left</source>
-<target>新しいファイル/フォルダを左側にコピー</target>
+<source>Copy new item to left</source>
+<target>新しい項目を左にコピー</target>
 
-<source>Copy new file/folder to right</source>
-<target>新しいファイル/フォルダを右側にコピー</target>
+<source>Copy new item to right</source>
+<target>新しい項目を右にコピー</target>
 
-<source>Delete left file/folder</source>
-<target>左側のファイル/フォルダを削除</target>
+<source>Delete left item</source>
+<target>左の項目を削除</target>
 
-<source>Delete right file/folder</source>
-<target>右側のファイル/フォルダを削除</target>
+<source>Delete right item</source>
+<target>右の項目を削除</target>
 
 <source>Move file on left</source>
 <target>ファイルを左に移動</target>
@@ -1338,20 +1299,20 @@ Exclude: \stuff\temp\*
 <source>Move file on right</source>
 <target>ファイルを右に移動</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>右側のものを左側のファイル/フォルダに上書き</target>
+<source>Overwrite left item</source>
+<target>左の項目に上書き</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>左側のものを右側のファイル/フォルダに上書き</target>
+<source>Overwrite right item</source>
+<target>右の項目に上書き</target>
 
 <source>Do nothing</source>
 <target>何もしない</target>
 
-<source>Copy file attributes only to left</source>
-<target>ファイル属性のみ左側にコピー</target>
+<source>Update attributes on left</source>
+<target>左の属性を更新</target>
 
-<source>Copy file attributes only to right</source>
-<target>ファイル属性のみ右側にコピー</target>
+<source>Update attributes on right</source>
+<target>右の属性を更新</target>
 
 <source>Multiple...</source>
 <target>複数処理...</target>
@@ -1404,11 +1365,11 @@ Exclude: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>%x の属性を更新</target>
 
-<source>Target directory name must not be empty!</source>
-<target>対象ディレクトリ名が空白です!</target>
+<source>Target folder name must not be empty.</source>
+<target>対象フォルダ名に空白は使用出来ません.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>ファイルバージョンが利用できないディレクトリです!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>ファイルバージョンのフォルダ名に空白は使用出来ません.</target>
 
 <source>Source directory %x not found.</source>
 <target>ソースディレクトリ %x がみつかりません.</target>
@@ -1437,8 +1398,8 @@ Exclude: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>以下のパスにあるゴミ箱が利用できません! 代わりにファイルは完全削除されます:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>複数ペアのディレクトリ設定部分に変更された箇所があります! 同期設定を再確認してみてください!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>複数フォルダペアの一部であるフォルダが変更されています. 同期設定を確認してください.</target>
 
 <source>Processing folder pair:</source>
 <target>フォルダペアを処理中:</target>

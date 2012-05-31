@@ -44,9 +44,6 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
     }
     catch (const FileError& error)
     {
-        if (!fileExists(filename))
-            throw FfsXmlError(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)));
-
         throw FfsXmlError(error.toString());
     }
 

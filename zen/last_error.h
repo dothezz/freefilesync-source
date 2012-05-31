@@ -8,7 +8,7 @@
 #define SYSTEMFUNCTIONS_H_INCLUDED
 
 #include <string>
-#include "utf8.h"
+#include "utf.h"
 #include "i18n.h"
 
 #ifdef FFS_WIN
@@ -116,7 +116,7 @@ std::wstring getLastErrorFormatted(ErrorCode lastError)
     replace(output, L"%x", numberTo<std::wstring>(lastError));
 
     output += L" ";
-    output += utf8CvrtTo<std::wstring>(::strerror(lastError));
+    output += utfCvrtTo<std::wstring>(::strerror(lastError));
 
     errno = lastError; //restore errno
     return output;

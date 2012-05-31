@@ -646,7 +646,7 @@ bool readText(const std::string& input, DirectionConfig::Variant& value)
 
 
 template <> inline
-bool readValue(const XmlElement& input, ColumnAttributeRim& value)
+bool readStruc(const XmlElement& input, ColumnAttributeRim& value)
 {
     XmlIn in(input);
     bool rv1 = in.attribute("Type",    value.type_);
@@ -656,7 +656,7 @@ bool readValue(const XmlElement& input, ColumnAttributeRim& value)
 }
 
 template <> inline
-void writeValue(const ColumnAttributeRim& value, XmlElement& output)
+void writeStruc(const ColumnAttributeRim& value, XmlElement& output)
 {
     XmlOut out(output);
     out.attribute("Type",    value.type_);
@@ -666,7 +666,7 @@ void writeValue(const ColumnAttributeRim& value, XmlElement& output)
 
 
 template <> inline
-bool readValue(const XmlElement& input, ColumnAttributeNavi& value)
+bool readStruc(const XmlElement& input, ColumnAttributeNavi& value)
 {
     XmlIn in(input);
     bool rv1 = in.attribute("Type",    value.type_);
@@ -676,7 +676,7 @@ bool readValue(const XmlElement& input, ColumnAttributeNavi& value)
 }
 
 template <> inline
-void writeValue(const ColumnAttributeNavi& value, XmlElement& output)
+void writeStruc(const ColumnAttributeNavi& value, XmlElement& output)
 {
     XmlOut out(output);
     out.attribute("Type",    value.type_);
@@ -812,7 +812,7 @@ void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
 
     inGuiCfg["HideFiltered"     ](config.hideFilteredElements);
     inGuiCfg["HandleError"      ](config.handleError);
-    inGuiCfg["SyncPreviewActive"](config.syncPreviewEnabled);
+    inGuiCfg["SyncPreviewActive"](config.showSyncAction);
 }
 
 
@@ -1081,7 +1081,7 @@ void writeConfig(const XmlGuiConfig& config, XmlOut& out)
 
     outGuiCfg["HideFiltered"     ](config.hideFilteredElements);
     outGuiCfg["HandleError"      ](config.handleError);
-    outGuiCfg["SyncPreviewActive"](config.syncPreviewEnabled);
+    outGuiCfg["SyncPreviewActive"](config.showSyncAction);
 }
 
 void writeConfig(const XmlBatchConfig& config, XmlOut& out)
@@ -1220,9 +1220,9 @@ void xmlAccess::writeConfig(const XmlGlobalSettings& config)
 }
 
 
-wxString xmlAccess::extractJobName(const wxString& configFilename)
+std::wstring xmlAccess::extractJobName(const Zstring& configFilename)
 {
-    const wxString shortName = afterLast(configFilename, utf8CvrtTo<wxString>(FILE_NAME_SEPARATOR)); //returns the whole string if separator not found
-    const wxString jobName = beforeLast(shortName, L'.'); //returns empty string if seperator not found
-    return jobName.IsEmpty() ? shortName : jobName;
+    const Zstring shortName = afterLast(configFilename, FILE_NAME_SEPARATOR); //returns the whole string if separator not found
+    const Zstring jobName = beforeLast(shortName, Zstr('.')); //returns empty string if seperator not found
+    return utfCvrtTo<std::wstring>(jobName.empty() ? shortName : jobName);
 }

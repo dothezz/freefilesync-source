@@ -58,7 +58,7 @@ protected:
     wxStaticText* m_staticText3;
     wxStaticText* m_staticText4;
     wxStaticText* m_staticText5;
-    wxStaticText* m_staticText21;
+    wxStaticText* m_staticText811;
     wxStaticLine* m_staticline2;
     wxStaticBoxSizer* sbSizerDirToWatch2;
     wxPanel* m_panelMainFolder;
@@ -68,15 +68,15 @@ protected:
     wxTextCtrl* m_txtCtrlDirectoryMain;
     wxScrolledWindow* m_scrolledWinFolders;
     wxBoxSizer* bSizerFolders;
-    wxTextCtrl* m_textCtrlCommand;
     wxSpinCtrl* m_spinCtrlDelay;
+    wxTextCtrl* m_textCtrlCommand;
     zen::BitmapButton* m_buttonStart;
     wxButton* m_buttonCancel;
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnSaveConfig( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnLoadConfig( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnSaveConfig( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }
@@ -123,6 +123,8 @@ private:
 protected:
     wxStaticBitmap* m_bitmap10;
     wxTextCtrl* m_textCtrl8;
+    wxStaticLine* m_staticline2;
+    wxPanel* m_panel3;
     wxButton* m_buttonRetry;
     wxButton* m_buttonAbort;
 
@@ -134,7 +136,7 @@ protected:
 
 public:
 
-    ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
+    ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
     ~ErrorDlgGenerated();
 
 };

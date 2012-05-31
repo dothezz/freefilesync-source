@@ -36,13 +36,6 @@ bool& refMainWndStatus()
 }
 
 inline
-bool& refQueryEnd()
-{
-    static bool status = false; //external linkage!
-    return status;
-}
-
-inline
 void setMainWindow(wxWindow* window)
 {
     wxTheApp->SetTopWindow(window);

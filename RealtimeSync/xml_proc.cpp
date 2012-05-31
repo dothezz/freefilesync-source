@@ -38,9 +38,6 @@ bool isXmlTypeRTS(const XmlDoc& doc) //throw()
 
 void xmlAccess::readRealConfig(const Zstring& filename, XmlRealConfig& config)
 {
-    if (!fileExists(filename))
-        throw FfsXmlError(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)));
-
     XmlDoc doc;
     loadXmlDocument(filename, doc); //throw FfsXmlError
 

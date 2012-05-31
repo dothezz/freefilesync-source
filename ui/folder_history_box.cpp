@@ -148,10 +148,11 @@ void FolderHistoryBox::OnMouseWheel(wxMouseEvent& event)
     wxWindow* wnd = this;
     while ((wnd = wnd->GetParent()) != nullptr) //silence MSVC warning
         if (dynamic_cast<wxScrolledWindow*>(wnd) != nullptr)
-        {
-            wnd->GetEventHandler()->AddPendingEvent(event);
-            break;
-        }
+            if (wxEvtHandler* evtHandler = wnd->GetEventHandler())
+            {
+                evtHandler->AddPendingEvent(event);
+                break;
+            }
 
     //	event.Skip();
 }

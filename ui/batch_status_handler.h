@@ -12,6 +12,7 @@
 #include "../lib/process_xml.h"
 #include "progress_indicator.h"
 #include "switch_to_gui.h"
+#include "lib/return_codes.h"
 
 class LogFile;
 
@@ -23,12 +24,13 @@ class BatchStatusHandler : public zen::StatusHandler
 {
 public:
     BatchStatusHandler(bool showProgress, //defines: -start minimized and -quit immediately when finished
-                       const wxString& jobName,
+                       const std::wstring& jobName, //should not be empty for a batch job!
+                       const std::wstring& timestamp,
                        const wxString& logfileDirectory,
                        size_t logFileCountMax, //0 if logging shall be inactive
                        const xmlAccess::OnError handleError,
                        const zen::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
-                       int& returnVal,
+                       zen::FfsReturnCode& returnCode,
                        const std::wstring& execWhenFinished,
                        std::vector<std::wstring>& execFinishedHistory);
     ~BatchStatusHandler();
@@ -50,7 +52,7 @@ private:
     bool switchToGuiRequested;
     xmlAccess::OnError handleError_;
     zen::ErrorLog errorLog; //list of non-resolved errors and warnings
-    int& returnValue;
+    zen::FfsReturnCode& returnCode_;
 
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
     std::unique_ptr<LogFile> logFile; //optional!

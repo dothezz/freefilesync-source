@@ -7,8 +7,8 @@
 	<plural definition>0</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>正在搜索目录 %x...</target>
+<source>Searching for folder %x...</source>
+<target>正在搜索文件夹 %x...</target>
 
 <source>Show in Explorer</source>
 <target>在Explorer中显示</target>
@@ -20,10 +20,13 @@
 <target>浏览目录</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
-<target>取消请求: 正在等待当前操作完成...</target>
+<target>请求中止: 正在等待当前操作完成...</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>实时同步 - 自动同步</target>
+
+<source>Error</source>
+<target>错误</target>
 
 <source>Select alternate comparison settings</source>
 <target>选择替换的比较设置</target>
@@ -31,11 +34,11 @@
 <source>Select alternate synchronization settings</source>
 <target>选择替换同步设置</target>
 
+<source>Filter is active</source>
+<target>过滤器已生效</target>
+
 <source>No filter selected</source>
 <target>没有选定过滤器</target>
-
-<source>Filter is active</source>
-<target>过滤器已激活</target>
 
 <source>Remove alternate settings</source>
 <target>移除替换设置</target>
@@ -55,9 +58,6 @@
 <source>About</source>
 <target>关于</target>
 
-<source>Error</source>
-<target>错误</target>
-
 <source>Warning</source>
 <target>警告</target>
 
@@ -68,13 +68,13 @@
 <target>确认</target>
 
 <source>Configure filter</source>
-<target>配置过滤</target>
+<target>配置过滤器</target>
 
 <source>Global settings</source>
 <target>全局设置</target>
 
-<source>Synchronization Preview</source>
-<target>同步预览</target>
+<source>Summary</source>
+<target>总结</target>
 
 <source>Find</source>
 <target>查找</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>浏览</target>
 
-<source>Invalid command line: %x</source>
-<target>无效的命令行: %x</target>
+<source>Invalid command line:</source>
+<target>无效的命令行:</target>
 
 <source>Info</source>
 <target>信息</target>
@@ -119,7 +119,7 @@
 <target>Linux错误代码 %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
-<target>无法解决 %x 的符号连接.</target>
+<target>无法解决符号连接 %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -223,29 +223,29 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>卷名 %x 并非文件名 %y 的一部分!</target>
 
-<source>Cannot find file %x.</source>
-<target>无法找到文件 %x .</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>无法读取如下XML元素:</target>
 
-<source>S&ave configuration...</source>
-<target>保存配置(&A)...</target>
+<source>Cannot find file %x.</source>
+<target>无法找到文件 %x .</target>
 
-<source>&Load configuration...</source>
-<target>加载配置(&L)...</target>
+<source>&Open...</source>
+<target>打开(&O)...</target>
+
+<source>&Save...</source>
+<target>保存(&S)...</target>
 
 <source>&Quit</source>
 <target>退出(&Q)</target>
 
-<source>&File</source>
-<target>文件(&F)</target>
+<source>&Program</source>
+<target>程序(&P)</target>
 
 <source>&Content</source>
 <target>内容(&C)</target>
 
-<source>&About...</source>
-<target>关于(&A)...</target>
+<source>&About</source>
+<target>关于(&A)</target>
 
 <source>&Help</source>
 <target>帮助(&H)</target>
@@ -253,8 +253,8 @@
 <source>Usage:</source>
 <target>用法:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. 选择要监视的目录.</target>
+<source>1. Select folders to watch.</source>
+<target>1. 选择要监视的文件夹.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. 输入一个命令行.</target>
@@ -262,40 +262,49 @@
 <source>3. Press 'Start'.</source>
 <target>3. 点击'开始'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-每次有如下情况时执行这个命令行:
-- 所有目录转为可用状态(例如插入U盘)
-- 目录或子目录里的文件被修改
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>要开始只需导入一个 .ffs_batch文件.</target>
 
-<source>Directories to watch</source>
-<target>要监视的目录</target>
+<source>Folders to watch</source>
+<target>要监视的文件夹</target>
 
 <source>Add folder</source>
 <target>添加文件夹</target>
 
 <source>Remove folder</source>
-<target>删除文件夹</target>
+<target>移除文件夹</target>
 
 <source>Select a folder</source>
 <target>选择一个文件夹</target>
 
+<source>Delay [seconds]</source>
+<target>延时 [秒]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>最后检测到改变和命令执行之间的空闲时间</target>
+
 <source>Command line</source>
 <target>命令行</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>最小空闲时间[秒]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>以秒计的最后变更和执行命令行之间的空闲时间</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+命令将被触发如果:
+- 文件或子文件夹改变
+- 新文件夹到达(例如U盘插入)
+</target>
 
 <source>Start</source>
 <target>开始</target>
+
+<source>&Retry</source>
+<target>重试(&R)</target>
+
+<source>Cancel</source>
+<target>取消</target>
 
 <source>(Build: %x)</source>
 <target>(Build: %x)</target>
@@ -315,14 +324,14 @@ The command line is executed each time:
 <source>Waiting for missing directories...</source>
 <target>正在等待丢失的目录...</target>
 
-<source>A directory input field is empty.</source>
-<target>有一个目录输入字段是空的.</target>
+<source>An input folder name is empty.</source>
+<target>有一个输入的文件夹名为空.</target>
 
 <source>Logging</source>
 <target>记录</target>
 
 <source>File time and size</source>
-<target>文件时间和日期</target>
+<target>文件时间和大小</target>
 
 <source>File content</source>
 <target>文件内容</target>
@@ -361,7 +370,7 @@ The command line is executed each time:
 <target>停止</target>
 
 <source>Synchronization aborted!</source>
-<target>同步已放弃!</target>
+<target>同步已被中止!</target>
 
 <source>Synchronization completed with errors!</source>
 <target>同步已完成但有错误.</target>
@@ -387,11 +396,11 @@ The command line is executed each time:
 <source>Download now?</source>
 <target>立即下载?</target>
 
-<source>Information</source>
-<target>信息</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>FreeFileSync 已是最新!</target>
+
+<source>Information</source>
+<target>信息</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>要让 FreeFileSync 保持每周检查一次更新吗?</target>
@@ -402,8 +411,8 @@ The command line is executed each time:
 <source><Symlink></source>
 <target><符号连接></target>
 
-<source><Directory></source>
-<target><目录></target>
+<source><Folder></source>
+<target><文件夹></target>
 
 <source>Full path</source>
 <target>完整路径</target>
@@ -414,8 +423,8 @@ The command line is executed each time:
 <source>Relative path</source>
 <target>相对路径</target>
 
-<source>Directory</source>
-<target>目录</target>
+<source>Base folder</source>
+<target>主文件夹</target>
 
 <source>Size</source>
 <target>大小</target>
@@ -426,8 +435,11 @@ The command line is executed each time:
 <source>Extension</source>
 <target>扩展名</target>
 
-<source>Comparison Result</source>
-<target>比较结果</target>
+<source>Action</source>
+<target>动作</target>
+
+<source>Category</source>
+<target>分类</target>
 
 <source>Drag && drop</source>
 <target>拖放</target>
@@ -435,14 +447,14 @@ The command line is executed each time:
 <source>Close progress dialog</source>
 <target>关闭进度对话框</target>
 
-<source>Shut down</source>
-<target>关机</target>
+<source>Standby</source>
+<target>待机</target>
 
 <source>Log off</source>
 <target>注销</target>
 
-<source>Standby</source>
-<target>待机</target>
+<source>Shut down</source>
+<target>关机</target>
 
 <source>Hibernate</source>
 <target>休眠</target>
@@ -450,14 +462,11 @@ The command line is executed each time:
 <source>1. &Compare</source>
 <target>1. 比较(&C)</target>
 
-<source>2. &Synchronize...</source>
-<target>2. 同步(&S)...</target>
+<source>2. &Synchronize</source>
+<target>2. 同步(&S)</target>
 
 <source>&New</source>
 <target>新建(&N)</target>
-
-<source>&Program</source>
-<target>程序(&P)</target>
 
 <source>&Language</source>
 <target>切换语言(&L)</target>
@@ -486,8 +495,8 @@ The command line is executed each time:
 <source>&Abort</source>
 <target>取消(&A)</target>
 
-<source>Synchronize...</source>
-<target>同步...</target>
+<source>Synchronize</source>
+<target>同步</target>
 
 <source>Start synchronization</source>
 <target>开始同步</target>
@@ -496,16 +505,16 @@ The command line is executed each time:
 <target>添加成对文件夹</target>
 
 <source>Remove folder pair</source>
-<target>删除文件夹对</target>
+<target>移除文件夹对</target>
 
 <source>Swap sides</source>
 <target>两侧互换</target>
 
-<source>Save current configuration to file</source>
-<target>保存当前配置到文件</target>
-
 <source>Load configuration from file</source>
 <target>从文件加载配置</target>
+
+<source>Save current configuration to file</source>
+<target>保存当前配置到文件</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>最后使用的配置(按DEL键将其从列表中移除)</target>
@@ -516,17 +525,17 @@ The command line is executed each time:
 <source>Hide filtered or temporarily excluded files</source>
 <target>隐藏已过滤或临时排除的文件</target>
 
-<source>Number of files and directories that will be created</source>
-<target>一些文件和目录将被创建</target>
+<source>Number of files and folders that will be created</source>
+<target>将被创建的文件和文件夹数</target>
 
 <source>Number of files that will be overwritten</source>
-<target>一些文件和目录将被覆盖</target>
+<target>将被覆盖的文件数</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>一些文件和目录将被删除</target>
+<source>Number of files and folders that will be deleted</source>
+<target>将被删除的文件和文件夹数</target>
 
 <source>Total amount of data that will be transferred</source>
-<target>将被转移的总数据</target>
+<target>将被传输的数据总量</target>
 
 <source>Operation:</source>
 <target>操作:</target>
@@ -546,14 +555,14 @@ The command line is executed each time:
 <source>Batch job</source>
 <target>批处理作业</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>创建批处理文件并自动同步. 要在批处理模式下开始, 只需简单双击此文件或运行如下命令: FreeFileSync.exe SyncJob.ffs_batch. 此外也可在你系统中的计划任务里面执行.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>创建一个用于自动同步的批处理文件. 双击这个文件或者在你的系统的任务计划中定时执行: FreeFileSync.exe <作业名>.ffs_batch</target>
 
 <source>Help</source>
 <target>帮助</target>
 
 <source>Filter files</source>
-<target>过滤文件</target>
+<target>过滤器文件</target>
 
 <source>Left</source>
 <target>左侧</target>
@@ -573,20 +582,11 @@ The command line is executed each time:
 <source>Maximum number of log files:</source>
 <target>最大的日志文件数:</target>
 
-<source>Select log file directory:</source>
-<target>选择日志保存位置:</target>
+<source>Select folder to save log files:</source>
+<target>选择要保存日志的文件夹:</target>
 
 <source>Batch settings</source>
 <target>批处理设置</target>
-
-<source>&Save</source>
-<target>保存(&S)</target>
-
-<source>&Load</source>
-<target>加载(&L)</target>
-
-<source>Cancel</source>
-<target>取消</target>
 
 <source>Select variant:</source>
 <target>选择变化的:</target>
@@ -612,29 +612,23 @@ The command line is executed each time:
 <source>Configuration</source>
 <target>配置</target>
 
-<source>Category</source>
-<target>分类</target>
+<source>Item exists on left side only</source>
+<target>项目仅存在于左侧</target>
 
-<source>Action</source>
-<target>动作</target>
+<source>Item exists on right side only</source>
+<target>项目仅存在于右侧</target>
 
-<source>File/folder exists on left side only</source>
-<target>文件/文件夹仅存在于左侧</target>
+<source>Left side is newer</source>
+<target>左侧较新</target>
 
-<source>File/folder exists on right side only</source>
-<target>文件/文件夹仅存在于右侧</target>
+<source>Right side is newer</source>
+<target>右侧较新</target>
 
-<source>Left file is newer</source>
-<target>左侧文件较新</target>
+<source>Items have different content</source>
+<target>项目有不同的内容</target>
 
-<source>Right file is newer</source>
-<target>右侧文件较新</target>
-
-<source>Files have different content</source>
-<target>文件内容不同</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>冲突/文件不能被分类</target>
+<source>Conflict/item cannot be categorized</source>
+<target>冲突/项目未能被分类</target>
 
 <source>OK</source>
 <target>确定</target>
@@ -663,7 +657,7 @@ is the same
 <target>
 文件被认为是相同的，如果
      - 文件内容
-相同
+是相同的
 </target>
 
 <source>Symbolic Link handling</source>
@@ -711,9 +705,6 @@ is the same
 <source>&Ignore</source>
 <target>忽略(&I)</target>
 
-<source>&Retry</source>
-<target>重试(&R)</target>
-
 <source>Do not show this dialog again</source>
 <target>不要再显示此对话框</target>
 
@@ -744,33 +735,6 @@ Note: File names must be relative to base directories!
 注:文件名必须是主目录的相对路径!
 </target>
 
-<source>Hints:</source>
-<target>提示:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. 输入相对文件或文件夹名称,用';'或空行分隔.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. 使用通配符‘*’和‘?’.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. 通过右键菜单在主网格排除文件.</target>
-
-<source>Example</source>
-<target>例如</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-包括: *.doc;*.zip;*.exe
-排除: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>同步所有 .doc, .zip和 .exe 文件, 除了"temp"中的一切.</target>
-
 <source>Include</source>
 <target>包括</target>
 
@@ -792,8 +756,8 @@ Exclude: \stuff\temp\*
 <source>&Default</source>
 <target>默认(&D)</target>
 
-<source>Transactional file copy</source>
-<target>事务文件复制</target>
+<source>Fail-safe file copy</source>
+<target>无风险的文件复制</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>首先写入到一个临时文件(*.ffs_tmp)然后再重命名. 这样即使出现致命错误也能保持一致的状态.</target>
@@ -807,8 +771,8 @@ Exclude: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>复制文件存取权限</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>转移文件和目录的权限(需要管理员权限)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>传输文件和文件夹的权限(需要管理员权限)</target>
 
 <source>Restore hidden dialogs</source>
 <target>恢复被隐藏的对话框</target>
@@ -997,7 +961,7 @@ Exclude: \stuff\temp\*
 <target>显示将不被复制的文件</target>
 
 <source>All directories in sync!</source>
-<target>所有目录同步!</target>
+<target>所有目录已同步!</target>
 
 <source>Please run a Compare first before synchronizing!</source>
 <target>同步之前请先进行对比</target>
@@ -1112,11 +1076,11 @@ Exclude: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>集成外部应用程序到右键菜单. 如下宏可用:</target>
 
-<source>- full file or directory name</source>
-<target>- 完整的文件名或目录名</target>
+<source>- full file or folder name</source>
+<target>- 完整的文件或文件夹名</target>
 
-<source>- directory part only</source>
-<target>- 只对目录部分</target>
+<source>- folder part only</source>
+<target>- 只对文件夹部分</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- 另一侧参照 %name</target>
@@ -1158,8 +1122,8 @@ Exclude: \stuff\temp\*
 <source>Versioning</source>
 <target>保留历史版本</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>移动文件到时间标记子目录</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>移动文件到一个以时间标记命名的子文件夹</target>
 
 <source>Files</source>
 <target>文件</target>
@@ -1251,8 +1215,8 @@ Exclude: \stuff\temp\*
 <source>Cannot read directory %x.</source>
 <target>无法读取目录 %x.</target>
 
-<source>Endless loop.</source>
-<target>无限循环.</target>
+<source>Detected endless directory recursion.</source>
+<target>检测到无限的目录递归.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>无法设置 %x 的特权.</target>
@@ -1278,14 +1242,11 @@ Exclude: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>设置默认的同步方向:旧文件会被新文件覆盖.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>该文件不包含有效的配置:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>你可以忽略这个错误而认为文件夹是空的.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>你可以忽略这个错误而认为目录是空的.</target>
-
-<source>Cannot find directory %x.</source>
-<target>无法找到目录 %x.</target>
+<source>Cannot find folder %x.</source>
+<target>无法找到文件夹 %x</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目录有依赖性！在设立同步规则时请小心:</target>
@@ -1294,7 +1255,7 @@ Exclude: \stuff\temp\*
 <target>正在准备同步...</target>
 
 <source>Conflict detected:</source>
-<target>检测到冲突:</target>
+<target>检测到的冲突:</target>
 
 <source>File %x has an invalid date!</source>
 <target>文件 %x 的日期非法!</target>
@@ -1317,20 +1278,20 @@ Exclude: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>两侧相等</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>文件/文件夹仅属性不同</target>
+<source>Items have different attributes</source>
+<target>项目有不同的属性</target>
 
-<source>Copy new file/folder to left</source>
-<target>复制新文件/文件夹至左侧</target>
+<source>Copy new item to left</source>
+<target>复制新项目到左侧</target>
 
-<source>Copy new file/folder to right</source>
-<target>复制新文件/文件夹至右侧</target>
+<source>Copy new item to right</source>
+<target>复制新项目到右侧</target>
 
-<source>Delete left file/folder</source>
-<target>删除左侧文件/文件夹</target>
+<source>Delete left item</source>
+<target>删除左侧项目</target>
 
-<source>Delete right file/folder</source>
-<target>删除右侧文件/文件夹</target>
+<source>Delete right item</source>
+<target>删除右侧项目</target>
 
 <source>Move file on left</source>
 <target>移动左侧的文件</target>
@@ -1338,20 +1299,20 @@ Exclude: \stuff\temp\*
 <source>Move file on right</source>
 <target>移动右侧的文件</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>从右侧覆盖左侧的文件/文件夹</target>
+<source>Overwrite left item</source>
+<target>覆盖左侧的项目</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>从左侧覆盖右侧的文件/文件夹</target>
+<source>Overwrite right item</source>
+<target>覆盖右侧的项目</target>
 
 <source>Do nothing</source>
 <target>保持不动</target>
 
-<source>Copy file attributes only to left</source>
-<target>仅复制文件属性到左侧</target>
+<source>Update attributes on left</source>
+<target>更新左侧的文件属性</target>
 
-<source>Copy file attributes only to right</source>
-<target>仅复制文件属性到右侧</target>
+<source>Update attributes on right</source>
+<target>更新右侧的文件属性</target>
 
 <source>Multiple...</source>
 <target>并联...</target>
@@ -1404,11 +1365,11 @@ Exclude: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>更新 %x 的属性</target>
 
-<source>Target directory name must not be empty!</source>
-<target>目标目录名不能为空!</target>
+<source>Target folder name must not be empty.</source>
+<target>目标文件夹名必须不是空的.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>用于保存文件历史版本的目录没有提供!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>存放历史版本的文件夹名必须不是空的.</target>
 
 <source>Source directory %x not found.</source>
 <target>来源目录 %x 无法找到.</target>
@@ -1437,8 +1398,8 @@ Exclude: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>如下路径的回收站不可用! 文件会被永久删除:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>有一个目录将被修改,而它是多个文件夹对的一部分!请重新检查同步设置!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>一个将被修改的文件夹是多个文件夹对的一部分. 请重新检视同步设置.</target>
 
 <source>Processing folder pair:</source>
 <target>正在处理成对文件夹:</target>

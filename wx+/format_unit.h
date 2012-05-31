@@ -18,15 +18,9 @@ std::wstring remainingTimeToShortString(double timeInSec);
 std::wstring fractionToShortString(double fraction); //within [0, 1]
 
 template <class NumberType>
-std::wstring toStringSep(NumberType number); //convert number to std::wstring including thousands separator
+std::wstring toGuiString(NumberType number); //format integer number including thousands separator
 
 std::wstring utcToLocalTimeString(Int64 utcTime); //throw std::runtime_error
-
-
-
-
-
-
 
 
 
@@ -55,8 +49,9 @@ std::wstring includeNumberSeparator(const std::wstring& number);
 }
 
 template <class NumberType> inline
-std::wstring toStringSep(NumberType number)
+std::wstring toGuiString(NumberType number)
 {
+    //assert_static(IsInteger<NumberType>::value); -> doesn't work for UInt64
     return ffs_Impl::includeNumberSeparator(zen::numberTo<std::wstring>(number));
 }
 }

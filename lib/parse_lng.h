@@ -17,7 +17,8 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <zen/utf8.h>
+#include <zen/utf.h>
+#include <zen/string_tools.h>
 
 namespace lngfile
 {
@@ -311,24 +312,6 @@ private:
     std::string::const_iterator pos;
 };
 
-template <class C, class T>
-inline
-std::basic_string<C> numberToString(const T& number) //convert number to string the C++ way
-{
-    std::basic_ostringstream<C> ss;
-    ss << number;
-    return ss.str();
-}
-
-template <class T, class C>
-inline
-T stringToNumber(const std::basic_string<C>& str) //convert string to number the C++ way
-{
-    T number = 0;
-    std::basic_istringstream<C>(str) >> number;
-    return number;
-}
-
 
 class LngParser
 {
@@ -370,7 +353,7 @@ public:
         consumeToken(Token::TK_FLAG_FILE_END);
 
         consumeToken(Token::TK_PLURAL_COUNT_BEGIN);
-        header.pluralCount = stringToNumber<int>(tk.text);
+        header.pluralCount = zen::stringTo<int>(tk.text);
         consumeToken(Token::TK_TEXT);
         consumeToken(Token::TK_PLURAL_COUNT_END);
 
@@ -521,7 +504,7 @@ void generateLng(const TranslationList& in, const TransHeader& header, std::stri
     fileStream += KnownTokens::text(Token::TK_FLAG_FILE_END) + LB;
 
     fileStream += TAB + KnownTokens::text(Token::TK_PLURAL_COUNT_BEGIN);
-    fileStream += numberToString<char>(header.pluralCount);
+    fileStream += zen::numberTo<std::string>(header.pluralCount);
     fileStream += KnownTokens::text(Token::TK_PLURAL_COUNT_END) + LB;
 
     fileStream += TAB + KnownTokens::text(Token::TK_PLURAL_DEF_BEGIN);

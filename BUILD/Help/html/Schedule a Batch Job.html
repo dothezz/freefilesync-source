@@ -5,40 +5,37 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20120221;18051600">
+	<META NAME="CHANGED" CONTENT="20120512;16135500">
 	<STYLE TYPE="text/css">
 	<!--
 		@page { margin: 2cm }
 		P { margin-bottom: 0.21cm }
-		H3 { margin-bottom: 0.21cm }
-		H3.western { font-family: "Arial", sans-serif }
-		H3.cjk { font-family: "MS Mincho" }
-		H3.ctl { font-family: "Mangal" }
+		H2.cjk { font-family: "SimSun" }
+		H2.ctl { font-family: "Mangal" }
 		A:link { so-language: zxx }
 	-->
 	</STYLE>
 </HEAD>
 <BODY LANG="de-DE" DIR="LTR">
-<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Schedule a Batch
-Job</FONT></H3>
+<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Schedule
+a Batch Job</FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <OL>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Create
 	a new batch job via FreeFileSync's main
 	dialog:<BR></FONT><FONT FACE="Tahoma, sans-serif"><I>Menu-&gt;Advanced-&gt;Create
-	batch job</I></FONT> <FONT FACE="Tahoma, sans-serif">and save it,
-	for example, as &quot;</FONT><FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">&quot;.<BR>&nbsp;</FONT></P>
+	batch job</I></FONT><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
-	the batch job shall run without user interaction or as part of a
-	batch script, make sure that no popup dialog stops the progress:
-	Disable checkbox &quot;<I>Show progress dialog</I>&quot; to avoid
-	blocking while showing the result after synchronization.
+	the batch job shall run without user interaction or as part of an
+	unattended batch script, make sure that no popup dialog stops the
+	progress:<BR>Disable checkbox &quot;<I>Show progress dialog</I>&quot;
+	to avoid blocking while showing the result after synchronization.
 	Alternatively you can select the &quot;On completion&quot; action
 	&quot;Close progress dialog&quot; located in synchronization
-	settings. Note that even if the progress is not shown initially it
-	can be displayed interactively at any time during synchronization,
-	by double-clicking the corresponding systray icon.<BR><IMG SRC="../img/SetupBatch.png" NAME="Grafik3" ALIGN=BOTTOM BORDER=0></FONT></P>
+	settings. <B>Note:</B> Even if the progress dialog is not shown at
+	the beginning, a user can make it visible <B>during</B>
+	synchronization by double-clicking the FreeFileSync systray icon.<BR><IMG SRC="../img/SetupBatch.png" NAME="Grafik3" ALIGN=BOTTOM WIDTH=560 HEIGHT=342 BORDER=0></FONT></P>
 	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
 	order to prevent error or warning popup messages from stopping
@@ -70,9 +67,19 @@ Job</FONT></H3>
 		<UL>
 			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif"><FONT COLOR="#000000"><FONT SIZE=3>Use
 			quotes if any paths contain spaces, e.g.: </FONT></FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><FONT SIZE=3>&quot;C:\some
-			folder\SyncJob.ffs_batch&quot;</FONT></FONT></FONT><FONT COLOR="#000000"><FONT SIZE=3><BR></FONT></FONT><IMG SRC="../img/win7scheduler.png" NAME="Grafik1" ALIGN=BOTTOM WIDTH=708 HEIGHT=321 BORDER=0><BR>&nbsp;</FONT></P>
+			folder\SyncJob.ffs_batch&quot;</FONT></FONT></FONT><FONT COLOR="#000000"><FONT SIZE=3><BR></FONT></FONT><IMG SRC="../img/win7scheduler.png" NAME="Grafik1" ALIGN=BOTTOM WIDTH=708 HEIGHT=321 BORDER=0></FONT></P>
 		</UL>
 	</OL>
+	<P STYLE="margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+		<FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT><FONT FACE="Tahoma, sans-serif"><BR>Beginning
+		with Windows Vista the &quot;Program/script&quot; always needs to
+		be a path to &quot;FreeFileSync.exe&quot; even if ffs_batch file
+		associations are set!</FONT> <FONT FACE="Tahoma, sans-serif">Else
+		the task will return with error code 0xC1, &quot;%1 is not a valid
+		Win32 application&quot; if a ffs_batch file is entered directly.</FONT></P>
+	</SPAN><BR CLEAR=LEFT>&nbsp; 
+	</P>
 </OL>
 <OL>
 	<OL TYPE=A START=2>
@@ -84,10 +91,10 @@ Job</FONT></H3>
 			select &quot;<I>Add Scheduled Task</I>&quot;.</FONT></P>
 			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Follow
 			the wizard and select FreeFileSync.exe as program to run.</FONT></P>
-			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif">Make
-			sure &quot;Run:&quot; is specified as: <FONT FACE="Courier New, monospace">&lt;FreeFileSync
-			installation directory&gt;\FreeFileSync.exe &lt;ffs_batch
-			file&gt;</FONT><BR><IMG SRC="../img/ScheduleBatch_html_m10bf0d36.gif" NAME="Grafik2" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0><BR>&nbsp;</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif">Enter
+			&quot;Run:&quot; as: <FONT FACE="Courier New, monospace">&lt;FreeFileSync
+			installation directory&gt;\FreeFileSync.exe &lt;job
+			name&gt;.ffs_batch</FONT><BR><IMG SRC="../img/ScheduleBatch_html_m10bf0d36.gif" NAME="Grafik2" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0><BR>&nbsp;</FONT></P>
 		</UL>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Ubuntu
 		Linux Gnome-schedule:</B></FONT></P>
@@ -112,20 +119,11 @@ Job</FONT></H3>
 		<UL>
 			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">Specify
 			the command as:</SPAN></SPAN></FONT> <FONT FACE="Courier New, monospace"><I><SPAN STYLE="font-weight: normal">&lt;FreeFileSync
-			installation directory&gt;/FreeFileSync &lt;ffs_batch file&gt;<BR></SPAN></I></FONT><IMG SRC="../img/ubuntuScheduler.png" NAME="Grafik5" ALIGN=BOTTOM WIDTH=629 HEIGHT=560 BORDER=0></P>
+			installation directory&gt;/FreeFileSync &lt;job name&gt;.ffs_batch<BR></SPAN></I></FONT><IMG SRC="../img/ubuntuScheduler.png" NAME="Grafik5" ALIGN=BOTTOM WIDTH=629 HEIGHT=560 BORDER=0></P>
 		</UL>
 	</OL>
 </OL>
 <P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-	<FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT><FONT FACE="Tahoma, sans-serif"><BR>Beginning
-	with Windows Vista, the command always needs to start with the path
-	to &quot;FreeFileSync.exe&quot; even if file associations are set!</FONT>
-	<FONT FACE="Tahoma, sans-serif">Else the task will return with error
-	code 0xC1, &quot;%1 is not a valid Win32 application&quot;.</FONT></P>
-</SPAN><BR CLEAR=LEFT><BR>
 </P>
 </BODY>
 </HTML>

@@ -14,7 +14,6 @@
 #include "file_io.h"
 #include "assert_static.h"
 #include <boost/thread/tss.hpp>
-//#include <boost/thread/once.hpp>
 #include "file_id_def.h"
 
 #ifdef FFS_WIN
@@ -73,15 +72,15 @@ bool zen::dirExists(const Zstring& dirname)
 }
 
 
-bool zen::symlinkExists(const Zstring& objname)
+bool zen::symlinkExists(const Zstring& linkname)
 {
 #ifdef FFS_WIN
-    const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
+    const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(linkname).c_str());
     return ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 
 #elif defined FFS_LINUX
     struct stat fileInfo = {};
-    return ::lstat(objname.c_str(), &fileInfo) == 0 &&
+    return ::lstat(linkname.c_str(), &fileInfo) == 0 &&
            S_ISLNK(fileInfo.st_mode); //symbolic link
 #endif
 }
@@ -143,7 +142,7 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
                                           FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                           nullptr,
                                           OPEN_EXISTING,
-                                          FILE_FLAG_BACKUP_SEMANTICS,
+                                          FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory
                                           nullptr);
         if (hFile == INVALID_HANDLE_VALUE)
             throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
@@ -453,7 +452,7 @@ Zstring getFilenameFmt(const Zstring& filename, Function fun) //throw(); returns
     const DWORD rv = fun(filenameFmt.c_str(), //__in   LPCTSTR lpszShortPath,
                          &buffer[0],          //__out  LPTSTR  lpszLongPath,
                          bufferSize);         //__in   DWORD   cchBuffer
-    if (rv == 0 || rv >= buffer.size())
+    if (rv == 0 || rv >= bufferSize)
         return Zstring();
 
     return &buffer[0];
@@ -478,7 +477,7 @@ Zstring findUnused8Dot3Name(const Zstring& filename) //find a unique 8.3 short n
             return output;
     }
 
-    throw std::runtime_error(std::string("100000000 files, one for each number, exist in this directory? You're kidding...\n") + utf8CvrtTo<std::string>(pathPrefix));
+    throw std::runtime_error(std::string("100000000 files, one for each number, exist in this directory? You're kidding...\n") + utfCvrtTo<std::string>(pathPrefix));
 }
 
 
@@ -575,14 +574,10 @@ public:
 
     virtual void deleteTargetFile(const Zstring& targetFile) { assert(!fileExists(targetFile)); }
 
-    virtual void updateCopyStatus(UInt64 totalBytesTransferred)
+    virtual void updateCopyStatus(Int64 bytesDelta)
     {
         if (moveCallback)
-        {
-            const Int64 delta = to<Int64>(totalBytesTransferred) - bytesReported;
-            moveCallback->updateStatus(delta);
-            bytesReported += delta;
-        }
+            moveCallback->updateStatus(bytesDelta);
     }
 
 private:
@@ -592,7 +587,6 @@ private:
     const Zstring sourceFile_;
     const Zstring targetFile_;
     CallbackMoveFile* moveCallback; //optional
-    Int64 bytesReported;
 };
 
 
@@ -649,12 +643,13 @@ public:
         files_.push_back(std::make_pair(shortName, fullName));
     }
 
-    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
     {
         if (details.dirLink)
             dirs_.push_back(std::make_pair(shortName, fullName));
         else
             files_.push_back(std::make_pair(shortName, fullName));
+        return LINK_SKIP;
     }
 
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
@@ -727,7 +722,7 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, Callb
 
         //traverse source directory one level
         TraverseOneLevel traverseCallback(fileList, dirList);
-        traverseFolder(sourceDir, false, traverseCallback); //traverse one level, don't follow symlinks
+        traverseFolder(sourceDir, traverseCallback); //traverse one level
 
         const Zstring targetDirPf = appendSeparator(targetDir);
 
@@ -780,12 +775,13 @@ public:
     {
         m_files.push_back(fullName);
     }
-    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
     {
         if (details.dirLink)
             m_dirs.push_back(fullName);
         else
             m_files.push_back(fullName);
+        return LINK_SKIP;
     }
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
     {
@@ -836,7 +832,7 @@ void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
     {
         //get all files and directories from current directory (WITHOUT subdirectories!)
         FilesDirsOnlyTraverser traverser(fileList, dirList);
-        traverseFolder(directory, false, traverser); //don't follow symlinks
+        traverseFolder(directory, traverser); //don't follow symlinks
     }
 
     //delete directories recursively
@@ -896,7 +892,9 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
     FileUpdateHandle targetHandle(filename, [=]
     {
         return ::CreateFile(applyLongPathPrefix(filename).c_str(),
-        GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
+        FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,
+        //avoids mysterious "access denied" when using "GENERIC_READ | GENERIC_WRITE" on a read-only file, even after read-only was removed right before:
+        //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
         nullptr,
         OPEN_EXISTING,
@@ -917,11 +915,68 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
 
     auto isNullTime = [](const FILETIME & ft) { return ft.dwLowDateTime == 0 && ft.dwHighDateTime == 0; };
 
-    if (!::SetFileTime(targetHandle.get(),
-                       isNullTime(creationTime) ? nullptr : &creationTime,
-                       nullptr,
-                       &lastWriteTime))
-        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+    if (!::SetFileTime(targetHandle.get(), //__in      HANDLE hFile,
+                       !isNullTime(creationTime) ? &creationTime : nullptr, //__in_opt  const FILETIME *lpCreationTime,
+                       nullptr,            //__in_opt  const FILETIME *lpLastAccessTime,
+                       &lastWriteTime))    //__in_opt  const FILETIME *lpLastWriteTime
+    {
+        auto lastErr = ::GetLastError();
+
+        //function may fail if file is read-only: https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
+        if (lastErr == ERROR_ACCESS_DENIED)
+        {
+            //dynamically load windows API function: available with Windows Vista and later
+            typedef BOOL (WINAPI* SetFileInformationByHandleFunc)(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
+
+            const SysDllFun<SetFileInformationByHandleFunc> setFileInformationByHandle(L"kernel32.dll", "SetFileInformationByHandle");
+            if (setFileInformationByHandle) //if not: let the original error propagate!
+            {
+                auto setFileInfo = [&](FILE_BASIC_INFO basicInfo) //throw FileError; no const& since SetFileInformationByHandle() requires non-const parameter!
+                {
+                    if (!setFileInformationByHandle(targetHandle.get(), //__in  HANDLE hFile,
+                                                    FileBasicInfo,      //__in  FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
+                                                    &basicInfo,         //__in  LPVOID lpFileInformation,
+                                                    sizeof(basicInfo))) //__in  DWORD dwBufferSize
+                        throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+                };
+
+                auto toLargeInteger = [](const FILETIME& ft) -> LARGE_INTEGER
+                {
+                    LARGE_INTEGER tmp = {};
+                    tmp.LowPart  = ft.dwLowDateTime;
+                    tmp.HighPart = ft.dwHighDateTime;
+                    return tmp;
+                };
+                //---------------------------------------------------------------------------
+
+                BY_HANDLE_FILE_INFORMATION fileInfo = {};
+                if (::GetFileInformationByHandle(targetHandle.get(), &fileInfo))
+                    if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+                    {
+                        FILE_BASIC_INFO basicInfo = {}; //undocumented: file times of "0" stand for "don't change"
+                        basicInfo.FileAttributes = FILE_ATTRIBUTE_NORMAL;        //[!] the bug in the ticket above requires we set this together with file times!!!
+                        basicInfo.LastWriteTime = toLargeInteger(lastWriteTime); //
+                        if (!isNullTime(creationTime))
+                            basicInfo.CreationTime = toLargeInteger(creationTime);
+
+                        setFileInfo(basicInfo); //throw FileError
+
+                        try //... to restore original file attributes
+                        {
+                            FILE_BASIC_INFO basicInfo2 = {};
+                            basicInfo2.FileAttributes = fileInfo.dwFileAttributes;
+                            setFileInfo(basicInfo2); //throw FileError
+                        }
+                        catch (FileError&) {}
+
+                        lastErr = ERROR_SUCCESS;
+                    }
+            }
+
+            if (lastErr != ERROR_SUCCESS)
+                throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastErr));
+        }
+    }
 
 #ifndef NDEBUG //dst hack: verify data written
     if (dst::isFatDrive(filename) && !dirExists(filename)) //throw()
@@ -1322,7 +1377,6 @@ void createDirectory_straight(const Zstring& directory, const Zstring& templateD
                         ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
 
                         USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
-
                         DWORD bytesReturned = 0;
                         ::DeviceIoControl(hDir,                  //handle to file or directory
                                           FSCTL_SET_COMPRESSION, //dwIoControlCode
@@ -1364,8 +1418,11 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
             return;
     }
 #elif defined FFS_LINUX
-    if (dirExists(directory))
-        return;
+    if (somethingExists(directory))
+    {
+        if (dirExists(directory))
+            return;
+    }
 #endif
     else //if "not somethingExists" we need to create the parent directory
     {
@@ -1485,7 +1542,7 @@ source attr | tf normal | tf compressed | tf encrypted | handled by
 ============|==================================================================
     ---     |    ---           -C-             E--       copyFileWindowsDefault
     --S     |    --S           -CS             E-S       copyFileWindowsSparse
-    -C-     |    --- (NOK)     -C-             E--       copyFileWindowsDefault
+    -C-     |    -C-           -C-             E--       copyFileWindowsDefault
     -CS     |    -CS           -CS             E-S       copyFileWindowsSparse
     E--     |    E--           E--             E--       copyFileWindowsDefault
     E-S     |    E-- (NOK)     E-- (NOK)       E-- (NOK) copyFileWindowsDefault -> may fail with ERROR_DISK_FULL!!
@@ -1502,14 +1559,10 @@ Note: - if target parent folder is compressed or encrypted, both attributes are 
 
 
 //due to issues on non-NTFS volumes, we should use the copy-as-sparse routine only if required and supported!
-bool canCopyAsSparse(HANDLE hSource, const Zstring& targetFile) //throw ()
+bool canCopyAsSparse(DWORD fileAttrSource, const Zstring& targetFile) //throw ()
 {
-    BY_HANDLE_FILE_INFORMATION fileInfoSource = {};
-    if (!::GetFileInformationByHandle(hSource, &fileInfoSource))
-        return false;
-
-    const bool sourceIsEncrypted = (fileInfoSource.dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED)   != 0;
-    const bool sourceIsSparse    = (fileInfoSource.dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
+    const bool sourceIsEncrypted = (fileAttrSource & FILE_ATTRIBUTE_ENCRYPTED)   != 0;
+    const bool sourceIsSparse    = (fileAttrSource & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
 
     if (sourceIsEncrypted || !sourceIsSparse) //BackupRead() silently fails reading encrypted files!
         return false; //small perf optimization: don't check "targetFile" if not needed
@@ -1544,18 +1597,23 @@ bool canCopyAsSparse(HANDLE hSource, const Zstring& targetFile) //throw ()
 
 bool canCopyAsSparse(const Zstring& sourceFile, const Zstring& targetFile) //throw ()
 {
-    HANDLE hFileSource = ::CreateFile(applyLongPathPrefix(sourceFile).c_str(),
-                                      GENERIC_READ,
-                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read files that are open in other applications
-                                      nullptr,
-                                      OPEN_EXISTING,
-                                      0,
-                                      nullptr);
-    if (hFileSource == INVALID_HANDLE_VALUE)
+    //follow symlinks!
+    HANDLE hSource = ::CreateFile(applyLongPathPrefix(sourceFile).c_str(),
+                                  0,
+                                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read files that are open in other applications
+                                  nullptr,
+                                  OPEN_EXISTING,
+                                  0,
+                                  nullptr);
+    if (hSource == INVALID_HANDLE_VALUE)
         return false;
-    ZEN_ON_SCOPE_EXIT(::CloseHandle(hFileSource));
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(hSource));
 
-    return canCopyAsSparse(hFileSource, targetFile); //throw ()
+    BY_HANDLE_FILE_INFORMATION fileInfoSource = {};
+    if (!::GetFileInformationByHandle(hSource, &fileInfoSource))
+        return false;
+
+    return canCopyAsSparse(fileInfoSource.dwFileAttributes, targetFile); //throw ()
 }
 
 
@@ -1567,7 +1625,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
 {
     assert(canCopyAsSparse(sourceFile, targetFile));
 
-    //comment suggests "FILE_FLAG_BACKUP_SEMANTICS +  SE_BACKUP_NAME" may be needed: http://msdn.microsoft.com/en-us/library/windows/desktop/aa362509(v=vs.85).aspx
+    //try to get backup read and write privileges: who knows, maybe this helps solve some obscure "access denied" errors
     try { activatePrivilege(SE_BACKUP_NAME); }
     catch (const FileError&) {}
     try { activatePrivilege(SE_RESTORE_NAME); }
@@ -1576,7 +1634,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     //open sourceFile for reading
     HANDLE hFileSource = ::CreateFile(applyLongPathPrefix(sourceFile).c_str(),
                                       GENERIC_READ,
-                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read files that are open in other applications
+                                      FILE_SHARE_READ | FILE_SHARE_DELETE,
                                       nullptr,
                                       OPEN_EXISTING, //FILE_FLAG_OVERLAPPED must not be used!
                                       FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_BACKUP_SEMANTICS, //FILE_FLAG_NO_BUFFERING should not be used!
@@ -1605,7 +1663,8 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
         throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + getLastErrorFormatted());
 
     //----------------------------------------------------------------------
-    const DWORD validAttribs = FILE_ATTRIBUTE_READONLY |
+    const DWORD validAttribs = FILE_ATTRIBUTE_NORMAL   | //"This attribute is valid only if used alone."
+                               FILE_ATTRIBUTE_READONLY |
                                FILE_ATTRIBUTE_HIDDEN   |
                                FILE_ATTRIBUTE_SYSTEM   |
                                FILE_ATTRIBUTE_ARCHIVE  |           //those two are not set properly (not worse than ::CopyFileEx())
@@ -1615,7 +1674,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     //create targetFile and open it for writing
     HANDLE hFileTarget = ::CreateFile(applyLongPathPrefix(targetFile).c_str(),
                                       GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
-                                      FILE_SHARE_READ | FILE_SHARE_DELETE,
+                                      FILE_SHARE_DELETE, //FILE_SHARE_DELETE is required to rename file while handle is open!
                                       nullptr,
                                       CREATE_NEW,
                                       FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_BACKUP_SEMANTICS | (fileInfoSource.dwFileAttributes & validAttribs),
@@ -1652,73 +1711,44 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
         newAttrib->targetFileId     = extractFileID(fileInfoTarget);
     }
 
-    //----------------------------------------------------------------------
-    DWORD fsFlagsTarget = 0;
-    {
-        const DWORD bufferSize = 10000;
-        std::vector<wchar_t> buffer(bufferSize);
-
-        //full pathName need not yet exist!
-        if (!::GetVolumePathName(targetFile.c_str(), //__in   LPCTSTR lpszFileName,
-                                 &buffer[0],         //__out  LPTSTR lpszVolumePathName,
-                                 bufferSize))        //__in   DWORD cchBufferLength
-            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
-
-        //GetVolumeInformationByHandleW would be a better solution, but it is supported beginning with Vista only!
-        if (!::GetVolumeInformation(&buffer[0],     //__in_opt   LPCTSTR lpRootPathName
-                                    nullptr,        //__out_opt  LPTSTR lpVolumeNameBuffer,
-                                    0,              //__in       DWORD nVolumeNameSize,
-                                    nullptr,        //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                    nullptr,        //__out_opt  LPDWORD lpMaximumComponentLength,
-                                    &fsFlagsTarget, //__out_opt  LPDWORD lpFileSystemFlags,
-                                    nullptr,        //__out      LPTSTR lpFileSystemNameBuffer,
-                                    0))             //__in       DWORD nFileSystemNameSize
-            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
-    }
-
-    //----------------------------------------------------------------------
-    const bool sourceIsCompressed = (fileInfoSource.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED)  != 0;
-    const bool sourceIsSparse     = (fileInfoSource.dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
-
-    const bool targetSupportsCompressed = (fsFlagsTarget & FILE_FILE_COMPRESSION     ) != 0;
-    const bool targetSupportsSparse     = (fsFlagsTarget & FILE_SUPPORTS_SPARSE_FILES) != 0;
-
-    //----------------------------------------------------------------------
-    if (sourceIsCompressed && targetSupportsCompressed)
+    //#################### copy NTFS compressed attribute #########################
+    const bool sourceIsCompressed = (fileInfoSource.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0;
+    const bool targetIsCompressed = (fileInfoTarget.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0; //already set by CreateFile if target parent folder is compressed!
+    if (sourceIsCompressed && !targetIsCompressed)
     {
         USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
         DWORD bytesReturned = 0;
-        if (!DeviceIoControl(hFileTarget,           //handle to file or directory
-                             FSCTL_SET_COMPRESSION, //dwIoControlCode
-                             &cmpState,             //input buffer
-                             sizeof(cmpState),      //size of input buffer
-                             nullptr,               //lpOutBuffer
-                             0,                     //OutBufferSize
-                             &bytesReturned,        //number of bytes returned
-                             nullptr))              //OVERLAPPED structure
-        {
-            //-> if target folder is encrypted this call will legitimately fail with ERROR_INVALID_FUNCTION
-            //throw FileError
-        }
+        if (!::DeviceIoControl(hFileTarget,           //handle to file or directory
+                               FSCTL_SET_COMPRESSION, //dwIoControlCode
+                               &cmpState,             //input buffer
+                               sizeof(cmpState),      //size of input buffer
+                               nullptr,               //lpOutBuffer
+                               0,                     //OutBufferSize
+                               &bytesReturned,        //number of bytes returned
+                               nullptr))              //OVERLAPPED structure
+        {} //may legitimately fail with ERROR_INVALID_FUNCTION if:
+        // - target folder is encrypted
+        // - target volume does not support compressed attribute -> unlikely in this context
     }
+    //#############################################################################
 
     //although it seems the sparse attribute is set automatically by BackupWrite, we are required to do this manually: http://support.microsoft.com/kb/271398/en-us
     //Quote: It is the responsibility of the backup utility to apply file attributes to a file after it is restored by using BackupWrite.
     //The application should retrieve the attributes by using GetFileAttributes prior to creating a backup with BackupRead.
     //If a file originally had the sparse attribute (FILE_ATTRIBUTE_SPARSE_FILE), the backup utility must explicitly set the
-    //attribute on the restored file. The attribute can be set by using the DeviceIoControl function with the FSCTL_SET_SPARSE flag.
+    //attribute on the restored file.
 
-    if (sourceIsSparse && targetSupportsSparse)
+    //if (sourceIsSparse && targetSupportsSparse) -> no need to check, this is our precondition!
     {
         DWORD bytesReturned = 0;
-        if (!DeviceIoControl(hFileTarget,      //handle to file
-                             FSCTL_SET_SPARSE, //dwIoControlCode
-                             nullptr,          //input buffer
-                             0,                //size of input buffer
-                             nullptr,          //lpOutBuffer
-                             0,                //OutBufferSize
-                             &bytesReturned,   //number of bytes returned
-                             nullptr))         //OVERLAPPED structure
+        if (!::DeviceIoControl(hFileTarget,      //handle to file
+                               FSCTL_SET_SPARSE, //dwIoControlCode
+                               nullptr,          //input buffer
+                               0,                //size of input buffer
+                               nullptr,          //lpOutBuffer
+                               0,                //OutBufferSize
+                               &bytesReturned,   //number of bytes returned
+                               nullptr))         //OVERLAPPED structure
             throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(targetFile)) +
                             L"\n\n" + zen::getLastErrorFormatted() + L" (NTFS sparse)");
     }
@@ -1737,10 +1767,9 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
         if (contextRead ) ::BackupRead (0, nullptr, 0, nullptr, true, false, &contextRead); //lpContext must be passed [...] all other parameters are ignored.
         if (contextWrite) ::BackupWrite(0, nullptr, 0, nullptr, true, false, &contextWrite); );
 
-
     //stream-copy sourceFile to targetFile
-    UInt64 totalBytesTransferred; //may be larger than file size! context information + ADS!
     bool eof = false;
+    bool silentFailure = true; //try to detect failure reading encrypted files
     do
     {
         DWORD bytesRead = 0;
@@ -1772,18 +1801,21 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
         if (bytesWritten != bytesRead)
             throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + L"(incomplete write)");
 
-        totalBytesTransferred += bytesRead;
+        //total bytes transferred may be larger than file size! context information + ADS or smaller (sparse, compressed)!
 
         //invoke callback method to update progress indicators
         if (callback)
-            callback->updateCopyStatus(totalBytesTransferred); //throw X!
+            callback->updateCopyStatus(Int64(bytesRead)); //throw X!
+
+        if (bytesRead > 0)
+            silentFailure = false;
     }
     while (!eof);
 
     //DST hack not required, since both source and target volumes cannot be FAT!
 
     //::BackupRead() silently fails reading encrypted files -> double check!
-    if (totalBytesTransferred == 0U && UInt64(fileInfoSource.nFileSizeLow, fileInfoSource.nFileSizeHigh) != 0U)
+    if (silentFailure && UInt64(fileInfoSource.nFileSizeLow, fileInfoSource.nFileSizeHigh) != 0U)
         //note: there is no guaranteed ordering relation beween bytes transferred and file size! Consider ADS (>) and compressed/sparse files (<)!
         throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + L"(unknown error)");
 
@@ -1835,33 +1867,32 @@ DEFINE_NEW_FILE_ERROR(ErrorShouldCopyAsSparse);
 class ErrorHandling
 {
 public:
-    ErrorHandling() : shouldCopyAsSparse(false) {}
+    ErrorHandling() : shouldCopyAsSparse(false), exceptionInUserCallback(nullptr) {}
 
-    void reportUserException(CallbackCopyFile& userCallback, const UInt64& bytesTransferred)
-    {
-        exceptionInUserCallback.reset(new std::pair<CallbackCopyFile*, UInt64>(&userCallback, bytesTransferred));
-    }
-
+    //call context: copyCallbackInternal()
     void reportErrorShouldCopyAsSparse() { shouldCopyAsSparse = true; }
+
+    void reportUserException(CallbackCopyFile& userCallback) { exceptionInUserCallback = &userCallback; }
 
     void reportError(const std::wstring& message) { errorMsg = message; }
 
+    //call context: copyFileWindowsDefault()
     void evaluateErrors() //throw X
     {
         if (shouldCopyAsSparse)
             throw ErrorShouldCopyAsSparse(L"sparse dummy value");
 
         if (exceptionInUserCallback)
-            exceptionInUserCallback->first->updateCopyStatus(exceptionInUserCallback->second); //rethrow (hopefully!)
+            exceptionInUserCallback->updateCopyStatus(0); //rethrow (hopefully!)
 
         if (!errorMsg.empty())
             throw FileError(errorMsg);
     }
 
 private:
-    bool shouldCopyAsSparse;
-    std::wstring errorMsg;                                                         //these two are exclusive!
-    std::unique_ptr<std::pair<CallbackCopyFile*, UInt64>> exceptionInUserCallback; //
+    bool shouldCopyAsSparse;                   //
+    std::wstring errorMsg;                     //these are exclusive!
+    CallbackCopyFile* exceptionInUserCallback; //
 };
 
 
@@ -1879,7 +1910,9 @@ struct CallbackData
 
     CallbackCopyFile* const userCallback; //optional!
     ErrorHandling errorHandler;
-    FileAttrib newAttrib; //modified by CopyFileEx at start
+    FileAttrib newAttrib; //modified by CopyFileEx() at beginning
+
+    Int64 bytesReported; //used internally to calculate bytes transferred delta
 };
 
 
@@ -1903,6 +1936,8 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
     file time handling:
         ::CopyFileEx() will copy file modification time (only) over from source file AFTER the last invokation of this callback
         => it is possible to adapt file creation time of target in here, but NOT file modification time!
+    	CAVEAT: if ::CopyFileEx() fails to set modification time, it silently ignores this error and returns success!!!
+    	see procmon log in: https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
 
     alternate data stream handling:
         CopyFileEx() processes multiple streams one after another, stream 1 is the file data stream and always available!
@@ -1915,12 +1950,6 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
     if (dwCallbackReason == CALLBACK_STREAM_SWITCH &&  //called up-front for every file (even if 0-sized)
         dwStreamNumber == 1) //consider ADS!
     {
-        if (canCopyAsSparse(hSourceFile, cbd.targetFile_)) //throw ()
-        {
-            cbd.errorHandler.reportErrorShouldCopyAsSparse(); //use another copy routine!
-            return PROGRESS_CANCEL;
-        }
-
         //#################### return source file attributes ################################
         BY_HANDLE_FILE_INFORMATION fileInfoSrc = {};
         if (!::GetFileInformationByHandle(hSourceFile, &fileInfoSrc))
@@ -1941,14 +1970,40 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         cbd.newAttrib.sourceFileId     = extractFileID(fileInfoSrc);
         cbd.newAttrib.targetFileId     = extractFileID(fileInfoTrg);
 
+        //#################### switch to sparse file copy if req. #######################
+        if (canCopyAsSparse(fileInfoSrc.dwFileAttributes, cbd.targetFile_)) //throw ()
+        {
+            cbd.errorHandler.reportErrorShouldCopyAsSparse(); //use a different copy routine!
+            return PROGRESS_CANCEL;
+        }
+
         //#################### copy file creation time ################################
         ::SetFileTime(hDestinationFile, &fileInfoSrc.ftCreationTime, nullptr, nullptr); //no error handling!
-        //##############################################################################
+
+        //#################### copy NTFS compressed attribute #########################
+        const bool sourceIsCompressed = (fileInfoSrc.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0;
+        const bool targetIsCompressed = (fileInfoTrg.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0; //already set by CopyFileEx if target parent folder is compressed!
+        if (sourceIsCompressed && !targetIsCompressed)
+        {
+            USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
+            DWORD bytesReturned = 0;
+            if (!::DeviceIoControl(hDestinationFile,      //handle to file or directory
+                                   FSCTL_SET_COMPRESSION, //dwIoControlCode
+                                   &cmpState,             //input buffer
+                                   sizeof(cmpState),      //size of input buffer
+                                   nullptr,               //lpOutBuffer
+                                   0,                     //OutBufferSize
+                                   &bytesReturned,        //number of bytes returned
+                                   nullptr))              //OVERLAPPED structure
+            {} //may legitimately fail with ERROR_INVALID_FUNCTION if
+            // - if target folder is encrypted
+            // - target volume does not support compressed attribute
+            //#############################################################################
+        }
     }
 
     //called after copy operation is finished - note: for 0-sized files this callback is invoked just ONCE!
     //if (totalFileSize.QuadPart == totalBytesTransferred.QuadPart && dwStreamNumber == 1) {}
-
     if (cbd.userCallback)
     {
         //some odd check for some possible(?) error condition
@@ -1960,13 +2015,14 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
                          nullptr, 0);
         try
         {
-            cbd.userCallback->updateCopyStatus(UInt64(totalBytesTransferred.QuadPart)); //throw X!
+            cbd.userCallback->updateCopyStatus(totalBytesTransferred.QuadPart - cbd.bytesReported); //throw X!
+            cbd.bytesReported = totalBytesTransferred.QuadPart;
         }
         catch (...)
         {
             //#warning migrate to std::exception_ptr when available
 
-            cbd.errorHandler.reportUserException(*cbd.userCallback, UInt64(totalBytesTransferred.QuadPart));
+            cbd.errorHandler.reportUserException(*cbd.userCallback);
             return PROGRESS_CANCEL;
         }
     }
@@ -1975,7 +2031,7 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
 
 
 const bool supportNonEncryptedDestination = winXpOrLater(); //encrypted destination is not supported with Windows 2000
-const bool supportUnbufferedCopy          = vistaOrLater();
+//const bool supportUnbufferedCopy          = vistaOrLater();
 //caveat: function scope static initialization is not thread-safe in VS 2010!
 
 
@@ -1984,20 +2040,23 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
                             CallbackCopyFile* callback,
                             FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked, ErrorShouldCopyAsSparse
 {
+    //try to get backup read and write privileges: who knows, maybe this helps solve some obscure "access denied" errors
+    try { activatePrivilege(SE_BACKUP_NAME); }
+    catch (const FileError&) {}
+    try { activatePrivilege(SE_RESTORE_NAME); }
+    catch (const FileError&) {}
+
     zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (...) {} });
     //transactional behavior: guard just before starting copy, we don't trust ::CopyFileEx(), do we? ;)
 
     DWORD copyFlags = COPY_FILE_FAIL_IF_EXISTS;
 
-#ifndef COPY_FILE_ALLOW_DECRYPTED_DESTINATION
-    const DWORD COPY_FILE_ALLOW_DECRYPTED_DESTINATION = 0x00000008;
-#endif
-
     if (supportNonEncryptedDestination)
         copyFlags |= COPY_FILE_ALLOW_DECRYPTED_DESTINATION; //allow copying from encrypted to non-encrytped location
 
-    if (supportUnbufferedCopy) //see http://blogs.technet.com/b/askperf/archive/2007/05/08/slow-large-file-copy-issues.aspx
-        copyFlags |= COPY_FILE_NO_BUFFERING; //no perf difference at worst, huge improvement for large files (20% in test NTFS -> NTFS)
+    //if (supportUnbufferedCopy) //see http://blogs.technet.com/b/askperf/archive/2007/05/08/slow-large-file-copy-issues.aspx
+    //  copyFlags |= COPY_FILE_NO_BUFFERING; //no perf difference at worst, huge improvement for large files (20% in test NTFS -> NTFS)
+    //It's a shame this flag causes file corruption! https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3529683&group_id=234430
 
     CallbackData cbd(callback, sourceFile, targetFile);
 
@@ -2007,7 +2066,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
                              copyCallbackInternal, //__in_opt  LPPROGRESS_ROUTINE lpProgressRoutine,
                              &cbd,                 //__in_opt  LPVOID lpData,
                              nullptr,              //__in_opt  LPBOOL pbCancel,
-                             copyFlags) == TRUE;   //__in      DWORD dwCopyFlags
+                             copyFlags) != FALSE;  //__in      DWORD dwCopyFlags
 
     cbd.errorHandler.evaluateErrors(); //throw ?, process errors in callback first!
     if (!success)
@@ -2141,18 +2200,15 @@ void copyFileLinux(const Zstring& sourceFile,
         }();
 
         //copy contents of sourceFile to targetFile
-        UInt64 totalBytesTransferred;
         do
         {
             const size_t bytesRead = fileIn.read(&buffer[0], buffer.size()); //throw FileError
 
             fileOut.write(&buffer[0], bytesRead); //throw FileError
 
-            totalBytesTransferred += bytesRead;
-
             //invoke callback method to update progress indicators
             if (callback)
-                callback->updateCopyStatus(totalBytesTransferred); //throw X!
+                callback->updateCopyStatus(Int64(bytesRead)); //throw X!
         }
         while (!fileIn.eof());
     }
@@ -2194,11 +2250,11 @@ void copyFileLinux(const Zstring& sourceFile,
 #endif
 
 
-Zstring createTempName(const Zstring& filename)
+Zstring findUnusedTempName(const Zstring& filename)
 {
     Zstring output = filename + zen::TEMP_FILE_ENDING;
 
-    //ensure uniqueness
+    //ensure uniqueness (+ minor race condition)
     for (int i = 1; somethingExists(output); ++i)
         output = filename + Zchar('_') + numberTo<Zstring>(i) + zen::TEMP_FILE_ENDING;
 
@@ -2255,7 +2311,7 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
         {
             //determine non-used temp file name "first":
             //using optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
-            temporary = createTempName(targetFile);
+            temporary = findUnusedTempName(targetFile);
 
             //retry
             copyFileSelectOs(sourceFile, temporary, callback, sourceAttr); //throw FileError

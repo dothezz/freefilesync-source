@@ -21,7 +21,7 @@ struct CallbackCopyFile;
 
 bool fileExists     (const Zstring& filename); //throw()       check whether file      or symlink exists
 bool dirExists      (const Zstring& dirname);  //throw()       check whether directory or symlink exists
-bool symlinkExists  (const Zstring& objname);  //throw()       check whether a symbolic link exists
+bool symlinkExists  (const Zstring& linkname); //throw()       check whether a symbolic link exists
 bool somethingExists(const Zstring& objname);  //throw()       check whether any object with this name exists
 
 //check whether two folders are located on the same (logical) volume
@@ -108,7 +108,7 @@ struct CallbackCopyFile //callback functionality
     //may throw:
     //Linux:   unconditionally
     //Windows: first exception is swallowed, updateCopyStatus() is then called again where it should throw again and exception will propagate as expected
-    virtual void updateCopyStatus(UInt64 totalBytesTransferred) = 0;
+    virtual void updateCopyStatus(Int64 bytesDelta) = 0; //accummulated delta != file size! consider ADS, sparse, compressed files
 };
 
 

@@ -9,6 +9,7 @@
 #include <wx/settings.h>
 #include <zen/i18n.h>
 #include <zen/file_error.h>
+#include <zen/basic_math.h>
 #include <wx+/tooltip.h>
 #include <wx+/format_unit.h>
 #include <wx+/string_conv.h>
@@ -195,7 +196,44 @@ protected:
                 dc.GradientFillLinear(rect, getColorSelectionGradientFrom(), getColorSelectionGradientTo(), wxEAST);
             //ignore focus
             else
-                clearArea(dc, rect, getBackGroundColor(row));
+            {
+                //alternate background color to improve readability (while lacking cell borders)
+                if (getRowDisplayType(row) == DISP_TYPE_NORMAL && row % 2 == 0)
+                {
+                    //accessibility, support high-contrast schemes => work with user-defined background color!
+                    const auto backCol = getBackGroundColor(row);
+
+                    auto colorDist = [](const wxColor& lhs, const wxColor& rhs) //just some metric
+                    {
+                        return numeric::power<2>(static_cast<int>(lhs.Red  ()) - static_cast<int>(rhs.Red  ())) +
+                               numeric::power<2>(static_cast<int>(lhs.Green()) - static_cast<int>(rhs.Green())) +
+                               numeric::power<2>(static_cast<int>(lhs.Blue ()) - static_cast<int>(rhs.Blue ()));
+                    };
+
+                    const int levelDiff = 20;
+                    const int level = colorDist(backCol, *wxBLACK) < colorDist(backCol, *wxWHITE) ?
+                                      levelDiff : -levelDiff; //brighten or darken
+
+                    auto incChannel = [level](unsigned char c) { return static_cast<unsigned char>(std::max(0, std::min(255, c + level))); };
+
+                    const wxColor backColAlt(incChannel(backCol.Red  ()),
+                                             incChannel(backCol.Green()),
+                                             incChannel(backCol.Blue ()));
+
+                    //clearArea(dc, rect, backColAlt);
+
+                    //add some nice background gradient
+                    wxRect rectUpper = rect;
+                    rectUpper.height /= 2;
+                    wxRect rectLower = rect;
+                    rectLower.y += rectUpper.height;
+                    rectLower.height -= rectUpper.height;
+                    dc.GradientFillLinear(rectUpper, backColAlt, getBackGroundColor(row), wxSOUTH);
+                    dc.GradientFillLinear(rectLower, backColAlt, getBackGroundColor(row), wxNORTH);
+                }
+                else
+                    clearArea(dc, rect, getBackGroundColor(row));
+            }
         }
         else
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
@@ -203,41 +241,71 @@ protected:
 
     wxColor getBackGroundColor(size_t row) const
     {
-        wxColor backGroundCol = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+        //accessibility: always set both foreground AND background colors!
+        // => harmonize with renderCell()!
 
-        if (const FileSystemObject* fsObj = getRawData(row))
+        switch (getRowDisplayType(row))
         {
-            //mark filtered rows
-            if (!fsObj->isActive())
+            case DISP_TYPE_NORMAL:
+                break;
+            case DISP_TYPE_FOLDER:
+                return COLOR_GREY;
+            case DISP_TYPE_SYMLINK:
+                return COLOR_ORANGE;
+            case DISP_TYPE_INACTIVE:
                 return COLOR_NOT_ACTIVE;
-            else if (!fsObj->isEmpty<side>()) //always show not existing files/dirs/symlinks as empty
-            {
-                //mark directories and symlinks
-                struct GetRowColor : public FSObjectVisitor
-                {
-                    GetRowColor(wxColour& background) : background_(background) {}
 
-                    virtual void visit(const FileMapping& fileObj) {}
-                    virtual void visit(const SymLinkMapping& linkObj)
-                    {
-                        background_ = COLOR_ORANGE;
-                    }
-                    virtual void visit(const DirMapping& dirObj)
-                    {
-                        background_ = COLOR_GREY;
-                    }
-                private:
-                    wxColour& background_;
-                } getCol(backGroundCol);
-                fsObj->accept(getCol);
-            }
         }
-        return backGroundCol;
+        return wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
     }
 
     const FileSystemObject* getRawData(size_t row) const { return gridDataView_ ? gridDataView_->getObject(row) : nullptr; }
 
 private:
+    enum DisplayType
+    {
+        DISP_TYPE_NORMAL,
+        DISP_TYPE_FOLDER,
+        DISP_TYPE_SYMLINK,
+        DISP_TYPE_INACTIVE,
+    };
+
+
+    DisplayType getRowDisplayType(size_t row) const
+    {
+        const FileSystemObject* fsObj = getRawData(row);
+        if (!fsObj )
+            return DISP_TYPE_NORMAL;
+
+        //mark filtered rows
+        if (!fsObj->isActive())
+            return DISP_TYPE_INACTIVE;
+
+        if (fsObj->isEmpty<side>()) //always show not existing files/dirs/symlinks as empty
+            return DISP_TYPE_NORMAL;
+
+        DisplayType output = DISP_TYPE_NORMAL;
+        //mark directories and symlinks
+        struct GetRowType : public FSObjectVisitor
+        {
+            GetRowType(DisplayType& result) : result_(result) {}
+
+            virtual void visit(const FileMapping& fileObj) {}
+            virtual void visit(const SymLinkMapping& linkObj)
+            {
+                result_ = DISP_TYPE_SYMLINK;
+            }
+            virtual void visit(const DirMapping& dirObj)
+            {
+                result_ = DISP_TYPE_FOLDER;
+            }
+        private:
+            DisplayType& result_;
+        } getType(output);
+        fsObj->accept(getType);
+        return output;
+    }
+
     virtual size_t getRowCount() const
     {
         if (gridDataView_)
@@ -265,7 +333,7 @@ private:
                     switch (colType_)
                     {
                         case COL_TYPE_FULL_PATH:
-                            value = toWx(beforeLast(fileObj.getFullName<side>(), FILE_NAME_SEPARATOR));
+                            value = toWx(appendSeparator(beforeLast(fileObj.getBaseDirPf<side>() + fileObj.getObjRelativeName(), FILE_NAME_SEPARATOR)));
                             break;
                         case COL_TYPE_FILENAME: //filename
                             value = toWx(fileObj.getShortName<side>());
@@ -278,7 +346,7 @@ private:
                             break;
                         case COL_TYPE_SIZE: //file size
                             if (!fsObj_.isEmpty<side>())
-                                value = zen::toStringSep(fileObj.getFileSize<side>());
+                                value = zen::toGuiString(fileObj.getFileSize<side>());
                             break;
                         case COL_TYPE_DATE: //date
                             if (!fsObj_.isEmpty<side>())
@@ -295,7 +363,7 @@ private:
                     switch (colType_)
                     {
                         case COL_TYPE_FULL_PATH:
-                            value = toWx(beforeLast(linkObj.getFullName<side>(), FILE_NAME_SEPARATOR));
+                            value = toWx(appendSeparator(beforeLast(linkObj.getBaseDirPf<side>() + linkObj.getObjRelativeName(), FILE_NAME_SEPARATOR)));
                             break;
                         case COL_TYPE_FILENAME: //filename
                             value = toWx(linkObj.getShortName<side>());
@@ -325,7 +393,7 @@ private:
                     switch (colType_)
                     {
                         case COL_TYPE_FULL_PATH:
-                            value = toWx(dirObj.getFullName<side>());
+                            value = toWx(appendSeparator(beforeLast(dirObj.getBaseDirPf<side>() + dirObj.getObjRelativeName(), FILE_NAME_SEPARATOR)));
                             break;
                         case COL_TYPE_FILENAME:
                             value = toWx(dirObj.getShortName<side>());
@@ -338,7 +406,7 @@ private:
                             break;
                         case COL_TYPE_SIZE: //file size
                             if (!fsObj_.isEmpty<side>())
-                                value = _("<Directory>");
+                                value = _("<Folder>");
                             break;
                         case COL_TYPE_DATE: //date
                             if (!fsObj_.isEmpty<side>())
@@ -366,7 +434,18 @@ private:
 
     virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
     {
-        wxRect rectTmp = drawCellBorder(dc, rect);
+        wxRect rectTmp = rect;
+
+        //draw horizontal border if required
+        auto dispTp = getRowDisplayType(row);
+        if (dispTp == getRowDisplayType(row + 1) && dispTp != DISP_TYPE_NORMAL)
+        {
+            const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
+            wxDCPenChanger dummy2(dc, wxPen(colorGridLine, 1, wxSOLID));
+            dc.DrawLine(rect.GetBottomLeft(),  rect.GetBottomRight() + wxPoint(1, 0));
+            rectTmp.height -= 1;
+        }
+        //wxRect rectTmp = drawCellBorder(dc, rect);
 
         const bool isActive = [&]() -> bool
         {
@@ -436,6 +515,10 @@ private:
             rectTmp.width -= iconSize;
         }
 
+        std::unique_ptr<wxDCTextColourChanger> dummy3;
+        if (getRowDisplayType(row) != DISP_TYPE_NORMAL)
+            dummy3 = make_unique<wxDCTextColourChanger>(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
+
         //draw text
         if (static_cast<ColumnTypeRim>(colType) == COL_TYPE_SIZE && grid.GetLayoutDirection() != wxLayout_RightToLeft)
         {
@@ -462,9 +545,9 @@ private:
         if (static_cast<ColumnTypeRim>(colType) == COL_TYPE_FILENAME && iconMgr_)
             bestSize += CELL_BORDER + iconMgr_->iconBuffer.getSize();
 
-        bestSize += CELL_BORDER + dc.GetTextExtent(getValue(row, colType)).GetWidth();
+        bestSize += CELL_BORDER + dc.GetTextExtent(getValue(row, colType)).GetWidth() + CELL_BORDER;
 
-        return bestSize + CELL_BORDER + 1; //add additional right border + 1 pix for border line
+        return bestSize; // + 1 pix for cell border line -> not used anymore!
     }
 
     virtual wxString getColumnLabel(ColumnType colType) const
@@ -478,7 +561,7 @@ private:
             case COL_TYPE_REL_PATH:
                 return _("Relative path");
             case COL_TYPE_DIRECTORY:
-                return _("Directory");
+                return _("Base folder");
             case COL_TYPE_SIZE:
                 return _("Size");
             case COL_TYPE_DATE:
@@ -682,7 +765,7 @@ public:
     GridDataMiddle(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) :
         GridDataBase(grid),
         gridDataView_(gridDataView),
-        syncPreviewActive(true) {}
+        showSyncAction_(true) {}
 
     void onSelectBegin(const wxPoint& clientPos, size_t row, ColumnType colType)
     {
@@ -775,7 +858,7 @@ public:
         toolTip.hide(); //handle custom tooltip
     }
 
-    void setSyncPreviewActive(bool value) { syncPreviewActive = value; }
+    void showSyncAction(bool value) { showSyncAction_ = value; }
 
 private:
     virtual size_t getRowCount() const { return 0; /*if there are multiple grid components, only the first one will be polled for row count!*/ }
@@ -785,7 +868,7 @@ private:
         if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE)
         {
             if (const FileSystemObject* fsObj = getRawData(row))
-                return syncPreviewActive ? getSymbol(fsObj->getSyncOperation()) : getSymbol(fsObj->getCategory());
+                return showSyncAction_ ? getSymbol(fsObj->getSyncOperation()) : getSymbol(fsObj->getCategory());
         }
         return wxEmptyString;
     }
@@ -802,10 +885,10 @@ private:
         {
             case COL_TYPE_MIDDLE_VALUE:
             {
-                wxRect rectInside = drawCellBorder(dc, rect);
-
                 if (const FileSystemObject* fsObj = getRawData(row))
                 {
+                    wxRect rectInside = drawCellBorder(dc, rect);
+
                     //draw checkbox
                     wxRect checkBoxArea = rectInside;
                     checkBoxArea.SetWidth(CHECK_BOX_WIDTH);
@@ -822,7 +905,7 @@ private:
                     rectInside.x += CHECK_BOX_WIDTH;
 
                     //synchronization preview
-                    if (syncPreviewActive)
+                    if (showSyncAction_)
                     {
                         if (rowHighlighted && highlightBlock != BLOCKPOS_CHECK_BOX)
                             switch (highlightBlock)
@@ -864,7 +947,7 @@ private:
                 wxRect rectInside = drawColumnLabelBorder(dc, rect);
                 drawColumnLabelBackground(dc, rectInside, highlighted);
 
-                if (syncPreviewActive)
+                if (showSyncAction_)
                     dc.DrawLabel(wxEmptyString, GlobalResources::getImage(L"syncSmall"), rectInside, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
                 else
                     dc.DrawLabel(wxEmptyString, GlobalResources::getImage(L"compareSmall"), rectInside, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
@@ -887,7 +970,7 @@ private:
                 return COLOR_NOT_ACTIVE;
             else
             {
-                if (syncPreviewActive) //synchronization preview
+                if (showSyncAction_) //synchronization preview
                 {
                     switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
                     {
@@ -959,7 +1042,7 @@ private:
         if (rect.width > CHECK_BOX_WIDTH && rect.height > 0)
         {
             const FileSystemObject* const fsObj = getRawData(row);
-            if (fsObj && syncPreviewActive &&
+            if (fsObj && showSyncAction_ &&
                 fsObj->getSyncOperation() != SO_EQUAL) //in sync-preview equal files shall be treated as in cmp result, i.e. as full checkbox
             {
                 // cell:
@@ -987,7 +1070,7 @@ private:
     {
         if (const FileSystemObject* fsObj = getRawData(row))
         {
-            if (syncPreviewActive) //synchronization preview
+            if (showSyncAction_) //synchronization preview
             {
                 const wchar_t* imageName = [&]() -> const wchar_t*
                 {
@@ -1066,10 +1149,10 @@ private:
             toolTip.hide(); //if invalid row...
     }
 
-    virtual wxString getToolTip(ColumnType colType) const { return syncPreviewActive ? _("Synchronization Preview") : _("Comparison Result"); }
+    virtual wxString getToolTip(ColumnType colType) const { return showSyncAction_ ? _("Action") : _("Category"); }
 
     std::shared_ptr<const zen::GridView> gridDataView_;
-    bool syncPreviewActive;
+    bool showSyncAction_;
     std::unique_ptr<std::pair<size_t, BlockPosition>> highlight; //(row, block) current mouse highlight
     std::unique_ptr<std::pair<size_t, BlockPosition>> dragSelection; //(row, block)
     std::unique_ptr<wxBitmap> buffer; //avoid costs of recreating this temporal variable
@@ -1354,10 +1437,10 @@ void gridview::setNavigationMarker(Grid& grid,
 }
 
 
-void gridview::setSyncPreviewActive(Grid& grid, bool value)
+void gridview::showSyncAction(Grid& grid, bool value)
 {
     if (auto* provMiddle = dynamic_cast<GridDataMiddle*>(grid.getDataProvider(gridview::COMP_MIDDLE)))
-        provMiddle->setSyncPreviewActive(value);
+        provMiddle->showSyncAction(value);
     else
         assert(false);
 }

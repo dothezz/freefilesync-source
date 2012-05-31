@@ -157,7 +157,7 @@ bool zen::moveToRecycleBin(const Zstring& filename)  //throw FileError
         }
 
         throw FileError(shortMsg + L"\n\n" + L"Glib Error Code " + numberTo<std::wstring>(error->code) + /* L", " +
-                                          g_quark_to_string(error->domain) + */ L": " + utf8CvrtTo<std::wstring>(error->message));
+                                          g_quark_to_string(error->domain) + */ L": " + utfCvrtTo<std::wstring>(error->message));
     }
 #endif
     return true;

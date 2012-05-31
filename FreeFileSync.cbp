@@ -205,6 +205,7 @@
 		<Unit filename="lib\resolve_path.h" />
 		<Unit filename="lib\resources.cpp" />
 		<Unit filename="lib\resources.h" />
+		<Unit filename="lib\return_codes.h" />
 		<Unit filename="lib\shadow.cpp" />
 		<Unit filename="lib\shadow.h" />
 		<Unit filename="lib\soft_filter.h" />

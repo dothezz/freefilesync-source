@@ -7,8 +7,8 @@
 	<plural definition>n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>Iščem imenik %x...</target>
+<source>Searching for folder %x...</source>
+<target>Iskanje mape %x...</target>
 
 <source>Show in Explorer</source>
 <target>Prikaži v Raziskovalcu</target>
@@ -25,17 +25,20 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Avtomatizirana sinhronizacija</target>
 
+<source>Error</source>
+<target>Napaka</target>
+
 <source>Select alternate comparison settings</source>
 <target>Izberite alternativne nastavitve primerjanja</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Izberite nadomestne nastavitve sinhronizacije</target>
 
-<source>No filter selected</source>
-<target>Noben filter ni izbran</target>
-
 <source>Filter is active</source>
 <target>Filter je aktiven</target>
+
+<source>No filter selected</source>
+<target>Noben filter ni izbran</target>
 
 <source>Remove alternate settings</source>
 <target>Odstrani nadomestne nastavitve</target>
@@ -55,9 +58,6 @@
 <source>About</source>
 <target>O programu(1)</target>
 
-<source>Error</source>
-<target>Napaka</target>
-
 <source>Warning</source>
 <target>Pozor</target>
 
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Globalne nastavitve</target>
 
-<source>Synchronization Preview</source>
-<target>Predogled sinhronizacije</target>
+<source>Summary</source>
+<target>Povzetek</target>
 
 <source>Find</source>
 <target>Najdi</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Brskaj</target>
 
-<source>Invalid command line: %x</source>
-<target>Napačna ukazna vrstica: %x</target>
+<source>Invalid command line:</source>
+<target>Napačna ukazna vrstica:</target>
 
 <source>Info</source>
 <target>Info</target>
@@ -232,29 +232,29 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>Ime volumna %x ni del imena datoteke %y!</target>
 
-<source>Cannot find file %x.</source>
-<target>Ne morem najti datoteke %x.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Ne morem brati naslednje XML elemente:</target>
 
-<source>S&ave configuration...</source>
-<target>Shr&ani konfiguracijo...</target>
+<source>Cannot find file %x.</source>
+<target>Ne morem najti datoteke %x.</target>
 
-<source>&Load configuration...</source>
-<target>Na&loži konfiguracijo...</target>
+<source>&Open...</source>
+<target>&Odpri...</target>
+
+<source>&Save...</source>
+<target>&Shrani...</target>
 
 <source>&Quit</source>
 <target>&Zapri</target>
 
-<source>&File</source>
-<target>&Datoteka</target>
+<source>&Program</source>
+<target>&Program</target>
 
 <source>&Content</source>
 <target>&Vsebina</target>
 
-<source>&About...</source>
-<target>&O programu...</target>
+<source>&About</source>
+<target>&O programu</target>
 
 <source>&Help</source>
 <target>&Pomoč</target>
@@ -262,8 +262,8 @@
 <source>Usage:</source>
 <target>Uporaba:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. Izberite imenike za nadziranje</target>
+<source>1. Select folders to watch.</source>
+<target>1. Izberite mape za opazovanje</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Vnesite ukazno-vrstico.</target>
@@ -271,19 +271,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. Pritisnite 'Začni'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-Ukazna vrstica se izvrši vsakič ko:
-- vsi imeniki postanejo dostopni (npr. ob vstavitvi USB ključa)
-- so datoteke znotraj teh imenikov in podimenikov spremenjene
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>Da začnete uvozite datoteko .ffs_batch</target>
 
-<source>Directories to watch</source>
-<target>Imenika za nadzorovanje</target>
+<source>Folders to watch</source>
+<target>Mape za opazovanje</target>
 
 <source>Add folder</source>
 <target>Dodaj mapo</target>
@@ -294,17 +286,34 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Select a folder</source>
 <target>Izberite mapo</target>
 
+<source>Delay [seconds]</source>
+<target>Zakasnitev [sekunde]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Čas nedejavnosti med zadnjo zaznano spremembo in izvršitvijo ukaza</target>
+
 <source>Command line</source>
 <target>Ukazna vrstica</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Minimalen čas nedejavnosti [sekunde]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Čas nedejavnosti med zaznavanjem zadnje spremembe in izvršitvijo ukazne vrstice v sekundah</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+Ukaz se sproži če:
+- se spremenijo datoteke ali podmape
+- pridejo nove mape (npr. ob vstavitvi USB ključka)
+</target>
 
 <source>Start</source>
 <target>Začni</target>
+
+<source>&Retry</source>
+<target>&Ponovi</target>
+
+<source>Cancel</source>
+<target>Prekliči</target>
 
 <source>(Build: %x)</source>
 <target>(Izgradnja: %x)</target>
@@ -324,8 +333,8 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Waiting for missing directories...</source>
 <target>Čakam na manjkajoče imenike...</target>
 
-<source>A directory input field is empty.</source>
-<target>Vpisno polje za imenik je prazno.</target>
+<source>An input folder name is empty.</source>
+<target>Vhodno ime mape je prazno.</target>
 
 <source>Logging</source>
 <target>Beleženje</target>
@@ -411,8 +420,8 @@ Ukazna vrstica se izvrši vsakič ko:
 <source><Symlink></source>
 <target><Simbolična povezava></target>
 
-<source><Directory></source>
-<target><Imenik></target>
+<source><Folder></source>
+<target><Mapa></target>
 
 <source>Full path</source>
 <target>Polna pot</target>
@@ -423,8 +432,8 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Relative path</source>
 <target>Relativna pot</target>
 
-<source>Directory</source>
-<target>Imenik</target>
+<source>Base folder</source>
+<target>Osnovna mapa</target>
 
 <source>Size</source>
 <target>Velikost</target>
@@ -435,8 +444,11 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Extension</source>
 <target>Razširitev</target>
 
-<source>Comparison Result</source>
-<target>Rezultati primerjave</target>
+<source>Action</source>
+<target>Ukrep</target>
+
+<source>Category</source>
+<target>Kategorija</target>
 
 <source>Drag && drop</source>
 <target>Povleci && spusti</target>
@@ -444,14 +456,14 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Close progress dialog</source>
 <target>Zapri pogovorno okno z napredkom</target>
 
-<source>Shut down</source>
-<target>Ugasni</target>
+<source>Standby</source>
+<target>V pripravljenost</target>
 
 <source>Log off</source>
 <target>Odjavi</target>
 
-<source>Standby</source>
-<target>V pripravljenost</target>
+<source>Shut down</source>
+<target>Ugasni</target>
 
 <source>Hibernate</source>
 <target>Hibernacija</target>
@@ -459,14 +471,11 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>1. &Compare</source>
 <target>1. &Primerjaj</target>
 
-<source>2. &Synchronize...</source>
-<target>2. &Sinhroniziraj...</target>
+<source>2. &Synchronize</source>
+<target>2. &Sinhroniziraj</target>
 
 <source>&New</source>
 <target>&Novo</target>
-
-<source>&Program</source>
-<target>&Program</target>
 
 <source>&Language</source>
 <target>&Jezik</target>
@@ -495,8 +504,8 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>&Abort</source>
 <target>&Prekini</target>
 
-<source>Synchronize...</source>
-<target>Sinhroniziraj...</target>
+<source>Synchronize</source>
+<target>Sinhroniziraj</target>
 
 <source>Start synchronization</source>
 <target>Začni sinhronizacijo</target>
@@ -510,11 +519,11 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Swap sides</source>
 <target>Zamenjaj strani</target>
 
-<source>Save current configuration to file</source>
-<target>Shrani trenutno konfiguracijo v datoteko</target>
-
 <source>Load configuration from file</source>
 <target>Naloži konfiguracijo iz datoteke</target>
+
+<source>Save current configuration to file</source>
+<target>Shrani trenutno konfiguracijo v datoteko</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Zadnje uporabljene konfiguracije (pritisite DEL za odstranitev s seznama)</target>
@@ -525,17 +534,17 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Skrij filtrirane ali začasno izključene datoteke</target>
 
-<source>Number of files and directories that will be created</source>
-<target>Število datotek in imenikov, ki bodo ustvarjeni</target>
+<source>Number of files and folders that will be created</source>
+<target>Število datotek in map, ki bodo ustvarjene</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Število datotek, ki bodo prepisane</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>Število datotek in imenikov, ki bodo izbrisani</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Število datotek in map, ki bodo izbrisane</target>
 
 <source>Total amount of data that will be transferred</source>
-<target>Količina podatkov, ki bo prenešena</target>
+<target>Količina podatkov, ki bo prenesena</target>
 
 <source>Operation:</source>
 <target>Operacija:</target>
@@ -555,8 +564,8 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Batch job</source>
 <target>Paketno opravilo</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Ustvari paketno datoteko in avtomatiziraj sinhronizacijo. Da začnete v paketnem načinu preprosto dvokliknite to datoteko ali poženite ukaz: FreeFileSync.exe SyncJob.ffs_batch. To se lahko nastavi v vaš sistemski načrtovalec opravil.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Ustvari paketno datoteko za avtomatiziranje sinhronizacije. Dvokliknite to datoteko ali jo nastavite v razpored opravil vašega sistema: FreeFileSync.exe <ime opravila>.ffs_batch</target>
 
 <source>Help</source>
 <target>Pomoč</target>
@@ -582,20 +591,11 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Maximum number of log files:</source>
 <target>Maksimalno število datotek beleženja:</target>
 
-<source>Select log file directory:</source>
-<target>Izberite imenik za datoteko beleženja:</target>
+<source>Select folder to save log files:</source>
+<target>Izberite mapo za shranjevanje datotek beleženja:</target>
 
 <source>Batch settings</source>
 <target>Paketne nastavitve</target>
-
-<source>&Save</source>
-<target>&Shrani</target>
-
-<source>&Load</source>
-<target>&Naloži</target>
-
-<source>Cancel</source>
-<target>Prekliči</target>
 
 <source>Select variant:</source>
 <target>Izberite varianto:</target>
@@ -621,29 +621,23 @@ Ukazna vrstica se izvrši vsakič ko:
 <source>Configuration</source>
 <target>Konfiguracija</target>
 
-<source>Category</source>
-<target>Kategorija</target>
+<source>Item exists on left side only</source>
+<target>Element obstaja samo na levi strani</target>
 
-<source>Action</source>
-<target>Ukrep</target>
+<source>Item exists on right side only</source>
+<target>Element obstaja samo na desni strani</target>
 
-<source>File/folder exists on left side only</source>
-<target>Datoteka/mapa obstaja samo na levi strani</target>
+<source>Left side is newer</source>
+<target>Leva stran je novejša</target>
 
-<source>File/folder exists on right side only</source>
-<target>Datoteka/mapa obstaja samo na desni strani</target>
+<source>Right side is newer</source>
+<target>Desna stran je novejša</target>
 
-<source>Left file is newer</source>
-<target>Leva datoteka je novejša</target>
+<source>Items have different content</source>
+<target>Elementi imajo različno vsebino</target>
 
-<source>Right file is newer</source>
-<target>Desna datoteka je novejša</target>
-
-<source>Files have different content</source>
-<target>Datoteki imata različno vsebino</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Spor/datoteka ne more biti kategorizirana</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Spor/element ne more biti kategoriziran</target>
 
 <source>OK</source>
 <target>V redu</target>
@@ -720,9 +714,6 @@ enaka
 <source>&Ignore</source>
 <target>&Ignoriraj</target>
 
-<source>&Retry</source>
-<target>&Ponovi</target>
-
 <source>Do not show this dialog again</source>
 <target>Ne prikaži več tega pogovornega okna</target>
 
@@ -753,33 +744,6 @@ Samo datoteke, ki ustrezajo vsem nastavitvam filtra bodo sinhronizirane.
 Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 </target>
 
-<source>Hints:</source>
-<target>Namigi:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Vnesite relativna imena datotek ali imenikov ločenih s ';' ali novo vrstico.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Uporabite lahko tudi znake '*' in '?'.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Izključite datoteke neposredno na glavni mreži s kontekstnim menujem.</target>
-
-<source>Example</source>
-<target>Primer</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Vključi: *.doc;*.zip;*.exe
-Izključi: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Sinhroniziraj vse .doc, .zip in .exe datoteke, razen iz podmape "temp".</target>
-
 <source>Include</source>
 <target>Vključi</target>
 
@@ -801,8 +765,8 @@ Izključi: \stuff\temp\*
 <source>&Default</source>
 <target>&Privzeto</target>
 
-<source>Transactional file copy</source>
-<target>Transakcijsko kopiranje datotek</target>
+<source>Fail-safe file copy</source>
+<target>Kopiranje datotek varno pred odpovedjo</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Najprej zapisuj v začasno datoteko (*.ffs_tmp) in nato preimenuj. To zagotavlja dosledno stanje celo v primeru usodne napake.</target>
@@ -816,8 +780,8 @@ Izključi: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>Kopiraj dovoljenja dostopov datoteke</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Prenesi dovoljenja datotek in imenikov (Zahteva pravice skrbnika)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>Prenesi dovoljenja datotek in map (Zahteva pravice Skrbnika)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Obnovi skrite pogovore</target>
@@ -1133,11 +1097,11 @@ Izključi: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:</target>
 
-<source>- full file or directory name</source>
-<target>- polno ime datoteke ali imenika</target>
+<source>- full file or folder name</source>
+<target>- polno ime datoteke ali mape</target>
 
-<source>- directory part only</source>
-<target>- del, ki zajema samo imenike</target>
+<source>- folder part only</source>
+<target>- samo del glede mape</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- Duplikat z druge strani od %name</target>
@@ -1185,8 +1149,8 @@ Izključi: \stuff\temp\*
 <source>Versioning</source>
 <target>Ustvarjanje različič</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Premakni datoteke v časovno-označen podimenik</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>Premakni datoteke v časovno-ožigosano podmapo</target>
 
 <source>Files</source>
 <target>Datoteke</target>
@@ -1287,8 +1251,8 @@ Izključi: \stuff\temp\*
 <source>Cannot read directory %x.</source>
 <target>Ne morem prebrati imenika %x.</target>
 
-<source>Endless loop.</source>
-<target>Neskončno zazankano</target>
+<source>Detected endless directory recursion.</source>
+<target>Zaznana neskončna imeniška rekurzija</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Ne morem nastaviti privilegija %x.</target>
@@ -1314,14 +1278,11 @@ Izključi: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Nastavljanje privzetih smeri sinhronizacije: Stare datoteke bodo prepisane z novimi datotekami.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Datoteka ne vsebuje veljavne konfiguracije:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>To napako, da upoštevate mapo kot prazno, lahko ignorirate</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>To napako z obravnavanjem imenika kot praznega lahko ignorirate.</target>
-
-<source>Cannot find directory %x.</source>
-<target>Ne morem najti imenika %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Ne morem najti mape %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Imeniki so v odvisnosti! Bodite pozorni, ko nastavljate sinhronizacijska pravila:</target>
@@ -1353,20 +1314,20 @@ Izključi: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>Obe strani sta enaki</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Datoteke/mape se razlikujejo samo v atributih</target>
+<source>Items have different attributes</source>
+<target>Elementi imajo različne atribute</target>
 
-<source>Copy new file/folder to left</source>
-<target>Kopiraj novo datoteko/mapo na levo</target>
+<source>Copy new item to left</source>
+<target>Kopiraj nov element na levo</target>
 
-<source>Copy new file/folder to right</source>
-<target>Kopiraj novo datoteko/mapo na desno</target>
+<source>Copy new item to right</source>
+<target>Kopiraj nov element na desno</target>
 
-<source>Delete left file/folder</source>
-<target>Izbriši levo datoteko/mapo</target>
+<source>Delete left item</source>
+<target>Izbriši levi element</target>
 
-<source>Delete right file/folder</source>
-<target>Izbriši desno datoteko/mapo</target>
+<source>Delete right item</source>
+<target>Izbriše desni element</target>
 
 <source>Move file on left</source>
 <target>Premakni datoteko na levo</target>
@@ -1374,20 +1335,20 @@ Izključi: \stuff\temp\*
 <source>Move file on right</source>
 <target>Premakni datoteko na desno</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Prepiši levo datoteko/mapo s tisto na desni</target>
+<source>Overwrite left item</source>
+<target>Prepiši levi element</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Prepiši desno datoteko/mapo s tisto na levi</target>
+<source>Overwrite right item</source>
+<target>Prepiši desni element</target>
 
 <source>Do nothing</source>
 <target>Ne naredi ničesar</target>
 
-<source>Copy file attributes only to left</source>
-<target>Kopiraj atribute datoteke samo na levo</target>
+<source>Update attributes on left</source>
+<target>Posodobi atribute na levi</target>
 
-<source>Copy file attributes only to right</source>
-<target>Kopiraj atribute datoteke samo na desno</target>
+<source>Update attributes on right</source>
+<target>Posodobi atribute na desni</target>
 
 <source>Multiple...</source>
 <target>Večkratno...</target>
@@ -1440,11 +1401,11 @@ Izključi: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>Posodabljam atribute od %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Ime ciljnega imenika ne sme biti prazno!</target>
+<source>Target folder name must not be empty.</source>
+<target>Ime ciljne mape ne sme biti prazno.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Imenik za upravljanje z datotečnimi raličicami ni bil podan!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>Ime mape za ustvarjanje različic ne sme biti prazno.</target>
 
 <source>Source directory %x not found.</source>
 <target>Izvorni imenik %x ni bil najden.</target>
@@ -1473,8 +1434,8 @@ Izključi: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Koš ni na voljo za naslednje poti! Namesto tega bodo datoteke trajno izbrisane:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Imenik bo spremenjen, kar je del večkratnih parov map! Prosimo preglejte nastavitve sinhronizacije!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>Spremenjena bo mapa, ki je del večkratnih parov map. Prosim preglejte nastavitve sinhronizacije.</target>
 
 <source>Processing folder pair:</source>
 <target>Obdelujem par map:</target>

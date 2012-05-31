@@ -9,10 +9,11 @@
 
 #include <wx/help.h>
 #include "ffs_paths.h"
+#include <zen/zstring.h>
 
 namespace zen
 {
-void displayHelpEntry(const wxString& section = wxEmptyString);
+void displayHelpEntry(const wxString& section = wxEmptyString); //use '/' as path separator!
 
 
 
@@ -52,7 +53,7 @@ void displayHelpEntry(const wxString& section)
     if (section.empty())
         getHelpCtrl().DisplayContents();
     else
-        getHelpCtrl().DisplaySection(section);
+        getHelpCtrl().DisplaySection(replaceCpy(section, L'/', utfCvrtTo<std::wstring>(FILE_NAME_SEPARATOR)));
 }
 }
 

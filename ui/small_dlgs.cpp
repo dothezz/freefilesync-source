@@ -18,6 +18,7 @@
 #include <zen/build_info.h>
 #include <wx/wupdlock.h>
 #include <wx/msgdlg.h>
+#include <wx+/no_flicker.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/rtl.h>
 #include "../lib/help_provider.h"
@@ -58,11 +59,13 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
         //language name
         wxStaticText* staticTextLanguage = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, iter->languageName, wxDefaultPosition, wxDefaultSize, 0 );
         staticTextLanguage->Wrap(-1);
+        staticTextLanguage->SetForegroundColour(*wxBLACK); //accessibility: always set both foreground AND background colors!
         fgSizerTranslators->Add(staticTextLanguage, 0, wxALIGN_CENTER_VERTICAL);
 
         //translator name
         wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, iter->translatorName, wxDefaultPosition, wxDefaultSize, 0 );
         staticTextTranslator->Wrap(-1);
+        staticTextTranslator->SetForegroundColour(*wxBLACK); //accessibility: always set both foreground AND background colors!
         fgSizerTranslators->Add(staticTextTranslator, 0, wxALIGN_CENTER_VERTICAL);
     }
 
@@ -90,10 +93,10 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     //m_animationControl1->Play();
 
     m_buttonOkay->SetFocus();
-    Fit();
+    Fit(); //child-element widths have changed: image was set
 
 #ifdef FFS_WIN
-    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //-> put *after* creating credit control
 #endif
 }
 
@@ -117,7 +120,7 @@ public:
 private:
     void OnClose       (  wxCloseEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnCancel      (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnHelp        (wxCommandEvent& event);
+    void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Exclude Items.html"); }
     void OnDefault     (wxCommandEvent& event);
     void OnApply       (wxCommandEvent& event);
     void OnUpdateChoice(wxCommandEvent& event) { updateGui(); }
@@ -172,8 +175,7 @@ FilterDlg::FilterDlg(wxWindow* parent,
 
     setFilter(filter);
 
-    m_panel13->Hide();
-    m_button10->SetFocus();
+    m_buttonOk->SetFocus();
 
     //adapt header for global/local dialog
     //    if (isGlobalFilter_)
@@ -266,17 +268,6 @@ FilterConfig FilterDlg::getFilter() const
 }
 
 
-void FilterDlg::OnHelp(wxCommandEvent& event)
-{
-    m_bpButtonHelp->Hide();
-    m_panel13->Show();
-    Fit();
-    Refresh();
-
-    event.Skip();
-}
-
-
 void FilterDlg::OnDefault(wxCommandEvent& event)
 {
     if (isGlobalFilter_)
@@ -359,6 +350,8 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
         m_checkBoxDeleteBothSides->SetValue(true);
     }
 
+    m_textCtrlFileList->SetMaxLength(0); //allow large entries!
+
     updateGui();
 
     m_buttonOK->SetFocus();
@@ -367,6 +360,8 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 
 void DeleteDialog::updateGui()
 {
+    wxWindowUpdateLocker dummy(m_panelHeader); //avoid display distortion
+
     const std::pair<wxString, int> delInfo = zen::deleteFromGridAndHDPreview(
                                                  rowsToDeleteOnLeft,
                                                  rowsToDeleteOnRight,
@@ -376,20 +371,22 @@ void DeleteDialog::updateGui()
     {
         header = _P("Do you really want to move the following object to the Recycle Bin?",
                     "Do you really want to move the following %x objects to the Recycle Bin?", delInfo.second);
-        m_bitmap12->SetBitmap(GlobalResources::getImage(wxT("recycler")));
+        m_bitmap12->SetBitmap(GlobalResources::getImage(L"recycler"));
     }
     else
     {
         header = _P("Do you really want to delete the following object?",
                     "Do you really want to delete the following %x objects?", delInfo.second);
-        m_bitmap12->SetBitmap(GlobalResources::getImage(wxT("deleteFile")));
+        m_bitmap12->SetBitmap(GlobalResources::getImage(L"deleteFile"));
     }
-    replace(header, L"%x", toStringSep(delInfo.second));
+    replace(header, L"%x", toGuiString(delInfo.second));
     m_staticTextHeader->SetLabel(header);
 
     const wxString& filesToDelete = delInfo.first;
-    m_textCtrlMessage->SetValue(filesToDelete);
+    m_textCtrlFileList->ChangeValue(filesToDelete);
 
+    Fit(); //child-element widths have changed: image was set
+    m_panelHeader->Layout();
     Layout();
 }
 
@@ -435,7 +432,7 @@ class SyncPreviewDlg : public SyncPreviewDlgGenerated
 public:
     SyncPreviewDlg(wxWindow* parent,
                    const wxString& variantName,
-                   const zen::SyncStatistics& statistics,
+                   const zen::SyncStatistics& st,
                    bool& dontShowAgain);
 private:
     void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
@@ -448,7 +445,7 @@ private:
 
 SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
                                const wxString& variantName,
-                               const zen::SyncStatistics& statistics,
+                               const SyncStatistics& st,
                                bool& dontShowAgain) :
     SyncPreviewDlgGenerated(parent),
     m_dontShowAgain(dontShowAgain)
@@ -457,27 +454,33 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    using zen::toStringSep;
-
-    m_buttonStartSync->setBitmapFront(GlobalResources::getImage(wxT("startSync")));
-
-    m_bitmapCreate->SetBitmap(mirrorIfRtl(GlobalResources::getImage(L"create")));
-    m_bitmapUpdate->SetBitmap(mirrorIfRtl(GlobalResources::getImage(L"update")));
-    m_bitmapDelete->SetBitmap(mirrorIfRtl(GlobalResources::getImage(L"delete")));
-    m_bitmapData  ->SetBitmap(mirrorIfRtl(GlobalResources::getImage(L"data")));
-
+    m_buttonStartSync->setBitmapFront(GlobalResources::getImage(L"startSync"));
     m_staticTextVariant->SetLabel(variantName);
-    m_textCtrlData->SetValue(zen::filesizeToShortString(statistics.getDataToProcess()));
-
-    m_textCtrlCreateL->SetValue(toStringSep(statistics.getCreate<LEFT_SIDE>()));
-    m_textCtrlUpdateL->SetValue(toStringSep(statistics.getUpdate<LEFT_SIDE>()));
-    m_textCtrlDeleteL->SetValue(toStringSep(statistics.getDelete<LEFT_SIDE>()));
-
-    m_textCtrlCreateR->SetValue(toStringSep(statistics.getCreate<RIGHT_SIDE>()));
-    m_textCtrlUpdateR->SetValue(toStringSep(statistics.getUpdate<RIGHT_SIDE>()));
-    m_textCtrlDeleteR->SetValue(toStringSep(statistics.getDelete<RIGHT_SIDE>()));
-
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
+
+    //update preview of item count and bytes to be transferred:
+    setText(*m_staticTextData, filesizeToShortString(st.getDataToProcess()));
+    if (st.getDataToProcess() == 0)
+        m_bitmapData->SetBitmap(greyScale(GlobalResources::getImage(L"data")));
+    else
+        m_bitmapData->SetBitmap(GlobalResources::getImage(L"data"));
+
+    auto setValue = [](wxStaticText& txtControl, int value, wxStaticBitmap& bmpControl, const wchar_t* bmpName)
+    {
+        setText(txtControl, toGuiString(value));
+
+        if (value == 0)
+            bmpControl.SetBitmap(greyScale(mirrorIfRtl(GlobalResources::getImage(bmpName))));
+        else
+            bmpControl.SetBitmap(mirrorIfRtl(GlobalResources::getImage(bmpName)));
+    };
+
+    setValue(*m_staticTextCreateLeft,  st.getCreate<LEFT_SIDE >(), *m_bitmapCreateLeft,  L"createLeftSmall");
+    setValue(*m_staticTextUpdateLeft,  st.getUpdate<LEFT_SIDE >(), *m_bitmapUpdateLeft,  L"updateLeftSmall");
+    setValue(*m_staticTextDeleteLeft,  st.getDelete<LEFT_SIDE >(), *m_bitmapDeleteLeft,  L"deleteLeftSmall");
+    setValue(*m_staticTextCreateRight, st.getCreate<RIGHT_SIDE>(), *m_bitmapCreateRight, L"createRightSmall");
+    setValue(*m_staticTextUpdateRight, st.getUpdate<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"updateRightSmall");
+    setValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"deleteRightSmall");
 
     m_buttonStartSync->SetFocus();
     Fit();
@@ -515,17 +518,16 @@ private:
     void OnOkay(wxCommandEvent& event);
     void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnShowHelp(wxCommandEvent& event);
+    void OnShowHelp(wxCommandEvent& event) { displayHelpEntry(L"html/Comparison Settings.html"); }
 
-    void OnTimeSize(wxCommandEvent& event) { m_radioBtnSizeDate->SetValue(true); }
-    //void OnFilesize(wxCommandEvent& event) { m_radioBtnSize    ->SetValue(true); }
-    void OnContent (wxCommandEvent& event) { m_radioBtnContent ->SetValue(true); }
+    void OnTimeSize(wxCommandEvent& event) { m_radioBtnSizeDate->SetValue(true); updateGui(); }
+    void OnContent (wxCommandEvent& event) { m_radioBtnContent ->SetValue(true); updateGui(); }
 
     void OnTimeSizeDouble(wxMouseEvent& event);
     void OnFilesizeDouble(wxMouseEvent& event);
     void OnContentDouble(wxMouseEvent& event);
 
-    void updateView();
+    void updateGui();
 
     CompConfig& cmpConfigOut;
 
@@ -550,10 +552,7 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
     //move dialog up so that compare-config button and first config-variant are on same level
     //   Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
 
-    m_bpButtonHelp   ->SetBitmapLabel(GlobalResources::getImage(wxT("help")));
-    m_bitmapByTime   ->SetBitmap     (GlobalResources::getImage(wxT("clock")));
-    //m_bitmapBySize   ->SetBitmap     (GlobalResources::getImage(wxT("size")));
-    m_bitmapByContent->SetBitmap     (GlobalResources::getImage(wxT("cmpByContent")));
+    m_bpButtonHelp   ->SetBitmapLabel(GlobalResources::getImage(L"help"));
 
     switch (cmpConfig.compareVar)
     {
@@ -569,13 +568,25 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
 
     setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, cmpConfig.handleSymlinks);
 
-    updateView();
-}
-
-void CompareCfgDialog::updateView()
-{
+    updateGui();
     Fit();
 }
+
+
+void CompareCfgDialog::updateGui()
+{
+    auto setBitmap = [](wxStaticBitmap& bmpCtrl, bool active, const wxBitmap& bmp)
+    {
+        if (active)
+            bmpCtrl.SetBitmap(bmp);
+        else
+            bmpCtrl.SetBitmap(greyScale(bmp));
+    };
+
+    setBitmap(*m_bitmapByTime,    m_radioBtnSizeDate->GetValue(), GlobalResources::getImage(L"clock"));
+    setBitmap(*m_bitmapByContent, m_radioBtnContent ->GetValue(), GlobalResources::getImage(L"cmpByContent"));
+}
+
 
 void CompareCfgDialog::OnOkay(wxCommandEvent& event)
 {
@@ -603,16 +614,6 @@ void CompareCfgDialog::OnContentDouble(wxMouseEvent& event)
     wxCommandEvent dummy;
     OnContent(dummy);
     OnOkay(dummy);
-}
-
-
-void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
-{
-#ifdef FFS_WIN
-    zen::displayHelpEntry(wxT("html\\ComparisonSettings.html"));
-#elif defined FFS_LINUX
-    zen::displayHelpEntry(wxT("html/ComparisonSettings.html"));
-#endif
 }
 
 
@@ -673,8 +674,8 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     set(globalSettings.gui.externelApplications);
 
     const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + wxT("\n\n") +
-                             wxT("%name   \t") + _("- full file or directory name") + wxT("\n") +
-                             wxT("%dir        \t") + _("- directory part only") + wxT("\n") +
+                             wxT("%name   \t") + _("- full file or folder name") + wxT("\n") +
+                             wxT("%dir        \t") + _("- folder part only") + wxT("\n") +
                              wxT("%nameCo \t") + _("- Other side's counterpart to %name") + wxT("\n") +
                              wxT("%dirCo   \t") + _("- Other side's counterpart to %dir");
 
@@ -768,10 +769,11 @@ xmlAccess::ExternalApps GlobalSettingsDlg::getExtApp()
     xmlAccess::ExternalApps output;
     for (int i = 0; i < m_gridCustomCommand->GetNumberRows(); ++i)
     {
-        auto entry = std::make_pair(m_gridCustomCommand->GetCellValue(i, 0),  //description
-                                    m_gridCustomCommand->GetCellValue(i, 1)); //commandline
-        if (!entry.first.empty() || !entry.second.empty())
-            output.push_back(entry);
+        auto description = copyStringTo<std::wstring>(m_gridCustomCommand->GetCellValue(i, 0));
+        auto commandline = copyStringTo<std::wstring>(m_gridCustomCommand->GetCellValue(i, 1));
+
+        if (!description.empty() || !commandline.empty())
+            output.push_back(std::make_pair(description, commandline));
     }
     return output;
 }
@@ -869,7 +871,7 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
                         LOCALE_IFIRSTDAYOFWEEK |               // first day of week specifier, 0-6, 0=Monday, 6=Sunday
                         LOCALE_RETURN_NUMBER,                  //__in   LCTYPE LCType,
                         reinterpret_cast<LPTSTR>(&firstDayOfWeek),      //__out  LPTSTR lpLCData,
-                        sizeof(firstDayOfWeek) / sizeof(TCHAR)) != 0 && //__in   int cchData
+                        sizeof(firstDayOfWeek) / sizeof(TCHAR)) > 0 && //__in   int cchData
         firstDayOfWeek == 6)
         style |= wxCAL_SUNDAY_FIRST;
     else //default

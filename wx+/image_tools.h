@@ -53,9 +53,9 @@ void move(wxImage& img, int up, int left)
 inline
 wxBitmap greyScale(const wxBitmap& bmp)
 {
-    wxImage output = bmp.ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
+    wxImage output = bmp.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3); //treat all channels equally!
     //wxImage output = bmp.ConvertToImage().ConvertToGreyscale();
-    adjustBrightness(output, 170);
+    adjustBrightness(output, 160);
     return output;
 }
 

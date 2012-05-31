@@ -7,8 +7,8 @@
 	<plural definition>0</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>디렉토리 %x 검색 중...</target>
+<source>Searching for folder %x...</source>
+<target>폴더 %x 검색 중...</target>
 
 <source>Show in Explorer</source>
 <target>탐색기에 표시</target>
@@ -25,17 +25,20 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>실시간 동기화 - 자동 동기화</target>
 
+<source>Error</source>
+<target>오류</target>
+
 <source>Select alternate comparison settings</source>
 <target>대체 비교 설정 선택</target>
 
 <source>Select alternate synchronization settings</source>
 <target>대체 동기화 설정 선택</target>
 
-<source>No filter selected</source>
-<target>선택한 필터가 없음</target>
-
 <source>Filter is active</source>
 <target>필터 활성화</target>
+
+<source>No filter selected</source>
+<target>선택한 필터가 없음</target>
 
 <source>Remove alternate settings</source>
 <target>대체설정 제거</target>
@@ -55,9 +58,6 @@
 <source>About</source>
 <target>상세 정보</target>
 
-<source>Error</source>
-<target>오류</target>
-
 <source>Warning</source>
 <target>경고</target>
 
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>전체 설정</target>
 
-<source>Synchronization Preview</source>
-<target>동기화 미리보기</target>
+<source>Summary</source>
+<target>개요</target>
 
 <source>Find</source>
 <target>검색</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>찾아보기</target>
 
-<source>Invalid command line: %x</source>
-<target>잘못된 명령줄 : %x</target>
+<source>Invalid command line:</source>
+<target>잘못된 명령줄 :</target>
 
 <source>Info</source>
 <target>정보</target>
@@ -229,22 +229,22 @@
 <source>Cannot read the following XML elements:</source>
 <target>다음 XML 요소를 읽을 수 없습니다 :</target>
 
-<source>S&ave configuration...</source>
-<target>설정 저장</target>
+<source>&Open...</source>
+<target>열기(&O)</target>
 
-<source>&Load configuration...</source>
-<target>설정 로드</target>
+<source>&Save...</source>
+<target>저장(&S)</target>
 
 <source>&Quit</source>
-<target>종료</target>
+<target>종료(&Q)</target>
 
-<source>&File</source>
-<target>파일(&F)</target>
+<source>&Program</source>
+<target>프로그램(&P)</target>
 
 <source>&Content</source>
-<target>도움말 내용</target>
+<target>도움말 내용(&C)</target>
 
-<source>&About...</source>
+<source>&About</source>
 <target>상세 정보(&A)</target>
 
 <source>&Help</source>
@@ -253,8 +253,8 @@
 <source>Usage:</source>
 <target>사용 :</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. 모니터 대상이 될 디렉토리를 선택하세요.</target>
+<source>1. Select folders to watch.</source>
+<target>1. 열어 볼 폴더를 선택하세요.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. 명령줄을 입력하세요.</target>
@@ -262,19 +262,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. '시작'을 누르세요.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-명령줄은 다음과 같은 경우에 매번 실행 됩니다:
-- 모든 디렉토리가 사용 가능할 경우 (예 : USB 스틱 삽입시) 
-- 해당 디렉토리 또는 서브디렉토리 내의 파일이 변경될 경우
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>시작하려면 .ffs_batch file (일괄 파일)만 가져오면 됩니다.</target>
 
-<source>Directories to watch</source>
-<target>감시 대상 디렉토리</target>
+<source>Folders to watch</source>
+<target>열어 볼 폴더</target>
 
 <source>Add folder</source>
 <target>폴더 추가</target>
@@ -285,17 +277,34 @@ The command line is executed each time:
 <source>Select a folder</source>
 <target>폴더 선택</target>
 
+<source>Delay [seconds]</source>
+<target>지연 [초]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>마지막으로 감지된 변화와 명령 실행 간의 유휴 시간</target>
+
 <source>Command line</source>
 <target>명령줄(커맨드라인)</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>최소 대기시간 [초 단위]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>마지막 변경내용 감지로부터 다음 명령줄 실행까지 대기시간 [초 단위]</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+명령은 다음과 경우에 실행됩니다 :
+- 파일이나 하위 폴더 변경 시
+- 새 폴더가 생겼을 시 (예 : USB 스틱 삽입)
+</target>
 
 <source>Start</source>
 <target>시작</target>
+
+<source>&Retry</source>
+<target>다시 시도(&R)</target>
+
+<source>Cancel</source>
+<target>취소</target>
 
 <source>(Build: %x)</source>
 <target>(빌드: %x)</target>
@@ -315,8 +324,8 @@ The command line is executed each time:
 <source>Waiting for missing directories...</source>
 <target>누락 디렉토리 대기 중...</target>
 
-<source>A directory input field is empty.</source>
-<target>디렉토리 입력 필드가 비어 있습니다.</target>
+<source>An input folder name is empty.</source>
+<target>입력 폴더 이름이 비어 있습니다.</target>
 
 <source>Logging</source>
 <target>로깅</target>
@@ -402,8 +411,8 @@ The command line is executed each time:
 <source><Symlink></source>
 <target><심링크></target>
 
-<source><Directory></source>
-<target><디렉토리></target>
+<source><Folder></source>
+<target><폴더></target>
 
 <source>Full path</source>
 <target>전체 경로</target>
@@ -414,8 +423,8 @@ The command line is executed each time:
 <source>Relative path</source>
 <target>대상 경로</target>
 
-<source>Directory</source>
-<target>디렉토리</target>
+<source>Base folder</source>
+<target>기본 폴더</target>
 
 <source>Size</source>
 <target>크기</target>
@@ -426,8 +435,11 @@ The command line is executed each time:
 <source>Extension</source>
 <target>확장자</target>
 
-<source>Comparison Result</source>
-<target>비교 결과</target>
+<source>Action</source>
+<target>실행</target>
+
+<source>Category</source>
+<target>카테고리</target>
 
 <source>Drag && drop</source>
 <target>드래그 && 드랍 (마우스로 파일 끌어다 놓기)</target>
@@ -435,14 +447,14 @@ The command line is executed each time:
 <source>Close progress dialog</source>
 <target>프로그레스 다이얼로그 (진행창) 닫기</target>
 
-<source>Shut down</source>
-<target>종료</target>
+<source>Standby</source>
+<target>대기</target>
 
 <source>Log off</source>
 <target>로그오프</target>
 
-<source>Standby</source>
-<target>대기</target>
+<source>Shut down</source>
+<target>종료</target>
 
 <source>Hibernate</source>
 <target>최대절전모드</target>
@@ -450,14 +462,11 @@ The command line is executed each time:
 <source>1. &Compare</source>
 <target>1. 비교</target>
 
-<source>2. &Synchronize...</source>
+<source>2. &Synchronize</source>
 <target>2. 동기화</target>
 
 <source>&New</source>
 <target>신규 작업</target>
-
-<source>&Program</source>
-<target>프로그램(&P)</target>
 
 <source>&Language</source>
 <target>언어 선택(&L)</target>
@@ -486,7 +495,7 @@ The command line is executed each time:
 <source>&Abort</source>
 <target>작업 중지(&A)</target>
 
-<source>Synchronize...</source>
+<source>Synchronize</source>
 <target>동  기  화</target>
 
 <source>Start synchronization</source>
@@ -501,11 +510,11 @@ The command line is executed each time:
 <source>Swap sides</source>
 <target>양측 위치 바꾸기</target>
 
-<source>Save current configuration to file</source>
-<target>현재 설정을 파일로 저장</target>
-
 <source>Load configuration from file</source>
 <target>외부 파일로부터 설정 로드</target>
+
+<source>Save current configuration to file</source>
+<target>현재 설정을 파일로 저장</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>마지막으로 사용한 설정 (DEL 키를 누르면 리스트에서 삭제)</target>
@@ -516,14 +525,14 @@ The command line is executed each time:
 <source>Hide filtered or temporarily excluded files</source>
 <target>필터링 되거나 임시 제외될 파일 숨기기</target>
 
-<source>Number of files and directories that will be created</source>
-<target>생성될 파일 및 디렉토리 개수</target>
+<source>Number of files and folders that will be created</source>
+<target>생성될 파일 및 폴더 ​​개수</target>
 
 <source>Number of files that will be overwritten</source>
 <target>덮어 씌어질 파일 개수</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>삭제될 파일 및 디렉토리 개수</target>
+<source>Number of files and folders that will be deleted</source>
+<target>삭제될 파일 및 폴더 ​​개수</target>
 
 <source>Total amount of data that will be transferred</source>
 <target>전송하게 될 전체 데이터 용량</target>
@@ -546,8 +555,8 @@ The command line is executed each time:
 <source>Batch job</source>
 <target>일괄 작업</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>일괄 파일 생성 및 자동 동기화. 배치모드 시작은 본 파일을 더블클릭하거나 다음 명령을 실행 : FreeFileSync.exe SyncJob.ffs_batch. 이 작업은 운영체제 작업관리 기능에서도 예약 가능합니다.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>자동 동기화 작업을 위한 일괄 파일을 만듭니다. 본 파일을 더블 클릭하거나 시스템 태스크 플래너에 다음과 같이 예약하세요 : FreeFileSync.exe <job name>.ffs_batch</target>
 
 <source>Help</source>
 <target>도움말</target>
@@ -573,20 +582,11 @@ The command line is executed each time:
 <source>Maximum number of log files:</source>
 <target>최대 로그파일 개수 :</target>
 
-<source>Select log file directory:</source>
-<target>로그파일 디렉토리 선택 :</target>
+<source>Select folder to save log files:</source>
+<target>로그 파일을 저장할 폴더를 선택 :</target>
 
 <source>Batch settings</source>
 <target>일괄 설정</target>
-
-<source>&Save</source>
-<target>저장(&S)</target>
-
-<source>&Load</source>
-<target>로드(&L)</target>
-
-<source>Cancel</source>
-<target>취소</target>
 
 <source>Select variant:</source>
 <target>옵션 선택 :</target>
@@ -612,29 +612,23 @@ The command line is executed each time:
 <source>Configuration</source>
 <target>구성 설정</target>
 
-<source>Category</source>
-<target>카테고리</target>
+<source>Item exists on left side only</source>
+<target>항목이 좌측에만 존재합니다.</target>
 
-<source>Action</source>
-<target>실행</target>
+<source>Item exists on right side only</source>
+<target>항목이 우측에만 존재합니다.</target>
 
-<source>File/folder exists on left side only</source>
-<target>파일/폴더가 좌측에만 존재</target>
+<source>Left side is newer</source>
+<target>좌측이 더 신규입니다.</target>
 
-<source>File/folder exists on right side only</source>
-<target>파일/폴더가 우측에만 존재</target>
+<source>Right side is newer</source>
+<target>우측이 더 신규입니다.</target>
 
-<source>Left file is newer</source>
-<target>좌측 파일이 더 최신</target>
+<source>Items have different content</source>
+<target>항목 내용이 서로 다릅니다.</target>
 
-<source>Right file is newer</source>
-<target>우측 파일이 더 최신</target>
-
-<source>Files have different content</source>
-<target>파일 내용이 다름</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>충돌/파일 분류 불가능</target>
+<source>Conflict/item cannot be categorized</source>
+<target>충돌 / 항목을 분류할 수 없음</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -711,9 +705,6 @@ is the same
 <source>&Ignore</source>
 <target>무시(&I)</target>
 
-<source>&Retry</source>
-<target>다시 시도(&R)</target>
-
 <source>Do not show this dialog again</source>
 <target>다음부터 표시하지 않음</target>
 
@@ -744,33 +735,6 @@ Note: File names must be relative to base directories!
 참고 : 파일 이름은 기본 디렉토리와 상응해야 합니다!
 </target>
 
-<source>Hints:</source>
-<target>힌트 :</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. 관련 파일이나 디렉토리 이름을 ';'로 구분하거나,  줄을 바꿔 입력하세요.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. 와일드카드 문자 '*' 및 '?' 을 사용합니다.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. 컨텍스트 메뉴에서 직접 파일을 제외합니다.</target>
-
-<source>Example</source>
-<target>보기/예</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-포함 : *.doc;*.zip;*.exe
-제외 : \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>서브폴더 "temp" 에 있는 파일들은 제외하고, 이외 모든 .doc, .zip, .exe 확장자 파일 동기화</target>
-
 <source>Include</source>
 <target>포함</target>
 
@@ -792,8 +756,8 @@ Exclude: \stuff\temp\*
 <source>&Default</source>
 <target>기본 설정/값(&D)</target>
 
-<source>Transactional file copy</source>
-<target>트랜잭션 파일 복사</target>
+<source>Fail-safe file copy</source>
+<target>실패 - 안전 파일 복사</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>임시 파일 (*.ffs_tmp)로 우선 작성 후, 파일명을 변경합니다. 이러면 치명적인 오류가 발생하더라도 일관된 상태를 보장할 수 있습니다.</target>
@@ -807,8 +771,8 @@ Exclude: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>파일 접근 권한 복사</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>파일 및 디렉토리 권한 전송 (관리자 권한이 필요함)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>파일 및 폴더 사용 권한 전송 (관리자 권한 필요)</target>
 
 <source>Restore hidden dialogs</source>
 <target>숨겨진 대화창 복원</target>
@@ -1112,11 +1076,11 @@ Exclude: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>외부 응용 프로그램을 Context Menu에 통합. 다음 매크로가 사용 가능합니다 :</target>
 
-<source>- full file or directory name</source>
-<target>- 전체 파일 또는 디렉토리 이름</target>
+<source>- full file or folder name</source>
+<target>- 전체 파일 또는 폴더 이름</target>
 
-<source>- directory part only</source>
-<target>- 디렉토리 부분만</target>
+<source>- folder part only</source>
+<target>- 폴더 부분만</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- %name 의 반대측 대상</target>
@@ -1158,8 +1122,8 @@ Exclude: \stuff\temp\*
 <source>Versioning</source>
 <target>버저닝</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>파일을 타임스탬프 된 서브 폴더로 이동</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>시간 기록이 남는 하위 폴더로 파일 이동</target>
 
 <source>Files</source>
 <target>파일</target>
@@ -1251,8 +1215,8 @@ Exclude: \stuff\temp\*
 <source>Cannot read directory %x.</source>
 <target>디렉토리 %x 을(를) 읽을 수 없습니다.</target>
 
-<source>Endless loop.</source>
-<target>무한 루프</target>
+<source>Detected endless directory recursion.</source>
+<target>삭제된 무한 디렉토리 재귀(반복)</target>
 
 <source>Cannot set privilege %x.</source>
 <target>권한 %x 을(를) 설정할 수 없습니다.</target>
@@ -1278,14 +1242,11 @@ Exclude: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>기본값 동기화 방향 설정 : 이전 파일들은 신규 파일들로 덮어 쓰여집니다.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>이 파일은 유효한 설정 값을 갖고 있지 않습니다 :</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>폴더를 빈 상태로 가정할 경우, 이 오류는 무시될 수 있습니다.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>디렉토리가 비었다는 오류는 무시 가능합니다.</target>
-
-<source>Cannot find directory %x.</source>
-<target>디렉토리 %x 을(를) 찾을 수 없습니다.</target>
+<source>Cannot find folder %x.</source>
+<target>폴더 %x 을(를) 찾을 수 없습니다.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>디렉토리가 의존 관계에 있습니다. 동기화 규칙 설정시 주의하십시오.</target>
@@ -1317,20 +1278,20 @@ Exclude: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>양측이 같음</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>파일/폴더가 속성만 다름</target>
+<source>Items have different attributes</source>
+<target>항목의 속성이 서로 다릅니다.</target>
 
-<source>Copy new file/folder to left</source>
-<target>신규 파일/폴더를 좌측으로 복사</target>
+<source>Copy new item to left</source>
+<target>좌측에 새 항목 복사</target>
 
-<source>Copy new file/folder to right</source>
-<target>신규 파일/폴더를 우측으로 복사</target>
+<source>Copy new item to right</source>
+<target>우측에 새 항목 복사</target>
 
-<source>Delete left file/folder</source>
-<target>남은 파일/폴더 삭제</target>
+<source>Delete left item</source>
+<target>좌측 항목 삭제</target>
 
-<source>Delete right file/folder</source>
-<target>우측 파일/폴더 삭제</target>
+<source>Delete right item</source>
+<target>우측 항목 삭제</target>
 
 <source>Move file on left</source>
 <target>좌측 파일 이동</target>
@@ -1338,20 +1299,20 @@ Exclude: \stuff\temp\*
 <source>Move file on right</source>
 <target>우측 파일 이동</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>우측 파일/폴더로 좌측 파일/폴더 덮어쓰기</target>
+<source>Overwrite left item</source>
+<target>좌측 항목 덮어쓰기</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>좌측 파일/폴더로 우측 파일/폴더 덮어쓰기</target>
+<source>Overwrite right item</source>
+<target>우측 항목 덮어쓰기</target>
 
 <source>Do nothing</source>
 <target>아무 것도 하지 않음</target>
 
-<source>Copy file attributes only to left</source>
-<target>파일 속성만 좌측으로 복사</target>
+<source>Update attributes on left</source>
+<target>좌측 속성 업데이트</target>
 
-<source>Copy file attributes only to right</source>
-<target>파일 속성만 우측으로 복사</target>
+<source>Update attributes on right</source>
+<target>우측 속성 업데이트</target>
 
 <source>Multiple...</source>
 <target>다중처리 (멀티플) 작업...</target>
@@ -1404,11 +1365,11 @@ Exclude: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>%x 속성 업데이트 중</target>
 
-<source>Target directory name must not be empty!</source>
-<target>대상 디렉토리 이름이 비어서는 안 됩니다!</target>
+<source>Target folder name must not be empty.</source>
+<target>대상 폴더 이름은 비워둘 수 없습니다.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>파일 버저닝을 위한 디렉토리가 제공되지 않았습니다!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>파일 버저닝을 위한 폴더 이름은 비워둘 수 없습니다.</target>
 
 <source>Source directory %x not found.</source>
 <target>소스 디렉토리 %x 을(를) 찾을 수 없습니다.</target>
@@ -1437,8 +1398,8 @@ Exclude: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>다음 경로로는 휴지통을 사용할 수 없습니다! 대신 파일을 영구적으로 삭제합니다 :</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>다중폴더 페어의 일부인 디렉토리가 변경됩니다. 동기화 설정을 재검토해 주세요.</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>다중 폴더 페어의 일부인 폴더가 변경됩니다. 동기화 설정을 재검토하세요.</target>
 
 <source>Processing folder pair:</source>
 <target>폴더 페어 처리 중 :</target>

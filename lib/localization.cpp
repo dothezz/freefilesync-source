@@ -90,21 +90,21 @@ FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(
 
     for (lngfile::TranslationMap::const_iterator i = transInput.begin(); i != transInput.end(); ++i)
     {
-        const std::wstring original    = utf8CvrtTo<std::wstring>(i->first);
-        const std::wstring translation = utf8CvrtTo<std::wstring>(i->second);
+        const std::wstring original    = utfCvrtTo<std::wstring>(i->first);
+        const std::wstring translation = utfCvrtTo<std::wstring>(i->second);
         assert(!translation.empty());
         transMapping.insert(std::make_pair(original , translation));
     }
 
     for (lngfile::TranslationPluralMap::const_iterator i = transPluralInput.begin(); i != transPluralInput.end(); ++i)
     {
-        const std::wstring singular = utf8CvrtTo<std::wstring>(i->first.first);
-        const std::wstring plural   = utf8CvrtTo<std::wstring>(i->first.second);
+        const std::wstring singular = utfCvrtTo<std::wstring>(i->first.first);
+        const std::wstring plural   = utfCvrtTo<std::wstring>(i->first.second);
         const lngfile::PluralForms& plForms = i->second;
 
         std::vector<std::wstring> plFormsWide;
         for (lngfile::PluralForms::const_iterator j = plForms.begin(); j != plForms.end(); ++j)
-            plFormsWide.push_back(utf8CvrtTo<std::wstring>(*j));
+            plFormsWide.push_back(utfCvrtTo<std::wstring>(*j));
 
         assert(!plFormsWide.empty());
 
@@ -127,9 +127,9 @@ public:
             lngFiles_.push_back(fullName);
     }
 
-    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
+    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName) { return nullptr; }
-    virtual HandleError onError(const std::wstring& errorText) { return TRAV_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleError onError(const std::wstring& errorText) { return ON_ERROR_IGNORE; } //errors are not really critical in this context
 
 private:
     std::vector<Zstring>& lngFiles_;
@@ -177,7 +177,6 @@ ExistingTranslations::ExistingTranslations()
     FindLngfiles traverseCallback(lngFiles);
 
     traverseFolder(zen::getResourceDir() +  Zstr("Languages"), //throw();
-                   false, //don't follow symlinks
                    traverseCallback);
 
     for (auto i = lngFiles.begin(); i != lngFiles.end(); ++i)
@@ -193,14 +192,14 @@ ExistingTranslations::ExistingTranslations()
                 There is some buggy behavior in wxWidgets which maps "zh_TW" to simplified chinese.
                 Fortunately locales can be also entered as description. I changed to "Chinese (Traditional)" which works fine.
                 */
-                if (const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utf8CvrtTo<wxString>(lngHeader.localeName)))
+                if (const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utfCvrtTo<wxString>(lngHeader.localeName)))
                 {
                     ExistingTranslations::Entry newEntry;
                     newEntry.languageID     = locInfo->Language;
-                    newEntry.languageName   = utf8CvrtTo<wxString>(lngHeader.languageName);
+                    newEntry.languageName   = utfCvrtTo<wxString>(lngHeader.languageName);
                     newEntry.languageFile   = toWx(*i);
-                    newEntry.translatorName = utf8CvrtTo<wxString>(lngHeader.translatorName);
-                    newEntry.languageFlag   = utf8CvrtTo<wxString>(lngHeader.flagFile);
+                    newEntry.translatorName = utfCvrtTo<wxString>(lngHeader.translatorName);
+                    newEntry.languageFlag   = utfCvrtTo<wxString>(lngHeader.flagFile);
                     locMapping.push_back(newEntry);
                 }
             }

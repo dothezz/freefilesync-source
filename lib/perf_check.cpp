@@ -79,7 +79,7 @@ wxString PerfCheck::getRemainingTime(double dataRemaining) const
             return zen::remainingTimeToShortString(remTimeSec);
         }
     }
-    return wxT("-"); //fallback
+    return L"-"; //fallback
 }
 
 
@@ -102,7 +102,7 @@ wxString PerfCheck::getBytesPerSecond() const
             if (dataDelta > 0) //may be negative if user cancels copying
                 return zen::filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
     }
-    return wxT("-"); //fallback
+    return L"-"; //fallback
 }
 
 
@@ -120,7 +120,7 @@ wxString PerfCheck::getOverallBytesPerSecond() const //for all samples
             if (dataDelta > 0) //may be negative if user cancels copying
                 return zen::filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
     }
-    return wxT("-"); //fallback
+    return L"-"; //fallback
 }
 
 
@@ -255,5 +255,4 @@ wxString Statistics::getRemainingTime(const int objectsCurrent, const double dat
 
     return formatRemainingTime((objectsTotal - objectsCurrent) * z1_current + (dataTotal - dataCurrent) * z2_current);
 }
-
 */

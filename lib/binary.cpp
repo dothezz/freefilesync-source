@@ -5,11 +5,14 @@
 // **************************************************************************
 
 #include "binary.h"
-#include <wx/stopwatch.h>
+#include <zen/tick_count.h>
 #include <vector>
 #include <zen/file_io.h>
 #include <zen/int64.h>
 #include <boost/thread/tss.hpp>
+
+using namespace zen;
+
 
 inline
 void setMinSize(std::vector<char>& buffer, size_t minSize)
@@ -61,6 +64,9 @@ private:
 
     size_t bufSize;
 };
+
+
+const std::int64_t TICKS_PER_SEC = ticksPerSec();
 }
 
 
@@ -80,33 +86,39 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
     std::vector<char>& memory2 = *cpyBuf2;
 
     BufferSize bufferSize;
-    zen::UInt64 bytesCompared;
+    UInt64 bytesCompared;
 
-    wxLongLong lastDelayViolation = wxGetLocalTimeMillis();
+    TickVal lastDelayViolation = getTicks();
 
     do
     {
         setMinSize(memory1, bufferSize);
         setMinSize(memory2, bufferSize);
 
-        const wxLongLong startTime = wxGetLocalTimeMillis();
+        const TickVal startTime = getTicks();
 
         const size_t length1 = file1.read(&memory1[0], bufferSize); //returns actual number of bytes read; throw FileError()
         const size_t length2 = file2.read(&memory2[0], bufferSize); //
 
-        const wxLongLong stopTime = wxGetLocalTimeMillis();
+        const TickVal stopTime = getTicks();
 
-        //-------- dynamically set buffer size to keep callback interval between 200 - 500ms ---------------------
-        const wxLongLong loopTime = stopTime - startTime;
-        if (loopTime < 200 && stopTime - lastDelayViolation > 2000) //avoid "flipping back": e.g. DVD-Roms read 32MB at once, so first read may be > 300 ms, but second one will be 0ms!
+        //-------- dynamically set buffer size to keep callback interval between 100 - 500ms ---------------------
+        if (TICKS_PER_SEC > 0)
         {
-            lastDelayViolation = stopTime;
-            bufferSize.inc(); //practically no costs!
-        }
-        else if (loopTime > 500)
-        {
-            lastDelayViolation = stopTime;
-            bufferSize.dec(); //
+            const std::int64_t loopTime = (stopTime - startTime) * 1000 / TICKS_PER_SEC; //unit: [ms]
+            if (loopTime < 100)
+            {
+                if ((stopTime - lastDelayViolation) / TICKS_PER_SEC > 2) //avoid "flipping back": e.g. DVD-Roms read 32MB at once, so first read may be > 500 ms, but second one will be 0ms!
+                {
+                    lastDelayViolation = stopTime;
+                    bufferSize.inc();
+                }
+            }
+            else if (loopTime > 500)
+            {
+                lastDelayViolation = stopTime;
+                bufferSize.dec();
+            }
         }
         //------------------------------------------------------------------------------------------------
 

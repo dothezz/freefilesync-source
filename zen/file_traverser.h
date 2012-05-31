@@ -17,9 +17,8 @@
 
 namespace zen
 {
-class TraverseCallback
+struct TraverseCallback
 {
-public:
     virtual ~TraverseCallback() {}
 
     struct FileInfo
@@ -32,21 +31,27 @@ public:
     struct SymlinkInfo
     {
         Int64   lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
-        Zstring targetPath;       //may be empty if something goes wrong
+        Zstring targetPath;       //optional: empty if something goes wrong
         bool    dirLink;          //"true": point to dir; "false": point to file (or broken Link on Linux)
+    };
+
+    enum HandleLink
+    {
+        LINK_FOLLOW, //dereferences link, then calls "onDir()" or "onFile()"
+        LINK_SKIP
     };
 
     enum HandleError
     {
-        TRAV_ERROR_RETRY,
-        TRAV_ERROR_IGNORE
+        ON_ERROR_RETRY,
+        ON_ERROR_IGNORE
     };
 
     //overwrite these virtual methods
-    virtual std::shared_ptr<TraverseCallback>  //nullptr: ignore directory, non-nullptr: traverse into
+    virtual std::shared_ptr<TraverseCallback>  //nullptr: ignore directory, non-nullptr: traverse into using the (new) callback
     /**/                onDir    (const Zchar* shortName, const Zstring& fullName) = 0;
     virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo&    details) = 0;
-    virtual void        onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) = 0;
+    virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) = 0;
     virtual HandleError onError  (const std::wstring& errorText) = 0;
 };
 
@@ -64,12 +69,8 @@ struct DstHackCallback; //DST hack not required on Linux
 //custom traverser with detail information about files
 //directory may end with PATH_SEPARATOR
 void traverseFolder(const Zstring& directory, //throw();
-                    bool followSymlinks,
                     TraverseCallback& sink,
                     DstHackCallback* dstCallback = nullptr); //apply DST hack if callback is supplied
-//followSymlinks:
-//"true":  Symlinks dereferenced and reported via onFile() and onDir() => onSymlink not used!
-//"false": Symlinks directly reported via onSymlink(), directory symlinks are not followed
 }
 
 #endif // FILETRAVERSER_H_INCLUDED

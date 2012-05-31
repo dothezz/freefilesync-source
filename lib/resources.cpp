@@ -53,7 +53,7 @@ GlobalResources::GlobalResources()
         wxImage::AddHandler(new wxPNGHandler); //ownership passed
 
         wxZipInputStream resourceFile(input, wxConvUTF8);
-        //do NOT rely on wxConvLocal! May result in "Cannot convert from the charset 'Unknown encoding (-1)'!"
+        //do NOT rely on wxConvLocal! ON failure shows unhelpful popup "Cannot convert from the charset 'Unknown encoding (-1)'!"
 
         while (true)
         {

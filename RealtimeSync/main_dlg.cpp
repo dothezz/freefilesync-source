@@ -44,11 +44,9 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     //prepare drag & drop
     dirNameFirst.reset(new DirectoryName<wxTextCtrl>(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath));
 
-
 #ifdef FFS_WIN
     new MouseMoveWindow(*this); //ownership passed to "this"
 #endif
-
 
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
@@ -120,11 +118,7 @@ const wxString& MainDialog::lastConfigFileName()
 
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
-#ifdef FFS_WIN
-    zen::displayHelpEntry(wxT("html\\RealtimeSync.html"));
-#elif defined FFS_LINUX
-    zen::displayHelpEntry(wxT("html/RealtimeSync.html"));
-#endif
+    zen::displayHelpEntry(L"html/RealtimeSync.html");
 }
 
 
@@ -166,7 +160,7 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
     Hide();
 
-    switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(currentConfigFileName)))
+    switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(utfCvrtTo<Zstring>(currentConfigFileName))))
     {
         case rts::EXIT_APP:
             Close();
@@ -188,8 +182,8 @@ void MainDialog::OnSaveConfig(wxCommandEvent& event)
 
 
     wxFileDialog filePicker(this, wxEmptyString, wxEmptyString, defaultFileName,
-                            _("RealtimeSync configuration") + L" (*.ffs_real)|*.ffs_real",
-                            wxFD_SAVE /*| wxFD_OVERWRITE_PROMPT*/);
+                            wxString(L"RealtimeSync (*.ffs_real)|*.ffs_real") + L"|" +_("All files") + L" (*.*)|*",
+                            wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (filePicker.ShowModal() != wxID_OK)
         return;
 
@@ -252,7 +246,7 @@ void MainDialog::setLastUsedConfig(const wxString& filename)
 void MainDialog::OnLoadConfig(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this, wxEmptyString, wxEmptyString, wxEmptyString,
-                            _("RealtimeSync configuration") + L" (*.ffs_real;*.ffs_batch)|*.ffs_real;*.ffs_batch",
+                            wxString(L"RealtimeSync (*.ffs_real;*.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN);
     if (filePicker.ShowModal() == wxID_OK)
         loadConfig(filePicker.GetPath());

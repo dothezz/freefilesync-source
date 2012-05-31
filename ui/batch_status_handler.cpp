@@ -37,8 +37,8 @@ public:
 
     virtual std::shared_ptr<TraverseCallback>
     onDir (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
-    virtual void        onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
-    virtual HandleError onError  (const std::wstring& errorText) { return TRAV_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
+    virtual HandleError onError  (const std::wstring& errorText) { return ON_ERROR_IGNORE; } //errors are not really critical in this context
 
 private:
     const Zstring prefix_;
@@ -50,9 +50,11 @@ private:
 class LogFile //throw FileError
 {
 public:
-    LogFile(const Zstring& logfileDirectory, const wxString& jobName) :
+    LogFile(const Zstring& logfileDirectory,
+            const std::wstring& jobName,
+            const std::wstring& timestamp) :
         jobName_(jobName), //throw FileError
-        logfileName(findUniqueLogname(logfileDirectory, jobName))
+        logfileName(findUnusedLogname(logfileDirectory, jobName, timestamp))
     {
         logFile.Open(toWx(logfileName), L"w");
         if (!logFile.IsOpened())
@@ -78,11 +80,11 @@ public:
         results.push_back(L"");
         if (itemsTotal != 0 || dataTotal != 0) //=: sync phase was reached and there were actual items to sync
         {
-            results.push_back(L"    " + _("Items processed:") + L" " + toStringSep(itemsSynced) + L" (" + filesizeToShortString(dataSynced) + L")");
+            results.push_back(L"    " + _("Items processed:") + L" " + toGuiString(itemsSynced) + L" (" + filesizeToShortString(dataSynced) + L")");
 
             if (itemsSynced != itemsTotal ||
                 dataSynced  != dataTotal)
-                results.push_back(L"    " + _("Items remaining:") + L" " + toStringSep(itemsTotal - itemsSynced) + L" (" + filesizeToShortString(dataTotal - dataSynced) + L")");
+                results.push_back(L"    " + _("Items remaining:") + L" " + toGuiString(itemsTotal - itemsSynced) + L" (" + filesizeToShortString(dataTotal - dataSynced) + L")");
         }
         results.push_back(L"    " + _("Total time:") + L" " + wxTimeSpan::Milliseconds(totalTime.Time()).Format());
 
@@ -100,7 +102,7 @@ public:
         const auto& entries = log.getEntries();
         for (auto iter = entries.begin(); iter != entries.end(); ++iter)
         {
-            const std::string& msg = utf8CvrtTo<std::string>(formatMessage(*iter));
+            const std::string& msg = utfCvrtTo<std::string>(formatMessage(*iter));
             logFile.Write(msg.c_str(), msg.size()); //better do UTF8 conversion ourselves rather than to rely on wxWidgets
             logFile.Write(L'\n');
         }
@@ -116,7 +118,6 @@ public:
         FindLogfiles traverseCallback(toZ(jobName_), logFiles);
 
         traverseFolder(beforeLast(logfileName, FILE_NAME_SEPARATOR), //throw();
-                       false, //don't follow symlinks
                        traverseCallback);
 
         if (logFiles.size() <= maxCount)
@@ -132,7 +133,9 @@ public:
     //Zstring getLogfileName() const { return logfileName; }
 
 private:
-    static Zstring findUniqueLogname(const Zstring& logfileDirectory, const wxString& jobName)
+    static Zstring findUnusedLogname(const Zstring& logfileDirectory,
+                                     const std::wstring& jobName,
+                                     const std::wstring& timestamp)
     {
         //create logfile directory
         Zstring logfileDir = logfileDirectory.empty() ?
@@ -143,7 +146,7 @@ private:
             createDirectory(logfileDir); //throw FileError; create recursively if necessary
 
         //assemble logfile name
-        const Zstring logfileName = appendSeparator(logfileDir) + toZ(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"));
+        const Zstring logfileName = appendSeparator(logfileDir) + toZ(jobName) + Zstr(" ") + utfCvrtTo<Zstring>(timestamp);
 
         //ensure uniqueness
         Zstring output = logfileName + Zstr(".log");
@@ -162,29 +165,30 @@ private:
 
 //##############################################################################################################################
 BatchStatusHandler::BatchStatusHandler(bool showProgress,
-                                       const wxString& jobName,
+                                       const std::wstring& jobName,
+                                       const std::wstring& timestamp,
                                        const wxString& logfileDirectory,
                                        size_t logFileCountMax,
                                        const xmlAccess::OnError handleError,
                                        const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
-                                       int& returnVal,
+                                       FfsReturnCode& returnCode,
                                        const std::wstring& execWhenFinished,
                                        std::vector<std::wstring>& execFinishedHistory) :
     switchBatchToGui_(switchBatchToGui),
     showFinalResults(showProgress), //=> exit immediately or wait when finished
     switchToGuiRequested(false),
     handleError_(handleError),
-    returnValue(returnVal),
+    returnCode_(returnCode),
     syncStatusFrame(*this, *this, nullptr, showProgress, jobName, execWhenFinished, execFinishedHistory)
 {
     if (logFileCountMax > 0) //init log file: starts internal timer!
         if (!tryReportingError([&]
     {
-        logFile.reset(new LogFile(toZ(logfileDirectory), jobName)); //throw FileError
+        logFile.reset(new LogFile(toZ(logfileDirectory), jobName, timestamp)); //throw FileError
             logFile->limitLogfileCount(logFileCountMax); //throw()
         }, *this))
     {
-        returnValue = -7;
+        returnCode_ = FFS_RC_ABORTED;
         throw BatchAbortProcess();
     }
 
@@ -200,13 +204,13 @@ BatchStatusHandler::~BatchStatusHandler()
     std::wstring finalStatus;
     if (abortIsRequested())
     {
-        returnValue = -4;
+        returnCode_ = FFS_RC_ABORTED;
         finalStatus = _("Synchronization aborted!");
         errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalErrors > 0)
     {
-        returnValue = -5;
+        returnCode_ = FFS_RC_FINISHED_WITH_ERRORS;
         finalStatus = _("Synchronization completed with errors!");
         errorLog.logMsg(finalStatus, TYPE_WARNING);
     }

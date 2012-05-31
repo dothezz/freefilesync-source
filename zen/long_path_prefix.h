@@ -15,7 +15,7 @@ namespace zen
 //handle filenames longer-equal 260 (== MAX_PATH) characters by applying \\?\-prefix; see: http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath
 /*
 1. path must be absolute
-2. if path is smaller than MAX_PATH nothing is changed!
+2. if path is smaller than MAX_PATH nothing is changed! caveat: FindFirstFile() "Prepending the string "\\?\" does not allow access to the root directory."
 3. path may already contain \\?\-prefix
 */
 Zstring applyLongPathPrefix(const Zstring& path); //throw()

@@ -291,11 +291,6 @@ template <class Char, template <class, class> class SP, class AP> inline Zbase<C
 
 
 
-
-
-
-
-
 //################################# implementation ########################################
 template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>::Zbase()
@@ -345,7 +340,7 @@ Zbase<Char, SP, AP>::Zbase(Zbase<Char, SP, AP>&& tmp)
 {
     //rawStr = this->clone(tmp.rawStr); NO! do not increment ref-count of a potentially unshared string! We'd lose optimization opportunity of reusing it!
     //instead create a dummy string and swap:
-    if (canWrite(tmp.rawStr, 0)) //perf: this check saves about 4%
+    if (this->canWrite(tmp.rawStr, 0)) //perf: this check saves about 4%
     {
         rawStr    = this->create(0); //no perf issue! see comment in default constructor
         rawStr[0] = 0;
@@ -446,17 +441,17 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::replace(size_t pos1, size_t n1, const 
 
     const size_t newLen = oldLen - n1 + n2;
 
-    if (canWrite(rawStr, newLen))
+    if (this->canWrite(rawStr, newLen))
     {
         if (n1 < n2) //move remainder right -> std::copy_backward
         {
             std::copy_backward(rawStr + pos1 + n1, rawStr + oldLen + 1, rawStr + newLen + 1); //include null-termination
-            setLength(rawStr, newLen);
+            this->setLength(rawStr, newLen);
         }
         else if (n1 > n2) //shift left -> std::copy
         {
             std::copy(rawStr + pos1 + n1, rawStr + oldLen + 1, rawStr + pos1 + n2); //include null-termination
-            setLength(rawStr, newLen);
+            this->setLength(rawStr, newLen);
         }
 
         std::copy(str.data(), str.data() + n2, rawStr + pos1);
@@ -470,7 +465,7 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::replace(size_t pos1, size_t n1, const 
         std::copy(str.data(), str.data() + n2, newStr + pos1);
         std::copy(rawStr + pos1 + n1, rawStr + oldLen + 1, newStr + pos1 + n2); //include null-termination
 
-        destroy(rawStr);
+        this->destroy(rawStr);
         rawStr = newStr;
     }
     return *this;
@@ -480,12 +475,12 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::replace(size_t pos1, size_t n1, const 
 template <class Char, template <class, class> class SP, class AP> inline
 void Zbase<Char, SP, AP>::resize(size_t newSize, Char fillChar)
 {
-    if (canWrite(rawStr, newSize))
+    if (this->canWrite(rawStr, newSize))
     {
         if (length() < newSize)
             std::fill(rawStr + length(), rawStr + newSize, fillChar);
         rawStr[newSize] = 0;
-        setLength(rawStr, newSize); //keep after call to length()
+        this->setLength(rawStr, newSize); //keep after call to length()
     }
     else
     {
@@ -500,7 +495,7 @@ void Zbase<Char, SP, AP>::resize(size_t newSize, Char fillChar)
         else
             std::copy(rawStr, rawStr + newSize, newStr);
 
-        destroy(rawStr);
+        this->destroy(rawStr);
         rawStr = newStr;
     }
 }
@@ -593,10 +588,10 @@ void Zbase<Char, SP, AP>::clear()
 {
     if (!empty())
     {
-        if (canWrite(rawStr, 0))
+        if (this->canWrite(rawStr, 0))
         {
             rawStr[0] = 0;        //keep allocated memory
-            setLength(rawStr, 0); //
+            this->setLength(rawStr, 0); //
         }
         else
             *this = Zbase();
@@ -614,13 +609,13 @@ void Zbase<Char, SP, AP>::swap(Zbase<Char, SP, AP>& other)
 template <class Char, template <class, class> class SP, class AP> inline
 void Zbase<Char, SP, AP>::reserve(size_t minCapacity) //make unshared and check capacity
 {
-    if (!canWrite(rawStr, minCapacity))
+    if (!this->canWrite(rawStr, minCapacity))
     {
         //allocate a new string
-        Char* newStr = create(length(), std::max(minCapacity, length())); //reserve() must NEVER shrink the string: logical const!
+        Char* newStr = this->create(length(), std::max(minCapacity, length())); //reserve() must NEVER shrink the string: logical const!
         std::copy(rawStr, rawStr + length() + 1, newStr); //include 0-termination
 
-        destroy(rawStr);
+        this->destroy(rawStr);
         rawStr = newStr;
     }
 }
@@ -629,11 +624,11 @@ void Zbase<Char, SP, AP>::reserve(size_t minCapacity) //make unshared and check 
 template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::assign(const Char* source, size_t len)
 {
-    if (canWrite(rawStr, len))
+    if (this->canWrite(rawStr, len))
     {
         std::copy(source, source + len, rawStr);
         rawStr[len] = 0; //include null-termination
-        setLength(rawStr, len);
+        this->setLength(rawStr, len);
     }
     else
         *this = Zbase(source, len);
@@ -650,7 +645,7 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::append(const Char* source, size_t len)
 
     std::copy(source, source + len, rawStr + thisLen);
     rawStr[thisLen + len] = 0;
-    setLength(rawStr, thisLen + len);
+    this->setLength(rawStr, thisLen + len);
     return *this;
 }
 

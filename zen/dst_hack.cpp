@@ -2,7 +2,7 @@
 #include <bitset>
 #include "basic_math.h"
 #include "long_path_prefix.h"
-#include "utf8.h"
+#include "utf.h"
 #include "assert_static.h"
 #include "int64.h"
 #include "file_error.h"
@@ -169,7 +169,7 @@ FILETIME utcToLocal(const FILETIME& utcTime) //throw std::runtime_error
         const std::wstring errorMessage = _("Conversion error:") + L" FILETIME -> local FILETIME: " + L"(" +
                                           L"High: " + numberTo<std::wstring>(utcTime.dwHighDateTime) + L" " +
                                           L"Low: "  + numberTo<std::wstring>(utcTime.dwLowDateTime) + L") " + L"\n\n" + getLastErrorFormatted();
-        throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
+        throw std::runtime_error(utfCvrtTo<std::string>(errorMessage));
     }
     return localTime;
 }
@@ -187,7 +187,7 @@ FILETIME localToUtc(const FILETIME& localTime) //throw std::runtime_error
         const std::wstring errorMessage = _("Conversion error:") + L" local FILETIME -> FILETIME: " + L"(" +
                                           L"High: " + numberTo<std::wstring>(localTime.dwHighDateTime) + L" " +
                                           L"Low: "  + numberTo<std::wstring>(localTime.dwLowDateTime) + L") " + L"\n\n" + getLastErrorFormatted();
-        throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
+        throw std::runtime_error(utfCvrtTo<std::string>(errorMessage));
     }
     return utcTime;
 }
@@ -288,7 +288,7 @@ std::bitset<UTC_LOCAL_OFFSET_BITS> getUtcLocalShift()
     {
         const std::wstring errorMessage = _("Conversion error:") + L" Unexpected UTC <-> local time shift: " +
                                           L"(" + numberTo<std::wstring>(timeShiftSec) + L") " + L"\n\n" + getLastErrorFormatted();
-        throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
+        throw std::runtime_error(utfCvrtTo<std::string>(errorMessage));
     }
 
     std::bitset<UTC_LOCAL_OFFSET_BITS> output(absValue);

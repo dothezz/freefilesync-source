@@ -18,25 +18,28 @@ public:
         attr(INVALID_FILE_ATTRIBUTES)
     {
         hFile = cmd();
-        if (hFile != INVALID_HANDLE_VALUE)
-            return;
-
-        const DWORD lastError = ::GetLastError();
-        if (lastError == ERROR_ACCESS_DENIED) //function fails if file is read-only
+        if (hFile == INVALID_HANDLE_VALUE)
         {
-            //zen::ScopeGuard guardErrorCode = zen::makeGuard([&] { ::SetLastError(lastError); }); //transactional behavior: ensure cleanup (e.g. network drop) -> cref [!]
-
-            //read-only file attribute may cause trouble: temporarily reset it
-            const DWORD tmpAttr = ::GetFileAttributes(filenameFmt.c_str());
-            if (tmpAttr != INVALID_FILE_ATTRIBUTES && (tmpAttr & FILE_ATTRIBUTE_READONLY))
+            //try to recover
+            if (::GetLastError() == ERROR_ACCESS_DENIED) //function fails if file is read-only
             {
-                if (::SetFileAttributes(filenameFmt.c_str(), FILE_ATTRIBUTE_NORMAL))
+                //read-only file attribute may cause trouble: temporarily reset it
+                const DWORD tmpAttr = ::GetFileAttributes(filenameFmt.c_str());
+                if (tmpAttr != INVALID_FILE_ATTRIBUTES)
                 {
-                    //guardErrorCode.dismiss();
-                    attr = tmpAttr; //"create" guard on read-only attribute
+                    if (tmpAttr & FILE_ATTRIBUTE_READONLY)
+                    {
+                        if (::SetFileAttributes(filenameFmt.c_str(), FILE_ATTRIBUTE_NORMAL))
+                        {
+                            //guardErrorCode.dismiss();
+                            attr = tmpAttr; //"create" guard on read-only attribute
 
-                    //now try again
-                    hFile = cmd();
+                            //now try again
+                            hFile = cmd();
+                        }
+                    }
+                    else
+                        ::SetLastError(ERROR_ACCESS_DENIED);
                 }
             }
         }

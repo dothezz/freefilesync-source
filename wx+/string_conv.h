@@ -7,15 +7,15 @@
 #ifndef STRINGCONV_H_INCLUDED
 #define STRINGCONV_H_INCLUDED
 
-#include <zen/utf8.h>
+#include <zen/utf.h>
 #include <wx/string.h>
 #include <zen/zstring.h>
 
 namespace zen
 {
 //conversion between Zstring and wxString
-inline wxString toWx(const Zstring&  str) { return utf8CvrtTo<wxString>(str); }
-inline Zstring   toZ(const wxString& str) { return utf8CvrtTo<Zstring>(str); }
+inline wxString toWx(const Zstring&  str) { return utfCvrtTo<wxString>(str); }
+inline Zstring   toZ(const wxString& str) { return utfCvrtTo<Zstring>(str); }
 
 inline std::vector<Zstring> toZ(const std::vector<wxString>& strList)
 {

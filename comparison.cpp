@@ -56,27 +56,23 @@ namespace
 {
 void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, ProcessCallback& procCallback)
 {
-    int partiallyFilledPairs = 0;
-    int totallyFilledPairs   = 0;
+    bool havePartialPair = false;
+    bool haveFullPair    = false;
 
     std::for_each(folderPairsForm.begin(), folderPairsForm.end(),
                   [&](const FolderPairCfg& fpCfg)
     {
         if (fpCfg.leftDirectoryFmt.empty() != fpCfg.rightDirectoryFmt.empty())
-            ++partiallyFilledPairs;
-
-        if (!fpCfg.leftDirectoryFmt.empty() && !fpCfg.rightDirectoryFmt.empty())
-            ++totallyFilledPairs;
+            havePartialPair = true;
+        else if (!fpCfg.leftDirectoryFmt.empty())
+            haveFullPair = true;
     });
 
-    //check for empty entries
     tryReportingError([&]
     {
-        if ((totallyFilledPairs + partiallyFilledPairs == 0) || //all empty
-        (partiallyFilledPairs > 0 && //partial entry is invalid
-        !(totallyFilledPairs == 0 && partiallyFilledPairs == 1))) //exception: one partial pair okay: one-dir only scenario
-            throw FileError(_("A directory input field is empty.") + L" \n\n" +
-            _("You can ignore this error to consider the directory as empty."));
+        if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-dir scenario
+            throw FileError(_("An input folder name is empty.") + L" \n\n" +
+            _("You can ignore this error to consider the folder as empty."));
     }, procCallback);
 }
 
@@ -94,8 +90,8 @@ void determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
             if (tryReportingError([&]
         {
             if (!dirExistsUpdating(dirname, allowUserInteraction, procCallback))
-                    throw FileError(replaceCpy(_("Cannot find directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" +
-                    _("You can ignore this error to consider the directory as empty."));
+                    throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname)) + L"\n\n" +
+                    _("You can ignore this error to consider the folder as empty."));
             }, procCallback))
             dirnamesExisting.insert(dirname);
         }
@@ -257,10 +253,10 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
                 procCallback_(pcb),
                 itemsReported(0) {}
 
-            virtual void reportStatus(const std::wstring& statusMsg, int itemTotal)
+            virtual void reportStatus(const std::wstring& statusMsg, int itemsTotal)
             {
-                procCallback_.updateProcessedData(itemTotal - itemsReported, 0); //processed data is communicated in subfunctions!
-                itemsReported = itemTotal;
+                procCallback_.updateProcessedData(itemsTotal - itemsReported, 0); //processed data is communicated in subfunctions!
+                itemsReported = itemsTotal;
 
                 procCallback_.reportStatus(statusMsg); //may throw
                 //procCallback_.requestUiRefresh(); //already called by reportStatus()
@@ -271,14 +267,14 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
                 switch (procCallback_.reportError(errorText))
                 {
                     case ProcessCallback::IGNORE_ERROR:
-                        return TRAV_ERROR_IGNORE;
+                        return ON_ERROR_IGNORE;
 
                     case ProcessCallback::RETRY:
-                        return TRAV_ERROR_RETRY;
+                        return ON_ERROR_RETRY;
                 }
 
                 assert(false);
-                return TRAV_ERROR_IGNORE;
+                return ON_ERROR_IGNORE;
             }
 
         private:
@@ -339,11 +335,11 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
     }
     catch (const std::bad_alloc& e)
     {
-        procCallback.reportFatalError(_("Out of memory!") + L" " + utf8CvrtTo<std::wstring>(e.what()));
+        procCallback.reportFatalError(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()));
     }
     catch (const std::exception& e)
     {
-        procCallback.reportFatalError(utf8CvrtTo<std::wstring>(e.what()));
+        procCallback.reportFatalError(utfCvrtTo<std::wstring>(e.what()));
     }
 }
 
@@ -365,8 +361,8 @@ std::wstring getConflictSameDateDiffSize(const FileMapping& fileObj)
 {
     return _("Conflict detected:") + L"\n" +
            replaceCpy(_("Files %x have the same date but a different size!"), L"%x", fmtFileName(fileObj.getObjRelativeName())) + L"\n\n" +
-           L"<--    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size") + L": " + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
-           L"-->    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size") + L": " + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
+           L"<--    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size") + L": " + toGuiString(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
+           L"-->    " + _("Date") + L": " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size") + L": " + toGuiString(fileObj.getFileSize<RIGHT_SIDE>());
 }
 }
 

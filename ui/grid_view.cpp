@@ -71,13 +71,14 @@ void GridView::updateView(Predicate pred)
             if (pred(*fsObj))
             {
                 //save row position for direct random access to FileMapping or DirMapping
-                rowPositions.insert(std::make_pair(ref.objId, viewRef.size())); //costs: 0.28 µs per call - MSVC based on std::set
+                this->rowPositions.insert(std::make_pair(ref.objId, viewRef.size())); //costs: 0.28 µs per call - MSVC based on std::set
+                //"this->" required by two-pass lookup as enforced by GCC 4.7
 
                 //save row position to identify first child *on sorted subview* of DirMapping or BaseDirMapping in case latter are filtered out
                 const HierarchyObject* parent = &(fsObj->parent());
                 for (;;) //map all yet unassociated parents to this row
                 {
-                    const auto rv = rowPositionsFirstChild.insert(std::make_pair(parent, viewRef.size()));
+                    const auto rv = this->rowPositionsFirstChild.insert(std::make_pair(parent, viewRef.size()));
                     if (!rv.second)
                         break;
 
@@ -88,7 +89,7 @@ void GridView::updateView(Predicate pred)
                 }
 
                 //build subview
-                viewRef.push_back(ref.objId);
+                this->viewRef.push_back(ref.objId);
             }
     });
 }

@@ -7,8 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>Zoeken naar map %x...</target>
+<source>Searching for folder %x...</source>
+<target>Bezig met zoeken naar map %x...</target>
 
 <source>Show in Explorer</source>
 <target>Toon in de verkenner</target>
@@ -34,11 +34,11 @@
 <source>Select alternate synchronization settings</source>
 <target>Selecteer alternatieve synchronisatie instellingen</target>
 
-<source>No filter selected</source>
-<target>Geen filter geselecteerd</target>
-
 <source>Filter is active</source>
 <target>Filter is actief</target>
+
+<source>No filter selected</source>
+<target>Geen filter geselecteerd</target>
 
 <source>Remove alternate settings</source>
 <target>Verwijder alternatieve instellingen</target>
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Algemene instellingen</target>
 
-<source>Synchronization Preview</source>
-<target>Synchronisatie voorbeeldweergave</target>
+<source>Summary</source>
+<target>Overzicht</target>
 
 <source>Find</source>
 <target>Vind</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Verkennen</target>
 
-<source>Invalid command line: %x</source>
-<target>Ongeldige opdrachtregel: %x</target>
+<source>Invalid command line:</source>
+<target>Ongeldige opdrachtregel:</target>
 
 <source>Info</source>
 <target>Info</target>
@@ -226,29 +226,29 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>Schijfnaam %x maakt geen deel uit van bestandsnaam %y!</target>
 
-<source>Cannot find file %x.</source>
-<target>Kan bestand %x niet vinden.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Kan de volgende XML elementen niet lezen:</target>
 
-<source>S&ave configuration...</source>
-<target>Sl&a configuratie op...</target>
+<source>Cannot find file %x.</source>
+<target>Kan bestand %x niet vinden.</target>
 
-<source>&Load configuration...</source>
-<target>&Laad configuratie...</target>
+<source>&Open...</source>
+<target>&Open...</target>
+
+<source>&Save...</source>
+<target>&Opslaan...</target>
 
 <source>&Quit</source>
 <target>&Afsluiten</target>
 
-<source>&File</source>
-<target>&Bestand</target>
+<source>&Program</source>
+<target>&Programma</target>
 
 <source>&Content</source>
 <target>&Inhoud</target>
 
-<source>&About...</source>
-<target>&Informatie...</target>
+<source>&About</source>
+<target>&Over</target>
 
 <source>&Help</source>
 <target>&Help</target>
@@ -256,8 +256,8 @@
 <source>Usage:</source>
 <target>Gebruik:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. Selecteer mappen om te observeren.</target>
+<source>1. Select folders to watch.</source>
+<target>1. Selecteer mappen om te bekijken.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Geef een opdrachtregel in.</target>
@@ -265,18 +265,10 @@
 <source>3. Press 'Start'.</source>
 <target>3. Klik op 'Start'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-De opdrachtregel wordt telkens uitgevoerd indien:
-- alle mappen beschikbaar worden (bijv. invoegen van USB stick)
-- bestanden binnen deze mappen of submappen veranderd zijn
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>Importeer een .ffs_batch bestand om te beginnen.</target>
 
-<source>Directories to watch</source>
+<source>Folders to watch</source>
 <target>Mappen om te bekijken</target>
 
 <source>Add folder</source>
@@ -288,14 +280,25 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Select a folder</source>
 <target>Selecteer een map</target>
 
+<source>Delay [seconds]</source>
+<target>Vertraging [seconden]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Tijd tussen de laatste gedetecteerde verandering en de uitvoering van het commando</target>
+
 <source>Command line</source>
 <target>Opdrachtregel</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Minimale inactieve tijd [seconden]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Aantal inactieve seconden tussen detectie van de laatste verandering en uitvoering van een commando</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+De opdracht word geactiveerd als>:
+- bestanden of subfolders veranderen
+- nieuwe folders worden gevonden (bijvoorbeeld bij invoeging van USB stick)
+</target>
 
 <source>Start</source>
 <target>Start</target>
@@ -309,8 +312,8 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>(Build: %x)</source>
 <target>(Build: %x)</target>
 
-<source>RealtimeSync configuration</source>
-<target>RealtimeSync configuratie</target>
+<source>All files</source>
+<target></target>
 
 <source>&Restore</source>
 <target>&Herstellen</target>
@@ -324,8 +327,8 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Waiting for missing directories...</source>
 <target>Wacht op missende mappen...</target>
 
-<source>A directory input field is empty.</source>
-<target>Een tekstveld over de map is leeg.</target>
+<source>An input folder name is empty.</source>
+<target>Een input map naam is leeg.</target>
 
 <source>Logging</source>
 <target>Loggen</target>
@@ -350,9 +353,6 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 
 <source>FreeFileSync batch file</source>
 <target>FreeFileSync taakbestand</target>
-
-<source>FreeFileSync configuration</source>
-<target>FreeFileSync configuratie</target>
 
 <source>Batch execution</source>
 <target>Taak uitvoeren</target>
@@ -396,11 +396,11 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Download now?</source>
 <target>Nu downloaden?</target>
 
-<source>Information</source>
-<target>Informatie</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>U gebruikt de nieuwste versie van FreeFileSync!</target>
+
+<source>Information</source>
+<target>Informatie</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Wilt u FreeFileSync elke week automatisch laten controleren of er een nieuwe versie is?</target>
@@ -411,8 +411,8 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source><Symlink></source>
 <target><Symlink></target>
 
-<source><Directory></source>
-<target><Map></target>
+<source><Folder></source>
+<target>Map</target>
 
 <source>Full path</source>
 <target>Volledig pad</target>
@@ -423,8 +423,8 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Relative path</source>
 <target>Relatief pad</target>
 
-<source>Directory</source>
-<target>Map</target>
+<source>Base folder</source>
+<target>Hoofdmap</target>
 
 <source>Size</source>
 <target>Grootte</target>
@@ -435,8 +435,11 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Extension</source>
 <target>Extensie</target>
 
-<source>Comparison Result</source>
-<target>Resultaat vergelijken</target>
+<source>Action</source>
+<target>Actie</target>
+
+<source>Category</source>
+<target>Categorie</target>
 
 <source>Drag && drop</source>
 <target>Drag en drop</target>
@@ -444,14 +447,14 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Close progress dialog</source>
 <target>Sluit voortgangsvenster</target>
 
-<source>Shut down</source>
-<target>Afsluiten</target>
+<source>Standby</source>
+<target>Stand-by</target>
 
 <source>Log off</source>
 <target>Afmelden</target>
 
-<source>Standby</source>
-<target>Stand-by</target>
+<source>Shut down</source>
+<target>Afsluiten</target>
 
 <source>Hibernate</source>
 <target>Slaapstand</target>
@@ -459,14 +462,11 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>1. &Compare</source>
 <target>1. &Vergelijk</target>
 
-<source>2. &Synchronize...</source>
-<target>2. &Synchroniseer...</target>
+<source>2. &Synchronize</source>
+<target>2. &Synchroniseer</target>
 
 <source>&New</source>
 <target>&Nieuw</target>
-
-<source>&Program</source>
-<target>&Programma</target>
 
 <source>&Language</source>
 <target>&Taal</target>
@@ -495,8 +495,8 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>&Abort</source>
 <target>&Afbreken</target>
 
-<source>Synchronize...</source>
-<target>Synchroniseer...</target>
+<source>Synchronize</source>
+<target>Synchroniseer</target>
 
 <source>Start synchronization</source>
 <target>Start synchronisatie</target>
@@ -510,11 +510,11 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Swap sides</source>
 <target>Wissel zijdes</target>
 
-<source>Save current configuration to file</source>
-<target>Sla de huidige configuratie op in een bestand</target>
-
 <source>Load configuration from file</source>
 <target>Laad configuratie uit bestand</target>
+
+<source>Save current configuration to file</source>
+<target>Sla de huidige configuratie op in een bestand</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Laatst gebruikte instellingen (druk op DEL om iets te verwijderen)</target>
@@ -525,20 +525,17 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Verberg gefilterde of tijdelijk uitgesloten bestanden</target>
 
-<source>Number of files and directories that will be created</source>
-<target>Aantal bestanden en mappen die aangemaakt zullen worden</target>
+<source>Number of files and folders that will be created</source>
+<target>Aantal bestanden en mappen die zullen worden aangemaakt</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Aantal bestanden die overschreven zullen worden</target>
 
-<source>Number of files and directories that will be deleted</source>
+<source>Number of files and folders that will be deleted</source>
 <target>Aantal bestanden en mappen die verwijderd zullen worden</target>
 
 <source>Total amount of data that will be transferred</source>
 <target>Totale hoeveelheid data die verplaatst wordt</target>
-
-<source>Operation:</source>
-<target>Bewerking:</target>
 
 <source>Items found:</source>
 <target>Onderdelen gevonden:</target>
@@ -555,8 +552,8 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Batch job</source>
 <target>Taaklijst</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Maak een batch bestand en automatiseer synchronisatie. Om te starten in batch modus dubbelklik je op dit bestand of voer het volgende commando uit: FreeFileSync.exe SyncJob.ffs_batch. Dit kan ook worden gepland in uw taakplanner van uw systeem.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Maak een batch bestand om synchronisatie te automatiseren. Dubbelklik op dit bestand of plan dit in de systeem taakplanner: FreeFileSync.exe <batch naam>.ffs_batch</target>
 
 <source>Help</source>
 <target>Help</target>
@@ -582,17 +579,11 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Maximum number of log files:</source>
 <target>Maximale aantal van logbestanden:</target>
 
-<source>Select log file directory:</source>
-<target>Selecteer een map voor het logbestand:</target>
+<source>Select folder to save log files:</source>
+<target>Selecteer de map voor het bewaren van log bestanden:</target>
 
 <source>Batch settings</source>
 <target>Batch instellingen</target>
-
-<source>&Save</source>
-<target>&Opslaan</target>
-
-<source>&Load</source>
-<target>&Laden</target>
 
 <source>Select variant:</source>
 <target>Selecteer een variant:</target>
@@ -618,29 +609,23 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <source>Configuration</source>
 <target>Configuratie</target>
 
-<source>Category</source>
-<target>Categorie</target>
+<source>Item exists on left side only</source>
+<target>Item bestaat alleen aan de linkerkant</target>
 
-<source>Action</source>
-<target>Actie</target>
+<source>Item exists on right side only</source>
+<target>Item bestaat alleen aan de rechterkant</target>
 
-<source>File/folder exists on left side only</source>
-<target>Bestand/Map bestaat alleen aan de linkerkant</target>
+<source>Left side is newer</source>
+<target>De linkerkant is nieuwer</target>
 
-<source>File/folder exists on right side only</source>
-<target>Bestand/Map bestaat alleen aan de rechterkant</target>
+<source>Right side is newer</source>
+<target>De rechterkant is nieuwer</target>
 
-<source>Left file is newer</source>
-<target>Linker bestand is nieuwer</target>
+<source>Items have different content</source>
+<target>De items hebben een andere inhoud</target>
 
-<source>Right file is newer</source>
-<target>Rechter bestand is nieuwer</target>
-
-<source>Files have different content</source>
-<target>Bestanden hebben verschillende inhoud</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Conflict/Bestand kan niet worden gecategoriseerd</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Conflict/item kan niet worden gecategoriseerd</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -747,33 +732,6 @@ Alleen bestanden die met alle filter instellingen overeen komen worden gesynchro
 Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 </target>
 
-<source>Hints:</source>
-<target>Tips:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Vul de relatieve bestands- of mapnaam in, gescheiden door ';' of een nieuwe regel.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Gebruik wildcard karakters zoals '*' en '?'.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Sluit bestanden in het hoofdscherm direct uit via het contextmenu</target>
-
-<source>Example</source>
-<target>Voorbeeld</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Opnemen: *.doc;*.zip;*.exe
-Uitsluiten: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Synchroniseer alle .doc, .zip en .exe bestanden behalve wat in submap "temp" staat.</target>
-
 <source>Include</source>
 <target>Opnemen</target>
 
@@ -795,8 +753,8 @@ Uitsluiten: \stuff\temp\*
 <source>&Default</source>
 <target>&Standaard</target>
 
-<source>Transactional file copy</source>
-<target>Transactionele bestands kopie</target>
+<source>Fail-safe file copy</source>
+<target>Fail-safe bestandskopie</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Schrijf eerst naar een tijdelijk bestand (*.ffs_tmp) en hernoem dan. Dit garandeert een consistente toestand, zelfs in het geval van een fatale fout.</target>
@@ -810,8 +768,8 @@ Uitsluiten: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>Kopiëer toegangsrechten van bestand.</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Zet bestand en map permissies over (Vereist Administrator rechten)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>Overdragen van bestands en maps permissies (Administrator rechten nodig)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Herstel verborgen dialogen</target>
@@ -1119,11 +1077,11 @@ Uitsluiten: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:</target>
 
-<source>- full file or directory name</source>
-<target>- volledig bestand of mapnaam</target>
+<source>- full file or folder name</source>
+<target>- volledige bestands of maps naam</target>
 
-<source>- directory part only</source>
-<target>- alleen de map</target>
+<source>- folder part only</source>
+<target>- alleen het map gedeelte</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- Tegenhanger andere zijde naar %naam</target>
@@ -1167,8 +1125,8 @@ Uitsluiten: \stuff\temp\*
 <source>Versioning</source>
 <target>Versiebeheer</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Verplaats de bestanden naar een tijd-gemarkeerde submap</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>Verplaats bestanden in een tijdsaangeduide submap</target>
 
 <source>Files</source>
 <target>Bestanden</target>
@@ -1233,6 +1191,9 @@ Uitsluiten: \stuff\temp\*
 <source>Cannot write modification time of %x.</source>
 <target>Kan wijzigings tijd van %x niet toevoegen.</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Kan bestandskenmerken van %x niet schrijven.</target>
+
 <source>Cannot find system function %x.</source>
 <target>Kan systeemfunctie %x niet vinden.</target>
 
@@ -1254,17 +1215,14 @@ Uitsluiten: \stuff\temp\*
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Kan snelkoppeling %x niet kopiëren naar %y.</target>
 
-<source>Cannot write file attributes of %x.</source>
-<target>Kan bestandskenmerken van %x niet schrijven.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Kan bestand %x niet kopiëren naar %y.</target>
 
 <source>Cannot read directory %x.</source>
 <target>Kan map %x niet lezen.</target>
 
-<source>Endless loop.</source>
-<target>Oneindige loop.</target>
+<source>Detected endless directory recursion.</source>
+<target>Eindeloze map recursie gedetecteerd.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Kan privilege %x niet instellen.</target>
@@ -1290,13 +1248,10 @@ Uitsluiten: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Stel standaard synchronisatie richtingen in: Oude bestanden worden door nieuwere bestanden overschreven.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Het bestand bevat geen geldige configuratie:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>U kunt deze waarschuwing negeren om de map als leeg te laten gelden.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>Je kan deze error negeren als de map leeg is.</target>
-
-<source>Cannot find directory %x.</source>
+<source>Cannot find folder %x.</source>
 <target>Kan map %x niet vinden.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
@@ -1329,20 +1284,20 @@ Uitsluiten: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>Beide kanten zijn gelijk</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Bestanden/Mappen verschillen alleen in attributen</target>
+<source>Items have different attributes</source>
+<target>Items hebben verschillende attributen</target>
 
-<source>Copy new file/folder to left</source>
-<target>Kopiëer nieuw bestand/map naar links</target>
+<source>Copy new item to left</source>
+<target>Kopieër nieuw item naar de linkerkant</target>
 
-<source>Copy new file/folder to right</source>
-<target>Kopiëer nieuw bestand/map naar rechts</target>
+<source>Copy new item to right</source>
+<target>Kopieër nieuw item naar de rechterkant</target>
 
-<source>Delete left file/folder</source>
-<target>Verwijder linker bestand/map</target>
+<source>Delete left item</source>
+<target>Verwijder linker item</target>
 
-<source>Delete right file/folder</source>
-<target>Verwijder rechter bestand/map</target>
+<source>Delete right item</source>
+<target>Verwijder rechter item</target>
 
 <source>Move file on left</source>
 <target>Verplaats bestand aan de linkerkant</target>
@@ -1350,20 +1305,20 @@ Uitsluiten: \stuff\temp\*
 <source>Move file on right</source>
 <target>Verplaats bestand aan de rechterkant</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Overschrijf linker bestand/map met de rechter</target>
+<source>Overwrite left item</source>
+<target>Overschrijf linker item</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Overschrijf rechter bestand/map met de linker</target>
+<source>Overwrite right item</source>
+<target>Overschrijf rechter item</target>
 
 <source>Do nothing</source>
 <target>Geen actie ondernemen</target>
 
-<source>Copy file attributes only to left</source>
-<target>Kopiëer bestandsattributen alleen naar links</target>
+<source>Update attributes on left</source>
+<target>Update attributen aan de linkerkant</target>
 
-<source>Copy file attributes only to right</source>
-<target>Kopiëer bestandsattributen alleen naar rechts</target>
+<source>Update attributes on right</source>
+<target>Update attributen aan de rechterkant</target>
 
 <source>Multiple...</source>
 <target>Meerdere...</target>
@@ -1416,11 +1371,11 @@ Uitsluiten: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>Attributen bijwerken van %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Doel mapnaam mag niet leeg zijn!</target>
+<source>Target folder name must not be empty.</source>
+<target>Doelmap mag geen lege naam hebben.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Map voor bestands versiebeheer is niet ingegeven!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>Mapnaam voor bestandsversies mag niet leeg zijn.</target>
 
 <source>Source directory %x not found.</source>
 <target>Bronmap %x niet gevonden.</target>
@@ -1449,8 +1404,8 @@ Uitsluiten: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Prullenbak is niet beschikbaar voor de volgende locaties! De bestanden worden permanent verwijderd:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Een map wordt bewerkt die deel is van meerdere mappen! Controleer de synchronisatie instellingen!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>Een map die onderdeel is van meerdere map paren word aangepast. Kijk alstublieft uw synchronisatie instellingen na.</target>
 
 <source>Processing folder pair:</source>
 <target>Verwerking van gekoppelde mappen:</target>

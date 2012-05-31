@@ -106,7 +106,7 @@ private:
     void deleteSelectedFiles(const std::vector<zen::FileSystemObject*>& selectionLeft,
                              const std::vector<zen::FileSystemObject*>& selectionRight);
 
-    void openExternalApplication(const zen::FileSystemObject* fsObj, bool leftSide, const wxString& commandline); //fsObj is optional!
+    void openExternalApplication(const wxString& commandline, const zen::FileSystemObject* fsObj, size_t compPos); //fsObj may be nullptr
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
@@ -251,9 +251,9 @@ private:
 
     bool processingGlobalKeyEvent; //indicator to notify recursion in OnGlobalKeyEvent()
 
-    bool syncPreviewEnabled; //toggle to display configuration preview instead of comparison result
+    bool showSyncAction_; //toggle to display configuration preview instead of comparison result
     //use this methods when changing values!
-    void enablePreview(bool value);
+    void showSyncAction(bool value);
 
     wxAuiManager auiMgr; //implement dockable GUI design
 

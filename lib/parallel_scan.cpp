@@ -13,6 +13,7 @@
 #include <wx+/string_conv.h>
 #include <zen/thread.h> //includes <boost/thread.hpp>
 #include <zen/scope_guard.h>
+#include <zen/fixed_list.h>
 
 using namespace zen;
 
@@ -219,7 +220,7 @@ public:
 
     void reportCurrentFile(const Zstring& filename, int threadID) //context of worker thread
     {
-        if (threadID != notifyingThreadID) return; //only one thread may report status
+        if (threadID != notifyingThreadID) return; //only one thread at a time may report status
 
         boost::lock_guard<boost::mutex> dummy(lockCurrentStatus);
         currentFile = filename;
@@ -329,7 +330,7 @@ public:
     virtual std::shared_ptr<TraverseCallback>
     onDir    (const Zchar* shortName, const Zstring& fullName);
     virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details);
-    virtual void        onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details);
+    virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details);
     virtual HandleError onError  (const std::wstring& errorText);
 
 private:
@@ -377,26 +378,38 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
 }
 
 
-void DirCallback::onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
 {
     boost::this_thread::interruption_point();
 
-    if (cfg.handleSymlinks_ == SYMLINK_IGNORE)
-        return;
+    switch (cfg.handleSymlinks_)
+    {
+        case SYMLINK_IGNORE:
+            return LINK_SKIP;
 
-    //update status information no matter whether object is excluded or not!
-    cfg.acb_.reportCurrentFile(fullName, cfg.threadID_);
+        case SYMLINK_USE_DIRECTLY:
+        {
+            //update status information no matter whether object is excluded or not!
+            cfg.acb_.reportCurrentFile(fullName, cfg.threadID_);
 
-    //------------------------------------------------------------------------------------
-    const Zstring& relName = relNameParentPf_ + shortName;
+            //------------------------------------------------------------------------------------
+            const Zstring& relName = relNameParentPf_ + shortName;
 
-    //apply filter before processing (use relative name!)
-    if (!cfg.filterInstance->passFileFilter(relName)) //always use file filter: Link type may not be "stable" on Linux!
-        return;
+            //apply filter before processing (use relative name!)
+            if (cfg.filterInstance->passFileFilter(relName)) //always use file filter: Link type may not be "stable" on Linux!
+            {
+                output_.addSubLink(shortName, LinkDescriptor(details.lastWriteTimeRaw, details.targetPath, details.dirLink ? LinkDescriptor::TYPE_DIR : LinkDescriptor::TYPE_FILE));
+                cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
+            }
+        }
+        return LINK_SKIP;
 
-    output_.addSubLink(shortName, LinkDescriptor(details.lastWriteTimeRaw, details.targetPath, details.dirLink ? LinkDescriptor::TYPE_DIR : LinkDescriptor::TYPE_FILE));
+        case SYMLINK_FOLLOW_LINK:
+            return LINK_FOLLOW;
+    }
 
-    cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
+    assert(false);
+    return LINK_SKIP;
 }
 
 
@@ -429,16 +442,16 @@ DirCallback::HandleError DirCallback::onError(const std::wstring& errorText)
 {
     switch (cfg.acb_.reportError(errorText))
     {
-        case FillBufferCallback::TRAV_ERROR_IGNORE:
+        case FillBufferCallback::ON_ERROR_IGNORE:
             cfg.failedReads_.insert(relNameParentPf_);
-            return TRAV_ERROR_IGNORE;
+            return ON_ERROR_IGNORE;
 
-        case FillBufferCallback::TRAV_ERROR_RETRY:
-            return TRAV_ERROR_RETRY;
+        case FillBufferCallback::ON_ERROR_RETRY:
+            return ON_ERROR_RETRY;
     }
 
     assert(false);
-    return TRAV_ERROR_IGNORE;
+    return ON_ERROR_IGNORE;
 }
 
 
@@ -498,20 +511,6 @@ public:
                                   Zstring(),
                                   dirVal.dirCont);
 
-            bool followSymlinks = false;
-            switch (item.first.handleSymlinks_)
-            {
-                case SYMLINK_IGNORE:
-                    followSymlinks = false; //=> symlinks will be reported via onSymlink() where they are excluded
-                    break;
-                case SYMLINK_USE_DIRECTLY:
-                    followSymlinks = false;
-                    break;
-                case SYMLINK_FOLLOW_LINK:
-                    followSymlinks = true;
-                    break;
-            }
-
             DstHackCallback* dstCallbackPtr = nullptr;
 #ifdef FFS_WIN
             DstHackCallbackImpl dstCallback(*acb_, threadID_);
@@ -519,7 +518,7 @@ public:
 #endif
 
             //get all files and folders from directoryPostfixed (and subdirectories)
-            traverseFolder(directoryName, followSymlinks, traverser, dstCallbackPtr); //exceptions may be thrown!
+            traverseFolder(directoryName, traverser, dstCallbackPtr); //exceptions may be thrown!
         });
     }
 
@@ -540,8 +539,7 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
 
     std::vector<std::set<DirectoryKey>> buckets = separateByDistinctDisk(keysToRead); //one bucket per physical device
 
-    std::vector<boost::thread> worker; //note: GCC doesn't allow to construct an array of empty threads since they would be initialized by const boost::thread&
-    worker.reserve(buckets.size());
+    FixedList<boost::thread> worker; //note: we cannot use std::vector<boost::thread>: compiler error on GCC 4.7, probably a boost screw-up
 
     zen::ScopeGuard guardWorker = zen::makeGuard([&]
     {
@@ -554,7 +552,6 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
     //init worker threads
     for (auto iter = buckets.begin(); iter != buckets.end(); ++iter)
     {
-        int threadID = iter - buckets.begin();
         const std::set<DirectoryKey>& bucket = *iter;
 
         std::vector<std::pair<DirectoryKey, DirectoryValue*>> workload;
@@ -566,16 +563,17 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
             workload.push_back(std::make_pair(key, &rv.first->second));
         });
 
-        worker.push_back(boost::thread(WorkerThread(threadID, acb, workload)));
+        const int threadId = iter - buckets.begin();
+        worker.emplace_back(WorkerThread(threadId, acb, workload));
     }
 
     //wait until done
-    for (auto iter = worker.begin(); iter != worker.end(); ++iter)
+    int threadId = 0;
+    for (auto iter = worker.begin(); iter != worker.end(); ++iter, ++threadId)
     {
         boost::thread& wt = *iter;
-        int threadID = iter - worker.begin();
 
-        acb->setNotifyingThread(threadID); //process info messages of first (active) thread only
+        acb->setNotifyingThread(threadId); //process info messages of first (active) thread only
 
         do
         {

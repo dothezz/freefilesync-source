@@ -8,8 +8,8 @@
 #define BOOST_THREAD_WRAP_H
 
 //temporary solution until C++11 thread becomes fully available
-#include <vector>
 #include <memory>
+#include "fixed_list.h"
 
 #ifdef __MINGW32__
 #pragma GCC diagnostic push
@@ -63,7 +63,7 @@ public:
 
 private:
     class AsyncResult;
-    std::vector<boost::thread> workload;
+    FixedList<boost::thread> workload; //note: we cannot use std::vector<boost::thread>: compiler error on GCC 4.7, probably a boost screw-up
     std::shared_ptr<AsyncResult> result;
 };
 
@@ -180,10 +180,10 @@ template <class Fun> inline
 void RunUntilFirstHit<T>::addJob(Fun f) //f must return a std::unique_ptr<T> containing a value on success
 {
     auto result2 = result; //VC11: this is ridiculous!!!
-    workload.push_back(boost::thread([result2, f]
+    workload.emplace_back([result2, f]
     {
         result2->reportFinished(f());
-    }));
+    });
 }
 
 

@@ -8,6 +8,7 @@
 #define STATUSHANDLER_H_INCLUDED
 
 #include "../process_callback.h"
+#include <vector>
 #include <string>
 #include <zen/int64.h>
 #include <zen/i18n.h>

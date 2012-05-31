@@ -9,7 +9,7 @@
 
 #include <string>
 #include "zstring.h"
-#include "utf8.h"
+#include "utf.h"
 #include "last_error.h" //we'll need this later anyway!
 
 namespace zen
@@ -39,7 +39,7 @@ DEFINE_NEW_FILE_ERROR(ErrorFileLocked);
 
 //allow implicit UTF8 conversion: since std::wstring models a GUI string, convenience is more important than performance
 inline
-std::wstring operator+(const std::wstring& lhs, const Zstring& rhs) { return std::wstring(lhs) += utf8CvrtTo<std::wstring>(rhs); }
+std::wstring operator+(const std::wstring& lhs, const Zstring& rhs) { return std::wstring(lhs) += utfCvrtTo<std::wstring>(rhs); }
 
 //we musn't put our overloads in namespace std, but namespace zen (+ using directive) is sufficient
 
@@ -48,10 +48,9 @@ inline
 std::wstring fmtFileName(const Zstring& filename)
 {
     std::wstring output;
-    output.reserve(filename.size() + 2);
-    output += L'\"';
-    output += utf8CvrtTo<std::wstring>(filename);
-    output += L'\"';
+    output += L'\'';
+    output += utfCvrtTo<std::wstring>(filename);
+    output += L'\'';
     return output;
 }
 }

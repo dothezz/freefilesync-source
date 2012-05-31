@@ -510,7 +510,7 @@ private:
         }
         //----------------------------------------------------------------------
 
-        //##################### schedule potentially existing temporary files for deletion ####################
+        //##################### schedule old temporary files for deletion ####################
         if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_LEFT);
@@ -521,7 +521,7 @@ private:
             fileObj.setSyncDir(SYNC_DIR_RIGHT);
             return;
         }
-        //#####################################################################################################
+        //####################################################################################
 
         /*
                 if (filterFileConflictFound(fileObj.getObjRelativeName()))
@@ -956,11 +956,11 @@ void zen::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsOb
         }
         virtual void visit(const SymLinkMapping& linkObj)
         {
-            dirSetter_(const_cast<SymLinkMapping&>(linkObj)); //phyiscal object is not const in this method anyway
+            dirSetter_(const_cast<SymLinkMapping&>(linkObj)); //
         }
         virtual void visit(const DirMapping& dirObj)
         {
-            dirSetter_(const_cast<DirMapping&>(dirObj)); //phyiscal object is not const in this method anyway
+            dirSetter_(const_cast<DirMapping&>(dirObj)); //
         }
     private:
         const SetNewDirection& dirSetter_;
@@ -1343,13 +1343,13 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview(const std::vector<FileS
         {
             if (!fsObj->isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + L'\n';
+                filesToDelete += utfCvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + L'\n';
                 ++totalDelCount;
             }
 
             if (!fsObj->isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + L'\n';
+                filesToDelete += utfCvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + L'\n';
                 ++totalDelCount;
             }
 
@@ -1363,7 +1363,7 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview(const std::vector<FileS
         {
             if (!fsObj->isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + L'\n';
+                filesToDelete += utfCvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + L'\n';
                 ++totalDelCount;
             }
         });
@@ -1373,7 +1373,7 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview(const std::vector<FileS
         {
             if (!fsObj->isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + L'\n';
+                filesToDelete += utfCvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + L'\n';
                 ++totalDelCount;
             }
         });
@@ -1555,149 +1555,3 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
                                            useRecycleBin,
                                            statusHandler);
 }
-
-
-//############################################################################################################
-/*Statistical theory: detect daylight saving time (DST) switch by comparing files that exist on both sides (and have same filesizes). If there are "enough"
-that have a shift by +-1h then assert that DST switch occurred.
-What is "enough" =: N? N should be large enough AND small enough that the following two errors remain small:
-
-Error 1: A DST switch is detected although there was none
-Error 2: A DST switch is not detected although it took place
-
-Error 1 results in lower bound, error 2 in upper bound for N.
-
-Target: Choose N such that probability of error 1 and error 2 is lower than 0.001 (0.1%)
-
-Definitions:
-p1: probability that a file with same filesize on both sides was changed nevertheless
-p2: probability that a changed file has +1h shift in filetime due to a change
-
-M: number of files with same filesize on both sides in total
-N: number of files with same filesize and time-diff +1h when DST check shall detect "true"
-
-X: number of files with same filesize that have a +1h difference after change
-
-Error 1 ("many files have +1h shift by chance") imposes:
-Probability of error 1: (binomial distribution)
-
-P(X >= N) = 1 - P(X <= N - 1) =
-1 - sum_i=0^N-1 p3^i * (1 - p3)^(M - i) (M above i)   shall be   <= 0.0005
-
-with p3 := p1 * p2
-
-Probability of error 2 also will be <= 0.0005 if we choose N as lowest number that satisfies the preceding formula. Proof is left to the reader.
-
-The function M |-> N behaves almost linearly and can be empirically approximated by:
-
-N(M) =
-
-2                   for      0 <= M <= 500
-125/1000000 * M + 5 for    500 <  M <= 50000
-77/1000000 * M + 10 for  50000 <  M <= 400000
-60/1000000 * M + 35 for 400000 <  M
-
-
-#ifdef FFS_WIN
-unsigned int getThreshold(const unsigned filesWithSameSizeTotal)
-{
-    if (filesWithSameSizeTotal <= 500)
-        return 2;
-    else if (filesWithSameSizeTotal <= 50000)
-        return unsigned(125.0/1000000 * filesWithSameSizeTotal + 5.0);
-    else if (filesWithSameSizeTotal <= 400000)
-        return unsigned(77.0/1000000 * filesWithSameSizeTotal + 10.0);
-    else
-        return unsigned(60.0/1000000 * filesWithSameSizeTotal + 35.0);
-}
-
-
-void zen::checkForDSTChange(const FileCompareResult& gridData,
-                                     const std::vector<FolderPair>& directoryPairsFormatted,
-                                     int& timeShift, wxString& driveName)
-{
-    driveName.Clear();
-    timeShift = 0;
-
-    TIME_ZONE_INFORMATION dummy;
-    DWORD rv = GetTimeZoneInformation(&dummy);
-    if (rv == TIME_ZONE_ID_UNKNOWN) return;
-    bool dstActive = rv == TIME_ZONE_ID_DAYLIGHT;
-
-    for (std::vector<FolderPair>::const_iterator i = directoryPairsFormatted.begin(); i != directoryPairsFormatted.end(); ++i)
-    {
-        bool leftDirIsFat = isFatDrive(i->leftDirectory);
-        bool rightDirIsFat = isFatDrive(i->rightDirectory);
-
-        if (leftDirIsFat || rightDirIsFat)
-        {
-            unsigned int filesTotal        = 0; //total number of files (with same size on both sides)
-            unsigned int plusOneHourCount  = 0; //number of files with +1h time shift
-            unsigned int minusOneHourCount = 0; // "
-
-            for (FileCompareResult::const_iterator j = gridData.begin(); j != gridData.end(); ++j)
-            {
-                const FileDescrLine& leftFile  = j->fileDescrLeft;
-                const FileDescrLine& rightFile = j->fileDescrRight;
-
-                if (leftFile.objType == FileDescrLine::TYPE_FILE && rightFile.objType == FileDescrLine::TYPE_FILE &&
-                        leftFile.fileSize == rightFile.fileSize &&
-                        leftFile.directory.CmpNoCase(i->leftDirectory.c_str()) == 0 && //Windows does NOT distinguish between upper/lower-case
-                        rightFile.directory.CmpNoCase(i->rightDirectory.c_str()) == 0) //
-                {
-                    ++filesTotal;
-
-                    if (sameFileTime(leftFile.lastWriteTimeRaw - 3600, rightFile.lastWriteTimeRaw))
-                        ++plusOneHourCount;
-                    else if (sameFileTime(leftFile.lastWriteTimeRaw + 3600, rightFile.lastWriteTimeRaw))
-                        ++minusOneHourCount;
-                }
-            }
-
-            unsigned int threshold = getThreshold(filesTotal);
-            if (plusOneHourCount >= threshold)
-            {
-                if (dstActive)
-                {
-                    if (rightDirIsFat) //it should be FAT; else this were some kind of error
-                    {
-                        timeShift = 3600;
-                        driveName = getDriveName(i->rightDirectory);
-                    }
-                }
-                else
-                {
-                    if (leftDirIsFat) //it should be FAT; else this were some kind of error
-                    {
-                        timeShift = -3600;
-                        driveName = getDriveName(i->leftDirectory);
-                    }
-                }
-                return;
-            }
-            else if (minusOneHourCount >= threshold)
-            {
-                if (dstActive)
-                {
-                    if (leftDirIsFat) //it should be FAT; else this were some kind of error
-                    {
-                        timeShift = 3600;
-                        driveName = getDriveName(i->leftDirectory);
-                    }
-                }
-                else
-                {
-                    if (rightDirIsFat) //it should be FAT; else this were some kind of error
-                    {
-                        timeShift = -3600;
-                        driveName = getDriveName(i->rightDirectory);
-                    }
-                }
-                return;
-            }
-        }
-    }
-}
-#endif  //FFS_WIN
-*/
-

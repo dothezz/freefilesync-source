@@ -260,13 +260,13 @@ public:
     TraverseMedia(DeviceList& devices) : devices_(devices) {}
 
     virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
-    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
+    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
     {
         devices_.insert(std::make_pair(shortName, fullName));
         return nullptr; //DON'T traverse into subdirs
     }
-    virtual HandleError onError(const std::wstring& errorText) { return TRAV_ERROR_IGNORE; }
+    virtual HandleError onError(const std::wstring& errorText) { return ON_ERROR_IGNORE; }
 
 private:
     DeviceList& devices_;
@@ -328,7 +328,7 @@ Zstring volumenNameToPath(const Zstring& volumeName) //return empty string on er
     TraverseMedia::DeviceList deviceList;
 
     TraverseMedia traverser(deviceList);
-    traverseFolder("/media", false, traverser); //traverse one level
+    traverseFolder("/media", traverser); //traverse one level
 
     TraverseMedia::DeviceList::const_iterator iter = deviceList.find(volumeName);
     if (iter != deviceList.end())
@@ -511,7 +511,7 @@ Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()
 
     //remove leading/trailing whitespace
     trim(dirname, true, false);
-    while (endsWith(dirname, " ")) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
+    while (endsWith(dirname, Zstr(' '))) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
         dirname.resize(dirname.size() - 1);
 
     if (dirname.empty()) //an empty string would later be resolved as "\"; this is not desired
@@ -613,7 +613,7 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
             trgRes.dwType       = RESOURCETYPE_DISK;
             trgRes.lpRemoteName = const_cast<LPWSTR>(networkShare.c_str()); //trgRes is "__in"
 
-            //note: following function call may block heavily if network is not reachable!!!
+            //following function call may block heavily if network is not reachable!!!
             DWORD rv2 = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
                                              nullptr, // __in  LPCTSTR lpPassword,
                                              nullptr, // __in  LPCTSTR lpUsername,

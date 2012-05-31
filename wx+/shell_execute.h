@@ -71,7 +71,7 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
     {
         wxString cmdFmt = L"File: " + filename + L"\nArg: " + arguments;
-        wxMessageBox(replaceCpy(_("Invalid command line: %x"), L"%x", L"\n" + cmdFmt) + L"\n\n" + getLastErrorFormatted());
+        wxMessageBox(_("Invalid command line:") + L"\n" + cmdFmt + L"\n\n" + getLastErrorFormatted());
         return;
     }
 
@@ -86,10 +86,10 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
     if (type == EXEC_TYPE_SYNC)
     {
         //Posix::system - execute a shell command
-        int rv = ::system(utf8CvrtTo<std::string>(command).c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
+        int rv = ::system(utfCvrtTo<std::string>(command).c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
         if (rv == -1 || WEXITSTATUS(rv) == 127) //http://linux.die.net/man/3/system    "In case /bin/sh could not be executed, the exit status will be that of a command that does exit(127)"
         {
-            wxMessageBox(replaceCpy(_("Invalid command line: %x"), L"%x", L"\n" + command));
+            wxMessageBox(_("Invalid command line:") + L"\n" + command);
             return;
         }
     }

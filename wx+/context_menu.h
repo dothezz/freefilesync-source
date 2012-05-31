@@ -59,19 +59,22 @@ public:
 
     void addSubmenu(const wxString& label, ContextMenu& submenu, const wxBitmap* bmp = nullptr) //invalidates submenu!
     {
-        wxMenuItem* newItem = new wxMenuItem(menu.get(), wxID_ANY, label, L"", wxITEM_NORMAL, submenu.menu.release()); //menu owns item!
-        if (bmp) newItem->SetBitmap(*bmp); //do not set AFTER appending item! wxWidgets screws up for yet another crappy reason
-        menu->Append(newItem);
         //transfer submenu commands:
         commandList.insert(submenu.commandList.begin(), submenu.commandList.end());
         submenu.commandList.clear();
+
+        submenu.menu->SetNextHandler(menu.get()); //on wxGTK submenu events are not propagated to their parent menu by default!
+
+        wxMenuItem* newItem = new wxMenuItem(menu.get(), wxID_ANY, label, L"", wxITEM_NORMAL, submenu.menu.release()); //menu owns item, item owns submenu!
+        if (bmp) newItem->SetBitmap(*bmp); //do not set AFTER appending item! wxWidgets screws up for yet another crappy reason
+        menu->Append(newItem);
     }
 
     void popup(wxWindow& wnd) //show popup menu + process lambdas
     {
         //eventually all events from submenu items will be received by this menu
         for (auto iter = commandList.begin(); iter != commandList.end(); ++iter)
-            menu->Connect(iter->first, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ContextMenu::onSelection), new GenericCommand(iter->second), /*pass ownership*/ this);
+            menu->Connect(iter->first, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ContextMenu::onSelection), new GenericCommand(iter->second) /*pass ownership*/, this);
 
         wnd.PopupMenu(menu.get());
         wxTheApp->ProcessPendingEvents(); //make sure lambdas are evaluated before going out of scope;

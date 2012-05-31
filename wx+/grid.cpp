@@ -16,14 +16,15 @@
 #include <zen/tick_count.h>
 #include <zen/string_tools.h>
 #include <zen/scope_guard.h>
+#include <zen/utf.h>
 #include "format_unit.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
 #endif
 
-
 using namespace zen;
+
 
 wxColor zen::getColorSelectionGradientFrom() { return wxColor(137, 172, 255); } //blue: H:158 S:255 V:196
 wxColor zen::getColorSelectionGradientTo  () { return wxColor(225, 234, 255); } //      H:158 S:255 V:240
@@ -210,12 +211,55 @@ void GridData::drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bo
 }
 
 
+namespace
+{
+#ifdef _MSC_VER
+#pragma warning(disable:4428)	// VC wrongly issues warning C4428: universal-character-name encountered in source
+#endif
+const wchar_t ELLIPSIS = L'\u2026'; //...
+
+template <class Function> inline
+wxString getTruncatedText(const wxString& text, Function textFits)
+{
+    if (textFits(text))
+        return text;
+
+    //unlike Windows 7 Explorer, we truncate UTF-16 correctly: e.g. CJK-Ideogramm encodes to TWO wchar_t: utfCvrtTo<wxString>("\xf0\xa4\xbd\x9c");
+    size_t low  = 0; //number of unicode chars!
+    size_t high = unicodeLength(text); //
+
+    for (;;)
+    {
+        const size_t middle = (low + high) / 2;
+
+        wxString candidate(strBegin(text), findUnicodePos(text, middle));
+        candidate += ELLIPSIS;
+
+        if (high - low <= 1)
+            return candidate;
+
+        if (textFits(candidate))
+            low = middle;
+        else
+            high = middle;
+    }
+}
+
+void drawTextLabelFitting(wxDC& dc, const wxString& text, const wxRect& rect, int alignment)
+{
+    DcClipper clip(dc, rect); //wxDC::DrawLabel doesn't care about width, WTF?
+
+    //truncate large texts and add ellipsis
+    auto textFits = [&](const wxString& phrase) { return dc.GetTextExtent(phrase).GetWidth() <= rect.GetWidth(); };
+    dc.DrawLabel(getTruncatedText(text, textFits), rect, alignment);
+}
+}
+
+
 void GridData::drawCellText(wxDC& dc, const wxRect& rect, const wxString& text, bool enabled, int alignment)
 {
     wxDCTextColourChanger dummy(dc, enabled ? dc.GetTextForeground() : wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
-
-    DcClipper clip(dc, rect); //wxDC::DrawLabel doesn't care about width, WTF?
-    dc.DrawLabel(text, rect, alignment);
+    drawTextLabelFitting(dc, text, rect, alignment);
 }
 
 
@@ -260,8 +304,8 @@ void GridData::drawColumnLabelBackground(wxDC& dc, const wxRect& rect, bool high
 
 void GridData::drawColumnLabelText(wxDC& dc, const wxRect& rect, const wxString& text)
 {
-    DcClipper clip(dc, rect); //wxDC::DrawLabel doesn't care about witdh, WTF?
-    dc.DrawLabel(text, rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+    wxDCTextColourChanger dummy(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
+    drawTextLabelFitting(dc, text, rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 }
 
 //----------------------------------------------------------------------------------------------------------------
@@ -481,7 +525,7 @@ public:
     }
 
 private:
-    static wxString formatRow(size_t row) { return toStringSep(row + 1); } //convert number to std::wstring including thousands separator
+    static wxString formatRow(size_t row) { return toGuiString(row + 1); } //convert number to std::wstring including thousands separator
 
     virtual bool AcceptsFocus() const { return false; }
 
@@ -495,7 +539,8 @@ private:
         wxFont labelFont = GetFont();
         labelFont.SetWeight(wxFONTWEIGHT_BOLD);
         dc.SetFont(labelFont);
-        dc.SetTextForeground(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+
+        wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
 
         auto rowRange = getRowsOnClient(rect); //returns range [begin, end)
         for (auto row = rowRange.first; row < rowRange.second; ++row)
@@ -513,6 +558,7 @@ private:
     {
         //clearArea(dc, rect, getColorRowLabel());
         dc.GradientFillLinear(rect, COLOR_LABEL_GRADIENT_FROM, COLOR_LABEL_GRADIENT_TO, wxWEST); //clear overlapping cells
+        wxDCTextColourChanger dummy3(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
 
         //label text
         wxRect textRect = rect;
@@ -621,7 +667,8 @@ private:
         wxFont labelFont = GetFont();
         labelFont.SetWeight(wxFONTWEIGHT_BOLD);
         dc.SetFont(labelFont);
-        dc.SetTextForeground(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+
+        wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
 
         const int colLabelHeight = refParent().colLabelHeight;
 
@@ -847,6 +894,10 @@ private:
 };
 
 //----------------------------------------------------------------------------------------------------------------
+namespace
+{
+const wxEventType EVENT_GRID_HAS_SCROLLED = wxNewEventType(); //internal to Grid::MainWin::ScrollWindow()
+}
 //----------------------------------------------------------------------------------------------------------------
 
 class Grid::MainWin : public SubWindow
@@ -857,7 +908,10 @@ public:
             ColLabelWin& colLabelWin) : SubWindow(parent),
         rowLabelWin_(rowLabelWin),
         colLabelWin_(colLabelWin),
-        selectionAnchor(0) {}
+        selectionAnchor(0)
+    {
+        Connect(EVENT_GRID_HAS_SCROLLED, wxCommandEventHandler(MainWin::updateAfterScroll), nullptr, this);
+    }
 
     void makeRowVisible(size_t row)
     {
@@ -915,7 +969,8 @@ private:
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
 
         dc.SetFont(GetFont());
-        dc.SetTextForeground(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+
+        wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
 
         const int rowHeight = rowLabelWin_.getRowHeight();
 
@@ -938,7 +993,7 @@ private:
             {
                 //draw background lines
                 {
-                    DcClipper dummy(dc, rect); //solve issues with drawBackground() painting in area outside of rect (which is not also refreshed by renderCell()) -> keep small scope!
+                    DcClipper dummy2(dc, rect); //solve issues with drawBackground() painting in area outside of rect (which is not also refreshed by renderCell()) -> keep small scope!
                     for (int row = rowFirst; row < rowLast; ++row)
                         drawBackground(*prov, dc, wxRect(cellAreaTL + wxPoint(0, row * rowHeight), wxSize(compWidth, rowHeight)), row, compPos);
                 }
@@ -992,8 +1047,12 @@ private:
     {
         const wxPoint absPos = refParent().CalcUnscrolledPosition(event.GetPosition());
         const auto row       = rowLabelWin_.getRowAtPos(absPos.y); //return -1 if no row at this position
-        if (const auto colInfo = refParent().getColumnAtPos(absPos.x)) //returns (column type, compPos)
-            sendEventNow(GridClickEvent(EVENT_GRID_MOUSE_LEFT_DOUBLE, event, row, colInfo->first, colInfo->second));
+        const auto colInfo = refParent().getColumnAtPos(absPos.x); //returns (column type, compPos)
+
+        const ColumnType colType = colInfo ? colInfo->first  : DUMMY_COLUMN_TYPE;
+        const ptrdiff_t  compPos = colInfo ? colInfo->second : -1;
+        //client is interested in all double-clicks, even those outside of the grid!
+        sendEventNow(GridClickEvent(EVENT_GRID_MOUSE_LEFT_DOUBLE, event, row, colType, compPos));
         event.Skip();
     }
 
@@ -1070,7 +1129,7 @@ private:
         const auto colInfo = refParent().getColumnAtPos(absPos.x); //returns optional pair (column type, compPos)
 
         const ColumnType colType = colInfo ? colInfo->first  : DUMMY_COLUMN_TYPE; //we probably should notify even if colInfo is invalid!
-        const size_t     compPos = colInfo ? colInfo->second : 0;
+        const ptrdiff_t  compPos = colInfo ? colInfo->second : -1;
 
         //notify event
         sendEventNow(GridClickEvent(event.RightUp() ? EVENT_GRID_MOUSE_RIGHT_UP : EVENT_GRID_MOUSE_LEFT_UP, event, row, colType, compPos));
@@ -1361,7 +1420,18 @@ private:
         rowLabelWin_.ScrollWindow(0, dy, rect);
         colLabelWin_.ScrollWindow(dx, 0, rect);
 
-        refParent().updateWindowSizes(false); //row label width has changed -> do *not* update scrollbars: recursion on wxGTK!
+        //attention, wxGTK call sequence: wxScrolledWindow::Scroll() -> wxScrolledHelperNative::Scroll() -> wxScrolledHelperNative::DoScroll()
+        //which *first* calls us, MainWin::ScrollWindow(), and *then* internally updates m_yScrollPosition
+        //=> we cannot use CalcUnscrolledPosition() here which gives the wrong/outdated value!!!
+        //=> we need to update asynchronously:
+        wxCommandEvent scrollEvent(EVENT_GRID_HAS_SCROLLED);
+        if (wxEvtHandler* evtHandler = GetEventHandler())
+            evtHandler->AddPendingEvent(scrollEvent);
+    }
+
+    void updateAfterScroll(wxCommandEvent&)
+    {
+        refParent().updateWindowSizes(false); //row label width has changed -> do *not* update scrollbars: recursion on wxGTK! -> still a problem, now that we're called async??
         rowLabelWin_.Update(); //update while dragging scroll thumb
     }
 

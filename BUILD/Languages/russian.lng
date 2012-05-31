@@ -7,7 +7,7 @@
 	<plural definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<11 || n%100>14) ? 1 : 2</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
+<source>Searching for folder %x...</source>
 <target>Поиск папки %x...</target>
 
 <source>Show in Explorer</source>
@@ -25,17 +25,20 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Автоматическая синхронизация</target>
 
+<source>Error</source>
+<target>Ошибка</target>
+
 <source>Select alternate comparison settings</source>
 <target>Выбрать альтернативные настройки сравнения</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Выбрать альтернативные настройки синхронизации</target>
 
-<source>No filter selected</source>
-<target>Ни один фильтр не выбран</target>
-
 <source>Filter is active</source>
 <target>Фильтр активен</target>
+
+<source>No filter selected</source>
+<target>Ни один фильтр не выбран</target>
 
 <source>Remove alternate settings</source>
 <target>Удалить альтернативные настройки</target>
@@ -55,9 +58,6 @@
 <source>About</source>
 <target>О программе</target>
 
-<source>Error</source>
-<target>Ошибка</target>
-
 <source>Warning</source>
 <target>Внимание</target>
 
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Глобальные настройки</target>
 
-<source>Synchronization Preview</source>
-<target>Предпросмотр синхронизации</target>
+<source>Summary</source>
+<target>Сводка</target>
 
 <source>Find</source>
 <target>Найти</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Обзор</target>
 
-<source>Invalid command line: %x</source>
-<target>Неверная командная строка: %x</target>
+<source>Invalid command line:</source>
+<target>Неверная командная строка:</target>
 
 <source>Info</source>
 <target>Информация</target>
@@ -229,29 +229,29 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>Имя тома %x не является частью имени файла %y!</target>
 
-<source>Cannot find file %x.</source>
-<target>Не удается найти файл %x.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Невозможно прочитать следующие XML элементы:</target>
 
-<source>S&ave configuration...</source>
-<target>Сохранить настройки синхронизации...</target>
+<source>Cannot find file %x.</source>
+<target>Не удается найти файл %x.</target>
 
-<source>&Load configuration...</source>
-<target>&Загрузить настройки синхронизации...</target>
+<source>&Open...</source>
+<target>&Открыть...</target>
+
+<source>&Save...</source>
+<target>&Сохранить...</target>
 
 <source>&Quit</source>
 <target>&Выход</target>
 
-<source>&File</source>
-<target>&Файл</target>
+<source>&Program</source>
+<target>&Программа</target>
 
 <source>&Content</source>
 <target>&Справка</target>
 
-<source>&About...</source>
-<target>&О программе...</target>
+<source>&About</source>
+<target>&О программе</target>
 
 <source>&Help</source>
 <target>&Помощь</target>
@@ -259,7 +259,7 @@
 <source>Usage:</source>
 <target>Инструкция:</target>
 
-<source>1. Select directories to monitor.</source>
+<source>1. Select folders to watch.</source>
 <target>1. Выберите папки для наблюдения;</target>
 
 <source>2. Enter a command line.</source>
@@ -268,18 +268,10 @@
 <source>3. Press 'Start'.</source>
 <target>3. Нажмите 'Старт'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-Командная строка выполняется каждый раз, когда:
-- все папки становятся доступны (например, подключение переносного носителя)
-- файлы в папках или подпапках изменены
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>Для запуска просто импортируйте файл .ffs_batch.</target>
 
-<source>Directories to watch</source>
+<source>Folders to watch</source>
 <target>Папки для наблюдения</target>
 
 <source>Add folder</source>
@@ -291,23 +283,40 @@ The command line is executed each time:
 <source>Select a folder</source>
 <target>Выбрать папку</target>
 
+<source>Delay [seconds]</source>
+<target>Задержка [в секундах]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Время задержки между последним обнаруженным изменением и выполнением командной строки в секундах</target>
+
 <source>Command line</source>
 <target>Командная строка</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Минимальное время простоя [секунд]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Время простоя между обнаружением последнего изменения и выполнением командной строки в секундах</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+Команда выполняется, если:
+- файлы или подпапки изменены
+- появились новые папки (например, подключение переносного носителя)
+</target>
 
 <source>Start</source>
 <target>Старт</target>
 
+<source>&Retry</source>
+<target>&Повторить</target>
+
+<source>Cancel</source>
+<target>Отмена</target>
+
 <source>(Build: %x)</source>
 <target>(сборка %x)</target>
 
-<source>RealtimeSync configuration</source>
-<target>Настройка RealtimeSync</target>
+<source>All files</source>
+<target></target>
 
 <source>&Restore</source>
 <target>&Восстановить</target>
@@ -321,8 +330,8 @@ The command line is executed each time:
 <source>Waiting for missing directories...</source>
 <target>Ожидание пропущенных папок...</target>
 
-<source>A directory input field is empty.</source>
-<target>Поле ввода пути папки пустое.</target>
+<source>An input folder name is empty.</source>
+<target>Поле ввода имени папки пустое.</target>
 
 <source>Logging</source>
 <target>Лог-файлы</target>
@@ -347,9 +356,6 @@ The command line is executed each time:
 
 <source>FreeFileSync batch file</source>
 <target>Файл пакетного задания FreeFileSync</target>
-
-<source>FreeFileSync configuration</source>
-<target>Настройка FreeFileSync</target>
 
 <source>Batch execution</source>
 <target>Выполнение пакетного задания</target>
@@ -393,11 +399,11 @@ The command line is executed each time:
 <source>Download now?</source>
 <target>Загрузить сейчас?</target>
 
-<source>Information</source>
-<target>Информация</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>У Вас самая последняя версия FreeFileSync!</target>
+
+<source>Information</source>
+<target>Информация</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Вы хотите, чтобы FreeFileSync автоматически проверял наличие обновлений каждую неделю?</target>
@@ -408,7 +414,7 @@ The command line is executed each time:
 <source><Symlink></source>
 <target><Символьная ссылка></target>
 
-<source><Directory></source>
+<source><Folder></source>
 <target><Папка></target>
 
 <source>Full path</source>
@@ -420,8 +426,8 @@ The command line is executed each time:
 <source>Relative path</source>
 <target>Относительный путь</target>
 
-<source>Directory</source>
-<target>Папка</target>
+<source>Base folder</source>
+<target>Основная папка</target>
 
 <source>Size</source>
 <target>Размер</target>
@@ -432,8 +438,11 @@ The command line is executed each time:
 <source>Extension</source>
 <target>Расширение</target>
 
-<source>Comparison Result</source>
-<target>Результаты сравнения</target>
+<source>Action</source>
+<target>Действие</target>
+
+<source>Category</source>
+<target>Категория</target>
 
 <source>Drag && drop</source>
 <target>Drag && drop</target>
@@ -441,14 +450,14 @@ The command line is executed each time:
 <source>Close progress dialog</source>
 <target>Закрыть окно процесса</target>
 
-<source>Shut down</source>
-<target>Выключить компьютер</target>
+<source>Standby</source>
+<target>Перейти в оджидание</target>
 
 <source>Log off</source>
 <target>Выйти из системы (разлогиниться)</target>
 
-<source>Standby</source>
-<target>Перейти в оджидание</target>
+<source>Shut down</source>
+<target>Выключить компьютер</target>
 
 <source>Hibernate</source>
 <target>Гибернация</target>
@@ -456,14 +465,11 @@ The command line is executed each time:
 <source>1. &Compare</source>
 <target>1. &Сравнить</target>
 
-<source>2. &Synchronize...</source>
+<source>2. &Synchronize</source>
 <target>2. &Синхронизировать</target>
 
 <source>&New</source>
 <target>&Новая</target>
-
-<source>&Program</source>
-<target>&Программа</target>
 
 <source>&Language</source>
 <target>&Язык</target>
@@ -492,7 +498,7 @@ The command line is executed each time:
 <source>&Abort</source>
 <target>&Отмена</target>
 
-<source>Synchronize...</source>
+<source>Synchronize</source>
 <target>Синхронизировать</target>
 
 <source>Start synchronization</source>
@@ -507,11 +513,11 @@ The command line is executed each time:
 <source>Swap sides</source>
 <target>Поменять направление</target>
 
-<source>Save current configuration to file</source>
-<target>Сохранить текущие настройки синхронизации в файл</target>
-
 <source>Load configuration from file</source>
 <target>Загрузить настройки синхронизации из файла</target>
+
+<source>Save current configuration to file</source>
+<target>Сохранить текущие настройки синхронизации в файл</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>
@@ -520,25 +526,22 @@ The command line is executed each time:
 </target>
 
 <source>Hide excluded items</source>
-<target>Скрыть исключенные пункты</target>
+<target>Скрыть исключенные элементы</target>
 
 <source>Hide filtered or temporarily excluded files</source>
 <target>Скрыть отфильтрованные или временно исключенные файлы</target>
 
-<source>Number of files and directories that will be created</source>
-<target>Число файлов и папок, которые будут созданы</target>
+<source>Number of files and folders that will be created</source>
+<target>Количество файлов и папок, которые будут созданы</target>
 
 <source>Number of files that will be overwritten</source>
-<target>Число файлов, которые будут перезаписаны</target>
+<target>Количество файлов, которые будут перезаписаны</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>Число файлов и папок, которые будут удалены</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Количество файлов и папок, которые будут удалены</target>
 
 <source>Total amount of data that will be transferred</source>
 <target>Общий объем данных, который будет передаваться</target>
-
-<source>Operation:</source>
-<target>Операция:</target>
 
 <source>Items found:</source>
 <target>Элементов найдено:</target>
@@ -555,8 +558,8 @@ The command line is executed each time:
 <source>Batch job</source>
 <target>Пакетное задание</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Создайте файл пакетного задания для автоматической синхронизации. Для запуска в пакетном режиме просто дважды щелкните по файлу или выполните командную строку: FreeFileSync.exe SyncJob.ffs_batch. Также запуск можно запланировать в планировщике задач операционной системы.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Создайте файл пакетного задания для автоматической синхронизации. Для запуска дважды кликните на файле или создайте расписание в планировщике вашей системы: FreeFileSync.exe <название>.ffs_batch</target>
 
 <source>Help</source>
 <target>Помощь</target>
@@ -582,20 +585,11 @@ The command line is executed each time:
 <source>Maximum number of log files:</source>
 <target>Максимальное количество лог-файлов:</target>
 
-<source>Select log file directory:</source>
-<target>Выберите папку для лог-файлов:</target>
+<source>Select folder to save log files:</source>
+<target>Выберите папку для сохранения лог-файлов:</target>
 
 <source>Batch settings</source>
 <target>Настройки пакетного задания</target>
-
-<source>&Save</source>
-<target>&Сохранить</target>
-
-<source>&Load</source>
-<target>&Загрузить</target>
-
-<source>Cancel</source>
-<target>Отмена</target>
 
 <source>Select variant:</source>
 <target>Варианты синхронизации</target>
@@ -621,29 +615,23 @@ The command line is executed each time:
 <source>Configuration</source>
 <target>Настройки</target>
 
-<source>Category</source>
-<target>Категория</target>
+<source>Item exists on left side only</source>
+<target>Элемент существует только на левой стороне</target>
 
-<source>Action</source>
-<target>Действие</target>
+<source>Item exists on right side only</source>
+<target>Элемент существует только на правой стороне</target>
 
-<source>File/folder exists on left side only</source>
-<target>Файл/папка существует только на левой стороне</target>
+<source>Left side is newer</source>
+<target>На левой стороне новее</target>
 
-<source>File/folder exists on right side only</source>
-<target>Файл/папка существует только на правой стороне</target>
+<source>Right side is newer</source>
+<target>На правой стороне новее</target>
 
-<source>Left file is newer</source>
-<target>Файл на левой стороне новее</target>
+<source>Items have different content</source>
+<target>Элемент имеют различное содержание</target>
 
-<source>Right file is newer</source>
-<target>Файл на правой стороне новее</target>
-
-<source>Files have different content</source>
-<target>Файлы имеют различное содержание</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Конфликт/файл не может быть отнесен к какой-либо категории</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Конфликт/элемент не могут быть отнесены к какой-либо категории</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -715,9 +703,6 @@ is the same
 <source>&Ignore</source>
 <target>&Игнорировать</target>
 
-<source>&Retry</source>
-<target>&Повторить</target>
-
 <source>Do not show this dialog again</source>
 <target>Больше не показывать это окно</target>
 
@@ -748,33 +733,6 @@ Note: File names must be relative to base directories!
 Примечание: Файлы должны относиться к синхронизируемым папкам!
 </target>
 
-<source>Hints:</source>
-<target>Подсказка:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Введите имена файлов или папок, разделяя знаком ';' или с новой строки.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Используйте символы '*' и '?' для замены неизвестных.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Исключите файлы прямо в главном окне через контекстное меню.</target>
-
-<source>Example</source>
-<target>Пример</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Включая: *.doc;*.zip;*.exe
-Исключая: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Синхронизировать все .doc, .zip и .exe файлы, за исключением всех файлов из подпапки "temp"</target>
-
 <source>Include</source>
 <target>Включить</target>
 
@@ -796,8 +754,8 @@ Exclude: \stuff\temp\*
 <source>&Default</source>
 <target>&По-умолчанию</target>
 
-<source>Transactional file copy</source>
-<target>Безопасное копирование файлов</target>
+<source>Fail-safe file copy</source>
+<target>Отказоустойчивое копирование файла</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Сначала копировать во временные файлы (*.ffs_tmp), затем переименовывать их. Это гарантирует целостность заменяемых файлов в случае возникновения фатальной ошибки копирования.</target>
@@ -811,7 +769,7 @@ Exclude: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>Копирование прав доступа к файлам</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
 <target>Передача прав доступа к файлам/папкам (требуются права Администратора)</target>
 
 <source>Restore hidden dialogs</source>
@@ -1127,10 +1085,10 @@ Exclude: \stuff\temp\*
 Доступны следующие команды:
 </target>
 
-<source>- full file or directory name</source>
+<source>- full file or folder name</source>
 <target>- полный путь файла или папки</target>
 
-<source>- directory part only</source>
+<source>- folder part only</source>
 <target>- часть пути папки</target>
 
 <source>- Other side's counterpart to %name</source>
@@ -1177,7 +1135,7 @@ Exclude: \stuff\temp\*
 <source>Versioning</source>
 <target>Перемещать старые версии файлов в заданную папку</target>
 
-<source>Move files into a time-stamped subdirectory</source>
+<source>Move files into a time-stamped subfolder</source>
 <target>Перемещать файлы в заданную папку (можно создавать архивные версии удаленных файлов)</target>
 
 <source>Files</source>
@@ -1246,6 +1204,9 @@ Exclude: \stuff\temp\*
 <source>Cannot write modification time of %x.</source>
 <target>Не удается записать время модификации файла %x.</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Не удается записать атрибуты файла %x.</target>
+
 <source>Cannot find system function %x.</source>
 <target>Не удается найти системную функцию %x.</target>
 
@@ -1267,17 +1228,14 @@ Exclude: \stuff\temp\*
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Не удается скопировать символьную ссылку %x в %y.</target>
 
-<source>Cannot write file attributes of %x.</source>
-<target>Не удается записать атрибуты файла %x.</target>
-
 <source>Cannot copy file %x to %y.</source>
 <target>Не удается скопировать файл %x в %y.</target>
 
 <source>Cannot read directory %x.</source>
 <target>Не удается прочесть папку %x.</target>
 
-<source>Endless loop.</source>
-<target>Бесконечный цикл.</target>
+<source>Detected endless directory recursion.</source>
+<target>Обнаружена бесконечная рекурсия папок.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Не удается установить привелегии %x.</target>
@@ -1306,13 +1264,10 @@ Exclude: \stuff\temp\*
 Старые файлы будут заменены более новыми файлами.
 </target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Файл не содержит действительных настроек синхронизации:</target>
-
-<source>You can ignore this error to consider the directory as empty.</source>
+<source>You can ignore this error to consider the folder as empty.</source>
 <target>Вы можете проигнорировать ошибку, приняв папку за пустую.</target>
 
-<source>Cannot find directory %x.</source>
+<source>Cannot find folder %x.</source>
 <target>Не удается найти папку %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
@@ -1345,20 +1300,20 @@ Exclude: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>Обе стороны равны</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Файлы/папки разнятся только атрибутами</target>
+<source>Items have different attributes</source>
+<target>Элементы имеют разные атрибуты</target>
 
-<source>Copy new file/folder to left</source>
-<target>Скопировать новый файл/папку налево</target>
+<source>Copy new item to left</source>
+<target>Скопировать новый элемент налево</target>
 
-<source>Copy new file/folder to right</source>
-<target>Скопировать новый файл/папку направо</target>
+<source>Copy new item to right</source>
+<target>Скопировать новый элемент направо</target>
 
-<source>Delete left file/folder</source>
-<target>Удалить файл/папку слева</target>
+<source>Delete left item</source>
+<target>Удалить элемент слева</target>
 
-<source>Delete right file/folder</source>
-<target>Удалить файл/папку справа</target>
+<source>Delete right item</source>
+<target>Удалить элемент справа</target>
 
 <source>Move file on left</source>
 <target>Переместить файл налево</target>
@@ -1366,20 +1321,20 @@ Exclude: \stuff\temp\*
 <source>Move file on right</source>
 <target>Переместить файл направо</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Перезаписать файл/папку слева на аналогичную из правой части</target>
+<source>Overwrite left item</source>
+<target>Перезаписать элемент слева</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Перезаписать файл/папку справа на аналогичную из левой части</target>
+<source>Overwrite right item</source>
+<target>Перезаписать элемент справа</target>
 
 <source>Do nothing</source>
 <target>Ничего не делать</target>
 
-<source>Copy file attributes only to left</source>
-<target>Скопировать только атрибуты файла налево</target>
+<source>Update attributes on left</source>
+<target>Обновление атрибутов слева</target>
 
-<source>Copy file attributes only to right</source>
-<target>Скопировать только атрибуты файла направо</target>
+<source>Update attributes on right</source>
+<target>Обновление атрибутов справа</target>
 
 <source>Multiple...</source>
 <target>Различные варианты синхронизации</target>
@@ -1432,11 +1387,11 @@ Exclude: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>Обновление атрибутов %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Путь целевой папки не должен быть пустым!</target>
+<source>Target folder name must not be empty.</source>
+<target>Путь целевой папки не должен быть пустым.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Папка для старых версий файлов не была указана!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>Путь папки для старых версий файлов не должен быть пустым.</target>
 
 <source>Source directory %x not found.</source>
 <target>Исходная папка %x не найдена.</target>
@@ -1465,8 +1420,8 @@ Exclude: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Для этого пути "Корзина" не доступна! Файлы будут удалены безвозвратно:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Папка, входящая в несколько пар папок, будет изменена. Пожалуйста, проверьте настройки синхронизации!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>Папка, входящая в несколько пар папок, будет изменена. Пожалуйста, проверьте настройки синхронизации.</target>
 
 <source>Processing folder pair:</source>
 <target>Обработка пары папок:</target>

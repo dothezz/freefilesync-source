@@ -211,7 +211,7 @@ int daysSinceBeginOfWeek(int dayOfWeek) //0-6, 0=Monday, 6=Sunday
                         LOCALE_IFIRSTDAYOFWEEK |             // first day of week specifier, 0-6, 0=Monday, 6=Sunday
                         LOCALE_RETURN_NUMBER,                //__in   LCTYPE LCType,
                         reinterpret_cast<LPTSTR>(&firstDayOfWeek),    //__out  LPTSTR lpLCData,
-                        sizeof(firstDayOfWeek) / sizeof(TCHAR)) != 0) //__in   int cchData
+                        sizeof(firstDayOfWeek) / sizeof(TCHAR)) > 0) //__in   int cchData
     {
         assert(firstDayOfWeek <= 6);
         return (dayOfWeek + (7 - firstDayOfWeek)) % 7;

@@ -7,8 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>מחפש מחיצה %x</target>
+<source>Searching for folder %x...</source>
+<target>מחפש את תיקייה %x...</target>
 
 <source>Show in Explorer</source>
 <target>הראה בסייר הקבצים</target>
@@ -34,11 +34,11 @@
 <source>Select alternate synchronization settings</source>
 <target>בחר הגדרות סנכרון חליפיות</target>
 
-<source>No filter selected</source>
-<target>לא נבחר מסנן פעיל</target>
-
 <source>Filter is active</source>
 <target>מסנן פעיל</target>
+
+<source>No filter selected</source>
+<target>לא נבחר מסנן פעיל</target>
 
 <source>Remove alternate settings</source>
 <target>הסר הגדרות תצורה חליפיות</target>
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>משתנים גלובליים</target>
 
-<source>Synchronization Preview</source>
-<target>תצוגה מקדימה של סנכרון</target>
+<source>Summary</source>
+<target>תקציר</target>
 
 <source>Find</source>
 <target>חפש</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>עיין</target>
 
-<source>Invalid command line: %x</source>
-<target>שורת פקודה בלתי חוקית: %x</target>
+<source>Invalid command line:</source>
+<target>שורת פקודה בלתי חוקית:</target>
 
 <source>Info</source>
 <target>מידע</target>
@@ -226,29 +226,29 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>ככונן %x לא בנתיב של קובץ %y!</target>
 
-<source>Cannot find file %x.</source>
-<target>לא יכול למצוא קובץ %x.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>לא יכול לקרוא את שמות צמתי XML:</target>
 
-<source>S&ave configuration...</source>
-<target>&שמור תצורה...</target>
+<source>Cannot find file %x.</source>
+<target>לא יכול למצוא קובץ %x.</target>
 
-<source>&Load configuration...</source>
-<target>&טען תצורה...</target>
+<source>&Open...</source>
+<target>&פתח...</target>
+
+<source>&Save...</source>
+<target>&שמור...</target>
 
 <source>&Quit</source>
 <target>&יציאה</target>
 
-<source>&File</source>
-<target>&קובץ</target>
+<source>&Program</source>
+<target>&תוכנה</target>
 
 <source>&Content</source>
 <target>&תוכן</target>
 
-<source>&About...</source>
-<target>&אודות...</target>
+<source>&About</source>
+<target>&אודות</target>
 
 <source>&Help</source>
 <target>&עזרה</target>
@@ -256,8 +256,8 @@
 <source>Usage:</source>
 <target>שימוש:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. בחר מחיצות לניטור.</target>
+<source>1. Select folders to watch.</source>
+<target>1. בחר תיקיות לצפייה.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. הקש שורת פקודות.</target>
@@ -265,19 +265,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. לחץ 'הפעל'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-שורת הפקודה מבוצעת בכל פעם כאשר:
-- כל המחיצות הופכות זמינות (לדוגמה חיבור זכרון נתיק)
-- קבצים במחיצות אלו משתנים
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>בכדי להתחיל יבא קובץ .ffs_batch</target>
 
-<source>Directories to watch</source>
-<target>מחיצות לניטור</target>
+<source>Folders to watch</source>
+<target>תיקיות לצפייה</target>
 
 <source>Add folder</source>
 <target>הוסף מחיצה</target>
@@ -288,14 +280,25 @@ The command line is executed each time:
 <source>Select a folder</source>
 <target>בחר מחיצה</target>
 
+<source>Delay [seconds]</source>
+<target>השהייה [שניות]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>זמן המתנה בין שינויי מאובחן אחרון לבין ביצוע של פקודה</target>
+
 <source>Command line</source>
 <target>שורת פקודות</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>זמן מנוחה מינימלי [שניות]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>זמן מנוחה מגילוי שינוי אחרון עד לביצוע שורת פקודה בשניות</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+הפקודה מופעלת כאשר:
+- קבצים או תת-תיקיות משתנים
+- תיקיות חדשות מופיעות (לדוגמה התקן USB מוכנס)
+</target>
 
 <source>Start</source>
 <target>התחל</target>
@@ -324,8 +327,8 @@ The command line is executed each time:
 <source>Waiting for missing directories...</source>
 <target>מחכה למחיצות חסרות...</target>
 
-<source>A directory input field is empty.</source>
-<target>שדה כניסת מחיצה ריק.</target>
+<source>An input folder name is empty.</source>
+<target>שם תיקיית קלט ריק.</target>
 
 <source>Logging</source>
 <target>רישום ביומן</target>
@@ -396,11 +399,11 @@ The command line is executed each time:
 <source>Download now?</source>
 <target>הורד עכשיו?</target>
 
-<source>Information</source>
-<target>מידע</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>FreeFileSync מעודכן לגירסה האחרונה!</target>
+
+<source>Information</source>
+<target>מידע</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>האם ברצונך שהתוכנה תבדוק לעדכון בכל שבוע?</target>
@@ -411,8 +414,8 @@ The command line is executed each time:
 <source><Symlink></source>
 <target><קשור סימבולי></target>
 
-<source><Directory></source>
-<target><מחיצה></target>
+<source><Folder></source>
+<target><תיקייה></target>
 
 <source>Full path</source>
 <target>נתיב מלא</target>
@@ -423,8 +426,8 @@ The command line is executed each time:
 <source>Relative path</source>
 <target>נתיב יחסי</target>
 
-<source>Directory</source>
-<target>מחיצה</target>
+<source>Base folder</source>
+<target>תיקיית בסיס</target>
 
 <source>Size</source>
 <target>גודל</target>
@@ -435,8 +438,11 @@ The command line is executed each time:
 <source>Extension</source>
 <target>סיומת</target>
 
-<source>Comparison Result</source>
-<target>תוצאות ההשוואה</target>
+<source>Action</source>
+<target>פעולה</target>
+
+<source>Category</source>
+<target>קטגוריה</target>
 
 <source>Drag && drop</source>
 <target>גרור והשלך</target>
@@ -444,14 +450,14 @@ The command line is executed each time:
 <source>Close progress dialog</source>
 <target>סגור שיח התקדמות</target>
 
-<source>Shut down</source>
-<target>כבה מחשב</target>
+<source>Standby</source>
+<target>עבור למצב המתנה</target>
 
 <source>Log off</source>
 <target>התנתק כמשתמש</target>
 
-<source>Standby</source>
-<target>עבור למצב המתנה</target>
+<source>Shut down</source>
+<target>כבה מחשב</target>
 
 <source>Hibernate</source>
 <target>עבור למצב שינה</target>
@@ -459,14 +465,11 @@ The command line is executed each time:
 <source>1. &Compare</source>
 <target>1. &השווה</target>
 
-<source>2. &Synchronize...</source>
-<target>2. &סנכרן...</target>
+<source>2. &Synchronize</source>
+<target>2. &סנכרן</target>
 
 <source>&New</source>
 <target>&חדש</target>
-
-<source>&Program</source>
-<target>&תוכנה</target>
 
 <source>&Language</source>
 <target>&שפה</target>
@@ -495,8 +498,8 @@ The command line is executed each time:
 <source>&Abort</source>
 <target>&נטוש</target>
 
-<source>Synchronize...</source>
-<target>...סנכרן</target>
+<source>Synchronize</source>
+<target>סנכרן</target>
 
 <source>Start synchronization</source>
 <target>התחל סנכרון</target>
@@ -510,11 +513,11 @@ The command line is executed each time:
 <source>Swap sides</source>
 <target>החלף צדדים</target>
 
-<source>Save current configuration to file</source>
-<target>שמור תצורה נוכחית לקובץ</target>
-
 <source>Load configuration from file</source>
 <target>טען קונפיגורציה מקובץ</target>
+
+<source>Save current configuration to file</source>
+<target>שמור תצורה נוכחית לקובץ</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>תצורות אחרונות שהיו בשמוש (לחץ DEL להסרה מהרשימה)</target>
@@ -525,20 +528,17 @@ The command line is executed each time:
 <source>Hide filtered or temporarily excluded files</source>
 <target>החבא קבצים מסוננים או נשללים</target>
 
-<source>Number of files and directories that will be created</source>
-<target>מספר התקיות והקבצים אשר עומדים להיוצר</target>
+<source>Number of files and folders that will be created</source>
+<target>מספר הקבצים והתיקיות שייוצרו</target>
 
 <source>Number of files that will be overwritten</source>
 <target>מספר הקבצים העומדים להיכתב מחדש</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>מספר הקבצים והתיקיות העומדים להימחק</target>
+<source>Number of files and folders that will be deleted</source>
+<target>מספר הקבצים והתיקיות שימחקו</target>
 
 <source>Total amount of data that will be transferred</source>
 <target>סך הכל נתונים להעברה</target>
-
-<source>Operation:</source>
-<target>פעולה:</target>
 
 <source>Items found:</source>
 <target>אלמנטים נמצאו:</target>
@@ -555,8 +555,8 @@ The command line is executed each time:
 <source>Batch job</source>
 <target>עבודת אצווה</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>צור קובץ אצווה ומכן הסינכרון. הפעל באמצעות הקשה כפולה על שם הקובץ או הפעל שורת פקודה: FreeFileSync.exe <ffs_batch file>. ההפעלה ניתנת לתזמון במתזמן המשימות של מערכת ההפעלה.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>יצור קובץ אצווה לסינכרון אוטומטי. הפעל בהקלקה כפולה או תזמן באמצעות מתזמן המשימות של המערכת: FreeFileSync.exe</target>
 
 <source>Help</source>
 <target>עזרה</target>
@@ -582,17 +582,11 @@ The command line is executed each time:
 <source>Maximum number of log files:</source>
 <target>מספר מכסימלי של קבצי יומן</target>
 
-<source>Select log file directory:</source>
-<target>בחר מחיצה לקבצי יומן</target>
+<source>Select folder to save log files:</source>
+<target>בחר תיקייה לשמירה קבצי יומן:</target>
 
 <source>Batch settings</source>
 <target>הגדרות אצווה</target>
-
-<source>&Save</source>
-<target>&שמירה</target>
-
-<source>&Load</source>
-<target>&טען</target>
 
 <source>Select variant:</source>
 <target>בחר משתנה:</target>
@@ -618,29 +612,23 @@ The command line is executed each time:
 <source>Configuration</source>
 <target>תצורה</target>
 
-<source>Category</source>
-<target>קטגוריה</target>
+<source>Item exists on left side only</source>
+<target>הפריט קיים בצד ימין בלבד</target>
 
-<source>Action</source>
-<target>פעולה</target>
+<source>Item exists on right side only</source>
+<target>הפריט קיים בצד שמאל בלבד</target>
 
-<source>File/folder exists on left side only</source>
-<target>קובץ\מחיצה קיים בצד ימין בלבד</target>
+<source>Left side is newer</source>
+<target>צד ימין חדש יותר</target>
 
-<source>File/folder exists on right side only</source>
-<target>קובץ\מחיצה קיים בצד שמאל בלבד</target>
-
-<source>Left file is newer</source>
-<target>קובץ בצד ימין חדש יותר</target>
-
-<source>Right file is newer</source>
+<source>Right side is newer</source>
 <target>צד שמאל חדש יותר</target>
 
-<source>Files have different content</source>
-<target>הקבצים בעלי תכולה שונה</target>
+<source>Items have different content</source>
+<target>הפריטים הם בעלי תוכן שונה</target>
 
-<source>Conflict/file cannot be categorized</source>
-<target>קונפליקט\קובץ אינו יכול לקבל סיווג</target>
+<source>Conflict/item cannot be categorized</source>
+<target>סתירה/פריט אינו ניתן לסיווג</target>
 
 <source>OK</source>
 <target>אשר</target>
@@ -747,33 +735,6 @@ Note: File names must be relative to base directories!
 הערה: שמות קבצים חייבים להיות מוגדרים באופן יחסי למחיצות הראשיות!
 </target>
 
-<source>Hints:</source>
-<target>טיפים:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. הכנס שם קובץ או שם תיקיה מופרדים ע"י ';' או דורה חדשה</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. השתמש באשפים '*' או '?'לבחירה מרובה.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. הוצא קבצים היישר באסכלה עיקרית דרך תפריט הקשר.</target>
-
-<source>Example</source>
-<target>דוגמה</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-כלול: *.doc;*.zip;*.exe
-אל תכלול: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>סנכרן .doc, .zip und .exe כל הקבצים בתיקית משנה "temp".</target>
-
 <source>Include</source>
 <target>כלול</target>
 
@@ -795,8 +756,8 @@ Exclude: \stuff\temp\*
 <source>&Default</source>
 <target>&ברירת מחדל</target>
 
-<source>Transactional file copy</source>
-<target>העתקת קובץ בעסקה</target>
+<source>Fail-safe file copy</source>
+<target>כשלון באבטחת העתקת קובץ</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>רשום לקובץ זמני (*.ffs_tmp) תחילה ושנה שם. פעולה זו מבטיחה עקביות המצב גם במקרה של שגיאה חמורה.</target>
@@ -810,8 +771,8 @@ Exclude: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>העתק הרשאות גישה של הקובץ</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>העבר הרשאות קבצים ומחיצות (דורש הרשאות מנהל מערכת)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>העבר הרשאות של תיקיות וקבצים (דורש זכויות מנהל)</target>
 
 <source>Restore hidden dialogs</source>
 <target>שחזר דיאלוגים מוסתרים</target>
@@ -1119,11 +1080,11 @@ Exclude: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>הטמע תוכנות חיצוניות. תפריטי המקרו הבאים זמינים:</target>
 
-<source>- full file or directory name</source>
-<target>- שם מלא של קובץ או תיקיה</target>
+<source>- full file or folder name</source>
+<target>- שם מלא של קובץ או תיקייה</target>
 
-<source>- directory part only</source>
-<target>- חלק התיקיה בלבד</target>
+<source>- folder part only</source>
+<target>- תיקייה בלבד</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- הצד השני מקביל ל- %name</target>
@@ -1167,8 +1128,8 @@ Exclude: \stuff\temp\*
 <source>Versioning</source>
 <target>עדכון גרסאות</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>העבר קבצים לתוך מחיצות עם שם המכיל טביעת זמן ותאריך</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>העבר קבצים לתיקייה המסומנת בחותמת-זמן</target>
 
 <source>Files</source>
 <target>קבצים</target>
@@ -1263,8 +1224,8 @@ Exclude: \stuff\temp\*
 <source>Cannot read directory %x.</source>
 <target>לא יכול לקרוא מחיצה %x.</target>
 
-<source>Endless loop.</source>
-<target>לולאה אינסופית.</target>
+<source>Detected endless directory recursion.</source>
+<target>אובחנה רקורסית תיקיות אינסופית.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>לא יכול להגדיר זבות %x.</target>
@@ -1290,14 +1251,11 @@ Exclude: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>בחר ברירת מחדל של סנכרון: קבצים ישנים ידרסו ע"י קבצים חדשים יותר.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>קובץ זה לא מכיל קונפיגורציה ברת תוקף</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>ניתן להתעלם משגיאה זו ולהחשיב התיקייה כריקה.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>אפשר להתעלם משגיאה זו ולהניח כי המחיצה ריקה.</target>
-
-<source>Cannot find directory %x.</source>
-<target>לא יכול למצוא מחיצה %x.</target>
+<source>Cannot find folder %x.</source>
+<target>לא מוצא תיקייה %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>מחיצות תלויות! זהירות בהגדרת כללי סנכרון:</target>
@@ -1329,20 +1287,20 @@ Exclude: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>שני הצדדים שווים</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>קבצים\מחיצות שונים בערכי התכונות בלבד</target>
+<source>Items have different attributes</source>
+<target>הפריטים הם בעלי תכונות שונות</target>
 
-<source>Copy new file/folder to left</source>
-<target>העתק קובץ\מחיצה חדש\ה משמאל לימין</target>
+<source>Copy new item to left</source>
+<target>העתק פריט חדש לצד ימין</target>
 
-<source>Copy new file/folder to right</source>
-<target>העתק קובץ\מחיצה חדש\ה מימין לשמאל</target>
+<source>Copy new item to right</source>
+<target>העתק פריט חדש לצד שמאל</target>
 
-<source>Delete left file/folder</source>
-<target>מחק קובץ\מחיצה בצד ימין</target>
+<source>Delete left item</source>
+<target>מחק פריט בצד ימין</target>
 
-<source>Delete right file/folder</source>
-<target>מחק קובץ\מחיצה בצד שמאל</target>
+<source>Delete right item</source>
+<target>מחק פריט בצד שמאל</target>
 
 <source>Move file on left</source>
 <target>העבר קובץ בצד ימין</target>
@@ -1350,20 +1308,20 @@ Exclude: \stuff\temp\*
 <source>Move file on right</source>
 <target>העבר קובץ בצד שמאל</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>העתק ודרוס קובץ\מחיצה משמאל לימין</target>
+<source>Overwrite left item</source>
+<target>רשום על גבי פריט בצד ימין</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>העתק ודרוס קובץ\מחיצה מימין לשמאל</target>
+<source>Overwrite right item</source>
+<target>רשום על גבי פריט בצד שמאל</target>
 
 <source>Do nothing</source>
 <target>אל תעשה כלום</target>
 
-<source>Copy file attributes only to left</source>
-<target>העתק תכונות קובץ בלבד משמאל לימין</target>
+<source>Update attributes on left</source>
+<target>עדכן תכונות בצד ימין</target>
 
-<source>Copy file attributes only to right</source>
-<target>העתק תכונות קובץ בלבד מימין לשמאל</target>
+<source>Update attributes on right</source>
+<target>עדכן תכונות בצד שמאל</target>
 
 <source>Multiple...</source>
 <target>הכפל...</target>
@@ -1416,11 +1374,11 @@ Exclude: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>מעדכן תכונות של %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>שם של מחיצת מטרה אינו יכול להיות ריק!</target>
+<source>Target folder name must not be empty.</source>
+<target>שם תיקיית מטרה אינו יכול להיות ריק.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>לא סופקה מחיצה לרישום גרסאות קבצים</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>שם תיקייה לגרסאות קבצים אינו יכול להיות ריק</target>
 
 <source>Source directory %x not found.</source>
 <target>מחיצת מקור %x לא נמצאה.</target>
@@ -1449,8 +1407,8 @@ Exclude: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>סל מחזור אינו זמין עבור הנתיבים הבאים! קבצים ימחקו לצמיתות:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>מחיצה שתשתנה היא חלק מריבוי זוגות מחיצות! בבקשה בדוק הגדרות סינכרון!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>התיקייה שתשתנה היא חלק מריבוי זוגות תיקיות. אנא סקור מחדש הגדרות סינכרון.</target>
 
 <source>Processing folder pair:</source>
 <target>מבצע זוג מחיצות:</target>

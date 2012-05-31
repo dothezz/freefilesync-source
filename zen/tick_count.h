@@ -56,17 +56,17 @@ public:
 #endif
 
     TickVal() : val_() {}
-    TickVal(const NativeVal& val) : val_(val) {}
+    explicit TickVal(const NativeVal& val) : val_(val) {}
 
     inline friend
     std::int64_t operator-(const TickVal& lhs, const TickVal& rhs)
     {
 #ifdef FFS_WIN
-		assert_static(IsSignedInt<decltype(lhs.val_.QuadPart)>::value);
+        assert_static(IsSignedInt<decltype(lhs.val_.QuadPart)>::value);
         return lhs.val_.QuadPart - rhs.val_.QuadPart;
 #elif defined FFS_LINUX
-		assert_static(IsSignedInt<decltype(lhs.val_.tv_sec)>::value);
-		assert_static(IsSignedInt<decltype(lhs.val_.tv_nsec)>::value);
+        assert_static(IsSignedInt<decltype(lhs.val_.tv_sec)>::value);
+        assert_static(IsSignedInt<decltype(lhs.val_.tv_nsec)>::value);
         return static_cast<std::int64_t>(lhs.val_.tv_sec - rhs.val_.tv_sec) * 1000000000.0 + lhs.val_.tv_nsec - rhs.val_.tv_nsec;
 #endif
     }
@@ -85,6 +85,7 @@ std::int64_t ticksPerSec() //return 0 on error
     LARGE_INTEGER frequency = {};
     if (!::QueryPerformanceFrequency(&frequency))
         return 0;
+    assert_static(sizeof(std::int64_t) >= sizeof(frequency.QuadPart));
     return frequency.QuadPart;
 
 #elif defined FFS_LINUX
@@ -107,7 +108,7 @@ TickVal getTicks() //return 0 on error
     if (::clock_gettime(CLOCK_MONOTONIC_RAW, &now) != 0) //CLOCK_MONOTONIC measures time reliably across processors!
         return TickVal();
 #endif
-    return now;
+    return TickVal(now);
 }
 }
 

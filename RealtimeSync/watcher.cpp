@@ -12,13 +12,14 @@
 #include <zen/dir_watcher.h>
 #include <zen/thread.h>
 #include <zen/assert_static.h>
+#include <zen/tick_count.h>
 #include <wx+/string_conv.h>
-#include <wx/timer.h>
 #include "../lib/resolve_path.h"
 //#include "../library/db_file.h"     //SYNC_DB_FILE_ENDING -> complete file too much of a dependency; file ending too little to decouple into single header
 //#include "../library/lock_holder.h" //LOCK_FILE_ENDING
 
 using namespace zen;
+
 
 namespace
 {
@@ -40,7 +41,7 @@ bool rts::updateUiIsAllowed()
 
 namespace
 {
-const int CHECK_DIR_INTERVAL = 1000; //1 second interval
+const int CHECK_DIR_INTERVAL = 1; //unit: [s]
 
 
 std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& dirs) //throw FileError
@@ -59,7 +60,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
 {
     const std::vector<Zstring> dirNamesFmt = getFormattedDirs(dirNamesNonFmt); //throw FileError
     if (dirNamesFmt.empty()) //pathological case, but check is needed nevertheless
-        throw zen::FileError(_("A directory input field is empty.")); //should have been checked by caller!
+        throw zen::FileError(_("An input folder name is empty.")); //should have been checked by caller!
 
     //detect when volumes are removed/are not available anymore
     std::vector<std::pair<Zstring, std::shared_ptr<DirWatcher>>> watches;
@@ -76,7 +77,6 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
             if (!ftDirExists.get())
                 return WaitResult(CHANGE_DIR_MISSING, dirnameFmt);
 
-
             watches.push_back(std::make_pair(dirnameFmt, std::make_shared<DirWatcher>(dirnameFmt))); //throw FileError, ErrorNotExisting
         }
         catch (ErrorNotExisting&) //nice atomic behavior: *no* second directory existence check!!!
@@ -91,15 +91,16 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
         }
     }
 
-    wxLongLong lastCheck;
+    const std::int64_t TICKS_DIR_CHECK_INTERVAL = CHECK_DIR_INTERVAL * ticksPerSec(); //0 on error
+    TickVal lastCheck = getTicks(); //0 on error
     while (true)
     {
-        const bool checkDirExistNow = [&lastCheck]() -> bool //checking once per sec should suffice
+        const bool checkDirExistNow = [&]() -> bool //checking once per sec should suffice
         {
-            const wxLongLong current = wxGetLocalTimeMillis();
-            if (current - lastCheck >= CHECK_DIR_INTERVAL)
+            const TickVal now = getTicks(); //0 on error
+            if (now - lastCheck >= TICKS_DIR_CHECK_INTERVAL)
             {
-                lastCheck = current;
+                lastCheck = now;
                 return true;
             }
             return false;
@@ -151,7 +152,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
         }
 
         boost::this_thread::sleep(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL));
-        statusHandler.requestUiRefresh();
+        statusHandler.requestUiRefresh(true); //throw ?: may start sync at this presumably idle time
     }
 }
 
@@ -190,8 +191,8 @@ void rts::waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt, WaitCal
             return;
 
         //wait some time...
-        assert_static(CHECK_DIR_INTERVAL % UI_UPDATE_INTERVAL == 0);
-        for (int i = 0; i < CHECK_DIR_INTERVAL / UI_UPDATE_INTERVAL; ++i)
+        assert_static(1000 * CHECK_DIR_INTERVAL % UI_UPDATE_INTERVAL == 0);
+        for (int i = 0; i < 1000 * CHECK_DIR_INTERVAL / UI_UPDATE_INTERVAL; ++i)
         {
             boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
             statusHandler.requestUiRefresh();

@@ -5,10 +5,9 @@
 // **************************************************************************
 #include "dir_lock.h"
 #include <utility>
-#include <wx/utils.h>
-#include <wx/timer.h>
+//#include <wx/utils.h>
 #include <wx/log.h>
-#include <wx/msgdlg.h>
+//#include <wx/msgdlg.h>
 #include <memory>
 #include <wx+/string_conv.h>
 #include <zen/last_error.h>
@@ -16,6 +15,7 @@
 #include <zen/scope_guard.h>
 #include <zen/guid.h>
 #include <zen/file_io.h>
+#include <zen/tick_count.h>
 #include <zen/assert_static.h>
 #include <wx+/serialize.h>
 #include <zen/int64.h>
@@ -39,9 +39,9 @@ using namespace std::rel_ops;
 
 namespace
 {
-const size_t EMIT_LIFE_SIGN_INTERVAL   =  5000; //show life sign;        unit: [ms]
-const size_t POLL_LIFE_SIGN_INTERVAL   =  4000; //poll for life sign;    unit: [ms]
-const size_t DETECT_ABANDONED_INTERVAL = 30000; //assume abandoned lock; unit: [ms]
+const int EMIT_LIFE_SIGN_INTERVAL   =  5; //show life sign;        unit: [s]
+const int POLL_LIFE_SIGN_INTERVAL   =  4; //poll for life sign;    unit: [s]
+const int DETECT_ABANDONED_INTERVAL = 30; //assume abandoned lock; unit: [s]
 
 const char LOCK_FORMAT_DESCR[] = "FreeFileSync";
 const int LOCK_FORMAT_VER = 2; //lock file format version
@@ -60,7 +60,7 @@ public:
         {
             while (true)
             {
-                boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(EMIT_LIFE_SIGN_INTERVAL)); //interruption point!
+                boost::this_thread::sleep(boost::posix_time::seconds(EMIT_LIFE_SIGN_INTERVAL)); //interruption point!
 
                 //actual work
                 emitLifeSign(); //throw ()
@@ -68,7 +68,7 @@ public:
         }
         catch (const std::exception& e) //exceptions must be catched per thread
         {
-            wxSafeShowMessage(_("An exception occurred!") + L" (Dirlock)", utf8CvrtTo<wxString>(e.what())); //simple wxMessageBox won't do for threads
+            wxSafeShowMessage(_("An exception occurred!") + L" (Dirlock)", utfCvrtTo<wxString>(e.what())); //simple wxMessageBox won't do for threads
         }
     }
 
@@ -228,7 +228,7 @@ struct LockInformation //throw FileError
     explicit LockInformation(FromCurrentProcess) :
         lockId(zen::generateGUID()),
 #ifdef FFS_WIN
-        sessionId(utf8CvrtTo<std::string>(getLoginSid())), //throw FileError
+        sessionId(utfCvrtTo<std::string>(getLoginSid())), //throw FileError
         processId(::GetCurrentProcessId()) //never fails
     {
         DWORD bufferSize = 0;
@@ -239,14 +239,14 @@ struct LockInformation //throw FileError
                                &buffer[0],                    //__out    LPTSTR lpBuffer,
                                &bufferSize))                  //__inout  LPDWORD lpnSize
             throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
-        computerName = "Windows." + utf8CvrtTo<std::string>(&buffer[0]);
+        computerName = "Windows." + utfCvrtTo<std::string>(&buffer[0]);
 
         bufferSize = UNLEN + 1;
         buffer.resize(bufferSize);
         if (!::GetUserName(&buffer[0],   //__out    LPTSTR lpBuffer,
                            &bufferSize)) //__inout  LPDWORD lpnSize
             throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
-        userId = utf8CvrtTo<std::string>(&buffer[0]);
+        userId = utfCvrtTo<std::string>(&buffer[0]);
     }
 #elif defined FFS_LINUX
         processId(::getpid()) //never fails
@@ -399,6 +399,9 @@ ProcessStatus getProcessStatus(const LockInformation& lockInfo) //throw FileErro
 }
 
 
+const std::int64_t TICKS_PER_SEC = ticksPerSec(); //= 0 on error
+
+
 void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
 {
     const std::wstring infoMsg = replaceCpy(_("Waiting while directory is locked (%x)..."), L"%x", fmtFileName(lockfilename));
@@ -429,12 +432,15 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
         catch (FileError&) {} //logfile may be only partly written -> this is no error!
 
         UInt64 fileSizeOld;
-        wxMilliClock_t lastLifeSign = wxGetLocalTimeMillis();
+        TickVal lastLifeSign = getTicks();
 
         while (true)
         {
-            wxMilliClock_t currentTime = wxGetLocalTimeMillis();
+            const TickVal currentTime = getTicks();
             const UInt64 fileSizeNew = ::getLockFileSize(lockfilename); //throw FileError, ErrorNotExisting
+
+            if (TICKS_PER_SEC <= 0 || !lastLifeSign.isValid() || !currentTime.isValid())
+                throw FileError(L"System Timer failed!"); //no i18n: "should" never throw ;)
 
             if (fileSizeNew != fileSizeOld) //received life sign from lock
             {
@@ -443,7 +449,7 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
             }
 
             if (lockOwnderDead || //no need to wait any longer...
-                currentTime - lastLifeSign > DETECT_ABANDONED_INTERVAL)
+                (currentTime - lastLifeSign) / TICKS_PER_SEC > DETECT_ABANDONED_INTERVAL)
             {
                 DirLock dummy(deleteAbandonedLockName(lockfilename), callback); //throw FileError
 
@@ -461,19 +467,19 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
             }
 
             //wait some time...
-            assert_static(POLL_LIFE_SIGN_INTERVAL % GUI_CALLBACK_INTERVAL == 0);
-            for (size_t i = 0; i < POLL_LIFE_SIGN_INTERVAL / GUI_CALLBACK_INTERVAL; ++i)
+            assert_static(1000 * POLL_LIFE_SIGN_INTERVAL % GUI_CALLBACK_INTERVAL == 0);
+            for (size_t i = 0; i < 1000 * POLL_LIFE_SIGN_INTERVAL / GUI_CALLBACK_INTERVAL; ++i)
             {
                 if (callback) callback->requestUiRefresh();
-                wxMilliSleep(GUI_CALLBACK_INTERVAL);
+                boost::this_thread::sleep(boost::posix_time::milliseconds(GUI_CALLBACK_INTERVAL));
 
                 if (callback)
                 {
                     //one signal missed: it's likely this is an abandoned lock => show countdown
-                    if (currentTime - lastLifeSign > EMIT_LIFE_SIGN_INTERVAL)
+                    if ((currentTime - lastLifeSign) / TICKS_PER_SEC > EMIT_LIFE_SIGN_INTERVAL)
                     {
-                        long remainingSeconds = ((DETECT_ABANDONED_INTERVAL - (wxGetLocalTimeMillis() - lastLifeSign)) / 1000).ToLong();
-                        remainingSeconds = std::max(0L, remainingSeconds);
+                        int remainingSeconds = DETECT_ABANDONED_INTERVAL - (getTicks() - lastLifeSign) / TICKS_PER_SEC;
+                        remainingSeconds = std::max(0, remainingSeconds);
 
                         const std::wstring remSecMsg = replaceCpy(_P("1 sec", "%x sec", remainingSeconds), L"%x", numberTo<std::wstring>(remainingSeconds));
                         callback->reportInfo(infoMsg + L" " + remSecMsg);

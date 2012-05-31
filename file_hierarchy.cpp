@@ -6,7 +6,7 @@
 
 #include "file_hierarchy.h"
 #include <zen/i18n.h>
-#include <zen/utf8.h>
+#include <zen/utf.h>
 #include <zen/file_error.h>
 
 using namespace zen;
@@ -267,21 +267,21 @@ std::wstring zen::getCategoryDescription(CompareFilesResult cmpRes)
     switch (cmpRes)
     {
         case FILE_LEFT_SIDE_ONLY:
-            return _("File/folder exists on left side only");
+            return _("Item exists on left side only");
         case FILE_RIGHT_SIDE_ONLY:
-            return _("File/folder exists on right side only");
+            return _("Item exists on right side only");
         case FILE_LEFT_NEWER:
-            return _("Left file is newer");
+            return _("Left side is newer");
         case FILE_RIGHT_NEWER:
-            return _("Right file is newer");
+            return _("Right side is newer");
         case FILE_DIFFERENT:
-            return _("Files have different content");
+            return _("Items have different content");
         case FILE_EQUAL:
             return _("Both sides are equal");
         case FILE_DIFFERENT_METADATA:
-            return _("Files/folders differ in attributes only");
+            return _("Items have different attributes");
         case FILE_CONFLICT:
-            return _("Conflict/file cannot be categorized");
+            return _("Conflict/item cannot be categorized");
     }
     assert(false);
     return std::wstring();
@@ -303,33 +303,33 @@ std::wstring zen::getSyncOpDescription(SyncOperation op)
     switch (op)
     {
         case SO_CREATE_NEW_LEFT:
-            return _("Copy new file/folder to left");
+            return _("Copy new item to left");
         case SO_CREATE_NEW_RIGHT:
-            return _("Copy new file/folder to right");
+            return _("Copy new item to right");
         case SO_DELETE_LEFT:
-            return _("Delete left file/folder");
+            return _("Delete left item");
         case SO_DELETE_RIGHT:
-            return _("Delete right file/folder");
+            return _("Delete right item");
         case SO_MOVE_LEFT_SOURCE:
         case SO_MOVE_LEFT_TARGET:
-            return _("Move file on left");
+            return _("Move file on left"); //move only supported for files
         case SO_MOVE_RIGHT_SOURCE:
         case SO_MOVE_RIGHT_TARGET:
             return _("Move file on right");
         case SO_OVERWRITE_LEFT:
-            return _("Overwrite left file/folder with right one");
+            return _("Overwrite left item");
         case SO_OVERWRITE_RIGHT:
-            return _("Overwrite right file/folder with left one");
+            return _("Overwrite right item");
         case SO_DO_NOTHING:
             return _("Do nothing");
         case SO_EQUAL:
             return _("Both sides are equal");
         case SO_COPY_METADATA_TO_LEFT:
-            return _("Copy file attributes only to left");
+            return _("Update attributes on left");
         case SO_COPY_METADATA_TO_RIGHT:
-            return _("Copy file attributes only to right");
+            return _("Update attributes on right");
         case SO_UNRESOLVED_CONFLICT: //not used on GUI, but in .csv
-            return _("Conflict/file cannot be categorized");
+            return _("Conflict/item cannot be categorized");
     }
     assert(false);
     return std::wstring();

@@ -60,7 +60,7 @@ bool Application::OnInit()
     std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
 #endif
 
-    returnValue = 0;
+    returnCode = FFS_RC_SUCCESS;
     //do not call wxApp::OnInit() to avoid using default commandline parser
 
     //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: batch mode requires the wxApp eventhandler to be established
@@ -73,13 +73,67 @@ bool Application::OnInit()
 }
 
 
+std::vector<wxString> getCommandlineArgs(const wxApp& app)
+{
+    std::vector<wxString> args;
+#ifdef FFS_WIN
+    //we do the job ourselves! both wxWidgets and ::CommandLineToArgvW() parse "C:\" "D:\" as single line C:\" D:\"
+    //-> "solution": we just don't support protected quotation mark!
+    std::wstring cmdLine = ::GetCommandLine(); //only way to get a unicode commandline
+    while (endsWith(cmdLine, L' ')) //may end with space
+        cmdLine.resize(cmdLine.size() - 1);
+
+    auto iterStart = cmdLine.end(); //end() means: no token
+    for (auto iter = cmdLine.begin(); iter != cmdLine.end(); ++iter)
+        if (*iter == L' ') //space commits token
+        {
+            if (iterStart != cmdLine.end())
+            {
+                args.push_back(std::wstring(iterStart, iter));
+                iterStart = cmdLine.end(); //expect consecutive blanks!
+            }
+        }
+        else
+        {
+            //start new token
+            if (iterStart == cmdLine.end())
+                iterStart = iter;
+
+            if (*iter == L'\"')
+            {
+                iter = std::find(iter + 1, cmdLine.end(), L'\"');
+                if (iter == cmdLine.end())
+                    break;
+            }
+        }
+    if (iterStart != cmdLine.end())
+        args.push_back(std::wstring(iterStart, cmdLine.end()));
+
+    if (!args.empty())
+        args.erase(args.begin()); //remove first argument which is exe path by convention: http://blogs.msdn.com/b/oldnewthing/archive/2006/05/15/597984.aspx
+
+    std::for_each(args.begin(), args.end(),
+                  [](wxString& str)
+    {
+        if (str.size() >= 2 && startsWith(str, L'\"') && endsWith(str, L'\"'))
+            str = wxString(str.c_str() + 1, str.size() - 2);
+    });
+
+#else
+    for (int i = 1; i < app.argc; ++i) //wxWidgets screws up once again making "argv implicitly convertible to a wxChar**" in 2.9.3,
+        args.push_back(app.argv[i]);   //so we are forced to use this pitiful excuse for a range construction!!
+#endif
+    return args;
+}
+
+
 void Application::OnStartApplication(wxIdleEvent&)
 {
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
 
     //wxWidgets app exit handling is weird... we want the app to exit only if the logical main window is closed
     wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
-	auto app = wxTheApp; //fix lambda/wxWigets/VC fuck up
+    auto app = wxTheApp; //fix lambda/wxWigets/VC fuck up
     ZEN_ON_SCOPE_EXIT(if (!mainWindowWasSet()) app->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
 
     //if appname is not set, the default is the executable's name!
@@ -121,9 +175,7 @@ void Application::OnStartApplication(wxIdleEvent&)
     setLanguage(globalSettings.programLanguage);
 
     //determine FFS mode of operation
-    std::vector<wxString> commandArgs; //wxWidgets screws up once again making "argv implicitly convertible to a wxChar**" in 2.9.3,
-    for (int i = 1; i < argc; ++i)     //so we are forced to use this pitiful excuse for a range construction!!
-        commandArgs.push_back(argv[i]);
+    std::vector<wxString> commandArgs = getCommandlineArgs(*this);
 
     if (commandArgs.empty())
         runGuiMode(commandArgs, globalSettings);
@@ -150,7 +202,7 @@ void Application::OnStartApplication(wxIdleEvent&)
 
                 if (index % 2 == 0)
                     fp.leftDirectory = toZ(*iter);
-                else if (index % 2 == 1)
+                else
                     fp.rightDirectory = toZ(*iter);
             }
 
@@ -180,7 +232,7 @@ void Application::OnStartApplication(wxIdleEvent&)
             {
                 case MERGE_BATCH: //pure batch config files
                     if (commandArgs.size() == 1)
-                        runBatchMode(commandArgs[0], globalSettings);
+                        runBatchMode(utfCvrtTo<Zstring>(commandArgs[0]), globalSettings);
                     else
                         runGuiMode(commandArgs, globalSettings);
                     break;
@@ -199,7 +251,7 @@ void Application::OnStartApplication(wxIdleEvent&)
                         {
                             case XML_TYPE_GLOBAL:
                             case XML_TYPE_OTHER:
-                                wxMessageBox(_("The file does not contain a valid configuration:") + L" " + fmtFileName(toZ(filename)), _("Error"), wxOK | wxICON_ERROR);
+                                wxMessageBox(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(toZ(filename))), _("Error"), wxOK | wxICON_ERROR);
                                 return true;
 
                             case XML_TYPE_GUI:
@@ -231,10 +283,10 @@ int Application::OnRun()
     {
         //it's not always possible to display a message box, e.g. corrupted stack, however (non-stream) file output works!
         wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
-        safeOutput.Write(utf8CvrtTo<wxString>(e.what()));
+        safeOutput.Write(utfCvrtTo<wxString>(e.what()));
 
-        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", utf8CvrtTo<wxString>(e.what()));
-        return -9;
+        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", utfCvrtTo<wxString>(e.what()));
+        return FFS_RC_EXCEPTION;
     }
     catch (...) //catch the rest
     {
@@ -244,10 +296,10 @@ int Application::OnRun()
         safeOutput.Write(msg);
 
         wxSafeShowMessage(_("An exception occurred!"), msg);
-        return -9;
+        return FFS_RC_EXCEPTION;
     }
 
-    return returnValue;
+    return returnCode;
 }
 
 
@@ -277,7 +329,7 @@ void Application::OnQueryEndSession(wxEvent& event)
         mainWin->onQueryEndSession();
     OnExit();
     //wxEntryCleanup(); -> gives popup "dll init failed" on XP
-    std::exit(returnValue); //Windows will terminate anyway: destruct global objects
+    std::exit(returnCode); //Windows will terminate anyway: destruct global objects
 }
 
 
@@ -295,15 +347,13 @@ void Application::runGuiMode(const std::vector<wxString>& cfgFileNames, xmlAcces
 }
 
 
-void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings)
+void Application::runBatchMode(const Zstring& filename, xmlAccess::XmlGlobalSettings& globSettings)
 {
-    using namespace xmlAccess;
-    using namespace zen;
     //load XML settings
     XmlBatchConfig batchCfg;  //structure to receive gui settings
     try
     {
-        readConfig(toZ(filename), batchCfg);
+        readConfig(filename, batchCfg);
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
@@ -318,16 +368,19 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
     try //begin of synchronization process (all in one try-catch block)
     {
-        const SwitchToGui switchBatchToGui(filename, batchCfg, globSettings); //prepare potential operational switch
+        const std::wstring timestamp = formatTime<std::wstring>(L"%Y-%m-%d %H%M%S");
+
+        const SwitchToGui switchBatchToGui(utfCvrtTo<wxString>(filename), batchCfg, globSettings); //prepare potential operational switch
 
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(batchCfg.showProgress,
                                          extractJobName(filename),
+                                         timestamp,
                                          batchCfg.logFileDirectory,
                                          batchCfg.logFileCountMax,
                                          batchCfg.handleError,
                                          switchBatchToGui,
-                                         returnValue,
+                                         returnCode,
                                          batchCfg.mainCfg.onCompletion,
                                          globSettings.gui.onCompletionHistory);
 
@@ -369,14 +422,15 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         cmpProc.startCompareProcess(cmpConfig, folderCmp);
 
         //START SYNCHRONIZATION
-        SyncProcess syncProc(
-            globSettings.optDialogs,
-            globSettings.verifyFileCopy,
-            globSettings.copyLockedFiles,
-            globSettings.copyFilePermissions,
-            globSettings.transactionalFileCopy,
-            globSettings.runWithBackgroundPriority,
-            statusHandler);
+        SyncProcess syncProc(extractJobName(filename),
+                             timestamp,
+                             globSettings.optDialogs,
+                             globSettings.verifyFileCopy,
+                             globSettings.copyLockedFiles,
+                             globSettings.copyFilePermissions,
+                             globSettings.transactionalFileCopy,
+                             globSettings.runWithBackgroundPriority,
+                             statusHandler);
 
         const std::vector<FolderPairSyncCfg> syncProcessCfg = extractSyncCfg(batchCfg.mainCfg);
         assert(syncProcessCfg.size() == folderCmp.size());
@@ -386,15 +440,10 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //play (optional) sound notification after sync has completed -> don't play in silent mode, consider RealtimeSync!
         if (batchCfg.showProgress)
         {
-            const wxString soundFile = toWx(getResourceDir()) + wxT("Sync_Complete.wav");
+            const wxString soundFile = toWx(getResourceDir()) + L"Sync_Complete.wav";
             if (fileExists(toZ(soundFile)))
                 wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as a service!
         }
     }
-    catch (BatchAbortProcess&)  //exit used by statusHandler
-    {
-        if (returnValue >= 0)
-            returnValue = -12;
-        return;
-    }
+    catch (BatchAbortProcess&) {} //exit used by statusHandler
 }

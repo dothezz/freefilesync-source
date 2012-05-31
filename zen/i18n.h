@@ -9,10 +9,8 @@
 
 #include <string>
 #include <memory>
-#include <clocale> //thousands separator
-#include "utf8.h"  //
 
-//thin layer to enable localization - without platform/library dependencies!
+//minimal layer enabling text translation - without platform/library dependencies!
 #ifndef WXINTL_NO_GETTEXT_MACRO
 #error WXINTL_NO_GETTEXT_MACRO must be defined to deactivate wxWidgets underscore macro
 #endif
@@ -36,7 +34,6 @@ struct TranslationHandler
 void setTranslator(TranslationHandler* newHandler = nullptr); //takes ownership
 TranslationHandler* getTranslator();
 
-std::wstring getThousandsSeparator();
 
 
 
@@ -93,18 +90,6 @@ void setTranslator(TranslationHandler* newHandler) { implementation::globalHandl
 
 inline
 TranslationHandler* getTranslator() { return implementation::globalHandler().get(); }
-
-
-inline
-std::wstring getThousandsSeparator() //consistency with sprintf(): just use the same values the C-runtime uses!!!
-{
-    //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
-    const lconv* localInfo = ::localeconv(); //always bound according to doc
-    return utf8CvrtTo<std::wstring>(localInfo->thousands_sep);
-    // why not working?
-    // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
-    // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
-}
 }
 
 #endif //I18_N_HEADER_3843489325045

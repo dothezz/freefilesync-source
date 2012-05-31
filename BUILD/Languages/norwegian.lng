@@ -7,8 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>Søker etter mappe %x...</target>
+<source>Searching for folder %x...</source>
+<target></target>
 
 <source>Show in Explorer</source>
 <target>Vis i Utforsker</target>
@@ -34,11 +34,11 @@
 <source>Select alternate synchronization settings</source>
 <target>Velg alternative synkroniseringsinnstillinger</target>
 
-<source>No filter selected</source>
-<target>Ingen filter valgt</target>
-
 <source>Filter is active</source>
 <target>Filter er aktivt</target>
+
+<source>No filter selected</source>
+<target>Ingen filter valgt</target>
 
 <source>Remove alternate settings</source>
 <target>Fjern alternative innstillinger</target>
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Felles innstillinger</target>
 
-<source>Synchronization Preview</source>
-<target>Forhåndsvisning for synkronisering</target>
+<source>Summary</source>
+<target></target>
 
 <source>Find</source>
 <target>Søk</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Bla gjennom</target>
 
-<source>Invalid command line: %x</source>
-<target>Ugyldig kommando: %x</target>
+<source>Invalid command line:</source>
+<target>Ugyldig kommando:</target>
 
 <source>Info</source>
 <target>Info</target>
@@ -232,23 +232,23 @@
 <source>Cannot read the following XML elements:</source>
 <target>Kan ikke lese følgende XML-elementer:</target>
 
-<source>S&ave configuration...</source>
-<target>L&agre innstilling...</target>
+<source>&Open...</source>
+<target></target>
 
-<source>&Load configuration...</source>
-<target>&Last innstilling...</target>
+<source>&Save...</source>
+<target></target>
 
 <source>&Quit</source>
 <target>&Avslutt</target>
 
-<source>&File</source>
-<target>&Fil</target>
+<source>&Program</source>
+<target>&Program</target>
 
 <source>&Content</source>
 <target>&Innhold</target>
 
-<source>&About...</source>
-<target>&Om programmet...</target>
+<source>&About</source>
+<target>&Om programmet</target>
 
 <source>&Help</source>
 <target>&Hjelp</target>
@@ -256,8 +256,8 @@
 <source>Usage:</source>
 <target>Bruk:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. Velg mapper å overvåke.</target>
+<source>1. Select folders to watch.</source>
+<target></target>
 
 <source>2. Enter a command line.</source>
 <target>2. Oppfør en kommandolinje.</target>
@@ -265,19 +265,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. Trykk 'Start'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-Kommandolinjen kjøres hver gang:
-- Alle mapper blir tilgjengelige (f.eks. ved innsetting av USB-minnepinne)
-- Filer i disse mapper eller undermapper endres
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target></target>
 
-<source>Directories to watch</source>
-<target>Mapper å overvåke</target>
+<source>Folders to watch</source>
+<target></target>
 
 <source>Add folder</source>
 <target>Legg til mappe</target>
@@ -288,14 +280,21 @@ Kommandolinjen kjøres hver gang:
 <source>Select a folder</source>
 <target>Velg en mappe</target>
 
+<source>Delay [seconds]</source>
+<target></target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target></target>
+
 <source>Command line</source>
 <target>Kommandolinje</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Minimum pausetid [sekunder]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Uvirksom tid mellom oppdaging av siste endring og kjøring av kommandolinje i sekunder</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target></target>
 
 <source>Start</source>
 <target>Start</target>
@@ -324,8 +323,8 @@ Kommandolinjen kjøres hver gang:
 <source>Waiting for missing directories...</source>
 <target>Venter på manglende mapper...</target>
 
-<source>A directory input field is empty.</source>
-<target>Et inndatafelt for mappe er tomt.</target>
+<source>An input folder name is empty.</source>
+<target></target>
 
 <source>Logging</source>
 <target>Logging</target>
@@ -411,8 +410,8 @@ Kommandolinjen kjøres hver gang:
 <source><Symlink></source>
 <target><Symbolsk lenke></target>
 
-<source><Directory></source>
-<target><Mappe></target>
+<source><Folder></source>
+<target></target>
 
 <source>Full path</source>
 <target>Full bane</target>
@@ -423,8 +422,8 @@ Kommandolinjen kjøres hver gang:
 <source>Relative path</source>
 <target>Relativ bane</target>
 
-<source>Directory</source>
-<target>Mappe</target>
+<source>Base folder</source>
+<target></target>
 
 <source>Size</source>
 <target>Størrelse</target>
@@ -435,8 +434,11 @@ Kommandolinjen kjøres hver gang:
 <source>Extension</source>
 <target>Filendelse</target>
 
-<source>Comparison Result</source>
-<target>Sammenligningsresultat</target>
+<source>Action</source>
+<target>Handling</target>
+
+<source>Category</source>
+<target>Kategori</target>
 
 <source>Drag && drop</source>
 <target>Dra && slipp</target>
@@ -444,14 +446,14 @@ Kommandolinjen kjøres hver gang:
 <source>Close progress dialog</source>
 <target>Lukk framdriftsvindu</target>
 
-<source>Shut down</source>
-<target>Slå av maskinen</target>
+<source>Standby</source>
+<target>Standby</target>
 
 <source>Log off</source>
 <target>Logg av</target>
 
-<source>Standby</source>
-<target>Standby</target>
+<source>Shut down</source>
+<target>Slå av maskinen</target>
 
 <source>Hibernate</source>
 <target>Sett i dvalemodus</target>
@@ -459,14 +461,11 @@ Kommandolinjen kjøres hver gang:
 <source>1. &Compare</source>
 <target>1. Sammen&lign</target>
 
-<source>2. &Synchronize...</source>
-<target>2. &Synkroniser...</target>
+<source>2. &Synchronize</source>
+<target>2. &Synkroniser</target>
 
 <source>&New</source>
 <target>&Ny</target>
-
-<source>&Program</source>
-<target>&Program</target>
 
 <source>&Language</source>
 <target>&Språk</target>
@@ -495,8 +494,8 @@ Kommandolinjen kjøres hver gang:
 <source>&Abort</source>
 <target>&Avbryt</target>
 
-<source>Synchronize...</source>
-<target>Synkroniser...</target>
+<source>Synchronize</source>
+<target>Synkroniser</target>
 
 <source>Start synchronization</source>
 <target>Start synkronisering</target>
@@ -510,11 +509,11 @@ Kommandolinjen kjøres hver gang:
 <source>Swap sides</source>
 <target>Bytt sider</target>
 
-<source>Save current configuration to file</source>
-<target>Lagre gjeldende innstilling til fil</target>
-
 <source>Load configuration from file</source>
 <target>Last innstilling fra fil</target>
+
+<source>Save current configuration to file</source>
+<target>Lagre gjeldende innstilling til fil</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Sist brukte innstillinger (trykk DEL for å fjerne fra liste)</target>
@@ -525,14 +524,14 @@ Kommandolinjen kjøres hver gang:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Skjul filtrerte eller midlertidig ekskluderte filer</target>
 
-<source>Number of files and directories that will be created</source>
-<target>Antall filer og mapper som blir opprettet</target>
+<source>Number of files and folders that will be created</source>
+<target></target>
 
 <source>Number of files that will be overwritten</source>
 <target>Antall filer som blir overskrevet</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>Antal filer og mapper som blir slettet</target>
+<source>Number of files and folders that will be deleted</source>
+<target></target>
 
 <source>Total amount of data that will be transferred</source>
 <target>Totale antall data som blir overført</target>
@@ -555,8 +554,8 @@ Kommandolinjen kjøres hver gang:
 <source>Batch job</source>
 <target>Batch-jobb</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Opprett en batch-fil og automatiser synkronisering. For å starte i batch-modus dobbeltklikk denne filen eller kjør kommandoen: FreeFileSync.exe SyncJob.ffs_batch. Dette kan også planlegges i ditt systems oppgaveplanlegger.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target></target>
 
 <source>Help</source>
 <target>Hjelp</target>
@@ -582,17 +581,11 @@ Kommandolinjen kjøres hver gang:
 <source>Maximum number of log files:</source>
 <target>Maksimale antall loggfiler:</target>
 
-<source>Select log file directory:</source>
-<target>Velg loggfilmappe:</target>
+<source>Select folder to save log files:</source>
+<target></target>
 
 <source>Batch settings</source>
 <target>Batch-innstillinger</target>
-
-<source>&Save</source>
-<target>La&gre</target>
-
-<source>&Load</source>
-<target>&Last</target>
 
 <source>Select variant:</source>
 <target>Velg variant:</target>
@@ -618,29 +611,23 @@ Kommandolinjen kjøres hver gang:
 <source>Configuration</source>
 <target>Innstilling</target>
 
-<source>Category</source>
-<target>Kategori</target>
+<source>Item exists on left side only</source>
+<target></target>
 
-<source>Action</source>
-<target>Handling</target>
+<source>Item exists on right side only</source>
+<target></target>
 
-<source>File/folder exists on left side only</source>
-<target>Fil/mappe finnes bare på venstre side</target>
+<source>Left side is newer</source>
+<target></target>
 
-<source>File/folder exists on right side only</source>
-<target>Fil/mappe finnes bare på høyre side</target>
+<source>Right side is newer</source>
+<target></target>
 
-<source>Left file is newer</source>
-<target>Fil til venstre er nyere</target>
+<source>Items have different content</source>
+<target></target>
 
-<source>Right file is newer</source>
-<target>Fil til høyre er nyere</target>
-
-<source>Files have different content</source>
-<target>Filer har forskjellig innhold</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Konflikt/filen kan ikke kategoriseres</target>
+<source>Conflict/item cannot be categorized</source>
+<target></target>
 
 <source>OK</source>
 <target>OK</target>
@@ -747,33 +734,6 @@ Synkroniserer kun filer som passer til alle filterinnstillinger.
 Merk: Filnavn må være relative til basismapper!
 </target>
 
-<source>Hints:</source>
-<target>Veiledninger:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Oppfør relative fil- eller mappenavn adskilt med ';' eller en ny linje.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Bruk jokertegn '*' og '?'.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Ekskluder filer direkte i hovedvindu via høyreklikkmeny.</target>
-
-<source>Example</source>
-<target>Eksempel</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Inkluder: *.doc;*.zip;*.exe
-Ekskluder: \ting\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Synkroniserer alle .doc, .zip og .exe-filer unntatt alt i undermappen "temp".</target>
-
 <source>Include</source>
 <target>Inkluder</target>
 
@@ -795,8 +755,8 @@ Ekskluder: \ting\temp\*
 <source>&Default</source>
 <target>&Standard</target>
 
-<source>Transactional file copy</source>
-<target>Transaksjonell filkopiering</target>
+<source>Fail-safe file copy</source>
+<target></target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Skriv til en midlertidig fil (*.ffs_tmp) først så endre navn på den. Dette garanterer en konsistent tilstand selv ved alvorlige feil.</target>
@@ -810,8 +770,8 @@ Ekskluder: \ting\temp\*
 <source>Copy file access permissions</source>
 <target>Kopier filadgangstillatelser</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Overfør fil- og mappetillatelser (Krever administratorrettigheter)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target></target>
 
 <source>Restore hidden dialogs</source>
 <target>Gjenopprett skjulte dialoger</target>
@@ -1119,11 +1079,11 @@ Ekskluder: \ting\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integrer eksterne programmer i høyreklikkmeny. Følgende makroer er tilgjengelige:</target>
 
-<source>- full file or directory name</source>
-<target>- fullt fil- eller mappenavn</target>
+<source>- full file or folder name</source>
+<target></target>
 
-<source>- directory part only</source>
-<target>- bare mappedel</target>
+<source>- folder part only</source>
+<target></target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- Andre sides motstykke til %name</target>
@@ -1167,8 +1127,8 @@ Ekskluder: \ting\temp\*
 <source>Versioning</source>
 <target>Versjonshåndtering</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Flytt filer til en datomerket undermappe</target>
+<source>Move files into a time-stamped subfolder</source>
+<target></target>
 
 <source>Files</source>
 <target>Filer</target>
@@ -1263,8 +1223,8 @@ Ekskluder: \ting\temp\*
 <source>Cannot read directory %x.</source>
 <target>Kan ikke lese mappen %x.</target>
 
-<source>Endless loop.</source>
-<target>Endeløs sløyfe.</target>
+<source>Detected endless directory recursion.</source>
+<target></target>
 
 <source>Cannot set privilege %x.</source>
 <target>Kan ikke sette privilegie %x.</target>
@@ -1290,14 +1250,11 @@ Ekskluder: \ting\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Stiller inn standard synkroniseringsretning: Gamle filer blir overskrevet med nyere filer.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Filen inneholder ingen gyldig innstilling:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target></target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>Du kan ignorere denne feil og anse mappen som tom.</target>
-
-<source>Cannot find directory %x.</source>
-<target>Kan ikke finne mappen %x.</target>
+<source>Cannot find folder %x.</source>
+<target></target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Mapper er avhengige av hverandre! Vær forsiktig når du setter opp synkroniseringsregler:</target>
@@ -1329,20 +1286,20 @@ Ekskluder: \ting\temp\*
 <source>Both sides are equal</source>
 <target>Begge sider er like</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Filer/mapper skiller bare i attributter</target>
+<source>Items have different attributes</source>
+<target></target>
 
-<source>Copy new file/folder to left</source>
-<target>Kopier ny fil/mappe til venstre</target>
+<source>Copy new item to left</source>
+<target></target>
 
-<source>Copy new file/folder to right</source>
-<target>Kopier ny fil/mappe til høyre</target>
+<source>Copy new item to right</source>
+<target></target>
 
-<source>Delete left file/folder</source>
-<target>Slett venstre fil/mappe</target>
+<source>Delete left item</source>
+<target></target>
 
-<source>Delete right file/folder</source>
-<target>Slett høyre fil/mappe</target>
+<source>Delete right item</source>
+<target></target>
 
 <source>Move file on left</source>
 <target>Flytt venstre fil</target>
@@ -1350,20 +1307,20 @@ Ekskluder: \ting\temp\*
 <source>Move file on right</source>
 <target>Flytt høyre fil</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Overskriv venstre fil/mappe med den til høyre</target>
+<source>Overwrite left item</source>
+<target></target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Overskriv høyre fil/mappe med den til venstre</target>
+<source>Overwrite right item</source>
+<target></target>
 
 <source>Do nothing</source>
 <target>Ikke gjør noe</target>
 
-<source>Copy file attributes only to left</source>
-<target>Kopier filattributter bare til venstre</target>
+<source>Update attributes on left</source>
+<target></target>
 
-<source>Copy file attributes only to right</source>
-<target>Kopier filattributter bare til høyre</target>
+<source>Update attributes on right</source>
+<target></target>
 
 <source>Multiple...</source>
 <target>Flere...</target>
@@ -1416,11 +1373,11 @@ Ekskluder: \ting\temp\*
 <source>Updating attributes of %x</source>
 <target>Oppdaterer attributter til %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Navn på målmappe må ikke være tomt!</target>
+<source>Target folder name must not be empty.</source>
+<target></target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Mappe for filversjonshåndtering ble ikke angitt!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target></target>
 
 <source>Source directory %x not found.</source>
 <target>Kildemappen %x ikke funnet.</target>
@@ -1449,8 +1406,8 @@ Ekskluder: \ting\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Papirkurv er ikke tilgjengelig for de følgende baner! Filer blir isteden slettet permanent:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>En mappe blir endret som er del av flere mappepar! Kontroller synkroniseringsinnstillinger!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target></target>
 
 <source>Processing folder pair:</source>
 <target>Behandler mappepar:</target>

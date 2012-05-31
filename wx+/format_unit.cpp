@@ -15,22 +15,18 @@
 #ifdef FFS_WIN
 #include <zen/win.h> //includes "windows.h"
 #include <zen/win_ver.h>
+
+#elif defined FFS_LINUX
+#include <clocale>    //thousands separator
+#include <zen/utf.h> //
 #endif
 
-
-namespace
-{
-inline
-size_t getDigitCount(size_t number)
-{
-    return number == 0 ? 1 : static_cast<size_t>(std::log10(static_cast<double>(number))) + 1;
-} //count number of digits
-}
+using namespace zen;
 
 
 std::wstring zen::filesizeToShortString(Int64 size)
 {
-    //if (to<Int64>(size) < 0) return _("Error"); -> really? there's one exceptional case: a failed rename operation falls-back to copy + delete, reducing "bytes transferred" to potentially < 0!
+    //if (size < 0) return _("Error"); -> really? there's at least one exceptional case: a failed rename operation falls-back to copy + delete, reducing "bytes transferred" to potentially < 0!
 
     if (numeric::abs(size) <= 999)
         return replaceCpy(_P("1 Byte", "%x Bytes", to<int>(size)),
@@ -63,15 +59,14 @@ std::wstring zen::filesizeToShortString(Int64 size)
             }
         }
         //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
-        const size_t leadDigitCount = getDigitCount(static_cast<size_t>(numeric::abs(filesize))); //number of digits before decimal point
-        if (leadDigitCount == 0 || leadDigitCount > 3)
-            return _("Error");
+        const size_t fullunits = static_cast<size_t>(numeric::abs(filesize));
+        const int precisionDigits = fullunits < 10 ? 2 : fullunits < 100 ? 1 : 0; //sprintf requires "int"
 
         wchar_t buffer[50];
 #ifdef __MINGW32__
-        int charsWritten =   ::snwprintf(buffer, 50, L"%.*f", static_cast<int>(3 - leadDigitCount), filesize); //MinGW does not comply to the C standard here
+        int charsWritten =   ::snwprintf(buffer, 50, L"%.*f", precisionDigits, filesize); //MinGW does not comply to the C standard here
 #else
-        int charsWritten = std::swprintf(buffer, 50, L"%.*f", static_cast<int>(3 - leadDigitCount), filesize);
+        int charsWritten = std::swprintf(buffer, 50, L"%.*f", precisionDigits, filesize);
 #endif
         return charsWritten > 0 ? replaceCpy(output, L"%x", std::wstring(buffer, charsWritten)) : _("Error");
     }
@@ -142,8 +137,114 @@ std::wstring zen::fractionToShortString(double fraction)
 }
 
 
+#ifdef FFS_WIN
+namespace
+{
+bool getUserSetting(LCTYPE lt, UINT& setting)
+{
+    return ::GetLocaleInfo(LOCALE_USER_DEFAULT,                  //__in   LCID Locale,
+                           lt | LOCALE_RETURN_NUMBER,            //__in   LCTYPE LCType,
+                           reinterpret_cast<LPTSTR>(&setting),   //__out  LPTSTR lpLCData,
+                           sizeof(setting) / sizeof(TCHAR)) > 0; //__in   int cchData
+}
+
+
+bool getUserSetting(LCTYPE lt, std::wstring& setting)
+{
+    int bufferSize = ::GetLocaleInfo(LOCALE_USER_DEFAULT, lt, nullptr, 0);
+    if (bufferSize > 0)
+    {
+        std::vector<wchar_t> buffer(bufferSize);
+        if (::GetLocaleInfo(LOCALE_USER_DEFAULT, //__in   LCID Locale,
+                            lt,                  //__in   LCTYPE LCType,
+                            &buffer[0],          //__out  LPTSTR lpLCData,
+                            bufferSize) > 0)     //__in   int cchData
+        {
+            setting = &buffer[0]; //GetLocaleInfo() returns char count *including* 0-termination!
+            return true;
+        }
+    }
+    return false;
+}
+
+class IntegerFormat
+{
+public:
+    static const NUMBERFMT& get() { return getInst().fmt; }
+    static bool isValid() { return getInst().valid_; }
+
+private:
+    static const IntegerFormat& getInst()
+    {
+        static IntegerFormat inst; //not threadsafe in MSVC until C++11, but not required right now
+        return inst;
+    }
+
+    IntegerFormat() : fmt(), valid_(false)
+    {
+        //all we want is default NUMBERFMT, but set NumDigits to 0. what a disgrace:
+        fmt.NumDigits = 0;
+
+        std::wstring grouping;
+        if (getUserSetting(LOCALE_ILZERO,     fmt.LeadingZero) &&
+            getUserSetting(LOCALE_SGROUPING,  grouping)        &&
+            getUserSetting(LOCALE_SDECIMAL,   decimalSep)      &&
+            getUserSetting(LOCALE_STHOUSAND,  thousandSep)     &&
+            getUserSetting(LOCALE_INEGNUMBER, fmt.NegativeOrder))
+        {
+            fmt.lpDecimalSep  = &decimalSep[0]; //not used
+            fmt.lpThousandSep = &thousandSep[0];
+
+            //convert LOCALE_SGROUPING to Grouping: http://blogs.msdn.com/b/oldnewthing/archive/2006/04/18/578251.aspx
+            replace(grouping, L';', L"");
+            if (endsWith(grouping, L'0'))
+                grouping.resize(grouping.size() - 1);
+            else
+                grouping += L'0';
+            fmt.Grouping = stringTo<UINT>(grouping);
+            valid_ = true;
+        }
+    }
+
+    NUMBERFMT fmt;
+    std::wstring thousandSep;
+    std::wstring decimalSep;
+    bool valid_;
+};
+}
+#endif
+
+
 std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 {
+#ifdef FFS_WIN
+    if (IntegerFormat::isValid())
+    {
+        int bufferSize = ::GetNumberFormat(LOCALE_USER_DEFAULT, 0, number.c_str(), &IntegerFormat::get(), nullptr, 0);
+        if (bufferSize > 0)
+        {
+            std::vector<wchar_t> buffer(bufferSize);
+            if (::GetNumberFormat(LOCALE_USER_DEFAULT,   //__in       LCID Locale,
+                                  0,                     //__in       DWORD dwFlags,
+                                  number.c_str(),        //__in       LPCTSTR lpValue,
+                                  &IntegerFormat::get(), //__in_opt   const NUMBERFMT *lpFormat,
+                                  &buffer[0],            //__out_opt  LPTSTR lpNumberStr,
+                                  bufferSize) > 0)       //__in       int cchNumber
+                return &buffer[0]; //GetNumberFormat() returns char count *including* 0-termination!
+        }
+    }
+    return number;
+
+#else
+    //we have to include thousands separator ourselves; this doesn't work for all countries (e.g india), but is better than nothing
+
+    //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
+    const lconv* localInfo = ::localeconv(); //always bound according to doc
+    const std::wstring& thousandSep = utfCvrtTo<std::wstring>(localInfo->thousands_sep);
+    // why not working?
+    // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
+    // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
+
     std::wstring output(number);
     size_t i = output.size();
     for (;;)
@@ -153,9 +254,10 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
         i -= 3;
         if (!isDigit(output[i - 1]))
             break;
-        output.insert(i, zen::getThousandsSeparator());
+        output.insert(i, thousandSep);
     }
     return output;
+#endif
 }
 
 /*

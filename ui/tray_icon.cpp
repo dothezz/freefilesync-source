@@ -171,7 +171,7 @@ private:
             return nullptr;
 
         wxMenu* contextMenu = new wxMenu;
-        contextMenu->Append(CONTEXT_ABOUT, _("&About..."));
+        contextMenu->Append(CONTEXT_ABOUT, _("&About"));
         contextMenu->AppendSeparator();
         contextMenu->Append(CONTEXT_RESTORE, _("&Restore"));
         //event handling

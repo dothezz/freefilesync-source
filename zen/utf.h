@@ -14,23 +14,25 @@
 
 namespace zen
 {
-//convert any(!) "string-like" object into target string by applying a UTF8 conversion (but only if necessary!)
+//convert all(!) char- and wchar_t-based "string-like" objects applying a UTF8 conversions (but only if necessary!)
 template <class TargetString, class SourceString>
-TargetString utf8CvrtTo(const SourceString& str);
-
-//convert wide to utf8 string; example: std::string tmp = toUtf8<std::string>(L"abc");
-template <class CharString, class WideString>
-CharString wideToUtf8(const WideString& str);
-
-//convert utf8 string to wide; example: std::wstring tmp = utf8To<std::wstring>("abc");
-template <class WideString, class CharString>
-WideString utf8ToWide(const CharString& str);
+TargetString utfCvrtTo(const SourceString& str);
 
 const char BYTE_ORDER_MARK_UTF8[] = "\xEF\xBB\xBF";
 
+//---- explicit conversion: wide <-> utf8 ----
+template <class CharString, class WideString>
+CharString wideToUtf8(const WideString& str); //example: std::string tmp = wideToUtf8<std::string>(L"abc");
 
+template <class WideString, class CharString>
+WideString utf8ToWide(const CharString& str); //std::wstring tmp = utf8ToWide<std::wstring>("abc");
 
+//access unicode characters in UTF-encoded string (char- or wchar_t-based)
+template <class UtfString>
+size_t unicodeLength(const UtfString& str); //return number of code points for UTF-encoded string
 
+template <class UtfString>
+size_t findUnicodePos(const UtfString& str, size_t unicodePos); //return position of unicode char in UTF-encoded string
 
 
 
@@ -95,6 +97,21 @@ void codePointToUtf16(CodePoint cp, Function writeOutput) //"writeOutput" is a u
 }
 
 
+inline
+size_t getUtf16Len(Char16 ch) //ch must be first code unit!
+{
+    const CodePoint cp = ch;
+
+    if (HIGH_SURROGATE <= cp && cp <= HIGH_SURROGATE_MAX)
+        return 2;
+    else
+    {
+        assert(cp < LOW_SURROGATE || LOW_SURROGATE_MAX < cp); //NO low surrogate expected
+        return 1;
+    }
+}
+
+
 template <class CharIterator, class Function> inline
 void utf16ToCodePoint(CharIterator first, CharIterator last, Function writeOutput) //"writeOutput" is a unary function taking a CodePoint
 {
@@ -151,7 +168,7 @@ void codePointToUtf8(CodePoint cp, Function writeOutput) //"writeOutput" is a un
 
 
 inline
-size_t getUtf8Len(unsigned char ch)
+size_t getUtf8Len(unsigned char ch) //ch must be first code unit!
 {
     if (ch < 0x80)
         return 1;
@@ -229,8 +246,133 @@ void utf8ToCodePoint(CharIterator first, CharIterator last, Function writeOutput
 }
 
 
+template <class CharString> inline
+size_t unicodeLength(const CharString& str, char) //utf8
+{
+    typedef typename GetCharType<CharString>::Type CharType;
+
+    const CharType*       strFirst  = strBegin(str);
+    const CharType* const strLast   = strFirst + strLength(str);
+
+    size_t len = 0;
+    while (strFirst < strLast) //[!]
+    {
+        ++len;
+        strFirst += getUtf8Len(*strFirst); //[!]
+    }
+    return len;
+}
+
+
+template <class WideString> inline
+size_t unicodeLengthWide(const WideString& str, Int2Type<2>) //windows: utf16-wchar_t
+{
+    typedef typename GetCharType<WideString>::Type CharType;
+
+    const CharType*       strFirst = strBegin(str);
+    const CharType* const strLast  = strFirst + strLength(str);
+
+    size_t len = 0;
+    while (strFirst < strLast) //[!]
+    {
+        ++len;
+        strFirst += getUtf16Len(*strFirst); //[!]
+    }
+    return len;
+}
+
+
+template <class WideString> inline
+size_t unicodeLengthWide(const WideString& str, Int2Type<4>) //other OS: utf32-wchar_t
+{
+    return strLength(str);
+}
+
+
+template <class WideString> inline
+size_t unicodeLength(const WideString& str, wchar_t)
+{
+    return unicodeLengthWide(str, Int2Type<sizeof(wchar_t)>());
+}
+}
+
+
+template <class UtfString> inline
+size_t unicodeLength(const UtfString& str) //return number of code points
+{
+    return implementation::unicodeLength(str, typename GetCharType<UtfString>::Type());
+}
+
+
+namespace implementation
+{
+template <class CharString> inline
+size_t findUnicodePos(const CharString& str, size_t unicodePos, char) //utf8-char
+{
+    typedef typename GetCharType<CharString>::Type CharType;
+
+    const CharType* strFirst = strBegin(str);
+    const size_t strLen = strLength(str);
+
+    size_t utfPos = 0;
+    while (unicodePos-- > 0)
+    {
+        utfPos += getUtf8Len(strFirst[utfPos]);
+
+        if (utfPos >= strLen)
+            return strLen;
+    }
+    return utfPos;
+}
+
+
+template <class WideString> inline
+size_t findUnicodePosWide(const WideString& str, size_t unicodePos, Int2Type<2>) //windows: utf16-wchar_t
+{
+    typedef typename GetCharType<WideString>::Type CharType;
+
+    const CharType* strFirst = strBegin(str);
+    const size_t strLen = strLength(str);
+
+    size_t utfPos = 0;
+    while (unicodePos-- > 0)
+    {
+        utfPos += getUtf16Len(strFirst[utfPos]);
+
+        if (utfPos >= strLen)
+            return strLen;
+    }
+    return utfPos;
+}
+
+
+template <class WideString> inline
+size_t findUnicodePosWide(const WideString& str, size_t unicodePos, Int2Type<4>) //other OS: utf32-wchar_t
+{
+    return std::min(strLength(str), unicodePos);
+}
+
+
+template <class UtfString> inline
+size_t findUnicodePos(const UtfString& str, size_t unicodePos, wchar_t)
+{
+    return findUnicodePosWide(str, unicodePos, Int2Type<sizeof(wchar_t)>());
+}
+}
+
+
+template <class UtfString> inline
+size_t findUnicodePos(const UtfString& str, size_t unicodePos) //return position of unicode char in UTF-encoded string
+{
+    return implementation::findUnicodePos(str, unicodePos, typename GetCharType<UtfString>::Type());
+}
+
+//-------------------------------------------------------------------------------------------
+
+namespace implementation
+{
 template <class WideString, class CharString> inline
-WideString utf8ToWide(const CharString& str, Int2Type<2>) //windows: convert utf8 to utf16 wchar_t
+WideString utf8ToWide(const CharString& str, Int2Type<2>) //windows: convert utf8 to utf16-wchar_t
 {
     WideString output;
     utf8ToCodePoint(strBegin(str), strBegin(str) + strLength(str),
@@ -240,7 +382,7 @@ WideString utf8ToWide(const CharString& str, Int2Type<2>) //windows: convert utf
 
 
 template <class WideString, class CharString> inline
-WideString utf8ToWide(const CharString& str, Int2Type<4>) //other OS: convert utf8 to utf32 wchar_t
+WideString utf8ToWide(const CharString& str, Int2Type<4>) //other OS: convert utf8 to utf32-wchar_t
 {
     WideString output;
     utf8ToCodePoint(strBegin(str), strBegin(str) + strLength(str),
@@ -289,26 +431,26 @@ CharString wideToUtf8(const WideString& str)
     return implementation::wideToUtf8<CharString>(str, Int2Type<sizeof(wchar_t)>());
 }
 
-
 //-------------------------------------------------------------------------------------------
-template <class TargetString, class SourceString> inline
-TargetString utf8CvrtTo(const SourceString& str, char, wchar_t) { return utf8ToWide<TargetString>(str); }
 
 template <class TargetString, class SourceString> inline
-TargetString utf8CvrtTo(const SourceString& str, wchar_t, char) { return wideToUtf8<TargetString>(str); }
+TargetString utfCvrtTo(const SourceString& str, char, wchar_t) { return utf8ToWide<TargetString>(str); }
 
 template <class TargetString, class SourceString> inline
-TargetString utf8CvrtTo(const SourceString& str, char, char) { return copyStringTo<TargetString>(str); }
+TargetString utfCvrtTo(const SourceString& str, wchar_t, char) { return wideToUtf8<TargetString>(str); }
 
 template <class TargetString, class SourceString> inline
-TargetString utf8CvrtTo(const SourceString& str, wchar_t, wchar_t) { return copyStringTo<TargetString>(str); }
+TargetString utfCvrtTo(const SourceString& str, char, char) { return copyStringTo<TargetString>(str); }
 
 template <class TargetString, class SourceString> inline
-TargetString utf8CvrtTo(const SourceString& str)
+TargetString utfCvrtTo(const SourceString& str, wchar_t, wchar_t) { return copyStringTo<TargetString>(str); }
+
+template <class TargetString, class SourceString> inline
+TargetString utfCvrtTo(const SourceString& str)
 {
-    return utf8CvrtTo<TargetString>(str,
-                                    typename GetCharType<SourceString>::Type(),
-                                    typename GetCharType<TargetString>::Type());
+    return utfCvrtTo<TargetString>(str,
+                                   typename GetCharType<SourceString>::Type(),
+                                   typename GetCharType<TargetString>::Type());
 }
 }
 

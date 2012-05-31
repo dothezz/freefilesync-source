@@ -105,7 +105,7 @@ enum SyncOperation
 
     SO_OVERWRITE_LEFT,
     SO_OVERWRITE_RIGHT,
-    SO_COPY_METADATA_TO_LEFT, //objects are already equal: transfer metadata only
+    SO_COPY_METADATA_TO_LEFT,  //objects are already equal: transfer metadata only - optimization
     SO_COPY_METADATA_TO_RIGHT, //
 
     SO_DO_NOTHING, //= both sides differ, but nothing will be synced

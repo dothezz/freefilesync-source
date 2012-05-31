@@ -26,7 +26,7 @@ void init(Grid& grid, const std::shared_ptr<const GridView>& gridDataView);
 std::vector<Grid::ColumnAttribute> convertConfig(const std::vector<ColumnAttributeRim>& attribs); //+ make consistent
 std::vector<ColumnAttributeRim>    convertConfig(const std::vector<Grid::ColumnAttribute>& attribs); //
 
-void setSyncPreviewActive(Grid& grid, bool value);
+void showSyncAction(Grid& grid, bool value);
 
 void setupIcons(Grid& grid, bool show, IconBuffer::IconSize sz);
 

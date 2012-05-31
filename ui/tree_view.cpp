@@ -9,6 +9,7 @@
 #include <wx/settings.h>
 #include <wx/menu.h>
 #include <zen/i18n.h>
+#include <zen/utf.h>
 #include <zen/stl_tools.h>
 #include <wx+/format_unit.h>
 #include <wx+/rtl.h>
@@ -336,7 +337,7 @@ void TreeView::updateView(Predicate pred)
         if (root.firstFile || !root.subDirs.empty())
         {
             root.baseMap = baseObj;
-            compressNode(root);
+            this->compressNode(root); //"this->" required by two-pass lookup as enforced by GCC 4.7
         }
         else
             newView.pop_back();
@@ -656,18 +657,18 @@ private:
                     case COL_TYPE_NAVI_DIRECTORY:
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
                         {
-                            const wxString dirLeft  = utf8CvrtTo<wxString>(beforeLast(root->baseMap_.getBaseDirPf<LEFT_SIDE >(), FILE_NAME_SEPARATOR));
-                            const wxString dirRight = utf8CvrtTo<wxString>(beforeLast(root->baseMap_.getBaseDirPf<RIGHT_SIDE>(), FILE_NAME_SEPARATOR));
+                            const wxString dirLeft  = utfCvrtTo<wxString>(beforeLast(root->baseMap_.getBaseDirPf<LEFT_SIDE >(), FILE_NAME_SEPARATOR));
+                            const wxString dirRight = utfCvrtTo<wxString>(beforeLast(root->baseMap_.getBaseDirPf<RIGHT_SIDE>(), FILE_NAME_SEPARATOR));
 
                             if (dirLeft.empty())
                                 return dirRight;
                             else if (dirRight.empty())
                                 return dirLeft;
                             else
-                                return utf8CvrtTo<wxString>(dirLeft + L" \x2212 " + dirRight); //\x2212 = unicode minus
+                                return utfCvrtTo<wxString>(dirLeft + L" \x2212 " + dirRight); //\x2212 = unicode minus
                         }
                         else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
-                            return utf8CvrtTo<wxString>(dir->dirObj_.getObjShortName());
+                            return utfCvrtTo<wxString>(dir->dirObj_.getObjShortName());
                         else if (dynamic_cast<const TreeView::FilesNode*>(node.get()))
                             return _("Files");
                         break;
@@ -801,6 +802,8 @@ private:
                             dc.SetBrush(*wxTRANSPARENT_BRUSH);
                             dc.DrawRectangle(areaPerc);
                         }
+
+                        wxDCTextColourChanger dummy3(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
                         dc.DrawLabel(numberTo<wxString>(node->percent_) + L"%", areaPerc, wxALIGN_CENTER);
 
                         rectTmp.x     += widthPercentBar + 2 * CELL_BORDER;
@@ -816,7 +819,8 @@ private:
                             wxRect rectStat(rectTmp.GetTopLeft(), wxSize(bmp.GetWidth(), bmp.GetHeight()));
                             rectStat.y += (rectTmp.height - rectStat.height) / 2;
 
-                            clearArea(dc, rectStat, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+                            //clearArea(dc, rectStat, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+                            clearArea(dc, rectStat, *wxWHITE); //accessibility: always set both foreground AND background colors!
                             drawBitmapRtlMirror(dc, bmp, rectStat, wxALIGN_CENTER, buffer);
                         };
 

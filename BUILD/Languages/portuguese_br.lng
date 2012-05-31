@@ -7,8 +7,8 @@
 	<plural definition>n <= 1 ? 0 : 1</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>Procurando pelo diretório %x...</target>
+<source>Searching for folder %x...</source>
+<target>Buscando pela pasta %x...</target>
 
 <source>Show in Explorer</source>
 <target>Mostrar no Explorer</target>
@@ -17,7 +17,7 @@
 <target>Abrir com aplicativo padrão</target>
 
 <source>Browse directory</source>
-<target>Navegar pelo diretório</target>
+<target>Procurar diretório</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Cancelar solicitado: Esperando fim da operação...</target>
@@ -25,17 +25,20 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronização Automatizada</target>
 
+<source>Error</source>
+<target>Erro</target>
+
 <source>Select alternate comparison settings</source>
-<target>Selecionar configuração de comparação alternativa</target>
+<target>Selecionar configurações alternativas de comparação</target>
 
 <source>Select alternate synchronization settings</source>
-<target>Selecionar configuração de sincronização alternativa</target>
-
-<source>No filter selected</source>
-<target>Nenhum filtro selecionado</target>
+<target>Selecionar configurações alternativas de sincronização</target>
 
 <source>Filter is active</source>
 <target>Filtro está ativo</target>
+
+<source>No filter selected</source>
+<target>Nenhum filtro selecionado</target>
 
 <source>Remove alternate settings</source>
 <target>Remover configurações alternativas</target>
@@ -50,13 +53,10 @@
 <target>Parâmetros de sincronização</target>
 
 <source>Comparison settings</source>
-<target>Configurações da comparação</target>
+<target>Parâmetros da comparação</target>
 
 <source>About</source>
 <target>Sobre</target>
-
-<source>Error</source>
-<target>Erro</target>
 
 <source>Warning</source>
 <target>Avisos</target>
@@ -73,29 +73,29 @@
 <source>Global settings</source>
 <target>Configurações</target>
 
-<source>Synchronization Preview</source>
-<target>Pré-visualização da Sincronização</target>
+<source>Summary</source>
+<target>Resumo</target>
 
 <source>Find</source>
 <target>Localizar</target>
 
 <source>Select time span</source>
-<target>Selecionar período de tempo</target>
+<target>Selecionar intervalo de tempo</target>
 
 <source>Show pop-up</source>
 <target>Mostrar pop-up</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target>Mostrar pop-up em erros e avisos</target>
+<target>Mostrar pop-up em caso de erros ou avisos</target>
 
 <source>Ignore errors</source>
 <target>Ignorar erros</target>
 
 <source>Hide all error and warning messages</source>
-<target>Ocultar todas as mensagens de erro ou aviso</target>
+<target>Ocultar todas as mensagens de erro e aviso</target>
 
 <source>Exit instantly</source>
-<target>Sair instantaneamente</target>
+<target>Sair imediatamente</target>
 
 <source>Abort synchronization immediately</source>
 <target>Cancelar a sincronização imediatamente</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Procurar</target>
 
-<source>Invalid command line: %x</source>
-<target>Linha de comando inválida: %x</target>
+<source>Invalid command line:</source>
+<target>Linha de comando inválida:</target>
 
 <source>Info</source>
 <target>Informações</target>
@@ -158,7 +158,7 @@
 <target>Falta de memória!</target>
 
 <source>Database files do not share a common session.</source>
-<target>Os arquivos de banco de dados não compartilham uma sessão comum.</target>
+<target>Os arquivos de banco de dados são de sessões diferentes.</target>
 
 <source>An exception occurred!</source>
 <target>Ocorreu uma exceção!</target>
@@ -170,10 +170,10 @@
 <target>Não foi possível obter as informações do processo.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
-<target>Esperando enquanto o diretório é travado (%x)...</target>
+<target>Esperando enquanto o diretório é bloqueado (%x)...</target>
 
 <source>Cannot set directory lock %x.</source>
-<target>Não foi possível ajustar o bloqueio no diretório %x.</target>
+<target>Não foi possível bloquear o diretório %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -181,7 +181,7 @@
 </source>
 <target>
 <pluralform>1 seg</pluralform>
-<pluralform>%x seg</pluralform>
+<pluralform>%x segs</pluralform>
 </target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
@@ -209,7 +209,7 @@
 <target>O arquivo %x não contém uma configuração válida.</target>
 
 <source>Configuration file %x loaded partially only.</source>
-<target>O arquivo de configuração %x foi lido parcialmente apenas.</target>
+<target>O arquivo de configuração %x foi carregado parcialmente.</target>
 
 <source>Cannot access Volume Shadow Copy Service.</source>
 <target>Não foi possível acessar o Serviço Cópia de Sombra de Volume.</target>
@@ -232,32 +232,32 @@
 <source>Cannot read the following XML elements:</source>
 <target>Não foi possível ler os seguintes elementos XML:</target>
 
-<source>S&ave configuration...</source>
-<target>S&alvar configuração...</target>
+<source>&Open...</source>
+<target>&Abrir...</target>
 
-<source>&Load configuration...</source>
-<target>&Carregar configuração...</target>
+<source>&Save...</source>
+<target>&Salvar...</target>
 
 <source>&Quit</source>
-<target>&Sair</target>
+<target>Sai&r</target>
 
-<source>&File</source>
-<target>&Arquivo</target>
+<source>&Program</source>
+<target>&Programa</target>
 
 <source>&Content</source>
 <target>&Conteúdo</target>
 
-<source>&About...</source>
-<target>&Sobre...</target>
+<source>&About</source>
+<target>&Sobre</target>
 
 <source>&Help</source>
-<target>&Ajuda</target>
+<target>A&juda</target>
 
 <source>Usage:</source>
 <target>Uso:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. Selecione os diretórios para monitorar.</target>
+<source>1. Select folders to watch.</source>
+<target>1. Selecione as pastas para monitorar.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Entre uma linha de comando.</target>
@@ -265,19 +265,11 @@
 <source>3. Press 'Start'.</source>
 <target>3. Pressione 'Iniciar'.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-A linha de comando é executada cada vez que:
-- todos os diretórios ficam disponíveis (ex.: inserção de uma Pen Drive)
-- arquivos dentro desses diretórios ou subdiretórios são modificados
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>Para iniciar importe um arquivo .ffs_batch.</target>
 
-<source>Directories to watch</source>
-<target>Diretórios para monitorar</target>
+<source>Folders to watch</source>
+<target>Pastas para comparar</target>
 
 <source>Add folder</source>
 <target>Adicionar pasta</target>
@@ -288,17 +280,34 @@ A linha de comando é executada cada vez que:
 <source>Select a folder</source>
 <target>Selecionar uma pasta</target>
 
+<source>Delay [seconds]</source>
+<target>Atraso [segundos]</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Tempo de espera entre última mudança detectada e execução do comando</target>
+
 <source>Command line</source>
 <target>Linha de comando</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>Mínimo Tempo Ocioso [segundos]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Tempo ocioso entre detecção da última mudança e da execução da linha de comando em segundos</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+O comando é disparado se:
+- arquivos ou subpastas são alterados
+- novas pastas aparecem (p. ex. Uma pendrive é inserida)
+</target>
 
 <source>Start</source>
 <target>Iniciar</target>
+
+<source>&Retry</source>
+<target>&Tentar Novamente</target>
+
+<source>Cancel</source>
+<target>Cancelar</target>
 
 <source>(Build: %x)</source>
 <target>(Versão: %x)</target>
@@ -318,8 +327,8 @@ A linha de comando é executada cada vez que:
 <source>Waiting for missing directories...</source>
 <target>Esperando por diretórios faltantes...</target>
 
-<source>A directory input field is empty.</source>
-<target>Um campo de entrada de diretório está vazio.</target>
+<source>An input folder name is empty.</source>
+<target>Um nome de pasta de entrada está em branco.</target>
 
 <source>Logging</source>
 <target>Ver Log</target>
@@ -397,7 +406,7 @@ A linha de comando é executada cada vez que:
 <target>FreeFileSync está atualizado!</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
-<target>Deseja que o FreeFileSync procure automaticamente novas versões toda semana?</target>
+<target>Deseja que o FreeFileSync procure automaticamente novas versões todas as semanas?</target>
 
 <source>(Requires an Internet connection!)</source>
 <target>(Requer conexão com a Internet!)</target>
@@ -405,8 +414,8 @@ A linha de comando é executada cada vez que:
 <source><Symlink></source>
 <target><Link Simbólico></target>
 
-<source><Directory></source>
-<target><Diretório></target>
+<source><Folder></source>
+<target><Pasta></target>
 
 <source>Full path</source>
 <target>Caminho completo</target>
@@ -417,8 +426,8 @@ A linha de comando é executada cada vez que:
 <source>Relative path</source>
 <target>Caminho relativo</target>
 
-<source>Directory</source>
-<target>Diretório</target>
+<source>Base folder</source>
+<target>Pasta base</target>
 
 <source>Size</source>
 <target>Tamanho</target>
@@ -429,8 +438,11 @@ A linha de comando é executada cada vez que:
 <source>Extension</source>
 <target>Extensão</target>
 
-<source>Comparison Result</source>
-<target>Resultado da Comparação</target>
+<source>Action</source>
+<target>Ação</target>
+
+<source>Category</source>
+<target>Categoria</target>
 
 <source>Drag && drop</source>
 <target>Arrastar && Soltar</target>
@@ -438,29 +450,26 @@ A linha de comando é executada cada vez que:
 <source>Close progress dialog</source>
 <target>Fechar indicador de progresso</target>
 
-<source>Shut down</source>
-<target>Desligar</target>
+<source>Standby</source>
+<target>Em espera</target>
 
 <source>Log off</source>
 <target>Fazer logoff</target>
 
-<source>Standby</source>
-<target>Em espera</target>
+<source>Shut down</source>
+<target>Desligar</target>
 
 <source>Hibernate</source>
 <target>Hibernar</target>
 
 <source>1. &Compare</source>
-<target>1. C&omparar</target>
+<target>1. &Comparar</target>
 
-<source>2. &Synchronize...</source>
-<target>2. S&incronizar...</target>
+<source>2. &Synchronize</source>
+<target>2. S&incronizar</target>
 
 <source>&New</source>
 <target>&Novo</target>
-
-<source>&Program</source>
-<target>&Programa</target>
 
 <source>&Language</source>
 <target>&Idioma</target>
@@ -489,26 +498,26 @@ A linha de comando é executada cada vez que:
 <source>&Abort</source>
 <target>&Abortar</target>
 
-<source>Synchronize...</source>
-<target>Sincronizar...</target>
+<source>Synchronize</source>
+<target>Sincronizar</target>
 
 <source>Start synchronization</source>
-<target>Iniciar sincronização</target>
+<target>Iniciar a sincronização</target>
 
 <source>Add folder pair</source>
-<target>Adicionar par de pastas</target>
+<target>Adicionar um par de pastas</target>
 
 <source>Remove folder pair</source>
-<target>Remover par de pastas</target>
+<target>Remover o par de pastas</target>
 
 <source>Swap sides</source>
 <target>Inverter lados</target>
 
-<source>Save current configuration to file</source>
-<target>Salvar configuração atual para arquivo</target>
-
 <source>Load configuration from file</source>
 <target>Carregar configuração do arquivo</target>
+
+<source>Save current configuration to file</source>
+<target>Salvar configuração atual para arquivo</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Últimas configurações usadas (pressione DEL para remover da lista)</target>
@@ -519,14 +528,14 @@ A linha de comando é executada cada vez que:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Ocultar arquivos filtrados ou temporariamente excluídos</target>
 
-<source>Number of files and directories that will be created</source>
-<target>Número de arquivos e diretórios que serão criados</target>
+<source>Number of files and folders that will be created</source>
+<target>Número de arquivos e pastas que serão criados</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Número de arquivos que serão substituídos</target>
 
-<source>Number of files and directories that will be deleted</source>
-<target>Número de arquivos e diretórios que serão apagados</target>
+<source>Number of files and folders that will be deleted</source>
+<target>Número de arquivos e pastas que serão apagados</target>
 
 <source>Total amount of data that will be transferred</source>
 <target>Volume total de dados que será transferido</target>
@@ -549,8 +558,8 @@ A linha de comando é executada cada vez que:
 <source>Batch job</source>
 <target>Tarefa em lote</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Cria um arquivo de lote e automatiza a sincronização. Para iniciar em modo de lote, simplesmente dê um clique-duplo neste arquivo ou execute o comando: FreeFileSync.exe SyncJob.ffs_batch. Também pode ser agendado pelo Agendador de Tarefas do sistema operacional.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Cria um arquivo de lote para automatizar a sincronização. Dê um clique duplo ou agende no Agendador de Tarefas do sistema operacional: FreeFileSync.exe <nome>.ffs_batch</target>
 
 <source>Help</source>
 <target>Ajuda</target>
@@ -576,20 +585,11 @@ A linha de comando é executada cada vez que:
 <source>Maximum number of log files:</source>
 <target>Número máximo de arquivos de log:</target>
 
-<source>Select log file directory:</source>
-<target>Escolha um diretório para salvar o arquivo de log:</target>
+<source>Select folder to save log files:</source>
+<target>Selecione a pasta para salvar os arquivos de log:</target>
 
 <source>Batch settings</source>
 <target>Configurações da tarefa em lote</target>
-
-<source>&Save</source>
-<target>&Salvar</target>
-
-<source>&Load</source>
-<target>&Carregar</target>
-
-<source>Cancel</source>
-<target>Cancelar</target>
 
 <source>Select variant:</source>
 <target>Selecione um modo:</target>
@@ -615,29 +615,23 @@ A linha de comando é executada cada vez que:
 <source>Configuration</source>
 <target>Configuração</target>
 
-<source>Category</source>
-<target>Categoria</target>
+<source>Item exists on left side only</source>
+<target>Item existe apenas no lado esquerdo</target>
 
-<source>Action</source>
-<target>Ação</target>
+<source>Item exists on right side only</source>
+<target>Item existe apenas no lado direito</target>
 
-<source>File/folder exists on left side only</source>
-<target>Arquivo/pasta existente somente no lado esquerdo</target>
+<source>Left side is newer</source>
+<target>Lado esquerdo é novo</target>
 
-<source>File/folder exists on right side only</source>
-<target>Arquivo/pasta existente somente no lado direito</target>
+<source>Right side is newer</source>
+<target>Lado direito é novo</target>
 
-<source>Left file is newer</source>
-<target>O arquivo à esquerda é mais novo</target>
+<source>Items have different content</source>
+<target>Itens têm conteúdos diferentes</target>
 
-<source>Right file is newer</source>
-<target>O arquivo à direita é mais novo</target>
-
-<source>Files have different content</source>
-<target>Os arquivos possuem conteúdos diferentes</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>O conflito/arquivo não pode ser categorizado</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Conflito/item não pode ser categorizado</target>
 
 <source>OK</source>
 <target>OK</target>
@@ -714,9 +708,6 @@ Os arquivos são considerados iguais se
 <source>&Ignore</source>
 <target>&Ignorar</target>
 
-<source>&Retry</source>
-<target>&Tentar Novamente</target>
-
 <source>Do not show this dialog again</source>
 <target>Não mostrar este diálogo novamente</target>
 
@@ -747,33 +738,6 @@ Apenas arquivos que correspondem a todas as configurações do filtro serão sin
 Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 </target>
 
-<source>Hints:</source>
-<target>Dicas:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Entre os nomes dos arquivos ou diretórios relativos separados por ';' ou uma nova linha.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. Use '*' e '?' como caracteres coringa.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Exclua arquivos diretamente do grid principal através do menu de contexto.</target>
-
-<source>Example</source>
-<target>Exemplo</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Incluir: *.doc;*.zip;*.exe
-Excluir: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>Sincronizar todos arquivos .doc, .zip e .exe exceto tudo que estiver na subpasta "temp".</target>
-
 <source>Include</source>
 <target>Incluir</target>
 
@@ -795,8 +759,8 @@ Excluir: \stuff\temp\*
 <source>&Default</source>
 <target>&Config. Padrão</target>
 
-<source>Transactional file copy</source>
-<target>Cópia de arquivo transacional</target>
+<source>Fail-safe file copy</source>
+<target>Cópia de arquivos a prova de falha</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Escreve para um arquivo temporário primeiro (*.ffs_tmp) e depois o renomeia. Isto garante um estado consistente mesmo em caso de erro fatal.</target>
@@ -810,8 +774,8 @@ Excluir: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>Copiar permissões de acesso aos arquivos</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Transfere as permissões de arquivos e diretórios (Requer direitos de Administrador)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>Tranfere as permissões dos arquivos e pastas (requer direitos de Administrador)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Restaurar diálogos ocultados</target>
@@ -889,7 +853,7 @@ Excluir: \stuff\temp\*
 <target>Grande</target>
 
 <source>Select time span...</source>
-<target>Selecionar período de tempo...</target>
+<target>Selecionar intervalo de tempo...</target>
 
 <source>Default view</source>
 <target>Visualização padrão</target>
@@ -1006,7 +970,7 @@ Excluir: \stuff\temp\*
 <target>Por favor execute primeiro a Comparação antes de sincronizar!</target>
 
 <source>Comma separated list</source>
-<target>Lista de itens separada por vírgula</target>
+<target>Lista de itens separados por vírgulas</target>
 
 <source>Legend</source>
 <target>Legenda</target>
@@ -1108,7 +1072,7 @@ Excluir: \stuff\temp\*
 <target>Filtro</target>
 
 <source>Direct</source>
-<target>Direcionar</target>
+<target>Direto</target>
 
 <source>Follow</source>
 <target>Seguir</target>
@@ -1119,11 +1083,11 @@ Excluir: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:</target>
 
-<source>- full file or directory name</source>
-<target>- nome completo do arquivo ou diretório</target>
+<source>- full file or folder name</source>
+<target>- nome completo do arquivo ou pasta</target>
 
-<source>- directory part only</source>
-<target>- apenas a parte do diretório</target>
+<source>- folder part only</source>
+<target>- apenas parte da pasta</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- Correspondente do outro lado a %name</target>
@@ -1167,8 +1131,8 @@ Excluir: \stuff\temp\*
 <source>Versioning</source>
 <target>Controle de versões</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Mover arquivos para um subdiretório com carimbo de tempo</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>Move os arquivos para uma subpasta com estampa de tempo</target>
 
 <source>Files</source>
 <target>Arquivos</target>
@@ -1191,7 +1155,7 @@ Excluir: \stuff\temp\*
 </source>
 <target>
 <pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
+<pluralform>%x mins</pluralform>
 </target>
 
 <source>
@@ -1263,8 +1227,8 @@ Excluir: \stuff\temp\*
 <source>Cannot read directory %x.</source>
 <target>Não foi possível ler o diretório %x.</target>
 
-<source>Endless loop.</source>
-<target>Loop infinito.</target>
+<source>Detected endless directory recursion.</source>
+<target>Detectada recursão de diretório infinita.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Não foi possível estabelecer o privilégio %x.</target>
@@ -1290,14 +1254,11 @@ Excluir: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Configurando direções padrões de sincronização: Arquivos antigos serão substituídos por arquivos mais novos.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>O arquivo não contém uma configuração válida:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>Você pode ignorar este erro para considerar a pasta como vazia.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>Você pode ignorar esse erro para considerar o diretório como vazio.</target>
-
-<source>Cannot find directory %x.</source>
-<target>Não foi possível encontrar o diretório %x.</target>
+<source>Cannot find folder %x.</source>
+<target>Não foi possível encontrar a pasta %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Os diretórios são dependentes! Cuidado ao definir as regras de sincronização:</target>
@@ -1329,44 +1290,44 @@ Excluir: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>Ambos os lados são iguais</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Os arquivos/pastas se diferenciam apenas nos atributos</target>
+<source>Items have different attributes</source>
+<target>Itens têm atributos diferentes</target>
 
-<source>Copy new file/folder to left</source>
-<target>Copiar arquivos/pastas novos para a esquerda</target>
+<source>Copy new item to left</source>
+<target>Copiar novo item para a esquerda</target>
 
-<source>Copy new file/folder to right</source>
-<target>Copiar arquivos/pastas novos para a direita</target>
+<source>Copy new item to right</source>
+<target>Copiar novo item para a direita</target>
 
-<source>Delete left file/folder</source>
-<target>Apagar arquivos/pastas da esquerda</target>
+<source>Delete left item</source>
+<target>Deletar item à esquerda</target>
 
-<source>Delete right file/folder</source>
-<target>Apagar arquivos/pastas da direita</target>
+<source>Delete right item</source>
+<target>Deletar item à direita</target>
 
 <source>Move file on left</source>
-<target>Mover arquivo da esquerda</target>
+<target>Mover arquivo à esquerda</target>
 
 <source>Move file on right</source>
-<target>Mover arquivo da direita</target>
+<target>Mover arquivo à direita</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Substituir arquivos/pastas da esquerda pelos da direita</target>
+<source>Overwrite left item</source>
+<target>Sobrescrever item à esquerda</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Substituir arquivos/pastas da direita pelos da esquerda</target>
+<source>Overwrite right item</source>
+<target>Sobrescrever item à esquerda</target>
 
 <source>Do nothing</source>
 <target>Não fazer nada</target>
 
-<source>Copy file attributes only to left</source>
-<target>Copiar apenas os atributos do arquivo para a esquerda</target>
+<source>Update attributes on left</source>
+<target>Atualizar atributos à esquerda</target>
 
-<source>Copy file attributes only to right</source>
-<target>Copiar apenas os atributos do arquivo para a direita</target>
+<source>Update attributes on right</source>
+<target>Atualizar atributos à direita</target>
 
 <source>Multiple...</source>
-<target>Múltiplos...</target>
+<target>Múltiplo...</target>
 
 <source>Deleting file %x</source>
 <target>Apagando arquivo %x</target>
@@ -1416,11 +1377,11 @@ Excluir: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>Atualizando atributos de %x</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Nome do diretório de destino não pode estar vazio!</target>
+<source>Target folder name must not be empty.</source>
+<target>O nome da pasta de destino não pode estar em branco.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>O diretório para controle de versões não foi fornecido!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>O nome da pasta para o controle de versões não pode estar em branco.</target>
 
 <source>Source directory %x not found.</source>
 <target>O diretório de origem %x não foi encontrado.</target>
@@ -1449,8 +1410,8 @@ Excluir: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>A Lixeira não está disponível para os seguintes caminhos! Os arquivos serão apagados permanentemente:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Um diretório que faz parte de múltiplos pares de pastas será modificado! Por favor revise suas configurações de sincronização!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>Uma pasta que é parte de múltiplos pares de pasta será modificada. Por favor, revise as configurações de sincronização.</target>
 
 <source>Processing folder pair:</source>
 <target>Processando par de pastas:</target>

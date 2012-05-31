@@ -66,6 +66,8 @@ ErrorDlg::ErrorDlg(wxWindow* parent, const int activeButtons, const wxString& me
         m_buttonIgnore->SetFocus();
     else if (activeButtons & ReturnErrorDlg::BUTTON_ABORT)
         m_buttonAbort->SetFocus();
+
+    Fit(); //child-element widths have changed: image was set
 }
 
 
@@ -148,6 +150,8 @@ WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& mes
         m_buttonIgnore->SetFocus();
     else if (activeButtons & ReturnWarningDlg::BUTTON_ABORT)
         m_buttonAbort->SetFocus();
+
+    Fit(); //child-element widths have changed: image was set
 }
 
 
@@ -237,6 +241,8 @@ QuestionDlg::QuestionDlg(wxWindow* parent, int activeButtons, const wxString& me
         m_buttonCancel->SetFocus();
     else if (activeButtons & ReturnQuestionDlg::BUTTON_NO)
         m_buttonNo->SetFocus();
+
+    Fit(); //child-element widths have changed: image was set
 }
 
 void QuestionDlg::OnYes(wxCommandEvent& event)

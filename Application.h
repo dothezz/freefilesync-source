@@ -9,6 +9,7 @@
 
 #include <wx/app.h>
 #include "lib/process_xml.h"
+#include "lib/return_codes.h"
 
 
 class Application : public wxApp
@@ -25,10 +26,10 @@ public:
 private:
     void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, xmlAccess::XmlGlobalSettings& settings);
     void runGuiMode(const std::vector<wxString>& cfgFileName, xmlAccess::XmlGlobalSettings& settings);
-    void runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings);
+    void runBatchMode(const Zstring& filename, xmlAccess::XmlGlobalSettings& globSettings);
 
     xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
-    int returnValue;
+    zen::FfsReturnCode returnCode;
 };
 
 #endif // FREEFILESYNCAPP_H

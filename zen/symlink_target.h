@@ -64,16 +64,15 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
 #ifdef FFS_WIN
     //FSCTL_GET_REPARSE_POINT: http://msdn.microsoft.com/en-us/library/aa364571(VS.85).aspx
 
-    try //reading certain symlinks/junctions requires admin rights! This shall not cause an error in user mode!
-    {
-        activatePrivilege(SE_BACKUP_NAME); //throw FileError
-    }
-    catch (FileError&) {}
+    //reading certain symlinks/junctions requires admin rights!
+    try
+    { activatePrivilege(SE_BACKUP_NAME); } //throw FileError
+    catch (FileError&) {} //This shall not cause an error in user mode!
 
     const HANDLE hLink = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),
                                       GENERIC_READ,
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      0,
+                                      nullptr,
                                       OPEN_EXISTING,
                                       FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
                                       nullptr);

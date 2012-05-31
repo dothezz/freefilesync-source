@@ -45,7 +45,7 @@ private:
     virtual void OnCmpSettings    (wxCommandEvent& event);
     virtual void OnSyncSettings   (wxCommandEvent& event);
     virtual void OnConfigureFilter(wxCommandEvent& event);
-    virtual void OnHelp           (wxCommandEvent& event);
+    virtual void OnHelp           (wxCommandEvent& event) { displayHelpEntry(L"html/Schedule a Batch Job.html"); }
 
     void OnCompSettingsContext(wxCommandEvent& event);
     void OnSyncSettingsContext(wxCommandEvent& event);
@@ -368,15 +368,15 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
     m_staticTextSyncVariant->SetLabel(cfg.mainCfg.getSyncVariantName());
 
     //set filter icon
-    if (isNullFilter(cfg.mainCfg.globalFilter))
+    if (!isNullFilter(cfg.mainCfg.globalFilter))
     {
-        setImage(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOff")));
-        m_bpButtonFilter->SetToolTip(_("No filter selected"));
+        setImage(*m_bpButtonFilter, GlobalResources::getImage(L"filter"));
+        m_bpButtonFilter->SetToolTip(_("Filter is active"));
     }
     else
     {
-        setImage(*m_bpButtonFilter, GlobalResources::getImage(wxT("filterOn")));
-        m_bpButtonFilter->SetToolTip(_("Filter is active"));
+        setImage(*m_bpButtonFilter, greyScale(GlobalResources::getImage(L"filter")));
+        m_bpButtonFilter->SetToolTip(_("No filter selected"));
     }
 
     m_panelOverview->Layout (); //adjust stuff inside scrolled window
@@ -461,15 +461,6 @@ void BatchDialog::OnFilesDropped(FileDropEvent& event)
 }
 
 
-void BatchDialog::OnHelp(wxCommandEvent& event)
-{
-#ifdef FFS_WIN
-    zen::displayHelpEntry(wxT("html\\ScheduleBatch.html"));
-#elif defined FFS_LINUX
-    zen::displayHelpEntry(wxT("html/ScheduleBatch.html"));
-#endif
-}
-
 /*
 void BatchDialog::showNotebookpage(wxWindow* page, const wxString& pageName, bool show)
 {
@@ -513,8 +504,8 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
                             wxEmptyString,
                             wxEmptyString,
                             defaultFileName,
-                            wxString(_("FreeFileSync batch file")) + L" (*.ffs_batch)|*.ffs_batch",
-                            wxFD_SAVE /*| wxFD_OVERWRITE_PROMPT*/); //creating this on freestore leads to memleak!
+                            _("FreeFileSync batch file") + L" (*.ffs_batch)|*.ffs_batch" + L"|" +_("All files") + L" (*.*)|*",
+                            wxFD_SAVE | wxFD_OVERWRITE_PROMPT); //creating this on freestore leads to memleak!
     if (filePicker.ShowModal() == wxID_OK)
     {
         const wxString newFileName = filePicker.GetPath();
@@ -530,9 +521,9 @@ void BatchDialog::OnLoadBatchJob(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this,
                             wxEmptyString,
-                            beforeLast(proposedBatchFileName, utf8CvrtTo<wxString>(FILE_NAME_SEPARATOR)), //set default dir: empty string if "currentConfigFileName" is empty or has no path separator
+                            beforeLast(proposedBatchFileName, utfCvrtTo<wxString>(FILE_NAME_SEPARATOR)), //set default dir: empty string if "currentConfigFileName" is empty or has no path separator
                             wxEmptyString,
-                            wxString(_("FreeFileSync configuration")) + wxT(" (*.ffs_batch;*.ffs_gui)|*.ffs_batch;*.ffs_gui"),
+                            _("FreeFileSync batch file") + L" (*.ffs_batch;*.ffs_gui)|*.ffs_batch;*.ffs_gui" + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN | wxFD_MULTIPLE); //creating this on freestore leads to memleak!
     if (filePicker.ShowModal() == wxID_OK)
     {

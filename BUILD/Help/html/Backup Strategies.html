@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20110901;20151400">
+	<META NAME="CHANGED" CONTENT="20120511;23131500">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -14,27 +14,26 @@
 	<!--
 		@page { margin: 2cm }
 		P { margin-bottom: 0.21cm }
-		H3 { margin-bottom: 0.21cm }
-		H3.western { font-family: "Arial", sans-serif }
-		H3.cjk { font-family: "MS Mincho" }
-		H3.ctl { font-family: "Mangal" }
+		H2.cjk { font-family: "SimSun" }
+		H2.ctl { font-family: "Mangal" }
 		A:link { so-language: zxx }
 	-->
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Backup strategies</FONT></H3>
+<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Backup
+Strategies</FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>1.
 Full backup with versioning of old files</B></FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
-synchronization settings select and specify a &quot;User-defined
-directory&quot; for deletion handling. FreeFileSync will place files
-that have been deleted or overwritten with newer versions into
-corresponding time-stamped sub directories. This provides a
-space-optimized way to retain all older versions of files while the
-most recent ones are available in main source and target directories.</FONT></P>
+synchronization settings select and specify &quot;Versioning&quot;
+for deletion handling. FreeFileSync will place files that have been
+deleted or overwritten with newer versions into corresponding
+time-stamped sub directories. This provides a space-optimized way to
+save all older versions of files separately while the most recent
+ones are available in main source and target directories.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -62,7 +61,7 @@ Base directories are set up accordingly:</FONT></P>
 will be interactively replaced with the current date during
 synchronization. In order to further automate this process, you can
 create a *.ffs_batch file with this configuration and choose &quot;<I>ignore
-errors</I>&quot; to avoid the warning that target directory is not
-(yet) existing.</FONT></P>
+errors</I>&quot; to avoid the popup message that target directory is
+not (yet) existing.</FONT></P>
 </BODY>
 </HTML>

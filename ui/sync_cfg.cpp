@@ -214,7 +214,7 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     enumDelhandDescr.
     add(DELETE_PERMANENTLY,       _("Delete permanently"), _("Delete or overwrite files permanently")).
     add(MOVE_TO_RECYCLE_BIN,      _("Use Recycle Bin"),    _("Use Recycle Bin when deleting or overwriting files")).
-    add(MOVE_TO_CUSTOM_DIRECTORY, _("Versioning"),         _("Move files into a time-stamped subdirectory"));
+    add(MOVE_TO_CUSTOM_DIRECTORY, _("Versioning"),         _("Move files into a time-stamped subfolder"));
 
     enumErrhandDescr.
     add(ON_GUIERROR_POPUP,  _("Show pop-up"),    _("Show pop-up on errors or warnings")).
@@ -317,19 +317,27 @@ void SyncCfgDialog::updateGui()
     }
 
     //set radiobuttons -> have no parameter-ownership at all!
+    m_staticTextAutomatic->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+    m_staticTextMirror   ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+    m_staticTextUpdate   ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+    m_staticTextCustom   ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     switch (currentDirectionCfg.var)
     {
         case DirectionConfig::AUTOMATIC:
             m_radioBtnAutomatic->SetValue(true); //automatic mode
+            m_staticTextAutomatic->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
             break;
         case DirectionConfig::MIRROR:
             m_radioBtnMirror->SetValue(true);    //one way ->
+            m_staticTextMirror->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
             break;
         case DirectionConfig::UPDATE:
             m_radioBtnUpdate->SetValue(true);    //Update ->
+            m_staticTextUpdate->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
             break;
         case DirectionConfig::CUSTOM:
             m_radioBtnCustom->SetValue(true);    //custom
+            m_staticTextCustom->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
             break;
     }
 

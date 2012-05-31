@@ -30,6 +30,7 @@
 
 using namespace zen;
 
+
 namespace
 {
 inline
@@ -72,7 +73,7 @@ SyncStatistics::SyncStatistics(const HierarchyObject&  hierObj)
 SyncStatistics::SyncStatistics(const FileMapping& fileObj)
 {
     init();
-    getFileNumbers(fileObj);
+    calcStats(fileObj);
     rowsTotal += 1;
 }
 
@@ -80,14 +81,9 @@ SyncStatistics::SyncStatistics(const FileMapping& fileObj)
 inline
 void SyncStatistics::recurse(const HierarchyObject& hierObj)
 {
-    std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
-    [&](const DirMapping& dirObj) { getDirNumbers(dirObj); });
-
-    std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-    [&](const FileMapping& fileObj) { getFileNumbers(fileObj); });
-
-    std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-    [&](const SymLinkMapping& linkObj) { getLinkNumbers(linkObj); });
+    std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](const DirMapping&     dirObj ) { calcStats(dirObj ); });
+    std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](const FileMapping&    fileObj) { calcStats(fileObj); });
+    std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](const SymLinkMapping& linkObj) { calcStats(linkObj); });
 
     rowsTotal += hierObj.refSubDirs(). size();
     rowsTotal += hierObj.refSubFiles().size();
@@ -96,7 +92,7 @@ void SyncStatistics::recurse(const HierarchyObject& hierObj)
 
 
 inline
-void SyncStatistics::getFileNumbers(const FileMapping& fileObj)
+void SyncStatistics::calcStats(const FileMapping& fileObj)
 {
     switch (fileObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
@@ -126,7 +122,7 @@ void SyncStatistics::getFileNumbers(const FileMapping& fileObj)
             ++updateRight;
             break;
 
-        case SO_MOVE_LEFT_SOURCE:  //ignore
+        case SO_MOVE_LEFT_SOURCE:  //ignore; already counted
         case SO_MOVE_RIGHT_SOURCE: //
             break;
 
@@ -162,7 +158,7 @@ void SyncStatistics::getFileNumbers(const FileMapping& fileObj)
 
 
 inline
-void SyncStatistics::getLinkNumbers(const SymLinkMapping& linkObj)
+void SyncStatistics::calcStats(const SymLinkMapping& linkObj)
 {
     switch (linkObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
@@ -211,7 +207,7 @@ void SyncStatistics::getLinkNumbers(const SymLinkMapping& linkObj)
 
 
 inline
-void SyncStatistics::getDirNumbers(const DirMapping& dirObj)
+void SyncStatistics::calcStats(const DirMapping& dirObj)
 {
     switch (dirObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
@@ -260,9 +256,7 @@ void SyncStatistics::getDirNumbers(const DirMapping& dirObj)
             break;
     }
 
-    recurse(dirObj); //hm, if this dir is deleted, it is not correct to recurse, except deletion variant is "permanently" or
-    //"user-defined + different volume" -> fortunately the numbers are adjusted during sync!
-    //however: it's risky to *not* recurse, since sync-algorithm might do so, even in case of deletion! (e.g. ignored failure to delete parent directory)!
+    recurse(dirObj); //since we model logical stats, we recurse, even if deletion variant is "recycler" or "versioning + same volume", which is a single physical operation!
 }
 
 
@@ -293,7 +287,7 @@ std::vector<zen::FolderPairSyncCfg> zen::extractSyncCfg(const MainConfiguration&
 //------------------------------------------------------------------------------------------------------------
 
 
-//test if user accidentally tries to sync the wrong folders
+//test if user accidentally selected the wrong folders to sync
 bool significantDifferenceDetected(const SyncStatistics& folderPairStat)
 {
     //initial file copying shall not be detected as major difference
@@ -311,8 +305,102 @@ bool significantDifferenceDetected(const SyncStatistics& folderPairStat)
 
     return nonMatchingRows >= 10 && nonMatchingRows > 0.5 * folderPairStat.getRowCount();
 }
-//#################################################################################################################
 
+//#################################################################################################################
+#ifdef FFS_WIN
+warn_static("finish")
+#endif
+/*
+class PhysicalStatistics //counts *physical* operations, disk accesses and bytes transferred
+{
+public:
+PhysicalStatistics(const FolderComparison& folderCmp) : accesses(0)
+{
+	std::for_each(begin(folderCmp), end(folderCmp), [&](const BaseDirMapping& baseMap) { recurse(baseMap); });
+}
+
+int getAccesses() const { return accesses; }
+zen::Int64 getBytes() const { return bytes; }
+
+private:
+void recurse(const HierarchyObject& hierObj)
+{
+std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](const DirMapping&     dirObj ) { calcStats(dirObj ); });
+std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](const FileMapping&    fileObj) { calcStats(fileObj); });
+std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](const SymLinkMapping& linkObj) { calcStats(linkObj); });
+}
+
+void calcStats(const FileMapping& fileObj)
+{
+switch (fileObj.getSyncOperation()) //evaluate comparison result and sync direction
+{
+    case SO_CREATE_NEW_LEFT:
+        accesses += 2; //read + write
+        bytes += to<Int64>(fileObj.getFileSize<RIGHT_SIDE>());
+        break;
+
+    case SO_CREATE_NEW_RIGHT:
+        accesses += 2; //read + write
+        bytes += to<Int64>(fileObj.getFileSize<LEFT_SIDE>());
+        break;
+
+    case SO_DELETE_LEFT:
+        ++accesses;
+        break;
+
+    case SO_DELETE_RIGHT:
+        ++accesses;
+        break;
+
+    case SO_MOVE_LEFT_TARGET:
+    case SO_MOVE_RIGHT_TARGET:
+        ++accesses;
+        break;
+
+    case SO_MOVE_LEFT_SOURCE:  //ignore; already counted
+    case SO_MOVE_RIGHT_SOURCE: //
+        break;
+
+    case SO_OVERWRITE_LEFT:
+        //todo: delete
+		accesses += 2; //read + write
+        bytes += to<Int64>(fileObj.getFileSize<RIGHT_SIDE>());
+        break;
+
+    case SO_OVERWRITE_RIGHT:
+		//todo: delete
+		accesses += 2; //read + write
+        bytes += to<Int64>(fileObj.getFileSize<LEFT_SIDE>());
+        break;
+
+    case SO_COPY_METADATA_TO_LEFT:
+    case SO_COPY_METADATA_TO_RIGHT:
+        accesses += 2; //read + write
+        break;
+
+    case SO_UNRESOLVED_CONFLICT:
+    case SO_DO_NOTHING:
+    case SO_EQUAL:
+        break;
+}
+}
+
+void calcStats(const SymLinkMapping& linkObj)
+{
+
+}
+
+void calcStats(const DirMapping& dirObj)
+{
+		//since we model physical stats, we recurse only if deletion variant is "permanently" or "user-defined + different volume",
+	//else deletion is done as a single physical operation
+}
+
+int accesses;
+Int64 bytes;
+};
+*/
+//#################################################################################################################
 
 FolderPairSyncCfg::FolderPairSyncCfg(bool automaticMode,
                                      const DeletionPolicy handleDel,
@@ -325,24 +413,20 @@ FolderPairSyncCfg::FolderPairSyncCfg(bool automaticMode,
 /*
 add some postfix to alternate deletion directory: deletionDirectory\<prefix>2010-06-30 12-59-12\
 */
-Zstring getSessionDeletionDir(const Zstring& deletionDirectory, const Zstring& prefix = Zstring())
+
+Zstring findUnusedName(const Zstring& filename)
 {
-    if (deletionDirectory.empty())
-        return Zstring(); //no valid directory for deletion specified (checked later)
-
-    const Zstring formattedDir = appendSeparator(deletionDirectory) + prefix + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"));
-
     //ensure that session directory does not yet exist (must be unique)
-    Zstring output = formattedDir;
+    Zstring output = filename;
     for (int i = 1; zen::somethingExists(output); ++i)
-        output = formattedDir + Zchar('_') + numberTo<Zstring>(i);
+        output = filename + Zchar('_') + numberTo<Zstring>(i);
 
-    output += FILE_NAME_SEPARATOR;
     return output;
 }
 
-
-SyncProcess::SyncProcess(xmlAccess::OptionalDialogs& warnings,
+SyncProcess::SyncProcess(const std::wstring& jobName,
+                         const std::wstring& timestamp,
+                         xmlAccess::OptionalDialogs& warnings,
                          bool verifyCopiedFiles,
                          bool copyLockedFiles,
                          bool copyFilePermissions,
@@ -354,7 +438,9 @@ SyncProcess::SyncProcess(xmlAccess::OptionalDialogs& warnings,
     copyFilePermissions_(copyFilePermissions),
     transactionalFileCopy_(transactionalFileCopy),
     m_warnings(warnings),
-    procCallback(handler)
+    procCallback(handler),
+    custDelDirShortname(utfCvrtTo<Zstring>(jobName.empty() ? timestamp : jobName + L" " + timestamp))
+
 {
     if (runWithBackgroundPriority)
         procBackground.reset(new ScheduleForBackgroundProcessing);
@@ -365,7 +451,8 @@ class DeletionHandling //e.g. generate name of alternate deletion directory (uni
 {
 public:
     DeletionHandling(DeletionPolicy handleDel,
-                     const Zstring& custDelFolder,
+                     const Zstring& custDelDir,  // final custom deletion directory: custDelDir + \ + subdirShort
+                     const Zstring& subdirShort, //
                      const Zstring& baseDirPf, //with separator postfix
                      ProcessCallback& procCallback);
     ~DeletionHandling(); //always (try to) clean up, even if synchronization is aborted!
@@ -391,9 +478,8 @@ private:
     DeletionPolicy deletionType;
     ProcessCallback* procCallback_; //always bound! need assignment operator => not a reference
 
-    Zstring sessionDelDir;  //target deletion folder for current folder pair (with timestamp, ends with path separator)
-
-    Zstring baseDirPf_;  //with separator postfix
+    Zstring sessionDelDirPf;  //full target deletion folder for current folder pair (with timestamp, ends with path separator)
+    Zstring baseDirPf_;  //ends with path separator
 
     //preloaded status texts:
     std::wstring txtRemovingFile;
@@ -405,7 +491,8 @@ private:
 
 
 DeletionHandling::DeletionHandling(DeletionPolicy handleDel,
-                                   const Zstring& custDelFolder,
+                                   const Zstring& custDelDir,  // final custom deletion directory: custDelDir + \ + subdirShort
+                                   const Zstring& subdirShort, //
                                    const Zstring& baseDirPf, //with separator postfix
                                    ProcessCallback& procCallback) :
     deletionType(handleDel),
@@ -418,7 +505,6 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel,
         (deletionType == MOVE_TO_RECYCLE_BIN && recycleBinStatus(baseDirPf) == STATUS_REC_MISSING))
         deletionType = DELETE_PERMANENTLY; //Windows' ::SHFileOperation() will do this anyway, but we have a better and faster deletion routine (e.g. on networks)
 #endif
-
     switch (deletionType)
     {
         case DELETE_PERMANENTLY:
@@ -428,7 +514,8 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel,
             break;
 
         case MOVE_TO_RECYCLE_BIN:
-            sessionDelDir = getSessionDeletionDir(baseDirPf_, Zstr("FFS "));
+            if (!baseDirPf_.empty())
+                sessionDelDirPf = appendSeparator(findUnusedName(baseDirPf_ + Zstr("FFS ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"))));
 
             txtRemovingFile      = _("Moving file %x to recycle bin"         );
             txtRemovingDirectory = _("Moving folder %x to recycle bin"       );
@@ -436,11 +523,12 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel,
             break;
 
         case MOVE_TO_CUSTOM_DIRECTORY:
-            sessionDelDir = getSessionDeletionDir(custDelFolder);
+            if (!custDelDir.empty())
+                sessionDelDirPf = appendSeparator(findUnusedName(appendSeparator(custDelDir) + subdirShort));
 
-            txtRemovingFile      = replaceCpy(_("Moving file %x to %y"         ), L"%y", fmtFileName(custDelFolder));
-            txtRemovingDirectory = replaceCpy(_("Moving folder %x to %y"       ), L"%y", fmtFileName(custDelFolder));
-            txtRemovingSymlink   = replaceCpy(_("Moving symbolic link %x to %y"), L"%y", fmtFileName(custDelFolder));
+            txtRemovingFile      = replaceCpy(_("Moving file %x to %y"         ), L"%y", fmtFileName(custDelDir));
+            txtRemovingDirectory = replaceCpy(_("Moving folder %x to %y"       ), L"%y", fmtFileName(custDelDir));
+            txtRemovingSymlink   = replaceCpy(_("Moving symbolic link %x to %y"), L"%y", fmtFileName(custDelDir));
             break;
     }
 }
@@ -459,7 +547,7 @@ void DeletionHandling::tryCleanup() //throw FileError
     if (!cleanedUp)
     {
         if (deletionType == MOVE_TO_RECYCLE_BIN) //clean-up temporary directory (recycle bin)
-            zen::moveToRecycleBin(beforeLast(sessionDelDir, FILE_NAME_SEPARATOR)); //throw FileError
+            zen::moveToRecycleBin(beforeLast(sessionDelDirPf, FILE_NAME_SEPARATOR)); //throw FileError
 
         cleanedUp = true;
     }
@@ -557,12 +645,12 @@ void DeletionHandling::removeFile(const Zstring& relativeName) const
 
         case MOVE_TO_RECYCLE_BIN:
         {
-            const Zstring targetFile = sessionDelDir + relativeName; //ends with path separator
+            const Zstring targetFile = sessionDelDirPf + relativeName; //ends with path separator
 
-            try //... to get away cheaply!
+            try
             {
                 //performance optimization: Instead of moving each object into recycle bin separately,
-                //we rename them ony by one into a temporary directory and delete this directory only ONCE!
+                //we rename them one by one into a temporary directory and delete this directory only ONCE!
                 renameFile(fullName, targetFile); //throw FileError -> try to get away cheaply!
             }
             catch (FileError&)
@@ -588,7 +676,7 @@ void DeletionHandling::removeFile(const Zstring& relativeName) const
         case MOVE_TO_CUSTOM_DIRECTORY:
         {
             CallbackMoveFileImpl callBack(*procCallback_, *this, nullptr); //we do *not* report statistics in this method
-            const Zstring targetFile = sessionDelDir + relativeName; //ends with path separator
+            const Zstring targetFile = sessionDelDirPf + relativeName; //ends with path separator
 
             try //... to get away cheaply!
             {
@@ -633,12 +721,12 @@ void DeletionHandling::removeFolderInt(const Zstring& relativeName, const int* o
 
         case MOVE_TO_RECYCLE_BIN:
         {
-            const Zstring targetDir = sessionDelDir + relativeName;
+            const Zstring targetDir = sessionDelDirPf + relativeName;
 
-            try //... to get away cheaply!
+            try
             {
                 //performance optimization: Instead of moving each object into recycle bin separately,
-                //we rename them ony by one into a temporary directory and delete this directory only ONCE!
+                //we rename them one by one into a temporary directory and delete this directory only ONCE!
                 renameFile(fullName, targetDir); //throw FileError -> try to get away cheaply!
             }
             catch (FileError&)
@@ -670,7 +758,7 @@ void DeletionHandling::removeFolderInt(const Zstring& relativeName, const int* o
         case MOVE_TO_CUSTOM_DIRECTORY:
         {
             CallbackMoveFileImpl callBack(*procCallback_, *this, objectsExpected ? &objectsReported : nullptr);
-            const Zstring targetDir = sessionDelDir + relativeName;
+            const Zstring targetDir = sessionDelDirPf + relativeName;
 
             try //... to get away cheaply!
             {
@@ -715,7 +803,7 @@ bool DeletionHandling::deletionFreesSpace() const
         case MOVE_TO_RECYCLE_BIN:
             return false; //in general... (unless Recycle Bin is full)
         case MOVE_TO_CUSTOM_DIRECTORY:
-            switch (zen::onSameVolume(baseDirPf_, sessionDelDir))
+            switch (zen::onSameVolume(baseDirPf_, sessionDelDirPf))
             {
                 case IS_SAME_YES:
                     return false;
@@ -969,7 +1057,7 @@ bool haveNameClash(const Zstring& shortname, Mapping& m)
 }
 
 
-Zstring findUniqueTempName(const Zstring& filename)
+Zstring findUnusedTempName(const Zstring& filename)
 {
     Zstring output = filename + zen::TEMP_FILE_ENDING;
 
@@ -987,7 +1075,7 @@ void SynchronizeFolderPair::prepare2StepMove(FileMapping& sourceObj,
                                              FileMapping& targetObj) //throw FileError
 {
     const Zstring& source = sourceObj.getFullName<side>();
-    const Zstring& tmpTarget = findUniqueTempName(sourceObj.getBaseDirPf<side>() + sourceObj.getShortName<side>());
+    const Zstring& tmpTarget = findUnusedTempName(sourceObj.getBaseDirPf<side>() + sourceObj.getShortName<side>());
     //this could still lead to a name-clash in obscure cases, if some file ex. on the other side with
     //the very same (.ffs_tmp) name and is copied before the second step of the move is executed
     //good news: even in this pathologic case, this may only prevent the copy of the other file, but not the move
@@ -1273,7 +1361,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
     std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
                   [&](FileMapping& fileObj)
     {
-        if (pass == getPass(fileObj))
+        if (pass == this->getPass(fileObj)) //"this->" required by two-pass lookup as enforced by GCC 4.7
             tryReportingError([&] { synchronizeFile(fileObj); }, procCallback_);
     });
 
@@ -1281,7 +1369,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
     std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
                   [&](SymLinkMapping& linkObj)
     {
-        if (pass == getPass(linkObj))
+        if (pass == this->getPass(linkObj))
             tryReportingError([&] { synchronizeLink(linkObj); }, procCallback_);
     });
 
@@ -1289,7 +1377,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
     std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
                   [&](DirMapping& dirObj)
     {
-        if (pass == getPass(dirObj))
+        if (pass == this->getPass(dirObj))
             tryReportingError([&] { synchronizeFolder(dirObj); }, procCallback_);
 
         this->runPass<pass>(dirObj); //recurse
@@ -1301,7 +1389,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
 namespace
 {
 inline
-bool getTargetDir(SyncOperation syncOp, SelectedSide* side)
+bool getTargetDirection(SyncOperation syncOp, SelectedSide* side)
 {
     switch (syncOp)
     {
@@ -1340,7 +1428,7 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
 
     SelectedSide sideTrg = LEFT_SIDE;
 
-    if (getTargetDir(syncOp, &sideTrg))
+    if (getTargetDirection(syncOp, &sideTrg))
     {
         if (sideTrg == LEFT_SIDE)
             synchronizeFileInt<LEFT_SIDE>(fileObj, syncOp);
@@ -1493,7 +1581,7 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
 
     SelectedSide sideTrg = LEFT_SIDE;
 
-    if (getTargetDir(syncOp, &sideTrg))
+    if (getTargetDirection(syncOp, &sideTrg))
     {
         if (sideTrg == LEFT_SIDE)
             synchronizeLinkInt<LEFT_SIDE>(linkObj, syncOp);
@@ -1617,7 +1705,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
 
     SelectedSide sideTrg = LEFT_SIDE;
 
-    if (getTargetDir(syncOp, &sideTrg))
+    if (getTargetDirection(syncOp, &sideTrg))
     {
         if (sideTrg == LEFT_SIDE)
             synchronizeFolderInt<LEFT_SIDE>(dirObj, syncOp);
@@ -1761,13 +1849,18 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         const size_t folderIndex = j - folderCmp.begin();
         const FolderPairSyncCfg& folderPairCfg = syncConfig[folderIndex];
 
+        const Zstring subDirShort = folderCmp.size() <= 1 ? custDelDirShortname : custDelDirShortname + Zstr(" (") + numberTo<Zstring>(folderIndex + 1) + Zstr(")");
+        //e.g. "SyncJob 2012-05-15 131513 (1)" -> enforce different custom deletion dir when using multiple folder pairs!!!
+
         delHandler.push_back(std::make_pair(DeletionHandling(folderPairCfg.handleDeletion,
                                                              folderPairCfg.custDelFolder,
+                                                             subDirShort,
                                                              j->getBaseDirPf<LEFT_SIDE>(),
                                                              procCallback),
 
                                             DeletionHandling(folderPairCfg.handleDeletion,
                                                              folderPairCfg.custDelFolder,
+                                                             subDirShort,
                                                              j->getBaseDirPf<RIGHT_SIDE>(),
                                                              procCallback)));
     }
@@ -1847,7 +1940,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         if ((j->getBaseDirPf<LEFT_SIDE >().empty() && (writeLeft  || folderPairCfg.inAutomaticMode)) ||
             (j->getBaseDirPf<RIGHT_SIDE>().empty() && (writeRight || folderPairCfg.inAutomaticMode)))
         {
-            procCallback.reportFatalError(_("Target directory name must not be empty!"));
+            procCallback.reportFatalError(_("Target folder name must not be empty."));
             skipFolderPair[folderIndex] = true;
             continue;
         }
@@ -1885,7 +1978,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
                 //check if user-defined directory for deletion was specified
                 if (folderPairCfg.custDelFolder.empty())
                 {
-                    procCallback.reportFatalError(_("Directory for file versioning was not supplied!"));
+                    procCallback.reportFatalError(_("Folder name for file versioning must not be empty."));
                     skipFolderPair[folderIndex] = true;
                     continue;
                 }
@@ -1958,7 +2051,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     {
         //show the first few conflicts in warning message also:
         std::wstring warningMessage = _("Unresolved conflicts existing!") +
-                                      L" (" + toStringSep(statisticsTotal.getConflict()) + L")\n\n";
+                                      L" (" + toGuiString(statisticsTotal.getConflict()) + L")\n\n";
 
         const auto& firstConflicts = statisticsTotal.getFirstConflicts(); //get first few sync conflicts
         for (auto iter = firstConflicts.begin(); iter != firstConflicts.end(); ++iter)
@@ -2012,7 +2105,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         warningMessage += L"\n";
 
         std::for_each(recyclMissing.begin(), recyclMissing.end(),
-        [&](const Zstring& path) { warningMessage += L"\n" + utf8CvrtTo<std::wstring>(path); });
+        [&](const Zstring& path) { warningMessage += L"\n" + utfCvrtTo<std::wstring>(path); });
 
         procCallback.reportWarning(warningMessage, m_warnings.warningRecyclerMissing);
     }
@@ -2030,7 +2123,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
     if (!conflictDirs.empty())
     {
-        std::wstring warningMessage = _("A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!") + L"\n";
+        std::wstring warningMessage = _("A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.") + L"\n";
         for (auto i = conflictDirs.begin(); i != conflictDirs.end(); ++i)
             warningMessage += L"\n" + fmtFileName(*i);
         procCallback.reportWarning(warningMessage, m_warnings.warningMultiFolderWriteAccess);
@@ -2048,6 +2141,18 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         //loop through all directory pairs
         for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
         {
+            //------------------------------------------------------------------------------------------
+            //always report folder pairs for log file, even if there is no work to do
+            std::wstring left  = _("Left")  + L": ";
+            std::wstring right = _("Right") + L": ";
+            makeSameLength(left, right);
+
+            const std::wstring statusTxt = _("Processing folder pair:") + L"\n" +
+                                           L"    " + left  + fmtFileName(j->getBaseDirPf<LEFT_SIDE >()) + L"\n" +
+                                           L"    " + right + fmtFileName(j->getBaseDirPf<RIGHT_SIDE>());
+            procCallback.reportInfo(statusTxt);
+            //------------------------------------------------------------------------------------------
+
             const size_t folderIndex = j - begin(folderCmp);
 
             const FolderPairSyncCfg& folderPairCfg = syncConfig[folderIndex];
@@ -2059,19 +2164,6 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             //exclude some pathological case (leftdir, rightdir are empty)
             if (EqualFilename()(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()))
                 continue;
-
-            //------------------------------------------------------------------------------------------
-            //info about folder pair to be processed (useful for logfile)
-            std::wstring left  = _("Left")  + L": ";
-            std::wstring right = _("Right") + L": ";
-            makeSameLength(left, right);
-
-            const std::wstring statusTxt = _("Processing folder pair:") + L" \n" +
-                                           L"    " + left  + fmtFileName(j->getBaseDirPf<LEFT_SIDE >()) + L" \n" +
-                                           L"    " + right + fmtFileName(j->getBaseDirPf<RIGHT_SIDE>());
-            procCallback.reportInfo(statusTxt);
-
-            //------------------------------------------------------------------------------------------
 
             //create base directories first (if not yet existing) -> no symlink or attribute copying! -> single error message instead of one per file (e.g. unplugged network drive)
             const Zstring dirnameLeft = beforeLast(j->getBaseDirPf<LEFT_SIDE>(), FILE_NAME_SEPARATOR);
@@ -2133,7 +2225,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     }
     catch (const std::exception& e)
     {
-        procCallback.reportFatalError(utf8CvrtTo<std::wstring>(e.what()));
+        procCallback.reportFatalError(utfCvrtTo<std::wstring>(e.what()));
     }
 }
 
@@ -2154,11 +2246,11 @@ public:
 
     virtual void deleteTargetFile(const Zstring& targetFile) { cmd_(); }
 
-    virtual void updateCopyStatus(UInt64 totalBytesTransferred)
+    virtual void updateCopyStatus(Int64 bytesDelta)
     {
         //inform about the (differential) processed amount of data
-        statusHandler_.updateProcessedData(0, to<Int64>(totalBytesTransferred) - bytesReported_); //throw()! -> this ensures client and service provider are in sync!
-        bytesReported_ = to<Int64>(totalBytesTransferred);                                         //
+        statusHandler_.updateProcessedData(0, bytesDelta); //throw()! -> this ensures client and service provider are in sync!
+        bytesReported_ += bytesDelta;                      //
 
         statusHandler_.requestUiRefresh(); //may throw
     }
@@ -2174,7 +2266,7 @@ private:
 template <SelectedSide side, class DelTargetCommand>
 void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const DelTargetCommand& cmd, FileAttrib& newAttr) const
 {
-    const UInt64 expectedBytesToCpy = fileObj.getFileSize<OtherSide<side>::result>();
+    const Int64 expectedBytesToCpy = to<Int64>(fileObj.getFileSize<OtherSide<side>::result>());
     Zstring source = fileObj.getFullName<OtherSide<side>::result>();
     const Zstring& target = fileObj.getBaseDirPf<side>() + fileObj.getRelativeName<OtherSide<side>::result>();
 
@@ -2201,10 +2293,14 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
         &newAttr); //throw FileError, ErrorFileLocked
 
         //inform about the (remaining) processed amount of data
-        if (newAttr.fileSize != expectedBytesToCpy)
-            procCallback_.updateTotalData(0, to<Int64>(newAttr.fileSize) - to<Int64>(expectedBytesToCpy)); //adjust total: file may have changed after comparison!
-        procCallback_.updateProcessedData(0, to<Int64>(newAttr.fileSize) - bytesReported);
-        bytesReported = to<Int64>(newAttr.fileSize);
+        if (bytesReported != expectedBytesToCpy)
+            procCallback_.updateTotalData(0, bytesReported - expectedBytesToCpy);
+
+#ifdef FFS_WIN
+        warn_static("clarify: return physical(bytesReported) or logical(newAttr) numbers")
+#endif
+
+        //we model physical statistic numbers => adjust total: consider ADS, sparse, compressed files -> transferred bytes may differ from file size (which is just a rough guess)!
 
         guardStatistics.dismiss();
     };
@@ -2235,6 +2331,12 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
 #else
     copyOperation();
 #endif
+
+
+#ifdef FFS_WIN
+    warn_static("make verification stats a first class citizen?")
+#endif
+
 
 
     //#################### Verification #############################

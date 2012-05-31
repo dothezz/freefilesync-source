@@ -39,8 +39,8 @@ enum OnGuiError
     ON_GUIERROR_IGNORE
 };
 
-typedef wxString Description;
-typedef wxString Commandline;
+typedef std::wstring Description;
+typedef std::wstring Commandline;
 typedef std::vector<std::pair<Description, Commandline> > ExternalApps;
 
 //---------------------------------------------------------------------
@@ -49,20 +49,20 @@ struct XmlGuiConfig
     XmlGuiConfig() :
         hideFilteredElements(false),
         handleError(ON_GUIERROR_POPUP),
-        syncPreviewEnabled(true) {} //initialize values
+        showSyncAction(true) {} //initialize values
 
     zen::MainConfiguration mainCfg;
 
     bool hideFilteredElements;
     OnGuiError handleError; //reaction on error situation during synchronization
-    bool syncPreviewEnabled;
+    bool showSyncAction;
 
     bool operator==(const XmlGuiConfig& other) const
     {
         return mainCfg              == other.mainCfg               &&
                hideFilteredElements == other.hideFilteredElements  &&
                handleError          == other.handleError           &&
-               syncPreviewEnabled   == other.syncPreviewEnabled;
+               showSyncAction       == other.showSyncAction;
     }
 
     bool operator!=(const XmlGuiConfig& other) const { return !(*this == other); }
@@ -174,7 +174,7 @@ struct XmlGlobalSettings
             externelApplications.push_back(std::make_pair(L"Open with default application", //mark for extraction: _("Open with default application")
                                                           L"\"%name\""));
 #elif defined FFS_LINUX
-            externelApplications.push_back(std::make_pair(L"Browse directory", //mark for extraction: _("Browse directory")
+            externelApplications.push_back(std::make_pair(L"Browse directory", //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
                                                           L"xdg-open \"%dir\""));
             externelApplications.push_back(std::make_pair(L"Open with default application", //mark for extraction: _("Open with default application")
                                                           L"xdg-open \"%name\""));
@@ -250,7 +250,7 @@ MergeType getMergeType(const std::vector<Zstring>& filenames);   //throw ()
 void convertConfig(const std::vector<Zstring>& filenames, XmlGuiConfig&   config); //throw xmlAccess::FfsXmlError
 void convertConfig(const std::vector<Zstring>& filenames, XmlBatchConfig& config); //throw xmlAccess::FfsXmlError
 
-wxString extractJobName(const wxString& configFilename);
+std::wstring extractJobName(const Zstring& configFilename);
 }
 
 

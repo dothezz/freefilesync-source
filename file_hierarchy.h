@@ -208,7 +208,7 @@ private:
     SubLinkVec subLinks; //contained symbolic link maps
     SubDirVec  subDirs;  //contained directory maps
 
-    Zstring objRelNamePf;
+    Zstring objRelNamePf; //postfixed or empty
     BaseDirMapping& root_;
 };
 

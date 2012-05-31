@@ -36,12 +36,12 @@
 #include <wx/combobox.h>
 #include <wx/filepicker.h>
 #include <wx/scrolwin.h>
+#include <wx/statbmp.h>
+#include <wx/statline.h>
 #include <wx/listbox.h>
 #include <wx/checkbox.h>
-#include <wx/statbmp.h>
-#include <wx/textctrl.h>
-#include <wx/statline.h>
 #include <wx/frame.h>
+#include <wx/textctrl.h>
 #include <wx/gauge.h>
 #include <wx/statbox.h>
 #include <wx/choice.h>
@@ -75,8 +75,8 @@ protected:
     wxMenuItem* m_menuItem10;
     wxMenuItem* m_menuItem11;
     wxMenuItem* m_menuItemNew;
-    wxMenuItem* m_menuItemSave;
     wxMenuItem* m_menuItemLoad;
+    wxMenuItem* m_menuItemSave;
     wxMenu* m_menuAdvanced;
     wxMenu* m_menuLanguages;
     wxMenuItem* m_menuItemGlobSett;
@@ -104,41 +104,8 @@ protected:
     wxScrolledWindow* m_scrolledWindowFolderPairs;
     wxBoxSizer* bSizerAddFolderPairs;
     zen::Grid* m_gridNavi;
+    wxPanel* m_panelCenter;
     zen::Grid* m_gridMain;
-    wxPanel* m_panelConfig;
-    wxBoxSizer* bSizerConfig;
-    wxBitmapButton* m_bpButtonSave;
-    wxBitmapButton* m_bpButtonLoad;
-    wxListBox* m_listBoxHistory;
-    wxPanel* m_panelFilter;
-    wxBitmapButton* m_bpButtonFilter;
-    wxCheckBox* m_checkBoxHideFilt;
-    wxPanel* m_panelStatistics;
-    wxBoxSizer* bSizerStatistics;
-    wxStaticBitmap* m_bitmapCreate;
-    wxTextCtrl* m_textCtrlCreate;
-    wxStaticBitmap* m_bitmapUpdate;
-    wxTextCtrl* m_textCtrlUpdate;
-    wxStaticBitmap* m_bitmapDelete;
-    wxTextCtrl* m_textCtrlDelete;
-    wxStaticBitmap* m_bitmapData;
-    wxTextCtrl* m_textCtrlData;
-    wxPanel* m_panelViewFilter;
-    wxBoxSizer* bSizerViewFilter;
-    ToggleButton* m_bpButtonSyncCreateLeft;
-    ToggleButton* m_bpButtonSyncDirOverwLeft;
-    ToggleButton* m_bpButtonSyncDeleteLeft;
-    ToggleButton* m_bpButtonLeftOnly;
-    ToggleButton* m_bpButtonLeftNewer;
-    ToggleButton* m_bpButtonEqual;
-    ToggleButton* m_bpButtonDifferent;
-    ToggleButton* m_bpButtonSyncDirNone;
-    ToggleButton* m_bpButtonRightNewer;
-    ToggleButton* m_bpButtonRightOnly;
-    ToggleButton* m_bpButtonSyncDeleteRight;
-    ToggleButton* m_bpButtonSyncDirOverwRight;
-    ToggleButton* m_bpButtonSyncCreateRight;
-    ToggleButton* m_bpButtonConflict;
     wxPanel* m_panelStatusBar;
     wxBoxSizer* bSizerStatusLeftDirectories;
     wxStaticBitmap* m_bitmapSmallDirectoryLeft;
@@ -157,15 +124,54 @@ protected:
     wxStaticBitmap* m_bitmapSmallFileRight;
     wxStaticText* m_staticTextStatusRightFiles;
     wxStaticText* m_staticTextStatusRightBytes;
-    wxStaticBitmap* m_bitmapResizeCorner;
+    wxPanel* m_panelConfig;
+    wxBoxSizer* bSizerConfig;
+    wxBitmapButton* m_bpButtonLoad;
+    wxBitmapButton* m_bpButtonSave;
+    wxListBox* m_listBoxHistory;
+    wxPanel* m_panelFilter;
+    wxBitmapButton* m_bpButtonFilter;
+    wxCheckBox* m_checkBoxHideFilt;
+    wxPanel* m_panelStatistics;
+    wxBoxSizer* bSizer1801;
+    wxStaticBitmap* m_bitmapCreateLeft;
+    wxStaticText* m_staticTextCreateLeft;
+    wxStaticBitmap* m_bitmapUpdateLeft;
+    wxStaticText* m_staticTextUpdateLeft;
+    wxStaticBitmap* m_bitmapDeleteLeft;
+    wxStaticText* m_staticTextDeleteLeft;
+    wxStaticBitmap* m_bitmapData;
+    wxStaticText* m_staticTextData;
+    wxStaticBitmap* m_bitmapDeleteRight;
+    wxStaticText* m_staticTextDeleteRight;
+    wxStaticBitmap* m_bitmapUpdateRight;
+    wxStaticText* m_staticTextUpdateRight;
+    wxStaticBitmap* m_bitmapCreateRight;
+    wxStaticText* m_staticTextCreateRight;
+    wxPanel* m_panelViewFilter;
+    wxBoxSizer* bSizerViewFilter;
+    ToggleButton* m_bpButtonSyncCreateLeft;
+    ToggleButton* m_bpButtonSyncDirOverwLeft;
+    ToggleButton* m_bpButtonSyncDeleteLeft;
+    ToggleButton* m_bpButtonLeftOnly;
+    ToggleButton* m_bpButtonLeftNewer;
+    ToggleButton* m_bpButtonEqual;
+    ToggleButton* m_bpButtonDifferent;
+    ToggleButton* m_bpButtonSyncDirNone;
+    ToggleButton* m_bpButtonRightNewer;
+    ToggleButton* m_bpButtonRightOnly;
+    ToggleButton* m_bpButtonSyncDeleteRight;
+    ToggleButton* m_bpButtonSyncDirOverwRight;
+    ToggleButton* m_bpButtonSyncCreateRight;
+    ToggleButton* m_bpButtonConflict;
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
     virtual void OnCompare( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnStartSync( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnNewConfig( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSaveConfig( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnLoadConfig( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnSaveConfig( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuQuit( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuGlobalSettings( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuBatchJob( wxCommandEvent& event ) { event.Skip(); }
@@ -210,6 +216,8 @@ public:
     wxPanel* m_panelTopRight;
     FolderHistoryBox* m_directoryRight;
     zen::DirPickerCtrl* m_dirPickerRight;
+    wxBoxSizer* bSizerStatistics;
+    wxBoxSizer* bSizerData;
 
     MainDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 702,522 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
@@ -252,7 +260,6 @@ class CompareStatusGenerated : public wxPanel
 private:
 
 protected:
-    wxStaticText* m_staticText30;
     wxTextCtrl* m_textCtrlStatus;
     wxGauge* m_gauge2;
     wxBoxSizer* bSizer42;
@@ -306,6 +313,7 @@ protected:
     wxBoxSizer* bSizerAddFolderPairs;
     wxPanel* m_panelBatchSettings;
     wxCheckBox* m_checkBoxShowProgress;
+    wxStaticText* m_staticText961;
     wxChoice* m_choiceHandleError;
     wxStaticBoxSizer* sbSizerLogfileDir;
     wxStaticText* m_staticText96;
@@ -391,16 +399,16 @@ private:
 protected:
     wxRadioButton* m_radioBtnAutomatic;
     wxButton* m_buttonAutomatic;
-    wxStaticText* m_staticText81;
+    wxStaticText* m_staticTextAutomatic;
     wxRadioButton* m_radioBtnMirror;
-    wxButton* m_buttonOneWay;
-    wxStaticText* m_staticText8;
+    wxButton* m_buttonMirror;
+    wxStaticText* m_staticTextMirror;
     wxRadioButton* m_radioBtnUpdate;
     wxButton* m_buttonUpdate;
-    wxStaticText* m_staticText101;
+    wxStaticText* m_staticTextUpdate;
     wxRadioButton* m_radioBtnCustom;
-    wxButton* m_buttonUpdate1;
-    wxStaticText* m_staticText9;
+    wxButton* m_buttonCustom;
+    wxStaticText* m_staticTextCustom;
     wxStaticBoxSizer* sbSizerCustDelDir;
     wxChoice* m_choiceHandleDeletion;
     wxPanel* m_panelCustomDeletionDir;
@@ -511,17 +519,15 @@ class SyncStatusDlgGenerated : public wxFrame
 private:
 
 protected:
-    wxPanel* m_panelBackground;
     wxBoxSizer* bSizerTop;
+    wxPanel* m_panelHeader;
     wxStaticBitmap* m_bitmapStatus;
     wxStaticText* m_staticTextStatus;
     wxAnimationCtrl* m_animationControl1;
-    wxBoxSizer* bSizerCurrentOperation;
-    wxStaticText* m_staticText2511;
-    wxTextCtrl* m_textCtrlInfo;
+    wxStaticLine* m_staticlineHeader;
     wxPanel* m_panelProgress;
+    wxTextCtrl* m_textCtrlStatus;
     wxBoxSizer* bSizer171;
-    wxStaticBoxSizer* bSizerProgressStat;
     wxStaticText* m_staticTextLabelItemsProc;
     wxBoxSizer* bSizerItemsProc;
     wxStaticText* m_staticTextProcessedObj;
@@ -539,6 +545,8 @@ protected:
     zen::Graph2D* m_panelGraph;
     wxBoxSizer* bSizerFinalStat;
     wxListbook* m_listbookResult;
+    wxStaticLine* m_staticline12;
+    wxPanel* m_panelFooter;
     wxBoxSizer* bSizerExecFinished;
     wxStaticText* m_staticText87;
     ExecFinishedBox* m_comboBoxExecFinished;
@@ -558,7 +566,7 @@ protected:
 public:
     wxGauge* m_gauge1;
 
-    SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 640,350 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+    SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
     ~SyncStatusDlgGenerated();
 
@@ -575,6 +583,7 @@ protected:
     ToggleButton* m_bpButtonErrors;
     ToggleButton* m_bpButtonWarnings;
     ToggleButton* m_bpButtonInfo;
+    wxStaticLine* m_staticline13;
     wxTextCtrl* m_textCtrlInfo;
 
     // Virtual event handlers, overide them in your derived class
@@ -624,6 +633,9 @@ protected:
     wxBoxSizer* bSizerTranslators;
     wxStaticText* m_staticText54;
     wxFlexGridSizer* fgSizerTranslators;
+    wxPanel* m_panel40;
+    wxPanel* m_panel39;
+    wxStaticText* m_staticText83;
     wxHyperlinkCtrl* m_hyperlink3;
     wxStaticBitmap* m_bitmapPaypal;
     wxStaticBitmap* m_bitmap13;
@@ -652,6 +664,8 @@ private:
 protected:
     wxStaticBitmap* m_bitmap10;
     wxTextCtrl* m_textCtrl8;
+    wxStaticLine* m_staticline6;
+    wxPanel* m_panel33;
     wxCheckBox* m_checkBoxIgnoreErrors;
     wxButton* m_buttonIgnore;
     wxButton* m_buttonRetry;
@@ -666,7 +680,7 @@ protected:
 
 public:
 
-    ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
+    ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
     ~ErrorDlgGenerated();
 
 };
@@ -680,6 +694,8 @@ private:
 
 protected:
     wxTextCtrl* m_textCtrl8;
+    wxStaticLine* m_staticline7;
+    wxPanel* m_panel34;
     wxCheckBox* m_checkBoxDontShowAgain;
     wxButton* m_buttonIgnore;
     wxButton* m_buttonSwitch;
@@ -695,7 +711,7 @@ protected:
 public:
     wxStaticBitmap* m_bitmap10;
 
-    WarningDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Warning"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
+    WarningDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Warning"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
     ~WarningDlgGenerated();
 
 };
@@ -710,6 +726,8 @@ private:
 protected:
     wxStaticBitmap* m_bitmap10;
     wxTextCtrl* m_textCtrl8;
+    wxStaticLine* m_staticline8;
+    wxPanel* m_panel35;
     wxCheckBox* m_checkBox;
     wxButton* m_buttonYes;
     wxButton* m_buttonNo;
@@ -724,7 +742,7 @@ protected:
 
 public:
 
-    QuestionDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Question"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,198 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
+    QuestionDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Question"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
     ~QuestionDlgGenerated();
 
 };
@@ -737,9 +755,13 @@ class DeleteDlgGenerated : public wxDialog
 private:
 
 protected:
+    wxPanel* m_panelHeader;
     wxStaticBitmap* m_bitmap12;
     wxStaticText* m_staticTextHeader;
-    wxTextCtrl* m_textCtrlMessage;
+    wxStaticLine* m_staticline91;
+    wxTextCtrl* m_textCtrlFileList;
+    wxStaticLine* m_staticline9;
+    wxPanel* m_panel36;
     wxCheckBox* m_checkBoxUseRecycler;
     wxCheckBox* m_checkBoxDeleteBothSides;
     wxButton* m_buttonOK;
@@ -755,7 +777,7 @@ protected:
 
 public:
 
-    DeleteDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Confirm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 560,336 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
+    DeleteDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Confirm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
     ~DeleteDlgGenerated();
 
 };
@@ -773,14 +795,6 @@ protected:
     wxStaticText* m_staticTexHeader;
     wxStaticText* m_staticText44;
     wxBitmapButton* m_bpButtonHelp;
-    wxPanel* m_panel13;
-    wxStaticLine* m_staticline10;
-    wxStaticText* m_staticText45;
-    wxStaticText* m_staticText83;
-    wxStaticText* m_staticText84;
-    wxStaticText* m_staticText85;
-    wxStaticText* m_staticText181;
-    wxStaticText* m_staticText1811;
     wxStaticBitmap* m_bitmapInclude;
     wxTextCtrl* m_textCtrlInclude;
     wxStaticBitmap* m_bitmapExclude;
@@ -796,7 +810,7 @@ protected:
     wxSpinCtrl* m_spinCtrlMaxSize;
     wxChoice* m_choiceUnitMaxSize;
     wxButton* m_button9;
-    wxButton* m_button10;
+    wxButton* m_buttonOk;
     wxButton* m_button17;
 
     // Virtual event handlers, overide them in your derived class
@@ -870,19 +884,20 @@ protected:
     wxStaticLine* m_staticline16;
     wxStaticText* m_staticTextVariant;
     wxStaticLine* m_staticline14;
-    wxStaticText* m_staticText94;
-    wxStaticBitmap* m_bitmapCreate;
-    wxTextCtrl* m_textCtrlCreateL;
-    wxStaticBitmap* m_bitmapUpdate;
-    wxTextCtrl* m_textCtrlUpdateL;
-    wxStaticBitmap* m_bitmapDelete;
-    wxTextCtrl* m_textCtrlDeleteL;
-    wxStaticText* m_staticText95;
-    wxTextCtrl* m_textCtrlCreateR;
-    wxTextCtrl* m_textCtrlUpdateR;
-    wxTextCtrl* m_textCtrlDeleteR;
+    wxStaticBitmap* m_bitmapCreateLeft;
+    wxStaticBitmap* m_bitmapUpdateLeft;
+    wxStaticBitmap* m_bitmapDeleteLeft;
     wxStaticBitmap* m_bitmapData;
-    wxTextCtrl* m_textCtrlData;
+    wxStaticBitmap* m_bitmapDeleteRight;
+    wxStaticBitmap* m_bitmapUpdateRight;
+    wxStaticBitmap* m_bitmapCreateRight;
+    wxStaticText* m_staticTextCreateLeft;
+    wxStaticText* m_staticTextUpdateLeft;
+    wxStaticText* m_staticTextDeleteLeft;
+    wxStaticText* m_staticTextData;
+    wxStaticText* m_staticTextDeleteRight;
+    wxStaticText* m_staticTextUpdateRight;
+    wxStaticText* m_staticTextCreateRight;
     wxStaticLine* m_staticline12;
     wxCheckBox* m_checkBoxDontShowAgain;
     wxButton* m_button16;
@@ -895,7 +910,7 @@ protected:
 
 public:
 
-    SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization Preview"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+    SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Summary"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
     ~SyncPreviewDlgGenerated();
 
 };
@@ -942,7 +957,7 @@ protected:
 
 public:
 
-    SearchDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 384,97 ), long style = wxDEFAULT_DIALOG_STYLE );
+    SearchDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
     ~SearchDialogGenerated();
 
 };

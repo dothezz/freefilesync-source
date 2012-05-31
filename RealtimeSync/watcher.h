@@ -22,7 +22,7 @@ class WaitCallback
 {
 public:
     virtual ~WaitCallback() {}
-    virtual void requestUiRefresh() = 0; //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
+    virtual void requestUiRefresh(bool readyForSync = false) = 0; //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
 };
 
 
@@ -45,7 +45,7 @@ WaitResult waitForChanges(const std::vector<Zstring>& dirNamesNonFmt,
                           //non-formatted dirnames that yet require call to getFormattedDirectoryName(); empty directories must be checked by caller!
                           WaitCallback& statusHandler); //throw FileError
 
-//wait until all directories become available (again)
+//wait until all directories become available (again) + logs in network share
 void waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt,
                         WaitCallback& statusHandler); //throw FileError
 }

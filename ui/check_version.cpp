@@ -52,7 +52,7 @@ bool getOnlineVersion(wxString& version)
 }
 
 
-const wxChar VERSION_SEP = wxT('.');
+const wchar_t VERSION_SEP = L'.';
 
 
 std::vector<size_t> parseVersion(const wxString& version)
@@ -69,7 +69,7 @@ std::vector<size_t> parseVersion(const wxString& version)
 }
 
 
-bool newerVersionExists(const wxString& onlineVersion)
+bool isNewerVersion(const wxString& onlineVersion)
 {
     std::vector<size_t> current = parseVersion(zen::currentVersion);
     std::vector<size_t> online  = parseVersion(onlineVersion);
@@ -91,14 +91,11 @@ void zen::checkForUpdateNow(wxWindow* parent)
         return;
     }
 
-    if (newerVersionExists(onlineVersion))
+    if (isNewerVersion(onlineVersion))
     {
-        const int rv = wxMessageBox(_("A newer version of FreeFileSync is available:")  + L" v" + onlineVersion + L". " + _("Download now?"),
-                                    _("Information"),
-                                    wxYES_NO | wxICON_QUESTION,
-                                    parent);
-        if (rv == wxYES)
-            wxLaunchDefaultBrowser(wxString(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v") + onlineVersion + L"/");
+        if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+                            _("A newer version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
+            wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
     }
     else
         wxMessageBox(_("FreeFileSync is up to date!"), _("Information"), wxICON_INFORMATION, parent);
@@ -116,17 +113,22 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
     {
         if (lastUpdateCheck == 0)
         {
-            const bool checkRegularly = showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO,
-                                                        _("Do you want FreeFileSync to automatically check for updates every week?") + L"\n" +
-                                                        _("(Requires an Internet connection!)")) == ReturnQuestionDlg::BUTTON_YES;
-            if (checkRegularly)
+            switch (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
+                                    _("Do you want FreeFileSync to automatically check for updates every week?") + L"\n" +
+                                    _("(Requires an Internet connection!)")))
             {
-                lastUpdateCheck = 123; //some old date (few seconds after 1970)
+                case ReturnQuestionDlg::BUTTON_YES:
+                    lastUpdateCheck = 123; //some old date (few seconds after 1970) different from 0 and -1
+                    checkForUpdatePeriodically(parent, lastUpdateCheck); //check for updates now
+                    break;
 
-                checkForUpdatePeriodically(parent, lastUpdateCheck); //check for updates now
+                case ReturnQuestionDlg::BUTTON_NO:
+                    lastUpdateCheck = -1; //don't check for updates anymore
+                    break;
+
+                case ReturnQuestionDlg::BUTTON_CANCEL:
+                    break;
             }
-            else
-                lastUpdateCheck = -1; //don't check for updates anymore
         }
         else if (wxGetLocalTime() >= lastUpdateCheck + 7 * 24 * 3600) //check weekly
         {
@@ -136,14 +138,11 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
 
             lastUpdateCheck = wxGetLocalTime();
 
-            if (newerVersionExists(onlineVersion))
+            if (isNewerVersion(onlineVersion))
             {
-                const int rv = wxMessageBox(_("A newer version of FreeFileSync is available:")  + L" v" + onlineVersion + L". " + _("Download now?"),
-                                            _("Information"),
-                                            wxYES_NO | wxICON_QUESTION,
-                                            parent);
-                if (rv == wxYES)
-                    wxLaunchDefaultBrowser(wxString(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v") + onlineVersion + L"/");
+                if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+                                    _("A newer version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
+                    wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
             }
         }
     }

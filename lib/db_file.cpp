@@ -15,7 +15,7 @@
 #include <zen/file_io.h>
 #include <zen/scope_guard.h>
 #include <zen/guid.h>
-#include <zen/utf8.h>
+#include <zen/utf.h>
 
 #ifdef FFS_WIN
 #include <zen/win.h> //includes "windows.h"
@@ -128,7 +128,7 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError
     }
     catch (const std::bad_alloc& e)
     {
-        throw FileError(_("Out of memory!") + L" " + utf8CvrtTo<std::wstring>(e.what()));
+        throw FileError(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()));
     }
 }
 
@@ -148,7 +148,7 @@ public:
         }
         catch (const std::bad_alloc& e)
         {
-            throw FileError(_("Out of memory!") + L" " + utf8CvrtTo<std::wstring>(e.what()));
+            throw FileError(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()));
         }
     }
 
@@ -160,7 +160,7 @@ private:
 
     Zstring readStringUtf8() const
     {
-        return utf8CvrtTo<Zstring>(readString<Zbase<char>>());
+        return utfCvrtTo<Zstring>(readString<Zbase<char>>());
     }
 
     FileId readFileId() const
@@ -280,7 +280,7 @@ private:
         writePOD<bool>(false); //mark last entry
     }
 
-    void writeStringUtf8(const Zstring& str) { writeString(utf8CvrtTo<Zbase<char>>(str)); }
+    void writeStringUtf8(const Zstring& str) { writeString(utfCvrtTo<Zbase<char>>(str)); }
 
     void writeFileId(const FileId& id)
     {

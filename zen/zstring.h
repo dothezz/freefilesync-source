@@ -104,7 +104,7 @@ template <template <class, class> class SP, class AP>
 void makeUpper(zen::Zbase<wchar_t, SP, AP>& str);
 #endif
 
-#ifdef FFS_WIN //Windows stores filenames in wide character format
+#ifdef FFS_WIN //Windows encodes Unicode as UTF-16 wchar_t
 typedef wchar_t Zchar;
 #define Zstr(x) L ## x
 const Zchar FILE_NAME_SEPARATOR = L'\\';
@@ -157,8 +157,7 @@ void makeUpperCaseWin(wchar_t* str, size_t size);
 }
 
 
-template <class T, template <class, class> class SP, class AP>
-inline
+template <class T, template <class, class> class SP, class AP> inline
 int cmpFileName(const zen::Zbase<T, SP, AP>& lhs, const zen::Zbase<T, SP, AP>& rhs)
 {
 #ifdef FFS_WIN
@@ -169,8 +168,7 @@ int cmpFileName(const zen::Zbase<T, SP, AP>& lhs, const zen::Zbase<T, SP, AP>& r
 }
 
 
-template <class T, template <class, class> class SP, class AP>
-inline
+template <class T, template <class, class> class SP, class AP> inline
 bool LessFilename::operator()(const zen::Zbase<T, SP, AP>& lhs, const zen::Zbase<T, SP, AP>& rhs) const
 {
 #ifdef FFS_WIN
@@ -181,8 +179,7 @@ bool LessFilename::operator()(const zen::Zbase<T, SP, AP>& lhs, const zen::Zbase
 }
 
 
-template <class T, template <class, class> class SP, class AP>
-inline
+template <class T, template <class, class> class SP, class AP> inline
 bool EqualFilename::operator()(const zen::Zbase<T, SP, AP>& lhs, const zen::Zbase<T, SP, AP>& rhs) const
 {
 #ifdef FFS_WIN
@@ -195,8 +192,7 @@ bool EqualFilename::operator()(const zen::Zbase<T, SP, AP>& lhs, const zen::Zbas
 
 
 #ifdef FFS_WIN
-template <template <class, class> class SP, class AP>
-inline
+template <template <class, class> class SP, class AP> inline
 void makeUpper(zen::Zbase<wchar_t, SP, AP>& str)
 {
     z_impl::makeUpperCaseWin(str.begin(), str.length());

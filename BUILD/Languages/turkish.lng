@@ -7,8 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
-<source>Searching for directory %x...</source>
-<target>%x klasörü aranıyor...</target>
+<source>Searching for folder %x...</source>
+<target>%s klasörü aranıyor...</target>
 
 <source>Show in Explorer</source>
 <target>Tarayıcıda Göster</target>
@@ -25,17 +25,20 @@
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Kendiliğinden Eşleştirme</target>
 
+<source>Error</source>
+<target>Hata</target>
+
 <source>Select alternate comparison settings</source>
 <target>Alternatif karşılaştırma ayarlarını seçin</target>
 
 <source>Select alternate synchronization settings</source>
 <target>Alternatif eşleştirme ayarlarını seçin</target>
 
-<source>No filter selected</source>
-<target>Seçilmiş süzgeç yok</target>
-
 <source>Filter is active</source>
 <target>Süzgeç etkin</target>
+
+<source>No filter selected</source>
+<target>Seçilmiş süzgeç yok</target>
 
 <source>Remove alternate settings</source>
 <target>Alternatif ayarları sil</target>
@@ -55,9 +58,6 @@
 <source>About</source>
 <target>Hakkında</target>
 
-<source>Error</source>
-<target>Hata</target>
-
 <source>Warning</source>
 <target>Uyarı</target>
 
@@ -73,8 +73,8 @@
 <source>Global settings</source>
 <target>Genel ayarlar</target>
 
-<source>Synchronization Preview</source>
-<target>Eşleştirme önizlemesi</target>
+<source>Summary</source>
+<target>Özet</target>
 
 <source>Find</source>
 <target>Bul</target>
@@ -103,8 +103,8 @@
 <source>Browse</source>
 <target>Gözat</target>
 
-<source>Invalid command line: %x</source>
-<target>Geçersiz komut satırı: %x</target>
+<source>Invalid command line:</source>
+<target>Geçersiz komut satırı:</target>
 
 <source>Info</source>
 <target>Bilgi</target>
@@ -226,29 +226,29 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>%x birim adı, %y dosya adının parçası değil!</target>
 
-<source>Cannot find file %x.</source>
-<target>%x dosyası bulunamadı.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Şu XML elemanları okunamadı:</target>
 
-<source>S&ave configuration...</source>
-<target>Y&apılandırmayı kaydet...</target>
+<source>Cannot find file %x.</source>
+<target>%x dosyası bulunamadı.</target>
 
-<source>&Load configuration...</source>
-<target>Yapılandırmayı a&l...</target>
+<source>&Open...</source>
+<target>&Aç...</target>
+
+<source>&Save...</source>
+<target>&Kaydet</target>
 
 <source>&Quit</source>
 <target>Çı&k</target>
 
-<source>&File</source>
-<target>&Dosya</target>
+<source>&Program</source>
+<target>&Program</target>
 
 <source>&Content</source>
 <target>İçe&rik</target>
 
-<source>&About...</source>
-<target>H&akkında...</target>
+<source>&About</source>
+<target>H&akkında</target>
 
 <source>&Help</source>
 <target>&Yardım</target>
@@ -256,8 +256,8 @@
 <source>Usage:</source>
 <target>Kullanım:</target>
 
-<source>1. Select directories to monitor.</source>
-<target>1. İzlenecek klasörleri seçin.</target>
+<source>1. Select folders to watch.</source>
+<target>1. İzlenecek klasörleri seçin</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Bir komut satırı yazın.</target>
@@ -265,18 +265,10 @@
 <source>3. Press 'Start'.</source>
 <target>3. 'Başlat'a Tıklayın.</target>
 
-<source>
-The command line is executed each time:
-- all directories become available (e.g. USB stick insert)
-- files within these directories or subdirectories are modified
-</source>
-<target>
-Her seferinde çalıştırılacak komut satırı:
-- tüm klasörler geçerli (örneğin USB bellek takıldığında)
-- bu klasörlerin ya da alt klasörlerin içindeki dosyalar değiştirildiğinde
-</target>
+<source>To get started just import a .ffs_batch file.</source>
+<target>.ffs_batch dosyasını yükleyerek başlayabilirsiniz.</target>
 
-<source>Directories to watch</source>
+<source>Folders to watch</source>
 <target>İzlenecek klasörler</target>
 
 <source>Add folder</source>
@@ -288,17 +280,34 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Select a folder</source>
 <target>Bir klasör seçin</target>
 
+<source>Delay [seconds]</source>
+<target>Gecikme [saniye}</target>
+
+<source>Idle time between last detected change and execution of command</source>
+<target>Son algılanan değişiklik ile komutun yürütülmesi arasındaki bekleme süresi</target>
+
 <source>Command line</source>
 <target>Komut satırı</target>
 
-<source>Minimum Idle Time [seconds]</source>
-<target>En az boşta bekleme süresi [saniye]</target>
-
-<source>Idle time between detection of last change and execution of command line in seconds</source>
-<target>Son değişikliğin algılanması ile komut satırının yürütülmesi arasındaki bekleme süresi</target>
+<source>
+The command is triggered if:
+- files or subfolders change
+- new folders arrive (e.g. USB stick insert)
+</source>
+<target>
+Komut şu durumlarda yürütülür:
+- dosya ya alt klasörler değiştiğinde
+- yeni klasörler algılandığında (örneğin bir USB bellek takıldığında)
+</target>
 
 <source>Start</source>
 <target>Başla</target>
+
+<source>&Retry</source>
+<target>&Yeniden dene</target>
+
+<source>Cancel</source>
+<target>İptal</target>
 
 <source>(Build: %x)</source>
 <target>(Yapım: %x)</target>
@@ -318,8 +327,8 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Waiting for missing directories...</source>
 <target>Kayıp klasörler için bekleniyor...</target>
 
-<source>A directory input field is empty.</source>
-<target>Bir klasör giriş alanı boş</target>
+<source>An input folder name is empty.</source>
+<target>Bir giriş klasörü adı eksik.</target>
 
 <source>Logging</source>
 <target>Günlükleme</target>
@@ -405,7 +414,7 @@ Her seferinde çalıştırılacak komut satırı:
 <source><Symlink></source>
 <target><Smblkbağlantı></target>
 
-<source><Directory></source>
+<source><Folder></source>
 <target><Klasör></target>
 
 <source>Full path</source>
@@ -417,8 +426,8 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Relative path</source>
 <target>Bağıl klasör yolu</target>
 
-<source>Directory</source>
-<target>Klasör</target>
+<source>Base folder</source>
+<target>Başlangıç klasörü</target>
 
 <source>Size</source>
 <target>Boyut</target>
@@ -429,8 +438,11 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Extension</source>
 <target>Uzantı</target>
 
-<source>Comparison Result</source>
-<target>Karşılaştırma sonucu</target>
+<source>Action</source>
+<target>İşlem</target>
+
+<source>Category</source>
+<target>Kategori</target>
 
 <source>Drag && drop</source>
 <target>Klasör ya da dosyaları buraya sürükleyip bırakabilirsiniz</target>
@@ -438,14 +450,14 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Close progress dialog</source>
 <target>İşlem penceresini kapat</target>
 
-<source>Shut down</source>
-<target>Bilgisayarı kapat</target>
+<source>Standby</source>
+<target>Uykuya dal</target>
 
 <source>Log off</source>
 <target>Oturumu kapat</target>
 
-<source>Standby</source>
-<target>Uykuya dal</target>
+<source>Shut down</source>
+<target>Bilgisayarı kapat</target>
 
 <source>Hibernate</source>
 <target>Hazırda beklet</target>
@@ -453,14 +465,11 @@ Her seferinde çalıştırılacak komut satırı:
 <source>1. &Compare</source>
 <target>1. &Karşılaştır</target>
 
-<source>2. &Synchronize...</source>
-<target>2. &Eşleştir...</target>
+<source>2. &Synchronize</source>
+<target>2. &Eşleştir</target>
 
 <source>&New</source>
 <target>Ye&ni</target>
-
-<source>&Program</source>
-<target>&Program</target>
 
 <source>&Language</source>
 <target>Di&l</target>
@@ -489,8 +498,8 @@ Her seferinde çalıştırılacak komut satırı:
 <source>&Abort</source>
 <target>V&azgeç</target>
 
-<source>Synchronize...</source>
-<target>Eşleştir...</target>
+<source>Synchronize</source>
+<target>Eşleştir</target>
 
 <source>Start synchronization</source>
 <target>Eşleştirmeyi başlat</target>
@@ -504,11 +513,11 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Swap sides</source>
 <target>Sağ ve sol yanı değiştir</target>
 
-<source>Save current configuration to file</source>
-<target>Geçerli yapılandırmayı dosyaya kaydeder</target>
-
 <source>Load configuration from file</source>
 <target>Yapılandırma dosyasından ayarları alır</target>
+
+<source>Save current configuration to file</source>
+<target>Geçerli yapılandırmayı dosyaya kaydeder</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Son kullanılan yapılandırmalar (listeden silmek için DEL tuşuna basın)</target>
@@ -519,13 +528,13 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Hide filtered or temporarily excluded files</source>
 <target>Süzülmüş ya da geçici olarak dışlanmış dosyaları gizler</target>
 
-<source>Number of files and directories that will be created</source>
+<source>Number of files and folders that will be created</source>
 <target>Oluşturulacak dosya ve klasör sayısı</target>
 
 <source>Number of files that will be overwritten</source>
 <target>Üzerine yazılacak dosya sayısı</target>
 
-<source>Number of files and directories that will be deleted</source>
+<source>Number of files and folders that will be deleted</source>
 <target>Silinecek dosya ve klasör sayısı</target>
 
 <source>Total amount of data that will be transferred</source>
@@ -549,8 +558,8 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Batch job</source>
 <target>Toplu iş</target>
 
-<source>Create a batch file and automate synchronization. To start in batch mode simply double-click this file or run command: FreeFileSync.exe SyncJob.ffs_batch. This can also be scheduled in your system's task planner.</source>
-<target>Bir yığın dosyası oluşturarak eşleştirmeyi otomatikleştirir. Yığın kipini başlatmak için oluşturulan dosya üzerinde çift tıklamak ya da şu komutu çalıştırmak yeterlidir: FreeFileSync.exe Eşleştirmeİşi.ffs_batch. Bu işlem aynı şekilde sisteminizin zamanlanmış görev çalıştırıcısına eklenebilir.</target>
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Eşleştirmeyi otomatikleştirmek için bir komut yığın dosyası oluşturun. Bu dosyaya çift tıklayarak ya da sisteminizdeki görev zamanlayıcıya: FreeFileSync.exe <görev adı>.ffs_batch şeklinde yazarak ekleyin</target>
 
 <source>Help</source>
 <target>Yardım</target>
@@ -576,20 +585,11 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Maximum number of log files:</source>
 <target>Tutulacak en fazla günlük dosyası sayısı:</target>
 
-<source>Select log file directory:</source>
-<target>Kayıt dosyası klasörü:</target>
+<source>Select folder to save log files:</source>
+<target>Günlük dosyalarının kaydedileceği klasörü seçin:</target>
 
 <source>Batch settings</source>
 <target>İş ayarları</target>
-
-<source>&Save</source>
-<target>&Kaydet</target>
-
-<source>&Load</source>
-<target>Yük&le</target>
-
-<source>Cancel</source>
-<target>İptal</target>
 
 <source>Select variant:</source>
 <target>Davranışı seçin:</target>
@@ -615,29 +615,23 @@ Her seferinde çalıştırılacak komut satırı:
 <source>Configuration</source>
 <target>Yapılandırma</target>
 
-<source>Category</source>
-<target>Kategori</target>
+<source>Item exists on left side only</source>
+<target>Yalnız sol yanda bulunan ögeler</target>
 
-<source>Action</source>
-<target>İşlem</target>
+<source>Item exists on right side only</source>
+<target>Yalnız sağ yanda bulunan ögeler</target>
 
-<source>File/folder exists on left side only</source>
-<target>Dosya/Klasör yalnız sol tarafta var</target>
+<source>Left side is newer</source>
+<target>Sol yan daha yeni</target>
 
-<source>File/folder exists on right side only</source>
-<target>Dosya/Klasör yalnız sağ tarafta var</target>
+<source>Right side is newer</source>
+<target>Sağ yan daha yeni</target>
 
-<source>Left file is newer</source>
-<target>Soldaki dosya daha yeni</target>
+<source>Items have different content</source>
+<target>Ögelerin içeriği farklı</target>
 
-<source>Right file is newer</source>
-<target>Sağdaki dosya daha yeni</target>
-
-<source>Files have different content</source>
-<target>Farklı içeriğe sahip dosyalar</target>
-
-<source>Conflict/file cannot be categorized</source>
-<target>Çatışma/dosya kategorize edilemedi</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Uyuşmazlık/öge kategorize edilemiyor</target>
 
 <source>OK</source>
 <target>Tamam</target>
@@ -714,9 +708,6 @@ aynı olmalıdır
 <source>&Ignore</source>
 <target>&Yoksay</target>
 
-<source>&Retry</source>
-<target>&Yeniden dene</target>
-
 <source>Do not show this dialog again</source>
 <target>Bu iletiyi yeniden gösterme</target>
 
@@ -747,33 +738,6 @@ Yalnız tüm süzgeç ayarlarına uyan dosyalar eşleştirilecek.
 Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 </target>
 
-<source>Hints:</source>
-<target>İpuçları:</target>
-
-<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
-<target>1. Bağıl dosya ya da klasör adlarını ';' ile ayırarak ya da ayrı satırlar şeklinde yazın.</target>
-
-<source>2. Use wildcard characters '*' and '?'.</source>
-<target>2. '*' ve '?' jokerleri kullanılabilsin.</target>
-
-<source>3. Exclude files directly on main grid via context menu.</source>
-<target>3. Ana listedeki dosyaları sağ fare tuşu menüsüyle doğrudan dışla.</target>
-
-<source>Example</source>
-<target>Örnek</target>
-
-<source>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
-</source>
-<target>
-Kat: *.doc;*.zip;*.exe
-Katma: \stuff\temp\*
-</target>
-
-<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
-<target>"temp" alt klasöründeki herşey hariç, tüm .doc, .zip ve .exe dosyalarını eşleştir.</target>
-
 <source>Include</source>
 <target>Katılacaklar:</target>
 
@@ -795,8 +759,8 @@ Katma: \stuff\temp\*
 <source>&Default</source>
 <target>&Varsayılan</target>
 
-<source>Transactional file copy</source>
-<target>Aşamalı kopyalama kullan</target>
+<source>Fail-safe file copy</source>
+<target>Hatasız dosya kopyalama</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Kopyalama önce geçici bir dosyaya (*.ffs_tmp) yapılır. Sonra dosya yeniden adlandırılır. Böylece hatalara karşı daha sağlıklı bir durum sağlanır</target>
@@ -810,8 +774,8 @@ Katma: \stuff\temp\*
 <source>Copy file access permissions</source>
 <target>Dosya erişim izinlerini kopyala</target>
 
-<source>Transfer file and directory permissions (Requires Administrator rights)</source>
-<target>Dosya ve klasör izinlerini de aktarır (Yönetici izinlerine gerek duyar)</target>
+<source>Transfer file and folder permissions (Requires Administrator rights)</source>
+<target>Dosya ve klasör izinlerini de kopyala (Yönetici haklarına gerek duyar)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Gizli iletileri göster</target>
@@ -1119,11 +1083,11 @@ Katma: \stuff\temp\*
 <source>Integrate external applications into context menu. The following macros are available:</source>
 <target>Dış uygulamaları sağ tuş menüsüne ekler. Şu makrolar kullanılabilir:</target>
 
-<source>- full file or directory name</source>
+<source>- full file or folder name</source>
 <target>- tam dosya ya da klasör adı</target>
 
-<source>- directory part only</source>
-<target>- Yalnız klasör kısmı</target>
+<source>- folder part only</source>
+<target>- yalnız klasör bölümü</target>
 
 <source>- Other side's counterpart to %name</source>
 <target>- %name diğer taraftaki karşılığı</target>
@@ -1167,8 +1131,8 @@ Katma: \stuff\temp\*
 <source>Versioning</source>
 <target>Eski sürüm olarak sakla</target>
 
-<source>Move files into a time-stamped subdirectory</source>
-<target>Dosyaları zaman damgasıyla bir alt klasöre taşır</target>
+<source>Move files into a time-stamped subfolder</source>
+<target>Dosyaları zaman damgalı bir alt klasöre taşı</target>
 
 <source>Files</source>
 <target>Dosyalar</target>
@@ -1263,8 +1227,8 @@ Katma: \stuff\temp\*
 <source>Cannot read directory %x.</source>
 <target>%x klasörü okunamadı.</target>
 
-<source>Endless loop.</source>
-<target>Sonsuz çevrim.</target>
+<source>Detected endless directory recursion.</source>
+<target>Sonsuz klasör kısayol döngüsü algılandı.</target>
 
 <source>Cannot set privilege %x.</source>
 <target>%x izni verilemedi.</target>
@@ -1290,14 +1254,11 @@ Katma: \stuff\temp\*
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Varsayılan eşleştirme yönleri ayarlanıyor: Yeni dosyalar eski dosyaların üzerine yazılacak.</target>
 
-<source>The file does not contain a valid configuration:</source>
-<target>Dosya geçerli bir yapılandırma içermiyor:</target>
+<source>You can ignore this error to consider the folder as empty.</source>
+<target>Klasörün boş olarak kabul edilmesi için bu hatayı yok sayanbilirsiniz.</target>
 
-<source>You can ignore this error to consider the directory as empty.</source>
-<target>Bu hatayı, klasörü boş sayacak şekilde yok sayabilirsiniz.</target>
-
-<source>Cannot find directory %x.</source>
-<target>%x klasörü bulunamadı.</target>
+<source>Cannot find folder %x.</source>
+<target>%x klasörü bulunamıyor.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Klasörler bağımlı! Eşleştirme kurallarını koyarken dikkatli olun:</target>
@@ -1329,20 +1290,20 @@ Katma: \stuff\temp\*
 <source>Both sides are equal</source>
 <target>İki tarafta aynı</target>
 
-<source>Files/folders differ in attributes only</source>
-<target>Yalnız dosya/klasör öznitelikleri farklı olanlar</target>
+<source>Items have different attributes</source>
+<target>Ögeler farklı özniteliklere sahip</target>
 
-<source>Copy new file/folder to left</source>
-<target>Yeni dosya/klasörleri sola kopyala</target>
+<source>Copy new item to left</source>
+<target>Yeni ögeyi sola kopyala</target>
 
-<source>Copy new file/folder to right</source>
-<target>Yeni dosya/klasörleri sağa kopyala</target>
+<source>Copy new item to right</source>
+<target>Yeni ögeyi sağa kopyala</target>
 
-<source>Delete left file/folder</source>
-<target>Soldaki dosya/klasörleri sil</target>
+<source>Delete left item</source>
+<target>Soldaki ögeyi sil</target>
 
-<source>Delete right file/folder</source>
-<target>Sağdaki dosya/klasörleri sil</target>
+<source>Delete right item</source>
+<target>Sağdaki ögeyi sil</target>
 
 <source>Move file on left</source>
 <target>Soldaki dosyayı taşı</target>
@@ -1350,20 +1311,20 @@ Katma: \stuff\temp\*
 <source>Move file on right</source>
 <target>Sağdaki dosyayı taşı</target>
 
-<source>Overwrite left file/folder with right one</source>
-<target>Soldaki dosya/klasörlerin üzerine sağdakileri yaz</target>
+<source>Overwrite left item</source>
+<target>Soldaki ögenin üzerine yaz</target>
 
-<source>Overwrite right file/folder with left one</source>
-<target>Sağdaki dosya/klasörlerin üzerine soldakileri yaz</target>
+<source>Overwrite right item</source>
+<target>Sağdaki ögenin üzerine yaz</target>
 
 <source>Do nothing</source>
 <target>Hiçbir şey yapma</target>
 
-<source>Copy file attributes only to left</source>
-<target>Dosya özniteliklerini yalnız sola kopyalaya</target>
+<source>Update attributes on left</source>
+<target>Soldaki öznitelikleri güncelle</target>
 
-<source>Copy file attributes only to right</source>
-<target>Dosya özniteliklerini yalnız sağa kopyalaya</target>
+<source>Update attributes on right</source>
+<target>Sağdaki öznitelikleri güncelle</target>
 
 <source>Multiple...</source>
 <target>Çoklu...</target>
@@ -1416,11 +1377,11 @@ Katma: \stuff\temp\*
 <source>Updating attributes of %x</source>
 <target>%x öznitelikleri güncelleniyor</target>
 
-<source>Target directory name must not be empty!</source>
-<target>Hedef klasör adı boş olamaz!</target>
+<source>Target folder name must not be empty.</source>
+<target>Hedef klasör adı boş olamaz.</target>
 
-<source>Directory for file versioning was not supplied!</source>
-<target>Dosya sürümlemesi için klasör desteklenmiyor!</target>
+<source>Folder name for file versioning must not be empty.</source>
+<target>Dosya sürümlemesi için klasör adı boş olamaz.</target>
 
 <source>Source directory %x not found.</source>
 <target>%x kaynak klasörü bulunamadı.</target>
@@ -1449,8 +1410,8 @@ Katma: \stuff\temp\*
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Şu yollar için geri dönüşüm kutusu kullanılamaz! Dosyalar anında ve tamamen silinir:</target>
 
-<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
-<target>Bir klasör, çoklu klasör çiftlerinin bir parçası olduğundan değiştirilecek! Lütfen eşleştirme ayarlarınızı gözden geçirin!</target>
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>Çoklu klasör çiftlerinin parçası olan bir klasör değiştirilecek. Lütfen eşleştirme ayarlarını gözden geçirin.</target>
 
 <source>Processing folder pair:</source>
 <target>İşlenen klasör çifti:</target>
