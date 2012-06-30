@@ -22,7 +22,7 @@ namespace
 {
 void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, wxWindow& tooltipWnd, wxStaticText* staticText, size_t timeout)
 {
-    const wxString dirFormatted = toWx(getFormattedDirectoryName(toZ(dirname)));
+    const wxString dirFormatted = utfCvrtTo<wxString>(getFormattedDirectoryName(toZ(dirname)));
 
     tooltipWnd.SetToolTip(nullptr); //workaround wxComboBox bug http://trac.wxwidgets.org/ticket/10512 / http://trac.wxwidgets.org/ticket/12659
     tooltipWnd.SetToolTip(dirFormatted); //only lord knows when the real bugfix reaches mere mortals via an official release

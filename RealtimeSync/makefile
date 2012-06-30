@@ -7,12 +7,12 @@ COMMON_LINK_FLAGS    = -pthread -lrt
 
 #default build
 CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
-LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes` -lboost_thread
+LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes` -lboost_thread -lboost_system
 
 #static std library linkage used for precompiled release
 ifeq ($(BUILD),release)
 CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
-LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
+LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a /usr/local/lib/libboost_system.a
 endif
 #####################################################################################################
 

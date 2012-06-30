@@ -15,56 +15,46 @@
 #include <zen/string_tools.h>
 #include "msg_popup.h"
 #include "../lib/ffs_paths.h"
-#include <zen/scope_guard.h>
-#include <wx/tokenzr.h>
 #include <zen/i18n.h>
 
+using namespace zen;
 
-bool getOnlineVersion(wxString& version)
+
+wxString getOnlineVersion() //empty string on error;
 {
     wxWindowDisabler dummy;
 
     wxHTTP webAccess;
-    webAccess.SetHeader(wxT("Content-type"), wxT("text/html; charset=utf-8"));
-    webAccess.SetTimeout(5); //5 seconds of timeout instead of 10 minutes...
+    webAccess.SetHeader(L"Content-type", L"text/html; charset=utf-8");
+    webAccess.SetTimeout(5); //5 seconds of timeout instead of 10 minutes(WTF are they thinking???)...
 
-    if (webAccess.Connect(wxT("freefilesync.cvs.sourceforge.net"))) //only the server, no pages here yet...
+    if (webAccess.Connect(L"freefilesync.cvs.sourceforge.net")) //only the server, no pages here yet...
     {
         //wxApp::IsMainLoopRunning(); // should return true
 
-        std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(wxT("/viewvc/freefilesync/version/version.txt")));
+        std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(L"/viewvc/freefilesync/version/version.txt"));
         //must be deleted BEFORE webAccess is closed
 
         if (httpStream && webAccess.GetError() == wxPROTO_NOERR)
         {
-            wxString newestVersion;
-            wxStringOutputStream out_stream(&newestVersion);
+            wxString onlineVersion;
+            wxStringOutputStream out_stream(&onlineVersion);
             httpStream->Read(out_stream);
-            if (!newestVersion.empty())
-            {
-                version = newestVersion;
-                return true;
-            }
+            return onlineVersion;
         }
     }
-
-    return false;
+    return wxString();
 }
 
 
 const wchar_t VERSION_SEP = L'.';
 
-
 std::vector<size_t> parseVersion(const wxString& version)
 {
-    std::vector<size_t> output;
+    std::vector<wxString> digits = split(version, VERSION_SEP);
 
-    wxStringTokenizer tkz(version, VERSION_SEP, wxTOKEN_RET_EMPTY);
-    while (tkz.HasMoreTokens())
-    {
-        const wxString& token = tkz.GetNextToken();
-        output.push_back(zen::stringTo<size_t>(token));
-    }
+    std::vector<size_t> output;
+    std::transform(digits.begin(), digits.end(), std::back_inserter(output), [&](const wxString& d) { return stringTo<size_t>(d); });
     return output;
 }
 
@@ -74,18 +64,18 @@ bool isNewerVersion(const wxString& onlineVersion)
     std::vector<size_t> current = parseVersion(zen::currentVersion);
     std::vector<size_t> online  = parseVersion(onlineVersion);
 
-    if (online.empty() || online[0] == 0) //onlineVersion may be "This website has been moved..." In this case better check for an update
+    if (online.empty() || online[0] == 0) //online version may be "This website has been moved..." In this case better check for an update
         return true;
 
     return std::lexicographical_compare(current.begin(), current.end(),
-                                        online.begin(), online.end());
+                                        online .begin(), online .end());
 }
 
 
 void zen::checkForUpdateNow(wxWindow* parent)
 {
-    wxString onlineVersion;
-    if (!getOnlineVersion(onlineVersion))
+    const wxString onlineVersion = getOnlineVersion();
+    if (onlineVersion.empty())
     {
         wxMessageBox(_("Unable to connect to sourceforge.net!"), _("Error"), wxOK | wxICON_ERROR, parent);
         return;
@@ -94,7 +84,7 @@ void zen::checkForUpdateNow(wxWindow* parent)
     if (isNewerVersion(onlineVersion))
     {
         if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                            _("A newer version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
+                            _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
             wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
     }
     else
@@ -105,7 +95,7 @@ void zen::checkForUpdateNow(wxWindow* parent)
 void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
 {
 #ifdef FFS_LINUX
-    if (!zen::isPortableVersion()) //don't check for updates in installer version -> else: handled by .deb
+    if (!zen::isPortableVersion()) //don't check for updates in locally installed version -> handled by system updater
         return;
 #endif
 
@@ -132,8 +122,8 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
         }
         else if (wxGetLocalTime() >= lastUpdateCheck + 7 * 24 * 3600) //check weekly
         {
-            wxString onlineVersion;
-            if (!getOnlineVersion(onlineVersion))
+            const wxString onlineVersion = getOnlineVersion();
+            if (onlineVersion.empty())
                 return; //do not handle error
 
             lastUpdateCheck = wxGetLocalTime();
@@ -141,7 +131,7 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
             if (isNewerVersion(onlineVersion))
             {
                 if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                    _("A newer version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
+                                    _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
                     wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
             }
         }

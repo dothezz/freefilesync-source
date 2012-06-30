@@ -10,7 +10,6 @@
 #include <wx/combobox.h>
 #include <memory>
 #include <zen/zstring.h>
-#include <wx+/string_conv.h>
 #include <zen/stl_tools.h>
 
 //combobox with history function + functionality to delete items (DEL)

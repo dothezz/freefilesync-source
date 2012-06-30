@@ -5,24 +5,24 @@
 // **************************************************************************
 
 #include "application.h"
+#include <memory>
 #include "ui/main_dlg.h"
 #include <wx/msgdlg.h>
+#include <wx/sound.h>
+#include <wx/tooltip.h> //wxWidgets v2.9
+#include <wx/log.h>
+#include <zen/file_io.h>
+#include <zen/file_handling.h>
+#include <wx+/serialize.h>
+#include <wx+/app_main.h>
 #include "comparison.h"
 #include "algorithm.h"
 #include "synchronization.h"
-#include <memory>
 #include "ui/batch_status_handler.h"
 #include "ui/check_version.h"
-#include <wx/file.h>
-#include "lib/resources.h"
 #include "ui/switch_to_gui.h"
+#include "lib/resources.h"
 #include "lib/ffs_paths.h"
-#include <wx+/app_main.h>
-#include <wx/sound.h>
-#include <zen/file_handling.h>
-#include <wx+/string_conv.h>
-#include <wx/log.h>
-#include <wx/tooltip.h> //wxWidgets v2.9
 #include "lib/lock_holder.h"
 
 #ifdef FFS_LINUX
@@ -275,27 +275,30 @@ bool Application::OnExceptionInMainLoop()
 
 int Application::OnRun()
 {
+    auto processException = [](const std::wstring& msg)
+    {
+        //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
+        try
+        {
+            saveBinStream(getConfigDir() + Zstr("LastError.txt"), utfCvrtTo<std::string>(msg)); //throw FileError
+        }
+        catch (const FileError&) {}
+
+        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", msg);
+    };
+
     try
     {
         wxApp::OnRun();
     }
     catch (const std::exception& e) //catch all STL exceptions
     {
-        //it's not always possible to display a message box, e.g. corrupted stack, however (non-stream) file output works!
-        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
-        safeOutput.Write(utfCvrtTo<wxString>(e.what()));
-
-        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", utfCvrtTo<wxString>(e.what()));
+        processException(utfCvrtTo<std::wstring>(e.what()));
         return FFS_RC_EXCEPTION;
     }
     catch (...) //catch the rest
     {
-        const wxString& msg = L"Unknown error.";
-
-        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
-        safeOutput.Write(msg);
-
-        wxSafeShowMessage(_("An exception occurred!"), msg);
+        processException(L"Unknown error.");
         return FFS_RC_EXCEPTION;
     }
 

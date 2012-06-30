@@ -10,7 +10,6 @@
 #include "dir_name.h"
 #include <wx/wupdlock.h>
 #include <wx+/mouse_move_dlg.h>
-#include <wx+/string_conv.h>
 #include <wx+/dir_picker.h>
 #include <wx+/rtl.h>
 #include "gui_generated.h"
@@ -223,7 +222,7 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
 
     //a proper set-method may be in order some time...
     setEnumVal(enumDelhandDescr, *m_choiceHandleDeletion, syncCfg.handleDeletion);
-    customDelFolder.setName(toWx(syncCfg.customDeletionDirectory));
+    customDelFolder.setName(utfCvrtTo<wxString>(syncCfg.customDeletionDirectory));
     updateGui();
 
     //error handling
@@ -353,7 +352,7 @@ void SyncCfgDialog::OnApply(wxCommandEvent& event)
     //write configuration to main dialog
     syncCfgOut.directionCfg            = currentDirectionCfg;
     syncCfgOut.handleDeletion          = getEnumVal(enumDelhandDescr, *m_choiceHandleDeletion);
-    syncCfgOut.customDeletionDirectory = toZ(customDelFolder.getName());
+    syncCfgOut.customDeletionDirectory = utfCvrtTo<Zstring>(customDelFolder.getName());
 
     if (refHandleError)
         *refHandleError = getEnumVal(enumErrhandDescr, *m_choiceHandleError);

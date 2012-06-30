@@ -42,7 +42,7 @@ namespace impl
 inline
 const Zstring& getBinaryDir() //directory containing executable WITH path separator at end
 {
-    static Zstring instance = beforeLast(toZ(wxStandardPaths::Get().GetExecutablePath()), FILE_NAME_SEPARATOR) + Zstring(FILE_NAME_SEPARATOR); //extern linkage!
+    static Zstring instance = beforeLast(utfCvrtTo<Zstring>(wxStandardPaths::Get().GetExecutablePath()), FILE_NAME_SEPARATOR) + Zstring(FILE_NAME_SEPARATOR); //extern linkage!
     return instance;
 }
 
@@ -102,7 +102,7 @@ Zstring getConfigDir()
         if (!dirExists(userDirectory))
             try
             {
-                createDirectory(userDirectory); //only top directory needs to be created: no recursion necessary
+                makeDirectory(userDirectory); //only top directory needs to be created: no recursion necessary
             }
             catch (const FileError&) {}
 

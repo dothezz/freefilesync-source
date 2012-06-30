@@ -29,8 +29,8 @@ Linker   flags: `pkg-config --libs gio-2.0`
 Already included in package "gtk+-2.0"!
 */
 
-//move a file or folder to Recycle Bin (deletes permanently if recycle is not available)
-bool moveToRecycleBin(const Zstring& filename); //throw FileError, return "true" if file/dir was actually deleted
+//move a file or folder to Recycle Bin (deletes permanently if recycle is not available) -> crappy semantics, but we have no choice thanks to Windows' design
+bool recycleOrDelete(const Zstring& filename); //throw FileError, return "true" if file/dir was actually deleted
 
 
 #ifdef FFS_WIN

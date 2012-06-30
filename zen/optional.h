@@ -38,9 +38,17 @@ public:
     Opt(NoValue)      : value()   , valid(false) {}
     Opt(const T& val) : value(val), valid(true ) {}
 
-    //rvalue optimization: only basic exception safety:
-    Opt(Opt&& tmp) : value(std::move(tmp.value)), valid(tmp.valid) {}
-    Opt& operator=(const Opt& tmp) { value = std::move(tmp.value); valid = tmp.valid; }
+    Opt(const Opt& tmp) : value(tmp.valid ? tmp.value : T()), valid(tmp.valid) {}
+
+    Opt& operator=(const Opt& tmp)
+    {
+        if (tmp.valid)
+            value = tmp.value;
+        valid = tmp.valid;
+    }
+
+    ////rvalue optimization: only basic exception safety:
+    //   Opt(Opt&& tmp) : value(std::move(tmp.value)), valid(tmp.valid) {}
 
 #ifdef _MSC_VER
 private:
@@ -58,6 +66,7 @@ public:
     /**/  T* operator->()       { return &value; }
 
     void reset() { valid = false; }
+
 private:
     T value;
     bool valid;

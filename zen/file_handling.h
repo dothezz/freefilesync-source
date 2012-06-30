@@ -53,18 +53,18 @@ void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = nul
 
 
 //rename file or directory: no copying!!!
-void renameFile(const Zstring& oldName, const Zstring& newName); //throw FileError;
+void renameFile(const Zstring& oldName, const Zstring& newName); //throw FileError
 
 //move source to target across volumes; prerequisite: all super-directories of target exist
 //if target already contains some files/dirs they are seen as remnants of a previous incomplete move - see comment in moveDirectoryImpl
-void moveFile(const Zstring& sourceFile, const Zstring& targetFile, CallbackMoveFile* callback); //throw FileError
-void moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, CallbackMoveFile* callback); //throw FileError
+void moveFile     (const Zstring& sourceFile, const Zstring& targetFile, CallbackMoveFile* callback); //throw FileError
+void moveDirectory(const Zstring& sourceDir,  const Zstring& targetDir,  CallbackMoveFile* callback); //throw FileError
 
 bool supportsPermissions(const Zstring& dirname); //throw FileError, derefernces symlinks
 
 //creates superdirectories automatically:
-void createDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //throw FileError;
-void createDirectory(const Zstring& directory); //throw FileError; -> function overload avoids default parameter ambiguity issues!
+void makeDirectory(const Zstring& directory); //throw FileError; do nothing if directory already exists!
+void makeNewDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //FileError, ErrorTargetExisting
 
 struct FileAttrib
 {

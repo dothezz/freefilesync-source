@@ -19,7 +19,7 @@ namespace zen
 3. path may already contain \\?\-prefix
 */
 Zstring applyLongPathPrefix(const Zstring& path); //throw()
-Zstring applyLongPathPrefixCreateDir(const Zstring& path); //throw() -> special rule for ::CreateDirectoryEx(): MAX_PATH - 12(=^ 8.3 filename) is threshold
+Zstring applyLongPathPrefixCreateDir(const Zstring& path); //throw() -> special rule for ::CreateDirectory()/::CreateDirectoryEx(): MAX_PATH - 12(=^ 8.3 filename) is threshold
 
 Zstring removeLongPathPrefix(const Zstring& path); //throw()
 }

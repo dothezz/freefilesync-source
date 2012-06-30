@@ -10,7 +10,6 @@
 #include "lock_holder.h"
 #include <zen/file_traverser.h>
 #include <zen/file_error.h>
-#include <wx+/string_conv.h>
 #include <zen/thread.h> //includes <boost/thread.hpp>
 #include <zen/scope_guard.h>
 #include <zen/fixed_list.h>
@@ -176,7 +175,7 @@ class AsyncCallback //actor pattern
 {
 public:
     AsyncCallback() :
-        notifyingThreadID(-1),
+        notifyingThreadID(0),
         textScanning(_("Scanning:")),
         itemsScanned(0),
         activeWorker(0) {}
@@ -216,9 +215,9 @@ public:
         }
     }
 
-    void setNotifyingThread(int threadID) { notifyingThreadID = threadID; } //context of main thread
+    void setNotifyingThread(size_t threadID) { notifyingThreadID = threadID; } //context of main thread
 
-    void reportCurrentFile(const Zstring& filename, int threadID) //context of worker thread
+    void reportCurrentFile(const Zstring& filename, size_t threadID) //context of worker thread
     {
         if (threadID != notifyingThreadID) return; //only one thread at a time may report status
 
@@ -227,7 +226,7 @@ public:
         currentStatus.clear();
     }
 
-    void reportCurrentStatus(const std::wstring& status, int threadID) //context of worker thread
+    void reportCurrentStatus(const std::wstring& status, size_t threadID) //context of worker thread
     {
         if (threadID != notifyingThreadID) return; //only one thread may report status
 
@@ -278,7 +277,7 @@ private:
     std::unique_ptr<FillBufferCallback::HandleError> errorResponse;
 
     //---- status updates ----
-    volatile int notifyingThreadID; //theoretically racy, but there is nothing that could go wrong...
+    volatile size_t notifyingThreadID; //theoretically racy, but there is nothing that could go wrong...
     //CAVEAT: do NOT use boost::thread::id as long as this showstopper exists: https://svn.boost.org/trac/boost/ticket/5754
     boost::mutex lockCurrentStatus; //use a different lock for current file: continue traversing while some thread may process an error
     Zstring currentFile;        //only one of these two is filled at a time!
@@ -296,7 +295,7 @@ private:
 struct TraverserShared
 {
 public:
-    TraverserShared(int threadID,
+    TraverserShared(size_t threadID,
                     SymLinkHandling handleSymlinks,
                     const HardFilter::FilterRef& filter,
                     std::set<Zstring>& failedReads,
@@ -313,7 +312,7 @@ public:
     std::set<Zstring>& failedReads_; //relative postfixed names of directories that could not be read (empty for root)
 
     AsyncCallback& acb_;
-    int threadID_;
+    size_t threadID_;
 };
 
 
@@ -459,7 +458,7 @@ DirCallback::HandleError DirCallback::onError(const std::wstring& errorText)
 class DstHackCallbackImpl : public DstHackCallback
 {
 public:
-    DstHackCallbackImpl(AsyncCallback& acb, int threadID) :
+    DstHackCallbackImpl(AsyncCallback& acb, size_t threadID) :
         acb_(acb),
         threadID_(threadID),
         textApplyingDstHack(replaceCpy(_("Encoding extended time information: %x"), L"%x", L"\n%x")) {}
@@ -471,7 +470,7 @@ private:
     }
 
     AsyncCallback& acb_;
-    int threadID_;
+    size_t threadID_;
     const std::wstring textApplyingDstHack;
 };
 #endif
@@ -481,7 +480,7 @@ private:
 class WorkerThread
 {
 public:
-    WorkerThread(int threadID,
+    WorkerThread(size_t threadID,
                  const std::shared_ptr<AsyncCallback>& acb,
                  const std::vector<std::pair<DirectoryKey, DirectoryValue*>>& workload) :
         threadID_(threadID),
@@ -523,7 +522,7 @@ public:
     }
 
 private:
-    int threadID_;
+    size_t threadID_;
     std::shared_ptr<AsyncCallback> acb_;
     std::vector<std::pair<DirectoryKey, DirectoryValue*>> workload_;
 };
@@ -563,12 +562,12 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
             workload.push_back(std::make_pair(key, &rv.first->second));
         });
 
-        const int threadId = iter - buckets.begin();
+        const size_t threadId = iter - buckets.begin();
         worker.emplace_back(WorkerThread(threadId, acb, workload));
     }
 
     //wait until done
-    int threadId = 0;
+    size_t threadId = 0;
     for (auto iter = worker.begin(); iter != worker.end(); ++iter, ++threadId)
     {
         boost::thread& wt = *iter;

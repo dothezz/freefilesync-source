@@ -112,8 +112,8 @@ private:
     void OnIdleEvent(wxEvent& event);
 
     //delayed status information restore
-    void pushStatusInformation(const wxString& text);
-    void clearStatusBar();
+    void setStatusInformation(const wxString& msg);  //set main status
+    void flashStatusInformation(const wxString& msg); //temporarily show different status
 
     //events
     void onGridButtonEvent         (wxKeyEvent& event);
@@ -159,9 +159,10 @@ private:
     void OnSyncDirRight(        wxCommandEvent& event);
     void OnSyncDirNone(         wxCommandEvent& event);
 
-    void OnNewConfig(           wxCommandEvent& event);
-    void OnSaveConfig(          wxCommandEvent& event);
-    void OnLoadConfig(          wxCommandEvent& event);
+    void OnConfigNew(           wxCommandEvent& event);
+    void OnConfigSave(          wxCommandEvent& event);
+    void OnConfigSaveAs(        wxCommandEvent& event);
+    void OnConfigLoad(          wxCommandEvent& event);
     void OnLoadFromHistory(     wxCommandEvent& event);
 
     void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
@@ -242,7 +243,7 @@ private:
     //***********************************************
     //status information
     wxLongLong lastStatusChange;
-    std::stack<wxString> stackObjects;
+    std::vector<wxString> statusMsgStack;
 
     //compare status panel (hidden on start, shown when comparing)
     std::unique_ptr<CompareStatus> compareStatus; //always bound

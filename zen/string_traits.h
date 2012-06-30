@@ -35,7 +35,7 @@ strLength():
 	strLength(array); //equals cStringLength(array)
 */
 
-//wrap a sub-string or a char* as an intermediate string class when the length is already known
+//reference a sub-string or a char* as an intermediate string class when the length is already known
 template <class Char>
 class StringProxy
 {
@@ -126,8 +126,7 @@ public:
 
     enum
     {
-        isStringLike =
-            IsSameType<CharType, char   >::value ||
+        isStringLike = IsSameType<CharType, char>::value ||
         IsSameType<CharType, wchar_t>::value
     };
 };

@@ -18,7 +18,7 @@
 #include <zen/int64.h>
 #include <zen/file_id_def.h>
 #include "structures.h"
-
+#include "lib/hard_filter.h"
 
 namespace zen
 {
@@ -32,9 +32,9 @@ struct FileDescriptor
         fileSize(fileSizeIn),
         id(idIn) {}
 
-    Int64  lastWriteTimeRaw;   //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+    Int64  lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
     UInt64 fileSize;
-    FileId id; //optional! (however, always set on Linux, and *generally* available on Windows)
+    FileId id;               //optional! (however, always set on Linux, and *generally* available on Windows)
 };
 
 
@@ -55,7 +55,7 @@ struct LinkDescriptor
         type(lt) {}
 
     Int64    lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
-    Zstring  targetPath;       //symlink "content", may be empty if determination failed
+    Zstring  targetPath;       //optional: symlink "content", may be empty if determination failed
     LinkType type;             //type is required for Windows only! On Linux there is no such thing => consider this when comparing Symbolic Links!
 };
 
@@ -86,9 +86,9 @@ class FileSystemObject;
 //------------------------------------------------------------------
 /*
 ERD:
-	DirContainer 1 -----> 0..n DirContainer
-	DirContainer 1 -----> 0..n FileDescriptor
-	DirContainer 1 -----> 0..n LinkDescriptor
+	DirContainer 1 --> 0..n DirContainer
+	DirContainer 1 --> 0..n FileDescriptor
+	DirContainer 1 --> 0..n LinkDescriptor
 */
 
 struct DirContainer
@@ -99,9 +99,9 @@ struct DirContainer
     typedef std::map<Zstring, LinkDescriptor, LessFilename> LinkList; //
     //------------------------------------------------------------------
 
-    DirList  dirs;  //contained directories
-    FileList files; //contained files
-    LinkList links; //contained symlinks (note: only symlinks that are not treated as their target are placed here!)
+    DirList  dirs;
+    FileList files;
+    LinkList links; //non-followed symlinks
 
     //convenience
     DirContainer& addSubDir(const Zstring& shortName)
@@ -141,11 +141,11 @@ class HierarchyObject
     friend class DirMapping;
     friend class FileSystemObject;
 
+public:
     typedef zen::FixedList<FileMapping>    SubFileVec; //MergeSides::execute() requires a structure that doesn't invalidate pointers after push_back()
     typedef zen::FixedList<SymLinkMapping> SubLinkVec; //Note: deque<> has circular dependency in VCPP!
     typedef zen::FixedList<DirMapping>     SubDirVec;
 
-public:
     DirMapping& addSubDir(const Zstring& shortNameLeft,
                           const Zstring& shortNameRight);
 
@@ -184,6 +184,8 @@ public:
 
     BaseDirMapping& getRoot() { return root_; }
 
+    const Zstring& getObjRelativeNamePf() const { return objRelNamePf; } //postfixed or empty!
+
 protected:
     HierarchyObject(const Zstring& relativeNamePf,
                     BaseDirMapping& baseMap) :
@@ -202,8 +204,6 @@ private:
     HierarchyObject(const HierarchyObject&);            //this class is referenced by it's child elements => make it non-copyable/movable!
     HierarchyObject& operator=(const HierarchyObject&); //
 
-    const Zstring& getObjRelativeNamePf() const { return objRelNamePf; }
-
     SubFileVec subFiles; //contained file maps
     SubLinkVec subLinks; //contained symbolic link maps
     SubDirVec  subDirs;  //contained directory maps
@@ -220,7 +220,10 @@ public:
     BaseDirMapping(const Zstring& dirPostfixedLeft,
                    bool dirExistsLeft,
                    const Zstring& dirPostfixedRight,
-                   bool dirExistsRight) :
+                   bool dirExistsRight,
+                   const HardFilter::FilterRef& filter,
+                   CompareVariant cmpVar,
+                   size_t fileTimeTolerance) :
 #ifdef _MSC_VER
 #pragma warning(disable : 4355) //"The this pointer is valid only within nonstatic member functions. It cannot be used in the initializer list for a base class."
 #endif
@@ -228,6 +231,7 @@ public:
 #ifdef _MSC_VER
 #pragma warning(default : 4355)
 #endif
+        filter_(filter), cmpVar_(cmpVar), fileTimeTolerance_(fileTimeTolerance),
         baseDirPfL     (dirPostfixedLeft ),
         baseDirPfR     (dirPostfixedRight),
         dirExistsLeft_ (dirExistsLeft    ),
@@ -238,11 +242,20 @@ public:
 
     template <SelectedSide side> bool wasExisting() const; //status of directory existence at the time of comparison!
 
+    //get settings which were used while creating BaseDirMapping
+    const HardFilter&   getFilter() const { return *filter_; }
+    CompareVariant getCompVariant() const { return cmpVar_; }
+    size_t   getFileTimeTolerance() const { return fileTimeTolerance_; }
+
     virtual void flip();
 
 private:
     BaseDirMapping(const BaseDirMapping&);            //this class is referenced by HierarchyObject => make it non-copyable/movable!
     BaseDirMapping& operator=(const BaseDirMapping&); //
+
+    HardFilter::FilterRef filter_; //filter used while scanning directory: represents sub-view of actual files!
+    CompareVariant cmpVar_;
+    size_t fileTimeTolerance_;
 
     Zstring baseDirPfL; //base sync dir postfixed
     Zstring baseDirPfR; //

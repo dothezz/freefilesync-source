@@ -333,7 +333,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
     }
     if (dirList.empty() || std::any_of(dirList.begin(), dirList.end(), [](Zstring str) -> bool { trim(str); return str.empty(); }))
     {
-        wxMessageBox(_("An input folder name is empty."), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(_("A folder input field is empty."), _("Error"), wxOK | wxICON_ERROR);
         return SHOW_GUI;
     }
 

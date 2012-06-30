@@ -173,7 +173,7 @@ void MainDialog::OnStart(wxCommandEvent& event)
 }
 
 
-void MainDialog::OnSaveConfig(wxCommandEvent& event)
+void MainDialog::OnConfigSave(wxCommandEvent& event)
 {
     wxString defaultFileName = currentConfigFileName.empty() ? L"Realtime.ffs_real" : currentConfigFileName;
     //attention: currentConfigFileName may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
@@ -243,7 +243,7 @@ void MainDialog::setLastUsedConfig(const wxString& filename)
 }
 
 
-void MainDialog::OnLoadConfig(wxCommandEvent& event)
+void MainDialog::OnConfigLoad(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this, wxEmptyString, wxEmptyString, wxEmptyString,
                             wxString(L"RealtimeSync (*.ffs_real;*.ffs_batch)|*.ffs_real;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",

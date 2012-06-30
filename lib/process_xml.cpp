@@ -5,15 +5,17 @@
 // **************************************************************************
 
 #include "process_xml.h"
+#include <utility>
 #include <zenxml/xml.h>
 #include "ffs_paths.h"
-#include <wx+/string_conv.h>
 #include <zen/file_handling.h>
 #include <zen/file_io.h>
 #include "xml_base.h"
 
 using namespace zen;
 using namespace xmlAccess; //functionally needed for correct overload resolution!!!
+
+using namespace std::rel_ops;
 
 
 XmlType getXmlType(const zen::XmlDoc& doc) //throw()
@@ -181,7 +183,7 @@ xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<Zstring>& filenam
 namespace
 {
 template <class XmlCfg>
-XmlCfg loadCfgImpl(const Zstring& filename, std::unique_ptr<xmlAccess::FfsXmlError>& exeption) //throw xmlAccess::FfsXmlError
+XmlCfg loadCfgImpl(const Zstring& filename, std::unique_ptr<xmlAccess::FfsXmlError>& warning) //throw xmlAccess::FfsXmlError
 {
     XmlCfg cfg;
     try
@@ -193,7 +195,7 @@ XmlCfg loadCfgImpl(const Zstring& filename, std::unique_ptr<xmlAccess::FfsXmlErr
         if (e.getSeverity() == xmlAccess::FfsXmlError::FATAL)
             throw;
         else
-            exeption.reset(new xmlAccess::FfsXmlError(e));
+            warning.reset(new xmlAccess::FfsXmlError(e));
     }
     return cfg;
 }
@@ -207,8 +209,7 @@ void mergeConfigFilesImpl(const std::vector<Zstring>& filenames, XmlCfg& config)
         return;
 
     std::vector<zen::MainConfiguration> mainCfgs;
-    std::unique_ptr<FfsXmlError> savedException;
-    Zstring invalidFile;
+    std::unique_ptr<FfsXmlError> savedWarning;
 
     std::for_each(filenames.begin(), filenames.end(),
                   [&](const Zstring& filename)
@@ -216,22 +217,21 @@ void mergeConfigFilesImpl(const std::vector<Zstring>& filenames, XmlCfg& config)
         switch (getXmlType(filename))
         {
             case XML_TYPE_GUI:
-                mainCfgs.push_back(loadCfgImpl<XmlGuiConfig>(filename, savedException).mainCfg); //throw xmlAccess::FfsXmlError
+                mainCfgs.push_back(loadCfgImpl<XmlGuiConfig>(filename, savedWarning).mainCfg); //throw xmlAccess::FfsXmlError
                 break;
 
             case XML_TYPE_BATCH:
-                mainCfgs.push_back(loadCfgImpl<XmlBatchConfig>(filename, savedException).mainCfg); //throw xmlAccess::FfsXmlError
+                mainCfgs.push_back(loadCfgImpl<XmlBatchConfig>(filename, savedWarning).mainCfg); //throw xmlAccess::FfsXmlError
                 break;
 
             case XML_TYPE_GLOBAL:
             case XML_TYPE_OTHER:
-                invalidFile = filename;
-                break;
+                if (!fileExists(filename))
+                    throw FfsXmlError(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)));
+                else
+                    throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
         }
     });
-
-    if (mainCfgs.empty())
-        throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(invalidFile)));
 
     try //...to init all non-"mainCfg" settings with first config file
     {
@@ -241,8 +241,8 @@ void mergeConfigFilesImpl(const std::vector<Zstring>& filenames, XmlCfg& config)
 
     config.mainCfg = merge(mainCfgs);
 
-    if (savedException.get()) //"re-throw" exception
-        throw* savedException;
+    if (savedWarning.get()) //"re-throw" exception
+        throw* savedWarning;
 }
 }
 
@@ -761,7 +761,8 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
 
     //###########################################################
     //alternate filter configuration
-    readConfig(in["LocalFilter"], enhPair.localFilter);
+    if (XmlIn inLocFilter = in["LocalFilter"])
+        readConfig(inLocFilter, enhPair.localFilter);
 }
 
 
@@ -1019,7 +1020,6 @@ void writeConfigFolderPair(const FolderPairEnh& enhPair, XmlOut& out)
     if (enhPair.altCmpConfig.get())
     {
         XmlOut outAlt = outPair["CompareConfig"];
-
         writeConfig(*enhPair.altCmpConfig, outAlt);
     }
     //###########################################################
@@ -1027,14 +1027,16 @@ void writeConfigFolderPair(const FolderPairEnh& enhPair, XmlOut& out)
     if (enhPair.altSyncConfig.get())
     {
         XmlOut outAltSync = outPair["SyncConfig"];
-
         writeConfig(*enhPair.altSyncConfig, outAltSync);
     }
 
     //###########################################################
     //alternate filter configuration
-    XmlOut outFilter = outPair["LocalFilter"];
-    writeConfig(enhPair.localFilter, outFilter);
+    if (enhPair.localFilter != FilterConfig()) //don't spam .ffs_gui file with default filter entries
+    {
+        XmlOut outFilter = outPair["LocalFilter"];
+        writeConfig(enhPair.localFilter, outFilter);
+    }
 }
 
 

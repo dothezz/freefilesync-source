@@ -15,7 +15,6 @@
 #include <wx/event.h>
 #include <wx+/context_menu.h>
 #include <wx/menu.h>
-#include <wx+/string_conv.h>
 #include "../lib/norm_filter.h"
 #include <wx+/button.h>
 #include <wx+/image_tools.h>

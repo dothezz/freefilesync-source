@@ -9,6 +9,7 @@
 
 #include <wx/event.h>
 #include <zen/error_log.h>
+#include <wx/stopwatch.h>
 #include "progress_indicator.h"
 #include "../lib/status_handler.h"
 #include "../lib/process_xml.h"
@@ -49,7 +50,7 @@ class SyncStatusHandler : public zen::StatusHandler
 public:
     SyncStatusHandler(MainDialog* parentDlg,
                       xmlAccess::OnGuiError handleError,
-                      const wxString& jobName,
+                      const std::wstring& jobName,
                       const std::wstring& execWhenFinished,
                       std::vector<std::wstring>& execFinishedHistory);
     ~SyncStatusHandler();
@@ -70,6 +71,8 @@ private:
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
     xmlAccess::OnGuiError handleError_;
     zen::ErrorLog errorLog;
+    const std::wstring jobName_;
+    wxStopWatch totalTime;
 };
 
 

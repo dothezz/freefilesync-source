@@ -27,7 +27,7 @@ using namespace zen;
 namespace
 {
 #ifdef FFS_WIN
-Zstring resolveRelativePath(Zstring relativeName) //note: ::GetFullPathName() is documented not threadsafe!
+Zstring resolveRelativePath(const Zstring& relativeName) //note: ::GetFullPathName() is documented not threadsafe!
 {
     const DWORD bufferSize = 10000;
     std::vector<wchar_t> buffer(bufferSize);
@@ -36,10 +36,10 @@ Zstring resolveRelativePath(Zstring relativeName) //note: ::GetFullPathName() is
                                                  bufferSize, //__in   DWORD nBufferLength,
                                                  &buffer[0], //__out  LPTSTR lpBuffer,
                                                  nullptr);   //__out  LPTSTR *lpFilePart
-    if (charsWritten == 0 || charsWritten >= bufferSize) //theoretically, charsWritten can never be == bufferSize
+    if (charsWritten == 0 || charsWritten >= bufferSize) //theoretically, charsWritten cannot be == "bufferSize"
         return relativeName; //ERROR! Don't do anything
 
-    return Zstring(&buffer[0], charsWritten);
+    return removeLongPathPrefix(Zstring(&buffer[0], charsWritten)); //GetFullPathName() preserves long path prefix -> a low-level detail we don't want to leak out!
 }
 
 #elif defined FFS_LINUX
@@ -347,7 +347,6 @@ Zstring volumePathToName(const Zstring& volumePath) //return empty string on err
         rv != DRIVE_CDROM)
     {
         std::vector<wchar_t> buffer(MAX_PATH + 1);
-
         if (::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
                                    &buffer[0],         //__out      LPTSTR lpVolumeNameBuffer,
                                    static_cast<DWORD>(buffer.size()), //__in       DWORD nVolumeNameSize,

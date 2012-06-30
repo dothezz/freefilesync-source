@@ -24,8 +24,6 @@ static const long oneYearFromNow = wxGetUTCTime() + 365 * 24 * 3600; //init at p
 class CmpFileTime
 {
 public:
-    CmpFileTime(size_t tolerance) : tolerance_(tolerance) {}
-
     enum Result
     {
         TIME_EQUAL,
@@ -35,9 +33,9 @@ public:
         TIME_RIGHT_INVALID
     };
 
-    Result getResult(const Int64& lhs, const Int64& rhs) const
+    static Result getResult(const Int64& lhs, const Int64& rhs, size_t tolerance)
     {
-        if (sameFileTime(lhs, rhs, tolerance_)) //last write time may differ by up to 2 seconds (NTFS vs FAT32)
+        if (sameFileTime(lhs, rhs, tolerance)) //last write time may differ by up to 2 seconds (NTFS vs FAT32)
             return TIME_EQUAL;
 
         //check for erroneous dates
@@ -53,9 +51,6 @@ public:
         else
             return TIME_LEFT_NEWER;
     }
-
-private:
-    const size_t tolerance_;
 };
 }
 

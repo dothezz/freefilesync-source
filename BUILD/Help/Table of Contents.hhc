@@ -28,7 +28,7 @@
 			<param name="Local" value="html\Batch Scripting.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Compare by file size">
+			<param name="Name" value="Compare by file size only">
 			<param name="Local" value="html\Compare by File Size.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">

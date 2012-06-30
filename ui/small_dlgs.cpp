@@ -9,7 +9,6 @@
 #include "msg_popup.h"
 #include "../lib/resources.h"
 #include "../algorithm.h"
-#include <wx+/string_conv.h>
 #include <wx+/format_unit.h>
 #include <wx+/choice_enum.h>
 #include "../synchronization.h"
@@ -25,6 +24,7 @@
 #include <wx+/image_tools.h>
 #include <zen/stl_tools.h>
 #include "../lib/hard_filter.h"
+#include "../version/version.h"
 
 using namespace zen;
 
@@ -44,7 +44,6 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 {
     m_bitmap9 ->SetBitmap(GlobalResources::getImage(L"website"));
     m_bitmap10->SetBitmap(GlobalResources::getImage(L"email"));
-    m_bitmap11->SetBitmap(GlobalResources::getImage(L"logo"));
     m_bitmap13->SetBitmap(GlobalResources::getImage(L"gpl"));
     //m_bitmapTransl->SetBitmap(GlobalResources::getImage(wxT("translation")));
     m_bitmapPaypal->SetBitmap(GlobalResources::getImage(L"paypal"));
@@ -71,6 +70,9 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
     bSizerTranslators->Fit(m_scrolledWindowTranslators);
 
+#ifdef FFS_WIN
+    new zen::MouseMoveWindow(*this); //-> put *after* creating credits
+#endif
 
     //build information
     wxString build = __TDATE__;
@@ -92,12 +94,33 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     //m_animationControl1->SetAnimation(GlobalResources::instance().animationMoney);
     //m_animationControl1->Play();
 
-    m_buttonOkay->SetFocus();
     Fit(); //child-element widths have changed: image was set
 
-#ifdef FFS_WIN
-    new zen::MouseMoveWindow(*this); //-> put *after* creating credit control
-#endif
+    //generate logo
+    //-> put *after* first Fit()
+    Layout(); //make sure m_panelLogo has final width (required by wxGTK)
+
+    wxBitmap bmpLogo;
+    {
+        wxImage tmp = GlobalResources::getImage(L"logo").ConvertToImage();
+        tmp.Resize(wxSize(m_panelLogo->GetClientSize().GetWidth(), tmp.GetHeight()), wxPoint(0, 0), 255, 255, 255); //enlarge to fit full width
+        bmpLogo = wxBitmap(tmp);
+    }
+    {
+        wxMemoryDC dc;
+        dc.SelectObject(bmpLogo);
+
+        dc.SetTextForeground(*wxBLACK);
+        dc.SetFont(wxFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"));
+        dc.DrawLabel(wxString(L"FreeFileSync ") + zen::currentVersion, wxNullBitmap, wxRect(0, 0, bmpLogo.GetWidth(), bmpLogo.GetHeight()), wxALIGN_CENTER);
+
+        dc.SelectObject(wxNullBitmap);
+    }
+    m_bitmap11->SetBitmap(bmpLogo);
+
+    Fit(); //child-element widths have changed: image was set
+
+    m_buttonOkay->SetFocus();
 }
 
 
@@ -170,7 +193,7 @@ FilterDlg::FilterDlg(wxWindow* parent,
     add(USIZE_KB,   _("KB")).
     add(USIZE_MB,   _("MB"));
 
-    m_bitmap26->SetBitmap(GlobalResources::getImage(L"filterOn"));
+    m_bitmap26->SetBitmap(GlobalResources::getImage(L"filter"));
     m_bpButtonHelp->SetBitmapLabel(GlobalResources::getImage(L"help"));
 
     setFilter(filter);

@@ -11,21 +11,24 @@
 #include <memory>
 #include "fixed_list.h"
 
+//fix this pathetic boost thread warning mess
 #ifdef __MINGW32__
 #pragma GCC diagnostic push
-
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-//#pragma GCC diagnostic ignored "-Wno-attributes"
-//#pragma GCC diagnostic ignored "-Wredundant-decls"
-//#pragma GCC diagnostic ignored "-Wcast-align"
-//#pragma GCC diagnostic ignored "-Wunused-value"
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
+#ifdef _MSC_VER
+#pragma warning(disable : 4702) //unreachable code
 #endif
 
 #include <boost/thread.hpp>
 
 #ifdef __MINGW32__
 #pragma GCC diagnostic pop
+#endif
+#ifdef _MSC_VER
+#pragma warning(default : 4702) //unreachable code
 #endif
 
 namespace zen
@@ -89,7 +92,7 @@ auto async2(Function fun) -> boost::unique_future<T> //workaround VS2010 bug: bo
     boost::packaged_task<T> pt([=] { return fun(); });
     auto fut = pt.get_future();
     boost::thread(std::move(pt));
-    return std::move(fut);
+    return std::move(fut); //compiler error without "move", why needed???
 }
 
 

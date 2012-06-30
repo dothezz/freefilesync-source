@@ -8,13 +8,13 @@
 #define BATCHSTATUSHANDLER_H_INCLUDED
 
 #include <zen/error_log.h>
+#include <zen/file_io.h>
 #include "../lib/status_handler.h"
 #include "../lib/process_xml.h"
 #include "progress_indicator.h"
 #include "switch_to_gui.h"
 #include "lib/return_codes.h"
 
-class LogFile;
 
 //Exception class used to abort the "compare" and "sync" process
 class BatchAbortProcess {};
@@ -55,7 +55,10 @@ private:
     zen::FfsReturnCode& returnCode_;
 
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
-    std::unique_ptr<LogFile> logFile; //optional!
+    std::unique_ptr<zen::FileOutput> logFile; //optional!
+
+    const std::wstring jobName_;
+    wxStopWatch totalTime;
 };
 
 

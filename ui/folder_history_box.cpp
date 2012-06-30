@@ -8,6 +8,7 @@
 #include <list>
 #include <wx/scrolwin.h>
 #include "../lib/resolve_path.h"
+#include <wx+/string_conv.h>
 
 using namespace zen;
 

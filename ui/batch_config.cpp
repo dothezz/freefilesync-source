@@ -14,7 +14,6 @@
 #include <zen/file_handling.h>
 #include "msg_popup.h"
 #include "gui_generated.h"
-//#include <wx/dnd.h>
 #include <wx/msgdlg.h>
 #include <wx+/button.h>
 #include <wx+/choice_enum.h>
@@ -504,7 +503,7 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
                             wxEmptyString,
                             wxEmptyString,
                             defaultFileName,
-                            _("FreeFileSync batch file") + L" (*.ffs_batch)|*.ffs_batch" + L"|" +_("All files") + L" (*.*)|*",
+                            _("FreeFileSync batch") + L" (*.ffs_batch)|*.ffs_batch" + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_SAVE | wxFD_OVERWRITE_PROMPT); //creating this on freestore leads to memleak!
     if (filePicker.ShowModal() == wxID_OK)
     {
@@ -523,7 +522,7 @@ void BatchDialog::OnLoadBatchJob(wxCommandEvent& event)
                             wxEmptyString,
                             beforeLast(proposedBatchFileName, utfCvrtTo<wxString>(FILE_NAME_SEPARATOR)), //set default dir: empty string if "currentConfigFileName" is empty or has no path separator
                             wxEmptyString,
-                            _("FreeFileSync batch file") + L" (*.ffs_batch;*.ffs_gui)|*.ffs_batch;*.ffs_gui" + L"|" +_("All files") + L" (*.*)|*",
+                            _("FreeFileSync batch") + L" (*.ffs_batch;*.ffs_gui)|*.ffs_batch;*.ffs_gui" + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN | wxFD_MULTIPLE); //creating this on freestore leads to memleak!
     if (filePicker.ShowModal() == wxID_OK)
     {

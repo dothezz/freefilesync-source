@@ -10,13 +10,12 @@
 #include "symlink_target.h"
 
 #ifdef FFS_WIN
-#include "win.h" //includes "windows.h"
+#include <zen/win_ver.h>
 #include "long_path_prefix.h"
 #include "dst_hack.h"
-#include "file_update_handle.h"
+#include "file_handling.h" //remove this huge dependency when getting rid of DST hack!! until then we need "setFileTime"
 #include "dll.h"
 #include "FindFilePlus/find_file_plus.h"
-#include <zen/win_ver.h>
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -179,11 +178,12 @@ struct Win32Traverser
 {
     struct DirHandle
     {
-        DirHandle() : searchHandle(nullptr), firstRead(true), firstData() {}
+        DirHandle() : searchHandle(nullptr), haveData(true), data() {}
 
         HANDLE searchHandle;
-        bool firstRead;
-        WIN32_FIND_DATA firstData;
+
+        bool haveData;
+        WIN32_FIND_DATA data;
     };
 
     typedef WIN32_FIND_DATA FindData;
@@ -192,7 +192,7 @@ struct Win32Traverser
     {
         const Zstring& directoryPf = appendSeparator(directory);
 
-        hnd.searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryPf + L'*').c_str(), &hnd.firstData);
+        hnd.searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryPf + L'*').c_str(), &hnd.data);
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
         if (hnd.searchHandle == INVALID_HANDLE_VALUE)
             throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
@@ -208,10 +208,10 @@ struct Win32Traverser
     template <class FallbackFun>
     static bool getEntry(DirHandle& hnd, const Zstring& directory, FindData& fileInfo, FallbackFun) //throw FileError
     {
-        if (hnd.firstRead)
+        if (hnd.haveData)
         {
-            hnd.firstRead = false;
-            ::memcpy(&fileInfo, &hnd.firstData, sizeof(fileInfo));
+            hnd.haveData = false;
+            ::memcpy(&fileInfo, &hnd.data, sizeof(fileInfo));
             return true;
         }
 
@@ -451,7 +451,7 @@ private:
                     if (dst::fatHasUtcEncoded(rawTime)) //throw std::runtime_error
                         fileInfo.lastWriteTimeRaw = toTimeT(dst::fatDecodeUtcTime(rawTime)); //return real UTC time; throw (std::runtime_error)
                     else
-                        markForDstHack.push_back(std::make_pair(fullName, Trav::getModTimeRaw(findData)));
+                        markForDstHack.push_back(std::make_pair(fullName, toTimeT(rawTime.writeTimeRaw)));
                 }
                 //####################################### DST hack ###########################################
 
@@ -467,52 +467,33 @@ private:
         int failedAttempts  = 0;
         int filesToValidate = 50; //don't let data verification become a performance issue
 
-        for (FilenameTimeList::const_iterator i = markForDstHack.begin(); i != markForDstHack.end(); ++i)
+        for (auto iter = markForDstHack.begin(); iter != markForDstHack.end(); ++iter)
         {
             if (failedAttempts >= 10) //some cloud storages don't support changing creation/modification times => don't waste (a lot of) time trying to
                 return;
 
-            dstCallback.requestUiRefresh(i->first);
+            dstCallback.requestUiRefresh(iter->first);
 
-            const dst::RawTime encodedTime = dst::fatEncodeUtcTime(i->second); //throw std::runtime_error
+            try
             {
-                //may need to remove the readonly-attribute (e.g. FAT usb drives)
-                FileUpdateHandle updateHandle(i->first, [=]
-                {
-                    return ::CreateFile(zen::applyLongPathPrefix(i->first).c_str(),
-                    FILE_WRITE_ATTRIBUTES,
-                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                    nullptr,
-                    OPEN_EXISTING,
-                    FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory
-                    nullptr);
-                });
-                if (updateHandle.get() == INVALID_HANDLE_VALUE)
-                {
-                    ++failedAttempts;
-                    assert(false); //don't throw exceptions due to dst hack here
-                    continue;
-                }
-
-                if (!::SetFileTime(updateHandle.get(),
-                                   &encodedTime.createTimeRaw,
-                                   nullptr,
-                                   &encodedTime.writeTimeRaw))
-                {
-                    ++failedAttempts;
-                    assert(false); //don't throw exceptions due to dst hack here
-                    continue;
-                }
+                //set modification time including DST hack: this function is too clever to not introduce this dependency
+                setFileTime(iter->first, iter->second, SYMLINK_FOLLOW); //throw FileError
+            }
+            catch (FileError&)
+            {
+                ++failedAttempts;
+                assert(false); //don't throw exceptions due to dst hack here
+                continue;
             }
 
             //even at this point it's not sure whether data was written correctly, again cloud storages tend to lie about success status
-            if (filesToValidate > 0)
+            if (filesToValidate-- > 0)
             {
-                --filesToValidate; //don't change during check!
+                const dst::RawTime encodedTime = dst::fatEncodeUtcTime(tofiletime(iter->second)); //throw std::runtime_error
 
                 //dst hack: verify data written; attention: this check may fail for "sync.ffs_lock"
                 WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
-                ::GetFileAttributesEx(zen::applyLongPathPrefix(i->first).c_str(), //__in   LPCTSTR lpFileName,
+                ::GetFileAttributesEx(zen::applyLongPathPrefix(iter->first).c_str(), //__in   LPCTSTR lpFileName,
                                       GetFileExInfoStandard,                //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
                                       &debugeAttr);                         //__out  LPVOID lpFileInformation
 
@@ -528,7 +509,7 @@ private:
     }
 
     const bool isFatFileSystem;
-    typedef std::vector<std::pair<Zstring, FILETIME> > FilenameTimeList;
+    typedef std::vector<std::pair<Zstring, Int64> > FilenameTimeList;
     FilenameTimeList markForDstHack;
     //####################################### DST hack ###########################################
 

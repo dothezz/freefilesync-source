@@ -9,17 +9,15 @@
 #include <wx/log.h>
 //#include <wx/msgdlg.h>
 #include <memory>
-#include <wx+/string_conv.h>
 #include <zen/last_error.h>
 #include <zen/thread.h> //includes <boost/thread.hpp>
 #include <zen/scope_guard.h>
 #include <zen/guid.h>
-#include <zen/file_io.h>
 #include <zen/tick_count.h>
 #include <zen/assert_static.h>
-#include <wx+/serialize.h>
 #include <zen/int64.h>
 #include <zen/file_handling.h>
+#include <wx+/serialize.h>
 
 #ifdef FFS_WIN
 #include <tlhelp32.h>
@@ -161,27 +159,6 @@ Zstring deleteAbandonedLockName(const Zstring& lockfilename) //make sure to NOT 
 }
 
 
-class CheckedLockReader : public CheckedReader
-{
-public:
-    CheckedLockReader(wxInputStream& stream, const Zstring& errorObjName) : CheckedReader(stream), errorObjName_(errorObjName) {}
-    virtual void throwException() const { throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(errorObjName_))); }
-
-private:
-    const Zstring errorObjName_;
-};
-
-class CheckedLockWriter : public CheckedWriter
-{
-public:
-    CheckedLockWriter(wxOutputStream& stream, const Zstring& errorObjName) : CheckedWriter(stream), errorObjName_(errorObjName) {}
-    virtual void throwException() const { throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(errorObjName_))); }
-
-private:
-    const Zstring errorObjName_;
-};
-
-
 #ifdef FFS_WIN
 std::wstring getLoginSid() //throw FileError
 {
@@ -273,35 +250,35 @@ struct LockInformation //throw FileError
     }
 #endif
 
-    explicit LockInformation(CheckedLockReader& reader)
+    explicit LockInformation(BinStreamIn& stream) //throw UnexpectedEndOfStreamError
     {
         char tmp[sizeof(LOCK_FORMAT_DESCR)] = {};
-        reader.readArray(&tmp, sizeof(tmp));                          //file format header
-        const int lockFileVersion = reader.readPOD<boost::int32_t>(); //
+        readArray(stream, &tmp, sizeof(tmp));                           //file format header
+        const int lockFileVersion = readNumber<boost::int32_t>(stream); //
 
         if (!std::equal(std::begin(tmp), std::end(tmp), std::begin(LOCK_FORMAT_DESCR)) ||
             lockFileVersion != LOCK_FORMAT_VER)
-            reader.throwException();
+            throw UnexpectedEndOfStreamError(); //well, not really...!?
 
-        reader.readString(lockId);
-        reader.readString(computerName);
-        reader.readString(userId);
-        reader.readString(sessionId);
-        processId = static_cast<decltype(processId)>(reader.readPOD<std::uint64_t>()); //[!] conversion
+        lockId       = readContainer<std::string>(stream); //
+        computerName = readContainer<std::string>(stream); //UnexpectedEndOfStreamError
+        userId       = readContainer<std::string>(stream); //
+        sessionId    = readContainer<std::string>(stream); //
+        processId = static_cast<decltype(processId)>(readNumber<std::uint64_t>(stream)); //[!] conversion
     }
 
-    void toStream(CheckedLockWriter& writer) const
+    void toStream(BinStreamOut& stream) const //throw ()
     {
-        writer.writeArray(LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
-        writer.writePOD<boost::int32_t>(LOCK_FORMAT_VER);
+        writeArray(stream, LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
+        writeNumber<boost::int32_t>(stream, LOCK_FORMAT_VER);
 
         assert_static(sizeof(processId) <= sizeof(std::uint64_t)); //ensure portability
 
-        writer.writeString(lockId);
-        writer.writeString(computerName);
-        writer.writeString(userId);
-        writer.writeString(sessionId);
-        writer.writePOD<std::uint64_t>(processId);
+        writeContainer(stream, lockId);
+        writeContainer(stream, computerName);
+        writeContainer(stream, userId);
+        writeContainer(stream, sessionId);
+        writeNumber<std::uint64_t>(stream, processId);
     }
 
     std::string lockId; //16 byte GUID - a universal identifier for this lock (no matter what the path is, considering symlinks, distributed network, etc.)
@@ -322,17 +299,23 @@ struct LockInformation //throw FileError
 
 void writeLockInfo(const Zstring& lockfilename) //throw FileError
 {
-    FileOutputStream stream(lockfilename); //throw FileError
-    CheckedLockWriter writer(stream, lockfilename);
-    LockInformation(FromCurrentProcess()).toStream(writer); //throw FileError
+    BinStreamOut streamOut;
+    LockInformation(FromCurrentProcess()).toStream(streamOut);
+    saveBinStream(lockfilename, streamOut.get()); //throw FileError
 }
 
 
 LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw FileError, ErrorNotExisting
 {
-    FileInputStream stream(lockfilename); //throw FileError, ErrorNotExisting
-    CheckedLockReader reader(stream, lockfilename);
-    return LockInformation(reader); //throw FileError
+    BinStreamIn streamIn = loadBinStream<BinaryStream>(lockfilename); //throw FileError, ErrorNotExisting
+    try
+    {
+        return LockInformation(streamIn); //throw UnexpectedEndOfStreamError
+    }
+    catch (UnexpectedEndOfStreamError&)
+    {
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(lockfilename)));
+    }
 }
 
 

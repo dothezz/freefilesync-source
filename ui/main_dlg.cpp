@@ -9,7 +9,6 @@
 #include <stdexcept>
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
-#include <wx/ffile.h>
 #include <wx/imaglist.h>
 #include <wx/wupdlock.h>
 #include <wx/msgdlg.h>
@@ -29,7 +28,6 @@
 #include "check_version.h"
 #include "gui_status_handler.h"
 #include "sync_cfg.h"
-#include <wx+/string_conv.h>
 #include "small_dlgs.h"
 #include <wx+/mouse_move_dlg.h>
 #include "progress_indicator.h"
@@ -45,6 +43,7 @@
 #include <wx+/toggle_button.h>
 #include "folder_pair.h"
 #include <wx+/rtl.h>
+#include <wx+/serialize.h>
 #include "search.h"
 #include "../lib/help_provider.h"
 #include "batch_config.h"
@@ -514,7 +513,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
                    wxAuiPaneInfo().Name(wxT("Panel6")).Layer(4).Bottom().Row(1).Position(2).Caption(_("Select view")).MinSize(m_bpButtonSyncDirNone->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_panelStatistics,
-                   wxAuiPaneInfo().Name(wxT("Panel7")).Layer(4).Bottom().Row(1).Position(3).Caption(_("Statistics")).MinSize(bSizerData->GetSize().GetWidth() / 2, m_panelStatistics->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(wxT("Panel7")).Layer(4).Bottom().Row(1).Position(3).Caption(_("Statistics")).MinSize(m_bitmapData->GetSize().GetWidth() + m_staticTextData->GetSize().GetWidth(), m_panelStatistics->GetSize().GetHeight()));
 
     auiMgr.Update();
 
@@ -601,11 +600,22 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
 
     //menu icons: workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
     MenuItemUpdater updateMenuFile(*m_menuFile);
-    updateMenuFile.markForUpdate(m_menuItem10,   GlobalResources::getImage(wxT("compareSmall")));
-    updateMenuFile.markForUpdate(m_menuItem11,   GlobalResources::getImage(wxT("syncSmall")));
-    //updateMenuFile.markForUpdate(m_menuItemNew,  GlobalResources::getImage(wxT("newSmall")));
-    updateMenuFile.markForUpdate(m_menuItemSave, GlobalResources::getImage(wxT("saveSmall")));
-    updateMenuFile.markForUpdate(m_menuItemLoad, GlobalResources::getImage(wxT("loadSmall")));
+
+    const int dummySize = 5;
+    wxImage dummyImg(dummySize, dummySize);
+    if (!dummyImg.HasAlpha())
+        dummyImg.InitAlpha();
+    std::fill(dummyImg.GetAlpha(), dummyImg.GetAlpha() + dummySize * dummySize, wxIMAGE_ALPHA_TRANSPARENT);
+
+    updateMenuFile.markForUpdate(m_menuItem10,   GlobalResources::getImage(L"compareSmall"));
+    updateMenuFile.markForUpdate(m_menuItem11,   GlobalResources::getImage(L"syncSmall"));
+
+    updateMenuFile.markForUpdate(m_menuItemNew,  dummyImg); //it's ridiculous, but wxWidgets screws up aligning short-cut label texts if we don't set an image!
+    //updateMenuFile.markForUpdate(m_menuItemSave, dummyImg); //
+    updateMenuFile.markForUpdate(m_menuItemSave, GlobalResources::getImage(L"saveSmall"));
+
+    //updateMenuFile.markForUpdate(m_menuItemSaveAs, GlobalResources::getImage(L"saveSmall"));
+    updateMenuFile.markForUpdate(m_menuItemLoad,   GlobalResources::getImage(L"loadSmall"));
 
     MenuItemUpdater updateMenuAdv(*m_menuAdvanced);
     updateMenuAdv.markForUpdate(m_menuItemGlobSett, GlobalResources::getImage(L"settingsSmall"));
@@ -613,7 +623,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
 
     MenuItemUpdater updateMenuHelp(*m_menuHelp);
     updateMenuHelp.markForUpdate(m_menuItemManual, GlobalResources::getImage(L"helpSmall"));
-    updateMenuHelp.markForUpdate(m_menuItemAbout, GlobalResources::getImage(L"aboutSmall"));
+    updateMenuHelp.markForUpdate(m_menuItemAbout,  GlobalResources::getImage(L"aboutSmall"));
 
 #ifdef FFS_LINUX
     m_menuItemCheckVer->Enable(zen::isPortableVersion()); //disable update check for Linux installer-based version -> handled by .deb
@@ -856,29 +866,6 @@ void MainDialog::setManualFilter(const std::vector<FileSystemObject*>& selection
 }
 
 
-void MainDialog::OnIdleEvent(wxEvent& event)
-{
-    //small routine to restore status information after some time
-    if (!stackObjects.empty())  //check if there is some work to do
-    {
-        wxMilliClock_t currentTime = wxGetLocalTimeMillis();
-        if (currentTime - lastStatusChange > 2500) //restore stackObject after two seconds
-        {
-            lastStatusChange = currentTime;
-
-            m_staticTextStatusMiddle->SetLabel(stackObjects.top());
-            stackObjects.pop();
-
-            if (stackObjects.empty())
-                m_staticTextStatusMiddle->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //reset color
-
-            m_panelStatusBar->Layout();
-        }
-    }
-
-    event.Skip();
-}
-
 namespace
 {
 //fast replacement for wxString modelling exponential growth
@@ -995,7 +982,6 @@ public:
         deletionCount(0)
     {
         mainDlg->disableAllElements(true); //disable everything except abort button
-        mainDlg->clearStatusBar();
 
         //register abort button
         mainDlg->m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ManualDeletionHandler::OnAbortDeletion), nullptr, this );
@@ -1021,7 +1007,7 @@ public:
 
         bool ignoreNextErrors = false;
         switch (showErrorDlg(mainDlg,
-                             ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
+                             ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
                              errorMessage, &ignoreNextErrors))
         {
             case ReturnErrorDlg::BUTTON_IGNORE:
@@ -1029,7 +1015,7 @@ public:
                 return DeleteFilesHandler::IGNORE_ERROR;
             case ReturnErrorDlg::BUTTON_RETRY:
                 return DeleteFilesHandler::RETRY;
-            case ReturnErrorDlg::BUTTON_ABORT:
+            case ReturnErrorDlg::BUTTON_CANCEL:
                 throw AbortDeleteProcess();
         }
 
@@ -1043,14 +1029,8 @@ public:
 
         if (updateUiIsAllowed())  //test if specific time span between ui updates is over
         {
-            wxString statusMessage = replaceCpy(_P("Object deleted successfully!", "%x objects deleted successfully!", deletionCount),
-                                                L"%x", zen::toGuiString(deletionCount), false);
-
-            if (mainDlg->m_staticTextStatusMiddle->GetLabel() != statusMessage)
-            {
-                mainDlg->m_staticTextStatusMiddle->SetLabel(statusMessage);
-                mainDlg->m_panelStatusBar->Layout();
-            }
+            mainDlg->setStatusInformation(replaceCpy(_P("Object deleted successfully!", "%x objects deleted successfully!", deletionCount),
+                                                     L"%x", zen::toGuiString(deletionCount), false));
             updateUiNow();
         }
 
@@ -1227,29 +1207,58 @@ void MainDialog::openExternalApplication(const wxString& commandline, const zen:
 }
 
 
-void MainDialog::pushStatusInformation(const wxString& text)
+void MainDialog::setStatusInformation(const wxString& msg)
 {
-    lastStatusChange = wxGetLocalTimeMillis();
-    stackObjects.push(m_staticTextStatusMiddle->GetLabel());
-    m_staticTextStatusMiddle->SetLabel(text);
-    m_staticTextStatusMiddle->SetForegroundColour(wxColour(31, 57, 226)); //highlight color: blue
-    m_panelStatusBar->Layout();
+    if (statusMsgStack.empty())
+    {
+        if (m_staticTextStatusMiddle->GetLabel() != msg)
+        {
+            m_staticTextStatusMiddle->SetLabel(msg);
+            m_panelStatusBar->Layout();
+        }
+    }
+    else
+        statusMsgStack[0] = msg; //statusMsgStack, index 0 is main status, while 1, 2, ... are temporary status texts in reverse order of screen appearance
 }
 
 
-void MainDialog::clearStatusBar()
+void MainDialog::flashStatusInformation(const wxString& text)
 {
-    while (!stackObjects.empty())
-        stackObjects.pop();
+    if (statusMsgStack.empty())
+    {
+        statusMsgStack.push_back(m_staticTextStatusMiddle->GetLabel());
 
-    m_staticTextStatusMiddle->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //reset color
-    bSizerStatusLeftDirectories->Show(false);
-    bSizerStatusLeftFiles      ->Show(false);
+        lastStatusChange = wxGetLocalTimeMillis();
+        m_staticTextStatusMiddle->SetLabel(text);
+        m_staticTextStatusMiddle->SetForegroundColour(wxColour(31, 57, 226)); //highlight color: blue
+        m_panelStatusBar->Layout();
+    }
+    else
+        statusMsgStack.insert(statusMsgStack.begin() + 1, text);
+}
 
-    m_staticTextStatusMiddle->SetLabel(wxEmptyString);
 
-    bSizerStatusRightDirectories->Show(false);
-    bSizerStatusRightFiles      ->Show(false);
+void MainDialog::OnIdleEvent(wxEvent& event)
+{
+    //small routine to restore status information after some time
+    if (!statusMsgStack.empty())  //check if there is some work to do
+    {
+        wxMilliClock_t currentTime = wxGetLocalTimeMillis();
+        if (currentTime - lastStatusChange > 2500) //restore stackObject after two seconds
+        {
+            lastStatusChange = currentTime;
+
+            m_staticTextStatusMiddle->SetLabel(statusMsgStack.back());
+            statusMsgStack.pop_back();
+
+            if (statusMsgStack.empty())
+                m_staticTextStatusMiddle->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //reset color
+
+            m_panelStatusBar->Layout();
+        }
+    }
+
+    event.Skip();
 }
 
 
@@ -1267,7 +1276,7 @@ void MainDialog::disableAllElements(bool enableAbort)
     m_bpButtonSyncConfig ->Disable();
     m_buttonStartSync    ->Disable();
     m_gridMain           ->Disable();
-    m_panelCenter        ->Disable();
+    m_gridMain           ->Disable();
     m_panelStatistics    ->Disable();
     m_gridNavi           ->Disable();
     m_panelDirectoryPairs->Disable();
@@ -1303,7 +1312,7 @@ void MainDialog::enableAllElements()
     m_bpButtonSyncConfig ->Enable();
     m_buttonStartSync    ->Enable();
     m_gridMain           ->Enable();
-    m_panelCenter        ->Enable();
+    m_gridMain           ->Enable();
     m_panelStatistics    ->Enable();
     m_gridNavi           ->Enable();
     m_panelDirectoryPairs->Enable();
@@ -1326,21 +1335,11 @@ namespace
 {
 void updateSizerOrientation(wxBoxSizer& sizer, wxWindow& window)
 {
-    if (window.GetSize().GetWidth() > window.GetSize().GetHeight()) //check window NOT sizer width!
+    const int newOrientation = window.GetSize().GetWidth() > window.GetSize().GetHeight() ? wxHORIZONTAL : wxVERTICAL; //check window NOT sizer width!
+    if (sizer.GetOrientation() != newOrientation)
     {
-        if (sizer.GetOrientation() != wxHORIZONTAL)
-        {
-            sizer.SetOrientation(wxHORIZONTAL);
-            window.Layout();
-        }
-    }
-    else
-    {
-        if (sizer.GetOrientation() != wxVERTICAL)
-        {
-            sizer.SetOrientation(wxVERTICAL);
-            window.Layout();
-        }
+        sizer.SetOrientation(newOrientation);
+        window.Layout();
     }
 }
 }
@@ -1360,7 +1359,27 @@ void MainDialog::OnResizeViewPanel(wxEvent& event)
 
 void MainDialog::OnResizeStatisticsPanel(wxEvent& event)
 {
-    updateSizerOrientation(*bSizerStatistics, *m_panelStatistics);
+    //updateSizerOrientation(*bSizerStatistics, *m_panelStatistics);
+
+    //we need something more fancy:
+    const int parentOrient = m_panelStatistics->GetSize().GetWidth() > m_panelStatistics->GetSize().GetHeight() ? wxHORIZONTAL : wxVERTICAL; //check window NOT sizer width!
+    if (bSizerStatistics->GetOrientation() != parentOrient)
+    {
+        bSizerStatistics->SetOrientation(parentOrient);
+
+        //apply opposite orientation for child sizers
+        const int childOrient = parentOrient == wxHORIZONTAL ? wxVERTICAL : wxHORIZONTAL;
+        wxSizerItemList& sl = bSizerStatistics->GetChildren();
+        for (auto iter = sl.begin(); iter != sl.end(); ++iter) //yet another wxWidgets bug keeps us from using std::for_each
+        {
+            wxSizerItem& szItem = **iter;
+            if (auto sizerChild = dynamic_cast<wxBoxSizer*>(szItem.GetSizer()))
+                if (sizerChild->GetOrientation() != childOrient)
+                    sizerChild->SetOrientation(childOrient);
+        }
+        m_panelStatistics->Layout();
+    }
+
     event.Skip();
 }
 
@@ -2202,7 +2221,29 @@ void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
 }
 
 
-void MainDialog::OnSaveConfig(wxCommandEvent& event)
+void MainDialog::OnConfigSave(wxCommandEvent& event)
+{
+    //if we work on a single named configuration document: save directly if changed
+    //else: always show file dialog
+    if (activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName())
+    {
+        const wxString filename = activeConfigFiles[0];
+
+        //don't overwrite .ffs_batch!
+        using namespace xmlAccess;
+        if (getXmlType(utfCvrtTo<Zstring>(filename)) == XML_TYPE_GUI) //throw()
+        {
+            if (lastConfigurationSaved != getConfig())
+                trySaveConfig(&filename);
+            return;
+        }
+    }
+
+    trySaveConfig(nullptr);
+}
+
+
+void MainDialog::OnConfigSaveAs(wxCommandEvent& event)
 {
     trySaveConfig(nullptr);
 }
@@ -2239,7 +2280,7 @@ bool MainDialog::trySaveConfig(const wxString* fileName) //return true if saved 
         xmlAccess::writeConfig(guiCfg, toZ(targetFilename)); //write config to XML
         setLastUsedConfig(targetFilename, guiCfg);
 
-        pushStatusInformation(_("Configuration saved!"));
+        flashStatusInformation(_("Configuration saved!"));
         return true;
     }
     catch (const xmlAccess::FfsXmlError& e)
@@ -2250,7 +2291,51 @@ bool MainDialog::trySaveConfig(const wxString* fileName) //return true if saved 
 }
 
 
-void MainDialog::OnLoadConfig(wxCommandEvent& event)
+bool MainDialog::saveOldConfig() //return false on user abort
+{
+    if (lastConfigurationSaved != getConfig())
+    {
+        //notify user about changed settings
+        if (globalSettings->optDialogs.popupOnConfigChange)
+            if (activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName())
+                //only if check is active and non-default config file loaded
+            {
+                const wxString filename = activeConfigFiles[0];
+
+                bool neverSave = !globalSettings->optDialogs.popupOnConfigChange;
+                CheckBox cb(_("Never save changes"), neverSave);
+
+                switch (showQuestionDlg(this,
+                                        ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
+                                        replaceCpy(_("Do you want to save changes to %x?"), L"%x", fmtFileName(afterLast(utfCvrtTo<Zstring>(filename), FILE_NAME_SEPARATOR))),
+                                        filename, //caption
+                                        _("Save"), _("Don't Save"),
+                                        &cb))
+                {
+                    case ReturnQuestionDlg::BUTTON_YES:
+
+                        using namespace xmlAccess;
+                        return trySaveConfig(getXmlType(utfCvrtTo<Zstring>(filename)) == XML_TYPE_GUI ? //don't overwrite .ffs_batch!
+                                             &filename :
+                                             nullptr);
+
+                    case ReturnQuestionDlg::BUTTON_NO:
+                        globalSettings->optDialogs.popupOnConfigChange = !neverSave;
+                        break;
+
+                    case ReturnQuestionDlg::BUTTON_CANCEL:
+                        return false;
+                }
+            }
+
+        //discard current config selection, this ensures next app start will load <last session> instead of the original non-modified config selection
+        setLastUsedConfig(std::vector<wxString>(), getConfig());
+    }
+    return true;
+}
+
+
+void MainDialog::OnConfigLoad(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this,
                             wxEmptyString,
@@ -2270,7 +2355,7 @@ void MainDialog::OnLoadConfig(wxCommandEvent& event)
 }
 
 
-void MainDialog::OnNewConfig(wxCommandEvent& event)
+void MainDialog::OnConfigNew(wxCommandEvent& event)
 {
     if (!saveOldConfig()) //notify user about changed settings
         return;
@@ -2305,45 +2390,6 @@ void MainDialog::OnLoadFromHistory(wxCommandEvent& event)
 }
 
 
-bool MainDialog::saveOldConfig() //return false on user abort
-{
-    if (lastConfigurationSaved != getConfig())
-    {
-        //notify user about changed settings
-        if (!globalSettings->optDialogs.popupOnConfigChange)
-            //discard current config selection, this ensures next app start will load <last session> instead of the original non-modified config selection
-            setLastUsedConfig(std::vector<wxString>(), getConfig());
-        else if (activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() /*|| activeConfigFiles.size() > 1*/)
-            //only if check is active and non-default config file loaded
-        {
-            const wxString filename = activeConfigFiles[0];
-
-            bool neverSave = !globalSettings->optDialogs.popupOnConfigChange;
-            CheckBox cb(_("Never save changes"), neverSave);
-
-            switch (showQuestionDlg(this,
-                                    ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
-                                    _("Save changes to current configuration?"), &cb))
-            {
-                case ReturnQuestionDlg::BUTTON_YES:
-                    return trySaveConfig(endsWith(filename, L".ffs_gui") ? &filename : nullptr); //don't overwrite .ffs_batch!
-
-                case ReturnQuestionDlg::BUTTON_NO:
-                    globalSettings->optDialogs.popupOnConfigChange = !neverSave;
-                    //by choosing "no" user actively discards current config selection
-                    //this ensures next app start will load <last session> instead of the original non-modified config selection
-                    setLastUsedConfig(std::vector<wxString>(), getConfig());
-                    break;
-
-                case ReturnQuestionDlg::BUTTON_CANCEL:
-                    return false;
-            }
-        }
-    }
-    return true;
-}
-
-
 void MainDialog::loadConfiguration(const wxString& filename)
 {
     std::vector<wxString> filenames;
@@ -2369,7 +2415,7 @@ void MainDialog::loadConfiguration(const std::vector<wxString>& filenames)
         xmlAccess::convertConfig(toZ(filenames), newGuiCfg); //throw FfsXmlError
 
         setLastUsedConfig(filenames, newGuiCfg);
-        pushStatusInformation(_("Configuration loaded!"));
+        //flashStatusInformation(_("Configuration loaded!")); -> irrelvant!?
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
@@ -2434,7 +2480,7 @@ void MainDialog::OnClose(wxCloseEvent& event)
         const bool cancelled = !saveOldConfig(); //notify user about changed settings
         if (cancelled)
         {
-            //attention: this Veto() would NOT cancel system shutdown since saveOldConfig() shows modal dialog
+            //attention: this Veto() will NOT cancel system shutdown since saveOldConfig() blocks on modal dialog
 
             event.Veto();
             return;
@@ -2892,7 +2938,6 @@ void MainDialog::updateFilterButtons()
 void MainDialog::OnCompare(wxCommandEvent& event)
 {
     //PERF_START;
-    clearStatusBar();
 
     wxBusyCursor dummy; //show hourglass cursor
 
@@ -2961,7 +3006,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
 
     //prepare status information
     if (allElementsEqual(folderCmp))
-        pushStatusInformation(_("All directories in sync!"));
+        flashStatusInformation(_("All directories in sync!"));
 }
 
 
@@ -3097,8 +3142,6 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
 
         if (folderCmp.empty()) //check if user aborted or error occured, ect...
             return;
-        //pushStatusInformation(_("Please run a Compare first before synchronizing!"));
-        //return;
     }
 
     //show sync preview screen
@@ -3117,7 +3160,6 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
 
     wxBusyCursor dummy; //show hourglass cursor
 
-    clearStatusBar();
     try
     {
         //PERF_START;
@@ -3421,8 +3463,6 @@ void MainDialog::updateGridViewData()
     //status bar
     wxWindowUpdateLocker dummy(m_panelStatusBar); //avoid display distortion
 
-    clearStatusBar();
-
     //#################################################
     //update status information
     bSizerStatusLeftDirectories->Show(foldersOnLeftView > 0);
@@ -3440,7 +3480,7 @@ void MainDialog::updateGridViewData()
             replace(statusMiddleNew, L"%x", toGuiString(gridDataView->rowsOnView()), false);
             replace(statusMiddleNew, L"%y", toGuiString(gridDataView->rowsTotal ()), false);
         }
-        setText(*m_staticTextStatusMiddle, statusMiddleNew);
+        setStatusInformation(statusMiddleNew);
     }
 
     bSizerStatusRightDirectories->Show(foldersOnRightView > 0);
@@ -3734,46 +3774,46 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
     if (filePicker.ShowModal() != wxID_OK)
         return;
 
-    const wxString newFileName = filePicker.GetPath();
+    const Zstring filename = utfCvrtTo<Zstring>(filePicker.GetPath());
 
-    typedef Zbase<char> UtfString; //perf: wxString doesn't model exponential growth and so is out, std::string doesn't give performance guarantee!
-    UtfString exportString;
+    Utf8String buffer; //perf: wxString doesn't model exponential growth and so is out, std::string doesn't give performance guarantee!
+    buffer += BYTE_ORDER_MARK_UTF8;
 
     //write legend
-    exportString +=  utfCvrtTo<UtfString>(_("Legend")) + '\n';
+    buffer +=  utfCvrtTo<Utf8String>(_("Legend")) + '\n';
     if (showSyncAction_)
     {
-        exportString += "\"" + utfCvrtTo<UtfString>(getSyncOpDescription(SO_EQUAL))               + "\";" + utfCvrtTo<UtfString>(getSymbol(SO_EQUAL))               + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getSyncOpDescription(SO_CREATE_NEW_LEFT))     + "\";" + utfCvrtTo<UtfString>(getSymbol(SO_CREATE_NEW_LEFT))     + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getSyncOpDescription(SO_CREATE_NEW_RIGHT))    + "\";" + utfCvrtTo<UtfString>(getSymbol(SO_CREATE_NEW_RIGHT))    + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getSyncOpDescription(SO_OVERWRITE_LEFT))      + "\";" + utfCvrtTo<UtfString>(getSymbol(SO_OVERWRITE_LEFT))      + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getSyncOpDescription(SO_OVERWRITE_RIGHT))     + "\";" + utfCvrtTo<UtfString>(getSymbol(SO_OVERWRITE_RIGHT))     + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getSyncOpDescription(SO_DELETE_LEFT))         + "\";" + utfCvrtTo<UtfString>(getSymbol(SO_DELETE_LEFT))         + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getSyncOpDescription(SO_DELETE_RIGHT))        + "\";" + utfCvrtTo<UtfString>(getSymbol(SO_DELETE_RIGHT))        + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getSyncOpDescription(SO_DO_NOTHING))          + "\";" + utfCvrtTo<UtfString>(getSymbol(SO_DO_NOTHING))          + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getSyncOpDescription(SO_UNRESOLVED_CONFLICT)) + "\";" + utfCvrtTo<UtfString>(getSymbol(SO_UNRESOLVED_CONFLICT)) + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_EQUAL))               + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_EQUAL))               + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_CREATE_NEW_LEFT))     + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_CREATE_NEW_LEFT))     + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_CREATE_NEW_RIGHT))    + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_CREATE_NEW_RIGHT))    + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_OVERWRITE_LEFT))      + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_OVERWRITE_LEFT))      + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_OVERWRITE_RIGHT))     + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_OVERWRITE_RIGHT))     + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_DELETE_LEFT))         + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_DELETE_LEFT))         + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_DELETE_RIGHT))        + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_DELETE_RIGHT))        + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_DO_NOTHING))          + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_DO_NOTHING))          + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_UNRESOLVED_CONFLICT)) + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_UNRESOLVED_CONFLICT)) + '\n';
     }
     else
     {
-        exportString += "\"" + utfCvrtTo<UtfString>(getCategoryDescription(FILE_EQUAL))           + "\";" + utfCvrtTo<UtfString>(getSymbol(FILE_EQUAL))           + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getCategoryDescription(FILE_DIFFERENT))       + "\";" + utfCvrtTo<UtfString>(getSymbol(FILE_DIFFERENT))       + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getCategoryDescription(FILE_LEFT_SIDE_ONLY))  + "\";" + utfCvrtTo<UtfString>(getSymbol(FILE_LEFT_SIDE_ONLY))  + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getCategoryDescription(FILE_RIGHT_SIDE_ONLY)) + "\";" + utfCvrtTo<UtfString>(getSymbol(FILE_RIGHT_SIDE_ONLY)) + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getCategoryDescription(FILE_LEFT_NEWER))      + "\";" + utfCvrtTo<UtfString>(getSymbol(FILE_LEFT_NEWER))      + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getCategoryDescription(FILE_RIGHT_NEWER))     + "\";" + utfCvrtTo<UtfString>(getSymbol(FILE_RIGHT_NEWER))     + '\n';
-        exportString += "\"" + utfCvrtTo<UtfString>(getCategoryDescription(FILE_CONFLICT))        + "\";" + utfCvrtTo<UtfString>(getSymbol(FILE_CONFLICT))        + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_EQUAL))           + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_EQUAL))           + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_DIFFERENT))       + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_DIFFERENT))       + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_LEFT_SIDE_ONLY))  + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_LEFT_SIDE_ONLY))  + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_RIGHT_SIDE_ONLY)) + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_RIGHT_SIDE_ONLY)) + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_LEFT_NEWER))      + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_LEFT_NEWER))      + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_RIGHT_NEWER))     + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_RIGHT_NEWER))     + '\n';
+        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_CONFLICT))        + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_CONFLICT))        + '\n';
     }
-    exportString += '\n';
+    buffer += '\n';
 
     //base folders
-    exportString += utfCvrtTo<UtfString>(_("Folder pairs")) + '\n' ;
+    buffer += utfCvrtTo<Utf8String>(_("Folder pairs")) + '\n' ;
     std::for_each(begin(folderCmp), end(folderCmp),
                   [&](BaseDirMapping& baseMap)
     {
-        exportString += utfCvrtTo<UtfString>(baseMap.getBaseDirPf<LEFT_SIDE >()) + ';';
-        exportString += utfCvrtTo<UtfString>(baseMap.getBaseDirPf<RIGHT_SIDE>()) + '\n';
+        buffer += utfCvrtTo<Utf8String>(baseMap.getBaseDirPf<LEFT_SIDE >()) + ';';
+        buffer += utfCvrtTo<Utf8String>(baseMap.getBaseDirPf<RIGHT_SIDE>()) + '\n';
     });
-    exportString += '\n';
+    buffer += '\n';
 
     //write header
     auto provLeft   = m_gridMain->getDataProvider(gridview::COMP_LEFT);
@@ -3791,9 +3831,9 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
     auto addCellValue = [&](const wxString& val)
     {
         if (val.find(L';') != wxString::npos)
-            exportString += '\"' + utfCvrtTo<UtfString>(val) + '\"';
+            buffer += '\"' + utfCvrtTo<Utf8String>(val) + '\"';
         else
-            exportString += utfCvrtTo<UtfString>(val);
+            buffer += utfCvrtTo<Utf8String>(val);
     };
 
     if (provLeft && provMiddle && provRight)
@@ -3802,13 +3842,13 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
                       [&](const Grid::ColumnAttribute& ca)
         {
             addCellValue(provLeft->getColumnLabel(ca.type_));
-            exportString += ';';
+            buffer += ';';
         });
         std::for_each(colAttrMiddle.begin(), colAttrMiddle.end(),
                       [&](const Grid::ColumnAttribute& ca)
         {
             addCellValue(provMiddle->getColumnLabel(ca.type_));
-            exportString += ';';
+            buffer += ';';
         });
         if (!colAttrRight.empty())
         {
@@ -3816,11 +3856,11 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
                           [&](const Grid::ColumnAttribute& ca)
             {
                 addCellValue(provRight->getColumnLabel(ca.type_));
-                exportString += ';';
+                buffer += ';';
             });
             addCellValue(provRight->getColumnLabel(colAttrRight.back().type_));
         }
-        exportString += '\n';
+        buffer += '\n';
 
         //main grid
         const size_t rowCount = m_gridMain->getRowCount();
@@ -3830,13 +3870,13 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
                           [&](const Grid::ColumnAttribute& ca)
             {
                 addCellValue(provLeft->getValue(row, ca.type_));
-                exportString += ';';
+                buffer += ';';
             });
             std::for_each(colAttrMiddle.begin(), colAttrMiddle.end(),
                           [&](const Grid::ColumnAttribute& ca)
             {
                 addCellValue(provMiddle->getValue(row, ca.type_));
-                exportString += ';';
+                buffer += ';';
             });
             if (!colAttrRight.empty())
             {
@@ -3844,23 +3884,26 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
                               [&](const Grid::ColumnAttribute& ca)
                 {
                     addCellValue(provRight->getValue(row, ca.type_));
-                    exportString += ';';
+                    buffer += ';';
                 });
                 addCellValue(provRight->getValue(row, colAttrRight.back().type_));
             }
-            exportString += '\n';
+            buffer += '\n';
         }
 
-        //write export file
-        wxFFile output(newFileName.c_str(), L"w"); //don't write in binary mode
-        if (output.IsOpened())
+        //write file
+        try
         {
-            output.Write(BYTE_ORDER_MARK_UTF8, sizeof(BYTE_ORDER_MARK_UTF8) - 1);
-            output.Write(exportString.c_str(), exportString.size());
-            pushStatusInformation(_("File list exported!"));
+            replace(buffer, '\n', LINE_BREAK);
+
+            saveBinStream(filename, buffer); //throw FileError
+
+            flashStatusInformation(_("File list exported!"));
         }
-        else
-            wxMessageBox(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(toZ(newFileName))), _("Error"), wxOK | wxICON_ERROR, this);
+        catch (const FileError& e)
+        {
+            wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR, this);
+        }
     }
 }
 

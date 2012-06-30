@@ -4,8 +4,8 @@
 // * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
-#ifndef PTR_WRAP_012384670856841394535
-#define PTR_WRAP_012384670856841394535
+#ifndef FIXED_LIST_01238467085684139453534
+#define FIXED_LIST_01238467085684139453534
 
 #include <iterator>
 
@@ -19,12 +19,13 @@ class FixedList
     struct Node
     {
         Node() : next(nullptr), val() {}
-        template <class A>                                              Node(A&& a)                                    : next(nullptr), val(a) {}
-        template <class A, class B>                                     Node(A&& a, B&& b)                             : next(nullptr), val(a, b) {}
-        template <class A, class B, class C>                            Node(A&& a, B&& b, C&& c)                      : next(nullptr), val(a, b, c) {}
-        template <class A, class B, class C, class D>                   Node(A&& a, B&& b, C&& c, D&& d)               : next(nullptr), val(a, b, c, d) {}
-        template <class A, class B, class C, class D, class E>          Node(A&& a, B&& b, C&& c, D&& d, E&& e)        : next(nullptr), val(a, b, c, d, e) {}
-        template <class A, class B, class C, class D, class E, class F> Node(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f) : next(nullptr), val(a, b, c, d, e, f) {}
+		//no variadic templates on VC2010... :(
+        template <class A>                                              Node(A&& a)                                    : next(nullptr), val(std::forward<A>(a)) {}
+        template <class A, class B>                                     Node(A&& a, B&& b)                             : next(nullptr), val(std::forward<A>(a), std::forward<B>(b)) {}
+        template <class A, class B, class C>                            Node(A&& a, B&& b, C&& c)                      : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c)) {}
+        template <class A, class B, class C, class D>                   Node(A&& a, B&& b, C&& c, D&& d)               : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d)) {}
+        template <class A, class B, class C, class D, class E>          Node(A&& a, B&& b, C&& c, D&& d, E&& e)        : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e)) {}
+        template <class A, class B, class C, class D, class E, class F> Node(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f) : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f)) {}
 
         Node* next; //singly linked list is sufficient
         T val;
@@ -36,16 +37,7 @@ public:
         lastInsert(nullptr),
         sz(0) {}
 
-    ~FixedList()
-    {
-        Node* ptr = first;
-        while (ptr)
-        {
-            Node* tmp = ptr;
-            ptr = ptr->next;
-            delete tmp;
-        }
-    }
+    ~FixedList() { clear(); }
 
     template <class NodeT, class U>
     class ListIterator : public std::iterator<std::forward_iterator_tag, U>
@@ -72,6 +64,9 @@ public:
 
     const_iterator begin() const { return first; }
     const_iterator end  () const { return const_iterator(); }
+
+    const_iterator cbegin() const { return first; }
+    const_iterator cend  () const { return const_iterator(); }
 
     reference       front()       { return first->val; }
     const_reference front() const { return first->val; }
@@ -112,7 +107,20 @@ public:
             }
     }
 
-    void clear() { remove_if([](T&) { return true; }); }
+    void clear()
+    {
+        Node* ptr = first;
+        while (ptr)
+        {
+            Node* tmp = ptr;
+            ptr = ptr->next;
+            delete tmp;
+        }
+
+        first = lastInsert = nullptr;
+        sz = 0;
+    }
+
     bool empty() const { return first == nullptr; }
     size_t size() const { return sz; }
 
@@ -120,7 +128,7 @@ private:
     FixedList(const FixedList&);
     FixedList& operator=(const FixedList&);
 
-    void pushNode(Node* newNode)
+    void pushNode(Node* newNode) //throw()
     {
         ++sz;
         if (lastInsert == nullptr)
@@ -144,10 +152,9 @@ private:
     }
 
     Node* first;
-    Node* lastInsert; //point to last insertion; required by emplace_back()
+    Node* lastInsert; //point to last insertion; required by efficient emplace_back()
     size_t sz;
 };
 }
 
-
-#endif //PTR_WRAP_012384670856841394535
+#endif //FIXED_LIST_01238467085684139453534

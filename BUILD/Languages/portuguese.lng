@@ -58,12 +58,6 @@
 <source>About</source>
 <target>Sobre</target>
 
-<source>Warning</source>
-<target>Atenção</target>
-
-<source>Question</source>
-<target>Questão</target>
-
 <source>Confirm</source>
 <target>Confirmar</target>
 
@@ -109,6 +103,9 @@
 <source>Info</source>
 <target>Info</target>
 
+<source>Warning</source>
+<target>Atenção</target>
+
 <source>Fatal Error</source>
 <target>Erro crítico</target>
 
@@ -139,12 +136,6 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source>Cannot read file %x.</source>
-<target>Não é possível ler o ficheiro %x.</target>
-
-<source>Cannot write file %x.</source>
-<target>Não é possível escrever o ficheiro %x.</target>
-
 <source>Database file %x is incompatible.</source>
 <target>Base de dados %x não é compatível.</target>
 
@@ -154,8 +145,17 @@
 <source>Database file %x does not yet exist.</source>
 <target>Base de dados %x não existe.</target>
 
+<source>Database file is corrupt:</source>
+<target></target>
+
 <source>Out of memory!</source>
 <target>Sem memória disponível!</target>
+
+<source>Cannot write file %x.</source>
+<target>Não é possível escrever o ficheiro %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Não é possível ler o ficheiro %x.</target>
 
 <source>Database files do not share a common session.</source>
 <target>As bases de dados são de sessões diferentes.</target>
@@ -205,6 +205,9 @@
 <source>/sec</source>
 <target>/seg</target>
 
+<source>Cannot find file %x.</source>
+<target>Não é possível encontrar o ficheiro %x.</target>
+
 <source>File %x does not contain a valid configuration.</source>
 <target>Ficheiro %x não tem uma configuração válida.</target>
 
@@ -229,14 +232,11 @@
 <source>Cannot read the following XML elements:</source>
 <target>Não é possível ler os elementos XML:</target>
 
-<source>Cannot find file %x.</source>
-<target>Não é possível encontrar o ficheiro %x.</target>
-
 <source>&Open...</source>
 <target>&Abrir...</target>
 
-<source>&Save...</source>
-<target>&Guardar...</target>
+<source>Save &As...</source>
+<target></target>
 
 <source>&Quit</source>
 <target>S&air</target>
@@ -312,8 +312,8 @@ O comando é executado se:
 <source>(Build: %x)</source>
 <target>(Build: %x)</target>
 
-<source>RealtimeSync configuration</source>
-<target>Configuração do RealtimeSync</target>
+<source>All files</source>
+<target></target>
 
 <source>&Restore</source>
 <target>&Restaurar</target>
@@ -327,8 +327,8 @@ O comando é executado se:
 <source>Waiting for missing directories...</source>
 <target>A aguardar pelos directórios em falta...</target>
 
-<source>An input folder name is empty.</source>
-<target>Um dos campos de comparação está vazio.</target>
+<source>A folder input field is empty.</source>
+<target></target>
 
 <source>Logging</source>
 <target>A escrever em log</target>
@@ -351,11 +351,8 @@ O comando é executado se:
 <source>Custom</source>
 <target>Personalizado</target>
 
-<source>FreeFileSync batch file</source>
-<target>FreeFileSync ficheiro batch</target>
-
-<source>FreeFileSync configuration</source>
-<target>FreeFileSync configuração</target>
+<source>FreeFileSync batch</source>
+<target></target>
 
 <source>Batch execution</source>
 <target>Execução do batch</target>
@@ -393,17 +390,17 @@ O comando é executado se:
 <source>Unable to connect to sourceforge.net!</source>
 <target>Não é possível ligar a sourceforge.net!</target>
 
-<source>A newer version of FreeFileSync is available:</source>
-<target>Mais recente versão do FreeFileSync disponível:</target>
+<source>A new version of FreeFileSync is available:</source>
+<target></target>
 
 <source>Download now?</source>
 <target>Fazer download agora?</target>
 
-<source>Information</source>
-<target>Informação</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>FreeFileSync está actualizado!</target>
+
+<source>Information</source>
+<target>Informação</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Deseja que o FreeFileSync procure automaticamente actualizações todas as semanas?</target>
@@ -438,6 +435,12 @@ O comando é executado se:
 <source>Extension</source>
 <target>Extensão</target>
 
+<source>Size:</source>
+<target></target>
+
+<source>Date:</source>
+<target></target>
+
 <source>Action</source>
 <target>Ação</target>
 
@@ -470,6 +473,9 @@ O comando é executado se:
 
 <source>&New</source>
 <target>&Novo</target>
+
+<source>&Save</source>
+<target></target>
 
 <source>&Language</source>
 <target>&Língua</target>
@@ -537,11 +543,8 @@ O comando é executado se:
 <source>Number of files and folders that will be deleted</source>
 <target>Número de ficheiros e pastas a ser eliminados</target>
 
-<source>Total amount of data that will be transferred</source>
-<target>Volume de dados a ser transferido</target>
-
-<source>Operation:</source>
-<target>Operação:</target>
+<source>Total bytes to copy</source>
+<target></target>
 
 <source>Items found:</source>
 <target>Elementos encontrados:</target>
@@ -549,11 +552,11 @@ O comando é executado se:
 <source>Speed:</source>
 <target>Velocidade:</target>
 
-<source>Remaining time:</source>
-<target>Tempo restante:</target>
+<source>Time remaining:</source>
+<target></target>
 
-<source>Elapsed time:</source>
-<target>Tempo passado:</target>
+<source>Time elapsed:</source>
+<target></target>
 
 <source>Batch job</source>
 <target>Ficheiro Batch</target>
@@ -674,6 +677,15 @@ Os ficheiros são considerados iguais se
 <source>Source code written in C++ utilizing:</source>
 <target>Código fonte escrito em C++ utilizando:</target>
 
+<source>If you like FreeFileSync</source>
+<target>Se gosta do FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Doar usando PayPal</target>
+
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Pela tradução de FreeFileSync, um agradecimento a:</target>
+
 <source>Feedback and suggestions are welcome</source>
 <target>Comentários e sugestões são apreciados</target>
 
@@ -686,38 +698,8 @@ Os ficheiros são considerados iguais se
 <source>Email</source>
 <target>Email</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Pela tradução de FreeFileSync, um agradecimento a:</target>
-
-<source>If you like FreeFileSync</source>
-<target>Se gosta do FreeFileSync</target>
-
-<source>Donate with PayPal</source>
-<target>Doar usando PayPal</target>
-
 <source>Published under the GNU General Public License</source>
 <target>Publicado sobre GNU General Public License</target>
-
-<source>Ignore further errors</source>
-<target>Ignorar próximos erros</target>
-
-<source>Hide further error messages during the current process</source>
-<target>Ocultar próximas mensagens de erro durante este processo</target>
-
-<source>&Ignore</source>
-<target>&Ignorar</target>
-
-<source>Do not show this dialog again</source>
-<target>Não mostrar este diálogo novamente</target>
-
-<source>&Switch</source>
-<target>&Trocar</target>
-
-<source>&Yes</source>
-<target>&Sim</target>
-
-<source>&No</source>
-<target>&Não</target>
 
 <source>Use Recycle Bin</source>
 <target>Utilizar Reciclagem</target>
@@ -790,6 +772,9 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 
 <source>Statistics</source>
 <target>Estatísticas</target>
+
+<source>Do not show this dialog again</source>
+<target>Não mostrar este diálogo novamente</target>
 
 <source>Find what:</source>
 <target>Procurar:</target>
@@ -869,8 +854,14 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Never save changes</source>
 <target>Nunca guardar alterações</target>
 
-<source>Save changes to current configuration?</source>
-<target>Guardar alterações à configuração?</target>
+<source>Do you want to save changes to %x?</source>
+<target></target>
+
+<source>Save</source>
+<target></target>
+
+<source>Don't Save</source>
+<target></target>
 
 <source>Configuration loaded!</source>
 <target>Configuração carregada!</target>
@@ -965,9 +956,6 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>All directories in sync!</source>
 <target>Todas as pastas sincronizadas!</target>
 
-<source>Please run a Compare first before synchronizing!</source>
-<target>Use Comparar antes da primeira sincronização!</target>
-
 <source>Comma separated list</source>
 <target>Lista de itens separados por vírgulas</target>
 
@@ -1012,6 +1000,24 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <pluralform>%x de 1 linha em vista</pluralform>
 <pluralform>%x de %y linhas em vista</pluralform>
 </target>
+
+<source>Ignore further errors</source>
+<target>Ignorar próximos erros</target>
+
+<source>&Ignore</source>
+<target>&Ignorar</target>
+
+<source>&Switch</source>
+<target>&Trocar</target>
+
+<source>Question</source>
+<target>Questão</target>
+
+<source>&Yes</source>
+<target>&Sim</target>
+
+<source>&No</source>
+<target>&Não</target>
 
 <source>Scanning...</source>
 <target>A pesquisar...</target>
@@ -1193,6 +1199,9 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Cannot delete directory %x.</source>
 <target>Não é possível eliminar o directório %x.</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Não é possível escrever os atributos de %x.</target>
+
 <source>Cannot write modification time of %x.</source>
 <target>Não é possível alterar a data de modificação a %x.</target>
 
@@ -1216,9 +1225,6 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Não é possível copiar o link simbólico %x para %y.</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Não é possível escrever os atributos de %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Não é possível copiar o ficheiro %x para %y.</target>
@@ -1244,11 +1250,8 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>No change since last synchronization!</source>
 <target>Não há alterações desde a última sincronização!</target>
 
-<source>Filter settings have changed!</source>
-<target>Opções de filtro alteradas!</target>
-
-<source>The file was not processed by last synchronization!</source>
-<target>O ficheiro não foi processado na última sincronização!</target>
+<source>The corresponding database entries are not in sync considering current settings.</source>
+<target></target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Escolher direcção de sincronização por defeito: Os ficheiros antigos serão substituídos pelos novos.</target>
@@ -1376,14 +1379,14 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Updating attributes of %x</source>
 <target>Actualizar atributos de %x</target>
 
-<source>Target folder name must not be empty.</source>
-<target>Nome da pasta de destino não pode estar vazio.</target>
+<source>Target folder input field must not be empty.</source>
+<target></target>
 
-<source>Folder name for file versioning must not be empty.</source>
-<target>Nome da pasta para manter versões não pode estar vazio.</target>
+<source>Folder input field for versioning must not be empty.</source>
+<target></target>
 
-<source>Source directory %x not found.</source>
-<target>Directório fonte %x não encontrado.</target>
+<source>Source folder %x not found.</source>
+<target></target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Existem conflitos por resolver!</target>
@@ -1400,11 +1403,11 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Not enough free disk space available in:</source>
 <target>Não há espaço livre suficiente em:</target>
 
-<source>Free disk space required:</source>
-<target>Espaço livre necessário em disco:</target>
+<source>Required:</source>
+<target></target>
 
-<source>Free disk space available:</source>
-<target>Espaço livre disponível em disco:</target>
+<source>Available:</source>
+<target></target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Reciclagem não disponível para os seguintes caminhos! Os ficheiros serão apagados permanentemente:</target>
@@ -1414,6 +1417,9 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 
 <source>Processing folder pair:</source>
 <target>A processar o par do directorio:</target>
+
+<source>Target folder %x already existing.</source>
+<target></target>
 
 <source>Generating database...</source>
 <target>A gerar base de dados...</target>

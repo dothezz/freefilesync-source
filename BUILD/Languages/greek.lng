@@ -58,12 +58,6 @@
 <source>About</source>
 <target>Σχετικά με το...</target>
 
-<source>Warning</source>
-<target>Προειδοποίηση</target>
-
-<source>Question</source>
-<target>Ερώτηση</target>
-
 <source>Confirm</source>
 <target>Επιβεβαίωση</target>
 
@@ -109,6 +103,9 @@
 <source>Info</source>
 <target>Πληροφορία</target>
 
+<source>Warning</source>
+<target>Προειδοποίηση</target>
+
 <source>Fatal Error</source>
 <target>Σημαντικό Σφάλμα</target>
 
@@ -139,12 +136,6 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source>Cannot read file %x.</source>
-<target>Δεν μπορεί να γίνει ανάγνωση του αρχείου %x.</target>
-
-<source>Cannot write file %x.</source>
-<target>Δεν μπορεί να γίνει εγγραφή του αρχείου %x.</target>
-
 <source>Database file %x is incompatible.</source>
 <target>Το αρχείο βάσης δεδομένων %x δεν είναι συμβατό</target>
 
@@ -154,8 +145,17 @@
 <source>Database file %x does not yet exist.</source>
 <target>Το αρχείο βάσης δεδομένων %x δεν υπάρχει ακόμα.</target>
 
+<source>Database file is corrupt:</source>
+<target>Το αρχείο βάσης δεδομένων είναι αλλοιωμένο:</target>
+
 <source>Out of memory!</source>
 <target>Ανεπαρκής μνήμη!</target>
+
+<source>Cannot write file %x.</source>
+<target>Δεν μπορεί να γίνει εγγραφή του αρχείου %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Δεν μπορεί να γίνει ανάγνωση του αρχείου %x.</target>
 
 <source>Database files do not share a common session.</source>
 <target>Τα αρχεία βάσης δεδομένων δεν έχουν χρησιμοποιηθεί από κοινού σε συγχρονισμό.</target>
@@ -205,6 +205,9 @@
 <source>/sec</source>
 <target>/δευτερόλεπτο</target>
 
+<source>Cannot find file %x.</source>
+<target>Το αρχείο %x δε βρέθηκε.</target>
+
 <source>File %x does not contain a valid configuration.</source>
 <target>Το αρχείο %x δεν περιέχει μια έγκυρη διάταξη.</target>
 
@@ -226,17 +229,14 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>Το όνομα τόμου %x δεν είναι μέρος του ονόματος του αρχείου %y!</target>
 
-<source>Cannot find file %x.</source>
-<target>Το αρχείο %x δε βρέθηκε.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Δεν ήταν δυνατό να αναγνωσθούν τα ακόλουθα στοιχεία XML:</target>
 
 <source>&Open...</source>
 <target>Ά&νοιγμα...</target>
 
-<source>&Save...</source>
-<target>Α&ποθήκευση...</target>
+<source>Save &As...</source>
+<target>Αποθή&κευση ως...</target>
 
 <source>&Quit</source>
 <target>Έ&ξοδος</target>
@@ -312,8 +312,8 @@ The command is triggered if:
 <source>(Build: %x)</source>
 <target>(Δημιουργήθηκε : %x)</target>
 
-<source>RealtimeSync configuration</source>
-<target>Διαμόρφωση του RealtimeSync</target>
+<source>All files</source>
+<target>Όλα τα αρχεία</target>
 
 <source>&Restore</source>
 <target>&Επαναφορά</target>
@@ -327,8 +327,8 @@ The command is triggered if:
 <source>Waiting for missing directories...</source>
 <target>Αναμονή για τους υποκαταλόγους που απουσιάζουν...</target>
 
-<source>An input folder name is empty.</source>
-<target>Το όνομα ενός υποκαταλόγου είναι κενό.</target>
+<source>A folder input field is empty.</source>
+<target>Ένα πεδίο εισαγωγής υποκαταλόγων είναι άδειο.</target>
 
 <source>Logging</source>
 <target>Καταγραφή μηνυμάτων</target>
@@ -351,11 +351,8 @@ The command is triggered if:
 <source>Custom</source>
 <target>Εξατομίκευση</target>
 
-<source>FreeFileSync batch file</source>
-<target>FreeFileSync αρχείο δέσμης</target>
-
-<source>FreeFileSync configuration</source>
-<target>Αρχείο διάταξης FreeFileSync</target>
+<source>FreeFileSync batch</source>
+<target>Δέσμη ενεργειών του FreeFileSync</target>
 
 <source>Batch execution</source>
 <target>Εκτέλεση δέσμης ενεργειών</target>
@@ -393,17 +390,17 @@ The command is triggered if:
 <source>Unable to connect to sourceforge.net!</source>
 <target>Δεν είναι δυνατή η σύνδεση με το sourceforge.net!</target>
 
-<source>A newer version of FreeFileSync is available:</source>
-<target>Μια νεότερη έκδοση του FreeFileSync είναι διαθέσιμη:</target>
+<source>A new version of FreeFileSync is available:</source>
+<target>Μια νέα έκδοση του FreeFileSync είναι διαθέσιμη:</target>
 
 <source>Download now?</source>
 <target>Λήψη τώρα;</target>
 
-<source>Information</source>
-<target>Πληροφορία</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>Το FreeFileSync είναι ενημερωμένο!</target>
+
+<source>Information</source>
+<target>Πληροφορία</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Θέλετε το FreeFileSync να ελέγχει αυτόματα για ενημερώσεις κάθε εβδομάδα;</target>
@@ -438,6 +435,12 @@ The command is triggered if:
 <source>Extension</source>
 <target>Επέκταση</target>
 
+<source>Size:</source>
+<target>Μέγεθος:</target>
+
+<source>Date:</source>
+<target>Ημερομηνία:</target>
+
 <source>Action</source>
 <target>Ενέργεια</target>
 
@@ -470,6 +473,9 @@ The command is triggered if:
 
 <source>&New</source>
 <target>&Δημιουργία</target>
+
+<source>&Save</source>
+<target>Απο&θήκευση</target>
 
 <source>&Language</source>
 <target>&Γλώσσα</target>
@@ -537,11 +543,8 @@ The command is triggered if:
 <source>Number of files and folders that will be deleted</source>
 <target>Αριθμός αρχείων και υποκαταλόγων που θα διαγραφούν</target>
 
-<source>Total amount of data that will be transferred</source>
-<target>Συνολικός όγκος δεδομένων που θα μεταφερθούν</target>
-
-<source>Operation:</source>
-<target>Λειτουργία:</target>
+<source>Total bytes to copy</source>
+<target>Συνολικός αριθμός bytes προς αντιγραφή</target>
 
 <source>Items found:</source>
 <target>Βρέθηκαν στοιχεία:</target>
@@ -549,10 +552,10 @@ The command is triggered if:
 <source>Speed:</source>
 <target>Ταχύτητα:</target>
 
-<source>Remaining time:</source>
+<source>Time remaining:</source>
 <target>Απομένει χρόνος:</target>
 
-<source>Elapsed time:</source>
+<source>Time elapsed:</source>
 <target>Πέρασε χρόνος:</target>
 
 <source>Batch job</source>
@@ -675,6 +678,15 @@ is the same
 <source>Source code written in C++ utilizing:</source>
 <target>Ο πηγαίος κώδικας γράφτηκε σε C++ χρησιμοποιώντας τα:</target>
 
+<source>If you like FreeFileSync</source>
+<target>Αν σας αρέσει το FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Κάντε μια δωρεά μέσω PayPal</target>
+
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Για τις μεταφράσεις του FreeFileSync, ευχαριστούμε τους:</target>
+
 <source>Feedback and suggestions are welcome</source>
 <target>Τα σχόλια και οι προτάσεις σας είναι ευπρόσδεκτα</target>
 
@@ -687,38 +699,8 @@ is the same
 <source>Email</source>
 <target>Email</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Για τις μεταφράσεις του FreeFileSync, ευχαριστούμε τους:</target>
-
-<source>If you like FreeFileSync</source>
-<target>Αν σας αρέσει το FreeFileSync</target>
-
-<source>Donate with PayPal</source>
-<target>Κάντε μια δωρεά μέσω PayPal</target>
-
 <source>Published under the GNU General Public License</source>
 <target>Διανέμεται υπό την Γενική Άδεια Δημόσιας Χρήσης GNU</target>
-
-<source>Ignore further errors</source>
-<target>Αγνόηση επόμενων σφαλμάτων</target>
-
-<source>Hide further error messages during the current process</source>
-<target>Απόκρυψη επόμενων μηνυμάτων σφάλματος στην τρέχουσα διαδικασία</target>
-
-<source>&Ignore</source>
-<target>&Παράβλεψη</target>
-
-<source>Do not show this dialog again</source>
-<target>Να μην εμφανιστεί ξανά αυτό το μήνυμα</target>
-
-<source>&Switch</source>
-<target>&Εναλλαγή</target>
-
-<source>&Yes</source>
-<target>&Ναι</target>
-
-<source>&No</source>
-<target>&Όχι</target>
 
 <source>Use Recycle Bin</source>
 <target>Χρήση του Κάδου Ανακύκλωσης</target>
@@ -791,6 +773,9 @@ Note: File names must be relative to base directories!
 
 <source>Statistics</source>
 <target>Στατιστικά</target>
+
+<source>Do not show this dialog again</source>
+<target>Να μην εμφανιστεί ξανά αυτό το μήνυμα</target>
 
 <source>Find what:</source>
 <target>Αναζήτηση του:</target>
@@ -870,8 +855,14 @@ Note: File names must be relative to base directories!
 <source>Never save changes</source>
 <target>Να μην αποθηκεύονται οι αλλαγές</target>
 
-<source>Save changes to current configuration?</source>
-<target>Να αποθηκευτούν οι αλλαγές στην τρέχουσα διάταξη;</target>
+<source>Do you want to save changes to %x?</source>
+<target>Θέλετε να αποθηκεύσετε τις αλλαγές στο %x;</target>
+
+<source>Save</source>
+<target>Αποθήκευση</target>
+
+<source>Don't Save</source>
+<target>Χωρίς αποθήκευση</target>
 
 <source>Configuration loaded!</source>
 <target>Η διάταξη έχει ανοιχθεί!</target>
@@ -966,9 +957,6 @@ Note: File names must be relative to base directories!
 <source>All directories in sync!</source>
 <target>Όλοι οι υποκατάλογοι είναι συγχρονισμένοι!</target>
 
-<source>Please run a Compare first before synchronizing!</source>
-<target>Παρακαλώ εκτελέστε πρώτα Σύγκριση πριν το Συγχρονισμό!</target>
-
 <source>Comma separated list</source>
 <target>Κατάλογος οριοθετημένος με κόμματα</target>
 
@@ -1013,6 +1001,24 @@ Note: File names must be relative to base directories!
 <pluralform>%x από τη 1 φανερή γραμμή</pluralform>
 <pluralform>%x από τις %y φανερές γραμμές</pluralform>
 </target>
+
+<source>Ignore further errors</source>
+<target>Αγνόηση επόμενων σφαλμάτων</target>
+
+<source>&Ignore</source>
+<target>&Παράβλεψη</target>
+
+<source>&Switch</source>
+<target>&Εναλλαγή</target>
+
+<source>Question</source>
+<target>Ερώτηση</target>
+
+<source>&Yes</source>
+<target>&Ναι</target>
+
+<source>&No</source>
+<target>&Όχι</target>
 
 <source>Scanning...</source>
 <target>Ανίχνευση...</target>
@@ -1194,6 +1200,9 @@ Note: File names must be relative to base directories!
 <source>Cannot delete directory %x.</source>
 <target>Δεν μπορεί να διαγραφεί ο υποκατάλογος %x.</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Δεν μπορεί να γίνει εγγραφή των χαρακτηριστικών αρχείου του %x.</target>
+
 <source>Cannot write modification time of %x.</source>
 <target>Δεν μπορεί να γίνει εγγραφή της ώρας τροποποίησης του %x.</target>
 
@@ -1217,9 +1226,6 @@ Note: File names must be relative to base directories!
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Δεν μπορεί να αντιγραφεί ο συμβολικός δεσμός %x στο %y.</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Δεν μπορεί να γίνει εγγραφή των χαρακτηριστικών αρχείου του %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Δεν μπορεί να αντιγραφεί το αρχείο %x στο %y.</target>
@@ -1245,11 +1251,8 @@ Note: File names must be relative to base directories!
 <source>No change since last synchronization!</source>
 <target>Καμία αλλαγή από τον προηγούμενο συγχρονισμό!</target>
 
-<source>Filter settings have changed!</source>
-<target>Οι ρυθμίσεις φίλτρου έχουν αλλάξει!</target>
-
-<source>The file was not processed by last synchronization!</source>
-<target>Το αρχείο δεν συμμετείχε στον τελευταίο συγχρονισμό!</target>
+<source>The corresponding database entries are not in sync considering current settings.</source>
+<target>Οι αντίστοιχες καταχωρήσεις του αρχείου δεδομένων δεν είναι συγχρονισμένες, λαμβάνοντας υπόψη τις τρέχουσες ρυθμίσεις.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Ρύθμιση προεπιλεγμένης κατεύθυνσης συγχρονισμού: Τα νεότερα αρχεία θα αντικαταστήσουν τα παλιότερα.</target>
@@ -1377,14 +1380,14 @@ Note: File names must be relative to base directories!
 <source>Updating attributes of %x</source>
 <target>Ενημέρωση των χαρακτηριστικών αρχείου του %x</target>
 
-<source>Target folder name must not be empty.</source>
-<target>Ο υποκατάλογος στόχος πρέπει να μην είναι κενός</target>
+<source>Target folder input field must not be empty.</source>
+<target>Το πεδίο εισαγωγής του υποκαταλόγου-στόχου πρέπει να μην είναι κενό.</target>
 
-<source>Folder name for file versioning must not be empty.</source>
-<target>Το όνομα του υποκαταλόγου για τη διατήρηση παλιών εκδόσεων δεν μπορεί να είναι κενό.</target>
+<source>Folder input field for versioning must not be empty.</source>
+<target>Το πεδίο εισαγωγής του υποκαταλόγου για διατήρηση παλιών εκδόσεων πρέπει να μην είναι κενό.</target>
 
-<source>Source directory %x not found.</source>
-<target>Ο υποκατάλογος πηγής %x δεν βρέθηκε.</target>
+<source>Source folder %x not found.</source>
+<target>Ο υποκατάλογος %x δε βρέθηκε.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Υπάρχουν ανεπίλυτες διενέξεις!</target>
@@ -1401,11 +1404,11 @@ Note: File names must be relative to base directories!
 <source>Not enough free disk space available in:</source>
 <target>Δεν υπάρχει αρκετός διαθέσιμος χώρος στο δίσκο:</target>
 
-<source>Free disk space required:</source>
-<target>Απαιτούμενος ελεύθερος χώρος δίσκου:</target>
+<source>Required:</source>
+<target>Απαιτείται:</target>
 
-<source>Free disk space available:</source>
-<target>Διαθέσιμος ελεύθερος χώρος δίσκου:</target>
+<source>Available:</source>
+<target>Διαθέσιμος:</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Ο Κάδος Ανακύκλωσης δεν είναι διαθέσιμος για τις ακόλουθες διαδρομές! Τα αρχεία θα διαγραφούν μόνιμα:</target>
@@ -1415,6 +1418,9 @@ Note: File names must be relative to base directories!
 
 <source>Processing folder pair:</source>
 <target>Σύγκριση του ζεύγους υποκαταλόγων:</target>
+
+<source>Target folder %x already existing.</source>
+<target>Ο υποκατάλογος-στόχος %x υπάρχει ήδη.</target>
 
 <source>Generating database...</source>
 <target>Δημιουργία βάσης δεδομένων...</target>

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <limits>
 #include <cmath>
+#include <zen/string_tools.h>
 #include <wx/dcmemory.h>
 #include <wx/image.h>
 #include "image_tools.h"
@@ -79,7 +80,7 @@ void makeWhiteTransparent(wxImage& image) //assume black text on white backgroun
         unsigned char* alphaLast = alphaFirst + image.GetWidth() * image.GetHeight();
 
         //dist(black, white)
-        double distBlackWhite = std::sqrt(3.0 * 255 * 255);
+        const double distBlackWhite = 255 * std::sqrt(3.0);
 
         const unsigned char* bytePos = image.GetData();
 
@@ -101,12 +102,14 @@ void makeWhiteTransparent(wxImage& image) //assume black text on white backgroun
 
 wxSize getSizeNeeded(const wxString& text, wxFont& font)
 {
-    wxCoord width, height;
-    wxMemoryDC dc;
+    const wxString& textFormatted = replaceCpy(text, L"&", L"", false); //remove accelerator
 
-    wxString textFormatted = text;
-    textFormatted.Replace(wxT("&"), wxT(""), false); //remove accelerator
+    wxCoord width  = 0;
+    wxCoord height = 0;
+
+    wxMemoryDC dc;
     dc.GetMultiLineTextExtent(textFormatted, &width, &height, nullptr, &font);
+
     return wxSize(width, height);
 }
 
@@ -138,7 +141,7 @@ wxBitmap BitmapButton::createBitmapFromText(const wxString& text)
         wxString textLabelFormatted = text;
         if ((accelPos = text.find(wxT("&"))) != wxString::npos)
         {
-            textLabelFormatted.Replace(wxT("&"), wxT(""), false); //remove accelerator
+            replace(textLabelFormatted, L"&", L"", false); //remove accelerator
             indexAccel = static_cast<int>(accelPos);
         }
 

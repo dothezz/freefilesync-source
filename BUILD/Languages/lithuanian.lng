@@ -58,12 +58,6 @@
 <source>About</source>
 <target>Apie</target>
 
-<source>Warning</source>
-<target>Perspėjimas</target>
-
-<source>Question</source>
-<target>Klausimas</target>
-
 <source>Confirm</source>
 <target>Patvirtinti</target>
 
@@ -109,6 +103,9 @@
 <source>Info</source>
 <target>Informacija</target>
 
+<source>Warning</source>
+<target>Perspėjimas</target>
+
 <source>Fatal Error</source>
 <target>Kritinė klaida</target>
 
@@ -141,12 +138,6 @@
 <pluralform>%x Baitai</pluralform>
 </target>
 
-<source>Cannot read file %x.</source>
-<target>Nepavyksta nuskaityti failo %x.</target>
-
-<source>Cannot write file %x.</source>
-<target>Nepavyksta įrašyti failo %x.</target>
-
 <source>Database file %x is incompatible.</source>
 <target>Duomenų bazė %x yra netinkama.</target>
 
@@ -156,8 +147,17 @@
 <source>Database file %x does not yet exist.</source>
 <target>Duomenų bazės failo %x dar nėra.</target>
 
+<source>Database file is corrupt:</source>
+<target></target>
+
 <source>Out of memory!</source>
 <target>Trūksta atminties!</target>
+
+<source>Cannot write file %x.</source>
+<target>Nepavyksta įrašyti failo %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Nepavyksta nuskaityti failo %x.</target>
 
 <source>Database files do not share a common session.</source>
 <target>Duomenų bazės failai nesidalina bendros sesijos.</target>
@@ -211,6 +211,9 @@
 <source>/sec</source>
 <target>/sek.</target>
 
+<source>Cannot find file %x.</source>
+<target>Nepavyksta rasti failo %x.</target>
+
 <source>File %x does not contain a valid configuration.</source>
 <target>Failas %x neturi tinkamų nustatymų.</target>
 
@@ -235,14 +238,11 @@
 <source>Cannot read the following XML elements:</source>
 <target>Nepavyksta perskaityti sekančių XML elementų:</target>
 
-<source>Cannot find file %x.</source>
-<target>Nepavyksta rasti failo %x.</target>
-
 <source>&Open...</source>
 <target>&Atverti...</target>
 
-<source>&Save...</source>
-<target>&Išsaugoti...</target>
+<source>Save &As...</source>
+<target></target>
 
 <source>&Quit</source>
 <target>&Išeiti</target>
@@ -318,8 +318,8 @@ Komanda inicijuojama jei:
 <source>(Build: %x)</source>
 <target>(Komponavimo versija: %x)</target>
 
-<source>RealtimeSync configuration</source>
-<target>RealtimeSync nustatymai</target>
+<source>All files</source>
+<target></target>
 
 <source>&Restore</source>
 <target>&Atstatyti</target>
@@ -333,8 +333,8 @@ Komanda inicijuojama jei:
 <source>Waiting for missing directories...</source>
 <target>Laikiama trūkstamų katalogų...</target>
 
-<source>An input folder name is empty.</source>
-<target>Įvesties aplanko pavadinimas yra tuščias.</target>
+<source>A folder input field is empty.</source>
+<target></target>
 
 <source>Logging</source>
 <target>Užduoties duomenys</target>
@@ -357,11 +357,8 @@ Komanda inicijuojama jei:
 <source>Custom</source>
 <target>Savitas</target>
 
-<source>FreeFileSync batch file</source>
-<target>FreeFileSync paketinės užduoties failas</target>
-
-<source>FreeFileSync configuration</source>
-<target>FreeFileSync nustatymai</target>
+<source>FreeFileSync batch</source>
+<target></target>
 
 <source>Batch execution</source>
 <target>Paketinės užduoties vykdymas</target>
@@ -399,17 +396,17 @@ Komanda inicijuojama jei:
 <source>Unable to connect to sourceforge.net!</source>
 <target>Nepavyksta prisijungti prie sourceforge.net!</target>
 
-<source>A newer version of FreeFileSync is available:</source>
-<target>Naujesnė FreeFileSync versija yra pasiekiama:</target>
+<source>A new version of FreeFileSync is available:</source>
+<target></target>
 
 <source>Download now?</source>
 <target>Atsiųsti dabar?</target>
 
-<source>Information</source>
-<target>Informacija</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>FreeFileSync yra naujausia!</target>
+
+<source>Information</source>
+<target>Informacija</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Ar tikrai norite, kad FreeFileSync automatiškai ieškoti atnaujinimų kiekvieną savaitę?</target>
@@ -444,6 +441,12 @@ Komanda inicijuojama jei:
 <source>Extension</source>
 <target>Plėtinys</target>
 
+<source>Size:</source>
+<target></target>
+
+<source>Date:</source>
+<target></target>
+
 <source>Action</source>
 <target>Veiksmas</target>
 
@@ -476,6 +479,9 @@ Komanda inicijuojama jei:
 
 <source>&New</source>
 <target>&Naujas</target>
+
+<source>&Save</source>
+<target></target>
 
 <source>&Language</source>
 <target>&Kalba</target>
@@ -543,11 +549,8 @@ Komanda inicijuojama jei:
 <source>Number of files and folders that will be deleted</source>
 <target>Failų ir aplankų, kurie bus ištrinti, skaičius</target>
 
-<source>Total amount of data that will be transferred</source>
-<target>Visas duomenų kiekis, kuris bus perduotas</target>
-
-<source>Operation:</source>
-<target>Operacija:</target>
+<source>Total bytes to copy</source>
+<target></target>
 
 <source>Items found:</source>
 <target>Rasta elementų:</target>
@@ -555,11 +558,11 @@ Komanda inicijuojama jei:
 <source>Speed:</source>
 <target>Greitis:</target>
 
-<source>Remaining time:</source>
-<target>Likęs laikas:</target>
+<source>Time remaining:</source>
+<target></target>
 
-<source>Elapsed time:</source>
-<target>Praėjęs laikas:</target>
+<source>Time elapsed:</source>
+<target></target>
 
 <source>Batch job</source>
 <target>Paketinė užduotis</target>
@@ -681,6 +684,15 @@ yra toks pats
 <source>Source code written in C++ utilizing:</source>
 <target>Šaltinio kodas parašytas su C++ naudojant:</target>
 
+<source>If you like FreeFileSync</source>
+<target>Jei Jums patinka FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Paremkite per PayPal</target>
+
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Didelė padėka už FreeFileSync vertimą reiškiama:</target>
+
 <source>Feedback and suggestions are welcome</source>
 <target>Nuomonė ir patarimai laukiami</target>
 
@@ -693,38 +705,8 @@ yra toks pats
 <source>Email</source>
 <target>El. paštas</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Didelė padėka už FreeFileSync vertimą reiškiama:</target>
-
-<source>If you like FreeFileSync</source>
-<target>Jei Jums patinka FreeFileSync</target>
-
-<source>Donate with PayPal</source>
-<target>Paremkite per PayPal</target>
-
 <source>Published under the GNU General Public License</source>
 <target>Platinama su GNU General Public licenzija</target>
-
-<source>Ignore further errors</source>
-<target>Ignoruoti tolimesnes klaidas</target>
-
-<source>Hide further error messages during the current process</source>
-<target>Slėpti tolimesnius klaidų pranešimus per esamą procesą</target>
-
-<source>&Ignore</source>
-<target>&Ignoruoti</target>
-
-<source>Do not show this dialog again</source>
-<target>Nerodyti šio lango daugiau</target>
-
-<source>&Switch</source>
-<target>&Perjungti</target>
-
-<source>&Yes</source>
-<target>&Taip</target>
-
-<source>&No</source>
-<target>&Ne</target>
 
 <source>Use Recycle Bin</source>
 <target>Naudoti šiukšliadėžę</target>
@@ -797,6 +779,9 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Statistics</source>
 <target>Statistika</target>
+
+<source>Do not show this dialog again</source>
+<target>Nerodyti šio lango daugiau</target>
 
 <source>Find what:</source>
 <target>Rasti kas:</target>
@@ -876,8 +861,14 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Never save changes</source>
 <target>Niekada nesaugoti pakeitimų</target>
 
-<source>Save changes to current configuration?</source>
-<target>Išsaugoti pakeitimus į esamus nustatymus?</target>
+<source>Do you want to save changes to %x?</source>
+<target></target>
+
+<source>Save</source>
+<target></target>
+
+<source>Don't Save</source>
+<target></target>
 
 <source>Configuration loaded!</source>
 <target>Nustatymai įkelti!</target>
@@ -972,9 +963,6 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>All directories in sync!</source>
 <target>Visi katalogai sinchronizuoti!</target>
 
-<source>Please run a Compare first before synchronizing!</source>
-<target>Prašome paleisti sulyginimą prieš sinchronizavimą!</target>
-
 <source>Comma separated list</source>
 <target>Kableliais atksirtas sąrašas</target>
 
@@ -1027,6 +1015,24 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <pluralform>%x iš %y eilių rodmenyje</pluralform>
 <pluralform>%x iš %y eilių rodmenyje</pluralform>
 </target>
+
+<source>Ignore further errors</source>
+<target>Ignoruoti tolimesnes klaidas</target>
+
+<source>&Ignore</source>
+<target>&Ignoruoti</target>
+
+<source>&Switch</source>
+<target>&Perjungti</target>
+
+<source>Question</source>
+<target>Klausimas</target>
+
+<source>&Yes</source>
+<target>&Taip</target>
+
+<source>&No</source>
+<target>&Ne</target>
 
 <source>Scanning...</source>
 <target>Skenuojama...</target>
@@ -1218,6 +1224,9 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Cannot delete directory %x.</source>
 <target>Nepavyksta ištrinti katalogo %x.</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Nepavyksta įrašyti atributų failui %x.</target>
+
 <source>Cannot write modification time of %x.</source>
 <target>Nepavyksta šrašyti pakeitimo datos %x.</target>
 
@@ -1241,9 +1250,6 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Nepavyksta nukopijuoti simbolinės nuorodos %x į %y.</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Nepavyksta įrašyti atributų failui %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Nepavyksta nukopijuoti failo %x į %y.</target>
@@ -1269,11 +1275,8 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>No change since last synchronization!</source>
 <target>Nėra pakitimo nuo pakutinio sinchronizavimo!</target>
 
-<source>Filter settings have changed!</source>
-<target>Filtro nustatymai buvo pakeisti!</target>
-
-<source>The file was not processed by last synchronization!</source>
-<target>Failas nebuvo apdirbtas paskutinio sinchronizavimo!</target>
+<source>The corresponding database entries are not in sync considering current settings.</source>
+<target></target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Nustatomos numatytos sinchronizavimo kryptys: Seni failai bus perrašyti naujesniais failais.</target>
@@ -1401,14 +1404,14 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Updating attributes of %x</source>
 <target>Atnaujinami atributai %x</target>
 
-<source>Target folder name must not be empty.</source>
-<target>Tikslo aplanko pavadinimas privalo nebūti tuščias.</target>
+<source>Target folder input field must not be empty.</source>
+<target></target>
 
-<source>Folder name for file versioning must not be empty.</source>
-<target>Aplanko pavadinimas failų versionavimui privalo nebūti tuščias.</target>
+<source>Folder input field for versioning must not be empty.</source>
+<target></target>
 
-<source>Source directory %x not found.</source>
-<target>Šaltinio katalogas %x nerastas.</target>
+<source>Source folder %x not found.</source>
+<target></target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Yra neišspręstų konfliktų!</target>
@@ -1425,11 +1428,11 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Not enough free disk space available in:</source>
 <target>Nepakanka laisvos disko vietos:</target>
 
-<source>Free disk space required:</source>
-<target>Laisva disko vieta reikalinga:</target>
+<source>Required:</source>
+<target></target>
 
-<source>Free disk space available:</source>
-<target>Laisva disko vieta prieinama:</target>
+<source>Available:</source>
+<target></target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Šiukšliadėžė nepasiekiama sekantiems keliams! Failai bus ištrinti visam laikui išskyrus:</target>
@@ -1439,6 +1442,9 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Processing folder pair:</source>
 <target>Apdorojama aplankų pora:</target>
+
+<source>Target folder %x already existing.</source>
+<target></target>
 
 <source>Generating database...</source>
 <target>Generuojama duomenų bazė...</target>

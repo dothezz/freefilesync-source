@@ -17,7 +17,7 @@
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-DNDEBUG" />
-					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswu" />
+					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_release_lib\mswu" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -27,8 +27,10 @@
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
-					<Add library="libboost_thread-mgw46-mt-s-1_49.a" />
-					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
+					<Add library="libboost_thread-mgw47-mt-s-1_50.a" />
+					<Add library="libboost_system-mgw47-mt-s-1_50.a" />
+					<Add library="libboost_chrono-mgw47-mt-s-1_50.a" />
+					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_release_lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after='&quot;C:\Program Files\C++\CodeSigning\SignCode.cmd&quot; &quot;$(PROJECT_DIR)$(TARGET_OUTPUT_FILE)&quot;' />
@@ -46,7 +48,7 @@
 					<Add option="-Winvalid-pch" />
 					<Add option='-include &quot;../wx+/pch.h&quot;' />
 					<Add option="-D__WXDEBUG__" />
-					<Add directory="C:\Program Files\C++\wxWidgets\lib\gcc_dll\mswud" />
+					<Add directory="C:\Program Files\C++\wxWidgets\lib\mingw_debug_dll\mswud" />
 				</Compiler>
 				<Linker>
 					<Add library="libwxmsw28ud_core.a" />
@@ -54,8 +56,10 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw46-mt-sd-1_49.a" />
-					<Add directory="C:\Program Files\C++\wxWidgets\lib\gcc_dll" />
+					<Add library="libboost_thread-mgw47-mt-sd-1_50.a" />
+					<Add library="libboost_system-mgw47-mt-sd-1_50.a" />
+					<Add library="libboost_chrono-mgw47-mt-sd-1_50.a" />
+					<Add directory="C:\Program Files\C++\wxWidgets\lib\mingw_debug_dll" />
 				</Linker>
 			</Target>
 		</Build>

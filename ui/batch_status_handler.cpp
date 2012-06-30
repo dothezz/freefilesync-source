@@ -5,10 +5,8 @@
 // **************************************************************************
 
 #include "batch_status_handler.h"
-#include <wx/ffile.h>
 #include <zen/file_handling.h>
 #include <zen/file_traverser.h>
-#include <wx+/string_conv.h>
 #include <wx+/app_main.h>
 #include <wx+/format_unit.h>
 #include <wx+/shell_execute.h>
@@ -17,6 +15,7 @@
 #include "../lib/ffs_paths.h"
 #include "../lib/resolve_path.h"
 #include "../lib/status_handler_impl.h"
+#include "../lib/generate_logfile.h"
 
 using namespace zen;
 
@@ -44,130 +43,62 @@ private:
     const Zstring prefix_;
     std::vector<Zstring>& logfiles_;
 };
+
+
+void limitLogfileCount(const Zstring& logdir, const std::wstring& jobname, size_t maxCount) //throw()
+{
+    std::vector<Zstring> logFiles;
+    FindLogfiles traverseCallback(toZ(jobname), logFiles);
+
+    traverseFolder(logdir, //throw();
+                   traverseCallback);
+
+    if (logFiles.size() <= maxCount)
+        return;
+
+    //delete oldest logfiles
+    std::nth_element(logFiles.begin(), logFiles.end() - maxCount, logFiles.end()); //take advantage of logfile naming convention to find oldest files
+
+    std::for_each(logFiles.begin(), logFiles.end() - maxCount,
+    [](const Zstring& filename) { try { removeFile(filename); } catch (FileError&) {} });
 }
 
 
-class LogFile //throw FileError
+std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, //throw FileError
+                                              const std::wstring& jobName,
+                                              const std::wstring& timestamp) //return value always bound!
 {
-public:
-    LogFile(const Zstring& logfileDirectory,
-            const std::wstring& jobName,
-            const std::wstring& timestamp) :
-        jobName_(jobName), //throw FileError
-        logfileName(findUnusedLogname(logfileDirectory, jobName, timestamp))
-    {
-        logFile.Open(toWx(logfileName), L"w");
-        if (!logFile.IsOpened())
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(logfileName)));
+    //create logfile directory if required
+    Zstring logfileDir = logfileDirectory.empty() ?
+                         getConfigDir() + Zstr("Logs") :
+                         getFormattedDirectoryName(logfileDirectory);
 
-        //write header
-        const wxString& headerLine = wxString(L"FreeFileSync - ") + _("Batch execution") + L" - " + formatTime<wxString>(FORMAT_DATE);
-        logFile.Write(headerLine + L'\n');
-        logFile.Write(wxString().Pad(headerLine.Len(), L'=') + L'\n');
+    makeDirectory(logfileDir); //throw FileError
 
-        //logItemStart = formatTime<wxString>(L"[%X] ") + _("Start");
+    //assemble logfile name
+    const Zstring body = appendSeparator(logfileDir) + toZ(jobName) + Zstr(" ") + utfCvrtTo<Zstring>(timestamp);
 
-        totalTime.Start(); //measure total time
-    }
-
-    void writeLog(const ErrorLog& log, const std::wstring& finalStatus,
-                  int itemsSynced, Int64 dataSynced,
-                  int itemsTotal,  Int64 dataTotal)
-    {
-        //assemble results box
-        std::vector<wxString> results;
-        results.push_back(finalStatus);
-        results.push_back(L"");
-        if (itemsTotal != 0 || dataTotal != 0) //=: sync phase was reached and there were actual items to sync
+    //ensure uniqueness
+    for (int i = 0;; ++i)
+        try
         {
-            results.push_back(L"    " + _("Items processed:") + L" " + toGuiString(itemsSynced) + L" (" + filesizeToShortString(dataSynced) + L")");
+            const Zstring& filename = i == 0 ?
+                                      body + Zstr(".log") :
+                                      body + Zstr('_') + numberTo<Zstring>(i) + Zstr(".log");
 
-            if (itemsSynced != itemsTotal ||
-                dataSynced  != dataTotal)
-                results.push_back(L"    " + _("Items remaining:") + L" " + toGuiString(itemsTotal - itemsSynced) + L" (" + filesizeToShortString(dataTotal - dataSynced) + L")");
+            return make_unique<FileOutput>(filename, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetExisting
+            //*no* file system race-condition!
         }
-        results.push_back(L"    " + _("Total time:") + L" " + wxTimeSpan::Milliseconds(totalTime.Time()).Format());
-
-        //write results box
-        size_t sepLineLen = 0;
-        std::for_each(results.begin(), results.end(), [&](const wxString& str) { sepLineLen = std::max(sepLineLen, str.size()); });
-
-        logFile.Write(wxString().Pad(sepLineLen, L'_') + L"\n\n");
-        std::for_each(results.begin(), results.end(), [&](const wxString& str) { logFile.Write(str + L'\n'); });
-        logFile.Write(wxString().Pad(sepLineLen, L'_') + L"\n\n");
-
-        //logFile.Write(logItemStart + L"\n\n");
-
-        //write log items
-        const auto& entries = log.getEntries();
-        for (auto iter = entries.begin(); iter != entries.end(); ++iter)
-        {
-            const std::string& msg = utfCvrtTo<std::string>(formatMessage(*iter));
-            logFile.Write(msg.c_str(), msg.size()); //better do UTF8 conversion ourselves rather than to rely on wxWidgets
-            logFile.Write(L'\n');
-        }
-
-        ////write footer
-        //logFile.Write(L'\n');
-        //logFile.Write(formatTime<wxString>(L"[%X] ") + _("Stop") + L" (" + _("Total time:") + L" " + wxTimeSpan::Milliseconds(totalTime.Time()).Format() + L")\n");
-    }
-
-    void limitLogfileCount(size_t maxCount) const //throw()
-    {
-        std::vector<Zstring> logFiles;
-        FindLogfiles traverseCallback(toZ(jobName_), logFiles);
-
-        traverseFolder(beforeLast(logfileName, FILE_NAME_SEPARATOR), //throw();
-                       traverseCallback);
-
-        if (logFiles.size() <= maxCount)
-            return;
-
-        //delete oldest logfiles
-        std::nth_element(logFiles.begin(), logFiles.end() - maxCount, logFiles.end()); //take advantage of logfile naming convention to find oldest files
-
-        std::for_each(logFiles.begin(), logFiles.end() - maxCount,
-        [](const Zstring& filename) { try { removeFile(filename); } catch (FileError&) {} });
-    }
-
-    //Zstring getLogfileName() const { return logfileName; }
-
-private:
-    static Zstring findUnusedLogname(const Zstring& logfileDirectory,
-                                     const std::wstring& jobName,
-                                     const std::wstring& timestamp)
-    {
-        //create logfile directory
-        Zstring logfileDir = logfileDirectory.empty() ?
-                             getConfigDir() + Zstr("Logs") :
-                             getFormattedDirectoryName(logfileDirectory);
-
-        if (!dirExists(logfileDir))
-            createDirectory(logfileDir); //throw FileError; create recursively if necessary
-
-        //assemble logfile name
-        const Zstring logfileName = appendSeparator(logfileDir) + toZ(jobName) + Zstr(" ") + utfCvrtTo<Zstring>(timestamp);
-
-        //ensure uniqueness
-        Zstring output = logfileName + Zstr(".log");
-
-        for (int i = 1; somethingExists(output); ++i)
-            output = logfileName + Zstr('_') + numberTo<Zstring>(i) + Zstr(".log");
-        return output;
-    }
-
-    const wxString jobName_;
-    const Zstring logfileName;
-    wxFFile logFile;
-    wxStopWatch totalTime;
-};
+        catch (const ErrorTargetExisting&) {}
+}
+}
 
 
 //##############################################################################################################################
 BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        const std::wstring& jobName,
                                        const std::wstring& timestamp,
-                                       const wxString& logfileDirectory,
+                                       const wxString& logfileDirectory, //may be empty
                                        size_t logFileCountMax,
                                        const xmlAccess::OnError handleError,
                                        const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
@@ -179,18 +110,22 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     switchToGuiRequested(false),
     handleError_(handleError),
     returnCode_(returnCode),
-    syncStatusFrame(*this, *this, nullptr, showProgress, jobName, execWhenFinished, execFinishedHistory)
+    syncStatusFrame(*this, *this, nullptr, showProgress, jobName, execWhenFinished, execFinishedHistory),
+    jobName_(jobName)
 {
     if (logFileCountMax > 0) //init log file: starts internal timer!
         if (!tryReportingError([&]
     {
-        logFile.reset(new LogFile(toZ(logfileDirectory), jobName, timestamp)); //throw FileError
-            logFile->limitLogfileCount(logFileCountMax); //throw()
+        logFile = prepareNewLogfile(toZ(logfileDirectory), jobName, timestamp); //throw FileError; return value always bound!
+
+            limitLogfileCount(beforeLast(logFile->getFilename(), FILE_NAME_SEPARATOR), jobName_, logFileCountMax); //throw()
         }, *this))
     {
         returnCode_ = FFS_RC_ABORTED;
         throw BatchAbortProcess();
     }
+
+    totalTime.Start(); //measure total time
 
     //::wxSetEnv(L"logfile", logFile->getLogfileName());
 }
@@ -224,14 +159,26 @@ BatchStatusHandler::~BatchStatusHandler()
         errorLog.logMsg(finalStatus, TYPE_INFO);
     }
 
+    const Utf8String logStream = generateLogStream(errorLog, jobName_, finalStatus,
+                                                   getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
+                                                   getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING), totalTime.Time() / 1000);
     //print the results list: logfile
     if (logFile.get())
     {
-        logFile->writeLog(errorLog, finalStatus,
-                          getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
-                          getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING));
+        try
+        {
+            if (!logStream.empty())
+                logFile->write(&*logStream.begin(), logStream.size()); //throw FileError
+        }
+        catch (FileError&) {}
+
         logFile.reset(); //close file now: user may do something with it in "on completion"
     }
+    try
+    {
+        saveToLastSyncsLog(logStream); //throw FileError
+    }
+    catch (FileError&) {}
 
     //decide whether to stay on status screen or exit immediately...
     if (switchToGuiRequested) //-> avoid recursive yield() calls, thous switch not before ending batch mode
@@ -326,11 +273,11 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
 
             bool dontWarnAgain = false;
             switch (showWarningDlg(syncStatusFrame.getAsWindow(),
-                                   ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_SWITCH | ReturnWarningDlg::BUTTON_ABORT,
+                                   ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_SWITCH | ReturnWarningDlg::BUTTON_CANCEL,
                                    warningMessage + L"\n\n" + _("Press \"Switch\" to resolve issues in FreeFileSync main dialog."),
                                    dontWarnAgain))
             {
-                case ReturnWarningDlg::BUTTON_ABORT:
+                case ReturnWarningDlg::BUTTON_CANCEL:
                     abortThisProcess();
                     break;
 
@@ -368,7 +315,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
 
             bool ignoreNextErrors = false;
             switch (showErrorDlg(syncStatusFrame.getAsWindow(),
-                                 ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
+                                 ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
                                  errorMessage, &ignoreNextErrors))
             {
                 case ReturnErrorDlg::BUTTON_IGNORE:
@@ -380,7 +327,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
                 case ReturnErrorDlg::BUTTON_RETRY:
                     return ProcessCallback::RETRY;
 
-                case ReturnErrorDlg::BUTTON_ABORT:
+                case ReturnErrorDlg::BUTTON_CANCEL:
                     errorLog.logMsg(errorMessage, TYPE_ERROR);
                     abortThisProcess();
             }
@@ -414,21 +361,18 @@ void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showErrorDlg(syncStatusFrame.getAsWindow(),
-                                 ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_ABORT,
-                                 errorMessage, &ignoreNextErrors))
+            switch (showFatalErrorDlg(syncStatusFrame.getAsWindow(),
+                                      ReturnFatalErrorDlg::BUTTON_IGNORE |  ReturnFatalErrorDlg::BUTTON_CANCEL,
+                                      errorMessage, &ignoreNextErrors))
             {
-                case ReturnErrorDlg::BUTTON_IGNORE:
+                case ReturnFatalErrorDlg::BUTTON_IGNORE:
                     if (ignoreNextErrors) //falsify only
                         handleError_ = xmlAccess::ON_ERROR_IGNORE;
                     break;
 
-                case ReturnErrorDlg::BUTTON_ABORT:
+                case ReturnFatalErrorDlg::BUTTON_CANCEL:
                     abortThisProcess();
                     break;
-
-                case ReturnErrorDlg::BUTTON_RETRY:
-                    assert(false);
             }
         }
         break;

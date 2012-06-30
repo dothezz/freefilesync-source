@@ -9,15 +9,15 @@
 
 #include <vector>
 #include <memory>
-#include <wx/stream.h>
 #include <zen/zstring.h>
+//#include <wx+/serialize.h>
 
 namespace zen
 {
 //------------------------------------------------------------------
 /*
 Semantics of HardFilter:
-1. using it creates a NEW folder hierarchy! -> must be considered by <Automatic>-mode! (fortunately it turns out, doing nothing already has perfect semantics :)
+1. using it creates a NEW folder hierarchy! -> must be considered by <Automatic>-mode!
 2. it applies equally to both sides => it always matches either both sides or none! => can be used while traversing a single folder!
 
     class hierarchy:
@@ -45,14 +45,14 @@ public:
     typedef std::shared_ptr<const HardFilter> FilterRef; //always bound by design!
 
     //serialization
-    void saveFilter(wxOutputStream& stream) const; //serialize derived object
-    static FilterRef loadFilter(wxInputStream& stream); //CAVEAT!!! adapt this method for each new derivation!!!
+    //    void saveFilter(ZstreamOut& stream) const; //serialize derived object
+    //    static FilterRef loadFilter(ZstreamIn& stream); //throw UnexpectedEndOfStreamError; CAVEAT!!! adapt this method for each new derivation!!!
 
 private:
-    friend bool operator< (const HardFilter& lhs, const HardFilter& rhs);
+    friend bool operator<(const HardFilter& lhs, const HardFilter& rhs);
 
-    virtual void save(wxOutputStream& stream) const = 0; //serialization
-    virtual Zstring uniqueClassIdentifier() const = 0;   //get identifier, used for serialization
+    //    virtual void save(ZstreamOut& stream) const = 0; //serialization
+    virtual std::string uniqueClassIdentifier() const = 0;   //get identifier, used for serialization
     virtual bool cmpLessSameType(const HardFilter& other) const = 0; //typeid(*this) == typeid(other) in this context!
 };
 
@@ -74,9 +74,9 @@ public:
 
 private:
     friend class HardFilter;
-    virtual void save(wxOutputStream& stream) const {}
-    virtual Zstring uniqueClassIdentifier() const;
-    static FilterRef load(wxInputStream& stream); //"serial constructor"
+    //    virtual void save(ZstreamOut& stream) const {}
+    virtual std::string uniqueClassIdentifier() const { return "NullFilter"; }
+    //    static FilterRef load(ZstreamIn& stream); //throw UnexpectedEndOfStreamError
     virtual bool cmpLessSameType(const HardFilter& other) const;
 };
 
@@ -94,9 +94,9 @@ public:
 
 private:
     friend class HardFilter;
-    virtual void save(wxOutputStream& stream) const;
-    virtual Zstring uniqueClassIdentifier() const;
-    static FilterRef load(wxInputStream& stream); //"serial constructor"
+    //    virtual void save(ZstreamOut& stream) const;
+    virtual std::string uniqueClassIdentifier() const { return "NameFilter"; }
+    //    static FilterRef load(ZstreamIn& stream); //throw UnexpectedEndOfStreamError
     virtual bool cmpLessSameType(const HardFilter& other) const;
 
     std::vector<Zstring> filterFileIn;   //
@@ -120,9 +120,9 @@ public:
 
 private:
     friend class HardFilter;
-    virtual void save(wxOutputStream& stream) const;
-    virtual Zstring uniqueClassIdentifier() const;
-    static FilterRef load(wxInputStream& stream); //"serial constructor"
+    //    virtual void save(ZstreamOut& stream) const;
+    virtual std::string uniqueClassIdentifier() const { return "CombinedFilter"; }
+    //    static FilterRef load(ZstreamIn& stream); //throw UnexpectedEndOfStreamError
     virtual bool cmpLessSameType(const HardFilter& other) const;
 
     const FilterRef first_;
@@ -147,11 +147,11 @@ private:
 
 
 //---------------Inline Implementation---------------------------------------------------
-inline
-HardFilter::FilterRef NullFilter::load(wxInputStream& stream) //"serial constructor"
-{
-    return FilterRef(new NullFilter);
-}
+//inline
+//HardFilter::FilterRef NullFilter::load(ZstreamIn& stream)
+//{
+//    return FilterRef(new NullFilter);
+//}
 
 
 inline
@@ -185,16 +185,9 @@ bool NullFilter::cmpLessSameType(const HardFilter& other) const
 
 
 inline
-Zstring NullFilter::uniqueClassIdentifier() const
-{
-    return Zstr("NullFilter");
-}
-
-
-inline
 bool CombinedFilter::passFileFilter(const Zstring& relFilename) const
 {
-    return first_->passFileFilter(relFilename) && //short-circuit behavior
+    return first_ ->passFileFilter(relFilename) && //short-circuit behavior
            second_->passFileFilter(relFilename);
 }
 
@@ -202,8 +195,14 @@ bool CombinedFilter::passFileFilter(const Zstring& relFilename) const
 inline
 bool CombinedFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const
 {
-    return first_->passDirFilter(relDirname, subObjMightMatch) && //short-circuit behavior: subObjMightMatch handled correctly!
-           second_->passDirFilter(relDirname, subObjMightMatch);
+    if (first_->passDirFilter(relDirname, subObjMightMatch))
+        return second_->passDirFilter(relDirname, subObjMightMatch);
+    else
+    {
+        if (subObjMightMatch && *subObjMightMatch)
+            second_->passDirFilter(relDirname, subObjMightMatch);
+        return false;
+    }
 }
 
 
@@ -228,29 +227,22 @@ bool CombinedFilter::cmpLessSameType(const HardFilter& other) const
 }
 
 
-inline
-Zstring CombinedFilter::uniqueClassIdentifier() const
-{
-    return Zstr("CombinedFilter");
-}
+//inline
+//void CombinedFilter::save(ZstreamOut& stream) const
+//{
+//    first_ ->saveFilter(stream);
+//    second_->saveFilter(stream);
+//}
 
 
-inline
-void CombinedFilter::save(wxOutputStream& stream) const
-{
-    first_->saveFilter(stream);
-    second_->saveFilter(stream);
-}
-
-
-inline
-HardFilter::FilterRef CombinedFilter::load(wxInputStream& stream) //"constructor"
-{
-    FilterRef first  = loadFilter(stream);
-    FilterRef second = loadFilter(stream);
-
-    return combineFilters(first, second);
-}
+//inline
+//HardFilter::FilterRef CombinedFilter::load(ZstreamIn& stream) //throw UnexpectedEndOfStreamError
+//{
+//    FilterRef first  = loadFilter(stream); //throw UnexpectedEndOfStreamError
+//    FilterRef second = loadFilter(stream); //
+//
+//    return combineFilters(first, second);
+//}
 
 
 inline
@@ -272,8 +264,6 @@ HardFilter::FilterRef combineFilters(const HardFilter::FilterRef& first,
             return HardFilter::FilterRef(new CombinedFilter(first, second));
     }
 }
-
-
 }
 
 

@@ -5,14 +5,12 @@
 // **************************************************************************
 
 #include "hard_filter.h"
-#include <zen/zstring.h>
-#include <wx/string.h>
 #include <set>
 #include <stdexcept>
 #include <vector>
-#include "../structures.h"
-#include <wx+/serialize.h>
 #include <typeinfo>
+#include <iterator>
+//#include "../structures.h"
 
 using namespace zen;
 
@@ -30,31 +28,31 @@ bool zen::operator<(const HardFilter& lhs, const HardFilter& rhs)
 }
 
 
-void HardFilter::saveFilter(wxOutputStream& stream) const //serialize derived object
-{
-    //save type information
-    writeString(stream, uniqueClassIdentifier());
+//void HardFilter::saveFilter(ZstreamOut& stream) const //serialize derived object
+//{
+//    //save type information
+//    writeString(stream, uniqueClassIdentifier());
+//
+//    //save actual object
+//    save(stream);
+//}
 
-    //save actual object
-    save(stream);
-}
 
-
-HardFilter::FilterRef HardFilter::loadFilter(wxInputStream& stream)
-{
-    //read type information
-    const Zstring uniqueClassId = readString<Zstring>(stream);
-
-    //read actual object
-    if (uniqueClassId == Zstr("NullFilter"))
-        return NullFilter::load(stream);
-    else if (uniqueClassId == Zstr("NameFilter"))
-        return NameFilter::load(stream);
-    else if (uniqueClassId == Zstr("CombinedFilter"))
-        return CombinedFilter::load(stream);
-    else
-        throw std::logic_error("Programming Error: Unknown filter!");
-}
+//HardFilter::FilterRef HardFilter::loadFilter(ZstreamIn& stream) //throw UnexpectedEndOfStreamError
+//{
+//    //read type information
+//    const std::string uniqueClassId = readString<std::string>(stream); //throw UnexpectedEndOfStreamError
+//
+//    //read actual object
+//    if (uniqueClassId == "NullFilter")
+//        return NullFilter::load(stream);
+//    else if (uniqueClassId == "NameFilter")
+//        return NameFilter::load(stream);
+//    else if (uniqueClassId == "CombinedFilter")
+//        return CombinedFilter::load(stream);
+//    else
+//        throw std::logic_error("Programming Error: Unknown filter!");
+//}
 
 
 namespace
@@ -240,7 +238,7 @@ std::vector<Zstring> splitByDelimiter(const Zstring& filterString)
     //delimiters may be ';' or '\n'
     std::vector<Zstring> output;
 
-    const std::vector<Zstring> blocks = split(filterString, Zchar(';'));
+    const std::vector<Zstring> blocks = split(filterString, Zchar(';')); //split by less common delimiter first
     std::for_each(blocks.begin(), blocks.end(),
                   [&](const Zstring& item)
     {
@@ -377,23 +375,17 @@ bool NameFilter::cmpLessSameType(const HardFilter& other) const
 }
 
 
-Zstring NameFilter::uniqueClassIdentifier() const
-{
-    return Zstr("NameFilter");
-}
-
-
-void NameFilter::save(wxOutputStream& stream) const
-{
-    writeString(stream, includeFilterTmp);
-    writeString(stream, excludeFilterTmp);
-}
-
-
-HardFilter::FilterRef NameFilter::load(wxInputStream& stream) //"constructor"
-{
-    const Zstring include = readString<Zstring>(stream);
-    const Zstring exclude = readString<Zstring>(stream);
-
-    return FilterRef(new NameFilter(include, exclude));
-}
+//void NameFilter::save(ZstreamOut& stream) const
+//{
+//    writeString(stream, includeFilterTmp);
+//    writeString(stream, excludeFilterTmp);
+//}
+//
+//
+//HardFilter::FilterRef NameFilter::load(ZstreamIn& stream) //throw UnexpectedEndOfStreamError
+//{
+//    const Zstring include = readString<Zstring>(stream); //throw UnexpectedEndOfStreamError
+//    const Zstring exclude = readString<Zstring>(stream); //
+//
+//    return FilterRef(new NameFilter(include, exclude));
+//}

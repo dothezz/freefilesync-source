@@ -22,10 +22,14 @@ public:
 #ifdef FFS_WIN
         //fix wxWidgets localization gap:
         wxButton* button = dynamic_cast<wxButton*>(m_pickerIface);
-        if (button) button->SetLabel(_("Browse"));
+        if (button)
+        {
+            button->SetLabel(_("Browse")); //button width needs to be adapted for very long translations
+            SetMinSize(button->GetBestSize()); //SetSize and wxButton::SetSize just do nothing!!??
+        }
 #endif
     }
 };
 }
 
-#endif // DIR_PICKER_I18N_H_INCLUDED
+#endif // DIR_PICKER_I18N_H_INCLUDED 

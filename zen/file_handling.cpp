@@ -23,7 +23,6 @@
 #include "long_path_prefix.h"
 #include <Aclapi.h>
 #include "dst_hack.h"
-#include "file_update_handle.h"
 #include "win_ver.h"
 #include "IFileOperation/file_op.h"
 
@@ -703,18 +702,25 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, Callb
     }
     //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the directory)
     catch (const ErrorDifferentVolume&) {}
-    catch (const ErrorTargetExisting&) {}
+    catch (const ErrorTargetExisting& ) {}
 
     //create target
     if (symlinkExists(sourceDir))
     {
-        if (!dirExists(targetDir))
+        if (!symlinkExists(targetDir))
             copySymlink(sourceDir, targetDir, false); //throw FileError -> don't copy permissions
     }
     else
     {
-        if (!dirExists(targetDir)) //check even if ErrorTargetExisting: me may have clashed with a file of the same name!!!
-            createDirectory(targetDir, sourceDir, false); //throw FileError
+        try
+        {
+            makeNewDirectory(targetDir, sourceDir, false); //FileError, ErrorTargetExisting
+        }
+        catch (const ErrorTargetExisting&)
+        {
+            if (!dirExists(targetDir))
+                throw; //clashed with a file or symlink of the same name!!!
+        }
 
         //move files/folders recursively
         TraverseOneLevel::NameList fileList; //list of names: 1. short 2.long
@@ -888,23 +894,6 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
     {
     */
 
-    //may need to remove the readonly-attribute (e.g. FAT usb drives)
-    FileUpdateHandle targetHandle(filename, [=]
-    {
-        return ::CreateFile(applyLongPathPrefix(filename).c_str(),
-        FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,
-        //avoids mysterious "access denied" when using "GENERIC_READ | GENERIC_WRITE" on a read-only file, even after read-only was removed right before:
-        //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
-        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-        nullptr,
-        OPEN_EXISTING,
-        FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
-        (procSl == SYMLINK_DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0), //process symlinks
-        nullptr);
-    });
-
-    if (targetHandle.get() == INVALID_HANDLE_VALUE)
-        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
     /*
     if (hTarget == INVALID_HANDLE_VALUE && ::GetLastError() == ERROR_SHARING_VIOLATION)
         ::Sleep(retryInterval); //wait then retry
@@ -913,12 +902,87 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
     }
     */
 
-    auto isNullTime = [](const FILETIME & ft) { return ft.dwLowDateTime == 0 && ft.dwHighDateTime == 0; };
+    //temporarily reset read-only flag if required
+    DWORD attribs = INVALID_FILE_ATTRIBUTES;
+    ZEN_ON_SCOPE_EXIT(
+        if (attribs != INVALID_FILE_ATTRIBUTES)
+        ::SetFileAttributes(applyLongPathPrefix(filename).c_str(), attribs);
+    );
 
-    if (!::SetFileTime(targetHandle.get(), //__in      HANDLE hFile,
+    auto removeReadonly = [&]() -> bool //may need to remove the readonly-attribute (e.g. on FAT usb drives)
+    {
+        if (attribs == INVALID_FILE_ATTRIBUTES)
+        {
+            const DWORD tmpAttr = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
+            if (tmpAttr == INVALID_FILE_ATTRIBUTES)
+                throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+
+            if (tmpAttr & FILE_ATTRIBUTE_READONLY)
+            {
+                if (!::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_NORMAL))
+                    throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+
+                attribs = tmpAttr; //reapplied on scope exit
+                return true;
+            }
+        }
+        return false;
+    };
+
+    auto openFile = [&](bool conservativeApproach)
+    {
+        return ::CreateFile(applyLongPathPrefix(filename).c_str(),
+                            (conservativeApproach ?
+                             //some NAS seem to have issues with FILE_WRITE_ATTRIBUTES, even worse, they may fail silently!
+                             //http://sourceforge.net/tracker/?func=detail&atid=1093081&aid=3536680&group_id=234430
+                             //Citrix shares seem to have this issue, too, but at least fail with "access denied" => try generic access first:
+                             GENERIC_READ | GENERIC_WRITE :
+                             //avoids mysterious "access denied" when using "GENERIC_READ | GENERIC_WRITE" on a read-only file, even *after* read-only was removed directly before the call!
+                             //http://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
+                             //since former gives an error notification we may very well try FILE_WRITE_ATTRIBUTES second.
+                             FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES),
+                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                            nullptr,
+                            OPEN_EXISTING,
+                            FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
+                            (procSl == SYMLINK_DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0), //process symlinks
+                            nullptr);
+    };
+
+    HANDLE hFile = INVALID_HANDLE_VALUE;
+    for (int i = 0; i < 2; ++i) //we will get this handle, no matter what! :)
+    {
+        //1. be conservative
+        hFile = openFile(true);
+        if (hFile == INVALID_HANDLE_VALUE)
+        {
+            if (::GetLastError() == ERROR_ACCESS_DENIED) //fails if file is read-only (or for "other" reasons)
+                if (removeReadonly())
+                    continue;
+
+            //2. be a *little* fancy
+            hFile = openFile(false);
+            if (hFile == INVALID_HANDLE_VALUE)
+            {
+                if (::GetLastError() == ERROR_ACCESS_DENIED)
+                    if (removeReadonly())
+                        continue;
+
+                //3. after these herculean stunts we give up...
+                throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+            }
+        }
+        break;
+    }
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
+
+
+    auto isNullTime = [](const FILETIME& ft) { return ft.dwLowDateTime == 0 && ft.dwHighDateTime == 0; };
+
+    if (!::SetFileTime(hFile,           //__in      HANDLE hFile,
                        !isNullTime(creationTime) ? &creationTime : nullptr, //__in_opt  const FILETIME *lpCreationTime,
-                       nullptr,            //__in_opt  const FILETIME *lpLastAccessTime,
-                       &lastWriteTime))    //__in_opt  const FILETIME *lpLastWriteTime
+                       nullptr,         //__in_opt  const FILETIME *lpLastAccessTime,
+                       &lastWriteTime)) //__in_opt  const FILETIME *lpLastWriteTime
     {
         auto lastErr = ::GetLastError();
 
@@ -933,7 +997,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
             {
                 auto setFileInfo = [&](FILE_BASIC_INFO basicInfo) //throw FileError; no const& since SetFileInformationByHandle() requires non-const parameter!
                 {
-                    if (!setFileInformationByHandle(targetHandle.get(), //__in  HANDLE hFile,
+                    if (!setFileInformationByHandle(hFile,              //__in  HANDLE hFile,
                                                     FileBasicInfo,      //__in  FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
                                                     &basicInfo,         //__in  LPVOID lpFileInformation,
                                                     sizeof(basicInfo))) //__in  DWORD dwBufferSize
@@ -950,7 +1014,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
                 //---------------------------------------------------------------------------
 
                 BY_HANDLE_FILE_INFORMATION fileInfo = {};
-                if (::GetFileInformationByHandle(targetHandle.get(), &fileInfo))
+                if (::GetFileInformationByHandle(hFile, &fileInfo))
                     if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
                     {
                         FILE_BASIC_INFO basicInfo = {}; //undocumented: file times of "0" stand for "don't change"
@@ -959,6 +1023,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
                         if (!isNullTime(creationTime))
                             basicInfo.CreationTime = toLargeInteger(creationTime);
 
+                        //set file time + attributes
                         setFileInfo(basicInfo); //throw FileError
 
                         try //... to restore original file attributes
@@ -972,10 +1037,10 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
                         lastErr = ERROR_SUCCESS;
                     }
             }
-
-            if (lastErr != ERROR_SUCCESS)
-                throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastErr));
         }
+
+        if (lastErr != ERROR_SUCCESS)
+            throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastErr));
     }
 
 #ifndef NDEBUG //dst hack: verify data written
@@ -1005,8 +1070,8 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
     else
     {
         struct timeval newTimes[2] = {};
-        newTimes[0].tv_sec  = ::time(nullptr);	/* seconds */
-        newTimes[0].tv_usec = 0;	        /* microseconds */
+        newTimes[0].tv_sec  = ::time(nullptr); //seconds
+        newTimes[0].tv_usec = 0;	           //microseconds
 
         newTimes[1].tv_sec  = to<time_t>(modificationTime);
         newTimes[1].tv_usec = 0;
@@ -1140,7 +1205,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
 
 
 //copy permissions for files, directories or symbolic links: requires admin rights
-void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSymlink procSl) //throw FileError;
+void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSymlink procSl) //throw FileError
 {
 #ifdef FFS_WIN
     //setting privileges requires admin rights!
@@ -1314,22 +1379,41 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
 }
 
 
-void createDirectory_straight(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions, int level)
+void createDirectoryStraight(const Zstring& directory, //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+                             const Zstring& templateDir,
+                             bool copyFilePermissions)
 {
-    //default directory creation
 #ifdef FFS_WIN
     //don't use ::CreateDirectoryEx:
     //- it may fail with "wrong parameter (error code 87)" when source is on mapped online storage
     //- automatically copies symbolic links if encountered: unfortunately it doesn't copy symlinks over network shares but silently creates empty folders instead (on XP)!
     //- it isn't able to copy most junctions because of missing permissions (although target path can be retrieved alternatively!)
-    if (!::CreateDirectory(applyLongPathPrefixCreateDir(directory).c_str(), nullptr))
-#elif defined FFS_LINUX
-    if (::mkdir(directory.c_str(), 0755) != 0)
-#endif
+    if (!::CreateDirectory(applyLongPathPrefixCreateDir(directory).c_str(), //__in      LPCTSTR lpPathName,
+                           nullptr))                                        //__in_opt  LPSECURITY_ATTRIBUTES lpSecurityAttributes
     {
-        if (level != 0) return;
-        throw FileError(replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
+        const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted();
+        const ErrorCode lastError = getLastError();
+
+        if (lastError == ERROR_ALREADY_EXISTS)
+            throw ErrorTargetExisting(msg);
+        else if (lastError == ERROR_PATH_NOT_FOUND)
+            throw ErrorTargetPathMissing(msg);
+        throw FileError(msg);
     }
+
+#elif defined FFS_LINUX
+    if (::mkdir(directory.c_str(), 0755) != 0) //mode: drwxr-xr-x
+    {
+        const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted();
+        const ErrorCode lastError = getLastError();
+
+        if (lastError == EEXIST)
+            throw ErrorTargetExisting(msg);
+        else if (lastError == ENOENT)
+            throw ErrorTargetPathMissing(msg);
+        throw FileError(msg);
+    }
+#endif
 
     if (!templateDir.empty())
     {
@@ -1355,10 +1439,11 @@ void createDirectory_straight(const Zstring& directory, const Zstring& templateD
             const DWORD sourceAttr = ::GetFileAttributes(applyLongPathPrefix(sourcePath).c_str());
             if (sourceAttr != INVALID_FILE_ATTRIBUTES)
             {
+                ::SetFileAttributes(applyLongPathPrefix(directory).c_str(), sourceAttr);
+                //copy "read-only and system attributes": http://blogs.msdn.com/b/oldnewthing/archive/2003/09/30/55100.aspx
+
                 const bool isCompressed = (sourceAttr & FILE_ATTRIBUTE_COMPRESSED)  != 0;
                 const bool isEncrypted  = (sourceAttr & FILE_ATTRIBUTE_ENCRYPTED)   != 0;
-
-                ::SetFileAttributes(applyLongPathPrefix(directory).c_str(), sourceAttr);
 
                 if (isEncrypted)
                     ::EncryptFile(directory.c_str()); //seems no long path is required (check passed!)
@@ -1391,6 +1476,7 @@ void createDirectory_straight(const Zstring& directory, const Zstring& templateD
             }
         }
 #endif
+
         zen::ScopeGuard guardNewDir = zen::makeGuard([&] { try { removeDirectory(directory); } catch (...) {} }); //ensure cleanup:
 
         //enforce copying file permissions: it's advertized on GUI...
@@ -1402,47 +1488,48 @@ void createDirectory_straight(const Zstring& directory, const Zstring& templateD
 }
 
 
-void createDirectoryRecursively(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions, int level)
+void createDirectoryRecursively(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions) //FileError, ErrorTargetExisting
 {
-    if (level == 100) //catch endless recursion
-        return;
-
-#ifdef FFS_WIN
-    std::unique_ptr<Fix8Dot3NameClash> fnc;
-    if (somethingExists(directory))
+    try
     {
+        createDirectoryStraight(directory, templateDir, copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+    }
+    catch (const ErrorTargetExisting&)
+    {
+#ifdef FFS_WIN
         //handle issues with already existing short 8.3 file names on Windows
         if (have8dot3NameClash(directory))
-            fnc.reset(new Fix8Dot3NameClash(directory)); //move clashing object to the side
-        else if (dirExists(directory))
+        {
+            Fix8Dot3NameClash dummy(directory); //move clashing object to the side
+
+            //now try again...
+            createDirectoryStraight(directory, templateDir, copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
             return;
-    }
-#elif defined FFS_LINUX
-    if (somethingExists(directory))
-    {
-        if (dirExists(directory))
-            return;
-    }
+        }
 #endif
-    else //if "not somethingExists" we need to create the parent directory
+        throw;
+    }
+    catch (const ErrorTargetPathMissing&)
     {
-        //try to create parent folders first
+        //we need to create parent directories first
         const Zstring dirParent = beforeLast(directory, FILE_NAME_SEPARATOR);
-        if (!dirParent.empty() && !dirExists(dirParent))
+        if (!dirParent.empty())
         {
             //call function recursively
             const Zstring templateParent = beforeLast(templateDir, FILE_NAME_SEPARATOR); //returns empty string if ch not found
-            createDirectoryRecursively(dirParent, templateParent, copyFilePermissions, level + 1);
+            createDirectoryRecursively(dirParent, templateParent, copyFilePermissions); //throw
+
+            //now try again...
+            createDirectoryStraight(directory, templateDir, copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+            return;
         }
+        throw;
     }
-
-    //now creation should be possible
-    createDirectory_straight(directory, templateDir, copyFilePermissions, level); //throw FileError
 }
 }
 
 
-void zen::createDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions)
+void zen::makeNewDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions) //FileError, ErrorTargetExisting
 {
     //remove trailing separator
     const Zstring dirFormatted = endsWith(directory, FILE_NAME_SEPARATOR) ?
@@ -1453,13 +1540,22 @@ void zen::createDirectory(const Zstring& directory, const Zstring& templateDir, 
                                       beforeLast(templateDir, FILE_NAME_SEPARATOR) :
                                       templateDir;
 
-    createDirectoryRecursively(dirFormatted, templateFormatted, copyFilePermissions, 0);
+    createDirectoryRecursively(dirFormatted, templateFormatted, copyFilePermissions); //FileError, ErrorTargetExisting
 }
 
 
-void zen::createDirectory(const Zstring& directory)
+void zen::makeDirectory(const Zstring& directory)
 {
-    zen::createDirectory(directory, Zstring(), false);
+    try
+    {
+        makeNewDirectory(directory, Zstring(), false); //FileError, ErrorTargetExisting
+    }
+    catch (const ErrorTargetExisting&)
+    {
+        if (dirExists(directory))
+            return;
+        throw; //clash with file (dir symlink is okay)
+    }
 }
 
 
@@ -2254,7 +2350,7 @@ Zstring findUnusedTempName(const Zstring& filename)
 {
     Zstring output = filename + zen::TEMP_FILE_ENDING;
 
-    //ensure uniqueness (+ minor race condition)
+    //ensure uniqueness (+ minor file system race condition!)
     for (int i = 1; somethingExists(output); ++i)
         output = filename + Zchar('_') + numberTo<Zstring>(i) + zen::TEMP_FILE_ENDING;
 

@@ -90,7 +90,8 @@ bool isWhiteSpace(char ch)
            std::isspace(static_cast<unsigned char>(ch)) != 0;
 }
 
-template <> inline bool isWhiteSpace(wchar_t ch) { return std::iswspace(ch) != 0; }
+template <> inline
+bool isWhiteSpace(wchar_t ch) { return std::iswspace(ch) != 0; }
 
 
 template <class Char> inline
@@ -458,7 +459,7 @@ S formatInteger(Num n, bool hasMinus)
     assert(n >= 0);
     typedef typename GetCharType<S>::Type CharType;
 
-    const size_t bufferSize = 100; //sufficient for signed 256-bit numbers
+    const size_t bufferSize = 64; //sufficient for signed 128-bit numbers
     CharType buffer[bufferSize]; //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
     assert_static(2 + 5 * sizeof(n) / 2 <= bufferSize);
     //minimum required chars (+ sign char): 1 + ceil(ln_10 (256^sizeof(n))) =~ 1 + ceil(sizeof(n) * 2.4082) <= 2 + floor(sizeof(n) * 2.5)
@@ -491,7 +492,6 @@ S numberTo(const Num& number, Int2Type<NUM_TYPE_UNSIGNED_INT>)
 }
 
 //--------------------------------------------------------------------------------
-
 
 template <class Num, class S> inline
 Num stringTo(const S& str, Int2Type<NUM_TYPE_OTHER>) //default string to number conversion using streams: convenient, but SLOW

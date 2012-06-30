@@ -10,12 +10,12 @@ COMMON_LINK_FLAGS    = -pthread -lrt
 
 #default build
 CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
-LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes` -lboost_thread
+LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes` -lboost_thread -lboost_system
 
 #static std library linkage used for precompiled release
 ifeq ($(BUILD),release)
 CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
-LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
+LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a /usr/local/lib/libboost_system.a
 endif
 #####################################################################################################
 
@@ -87,6 +87,7 @@ CPP_LIST+=wx+/button.cpp
 CPP_LIST+=wx+/format_unit.cpp
 CPP_LIST+=wx+/graph.cpp
 CPP_LIST+=wx+/tooltip.cpp
+CPP_LIST+=wx+/zlib_wrap.cpp
 
 #list of all *.o files
 OBJECT_LIST=$(CPP_LIST:%.cpp=OBJ/FFS_Release_GCC_Make/%.o)

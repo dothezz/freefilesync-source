@@ -9,7 +9,6 @@
 #include <set>
 #include <zen/thread.h> //includes <boost/thread.hpp>
 #include <zen/scope_guard.h>
-//#include <boost/thread/once.hpp>
 
 #ifdef FFS_WIN
 #include <zen/dll.h>
@@ -27,7 +26,7 @@ namespace
 {
 const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to buffer
 
-
+inline
 int cvrtSize(IconBuffer::IconSize sz) //get size in pixel
 {
     switch (sz)
@@ -57,7 +56,7 @@ public:
     typedef GdkPixbuf* HandleType;
 #endif
 
-    explicit IconHolder(HandleType handle = 0) : handle_(handle) {} //take ownership!
+    explicit IconHolder(HandleType handle = nullptr) : handle_(handle) {} //take ownership!
 
     //icon holder has value semantics!
     IconHolder(const IconHolder& other) : handle_(other.handle_ == nullptr ? nullptr :
@@ -104,31 +103,36 @@ public:
             ICONINFO icoInfo = {};
             if (::GetIconInfo(clone.handle_, &icoInfo))
             {
-                ::DeleteObject(icoInfo.hbmMask); //nice potential for a GDI leak!
-                ZEN_ON_SCOPE_EXIT(::DeleteObject(icoInfo.hbmColor)); //
+                if (icoInfo.hbmMask) //VC11 static analyzer warns this could be null
+                    ::DeleteObject(icoInfo.hbmMask); //nice potential for a GDI leak!
 
-                BITMAP bmpInfo = {};
-                if (::GetObject(icoInfo.hbmColor, //__in   HGDIOBJ hgdiobj,
-                                sizeof(BITMAP),   //__in   int cbBuffer,
-                                &bmpInfo) != 0)   // __out  LPVOID lpvObject
+                if (icoInfo.hbmColor) //optional (for black and white bitmap)
                 {
-                    const int maxExtent = std::max(bmpInfo.bmWidth, bmpInfo.bmHeight);
-                    if (0 < expectedSize && expectedSize < maxExtent)
+                    ZEN_ON_SCOPE_EXIT(::DeleteObject(icoInfo.hbmColor)); //
+
+                    BITMAP bmpInfo = {};
+                    if (::GetObject(icoInfo.hbmColor, //__in   HGDIOBJ hgdiobj,
+                                    sizeof(BITMAP),   //__in   int cbBuffer,
+                                    &bmpInfo) != 0)   // __out  LPVOID lpvObject
                     {
-                        bmpInfo.bmWidth  = bmpInfo.bmWidth  * expectedSize / maxExtent; //scale those Vista jumbo 256x256 icons down!
-                        bmpInfo.bmHeight = bmpInfo.bmHeight * expectedSize / maxExtent; //
+                        const int maxExtent = std::max(bmpInfo.bmWidth, bmpInfo.bmHeight);
+                        if (0 < expectedSize && expectedSize < maxExtent)
+                        {
+                            bmpInfo.bmWidth  = bmpInfo.bmWidth  * expectedSize / maxExtent; //scale those Vista jumbo 256x256 icons down!
+                            bmpInfo.bmHeight = bmpInfo.bmHeight * expectedSize / maxExtent; //
+                        }
+                        newIcon.SetSize(bmpInfo.bmWidth, bmpInfo.bmHeight); //wxIcon is stretched to this size
                     }
-                    newIcon.SetSize(bmpInfo.bmWidth, bmpInfo.bmHeight); //wxIcon is stretched to this size
                 }
             }
         }
         //no stretching for now
-        //newIcon.SetSize(defaultSize, defaultSize); //icon is stretched to this size if referenced HICON differs
+        //newIcon.SetSize(expectedSize, expectedSize); //icon is stretched to this size if referenced HICON differs
 
 #elif defined FFS_LINUX                   //
         newIcon.SetPixbuf(clone.handle_); // transfer ownership!!
 #endif                                    //
-        clone.handle_ = nullptr;             //
+        clone.handle_ = nullptr;          //
         return newIcon;
     }
 
@@ -486,7 +490,7 @@ void WorkerThread::operator()() //thread entry
 
     //2. Initialize system image list
     typedef BOOL (WINAPI* FileIconInitFun)(BOOL fRestoreCache);
-    const SysDllFun<FileIconInitFun> fileIconInit(L"Shell32.dll", reinterpret_cast<LPCSTR>(660));
+    const SysDllFun<FileIconInitFun> fileIconInit(L"Shell32.dll", reinterpret_cast<LPCSTR>(660)); //MS requires and documents this magic number
     assert(fileIconInit);
     if (fileIconInit)
         fileIconInit(false); //TRUE to restore the system image cache from disk; FALSE otherwise.

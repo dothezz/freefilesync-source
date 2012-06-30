@@ -5,13 +5,13 @@ using namespace zen;
 
 namespace
 {
-std::string detectLineBreak(const Zstring& filename) //throw (FileError)
+std::string detectLineBreak(const Zstring& filename) //throw FileError
 {
     //read a (hopefully) significant portion of data
     zen::FileInput input(filename);
 
     std::vector<char> buffer(64 * 1024);
-    size_t bytesRead = input.read(&buffer[0], buffer.size()); //throw (FileError);
+    size_t bytesRead = input.read(&buffer[0], buffer.size()); //throw FileError
     buffer.resize(bytesRead);
 
     //detect line break
@@ -41,15 +41,15 @@ std::string detectLineBreak(const Zstring& filename) //throw (FileError)
 }
 
 
-ExtractLines::ExtractLines(const Zstring& filename, const std::string& lineBreak) :  //throw (FileError)
+ExtractLines::ExtractLines(const Zstring& filename, const std::string& lineBreak) :  //throw FileError
     inputStream(filename), bufferLogBegin(buffer.begin()), lineBreak_(lineBreak)
 {
     if (lineBreak.empty())
-        lineBreak_ = detectLineBreak(filename); //throw (FileError)
+        lineBreak_ = detectLineBreak(filename); //throw FileError
 }
 
 
-bool ExtractLines::getLine(std::string& output) //throw (FileError)
+bool ExtractLines::getLine(std::string& output) //throw FileError
 {
     for (;;)
     {
@@ -80,7 +80,7 @@ bool ExtractLines::getLine(std::string& output) //throw (FileError)
         const size_t BLOCK_SIZE = 512 * 1024;
         buffer.resize(buffer.size() + BLOCK_SIZE);
 
-        size_t bytesRead = inputStream.read(&buffer[0] + buffer.size() - BLOCK_SIZE, BLOCK_SIZE); //throw (FileError);
+        size_t bytesRead = inputStream.read(&buffer[0] + buffer.size() - BLOCK_SIZE, BLOCK_SIZE); //throw FileError
         assert(bytesRead <= BLOCK_SIZE); //promised by FileInput()
 
         if (bytesRead < BLOCK_SIZE)

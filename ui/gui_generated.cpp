@@ -44,8 +44,11 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_menuItemLoad = new wxMenuItem( m_menuFile, wxID_OPEN, wxString( _("&Open...") ) + wxT('\t') + wxT("Ctrl+O"), wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItemLoad );
 
-    m_menuItemSave = new wxMenuItem( m_menuFile, wxID_SAVE, wxString( _("&Save...") ) + wxT('\t') + wxT("Ctrl+S"), wxEmptyString, wxITEM_NORMAL );
+    m_menuItemSave = new wxMenuItem( m_menuFile, wxID_SAVE, wxString( _("&Save") ) + wxT('\t') + wxT("Ctrl+S"), wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItemSave );
+
+    m_menuItemSaveAs = new wxMenuItem( m_menuFile, wxID_SAVEAS, wxString( _("Save &As...") ) , wxEmptyString, wxITEM_NORMAL );
+    m_menuFile->Append( m_menuItemSaveAs );
 
     m_menuFile->AppendSeparator();
 
@@ -559,19 +562,16 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     wxBoxSizer* bSizer1712;
     bSizer1712 = new wxBoxSizer( wxVERTICAL );
 
-
-    bSizer1712->Add( 0, 0, 1, wxEXPAND, 5 );
-
     m_bitmapCreateLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
     m_bitmapCreateLeft->SetToolTip( _("Number of files and folders that will be created") );
 
     bSizer1712->Add( m_bitmapCreateLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 
+    bSizer1712->Add( 5, 2, 0, 0, 5 );
+
+
     bSizer1712->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    bSizer1712->Add( 2, 2, 0, 0, 5 );
 
     m_staticTextCreateLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextCreateLeft->Wrap( -1 );
@@ -588,19 +588,16 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     wxBoxSizer* bSizer172;
     bSizer172 = new wxBoxSizer( wxVERTICAL );
 
-
-    bSizer172->Add( 0, 0, 1, wxEXPAND, 5 );
-
     m_bitmapUpdateLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
     m_bitmapUpdateLeft->SetToolTip( _("Number of files that will be overwritten") );
 
     bSizer172->Add( m_bitmapUpdateLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
+    bSizer172->Add( 5, 2, 0, 0, 5 );
+
+
     bSizer172->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    bSizer172->Add( 2, 2, 0, 0, 5 );
 
     m_staticTextUpdateLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextUpdateLeft->Wrap( -1 );
@@ -617,19 +614,16 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     wxBoxSizer* bSizer173;
     bSizer173 = new wxBoxSizer( wxVERTICAL );
 
-
-    bSizer173->Add( 0, 0, 1, wxEXPAND, 5 );
-
     m_bitmapDeleteLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
     m_bitmapDeleteLeft->SetToolTip( _("Number of files and folders that will be deleted") );
 
     bSizer173->Add( m_bitmapDeleteLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
+    bSizer173->Add( 5, 2, 0, 0, 5 );
+
+
     bSizer173->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    bSizer173->Add( 2, 2, 0, 0, 5 );
 
     m_staticTextDeleteLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextDeleteLeft->Wrap( -1 );
@@ -645,23 +639,20 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     bSizerData = new wxBoxSizer( wxVERTICAL );
 
-
-    bSizerData->Add( 0, 0, 1, wxEXPAND, 5 );
-
     m_bitmapData = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    m_bitmapData->SetToolTip( _("Total amount of data that will be transferred") );
+    m_bitmapData->SetToolTip( _("Total bytes to copy") );
 
     bSizerData->Add( m_bitmapData, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 
+    bSizerData->Add( 5, 2, 0, 0, 5 );
+
+
     bSizerData->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    bSizerData->Add( 2, 2, 0, 0, 5 );
 
     m_staticTextData = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextData->Wrap( -1 );
-    m_staticTextData->SetToolTip( _("Total amount of data that will be transferred") );
+    m_staticTextData->SetToolTip( _("Total bytes to copy") );
 
     bSizerData->Add( m_staticTextData, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
@@ -674,19 +665,16 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     wxBoxSizer* bSizer176;
     bSizer176 = new wxBoxSizer( wxVERTICAL );
 
-
-    bSizer176->Add( 0, 0, 1, wxEXPAND, 5 );
-
     m_bitmapDeleteRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
     m_bitmapDeleteRight->SetToolTip( _("Number of files and folders that will be deleted") );
 
     bSizer176->Add( m_bitmapDeleteRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
+    bSizer176->Add( 5, 2, 0, 0, 5 );
+
+
     bSizer176->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    bSizer176->Add( 2, 2, 0, 0, 5 );
 
     m_staticTextDeleteRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextDeleteRight->Wrap( -1 );
@@ -703,19 +691,16 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     wxBoxSizer* bSizer177;
     bSizer177 = new wxBoxSizer( wxVERTICAL );
 
-
-    bSizer177->Add( 0, 0, 1, wxEXPAND, 5 );
-
     m_bitmapUpdateRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
     m_bitmapUpdateRight->SetToolTip( _("Number of files that will be overwritten") );
 
     bSizer177->Add( m_bitmapUpdateRight, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 
+    bSizer177->Add( 5, 2, 0, 0, 5 );
+
+
     bSizer177->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    bSizer177->Add( 2, 2, 0, 0, 5 );
 
     m_staticTextUpdateRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextUpdateRight->Wrap( -1 );
@@ -732,19 +717,16 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     wxBoxSizer* bSizer178;
     bSizer178 = new wxBoxSizer( wxVERTICAL );
 
-
-    bSizer178->Add( 0, 0, 1, wxEXPAND, 5 );
-
     m_bitmapCreateRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
     m_bitmapCreateRight->SetToolTip( _("Number of files and folders that will be created") );
 
     bSizer178->Add( m_bitmapCreateRight, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 
+    bSizer178->Add( 5, 2, 0, 0, 5 );
+
+
     bSizer178->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    bSizer178->Add( 2, 2, 0, 0, 5 );
 
     m_staticTextCreateRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextCreateRight->Wrap( -1 );
@@ -832,9 +814,10 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MainDialogGenerated::OnClose ) );
     this->Connect( m_menuItem10->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnCompare ) );
     this->Connect( m_menuItem11->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnStartSync ) );
-    this->Connect( m_menuItemNew->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnNewConfig ) );
-    this->Connect( m_menuItemLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnLoadConfig ) );
-    this->Connect( m_menuItemSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnSaveConfig ) );
+    this->Connect( m_menuItemNew->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigNew ) );
+    this->Connect( m_menuItemLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigLoad ) );
+    this->Connect( m_menuItemSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigSave ) );
+    this->Connect( m_menuItemSaveAs->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigSaveAs ) );
     this->Connect( m_menuItem4->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuQuit ) );
     this->Connect( m_menuItemGlobSett->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuGlobalSettings ) );
     this->Connect( m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuBatchJob ) );
@@ -851,8 +834,8 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_dirPickerLeft->Connect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( MainDialogGenerated::OnDirSelected ), NULL, this );
     m_bpButtonSwapSides->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnSwapSides ), NULL, this );
     m_dirPickerRight->Connect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( MainDialogGenerated::OnDirSelected ), NULL, this );
-    m_bpButtonLoad->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnLoadConfig ), NULL, this );
-    m_bpButtonSave->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnSaveConfig ), NULL, this );
+    m_bpButtonLoad->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigLoad ), NULL, this );
+    m_bpButtonSave->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigSaveAs ), NULL, this );
     m_listBoxHistory->Connect( wxEVT_CHAR, wxKeyEventHandler( MainDialogGenerated::OnCfgHistoryKeyEvent ), NULL, this );
     m_listBoxHistory->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnLoadFromHistory ), NULL, this );
     m_bpButtonFilter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigureFilter ), NULL, this );
@@ -879,9 +862,10 @@ MainDialogGenerated::~MainDialogGenerated()
     this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MainDialogGenerated::OnClose ) );
     this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnCompare ) );
     this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnStartSync ) );
-    this->Disconnect( wxID_NEW, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnNewConfig ) );
-    this->Disconnect( wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnLoadConfig ) );
-    this->Disconnect( wxID_SAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnSaveConfig ) );
+    this->Disconnect( wxID_NEW, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigNew ) );
+    this->Disconnect( wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigLoad ) );
+    this->Disconnect( wxID_SAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigSave ) );
+    this->Disconnect( wxID_SAVEAS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnConfigSaveAs ) );
     this->Disconnect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuQuit ) );
     this->Disconnect( wxID_PREFERENCES, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuGlobalSettings ) );
     this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuBatchJob ) );
@@ -898,8 +882,8 @@ MainDialogGenerated::~MainDialogGenerated()
     m_dirPickerLeft->Disconnect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( MainDialogGenerated::OnDirSelected ), NULL, this );
     m_bpButtonSwapSides->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnSwapSides ), NULL, this );
     m_dirPickerRight->Disconnect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( MainDialogGenerated::OnDirSelected ), NULL, this );
-    m_bpButtonLoad->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnLoadConfig ), NULL, this );
-    m_bpButtonSave->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnSaveConfig ), NULL, this );
+    m_bpButtonLoad->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigLoad ), NULL, this );
+    m_bpButtonSave->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigSaveAs ), NULL, this );
     m_listBoxHistory->Disconnect( wxEVT_CHAR, wxKeyEventHandler( MainDialogGenerated::OnCfgHistoryKeyEvent ), NULL, this );
     m_listBoxHistory->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnLoadFromHistory ), NULL, this );
     m_bpButtonFilter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigureFilter ), NULL, this );
@@ -1109,7 +1093,7 @@ CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id,
 
     sSizerTimeRemaining = new wxBoxSizer( wxHORIZONTAL );
 
-    m_staticTextTimeRemFixed = new wxStaticText( this, wxID_ANY, _("Remaining time:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextTimeRemFixed = new wxStaticText( this, wxID_ANY, _("Time remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextTimeRemFixed->Wrap( -1 );
     m_staticTextTimeRemFixed->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
@@ -1130,7 +1114,7 @@ CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id,
     sSizerTimeElapsed = new wxBoxSizer( wxHORIZONTAL );
 
     wxStaticText* m_staticText37;
-    m_staticText37 = new wxStaticText( this, wxID_ANY, _("Elapsed time:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText37 = new wxStaticText( this, wxID_ANY, _("Time elapsed:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText37->Wrap( -1 );
     m_staticText37->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
@@ -1539,16 +1523,16 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     wxBoxSizer* bSizer68;
     bSizer68 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonSave = new wxButton( this, wxID_SAVE, _("&Save..."), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonSave->SetDefault();
-    m_buttonSave->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
-
-    bSizer68->Add( m_buttonSave, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
-
     m_buttonLoad = new wxButton( this, wxID_OPEN, _("&Open..."), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonLoad->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
-    bSizer68->Add( m_buttonLoad, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+    bSizer68->Add( m_buttonLoad, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
+
+    m_buttonSave = new wxButton( this, wxID_SAVE, _("Save &As..."), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonSave->SetDefault();
+    m_buttonSave->SetFont( wxFont( 10, 70, 90, 92, false, wxEmptyString ) );
+
+    bSizer68->Add( m_buttonSave, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     m_button6 = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_button6->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
@@ -1575,8 +1559,8 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     m_bpButtonRemovePair->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnRemoveTopFolderPair ), NULL, this );
     m_choiceHandleError->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnChangeErrorHandling ), NULL, this );
     m_spinCtrlLogCountMax->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( BatchDlgGenerated::OnChangeMaxLogCountTxt ), NULL, this );
-    m_buttonSave->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSaveBatchJob ), NULL, this );
     m_buttonLoad->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnLoadBatchJob ), NULL, this );
+    m_buttonSave->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSaveBatchJob ), NULL, this );
     m_button6->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnCancel ), NULL, this );
 }
 
@@ -1592,8 +1576,8 @@ BatchDlgGenerated::~BatchDlgGenerated()
     m_bpButtonRemovePair->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnRemoveTopFolderPair ), NULL, this );
     m_choiceHandleError->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnChangeErrorHandling ), NULL, this );
     m_spinCtrlLogCountMax->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( BatchDlgGenerated::OnChangeMaxLogCountTxt ), NULL, this );
-    m_buttonSave->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSaveBatchJob ), NULL, this );
     m_buttonLoad->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnLoadBatchJob ), NULL, this );
+    m_buttonSave->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSaveBatchJob ), NULL, this );
     m_button6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnCancel ), NULL, this );
 
 }
@@ -2257,7 +2241,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
     m_staticTextStatus->Wrap( -1 );
     m_staticTextStatus->SetFont( wxFont( 14, 70, 90, 92, false, wxEmptyString ) );
 
-    bSizer42->Add( m_staticTextStatus, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP, 5 );
+    bSizer42->Add( m_staticTextStatus, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5 );
 
     m_animationControl1 = new wxAnimationCtrl( m_panelHeader, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxDefaultSize, wxAC_DEFAULT_STYLE );
     m_animationControl1->SetMinSize( wxSize( 45,45 ) );
@@ -2359,7 +2343,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 
     fgSizer10->Add( m_staticTextSpeed, 0, wxALIGN_BOTTOM, 5 );
 
-    m_staticTextLabelRemTime = new wxStaticText( m_panelProgress, wxID_ANY, _("Remaining time:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextLabelRemTime = new wxStaticText( m_panelProgress, wxID_ANY, _("Time remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextLabelRemTime->Wrap( -1 );
     m_staticTextLabelRemTime->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
@@ -2371,7 +2355,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 
     fgSizer10->Add( m_staticTextRemTime, 0, wxALIGN_BOTTOM, 5 );
 
-    m_staticTextLabelElapsedTime = new wxStaticText( m_panelProgress, wxID_ANY, _("Elapsed time:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticTextLabelElapsedTime = new wxStaticText( m_panelProgress, wxID_ANY, _("Time elapsed:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextLabelElapsedTime->Wrap( -1 );
     m_staticTextLabelElapsedTime->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
@@ -2561,20 +2545,20 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     wxBoxSizer* bSizer53;
     bSizer53 = new wxBoxSizer( wxVERTICAL );
 
-    m_panel5 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
-    m_panel5->SetBackgroundColour( wxColour( 255, 255, 255 ) );
+    m_panelLogo = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
+    m_panelLogo->SetBackgroundColour( wxColour( 255, 255, 255 ) );
 
     wxBoxSizer* bSizer36;
     bSizer36 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_bitmap11 = new wxStaticBitmap( m_panel5, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    m_bitmap11 = new wxStaticBitmap( m_panelLogo, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizer36->Add( m_bitmap11, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    m_panel5->SetSizer( bSizer36 );
-    m_panel5->Layout();
-    bSizer36->Fit( m_panel5 );
-    bSizer53->Add( m_panel5, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxTOP|wxBOTTOM, 5 );
+    m_panelLogo->SetSizer( bSizer36 );
+    m_panelLogo->Layout();
+    bSizer36->Fit( m_panelLogo );
+    bSizer53->Add( m_panelLogo, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxTOP|wxBOTTOM, 5 );
 
     m_build = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_build->Wrap( -1 );
@@ -2680,6 +2664,84 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     bSizerCodeInfo->Fit( m_panel33 );
     bSizer53->Add( m_panel33, 0, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 
+    m_panel40 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panel40->SetBackgroundColour( wxColour( 153, 170, 187 ) );
+
+    wxBoxSizer* bSizer183;
+    bSizer183 = new wxBoxSizer( wxVERTICAL );
+
+    m_panel39 = new wxPanel( m_panel40, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panel39->SetBackgroundColour( wxColour( 221, 221, 255 ) );
+
+    wxBoxSizer* bSizer184;
+    bSizer184 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_staticText83 = new wxStaticText( m_panel39, wxID_ANY, _("If you like FreeFileSync"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText83->Wrap( -1 );
+    m_staticText83->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 92, false, wxEmptyString ) );
+    m_staticText83->SetForegroundColour( wxColour( 0, 0, 0 ) );
+
+    bSizer184->Add( m_staticText83, 0, wxALL, 5 );
+
+
+    bSizer184->Add( 0, 0, 1, wxEXPAND, 5 );
+
+    m_hyperlink3 = new wxHyperlinkCtrl( m_panel39, wxID_ANY, _("Donate with PayPal"), wxT("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zhnmju123@gmx.de&lc=US&currency_code=EUR"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink3->SetFont( wxFont( 10, 70, 90, 92, true, wxEmptyString ) );
+    m_hyperlink3->SetBackgroundColour( wxColour( 221, 221, 255 ) );
+    m_hyperlink3->SetToolTip( _("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zhnmju123@gmx.de&lc=US&currency_code=EUR") );
+
+    bSizer184->Add( m_hyperlink3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_bitmapPaypal = new wxStaticBitmap( m_panel39, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    m_bitmapPaypal->SetToolTip( _("Donate with PayPal") );
+
+    bSizer184->Add( m_bitmapPaypal, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+
+
+    bSizer184->Add( 0, 0, 1, wxEXPAND, 5 );
+
+
+    m_panel39->SetSizer( bSizer184 );
+    m_panel39->Layout();
+    bSizer184->Fit( m_panel39 );
+    bSizer183->Add( m_panel39, 0, wxEXPAND|wxALL, 5 );
+
+
+    m_panel40->SetSizer( bSizer183 );
+    m_panel40->Layout();
+    bSizer183->Fit( m_panel40 );
+    bSizer53->Add( m_panel40, 0, wxEXPAND|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+    m_scrolledWindowTranslators = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxDOUBLE_BORDER|wxHSCROLL|wxVSCROLL );
+    m_scrolledWindowTranslators->SetScrollRate( 5, 5 );
+    m_scrolledWindowTranslators->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    m_scrolledWindowTranslators->SetMinSize( wxSize( -1,180 ) );
+
+    bSizerTranslators = new wxBoxSizer( wxVERTICAL );
+
+    m_staticText54 = new wxStaticText( m_scrolledWindowTranslators, wxID_ANY, _("Big thanks for localizing FreeFileSync goes out to:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText54->Wrap( -1 );
+    m_staticText54->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+
+    bSizerTranslators->Add( m_staticText54, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP|wxBOTTOM, 5 );
+
+
+    bSizerTranslators->Add( 0, 5, 0, 0, 5 );
+
+    fgSizerTranslators = new wxFlexGridSizer( 50, 3, 2, 20 );
+    fgSizerTranslators->SetFlexibleDirection( wxBOTH );
+    fgSizerTranslators->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+
+    bSizerTranslators->Add( fgSizerTranslators, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+
+
+    m_scrolledWindowTranslators->SetSizer( bSizerTranslators );
+    m_scrolledWindowTranslators->Layout();
+    bSizerTranslators->Fit( m_scrolledWindowTranslators );
+    bSizer53->Add( m_scrolledWindowTranslators, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxEXPAND, 5 );
+
     wxStaticBoxSizer* sbSizer29;
     sbSizer29 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Feedback and suggestions are welcome") ), wxHORIZONTAL );
 
@@ -2732,84 +2794,6 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer53->Add( sbSizer29, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM, 5 );
 
-    m_scrolledWindowTranslators = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxDOUBLE_BORDER|wxHSCROLL|wxVSCROLL );
-    m_scrolledWindowTranslators->SetScrollRate( 5, 5 );
-    m_scrolledWindowTranslators->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-    m_scrolledWindowTranslators->SetMinSize( wxSize( -1,180 ) );
-
-    bSizerTranslators = new wxBoxSizer( wxVERTICAL );
-
-    m_staticText54 = new wxStaticText( m_scrolledWindowTranslators, wxID_ANY, _("Big thanks for localizing FreeFileSync goes out to:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText54->Wrap( -1 );
-    m_staticText54->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
-
-    bSizerTranslators->Add( m_staticText54, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP|wxBOTTOM, 5 );
-
-
-    bSizerTranslators->Add( 0, 5, 0, 0, 5 );
-
-    fgSizerTranslators = new wxFlexGridSizer( 50, 3, 2, 20 );
-    fgSizerTranslators->SetFlexibleDirection( wxBOTH );
-    fgSizerTranslators->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-
-
-    bSizerTranslators->Add( fgSizerTranslators, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-
-
-    m_scrolledWindowTranslators->SetSizer( bSizerTranslators );
-    m_scrolledWindowTranslators->Layout();
-    bSizerTranslators->Fit( m_scrolledWindowTranslators );
-    bSizer53->Add( m_scrolledWindowTranslators, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxEXPAND, 5 );
-
-    m_panel40 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel40->SetBackgroundColour( wxColour( 153, 170, 187 ) );
-
-    wxBoxSizer* bSizer183;
-    bSizer183 = new wxBoxSizer( wxVERTICAL );
-
-    m_panel39 = new wxPanel( m_panel40, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel39->SetBackgroundColour( wxColour( 221, 221, 255 ) );
-
-    wxBoxSizer* bSizer184;
-    bSizer184 = new wxBoxSizer( wxHORIZONTAL );
-
-    m_staticText83 = new wxStaticText( m_panel39, wxID_ANY, _("If you like FreeFileSync"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText83->Wrap( -1 );
-    m_staticText83->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 92, false, wxEmptyString ) );
-    m_staticText83->SetForegroundColour( wxColour( 0, 0, 0 ) );
-
-    bSizer184->Add( m_staticText83, 0, wxALL, 5 );
-
-
-    bSizer184->Add( 0, 0, 1, wxEXPAND, 5 );
-
-    m_hyperlink3 = new wxHyperlinkCtrl( m_panel39, wxID_ANY, _("Donate with PayPal"), wxT("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zhnmju123@gmx.de&lc=US&currency_code=EUR"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink3->SetFont( wxFont( 10, 70, 90, 92, true, wxEmptyString ) );
-    m_hyperlink3->SetBackgroundColour( wxColour( 221, 221, 255 ) );
-    m_hyperlink3->SetToolTip( _("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zhnmju123@gmx.de&lc=US&currency_code=EUR") );
-
-    bSizer184->Add( m_hyperlink3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-
-    m_bitmapPaypal = new wxStaticBitmap( m_panel39, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    m_bitmapPaypal->SetToolTip( _("Donate with PayPal") );
-
-    bSizer184->Add( m_bitmapPaypal, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-
-    bSizer184->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    m_panel39->SetSizer( bSizer184 );
-    m_panel39->Layout();
-    bSizer184->Fit( m_panel39 );
-    bSizer183->Add( m_panel39, 0, wxEXPAND|wxALL, 5 );
-
-
-    m_panel40->SetSizer( bSizer183 );
-    m_panel40->Layout();
-    bSizer183->Fit( m_panel40 );
-    bSizer53->Add( m_panel40, 0, wxEXPAND|wxBOTTOM, 5 );
-
     wxStaticBoxSizer* sbSizer14;
     sbSizer14 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Published under the GNU General Public License") ), wxHORIZONTAL );
 
@@ -2857,7 +2841,7 @@ AboutDlgGenerated::~AboutDlgGenerated()
 
 }
 
-ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+MessageDlgGenerated::MessageDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
     this->SetSizeHints( wxSize( 300,160 ), wxDefaultSize );
     this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
@@ -2871,11 +2855,11 @@ ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     wxBoxSizer* bSizer26;
     bSizer26 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_bitmap10 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
-    bSizer26->Add( m_bitmap10, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+    m_bitmapMsgType = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    bSizer26->Add( m_bitmapMsgType, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 
-    m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400,130 ), wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
-    bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    m_textCtrlMessage = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400,130 ), wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
+    bSizer26->Add( m_textCtrlMessage, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 
 
     bSizer24->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
@@ -2889,29 +2873,27 @@ ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     wxBoxSizer* bSizer177;
     bSizer177 = new wxBoxSizer( wxVERTICAL );
 
-    m_checkBoxIgnoreErrors = new wxCheckBox( m_panel33, wxID_ANY, _("Ignore further errors"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_checkBoxIgnoreErrors->SetToolTip( _("Hide further error messages during the current process") );
-
-    bSizer177->Add( m_checkBoxIgnoreErrors, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5 );
+    m_checkBoxCustom = new wxCheckBox( m_panel33, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer177->Add( m_checkBoxCustom, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5 );
 
     wxBoxSizer* bSizer25;
     bSizer25 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_buttonIgnore = new wxButton( m_panel33, wxID_OK, _("&Ignore"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonIgnore->SetDefault();
-    m_buttonIgnore->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+    m_buttonCustom1 = new wxButton( m_panel33, wxID_ANY, _("dummy"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCustom1->SetDefault();
+    m_buttonCustom1->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
-    bSizer25->Add( m_buttonIgnore, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer25->Add( m_buttonCustom1, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_buttonRetry = new wxButton( m_panel33, wxID_RETRY, _("&Retry"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonRetry->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+    m_buttonCustom2 = new wxButton( m_panel33, wxID_ANY, _("dummy"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCustom2->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
-    bSizer25->Add( m_buttonRetry, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer25->Add( m_buttonCustom2, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_buttonAbort = new wxButton( m_panel33, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonAbort->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+    m_buttonCancel = new wxButton( m_panel33, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonCancel->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
 
-    bSizer25->Add( m_buttonAbort, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
+    bSizer25->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 
 
     bSizer177->Add( bSizer25, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
@@ -2930,193 +2912,19 @@ ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     this->Centre( wxBOTH );
 
     // Connect Events
-    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ErrorDlgGenerated::OnClose ) );
-    m_buttonIgnore->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnIgnore ), NULL, this );
-    m_buttonRetry->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnRetry ), NULL, this );
-    m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnAbort ), NULL, this );
+    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MessageDlgGenerated::OnClose ) );
+    m_buttonCustom1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnButton1 ), NULL, this );
+    m_buttonCustom2->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnButton2 ), NULL, this );
+    m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnCancel ), NULL, this );
 }
 
-ErrorDlgGenerated::~ErrorDlgGenerated()
+MessageDlgGenerated::~MessageDlgGenerated()
 {
     // Disconnect Events
-    this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ErrorDlgGenerated::OnClose ) );
-    m_buttonIgnore->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnIgnore ), NULL, this );
-    m_buttonRetry->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnRetry ), NULL, this );
-    m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnAbort ), NULL, this );
-
-}
-
-WarningDlgGenerated::WarningDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-    this->SetSizeHints( wxSize( 300,160 ), wxDefaultSize );
-    this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-
-    wxBoxSizer* bSizer24;
-    bSizer24 = new wxBoxSizer( wxVERTICAL );
-
-
-    bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
-
-    wxBoxSizer* bSizer26;
-    bSizer26 = new wxBoxSizer( wxHORIZONTAL );
-
-    m_bitmap10 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
-    bSizer26->Add( m_bitmap10, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-    m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400,130 ), wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
-    bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-
-
-    bSizer24->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
-
-    m_staticline7 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    bSizer24->Add( m_staticline7, 0, wxEXPAND|wxTOP, 5 );
-
-    m_panel34 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel34->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-
-    wxBoxSizer* bSizer178;
-    bSizer178 = new wxBoxSizer( wxVERTICAL );
-
-    m_checkBoxDontShowAgain = new wxCheckBox( m_panel34, wxID_ANY, _("Do not show this dialog again"), wxDefaultPosition, wxDefaultSize, 0 );
-    bSizer178->Add( m_checkBoxDontShowAgain, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5 );
-
-    wxBoxSizer* bSizer25;
-    bSizer25 = new wxBoxSizer( wxHORIZONTAL );
-
-    m_buttonIgnore = new wxButton( m_panel34, wxID_IGNORE, _("&Ignore"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonIgnore->SetDefault();
-    m_buttonIgnore->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizer25->Add( m_buttonIgnore, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
-
-    m_buttonSwitch = new wxButton( m_panel34, wxID_MORE, _("&Switch"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonSwitch->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizer25->Add( m_buttonSwitch, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
-
-    m_buttonAbort = new wxButton( m_panel34, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonAbort->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizer25->Add( m_buttonAbort, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
-
-
-    bSizer178->Add( bSizer25, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-
-
-    m_panel34->SetSizer( bSizer178 );
-    m_panel34->Layout();
-    bSizer178->Fit( m_panel34 );
-    bSizer24->Add( m_panel34, 0, wxEXPAND, 5 );
-
-
-    this->SetSizer( bSizer24 );
-    this->Layout();
-    bSizer24->Fit( this );
-
-    this->Centre( wxBOTH );
-
-    // Connect Events
-    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WarningDlgGenerated::OnClose ) );
-    m_buttonIgnore->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WarningDlgGenerated::OnIgnore ), NULL, this );
-    m_buttonSwitch->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WarningDlgGenerated::OnSwitch ), NULL, this );
-    m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WarningDlgGenerated::OnAbort ), NULL, this );
-}
-
-WarningDlgGenerated::~WarningDlgGenerated()
-{
-    // Disconnect Events
-    this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WarningDlgGenerated::OnClose ) );
-    m_buttonIgnore->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WarningDlgGenerated::OnIgnore ), NULL, this );
-    m_buttonSwitch->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WarningDlgGenerated::OnSwitch ), NULL, this );
-    m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WarningDlgGenerated::OnAbort ), NULL, this );
-
-}
-
-QuestionDlgGenerated::QuestionDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-    this->SetSizeHints( wxSize( 300,160 ), wxDefaultSize );
-    this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-
-    wxBoxSizer* bSizer24;
-    bSizer24 = new wxBoxSizer( wxVERTICAL );
-
-
-    bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
-
-    wxBoxSizer* bSizer26;
-    bSizer26 = new wxBoxSizer( wxHORIZONTAL );
-
-    m_bitmap10 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
-    bSizer26->Add( m_bitmap10, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-
-    m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400,130 ), wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
-    bSizer26->Add( m_textCtrl8, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    bSizer24->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
-
-    m_staticline8 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    bSizer24->Add( m_staticline8, 0, wxEXPAND|wxTOP, 5 );
-
-    m_panel35 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel35->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-
-    wxBoxSizer* bSizer179;
-    bSizer179 = new wxBoxSizer( wxVERTICAL );
-
-    m_checkBox = new wxCheckBox( m_panel35, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-    bSizer179->Add( m_checkBox, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5 );
-
-    wxBoxSizer* bSizer25;
-    bSizer25 = new wxBoxSizer( wxHORIZONTAL );
-
-    m_buttonYes = new wxButton( m_panel35, wxID_YES, _("&Yes"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonYes->SetDefault();
-    m_buttonYes->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizer25->Add( m_buttonYes, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
-
-    m_buttonNo = new wxButton( m_panel35, wxID_NO, _("&No"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonNo->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizer25->Add( m_buttonNo, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
-
-    m_buttonCancel = new wxButton( m_panel35, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonCancel->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
-
-    bSizer25->Add( m_buttonCancel, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
-
-
-    bSizer179->Add( bSizer25, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-
-
-    m_panel35->SetSizer( bSizer179 );
-    m_panel35->Layout();
-    bSizer179->Fit( m_panel35 );
-    bSizer24->Add( m_panel35, 0, wxEXPAND, 5 );
-
-
-    this->SetSizer( bSizer24 );
-    this->Layout();
-    bSizer24->Fit( this );
-
-    this->Centre( wxBOTH );
-
-    // Connect Events
-    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( QuestionDlgGenerated::OnClose ) );
-    m_buttonYes->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( QuestionDlgGenerated::OnYes ), NULL, this );
-    m_buttonNo->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( QuestionDlgGenerated::OnNo ), NULL, this );
-    m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( QuestionDlgGenerated::OnCancel ), NULL, this );
-}
-
-QuestionDlgGenerated::~QuestionDlgGenerated()
-{
-    // Disconnect Events
-    this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( QuestionDlgGenerated::OnClose ) );
-    m_buttonYes->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( QuestionDlgGenerated::OnYes ), NULL, this );
-    m_buttonNo->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( QuestionDlgGenerated::OnNo ), NULL, this );
-    m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( QuestionDlgGenerated::OnCancel ), NULL, this );
+    this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MessageDlgGenerated::OnClose ) );
+    m_buttonCustom1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnButton1 ), NULL, this );
+    m_buttonCustom2->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnButton2 ), NULL, this );
+    m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnCancel ), NULL, this );
 
 }
 
@@ -3738,7 +3546,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
     fgSizer11->Add( m_bitmapDeleteLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_bitmapData = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    m_bitmapData->SetToolTip( _("Total amount of data that will be transferred") );
+    m_bitmapData->SetToolTip( _("Total bytes to copy") );
 
     fgSizer11->Add( m_bitmapData, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
@@ -3777,7 +3585,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 
     m_staticTextData = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextData->Wrap( -1 );
-    m_staticTextData->SetToolTip( _("Total amount of data that will be transferred") );
+    m_staticTextData->SetToolTip( _("Total bytes to copy") );
 
     fgSizer11->Add( m_staticTextData, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 

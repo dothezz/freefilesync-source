@@ -7,15 +7,15 @@
 #include "application.h"
 #include "main_dlg.h"
 #include <wx/event.h>
-#include "resources.h"
-#include <wx/msgdlg.h>
-#include "../lib/localization.h"
-#include "xml_ffs.h"
-#include "../lib/ffs_paths.h"
-#include <wx/file.h>
-#include <wx+/string_conv.h>
 #include <wx/log.h>
+#include <wx/msgdlg.h>
+#include <wx+/serialize.h>
+#include <wx+/string_conv.h>
 #include <zen/file_handling.h>
+#include "resources.h"
+#include "xml_ffs.h"
+#include "../lib/localization.h"
+#include "../lib/ffs_paths.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -97,27 +97,31 @@ bool Application::OnExceptionInMainLoop()
 
 int Application::OnRun()
 {
+
+    auto processException = [](const std::wstring& msg)
+    {
+        //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
+        try
+        {
+            saveBinStream(getConfigDir() + Zstr("LastError.txt"), utfCvrtTo<std::string>(msg)); //throw FileError
+        }
+        catch (const FileError&) {}
+
+        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", msg);
+    };
+
     try
     {
         wxApp::OnRun();
     }
     catch (const std::exception& e) //catch all STL exceptions
     {
-        //it's not always possible to display a message box, e.g. corrupted stack, however (non-stream) file output works!
-        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
-        safeOutput.Write(utfCvrtTo<wxString>(e.what()));
-
-        wxSafeShowMessage(_("An exception occurred!") + L" - RTS", utfCvrtTo<wxString>(e.what()));
+        processException(utfCvrtTo<std::wstring>(e.what()));
         return -9;
     }
     catch (...) //catch the rest
     {
-        const wxString& msg = L"Unknown error.";
-
-        wxFile safeOutput(toWx(getConfigDir()) + L"LastError.txt", wxFile::write);
-        safeOutput.Write(msg);
-
-        wxSafeShowMessage(_("An exception occurred!"), msg);
+        processException(L"Unknown error.");
         return -9;
     }
 

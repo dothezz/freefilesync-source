@@ -32,15 +32,16 @@ public:
     int getDelete() const;
     template <SelectedSide side> int getDelete() const;
 
-    int getConflict() const { return conflict; }
+    int getConflict() const { return static_cast<int>(conflictMsgs.size()); }
 
     typedef std::vector<std::pair<Zstring, std::wstring> > ConflictTexts; // Pair(filename/conflict text)
-    const ConflictTexts& getFirstConflicts() const { return firstConflicts; }
+    const ConflictTexts& getConflictMessages() const { return conflictMsgs; }
 
     zen::Int64 getDataToProcess() const { return dataToProcess; }
     size_t     getRowCount()      const { return rowsTotal; }
 
 private:
+    //static const size_t MAX_CONFLICTS = 3;
     void init();
 
     void recurse(const HierarchyObject& hierObj);
@@ -52,8 +53,8 @@ private:
     int createLeft, createRight;
     int updateLeft, updateRight;
     int deleteLeft, deleteRight;
-    int conflict;
-    ConflictTexts firstConflicts; //save the first few conflict texts to display as a warning message
+    //    int conflict;
+    ConflictTexts conflictMsgs; //conflict texts to display as a warning message
     zen::Int64 dataToProcess;
     size_t rowsTotal;
 };

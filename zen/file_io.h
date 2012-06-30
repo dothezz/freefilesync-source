@@ -19,6 +19,12 @@
 
 namespace zen
 {
+#ifdef FFS_WIN
+static const char LINE_BREAK[] = "\r\n";
+#elif defined FFS_LINUX
+static const char LINE_BREAK[] = "\n";
+#endif
+
 //file IO optimized for sequential read/write accesses + better error reporting + long path support (following symlinks)
 
 #ifdef FFS_WIN
@@ -36,6 +42,8 @@ public:
 
     size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns actual number of bytes read
     bool eof() { return eofReached; } //end of file reached
+
+    const Zstring& getFilename() const { return filename_; }
 
 private:
     FileInput(const FileInput&);
@@ -60,6 +68,8 @@ public:
     ~FileOutput();
 
     void write(const void* buffer, size_t bytesToWrite); //throw FileError
+
+    const Zstring& getFilename() const { return filename_; }
 
 private:
     FileOutput(const FileOutput&);

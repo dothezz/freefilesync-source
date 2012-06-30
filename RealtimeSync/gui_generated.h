@@ -75,8 +75,8 @@ protected:
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-    virtual void OnLoadConfig( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSaveConfig( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnConfigLoad( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnConfigSave( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }

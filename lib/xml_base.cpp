@@ -24,7 +24,7 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
             const std::string xmlBegin = "<?xml version=";
             std::vector<char> buffer(xmlBegin.size() + sizeof(zen::BYTE_ORDER_MARK_UTF8));
 
-            FileInput inputFile(filename); //throw FileError;
+            FileInput inputFile(filename); //throw FileError
             const size_t bytesRead = inputFile.read(&buffer[0], buffer.size()); //throw FileError
 
             const std::string fileBegin(&buffer[0], bytesRead);

@@ -84,7 +84,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
     const DWORD bufferSize = REPARSE_DATA_BUFFER_HEADER_SIZE + MAXIMUM_REPARSE_DATA_BUFFER_SIZE;
     std::vector<char> buffer(bufferSize);
 
-    DWORD bytesReturned; //dummy value required by FSCTL_GET_REPARSE_POINT!
+    DWORD bytesReturned = 0; //dummy value required by FSCTL_GET_REPARSE_POINT!
     if (!::DeviceIoControl(hLink,                   //__in         HANDLE hDevice,
                            FSCTL_GET_REPARSE_POINT, //__in         DWORD dwIoControlCode,
                            nullptr,                 //__in_opt     LPVOID lpInBuffer,

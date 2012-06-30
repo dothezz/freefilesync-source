@@ -181,16 +181,12 @@ private:
 
 
 
-
-
-
-//############################################################################
-//inline implementation
+//##################### implementation #########################################
 
 inline
 const FileSystemObject* GridView::getObject(size_t row) const
 {
-    return row < rowsOnView() ?
+    return row < viewRef.size() ?
            FileSystemObject::retrieve(viewRef[row]) : nullptr;
 }
 

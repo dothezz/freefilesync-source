@@ -31,7 +31,8 @@ public:
     //::operator new/ ::operator delete show same performance characterisics like malloc()/free()!
     static void* allocate(size_t size) { return ::operator new(size); } //throw std::bad_alloc
     static void  deallocate(void* ptr) { ::operator delete(ptr); }
-    static size_t calcCapacity(size_t length) { return std::max<size_t>(16, length + length / 2); } //any growth rate should not exceed golden ratio: 1.618033989
+    static size_t calcCapacity(size_t length) { return std::max<size_t>(std::max<size_t>(16, length), length + length / 2); } //size_t might overflow!
+    //any growth rate should not exceed golden ratio: 1.618033989
 };
 
 
@@ -68,9 +69,9 @@ protected:
     static Char* create(size_t size) { return create(size, size); }
     static Char* create(size_t size, size_t minCapacity)
     {
+        assert(size <= minCapacity);
         const size_t newCapacity = AP::calcCapacity(minCapacity);
         assert(newCapacity >= minCapacity);
-        assert(minCapacity >= size);
 
         Descriptor* const newDescr = static_cast<Descriptor*>(AP::allocate(sizeof(Descriptor) + (newCapacity + 1) * sizeof(Char)));
 
@@ -121,9 +122,10 @@ protected:
     static Char* create(size_t size) { return create(size, size); }
     static Char* create(size_t size, size_t minCapacity)
     {
+        assert(size <= minCapacity);
+
         const size_t newCapacity = AP::calcCapacity(minCapacity);
         assert(newCapacity >= minCapacity);
-        assert(minCapacity >= size);
 
         Descriptor* const newDescr = static_cast<Descriptor*>(AP::allocate(sizeof(Descriptor) + (newCapacity + 1) * sizeof(Char)));
         new (newDescr) Descriptor(1, size, newCapacity);

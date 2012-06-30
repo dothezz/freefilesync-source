@@ -71,7 +71,7 @@ Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string 
 }
 
 
-bool zen::moveToRecycleBin(const Zstring& filename)  //throw FileError
+bool zen::recycleOrDelete(const Zstring& filename)  //throw FileError
 {
     if (!somethingExists(filename))
         return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
@@ -165,12 +165,37 @@ bool zen::moveToRecycleBin(const Zstring& filename)  //throw FileError
 
 
 #ifdef FFS_WIN
-zen::StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
+StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
 {
-    warn_static("fix XP not working + finish");
+    const DWORD bufferSize = MAX_PATH + 1;
+    std::vector<wchar_t> buffer(bufferSize);
+    if (!::GetVolumePathName(pathName.c_str(), //__in   LPCTSTR lpszFileName,
+                             &buffer[0],       //__out  LPTSTR lpszVolumePathName,
+                             bufferSize))      //__in   DWORD cchBufferLength
+        return STATUS_REC_UNKNOWN;
+
+    const Zstring rootPathPf = appendSeparator(&buffer[0]);
+
+    SHQUERYRBINFO recInfo = {};
+    recInfo.cbSize = sizeof(recInfo);
+    HRESULT rv = ::SHQueryRecycleBin(rootPathPf.c_str(), //__in_opt  LPCTSTR pszRootPath,
+                                     &recInfo);          //__inout   LPSHQUERYRBINFO pSHQueryRBInfo
+
+    return rv == S_OK ? STATUS_REC_EXISTS : STATUS_REC_MISSING;
+    //1. excessive: traverses whole C:\$Recycle.Bin directory tree each time!!!! But it's safe and correct.
+
+    //2. we would prefer to use CLSID_RecycleBinManager beginning with Vista... if only this interface were documented!!!
+
+    //3. check directory existence of "C:\$Recycle.Bin, C:\RECYCLER, C:\RECYCLED"
+    // -> not upward-compatible, wrong result for subst-alias: recycler assumed existing, although it is not!
+
+    //4. alternative approach a'la Raymond Chen: http://blogs.msdn.com/b/oldnewthing/archive/2008/09/18/8956382.aspx
+    //caveat: might not be reliable, e.g. "subst"-alias of volume contains "$Recycle.Bin" although it is not available!
 
     /*
-    const bool canUseFastCheckForRecycler = winXpOrLater();
+        Zstring rootPathPf = appendSeparator(&buffer[0]);
+
+    	const bool canUseFastCheckForRecycler = winXpOrLater();
         if (!canUseFastCheckForRecycler) //== "checkForRecycleBin"
             return STATUS_REC_UNKNOWN;
 
@@ -180,20 +205,7 @@ zen::StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
         if (!checkRecycler)
             return STATUS_REC_UNKNOWN; //actually an error since we're >= XP
 
-        const DWORD bufferSize = MAX_PATH + 1;
-        std::vector<wchar_t> buffer(bufferSize);
-        if (!::GetVolumePathName(pathName.c_str(), //__in   LPCTSTR lpszFileName,
-                                 &buffer[0],       //__out  LPTSTR lpszVolumePathName,
-                                 bufferSize))      //__in   DWORD cchBufferLength
-            return STATUS_REC_UNKNOWN;
-
-        Zstring rootPathPf = appendSeparator(&buffer[0]);
-
         //search root directories for recycle bin folder...
-        //we would prefer to use CLSID_RecycleBinManager beginning with Vista... if this interface were documented
-
-        //caveat: "subst"-alias of volume contains "$Recycle.Bin" although it is not available!!!
-        warn_static("check")
 
         WIN32_FIND_DATA dataRoot = {};
         HANDLE hFindRoot = ::FindFirstFile(applyLongPathPrefix(rootPathPf + L'*').c_str(), &dataRoot);
@@ -207,8 +219,8 @@ zen::StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
         {
             if (!shouldSkip(dataRoot.cFileName) &&
                 (dataRoot.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 &&
-                (dataRoot.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM   ) != 0 && //maybe a little risky to rely on these attributes, there may be a recycler
-                (dataRoot.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN   ) != 0)   //(in obscure cases) we don't find, but that's better than the other way round
+                (dataRoot.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM   ) != 0 && //risky to rely on these attributes!!!
+                (dataRoot.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN   ) != 0)   //
             {
                 WIN32_FIND_DATA dataChild = {};
                 const Zstring childDirPf = rootPathPf + dataRoot.cFileName + L"\\";
@@ -238,25 +250,7 @@ zen::StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
         while (::FindNextFile(hFindRoot, &dataRoot)); //
 
         return STATUS_REC_MISSING;
-
     */
-
-    const DWORD bufferSize = MAX_PATH + 1;
-    std::vector<wchar_t> buffer(bufferSize);
-    if (!::GetVolumePathName(pathName.c_str(), //__in   LPCTSTR lpszFileName,
-                             &buffer[0],       //__out  LPTSTR lpszVolumePathName,
-                             bufferSize))      //__in   DWORD cchBufferLength
-        return STATUS_REC_UNKNOWN;
-
-    const Zstring rootPathPf = appendSeparator(&buffer[0]);
-
-    SHQUERYRBINFO recInfo = {};
-    recInfo.cbSize = sizeof(recInfo);
-    HRESULT rv = ::SHQueryRecycleBin(rootPathPf.c_str(), //__in_opt  LPCTSTR pszRootPath,
-                                     &recInfo);          //__inout   LPSHQUERYRBINFO pSHQueryRBInfo
-    //traverses whole C:\$Recycle.Bin directory each time!!!!
-
-    return rv == S_OK ? STATUS_REC_EXISTS : STATUS_REC_MISSING;
 }
 
 #elif defined FFS_LINUX

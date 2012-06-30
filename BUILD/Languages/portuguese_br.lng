@@ -1,5 +1,5 @@
 <header>
-	<language name>Português do Brasil</language name>
+	<language name>Português (BR)</language name>
 	<translator>Edison Aranha</translator>
 	<locale>pt_BR</locale>
 	<flag file>brazil.png</flag file>
@@ -9,6 +9,18 @@
 
 <source>Searching for folder %x...</source>
 <target>Buscando pela pasta %x...</target>
+
+<source>Batch execution</source>
+<target>Execução da tarefa em lote</target>
+
+<source>Items processed:</source>
+<target>Elementos processados:</target>
+
+<source>Items remaining:</source>
+<target>Elementos restantes:</target>
+
+<source>Total time:</source>
+<target>Tempo total:</target>
 
 <source>Show in Explorer</source>
 <target>Mostrar no Explorer</target>
@@ -58,12 +70,6 @@
 <source>About</source>
 <target>Sobre</target>
 
-<source>Warning</source>
-<target>Avisos</target>
-
-<source>Question</source>
-<target>Questão</target>
-
 <source>Confirm</source>
 <target>Confirmar</target>
 
@@ -109,6 +115,9 @@
 <source>Info</source>
 <target>Informações</target>
 
+<source>Warning</source>
+<target>Avisos</target>
+
 <source>Fatal Error</source>
 <target>Erro fatal</target>
 
@@ -139,12 +148,6 @@
 <pluralform>%x Bytes</pluralform>
 </target>
 
-<source>Cannot read file %x.</source>
-<target>Não foi possível ler o arquivo %x.</target>
-
-<source>Cannot write file %x.</source>
-<target>Não foi possível escrever o arquivo %x.</target>
-
 <source>Database file %x is incompatible.</source>
 <target>O arquivo de banco de dados %x é incompatível.</target>
 
@@ -154,8 +157,17 @@
 <source>Database file %x does not yet exist.</source>
 <target>O arquivo de banco de dados %x ainda não existe.</target>
 
+<source>Database file is corrupt:</source>
+<target>O arquivo de banco de dados está corrompido</target>
+
 <source>Out of memory!</source>
 <target>Falta de memória!</target>
+
+<source>Cannot write file %x.</source>
+<target>Não foi possível escrever o arquivo %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Não foi possível ler o arquivo %x.</target>
 
 <source>Database files do not share a common session.</source>
 <target>Os arquivos de banco de dados são de sessões diferentes.</target>
@@ -205,6 +217,9 @@
 <source>/sec</source>
 <target>/seg</target>
 
+<source>Cannot find file %x.</source>
+<target>Não foi possível encontrar o aquivo %x.</target>
+
 <source>File %x does not contain a valid configuration.</source>
 <target>O arquivo %x não contém uma configuração válida.</target>
 
@@ -226,17 +241,14 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>Nome do volume %x não é parte do arquivo %y!</target>
 
-<source>Cannot find file %x.</source>
-<target>Não foi possível encontrar o aquivo %x.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Não foi possível ler os seguintes elementos XML:</target>
 
 <source>&Open...</source>
 <target>&Abrir...</target>
 
-<source>&Save...</source>
-<target>&Salvar...</target>
+<source>Save &As...</source>
+<target>Salvar &Como...</target>
 
 <source>&Quit</source>
 <target>Sai&r</target>
@@ -312,8 +324,8 @@ O comando é disparado se:
 <source>(Build: %x)</source>
 <target>(Versão: %x)</target>
 
-<source>RealtimeSync configuration</source>
-<target>Configuração do RealtimeSync</target>
+<source>All files</source>
+<target>Todos os arquivos</target>
 
 <source>&Restore</source>
 <target>&Restaurar</target>
@@ -327,8 +339,8 @@ O comando é disparado se:
 <source>Waiting for missing directories...</source>
 <target>Esperando por diretórios faltantes...</target>
 
-<source>An input folder name is empty.</source>
-<target>Um nome de pasta de entrada está em branco.</target>
+<source>A folder input field is empty.</source>
+<target>Um campo de entrada de pasta está vazio.</target>
 
 <source>Logging</source>
 <target>Ver Log</target>
@@ -351,26 +363,8 @@ O comando é disparado se:
 <source>Custom</source>
 <target>Personalizado</target>
 
-<source>FreeFileSync batch file</source>
-<target>Arquivo de lote do FreeFileSync</target>
-
-<source>FreeFileSync configuration</source>
-<target>FreeFileSync configuração</target>
-
-<source>Batch execution</source>
-<target>Execução da tarefa em lote</target>
-
-<source>Items processed:</source>
-<target>Elementos processados:</target>
-
-<source>Items remaining:</source>
-<target>Elementos restantes:</target>
-
-<source>Total time:</source>
-<target>Tempo total:</target>
-
-<source>Stop</source>
-<target>Parar</target>
+<source>FreeFileSync batch</source>
+<target>Tarefa em lote do FreeFileSync</target>
 
 <source>Synchronization aborted!</source>
 <target>Sincronização cancelada!</target>
@@ -393,17 +387,17 @@ O comando é disparado se:
 <source>Unable to connect to sourceforge.net!</source>
 <target>Não foi possível conectar a sourceforge.net!</target>
 
-<source>A newer version of FreeFileSync is available:</source>
+<source>A new version of FreeFileSync is available:</source>
 <target>Uma nova versão do FreeFileSync está disponível:</target>
 
 <source>Download now?</source>
 <target>Baixar agora?</target>
 
-<source>Information</source>
-<target>Informação</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>FreeFileSync está atualizado!</target>
+
+<source>Information</source>
+<target>Informação</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Deseja que o FreeFileSync procure automaticamente novas versões todas as semanas?</target>
@@ -438,6 +432,12 @@ O comando é disparado se:
 <source>Extension</source>
 <target>Extensão</target>
 
+<source>Size:</source>
+<target>Tamanho:</target>
+
+<source>Date:</source>
+<target>Data:</target>
+
 <source>Action</source>
 <target>Ação</target>
 
@@ -463,13 +463,16 @@ O comando é disparado se:
 <target>Hibernar</target>
 
 <source>1. &Compare</source>
-<target>1. &Comparar</target>
+<target>1. C&omparar</target>
 
 <source>2. &Synchronize</source>
 <target>2. S&incronizar</target>
 
 <source>&New</source>
 <target>&Novo</target>
+
+<source>&Save</source>
+<target>&Salvar</target>
 
 <source>&Language</source>
 <target>&Idioma</target>
@@ -537,11 +540,8 @@ O comando é disparado se:
 <source>Number of files and folders that will be deleted</source>
 <target>Número de arquivos e pastas que serão apagados</target>
 
-<source>Total amount of data that will be transferred</source>
-<target>Volume total de dados que será transferido</target>
-
-<source>Operation:</source>
-<target>Operação:</target>
+<source>Total bytes to copy</source>
+<target>Bytes totais a serem copiados</target>
 
 <source>Items found:</source>
 <target>Elementos encontrados:</target>
@@ -549,10 +549,10 @@ O comando é disparado se:
 <source>Speed:</source>
 <target>Velocidade:</target>
 
-<source>Remaining time:</source>
+<source>Time remaining:</source>
 <target>Tempo restante:</target>
 
-<source>Elapsed time:</source>
+<source>Time elapsed:</source>
 <target>Tempo decorrido:</target>
 
 <source>Batch job</source>
@@ -675,6 +675,15 @@ Os arquivos são considerados iguais se
 <source>Source code written in C++ utilizing:</source>
 <target>Código-fonte escrito em C++ utilizando:</target>
 
+<source>If you like FreeFileSync</source>
+<target>Se você gosta do FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Doar usando PayPal</target>
+
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Pela tradução do FreeFileSync, um agradecimento a:</target>
+
 <source>Feedback and suggestions are welcome</source>
 <target>Críticas e sugestões são bem-vindas</target>
 
@@ -687,38 +696,8 @@ Os arquivos são considerados iguais se
 <source>Email</source>
 <target>E-mail</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Pela tradução do FreeFileSync, um agradecimento a:</target>
-
-<source>If you like FreeFileSync</source>
-<target>Se você gosta do FreeFileSync</target>
-
-<source>Donate with PayPal</source>
-<target>Doar usando PayPal</target>
-
 <source>Published under the GNU General Public License</source>
 <target>Publicado sobre a GNU General Public License</target>
-
-<source>Ignore further errors</source>
-<target>Ignorar erros subsequentes</target>
-
-<source>Hide further error messages during the current process</source>
-<target>Ocultar próximas mensagens de erro durante este processo</target>
-
-<source>&Ignore</source>
-<target>&Ignorar</target>
-
-<source>Do not show this dialog again</source>
-<target>Não mostrar este diálogo novamente</target>
-
-<source>&Switch</source>
-<target>&Alterar</target>
-
-<source>&Yes</source>
-<target>&Sim</target>
-
-<source>&No</source>
-<target>&Não</target>
 
 <source>Use Recycle Bin</source>
 <target>Utilizar Lixeira</target>
@@ -760,7 +739,7 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <target>&Config. Padrão</target>
 
 <source>Fail-safe file copy</source>
-<target>Cópia de arquivos a prova de falha</target>
+<target>Cópia de arquivos a prova de falhas</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
 <target>Escreve para um arquivo temporário primeiro (*.ffs_tmp) e depois o renomeia. Isto garante um estado consistente mesmo em caso de erro fatal.</target>
@@ -791,6 +770,9 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 
 <source>Statistics</source>
 <target>Estatísticas</target>
+
+<source>Do not show this dialog again</source>
+<target>Não mostrar este diálogo novamente</target>
 
 <source>Find what:</source>
 <target>Localizar o que:</target>
@@ -870,8 +852,14 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Never save changes</source>
 <target>Nunca salvar alterações</target>
 
-<source>Save changes to current configuration?</source>
-<target>Salvar modificações para a configuração atual?</target>
+<source>Do you want to save changes to %x?</source>
+<target>Gostaria de salvar as alterações para %x?</target>
+
+<source>Save</source>
+<target>Salvar</target>
+
+<source>Don't Save</source>
+<target>Não Salvar</target>
 
 <source>Configuration loaded!</source>
 <target>Configuração carregada!</target>
@@ -966,9 +954,6 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>All directories in sync!</source>
 <target>Todos os diretórios em sincronismo!</target>
 
-<source>Please run a Compare first before synchronizing!</source>
-<target>Por favor execute primeiro a Comparação antes de sincronizar!</target>
-
 <source>Comma separated list</source>
 <target>Lista de itens separados por vírgulas</target>
 
@@ -1013,6 +998,24 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <pluralform>%x de 1 linha</pluralform>
 <pluralform>%x de %y linhas</pluralform>
 </target>
+
+<source>Ignore further errors</source>
+<target>Ignorar erros subsequentes</target>
+
+<source>&Ignore</source>
+<target>&Ignorar</target>
+
+<source>&Switch</source>
+<target>&Alterar</target>
+
+<source>Question</source>
+<target>Questão</target>
+
+<source>&Yes</source>
+<target>&Sim</target>
+
+<source>&No</source>
+<target>&Não</target>
 
 <source>Scanning...</source>
 <target>Pesquisando...</target>
@@ -1194,6 +1197,9 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Cannot delete directory %x.</source>
 <target>Não foi possível excluir o diretório %x.</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Não foi possível escrever os atributos de arquivo de %x.</target>
+
 <source>Cannot write modification time of %x.</source>
 <target>Não foi possível escrever a data de modificação de %x.</target>
 
@@ -1217,9 +1223,6 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Não foi possível copiar o link simbólico %x para %y.</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Não foi possível escrever os atributos de arquivo de %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Não foi possível copiar o arquivo %x para %y.</target>
@@ -1245,11 +1248,8 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>No change since last synchronization!</source>
 <target>Nenhuma mudança desde a última sincronização!</target>
 
-<source>Filter settings have changed!</source>
-<target>As configurações do filtro foram alteradas!</target>
-
-<source>The file was not processed by last synchronization!</source>
-<target>O arquivo não foi processado pela última sincronização!</target>
+<source>The corresponding database entries are not in sync considering current settings.</source>
+<target>As entradas de banco de dados correspondentes não estão em sincronia considerando as configurações atuais.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Configurando direções padrões de sincronização: Arquivos antigos serão substituídos por arquivos mais novos.</target>
@@ -1315,7 +1315,7 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <target>Sobrescrever item à esquerda</target>
 
 <source>Overwrite right item</source>
-<target>Sobrescrever item à esquerda</target>
+<target>Sobrescrever item à direita</target>
 
 <source>Do nothing</source>
 <target>Não fazer nada</target>
@@ -1377,14 +1377,14 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Updating attributes of %x</source>
 <target>Atualizando atributos de %x</target>
 
-<source>Target folder name must not be empty.</source>
-<target>O nome da pasta de destino não pode estar em branco.</target>
+<source>Target folder input field must not be empty.</source>
+<target>Campo de entrada da pasta de destino não pode ficar vazio.</target>
 
-<source>Folder name for file versioning must not be empty.</source>
-<target>O nome da pasta para o controle de versões não pode estar em branco.</target>
+<source>Folder input field for versioning must not be empty.</source>
+<target>Campo de entrada da pasta para controle de versão não pode ficar vazio.</target>
 
-<source>Source directory %x not found.</source>
-<target>O diretório de origem %x não foi encontrado.</target>
+<source>Source folder %x not found.</source>
+<target>Pasta de origem %x não foi encontrada.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Conflitos não resolvidos existentes!</target>
@@ -1401,11 +1401,11 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Not enough free disk space available in:</source>
 <target>Espaço em disco insuficiente em:</target>
 
-<source>Free disk space required:</source>
-<target>Espaço livre em disco requerido:</target>
+<source>Required:</source>
+<target>Requerido:</target>
 
-<source>Free disk space available:</source>
-<target>Espaço livre em disco:</target>
+<source>Available:</source>
+<target>Disponível:</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>A Lixeira não está disponível para os seguintes caminhos! Os arquivos serão apagados permanentemente:</target>
@@ -1415,6 +1415,9 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 
 <source>Processing folder pair:</source>
 <target>Processando par de pastas:</target>
+
+<source>Target folder %x already existing.</source>
+<target>Pasta de destino %x já existe.</target>
 
 <source>Generating database...</source>
 <target>Gerando banco de dados...</target>

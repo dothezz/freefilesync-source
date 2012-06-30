@@ -58,12 +58,6 @@
 <source>About</source>
 <target>O Programu</target>
 
-<source>Warning</source>
-<target>Varování</target>
-
-<source>Question</source>
-<target>Dotaz</target>
-
 <source>Confirm</source>
 <target>Potvrdit</target>
 
@@ -109,6 +103,9 @@
 <source>Info</source>
 <target>Info</target>
 
+<source>Warning</source>
+<target>Varování</target>
+
 <source>Fatal Error</source>
 <target>Závažná chyba</target>
 
@@ -140,12 +137,6 @@
 <pluralform>%x B</pluralform>
 </target>
 
-<source>Cannot read file %x.</source>
-<target>Nelze číst soubor %x.</target>
-
-<source>Cannot write file %x.</source>
-<target>Nelze zapsat soubor %x.</target>
-
 <source>Database file %x is incompatible.</source>
 <target>Chybný formát databáze %x.</target>
 
@@ -155,8 +146,17 @@
 <source>Database file %x does not yet exist.</source>
 <target>Databázový soubor %x neexistuje.</target>
 
+<source>Database file is corrupt:</source>
+<target>Databáze je poškozená:</target>
+
 <source>Out of memory!</source>
 <target>Nedostatek pracovní paměti!</target>
+
+<source>Cannot write file %x.</source>
+<target>Nelze zapsat soubor %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Nelze číst soubor %x.</target>
 
 <source>Database files do not share a common session.</source>
 <target>Databázové soubory nejsou navzájem komplementární.</target>
@@ -208,6 +208,9 @@
 <source>/sec</source>
 <target>/s</target>
 
+<source>Cannot find file %x.</source>
+<target>Nelze najít soubor %x.</target>
+
 <source>File %x does not contain a valid configuration.</source>
 <target>Soubor %x neobsahuje platnou konfiguraci.</target>
 
@@ -229,17 +232,14 @@
 <source>Volume name %x not part of file name %y!</source>
 <target>Disk %x není součástí jména souboru %y!</target>
 
-<source>Cannot find file %x.</source>
-<target>Nalze najít soubor %x.</target>
-
 <source>Cannot read the following XML elements:</source>
 <target>Nelze načíst následující XML elementy:</target>
 
 <source>&Open...</source>
 <target>&Otevřít...</target>
 
-<source>&Save...</source>
-<target>&Uložit</target>
+<source>Save &As...</source>
+<target>Uložit &jako...</target>
 
 <source>&Quit</source>
 <target>U&končit</target>
@@ -315,8 +315,8 @@ Příkaz je spuštěn když:
 <source>(Build: %x)</source>
 <target>(Build: %x)</target>
 
-<source>RealtimeSync configuration</source>
-<target>Konfigurace RealtimeSync</target>
+<source>All files</source>
+<target>Všechny soubory</target>
 
 <source>&Restore</source>
 <target>&Obnovit</target>
@@ -330,7 +330,7 @@ Příkaz je spuštěn když:
 <source>Waiting for missing directories...</source>
 <target>Čekání na nedostupné adresáře...</target>
 
-<source>An input folder name is empty.</source>
+<source>A folder input field is empty.</source>
 <target>Není zadána vstupní složka.</target>
 
 <source>Logging</source>
@@ -354,11 +354,8 @@ Příkaz je spuštěn když:
 <source>Custom</source>
 <target>Vlastní</target>
 
-<source>FreeFileSync batch file</source>
-<target>FreeFileSync dávkový soubor</target>
-
-<source>FreeFileSync configuration</source>
-<target>Konfigurace FreeFileSync</target>
+<source>FreeFileSync batch</source>
+<target>FreeFileSync dávka</target>
 
 <source>Batch execution</source>
 <target>Spuštění dávky</target>
@@ -396,17 +393,17 @@ Příkaz je spuštěn když:
 <source>Unable to connect to sourceforge.net!</source>
 <target>Není možné se připojit k sourceforge.net!</target>
 
-<source>A newer version of FreeFileSync is available:</source>
+<source>A new version of FreeFileSync is available:</source>
 <target>Je dostupná novější verze FreeFileSync:</target>
 
 <source>Download now?</source>
 <target>Stáhnout nyní?</target>
 
-<source>Information</source>
-<target>Informace</target>
-
 <source>FreeFileSync is up to date!</source>
 <target>FreeFileSync je aktuální!</target>
+
+<source>Information</source>
+<target>Informace</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Chcete aby FreeFileSync automaticky zjišťoval aktualizace každý týden?</target>
@@ -441,6 +438,12 @@ Příkaz je spuštěn když:
 <source>Extension</source>
 <target>Přípona</target>
 
+<source>Size:</source>
+<target>Velikost:</target>
+
+<source>Date:</source>
+<target>Čas:</target>
+
 <source>Action</source>
 <target>Akce</target>
 
@@ -473,6 +476,9 @@ Příkaz je spuštěn když:
 
 <source>&New</source>
 <target>&Nový</target>
+
+<source>&Save</source>
+<target>&Uložit</target>
 
 <source>&Language</source>
 <target>&Jazyk</target>
@@ -540,11 +546,8 @@ Příkaz je spuštěn když:
 <source>Number of files and folders that will be deleted</source>
 <target>Počet souborů a složek ke smazání</target>
 
-<source>Total amount of data that will be transferred</source>
-<target>Celkový objem dat, který bude přenesen</target>
-
-<source>Operation:</source>
-<target>Operace:</target>
+<source>Total bytes to copy</source>
+<target>Celkový objem dat</target>
 
 <source>Items found:</source>
 <target>Nalezeno položek:</target>
@@ -552,10 +555,10 @@ Příkaz je spuštěn když:
 <source>Speed:</source>
 <target>Rychlost:</target>
 
-<source>Remaining time:</source>
+<source>Time remaining:</source>
 <target>Zbývající čas:</target>
 
-<source>Elapsed time:</source>
+<source>Time elapsed:</source>
 <target>Uplynulý čas:</target>
 
 <source>Batch job</source>
@@ -678,6 +681,15 @@ je stejný
 <source>Source code written in C++ utilizing:</source>
 <target>Zdrojový kód byl napsán kompletně v C++ s pomocí:</target>
 
+<source>If you like FreeFileSync</source>
+<target>Pokud se Vám FreeFileSync líbí</target>
+
+<source>Donate with PayPal</source>
+<target>Přispět pomocí PayPal</target>
+
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Poděkování za překlad FreeFileSync:</target>
+
 <source>Feedback and suggestions are welcome</source>
 <target>Komentáře a náměty jsou vždy vítány</target>
 
@@ -690,38 +702,8 @@ je stejný
 <source>Email</source>
 <target>Napište</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Poděkování za překlad FreeFileSync:</target>
-
-<source>If you like FreeFileSync</source>
-<target>Pokud se Vám FreeFileSync líbí</target>
-
-<source>Donate with PayPal</source>
-<target>Přispět pomocí PayPal</target>
-
 <source>Published under the GNU General Public License</source>
 <target>Vydáno pod GNU General Public License (GPL)</target>
-
-<source>Ignore further errors</source>
-<target>Přeskočit další chyby</target>
-
-<source>Hide further error messages during the current process</source>
-<target>Nezobrazovat další chybová hlášení během zpracování</target>
-
-<source>&Ignore</source>
-<target>&Pokračovat</target>
-
-<source>Do not show this dialog again</source>
-<target>Tento dialog již nezobrazovat</target>
-
-<source>&Switch</source>
-<target>&Přepnout</target>
-
-<source>&Yes</source>
-<target>&Ano</target>
-
-<source>&No</source>
-<target>&Ne</target>
 
 <source>Use Recycle Bin</source>
 <target>Použít Koš</target>
@@ -794,6 +776,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Statistics</source>
 <target>Statistika</target>
+
+<source>Do not show this dialog again</source>
+<target>Tento dialog již nezobrazovat</target>
 
 <source>Find what:</source>
 <target>Najít:</target>
@@ -873,8 +858,14 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Never save changes</source>
 <target>Nikdy neukládat změny</target>
 
-<source>Save changes to current configuration?</source>
-<target>Uložit změny do aktuální konfigurace?</target>
+<source>Do you want to save changes to %x?</source>
+<target>Uložit změny do %x?</target>
+
+<source>Save</source>
+<target>Uložit></target>
+
+<source>Don't Save</source>
+<target>Neukládat</target>
 
 <source>Configuration loaded!</source>
 <target>Konfigurace načtena.</target>
@@ -969,9 +960,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>All directories in sync!</source>
 <target>Všechny adresáře jsou synchronizovány!</target>
 
-<source>Please run a Compare first before synchronizing!</source>
-<target>Prosím proveďte nejdřív porovnání před synchronizací!</target>
-
 <source>Comma separated list</source>
 <target>Text oddělený čárkami</target>
 
@@ -1020,6 +1008,24 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <pluralform>%x z %y řádků</pluralform>
 <pluralform>%x z %y řádků</pluralform>
 </target>
+
+<source>Ignore further errors</source>
+<target>Přeskočit další chyby</target>
+
+<source>&Ignore</source>
+<target>&Pokračovat</target>
+
+<source>&Switch</source>
+<target>&Přepnout</target>
+
+<source>Question</source>
+<target>Dotaz</target>
+
+<source>&Yes</source>
+<target>&Ano</target>
+
+<source>&No</source>
+<target>&Ne</target>
 
 <source>Scanning...</source>
 <target>Zpracovávání...</target>
@@ -1206,6 +1212,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Cannot delete directory %x.</source>
 <target>Nelze smazat adresář %x.</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Nelze zapsat atributy souboru %x.</target>
+
 <source>Cannot write modification time of %x.</source>
 <target>Nelze nastavit atribut času změny pro %x.</target>
 
@@ -1229,9 +1238,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Nelze kopítovat zástupce %x do %y.</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Nelze zapsat atributy souboru %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Nelze kopírovat soubor %x do %y.</target>
@@ -1257,11 +1263,8 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>No change since last synchronization!</source>
 <target>Žádné změny od poslední synchronizace!</target>
 
-<source>Filter settings have changed!</source>
-<target>Nastavení filtru bylo změněno!</target>
-
-<source>The file was not processed by last synchronization!</source>
-<target>Soubor nebyl poslední synchronizací zpracován!</target>
+<source>The corresponding database entries are not in sync considering current settings.</source>
+<target>Databázové položky nejsou podle aktuální konfigurace synchronní.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Nastaven výchozí způsob synchronizace: Staré soubory budou nahrazeny novými.</target>
@@ -1389,14 +1392,14 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Updating attributes of %x</source>
 <target>Aktualizace atributů souboru %x</target>
 
-<source>Target folder name must not be empty.</source>
+<source>Target folder input field must not be empty.</source>
 <target>Cílová složka nesmí být prázdná.</target>
 
-<source>Folder name for file versioning must not be empty.</source>
+<source>Folder input field for versioning must not be empty.</source>
 <target>Složka pro verzování souborů nesmí být prázdná.</target>
 
-<source>Source directory %x not found.</source>
-<target>Zdrojový adresář %x nelze najít.</target>
+<source>Source folder %x not found.</source>
+<target>Zdrojovou složku %x nelze najít.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Nevyřešené konflikty!</target>
@@ -1413,11 +1416,11 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Not enough free disk space available in:</source>
 <target>Nedostatek místa na disku:</target>
 
-<source>Free disk space required:</source>
-<target>Požadované volné místo na disku:</target>
+<source>Required:</source>
+<target>Požadováno</target>
 
-<source>Free disk space available:</source>
-<target>Volné místo k dispozici:</target>
+<source>Available:</source>
+<target>K dispozici</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Nelze použít Koš pro následující umístění! Soubory budou odstraněny trvale:</target>
@@ -1427,6 +1430,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Processing folder pair:</source>
 <target>Zpracovávání adresářové páru:</target>
+
+<source>Target folder %x already existing.</source>
+<target>Cílova složka %x již existuje.</target>
 
 <source>Generating database...</source>
 <target>Vytváření databáze...</target>

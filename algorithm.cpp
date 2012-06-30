@@ -14,7 +14,6 @@
 #include <zen/recycler.h>
 #include <wx/msgdlg.h>
 #include "lib/norm_filter.h"
-#include <wx+/string_conv.h>
 #include "lib/db_file.h"
 #include <zen/scope_guard.h>
 #include "lib/cmp_filetime.h"
@@ -31,8 +30,10 @@ void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp
     redetermineSyncDirection(config, folderCmp, [](const std::wstring&) {});
 }
 
-
 //----------------------------------------------------------------------------------------------
+
+namespace
+{
 class Redetermine
 {
 public:
@@ -77,16 +78,14 @@ private:
                 fileObj.setSyncDir(dirCfg.different);
                 break;
             case FILE_CONFLICT:
+            case FILE_DIFFERENT_METADATA: //use setting from "conflict/cannot categorize"
                 if (dirCfg.conflict == SYNC_DIR_NONE)
-                    fileObj.setSyncDirConflict(fileObj.getCatConflict()); //take over category conflict
+                    fileObj.setSyncDirConflict(getCategoryDescription(fileObj)); //take over category conflict
                 else
                     fileObj.setSyncDir(dirCfg.conflict);
                 break;
             case FILE_EQUAL:
                 fileObj.setSyncDir(SYNC_DIR_NONE);
-                break;
-            case FILE_DIFFERENT_METADATA:
-                fileObj.setSyncDir(dirCfg.conflict); //use setting from "conflict/cannot categorize"
                 break;
         }
     }
@@ -108,8 +107,9 @@ private:
                 linkObj.setSyncDir(dirCfg.rightNewer);
                 break;
             case SYMLINK_CONFLICT:
+            case SYMLINK_DIFFERENT_METADATA: //use setting from "conflict/cannot categorize"
                 if (dirCfg.conflict == SYNC_DIR_NONE)
-                    linkObj.setSyncDirConflict(linkObj.getCatConflict()); //take over category conflict
+                    linkObj.setSyncDirConflict(getCategoryDescription(linkObj)); //take over category conflict
                 else
                     linkObj.setSyncDir(dirCfg.conflict);
                 break;
@@ -119,10 +119,6 @@ private:
             case SYMLINK_EQUAL:
                 linkObj.setSyncDir(SYNC_DIR_NONE);
                 break;
-            case SYMLINK_DIFFERENT_METADATA:
-                linkObj.setSyncDir(dirCfg.conflict); //use setting from "conflict/cannot categorize"
-                break;
-
         }
     }
 
@@ -139,8 +135,11 @@ private:
             case DIR_EQUAL:
                 dirObj.setSyncDir(SYNC_DIR_NONE);
                 break;
-            case DIR_DIFFERENT_METADATA:
-                dirObj.setSyncDir(dirCfg.conflict); //use setting from "conflict/cannot categorize"
+            case DIR_DIFFERENT_METADATA: //use setting from "conflict/cannot categorize"
+                if (dirCfg.conflict == SYNC_DIR_NONE)
+                    dirObj.setSyncDirConflict(getCategoryDescription(dirObj)); //take over category conflict
+                else
+                    dirObj.setSyncDir(dirCfg.conflict);
                 break;
         }
 
@@ -171,210 +170,137 @@ struct AllEqual //test if non-equal items exist in scanned data
         });    //directories
     }
 };
-
+}
 
 bool zen::allElementsEqual(const FolderComparison& folderCmp)
 {
     return std::all_of(begin(folderCmp), end(folderCmp), AllEqual());
 }
+
 //---------------------------------------------------------------------------------------------------------------
 
-
-class DataSetFile
+namespace
 {
-public:
-    DataSetFile() {}
+template <SelectedSide side> inline
+const FileDescriptor& getDescriptor(const InSyncFile& dbFile) { return dbFile.left; }
 
-    DataSetFile(const Zstring& name, const FileDescriptor& fileDescr)
-    {
-        shortName     = name;
-        lastWriteTime = fileDescr.lastWriteTimeRaw;
-        fileSize      = fileDescr.fileSize;
-    }
+template <> inline
+const FileDescriptor& getDescriptor<RIGHT_SIDE>(const InSyncFile& dbFile) { return dbFile.right; }
 
-    DataSetFile(const FileMapping& fileObj, Int2Type<LEFT_SIDE>)
-    {
-        init<LEFT_SIDE>(fileObj);
-    }
 
-    DataSetFile(const FileMapping& fileObj, Int2Type<RIGHT_SIDE>)
-    {
-        init<RIGHT_SIDE>(fileObj);
-    }
+//check whether database entry and current item match: *irrespective* of current comparison settings
+template <SelectedSide side> inline
+bool isEqual(const FileMapping& fileObj, const InSyncDir::FileList::value_type* dbFile)
+{
+    if (fileObj.isEmpty<side>())
+        return !dbFile;
+    else if (!dbFile)
+        return false;
 
-    inline friend
-    bool operator==(const DataSetFile& lhs, const DataSetFile& rhs)
-    {
-        if (lhs.shortName.empty())
-            return rhs.shortName.empty();
-        else if (rhs.shortName.empty())
-            return false;
+    const Zstring&    shortNameDb = dbFile->first;
+    const FileDescriptor& descrDb = getDescriptor<side>(dbFile->second);
 
-        return lhs.shortName == rhs.shortName && //detect changes in case (windows)
-               //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
-               sameFileTime(lhs.lastWriteTime, rhs.lastWriteTime, 2) &&
-               lhs.fileSize == rhs.fileSize;
-    }
-
-private:
-    template <SelectedSide side>
-    void init(const FileMapping& fileObj)
-    {
-        if (!fileObj.isEmpty<side>())
-        {
-            shortName     = fileObj.getShortName<side>();
-            lastWriteTime = fileObj.getLastWriteTime<side>();
-            fileSize      = fileObj.getFileSize<side>();
-        }
-    }
-
-    Zstring     shortName;     //empty if object not existing
-    zen::Int64  lastWriteTime;
-    zen::UInt64 fileSize;
-
+    return fileObj.getShortName<side>() == shortNameDb && //detect changes in case (windows)
+           //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
+           sameFileTime(fileObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2) &&
+           fileObj.getFileSize<side>() == descrDb.fileSize;
     //note: we do *not* consider FileId here, but are only interested in *visual* changes. Consider user moving data to some other medium, this is not a change!
-};
+}
 
+
+//check whether database entry is in sync considering *current* comparison settings
+inline
+bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, size_t fileTimeTolerance)
+{
+    switch (compareVar)
+    {
+        case CMP_BY_TIME_SIZE:
+            return dbFile.inSyncType == InSyncFile::IN_SYNC_BINARY_EQUAL || //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
+                   //case-sensitive short name match is a database invariant!
+                   (CmpFileTime::getResult(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL &&
+                    dbFile.left.fileSize == dbFile.right.fileSize);
+
+        case CMP_BY_CONTENT:
+            //case-sensitive short name match is a database invariant!
+            return dbFile.inSyncType == InSyncFile::IN_SYNC_BINARY_EQUAL;
+            //in contrast to comparison, we don't care about modification time here!
+    }
+    assert(false);
+    return false;
+}
 
 //--------------------------------------------------------------------
-class DataSetSymlink
+
+template <SelectedSide side> inline
+const LinkDescriptor& getDescriptor(const InSyncSymlink& dbLink) { return dbLink.left; }
+
+template <> inline
+const LinkDescriptor& getDescriptor<RIGHT_SIDE>(const InSyncSymlink& dbLink) { return dbLink.right; }
+
+
+//check whether database entry and current item match: *irrespective* of current comparison settings
+template <SelectedSide side> inline
+bool isEqual(const SymLinkMapping& linkObj, const InSyncDir::LinkList::value_type* dbLink)
 {
-public:
-    DataSetSymlink()
-#ifdef FFS_WIN
-        : type(LinkDescriptor::TYPE_FILE) //dummy value
-#endif
-    {}
+    if (linkObj.isEmpty<side>())
+        return !dbLink;
+    else if (!dbLink)
+        return false;
 
-    DataSetSymlink(const Zstring& name, const LinkDescriptor& linkDescr)
-    {
-        shortName     = name;
-        lastWriteTime = linkDescr.lastWriteTimeRaw;
-        targetPath    = linkDescr.targetPath;
-#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
-        type          = linkDescr.type;
-#endif
-    }
+    const Zstring&    shortNameDb = dbLink->first;
+    const LinkDescriptor& descrDb = getDescriptor<side>(dbLink->second);
 
-    DataSetSymlink(const SymLinkMapping& linkObj, Int2Type<LEFT_SIDE>)
-    {
-        init<LEFT_SIDE>(linkObj);
-    }
-
-    DataSetSymlink(const SymLinkMapping& linkObj, Int2Type<RIGHT_SIDE>)
-    {
-        init<RIGHT_SIDE>(linkObj);
-    }
-
-    inline friend
-    bool operator==(const DataSetSymlink& lhs, const DataSetSymlink& rhs)
-    {
-        if (lhs.shortName.empty()) //test if object is existing at all
-            return rhs.shortName.empty();
-        else if (rhs.shortName.empty())
-            return false;
-
-        return lhs.shortName == rhs.shortName &&
-               //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
-               sameFileTime(lhs.lastWriteTime, rhs.lastWriteTime, 2) &&
+    return linkObj.getShortName<side>() == shortNameDb &&
+           //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
+           sameFileTime(linkObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2) &&
 #ifdef FFS_WIN //comparison of symbolic link type is relevant for Windows only
-               lhs.type == rhs.type &&
+           linkObj.getLinkType<side>() == descrDb.type &&
 #endif
-               lhs.targetPath == rhs.targetPath;
-    }
+           linkObj.getTargetPath<side>() == descrDb.targetPath;
+}
 
-private:
-    template <SelectedSide side>
-    void init(const SymLinkMapping& linkObj)
-    {
-#ifdef FFS_WIN
-        type = LinkDescriptor::TYPE_FILE; //always initialize
-#endif
 
-        if (!linkObj.isEmpty<side>())
-        {
-            shortName     = linkObj.getShortName<side>();
-            lastWriteTime = linkObj.getLastWriteTime<side>();
-            targetPath    = linkObj.getTargetPath<side>();
+//check whether database entry is in sync considering *current* comparison settings
+inline
+bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar)
+{
+    return !dbLink.left .targetPath.empty() && //if one of these is empty, we can't make a statement whether both sides are in sync
+           !dbLink.right.targetPath.empty() && //
 #ifdef FFS_WIN //type of symbolic link is relevant for Windows only
-            type          = linkObj.getLinkType<side>();
+           dbLink.left.type == dbLink.right.type &&
 #endif
-        }
-    }
+           dbLink.left.targetPath == dbLink.right.targetPath;
+    //case-sensitive short name match is a database invariant!
+    //in contrast to comparison, we don't care about modification time!
+}
 
-    Zstring    shortName;     //empty if object not existing
-    zen::Int64 lastWriteTime;
-    Zstring    targetPath;
-#ifdef FFS_WIN
-    LinkDescriptor::LinkType type;
-#endif
-};
 //--------------------------------------------------------------------
 
-
-class DataSetDir
+//check whether database entry and current item match: *irrespective* of current comparison settings
+template <SelectedSide side> inline
+bool isEqual(const DirMapping& dirObj, const InSyncDir::DirList::value_type* dbDir)
 {
-public:
-    DataSetDir() {}
+    if (dirObj.isEmpty<side>())
+        return !dbDir || dbDir->second.status == InSyncDir::STATUS_STRAW_MAN;
+    else if (!dbDir || dbDir->second.status == InSyncDir::STATUS_STRAW_MAN)
+        return false;
 
-    DataSetDir(const Zstring& name) :
-        shortName(name) {}
+    const Zstring& shortNameDb = dbDir->first;
 
-    DataSetDir(const DirMapping& dirObj, Int2Type<LEFT_SIDE>) :
-        shortName(dirObj.getShortName<LEFT_SIDE>()) {}
-
-    DataSetDir(const DirMapping& dirObj, Int2Type<RIGHT_SIDE>) :
-        shortName(dirObj.getShortName<RIGHT_SIDE>()) {}
-
-    inline friend
-    bool operator==(const DataSetDir& lhs, const DataSetDir& rhs)
-    {
-        return lhs.shortName == rhs.shortName;
-    }
-
-private:
-    Zstring shortName; //empty if object not existing
-};
-//--------------------------------------------------------------------------------------------------------
-
-DataSetFile retrieveDataSetFile(const Zstring& objShortName, const DirContainer* dbDirectory)
-{
-    if (dbDirectory)
-    {
-        DirContainer::FileList::const_iterator iter = dbDirectory->files.find(objShortName);
-        if (iter != dbDirectory->files.end())
-            return DataSetFile(iter->first, iter->second);
-    }
-
-    return DataSetFile(); //object not found
-}
-
-DataSetSymlink retrieveDataSetSymlink(const Zstring& objShortName, const DirContainer* dbDirectory)
-{
-    if (dbDirectory)
-    {
-        DirContainer::LinkList::const_iterator iter = dbDirectory->links.find(objShortName);
-        if (iter != dbDirectory->links.end())
-            return DataSetSymlink(iter->first, iter->second);
-    }
-
-    return DataSetSymlink(); //object not found
+    return dirObj.getShortName<side>() == shortNameDb;
 }
 
 
-std::pair<DataSetDir, const DirContainer*> retrieveDataSetDir(const Zstring& objShortName, const DirContainer* dbDirectory)
+inline
+bool stillInSync(const InSyncDir& dbDir)
 {
-    if (dbDirectory)
-    {
-        DirContainer::DirList::const_iterator iter = dbDirectory->dirs.find(objShortName);
-        if (iter != dbDirectory->dirs.end())
-            return std::make_pair(DataSetDir(iter->first), &iter->second);
-    }
-
-    return std::make_pair(DataSetDir(), nullptr); //object not found
+    //case-sensitive short name match is a database invariant!
+    //InSyncDir::STATUS_STRAW_MAN considered
+    return true;
 }
 
 //----------------------------------------------------------------------------------------------
+
 class RedetermineAuto
 {
 public:
@@ -387,17 +313,17 @@ private:
     RedetermineAuto(BaseDirMapping& baseDirectory, std::function<void(const std::wstring&)> reportWarning) :
         txtBothSidesChanged(_("Both sides have changed since last synchronization!")),
         txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization!")),
-        txtFilterChanged(_("Cannot determine sync-direction:") + L" \n" + _("Filter settings have changed!")),
-        txtLastSyncFail (_("Cannot determine sync-direction:") + L" \n" + _("The file was not processed by last synchronization!")),
+        txtDbNotInSync(_("Cannot determine sync-direction:") + L" \n" + _("The corresponding database entries are not in sync considering current settings.")),
+        cmpVar(baseDirectory.getCompVariant()),
+        fileTimeTolerance(baseDirectory.getFileTimeTolerance()),
         reportWarning_(reportWarning)
     {
         if (AllEqual()(baseDirectory)) //nothing to do: abort and don't show any nag-screens
             return;
 
         //try to load sync-database files
-        std::pair<DirInfoPtr, DirInfoPtr> dirInfo = loadDBFile(baseDirectory);
-        if (dirInfo.first.get()  == nullptr ||
-            dirInfo.second.get() == nullptr)
+        std::shared_ptr<InSyncDir> lastSyncState = loadDBFile(baseDirectory);
+        if (!lastSyncState)
         {
             //set conservative "two-way" directions
             DirectionSet twoWayCfg = getTwoWaySet();
@@ -406,48 +332,24 @@ private:
             return;
         }
 
-        const DirInformation& dirInfoLeft  = *dirInfo.first;
-        const DirInformation& dirInfoRight = *dirInfo.second;
-
         //-> considering filter not relevant:
         //if narrowing filter: all ok; if widening filter (if file ex on both sides -> conflict, fine; if file ex. on one side: copy to other side: fine)
-        /*
-                //save db filter (if it needs to be considered only):
-                if (respectFiltering(baseDirectory, dirInfoLeft))
-                    dbFilterLeft = dirInfoLeft.filter.get();
 
-                if (respectFiltering(baseDirectory, dirInfoRight))
-                    dbFilterRight = dirInfoRight.filter.get();
-        */
-        recurse(baseDirectory,
-                &dirInfoLeft.baseDirContainer,
-                &dirInfoRight.baseDirContainer);
+        recurse(baseDirectory, &*lastSyncState);
 
         //----------- detect renamed files -----------------
         if (!exLeftOnly.empty() && !exRightOnly.empty())
         {
-            findEqualDbEntries(dirInfoLeft .baseDirContainer, //fill map "onceEqual"
-                               dirInfoRight.baseDirContainer);
-
+            collectEqualDbEntries(*lastSyncState); //fill map "onceEqual"
             detectRenamedFiles();
         }
     }
 
-    /*
-    static bool respectFiltering(const BaseDirMapping& baseDirectory, const DirInformation& dirInfo)
-    {
-        //respect filtering if sync-DB filter is active && different from baseDir's filter:
-        // in all other cases "view on files" is smaller for baseDirectory(current) than it was for dirInfo(old)
-        // => dirInfo can be queried as if it were a scan without filters
-        return !dirInfo.filter->isNull() && *dirInfo.filter != *baseDirectory.getFilter();
-    }
-    */
-
-    std::pair<DirInfoPtr, DirInfoPtr> loadDBFile(const BaseDirMapping& baseDirectory) //return nullptr on failure
+    std::shared_ptr<InSyncDir> loadDBFile(const BaseDirMapping& baseMap) //return nullptr on failure
     {
         try
         {
-            return loadFromDisk(baseDirectory);
+            return loadLastSynchronousState(baseMap); //throw FileError, FileErrorDatabaseNotExisting
         }
         catch (FileErrorDatabaseNotExisting&) {} //let's ignore these errors for now...
         catch (FileError& error) //e.g. incompatible database version
@@ -455,43 +357,17 @@ private:
             reportWarning_(error.toString() + L" \n\n" +
                            _("Setting default synchronization directions: Old files will be overwritten with newer files."));
         }
-        return std::pair<DirInfoPtr, DirInfoPtr>();
+        return nullptr;
     }
 
-    /*
-        bool filterFileConflictFound(const Zstring& relativeName) const
-        {
-            //if filtering would have excluded file during database creation, then we can't say anything about its former state
-            return (dbFilterLeft  && !dbFilterLeft ->passFileFilter(relativeName)) ||
-                   (dbFilterRight && !dbFilterRight->passFileFilter(relativeName));
-        }
-
-
-        bool filterDirConflictFound(const Zstring& relativeName) const
-        {
-            //if filtering would have excluded directory during database creation, then we can't say anything about its former state
-            return (dbFilterLeft  && !dbFilterLeft ->passDirFilter(relativeName, nullptr)) ||
-                   (dbFilterRight && !dbFilterRight->passDirFilter(relativeName, nullptr));
-        }
-    */
-
-    void recurse(HierarchyObject& hierObj,
-                 const DirContainer* dbDirectoryLeft,
-                 const DirContainer* dbDirectoryRight)
+    void recurse(HierarchyObject& hierObj, const InSyncDir* dbContainer)
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-        [&](FileMapping& fileMap) { processFile(fileMap, dbDirectoryLeft, dbDirectoryRight); });
-
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-        [&](SymLinkMapping& linkMap) { processSymlink(linkMap, dbDirectoryLeft, dbDirectoryRight); });
-
-        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
-        [&](DirMapping& dirMap) { processDir(dirMap, dbDirectoryLeft, dbDirectoryRight); });
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { processFile   (fileMap, dbContainer); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { processSymlink(linkMap, dbContainer); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { processDir    (dirMap,  dbContainer); });
     }
 
-    void processFile(FileMapping& fileObj,
-                     const DirContainer* dbDirectoryLeft,
-                     const DirContainer* dbDirectoryRight)
+    void processFile(FileMapping& fileObj, const InSyncDir* dbContainer)
     {
         const CompareFilesResult cat = fileObj.getCategory();
         if (cat == FILE_EQUAL)
@@ -511,245 +387,138 @@ private:
         //----------------------------------------------------------------------
 
         //##################### schedule old temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
+        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_LEFT);
             return;
         }
-        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), zen::TEMP_FILE_ENDING))
+        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_RIGHT);
             return;
         }
         //####################################################################################
 
-        /*
-                if (filterFileConflictFound(fileObj.getObjRelativeName()))
-                {
-                    if (cat == FILE_LEFT_SIDE_ONLY)
-                        fileObj.setSyncDir(SYNC_DIR_RIGHT);
-                    else if (cat == FILE_RIGHT_SIDE_ONLY)
-                        fileObj.setSyncDir(SYNC_DIR_LEFT);
-                    else
-                        fileObj.setSyncDirConflict(txtFilterChanged);
-                    return;
-                }
-                */
-
-        //determine datasets for change detection
-        const DataSetFile dataDbLeft  = retrieveDataSetFile(fileObj.getObjShortName(), dbDirectoryLeft);
-        const DataSetFile dataDbRight = retrieveDataSetFile(fileObj.getObjShortName(), dbDirectoryRight);
-
-        const DataSetFile dataCurrentLeft (fileObj, Int2Type<LEFT_SIDE >());
-        const DataSetFile dataCurrentRight(fileObj, Int2Type<RIGHT_SIDE>());
+        //try to find corresponding database entry
+        const InSyncDir::FileList::value_type* dbEntry = nullptr;
+        if (dbContainer)
+        {
+            auto iter = dbContainer->files.find(fileObj.getObjShortName());
+            if (iter != dbContainer->files.end())
+                dbEntry = &*iter;
+        }
 
         //evaluation
-        const bool changeOnLeft  = dataDbLeft  != dataCurrentLeft;
-        const bool changeOnRight = dataDbRight != dataCurrentRight;
+        const bool changeOnLeft  = !isEqual<LEFT_SIDE >(fileObj, dbEntry);
+        const bool changeOnRight = !isEqual<RIGHT_SIDE>(fileObj, dbEntry);
 
-        if (dataDbLeft == dataDbRight) //we have a "last synchronous state" => last sync seems to have been successful
+        if (changeOnLeft != changeOnRight)
+        {
+            //if database entry not in sync according to current settings! -> do not set direction based on async status!
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
+                fileObj.setSyncDirConflict(txtDbNotInSync);
+            else
+                fileObj.setSyncDir(changeOnLeft ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT);
+        }
+        else
         {
             if (changeOnLeft)
-            {
-                if (changeOnRight)
-                    fileObj.setSyncDirConflict(txtBothSidesChanged);
-                else
-                    fileObj.setSyncDir(SYNC_DIR_RIGHT);
-            }
-            else
-            {
-                if (changeOnRight)
-                    fileObj.setSyncDir(SYNC_DIR_LEFT);
-                else
-                    fileObj.setSyncDirConflict(txtNoSideChanged);
-            }
-        }
-        else //object did not complete last sync: important check: user may have changed comparison variant, so what was in sync according to last variant is not any longer!
-        {
-            if (changeOnLeft && changeOnRight)
                 fileObj.setSyncDirConflict(txtBothSidesChanged);
             else
-            {
-                //                if (cat == FILE_LEFT_SIDE_ONLY)
-                //                    fileObj.setSyncDir(SYNC_DIR_RIGHT);
-                //                else if (cat == FILE_RIGHT_SIDE_ONLY)
-                //                    fileObj.setSyncDir(SYNC_DIR_LEFT);
-                //                else
-                fileObj.setSyncDirConflict(txtLastSyncFail);
-            }
+                fileObj.setSyncDirConflict(txtNoSideChanged);
         }
     }
 
-
-    void processSymlink(SymLinkMapping& linkObj,
-                        const DirContainer* dbDirectoryLeft,
-                        const DirContainer* dbDirectoryRight)
+    void processSymlink(SymLinkMapping& linkObj, const InSyncDir* dbContainer)
     {
         const CompareSymlinkResult cat = linkObj.getLinkCategory();
         if (cat == SYMLINK_EQUAL)
             return;
 
-        /*
-                if (filterFileConflictFound(linkObj.getObjRelativeName())) //always use file filter: Link type may not be "stable" on Linux!
-                {
-                    if (cat == SYMLINK_LEFT_SIDE_ONLY)
-                        linkObj.setSyncDir(SYNC_DIR_RIGHT);
-                    else if (cat == SYMLINK_RIGHT_SIDE_ONLY)
-                        linkObj.setSyncDir(SYNC_DIR_LEFT);
-                    else
-                        linkObj.setSyncDirConflict(txtFilterChanged);
-                    return;
-                }
-                */
-
-        //determine datasets for change detection
-        const DataSetSymlink dataDbLeft  = retrieveDataSetSymlink(linkObj.getObjShortName(), dbDirectoryLeft);
-        const DataSetSymlink dataDbRight = retrieveDataSetSymlink(linkObj.getObjShortName(), dbDirectoryRight);
-
-        const DataSetSymlink dataCurrentLeft( linkObj, Int2Type<LEFT_SIDE>());
-        const DataSetSymlink dataCurrentRight(linkObj, Int2Type<RIGHT_SIDE>());
+        //try to find corresponding database entry
+        const InSyncDir::LinkList::value_type* dbEntry = nullptr;
+        if (dbContainer)
+        {
+            auto iter = dbContainer->symlinks.find(linkObj.getObjShortName());
+            if (iter != dbContainer->symlinks.end())
+                dbEntry = &*iter;
+        }
 
         //evaluation
-        const bool changeOnLeft  = dataDbLeft  != dataCurrentLeft;
-        const bool changeOnRight = dataDbRight != dataCurrentRight;
+        const bool changeOnLeft  = !isEqual<LEFT_SIDE >(linkObj, dbEntry);
+        const bool changeOnRight = !isEqual<RIGHT_SIDE>(linkObj, dbEntry);
 
-        if (dataDbLeft == dataDbRight) //last sync seems to have been successful
+        if (changeOnLeft != changeOnRight)
+        {
+            //if database entry not in sync according to current settings! -> do not set direction based on async status!
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar))
+                linkObj.setSyncDirConflict(txtDbNotInSync);
+            else
+                linkObj.setSyncDir(changeOnLeft ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT);
+        }
+        else
         {
             if (changeOnLeft)
-            {
-                if (changeOnRight)
-                    linkObj.setSyncDirConflict(txtBothSidesChanged);
-                else
-                    linkObj.setSyncDir(SYNC_DIR_RIGHT);
-            }
-            else
-            {
-                if (changeOnRight)
-                    linkObj.setSyncDir(SYNC_DIR_LEFT);
-                else
-                    linkObj.setSyncDirConflict(txtNoSideChanged);
-            }
-        }
-        else //object did not complete last sync
-        {
-            if (changeOnLeft && changeOnRight)
                 linkObj.setSyncDirConflict(txtBothSidesChanged);
             else
-                linkObj.setSyncDirConflict(txtLastSyncFail);
+                linkObj.setSyncDirConflict(txtNoSideChanged);
         }
     }
 
-
-    void processDir(DirMapping& dirObj,
-                    const DirContainer* dbDirectoryLeft,
-                    const DirContainer* dbDirectoryRight)
+    void processDir(DirMapping& dirObj, const InSyncDir* dbContainer)
     {
         const CompareDirResult cat = dirObj.getDirCategory();
 
-        /*
-                if (filterDirConflictFound(dirObj.getObjRelativeName()))
-                {
-                    switch (cat)
-                    {
-                    case DIR_LEFT_SIDE_ONLY:
-                        dirObj.setSyncDir(SYNC_DIR_RIGHT);
-                        break;
-                    case DIR_RIGHT_SIDE_ONLY:
-                        dirObj.setSyncDir(SYNC_DIR_LEFT);
-                        break;
-                    case DIR_EQUAL:
-                        ;
-                    }
-
-                    SetDirChangedFilter().recurse(dirObj); //filter issue for this directory => treat subfiles/-dirs the same
-                    return;
-                }
-        */
-        //determine datasets for change detection
-        const std::pair<DataSetDir, const DirContainer*> dataDbLeftStuff  = retrieveDataSetDir(dirObj.getObjShortName(), dbDirectoryLeft);
-        const std::pair<DataSetDir, const DirContainer*> dataDbRightStuff = retrieveDataSetDir(dirObj.getObjShortName(), dbDirectoryRight);
+        //try to find corresponding database entry
+        const InSyncDir::DirList::value_type* dbEntry = nullptr;
+        if (dbContainer)
+        {
+            auto iter = dbContainer->dirs.find(dirObj.getObjShortName());
+            if (iter != dbContainer->dirs.end())
+                dbEntry = &*iter;
+        }
 
         if (cat != DIR_EQUAL)
         {
-            const DataSetDir dataCurrentLeft( dirObj, Int2Type<LEFT_SIDE>());
-            const DataSetDir dataCurrentRight(dirObj, Int2Type<RIGHT_SIDE>());
-
             //evaluation
-            const bool changeOnLeft  = dataDbLeftStuff.first  != dataCurrentLeft;
-            const bool changeOnRight = dataDbRightStuff.first != dataCurrentRight;
+            const bool changeOnLeft  = !isEqual<LEFT_SIDE >(dirObj, dbEntry);
+            const bool changeOnRight = !isEqual<RIGHT_SIDE>(dirObj, dbEntry);
 
-            if (dataDbLeftStuff.first == dataDbRightStuff.first) //last sync seems to have been successful
+            if (changeOnLeft != changeOnRight)
+            {
+                //if database entry not in sync according to current settings! -> do not set direction based on async status!
+                if (dbEntry && !stillInSync(dbEntry->second))
+                    dirObj.setSyncDirConflict(txtDbNotInSync);
+                else
+                    dirObj.setSyncDir(changeOnLeft ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT);
+            }
+            else
             {
                 if (changeOnLeft)
-                {
-                    if (changeOnRight)
-                        dirObj.setSyncDirConflict(txtBothSidesChanged);
-                    else
-                        dirObj.setSyncDir(SYNC_DIR_RIGHT);
-                }
-                else
-                {
-                    if (changeOnRight)
-                        dirObj.setSyncDir(SYNC_DIR_LEFT);
-                    else
-                    {
-                        assert(false);
-                        dirObj.setSyncDirConflict(txtNoSideChanged);
-                    }
-                }
-            }
-            else //object did not complete last sync
-            {
-                if (changeOnLeft && changeOnRight)
                     dirObj.setSyncDirConflict(txtBothSidesChanged);
                 else
-                {
-                    //                    switch (cat)
-                    //                    {
-                    //                    case DIR_LEFT_SIDE_ONLY:
-                    //                        dirObj.setSyncDir(SYNC_DIR_RIGHT);
-                    //                        break;
-                    //                    case DIR_RIGHT_SIDE_ONLY:
-                    //                        dirObj.setSyncDir(SYNC_DIR_LEFT);
-                    //                        break;
-                    //                    case DIR_EQUAL:
-                    //                        assert(false);
-                    //                    }
-
-                    dirObj.setSyncDirConflict(txtLastSyncFail);
-                }
+                    dirObj.setSyncDirConflict(txtNoSideChanged);
             }
         }
 
-        recurse(dirObj, dataDbLeftStuff.second, dataDbRightStuff.second); //recursion
+        recurse(dirObj, dbEntry ? &dbEntry->second : nullptr); //recursion
     }
 
-
-    void findEqualDbEntries(const DirContainer& dbDirectoryLeft,
-                            const DirContainer& dbDirectoryRight)
+    void collectEqualDbEntries(const InSyncDir& container)
     {
         //note: we cannot integrate this traversal into "recurse()" since it may take a *slightly* different path: e.g. file renamed on both sides
 
-        std::for_each(dbDirectoryLeft.files.begin(), dbDirectoryLeft.files.end(),
-                      [&](const DirContainer::FileList::value_type& entryLeft)
+        std::for_each(container.files.begin(), container.files.end(),
+                      [&](const std::pair<Zstring, InSyncFile>& filePair)
         {
-            auto iterRight = dbDirectoryRight.files.find(entryLeft.first);
-            if (iterRight != dbDirectoryRight.files.end())
-            {
-                if (entryLeft. second.id != FileId() &&
-                    iterRight->second.id != FileId() &&
-                    DataSetFile(entryLeft.first, entryLeft.second) == DataSetFile(iterRight->first, iterRight->second))
-                    onceEqual.insert(std::make_pair(getFileIdKey(entryLeft.second), getFileIdKey(iterRight->second)));
-            }
+            if (filePair.second.left .id != FileId() &&
+                filePair.second.right.id != FileId() &&
+                stillInSync(filePair.second, cmpVar, fileTimeTolerance))
+                onceEqual.insert(std::make_pair(getFileIdKey(filePair.second.left), getFileIdKey(filePair.second.right)));
         });
 
-        std::for_each(dbDirectoryLeft.dirs.begin(), dbDirectoryLeft.dirs.end(),
-                      [&](const DirContainer::DirList::value_type& entryLeft)
-        {
-            auto iterRight = dbDirectoryRight.dirs.find(entryLeft.first);
-            if (iterRight != dbDirectoryRight.dirs.end())
-                findEqualDbEntries(entryLeft.second, iterRight->second);
-        });
+        std::for_each(container.dirs.begin(), container.dirs.end(),
+        [&](const std::pair<Zstring, InSyncDir>& dirPair) { collectEqualDbEntries(dirPair.second); });
     }
 
     typedef std::tuple<Int64, UInt64, FileId> FileIdKey; //(date, size, file ID)
@@ -793,11 +562,12 @@ private:
         });
     }
 
-
     const std::wstring txtBothSidesChanged;
     const std::wstring txtNoSideChanged;
-    const std::wstring txtFilterChanged;
-    const std::wstring txtLastSyncFail;
+    const std::wstring txtDbNotInSync;
+
+    const CompareVariant cmpVar;
+    const size_t fileTimeTolerance;
 
     std::function<void(const std::wstring&)> reportWarning_;
 
@@ -849,12 +619,31 @@ private:
 
        FAT caveat: File Ids are generally not stable when file is either moved or renamed!
        => 1. Move/rename operations on FAT cannot be detected reliably.
-       => 2. database generally contains wrong file ID on FAT after renaming from .ffs_tmp files => correct file Ids in database after next sync
+       => 2. database generally contains wrong file ID on FAT after renaming from .ffs_tmp files => correct file Ids in database only after next sync
+       => 3. even exFAT screws up (but less than FAT) and changes IDs after file move. Did they learn nothing from the past?
+
+    Possible refinement
+    -------------------
+    If the file ID is wrong (FAT) or not available, we could at least allow direct association by name, instead of breaking the chain completely: support NTFS -> FAT
+
+    1. find equal entries in database:
+    	std::hash_map: DB* |-> DB*       onceEqual
+
+    2. build alternative mappings if file Id is available for database entries:
+    	std::map: FielId |-> DB*  leftIdToDbRight
+    	std::map: FielId |-> DB* rightIdToDbRight
+
+    3. collect files on one side during determination of sync directions:
+    	std::vector<FileMapping*, DB*>   exLeftOnlyToDbRight   -> first try to use file Id, if failed associate via file name instead
+    	std::hash_map<DB*, FileMapping*> dbRightToexRightOnly  ->
+
+    4. find renamed pairs
     */
 };
-
+}
 
 //---------------------------------------------------------------------------------------------------------------
+
 std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& mainCfg)
 {
     //merge first and additional pairs
@@ -1415,7 +1204,7 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                 {
                     if (useRecycleBin)
                     {
-                        if (zen::moveToRecycleBin(fsObj.getFullName<side>()))  //throw FileError
+                        if (zen::recycleOrDelete(fsObj.getFullName<side>()))  //throw FileError
                             statusHandler.notifyDeletion(fsObj.getFullName<side>());
                     }
                     else

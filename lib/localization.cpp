@@ -9,7 +9,7 @@
 #include <map>
 #include <list>
 #include <iterator>
-#include <wx/ffile.h>
+//#include <wx/ffile.h>
 #include <wx/intl.h>
 #include <wx/msgdlg.h>
 #include "parse_plural.h"
@@ -18,7 +18,6 @@
 #include <zen/string_tools.h>
 #include <zen/file_traverser.h>
 #include "ffs_paths.h"
-#include <wx+/string_conv.h>
 #include <zenxml/io.h>
 #include <zen/i18n.h>
 

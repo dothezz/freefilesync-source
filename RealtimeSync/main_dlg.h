@@ -53,8 +53,8 @@ private:
     virtual void OnRemoveTopFolder(wxCommandEvent& event);
     virtual void OnKeyPressed     (wxKeyEvent& event);
     virtual void OnStart          (wxCommandEvent& event);
-    virtual void OnSaveConfig     (wxCommandEvent& event);
-    virtual void OnLoadConfig     (wxCommandEvent& event);
+    virtual void OnConfigSave     (wxCommandEvent& event);
+    virtual void OnConfigLoad     (wxCommandEvent& event);
 
     void setConfiguration(const xmlAccess::XmlRealConfig& cfg);
     xmlAccess::XmlRealConfig getConfiguration();

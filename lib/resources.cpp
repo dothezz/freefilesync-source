@@ -10,7 +10,7 @@
 #include <wx/zipstrm.h>
 #include <wx/image.h>
 #include <wx/mstream.h>
-#include <wx+/string_conv.h>
+//#include <wx+/string_conv.h>
 #include "ffs_paths.h"
 
 using namespace zen;

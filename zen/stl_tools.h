@@ -33,6 +33,9 @@ void set_remove_if(S& set, Predicate p);
 template <class M, class Predicate>
 void map_remove_if(M& map, Predicate p);
 
+template <class M, class K, class V>
+V& map_add_or_update(M& map, const K& key, const V& value); //efficient add or update without "default-constructible" requirement (Effective STL, item 24)
+
 //binary search returning an iterator
 template <class ForwardIterator, class T, typename Compare>
 ForwardIterator binary_search(ForwardIterator first, ForwardIterator last, const T& value, Compare comp);
@@ -96,6 +99,20 @@ void set_remove_if(S& set, Predicate p)
 
 template <class M, class Predicate> inline
 void map_remove_if(M& map, Predicate p) { set_remove_if(map, p); }
+
+
+template <class M, class K, class V> inline
+V& map_add_or_update(M& map, const K& key, const V& value) //efficient add or update without "default-constructible" requirement (Effective STL, item 24)
+{
+    auto iter = map.lower_bound(key);
+    if (iter != map.end() && !(map.key_comp()(key, iter->first)))
+    {
+        iter->second = value;
+        return iter->second;
+    }
+    else
+        return map.insert(iter, typename M::value_type(key, value))->second;
+}
 
 
 template <class ForwardIterator, class T, typename Compare> inline

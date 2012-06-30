@@ -1,8 +1,15 @@
 #define IDR_VERSION1 1
 
-#include "Winver.h"
-#include "wx/msw/wx.rc"
+#include <Winver.h>
 #include "../version/version.rc"
+
+//beginning with VC11 we get linking error "CVTRES : fatal error CVT1100: duplicate resource.  type:MANIFEST, name:1, language:0x0409" 
+//due to "#define wxMANIFEST_ID 1" in wx.rc. Using another number doesn't integrate the manifest correctly for VC2010 compilers.
+//However tests indicate we do not need this manifest at all:
+//#define wxUSE_NO_MANIFEST 1 //VC11 screws up if not set to an integer, unbelievable
+//we can't #ifdef _MSC_VER: not known by resource compiler!
+//see also: http://blog.m-ri.de/index.php/2010/11/26/combobox-dropdown-hoehe-wird-nicht-mehr-durch-die-ressourcen-definiert/
+#include <wx/msw/wx.rc>
 
 A_PROGRAM_ICON ICON DISCARDABLE "RealtimeSync.ico"
 

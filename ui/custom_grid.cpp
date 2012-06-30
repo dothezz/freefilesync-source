@@ -347,6 +347,9 @@ private:
                         case COL_TYPE_SIZE: //file size
                             if (!fsObj_.isEmpty<side>())
                                 value = zen::toGuiString(fileObj.getFileSize<side>());
+
+                            //if (!fsObj_.isEmpty<side>()) -> test file id
+                            //	value = toGuiString(fileObj.getFileId<side>().second);
                             break;
                         case COL_TYPE_DATE: //date
                             if (!fsObj_.isEmpty<side>())
@@ -647,14 +650,14 @@ private:
                 virtual void visit(const FileMapping& fileObj)
                 {
                     tipMsg_ += L"\n" +
-                               _("Size") + L": " + zen::filesizeToShortString(to<Int64>(fileObj.getFileSize<side>())) + L"\n" +
-                               _("Date") + L": " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
+                               _("Size:") + L" " + zen::filesizeToShortString(to<Int64>(fileObj.getFileSize<side>())) + L"\n" +
+                               _("Date:") + L" " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
                 }
 
                 virtual void visit(const SymLinkMapping& linkObj)
                 {
                     tipMsg_ += L"\n" +
-                               _("Date") + L": " + zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
+                               _("Date:") + L" " + zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
                 }
 
                 virtual void visit(const DirMapping& dirObj) {}
@@ -769,7 +772,8 @@ public:
 
     void onSelectBegin(const wxPoint& clientPos, size_t row, ColumnType colType)
     {
-        if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE)
+        if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE &&
+            row < refGrid().getRowCount())
         {
             refGrid().clearSelection(gridview::COMP_MIDDLE);
             dragSelection.reset(new std::pair<size_t, BlockPosition>(row, mousePosToBlock(clientPos, row)));

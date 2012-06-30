@@ -17,10 +17,10 @@ namespace zen
 {
 enum MessageType
 {
-    TYPE_INFO        = 1,
-    TYPE_WARNING     = 2,
-    TYPE_ERROR       = 4,
-    TYPE_FATAL_ERROR = 8,
+    TYPE_INFO        = 0x1,
+    TYPE_WARNING     = 0x2,
+    TYPE_ERROR       = 0x4,
+    TYPE_FATAL_ERROR = 0x8,
 };
 
 struct LogEntry
@@ -130,4 +130,4 @@ inline std::wstring formatMessage(const LogEntry& entry) { return formatMessageI
 
 }
 
-#endif // ERRORLOGGING_H_INCLUDED
+#endif //ERRORLOGGING_H_INCLUDED

@@ -10,6 +10,7 @@
 #include "msg_popup.h"
 #include "main_dlg.h"
 #include "exec_finished_box.h"
+#include "../lib/generate_logfile.h"
 
 using namespace zen;
 using namespace xmlAccess;
@@ -54,7 +55,7 @@ CompareStatusHandler::~CompareStatusHandler()
     mainDlg.m_buttonAbort->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
 
     if (abortIsRequested())
-        mainDlg.pushStatusInformation(_("Operation aborted!"));
+        mainDlg.flashStatusInformation(_("Operation aborted!"));
 }
 
 
@@ -103,7 +104,7 @@ ProcessCallback::Response CompareStatusHandler::reportError(const std::wstring& 
 
     bool ignoreNextErrors = false;
     switch (showErrorDlg(&mainDlg,
-                         ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
+                         ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
                          message, &ignoreNextErrors))
     {
         case ReturnErrorDlg::BUTTON_IGNORE:
@@ -113,7 +114,7 @@ ProcessCallback::Response CompareStatusHandler::reportError(const std::wstring& 
         case ReturnErrorDlg::BUTTON_RETRY:
             return ProcessCallback::RETRY;
 
-        case ReturnErrorDlg::BUTTON_ABORT:
+        case ReturnErrorDlg::BUTTON_CANCEL:
             abortThisProcess();
     }
 
@@ -126,7 +127,7 @@ void CompareStatusHandler::reportFatalError(const std::wstring& errorMessage)
 {
     forceUiRefresh();
 
-    showErrorDlg(&mainDlg, ReturnErrorDlg::BUTTON_ABORT, errorMessage, nullptr);
+    showFatalErrorDlg(&mainDlg, ReturnFatalErrorDlg::BUTTON_CANCEL, errorMessage, nullptr);
 }
 
 
@@ -140,7 +141,7 @@ void CompareStatusHandler::reportWarning(const std::wstring& warningMessage, boo
     //show pop-up and ask user how to handle warning
     bool dontWarnAgain = false;
     switch (showWarningDlg(&mainDlg,
-                           ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_ABORT,
+                           ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_CANCEL,
                            warningMessage, dontWarnAgain))
     {
         case ReturnWarningDlg::BUTTON_IGNORE:
@@ -149,7 +150,7 @@ void CompareStatusHandler::reportWarning(const std::wstring& warningMessage, boo
 
         case ReturnWarningDlg::BUTTON_SWITCH:
             assert(false);
-        case ReturnWarningDlg::BUTTON_ABORT:
+        case ReturnWarningDlg::BUTTON_CANCEL:
             abortThisProcess();
             break;
     }
@@ -178,13 +179,15 @@ void CompareStatusHandler::abortThisProcess()
 
 SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg,
                                      OnGuiError handleError,
-                                     const wxString& jobName,
+                                     const std::wstring& jobName,
                                      const std::wstring& execWhenFinished,
                                      std::vector<std::wstring>& execFinishedHistory) :
     parentDlg_(parentDlg),
     syncStatusFrame(*this, *this, parentDlg, true, jobName, execWhenFinished, execFinishedHistory),
-    handleError_(handleError)
+    handleError_(handleError),
+    jobName_(jobName)
 {
+    totalTime.Start(); //measure total time
 }
 
 
@@ -193,18 +196,36 @@ SyncStatusHandler::~SyncStatusHandler()
     const int totalErrors = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
 
     //finalize error log
+    //finalize error log
+    std::wstring finalStatus;
     if (abortIsRequested())
-        errorLog.logMsg(_("Synchronization aborted!"), TYPE_ERROR);
+    {
+        finalStatus = _("Synchronization aborted!");
+        errorLog.logMsg(finalStatus, TYPE_ERROR);
+    }
     else if (totalErrors > 0)
-        errorLog.logMsg(_("Synchronization completed with errors!"), TYPE_WARNING);
+    {
+        finalStatus = _("Synchronization completed with errors!");
+        errorLog.logMsg(finalStatus, TYPE_WARNING);
+    }
     else
     {
         if (getObjectsTotal(PHASE_SYNCHRONIZING) == 0 && //we're past "initNewPhase(PHASE_SYNCHRONIZING)" at this point!
             getDataTotal   (PHASE_SYNCHRONIZING) == 0)
-            errorLog.logMsg(_("Nothing to synchronize!"), TYPE_INFO); //even if "ignored conflicts" occurred!
+            finalStatus = _("Nothing to synchronize!"); //even if "ignored conflicts" occurred!
         else
-            errorLog.logMsg(_("Synchronization completed successfully!"), TYPE_INFO);
+            finalStatus = _("Synchronization completed successfully!");
+        errorLog.logMsg(finalStatus, TYPE_INFO);
     }
+
+    const Utf8String logStream = generateLogStream(errorLog, jobName_, finalStatus,
+                                                   getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
+                                                   getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING), totalTime.Time() / 1000);
+    try
+    {
+        saveToLastSyncsLog(logStream); //throw FileError
+    }
+    catch (FileError&) {}
 
     bool showFinalResults = true;
 
@@ -272,7 +293,7 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
 
     bool ignoreNextErrors = false;
     switch (showErrorDlg(parentDlg_,
-                         ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
+                         ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
                          errorMessage,
                          &ignoreNextErrors))
     {
@@ -285,7 +306,7 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
         case ReturnErrorDlg::BUTTON_RETRY:
             return ProcessCallback::RETRY;
 
-        case ReturnErrorDlg::BUTTON_ABORT:
+        case ReturnErrorDlg::BUTTON_CANCEL:
             errorLog.logMsg(errorMessage, TYPE_ERROR);
             abortThisProcess();
             break;
@@ -308,21 +329,18 @@ void SyncStatusHandler::reportFatalError(const std::wstring& errorMessage)
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showErrorDlg(parentDlg_,
-                                 ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_ABORT,
-                                 errorMessage, &ignoreNextErrors))
+            switch (showFatalErrorDlg(parentDlg_,
+                                      ReturnFatalErrorDlg::BUTTON_IGNORE |  ReturnFatalErrorDlg::BUTTON_CANCEL,
+                                      errorMessage, &ignoreNextErrors))
             {
-                case ReturnErrorDlg::BUTTON_IGNORE:
+                case ReturnFatalErrorDlg::BUTTON_IGNORE:
                     if (ignoreNextErrors) //falsify only
                         handleError_ = ON_GUIERROR_IGNORE;
                     break;
 
-                case ReturnErrorDlg::BUTTON_ABORT:
+                case ReturnFatalErrorDlg::BUTTON_CANCEL:
                     abortThisProcess();
                     break;
-
-                case ReturnErrorDlg::BUTTON_RETRY:
-                    assert(false);
             }
         }
         break;
@@ -349,7 +367,7 @@ void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& 
 
             bool dontWarnAgain = false;
             switch (showWarningDlg(parentDlg_,
-                                   ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_ABORT,
+                                   ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_CANCEL,
                                    warningMessage, dontWarnAgain))
             {
                 case ReturnWarningDlg::BUTTON_IGNORE: //no unhandled error situation!
@@ -358,7 +376,7 @@ void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& 
 
                 case ReturnWarningDlg::BUTTON_SWITCH:
                     assert(false);
-                case ReturnWarningDlg::BUTTON_ABORT:
+                case ReturnWarningDlg::BUTTON_CANCEL:
                     abortThisProcess();
                     break;
             }

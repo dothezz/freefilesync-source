@@ -81,7 +81,7 @@ FileInput::~FileInput()
 }
 
 
-size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number of bytes read; throw (FileError)
+size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number of bytes read; throw FileError
 {
 #ifdef FFS_WIN
     DWORD bytesRead = 0;

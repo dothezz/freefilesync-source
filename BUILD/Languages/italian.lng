@@ -10,6 +10,18 @@
 <source>Searching for folder %x...</source>
 <target>Ricerca della cartella %x...</target>
 
+<source>Batch execution</source>
+<target>Esecuzione in batch</target>
+
+<source>Items processed:</source>
+<target>Elementi processati:</target>
+
+<source>Items remaining:</source>
+<target>Elementi rimanenti:</target>
+
+<source>Total time:</source>
+<target>Tempo totale:</target>
+
 <source>Show in Explorer</source>
 <target>Mostra in Esplora Risorse</target>
 
@@ -58,12 +70,6 @@
 <source>About</source>
 <target>Info su</target>
 
-<source>Warning</source>
-<target>Attenzione</target>
-
-<source>Question</source>
-<target>Domanda</target>
-
 <source>Confirm</source>
 <target>Conferma</target>
 
@@ -86,7 +92,7 @@
 <target>Mostra popup</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target>Mostra popup di errori o avviso</target>
+<target>Mostra popup di errore o avviso</target>
 
 <source>Ignore errors</source>
 <target>Ignora errori</target>
@@ -108,6 +114,9 @@
 
 <source>Info</source>
 <target>Info</target>
+
+<source>Warning</source>
+<target>Attenzione</target>
 
 <source>Fatal Error</source>
 <target>Errore fatale</target>
@@ -139,12 +148,6 @@
 <pluralform>%x Byte</pluralform>
 </target>
 
-<source>Cannot read file %x.</source>
-<target>Impossibile leggere il file %x.</target>
-
-<source>Cannot write file %x.</source>
-<target>Impossibile scrivere il file %x.</target>
-
 <source>Database file %x is incompatible.</source>
 <target>Il file database %x non è compatibile.</target>
 
@@ -154,8 +157,17 @@
 <source>Database file %x does not yet exist.</source>
 <target>Il file database %x non è ancora stato creato.</target>
 
+<source>Database file is corrupt:</source>
+<target>Il file database è corrotto:</target>
+
 <source>Out of memory!</source>
 <target>Memoria insufficiente!</target>
+
+<source>Cannot write file %x.</source>
+<target>Impossibile scrivere il file %x.</target>
+
+<source>Cannot read file %x.</source>
+<target>Impossibile leggere il file %x.</target>
 
 <source>Database files do not share a common session.</source>
 <target>I file database non condividono una sessione comune.</target>
@@ -205,6 +217,9 @@
 <source>/sec</source>
 <target>/sec</target>
 
+<source>Cannot find file %x.</source>
+<target>Impossibile trovare il file %x.</target>
+
 <source>File %x does not contain a valid configuration.</source>
 <target>Il file %x non contiene una configurazione valida.</target>
 
@@ -229,14 +244,11 @@
 <source>Cannot read the following XML elements:</source>
 <target>Impossibile leggere i seguenti elementi XML:</target>
 
-<source>Cannot find file %x.</source>
-<target>Impossibile trovare il file %x.</target>
-
 <source>&Open...</source>
 <target>&Apri...</target>
 
-<source>&Save...</source>
-<target>&Salva...</target>
+<source>Save &As...</source>
+<target>Salva &Con nome...</target>
 
 <source>&Quit</source>
 <target>&Esci</target>
@@ -312,8 +324,8 @@ Il comando è attivato se:
 <source>(Build: %x)</source>
 <target>(Versione: %x)</target>
 
-<source>RealtimeSync configuration</source>
-<target>Configurazione di RealtimeSync</target>
+<source>All files</source>
+<target>Tutti i file</target>
 
 <source>&Restore</source>
 <target>&Ripristina</target>
@@ -327,8 +339,8 @@ Il comando è attivato se:
 <source>Waiting for missing directories...</source>
 <target>In attesa delle cartelle mancanti...</target>
 
-<source>An input folder name is empty.</source>
-<target>Il nome di una cartella di input è vuoto.</target>
+<source>A folder input field is empty.</source>
+<target>Un campo cartella input è vuoto.</target>
 
 <source>Logging</source>
 <target>Registo attività</target>
@@ -351,26 +363,8 @@ Il comando è attivato se:
 <source>Custom</source>
 <target>Personalizza</target>
 
-<source>FreeFileSync batch file</source>
-<target>FreeFileSync file batch</target>
-
-<source>FreeFileSync configuration</source>
-<target>Configurazione di FreeFileSync</target>
-
-<source>Batch execution</source>
-<target>Esecuzione in batch</target>
-
-<source>Items processed:</source>
-<target>Elementi processati:</target>
-
-<source>Items remaining:</source>
-<target>Elementi rimanenti:</target>
-
-<source>Total time:</source>
-<target>Tempo totale:</target>
-
-<source>Stop</source>
-<target>Stop</target>
+<source>FreeFileSync batch</source>
+<target>FreeFileSync batch</target>
 
 <source>Synchronization aborted!</source>
 <target>Sincronizzazione abortita!</target>
@@ -393,7 +387,7 @@ Il comando è attivato se:
 <source>Unable to connect to sourceforge.net!</source>
 <target>Impossibile collegarsi a sourceforge.net!</target>
 
-<source>A newer version of FreeFileSync is available:</source>
+<source>A new version of FreeFileSync is available:</source>
 <target>E' disponibile una nuova versione di FreeFileSync:</target>
 
 <source>Download now?</source>
@@ -438,6 +432,12 @@ Il comando è attivato se:
 <source>Extension</source>
 <target>Estensione</target>
 
+<source>Size:</source>
+<target>Dimensione:</target>
+
+<source>Date:</source>
+<target>Data:</target>
+
 <source>Action</source>
 <target>Azioni</target>
 
@@ -470,6 +470,9 @@ Il comando è attivato se:
 
 <source>&New</source>
 <target>&Nuovo</target>
+
+<source>&Save</source>
+<target>&Salva</target>
 
 <source>&Language</source>
 <target>&Lingua</target>
@@ -537,8 +540,8 @@ Il comando è attivato se:
 <source>Number of files and folders that will be deleted</source>
 <target>Numero di file e cartelle che verranno eliminati</target>
 
-<source>Total amount of data that will be transferred</source>
-<target>Volume dei dati che verranno trasferiti</target>
+<source>Total bytes to copy</source>
+<target>Bytes totali da copiare</target>
 
 <source>Items found:</source>
 <target>Elementi trovati:</target>
@@ -546,14 +549,14 @@ Il comando è attivato se:
 <source>Speed:</source>
 <target>Velocita':</target>
 
-<source>Remaining time:</source>
+<source>Time remaining:</source>
 <target>Tempo rimanente:</target>
 
-<source>Elapsed time:</source>
+<source>Time elapsed:</source>
 <target>Tempo trascorso:</target>
 
 <source>Batch job</source>
-<target>Attivitò batch</target>
+<target>Attività batch</target>
 
 <source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
 <target>Crea un file batch per automatizzare la sincronizzazione. Doppio click su questo file o schedula nelle operazioni pianificate del tuo sistema: FreeFileSync.exe <nome file batch>.ffs_batch</target>
@@ -672,6 +675,15 @@ I file sono considerati identici se
 <source>Source code written in C++ utilizing:</source>
 <target>Codice sorgente scritto in C++ utilizzando:</target>
 
+<source>If you like FreeFileSync</source>
+<target>Se ti piace FreeFileSync</target>
+
+<source>Donate with PayPal</source>
+<target>Fai una donazione con PayPal</target>
+
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Per la traduzione di FreeFileSync, un grazie va a:</target>
+
 <source>Feedback and suggestions are welcome</source>
 <target>Ogni commento o suggerimento è ben accetto</target>
 
@@ -684,38 +696,8 @@ I file sono considerati identici se
 <source>Email</source>
 <target>Email</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Per la traduzione di FreeFileSync, un grazie va a:</target>
-
-<source>If you like FreeFileSync</source>
-<target>Se ti piace FreeFileSync</target>
-
-<source>Donate with PayPal</source>
-<target>Fai una donazione con PayPal</target>
-
 <source>Published under the GNU General Public License</source>
 <target>Pubblicato sotto licenza GNU General Public</target>
-
-<source>Ignore further errors</source>
-<target>Ignora i prossimi errori</target>
-
-<source>Hide further error messages during the current process</source>
-<target>Non mostrare i successivi messaggi d'errore durante il processo corrente</target>
-
-<source>&Ignore</source>
-<target>&Ignora</target>
-
-<source>Do not show this dialog again</source>
-<target>Non visualizzare più questo messaggio</target>
-
-<source>&Switch</source>
-<target>&Passa</target>
-
-<source>&Yes</source>
-<target>&Si</target>
-
-<source>&No</source>
-<target>&No</target>
 
 <source>Use Recycle Bin</source>
 <target>Usa il Cestino</target>
@@ -788,6 +770,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 
 <source>Statistics</source>
 <target>Statistiche</target>
+
+<source>Do not show this dialog again</source>
+<target>Non visualizzare più questo messaggio</target>
 
 <source>Find what:</source>
 <target>Trova questo:</target>
@@ -867,8 +852,14 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Never save changes</source>
 <target>Non salvare mai le modifiche</target>
 
-<source>Save changes to current configuration?</source>
-<target>Salvare i cambiamenti alla configurazione corrente?</target>
+<source>Do you want to save changes to %x?</source>
+<target>Vuoi salvare le modifiche a %x?</target>
+
+<source>Save</source>
+<target>Salva</target>
+
+<source>Don't Save</source>
+<target>Non salvare</target>
 
 <source>Configuration loaded!</source>
 <target>Configurazione caricata!</target>
@@ -963,9 +954,6 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>All directories in sync!</source>
 <target>Tutte le cartelle sincronizzate!</target>
 
-<source>Please run a Compare first before synchronizing!</source>
-<target>Prima di sincronizzare effettua una comparazione!</target>
-
 <source>Comma separated list</source>
 <target>Elenco elementi separati da virgola</target>
 
@@ -1010,6 +998,24 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <pluralform>%x di 1 riga nella vista</pluralform>
 <pluralform>%x di %y righe nella vista</pluralform>
 </target>
+
+<source>Ignore further errors</source>
+<target>Ignora i prossimi errori</target>
+
+<source>&Ignore</source>
+<target>&Ignora</target>
+
+<source>&Switch</source>
+<target>&Passa</target>
+
+<source>Question</source>
+<target>Domanda</target>
+
+<source>&Yes</source>
+<target>&Si</target>
+
+<source>&No</source>
+<target>&No</target>
 
 <source>Scanning...</source>
 <target>Scansione...</target>
@@ -1191,6 +1197,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Cannot delete directory %x.</source>
 <target>Impossibile eliminare la cartella %x.</target>
 
+<source>Cannot write file attributes of %x.</source>
+<target>Impossibile scrivere attributi file di %x.</target>
+
 <source>Cannot write modification time of %x.</source>
 <target>Impossibile scrivere data e ora di modifica di %x.</target>
 
@@ -1214,9 +1223,6 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 
 <source>Cannot copy symbolic link %x to %y.</source>
 <target>Impossibile copiare collegamento %x su %y.</target>
-
-<source>Cannot write file attributes of %x.</source>
-<target>Impossibile scrivere attributi file di %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Impossibile copiare file %x in %y.</target>
@@ -1242,11 +1248,8 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>No change since last synchronization!</source>
 <target>Nessun cambiamento dall'ultima sincronizzazione!</target>
 
-<source>Filter settings have changed!</source>
-<target>Le impostazioni del filtro sono cambiate!</target>
-
-<source>The file was not processed by last synchronization!</source>
-<target>Il file non era processato nell'ultima sincronizzazione!</target>
+<source>The corresponding database entries are not in sync considering current settings.</source>
+<target>Le voci del database corrispondenti non sono in sincronia con le impostazioni correnti.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Imposta direzioni di sincronizzazione dpredefinite: i vecchi file saranno sovrascritti dai nuovi.</target>
@@ -1374,13 +1377,13 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Updating attributes of %x</source>
 <target>Aggiornamento attributi di %x</target>
 
-<source>Target folder name must not be empty.</source>
-<target>Il nome della cartella di destinazione non può essere vuoto.</target>
+<source>Target folder input field must not be empty.</source>
+<target>Il campo per la cartella di destinazione non può essere vuoto.</target>
 
-<source>Folder name for file versioning must not be empty.</source>
-<target>Il nome della cartella per le versioni dei file non può essere vuoto.</target>
+<source>Folder input field for versioning must not be empty.</source>
+<target>Il campo per la cartella di versione non può essere vuoto.</target>
 
-<source>Source directory %x not found.</source>
+<source>Source folder %x not found.</source>
 <target>Cartella sorgente %x non trovata.</target>
 
 <source>Unresolved conflicts existing!</source>
@@ -1398,11 +1401,11 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Not enough free disk space available in:</source>
 <target>Spazio libero su disco insufficiente in:</target>
 
-<source>Free disk space required:</source>
-<target>Spazio libero su disco richiesto:</target>
+<source>Required:</source>
+<target>Richiesto:</target>
 
-<source>Free disk space available:</source>
-<target>Spazio libero su disco disponibile:</target>
+<source>Available:</source>
+<target>Dispobilile:</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Cestino non disponibile per i seguenti percorsi! I file verranno cancellati in modo permanente:</target>
@@ -1412,6 +1415,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 
 <source>Processing folder pair:</source>
 <target>Elaborazione coppia di cartelle:</target>
+
+<source>Target folder %x already existing.</source>
+<target>La cartella di destinazione %x è già esistente.</target>
 
 <source>Generating database...</source>
 <target>Generazione database...</target>

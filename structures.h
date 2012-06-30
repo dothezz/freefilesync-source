@@ -48,7 +48,7 @@ enum CompareFilesResult
     FILE_RIGHT_NEWER,
     FILE_DIFFERENT,
     FILE_EQUAL,
-    FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only
+    FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only: short name case, modification time
     FILE_CONFLICT
 };
 //attention make sure these /|\  \|/ three enums match!!!
@@ -57,7 +57,7 @@ enum CompareDirResult
     DIR_LEFT_SIDE_ONLY     = FILE_LEFT_SIDE_ONLY,
     DIR_RIGHT_SIDE_ONLY    = FILE_RIGHT_SIDE_ONLY,
     DIR_EQUAL              = FILE_EQUAL,
-    DIR_DIFFERENT_METADATA = FILE_DIFFERENT_METADATA //both sides equal, but different metadata only
+    DIR_DIFFERENT_METADATA = FILE_DIFFERENT_METADATA //both sides equal, but different metadata only: short name case
 };
 
 enum CompareSymlinkResult
@@ -68,7 +68,7 @@ enum CompareSymlinkResult
     SYMLINK_RIGHT_NEWER     = FILE_RIGHT_NEWER,
     SYMLINK_DIFFERENT       = FILE_DIFFERENT,
     SYMLINK_EQUAL           = FILE_EQUAL,
-    SYMLINK_DIFFERENT_METADATA = FILE_DIFFERENT_METADATA, //files are considered "equal" but different only in metadata
+    SYMLINK_DIFFERENT_METADATA = FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only: short name case
     SYMLINK_CONFLICT        = FILE_CONFLICT
 };
 
