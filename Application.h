@@ -14,21 +14,15 @@
 
 class Application : public wxApp
 {
-public:
-    bool OnInit();
-    int  OnRun();
-    int  OnExit();
-    bool OnExceptionInMainLoop();
+private:
+    virtual bool OnInit();
+    virtual int  OnRun();
+    virtual int  OnExit() { return 0; }
+    virtual bool OnExceptionInMainLoop();
 
     void OnStartApplication(wxIdleEvent& event);
     void OnQueryEndSession(wxEvent& event);
 
-private:
-    void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, xmlAccess::XmlGlobalSettings& settings);
-    void runGuiMode(const std::vector<wxString>& cfgFileName, xmlAccess::XmlGlobalSettings& settings);
-    void runBatchMode(const Zstring& filename, xmlAccess::XmlGlobalSettings& globSettings);
-
-    xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
     zen::FfsReturnCode returnCode;
 };
 

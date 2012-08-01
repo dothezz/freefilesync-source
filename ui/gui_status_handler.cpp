@@ -279,37 +279,38 @@ void SyncStatusHandler::reportInfo(const std::wstring& text)
 
 ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& errorMessage)
 {
+    errorLog.logMsg(errorMessage, TYPE_ERROR); //always, even for "retry"
+
     switch (handleError_)
     {
         case ON_GUIERROR_POPUP:
-            break;
+        {
+            PauseTimers dummy(syncStatusFrame);
+            forceUiRefresh();
+
+            bool ignoreNextErrors = false;
+            switch (showErrorDlg(parentDlg_,
+                                 ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
+                                 errorMessage,
+                                 &ignoreNextErrors))
+            {
+                case ReturnErrorDlg::BUTTON_IGNORE:
+                    if (ignoreNextErrors) //falsify only
+                        handleError_ = ON_GUIERROR_IGNORE;
+                    return ProcessCallback::IGNORE_ERROR;
+
+                case ReturnErrorDlg::BUTTON_RETRY:
+                    return ProcessCallback::RETRY;
+
+                case ReturnErrorDlg::BUTTON_CANCEL:
+                    abortThisProcess();
+                    break;
+            }
+        }
+        break;
+
         case ON_GUIERROR_IGNORE:
-            errorLog.logMsg(errorMessage, TYPE_ERROR);
             return ProcessCallback::IGNORE_ERROR;
-    }
-
-    PauseTimers dummy(syncStatusFrame);
-    forceUiRefresh();
-
-    bool ignoreNextErrors = false;
-    switch (showErrorDlg(parentDlg_,
-                         ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
-                         errorMessage,
-                         &ignoreNextErrors))
-    {
-        case ReturnErrorDlg::BUTTON_IGNORE:
-            if (ignoreNextErrors) //falsify only
-                handleError_ = ON_GUIERROR_IGNORE;
-            errorLog.logMsg(errorMessage, TYPE_ERROR);
-            return ProcessCallback::IGNORE_ERROR;
-
-        case ReturnErrorDlg::BUTTON_RETRY:
-            return ProcessCallback::RETRY;
-
-        case ReturnErrorDlg::BUTTON_CANCEL:
-            errorLog.logMsg(errorMessage, TYPE_ERROR);
-            abortThisProcess();
-            break;
     }
 
     assert(false);

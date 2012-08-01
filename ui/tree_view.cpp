@@ -478,9 +478,9 @@ void TreeView::updateCmpResult(bool hideFiltered,
             case FILE_DIFFERENT:
                 return differentFilesActive;
             case FILE_EQUAL:
+            case FILE_DIFFERENT_METADATA: //= sub-category of equal
                 return equalFilesActive;
             case FILE_CONFLICT:
-            case FILE_DIFFERENT_METADATA:
                 return conflictFilesActive;
         }
         assert(false);
@@ -612,8 +612,8 @@ const wxColour COLOR_LEVEL11(0xff, 0xcc, 0x99);
 const wxColour COLOR_PERCENTAGE_BORDER(198, 198, 198);
 const wxColour COLOR_PERCENTAGE_BACKGROUND(0xf8, 0xf8, 0xf8);
 
-//const wxColor COLOR_TREE_SELECTION_GRADIENT_FROM = wxColor( 89, 255,  99); //green: H:88 S:255 V:172
-//const wxColor COLOR_TREE_SELECTION_GRADIENT_TO   = wxColor(225, 255, 227); //       H:88 S:255 V:240
+//const wxColor COLOR_TREE_SELECTION_GRADIENT_FROM = wxColor( 89, 255,  99); //green: HSV: 88, 255, 172
+//const wxColor COLOR_TREE_SELECTION_GRADIENT_TO   = wxColor(225, 255, 227); //       HSV: 88, 255, 240
 const wxColor COLOR_TREE_SELECTION_GRADIENT_FROM = getColorSelectionGradientFrom();
 const wxColor COLOR_TREE_SELECTION_GRADIENT_TO   = getColorSelectionGradientTo  ();
 
@@ -1182,7 +1182,7 @@ std::vector<Grid::ColumnAttribute> treeview::convertConfig(const std::vector<Col
 
     std::vector<Grid::ColumnAttribute> output;
     std::transform(attribClean.begin(), attribClean.end(), std::back_inserter(output),
-    [&](const ColumnAttributeNavi& a) { return Grid::ColumnAttribute(static_cast<ColumnType>(a.type_), a.width_, a.visible_); });
+    [&](const ColumnAttributeNavi& ca) { return Grid::ColumnAttribute(static_cast<ColumnType>(ca.type_), ca.offset_, ca.stretch_, ca.visible_); });
 
     return output;
 }
@@ -1193,7 +1193,7 @@ std::vector<ColumnAttributeNavi> treeview::convertConfig(const std::vector<Grid:
     std::vector<ColumnAttributeNavi> output;
 
     std::transform(attribs.begin(), attribs.end(), std::back_inserter(output),
-    [&](const Grid::ColumnAttribute& ca) { return ColumnAttributeNavi(static_cast<ColumnTypeNavi>(ca.type_), ca.width_, ca.visible_); });
+    [&](const Grid::ColumnAttribute& ca) { return ColumnAttributeNavi(static_cast<ColumnTypeNavi>(ca.type_), ca.offset_, ca.stretch_, ca.visible_); });
 
     return makeConsistent(output);
 }

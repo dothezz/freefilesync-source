@@ -16,6 +16,7 @@
 #include "folder_history_box.h"
 #include "../wx+/dir_picker.h"
 #include "../wx+/grid.h"
+#include "triple_splitter.h"
 #include "../wx+/toggle_button.h"
 #include "exec_finished_box.h"
 #include "../wx+/graph.h"
@@ -106,7 +107,10 @@ protected:
     wxBoxSizer* bSizerAddFolderPairs;
     zen::Grid* m_gridNavi;
     wxPanel* m_panelCenter;
-    zen::Grid* m_gridMain;
+    zen::TripleSplitter* m_splitterMain;
+    zen::Grid* m_gridMainL;
+    zen::Grid* m_gridMainC;
+    zen::Grid* m_gridMainR;
     wxPanel* m_panelStatusBar;
     wxBoxSizer* bSizerStatusLeftDirectories;
     wxStaticBitmap* m_bitmapSmallDirectoryLeft;

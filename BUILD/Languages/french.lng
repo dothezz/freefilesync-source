@@ -198,7 +198,7 @@
 <pluralform>[%x Threads]</pluralform>
 </source>
 <target>
-<pluralform>[1 Tâche]</pluralform>
+<pluralform>[%x Tâche]</pluralform>
 <pluralform>[%x Tâches]</pluralform>
 </target>
 

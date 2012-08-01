@@ -72,7 +72,7 @@ enum CompareSymlinkResult
     SYMLINK_CONFLICT        = FILE_CONFLICT
 };
 
-
+/*
 inline
 CompareFilesResult convertToFilesResult(CompareDirResult value)
 {
@@ -85,7 +85,7 @@ CompareFilesResult convertToFilesResult(CompareSymlinkResult value)
 {
     return static_cast<CompareFilesResult>(value);
 }
-
+*/
 
 std::wstring getSymbol(CompareFilesResult cmpRes);
 

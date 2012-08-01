@@ -359,9 +359,27 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     wxBoxSizer* bSizer1711;
     bSizer1711 = new wxBoxSizer( wxVERTICAL );
 
-    m_gridMain = new zen::Grid( m_panelCenter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
-    m_gridMain->SetScrollRate( 5, 5 );
-    bSizer1711->Add( m_gridMain, 1, wxEXPAND, 5 );
+    m_splitterMain = new zen::TripleSplitter( m_panelCenter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    wxBoxSizer* bSizer1781;
+    bSizer1781 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_gridMainL = new zen::Grid( m_splitterMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+    m_gridMainL->SetScrollRate( 5, 5 );
+    bSizer1781->Add( m_gridMainL, 1, wxEXPAND, 5 );
+
+    m_gridMainC = new zen::Grid( m_splitterMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+    m_gridMainC->SetScrollRate( 5, 5 );
+    bSizer1781->Add( m_gridMainC, 0, wxEXPAND, 5 );
+
+    m_gridMainR = new zen::Grid( m_splitterMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+    m_gridMainR->SetScrollRate( 5, 5 );
+    bSizer1781->Add( m_gridMainR, 1, wxEXPAND, 5 );
+
+
+    m_splitterMain->SetSizer( bSizer1781 );
+    m_splitterMain->Layout();
+    bSizer1781->Fit( m_splitterMain );
+    bSizer1711->Add( m_splitterMain, 1, wxEXPAND, 5 );
 
     m_panelStatusBar = new wxPanel( m_panelCenter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* bSizer451;
@@ -2676,30 +2694,30 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     wxBoxSizer* bSizer184;
     bSizer184 = new wxBoxSizer( wxHORIZONTAL );
 
+    wxBoxSizer* bSizer178;
+    bSizer178 = new wxBoxSizer( wxVERTICAL );
+
     m_staticText83 = new wxStaticText( m_panel39, wxID_ANY, _("If you like FreeFileSync"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText83->Wrap( -1 );
     m_staticText83->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 93, 92, false, wxEmptyString ) );
     m_staticText83->SetForegroundColour( wxColour( 0, 0, 0 ) );
 
-    bSizer184->Add( m_staticText83, 0, wxALL, 5 );
-
-
-    bSizer184->Add( 0, 0, 1, wxEXPAND, 5 );
+    bSizer178->Add( m_staticText83, 0, wxALL, 5 );
 
     m_hyperlink3 = new wxHyperlinkCtrl( m_panel39, wxID_ANY, _("Donate with PayPal"), wxT("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zhnmju123@gmx.de&lc=US&currency_code=EUR"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink3->SetFont( wxFont( 10, 70, 90, 92, true, wxEmptyString ) );
     m_hyperlink3->SetBackgroundColour( wxColour( 221, 221, 255 ) );
     m_hyperlink3->SetToolTip( _("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zhnmju123@gmx.de&lc=US&currency_code=EUR") );
 
-    bSizer184->Add( m_hyperlink3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+    bSizer178->Add( m_hyperlink3, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+
+
+    bSizer184->Add( bSizer178, 1, wxALIGN_CENTER_VERTICAL, 5 );
 
     m_bitmapPaypal = new wxStaticBitmap( m_panel39, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
     m_bitmapPaypal->SetToolTip( _("Donate with PayPal") );
 
     bSizer184->Add( m_bitmapPaypal, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-
-    bSizer184->Add( 0, 0, 1, wxEXPAND, 5 );
 
 
     m_panel39->SetSizer( bSizer184 );

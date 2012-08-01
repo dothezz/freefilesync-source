@@ -198,6 +198,8 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
 
     //PERF_START;
 
+    procCallback.reportInfo(_("Start comparison")); //we want some indicator at the very beginning to make sense of "total time"
+
     //init process: keep at beginning so that all gui elements are initialized properly
     procCallback.initNewPhase(-1, 0, ProcessCallback::PHASE_SCANNING); //it's not known how many files will be scanned => -1 objects
 
@@ -348,24 +350,48 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& cfgLi
 
 //--------------------assemble conflict descriptions---------------------------
 
+namespace
+{
+//const wchar_t arrowLeft [] = L"\u2190";
+//const wchar_t arrowRight[] = L"\u2192"; unicode arrows -> too small
+const wchar_t arrowLeft [] = L"<--";
+const wchar_t arrowRight[] = L"-->";
+
+
 //check for very old dates or date2s in the future
 std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 {
     return _("Conflict detected:") + L"\n" +
-           replaceCpy(_("File %x has an invalid date!"), L"%x", fmtFileName(fileNameFull)) + L"\n\n" +
+           replaceCpy(_("File %x has an invalid date!"), L"%x", fmtFileName(fileNameFull)) + L"\n" +
            _("Date:") + L" " + utcToLocalTimeString(utcTime);
 }
 
 
-namespace
-{
 //check for changed files with same modification date
 std::wstring getConflictSameDateDiffSize(const FileMapping& fileObj)
 {
     return _("Conflict detected:") + L"\n" +
-           replaceCpy(_("Files %x have the same date but a different size!"), L"%x", fmtFileName(fileObj.getObjRelativeName())) + L"\n\n" +
-           L"<--    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
-           L"-->    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<RIGHT_SIDE>());
+           replaceCpy(_("Files %x have the same date but a different size!"), L"%x", fmtFileName(fileObj.getObjRelativeName())) + L"\n" +
+           arrowLeft  + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
+           arrowRight + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<RIGHT_SIDE>());
+}
+
+
+inline
+std::wstring getDescrDiffMetaShortname(const FileSystemObject& fsObj)
+{
+    return _("Items have different attributes") + L"\n" +
+           arrowLeft  + L"    " + fmtFileName(fsObj.getShortName<LEFT_SIDE >()) + L"\n" +
+           arrowRight + L"    " + fmtFileName(fsObj.getShortName<RIGHT_SIDE>());
+}
+
+
+template <class FileOrLinkMapping> inline
+std::wstring getDescrDiffMetaDate(const FileOrLinkMapping& fileObj)
+{
+    return _("Items have different attributes") + L"\n" +
+           arrowLeft  + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.template getLastWriteTime<LEFT_SIDE >()) + L"\n" +
+           arrowRight + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.template getLastWriteTime<RIGHT_SIDE>());
 }
 }
 
@@ -394,9 +420,9 @@ void CompareProcess::categorizeSymlinkByTime(SymLinkMapping& linkObj) const
                 //2. harmonize with "bool stillInSync()" in algorithm.cpp
 
                 if (linkObj.getShortName<LEFT_SIDE>() == linkObj.getShortName<RIGHT_SIDE>())
-                    linkObj.setCategory<SYMLINK_EQUAL>();
+                    linkObj.setCategory<FILE_EQUAL>();
                 else
-                    linkObj.setCategory<SYMLINK_DIFFERENT_METADATA>();
+                    linkObj.setCategoryDiffMetadata(getDescrDiffMetaShortname(linkObj));
             }
             else
                 linkObj.setCategoryConflict(_("Conflict detected:") + L"\n" +
@@ -404,11 +430,11 @@ void CompareProcess::categorizeSymlinkByTime(SymLinkMapping& linkObj) const
             break;
 
         case CmpFileTime::TIME_LEFT_NEWER:
-            linkObj.setCategory<SYMLINK_LEFT_NEWER>();
+            linkObj.setCategory<FILE_LEFT_NEWER>();
             break;
 
         case CmpFileTime::TIME_RIGHT_NEWER:
-            linkObj.setCategory<SYMLINK_RIGHT_NEWER>();
+            linkObj.setCategory<FILE_RIGHT_NEWER>();
             break;
 
         case CmpFileTime::TIME_LEFT_INVALID:
@@ -450,7 +476,7 @@ void CompareProcess::compareByTimeSize(const FolderPairCfg& fpConfig, BaseDirMap
                     if (fileObj->getShortName<LEFT_SIDE>() == fileObj->getShortName<RIGHT_SIDE>())
                         fileObj->setCategory<FILE_EQUAL>();
                     else
-                        fileObj->setCategory<FILE_DIFFERENT_METADATA>();
+                        fileObj->setCategoryDiffMetadata(getDescrDiffMetaShortname(*fileObj));
                 }
                 else
                     fileObj->setCategoryConflict(getConflictSameDateDiffSize(*fileObj)); //same date, different filesize
@@ -496,16 +522,15 @@ void CompareProcess::categorizeSymlinkByContent(SymLinkMapping& linkObj) const
         //2. harmonize with "bool stillInSync()" in algorithm.cpp
 
         //symlinks have same "content"
-        if (linkObj.getShortName<LEFT_SIDE>() == linkObj.getShortName<RIGHT_SIDE>() &&
-            CmpFileTime::getResult(linkObj.getLastWriteTime<LEFT_SIDE>(),
-                                   linkObj.getLastWriteTime<RIGHT_SIDE>(),
-                                   fileTimeTolerance) == CmpFileTime::TIME_EQUAL)
-            linkObj.setCategory<SYMLINK_EQUAL>();
+        if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>())
+            linkObj.setCategoryDiffMetadata(getDescrDiffMetaShortname(linkObj));
+        else if (CmpFileTime::getResult(linkObj.getLastWriteTime<LEFT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance) != CmpFileTime::TIME_EQUAL)
+            linkObj.setCategoryDiffMetadata(getDescrDiffMetaDate(linkObj));
         else
-            linkObj.setCategory<SYMLINK_DIFFERENT_METADATA>();
+            linkObj.setCategory<FILE_EQUAL>();
     }
     else
-        linkObj.setCategory<SYMLINK_DIFFERENT>();
+        linkObj.setCategory<FILE_DIFFERENT>();
 }
 
 
@@ -574,14 +599,12 @@ void CompareProcess::compareByContent(std::vector<std::pair<FolderPairCfg, BaseD
                 //Caveat:
                 //1. FILE_EQUAL may only be set if short names match in case: InSyncDir's mapping tables use short name as a key! see db_file.cpp
                 //2. harmonize with "bool stillInSync()" in algorithm.cpp
-
-                if (fileObj->getShortName<LEFT_SIDE>() == fileObj->getShortName<RIGHT_SIDE>() &&
-                CmpFileTime::getResult(fileObj->getLastWriteTime<LEFT_SIDE >(),
-                fileObj->getLastWriteTime<RIGHT_SIDE>(),
-                fileTimeTolerance) == CmpFileTime::TIME_EQUAL)
-                    fileObj->setCategory<FILE_EQUAL>();
+                if (fileObj->getShortName<LEFT_SIDE>() != fileObj->getShortName<RIGHT_SIDE>())
+                    fileObj->setCategoryDiffMetadata(getDescrDiffMetaShortname(*fileObj));
+                else if (CmpFileTime::getResult(fileObj->getLastWriteTime<LEFT_SIDE>(), fileObj->getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance) != CmpFileTime::TIME_EQUAL)
+                    fileObj->setCategoryDiffMetadata(getDescrDiffMetaDate(*fileObj));
                 else
-                    fileObj->setCategory<FILE_DIFFERENT_METADATA>();
+                    fileObj->setCategory<FILE_EQUAL>();
             }
             else
                 fileObj->setCategory<FILE_DIFFERENT>();
@@ -727,7 +750,10 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
 
     [&](const DirData& dirLeft, const DirData& dirRight) //both sides
     {
-        DirMapping& newDirMap = output.addSubDir(dirLeft.first, dirRight.first);
+        DirMapping& newDirMap = output.addSubDir(dirLeft.first, dirRight.first, DIR_EQUAL);
+        if (dirLeft.first != dirRight.first)
+            newDirMap.setCategoryDiffMetadata(getDescrDiffMetaShortname(newDirMap));
+
         execute(dirLeft.second, dirRight.second, newDirMap); //recurse into subdirectories
     });
 }

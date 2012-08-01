@@ -30,7 +30,7 @@ struct ProcessCallback
         PHASE_COMPARING_CONTENT,
         PHASE_SYNCHRONIZING
     };
-    virtual void initNewPhase(int objectsTotal, zen::Int64 dataTotal, Phase phaseId) = 0; //informs about the total amount of data that will be processed in this phase
+    virtual void initNewPhase(int objectsTotal, zen::Int64 dataTotal, Phase phaseId) = 0; //informs about the estimated amount of data that will be processed in this phase
 
     //note: this one must NOT throw in order to properly allow undoing setting of statistics!
     //it is in general paired with a call to requestUiRefresh() to compensate!
@@ -47,7 +47,7 @@ struct ProcessCallback
 
     //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
     virtual void requestUiRefresh() = 0; //throw ?
-    virtual void forceUiRefresh  () = 0; //throw ? - call before starting long running task which doesn't update regularly
+    virtual void forceUiRefresh  () = 0; //throw ? - called before starting long running task which doesn't update regularly
 
     //called periodically after data was processed: expected(!) to request GUI update
     virtual void reportStatus(const std::wstring& text) = 0; //UI info only, should not be logged!

@@ -25,11 +25,12 @@ enum ColumnTypeRim
 
 struct ColumnAttributeRim
 {
-    ColumnAttributeRim() : type_(COL_TYPE_DIRECTORY), width_(0), visible_(false) {}
-    ColumnAttributeRim(ColumnTypeRim type, int width, bool visible) : type_(type), width_(width), visible_(visible) {}
+    ColumnAttributeRim() : type_(COL_TYPE_DIRECTORY), offset_(0), stretch_(0), visible_(false) {}
+    ColumnAttributeRim(ColumnTypeRim type, int offset, int stretch, bool visible) : type_(type), offset_(offset), stretch_(stretch), visible_(visible) {}
 
     ColumnTypeRim type_;
-    int           width_; //negative value stretches proportionally!
+    int           offset_;
+    int           stretch_;
     bool          visible_;
 };
 
@@ -39,26 +40,26 @@ namespace
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
 {
     std::vector<ColumnAttributeRim> attr;
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH, 250, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY, 200, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,  200, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  150, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,       80, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,      112, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,  60, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH,  250, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY,  200, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,   200, 0, true));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  -280, 1, true)); //stretch to full width and substract sum of fixed size widths!
+    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,        80, 0, true));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,       112, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,   60, 0, false));
     return attr;
 }
 
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
 {
     std::vector<ColumnAttributeRim> attr;
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH, 250, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY, 200, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,  200, false)); //already shown on left side
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  150, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,       80, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,      112, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,  60, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH, 250, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY, 200, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,  200, 0, false)); //already shown on left side
+    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  -80, 1, true));  //stretch to full width and substract sum of fixed size widths!
+    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,       80, 0, true));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,      112, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,  60, 0, false));
     return attr;
 }
 }
@@ -83,11 +84,12 @@ enum ColumnTypeNavi
 
 struct ColumnAttributeNavi
 {
-    ColumnAttributeNavi() : type_(COL_TYPE_NAVI_DIRECTORY), width_(0), visible_(false) {}
-    ColumnAttributeNavi(ColumnTypeNavi type, int width, bool visible) : type_(type), width_(width), visible_(visible) {}
+    ColumnAttributeNavi() : type_(COL_TYPE_NAVI_DIRECTORY), offset_(0), stretch_(0), visible_(false) {}
+    ColumnAttributeNavi(ColumnTypeNavi type, int offset, int stretch, bool visible) : type_(type), offset_(offset), stretch_(stretch), visible_(visible) {}
 
     ColumnTypeNavi type_;
-    int            width_; //negative value stretches proportionally!
+    int            offset_;
+    int            stretch_;
     bool           visible_;
 };
 
@@ -100,19 +102,8 @@ inline
 std::vector<ColumnAttributeNavi> getDefaultColumnAttributesNavi()
 {
     std::vector<ColumnAttributeNavi> attr;
-
-    ColumnAttributeNavi newEntry;
-
-    newEntry.type_    = COL_TYPE_NAVI_DIRECTORY;
-    newEntry.visible_ = true;
-    newEntry.width_   = -1; //stretch, old value: 280;
-    attr.push_back(newEntry);
-
-    newEntry.type_    = COL_TYPE_NAVI_BYTES;
-    newEntry.visible_ = true;
-    newEntry.width_   = 60; //GTK needs a few pixels more
-    attr.push_back(newEntry);
-
+    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_DIRECTORY, -60, 1, true)); //stretch to full width and substract sum of fixed size widths!
+    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_BYTES,      60, 0, true)); //GTK needs a few pixels width more
     return attr;
 }
 }

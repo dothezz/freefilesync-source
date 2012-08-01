@@ -48,7 +48,7 @@ UInt64 getFilesize(const Zstring& filename); //throw FileError
 UInt64 getFreeDiskSpace(const Zstring& path); //throw FileError
 
 //file handling
-bool removeFile(const Zstring& filename); //return "true" if file was actually deleted; throw FileError
+bool removeFile(const Zstring& filename); //throw FileError; return "true" if file was actually deleted
 void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = nullptr); //throw FileError
 
 

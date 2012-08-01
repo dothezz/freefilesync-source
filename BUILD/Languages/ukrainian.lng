@@ -212,7 +212,7 @@
 <pluralform>[%x Threads]</pluralform>
 </source>
 <target>
-<pluralform>[1 Нить виконання]</pluralform>
+<pluralform>[%x Нить виконання]</pluralform>
 <pluralform>[%x Ниті виконання]</pluralform>
 <pluralform>[%x Нитей виконання]</pluralform>
 </target>

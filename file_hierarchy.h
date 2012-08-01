@@ -147,7 +147,8 @@ public:
     typedef zen::FixedList<DirMapping>     SubDirVec;
 
     DirMapping& addSubDir(const Zstring& shortNameLeft,
-                          const Zstring& shortNameRight);
+                          const Zstring& shortNameRight,
+                          CompareDirResult defaultCmpResult);
 
     template <SelectedSide side>
     DirMapping& addSubDir(const Zstring& shortName); //dir exists on one side only
@@ -357,8 +358,9 @@ public:
     template <SelectedSide side>       Zstring  getFullName()     const; //getFullName() == getBaseDirPf() + getRelativeName()
 
     //comparison result
-    virtual CompareFilesResult getCategory() const = 0;
-    virtual std::wstring getCatConflict() const = 0; //only filled if getCategory() == FILE_CONFLICT
+    CompareFilesResult getCategory() const { return cmpResult; }
+    std::wstring getCatExtraDescription() const; //only filled if getCategory() == FILE_CONFLICT or FILE_DIFFERENT_METADATA
+
     //sync operation
     virtual SyncOperation testSyncOperation(SyncDirection testSyncDir) const; //semantics: "what if"! assumes "active, no conflict, no recursion (directory)!
     virtual SyncOperation getSyncOperation() const;
@@ -381,8 +383,17 @@ public:
     const BaseDirMapping& root() const  { return parent_.getRoot(); }
     /**/  BaseDirMapping& root()        { return parent_.getRoot(); }
 
+    //for use during init in "CompareProcess" only:
+    template <CompareFilesResult res> void setCategory();
+    void setCategoryConflict(const std::wstring& description);
+    void setCategoryDiffMetadata(const std::wstring& description);
+
 protected:
-    FileSystemObject(const Zstring& shortNameLeft, const Zstring& shortNameRight, HierarchyObject& parentObj) :
+    FileSystemObject(const Zstring& shortNameLeft,
+                     const Zstring& shortNameRight,
+                     HierarchyObject& parentObj,
+                     CompareFilesResult defaultCmpResult) :
+        cmpResult(defaultCmpResult),
         selectedForSynchronization(true),
         syncDir(SYNC_DIR_NONE),
         shortNameLeft_(shortNameLeft),
@@ -406,6 +417,10 @@ private:
     virtual void removeObjectL() = 0;
     virtual void removeObjectR() = 0;
 
+    //categorization
+    CompareFilesResult cmpResult;
+    std::unique_ptr<std::wstring> cmpResultDescr; //only filled if getCategory() == FILE_CONFLICT or FILE_DIFFERENT_METADATA
+
     bool selectedForSynchronization;
     SyncDirection syncDir;
     std::unique_ptr<std::wstring> syncDirConflict; //non-empty if we have a conflict setting sync-direction
@@ -420,38 +435,21 @@ private:
 //------------------------------------------------------------------
 class DirMapping : public FileSystemObject, public HierarchyObject
 {
-    friend class CompareProcess; //only CompareProcess shall be allowed to change cmpResult
     friend class HierarchyObject;
 
 public:
     virtual void accept(FSObjectVisitor& visitor) const;
 
-    virtual CompareFilesResult getCategory() const;
     CompareDirResult getDirCategory() const; //returns actually used subset of CompareFilesResult
-    virtual std::wstring getCatConflict() const;
 
     DirMapping(const Zstring& shortNameLeft,  //use empty shortname if "not existing"
                const Zstring& shortNameRight, //
-               HierarchyObject& parentObj) :
-        FileSystemObject(shortNameLeft, shortNameRight, parentObj),
+               HierarchyObject& parentObj,
+               CompareDirResult defaultCmpResult) :
+        FileSystemObject(shortNameLeft, shortNameRight, parentObj, static_cast<CompareFilesResult>(defaultCmpResult)),
         HierarchyObject(getObjRelativeName() + FILE_NAME_SEPARATOR, parentObj.getRoot()),
         syncOpBuffered(SO_DO_NOTHING),
-        syncOpUpToDate(false)
-    {
-        assert(!shortNameLeft.empty() || !shortNameRight.empty());
-
-        if (shortNameRight.empty())
-            cmpResult = DIR_LEFT_SIDE_ONLY;
-        else if (shortNameLeft.empty())
-            cmpResult = DIR_RIGHT_SIDE_ONLY;
-        else
-        {
-            if (shortNameLeft == shortNameRight)
-                cmpResult = DIR_EQUAL;
-            else
-                cmpResult = DIR_DIFFERENT_METADATA;
-        }
-    }
+        syncOpUpToDate(false) {}
 
     virtual SyncOperation getSyncOperation() const;
 
@@ -464,9 +462,6 @@ private:
     virtual void notifySyncCfgChanged() { syncOpUpToDate = false; FileSystemObject::notifySyncCfgChanged(); HierarchyObject::notifySyncCfgChanged(); }
     //------------------------------------------------------------------
 
-    //categorization
-    CompareDirResult cmpResult;
-
     mutable SyncOperation syncOpBuffered; //determining sync-op for directory may be expensive as it depends on child-objects -> buffer it
     mutable bool syncOpUpToDate;         //
 };
@@ -474,7 +469,6 @@ private:
 //------------------------------------------------------------------
 class FileMapping : public FileSystemObject
 {
-    friend class CompareProcess;  //only CompareProcess shall be allowed to change cmpResult
     friend class HierarchyObject; //construction
 
 public:
@@ -486,8 +480,7 @@ public:
                 const Zstring&        shortNameRight, //
                 const FileDescriptor& right,
                 HierarchyObject& parentObj) :
-        FileSystemObject(shortNameLeft, shortNameRight, parentObj),
-        cmpResult(defaultCmpResult),
+        FileSystemObject(shortNameLeft, shortNameRight, parentObj, defaultCmpResult),
         dataLeft(left),
         dataRight(right),
         moveFileRef(nullptr) {}
@@ -499,8 +492,7 @@ public:
     void setMoveRef(ObjectId refId) { moveFileRef = refId; } //reference to corresponding renamed file
     ObjectId getMoveRef() const { return moveFileRef; } //may be nullptr
 
-    virtual CompareFilesResult getCategory() const;
-    virtual std::wstring getCatConflict() const;
+    CompareFilesResult getFileCategory() const;
 
     virtual SyncOperation testSyncOperation(SyncDirection testSyncDir) const; //semantics: "what if"! assumes "active, no conflict, no recursion (directory)!
     virtual SyncOperation getSyncOperation() const;
@@ -508,20 +500,12 @@ public:
     template <SelectedSide side> void syncTo(const FileDescriptor& descrTarget, const FileDescriptor* descrSource = nullptr); //copy + update file attributes (optional)
 
 private:
-    template <CompareFilesResult res>
-    void setCategory();
-    void setCategoryConflict(const std::wstring& description);
-
     SyncOperation applyMoveOptimization(SyncOperation op) const;
 
     virtual void flip();
     virtual void removeObjectL();
     virtual void removeObjectR();
     //------------------------------------------------------------------
-
-    //categorization
-    CompareFilesResult cmpResult;
-    std::unique_ptr<std::wstring> cmpConflictDescr; //only filled if cmpResult == FILE_CONFLICT
 
     FileDescriptor dataLeft;
     FileDescriptor dataRight;
@@ -532,7 +516,6 @@ private:
 //------------------------------------------------------------------
 class SymLinkMapping : public FileSystemObject //this class models a TRUE symbolic link, i.e. one that is NEVER dereferenced: deref-links should be directly placed in class File/DirMapping
 {
-    friend class CompareProcess;  //only CompareProcess shall be allowed to change cmpResult
     friend class HierarchyObject; //construction
 
 public:
@@ -542,9 +525,7 @@ public:
     template <SelectedSide side> LinkDescriptor::LinkType getLinkType() const;
     template <SelectedSide side> const Zstring& getTargetPath() const;
 
-    virtual CompareFilesResult getCategory() const;
     CompareSymlinkResult getLinkCategory()   const; //returns actually used subset of CompareFilesResult
-    virtual std::wstring getCatConflict() const;
 
     SymLinkMapping(const Zstring&         shortNameLeft, //use empty string if "not existing"
                    const LinkDescriptor&  left,
@@ -552,8 +533,7 @@ public:
                    const Zstring&         shortNameRight, //use empty string if "not existing"
                    const LinkDescriptor&  right,
                    HierarchyObject& parentObj) :
-        FileSystemObject(shortNameLeft, shortNameRight, parentObj),
-        cmpResult(defaultCmpResult),
+        FileSystemObject(shortNameLeft, shortNameRight, parentObj, static_cast<CompareFilesResult>(defaultCmpResult)),
         dataLeft(left),
         dataRight(right) {}
 
@@ -563,15 +543,7 @@ private:
     virtual void flip();
     virtual void removeObjectL();
     virtual void removeObjectR();
-
-    template <CompareSymlinkResult res>
-    void setCategory();
-    void setCategoryConflict(const std::wstring& description);
     //------------------------------------------------------------------
-
-    //categorization
-    CompareSymlinkResult cmpResult;
-    std::unique_ptr<std::wstring> cmpConflictDescr; //only filled if cmpResult == SYMLINK_CONFLICT
 
     LinkDescriptor dataLeft;
     LinkDescriptor dataRight;
@@ -642,37 +614,16 @@ void SymLinkMapping::accept(FSObjectVisitor& visitor) const
 
 
 inline
-CompareFilesResult FileMapping::getCategory() const
+CompareFilesResult FileMapping::getFileCategory() const
 {
-    return cmpResult;
-}
-
-
-inline
-std::wstring FileMapping::getCatConflict() const
-{
-    return cmpConflictDescr ? *cmpConflictDescr : std::wstring();
-}
-
-
-inline
-CompareFilesResult DirMapping::getCategory() const
-{
-    return convertToFilesResult(cmpResult);
+    return getCategory();
 }
 
 
 inline
 CompareDirResult DirMapping::getDirCategory() const
 {
-    return cmpResult;
-}
-
-
-inline
-std::wstring DirMapping::getCatConflict() const
-{
-    return std::wstring();
+    return static_cast<CompareDirResult>(getCategory());
 }
 
 
@@ -683,6 +634,14 @@ void FileSystemObject::setSyncDir(SyncDirection newDir)
     syncDirConflict.reset();
 
     notifySyncCfgChanged();
+}
+
+
+inline
+std::wstring FileSystemObject::getCatExtraDescription() const
+{
+    assert(getCategory() == FILE_CONFLICT || getCategory() == FILE_DIFFERENT_METADATA);
+    return cmpResultDescr ? *cmpResultDescr : std::wstring();
 }
 
 
@@ -801,6 +760,7 @@ const Zstring& FileSystemObject::getBaseDirPf<RIGHT_SIDE>() const
 template <> inline
 void FileSystemObject::removeObject<LEFT_SIDE>()
 {
+    cmpResult = isEmpty<RIGHT_SIDE>() ? FILE_EQUAL : FILE_RIGHT_SIDE_ONLY;
     shortNameLeft_.clear();
     removeObjectL();
 
@@ -811,6 +771,7 @@ void FileSystemObject::removeObject<LEFT_SIDE>()
 template <> inline
 void FileSystemObject::removeObject<RIGHT_SIDE>()
 {
+    cmpResult = isEmpty<LEFT_SIDE>() ? FILE_EQUAL : FILE_LEFT_SIDE_ONLY;
     shortNameRight_.clear();
     removeObjectR();
 
@@ -823,6 +784,7 @@ void FileSystemObject::copyToL()
 {
     assert(!isEmpty());
     shortNameLeft_ = shortNameRight_;
+    cmpResult = FILE_EQUAL;
     setSyncDir(SYNC_DIR_NONE);
 }
 
@@ -832,14 +794,60 @@ void FileSystemObject::copyToR()
 {
     assert(!isEmpty());
     shortNameRight_ = shortNameLeft_;
+    cmpResult = FILE_EQUAL;
     setSyncDir(SYNC_DIR_NONE);
 }
 
+
+template <CompareFilesResult res> inline
+void FileSystemObject::setCategory()
+{
+    cmpResult = res;
+}
+template <> void FileSystemObject::setCategory<FILE_CONFLICT>();           //
+template <> void FileSystemObject::setCategory<FILE_DIFFERENT_METADATA>(); //not defined!
+template <> void FileSystemObject::setCategory<FILE_LEFT_SIDE_ONLY>();     //
+template <> void FileSystemObject::setCategory<FILE_RIGHT_SIDE_ONLY>();    //
+
+inline
+void FileSystemObject::setCategoryConflict(const std::wstring& description)
+{
+    cmpResult = FILE_CONFLICT;
+    cmpResultDescr.reset(new std::wstring(description));
+}
+
+inline
+void FileSystemObject::setCategoryDiffMetadata(const std::wstring& description)
+{
+    cmpResult = FILE_DIFFERENT_METADATA;
+    cmpResultDescr.reset(new std::wstring(description));
+}
 
 inline
 void FileSystemObject::flip()
 {
     std::swap(shortNameLeft_, shortNameRight_);
+
+    switch (cmpResult)
+    {
+        case FILE_LEFT_SIDE_ONLY:
+            cmpResult = FILE_RIGHT_SIDE_ONLY;
+            break;
+        case FILE_RIGHT_SIDE_ONLY:
+            cmpResult = FILE_LEFT_SIDE_ONLY;
+            break;
+        case FILE_LEFT_NEWER:
+            cmpResult = FILE_RIGHT_NEWER;
+            break;
+        case FILE_RIGHT_NEWER:
+            cmpResult = FILE_LEFT_NEWER;
+            break;
+        case FILE_DIFFERENT:
+        case FILE_EQUAL:
+        case FILE_DIFFERENT_METADATA:
+        case FILE_CONFLICT:
+            break;
+    }
 
     notifySyncCfgChanged();
 }
@@ -856,9 +864,10 @@ void HierarchyObject::flip()
 
 inline
 DirMapping& HierarchyObject::addSubDir(const Zstring& shortNameLeft,
-                                       const Zstring& shortNameRight)
+                                       const Zstring& shortNameRight,
+                                       CompareDirResult defaultCmpResult)
 {
-    subDirs.emplace_back(shortNameLeft, shortNameRight, *this);
+    subDirs.emplace_back(shortNameLeft, shortNameRight, *this, defaultCmpResult);
     return subDirs.back();
 }
 
@@ -866,7 +875,7 @@ DirMapping& HierarchyObject::addSubDir(const Zstring& shortNameLeft,
 template <> inline
 DirMapping& HierarchyObject::addSubDir<LEFT_SIDE>(const Zstring& shortName)
 {
-    subDirs.emplace_back(shortName, Zstring(), *this);
+    subDirs.emplace_back(shortName, Zstring(), *this, DIR_LEFT_SIDE_ONLY);
     return subDirs.back();
 }
 
@@ -874,7 +883,7 @@ DirMapping& HierarchyObject::addSubDir<LEFT_SIDE>(const Zstring& shortName)
 template <> inline
 DirMapping& HierarchyObject::addSubDir<RIGHT_SIDE>(const Zstring& shortName)
 {
-    subDirs.emplace_back(Zstring(), shortName, *this);
+    subDirs.emplace_back(Zstring(), shortName, *this, DIR_RIGHT_SIDE_ONLY);
     return subDirs.back();
 }
 
@@ -949,30 +958,14 @@ void BaseDirMapping::flip()
 inline
 void DirMapping::flip()
 {
-
     HierarchyObject ::flip(); //call base class versions
     FileSystemObject::flip(); //
-
-    //swap compare result
-    switch (cmpResult)
-    {
-        case DIR_LEFT_SIDE_ONLY:
-            cmpResult = DIR_RIGHT_SIDE_ONLY;
-            break;
-        case DIR_RIGHT_SIDE_ONLY:
-            cmpResult = DIR_LEFT_SIDE_ONLY;
-            break;
-        case DIR_EQUAL:
-        case DIR_DIFFERENT_METADATA:
-            break;
-    }
 }
 
 
 inline
 void DirMapping::removeObjectL()
 {
-    cmpResult = isEmpty<RIGHT_SIDE>() ? DIR_EQUAL : DIR_RIGHT_SIDE_ONLY;
     std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
     std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
     std::for_each(refSubDirs(). begin(), refSubDirs() .end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
@@ -982,7 +975,6 @@ void DirMapping::removeObjectL()
 inline
 void DirMapping::removeObjectR()
 {
-    cmpResult = isEmpty<LEFT_SIDE>() ? DIR_EQUAL : DIR_LEFT_SIDE_ONLY;
     std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
     std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
     std::for_each(refSubDirs(). begin(), refSubDirs(). end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
@@ -1007,55 +999,13 @@ inline
 void FileMapping::flip()
 {
     FileSystemObject::flip(); //call base class version
-
-    //swap compare result
-    switch (cmpResult)
-    {
-        case FILE_LEFT_SIDE_ONLY:
-            cmpResult = FILE_RIGHT_SIDE_ONLY;
-            break;
-        case FILE_RIGHT_SIDE_ONLY:
-            cmpResult = FILE_LEFT_SIDE_ONLY;
-            break;
-        case FILE_LEFT_NEWER:
-            cmpResult = FILE_RIGHT_NEWER;
-            break;
-        case FILE_RIGHT_NEWER:
-            cmpResult = FILE_LEFT_NEWER;
-            break;
-        case FILE_DIFFERENT:
-        case FILE_EQUAL:
-        case FILE_DIFFERENT_METADATA:
-        case FILE_CONFLICT:
-            break;
-    }
-
     std::swap(dataLeft, dataRight);
-}
-
-
-template <CompareFilesResult res> inline
-void FileMapping::setCategory()
-{
-    cmpResult = res;
-}
-
-template <> inline
-void FileMapping::setCategory<FILE_CONFLICT>(); //if conflict is detected, use setCategoryConflict! => method is not defined!
-
-
-inline
-void FileMapping::setCategoryConflict(const std::wstring& description)
-{
-    cmpResult = FILE_CONFLICT;
-    cmpConflictDescr.reset(new std::wstring(description));
 }
 
 
 inline
 void FileMapping::removeObjectL()
 {
-    cmpResult = isEmpty<RIGHT_SIDE>() ? FILE_EQUAL : FILE_RIGHT_SIDE_ONLY;
     dataLeft  = FileDescriptor();
 }
 
@@ -1063,7 +1013,6 @@ void FileMapping::removeObjectL()
 inline
 void FileMapping::removeObjectR()
 {
-    cmpResult = isEmpty<LEFT_SIDE>() ? FILE_EQUAL : FILE_LEFT_SIDE_ONLY;
     dataRight = FileDescriptor();
 }
 
@@ -1118,7 +1067,6 @@ void FileMapping::syncTo<LEFT_SIDE>(const FileDescriptor& descrTarget, const Fil
         dataRight = *descrSource;
 
     moveFileRef = nullptr;
-    cmpResult = FILE_EQUAL;
     copyToL(); //copy FileSystemObject specific part
 }
 
@@ -1131,7 +1079,6 @@ void FileMapping::syncTo<RIGHT_SIDE>(const FileDescriptor& descrTarget, const Fi
         dataLeft = *descrSource;
 
     moveFileRef = nullptr;
-    cmpResult = FILE_EQUAL;
     copyToR(); //copy FileSystemObject specific part
 }
 
@@ -1140,7 +1087,6 @@ template <> inline
 void SymLinkMapping::copyTo<LEFT_SIDE>() //copy + update link attributes
 {
     dataLeft  = dataRight;
-    cmpResult = SYMLINK_EQUAL;
     copyToL(); //copy FileSystemObject specific part
 }
 
@@ -1149,7 +1095,6 @@ template <> inline
 void SymLinkMapping::copyTo<RIGHT_SIDE>() //copy + update link attributes
 {
     dataRight = dataLeft;
-    cmpResult = SYMLINK_EQUAL;
     copyToR(); //copy FileSystemObject specific part
 }
 
@@ -1157,7 +1102,6 @@ void SymLinkMapping::copyTo<RIGHT_SIDE>() //copy + update link attributes
 template <> inline
 void DirMapping::copyTo<LEFT_SIDE>()
 {
-    cmpResult = DIR_EQUAL;
     copyToL(); //copy FileSystemObject specific part
 }
 
@@ -1165,7 +1109,6 @@ void DirMapping::copyTo<LEFT_SIDE>()
 template <> inline
 void DirMapping::copyTo<RIGHT_SIDE>()
 {
-    cmpResult = DIR_EQUAL;
     copyToR(); //copy FileSystemObject specific part
 }
 
@@ -1213,23 +1156,9 @@ const Zstring& SymLinkMapping::getTargetPath<RIGHT_SIDE>() const
 
 
 inline
-CompareFilesResult SymLinkMapping::getCategory() const
-{
-    return convertToFilesResult(cmpResult);
-}
-
-
-inline
 CompareSymlinkResult SymLinkMapping::getLinkCategory() const
 {
-    return cmpResult;
-}
-
-
-inline
-std::wstring SymLinkMapping::getCatConflict() const
-{
-    return cmpConflictDescr ? *cmpConflictDescr : std::wstring();
+    return static_cast<CompareSymlinkResult>(getCategory());
 }
 
 
@@ -1237,28 +1166,6 @@ inline
 void SymLinkMapping::flip()
 {
     FileSystemObject::flip(); //call base class versions
-
-    switch (cmpResult)
-    {
-        case SYMLINK_LEFT_SIDE_ONLY:
-            cmpResult = SYMLINK_RIGHT_SIDE_ONLY;
-            break;
-        case SYMLINK_RIGHT_SIDE_ONLY:
-            cmpResult = SYMLINK_LEFT_SIDE_ONLY;
-            break;
-        case SYMLINK_LEFT_NEWER:
-            cmpResult = SYMLINK_RIGHT_NEWER;
-            break;
-        case SYMLINK_RIGHT_NEWER:
-            cmpResult = SYMLINK_LEFT_NEWER;
-            break;
-        case SYMLINK_EQUAL:
-        case SYMLINK_DIFFERENT_METADATA:
-        case SYMLINK_DIFFERENT:
-        case SYMLINK_CONFLICT:
-            break;
-    }
-
     std::swap(dataLeft, dataRight);
 }
 
@@ -1266,7 +1173,6 @@ void SymLinkMapping::flip()
 inline
 void SymLinkMapping::removeObjectL()
 {
-    cmpResult = isEmpty<RIGHT_SIDE>() ? SYMLINK_EQUAL : SYMLINK_RIGHT_SIDE_ONLY;
     dataLeft  = LinkDescriptor();
 }
 
@@ -1274,27 +1180,7 @@ void SymLinkMapping::removeObjectL()
 inline
 void SymLinkMapping::removeObjectR()
 {
-    cmpResult = isEmpty<LEFT_SIDE>() ? SYMLINK_EQUAL : SYMLINK_LEFT_SIDE_ONLY;
     dataRight = LinkDescriptor();
-}
-
-
-template <CompareSymlinkResult res> inline
-void SymLinkMapping::setCategory()
-{
-    cmpResult = res;
-}
-
-
-template <>
-void SymLinkMapping::setCategory<SYMLINK_CONFLICT>(); //if conflict is detected, use setCategoryConflict! => method is not defined!
-
-
-inline
-void SymLinkMapping::setCategoryConflict(const std::wstring& description)
-{
-    cmpResult = SYMLINK_CONFLICT;
-    cmpConflictDescr.reset(new std::wstring(description));
 }
 }
 

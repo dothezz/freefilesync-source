@@ -308,93 +308,111 @@ bool significantDifferenceDetected(const SyncStatistics& folderPairStat)
 //#################################################################################################################
 
 /*
-class PhysicalStatistics //counts *physical* operations, disk accesses and bytes transferred
+class PhysicalStatistics //counts *physical* operations, actual items processed (NOT disk accesses) and bytes transferred
 {
 public:
-PhysicalStatistics(const FolderComparison& folderCmp) : accesses(0)
-{
-	std::for_each(begin(folderCmp), end(folderCmp), [&](const BaseDirMapping& baseMap) { recurse(baseMap); });
-}
+    PhysicalStatistics(const FolderComparison& folderCmp) : items(0)
+    {
+        delType =;
+        std::for_each(begin(folderCmp), end(folderCmp), [&](const BaseDirMapping& baseMap) { recurse(baseMap); });
+    }
 
-int getAccesses() const { return accesses; }
-zen::Int64 getBytes() const { return bytes; }
+    int   getItems() const { return items; }
+    Int64 getBytes() const { return bytes; }
 
 private:
-void recurse(const HierarchyObject& hierObj)
+    enum DeletionType
 {
-std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](const DirMapping&     dirObj ) { calcStats(dirObj ); });
-std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](const FileMapping&    fileObj) { calcStats(fileObj); });
-std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](const SymLinkMapping& linkObj) { calcStats(linkObj); });
-}
+    DEL_PERMANENTLY,
+    DEL_RECYCLE_BIN,
+    VERSIONING_SAME_VOL,
+    VERSIONING_DIFF_VOL,
+};
 
-void calcStats(const FileMapping& fileObj)
-{
-switch (fileObj.getSyncOperation()) //evaluate comparison result and sync direction
-{
-    case SO_CREATE_NEW_LEFT:
-        accesses += 2; //read + write
-        bytes += to<Int64>(fileObj.getFileSize<RIGHT_SIDE>());
-        break;
+    void recurse(const HierarchyObject& hierObj)
+    {
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](const DirMapping&     dirObj ) { calcStats(dirObj ); });
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](const FileMapping&    fileObj) { calcStats(fileObj); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](const SymLinkMapping& linkObj) { calcStats(linkObj); });
+    }
 
-    case SO_CREATE_NEW_RIGHT:
-        accesses += 2; //read + write
-        bytes += to<Int64>(fileObj.getFileSize<LEFT_SIDE>());
-        break;
+    void calcStats(const FileMapping& fileObj)
+    {
+        switch (fileObj.getSyncOperation()) //evaluate comparison result and sync direction
+        {
+            case SO_CREATE_NEW_LEFT:
+                items += 2;
+                bytes += to<Int64>(fileObj.getFileSize<RIGHT_SIDE>());
+                break;
 
-    case SO_DELETE_LEFT:
-        ++accesses;
-        break;
+            case SO_CREATE_NEW_RIGHT:
+                ++items;
+                bytes += to<Int64>(fileObj.getFileSize<LEFT_SIDE>());
+                break;
 
-    case SO_DELETE_RIGHT:
-        ++accesses;
-        break;
+            case SO_DELETE_LEFT:
+                switch (delType)
+                    {
+                    case DEL_INSTANTLY:
+                        ++items;
+                        break;
+                        case DEL_COPY_DELETE:
+                        break;
+                    }
+                break;
 
-    case SO_MOVE_LEFT_TARGET:
-    case SO_MOVE_RIGHT_TARGET:
-        ++accesses;
-        break;
+            case SO_DELETE_RIGHT:
+                ++items;
+                break;
 
-    case SO_MOVE_LEFT_SOURCE:  //ignore; already counted
-    case SO_MOVE_RIGHT_SOURCE: //
-        break;
+            case SO_MOVE_LEFT_TARGET:
+            case SO_MOVE_RIGHT_TARGET:
+                ++items;
+                break;
 
-    case SO_OVERWRITE_LEFT:
-        //todo: delete
-		accesses += 2; //read + write
-        bytes += to<Int64>(fileObj.getFileSize<RIGHT_SIDE>());
-        break;
+            case SO_MOVE_LEFT_SOURCE:  //ignore; already counted
+            case SO_MOVE_RIGHT_SOURCE: //
+                break;
 
-    case SO_OVERWRITE_RIGHT:
-		//todo: delete
-		accesses += 2; //read + write
-        bytes += to<Int64>(fileObj.getFileSize<LEFT_SIDE>());
-        break;
+            case SO_OVERWRITE_LEFT:
+                //todo: delete
+                items += 2; //read + write
+                bytes += to<Int64>(fileObj.getFileSize<RIGHT_SIDE>());
+                break;
 
-    case SO_COPY_METADATA_TO_LEFT:
-    case SO_COPY_METADATA_TO_RIGHT:
-        accesses += 2; //read + write
-        break;
+            case SO_OVERWRITE_RIGHT:
+                //todo: delete
+                items += 2; //read + write
+                bytes += to<Int64>(fileObj.getFileSize<LEFT_SIDE>());
+                break;
 
-    case SO_UNRESOLVED_CONFLICT:
-    case SO_DO_NOTHING:
-    case SO_EQUAL:
-        break;
-}
-}
+            case SO_COPY_METADATA_TO_LEFT:
+            case SO_COPY_METADATA_TO_RIGHT:
+                ++items;
+                break;
 
-void calcStats(const SymLinkMapping& linkObj)
-{
+            case SO_UNRESOLVED_CONFLICT:
+            case SO_DO_NOTHING:
+            case SO_EQUAL:
+                break;
+        }
+    }
 
-}
+    void calcStats(const SymLinkMapping& linkObj)
+    {
 
-void calcStats(const DirMapping& dirObj)
-{
-		//since we model physical stats, we recurse only if deletion variant is "permanently" or "user-defined + different volume",
-	//else deletion is done as a single physical operation
-}
+    }
 
-int accesses;
-Int64 bytes;
+    void calcStats(const DirMapping& dirObj)
+    {
+        //since we model physical stats, we recurse only if deletion variant is "permanently" or "user-defined + different volume",
+        //else deletion is done as a single physical operation
+    }
+
+    int items;
+    Int64 bytes;
+
+DeletionType delType;
 };
 */
 //#################################################################################################################
@@ -437,7 +455,6 @@ SyncProcess::SyncProcess(const std::wstring& jobName,
     m_warnings(warnings),
     procCallback(handler),
     custDelDirShortname(utfCvrtTo<Zstring>(jobName.empty() ? timestamp : jobName + L" " + timestamp))
-
 {
     if (runWithBackgroundPriority)
         procBackground.reset(new ScheduleForBackgroundProcessing);
@@ -1998,17 +2015,15 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             }
 
 
-            if (folderPairStat.getUpdate() + folderPairStat.getDelete() > 0)
+            if (folderPairStat.getUpdate() + folderPairStat.getDelete() > 0 &&
+                folderPairCfg.handleDeletion == zen::MOVE_TO_CUSTOM_DIRECTORY)
             {
-                if (folderPairCfg.handleDeletion == zen::MOVE_TO_CUSTOM_DIRECTORY)
+                //check if user-defined directory for deletion was specified
+                if (folderPairCfg.custDelFolder.empty()) //already trimmed by getFormattedDirectoryName()
                 {
-                    //check if user-defined directory for deletion was specified
-                    if (folderPairCfg.custDelFolder.empty())
-                    {
-                        procCallback.reportFatalError(_("Folder input field for versioning must not be empty."));
-                        skipFolderPair[folderIndex] = true;
-                        continue;
-                    }
+                    procCallback.reportFatalError(_("Folder input field for versioning must not be empty."));
+                    skipFolderPair[folderIndex] = true;
+                    continue;
                 }
             }
 
@@ -2186,10 +2201,9 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             std::wstring right = _("Right") + L": ";
             makeSameLength(left, right);
 
-            const std::wstring statusTxt = _("Processing folder pair:") + L"\n" +
-                                           L"    " + left  + fmtFileName(j->getBaseDirPf<LEFT_SIDE >()) + L"\n" +
-                                           L"    " + right + fmtFileName(j->getBaseDirPf<RIGHT_SIDE>());
-            procCallback.reportInfo(statusTxt);
+            procCallback.reportInfo(_("Synchronize folder pair:") + L"\n" +
+                                    L"    " + left  + fmtFileName(j->getBaseDirPf<LEFT_SIDE >()) + L"\n" +
+                                    L"    " + right + fmtFileName(j->getBaseDirPf<RIGHT_SIDE>()));
             //------------------------------------------------------------------------------------------
 
             const size_t folderIndex = j - begin(folderCmp);
@@ -2253,7 +2267,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             {
                 if (folderPairCfg.inAutomaticMode)
                     try { zen::saveLastSynchronousState(*j); }
-                    catch (...) {}   //throw FileError
+                    catch (...) {} //throw FileError
             });
 
             //guarantee removal of invalid entries (where element on both sides is empty)
@@ -2358,13 +2372,18 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
         &callback,
         &newAttr); //throw FileError, ErrorFileLocked
 
+        //#################### Verification #############################
+        if (verifyCopiedFiles_)
+        {
+            ScopeGuard guardTarget = makeGuard([&] { removeFile(target); }); //delete target if verification fails
+            verifyFileCopy(source, target); //throw FileError
+            guardTarget.dismiss();
+        }
+        //#################### /Verification #############################
+
         //inform about the (remaining) processed amount of data
         if (bytesReported != expectedBytesToCpy)
             procCallback_.updateTotalData(0, bytesReported - expectedBytesToCpy);
-
-#ifdef FFS_WIN
-        warn_static("clarify: return physical(bytesReported) or logical(newAttr) numbers")
-#endif
 
         //we model physical statistic numbers => adjust total: consider ADS, sparse, compressed files -> transferred bytes may differ from file size (which is just a rough guess)!
 
@@ -2397,29 +2416,6 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
 #else
     copyOperation();
 #endif
-
-
-#ifdef FFS_WIN
-    warn_static("make verification stats a first class citizen?")
-#endif
-
-
-
-    //#################### Verification #############################
-    if (verifyCopiedFiles_)
-    {
-        ScopeGuard guardTarget     = makeGuard([&] { removeFile(target); }); //delete target if verification fails
-        ScopeGuard guardStatistics = makeGuard([&]
-        {
-            procCallback_.updateProcessedData(0, -bytesReported);
-            bytesReported = 0;
-        });
-
-        verifyFileCopy(source, target); //throw FileError
-
-        guardTarget.dismiss();
-        guardStatistics.dismiss();
-    }
 }
 
 

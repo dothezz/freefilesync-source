@@ -61,7 +61,7 @@ private:
     void OnFilesDropped(FileDropEvent& event);
 
     void addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
-    void removeAddFolderPair(const int pos);
+    void removeAddFolderPair(int pos);
     void clearAddFolderPairs();
 
     void updateGuiForFolderPair();
@@ -830,7 +830,7 @@ void BatchDialog::addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs,
 }
 
 
-void BatchDialog::removeAddFolderPair(const int pos)
+void BatchDialog::removeAddFolderPair(int pos)
 {
     wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
 

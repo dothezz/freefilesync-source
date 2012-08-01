@@ -127,7 +127,8 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
 
     totalTime.Start(); //measure total time
 
-    //::wxSetEnv(L"logfile", logFile->getLogfileName());
+    //if (logFile)
+    //	::wxSetEnv(L"logfile", utfCvrtTo<wxString>(logFile->getFilename())); -> requires a command line interpreter to take advantage of
 }
 
 
@@ -306,6 +307,8 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
 
 ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& errorMessage)
 {
+    errorLog.logMsg(errorMessage, TYPE_ERROR); //always, even for "retry"
+
     switch (handleError_)
     {
         case xmlAccess::ON_ERROR_POPUP:
@@ -321,26 +324,23 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
                 case ReturnErrorDlg::BUTTON_IGNORE:
                     if (ignoreNextErrors) //falsify only
                         handleError_ = xmlAccess::ON_ERROR_IGNORE;
-                    errorLog.logMsg(errorMessage, TYPE_ERROR);
                     return ProcessCallback::IGNORE_ERROR;
 
                 case ReturnErrorDlg::BUTTON_RETRY:
                     return ProcessCallback::RETRY;
 
                 case ReturnErrorDlg::BUTTON_CANCEL:
-                    errorLog.logMsg(errorMessage, TYPE_ERROR);
                     abortThisProcess();
+                    break;
             }
         }
         break; //used if last switch didn't find a match
 
         case xmlAccess::ON_ERROR_EXIT: //abort
-            errorLog.logMsg(errorMessage, TYPE_ERROR);
             abortThisProcess();
             break;
 
         case xmlAccess::ON_ERROR_IGNORE:
-            errorLog.logMsg(errorMessage, TYPE_ERROR);
             return ProcessCallback::IGNORE_ERROR;
     }
 

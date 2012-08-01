@@ -458,30 +458,29 @@ S formatInteger(Num n, bool hasMinus)
 {
     assert(n >= 0);
     typedef typename GetCharType<S>::Type CharType;
+    CharType buffer[2 + 5 * sizeof(Num) / 2]; //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
+    //minimum required chars (+ sign char): 1 + ceil(ln_10 (256^sizeof(n))) =~ 1 + ceil(sizeof(n) * 2.4082) < 2 + floor(sizeof(n) * 2.5)
 
-    const size_t bufferSize = 64; //sufficient for signed 128-bit numbers
-    CharType buffer[bufferSize]; //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
-    assert_static(2 + 5 * sizeof(n) / 2 <= bufferSize);
-    //minimum required chars (+ sign char): 1 + ceil(ln_10 (256^sizeof(n))) =~ 1 + ceil(sizeof(n) * 2.4082) <= 2 + floor(sizeof(n) * 2.5)
-
-    size_t startPos = bufferSize;
+    auto iter = std::end(buffer);
     do
     {
-        buffer[--startPos] = static_cast<char>('0' + n % 10);
-        n /= 10;
+        const Num tmp = n / 10;
+        *--iter = static_cast<CharType>('0' + (n - tmp * 10)); //8% faster than using modulus operator!
+        n = tmp;
     }
     while (n != 0);
 
     if (hasMinus)
-        buffer[--startPos] = static_cast<CharType>('-');
+        *--iter = static_cast<CharType>('-');
 
-    return S(buffer + startPos, bufferSize - startPos);
+    return S(&*iter, std::end(buffer) - iter);
 }
 
 template <class S, class Num> inline
 S numberTo(const Num& number, Int2Type<NUM_TYPE_SIGNED_INT>)
 {
     return formatInteger<S>(number < 0 ? -number : number, number < 0);
+    //bug for "INT_MIN"! technically -INT_MIN == INT_MIN -> not worth the trouble
 }
 
 

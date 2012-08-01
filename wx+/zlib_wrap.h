@@ -7,7 +7,7 @@
 #ifndef SIMPLE_H_INCLUDED_18134135134135345489
 #define SIMPLE_H_INCLUDED_18134135134135345489
 
-#include <wx+/serialize.h>
+#include <zen/serialize.h>
 
 namespace zen
 {

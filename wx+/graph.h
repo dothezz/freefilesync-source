@@ -279,20 +279,15 @@ private:
     void OnMouseLeftUp  (wxMouseEvent& event);
     void OnMouseCaptureLost(wxMouseCaptureLostEvent& event);
 
-    void onPaintEvent(wxPaintEvent& evt)
+    void onPaintEvent(wxPaintEvent& event)
     {
         wxAutoBufferedPaintDC dc(this); //this one happily fucks up for RTL layout by not drawing the first column (x = 0)!
         //wxPaintDC dc(this);
         render(dc);
     }
 
-    void onRefreshRequired(wxEvent& evt)
-    {
-        Refresh();
-        evt.Skip();
-    }
-
-    void onEraseBackGround(wxEraseEvent& evt) {}
+    void onSizeEvent(wxSizeEvent& event) { Refresh(); event.Skip(); }
+    void onEraseBackGround(wxEraseEvent& event) {}
 
     void render(wxDC& dc) const;
 

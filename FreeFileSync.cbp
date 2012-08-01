@@ -373,6 +373,14 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
+		<Unit filename="ui\triple_splitter.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="ui\triple_splitter.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
 		<Unit filename="ui\wx_form_build_hide_warnings.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -440,10 +448,6 @@
 			<Option target="Debug-DLL" />
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="wx+\serialize.h">
-			<Option target="Release" />
-			<Option target="Debug-DLL" />
-		</Unit>
 		<Unit filename="wx+\shell_execute.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -499,6 +503,7 @@
 		<Unit filename="zen\read_txt.h" />
 		<Unit filename="zen\recycler.cpp" />
 		<Unit filename="zen\recycler.h" />
+		<Unit filename="zen\serialize.h" />
 		<Unit filename="zen\stl_tools.h" />
 		<Unit filename="zen\string_base.h" />
 		<Unit filename="zen\string_tools.h" />

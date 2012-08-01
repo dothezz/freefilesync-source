@@ -225,7 +225,6 @@ struct Win32Traverser
         return true;
     }
 
-    template <class FindData>
     static void extractFileInfo(const FindData& fileInfo, DWORD volumeSerial, TraverseCallback::FileInfo& output)
     {
         output.fileSize         = UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
@@ -233,23 +232,12 @@ struct Win32Traverser
         output.id = FileId();
     }
 
-    template <class FindData>
-    static Int64 getModTime(const FindData& fileInfo) { return toTimeT(fileInfo.ftLastWriteTime); }
-
-    template <class FindData>
-    static const FILETIME& getModTimeRaw(const FindData& fileInfo) { return fileInfo.ftLastWriteTime; }
-
-    template <class FindData>
+    static Int64           getModTime      (const FindData& fileInfo) { return toTimeT(fileInfo.ftLastWriteTime); }
+    static const FILETIME& getModTimeRaw   (const FindData& fileInfo) { return fileInfo.ftLastWriteTime; }
     static const FILETIME& getCreateTimeRaw(const FindData& fileInfo) { return fileInfo.ftCreationTime; }
-
-    template <class FindData>
-    static const wchar_t* getShortName(const FindData& fileInfo) { return fileInfo.cFileName; }
-
-    template <class FindData>
-    static bool isDirectory(const FindData& fileInfo) { return (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; }
-
-    template <class FindData>
-    static bool isSymlink(const FindData& fileInfo) { return (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0; }
+    static const wchar_t*  getShortName    (const FindData& fileInfo) { return fileInfo.cFileName; }
+    static bool            isDirectory     (const FindData& fileInfo) { return (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; }
+    static bool            isSymlink       (const FindData& fileInfo) { return zen::isSymlink(fileInfo); } //[!] keep namespace
 };
 
 
@@ -295,10 +283,10 @@ struct FilePlusTraverser
             //else we have a problem... report it:
             throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (+)");
         }
+
         return true;
     }
 
-    template <class FindData>
     static void extractFileInfo(const FindData& fileInfo, DWORD volumeSerial, TraverseCallback::FileInfo& output)
     {
         output.fileSize         = fileInfo.fileSize.QuadPart;
@@ -306,23 +294,12 @@ struct FilePlusTraverser
         output.id               = extractFileID(volumeSerial, fileInfo.fileId);
     }
 
-    template <class FindData>
-    static Int64 getModTime(const FindData& fileInfo) { return toTimeT(fileInfo.lastWriteTime); }
-
-    template <class FindData>
-    static const FILETIME& getModTimeRaw(const FindData& fileInfo) { return fileInfo.lastWriteTime; }
-
-    template <class FindData>
+    static Int64           getModTime      (const FindData& fileInfo) { return toTimeT(fileInfo.lastWriteTime); }
+    static const FILETIME& getModTimeRaw   (const FindData& fileInfo) { return fileInfo.lastWriteTime; }
     static const FILETIME& getCreateTimeRaw(const FindData& fileInfo) { return fileInfo.creationTime; }
-
-    template <class FindData>
-    static const wchar_t* getShortName(const FindData& fileInfo) { return fileInfo.shortName; }
-
-    template <class FindData>
-    static bool isDirectory(const FindData& fileInfo) { return (fileInfo.fileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; }
-
-    template <class FindData>
-    static bool isSymlink(const FindData& fileInfo) { return (fileInfo.fileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0; }
+    static const wchar_t*  getShortName    (const FindData& fileInfo) { return fileInfo.shortName; }
+    static bool            isDirectory     (const FindData& fileInfo) { return (fileInfo.fileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; }
+    static bool            isSymlink       (const FindData& fileInfo) { return zen::isSymlink(fileInfo.fileAttributes, fileInfo.reparseTag); } //[!] keep namespace
 };
 
 

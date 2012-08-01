@@ -6,7 +6,7 @@ APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 DOCSHAREDIR = $(SHAREDIR)/doc/$(APPNAME)
 
 COMMON_COMPILE_FLAGS = -Wall -pipe -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h"
-COMMON_LINK_FLAGS    = -pthread -lrt
+COMMON_LINK_FLAGS    = -pthread -lrt -lz
 
 #default build
 CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
@@ -62,6 +62,7 @@ CPP_LIST+=ui/search.cpp
 CPP_LIST+=ui/small_dlgs.cpp
 CPP_LIST+=ui/sync_cfg.cpp
 CPP_LIST+=ui/taskbar.cpp
+CPP_LIST+=ui/triple_splitter.cpp
 CPP_LIST+=ui/tray_icon.cpp
 CPP_LIST+=lib/binary.cpp
 CPP_LIST+=lib/db_file.cpp

@@ -154,7 +154,7 @@ z_1 + z_2 * X / m = F / m
 => we obtain a new (artificial) measurement with size X / m and time F / m to be used in the linear approximation above
 
 
-Statistics::Statistics(const int totalObjectCount, const double totalDataAmount, const unsigned recordCount) :
+Statistics::Statistics(int totalObjectCount, double totalDataAmount, unsigned recordCount) :
         objectsTotal(totalObjectCount),
         dataTotal(totalDataAmount),
         recordsMax(recordCount),
@@ -166,7 +166,7 @@ Statistics::Statistics(const int totalObjectCount, const double totalDataAmount,
         dummyRecordPresent(false) {}
 
 
-wxString Statistics::getRemainingTime(const int objectsCurrent, const double dataCurrent)
+wxString Statistics::getRemainingTime(int objectsCurrent, double dataCurrent)
 {
     //add new measurement point
     const int m = objectsCurrent - objectsLast;

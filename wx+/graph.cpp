@@ -96,7 +96,7 @@ void drawYLabel(wxDC& dc, double& yMin, double& yMax, const wxRect& clientArea, 
     if (clientArea.GetHeight() <= 0 || clientArea.GetWidth() <= 0)
         return;
 
-    int optimalBlockHeight = 3 * dc.GetMultiLineTextExtent(L"1").GetHeight();;
+    int optimalBlockHeight = 3 * dc.GetMultiLineTextExtent(L"1").GetHeight();
 
     double valRangePerBlock = (yMax - yMin) * optimalBlockHeight / clientArea.GetHeight();
     valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
@@ -244,7 +244,7 @@ Graph2D::Graph2D(wxWindow* parent,
     wxPanel(parent, winid, pos, size, style, name)
 {
     Connect(wxEVT_PAINT, wxPaintEventHandler(Graph2D::onPaintEvent), nullptr, this);
-    Connect(wxEVT_SIZE, wxEventHandler(Graph2D::onRefreshRequired),  nullptr, this);
+    Connect(wxEVT_SIZE,  wxSizeEventHandler (Graph2D::onSizeEvent ),  nullptr, this);
     //http://wiki.wxwidgets.org/Flicker-Free_Drawing
     Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Graph2D::onEraseBackGround), nullptr, this);
 
@@ -291,9 +291,9 @@ void Graph2D::OnMouseLeftUp(wxMouseEvent& event)
         if (activeSel->getStartPos() != activeSel->refCurrentPos()) //if it's just a single mouse click: discard selection
         {
             //fire off GraphSelectEvent
-            GraphSelectEvent evt(activeSel->refSelection());
-            if (wxEvtHandler* evtHandler = GetEventHandler())
-                evtHandler->AddPendingEvent(evt);
+            GraphSelectEvent selEvent(activeSel->refSelection());
+            if (wxEvtHandler* handler = GetEventHandler())
+                handler->AddPendingEvent(selEvent);
 
             oldSel.push_back(activeSel->refSelection());
         }

@@ -222,7 +222,7 @@ public:
         }
         catch (boost::thread_interrupted&)
         {
-            throw; //this is the only reasonable exception!
+            throw; //this is the only exception expected!
         }
     }
 

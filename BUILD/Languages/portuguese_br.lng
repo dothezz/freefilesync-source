@@ -144,7 +144,7 @@
 <pluralform>%x Bytes</pluralform>
 </source>
 <target>
-<pluralform>1 Byte</pluralform>
+<pluralform>%x Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
 </target>
 
@@ -192,7 +192,7 @@
 <pluralform>%x sec</pluralform>
 </source>
 <target>
-<pluralform>1 seg</pluralform>
+<pluralform>%x seg</pluralform>
 <pluralform>%x segs</pluralform>
 </target>
 
@@ -210,7 +210,7 @@
 <pluralform>[%x Threads]</pluralform>
 </source>
 <target>
-<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </target>
 
@@ -977,7 +977,7 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <pluralform>%x directories</pluralform>
 </source>
 <target>
-<pluralform>1 diretório</pluralform>
+<pluralform>%x diretório</pluralform>
 <pluralform>%x diretórios</pluralform>
 </target>
 
@@ -986,7 +986,7 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <pluralform>%x files</pluralform>
 </source>
 <target>
-<pluralform>1 arquivo</pluralform>
+<pluralform>%x arquivo</pluralform>
 <pluralform>%x arquivos</pluralform>
 </target>
 
@@ -995,7 +995,7 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <pluralform>%x of %y rows in view</pluralform>
 </source>
 <target>
-<pluralform>%x de 1 linha</pluralform>
+<pluralform>%x de %y linha</pluralform>
 <pluralform>%x de %y linhas</pluralform>
 </target>
 
@@ -1157,7 +1157,7 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <pluralform>%x min</pluralform>
 </source>
 <target>
-<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
 <pluralform>%x mins</pluralform>
 </target>
 
@@ -1166,7 +1166,7 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <pluralform>%x hours</pluralform>
 </source>
 <target>
-<pluralform>1 hora</pluralform>
+<pluralform>%x hora</pluralform>
 <pluralform>%x horas</pluralform>
 </target>
 
@@ -1175,7 +1175,7 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <pluralform>%x days</pluralform>
 </source>
 <target>
-<pluralform>1 dia</pluralform>
+<pluralform>%x dia</pluralform>
 <pluralform>%x dias</pluralform>
 </target>
 

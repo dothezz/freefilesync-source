@@ -259,6 +259,7 @@
     <ClCompile Include="ui\taskbar.cpp" />
     <ClCompile Include="ui\tray_icon.cpp" />
     <ClCompile Include="ui\tree_view.cpp" />
+    <ClCompile Include="ui\triple_splitter.cpp" />
     <ClCompile Include="wx+\button.cpp" />
     <ClCompile Include="wx+\create_pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

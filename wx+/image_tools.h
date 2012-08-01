@@ -27,6 +27,7 @@ bool isEqual(const wxBitmap& lhs, const wxBitmap& rhs); //pixel-wise equality (r
 
 wxColor gradient(const wxColor& from, const wxColor& to, double fraction); //maps fraction within [0, 1] to an intermediate color
 
+wxColour hsvColor(double h, double s, double v); //h within [0, 360), s, v within [0, 1]
 
 
 
@@ -164,7 +165,54 @@ wxColor gradient(const wxColor& from, const wxColor& to, double fraction)
                    from.Blue () + (to.Blue () - from.Blue ()) * fraction,
                    from.Alpha() + (to.Alpha() - from.Alpha()) * fraction);
 }
-}
 
+
+inline
+wxColour hsvColor(double h, double s, double v) //h within [0, 360), s, v within [0, 1]
+{
+    //http://de.wikipedia.org/wiki/HSV-Farbraum
+
+    //make input values fit into bounds
+    if (h > 360)
+        h -= static_cast<int>(h / 360) * 360;
+    else if (h < 0)
+        h -= static_cast<int>(h / 360) * 360 - 360;
+    numeric::confine<double>(s, 0, 1);
+    numeric::confine<double>(v, 0, 1);
+    //------------------------------------
+    const int h_i = h / 60;
+    const float f = h / 60 - h_i;
+
+    auto polish = [](double val) -> unsigned char
+    {
+        int result = numeric::round(val * 255);
+        numeric::confine(result, 0, 255);
+        return static_cast<unsigned char>(result);
+    };
+
+    const unsigned char p  = polish(v * (1 - s));
+    const unsigned char q  = polish(v * (1 - s * f));
+    const unsigned char t  = polish(v * (1 - s * (1 - f)));
+    const unsigned char vi = polish(v);
+
+    switch (h_i)
+    {
+        case 0:
+            return wxColour(vi, t, p);
+        case 1:
+            return wxColour(q, vi, p);
+        case 2:
+            return wxColour(p, vi, t);
+        case 3:
+            return wxColour(p, q, vi);
+        case 4:
+            return wxColour(t, p, vi);
+        case 5:
+            return wxColour(vi, p, q);
+    }
+    assert(false);
+    return *wxBLACK;
+}
+}
 
 #endif //IMAGE_TOOLS_HEADER_45782456427634254

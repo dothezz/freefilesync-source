@@ -50,11 +50,11 @@ struct GridClickEvent : public wxMouseEvent
 
 struct GridColumnResizeEvent : public wxCommandEvent
 {
-    GridColumnResizeEvent(int width, ColumnType colType, size_t compPos) : wxCommandEvent(EVENT_GRID_COL_RESIZE), colType_(colType), width_(width), compPos_(compPos) {}
+    GridColumnResizeEvent(ptrdiff_t offset, ColumnType colType, size_t compPos) : wxCommandEvent(EVENT_GRID_COL_RESIZE), colType_(colType), offset_(offset), compPos_(compPos) {}
     virtual wxEvent* Clone() const { return new GridColumnResizeEvent(*this); }
 
     const ColumnType colType_;
-    const int        width_;
+    const ptrdiff_t  offset_;
     const size_t     compPos_;
 };
 
@@ -138,10 +138,13 @@ public:
 
     struct ColumnAttribute
     {
-        ColumnAttribute(ColumnType type, int width, bool visible = true) : type_(type), width_(width), visible_(visible) {}
+        ColumnAttribute(ColumnType type, ptrdiff_t offset, ptrdiff_t stretch, bool visible = true) : type_(type), visible_(visible), stretch_(std::max<ptrdiff_t>(stretch, 0)), offset_(offset) {}
         ColumnType type_;
-        int width_; //if negative, treat as proportional stretch!
         bool visible_;
+        //first client width is partitioned according to all available stretch factors, then "offset_" is added
+        //universal model: a non-stretched column has stretch factor 0 with the "offset" becoming identical to final width!
+        ptrdiff_t stretch_; //>= 0
+        ptrdiff_t offset_;
     };
 
     void setColumnConfig(const std::vector<ColumnAttribute>& attr, size_t compPos = 0); //set column count + widths
@@ -155,10 +158,17 @@ public:
     void setColumnLabelHeight(int height);
     void showRowLabel(bool visible);
 
-    void showScrollBars(bool horizontal, bool vertical);
+    enum ScrollBarStatus
+    {
+        SB_SHOW_AUTOMATIC,
+        SB_SHOW_ALWAYS,
+        SB_SHOW_NEVER,
+    };
+    //alternative until wxScrollHelper::ShowScrollbars() becomes available in wxWidgets 2.9
+    void showScrollBars(ScrollBarStatus horizontal, ScrollBarStatus vertical);
 
     std::vector<size_t> getSelectedRows(size_t compPos = 0) const;
-    void clearSelection(size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].selection.clear(); }
+    void clearSelection(size_t compPos = 0);
 
     void scrollDelta(int deltaX, int deltaY); //in scroll units
 
@@ -187,7 +197,7 @@ public:
 private:
     void onPaintEvent(wxPaintEvent& event);
     void onEraseBackGround(wxEraseEvent& event) {} //[!]
-    void onSizeEvent(wxEvent& evt) { updateWindowSizes(); }
+    void onSizeEvent(wxSizeEvent& event) { updateWindowSizes(); event.Skip(); }
 
     void updateWindowSizes(bool updateScrollbar = true);
 
@@ -242,9 +252,10 @@ private:
 
     struct VisibleColumn
     {
-        VisibleColumn(ColumnType type, ptrdiff_t width) : type_(type), width_(width) {}
+        VisibleColumn(ColumnType type, ptrdiff_t offset, ptrdiff_t stretch) : type_(type), stretch_(stretch), offset_(offset) {}
         ColumnType type_;
-        ptrdiff_t width_; //may be NEGATIVE => treat as proportional stretch! use getAbsoluteWidths() to evaluate!!!
+        ptrdiff_t stretch_; //>= 0
+        ptrdiff_t offset_;
     };
 
     struct Component
@@ -260,22 +271,67 @@ private:
         std::vector<ColumnAttribute> oldColAttributes; //visible + nonvisible columns; use for conversion in setColumnConfig()/getColumnConfig() *only*!
     };
 
-    ptrdiff_t getMinAbsoluteWidthTotal() const; //assigns minimum width to stretched columns
-    std::vector<std::vector<VisibleColumn>> getAbsoluteWidths() const; //evaluate negative widths as stretched absolute values! structure matches "comp"
-
-    Opt<size_t> getAbsoluteWidth(size_t col, size_t compPos) const //resolve stretched columns
+    struct ColumnWidth
     {
-        const auto& absWidth = getAbsoluteWidths();
-        if (compPos < absWidth.size() && col < absWidth[compPos].size())
-            return absWidth[compPos][col].width_;
+        ColumnWidth(ColumnType type, ptrdiff_t width) : type_(type), width_(width) {}
+        ColumnType type_;
+        ptrdiff_t width_;
+    };
+    std::vector<std::vector<ColumnWidth>> getColWidths()                 const; //
+    std::vector<std::vector<ColumnWidth>> getColWidths(int mainWinWidth) const; //evaluate stretched columns; structure matches "comp"
+    ptrdiff_t                             getColWidthsSum(int mainWinWidth) const;
+
+    Opt<ptrdiff_t> getColWidth(size_t col, size_t compPos) const
+    {
+        const auto& widths = getColWidths();
+        if (compPos < widths.size() && col < widths[compPos].size())
+            return widths[compPos][col].width_;
         return NoValue();
     }
 
-    void setColWidth(size_t col, size_t compPos, ptrdiff_t width) //width may be >= 0: absolute, or < 0: stretched
-    {
-        if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
-            comp[compPos].visibleCols[col].width_ = width;
-    }
+    ptrdiff_t getStretchTotal() const; //sum of all stretch factors
+    static ptrdiff_t getColStretchedWidth(ptrdiff_t stretch, ptrdiff_t stretchTotal, int mainWinWidth); //final width = stretchedWidth + (normalized) offset
+
+    void setColWidthAndNotify(ptrdiff_t width, size_t col, size_t compPos, bool notifyAsync = false);
+
+    //ptrdiff_t getNormalizedColOffset(ptrdiff_t offset, ptrdiff_t stretchedWidth) const; //normalize so that "stretchedWidth + offset" gives reasonable width!
+
+    //Opt<ptrdiff_t> getColOffsetNorm(size_t col, size_t compPos) const //returns *normalized* offset!
+    //   {
+    //       if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
+    //       {
+    //           const VisibleColumn& vc = comp[compPos].visibleCols[col];
+    //           return getNormalizedColOffset(vc.offset_, getColStretchedWidth(vc.stretch_));
+    //       }
+    //       return NoValue();
+    //   }
+
+    //Opt<VisibleColumn> getColAttrib(size_t col, size_t compPos) const
+    //{
+    //       if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
+    //       return comp[compPos].visibleCols[col];
+    //       return NoValue();
+    //}
+
+    //Opt<ptrdiff_t> getColStretchedWidth(size_t col, size_t compPos) const
+    //   {
+    //       if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
+    //       {
+    //           const VisibleColumn& vc = comp[compPos].visibleCols[col];
+    //		return getColStretchedWidth(vc.stretch_);
+    //       }
+    //       return NoValue();
+    //   }
+
+
+    //void setColOffset(size_t col, size_t compPos, ptrdiff_t offset)
+    //   {
+    //       if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
+    //       {
+    //           VisibleColumn& vc = comp[compPos].visibleCols[col];
+    //           vc.offset_ = offset;
+    //       }
+    //   }
 
     wxRect getColumnLabelArea(ColumnType colType, size_t compPos) const; //returns empty rect if column not found
 
@@ -313,8 +369,8 @@ private:
     ColLabelWin* colLabelWin_;
     MainWin*     mainWin_;
 
-    bool showScrollbarX;
-    bool showScrollbarY;
+    ScrollBarStatus showScrollbarX;
+    ScrollBarStatus showScrollbarY;
 
     int colLabelHeight;
     bool drawRowLabel;

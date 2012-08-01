@@ -4,8 +4,8 @@
 // * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
 // **************************************************************************
 
-#ifndef RESOURCES_H_INCLUDED
-#define RESOURCES_H_INCLUDED
+#ifndef RESOURCES_H_INCLUDED_870857342085670826521345
+#define RESOURCES_H_INCLUDED_870857342085670826521345
 
 #include <map>
 #include <wx/bitmap.h>
@@ -32,4 +32,4 @@ private:
     std::map<wxString, wxBitmap> bitmaps;
 };
 
-#endif // RESOURCES_H_INCLUDED
+#endif //RESOURCES_H_INCLUDED_870857342085670826521345

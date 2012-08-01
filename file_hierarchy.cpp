@@ -32,7 +32,7 @@ void HierarchyObject::removeEmptyRec()
 
     //	for (auto& subDir : refSubDirs())
     //      subDir.removeEmptyRec(); //recurse
-    std::for_each(refSubDirs().begin(), refSubDirs().end(), std::mem_fun_ref(&HierarchyObject::removeEmptyRec));
+    std::for_each(refSubDirs().begin(), refSubDirs().end(), [&](HierarchyObject& hierObj) { hierObj.removeEmptyRec(); });
 }
 
 namespace
@@ -291,8 +291,9 @@ std::wstring zen::getCategoryDescription(CompareFilesResult cmpRes)
 std::wstring zen::getCategoryDescription(const FileSystemObject& fsObj)
 {
     const CompareFilesResult cmpRes = fsObj.getCategory();
-    if (cmpRes == FILE_CONFLICT)
-        return fsObj.getCatConflict();
+    if (cmpRes == FILE_CONFLICT ||
+        cmpRes == FILE_DIFFERENT_METADATA)
+        return fsObj.getCatExtraDescription();
 
     return getCategoryDescription(cmpRes);
 }

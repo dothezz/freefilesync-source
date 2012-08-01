@@ -1,6 +1,6 @@
 <header>
 	<language name>Nederlands</language name>
-	<translator>Edwin Dierssen</translator>
+	<translator>Edwin Dierssen && Jochem Sparla</translator>
 	<locale>nl_NL</locale>
 	<flag file>holland.png</flag file>
 	<plural forms>2</plural forms>
@@ -10,8 +10,20 @@
 <source>Searching for folder %x...</source>
 <target>Bezig met zoeken naar map %x...</target>
 
+<source>Batch execution</source>
+<target>Taak uitvoeren</target>
+
+<source>Items processed:</source>
+<target>Onderdelen verwerkt:</target>
+
+<source>Items remaining:</source>
+<target>Onderdelen te gaan:</target>
+
+<source>Total time:</source>
+<target>Totale tijd:</target>
+
 <source>Show in Explorer</source>
-<target>Toon in de verkenner</target>
+<target>Toon in Verkenner</target>
 
 <source>Open with default application</source>
 <target>Open met standaardapplicatie</target>
@@ -29,10 +41,10 @@
 <target>Fout</target>
 
 <source>Select alternate comparison settings</source>
-<target>Selecteer alternatieve vergelijkings instellingen</target>
+<target>Selecteer alternatieve vergelijkingsinstellingen</target>
 
 <source>Select alternate synchronization settings</source>
-<target>Selecteer alternatieve synchronisatie instellingen</target>
+<target>Selecteer alternatieve synchronisatieinstellingen</target>
 
 <source>Filter is active</source>
 <target>Filter is actief</target>
@@ -44,16 +56,16 @@
 <target>Verwijder alternatieve instellingen</target>
 
 <source>Clear filter settings</source>
-<target>Verwijder filter instellingen</target>
+<target>Verwijder filterinstellingen</target>
 
 <source>Create a batch job</source>
 <target>Creëer een taaklijst</target>
 
 <source>Synchronization settings</source>
-<target>Synchronisatie instellingen</target>
+<target>Synchronisatieinstellingen</target>
 
 <source>Comparison settings</source>
-<target>Vergelijk instellingen</target>
+<target>Vergelijksinstellingen</target>
 
 <source>About</source>
 <target>Informatie</target>
@@ -62,7 +74,7 @@
 <target>Bevestig</target>
 
 <source>Configure filter</source>
-<target>Filter configuratie</target>
+<target>Filterconfiguratie</target>
 
 <source>Global settings</source>
 <target>Algemene instellingen</target>
@@ -107,13 +119,13 @@
 <target>Waarschuwing</target>
 
 <source>Fatal Error</source>
-<target>Fatale fout</target>
+<target>Kritieke fout</target>
 
 <source>Windows Error Code %x:</source>
-<target>Windows Fout Code %x:</target>
+<target>Windows Foutcode %x:</target>
 
 <source>Linux Error Code %x:</source>
-<target>Linux Fout Code %x:</target>
+<target>Linux Foutcode %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Kan snelkoppeling %x niet vinden.</target>
@@ -137,16 +149,16 @@
 </target>
 
 <source>Database file %x is incompatible.</source>
-<target>Database bestand %x is niet compatibel.</target>
+<target>Databasebestand %x is niet compatibel.</target>
 
 <source>Initial synchronization:</source>
-<target>Initiële  synchronisatie:</target>
+<target>Initiële synchronisatie:</target>
 
 <source>Database file %x does not yet exist.</source>
-<target>Database bestand %x bestaat nog niet.</target>
+<target>Databasebestand %x bestaat nog niet.</target>
 
 <source>Database file is corrupt:</source>
-<target></target>
+<target>Databasebestand is corrupt:</target>
 
 <source>Out of memory!</source>
 <target>Onvoldoende geheugen!</target>
@@ -158,7 +170,7 @@
 <target>Kan bestand %x niet vinden.</target>
 
 <source>Database files do not share a common session.</source>
-<target>Database bestanden delen geen gezamelijke sessie.</target>
+<target>Databasebestanden delen geen gezamelijke sessie.</target>
 
 <source>An exception occurred!</source>
 <target>Er heeft een uitzondering plaatsgevonden!</target>
@@ -170,7 +182,7 @@
 <target>Kan geen procesinformatie verkrijgen.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
-<target>Wacht totdat map is vergrendeld (%x)...</target>
+<target>Wachten totdat map is vergrendeld (%x)...</target>
 
 <source>Cannot set directory lock %x.</source>
 <target>Kan directory %x niet sluiten.</target>
@@ -191,7 +203,7 @@
 <target>Doorzoekt:</target>
 
 <source>Encoding extended time information: %x</source>
-<target>Coderen uitgebreide tijd informatie: %x</target>
+<target>Coderen uitgebreide tijdinformatie: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -212,7 +224,7 @@
 <target>Bestand %x bevat geen valide configuratie.</target>
 
 <source>Configuration file %x loaded partially only.</source>
-<target>Configuratie bestand %x alleen deels geladen.</target>
+<target>Configuratiebestand %x alleen deels geladen.</target>
 
 <source>Cannot access Volume Shadow Copy Service.</source>
 <target>Kan de Volume Schaduwkopie Service niet benaderen.</target>
@@ -236,7 +248,7 @@
 <target>&Open...</target>
 
 <source>Save &As...</source>
-<target></target>
+<target>Ops&laan als...</target>
 
 <source>&Quit</source>
 <target>&Afsluiten</target>
@@ -248,7 +260,7 @@
 <target>&Inhoud</target>
 
 <source>&About</source>
-<target>&Over</target>
+<target>O&ver</target>
 
 <source>&Help</source>
 <target>&Help</target>
@@ -295,7 +307,7 @@ The command is triggered if:
 - new folders arrive (e.g. USB stick insert)
 </source>
 <target>
-De opdracht word geactiveerd als>:
+De opdracht word geactiveerd als:
 - bestanden of subfolders veranderen
 - nieuwe folders worden gevonden (bijvoorbeeld bij invoeging van USB stick)
 </target>
@@ -313,7 +325,7 @@ De opdracht word geactiveerd als>:
 <target>(Build: %x)</target>
 
 <source>All files</source>
-<target></target>
+<target>Alle bestanden</target>
 
 <source>&Restore</source>
 <target>&Herstellen</target>
@@ -322,19 +334,19 @@ De opdracht word geactiveerd als>:
 <target>&Afsluiten</target>
 
 <source>Monitoring active...</source>
-<target>Observeren actief...</target>
+<target>Controle actief...</target>
 
 <source>Waiting for missing directories...</source>
-<target>Wacht op missende mappen...</target>
+<target>Wacht op ontbrekende mappen...</target>
 
 <source>A folder input field is empty.</source>
-<target></target>
+<target>Een map invoerveld is leeg.</target>
 
 <source>Logging</source>
 <target>Loggen</target>
 
 <source>File time and size</source>
-<target>Bestands tijd-en grootte</target>
+<target>Bestandstijd- en grootte</target>
 
 <source>File content</source>
 <target>Bestandsinhoud</target>
@@ -352,22 +364,7 @@ De opdracht word geactiveerd als>:
 <target>Aangepast</target>
 
 <source>FreeFileSync batch</source>
-<target></target>
-
-<source>Batch execution</source>
-<target>Taak uitvoeren</target>
-
-<source>Items processed:</source>
-<target>Onderdelen verwerkt:</target>
-
-<source>Items remaining:</source>
-<target>Onderdelen te gaan:</target>
-
-<source>Total time:</source>
-<target>Totale tijd:</target>
-
-<source>Stop</source>
-<target>Stop</target>
+<target>FreeFileSync taak</target>
 
 <source>Synchronization aborted!</source>
 <target>Synchronisatie afgebroken!</target>
@@ -376,7 +373,7 @@ De opdracht word geactiveerd als>:
 <target>Synchronisatie is met fouten afgerond!</target>
 
 <source>Nothing to synchronize!</source>
-<target>Niks om te synchroniseren!</target>
+<target>Niets om te synchroniseren!</target>
 
 <source>Synchronization completed successfully!</source>
 <target>Synchronisatie succesvol afgerond!</target>
@@ -388,10 +385,10 @@ De opdracht word geactiveerd als>:
 <target>Bezig met omschakelen naar het FreeFileSync hoofdscherm.</target>
 
 <source>Unable to connect to sourceforge.net!</source>
-<target>Niet in staat verbinding te maken met sourceforge.net!</target>
+<target>Kan geen verbinding maken met sourceforge.net!</target>
 
 <source>A new version of FreeFileSync is available:</source>
-<target></target>
+<target>Er is een nieuwe versie van FreeFileSync beschikbaar:</target>
 
 <source>Download now?</source>
 <target>Nu downloaden?</target>
@@ -412,7 +409,7 @@ De opdracht word geactiveerd als>:
 <target><Symlink></target>
 
 <source><Folder></source>
-<target>Map</target>
+<target><Map></target>
 
 <source>Full path</source>
 <target>Volledig pad</target>
@@ -436,10 +433,10 @@ De opdracht word geactiveerd als>:
 <target>Extensie</target>
 
 <source>Size:</source>
-<target></target>
+<target>Grootte:</target>
 
 <source>Date:</source>
-<target></target>
+<target>Datum:</target>
 
 <source>Action</source>
 <target>Actie</target>
@@ -475,7 +472,7 @@ De opdracht word geactiveerd als>:
 <target>&Nieuw</target>
 
 <source>&Save</source>
-<target></target>
+<target>O&pslaan</target>
 
 <source>&Language</source>
 <target>&Taal</target>
@@ -544,7 +541,7 @@ De opdracht word geactiveerd als>:
 <target>Aantal bestanden en mappen die verwijderd zullen worden</target>
 
 <source>Total bytes to copy</source>
-<target></target>
+<target>Aantal bytes om te kopiëren</target>
 
 <source>Items found:</source>
 <target>Onderdelen gevonden:</target>
@@ -553,16 +550,16 @@ De opdracht word geactiveerd als>:
 <target>Snelheid:</target>
 
 <source>Time remaining:</source>
-<target></target>
+<target>Resterende tijd:</target>
 
 <source>Time elapsed:</source>
-<target></target>
+<target>Verstreken tijd:</target>
 
 <source>Batch job</source>
 <target>Taaklijst</target>
 
 <source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Maak een batch bestand om synchronisatie te automatiseren. Dubbelklik op dit bestand of plan dit in de systeem taakplanner: FreeFileSync.exe <batch naam>.ffs_batch</target>
+<target>Maak een taakbestand om synchronisatie te automatiseren. Dubbelklik op dit bestand of plan dit in de systeem taakplanner: FreeFileSync.exe <taaknaam>.ffs_batch</target>
 
 <source>Help</source>
 <target>Help</target>
@@ -589,10 +586,10 @@ De opdracht word geactiveerd als>:
 <target>Maximale aantal van logbestanden:</target>
 
 <source>Select folder to save log files:</source>
-<target>Selecteer de map voor het bewaren van log bestanden:</target>
+<target>Selecteer de map voor het bewaren van logbestanden:</target>
 
 <source>Batch settings</source>
-<target>Batch instellingen</target>
+<target>Batchinstellingen</target>
 
 <source>Select variant:</source>
 <target>Selecteer een variant:</target>
@@ -601,7 +598,7 @@ De opdracht word geactiveerd als>:
 <target>Identificeer en verspreid veranderingen aan beide kanten met behulp van een database. Verwijderingen, hernoemingen en conflicten worden automatisch gedetecteerd.</target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Spiegel backup van linker map. Rechter map is bewerkt om na synchronisatie een exacte kopie te zijn van de linker map.</target>
+<target>Spiegel backup van linker map. Rechter map is na synchronisatie een exacte kopie van de linker map.</target>
 
 <source>Copy new or updated files to right folder.</source>
 <target>Kopiëer nieuwe of geupdate bestanden naar de rechter map.</target>
@@ -613,7 +610,7 @@ De opdracht word geactiveerd als>:
 <target>Verwijder-afhandeling</target>
 
 <source>On completion:</source>
-<target>Bij voltooiing</target>
+<target>Bij voltooiing:</target>
 
 <source>Configuration</source>
 <target>Configuratie</target>
@@ -649,7 +646,7 @@ Files are found equal if
 are the same
 </source>
 <target>
-Bestanden worden als gelijk bevonden indien,
+Bestanden worden als gelijk bevonden indien
      - de laatste schrijf tijd en datum
      - de bestandsgrootte
 gelijk zijn
@@ -661,7 +658,7 @@ Files are found equal if
 is the same
 </source>
 <target>
-Bestanden worden als gelijk beschouwd indien,
+Bestanden worden als gelijk beschouwd indien
      - de bestandsinhoud
 overeenkomt
 </target>
@@ -745,7 +742,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Fail-safe bestandskopie</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Schrijf eerst naar een tijdelijk bestand (*.ffs_tmp) en hernoem dan. Dit garandeert een consistente toestand, zelfs in het geval van een fatale fout.</target>
+<target>Schrijf eerst naar een tijdelijk bestand (*.ffs_tmp) en hernoem daarna. Dit garandeert een consistente toestand, zelfs in het geval van een fatale fout.</target>
 
 <source>Copy locked files</source>
 <target>Kopiëer vergrendelde bestanden</target>
@@ -757,7 +754,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Kopiëer toegangsrechten van bestand.</target>
 
 <source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Overdragen van bestands en maps permissies (Administrator rechten nodig)</target>
+<target>Overdragen van bestands- en mappermissies (Administrator rechten nodig)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Herstel verborgen dialogen</target>
@@ -805,7 +802,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Stel richting in:</target>
 
 <source>Exclude temporarily</source>
-<target>Sluit tijdelijk uit</target>
+<target>Tijdelijk uitsluiten</target>
 
 <source>Include temporarily</source>
 <target>Tijdelijk opnemen</target>
@@ -820,7 +817,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Verwijderen</target>
 
 <source>Include all</source>
-<target>Alles insluiten</target>
+<target>Alles opnemen</target>
 
 <source>Exclude all</source>
 <target>Alles uitsluiten</target>
@@ -853,16 +850,16 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Configuratie opgeslagen!</target>
 
 <source>Never save changes</source>
-<target>Veranderingen nooit opslaan</target>
+<target>Wijzigingen nooit opslaan</target>
 
 <source>Do you want to save changes to %x?</source>
-<target></target>
+<target>Wilt u de wijzigingen in %x opslaan?</target>
 
 <source>Save</source>
-<target></target>
+<target>Opslaan</target>
 
 <source>Don't Save</source>
-<target></target>
+<target>Niet opslaan</target>
 
 <source>Configuration loaded!</source>
 <target>Configuratie geladen!</target>
@@ -901,7 +898,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Toon bestanden die gelijk zijn</target>
 
 <source>Hide files that are different</source>
-<target>Verberg bestanden die verschillen</target>
+<target>Verberg bestanden die verschillend zijn</target>
 
 <source>Show files that are different</source>
 <target>Toon bestanden die verschillend zijn</target>
@@ -913,43 +910,43 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Toon conflicten</target>
 
 <source>Hide files that will be created on the left side</source>
-<target>Verberg bestanden die aan de linkerzijde zullen worden aangemaakt</target>
+<target>Verberg bestanden die aan de linkerzijde aangemaakt zullen worden</target>
 
 <source>Show files that will be created on the left side</source>
 <target>Toon bestanden die aan de linkerzijde aangemaakt zullen worden</target>
 
 <source>Hide files that will be created on the right side</source>
-<target>Verberg bestanden die aan de rechterzijde zullen worden aangemaakt</target>
+<target>Verberg bestanden die aan de rechterzijde aangemaakt zullen worden</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Toon bestanden die aan de rechterzijde aangemaakt zullen worden</target>
 
 <source>Hide files that will be deleted on the left side</source>
-<target>Verberg bestanden die aan de linkerzijde zullen worden verwijderd</target>
+<target>Verberg bestanden die aan de linkerzijde aangemaakt zullen worden</target>
 
 <source>Show files that will be deleted on the left side</source>
 <target>Toon bestanden die van de linkerzijde verwijderd zullen worden</target>
 
 <source>Hide files that will be deleted on the right side</source>
-<target>Verberg bestanden die aan de rechterzijde zullen worden verwijderd</target>
+<target>Verberg bestanden die aan de rechterzijde verwijderd zullen worden</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Toon bestanden die van de rechterzijde verwijderd zullen worden</target>
 
 <source>Hide files that will be overwritten on left side</source>
-<target>Verberg bestanden die aan de linkerzijde zullen worden overschreven</target>
+<target>Verberg bestanden die aan de linkerzijde overschreven zullen worden</target>
 
 <source>Show files that will be overwritten on left side</source>
 <target>Toon bestanden die aan de linkerzijde overschreven zullen worden</target>
 
 <source>Hide files that will be overwritten on right side</source>
-<target>Verberg bestanden die aan de rechterzijde zullen worden overschreven</target>
+<target>Verberg bestanden die aan de rechterzijde overschreven zullen worden</target>
 
 <source>Show files that will be overwritten on right side</source>
 <target>Toon bestanden die aan de rechterzijde overschreven zullen worden</target>
 
 <source>Hide files that won't be copied</source>
-<target>Verberg bestanden die niet zullen worden gekopiëerd</target>
+<target>Verberg bestanden die niet gekopiëerd zullen worden</target>
 
 <source>Show files that won't be copied</source>
 <target>Toon bestanden die niet gekopiëerd zullen worden</target>
@@ -958,7 +955,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Alle mappen zijn gesynchroniseerd!</target>
 
 <source>Comma separated list</source>
-<target>Komma gescheiden lijst</target>
+<target>Kommagescheiden bestand</target>
 
 <source>Legend</source>
 <target>Legenda</target>
@@ -1090,7 +1087,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:</target>
 
 <source>- full file or folder name</source>
-<target>- volledige bestands of maps naam</target>
+<target>- volledige bestands- of mapnaam</target>
 
 <source>- folder part only</source>
 <target>- alleen het map gedeelte</target>
@@ -1102,7 +1099,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>- Tegenhanger andere zijde naar %dir</target>
 
 <source>Make hidden dialogs and warning messages visible again?</source>
-<target>Maak verborgen dialogen en waarschuwings berichten opnieuw zichtbaar?</target>
+<target>Verborgen dialogen en waarschuwings berichten opnieuw zichtbaar maken?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1126,10 +1123,10 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Beschouw als onopgelost conflict</target>
 
 <source>Delete permanently</source>
-<target>Verwijder onomkeerbaar</target>
+<target>Definitief verwijderen</target>
 
 <source>Delete or overwrite files permanently</source>
-<target>Verwijder of overschrijf bestanden onomkeerbaar</target>
+<target>Bestanden definitief verwijderen of overschrijven</target>
 
 <source>Use Recycle Bin when deleting or overwriting files</source>
 <target>Gebruik de prullenbak bij verwijderen of overschrijven van bestanden</target>
@@ -1186,13 +1183,13 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Kan locatie %x niet controleren.</target>
 
 <source>Conversion error:</source>
-<target>Converteer fout:</target>
+<target>Converteerfout:</target>
 
 <source>Cannot delete file %x.</source>
 <target>Kan bestand %x niet verwijderen.</target>
 
 <source>The file is locked by another process:</source>
-<target>Het bestand is op afgesloten door een ander proces:</target>
+<target>Het bestand is in gebruik door een ander proces:</target>
 
 <source>Cannot move file %x to %y.</source>
 <target>Kan bestand %x niet verplaatsen naar %y.</target>
@@ -1204,7 +1201,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Kan bestandskenmerken van %x niet schrijven.</target>
 
 <source>Cannot write modification time of %x.</source>
-<target>Kan wijzigings tijd van %x niet toevoegen.</target>
+<target>Kan wijzigingstijd van %x niet toevoegen.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Kan systeemfunctie %x niet vinden.</target>
@@ -1252,10 +1249,13 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Geen veranderingen sinds de laatste synchronisatie!</target>
 
 <source>The corresponding database entries are not in sync considering current settings.</source>
-<target></target>
+<target>De volgende databaseregels zijn niet gesynchroniseerd volgens de huidige instellingen.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Stel standaard synchronisatie richtingen in: Oude bestanden worden door nieuwere bestanden overschreven.</target>
+
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Prullenbak is niet beschikbaar voor de volgende locaties! De bestanden worden permanent verwijderd:</target>
 
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>U kunt deze waarschuwing negeren om de map als leeg te laten gelden.</target>
@@ -1265,6 +1265,9 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:</target>
+
+<source>Start comparison</source>
+<target></target>
 
 <source>Preparing synchronization...</source>
 <target>Synchronisatie voorbereiden</target>
@@ -1277,6 +1280,9 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 
 <source>Files %x have the same date but a different size!</source>
 <target>Bestanden %x hebben dezelfde datums maar een afwijkende grootte!</target>
+
+<source>Items have different attributes</source>
+<target>Items hebben verschillende attributen</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Snelkoppelingen %x hebben dezelfde datum maar een verschillend doel.</target>
@@ -1292,9 +1298,6 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 
 <source>Both sides are equal</source>
 <target>Beide kanten zijn gelijk</target>
-
-<source>Items have different attributes</source>
-<target>Items hebben verschillende attributen</target>
 
 <source>Copy new item to left</source>
 <target>Kopieër nieuw item naar de linkerkant</target>
@@ -1342,13 +1345,13 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Verwijderen van snelkoppeling %x</target>
 
 <source>Moving file %x to recycle bin</source>
-<target>Bezig met verplaatsen van bestand %x naar prullenbak</target>
+<target>Bezig met verplaatsen van bestand %x naar de prullenbak</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target>Bezig met verplaatsen van map %x naar prullenbak</target>
+<target>Bezig met verplaatsen van map %x naar de prullenbak</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target>Bezig met verplaatsen van snelkoppeling %x naar prullenbak</target>
+<target>Bezig met verplaatsen van snelkoppeling %x naar de prullenbak</target>
 
 <source>Moving file %x to %y</source>
 <target>Bezig met verplaatsen van bestand %x naar %y</target>
@@ -1381,13 +1384,13 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Attributen bijwerken van %x</target>
 
 <source>Target folder input field must not be empty.</source>
-<target></target>
+<target>Doelmap mag niet leeg zijn.</target>
 
 <source>Folder input field for versioning must not be empty.</source>
-<target></target>
+<target>Bronmap voor versiebeheer mag niet leeg zijn.</target>
 
 <source>Source folder %x not found.</source>
-<target></target>
+<target>Bronmap %x niet gevonden.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Er bestaan onopgeloste conflicten!</target>
@@ -1405,22 +1408,19 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Niet genoeg vrije schijfruimte beschikbaar op:</target>
 
 <source>Required:</source>
-<target></target>
+<target>Vereist:</target>
 
 <source>Available:</source>
-<target></target>
-
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Prullenbak is niet beschikbaar voor de volgende locaties! De bestanden worden permanent verwijderd:</target>
+<target>Beschikbaar:</target>
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Een map die onderdeel is van meerdere map paren word aangepast. Kijk alstublieft uw synchronisatie instellingen na.</target>
 
-<source>Processing folder pair:</source>
-<target>Verwerking van gekoppelde mappen:</target>
+<source>Synchronize folder pair:</source>
+<target></target>
 
 <source>Target folder %x already existing.</source>
-<target></target>
+<target>Doelmap %x bestaat al.</target>
 
 <source>Generating database...</source>
 <target>Genereren van database...</target>

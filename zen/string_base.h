@@ -196,7 +196,7 @@ public:
     Zbase(const Char* source, size_t length);
     Zbase(const Zbase& source);
     Zbase(Zbase&& tmp);
-    explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups... forgot &, but no error
+    explicit Zbase(Char source); //dangerous if implicit: Char buffer[]; return buffer[0]; ups... forgot &, but not a compiler error!
     //allow explicit construction from different string type, prevent ambiguity via SFINAE
     template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
     ~Zbase();

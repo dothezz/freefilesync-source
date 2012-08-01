@@ -252,7 +252,7 @@ HardFilter::FilterRef combineFilters(const HardFilter::FilterRef& first,
     if (first->isNull())
     {
         if (second->isNull())
-            return HardFilter::FilterRef(new NullFilter);
+            return std::make_shared<NullFilter>();
         else
             return second;
     }
@@ -261,7 +261,7 @@ HardFilter::FilterRef combineFilters(const HardFilter::FilterRef& first,
         if (second->isNull())
             return first;
         else
-            return HardFilter::FilterRef(new CombinedFilter(first, second));
+            return std::make_shared<CombinedFilter>(first, second);
     }
 }
 }

@@ -147,6 +147,7 @@ struct XmlGlobalSettings
             dlgPos(wxDefaultCoord, wxDefaultCoord),
             dlgSize(wxDefaultCoord, wxDefaultCoord),
             isMaximized(false),
+            sashOffset(0),
             maxFolderPairsVisible(6),
             columnAttribNavi (zen::getDefaultColumnAttributesNavi()),
             columnAttribLeft (zen::getDefaultColumnAttributesLeft()),
@@ -184,6 +185,7 @@ struct XmlGlobalSettings
         wxPoint dlgPos;
         wxSize dlgSize;
         bool isMaximized;
+        int sashOffset;
 
         int maxFolderPairsVisible;
 

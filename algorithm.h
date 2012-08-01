@@ -52,7 +52,8 @@ public:
         IGNORE_ERROR = 10,
         RETRY
     };
-    virtual Response reportError(const std::wstring& errorMessage) = 0;
+    virtual Response reportError  (const std::wstring& msg) = 0;
+    virtual void     reportWarning(const std::wstring& msg, bool& warningActive) = 0;
 
     //virtual void totalFilesToDelete(int objectsTotal) = 0; //informs about the total number of files to be deleted
     virtual void notifyDeletion(const Zstring& currentObject) = 0; //called for each file/folder that has been deleted
@@ -63,7 +64,9 @@ void deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLef
                          const std::vector<DirectionConfig>& directCfgs,
                          bool deleteOnBothSides,
                          bool useRecycleBin,
-                         DeleteFilesHandler& statusHandler);
+                         DeleteFilesHandler& statusHandler,
+                         //global warnings:
+                         bool& warningRecyclerMissing);
 }
 
 #endif // ALGORITHM_H_INCLUDED

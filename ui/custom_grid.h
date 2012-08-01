@@ -17,23 +17,20 @@ namespace zen
 //setup grid to show grid view within three components:
 namespace gridview
 {
-static const size_t COMP_LEFT   = 0;
-static const size_t COMP_MIDDLE = 1;
-static const size_t COMP_RIGHT  = 2;
-
-void init(Grid& grid, const std::shared_ptr<const GridView>& gridDataView);
+void init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std::shared_ptr<const GridView>& gridDataView);
 
 std::vector<Grid::ColumnAttribute> convertConfig(const std::vector<ColumnAttributeRim>& attribs); //+ make consistent
 std::vector<ColumnAttributeRim>    convertConfig(const std::vector<Grid::ColumnAttribute>& attribs); //
 
-void showSyncAction(Grid& grid, bool value);
+void showSyncAction(Grid& gridCenter, bool value);
 
-void setupIcons(Grid& grid, bool show, IconBuffer::IconSize sz);
+void setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, bool show, IconBuffer::IconSize sz);
 
-void clearSelection(Grid& grid); //clear all components
+void clearSelection(Grid& gridLeft, Grid& gridCenter, Grid& gridRight); //clear all components
+void refresh(Grid& gridLeft, Grid& gridCenter, Grid& gridRight);
 
 //mark rows selected in navigation/compressed tree and navigate to leading object
-void setNavigationMarker(Grid& grid,
+void setNavigationMarker(Grid& gridLeft,
                          std::vector<const HierarchyObject*>&& markedFiles,      //mark files/symlinks directly within a container
                          std::vector<const HierarchyObject*>&& markedContainer); //mark full container including child-objects
 }

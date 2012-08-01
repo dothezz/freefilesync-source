@@ -17,7 +17,7 @@
 #include <zen/assert_static.h>
 #include <zen/int64.h>
 #include <zen/file_handling.h>
-#include <wx+/serialize.h>
+#include <zen/serialize.h>
 
 #ifdef FFS_WIN
 #include <tlhelp32.h>
@@ -27,7 +27,8 @@
 #include <Lmcons.h> //UNLEN
 
 #elif defined FFS_LINUX
-#include <sys/stat.h>
+#include <fcntl.h>    //::open()
+#include <sys/stat.h> //
 #include <unistd.h>
 #endif
 
@@ -484,7 +485,7 @@ void releaseLock(const Zstring& lockfilename) //throw ()
 {
     try
     {
-        removeFile(lockfilename);
+        removeFile(lockfilename); //throw FileError
     }
     catch (...) {}
 }
@@ -510,6 +511,8 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
             throw FileError(replaceCpy(_("Cannot set directory lock %x."), L"%x", fmtFileName(lockfilename)) + L"\n\n" + getLastErrorFormatted());
     }
     ::CloseHandle(fileHandle);
+
+    ::SetFileAttributes(applyLongPathPrefix(lockfilename).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide it
 
 #elif defined FFS_LINUX
     //O_EXCL contains a race condition on NFS file systems: http://linux.die.net/man/2/open

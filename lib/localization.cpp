@@ -54,7 +54,6 @@ public:
             if (0 <= formNo && formNo < static_cast<int>(iter->second.size()))
                 return iter->second[formNo];
         }
-
         return n == 1 ? singular : plural; //fallback
     }
 
@@ -75,7 +74,7 @@ FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(
     std::string inputStream;
     try
     {
-        inputStream = loadStream(filename);; //throw XmlFileError
+        inputStream = loadStream(filename); //throw XmlFileError
     }
     catch (...)
     {
@@ -92,7 +91,7 @@ FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(
         const std::wstring original    = utfCvrtTo<std::wstring>(i->first);
         const std::wstring translation = utfCvrtTo<std::wstring>(i->second);
         assert(!translation.empty());
-        transMapping.insert(std::make_pair(original , translation));
+        transMapping.insert(std::make_pair(original, translation));
     }
 
     for (lngfile::TranslationPluralMap::const_iterator i = transPluralInput.begin(); i != transPluralInput.end(); ++i)
@@ -164,10 +163,10 @@ ExistingTranslations::ExistingTranslations()
         //default entry:
         ExistingTranslations::Entry newEntry;
         newEntry.languageID     = wxLANGUAGE_ENGLISH_US;
-        newEntry.languageName   = wxT("English (US)");
-        newEntry.languageFile   = wxT("");
-        newEntry.translatorName = wxT("ZenJu");
-        newEntry.languageFlag   = wxT("usa.png");
+        newEntry.languageName   = L"English (US)";
+        newEntry.languageFile   = L"";
+        newEntry.translatorName = L"ZenJu";
+        newEntry.languageFlag   = L"usa.png";
         locMapping.push_back(newEntry);
     }
 
@@ -196,7 +195,7 @@ ExistingTranslations::ExistingTranslations()
                     ExistingTranslations::Entry newEntry;
                     newEntry.languageID     = locInfo->Language;
                     newEntry.languageName   = utfCvrtTo<wxString>(lngHeader.languageName);
-                    newEntry.languageFile   = toWx(*i);
+                    newEntry.languageFile   = utfCvrtTo<wxString>(*i);
                     newEntry.translatorName = utfCvrtTo<wxString>(lngHeader.translatorName);
                     newEntry.languageFlag   = utfCvrtTo<wxString>(lngHeader.flagFile);
                     locMapping.push_back(newEntry);
@@ -297,6 +296,7 @@ wxLanguage mapLanguageDialect(wxLanguage language)
             //case wxLANGUAGE_HUNGARIAN:
             //case wxLANGUAGE_PORTUGUESE:
             //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
+            //case wxLANGUAGE_SCOTS_GAELIC:
             //case wxLANGUAGE_KOREAN:
             //case wxLANGUAGE_UKRAINIAN:
             //case wxLANGUAGE_CROATIAN:
@@ -365,6 +365,8 @@ private:
 
 void zen::setLanguage(int language)
 {
+    if (language == getLanguage()) return; //support polling
+
     //(try to) retrieve language file
     wxString languageFile;
 
@@ -375,12 +377,10 @@ void zen::setLanguage(int language)
             break;
         }
 
-
     //handle RTL swapping: we need wxWidgets to do this
     static std::unique_ptr<CustomLocale> dummy;
     dummy.reset(); //avoid global locale lifetime overlap! wxWidgets cannot handle this and will crash!
     dummy.reset(new CustomLocale(languageFile.empty() ? wxLANGUAGE_ENGLISH : language));
-
 
     //reset to english language; in case of error show error message just once
     zen::setTranslator();
@@ -408,7 +408,7 @@ void zen::setLanguage(int language)
 
 int zen::getLanguage()
 {
-    FFSLocale* loc = dynamic_cast<FFSLocale*>(zen::getTranslator());
+    const FFSLocale* loc = dynamic_cast<const FFSLocale*>(zen::getTranslator());
     return loc ? loc->langId() : wxLANGUAGE_ENGLISH_US;
 }
 

@@ -147,7 +147,7 @@ private:
     template <bool ascending> static void sortSingleLevel(std::vector<TreeLine>& items, ColumnTypeNavi columnType);
     template <bool ascending> struct LessShortName;
 
-    std::vector<TreeLine> flatTree; //collapsable/expandable sub-tree of partial view -> always sorted!
+    std::vector<TreeLine> flatTree; //collapsable/expandable sub-tree of folderCmpView -> always sorted!
     /*             /|\
                     | (update...)
                     |                         */

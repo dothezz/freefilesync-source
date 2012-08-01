@@ -9,8 +9,8 @@
 
 #include <zen/error_log.h>
 #include <zen/file_io.h>
+#include <zen/serialize.h>
 #include <wx+/format_unit.h>
-#include <wx+/serialize.h>
 #include "ffs_paths.h"
 
 
@@ -129,7 +129,18 @@ void saveToLastSyncsLog(const Utf8String& logstream) //throw FileError
     }
 
     //limit file size: 128 kB (but do not truncate new log)
-    newStream.resize(std::min(newStream.size(), std::max<size_t>(logstream.size(), 128 * 1024)));
+    const size_t newSize = std::min(newStream.size(), std::max<size_t>(logstream.size(), 128 * 1024));
+
+    //do not cut in the middle of a row
+    auto iter = std::search(newStream.begin() + newSize, newStream.end(), std::begin(LINE_BREAK), std::end(LINE_BREAK) - 1);
+    if (iter != newStream.end())
+    {
+        newStream.resize(iter - newStream.begin());
+
+        newStream += LINE_BREAK;
+        newStream += "[...]";
+        newStream += LINE_BREAK;
+    }
 
     saveBinStream(filename, newStream); //throw FileError
 }

@@ -286,7 +286,7 @@ xmlAccess::XmlRealConfig MainDialog::getConfiguration()
         output.directories.push_back((*i)->getName());
 
     output.commandline = m_textCtrlCommand->GetValue();
-    output.delay       = m_spinCtrlDelay->GetValue();;
+    output.delay       = m_spinCtrlDelay->GetValue();
 
     return output;
 }

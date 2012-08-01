@@ -150,9 +150,9 @@ std::wstring zen::getSymbol(CompareFilesResult cmpRes)
         case FILE_DIFFERENT:
             return L"!=";
         case FILE_EQUAL:
+        case FILE_DIFFERENT_METADATA: //= sub-category of equal!
             return L"'=="; //added quotation mark to avoid error in Excel cell when exporting to *.cvs
         case FILE_CONFLICT:
-        case FILE_DIFFERENT_METADATA:
             return L"conflict";
     }
     assert(false);

@@ -37,7 +37,7 @@ struct CompileTimeError<true> {};
 #endif
 */
 
-//C++11: at least get rid of this pointless string literal requirement
+//C++11: please get rid of this pointless string literal requirement!
 #define assert_static(X)  \
     static_assert(X, "Static assert has failed!");
 

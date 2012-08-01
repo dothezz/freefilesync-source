@@ -29,11 +29,11 @@ class MainDialog : public MainDialogGenerated
 {
 public:
     MainDialog(const std::vector<wxString>& cfgFileNames, //default behavior, application start
-               xmlAccess::XmlGlobalSettings& settings);
+               const xmlAccess::XmlGlobalSettings& globalSettings); //take over ownership => save on exit
 
     MainDialog(const std::vector<wxString>& referenceFiles,
                const xmlAccess::XmlGuiConfig& guiCfg,
-               xmlAccess::XmlGlobalSettings& settings,
+               const xmlAccess::XmlGlobalSettings& globalSettings, //take over ownership => save on exit
                bool startComparison);
 
     ~MainDialog();
@@ -41,7 +41,7 @@ public:
     void disableAllElements(bool enableAbort); //dis-/enables all elements (except abort button) that might receive user input
     void enableAllElements();                   //during long-running processes: comparison, deletion
 
-    void onQueryEndSession(); //last chance to do something before getting killed!
+    void onQueryEndSession(); //last chance to do something useful before killing the application!
 
 private:
     friend class CompareStatusHandler;
@@ -56,7 +56,7 @@ private:
     MainDialog();
 
     void init(const xmlAccess::XmlGuiConfig& guiCfg,
-              xmlAccess::XmlGlobalSettings& settings,
+              const xmlAccess::XmlGlobalSettings& globalSettings,
               bool startComparison);
 
     //configuration load/save
@@ -65,6 +65,9 @@ private:
 
     xmlAccess::XmlGuiConfig getConfig() const;
     void setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg);
+
+    void setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSettings); //messes with Maximize(), window sizes, so call just once!
+    xmlAccess::XmlGlobalSettings getGlobalCfgBeforeExit(); //destructive "get" thanks to "Iconize(false), Maximize(false)"
 
     void loadConfiguration(const wxString& filename);
     void loadConfiguration(const std::vector<wxString>& filenames);
@@ -77,9 +80,6 @@ private:
     xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
     //used when saving configuration
     std::vector<wxString> activeConfigFiles; //name of currently loaded config file (may be more than 1)
-
-    void readGlobalSettings();
-    void writeGlobalSettings();
 
     void initViewFilterButtons();
     void updateFilterButtons();
@@ -106,7 +106,7 @@ private:
     void deleteSelectedFiles(const std::vector<zen::FileSystemObject*>& selectionLeft,
                              const std::vector<zen::FileSystemObject*>& selectionRight);
 
-    void openExternalApplication(const wxString& commandline, const zen::FileSystemObject* fsObj, size_t compPos); //fsObj may be nullptr
+    void openExternalApplication(const wxString& commandline, const zen::FileSystemObject* fsObj, bool leftSide); //fsObj may be nullptr
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
@@ -116,7 +116,11 @@ private:
     void flashStatusInformation(const wxString& msg); //temporarily show different status
 
     //events
-    void onGridButtonEvent         (wxKeyEvent& event);
+    void onGridButtonEventL(wxKeyEvent& event);
+    void onGridButtonEventC(wxKeyEvent& event);
+    void onGridButtonEventR(wxKeyEvent& event);
+    void onGridButtonEvent(wxKeyEvent& event, zen::Grid& grid, bool leftSide);
+
     void onTreeButtonEvent         (wxKeyEvent& event);
     void OnContextSetLayout        (wxMouseEvent& event);
     void OnGlobalKeyEvent          (wxKeyEvent& event);
@@ -128,7 +132,11 @@ private:
     void applyCompareConfig(bool changePreviewStatus = true);
 
     //context menu handler methods
-    void onMainGridContext(zen::GridClickEvent& event);
+    void onMainGridContextL(zen::GridClickEvent& event);
+    void onMainGridContextC(zen::GridClickEvent& event);
+    void onMainGridContextR(zen::GridClickEvent& event);
+    void onMainGridContextRim(bool leftSide);
+
     void onNaviGridContext(zen::GridClickEvent& event);
 
     void onNaviSelection(zen::GridRangeSelectEvent& event);
@@ -139,9 +147,19 @@ private:
     void onCheckRows       (zen::CheckRowsEvent&     event);
     void onSetSyncDirection(zen::SyncDirectionEvent& event);
 
-    void onGridDoubleClick    (zen::GridClickEvent& event);
-    void onGridLabelLeftClick (zen::GridClickEvent& event);
-    void onGridLabelContext(zen::GridClickEvent& event);
+    void onGridDoubleClickL(zen::GridClickEvent& event);
+    void onGridDoubleClickR(zen::GridClickEvent& event);
+    void onGridDoubleClickRim(int row, bool leftSide);
+
+    void onGridLabelLeftClickC (zen::GridClickEvent& event);
+    void onGridLabelLeftClickL (zen::GridClickEvent& event);
+    void onGridLabelLeftClickR (zen::GridClickEvent& event);
+    void onGridLabelLeftClick(bool onLeft, zen::ColumnTypeRim type);
+
+    void onGridLabelContextL(zen::GridClickEvent& event);
+    void onGridLabelContextC(zen::GridClickEvent& event);
+    void onGridLabelContextR(zen::GridClickEvent& event);
+    void onGridLabelContext(zen::Grid& grid, zen::ColumnTypeRim type, const std::vector<zen::ColumnAttributeRim>& defaultColumnAttributes);
 
     void OnLeftOnlyFiles(       wxCommandEvent& event);
     void OnRightOnlyFiles(      wxCommandEvent& event);
@@ -209,7 +227,7 @@ private:
     void OnMenuQuit(            wxCommandEvent& event);
     void OnMenuLanguageSwitch(  wxCommandEvent& event);
 
-    void switchProgramLanguage(const int langID);
+    void switchProgramLanguage(int langID);
 
     typedef int MenuItemID;
     typedef int LanguageID;
@@ -218,8 +236,8 @@ private:
     //***********************************************
     //application variables are stored here:
 
-    //global settings used by GUI and batch mode
-    xmlAccess::XmlGlobalSettings* globalSettings; //always bound!
+    //global settings shared by GUI and batch mode
+    xmlAccess::XmlGlobalSettings globalCfg;
 
     //UI view of FolderComparison structure (partially owns folderCmp)
     std::shared_ptr<zen::GridView> gridDataView; //always bound!

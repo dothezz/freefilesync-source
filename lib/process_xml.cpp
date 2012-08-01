@@ -542,13 +542,53 @@ bool readText(const std::string& input, UnitTime& value)
 template <> inline
 void writeText(const ColumnTypeRim& value, std::string& output)
 {
-    output = numberTo<std::string>(value);
+    switch (value)
+    {
+        case COL_TYPE_DIRECTORY:
+            output = "Base";
+            break;
+        case COL_TYPE_FULL_PATH:
+            output = "Full";
+            break;
+        case COL_TYPE_REL_PATH:
+            output = "Rel";
+            break;
+        case COL_TYPE_FILENAME:
+            output = "Name";
+            break;
+        case COL_TYPE_SIZE:
+            output = "Size";
+            break;
+        case COL_TYPE_DATE:
+            output = "Date";
+            break;
+        case COL_TYPE_EXTENSION:
+            output = "Ext";
+            break;
+    }
 }
 
 template <> inline
 bool readText(const std::string& input, ColumnTypeRim& value)
 {
-    value = static_cast<ColumnTypeRim>(stringTo<int>(input));
+    std::string tmp = input;
+    zen::trim(tmp);
+    if (tmp == "Base")
+        value = COL_TYPE_DIRECTORY;
+    else if (tmp == "Full")
+        value = COL_TYPE_FULL_PATH;
+    else if (tmp == "Rel")
+        value = COL_TYPE_REL_PATH;
+    else if (tmp == "Name")
+        value = COL_TYPE_FILENAME;
+    else if (tmp == "Size")
+        value = COL_TYPE_SIZE;
+    else if (tmp == "Date")
+        value = COL_TYPE_DATE;
+    else if (tmp == "Ext")
+        value = COL_TYPE_EXTENSION;
+    else
+        return false;
     return true;
 }
 
@@ -556,13 +596,28 @@ bool readText(const std::string& input, ColumnTypeRim& value)
 template <> inline
 void writeText(const ColumnTypeNavi& value, std::string& output)
 {
-    output = numberTo<std::string>(value);
+    switch (value)
+    {
+        case COL_TYPE_NAVI_BYTES:
+            output = "Bytes";
+            break;
+        case COL_TYPE_NAVI_DIRECTORY:
+            output = "Tree";
+            break;
+    }
 }
 
 template <> inline
 bool readText(const std::string& input, ColumnTypeNavi& value)
 {
-    value = static_cast<ColumnTypeNavi>(stringTo<int>(input));
+    std::string tmp = input;
+    zen::trim(tmp);
+    if (tmp == "Bytes")
+        value = COL_TYPE_NAVI_BYTES;
+    else if (tmp == "Tree")
+        value = COL_TYPE_NAVI_DIRECTORY;
+    else
+        return false;
     return true;
 }
 
@@ -651,17 +706,19 @@ bool readStruc(const XmlElement& input, ColumnAttributeRim& value)
     XmlIn in(input);
     bool rv1 = in.attribute("Type",    value.type_);
     bool rv2 = in.attribute("Visible", value.visible_);
-    bool rv3 = in.attribute("Width",   value.width_);
-    return rv1 && rv2 && rv3;
+    bool rv3 = in.attribute("Width",   value.offset_); //offset == width if stretch is 0
+    bool rv4 = in.attribute("Stretch", value.stretch_);
+    return rv1 && rv2 && rv3 && rv4;
 }
 
 template <> inline
 void writeStruc(const ColumnAttributeRim& value, XmlElement& output)
 {
     XmlOut out(output);
-    out.attribute("Type",    value.type_);
-    out.attribute("Visible", value.visible_);
-    out.attribute("Width",   value.width_);
+    out.attribute("Type",     value.type_);
+    out.attribute("Visible",  value.visible_);
+    out.attribute("Width",    value.offset_);
+    out.attribute("Stretch",  value.stretch_);
 }
 
 
@@ -671,8 +728,9 @@ bool readStruc(const XmlElement& input, ColumnAttributeNavi& value)
     XmlIn in(input);
     bool rv1 = in.attribute("Type",    value.type_);
     bool rv2 = in.attribute("Visible", value.visible_);
-    bool rv3 = in.attribute("Width",   value.width_);
-    return rv1 && rv2 && rv3;
+    bool rv3 = in.attribute("Width",   value.offset_); //offset == width if stretch is 0
+    bool rv4 = in.attribute("Stretch", value.stretch_);
+    return rv1 && rv2 && rv3 && rv4;
 }
 
 template <> inline
@@ -681,7 +739,8 @@ void writeStruc(const ColumnAttributeNavi& value, XmlElement& output)
     XmlOut out(output);
     out.attribute("Type",    value.type_);
     out.attribute("Visible", value.visible_);
-    out.attribute("Width",   value.width_);
+    out.attribute("Width",   value.offset_);
+    out.attribute("Stretch", value.stretch_);
 }
 }
 
@@ -747,7 +806,7 @@ void readConfig(const XmlIn& in, FolderPairEnh& enhPair)
         CompConfig altCmpCfg;
         readConfig(inAltCmp, altCmpCfg);
 
-        enhPair.altCmpConfig = std::make_shared<CompConfig>(altCmpCfg);;
+        enhPair.altCmpConfig = std::make_shared<CompConfig>(altCmpCfg);
     }
     //###########################################################
     //alternate sync configuration (optional)
@@ -883,12 +942,14 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inColNavi(config.gui.columnAttribNavi);
 
     inColNavi.attribute("ShowPercentage", config.gui.showPercentBar);
-    inColNavi.attribute("SortByColumn", config.gui.naviLastSortColumn);
-    inColNavi.attribute("SortAscending", config.gui.naviLastSortAscending);
+    inColNavi.attribute("SortByColumn",   config.gui.naviLastSortColumn);
+    inColNavi.attribute("SortAscending",  config.gui.naviLastSortAscending);
 
     XmlIn inMainGrid = inWnd["MainGrid"];
-    inMainGrid.attribute("ShowIcons", config.gui.showIcons);
-    inMainGrid.attribute("IconSize", config.gui.iconSize);
+    inMainGrid.attribute("ShowIcons",  config.gui.showIcons);
+    inMainGrid.attribute("IconSize",   config.gui.iconSize);
+    inMainGrid.attribute("SashOffset", config.gui.sashOffset);
+
 
     XmlIn inColLeft = inMainGrid["ColumnsLeft"];
     inColLeft(config.gui.columnAttribLeft);
@@ -1153,12 +1214,13 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outColNavi(config.gui.columnAttribNavi);
 
     outColNavi.attribute("ShowPercentage", config.gui.showPercentBar);
-    outColNavi.attribute("SortByColumn", config.gui.naviLastSortColumn);
-    outColNavi.attribute("SortAscending", config.gui.naviLastSortAscending);
+    outColNavi.attribute("SortByColumn",   config.gui.naviLastSortColumn);
+    outColNavi.attribute("SortAscending",  config.gui.naviLastSortAscending);
 
     XmlOut outMainGrid = outWnd["MainGrid"];
-    outMainGrid.attribute("ShowIcons", config.gui.showIcons);
-    outMainGrid.attribute("IconSize", config.gui.iconSize);
+    outMainGrid.attribute("ShowIcons",  config.gui.showIcons);
+    outMainGrid.attribute("IconSize",   config.gui.iconSize);
+    outMainGrid.attribute("SashOffset", config.gui.sashOffset);
 
     XmlOut outColLeft = outMainGrid["ColumnsLeft"];
     outColLeft(config.gui.columnAttribLeft);

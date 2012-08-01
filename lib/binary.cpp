@@ -44,7 +44,7 @@ public:
     operator size_t() const { return bufSize; }
 
 private:
-    static const size_t BUFFER_SIZE_MIN   =       128 * 1024;
+    static const size_t BUFFER_SIZE_MIN   =        64 * 1024;
     static const size_t BUFFER_SIZE_START =       512 * 1024; //512 kb seems to be a reasonable initial buffer size
     static const size_t BUFFER_SIZE_MAX   = 16 * 1024 * 1024;
 
@@ -72,9 +72,6 @@ const std::int64_t TICKS_PER_SEC = ticksPerSec();
 
 bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback)
 {
-    FileInput file1(filename1); //throw FileError
-    FileInput file2(filename2); //throw FileError
-
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf1;
     static boost::thread_specific_ptr<std::vector<char>> cpyBuf2;
     if (!cpyBuf1.get())
@@ -84,6 +81,9 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
 
     std::vector<char>& memory1 = *cpyBuf1;
     std::vector<char>& memory2 = *cpyBuf2;
+
+    FileInput file1(filename1); //throw FileError
+    FileInput file2(filename2); //
 
     BufferSize bufferSize;
     UInt64 bytesCompared;

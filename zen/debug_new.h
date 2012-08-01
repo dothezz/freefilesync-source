@@ -18,9 +18,14 @@
 /*overwrite "operator new" to get more detailed error messages on bad_alloc, detect memory leaks and write memory dumps
 Usage:
 - Include everywhere before any other file: $(ProjectDir)\shared\debug_new.h
+
 For Minidumps:
-- Compile "debug_new.cpp"
-- Compile with debugging symbols and optimization deactivated
+-------------
+1. Compile "debug_new.cpp"
+2. Compile "release" build with:
+	- debugging symbols
+	- optimization deactivated
+	- do not suppress frame pointer(/Oy-) - avoid call stack mess up
 */
 
 namespace mem_check

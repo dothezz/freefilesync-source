@@ -24,7 +24,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
     filename_(filename)
 {
 #ifdef FFS_WIN
-    fileHandle = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
+    fileHandle = ::CreateFile(applyLongPathPrefix(filename).c_str(),
                               GENERIC_READ,
                               FILE_SHARE_READ | FILE_SHARE_DELETE,
                               nullptr,
@@ -123,31 +123,54 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
     filename_(filename)
 {
 #ifdef FFS_WIN
-    fileHandle = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
-                              GENERIC_READ | GENERIC_WRITE,
-                              /*  http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx
-                                     quote: When an application creates a file across a network, it is better
-                                     to use GENERIC_READ | GENERIC_WRITE for dwDesiredAccess than to use GENERIC_WRITE alone.
-                                     The resulting code is faster, because the redirector can use the cache manager and send fewer SMBs with more data.
-                                     This combination also avoids an issue where writing to a file across a network can occasionally return ERROR_ACCESS_DENIED. */
-                              FILE_SHARE_DELETE, //FILE_SHARE_DELETE is required to rename file while handle is open!
-                              nullptr,
-                              access == ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW,
-                              FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
-                              nullptr);
+    const DWORD dwCreationDisposition = access == FileOutput::ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW;
+
+    auto getHandle = [&](DWORD dwFlagsAndAttributes)
+    {
+        return ::CreateFile(applyLongPathPrefix(filename).c_str(),
+                            GENERIC_READ | GENERIC_WRITE,
+                            /*  http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx
+                                   quote: When an application creates a file across a network, it is better
+                                   to use GENERIC_READ | GENERIC_WRITE for dwDesiredAccess than to use GENERIC_WRITE alone.
+                                   The resulting code is faster, because the redirector can use the cache manager and send fewer SMBs with more data.
+                                   This combination also avoids an issue where writing to a file across a network can occasionally return ERROR_ACCESS_DENIED. */
+                            FILE_SHARE_DELETE, //FILE_SHARE_DELETE is required to rename file while handle is open!
+                            nullptr,
+                            dwCreationDisposition,
+                            dwFlagsAndAttributes | FILE_FLAG_SEQUENTIAL_SCAN,
+                            nullptr);
+    };
+
+    fileHandle = getHandle(FILE_ATTRIBUTE_NORMAL);
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
-        const DWORD lastError = ::GetLastError();
-        const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + zen::getLastErrorFormatted(lastError);
+        DWORD lastError = ::GetLastError();
 
-        if (lastError == ERROR_FILE_EXISTS || //confirmed to be used
-            lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
-            throw ErrorTargetExisting(errorMessage);
+        //CREATE_ALWAYS fails with ERROR_ACCESS_DENIED if the existing file is hidden or "system" http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
+        if (lastError == ERROR_ACCESS_DENIED &&
+            dwCreationDisposition == CREATE_ALWAYS)
+        {
+            const DWORD attrib = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
+            if (attrib != INVALID_FILE_ATTRIBUTES)
+            {
+                fileHandle = getHandle(attrib); //retry
+                lastError = ::GetLastError();
+            }
+        }
+        //"regular" error handling
+        if (fileHandle == INVALID_HANDLE_VALUE)
+        {
+            const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + zen::getLastErrorFormatted(lastError);
 
-        if (lastError == ERROR_PATH_NOT_FOUND)
-            throw ErrorTargetPathMissing(errorMessage);
+            if (lastError == ERROR_FILE_EXISTS || //confirmed to be used
+                lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
+                throw ErrorTargetExisting(errorMessage);
 
-        throw FileError(errorMessage);
+            if (lastError == ERROR_PATH_NOT_FOUND)
+                throw ErrorTargetPathMissing(errorMessage);
+
+            throw FileError(errorMessage);
+        }
     }
 
 #elif defined FFS_LINUX

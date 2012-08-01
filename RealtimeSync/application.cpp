@@ -9,13 +9,13 @@
 #include <wx/event.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
-#include <wx+/serialize.h>
 #include <wx+/string_conv.h>
-#include <zen/file_handling.h>
 #include "resources.h"
 #include "xml_ffs.h"
 #include "../lib/localization.h"
 #include "../lib/ffs_paths.h"
+#include "../lib/return_codes.h"
+#include "lib/error_log.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -101,12 +101,7 @@ int Application::OnRun()
     auto processException = [](const std::wstring& msg)
     {
         //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
-        try
-        {
-            saveBinStream(getConfigDir() + Zstr("LastError.txt"), utfCvrtTo<std::string>(msg)); //throw FileError
-        }
-        catch (const FileError&) {}
-
+        logError(utfCvrtTo<std::string>(msg));
         wxSafeShowMessage(_("An exception occurred!") + L" - FFS", msg);
     };
 
@@ -117,14 +112,14 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         processException(utfCvrtTo<std::wstring>(e.what()));
-        return -9;
+        return FFS_RC_EXCEPTION;
     }
     catch (...) //catch the rest
     {
         processException(L"Unknown error.");
-        return -9;
+        return FFS_RC_EXCEPTION;
     }
 
-    return 0; //program's return code
+    return FFS_RC_SUCCESS; //program's return code
 }
 

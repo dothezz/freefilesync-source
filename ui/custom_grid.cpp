@@ -39,7 +39,8 @@ const wxColour COLOR_NOT_ACTIVE  (228, 228, 228); //light grey
 const Zstring ICON_FILE_FOLDER = Zstr("folder");
 
 const int CHECK_BOX_IMAGE = 12; //width of checkbox image
-const int CHECK_BOX_WIDTH = CHECK_BOX_IMAGE + 2; //width of first block
+const int CHECK_BOX_SPACE_LEFT = 2;
+const int CHECK_BOX_WIDTH = CHECK_BOX_SPACE_LEFT + CHECK_BOX_IMAGE; //width of first block
 
 const size_t ROW_COUNT_NO_DATA = 10;
 
@@ -58,9 +59,9 @@ class hierarchy:
 
 
 
-void refreshCell(Grid& grid, size_t row, ColumnType colType, size_t compPos)
+void refreshCell(Grid& grid, size_t row, ColumnType colType)
 {
-    wxRect cellArea = grid.getCellArea(row, colType, compPos); //returns empty rect if column not found; absolute coordinates!
+    wxRect cellArea = grid.getCellArea(row, colType); //returns empty rect if column not found; absolute coordinates!
     if (cellArea.height > 0)
     {
         cellArea.SetTopLeft(grid.CalcScrolledPosition(cellArea.GetTopLeft()));
@@ -115,7 +116,7 @@ struct IconManager
 class GridDataBase : public GridData
 {
 public:
-    GridDataBase(Grid& grid) : grid_(grid) {}
+    GridDataBase(Grid& grid, const std::shared_ptr<const zen::GridView>& gridDataView) : grid_(grid), gridDataView_(gridDataView) {}
 
     void holdOwnership(const std::shared_ptr<GridEventManager>& evtMgr) { evtMgr_ = evtMgr; }
 
@@ -123,18 +124,42 @@ protected:
     Grid& refGrid() { return grid_; }
     const Grid& refGrid() const { return grid_; }
 
+    const GridView* getGridDataView() const { return gridDataView_.get(); }
+
+    const FileSystemObject* getRawData(size_t row) const
+    {
+        if (auto view = getGridDataView())
+            return view->getObject(row);
+        return nullptr;
+    }
+
 private:
+    virtual size_t getRowCount() const
+    {
+        if (gridDataView_)
+        {
+            if (gridDataView_->rowsTotal() == 0)
+                return ROW_COUNT_NO_DATA;
+            return gridDataView_->rowsOnView();
+        }
+        else
+            return ROW_COUNT_NO_DATA;
+
+        //return std::max(MIN_ROW_COUNT, gridDataView_ ? gridDataView_->rowsOnView() : 0);
+    }
+
     std::shared_ptr<GridEventManager> evtMgr_;
     Grid& grid_;
-
+    std::shared_ptr<const GridView> gridDataView_;
 };
+
 //########################################################################################################
 
 template <SelectedSide side>
 class GridDataRim : public GridDataBase
 {
 public:
-    GridDataRim(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid, size_t compPos) : GridDataBase(grid), gridDataView_(gridDataView), compPos_(compPos) {}
+    GridDataRim(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) : GridDataBase(grid, gridDataView) {}
 
     void setIconManager(const std::shared_ptr<IconManager>& iconMgr) { iconMgr_ = iconMgr; }
 
@@ -165,7 +190,7 @@ public:
                         if (iconMgr_->iconBuffer.requestFileIcon(fileName))
                         {
                             //do a *full* refresh for *every* failed load to update partial DC updates while scrolling
-                            refreshCell(refGrid(), currentRow, static_cast<ColumnType>(COL_TYPE_FILENAME), compPos_);
+                            refreshCell(refGrid(), currentRow, static_cast<ColumnType>(COL_TYPE_FILENAME));
                             setFailedLoad(currentRow, false);
                         }
                         else //not yet in buffer: mark for async. loading
@@ -203,6 +228,15 @@ protected:
                     //accessibility, support high-contrast schemes => work with user-defined background color!
                     const auto backCol = getBackGroundColor(row);
 
+                    auto incChannel = [](unsigned char c, int diff) { return static_cast<unsigned char>(std::max(0, std::min(255, c + diff))); };
+
+                    auto getAdjustedColor = [&](int diff)
+                    {
+                        return wxColor(incChannel(backCol.Red  (), diff),
+                                       incChannel(backCol.Green(), diff),
+                                       incChannel(backCol.Blue (), diff));
+                    };
+
                     auto colorDist = [](const wxColor& lhs, const wxColor& rhs) //just some metric
                     {
                         return numeric::power<2>(static_cast<int>(lhs.Red  ()) - static_cast<int>(rhs.Red  ())) +
@@ -210,15 +244,10 @@ protected:
                                numeric::power<2>(static_cast<int>(lhs.Blue ()) - static_cast<int>(rhs.Blue ()));
                     };
 
-                    const int levelDiff = 20;
-                    const int level = colorDist(backCol, *wxBLACK) < colorDist(backCol, *wxWHITE) ?
-                                      levelDiff : -levelDiff; //brighten or darken
+                    const int signLevel = colorDist(backCol, *wxBLACK) < colorDist(backCol, *wxWHITE) ? 1 : -1; //brighten or darken
 
-                    auto incChannel = [level](unsigned char c) { return static_cast<unsigned char>(std::max(0, std::min(255, c + level))); };
-
-                    const wxColor backColAlt(incChannel(backCol.Red  ()),
-                                             incChannel(backCol.Green()),
-                                             incChannel(backCol.Blue ()));
+                    const wxColor colOutter = getAdjustedColor(signLevel * 20);
+                    const wxColor colInner  = getAdjustedColor(signLevel * 10);
 
                     //clearArea(dc, rect, backColAlt);
 
@@ -228,8 +257,8 @@ protected:
                     wxRect rectLower = rect;
                     rectLower.y += rectUpper.height;
                     rectLower.height -= rectUpper.height;
-                    dc.GradientFillLinear(rectUpper, backColAlt, getBackGroundColor(row), wxSOUTH);
-                    dc.GradientFillLinear(rectLower, backColAlt, getBackGroundColor(row), wxNORTH);
+                    dc.GradientFillLinear(rectUpper, colOutter, colInner, wxSOUTH);
+                    dc.GradientFillLinear(rectLower, colOutter, colInner, wxNORTH);
                 }
                 else
                     clearArea(dc, rect, getBackGroundColor(row));
@@ -259,8 +288,6 @@ protected:
         return wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
     }
 
-    const FileSystemObject* getRawData(size_t row) const { return gridDataView_ ? gridDataView_->getObject(row) : nullptr; }
-
 private:
     enum DisplayType
     {
@@ -269,7 +296,6 @@ private:
         DISP_TYPE_SYMLINK,
         DISP_TYPE_INACTIVE,
     };
-
 
     DisplayType getRowDisplayType(size_t row) const
     {
@@ -306,20 +332,6 @@ private:
         return output;
     }
 
-    virtual size_t getRowCount() const
-    {
-        if (gridDataView_)
-        {
-            if (gridDataView_->rowsTotal() == 0)
-                return ROW_COUNT_NO_DATA;
-            return gridDataView_->rowsOnView();
-        }
-        else
-            return ROW_COUNT_NO_DATA;
-
-        //return std::max(MIN_ROW_COUNT, gridDataView_ ? gridDataView_->rowsOnView() : 0);
-    }
-
     virtual wxString getValue(size_t row, ColumnType colType) const
     {
         if (const FileSystemObject* fsObj = getRawData(row))
@@ -348,8 +360,9 @@ private:
                             if (!fsObj_.isEmpty<side>())
                                 value = zen::toGuiString(fileObj.getFileSize<side>());
 
-                            //if (!fsObj_.isEmpty<side>()) -> test file id
-                            //	value = toGuiString(fileObj.getFileId<side>().second);
+                            // -> test file id
+                            //if (!fsObj_.isEmpty<side>())
+                            //	value = toGuiString(fileObj.getFileId<side>().second) + L" " + toGuiString(fileObj.getFileId<side>().first);
                             break;
                         case COL_TYPE_DATE: //date
                             if (!fsObj_.isEmpty<side>())
@@ -587,12 +600,12 @@ private:
         drawColumnLabelText(dc, rectInside, getColumnLabel(colType));
 
         //draw sort marker
-        if (gridDataView_)
+        if (getGridDataView())
         {
-            auto sortInfo = gridDataView_->getSortInfo();
+            auto sortInfo = getGridDataView()->getSortInfo();
             if (sortInfo)
             {
-                if (colType == static_cast<ColumnType>(sortInfo->type_) && (compPos_ == gridview::COMP_LEFT) == sortInfo->onLeft_)
+                if (colType == static_cast<ColumnType>(sortInfo->type_) && (side == LEFT_SIDE) == sortInfo->onLeft_)
                 {
                     const wxBitmap& marker = GlobalResources::getImage(sortInfo->ascending_ ? L"sortAscending" : L"sortDescending");
                     wxPoint markerBegin = rectInside.GetTopLeft() + wxPoint((rectInside.width - marker.GetWidth()) / 2, 0);
@@ -639,7 +652,7 @@ private:
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj && !fsObj->isEmpty<side>())
         {
-            toolTip = toWx(gridDataView_->getFolderPairCount() > 1 ? //gridDataView_ bound in this path
+            toolTip = toWx(getGridDataView() && getGridDataView()->getFolderPairCount() > 1 ?
                            fsObj->getFullName<side>() :
                            fsObj->getRelativeName<side>());
 
@@ -669,10 +682,8 @@ private:
         return toolTip;
     }
 
-    std::shared_ptr<const zen::GridView> gridDataView_;
     std::shared_ptr<IconManager> iconMgr_; //optional
     std::vector<char> failedLoads; //effectively a vector<bool> of size "number of rows"
-    const size_t compPos_;
     std::unique_ptr<wxBitmap> buffer; //avoid costs of recreating this temporal variable
 };
 
@@ -680,7 +691,7 @@ private:
 class GridDataLeft : public GridDataRim<LEFT_SIDE>
 {
 public:
-    GridDataLeft(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid, size_t compPos) : GridDataRim<LEFT_SIDE>(gridDataView, grid, compPos) {}
+    GridDataLeft(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) : GridDataRim<LEFT_SIDE>(gridDataView, grid) {}
 
     void setNavigationMarker(std::vector<const HierarchyObject*>&& markedFiles,
                              std::vector<const HierarchyObject*>&& markedContainer)
@@ -754,10 +765,8 @@ private:
 class GridDataRight : public GridDataRim<RIGHT_SIDE>
 {
 public:
-    GridDataRight(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid, size_t compPos) : GridDataRim<RIGHT_SIDE>(gridDataView, grid, compPos) {}
+    GridDataRight(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) : GridDataRim<RIGHT_SIDE>(gridDataView, grid) {}
 };
-
-
 
 
 //########################################################################################################
@@ -766,8 +775,7 @@ class GridDataMiddle : public GridDataBase
 {
 public:
     GridDataMiddle(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) :
-        GridDataBase(grid),
-        gridDataView_(gridDataView),
+        GridDataBase(grid, gridDataView),
         showSyncAction_(true) {}
 
     void onSelectBegin(const wxPoint& clientPos, size_t row, ColumnType colType)
@@ -775,14 +783,14 @@ public:
         if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE &&
             row < refGrid().getRowCount())
         {
-            refGrid().clearSelection(gridview::COMP_MIDDLE);
+            refGrid().clearSelection();
             dragSelection.reset(new std::pair<size_t, BlockPosition>(row, mousePosToBlock(clientPos, row)));
         }
     }
 
     void onSelectEnd(size_t rowFrom, size_t rowTo) //we cannot reuse row from "onSelectBegin": rowFrom and rowTo may be different if user is holding shift
     {
-        refGrid().clearSelection(gridview::COMP_MIDDLE);
+        refGrid().clearSelection();
 
         //issue custom event
         if (dragSelection)
@@ -826,7 +834,7 @@ public:
         }
     }
 
-    void onMouseMovement(const wxPoint& clientPos, size_t row, ColumnType colType, size_t compPos)
+    void onMouseMovement(const wxPoint& clientPos, size_t row, ColumnType colType)
     {
         //manage block highlighting and custom tooltip
         if (dragSelection)
@@ -835,13 +843,13 @@ public:
         }
         else
         {
-            if (compPos == gridview::COMP_MIDDLE && static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE)
+            if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE)
             {
                 if (highlight) //refresh old highlight
-                    refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE), gridview::COMP_MIDDLE);
+                    refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
 
                 highlight.reset(new std::pair<size_t, BlockPosition>(row, mousePosToBlock(clientPos, row)));
-                refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE), gridview::COMP_MIDDLE);
+                refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
 
                 //show custom tooltip
                 showToolTip(row, refGrid().getMainWin().ClientToScreen(clientPos));
@@ -855,7 +863,7 @@ public:
     {
         if (highlight)
         {
-            refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE), gridview::COMP_MIDDLE);
+            refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
             highlight.reset();
         }
 
@@ -865,8 +873,6 @@ public:
     void showSyncAction(bool value) { showSyncAction_ = value; }
 
 private:
-    virtual size_t getRowCount() const { return 0; /*if there are multiple grid components, only the first one will be polled for row count!*/ }
-
     virtual wxString getValue(size_t row, ColumnType colType) const
     {
         if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE)
@@ -891,11 +897,15 @@ private:
             {
                 if (const FileSystemObject* fsObj = getRawData(row))
                 {
-                    wxRect rectInside = drawCellBorder(dc, rect);
+                    //wxRect rectInside = drawCellBorder(dc, rect);
+                    wxRect rectInside = rect;
+
+                    rectInside.width -= CHECK_BOX_SPACE_LEFT;
+                    rectInside.x += CHECK_BOX_SPACE_LEFT;
 
                     //draw checkbox
                     wxRect checkBoxArea = rectInside;
-                    checkBoxArea.SetWidth(CHECK_BOX_WIDTH);
+                    checkBoxArea.SetWidth(CHECK_BOX_IMAGE);
 
                     const bool          rowHighlighted = dragSelection ? row == dragSelection->first : highlight ? row == highlight->first : false;
                     const BlockPosition highlightBlock = dragSelection ? dragSelection->second       : highlight ? highlight->second       : BLOCKPOS_CHECK_BOX;
@@ -905,8 +915,8 @@ private:
                     else //default
                         drawBitmapRtlMirror(dc, GlobalResources::getImage(fsObj->isActive() ? L"checkboxTrue"      : L"checkboxFalse"     ), checkBoxArea, wxALIGN_CENTER, buffer);
 
-                    rectInside.width -= CHECK_BOX_WIDTH;
-                    rectInside.x += CHECK_BOX_WIDTH;
+                    rectInside.width -= CHECK_BOX_IMAGE;
+                    rectInside.x += CHECK_BOX_IMAGE;
 
                     //synchronization preview
                     if (showSyncAction_)
@@ -964,8 +974,6 @@ private:
         }
     }
 
-    const FileSystemObject* getRawData(size_t row) const { return gridDataView_ ? gridDataView_->getObject(row) : nullptr; }
-
     wxColor getBackGroundColor(size_t row) const
     {
         if (const FileSystemObject* fsObj = getRawData(row))
@@ -1019,9 +1027,9 @@ private:
                         case FILE_EQUAL:
                             break; //usually white
                         case FILE_CONFLICT:
+                        case FILE_DIFFERENT_METADATA: //= sub-category of equal, but hint via background that sync direction follows conflict-setting
                             return COLOR_YELLOW;
-                        case FILE_DIFFERENT_METADATA:
-                            return COLOR_YELLOW_LIGHT;
+                            //return COLOR_YELLOW_LIGHT;
                     }
                 }
             }
@@ -1042,7 +1050,7 @@ private:
     {
         const int absX = refGrid().CalcUnscrolledPosition(clientPos).x;
 
-        const wxRect rect = refGrid().getCellArea(row, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE), gridview::COMP_MIDDLE); //returns empty rect if column not found; absolute coordinates!
+        const wxRect rect = refGrid().getCellArea(row, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE)); //returns empty rect if column not found; absolute coordinates!
         if (rect.width > CHECK_BOX_WIDTH && rect.height > 0)
         {
             const FileSystemObject* const fsObj = getRawData(row);
@@ -1136,9 +1144,8 @@ private:
                         case FILE_DIFFERENT:
                             return L"different";
                         case FILE_EQUAL:
+                        case FILE_DIFFERENT_METADATA: //= sub-category of equal
                             return L"equal";
-                        case FILE_DIFFERENT_METADATA:
-                            return L"conflict";
                         case FILE_CONFLICT:
                             return L"conflict";
                     }
@@ -1155,7 +1162,6 @@ private:
 
     virtual wxString getToolTip(ColumnType colType) const { return showSyncAction_ ? _("Action") : _("Category"); }
 
-    std::shared_ptr<const zen::GridView> gridDataView_;
     bool showSyncAction_;
     std::unique_ptr<std::pair<size_t, BlockPosition>> highlight; //(row, block) current mouse highlight
     std::unique_ptr<std::pair<size_t, BlockPosition>> dragSelection; //(row, block)
@@ -1165,58 +1171,108 @@ private:
 
 //########################################################################################################
 
+const wxEventType EVENT_ALIGN_SCROLLBARS = wxNewEventType();
+
 class GridEventManager : private wxEvtHandler
 {
 public:
-    GridEventManager(Grid& grid,
+    GridEventManager(Grid& gridL,
+                     Grid& gridC,
+                     Grid& gridR,
                      GridDataLeft& provLeft,
                      GridDataMiddle& provMiddle,
-                     GridDataRight& provRight) : grid_(grid), provLeft_(provLeft), provMiddle_(provMiddle), provRight_(provRight)
+                     GridDataRight& provRight) :
+        gridL_(gridL), gridC_(gridC), gridR_(gridR),
+        provLeft_(provLeft), provMiddle_(provMiddle), provRight_(provRight)
     {
-        grid_.Connect(EVENT_GRID_COL_RESIZE, GridColumnResizeEventHandler(GridEventManager::onResizeColumn), nullptr, this);
+        gridL_.Connect(EVENT_GRID_COL_RESIZE, GridColumnResizeEventHandler(GridEventManager::onResizeColumnL), nullptr, this);
+        gridR_.Connect(EVENT_GRID_COL_RESIZE, GridColumnResizeEventHandler(GridEventManager::onResizeColumnR), nullptr, this);
 
-        grid_.getMainWin().Connect(wxEVT_MOTION,       wxMouseEventHandler(GridEventManager::onMouseMovement), nullptr, this);
-        grid_.getMainWin().Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(GridEventManager::onMouseLeave   ), nullptr, this);
-        grid_.getMainWin().Connect(wxEVT_KEY_DOWN,     wxKeyEventHandler  (GridEventManager::onKeyDown      ), nullptr, this);
+        gridL_.getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler  (GridEventManager::onKeyDownL), nullptr, this);
+        gridC_.getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler  (GridEventManager::onKeyDownC), nullptr, this);
+        gridR_.getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler  (GridEventManager::onKeyDownR), nullptr, this);
 
-        grid_.Connect(EVENT_GRID_MOUSE_LEFT_DOWN, GridClickEventHandler      (GridEventManager::onSelectBegin), nullptr, this);
-        grid_.Connect(EVENT_GRID_SELECT_RANGE,    GridRangeSelectEventHandler(GridEventManager::onSelectEnd  ), nullptr, this);
+        gridC_.getMainWin().Connect(wxEVT_MOTION,       wxMouseEventHandler(GridEventManager::onCenterMouseMovement), nullptr, this);
+        gridC_.getMainWin().Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(GridEventManager::onCenterMouseLeave   ), nullptr, this);
+
+        gridC_.Connect(EVENT_GRID_MOUSE_LEFT_DOWN, GridClickEventHandler      (GridEventManager::onCenterSelectBegin), nullptr, this);
+        gridC_.Connect(EVENT_GRID_SELECT_RANGE,    GridRangeSelectEventHandler(GridEventManager::onCenterSelectEnd  ), nullptr, this);
+
+        //clear selection of other grid when selecting on
+        gridL_.Connect(EVENT_GRID_SELECT_RANGE,    GridRangeSelectEventHandler(GridEventManager::onGridSelectionL), nullptr, this);
+        gridR_.Connect(EVENT_GRID_SELECT_RANGE,    GridRangeSelectEventHandler(GridEventManager::onGridSelectionR), nullptr, this);
+
+        //parallel grid scrolling: do NOT use DoPrepareDC() to align grids! GDI resource leak! Use regular paint event instead:
+        gridL_.getMainWin().Connect(wxEVT_PAINT, wxEventHandler(GridEventManager::onPaintGridL), NULL, this);
+        gridC_.getMainWin().Connect(wxEVT_PAINT, wxEventHandler(GridEventManager::onPaintGridC), NULL, this);
+        gridR_.getMainWin().Connect(wxEVT_PAINT, wxEventHandler(GridEventManager::onPaintGridR), NULL, this);
+
+        gridL_.Connect(wxEVT_SCROLLWIN_THUMBTRACK, wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
+        gridL_.Connect(wxEVT_SCROLLWIN_PAGEUP,     wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
+        gridL_.Connect(wxEVT_SCROLLWIN_PAGEDOWN,   wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
+        gridL_.Connect(wxEVT_SCROLLWIN_TOP,        wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
+        gridL_.Connect(wxEVT_SCROLLWIN_BOTTOM,     wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
+        gridL_.Connect(wxEVT_SCROLLWIN_LINEUP,     wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
+        gridL_.Connect(wxEVT_SCROLLWIN_LINEDOWN,   wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
+
+        gridR_.Connect(wxEVT_SCROLLWIN_THUMBTRACK, wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
+        gridR_.Connect(wxEVT_SCROLLWIN_PAGEUP,     wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
+        gridR_.Connect(wxEVT_SCROLLWIN_PAGEDOWN,   wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
+        gridR_.Connect(wxEVT_SCROLLWIN_TOP,        wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
+        gridR_.Connect(wxEVT_SCROLLWIN_BOTTOM,     wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
+        gridR_.Connect(wxEVT_SCROLLWIN_LINEUP,     wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
+        gridR_.Connect(wxEVT_SCROLLWIN_LINEDOWN,   wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
+
+        Connect(EVENT_ALIGN_SCROLLBARS, wxEventHandler(GridEventManager::onAlignScrollBars), NULL, this);
     }
 
 private:
-    void onMouseMovement(wxMouseEvent& event)
+    void onCenterSelectBegin(GridClickEvent& event)
     {
-        const wxPoint& topLeftAbs = grid_.CalcUnscrolledPosition(event.GetPosition());
-        const int row = grid_.getRowAtPos(topLeftAbs.y); //returns < 0 if column not found; absolute coordinates!
-        if (auto colInfo = grid_.getColumnAtPos(topLeftAbs.x)) //(column type, component position)
+
+        provMiddle_.onSelectBegin(event.GetPosition(), event.row_, event.colType_);
+        event.Skip();
+    }
+
+    void onCenterSelectEnd(GridRangeSelectEvent& event)
+    {
+        if (event.positive_) //we do NOT want to react on GridRangeSelectEvent() within Grid::clearSelectionAll() directly following right mouse click!
+            provMiddle_.onSelectEnd(event.rowFrom_, event.rowTo_);
+        event.Skip();
+    }
+
+    void onCenterMouseMovement(wxMouseEvent& event)
+    {
+        const wxPoint& topLeftAbs = gridC_.CalcUnscrolledPosition(event.GetPosition());
+        const int row = gridC_.getRowAtPos(topLeftAbs.y); //returns < 0 if column not found; absolute coordinates!
+        if (auto colInfo = gridC_.getColumnAtPos(topLeftAbs.x)) //(column type, component position)
         {
             //redirect mouse movement to middle grid component
-            provMiddle_.onMouseMovement(event.GetPosition(), row, colInfo->first, colInfo->second);
+            provMiddle_.onMouseMovement(event.GetPosition(), row, colInfo->first);
         }
         event.Skip();
     }
 
-    void onMouseLeave(wxMouseEvent& event)
+    void onCenterMouseLeave(wxMouseEvent& event)
     {
         provMiddle_.onMouseLeave();
         event.Skip();
     }
 
-    void onSelectBegin(GridClickEvent& event)
+    void onGridSelectionL(GridRangeSelectEvent& event) { onGridSelection(gridL_, gridR_); event.Skip(); }
+    void onGridSelectionR(GridRangeSelectEvent& event) { onGridSelection(gridR_, gridL_); event.Skip(); }
+
+    void onGridSelection(const Grid& grid, Grid& other)
     {
-        if (event.compPos_ == gridview::COMP_MIDDLE)
-            provMiddle_.onSelectBegin(event.GetPosition(), event.row_, event.colType_);
-        event.Skip();
+        if (!wxGetKeyState(WXK_CONTROL)) //clear other grid unless user is holding CTRL
+            other.clearSelection();
     }
 
-    void onSelectEnd(GridRangeSelectEvent& event)
-    {
-        if (event.compPos_ == gridview::COMP_MIDDLE)
-            provMiddle_.onSelectEnd(event.rowFrom_, event.rowTo_);
-        event.Skip();
-    }
+    void onKeyDownL(wxKeyEvent& event) {  onKeyDown(event, gridL_); }
+    void onKeyDownC(wxKeyEvent& event) {  onKeyDown(event, gridC_); }
+    void onKeyDownR(wxKeyEvent& event) {  onKeyDown(event, gridR_); }
 
-    void onKeyDown(wxKeyEvent& event)
+    void onKeyDown(wxKeyEvent& event, const Grid& grid)
     {
         int keyCode = event.GetKeyCode();
         if (wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft)
@@ -1233,7 +1289,7 @@ private:
 
         //skip middle component when navigating via keyboard
 
-        const auto row =  grid_.getGridCursor().first;
+        const auto row = grid.getGridCursor().first;
 
         if (event.ShiftDown())
             ;
@@ -1244,47 +1300,119 @@ private:
             {
                 case WXK_LEFT:
                 case WXK_NUMPAD_LEFT:
-                    grid_.setGridCursor(row, gridview::COMP_LEFT);
+                    gridL_.setGridCursor(row);
+                    gridL_.SetFocus();
                     return; //swallow event
 
                 case WXK_RIGHT:
                 case WXK_NUMPAD_RIGHT:
-                    grid_.setGridCursor(row, gridview::COMP_RIGHT);
+                    gridR_.setGridCursor(row);
+                    gridR_.SetFocus();
                     return; //swallow event
             }
 
         event.Skip();
     }
 
-    void onResizeColumn(GridColumnResizeEvent& event)
+    void onResizeColumnL(GridColumnResizeEvent& event) { resizeOtherSide(gridL_, gridR_, event.colType_, event.offset_); }
+    void onResizeColumnR(GridColumnResizeEvent& event) { resizeOtherSide(gridR_, gridL_, event.colType_, event.offset_); }
+
+    void resizeOtherSide(const Grid& src, Grid& trg, ColumnType type, ptrdiff_t offset)
     {
-        auto resizeOtherSide = [&](size_t compPosOther)
+        //find stretch factor of resized column: type is unique due to makeConsistent()!
+        std::vector<Grid::ColumnAttribute> cfgSrc = src.getColumnConfig();
+        auto iter = std::find_if(cfgSrc.begin(), cfgSrc.end(), [&](Grid::ColumnAttribute& ca) { return ca.type_ == type; });
+        if (iter == cfgSrc.end())
+            return;
+        const ptrdiff_t stretchSrc = iter->stretch_;
+
+        //we do not propagate resizings on stretched columns to the other side: awkward user experience
+        if (stretchSrc > 0)
+            return;
+
+        //apply resized offset to other side, but only if stretch factors match!
+        std::vector<Grid::ColumnAttribute> cfgTrg = trg.getColumnConfig();
+        std::for_each(cfgTrg.begin(), cfgTrg.end(), [&](Grid::ColumnAttribute& ca)
         {
-            std::vector<Grid::ColumnAttribute> colAttr = grid_.getColumnConfig(compPosOther);
-
-            std::for_each(colAttr.begin(), colAttr.end(), [&](Grid::ColumnAttribute& ca)
-            {
-                if (ca.type_ == event.colType_)
-                    ca.width_ = event.width_;
-            });
-
-            grid_.setColumnConfig(colAttr, compPosOther); //set column count + widths
-        };
-
-        switch (event.compPos_)
-        {
-            case gridview::COMP_LEFT:
-                resizeOtherSide(gridview::COMP_RIGHT);
-                break;
-            case gridview::COMP_MIDDLE:
-                break;
-            case gridview::COMP_RIGHT:
-                resizeOtherSide(gridview::COMP_LEFT);
-                break;
-        }
+            if (ca.type_ == type && ca.stretch_ == stretchSrc)
+                ca.offset_ = offset;
+        });
+        trg.setColumnConfig(cfgTrg);
     }
 
-    Grid& grid_;
+    void onGridAccessL(wxEvent& event) { gridL_.SetFocus(); event.Skip(); }
+    void onGridAccessR(wxEvent& event) { gridR_.SetFocus(); event.Skip(); }
+
+    void onPaintGridL(wxEvent& event) { onPaintGrid(gridL_); event.Skip(); }
+    void onPaintGridC(wxEvent& event) { onPaintGrid(gridC_); event.Skip(); }
+    void onPaintGridR(wxEvent& event) { onPaintGrid(gridR_); event.Skip(); }
+
+    void onPaintGrid(const Grid& grid)
+    {
+        //align scroll positions of all three grids *synchronously* during paint event! (wxGTK has visible delay when this is done asynchronously, no delay on Windows)
+
+        //determine lead grid
+        const Grid* lead = nullptr;
+        Grid* follow1    = nullptr;
+        Grid* follow2    = nullptr;
+        auto setGrids = [&](const Grid& l, Grid& f1, Grid& f2) { lead = &l; follow1 = &f1; follow2 = &f2; };
+
+        if (wxWindow::FindFocus() == &gridC_.getMainWin())
+            setGrids(gridC_, gridL_, gridR_);
+        else if (wxWindow::FindFocus() == &gridR_.getMainWin())
+            setGrids(gridR_, gridL_, gridC_);
+        else //default: left panel
+            setGrids(gridL_, gridC_, gridR_);
+
+        //align other grids only while repainting the lead grid to avoid scrolling and updating a grid at the same time!
+        if (lead != &grid) return;
+
+        auto scroll = [](Grid& target, int y) //support polling
+        {
+            //scroll vertically only - scrolling horizontally becomes annoying if left and right sides have different widths;
+            //e.g. h-scroll on left would be undone when scrolling vertically on right which doesn't have a h-scrollbar
+            int yOld = 0;
+            target.GetViewStart(nullptr, &yOld);
+            if (yOld != y)
+                target.Scroll(-1, y);
+        };
+        int y = 0;
+        lead->GetViewStart(nullptr, &y);
+        scroll(*follow1, y);
+        scroll(*follow2, y);
+
+        //harmonize placement of horizontal scrollbar to avoid grids getting out of sync!
+        //since this affects the grid that is currently repainted as well, we do work asynchronously!
+        //avoids at least this problem: remaining graphics artifact when changing from Grid::SB_SHOW_ALWAYS to Grid::SB_SHOW_NEVER at location of old scrollbar (Windows only)
+        wxCommandEvent alignEvent(EVENT_ALIGN_SCROLLBARS);
+        AddPendingEvent(alignEvent); //waits until next idle event - may take up to a second if the app is busy on wxGTK!
+    }
+
+    void onAlignScrollBars(wxEvent& event)
+    {
+        auto needsHorizontalScrollbars = [](Grid& grid) -> bool
+        {
+            const wxWindow& mainWin = grid.getMainWin();
+            return mainWin.GetVirtualSize().GetWidth() > mainWin.GetClientSize().GetWidth();
+            //assuming Grid::updateWindowSizes() does its job well, this should suffice!
+            //CAVEAT: if horizontal and vertical scrollbar are circular dependent from each other
+            //(h-scrollbar is shown due to v-scrollbar consuming horizontal width, ect...)
+            //while in fact both are NOT needed, this special case results in a bogus need for scrollbars!
+            //see https://sourceforge.net/tracker/?func=detail&aid=3514183&group_id=234430&atid=1093083
+			// => since we're outside the Grid abstraction, we should not duplicate code to handle this special case as it seems to be insignificant
+        };
+
+        Grid::ScrollBarStatus sbStatusX = needsHorizontalScrollbars(gridL_) ||
+                                          needsHorizontalScrollbars(gridR_) ?
+                                          Grid::SB_SHOW_ALWAYS : Grid::SB_SHOW_NEVER;
+        gridL_.showScrollBars(sbStatusX, Grid::SB_SHOW_NEVER);
+        gridC_.showScrollBars(sbStatusX, Grid::SB_SHOW_NEVER);
+        gridR_.showScrollBars(sbStatusX, Grid::SB_SHOW_AUTOMATIC);
+    }
+
+    Grid& gridL_;
+    Grid& gridC_;
+    Grid& gridR_;
     GridDataLeft&   provLeft_;
     GridDataMiddle& provMiddle_;
     GridDataRight& provRight_;
@@ -1293,32 +1421,36 @@ private:
 
 //########################################################################################################
 
-void gridview::init(Grid& grid, const std::shared_ptr<const zen::GridView>& gridDataView)
+void gridview::init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std::shared_ptr<const zen::GridView>& gridDataView)
 {
-    grid.setComponentCount(3);
+    auto provLeft_   = std::make_shared<GridDataLeft  >(gridDataView, gridLeft);
+    auto provMiddle_ = std::make_shared<GridDataMiddle>(gridDataView, gridCenter);
+    auto provRight_  = std::make_shared<GridDataRight >(gridDataView, gridRight);
 
-    auto provLeft_   = std::make_shared<GridDataLeft  >(gridDataView, grid, gridview::COMP_LEFT );
-    auto provMiddle_ = std::make_shared<GridDataMiddle>(gridDataView, grid);
-    auto provRight_  = std::make_shared<GridDataRight >(gridDataView, grid, gridview::COMP_RIGHT);
+    gridLeft  .setDataProvider(provLeft_);   //data providers reference grid =>
+    gridCenter.setDataProvider(provMiddle_); //ownership must belong *exclusively* to grid!
+    gridRight .setDataProvider(provRight_);
 
-    grid.setDataProvider(provLeft_  , gridview::COMP_LEFT);   //data providers reference grid =>
-    grid.setDataProvider(provMiddle_, gridview::COMP_MIDDLE); //ownership must belong *exclusively* to grid!
-    grid.setDataProvider(provRight_ , gridview::COMP_RIGHT);
-
-    auto evtMgr = std::make_shared<GridEventManager>(grid, *provLeft_, *provMiddle_, *provRight_);
+    auto evtMgr = std::make_shared<GridEventManager>(gridLeft, gridCenter, gridRight, *provLeft_, *provMiddle_, *provRight_);
     provLeft_  ->holdOwnership(evtMgr);
     provMiddle_->holdOwnership(evtMgr);
     provRight_ ->holdOwnership(evtMgr);
 
-    grid.enableColumnMove  (false, gridview::COMP_MIDDLE);
-    grid.enableColumnResize(false, gridview::COMP_MIDDLE);
+    gridCenter.enableColumnMove  (false);
+    gridCenter.enableColumnResize(false);
 
+    gridCenter.showRowLabel(false);
+    gridRight .showRowLabel(false);
+
+    //gridLeft  .showScrollBars(Grid::SB_SHOW_AUTOMATIC, Grid::SB_SHOW_NEVER); -> redundant: configuration happens in GridEventManager::onAlignScrollBars()
+    //gridCenter.showScrollBars(Grid::SB_SHOW_NEVER,     Grid::SB_SHOW_NEVER);
+
+    gridCenter.SetSize(60 /*+ 2 * 5*/, -1);
     std::vector<Grid::ColumnAttribute> attribMiddle;
-    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_BORDER), 5));
-    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE), 60));
-    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_BORDER), 5));
-
-    grid.setColumnConfig(attribMiddle, gridview::COMP_MIDDLE);
+    //attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_BORDER), 5, 0, true));
+    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE), 60, 0, true));
+    //attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_BORDER), 5, 0, true));
+    gridCenter.setColumnConfig(attribMiddle);
 }
 
 
@@ -1348,7 +1480,7 @@ std::vector<Grid::ColumnAttribute> gridview::convertConfig(const std::vector<Col
 
     std::vector<Grid::ColumnAttribute> output;
     std::transform(attribClean.begin(), attribClean.end(), std::back_inserter(output),
-    [&](const ColumnAttributeRim& a) { return Grid::ColumnAttribute(static_cast<ColumnType>(a.type_), a.width_, a.visible_); });
+    [&](const ColumnAttributeRim& ca) { return Grid::ColumnAttribute(static_cast<ColumnType>(ca.type_), ca.offset_, ca.stretch_, ca.visible_); });
 
     return output;
 }
@@ -1359,7 +1491,7 @@ std::vector<ColumnAttributeRim> gridview::convertConfig(const std::vector<Grid::
     std::vector<ColumnAttributeRim> output;
 
     std::transform(attribs.begin(), attribs.end(), std::back_inserter(output),
-    [&](const Grid::ColumnAttribute& ca) { return ColumnAttributeRim(static_cast<ColumnTypeRim>(ca.type_), ca.width_, ca.visible_); });
+    [&](const Grid::ColumnAttribute& ca) { return ColumnAttributeRim(static_cast<ColumnTypeRim>(ca.type_), ca.offset_, ca.stretch_, ca.visible_); });
 
     return makeConsistent(output);
 }
@@ -1392,13 +1524,14 @@ private:
 };
 }
 
-void gridview::setupIcons(Grid& grid, bool show, IconBuffer::IconSize sz)
+void gridview::setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, bool show, IconBuffer::IconSize sz)
 {
-    auto* provLeft  = dynamic_cast<GridDataLeft*>(grid.getDataProvider(gridview::COMP_LEFT));
-    auto* provRight = dynamic_cast<GridDataRight*>(grid.getDataProvider(gridview::COMP_RIGHT));
+    auto* provLeft  = dynamic_cast<GridDataLeft*>(gridLeft .getDataProvider());
+    auto* provRight = dynamic_cast<GridDataRight*>(gridRight.getDataProvider());
 
     if (provLeft && provRight)
     {
+        int newRowHeight = 0;
         if (show)
         {
             auto iconMgr = std::make_shared<IconManager>(sz);
@@ -1406,44 +1539,53 @@ void gridview::setupIcons(Grid& grid, bool show, IconBuffer::IconSize sz)
 
             provLeft ->setIconManager(iconMgr);
             provRight->setIconManager(iconMgr);
-            grid.setRowHeight(iconMgr->iconBuffer.getSize() + 1); //+ 1 for line between rows
+            newRowHeight = iconMgr->iconBuffer.getSize() + 1; //+ 1 for line between rows
         }
         else
         {
             provLeft ->setIconManager(nullptr);
             provRight->setIconManager(nullptr);
-            grid.setRowHeight(IconBuffer(IconBuffer::SIZE_SMALL).getSize() + 1); //+ 1 for line between rows
+            newRowHeight = IconBuffer(IconBuffer::SIZE_SMALL).getSize() + 1; //+ 1 for line between rows
         }
-        grid.Refresh();
+        gridLeft  .setRowHeight(newRowHeight);
+        gridCenter.setRowHeight(newRowHeight);
+        gridRight .setRowHeight(newRowHeight);
     }
     else
         assert(false);
 }
 
 
-void gridview::clearSelection(Grid& grid)
+void gridview::clearSelection(Grid& gridLeft, Grid& gridCenter, Grid& gridRight)
 {
-    grid.clearSelection(gridview::COMP_LEFT);
-    grid.clearSelection(gridview::COMP_MIDDLE);
-    grid.clearSelection(gridview::COMP_RIGHT);
+    gridLeft  .clearSelection();
+    gridCenter.clearSelection();
+    gridRight .clearSelection();
+}
+
+void gridview::refresh(Grid& gridLeft, Grid& gridCenter, Grid& gridRight)
+{
+    gridLeft  .Refresh();
+    gridCenter.Refresh();
+    gridRight .Refresh();
 }
 
 
-void gridview::setNavigationMarker(Grid& grid,
+void gridview::setNavigationMarker(Grid& gridLeft,
                                    std::vector<const HierarchyObject*>&& markedFiles,
                                    std::vector<const HierarchyObject*>&& markedContainer)
 {
-    if (auto* provLeft  = dynamic_cast<GridDataLeft*>(grid.getDataProvider(gridview::COMP_LEFT)))
+    if (auto* provLeft  = dynamic_cast<GridDataLeft*>(gridLeft.getDataProvider()))
         provLeft->setNavigationMarker(std::move(markedFiles), std::move(markedContainer));
     else
         assert(false);
-    grid.Refresh();
+    gridLeft.Refresh();
 }
 
 
-void gridview::showSyncAction(Grid& grid, bool value)
+void gridview::showSyncAction(Grid& gridCenter, bool value)
 {
-    if (auto* provMiddle = dynamic_cast<GridDataMiddle*>(grid.getDataProvider(gridview::COMP_MIDDLE)))
+    if (auto* provMiddle = dynamic_cast<GridDataMiddle*>(gridCenter.getDataProvider()))
         provMiddle->showSyncAction(value);
     else
         assert(false);
@@ -1503,9 +1645,9 @@ wxBitmap zen::getCmpResultImage(CompareFilesResult cmpResult)
         case FILE_DIFFERENT:
             return GlobalResources::getImage(L"differentSmall");
         case FILE_EQUAL:
+        case FILE_DIFFERENT_METADATA: //= sub-category of equal
             return GlobalResources::getImage(L"equalSmall");
         case FILE_CONFLICT:
-        case FILE_DIFFERENT_METADATA:
             return GlobalResources::getImage(L"conflictSmall");
     }
     return wxNullBitmap;

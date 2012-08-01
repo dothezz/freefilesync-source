@@ -10,6 +10,18 @@
 <source>Searching for folder %x...</source>
 <target>Suche Ordner %x...</target>
 
+<source>Batch execution</source>
+<target>Batchlauf</target>
+
+<source>Items processed:</source>
+<target>Verarbeitete Elemente:</target>
+
+<source>Items remaining:</source>
+<target>Verbleibende Elemente:</target>
+
+<source>Total time:</source>
+<target>Gesamtzeit:</target>
+
 <source>Show in Explorer</source>
 <target>Im Explorer anzeigen</target>
 
@@ -354,21 +366,6 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>FreeFileSync batch</source>
 <target>FreeFileSync Batch</target>
 
-<source>Batch execution</source>
-<target>Batchlauf</target>
-
-<source>Items processed:</source>
-<target>Verarbeitete Elemente:</target>
-
-<source>Items remaining:</source>
-<target>Verbleibende Elemente:</target>
-
-<source>Total time:</source>
-<target>Gesamtzeit:</target>
-
-<source>Stop</source>
-<target>Stop</target>
-
 <source>Synchronization aborted!</source>
 <target>Synchronisation abgebrochen!</target>
 
@@ -433,7 +430,7 @@ Die Befehlszeile wird ausgelöst wenn:
 <target>Datum</target>
 
 <source>Extension</source>
-<target>Dateiendung</target>
+<target>Erweiterung</target>
 
 <source>Size:</source>
 <target>Größe:</target>
@@ -1257,6 +1254,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Setze Standardwerte für Synchronisationsrichtungen: Alte Dateien werden durch neuere überschrieben.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Der Papierkorb ist für die folgenden Pfade nicht verfügbar! Die Dateien werden stattdessen permanent gelöscht:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>Dieser Fehler kann ignoriert werden, um den Ordner als leer anzusehen.</target>
 
@@ -1265,6 +1265,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationsregeln:</target>
+
+<source>Start comparison</source>
+<target>Starte Vergleich</target>
 
 <source>Preparing synchronization...</source>
 <target>Bereite Synchronisation vor...</target>
@@ -1277,6 +1280,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Files %x have the same date but a different size!</source>
 <target>Die Dateien %x haben dasselbe Datum, aber unterschiedliche Größen!</target>
+
+<source>Items have different attributes</source>
+<target>Die Elemente haben unterschiedliche Attribute</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Die Symbolischen Links %x haben dasselbe Datum, aber ein unterschiedliches Ziel.</target>
@@ -1292,9 +1298,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Both sides are equal</source>
 <target>Beide Seiten sind gleich</target>
-
-<source>Items have different attributes</source>
-<target>Die Elemente haben unterschiedliche Attribute</target>
 
 <source>Copy new item to left</source>
 <target>Kopiere neues Element nach links</target>
@@ -1410,14 +1413,11 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Available:</source>
 <target>Verfügbar:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Der Papierkorb ist auf nachfolgenden Verzeichnissen nicht verfügbar! Die Dateien werden stattdessen permanent gelöscht:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Ein Ordner wird verändert werden, der Teil mehrerer Ordnerpaare ist. Bitte überprüfen Sie die Synchronisationseinstellungen.</target>
 
-<source>Processing folder pair:</source>
-<target>Bearbeite Ordnerpaar:</target>
+<source>Synchronize folder pair:</source>
+<target>Synchronisiere Ordnerpaar:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Der Zielordner %x existiert bereits.</target>

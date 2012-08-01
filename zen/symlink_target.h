@@ -21,6 +21,33 @@
 #endif
 
 
+namespace zen
+{
+#ifdef FFS_WIN
+bool isSymlink(const WIN32_FIND_DATA& data); //*not* a simple FILE_ATTRIBUTE_REPARSE_POINT check!
+bool isSymlink(DWORD fileAttributes, DWORD reparseTag);
+#endif
+
+Zstring getSymlinkRawTargetString(const Zstring& linkPath); //throw FileError
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//################################ implementation ################################
 #ifdef _MSC_VER //I don't have Windows Driver Kit at hands right now, so unfortunately we need to redefine this structures and cross fingers...
 typedef struct _REPARSE_DATA_BUFFER //from ntifs.h
 {
@@ -55,10 +82,11 @@ typedef struct _REPARSE_DATA_BUFFER //from ntifs.h
 #define REPARSE_DATA_BUFFER_HEADER_SIZE   FIELD_OFFSET(REPARSE_DATA_BUFFER, GenericReparseBuffer)
 #endif
 
+
 namespace
 {
 //retrieve raw target data of symlink or junction
-Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
+Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileError
 {
     using namespace zen;
 #ifdef FFS_WIN
@@ -134,6 +162,40 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw FileError
     return Zstring(&buffer[0], bytesWritten);
 #endif
 }
+}
+
+
+namespace zen
+{
+inline
+Zstring getSymlinkRawTargetString(const Zstring& linkPath) { return getSymlinkRawTargetString_impl(linkPath); }
+
+
+#ifdef FFS_WIN
+/*
+ Reparse Point Tags
+	http://msdn.microsoft.com/en-us/library/windows/desktop/aa365511(v=vs.85).aspx
+ WIN32_FIND_DATA structure
+	http://msdn.microsoft.com/en-us/library/windows/desktop/aa365740(v=vs.85).aspx
+
+ The only surrogate reparse points are;
+	IO_REPARSE_TAG_MOUNT_POINT
+	IO_REPARSE_TAG_SYMLINK
+*/
+
+inline
+bool isSymlink(DWORD fileAttributes, DWORD reparseTag)
+{
+    return (fileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0 &&
+           IsReparseTagNameSurrogate(reparseTag);
+}
+
+inline
+bool isSymlink(const WIN32_FIND_DATA& data)
+{
+    return isSymlink(data.dwFileAttributes, data.dwReserved0);
+}
+#endif
 }
 
 #endif // SYMLINK_WIN_H_INCLUDED

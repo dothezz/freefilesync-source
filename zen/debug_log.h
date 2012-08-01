@@ -56,7 +56,7 @@ public:
                const std::string& message)
     {
         const std::string logEntry = "[" + formatTime<std::string>(FORMAT_TIME) + "] " + afterLast(sourceFile, ZEN_FILE_NAME_SEPARATOR) +
-                                     ", line " + numberTo<std::string>(sourceRow) + ": " + message + "\n";
+                                     " (" + numberTo<std::string>(sourceRow) + "): " + message + "\n";
 
         const size_t bytesWritten = ::fwrite(logEntry.c_str(), 1, logEntry.size(), handle);
         if (std::ferror(handle) != 0 || bytesWritten != logEntry.size())

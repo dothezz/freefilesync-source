@@ -74,8 +74,14 @@ bool zen::dirExists(const Zstring& dirname)
 bool zen::symlinkExists(const Zstring& linkname)
 {
 #ifdef FFS_WIN
-    const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(linkname).c_str());
-    return ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
+    WIN32_FIND_DATA fileInfo = {};
+    {
+        const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(linkname).c_str(), &fileInfo);
+        if (searchHandle == INVALID_HANDLE_VALUE)
+            return false;
+        ::FindClose(searchHandle);
+    }
+    return isSymlink(fileInfo);
 
 #elif defined FFS_LINUX
     struct stat fileInfo = {};
@@ -115,8 +121,7 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
     //                                   GetFileExInfoStandard,                  //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
     //                                   &sourceAttr))                           //__out  LPVOID lpFileInformation
 
-    const bool isSymbolicLink = (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
-    if (!isSymbolicLink || procSl == SYMLINK_DIRECT)
+    if (!isSymlink(fileInfo) || procSl == SYMLINK_DIRECT)
     {
         //####################################### DST hack ###########################################
         const bool isDirectory = (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
@@ -1531,7 +1536,21 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
 
 void zen::makeNewDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions) //FileError, ErrorTargetExisting
 {
-    //remove trailing separator
+#ifdef FFS_WIN
+    //special handling for volume root: trying to create existing root directory results in ERROR_ACCESS_DENIED rather than ERROR_ALREADY_EXISTS!
+    const Zstring dirTmp = removeLongPathPrefix(directory);
+    if (dirTmp.size() == 3 &&
+        std::iswalpha(dirTmp[0]) && endsWith(dirTmp, L":\\"))
+    {
+        const ErrorCode lastError = dirExists(dirTmp) ? ERROR_ALREADY_EXISTS : ERROR_PATH_NOT_FOUND;
+
+        const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(dirTmp)) + L"\n\n" + getLastErrorFormatted(lastError);
+        if (lastError == ERROR_ALREADY_EXISTS)
+            throw ErrorTargetExisting(msg);
+        throw FileError(msg);
+    }
+#endif
+    //remove trailing separator (except for volume root directories!)
     const Zstring dirFormatted = endsWith(directory, FILE_NAME_SEPARATOR) ?
                                  beforeLast(directory, FILE_NAME_SEPARATOR) :
                                  directory;
@@ -1550,11 +1569,14 @@ void zen::makeDirectory(const Zstring& directory)
     {
         makeNewDirectory(directory, Zstring(), false); //FileError, ErrorTargetExisting
     }
-    catch (const ErrorTargetExisting&)
+    catch (const FileError& e)
     {
-        if (dirExists(directory))
+        assert(dynamic_cast<const ErrorTargetExisting*>(&e)); (void)e;
+        //could there be situations where a directory/network path exists, but creation fails with
+        //error different than "ErrorTargetExisting"?? => better catch all "FileError" and check existence again
+        if (dirExists(directory)) //technically a file system race-condition!
             return;
-        throw; //clash with file (dir symlink is okay)
+        throw;
     }
 }
 

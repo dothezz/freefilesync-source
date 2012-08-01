@@ -11,9 +11,6 @@
 #include <wx/sound.h>
 #include <wx/tooltip.h> //wxWidgets v2.9
 #include <wx/log.h>
-#include <zen/file_io.h>
-#include <zen/file_handling.h>
-#include <wx+/serialize.h>
 #include <wx+/app_main.h>
 #include "comparison.h"
 #include "algorithm.h"
@@ -24,6 +21,8 @@
 #include "lib/resources.h"
 #include "lib/ffs_paths.h"
 #include "lib/lock_holder.h"
+#include "lib/process_xml.h"
+#include "lib/error_log.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -32,7 +31,12 @@
 using namespace zen;
 using namespace xmlAccess;
 
+
 IMPLEMENT_APP(Application)
+
+void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, const XmlGlobalSettings& settings);
+void runGuiMode(const std::vector<wxString>& cfgFileName, const XmlGlobalSettings& settings);
+void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsReturnCode& returnCode);
 
 
 #ifdef FFS_WIN
@@ -156,11 +160,16 @@ void Application::OnStartApplication(wxIdleEvent&)
     wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
 #endif
 
+    xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
+    setLanguage(globalSettings.programLanguage); //set default language tentatively
+
     try //load global settings from XML: they are written on exit, so read them FIRST
     {
         if (fileExists(toZ(getGlobalConfigFile())))
-            readConfig(globalSettings);
+            readConfig(globalSettings); //throw FfsXmlError
         //else: globalSettings already has default values
+
+        setLanguage(globalSettings.programLanguage);
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
@@ -170,9 +179,6 @@ void Application::OnStartApplication(wxIdleEvent&)
         else
             wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
     }
-
-    //set program language
-    setLanguage(globalSettings.programLanguage);
 
     //determine FFS mode of operation
     std::vector<wxString> commandArgs = getCommandlineArgs(*this);
@@ -232,7 +238,7 @@ void Application::OnStartApplication(wxIdleEvent&)
             {
                 case MERGE_BATCH: //pure batch config files
                     if (commandArgs.size() == 1)
-                        runBatchMode(utfCvrtTo<Zstring>(commandArgs[0]), globalSettings);
+                        runBatchMode(utfCvrtTo<Zstring>(commandArgs[0]), globalSettings, returnCode);
                     else
                         runGuiMode(commandArgs, globalSettings);
                     break;
@@ -278,12 +284,7 @@ int Application::OnRun()
     auto processException = [](const std::wstring& msg)
     {
         //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
-        try
-        {
-            saveBinStream(getConfigDir() + Zstr("LastError.txt"), utfCvrtTo<std::string>(msg)); //throw FileError
-        }
-        catch (const FileError&) {}
-
+        logError(utfCvrtTo<std::string>(msg));
         wxSafeShowMessage(_("An exception occurred!") + L" - FFS", msg);
     };
 
@@ -306,25 +307,6 @@ int Application::OnRun()
 }
 
 
-int Application::OnExit()
-{
-    //get program language
-    globalSettings.programLanguage = getLanguage();
-
-    try //save global settings to XML
-    {
-        xmlAccess::writeConfig(globalSettings);
-    }
-    catch (const xmlAccess::FfsXmlError&)
-    {
-        //wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR); -> not that important/might be tedious in silent batch?
-        assert(false); //get info in debug build
-    }
-
-    return 0;
-}
-
-
 void Application::OnQueryEndSession(wxEvent& event)
 {
     //alas wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/3069
@@ -336,21 +318,21 @@ void Application::OnQueryEndSession(wxEvent& event)
 }
 
 
-void Application::runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, xmlAccess::XmlGlobalSettings& settings)
+void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, const XmlGlobalSettings& settings)
 {
     MainDialog* frame = new MainDialog(std::vector<wxString>(), guiCfg, settings, true);
     frame->Show();
 }
 
 
-void Application::runGuiMode(const std::vector<wxString>& cfgFileNames, xmlAccess::XmlGlobalSettings& settings)
+void runGuiMode(const std::vector<wxString>& cfgFileNames, const XmlGlobalSettings& settings)
 {
     MainDialog* frame = new MainDialog(cfgFileNames, settings);
     frame->Show();
 }
 
 
-void Application::runBatchMode(const Zstring& filename, xmlAccess::XmlGlobalSettings& globSettings)
+void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsReturnCode& returnCode)
 {
     //load XML settings
     XmlBatchConfig batchCfg;  //structure to receive gui settings
@@ -358,9 +340,9 @@ void Application::runBatchMode(const Zstring& filename, xmlAccess::XmlGlobalSett
     {
         readConfig(filename, batchCfg);
     }
-    catch (const xmlAccess::FfsXmlError& error)
+    catch (const xmlAccess::FfsXmlError& e)
     {
-        wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
+        wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
         return;
     }
     //all settings have been read successfully...
@@ -449,4 +431,17 @@ void Application::runBatchMode(const Zstring& filename, xmlAccess::XmlGlobalSett
         }
     }
     catch (BatchAbortProcess&) {} //exit used by statusHandler
+
+
+    try //save global settings to XML: e.g. ignored warnings
+    {
+        xmlAccess::writeConfig(globSettings); //FfsXmlError
+    }
+    catch (const xmlAccess::FfsXmlError& e)
+    {
+        if (batchCfg.handleError == ON_ERROR_POPUP)
+            wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
+        else
+            logError(utfCvrtTo<std::string>(e.toString()));
+    }
 }

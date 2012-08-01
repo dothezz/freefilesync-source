@@ -134,7 +134,7 @@ const T& max(const T& a, const T& b, const T& c)
 
 
 template <class T> inline
-void confine(T& val, const T& minVal, const T& maxVal)
+void confine(T& val, const T& minVal, const T& maxVal) //name trim?
 {
     assert(minVal <= maxVal);
     if (val < minVal)

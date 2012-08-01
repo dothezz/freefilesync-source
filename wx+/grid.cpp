@@ -18,6 +18,7 @@
 #include <zen/scope_guard.h>
 #include <zen/utf.h>
 #include "format_unit.h"
+#include "image_tools.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -26,8 +27,8 @@
 using namespace zen;
 
 
-wxColor zen::getColorSelectionGradientFrom() { return wxColor(137, 172, 255); } //blue: H:158 S:255 V:196
-wxColor zen::getColorSelectionGradientTo  () { return wxColor(225, 234, 255); } //      H:158 S:255 V:240
+wxColor zen::getColorSelectionGradientFrom() { return wxColor(137, 172, 255); } //blue: HSL: 158, 255, 196   HSV: 222, 0.46, 1
+wxColor zen::getColorSelectionGradientTo  () { return wxColor(225, 234, 255); } //      HSL: 158, 255, 240   HSV: 222, 0.12, 1
 
 void zen::clearArea(wxDC& dc, const wxRect& rect, const wxColor& col)
 {
@@ -38,16 +39,17 @@ void zen::clearArea(wxDC& dc, const wxRect& rect, const wxColor& col)
 
 namespace
 {
-//------------ Grid Constants ------------------------------------------------------------------------------------
+//------------ Grid Constants --------------------------------
 const double MOUSE_DRAG_ACCELERATION = 1.5; //unit: [rows / (pixel * sec)] -> same value as Explorer!
 const int DEFAULT_ROW_HEIGHT       = 20;
-const int DEFAULT_COL_LABEL_HEIGHT = 25;
+const int DEFAULT_COL_LABEL_HEIGHT = 24;
 const int COLUMN_BORDER_LEFT       = 4; //for left-aligned text
 const int COLUMN_LABEL_BORDER      = COLUMN_BORDER_LEFT;
 const int COLUMN_MOVE_DELAY        = 5; //unit: [pixel] (from Explorer)
 const int COLUMN_MIN_WIDTH         = 40; //only honored when resizing manually!
 const int ROW_LABEL_BORDER         = 3;
 const int COLUMN_RESIZE_TOLERANCE  = 6; //unit [pixel]
+const int COLUMN_FILL_GAP_TOLERANCE = 10; //enlarge column to fill full width when resizing
 
 const wxColor COLOR_SELECTION_GRADIENT_NO_FOCUS_FROM = wxColour(192, 192, 192); //light grey  wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW);
 const wxColor COLOR_SELECTION_GRADIENT_NO_FOCUS_TO   = wxColour(228, 228, 228);
@@ -62,7 +64,7 @@ const wxColor COLOR_LABEL_GRADIENT_TO_FOCUS   = COLOR_LABEL_GRADIENT_TO;
 wxColor getColorMainWinBackground() { return wxListBox::GetClassDefaultAttributes().colBg; } //cannot be initialized statically on wxGTK!
 
 const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
-//----------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------
 
 
 //a fix for a poor wxWidgets implementation (wxAutoBufferedPaintDC skips one pixel on left side when RTL layout is active)
@@ -328,7 +330,7 @@ public:
         parent_(parent)
     {
         Connect(wxEVT_PAINT, wxPaintEventHandler(SubWindow::onPaintEvent), nullptr, this);
-        Connect(wxEVT_SIZE, wxEventHandler(SubWindow::onSizeEvent),  nullptr, this);
+        Connect(wxEVT_SIZE,  wxSizeEventHandler (SubWindow::onSizeEvent),  nullptr, this);
         //http://wiki.wxwidgets.org/Flicker-Free_Drawing
         Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(SubWindow::onEraseBackGround), nullptr, this);
 
@@ -411,7 +413,7 @@ private:
     virtual void onKeyUp  (wxKeyEvent& event) { event.Skip(); }
     virtual void onKeyDown(wxKeyEvent& event) { event.Skip(); }
 
-    void onPaintEvent(wxPaintEvent& evt)
+    void onPaintEvent(wxPaintEvent& event)
     {
         //wxAutoBufferedPaintDC dc(this); -> this one happily fucks up for RTL layout by not drawing the first column (x = 0)!
         BufferedPaintDC dc(*this, buffer);
@@ -423,13 +425,13 @@ private:
             render(dc, iter.GetRect());
     }
 
-    void onSizeEvent(wxEvent& evt)
+    void onSizeEvent(wxSizeEvent& event)
     {
         Refresh();
-        evt.Skip();
+        event.Skip();
     }
 
-    void onEraseBackGround(wxEraseEvent& evt) {}
+    void onEraseBackGround(wxEraseEvent& event) {}
 
     Grid& parent_;
     std::unique_ptr<wxBitmap> buffer;
@@ -595,12 +597,15 @@ class ColumnResizing
 {
 public:
     ColumnResizing(wxWindow& wnd, size_t col, size_t compPos, ptrdiff_t startWidth, int clientPosX) :
-        wnd_(wnd),
-        col_(col),
-        compPos_(compPos),
-        startWidth_(startWidth),
-        clientPosX_(clientPosX) { wnd_.CaptureMouse(); }
-    ~ColumnResizing() { if (wnd_.HasCapture()) wnd_.ReleaseMouse(); }
+        wnd_(wnd), col_(col), compPos_(compPos), startWidth_(startWidth), clientPosX_(clientPosX)
+    {
+        wnd_.CaptureMouse();
+    }
+    ~ColumnResizing()
+    {
+        if (wnd_.HasCapture())
+            wnd_.ReleaseMouse();
+    }
 
     size_t    getColumn      () const { return col_; }
     size_t    getComponentPos() const { return compPos_; }
@@ -674,7 +679,7 @@ private:
 
         wxPoint labelAreaTL(refParent().CalcScrolledPosition(wxPoint(0, 0)).x, 0); //client coordinates
 
-        std::vector<std::vector<VisibleColumn>> compAbsWidths = refParent().getAbsoluteWidths(); //resolve negative/stretched widths
+        std::vector<std::vector<ColumnWidth>> compAbsWidths = refParent().getColWidths(); //resolve stretched widths
         for (auto iterComp = compAbsWidths.begin(); iterComp != compAbsWidths.end(); ++iterComp)
             for (auto iterCol = iterComp->begin(); iterCol != iterComp->end(); ++iterCol)
             {
@@ -725,17 +730,9 @@ private:
         {
             if (action->wantResize)
             {
-                if (event.LeftDClick()) //auto-size visible range on double-click
-                {
-                    const auto bestWidth = refParent().getBestColumnSize(action->col, action->compPos); //return -1 on error
-                    if (bestWidth >= 0)
-                        refParent().setColWidth(action->col, action->compPos, std::max<ptrdiff_t>(COLUMN_MIN_WIDTH, bestWidth));
-                }
-                else
-                {
-                    if (Opt<size_t> colWidth = refParent().getAbsoluteWidth(action->col, action->compPos))
+                if (!event.LeftDClick()) //double-clicks never seem to arrive here; why is this checked at all???
+                    if (Opt<ptrdiff_t> colWidth = refParent().getColWidth(action->col, action->compPos))
                         activeResizing.reset(new ColumnResizing(*this, action->col, action->compPos, *colWidth, event.GetPosition().x));
-                }
             }
             else //a move or single click
                 activeMove.reset(new ColumnMove(*this, action->col, action->compPos, event.GetPosition().x));
@@ -786,20 +783,17 @@ private:
 
     virtual void onMouseLeftDouble(wxMouseEvent& event)
     {
-        const Opt<ColAction> action = refParent().clientPosToColumnAction(event.GetPosition());
-        if (action && action->wantResize)
-        {
-            //auto-size visible range on double-click
-            const auto bestWidth = refParent().getBestColumnSize(action->col, action->compPos); //return -1 on error
-            if (bestWidth >= 0)
+        if (Opt<ColAction> action = refParent().clientPosToColumnAction(event.GetPosition()))
+            if (action->wantResize)
             {
-                const auto newWidth = std::max<ptrdiff_t>(COLUMN_MIN_WIDTH, bestWidth);
-                refParent().setColWidth(action->col, action->compPos, newWidth);
-
-                if (const Opt<ColumnType> colType = refParent().colToType(action->col, action->compPos))
-                    sendEventNow(GridColumnResizeEvent(newWidth, *colType, action->compPos)); //notify column resize
+                //auto-size visible range on double-click
+                const ptrdiff_t bestWidth = refParent().getBestColumnSize(action->col, action->compPos); //return -1 on error
+                if (bestWidth >= 0)
+                {
+                    refParent().setColWidthAndNotify(bestWidth, action->col, action->compPos);
+                    refParent().Refresh(); //refresh main grid as well!
+                }
             }
-        }
         event.Skip();
     }
 
@@ -810,19 +804,17 @@ private:
             const auto col     = activeResizing->getColumn();
             const auto compPos = activeResizing->getComponentPos();
 
-            if (Opt<size_t> colWidth = refParent().getAbsoluteWidth(col, compPos))
-            {
-                const size_t newWidth = std::max<ptrdiff_t>(COLUMN_MIN_WIDTH, activeResizing->getStartWidth() + event.GetPosition().x - activeResizing->getStartPosX());
-                if (newWidth != *colWidth)
-                {
-                    refParent().setColWidth(col, compPos, newWidth);
+            const ptrdiff_t newWidth = activeResizing->getStartWidth() + event.GetPosition().x - activeResizing->getStartPosX();
 
-                    if (const Opt<ColumnType> colType = refParent().colToType(col, compPos))
-                        sendEventNow(GridColumnResizeEvent(static_cast<int>(newWidth), *colType, compPos)); //notify column resize
+            //set width tentatively
+            refParent().setColWidthAndNotify(newWidth, col, compPos);
 
-                    refParent().Refresh();
-                }
-            }
+            //check if there's a small gap after last column, if yes, fill it
+            int gapWidth = GetClientSize().GetWidth() - refParent().getColWidthsSum(GetClientSize().GetWidth());
+            if (std::abs(gapWidth) < COLUMN_FILL_GAP_TOLERANCE)
+                refParent().setColWidthAndNotify(newWidth + gapWidth, col, compPos);
+
+            refParent().Refresh(); //refresh columns on main grid as well!
         }
         else if (activeMove)
         {
@@ -982,11 +974,11 @@ private:
 
         wxPoint cellAreaTL(refParent().CalcScrolledPosition(wxPoint(0, 0))); //client coordinates
 
-        std::vector<std::vector<VisibleColumn>> compAbsWidths = refParent().getAbsoluteWidths(); //resolve negative/stretched widths
+        std::vector<std::vector<ColumnWidth>> compAbsWidths = refParent().getColWidths(); //resolve stretched widths
         for (auto iterComp = compAbsWidths.begin(); iterComp != compAbsWidths.end(); ++iterComp)
         {
             const ptrdiff_t compWidth = std::accumulate(iterComp->begin(), iterComp->end(), static_cast<ptrdiff_t>(0),
-            [](ptrdiff_t sum, const VisibleColumn& vc) { return sum + vc.width_; });
+            [](ptrdiff_t sum, const ColumnWidth& cw) { return sum + cw.width_; });
 
             const size_t compPos = iterComp - compAbsWidths.begin();
             if (auto prov = refParent().getDataProvider(compPos))
@@ -1058,7 +1050,7 @@ private:
 
     void onMouseDown(wxMouseEvent& event) //handle left and right mouse button clicks (almost) the same
     {
-        if (FindFocus() != this) //doesn't seem to happen automatically for right mouse button
+        if (wxWindow::FindFocus() != this) //doesn't seem to happen automatically for right mouse button
             SetFocus();
 
         const wxPoint absPos = refParent().CalcUnscrolledPosition(event.GetPosition());
@@ -1115,9 +1107,9 @@ private:
             const auto rowTo    = activeSelection->getCurrentRow();
             const auto compPos  = activeSelection->getComponentPos();
             const bool positive = activeSelection->isPositiveSelect();
-            refParent().selectRange(rowFrom, rowTo, compPos, positive);
 
             cursor.first = activeSelection->getCurrentRow(); //slight deviation from Explorer: change cursor while dragging mouse! -> unify behavior with shift + direction keys
+            refParent().selectRange(rowFrom, rowTo, compPos, positive);
 
             activeSelection.reset();
         }
@@ -1425,8 +1417,7 @@ private:
         //=> we cannot use CalcUnscrolledPosition() here which gives the wrong/outdated value!!!
         //=> we need to update asynchronously:
         wxCommandEvent scrollEvent(EVENT_GRID_HAS_SCROLLED);
-        if (wxEvtHandler* evtHandler = GetEventHandler())
-            evtHandler->AddPendingEvent(scrollEvent);
+        AddPendingEvent(scrollEvent); //asynchronously call updateAfterScroll()
     }
 
     void updateAfterScroll(wxCommandEvent&)
@@ -1453,8 +1444,8 @@ Grid::Grid(wxWindow* parent,
            const wxSize& size,
            long style,
            const wxString& name) : wxScrolledWindow(parent, id, pos, size, style | wxWANTS_CHARS, name),
-    showScrollbarX(true),
-    showScrollbarY(true),
+    showScrollbarX(SB_SHOW_AUTOMATIC),
+    showScrollbarY(SB_SHOW_AUTOMATIC),
     colLabelHeight(DEFAULT_COL_LABEL_HEIGHT),
     drawRowLabel(true),
     comp(1),
@@ -1462,7 +1453,7 @@ Grid::Grid(wxWindow* parent,
 {
     Connect(wxEVT_PAINT,            wxPaintEventHandler(Grid::onPaintEvent     ), nullptr, this);
     Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Grid::onEraseBackGround), nullptr, this);
-    Connect(wxEVT_SIZE,             wxEventHandler     (Grid::onSizeEvent      ), nullptr, this);
+    Connect(wxEVT_SIZE,             wxSizeEventHandler (Grid::onSizeEvent      ), nullptr, this);
 
     cornerWin_   = new CornerWin  (*this); //
     rowLabelWin_ = new RowLabelWin(*this); //owership handled by "this"
@@ -1480,67 +1471,129 @@ Grid::Grid(wxWindow* parent,
 
 void Grid::updateWindowSizes(bool updateScrollbar)
 {
-    /* We have to deal with a nasty circular dependency:
+    /* We have to deal with TWO nasty circular dependencies:
+    1.
+    	rowLabelWidth
+    	    /|\
+    	mainWin::client width
+    	    /|\
+    	SetScrollbars -> show/hide horizontal scrollbar depending on client width
+    	    /|\
+    	mainWin::client height -> possibly trimmed by horizontal scrollbars
+    	    /|\
+    	rowLabelWidth
 
+    2.
     	mainWin_->GetClientSize()
-    	  /|\
+    	    /|\
     	SetScrollbars -> show/hide scrollbars depending on whether client size is big enough
-    	  /|\
-    	GetClientRect(); -> possibly trimmed by scrollbars
-    	  /|\
-    	mainWin_->GetClientSize()  -> also trimmed, since it's a sub-window !
+    	    /|\
+    	GetClientSize(); -> possibly trimmed by scrollbars
+    	    /|\
+    	mainWin_->GetClientSize()  -> also trimmed, since it's a sub-window!
     */
 
-    //update scrollbars: showing/hiding scrollbars changes client size!
-    if (updateScrollbar)
+    //break this vicious circle:
+
+    //1. calculate row label width independent from scrollbars
+    const int mainWinHeightGross = std::max(GetSize().GetHeight() - colLabelHeight, 0); //independent from client sizes and scrollbars!
+    const ptrdiff_t logicalHeight = rowLabelWin_->getLogicalHeight();                   //
+
+    int rowLabelWidth = 0;
+    if (drawRowLabel && logicalHeight > 0)
     {
-        //help SetScrollbars() do a better job
-        //mainWin_->SetSize(std::max(0, GetSize().GetWidth () - rowLabelWidth), -> not working!
-        //                  std::max(0, GetSize().GetHeight() - colLabelHeight));
+        ptrdiff_t yFrom = CalcUnscrolledPosition(wxPoint(0, 0)).y;
+        ptrdiff_t yTo   = CalcUnscrolledPosition(wxPoint(0, mainWinHeightGross - 1)).y ;
+        numeric::confine<ptrdiff_t>(yFrom, 0, logicalHeight - 1);
+        numeric::confine<ptrdiff_t>(yTo,   0, logicalHeight - 1);
 
-        int scrollPosX = 0;
-        int scrollPosY = 0;
-        GetViewStart(&scrollPosX, &scrollPosY); //preserve current scroll position
-
-        const int pixPerScrollUnitY = rowLabelWin_->getRowHeight();
-        const int pixPerScrollUnitX = pixPerScrollUnitY;
-
-        const int scrollUnitsX = std::ceil(static_cast<double>(      getMinAbsoluteWidthTotal()) / pixPerScrollUnitX);
-        const int scrollUnitsY = std::ceil(static_cast<double>(rowLabelWin_->getLogicalHeight()) / pixPerScrollUnitY);
-
-        SetScrollbars(pixPerScrollUnitX, pixPerScrollUnitY, //another abysmal wxWidgets design decision: why is precision needlessly reduced to "pixelsPerUnit"????
-                      scrollUnitsX, scrollUnitsY,
-                      scrollPosX,   scrollPosY);
+        const ptrdiff_t rowFrom = rowLabelWin_->getRowAtPos(yFrom);
+        const ptrdiff_t rowTo   = rowLabelWin_->getRowAtPos(yTo);
+        if (rowFrom >= 0 && rowTo >= 0)
+            rowLabelWidth = rowLabelWin_->getBestWidth(rowFrom, rowTo);
     }
 
-    const wxRect clientRect = GetClientRect();
+    auto getMainWinSize = [&](const wxSize& clientSize) { return wxSize(std::max(0, clientSize.GetWidth() - rowLabelWidth), std::max(0, clientSize.GetHeight() - colLabelHeight)); };
 
-    const int mainWinHeight = std::max(0, clientRect.height - colLabelHeight);
-
-    int rowLabelWidth = 0; //calculate optimal row label width
-    if (drawRowLabel)
+    auto setScrollbars2 = [&](int logWidth, int logHeight) //replace SetScrollbars, which loses precision to pixelsPerUnitX for some brain-dead reason
     {
-        const auto heightTotal = rowLabelWin_->getLogicalHeight();
-        if (heightTotal > 0)
-        {
-            ptrdiff_t yFrom = CalcUnscrolledPosition(wxPoint(0, 0)).y;
-            ptrdiff_t yTo   = CalcUnscrolledPosition(wxPoint(0, mainWinHeight - 1)).y ;
-            numeric::confine<ptrdiff_t>(yFrom, 0, heightTotal - 1);
-            numeric::confine<ptrdiff_t>(yTo,   0, heightTotal - 1);
+        int ppsuX = 0; //pixel per scroll unit
+        int ppsuY = 0;
+        GetScrollPixelsPerUnit(&ppsuX, &ppsuY);
 
-            const ptrdiff_t rowFrom = rowLabelWin_->getRowAtPos(yFrom);
-            const ptrdiff_t rowTo   = rowLabelWin_->getRowAtPos(yTo);
-            if (rowFrom >= 0 && rowTo >= 0)
-                rowLabelWidth = rowLabelWin_->getBestWidth(rowFrom, rowTo);
-        }
-    }
+        const int ppsuNew = rowLabelWin_->getRowHeight();
+        if (ppsuX != ppsuNew || ppsuY != ppsuNew) //support polling!
+            SetScrollRate(ppsuNew, ppsuNew); //internally calls AdjustScrollbars()!
 
-    const int mainWinWidth = std::max(0, clientRect.width - rowLabelWidth);
+        mainWin_->SetVirtualSize(logWidth, logHeight);
+        AdjustScrollbars(); //lousy wxWidgets design decision: internally calls mainWin_->GetClientSize() without considering impact of scrollbars!
+        //Attention: setting scrollbars triggers *synchronous* resize event if scrollbars are shown or hidden! => updateWindowSizes() recursion! (Windows)
+    };
+
+    //2. update managed windows' sizes: just assume scrollbars are already set correctly, even if they may not be (yet)!
+    //this ensures mainWin_->SetVirtualSize() and AdjustScrollbars() are working with the correct main window size, unless sb change later, which triggers a recalculation anyway!
+    const wxSize mainWinSize = getMainWinSize(GetClientSize());
 
     cornerWin_  ->SetSize(0, 0, rowLabelWidth, colLabelHeight);
-    rowLabelWin_->SetSize(0, colLabelHeight, rowLabelWidth, mainWinHeight);
-    colLabelWin_->SetSize(rowLabelWidth, 0, mainWinWidth, colLabelHeight);
-    mainWin_    ->SetSize(rowLabelWidth, colLabelHeight, mainWinWidth, mainWinHeight);
+    rowLabelWin_->SetSize(0, colLabelHeight, rowLabelWidth, mainWinSize.GetHeight());
+    colLabelWin_->SetSize(rowLabelWidth, 0, mainWinSize.GetWidth(), colLabelHeight);
+    mainWin_    ->SetSize(rowLabelWidth, colLabelHeight, mainWinSize.GetWidth(), mainWinSize.GetHeight());
+
+    //avoid flicker in wxWindowMSW::HandleSize() when calling ::EndDeferWindowPos() where the sub-windows are moved only although they need to be redrawn!
+    colLabelWin_->Refresh();
+    mainWin_    ->Refresh();
+
+    //3. update scrollbars: "guide wxScrolledHelper to not screw up too much"
+    if (updateScrollbar)
+    {
+        const int mainWinWidthGross = getMainWinSize(GetSize()).GetWidth();
+
+        if (logicalHeight <= mainWinHeightGross &&
+            getColWidthsSum(mainWinWidthGross) <= mainWinWidthGross &&
+            //this special case needs to be considered *only* when both scrollbars are flexible:
+            showScrollbarX == SB_SHOW_AUTOMATIC &&
+            showScrollbarY == SB_SHOW_AUTOMATIC)
+            setScrollbars2(0, 0); //no scrollbars required at all! -> wxScrolledWindow requires active help to detect this special case!
+        else
+        {
+            const int logicalWidthTmp = getColWidthsSum(mainWinSize.GetWidth()); //assuming vertical scrollbar stays as it is...
+            setScrollbars2(logicalWidthTmp, logicalHeight); //if scrollbars are shown or hidden a new resize event recurses into updateWindowSizes()
+            /*
+            is there a risk of endless recursion? No, 2-level recursion at most, consider the following 6 cases:
+
+            <----------gw---------->
+            <----------nw------>
+            ------------------------  /|\   /|\
+            |                   |  |   |     |
+            |     main window   |  |   nh    |
+            |                   |  |   |     gh
+            ------------------------  \|/    |
+            |                   |  |         |
+            ------------------------        \|/
+            	gw := gross width
+            	nw := net width := gross width - sb size
+            	gh := gross height
+            	nh := net height := gross height - sb size
+
+            There are 6 cases that can occur:
+            ---------------------------------
+            	lw := logical width
+            	lh := logical height
+
+            1. lw <= gw && lh <= gh  => no scrollbars needed
+
+            2. lw > gw  && lh > gh   => need both scrollbars
+
+            3. lh > gh
+            	4.1 lw <= nw         => need vertical scrollbar only
+            	4.2 nw < lw <= gw    => need both scrollbars
+
+            4. lw > gw
+            	3.1 lh <= nh         => need horizontal scrollbar only
+            	3.2 nh < lh <= gh    => need both scrollbars
+            */
+        }
+    }
 }
 
 
@@ -1622,6 +1675,7 @@ void Grid::setRowHeight(size_t height)
 {
     rowLabelWin_->setRowHeight(height);
     updateWindowSizes();
+    Refresh();
 }
 
 
@@ -1637,7 +1691,7 @@ void Grid::setColumnConfig(const std::vector<Grid::ColumnAttribute>& attr, size_
                       [&](const ColumnAttribute& ca)
         {
             if (ca.visible_)
-                visibleCols.push_back(Grid::VisibleColumn(ca.type_, ca.width_));
+                visibleCols.push_back(Grid::VisibleColumn(ca.type_, ca.offset_, ca.stretch_));
         });
 
         //set ownership of visible columns
@@ -1673,7 +1727,8 @@ std::vector<Grid::ColumnAttribute> Grid::getColumnConfig(size_t compPos) const
                 {
                     ca.visible_ = true; //paranoia
                     ca.type_    = iterVcols->type_;
-                    ca.width_   = iterVcols->width_;
+                    ca.stretch_ = iterVcols->stretch_;
+                    ca.offset_  = iterVcols->offset_;
                     ++iterVcols;
                 }
             }
@@ -1687,30 +1742,74 @@ std::vector<Grid::ColumnAttribute> Grid::getColumnConfig(size_t compPos) const
 }
 
 
-void Grid::showScrollBars(bool horizontal, bool vertical)
+void Grid::showScrollBars(Grid::ScrollBarStatus horizontal, Grid::ScrollBarStatus vertical)
 {
-#ifdef FFS_WIN
+#if wxCHECK_VERSION(2, 9, 1)
+    int weShouldMigrateToWxWidgetsShowScrollBarsInstead; //lousy compile-time warning, I know ;)
+#endif
+
+    if (showScrollbarX == horizontal &&
+        showScrollbarY == vertical) return; //support polling!
+
     showScrollbarX = horizontal;
     showScrollbarY = vertical;
-    updateWindowSizes();
 
-#elif defined FFS_LINUX //get rid of scrollbars, but preserve scrolling behavior!
+#ifdef FFS_LINUX //get rid of scrollbars, but preserve scrolling behavior!
+    //the following wxGTK approach is pretty much identical to wxWidgets 2.9 ShowScrollbars() code!
+
+    auto mapStatus = [](ScrollBarStatus sbStatus) -> GtkPolicyType
+    {
+        switch (sbStatus)
+        {
+            case SB_SHOW_AUTOMATIC:
+                return GTK_POLICY_AUTOMATIC;
+            case SB_SHOW_ALWAYS:
+                return GTK_POLICY_ALWAYS;
+            case SB_SHOW_NEVER:
+                return GTK_POLICY_NEVER;
+        }
+        assert(false);
+        return GTK_POLICY_AUTOMATIC;
+    };
+
     GtkWidget* gridWidget = wxWindow::m_widget;
     GtkScrolledWindow* scrolledWindow = GTK_SCROLLED_WINDOW(gridWidget);
     gtk_scrolled_window_set_policy(scrolledWindow,
-                                   horizontal ? GTK_POLICY_AUTOMATIC : GTK_POLICY_NEVER,
-                                   vertical   ? GTK_POLICY_AUTOMATIC : GTK_POLICY_NEVER);
+                                   mapStatus(horizontal),
+                                   mapStatus(vertical));
 #endif
+    updateWindowSizes();
 }
 
 
 #ifdef FFS_WIN //get rid of scrollbars, but preserve scrolling behavior!
 void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh)
 {
-    if ((orientation == wxHORIZONTAL && !showScrollbarX) || (orientation == wxVERTICAL && !showScrollbarY))
-        wxWindow::SetScrollbar(orientation, 0, 0, 0, refresh);
+    ScrollBarStatus sbStatus = SB_SHOW_AUTOMATIC;
+    if (orientation == wxHORIZONTAL)
+        sbStatus = showScrollbarX;
+    else if (orientation == wxVERTICAL)
+        sbStatus = showScrollbarY;
     else
-        wxWindow::SetScrollbar(orientation, position, thumbSize, range, refresh);
+        assert(false);
+
+    switch (sbStatus)
+    {
+        case SB_SHOW_AUTOMATIC:
+            wxScrolledWindow::SetScrollbar(orientation, position, thumbSize, range, refresh);
+            break;
+
+        case SB_SHOW_ALWAYS:
+            if (range <= 1) //scrollbars hidden if range == 0 or 1
+                wxScrolledWindow::SetScrollbar(orientation, 0, 199999, 200000, refresh);
+            else
+                wxScrolledWindow::SetScrollbar(orientation, position, thumbSize, range, refresh);
+            break;
+
+        case SB_SHOW_NEVER:
+            wxScrolledWindow::SetScrollbar(orientation, 0, 0, 0, refresh);
+            break;
+    }
 }
 
 
@@ -1735,7 +1834,7 @@ WXLRESULT Grid::MSWDefWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam)
         scrollDelta(rotations * linesPerRotation, 0); //in scroll units
     }
 
-    return wxScrolledWindow::MSWDefWindowProc(nMsg, wParam, lParam);;
+    return wxScrolledWindow::MSWDefWindowProc(nMsg, wParam, lParam);
 }
 #endif
 
@@ -1748,23 +1847,23 @@ wxWindow& Grid::getMainWin    () { return *mainWin_;     }
 
 wxRect Grid::getColumnLabelArea(ColumnType colType, size_t compPos) const
 {
-    std::vector<std::vector<VisibleColumn>> compAbsWidths = getAbsoluteWidths(); //resolve negative/stretched widths
+    std::vector<std::vector<ColumnWidth>> compAbsWidths = getColWidths(); //resolve negative/stretched widths
     if (compPos < compAbsWidths.size())
     {
         auto iterComp = compAbsWidths.begin() + compPos;
 
-        auto iterCol = std::find_if(iterComp->begin(), iterComp->end(), [&](const VisibleColumn& vc) { return vc.type_ == colType; });
+        auto iterCol = std::find_if(iterComp->begin(), iterComp->end(), [&](const ColumnWidth& cw) { return cw.type_ == colType; });
         if (iterCol != iterComp->end())
         {
             ptrdiff_t posX = std::accumulate(compAbsWidths.begin(), iterComp, static_cast<ptrdiff_t>(0),
-                                             [](ptrdiff_t sum, const std::vector<VisibleColumn>& cols)
+                                             [](ptrdiff_t sum, const std::vector<ColumnWidth>& cols)
             {
                 return sum + std::accumulate(cols.begin(), cols.end(), static_cast<ptrdiff_t>(0),
-                [](ptrdiff_t val2, const VisibleColumn& vc) { return val2 + vc.width_; });
+                [](ptrdiff_t val2, const ColumnWidth& cw) { return val2 + cw.width_; });
             });
 
             posX += std::accumulate(iterComp->begin(), iterCol, static_cast<ptrdiff_t>(0),
-            [](ptrdiff_t sum, const VisibleColumn& vc) { return sum + vc.width_; });
+            [](ptrdiff_t sum, const ColumnWidth& cw) { return sum + cw.width_; });
 
             return wxRect(wxPoint(posX, 0), wxSize(iterCol->width_, colLabelHeight));
         }
@@ -1780,7 +1879,7 @@ Opt<Grid::ColAction> Grid::clientPosToColumnAction(const wxPoint& pos) const
     {
         ptrdiff_t accuWidth = 0;
 
-        std::vector<std::vector<VisibleColumn>> compAbsWidths = getAbsoluteWidths(); //resolve negative/stretched widths
+        std::vector<std::vector<ColumnWidth>> compAbsWidths = getColWidths(); //resolve stretched widths
         for (auto iterComp = compAbsWidths.begin(); iterComp != compAbsWidths.end(); ++iterComp)
         {
             const size_t compPos =  iterComp - compAbsWidths.begin();
@@ -1833,17 +1932,17 @@ void Grid::moveColumn(size_t colFrom, size_t colTo, size_t compPos)
 
 ptrdiff_t Grid::clientPosToMoveTargetColumn(const wxPoint& pos, size_t compPos) const
 {
-    std::vector<std::vector<VisibleColumn>> compAbsWidths = getAbsoluteWidths(); //resolve negative/stretched widths
+    std::vector<std::vector<ColumnWidth>> compAbsWidths = getColWidths(); //resolve negative/stretched widths
     if (compPos < compAbsWidths.size())
     {
         auto iterComp = compAbsWidths.begin() + compPos;
         const int absPosX = CalcUnscrolledPosition(pos).x;
 
         ptrdiff_t accuWidth = std::accumulate(compAbsWidths.begin(), iterComp, static_cast<ptrdiff_t>(0),
-                                              [](ptrdiff_t sum, const std::vector<VisibleColumn>& cols)
+                                              [](ptrdiff_t sum, const std::vector<ColumnWidth>& cols)
         {
             return sum + std::accumulate(cols.begin(), cols.end(), static_cast<ptrdiff_t>(0),
-            [](ptrdiff_t sum2, const VisibleColumn& vc) { return sum2 + vc.width_; });
+            [](ptrdiff_t sum2, const ColumnWidth& cw) { return sum2 + cw.width_; });
         });
 
         for (auto iterCol = iterComp->begin(); iterCol != iterComp->end(); ++iterCol)
@@ -1862,12 +1961,8 @@ ptrdiff_t Grid::clientPosToMoveTargetColumn(const wxPoint& pos, size_t compPos) 
 
 Opt<ColumnType> Grid::colToType(size_t col, size_t compPos) const
 {
-    if (compPos < comp.size())
-    {
-        auto& visibleCols = comp[compPos].visibleCols;
-        if (col < visibleCols.size())
-            return visibleCols[col].type_;
-    }
+    if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
+        return comp[compPos].visibleCols[col].type_;
     return NoValue();
 }
 
@@ -1879,7 +1974,7 @@ Opt<std::pair<ColumnType, size_t>> Grid::getColumnAtPos(int posX) const
 {
     if (posX >= 0)
     {
-        std::vector<std::vector<VisibleColumn>> compAbsWidths = getAbsoluteWidths(); //resolve negative/stretched widths
+        std::vector<std::vector<ColumnWidth>> compAbsWidths = getColWidths(); //resolve negative/stretched widths
 
         ptrdiff_t accWidth = 0;
         for (auto iterComp = compAbsWidths.begin(); iterComp != compAbsWidths.end(); ++iterComp)
@@ -1905,15 +2000,26 @@ wxRect Grid::getCellArea(size_t row, ColumnType colType, size_t compPos) const
 }
 
 
+void Grid::clearSelection(size_t compPos)
+{
+    if (compPos < comp.size())
+    {
+        comp[compPos].selection.clear();
+        mainWin_->Refresh();
+    }
+}
+
+
 void Grid::setGridCursor(size_t row, size_t compPos)
 {
     if (compPos < comp.size())
     {
+        mainWin_->setCursor(row, compPos);
+        mainWin_->makeRowVisible(row);
+
         std::for_each(comp.begin(), comp.end(), [](Grid::Component& c) { c.selection.clear(); }); //clear selection, do NOT fire event
         selectRange(row, row, compPos); //set new selection + fire event
 
-        mainWin_->setCursor(row, compPos);
-        mainWin_->makeRowVisible(row);
         mainWin_->Refresh();
         rowLabelWin_->Refresh(); //row labels! (Kubuntu)
     }
@@ -1938,12 +2044,17 @@ void Grid::selectRange(ptrdiff_t rowFrom, ptrdiff_t rowTo, size_t compPos, bool 
 
 void Grid::clearSelectionAll()
 {
-    std::for_each(comp.begin(), comp.end(), [](Grid::Component& c) { c.selection.clear(); });
+    for (auto iter = comp.begin(); iter != comp.end(); ++iter)
+    {
+        Grid::Component& c = *iter;
+        c.selection.clear();
 
-    //notify event
-    GridRangeSelectEvent unselectionEvent(-1, -1, static_cast<size_t>(-1), false);
-    if (wxEvtHandler* evtHandler = GetEventHandler())
-        evtHandler->ProcessEvent(unselectionEvent);
+        //notify event
+        const size_t compPos = iter - comp.begin();
+        GridRangeSelectEvent unselectionEvent(-1, -1, compPos, false);
+        if (wxEvtHandler* evtHandler = GetEventHandler())
+            evtHandler->ProcessEvent(unselectionEvent);
+    }
 }
 
 
@@ -1956,13 +2067,17 @@ void Grid::scrollTo(size_t row)
         GetScrollPixelsPerUnit(nullptr, &pixelsPerUnitY);
         if (pixelsPerUnitY > 0)
         {
-            int scrollPosX = 0;
-            GetViewStart(&scrollPosX, nullptr);
-            int scrollPosY = labelRect.GetTopLeft().y / pixelsPerUnitY;
+            const int scrollPosYNew = labelRect.GetTopLeft().y / pixelsPerUnitY;
+            int scrollPosXOld = 0;
+            int scrollPosYOld = 0;
+            GetViewStart(&scrollPosXOld, &scrollPosYOld);
 
-            Scroll(scrollPosX, scrollPosY);
-            updateWindowSizes(); //may show horizontal scroll bar
-            Refresh();
+            if (scrollPosYOld != scrollPosYNew) //support polling
+            {
+                Scroll(scrollPosXOld, scrollPosYNew);
+                updateWindowSizes(); //may show horizontal scroll bar
+                Refresh();
+            }
         }
     }
 }
@@ -2000,6 +2115,43 @@ ptrdiff_t Grid::getBestColumnSize(size_t col, size_t compPos) const
 }
 
 
+void Grid::setColWidthAndNotify(ptrdiff_t width, size_t col, size_t compPos, bool notifyAsync)
+{
+    if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
+    {
+        VisibleColumn& vcRs = comp[compPos].visibleCols[col];
+        const int mainWinWidth = mainWin_->GetClientSize().GetWidth();
+        const ptrdiff_t stretchTotal = getStretchTotal();
+
+        const ptrdiff_t offset = width - getColStretchedWidth(vcRs.stretch_, stretchTotal, mainWinWidth); //width := stretchedWidth + (normalized) offset
+        vcRs.offset_ = offset;
+
+        //I. width may be < COLUMN_MIN_WIDTH: for non-stretched columns this doesn't matter, since it's normalized in getColWidths() anyway,
+        //	for stretched columns on the other hand negative width would be evaluated *before* normalization! => need to normalize here!
+        //II. worse: resizing any column should normalize *all* other stretched columns' offsets considering current mainWinWidth!
+	    //  Testcase: 1. make main window so small in width that horizontal scrollbars are shown despite existing streched column. 
+		//	2. resize a fixed size column so that scrollbars vanish. 3. verify that the stretched column is resizing immediately while main dialog is enlarged
+        std::for_each(comp.begin(), comp.end(), [&](Component& c)
+        {
+            std::for_each(c.visibleCols.begin(), c.visibleCols.end(), [&](VisibleColumn& vc)
+            {
+                const ptrdiff_t stretchedWidth = Grid::getColStretchedWidth(vc.stretch_, stretchTotal, mainWinWidth);
+                vc.offset_ = std::max(vc.offset_, COLUMN_MIN_WIDTH - stretchedWidth); //it would suffice to normalize stretched columns only
+            });
+        });
+
+        GridColumnResizeEvent sizeEvent(offset, vcRs.type_, compPos);
+        if (wxEvtHandler* evtHandler = GetEventHandler())
+        {
+            if (notifyAsync)
+                evtHandler->AddPendingEvent(sizeEvent);
+            else
+                evtHandler->ProcessEvent(sizeEvent);
+        }
+    }
+}
+
+
 void Grid::autoSizeColumns(size_t compPos)
 {
     if (compPos < comp.size() && comp[compPos].allowColumnResize)
@@ -2007,18 +2159,10 @@ void Grid::autoSizeColumns(size_t compPos)
         auto& visibleCols = comp[compPos].visibleCols;
         for (auto iter = visibleCols.begin(); iter != visibleCols.end(); ++iter)
         {
-            const int col = iter - visibleCols.begin();
-            const int bestWidth = getBestColumnSize(col, compPos); //return -1 on error
+            const size_t col = iter - visibleCols.begin();
+            const ptrdiff_t bestWidth = getBestColumnSize(col, compPos); //return -1 on error
             if (bestWidth >= 0)
-            {
-                const auto newWidth = std::max(COLUMN_MIN_WIDTH, bestWidth);
-                iter->width_ = newWidth;
-
-                //notify column resize (asynchronously!)
-                GridColumnResizeEvent sizeEvent(newWidth, iter->type_, compPos);
-                if (wxEvtHandler* evtHandler = GetEventHandler())
-                    evtHandler->AddPendingEvent(sizeEvent);
-            }
+                setColWidthAndNotify(bestWidth, col, compPos, true);
         }
         updateWindowSizes();
         Refresh();
@@ -2026,80 +2170,59 @@ void Grid::autoSizeColumns(size_t compPos)
 }
 
 
-ptrdiff_t Grid::getMinAbsoluteWidthTotal() const
+ptrdiff_t Grid::getStretchTotal() const //sum of all stretch factors
 {
-    ptrdiff_t minWidthTotal = 0;
-    //bool haveStretchedCols = false;
-    std::for_each(comp.begin(), comp.end(),
-                  [&](const Component& c)
+    return std::accumulate(comp.begin(), comp.end(), static_cast<ptrdiff_t>(0),
+                           [](ptrdiff_t sum, const Component& c)
     {
-        std::for_each(c.visibleCols.begin(), c.visibleCols.end(),
-                      [&](const VisibleColumn& vc)
-        {
-            if (vc.width_ >= 0)
-                minWidthTotal += vc.width_;
-            else
-            {
-                //haveStretchedCols = true;
-                minWidthTotal += COLUMN_MIN_WIDTH; //use "min width" if column is stretched
-            }
-        });
+        return sum + std::accumulate(c.visibleCols.begin(), c.visibleCols.end(), static_cast<ptrdiff_t>(0),
+        [](ptrdiff_t val2, const Grid::VisibleColumn& vc) { return val2 + vc.stretch_; });
     });
-    return minWidthTotal;
 }
 
 
-std::vector<std::vector<Grid::VisibleColumn>> Grid::getAbsoluteWidths() const //evaluate negative widths as stretched absolute values! structure matches "comp"
+ptrdiff_t Grid::getColStretchedWidth(ptrdiff_t stretch, ptrdiff_t stretchTotal, int mainWinWidth) //final width = stretchedWidth + (normalized) offset
 {
-    std::vector<std::vector<VisibleColumn>> output;
+    return stretchTotal > 0 ? mainWinWidth * stretch / stretchTotal : 0; //rounds down! => not all of clientWidth is correctly distributed according to stretch factors
+}
 
-    std::vector<std::pair<ptrdiff_t, VisibleColumn*>> stretchedCols; //(factor, column to stretch)
-    ptrdiff_t factorTotal   = 0;
-    ptrdiff_t minWidthTotal = 0;
 
-    output.reserve(comp.size());
-    std::for_each(comp.begin(), comp.end(),
-                  [&](const Component& c)
+std::vector<std::vector<Grid::ColumnWidth>> Grid::getColWidths() const
+{
+    return getColWidths(mainWin_->GetClientSize().GetWidth());
+}
+
+
+std::vector<std::vector<Grid::ColumnWidth>> Grid::getColWidths(int mainWinWidth) const //evaluate stretched columns; structure matches "comp"
+{
+    std::vector<std::vector<ColumnWidth>> output;
+
+    const ptrdiff_t stretchTotal = getStretchTotal();
+
+    std::for_each(comp.begin(), comp.end(), [&](const Component& c)
     {
-        output.push_back(std::vector<VisibleColumn>());
+        output.push_back(std::vector<ColumnWidth>());
         auto& compWidths = output.back();
 
-        compWidths.reserve(c.visibleCols.size());
-        std::for_each(c.visibleCols.begin(), c.visibleCols.end(),
-                      [&](const VisibleColumn& vc)
+        std::for_each(c.visibleCols.begin(), c.visibleCols.end(), [&](const VisibleColumn& vc)
         {
-            if (vc.width_ >= 0)
-            {
-                compWidths.push_back(Grid::VisibleColumn(vc.type_, vc.width_));
-                minWidthTotal += vc.width_;
-            }
-            else //stretched column
-            {
-                compWidths.push_back(Grid::VisibleColumn(vc.type_, COLUMN_MIN_WIDTH)); //use "min width" if column is stretched
-                minWidthTotal += COLUMN_MIN_WIDTH;
+            const ptrdiff_t stretchedWidth = Grid::getColStretchedWidth(vc.stretch_, stretchTotal, mainWinWidth);
+            const ptrdiff_t widthNormalized = std::max(stretchedWidth + vc.offset_, static_cast<ptrdiff_t>(COLUMN_MIN_WIDTH));
 
-                stretchedCols.push_back(std::make_pair(vc.width_, &compWidths.back()));
-                factorTotal += vc.width_;
-            }
+            compWidths.push_back(Grid::ColumnWidth(vc.type_, widthNormalized));
         });
     });
-
-    if (!stretchedCols.empty())
-    {
-        const ptrdiff_t widthToFill = mainWin_->GetClientSize().GetWidth() - minWidthTotal;
-        if (widthToFill > 0)
-        {
-            int widthRemaining = widthToFill;
-            for (auto iter = stretchedCols.begin(); iter != stretchedCols.end(); ++iter)
-            {
-                const ptrdiff_t addWidth = (widthToFill * iter->first) / factorTotal; //round down
-                iter->second->width_ += addWidth;
-                widthRemaining -= addWidth;
-            }
-
-            if (widthRemaining > 0) //should be empty, except for rounding errors
-                stretchedCols.back().second->width_ += widthRemaining;
-        }
-    }
     return output;
 }
+
+
+ptrdiff_t Grid::getColWidthsSum(int mainWinWidth) const
+{
+    auto widths = getColWidths(mainWinWidth);
+    return std::accumulate(widths.begin(), widths.end(), static_cast<ptrdiff_t>(0),
+                           [](ptrdiff_t sum, const std::vector<Grid::ColumnWidth>& cols)
+    {
+        return sum + std::accumulate(cols.begin(), cols.end(), static_cast<ptrdiff_t>(0),
+        [](ptrdiff_t val2, const Grid::ColumnWidth& cw) { return val2 + cw.width_; });
+    });
+};

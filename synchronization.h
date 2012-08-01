@@ -37,7 +37,7 @@ public:
     typedef std::vector<std::pair<Zstring, std::wstring> > ConflictTexts; // Pair(filename/conflict text)
     const ConflictTexts& getConflictMessages() const { return conflictMsgs; }
 
-    zen::Int64 getDataToProcess() const { return dataToProcess; }
+    Int64 getDataToProcess() const { return dataToProcess; }
     size_t     getRowCount()      const { return rowsTotal; }
 
 private:
@@ -55,7 +55,7 @@ private:
     int deleteLeft, deleteRight;
     //    int conflict;
     ConflictTexts conflictMsgs; //conflict texts to display as a warning message
-    zen::Int64 dataToProcess;
+    Int64 dataToProcess;
     size_t rowsTotal;
 };
 

@@ -161,11 +161,11 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
                 if (!differentFilesActive) return false;
                 break;
             case FILE_EQUAL:
+            case FILE_DIFFERENT_METADATA: //= sub-category of equal
                 output.existsEqual = true;
                 if (!equalFilesActive) return false;
                 break;
             case FILE_CONFLICT:
-            case FILE_DIFFERENT_METADATA: //no extra button on screen
                 output.existsConflict = true;
                 if (!conflictFilesActive) return false;
                 break;

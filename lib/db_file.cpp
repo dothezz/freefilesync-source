@@ -5,21 +5,12 @@
 // **************************************************************************
 
 #include "db_file.h"
-#include <zen/file_error.h>
 #include <zen/file_handling.h>
 #include <zen/scope_guard.h>
 #include <zen/guid.h>
 #include <zen/utf.h>
+#include <zen/serialize.h>
 #include <wx+/zlib_wrap.h>
-#include <wx+/serialize.h>
-
-#ifdef FFS_WIN
-warn_static("get rid of wx headers")
-#endif
-#include <wx/wfstream.h>
-#include <wx/zstream.h>
-#include <wx/mstream.h>
-#include <zen/perf.h>
 
 #ifdef FFS_WIN
 #include <zen/win.h> //includes "windows.h"
@@ -91,13 +82,6 @@ void saveStreams(const StreamMapping& streamList, const Zstring& filename) //thr
 }
 
 
-#ifdef FFS_WIN
-warn_static("remove after migration")
-#endif
-
-StreamMapping loadStreams_v8(const Zstring& filename); //throw FileError
-
-
 StreamMapping loadStreams(const Zstring& filename) //throw FileError, FileErrorDatabaseNotExisting
 {
     try
@@ -113,13 +97,7 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError, FileErrorD
 
         const int version = readNumber<std::int32_t>(streamIn); //throw UnexpectedEndOfStreamError
         if (version != FILE_FORMAT_VER) //read file format version#
-            //throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
-            return loadStreams_v8(filename);
-
-        #ifdef FFS_WIN
-warn_static("fix after migration")
-#endif
-
+            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
 
         //read stream lists
         StreamMapping output;
@@ -153,10 +131,6 @@ warn_static("fix after migration")
 
 //#######################################################################################################################################
 
-#ifdef FFS_WIN
-warn_static("remove v8Compatibilty after migration")
-#endif
-
 class StreamGenerator //for db-file back-wards compatibility we stick with two output streams until further
 {
 public:
@@ -164,8 +138,7 @@ public:
                         const Zstring& filenameL, //used for diagnostics only
                         const Zstring& filenameR,
                         BinaryStream& streamL,
-                        BinaryStream& streamR,
-                        bool v8Compatibilty)
+                        BinaryStream& streamR)
     {
         StreamGenerator generator;
 
@@ -209,12 +182,6 @@ public:
 
         size_t size1stPart = tmpB.size() / 2;
         size_t size2ndPart = tmpB.size() - size1stPart;
-
-        if (v8Compatibilty)
-        {
-            size1stPart = tmpB.size();
-            size2ndPart = 0;
-        }
 
         writeNumber<std::uint64_t>(outL, size1stPart);
         writeNumber<std::uint64_t>(outR, size2ndPart);
@@ -326,13 +293,8 @@ public:
 
             bool has1stPartL = readNumber<bool>(inL); //throw UnexpectedEndOfStreamError
             bool has1stPartR = readNumber<bool>(inR); //
-
-#ifdef FFS_WIN
-warn_static("restore check after migration!")
-#endif
-
-            //if (has1stPartL == has1stPartR)
-            //    throw UnexpectedEndOfStreamError();
+            if (has1stPartL == has1stPartR)
+                throw UnexpectedEndOfStreamError();
 
             BinStreamIn& in1stPart = has1stPartL ? inL : inR;
             BinStreamIn& in2ndPart = has1stPartL ? inR : inL;
@@ -766,7 +728,7 @@ void zen::saveLastSynchronousState(const BaseDirMapping& baseMapping) //throw Fi
                              dbNameLeft,
                              dbNameRight,
                              updatedStreamLeft,
-                             updatedStreamRight, false); //throw FileError
+                             updatedStreamRight); //throw FileError
 
     //check if there is some work to do at all
     if (streamIterLeftOld  != streamListLeft .end() && updatedStreamLeft  == streamIterLeftOld ->second &&
@@ -802,180 +764,4 @@ void zen::saveLastSynchronousState(const BaseDirMapping& baseMapping) //throw Fi
 
     guardTempFileLeft. dismiss(); //no need to delete temp file anymore
     guardTempFileRight.dismiss(); //
-}
-
-#ifdef FFS_WIN
-warn_static("remove after migration")
-#endif
-
-namespace
-{
-class CheckedDbReader : public CheckedReader
-{
-public:
-    CheckedDbReader(wxInputStream& stream, const Zstring& errorObjName) : CheckedReader(stream), errorObjName_(errorObjName) {}
-
-private:
-    virtual void throwException() const { throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(errorObjName_))); }
-
-    const Zstring errorObjName_;
-};
-
-
-class StreamParser_v8 //for db-file back-wards compatibility we stick with two output streams until further
-{
-public:
-    static std::shared_ptr<InSyncDir> execute(const BinaryStream& streamL, const BinaryStream& streamR, //throw FileError
-                                              const Zstring& filenameL, //used for diagnostics only
-                                              const Zstring& filenameR)
-    {
-        try
-        {
-            auto output = std::make_shared<InSyncDir>(InSyncDir::STATUS_IN_SYNC);
-            StreamParser_v8 parser(streamL, streamR); //throw UnexpectedEndOfStreamError, std::bad_alloc
-            parser.recurse(*output);
-            return output;
-        }
-        catch (const UnexpectedEndOfStreamError&)
-        {
-            throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filenameL) + L"\n" + fmtFileName(filenameR));
-        }
-        catch (const std::bad_alloc& e)
-        {
-            throw FileError(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()));
-        }
-    }
-
-private:
-    StreamParser_v8(const BinaryStream& bufferL,
-                    const BinaryStream& bufferR) :
-        inputLeft (bufferL), //input is referenced only!
-        inputRight(bufferR) {}
-
-    static Zstring readUtf8(BinStreamIn& input) { return utfCvrtTo<Zstring>(readContainer<Zbase<char>>(input)); } //throw UnexpectedEndOfStreamError
-
-    static void read(BinStreamIn& input, Zstring& shortName, FileDescriptor& descr)
-    {
-        //attention: order of function argument evaluation is undefined! So do it one after the other...
-        shortName = readUtf8(input);
-        descr.lastWriteTimeRaw = readNumber<std::int64_t>(input); //throw UnexpectedEndOfStreamError
-        descr.fileSize         = readNumber<std::uint64_t>(input);
-        descr.id.first  = static_cast<decltype(descr.id.first )>(readNumber<std::uint64_t>(input)); //
-        descr.id.second = static_cast<decltype(descr.id.second)>(readNumber<std::uint64_t>(input)); //silence "loss of precision" compiler warnings
-    }
-
-    static void read(BinStreamIn& input, Zstring& shortName, LinkDescriptor& descr)
-    {
-        shortName = readUtf8(input);
-        descr.lastWriteTimeRaw = readNumber<std::int64_t>(input);
-        descr.targetPath       = readUtf8(input); //file name
-        descr.type             = static_cast<LinkDescriptor::LinkType>(readNumber<std::int32_t>(input));
-    }
-
-    void recurse(InSyncDir& dir)
-    {
-        for (;;) //files
-        {
-            bool haveItemL = readNumber<bool>(inputLeft ); //remove redundancy in next db format
-            bool haveItemR = readNumber<bool>(inputRight); //
-            assert(haveItemL == haveItemR);
-            if (!haveItemL || !haveItemR) break;
-
-            Zstring shortName;
-            FileDescriptor dataL;
-            FileDescriptor dataR;
-            read(inputLeft,  shortName, dataL);
-            read(inputRight, shortName, dataR);
-
-            dir.addFile(shortName, dataL, dataR, InSyncFile::IN_SYNC_ATTRIBUTES_EQUAL);
-        }
-
-        for (;;) //symlinks
-        {
-            bool haveItemL = readNumber<bool>(inputLeft );
-            bool haveItemR = readNumber<bool>(inputRight);
-            assert(haveItemL == haveItemR);
-            if (!haveItemL || !haveItemR) break;
-
-            Zstring shortName;
-            LinkDescriptor dataL;
-            LinkDescriptor dataR;
-            read(inputLeft,  shortName, dataL);
-            read(inputRight, shortName, dataR);
-
-            dir.addSymlink(shortName, dataL, dataR);
-        }
-
-        for (;;) //directories
-        {
-            bool haveItemL = readNumber<bool>(inputLeft );
-            bool haveItemR = readNumber<bool>(inputRight);
-            assert(haveItemL == haveItemR);
-            if (!haveItemL || !haveItemR) break;
-
-            Zstring shortName = readUtf8(inputLeft);
-            shortName = readUtf8(inputRight);
-            InSyncDir& subDir = dir.addDir(shortName, InSyncDir::STATUS_IN_SYNC);
-            recurse(subDir);
-        }
-    }
-
-    BinStreamIn inputLeft;
-    BinStreamIn inputRight;
-};
-
-
-StreamMapping loadStreams_v8(const Zstring& filename) //throw FileError
-{
-    try
-    {
-        //read format description (uncompressed)
-        FileInputStream rawStream(filename); //throw FileError, ErrorNotExisting
-
-        //read FreeFileSync file identifier
-        char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
-        rawStream.Read(formatDescr, sizeof(formatDescr)); //throw FileError
-
-        if (!std::equal(FILE_FORMAT_DESCR, FILE_FORMAT_DESCR + sizeof(FILE_FORMAT_DESCR), formatDescr))
-            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
-
-        wxZlibInputStream decompressed(rawStream, wxZLIB_ZLIB);
-
-        CheckedDbReader cr(decompressed, filename);
-
-        std::int32_t version = cr.readPOD<std::int32_t>();
-        if (version != 8) //read file format version#
-            throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
-
-        //read stream lists
-        StreamMapping output;
-
-        std::uint32_t dbCount = cr.readPOD<std::uint32_t>(); //number of databases: one for each sync-pair
-        while (dbCount-- != 0)
-        {
-            //DB id of partner databases
-            std::string sessionID = cr.readString<std::string>();
-            BinaryStream stream = cr.readString<BinaryStream>(); //read db-entry stream (containing DirInformation)
-
-            //convert streams
-            std::shared_ptr<InSyncDir> lastSyncState = StreamParser_v8::execute(stream, stream, filename, filename); //throw FileError
-
-            //serialize again
-            BinaryStream strL;
-            BinaryStream strR;
-            StreamGenerator::execute(*lastSyncState, filename, filename, strL, strR, true); //throw FileError
-            output[sessionID] = std::move(strL);
-        }
-        return output;
-    }
-    catch (ErrorNotExisting&)
-    {
-        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
-                                           replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filename)));
-    }
-    catch (const std::bad_alloc& e)
-    {
-        throw FileError(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()));
-    }
-}
 }

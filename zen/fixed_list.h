@@ -19,7 +19,7 @@ class FixedList
     struct Node
     {
         Node() : next(nullptr), val() {}
-		//no variadic templates on VC2010... :(
+        //no variadic templates on VC2010... :(
         template <class A>                                              Node(A&& a)                                    : next(nullptr), val(std::forward<A>(a)) {}
         template <class A, class B>                                     Node(A&& a, B&& b)                             : next(nullptr), val(std::forward<A>(a), std::forward<B>(b)) {}
         template <class A, class B, class C>                            Node(A&& a, B&& b, C&& c)                      : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c)) {}

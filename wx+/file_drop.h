@@ -91,8 +91,7 @@ private:
         {
             //create a custom event on drop window: execute event after file dropping is completed! (after mouse is released)
             FileDropEvent evt(filenames, dropWindow_, wxPoint(x, y));
-            auto handler = dropWindow_.GetEventHandler();
-            if (handler)
+            if (wxEvtHandler* handler = dropWindow_.GetEventHandler())
                 handler->AddPendingEvent(evt);
         }
         return true;

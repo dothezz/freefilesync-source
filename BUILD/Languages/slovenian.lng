@@ -132,7 +132,7 @@
 <pluralform>%x Bytes</pluralform>
 </source>
 <target>
-<pluralform>1 Bajt</pluralform>
+<pluralform>%x Bajt</pluralform>
 <pluralform>%x Bajta</pluralform>
 <pluralform>%x Bajti</pluralform>
 <pluralform>%x Bajtov</pluralform>
@@ -182,7 +182,7 @@
 <pluralform>%x sec</pluralform>
 </source>
 <target>
-<pluralform>1 sek</pluralform>
+<pluralform>%x sek</pluralform>
 <pluralform>%x sek</pluralform>
 <pluralform>%x sek</pluralform>
 <pluralform>%x sek</pluralform>
@@ -202,7 +202,7 @@
 <pluralform>[%x Threads]</pluralform>
 </source>
 <target>
-<pluralform>[1 nit]</pluralform>
+<pluralform>[%x nit]</pluralform>
 <pluralform>[%x niti]</pluralform>
 <pluralform>[%x niti]</pluralform>
 <pluralform>[%x niti]</pluralform>
@@ -988,7 +988,7 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <pluralform>%x directories</pluralform>
 </source>
 <target>
-<pluralform>1 imenik</pluralform>
+<pluralform>%x imenik</pluralform>
 <pluralform>%x imenika</pluralform>
 <pluralform>%x imeniki</pluralform>
 <pluralform>%x imenikov</pluralform>
@@ -999,7 +999,7 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <pluralform>%x files</pluralform>
 </source>
 <target>
-<pluralform>1 datoteka</pluralform>
+<pluralform>%x datoteka</pluralform>
 <pluralform>%x datoteki</pluralform>
 <pluralform>%x datoteke</pluralform>
 <pluralform>%x datotek</pluralform>
@@ -1010,7 +1010,7 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <pluralform>%x of %y rows in view</pluralform>
 </source>
 <target>
-<pluralform>%x od 1 vrstice v prikazu</pluralform>
+<pluralform>%x od %y vrstice v prikazu</pluralform>
 <pluralform>%x od %y vrstic v prikazu</pluralform>
 <pluralform>%x od %y vrstic v prikazu</pluralform>
 <pluralform>%x od %y vrstic v prikazu</pluralform>
@@ -1178,7 +1178,7 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <pluralform>%x min</pluralform>
 </source>
 <target>
-<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
 <pluralform>%x min</pluralform>
 <pluralform>%x min</pluralform>
 <pluralform>%x min</pluralform>
@@ -1189,7 +1189,7 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <pluralform>%x hours</pluralform>
 </source>
 <target>
-<pluralform>1 ura</pluralform>
+<pluralform>%x ura</pluralform>
 <pluralform>%x uri</pluralform>
 <pluralform>%x ure</pluralform>
 <pluralform>%x ur</pluralform>
@@ -1200,7 +1200,7 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <pluralform>%x days</pluralform>
 </source>
 <target>
-<pluralform>1 dan</pluralform>
+<pluralform>%x dan</pluralform>
 <pluralform>%x dni</pluralform>
 <pluralform>%x dni</pluralform>
 <pluralform>%x dni</pluralform>

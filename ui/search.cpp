@@ -107,13 +107,12 @@ private:
 
 template <bool respectCase>
 ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
-                  size_t compPos,
                   const wxString& searchString,
                   size_t rowFirst, //specify area to search:
                   size_t rowLast)  // [rowFirst, rowLast)
 {
-    auto prov = grid.getDataProvider(compPos);
-    std::vector<Grid::ColumnAttribute> colAttr = grid.getColumnConfig(compPos);
+    auto prov = grid.getDataProvider();
+    std::vector<Grid::ColumnAttribute> colAttr = grid.getColumnConfig();
     vector_remove_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
     if (!colAttr.empty() && prov)
     {
@@ -129,16 +128,15 @@ ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
 
 
 //syntactic sugar...
-ptrdiff_t findRow(const Grid& grid,
-                  size_t compPos,
+ptrdiff_t findRow(Grid& grid,
                   bool respectCase,
                   const wxString& searchString,
                   size_t rowFirst, //specify area to search:
                   size_t rowLast)  // [rowFirst, rowLast)
 {
     return respectCase ?
-           findRow<true>( grid, compPos, searchString, rowFirst, rowLast) :
-           findRow<false>(grid, compPos, searchString, rowFirst, rowLast);
+           findRow<true>( grid, searchString, rowFirst, rowLast) :
+           findRow<false>(grid, searchString, rowFirst, rowLast);
 }
 
 
@@ -148,8 +146,7 @@ wxString lastSearchString; //this variable really is conceptionally global...
 void executeSearch(bool forceShowDialog,
                    bool& respectCase,
                    wxWindow* parent,
-                   Grid& grid,
-                   size_t compPosLeft, size_t compPosRight)
+                   Grid* gridL, Grid* gridR)
 {
     bool searchDialogWasShown = false;
 
@@ -162,36 +159,35 @@ void executeSearch(bool forceShowDialog,
         searchDialogWasShown = true;
     }
 
-    const size_t rowCount = grid.getRowCount();
-    auto cursorPos = grid.getGridCursor(); //(row, component pos)
+    if (wxWindow::FindFocus() == &gridR->getMainWin())
+        std::swap(gridL, gridR); //select side to start with
 
-    size_t cursorRow = cursorPos.first;
-    if (cursorRow >= rowCount)
-        cursorRow = 0;
+    const size_t rowCountL = gridL->getRowCount();
+    const size_t rowCountR = gridR->getRowCount();
+    auto cursorPos = gridL->getGridCursor(); //(row, component pos)
 
-    if (cursorPos.second == compPosRight)
-        std::swap(compPosLeft, compPosRight); //select side to start with
-    else if (cursorPos.second != compPosLeft)
-        cursorRow = 0;
-
+    size_t cursorRowL = cursorPos.first;
+    if (cursorRowL >= rowCountL)
+        cursorRowL = 0;
     {
         wxBusyCursor showHourGlass;
 
-        auto finishSearch = [&](size_t compPos, size_t rowFirst, size_t rowLast) -> bool
+        auto finishSearch = [&](Grid& grid, size_t rowFirst, size_t rowLast) -> bool
         {
-            const ptrdiff_t targetRow = findRow(grid, compPos, respectCase, lastSearchString, rowFirst, rowLast);
+            const ptrdiff_t targetRow = findRow(grid, respectCase, lastSearchString, rowFirst, rowLast);
             if (targetRow >= 0)
             {
-                grid.setGridCursor(targetRow, compPos);
+                //gridOther.clearSelection(); -> not needed other grids are automatically cleared after selection
+                grid.setGridCursor(targetRow);
                 grid.SetFocus();
                 return true;
             }
             return false;
         };
 
-        if (finishSearch(compPosLeft , cursorRow + 1, rowCount) ||
-            finishSearch(compPosRight, 0, rowCount)             ||
-            finishSearch(compPosLeft , 0, cursorRow + 1))
+        if (finishSearch(*gridL, cursorRowL + 1, rowCountL) ||
+            finishSearch(*gridR, 0, rowCountR)              ||
+            finishSearch(*gridL, 0, cursorRowL + 1))
             return;
     }
 
@@ -199,18 +195,18 @@ void executeSearch(bool forceShowDialog,
 
     //show search dialog again
     if (searchDialogWasShown)
-        executeSearch(true, respectCase, parent, grid, compPosLeft, compPosRight);
+        executeSearch(true, respectCase, parent, gridL, gridR);
 }
 //###########################################################################################
 
 
-void zen::startFind(wxWindow* parent, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase) //Strg + F
+void zen::startFind(wxWindow* parent, Grid& gridL, Grid& gridR, bool& respectCase) //Strg + F
 {
-    executeSearch(true, respectCase, parent, grid, compPosLeft, compPosRight);
+    executeSearch(true, respectCase, parent, &gridL, &gridR);
 }
 
 
-void zen::findNext(wxWindow* parent, Grid& grid, size_t compPosLeft, size_t compPosRight, bool& respectCase)  //F3
+void zen::findNext(wxWindow* parent, Grid& gridL, Grid& gridR, bool& respectCase)  //F3
 {
-    executeSearch(false, respectCase, parent, grid, compPosLeft, compPosRight);
+    executeSearch(false, respectCase, parent, &gridL, &gridR);
 }
