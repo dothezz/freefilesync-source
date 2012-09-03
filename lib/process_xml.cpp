@@ -1,7 +1,7 @@
 ﻿// **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "process_xml.h"
@@ -114,23 +114,7 @@ xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchCo
 
 xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg, const Zstring& referenceFile)
 {
-    //try to take over batch-specific settings from reference
-    if (!referenceFile.empty() && getXmlType(referenceFile) == XML_TYPE_BATCH)
-        try
-        {
-            XmlBatchConfig output;
-
-            std::vector<Zstring> filenames;
-            filenames.push_back(referenceFile);
-            convertConfig(filenames, output); //throw xmlAccess::FfsXmlError
-
-            output.mainCfg = guiCfg.mainCfg;
-            return output;
-        }
-        catch (xmlAccess::FfsXmlError&) {}
-
     XmlBatchConfig output; //use default batch-settings
-    output.mainCfg = guiCfg.mainCfg;
 
     switch (guiCfg.handleError)
     {
@@ -142,6 +126,17 @@ xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiCo
             break;
     }
 
+    //try to take over batch-specific settings from reference
+    if (!referenceFile.empty() && getXmlType(referenceFile) == XML_TYPE_BATCH)
+        try
+        {
+            std::vector<Zstring> filenames;
+            filenames.push_back(referenceFile);
+            convertConfig(filenames, output); //throw xmlAccess::FfsXmlError
+        }
+        catch (xmlAccess::FfsXmlError&) {}
+
+    output.mainCfg = guiCfg.mainCfg;
     return output;
 }
 
@@ -428,13 +423,13 @@ void writeText(const DeletionPolicy& value, std::string& output)
     switch (value)
     {
         case DELETE_PERMANENTLY:
-            output = "DeletePermanently";
+            output = "Permanent";
             break;
-        case MOVE_TO_RECYCLE_BIN:
-            output = "MoveToRecycleBin";
+        case DELETE_TO_RECYCLER:
+            output = "RecycleBin";
             break;
-        case MOVE_TO_CUSTOM_DIRECTORY:
-            output = "MoveToCustomDirectory";
+        case DELETE_TO_VERSIONING:
+            output = "Versioning";
             break;
     }
 }
@@ -444,14 +439,24 @@ bool readText(const std::string& input, DeletionPolicy& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    if (tmp == "DeletePermanently")
+    //------------------
+    warn_static("remove after migration?")
+    if (tmp == "DeletePermanently")//obsolete name
         value = DELETE_PERMANENTLY;
-    else if (tmp == "MoveToRecycleBin")
-        value = MOVE_TO_RECYCLE_BIN;
-    else if (tmp == "MoveToCustomDirectory")
-        value = MOVE_TO_CUSTOM_DIRECTORY;
+    else if (tmp == "MoveToRecycleBin")//obsolete name
+        value = DELETE_TO_RECYCLER;
+    else if (tmp == "MoveToCustomDirectory")//obsolete name
+        value = DELETE_TO_VERSIONING;
     else
-        return false;
+        //------------------
+        if (tmp == "Permanent")
+            value = DELETE_PERMANENTLY;
+        else if (tmp == "RecycleBin")
+            value = DELETE_TO_RECYCLER;
+        else if (tmp == "Versioning")
+            value = DELETE_TO_VERSIONING;
+        else
+            return false;
     return true;
 }
 
@@ -501,9 +506,6 @@ void writeText(const UnitTime& value, std::string& output)
         case UTIME_TODAY:
             output = "Today";
             break;
-            //case UTIME_THIS_WEEK:
-            //    output = "Week";
-            //    break;
         case UTIME_THIS_MONTH:
             output = "Month";
             break;
@@ -525,8 +527,6 @@ bool readText(const std::string& input, UnitTime& value)
         value = UTIME_NONE;
     else if (tmp == "Today")
         value = UTIME_TODAY;
-    //else if (tmp == "Week")
-    //    value = UTIME_THIS_WEEK;
     else if (tmp == "Month")
         value = UTIME_THIS_MONTH;
     else if (tmp == "Year")
@@ -772,8 +772,19 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
 {
     readConfig(in, syncCfg.directionCfg);
 
-    in["DeletionPolicy"      ](syncCfg.handleDeletion);
-    in["CustomDeletionFolder"](syncCfg.customDeletionDirectory);
+    in["DeletionPolicy"](syncCfg.handleDeletion);
+
+    warn_static("remove after migration?")
+    if (in["CustomDeletionFolder"])
+    {
+        in["CustomDeletionFolder"](syncCfg.versioningDirectory);//obsolete name
+        syncCfg.versionCountLimit = 0; //new parameter
+    }
+    else
+    {
+        in["VersioningFolder"](syncCfg.versioningDirectory);
+        in["VersioningFolder"].attribute("Limit", syncCfg.versionCountLimit);
+    }
 }
 
 
@@ -782,14 +793,21 @@ void readConfig(const XmlIn& in, FilterConfig& filter)
     in["Include"](filter.includeFilter);
     in["Exclude"](filter.excludeFilter);
 
-    in["TimeSpan"    ](filter.timeSpan);
-    in["UnitTimeSpan"](filter.unitTimeSpan);
+    in["TimeSpan"](filter.timeSpan);
+    warn_static("remove after migration?")
+    if (in["UnitTimeSpan"]) in["UnitTimeSpan"](filter.unitTimeSpan);//obsolete name
+    else
+        in["TimeSpan"].attribute("Type", filter.unitTimeSpan);
 
-    in["SizeMin"    ](filter.sizeMin);
-    in["UnitSizeMin"](filter.unitSizeMin);
+    in["SizeMin"](filter.sizeMin);
+    if (in["UnitSizeMin"]) in["UnitSizeMin"](filter.unitSizeMin);//obsolete name
+    else
+        in["SizeMin"].attribute("Unit", filter.unitSizeMin);
 
-    in["SizeMax"    ](filter.sizeMax);
-    in["UnitSizeMax"](filter.unitSizeMax);
+    in["SizeMax"](filter.sizeMax);
+    if (in["UnitSizeMax"]) in["UnitSizeMax"](filter.unitSizeMax);//obsolete name
+    else
+        in["SizeMax"].attribute("Unit", filter.unitSizeMax);
 }
 
 
@@ -859,7 +877,10 @@ void readConfig(const XmlIn& in, MainConfiguration& mainCfg)
             mainCfg.additionalPairs.push_back(newPair); //set additional folder pairs
     }
 
-    inMain["ExecuteWhenFinished"](mainCfg.onCompletion);
+    warn_static("remove after migration?")
+    if (inMain["ExecuteWhenFinished"]) inMain["ExecuteWhenFinished"](mainCfg.onCompletion); //obsolete name
+    else
+        inMain["OnCompletion"](mainCfg.onCompletion);
 }
 
 
@@ -870,7 +891,15 @@ void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
     //read GUI specific config data
     XmlIn inGuiCfg = in["GuiConfig"];
 
-    inGuiCfg["HideFiltered"     ](config.hideFilteredElements);
+    warn_static("remove after migration?")
+    if (inGuiCfg["HideFiltered"     ]) //obsolete name
+    {
+        inGuiCfg["HideFiltered"     ](config.showFilteredElements);
+        config.showFilteredElements = !config.showFilteredElements;
+    }
+    else
+        inGuiCfg["ShowFiltered"](config.showFilteredElements);
+
     inGuiCfg["HandleError"      ](config.handleError);
     inGuiCfg["SyncPreviewActive"](config.showSyncAction);
 }
@@ -883,10 +912,17 @@ void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
     //read GUI specific config data
     XmlIn inBatchCfg = in["BatchConfig"];
 
-    inBatchCfg["ShowProgress"    ](config.showProgress);
-    inBatchCfg["LogfileDirectory"](config.logFileDirectory);
-    inBatchCfg["LogfileCountMax" ](config.logFileCountMax);
     inBatchCfg["HandleError"     ](config.handleError);
+    inBatchCfg["ShowProgress"    ](config.showProgress);
+
+    warn_static("remove after migration?")
+    if (inBatchCfg["LogfileDirectory"]) inBatchCfg["LogfileDirectory"](config.logFileDirectory); //obsolete name
+    else
+        inBatchCfg["LogfileFolder"](config.logFileDirectory);
+
+    if (inBatchCfg["LogfileCountMax" ]) inBatchCfg["LogfileCountMax"](config.logfilesCountLimit); //obsolete name
+    else
+        inBatchCfg["LogfileFolder"].attribute("Limit", config.logfilesCountLimit);
 }
 
 
@@ -960,6 +996,15 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     inWnd["Layout"](config.gui.guiPerspectiveLast);
 
+    //load config file history
+    warn_static("remove after migration?")
+    if (inGui["LastConfigActive"]) inGui["LastConfigActive"](config.gui.lastUsedConfigFiles);//obsolete name
+    else
+        inGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
+
+    inGui["ConfigHistory"](config.gui.cfgFileHistory);
+    inGui["ConfigHistory"].attribute("MaxSize", config.gui.cfgFileHistMax);
+
     inGui["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
     inGui["FolderHistoryRight"](config.gui.folderHistoryRight);
     inGui["FolderHistoryLeft"].attribute("MaxSize", config.gui.folderHistMax);
@@ -970,9 +1015,17 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //external applications
     inGui["ExternalApplications"](config.gui.externelApplications);
 
-    //load config file history
-    inGui["LastConfigActive"](config.gui.lastUsedConfigFiles);
-    inGui["ConfigHistory"](config.gui.cfgFileHistory);
+
+    warn_static("remove after migration?")
+    //convert new internal macro naming convention: %name -> %item_path%; %dir -> %item_folder%
+    for (auto iter = config.gui.externelApplications.begin(); iter != config.gui.externelApplications.end(); ++iter)
+    {
+        replace(iter->second, L"%nameCo", L"%item2_path%"); //unambiguous "Co" names first
+        replace(iter->second, L"%dirCo" , L"%item2_folder%");
+        replace(iter->second, L"%name"  , L"%item_path%");
+        replace(iter->second, L"%dir"   , L"%item_folder%");
+    }
+
 
     //last update check
     inGui["LastUpdateCheck"](config.gui.lastUpdateCheck);
@@ -1047,8 +1100,9 @@ void writeConfig(const SyncConfig& syncCfg, XmlOut& out)
 {
     writeConfig(syncCfg.directionCfg, out);
 
-    out["DeletionPolicy"      ](syncCfg.handleDeletion);
-    out["CustomDeletionFolder"](syncCfg.customDeletionDirectory);
+    out["DeletionPolicy"  ](syncCfg.handleDeletion);
+    out["VersioningFolder"](syncCfg.versioningDirectory);
+    out["VersioningFolder"].attribute("Limit", syncCfg.versionCountLimit);
 }
 
 
@@ -1057,14 +1111,14 @@ void writeConfig(const FilterConfig& filter, XmlOut& out)
     out["Include"](filter.includeFilter);
     out["Exclude"](filter.excludeFilter);
 
-    out["TimeSpan"    ](filter.timeSpan);
-    out["UnitTimeSpan"](filter.unitTimeSpan);
+    out["TimeSpan"](filter.timeSpan);
+    out["TimeSpan"].attribute("Type", filter.unitTimeSpan);
 
-    out["SizeMin"    ](filter.sizeMin);
-    out["UnitSizeMin"](filter.unitSizeMin);
+    out["SizeMin"](filter.sizeMin);
+    out["SizeMin"].attribute("Unit", filter.unitSizeMin);
 
-    out["SizeMax"    ](filter.sizeMax);
-    out["UnitSizeMax"](filter.unitSizeMax);
+    out["SizeMax"](filter.sizeMax);
+    out["SizeMax"].attribute("Unit", filter.unitSizeMax);
 }
 
 
@@ -1131,7 +1185,7 @@ void writeConfig(const MainConfiguration& mainCfg, XmlOut& out)
     std::for_each(mainCfg.additionalPairs.begin(), mainCfg.additionalPairs.end(),
     [&](const FolderPairEnh& fp) { writeConfigFolderPair(fp, outFp); });
 
-    outMain["ExecuteWhenFinished"](mainCfg.onCompletion);
+    outMain["OnCompletion"](mainCfg.onCompletion);
 }
 
 
@@ -1142,7 +1196,7 @@ void writeConfig(const XmlGuiConfig& config, XmlOut& out)
     //write GUI specific config data
     XmlOut outGuiCfg = out["GuiConfig"];
 
-    outGuiCfg["HideFiltered"     ](config.hideFilteredElements);
+    outGuiCfg["ShowFiltered"     ](config.showFilteredElements);
     outGuiCfg["HandleError"      ](config.handleError);
     outGuiCfg["SyncPreviewActive"](config.showSyncAction);
 }
@@ -1155,10 +1209,10 @@ void writeConfig(const XmlBatchConfig& config, XmlOut& out)
     //write GUI specific config data
     XmlOut outBatchCfg = out["BatchConfig"];
 
-    outBatchCfg["ShowProgress"    ](config.showProgress);
-    outBatchCfg["LogfileDirectory"](config.logFileDirectory);
-    outBatchCfg["LogfileCountMax" ](config.logFileCountMax);
-    outBatchCfg["HandleError"     ](config.handleError);
+    outBatchCfg["HandleError"    ](config.handleError);
+    outBatchCfg["ShowProgress"   ](config.showProgress);
+    outBatchCfg["LogfileFolder"  ](config.logFileDirectory);
+    outBatchCfg["LogfileFolder"].attribute("Limit", config.logfilesCountLimit);
 }
 
 
@@ -1231,6 +1285,11 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
     outWnd["Layout"](config.gui.guiPerspectiveLast);
 
+    //load config file history
+    outGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
+    outGui["ConfigHistory" ](config.gui.cfgFileHistory);
+    outGui["ConfigHistory"].attribute("MaxSize", config.gui.cfgFileHistMax);
+
     outGui["FolderHistoryLeft" ](config.gui.folderHistoryLeft);
     outGui["FolderHistoryRight"](config.gui.folderHistoryRight);
     outGui["FolderHistoryLeft" ].attribute("MaxSize", config.gui.folderHistMax);
@@ -1240,10 +1299,6 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
     //external applications
     outGui["ExternalApplications"](config.gui.externelApplications);
-
-    //load config file history
-    outGui["LastConfigActive"](config.gui.lastUsedConfigFiles);
-    outGui["ConfigHistory"   ](config.gui.cfgFileHistory);
 
     //last update check
     outGui["LastUpdateCheck"](config.gui.lastUpdateCheck);

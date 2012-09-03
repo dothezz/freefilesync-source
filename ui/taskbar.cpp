@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 //
 #include "taskbar.h"
@@ -29,8 +29,8 @@ class Taskbar::Pimpl //throw TaskbarNotAvailable
 public:
     Pimpl(const wxTopLevelWindow& window) :
         assocWindow(window.GetHWND()),
-        setStatus_  (getDllName(), setStatusFctName),
-        setProgress_(getDllName(), setProgressFctName)
+        setStatus_  (getDllName(), funName_setStatus),
+        setProgress_(getDllName(), funName_setProgress)
     {
         if (!assocWindow || !setProgress_ || !setStatus_)
             throw TaskbarNotAvailable();
@@ -73,8 +73,8 @@ public:
 
 private:
     void* assocWindow; //HWND
-    const DllFun<SetStatusFct>   setStatus_;
-    const DllFun<SetProgressFct> setProgress_;
+    const DllFun<FunType_setStatus>   setStatus_;
+    const DllFun<FunType_setProgress> setProgress_;
 };
 
 #elif defined HAVE_UBUNTU_UNITY //Ubuntu unity

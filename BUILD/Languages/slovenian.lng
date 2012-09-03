@@ -10,6 +10,15 @@
 <source>Searching for folder %x...</source>
 <target>Iskanje mape %x...</target>
 
+<source>Items processed:</source>
+<target>Obdelanih elementov:</target>
+
+<source>Items remaining:</source>
+<target>Preostalih elementov:</target>
+
+<source>Total time:</source>
+<target>Celoten čas:</target>
+
 <source>Show in Explorer</source>
 <target>Prikaži v Raziskovalcu</target>
 
@@ -49,11 +58,11 @@
 <source>Create a batch job</source>
 <target>Ustvari paketno opravilo</target>
 
-<source>Synchronization settings</source>
-<target>Nastavitve sinhronizacije</target>
-
 <source>Comparison settings</source>
 <target>Nastavitve primerjanja</target>
+
+<source>Synchronization settings</source>
+<target>Nastavitve sinhronizacije</target>
 
 <source>About</source>
 <target>O programu(1)</target>
@@ -75,27 +84,6 @@
 
 <source>Select time span</source>
 <target>Izberite časovni okvir</target>
-
-<source>Show pop-up</source>
-<target>Prikaži pojavno okno</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Prikaži pojavne napaka ali opozorila</target>
-
-<source>Ignore errors</source>
-<target>Ignoriraj napake</target>
-
-<source>Hide all error and warning messages</source>
-<target>Skrij vsa obvestila o napakah in opozorilih</target>
-
-<source>Exit instantly</source>
-<target>Zapusti v trenutku</target>
-
-<source>Abort synchronization immediately</source>
-<target>Takoj prekini sinhronizacijo</target>
-
-<source>Browse</source>
-<target>Brskaj</target>
 
 <source>Invalid command line:</source>
 <target>Napačna ukazna vrstica:</target>
@@ -241,7 +229,7 @@
 <source>&Open...</source>
 <target>&Odpri...</target>
 
-<source>Save &As...</source>
+<source>Save &as...</source>
 <target>Shr&ani kot...</target>
 
 <source>&Quit</source>
@@ -283,6 +271,9 @@
 <source>Remove folder</source>
 <target>Odstrani v mapo</target>
 
+<source>Browse</source>
+<target>Brskaj</target>
+
 <source>Select a folder</source>
 <target>Izberite mapo</target>
 
@@ -315,8 +306,8 @@ Ukaz se sproži če:
 <source>Cancel</source>
 <target>Prekliči</target>
 
-<source>(Build: %x)</source>
-<target>(Izgradnja: %x)</target>
+<source>Build: %x</source>
+<target>Izgradnja: %x</target>
 
 <source>All files</source>
 <target>Vse datoteke</target>
@@ -335,9 +326,6 @@ Ukaz se sproži če:
 
 <source>A folder input field is empty.</source>
 <target>Vnosno polje za mapo je prazno.</target>
-
-<source>Logging</source>
-<target>Beleženje</target>
 
 <source>File time and size</source>
 <target>Čas in velikost datoteke</target>
@@ -359,21 +347,6 @@ Ukaz se sproži če:
 
 <source>FreeFileSync batch</source>
 <target>FreeFileSync paket</target>
-
-<source>Batch execution</source>
-<target>Paketno izvajanje</target>
-
-<source>Items processed:</source>
-<target>Obdelanih elementov:</target>
-
-<source>Items remaining:</source>
-<target>Preostalih elementov:</target>
-
-<source>Total time:</source>
-<target>Celoten čas:</target>
-
-<source>Stop</source>
-<target>Ustavi</target>
 
 <source>Synchronization aborted!</source>
 <target>Sinhronizacija prekinjena!</target>
@@ -534,11 +507,11 @@ Ukaz se sproži če:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Zadnje uporabljene konfiguracije (pritisite DEL za odstranitev s seznama)</target>
 
-<source>Hide excluded items</source>
-<target>Skrij izključene predmete</target>
+<source>Show excluded items</source>
+<target>Pokaži izključene elemente</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Skrij filtrirane ali začasno izključene datoteke</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Pokaži filtrirane ali začasno izključene datoteke</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Število datotek in map, ki bodo ustvarjene</target>
@@ -582,68 +555,47 @@ Ukaz se sproži če:
 <source>Right</source>
 <target>Desno</target>
 
-<source>Status feedback</source>
-<target>Povratne informacije statusa</target>
-
-<source>Show progress dialog</source>
-<target>Prikazuj pogovorno okno z napredkom</target>
-
 <source>Error handling</source>
 <target>Napaka pri obravnavanju</target>
 
-<source>Maximum number of log files:</source>
-<target>Maksimalno število datotek beleženja:</target>
+<source>Ignore</source>
+<target>Ignoriraj</target>
 
-<source>Select folder to save log files:</source>
-<target>Izberite mapo za shranjevanje datotek beleženja:</target>
+<source>Hide all error and warning messages</source>
+<target>Skrij vsa obvestila o napakah in opozorilih</target>
 
-<source>Batch settings</source>
-<target>Paketne nastavitve</target>
+<source>Pop-up</source>
+<target>Pogovorno okno</target>
 
-<source>Select variant:</source>
-<target>Izberite varianto:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Prikaži pojavne napaka ali opozorila</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identificiraj in promoviraj spremembe na obeh straneh z uporabo podatkovne baze. Izbrisi, preimenovanja in spori so samodejno zaznani.</target>
+<source>Exit</source>
+<target>Izhod</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Zrcalna varnostna kopija leve mape. Desna mapa bo spremenjena, da se bo natančno ujemala z levo mapo po sinhronizaciji.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Kopiraj nove ali posodobljene datoteke v desno mapo.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Konfigurirajte vaša lastna sinhronizacijska pravila.</target>
-
-<source>Deletion handling</source>
-<target>Ravnanje pri brisanju</target>
+<source>Abort synchronization on first error</source>
+<target>Prekini sinhronizacijo ob prvi napaki</target>
 
 <source>On completion:</source>
 <target>Ob zaključku:</target>
 
-<source>Configuration</source>
-<target>Konfiguracija</target>
+<source>Show progress dialog</source>
+<target>Prikazuj pogovorno okno z napredkom</target>
 
-<source>Item exists on left side only</source>
-<target>Element obstaja samo na levi strani</target>
+<source>Generate log file</source>
+<target>Ustvari datoteko beleženja</target>
 
-<source>Item exists on right side only</source>
-<target>Element obstaja samo na desni strani</target>
+<source>Select folder to save log files</source>
+<target>Izberite mapo za shranjevanje datotek beleženja</target>
 
-<source>Left side is newer</source>
-<target>Leva stran je novejša</target>
+<source>Limit</source>
+<target>Omejitev</target>
 
-<source>Right side is newer</source>
-<target>Desna stran je novejša</target>
+<source>Limit maximum number of log files</source>
+<target>Omeji maksimalno število datotek beleženja</target>
 
-<source>Items have different content</source>
-<target>Elementi imajo različno vsebino</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Spor/element ne more biti kategoriziran</target>
-
-<source>OK</source>
-<target>V redu</target>
+<source>Batch settings</source>
+<target>Paketne nastavitve</target>
 
 <source>Compare by...</source>
 <target>Primerjaj po...</target>
@@ -675,6 +627,69 @@ enaka
 <source>Symbolic Link handling</source>
 <target>Rokovanje s simboličnimi povezavami</target>
 
+<source>OK</source>
+<target>V redu</target>
+
+<source>Select variant:</source>
+<target>Izberite varianto:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Identificiraj in promoviraj spremembe na obeh straneh z uporabo podatkovne baze. Izbrisi, preimenovanja in spori so samodejno zaznani.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Zrcalna varnostna kopija leve mape. Desna mapa bo spremenjena, da se bo natančno ujemala z levo mapo po sinhronizaciji.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Kopiraj nove ali posodobljene datoteke v desno mapo.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Konfigurirajte vaša lastna sinhronizacijska pravila.</target>
+
+<source>Deletion handling</source>
+<target>Ravnanje pri brisanju</target>
+
+<source>Permanent</source>
+<target>Trajno</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Trajno izbriši ali prepiši datoteke</target>
+
+<source>Recycle Bin</source>
+<target>Koš</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Uporabi Koš pri brisanju ali prepisovanju datotek</target>
+
+<source>Versioning</source>
+<target>Ustvarjanje različič</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Premakni časovno-označene datoteke v določeno mapo</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Omejitev maksimalnega števila različic na datoteko</target>
+
+<source>Configuration</source>
+<target>Konfiguracija</target>
+
+<source>Item exists on left side only</source>
+<target>Element obstaja samo na levi strani</target>
+
+<source>Item exists on right side only</source>
+<target>Element obstaja samo na desni strani</target>
+
+<source>Left side is newer</source>
+<target>Leva stran je novejša</target>
+
+<source>Right side is newer</source>
+<target>Desna stran je novejša</target>
+
+<source>Items have different content</source>
+<target>Elementi imajo različno vsebino</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Spor/element ne more biti kategoriziran</target>
+
 <source>Synchronizing...</source>
 <target>Sinhroniziram...</target>
 
@@ -690,8 +705,8 @@ enaka
 <source>Donate with PayPal</source>
 <target>Doniraj s PayPal</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Zahvale za prevod FreeFileSync gredo:</target>
+<source>Many thanks for localization:</source>
+<target>Zahvale za lokalizacijo:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Povratne informacije in predlogi so dobrodošli</target>
@@ -707,9 +722,6 @@ enaka
 
 <source>Published under the GNU General Public License</source>
 <target>Objavljeno pod licenco GNU General Public</target>
-
-<source>Use Recycle Bin</source>
-<target>Uporabi Koš</target>
 
 <source>Delete on both sides</source>
 <target>Izbriši na obeh straneh</target>
@@ -780,8 +792,8 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <source>Statistics</source>
 <target>Statistika</target>
 
-<source>Do not show this dialog again</source>
-<target>Ne prikaži več tega pogovornega okna</target>
+<source>Don't show this dialog again</source>
+<target>Ne prikazuj več tega pogovora</target>
 
 <source>Find what:</source>
 <target>Najdi kaj</target>
@@ -864,11 +876,8 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <source>Do you want to save changes to %x?</source>
 <target>Ali želite shraniti spremembe v %x?</target>
 
-<source>Save</source>
-<target>Shrani</target>
-
-<source>Don't Save</source>
-<target>Ne shrani</target>
+<source>Do&n't save</source>
+<target>Ne shra&ni</target>
 
 <source>Configuration loaded!</source>
 <target>Konfiguracija naložena!</target>
@@ -960,8 +969,8 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <source>Show files that won't be copied</source>
 <target>Prikaži datoteke, ki ne bodo kopirane</target>
 
-<source>All directories in sync!</source>
-<target>Vsi imeniki so sinhronizirani!</target>
+<source>All folders are in sync!</source>
+<target>Vse mape so sinhronizirane!</target>
 
 <source>Comma separated list</source>
 <target>Seznam ločen z vejico</target>
@@ -1058,6 +1067,9 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <source>Pause</source>
 <target>Premor</target>
 
+<source>Logging</source>
+<target>Beleženje</target>
+
 <source>Cannot find %x</source>
 <target>Ne najdem %x</target>
 
@@ -1142,21 +1154,6 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 
 <source>Leave as unresolved conflict</source>
 <target>Pusti kot nerešeni spor</target>
-
-<source>Delete permanently</source>
-<target>Trajno izbriši</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Trajno izbriši ali prepiši datoteke</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Uporabi Koš pri brisanju ali prepisovanju datotek</target>
-
-<source>Versioning</source>
-<target>Ustvarjanje različič</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Premakni datoteke v časovno-ožigosano podmapo</target>
 
 <source>Files</source>
 <target>Datoteke</target>
@@ -1254,8 +1251,11 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <source>Cannot copy file %x to %y.</source>
 <target>Ne morem kopirati datoteke %x v %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Ne morem prebrati imenika %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Ne morem odpreti imenika %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Ne morem oštevilčiti imenika %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Zaznana neskončna imeniška rekurzija</target>
@@ -1281,6 +1281,9 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Nastavljanje privzetih smeri sinhronizacije: Stare datoteke bodo prepisane z novimi datotekami.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Koš ni na voljo za naslednje poti! Namesto tega bodo datoteke trajno izbrisane:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>To napako, da upoštevate mapo kot prazno, lahko ignorirate</target>
 
@@ -1289,6 +1292,9 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Imeniki so v odvisnosti! Bodite pozorni, ko nastavljate sinhronizacijska pravila:</target>
+
+<source>Start comparison</source>
+<target>Začni primerjavo</target>
 
 <source>Preparing synchronization...</source>
 <target>Pripravljam sinhronizacijo...</target>
@@ -1301,6 +1307,9 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 
 <source>Files %x have the same date but a different size!</source>
 <target>Datoteki %x imata enak datum ampak različno velikost!</target>
+
+<source>Items differ in attributes only</source>
+<target>Elementi se razlikujejo samo v atributih</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Simbolične povezave %x imajo isti datum, vendar različno tarčo.</target>
@@ -1316,9 +1325,6 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 
 <source>Both sides are equal</source>
 <target>Obe strani sta enaki</target>
-
-<source>Items have different attributes</source>
-<target>Elementi imajo različne atribute</target>
 
 <source>Copy new item to left</source>
 <target>Kopiraj nov element na levo</target>
@@ -1434,14 +1440,11 @@ Opomba: Imena datoteka morajo biti relativna osnovnim imenikom!
 <source>Available:</source>
 <target>Na voljo:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Koš ni na voljo za naslednje poti! Namesto tega bodo datoteke trajno izbrisane:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Spremenjena bo mapa, ki je del večkratnih parov map. Prosim preglejte nastavitve sinhronizacije.</target>
 
-<source>Processing folder pair:</source>
-<target>Obdelujem par map:</target>
+<source>Synchronizing folder pair:</source>
+<target>Sinhroniziram par map:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Ciljna mapa %x že obstaja.</target>

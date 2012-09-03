@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "perf_check.h"
@@ -75,8 +75,8 @@ wxString PerfCheck::getRemainingTime(double dataRemaining) const
 
         if (!numeric::isNull(dataDelta)) //sign(dataRemaining) != sign(dataDelta) usually an error, so show it!
         {
-            int remTimeSec = dataRemaining * timeDelta / (1000.0 * dataDelta);
-            return zen::remainingTimeToShortString(remTimeSec);
+            const double remTimeSec = dataRemaining * timeDelta / (1000.0 * dataDelta);
+            return remainingTimeToShortString(remTimeSec);
         }
     }
     return L"-"; //fallback
@@ -100,7 +100,7 @@ wxString PerfCheck::getBytesPerSecond() const
 
         if (!numeric::isNull(timeDelta))
             if (dataDelta > 0) //may be negative if user cancels copying
-                return zen::filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
+                return filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
     }
     return L"-"; //fallback
 }

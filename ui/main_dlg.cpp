@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "main_dlg.h"
@@ -16,10 +16,10 @@
 #include <wx/display.h>
 #include <wx/app.h>
 #include <wx/dcmemory.h>
+#include <wx/filedlg.h>
 #include <wx+/context_menu.h>
 #include "folder_history_box.h"
 #include <wx+/button.h>
-#include <wx+/dir_picker.h>
 #include "../comparison.h"
 #include "../synchronization.h"
 #include "../algorithm.h"
@@ -62,11 +62,12 @@ using namespace std::rel_ops;
 
 namespace
 {
-struct wxClientDataString : public wxClientData //we need a wxClientData derived class to tell wxWidgets to take object ownership!
+struct wxClientHistoryData: public wxClientData //we need a wxClientData derived class to tell wxWidgets to take object ownership!
 {
-    wxClientDataString(const wxString& name) : name_(name) {}
+    wxClientHistoryData(const wxString& cfgFile, int lastUseIndex) : cfgFile_(cfgFile), lastUseIndex_(lastUseIndex) {}
 
-    wxString name_;
+    wxString cfgFile_;
+    int lastUseIndex_; //support sorting history by last usage, the higher the index the more recent the usage
 };
 
 IconBuffer::IconSize convert(xmlAccess::FileIconSize isize)
@@ -92,12 +93,11 @@ public:
     DirectoryNameMainImpl(MainDialog&      mainDlg,
                           wxWindow&        dropWindow1,
                           Grid&            dropGrid,
-                          wxDirPickerCtrl& dirPicker,
+                          wxButton&        dirSelectButton,
                           FolderHistoryBox& dirName,
                           wxStaticText&    staticText) :
-        DirectoryName(dropWindow1, dirPicker, dirName, &staticText, &dropGrid.getMainWin()),
-        mainDlg_(mainDlg),
-        dropGrid_(dropGrid) {}
+        DirectoryName(dropWindow1, dirSelectButton, dirName, &staticText, &dropGrid.getMainWin()),
+        mainDlg_(mainDlg) {}
 
     virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd)
     {
@@ -117,7 +117,7 @@ public:
                 break;
         }
 
-        mainDlg_.clearGrid();
+        //mainDlg_.clearGrid();
         return true;
     }
 
@@ -126,7 +126,6 @@ private:
     DirectoryNameMainImpl& operator=(const DirectoryNameMainImpl&);
 
     MainDialog& mainDlg_;
-    Grid&  dropGrid_;
 };
 
 //------------------------------------------------------------------
@@ -194,8 +193,12 @@ public:
     DirectoryPair(wxWindow* parent, MainDialog& mainDialog) :
         FolderPairGenerated(parent),
         FolderPairCallback<FolderPairGenerated>(static_cast<FolderPairGenerated&>(*this), mainDialog), //pass FolderPairGenerated part...
-        dirNameLeft (*m_panelLeft,  *m_dirPickerLeft,  *m_directoryLeft),
-        dirNameRight(*m_panelRight, *m_dirPickerRight, *m_directoryRight) {}
+        dirNameLeft (*m_panelLeft,  *m_buttonSelectDirLeft,  *m_directoryLeft),
+        dirNameRight(*m_panelRight, *m_buttonSelectDirRight, *m_directoryRight)
+    {
+        dirNameLeft .Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::OnDirSelected), nullptr, &mainDialog);
+        dirNameRight.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::OnDirSelected), nullptr, &mainDialog);
+    }
 
     void setValues(const wxString& leftDir,
                    const wxString& rightDir,
@@ -227,15 +230,19 @@ public:
         dirNameLeft(mainDialog,
                     *mainDialog.m_panelTopLeft,
                     *mainDialog.m_gridMainL,
-                    *mainDialog.m_dirPickerLeft,
+                    *mainDialog.m_buttonSelectDirLeft,
                     *mainDialog.m_directoryLeft,
                     *mainDialog.m_staticTextFinalPathLeft),
         dirNameRight(mainDialog,
                      *mainDialog.m_panelTopRight,
                      *mainDialog.m_gridMainR,
-                     *mainDialog.m_dirPickerRight,
+                     *mainDialog.m_buttonSelectDirRight,
                      *mainDialog.m_directoryRight,
-                     *mainDialog.m_staticTextFinalPathRight) {}
+                     *mainDialog.m_staticTextFinalPathRight)
+    {
+        dirNameLeft .Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::OnDirSelected), nullptr, &mainDialog);
+        dirNameRight.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::OnDirSelected), nullptr, &mainDialog);
+    }
 
     void setValues(const wxString& leftDir,
                    const wxString& rightDir,
@@ -493,7 +500,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
                    wxAuiPaneInfo().Name(wxT("Panel3")).CenterPane().PaneBorder(false));
 
     auiMgr.AddPane(m_gridNavi,
-                   wxAuiPaneInfo().Name(L"Panel10").Left().Layer(3).Caption(_("Overview")).MinSize(350, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
+                   wxAuiPaneInfo().Name(L"Panel10").Left().Layer(3).Caption(_("Overview")).MinSize(230, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
 
     auiMgr.AddPane(m_panelConfig,
                    wxAuiPaneInfo().Name(wxT("Panel4")).Layer(4).Bottom().Row(1).Position(0).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
@@ -664,7 +671,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
     //Connect(wxEVT_MOVE, wxSizeEventHandler(MainDialog::OnResize), nullptr, this);
 
     //calculate witdh of folder pair manually (if scrollbars are visible)
-    m_panelTopLeft->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeFolderPairs), nullptr, this);
+    m_panelTopLeft->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeLeftFolderWidth), nullptr, this);
 
     //dynamically change sizer direction depending on size
     m_panelConfig    ->Connect(wxEVT_SIZE, wxEventHandler(MainDialog::OnResizeConfigPanel),     nullptr, this);
@@ -688,7 +695,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
     //asynchronous call to wxWindow::Layout(): fix superfluous frame on right and bottom when FFS is started in fullscreen mode
     Connect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnLayoutWindowAsync), nullptr, this);
     wxCommandEvent evtDummy;       //call once before OnLayoutWindowAsync()
-    OnResizeFolderPairs(evtDummy); //
+    OnResizeLeftFolderWidth(evtDummy); //
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------
     //some convenience: if FFS is started with a *.ffs_gui file as commandline parameter AND all directories contained exist, comparison shall be started right away
@@ -771,10 +778,14 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
 
     treeDataView->setSortDirection(globalSettings.gui.naviLastSortColumn, globalSettings.gui.naviLastSortAscending);
 
+    //--------------------------------------------------------------------------------
     //load list of last used configuration files
     std::vector<wxString> cfgFileNames = globalSettings.gui.cfgFileHistory;
-    cfgFileNames.push_back(lastRunConfigName()); //make sure <Last session> is always part of history list
+    std::reverse(cfgFileNames.begin(), cfgFileNames.end()); //list is stored with last used files first in xml, however addFileToCfgHistory() needs them last!!!
+
+    cfgFileNames.push_back(lastRunConfigName()); //make sure <Last session> is always part of history list (if existing)
     addFileToCfgHistory(cfgFileNames);
+    //--------------------------------------------------------------------------------
 
     //load list of last used folders
     *folderHistoryLeft  = FolderHistory(globalSettings.gui.folderHistoryLeft,  globalSettings.gui.folderHistMax);
@@ -794,8 +805,12 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
     auiMgr.LoadPerspective(globalSettings.gui.guiPerspectiveLast);
 
     //restore original captions
-    for (CaptionNameMapping::const_iterator i = captionNameMap.begin(); i != captionNameMap.end(); ++i)
-        auiMgr.GetPane(i->second).Caption(i->first);
+    for (auto iter = captionNameMap.begin(); iter != captionNameMap.end(); ++iter)
+        auiMgr.GetPane(iter->second).Caption(iter->first);
+
+    //if MainDialog::onQueryEndSession() is called while comparison is active, this panel is saved and restored as "visible"
+    auiMgr.GetPane(compareStatus->getAsWindow()).Hide();
+
     auiMgr.Update();
 }
 
@@ -809,18 +824,6 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
 
     globalSettings.programLanguage = getLanguage();
 
-    //write global settings to (global) variable stored in application instance
-    if (IsIconized()) //we need to (reliably) retrieve non-iconized, non-maximized size and position
-        Iconize(false);
-
-    globalSettings.gui.isMaximized = IsMaximized(); //evaluate AFTER uniconizing!
-
-    if (IsMaximized())
-        Maximize(false);
-
-    globalSettings.gui.dlgSize = GetSize();
-    globalSettings.gui.dlgPos  = GetPosition();
-
     //retrieve column attributes
     globalSettings.gui.columnAttribLeft  = gridview::convertConfig(m_gridMainL->getColumnConfig());
     globalSettings.gui.columnAttribRight = gridview::convertConfig(m_gridMainR->getColumnConfig());
@@ -833,13 +836,24 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
     globalSettings.gui.naviLastSortColumn    = sortInfo.first;
     globalSettings.gui.naviLastSortAscending = sortInfo.second;
 
+    //--------------------------------------------------------------------------------
     //write list of last used configuration files
-    std::vector<wxString> cfgFileHistory;
+    typedef std::pair<wxString, int> HistItem; //(cfg-file/last use index)
+    std::vector<HistItem> historyDetail;
     for (unsigned int i = 0; i < m_listBoxHistory->GetCount(); ++i)
-        if (auto clientString = dynamic_cast<wxClientDataString*>(m_listBoxHistory->GetClientObject(i)))
-            cfgFileHistory.push_back(clientString->name_);
+        if (auto clientString = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
+            historyDetail.push_back(std::make_pair(clientString->cfgFile_, clientString->lastUseIndex_));
+    //sort by last use, most recent items *first* (looks better in xml than the reverse)
+    std::sort(historyDetail.begin(), historyDetail.end(), [](const HistItem& lhs, const HistItem& rhs) { return lhs.second > rhs.second; });
 
-    globalSettings.gui.cfgFileHistory      = cfgFileHistory;
+    std::vector<wxString> history;
+    std::transform(historyDetail.begin(), historyDetail.end(), std::back_inserter(history), [](const HistItem& item) { return item.first; });
+
+    if (history.size() > globalSettings.gui.cfgFileHistMax) //erase oldest elements
+        history.resize(globalSettings.gui.cfgFileHistMax);
+
+    globalSettings.gui.cfgFileHistory = history;
+    //--------------------------------------------------------------------------------
     globalSettings.gui.lastUsedConfigFiles = activeConfigFiles;
 
     //write list of last used folders
@@ -847,6 +861,19 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
     globalSettings.gui.folderHistoryRight = folderHistoryRight->getList();
 
     globalSettings.gui.guiPerspectiveLast = auiMgr.SavePerspective();
+
+    //we need to portably retrieve non-iconized, non-maximized size and position (non-portable: GetWindowPlacement())
+    //call *after* wxAuiManager::SavePerspective()!
+    if (IsIconized())
+        Iconize(false);
+
+    globalSettings.gui.isMaximized = IsMaximized(); //evaluate AFTER uniconizing!
+
+    if (IsMaximized())
+        Maximize(false);
+
+    globalSettings.gui.dlgSize = GetSize();
+    globalSettings.gui.dlgPos  = GetPosition();
 
     return globalSettings;
 }
@@ -871,7 +898,7 @@ void MainDialog::setSyncDirManually(const std::vector<FileSystemObject*>& select
 void MainDialog::setManualFilter(const std::vector<FileSystemObject*>& selection, bool setIncluded)
 {
     //if hidefiltered is active, there should be no filtered elements on screen => current element was filtered out
-    assert(!currentCfg.hideFilteredElements || !setIncluded);
+    assert(currentCfg.showFilteredElements || !setIncluded);
 
     if (!selection.empty())
     {
@@ -1184,11 +1211,15 @@ void MainDialog::openExternalApplication(const wxString& commandline, const zen:
 
     wxString command = commandline;
 
-    auto tryReplace = [&](const wxString& phrase, const wxString& replacement) -> bool
+    auto tryReplace = [&](wxString phrase, const wxString& replacement) -> bool
     {
-        if (command.find(phrase) != wxString::npos)
+        wxString cmdTmp = command.Upper(); //case insensitive search
+        phrase.MakeUpper();                //
+
+        size_t pos = cmdTmp.find(phrase);
+        if (pos != wxString::npos)
         {
-            replace(command, phrase, replacement);
+            command.replace(pos, phrase.size(), replacement);
             if (replacement.empty())
                 return false;
         }
@@ -1196,10 +1227,10 @@ void MainDialog::openExternalApplication(const wxString& commandline, const zen:
     };
 
     bool expandSuccess =
-        /**/        tryReplace(L"%nameCo", nameCo); //attention: replace %nameCo, %dirCo BEFORE %name, %dir to handle dependency
-    expandSuccess = tryReplace(L"%dirCo",  dirCo ) && expandSuccess; //
-    expandSuccess = tryReplace(L"%name",   name  ) && expandSuccess; //prevent short-cut behavior!
-    expandSuccess = tryReplace(L"%dir",    dir   ) && expandSuccess; //
+        /**/        tryReplace(L"%item_path%"   , name  ); //prevent short-cut behavior!
+    expandSuccess = tryReplace(L"%item_folder%" , dir   ) && expandSuccess; //
+    expandSuccess = tryReplace(L"%item2_path%"  , nameCo) && expandSuccess; //
+    expandSuccess = tryReplace(L"%item2_folder%", dirCo ) && expandSuccess; //
 
     const bool openFileBrowser = [&]() -> bool
     {
@@ -1208,8 +1239,11 @@ void MainDialog::openExternalApplication(const wxString& commandline, const zen:
     }();
 
     if (!openFileBrowser || expandSuccess)
-        zen::shellExecute(command); //just execute, show error message if command is malformed
-    else //support built-in fallback!
+    {
+        auto cmdExp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(command)));
+        zen::shellExecute(cmdExp); //just execute, show error message if command is malformed
+    }
+    else //failed to expand file browser command: support built-in fallback instead of an error!
     {
         wxString fallbackDir;
         if (fsObj)
@@ -1410,7 +1444,7 @@ void MainDialog::OnResizeStatisticsPanel(wxEvent& event)
 }
 
 
-void MainDialog::OnResizeFolderPairs(wxEvent& event)
+void MainDialog::OnResizeLeftFolderWidth(wxEvent& event)
 {
     //adapt left-shift display distortion caused by scrollbars for multiple folder pairs
     const int width = m_panelTopLeft->GetSize().GetWidth();
@@ -1418,7 +1452,6 @@ void MainDialog::OnResizeFolderPairs(wxEvent& event)
                   [&](DirectoryPair* dirPair)
     {
         dirPair->m_panelLeft->SetMinSize(wxSize(width, -1));
-
     });
 
     event.Skip();
@@ -2186,19 +2219,17 @@ void MainDialog::OnSyncSettingsContext(wxMouseEvent& event)
 }
 
 
-void MainDialog::OnDirSelected(wxFileDirPickerEvent& event)
+void MainDialog::onNaviPanelFilesDropped(FileDropEvent& event)
 {
-    //left and right directory text-control and dirpicker are synchronized by MainFolderDragDrop automatically
-
-    clearGrid(); //disable the sync button
-
+    loadConfiguration(event.getFiles());
     event.Skip();
 }
 
 
-void MainDialog::onNaviPanelFilesDropped(FileDropEvent& event)
+void MainDialog::OnDirSelected(wxCommandEvent& event)
 {
-    loadConfiguration(event.getFiles());
+    //left and right directory text-control and dirpicker are synchronized by MainFolderDragDrop automatically
+    clearGrid(); //disable the sync button
     event.Skip();
 }
 
@@ -2225,10 +2256,17 @@ void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
 
     //potentially slow network access: give all checks 500ms to finish
     wait_for_all_timed(fileEx.begin(), fileEx.end(), boost::posix_time::milliseconds(500));
+
     //------------------------------------------------------------------------------------------
 
+    //determine highest "last use" index number of m_listBoxHistory
+    int lastUseIndexMax = 0;
+    for (int i = 0; i < static_cast<int>(m_listBoxHistory->GetCount()); ++i)
+        if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
+            if (histData->lastUseIndex_ > lastUseIndexMax)
+                lastUseIndexMax = histData->lastUseIndex_;
 
-    std::deque<bool> selections(m_listBoxHistory->GetCount());
+    std::deque<bool> selections(m_listBoxHistory->GetCount()); //items to select after update of history list
 
     auto futIter = fileEx.begin();
     for (auto iter = filenames.begin(); iter != filenames.end(); ++iter, ++futIter)
@@ -2238,37 +2276,28 @@ void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
             continue;
 
         const wxString& filename = *iter;
-        const Zstring file = toZ(filename);
 
-        int posFound = -1;
-
-        for (int i = 0; i < static_cast<int>(m_listBoxHistory->GetCount()); ++i)
+        auto findItem = [&]() -> int
         {
-            wxClientDataString* cData = dynamic_cast<wxClientDataString*>(m_listBoxHistory->GetClientObject(i));
-            if (cData)
-            {
-                const wxString& filenameTmp = cData->name_;
+            for (int i = 0; i < static_cast<int>(m_listBoxHistory->GetCount()); ++i)
+                if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
+                    if (samePhysicalFile(toZ(filename), toZ(histData->cfgFile_)))
+                        return i;
+            return -1;
+        };
 
-                //tests if the same filenames are specified, even if they are relative to the current working directory/include symlinks or \\?\ prefix
-                if (zen::samePhysicalFile(toZ(filename), toZ(filenameTmp)))
-                {
-                    posFound = i;
-                    break;
-                }
-            }
+        const int itemPos = findItem();
+        if (itemPos >= 0) //update
+        {
+            if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(itemPos)))
+                histData->lastUseIndex_ = ++lastUseIndexMax;
+            selections[itemPos] = true;
         }
-
-        if (posFound != -1)
-            selections[posFound] = true;
-        else
+        else //insert
         {
-            int newPos = -1;
-            //the default config file should receive a different name on GUI
-            if (zen::samePhysicalFile(toZ(lastRunConfigName()), toZ(filename)))
-                newPos = m_listBoxHistory->Append(_("<Last session>"), new wxClientDataString(filename));
-            else
-                newPos = m_listBoxHistory->Append(getFormattedHistoryElement(filename), new wxClientDataString(filename));
-
+            const wxString label = samePhysicalFile(toZ(lastRunConfigName()), toZ(filename)) ? //give default config file a different name
+                                   _("<Last session>") : getFormattedHistoryElement(filename);
+            const int newPos = m_listBoxHistory->Append(label, new wxClientHistoryData(filename, ++lastUseIndexMax)); //*insert* into sorted list
             selections.insert(selections.begin() + newPos, true);
         }
     }
@@ -2376,7 +2405,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
                                         ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
                                         replaceCpy(_("Do you want to save changes to %x?"), L"%x", fmtFileName(afterLast(utfCvrtTo<Zstring>(filename), FILE_NAME_SEPARATOR))),
                                         filename, //caption
-                                        _("Save"), _("Don't Save"),
+                                        _("&Save"), _("Do&n't save"),
                                         &cb))
                 {
                     case ReturnQuestionDlg::BUTTON_YES:
@@ -2443,8 +2472,8 @@ void MainDialog::OnLoadFromHistory(wxCommandEvent& event)
     std::for_each(selections.begin(), selections.end(),
                   [&](int pos)
     {
-        if (auto cData = dynamic_cast<wxClientDataString*>(m_listBoxHistory->GetClientObject(pos)))
-            filenames.push_back(cData->name_);
+        if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(pos)))
+            filenames.push_back(histData->cfgFile_);
     });
 
     if (!filenames.empty())
@@ -2649,7 +2678,7 @@ void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg)
 
 
     //read GUI layout
-    m_checkBoxHideFilt->SetValue(currentCfg.hideFilteredElements);
+    m_checkBoxShowExcluded->SetValue(currentCfg.showFilteredElements);
 
     showSyncAction(currentCfg.showSyncAction);
 
@@ -2710,7 +2739,7 @@ void MainDialog::updateGuiAfterFilterChange(int delay)
 {
     //signal UI that grids need to be refreshed on next Update()
 
-    if (currentCfg.hideFilteredElements)
+    if (!currentCfg.showFilteredElements)
     {
         gridview::refresh(*m_gridMainL, *m_gridMainC, *m_gridMainR);
         m_gridMainL->Update();
@@ -2724,12 +2753,12 @@ void MainDialog::updateGuiAfterFilterChange(int delay)
 }
 
 
-void MainDialog::OnHideFilteredButton(wxCommandEvent& event)
+void MainDialog::OnShowExcluded(wxCommandEvent& event)
 {
     //toggle showing filtered rows
-    currentCfg.hideFilteredElements = !currentCfg.hideFilteredElements;
-    //make sure, checkbox and "hideFiltered" are in sync
-    m_checkBoxHideFilt->SetValue(currentCfg.hideFilteredElements);
+    currentCfg.showFilteredElements = !currentCfg.showFilteredElements;
+    //make sure, checkbox and value are in sync
+    m_checkBoxShowExcluded->SetValue(currentCfg.showFilteredElements);
 
     updateGui();
 }
@@ -3043,15 +3072,14 @@ void MainDialog::OnCompare(wxCommandEvent& event)
             }
         }
 
-        //begin comparison
-        zen::CompareProcess compProc(globalCfg.fileTimeTolerance,
-                                     globalCfg.optDialogs,
-                                     true, //allow pw prompt
-                                     globalCfg.runWithBackgroundPriority,
-                                     statusHandler);
-
-        //technical representation of comparison data
-        compProc.startCompareProcess(cmpConfig, folderCmp); //throw GuiAbortProcess
+        //COMPARE DIRECTORIES
+        compare(globalCfg.fileTimeTolerance,
+                globalCfg.optDialogs,
+                true, //allow pw prompt
+                globalCfg.runWithBackgroundPriority,
+                cmpConfig,
+                folderCmp,
+                statusHandler); //throw GuiAbortProcess
     }
     catch (GuiAbortProcess&)
     {
@@ -3082,7 +3110,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
 
     //prepare status information
     if (allElementsEqual(folderCmp))
-        flashStatusInformation(_("All directories in sync!"));
+        flashStatusInformation(_("All folders are in sync!"));
 }
 
 
@@ -3265,24 +3293,21 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
             }
         }
 
-        //start synchronization and mark all elements processed
-        zen::SyncProcess syncProc(xmlAccess::extractJobName(activeFileName),
-                                  formatTime<std::wstring>(L"%Y-%m-%d %H%M%S"),
-                                  globalCfg.optDialogs,
-                                  globalCfg.verifyFileCopy,
-                                  globalCfg.copyLockedFiles,
-                                  globalCfg.copyFilePermissions,
-                                  globalCfg.transactionalFileCopy,
-                                  globalCfg.runWithBackgroundPriority,
-                                  statusHandler);
-
+        //START SYNCHRONIZATION
         const std::vector<zen::FolderPairSyncCfg> syncProcessCfg = zen::extractSyncCfg(guiCfg.mainCfg);
-
-        //make sure syncProcessCfg and dataToSync have same size and correspond!
         if (syncProcessCfg.size() != folderCmp.size())
             throw std::logic_error("Programming Error: Contract violation!"); //should never happen: sync button is deactivated if they are not in sync
 
-        syncProc.startSynchronizationProcess(syncProcessCfg, folderCmp);
+        synchronize(localTime(),
+                    globalCfg.optDialogs,
+                    globalCfg.verifyFileCopy,
+                    globalCfg.copyLockedFiles,
+                    globalCfg.copyFilePermissions,
+                    globalCfg.transactionalFileCopy,
+                    globalCfg.runWithBackgroundPriority,
+                    syncProcessCfg,
+                    folderCmp,
+                    statusHandler);
 
         //play (optional) sound notification after sync has completed (GUI and batch mode)
         const wxString soundFile = toWx(zen::getResourceDir()) + L"Sync_Complete.wav";
@@ -3379,6 +3404,7 @@ void MainDialog::OnSwapSides(wxCommandEvent& event)
     m_bpButtonLeftNewer->setActive(m_bpButtonRightNewer->isActive());
     m_bpButtonRightNewer->setActive(tmp);
 
+    /* for sync preview and "mirror" variant swapping may create strange effect:
     tmp = m_bpButtonSyncCreateLeft->isActive();
     m_bpButtonSyncCreateLeft->setActive(m_bpButtonSyncCreateRight->isActive());
     m_bpButtonSyncCreateRight->setActive(tmp);
@@ -3390,6 +3416,7 @@ void MainDialog::OnSwapSides(wxCommandEvent& event)
     tmp = m_bpButtonSyncDirOverwLeft->isActive();
     m_bpButtonSyncDirOverwLeft->setActive(m_bpButtonSyncDirOverwRight->isActive());
     m_bpButtonSyncDirOverwRight->setActive(tmp);
+    */
 
     //swap grid information
     zen::swapGrids(getConfig().mainCfg, folderCmp);
@@ -3427,7 +3454,7 @@ void MainDialog::updateGridViewData()
 
     if (showSyncAction_)
     {
-        const GridView::StatusSyncPreview result = gridDataView->updateSyncPreview(currentCfg.hideFilteredElements,
+        const GridView::StatusSyncPreview result = gridDataView->updateSyncPreview(!currentCfg.showFilteredElements,
                                                                                    m_bpButtonSyncCreateLeft->   isActive(),
                                                                                    m_bpButtonSyncCreateRight->  isActive(),
                                                                                    m_bpButtonSyncDeleteLeft->   isActive(),
@@ -3475,7 +3502,7 @@ void MainDialog::updateGridViewData()
     }
     else
     {
-        const GridView::StatusCmpResult result = gridDataView->updateCmpResult(currentCfg.hideFilteredElements,
+        const GridView::StatusCmpResult result = gridDataView->updateCmpResult(!currentCfg.showFilteredElements,
                                                                                m_bpButtonLeftOnly->  isActive(),
                                                                                m_bpButtonRightOnly-> isActive(),
                                                                                m_bpButtonLeftNewer-> isActive(),
@@ -3518,7 +3545,7 @@ void MainDialog::updateGridViewData()
 
     //navigation tree
     if (showSyncAction_)
-        treeDataView->updateSyncPreview(currentCfg.hideFilteredElements,
+        treeDataView->updateSyncPreview(!currentCfg.showFilteredElements,
                                         m_bpButtonSyncCreateLeft->   isActive(),
                                         m_bpButtonSyncCreateRight->  isActive(),
                                         m_bpButtonSyncDeleteLeft->   isActive(),
@@ -3529,7 +3556,7 @@ void MainDialog::updateGridViewData()
                                         m_bpButtonEqual->            isActive(),
                                         m_bpButtonConflict->         isActive());
     else
-        treeDataView->updateCmpResult(currentCfg.hideFilteredElements,
+        treeDataView->updateCmpResult(!currentCfg.showFilteredElements,
                                       m_bpButtonLeftOnly->  isActive(),
                                       m_bpButtonRightOnly-> isActive(),
                                       m_bpButtonLeftNewer-> isActive(),
@@ -3664,51 +3691,38 @@ void MainDialog::updateGuiForFolderPair()
     wxWindowUpdateLocker dummy(this);
 
     //adapt delete top folder pair button
-    if (additionalFolderPairs.empty())
-        m_bpButtonRemovePair->Hide();
-    else
-        m_bpButtonRemovePair->Show();
+    m_bpButtonRemovePair->Show(!additionalFolderPairs.empty());
     m_panelTopLeft->Layout();
 
     //adapt local filter and sync cfg for first folder pair
-    if (additionalFolderPairs.empty() &&
-        firstFolderPair->getAltCompConfig().get() == nullptr &&
-        firstFolderPair->getAltSyncConfig().get() == nullptr &&
-        isNullFilter(firstFolderPair->getAltFilterConfig()))
-    {
-        m_bpButtonAltCompCfg ->Hide();
-        m_bpButtonAltSyncCfg ->Hide();
-        m_bpButtonLocalFilter->Hide();
+    const bool showLocalCfgFirstPair = !additionalFolderPairs.empty()                       ||
+                                       firstFolderPair->getAltCompConfig().get() != nullptr ||
+                                       firstFolderPair->getAltSyncConfig().get() != nullptr ||
+                                       !isNullFilter(firstFolderPair->getAltFilterConfig());
 
-        setImage(*m_bpButtonSwapSides, GlobalResources::getImage(L"swap"));
-    }
-    else
-    {
-        m_bpButtonAltCompCfg ->Show();
-        m_bpButtonAltSyncCfg ->Show();
-        m_bpButtonLocalFilter->Show();
-
-        setImage(*m_bpButtonSwapSides, GlobalResources::getImage(L"swapSlim"));
-    }
+    m_bpButtonAltCompCfg ->Show(showLocalCfgFirstPair);
+    m_bpButtonAltSyncCfg ->Show(showLocalCfgFirstPair);
+    m_bpButtonLocalFilter->Show(showLocalCfgFirstPair);
+    setImage(*m_bpButtonSwapSides, GlobalResources::getImage(showLocalCfgFirstPair ? L"swapSlim" : L"swap"));
     m_panelTopMiddle->Layout();
 
     int addPairMinimalHeight = 0;
     int addPairOptimalHeight = 0;
     if (!additionalFolderPairs.empty())
     {
-        int pairHeight = additionalFolderPairs[0]->GetSize().GetHeight();
-        addPairMinimalHeight = std::min<double>(1.5, additionalFolderPairs.size()) * pairHeight; //have 0.5 * height indicate that more folders are there
+        const int pairHeight = additionalFolderPairs[0]->GetSize().GetHeight();
+        addPairMinimalHeight = std::min<double>(1.5, additionalFolderPairs.size()) * pairHeight; //have 1.5 * height indicate that more folders are there
         addPairOptimalHeight = std::min<double>(globalCfg.gui.maxFolderPairsVisible - 1 + 0.5, //subtract first/main folder pair and add 0.5 to indicate additional folders
                                                 additionalFolderPairs.size()) * pairHeight;
 
         addPairOptimalHeight = std::max(addPairOptimalHeight, addPairMinimalHeight); //implicitly handle corrupted values for "maxFolderPairsVisible"
     }
 
+    const int firstPairHeight = m_panelDirectoryPairs->ClientToWindowSize(m_panelTopLeft->GetSize()).GetHeight(); //include m_panelDirectoryPairs window borders!
+
     //########################################################################################################################
     //wxAUI hack: set minimum height to desired value, then call wxAuiPaneInfo::Fixed() to apply it
-    const int panelNewHeight = m_panelDirectoryPairs->ClientToWindowSize(m_panelTopLeft->GetSize()).GetHeight(); //respect m_panelDirectoryPairs window borders!
-
-    auiMgr.GetPane(m_panelDirectoryPairs).MinSize(-1, panelNewHeight + addPairOptimalHeight);
+    auiMgr.GetPane(m_panelDirectoryPairs).MinSize(-1, firstPairHeight + addPairOptimalHeight);
     auiMgr.GetPane(m_panelDirectoryPairs).Fixed();
     auiMgr.Update();
 
@@ -3717,8 +3731,8 @@ void MainDialog::updateGuiForFolderPair()
     auiMgr.Update();
     //########################################################################################################################
 
-    //ensure additional folder pairs are at least partially visible
-    auiMgr.GetPane(m_panelDirectoryPairs).MinSize(-1, m_panelTopLeft->GetSize().GetHeight() + addPairMinimalHeight);
+    //make sure user cannot fully shrink additional folder pairs
+    auiMgr.GetPane(m_panelDirectoryPairs).MinSize(-1, firstPairHeight + addPairMinimalHeight);
     auiMgr.Update();
 
     m_scrolledWindowFolderPairs->Fit();    //adjust scrolled window size

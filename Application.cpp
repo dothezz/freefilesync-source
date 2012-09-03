@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "application.h"
@@ -161,24 +161,22 @@ void Application::OnStartApplication(wxIdleEvent&)
 #endif
 
     xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
-    setLanguage(globalSettings.programLanguage); //set default language tentatively
-
-    try //load global settings from XML: they are written on exit, so read them FIRST
+    try //load global settings
     {
         if (fileExists(toZ(getGlobalConfigFile())))
             readConfig(globalSettings); //throw FfsXmlError
         //else: globalSettings already has default values
-
-        setLanguage(globalSettings.programLanguage);
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
+        setLanguage(globalSettings.programLanguage); //set default language
         //show messagebox and continue
         if (error.getSeverity() == FfsXmlError::WARNING)
             ; //wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
         else
             wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
     }
+    setLanguage(globalSettings.programLanguage);
 
     //determine FFS mode of operation
     std::vector<wxString> commandArgs = getCommandlineArgs(*this);
@@ -353,16 +351,17 @@ void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsR
 
     try //begin of synchronization process (all in one try-catch block)
     {
-        const std::wstring timestamp = formatTime<std::wstring>(L"%Y-%m-%d %H%M%S");
+
+        const TimeComp timeStamp = localTime();
 
         const SwitchToGui switchBatchToGui(utfCvrtTo<wxString>(filename), batchCfg, globSettings); //prepare potential operational switch
 
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(batchCfg.showProgress,
                                          extractJobName(filename),
-                                         timestamp,
+                                         timeStamp,
                                          batchCfg.logFileDirectory,
-                                         batchCfg.logFileCountMax,
+                                         batchCfg.logfilesCountLimit,
                                          batchCfg.handleError,
                                          switchBatchToGui,
                                          returnCode,
@@ -397,30 +396,30 @@ void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsR
         }
 
         //COMPARE DIRECTORIES
-        CompareProcess cmpProc(globSettings.fileTimeTolerance,
-                               globSettings.optDialogs,
-                               allowPwPrompt,
-                               globSettings.runWithBackgroundPriority,
-                               statusHandler);
-
         FolderComparison folderCmp;
-        cmpProc.startCompareProcess(cmpConfig, folderCmp);
+        compare(globSettings.fileTimeTolerance,
+                globSettings.optDialogs,
+                allowPwPrompt,
+                globSettings.runWithBackgroundPriority,
+                cmpConfig,
+                folderCmp,
+                statusHandler);
 
         //START SYNCHRONIZATION
-        SyncProcess syncProc(extractJobName(filename),
-                             timestamp,
-                             globSettings.optDialogs,
-                             globSettings.verifyFileCopy,
-                             globSettings.copyLockedFiles,
-                             globSettings.copyFilePermissions,
-                             globSettings.transactionalFileCopy,
-                             globSettings.runWithBackgroundPriority,
-                             statusHandler);
-
         const std::vector<FolderPairSyncCfg> syncProcessCfg = extractSyncCfg(batchCfg.mainCfg);
-        assert(syncProcessCfg.size() == folderCmp.size());
+        if (syncProcessCfg.size() != folderCmp.size())
+            throw std::logic_error("Programming Error: Contract violation!");
 
-        syncProc.startSynchronizationProcess(syncProcessCfg, folderCmp);
+        synchronize(timeStamp,
+                    globSettings.optDialogs,
+                    globSettings.verifyFileCopy,
+                    globSettings.copyLockedFiles,
+                    globSettings.copyFilePermissions,
+                    globSettings.transactionalFileCopy,
+                    globSettings.runWithBackgroundPriority,
+                    syncProcessCfg,
+                    folderCmp,
+                    statusHandler);
 
         //play (optional) sound notification after sync has completed -> don't play in silent mode, consider RealtimeSync!
         if (batchCfg.showProgress)
@@ -431,7 +430,6 @@ void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsR
         }
     }
     catch (BatchAbortProcess&) {} //exit used by statusHandler
-
 
     try //save global settings to XML: e.g. ignored warnings
     {

@@ -10,6 +10,15 @@
 <source>Searching for folder %x...</source>
 <target>Αναζήτηση του υποκαταλόγου %x...</target>
 
+<source>Items processed:</source>
+<target>Επεξεργάστηκαν στοιχεία:</target>
+
+<source>Items remaining:</source>
+<target>Περισσεύουν στοιχεία:</target>
+
+<source>Total time:</source>
+<target>Συνολική διάρκεια:</target>
+
 <source>Show in Explorer</source>
 <target>Εμφάνιση στην Εξερεύνηση</target>
 
@@ -21,6 +30,9 @@
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Ζητήθηκε ματαίωση: Αναμονή για την λήξη της τρέχουσας εργασίας...</target>
+
+<source>Failure to create time stamp for versioning:</source>
+<target></target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Αυτοματοποιημένος Συγχρονισμός</target>
@@ -49,11 +61,11 @@
 <source>Create a batch job</source>
 <target>Δημιουργία μιας δέσμης ενεργειών</target>
 
-<source>Synchronization settings</source>
-<target>Ρυθμίσεις συγχρονισμού</target>
-
 <source>Comparison settings</source>
 <target>Ρυθμίσεις σύγκρισης</target>
+
+<source>Synchronization settings</source>
+<target>Ρυθμίσεις συγχρονισμού</target>
 
 <source>About</source>
 <target>Σχετικά με το...</target>
@@ -75,27 +87,6 @@
 
 <source>Select time span</source>
 <target>Επιλογή χρονικού διαστήματος</target>
-
-<source>Show pop-up</source>
-<target>Εμφάνιση αναδυόμενου παράθυρου</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Εμφάνιση αναδυόμενου παράθυρου σε σφάλματα ή προειδοποιήσεις</target>
-
-<source>Ignore errors</source>
-<target>Παράβλεψη των σφαλμάτων</target>
-
-<source>Hide all error and warning messages</source>
-<target>Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων</target>
-
-<source>Exit instantly</source>
-<target>Άμεση έξοδος</target>
-
-<source>Abort synchronization immediately</source>
-<target>Άμεση ματαίωση του συγχρονισμού</target>
-
-<source>Browse</source>
-<target>Αναζήτηση</target>
 
 <source>Invalid command line:</source>
 <target>Σφάλμα στη γραμμή εντολών:</target>
@@ -235,8 +226,8 @@
 <source>&Open...</source>
 <target>Ά&νοιγμα...</target>
 
-<source>Save &As...</source>
-<target>Αποθή&κευση ως...</target>
+<source>Save &as...</source>
+<target>Απο&θήκευση ως...</target>
 
 <source>&Quit</source>
 <target>Έ&ξοδος</target>
@@ -277,6 +268,9 @@
 <source>Remove folder</source>
 <target>Διαγραφή του υποκαταλόγου</target>
 
+<source>Browse</source>
+<target>Αναζήτηση</target>
+
 <source>Select a folder</source>
 <target>Επιλογή υποκαταλόγου</target>
 
@@ -309,8 +303,8 @@ The command is triggered if:
 <source>Cancel</source>
 <target>Άκυρο</target>
 
-<source>(Build: %x)</source>
-<target>(Δημιουργήθηκε : %x)</target>
+<source>Build: %x</source>
+<target>Δημιουργήθηκε : %x</target>
 
 <source>All files</source>
 <target>Όλα τα αρχεία</target>
@@ -329,9 +323,6 @@ The command is triggered if:
 
 <source>A folder input field is empty.</source>
 <target>Ένα πεδίο εισαγωγής υποκαταλόγων είναι άδειο.</target>
-
-<source>Logging</source>
-<target>Καταγραφή μηνυμάτων</target>
 
 <source>File time and size</source>
 <target>Ημερομηνία και μέγεθος αρχείων</target>
@@ -353,21 +344,6 @@ The command is triggered if:
 
 <source>FreeFileSync batch</source>
 <target>Δέσμη ενεργειών του FreeFileSync</target>
-
-<source>Batch execution</source>
-<target>Εκτέλεση δέσμης ενεργειών</target>
-
-<source>Items processed:</source>
-<target>Επεξεργάστηκαν στοιχεία:</target>
-
-<source>Items remaining:</source>
-<target>Περισσεύουν στοιχεία:</target>
-
-<source>Total time:</source>
-<target>Συνολική διάρκεια:</target>
-
-<source>Stop</source>
-<target>Λήξη</target>
 
 <source>Synchronization aborted!</source>
 <target>Ο συγχρονισμός ματαιώθηκε!</target>
@@ -528,11 +504,11 @@ The command is triggered if:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Διατάξεις που χρησιμοποιήθηκαν τελευταία (πατήστε DEL για διαγραφή από τη λίστα)</target>
 
-<source>Hide excluded items</source>
-<target>Απόκρυψη των εξαιρεθέντων στοιχείων</target>
+<source>Show excluded items</source>
+<target>Εμφάνιση εξαιρεθέντων στοιχείων</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Απόκρυψη των αρχείων που φιλτραρίστηκαν ή εξαιρέθηκαν προσωρινά</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Εμφάνιση φιλτραρισμένων ή προσωρινά εξαιρεθέντων αρχείων</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Αριθμός αρχείων και υποκαταλόγων που θα δημιουργηθούν</target>
@@ -576,68 +552,47 @@ The command is triggered if:
 <source>Right</source>
 <target>Δεξιά</target>
 
-<source>Status feedback</source>
-<target>Αναφορά κατάστασης</target>
-
-<source>Show progress dialog</source>
-<target>Εμφάνιση της αναφοράς προόδου</target>
-
 <source>Error handling</source>
 <target>Διαχείριση σφαλμάτων</target>
 
-<source>Maximum number of log files:</source>
-<target>Μέγιστος αριθμός αρχείων καταγραφής:</target>
+<source>Ignore</source>
+<target>Παράβλεψη</target>
 
-<source>Select folder to save log files:</source>
-<target>Επιλέξτε τον υποκατάλογο όπου θα αποθηκευτούν τα αρχεία καταγραφής:</target>
+<source>Hide all error and warning messages</source>
+<target>Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων</target>
 
-<source>Batch settings</source>
-<target>Ρυθμίσεις δέσμης ενεργειών</target>
+<source>Pop-up</source>
+<target>Αναδυόμενο μήνυμα</target>
 
-<source>Select variant:</source>
-<target>Επιλέξτε μια μέθοδο:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Εμφάνιση αναδυόμενου παράθυρου σε σφάλματα ή προειδοποιήσεις</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Αναγνώριση και αναπαραγωγή των αλλαγών και στις δύο πλευρές με τη χρήση μιας βάσης δεδομένων. Διαγραφές, μετονομασίες και διενέξεις ανιχνεύονται αυτόματα.</target>
+<source>Exit</source>
+<target>Έξοδος</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Κατοπτρικό αντίγραφο του αριστερού υποκαταλόγου. Ο υποκατάλογος δεξιά θα τροποποιηθεί και θα αντιστοιχεί εξολοκλήρου στον αριστερό μετά το συγχρονισμό</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Αντιγραφή των νέων ή πιο πρόσφατων αρχείων στον υποκατάλογο δεξιά.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Ορίστε τους δικούς σας κανόνες συγχρονισμού.</target>
-
-<source>Deletion handling</source>
-<target>Διαχείριση των διαγραφών</target>
+<source>Abort synchronization on first error</source>
+<target>Ματαίωση του συγχρονισμού με το πρώτο σφάλμα</target>
 
 <source>On completion:</source>
 <target>Μετά την ολοκλήρωση:</target>
 
-<source>Configuration</source>
-<target>Διάταξη</target>
+<source>Show progress dialog</source>
+<target>Εμφάνιση της αναφοράς προόδου</target>
 
-<source>Item exists on left side only</source>
-<target>Το αντικείμενο υπάρχει μόνο στην αριστερή πλευρά</target>
+<source>Generate log file</source>
+<target>Δημιουργία αρχείων καταγραφής</target>
 
-<source>Item exists on right side only</source>
-<target>Το αντικείμενο υπάρχει μόνο στη δεξιά πλευρά</target>
+<source>Select folder to save log files</source>
+<target>Επιλογή υποκαταλόγου για την αποθήκευση των αρχείων καταγραφής</target>
 
-<source>Left side is newer</source>
-<target>Το αντικείμενο στην αριστερή πλευρά είναι πιο πρόσφατο</target>
+<source>Limit</source>
+<target>Αριθμός εκδόσεων</target>
 
-<source>Right side is newer</source>
-<target>Το αντικείμενο στη δεξιά πλευρά είναι πιο πρόσφατο</target>
+<source>Limit maximum number of log files</source>
+<target>Μέγιστος αριθμός αρχείων καταγραφής</target>
 
-<source>Items have different content</source>
-<target>Τα αντικείμενα έχουν διαφορετικό περιεχόμενο</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Διένεξη/το αντικείμενο δεν μπορεί να κατηγοριοποιηθεί</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Ρυθμίσεις δέσμης ενεργειών</target>
 
 <source>Compare by...</source>
 <target>Σύγκριση με βάση το...</target>
@@ -669,6 +624,69 @@ is the same
 <source>Symbolic Link handling</source>
 <target>Τρόπος διαχείρισης των συμβολικών δεσμών</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Επιλέξτε μια μέθοδο:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Αναγνώριση και αναπαραγωγή των αλλαγών και στις δύο πλευρές με τη χρήση μιας βάσης δεδομένων. Διαγραφές, μετονομασίες και διενέξεις ανιχνεύονται αυτόματα.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Κατοπτρικό αντίγραφο του αριστερού υποκαταλόγου. Ο υποκατάλογος δεξιά θα τροποποιηθεί και θα αντιστοιχεί εξολοκλήρου στον αριστερό μετά το συγχρονισμό</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Αντιγραφή των νέων ή πιο πρόσφατων αρχείων στον υποκατάλογο δεξιά.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Ορίστε τους δικούς σας κανόνες συγχρονισμού.</target>
+
+<source>Deletion handling</source>
+<target>Διαγραφή των αρχείων</target>
+
+<source>Permanent</source>
+<target>Μόνιμα</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Μόνιμη διαγραφή ή αντικατάσταση των αρχείων</target>
+
+<source>Recycle Bin</source>
+<target>Κάδος Ανακύκλωσης</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Χρήση του Κάδου Ανακύκλωσης κατά τη διαγραφή ή αντικατάσταση αρχείων</target>
+
+<source>Versioning</source>
+<target>Διατήρηση παλιών εκδόσεων</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Μεταφορά χρονοσημασμένων αρχείων σε συγκεκριμένο υποκατάλογο</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Περιορισμός του μέγιστου αριθμού εκδόσεων ανά αρχείο</target>
+
+<source>Configuration</source>
+<target>Διάταξη</target>
+
+<source>Item exists on left side only</source>
+<target>Το αντικείμενο υπάρχει μόνο στην αριστερή πλευρά</target>
+
+<source>Item exists on right side only</source>
+<target>Το αντικείμενο υπάρχει μόνο στη δεξιά πλευρά</target>
+
+<source>Left side is newer</source>
+<target>Το αντικείμενο στην αριστερή πλευρά είναι πιο πρόσφατο</target>
+
+<source>Right side is newer</source>
+<target>Το αντικείμενο στη δεξιά πλευρά είναι πιο πρόσφατο</target>
+
+<source>Items have different content</source>
+<target>Τα αντικείμενα έχουν διαφορετικό περιεχόμενο</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Διένεξη/το αντικείμενο δεν μπορεί να κατηγοριοποιηθεί</target>
+
 <source>Synchronizing...</source>
 <target>Γίνεται συγχρονισμός...</target>
 
@@ -684,8 +702,8 @@ is the same
 <source>Donate with PayPal</source>
 <target>Κάντε μια δωρεά μέσω PayPal</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Για τις μεταφράσεις του FreeFileSync, ευχαριστούμε τους:</target>
+<source>Many thanks for localization:</source>
+<target>Πολλές ευχαριστίες για τις μεταφράσεις:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Τα σχόλια και οι προτάσεις σας είναι ευπρόσδεκτα</target>
@@ -701,9 +719,6 @@ is the same
 
 <source>Published under the GNU General Public License</source>
 <target>Διανέμεται υπό την Γενική Άδεια Δημόσιας Χρήσης GNU</target>
-
-<source>Use Recycle Bin</source>
-<target>Χρήση του Κάδου Ανακύκλωσης</target>
 
 <source>Delete on both sides</source>
 <target>Διαγραφή και στις δυο πλευρές</target>
@@ -774,7 +789,7 @@ Note: File names must be relative to base directories!
 <source>Statistics</source>
 <target>Στατιστικά</target>
 
-<source>Do not show this dialog again</source>
+<source>Don't show this dialog again</source>
 <target>Να μην εμφανιστεί ξανά αυτό το μήνυμα</target>
 
 <source>Find what:</source>
@@ -858,11 +873,8 @@ Note: File names must be relative to base directories!
 <source>Do you want to save changes to %x?</source>
 <target>Θέλετε να αποθηκεύσετε τις αλλαγές στο %x;</target>
 
-<source>Save</source>
-<target>Αποθήκευση</target>
-
-<source>Don't Save</source>
-<target>Χωρίς αποθήκευση</target>
+<source>Do&n't save</source>
+<target>Να &μην αποθηκευθούν</target>
 
 <source>Configuration loaded!</source>
 <target>Η διάταξη έχει ανοιχθεί!</target>
@@ -954,7 +966,7 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>Εμφάνιση των αρχείων που δε θα αντιγραφούν</target>
 
-<source>All directories in sync!</source>
+<source>All folders are in sync!</source>
 <target>Όλοι οι υποκατάλογοι είναι συγχρονισμένοι!</target>
 
 <source>Comma separated list</source>
@@ -1044,6 +1056,9 @@ Note: File names must be relative to base directories!
 <source>Pause</source>
 <target>Παύση</target>
 
+<source>Logging</source>
+<target>Καταγραφή μηνυμάτων</target>
+
 <source>Cannot find %x</source>
 <target>Δεν μπορεί να βρεθεί το %x</target>
 
@@ -1124,21 +1139,6 @@ Note: File names must be relative to base directories!
 
 <source>Leave as unresolved conflict</source>
 <target>Παράβλεψη ως ανεπίλυτη διένεξη</target>
-
-<source>Delete permanently</source>
-<target>Μόνιμη διαγραφή</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Μόνιμη διαγραφή ή αντικατάσταση των αρχείων</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Χρήση του Κάδου Ανακύκλωσης κατά τη διαγραφή ή αντικατάσταση αρχείων</target>
-
-<source>Versioning</source>
-<target>Διατήρηση παλιών εκδόσεων</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Μεταφορά αρχείων σε υποκατάλογο με χρονική περιγραφή</target>
 
 <source>Files</source>
 <target>Αρχεία</target>
@@ -1230,8 +1230,11 @@ Note: File names must be relative to base directories!
 <source>Cannot copy file %x to %y.</source>
 <target>Δεν μπορεί να αντιγραφεί το αρχείο %x στο %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Δεν μπορεί να αναγνωσθεί ο υποκατάλογος %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Δεν είναι δυνατό το άνοιγμα του υποκαταλόγου %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Δεν είναι δυνατή η καταλογογράφηση του υποκαταλόγου %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Ανιχνεύτηκε αέναος βρόχος υποκαταλόγων.</target>
@@ -1240,7 +1243,7 @@ Note: File names must be relative to base directories!
 <target>Τα δικαιώματα %x δεν μπορούν να οριστούν.</target>
 
 <source>Unable to move %x to the Recycle Bin!</source>
-<target>Το αρχείο %x δεν μπόρεσε να μεταφερθεί στον Κάδο Ανακύκλωσης!</target>
+<target>Το αρχείο %x δεν ήταν δυνατό να μεταφερθεί στον Κάδο Ανακύκλωσης!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Και οι δυο πλευρές έχουν αλλάξει από τον τελευταίο συγχρονισμό!</target>
@@ -1257,6 +1260,9 @@ Note: File names must be relative to base directories!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Ρύθμιση προεπιλεγμένης κατεύθυνσης συγχρονισμού: Τα νεότερα αρχεία θα αντικαταστήσουν τα παλιότερα.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Ο Κάδος Ανακύκλωσης δεν είναι διαθέσιμος για τις ακόλουθες διαδρομές! Τα αρχεία θα διαγραφούν μόνιμα:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>Μπορείτε να αγνοήσετε αυτό το λάθος, για να θεωρήσετε ότι ο υποκατάλογος είναι κενός.</target>
 
@@ -1265,6 +1271,9 @@ Note: File names must be relative to base directories!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Οι υποκατάλογοι είναι εξαρτώμενοι. Προσοχή κατά την εισαγωγή των κανόνων συγχρονισμού:</target>
+
+<source>Start comparison</source>
+<target>Έναρξη σύγκρισης</target>
 
 <source>Preparing synchronization...</source>
 <target>Προετοιμασία του συγχρονισμού...</target>
@@ -1277,6 +1286,9 @@ Note: File names must be relative to base directories!
 
 <source>Files %x have the same date but a different size!</source>
 <target>Τα αρχεία %x έχουν την ίδια ημερομηνία αλλά διαφορετικό μέγεθος!</target>
+
+<source>Items differ in attributes only</source>
+<target>Τα στοιχεία διαφέρουν μόνο ως προς τα χαρακτηριστικά τους</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Οι συμβολικοί δεσμοί %x έχουν την ίδια ημερομηνία αλλά διαφορετικό προορισμό.</target>
@@ -1292,9 +1304,6 @@ Note: File names must be relative to base directories!
 
 <source>Both sides are equal</source>
 <target>Οι δυο πλευρές είναι ίδιες</target>
-
-<source>Items have different attributes</source>
-<target>Τα στοιχεία έχουν διαφορετικά χαρακτηριστικά</target>
 
 <source>Copy new item to left</source>
 <target>Αντιγραφή του νέου στοιχείου στα αριστερά</target>
@@ -1359,6 +1368,9 @@ Note: File names must be relative to base directories!
 <source>Moving symbolic link %x to %y</source>
 <target>Μεταφορά του συμβολικού δεσμού %x στο %y</target>
 
+<source>Removing old versions...</source>
+<target></target>
+
 <source>Creating file %x</source>
 <target>Δημιουργία του αρχείου %x</target>
 
@@ -1410,14 +1422,11 @@ Note: File names must be relative to base directories!
 <source>Available:</source>
 <target>Διαθέσιμος:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Ο Κάδος Ανακύκλωσης δεν είναι διαθέσιμος για τις ακόλουθες διαδρομές! Τα αρχεία θα διαγραφούν μόνιμα:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Θα τροποποιηθεί ένας υποκατάλογος που είναι μέρος από πολλαπλά ζεύγη υποκαταλόγων. Παρακαλούμε επανελέγξτε τις ρυθμίσεις συγχρονισμού.</target>
 
-<source>Processing folder pair:</source>
-<target>Σύγκριση του ζεύγους υποκαταλόγων:</target>
+<source>Synchronizing folder pair:</source>
+<target>Συγχρονίζεται το ζευγάρι υποκαταλόγων:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Ο υποκατάλογος-στόχος %x υπάρχει ήδη.</target>

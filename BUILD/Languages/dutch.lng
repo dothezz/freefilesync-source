@@ -10,9 +10,6 @@
 <source>Searching for folder %x...</source>
 <target>Bezig met zoeken naar map %x...</target>
 
-<source>Batch execution</source>
-<target>Taak uitvoeren</target>
-
 <source>Items processed:</source>
 <target>Onderdelen verwerkt:</target>
 
@@ -33,6 +30,9 @@
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Bezig met afbreken: Wacht op beëindiging huidige bewerking...</target>
+
+<source>Failure to create time stamp for versioning:</source>
+<target></target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Geautomatiseerde Synchronisatie</target>
@@ -61,11 +61,11 @@
 <source>Create a batch job</source>
 <target>Creëer een taaklijst</target>
 
-<source>Synchronization settings</source>
-<target>Synchronisatieinstellingen</target>
-
 <source>Comparison settings</source>
 <target>Vergelijksinstellingen</target>
+
+<source>Synchronization settings</source>
+<target>Synchronisatieinstellingen</target>
 
 <source>About</source>
 <target>Informatie</target>
@@ -87,27 +87,6 @@
 
 <source>Select time span</source>
 <target>Selecteer tijdsspanne</target>
-
-<source>Show pop-up</source>
-<target>Laat pop-up zien</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Laat pop-up zien bij foutmeldingen of waarschuwingen</target>
-
-<source>Ignore errors</source>
-<target>Negeer foutmeldingen</target>
-
-<source>Hide all error and warning messages</source>
-<target>Verberg alle fout- en waarschuwingsberichten</target>
-
-<source>Exit instantly</source>
-<target>Sluit meteen af</target>
-
-<source>Abort synchronization immediately</source>
-<target>Stop synchronisatie onmiddelijk</target>
-
-<source>Browse</source>
-<target>Verkennen</target>
 
 <source>Invalid command line:</source>
 <target>Ongeldige opdrachtregel:</target>
@@ -247,7 +226,7 @@
 <source>&Open...</source>
 <target>&Open...</target>
 
-<source>Save &As...</source>
+<source>Save &as...</source>
 <target>Ops&laan als...</target>
 
 <source>&Quit</source>
@@ -260,7 +239,7 @@
 <target>&Inhoud</target>
 
 <source>&About</source>
-<target>O&ver</target>
+<target>&Over</target>
 
 <source>&Help</source>
 <target>&Help</target>
@@ -288,6 +267,9 @@
 
 <source>Remove folder</source>
 <target>Verwijder map</target>
+
+<source>Browse</source>
+<target>Verkennen</target>
 
 <source>Select a folder</source>
 <target>Selecteer een map</target>
@@ -321,8 +303,8 @@ De opdracht word geactiveerd als:
 <source>Cancel</source>
 <target>Annuleren</target>
 
-<source>(Build: %x)</source>
-<target>(Build: %x)</target>
+<source>Build: %x</source>
+<target>Build: %x</target>
 
 <source>All files</source>
 <target>Alle bestanden</target>
@@ -341,9 +323,6 @@ De opdracht word geactiveerd als:
 
 <source>A folder input field is empty.</source>
 <target>Een map invoerveld is leeg.</target>
-
-<source>Logging</source>
-<target>Loggen</target>
 
 <source>File time and size</source>
 <target>Bestandstijd- en grootte</target>
@@ -525,11 +504,11 @@ De opdracht word geactiveerd als:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Laatst gebruikte instellingen (druk op DEL om iets te verwijderen)</target>
 
-<source>Hide excluded items</source>
-<target>Verberg uitgesloten items</target>
+<source>Show excluded items</source>
+<target>Laat uitgesloten bestanden zien</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Verberg gefilterde of tijdelijk uitgesloten bestanden</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Laat gefilterde of tijdelijk uitgesloten bestanden zien</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Aantal bestanden en mappen die zullen worden aangemaakt</target>
@@ -573,68 +552,47 @@ De opdracht word geactiveerd als:
 <source>Right</source>
 <target>Rechts</target>
 
-<source>Status feedback</source>
-<target>Status terugkoppeling</target>
-
-<source>Show progress dialog</source>
-<target>Toon voortgangsdialoogvenster</target>
-
 <source>Error handling</source>
 <target>Fout afhandeling</target>
 
-<source>Maximum number of log files:</source>
-<target>Maximale aantal van logbestanden:</target>
+<source>Ignore</source>
+<target>Negeer</target>
 
-<source>Select folder to save log files:</source>
-<target>Selecteer de map voor het bewaren van logbestanden:</target>
+<source>Hide all error and warning messages</source>
+<target>Verberg alle fout- en waarschuwingsberichten</target>
 
-<source>Batch settings</source>
-<target>Batchinstellingen</target>
+<source>Pop-up</source>
+<target>Pop-up</target>
 
-<source>Select variant:</source>
-<target>Selecteer een variant:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Laat pop-up zien bij foutmeldingen of waarschuwingen</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identificeer en verspreid veranderingen aan beide kanten met behulp van een database. Verwijderingen, hernoemingen en conflicten worden automatisch gedetecteerd.</target>
+<source>Exit</source>
+<target>Sluiten</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Spiegel backup van linker map. Rechter map is na synchronisatie een exacte kopie van de linker map.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Kopiëer nieuwe of geupdate bestanden naar de rechter map.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Configureer uw eigen synchronisatieregels.</target>
-
-<source>Deletion handling</source>
-<target>Verwijder-afhandeling</target>
+<source>Abort synchronization on first error</source>
+<target>Synchronisatie stoppen bij eerste foutmelding</target>
 
 <source>On completion:</source>
 <target>Bij voltooiing:</target>
 
-<source>Configuration</source>
-<target>Configuratie</target>
+<source>Show progress dialog</source>
+<target>Toon voortgangsdialoogvenster</target>
 
-<source>Item exists on left side only</source>
-<target>Item bestaat alleen aan de linkerkant</target>
+<source>Generate log file</source>
+<target>Log bestand aanmaken</target>
 
-<source>Item exists on right side only</source>
-<target>Item bestaat alleen aan de rechterkant</target>
+<source>Select folder to save log files</source>
+<target>Selecteer map om log bestanden op te slaan</target>
 
-<source>Left side is newer</source>
-<target>De linkerkant is nieuwer</target>
+<source>Limit</source>
+<target>Limiet</target>
 
-<source>Right side is newer</source>
-<target>De rechterkant is nieuwer</target>
+<source>Limit maximum number of log files</source>
+<target>Limiteer maximaal aantal log bestanden</target>
 
-<source>Items have different content</source>
-<target>De items hebben een andere inhoud</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Conflict/item kan niet worden gecategoriseerd</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Batchinstellingen</target>
 
 <source>Compare by...</source>
 <target>Vergelijk met...</target>
@@ -666,6 +624,69 @@ overeenkomt
 <source>Symbolic Link handling</source>
 <target>Afhandeling van snelkoppelingen</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Selecteer een variant:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Identificeer en verspreid veranderingen aan beide kanten met behulp van een database. Verwijderingen, hernoemingen en conflicten worden automatisch gedetecteerd.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Spiegel backup van linker map. Rechter map is na synchronisatie een exacte kopie van de linker map.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Kopiëer nieuwe of geupdate bestanden naar de rechter map.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Configureer uw eigen synchronisatieregels.</target>
+
+<source>Deletion handling</source>
+<target>Verwijder-afhandeling</target>
+
+<source>Permanent</source>
+<target>Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Bestanden definitief verwijderen of overschrijven</target>
+
+<source>Recycle Bin</source>
+<target>Prullenbak</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Gebruik de prullenbak bij verwijderen of overschrijven van bestanden</target>
+
+<source>Versioning</source>
+<target>Versiebeheer</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Verplaats bestanden met tijdstempel naar specifieke map</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Limiteer maximaal aantal versies per bestand</target>
+
+<source>Configuration</source>
+<target>Configuratie</target>
+
+<source>Item exists on left side only</source>
+<target>Item bestaat alleen aan de linkerkant</target>
+
+<source>Item exists on right side only</source>
+<target>Item bestaat alleen aan de rechterkant</target>
+
+<source>Left side is newer</source>
+<target>De linkerkant is nieuwer</target>
+
+<source>Right side is newer</source>
+<target>De rechterkant is nieuwer</target>
+
+<source>Items have different content</source>
+<target>De items hebben een andere inhoud</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Conflict/item kan niet worden gecategoriseerd</target>
+
 <source>Synchronizing...</source>
 <target>Synchroniseert...</target>
 
@@ -681,8 +702,8 @@ overeenkomt
 <source>Donate with PayPal</source>
 <target>Doneer met PayPal</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Extra dank voor het vertalen van FreeFileSync gaat naar:</target>
+<source>Many thanks for localization:</source>
+<target>Veel dank voor de vertalingen:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback en suggesties zijn welkom</target>
@@ -698,9 +719,6 @@ overeenkomt
 
 <source>Published under the GNU General Public License</source>
 <target>Gepubliceerd onder de GNU General Public License</target>
-
-<source>Use Recycle Bin</source>
-<target>Gebruik de prullenbak</target>
 
 <source>Delete on both sides</source>
 <target>Verwijder aan beide zijdes</target>
@@ -771,8 +789,8 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <source>Statistics</source>
 <target>Statistieken</target>
 
-<source>Do not show this dialog again</source>
-<target>Toon deze melding niet meer</target>
+<source>Don't show this dialog again</source>
+<target>Laat deze dialoog niet meer zien</target>
 
 <source>Find what:</source>
 <target>Vind wat:</target>
@@ -855,11 +873,8 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <source>Do you want to save changes to %x?</source>
 <target>Wilt u de wijzigingen in %x opslaan?</target>
 
-<source>Save</source>
-<target>Opslaan</target>
-
-<source>Don't Save</source>
-<target>Niet opslaan</target>
+<source>Do&n't save</source>
+<target>&Niet opslaan</target>
 
 <source>Configuration loaded!</source>
 <target>Configuratie geladen!</target>
@@ -951,7 +966,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <source>Show files that won't be copied</source>
 <target>Toon bestanden die niet gekopiëerd zullen worden</target>
 
-<source>All directories in sync!</source>
+<source>All folders are in sync!</source>
 <target>Alle mappen zijn gesynchroniseerd!</target>
 
 <source>Comma separated list</source>
@@ -1041,6 +1056,9 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <source>Pause</source>
 <target>Pauze</target>
 
+<source>Logging</source>
+<target>Loggen</target>
+
 <source>Cannot find %x</source>
 <target>Kan %x niet vinden</target>
 
@@ -1121,21 +1139,6 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 
 <source>Leave as unresolved conflict</source>
 <target>Beschouw als onopgelost conflict</target>
-
-<source>Delete permanently</source>
-<target>Definitief verwijderen</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Bestanden definitief verwijderen of overschrijven</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Gebruik de prullenbak bij verwijderen of overschrijven van bestanden</target>
-
-<source>Versioning</source>
-<target>Versiebeheer</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Verplaats bestanden in een tijdsaangeduide submap</target>
 
 <source>Files</source>
 <target>Bestanden</target>
@@ -1227,8 +1230,11 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <source>Cannot copy file %x to %y.</source>
 <target>Kan bestand %x niet kopiëren naar %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Kan map %x niet lezen.</target>
+<source>Cannot open directory %x.</source>
+<target>Kan map %x niet openen.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Kan map %x niet opsommen.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Eindeloze map recursie gedetecteerd.</target>
@@ -1267,7 +1273,7 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <target>Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:</target>
 
 <source>Start comparison</source>
-<target></target>
+<target>Start vergelijking</target>
 
 <source>Preparing synchronization...</source>
 <target>Synchronisatie voorbereiden</target>
@@ -1281,8 +1287,8 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <source>Files %x have the same date but a different size!</source>
 <target>Bestanden %x hebben dezelfde datums maar een afwijkende grootte!</target>
 
-<source>Items have different attributes</source>
-<target>Items hebben verschillende attributen</target>
+<source>Items differ in attributes only</source>
+<target>Items verschillen alleen in attributen</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Snelkoppelingen %x hebben dezelfde datum maar een verschillend doel.</target>
@@ -1362,6 +1368,9 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <source>Moving symbolic link %x to %y</source>
 <target>Bezig met verplaatsen van snelkoppeling %x naar %y</target>
 
+<source>Removing old versions...</source>
+<target></target>
+
 <source>Creating file %x</source>
 <target>Bestand %x wordt aangemaakt</target>
 
@@ -1416,8 +1425,8 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen!
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Een map die onderdeel is van meerdere map paren word aangepast. Kijk alstublieft uw synchronisatie instellingen na.</target>
 
-<source>Synchronize folder pair:</source>
-<target></target>
+<source>Synchronizing folder pair:</source>
+<target>Bezig met synchroniseren van folder paar:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Doelmap %x bestaat al.</target>

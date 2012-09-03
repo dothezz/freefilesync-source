@@ -1,13 +1,11 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 #include "dir_lock.h"
 #include <utility>
-//#include <wx/utils.h>
 #include <wx/log.h>
-//#include <wx/msgdlg.h>
 #include <memory>
 #include <zen/last_error.h>
 #include <zen/thread.h> //includes <boost/thread.hpp>

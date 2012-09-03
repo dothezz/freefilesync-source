@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "algorithm.h"
@@ -509,8 +509,8 @@ private:
         std::for_each(container.files.begin(), container.files.end(),
                       [&](const std::pair<Zstring, InSyncFile>& filePair)
         {
-            if (filePair.second.left .id != FileId() &&
-                filePair.second.right.id != FileId() &&
+            if (getFileId(filePair.second.left ) != FileId() &&
+                getFileId(filePair.second.right) != FileId() &&
                 stillInSync(filePair.second, cmpVar, fileTimeTolerance))
                 onceEqual.insert(std::make_pair(getFileIdKey(filePair.second.left), getFileIdKey(filePair.second.right)));
         });
@@ -572,7 +572,7 @@ private:
     //detection of renamed files
     template <SelectedSide side>
     static FileIdKey getFileIdKey(const FileMapping& fsObj) { return std::make_tuple(fsObj.getLastWriteTime<side>(), fsObj.getFileSize<side>(), fsObj.getFileId<side>()); }
-    static FileIdKey getFileIdKey(const FileDescriptor& fileDescr) { return std::make_tuple(fileDescr.lastWriteTimeRaw, fileDescr.fileSize, fileDescr.id); }
+    static FileIdKey getFileIdKey(const FileDescriptor& fileDescr) { return std::make_tuple(fileDescr.lastWriteTimeRaw, fileDescr.fileSize, getFileId(fileDescr)); }
 
     struct LessFileIdKey
     {

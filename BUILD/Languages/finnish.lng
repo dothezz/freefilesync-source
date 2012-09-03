@@ -10,6 +10,15 @@
 <source>Searching for folder %x...</source>
 <target>Etsitään hakemistoa %x...</target>
 
+<source>Items processed:</source>
+<target>Osia käsitelty:</target>
+
+<source>Items remaining:</source>
+<target>Osia jäljellä:</target>
+
+<source>Total time:</source>
+<target>Kokonaisaika:</target>
+
 <source>Show in Explorer</source>
 <target>Näytä Explorerissa</target>
 
@@ -49,11 +58,11 @@
 <source>Create a batch job</source>
 <target>Eräajon luonti</target>
 
-<source>Synchronization settings</source>
-<target>Täsmäytyksen asetukset</target>
-
 <source>Comparison settings</source>
 <target>Vertailun asetukset</target>
+
+<source>Synchronization settings</source>
+<target>Täsmäytyksen asetukset</target>
 
 <source>About</source>
 <target>Ohje</target>
@@ -75,27 +84,6 @@
 
 <source>Select time span</source>
 <target>Valitse aikajana</target>
-
-<source>Show pop-up</source>
-<target>Näytä Pop-Up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Näytä Pop-Up (virheet/varoitukset)</target>
-
-<source>Ignore errors</source>
-<target>Älä huomioi virheitä</target>
-
-<source>Hide all error and warning messages</source>
-<target>Piilota kaikki virhe- ja varoitusviestit</target>
-
-<source>Exit instantly</source>
-<target>Poistu välittömästi</target>
-
-<source>Abort synchronization immediately</source>
-<target>Lopeta täsmäytys välittömästi</target>
-
-<source>Browse</source>
-<target>Selaa</target>
 
 <source>Invalid command line:</source>
 <target>Virheellinen komentokehote:</target>
@@ -235,7 +223,7 @@
 <source>&Open...</source>
 <target>&Avaa...</target>
 
-<source>Save &As...</source>
+<source>Save &as...</source>
 <target>Tallenna n&imellä...</target>
 
 <source>&Quit</source>
@@ -277,6 +265,9 @@
 <source>Remove folder</source>
 <target>Poista hakemisto</target>
 
+<source>Browse</source>
+<target>Selaa</target>
+
 <source>Select a folder</source>
 <target>Valitse hakemisto</target>
 
@@ -309,8 +300,8 @@ Käsky suoritetaan jos:
 <source>Cancel</source>
 <target>Lopeta</target>
 
-<source>(Build: %x)</source>
-<target>(Versio: %x)</target>
+<source>Build: %x</source>
+<target>Versio: %x</target>
 
 <source>All files</source>
 <target>Kaikki tiedostot</target>
@@ -329,9 +320,6 @@ Käsky suoritetaan jos:
 
 <source>A folder input field is empty.</source>
 <target>Hakemiston syöte on tyhjä.</target>
-
-<source>Logging</source>
-<target>Kirjaa</target>
 
 <source>File time and size</source>
 <target>Tiedoston aika ja koko</target>
@@ -353,18 +341,6 @@ Käsky suoritetaan jos:
 
 <source>FreeFileSync batch</source>
 <target>FreeFileSync eräajo</target>
-
-<source>Batch execution</source>
-<target>Eräajon suoritus</target>
-
-<source>Items processed:</source>
-<target>Osia käsitelty:</target>
-
-<source>Items remaining:</source>
-<target>Osia jäljellä:</target>
-
-<source>Total time:</source>
-<target>Kokonaisaika:</target>
 
 <source>Synchronization aborted!</source>
 <target>Täsmäytys lopetettiin!</target>
@@ -525,11 +501,11 @@ Käsky suoritetaan jos:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Viimeksi käytetty asetus (poista listalta paina DEL)</target>
 
-<source>Hide excluded items</source>
-<target>Piilota suodatetut</target>
+<source>Show excluded items</source>
+<target>Näytä suodatetut</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Piilota suodatetut ja tilapäisesti poistetut</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Näytä suodatetut/nyt pois suljetut tiedostot</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Luotavien tiedostojen ja hakemistojen määrä</target>
@@ -573,68 +549,47 @@ Käsky suoritetaan jos:
 <source>Right</source>
 <target>Oikea</target>
 
-<source>Status feedback</source>
-<target>Tilan palaute</target>
-
-<source>Show progress dialog</source>
-<target>Näytä etenemä ikkuna</target>
-
 <source>Error handling</source>
 <target>Virheiden käsittely</target>
 
-<source>Maximum number of log files:</source>
-<target>Lokitiedostojen enimmäismäärä:</target>
+<source>Ignore</source>
+<target>Ohita</target>
 
-<source>Select folder to save log files:</source>
-<target>Lokitiedostojen tallennushakemisto:</target>
+<source>Hide all error and warning messages</source>
+<target>Piilota kaikki virhe- ja varoitusviestit</target>
 
-<source>Batch settings</source>
-<target>Eräajo asetukset</target>
+<source>Pop-up</source>
+<target>Pop-up</target>
 
-<source>Select variant:</source>
-<target>Valitse vaihtoehto:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Näytä Pop-Up (virheet/varoitukset)</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Tunnista ja monista muutokset tietokannalla molemmille puolille. Poistot, uudelleennimeäminen ja ristiriidat havaitaan automaattisesti.</target>
+<source>Exit</source>
+<target>Poistu</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Vasemman peilaava varmuuskopio. Oikeanpuoleinen hakemisto muutetaan täsmäytyksessä vastaamaan tarkasti vasenta.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Kopioi uudet tai päivitetyt tiedostot oikeaan kansioon.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Määritä omat täsmäyssäännöt.</target>
-
-<source>Deletion handling</source>
-<target>Poistotapa</target>
+<source>Abort synchronization on first error</source>
+<target>Keskeytä täsmäytys ensimmäisestä virheestä</target>
 
 <source>On completion:</source>
 <target>Kun valmis</target>
 
-<source>Configuration</source>
-<target>Asetukset</target>
+<source>Show progress dialog</source>
+<target>Näytä etenemä ikkuna</target>
 
-<source>Item exists on left side only</source>
-<target>Kohde löytyy vain vasemmalta</target>
+<source>Generate log file</source>
+<target>Luo lokitiedosto</target>
 
-<source>Item exists on right side only</source>
-<target>Kohde löytyy vain oikealta</target>
+<source>Select folder to save log files</source>
+<target>Valitse tallennushakemisto lokeille</target>
 
-<source>Left side is newer</source>
-<target>Uudempi vasemmalla</target>
+<source>Limit</source>
+<target>Raja</target>
 
-<source>Right side is newer</source>
-<target>Uudempi oikealla</target>
+<source>Limit maximum number of log files</source>
+<target>Lokeja enintäin</target>
 
-<source>Items have different content</source>
-<target>Kohteilla eri sisältö</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Ristiriita, ei määriteltävissä</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Eräajo asetukset</target>
 
 <source>Compare by...</source>
 <target>Vertaile...</target>
@@ -666,6 +621,69 @@ on sama
 <source>Symbolic Link handling</source>
 <target>Pikakuvakkeiden hallinta</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Valitse vaihtoehto:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Tunnista ja monista muutokset tietokannalla molemmille puolille. Poistot, uudelleennimeäminen ja ristiriidat havaitaan automaattisesti.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Vasemman peilaava varmuuskopio. Oikeanpuoleinen hakemisto muutetaan täsmäytyksessä vastaamaan tarkasti vasenta.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Kopioi uudet tai päivitetyt tiedostot oikeaan kansioon.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Määritä omat täsmäyssäännöt.</target>
+
+<source>Deletion handling</source>
+<target>Poistotapa</target>
+
+<source>Permanent</source>
+<target>Pysyvä</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Poista tai korvaa tiedostoja pysyvästi</target>
+
+<source>Recycle Bin</source>
+<target>Roskakori</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Käytä Roskakoria kun poistat tai korvaat tiedostoja</target>
+
+<source>Versioning</source>
+<target>Versiointi</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Siirrä aikaleimatut tiedostot hakemistoon</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Tiedostoversioita enintäin</target>
+
+<source>Configuration</source>
+<target>Asetukset</target>
+
+<source>Item exists on left side only</source>
+<target>Kohde löytyy vain vasemmalta</target>
+
+<source>Item exists on right side only</source>
+<target>Kohde löytyy vain oikealta</target>
+
+<source>Left side is newer</source>
+<target>Uudempi vasemmalla</target>
+
+<source>Right side is newer</source>
+<target>Uudempi oikealla</target>
+
+<source>Items have different content</source>
+<target>Kohteilla eri sisältö</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Ristiriita, ei määriteltävissä</target>
+
 <source>Synchronizing...</source>
 <target>Täsmäytetään...</target>
 
@@ -681,8 +699,8 @@ on sama
 <source>Donate with PayPal</source>
 <target>Lahjoita PayPal:lla</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Suuret kiitokset FreeFileSync:n paikallistamisesta:</target>
+<source>Many thanks for localization:</source>
+<target>Paljon kiitoksia kääntäjille:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Palaute ja uudet ideat ovat tervetulleita</target>
@@ -698,9 +716,6 @@ on sama
 
 <source>Published under the GNU General Public License</source>
 <target>Julkaistu lisenssillä GNU General Public License</target>
-
-<source>Use Recycle Bin</source>
-<target>Käytä Roskakoria</target>
 
 <source>Delete on both sides</source>
 <target>Poista molemmilta puolilta</target>
@@ -771,8 +786,8 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Statistics</source>
 <target>Tilastot</target>
 
-<source>Do not show this dialog again</source>
-<target>Älä enää näytä valintaikkunaa</target>
+<source>Don't show this dialog again</source>
+<target>Älä näytä tätä uudestaan</target>
 
 <source>Find what:</source>
 <target>Etsi:</target>
@@ -855,10 +870,7 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Do you want to save changes to %x?</source>
 <target>Haluatko tallentaa muutokset: %x?</target>
 
-<source>Save</source>
-<target>Tallenna</target>
-
-<source>Don't Save</source>
+<source>Do&n't save</source>
 <target>Älä tallenna</target>
 
 <source>Configuration loaded!</source>
@@ -951,8 +963,8 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Show files that won't be copied</source>
 <target>Näytä kopioimatta jäävät tiedostot</target>
 
-<source>All directories in sync!</source>
-<target>Kaikki hakemistot täsmäävät!</target>
+<source>All folders are in sync!</source>
+<target>Kaikki hakemistot täsmäytetty!</target>
 
 <source>Comma separated list</source>
 <target>CSV-muotoinen lista</target>
@@ -1041,6 +1053,9 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Pause</source>
 <target>Tauko</target>
 
+<source>Logging</source>
+<target>Kirjaa</target>
+
 <source>Cannot find %x</source>
 <target>En löydä %x</target>
 
@@ -1121,21 +1136,6 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 
 <source>Leave as unresolved conflict</source>
 <target>Jätä ratkaisemattomana virheenä</target>
-
-<source>Delete permanently</source>
-<target>Poista pysyvästi</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Poista tai korvaa tiedostoja pysyvästi</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Käytä Roskakoria kun poistat tai korvaat tiedostoja</target>
-
-<source>Versioning</source>
-<target>Versiointi</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Siirrä tiedostot aikaleimattuun alihakemistoon</target>
 
 <source>Files</source>
 <target>Tiedostot</target>
@@ -1227,8 +1227,11 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Cannot copy file %x to %y.</source>
 <target>Tiedostoa %x ei voida kopioida kohtaan %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Hakemisto %x ei voida lukea.</target>
+<source>Cannot open directory %x.</source>
+<target>Hakemistoa %x ei voida avata.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Hakemistoa ei voida luetella.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Päättymätön hakemiston toisto.</target>
@@ -1254,6 +1257,9 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Aseta oletussuunta täsmäykselle: Vanhat tiedostot korvataan uudemilla tiedostoilla.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Roskakori puuttuu näistä polusta! Tiedostot poistetaan pysyvästi:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>Ohita tämä virhe ja oleta hakemisto tyhjäksi.</target>
 
@@ -1262,6 +1268,9 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Hakemistot riippuvuussuhteessa! Aseta täsmäyssääntöjä varovasti:</target>
+
+<source>Start comparison</source>
+<target>Käynnistä vertailu</target>
 
 <source>Preparing synchronization...</source>
 <target>Täsmäytys alustetaan...</target>
@@ -1274,6 +1283,9 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 
 <source>Files %x have the same date but a different size!</source>
 <target>Tiedostoilla %x on sama päiväys mutta eri koko!</target>
+
+<source>Items differ in attributes only</source>
+<target>Kohteiden eroaa vain määritteissä</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Pikakuvikeilla %x on sama päiväys mutta osoittavat eri kohtiin.</target>
@@ -1289,9 +1301,6 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 
 <source>Both sides are equal</source>
 <target>Puolet ovat identtiset</target>
-
-<source>Items have different attributes</source>
-<target>Kohteilla poikkeavat ominaisuudet</target>
 
 <source>Copy new item to left</source>
 <target>Monista uusi vasemmalle</target>
@@ -1407,14 +1416,11 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Available:</source>
 <target>Saatavilla:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Roskakori puuttuu näistä polusta! Tiedostot poistetaan pysyvästi:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Moniosaisen hakemistoparin hakemistoa muutetaan. Tarkista täsmäytyksen asetuksia.</target>
 
-<source>Processing folder pair:</source>
-<target>Käsitellään hakemistoparia:</target>
+<source>Synchronizing folder pair:</source>
+<target>Täsmäytetään  hakemistoparia:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Kohdehakemisto %x on olemassa.</target>

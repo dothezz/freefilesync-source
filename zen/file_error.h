@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef FILEERROR_H_INCLUDED
@@ -32,6 +32,7 @@ DEFINE_NEW_FILE_ERROR(ErrorNotExisting);
 DEFINE_NEW_FILE_ERROR(ErrorTargetExisting);
 DEFINE_NEW_FILE_ERROR(ErrorTargetPathMissing);
 DEFINE_NEW_FILE_ERROR(ErrorFileLocked);
+DEFINE_NEW_FILE_ERROR(ErrorDifferentVolume);
 
 
 

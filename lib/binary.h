@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef BINARY_H_INCLUDED
@@ -13,13 +13,10 @@
 
 namespace zen
 {
-
-//callback functionality for status updates while comparing
-class CompareCallback
+struct CompareCallback
 {
-public:
     virtual ~CompareCallback() {}
-    virtual void updateCompareStatus(zen::UInt64 totalBytes) = 0;
+    virtual void updateCompareStatus(UInt64 totalBytes) = 0;
 };
 
 bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback); //throw FileError

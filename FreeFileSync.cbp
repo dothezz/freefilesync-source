@@ -23,9 +23,9 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-static" />
-					<Add library="libboost_thread-mgw47-mt-s-1_50.a" />
-					<Add library="libboost_system-mgw47-mt-s-1_50.a" />
-					<Add library="libboost_chrono-mgw47-mt-s-1_50.a" />
+					<Add library="libboost_thread-mgw47-mt-s-1_51.a" />
+					<Add library="libboost_system-mgw47-mt-s-1_51.a" />
+					<Add library="libboost_chrono-mgw47-mt-s-1_51.a" />
 					<Add library="libwxmsw28u_aui.a" />
 					<Add library="libwxmsw28u_adv.a" />
 					<Add library="libwxmsw28u_core.a" />
@@ -55,9 +55,9 @@
 					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_debug_dll\mswud" />
 				</Compiler>
 				<Linker>
-					<Add library="libboost_thread-mgw47-mt-sd-1_50.a" />
-					<Add library="libboost_system-mgw47-mt-sd-1_50.a" />
-					<Add library="libboost_chrono-mgw47-mt-sd-1_50.a" />
+					<Add library="libboost_thread-mgw47-mt-sd-1_51.a" />
+					<Add library="libboost_system-mgw47-mt-sd-1_51.a" />
+					<Add library="libboost_chrono-mgw47-mt-sd-1_51.a" />
 					<Add library="libwxmsw28ud_aui.a" />
 					<Add library="libwxmsw28ud_adv.a" />
 					<Add library="libwxmsw28ud_core.a" />
@@ -85,9 +85,9 @@
 					<Add directory="lib\gtest\include" />
 				</Compiler>
 				<Linker>
-					<Add library="libboost_thread-mgw47-mt-sd-1_50.a" />
-					<Add library="libboost_system-mgw47-mt-sd-1_50.a" />
-					<Add library="libboost_chrono-mgw47-mt-sd-1_50.a" />
+					<Add library="libboost_thread-mgw47-mt-sd-1_51.a" />
+					<Add library="libboost_system-mgw47-mt-sd-1_51.a" />
+					<Add library="libboost_chrono-mgw47-mt-sd-1_51.a" />
 					<Add library="libwxmsw28ud_adv.a" />
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />
@@ -166,6 +166,7 @@
 		<Unit filename="lib\dir_exist_async.h" />
 		<Unit filename="lib\dir_lock.cpp" />
 		<Unit filename="lib\dir_lock.h" />
+		<Unit filename="lib\error_log.h" />
 		<Unit filename="lib\ffs_paths.h" />
 		<Unit filename="lib\generate_logfile.h" />
 		<Unit filename="lib\gtest\main.cpp">
@@ -219,6 +220,8 @@
 		<Unit filename="lib\soft_filter.h" />
 		<Unit filename="lib\status_handler.cpp" />
 		<Unit filename="lib\status_handler.h" />
+		<Unit filename="lib\versioning.cpp" />
+		<Unit filename="lib\versioning.h" />
 		<Unit filename="lib\xml_base.cpp" />
 		<Unit filename="lib\xml_base.h" />
 		<Unit filename="resource.rc">

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "triple_splitter.h"
@@ -188,6 +188,10 @@ void TripleSplitter::onMouseMovement(wxMouseEvent& event)
     if (activeMove)
     {
         centerOffset = activeMove->getCenterPosXStart() - getCenterPosXOptimal() + event.GetPosition().x - activeMove->getMousePosXStart();
+
+        //CAVEAT: centerOffset is evaluated *before* normalization in getCenterPosX()!
+        //This can lead to the strange effect of window not immediately resizing when centerOffset is extremely off limits => normalize right here
+        centerOffset = getCenterPosX() - getCenterPosXOptimal();
 
         updateWindowSizes();
         Update(); //no time to wait until idle event!

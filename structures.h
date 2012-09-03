@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef FREEFILESYNC_H_INCLUDED
@@ -12,7 +12,6 @@
 #include <zen/zstring.h>
 #include <zen/assert_static.h>
 #include <zen/int64.h>
-
 
 namespace zen
 {
@@ -72,20 +71,6 @@ enum CompareSymlinkResult
     SYMLINK_CONFLICT        = FILE_CONFLICT
 };
 
-/*
-inline
-CompareFilesResult convertToFilesResult(CompareDirResult value)
-{
-    return static_cast<CompareFilesResult>(value);
-}
-
-
-inline
-CompareFilesResult convertToFilesResult(CompareSymlinkResult value)
-{
-    return static_cast<CompareFilesResult>(value);
-}
-*/
 
 std::wstring getSymbol(CompareFilesResult cmpRes);
 
@@ -181,10 +166,10 @@ std::wstring getVariantName(DirectionConfig::Variant var);
 
 struct CompConfig
 {
-    CompConfig(CompareVariant cmpVar,
-               SymLinkHandling handleSyml) :
-        compareVar(cmpVar),
-        handleSymlinks(handleSyml) {}
+    //CompConfig(CompareVariant cmpVar,
+    //           SymLinkHandling handleSyml) :
+    //    compareVar(cmpVar),
+    //    handleSymlinks(handleSyml) {}
 
     CompConfig() :
         compareVar(CMP_BY_TIME_SIZE),
@@ -204,39 +189,42 @@ bool operator==(const CompConfig& lhs, const CompConfig& rhs)
 
 enum DeletionPolicy
 {
-    DELETE_PERMANENTLY = 5,
-    MOVE_TO_RECYCLE_BIN,
-    MOVE_TO_CUSTOM_DIRECTORY
+    DELETE_PERMANENTLY,
+    DELETE_TO_RECYCLER,
+    DELETE_TO_VERSIONING
 };
 
 
 struct SyncConfig
 {
-    SyncConfig(const DirectionConfig& directCfg,
-               const DeletionPolicy   handleDel,
-               const Zstring&         customDelDir) :
-        directionCfg(directCfg),
-        handleDeletion(handleDel),
-        customDeletionDirectory(customDelDir) {}
+    //SyncConfig(const DirectionConfig& directCfg,
+    //           const DeletionPolicy   handleDel,
+    //           const Zstring&         versionDir) :
+    //    directionCfg(directCfg),
+    //    handleDeletion(handleDel),
+    //    versioningDirectory(versionDir) {}
 
     SyncConfig() :  //construct with default values
-        handleDeletion(MOVE_TO_RECYCLE_BIN) {}
+        handleDeletion(DELETE_TO_RECYCLER),
+        versionCountLimit(-1) {}
 
     //sync direction settings
     DirectionConfig directionCfg;
 
     //misc options
     DeletionPolicy handleDeletion; //use Recycle, delete permanently or move to user-defined location
-    Zstring customDeletionDirectory;
+    Zstring versioningDirectory;
+    int versionCountLimit; //max versions per file (DELETE_TO_VERSIONING); < 0 := no limit
 };
 
 inline
 bool operator==(const SyncConfig& lhs, const SyncConfig& rhs)
 {
-    return lhs.directionCfg            == rhs.directionCfg   &&
-           lhs.handleDeletion          == rhs.handleDeletion &&
-           (lhs.handleDeletion != MOVE_TO_CUSTOM_DIRECTORY || //only compare deletion directory if required!
-            lhs.customDeletionDirectory == rhs.customDeletionDirectory);
+    return lhs.directionCfg   == rhs.directionCfg   &&
+           lhs.handleDeletion == rhs.handleDeletion &&
+           (lhs.handleDeletion != DELETE_TO_VERSIONING || //only compare deletion directory if required!
+            (lhs.versioningDirectory == rhs.versioningDirectory &&
+             lhs.versionCountLimit   == rhs.versionCountLimit));
 }
 
 

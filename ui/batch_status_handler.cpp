@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "batch_status_handler.h"
@@ -27,6 +27,7 @@ class FindLogfiles : public TraverseCallback
 public:
     FindLogfiles(const Zstring& prefix, std::vector<Zstring>& logfiles) : prefix_(prefix), logfiles_(logfiles) {}
 
+private:
     virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
     {
         const Zstring fileName(shortName);
@@ -37,9 +38,8 @@ public:
     virtual std::shared_ptr<TraverseCallback>
     onDir (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
     virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual HandleError onError  (const std::wstring& errorText) { return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleError onError  (const std::wstring& msg) { return ON_ERROR_IGNORE; } //errors are not really critical in this context
 
-private:
     const Zstring prefix_;
     std::vector<Zstring>& logfiles_;
 };
@@ -48,16 +48,16 @@ private:
 void limitLogfileCount(const Zstring& logdir, const std::wstring& jobname, size_t maxCount) //throw()
 {
     std::vector<Zstring> logFiles;
-    FindLogfiles traverseCallback(toZ(jobname), logFiles);
+    FindLogfiles traverseCallback(toZ(jobname), logFiles); //throw()!
 
-    traverseFolder(logdir, //throw();
+    traverseFolder(logdir,
                    traverseCallback);
 
     if (logFiles.size() <= maxCount)
         return;
 
-    //delete oldest logfiles
-    std::nth_element(logFiles.begin(), logFiles.end() - maxCount, logFiles.end()); //take advantage of logfile naming convention to find oldest files
+    //delete oldest logfiles: take advantage of logfile naming convention to find them
+    std::nth_element(logFiles.begin(), logFiles.end() - maxCount, logFiles.end(), LessFilename());
 
     std::for_each(logFiles.begin(), logFiles.end() - maxCount,
     [](const Zstring& filename) { try { removeFile(filename); } catch (FileError&) {} });
@@ -66,7 +66,7 @@ void limitLogfileCount(const Zstring& logdir, const std::wstring& jobname, size_
 
 std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, //throw FileError
                                               const std::wstring& jobName,
-                                              const std::wstring& timestamp) //return value always bound!
+                                              const TimeComp& timeStamp) //return value always bound!
 {
     //create logfile directory if required
     Zstring logfileDir = logfileDirectory.empty() ?
@@ -76,7 +76,7 @@ std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, /
     makeDirectory(logfileDir); //throw FileError
 
     //assemble logfile name
-    const Zstring body = appendSeparator(logfileDir) + toZ(jobName) + Zstr(" ") + utfCvrtTo<Zstring>(timestamp);
+    const Zstring body = appendSeparator(logfileDir) + toZ(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp);
 
     //ensure uniqueness
     for (int i = 0;; ++i)
@@ -97,9 +97,9 @@ std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, /
 //##############################################################################################################################
 BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        const std::wstring& jobName,
-                                       const std::wstring& timestamp,
-                                       const wxString& logfileDirectory, //may be empty
-                                       size_t logFileCountMax,
+                                       const TimeComp& timeStamp,
+                                       const Zstring& logfileDirectory, //may be empty
+                                       int logfilesCountLimit,
                                        const xmlAccess::OnError handleError,
                                        const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                                        FfsReturnCode& returnCode,
@@ -113,16 +113,17 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     syncStatusFrame(*this, *this, nullptr, showProgress, jobName, execWhenFinished, execFinishedHistory),
     jobName_(jobName)
 {
-    if (logFileCountMax > 0) //init log file: starts internal timer!
-        if (!tryReportingError([&]
+    if (logfilesCountLimit != 0) //init log file: starts internal timer!
     {
-        logFile = prepareNewLogfile(toZ(logfileDirectory), jobName, timestamp); //throw FileError; return value always bound!
+        if (!tryReportingError([&] { logFile = prepareNewLogfile(logfileDirectory, jobName, timeStamp); }, //throw FileError; return value always bound!
+                               *this))
+        {
+            returnCode_ = FFS_RC_ABORTED;
+            throw BatchAbortProcess();
+        }
 
-            limitLogfileCount(beforeLast(logFile->getFilename(), FILE_NAME_SEPARATOR), jobName_, logFileCountMax); //throw()
-        }, *this))
-    {
-        returnCode_ = FFS_RC_ABORTED;
-        throw BatchAbortProcess();
+        if (logfilesCountLimit >= 0)
+            limitLogfileCount(beforeLast(logFile->getFilename(), FILE_NAME_SEPARATOR), jobName_, logfilesCountLimit); //throw()
     }
 
     totalTime.Start(); //measure total time
@@ -203,7 +204,10 @@ BatchStatusHandler::~BatchStatusHandler()
             if (isCloseProgressDlgCommand(finalCommand))
                 showFinalResults = false; //take precedence over current visibility status
             else if (!finalCommand.empty())
-                shellExecute(finalCommand);
+            {
+                auto cmdexp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(finalCommand)));
+                shellExecute(cmdexp);
+            }
         }
 
         if (showFinalResults) //warning: wxWindow::Show() is called within processHasFinished()!

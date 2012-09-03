@@ -10,6 +10,15 @@
 <source>Searching for folder %x...</source>
 <target>Söker efter mappen %x...</target>
 
+<source>Items processed:</source>
+<target>Processade poster</target>
+
+<source>Items remaining:</source>
+<target>Återstående poster:</target>
+
+<source>Total time:</source>
+<target>Total tid:</target>
+
 <source>Show in Explorer</source>
 <target>Visa i Utforskaren</target>
 
@@ -49,11 +58,11 @@
 <source>Create a batch job</source>
 <target>Skapa ett batch-jobb</target>
 
-<source>Synchronization settings</source>
-<target>Synkroniseringsinställningar</target>
-
 <source>Comparison settings</source>
 <target>Jämförelseinställningar</target>
+
+<source>Synchronization settings</source>
+<target>Synkroniseringsinställningar</target>
 
 <source>About</source>
 <target>Om</target>
@@ -75,27 +84,6 @@
 
 <source>Select time span</source>
 <target>Välj tidsintervall</target>
-
-<source>Show pop-up</source>
-<target>Visa pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Visa pop-up vid fel och varningar</target>
-
-<source>Ignore errors</source>
-<target>Ignorera fel</target>
-
-<source>Hide all error and warning messages</source>
-<target>Visa inte fel- och varningsmeddelanden</target>
-
-<source>Exit instantly</source>
-<target>Avsluta omedelbart</target>
-
-<source>Abort synchronization immediately</source>
-<target>Avbryt synkronisering omedelbart</target>
-
-<source>Browse</source>
-<target>Bläddra</target>
 
 <source>Invalid command line:</source>
 <target>Ogiltig kommandorad:</target>
@@ -235,8 +223,8 @@
 <source>&Open...</source>
 <target>&Öppna...</target>
 
-<source>Save &As...</source>
-<target>Spara s&om...</target>
+<source>Save &as...</source>
+<target>S&para som...</target>
 
 <source>&Quit</source>
 <target>&Avsluta</target>
@@ -277,6 +265,9 @@
 <source>Remove folder</source>
 <target>Ta bort mapp</target>
 
+<source>Browse</source>
+<target>Bläddra</target>
+
 <source>Select a folder</source>
 <target>Markera en mapp</target>
 
@@ -309,8 +300,8 @@ Kommandot triggas om:
 <source>Cancel</source>
 <target>Avbryt</target>
 
-<source>(Build: %x)</source>
-<target>(Bygge: %x)</target>
+<source>Build: %x</source>
+<target>Bygge: %x</target>
 
 <source>All files</source>
 <target>Alla filer</target>
@@ -329,9 +320,6 @@ Kommandot triggas om:
 
 <source>A folder input field is empty.</source>
 <target>Ett inmatningsfält är tomt</target>
-
-<source>Logging</source>
-<target>Loggar</target>
 
 <source>File time and size</source>
 <target>Tidsstämpling och storlek</target>
@@ -353,21 +341,6 @@ Kommandot triggas om:
 
 <source>FreeFileSync batch</source>
 <target>FreeFileSync batch</target>
-
-<source>Batch execution</source>
-<target>Batch-körning</target>
-
-<source>Items processed:</source>
-<target>Processade poster</target>
-
-<source>Items remaining:</source>
-<target>Återstående poster:</target>
-
-<source>Total time:</source>
-<target>Total tid:</target>
-
-<source>Stop</source>
-<target>Stopp</target>
 
 <source>Synchronization aborted!</source>
 <target>Synkronisering avbruten!</target>
@@ -528,11 +501,11 @@ Kommandot triggas om:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Senast använda konfigurationer (Tryck DEL för att ta bort)</target>
 
-<source>Hide excluded items</source>
-<target>Visa inte undantagna objekt</target>
+<source>Show excluded items</source>
+<target>Visa undantagna poster</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Visa inte filtrerade eller temporärt undantagna filer</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Visa filtrerade eller temporärt undantagna filer</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Antal filer och mappar som kommer att skapas</target>
@@ -576,68 +549,47 @@ Kommandot triggas om:
 <source>Right</source>
 <target>Höger</target>
 
-<source>Status feedback</source>
-<target>Status</target>
-
-<source>Show progress dialog</source>
-<target>Visa förloppsindikator</target>
-
 <source>Error handling</source>
 <target>Felhantering</target>
 
-<source>Maximum number of log files:</source>
-<target>Max antal loggfiler:</target>
+<source>Ignore</source>
+<target>Ignorera</target>
 
-<source>Select folder to save log files:</source>
-<target>Välj mapp, att spara loggfiler i</target>
+<source>Hide all error and warning messages</source>
+<target>Visa inte fel- och varningsmeddelanden</target>
 
-<source>Batch settings</source>
-<target>Batch-inställningar</target>
+<source>Pop-up</source>
+<target>Popup</target>
 
-<source>Select variant:</source>
-<target>Välj variant:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Visa popup vid fel och varningar</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Använd en databas för att identifiera och sprida ändringar på båda sidor. Borttagning, namnbyte och konflikter upptäcks automatiskt</target>
+<source>Exit</source>
+<target>Avsluta</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Speglar säkerhetskopia av vänster mapp. Höger mapp ändras för att exakt matcha vänster efter synkroniseringen.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Kopiera nya och uppdaterade filer till höger mapp.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Konfigurera dina egna synkroniseringsregler.</target>
-
-<source>Deletion handling</source>
-<target>Borttagning</target>
+<source>Abort synchronization on first error</source>
+<target>Avbryt synkronisering vid första felet</target>
 
 <source>On completion:</source>
 <target>Vid slutfört:</target>
 
-<source>Configuration</source>
-<target>Inställningar</target>
+<source>Show progress dialog</source>
+<target>Visa förloppsindikator</target>
 
-<source>Item exists on left side only</source>
-<target>Objektet finns bara på vänster sida</target>
+<source>Generate log file</source>
+<target>Skapa loggfil</target>
 
-<source>Item exists on right side only</source>
-<target>Objektet finns bara på höger sida</target>
+<source>Select folder to save log files</source>
+<target>Väl en mapp att spara loggfiler i</target>
 
-<source>Left side is newer</source>
-<target>Vänster sida är nyare</target>
+<source>Limit</source>
+<target>Begränsa</target>
 
-<source>Right side is newer</source>
-<target>Höger sida är nyare</target>
+<source>Limit maximum number of log files</source>
+<target>Begränsa antalet loggfiler</target>
 
-<source>Items have different content</source>
-<target>Objekten har olika innehåll</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Konflikten/Objektet kan inte kategoriseras</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Batch-inställningar</target>
 
 <source>Compare by...</source>
 <target>Jämför...</target>
@@ -669,6 +621,69 @@ Filerna betecknas som lika om,
 <source>Symbolic Link handling</source>
 <target>Hantering av Symboliska länkar</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Välj variant:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Använd en databas för att identifiera och sprida ändringar på båda sidor. Borttagning, namnbyte och konflikter upptäcks automatiskt</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Speglar säkerhetskopia av vänster mapp. Höger mapp ändras för att exakt matcha vänster efter synkroniseringen.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Kopiera nya och uppdaterade filer till höger mapp.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Konfigurera dina egna synkroniseringsregler.</target>
+
+<source>Deletion handling</source>
+<target>Borttagning</target>
+
+<source>Permanent</source>
+<target>Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Ta bort eller skriv över permanent</target>
+
+<source>Recycle Bin</source>
+<target>Papperskorgen</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Använd papperskorgen vid borttagning och överskrivning av filer</target>
+
+<source>Versioning</source>
+<target>Versionshantering</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Flytta tidsstämplade filer till specificerad mapp</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Begränsa antalet versioner per fil</target>
+
+<source>Configuration</source>
+<target>Inställningar</target>
+
+<source>Item exists on left side only</source>
+<target>Objektet finns bara på vänster sida</target>
+
+<source>Item exists on right side only</source>
+<target>Objektet finns bara på höger sida</target>
+
+<source>Left side is newer</source>
+<target>Vänster sida är nyare</target>
+
+<source>Right side is newer</source>
+<target>Höger sida är nyare</target>
+
+<source>Items have different content</source>
+<target>Objekten har olika innehåll</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Konflikten/Objektet kan inte kategoriseras</target>
+
 <source>Synchronizing...</source>
 <target>Synkroniserar...</target>
 
@@ -684,8 +699,8 @@ Filerna betecknas som lika om,
 <source>Donate with PayPal</source>
 <target>Donera via PayPal</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Stort tack för översättningen av FreeFileSync går till:</target>
+<source>Many thanks for localization:</source>
+<target>Tack för översättning:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Återkoppling och förslag är välkommna</target>
@@ -701,9 +716,6 @@ Filerna betecknas som lika om,
 
 <source>Published under the GNU General Public License</source>
 <target>Publiserad under GNU General Public License</target>
-
-<source>Use Recycle Bin</source>
-<target>Använd papperskorgen</target>
 
 <source>Delete on both sides</source>
 <target>Ta bort på båda sidor</target>
@@ -774,8 +786,8 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Statistics</source>
 <target>Statistik</target>
 
-<source>Do not show this dialog again</source>
-<target>Visa inte den här dialogrutan igen</target>
+<source>Don't show this dialog again</source>
+<target>Visa inte det här igen</target>
 
 <source>Find what:</source>
 <target>Sök efter:</target>
@@ -858,11 +870,8 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Do you want to save changes to %x?</source>
 <target>Vill du spara ändringar till %x?</target>
 
-<source>Save</source>
-<target>Spara</target>
-
-<source>Don't Save</source>
-<target>Spara inte</target>
+<source>Do&n't save</source>
+<target>Spara &inte</target>
 
 <source>Configuration loaded!</source>
 <target>Inställningar inlästa!</target>
@@ -954,8 +963,8 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Show files that won't be copied</source>
 <target>Visa filer som inte kommer att kopieras</target>
 
-<source>All directories in sync!</source>
-<target>Alla mappar synkroniserade!</target>
+<source>All folders are in sync!</source>
+<target>Alla mappar är synkroniserade!</target>
 
 <source>Comma separated list</source>
 <target>Komma-separerad lista</target>
@@ -1044,6 +1053,9 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Pause</source>
 <target>Paus</target>
 
+<source>Logging</source>
+<target>Loggar</target>
+
 <source>Cannot find %x</source>
 <target>Kan inte hitta %x</target>
 
@@ -1124,21 +1136,6 @@ OBS! Filnamnen måste anges relativt till basmappar
 
 <source>Leave as unresolved conflict</source>
 <target>Ignorera konflikt</target>
-
-<source>Delete permanently</source>
-<target>Ta bort permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Ta bort eller skriv över permanent</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Använd papperskorgen vid borttagning och överskrivning av filer</target>
-
-<source>Versioning</source>
-<target>Versionshantering</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Flytta filer till en tidsstämplad undermapp</target>
 
 <source>Files</source>
 <target>Filer</target>
@@ -1230,8 +1227,11 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Cannot copy file %x to %y.</source>
 <target>Kan inte kopiera filen %x till %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Kan inte läsa in mappen %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Kan inte öppna %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Kan inte räkna upp %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Upptäckte ändlös mapprekursion</target>
@@ -1257,6 +1257,9 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Standardsynkronisering: Gamla filer kommer att skrivas över av nyare versioner.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Papperskorgen är inte tillgänglig för följande sökvägar! Filerna tas i stället bort permanent.</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>Du kan ignorera detta fel och betrakta mappen som tom</target>
 
@@ -1265,6 +1268,9 @@ OBS! Filnamnen måste anges relativt till basmappar
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Mappar är beroende! Var försiktig när du sätter upp synkroniseringsregler:</target>
+
+<source>Start comparison</source>
+<target>Starta jämförelse</target>
 
 <source>Preparing synchronization...</source>
 <target>Förbereder synkronisering...</target>
@@ -1277,6 +1283,9 @@ OBS! Filnamnen måste anges relativt till basmappar
 
 <source>Files %x have the same date but a different size!</source>
 <target>Filerna %x har samma datum men olika storlek!</target>
+
+<source>Items differ in attributes only</source>
+<target>Endast attribut skiljer objekten åt</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>De symboliska länkarna %x har samma datumstämpel men olika mål.</target>
@@ -1292,9 +1301,6 @@ OBS! Filnamnen måste anges relativt till basmappar
 
 <source>Both sides are equal</source>
 <target>Bägge sidor är lika</target>
-
-<source>Items have different attributes</source>
-<target>Objekten har olika attribut</target>
 
 <source>Copy new item to left</source>
 <target>Kopiera nytt objekt åt vänster</target>
@@ -1410,14 +1416,11 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Available:</source>
 <target>Tillgängligt:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Papperskorgen är inte tillgänglig för följande sökvägar! Filerna tas i stället bort permanent.</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>En mapp som tillhör flera mapp-par är på väg att ändras. Kontrollera synkroniseringsinställningarna</target>
 
-<source>Processing folder pair:</source>
-<target>Bearbetar mapp-paret:</target>
+<source>Synchronizing folder pair:</source>
+<target>Synkroniserar mapp-par:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Målmappen %x finns redan.</target>

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef REALTIMESYNCMAIN_H
@@ -11,7 +11,6 @@
 #include <vector>
 #include <memory>
 #include "../ui/dir_name.h"
-#include <wx+/dir_picker.h>
 
 namespace xmlAccess
 {
@@ -24,7 +23,7 @@ class DirectoryPanel : public FolderGenerated
 public:
     DirectoryPanel(wxWindow* parent) :
         FolderGenerated(parent),
-        dirName(*this, *m_dirPicker, *m_txtCtrlDirectory) {}
+        dirName(*this, *m_buttonSelectDir, *m_txtCtrlDirectory) {}
 
     void setName(const wxString& dirname) { dirName.setName(dirname); }
     wxString getName() const { return dirName.getName(); }

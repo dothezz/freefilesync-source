@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "file_traverser.h"
@@ -195,7 +195,7 @@ struct Win32Traverser
         hnd.searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryPf + L'*').c_str(), &hnd.data);
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
         if (hnd.searchHandle == INVALID_HANDLE_VALUE)
-            throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
 
         //::GetLastError() == ERROR_FILE_NOT_FOUND -> *usually* NOT okay:
         //directory may not exist *or* it is completely empty: not all directories contain "., .." entries, e.g. a drive's root directory
@@ -220,7 +220,7 @@ struct Win32Traverser
             if (::GetLastError() == ERROR_NO_MORE_FILES) //not an error situation
                 return false;
             //else we have a problem... report it:
-            throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
         }
         return true;
     }
@@ -256,7 +256,7 @@ struct FilePlusTraverser
     {
         hnd.searchHandle = ::openDir(applyLongPathPrefix(directory).c_str());
         if (hnd.searchHandle == nullptr)
-            throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted() + L" (+)");
+            throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted() + L" (+)");
     }
 
     static void destroy(DirHandle hnd) { ::closeDir(hnd.searchHandle); } //throw()
@@ -281,7 +281,7 @@ struct FilePlusTraverser
             }
 
             //else we have a problem... report it:
-            throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (+)");
+            throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (+)");
         }
 
         return true;
@@ -336,7 +336,7 @@ private:
         tryReportingError([&]
         {
             if (level == 100) //notify endless recursion
-                throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + _("Detected endless directory recursion."));
+                throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + _("Detected endless directory recursion."));
         }, sink);
 
         typename Trav::DirHandle searchHandle;
@@ -382,29 +382,26 @@ private:
                 switch (sink.onSymlink(shortName, fullName, linkInfo))
                 {
                     case TraverseCallback::LINK_FOLLOW:
-                    {
-                        //try to resolve symlink (and report error on failure!!!)
-                        TraverseCallback::FileInfo targetInfo;
-                        const bool validLink = tryReportingError([&]
+                        if (Trav::isDirectory(findData))
                         {
-                            if (!getTargetInfoFromSymlink(fullName, targetInfo))
-                                throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(fullName)) + L"\n\n" + getLastErrorFormatted());
-                        }, sink);
-
-                        if (validLink)
-                        {
-                            if (Trav::isDirectory(findData))
-                            {
-                                if (const std::shared_ptr<TraverseCallback>& rv = sink.onDir(shortName, fullName))
-                                    traverse<Trav>(fullName, *rv, level + 1);
-                            }
-                            else //a file
-                                sink.onFile(shortName, fullName, targetInfo);
+                            if (const std::shared_ptr<TraverseCallback>& rv = sink.onDir(shortName, fullName))
+                                traverse<Trav>(fullName, *rv, level + 1);
                         }
-                        else //report broken symlink as file!
-                            sink.onFile(shortName, fullName, TraverseCallback::FileInfo());
-                    }
-                    break;
+                        else //a file
+                        {
+                            TraverseCallback::FileInfo targetInfo;
+                            const bool validLink = tryReportingError([&] //try to resolve symlink (and report error on failure!!!)
+                            {
+                                if (!getTargetInfoFromSymlink(fullName, targetInfo))
+                                    throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(fullName)) + L"\n\n" + getLastErrorFormatted());
+                            }, sink);
+
+                            if (validLink)
+                                sink.onFile(shortName, fullName, targetInfo);
+                            else //broken symlink
+                                sink.onFile(shortName, fullName, TraverseCallback::FileInfo());
+                        }
+                        break;
 
                     case TraverseCallback::LINK_SKIP:
                         break;
@@ -525,7 +522,7 @@ private:
         tryReportingError([&]
         {
             if (level == 100) //notify endless recursion
-                throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + _("Detected endless directory recursion."));
+                throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + _("Detected endless directory recursion."));
         }, sink);
 
 
@@ -534,7 +531,7 @@ private:
     {
         dirObj = ::opendir(directory.c_str()); //directory must NOT end with path separator, except "/"
             if (!dirObj)
-                throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
+                throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
         }, sink))
         return; //ignored error
         ZEN_ON_SCOPE_EXIT(::closedir(dirObj)); //never close nullptr handles! -> crash
@@ -545,7 +542,7 @@ private:
             tryReportingError([&]
             {
                 if (::readdir_r(dirObj, reinterpret_cast< ::dirent*>(&buffer[0]), &dirEntry) != 0)
-                    throw FileError(replaceCpy(_("Cannot read directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
+                    throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
             }, sink);
             if (!dirEntry) //no more items or ignored error
                 return;

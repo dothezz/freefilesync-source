@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "file_hierarchy.h"
@@ -279,7 +279,7 @@ std::wstring zen::getCategoryDescription(CompareFilesResult cmpRes)
         case FILE_EQUAL:
             return _("Both sides are equal");
         case FILE_DIFFERENT_METADATA:
-            return _("Items have different attributes");
+            return _("Items differ in attributes only");
         case FILE_CONFLICT:
             return _("Conflict/item cannot be categorized");
     }

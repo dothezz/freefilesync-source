@@ -10,9 +10,6 @@
 <source>Searching for folder %x...</source>
 <target>Søger efter mappen %x...</target>
 
-<source>Batch execution</source>
-<target>Batch afvikling</target>
-
 <source>Items processed:</source>
 <target>Enheder behandlet:</target>
 
@@ -61,11 +58,11 @@
 <source>Create a batch job</source>
 <target>Lav et batch job</target>
 
-<source>Synchronization settings</source>
-<target>Synkroniserings indstillinger</target>
-
 <source>Comparison settings</source>
 <target>Sammenlignings indstillinger</target>
+
+<source>Synchronization settings</source>
+<target>Synkroniserings indstillinger</target>
 
 <source>About</source>
 <target>Om</target>
@@ -87,27 +84,6 @@
 
 <source>Select time span</source>
 <target>Vælg tids område</target>
-
-<source>Show pop-up</source>
-<target>Vis pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Vis pop-up ved fejl eller advarsler</target>
-
-<source>Ignore errors</source>
-<target>Ignorer fejl</target>
-
-<source>Hide all error and warning messages</source>
-<target>Skjul beskeder om fejl og advarsler</target>
-
-<source>Exit instantly</source>
-<target>Afslut med det samme</target>
-
-<source>Abort synchronization immediately</source>
-<target>Abort synkronisering med det samme</target>
-
-<source>Browse</source>
-<target>Gennemse</target>
 
 <source>Invalid command line:</source>
 <target>Ugyldig kommando:</target>
@@ -247,8 +223,8 @@
 <source>&Open...</source>
 <target>&Åben...</target>
 
-<source>Save &As...</source>
-<target>Gem &Som...</target>
+<source>Save &as...</source>
+<target>Gem &som...</target>
 
 <source>&Quit</source>
 <target>&Afslut</target>
@@ -289,6 +265,9 @@
 <source>Remove folder</source>
 <target>Fjern mappe</target>
 
+<source>Browse</source>
+<target>Gennemse</target>
+
 <source>Select a folder</source>
 <target>Vælg en mappe</target>
 
@@ -321,8 +300,8 @@ Kommandoen udføres hvis:
 <source>Cancel</source>
 <target>Anuller</target>
 
-<source>(Build: %x)</source>
-<target>(Build: %x)</target>
+<source>Build: %x</source>
+<target>Build: %x</target>
 
 <source>All files</source>
 <target>Alle filer</target>
@@ -341,9 +320,6 @@ Kommandoen udføres hvis:
 
 <source>A folder input field is empty.</source>
 <target>Et mappe felt er tomt.</target>
-
-<source>Logging</source>
-<target>Logger</target>
 
 <source>File time and size</source>
 <target>Fil tid og størrelse</target>
@@ -525,11 +501,11 @@ Kommandoen udføres hvis:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Senest brugte konfigurationer (tryk DEL for at fjerne fra listen)</target>
 
-<source>Hide excluded items</source>
-<target>Skjul udelukkede emner</target>
+<source>Show excluded items</source>
+<target>Vis afviste emner</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Skjul filtrerede eller midlertidigt udelukkede filer</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Vis filtrerede eller midlertidigt afviste filer</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Antallet af filer og mapper der vil blive oprettet</target>
@@ -573,68 +549,47 @@ Kommandoen udføres hvis:
 <source>Right</source>
 <target>Højre</target>
 
-<source>Status feedback</source>
-<target>Status feedback</target>
-
-<source>Show progress dialog</source>
-<target>Vis dialog boks</target>
-
 <source>Error handling</source>
 <target>Fejl håndtering</target>
 
-<source>Maximum number of log files:</source>
-<target>Maksimalt antal log filer:</target>
+<source>Ignore</source>
+<target>Ignorer</target>
 
-<source>Select folder to save log files:</source>
-<target>Vælg hvor log filer skal gemmes:</target>
+<source>Hide all error and warning messages</source>
+<target>Skjul beskeder om fejl og advarsler</target>
 
-<source>Batch settings</source>
-<target>Batch indstillinger</target>
+<source>Pop-up</source>
+<target>Pop-up</target>
 
-<source>Select variant:</source>
-<target>Vælg variant:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Vis pop-up ved fejl eller advarsler</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>find ændringer på begge sider via. database. Sletninger, omdøbninger og konflikter bliver automatisk fundet.</target>
+<source>Exit</source>
+<target>Afslut</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Spejling af venstre mappe. Højre mappe tilpasses så den ligner den venstre efter synkronisering.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Kopier nye eller opdaterede filer til højre mappe.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Konfigurer dine egne synkroniserings regler.</target>
-
-<source>Deletion handling</source>
-<target>Slette håndtering</target>
+<source>Abort synchronization on first error</source>
+<target>Stop synkronisering ved første fejl</target>
 
 <source>On completion:</source>
 <target>Før færdiggørelse:</target>
 
-<source>Configuration</source>
-<target>Konfiguration</target>
+<source>Show progress dialog</source>
+<target>Vis dialog boks</target>
 
-<source>Item exists on left side only</source>
-<target>Enheden findes kun på venstre side</target>
+<source>Generate log file</source>
+<target>Lav log fil</target>
 
-<source>Item exists on right side only</source>
-<target>Enheden findes kun på højre side</target>
+<source>Select folder to save log files</source>
+<target>Vælg destinations mappe til log filer</target>
 
-<source>Left side is newer</source>
-<target>Venstre side er nyest</target>
+<source>Limit</source>
+<target>Grænse</target>
 
-<source>Right side is newer</source>
-<target>Højre side er nyest</target>
+<source>Limit maximum number of log files</source>
+<target>Maksimale antal log filer</target>
 
-<source>Items have different content</source>
-<target>Enhederne har forskelligt indhold</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Advarsel/enheden kan ikke kategoriseres</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Batch indstillinger</target>
 
 <source>Compare by...</source>
 <target>Sammenlign ved...</target>
@@ -666,6 +621,69 @@ er det samme
 <source>Symbolic Link handling</source>
 <target>Link håndtering</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Vælg variant:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>find ændringer på begge sider via. database. Sletninger, omdøbninger og konflikter bliver automatisk fundet.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Spejling af venstre mappe. Højre mappe tilpasses så den ligner den venstre efter synkronisering.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Kopier nye eller opdaterede filer til højre mappe.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Konfigurer dine egne synkroniserings regler.</target>
+
+<source>Deletion handling</source>
+<target>Slette håndtering</target>
+
+<source>Permanent</source>
+<target>Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Slet eller overskriv filer permanent</target>
+
+<source>Recycle Bin</source>
+<target>Skralsespand</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Brug skraldespand ved sletning eller overskrivning</target>
+
+<source>Versioning</source>
+<target>Versionering</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Flyt tids-stemplede filer til den valgte mappe</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Begræns det maksimale antal fil versioner</target>
+
+<source>Configuration</source>
+<target>Konfiguration</target>
+
+<source>Item exists on left side only</source>
+<target>Enheden findes kun på venstre side</target>
+
+<source>Item exists on right side only</source>
+<target>Enheden findes kun på højre side</target>
+
+<source>Left side is newer</source>
+<target>Venstre side er nyest</target>
+
+<source>Right side is newer</source>
+<target>Højre side er nyest</target>
+
+<source>Items have different content</source>
+<target>Enhederne har forskelligt indhold</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Advarsel/enheden kan ikke kategoriseres</target>
+
 <source>Synchronizing...</source>
 <target>Synkroniserer...</target>
 
@@ -681,8 +699,8 @@ er det samme
 <source>Donate with PayPal</source>
 <target>Doner med PayPal</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Stor tak for lokalisering af FreeFileSync går til:</target>
+<source>Many thanks for localization:</source>
+<target>Mange tak for oversættelse til:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback og forslag er velkomne</target>
@@ -698,9 +716,6 @@ er det samme
 
 <source>Published under the GNU General Public License</source>
 <target>Udgivet under GNU General Public Licence</target>
-
-<source>Use Recycle Bin</source>
-<target>Brug skraldespanden</target>
 
 <source>Delete on both sides</source>
 <target>Slet på begge sider</target>
@@ -771,8 +786,8 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <source>Statistics</source>
 <target>Statestik</target>
 
-<source>Do not show this dialog again</source>
-<target>Vis ikke denne dialog igen</target>
+<source>Don't show this dialog again</source>
+<target>Vis ikke denne dialog boks igen</target>
 
 <source>Find what:</source>
 <target>Find:</target>
@@ -855,11 +870,8 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <source>Do you want to save changes to %x?</source>
 <target>Ønsker du at gemme ændringerne til %x?</target>
 
-<source>Save</source>
-<target>Gem</target>
-
-<source>Don't Save</source>
-<target>Gem Ikke</target>
+<source>Do&n't save</source>
+<target>Gem ikke</target>
 
 <source>Configuration loaded!</source>
 <target>Konfiguration hentet!</target>
@@ -951,8 +963,8 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <source>Show files that won't be copied</source>
 <target>Vis filer der ikke bliver kopieret</target>
 
-<source>All directories in sync!</source>
-<target>Alle biblioteker er synkroniseret!</target>
+<source>All folders are in sync!</source>
+<target>Alle mapper er synkroniserede</target>
 
 <source>Comma separated list</source>
 <target>Komma separeret list</target>
@@ -1041,6 +1053,9 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <source>Pause</source>
 <target>Pause</target>
 
+<source>Logging</source>
+<target>Logger</target>
+
 <source>Cannot find %x</source>
 <target>Kan ikke finde %x</target>
 
@@ -1121,21 +1136,6 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 
 <source>Leave as unresolved conflict</source>
 <target>Efterlad som uløste konflikter</target>
-
-<source>Delete permanently</source>
-<target>Slet permanent</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Slet eller overskriv filer permanent</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Brug skraldespand ved sletning eller overskrivning</target>
-
-<source>Versioning</source>
-<target>Versionering</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Flyt filer til tids-stemplet undermappe</target>
 
 <source>Files</source>
 <target>Filer</target>
@@ -1227,8 +1227,11 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <source>Cannot copy file %x to %y.</source>
 <target>Kan ikke kopiere filen %x til %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Kan ikke læse biblioteket %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Kan ikke åbne bibliotek %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Kan ikke optælle biblioteket %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Opdaget en uendelig biblioteks løkke.</target>
@@ -1254,6 +1257,9 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Sætter standard synkroniseringsvej: Gamle filer bliver overskrevet med nyere.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Papirkurven kan ikke bruges på følgende stier! Filerne vil blive slettet permanent i stedet for:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>Du kan ignorere denne fejl og betegne mappen som tom.</target>
 
@@ -1262,6 +1268,9 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Biblioteker er afhængige! Vær forsigtig når du laver synkroniserings reglerne:</target>
+
+<source>Start comparison</source>
+<target>Start sammenligning</target>
 
 <source>Preparing synchronization...</source>
 <target>Forbereder synkronisering...</target>
@@ -1274,6 +1283,9 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 
 <source>Files %x have the same date but a different size!</source>
 <target>Filerne %x har den samme dato men forskellig størrelse!</target>
+
+<source>Items differ in attributes only</source>
+<target>Enheder der kun har attributter til forskel</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Linksene %x har samme dato men forskellige mål.</target>
@@ -1289,9 +1301,6 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 
 <source>Both sides are equal</source>
 <target>Begge sider er ens</target>
-
-<source>Items have different attributes</source>
-<target>Enhederne har forskellige attributter</target>
 
 <source>Copy new item to left</source>
 <target>Kopiere nyt emne mod venstre</target>
@@ -1407,14 +1416,11 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <source>Available:</source>
 <target>Tilgængeligt:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Papirkurven kan ikke bruges på følgende stier! Filerne vil blive slettet permanent i stedet for:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>En mappe som er en del af flere mappe parringer vil blive ændret. Gennemse venligst synkroniserings indstillingerne.</target>
 
-<source>Processing folder pair:</source>
-<target>Behandler mappe par:</target>
+<source>Synchronizing folder pair:</source>
+<target>Synkroniserer mappe par:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Destinations mappen %x eksisterer allerede.</target>

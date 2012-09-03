@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef PARALLEL_SCAN_H_INCLUDED
@@ -45,7 +45,7 @@ bool operator<(const DirectoryKey& lhs, const DirectoryKey& rhs)
 struct DirectoryValue
 {
     DirContainer dirCont;
-    std::set<Zstring> failedReads; //relative postfixed names of directories that could not be read (empty string for root), e.g. access denied, or temporal network drop
+    std::set<Zstring> failedReads; //relative postfixed names of directories that could not be read completely (empty string for root), e.g. access denied, or temporal network drop
 };
 
 
@@ -59,8 +59,8 @@ public:
         ON_ERROR_RETRY,
         ON_ERROR_IGNORE
     };
-    virtual HandleError reportError (const std::wstring& errorText) = 0;                 //may throw!
-    virtual void        reportStatus(const std::wstring& statusMsg, int itemsTotal) = 0; //
+    virtual HandleError reportError (const std::wstring& msg) = 0;                 //may throw!
+    virtual void        reportStatus(const std::wstring& msg, int itemsTotal) = 0; //
 };
 
 //attention: ensure directory filtering is applied later to exclude filtered directories which have been kept as parent folders

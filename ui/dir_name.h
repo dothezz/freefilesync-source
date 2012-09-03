@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef DRAGANDDROP_H_INCLUDED
@@ -10,23 +10,34 @@
 #include <vector>
 #include <wx/event.h>
 #include <wx/sizer.h>
-#include <wx/filepicker.h>
 #include <wx+/file_drop.h>
 #include <wx/stattext.h>
+#include <wx/button.h>
 
 namespace zen
 {
-//handle drag and drop, tooltip, label and manual input, coordinating a wxWindow, wxDirPickerCtrl, and wxComboBox/wxTextCtrl
+//handle drag and drop, tooltip, label and manual input, coordinating a wxWindow, wxButton, and wxComboBox/wxTextCtrl
+/*
+Reasons NOT to use wxDirPickerCtrl, but wxButton instead:
+	- Crash on GTK 2: http://favapps.wordpress.com/2012/06/11/freefilesync-crash-in-linux-when-syncing-solved/
+	- selection dialog remembers size, but NOT position => if user enlarges window, the next time he opens the dialog it may leap out of visible screen
+	- still uses outdated ::SHBrowseForFolder() (Windows 7)
+	- hard-codes "Browse" button label
+*/
+
+//emit event when directory is changed by the user:
+extern const wxEventType EVENT_ON_DIR_SELECTED;
+//example: wnd.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MyDlg::OnDirSelected), nullptr, this);
 
 template <class NameControl>  //NameControl may be wxTextCtrl, FolderHistoryBox
-class DirectoryName: private wxEvtHandler
+class DirectoryName: public wxEvtHandler
 {
 public:
-    DirectoryName(wxWindow&        dropWindow,
-                  wxDirPickerCtrl& dirPicker,
-                  NameControl&     dirName,
-                  wxStaticText*    staticText = nullptr,
-                  wxWindow*        dropWindow2 = nullptr); //optional
+    DirectoryName(wxWindow&     dropWindow,
+                  wxButton&     selectButton,
+                  NameControl&  dirName,
+                  wxStaticText* staticText  = nullptr,  //optional
+                  wxWindow*     dropWindow2 = nullptr); //
 
     ~DirectoryName();
 
@@ -38,13 +49,13 @@ private:
 
     void OnFilesDropped(FileDropEvent& event);
     void OnWriteDirManually(wxCommandEvent& event);
-    void OnDirSelected(wxFileDirPickerEvent& event);
+    void OnSelectDir(wxCommandEvent& event);
 
-    const wxWindow&   dropWindow_;
-    const wxWindow*   dropWindow2_;
-    wxDirPickerCtrl&  dirPicker_;
-    NameControl&      dirName_;
-    wxStaticText*     staticText_; //optional
+    wxWindow&     dropWindow_;
+    wxWindow*     dropWindow2_;
+    wxButton&     selectButton_;
+    NameControl&  dirName_;
+    wxStaticText* staticText_; //optional
 };
 }
 

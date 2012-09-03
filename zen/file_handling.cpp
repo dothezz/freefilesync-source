@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "file_handling.h"
@@ -91,7 +91,7 @@ bool zen::symlinkExists(const Zstring& linkname)
 }
 
 
-bool zen::somethingExists(const Zstring& objname) //throw()       check whether any object with this name exists
+bool zen::somethingExists(const Zstring& objname)
 {
 #ifdef FFS_WIN
     const DWORD rv = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
@@ -349,8 +349,6 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
 
 namespace
 {
-DEFINE_NEW_FILE_ERROR(ErrorDifferentVolume);
-
 /* Usage overview: (avoid circular pattern!)
 
   renameFile()  -->  renameFile_sub()
@@ -567,214 +565,6 @@ void zen::renameFile(const Zstring& oldName, const Zstring& newName) //throw Fil
 }
 
 
-class CopyCallbackImpl : public zen::CallbackCopyFile //callback functionality
-{
-public:
-    CopyCallbackImpl(const Zstring& sourceFile,
-                     const Zstring& targetFile,
-                     CallbackMoveFile* callback) : sourceFile_(sourceFile),
-        targetFile_(targetFile),
-        moveCallback(callback) {}
-
-    virtual void deleteTargetFile(const Zstring& targetFile) { assert(!fileExists(targetFile)); }
-
-    virtual void updateCopyStatus(Int64 bytesDelta)
-    {
-        if (moveCallback)
-            moveCallback->updateStatus(bytesDelta);
-    }
-
-private:
-    CopyCallbackImpl(const CopyCallbackImpl&);
-    CopyCallbackImpl& operator=(const CopyCallbackImpl&);
-
-    const Zstring sourceFile_;
-    const Zstring targetFile_;
-    CallbackMoveFile* moveCallback; //optional
-};
-
-
-void zen::moveFile(const Zstring& sourceFile, const Zstring& targetFile, CallbackMoveFile* callback) //throw FileError
-{
-    if (callback) callback->onBeforeFileMove(sourceFile, targetFile); //call back once *after* work was done
-
-    //first try to move the file directly without copying
-    try
-    {
-        renameFile(sourceFile, targetFile); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
-        //great, we get away cheaply!
-        if (callback) callback->objectProcessed();
-        return;
-    }
-    //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
-    catch (const ErrorDifferentVolume&) {}
-    catch (const ErrorTargetExisting&) {}
-
-    //create target
-    if (!fileExists(targetFile)) //check even if ErrorTargetExisting: me may have clashed with a directory of the same name!!!
-    {
-        //file is on a different volume: let's copy it
-        if (symlinkExists(sourceFile))
-            copySymlink(sourceFile, targetFile, false); //throw FileError; don't copy filesystem permissions
-        else
-        {
-            CopyCallbackImpl copyCallback(sourceFile, targetFile, callback);
-            copyFile(sourceFile, targetFile, false, true, &copyCallback); //throw FileError - permissions "false", transactional copy "true"
-        }
-    }
-
-    //delete source
-    removeFile(sourceFile); //throw FileError
-
-    //note: newly copied file is NOT deleted in case of exception: currently this function is called in context of user-defined deletion dir, where this behavior is fine
-    if (callback) callback->objectProcessed();
-}
-
-namespace
-{
-class TraverseOneLevel : public zen::TraverseCallback
-{
-public:
-    typedef std::pair<Zstring, Zstring> ShortLongNames;
-    typedef std::vector<ShortLongNames> NameList;
-
-    TraverseOneLevel(NameList& files, NameList& dirs) :
-        files_(files),
-        dirs_(dirs) {}
-
-    virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
-    {
-        files_.push_back(std::make_pair(shortName, fullName));
-    }
-
-    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
-    {
-        if (details.dirLink)
-            dirs_.push_back(std::make_pair(shortName, fullName));
-        else
-            files_.push_back(std::make_pair(shortName, fullName));
-        return LINK_SKIP;
-    }
-
-    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
-    {
-        dirs_.push_back(std::make_pair(shortName, fullName));
-        return nullptr; //DON'T traverse into subdirs; moveDirectory works recursively!
-    }
-
-    virtual HandleError onError(const std::wstring& errorText) { throw FileError(errorText); }
-
-private:
-    TraverseOneLevel(const TraverseOneLevel&);
-    TraverseOneLevel& operator=(const TraverseOneLevel&);
-
-    NameList& files_;
-    NameList& dirs_;
-};
-
-
-struct RemoveCallbackImpl : public CallbackRemoveDir
-{
-    RemoveCallbackImpl(CallbackMoveFile* moveCallback) : moveCallback_(moveCallback) {}
-
-    virtual void notifyFileDeletion(const Zstring& filename) { if (moveCallback_) moveCallback_->updateStatus(0); }
-    virtual void notifyDirDeletion (const Zstring& dirname ) { if (moveCallback_) moveCallback_->updateStatus(0); }
-
-private:
-    RemoveCallbackImpl(const RemoveCallbackImpl&);
-    RemoveCallbackImpl& operator=(const RemoveCallbackImpl&);
-
-    CallbackMoveFile* moveCallback_; //optional
-};
-}
-
-
-void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, CallbackMoveFile* callback) //throw FileError
-{
-    //note: we cannot support "throw exception if target already exists": If we did, we would have to do a full cleanup
-    //removing all newly created directories in case of an exception so that subsequent tries would not fail with "target already existing".
-    //However an exception may also happen during final deletion of source folder, in which case cleanup effectively leads to data loss!
-
-    if (callback) callback->onBeforeDirMove(sourceDir, targetDir); //call back once *after* work was done
-
-    //first try to move the directory directly without copying
-    try
-    {
-        renameFile(sourceDir, targetDir); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
-        //great, we get away cheaply!
-        if (callback) callback->objectProcessed();
-        return;
-    }
-    //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the directory)
-    catch (const ErrorDifferentVolume&) {}
-    catch (const ErrorTargetExisting& ) {}
-
-    //create target
-    if (symlinkExists(sourceDir))
-    {
-        if (!symlinkExists(targetDir))
-            copySymlink(sourceDir, targetDir, false); //throw FileError -> don't copy permissions
-    }
-    else
-    {
-        try
-        {
-            makeNewDirectory(targetDir, sourceDir, false); //FileError, ErrorTargetExisting
-        }
-        catch (const ErrorTargetExisting&)
-        {
-            if (!dirExists(targetDir))
-                throw; //clashed with a file or symlink of the same name!!!
-        }
-
-        //move files/folders recursively
-        TraverseOneLevel::NameList fileList; //list of names: 1. short 2.long
-        TraverseOneLevel::NameList dirList;  //
-
-        //traverse source directory one level
-        TraverseOneLevel traverseCallback(fileList, dirList);
-        traverseFolder(sourceDir, traverseCallback); //traverse one level
-
-        const Zstring targetDirPf = appendSeparator(targetDir);
-
-        //move files
-        for (TraverseOneLevel::NameList::const_iterator i = fileList.begin(); i != fileList.end(); ++i)
-            moveFile(i->second, targetDirPf + i->first, callback); //throw FileError
-
-        //move directories
-        for (TraverseOneLevel::NameList::const_iterator i = dirList.begin(); i != dirList.end(); ++i)
-            ::moveDirectoryImpl(i->second, targetDirPf + i->first, callback);
-    }
-
-    //delete source
-    RemoveCallbackImpl removeCallback(callback);
-    removeDirectory(sourceDir, &removeCallback); //throw FileError
-
-    if (callback) callback->objectProcessed();
-}
-
-
-void zen::moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, CallbackMoveFile* callback) //throw FileError
-{
-#ifdef FFS_WIN
-    const Zstring& sourceDirFormatted = sourceDir;
-    const Zstring& targetDirFormatted = targetDir;
-
-#elif defined FFS_LINUX
-    const Zstring sourceDirFormatted = //remove trailing slash
-        sourceDir.size() > 1 && endsWith(sourceDir, FILE_NAME_SEPARATOR) ?  //exception: allow '/'
-        beforeLast(sourceDir, FILE_NAME_SEPARATOR) :
-        sourceDir;
-    const Zstring targetDirFormatted = //remove trailing slash
-        targetDir.size() > 1 && endsWith(targetDir, FILE_NAME_SEPARATOR) ?  //exception: allow '/'
-        beforeLast(targetDir, FILE_NAME_SEPARATOR) :
-        targetDir;
-#endif
-
-    ::moveDirectoryImpl(sourceDirFormatted, targetDirFormatted, callback);
-}
-
-
 class FilesDirsOnlyTraverser : public zen::TraverseCallback
 {
 public:
@@ -799,7 +589,7 @@ public:
         m_dirs.push_back(fullName);
         return nullptr; //DON'T traverse into subdirs; removeDirectory works recursively!
     }
-    virtual HandleError onError(const std::wstring& errorText) { throw FileError(errorText); }
+    virtual HandleError onError(const std::wstring& msg) { throw FileError(msg); }
 
 private:
     FilesDirsOnlyTraverser(const FilesDirsOnlyTraverser&);
@@ -1213,26 +1003,32 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
 void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSymlink procSl) //throw FileError
 {
 #ifdef FFS_WIN
-    //setting privileges requires admin rights!
-
-    //enable privilege: required to read/write SACL information (only)
-    activatePrivilege(SE_SECURITY_NAME); //throw FileError
-    //Note: trying to copy SACL (SACL_SECURITY_INFORMATION) may return ERROR_PRIVILEGE_NOT_HELD (1314) on Samba shares. This is not due to missing privileges!
-    //However, this is okay, since copying NTFS permissions doesn't make sense in this case anyway
-
-    //enable privilege: required to copy owner information
-    activatePrivilege(SE_RESTORE_NAME); //throw FileError
-
-    //the following privilege may be required according to http://msdn.microsoft.com/en-us/library/aa364399(VS.85).aspx (although not needed nor active in my tests)
-    activatePrivilege(SE_BACKUP_NAME); //throw FileError
-
-
     //in contrast to ::SetSecurityInfo(), ::SetFileSecurity() seems to honor the "inherit DACL/SACL" flags
     //CAVEAT: if a file system does not support ACLs, GetFileSecurity() will return successfully with a *valid* security descriptor containing *no* ACL entries!
 
     //NOTE: ::GetFileSecurity()/::SetFileSecurity() do NOT follow Symlinks!
     const Zstring sourceResolved = procSl == SYMLINK_FOLLOW && symlinkExists(source) ? getSymlinkTargetPath(source) : source;
     const Zstring targetResolved = procSl == SYMLINK_FOLLOW && symlinkExists(target) ? getSymlinkTargetPath(target) : target;
+
+    //setting privileges requires admin rights!
+    try
+    {
+        //enable privilege: required to read/write SACL information (only)
+        activatePrivilege(SE_SECURITY_NAME); //throw FileError
+        //Note: trying to copy SACL (SACL_SECURITY_INFORMATION) may return ERROR_PRIVILEGE_NOT_HELD (1314) on Samba shares. This is not due to missing privileges!
+        //However, this is okay, since copying NTFS permissions doesn't make sense in this case anyway
+
+        //enable privilege: required to copy owner information
+        activatePrivilege(SE_RESTORE_NAME); //throw FileError
+
+        //the following privilege may be required according to http://msdn.microsoft.com/en-us/library/aa364399(VS.85).aspx (although not needed nor active in my tests)
+        activatePrivilege(SE_BACKUP_NAME); //throw FileError
+    }
+    catch (const FileError& e)//add some more context description (e.g. user is not an admin)
+    {
+        throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(sourceResolved)) + L"\n\n" + e.toString());
+    }
+
 
     std::vector<char> buffer(10000); //example of actually required buffer size: 192 bytes
     for (;;)
@@ -1571,7 +1367,8 @@ void zen::makeDirectory(const Zstring& directory)
     }
     catch (const FileError& e)
     {
-        assert(dynamic_cast<const ErrorTargetExisting*>(&e)); (void)e;
+        assert(dynamic_cast<const ErrorTargetExisting*>(&e));
+        (void)e;
         //could there be situations where a directory/network path exists, but creation fails with
         //error different than "ErrorTargetExisting"?? => better catch all "FileError" and check existence again
         if (dirExists(directory)) //technically a file system race-condition!
@@ -2127,7 +1924,7 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         //some odd check for some possible(?) error condition
         if (totalBytesTransferred.QuadPart < 0) //let's see if someone answers the call...
             ::MessageBox(nullptr, L"You've just discovered a bug in WIN32 API function \"CopyFileEx\"! \n\n\
-            Please write a mail to the author of FreeFileSync at zhnmju123@gmx.de and simply state that\n\
+            Please write a mail to the author of FreeFileSync at zenju@gmx.de and simply state that\n\
             \"totalBytesTransferred.HighPart can be below zero\"!\n\n\
             This will then be handled in future versions of FreeFileSync.\n\nThanks -ZenJu",
                          nullptr, 0);

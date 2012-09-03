@@ -10,9 +10,6 @@
 <source>Searching for folder %x...</source>
 <target>正在搜尋資料夾 %x...</target>
 
-<source>Batch execution</source>
-<target>批次處理執行</target>
-
 <source>Items processed:</source>
 <target>已處理項目：</target>
 
@@ -33,6 +30,9 @@
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>中止請求：正在等待目前操作完成...</target>
+
+<source>Failure to create time stamp for versioning:</source>
+<target></target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>即時同步 - 自動同步</target>
@@ -61,11 +61,11 @@
 <source>Create a batch job</source>
 <target>新建一個批次處理作業</target>
 
-<source>Synchronization settings</source>
-<target>同步設定</target>
-
 <source>Comparison settings</source>
 <target>比對設定</target>
+
+<source>Synchronization settings</source>
+<target>同步設定</target>
 
 <source>About</source>
 <target>關於</target>
@@ -87,27 +87,6 @@
 
 <source>Select time span</source>
 <target>選擇時間間隔</target>
-
-<source>Show pop-up</source>
-<target>顯示彈出視窗</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>在彈出視窗上顯示錯誤或警告訊息</target>
-
-<source>Ignore errors</source>
-<target>忽略錯誤</target>
-
-<source>Hide all error and warning messages</source>
-<target>隱藏所有錯誤和警告訊息</target>
-
-<source>Exit instantly</source>
-<target>立即退出</target>
-
-<source>Abort synchronization immediately</source>
-<target>立即中止同步</target>
-
-<source>Browse</source>
-<target>瀏覽</target>
 
 <source>Invalid command line:</source>
 <target>無效的命令列：</target>
@@ -244,8 +223,8 @@
 <source>&Open...</source>
 <target>開啟(&O)...</target>
 
-<source>Save &As...</source>
-<target>另存新檔(&A)...</target>
+<source>Save &as...</source>
+<target>另存新檔(&a)...</target>
 
 <source>&Quit</source>
 <target>離開(&Q)</target>
@@ -286,6 +265,9 @@
 <source>Remove folder</source>
 <target>移除資料夾</target>
 
+<source>Browse</source>
+<target>瀏覽</target>
+
 <source>Select a folder</source>
 <target>選擇一個資料夾</target>
 
@@ -318,8 +300,8 @@ The command is triggered if:
 <source>Cancel</source>
 <target>取消</target>
 
-<source>(Build: %x)</source>
-<target>(建立：%x)</target>
+<source>Build: %x</source>
+<target>建立：%x</target>
 
 <source>All files</source>
 <target>所有檔案</target>
@@ -338,9 +320,6 @@ The command is triggered if:
 
 <source>A folder input field is empty.</source>
 <target>資料夾輸入欄位是空的。</target>
-
-<source>Logging</source>
-<target>日誌記錄</target>
 
 <source>File time and size</source>
 <target>檔案大小和日期</target>
@@ -505,10 +484,10 @@ The command is triggered if:
 <target>開始同步</target>
 
 <source>Add folder pair</source>
-<target>新增一對資料夾</target>
+<target>新增配對資料夾</target>
 
 <source>Remove folder pair</source>
-<target>移除一對資料夾</target>
+<target>移除配對資料夾</target>
 
 <source>Swap sides</source>
 <target>兩邊交換</target>
@@ -522,11 +501,11 @@ The command is triggered if:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>上次使用的配置(按DEL鍵，從清單中移除)</target>
 
-<source>Hide excluded items</source>
-<target>隱藏被排除的項目</target>
+<source>Show excluded items</source>
+<target>顯示排除的項目</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>隱藏篩選或暫時被排除的檔案</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>顯示已篩選或暫時排除的檔案</target>
 
 <source>Number of files and folders that will be created</source>
 <target>將被新建的檔案和資料夾數量</target>
@@ -570,68 +549,47 @@ The command is triggered if:
 <source>Right</source>
 <target>右邊</target>
 
-<source>Status feedback</source>
-<target>狀態回報</target>
-
-<source>Show progress dialog</source>
-<target>顯示進度對話框</target>
-
 <source>Error handling</source>
 <target>錯誤處理</target>
 
-<source>Maximum number of log files:</source>
-<target>日誌檔的最大數目：</target>
+<source>Ignore</source>
+<target>忽略</target>
 
-<source>Select folder to save log files:</source>
-<target>選擇要儲存日誌檔的資料夾：</target>
+<source>Hide all error and warning messages</source>
+<target>隱藏所有錯誤和警告訊息</target>
 
-<source>Batch settings</source>
-<target>批次處理設定</target>
+<source>Pop-up</source>
+<target>彈出視窗</target>
 
-<source>Select variant:</source>
-<target>選擇變數：</target>
+<source>Show pop-up on errors or warnings</source>
+<target>在彈出視窗上顯示錯誤或警告訊息</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>對兩邊使用同一個資料庫來識別和傳送更改。自動檢測刪除、重新命名和衝突部份。</target>
+<source>Exit</source>
+<target>結束</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>鏡像備份的左邊的資料夾。同步後，右邊的資料夾進行修改以完全相配左邊的資料夾。</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>將新的或更新過的檔案複製到右邊的資料夾中。</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>配置你自己的同步規則。</target>
-
-<source>Deletion handling</source>
-<target>刪除處理</target>
+<source>Abort synchronization on first error</source>
+<target>在第一個錯誤出現即中止同步</target>
 
 <source>On completion:</source>
 <target>完成後：</target>
 
-<source>Configuration</source>
-<target>配置</target>
+<source>Show progress dialog</source>
+<target>顯示進度對話框</target>
 
-<source>Item exists on left side only</source>
-<target>只存在於左邊的項目</target>
+<source>Generate log file</source>
+<target>產生日誌檔</target>
 
-<source>Item exists on right side only</source>
-<target>只存在於右邊的項目</target>
+<source>Select folder to save log files</source>
+<target>選擇要儲存日誌檔的資料夾</target>
 
-<source>Left side is newer</source>
-<target>左邊較新</target>
+<source>Limit</source>
+<target>限制</target>
 
-<source>Right side is newer</source>
-<target>右邊較新</target>
+<source>Limit maximum number of log files</source>
+<target>限制日誌檔的最大數量</target>
 
-<source>Items have different content</source>
-<target>項目具有不同內容</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>衝突/項目不能被分類</target>
-
-<source>OK</source>
-<target>確定</target>
+<source>Batch settings</source>
+<target>批次處理設定</target>
 
 <source>Compare by...</source>
 <target>比對選項...</target>
@@ -654,6 +612,69 @@ is the same
 <source>Symbolic Link handling</source>
 <target>符號連結處理</target>
 
+<source>OK</source>
+<target>確定</target>
+
+<source>Select variant:</source>
+<target>選擇變數：</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>對兩邊使用同一個資料庫來識別和傳送更改。自動檢測刪除、重新命名和衝突部份。</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>鏡像備份的左邊的資料夾。同步後，右邊的資料夾進行修改以完全相配左邊的資料夾。</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>將新的或更新過的檔案複製到右邊的資料夾中。</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>配置你自己的同步規則。</target>
+
+<source>Deletion handling</source>
+<target>刪除處理</target>
+
+<source>Permanent</source>
+<target>常駐</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>永久刪除或覆蓋檔案</target>
+
+<source>Recycle Bin</source>
+<target>資源回收筒</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>當刪除或覆蓋檔案時使用資源回收筒</target>
+
+<source>Versioning</source>
+<target>版本控制</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>將時間戳記檔案移動到指定的資料夾</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>限制每個檔案版本的最大數量</target>
+
+<source>Configuration</source>
+<target>配置</target>
+
+<source>Item exists on left side only</source>
+<target>只存在於左邊的項目</target>
+
+<source>Item exists on right side only</source>
+<target>只存在於右邊的項目</target>
+
+<source>Left side is newer</source>
+<target>左邊較新</target>
+
+<source>Right side is newer</source>
+<target>右邊較新</target>
+
+<source>Items have different content</source>
+<target>項目具有不同內容</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>衝突/項目不能被分類</target>
+
 <source>Synchronizing...</source>
 <target>正在同步...</target>
 
@@ -669,8 +690,8 @@ is the same
 <source>Donate with PayPal</source>
 <target>使用PayPal捐款</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>非常感謝FreeFileSync當地語系化的工作人員：</target>
+<source>Many thanks for localization:</source>
+<target>非常感謝本地化語系翻譯工作人員：</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>歡迎反饋意見和建議</target>
@@ -686,9 +707,6 @@ is the same
 
 <source>Published under the GNU General Public License</source>
 <target>在GNU通用公共許可證下發佈</target>
-
-<source>Use Recycle Bin</source>
-<target>使用資源回收筒</target>
 
 <source>Delete on both sides</source>
 <target>兩邊都刪除</target>
@@ -759,7 +777,7 @@ Note: File names must be relative to base directories!
 <source>Statistics</source>
 <target>統計</target>
 
-<source>Do not show this dialog again</source>
+<source>Don't show this dialog again</source>
 <target>不要再顯示此對話框</target>
 
 <source>Find what:</source>
@@ -778,7 +796,7 @@ Note: File names must be relative to base directories!
 <target>主欄位</target>
 
 <source>Folder pairs</source>
-<target>資料夾對</target>
+<target>配對資料夾</target>
 
 <source>Overview</source>
 <target>摘要</target>
@@ -843,11 +861,8 @@ Note: File names must be relative to base directories!
 <source>Do you want to save changes to %x?</source>
 <target>是否要更改儲存到 %x？</target>
 
-<source>Save</source>
-<target>儲存</target>
-
-<source>Don't Save</source>
-<target>不要儲存</target>
+<source>Do&n't save</source>
+<target>不儲存(&n)</target>
 
 <source>Configuration loaded!</source>
 <target>配置已載入！</target>
@@ -939,8 +954,8 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>顯示將不會被複製的檔案</target>
 
-<source>All directories in sync!</source>
-<target>同步所有目錄！</target>
+<source>All folders are in sync!</source>
+<target>所有資料夾都是同步的！</target>
 
 <source>Comma separated list</source>
 <target>逗號分隔清單</target>
@@ -1025,6 +1040,9 @@ Note: File names must be relative to base directories!
 <source>Pause</source>
 <target>暫停</target>
 
+<source>Logging</source>
+<target>日誌記錄</target>
+
 <source>Cannot find %x</source>
 <target>找不到 %x</target>
 
@@ -1103,21 +1121,6 @@ Note: File names must be relative to base directories!
 
 <source>Leave as unresolved conflict</source>
 <target>保留給未解決的衝突</target>
-
-<source>Delete permanently</source>
-<target>永久刪除</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>永久刪除或覆蓋檔案</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>當刪除或覆蓋檔案時使用資源回收筒</target>
-
-<source>Versioning</source>
-<target>版本控制</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>將檔移動到一個有時間戳記的子資料夾</target>
 
 <source>Files</source>
 <target>檔案</target>
@@ -1206,8 +1209,11 @@ Note: File names must be relative to base directories!
 <source>Cannot copy file %x to %y.</source>
 <target>無法複製檔案 %x 到 %y。</target>
 
-<source>Cannot read directory %x.</source>
-<target>無法讀取目錄 %x。</target>
+<source>Cannot open directory %x.</source>
+<target>無法開啟目錄 %x。</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>無法枚舉目錄 %x。</target>
 
 <source>Detected endless directory recursion.</source>
 <target>檢測到無限目錄遞迴。</target>
@@ -1233,6 +1239,9 @@ Note: File names must be relative to base directories!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>設定預設同步方向：舊檔案會被較新的檔案覆蓋。</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>資源回收筒不可用於以下路徑！相反的，檔案將永遠被刪除：</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>您可以忽略此錯誤，考慮到空的資料夾。</target>
 
@@ -1241,6 +1250,9 @@ Note: File names must be relative to base directories!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目錄有依靠性！請小心設定同步規則：</target>
+
+<source>Start comparison</source>
+<target>開始比較</target>
 
 <source>Preparing synchronization...</source>
 <target>正在準備同步...</target>
@@ -1253,6 +1265,9 @@ Note: File names must be relative to base directories!
 
 <source>Files %x have the same date but a different size!</source>
 <target>檔案 %x 日期相同但大小不同！</target>
+
+<source>Items differ in attributes only</source>
+<target>只有項目的屬性不同</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>%x 的符號連結具有相同的日期，但不同的目標。</target>
@@ -1268,9 +1283,6 @@ Note: File names must be relative to base directories!
 
 <source>Both sides are equal</source>
 <target>兩邊都相同</target>
-
-<source>Items have different attributes</source>
-<target>項目具有不同屬性</target>
 
 <source>Copy new item to left</source>
 <target>複製新的項目到左邊</target>
@@ -1335,6 +1347,9 @@ Note: File names must be relative to base directories!
 <source>Moving symbolic link %x to %y</source>
 <target>正在移動符號連結 %x 到 %y</target>
 
+<source>Removing old versions...</source>
+<target></target>
+
 <source>Creating file %x</source>
 <target>正在新建檔案 %x</target>
 
@@ -1386,14 +1401,11 @@ Note: File names must be relative to base directories!
 <source>Available:</source>
 <target>可用：</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>資源回收筒不可用於以下路徑！相反的，檔案將永遠被刪除：</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>一個將被修改的資料夾，是多個資料夾對的一部分。請檢查同步設定。</target>
+<target>一個將被修改的資料夾，是多個配對資料夾的一部分。請檢查同步設定。</target>
 
-<source>Processing folder pair:</source>
-<target>處理一對資料夾：</target>
+<source>Synchronizing folder pair:</source>
+<target>同步配對資料夾：</target>
 
 <source>Target folder %x already existing.</source>
 <target>目標資料夾 %x 已存在。</target>

@@ -10,6 +10,15 @@
 <source>Searching for folder %x...</source>
 <target>A(z) %x mappa keresése...</target>
 
+<source>Items processed:</source>
+<target>Feldolgozott elemek száma:</target>
+
+<source>Items remaining:</source>
+<target>Hátralévő elemek száma:</target>
+
+<source>Total time:</source>
+<target>Becsült idő:</target>
+
 <source>Show in Explorer</source>
 <target>Mutatás az Intézőben</target>
 
@@ -21,6 +30,9 @@
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Megszakítási kérelem: Várakozás a folyamatban lévő művelet befejezésére...</target>
+
+<source>Failure to create time stamp for versioning:</source>
+<target></target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatikus szinkronizálás</target>
@@ -49,11 +61,11 @@
 <source>Create a batch job</source>
 <target>Kötegelt feladat létrehozása</target>
 
-<source>Synchronization settings</source>
-<target>Szinkronizáció beállításai</target>
-
 <source>Comparison settings</source>
 <target>Összehasonlítási beállítások</target>
+
+<source>Synchronization settings</source>
+<target>Szinkronizáció beállításai</target>
 
 <source>About</source>
 <target>A programról</target>
@@ -75,27 +87,6 @@
 
 <source>Select time span</source>
 <target>Időintervallum kiválasztása</target>
-
-<source>Show pop-up</source>
-<target>Párbeszédablak mutatása</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Párbeszédablakok mutatása hiba vagy figyelmeztetés esetén</target>
-
-<source>Ignore errors</source>
-<target>Hibák figyelmen kívül hagyása</target>
-
-<source>Hide all error and warning messages</source>
-<target>Összes hibaüzenet és figyelmeztetés elrejtése</target>
-
-<source>Exit instantly</source>
-<target>Kilépés azonnal</target>
-
-<source>Abort synchronization immediately</source>
-<target>Szinkronizáció azonnali megszakítása</target>
-
-<source>Browse</source>
-<target>Tallózás</target>
 
 <source>Invalid command line:</source>
 <target>Érvénytelen parancssor:</target>
@@ -146,7 +137,7 @@
 <target>A következő adatbázisfájl nem létezik: %x.</target>
 
 <source>Database file is corrupt:</source>
-<target></target>
+<target>Sérült adatbázisfájl:</target>
 
 <source>Out of memory!</source>
 <target>Elfogyott a szabad memória!</target>
@@ -235,8 +226,8 @@
 <source>&Open...</source>
 <target>&Megnyitás...</target>
 
-<source>Save &As...</source>
-<target></target>
+<source>Save &as...</source>
+<target>Mentés m&ásként...</target>
 
 <source>&Quit</source>
 <target>&Kilépés</target>
@@ -277,6 +268,9 @@
 <source>Remove folder</source>
 <target>Mappa eltávolítása</target>
 
+<source>Browse</source>
+<target>Tallózás</target>
+
 <source>Select a folder</source>
 <target>Mappa kiválasztása</target>
 
@@ -309,11 +303,11 @@ A parancs végrehajtódik, ha:
 <source>Cancel</source>
 <target>Mégsem</target>
 
-<source>(Build: %x)</source>
-<target>(Build: %x)</target>
+<source>Build: %x</source>
+<target>Build: %x</target>
 
 <source>All files</source>
-<target></target>
+<target>Összes fájl</target>
 
 <source>&Restore</source>
 <target>&Visszaállítás</target>
@@ -328,10 +322,7 @@ A parancs végrehajtódik, ha:
 <target>Várakozás a hiányzó mappákra...</target>
 
 <source>A folder input field is empty.</source>
-<target></target>
-
-<source>Logging</source>
-<target>Naplózás</target>
+<target>A mappa beviteli mezeje üres.</target>
 
 <source>File time and size</source>
 <target>Fájl dátuma és mérete</target>
@@ -352,22 +343,7 @@ A parancs végrehajtódik, ha:
 <target>Egyedi</target>
 
 <source>FreeFileSync batch</source>
-<target></target>
-
-<source>Batch execution</source>
-<target>Kötegelt végrehajtás</target>
-
-<source>Items processed:</source>
-<target>Feldolgozott elemek száma:</target>
-
-<source>Items remaining:</source>
-<target>Hátralévő elemek száma:</target>
-
-<source>Total time:</source>
-<target>Becsült idő:</target>
-
-<source>Stop</source>
-<target>Megállítás</target>
+<target>FreeFileSync kötegelt fájl</target>
 
 <source>Synchronization aborted!</source>
 <target>A szinkronizáció megszakítva!</target>
@@ -391,7 +367,7 @@ A parancs végrehajtódik, ha:
 <target>A csatlakozás a sourceforge.net-hez sikertelen!</target>
 
 <source>A new version of FreeFileSync is available:</source>
-<target></target>
+<target>Elérhető a FreeFileSync új verziója:</target>
 
 <source>Download now?</source>
 <target>Letöltsem most?</target>
@@ -436,10 +412,10 @@ A parancs végrehajtódik, ha:
 <target>Kiterjesztés</target>
 
 <source>Size:</source>
-<target></target>
+<target>Méret:</target>
 
 <source>Date:</source>
-<target></target>
+<target>Dátum:</target>
 
 <source>Action</source>
 <target>Művelet</target>
@@ -475,7 +451,7 @@ A parancs végrehajtódik, ha:
 <target>&Új</target>
 
 <source>&Save</source>
-<target></target>
+<target>&Mentés</target>
 
 <source>&Language</source>
 <target>&Nyelv</target>
@@ -528,11 +504,11 @@ A parancs végrehajtódik, ha:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Utoljára használt beállítások (DEL billentyűvel törölhető a listából)</target>
 
-<source>Hide excluded items</source>
-<target>A kizárt elemek elrejtése</target>
+<source>Show excluded items</source>
+<target>Kizárt elemek mutatása</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>A kiszűrt vagy ideiglenesen kizárt fájlok elrejtése</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>A szűrt vagy ideiglenesen kizárt fájlok mutatása</target>
 
 <source>Number of files and folders that will be created</source>
 <target>A létrehozandó fájlok és mappák száma</target>
@@ -544,7 +520,7 @@ A parancs végrehajtódik, ha:
 <target>A törlendő fájlok és mappák száma</target>
 
 <source>Total bytes to copy</source>
-<target></target>
+<target>Összesen másolandó bájtok</target>
 
 <source>Items found:</source>
 <target>Talált elemek száma:</target>
@@ -553,10 +529,10 @@ A parancs végrehajtódik, ha:
 <target>Sebesség:</target>
 
 <source>Time remaining:</source>
-<target></target>
+<target>Hátralévő idő:</target>
 
 <source>Time elapsed:</source>
-<target></target>
+<target>Eltelt idő:</target>
 
 <source>Batch job</source>
 <target>Kötegelt feladat</target>
@@ -576,68 +552,47 @@ A parancs végrehajtódik, ha:
 <source>Right</source>
 <target>Jobb oldal</target>
 
-<source>Status feedback</source>
-<target>Státusz visszajelzés</target>
-
-<source>Show progress dialog</source>
-<target>Folyamatjelző párbeszédablak mutatása</target>
-
 <source>Error handling</source>
 <target>Hibakezelés</target>
 
-<source>Maximum number of log files:</source>
-<target>Naplófájlok maximális száma:</target>
+<source>Ignore</source>
+<target>Kihagy</target>
 
-<source>Select folder to save log files:</source>
-<target>Válaszd ki a mappát a naplófájlok mentéséhez:</target>
+<source>Hide all error and warning messages</source>
+<target>Összes hibaüzenet és figyelmeztetés elrejtése</target>
 
-<source>Batch settings</source>
-<target>Beállítások</target>
+<source>Pop-up</source>
+<target>Párbeszédablak</target>
 
-<source>Select variant:</source>
-<target>Változat kiválasztása:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Párbeszédablakok mutatása hiba vagy figyelmeztetés esetén</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Változások azonosítása és végrehajtása mindkét oldalon adatbázis segítségével. Automatikusan felismerődnek a törlések, átnevezések és ütközések.</target>
+<source>Exit</source>
+<target>Kilépés</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>A bal oldali mappa tükrözött másolata. A jobb oldali mappa úgy lesz megváltoztatva, hogy a szinkronizáció után pontosan megegyezzen a bal oldalival.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Új vagy frissített fájlok másolása a jobb oldali mappába.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Saját szinkronizálási szabályok beállítása.</target>
-
-<source>Deletion handling</source>
-<target>Törlések kezelése</target>
+<source>Abort synchronization on first error</source>
+<target>Szinkronizáció leállítása az első hibánál</target>
 
 <source>On completion:</source>
 <target>Végrehajtás után:</target>
 
-<source>Configuration</source>
-<target>Beállítás</target>
+<source>Show progress dialog</source>
+<target>Folyamatjelző párbeszédablak mutatása</target>
 
-<source>Item exists on left side only</source>
-<target>Az elem csak a bal oldalon létezik</target>
+<source>Generate log file</source>
+<target>Naplófájl generálása</target>
 
-<source>Item exists on right side only</source>
-<target>Az elem csak a jobb oldalon létezik</target>
+<source>Select folder to save log files</source>
+<target>Válaszd ki a mappát a naplófájlok mentéséhez</target>
 
-<source>Left side is newer</source>
-<target>A bal oldal újabb</target>
+<source>Limit</source>
+<target>Korlát</target>
 
-<source>Right side is newer</source>
-<target>A jobb oldal újabb</target>
+<source>Limit maximum number of log files</source>
+<target>Naplófájlok maximális számának korlátozása</target>
 
-<source>Items have different content</source>
-<target>Az elemek tartalma különbözik</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Az ütközés vagy elem nem kategorizálható</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Beállítások</target>
 
 <source>Compare by...</source>
 <target>Összehasonlítás</target>
@@ -667,6 +622,69 @@ A fájlok megegyeznek, ha megegyezik
 <source>Symbolic Link handling</source>
 <target>Symlink kezelés</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Változat kiválasztása:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Változások azonosítása és végrehajtása mindkét oldalon adatbázis segítségével. Automatikusan felismerődnek a törlések, átnevezések és ütközések.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>A bal oldali mappa tükrözött másolata. A jobb oldali mappa úgy lesz megváltoztatva, hogy a szinkronizáció után pontosan megegyezzen a bal oldalival.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Új vagy frissített fájlok másolása a jobb oldali mappába.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Saját szinkronizálási szabályok beállítása.</target>
+
+<source>Deletion handling</source>
+<target>Törlések kezelése</target>
+
+<source>Permanent</source>
+<target>Állandó</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>A fájlok folyamatos törlése vagy felülírása</target>
+
+<source>Recycle Bin</source>
+<target>Lomtár (Recycle Bin)</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>A Lomtár (Recycle Bin) használata fájlok törlésénél vagy felülírásánál</target>
+
+<source>Versioning</source>
+<target>Verziókövetés</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Időbélyeges fájlok mozgatása a megadott mappába</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Verziók maximális számának korlátozása fájlonként</target>
+
+<source>Configuration</source>
+<target>Beállítás</target>
+
+<source>Item exists on left side only</source>
+<target>Az elem csak a bal oldalon létezik</target>
+
+<source>Item exists on right side only</source>
+<target>Az elem csak a jobb oldalon létezik</target>
+
+<source>Left side is newer</source>
+<target>A bal oldal újabb</target>
+
+<source>Right side is newer</source>
+<target>A jobb oldal újabb</target>
+
+<source>Items have different content</source>
+<target>Az elemek tartalma különbözik</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Az ütközés vagy elem nem kategorizálható</target>
+
 <source>Synchronizing...</source>
 <target>Szinkronizálás folyamatban...</target>
 
@@ -682,11 +700,8 @@ A fájlok megegyeznek, ha megegyezik
 <source>Donate with PayPal</source>
 <target>Ha szereted a FreeFileSync-et, támogasd a PayPal segítségével.</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>
-Nagy köszönet a FreeFileSync lokalizációjáért
-a következő személyeknek:
-</target>
+<source>Many thanks for localization:</source>
+<target>Ezer köszönet a lokalizációért:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Várjuk a visszajelzéseket és az ötleteket</target>
@@ -702,9 +717,6 @@ a következő személyeknek:
 
 <source>Published under the GNU General Public License</source>
 <target>Kiadva a GNU General Public License alatt</target>
-
-<source>Use Recycle Bin</source>
-<target>Lomtár (Recycle Bin) használata</target>
 
 <source>Delete on both sides</source>
 <target>Törlés mindkét oldalon</target>
@@ -775,8 +787,8 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Statistics</source>
 <target>Statisztikák</target>
 
-<source>Do not show this dialog again</source>
-<target>Ne mutasd újra ezt a párbeszédablakot</target>
+<source>Don't show this dialog again</source>
+<target>Ne mutasd ezt a párbeszédablakot többé</target>
 
 <source>Find what:</source>
 <target>Mit keresünk:</target>
@@ -857,13 +869,10 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <target>Változtatások figyelmen kívül hagyása</target>
 
 <source>Do you want to save changes to %x?</source>
-<target></target>
+<target>Akarod menteni a %x változtatásait?</target>
 
-<source>Save</source>
-<target></target>
-
-<source>Don't Save</source>
-<target></target>
+<source>Do&n't save</source>
+<target>Ne mentsd</target>
 
 <source>Configuration loaded!</source>
 <target>Beállítások betöltve!</target>
@@ -955,7 +964,7 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Show files that won't be copied</source>
 <target>A nem másolandó fájlok mutatása</target>
 
-<source>All directories in sync!</source>
+<source>All folders are in sync!</source>
 <target>Minden mappa szinkronban!</target>
 
 <source>Comma separated list</source>
@@ -1045,6 +1054,9 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Pause</source>
 <target>Szünet</target>
 
+<source>Logging</source>
+<target>Naplózás</target>
+
 <source>Cannot find %x</source>
 <target>Nem található: %x</target>
 
@@ -1125,21 +1137,6 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>Leave as unresolved conflict</source>
 <target>Feloldatlan ütközésként hagyni</target>
-
-<source>Delete permanently</source>
-<target>Folyamatosan törölni</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>A fájlok folyamatos törlése vagy felülírása</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>A Lomtár (Recycle Bin) használata fájlok törlésénél vagy felülírásánál</target>
-
-<source>Versioning</source>
-<target>Verziókövetés</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Fájlok mozgatása egy időbélyeges almappába</target>
 
 <source>Files</source>
 <target>Fájlok</target>
@@ -1231,8 +1228,11 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Cannot copy file %x to %y.</source>
 <target>%x fájl másolása a(z) %y fájlba sikertelen.</target>
 
-<source>Cannot read directory %x.</source>
-<target>A következő mappa olvasása sikertelen: %x.</target>
+<source>Cannot open directory %x.</source>
+<target>A következő mappa megnyitása sikertelen: %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>A következő mappa sorszámozása sikertelen: %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Végtelen mapparekurzió detektálva.</target>
@@ -1253,10 +1253,13 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <target>Az utolsó szinkronizálás után nem történt változás.</target>
 
 <source>The corresponding database entries are not in sync considering current settings.</source>
-<target></target>
+<target>A megfelelő adatbázisbejegyzések nincsenek szinkronban a jelenlegi beállításokat tekintve.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Alapértelmezett szinkronizációs irányok beállítása: a régebbi fájlok felülíródnak az újabbakkal.</target>
+
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>A Lomtár (Recycle Bin) nem elérhető a következő útvonalakhoz! A fájlok azonnali törlésre kerülnek helyette:</target>
 
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>Figyelmen kívül hagyhatod ezt a hibát ezzel üresnek tekintve a mappát.</target>
@@ -1266,6 +1269,9 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>A mappák függenek egymástól! Legyen óvatos, amikor megadja a szinkronizálási szabályokat:</target>
+
+<source>Start comparison</source>
+<target>Összehasonlítás megkezdése</target>
 
 <source>Preparing synchronization...</source>
 <target>Szinkronizálás előkészítése...</target>
@@ -1278,6 +1284,9 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>Files %x have the same date but a different size!</source>
 <target>A(z) %x fájlok dátuma megegyezik, de a mérete nem!</target>
+
+<source>Items differ in attributes only</source>
+<target>Az elemek csak attribútumaikban különböznek</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>A következő symlinkeknek megegyezik a dátuma, de a célpontjuk különböző: %x.</target>
@@ -1293,9 +1302,6 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>Both sides are equal</source>
 <target>Mindkét oldal egyforma</target>
-
-<source>Items have different attributes</source>
-<target>Az elemek attribútumai különböznek</target>
 
 <source>Copy new item to left</source>
 <target>Új elemek másolása a bal oldalra</target>
@@ -1360,6 +1366,9 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Moving symbolic link %x to %y</source>
 <target>%x symlink mozgatása ide: %y</target>
 
+<source>Removing old versions...</source>
+<target></target>
+
 <source>Creating file %x</source>
 <target>%x fájl létrehozása</target>
 
@@ -1382,13 +1391,13 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <target>A(z) %x attribútumainak frissítése</target>
 
 <source>Target folder input field must not be empty.</source>
-<target></target>
+<target>A célmappa beviteli mezeje nem lehet üres.</target>
 
 <source>Folder input field for versioning must not be empty.</source>
-<target></target>
+<target>A verziókövetés mappájának beviteli mezeje nem lehet üres.</target>
 
 <source>Source folder %x not found.</source>
-<target></target>
+<target>A következő forrásmappa nem található: %x.</target>
 
 <source>Unresolved conflicts existing!</source>
 <target>Feloldatlan ütközések vannak!</target>
@@ -1406,22 +1415,19 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <target>Nincs elég szabad lemezterület:</target>
 
 <source>Required:</source>
-<target></target>
+<target>Szükséges:</target>
 
 <source>Available:</source>
-<target></target>
-
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>A Lomtár (Recycle Bin) nem elérhető a következő útvonalakhoz! A fájlok azonnali törlésre kerülnek helyette:</target>
+<target>Szabad:</target>
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Egy olyan mappa kerül módosításra, amely része több mappapárnak. Kérjük, ellenőrizze a szinkronizációs beállításokat.</target>
 
-<source>Processing folder pair:</source>
-<target>Mappapár feldolgozása:</target>
+<source>Synchronizing folder pair:</source>
+<target>Mappapár szinkronizálása:</target>
 
 <source>Target folder %x already existing.</source>
-<target></target>
+<target>A következő célmappa már létezik: %x.</target>
 
 <source>Generating database...</source>
 <target>Adatbázis generálása...</target>

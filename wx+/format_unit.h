@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef UTIL_H_INCLUDED
@@ -20,7 +20,7 @@ std::wstring fractionToShortString(double fraction); //within [0, 1]
 template <class NumberType>
 std::wstring toGuiString(NumberType number); //format integer number including thousands separator
 
-std::wstring utcToLocalTimeString(Int64 utcTime); //throw std::runtime_error
+std::wstring utcToLocalTimeString(Int64 utcTime);
 
 
 

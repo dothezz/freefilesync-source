@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef PROCESSXML_H_INCLUDED
@@ -12,6 +12,7 @@
 #include "xml_base.h"
 #include "localization.h"
 #include "../ui/column_attr.h"
+//#include "ffs_paths.h"
 
 namespace xmlAccess
 {
@@ -47,25 +48,23 @@ typedef std::vector<std::pair<Description, Commandline> > ExternalApps;
 struct XmlGuiConfig
 {
     XmlGuiConfig() :
-        hideFilteredElements(false),
+        showFilteredElements(true),
         handleError(ON_GUIERROR_POPUP),
         showSyncAction(true) {} //initialize values
 
     zen::MainConfiguration mainCfg;
 
-    bool hideFilteredElements;
+    bool showFilteredElements;
     OnGuiError handleError; //reaction on error situation during synchronization
     bool showSyncAction;
 
     bool operator==(const XmlGuiConfig& other) const
     {
-        return mainCfg              == other.mainCfg               &&
-               hideFilteredElements == other.hideFilteredElements  &&
-               handleError          == other.handleError           &&
+        return mainCfg              == other.mainCfg              &&
+               showFilteredElements == other.showFilteredElements &&
+               handleError          == other.handleError          &&
                showSyncAction       == other.showSyncAction;
     }
-
-    bool operator!=(const XmlGuiConfig& other) const { return !(*this == other); }
 };
 
 
@@ -73,15 +72,15 @@ struct XmlBatchConfig
 {
     XmlBatchConfig() :
         showProgress(true),
-        logFileCountMax(200),
+        logfilesCountLimit(-1),
         handleError(ON_ERROR_POPUP) {}
 
     zen::MainConfiguration mainCfg;
 
     bool showProgress;
-    wxString logFileDirectory;
-    size_t logFileCountMax;
-    OnError handleError;       //reaction on error situation during synchronization
+    Zstring logFileDirectory;
+    int logfilesCountLimit; //max logfiles; 0 := don't save logfiles; < 0 := no limit
+    OnError handleError;    //reaction on error situation during synchronization
 };
 
 
@@ -155,6 +154,7 @@ struct XmlGlobalSettings
             naviLastSortColumn(zen::defaultValueLastSortColumn),
             naviLastSortAscending(zen::defaultValueLastSortAscending),
             showPercentBar(zen::defaultValueShowPercentage),
+            cfgFileHistMax(20),
             folderHistMax(15),
             onCompletionHistoryMax(8),
             deleteOnBothSides(false),
@@ -171,14 +171,14 @@ struct XmlGlobalSettings
             //default external apps will be translated "on the fly"!!! First entry will be used for [Enter] or mouse double-click!
 #ifdef FFS_WIN
             externelApplications.push_back(std::make_pair(L"Show in Explorer", //mark for extraction: _("Show in Explorer")
-                                                          L"explorer /select, \"%name\""));
+                                                          L"explorer /select, \"%item_path%\""));
             externelApplications.push_back(std::make_pair(L"Open with default application", //mark for extraction: _("Open with default application")
-                                                          L"\"%name\""));
+                                                          L"\"%item_path%\""));
 #elif defined FFS_LINUX
             externelApplications.push_back(std::make_pair(L"Browse directory", //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
-                                                          L"xdg-open \"%dir\""));
+                                                          L"xdg-open \"%item_folder%\""));
             externelApplications.push_back(std::make_pair(L"Open with default application", //mark for extraction: _("Open with default application")
-                                                          L"xdg-open \"%name\""));
+                                                          L"xdg-open \"%item_path%\""));
 #endif
         }
 
@@ -201,11 +201,13 @@ struct XmlGlobalSettings
         ExternalApps externelApplications;
 
         std::vector<wxString> cfgFileHistory;
+        size_t cfgFileHistMax;
+
         std::vector<wxString> lastUsedConfigFiles;
 
         std::vector<Zstring> folderHistoryLeft;
         std::vector<Zstring> folderHistoryRight;
-        unsigned int folderHistMax;
+        size_t folderHistMax;
 
         std::vector<std::wstring> onCompletionHistory;
         size_t onCompletionHistoryMax;

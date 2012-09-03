@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef FILE_HANDLING_H_INCLUDED
@@ -15,7 +15,6 @@
 namespace zen
 {
 struct CallbackRemoveDir;
-struct CallbackMoveFile;
 struct CallbackCopyFile;
 
 
@@ -51,14 +50,8 @@ UInt64 getFreeDiskSpace(const Zstring& path); //throw FileError
 bool removeFile(const Zstring& filename); //throw FileError; return "true" if file was actually deleted
 void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = nullptr); //throw FileError
 
-
 //rename file or directory: no copying!!!
-void renameFile(const Zstring& oldName, const Zstring& newName); //throw FileError
-
-//move source to target across volumes; prerequisite: all super-directories of target exist
-//if target already contains some files/dirs they are seen as remnants of a previous incomplete move - see comment in moveDirectoryImpl
-void moveFile     (const Zstring& sourceFile, const Zstring& targetFile, CallbackMoveFile* callback); //throw FileError
-void moveDirectory(const Zstring& sourceDir,  const Zstring& targetDir,  CallbackMoveFile* callback); //throw FileError
+void renameFile(const Zstring& oldName, const Zstring& newName); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 
 bool supportsPermissions(const Zstring& dirname); //throw FileError, derefernces symlinks
 
@@ -97,7 +90,7 @@ struct CallbackRemoveDir
 };
 
 
-struct CallbackCopyFile //callback functionality
+struct CallbackCopyFile
 {
     virtual ~CallbackCopyFile() {}
 
@@ -109,19 +102,6 @@ struct CallbackCopyFile //callback functionality
     //Linux:   unconditionally
     //Windows: first exception is swallowed, updateCopyStatus() is then called again where it should throw again and exception will propagate as expected
     virtual void updateCopyStatus(Int64 bytesDelta) = 0; //accummulated delta != file size! consider ADS, sparse, compressed files
-};
-
-
-struct CallbackMoveFile //callback functionality
-{
-    virtual ~CallbackMoveFile() {} //see CallbackCopyFile for limitations when trowing exceptions!
-
-    virtual void onBeforeFileMove(const Zstring& fileFrom, const Zstring& fileTo) = 0; //one call before each (planned) move
-    virtual void onBeforeDirMove (const Zstring& dirFrom,  const Zstring& dirTo ) = 0; //
-    virtual void objectProcessed() = 0; //one call after each completed move (count objects total)
-
-    //called frequently if move has to revert to copy + delete:
-    virtual void updateStatus(Int64 bytesDelta) = 0;
 };
 }
 

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef GEN_LOGFILE_H_93172643216748973216458732165415
@@ -41,41 +41,41 @@ Utf8String generateLogStream_impl(const ErrorLog& log,
                                   int itemsTotal,  Int64 dataTotal,
                                   long totalTime) //unit: [sec]
 {
+    assert(itemsSynced <= itemsTotal);
+    assert(dataSynced  <= dataTotal);
+
     Utf8String output;
 
     //write header
-    std::wstring headerLine = _("Batch execution") + L" - " + formatTime<std::wstring>(FORMAT_DATE);
+    std::wstring headerLine = formatTime<std::wstring>(FORMAT_DATE);
     if (!jobName.empty())
         headerLine += L" - " + jobName;
-
-    //output += utfCvrtTo<MemoryStream>(headerLine);
-    //output += '\n';
-
-    //for (size_t i = 0; i < headerLine.size(); ++i) //well, this considers UTF-16 only, not true Unicode...
-    //    output += '=';
-    //output += '\n';
+    headerLine += L": " + finalStatus;
 
     //assemble results box
     std::vector<std::wstring> results;
     results.push_back(headerLine);
     results.push_back(L"");
-    results.push_back(finalStatus);
-    results.push_back(L"");
+
+    std::wstring itemsProc = L"    " + _("Items processed:") + L" " + toGuiString(itemsSynced); //show always, even if 0!
+    if (itemsSynced != 0 || dataSynced != 0) //[!] don't show 0 bytes processed if 0 items were processed
+        itemsProc += + L" (" + filesizeToShortString(dataSynced) + L")";
+    results.push_back(itemsProc);
+
     if (itemsTotal != 0 || dataTotal != 0) //=: sync phase was reached and there were actual items to sync
     {
-        results.push_back(L"    " + _("Items processed:") + L" " + toGuiString(itemsSynced) + L" (" + filesizeToShortString(dataSynced) + L")");
-
         if (itemsSynced != itemsTotal ||
             dataSynced  != dataTotal)
             results.push_back(L"    " + _("Items remaining:") + L" " + toGuiString(itemsTotal - itemsSynced) + L" (" + filesizeToShortString(dataTotal - dataSynced) + L")");
     }
+
     results.push_back(L"    " + _("Total time:") + L" " + copyStringTo<std::wstring>(wxTimeSpan::Seconds(totalTime).Format()));
 
     //calculate max width, this considers UTF-16 only, not true Unicode...
     size_t sepLineLen = 0;
     std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { sepLineLen = std::max(sepLineLen, str.size()); });
 
-    for (size_t i = 0; i < sepLineLen; ++i) output += '_';
+    for (size_t i = 0; i < sepLineLen; ++i) output += '_'; //this considers UTF-16 only, not true Unicode!!!
     output += "\n";
 
     std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { output += utfCvrtTo<Utf8String>(str); output += '\n'; });

@@ -1,27 +1,29 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "main_dlg.h"
 #include "resources.h"
-#include <wx+/button.h>
-#include "../lib/ffs_paths.h"
 #include <wx/msgdlg.h>
 #include <wx/wupdlock.h>
-#include "watcher.h"
+#include <wx/filedlg.h>
 #include <wx/utils.h>
+#include <wx/filedlg.h>
+#include <wx+/button.h>
+#include <wx+/string_conv.h>
+#include <wx+/mouse_move_dlg.h>
+#include <zen/assert_static.h>
+#include <zen/file_handling.h>
+#include <zen/build_info.h>
+#include "watcher.h"
 #include "xml_proc.h"
 #include "tray_menu.h"
-#include <zen/file_handling.h>
 #include "xml_ffs.h"
-#include <wx+/string_conv.h>
-#include <zen/assert_static.h>
-#include <zen/build_info.h>
 #include "../lib/help_provider.h"
 #include "../lib/process_xml.h"
-#include <wx+/mouse_move_dlg.h>
+#include "../lib/ffs_paths.h"
 
 using namespace zen;
 
@@ -42,7 +44,7 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), nullptr, this);
 
     //prepare drag & drop
-    dirNameFirst.reset(new DirectoryName<wxTextCtrl>(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath));
+    dirNameFirst.reset(new DirectoryName<wxTextCtrl>(*m_panelMainFolder, *m_buttonSelectDirMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath));
 
 #ifdef FFS_WIN
     new MouseMoveWindow(*this); //ownership passed to "this"
@@ -139,7 +141,7 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
         build += L" x86";
     assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
-    wxMessageBox(L"RealtimeSync" L"\n\n" + replaceCpy(_("(Build: %x)"), L"%x", build), _("About"), wxOK, this);
+    wxMessageBox(L"RealtimeSync" L"\n\n" + replaceCpy(_("Build: %x"), L"%x", build), _("About"), wxOK, this);
 }
 
 

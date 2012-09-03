@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef FILEHIERARCHY_H_INCLUDED
@@ -24,19 +24,23 @@ namespace zen
 {
 struct FileDescriptor
 {
-    FileDescriptor() {}
+    FileDescriptor() : fileIdx(), devId() {}
     FileDescriptor(Int64  lastWriteTimeRawIn,
                    UInt64 fileSizeIn,
                    const FileId& idIn) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
         fileSize(fileSizeIn),
-        id(idIn) {}
+        fileIdx(idIn.second),
+        devId(idIn.first) {}
 
     Int64  lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
     UInt64 fileSize;
-    FileId id;               //optional! (however, always set on Linux, and *generally* available on Windows)
+    FileIndex fileIdx; // == file id: optional! (however, always set on Linux, and *generally* available on Windows)
+    DeviceId  devId;   //split into file id into components to avoid padding overhead of a struct!
 };
 
+inline
+FileId getFileId(const FileDescriptor& fd) { return FileId(fd.devId, fd.fileIdx); }
 
 struct LinkDescriptor
 {
@@ -238,7 +242,7 @@ public:
         dirExistsLeft_ (dirExistsLeft    ),
         dirExistsRight_(dirExistsRight) {}
 
-    template <SelectedSide side> const Zstring& getBaseDirPf() const; //base sync directory postfixed with FILE_NAME_SEPARATOR
+    template <SelectedSide side> const Zstring& getBaseDirPf() const; //base sync directory postfixed with FILE_NAME_SEPARATOR (or empty!)
     static void removeEmpty(BaseDirMapping& baseDir) { baseDir.removeEmptyRec(); }; //physically remove all invalid entries (where both sides are empty) recursively
 
     template <SelectedSide side> bool wasExisting() const; //status of directory existence at the time of comparison!
@@ -1048,14 +1052,14 @@ zen::UInt64 FileMapping::getFileSize<RIGHT_SIDE>() const
 template <> inline
 FileId FileMapping::getFileId<LEFT_SIDE>() const
 {
-    return dataLeft.id;
+    return FileId(dataLeft.devId, dataLeft.fileIdx);
 }
 
 
 template <> inline
 FileId FileMapping::getFileId<RIGHT_SIDE>() const
 {
-    return dataRight.id;
+    return FileId(dataRight.devId, dataRight.fileIdx);
 }
 
 

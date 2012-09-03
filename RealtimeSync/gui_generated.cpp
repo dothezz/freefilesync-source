@@ -20,7 +20,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_menuFile->Append( m_menuItem13 );
 
     wxMenuItem* m_menuItem14;
-    m_menuItem14 = new wxMenuItem( m_menuFile, wxID_SAVEAS, wxString( _("Save &As...") ) , wxEmptyString, wxITEM_NORMAL );
+    m_menuItem14 = new wxMenuItem( m_menuFile, wxID_SAVEAS, wxString( _("Save &as...") ) , wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItem14 );
 
     m_menuFile->AppendSeparator();
@@ -119,10 +119,10 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_txtCtrlDirectoryMain = new wxTextCtrl( m_panelMainFolder, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 300,-1 ), 0 );
     bSizer781->Add( m_txtCtrlDirectoryMain, 1, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_dirPickerMain = new zen::DirPickerCtrl( m_panelMainFolder, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_dirPickerMain->SetToolTip( _("Select a folder") );
+    m_buttonSelectDirMain = new wxButton( m_panelMainFolder, wxID_ANY, _("Browse"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_buttonSelectDirMain->SetToolTip( _("Select a folder") );
 
-    bSizer781->Add( m_dirPickerMain, 0, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer781->Add( m_buttonSelectDirMain, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
 
     bSizer10->Add( bSizer781, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
@@ -233,10 +233,10 @@ FolderGenerated::FolderGenerated( wxWindow* parent, wxWindowID id, const wxPoint
     m_txtCtrlDirectory = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
     bSizer20->Add( m_txtCtrlDirectory, 1, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_dirPicker = new zen::DirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_dirPicker->SetToolTip( _("Select a folder") );
+    m_buttonSelectDir = new wxButton( this, wxID_ANY, _("Browse"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_buttonSelectDir->SetToolTip( _("Select a folder") );
 
-    bSizer20->Add( m_dirPicker, 0, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer20->Add( m_buttonSelectDir, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
 
     bSizer114->Add( bSizer20, 1, wxALIGN_CENTER_VERTICAL, 5 );

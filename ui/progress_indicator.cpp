@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "progress_indicator.h"
@@ -680,8 +680,9 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     m_panelGraph->addData(graphDataBytes,      Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0))); //medium green
 
     //allow changing on completion command
-    m_comboBoxExecFinished->setValue     (execWhenFinished);
-    m_comboBoxExecFinished->setHistoryRef(execFinishedHistory);
+
+    m_comboBoxExecFinished->initHistory(execFinishedHistory, execFinishedHistory.size()); //-> we won't use addItemHistory() later
+    m_comboBoxExecFinished->setValue(execWhenFinished);
 
     updateDialogStatus(); //null-status will be shown while waiting for dir locks (if at all)
 

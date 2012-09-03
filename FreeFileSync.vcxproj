@@ -237,6 +237,7 @@
     <ClCompile Include="lib\resources.cpp" />
     <ClCompile Include="lib\shadow.cpp" />
     <ClCompile Include="lib\status_handler.cpp" />
+    <ClCompile Include="lib\versioning.cpp" />
     <ClCompile Include="lib\xml_base.cpp" />
     <ClCompile Include="structures.cpp" />
     <ClCompile Include="synchronization.cpp" />

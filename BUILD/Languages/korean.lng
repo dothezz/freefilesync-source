@@ -10,6 +10,15 @@
 <source>Searching for folder %x...</source>
 <target>폴더 %x 검색 중...</target>
 
+<source>Items processed:</source>
+<target>처리된 항목 :</target>
+
+<source>Items remaining:</source>
+<target>남은 항목 :</target>
+
+<source>Total time:</source>
+<target>전체 시간 :</target>
+
 <source>Show in Explorer</source>
 <target>탐색기에 표시</target>
 
@@ -49,11 +58,11 @@
 <source>Create a batch job</source>
 <target>일괄작업 생성</target>
 
-<source>Synchronization settings</source>
-<target>동기화 설정</target>
-
 <source>Comparison settings</source>
 <target>비교 설정</target>
+
+<source>Synchronization settings</source>
+<target>동기화 설정</target>
 
 <source>About</source>
 <target>상세 정보</target>
@@ -75,27 +84,6 @@
 
 <source>Select time span</source>
 <target>시간간격(타임스팬) 선택</target>
-
-<source>Show pop-up</source>
-<target>팝업 보이기</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>오류 또는 경고에 대한 팝업 보이기</target>
-
-<source>Ignore errors</source>
-<target>오류 무시</target>
-
-<source>Hide all error and warning messages</source>
-<target>모든 오류/경고 메세지 숨기기</target>
-
-<source>Exit instantly</source>
-<target>즉시 종료</target>
-
-<source>Abort synchronization immediately</source>
-<target>동기화 작업 즉시 중단</target>
-
-<source>Browse</source>
-<target>찾아보기</target>
 
 <source>Invalid command line:</source>
 <target>잘못된 명령줄 :</target>
@@ -232,8 +220,8 @@
 <source>&Open...</source>
 <target>열기(&O)</target>
 
-<source>Save &As...</source>
-<target>다른 이름으로 저장(&A)</target>
+<source>Save &as...</source>
+<target>다른 이름으로 저장(&a)</target>
 
 <source>&Quit</source>
 <target>종료(&Q)</target>
@@ -274,6 +262,9 @@
 <source>Remove folder</source>
 <target>폴더 제거</target>
 
+<source>Browse</source>
+<target>찾아보기</target>
+
 <source>Select a folder</source>
 <target>폴더 선택</target>
 
@@ -306,8 +297,8 @@ The command is triggered if:
 <source>Cancel</source>
 <target>취소</target>
 
-<source>(Build: %x)</source>
-<target>(빌드: %x)</target>
+<source>Build: %x</source>
+<target>빌드: %x</target>
 
 <source>All files</source>
 <target>모든 파일</target>
@@ -326,9 +317,6 @@ The command is triggered if:
 
 <source>A folder input field is empty.</source>
 <target>폴더 입력 필드 하나가 비어 있습니다.</target>
-
-<source>Logging</source>
-<target>로깅</target>
 
 <source>File time and size</source>
 <target>파일 시간 및 크기</target>
@@ -350,21 +338,6 @@ The command is triggered if:
 
 <source>FreeFileSync batch</source>
 <target>FreeFileSync 일괄처리(배치)</target>
-
-<source>Batch execution</source>
-<target>일괄 실행</target>
-
-<source>Items processed:</source>
-<target>처리된 항목 :</target>
-
-<source>Items remaining:</source>
-<target>남은 항목 :</target>
-
-<source>Total time:</source>
-<target>전체 시간 :</target>
-
-<source>Stop</source>
-<target>정지</target>
 
 <source>Synchronization aborted!</source>
 <target>동기화 중단!</target>
@@ -448,7 +421,7 @@ The command is triggered if:
 <target>드래그 && 드랍 (마우스로 파일 끌어다 놓기)</target>
 
 <source>Close progress dialog</source>
-<target>프로그레스 다이얼로그 (진행창) 닫기</target>
+<target>프로그레스 다이얼로그 (진행 창) 닫기</target>
 
 <source>Standby</source>
 <target>대기</target>
@@ -525,20 +498,20 @@ The command is triggered if:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>마지막으로 사용한 설정 (DEL 키를 누르면 리스트에서 삭제)</target>
 
-<source>Hide excluded items</source>
-<target>제외된 항목 숨기기</target>
+<source>Show excluded items</source>
+<target>제외 항목 보이기</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>필터링 되거나 임시 제외될 파일 숨기기</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>필터링 또는 일시적으로 제외된 파일 보이기</target>
 
 <source>Number of files and folders that will be created</source>
-<target>생성될 파일 및 폴더 ​​개수</target>
+<target>생성될 파일 및 폴더 개수</target>
 
 <source>Number of files that will be overwritten</source>
 <target>덮어 씌어질 파일 개수</target>
 
 <source>Number of files and folders that will be deleted</source>
-<target>삭제될 파일 및 폴더 ​​개수</target>
+<target>삭제될 파일 및 폴더 개수</target>
 
 <source>Total bytes to copy</source>
 <target>복사할 전체 바이트 크기</target>
@@ -559,7 +532,7 @@ The command is triggered if:
 <target>일괄 작업</target>
 
 <source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>자동 동기화 작업을 위한 일괄 파일을 만듭니다. 본 파일을 더블 클릭하거나 시스템 태스크 플래너에 다음과 같이 예약하세요 : FreeFileSync.exe <job name>.ffs_batch</target>
+<target>자동 동기화를 위한 일괄 파일을 만듭니다. 본 파일을 더블 클릭하거나 시스템 태스크 플래너에 다음과 같이 예약하세요 : FreeFileSync.exe <job name>.ffs_batch</target>
 
 <source>Help</source>
 <target>도움말</target>
@@ -573,23 +546,80 @@ The command is triggered if:
 <source>Right</source>
 <target>우측</target>
 
-<source>Status feedback</source>
-<target>상태 피드백</target>
-
-<source>Show progress dialog</source>
-<target>프로그레스 다이얼로그 (진행창) 보기</target>
-
 <source>Error handling</source>
 <target>오류 발생시 :</target>
 
-<source>Maximum number of log files:</source>
-<target>최대 로그파일 개수 :</target>
+<source>Ignore</source>
+<target>무시</target>
 
-<source>Select folder to save log files:</source>
-<target>로그 파일을 저장할 폴더를 선택 :</target>
+<source>Hide all error and warning messages</source>
+<target>모든 오류/경고 메세지 숨기기</target>
+
+<source>Pop-up</source>
+<target>팝업</target>
+
+<source>Show pop-up on errors or warnings</source>
+<target>오류 또는 경고에 대한 팝업 보이기</target>
+
+<source>Exit</source>
+<target>종료</target>
+
+<source>Abort synchronization on first error</source>
+<target>첫 번째 오류 시 동기화 중지</target>
+
+<source>On completion:</source>
+<target>완료 :</target>
+
+<source>Show progress dialog</source>
+<target>프로그레스 다이얼로그 (진행 창) 보기</target>
+
+<source>Generate log file</source>
+<target>로그 파일 생성</target>
+
+<source>Select folder to save log files</source>
+<target>로그 파일을 저장할 폴더 선택</target>
+
+<source>Limit</source>
+<target>제한</target>
+
+<source>Limit maximum number of log files</source>
+<target>로그 파일의 최대 개수 제한</target>
 
 <source>Batch settings</source>
 <target>일괄 설정</target>
+
+<source>Compare by...</source>
+<target>대상 별 비교...</target>
+
+<source>
+Files are found equal if
+     - last write time and date
+     - file size
+are the same
+</source>
+<target>
+비교된 양쪽 파일은
+마지막 쓰기 시간과 날짜,
+그리고 파일 크기가 모두 같을 경우,
+동일한 파일로 간주됩니다.
+</target>
+
+<source>
+Files are found equal if
+     - file content
+is the same
+</source>
+<target>
+비교된 양쪽 파일은
+파일 내용이 같을 경우,
+동일한 파일로 간주됩니다.
+</target>
+
+<source>Symbolic Link handling</source>
+<target>심볼릭 링크 처리</target>
+
+<source>OK</source>
+<target>OK</target>
 
 <source>Select variant:</source>
 <target>옵션 선택 :</target>
@@ -609,8 +639,26 @@ The command is triggered if:
 <source>Deletion handling</source>
 <target>삭제 처리 옵션</target>
 
-<source>On completion:</source>
-<target>완료 :</target>
+<source>Permanent</source>
+<target>영구</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>파일 영구 삭제 또는 덮어쓰기</target>
+
+<source>Recycle Bin</source>
+<target>휴지통</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>파일을 삭제하거나 덮어쓰기 할 때, 휴지통 사용</target>
+
+<source>Versioning</source>
+<target>버저닝</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>타임스탬핑(생성시간 날인)된 파일을 지정된 폴더로 이동</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>파일 당 버전 최대 개수 제한</target>
 
 <source>Configuration</source>
 <target>구성 설정</target>
@@ -633,39 +681,6 @@ The command is triggered if:
 <source>Conflict/item cannot be categorized</source>
 <target>충돌 / 항목을 분류할 수 없음</target>
 
-<source>OK</source>
-<target>OK</target>
-
-<source>Compare by...</source>
-<target>대상 별 비교...</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-비교된 양쪽 파일은
-마지막 쓰기 시간과 날짜,
-그리고 파일 크기가 같을 경우,
-동일한 파일로 간주됩니다.
-</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-비교된 양쪽 파일은
-파일 내용이 같을 경우,
-동일한 파일로 간주됩니다.
-</target>
-
-<source>Symbolic Link handling</source>
-<target>심볼릭 링크 처리</target>
-
 <source>Synchronizing...</source>
 <target>동기화 작업 중...</target>
 
@@ -681,8 +696,8 @@ is the same
 <source>Donate with PayPal</source>
 <target>PayPal로 기부하기</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>FreeFileSync 현지화에 도움을 주신 분들께 감사 드립니다 :</target>
+<source>Many thanks for localization:</source>
+<target>현지화 작업에 깊은 감사 드립니다:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>모든 의견 및 건의/제안을 환영합니다</target>
@@ -698,9 +713,6 @@ is the same
 
 <source>Published under the GNU General Public License</source>
 <target>GNU 일반 공용 라이센스에 의한 출시</target>
-
-<source>Use Recycle Bin</source>
-<target>휴지통 사용</target>
 
 <source>Delete on both sides</source>
 <target>양측 모두 삭제</target>
@@ -757,7 +769,7 @@ Note: File names must be relative to base directories!
 <target>파일 및 폴더 사용 권한 전송 (관리자 권한 필요)</target>
 
 <source>Restore hidden dialogs</source>
-<target>숨겨진 대화창 복원</target>
+<target>숨겨진 대화 상자 복원</target>
 
 <source>External applications</source>
 <target>외부 응용 프로그램</target>
@@ -771,8 +783,8 @@ Note: File names must be relative to base directories!
 <source>Statistics</source>
 <target>통계</target>
 
-<source>Do not show this dialog again</source>
-<target>다음부터 표시하지 않음</target>
+<source>Don't show this dialog again</source>
+<target>이 대화 상자를 다시 표시하지 않음</target>
 
 <source>Find what:</source>
 <target>검색어 :</target>
@@ -855,11 +867,8 @@ Note: File names must be relative to base directories!
 <source>Do you want to save changes to %x?</source>
 <target>%x의 변경사항을 저장하시겠습니까?</target>
 
-<source>Save</source>
-<target>저장</target>
-
-<source>Don't Save</source>
-<target>저장 안 함.</target>
+<source>Do&n't save</source>
+<target>저장하기 않기(&n)</target>
 
 <source>Configuration loaded!</source>
 <target>설정 로드 완료!</target>
@@ -951,8 +960,8 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>복사되지 않을 파일 표시</target>
 
-<source>All directories in sync!</source>
-<target>모든 디렉토리 동기화!</target>
+<source>All folders are in sync!</source>
+<target>모든 폴더가 동기화 되었음!</target>
 
 <source>Comma separated list</source>
 <target>콤마 분리 목록</target>
@@ -1037,6 +1046,9 @@ Note: File names must be relative to base directories!
 <source>Pause</source>
 <target>일시정지</target>
 
+<source>Logging</source>
+<target>로깅</target>
+
 <source>Cannot find %x</source>
 <target>%x 을(를) 찾을 수 없습니다.</target>
 
@@ -1095,7 +1107,7 @@ Note: File names must be relative to base directories!
 <target>- %dir 의 반대측 대상</target>
 
 <source>Make hidden dialogs and warning messages visible again?</source>
-<target>숨겨진 대화창이나 경고 메세지를 다시 보이게 하시겠습니까?</target>
+<target>숨겨진 대화 상자나 경고 메세지를 다시 보이게 하시겠습니까?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1115,21 +1127,6 @@ Note: File names must be relative to base directories!
 
 <source>Leave as unresolved conflict</source>
 <target>해결되지 않은 충돌로 놔두기</target>
-
-<source>Delete permanently</source>
-<target>영구 삭제</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>파일 영구 삭제 또는 덮어쓰기</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>파일을 삭제하거나 덮어쓰기 할 때, 휴지통 사용</target>
-
-<source>Versioning</source>
-<target>버저닝</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>시간 기록이 남는 하위 폴더로 파일 이동</target>
 
 <source>Files</source>
 <target>파일</target>
@@ -1218,8 +1215,11 @@ Note: File names must be relative to base directories!
 <source>Cannot copy file %x to %y.</source>
 <target>파일 %x 을(를) %y (으)로 복사할 수 없습니다.</target>
 
-<source>Cannot read directory %x.</source>
-<target>디렉토리 %x 을(를) 읽을 수 없습니다.</target>
+<source>Cannot open directory %x.</source>
+<target>디렉토리 %x 을(를) 열 수 없습니다.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>디렉토리 %x 을(를) 열거할 수 없습니다.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>삭제된 무한 디렉토리 재귀(반복)</target>
@@ -1245,6 +1245,9 @@ Note: File names must be relative to base directories!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>기본값 동기화 방향 설정 : 이전 파일들은 신규 파일들로 덮어 쓰여집니다.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>다음 경로로는 휴지통을 사용할 수 없습니다! 대신 파일을 영구적으로 삭제합니다 :</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>폴더를 빈 상태로 가정할 경우, 이 오류는 무시될 수 있습니다.</target>
 
@@ -1253,6 +1256,9 @@ Note: File names must be relative to base directories!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>디렉토리가 의존 관계에 있습니다. 동기화 규칙 설정시 주의하십시오.</target>
+
+<source>Start comparison</source>
+<target>비교 시작</target>
 
 <source>Preparing synchronization...</source>
 <target>동기화 준비 중...</target>
@@ -1265,6 +1271,9 @@ Note: File names must be relative to base directories!
 
 <source>Files %x have the same date but a different size!</source>
 <target>파일 %x 의 날짜는 같으나, 크기가 다릅니다!</target>
+
+<source>Items differ in attributes only</source>
+<target>항목들이 속성에서만 차이가 있습니다.</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>심볼릭 링크 %x 의 날짜는 같으나, 타겟이 다릅니다.</target>
@@ -1280,9 +1289,6 @@ Note: File names must be relative to base directories!
 
 <source>Both sides are equal</source>
 <target>양측이 같음</target>
-
-<source>Items have different attributes</source>
-<target>항목의 속성이 서로 다릅니다.</target>
 
 <source>Copy new item to left</source>
 <target>좌측에 새 항목 복사</target>
@@ -1398,14 +1404,11 @@ Note: File names must be relative to base directories!
 <source>Available:</source>
 <target>여유 공간(크기) :</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>다음 경로로는 휴지통을 사용할 수 없습니다! 대신 파일을 영구적으로 삭제합니다 :</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>다중 폴더 페어의 일부인 폴더가 변경됩니다. 동기화 설정을 재검토하세요.</target>
 
-<source>Processing folder pair:</source>
-<target>폴더 페어 처리 중 :</target>
+<source>Synchronizing folder pair:</source>
+<target>폴더 페어(짝) 동기화 진행 중</target>
 
 <source>Target folder %x already existing.</source>
 <target>대상 폴더 %x이(가) 이미 존재함.</target>

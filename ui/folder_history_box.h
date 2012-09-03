@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef CUSTOMCOMBOBOX_H_INCLUDED
@@ -11,6 +11,7 @@
 #include <memory>
 #include <zen/zstring.h>
 #include <zen/stl_tools.h>
+#include <zen/utf.h>
 
 //combobox with history function + functionality to delete items (DEL)
 
@@ -30,11 +31,11 @@ public:
 
     const std::vector<Zstring>& getList() const { return dirnames_; }
 
-    static const Zstring lineSeparator() { return Zstr("---------------------------------------------------------------------------------------------------------------"); }
+    static const wxString separationLine() { return L"---------------------------------------------------------------------------------------------------------------"; }
 
     void addItem(const Zstring& dirname)
     {
-        if (dirname.empty() || dirname == lineSeparator())
+		if (dirname.empty() || dirname == zen::utfCvrtTo<Zstring>(separationLine()))
             return;
 
         Zstring nameTmp = dirname;
@@ -88,6 +89,7 @@ private:
     void OnKeyEvent(wxKeyEvent& event);
     void OnMouseWheel(wxMouseEvent& event);
     void OnSelection(wxCommandEvent& event);
+	void OnValidateSelection(wxCommandEvent& event);
     void OnUpdateList(wxEvent& event) { setValueAndUpdateList(GetValue()); event.Skip(); }
 
     void setValueAndUpdateList(const wxString& dirname);

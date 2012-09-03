@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef FILETRAVERSER_H_INCLUDED
@@ -26,6 +26,7 @@ struct TraverseCallback
         UInt64 fileSize;        //unit: bytes!
         Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
         FileId id;              //optional: may be initial!
+        //bool isFollowedSymlink;
     };
 
     struct SymlinkInfo
@@ -52,7 +53,7 @@ struct TraverseCallback
     /**/                onDir    (const Zchar* shortName, const Zstring& fullName) = 0;
     virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo&    details) = 0;
     virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) = 0;
-    virtual HandleError onError  (const std::wstring& errorText) = 0;
+    virtual HandleError onError  (const std::wstring& msg) = 0;
 };
 
 

@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20120511;23111200">
+	<META NAME="CHANGED" CONTENT="20120904;11283300">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -28,22 +28,26 @@ applications</FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">By
 default FreeFileSync opens the operating system's standard file
 browser on each mouse double-click by invoking &quot;<FONT FACE="Courier New, monospace">explorer
-/select, &quot;%name&quot;</FONT>&quot; on Windows and &quot;<FONT FACE="Courier New, monospace">xdg-open
-&quot;%dir&quot;</FONT>&quot; on Linux.</FONT></P>
+/select, &quot;%item_path%&quot;</FONT>&quot; on Windows and
+&quot;<FONT FACE="Courier New, monospace">xdg-open &quot;%item_folder%&quot;</FONT>&quot;
+on Linux.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">However
 you are free to integrate other external applications into
 FreeFileSync: navigate to &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Menu
 -&gt; Advanced -&gt; Global settings: External Applications</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
 and add or replace a command string. The first entry is executed when
 double-clicking a row on main grid while all other entries are only
-available via right-click context menu. The following macros may be
-used:</FONT></P>
+available via right-click context menu. The following internal macros
+may be used:</FONT></P>
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen3" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-	<FONT FACE="Courier New, monospace">%name&nbsp;&nbsp;&nbsp;- full
-	file or directory name<BR>%dir &nbsp;&nbsp;&nbsp;- directory part
-	only<BR>%nameCo&nbsp;- Other side's counterpart to %name<BR>%dirCo&nbsp;&nbsp;-
-	Other side's counterpart to %dir</FONT></P>
+	<FONT FACE="Courier New, monospace">%item_path%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
+	<FONT FACE="Tahoma, sans-serif">full file or folder
+	name</FONT><BR>%item_folder% &nbsp;&nbsp;- <FONT FACE="Tahoma, sans-serif">folder
+	part only</FONT><BR>%item2_path%&nbsp;&nbsp;&nbsp;&nbsp;- <FONT FACE="Tahoma, sans-serif">Other
+	side's counterpart to %item_path%</FONT><BR>%item2_folder%&nbsp;&nbsp;-
+	<FONT FACE="Tahoma, sans-serif">Other side's counterpart to
+	%item_folder%</FONT></FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -52,17 +56,18 @@ used:</FONT></P>
 <UL>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Start
 	visual difference tool:<BR><FONT FACE="Courier New, monospace">&quot;C:\Program
-	Files\WinMerge\WinMergeU.exe&quot; &quot;%name&quot; &quot;%nameCo&quot;<BR>&nbsp;</FONT></FONT></P>
+	Files\WinMerge\WinMergeU.exe&quot; &quot;%item_path%&quot;
+	&quot;%item2_path%&quot;<BR>&nbsp;</FONT></FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Show
 	file in Windows Explorer:<BR><FONT FACE="Courier New, monospace">explorer
-	/select, &quot;%name&quot;<BR>&nbsp;</FONT></FONT></P>
+	/select, &quot;%item_path%&quot;<BR>&nbsp;</FONT></FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
 	file in associated application:</FONT><BR><FONT FACE="Courier New, monospace">cmd
-	/c start &quot;&quot; &quot;%name&quot; </FONT><FONT FACE="Tahoma, sans-serif">or
-	simply</FONT> <FONT FACE="Courier New, monospace">&quot;%name&quot;</FONT><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></P>
+	/c start &quot;&quot; &quot;%item_path%&quot; </FONT><FONT FACE="Tahoma, sans-serif">or
+	simply</FONT> <FONT FACE="Courier New, monospace">&quot;%item_path%&quot;</FONT><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
 	console dialog:<BR><FONT FACE="Courier New, monospace">cmd /k cd /D
-	&quot;%dir&quot;<BR>&nbsp;</FONT></FONT></P>
+	&quot;%item_folder%&quot;<BR>&nbsp;</FONT></FONT></P>
 </UL>
 <P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">

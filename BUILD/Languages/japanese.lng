@@ -10,6 +10,15 @@
 <source>Searching for folder %x...</source>
 <target>フォルダ %x を検索中...</target>
 
+<source>Items processed:</source>
+<target>処理された要素:</target>
+
+<source>Items remaining:</source>
+<target>残りの要素:</target>
+
+<source>Total time:</source>
+<target>合計時間:</target>
+
 <source>Show in Explorer</source>
 <target>エクスプローラで表示</target>
 
@@ -49,11 +58,11 @@
 <source>Create a batch job</source>
 <target>一括ジョブを作成</target>
 
-<source>Synchronization settings</source>
-<target>同期処理設定</target>
-
 <source>Comparison settings</source>
 <target>比較設定</target>
+
+<source>Synchronization settings</source>
+<target>同期処理設定</target>
 
 <source>About</source>
 <target>情報</target>
@@ -75,27 +84,6 @@
 
 <source>Select time span</source>
 <target>タイムスパンを選択</target>
-
-<source>Show pop-up</source>
-<target>ポップアップ表示</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>エラーと警告をポップアップで表示</target>
-
-<source>Ignore errors</source>
-<target>エラーを無視</target>
-
-<source>Hide all error and warning messages</source>
-<target>すべてのエラーと警告メッセージを非表示</target>
-
-<source>Exit instantly</source>
-<target>すぐに終了</target>
-
-<source>Abort synchronization immediately</source>
-<target>今すぐに同期処理を中断</target>
-
-<source>Browse</source>
-<target>参照</target>
 
 <source>Invalid command line:</source>
 <target>無効なコマンドライン:</target>
@@ -232,7 +220,7 @@
 <source>&Open...</source>
 <target>開く(&O)...</target>
 
-<source>Save &As...</source>
+<source>Save &as...</source>
 <target>別名保存(&A)...</target>
 
 <source>&Quit</source>
@@ -274,6 +262,9 @@
 <source>Remove folder</source>
 <target>フォルダ除去</target>
 
+<source>Browse</source>
+<target>参照</target>
+
 <source>Select a folder</source>
 <target>フォルダを選択</target>
 
@@ -306,8 +297,8 @@ The command is triggered if:
 <source>Cancel</source>
 <target>キャンセル</target>
 
-<source>(Build: %x)</source>
-<target>(ビルド: %x)</target>
+<source>Build: %x</source>
+<target>ビルド: %x</target>
 
 <source>All files</source>
 <target>すべてのファイル</target>
@@ -326,9 +317,6 @@ The command is triggered if:
 
 <source>A folder input field is empty.</source>
 <target>フォルダ入力欄が空白です.</target>
-
-<source>Logging</source>
-<target>ログ</target>
 
 <source>File time and size</source>
 <target>ファイル時刻とサイズ</target>
@@ -350,21 +338,6 @@ The command is triggered if:
 
 <source>FreeFileSync batch</source>
 <target>FreeFileSync 一括</target>
-
-<source>Batch execution</source>
-<target>一括処理を実行</target>
-
-<source>Items processed:</source>
-<target>処理された要素:</target>
-
-<source>Items remaining:</source>
-<target>残りの要素:</target>
-
-<source>Total time:</source>
-<target>合計時間:</target>
-
-<source>Stop</source>
-<target>停止</target>
 
 <source>Synchronization aborted!</source>
 <target>同期処理を中断!</target>
@@ -525,11 +498,11 @@ The command is triggered if:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>前回使用した構成設定(DEL キーでリストから除去します)</target>
 
-<source>Hide excluded items</source>
-<target>除外アイテムを隠す</target>
+<source>Show excluded items</source>
+<target>除外した項目を表示</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>フィルター、または一時除外ファイルを隠す</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>フィルター済、または一時除外ファイルを表示</target>
 
 <source>Number of files and folders that will be created</source>
 <target>作成されたファイル、およびフォルダの数</target>
@@ -573,68 +546,47 @@ The command is triggered if:
 <source>Right</source>
 <target>右側</target>
 
-<source>Status feedback</source>
-<target>状態 フィードバック</target>
-
-<source>Show progress dialog</source>
-<target>進捗ダイアログを表示</target>
-
 <source>Error handling</source>
 <target>ハンドリングのエラー時:</target>
 
-<source>Maximum number of log files:</source>
-<target>ログファイルの最大数:</target>
+<source>Ignore</source>
+<target>無視</target>
 
-<source>Select folder to save log files:</source>
-<target>ログファイル保存先フォルダを選択:</target>
+<source>Hide all error and warning messages</source>
+<target>すべてのエラーと警告メッセージを非表示</target>
 
-<source>Batch settings</source>
-<target>一括設定</target>
+<source>Pop-up</source>
+<target>ポップアップ</target>
 
-<source>Select variant:</source>
-<target>変数を選択:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>エラーと警告をポップアップで表示</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>両側の識別、プロパティの変更特定にデータベースを使用します。削除、リネーム及び競合などは自動的に検出されます</target>
+<source>Exit</source>
+<target>終了</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>左側に合わせてバックアップ. 右側のフォルダ内容が同期処理後に左側と同じになるようにします。</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>新しい(更新)ファイルを右フォルダにコピー</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>あなたの設定した同期規則を使用します。</target>
-
-<source>Deletion handling</source>
-<target>削除の取り扱い</target>
+<source>Abort synchronization on first error</source>
+<target>最初のエラー発生時に同期を中断する</target>
 
 <source>On completion:</source>
 <target>完了時:</target>
 
-<source>Configuration</source>
-<target>構成設定</target>
+<source>Show progress dialog</source>
+<target>進捗ダイアログを表示</target>
 
-<source>Item exists on left side only</source>
-<target>左側のみに存在する項目</target>
+<source>Generate log file</source>
+<target>ログファイルを生成</target>
 
-<source>Item exists on right side only</source>
-<target>右側のみに存在する項目</target>
+<source>Select folder to save log files</source>
+<target>ログファイル保存先フォルダを選択</target>
 
-<source>Left side is newer</source>
-<target>左側がより新しい</target>
+<source>Limit</source>
+<target>制限</target>
 
-<source>Right side is newer</source>
-<target>右側がより新しい</target>
+<source>Limit maximum number of log files</source>
+<target>ログファイルの最大数を制限</target>
 
-<source>Items have different content</source>
-<target>内容が異なる項目</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>競合/項目を分類化できません</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>一括設定</target>
 
 <source>Compare by...</source>
 <target>比較対象...</target>
@@ -664,7 +616,70 @@ is the same
 </target>
 
 <source>Symbolic Link handling</source>
-<target>シンボリック・リンクの取り扱い</target>
+<target>ｼﾝﾎﾞﾘｯｸ・ﾘﾝｸの取り扱い</target>
+
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>変数を選択:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>両側の識別、プロパティの変更特定にデータベースを使用します。削除、リネーム及び競合などは自動的に検出されます</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>左側に合わせてバックアップ. 右側のフォルダ内容が同期処理後に左側と同じになるようにします。</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>新しい(更新)ファイルを右フォルダにコピー</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>あなたの設定した同期規則を使用します。</target>
+
+<source>Deletion handling</source>
+<target>削除の取り扱い</target>
+
+<source>Permanent</source>
+<target>完全消去</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>ファイルを上書き、または完全に削除</target>
+
+<source>Recycle Bin</source>
+<target>ゴミ箱に移動</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>ファイルの削除、上書き時にゴミ箱を使用する</target>
+
+<source>Versioning</source>
+<target>バージョン付け</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>ファイルのタイムスタンプで指定フォルダに移動</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>ファイル当たりのバージョン番号制限</target>
+
+<source>Configuration</source>
+<target>構成設定</target>
+
+<source>Item exists on left side only</source>
+<target>左側のみに存在する項目</target>
+
+<source>Item exists on right side only</source>
+<target>右側のみに存在する項目</target>
+
+<source>Left side is newer</source>
+<target>左側がより新しい</target>
+
+<source>Right side is newer</source>
+<target>右側がより新しい</target>
+
+<source>Items have different content</source>
+<target>内容が異なる項目</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>競合/項目を分類化できません</target>
 
 <source>Synchronizing...</source>
 <target>同期処理中...</target>
@@ -681,8 +696,8 @@ is the same
 <source>Donate with PayPal</source>
 <target>PayPal から寄付する</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>FreeFileSync のローカライズへの協力に感謝します:</target>
+<source>Many thanks for localization:</source>
+<target>ローカライズのご協力に感謝します:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>フィードバック、提案などはこちらから</target>
@@ -698,9 +713,6 @@ is the same
 
 <source>Published under the GNU General Public License</source>
 <target>GNU 一般共有使用許諾に基づき公開されています</target>
-
-<source>Use Recycle Bin</source>
-<target>ゴミ箱を使用</target>
 
 <source>Delete on both sides</source>
 <target>両方を削除</target>
@@ -771,8 +783,8 @@ Note: File names must be relative to base directories!
 <source>Statistics</source>
 <target>統計</target>
 
-<source>Do not show this dialog again</source>
-<target>次回から表示しない</target>
+<source>Don't show this dialog again</source>
+<target>次回からダイアログを表示しない</target>
 
 <source>Find what:</source>
 <target>検索語:</target>
@@ -855,11 +867,8 @@ Note: File names must be relative to base directories!
 <source>Do you want to save changes to %x?</source>
 <target>本当に %x の変更を保存しますか?</target>
 
-<source>Save</source>
-<target>保存</target>
-
-<source>Don't Save</source>
-<target>保存しない</target>
+<source>Do&n't save</source>
+<target>保存しない(&N)</target>
 
 <source>Configuration loaded!</source>
 <target>構成設定を読み込み中!</target>
@@ -951,8 +960,8 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>コピーされなかったファイルを表示</target>
 
-<source>All directories in sync!</source>
-<target>すべてのディレクトリを同期!</target>
+<source>All folders are in sync!</source>
+<target>すべてのフォルダを同期!</target>
 
 <source>Comma separated list</source>
 <target>カンマ区切り</target>
@@ -1037,6 +1046,9 @@ Note: File names must be relative to base directories!
 <source>Pause</source>
 <target>一時停止</target>
 
+<source>Logging</source>
+<target>ログ</target>
+
 <source>Cannot find %x</source>
 <target>%x は見つかりません</target>
 
@@ -1115,21 +1127,6 @@ Note: File names must be relative to base directories!
 
 <source>Leave as unresolved conflict</source>
 <target>未解決の競合はそのまま残す</target>
-
-<source>Delete permanently</source>
-<target>完全に削除</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>ファイルを上書き、または完全に削除</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>ファイルの削除、上書き時にゴミ箱を使用する</target>
-
-<source>Versioning</source>
-<target>バージョン付け</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>サブフォルダのタイムスタンプでファイルを移動</target>
 
 <source>Files</source>
 <target>ファイル</target>
@@ -1218,8 +1215,11 @@ Note: File names must be relative to base directories!
 <source>Cannot copy file %x to %y.</source>
 <target>%x から %y にコピーできません.</target>
 
-<source>Cannot read directory %x.</source>
-<target>ディレクトリ %x を読み込めません.</target>
+<source>Cannot open directory %x.</source>
+<target>ディレクトリ %x を開けません.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>ディレクトリ %x を列挙できません</target>
 
 <source>Detected endless directory recursion.</source>
 <target>ディレクトリ再帰処理でループを検出</target>
@@ -1245,6 +1245,9 @@ Note: File names must be relative to base directories!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>同期方向のデフォルト設定: 古いファイルに新しいファイルを上書き</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>以下のパスにあるゴミ箱が利用できません! 代わりにファイルは完全削除されます:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>フォルダを空と想定する場合は、このエラーは無視できます.</target>
 
@@ -1253,6 +1256,9 @@ Note: File names must be relative to base directories!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>ディレクトリが依存関係にあります! 同期規則の設定時には注意してください:</target>
+
+<source>Start comparison</source>
+<target>比較を開始</target>
 
 <source>Preparing synchronization...</source>
 <target>同期処理の準備中...</target>
@@ -1265,6 +1271,9 @@ Note: File names must be relative to base directories!
 
 <source>Files %x have the same date but a different size!</source>
 <target>ファイル %x は、同じ時間ですがサイズが異なっています!</target>
+
+<source>Items differ in attributes only</source>
+<target>属性のみ異なる項目</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>シンボリックリンク %x の日付は同じですが、対象が異なっています.</target>
@@ -1280,9 +1289,6 @@ Note: File names must be relative to base directories!
 
 <source>Both sides are equal</source>
 <target>両側とも等しく</target>
-
-<source>Items have different attributes</source>
-<target>属性が異なる項目</target>
 
 <source>Copy new item to left</source>
 <target>新しい項目を左にコピー</target>
@@ -1398,14 +1404,11 @@ Note: File names must be relative to base directories!
 <source>Available:</source>
 <target>利用可能:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>以下のパスにあるゴミ箱が利用できません! 代わりにファイルは完全削除されます:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>複数フォルダペアの一部であるフォルダが変更されています. 同期設定を確認してください.</target>
 
-<source>Processing folder pair:</source>
-<target>フォルダペアを処理中:</target>
+<source>Synchronizing folder pair:</source>
+<target>フォルダペアを同期処理中:</target>
 
 <source>Target folder %x already existing.</source>
 <target>対象フォルダ %x は既に存在します.</target>

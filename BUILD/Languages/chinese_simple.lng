@@ -10,9 +10,6 @@
 <source>Searching for folder %x...</source>
 <target>正在搜索文件夹 %x...</target>
 
-<source>Batch execution</source>
-<target>批处理执行</target>
-
 <source>Items processed:</source>
 <target>已处理的项目:</target>
 
@@ -61,11 +58,11 @@
 <source>Create a batch job</source>
 <target>创建一个批处理作业</target>
 
-<source>Synchronization settings</source>
-<target>同步设置</target>
-
 <source>Comparison settings</source>
 <target>比较设置</target>
+
+<source>Synchronization settings</source>
+<target>同步设置</target>
 
 <source>About</source>
 <target>关于</target>
@@ -87,27 +84,6 @@
 
 <source>Select time span</source>
 <target>选择时间跨度</target>
-
-<source>Show pop-up</source>
-<target>显示弹出对话框</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>在错误或警告时显示弹出对话框</target>
-
-<source>Ignore errors</source>
-<target>忽略错误</target>
-
-<source>Hide all error and warning messages</source>
-<target>隐藏所有错误与警告信息</target>
-
-<source>Exit instantly</source>
-<target>立即退出</target>
-
-<source>Abort synchronization immediately</source>
-<target>立即中止同步</target>
-
-<source>Browse</source>
-<target>浏览</target>
 
 <source>Invalid command line:</source>
 <target>无效的命令行:</target>
@@ -244,7 +220,7 @@
 <source>&Open...</source>
 <target>打开(&O)...</target>
 
-<source>Save &As...</source>
+<source>Save &as...</source>
 <target>另存为(&A)...</target>
 
 <source>&Quit</source>
@@ -286,6 +262,9 @@
 <source>Remove folder</source>
 <target>移除文件夹</target>
 
+<source>Browse</source>
+<target>浏览</target>
+
 <source>Select a folder</source>
 <target>选择一个文件夹</target>
 
@@ -318,8 +297,8 @@ The command is triggered if:
 <source>Cancel</source>
 <target>取消</target>
 
-<source>(Build: %x)</source>
-<target>(Build: %x)</target>
+<source>Build: %x</source>
+<target>Build: %x</target>
 
 <source>All files</source>
 <target>所有文件</target>
@@ -338,9 +317,6 @@ The command is triggered if:
 
 <source>A folder input field is empty.</source>
 <target>有一个文件夹输入框为空.</target>
-
-<source>Logging</source>
-<target>记录</target>
 
 <source>File time and size</source>
 <target>文件时间和大小</target>
@@ -522,11 +498,11 @@ The command is triggered if:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>最后使用的配置(按DEL键将其从列表中移除)</target>
 
-<source>Hide excluded items</source>
-<target>隐藏已排除的项目</target>
+<source>Show excluded items</source>
+<target>显示已排除项目</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>隐藏已过滤或临时排除的文件</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>显示已被过滤或被临时排除的文件</target>
 
 <source>Number of files and folders that will be created</source>
 <target>将被创建的文件和文件夹数</target>
@@ -570,68 +546,47 @@ The command is triggered if:
 <source>Right</source>
 <target>右侧</target>
 
-<source>Status feedback</source>
-<target>状况反馈</target>
-
-<source>Show progress dialog</source>
-<target>显示进度对话框</target>
-
 <source>Error handling</source>
 <target>错误处理</target>
 
-<source>Maximum number of log files:</source>
-<target>最大的日志文件数:</target>
+<source>Ignore</source>
+<target>忽略</target>
 
-<source>Select folder to save log files:</source>
-<target>选择要保存日志的文件夹:</target>
+<source>Hide all error and warning messages</source>
+<target>隐藏所有错误与警告信息</target>
 
-<source>Batch settings</source>
-<target>批处理设置</target>
+<source>Pop-up</source>
+<target>弹出框</target>
 
-<source>Select variant:</source>
-<target>选择变化的:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>在错误或警告时显示弹出对话框</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>使用一个数据库来识别和传播两边的改变. 删除，重命名和冲突会自动检测.</target>
+<source>Exit</source>
+<target>退出</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>镜像备份左边的文件夹.同步后右边的文件夹被修改为和左边文件夹精确匹配.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>复制新的或修改过的文件到右侧文件夹</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>配置你自己的同步规则.</target>
-
-<source>Deletion handling</source>
-<target>删除处理</target>
+<source>Abort synchronization on first error</source>
+<target>在第一个错误时中止同步</target>
 
 <source>On completion:</source>
 <target>完成时:</target>
 
-<source>Configuration</source>
-<target>配置</target>
+<source>Show progress dialog</source>
+<target>显示进度对话框</target>
 
-<source>Item exists on left side only</source>
-<target>项目仅存在于左侧</target>
+<source>Generate log file</source>
+<target>生成日志文件</target>
 
-<source>Item exists on right side only</source>
-<target>项目仅存在于右侧</target>
+<source>Select folder to save log files</source>
+<target>选择要保存日志文件的文件夹</target>
 
-<source>Left side is newer</source>
-<target>左侧较新</target>
+<source>Limit</source>
+<target>限制</target>
 
-<source>Right side is newer</source>
-<target>右侧较新</target>
+<source>Limit maximum number of log files</source>
+<target>限制日志文件的量大个数</target>
 
-<source>Items have different content</source>
-<target>项目有不同的内容</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>冲突/项目未能被分类</target>
-
-<source>OK</source>
-<target>确定</target>
+<source>Batch settings</source>
+<target>批处理设置</target>
 
 <source>Compare by...</source>
 <target>比较选项...</target>
@@ -663,6 +618,69 @@ is the same
 <source>Symbolic Link handling</source>
 <target>符号连接处理方式</target>
 
+<source>OK</source>
+<target>确定</target>
+
+<source>Select variant:</source>
+<target>选择变化的:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>使用一个数据库来识别和传播两边的改变. 删除，重命名和冲突会自动检测.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>镜像备份左边的文件夹.同步后右边的文件夹被修改为和左边文件夹精确匹配.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>复制新的或修改过的文件到右侧文件夹</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>配置你自己的同步规则.</target>
+
+<source>Deletion handling</source>
+<target>删除处理</target>
+
+<source>Permanent</source>
+<target>永久</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>永久性删除或覆盖文件</target>
+
+<source>Recycle Bin</source>
+<target>回收站</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>当删除或覆盖文件时使用回收站</target>
+
+<source>Versioning</source>
+<target>保留历史版本</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>移动时间标记文件到指定的文件夹</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>限制每个文件的最大历史版本数</target>
+
+<source>Configuration</source>
+<target>配置</target>
+
+<source>Item exists on left side only</source>
+<target>项目仅存在于左侧</target>
+
+<source>Item exists on right side only</source>
+<target>项目仅存在于右侧</target>
+
+<source>Left side is newer</source>
+<target>左侧较新</target>
+
+<source>Right side is newer</source>
+<target>右侧较新</target>
+
+<source>Items have different content</source>
+<target>项目有不同的内容</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>冲突/项目未能被分类</target>
+
 <source>Synchronizing...</source>
 <target>同步中...</target>
 
@@ -678,8 +696,8 @@ is the same
 <source>Donate with PayPal</source>
 <target>通过PayPal捐赠</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>非常感谢以下本地化 FreeFileSync 的工作人员:</target>
+<source>Many thanks for localization:</source>
+<target>非常感谢以下本地化翻译者:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>欢迎反馈意见和提出建议</target>
@@ -695,9 +713,6 @@ is the same
 
 <source>Published under the GNU General Public License</source>
 <target>在GNU通用公共许可下发布</target>
-
-<source>Use Recycle Bin</source>
-<target>使用回收站</target>
 
 <source>Delete on both sides</source>
 <target>从两侧删除</target>
@@ -768,8 +783,8 @@ Note: File names must be relative to base directories!
 <source>Statistics</source>
 <target>统计</target>
 
-<source>Do not show this dialog again</source>
-<target>不要再显示此对话框</target>
+<source>Don't show this dialog again</source>
+<target>不要再显示这个对话框</target>
 
 <source>Find what:</source>
 <target>要查找什么:</target>
@@ -852,11 +867,8 @@ Note: File names must be relative to base directories!
 <source>Do you want to save changes to %x?</source>
 <target>是否要保存修改到 %x ?</target>
 
-<source>Save</source>
-<target>保存</target>
-
-<source>Don't Save</source>
-<target>不保存</target>
+<source>Do&n't save</source>
+<target>不保存(&N)</target>
 
 <source>Configuration loaded!</source>
 <target>配置已加载!</target>
@@ -948,8 +960,8 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>显示将不被复制的文件</target>
 
-<source>All directories in sync!</source>
-<target>所有目录已同步!</target>
+<source>All folders are in sync!</source>
+<target>所有文件夹都是同步的!</target>
 
 <source>Comma separated list</source>
 <target>逗号分隔的列表</target>
@@ -1034,6 +1046,9 @@ Note: File names must be relative to base directories!
 <source>Pause</source>
 <target>暂停</target>
 
+<source>Logging</source>
+<target>记录</target>
+
 <source>Cannot find %x</source>
 <target>找不到 %x</target>
 
@@ -1112,21 +1127,6 @@ Note: File names must be relative to base directories!
 
 <source>Leave as unresolved conflict</source>
 <target>遗留为未解决的冲突</target>
-
-<source>Delete permanently</source>
-<target>永久性删除</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>永久性删除或覆盖文件</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>当删除或覆盖文件时使用回收站</target>
-
-<source>Versioning</source>
-<target>保留历史版本</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>移动文件到一个以时间标记命名的子文件夹</target>
 
 <source>Files</source>
 <target>文件</target>
@@ -1215,8 +1215,11 @@ Note: File names must be relative to base directories!
 <source>Cannot copy file %x to %y.</source>
 <target>无法复制文件 %x 到 %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>无法读取目录 %x.</target>
+<source>Cannot open directory %x.</source>
+<target>无法打开目录 %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>无法列举目录 %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>检测到无限的目录递归.</target>
@@ -1242,6 +1245,9 @@ Note: File names must be relative to base directories!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>设置默认的同步方向:旧文件会被新文件覆盖.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>如下路径的回收站不可用! 文件会被永久删除:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>你可以忽略这个错误而认为文件夹是空的.</target>
 
@@ -1250,6 +1256,9 @@ Note: File names must be relative to base directories!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目录有依赖性！在设立同步规则时请小心:</target>
+
+<source>Start comparison</source>
+<target>开始比较</target>
 
 <source>Preparing synchronization...</source>
 <target>正在准备同步...</target>
@@ -1262,6 +1271,9 @@ Note: File names must be relative to base directories!
 
 <source>Files %x have the same date but a different size!</source>
 <target>文件 %x 日期相同但大小不同!</target>
+
+<source>Items differ in attributes only</source>
+<target>项目仅是文件属性不同</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>符号连接 %x 有相同的日期但目标不同.</target>
@@ -1277,9 +1289,6 @@ Note: File names must be relative to base directories!
 
 <source>Both sides are equal</source>
 <target>两侧相等</target>
-
-<source>Items have different attributes</source>
-<target>项目有不同的属性</target>
 
 <source>Copy new item to left</source>
 <target>复制新项目到左侧</target>
@@ -1395,14 +1404,11 @@ Note: File names must be relative to base directories!
 <source>Available:</source>
 <target>可用:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>如下路径的回收站不可用! 文件会被永久删除:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>一个将被修改的文件夹是多个文件夹对的一部分. 请重新检视同步设置.</target>
 
-<source>Processing folder pair:</source>
-<target>正在处理成对文件夹:</target>
+<source>Synchronizing folder pair:</source>
+<target>正在同步成对的文件夹:</target>
 
 <source>Target folder %x already existing.</source>
 <target>目标文件夹 %x 已经存在.</target>

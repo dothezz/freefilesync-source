@@ -10,9 +10,6 @@
 <source>Searching for folder %x...</source>
 <target>Ricerca della cartella %x...</target>
 
-<source>Batch execution</source>
-<target>Esecuzione in batch</target>
-
 <source>Items processed:</source>
 <target>Elementi processati:</target>
 
@@ -33,6 +30,9 @@
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Selezionata interruazione: conclusione dell'operazione...</target>
+
+<source>Failure to create time stamp for versioning:</source>
+<target></target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronizzazione automatizzata</target>
@@ -61,11 +61,11 @@
 <source>Create a batch job</source>
 <target>Creazione di un attività batch</target>
 
-<source>Synchronization settings</source>
-<target>Parametri di sincronizzazione</target>
-
 <source>Comparison settings</source>
 <target>Impostazioni di comparazione</target>
+
+<source>Synchronization settings</source>
+<target>Parametri di sincronizzazione</target>
 
 <source>About</source>
 <target>Info su</target>
@@ -87,27 +87,6 @@
 
 <source>Select time span</source>
 <target>Seleziona intervallo di tempo</target>
-
-<source>Show pop-up</source>
-<target>Mostra popup</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Mostra popup di errore o avviso</target>
-
-<source>Ignore errors</source>
-<target>Ignora errori</target>
-
-<source>Hide all error and warning messages</source>
-<target>Nascondi tutti gli errori e i messaggi d'avviso</target>
-
-<source>Exit instantly</source>
-<target>Esci istantaneamente</target>
-
-<source>Abort synchronization immediately</source>
-<target>Interrompi immediatamente la sincronizzazione</target>
-
-<source>Browse</source>
-<target>Sfoglia</target>
 
 <source>Invalid command line:</source>
 <target>Linea di comando non valida:</target>
@@ -247,8 +226,8 @@
 <source>&Open...</source>
 <target>&Apri...</target>
 
-<source>Save &As...</source>
-<target>Salva &Con nome...</target>
+<source>Save &as...</source>
+<target>Salva &come...</target>
 
 <source>&Quit</source>
 <target>&Esci</target>
@@ -289,6 +268,9 @@
 <source>Remove folder</source>
 <target>Rimuovi cartella</target>
 
+<source>Browse</source>
+<target>Sfoglia</target>
+
 <source>Select a folder</source>
 <target>Seleziona una cartella</target>
 
@@ -321,8 +303,8 @@ Il comando è attivato se:
 <source>Cancel</source>
 <target>Annulla</target>
 
-<source>(Build: %x)</source>
-<target>(Versione: %x)</target>
+<source>Build: %x</source>
+<target>Versione: %x</target>
 
 <source>All files</source>
 <target>Tutti i file</target>
@@ -341,9 +323,6 @@ Il comando è attivato se:
 
 <source>A folder input field is empty.</source>
 <target>Un campo cartella input è vuoto.</target>
-
-<source>Logging</source>
-<target>Registo attività</target>
 
 <source>File time and size</source>
 <target>Ora e dimensione file</target>
@@ -525,11 +504,11 @@ Il comando è attivato se:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Ultima configurazione utilizzata (premi CANC per rimuovere dall'elenco)</target>
 
-<source>Hide excluded items</source>
-<target>Nascondi oggetti esclusi</target>
+<source>Show excluded items</source>
+<target>Mostra oggetti esclusi</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Nascondi file filtrati o temporaneamente esclusi</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Mostra file filtrati o temporaneamente esclusi</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Numero di file e cartelle che verranno creati</target>
@@ -573,68 +552,47 @@ Il comando è attivato se:
 <source>Right</source>
 <target>Destra</target>
 
-<source>Status feedback</source>
-<target>Feedback di stato</target>
-
-<source>Show progress dialog</source>
-<target>Mostra stato di avanzamento</target>
-
 <source>Error handling</source>
 <target>Gestione degli errori</target>
 
-<source>Maximum number of log files:</source>
-<target>Numero massimo di file registro:</target>
+<source>Ignore</source>
+<target>Ignora</target>
 
-<source>Select folder to save log files:</source>
-<target>Seleziona cartella per il salvataggio dei file registro:</target>
+<source>Hide all error and warning messages</source>
+<target>Nascondi tutti gli errori e i messaggi d'avviso</target>
 
-<source>Batch settings</source>
-<target>Impostazioni batch</target>
+<source>Pop-up</source>
+<target>Pop-up</target>
 
-<source>Select variant:</source>
-<target>Seleziona una variante:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Mostra popup di errore o avviso</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identifica e propaga modifiche su entrambi i lati usando un database. Cancellazioni, ridenominazioni e conflitti sono rilevati automaticamente.</target>
+<source>Exit</source>
+<target></target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Backup mirror della cartella di sinistra. La cartella destra verrà modificata per corrispondere esattamente alla cartella di sinistra dopo la sincronizzazione.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Copia file nuovi o aggiornati nella cartella di destra.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Configura le tue regole di sincronizzazione.</target>
-
-<source>Deletion handling</source>
-<target>Gestione cancellazione</target>
+<source>Abort synchronization on first error</source>
+<target>Abortisci sincronizzazione al primo errore</target>
 
 <source>On completion:</source>
 <target>In completamento:</target>
 
-<source>Configuration</source>
-<target>Configurazione</target>
+<source>Show progress dialog</source>
+<target>Mostra stato di avanzamento</target>
 
-<source>Item exists on left side only</source>
-<target>L'elemento esiste solo sul lato sinistro</target>
+<source>Generate log file</source>
+<target>Genera file log</target>
 
-<source>Item exists on right side only</source>
-<target>L'elemento esiste solo sul lato destro</target>
+<source>Select folder to save log files</source>
+<target>Seleziona cartella dove salvare i file log</target>
 
-<source>Left side is newer</source>
-<target>Il più recente è sul lato sinistro</target>
+<source>Limit</source>
+<target>Limita</target>
 
-<source>Right side is newer</source>
-<target>Il più recente è sul lato destro</target>
+<source>Limit maximum number of log files</source>
+<target>Limita il numero massimo di file log</target>
 
-<source>Items have different content</source>
-<target>Gli elementi hanno contenuto differente</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Conflitto/elemento non categorizzabile</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Impostazioni batch</target>
 
 <source>Compare by...</source>
 <target>Compara per...</target>
@@ -666,6 +624,69 @@ I file sono considerati identici se
 <source>Symbolic Link handling</source>
 <target>Gestione Collegamenti</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Seleziona una variante:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Identifica e propaga modifiche su entrambi i lati usando un database. Cancellazioni, ridenominazioni e conflitti sono rilevati automaticamente.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Backup mirror della cartella di sinistra. La cartella destra verrà modificata per corrispondere esattamente alla cartella di sinistra dopo la sincronizzazione.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Copia file nuovi o aggiornati nella cartella di destra.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Configura le tue regole di sincronizzazione.</target>
+
+<source>Deletion handling</source>
+<target>Gestione cancellazione</target>
+
+<source>Permanent</source>
+<target>Permanente</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Elimina o sovrascrivi file definitivamente</target>
+
+<source>Recycle Bin</source>
+<target>Cestino</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Usa il Cestino quando si elimina o sovrascrive un file</target>
+
+<source>Versioning</source>
+<target>Versione</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Sposta file con indicazione datata nella cartella specifica</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Limita numero massimo di versioni per ogni file</target>
+
+<source>Configuration</source>
+<target>Configurazione</target>
+
+<source>Item exists on left side only</source>
+<target>L'elemento esiste solo sul lato sinistro</target>
+
+<source>Item exists on right side only</source>
+<target>L'elemento esiste solo sul lato destro</target>
+
+<source>Left side is newer</source>
+<target>Il più recente è sul lato sinistro</target>
+
+<source>Right side is newer</source>
+<target>Il più recente è sul lato destro</target>
+
+<source>Items have different content</source>
+<target>Gli elementi hanno contenuto differente</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Conflitto/elemento non categorizzabile</target>
+
 <source>Synchronizing...</source>
 <target>Sincronizzazione...</target>
 
@@ -681,8 +702,8 @@ I file sono considerati identici se
 <source>Donate with PayPal</source>
 <target>Fai una donazione con PayPal</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Per la traduzione di FreeFileSync, un grazie va a:</target>
+<source>Many thanks for localization:</source>
+<target>Ringraziamenti per la localizzazione:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Ogni commento o suggerimento è ben accetto</target>
@@ -698,9 +719,6 @@ I file sono considerati identici se
 
 <source>Published under the GNU General Public License</source>
 <target>Pubblicato sotto licenza GNU General Public</target>
-
-<source>Use Recycle Bin</source>
-<target>Usa il Cestino</target>
 
 <source>Delete on both sides</source>
 <target>Elimina su entrambi i lati</target>
@@ -771,8 +789,8 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Statistics</source>
 <target>Statistiche</target>
 
-<source>Do not show this dialog again</source>
-<target>Non visualizzare più questo messaggio</target>
+<source>Don't show this dialog again</source>
+<target>Non mostrare più questo messaggio</target>
 
 <source>Find what:</source>
 <target>Trova questo:</target>
@@ -855,11 +873,8 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Do you want to save changes to %x?</source>
 <target>Vuoi salvare le modifiche a %x?</target>
 
-<source>Save</source>
-<target>Salva</target>
-
-<source>Don't Save</source>
-<target>Non salvare</target>
+<source>Do&n't save</source>
+<target>No&n salvare</target>
 
 <source>Configuration loaded!</source>
 <target>Configurazione caricata!</target>
@@ -951,8 +966,8 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Show files that won't be copied</source>
 <target>Mostra file che non saranno copiati</target>
 
-<source>All directories in sync!</source>
-<target>Tutte le cartelle sincronizzate!</target>
+<source>All folders are in sync!</source>
+<target>Tutte le cartelle sono sincronizzate!</target>
 
 <source>Comma separated list</source>
 <target>Elenco elementi separati da virgola</target>
@@ -1041,6 +1056,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Pause</source>
 <target>Pausa</target>
 
+<source>Logging</source>
+<target>Registo attività</target>
+
 <source>Cannot find %x</source>
 <target>Impossibile trovare %x</target>
 
@@ -1121,21 +1139,6 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 
 <source>Leave as unresolved conflict</source>
 <target>Lascia come conflitti irrisolti</target>
-
-<source>Delete permanently</source>
-<target>Elimina definitivamente</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Elimina o sovrascrivi file definitivamente</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Usa il Cestino quando si elimina o sovrascrive un file</target>
-
-<source>Versioning</source>
-<target>Versione</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Sposta file in una sotto-cartella con data e ora</target>
 
 <source>Files</source>
 <target>File</target>
@@ -1227,8 +1230,11 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Cannot copy file %x to %y.</source>
 <target>Impossibile copiare file %x in %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Impossibile leggere cartella %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Impossibile aprire cartella %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Impossibile numerare cartella %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Rilevato percorso ricorsivo senza fine.</target>
@@ -1254,6 +1260,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Imposta direzioni di sincronizzazione dpredefinite: i vecchi file saranno sovrascritti dai nuovi.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Cestino non disponibile per i seguenti percorsi! I file verranno cancellati in modo permanente:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>Puoi ignorare questo errore per considerare la cartella come vuota.</target>
 
@@ -1262,6 +1271,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Le cartelle sono dipendenti! Fai attenzione quando configuri le regole di sincronizzazione:</target>
+
+<source>Start comparison</source>
+<target>Inizia comparazione</target>
 
 <source>Preparing synchronization...</source>
 <target>Preparazione sincronizzazione...</target>
@@ -1274,6 +1286,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 
 <source>Files %x have the same date but a different size!</source>
 <target>I file %x hanno la stessa data ma dimensione diversa!</target>
+
+<source>Items differ in attributes only</source>
+<target>Gli oggetti differiscono solo negli attributi</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Il collegamento %x ha stessa data ma un diverso puntamento.</target>
@@ -1289,9 +1304,6 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 
 <source>Both sides are equal</source>
 <target>Entrambi i lati sono uguali</target>
-
-<source>Items have different attributes</source>
-<target>Gli elementi hanno differenti attributi</target>
 
 <source>Copy new item to left</source>
 <target>Copia nuovo elemento a sinistra</target>
@@ -1356,6 +1368,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Moving symbolic link %x to %y</source>
 <target>Spostamento collegamento %x in %y</target>
 
+<source>Removing old versions...</source>
+<target></target>
+
 <source>Creating file %x</source>
 <target>Creazione file %x</target>
 
@@ -1407,14 +1422,11 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Available:</source>
 <target>Dispobilile:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Cestino non disponibile per i seguenti percorsi! I file verranno cancellati in modo permanente:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Verrà modificata una cartella che è parte di molteplici coppie di cartelle. Controlla le impostazioni di sincronizzazione.</target>
 
-<source>Processing folder pair:</source>
-<target>Elaborazione coppia di cartelle:</target>
+<source>Synchronizing folder pair:</source>
+<target>Sincronizzazione della coppia di cartelle:</target>
 
 <source>Target folder %x already existing.</source>
 <target>La cartella di destinazione %x è già esistente.</target>

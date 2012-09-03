@@ -5,7 +5,7 @@ SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 DOCSHAREDIR = $(SHAREDIR)/doc/$(APPNAME)
 
-COMMON_COMPILE_FLAGS = -Wall -pipe -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h"
+COMMON_COMPILE_FLAGS = -Wall -pipe -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h" -include "zen/warn_static.h"
 COMMON_LINK_FLAGS    = -pthread -lrt -lz
 
 #default build
@@ -76,6 +76,7 @@ CPP_LIST+=lib/resolve_path.cpp
 CPP_LIST+=lib/resources.cpp
 CPP_LIST+=lib/perf_check.cpp
 CPP_LIST+=lib/status_handler.cpp
+CPP_LIST+=lib/versioning.cpp
 CPP_LIST+=lib/xml_base.cpp
 CPP_LIST+=zen/recycler.cpp
 CPP_LIST+=zen/file_handling.cpp

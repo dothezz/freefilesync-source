@@ -1,31 +1,41 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "dir_name.h"
+#include <zen/thread.h>
+#include <zen/file_handling.h>
 #include <wx/dnd.h>
 #include <wx/window.h>
 #include <wx/textctrl.h>
 #include <wx/statbox.h>
-#include <zen/thread.h>
-#include <zen/file_handling.h>
-#include "../lib/resolve_path.h"
+#include <wx/dirdlg.h>
+#include <wx/msgdlg.h>
 #include <wx+/string_conv.h>
+#include "../lib/resolve_path.h"
 #include "folder_history_box.h"
+
+#ifdef FFS_WIN
+#include <zen/dll.h>
+#include <zen/win_ver.h>
+#include "IFileDialog_Vista\ifile_dialog.h"
+#endif
 
 using namespace zen;
 
 
+const wxEventType zen::EVENT_ON_DIR_SELECTED = wxNewEventType();
+
 namespace
 {
-void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, wxWindow& tooltipWnd, wxStaticText* staticText, size_t timeout)
+void setDirectoryNameImpl(const wxString& dirname, wxWindow& tooltipWnd, wxStaticText* staticText)
 {
     const wxString dirFormatted = utfCvrtTo<wxString>(getFormattedDirectoryName(toZ(dirname)));
 
     tooltipWnd.SetToolTip(nullptr); //workaround wxComboBox bug http://trac.wxwidgets.org/ticket/10512 / http://trac.wxwidgets.org/ticket/12659
-    tooltipWnd.SetToolTip(dirFormatted); //only lord knows when the real bugfix reaches mere mortals via an official release
+    tooltipWnd.SetToolTip(dirFormatted); //who knows when the real bugfix reaches mere mortals via an official release...
 
     if (staticText)
     {
@@ -37,78 +47,69 @@ void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, w
 
         staticText->SetLabel(dirNormalized == dirFormatted ? wxString(_("Drag && drop")) : dirFormatted);
     }
-
-    if (dirPicker && !dirFormatted.empty())
-    {
-        Zstring dir = toZ(dirFormatted); //convert to Zstring first: we don't want to pass wxString by value and risk MT issues!
-        auto ft = async([=] { return zen::dirExists(dir); });
-
-        if (ft.timed_wait(boost::posix_time::milliseconds(timeout)) && ft.get()) //potentially slow network access: wait 200ms at most
-            dirPicker->SetPath(dirFormatted);
-    }
 }
 
 
 void setDirectoryName(const wxString&  dirname,
                       wxTextCtrl*      txtCtrl,
-                      wxDirPickerCtrl* dirPicker,
                       wxWindow&        tooltipWnd,
-                      wxStaticText*    staticText,
-                      size_t           timeout = 200) //pointers are optional
+                      wxStaticText*    staticText) //pointers are optional
 {
     if (txtCtrl)
         txtCtrl->ChangeValue(dirname);
-    setDirectoryNameImpl(dirname, dirPicker, tooltipWnd, staticText, timeout);
+    setDirectoryNameImpl(dirname, tooltipWnd, staticText);
 }
 
 
 void setDirectoryName(const wxString&   dirname,
                       FolderHistoryBox* comboBox,
-                      wxDirPickerCtrl*  dirPicker,
                       wxWindow&         tooltipWnd,
-                      wxStaticText*    staticText,
-                      size_t            timeout = 200) //pointers are optional
+                      wxStaticText*    staticText) //pointers are optional
 {
     if (comboBox)
         comboBox->setValue(dirname);
-    setDirectoryNameImpl(dirname, dirPicker, tooltipWnd, staticText, timeout);
+    setDirectoryNameImpl(dirname, tooltipWnd, staticText);
 }
 }
 //##############################################################################################################
 
 template <class NameControl>
-DirectoryName<NameControl>::DirectoryName(wxWindow&        dropWindow,
-                                          wxDirPickerCtrl& dirPicker,
-                                          NameControl&     dirName,
-                                          wxStaticText*    staticText,
-                                          wxWindow*        dropWindow2) :
+DirectoryName<NameControl>::DirectoryName(wxWindow&     dropWindow,
+                                          wxButton&     selectButton,
+                                          NameControl&  dirName,
+                                          wxStaticText* staticText,
+                                          wxWindow*     dropWindow2) :
     dropWindow_(dropWindow),
     dropWindow2_(dropWindow2),
-    dirPicker_(dirPicker),
+    selectButton_(selectButton),
     dirName_(dirName),
     staticText_(staticText)
 {
     //prepare drag & drop
-    setupFileDrop(dropWindow);
-    dropWindow.Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
+    setupFileDrop(dropWindow_);
+    dropWindow_.Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
 
-    if (dropWindow2)
+    if (dropWindow2_)
     {
-        setupFileDrop(*dropWindow2);
-        dropWindow2->Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
+        setupFileDrop(*dropWindow2_);
+        dropWindow2_->Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
     }
 
     //keep dirPicker and dirName synchronous
-    dirName_  .Connect(wxEVT_COMMAND_TEXT_UPDATED,      wxCommandEventHandler(      DirectoryName::OnWriteDirManually), nullptr, this);
-    dirPicker_.Connect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(DirectoryName::OnDirSelected     ), nullptr, this);
+    dirName_     .Connect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler      (DirectoryName::OnWriteDirManually), nullptr, this);
+    selectButton_.Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler      (DirectoryName::OnSelectDir       ), nullptr, this);
 }
 
 
 template <class NameControl>
 DirectoryName<NameControl>::~DirectoryName()
 {
-    dirName_  .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,      wxCommandEventHandler(      DirectoryName::OnWriteDirManually), nullptr, this);
-    dirPicker_.Disconnect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(DirectoryName::OnDirSelected     ), nullptr, this);
+    dropWindow_.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
+    if (dropWindow2_)
+        dropWindow2_->Disconnect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
+
+    dirName_     .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler      (DirectoryName::OnWriteDirManually), nullptr, this);
+    selectButton_.Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler      (DirectoryName::OnSelectDir       ), nullptr, this);
 }
 
 
@@ -123,7 +124,7 @@ void DirectoryName<NameControl>::OnFilesDropped(FileDropEvent& event)
     {
         const wxString fileName = event.getFiles()[0];
         if (dirExists(toZ(fileName)))
-            setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticText_);
+            setDirectoryName(fileName, &dirName_, dirName_, staticText_);
         else
         {
             wxString parentName = beforeLast(fileName, utfCvrtTo<wxString>(FILE_NAME_SEPARATOR)); //returns empty string if ch not found
@@ -132,10 +133,14 @@ void DirectoryName<NameControl>::OnFilesDropped(FileDropEvent& event)
                 parentName += FILE_NAME_SEPARATOR;
 #endif
             if (dirExists(toZ(parentName)))
-                setDirectoryName(parentName, &dirName_, &dirPicker_, dirName_, staticText_);
+                setDirectoryName(parentName, &dirName_, dirName_, staticText_);
             else //set original name unconditionally: usecase: inactive mapped network shares
-                setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticText_);
+                setDirectoryName(fileName, &dirName_, dirName_, staticText_);
         }
+
+        //notify action invoked by user
+        wxCommandEvent dummy(EVENT_ON_DIR_SELECTED);
+        ProcessEvent(dummy);
     }
     else
         event.Skip(); //let other handlers try!!!
@@ -145,17 +150,75 @@ void DirectoryName<NameControl>::OnFilesDropped(FileDropEvent& event)
 template <class NameControl>
 void DirectoryName<NameControl>::OnWriteDirManually(wxCommandEvent& event)
 {
-    setDirectoryName(event.GetString(), static_cast<NameControl*>(nullptr), &dirPicker_, dirName_, staticText_, 100); //potentially slow network access: wait 100 ms at most
+    setDirectoryName(event.GetString(), static_cast<NameControl*>(nullptr), dirName_, staticText_); //potentially slow network access: wait 100 ms at most
+
+    //wxCommandEvent dummy(EVENT_ON_DIR_SELECTED); -> don't annoy the user!
+    //ProcessEvent(dummy);
     event.Skip();
 }
 
 
 template <class NameControl>
-void DirectoryName<NameControl>::OnDirSelected(wxFileDirPickerEvent& event)
+void DirectoryName<NameControl>::OnSelectDir(wxCommandEvent& event)
 {
-    const wxString newPath = event.GetPath();
-    setDirectoryName(newPath, &dirName_, nullptr, dirName_, staticText_);
-    event.Skip();
+    wxString defaultDirname; //default selection for dir picker
+    {
+        const Zstring dirFmt = getFormattedDirectoryName(toZ(getName()));
+        if (!dirFmt.empty())
+        {
+            //convert to Zstring first: we don't want to pass wxString by value and risk MT issues!
+            auto ft = async([=] { return zen::dirExists(dirFmt); });
+
+            if (ft.timed_wait(boost::posix_time::milliseconds(200)) && ft.get()) //potentially slow network access: wait 200ms at most
+                defaultDirname = utfCvrtTo<wxString>(dirFmt);
+        }
+    }
+
+    //wxDirDialog internally uses lame looking SHBrowseForFolder(); Better use IFileDialog() instead! (remembers size and position!)
+    std::unique_ptr<wxString> newFolder;
+#ifdef FFS_WIN
+    if (vistaOrLater())
+    {
+        using namespace ifile;
+        const DllFun<FunType_showFolderPicker> showFolderPicker(getDllName(), funName_showFolderPicker);
+        const DllFun<FunType_freeString>       freeString      (getDllName(), funName_freeString);
+        if (showFolderPicker && freeString)
+        {
+            const wchar_t* selectedFolder = nullptr;
+            const wchar_t* errorMsg       = nullptr;
+            bool cancelled = false;
+            ZEN_ON_SCOPE_EXIT(freeString(selectedFolder));
+            ZEN_ON_SCOPE_EXIT(freeString(errorMsg));
+
+            showFolderPicker(static_cast<HWND>(selectButton_.GetHWND()),                //in;  ==HWND
+                             defaultDirname.empty() ? nullptr : defaultDirname.c_str(), //in, optional!
+                             selectedFolder, //out: call freeString() after use!
+                             cancelled,      //out
+                             errorMsg);      //out, optional: call freeString() after use!
+            if (errorMsg)
+            {
+                wxMessageBox(errorMsg, _("Error"), wxOK | wxICON_ERROR);
+                return;
+            }
+            if (cancelled || !selectedFolder)
+                return;
+            newFolder = make_unique<wxString>(selectedFolder);
+        }
+    }
+#endif
+    if (!newFolder.get())
+    {
+        wxDirDialog dirPicker(&selectButton_, _("Select a folder"), defaultDirname); //put modal dialog on stack: creating on freestore leads to memleak!
+        if (dirPicker.ShowModal() != wxID_OK)
+            return;
+        newFolder = make_unique<wxString>(dirPicker.GetPath());
+    }
+
+    setDirectoryName(*newFolder, &dirName_, dirName_, staticText_);
+
+    //notify action invoked by user
+    wxCommandEvent dummy(EVENT_ON_DIR_SELECTED);
+    ProcessEvent(dummy);
 }
 
 
@@ -169,7 +232,7 @@ wxString DirectoryName<NameControl>::getName() const
 template <class NameControl>
 void DirectoryName<NameControl>::setName(const wxString& dirname)
 {
-    setDirectoryName(dirname, &dirName_, &dirPicker_, dirName_, staticText_);
+    setDirectoryName(dirname, &dirName_, dirName_, staticText_);
 }
 
 

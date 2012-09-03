@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "custom_grid.h"
@@ -1399,7 +1399,7 @@ private:
             //(h-scrollbar is shown due to v-scrollbar consuming horizontal width, ect...)
             //while in fact both are NOT needed, this special case results in a bogus need for scrollbars!
             //see https://sourceforge.net/tracker/?func=detail&aid=3514183&group_id=234430&atid=1093083
-			// => since we're outside the Grid abstraction, we should not duplicate code to handle this special case as it seems to be insignificant
+            // => since we're outside the Grid abstraction, we should not duplicate code to handle this special case as it seems to be insignificant
         };
 
         Grid::ScrollBarStatus sbStatusX = needsHorizontalScrollbars(gridL_) ||

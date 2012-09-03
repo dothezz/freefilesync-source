@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef STATISTICS_H_INCLUDED
@@ -34,7 +34,7 @@ private:
         int objCount_;
         double data_; //unit: [bytes]
     };
-    std::multimap<long, Record> samples; ////time, unit: [ms]
+    std::multimap<long, Record> samples; //time, unit: [ms]
 };
 
 #endif // STATISTICS_H_INCLUDED

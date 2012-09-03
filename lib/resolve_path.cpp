@@ -1,17 +1,18 @@
 #include "resolve_path.h"
-#include <wx/utils.h>
-#include <zen/time.h>
-#include <wx+/string_conv.h>
 #include <map>
 #include <set>
+#include <zen/time.h>
 #include <zen/scope_guard.h>
 #include <zen/thread.h>
+#include <wx/utils.h>
+#include <wx+/string_conv.h>
 
 #ifdef FFS_WIN
 #include <zen/dll.h>
 #include <Shlobj.h>
 #include <zen/win.h> //includes "windows.h"
 #include <zen/long_path_prefix.h>
+#include <zen/file_handling.h>
 #ifdef _MSC_VER
 #pragma comment(lib, "Mpr.lib")
 #endif
@@ -138,119 +139,114 @@ private:
 };
 
 //caveat: function scope static initialization is not thread-safe in VS 2010! => make sure to call at app start!
-namespace
-{
 struct Dummy { Dummy() { CsidlConstants::get(); }} blah;
-}
 #endif
 
 
-wxString getEnvValue(const wxString& envName) //return empty on error
+std::unique_ptr<Zstring> getEnvironmentVar(const Zstring& envName) //return nullptr if not found
 {
-    //try to apply environment variables
-    wxString envValue;
-    if (wxGetEnv(envName, &envValue))
-    {
-        //some postprocessing:
-        trim(envValue); //remove leading, trailing blanks
+    wxString value;
+    if (!wxGetEnv(utfCvrtTo<wxString>(envName), &value))
+        return nullptr;
 
-        //remove leading, trailing double-quotes
-        if (startsWith(envValue, L"\"") &&
-            endsWith(envValue, L"\"") &&
-            envValue.length() >= 2)
-            envValue = wxString(envValue.c_str() + 1, envValue.length() - 2);
-    }
-    return envValue;
+    //some postprocessing:
+    trim(value); //remove leading, trailing blanks
+
+    //remove leading, trailing double-quotes
+    if (startsWith(value, L"\"") &&
+        endsWith  (value, L"\"") &&
+        value.length() >= 2)
+        value = wxString(value.c_str() + 1, value.length() - 2);
+
+    return make_unique<Zstring>(utfCvrtTo<Zstring>(value));
 }
 
 
-bool replaceMacro(wxString& macro) //macro without %-characters, return true if replaced successfully
+std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-characters
+                                      const std::vector<std::pair<Zstring, Zstring>>& ext) //return nullptr if not resolved
 {
-    if (macro.IsEmpty())
-        return false;
+    auto equalNoCase = [](const Zstring& lhs, const Zstring& rhs) { return utfCvrtTo<wxString>(lhs).CmpNoCase(utfCvrtTo<wxString>(rhs)) == 0; };
 
-    //there are equally named environment variables %TIME%, %DATE% existing, so replace these first!
-    if (macro.CmpNoCase(L"time") == 0)
-    {
-        macro = formatTime<wxString>(L"%H%M%S");
-        return true;
-    }
+    //there exist environment variables named %TIME%, %DATE% so check for our internal macros first!
+    if (equalNoCase(macro, Zstr("time")))
+        return make_unique<Zstring>(formatTime<Zstring>(Zstr("%H%M%S")));
 
-    if (macro.CmpNoCase(L"date") == 0)
-    {
-        macro = formatTime<wxString>(FORMAT_ISO_DATE);
-        return true;
-    }
+    if (equalNoCase(macro, Zstr("date")))
+        return make_unique<Zstring>(formatTime<Zstring>(FORMAT_ISO_DATE));
 
-    auto processPhrase = [&](const wchar_t* phrase, const wchar_t* format) -> bool
+    std::unique_ptr<Zstring> cand;
+    auto processPhrase = [&](const Zchar* phrase, const Zchar* format) -> bool
     {
-        if (macro.CmpNoCase(phrase) != 0)
+        if (!equalNoCase(macro, phrase))
             return false;
 
-        macro = formatTime<wxString>(format);
+        cand = make_unique<Zstring>(formatTime<Zstring>(format));
         return true;
     };
 
-    if (processPhrase(L"weekday", L"%A")) return true;
-    if (processPhrase(L"day"    , L"%d")) return true;
-    if (processPhrase(L"month"  , L"%B")) return true;
-    if (processPhrase(L"week"   , L"%U")) return true;
-    if (processPhrase(L"year"   , L"%Y")) return true;
-    if (processPhrase(L"hour"   , L"%H")) return true;
-    if (processPhrase(L"min"    , L"%M")) return true;
-    if (processPhrase(L"sec"    , L"%S")) return true;
+    if (processPhrase(Zstr("weekday"), Zstr("%A"))) return cand;
+    if (processPhrase(Zstr("day"    ), Zstr("%d"))) return cand;
+    if (processPhrase(Zstr("month"  ), Zstr("%B"))) return cand;
+    if (processPhrase(Zstr("week"   ), Zstr("%U"))) return cand;
+    if (processPhrase(Zstr("year"   ), Zstr("%Y"))) return cand;
+    if (processPhrase(Zstr("hour"   ), Zstr("%H"))) return cand;
+    if (processPhrase(Zstr("min"    ), Zstr("%M"))) return cand;
+    if (processPhrase(Zstr("sec"    ), Zstr("%S"))) return cand;
 
-    //try to apply environment variables
-    {
-        wxString envValue = getEnvValue(macro);
-        if (!envValue.empty())
-        {
-            macro = envValue;
-            return true;
-        }
-    }
+	//check domain-specific extensions
+	{
+		auto iter = std::find_if(ext.begin(), ext.end(), [&](const std::pair<Zstring, Zstring>& p){ return equalNoCase(macro, p.first); });
+        if (iter != ext.end())
+            return make_unique<Zstring>(iter->second);
+	}
+
+    //try to resolve as environment variable
+    if (std::unique_ptr<Zstring> value = getEnvironmentVar(macro))
+        return value;
 
 #ifdef FFS_WIN
-    //try to resolve CSIDL values
+    //try to resolve as CSIDL value
     {
-        auto csidlMap = CsidlConstants::get();
-        auto iter = csidlMap.find(toZ(macro));
+        const auto& csidlMap = CsidlConstants::get();
+        auto iter = csidlMap.find(macro);
         if (iter != csidlMap.end())
-        {
-            macro = toWx(iter->second);
-            return true;
-        }
+            return make_unique<Zstring>(iter->second);
     }
 #endif
 
-    return false;
+    return nullptr;
 }
 
+const Zchar MACRO_SEP = Zstr('%');
 
 //returns expanded or original string
-wxString expandMacros(const wxString& text)
+Zstring expandMacros(const Zstring& text, const std::vector<std::pair<Zstring, Zstring>>& ext)
 {
-    const wxChar SEPARATOR = L'%';
-
-    if (contains(text, SEPARATOR))
+    if (contains(text, MACRO_SEP))
     {
-        wxString prefix = text.BeforeFirst(SEPARATOR);
-        wxString rest   = text.AfterFirst(SEPARATOR);
-        if (contains(rest, SEPARATOR))
+        Zstring prefix = beforeFirst(text, MACRO_SEP);
+        Zstring rest   = afterFirst (text, MACRO_SEP);
+        if (contains(rest, MACRO_SEP))
         {
-            wxString potentialMacro = beforeFirst(rest, SEPARATOR);
-            wxString postfix        = afterFirst (rest, SEPARATOR); //text == prefix + SEPARATOR + potentialMacro + SEPARATOR + postfix
+            Zstring potentialMacro = beforeFirst(rest, MACRO_SEP);
+            Zstring postfix        = afterFirst (rest, MACRO_SEP); //text == prefix + MACRO_SEP + potentialMacro + MACRO_SEP + postfix
 
-            if (replaceMacro(potentialMacro))
-                return prefix + potentialMacro + expandMacros(postfix);
+            if (std::unique_ptr<Zstring> value = resolveMacro(potentialMacro, ext))
+                return prefix + *value + expandMacros(postfix, ext);
             else
-                return prefix + SEPARATOR + potentialMacro + expandMacros(SEPARATOR + postfix);
+                return prefix + MACRO_SEP + potentialMacro + expandMacros(MACRO_SEP + postfix, ext);
         }
     }
     return text;
 }
+}
 
 
+Zstring zen::expandMacros(const Zstring& text) { return ::expandMacros(text, std::vector<std::pair<Zstring, Zstring>>()); }
+
+
+namespace
+{
 #ifdef FFS_LINUX
 class TraverseMedia : public zen::TraverseCallback
 {
@@ -266,7 +262,7 @@ public:
         devices_.insert(std::make_pair(shortName, fullName));
         return nullptr; //DON'T traverse into subdirs
     }
-    virtual HandleError onError(const std::wstring& errorText) { return ON_ERROR_IGNORE; }
+    virtual HandleError onError(const std::wstring& msg) { return ON_ERROR_IGNORE; }
 
 private:
     DeviceList& devices_;
@@ -275,7 +271,7 @@ private:
 
 
 //networks and cdrom excluded - this should not block
-Zstring volumenNameToPath(const Zstring& volumeName) //return empty string on error
+Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on error
 {
 #ifdef FFS_WIN
     //FindFirstVolume(): traverses volumes on local hard disks only!
@@ -340,7 +336,7 @@ Zstring volumenNameToPath(const Zstring& volumeName) //return empty string on er
 
 #ifdef FFS_WIN
 //networks and cdrom excluded - this should not block
-Zstring volumePathToName(const Zstring& volumePath) //return empty string on error
+Zstring getVolumeName(const Zstring& volumePath) //return empty string on error
 {
     UINT rv = ::GetDriveType(volumePath.c_str()); //non-blocking call!
     if (rv != DRIVE_REMOTE &&
@@ -387,7 +383,7 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
             //[.*] pattern was found...
             if (!volname.empty())
             {
-                Zstring volPath = volumenNameToPath(volname); //should not block?!
+                Zstring volPath = getPathByVolumenName(volname); //should not block?!
                 if (!volPath.empty())
                     return appendSeparator(volPath) + rest; //successfully replaced pattern
             }
@@ -421,7 +417,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         dirname[1] == L':' &&
         dirname[2] == L'\\')
     {
-        Zstring volname = volumePathToName(Zstring(dirname.c_str(), 3)); //should not block
+        Zstring volname = getVolumeName(Zstring(dirname.c_str(), 3)); //should not block
         if (!volname.empty())
             output.insert(L"[" + volname + L"]" + Zstring(dirname.c_str() + 2));
     }
@@ -439,11 +435,10 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         std::map<Zstring, Zstring> envToDir;
 
         //get list of useful variables
-        auto addEnvVar = [&](const wxString& envName)
+        auto addEnvVar = [&](const Zstring& envName)
         {
-            wxString envVal = getEnvValue(envName); //return empty on error
-            if (!envVal.empty())
-                envToDir.insert(std::make_pair(toZ(envName), toZ(envVal)));
+            if (std::unique_ptr<Zstring> value = getEnvironmentVar(envName))
+                envToDir.insert(std::make_pair(envName, *value));
         };
         addEnvVar(L"AllUsersProfile");  // C:\ProgramData
         addEnvVar(L"AppData");          // C:\Users\username\AppData\Roaming
@@ -457,9 +452,10 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         addEnvVar(L"Temp");             // C:\Windows\Temp
 
         //add CSIDL values: http://msdn.microsoft.com/en-us/library/bb762494(v=vs.85).aspx
-        auto csidlMap = CsidlConstants::get();
+        const auto& csidlMap = CsidlConstants::get();
         envToDir.insert(csidlMap.begin(), csidlMap.end());
 
+        //substitute paths by symbolic names
         Zstring tmp = dirname;
         ::makeUpper(tmp);
         std::for_each(envToDir.begin(), envToDir.end(),
@@ -468,13 +464,13 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
             Zstring tmp2 = entry.second; //case-insensitive "startsWith()"
             ::makeUpper(tmp2);           //
             if (startsWith(tmp, tmp2))
-                output.insert(L"%" + entry.first + L"%" + (dirname.c_str() + tmp2.size()));
+                output.insert(MACRO_SEP + entry.first + MACRO_SEP + (dirname.c_str() + tmp2.size()));
         });
     }
 
     //4. replace (all) macros: %USERPROFILE% -> C:\Users\username
     {
-        Zstring testMacros = toZ(expandMacros(toWx(dirname)));
+        Zstring testMacros = expandMacros(dirname);
         if (testMacros != dirname)
             if (output.insert(testMacros).second)
                 getDirectoryAliasesRecursive(testMacros, output); //recurse!
@@ -502,9 +498,9 @@ std::vector<Zstring> zen::getDirectoryAliases(const Zstring& dirString)
 
 Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()
 {
-    //Formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
+    //formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
 
-    Zstring dirname = toZ(expandMacros(toWx(dirString)));
+    Zstring dirname = expandMacros(dirString);
 
     dirname = expandVolumeName(dirname); //should not block
 
@@ -517,7 +513,7 @@ Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()
         return Zstring();
 
     /*
-    resolve relative names; required by:
+    need to resolve relative paths:
     WINDOWS:
      - \\?\-prefix which needs absolute names
      - Volume Shadow Copy: volume name needs to be part of each filename
@@ -544,14 +540,68 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
     WebDrive					 | NO_ERROR				   | \\Webdrive-ZenJu\GNU		     | NO
     Box.net (WebDav)			 | NO_ERROR				   | \\www.box.net\DavWWWRoot\dav    | YES
     NetDrive					 | ERROR_NOT_CONNECTED     | <empty>						 | NO
+    ____________________________________________________________________________________________________________
+
+    Windows Login Prompt Naming Conventions:
+    	user account:	<Domain>\<user>		e.g. WIN-XP\ZenJu
+    	network share:	\\<server>\<share>	e.g. \\WIN-XP\test
+
+    Windows Command Line:
+    - list *all* active network connections, including deviceless ones which are hidden in Explorer:
+    		net use
+    - delete active connection:
+    		net use /delete \\server\share
+    ____________________________________________________________________________________________________________
+
+    Scenario: XP-shared folder is accessed by Win 7 over LAN with access limited to a certain user
+
+    Problems:
+    I.   WNetAddConnection2() allows (at least certain) invalid credentials (e.g. username: a/password: a) and establishes an *unusable* connection
+    II.  WNetAddConnection2() refuses to overwrite an existing (unusable) connection created in I), but shows prompt repeatedly
+    III. WNetAddConnection2() won't bring up the prompt if *wrong* credentials had been entered just recently, even with CONNECT_INTERACTIVE specified! => 2-step proccess
     */
 
-    //if (::GetFileAttributes((driveLetter + L'\\').c_str()) == INVALID_FILE_ATTRIBUTES) <- this will seriously block if network is not reachable!!!
+    auto connect = [&](NETRESOURCE& trgRes) //blocks heavily if network is not reachable!!!
+    {
+        //1. first try to connect without user interaction - blocks!
+        DWORD rv = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
+                                        nullptr, // __in  LPCTSTR lpPassword,
+                                        nullptr, // __in  LPCTSTR lpUsername,
+                                        0);      //__in  DWORD dwFlags
+        if (somethingExists(trgRes.lpRemoteName)) //blocks!
+            return; //success: connection usable! -> don't care about "rv"
+
+        if (rv == ERROR_BAD_NETPATH || //Windows 7
+            rv == ERROR_BAD_NET_NAME)  //XP
+            return; //no need to show a prompt for an unreachable network device
+
+        //2. if first attempt failed, we need to *force* prompt by using CONNECT_PROMPT
+        if (allowUserInteraction)
+        {
+            //avoid problem II.)
+            DWORD rv2= WNetCancelConnection2(trgRes.lpRemoteName, //_In_  LPCTSTR lpName,
+                                             0,					  //_In_  DWORD dwFlags,
+                                             true);				  //_In_  BOOL fForce
+            //enforce login prompt
+            DWORD rv3 = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
+                                             nullptr, // __in  LPCTSTR lpPassword,
+                                             nullptr, // __in  LPCTSTR lpUsername,
+                                             CONNECT_INTERACTIVE | CONNECT_PROMPT); //__in  DWORD dwFlags
+            (void)rv2;
+            (void)rv3;
+            //Sample error codes:
+            //53L	ERROR_BAD_NETPATH		The network path was not found.
+            //86L	ERROR_INVALID_PASSWORD
+            //1219L	ERROR_SESSION_CREDENTIAL_CONFLICT	Multiple connections to a server or shared resource by the same user, using more than one user name, are not allowed. Disconnect all previous connections to the server or shared resource and try again.
+            //1326L	ERROR_LOGON_FAILURE	Logon failure: unknown user name or bad password.
+        }
+    };
+
 
     Zstring dirname = removeLongPathPrefix(dirnameOrig);
     trim(dirname, true, false);
 
-    //1. local path
+    //1. locally mapped network share
     if (dirname.size() >= 2 && iswalpha(dirname[0]) && dirname[1] == L':')
     {
         Zstring driveLetter(dirname.c_str(), 2); //e.g.: "Q:"
@@ -577,22 +627,13 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
                     trgRes.lpLocalName  = const_cast<LPWSTR>(driveLetter.c_str());  //lpNetResource is marked "__in", seems WNetAddConnection2 is not const correct!
                     trgRes.lpRemoteName = const_cast<LPWSTR>(networkShare.c_str()); //
 
-                    //note: following function call may block heavily if network is not reachable!!!
-                    DWORD rv2 = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
-                                                     nullptr, // __in  LPCTSTR lpPassword,
-                                                     nullptr, // __in  LPCTSTR lpUsername,
-                                                     allowUserInteraction ? CONNECT_INTERACTIVE : 0); //__in  DWORD dwFlags
-                    if (rv2 == NO_ERROR)
-                        return; //mapping reestablished
-
-                    //restoring connection failed for some reason...
-                    //we could use full UNC path instead: networkShare + (dirname.c_str() + 2);  //replace "Q:\subdir" by "\\server\share\subdir"
+                    connect(trgRes); //blocks!
                 }
             }
         }
     }
-    //2. UNC path
-    else if (startsWith(dirname, L"\\\\"))
+    //2. deviceless network connection
+    else if (startsWith(dirname, L"\\\\")) //UNC path
     {
         const Zstring networkShare = [&]() -> Zstring //extract prefix "\\server\share"
         {
@@ -612,49 +653,7 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
             trgRes.dwType       = RESOURCETYPE_DISK;
             trgRes.lpRemoteName = const_cast<LPWSTR>(networkShare.c_str()); //trgRes is "__in"
 
-            //following function call may block heavily if network is not reachable!!!
-            DWORD rv2 = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
-                                             nullptr, // __in  LPCTSTR lpPassword,
-                                             nullptr, // __in  LPCTSTR lpUsername,
-                                             allowUserInteraction ? CONNECT_INTERACTIVE : 0); //__in  DWORD dwFlags
-            if (rv2 == NO_ERROR)
-                return; //mapping reestablished
-
-            /*
-            NETRESOURCE nr  = {};
-            nr.dwType       = RESOURCETYPE_DISK;
-            nr.lpRemoteName = const_cast<LPWSTR>(networkShare.c_str()); //nr is "__in"
-
-            DWORD bufferSize = sizeof(NETRESOURCE) + 20000;
-            std::vector<char> buffer(bufferSize);
-
-            LPTSTR relPath = nullptr;
-
-            //note: following function call may block heavily if network is not reachable!!!
-            const DWORD rv = WNetGetResourceInformation(&nr,         // __in     LPNETRESOURCE lpNetResource,
-                                                &buffer[0],  // __out    LPVOID lpBuffer,
-                                                &bufferSize, // __inout  LPDWORD lpcbBuffer,
-                                                &relPath);   // __out    LPTSTR *lplpSystem
-            if (rv == NO_ERROR)
-            {
-            //NO_ERROR: network share is existing, *either* connected or disconnected
-
-            //we have no way to check if network is already connected, so let's try to connect anyway:
-
-            NETRESOURCE& trgRes = reinterpret_cast<NETRESOURCE&>(buffer[0]);
-
-            if (trgRes.dwUsage & RESOURCEUSAGE_CONNECTABLE)
-            {
-            //note: following function call may block heavily if network is not reachable!!!
-            DWORD rv2 = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
-                                             nullptr,    // __in  LPCTSTR lpPassword,
-                                             nullptr,    // __in  LPCTSTR lpUsername,
-                                             allowUserInteraction ? CONNECT_INTERACTIVE : 0); //__in  DWORD dwFlags
-            if (rv2 == NO_ERROR)
-                return; //mapping reestablished
-            }
-            }
-            */
+            connect(trgRes); //blocks!
         }
     }
 }

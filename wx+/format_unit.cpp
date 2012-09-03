@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "format_unit.h"
@@ -133,7 +133,7 @@ std::wstring zen::remainingTimeToShortString(double timeInSec)
 std::wstring zen::fractionToShortString(double fraction)
 {
     //return replaceCpy(_("%x%"), L"%x", printNumber<std::wstring>(L"%3.2f", fraction * 100.0), false);
-    return printNumber<std::wstring>(L"%3.2f", fraction * 100.0) + L'%'; //no need to internationalize faction!?
+    return printNumber<std::wstring>(L"%3.2f", fraction * 100.0) + L'%'; //no need to internationalize fraction!?
 }
 
 
@@ -182,9 +182,10 @@ private:
 
     IntegerFormat() : fmt(), valid_(false)
     {
-        //all we want is default NUMBERFMT, but set NumDigits to 0. what a disgrace:
+        //all we want is default NUMBERFMT, but set NumDigits to 0
         fmt.NumDigits = 0;
 
+        //what a disgrace:
         std::wstring grouping;
         if (getUserSetting(LOCALE_ILZERO,     fmt.LeadingZero) &&
             getUserSetting(LOCALE_SGROUPING,  grouping)        &&
@@ -241,8 +242,8 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
     //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
     const lconv* localInfo = ::localeconv(); //always bound according to doc
     const std::wstring& thousandSep = utfCvrtTo<std::wstring>(localInfo->thousands_sep);
-    // why not working?
-    // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
+
+    // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep(); - why not working?
     // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
 
     std::wstring output(number);
@@ -293,6 +294,8 @@ const bool useNewLocalTimeCalculation = zen::vistaOrLater();
 
 std::wstring zen::utcToLocalTimeString(Int64 utcTime)
 {
+    auto errorMsg = [&] { return _("Error") + L" (time_t: " + numberTo<std::wstring>(utcTime) + L")"; };
+
 #ifdef FFS_WIN
     FILETIME lastWriteTimeUtc = tofiletime(utcTime); //convert ansi C time to FILETIME
 
@@ -303,23 +306,23 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
         SYSTEMTIME systemTimeUtc = {};
         if (!::FileTimeToSystemTime(&lastWriteTimeUtc, //__in   const FILETIME *lpFileTime,
                                     &systemTimeUtc))   //__out  LPSYSTEMTIME lpSystemTime
-            return _("Error");
+            return errorMsg();
 
         if (!::SystemTimeToTzSpecificLocalTime(nullptr,              //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
                                                &systemTimeUtc,    //__in      LPSYSTEMTIME lpUniversalTime,
                                                &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
-            return _("Error");
+            return errorMsg();
     }
     else //use DST setting (like in Windows 2000 and XP)
     {
         FILETIME fileTimeLocal = {};
         if (!::FileTimeToLocalFileTime(&lastWriteTimeUtc,  //pointer to UTC file time to convert
                                        &fileTimeLocal))    //pointer to converted file time
-            return _("Error");
+            return errorMsg();
 
         if (!::FileTimeToSystemTime(&fileTimeLocal,  //pointer to file time to convert
                                     &systemTimeLocal)) //pointer to structure to receive system time
-            return _("Error");
+            return errorMsg();
     }
 
     zen::TimeComp loc;
@@ -334,5 +337,6 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
     zen::TimeComp loc = zen::localTime(to<time_t>(utcTime));
 #endif
 
-    return formatTime<std::wstring>(L"%x  %X", loc);
+    std::wstring dateString = formatTime<std::wstring>(L"%x  %X", loc);
+    return !dateString.empty() ? dateString : errorMsg();
 }

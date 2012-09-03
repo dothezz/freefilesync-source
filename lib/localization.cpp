@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "localization.h"
@@ -127,7 +127,7 @@ public:
 
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName) { return nullptr; }
-    virtual HandleError onError(const std::wstring& errorText) { return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleError onError(const std::wstring& msg) { return ON_ERROR_IGNORE; } //errors are not really critical in this context
 
 private:
     std::vector<Zstring>& lngFiles_;

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "exec_finished_box.h"
@@ -18,7 +18,7 @@ using namespace zen;
 
 namespace
 {
-const std::wstring closeProgressDlg = L"Close progress dialog"; //special command //mark for extraction: _("Close progress dialog")
+const std::wstring cmdTxtCloseProgressDlg = L"Close progress dialog"; //special command //mark for extraction: _("Close progress dialog")
 
 const std::wstring separationLine(L"---------------------------------------------------------------------------------------------------------------");
 
@@ -56,7 +56,7 @@ std::vector<std::pair<std::wstring, std::wstring>> getDefaultCommands() //(gui n
     return output;
 }
 
-const wxEventType wxEVT_REPLACE_BUILT_IN_COMMANDS = wxNewEventType();
+const wxEventType wxEVT_VALIDATE_USER_SELECTION = wxNewEventType();
 }
 
 
@@ -64,36 +64,7 @@ bool isCloseProgressDlgCommand(const std::wstring& value)
 {
     std::wstring tmp = value;
     trim(tmp);
-    return tmp == closeProgressDlg;
-}
-
-
-void addValueToHistory(const std::wstring& value, std::vector<std::wstring>& history, size_t historyMax)
-{
-    std::wstring command = value;
-    trim(command);
-
-    bool skipCmd = command == separationLine   || //do not add sep. line
-                   command == closeProgressDlg || //do not add special command
-                   command.empty();
-
-    //do not add built-in commands to history
-    if (!skipCmd)
-    {
-        const auto& defaultCommands = getDefaultCommands();
-        for (auto iter = defaultCommands.begin(); iter != defaultCommands.end(); ++iter)
-            if (command == iter->first || command == iter->second)
-            {
-                skipCmd = true;
-                break;
-            }
-    }
-
-    if (!skipCmd)
-        history.insert(history.begin(), command);
-
-    if (history.size() > historyMax)
-        history.resize(historyMax);
+    return tmp == cmdTxtCloseProgressDlg;
 }
 
 
@@ -109,6 +80,7 @@ ExecFinishedBox::ExecFinishedBox(wxWindow* parent,
                                  const wxString& name) :
     wxComboBox(parent, id, value, pos, size, n, choices, style, validator, name),
     history_(nullptr),
+    historyMax_(0),
     defaultCommands(getDefaultCommands())
 {
     //#####################################
@@ -120,7 +92,38 @@ ExecFinishedBox::ExecFinishedBox(wxWindow* parent,
     Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ExecFinishedBox::OnSelection ), nullptr, this);
     Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler  (ExecFinishedBox::OnMouseWheel), nullptr, this);
 
-    Connect(wxEVT_REPLACE_BUILT_IN_COMMANDS, wxCommandEventHandler(ExecFinishedBox::OnReplaceBuiltInCmds), nullptr, this);
+    Connect(wxEVT_VALIDATE_USER_SELECTION, wxCommandEventHandler(ExecFinishedBox::OnValidateSelection), nullptr, this);
+}
+
+
+void ExecFinishedBox::addItemHistory()
+{
+    if (history_)
+    {
+        std::wstring command = getValue();
+        trim(command);
+
+        bool skipCmd = command == separationLine         || //do not add sep. line
+                       command == cmdTxtCloseProgressDlg || //do not add special command
+                       command.empty();
+
+        //do not add built-in commands to history
+        if (!skipCmd)
+        {
+            for (auto iter = defaultCommands.begin(); iter != defaultCommands.end(); ++iter)
+                if (command == iter->first || command == iter->second)
+                {
+                    skipCmd = true;
+                    break;
+                }
+        }
+
+        if (!skipCmd)
+            history_->insert(history_->begin(), command);
+
+        if (history_->size() > historyMax_)
+            history_->resize(historyMax_);
+    }
 }
 
 
@@ -131,8 +134,8 @@ std::wstring ExecFinishedBox::getValue() const
     {
         std::wstring tmp = value;
         trim(tmp);
-        if (tmp == implementation::translate(closeProgressDlg)) //have this symbolic constant translated properly
-            return closeProgressDlg;
+        if (tmp == implementation::translate(cmdTxtCloseProgressDlg)) //have this symbolic constant translated properly
+            return cmdTxtCloseProgressDlg;
     }
 
     return value;
@@ -144,8 +147,8 @@ void ExecFinishedBox::setValue(const std::wstring& value)
     std::wstring tmp = value;
     trim(tmp);
 
-    if (tmp == closeProgressDlg)
-        setValueAndUpdateList(implementation::translate(closeProgressDlg)); //have this symbolic constant translated properly
+    if (tmp == cmdTxtCloseProgressDlg)
+        setValueAndUpdateList(implementation::translate(cmdTxtCloseProgressDlg)); //have this symbolic constant translated properly
     else
         setValueAndUpdateList(value);
 }
@@ -158,7 +161,7 @@ void ExecFinishedBox::setValueAndUpdateList(const std::wstring& value)
     std::deque<std::wstring> items;
 
     //1. special command
-    items.push_back(implementation::translate(closeProgressDlg));
+    items.push_back(implementation::translate(cmdTxtCloseProgressDlg));
 
     //2. built in commands
     for (auto iter = defaultCommands.begin(); iter != defaultCommands.end(); ++iter)
@@ -191,7 +194,7 @@ void ExecFinishedBox::setValueAndUpdateList(const std::wstring& value)
 
 void ExecFinishedBox::OnSelection(wxCommandEvent& event)
 {
-    wxCommandEvent dummy2(wxEVT_REPLACE_BUILT_IN_COMMANDS); //we cannot replace built-in commands at this position in call stack, so defer to a later time!
+    wxCommandEvent dummy2(wxEVT_VALIDATE_USER_SELECTION); //we cannot replace built-in commands at this position in call stack, so defer to a later time!
     if (auto handler = GetEventHandler())
         handler->AddPendingEvent(dummy2);
 
@@ -199,7 +202,7 @@ void ExecFinishedBox::OnSelection(wxCommandEvent& event)
 }
 
 
-void ExecFinishedBox::OnReplaceBuiltInCmds(wxCommandEvent& event)
+void ExecFinishedBox::OnValidateSelection(wxCommandEvent& event)
 {
     const auto& value = getValue();
 

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "grid.h"
@@ -2126,11 +2126,12 @@ void Grid::setColWidthAndNotify(ptrdiff_t width, size_t col, size_t compPos, boo
         const ptrdiff_t offset = width - getColStretchedWidth(vcRs.stretch_, stretchTotal, mainWinWidth); //width := stretchedWidth + (normalized) offset
         vcRs.offset_ = offset;
 
+        //CAVEAT:
         //I. width may be < COLUMN_MIN_WIDTH: for non-stretched columns this doesn't matter, since it's normalized in getColWidths() anyway,
         //	for stretched columns on the other hand negative width would be evaluated *before* normalization! => need to normalize here!
         //II. worse: resizing any column should normalize *all* other stretched columns' offsets considering current mainWinWidth!
-	    //  Testcase: 1. make main window so small in width that horizontal scrollbars are shown despite existing streched column. 
-		//	2. resize a fixed size column so that scrollbars vanish. 3. verify that the stretched column is resizing immediately while main dialog is enlarged
+        //  Testcase: 1. make main window so small in width that horizontal scrollbars are shown despite existing streched column.
+        //	2. resize a fixed size column so that scrollbars vanish. 3. verify that the stretched column is resizing immediately while main dialog is enlarged
         std::for_each(comp.begin(), comp.end(), [&](Component& c)
         {
             std::for_each(c.visibleCols.begin(), c.visibleCols.end(), [&](VisibleColumn& vc)

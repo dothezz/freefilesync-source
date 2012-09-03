@@ -1,13 +1,13 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef SYNCHRONIZATION_H_INCLUDED
 #define SYNCHRONIZATION_H_INCLUDED
 
-#include <zen/process_priority.h>
+#include <zen/time.h>
 #include "file_hierarchy.h"
 #include "lib/process_xml.h"
 #include "process_callback.h"
@@ -38,7 +38,7 @@ public:
     const ConflictTexts& getConflictMessages() const { return conflictMsgs; }
 
     Int64 getDataToProcess() const { return dataToProcess; }
-    size_t     getRowCount()      const { return rowsTotal; }
+    size_t     getRowCount() const { return rowsTotal; }
 
 private:
     //static const size_t MAX_CONFLICTS = 3;
@@ -60,72 +60,38 @@ private:
 };
 
 
-class SynchronizeFolderPair;
-
 struct FolderPairSyncCfg
 {
     FolderPairSyncCfg(bool automaticMode,
                       const DeletionPolicy handleDel,
-                      const Zstring& custDelDir);
+                      const Zstring& versioningDirFmt,
+                      int versionCountLimit) :
+        inAutomaticMode(automaticMode),
+        handleDeletion(handleDel),
+        versioningFolder(versioningDirFmt),
+        versionCountLimit_(versionCountLimit) {}
 
     bool inAutomaticMode; //update database if in automatic mode
     DeletionPolicy handleDeletion;
-    Zstring custDelFolder; //formatted(!) directory name
+    Zstring versioningFolder; //formatted directory name
+    int versionCountLimit_;
 };
 std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 
+class SynchronizeFolderPair;
 
-//class handling synchronization process
-class SyncProcess
-{
-public:
-    SyncProcess(const std::wstring& jobName, //may be empty
-                const std::wstring& timestamp,
-                xmlAccess::OptionalDialogs& warnings,
-                bool verifyCopiedFiles,
-                bool copyLockedFiles,
-                bool copyFilePermissions,
-                bool transactionalFileCopy,
-                bool runWithBackgroundPriority,
-                ProcessCallback& handler);
+//FFS core routine:
+void synchronize(const TimeComp& timeStamp,
+                 xmlAccess::OptionalDialogs& warnings,
+                 bool verifyCopiedFiles,
+                 bool copyLockedFiles,
+                 bool copyFilePermissions,
+                 bool transactionalFileCopy,
+                 bool runWithBackgroundPriority,
 
-    //CONTRACT: syncConfig must have SAME SIZE as folderCmp and correspond row-wise!
-    void startSynchronizationProcess(const std::vector<FolderPairSyncCfg>& syncConfig, FolderComparison& folderCmp);
-
-private:
-    SyncProcess(const SyncProcess&);
-    SyncProcess& operator=(const SyncProcess&);
-
-    friend class SynchronizeFolderPair;
-
-    const bool verifyCopiedFiles_;
-    const bool copyLockedFiles_;
-    const bool copyFilePermissions_;
-    const bool transactionalFileCopy_;
-
-    //warnings
-    xmlAccess::OptionalDialogs& m_warnings;
-    ProcessCallback& procCallback;
-
-    std::unique_ptr<ScheduleForBackgroundProcessing> procBackground;
-    const Zstring custDelDirShortname; //e.g. "SyncJob 2012-05-15 131513"
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                 const std::vector<FolderPairSyncCfg>& syncConfig, //CONTRACT: syncConfig and folderCmp correspond row-wise!
+                 FolderComparison& folderCmp,                      //
+                 ProcessCallback& callback);
 
 
 

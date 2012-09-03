@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef MAINDIALOG_H
@@ -48,6 +48,7 @@ private:
     friend class SyncStatusHandler;
     friend class ManualDeletionHandler;
     friend class DirectoryPairFirst;
+    friend class DirectoryPair;
     friend class DirectoryNameMainImpl;
     template <class GuiPanel>
     friend class FolderPairCallback;
@@ -119,11 +120,11 @@ private:
     void onGridButtonEventL(wxKeyEvent& event);
     void onGridButtonEventC(wxKeyEvent& event);
     void onGridButtonEventR(wxKeyEvent& event);
-    void onGridButtonEvent(wxKeyEvent& event, zen::Grid& grid, bool leftSide);
+    void onGridButtonEvent (wxKeyEvent& event, zen::Grid& grid, bool leftSide);
 
-    void onTreeButtonEvent         (wxKeyEvent& event);
-    void OnContextSetLayout        (wxMouseEvent& event);
-    void OnGlobalKeyEvent          (wxKeyEvent& event);
+    void onTreeButtonEvent (wxKeyEvent& event);
+    void OnContextSetLayout(wxMouseEvent& event);
+    void OnGlobalKeyEvent  (wxKeyEvent& event);
 
     void OnCompSettingsContext(wxMouseEvent& event);
     void OnSyncSettingsContext(wxMouseEvent& event);
@@ -142,7 +143,8 @@ private:
     void onNaviSelection(zen::GridRangeSelectEvent& event);
 
     void onNaviPanelFilesDropped(zen::FileDropEvent& event);
-    void OnDirSelected(wxFileDirPickerEvent& event);
+
+    void OnDirSelected(wxCommandEvent& event);
 
     void onCheckRows       (zen::CheckRowsEvent&     event);
     void onSetSyncDirection(zen::SyncDirectionEvent& event);
@@ -151,9 +153,9 @@ private:
     void onGridDoubleClickR(zen::GridClickEvent& event);
     void onGridDoubleClickRim(int row, bool leftSide);
 
-    void onGridLabelLeftClickC (zen::GridClickEvent& event);
-    void onGridLabelLeftClickL (zen::GridClickEvent& event);
-    void onGridLabelLeftClickR (zen::GridClickEvent& event);
+    void onGridLabelLeftClickC(zen::GridClickEvent& event);
+    void onGridLabelLeftClickL(zen::GridClickEvent& event);
+    void onGridLabelLeftClickR(zen::GridClickEvent& event);
     void onGridLabelLeftClick(bool onLeft, zen::ColumnTypeRim type);
 
     void onGridLabelContextL(zen::GridClickEvent& event);
@@ -161,44 +163,44 @@ private:
     void onGridLabelContextR(zen::GridClickEvent& event);
     void onGridLabelContext(zen::Grid& grid, zen::ColumnTypeRim type, const std::vector<zen::ColumnAttributeRim>& defaultColumnAttributes);
 
-    void OnLeftOnlyFiles(       wxCommandEvent& event);
-    void OnRightOnlyFiles(      wxCommandEvent& event);
-    void OnLeftNewerFiles(      wxCommandEvent& event);
-    void OnRightNewerFiles(     wxCommandEvent& event);
-    void OnEqualFiles(          wxCommandEvent& event);
-    void OnDifferentFiles(      wxCommandEvent& event);
-    void OnConflictFiles(       wxCommandEvent& event);
+    void OnLeftOnlyFiles  (wxCommandEvent& event);
+    void OnRightOnlyFiles (wxCommandEvent& event);
+    void OnLeftNewerFiles (wxCommandEvent& event);
+    void OnRightNewerFiles(wxCommandEvent& event);
+    void OnEqualFiles     (wxCommandEvent& event);
+    void OnDifferentFiles (wxCommandEvent& event);
+    void OnConflictFiles  (wxCommandEvent& event);
 
-    void OnSyncCreateLeft(      wxCommandEvent& event);
-    void OnSyncCreateRight(     wxCommandEvent& event);
-    void OnSyncDeleteLeft(      wxCommandEvent& event);
-    void OnSyncDeleteRight(     wxCommandEvent& event);
-    void OnSyncDirLeft(         wxCommandEvent& event);
-    void OnSyncDirRight(        wxCommandEvent& event);
-    void OnSyncDirNone(         wxCommandEvent& event);
+    void OnSyncCreateLeft (wxCommandEvent& event);
+    void OnSyncCreateRight(wxCommandEvent& event);
+    void OnSyncDeleteLeft (wxCommandEvent& event);
+    void OnSyncDeleteRight(wxCommandEvent& event);
+    void OnSyncDirLeft    (wxCommandEvent& event);
+    void OnSyncDirRight   (wxCommandEvent& event);
+    void OnSyncDirNone    (wxCommandEvent& event);
 
-    void OnConfigNew(           wxCommandEvent& event);
-    void OnConfigSave(          wxCommandEvent& event);
-    void OnConfigSaveAs(        wxCommandEvent& event);
-    void OnConfigLoad(          wxCommandEvent& event);
-    void OnLoadFromHistory(     wxCommandEvent& event);
+    void OnConfigNew      (wxCommandEvent& event);
+    void OnConfigSave     (wxCommandEvent& event);
+    void OnConfigSaveAs   (wxCommandEvent& event);
+    void OnConfigLoad     (wxCommandEvent& event);
+    void OnLoadFromHistory(wxCommandEvent& event);
 
-    void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
-    void OnRegularUpdateCheck(  wxIdleEvent& event);
-    void OnLayoutWindowAsync(   wxIdleEvent& event);
+    void OnCfgHistoryKeyEvent(wxKeyEvent& event);
+    void OnRegularUpdateCheck(wxIdleEvent& event);
+    void OnLayoutWindowAsync (wxIdleEvent& event);
 
-    void OnResizeFolderPairs(   wxEvent& event);
-    void OnResizeConfigPanel(   wxEvent& event);
-    void OnResizeViewPanel(     wxEvent& event);
+    void OnResizeLeftFolderWidth(wxEvent& event);
+    void OnResizeConfigPanel    (wxEvent& event);
+    void OnResizeViewPanel      (wxEvent& event);
     void OnResizeStatisticsPanel(wxEvent& event);
-    void OnHideFilteredButton(  wxCommandEvent& event);
-    void OnConfigureFilter(     wxCommandEvent& event);
-    void OnSwapSides(           wxCommandEvent& event);
-    void OnCompare(             wxCommandEvent& event);
-    void OnSyncSettings(        wxCommandEvent& event);
-    void OnCmpSettings(         wxCommandEvent& event);
-    void OnStartSync(           wxCommandEvent& event);
-    void OnClose(               wxCloseEvent&   event);
+    void OnShowExcluded         (wxCommandEvent& event);
+    void OnConfigureFilter      (wxCommandEvent& event);
+    void OnSwapSides            (wxCommandEvent& event);
+    void OnCompare              (wxCommandEvent& event);
+    void OnSyncSettings         (wxCommandEvent& event);
+    void OnCmpSettings          (wxCommandEvent& event);
+    void OnStartSync            (wxCommandEvent& event);
+    void OnClose                (wxCloseEvent&   event);
 
     void updateGuiAfterFilterChange(int delay);
 
@@ -210,22 +212,22 @@ private:
 
     void updateSyncEnabledStatus();
 
-    void OnAddFolderPair(       wxCommandEvent& event);
-    void OnRemoveFolderPair(    wxCommandEvent& event);
-    void OnRemoveTopFolderPair( wxCommandEvent& event);
+    void OnAddFolderPair      (wxCommandEvent& event);
+    void OnRemoveFolderPair   (wxCommandEvent& event);
+    void OnRemoveTopFolderPair(wxCommandEvent& event);
 
     void applyFilterConfig();
     void applySyncConfig();
 
     //menu events
-    void OnMenuGlobalSettings(  wxCommandEvent& event);
-    void OnMenuExportFileList(  wxCommandEvent& event);
-    void OnMenuBatchJob(        wxCommandEvent& event);
-    void OnMenuCheckVersion(    wxCommandEvent& event);
-    void OnMenuAbout(           wxCommandEvent& event);
-    void OnShowHelp(            wxCommandEvent& event);
-    void OnMenuQuit(            wxCommandEvent& event);
-    void OnMenuLanguageSwitch(  wxCommandEvent& event);
+    void OnMenuGlobalSettings(wxCommandEvent& event);
+    void OnMenuExportFileList(wxCommandEvent& event);
+    void OnMenuBatchJob      (wxCommandEvent& event);
+    void OnMenuCheckVersion  (wxCommandEvent& event);
+    void OnMenuAbout         (wxCommandEvent& event);
+    void OnShowHelp          (wxCommandEvent& event);
+    void OnMenuQuit          (wxCommandEvent& event);
+    void OnMenuLanguageSwitch(wxCommandEvent& event);
 
     void switchProgramLanguage(int langID);
 

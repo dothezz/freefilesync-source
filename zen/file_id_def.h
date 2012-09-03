@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef FILE_ID_INTERNAL_HEADER_013287632486321493
@@ -21,7 +21,10 @@
 namespace zen
 {
 #ifdef FFS_WIN
-typedef std::pair<DWORD, ULONGLONG> FileId; //(volume serial number, file ID)
+typedef DWORD DeviceId;
+typedef ULONGLONG FileIndex;
+
+typedef std::pair<DeviceId, FileIndex> FileId;
 
 inline
 FileId extractFileID(const BY_HANDLE_FILE_INFORMATION& fileInfo)
@@ -49,7 +52,10 @@ assert_static(sizeof(FileId().second) == sizeof(ULARGE_INTEGER));
 #elif defined FFS_LINUX
 namespace impl { typedef struct ::stat StatDummy; } //sigh...
 
-typedef std::pair<decltype(impl::StatDummy::st_dev), decltype(impl::StatDummy::st_ino)> FileId; //(device id, inode)
+typedef decltype(impl::StatDummy::st_dev) DeviceId;
+typedef decltype(impl::StatDummy::st_ino) FileIndex;
+
+typedef std::pair<DeviceId, FileIndex> FileId;
 
 inline
 FileId extractFileID(const struct ::stat& fileInfo)

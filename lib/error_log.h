@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef ERROR_LOG_89734181783491324134
@@ -34,7 +34,7 @@ void logError(const std::string& msg) //throw()
     const std::string logEntry = "[" + formatTime<std::string>(FORMAT_DATE) + " "+ formatTime<std::string>(FORMAT_TIME) + "] " + msg;
     try
     {
-        saveBinStream(getConfigDir() + Zstr("LastError.txt"), logEntry); //throw FileError
+        saveBinStream(getConfigDir() + Zstr("LastError.log"), logEntry); //throw FileError
     }
     catch (const FileError&) {}
 }

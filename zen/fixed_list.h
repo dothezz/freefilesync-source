@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef FIXED_LIST_01238467085684139453534
@@ -20,12 +20,13 @@ class FixedList
     {
         Node() : next(nullptr), val() {}
         //no variadic templates on VC2010... :(
-        template <class A>                                              Node(A&& a)                                    : next(nullptr), val(std::forward<A>(a)) {}
-        template <class A, class B>                                     Node(A&& a, B&& b)                             : next(nullptr), val(std::forward<A>(a), std::forward<B>(b)) {}
-        template <class A, class B, class C>                            Node(A&& a, B&& b, C&& c)                      : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c)) {}
-        template <class A, class B, class C, class D>                   Node(A&& a, B&& b, C&& c, D&& d)               : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d)) {}
-        template <class A, class B, class C, class D, class E>          Node(A&& a, B&& b, C&& c, D&& d, E&& e)        : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e)) {}
-        template <class A, class B, class C, class D, class E, class F> Node(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f) : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f)) {}
+        template <class A>                                                       Node(A&& a)                                           : next(nullptr), val(std::forward<A>(a)) {}
+        template <class A, class B>                                              Node(A&& a, B&& b)                                    : next(nullptr), val(std::forward<A>(a), std::forward<B>(b)) {}
+        template <class A, class B, class C>                                     Node(A&& a, B&& b, C&& c)                             : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c)) {}
+        template <class A, class B, class C, class D>                            Node(A&& a, B&& b, C&& c, D&& d)                      : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d)) {}
+        template <class A, class B, class C, class D, class E>                   Node(A&& a, B&& b, C&& c, D&& d, E&& e)               : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e)) {}
+        template <class A, class B, class C, class D, class E, class F>          Node(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f)        : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f)) {}
+        template <class A, class B, class C, class D, class E, class F, class G> Node(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g) : next(nullptr), val(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f), std::forward<G>(g)) {}
 
         Node* next; //singly linked list is sufficient
         T val;
@@ -75,12 +76,13 @@ public:
     const_reference& back() const { return lastInsert->val; }
 
     void emplace_back() { pushNode(new Node); }
-    template <class A>                                              void emplace_back(A&& a)                                    { pushNode(new Node(std::forward<A>(a))); }
-    template <class A, class B>                                     void emplace_back(A&& a, B&& b)                             { pushNode(new Node(std::forward<A>(a), std::forward<B>(b))); }
-    template <class A, class B, class C>                            void emplace_back(A&& a, B&& b, C&& c)                      { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c))); }
-    template <class A, class B, class C, class D>                   void emplace_back(A&& a, B&& b, C&& c, D&& d)               { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d))); }
-    template <class A, class B, class C, class D, class E>          void emplace_back(A&& a, B&& b, C&& c, D&& d, E&& e)        { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e))); }
-    template <class A, class B, class C, class D, class E, class F> void emplace_back(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f) { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f))); }
+    template <class A>                                                       void emplace_back(A&& a)                                           { pushNode(new Node(std::forward<A>(a))); }
+    template <class A, class B>                                              void emplace_back(A&& a, B&& b)                                    { pushNode(new Node(std::forward<A>(a), std::forward<B>(b))); }
+    template <class A, class B, class C>                                     void emplace_back(A&& a, B&& b, C&& c)                             { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c))); }
+    template <class A, class B, class C, class D>                            void emplace_back(A&& a, B&& b, C&& c, D&& d)                      { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d))); }
+    template <class A, class B, class C, class D, class E>                   void emplace_back(A&& a, B&& b, C&& c, D&& d, E&& e)               { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e))); }
+    template <class A, class B, class C, class D, class E, class F>          void emplace_back(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f)        { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f))); }
+    template <class A, class B, class C, class D, class E, class F, class G> void emplace_back(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g) { pushNode(new Node(std::forward<A>(a), std::forward<B>(b), std::forward<C>(c), std::forward<D>(d), std::forward<E>(e), std::forward<F>(f), std::forward<G>(g))); }
 
     template <class Predicate>
     void remove_if(Predicate pred)

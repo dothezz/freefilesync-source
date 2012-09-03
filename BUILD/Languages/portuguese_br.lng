@@ -10,9 +10,6 @@
 <source>Searching for folder %x...</source>
 <target>Buscando pela pasta %x...</target>
 
-<source>Batch execution</source>
-<target>Execução da tarefa em lote</target>
-
 <source>Items processed:</source>
 <target>Elementos processados:</target>
 
@@ -33,6 +30,9 @@
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Cancelar solicitado: Esperando fim da operação...</target>
+
+<source>Failure to create time stamp for versioning:</source>
+<target></target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronização Automatizada</target>
@@ -61,11 +61,11 @@
 <source>Create a batch job</source>
 <target>Criar arquivo de lote</target>
 
+<source>Comparison settings</source>
+<target>Parâmetros de comparação</target>
+
 <source>Synchronization settings</source>
 <target>Parâmetros de sincronização</target>
-
-<source>Comparison settings</source>
-<target>Parâmetros da comparação</target>
 
 <source>About</source>
 <target>Sobre</target>
@@ -87,27 +87,6 @@
 
 <source>Select time span</source>
 <target>Selecionar intervalo de tempo</target>
-
-<source>Show pop-up</source>
-<target>Mostrar pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Mostrar pop-up em caso de erros ou avisos</target>
-
-<source>Ignore errors</source>
-<target>Ignorar erros</target>
-
-<source>Hide all error and warning messages</source>
-<target>Ocultar todas as mensagens de erro e aviso</target>
-
-<source>Exit instantly</source>
-<target>Sair imediatamente</target>
-
-<source>Abort synchronization immediately</source>
-<target>Cancelar a sincronização imediatamente</target>
-
-<source>Browse</source>
-<target>Procurar</target>
 
 <source>Invalid command line:</source>
 <target>Linha de comando inválida:</target>
@@ -247,8 +226,8 @@
 <source>&Open...</source>
 <target>&Abrir...</target>
 
-<source>Save &As...</source>
-<target>Salvar &Como...</target>
+<source>Save &as...</source>
+<target>Salvar &como...</target>
 
 <source>&Quit</source>
 <target>Sai&r</target>
@@ -289,6 +268,9 @@
 <source>Remove folder</source>
 <target>Remover pasta</target>
 
+<source>Browse</source>
+<target>Procurar</target>
+
 <source>Select a folder</source>
 <target>Selecionar uma pasta</target>
 
@@ -321,8 +303,8 @@ O comando é disparado se:
 <source>Cancel</source>
 <target>Cancelar</target>
 
-<source>(Build: %x)</source>
-<target>(Versão: %x)</target>
+<source>Build: %x</source>
+<target>Versão: %x</target>
 
 <source>All files</source>
 <target>Todos os arquivos</target>
@@ -341,9 +323,6 @@ O comando é disparado se:
 
 <source>A folder input field is empty.</source>
 <target>Um campo de entrada de pasta está vazio.</target>
-
-<source>Logging</source>
-<target>Ver Log</target>
 
 <source>File time and size</source>
 <target>Data e tamanho do arquivo</target>
@@ -499,7 +478,7 @@ O comando é disparado se:
 <target>Comparar os dois lados</target>
 
 <source>&Abort</source>
-<target>&Abortar</target>
+<target>&Cancelar</target>
 
 <source>Synchronize</source>
 <target>Sincronizar</target>
@@ -525,11 +504,11 @@ O comando é disparado se:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Últimas configurações usadas (pressione DEL para remover da lista)</target>
 
-<source>Hide excluded items</source>
-<target>Ocultar itens excluídos</target>
+<source>Show excluded items</source>
+<target>Mostrar itens excluídos</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Ocultar arquivos filtrados ou temporariamente excluídos</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Mostra arquivos que foram filtrados ou excluídos temporariamente</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Número de arquivos e pastas que serão criados</target>
@@ -573,68 +552,47 @@ O comando é disparado se:
 <source>Right</source>
 <target>Direita</target>
 
-<source>Status feedback</source>
-<target>Informação do Status</target>
-
-<source>Show progress dialog</source>
-<target>Mostrar indicador de progresso</target>
-
 <source>Error handling</source>
 <target>Tratamento de erros</target>
 
-<source>Maximum number of log files:</source>
-<target>Número máximo de arquivos de log:</target>
+<source>Ignore</source>
+<target>Ignorar</target>
 
-<source>Select folder to save log files:</source>
-<target>Selecione a pasta para salvar os arquivos de log:</target>
+<source>Hide all error and warning messages</source>
+<target>Oculta todas as mensagens de erros e avisos</target>
 
-<source>Batch settings</source>
-<target>Configurações da tarefa em lote</target>
+<source>Pop-up</source>
+<target>Pop-up</target>
 
-<source>Select variant:</source>
-<target>Selecione um modo:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Mostra pop-up em caso de erros ou avisos</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identifica e propaga as mudanças em ambos os lados usando um banco de dados. Arquivos apagados, renomeados e conflitantes são detectados automaticamente.</target>
+<source>Exit</source>
+<target>Sair</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Backup espelho da pasta da esquerda. A pasta da direita será modificada para ficar exatamente igual à pasta da esquerda após a sincronização.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Copia arquivos novos ou atualizados para a pasta da direita</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Configure as suas próprias regras de sincronização.</target>
-
-<source>Deletion handling</source>
-<target>Tratamento da exclusão</target>
+<source>Abort synchronization on first error</source>
+<target>Cancela sincronização no primeiro erro</target>
 
 <source>On completion:</source>
 <target>Ao terminar:</target>
 
-<source>Configuration</source>
-<target>Configuração</target>
+<source>Show progress dialog</source>
+<target>Mostrar indicador de progresso</target>
 
-<source>Item exists on left side only</source>
-<target>Item existe apenas no lado esquerdo</target>
+<source>Generate log file</source>
+<target>Gerar arquivo de log</target>
 
-<source>Item exists on right side only</source>
-<target>Item existe apenas no lado direito</target>
+<source>Select folder to save log files</source>
+<target>Seleciona pasta para salvar arquivos de log</target>
 
-<source>Left side is newer</source>
-<target>Lado esquerdo é novo</target>
+<source>Limit</source>
+<target>Limite</target>
 
-<source>Right side is newer</source>
-<target>Lado direito é novo</target>
+<source>Limit maximum number of log files</source>
+<target>Limita número máximo de arquivos de log</target>
 
-<source>Items have different content</source>
-<target>Itens têm conteúdos diferentes</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Conflito/item não pode ser categorizado</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Configurações da tarefa em lote</target>
 
 <source>Compare by...</source>
 <target>Comparar por...</target>
@@ -666,6 +624,69 @@ Os arquivos são considerados iguais se
 <source>Symbolic Link handling</source>
 <target>Tratamento de Links Simbólicos</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Selecione um modo:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Identifica e propaga as mudanças em ambos os lados usando um banco de dados. Arquivos apagados, renomeados e conflitantes são detectados automaticamente.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Backup espelho da pasta da esquerda. A pasta da direita será modificada para ficar exatamente igual à pasta da esquerda após a sincronização.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Copia arquivos novos ou atualizados para a pasta da direita</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Configure as suas próprias regras de sincronização.</target>
+
+<source>Deletion handling</source>
+<target>Tratamento da exclusão</target>
+
+<source>Permanent</source>
+<target>Permante</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Apaga ou substitui arquivos permanentemente</target>
+
+<source>Recycle Bin</source>
+<target>Lixeira</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Usa a Lixeira quando apagar ou substituir arquivos</target>
+
+<source>Versioning</source>
+<target>Controle de versões</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Move os arquivos com estampa de tempo para uma pasta especificada</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Limita número máximo de versões por arquivo</target>
+
+<source>Configuration</source>
+<target>Configuração</target>
+
+<source>Item exists on left side only</source>
+<target>Item existe apenas no lado esquerdo</target>
+
+<source>Item exists on right side only</source>
+<target>Item existe apenas no lado direito</target>
+
+<source>Left side is newer</source>
+<target>Lado esquerdo é novo</target>
+
+<source>Right side is newer</source>
+<target>Lado direito é novo</target>
+
+<source>Items have different content</source>
+<target>Itens têm conteúdos diferentes</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Conflito/item não pode ser categorizado</target>
+
 <source>Synchronizing...</source>
 <target>Sincronizando...</target>
 
@@ -681,8 +702,8 @@ Os arquivos são considerados iguais se
 <source>Donate with PayPal</source>
 <target>Doar usando PayPal</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Pela tradução do FreeFileSync, um agradecimento a:</target>
+<source>Many thanks for localization:</source>
+<target>Pela tradução, um agradecimento a:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Críticas e sugestões são bem-vindas</target>
@@ -698,9 +719,6 @@ Os arquivos são considerados iguais se
 
 <source>Published under the GNU General Public License</source>
 <target>Publicado sobre a GNU General Public License</target>
-
-<source>Use Recycle Bin</source>
-<target>Utilizar Lixeira</target>
 
 <source>Delete on both sides</source>
 <target>Apagar em ambos os lados</target>
@@ -771,8 +789,8 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Statistics</source>
 <target>Estatísticas</target>
 
-<source>Do not show this dialog again</source>
-<target>Não mostrar este diálogo novamente</target>
+<source>Don't show this dialog again</source>
+<target>Não mostrar esta caixa de diálogo novamente</target>
 
 <source>Find what:</source>
 <target>Localizar o que:</target>
@@ -855,11 +873,8 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Do you want to save changes to %x?</source>
 <target>Gostaria de salvar as alterações para %x?</target>
 
-<source>Save</source>
-<target>Salvar</target>
-
-<source>Don't Save</source>
-<target>Não Salvar</target>
+<source>Do&n't save</source>
+<target>&Não salvar</target>
 
 <source>Configuration loaded!</source>
 <target>Configuração carregada!</target>
@@ -951,8 +966,8 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Show files that won't be copied</source>
 <target>Mostrar arquivos que não serão copiados</target>
 
-<source>All directories in sync!</source>
-<target>Todos os diretórios em sincronismo!</target>
+<source>All folders are in sync!</source>
+<target>Todas as pastas estão sincronizadas!</target>
 
 <source>Comma separated list</source>
 <target>Lista de itens separados por vírgulas</target>
@@ -1041,6 +1056,9 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Pause</source>
 <target>Pausar</target>
 
+<source>Logging</source>
+<target>Ver Log</target>
+
 <source>Cannot find %x</source>
 <target>Não foi possível encontrar %x</target>
 
@@ -1121,21 +1139,6 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 
 <source>Leave as unresolved conflict</source>
 <target>Deixar como conflito não resolvido</target>
-
-<source>Delete permanently</source>
-<target>Apagar permanentemente</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Apagar ou substituir arquivos permanentemente</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Usar a Lixeira quando apagar ou substituir arquivos</target>
-
-<source>Versioning</source>
-<target>Controle de versões</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Move os arquivos para uma subpasta com estampa de tempo</target>
 
 <source>Files</source>
 <target>Arquivos</target>
@@ -1227,8 +1230,11 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Cannot copy file %x to %y.</source>
 <target>Não foi possível copiar o arquivo %x para %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Não foi possível ler o diretório %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Não foi possível abrir o diretório %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Não foi possível enumerar o diretório %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Detectada recursão de diretório infinita.</target>
@@ -1254,6 +1260,9 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Configurando direções padrões de sincronização: Arquivos antigos serão substituídos por arquivos mais novos.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>A Lixeira não está disponível para os seguintes caminhos! Os arquivos serão apagados permanentemente:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>Você pode ignorar este erro para considerar a pasta como vazia.</target>
 
@@ -1262,6 +1271,9 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Os diretórios são dependentes! Cuidado ao definir as regras de sincronização:</target>
+
+<source>Start comparison</source>
+<target>Iniciar a comparação</target>
 
 <source>Preparing synchronization...</source>
 <target>Preparando sincronização...</target>
@@ -1274,6 +1286,9 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 
 <source>Files %x have the same date but a different size!</source>
 <target>Os arquivos %x têm a mesma data mas tamanhos diferentes!</target>
+
+<source>Items differ in attributes only</source>
+<target>Os itens diferem apenas nos atributos</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Os links simbólicos %x têm a mesma data mas um destino diferente.</target>
@@ -1289,9 +1304,6 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 
 <source>Both sides are equal</source>
 <target>Ambos os lados são iguais</target>
-
-<source>Items have different attributes</source>
-<target>Itens têm atributos diferentes</target>
 
 <source>Copy new item to left</source>
 <target>Copiar novo item para a esquerda</target>
@@ -1356,6 +1368,9 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <source>Moving symbolic link %x to %y</source>
 <target>Movendo link simbólico %x para %y</target>
 
+<source>Removing old versions...</source>
+<target></target>
+
 <source>Creating file %x</source>
 <target>Criando arquivo %x</target>
 
@@ -1402,19 +1417,16 @@ Nota: Os nomes dos arquivos devem ser relativos aos diretórios base!
 <target>Espaço em disco insuficiente em:</target>
 
 <source>Required:</source>
-<target>Requerido:</target>
+<target>Necessário:</target>
 
 <source>Available:</source>
 <target>Disponível:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>A Lixeira não está disponível para os seguintes caminhos! Os arquivos serão apagados permanentemente:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Uma pasta que é parte de múltiplos pares de pasta será modificada. Por favor, revise as configurações de sincronização.</target>
 
-<source>Processing folder pair:</source>
-<target>Processando par de pastas:</target>
+<source>Synchronizing folder pair:</source>
+<target>Sincronizando par de pastas:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Pasta de destino %x já existe.</target>

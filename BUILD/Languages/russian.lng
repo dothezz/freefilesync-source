@@ -10,9 +10,6 @@
 <source>Searching for folder %x...</source>
 <target>Поиск папки %x...</target>
 
-<source>Batch execution</source>
-<target>Выполнение пакетного задания</target>
-
 <source>Items processed:</source>
 <target>Элементов обработано:</target>
 
@@ -61,11 +58,11 @@
 <source>Create a batch job</source>
 <target>Создать пакетное задание</target>
 
-<source>Synchronization settings</source>
-<target>Настройки синхронизации</target>
-
 <source>Comparison settings</source>
 <target>Настройки сравнения</target>
+
+<source>Synchronization settings</source>
+<target>Настройки синхронизации</target>
 
 <source>About</source>
 <target>О программе</target>
@@ -87,27 +84,6 @@
 
 <source>Select time span</source>
 <target>Выберите промежуток времени</target>
-
-<source>Show pop-up</source>
-<target>Показывать всплывающие окна</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Показывать всплывающие окна при ошибках и замечаниях</target>
-
-<source>Ignore errors</source>
-<target>Игнорировать ошибки</target>
-
-<source>Hide all error and warning messages</source>
-<target>Скрывать все ошибки и сообщения с предупреждениями</target>
-
-<source>Exit instantly</source>
-<target>Выйти немедленно</target>
-
-<source>Abort synchronization immediately</source>
-<target>Отменить синхронизацию немедленно</target>
-
-<source>Browse</source>
-<target>Обзор</target>
 
 <source>Invalid command line:</source>
 <target>Неверная командная строка:</target>
@@ -250,7 +226,7 @@
 <source>&Open...</source>
 <target>&Открыть...</target>
 
-<source>Save &As...</source>
+<source>Save &as...</source>
 <target>Сохранить &как...</target>
 
 <source>&Quit</source>
@@ -266,7 +242,7 @@
 <target>&О программе</target>
 
 <source>&Help</source>
-<target>&Помощь</target>
+<target>П&омощь</target>
 
 <source>Usage:</source>
 <target>Инструкция:</target>
@@ -291,6 +267,9 @@
 
 <source>Remove folder</source>
 <target>Удалить папку</target>
+
+<source>Browse</source>
+<target>Обзор</target>
 
 <source>Select a folder</source>
 <target>Выбрать папку</target>
@@ -324,8 +303,8 @@ The command is triggered if:
 <source>Cancel</source>
 <target>Отмена</target>
 
-<source>(Build: %x)</source>
-<target>(сборка %x)</target>
+<source>Build: %x</source>
+<target>сборка %x</target>
 
 <source>All files</source>
 <target>Все файлы</target>
@@ -344,9 +323,6 @@ The command is triggered if:
 
 <source>A folder input field is empty.</source>
 <target>Поле ввода папки пустое.</target>
-
-<source>Logging</source>
-<target>Лог-файлы</target>
 
 <source>File time and size</source>
 <target>Дата и размер файла</target>
@@ -466,10 +442,10 @@ The command is triggered if:
 <target>Гибернация</target>
 
 <source>1. &Compare</source>
-<target>1. &Сравнить</target>
+<target>1. С&равнить</target>
 
 <source>2. &Synchronize</source>
-<target>2. &Синхронизировать</target>
+<target>2. С&инхронизировать</target>
 
 <source>&New</source>
 <target>&Новая</target>
@@ -531,11 +507,11 @@ The command is triggered if:
 (нажмите DEL для удаления из списка)
 </target>
 
-<source>Hide excluded items</source>
-<target>Скрыть исключенные элементы</target>
+<source>Show excluded items</source>
+<target>Показать исключенные элементы</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Скрыть отфильтрованные или временно исключенные файлы</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Показать отфильтрованные или временно исключенные файлы</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Количество файлов и папок, которые будут созданы</target>
@@ -579,68 +555,47 @@ The command is triggered if:
 <source>Right</source>
 <target>Справа</target>
 
-<source>Status feedback</source>
-<target>Статус обратной связи</target>
-
-<source>Show progress dialog</source>
-<target>Показать диалог (окно) прогресса</target>
-
 <source>Error handling</source>
 <target>Обработка ошибок</target>
 
-<source>Maximum number of log files:</source>
-<target>Максимальное количество лог-файлов:</target>
+<source>Ignore</source>
+<target>Игнорировать</target>
 
-<source>Select folder to save log files:</source>
-<target>Выберите папку для сохранения лог-файлов:</target>
+<source>Hide all error and warning messages</source>
+<target>Скрывать все ошибки и сообщения с предупреждениями</target>
 
-<source>Batch settings</source>
-<target>Настройки пакетного задания</target>
+<source>Pop-up</source>
+<target>Всплывающие окна</target>
 
-<source>Select variant:</source>
-<target>Варианты синхронизации</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Показывать всплывающие окна при ошибках и замечаниях</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Выявление и распространение изменений на обе стороны, используя базу данных. Удаленные, переименованные и конфликтные файлы определяются автоматически.</target>
+<source>Exit</source>
+<target>Выход</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Зеркальная (резервная) копия левой части. В результате синхронизации правая папка будет изменена до полного соответствия левой.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Копировать новые или обновлять файлы на правой стороне.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Настроить свои собственные правила синхронизации.</target>
-
-<source>Deletion handling</source>
-<target>Настройки удаления</target>
+<source>Abort synchronization on first error</source>
+<target>Отменить синхронизацию при первой ошибке</target>
 
 <source>On completion:</source>
 <target>По окончании работы</target>
 
-<source>Configuration</source>
-<target>Настройки</target>
+<source>Show progress dialog</source>
+<target>Показать окно прогресса</target>
 
-<source>Item exists on left side only</source>
-<target>Элемент существует только на левой стороне</target>
+<source>Generate log file</source>
+<target>Создавать лог-файлы</target>
 
-<source>Item exists on right side only</source>
-<target>Элемент существует только на правой стороне</target>
+<source>Select folder to save log files</source>
+<target>Выберите папку для сохранения лог-файлов</target>
 
-<source>Left side is newer</source>
-<target>На левой стороне новее</target>
+<source>Limit</source>
+<target>Ограничение</target>
 
-<source>Right side is newer</source>
-<target>На правой стороне новее</target>
+<source>Limit maximum number of log files</source>
+<target>Ограничить максимальное количество лог-файлов</target>
 
-<source>Items have different content</source>
-<target>Элемент имеют различное содержание</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Конфликт/элемент не могут быть отнесены к какой-либо категории</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Настройки пакетного задания</target>
 
 <source>Compare by...</source>
 <target>Критерии сравнения</target>
@@ -667,6 +622,69 @@ is the same
 <source>Symbolic Link handling</source>
 <target>Обращение к символьной ссылке</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Варианты синхронизации</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Выявление и распространение изменений на обе стороны, используя базу данных. Удаленные, переименованные и конфликтные файлы определяются автоматически.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Зеркальная (резервная) копия левой части. В результате синхронизации правая папка будет изменена до полного соответствия левой.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Копировать новые или обновлять файлы на правой стороне.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Настроить свои собственные правила синхронизации.</target>
+
+<source>Deletion handling</source>
+<target>Настройки удаления</target>
+
+<source>Permanent</source>
+<target>Безвозвратно</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Удалить или перезаписать файлы, не помещая в "Корзину"</target>
+
+<source>Recycle Bin</source>
+<target>В "Корзину"</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Использовать "Корзину" при удалении или перезаписи файлов</target>
+
+<source>Versioning</source>
+<target>Переместить старые версии файлов в заданную папку</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Переместить файлы с отметками времени в указанную папку</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Ограничить максимальное количество версий на файл</target>
+
+<source>Configuration</source>
+<target>Настройки</target>
+
+<source>Item exists on left side only</source>
+<target>Элемент существует только на левой стороне</target>
+
+<source>Item exists on right side only</source>
+<target>Элемент существует только на правой стороне</target>
+
+<source>Left side is newer</source>
+<target>На левой стороне новее</target>
+
+<source>Right side is newer</source>
+<target>На правой стороне новее</target>
+
+<source>Items have different content</source>
+<target>Элемент имеют различное содержание</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Конфликт/элемент не могут быть отнесены к какой-либо категории</target>
+
 <source>Synchronizing...</source>
 <target>Синхронизация...</target>
 
@@ -682,8 +700,8 @@ is the same
 <source>Donate with PayPal</source>
 <target>Отправить деньги через PayPal</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Большое спасибо за перевод FreeFileSync:</target>
+<source>Many thanks for localization:</source>
+<target>Большое спасибо за перевод:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Замечания и предложения приветствуются</target>
@@ -700,14 +718,11 @@ is the same
 <source>Published under the GNU General Public License</source>
 <target>Издается под лицензией GNU General Public License</target>
 
-<source>Use Recycle Bin</source>
-<target>Использовать "Корзину"</target>
-
 <source>Delete on both sides</source>
 <target>Удалить с обеих сторон</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
-<target>Удалить с обеих сторон, если даже файл выделен только на одной стороне</target>
+<target>Удалить с обеих сторон, даже если файл выделен только на одной стороне</target>
 
 <source>
 Only files that match all filter settings will be synchronized.
@@ -772,7 +787,7 @@ Note: File names must be relative to base directories!
 <source>Statistics</source>
 <target>Статистика</target>
 
-<source>Do not show this dialog again</source>
+<source>Don't show this dialog again</source>
 <target>Больше не показывать это окно</target>
 
 <source>Find what:</source>
@@ -856,11 +871,8 @@ Note: File names must be relative to base directories!
 <source>Do you want to save changes to %x?</source>
 <target>Вы хотите сохранить изменения в %x?</target>
 
-<source>Save</source>
-<target>Сохранить</target>
-
-<source>Don't Save</source>
-<target>Не сохранять</target>
+<source>Do&n't save</source>
+<target>&Не сохранять</target>
 
 <source>Configuration loaded!</source>
 <target>Настройки синхронизации загружены!</target>
@@ -952,7 +964,7 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>Показать файлы, которые не будут скопированы</target>
 
-<source>All directories in sync!</source>
+<source>All folders are in sync!</source>
 <target>Все папки синхронизированы!</target>
 
 <source>Comma separated list</source>
@@ -1046,6 +1058,9 @@ Note: File names must be relative to base directories!
 <source>Pause</source>
 <target>Пауза</target>
 
+<source>Logging</source>
+<target>Лог-файлы</target>
+
 <source>Cannot find %x</source>
 <target>Невозможно найти %x</target>
 
@@ -1131,21 +1146,6 @@ Note: File names must be relative to base directories!
 
 <source>Leave as unresolved conflict</source>
 <target>Оставить как нерешенный конфликт</target>
-
-<source>Delete permanently</source>
-<target>Удалять, не помещая в "Корзину"</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Удалять или перезаписать файлы, не помещая в "Корзину"</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Использовать "Корзину" при удалении или перезаписи файлов</target>
-
-<source>Versioning</source>
-<target>Перемещать старые версии файлов в заданную папку</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Перемещать файлы в заданную папку (можно создавать архивные версии удаленных файлов)</target>
 
 <source>Files</source>
 <target>Файлы</target>
@@ -1240,8 +1240,11 @@ Note: File names must be relative to base directories!
 <source>Cannot copy file %x to %y.</source>
 <target>Не удается скопировать файл %x в %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Не удается прочесть папку %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Невозможно открыть папку %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Невозможно прочесть папку %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Обнаружена бесконечная рекурсия папок.</target>
@@ -1270,6 +1273,9 @@ Note: File names must be relative to base directories!
 Старые файлы будут заменены более новыми файлами.
 </target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Для этого пути "Корзина" не доступна! Файлы будут удалены безвозвратно:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>Вы можете проигнорировать ошибку, приняв папку за пустую.</target>
 
@@ -1278,6 +1284,9 @@ Note: File names must be relative to base directories!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Зависимые папки! Будьте внимательны при настройке правил синхронизации:</target>
+
+<source>Start comparison</source>
+<target>Начать сравнение</target>
 
 <source>Preparing synchronization...</source>
 <target>Подготовка к синхронизации...</target>
@@ -1290,6 +1299,9 @@ Note: File names must be relative to base directories!
 
 <source>Files %x have the same date but a different size!</source>
 <target>Файлы %x имеют одинаковую дату, но различаются по размеру!</target>
+
+<source>Items differ in attributes only</source>
+<target>Элементы различаются только атрибутами</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Символьная ссылка %x имеет ту же дату, но отличающуюся цель.</target>
@@ -1305,9 +1317,6 @@ Note: File names must be relative to base directories!
 
 <source>Both sides are equal</source>
 <target>Обе стороны равны</target>
-
-<source>Items have different attributes</source>
-<target>Элементы имеют разные атрибуты</target>
 
 <source>Copy new item to left</source>
 <target>Скопировать новый элемент налево</target>
@@ -1423,14 +1432,11 @@ Note: File names must be relative to base directories!
 <source>Available:</source>
 <target>Доступно:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Для этого пути "Корзина" не доступна! Файлы будут удалены безвозвратно:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Папка, входящая в несколько пар папок, будет изменена. Пожалуйста, проверьте настройки синхронизации.</target>
 
-<source>Processing folder pair:</source>
-<target>Обработка пары папок:</target>
+<source>Synchronizing folder pair:</source>
+<target>Синхронизация пары папок:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Целевая папка %x уже существует.</target>

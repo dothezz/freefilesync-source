@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "debug_new.h"
@@ -15,12 +15,13 @@ namespace
 {
 LONG WINAPI writeDumpOnException(EXCEPTION_POINTERS* pExceptionInfo)
 {
-    HANDLE hFile = ::CreateFile(L"exception.dmp", GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    HANDLE hFile = ::CreateFile(L"exception.dmp", GENERIC_READ | GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (hFile != INVALID_HANDLE_VALUE)
     {
         MINIDUMP_EXCEPTION_INFORMATION exInfo = {};
         exInfo.ThreadId          = ::GetCurrentThreadId();
         exInfo.ExceptionPointers = pExceptionInfo;
+        exInfo.ClientPointers    = FALSE;
 
         MINIDUMP_EXCEPTION_INFORMATION* exceptParam = pExceptionInfo ? &exInfo : nullptr;
 
@@ -45,5 +46,10 @@ struct Dummy { Dummy() { ::SetUnhandledExceptionFilter(writeDumpOnException); }}
 
 void mem_check::writeMinidump()
 {
-    writeDumpOnException(nullptr);
+    //force exception to catch the state of this thread and hopefully get a valid call stack
+    __try
+    {
+        ::RaiseException(EXCEPTION_BREAKPOINT, 0, 0, nullptr);
+    }
+    __except (writeDumpOnException(GetExceptionInformation()), EXCEPTION_CONTINUE_EXECUTION) {}
 }

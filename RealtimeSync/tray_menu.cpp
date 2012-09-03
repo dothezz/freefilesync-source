@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "tray_menu.h"
@@ -25,6 +25,7 @@
 #include <zen/build_info.h>
 #include <wx+/shell_execute.h>
 #include "gui_generated.h"
+#include "../lib/resolve_path.h"
 
 using namespace rts;
 using namespace zen;
@@ -107,7 +108,7 @@ private:
                     build += L" x86";
                 assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
-                wxMessageBox(L"RealtimeSync" L"\n\n" + replaceCpy(_("(Build: %x)"), L"%x", build), _("About"), wxOK);
+                wxMessageBox(L"RealtimeSync" L"\n\n" + replaceCpy(_("Build: %x"), L"%x", build), _("About"), wxOK);
             }
             break;
         }
@@ -266,12 +267,12 @@ public:
 private:
     void OnTimerEvent(wxEvent& event)
     {
-        --secondsLeft;
-        if (secondsLeft < 0)
+        if (secondsLeft <= 0)
         {
             EndModal(BUTTON_RETRY);
             return;
         }
+        --secondsLeft;
         updateButtonLabel();
     }
 
@@ -323,7 +324,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
 {
     const std::vector<Zstring> dirList = toZ(config.directories);
 
-    auto cmdLine = config.commandline;
+    wxString cmdLine = config.commandline;
     trim(cmdLine);
 
     if (cmdLine.empty())
@@ -382,7 +383,8 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                 lastFileChanged.clear(); //make sure old name is not shown again after a directory reappears
 
                 //execute command
-                zen::shellExecute(cmdLine, zen::EXEC_TYPE_SYNC);
+				auto cmdLineExp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(cmdLine)));
+                zen::shellExecute(cmdLineExp, zen::EXEC_TYPE_SYNC);
                 callback.clearSchedule();
             }
         };

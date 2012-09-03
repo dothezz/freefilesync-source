@@ -27,9 +27,9 @@
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
-					<Add library="libboost_thread-mgw47-mt-s-1_50.a" />
-					<Add library="libboost_system-mgw47-mt-s-1_50.a" />
-					<Add library="libboost_chrono-mgw47-mt-s-1_50.a" />
+					<Add library="libboost_thread-mgw47-mt-s-1_51.a" />
+					<Add library="libboost_system-mgw47-mt-s-1_51.a" />
+					<Add library="libboost_chrono-mgw47-mt-s-1_51.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_release_lib" />
 				</Linker>
 				<ExtraCommands>
@@ -56,9 +56,9 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw47-mt-sd-1_50.a" />
-					<Add library="libboost_system-mgw47-mt-sd-1_50.a" />
-					<Add library="libboost_chrono-mgw47-mt-sd-1_50.a" />
+					<Add library="libboost_thread-mgw47-mt-sd-1_51.a" />
+					<Add library="libboost_system-mgw47-mt-sd-1_51.a" />
+					<Add library="libboost_chrono-mgw47-mt-sd-1_51.a" />
 					<Add directory="C:\Program Files\C++\wxWidgets\lib\mingw_debug_dll" />
 				</Linker>
 			</Target>

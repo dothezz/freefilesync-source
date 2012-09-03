@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "parallel_scan.h"
@@ -330,7 +330,7 @@ public:
     onDir    (const Zchar* shortName, const Zstring& fullName);
     virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details);
     virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details);
-    virtual HandleError onError  (const std::wstring& errorText);
+    virtual HandleError onError  (const std::wstring& msg);
 
 private:
     TraverserShared& cfg;
@@ -437,9 +437,9 @@ std::shared_ptr<TraverseCallback> DirCallback::onDir(const Zchar* shortName, con
 }
 
 
-DirCallback::HandleError DirCallback::onError(const std::wstring& errorText)
+DirCallback::HandleError DirCallback::onError(const std::wstring& msg)
 {
-    switch (cfg.acb_.reportError(errorText))
+    switch (cfg.acb_.reportError(msg))
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
             cfg.failedReads_.insert(relNameParentPf_);

@@ -2,7 +2,7 @@
 // * This file is part of the zenXML project. It is distributed under the   *
 // * Boost Software License, Version 1.0. See accompanying file             *
 // * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef ZEN_TIME_HEADER_845709281432434
@@ -164,6 +164,9 @@ struct GetFormat<FormatIsoDateTimeTag> //%Y-%m-%d %H:%M:%S - e.g. 2001-08-23 14:
 };
 
 
+//strftime() craziness on invalid input:
+//	VS 2010: CRASH unless "_invalid_parameter_handler" is set: http://msdn.microsoft.com/en-us/library/ksazx244.aspx
+//	GCC: returns 0, apparently no crash. Still, considering some clib maintainer's comments, we should expect the worst!
 inline
 size_t strftimeWrap(char* buffer, size_t bufferSize, const char* format, const struct std::tm* timeptr)
 {
@@ -178,6 +181,24 @@ size_t strftimeWrap(wchar_t* buffer, size_t bufferSize, const wchar_t* format, c
 }
 
 
+inline
+bool isValid(const struct std::tm& t)
+{
+    auto inRange = [](int value, int minVal, int maxVal) { return minVal <= value && value <= maxVal; };
+
+    //http://www.cplusplus.com/reference/clibrary/ctime/tm/
+    return inRange(t.tm_sec , 0, 61) &&
+           inRange(t.tm_min , 0, 59) &&
+           inRange(t.tm_hour, 0, 23) &&
+           inRange(t.tm_mday, 1, 31) &&
+           inRange(t.tm_mon , 0, 11) &&
+           //tm_year
+           inRange(t.tm_wday, 0, 6) &&
+           inRange(t.tm_yday, 0, 365);
+    //tm_isdst
+};
+
+
 struct UserDefinedFormatTag {};
 struct PredefinedFormatTag  {};
 
@@ -185,10 +206,12 @@ template <class String, class String2> inline
 String formatTime(const String2& format, const TimeComp& comp, UserDefinedFormatTag) //format as specified by "std::strftime", returns empty string on failure
 {
     typedef typename GetCharType<String>::Type CharType;
-
     struct std::tm ctc = toClibTimeComponents(comp);
     std::mktime(&ctc); // unfortunately std::strftime() needs all elements of "struct tm" filled, e.g. tm_wday, tm_yday
     //note: although std::mktime() explicitly expects "local time", calculating weekday and day of year *should* be time-zone and DST independent
+
+    if (!isValid(ctc)) //strftime() might kill the app otherwise, std::mktime does *not* help here at all!
+        return String();
 
     CharType buffer[256];
     const size_t charsWritten = strftimeWrap(buffer, 256, strBegin(format), &ctc);
@@ -209,11 +232,13 @@ TimeComp localTime(time_t utc)
 {
 #ifdef _MSC_VER
     struct tm lt = {};
-    /*errno_t rv = */
-    ::localtime_s(&lt, &utc); //more secure?
+    errno_t rv = ::localtime_s(&lt, &utc); //more secure?
+    if (rv != 0)
+        return TimeComp();
     return implementation::toZenTimeComponents(lt);
 #else
-    return implementation::toZenTimeComponents(*std::localtime(&utc));
+    struct tm* lt = std::localtime(&utc); //returns nullptr for invalid time_t on Visual 2010!!! (testvalue "-1")
+    return lt ? implementation::toZenTimeComponents(*lt) : TimeComp();
 #endif
 }
 

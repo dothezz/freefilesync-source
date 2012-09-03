@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef WX_CHOICE_ENUM_H_INCLUDED
@@ -19,9 +19,9 @@ Member variable:
 
 Constructor code:
     enumDescrMap.
-    add(ON_ERROR_POPUP , _("Show pop-up")    , _("Show pop-up on errors or warnings")).
-    add(ON_ERROR_IGNORE, _("Ignore errors") , _("Hide all error and warning messages")).
-    add(ON_ERROR_EXIT  , _("Exit instantly"), _("Abort synchronization immediately"));
+    add(ON_ERROR_POPUP , "Show pop-up"   , "Show pop-up on errors or warnings"). <- add localization
+    add(ON_ERROR_IGNORE, "Ignore errors" , "Hide all error and warning messages").
+    add(ON_ERROR_EXIT  , "Exit instantly", "Abort synchronization immediately");
 
 Set enum value:
     setEnumVal(enumDescrMap, *m_choiceHandleError, value);

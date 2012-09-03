@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "db_file.h"
@@ -218,10 +218,10 @@ private:
     {
         writeNumber<std:: int64_t>(output, to<std:: int64_t>(descr.lastWriteTimeRaw));
         writeNumber<std::uint64_t>(output, to<std::uint64_t>(descr.fileSize));
-        writeNumber<std::uint64_t>(output, descr.id.first ); //device id
-        writeNumber<std::uint64_t>(output, descr.id.second); //file id
-        assert_static(sizeof(descr.id.first ) <= sizeof(std::uint64_t));
-        assert_static(sizeof(descr.id.second) <= sizeof(std::uint64_t));
+        writeNumber<std::uint64_t>(output, descr.devId);
+        writeNumber<std::uint64_t>(output, descr.fileIdx);
+        assert_static(sizeof(descr.devId  ) <= sizeof(std::uint64_t));
+        assert_static(sizeof(descr.fileIdx) <= sizeof(std::uint64_t));
     }
 
     static void write(BinStreamOut& output, const LinkDescriptor& descr)
@@ -344,8 +344,8 @@ private:
         //attention: order of function argument evaluation is undefined! So do it one after the other...
         descr.lastWriteTimeRaw = readNumber<std::int64_t>(input); //throw UnexpectedEndOfStreamError
         descr.fileSize         = readNumber<std::uint64_t>(input);
-        descr.id.first  = static_cast<decltype(descr.id.first )>(readNumber<std::uint64_t>(input)); //
-        descr.id.second = static_cast<decltype(descr.id.second)>(readNumber<std::uint64_t>(input)); //silence "loss of precision" compiler warnings
+        descr.devId            = static_cast<DeviceId >(readNumber<std::uint64_t>(input)); //
+        descr.fileIdx          = static_cast<FileIndex>(readNumber<std::uint64_t>(input)); //silence "loss of precision" compiler warnings
     }
 
     static void read(BinStreamIn& input, LinkDescriptor& descr)

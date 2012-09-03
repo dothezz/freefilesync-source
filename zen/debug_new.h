@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef DEBUGNEW_H_INCLUDED
@@ -15,17 +15,25 @@
 #error currently for use with MSC only
 #endif
 
-/*overwrite "operator new" to get more detailed error messages on bad_alloc, detect memory leaks and write memory dumps
-Usage:
-- Include everywhere before any other file: $(ProjectDir)\shared\debug_new.h
+/*
+Better std::bad_alloc
+---------------------
+overwrite "operator new" to automatically write mini dump and get info about bytes requested
 
-For Minidumps:
--------------
+1. Compile "debug_new.cpp"
+2. C/C++ -> Advanced: Forced Include File: zen/debug_new.h
+
+Minidumps http://msdn.microsoft.com/en-us/library/windows/desktop/ee416349(v=vs.85).aspx
+---------
 1. Compile "debug_new.cpp"
 2. Compile "release" build with:
-	- debugging symbols
-	- optimization deactivated
-	- do not suppress frame pointer(/Oy-) - avoid call stack mess up
+	- C/C++ -> General: Debug Information Format: "Program Database" (/Zi).
+	- C/C++ -> Optimization: Omit Frame Pointers: No (/Oy-) - avoid call stack mess up!
+	- Linker -> Debugging: Generate Debug Info: Yes (/DEBUG)
+	- Linker -> Optimization: References: Yes (/OPT:REF).
+	- Linker -> Optimization: Enable COMDAT Folding: Yes (/OPT:ICF).
+Optional:
+	- C/C++ -> Optimization: Disabled (/Od)
 */
 
 namespace mem_check

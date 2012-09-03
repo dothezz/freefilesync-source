@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "gui_generated.h"
@@ -89,7 +89,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
         build += L" x86";
     assert_static(zen::is32BitBuild || zen::is64BitBuild);
 
-    m_build->SetLabel(replaceCpy(_("(Build: %x)"), L"%x", build));
+    m_build->SetLabel(replaceCpy(_("Build: %x"), L"%x", build));
 
     //m_animationControl1->SetAnimation(GlobalResources::instance().animationMoney);
     //m_animationControl1->Play();
@@ -543,8 +543,8 @@ private:
     void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnShowHelp(wxCommandEvent& event) { displayHelpEntry(L"html/Comparison Settings.html"); }
 
-    void OnTimeSize(wxCommandEvent& event) { m_radioBtnSizeDate->SetValue(true); updateGui(); }
-    void OnContent (wxCommandEvent& event) { m_radioBtnContent ->SetValue(true); updateGui(); }
+    void OnTimeSize(wxCommandEvent& event) { compareVar = CMP_BY_TIME_SIZE; updateGui(); }
+    void OnContent (wxCommandEvent& event) { compareVar = CMP_BY_CONTENT;   updateGui(); }
 
     void OnTimeSizeDouble(wxMouseEvent& event);
     void OnFilesizeDouble(wxMouseEvent& event);
@@ -552,8 +552,8 @@ private:
 
     void updateGui();
 
-    CompConfig& cmpConfigOut;
-
+    CompConfig& cmpConfigOut; //for output only
+    CompareVariant compareVar;
     zen::EnumDescrList<SymLinkHandling>  enumDescrHandleSyml;
 };
 
@@ -561,35 +561,23 @@ private:
 CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
                                    CompConfig& cmpConfig) :
     CmpCfgDlgGenerated(parent),
-    cmpConfigOut(cmpConfig)
+    cmpConfigOut(cmpConfig),
+    compareVar(cmpConfig.compareVar)
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getImage(L"help"));
 
     enumDescrHandleSyml.
     add(SYMLINK_IGNORE,       _("Exclude")).
     add(SYMLINK_USE_DIRECTLY, _("Direct")).
     add(SYMLINK_FOLLOW_LINK,  _("Follow"));
 
+    setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, cmpConfig.handleSymlinks);
+
     //move dialog up so that compare-config button and first config-variant are on same level
     //   Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
-
-    m_bpButtonHelp   ->SetBitmapLabel(GlobalResources::getImage(L"help"));
-
-    switch (cmpConfig.compareVar)
-    {
-        case CMP_BY_TIME_SIZE:
-            m_radioBtnSizeDate->SetValue(true);
-            m_buttonContent->SetFocus(); //set focus on the other button
-            break;
-        case CMP_BY_CONTENT:
-            m_radioBtnContent->SetValue(true);
-            m_buttonTimeSize->SetFocus(); //set focus on the other button
-            break;
-    }
-
-    setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, cmpConfig.handleSymlinks);
 
     updateGui();
     Fit();
@@ -598,6 +586,20 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
 
 void CompareCfgDialog::updateGui()
 {
+    //update toggle buttons -> they have no parameter-ownership at all!
+    m_toggleBtnTimeSize->SetValue(false);
+    m_toggleBtnContent ->SetValue(false);
+
+    switch (compareVar)
+    {
+        case CMP_BY_TIME_SIZE:
+            m_toggleBtnTimeSize->SetValue(true);
+            break;
+        case CMP_BY_CONTENT:
+            m_toggleBtnContent->SetValue(true);
+            break;
+    }
+
     auto setBitmap = [](wxStaticBitmap& bmpCtrl, bool active, const wxBitmap& bmp)
     {
         if (active)
@@ -605,19 +607,14 @@ void CompareCfgDialog::updateGui()
         else
             bmpCtrl.SetBitmap(greyScale(bmp));
     };
-
-    setBitmap(*m_bitmapByTime,    m_radioBtnSizeDate->GetValue(), GlobalResources::getImage(L"clock"));
-    setBitmap(*m_bitmapByContent, m_radioBtnContent ->GetValue(), GlobalResources::getImage(L"cmpByContent"));
+    setBitmap(*m_bitmapByTime,    compareVar == CMP_BY_TIME_SIZE, GlobalResources::getImage(L"clock"));
+    setBitmap(*m_bitmapByContent, compareVar == CMP_BY_CONTENT,   GlobalResources::getImage(L"cmpByContent"));
 }
 
 
 void CompareCfgDialog::OnOkay(wxCommandEvent& event)
 {
-    if (m_radioBtnContent->GetValue())
-        cmpConfigOut.compareVar = CMP_BY_CONTENT;
-    else
-        cmpConfigOut.compareVar = CMP_BY_TIME_SIZE;
-
+    cmpConfigOut.compareVar = compareVar;
     cmpConfigOut.handleSymlinks = getEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks);
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
@@ -696,11 +693,11 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
 
     set(globalSettings.gui.externelApplications);
 
-    const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + wxT("\n\n") +
-                             wxT("%name   \t") + _("- full file or folder name") + wxT("\n") +
-                             wxT("%dir        \t") + _("- folder part only") + wxT("\n") +
-                             wxT("%nameCo \t") + _("- Other side's counterpart to %name") + wxT("\n") +
-                             wxT("%dirCo   \t") + _("- Other side's counterpart to %dir");
+    const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + L"\n\n" +
+                             L"%item_path%    \t" + _("- full file or folder name") + L"\n" +
+                             L"%item_folder%  \t" + _("- folder part only") + L"\n" +
+                             L"%item2_path%   \t" + _("- Other side's counterpart to %item_path%") + L"\n" +
+                             L"%item2_folder% \t" + _("- Other side's counterpart to %item_folder%");
 
     m_gridCustomCommand->GetGridWindow()->SetToolTip(toolTip);
     m_gridCustomCommand->GetGridColLabelWindow()->SetToolTip(toolTip);

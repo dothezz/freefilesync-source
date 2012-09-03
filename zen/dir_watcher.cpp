@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zhnmju123 AT gmx DOT de) - All Rights Reserved    *
+// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "dir_watcher.h"
@@ -14,7 +14,7 @@
 #include "notify_removal.h"
 #include "win.h" //includes "windows.h"
 #include "long_path_prefix.h"
-#include "privilege.h"
+//#include "privilege.h"
 
 #elif defined FFS_LINUX
 #include <sys/inotify.h>
@@ -191,8 +191,9 @@ public:
                 //async I/O is a resource that needs to be guarded since it will write to local variable "buffer"!
                 zen::ScopeGuard guardAio = zen::makeGuard([&]
                 {
-                    //http://msdn.microsoft.com/en-us/library/aa363789(v=vs.85).aspx
-                    if (::CancelIo(hDir) != FALSE) //cancel all async I/O related to this handle and thread
+                    //Canceling Pending I/O Operations: http://msdn.microsoft.com/en-us/library/aa363789(v=vs.85).aspx
+                    //if (::CancelIoEx(hDir, &overlapped) /*!= FALSE*/ || ::GetLastError() != ERROR_NOT_FOUND) -> Vista only
+                    if (::CancelIo(hDir) /*!= FALSE*/ || ::GetLastError() != ERROR_NOT_FOUND)
                     {
                         DWORD bytesWritten = 0;
                         ::GetOverlappedResult(hDir, &overlapped, &bytesWritten, true); //wait until cancellation is complete
@@ -361,7 +362,7 @@ public:
         dirs_.push_back(fullName);
         return otherMe_;
     }
-    virtual HandleError onError(const std::wstring& errorText) { throw FileError(errorText); }
+    virtual HandleError onError(const std::wstring& msg) { throw FileError(msg); }
 
 private:
     const std::shared_ptr<TraverseCallback>& otherMe_; //lifetime management, two options: 1. use std::weak_ptr 2. ref to shared_ptr

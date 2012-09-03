@@ -10,9 +10,6 @@
 <source>Searching for folder %x...</source>
 <target>מחפש את תיקייה %x...</target>
 
-<source>Batch execution</source>
-<target>פעולת אצווה</target>
-
 <source>Items processed:</source>
 <target>אלמנטים עובדו:</target>
 
@@ -33,6 +30,9 @@
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>התקבלה בקשת ביטול: מחכה לפעולה הנוכחית להסתיים...</target>
+
+<source>Failure to create time stamp for versioning:</source>
+<target></target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - סינכרון  אוטומטי</target>
@@ -61,11 +61,11 @@
 <source>Create a batch job</source>
 <target>יוצר עבודת אצווה</target>
 
-<source>Synchronization settings</source>
-<target>הגדרות סנכרון</target>
-
 <source>Comparison settings</source>
 <target>הגדרות השוואה</target>
+
+<source>Synchronization settings</source>
+<target>הגדרות סנכרון</target>
 
 <source>About</source>
 <target>אודות</target>
@@ -87,27 +87,6 @@
 
 <source>Select time span</source>
 <target>בחר תחום זמן</target>
-
-<source>Show pop-up</source>
-<target>הראה חלונות מוקפצים</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>הראה חלונות מוקפצים עבור שגיאות או אזהרות</target>
-
-<source>Ignore errors</source>
-<target>התעלם מטעויות</target>
-
-<source>Hide all error and warning messages</source>
-<target>הסתר את כל הודעות ההזהרה והשגיאה</target>
-
-<source>Exit instantly</source>
-<target>צא מידית</target>
-
-<source>Abort synchronization immediately</source>
-<target>הפסק סנכרון מידית</target>
-
-<source>Browse</source>
-<target>עיין</target>
 
 <source>Invalid command line:</source>
 <target>שורת פקודה בלתי חוקית:</target>
@@ -247,8 +226,8 @@
 <source>&Open...</source>
 <target>&פתח...</target>
 
-<source>Save &As...</source>
-<target>שמור בשם&</target>
+<source>Save &as...</source>
+<target>שמור &בשם...</target>
 
 <source>&Quit</source>
 <target>&יציאה</target>
@@ -289,6 +268,9 @@
 <source>Remove folder</source>
 <target>הסר מחיצה</target>
 
+<source>Browse</source>
+<target>עיין</target>
+
 <source>Select a folder</source>
 <target>בחר מחיצה</target>
 
@@ -321,8 +303,8 @@ The command is triggered if:
 <source>Cancel</source>
 <target>בטל</target>
 
-<source>(Build: %x)</source>
-<target>(מבנה: %x)</target>
+<source>Build: %x</source>
+<target>מבנה: %x</target>
 
 <source>All files</source>
 <target>כל הקבצים</target>
@@ -341,9 +323,6 @@ The command is triggered if:
 
 <source>A folder input field is empty.</source>
 <target>שדה קלט תיקייה ריק.</target>
-
-<source>Logging</source>
-<target>רישום ביומן</target>
 
 <source>File time and size</source>
 <target>זמן וגודל קובץ</target>
@@ -525,11 +504,11 @@ The command is triggered if:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>תצורות אחרונות שהיו בשמוש (לחץ DEL להסרה מהרשימה)</target>
 
-<source>Hide excluded items</source>
-<target>החבא פריטים נשללים</target>
+<source>Show excluded items</source>
+<target>הראה פריטים שלא נכללו</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>החבא קבצים מסוננים או נשללים</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>הראה קבצים שסוננו או לא נכללו זמנית</target>
 
 <source>Number of files and folders that will be created</source>
 <target>מספר הקבצים והתיקיות שייוצרו</target>
@@ -573,68 +552,47 @@ The command is triggered if:
 <source>Right</source>
 <target>שמאל</target>
 
-<source>Status feedback</source>
-<target>משוב מצב</target>
-
-<source>Show progress dialog</source>
-<target>הראה שיח התקדמות</target>
-
 <source>Error handling</source>
 <target>טיפול בשגיאות</target>
 
-<source>Maximum number of log files:</source>
-<target>מספר מכסימלי של קבצי יומן</target>
+<source>Ignore</source>
+<target>התעלם</target>
 
-<source>Select folder to save log files:</source>
-<target>בחר תיקייה לשמירה קבצי יומן:</target>
+<source>Hide all error and warning messages</source>
+<target>הסתר את כל הודעות ההזהרה והשגיאה</target>
 
-<source>Batch settings</source>
-<target>הגדרות אצווה</target>
+<source>Pop-up</source>
+<target>מוקפץ</target>
 
-<source>Select variant:</source>
-<target>בחר משתנה:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>הראה חלונות מוקפצים עבור שגיאות או אזהרות</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>זהה והפץ שינויים בשני הצדדים באמצעות שימוש במסד נתונים. מחיקות, שינויי שמות וסתירות מתגלים באופן אוטומטי.</target>
+<source>Exit</source>
+<target>יציאה</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>גיבוי מראה של מחיצה ימנית. מחיצה שמאלית תתעדכן ותהיה זהה לימנית לאחר הסינכרון.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>העתק קבצים חדשים או מעודכנים למחיצה השמאלית.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>סדר את כללי הסנכרון שלך.</target>
-
-<source>Deletion handling</source>
-<target>טיפול במחיקות</target>
+<source>Abort synchronization on first error</source>
+<target>הפסק פעולת סינכרון בשגיאה ראשונה</target>
 
 <source>On completion:</source>
 <target>לאחר סיום:</target>
 
-<source>Configuration</source>
-<target>תצורה</target>
+<source>Show progress dialog</source>
+<target>הראה שיח התקדמות</target>
 
-<source>Item exists on left side only</source>
-<target>הפריט קיים בצד ימין בלבד</target>
+<source>Generate log file</source>
+<target>יצר קובץ יומן</target>
 
-<source>Item exists on right side only</source>
-<target>הפריט קיים בצד שמאל בלבד</target>
+<source>Select folder to save log files</source>
+<target>בחר תיקיה לשמירת קובץ יומן</target>
 
-<source>Left side is newer</source>
-<target>צד ימין חדש יותר</target>
+<source>Limit</source>
+<target>הגבלה</target>
 
-<source>Right side is newer</source>
-<target>צד שמאל חדש יותר</target>
+<source>Limit maximum number of log files</source>
+<target>הגבל מספר מכסימלי של קבצי יומן</target>
 
-<source>Items have different content</source>
-<target>הפריטים הם בעלי תוכן שונה</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>סתירה/פריט אינו ניתן לסיווג</target>
-
-<source>OK</source>
-<target>אשר</target>
+<source>Batch settings</source>
+<target>הגדרות אצווה</target>
 
 <source>Compare by...</source>
 <target>השווה ע"י...</target>
@@ -666,6 +624,69 @@ is the same
 <source>Symbolic Link handling</source>
 <target>טיפול בקישור סימבולי</target>
 
+<source>OK</source>
+<target>אשר</target>
+
+<source>Select variant:</source>
+<target>בחר משתנה:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>זהה והפץ שינויים בשני הצדדים באמצעות שימוש במסד נתונים. מחיקות, שינויי שמות וסתירות מתגלים באופן אוטומטי.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>גיבוי מראה של מחיצה ימנית. מחיצה שמאלית תתעדכן ותהיה זהה לימנית לאחר הסינכרון.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>העתק קבצים חדשים או מעודכנים למחיצה השמאלית.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>סדר את כללי הסנכרון שלך.</target>
+
+<source>Deletion handling</source>
+<target>טיפול במחיקות</target>
+
+<source>Permanent</source>
+<target>קבוע</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>מחק או דרוס קבצים לצמיתות</target>
+
+<source>Recycle Bin</source>
+<target>סל מחזור</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>השתמש בסל המיחזור כאשר מוחק או דורס קבצים</target>
+
+<source>Versioning</source>
+<target>עדכון גרסאות</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>העבר קבצים עם חתימת זמן לתיקיה מיוחדת</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>הגבל מספר מכסימלי של גרסאות לקובץ</target>
+
+<source>Configuration</source>
+<target>תצורה</target>
+
+<source>Item exists on left side only</source>
+<target>הפריט קיים בצד ימין בלבד</target>
+
+<source>Item exists on right side only</source>
+<target>הפריט קיים בצד שמאל בלבד</target>
+
+<source>Left side is newer</source>
+<target>צד ימין חדש יותר</target>
+
+<source>Right side is newer</source>
+<target>צד שמאל חדש יותר</target>
+
+<source>Items have different content</source>
+<target>הפריטים הם בעלי תוכן שונה</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>סתירה/פריט אינו ניתן לסיווג</target>
+
 <source>Synchronizing...</source>
 <target>מסנכרן...</target>
 
@@ -681,8 +702,8 @@ is the same
 <source>Donate with PayPal</source>
 <target>תרום עם פייפל</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>תודות עבור עבודות התרגום של תוכנת הסנכרון:</target>
+<source>Many thanks for localization:</source>
+<target>תודות עבור תרגום שפות:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>משוב והצעות יתקבלו בברכה</target>
@@ -698,9 +719,6 @@ is the same
 
 <source>Published under the GNU General Public License</source>
 <target>מפורסם במסגרת GNU General Public License</target>
-
-<source>Use Recycle Bin</source>
-<target>השתמש בסל המיחזור</target>
 
 <source>Delete on both sides</source>
 <target>מחק בשני הצדדים</target>
@@ -771,8 +789,8 @@ Note: File names must be relative to base directories!
 <source>Statistics</source>
 <target>סטטיסטיקה</target>
 
-<source>Do not show this dialog again</source>
-<target>אל תראה מסך זה שנית</target>
+<source>Don't show this dialog again</source>
+<target>אל תראה דו-שיח זה שוב</target>
 
 <source>Find what:</source>
 <target>חפש מה:</target>
@@ -855,11 +873,8 @@ Note: File names must be relative to base directories!
 <source>Do you want to save changes to %x?</source>
 <target>האם לשמור שינויים אל %x?</target>
 
-<source>Save</source>
-<target>שמור</target>
-
-<source>Don't Save</source>
-<target>אל תשמור</target>
+<source>Do&n't save</source>
+<target>אל &תשמור</target>
 
 <source>Configuration loaded!</source>
 <target>תצורה הוטענה!</target>
@@ -951,8 +966,8 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>הראה קבצים שלא יועתקו</target>
 
-<source>All directories in sync!</source>
-<target>כל המחיצות מסונכרנות!</target>
+<source>All folders are in sync!</source>
+<target>כל התיקיות מסונכרנות</target>
 
 <source>Comma separated list</source>
 <target>רשימה מופרדת פסיקים</target>
@@ -1041,6 +1056,9 @@ Note: File names must be relative to base directories!
 <source>Pause</source>
 <target>עצור</target>
 
+<source>Logging</source>
+<target>רישום ביומן</target>
+
 <source>Cannot find %x</source>
 <target>לא מוצא %x</target>
 
@@ -1121,21 +1139,6 @@ Note: File names must be relative to base directories!
 
 <source>Leave as unresolved conflict</source>
 <target>השאר כקונפליקט לא מטופל</target>
-
-<source>Delete permanently</source>
-<target>מחק לצמיתות</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>מחק או דרוס קבצים לצמיתות</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>השתמש בסל המיחזור כאשר מוחק או דורס קבצים</target>
-
-<source>Versioning</source>
-<target>עדכון גרסאות</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>העבר קבצים לתיקייה המסומנת בחותמת-זמן</target>
 
 <source>Files</source>
 <target>קבצים</target>
@@ -1227,8 +1230,11 @@ Note: File names must be relative to base directories!
 <source>Cannot copy file %x to %y.</source>
 <target>לא יכול להעתיק קובץ %x  אל %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>לא יכול לקרוא מחיצה %x.</target>
+<source>Cannot open directory %x.</source>
+<target>לא יכול לפתוח מחיצה %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>לא יכול למספר מחיצה %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>אובחנה רקורסית תיקיות אינסופית.</target>
@@ -1254,6 +1260,9 @@ Note: File names must be relative to base directories!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>בחר ברירת מחדל של סנכרון: קבצים ישנים ידרסו ע"י קבצים חדשים יותר.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>סל מחזור אינו זמין עבור הנתיבים הבאים! קבצים ימחקו לצמיתות:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>ניתן להתעלם משגיאה זו ולהחשיב התיקייה כריקה.</target>
 
@@ -1262,6 +1271,9 @@ Note: File names must be relative to base directories!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>מחיצות תלויות! זהירות בהגדרת כללי סנכרון:</target>
+
+<source>Start comparison</source>
+<target>התחל השוואה</target>
 
 <source>Preparing synchronization...</source>
 <target>מכין סינכרון...</target>
@@ -1274,6 +1286,9 @@ Note: File names must be relative to base directories!
 
 <source>Files %x have the same date but a different size!</source>
 <target>קובץ %x בעל תאריך זהה אך גודל שונה!</target>
+
+<source>Items differ in attributes only</source>
+<target>פריטים שונים בתכונות בלבד</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>לקישורים סימבוליים %x יש תאריך זהה אבל יעד שונה.</target>
@@ -1289,9 +1304,6 @@ Note: File names must be relative to base directories!
 
 <source>Both sides are equal</source>
 <target>שני הצדדים שווים</target>
-
-<source>Items have different attributes</source>
-<target>הפריטים הם בעלי תכונות שונות</target>
 
 <source>Copy new item to left</source>
 <target>העתק פריט חדש לצד ימין</target>
@@ -1356,6 +1368,9 @@ Note: File names must be relative to base directories!
 <source>Moving symbolic link %x to %y</source>
 <target>מעביר קישור סימבולי %x אל %y</target>
 
+<source>Removing old versions...</source>
+<target></target>
+
 <source>Creating file %x</source>
 <target>יוצר קובץ %x</target>
 
@@ -1407,14 +1422,11 @@ Note: File names must be relative to base directories!
 <source>Available:</source>
 <target>זמין:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>סל מחזור אינו זמין עבור הנתיבים הבאים! קבצים ימחקו לצמיתות:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>התיקייה שתשתנה היא חלק מריבוי זוגות תיקיות. אנא סקור מחדש הגדרות סינכרון.</target>
 
-<source>Processing folder pair:</source>
-<target>מבצע זוג מחיצות:</target>
+<source>Synchronizing folder pair:</source>
+<target>מסנכרן זוג תיקיות:</target>
 
 <source>Target folder %x already existing.</source>
 <target>תיקיית מטרה %x כבר קיימת.</target>

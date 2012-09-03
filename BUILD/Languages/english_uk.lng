@@ -10,6 +10,15 @@
 <source>Searching for folder %x...</source>
 <target>Searching for folder %x...</target>
 
+<source>Items processed:</source>
+<target>Elements processed:</target>
+
+<source>Items remaining:</source>
+<target>Elements remaining:</target>
+
+<source>Total time:</source>
+<target>Total time:</target>
+
 <source>Show in Explorer</source>
 <target>Show in Explorer</target>
 
@@ -49,11 +58,11 @@
 <source>Create a batch job</source>
 <target>Create a batch job</target>
 
-<source>Synchronization settings</source>
-<target>Synchronisation settings</target>
-
 <source>Comparison settings</source>
 <target>Comparison settings</target>
+
+<source>Synchronization settings</source>
+<target>Synchronisation settings</target>
 
 <source>About</source>
 <target>About</target>
@@ -75,27 +84,6 @@
 
 <source>Select time span</source>
 <target>Select time span</target>
-
-<source>Show pop-up</source>
-<target>Show pop-up</target>
-
-<source>Show pop-up on errors or warnings</source>
-<target>Show pop-up on errors or warnings</target>
-
-<source>Ignore errors</source>
-<target>Ignore errors</target>
-
-<source>Hide all error and warning messages</source>
-<target>Hide all error and warning messages</target>
-
-<source>Exit instantly</source>
-<target>Exit instantly</target>
-
-<source>Abort synchronization immediately</source>
-<target>Abort synchronisation immediately</target>
-
-<source>Browse</source>
-<target>Browse</target>
 
 <source>Invalid command line:</source>
 <target>Invalid command line:</target>
@@ -235,8 +223,8 @@
 <source>&Open...</source>
 <target>&Open...</target>
 
-<source>Save &As...</source>
-<target>Save &As...</target>
+<source>Save &as...</source>
+<target>Save &as...</target>
 
 <source>&Quit</source>
 <target>&Quit</target>
@@ -277,6 +265,9 @@
 <source>Remove folder</source>
 <target>Remove folder</target>
 
+<source>Browse</source>
+<target>Browse</target>
+
 <source>Select a folder</source>
 <target>Select a folder</target>
 
@@ -309,8 +300,8 @@ The command is triggered if:
 <source>Cancel</source>
 <target>Cancel</target>
 
-<source>(Build: %x)</source>
-<target>(Build: %x)</target>
+<source>Build: %x</source>
+<target>Build: %x</target>
 
 <source>All files</source>
 <target>All files</target>
@@ -329,9 +320,6 @@ The command is triggered if:
 
 <source>A folder input field is empty.</source>
 <target>A folder input field is empty.</target>
-
-<source>Logging</source>
-<target>Logging</target>
 
 <source>File time and size</source>
 <target>File time and size</target>
@@ -353,21 +341,6 @@ The command is triggered if:
 
 <source>FreeFileSync batch</source>
 <target>FreeFileSync batch</target>
-
-<source>Batch execution</source>
-<target>Batch execution</target>
-
-<source>Items processed:</source>
-<target>Elements processed:</target>
-
-<source>Items remaining:</source>
-<target>Elements remaining:</target>
-
-<source>Total time:</source>
-<target>Total time:</target>
-
-<source>Stop</source>
-<target>Stop</target>
 
 <source>Synchronization aborted!</source>
 <target>Synchronisation aborted!</target>
@@ -528,11 +501,11 @@ The command is triggered if:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Last used configurations (press DEL to remove from list)</target>
 
-<source>Hide excluded items</source>
-<target>Hide excluded items</target>
+<source>Show excluded items</source>
+<target>Show excluded items</target>
 
-<source>Hide filtered or temporarily excluded files</source>
-<target>Hide filtered or temporarily excluded files</target>
+<source>Show filtered or temporarily excluded files</source>
+<target>Show filtered or temporarily excluded files</target>
 
 <source>Number of files and folders that will be created</source>
 <target>Number of files and folders that will be created</target>
@@ -576,68 +549,47 @@ The command is triggered if:
 <source>Right</source>
 <target>Right</target>
 
-<source>Status feedback</source>
-<target>Status feedback</target>
-
-<source>Show progress dialog</source>
-<target>Show progress dialog</target>
-
 <source>Error handling</source>
 <target>Error handling</target>
 
-<source>Maximum number of log files:</source>
-<target>Maximum number of log files:</target>
+<source>Ignore</source>
+<target>Ignore</target>
 
-<source>Select folder to save log files:</source>
-<target>Select folder to save log files:</target>
+<source>Hide all error and warning messages</source>
+<target>Hide all error and warning messages</target>
 
-<source>Batch settings</source>
-<target>Batch settings</target>
+<source>Pop-up</source>
+<target>Pop-up</target>
 
-<source>Select variant:</source>
-<target>Select variant:</target>
+<source>Show pop-up on errors or warnings</source>
+<target>Show pop-up on errors or warnings</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</target>
+<source>Exit</source>
+<target>Exit</target>
 
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronisation.</target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Copy new or updated files to right folder.</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Configure your own synchronisation rules.</target>
-
-<source>Deletion handling</source>
-<target>Deletion handling</target>
+<source>Abort synchronization on first error</source>
+<target>Abort synchronisation on first error</target>
 
 <source>On completion:</source>
 <target>On completion:</target>
 
-<source>Configuration</source>
-<target>Configuration</target>
+<source>Show progress dialog</source>
+<target>Show progress dialog</target>
 
-<source>Item exists on left side only</source>
-<target>Item exists on left side only</target>
+<source>Generate log file</source>
+<target>Generate log file</target>
 
-<source>Item exists on right side only</source>
-<target>Item exists on right side only</target>
+<source>Select folder to save log files</source>
+<target>Select folder to save log files</target>
 
-<source>Left side is newer</source>
-<target>Left side is newer</target>
+<source>Limit</source>
+<target>Limit</target>
 
-<source>Right side is newer</source>
-<target>Right side is newer</target>
+<source>Limit maximum number of log files</source>
+<target>Limit maximum number of log files</target>
 
-<source>Items have different content</source>
-<target>Items have different content</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Conflict/item cannot be categorised</target>
-
-<source>OK</source>
-<target>OK</target>
+<source>Batch settings</source>
+<target>Batch settings</target>
 
 <source>Compare by...</source>
 <target>Compare by...</target>
@@ -669,6 +621,69 @@ is the same
 <source>Symbolic Link handling</source>
 <target>Symbolic Link handling</target>
 
+<source>OK</source>
+<target>OK</target>
+
+<source>Select variant:</source>
+<target>Select variant:</target>
+
+<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
+<target>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronisation.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Copy new or updated files to right folder.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Configure your own synchronisation rules.</target>
+
+<source>Deletion handling</source>
+<target>Deletion handling</target>
+
+<source>Permanent</source>
+<target>Permanent</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Delete or overwrite files permanently</target>
+
+<source>Recycle Bin</source>
+<target>Recycle Bin</target>
+
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Use Recycle Bin when deleting or overwriting files</target>
+
+<source>Versioning</source>
+<target>Versioning</target>
+
+<source>Move time-stamped files into specified folder</source>
+<target>Move time-stamped files into specified folder</target>
+
+<source>Limit maximum number of versions per file</source>
+<target>Limit maximum number of versions per file</target>
+
+<source>Configuration</source>
+<target>Configuration</target>
+
+<source>Item exists on left side only</source>
+<target>Item exists on left side only</target>
+
+<source>Item exists on right side only</source>
+<target>Item exists on right side only</target>
+
+<source>Left side is newer</source>
+<target>Left side is newer</target>
+
+<source>Right side is newer</source>
+<target>Right side is newer</target>
+
+<source>Items have different content</source>
+<target>Items have different content</target>
+
+<source>Conflict/item cannot be categorized</source>
+<target>Conflict/item cannot be categorised</target>
+
 <source>Synchronizing...</source>
 <target>Synchronising...</target>
 
@@ -684,8 +699,8 @@ is the same
 <source>Donate with PayPal</source>
 <target>Donate with PayPal</target>
 
-<source>Big thanks for localizing FreeFileSync goes out to:</source>
-<target>Big thanks for localising FreeFileSync goes out to:</target>
+<source>Many thanks for localization:</source>
+<target>Many thanks for localisation:</target>
 
 <source>Feedback and suggestions are welcome</source>
 <target>Feedback and suggestions are welcome</target>
@@ -701,9 +716,6 @@ is the same
 
 <source>Published under the GNU General Public License</source>
 <target>Published under the GNU General Public Licence</target>
-
-<source>Use Recycle Bin</source>
-<target>Use Recycle Bin</target>
 
 <source>Delete on both sides</source>
 <target>Delete on both sides</target>
@@ -774,8 +786,8 @@ Note: File names must be relative to base directories!
 <source>Statistics</source>
 <target>Statistics</target>
 
-<source>Do not show this dialog again</source>
-<target>Do not show this dialogue again</target>
+<source>Don't show this dialog again</source>
+<target>Don't show this dialog again</target>
 
 <source>Find what:</source>
 <target>Find what:</target>
@@ -858,11 +870,8 @@ Note: File names must be relative to base directories!
 <source>Do you want to save changes to %x?</source>
 <target>Do you want to save changes to %x?</target>
 
-<source>Save</source>
-<target>Save</target>
-
-<source>Don't Save</source>
-<target>Don't Save</target>
+<source>Do&n't save</source>
+<target>Do&n't save</target>
 
 <source>Configuration loaded!</source>
 <target>Configuration loaded!</target>
@@ -954,8 +963,8 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>Show files that won't be copied</target>
 
-<source>All directories in sync!</source>
-<target>All directories in sync!</target>
+<source>All folders are in sync!</source>
+<target>All folders are in sync!</target>
 
 <source>Comma separated list</source>
 <target>Comma separated list</target>
@@ -1044,6 +1053,9 @@ Note: File names must be relative to base directories!
 <source>Pause</source>
 <target>Pause</target>
 
+<source>Logging</source>
+<target>Logging</target>
+
 <source>Cannot find %x</source>
 <target>Cannot find %x</target>
 
@@ -1124,21 +1136,6 @@ Note: File names must be relative to base directories!
 
 <source>Leave as unresolved conflict</source>
 <target>Leave as unresolved conflict</target>
-
-<source>Delete permanently</source>
-<target>Delete permanently</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Delete or overwrite files permanently</target>
-
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Use Recycle Bin when deleting or overwriting files</target>
-
-<source>Versioning</source>
-<target>Versioning</target>
-
-<source>Move files into a time-stamped subfolder</source>
-<target>Move files into a time-stamped subfolder</target>
 
 <source>Files</source>
 <target>Files</target>
@@ -1230,8 +1227,11 @@ Note: File names must be relative to base directories!
 <source>Cannot copy file %x to %y.</source>
 <target>Cannot copy file %x to %y.</target>
 
-<source>Cannot read directory %x.</source>
-<target>Cannot read directory %x.</target>
+<source>Cannot open directory %x.</source>
+<target>Cannot open directory %x.</target>
+
+<source>Cannot enumerate directory %x.</source>
+<target>Cannot enumerate directory %x.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Detected endless directory recursion.</target>
@@ -1257,6 +1257,9 @@ Note: File names must be relative to base directories!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Setting default synchronisation directions: Old files will be overwritten with newer files.</target>
 
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</target>
+
 <source>You can ignore this error to consider the folder as empty.</source>
 <target>You can ignore this error to consider the folder as empty.</target>
 
@@ -1265,6 +1268,9 @@ Note: File names must be relative to base directories!
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Directories are dependent! Be careful when setting up synchronisation rules:</target>
+
+<source>Start comparison</source>
+<target>Start comparison</target>
 
 <source>Preparing synchronization...</source>
 <target>Preparing synchronisation...</target>
@@ -1277,6 +1283,9 @@ Note: File names must be relative to base directories!
 
 <source>Files %x have the same date but a different size!</source>
 <target>Files %x have the same date but a different size!</target>
+
+<source>Items differ in attributes only</source>
+<target>Items differ in attributes only</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Symbolic links %x have the same date but a different target.</target>
@@ -1292,9 +1301,6 @@ Note: File names must be relative to base directories!
 
 <source>Both sides are equal</source>
 <target>Both sides are equal</target>
-
-<source>Items have different attributes</source>
-<target>Items have different attributes</target>
 
 <source>Copy new item to left</source>
 <target>Copy new item to left</target>
@@ -1410,14 +1416,11 @@ Note: File names must be relative to base directories!
 <source>Available:</source>
 <target>Available:</target>
 
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</target>
-
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>A folder will be modified which is part of multiple folder pairs. Please review synchronisation settings.</target>
 
-<source>Processing folder pair:</source>
-<target>Processing folder pair:</target>
+<source>Synchronizing folder pair:</source>
+<target>Synchronising folder pair:</target>
 
 <source>Target folder %x already existing.</source>
 <target>Target folder %x already existing.</target>

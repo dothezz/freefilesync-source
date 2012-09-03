@@ -11,7 +11,6 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-#include "../wx+/dir_picker.h"
 #include "../wx+/button.h"
 #include <wx/string.h>
 #include <wx/bitmap.h>
@@ -29,7 +28,6 @@
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
-#include <wx/filepicker.h>
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
 #include <wx/spinctrl.h>
@@ -66,6 +64,7 @@ protected:
     wxBitmapButton* m_bpButtonAddFolder;
     wxBitmapButton* m_bpButtonRemoveTopFolder;
     wxTextCtrl* m_txtCtrlDirectoryMain;
+    wxButton* m_buttonSelectDirMain;
     wxScrolledWindow* m_scrolledWinFolders;
     wxBoxSizer* bSizerFolders;
     wxSpinCtrl* m_spinCtrlDelay;
@@ -86,7 +85,6 @@ protected:
 
 
 public:
-    zen::DirPickerCtrl* m_dirPickerMain;
 
     MainDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RealtimeSync - Automated Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
@@ -102,11 +100,11 @@ class FolderGenerated : public wxPanel
 private:
 
 protected:
+    wxButton* m_buttonSelectDir;
 
 public:
     wxBitmapButton* m_bpButtonRemoveFolder;
     wxTextCtrl* m_txtCtrlDirectory;
-    zen::DirPickerCtrl* m_dirPicker;
 
     FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
     ~FolderGenerated();
