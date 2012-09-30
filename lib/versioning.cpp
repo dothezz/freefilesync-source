@@ -230,7 +230,7 @@ void FileVersioner::revisionFile(const Zstring& sourceFile, const Zstring& relat
         callback.objectProcessed();
     });
 
-    fileRelnames.push_back(relativeName);
+    fileRelNames.push_back(relativeName);
 }
 
 
@@ -254,7 +254,7 @@ void FileVersioner::revisionDir(const Zstring& sourceDir, const Zstring& relativ
             callback.objectProcessed();
         });
 
-        fileRelnames.push_back(relativeName);
+        fileRelNames.push_back(relativeName);
     }
     else
     {
@@ -354,7 +354,7 @@ void FileVersioner::limitVersions(std::function<void()> updateUI) //throw FileEr
         return newEntry;
     };
 
-    std::for_each(fileRelnames.begin(), fileRelnames.end(),
+    std::for_each(fileRelNames.begin(), fileRelNames.end(),
                   [&](const Zstring& relativeName) //e.g. "subdir\Sample.txt"
     {
         const Zstring fullname = appendSeparator(versioningDirectory_) + relativeName; //e.g. "D:\Revisions\subdir\Sample.txt"

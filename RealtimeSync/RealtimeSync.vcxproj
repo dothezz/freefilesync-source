@@ -227,7 +227,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\wx+\format_unit.cpp" />
     <ClCompile Include="..\wx+\mouse_move_dlg.cpp" />
     <ClCompile Include="..\zen\dir_watcher.cpp" />
     <ClCompile Include="..\zen\dst_hack.cpp" />

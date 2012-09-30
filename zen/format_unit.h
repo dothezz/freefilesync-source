@@ -1,11 +1,11 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef UTIL_H_INCLUDED
-#define UTIL_H_INCLUDED
+#ifndef FMT_UNIT_8702184019487324
+#define FMT_UNIT_8702184019487324
 
 #include <string>
 #include <zen/string_tools.h>
@@ -20,7 +20,7 @@ std::wstring fractionToShortString(double fraction); //within [0, 1]
 template <class NumberType>
 std::wstring toGuiString(NumberType number); //format integer number including thousands separator
 
-std::wstring utcToLocalTimeString(Int64 utcTime);
+std::wstring utcToLocalTimeString(Int64 utcTime); //like Windows Explorer would...
 
 
 
@@ -56,4 +56,4 @@ std::wstring toGuiString(NumberType number)
 }
 }
 
-#endif // UTIL_H_INCLUDED
+#endif

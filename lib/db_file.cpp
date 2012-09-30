@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "db_file.h"
@@ -414,7 +414,7 @@ class UpdateLastSynchronousState
     /*
     1. filter by file name does *not* create a new hierarchy, but merely gives a different *view* on the existing file hierarchy
         => only update database entries matching this view!
-    2. Symlink handling *does* create a new (asymmetric) hierarchies during comparison
+    2. Symlink handling *does* create a new (asymmetric) hierarchy during comparison
         => update all database entries!
     */
 public:
@@ -741,10 +741,9 @@ void zen::saveLastSynchronousState(const BaseDirMapping& baseMapping) //throw Fi
     if (streamIterRightOld != streamListRight.end())
         streamListRight.erase(streamIterRightOld);
 
-    //create/update DirInfo-streams
+    //create new session data
     const std::string sessionID = zen::generateGUID();
 
-    //fill in new
     streamListLeft [sessionID] = std::move(updatedStreamLeft);
     streamListRight[sessionID] = std::move(updatedStreamRight);
 
@@ -762,6 +761,6 @@ void zen::saveLastSynchronousState(const BaseDirMapping& baseMapping) //throw Fi
     renameFile(dbNameLeftTmp,  dbNameLeft);  //
     renameFile(dbNameRightTmp, dbNameRight); //
 
-    guardTempFileLeft. dismiss(); //no need to delete temp file anymore
+    guardTempFileLeft. dismiss(); //no need to delete temp files anymore
     guardTempFileRight.dismiss(); //
 }

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "format_unit.h"
@@ -301,14 +301,14 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
 
     SYSTEMTIME systemTimeLocal = {};
 
-    if (useNewLocalTimeCalculation) //use DST setting from source date (like in Windows 7, see http://msdn.microsoft.com/en-us/library/ms724277(VS.85).aspx)
+    if (useNewLocalTimeCalculation) //use DST setting from source date (like in Windows 7, see http://msdn.microsoft.com/en-us/library/ms724277(VS.85).aspx
     {
         SYSTEMTIME systemTimeUtc = {};
         if (!::FileTimeToSystemTime(&lastWriteTimeUtc, //__in   const FILETIME *lpFileTime,
                                     &systemTimeUtc))   //__out  LPSYSTEMTIME lpSystemTime
             return errorMsg();
 
-        if (!::SystemTimeToTzSpecificLocalTime(nullptr,              //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
+        if (!::SystemTimeToTzSpecificLocalTime(nullptr,           //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
                                                &systemTimeUtc,    //__in      LPSYSTEMTIME lpUniversalTime,
                                                &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
             return errorMsg();
@@ -316,12 +316,12 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
     else //use DST setting (like in Windows 2000 and XP)
     {
         FILETIME fileTimeLocal = {};
-        if (!::FileTimeToLocalFileTime(&lastWriteTimeUtc,  //pointer to UTC file time to convert
-                                       &fileTimeLocal))    //pointer to converted file time
+        if (!::FileTimeToLocalFileTime(&lastWriteTimeUtc, //_In_   const FILETIME *lpFileTime,
+                                       &fileTimeLocal))   //_Out_  LPFILETIME lpLocalFileTime
             return errorMsg();
 
-        if (!::FileTimeToSystemTime(&fileTimeLocal,  //pointer to file time to convert
-                                    &systemTimeLocal)) //pointer to structure to receive system time
+        if (!::FileTimeToSystemTime(&fileTimeLocal,    //__in   const FILETIME *lpFileTime,
+                                    &systemTimeLocal)) //__out  LPSYSTEMTIME lpSystemTime
             return errorMsg();
     }
 

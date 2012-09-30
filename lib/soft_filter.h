@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef SOFT_FILTER_H_INCLUDED
@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <limits>
 #include "../structures.h"
-#include <wx/stopwatch.h>
+//#include <wx/stopwatch.h>
 
 namespace zen
 {
@@ -30,9 +30,7 @@ public:
 
     bool matchTime(Int64 writeTime) const { return timeFrom_ <= writeTime; }
     bool matchSize(UInt64 fileSize) const { return sizeMin_ <= fileSize && fileSize <= sizeMax_; }
-    bool matchFolder() const { return timeFrom_ == std::numeric_limits<Int64>::min(); }
-    //if date filter is active we deactivate all folders: effectively gets rid of empty folders!
-
+    bool matchFolder() const { return matchesFolder_; }
     bool isNull() const; //filter is equivalent to NullFilter, but may be technically slower
 
     //small helper method: merge two soft filters
@@ -41,11 +39,13 @@ public:
 private:
     SoftFilter(const Int64& timeFrom,
                const UInt64& sizeMin,
-               const UInt64& sizeMax);
+               const UInt64& sizeMax,
+               bool matchesFolder);
 
     Int64  timeFrom_; //unit: UTC, seconds
     UInt64 sizeMin_; //unit: bytes
     UInt64 sizeMax_; //unit: bytes
+    bool matchesFolder_;
 };
 }
 
@@ -75,7 +75,10 @@ namespace zen
 inline
 SoftFilter::SoftFilter(size_t timeSpan, UnitTime unitTimeSpan,
                        size_t sizeMin,  UnitSize unitSizeMin,
-                       size_t sizeMax,  UnitSize unitSizeMax)
+                       size_t sizeMax,  UnitSize unitSizeMax) :
+    matchesFolder_(unitTimeSpan == UTIME_NONE &&
+                   unitSizeMin  == USIZE_NONE &&
+                   unitSizeMax  == USIZE_NONE) //exclude folders if size or date filter is active: avoids creating empty folders if not needed!
 {
     resolveUnits(timeSpan, unitTimeSpan,
                  sizeMin, unitSizeMin,
@@ -88,17 +91,20 @@ SoftFilter::SoftFilter(size_t timeSpan, UnitTime unitTimeSpan,
 inline
 SoftFilter::SoftFilter(const Int64& timeFrom,
                        const UInt64& sizeMin,
-                       const UInt64& sizeMax) :
+                       const UInt64& sizeMax,
+                       bool matchesFolder) :
     timeFrom_(timeFrom),
     sizeMin_ (sizeMin),
-    sizeMax_ (sizeMax)  {}
+    sizeMax_ (sizeMax),
+    matchesFolder_(matchesFolder) {}
 
 inline
-SoftFilter combineFilters(const SoftFilter& first, const SoftFilter& second)
+SoftFilter combineFilters(const SoftFilter& lhs, const SoftFilter& rhs)
 {
-    return SoftFilter(std::max(first.timeFrom_, second.timeFrom_),
-                      std::max(first.sizeMin_,  second.sizeMin_),
-                      std::min(first.sizeMax_,  second.sizeMax_));
+    return SoftFilter(std::max(lhs.timeFrom_, rhs.timeFrom_),
+                      std::max(lhs.sizeMin_,  rhs.sizeMin_),
+                      std::min(lhs.sizeMax_,  rhs.sizeMax_),
+                      lhs.matchesFolder_ && rhs.matchesFolder_);
 }
 
 inline
@@ -106,7 +112,8 @@ bool SoftFilter::isNull() const //filter is equivalent to NullFilter, but may be
 {
     return timeFrom_ == std::numeric_limits<Int64>::min() &&
            sizeMin_  == 0U &&
-           sizeMax_  == std::numeric_limits<UInt64>::max();
+           sizeMax_  == std::numeric_limits<UInt64>::max() &&
+           matchesFolder_ == true;;
 }
 }
 

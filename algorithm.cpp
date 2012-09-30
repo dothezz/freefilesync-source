@@ -1,23 +1,22 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "algorithm.h"
 #include <set>
-//#include <iterator>
 #include <stdexcept>
 #include <tuple>
-#include "lib/resources.h"
 #include <zen/file_handling.h>
 #include <zen/recycler.h>
-#include <wx/msgdlg.h>
+#include <zen/stl_tools.h>
+#include <zen/scope_guard.h>
+//#include <wx/msgdlg.h>
+#include "lib/resources.h"
 #include "lib/norm_filter.h"
 #include "lib/db_file.h"
-#include <zen/scope_guard.h>
 #include "lib/cmp_filetime.h"
-#include <zen/stl_tools.h>
 #include "lib/norm_filter.h"
 
 using namespace zen;
@@ -682,7 +681,7 @@ void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderCompa
     std::vector<DirectionConfig> directCfgs = extractDirectionCfg(mainCfg);
 
     if (folderCmp.size() != directCfgs.size())
-        throw std::logic_error("Programming Error: Contract violation!");
+        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     for (auto iter = folderCmp.begin(); iter != folderCmp.end(); ++iter)
     {
@@ -1015,7 +1014,7 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
     if (folderCmp.empty())
         return;
     else if (folderCmp.size() != mainCfg.additionalPairs.size() + 1)
-        throw std::logic_error("Programming Error: Contract violation!");
+        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     //merge first and additional pairs
     std::vector<FolderPairEnh> allPairs;
@@ -1105,13 +1104,12 @@ void zen::applyTimeSpanFilter(FolderComparison& folderCmp, const Int64& timeFrom
 
 
 //############################################################################################################
-std::pair<wxString, int> zen::deleteFromGridAndHDPreview(const std::vector<FileSystemObject*>& selectionLeft,
-                                                         const std::vector<FileSystemObject*>& selectionRight,
-                                                         bool deleteOnBothSides)
+std::pair<Zstring, int> zen::deleteFromGridAndHDPreview(const std::vector<FileSystemObject*>& selectionLeft,
+                                                        const std::vector<FileSystemObject*>& selectionRight,
+                                                        bool deleteOnBothSides)
 {
-    typedef Zbase<wchar_t> zxString; //fast replacement for wxString modelling exponential growth
-
-    zxString filesToDelete;
+    //don't use wxString here, it's linear allocation strategy would bring perf down to a crawl; Zstring: exponential growth!
+    Zstring fileList;
     int totalDelCount = 0;
 
     if (deleteOnBothSides)
@@ -1129,17 +1127,17 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview(const std::vector<FileS
         {
             if (!fsObj->isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += utfCvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + L'\n';
+                fileList += fsObj->getFullName<LEFT_SIDE>() + Zstr('\n');
                 ++totalDelCount;
             }
 
             if (!fsObj->isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += utfCvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + L'\n';
+                fileList += fsObj->getFullName<RIGHT_SIDE>() + Zstr('\n');
                 ++totalDelCount;
             }
 
-            filesToDelete += L'\n';
+            fileList += Zstr('\n');
         });
     }
     else //delete selected files only
@@ -1149,7 +1147,7 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview(const std::vector<FileS
         {
             if (!fsObj->isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += utfCvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + L'\n';
+                fileList += fsObj->getFullName<LEFT_SIDE>() + Zstr('\n');
                 ++totalDelCount;
             }
         });
@@ -1159,13 +1157,13 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview(const std::vector<FileS
         {
             if (!fsObj->isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += utfCvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + L'\n';
+                fileList += fsObj->getFullName<RIGHT_SIDE>() + Zstr('\n');
                 ++totalDelCount;
             }
         });
     }
 
-    return std::make_pair(copyStringTo<wxString>(filesToDelete), totalDelCount);
+    return std::make_pair(fileList, totalDelCount);
 }
 
 
@@ -1318,7 +1316,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     if (folderCmp.empty())
         return;
     else if (folderCmp.size() != directCfgs.size())
-        throw std::logic_error("Programming Error: Contract violation!");
+        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     //build up mapping from base directory to corresponding direction config
     hash_map<const BaseDirMapping*, DirectionConfig> baseDirCfgs;

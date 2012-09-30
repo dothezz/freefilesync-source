@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "dir_name.h"
@@ -26,7 +26,8 @@
 using namespace zen;
 
 
-const wxEventType zen::EVENT_ON_DIR_SELECTED = wxNewEventType();
+const wxEventType zen::EVENT_ON_DIR_SELECTED          = wxNewEventType();
+const wxEventType zen::EVENT_ON_DIR_MANUAL_CORRECTION = wxNewEventType();
 
 namespace
 {
@@ -150,10 +151,10 @@ void DirectoryName<NameControl>::OnFilesDropped(FileDropEvent& event)
 template <class NameControl>
 void DirectoryName<NameControl>::OnWriteDirManually(wxCommandEvent& event)
 {
-    setDirectoryName(event.GetString(), static_cast<NameControl*>(nullptr), dirName_, staticText_); //potentially slow network access: wait 100 ms at most
+    setDirectoryName(event.GetString(), static_cast<NameControl*>(nullptr), dirName_, staticText_);
 
-    //wxCommandEvent dummy(EVENT_ON_DIR_SELECTED); -> don't annoy the user!
-    //ProcessEvent(dummy);
+    wxCommandEvent dummy(EVENT_ON_DIR_MANUAL_CORRECTION);
+    ProcessEvent(dummy);
     event.Skip();
 }
 
@@ -208,7 +209,7 @@ void DirectoryName<NameControl>::OnSelectDir(wxCommandEvent& event)
 #endif
     if (!newFolder.get())
     {
-        wxDirDialog dirPicker(&selectButton_, _("Select a folder"), defaultDirname); //put modal dialog on stack: creating on freestore leads to memleak!
+        wxDirDialog dirPicker(&selectButton_, _("Select a folder"), defaultDirname); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
         if (dirPicker.ShowModal() != wxID_OK)
             return;
         newFolder = make_unique<wxString>(dirPicker.GetPath());

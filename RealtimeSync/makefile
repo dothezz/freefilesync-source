@@ -42,7 +42,6 @@ CPP_LIST+=../zen/file_io.cpp
 CPP_LIST+=../zen/file_traverser.cpp
 CPP_LIST+=../zen/zstring.cpp
 CPP_LIST+=../wx+/button.cpp
-CPP_LIST+=../wx+/format_unit.cpp
 
 #list of all *.o files
 OBJECT_LIST=$(CPP_LIST:%.cpp=../OBJ/RTS_Release_GCC_Make/RTS/%.o)

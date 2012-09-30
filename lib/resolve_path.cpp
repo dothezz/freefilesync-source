@@ -86,7 +86,7 @@ private:
     {
         auto addCsidl = [&](int csidl, const Zstring& paramName)
         {
-            wchar_t buffer[MAX_PATH];
+            wchar_t buffer[MAX_PATH] = {};
             if (SUCCEEDED(::SHGetFolderPath(nullptr,                        //__in   HWND hwndOwner,
                                             csidl | CSIDL_FLAG_DONT_VERIFY, //__in   int nFolder,
                                             nullptr,				        //__in   HANDLE hToken,
@@ -99,37 +99,55 @@ private:
             }
         };
 
-        addCsidl(CSIDL_DESKTOPDIRECTORY,        L"csidl_Desktop");        // C:\Users\username\Desktop
+        addCsidl(CSIDL_DESKTOPDIRECTORY,        L"csidl_Desktop");       // C:\Users\<user>\Desktop
         addCsidl(CSIDL_COMMON_DESKTOPDIRECTORY, L"csidl_PublicDesktop"); // C:\Users\All Users\Desktop
 
-        addCsidl(CSIDL_MYMUSIC,          L"csidl_MyMusic");         // C:\Users\username\My Documents\My Music
-        addCsidl(CSIDL_COMMON_MUSIC,     L"csidl_PublicMusic");     // C:\Users\All Users\Documents\My Music
+        addCsidl(CSIDL_FAVORITES,        L"csidl_Favorites");       // C:\Users\<user>\Favorites
+        addCsidl(CSIDL_COMMON_FAVORITES, L"csidl_PublicFavorites"); // C:\Users\<user>\Favorites; unused? -> http://blogs.msdn.com/b/oldnewthing/archive/2012/09/04/10346022.aspx
 
-        addCsidl(CSIDL_MYPICTURES,       L"csidl_MyPictures");      // C:\Users\username\My Documents\My Pictures
-        addCsidl(CSIDL_COMMON_PICTURES,  L"csidl_PublicPictures");  // C:\Users\All Users\Documents\My Pictures
+        addCsidl(CSIDL_PERSONAL,         L"csidl_MyDocuments");     // C:\Users\<user>\Documents
+        addCsidl(CSIDL_COMMON_DOCUMENTS, L"csidl_PublicDocuments"); // C:\Users\Public\Documents
 
-        addCsidl(CSIDL_MYVIDEO,          L"csidl_MyVideo");         // C:\Users\username\My Documents\My Videos
-        addCsidl(CSIDL_COMMON_VIDEO,     L"csidl_PublicVideo");     // C:\Users\All Users\Documents\My Videos
+        addCsidl(CSIDL_MYMUSIC,          L"csidl_MyMusic");         // C:\Users\<user>\Music
+        addCsidl(CSIDL_COMMON_MUSIC,     L"csidl_PublicMusic");     // C:\Users\Public\Music
 
-        addCsidl(CSIDL_PERSONAL,         L"csidl_MyDocuments");     // C:\Users\username\My Documents
-        addCsidl(CSIDL_COMMON_DOCUMENTS, L"csidl_PublicDocuments"); // C:\Users\All Users\Documents
+        addCsidl(CSIDL_MYPICTURES,       L"csidl_MyPictures");      // C:\Users\<user>\Pictures
+        addCsidl(CSIDL_COMMON_PICTURES,  L"csidl_PublicPictures");  // C:\Users\Public\Pictures
 
-        addCsidl(CSIDL_STARTMENU,        L"csidl_StartMenu");       // C:\Users\username\Start Menu
-        addCsidl(CSIDL_COMMON_STARTMENU, L"csidl_PublicStartMenu"); // C:\Users\All Users\Start Menu
+        addCsidl(CSIDL_MYVIDEO,          L"csidl_MyVideos");        // C:\Users\<user>\Videos
+        addCsidl(CSIDL_COMMON_VIDEO,     L"csidl_PublicVideos");    // C:\Users\Public\Videos
 
-        addCsidl(CSIDL_FAVORITES,        L"csidl_Favorites");       // C:\Users\username\Favorites
-        addCsidl(CSIDL_COMMON_FAVORITES, L"csidl_PublicFavorites"); // C:\Users\All Users\Favoriten
+        addCsidl(CSIDL_NETHOOD,          L"csidl_Nethood");         // C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Network Shortcuts
 
-        addCsidl(CSIDL_TEMPLATES,        L"csidl_Templates");       // C:\Users\username\Templates
-        addCsidl(CSIDL_COMMON_TEMPLATES, L"csidl_PublicTemplates"); // C:\Users\All Users\Templates
+        addCsidl(CSIDL_PROGRAMS,         L"csidl_Programs");        // C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs
+        addCsidl(CSIDL_COMMON_PROGRAMS,  L"csidl_PublicPrograms");  // C:\ProgramData\Microsoft\Windows\Start Menu\Programs
 
         addCsidl(CSIDL_RESOURCES,        L"csidl_Resources");       // C:\Windows\Resources
 
-        //CSIDL_APPDATA        covered by %AppData%
-        //CSIDL_LOCAL_APPDATA  covered by %LocalAppData%
-        //CSIDL_COMMON_APPDATA covered by %ProgramData%
+        addCsidl(CSIDL_STARTMENU,        L"csidl_StartMenu");       // C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Start Menu
+        addCsidl(CSIDL_COMMON_STARTMENU, L"csidl_PublicStartMenu"); // C:\ProgramData\Microsoft\Windows\Start Menu
 
-        //CSIDL_PROFILE covered by %UserProfile%
+        addCsidl(CSIDL_STARTUP,          L"csidl_Startup");         // C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\StartUp
+        addCsidl(CSIDL_COMMON_STARTUP,   L"csidl_PublicStartup");   // C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp
+
+        addCsidl(CSIDL_TEMPLATES,        L"csidl_Templates");       // C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Templates
+        addCsidl(CSIDL_COMMON_TEMPLATES, L"csidl_PublicTemplates"); // C:\ProgramData\Microsoft\Windows\Templates
+
+        /*
+        CSIDL_APPDATA				covered by %AppData%
+        CSIDL_LOCAL_APPDATA			covered by %LocalAppData% -> not on XP!
+        CSIDL_COMMON_APPDATA		covered by %ProgramData%  -> not on XP!
+        CSIDL_PROFILE				covered by %UserProfile%
+        CSIDL_WINDOWS				covered by %WinDir%
+        CSIDL_SYSTEM				covered by %WinDir%
+        CSIDL_SYSTEMX86				covered by %WinDir%
+        CSIDL_PROGRAM_FILES			covered by %ProgramFiles%
+        CSIDL_PROGRAM_FILES_COMMON	covered by %CommonProgramFiles%
+        CSIDL_PROGRAM_FILESX86			covered by %ProgramFiles(x86)%       -> not on XP!
+        CSIDL_PROGRAM_FILES_COMMONX86	covered by %CommonProgramFiles(x86)% -> not on XP!
+        CSIDL_ADMINTOOLS			not relevant?
+        CSIDL_COMMON_ADMINTOOLS		not relevant?
+        */
     }
 
     CsidlConstants(const CsidlConstants&);
@@ -193,12 +211,12 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
     if (processPhrase(Zstr("min"    ), Zstr("%M"))) return cand;
     if (processPhrase(Zstr("sec"    ), Zstr("%S"))) return cand;
 
-	//check domain-specific extensions
-	{
-		auto iter = std::find_if(ext.begin(), ext.end(), [&](const std::pair<Zstring, Zstring>& p){ return equalNoCase(macro, p.first); });
+    //check domain-specific extensions
+    {
+        auto iter = std::find_if(ext.begin(), ext.end(), [&](const std::pair<Zstring, Zstring>& p) { return equalNoCase(macro, p.first); });
         if (iter != ext.end())
             return make_unique<Zstring>(iter->second);
-	}
+    }
 
     //try to resolve as environment variable
     if (std::unique_ptr<Zstring> value = getEnvironmentVar(macro))
@@ -446,6 +464,8 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         addEnvVar(L"ProgramData");      // C:\ProgramData
         addEnvVar(L"ProgramFiles");     // C:\Program Files
         addEnvVar(L"ProgramFiles(x86)");// C:\Program Files (x86)
+        addEnvVar(L"CommonProgramFiles");      // C:\Program Files\Common Files
+        addEnvVar(L"CommonProgramFiles(x86)"); // C:\Program Files (x86)\Common Files
         addEnvVar(L"Public");           // C:\Users\Public
         addEnvVar(L"UserProfile");      // C:\Users\username
         addEnvVar(L"WinDir");           // C:\Windows

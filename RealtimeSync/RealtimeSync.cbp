@@ -116,7 +116,6 @@
 		<Unit filename="..\ui\folder_history_box.cpp" />
 		<Unit filename="..\ui\folder_history_box.h" />
 		<Unit filename="..\wx+\button.cpp" />
-		<Unit filename="..\wx+\format_unit.cpp" />
 		<Unit filename="..\wx+\mouse_move_dlg.cpp" />
 		<Unit filename="..\wx+\pch.h">
 			<Option compile="1" />

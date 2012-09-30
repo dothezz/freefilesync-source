@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "file_handling.h"
@@ -13,15 +13,15 @@
 #include "symlink_target.h"
 #include "file_io.h"
 #include "assert_static.h"
-#include <boost/thread/tss.hpp>
 #include "file_id_def.h"
+#include <boost/thread/tss.hpp>
 
 #ifdef FFS_WIN
+#include <Aclapi.h>
 #include "privilege.h"
 #include "dll.h"
 #include "win.h" //includes "windows.h"
 #include "long_path_prefix.h"
-#include <Aclapi.h>
 #include "dst_hack.h"
 #include "win_ver.h"
 #include "IFileOperation/file_op.h"
@@ -269,8 +269,8 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
 
     return volumeSerial;
 }
-#elif defined FFS_LINUX
 
+#elif defined FFS_LINUX
 dev_t retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
 {
     Zstring volumePathName = pathName;
@@ -655,6 +655,10 @@ void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
     if (::rmdir(directory.c_str()) != 0)
 #endif
         throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
+    //may spuriously fail with ERROR_DIR_NOT_EMPTY(145) even though all child items have
+    //successfully been *marked* for deletion, but some application still has a handle open!
+    //e.g. Open "C:\Test\Dir1\Dir2" (filled with lots of files) in Explorer, then delete "C:\Test\Dir1" via ::RemoveDirectory() => Error 145
+    //Sample code: http://us.generation-nt.com/answer/createfile-directory-handles-removing-parent-help-29126332.html
 
     if (callback)
         callback->notifyDirDeletion(directory); //and once per folder
@@ -834,8 +838,56 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
             }
         }
 
+        std::wstring errorMsg = replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastErr);
+
+        //add more meaningful message: FAT accepts only a subset of the NTFS date range
+        if (lastErr == ERROR_INVALID_PARAMETER &&
+            dst::isFatDrive(filename))
+        {
+            //we need a low-level reliable routine to format a potentially invalid date => don't use strftime!!!
+            auto fmtDate = [](const FILETIME& ft) -> Zstring
+            {
+                SYSTEMTIME st = {};
+                if (!::FileTimeToSystemTime(&ft,  //__in   const FILETIME *lpFileTime,
+                                            &st)) //__out  LPSYSTEMTIME lpSystemTime
+                    return Zstring();
+
+                Zstring dateTime;
+                {
+                    const int bufferSize = ::GetDateFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, nullptr, 0);
+                    if (bufferSize > 0)
+                    {
+                        std::vector<wchar_t> buffer(bufferSize);
+                        if (::GetDateFormat(LOCALE_USER_DEFAULT, //_In_       LCID Locale,
+                        0,                   //_In_       DWORD dwFlags,
+                        &st,				  //_In_opt_   const SYSTEMTIME *lpDate,
+                        nullptr,			  //_In_opt_   LPCTSTR lpFormat,
+                        &buffer[0],		  //_Out_opt_  LPTSTR lpDateStr,
+                        bufferSize) > 0)		  //_In_       int cchDate
+                            dateTime = &buffer[0]; //GetDateFormat() returns char count *including* 0-termination!
+                    }
+                }
+
+                const int bufferSize = ::GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, nullptr, 0);
+                if (bufferSize > 0)
+                {
+                    std::vector<wchar_t> buffer(bufferSize);
+                    if (::GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, &buffer[0], bufferSize) > 0)
+                    {
+                        dateTime += L" ";
+                        dateTime += &buffer[0]; //GetDateFormat() returns char count *including* 0-termination!
+                    }
+                }
+                return dateTime;
+            };
+
+            errorMsg += std::wstring(L"\nA FAT volume can only store dates between 1980 and 2107:\n") +
+                        L"\twrite (UTC): \t" + fmtDate(lastWriteTime) +
+                        (!isNullTime(creationTime) ? L"\n\tcreate (UTC): \t" + fmtDate(creationTime) : L"");
+        }
+
         if (lastErr != ERROR_SUCCESS)
-            throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastErr));
+            throw FileError(errorMsg);
     }
 
 #ifndef NDEBUG //dst hack: verify data written
@@ -1926,7 +1978,7 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
             ::MessageBox(nullptr, L"You've just discovered a bug in WIN32 API function \"CopyFileEx\"! \n\n\
             Please write a mail to the author of FreeFileSync at zenju@gmx.de and simply state that\n\
             \"totalBytesTransferred.HighPart can be below zero\"!\n\n\
-            This will then be handled in future versions of FreeFileSync.\n\nThanks -ZenJu",
+            This will then be handled in future versions of FreeFileSync.\n\nThanks -Zenju",
                          nullptr, 0);
         try
         {
@@ -1971,7 +2023,9 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
 
     //if (supportUnbufferedCopy) //see http://blogs.technet.com/b/askperf/archive/2007/05/08/slow-large-file-copy-issues.aspx
     //  copyFlags |= COPY_FILE_NO_BUFFERING; //no perf difference at worst, huge improvement for large files (20% in test NTFS -> NTFS)
-    //It's a shame this flag causes file corruption! https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3529683&group_id=234430
+    //It's a shame this flag causes file corruption! https://sourceforge.net/projects/freefilesync/forums/forum/847542/topic/5177950
+    //documentation on CopyFile2() even states: "It is not recommended to pause copies that are using this flag." How dangerous is this thing, why offer it at all???
+    //perf advantage: ~15% faster
 
     CallbackData cbd(callback, sourceFile, targetFile);
 
@@ -2043,12 +2097,12 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
         //DST hack
         const Int64 modTime = getFileTime(sourceFile, SYMLINK_FOLLOW); //throw FileError
         setFileTime(targetFile, modTime, SYMLINK_FOLLOW); //throw FileError
+        //caveat: - ::CopyFileEx() silently *ignores* failure to set modification time!!! => we need to set again in order to catch such errors!
+        //	      - this sequence leads to a loss of precision of up to 1 sec!
+        //	      - perf-loss on USB sticks with many small files of about 30%! damn!
 
         if (newAttrib)
             newAttrib->modificationTime = modTime;
-
-        //note: this sequence leads to a loss of precision of up to 1 sec!
-        //perf-loss on USB sticks with many small files of about 30%! damn!
     }
 
     guardTarget.dismiss(); //target has been created successfully!

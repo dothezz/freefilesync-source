@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "binary.h"
@@ -14,6 +14,8 @@
 using namespace zen;
 
 
+namespace
+{
 inline
 void setMinSize(std::vector<char>& buffer, size_t minSize)
 {
@@ -21,9 +23,6 @@ void setMinSize(std::vector<char>& buffer, size_t minSize)
         buffer.resize(minSize);
 }
 
-
-namespace
-{
 class BufferSize
 {
 public:

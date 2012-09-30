@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20120511;23110400">
+	<META NAME="CHANGED" CONTENT="20120907;12344300">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -55,16 +55,18 @@ variables: </B><SPAN STYLE="font-weight: normal">(Windows)</SPAN></FONT></P>
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">%AllUsersProfile%&nbsp;&nbsp;&nbsp;</FONT>e.
 	g. <FONT FACE="Courier New, monospace">C:\ProgramData<BR>%AppData%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Users\username\AppData\Roaming<BR>%LocalAppData%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Users\username\AppData\Local<BR>%ProgramData%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\AppData\Roaming<BR>%ComputerName%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">Zenju-PC<BR>%LocalAppData%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\AppData\Local<BR>%ProgramData%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
 	g. <FONT FACE="Courier New, monospace">C:\ProgramData<BR>%ProgramFiles%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
 	g. <FONT FACE="Courier New, monospace">C:\Program
 	Files<BR>%ProgramFiles(x86)%&nbsp;</FONT>e. g. <FONT FACE="Courier New, monospace">C:\Program
 	Files (x86)<BR>%Public%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Users\Public<BR>%UserProfile%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Users\username<BR>%WinDir%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Windows<BR>%Temp%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Windows\Temp</FONT></FONT></P>
+	g. <FONT FACE="Courier New, monospace">C:\Users\Public<BR>%Temp%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Windows\Temp<BR>%UserName%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">Zenju<BR>%UserProfile%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;<BR>%WinDir%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Windows</FONT></FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -74,22 +76,24 @@ folder locations </B><SPAN STYLE="font-weight: normal">(Windows)</SPAN></FONT></
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen6" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">%csidl_Desktop%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Users\username\Desktop<BR>%csidl_MyMusic%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Users\username\My
-	Documents\My Music<BR>%csidl_Pictures%&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Users\username\My
-	Documents\My Pictures<BR>%csidl_MyVideo%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Users\username\My
-	Documents\My Videos<BR>%csidl_MyDocuments%&nbsp;</FONT>e. g.
-	<FONT FACE="Courier New, monospace">C:\Users\username\My
-	Documents<BR>%csidl_StartMenu%&nbsp;&nbsp;&nbsp;</FONT>e. g.
-	<FONT FACE="Courier New, monospace">C:\Users\username\Start
-	Menu<BR>%csidl_Favorites%&nbsp;&nbsp;&nbsp;</FONT>e. g.
-	<FONT FACE="Courier New, monospace">C:\Users\username\Favorites<BR>%csidl_Templates%&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Users\username\Templates<BR>%csidl_Resources%&nbsp;&nbsp;&nbsp;</FONT>e.
-	g. <FONT FACE="Courier New, monospace">C:\Windows\Resources</FONT></FONT></P>
-</SPAN><BR CLEAR=LEFT>Note: Each macro listed here also has a variant
-to address public folders. E.g. <FONT FACE="Courier New, monospace">csidl_MyMusic</FONT>
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\Desktop<BR>%csidl_Favorites%&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\Favorites<BR>%csidl_MyDocuments%&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\Documents<BR>%csidl_MyMusic%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\Music<BR>%csidl_MyPictures%&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\Pictures<BR>%csidl_MyVideos%&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\Videos<BR>%csidl_Nethood%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\AppData\Roaming\Microsoft\Windows\Network
+	Shortcuts<BR>%csidl_Programs%&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e. g.
+	<FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\AppData\Roaming\Microsoft\Windows\Start
+	Menu\Programs<BR>%csidl_Resources%&nbsp;&nbsp;&nbsp;</FONT>e. g.
+	<FONT FACE="Courier New, monospace">C:\Windows\Resources<BR>%csidl_StartMenu%&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\AppData\Roaming\Microsoft\Windows\Start
+	Menu<BR>%csidl_Startup%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>e. g.
+	<FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\AppData\Roaming\Microsoft\Windows\Start
+	Menu\Programs\StartUp<BR>%csidl_Templates%&nbsp;&nbsp;&nbsp;</FONT>e.
+	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\AppData\Roaming\Microsoft\Windows\Templates</FONT></FONT></P>
+</SPAN><BR CLEAR=LEFT>Note: Most macros listed here also have a
+variant for public folders. E.g. <FONT FACE="Courier New, monospace">csidl_MyMusic</FONT>
 &rarr; <FONT FACE="Courier New, monospace">csidl_PublicMusic</FONT> 
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -98,10 +102,10 @@ to address public folders. E.g. <FONT FACE="Courier New, monospace">csidl_MyMusi
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 	<UL>
 		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">C:\Backup\%username%_Config&nbsp;</FONT>expands
-		to<FONT FACE="Courier New, monospace"><BR>C:\Backup\ZenJu_Config</FONT></FONT></P>
+		to<FONT FACE="Courier New, monospace"><BR>C:\Backup\Zenju_Config</FONT></FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">%appdata%\FreeFileSync&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>expands
 		to<FONT FACE="Courier New, monospace"><BR>C:\Documents and
-		Settings\ZenJu\Application Data\FreeFileSync</FONT></FONT></P>
+		Settings\Zenju\Application Data\FreeFileSync</FONT></FONT></P>
 	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
@@ -109,25 +113,24 @@ to address public folders. E.g. <FONT FACE="Courier New, monospace">csidl_MyMusi
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Hint:</B></FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">You can
-add a great amount of flexibility to Batch Synchronization
+add a great amount of flexibility to batch synchronization
 (*.ffs_batch) by creating new temporary environment variables in a
 *.bat/*.cmd file that are evaluated by FreeFileSync at runtime!</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
-batch configuration file <FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch
+FreeFileSync batch file <FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch
 </FONT>contains macro <FONT FACE="Courier New, monospace">%MyVar%
-</FONT>instead of an absolute target directory and is invoked by a
-*.cmd file:</FONT></P>
+</FONT>instead of an absolute target folder and is invoked by a *.cmd
+file:</FONT></P>
 <P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">set
-	MyVar=C:\Target<BR>cd &quot;C:\Program
-	files\FreeFileSync&quot;<BR>FreeFileSync.exe C:\SyncJob.ffs_batch
-	</FONT>(-&gt;<FONT FACE="Courier New, monospace">%MyVar% </FONT>is
-	replaced by <FONT FACE="Courier New, monospace">C:\Target </FONT>during
-	execution)</FONT></P>
+	MyVar=C:\Target<BR>&quot;C:\Program
+	files\FreeFileSync\FreeFileSync.exe&quot;
+	C:\SyncJob.ffs_batch<BR></FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::%MyVar%
+	is resolved as C:\Target during synchronization</B></I></FONT></FONT></FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>

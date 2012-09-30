@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef CUSTOMCOMBOBOX_H_INCLUDED
@@ -35,7 +35,7 @@ public:
 
     void addItem(const Zstring& dirname)
     {
-		if (dirname.empty() || dirname == zen::utfCvrtTo<Zstring>(separationLine()))
+        if (dirname.empty() || dirname == zen::utfCvrtTo<Zstring>(separationLine()))
             return;
 
         Zstring nameTmp = dirname;
@@ -89,7 +89,7 @@ private:
     void OnKeyEvent(wxKeyEvent& event);
     void OnMouseWheel(wxMouseEvent& event);
     void OnSelection(wxCommandEvent& event);
-	void OnValidateSelection(wxCommandEvent& event);
+    void OnValidateSelection(wxCommandEvent& event);
     void OnUpdateList(wxEvent& event) { setValueAndUpdateList(GetValue()); event.Skip(); }
 
     void setValueAndUpdateList(const wxString& dirname);

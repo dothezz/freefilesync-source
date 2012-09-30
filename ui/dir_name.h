@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef DRAGANDDROP_H_INCLUDED
@@ -20,13 +20,13 @@ namespace zen
 /*
 Reasons NOT to use wxDirPickerCtrl, but wxButton instead:
 	- Crash on GTK 2: http://favapps.wordpress.com/2012/06/11/freefilesync-crash-in-linux-when-syncing-solved/
+	- still uses outdated ::SHBrowseForFolder() (even on Windows 7)
 	- selection dialog remembers size, but NOT position => if user enlarges window, the next time he opens the dialog it may leap out of visible screen
-	- still uses outdated ::SHBrowseForFolder() (Windows 7)
 	- hard-codes "Browse" button label
 */
 
-//emit event when directory is changed by the user:
-extern const wxEventType EVENT_ON_DIR_SELECTED;
+extern const wxEventType EVENT_ON_DIR_SELECTED;			 //directory is changed by the user (except manual type-in)
+extern const wxEventType EVENT_ON_DIR_MANUAL_CORRECTION; //manual type-in
 //example: wnd.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MyDlg::OnDirSelected), nullptr, this);
 
 template <class NameControl>  //NameControl may be wxTextCtrl, FolderHistoryBox
@@ -47,9 +47,9 @@ public:
 private:
     virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) { return true; }; //return true if drop should be processed
 
-    void OnFilesDropped(FileDropEvent& event);
+    void OnFilesDropped    (FileDropEvent& event);
     void OnWriteDirManually(wxCommandEvent& event);
-    void OnSelectDir(wxCommandEvent& event);
+    void OnSelectDir       (wxCommandEvent& event);
 
     wxWindow&     dropWindow_;
     wxWindow*     dropWindow2_;

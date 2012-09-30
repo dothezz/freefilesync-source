@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "comparison.h"
@@ -10,7 +10,7 @@
 #include <zen/perf.h>
 #include <zen/scope_guard.h>
 #include <zen/process_priority.h>
-#include <wx+/format_unit.h>
+#include <zen/format_unit.h>
 #include "algorithm.h"
 #include "lib/parallel_scan.h"
 #include "lib/resolve_path.h"
@@ -365,7 +365,7 @@ void zen::compare(size_t fileTimeTolerance,
             callback.reportStatus(_("Preparing synchronization..."));
             callback.forceUiRefresh();
             zen::redetermineSyncDirection(fpCfg.directionCfg, *j,
-            [&](const std::wstring& warning) { callback.reportWarning(warning, warnings.warningSyncDatabase); });
+            [&](const std::wstring& warning) { callback.reportWarning(warning, warnings.warningDatabaseError); });
         }
 
         //only if everything was processed correctly output is written to!

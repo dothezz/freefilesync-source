@@ -1,33 +1,30 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "localization.h"
-#include <fstream>
+//#include <fstream>
 #include <map>
 #include <list>
 #include <iterator>
-//#include <wx/ffile.h>
-#include <wx/intl.h>
-#include <wx/msgdlg.h>
-#include "parse_plural.h"
-#include "parse_lng.h"
-#include <wx+/format_unit.h>
 #include <zen/string_tools.h>
 #include <zen/file_traverser.h>
-#include "ffs_paths.h"
 #include <zenxml/io.h>
 #include <zen/i18n.h>
+#include <zen/format_unit.h>
+#include <wx/intl.h>
+//#include <wx/msgdlg.h>
+#include "parse_plural.h"
+#include "parse_lng.h"
+#include "ffs_paths.h"
 
 using namespace zen;
 
 
 namespace
 {
-//global objects
-
 class FFSLocale : public TranslationHandler
 {
 public:
@@ -66,7 +63,6 @@ private:
     std::unique_ptr<PluralForm> pluralParser;
     wxLanguage langId_;
 };
-
 
 
 FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(languageId) //throw lngfile::ParsingError, PluralForm::ParsingError
@@ -109,7 +105,7 @@ FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(
         transMappingPl.insert(std::make_pair(std::make_pair(singular, plural), plFormsWide));
     }
 
-    pluralParser.reset(new PluralForm(copyStringTo<Wstring>(header.pluralDefinition))); //throw PluralForm::ParsingError
+    pluralParser.reset(new PluralForm(header.pluralDefinition)); //throw PluralForm::ParsingError
 }
 }
 
@@ -165,7 +161,7 @@ ExistingTranslations::ExistingTranslations()
         newEntry.languageID     = wxLANGUAGE_ENGLISH_US;
         newEntry.languageName   = L"English (US)";
         newEntry.languageFile   = L"";
-        newEntry.translatorName = L"ZenJu";
+        newEntry.translatorName = L"Zenju";
         newEntry.languageFlag   = L"usa.png";
         locMapping.push_back(newEntry);
     }
@@ -339,33 +335,45 @@ wxLanguage mapLanguageDialect(wxLanguage language)
             return language;
     }
 }
-}
 
 
-class CustomLocale
+//global wxWidgets localization: sets up C localization runtime as well!
+class wxWidgetsLocale
 {
 public:
-    CustomLocale(int selectedLng)
+    static void init(wxLanguage lng)
     {
+        locale.reset(); //avoid global locale lifetime overlap! wxWidgets cannot handle this and will crash!
+        locale.reset(new wxLocale);
+
         const wxLanguageInfo* sysLngInfo = wxLocale::GetLanguageInfo(wxLocale::GetSystemLanguage());
-        const wxLanguageInfo* selLngInfo = wxLocale::GetLanguageInfo(selectedLng);
+        const wxLanguageInfo* selLngInfo = wxLocale::GetLanguageInfo(lng);
 
         const bool sysLangIsRTL      = sysLngInfo ? sysLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
         const bool selectedLangIsRTL = selLngInfo ? selLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
 
         if (sysLangIsRTL == selectedLangIsRTL)
-            loc.Init(wxLANGUAGE_DEFAULT); //use sys-lang to preserve sub-language specific rules (e.g. german swiss number punctation)
+            locale->Init(wxLANGUAGE_DEFAULT); //use sys-lang to preserve sub-language specific rules (e.g. german swiss number punctation)
         else
-            loc.Init(selectedLng);
+            locale->Init(lng); //have to use the supplied language to enable RTL layout different than user settings
+        locLng = lng;
     }
+
+    static wxLanguage getLanguage() { return locLng; }
+
 private:
-    wxLocale loc; //required for RTL language support (and nothing else)
+    static std::unique_ptr<wxLocale> locale;
+    static wxLanguage locLng;
 };
+std::unique_ptr<wxLocale> wxWidgetsLocale::locale;
+wxLanguage wxWidgetsLocale::locLng = wxLANGUAGE_UNKNOWN;
+}
 
 
-void zen::setLanguage(int language)
+void zen::setLanguage(int language) //throw FileError
 {
-    if (language == getLanguage()) return; //support polling
+    if (language == getLanguage() && wxWidgetsLocale::getLanguage() == language)
+        return; //support polling
 
     //(try to) retrieve language file
     wxString languageFile;
@@ -377,31 +385,28 @@ void zen::setLanguage(int language)
             break;
         }
 
-    //handle RTL swapping: we need wxWidgets to do this
-    static std::unique_ptr<CustomLocale> dummy;
-    dummy.reset(); //avoid global locale lifetime overlap! wxWidgets cannot handle this and will crash!
-    dummy.reset(new CustomLocale(languageFile.empty() ? wxLANGUAGE_ENGLISH : language));
-
-    //reset to english language; in case of error show error message just once
-    zen::setTranslator();
-
     //load language file into buffer
-    if (!languageFile.empty()) //if languageFile is empty texts will be english per default
+    if (languageFile.empty()) //if languageFile is empty, texts will be english by default
+        zen::setTranslator();
+    else
         try
         {
             zen::setTranslator(new FFSLocale(languageFile, static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, PluralForm::ParsingError
         }
         catch (lngfile::ParsingError& e)
         {
-            wxMessageBox(replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
-                                                          L"%x", fmtFileName(toZ(languageFile))),
-                                               L"%y", numberTo<std::wstring>(e.row)),
-                                    L"%z", numberTo<std::wstring>(e.col)), _("Error"), wxOK | wxICON_ERROR);
+            throw FileError(replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
+                                                             L"%x", fmtFileName(toZ(languageFile))),
+                                                  L"%y", numberTo<std::wstring>(e.row)),
+                                       L"%z", numberTo<std::wstring>(e.col)));
         }
         catch (PluralForm::ParsingError&)
         {
-            wxMessageBox(L"Invalid Plural Form", _("Error"), wxOK | wxICON_ERROR);
+            throw FileError(L"Invalid Plural Form");
         }
+
+    //handle RTL swapping: we need wxWidgets to do this
+    wxWidgetsLocale::init(languageFile.empty() ? wxLANGUAGE_ENGLISH : static_cast<wxLanguage>(language));
 }
 
 

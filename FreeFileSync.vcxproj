@@ -266,7 +266,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="wx+\format_unit.cpp" />
     <ClCompile Include="wx+\graph.cpp" />
     <ClCompile Include="wx+\grid.cpp" />
     <ClCompile Include="wx+\mouse_move_dlg.cpp" />
@@ -278,6 +277,7 @@
     <ClCompile Include="zen\file_id.cpp" />
     <ClCompile Include="zen\file_io.cpp" />
     <ClCompile Include="zen\file_traverser.cpp" />
+    <ClCompile Include="zen\format_unit.cpp" />
     <ClCompile Include="zen\privilege.cpp" />
     <ClCompile Include="zen\recycler.cpp" />
     <ClCompile Include="zen\zstring.cpp" />

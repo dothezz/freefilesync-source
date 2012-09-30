@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef ALGORITHM_H_INCLUDED
@@ -36,7 +36,7 @@ void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or
 
 
 //manual deletion of files on main grid
-std::pair<wxString, int> deleteFromGridAndHDPreview(      //returns wxString with elements to be deleted and total count of selected(!) objects, NOT total files/dirs!
+std::pair<Zstring, int> deleteFromGridAndHDPreview(      //returns wxString with elements to be deleted and total count of selected(!) objects, NOT total files/dirs!
     const std::vector<FileSystemObject*>& selectionLeft,  //all pointers need to be bound!
     const std::vector<FileSystemObject*>& selectionRight, //
     bool deleteOnBothSides);

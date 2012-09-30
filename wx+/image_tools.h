@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef IMAGE_TOOLS_HEADER_45782456427634254
@@ -121,7 +121,10 @@ wxBitmap layOver(const wxBitmap& foreground, const wxBitmap& background)
     {
         wxMemoryDC dc;
         dc.SelectObject(output);
-        dc.DrawBitmap(foreground, 0, 0, true);
+
+        const int offsetX = (background.GetWidth () - foreground.GetWidth ()) / 2;
+        const int offsetY = (background.GetHeight() - foreground.GetHeight()) / 2;
+        dc.DrawBitmap(foreground, offsetX, offsetY, true);
         dc.SelectObject(wxNullBitmap);
     }
     return output;

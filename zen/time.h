@@ -1,8 +1,7 @@
 // **************************************************************************
 // * This file is part of the zenXML project. It is distributed under the   *
-// * Boost Software License, Version 1.0. See accompanying file             *
-// * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef ZEN_TIME_HEADER_845709281432434
@@ -10,7 +9,6 @@
 
 #include <ctime>
 #include "string_tools.h"
-
 
 namespace zen
 {
@@ -168,23 +166,28 @@ struct GetFormat<FormatIsoDateTimeTag> //%Y-%m-%d %H:%M:%S - e.g. 2001-08-23 14:
 //	VS 2010: CRASH unless "_invalid_parameter_handler" is set: http://msdn.microsoft.com/en-us/library/ksazx244.aspx
 //	GCC: returns 0, apparently no crash. Still, considering some clib maintainer's comments, we should expect the worst!
 inline
-size_t strftimeWrap(char* buffer, size_t bufferSize, const char* format, const struct std::tm* timeptr)
+size_t strftimeWrap_impl(char* buffer, size_t bufferSize, const char* format, const struct std::tm* timeptr)
 {
     return std::strftime(buffer, bufferSize, format, timeptr);
 }
 
 
 inline
-size_t strftimeWrap(wchar_t* buffer, size_t bufferSize, const wchar_t* format, const struct std::tm* timeptr)
+size_t strftimeWrap_impl(wchar_t* buffer, size_t bufferSize, const wchar_t* format, const struct std::tm* timeptr)
 {
     return std::wcsftime(buffer, bufferSize, format, timeptr);
 }
 
-
+/*
 inline
 bool isValid(const struct std::tm& t)
 {
-    auto inRange = [](int value, int minVal, int maxVal) { return minVal <= value && value <= maxVal; };
+	 -> not enough! MSCRT has different limits than the C standard which even seem to change with different versions:
+		_VALIDATE_RETURN((( timeptr->tm_sec >=0 ) && ( timeptr->tm_sec <= 59 ) ), EINVAL, FALSE)
+		_VALIDATE_RETURN(( timeptr->tm_year >= -1900 ) && ( timeptr->tm_year <= 8099 ), EINVAL, FALSE)
+	-> also std::mktime does *not* help here at all!
+
+	auto inRange = [](int value, int minVal, int maxVal) { return minVal <= value && value <= maxVal; };
 
     //http://www.cplusplus.com/reference/clibrary/ctime/tm/
     return inRange(t.tm_sec , 0, 61) &&
@@ -197,6 +200,21 @@ bool isValid(const struct std::tm& t)
            inRange(t.tm_yday, 0, 365);
     //tm_isdst
 };
+*/
+
+template <class CharType> inline
+size_t strftimeWrap(CharType* buffer, size_t bufferSize, const CharType* format, const struct std::tm* timeptr)
+{
+#if defined _MSC_VER && !defined NDEBUG
+    //it's no use: application init must register an invalid parameter that does nothing !!!
+    //=> strftime will abort with 0 and set errno to EINVAL instead of CRASH THE APPLICATION!
+    _invalid_parameter_handler oldHandler = _set_invalid_parameter_handler(nullptr);
+    assert(oldHandler);
+    _set_invalid_parameter_handler(oldHandler);
+#endif
+
+    return strftimeWrap_impl(buffer, bufferSize, format, timeptr);
+}
 
 
 struct UserDefinedFormatTag {};
@@ -209,9 +227,6 @@ String formatTime(const String2& format, const TimeComp& comp, UserDefinedFormat
     struct std::tm ctc = toClibTimeComponents(comp);
     std::mktime(&ctc); // unfortunately std::strftime() needs all elements of "struct tm" filled, e.g. tm_wday, tm_yday
     //note: although std::mktime() explicitly expects "local time", calculating weekday and day of year *should* be time-zone and DST independent
-
-    if (!isValid(ctc)) //strftime() might kill the app otherwise, std::mktime does *not* help here at all!
-        return String();
 
     CharType buffer[256];
     const size_t charsWritten = strftimeWrap(buffer, 256, strBegin(format), &ctc);

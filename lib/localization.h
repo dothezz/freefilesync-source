@@ -1,14 +1,15 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef MISC_H_INCLUDED
 #define MISC_H_INCLUDED
 
-#include <wx/string.h>
 #include <vector>
+#include <zen/file_error.h>
+#include <wx/string.h>
 
 namespace zen
 {
@@ -33,7 +34,7 @@ private:
     std::vector<Entry> locMapping;
 };
 
-void setLanguage(int language);
+void setLanguage(int language); //throw FileError
 int getLanguage();
 int retrieveSystemLanguage();
 }

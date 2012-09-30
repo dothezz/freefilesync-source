@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "structures.h"
@@ -201,7 +201,7 @@ namespace
 assert_static(std::numeric_limits<zen:: Int64>::is_specialized);
 assert_static(std::numeric_limits<zen::UInt64>::is_specialized);
 
-
+/*
 int daysSinceBeginOfWeek(int dayOfWeek) //0-6, 0=Monday, 6=Sunday
 {
     assert(0 <= dayOfWeek && dayOfWeek <= 6);
@@ -220,6 +220,7 @@ int daysSinceBeginOfWeek(int dayOfWeek) //0-6, 0=Monday, 6=Sunday
 #endif
         return dayOfWeek; //let all weeks begin with monday
 }
+*/
 
 
 Int64 resolve(size_t value, UnitTime unit, Int64 defaultVal)

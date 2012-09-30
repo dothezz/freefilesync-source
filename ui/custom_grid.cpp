@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "custom_grid.h"
@@ -10,10 +10,11 @@
 #include <zen/i18n.h>
 #include <zen/file_error.h>
 #include <zen/basic_math.h>
+#include <zen/format_unit.h>
 #include <wx+/tooltip.h>
-#include <wx+/format_unit.h>
 #include <wx+/string_conv.h>
 #include <wx+/rtl.h>
+#include <wx+/image_tools.h>
 #include "../file_hierarchy.h"
 #include "../lib/resources.h"
 
@@ -246,8 +247,8 @@ protected:
 
                     const int signLevel = colorDist(backCol, *wxBLACK) < colorDist(backCol, *wxWHITE) ? 1 : -1; //brighten or darken
 
-                    const wxColor colOutter = getAdjustedColor(signLevel * 20);
-                    const wxColor colInner  = getAdjustedColor(signLevel * 10);
+                    const wxColor colOutter = getAdjustedColor(signLevel * 14); //just some very faint gradient to avoid visual distraction
+                    const wxColor colInner  = getAdjustedColor(signLevel * 11); //
 
                     //clearArea(dc, rect, backColAlt);
 
@@ -961,10 +962,18 @@ private:
                 wxRect rectInside = drawColumnLabelBorder(dc, rect);
                 drawColumnLabelBackground(dc, rectInside, highlighted);
 
-                if (showSyncAction_)
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getImage(L"syncSmall"), rectInside, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
-                else
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getImage(L"compareSmall"), rectInside, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
+                const wxBitmap& cmpIcon  = GlobalResources::getImage(L"compareSmall");
+                const wxBitmap& syncIcon = GlobalResources::getImage(L"syncSmall");
+
+                const int space = 8;
+                const int imageWidthTotal = cmpIcon.GetWidth() + space + syncIcon.GetWidth();
+
+                const int posX = (rectInside.GetWidth () - imageWidthTotal) / 2;
+                const int posY = (rectInside.GetHeight() - cmpIcon.GetHeight()) / 2;
+                assert(cmpIcon.GetHeight() == syncIcon.GetHeight());
+
+                dc.DrawBitmap(showSyncAction_ ? greyScale(cmpIcon) : cmpIcon, posX, posY, true);
+                dc.DrawBitmap(showSyncAction_ ? syncIcon : greyScale(syncIcon), posX + cmpIcon.GetWidth() + space, posY, true);
             }
             break;
 
@@ -987,6 +996,7 @@ private:
                     switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
                     {
                         case SO_DO_NOTHING:
+                            //return COLOR_NOT_ACTIVE;
                         case SO_EQUAL:
                             break; //usually white
 

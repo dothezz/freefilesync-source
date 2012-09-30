@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "batch_config.h"
@@ -252,7 +252,7 @@ BatchDialog::BatchDialog(wxWindow* parent,
     logfileDir.reset(new DirectoryName<FolderHistoryBox>(*m_panelBatchSettings, *m_buttonSelectLogfileDir, *m_comboBoxLogfileDir));
 
     //set icons for this dialog
-    m_bpButtonAddPair->SetBitmapLabel(GlobalResources::getImage(L"addFolderPair"));
+    m_bpButtonAddPair->SetBitmapLabel(GlobalResources::getImage(L"item_add"));
     m_bitmap27->SetBitmap(GlobalResources::getImage(L"batch"));
 
     m_buttonSave->SetFocus();
@@ -551,7 +551,7 @@ void BatchDialog::loadBatchFile(const std::vector<wxString>& filenames)
     try
     {
         //open a *.ffs_gui or *.ffs_batch file!
-        convertConfig(toZ(filenames), batchCfg); //throw FfsXmlError
+        mergeConfigs(toZ(filenames), batchCfg); //throw FfsXmlError
 
         //readConfig(filename, batchCfg);
     }

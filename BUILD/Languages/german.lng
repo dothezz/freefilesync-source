@@ -1,6 +1,6 @@
 <header>
 	<language name>Deutsch</language name>
-	<translator>ZenJu</translator>
+	<translator>Zenju</translator>
 	<locale>de_DE</locale>
 	<flag file>germany.png</flag file>
 	<plural forms>2</plural forms>
@@ -363,9 +363,6 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Switching to FreeFileSync main dialog...</source>
 <target>Wechsle in FreeFileSyncs Hauptdialog...</target>
 
-<source>Unable to connect to sourceforge.net!</source>
-<target>Es konnte keine Verbindung zu Sourceforge.net aufgebaut werden!</target>
-
 <source>A new version of FreeFileSync is available:</source>
 <target>Eine neue Version von FreeFileSync ist verfügbar:</target>
 
@@ -377,6 +374,12 @@ Die Befehlszeile wird ausgelöst wenn:
 
 <source>Information</source>
 <target>Information</target>
+
+<source>Unable to connect to sourceforge.net!</source>
+<target>Es konnte keine Verbindung zu Sourceforge.net aufgebaut werden!</target>
+
+<source>Current FreeFileSync version number was not found online! Do you want to check manually?</source>
+<target>Die aktuelle FreeFileSync Versionsnummer wurde online nicht gefunden! Möchten Sie manuell prüfen?</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Soll FreeFileSync automatisch jede Woche nach Aktualisierungen suchen?</target>
@@ -495,11 +498,11 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Swap sides</source>
 <target>Seiten vertauschen</target>
 
-<source>Load configuration from file</source>
-<target>Konfiguration aus Datei laden</target>
+<source>Open...</source>
+<target>Öffnen...</target>
 
-<source>Save current configuration to file</source>
-<target>Aktuelle Konfiguration in Datei speichern</target>
+<source>Save</source>
+<target>Speichern</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Zuletzt benutzte Konfigurationen (Entf-Taste löscht Einträge)</target>
@@ -864,6 +867,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source><Last session></source>
 <target><Letzte Sitzung></target>
 
+<source>Folder Comparison and Synchronization</source>
+<target>Ordnervergleich und Synchronisation</target>
+
 <source>Configuration saved!</source>
 <target>Konfiguration gespeichert!</target>
 
@@ -878,9 +884,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Configuration loaded!</source>
 <target>Konfiguration geladen!</target>
-
-<source>Folder Comparison and Synchronization</source>
-<target>Ordnervergleich und Synchronisation</target>
 
 <source>Hide files that exist on left side only</source>
 <target>Nur links existierende Dateien ausblenden</target>
@@ -1146,42 +1149,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Percentage</source>
 <target>Prozent</target>
 
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 Min.</pluralform>
-<pluralform>%x Min.</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 Stunde</pluralform>
-<pluralform>%x Stunden</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 Tag</pluralform>
-<pluralform>%x Tage</pluralform>
-</target>
-
 <source>Cannot monitor directory %x.</source>
 <target>Das Verzeichnis %x kann nicht überwacht werden.</target>
 
@@ -1238,6 +1205,42 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Detected endless directory recursion.</source>
 <target>Eine endlose Verzeichnisrekursion wurde erkannt.</target>
+
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 Min.</pluralform>
+<pluralform>%x Min.</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 Stunde</pluralform>
+<pluralform>%x Stunden</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 Tag</pluralform>
+<pluralform>%x Tage</pluralform>
+</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Das Privileg %x kann nicht gesetzt werden.</target>

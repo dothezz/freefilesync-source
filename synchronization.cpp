@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "synchronization.h"
@@ -9,7 +9,7 @@
 #include <deque>
 #include <stdexcept>
 #include <wx/file.h> //get rid!?
-#include <wx+/format_unit.h>
+#include <zen/format_unit.h>
 #include <zen/scope_guard.h>
 #include <zen/process_priority.h>
 #include <zen/file_handling.h>
@@ -1843,7 +1843,7 @@ void zen::synchronize(const TimeComp& timeStamp,
     //PERF_START;
 
     if (syncConfig.size() != folderCmp.size())
-        throw std::logic_error("Programming Error: Contract violation!");
+        throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     //inform about the total amount of data that will be processed from now on
     const SyncStatistics statisticsTotal(folderCmp);
@@ -2152,7 +2152,7 @@ void zen::synchronize(const TimeComp& timeStamp,
         std::wstring warningMessage = _("A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.") + L"\n";
         for (auto i = conflictDirs.begin(); i != conflictDirs.end(); ++i)
             warningMessage += L"\n" + fmtFileName(*i);
-        callback.reportWarning(warningMessage, warnings.warningMultiFolderWriteAccess);
+        callback.reportWarning(warningMessage, warnings.warningFolderPairRaceCondition);
     }
 
     //-------------------end of basic checks------------------------------------------

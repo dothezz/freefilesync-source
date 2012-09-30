@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef SWITCHTOGUI_H_INCLUDED
@@ -27,9 +27,7 @@ public:
 
     void execute() const
     {
-
-        MainDialog* frame = new MainDialog(referenceFiles, guiCfg, globalSettings_, true); //toplevel window
-        frame->Show();
+        MainDialog::create(guiCfg, referenceFiles, globalSettings_, true); //new toplevel window
     }
 
 private:

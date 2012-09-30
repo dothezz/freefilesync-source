@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef WINDOWS_VERSION_HEADER_238470348254325
@@ -15,6 +15,7 @@ bool winXpOrLater();
 bool winServer2003orLater();
 bool vistaOrLater();
 bool win7OrLater();
+bool win8OrLater();
 
 
 
@@ -35,6 +36,7 @@ bool win7OrLater();
 //Server 2003 is version 5.2
 //Vista       is version 6.0
 //Seven       is version 6.1
+//Eight       is version 6.2
 
 namespace impl
 {
@@ -60,6 +62,9 @@ bool vistaOrLater() { return impl::winXyOrLater(6, 0); }
 
 inline
 bool win7OrLater() { return impl::winXyOrLater(6, 1); }
+
+inline
+bool win8OrLater() { return impl::winXyOrLater(6, 2); }
 }
 
 #endif //WINDOWS_VERSION_HEADER_238470348254325

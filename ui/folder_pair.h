@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef FOLDERPAIR_H_INCLUDED
@@ -47,8 +47,8 @@ public:
         if (altCompConfig.get())
         {
             setImage(*basicPanel_.m_bpButtonAltCompCfg, GlobalResources::getImage(L"cmpConfigSmall"));
-            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(wxString(_("Select alternate comparison settings")) +  wxT(" \n") +
-                                                         wxT("(") + getVariantName(altCompConfig->compareVar) + wxT(")"));
+            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Select alternate comparison settings") +  L" \n" +
+                                                         L"(" + getVariantName(altCompConfig->compareVar) + L")");
         }
         else
         {
@@ -59,8 +59,8 @@ public:
         if (altSyncConfig.get())
         {
             setImage(*basicPanel_.m_bpButtonAltSyncCfg, GlobalResources::getImage(L"syncConfigSmall"));
-            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) +  wxT(" \n") +
-                                                         wxT("(") + getVariantName(altSyncConfig->directionCfg.var) + wxT(")"));
+            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings") +  L" \n" +
+                                                         L"(" + getVariantName(altSyncConfig->directionCfg.var) + L")");
         }
         else
         {
@@ -94,7 +94,7 @@ protected:
         basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg    ), nullptr, this);
         basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), nullptr, this);
 
-        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(GlobalResources::getImage(L"removeFolderPair"));
+        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(GlobalResources::getImage(L"item_delete"));
     }
 
     virtual void removeAltCompCfg()

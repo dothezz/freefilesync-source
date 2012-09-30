@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef BOOST_THREAD_WRAP_H
@@ -86,6 +86,10 @@ private:
 
 
 //###################### implementation ######################
+#ifndef BOOST_HAS_THREADS
+#error just some paranoia check...
+#endif
+
 template <class T, class Function> inline
 auto async2(Function fun) -> boost::unique_future<T> //workaround VS2010 bug: bool (*fun)();  decltype(fun()) == int!
 {

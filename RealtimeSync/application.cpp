@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "application.h"
@@ -17,7 +17,9 @@
 #include "../lib/return_codes.h"
 #include "lib/error_log.h"
 
-#ifdef FFS_LINUX
+#ifdef FFS_WIN
+#include <zen/win_ver.h>
+#elif defined FFS_LINUX
 #include <gtk/gtk.h>
 #endif
 
@@ -26,9 +28,40 @@ using namespace zen;
 
 IMPLEMENT_APP(Application);
 
+#ifdef FFS_WIN
+namespace
+{
+const DWORD mainThreadId = ::GetCurrentThreadId();
+
+void onTerminationRequested()
+{
+    std::wstring msg = ::GetCurrentThreadId() == mainThreadId ?
+                       L"Termination requested in main thread!\n\n" :
+                       L"Termination requested in worker thread!\n\n";
+    msg += L"Please take a screenshot and file a bug report at: http://sourceforge.net/projects/freefilesync";
+
+    ::MessageBox(0, msg.c_str(), _("An exception occurred!").c_str(), 0);
+    std::abort();
+}
+
+#ifdef _MSC_VER
+void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
+#endif
+}
+#endif
+
 
 bool Application::OnInit()
 {
+#ifdef FFS_WIN
+    std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
+#ifdef _MSC_VER
+    _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
+#endif
+#endif
+
+    assert(!win8OrLater()); //another breadcrumb: test and add new OS entry to "compatibility" in application manifest
+
     //do not call wxApp::OnInit() to avoid using default commandline parser
 
     //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
@@ -56,7 +89,15 @@ void Application::OnStartApplication(wxIdleEvent& event)
 #endif
 
     //set program language
-    zen::setLanguage(rts::getProgramLanguage());
+    try
+    {
+        setLanguage(rts::getProgramLanguage()); //throw FileError
+    }
+    catch (const FileError& e)
+    {
+        wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR);
+        //continue!
+    }
 
     //try to set config/batch-filename set by %1 parameter
     std::vector<wxString> commandArgs;
@@ -86,12 +127,6 @@ void Application::OnStartApplication(wxIdleEvent& event)
     MainDialog* frame = new MainDialog(nullptr, cfgFilename);
     frame->SetIcon(GlobalResources::instance().programIcon); //set application icon
     frame->Show();
-}
-
-
-bool Application::OnExceptionInMainLoop()
-{
-    throw; //just re-throw exception and avoid display of additional exception messagebox: it will be caught in OnRun()
 }
 
 

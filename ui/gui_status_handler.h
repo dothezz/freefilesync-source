@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef GUISTATUSHANDLER_H_INCLUDED
@@ -22,7 +22,7 @@ class wxCommandEvent;
 class GuiAbortProcess {};
 
 //classes handling sync and compare error as well as status information
-class CompareStatusHandler : private wxEvtHandler, public zen::StatusHandler
+class CompareStatusHandler : private wxEvtHandler, public zen::StatusHandler //throw GuiAbortProcess
 {
 public:
     CompareStatusHandler(MainDialog& dlg);

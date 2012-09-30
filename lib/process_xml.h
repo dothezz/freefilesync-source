@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef PROCESSXML_H_INCLUDED
@@ -91,14 +91,14 @@ struct OptionalDialogs
     void resetDialogs();
 
     bool warningDependentFolders;
-    bool warningMultiFolderWriteAccess;
+    bool warningFolderPairRaceCondition;
     bool warningSignificantDifference;
     bool warningNotEnoughDiskSpace;
     bool warningUnresolvedConflicts;
-    bool warningSyncDatabase;
+    bool warningDatabaseError;
     bool warningRecyclerMissing;
     bool popupOnConfigChange;
-    bool showSummaryBeforeSync;
+    bool confirmSyncStart;
 };
 
 
@@ -154,7 +154,7 @@ struct XmlGlobalSettings
             naviLastSortColumn(zen::defaultValueLastSortColumn),
             naviLastSortAscending(zen::defaultValueLastSortAscending),
             showPercentBar(zen::defaultValueShowPercentage),
-            cfgFileHistMax(20),
+            cfgFileHistMax(30),
             folderHistMax(15),
             onCompletionHistoryMax(8),
             deleteOnBothSides(false),
@@ -228,13 +228,13 @@ struct XmlGlobalSettings
     //struct Batch
 };
 
-void readConfig(const Zstring& filename, XmlGuiConfig&      config); //throw FfsXmlError
+void readConfig(const Zstring& filename, XmlGuiConfig&      config); //
 void readConfig(const Zstring& filename, XmlBatchConfig&    config); //throw FfsXmlError
-void readConfig(                         XmlGlobalSettings& config); //throw FfsXmlError
+void readConfig(                         XmlGlobalSettings& config); //
 
-void writeConfig(const XmlGuiConfig&      config, const Zstring& filename); //throw FfsXmlError
+void writeConfig(const XmlGuiConfig&      config, const Zstring& filename); //
 void writeConfig(const XmlBatchConfig&    config, const Zstring& filename); //throw FfsXmlError
-void writeConfig(const XmlGlobalSettings& config);                          //throw FfsXmlError
+void writeConfig(const XmlGlobalSettings& config);                          //
 
 //config conversion utilities
 XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg);
@@ -251,8 +251,8 @@ enum MergeType
 };
 MergeType getMergeType(const std::vector<Zstring>& filenames);   //throw ()
 
-void convertConfig(const std::vector<Zstring>& filenames, XmlGuiConfig&   config); //throw xmlAccess::FfsXmlError
-void convertConfig(const std::vector<Zstring>& filenames, XmlBatchConfig& config); //throw xmlAccess::FfsXmlError
+void mergeConfigs(const std::vector<Zstring>& filenames, XmlGuiConfig&   config); //throw xmlAccess::FfsXmlError
+void mergeConfigs(const std::vector<Zstring>& filenames, XmlBatchConfig& config); //throw xmlAccess::FfsXmlError
 
 std::wstring extractJobName(const Zstring& configFilename);
 }

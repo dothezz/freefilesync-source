@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "main_dlg.h"
@@ -17,6 +17,7 @@
 #include <wx/app.h>
 #include <wx/dcmemory.h>
 #include <wx/filedlg.h>
+#include <zen/format_unit.h>
 #include <wx+/context_menu.h>
 #include "folder_history_box.h"
 #include <wx+/button.h>
@@ -24,7 +25,6 @@
 #include "../synchronization.h"
 #include "../algorithm.h"
 #include <wx+/app_main.h>
-#include <wx+/format_unit.h>
 #include "check_version.h"
 #include "gui_status_handler.h"
 #include "sync_cfg.h"
@@ -158,13 +158,13 @@ private:
     }
 
     virtual MainConfiguration getMainConfig() const { return mainDlg.getConfig().mainCfg; }
-    virtual void OnAltCompCfgChange() { mainDlg.applyCompareConfig(false); } //false: do not change preview status
-    virtual void OnAltSyncCfgChange() { mainDlg.applySyncConfig(); }
+    virtual void OnAltCompCfgChange() { mainDlg.applyCompareConfig(); }
+    virtual void OnAltSyncCfgChange() { mainDlg.applySyncConfig   (); }
 
     virtual void removeAltCompCfg()
     {
         FolderPairPanelBasic<GuiPanel>::removeAltCompCfg();
-        mainDlg.applyCompareConfig(false); //false: do not change preview status
+        mainDlg.applyCompareConfig();
     }
 
     virtual void removeAltSyncCfg()
@@ -196,8 +196,11 @@ public:
         dirNameLeft (*m_panelLeft,  *m_buttonSelectDirLeft,  *m_directoryLeft),
         dirNameRight(*m_panelRight, *m_buttonSelectDirRight, *m_directoryRight)
     {
-        dirNameLeft .Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::OnDirSelected), nullptr, &mainDialog);
-        dirNameRight.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::OnDirSelected), nullptr, &mainDialog);
+        dirNameLeft .Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
+        dirNameRight.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
+
+        dirNameLeft .Connect(EVENT_ON_DIR_MANUAL_CORRECTION, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
+        dirNameRight.Connect(EVENT_ON_DIR_MANUAL_CORRECTION, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
     }
 
     void setValues(const wxString& leftDir,
@@ -240,8 +243,11 @@ public:
                      *mainDialog.m_directoryRight,
                      *mainDialog.m_staticTextFinalPathRight)
     {
-        dirNameLeft .Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::OnDirSelected), nullptr, &mainDialog);
-        dirNameRight.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::OnDirSelected), nullptr, &mainDialog);
+        dirNameLeft .Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
+        dirNameRight.Connect(EVENT_ON_DIR_SELECTED, wxCommandEventHandler(MainDialog::onDirSelected), nullptr, &mainDialog);
+
+        dirNameLeft .Connect(EVENT_ON_DIR_MANUAL_CORRECTION, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
+        dirNameRight.Connect(EVENT_ON_DIR_MANUAL_CORRECTION, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
     }
 
     void setValues(const wxString& leftDir,
@@ -262,53 +268,6 @@ private:
     DirectoryNameMainImpl dirNameLeft;
     DirectoryNameMainImpl dirNameRight;
 };
-
-
-//workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
-class MenuItemUpdater
-{
-public:
-    MenuItemUpdater(wxMenu& menuToUpdate) : menuToUpdate_(menuToUpdate) {}
-
-    ~MenuItemUpdater()
-    {
-        wxMenuItemList allItems = menuToUpdate_.GetMenuItems();
-
-        //retrieve menu item positions: unfortunately wxMenu doesn't offer a better way
-        int index = 0;
-        for (auto itemIter = allItems.begin(); itemIter != allItems.end(); ++itemIter, ++index) //wxMenuItemList + std::for_each screws up with VS2010!
-        {
-            wxMenuItem* item = *itemIter;
-
-            auto iter = menuItems.find(item);
-            if (iter != menuItems.end())
-            {
-                /*
-                    menuToUpdate_.Remove(item);        ->this simple sequence crashes on Kubuntu x64, wxWidgets 2.9.2
-                    menuToUpdate_.Insert(index, item);
-                    */
-
-                const wxBitmap& bmp = iter->second;
-
-                wxMenuItem* newItem = new wxMenuItem(&menuToUpdate_, item->GetId(), item->GetItemLabel());
-                newItem->SetBitmap(bmp);
-
-                menuToUpdate_.Destroy(item);          //actual workaround
-                menuToUpdate_.Insert(index, newItem); //
-            }
-        }
-    }
-
-    void markForUpdate(wxMenuItem* newEntry, const wxBitmap& bmp)
-    {
-        menuItems.insert(std::make_pair(newEntry, bmp));
-    }
-
-private:
-    wxMenu& menuToUpdate_;
-    std::map<wxMenuItem*, wxBitmap> menuItems;
-};
-
 
 
 #ifdef FFS_WIN
@@ -337,11 +296,65 @@ private:
 #endif
 
 
-//##################################################################################################################################
-MainDialog::MainDialog(const std::vector<wxString>& cfgFileNames, const xmlAccess::XmlGlobalSettings& globalSettings) :
-    MainDialogGenerated(nullptr)
+namespace
 {
-    xmlAccess::XmlGuiConfig guiCfg;  //structure to receive gui settings, already defaulted!!
+//workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
+void setMenuItemImage(wxMenuItem*& menuItem, const wxBitmap& bmp)
+{
+    assert(menuItem->GetKind() == wxITEM_NORMAL);
+
+    //support polling
+    if (isEqual(bmp, menuItem->GetBitmap()))
+        return;
+
+    if (wxMenu* menu = menuItem->GetMenu())
+    {
+		int pos = menu->GetMenuItems().IndexOf(menuItem);
+		if (pos != wxNOT_FOUND)
+		{
+                /*
+                    menu->Remove(item);        ->this simple sequence crashes on Kubuntu x64, wxWidgets 2.9.2
+                    menu->Insert(index, item);
+                    */
+                const bool enabled = menuItem->IsEnabled();
+                wxMenuItem* newItem = new wxMenuItem(menu, menuItem->GetId(), menuItem->GetItemLabel());
+                newItem->SetBitmap(bmp);
+
+                menu->Destroy(menuItem);          //actual workaround
+                menuItem = menu->Insert(pos, newItem); //don't forget to update input item pointer!
+
+                if (!enabled)
+                    menuItem->Enable(false); //do not enable BEFORE appending item! wxWidgets screws up for yet another crappy reason
+		}
+    }
+}
+
+//##################################################################################################################################
+
+xmlAccess::XmlGlobalSettings retrieveGlobalCfgFromDisk() //blocks on GUI on errors!
+{
+    using namespace xmlAccess;
+    XmlGlobalSettings globalCfg;
+    try
+    {
+        if (fileExists(toZ(getGlobalConfigFile())))
+            readConfig(globalCfg); //throw FfsXmlError
+        //else: globalCfg already has default values
+    }
+    catch (const FfsXmlError& e)
+    {
+        if (e.getSeverity() != FfsXmlError::WARNING) //ignore parsing errors: should be migration problems only *cross-fingers*
+            wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR);
+    }
+    return globalCfg;
+}
+}
+
+
+void MainDialog::create(const std::vector<wxString>& cfgFileNames)
+{
+    using namespace xmlAccess;
+    const XmlGlobalSettings globalSettings = retrieveGlobalCfgFromDisk();
 
     std::vector<wxString> filenames;
     if (!cfgFileNames.empty()) //1. this one has priority
@@ -375,93 +388,77 @@ MainDialog::MainDialog(const std::vector<wxString>& cfgFileNames, const xmlAcces
         }
     }
 
+    XmlGuiConfig guiCfg; //structure to receive gui settings with default values
+
     bool loadCfgSuccess = false;
     if (!filenames.empty())
         try
         {
-            //load XML
-            xmlAccess::convertConfig(toZ(filenames), guiCfg); //throw xmlAccess::FfsXmlError
-
+            mergeConfigs(toZ(filenames), guiCfg); //throw FfsXmlError
             loadCfgSuccess = true;
         }
-        catch (const xmlAccess::FfsXmlError& error)
+        catch (const FfsXmlError& error)
         {
-            if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-                wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING, this);
+            if (error.getSeverity() == FfsXmlError::WARNING)
+                wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
+            //what about simulating changed config on parsing errors????
             else
-                wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR, this);
+                wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
         }
     const bool startComparisonImmediately = !cfgFileNames.empty() && loadCfgSuccess;
 
-    init(guiCfg,
-         globalSettings,
-         startComparisonImmediately);
+    //------------------------------------------------------------------------------------------
 
-    setLastUsedConfig(filenames, loadCfgSuccess ? guiCfg : xmlAccess::XmlGuiConfig()); //simulate changed config on parsing errors
+    create_impl(guiCfg, filenames, globalSettings, startComparisonImmediately);
 }
 
 
-MainDialog::MainDialog(const std::vector<wxString>& referenceFiles,
-                       const xmlAccess::XmlGuiConfig& guiCfg,
+void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
+                        bool startComparison)
+{
+    create_impl(guiCfg, std::vector<wxString>(), retrieveGlobalCfgFromDisk(), startComparison);
+}
+
+
+void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
+                        const std::vector<wxString>& referenceFiles,
+                        const xmlAccess::XmlGlobalSettings& globalSettings,
+                        bool startComparison)
+{
+    create_impl(guiCfg, referenceFiles, globalSettings, startComparison);
+}
+
+
+void MainDialog::create_impl(const xmlAccess::XmlGuiConfig& guiCfg,
+                             const std::vector<wxString>& referenceFiles,
+                             const xmlAccess::XmlGlobalSettings& globalSettings,
+                             bool startComparison)
+{
+    try
+    {
+        //we need to set language *before* creating MainDialog!
+        setLanguage(globalSettings.programLanguage); //throw FileError
+    }
+    catch (const FileError& e)
+    {
+        wxMessageBox(e.toString().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        //continue!
+    }
+
+    MainDialog* frame = new MainDialog(guiCfg, referenceFiles, globalSettings, startComparison);
+    frame->Show();
+}
+
+
+MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
+                       const std::vector<wxString>& referenceFiles,
                        const xmlAccess::XmlGlobalSettings& globalSettings,
                        bool startComparison) :
-    MainDialogGenerated(nullptr)
+    MainDialogGenerated(nullptr),
+    showSyncAction_(false),
+    folderHistoryLeft (std::make_shared<FolderHistory>()), //make sure it is always bound
+    folderHistoryRight(std::make_shared<FolderHistory>())  //
 {
-    init(guiCfg,
-         globalSettings,
-         startComparison);
-
-    setLastUsedConfig(referenceFiles, guiCfg);
-}
-
-
-MainDialog::~MainDialog()
-{
-    try //save "GlobalSettings.xml"
-    {
-        xmlAccess::writeConfig(getGlobalCfgBeforeExit()); //throw FfsXmlError
-    }
-    catch (const xmlAccess::FfsXmlError& e)
-    {
-        wxMessageBox(e.toString().c_str(), _("Error"), wxOK | wxICON_ERROR, this);
-    }
-
-    try //save "LastRun.ffs_gui"
-    {
-        xmlAccess::writeConfig(getConfig(), toZ(lastRunConfigName())); //throw FfsXmlError
-    }
-    //don't annoy users on read-only drives: it's enough to show a single error message when saving global config
-    catch (const xmlAccess::FfsXmlError&) {}
-
-    //important! event source wxTheApp is NOT dependent on this instance -> disconnect!
-    wxTheApp->Disconnect(wxEVT_KEY_DOWN,  wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), nullptr, this);
-    wxTheApp->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), nullptr, this);
-
-    auiMgr.UnInit();
-
-    //no need for wxEventHandler::Disconnect() here; event sources are components of this window and are destroyed, too
-}
-
-
-void MainDialog::onQueryEndSession()
-{
-    try { xmlAccess::writeConfig(getGlobalCfgBeforeExit()); }
-    catch (const xmlAccess::FfsXmlError&) {} //we try our best do to something useful in this extreme situation - no reason to notify or even log errors here!
-
-    try { xmlAccess::writeConfig(getConfig(), toZ(lastRunConfigName())); }
-    catch (const xmlAccess::FfsXmlError&) {}
-}
-
-
-void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
-                      const xmlAccess::XmlGlobalSettings& globalSettings,
-                      bool startComparison)
-{
-    showSyncAction_ = false;
-
-    folderHistoryLeft  = std::make_shared<FolderHistory>();  //make sure it is always bound
-    folderHistoryRight = std::make_shared<FolderHistory>(); //
-
     m_directoryLeft ->init(folderHistoryLeft);
     m_directoryRight->init(folderHistoryRight);
 
@@ -515,6 +512,14 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
                    wxAuiPaneInfo().Name(wxT("Panel7")).Layer(4).Bottom().Row(1).Position(3).Caption(_("Statistics")).MinSize(m_bitmapData->GetSize().GetWidth() + m_staticTextData->GetSize().GetWidth(), m_panelStatistics->GetSize().GetHeight()));
 
     auiMgr.Update();
+
+    //give panel captions bold typeface
+    if (wxAuiDockArt* artProvider = auiMgr.GetArtProvider())
+    {
+        wxFont font = artProvider->GetFont(wxAUI_DOCKART_CAPTION_FONT);
+        font.SetWeight(wxFONTWEIGHT_BOLD);
+        artProvider->SetFont(wxAUI_DOCKART_CAPTION_FONT, font);
+    }
 
     auiMgr.GetPane(m_gridNavi).MinSize(-1, -1); //we successfully tricked wxAuiManager into setting an initial Window size :> incomplete API anyone??
     auiMgr.Update(); //
@@ -581,16 +586,14 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
 
     //initialize and load configuration
     setGlobalCfgOnInit(globalSettings);
-    setConfig(guiCfg);
+    setConfig(guiCfg, referenceFiles);
 
     //set icons for this dialog
-    m_buttonCompare     ->setBitmapFront(GlobalResources::getImage(L"compare"));
+    m_buttonCompare     ->setBitmapFront(GlobalResources::getImage(L"compare"), 5);
     m_bpButtonSyncConfig->SetBitmapLabel(GlobalResources::getImage(L"syncConfig"));
     m_bpButtonCmpConfig ->SetBitmapLabel(GlobalResources::getImage(L"cmpConfig"));
-    m_bpButtonSave      ->SetBitmapLabel(GlobalResources::getImage(L"save"));
     m_bpButtonLoad      ->SetBitmapLabel(GlobalResources::getImage(L"load"));
-    m_bpButtonAddPair   ->SetBitmapLabel(GlobalResources::getImage(L"addFolderPair"));
-    //m_bitmapResizeCorner->SetBitmap(mirrorIfRtl(GlobalResources::getImage(L"statusEdge")));
+    m_bpButtonAddPair   ->SetBitmapLabel(GlobalResources::getImage(L"item_add"));
     {
         IconBuffer tmp(IconBuffer::SIZE_SMALL);
         const wxBitmap bmpFile = tmp.genericFileIcon();
@@ -604,32 +607,26 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
 
     m_panelTopButtons->Layout(); //wxButtonWithImage size might have changed
 
-    //menu icons: workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
-    MenuItemUpdater updateMenuFile(*m_menuFile);
-
     const int dummySize = 5;
     wxImage dummyImg(dummySize, dummySize);
     if (!dummyImg.HasAlpha())
         dummyImg.InitAlpha();
     std::fill(dummyImg.GetAlpha(), dummyImg.GetAlpha() + dummySize * dummySize, wxIMAGE_ALPHA_TRANSPARENT);
 
-    updateMenuFile.markForUpdate(m_menuItem10,   GlobalResources::getImage(L"compareSmall"));
-    updateMenuFile.markForUpdate(m_menuItem11,   GlobalResources::getImage(L"syncSmall"));
+    //menu icons: workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
+    setMenuItemImage(m_menuItem10,  GlobalResources::getImage(L"compareSmall"));
+    setMenuItemImage(m_menuItem11,  GlobalResources::getImage(L"syncSmall"));
 
-    updateMenuFile.markForUpdate(m_menuItemNew,  dummyImg); //it's ridiculous, but wxWidgets screws up aligning short-cut label texts if we don't set an image!
-    //updateMenuFile.markForUpdate(m_menuItemSave, dummyImg); //
-    updateMenuFile.markForUpdate(m_menuItemSave, GlobalResources::getImage(L"saveSmall"));
+    setMenuItemImage(m_menuItemNew,  dummyImg); //it's ridiculous, but wxWidgets screws up aligning short-cut label texts if we don't set an image!
+    setMenuItemImage(m_menuItemSaveAs, dummyImg);
+    setMenuItemImage(m_menuItemLoad,  GlobalResources::getImage(L"loadSmall"));
+    setMenuItemImage(m_menuItemSave,  GlobalResources::getImage(L"saveSmall"));
 
-    //updateMenuFile.markForUpdate(m_menuItemSaveAs, GlobalResources::getImage(L"saveSmall"));
-    updateMenuFile.markForUpdate(m_menuItemLoad,   GlobalResources::getImage(L"loadSmall"));
+    setMenuItemImage(m_menuItemGlobSett, GlobalResources::getImage(L"settingsSmall"));
+    setMenuItemImage(m_menuItem7,        GlobalResources::getImage(L"batchSmall"));
 
-    MenuItemUpdater updateMenuAdv(*m_menuAdvanced);
-    updateMenuAdv.markForUpdate(m_menuItemGlobSett, GlobalResources::getImage(L"settingsSmall"));
-    updateMenuAdv.markForUpdate(m_menuItem7,        GlobalResources::getImage(L"batchSmall"));
-
-    MenuItemUpdater updateMenuHelp(*m_menuHelp);
-    updateMenuHelp.markForUpdate(m_menuItemManual, GlobalResources::getImage(L"helpSmall"));
-    updateMenuHelp.markForUpdate(m_menuItemAbout,  GlobalResources::getImage(L"aboutSmall"));
+    setMenuItemImage(m_menuItemManual, GlobalResources::getImage(L"helpSmall"));
+    setMenuItemImage(m_menuItemAbout,  GlobalResources::getImage(L"aboutSmall"));
 
 #ifdef FFS_LINUX
     m_menuItemCheckVer->Enable(zen::isPortableVersion()); //disable update check for Linux installer-based version -> handled by .deb
@@ -639,7 +636,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
     std::for_each(zen::ExistingTranslations::get().begin(), ExistingTranslations::get().end(),
                   [&](const ExistingTranslations::Entry& entry)
     {
-        wxMenuItem* newItem = new wxMenuItem(m_menuLanguages, wxID_ANY, entry.languageName, wxEmptyString, wxITEM_NORMAL );
+        wxMenuItem* newItem = new wxMenuItem(m_menuLanguages, wxID_ANY, entry.languageName);
         newItem->SetBitmap(GlobalResources::getImage(entry.languageFlag));
 
         //map menu item IDs with language IDs: evaluated when processing event handler
@@ -745,15 +742,53 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig& guiCfg,
                 }
         }
     }
-    //----------------------------------------------------------------------------------------------------------------------------------------------------------------
 }
 
+
+MainDialog::~MainDialog()
+{
+    try //save "GlobalSettings.xml"
+    {
+        xmlAccess::writeConfig(getGlobalCfgBeforeExit()); //throw FfsXmlError
+    }
+    catch (const xmlAccess::FfsXmlError& e)
+    {
+        wxMessageBox(e.toString().c_str(), _("Error"), wxOK | wxICON_ERROR, this);
+    }
+
+    try //save "LastRun.ffs_gui"
+    {
+        xmlAccess::writeConfig(getConfig(), toZ(lastRunConfigName())); //throw FfsXmlError
+    }
+    //don't annoy users on read-only drives: it's enough to show a single error message when saving global config
+    catch (const xmlAccess::FfsXmlError&) {}
+
+    //important! event source wxTheApp is NOT dependent on this instance -> disconnect!
+    wxTheApp->Disconnect(wxEVT_KEY_DOWN,  wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), nullptr, this);
+    wxTheApp->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), nullptr, this);
+
+    auiMgr.UnInit();
+
+    //no need for wxEventHandler::Disconnect() here; event sources are components of this window and are destroyed, too
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------------
+
+void MainDialog::onQueryEndSession()
+{
+    try { xmlAccess::writeConfig(getGlobalCfgBeforeExit()); }
+    catch (const xmlAccess::FfsXmlError&) {} //we try our best do to something useful in this extreme situation - no reason to notify or even log errors here!
+
+    try { xmlAccess::writeConfig(getConfig(), toZ(lastRunConfigName())); }
+    catch (const xmlAccess::FfsXmlError&) {}
+}
 
 void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSettings)
 {
     globalCfg = globalSettings;
 
-    setLanguage(globalSettings.programLanguage);
+    //caveat set/get language asymmmetry! setLanguage(globalSettings.programLanguage); //throw FileError
+    //we need to set langugabe before creating this class!
 
     //set dialog size and position: test ALL parameters at once, since width/height are invalid if the window is minimized (eg x,y == -32000; height = 28, width = 160)
     //note: negative values for x and y are possible when using multiple monitors!
@@ -912,14 +947,13 @@ void MainDialog::setManualFilter(const std::vector<FileSystemObject*>& selection
 
 namespace
 {
-//fast replacement for wxString modelling exponential growth
-typedef Zbase<wchar_t> zxString; //for use with UI texts
+//perf: wxString doesn't model exponential growth and so is unusable for large data sets
+typedef Zbase<wchar_t> zxString; //guaranteed exponential growth
 }
-
 
 void MainDialog::copySelectionToClipboard()
 {
-    zxString clipboardString; //perf: wxString doesn't model exponential growth and so is out
+    zxString clipboardString;
 
     auto addSelection = [&](const Grid& grid)
     {
@@ -2145,9 +2179,8 @@ void MainDialog::OnContextSetLayout(wxMouseEvent& event)
 
     menu.addItem(_("Default view"), [&]
     {
-        auiMgr.LoadPerspective(defaultPerspective);
-
         m_splitterMain->setSashOffset(0);
+        auiMgr.LoadPerspective(defaultPerspective);
         updateGuiForFolderPair();
     });
     //----------------------------------------------------------------------------------------
@@ -2186,7 +2219,7 @@ void MainDialog::OnCompSettingsContext(wxMouseEvent& event)
     auto setVariant = [&](CompareVariant var)
     {
         currentCfg.mainCfg.cmpConfig.compareVar = var;
-        applyCompareConfig();
+        applyCompareConfig(true); //true: switchMiddleGrid
     };
 
     auto currentVar = getConfig().mainCfg.cmpConfig.compareVar;
@@ -2226,10 +2259,17 @@ void MainDialog::onNaviPanelFilesDropped(FileDropEvent& event)
 }
 
 
-void MainDialog::OnDirSelected(wxCommandEvent& event)
+void MainDialog::onDirSelected(wxCommandEvent& event)
 {
     //left and right directory text-control and dirpicker are synchronized by MainFolderDragDrop automatically
     clearGrid(); //disable the sync button
+    event.Skip();
+}
+
+
+void MainDialog::onDirManualCorrection(wxCommandEvent& event)
+{
+    updateUnsavedCfgStatus();
     event.Skip();
 }
 
@@ -2314,6 +2354,41 @@ void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
             else
                 m_listBoxHistory->Deselect(pos);
         }
+}
+
+
+void MainDialog::updateUnsavedCfgStatus()
+{
+    const bool haveUnsavedCfg = lastConfigurationSaved != getConfig();
+    const bool singleCfgLoaded = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName();
+
+    //update save config button
+    const bool allowSave = !singleCfgLoaded || haveUnsavedCfg;
+
+    auto makeBrightGrey = [](const wxBitmap& bmp) -> wxBitmap
+    {
+        wxImage img = bmp.ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
+        brighten(img, 80);
+        return img;
+    };
+    //setImage(*m_bpButtonSave, greyScale(GlobalResources::getImage(L"save")));
+
+    setImage(*m_bpButtonSave, allowSave ? GlobalResources::getImage(L"save") : makeBrightGrey(GlobalResources::getImage(L"save")));
+    m_bpButtonSave->Enable(allowSave);
+
+	m_menuItemSave->Enable(allowSave); //bitmap is automatically greyscaled on Win7 (introducing a crappy looking shift), but not on XP
+
+    //set main dialog title
+    wxString title;
+    if (haveUnsavedCfg)
+        title += L'*';
+
+    if (singleCfgLoaded)
+        title += activeConfigFiles[0];
+    else
+        title += L"FreeFileSync - " + _("Folder Comparison and Synchronization");
+
+    SetTitle(title);
 }
 
 
@@ -2424,8 +2499,10 @@ bool MainDialog::saveOldConfig() //return false on user abort
                 }
             }
 
-        //discard current config selection, this ensures next app start will load <last session> instead of the original non-modified config selection
-        setLastUsedConfig(std::vector<wxString>(), getConfig());
+        //discard current reference file(s), this ensures next app start will load <last session> instead of the original non-modified config selection
+        setLastUsedConfig(std::vector<wxString>(), lastConfigurationSaved);
+        //this seems to make theoretical sense also: the job of this function is to make sure current (volatile) config and reference file name are in sync
+        // => if user does not save cfg, it is not attached to a physical file names anymore!
     }
     return true;
 }
@@ -2456,10 +2533,7 @@ void MainDialog::OnConfigNew(wxCommandEvent& event)
     if (!saveOldConfig()) //notify user about changed settings
         return;
 
-    xmlAccess::XmlGuiConfig emptyCfg;
-    setConfig(emptyCfg);
-
-    setLastUsedConfig(std::vector<wxString>(), emptyCfg);
+    setConfig(xmlAccess::XmlGuiConfig(), std::vector<wxString>());
 }
 
 
@@ -2508,26 +2582,22 @@ void MainDialog::loadConfiguration(const std::vector<wxString>& filenames)
     try
     {
         //allow reading batch configurations also
-        xmlAccess::convertConfig(toZ(filenames), newGuiCfg); //throw FfsXmlError
+        xmlAccess::mergeConfigs(toZ(filenames), newGuiCfg); //throw FfsXmlError
 
-        setLastUsedConfig(filenames, newGuiCfg);
+        setConfig(newGuiCfg, filenames);
         //flashStatusInformation(_("Configuration loaded!")); -> irrelvant!?
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
         if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
         {
-            setLastUsedConfig(filenames, xmlAccess::XmlGuiConfig()); //simulate changed config on parsing errors
             wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING, this);
+            setConfig(newGuiCfg, filenames);
+            setLastUsedConfig(filenames, xmlAccess::XmlGuiConfig()); //simulate changed config due to parsing errors
         }
         else
-        {
             wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR, this);
-            return;
-        }
     }
-
-    setConfig(newGuiCfg);
 }
 
 
@@ -2639,18 +2709,12 @@ void MainDialog::setLastUsedConfig(const std::vector<wxString>& filenames,
 
     addFileToCfgHistory(activeConfigFiles); //put filename on list of last used config files
 
-    //set title
-    if (activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName())
-        SetTitle(activeConfigFiles[0]);
-    else
-        SetTitle(L"FreeFileSync - " + _("Folder Comparison and Synchronization"));
+    updateUnsavedCfgStatus();
 }
 
 
-void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg)
+void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::vector<wxString>& referenceFiles)
 {
-    clearGrid();
-
     currentCfg = newGuiCfg;
 
     //evaluate new settings...
@@ -2689,6 +2753,10 @@ void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg)
     //update sync variant name
     m_staticTextSyncVariant->SetLabel(currentCfg.mainCfg.getSyncVariantName());
     m_panelTopButtons->Layout(); //adapt layout for variant text
+
+    clearGrid(); //+ update GUI
+
+    setLastUsedConfig(referenceFiles, newGuiCfg);
 }
 
 
@@ -3022,15 +3090,11 @@ void MainDialog::updateFilterButtons()
         m_bpButtonFilter->SetToolTip(_("No filter selected"));
     }
 
-    //update main local filter
+    //update local filter buttons
     firstFolderPair->refreshButtons();
 
-    //update folder pairs
     std::for_each(additionalFolderPairs.begin(), additionalFolderPairs.end(),
-                  [&](DirectoryPair* dirPair)
-    {
-        dirPair->refreshButtons();
-    });
+    [&](DirectoryPair* dirPair) { dirPair->refreshButtons(); });
 }
 
 
@@ -3051,7 +3115,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         m_gridMainR->Scroll(scrollPosX, scrollPosY); //restore
         m_gridMainC->Scroll(-1, scrollPosY); )       //
 
-    clearGrid(false); //avoid memory peak by clearing old data
+    clearGrid(); //avoid memory peak by clearing old data
 
     try
     {
@@ -3092,8 +3156,6 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     treeDataView->setData(folderCmp); //
     updateGui();
 
-    updateSyncEnabledStatus(); //enable the sync button
-
     //    if (m_buttonStartSync->IsShownOnScreen()) m_buttonStartSync->SetFocus();
 
     gridview::clearSelection(*m_gridMainL, *m_gridMainC, *m_gridMainR);
@@ -3121,20 +3183,36 @@ void MainDialog::updateGui()
     //update sync preview statistics
     updateStatistics();
 
+    updateUnsavedCfgStatus();
+
+    //update sync and comparison variant names
+    m_staticTextSyncVariant->SetLabel(getConfig().mainCfg.getSyncVariantName());
+    m_staticTextCmpVariant ->SetLabel(getConfig().mainCfg.getCompVariantName());
+    m_panelTopButtons->Layout();
+
+    //update sync button enabled/disabled status
+    if (!folderCmp.empty())
+    {
+        m_buttonStartSync->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+        m_buttonStartSync->setBitmapFront(GlobalResources::getImage(L"sync"), 5);
+    }
+    else
+    {
+        m_buttonStartSync->SetForegroundColour(wxColor(128, 128, 128)); //Some colors seem to have problems with 16-bit desktop color, well this one hasn't!
+        m_buttonStartSync->setBitmapFront(greyScale(GlobalResources::getImage(L"sync")), 5);
+    }
+
     auiMgr.Update(); //fix small display distortion, if view filter panel is empty
 }
 
 
-void MainDialog::clearGrid(bool refreshGrid)
+void MainDialog::clearGrid()
 {
     folderCmp.clear();
     gridDataView->setData(folderCmp);
     treeDataView->setData(folderCmp);
 
-    updateSyncEnabledStatus();
-
-    if (refreshGrid)
-        updateGui();
+    updateGui();
 }
 
 
@@ -3189,17 +3267,12 @@ void MainDialog::OnSyncSettings(wxCommandEvent& event)
 }
 
 
-void MainDialog::applyCompareConfig(bool changePreviewStatus)
+void MainDialog::applyCompareConfig(bool switchMiddleGrid)
 {
-    //update compare variant name
-    m_staticTextCmpVariant->SetLabel(getConfig().mainCfg.getCompVariantName());
-    m_panelTopButtons->Layout(); //adapt layout for variant text
+    clearGrid(); //+ GUI update
 
-    if (changePreviewStatus)
-    {
-        clearGrid();
-
-        //convenience: change sync view
+    //convenience: change sync view
+    if (switchMiddleGrid)
         switch (currentCfg.mainCfg.cmpConfig.compareVar)
         {
             case CMP_BY_TIME_SIZE:
@@ -3209,10 +3282,6 @@ void MainDialog::applyCompareConfig(bool changePreviewStatus)
                 showSyncAction(false);
                 break;
         }
-
-        if (m_buttonCompare->IsShownOnScreen())
-            m_buttonCompare->SetFocus();
-    }
 }
 
 
@@ -3230,7 +3299,7 @@ void MainDialog::OnCmpSettings(wxCommandEvent& event)
     {
         currentCfg.mainCfg.cmpConfig = cmpConfigNew;
 
-        applyCompareConfig();
+        applyCompareConfig(true); //true: switchMiddleGrid
     }
 }
 
@@ -3248,8 +3317,8 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
             return;
     }
 
-    //show sync preview screen
-    if (globalCfg.optDialogs.showSummaryBeforeSync)
+    //show sync preview/confirmation dialog
+    if (globalCfg.optDialogs.confirmSyncStart)
     {
         bool dontShowAgain = false;
 
@@ -3259,7 +3328,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                                     dontShowAgain) != ReturnSmallDlg::BUTTON_OKAY)
             return;
 
-        globalCfg.optDialogs.showSummaryBeforeSync = !dontShowAgain;
+        globalCfg.optDialogs.confirmSyncStart = !dontShowAgain;
     }
 
     wxBusyCursor dummy; //show hourglass cursor
@@ -3275,7 +3344,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         const auto& guiCfg = getConfig();
 
         //class handling status updates and error messages
-        SyncStatusHandler statusHandler(this,
+        SyncStatusHandler statusHandler(this, //throw GuiAbortProcess
                                         currentCfg.handleError,
                                         xmlAccess::extractJobName(activeFileName),
                                         guiCfg.mainCfg.onCompletion,
@@ -3296,7 +3365,8 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         //START SYNCHRONIZATION
         const std::vector<zen::FolderPairSyncCfg> syncProcessCfg = zen::extractSyncCfg(guiCfg.mainCfg);
         if (syncProcessCfg.size() != folderCmp.size())
-            throw std::logic_error("Programming Error: Contract violation!"); //should never happen: sync button is deactivated if they are not in sync
+            throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
+        //should never happen: sync button is deactivated if they are not in sync
 
         synchronize(localTime(),
                     globalCfg.optDialogs,
@@ -3610,14 +3680,10 @@ void MainDialog::applyFilterConfig()
 
 void MainDialog::applySyncConfig()
 {
-    //update sync variant name
-    m_staticTextSyncVariant->SetLabel(getConfig().mainCfg.getSyncVariantName());
-    m_panelTopButtons->Layout(); //adapt layout for variant text
-
     zen::redetermineSyncDirection(getConfig().mainCfg, folderCmp,
                                   [&](const std::wstring& warning)
     {
-        bool& warningActive = globalCfg.optDialogs.warningSyncDatabase;
+        bool& warningActive = globalCfg.optDialogs.warningDatabaseError;
         if (warningActive)
         {
             bool dontWarnAgain = false;
@@ -3704,7 +3770,8 @@ void MainDialog::updateGuiForFolderPair()
     m_bpButtonAltSyncCfg ->Show(showLocalCfgFirstPair);
     m_bpButtonLocalFilter->Show(showLocalCfgFirstPair);
     setImage(*m_bpButtonSwapSides, GlobalResources::getImage(showLocalCfgFirstPair ? L"swapSlim" : L"swap"));
-    m_panelTopMiddle->Layout();
+    m_panelTopMiddle->Layout();      //both required to update button size for calculations below!!!
+	m_panelDirectoryPairs->Layout(); //   -> updates size of stretched m_panelTopLeft!
 
     int addPairMinimalHeight = 0;
     int addPairOptimalHeight = 0;
@@ -3789,10 +3856,7 @@ void MainDialog::addFolderPair(const std::vector<FolderPairEnh>& newPairs, bool 
                                                        iter->altCmpConfig,
                                                        iter->altSyncConfig,
                                                        iter->localFilter);
-
-    clearGrid();
-    applySyncConfig(); //mainly to update sync dir description text
-    applyCompareConfig(false); //false: do not change preview status
+    clearGrid(); //+ GUI update
 }
 
 
@@ -3824,11 +3888,7 @@ void MainDialog::removeAddFolderPair(size_t pos)
 
     updateGuiForFolderPair();
 
-    //------------------------------------------------------------------
-    //disable the sync button
-    clearGrid();
-    applySyncConfig(); //mainly to update sync dir description text
-    applyCompareConfig(false); //false: do not change preview status
+    clearGrid(); //+ GUI update
 }
 
 
@@ -4075,12 +4135,11 @@ void MainDialog::OnMenuQuit(wxCommandEvent& event)
 void MainDialog::switchProgramLanguage(int langID)
 {
     //create new dialog with respect to new language
-    zen::setLanguage(langID); //language is a global attribute
+    xmlAccess::XmlGlobalSettings newGlobalCfg = getGlobalCfgBeforeExit();
+    newGlobalCfg.programLanguage = langID;
 
-    //create new main window and delete old one
-    MainDialog* frame = new MainDialog(activeConfigFiles, getConfig(), getGlobalCfgBeforeExit(), false);
-    frame->Show();
-
+    //show new dialog, then delete old one
+    MainDialog::create(getConfig(), activeConfigFiles, newGlobalCfg, false);
     Destroy();
 }
 
@@ -4103,20 +4162,5 @@ void MainDialog::showSyncAction(bool value)
     gridview::showSyncAction(*m_gridMainC, value);
 
     updateGui();
-}
-
-
-void MainDialog::updateSyncEnabledStatus()
-{
-    if (!folderCmp.empty())
-    {
-        m_buttonStartSync->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-        m_buttonStartSync->setBitmapFront(GlobalResources::getImage(L"sync"));
-    }
-    else
-    {
-        m_buttonStartSync->SetForegroundColour(wxColor(128, 128, 128)); //Some colors seem to have problems with 16-bit desktop color, well this one hasn't!
-        m_buttonStartSync->setBitmapFront(GlobalResources::getImage(L"syncDisabled")); //looks better than greyscaling "sync" bmp
-    }
 }
 

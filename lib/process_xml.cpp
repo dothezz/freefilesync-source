@@ -1,7 +1,7 @@
 ﻿// **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "process_xml.h"
@@ -81,15 +81,15 @@ wxString xmlAccess::getGlobalConfigFile()
 
 void xmlAccess::OptionalDialogs::resetDialogs()
 {
-    warningDependentFolders       = true;
-    warningMultiFolderWriteAccess = true;
-    warningSignificantDifference  = true;
-    warningNotEnoughDiskSpace     = true;
-    warningUnresolvedConflicts    = true;
-    warningSyncDatabase           = true;
-    warningRecyclerMissing        = true;
-    popupOnConfigChange           = true;
-    showSummaryBeforeSync         = true;
+    warningDependentFolders        = true;
+    warningFolderPairRaceCondition = true;
+    warningSignificantDifference   = true;
+    warningNotEnoughDiskSpace      = true;
+    warningUnresolvedConflicts     = true;
+    warningDatabaseError           = true;
+    warningRecyclerMissing         = true;
+    popupOnConfigChange            = true;
+    confirmSyncStart               = true;
 }
 
 
@@ -132,7 +132,7 @@ xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiCo
         {
             std::vector<Zstring> filenames;
             filenames.push_back(referenceFile);
-            convertConfig(filenames, output); //throw xmlAccess::FfsXmlError
+            mergeConfigs(filenames, output); //throw xmlAccess::FfsXmlError
         }
         catch (xmlAccess::FfsXmlError&) {}
 
@@ -242,13 +242,13 @@ void mergeConfigFilesImpl(const std::vector<Zstring>& filenames, XmlCfg& config)
 }
 
 
-void xmlAccess::convertConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config) //throw FfsXmlError
+void xmlAccess::mergeConfigs(const std::vector<Zstring>& filenames, XmlGuiConfig& config) //throw FfsXmlError
 {
     mergeConfigFilesImpl(filenames, config); //throw FfsXmlError
 }
 
 
-void xmlAccess::convertConfig(const std::vector<Zstring>& filenames, XmlBatchConfig& config) //throw FfsXmlError
+void xmlAccess::mergeConfigs(const std::vector<Zstring>& filenames, XmlBatchConfig& config) //throw FfsXmlError
 {
     mergeConfigFilesImpl(filenames, config);   //throw FfsXmlError
 }
@@ -778,7 +778,7 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
     if (in["CustomDeletionFolder"])
     {
         in["CustomDeletionFolder"](syncCfg.versioningDirectory);//obsolete name
-        syncCfg.versionCountLimit = 0; //new parameter
+        syncCfg.versionCountLimit = -1; //new parameter
     }
     else
     {
@@ -943,16 +943,31 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //max. allowed file time deviation
     inShared["FileTimeTolerance"](config.fileTimeTolerance);
 
-    XmlIn inOpt = inShared["ShowOptionalDialogs"];
-    inOpt["CheckForDependentFolders"     ](config.optDialogs.warningDependentFolders);
-    inOpt["CheckForMultipleWriteAccess"  ](config.optDialogs.warningMultiFolderWriteAccess);
-    inOpt["CheckForSignificantDifference"](config.optDialogs.warningSignificantDifference);
-    inOpt["CheckForFreeDiskSpace"](config.optDialogs.warningNotEnoughDiskSpace);
-    inOpt["CheckForUnresolvedConflicts"](config.optDialogs.warningUnresolvedConflicts);
-    inOpt["NotifyDatabaseError"](config.optDialogs.warningSyncDatabase);
-    inOpt["CheckMissingRecycleBin"](config.optDialogs.warningRecyclerMissing);
-    inOpt["PopupOnConfigChange"](config.optDialogs.popupOnConfigChange);
-    inOpt["SummaryBeforeSync"  ](config.optDialogs.showSummaryBeforeSync);
+    XmlIn inOpt = inShared["OptionalDialogs"];
+    inOpt["WarnUnresolvedConflicts"    ](config.optDialogs.warningUnresolvedConflicts);
+    inOpt["WarnNotEnoughDiskSpace"     ](config.optDialogs.warningNotEnoughDiskSpace);
+    inOpt["WarnSignificantDifference"  ](config.optDialogs.warningSignificantDifference);
+    inOpt["WarnRecycleBinNotAvailable" ](config.optDialogs.warningRecyclerMissing);
+    inOpt["WarnDatabaseError"          ](config.optDialogs.warningDatabaseError);
+    inOpt["WarnDependentFolders"       ](config.optDialogs.warningDependentFolders);
+    inOpt["WarnFolderPairRaceCondition"](config.optDialogs.warningFolderPairRaceCondition);
+    inOpt["PromptSaveConfig"           ](config.optDialogs.popupOnConfigChange);
+    inOpt["ConfirmSyncStart"           ](config.optDialogs.confirmSyncStart);
+
+    warn_static("remove after migration?")
+    if (!inOpt)
+    {
+        inOpt = inShared["ShowOptionalDialogs"];
+        inOpt["CheckForDependentFolders"     ](config.optDialogs.warningDependentFolders);
+        inOpt["CheckForMultipleWriteAccess"  ](config.optDialogs.warningFolderPairRaceCondition);
+        inOpt["CheckForSignificantDifference"](config.optDialogs.warningSignificantDifference);
+        inOpt["CheckForFreeDiskSpace"](config.optDialogs.warningNotEnoughDiskSpace);
+        inOpt["CheckForUnresolvedConflicts"](config.optDialogs.warningUnresolvedConflicts);
+        inOpt["NotifyDatabaseError"   ](config.optDialogs.warningDatabaseError);
+        inOpt["CheckMissingRecycleBin"](config.optDialogs.warningRecyclerMissing);
+        inOpt["PopupOnConfigChange"   ](config.optDialogs.popupOnConfigChange);
+        inOpt["SummaryBeforeSync"     ](config.optDialogs.confirmSyncStart);
+    }
 
     //gui specific global settings (optional)
     XmlIn inGui = in["Gui"];
@@ -1233,16 +1248,16 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //max. allowed file time deviation
     outShared["FileTimeTolerance"](config.fileTimeTolerance);
 
-    XmlOut outOpt = outShared["ShowOptionalDialogs"];
-    outOpt["CheckForDependentFolders"     ](config.optDialogs.warningDependentFolders);
-    outOpt["CheckForMultipleWriteAccess"  ](config.optDialogs.warningMultiFolderWriteAccess);
-    outOpt["CheckForSignificantDifference"](config.optDialogs.warningSignificantDifference);
-    outOpt["CheckForFreeDiskSpace"        ](config.optDialogs.warningNotEnoughDiskSpace);
-    outOpt["CheckForUnresolvedConflicts"  ](config.optDialogs.warningUnresolvedConflicts);
-    outOpt["NotifyDatabaseError"          ](config.optDialogs.warningSyncDatabase);
-    outOpt["CheckMissingRecycleBin"       ](config.optDialogs.warningRecyclerMissing);
-    outOpt["PopupOnConfigChange"          ](config.optDialogs.popupOnConfigChange);
-    outOpt["SummaryBeforeSync"            ](config.optDialogs.showSummaryBeforeSync);
+    XmlOut outOpt = outShared["OptionalDialogs"];
+    outOpt["WarnUnresolvedConflicts"    ](config.optDialogs.warningUnresolvedConflicts);
+    outOpt["WarnNotEnoughDiskSpace"     ](config.optDialogs.warningNotEnoughDiskSpace);
+    outOpt["WarnSignificantDifference"  ](config.optDialogs.warningSignificantDifference);
+    outOpt["WarnRecycleBinNotAvailable" ](config.optDialogs.warningRecyclerMissing);
+    outOpt["WarnDatabaseError"          ](config.optDialogs.warningDatabaseError);
+    outOpt["WarnDependentFolders"       ](config.optDialogs.warningDependentFolders);
+    outOpt["WarnFolderPairRaceCondition"](config.optDialogs.warningFolderPairRaceCondition);
+    outOpt["PromptSaveConfig"           ](config.optDialogs.popupOnConfigChange);
+    outOpt["ConfirmSyncStart"           ](config.optDialogs.confirmSyncStart);
 
     //gui specific global settings (optional)
     XmlOut outGui = out["Gui"];

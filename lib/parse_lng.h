@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef PARSE_LNG_HEADER_INCLUDED
@@ -33,7 +33,7 @@ typedef std::map <SingularPluralPair, PluralForms> TranslationPluralMap; //(sing
 struct TransHeader
 {
     std::string languageName;     //display name: "English (UK)"
-    std::string translatorName;   //"ZenJu"
+    std::string translatorName;   //"Zenju"
     std::string localeName;       //ISO 639 language code + ISO 3166 country code, e.g. "en_GB", or "en_US"
     std::string flagFile;         //"england.png"
     int pluralCount;              //2

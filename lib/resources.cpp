@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "resources.h"
@@ -65,10 +65,10 @@ GlobalResources::GlobalResources()
             //generic image loading
             if (name.EndsWith(L".png"))
                 bitmaps.insert(std::make_pair(name, wxImage(resourceFile, wxBITMAP_TYPE_PNG)));
-            //else if (name == L"money.gif")
-            //    loadAnimFromZip(resourceFile, animationMoney);
+            else if (name == L"wink.gif")
+                loadAnimFromZip(resourceFile, aniWink);
             else if (name == L"working.gif")
-                loadAnimFromZip(resourceFile, animationSync);
+                loadAnimFromZip(resourceFile, aniSync);
         }
     }
 

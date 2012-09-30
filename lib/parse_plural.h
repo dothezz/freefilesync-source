@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef PARSE_PLURAL_H_INCLUDED
@@ -11,7 +11,6 @@
 #include <memory>
 #include <functional>
 #include <zen/string_base.h>
-
 
 //http://www.gnu.org/software/hello/manual/gettext/Plural-forms.html
 //http://translate.sourceforge.net/wiki/l10n/pluralforms
@@ -50,9 +49,9 @@ multiplicative-expression:
     multiplicative-expression % pm-expression
 
 pm-expression:
-    N
-    Number
-    ( Expression )
+    variable-number-n-expression
+    constant-number-expression
+    ( expression )
 */
 
 
@@ -71,49 +70,46 @@ struct Expr : public Expression
 template <class StlOp>
 struct BinaryExp : public Expr<typename StlOp::result_type>
 {
-    typedef const Expr<typename StlOp::first_argument_type> SourceExp;
+    typedef const Expr<typename StlOp::first_argument_type > ExpLhs;
+    typedef const Expr<typename StlOp::second_argument_type> ExpRhs;
 
-    BinaryExp(const SourceExp& lhs, const SourceExp& rhs, StlOp biop) : lhs_(lhs), rhs_(rhs), biop_(biop) {}
+    BinaryExp(const ExpLhs& lhs, const ExpRhs& rhs, StlOp biop) : lhs_(lhs), rhs_(rhs), biop_(biop) {}
     virtual typename StlOp::result_type eval() const { return biop_(lhs_.eval(), rhs_.eval()); }
-    const SourceExp& lhs_;
-    const SourceExp& rhs_;
+    const ExpLhs& lhs_;
+    const ExpRhs& rhs_;
     StlOp biop_;
 };
 
-template <class StlOp>
-inline
+template <class StlOp> inline
 BinaryExp<StlOp> makeBiExp(const Expression& lhs, const Expression& rhs, StlOp biop) //throw std::bad_cast
 {
-    return BinaryExp<StlOp>(dynamic_cast<const Expr<typename StlOp::first_argument_type >&>(lhs),
-                            dynamic_cast<const Expr<typename StlOp::second_argument_type>&>(rhs), biop);
+    return BinaryExp<StlOp>(dynamic_cast<const Expr<typename StlOp::first_argument_type >&>(lhs),        //throw std::bad_cast
+                            dynamic_cast<const Expr<typename StlOp::second_argument_type>&>(rhs), biop); //
 }
 
-template <class Out>
-struct TernaryExp : public Out
+template <class T>
+struct TernaryExp : public Expr<T>
 {
-    TernaryExp(const Expr<bool>& ifExp, const Out& thenExp, const Out& elseExp) : ifExp_(ifExp), thenExp_(thenExp), elseExp_(elseExp) {}
-    virtual typename Out::ValueType eval() const { return ifExp_.eval() ? thenExp_.eval() : elseExp_.eval(); }
+    TernaryExp(const Expr<bool>& ifExp, const Expr<T>& thenExp, const Expr<T>& elseExp) : ifExp_(ifExp), thenExp_(thenExp), elseExp_(elseExp) {}
+    virtual typename Expr<T>::ValueType eval() const { return ifExp_.eval() ? thenExp_.eval() : elseExp_.eval(); }
     const Expr<bool>& ifExp_;
-    const Out& thenExp_;
-    const Out& elseExp_;
+    const Expr<T>& thenExp_;
+    const Expr<T>& elseExp_;
 };
 
-struct LiteralNumberEx : public Expr<int>
+struct ConstNumberExp : public Expr<int>
 {
-    LiteralNumberEx(int n) : n_(n) {}
+    ConstNumberExp(int n) : n_(n) {}
     virtual int eval() const { return n_; }
     int n_;
 };
 
-struct NumberN : public Expr<int>
+struct VariableNumberNExp : public Expr<int>
 {
-    NumberN(int& n) : n_(n) {}
+    VariableNumberNExp(int& n) : n_(n) {}
     virtual int eval() const { return n_; }
     int& n_;
 };
-
-
-typedef zen::Zbase<char> Wstring;
 
 
 class PluralForm
@@ -122,7 +118,7 @@ public:
     struct ParsingError {};
 
     //.po format,e.g.: (n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)
-    PluralForm(const Wstring& phrase) : n_(0)
+    PluralForm(const std::string& phrase) : n_(0)
     {
         Parser(phrase, //in
                expr, n_, dump);  //out
@@ -148,8 +144,8 @@ private:
             TK_GREATER,
             TK_GREATER_EQUAL,
             TK_MODULUS,
-            TK_N,
-            TK_NUMBER,
+            TK_VARIABLE_N,
+            TK_CONST_NUMBER,
             TK_BRACKET_LEFT,
             TK_BRACKET_RIGHT,
             TK_END
@@ -158,13 +154,13 @@ private:
         Token(Type t) : type(t), number(0) {}
 
         Type type;
-        int number; //if type == TK_NUMBER
+        int number; //if type == TK_CONST_NUMBER
     };
 
     class Scanner
     {
     public:
-        Scanner(const Wstring& phrase) : stream(phrase), pos(stream.begin())
+        Scanner(const std::string& phrase) : stream(phrase), pos(stream.begin())
         {
             tokens.push_back(std::make_pair("?" , Token::TK_TERNARY_QUEST));
             tokens.push_back(std::make_pair(":" , Token::TK_TERNARY_COLON));
@@ -177,8 +173,8 @@ private:
             tokens.push_back(std::make_pair(">=", Token::TK_GREATER_EQUAL));
             tokens.push_back(std::make_pair(">" , Token::TK_GREATER      ));
             tokens.push_back(std::make_pair("%" , Token::TK_MODULUS      ));
-            tokens.push_back(std::make_pair("n" , Token::TK_N            ));
-            tokens.push_back(std::make_pair("N" , Token::TK_N            ));
+            tokens.push_back(std::make_pair("n" , Token::TK_VARIABLE_N   ));
+            tokens.push_back(std::make_pair("N" , Token::TK_VARIABLE_N   ));
             tokens.push_back(std::make_pair("(" , Token::TK_BRACKET_LEFT ));
             tokens.push_back(std::make_pair(")" , Token::TK_BRACKET_RIGHT));
         }
@@ -188,21 +184,22 @@ private:
             //skip whitespace
             pos = std::find_if(pos, stream.end(), [](char c) { return !zen::isWhiteSpace(c); });
 
-            if (pos == stream.end()) return Token(Token::TK_END);
+            if (pos == stream.end())
+                return Token::TK_END;
 
-            for (TokenList::const_iterator i = tokens.begin(); i != tokens.end(); ++i)
-                if (startsWith(i->first))
+            for (auto iter = tokens.begin(); iter != tokens.end(); ++iter)
+                if (startsWith(iter->first))
                 {
-                    pos += i->first.size();
-                    return Token(i->second);
+                    pos += iter->first.size();
+                    return Token(iter->second);
                 }
 
-            Wstring::const_iterator digitEnd = std::find_if(pos, stream.end(), [](char c) { return !zen::isDigit(c); });
-            int digitCount = digitEnd - pos;
+            auto digitEnd = std::find_if(pos, stream.end(), [](char c) { return !zen::isDigit(c); });
+            ptrdiff_t digitCount = digitEnd - pos;
             if (digitCount != 0)
             {
-                Token out(Token::TK_NUMBER);
-                out.number = zen::stringTo<int>(Wstring(&*pos, digitCount));
+                Token out(Token::TK_CONST_NUMBER);
+                out.number = zen::stringTo<int>(std::string(&*pos, digitCount));
                 pos += digitCount;
                 return out;
             }
@@ -211,25 +208,25 @@ private:
         }
 
     private:
-        bool startsWith(const Wstring& prefix) const
+        bool startsWith(const std::string& prefix) const
         {
             if (stream.end() - pos < static_cast<ptrdiff_t>(prefix.size()))
                 return false;
             return std::equal(prefix.begin(), prefix.end(), pos);
         }
 
-        typedef std::vector<std::pair<Wstring, Token::Type> > TokenList;
+        typedef std::vector<std::pair<std::string, Token::Type> > TokenList;
         TokenList tokens;
 
-        const Wstring stream;
-        Wstring::const_iterator pos;
+        const std::string stream;
+        std::string::const_iterator pos;
     };
 
 
     class Parser
     {
     public:
-        Parser(const Wstring& phrase, //in
+        Parser(const std::string& phrase, //in
                const Expr<int>*& expr, int& n, PluralForm::DumpList& dump) : //out
             scn(phrase),
             tk(scn.nextToken()),
@@ -238,8 +235,8 @@ private:
         {
             try
             {
-                const Expression& e = parse();
-                expr = &dynamic_cast<const Expr<int>&>(e);
+                const Expression& e = parse();             //throw std::bad_cast, ParsingError
+                expr = &dynamic_cast<const Expr<int>&>(e); //
             }
             catch (std::bad_cast&) { throw ParsingError(); }
 
@@ -250,14 +247,14 @@ private:
         void nextToken() { tk = scn.nextToken(); }
         const Token& token() const { return tk; }
 
-        void consumeToken(Token::Type t)
+        void consumeToken(Token::Type t) //throw ParsingError
         {
             if (token().type != t)
                 throw ParsingError();
             nextToken();
         }
 
-        const Expression& parse() { return parseConditional(); };
+        const Expression& parse() { return parseConditional(); }; //throw std::bad_cast, ParsingError
 
         const Expression& parseConditional()
         {
@@ -270,9 +267,9 @@ private:
                 consumeToken(Token::TK_TERNARY_COLON);
                 const Expression& elseEx = parse(); //
 
-                return manageObj(TernaryExp<Expr<int> >(dynamic_cast<const Expr<bool>&>(e),
-                                                        dynamic_cast<const Expr<int>&>(thenEx),
-                                                        dynamic_cast<const Expr<int>&>(elseEx)));
+                return manageObj(TernaryExp<int>(dynamic_cast<const Expr<bool>&>(e),       //
+                                                 dynamic_cast<const Expr<int>&>(thenEx),   //throw std::bad_cast
+                                                 dynamic_cast<const Expr<int>&>(elseEx))); //
             }
             return e;
         }
@@ -280,29 +277,25 @@ private:
         const Expression& parseLogicalOr()
         {
             const Expression* e = &parseLogicalAnd();
-            for (;;) //associativity: ->
-                if (token().type == Token::TK_OR)
-                {
-                    nextToken();
-                    const Expression& rhs = parseLogicalAnd();
-                    e = &manageObj(makeBiExp(*e, rhs, std::logical_or<bool>()));
-                }
-                else break;
+            while (token().type == Token::TK_OR) //associativity: ->
+            {
+                nextToken();
+                const Expression& rhs = parseLogicalAnd();
+                e = &manageObj(makeBiExp(*e, rhs, std::logical_or<bool>())); //throw std::bad_cast
+            }
             return *e;
         }
 
         const Expression& parseLogicalAnd()
         {
             const Expression* e = &parseEquality();
-            for (;;) //associativity: ->
-                if (token().type == Token::TK_AND)
-                {
-                    nextToken();
-                    const Expression& rhs = parseEquality();
+            while (token().type == Token::TK_AND) //associativity: ->
+            {
+                nextToken();
+                const Expression& rhs = parseEquality();
 
-                    e = &manageObj(makeBiExp(*e, rhs, std::logical_and<bool>()));
-                }
-                else break;
+                e = &manageObj(makeBiExp(*e, rhs, std::logical_and<bool>())); //throw std::bad_cast
+            }
             return *e;
         }
 
@@ -316,8 +309,8 @@ private:
                 nextToken();
                 const Expression& rhs = parseRelational();
 
-                if (t == Token::TK_EQUAL)     return manageObj(makeBiExp(e, rhs, std::equal_to    <int>()));
-                if (t == Token::TK_NOT_EQUAL) return manageObj(makeBiExp(e, rhs, std::not_equal_to<int>()));
+                if (t == Token::TK_EQUAL)     return manageObj(makeBiExp(e, rhs, std::equal_to    <int>())); //throw std::bad_cast
+                if (t == Token::TK_NOT_EQUAL) return manageObj(makeBiExp(e, rhs, std::not_equal_to<int>())); //
             }
             return e;
         }
@@ -335,10 +328,10 @@ private:
                 nextToken();
                 const Expression& rhs = parseMultiplicative();
 
-                if (t == Token::TK_LESS)          return manageObj(makeBiExp(e, rhs, std::less         <int>()));
-                if (t == Token::TK_LESS_EQUAL)    return manageObj(makeBiExp(e, rhs, std::less_equal   <int>()));
-                if (t == Token::TK_GREATER)       return manageObj(makeBiExp(e, rhs, std::greater      <int>()));
-                if (t == Token::TK_GREATER_EQUAL) return manageObj(makeBiExp(e, rhs, std::greater_equal<int>()));
+                if (t == Token::TK_LESS)          return manageObj(makeBiExp(e, rhs, std::less         <int>())); //
+                if (t == Token::TK_LESS_EQUAL)    return manageObj(makeBiExp(e, rhs, std::less_equal   <int>())); //throw std::bad_cast
+                if (t == Token::TK_GREATER)       return manageObj(makeBiExp(e, rhs, std::greater      <int>())); //
+                if (t == Token::TK_GREATER_EQUAL) return manageObj(makeBiExp(e, rhs, std::greater_equal<int>())); //
             }
             return e;
         }
@@ -347,35 +340,33 @@ private:
         {
             const Expression* e = &parsePrimary();
 
-            for (;;) //associativity: ->
-                if (token().type == Token::TK_MODULUS)
-                {
-                    nextToken();
-                    const Expression& rhs = parsePrimary();
+            while (token().type == Token::TK_MODULUS) //associativity: ->
+            {
+                nextToken();
+                const Expression& rhs = parsePrimary();
 
-                    //"compile-time" check: n % 0
-                    const LiteralNumberEx* literal = dynamic_cast<const LiteralNumberEx*>(&rhs);
-                    if (literal && literal->eval() == 0)
+                //"compile-time" check: n % 0
+                if (auto literal = dynamic_cast<const ConstNumberExp*>(&rhs))
+                    if (literal->eval() == 0)
                         throw ParsingError();
 
-                    e = &manageObj(makeBiExp(*e, rhs, std::modulus<int>()));
-                }
-                else break;
+                e = &manageObj(makeBiExp(*e, rhs, std::modulus<int>())); //throw std::bad_cast
+            }
             return *e;
         }
 
         const Expression& parsePrimary()
         {
-            if (token().type == Token::TK_N)
+            if (token().type == Token::TK_VARIABLE_N)
             {
                 nextToken();
-                return manageObj(NumberN(n_));
+                return manageObj(VariableNumberNExp(n_));
             }
-            else if (token().type == Token::TK_NUMBER)
+            else if (token().type == Token::TK_CONST_NUMBER)
             {
                 const int number = token().number;
                 nextToken();
-                return manageObj(LiteralNumberEx(number));
+                return manageObj(ConstNumberExp(number));
             }
             else if (token().type == Token::TK_BRACKET_LEFT)
             {

@@ -1,8 +1,7 @@
 // **************************************************************************
 // * This file is part of the zenXML project. It is distributed under the   *
-// * Boost Software License, Version 1.0. See accompanying file             *
-// * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef STRING_TOOLS_HEADER_213458973046

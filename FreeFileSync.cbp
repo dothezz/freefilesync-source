@@ -412,8 +412,8 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\format_unit.cpp" />
-		<Unit filename="wx+\format_unit.h">
+		<Unit filename="zen\format_unit.cpp" />
+		<Unit filename="zen\format_unit.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>

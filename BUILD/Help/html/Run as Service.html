@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20120903;12221300">
+	<META NAME="CHANGED" CONTENT="20120905;21304100">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -22,115 +22,50 @@
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Run
-as Service <SPAN STYLE="font-weight: normal">(Windows only)</SPAN></FONT></FONT></H2>
+as Service <SPAN STYLE="font-weight: normal">(Windows)</SPAN></FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
-following step-by-step guide describes how to setup RealtimeSync (or
-any other application) as a Windows Service. This is necessary if the
-tool shall run on the SYSTEM account independent from currently
-logged-in users. If you are the only user and all you want is to
-start RealtimeSync automatically then it's better to <B>place a link
-into Windows' Autostart folder</B>, specifying RealtimeSync.exe and
-the .ffs_batch or .ffs_real file as argument.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">RealtimeSync
+is designed as a background process which does not need further
+attention once it is running. Depending on your requirements there
+are a number of ways to start it together with the operating system.
+Generally the goal is to execute a command line like the following:
+</FONT><FONT FACE="Tahoma, sans-serif"><I><SPAN STYLE="font-weight: normal">&lt;installation
+folder&gt;\RealtimeSync.exe &lt;path to *.ffs_real or *.ffs_batch
+file&gt;</SPAN></I></FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Reference:
-<A HREF="http://support.microsoft.com/kb/137890">http://support.microsoft.com/kb/137890</A></FONT></P>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">1. Get
-access to the command-line tools &quot;</FONT><FONT FACE="Courier New, monospace">instsrv.exe</FONT><FONT FACE="Tahoma, sans-serif">&quot;
-and &quot;</FONT><FONT FACE="Courier New, monospace">srvany.exe</FONT><FONT FACE="Tahoma, sans-serif">&quot;
-which come with the Windows Server 2003 Resource Kit Tools:</FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Download:
-<A HREF="http://www.microsoft.com/downloads/details.aspx?familyid=9d467a69-57ff-4ae7-96ee-b18c4790cffd&amp;displaylang=en">http://www.microsoft.com/downloads/details.aspx?familyid=9d467a69-57ff-4ae7-96ee-b18c4790cffd&amp;displaylang=en</A></FONT></P>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">2.
-Create and register a new Service via command line:</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT></P>
 <UL>
-	<P STYLE="margin-right: 0.98cm"><SPAN ID="Rahmen4" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+	<P STYLE="margin-right: 0.98cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-		<FONT FACE="Courier New, monospace">instsrv &lt;ServiceName&gt;
-		&lt;PathToResourceKit&gt;\srvany.exe</FONT></P>
-	</SPAN><BR CLEAR=LEFT>&nbsp;<BR><IMG SRC="../img/RunAsService_html_4f230a46.png" NAME="Grafik9" ALIGN=BOTTOM WIDTH=430 HEIGHT=107 BORDER=0></P>
+		<FONT FACE="Courier New, monospace">&quot;C:\Program
+		Files\FreeFileSync\RealtimeSync.exe&quot; &quot;C:\some
+		folder\SyncJob.ffs_batch&quot;</FONT></P>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
 </UL>
+<P STYLE="margin-right: 0.98cm"><BR><BR>
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">RealtimeSync
+	should be monitoring only while a specific user is logged in: </SPAN></SPAN>Create
+	a new shortcut, enter the command line from above as target and
+	place it into the user's autostart folder.</FONT></P>
+	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/create_shortcut.png" NAME="Grafik3" ALIGN=BOTTOM BORDER=0></P>
+	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/shortcut_properties.png" NAME="Grafik4" ALIGN=BOTTOM BORDER=0></P>
+	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">RealtimeSync
+	should be monitoring while Windows is online irrespective of
+	currently logged in users: Create a new task in your operating
+	systems's task scheduler and have it execute the command line above
+	when the system starts. See <A HREF="Schedule%20a%20Batch%20Job.html">Schedule
+	a Batch Job</A> for an example how to add a new task. Then change
+	the user to run the task to &quot;SYSTEM&quot; - a special user
+	account always running in the background.</FONT></P>
+	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/schedule_realtimesync.png" NAME="Grafik1" ALIGN=BOTTOM BORDER=0></P>
+</OL>
 <P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">3. Link
-the new Service with RealtimeSync:</FONT></P>
-<UL>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
-	the Registry editor (Regedit.exe) and navigate to key
-	&quot;</FONT><FONT FACE="Courier New, monospace">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\&lt;ServiceName&gt;</FONT><FONT FACE="Tahoma, sans-serif">&quot;</FONT></P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Add
-	a new key &quot;</FONT><FONT FACE="Courier New, monospace">Parameters</FONT><FONT FACE="Tahoma, sans-serif">&quot;.<BR><IMG SRC="../img/RunAsService_html_bf02de4e.png" NAME="Grafik8" ALIGN=BOTTOM WIDTH=249 HEIGHT=101 BORDER=0></FONT></P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Add
-	a new String value named &quot;</FONT><FONT FACE="Courier New, monospace">Application</FONT><FONT FACE="Tahoma, sans-serif">&quot;
-	and specify a command line that shall be executed as value.<BR><IMG SRC="../img/RunAsService_html_m3be0f332.png" NAME="Grafik10" ALIGN=BOTTOM WIDTH=620 HEIGHT=58 BORDER=0></FONT></P>
-</UL>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The new
-service is now ready for operation!</FONT></P>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-	<FONT FACE="Tahoma, sans-serif"><B>Attention</B><BR>When running
-	RealtimeSync as a service the application has no means to interact
-	with the user. Therefore any popup dialog will block progress!
-	Consider the following options when setting up a FreeFileSync batch
-	job:</FONT></P>
-	<UL>
-		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Disable
-		checkbox &quot;<I>Show progress dialog</I>&quot; or automatically
-		close it after synchronization.</FONT></P>
-		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Set
-		&quot;<I>Error handling</I>&quot; to &quot;<I>Exit instantly</I>&quot;
-		or &quot;<I>Ignore errors</I>&quot;.</FONT></P>
-		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">To
-		ease debugging or initial setup &quot;Allow service to interact
-		with desktop&quot;. The may show error dialogs otherwise hidden by
-		the SYSTEM account.</FONT></P>
-	</UL>
-</SPAN><BR CLEAR=LEFT><BR><IMG SRC="../img/RunAsService_html_13819326743214.png" NAME="Grafik2" ALIGN=TEXTTOP WIDTH=535 HEIGHT=589 BORDER=0></P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">You can
-start the service now via command line or Windows Service
-administration:</FONT></P>
-<UL>
-	<P STYLE="margin-right: 0.98cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-		<FONT FACE="Tahoma, sans-serif">net start &lt;ServiceName&gt;</FONT></P>
-	</SPAN><BR CLEAR=LEFT>&nbsp;<BR><IMG SRC="../img/RunAsService_html_17e8fbfe.png" NAME="Grafik5" ALIGN=BOTTOM WIDTH=640 HEIGHT=55 BORDER=0><BR>&nbsp;<BR><IMG SRC="../img/RunAsService_html_7aa44556.png" NAME="Grafik1" ALIGN=BOTTOM WIDTH=548 HEIGHT=291 BORDER=0></P>
-</UL>
-<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen7" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-	<FONT FACE="Tahoma, sans-serif"><B>Note</B><BR>By default the
-	service is created with start-up type &quot;automatic&quot; which
-	runs it on Windows start. This behavior can be changed in Windows
-	Service administration.</FONT></P>
-</SPAN><BR CLEAR=LEFT><BR>
-</P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><IMG SRC="../img/RunAsService_html_m3e56d901.png" NAME="Grafik6" ALIGN=BOTTOM WIDTH=410 HEIGHT=468 BORDER=0></P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><BR>
-</P>
-<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If the
-Service shall be removed from the system, enter via command line:</FONT></P>
-<UL>
-	<P STYLE="margin-right: 0.98cm"><SPAN ID="Rahmen6" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-		<FONT FACE="Tahoma, sans-serif">instsrv &lt;ServiceName&gt; remove</FONT></P>
-	</SPAN><BR CLEAR=LEFT>&nbsp;<BR><IMG SRC="../img/RunAsService_html_68e0fe53.png" NAME="Grafik7" ALIGN=MIDDLE WIDTH=640 HEIGHT=52 BORDER=0></P>
-</UL>
-<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><BR>
 </P>
 </BODY>
 </HTML>

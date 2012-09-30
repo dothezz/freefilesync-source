@@ -3,21 +3,33 @@
 #include <Winver.h>
 #include "version/version.rc"
 
-//beginning with VC11 we get linking error "CVTRES : fatal error CVT1100: duplicate resource.  type:MANIFEST, name:1, language:0x0409" 
-//due to "#define wxMANIFEST_ID 1" in wx.rc. Using another number doesn't integrate the manifest correctly for VC2010 compilers.
-//However tests indicate we do not need this manifest at all:
-//#define wxUSE_NO_MANIFEST 1 //VC11 screws up if not set to an integer, unbelievable
-//we can't #ifdef _MSC_VER: not known by resource compiler!
-//see also: http://blog.m-ri.de/index.php/2010/11/26/combobox-dropdown-hoehe-wird-nicht-mehr-durch-die-ressourcen-definiert/
+#define wxUSE_NO_MANIFEST 1 //lame resource compiler requires us to define an integer here
 #include <wx/msw/wx.rc>
+/*
+Reasons to NOT use the wxWidgets manifest file:
+    1. beginning with VC11 we get linking error "CVTRES : fatal error CVT1100: duplicate resource.  type:MANIFEST, name:1, language:0x0409"
+    due to "#define wxMANIFEST_ID 1" in wx.rc. Using another number doesn't integrate the manifest correctly for VC2010 compilers.
+    2. it is missing the "requestedExecutionLevel" element. Consequently UAC virtualization will be active for a 32 bit executable started in user mode
+*/
+
+//MSDN on manifests: http://msdn.microsoft.com/en-us/library/bb756929.aspx
+#define MANIFEST_RESOURCE_ID 1
+#if defined(WX_CPU_AMD64) //check for 64 bit *first*
+MANIFEST_RESOURCE_ID RT_MANIFEST "amd64.manifest"
+#elif defined(WX_CPU_X86)
+MANIFEST_RESOURCE_ID RT_MANIFEST "win32.manifest"
+#else
+#error What is going on?
+#endif
+
 
 A_PROGRAM_ICON ICON DISCARDABLE "lib/FreeFileSync.ico"
 B_BATCH_ICON   ICON DISCARDABLE "lib/Batch.ico"
 C_SYNC_DB_ICON ICON DISCARDABLE "lib/SyncDB.ico"
 
 IDR_VERSION1   VERSIONINFO
-FILEVERSION    VER_FREEFILESYNC
-PRODUCTVERSION VER_FREEFILESYNC
+FILEVERSION    FREEFILESYNC_VER
+PRODUCTVERSION FREEFILESYNC_VER
 FILEOS         VOS__WINDOWS32
 FILETYPE       VFT_APP
 BEGIN
@@ -26,10 +38,10 @@ BEGIN
     BLOCK "FFFF04B0"
     BEGIN
       VALUE "FileDescription", "Folder Comparison and Synchronization\0"
-      VALUE "FileVersion",     VER_FREEFILESYNC_STR
+      VALUE "FileVersion",     FREEFILESYNC_VER_STR
       VALUE "ProductName",     "FreeFileSync\0"
-      VALUE "ProductVersion",  VER_FREEFILESYNC_STR
-      VALUE "LegalCopyright",  "ZenJu - All Rights Reserved\0"
+      VALUE "ProductVersion",  FREEFILESYNC_VER_STR
+      VALUE "LegalCopyright",  "Zenju - All Rights Reserved\0"
     END
   END
   BLOCK "VarFileInfo"

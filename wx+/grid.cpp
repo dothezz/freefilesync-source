@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "grid.h"
@@ -17,7 +17,7 @@
 #include <zen/string_tools.h>
 #include <zen/scope_guard.h>
 #include <zen/utf.h>
-#include "format_unit.h"
+#include <zen/format_unit.h>
 #include "image_tools.h"
 
 #ifdef FFS_LINUX

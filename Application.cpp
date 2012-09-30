@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "application.h"
@@ -24,7 +24,9 @@
 #include "lib/process_xml.h"
 #include "lib/error_log.h"
 
-#ifdef FFS_LINUX
+#ifdef FFS_WIN
+#include <zen/win_ver.h>
+#elif defined FFS_LINUX
 #include <gtk/gtk.h>
 #endif
 
@@ -34,9 +36,9 @@ using namespace xmlAccess;
 
 IMPLEMENT_APP(Application)
 
-void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, const XmlGlobalSettings& settings);
-void runGuiMode(const std::vector<wxString>& cfgFileName, const XmlGlobalSettings& settings);
-void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsReturnCode& returnCode);
+void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg);
+void runGuiMode(const std::vector<wxString>& cfgFileName);
+void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode);
 
 
 #ifdef FFS_WIN
@@ -54,6 +56,10 @@ void onTerminationRequested()
     ::MessageBox(0, msg.c_str(), _("An exception occurred!").c_str(), 0);
     std::abort();
 }
+
+#ifdef _MSC_VER
+void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
+#endif
 }
 #endif
 
@@ -62,6 +68,10 @@ bool Application::OnInit()
 {
 #ifdef FFS_WIN
     std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
+#ifdef _MSC_VER
+    _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
+#endif
+    assert(!win8OrLater()); //another breadcrumb: test and add new OS entry to "compatibility" in application manifest
 #endif
 
     returnCode = FFS_RC_SUCCESS;
@@ -144,7 +154,7 @@ void Application::OnStartApplication(wxIdleEvent&)
     SetAppName(L"FreeFileSync");
 
 #ifdef FFS_WIN
-    //Quote: "Best practice is that all applications call the process-wide SetErrorMode function with a parameter of
+    //Quote: "Best practice is that all applications call the process-wide ::SetErrorMode() function with a parameter of
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
@@ -160,29 +170,18 @@ void Application::OnStartApplication(wxIdleEvent&)
     wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
 #endif
 
-    xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
-    try //load global settings
+    try
     {
-        if (fileExists(toZ(getGlobalConfigFile())))
-            readConfig(globalSettings); //throw FfsXmlError
-        //else: globalSettings already has default values
+        //tentatively set program language to OS default until GlobalSettings.xml is read later
+        setLanguage(xmlAccess::XmlGlobalSettings().programLanguage); //throw FileError
     }
-    catch (const xmlAccess::FfsXmlError& error)
-    {
-        setLanguage(globalSettings.programLanguage); //set default language
-        //show messagebox and continue
-        if (error.getSeverity() == FfsXmlError::WARNING)
-            ; //wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
-        else
-            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
-    }
-    setLanguage(globalSettings.programLanguage);
+    catch (const FileError&) {} //no messagebox: consider batch job!
 
     //determine FFS mode of operation
     std::vector<wxString> commandArgs = getCommandlineArgs(*this);
 
     if (commandArgs.empty())
-        runGuiMode(commandArgs, globalSettings);
+        runGuiMode(commandArgs);
     else
     {
         const bool gotDirNames = std::any_of(commandArgs.begin(), commandArgs.end(), [](const wxString& dirname) { return dirExists(toZ(dirname)); });
@@ -210,7 +209,7 @@ void Application::OnStartApplication(wxIdleEvent&)
                     fp.rightDirectory = toZ(*iter);
             }
 
-            runGuiMode(guiCfg, globalSettings);
+            runGuiMode(guiCfg);
         }
         else //mode 2: try to set config/batch-filename set by %1 parameter
         {
@@ -236,14 +235,14 @@ void Application::OnStartApplication(wxIdleEvent&)
             {
                 case MERGE_BATCH: //pure batch config files
                     if (commandArgs.size() == 1)
-                        runBatchMode(utfCvrtTo<Zstring>(commandArgs[0]), globalSettings, returnCode);
+                        runBatchMode(utfCvrtTo<Zstring>(commandArgs[0]), returnCode);
                     else
-                        runGuiMode(commandArgs, globalSettings);
+                        runGuiMode(commandArgs);
                     break;
 
                 case MERGE_GUI:       //pure gui config files
                 case MERGE_GUI_BATCH: //gui and batch files
-                    runGuiMode(commandArgs, globalSettings);
+                    runGuiMode(commandArgs);
                     break;
 
                 case MERGE_OTHER: //= none or unknown;
@@ -268,12 +267,6 @@ void Application::OnStartApplication(wxIdleEvent&)
             }
         }
     }
-}
-
-
-bool Application::OnExceptionInMainLoop()
-{
-    throw; //just re-throw exception and avoid display of additional exception messagebox: it will be caught in OnRun()
 }
 
 
@@ -316,24 +309,22 @@ void Application::OnQueryEndSession(wxEvent& event)
 }
 
 
-void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg, const XmlGlobalSettings& settings)
+void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg)
 {
-    MainDialog* frame = new MainDialog(std::vector<wxString>(), guiCfg, settings, true);
-    frame->Show();
+    MainDialog::create(guiCfg, true);
 }
 
 
-void runGuiMode(const std::vector<wxString>& cfgFileNames, const XmlGlobalSettings& settings)
+void runGuiMode(const std::vector<wxString>& cfgFileNames)
 {
-    MainDialog* frame = new MainDialog(cfgFileNames, settings);
-    frame->Show();
+    MainDialog::create(cfgFileNames);
 }
 
 
-void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsReturnCode& returnCode)
+void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
 {
     //load XML settings
-    XmlBatchConfig batchCfg;  //structure to receive gui settings
+    XmlBatchConfig batchCfg;
     try
     {
         readConfig(filename, batchCfg);
@@ -341,23 +332,58 @@ void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsR
     catch (const xmlAccess::FfsXmlError& e)
     {
         wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
+        raiseReturnCode(returnCode, FFS_RC_ABORTED);
         return;
     }
+
+    auto notifyError = [&](const std::wstring& msg)
+    {
+        if (batchCfg.handleError == ON_ERROR_POPUP)
+            wxMessageBox(msg.c_str(), _("Error"), wxOK | wxICON_ERROR);
+        else //"exit" or "ignore"
+            logError(utfCvrtTo<std::string>(msg));
+
+        raiseReturnCode(returnCode, FFS_RC_FINISHED_WITH_ERRORS);
+    };
+
+    XmlGlobalSettings globalCfg;
+    try
+    {
+        if (fileExists(toZ(getGlobalConfigFile())))
+            readConfig(globalCfg); //throw FfsXmlError
+        //else: globalCfg already has default values
+    }
+    catch (const xmlAccess::FfsXmlError& e)
+    {
+        if (e.getSeverity() != FfsXmlError::WARNING) //ignore parsing errors: should be migration problems only *cross-fingers*
+            return notifyError(e.toString()); //abort sync!
+    }
+
+    try
+    {
+        setLanguage(globalCfg.programLanguage); //throw FileError
+    }
+    catch (const FileError& e)
+    {
+        notifyError(e.toString());
+        //continue!
+    }
+
     //all settings have been read successfully...
 
     //regular check for program updates -> disabled for batch
     //if (batchCfg.showProgress)
-    //    checkForUpdatePeriodically(globSettings.lastUpdateCheck);
+    //    checkForUpdatePeriodically(globalCfg.lastUpdateCheck);
 
     try //begin of synchronization process (all in one try-catch block)
     {
 
         const TimeComp timeStamp = localTime();
 
-        const SwitchToGui switchBatchToGui(utfCvrtTo<wxString>(filename), batchCfg, globSettings); //prepare potential operational switch
+        const SwitchToGui switchBatchToGui(utfCvrtTo<wxString>(filename), batchCfg, globalCfg); //prepare potential operational switch
 
         //class handling status updates and error messages
-        BatchStatusHandler statusHandler(batchCfg.showProgress,
+        BatchStatusHandler statusHandler(batchCfg.showProgress, //throw BatchAbortProcess
                                          extractJobName(filename),
                                          timeStamp,
                                          batchCfg.logFileDirectory,
@@ -366,7 +392,7 @@ void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsR
                                          switchBatchToGui,
                                          returnCode,
                                          batchCfg.mainCfg.onCompletion,
-                                         globSettings.gui.onCompletionHistory);
+                                         globalCfg.gui.onCompletionHistory);
 
         const std::vector<FolderPairCfg> cmpConfig = extractCompareCfg(batchCfg.mainCfg);
 
@@ -384,7 +410,7 @@ void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsR
         //batch mode: place directory locks on directories during both comparison AND synchronization
 
         std::unique_ptr<LockHolder> dummy;
-        if (globSettings.createLockFile)
+        if (globalCfg.createLockFile)
         {
             dummy.reset(new LockHolder(allowPwPrompt));
             std::for_each(cmpConfig.begin(), cmpConfig.end(),
@@ -397,10 +423,10 @@ void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsR
 
         //COMPARE DIRECTORIES
         FolderComparison folderCmp;
-        compare(globSettings.fileTimeTolerance,
-                globSettings.optDialogs,
+        compare(globalCfg.fileTimeTolerance,
+                globalCfg.optDialogs,
                 allowPwPrompt,
-                globSettings.runWithBackgroundPriority,
+                globalCfg.runWithBackgroundPriority,
                 cmpConfig,
                 folderCmp,
                 statusHandler);
@@ -408,15 +434,15 @@ void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsR
         //START SYNCHRONIZATION
         const std::vector<FolderPairSyncCfg> syncProcessCfg = extractSyncCfg(batchCfg.mainCfg);
         if (syncProcessCfg.size() != folderCmp.size())
-            throw std::logic_error("Programming Error: Contract violation!");
+            throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
         synchronize(timeStamp,
-                    globSettings.optDialogs,
-                    globSettings.verifyFileCopy,
-                    globSettings.copyLockedFiles,
-                    globSettings.copyFilePermissions,
-                    globSettings.transactionalFileCopy,
-                    globSettings.runWithBackgroundPriority,
+                    globalCfg.optDialogs,
+                    globalCfg.verifyFileCopy,
+                    globalCfg.copyLockedFiles,
+                    globalCfg.copyFilePermissions,
+                    globalCfg.transactionalFileCopy,
+                    globalCfg.runWithBackgroundPriority,
                     syncProcessCfg,
                     folderCmp,
                     statusHandler);
@@ -433,13 +459,10 @@ void runBatchMode(const Zstring& filename, XmlGlobalSettings& globSettings, FfsR
 
     try //save global settings to XML: e.g. ignored warnings
     {
-        xmlAccess::writeConfig(globSettings); //FfsXmlError
+        xmlAccess::writeConfig(globalCfg); //FfsXmlError
     }
     catch (const xmlAccess::FfsXmlError& e)
     {
-        if (batchCfg.handleError == ON_ERROR_POPUP)
-            wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
-        else
-            logError(utfCvrtTo<std::string>(e.toString()));
+        notifyError(e.toString());
     }
 }

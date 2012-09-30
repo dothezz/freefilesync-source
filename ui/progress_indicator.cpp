@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "progress_indicator.h"
@@ -10,9 +10,9 @@
 #include <wx/stopwatch.h>
 #include <wx/wupdlock.h>
 #include <zen/basic_math.h>
+#include <zen/format_unit.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/toggle_button.h>
-#include <wx+/format_unit.h>
 #include <wx+/image_tools.h>
 #include <wx+/graph.h>
 #include <wx+/no_flicker.h>
@@ -296,9 +296,9 @@ public:
         const int warningCount = log_.getItemCount(TYPE_WARNING);
         const int infoCount    = log_.getItemCount(TYPE_INFO);
 
-        m_bpButtonErrors  ->init(buttonPressed ("error"  ), buttonReleased("error"  ), _("Error"  ) + wxString::Format(L" (%d)", errorCount  ));
-        m_bpButtonWarnings->init(buttonPressed ("warning"), buttonReleased("warning"), _("Warning") + wxString::Format(L" (%d)", warningCount));
-        m_bpButtonInfo    ->init(buttonPressed ("info"   ), buttonReleased("info"   ), _("Info"   ) + wxString::Format(L" (%d)", infoCount   ));
+        m_bpButtonErrors  ->init(buttonPressed ("msg_error"  ), buttonReleased("msg_error"  ), _("Error"  ) + wxString::Format(L" (%d)", errorCount  ));
+        m_bpButtonWarnings->init(buttonPressed ("msg_warning"), buttonReleased("msg_warning"), _("Warning") + wxString::Format(L" (%d)", warningCount));
+        m_bpButtonInfo    ->init(buttonPressed ("msg_info"   ), buttonReleased("msg_info"   ), _("Info"   ) + wxString::Format(L" (%d)", infoCount   ));
 
         m_bpButtonErrors  ->setActive(true);
         m_bpButtonWarnings->setActive(true);
@@ -636,7 +636,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
         mainDialog->disableAllElements(false); //disable all child elements
     }
 
-    m_animationControl1->SetAnimation(GlobalResources::instance().animationSync);
+    m_animationControl1->SetAnimation(GlobalResources::instance().aniSync);
     m_animationControl1->Play();
 
     SetIcon(GlobalResources::instance().programIcon);

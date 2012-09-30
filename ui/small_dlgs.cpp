@@ -1,15 +1,15 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "gui_generated.h"
 #include "small_dlgs.h"
 #include "msg_popup.h"
+#include <zen/format_unit.h>
 #include "../lib/resources.h"
 #include "../algorithm.h"
-#include <wx+/format_unit.h>
 #include <wx+/choice_enum.h>
 #include "../synchronization.h"
 #include "custom_grid.h"
@@ -45,8 +45,10 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     m_bitmap9 ->SetBitmap(GlobalResources::getImage(L"website"));
     m_bitmap10->SetBitmap(GlobalResources::getImage(L"email"));
     m_bitmap13->SetBitmap(GlobalResources::getImage(L"gpl"));
-    //m_bitmapTransl->SetBitmap(GlobalResources::getImage(wxT("translation")));
-    m_bitmapPaypal->SetBitmap(GlobalResources::getImage(L"paypal"));
+    //m_bitmapSmiley->SetBitmap(GlobalResources::getImage(L"smiley"));
+
+    m_animCtrlWink->SetAnimation(GlobalResources::instance().aniWink);
+    m_animCtrlWink->Play();
 
     //create language credits
     for (auto iter = ExistingTranslations::get().begin(); iter != ExistingTranslations::get().end(); ++iter)
@@ -236,13 +238,13 @@ void FilterDlg::updateGui()
 
     m_bitmapInclude->SetBitmap(
         !NameFilter::isNull(activeCfg.includeFilter, FilterConfig().excludeFilter) ?
-        GlobalResources::getImage(L"include") :
-        greyScale(GlobalResources::getImage(L"include")));
+        GlobalResources::getImage(L"filter_include") :
+        greyScale(GlobalResources::getImage(L"filter_include")));
 
     m_bitmapExclude->SetBitmap(
         !NameFilter::isNull(FilterConfig().includeFilter, activeCfg.excludeFilter) ?
-        GlobalResources::getImage(L"exclude") :
-        greyScale(GlobalResources::getImage(L"exclude")));
+        GlobalResources::getImage(L"filter_exclude") :
+        greyScale(GlobalResources::getImage(L"filter_exclude")));
 
     m_bitmapFilterDate->SetBitmap(
         activeCfg.unitTimeSpan != UTIME_NONE ?
@@ -385,10 +387,10 @@ void DeleteDialog::updateGui()
 {
     wxWindowUpdateLocker dummy(m_panelHeader); //avoid display distortion
 
-    const std::pair<wxString, int> delInfo = zen::deleteFromGridAndHDPreview(
-                                                 rowsToDeleteOnLeft,
-                                                 rowsToDeleteOnRight,
-                                                 m_checkBoxDeleteBothSides->GetValue());
+    const std::pair<Zstring, int> delInfo = zen::deleteFromGridAndHDPreview(
+                                                rowsToDeleteOnLeft,
+                                                rowsToDeleteOnRight,
+                                                m_checkBoxDeleteBothSides->GetValue());
     wxString header;
     if (m_checkBoxUseRecycler->GetValue())
     {
@@ -405,8 +407,8 @@ void DeleteDialog::updateGui()
     replace(header, L"%x", toGuiString(delInfo.second));
     m_staticTextHeader->SetLabel(header);
 
-    const wxString& filesToDelete = delInfo.first;
-    m_textCtrlFileList->ChangeValue(filesToDelete);
+    const wxString& fileList = utfCvrtTo<wxString>(delInfo.first);
+    m_textCtrlFileList->ChangeValue(fileList);
 
     Fit(); //child-element widths have changed: image was set
     m_panelHeader->Layout();
@@ -477,7 +479,7 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_buttonStartSync->setBitmapFront(GlobalResources::getImage(L"startSync"));
+    m_buttonStartSync->setBitmapFront(GlobalResources::getImage(L"sync"), 5);
     m_staticTextVariant->SetLabel(variantName);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -675,10 +677,10 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     new zen::MouseMoveWindow(*this); //allow moving dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmapSettings    ->SetBitmap     (GlobalResources::getImage(wxT("settings")));
-    m_buttonResetDialogs->setBitmapFront(GlobalResources::getImage(wxT("warningSmall")), 5);
-    m_bpButtonAddRow    ->SetBitmapLabel(GlobalResources::getImage(wxT("addFolderPair")));
-    m_bpButtonRemoveRow ->SetBitmapLabel(GlobalResources::getImage(wxT("removeFolderPair")));
+    m_bitmapSettings    ->SetBitmap     (GlobalResources::getImage(L"settings"));
+    m_buttonResetDialogs->setBitmapFront(GlobalResources::getImage(L"warningSmall"), 5);
+    m_bpButtonAddRow    ->SetBitmapLabel(GlobalResources::getImage(L"item_add"));
+    m_bpButtonRemoveRow ->SetBitmapLabel(GlobalResources::getImage(L"item_delete"));
 
     m_checkBoxCopyLocked     ->SetValue(globalSettings.copyLockedFiles);
     m_checkBoxTransCopy      ->SetValue(globalSettings.transactionalFileCopy);

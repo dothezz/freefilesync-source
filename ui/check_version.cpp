@@ -1,49 +1,65 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "check_version.h"
 #include <memory>
+#include <zen/string_tools.h>
+#include <zen/i18n.h>
 #include <wx/msgdlg.h>
 #include <wx/protocol/http.h>
 #include <wx/sstream.h>
-#include "../version/version.h"
 #include <wx/utils.h>
 #include <wx/timer.h>
-#include <zen/string_tools.h>
 #include "msg_popup.h"
+#include "../version/version.h"
 #include "../lib/ffs_paths.h"
-#include <zen/i18n.h>
 
 using namespace zen;
 
 
-wxString getOnlineVersion() //empty string on error;
+namespace
+{
+enum GetVerResult
+{
+    GET_VER_SUCCESS,
+    GET_VER_NO_CONNECTION, //no internet connection?
+    GET_VER_PAGE_NOT_FOUND //version file seems to have moved! => trigger an update!
+};
+
+GetVerResult getOnlineVersion(wxString& version) //empty string on error;
 {
     wxWindowDisabler dummy;
 
     wxHTTP webAccess;
-    webAccess.SetHeader(L"Content-type", L"text/html; charset=utf-8");
+    webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
     webAccess.SetTimeout(5); //5 seconds of timeout instead of 10 minutes(WTF are they thinking???)...
 
-    if (webAccess.Connect(L"freefilesync.cvs.sourceforge.net")) //only the server, no pages here yet...
+    if (webAccess.Connect(L"freefilesync.sourceforge.net")) //only the server, no pages here yet...
     {
         //wxApp::IsMainLoopRunning(); // should return true
 
-        std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(L"/viewvc/freefilesync/version/version.txt"));
+        std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(L"/latest_version.txt"));
         //must be deleted BEFORE webAccess is closed
 
         if (httpStream && webAccess.GetError() == wxPROTO_NOERR)
         {
-            wxString onlineVersion;
-            wxStringOutputStream out_stream(&onlineVersion);
-            httpStream->Read(out_stream);
-            return onlineVersion;
+            wxString tmp;
+            wxStringOutputStream outStream(&tmp);
+            httpStream->Read(outStream);
+            version = tmp;
+            return GET_VER_SUCCESS;
         }
+        else
+            return GET_VER_PAGE_NOT_FOUND;
     }
-    return wxString();
+    else //check if sourceforge in general is reachable
+    {
+        webAccess.SetTimeout(1);
+        return webAccess.Connect(L"sourceforge.net") ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
+    }
 }
 
 
@@ -59,7 +75,7 @@ std::vector<size_t> parseVersion(const wxString& version)
 }
 
 
-bool isNewerVersion(const wxString& onlineVersion)
+bool haveNewerVersion(const wxString& onlineVersion)
 {
     std::vector<size_t> current = parseVersion(zen::currentVersion);
     std::vector<size_t> online  = parseVersion(onlineVersion);
@@ -70,25 +86,35 @@ bool isNewerVersion(const wxString& onlineVersion)
     return std::lexicographical_compare(current.begin(), current.end(),
                                         online .begin(), online .end());
 }
+}
 
 
 void zen::checkForUpdateNow(wxWindow* parent)
 {
-    const wxString onlineVersion = getOnlineVersion();
-    if (onlineVersion.empty())
+    wxString onlineVersion;
+    switch (getOnlineVersion(onlineVersion))
     {
-        wxMessageBox(_("Unable to connect to sourceforge.net!"), _("Error"), wxOK | wxICON_ERROR, parent);
-        return;
-    }
+        case GET_VER_SUCCESS:
+            if (haveNewerVersion(onlineVersion))
+            {
+                if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+                                    _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
+                    wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
+            }
+            else
+                wxMessageBox(_("FreeFileSync is up to date!"), _("Information"), wxICON_INFORMATION, parent);
+            break;
 
-    if (isNewerVersion(onlineVersion))
-    {
-        if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                            _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
-            wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
+        case GET_VER_NO_CONNECTION:
+            wxMessageBox(_("Unable to connect to sourceforge.net!"), _("Error"), wxOK | wxICON_ERROR, parent);
+            break;
+
+        case GET_VER_PAGE_NOT_FOUND:
+            if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+                                _("Current FreeFileSync version number was not found online! Do you want to check manually?")) == ReturnQuestionDlg::BUTTON_YES)
+                wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/");
+            break;
     }
-    else
-        wxMessageBox(_("FreeFileSync is up to date!"), _("Information"), wxICON_INFORMATION, parent);
 }
 
 
@@ -122,19 +148,30 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
         }
         else if (wxGetLocalTime() >= lastUpdateCheck + 7 * 24 * 3600) //check weekly
         {
-            const wxString onlineVersion = getOnlineVersion();
-            if (onlineVersion.empty())
-                return; //do not handle error
-
-            lastUpdateCheck = wxGetLocalTime();
-
-            if (isNewerVersion(onlineVersion))
+            wxString onlineVersion;
+            switch (getOnlineVersion(onlineVersion))
             {
-                if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                    _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
-                    wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
+                case GET_VER_SUCCESS:
+                    lastUpdateCheck = wxGetLocalTime();
+
+                    if (haveNewerVersion(onlineVersion))
+                    {
+                        if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+                                            _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" +
+                                            _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
+                            wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
+                    }
+                    break;
+
+                case GET_VER_NO_CONNECTION:
+                    break; //ignore this error
+
+                case GET_VER_PAGE_NOT_FOUND:
+                    if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+                                        _("Current FreeFileSync version number was not found online! Do you want to check manually?")) == ReturnQuestionDlg::BUTTON_YES)
+                        wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/");
+                    break;
             }
         }
     }
 }
-

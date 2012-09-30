@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "main_dlg.h"
@@ -36,9 +36,9 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     m_bpButtonRemoveTopFolder->Hide();
     m_panelMainFolder->Layout();
 
-    m_bpButtonAddFolder      ->SetBitmapLabel(GlobalResources::getImage(L"addFolderPair"));
-    m_bpButtonRemoveTopFolder->SetBitmapLabel(GlobalResources::getImage(L"removeFolderPair"));
-    m_buttonStart            ->setBitmapFront(GlobalResources::getImage(L"startRed"));
+    m_bpButtonAddFolder      ->SetBitmapLabel(GlobalResources::getImage(L"item_add"));
+    m_bpButtonRemoveTopFolder->SetBitmapLabel(GlobalResources::getImage(L"item_delete"));
+    m_buttonStart            ->setBitmapFront(GlobalResources::getImage(L"startRts"), 5);
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), nullptr, this);
@@ -353,7 +353,7 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
     {
         //add new folder pair
         DirectoryPanel* newFolder = new DirectoryPanel(m_scrolledWinFolders);
-        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(GlobalResources::getImage(wxT("removeFolderPair")));
+        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(GlobalResources::getImage(L"item_delete"));
 
         //get size of scrolled window
         folderHeight = newFolder->GetSize().GetHeight();

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef MAINDIALOG_H
@@ -19,7 +19,7 @@
 #include "tree_view.h"
 #include <wx+/file_drop.h>
 
-class FolderHistory;
+//class FolderHistory;
 class DirectoryPair;
 class CompareStatus;
 class DirectoryPairFirst;
@@ -28,15 +28,17 @@ class DirectoryPairFirst;
 class MainDialog : public MainDialogGenerated
 {
 public:
-    MainDialog(const std::vector<wxString>& cfgFileNames, //default behavior, application start
-               const xmlAccess::XmlGlobalSettings& globalSettings); //take over ownership => save on exit
+    //default behavior, application start
+    static void create(const std::vector<wxString>& cfgFileNames); //cfgFileNames empty: restore last config; non-empty load/merge given set of config files
 
-    MainDialog(const std::vector<wxString>& referenceFiles,
-               const xmlAccess::XmlGuiConfig& guiCfg,
-               const xmlAccess::XmlGlobalSettings& globalSettings, //take over ownership => save on exit
-               bool startComparison);
+    //load dynamically assembled config
+    static void create(const xmlAccess::XmlGuiConfig& guiCfg, bool startComparison);
 
-    ~MainDialog();
+    //when switching language or switching from batch run to GUI on warnings
+    static void create(const xmlAccess::XmlGuiConfig& guiCfg,
+                       const std::vector<wxString>& referenceFiles,
+                       const xmlAccess::XmlGlobalSettings& globalSettings, //take over ownership => save on exit
+                       bool startComparison);
 
     void disableAllElements(bool enableAbort); //dis-/enables all elements (except abort button) that might receive user input
     void enableAllElements();                   //during long-running processes: comparison, deletion
@@ -44,6 +46,17 @@ public:
     void onQueryEndSession(); //last chance to do something useful before killing the application!
 
 private:
+    static void create_impl(const xmlAccess::XmlGuiConfig& guiCfg,
+                            const std::vector<wxString>& referenceFiles,
+                            const xmlAccess::XmlGlobalSettings& globalSettings,
+                            bool startComparison);
+
+    MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
+               const std::vector<wxString>& referenceFiles,
+               const xmlAccess::XmlGlobalSettings& globalSettings, //take over ownership => save on exit
+               bool startComparison);
+    ~MainDialog();
+
     friend class CompareStatusHandler;
     friend class SyncStatusHandler;
     friend class ManualDeletionHandler;
@@ -54,18 +67,12 @@ private:
     friend class FolderPairCallback;
     friend class PanelMoveWindow;
 
-    MainDialog();
-
-    void init(const xmlAccess::XmlGuiConfig& guiCfg,
-              const xmlAccess::XmlGlobalSettings& globalSettings,
-              bool startComparison);
-
     //configuration load/save
     void setLastUsedConfig(const wxString& filename, const xmlAccess::XmlGuiConfig& guiConfig);
     void setLastUsedConfig(const std::vector<wxString>& filenames, const xmlAccess::XmlGuiConfig& guiConfig);
 
     xmlAccess::XmlGuiConfig getConfig() const;
-    void setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg);
+    void setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::vector<wxString>& referenceFiles);
 
     void setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSettings); //messes with Maximize(), window sizes, so call just once!
     xmlAccess::XmlGlobalSettings getGlobalCfgBeforeExit(); //destructive "get" thanks to "Iconize(false), Maximize(false)"
@@ -94,8 +101,10 @@ private:
     void updateGuiForFolderPair(); //helper method: add usability by showing/hiding buttons related to folder pairs
 
     //main method for putting gridDataView on UI: updates data respecting current view settings
-    void updateGui();
-    void updateGridViewData();
+    void updateGui(); //kitchen-sink update
+    void updateGridViewData();     //
+    void updateStatistics();       // more fine-grained updaters
+    void updateUnsavedCfgStatus(); //
 
     //context menu functions
     std::vector<zen::FileSystemObject*> getGridSelection(bool fromLeft = true, bool fromRight = true) const;
@@ -130,7 +139,7 @@ private:
     void OnSyncSettingsContext(wxMouseEvent& event);
     void OnGlobalFilterContext(wxCommandEvent& event);
 
-    void applyCompareConfig(bool changePreviewStatus = true);
+    void applyCompareConfig(bool switchMiddleGrid = false);
 
     //context menu handler methods
     void onMainGridContextL(zen::GridClickEvent& event);
@@ -144,7 +153,8 @@ private:
 
     void onNaviPanelFilesDropped(zen::FileDropEvent& event);
 
-    void OnDirSelected(wxCommandEvent& event);
+    void onDirSelected(wxCommandEvent& event);
+    void onDirManualCorrection(wxCommandEvent& event);
 
     void onCheckRows       (zen::CheckRowsEvent&     event);
     void onSetSyncDirection(zen::SyncDirectionEvent& event);
@@ -208,10 +218,6 @@ private:
     void excludeShortname(const zen::FileSystemObject& fsObj);
     void excludeItems(const std::vector<zen::FileSystemObject*>& selection);
 
-    void updateStatistics();
-
-    void updateSyncEnabledStatus();
-
     void OnAddFolderPair      (wxCommandEvent& event);
     void OnRemoveFolderPair   (wxCommandEvent& event);
     void OnRemoveTopFolderPair(wxCommandEvent& event);
@@ -248,17 +254,16 @@ private:
     //the prime data structure of this tool *bling*:
     zen::FolderComparison folderCmp; //optional!: sync button not available if empty
 
-    void clearGrid(bool refreshGrid = true);
+    void clearGrid();
 
     //-------------------------------------
-    //functional configuration
+    //program configuration
     xmlAccess::XmlGuiConfig currentCfg;
 
     //folder pairs:
     std::unique_ptr<DirectoryPairFirst> firstFolderPair; //always bound!!!
     std::vector<DirectoryPair*> additionalFolderPairs; //additional pairs to the first pair
     //-------------------------------------
-
 
     //***********************************************
     //status information

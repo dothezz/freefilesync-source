@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "gui_status_handler.h"
@@ -237,10 +237,10 @@ SyncStatusHandler::~SyncStatusHandler()
         if (isCloseProgressDlgCommand(finalCommand))
             showFinalResults = false; //take precedence over current visibility status
         else if (!finalCommand.empty())
-            {
-                auto cmdexp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(finalCommand)));
-                shellExecute(cmdexp);
-            }
+        {
+            auto cmdexp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(finalCommand)));
+            shellExecute(cmdexp);
+        }
     }
 
     //notify to syncStatusFrame that current process has ended

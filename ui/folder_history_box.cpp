@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "folder_history_box.h"
@@ -46,7 +46,7 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
     Connect(wxEVT_COMMAND_COMBOBOX_CLOSEUP, wxCommandEventHandler(FolderHistoryBox::OnHideDropDown), nullptr, this);
 #endif
 
-Connect(wxEVT_VALIDATE_USER_SELECTION, wxCommandEventHandler(FolderHistoryBox::OnValidateSelection), nullptr, this);
+    Connect(wxEVT_VALIDATE_USER_SELECTION, wxCommandEventHandler(FolderHistoryBox::OnValidateSelection), nullptr, this);
 }
 
 
@@ -84,7 +84,7 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
         //std::sort(tmp.begin(), tmp.end(), LessFilename());
 
         if (!dirList.empty() && !tmp.empty())
-			dirList.push_back(toZ(FolderHistory::separationLine()));
+            dirList.push_back(toZ(FolderHistory::separationLine()));
 
         dirList.insert(dirList.end(), tmp.begin(), tmp.end());
     }
@@ -105,7 +105,7 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
 
 void FolderHistoryBox::OnSelection(wxCommandEvent& event)
 {
-	    wxCommandEvent dummy2(wxEVT_VALIDATE_USER_SELECTION); //we cannot replace built-in commands at this position in call stack, so defer to a later time!
+    wxCommandEvent dummy2(wxEVT_VALIDATE_USER_SELECTION); //we cannot replace built-in commands at this position in call stack, so defer to a later time!
     if (auto handler = GetEventHandler())
         handler->AddPendingEvent(dummy2);
 
@@ -115,7 +115,7 @@ void FolderHistoryBox::OnSelection(wxCommandEvent& event)
 
 void FolderHistoryBox::OnValidateSelection(wxCommandEvent& event)
 {
-    //const auto& value = GetValue(); 
+    //const auto& value = GetValue();
     //if (value == FolderHistory::separationLine())
     //    setValueAndUpdateList(wxString()); -> not good enough (resolved folder name not updated)
 }

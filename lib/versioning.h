@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #ifndef VERSIONING_HEADER_8760247652438056
@@ -53,7 +53,7 @@ private:
     const Zstring timeStamp_;
     const int versionCountLimit_;
 
-    std::vector<Zstring> fileRelnames; //store list of revisioned files and symlinks (relativeName) for limitVersions()
+    std::vector<Zstring> fileRelNames; //store list of revisioned file and symlink relative names for limitVersions()
 };
 
 

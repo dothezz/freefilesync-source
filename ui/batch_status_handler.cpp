@@ -1,14 +1,14 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "batch_status_handler.h"
 #include <zen/file_handling.h>
 #include <zen/file_traverser.h>
+#include <zen/format_unit.h>
 #include <wx+/app_main.h>
-#include <wx+/format_unit.h>
 #include <wx+/shell_execute.h>
 #include "msg_popup.h"
 #include "exec_finished_box.h"
@@ -118,7 +118,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
         if (!tryReportingError([&] { logFile = prepareNewLogfile(logfileDirectory, jobName, timeStamp); }, //throw FileError; return value always bound!
                                *this))
         {
-            returnCode_ = FFS_RC_ABORTED;
+            raiseReturnCode(returnCode_, FFS_RC_ABORTED);
             throw BatchAbortProcess();
         }
 
@@ -141,13 +141,13 @@ BatchStatusHandler::~BatchStatusHandler()
     std::wstring finalStatus;
     if (abortIsRequested())
     {
-        returnCode_ = FFS_RC_ABORTED;
+        raiseReturnCode(returnCode_, FFS_RC_ABORTED);
         finalStatus = _("Synchronization aborted!");
         errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalErrors > 0)
     {
-        returnCode_ = FFS_RC_FINISHED_WITH_ERRORS;
+        raiseReturnCode(returnCode_, FFS_RC_FINISHED_WITH_ERRORS);
         finalStatus = _("Synchronization completed with errors!");
         errorLog.logMsg(finalStatus, TYPE_WARNING);
     }

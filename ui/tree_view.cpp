@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include <set>
@@ -11,7 +11,7 @@
 #include <zen/i18n.h>
 #include <zen/utf.h>
 #include <zen/stl_tools.h>
-#include <wx+/format_unit.h>
+#include <zen/format_unit.h>
 #include <wx+/rtl.h>
 #include <wx+/context_menu.h>
 #include "../lib/icon_buffer.h"

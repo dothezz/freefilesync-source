@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "msg_popup.h"
@@ -46,7 +46,7 @@ ErrorDlg::ErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageT
 #endif
 
     SetTitle(!caption.empty() ? caption : _("Error"));
-    m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"error"));
+    m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"msg_error"));
     m_textCtrlMessage->SetValue(messageText);
     checkBoxIgnoreErrors.SetLabel(_("Ignore further errors"));
     buttonIgnore.SetLabel(_("&Ignore"));
@@ -148,7 +148,7 @@ WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& mes
 #endif
 
     SetTitle(_("Warning"));
-    m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"warning"));
+    m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"msg_warning"));
     m_textCtrlMessage->SetValue(messageText);
     checkBoxDontShowAgain.SetLabel(_("Don't show this dialog again"));
     buttonIgnore.SetLabel(_("&Ignore"));
@@ -237,7 +237,7 @@ QuestionDlg::QuestionDlg(wxWindow* parent,
 #endif
 
     SetTitle(!caption.empty()? caption : _("Question"));
-    m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"question"));
+    m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"msg_question"));
     m_textCtrlMessage->SetValue(messageText);
     buttonYes.SetLabel(!labelYes.empty() ? labelYes : _("&Yes"));
     buttonNo .SetLabel(!labelNo .empty() ? labelNo  : _("&No"));

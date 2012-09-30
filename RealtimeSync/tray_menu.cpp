@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) ZenJu (zenju AT gmx DOT de) - All Rights Reserved        *
+// * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
 #include "tray_menu.h"
@@ -9,22 +9,23 @@
 #include <iterator>
 #include <limits>
 #include <set>
+#include <zen/assert_static.h>
+#include <zen/build_info.h>
+#include <wx+/mouse_move_dlg.h>
+#include <wx+/image_tools.h>
+#include <wx+/string_conv.h>
+#include <wx+/shell_execute.h>
 #include <wx/msgdlg.h>
 #include <wx/taskbar.h>
 #include <wx/app.h>
 #include <wx/utils.h>
 #include <wx/menu.h>
-#include "watcher.h"
 #include <wx/utils.h>
 #include <wx/icon.h> //Linux needs this
 #include <wx/timer.h>
-#include <wx+/mouse_move_dlg.h>
 #include "resources.h"
-#include <wx+/string_conv.h>
-#include <zen/assert_static.h>
-#include <zen/build_info.h>
-#include <wx+/shell_execute.h>
 #include "gui_generated.h"
+#include "watcher.h"
 #include "../lib/resolve_path.h"
 
 using namespace rts;
@@ -153,9 +154,9 @@ public:
     {
         wxIcon realtimeIcon;
 #ifdef FFS_WIN
-        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_win.png")); //use a 16x16 bitmap
+        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_win")); //use a 16x16 bitmap
 #elif defined FFS_LINUX
-        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_linux.png")); //use a 22x22 bitmap for perfect fit
+        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_linux")); //use a 22x22 bitmap for perfect fit
 #endif
         const wxString postFix = jobName_.empty() ? wxString() : (L"\n\"" + jobName_ + L"\"");
         trayMenu->SetIcon(realtimeIcon, _("Monitoring active...") + postFix);
@@ -165,9 +166,9 @@ public:
     {
         wxIcon realtimeIcon;
 #ifdef FFS_WIN
-        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_waiting_win.png")); //use a 16x16 bitmap
+        realtimeIcon.CopyFromBitmap(greyScale(GlobalResources::getImage(L"RTS_tray_win"))); //use a 16x16 bitmap
 #elif defined FFS_LINUX
-        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_waiting_linux.png")); //use a 22x22 bitmap for perfect fit
+        realtimeIcon.CopyFromBitmap(greyScale(GlobalResources::getImage(L"RTS_tray_linux"))); //use a 22x22 bitmap for perfect fit
 #endif
         const wxString postFix = jobName_.empty() ? wxString() : (L"\n\"" + jobName_ + L"\"");
         trayMenu->SetIcon(realtimeIcon, _("Waiting for missing directories...") + postFix);
@@ -246,7 +247,7 @@ public:
 #ifdef FFS_WIN
         new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-        m_bitmap10->SetBitmap(GlobalResources::getImage(L"error"));
+        m_bitmap10->SetBitmap(GlobalResources::getImage(L"msg_error"));
         m_textCtrl8->SetValue(messageText);
         m_buttonRetry->SetFocus();
 
@@ -383,7 +384,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                 lastFileChanged.clear(); //make sure old name is not shown again after a directory reappears
 
                 //execute command
-				auto cmdLineExp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(cmdLine)));
+                auto cmdLineExp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(cmdLine)));
                 zen::shellExecute(cmdLineExp, zen::EXEC_TYPE_SYNC);
                 callback.clearSchedule();
             }
