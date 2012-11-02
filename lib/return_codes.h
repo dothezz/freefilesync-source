@@ -12,6 +12,7 @@ namespace zen
 enum FfsReturnCode
 {
     FFS_RC_SUCCESS = 0,
+    FFS_RC_FINISHED_WITH_WARNINGS,
     FFS_RC_FINISHED_WITH_ERRORS,
     FFS_RC_ABORTED,
     FFS_RC_EXCEPTION,

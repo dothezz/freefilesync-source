@@ -24,10 +24,10 @@ namespace zen
 	       removal of top watched directory is NOT notified!
     Windows: removal of top watched directory also NOT notified (e.g. brute force usb stick removal)
 	         however manual unmount IS notified (e.g. usb stick removal, then re-insert), but watching is stopped!
-			 Renaming of top watched directory handled incorrectly: Not notified(!) + changes in subfolders
-			 report FILE_ACTION_MODIFIED for directory (check that should prevent this fails!)
+			 Renaming of top watched directory handled incorrectly: Not notified(!) + additional changes in subfolders
+			 now do report FILE_ACTION_MODIFIED for directory (check that should prevent this fails!)
 
-	Overcome all issues portably: check existence of watched directory externally + reinstall watch after changes in directory structure (added directories) are possible
+	Overcome all issues portably: check existence of top watched directory externally + reinstall watch after changes in directory structure (added directories) are possible
 */
 class DirWatcher
 {
@@ -35,8 +35,24 @@ public:
     DirWatcher(const Zstring& directory); //throw FileError, ErrorNotExisting
     ~DirWatcher();
 
+    enum ActionType
+    {
+        ACTION_CREATE,
+        ACTION_UPDATE,
+        ACTION_DELETE,
+    };
+
+    struct Entry
+    {
+        Entry() : action_(ACTION_CREATE) {}
+        Entry(ActionType action, const Zstring& filename) : action_(action), filename_(filename) {}
+
+        ActionType action_;
+        Zstring filename_;
+    };
+
     //extract accumulated changes since last call
-    std::vector<Zstring> getChanges(const std::function<void()>& processGuiMessages); //throw FileError
+    std::vector<Entry> getChanges(const std::function<void()>& processGuiMessages); //throw FileError
 
 private:
     DirWatcher(const DirWatcher&);

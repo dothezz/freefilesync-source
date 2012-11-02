@@ -539,7 +539,11 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
     zen::ScopeGuard guardWorker = zen::makeGuard([&]
     {
         std::for_each(worker.begin(), worker.end(), [](boost::thread& wt) { wt.interrupt(); }); //interrupt all at once, then join
-        std::for_each(worker.begin(), worker.end(), [](boost::thread& wt) { wt.join(); });
+        std::for_each(worker.begin(), worker.end(), [](boost::thread& wt)
+        {
+            if (wt.joinable()) //this is a precondition of thread::join()!!! Latter will throw an exception if violated!
+                wt.join();     //in this context it is possible a thread is *not* joinable anymore due to the thread::timed_join() below!
+        });
     });
 
     std::shared_ptr<AsyncCallback> acb = std::make_shared<AsyncCallback>();

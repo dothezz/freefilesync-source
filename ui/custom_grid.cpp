@@ -224,7 +224,7 @@ protected:
             else
             {
                 //alternate background color to improve readability (while lacking cell borders)
-                if (getRowDisplayType(row) == DISP_TYPE_NORMAL && row % 2 == 0)
+                if (getRowDisplayType(row) == DISP_TYPE_NORMAL && row % 2 == 1)
                 {
                     //accessibility, support high-contrast schemes => work with user-defined background color!
                     const auto backCol = getBackGroundColor(row);
@@ -1192,7 +1192,7 @@ public:
                      GridDataLeft& provLeft,
                      GridDataMiddle& provMiddle,
                      GridDataRight& provRight) :
-        gridL_(gridL), gridC_(gridC), gridR_(gridR),
+        gridL_(gridL), gridC_(gridC), gridR_(gridR), scrollMaster(nullptr),
         provLeft_(provLeft), provMiddle_(provMiddle), provRight_(provRight)
     {
         gridL_.Connect(EVENT_GRID_COL_RESIZE, GridColumnResizeEventHandler(GridEventManager::onResizeColumnL), nullptr, this);
@@ -1209,29 +1209,31 @@ public:
         gridC_.Connect(EVENT_GRID_SELECT_RANGE,    GridRangeSelectEventHandler(GridEventManager::onCenterSelectEnd  ), nullptr, this);
 
         //clear selection of other grid when selecting on
-        gridL_.Connect(EVENT_GRID_SELECT_RANGE,    GridRangeSelectEventHandler(GridEventManager::onGridSelectionL), nullptr, this);
-        gridR_.Connect(EVENT_GRID_SELECT_RANGE,    GridRangeSelectEventHandler(GridEventManager::onGridSelectionR), nullptr, this);
+        gridL_.Connect(EVENT_GRID_SELECT_RANGE, GridRangeSelectEventHandler(GridEventManager::onGridSelectionL), nullptr, this);
+        gridR_.Connect(EVENT_GRID_SELECT_RANGE, GridRangeSelectEventHandler(GridEventManager::onGridSelectionR), nullptr, this);
 
         //parallel grid scrolling: do NOT use DoPrepareDC() to align grids! GDI resource leak! Use regular paint event instead:
-        gridL_.getMainWin().Connect(wxEVT_PAINT, wxEventHandler(GridEventManager::onPaintGridL), NULL, this);
-        gridC_.getMainWin().Connect(wxEVT_PAINT, wxEventHandler(GridEventManager::onPaintGridC), NULL, this);
-        gridR_.getMainWin().Connect(wxEVT_PAINT, wxEventHandler(GridEventManager::onPaintGridR), NULL, this);
+        gridL_.getMainWin().Connect(wxEVT_PAINT, wxEventHandler(GridEventManager::onPaintGridL), nullptr, this);
+        gridC_.getMainWin().Connect(wxEVT_PAINT, wxEventHandler(GridEventManager::onPaintGridC), nullptr, this);
+        gridR_.getMainWin().Connect(wxEVT_PAINT, wxEventHandler(GridEventManager::onPaintGridR), nullptr, this);
 
-        gridL_.Connect(wxEVT_SCROLLWIN_THUMBTRACK, wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
-        gridL_.Connect(wxEVT_SCROLLWIN_PAGEUP,     wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
-        gridL_.Connect(wxEVT_SCROLLWIN_PAGEDOWN,   wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
-        gridL_.Connect(wxEVT_SCROLLWIN_TOP,        wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
-        gridL_.Connect(wxEVT_SCROLLWIN_BOTTOM,     wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
-        gridL_.Connect(wxEVT_SCROLLWIN_LINEUP,     wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
-        gridL_.Connect(wxEVT_SCROLLWIN_LINEDOWN,   wxEventHandler(GridEventManager::onGridAccessL), NULL, this);
+        auto connectGridAccess = [&](Grid& grid, wxObjectEventFunction func)
+        {
+            grid.Connect(wxEVT_SCROLLWIN_TOP,        func, nullptr, this);
+            grid.Connect(wxEVT_SCROLLWIN_BOTTOM,     func, nullptr, this);
+            grid.Connect(wxEVT_SCROLLWIN_LINEUP,     func, nullptr, this);
+            grid.Connect(wxEVT_SCROLLWIN_LINEDOWN,   func, nullptr, this);
+            grid.Connect(wxEVT_SCROLLWIN_PAGEUP,     func, nullptr, this);
+            grid.Connect(wxEVT_SCROLLWIN_PAGEDOWN,   func, nullptr, this);
+            grid.Connect(wxEVT_SCROLLWIN_THUMBTRACK, func, nullptr, this);
 
-        gridR_.Connect(wxEVT_SCROLLWIN_THUMBTRACK, wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
-        gridR_.Connect(wxEVT_SCROLLWIN_PAGEUP,     wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
-        gridR_.Connect(wxEVT_SCROLLWIN_PAGEDOWN,   wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
-        gridR_.Connect(wxEVT_SCROLLWIN_TOP,        wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
-        gridR_.Connect(wxEVT_SCROLLWIN_BOTTOM,     wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
-        gridR_.Connect(wxEVT_SCROLLWIN_LINEUP,     wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
-        gridR_.Connect(wxEVT_SCROLLWIN_LINEDOWN,   wxEventHandler(GridEventManager::onGridAccessR), NULL, this);
+            grid.getMainWin().Connect(wxEVT_SET_FOCUS, func, nullptr, this);
+            //on wxEVT_KILL_FOCUS, there's no need to reset "scrollMaster"
+
+        };
+        connectGridAccess(gridL_, wxEventHandler(GridEventManager::onGridAccessL));
+        connectGridAccess(gridC_, wxEventHandler(GridEventManager::onGridAccessC));
+        connectGridAccess(gridR_, wxEventHandler(GridEventManager::onGridAccessR));
 
         Connect(EVENT_ALIGN_SCROLLBARS, wxEventHandler(GridEventManager::onAlignScrollBars), NULL, this);
     }
@@ -1350,8 +1352,9 @@ private:
         trg.setColumnConfig(cfgTrg);
     }
 
-    void onGridAccessL(wxEvent& event) { gridL_.SetFocus(); event.Skip(); }
-    void onGridAccessR(wxEvent& event) { gridR_.SetFocus(); event.Skip(); }
+    void onGridAccessL(wxEvent& event) { scrollMaster = &gridL_; event.Skip(); }
+    void onGridAccessC(wxEvent& event) { scrollMaster = &gridC_; event.Skip(); }
+    void onGridAccessR(wxEvent& event) { scrollMaster = &gridR_; event.Skip(); }
 
     void onPaintGridL(wxEvent& event) { onPaintGrid(gridL_); event.Skip(); }
     void onPaintGridC(wxEvent& event) { onPaintGrid(gridC_); event.Skip(); }
@@ -1367,9 +1370,9 @@ private:
         Grid* follow2    = nullptr;
         auto setGrids = [&](const Grid& l, Grid& f1, Grid& f2) { lead = &l; follow1 = &f1; follow2 = &f2; };
 
-        if (wxWindow::FindFocus() == &gridC_.getMainWin())
+        if (&gridC_ == scrollMaster)
             setGrids(gridC_, gridL_, gridR_);
-        else if (wxWindow::FindFocus() == &gridR_.getMainWin())
+        else if (&gridR_ == scrollMaster)
             setGrids(gridR_, gridL_, gridC_);
         else //default: left panel
             setGrids(gridL_, gridC_, gridR_);
@@ -1384,7 +1387,7 @@ private:
             int yOld = 0;
             target.GetViewStart(nullptr, &yOld);
             if (yOld != y)
-                target.Scroll(-1, y);
+                target.Scroll(-1, y); //empirical test Windows/Ubuntu: this call does NOT trigger a wxEVT_SCROLLWIN event, which would incorrectly set "scrollMaster" to "&target"!
         };
         int y = 0;
         lead->GetViewStart(nullptr, &y);
@@ -1423,6 +1426,10 @@ private:
     Grid& gridL_;
     Grid& gridC_;
     Grid& gridR_;
+
+    const Grid* scrollMaster; //for address check only; this needn't be the grid having focus!
+    //e.g. mouse wheel events should set window under cursor as scrollMaster, but *not* change focus
+
     GridDataLeft&   provLeft_;
     GridDataMiddle& provMiddle_;
     GridDataRight& provRight_;

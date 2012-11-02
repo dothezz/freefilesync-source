@@ -355,10 +355,10 @@ The command is triggered if:
 <target>Synchronisation completed successfully!</target>
 
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Press "Switch" to resolve issues in FreeFileSync main dialog.</target>
+<target>Press "Switch" to resolve issues in FreeFileSync main dialogue.</target>
 
 <source>Switching to FreeFileSync main dialog...</source>
-<target>Switching to FreeFileSync main dialog...</target>
+<target>Switching to FreeFileSync main dialogue...</target>
 
 <source>Unable to connect to sourceforge.net!</source>
 <target>Unable to connect to sourceforge.net!</target>
@@ -424,7 +424,7 @@ The command is triggered if:
 <target>Drag && drop</target>
 
 <source>Close progress dialog</source>
-<target>Close progress dialog</target>
+<target>Close progress dialogue</target>
 
 <source>Standby</source>
 <target>Standby</target>
@@ -574,7 +574,7 @@ The command is triggered if:
 <target>On completion:</target>
 
 <source>Show progress dialog</source>
-<target>Show progress dialog</target>
+<target>Show progress dialogue</target>
 
 <source>Generate log file</source>
 <target>Generate log file</target>
@@ -772,7 +772,7 @@ Note: File names must be relative to base directories!
 <target>Transfer file and folder permissions (Requires Administrator rights)</target>
 
 <source>Restore hidden dialogs</source>
-<target>Restore hidden dialogs</target>
+<target>Restore hidden dialogues</target>
 
 <source>External applications</source>
 <target>External applications</target>
@@ -787,7 +787,7 @@ Note: File names must be relative to base directories!
 <target>Statistics</target>
 
 <source>Don't show this dialog again</source>
-<target>Don't show this dialog again</target>
+<target>Don't show this dialogue again</target>
 
 <source>Find what:</source>
 <target>Find what:</target>
@@ -1114,7 +1114,7 @@ Note: File names must be relative to base directories!
 <target>- Other side's counterpart to %dir</target>
 
 <source>Make hidden dialogs and warning messages visible again?</source>
-<target>Make hidden dialogs and warning messages visible again?</target>
+<target>Make hidden dialogues and warning messages visible again?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>

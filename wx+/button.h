@@ -24,9 +24,9 @@ public:
                  const wxValidator& validator = wxDefaultValidator,
                  const wxString& name         = wxButtonNameStr);
 
-    void setBitmapFront(const wxBitmap& bitmap, size_t spaceAfter = 0);
+    void setBitmapFront(const wxBitmap& bitmap, size_t spaceAfter = 0); //...and enlarge button if required!
     void setTextLabel(  const wxString& text);
-    void setBitmapBack( const wxBitmap& bitmap, size_t spaceBefore = 0);
+    void setBitmapBack( const wxBitmap& bitmap, size_t spaceBefore = 0); //
 
 private:
     wxBitmap createBitmapFromText(const wxString& text);

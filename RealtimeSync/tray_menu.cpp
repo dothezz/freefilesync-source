@@ -305,6 +305,22 @@ bool reportErrorTimeout(const std::wstring& msg) //return true if timeout or use
     }
     return false;
 }
+
+
+inline
+wxString toString(DirWatcher::ActionType type)
+{
+    switch (type)
+    {
+        case DirWatcher::ACTION_CREATE:
+            return L"CREATE";
+        case DirWatcher::ACTION_UPDATE:
+            return L"UPDATE";
+        case DirWatcher::ACTION_DELETE:
+            return L"DELETE";
+    }
+    return L"ERROR";
+}
 }
 
 /*
@@ -341,7 +357,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
 
     try
     {
-        Zstring lastFileChanged;
+        DirWatcher::Entry lastChangeDetected;
         WaitCallbackImpl callback(jobname);
 
         auto execMonitoring = [&] //throw FileError, AbortMonitoring
@@ -372,7 +388,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                                 break;
 
                             case CHANGE_DETECTED:
-                                lastFileChanged = res.filename;
+                                lastChangeDetected = res.changedItem_;
                                 break;
                         }
                         callback.scheduleNextSync(wxGetLocalTime() + static_cast<long>(config.delay));
@@ -380,8 +396,9 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                 }
                 catch (StartSyncNowException&) {}
 
-                ::wxSetEnv(L"changed_file", utfCvrtTo<wxString>(lastFileChanged)); //some way to output what file changed to the user
-                lastFileChanged.clear(); //make sure old name is not shown again after a directory reappears
+                ::wxSetEnv(L"change_path", utfCvrtTo<wxString>(lastChangeDetected.filename_)); //some way to output what file changed to the user
+                ::wxSetEnv(L"change_action", toString(lastChangeDetected.action_)); //
+                lastChangeDetected = DirWatcher::Entry(); //make sure old name is not shown again after a directory reappears
 
                 //execute command
                 auto cmdLineExp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(cmdLine)));

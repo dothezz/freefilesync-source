@@ -194,7 +194,8 @@ SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg,
 
 SyncStatusHandler::~SyncStatusHandler()
 {
-    const int totalErrors = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
+    const int totalErrors   = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
+    const int totalWarnings = errorLog.getItemCount(TYPE_WARNING);
 
     //finalize error log
     //finalize error log
@@ -207,7 +208,12 @@ SyncStatusHandler::~SyncStatusHandler()
     else if (totalErrors > 0)
     {
         finalStatus = _("Synchronization completed with errors!");
-        errorLog.logMsg(finalStatus, TYPE_WARNING);
+        errorLog.logMsg(finalStatus, TYPE_ERROR);
+    }
+    else if (totalWarnings > 0)
+    {
+        finalStatus = _("Synchronization completed with warnings!");
+        errorLog.logMsg(finalStatus, TYPE_WARNING); //give status code same warning priority as display category!
     }
     else
     {
@@ -250,6 +256,8 @@ SyncStatusHandler::~SyncStatusHandler()
             syncStatusFrame.processHasFinished(SyncStatus::RESULT_ABORTED, errorLog);  //enable okay and close events
         else if (totalErrors > 0)
             syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_ERROR, errorLog);
+        else if (totalWarnings > 0)
+            syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_WARNINGS, errorLog);
         else
             syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_SUCCESS, errorLog);
     }

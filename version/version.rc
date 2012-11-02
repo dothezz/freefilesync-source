@@ -1,2 +1,2 @@
-#define FREEFILESYNC_VER     5,8,0,0
-#define FREEFILESYNC_VER_STR "5.8\0"
+#define FREEFILESYNC_VER     5,9,0,0
+#define FREEFILESYNC_VER_STR "5.9\0"

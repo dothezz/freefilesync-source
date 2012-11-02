@@ -20,6 +20,7 @@
 #endif
 #ifdef _MSC_VER
 #pragma warning(disable : 4702) //unreachable code
+#pragma warning(disable : 4913) //user defined binary operator ',' exists but no overload could convert all operands, default built-in binary operator ',' used
 #endif
 
 #include <boost/thread.hpp>
@@ -28,7 +29,8 @@
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
-#pragma warning(default : 4702) //unreachable code
+#pragma warning(default : 4702)
+#pragma warning(default : 4913)
 #endif
 
 namespace zen

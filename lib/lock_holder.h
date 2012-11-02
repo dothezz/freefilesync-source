@@ -40,6 +40,8 @@ public:
 
         try
         {
+            //lock file creation is synchronous and may block noticably for very slow devices (usb sticks, mapped cloud storages)
+            procCallback.forceUiRefresh(); //=> make sure the right folder name is shown on GUI during this time!
             lockHolder.insert(std::make_pair(dirnameFmt, DirLock(dirnameFmt + Zstr("sync") + LOCK_FILE_ENDING, &callback)));
         }
         catch (const FileError& e)

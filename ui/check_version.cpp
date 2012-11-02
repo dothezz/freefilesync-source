@@ -16,50 +16,179 @@
 #include "msg_popup.h"
 #include "../version/version.h"
 #include "../lib/ffs_paths.h"
+#include <zen/scope_guard.h>
+
+#ifdef FFS_WIN
+#include <wininet.h>
+#endif
 
 using namespace zen;
 
 
 namespace
 {
+#ifdef FFS_WIN
+class InternetConnectionError {};
+
+class WinInetAccess //using IE proxy settings! :)
+{
+public:
+    WinInetAccess(const wchar_t* url) //throw InternetConnectionError (if url cannot be reached; no need to also call readBytes())
+    {
+        //::InternetAttemptConnect(0) -> not working as expected: succeeds even when there is no internet connection!
+
+        hInternet = ::InternetOpen(L"FreeFileSync", //_In_  LPCTSTR lpszAgent,
+                                   INTERNET_OPEN_TYPE_PRECONFIG, //_In_  DWORD dwAccessType,
+                                   nullptr,	//_In_  LPCTSTR lpszProxyName,
+                                   nullptr,	//_In_  LPCTSTR lpszProxyBypass,
+                                   0);		//_In_  DWORD dwFlags
+        if (!hInternet)
+            throw InternetConnectionError();
+        zen::ScopeGuard guardInternet = zen::makeGuard([&] { ::InternetCloseHandle(hInternet); });
+
+        hRequest = ::InternetOpenUrl(hInternet, //_In_  HINTERNET hInternet,
+                                     url,		//_In_  LPCTSTR lpszUrl,
+                                     nullptr,   //_In_  LPCTSTR lpszHeaders,
+                                     0,			//_In_  DWORD dwHeadersLength,
+                                     INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_UI, //_In_  DWORD dwFlags,
+                                     0);		  //_In_  DWORD_PTR dwContext
+        if (!hRequest) //won't fail due to unreachable url here! There is no substitute for HTTP_QUERY_STATUS_CODE!!!
+            throw InternetConnectionError();
+        zen::ScopeGuard guardRequest = zen::makeGuard([&] { ::InternetCloseHandle(hRequest); });
+
+        DWORD statusCode = 0;
+        DWORD bufferLength = sizeof(statusCode);
+        if (!::HttpQueryInfo(hRequest,		//_In_     HINTERNET hRequest,
+                             HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, //_In_     DWORD dwInfoLevel,
+                             &statusCode,	//_Inout_  LPVOID lpvBuffer,
+                             &bufferLength,	//_Inout_  LPDWORD lpdwBufferLength,
+                             nullptr))		//_Inout_  LPDWORD lpdwIndex
+            throw InternetConnectionError();
+
+        if (statusCode != HTTP_STATUS_OK)
+            throw InternetConnectionError(); //e.g. 404 - HTTP_STATUS_NOT_FOUND
+
+        guardRequest.dismiss();
+        guardInternet.dismiss();
+    }
+
+    ~WinInetAccess()
+    {
+        ::InternetCloseHandle(hRequest);
+        ::InternetCloseHandle(hInternet);
+    }
+
+    template <class OutputIterator>
+    OutputIterator readBytes(OutputIterator result) //throw InternetConnectionError
+    {
+        //internet says "HttpQueryInfo() + HTTP_QUERY_CONTENT_LENGTH" not supported by all http servers...
+        const DWORD bufferSize = 64 * 1024;
+        std::vector<char> buffer(bufferSize);
+        for (;;)
+        {
+            DWORD bytesRead = 0;
+            if (!::InternetReadFile(hRequest, 	 //_In_   HINTERNET hFile,
+                                    &buffer[0],  //_Out_  LPVOID lpBuffer,
+                                    bufferSize,  //_In_   DWORD dwNumberOfBytesToRead,
+                                    &bytesRead)) //_Out_  LPDWORD lpdwNumberOfBytesRead
+                throw InternetConnectionError();
+            if (bytesRead == 0)
+                return result;
+
+            result = std::copy(buffer.begin(), buffer.begin() + bytesRead, result);
+        }
+    }
+
+private:
+    HINTERNET hInternet;
+    HINTERNET hRequest;
+};
+
+
+inline
+bool canAccessUrl(const wchar_t* url) //throw ()
+{
+    try
+    {
+        (void)WinInetAccess(url); //throw InternetConnectionError
+        return true;
+    }
+    catch (const InternetConnectionError&)
+    {
+        return false;
+    }
+}
+
+
+template <class OutputIterator> inline
+OutputIterator readBytesUrl(const wchar_t* url, OutputIterator result) //throw InternetConnectionError
+{
+    return WinInetAccess(url).readBytes(result); //throw InternetConnectionError
+}
+#endif
+
+
 enum GetVerResult
 {
     GET_VER_SUCCESS,
-    GET_VER_NO_CONNECTION, //no internet connection?
+    GET_VER_NO_CONNECTION, //no internet connection or just Sourceforge down?
     GET_VER_PAGE_NOT_FOUND //version file seems to have moved! => trigger an update!
 };
 
 GetVerResult getOnlineVersion(wxString& version) //empty string on error;
 {
+#ifdef FFS_WIN
+    //internet access supporting proxy connections
+    std::vector<char> output;
+    try
+    {
+        readBytesUrl(L"http://freefilesync.sourceforge.net/latest_version.txt", std::back_inserter(output)); //throw InternetConnectionError
+    }
+    catch (const InternetConnectionError&)
+    {
+        return canAccessUrl(L"http://sourceforge.net/") ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
+    }
+
+    output.push_back('\0');
+    version = utfCvrtTo<wxString>(&output[0]);
+    return GET_VER_SUCCESS;
+
+#else
     wxWindowDisabler dummy;
 
-    wxHTTP webAccess;
-    webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
-    webAccess.SetTimeout(5); //5 seconds of timeout instead of 10 minutes(WTF are they thinking???)...
-
-    if (webAccess.Connect(L"freefilesync.sourceforge.net")) //only the server, no pages here yet...
+    auto getStringFromUrl = [](const wxString& server, const wxString& page, int timeout, wxString* output) -> bool //true on successful connection
     {
-        //wxApp::IsMainLoopRunning(); // should return true
+        wxHTTP webAccess;
+        webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
+        webAccess.SetTimeout(timeout); //default: 10 minutes(WTF are they thinking???)...
 
-        std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(L"/latest_version.txt"));
-        //must be deleted BEFORE webAccess is closed
-
-        if (httpStream && webAccess.GetError() == wxPROTO_NOERR)
+        if (webAccess.Connect(server)) //will *not* fail for non-reachable url here!
         {
-            wxString tmp;
-            wxStringOutputStream outStream(&tmp);
-            httpStream->Read(outStream);
-            version = tmp;
-            return GET_VER_SUCCESS;
+            //wxApp::IsMainLoopRunning(); // should return true
+
+            std::unique_ptr<wxInputStream> httpStream(webAccess.GetInputStream(page));
+            //must be deleted BEFORE webAccess is closed
+
+            if (httpStream && webAccess.GetError() == wxPROTO_NOERR)
+            {
+                if (output)
+                {
+                    output->clear();
+                    wxStringOutputStream outStream(output);
+                    httpStream->Read(outStream);
+                }
+                return true;
+            }
         }
-        else
-            return GET_VER_PAGE_NOT_FOUND;
-    }
-    else //check if sourceforge in general is reachable
-    {
-        webAccess.SetTimeout(1);
-        return webAccess.Connect(L"sourceforge.net") ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
-    }
+        return false;
+    };
+
+    if (getStringFromUrl(L"freefilesync.sourceforge.net", L"/latest_version.txt", 5, &version))
+        return GET_VER_SUCCESS;
+
+    const bool canConnectToSf = getStringFromUrl(L"sourceforge.net", L"/", 1, nullptr);
+    return canConnectToSf ? GET_VER_PAGE_NOT_FOUND : GET_VER_NO_CONNECTION;
+#endif
 }
 
 

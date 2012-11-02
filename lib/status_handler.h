@@ -75,8 +75,8 @@ protected:
         if (updateUiIsAllowed())  //test if specific time span between ui updates is over
             forceUiRefresh();
 
-        if (abortRequested)
-            abortThisProcess();  //abort can be triggered by requestAbortion()
+        if (abortRequested) //check *after* GUI update, to have up-to-date screen
+            abortThisProcess();  //triggered by requestAbortion()
     }
 
     virtual void reportStatus(const std::wstring& text) { statusText_ = text; requestUiRefresh(); /*throw AbortThisProcess */ }

@@ -1,9 +1,18 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 10 2012)
+// C++ code generated with wxFormBuilder (version Oct  8 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
+
+#include "../wx+/button.h"
+#include "../wx+/graph.h"
+#include "../wx+/grid.h"
+#include "../wx+/toggle_button.h"
+#include "exec_finished_box.h"
+#include "folder_history_box.h"
+#include "triple_splitter.h"
+#include "wx_form_build_hide_warnings.h"
 
 #include "gui_generated.h"
 
@@ -259,6 +268,9 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	wxBoxSizer* bSizer1771;
 	bSizer1771 = new wxBoxSizer( wxVERTICAL );
 	
+	
+	bSizer1771->Add( 0, 0, 1, wxEXPAND, 5 );
+	
 	m_bpButtonSwapSides = new wxBitmapButton( m_panelTopMiddle, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), wxBU_AUTODRAW );
 	m_bpButtonSwapSides->SetToolTip( _("Swap sides") );
 	
@@ -278,6 +290,9 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	
 	
 	bSizer1771->Add( bSizer160, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer1771->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	
 	m_panelTopMiddle->SetSizer( bSizer1771 );
@@ -851,6 +866,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	m_bpButtonSave->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigSave ), NULL, this );
 	m_listBoxHistory->Connect( wxEVT_CHAR, wxKeyEventHandler( MainDialogGenerated::OnCfgHistoryKeyEvent ), NULL, this );
 	m_listBoxHistory->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnLoadFromHistory ), NULL, this );
+	m_listBoxHistory->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( MainDialogGenerated::OnLoadFromHistoryDoubleClick ), NULL, this );
 	m_bpButtonFilter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigureFilter ), NULL, this );
 	m_checkBoxShowExcluded->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnShowExcluded ), NULL, this );
 	m_bpButtonSyncCreateLeft->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnSyncCreateLeft ), NULL, this );
@@ -897,6 +913,7 @@ MainDialogGenerated::~MainDialogGenerated()
 	m_bpButtonSave->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigSave ), NULL, this );
 	m_listBoxHistory->Disconnect( wxEVT_CHAR, wxKeyEventHandler( MainDialogGenerated::OnCfgHistoryKeyEvent ), NULL, this );
 	m_listBoxHistory->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnLoadFromHistory ), NULL, this );
+	m_listBoxHistory->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( MainDialogGenerated::OnLoadFromHistoryDoubleClick ), NULL, this );
 	m_bpButtonFilter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigureFilter ), NULL, this );
 	m_checkBoxShowExcluded->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnShowExcluded ), NULL, this );
 	m_bpButtonSyncCreateLeft->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnSyncCreateLeft ), NULL, this );
@@ -1015,6 +1032,7 @@ CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id,
 	bSizer182 = new wxBoxSizer( wxVERTICAL );
 	
 	m_textCtrlStatus = new wxTextCtrl( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	m_textCtrlStatus->SetMaxLength( 0 ); 
 	m_textCtrlStatus->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
 	
 	bSizer182->Add( m_textCtrlStatus, 0, wxEXPAND, 5 );
@@ -2266,6 +2284,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	bSizer1811 = new wxBoxSizer( wxVERTICAL );
 	
 	m_textCtrlStatus = new wxTextCtrl( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxSize( -1,-1 ), wxTE_READONLY|wxNO_BORDER );
+	m_textCtrlStatus->SetMaxLength( 0 ); 
 	m_textCtrlStatus->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 	
 	bSizer1811->Add( m_textCtrlStatus, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxLEFT, 5 );
@@ -2508,6 +2527,7 @@ LogControlGenerated::LogControlGenerated( wxWindow* parent, wxWindowID id, const
 	bSizer153->Add( m_staticline13, 0, wxEXPAND, 5 );
 	
 	m_textCtrlInfo = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_DONTWRAP|wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
+	m_textCtrlInfo->SetMaxLength( 0 ); 
 	bSizer153->Add( m_textCtrlInfo, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
@@ -2747,7 +2767,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer170->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_hyperlink1 = new wxHyperlinkCtrl( this, wxID_ANY, _("Homepage"), wxT("http://sourceforge.net/projects/freefilesync/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	m_hyperlink1 = new wxHyperlinkCtrl( this, wxID_ANY, _("Homepage"), wxT("http://freefilesync.sourceforge.net/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	m_hyperlink1->SetFont( wxFont( 10, 70, 90, 92, true, wxEmptyString ) );
 	m_hyperlink1->SetToolTip( _("http://sourceforge.net/projects/freefilesync/") );
 	
@@ -2855,6 +2875,7 @@ MessageDlgGenerated::MessageDlgGenerated( wxWindow* parent, wxWindowID id, const
 	bSizer26->Add( m_bitmapMsgType, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	m_textCtrlMessage = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400,130 ), wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
+	m_textCtrlMessage->SetMaxLength( 0 ); 
 	bSizer26->Add( m_textCtrlMessage, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	
@@ -2963,6 +2984,7 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	bSizer24->Add( m_staticline91, 0, wxEXPAND|wxBOTTOM, 5 );
 	
 	m_textCtrlFileList = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 550,200 ), wxTE_DONTWRAP|wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
+	m_textCtrlFileList->SetMaxLength( 0 ); 
 	bSizer24->Add( m_textCtrlFileList, 1, wxEXPAND|wxLEFT, 5 );
 	
 	m_staticline9 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
@@ -3107,6 +3129,7 @@ FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	sbSizer8->Add( m_bitmapInclude, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxRIGHT, 5 );
 	
 	m_textCtrlInclude = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE );
+	m_textCtrlInclude->SetMaxLength( 0 ); 
 	sbSizer8->Add( m_textCtrlInclude, 1, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	
@@ -3119,6 +3142,7 @@ FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	sbSizer26->Add( m_bitmapExclude, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 	
 	m_textCtrlExclude = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE );
+	m_textCtrlExclude->SetMaxLength( 0 ); 
 	sbSizer26->Add( m_textCtrlExclude, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	
@@ -3693,6 +3717,7 @@ SearchDialogGenerated::SearchDialogGenerated( wxWindow* parent, wxWindowID id, c
 	bSizer162->Add( m_staticText101, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlSearchTxt = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 220,-1 ), 0 );
+	m_textCtrlSearchTxt->SetMaxLength( 0 ); 
 	bSizer162->Add( m_textCtrlSearchTxt, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	

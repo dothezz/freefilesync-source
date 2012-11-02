@@ -9,6 +9,7 @@
 #include <wx/imaglist.h>
 #include <wx/stopwatch.h>
 #include <wx/wupdlock.h>
+#include <wx/sound.h>
 #include <zen/basic_math.h>
 #include <zen/format_unit.h>
 #include <wx+/mouse_move_dlg.h>
@@ -16,7 +17,9 @@
 #include <wx+/image_tools.h>
 #include <wx+/graph.h>
 #include <wx+/no_flicker.h>
+#include <zen/file_handling.h>
 #include "gui_generated.h"
+#include "../lib/ffs_paths.h"
 #include "../lib/resources.h"
 #include "../lib/perf_check.h"
 #include "tray_icon.h"
@@ -361,20 +364,19 @@ private:
             includedTypes |= TYPE_INFO;
 
         //fast replacement for wxString modelling exponential growth
-        typedef Zbase<wchar_t> zxString;
-        zxString logText;
+        MsgString logText;
 
         const auto& entries = log_.getEntries();
         for (auto iter = entries.begin(); iter != entries.end(); ++iter)
             if (iter->type & includedTypes)
             {
-                logText += copyStringTo<zxString>(formatMessage(*iter));
+                logText += formatMessage(*iter);
                 logText += L'\n';
             }
 
         if (logText.empty()) //if no messages match selected view filter, at least show final status message
             if (!entries.empty())
-                logText = copyStringTo<zxString>(formatMessage(entries.back()));
+                logText = formatMessage(entries.back());
 
         wxWindowUpdateLocker dummy(m_textCtrlInfo);
         m_textCtrlInfo->ChangeValue(copyStringTo<wxString>(logText));
@@ -810,6 +812,7 @@ std::wstring getDialogStatusText(const Statistics* syncStat, bool paused, SyncSt
             case SyncStatus::RESULT_ABORTED:
                 return _("Aborted");
             case SyncStatus::RESULT_FINISHED_WITH_ERROR:
+            case SyncStatus::RESULT_FINISHED_WITH_WARNINGS:
             case SyncStatus::RESULT_FINISHED_WITH_SUCCESS:
                 return _("Completed");
         }
@@ -1007,15 +1010,13 @@ std::wstring SyncStatus::SyncStatusImpl::getExecWhenFinishedCommand() const
 
 void SyncStatus::SyncStatusImpl::updateDialogStatus() //depends on "syncStat_, paused_, finalResult"
 {
-    m_staticTextStatus->SetLabel(getDialogStatusText(syncStat_, paused_, finalResult));
+    const wxString dlgStatusTxt = getDialogStatusText(syncStat_, paused_, finalResult);
 
+    m_staticTextStatus->SetLabel(dlgStatusTxt);
+
+    //status bitmap
     if (syncStat_) //sync running
     {
-        if (paused_)
-            m_buttonPause->SetLabel(_("Continue"));
-        else
-            m_buttonPause->SetLabel(_("Pause"));
-
         if (paused_)
             m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusPause"));
         else
@@ -1036,20 +1037,30 @@ void SyncStatus::SyncStatusImpl::updateDialogStatus() //depends on "syncStat_, p
                     m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusSyncing"));
                     break;
             }
+
+        m_bitmapStatus->SetToolTip(dlgStatusTxt);
     }
     else //sync finished
         switch (finalResult)
         {
             case RESULT_ABORTED:
-                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusError"));
+                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusAborted"));
+                m_bitmapStatus->SetToolTip(_("Synchronization aborted!"));
                 break;
 
             case RESULT_FINISHED_WITH_ERROR:
-                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusWarning"));
+                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusFinishedErrors"));
+                m_bitmapStatus->SetToolTip(_("Synchronization completed with errors!"));
+                break;
+
+            case RESULT_FINISHED_WITH_WARNINGS:
+                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusFinishedWarnings"));
+                m_bitmapStatus->SetToolTip(_("Synchronization completed with warnings!"));
                 break;
 
             case RESULT_FINISHED_WITH_SUCCESS:
-                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusSuccess"));
+                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusFinishedSuccess"));
+                m_bitmapStatus->SetToolTip(_("Synchronization completed successfully!"));
                 break;
         }
 
@@ -1082,10 +1093,20 @@ void SyncStatus::SyncStatusImpl::updateDialogStatus() //depends on "syncStat_, p
                     taskbar_->setStatus(Taskbar::STATUS_ERROR);
                     break;
 
+                case RESULT_FINISHED_WITH_WARNINGS:
                 case RESULT_FINISHED_WITH_SUCCESS:
                     taskbar_->setStatus(Taskbar::STATUS_NORMAL);
                     break;
             }
+    }
+
+    //pause button
+    if (syncStat_) //sync running
+    {
+        if (paused_)
+            m_buttonPause->SetLabel(_("Continue"));
+        else
+            m_buttonPause->SetLabel(_("Pause"));
     }
 
     m_panelHeader->Layout();
@@ -1227,6 +1248,22 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const E
 
     m_panelFooter->Layout();
     Layout();
+
+    //play (optional) sound notification after sync has completed -> only play when waiting on results dialog, seems to be pointless otherwise!
+    switch (finalResult)
+    {
+        case SyncStatus::RESULT_ABORTED:
+            break;
+        case SyncStatus::RESULT_FINISHED_WITH_ERROR:
+        case SyncStatus::RESULT_FINISHED_WITH_WARNINGS:
+        case SyncStatus::RESULT_FINISHED_WITH_SUCCESS:
+        {
+            const Zstring soundFile = getResourceDir() + Zstr("Sync_Complete.wav");
+            if (fileExists(soundFile))
+                wxSound::Play(utfCvrtTo<wxString>(soundFile), wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as a service!
+        }
+        break;
+    }
 
     //Raise(); -> don't! user may be watching a movie in the meantime ;)
 }

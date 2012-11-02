@@ -181,7 +181,7 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
                 buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"conflict")));
+                buttonConflict->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"conflict"))); //silent dependency to algorithm.cpp::Redetermine!!!
                 buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
                 break;
         }

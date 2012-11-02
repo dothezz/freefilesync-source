@@ -185,14 +185,19 @@ void DirectoryName<NameControl>::OnSelectDir(wxCommandEvent& event)
         const DllFun<FunType_freeString>       freeString      (getDllName(), funName_freeString);
         if (showFolderPicker && freeString)
         {
-            const wchar_t* selectedFolder = nullptr;
-            const wchar_t* errorMsg       = nullptr;
+            wchar_t* selectedFolder = nullptr;
+            wchar_t* errorMsg       = nullptr;
             bool cancelled = false;
             ZEN_ON_SCOPE_EXIT(freeString(selectedFolder));
             ZEN_ON_SCOPE_EXIT(freeString(errorMsg));
 
+            const GuidProxy guid = { '\x0', '\x4a', '\xf9', '\x31', '\xb4', '\x92', '\x40', '\xa0',
+                                     '\x8d', '\xc2', '\xc', '\xa5', '\xef', '\x59', '\x6e', '\x3b'
+                                   }; //some random GUID => have Windows save IFileDialog state separately from other file/dir pickers!
+
             showFolderPicker(static_cast<HWND>(selectButton_.GetHWND()),                //in;  ==HWND
                              defaultDirname.empty() ? nullptr : defaultDirname.c_str(), //in, optional!
+                             &guid,
                              selectedFolder, //out: call freeString() after use!
                              cancelled,      //out
                              errorMsg);      //out, optional: call freeString() after use!

@@ -98,7 +98,7 @@ void drawYLabel(wxDC& dc, double& yMin, double& yMax, const wxRect& clientArea, 
 
     int optimalBlockHeight = 3 * dc.GetMultiLineTextExtent(L"1").GetHeight();
 
-    double valRangePerBlock = (yMax - yMin) * optimalBlockHeight / clientArea.GetHeight();
+    double valRangePerBlock = (yMax - yMin) * optimalBlockHeight / clientArea.GetHeight(); //proposal
     valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
     if (isNull(valRangePerBlock))
         return;
@@ -150,7 +150,7 @@ void drawXLabel(wxDC& dc, double& xMin, double& xMax, const wxRect& clientArea, 
 
     const int optimalBlockWidth = dc.GetMultiLineTextExtent(L"100000000000000").GetWidth();
 
-    double valRangePerBlock = (xMax - xMin) * optimalBlockWidth / clientArea.GetWidth();
+    double valRangePerBlock = (xMax - xMin) * optimalBlockWidth / clientArea.GetWidth(); //proposal
     valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
     if (isNull(valRangePerBlock))
         return;
@@ -224,13 +224,11 @@ void subsample(StdCont& cont, size_t factor)
 {
     if (factor <= 1) return;
 
-    typedef typename StdCont::iterator IterType;
+    auto iterOut = cont.begin();
+    for (auto iterIn = cont.begin(); cont.end() - iterIn >= static_cast<ptrdiff_t>(factor); iterIn += factor) //don't even let iterator point out of range!
+        *iterOut++ = std::accumulate(iterIn, iterIn + factor, 0.0) / static_cast<double>(factor);
 
-    IterType posWrite = cont.begin();
-    for (IterType posRead = cont.begin(); cont.end() - posRead >= static_cast<int>(factor); posRead += factor) //don't even let iterator point out of range!
-        *posWrite++ = std::accumulate(posRead, posRead + factor, 0.0) / static_cast<double>(factor);
-
-    cont.erase(posWrite, cont.end());
+    cont.erase(iterOut, cont.end());
 }
 }
 
@@ -542,11 +540,11 @@ void Graph2D::render(wxDC& dc) const
             for (GraphList::const_iterator j = curves_.begin(); j != curves_.end(); ++j)
             {
                 std::vector<double>& yValues = yValuesList[j - curves_.begin()].first;  //actual y-values
-                int offset                   = yValuesList[j - curves_.begin()].second; //x-value offset in pixel
+                int offsetX                  = yValuesList[j - curves_.begin()].second; //x-value offset in pixel
 
                 std::vector<wxPoint> curve;
                 for (std::vector<double>::const_iterator i = yValues.begin(); i != yValues.end(); ++i)
-                    curve.push_back(wxPoint(i - yValues.begin() + offset,
+                    curve.push_back(wxPoint(i - yValues.begin() + offsetX,
                                             dataArea.height - 1 - cvrtY.realToScreen(*i)) + dataOrigin); //screen y axis starts upper left
 
                 if (!curve.empty())

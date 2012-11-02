@@ -43,9 +43,9 @@ enum CompareFilesResult
 {
     FILE_LEFT_SIDE_ONLY = 0,
     FILE_RIGHT_SIDE_ONLY,
-    FILE_LEFT_NEWER,
-    FILE_RIGHT_NEWER,
-    FILE_DIFFERENT,
+    FILE_LEFT_NEWER,  //CMP_BY_TIME_SIZE only!
+    FILE_RIGHT_NEWER, //
+    FILE_DIFFERENT, //CMP_BY_CONTENT only!
     FILE_EQUAL,
     FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only: short name case, modification time
     FILE_CONFLICT
@@ -104,18 +104,18 @@ std::wstring getSymbol     (SyncOperation op); //method used for exporting .csv 
 struct DirectionSet
 {
     DirectionSet() :
-        exLeftSideOnly( SYNC_DIR_RIGHT),
+        exLeftSideOnly (SYNC_DIR_RIGHT),
         exRightSideOnly(SYNC_DIR_LEFT),
-        leftNewer(      SYNC_DIR_RIGHT),
-        rightNewer(     SYNC_DIR_LEFT),
-        different(      SYNC_DIR_NONE),
-        conflict(       SYNC_DIR_NONE) {}
+        leftNewer      (SYNC_DIR_RIGHT),
+        rightNewer     (SYNC_DIR_LEFT),
+        different      (SYNC_DIR_NONE),
+        conflict       (SYNC_DIR_NONE) {}
 
     SyncDirection exLeftSideOnly;
     SyncDirection exRightSideOnly;
-    SyncDirection leftNewer;
-    SyncDirection rightNewer;
-    SyncDirection different;
+    SyncDirection leftNewer;  //CMP_BY_TIME_SIZE only!
+    SyncDirection rightNewer; //
+    SyncDirection different; //CMP_BY_CONTENT only!
     SyncDirection conflict;
 };
 
@@ -166,11 +166,6 @@ std::wstring getVariantName(DirectionConfig::Variant var);
 
 struct CompConfig
 {
-    //CompConfig(CompareVariant cmpVar,
-    //           SymLinkHandling handleSyml) :
-    //    compareVar(cmpVar),
-    //    handleSymlinks(handleSyml) {}
-
     CompConfig() :
         compareVar(CMP_BY_TIME_SIZE),
         handleSymlinks(SYMLINK_IGNORE) {}
@@ -385,8 +380,8 @@ inline
 bool operator==(const MainConfiguration& lhs, const MainConfiguration& rhs)
 {
     return lhs.cmpConfig        == rhs.cmpConfig       &&
-           lhs.globalFilter     == rhs.globalFilter    &&
            lhs.syncCfg          == rhs.syncCfg         &&
+           lhs.globalFilter     == rhs.globalFilter    &&
            lhs.firstPair        == rhs.firstPair       &&
            lhs.additionalPairs  == rhs.additionalPairs &&
            lhs.onCompletion     == rhs.onCompletion;

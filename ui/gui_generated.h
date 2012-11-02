@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 10 2012)
+// C++ code generated with wxFormBuilder (version Oct  8 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -11,14 +11,15 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-#include "wx_form_build_hide_warnings.h"
-#include "../wx+/button.h"
-#include "folder_history_box.h"
-#include "../wx+/grid.h"
-#include "triple_splitter.h"
-#include "../wx+/toggle_button.h"
-#include "exec_finished_box.h"
-#include "../wx+/graph.h"
+class ExecFinishedBox;
+class FolderHistoryBox;
+class ToggleButton;
+class wxStaticText;
+namespace zen{ class BitmapButton; }
+namespace zen{ class Graph2D; }
+namespace zen{ class Grid; }
+namespace zen{ class TripleSplitter; }
+
 #include <wx/string.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
@@ -192,6 +193,7 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnSwapSides( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCfgHistoryKeyEvent( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnLoadFromHistory( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLoadFromHistoryDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnShowExcluded( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSyncCreateLeft( wxCommandEvent& event ) { event.Skip(); }

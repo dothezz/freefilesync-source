@@ -20,6 +20,7 @@
 #elif defined FFS_LINUX
 #include <zen/file_traverser.h>
 #include <unistd.h>
+#include <stdlib.h> //getenv()
 #endif
 
 using namespace zen;
@@ -46,11 +47,30 @@ Zstring resolveRelativePath(const Zstring& relativeName) //note: ::GetFullPathNa
 #elif defined FFS_LINUX
 Zstring resolveRelativePath(const Zstring& relativeName)
 {
-    //unfortunately ::realpath only resolves *existing* relative paths, so we have resolve to absolute by ourselves
-
     //http://linux.die.net/man/2/path_resolution
     if (!startsWith(relativeName, FILE_NAME_SEPARATOR)) //absolute names are exactly those starting with a '/'
     {
+        /*
+        basic support for '~': strictly speaking this is a shell-layer feature, so "realpath()" won't handle it
+        http://www.gnu.org/software/bash/manual/html_node/Tilde-Expansion.html
+
+        http://linux.die.net/man/3/getpwuid: An application that wants to determine its user's home directory
+        should inspect the value of HOME (rather than the value getpwuid(getuid())->pw_dir) since this allows
+        the user to modify their notion of "the home directory" during a login session.
+        */
+        if (startsWith(relativeName, "~/") || relativeName == "~")
+        {
+            const char* homeDir = ::getenv("HOME");
+            if (!homeDir)
+                return relativeName; //error! no further processing!
+
+            if (startsWith(relativeName, "~/"))
+                return appendSeparator(homeDir) + afterFirst(relativeName, '/');
+            else if (relativeName == "~")
+                return homeDir;
+        }
+
+        //unfortunately ::realpath only resolves *existing* relative paths, so we need to do it by ourselves
         std::vector<char> buffer(10000);
         if (::getcwd(&buffer[0], buffer.size()) != nullptr)
             return appendSeparator(&buffer[0]) + relativeName;
@@ -426,9 +446,9 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
 }
 
 
-#ifdef FFS_WIN
 void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, LessFilename>& output)
 {
+#ifdef FFS_WIN
     //1. replace volume path by volume name: c:\dirname ->  [SYSTEM]\dirname
     if (dirname.size() >= 3 &&
         std::iswalpha(dirname[0]) &&
@@ -447,6 +467,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
             if (output.insert(testVolname).second)
                 getDirectoryAliasesRecursive(testVolname, output); //recurse!
     }
+#endif
 
     //3. environment variables: C:\Users\username -> %USERPROFILE%
     {
@@ -458,6 +479,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
             if (std::unique_ptr<Zstring> value = getEnvironmentVar(envName))
                 envToDir.insert(std::make_pair(envName, *value));
         };
+#ifdef FFS_WIN
         addEnvVar(L"AllUsersProfile");  // C:\ProgramData
         addEnvVar(L"AppData");          // C:\Users\username\AppData\Roaming
         addEnvVar(L"LocalAppData");     // C:\Users\username\AppData\Local
@@ -475,16 +497,27 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         const auto& csidlMap = CsidlConstants::get();
         envToDir.insert(csidlMap.begin(), csidlMap.end());
 
+#elif defined FFS_LINUX
+        addEnvVar("HOME");           // /home/zenju
+#endif
         //substitute paths by symbolic names
-        Zstring tmp = dirname;
-        ::makeUpper(tmp);
+        auto pathStartsWith = [](const Zstring& path, const Zstring& prefix) -> bool
+        {
+#ifdef FFS_WIN
+            Zstring tmp = path;
+            Zstring tmp2 = prefix;
+            ::makeUpper(tmp);
+            ::makeUpper(tmp2);
+            return startsWith(tmp, tmp2);
+#elif defined FFS_LINUX
+            return startsWith(path, prefix);
+#endif
+        };
         std::for_each(envToDir.begin(), envToDir.end(),
                       [&](const std::pair<Zstring, Zstring>& entry)
         {
-            Zstring tmp2 = entry.second; //case-insensitive "startsWith()"
-            ::makeUpper(tmp2);           //
-            if (startsWith(tmp, tmp2))
-                output.insert(MACRO_SEP + entry.first + MACRO_SEP + (dirname.c_str() + tmp2.size()));
+            if (pathStartsWith(dirname, entry.second))
+                output.insert(MACRO_SEP + entry.first + MACRO_SEP + (dirname.c_str() + entry.second.size()));
         });
     }
 
@@ -513,7 +546,6 @@ std::vector<Zstring> zen::getDirectoryAliases(const Zstring& dirString)
 
     return std::vector<Zstring>(tmp.begin(), tmp.end());
 }
-#endif
 
 
 Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()

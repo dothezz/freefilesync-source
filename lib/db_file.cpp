@@ -299,8 +299,8 @@ public:
             BinStreamIn& in1stPart = has1stPartL ? inL : inR;
             BinStreamIn& in2ndPart = has1stPartL ? inR : inL;
 
-            const size_t size1stPart = readNumber<std::uint64_t>(in1stPart);
-            const size_t size2ndPart = readNumber<std::uint64_t>(in2ndPart);
+            const size_t size1stPart = static_cast<size_t>(readNumber<std::uint64_t>(in1stPart));
+            const size_t size2ndPart = static_cast<size_t>(readNumber<std::uint64_t>(in2ndPart));
 
             BinaryStream tmpB;
             tmpB.resize(size1stPart + size2ndPart);

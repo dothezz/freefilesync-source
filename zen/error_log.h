@@ -7,11 +7,13 @@
 #ifndef ERRORLOGGING_H_INCLUDED
 #define ERRORLOGGING_H_INCLUDED
 
+#include <cassert>
 #include <algorithm>
 #include <vector>
 #include <string>
-#include <zen/time.h>
-#include <zen/i18n.h>
+#include "time.h"
+#include "i18n.h"
+#include "string_base.h"
 
 namespace zen
 {
@@ -23,20 +25,23 @@ enum MessageType
     TYPE_FATAL_ERROR = 0x8,
 };
 
+typedef Zbase<wchar_t> MsgString; //std::wstring may employ small string optimization: we cannot accept bloating the "logEntries" memory block below (think 1 million entries)
+
 struct LogEntry
 {
-    time_t       time;
-    MessageType  type;
-    std::wstring message;
+    time_t      time;
+    MessageType type;
+    MsgString   message; 
 };
 
-std::wstring formatMessage(const LogEntry& msg);
+MsgString formatMessage(const LogEntry& msg);
 
 
 class ErrorLog
 {
 public:
-    void logMsg(const std::wstring& message, MessageType type);
+	template <class String>
+    void logMsg(const String& message, MessageType type);
 
     int getItemCount(int typeFilter = TYPE_INFO | TYPE_WARNING | TYPE_ERROR | TYPE_FATAL_ERROR) const;
 
@@ -58,18 +63,11 @@ private:
 
 
 
-
-
-
-
-
-
 //######################## implementation ##########################
-
-inline
-void ErrorLog::logMsg(const std::wstring& message, zen::MessageType type)
+template <class String> inline
+void ErrorLog::logMsg(const String& message, zen::MessageType type)
 {
-    const LogEntry newEntry = { std::time(nullptr), type, message };
+	const LogEntry newEntry = { std::time(nullptr), type, copyStringTo<MsgString>(message) };
     logEntries.push_back(newEntry);
 }
 
@@ -83,7 +81,7 @@ int ErrorLog::getItemCount(int typeFilter) const
 
 namespace
 {
-std::wstring formatMessageImpl(const LogEntry& entry) //internal linkage
+MsgString formatMessageImpl(const LogEntry& entry) //internal linkage
 {
     auto getTypeName = [&]() -> std::wstring
     {
@@ -98,10 +96,11 @@ std::wstring formatMessageImpl(const LogEntry& entry) //internal linkage
             case TYPE_FATAL_ERROR:
                 return _("Fatal Error");
         }
+		assert(false);
         return std::wstring();
     };
 
-    std::wstring formattedText = L"[" + formatTime<std::wstring>(FORMAT_TIME, localTime(entry.time)) + L"] " + getTypeName() + L": ";
+    MsgString formattedText = L"[" + formatTime<MsgString>(FORMAT_TIME, localTime(entry.time)) + L"] " + copyStringTo<MsgString>(getTypeName()) + L": ";
     const size_t prefixLen = formattedText.size();
 
     for (auto iter = entry.message.begin(); iter != entry.message.end(); )
@@ -109,7 +108,7 @@ std::wstring formatMessageImpl(const LogEntry& entry) //internal linkage
         {
             formattedText += L'\n';
 
-            std::wstring blanks;
+            MsgString blanks;
             blanks.resize(prefixLen, L' ');
             formattedText += blanks;
 
@@ -126,8 +125,8 @@ std::wstring formatMessageImpl(const LogEntry& entry) //internal linkage
 }
 }
 
-inline std::wstring formatMessage(const LogEntry& entry) { return formatMessageImpl(entry); }
-
+inline 
+MsgString formatMessage(const LogEntry& entry) { return formatMessageImpl(entry); }
 }
 
 #endif //ERRORLOGGING_H_INCLUDED

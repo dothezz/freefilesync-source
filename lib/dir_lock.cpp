@@ -552,7 +552,7 @@ public:
     ~SharedDirLock()
     {
         threadObj.interrupt(); //thread lifetime is subset of this instances's life
-        threadObj.join();
+        threadObj.join(); //we assume precondition "threadObj.joinable()"!!!
 
         ::releaseLock(lockfilename_); //throw ()
     }

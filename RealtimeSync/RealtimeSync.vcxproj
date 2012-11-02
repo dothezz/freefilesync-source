@@ -137,6 +137,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MinimalRebuild>false</MinimalRebuild>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -235,6 +236,7 @@
     <ClCompile Include="..\zen\file_traverser.cpp" />
     <ClCompile Include="..\zen\notify_removal.cpp" />
     <ClCompile Include="..\zen\privilege.cpp" />
+    <ClCompile Include="..\zen\scroll_window_under_cursor.cpp" />
     <ClCompile Include="..\zen\zstring.cpp" />
     <ClCompile Include="application.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>

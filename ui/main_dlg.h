@@ -18,6 +18,7 @@
 #include "custom_grid.h"
 #include "tree_view.h"
 #include <wx+/file_drop.h>
+#include "folder_history_box.h"
 
 //class FolderHistory;
 class DirectoryPair;
@@ -77,8 +78,7 @@ private:
     void setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSettings); //messes with Maximize(), window sizes, so call just once!
     xmlAccess::XmlGlobalSettings getGlobalCfgBeforeExit(); //destructive "get" thanks to "Iconize(false), Maximize(false)"
 
-    void loadConfiguration(const wxString& filename);
-    void loadConfiguration(const std::vector<wxString>& filenames);
+    bool loadConfiguration(const std::vector<wxString>& filenames); //return true if loaded successfully
 
     bool trySaveConfig(const wxString* fileName); //return true if saved successfully
     bool saveOldConfig(); //return false on user abort
@@ -89,10 +89,10 @@ private:
     //used when saving configuration
     std::vector<wxString> activeConfigFiles; //name of currently loaded config file (may be more than 1)
 
-    void initViewFilterButtons();
+    void initViewFilterButtons(const zen::MainConfiguration& mainCfg);
     void updateFilterButtons();
 
-    void addFileToCfgHistory(const std::vector<wxString>& filenames);
+    void addFileToCfgHistory(const std::vector<wxString>& filenames); //= update/insert + apply selection
 
     void addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
     void removeAddFolderPair(size_t pos);
@@ -102,6 +102,8 @@ private:
 
     //main method for putting gridDataView on UI: updates data respecting current view settings
     void updateGui(); //kitchen-sink update
+    void updateGuiDelayedIf(bool condition); // 400 ms delay
+
     void updateGridViewData();     //
     void updateStatistics();       // more fine-grained updaters
     void updateUnsavedCfgStatus(); //
@@ -111,7 +113,7 @@ private:
     std::vector<zen::FileSystemObject*> getTreeSelection() const;
 
     void setSyncDirManually(const std::vector<zen::FileSystemObject*>& selection, zen::SyncDirection direction);
-    void setManualFilter(const std::vector<zen::FileSystemObject*>& selection, bool setIncluded);
+    void setFilterManually(const std::vector<zen::FileSystemObject*>& selection, bool setIncluded);
     void copySelectionToClipboard();
     void deleteSelectedFiles(const std::vector<zen::FileSystemObject*>& selectionLeft,
                              const std::vector<zen::FileSystemObject*>& selectionRight);
@@ -194,6 +196,7 @@ private:
     void OnConfigSaveAs   (wxCommandEvent& event);
     void OnConfigLoad     (wxCommandEvent& event);
     void OnLoadFromHistory(wxCommandEvent& event);
+    void OnLoadFromHistoryDoubleClick(wxCommandEvent& event);
 
     void OnCfgHistoryKeyEvent(wxKeyEvent& event);
     void OnRegularUpdateCheck(wxIdleEvent& event);
@@ -211,8 +214,6 @@ private:
     void OnCmpSettings          (wxCommandEvent& event);
     void OnStartSync            (wxCommandEvent& event);
     void OnClose                (wxCloseEvent&   event);
-
-    void updateGuiAfterFilterChange(int delay);
 
     void excludeExtension(const Zstring& extension);
     void excludeShortname(const zen::FileSystemObject& fsObj);

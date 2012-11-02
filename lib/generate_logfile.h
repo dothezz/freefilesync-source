@@ -57,7 +57,9 @@ Utf8String generateLogStream_impl(const ErrorLog& log,
     results.push_back(headerLine);
     results.push_back(L"");
 
-    std::wstring itemsProc = L"    " + _("Items processed:") + L" " + toGuiString(itemsSynced); //show always, even if 0!
+	const wchar_t tabSpace[] = L"    ";
+
+    std::wstring itemsProc = tabSpace + _("Items processed:") + L" " + toGuiString(itemsSynced); //show always, even if 0!
     if (itemsSynced != 0 || dataSynced != 0) //[!] don't show 0 bytes processed if 0 items were processed
         itemsProc += + L" (" + filesizeToShortString(dataSynced) + L")";
     results.push_back(itemsProc);
@@ -66,10 +68,10 @@ Utf8String generateLogStream_impl(const ErrorLog& log,
     {
         if (itemsSynced != itemsTotal ||
             dataSynced  != dataTotal)
-            results.push_back(L"    " + _("Items remaining:") + L" " + toGuiString(itemsTotal - itemsSynced) + L" (" + filesizeToShortString(dataTotal - dataSynced) + L")");
+            results.push_back(tabSpace + _("Items remaining:") + L" " + toGuiString(itemsTotal - itemsSynced) + L" (" + filesizeToShortString(dataTotal - dataSynced) + L")");
     }
 
-    results.push_back(L"    " + _("Total time:") + L" " + copyStringTo<std::wstring>(wxTimeSpan::Seconds(totalTime).Format()));
+    results.push_back(tabSpace + _("Total time:") + L" " + copyStringTo<std::wstring>(wxTimeSpan::Seconds(totalTime).Format()));
 
     //calculate max width, this considers UTF-16 only, not true Unicode...
     size_t sepLineLen = 0;
@@ -132,10 +134,10 @@ void saveToLastSyncsLog(const Utf8String& logstream) //throw FileError
     const size_t newSize = std::min(newStream.size(), std::max<size_t>(logstream.size(), 128 * 1024));
 
     //do not cut in the middle of a row
-    auto iter = std::search(newStream.begin() + newSize, newStream.end(), std::begin(LINE_BREAK), std::end(LINE_BREAK) - 1);
-    if (iter != newStream.end())
+    auto iter = std::search(newStream.cbegin() + newSize, newStream.cend(), std::begin(LINE_BREAK), std::end(LINE_BREAK) - 1);
+    if (iter != newStream.cend())
     {
-        newStream.resize(iter - newStream.begin());
+        newStream.resize(iter - newStream.cbegin());
 
         newStream += LINE_BREAK;
         newStream += "[...]";

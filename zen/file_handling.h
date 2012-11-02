@@ -100,7 +100,7 @@ struct CallbackCopyFile
 
     //may throw:
     //Linux:   unconditionally
-    //Windows: first exception is swallowed, updateCopyStatus() is then called again where it should throw again and exception will propagate as expected
+    //Windows: first exception is swallowed, updateCopyStatus() is then called again where it should throw again and the exception will propagate as expected
     virtual void updateCopyStatus(Int64 bytesDelta) = 0; //accummulated delta != file size! consider ADS, sparse, compressed files
 };
 }

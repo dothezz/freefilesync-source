@@ -18,7 +18,7 @@
 #include "lib/error_log.h"
 
 #ifdef FFS_WIN
-#include <zen/win_ver.h>
+#include <zen/win_ver.h> 
 #elif defined FFS_LINUX
 #include <gtk/gtk.h>
 #endif
@@ -55,12 +55,11 @@ bool Application::OnInit()
 {
 #ifdef FFS_WIN
     std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
+    assert(!win8OrLater()); //another breadcrumb: test and add new OS entry to "compatibility" in application manifest
 #ifdef _MSC_VER
     _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
 #endif
 #endif
-
-    assert(!win8OrLater()); //another breadcrumb: test and add new OS entry to "compatibility" in application manifest
 
     //do not call wxApp::OnInit() to avoid using default commandline parser
 

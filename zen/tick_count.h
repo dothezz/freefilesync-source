@@ -24,7 +24,7 @@ class TickVal;
 std::int64_t operator-(const TickVal& lhs, const TickVal& rhs);
 
 std::int64_t ticksPerSec(); //return 0 on error
-TickVal getTicks();         //return invalid value on error
+TickVal getTicks();         //return invalid value on error: !TickVal::isValid()
 
 
 

@@ -61,6 +61,7 @@ public:
     {
         RESULT_ABORTED,
         RESULT_FINISHED_WITH_ERROR,
+        RESULT_FINISHED_WITH_WARNINGS,
         RESULT_FINISHED_WITH_SUCCESS
     };
     //essential to call one of these two methods in StatusUpdater derived class destructor at the LATEST(!)

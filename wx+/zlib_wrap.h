@@ -101,7 +101,7 @@ BinContainer decompress(const BinContainer& stream) //throw ZlibInternalError
             if (uncompressedSize == 0) //cannot be 0: compress() directly maps empty -> empty container skipping zlib!
                 throw ZlibInternalError();
 
-            contOut.resize(uncompressedSize); //throw std::bad_alloc
+            contOut.resize(static_cast<size_t>(uncompressedSize)); //throw std::bad_alloc
         }
         catch (std::bad_alloc&) //most likely due to data corruption!
         {
@@ -112,7 +112,7 @@ BinContainer decompress(const BinContainer& stream) //throw ZlibInternalError
                                                           stream.size() - sizeof(uncompressedSize),
                                                           &*contOut.begin(),
                                                           uncompressedSize); //throw ZlibInternalError
-        if (bytesWritten != uncompressedSize)
+        if (bytesWritten != static_cast<size_t>(uncompressedSize))
             throw ZlibInternalError();
     }
     return contOut;

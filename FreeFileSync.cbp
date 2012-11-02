@@ -8,9 +8,9 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release">
-				<Option output="BUILD\Bin\FreeFileSync_Win32" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="BUILD\" />
-				<Option object_output="OBJ\FFS_Release_32_MinGW\" />
+				<Option output="BUILD/Bin/FreeFileSync_Win32" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="BUILD/" />
+				<Option object_output="OBJ/FFS_Release_32_MinGW/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectCompilerOptionsRelation="2" />
@@ -18,14 +18,13 @@
 				<Compiler>
 					<Add option="-O3" />
 					<Add option="-DNDEBUG" />
-					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_release_lib\mswu" />
+					<Add directory="C:/Programme/C++/wxWidgets/lib/mingw_release_lib/mswu" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-static" />
-					<Add library="libboost_thread-mgw47-mt-s-1_51.a" />
-					<Add library="libboost_system-mgw47-mt-s-1_51.a" />
-					<Add library="libboost_chrono-mgw47-mt-s-1_51.a" />
+					<Add library="libboost_thread-mgw47-mt-s-1_52.a" />
+					<Add library="libboost_system-mgw47-mt-s-1_52.a" />
 					<Add library="libwxmsw28u_aui.a" />
 					<Add library="libwxmsw28u_adv.a" />
 					<Add library="libwxmsw28u_core.a" />
@@ -33,16 +32,16 @@
 					<Add library="libwxbase28u_net.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
-					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_release_lib" />
+					<Add directory="C:/Programme/C++/wxWidgets/lib/mingw_release_lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after='&quot;C:\Program Files\C++\CodeSigning\SignCode.cmd&quot; &quot;$(PROJECT_DIR)$(TARGET_OUTPUT_FILE)&quot;' />
 				</ExtraCommands>
 			</Target>
 			<Target title="Debug-DLL">
-				<Option output="BUILD\Bin\FreeFileSync_Debug" prefix_auto="1" extension_auto="1" />
+				<Option output="BUILD/Bin/FreeFileSync_Debug" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="BUILD" />
-				<Option object_output="OBJ\FFS_Debug_32_MinGW\" />
+				<Option object_output="OBJ/FFS_Debug_32_MinGW/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectCompilerOptionsRelation="2" />
@@ -52,25 +51,24 @@
 					<Add option="-Winvalid-pch" />
 					<Add option='-include &quot;wx+/pch.h&quot;' />
 					<Add option="-D__WXDEBUG__" />
-					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_debug_dll\mswud" />
+					<Add directory="C:/Programme/C++/wxWidgets/lib/mingw_debug_dll/mswud" />
 				</Compiler>
 				<Linker>
-					<Add library="libboost_thread-mgw47-mt-sd-1_51.a" />
-					<Add library="libboost_system-mgw47-mt-sd-1_51.a" />
-					<Add library="libboost_chrono-mgw47-mt-sd-1_51.a" />
+					<Add library="libboost_thread-mgw47-mt-sd-1_52.a" />
+					<Add library="libboost_system-mgw47-mt-sd-1_52.a" />
 					<Add library="libwxmsw28ud_aui.a" />
 					<Add library="libwxmsw28ud_adv.a" />
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxbase28ud_net.a" />
 					<Add library="libwxzlibd.a" />
-					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_debug_dll" />
+					<Add directory="C:/Programme/C++/wxWidgets/lib/mingw_debug_dll" />
 				</Linker>
 			</Target>
 			<Target title="Unit Test">
-				<Option output="OBJ\Unit_Test_MinGW\Unit Test" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="OBJ\Unit_Test_MinGW\" />
-				<Option object_output="OBJ\Unit_Test_MinGW\" />
+				<Option output="OBJ/Unit_Test_MinGW/Unit Test" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="OBJ/Unit_Test_MinGW/" />
+				<Option object_output="OBJ/Unit_Test_MinGW/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option projectCompilerOptionsRelation="2" />
@@ -80,20 +78,19 @@
 					<Add option="-Winvalid-pch" />
 					<Add option='-include &quot;wx+/pch.h&quot;' />
 					<Add option="-D__WXDEBUG__" />
-					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_debug_dll\mswud" />
-					<Add directory="lib\gtest" />
-					<Add directory="lib\gtest\include" />
+					<Add directory="C:/Programme/C++/wxWidgets/lib/mingw_debug_dll/mswud" />
+					<Add directory="lib/gtest" />
+					<Add directory="lib/gtest/include" />
 				</Compiler>
 				<Linker>
-					<Add library="libboost_thread-mgw47-mt-sd-1_51.a" />
-					<Add library="libboost_system-mgw47-mt-sd-1_51.a" />
-					<Add library="libboost_chrono-mgw47-mt-sd-1_51.a" />
+					<Add library="libboost_thread-mgw47-mt-sd-1_52.a" />
+					<Add library="libboost_system-mgw47-mt-sd-1_52.a" />
 					<Add library="libwxmsw28ud_adv.a" />
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add directory="C:\Programme\C++\wxWidgets\lib\mingw_debug_dll" />
+					<Add directory="C:/Programme/C++/wxWidgets/lib/mingw_debug_dll" />
 				</Linker>
 			</Target>
 		</Build>
@@ -120,12 +117,12 @@
 			<Add option="-DBOOST_THREAD_USE_LIB" />
 			<Add option="-DWXINTL_NO_GETTEXT_MACRO" />
 			<Add option="-DZEN_PLATFORM_WINDOWS" />
-			<Add directory="C:\Programme\C++\wxWidgets\include" />
-			<Add directory="C:\Program Files\C++\Boost" />
+			<Add directory="C:/Programme/C++/wxWidgets/include" />
+			<Add directory="C:/Program Files/C++/Boost" />
 			<Add directory="." />
 		</Compiler>
 		<ResourceCompiler>
-			<Add directory="C:\Programme\C++\wxWidgets\include" />
+			<Add directory="C:/Programme/C++/wxWidgets/include" />
 		</ResourceCompiler>
 		<Linker>
 			<Add option="-mthreads" />
@@ -142,7 +139,8 @@
 			<Add library="libwinmm.a" />
 			<Add library="libmpr.a" />
 			<Add library="libuxtheme.a" />
-			<Add directory="C:\Program Files\C++\Boost\stage\lib" />
+			<Add library="libwininet.a" />
+			<Add directory="C:/Program Files/C++/Boost/stage/lib" />
 		</Linker>
 		<Unit filename="WxWizFrame.fbp">
 			<Option target="&lt;{~None~}&gt;" />
@@ -158,72 +156,72 @@
 		<Unit filename="comparison.h" />
 		<Unit filename="file_hierarchy.cpp" />
 		<Unit filename="file_hierarchy.h" />
-		<Unit filename="lib\binary.cpp" />
-		<Unit filename="lib\binary.h" />
-		<Unit filename="lib\cmp_filetime.h" />
-		<Unit filename="lib\db_file.cpp" />
-		<Unit filename="lib\db_file.h" />
-		<Unit filename="lib\dir_exist_async.h" />
-		<Unit filename="lib\dir_lock.cpp" />
-		<Unit filename="lib\dir_lock.h" />
-		<Unit filename="lib\error_log.h" />
-		<Unit filename="lib\ffs_paths.h" />
-		<Unit filename="lib\generate_logfile.h" />
-		<Unit filename="lib\gtest\main.cpp">
+		<Unit filename="lib/binary.cpp" />
+		<Unit filename="lib/binary.h" />
+		<Unit filename="lib/cmp_filetime.h" />
+		<Unit filename="lib/db_file.cpp" />
+		<Unit filename="lib/db_file.h" />
+		<Unit filename="lib/dir_exist_async.h" />
+		<Unit filename="lib/dir_lock.cpp" />
+		<Unit filename="lib/dir_lock.h" />
+		<Unit filename="lib/error_log.h" />
+		<Unit filename="lib/ffs_paths.h" />
+		<Unit filename="lib/generate_logfile.h" />
+		<Unit filename="lib/gtest/main.cpp">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="lib\gtest\src\gtest-all.cc">
+		<Unit filename="lib/gtest/src/gtest-all.cc">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="lib\gtest\unittest.h">
+		<Unit filename="lib/gtest/unittest.h">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="lib\gtest\unittest1.cpp">
+		<Unit filename="lib/gtest/unittest1.cpp">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="lib\gtest\unittest2.cpp">
+		<Unit filename="lib/gtest/unittest2.cpp">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="lib\gtest\unittest3.cpp">
+		<Unit filename="lib/gtest/unittest3.cpp">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="lib\hard_filter.cpp" />
-		<Unit filename="lib\hard_filter.h" />
-		<Unit filename="lib\help_provider.h" />
-		<Unit filename="lib\icon_buffer.cpp" />
-		<Unit filename="lib\icon_buffer.h" />
-		<Unit filename="lib\localization.cpp" />
-		<Unit filename="lib\localization.h" />
-		<Unit filename="lib\lock_holder.h" />
-		<Unit filename="lib\norm_filter.h" />
-		<Unit filename="lib\parallel_scan.cpp" />
-		<Unit filename="lib\parallel_scan.h" />
-		<Unit filename="lib\parse_lng.h" />
-		<Unit filename="lib\parse_plural.h" />
-		<Unit filename="lib\perf_check.cpp">
+		<Unit filename="lib/hard_filter.cpp" />
+		<Unit filename="lib/hard_filter.h" />
+		<Unit filename="lib/help_provider.h" />
+		<Unit filename="lib/icon_buffer.cpp" />
+		<Unit filename="lib/icon_buffer.h" />
+		<Unit filename="lib/localization.cpp" />
+		<Unit filename="lib/localization.h" />
+		<Unit filename="lib/lock_holder.h" />
+		<Unit filename="lib/norm_filter.h" />
+		<Unit filename="lib/parallel_scan.cpp" />
+		<Unit filename="lib/parallel_scan.h" />
+		<Unit filename="lib/parse_lng.h" />
+		<Unit filename="lib/parse_plural.h" />
+		<Unit filename="lib/perf_check.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="lib\perf_check.h">
+		<Unit filename="lib/perf_check.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="lib\process_xml.cpp" />
-		<Unit filename="lib\process_xml.h" />
-		<Unit filename="lib\resolve_path.cpp" />
-		<Unit filename="lib\resolve_path.h" />
-		<Unit filename="lib\resources.cpp" />
-		<Unit filename="lib\resources.h" />
-		<Unit filename="lib\return_codes.h" />
-		<Unit filename="lib\shadow.cpp" />
-		<Unit filename="lib\shadow.h" />
-		<Unit filename="lib\soft_filter.h" />
-		<Unit filename="lib\status_handler.cpp" />
-		<Unit filename="lib\status_handler.h" />
-		<Unit filename="lib\versioning.cpp" />
-		<Unit filename="lib\versioning.h" />
-		<Unit filename="lib\xml_base.cpp" />
-		<Unit filename="lib\xml_base.h" />
+		<Unit filename="lib/process_xml.cpp" />
+		<Unit filename="lib/process_xml.h" />
+		<Unit filename="lib/resolve_path.cpp" />
+		<Unit filename="lib/resolve_path.h" />
+		<Unit filename="lib/resources.cpp" />
+		<Unit filename="lib/resources.h" />
+		<Unit filename="lib/return_codes.h" />
+		<Unit filename="lib/shadow.cpp" />
+		<Unit filename="lib/shadow.h" />
+		<Unit filename="lib/soft_filter.h" />
+		<Unit filename="lib/status_handler.cpp" />
+		<Unit filename="lib/status_handler.h" />
+		<Unit filename="lib/versioning.cpp" />
+		<Unit filename="lib/versioning.h" />
+		<Unit filename="lib/xml_base.cpp" />
+		<Unit filename="lib/xml_base.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="Release" />
@@ -233,291 +231,295 @@
 		<Unit filename="structures.h" />
 		<Unit filename="synchronization.cpp" />
 		<Unit filename="synchronization.h" />
-		<Unit filename="ui\batch_config.cpp">
+		<Unit filename="ui/batch_config.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\batch_config.h">
+		<Unit filename="ui/batch_config.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\batch_status_handler.cpp">
+		<Unit filename="ui/batch_status_handler.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\batch_status_handler.h" />
-		<Unit filename="ui\check_version.cpp">
+		<Unit filename="ui/batch_status_handler.h" />
+		<Unit filename="ui/check_version.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\check_version.h">
+		<Unit filename="ui/check_version.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\custom_grid.cpp">
+		<Unit filename="ui/custom_grid.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\custom_grid.h">
+		<Unit filename="ui/custom_grid.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\dir_name.cpp">
+		<Unit filename="ui/dir_name.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\dir_name.h">
+		<Unit filename="ui/dir_name.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\exec_finished_box.cpp">
+		<Unit filename="ui/exec_finished_box.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\exec_finished_box.h">
+		<Unit filename="ui/exec_finished_box.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\folder_history_box.cpp">
+		<Unit filename="ui/folder_history_box.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\folder_history_box.h">
+		<Unit filename="ui/folder_history_box.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\folder_pair.h">
+		<Unit filename="ui/folder_pair.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\grid_view.cpp">
+		<Unit filename="ui/grid_view.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\grid_view.h">
+		<Unit filename="ui/grid_view.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\gui_generated.cpp">
+		<Unit filename="ui/gui_generated.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\gui_generated.h">
+		<Unit filename="ui/gui_generated.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\gui_status_handler.cpp">
+		<Unit filename="ui/gui_status_handler.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\gui_status_handler.h">
+		<Unit filename="ui/gui_status_handler.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\main_dlg.cpp">
+		<Unit filename="ui/main_dlg.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\main_dlg.h">
+		<Unit filename="ui/main_dlg.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\msg_popup.cpp">
+		<Unit filename="ui/msg_popup.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\msg_popup.h" />
-		<Unit filename="ui\progress_indicator.cpp">
+		<Unit filename="ui/msg_popup.h" />
+		<Unit filename="ui/progress_indicator.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\progress_indicator.h" />
-		<Unit filename="ui\search.cpp">
+		<Unit filename="ui/progress_indicator.h" />
+		<Unit filename="ui/search.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\search.h" />
-		<Unit filename="ui\small_dlgs.cpp">
+		<Unit filename="ui/search.h" />
+		<Unit filename="ui/small_dlgs.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\small_dlgs.h">
+		<Unit filename="ui/small_dlgs.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\sorting.h">
+		<Unit filename="ui/sorting.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\switch_to_gui.h">
+		<Unit filename="ui/switch_to_gui.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\sync_cfg.cpp">
+		<Unit filename="ui/sync_cfg.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\sync_cfg.h">
+		<Unit filename="ui/sync_cfg.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\taskbar.cpp" />
-		<Unit filename="ui\taskbar.h" />
-		<Unit filename="ui\tray_icon.cpp">
+		<Unit filename="ui/taskbar.cpp" />
+		<Unit filename="ui/taskbar.h" />
+		<Unit filename="ui/tray_icon.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\tray_icon.h" />
-		<Unit filename="ui\tree_view.cpp">
+		<Unit filename="ui/tray_icon.h" />
+		<Unit filename="ui/tree_view.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\tree_view.h">
+		<Unit filename="ui/tree_view.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\triple_splitter.cpp">
+		<Unit filename="ui/triple_splitter.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\triple_splitter.h">
+		<Unit filename="ui/triple_splitter.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\wx_form_build_hide_warnings.h">
+		<Unit filename="ui/wx_form_build_hide_warnings.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\app_main.h">
+		<Unit filename="wx+/app_main.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\button.cpp">
+		<Unit filename="wx+/button.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\button.h">
+		<Unit filename="wx+/button.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\choice_enum.h">
+		<Unit filename="wx+/choice_enum.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\dir_picker.h">
+		<Unit filename="wx+/dir_picker.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\file_drop.h">
+		<Unit filename="wx+/file_drop.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="zen\format_unit.cpp" />
-		<Unit filename="zen\format_unit.h">
+		<Unit filename="wx+/graph.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\graph.cpp">
+		<Unit filename="wx+/graph.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\graph.h">
+		<Unit filename="wx+/grid.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\grid.cpp">
+		<Unit filename="wx+/grid.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\grid.h">
+		<Unit filename="wx+/image_tools.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\image_tools.h">
+		<Unit filename="wx+/mouse_move_dlg.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\mouse_move_dlg.cpp">
+		<Unit filename="wx+/mouse_move_dlg.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\mouse_move_dlg.h">
-			<Option target="Release" />
-			<Option target="Debug-DLL" />
-		</Unit>
-		<Unit filename="wx+\pch.h">
+		<Unit filename="wx+/pch.h">
 			<Option compile="1" />
 			<Option weight="0" />
 			<Option target="Debug-DLL" />
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="wx+\shell_execute.h">
+		<Unit filename="wx+/shell_execute.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\string_conv.h">
+		<Unit filename="wx+/string_conv.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\toggle_button.h">
+		<Unit filename="wx+/toggle_button.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\tooltip.cpp">
+		<Unit filename="wx+/tooltip.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\tooltip.h">
+		<Unit filename="wx+/tooltip.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="wx+\zlib_wrap.cpp" />
-		<Unit filename="wx+\zlib_wrap.h" />
-		<Unit filename="zen\assert_static.h" />
-		<Unit filename="zen\base64.h" />
-		<Unit filename="zen\build_info.h" />
-		<Unit filename="zen\com_error.h" />
-		<Unit filename="zen\com_ptr.h" />
-		<Unit filename="zen\com_util.h" />
-		<Unit filename="zen\debug_log.h" />
-		<Unit filename="zen\dir_watcher.h" />
-		<Unit filename="zen\dll.h" />
-		<Unit filename="zen\dst_hack.cpp" />
-		<Unit filename="zen\dst_hack.h" />
-		<Unit filename="zen\file_error.h" />
-		<Unit filename="zen\file_handling.cpp" />
-		<Unit filename="zen\file_handling.h" />
-		<Unit filename="zen\file_id.cpp" />
-		<Unit filename="zen\file_id.h" />
-		<Unit filename="zen\file_io.cpp" />
-		<Unit filename="zen\file_io.h" />
-		<Unit filename="zen\file_traverser.cpp" />
-		<Unit filename="zen\file_traverser.h" />
-		<Unit filename="zen\fixed_list.h" />
-		<Unit filename="zen\guid.h" />
-		<Unit filename="zen\i18n.h" />
-		<Unit filename="zen\int64.h" />
-		<Unit filename="zen\last_error.h" />
-		<Unit filename="zen\long_path_prefix.h" />
-		<Unit filename="zen\notify_removal.h" />
-		<Unit filename="zen\perf.h" />
-		<Unit filename="zen\privilege.cpp" />
-		<Unit filename="zen\privilege.h" />
-		<Unit filename="zen\read_txt.h" />
-		<Unit filename="zen\recycler.cpp" />
-		<Unit filename="zen\recycler.h" />
-		<Unit filename="zen\serialize.h" />
-		<Unit filename="zen\stl_tools.h" />
-		<Unit filename="zen\string_base.h" />
-		<Unit filename="zen\string_tools.h" />
-		<Unit filename="zen\string_traits.h" />
-		<Unit filename="zen\symlink_target.h" />
-		<Unit filename="zen\thread.h" />
-		<Unit filename="zen\tick_count.h" />
-		<Unit filename="zen\warn_static.h" />
-		<Unit filename="zen\win.h" />
-		<Unit filename="zen\zstring.cpp" />
-		<Unit filename="zen\zstring.h" />
+		<Unit filename="wx+/zlib_wrap.cpp" />
+		<Unit filename="wx+/zlib_wrap.h" />
+		<Unit filename="zen/assert_static.h" />
+		<Unit filename="zen/base64.h" />
+		<Unit filename="zen/build_info.h" />
+		<Unit filename="zen/com_error.h" />
+		<Unit filename="zen/com_ptr.h" />
+		<Unit filename="zen/com_util.h" />
+		<Unit filename="zen/debug_log.h" />
+		<Unit filename="zen/dir_watcher.h" />
+		<Unit filename="zen/dll.h" />
+		<Unit filename="zen/dst_hack.cpp" />
+		<Unit filename="zen/dst_hack.h" />
+		<Unit filename="zen/file_error.h" />
+		<Unit filename="zen/file_handling.cpp" />
+		<Unit filename="zen/file_handling.h" />
+		<Unit filename="zen/file_id.cpp" />
+		<Unit filename="zen/file_id.h" />
+		<Unit filename="zen/file_io.cpp" />
+		<Unit filename="zen/file_io.h" />
+		<Unit filename="zen/file_traverser.cpp" />
+		<Unit filename="zen/file_traverser.h" />
+		<Unit filename="zen/fixed_list.h" />
+		<Unit filename="zen/format_unit.cpp" />
+		<Unit filename="zen/format_unit.h">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="zen/guid.h" />
+		<Unit filename="zen/i18n.h" />
+		<Unit filename="zen/int64.h" />
+		<Unit filename="zen/last_error.h" />
+		<Unit filename="zen/long_path_prefix.h" />
+		<Unit filename="zen/notify_removal.h" />
+		<Unit filename="zen/perf.h" />
+		<Unit filename="zen/privilege.cpp" />
+		<Unit filename="zen/privilege.h" />
+		<Unit filename="zen/read_txt.h" />
+		<Unit filename="zen/recycler.cpp" />
+		<Unit filename="zen/recycler.h" />
+		<Unit filename="zen/scroll_window_under_cursor.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
+		<Unit filename="zen/serialize.h" />
+		<Unit filename="zen/stl_tools.h" />
+		<Unit filename="zen/string_base.h" />
+		<Unit filename="zen/string_tools.h" />
+		<Unit filename="zen/string_traits.h" />
+		<Unit filename="zen/symlink_target.h" />
+		<Unit filename="zen/thread.h" />
+		<Unit filename="zen/tick_count.h" />
+		<Unit filename="zen/warn_static.h" />
+		<Unit filename="zen/win.h" />
+		<Unit filename="zen/zstring.cpp" />
+		<Unit filename="zen/zstring.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

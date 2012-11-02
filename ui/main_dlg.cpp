@@ -55,6 +55,7 @@
 #include <wx+/no_flicker.h>
 #include <wx+/grid.h>
 #include "../lib/error_log.h"
+#include "triple_splitter.h"
 
 using namespace zen;
 using namespace std::rel_ops;
@@ -309,23 +310,23 @@ void setMenuItemImage(wxMenuItem*& menuItem, const wxBitmap& bmp)
 
     if (wxMenu* menu = menuItem->GetMenu())
     {
-		int pos = menu->GetMenuItems().IndexOf(menuItem);
-		if (pos != wxNOT_FOUND)
-		{
-                /*
-                    menu->Remove(item);        ->this simple sequence crashes on Kubuntu x64, wxWidgets 2.9.2
-                    menu->Insert(index, item);
-                    */
-                const bool enabled = menuItem->IsEnabled();
-                wxMenuItem* newItem = new wxMenuItem(menu, menuItem->GetId(), menuItem->GetItemLabel());
-                newItem->SetBitmap(bmp);
+        int pos = menu->GetMenuItems().IndexOf(menuItem);
+        if (pos != wxNOT_FOUND)
+        {
+            /*
+                menu->Remove(item);        ->this simple sequence crashes on Kubuntu x64, wxWidgets 2.9.2
+                menu->Insert(index, item);
+                */
+            const bool enabled = menuItem->IsEnabled();
+            wxMenuItem* newItem = new wxMenuItem(menu, menuItem->GetId(), menuItem->GetItemLabel());
+            newItem->SetBitmap(bmp);
 
-                menu->Destroy(menuItem);          //actual workaround
-                menuItem = menu->Insert(pos, newItem); //don't forget to update input item pointer!
+            menu->Destroy(menuItem);          //actual workaround
+            menuItem = menu->Insert(pos, newItem); //don't forget to update input item pointer!
 
-                if (!enabled)
-                    menuItem->Enable(false); //do not enable BEFORE appending item! wxWidgets screws up for yet another crappy reason
-		}
+            if (!enabled)
+                menuItem->Enable(false); //do not enable BEFORE appending item! wxWidgets screws up for yet another crappy reason
+        }
     }
 }
 
@@ -578,7 +579,7 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     //init handling of first folder pair
     firstFolderPair.reset(new DirectoryPairFirst(*this));
 
-    initViewFilterButtons();
+    //initViewFilterButtons();
 
     //init grid settings
     gridview::init(*m_gridMainL, *m_gridMainC, *m_gridMainR, gridDataView);
@@ -783,6 +784,7 @@ void MainDialog::onQueryEndSession()
     catch (const xmlAccess::FfsXmlError&) {}
 }
 
+
 void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSettings)
 {
     globalCfg = globalSettings;
@@ -930,7 +932,7 @@ void MainDialog::setSyncDirManually(const std::vector<FileSystemObject*>& select
 }
 
 
-void MainDialog::setManualFilter(const std::vector<FileSystemObject*>& selection, bool setIncluded)
+void MainDialog::setFilterManually(const std::vector<FileSystemObject*>& selection, bool setIncluded)
 {
     //if hidefiltered is active, there should be no filtered elements on screen => current element was filtered out
     assert(currentCfg.showFilteredElements || !setIncluded);
@@ -940,7 +942,7 @@ void MainDialog::setManualFilter(const std::vector<FileSystemObject*>& selection
         std::for_each(selection.begin(), selection.end(),
         [&](FileSystemObject* fsObj) { zen::setActiveStatus(setIncluded, *fsObj); }); //works recursively for directories
 
-        updateGuiAfterFilterChange(400); //call this instead of updateGuiGrid() to add some delay if hideFiltered == true and to handle some graphical artifacts
+        updateGuiDelayedIf(!currentCfg.showFilteredElements); //show update GUI before removing rows
     }
 }
 
@@ -1170,7 +1172,7 @@ void MainDialog::deleteSelectedFiles(const std::vector<FileSystemObject*>& selec
     if (!selectionLeft.empty() || !selectionRight.empty())
     {
         wxWindow* oldFocus = wxWindow::FindFocus();
-        ZEN_ON_SCOPE_EXIT( if (oldFocus) oldFocus->SetFocus(); )
+        ZEN_ON_SCOPE_EXIT(if (oldFocus) oldFocus->SetFocus();)
 
             if (zen::showDeleteDialog(this,
                                       selectionLeft,
@@ -1382,7 +1384,8 @@ void MainDialog::disableAllElements(bool enableAbort)
         //show abort button
         m_buttonAbort->Enable();
         m_buttonAbort->Show();
-        if (m_buttonAbort->IsShownOnScreen()) m_buttonAbort->SetFocus();
+        if (m_buttonAbort->IsShownOnScreen())
+            m_buttonAbort->SetFocus();
         m_buttonCompare->Disable();
         m_buttonCompare->Hide();
         m_panelTopButtons->Layout();
@@ -1536,9 +1539,9 @@ void MainDialog::onTreeButtonEvent(wxKeyEvent& event)
             case WXK_SPACE:
             case WXK_NUMPAD_SPACE:
             {
-                const auto& selection = getTreeSelection();
+                const std::vector<FileSystemObject*>& selection = getTreeSelection();
                 if (!selection.empty())
-                    setManualFilter(selection, !selection[0]->isActive());
+                    setFilterManually(selection, !selection[0]->isActive());
             }
             return;
 
@@ -1622,9 +1625,9 @@ void MainDialog::onGridButtonEvent(wxKeyEvent& event, Grid& grid, bool leftSide)
             case WXK_SPACE:
             case WXK_NUMPAD_SPACE:
             {
-                const auto& selection = getGridSelection();
+				const std::vector<FileSystemObject*>& selection = getGridSelection();
                 if (!selection.empty())
-                    setManualFilter(selection, !selection[0]->isActive());
+                    setFilterManually(selection, !selection[0]->isActive());
             }
             return;
 
@@ -1718,14 +1721,16 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
             if (!isPartOf(focus, m_gridMainL     ) && //
                 !isPartOf(focus, m_gridMainC     ) && //don't propagate keyboard commands if grid is already in focus
                 !isPartOf(focus, m_gridMainR     ) && //
+                !isPartOf(focus, m_gridNavi      ) &&
                 !isPartOf(focus, m_listBoxHistory) && //don't propagate if selecting config
                 !isPartOf(focus, m_directoryLeft)  && //don't propagate if changing directory field
                 !isPartOf(focus, m_directoryRight) &&
-                !isPartOf(focus, m_gridNavi      ) &&
                 !isPartOf(focus, m_scrolledWindowFolderPairs))
-                if (wxEvtHandler* evtHandler = m_gridMainL->GetEventHandler())
+                if (wxEvtHandler* evtHandler = m_gridMainL->getMainWin().GetEventHandler())
                 {
                     m_gridMainL->SetFocus();
+
+					event.SetEventType(wxEVT_KEY_DOWN); //the grid event handler doesn't expect wxEVT_CHAR_HOOK!
                     evtHandler->ProcessEvent(event); //propagating event catched at wxTheApp to child leads to recursion, but we prevented it...
                     event.Skip(false); //definitively handled now!
                     return;
@@ -1827,9 +1832,9 @@ void MainDialog::onNaviGridContext(GridClickEvent& event)
     if (!selection.empty())
     {
         if (selection[0]->isActive())
-            menu.addItem(_("Exclude temporarily") + L"\tSpace", [this, &selection] { setManualFilter(selection, false); }, &GlobalResources::getImage(L"checkboxFalse"));
+            menu.addItem(_("Exclude temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, false); }, &GlobalResources::getImage(L"checkboxFalse"));
         else
-            menu.addItem(_("Include temporarily") + L"\tSpace", [this, &selection] { setManualFilter(selection, true); }, &GlobalResources::getImage(L"checkboxTrue"));
+            menu.addItem(_("Include temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, true); }, &GlobalResources::getImage(L"checkboxTrue"));
     }
     else
         menu.addItem(_("Exclude temporarily") + L"\tSpace", [] {}, nullptr, false);
@@ -1871,7 +1876,7 @@ void MainDialog::onMainGridContextC(GridClickEvent& event)
     menu.addItem(_("Exclude all"), [&]
     {
         zen::setActiveStatus(false, folderCmp);
-        updateGuiAfterFilterChange(400); //call this instead of updateGuiGrid() to add some delay if hideFiltered == true
+        updateGuiDelayedIf(!currentCfg.showFilteredElements); //show update GUI before removing rows
     }, nullptr, gridDataView->rowsTotal() > 0);
 
     menu.popup(*this);
@@ -1919,9 +1924,9 @@ void MainDialog::onMainGridContextRim(bool leftSide)
     if (!selection.empty())
     {
         if (selection[0]->isActive())
-            menu.addItem(_("Exclude temporarily") + L"\tSpace", [this, &selection] { setManualFilter(selection, false); }, &GlobalResources::getImage(L"checkboxFalse"));
+            menu.addItem(_("Exclude temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, false); }, &GlobalResources::getImage(L"checkboxFalse"));
         else
-            menu.addItem(_("Include temporarily") + L"\tSpace", [this, &selection] { setManualFilter(selection, true); }, &GlobalResources::getImage(L"checkboxTrue"));
+            menu.addItem(_("Include temporarily") + L"\tSpace", [this, &selection] { setFilterManually(selection, true); }, &GlobalResources::getImage(L"checkboxTrue"));
     }
     else
         menu.addItem(_("Exclude temporarily") + L"\tSpace", [] {}, nullptr, false);
@@ -2163,7 +2168,8 @@ void MainDialog::onGridLabelContext(Grid& grid, ColumnTypeRim type, const std::v
             if (showSelectTimespanDlg(this, manualTimeSpanFrom, manualTimeSpanTo) == ReturnSmallDlg::BUTTON_OKAY)
             {
                 applyTimeSpanFilter(folderCmp, manualTimeSpanFrom, manualTimeSpanTo); //overwrite current active/inactive settings
-                updateGuiAfterFilterChange(400);
+                //updateGuiDelayedIf(!currentCfg.showFilteredElements); //show update GUI before removing rows
+                updateGui();
             }
         };
         menu.addItem(_("Select time span..."), selectTimeSpan);
@@ -2376,7 +2382,7 @@ void MainDialog::updateUnsavedCfgStatus()
     setImage(*m_bpButtonSave, allowSave ? GlobalResources::getImage(L"save") : makeBrightGrey(GlobalResources::getImage(L"save")));
     m_bpButtonSave->Enable(allowSave);
 
-	m_menuItemSave->Enable(allowSave); //bitmap is automatically greyscaled on Win7 (introducing a crappy looking shift), but not on XP
+    m_menuItemSave->Enable(allowSave); //bitmap is automatically greyscaled on Win7 (introducing a crappy looking shift), but not on XP
 
     //set main dialog title
     wxString title;
@@ -2551,31 +2557,50 @@ void MainDialog::OnLoadFromHistory(wxCommandEvent& event)
     });
 
     if (!filenames.empty())
-    {
         loadConfiguration(filenames);
 
-        //in case user cancelled saving old config, selection is wrong: so reapply it!
-        addFileToCfgHistory(activeConfigFiles);
-    }
+    //user changed m_listBoxHistory selection so it's this method's responsibility to synchronize with activeConfigFiles
+    //- if user cancelled saving old config
+    //- there's an error loading new config
+    //- filenames is empty and user tried to unselect the current config
+    addFileToCfgHistory(activeConfigFiles);
 }
 
 
-void MainDialog::loadConfiguration(const wxString& filename)
+void MainDialog::OnLoadFromHistoryDoubleClick(wxCommandEvent& event)
 {
-    std::vector<wxString> filenames;
-    filenames.push_back(filename);
+    wxArrayInt selections;
+    m_listBoxHistory->GetSelections(selections);
 
-    loadConfiguration(filenames);
+    std::vector<wxString> filenames;
+    std::for_each(selections.begin(), selections.end(),
+                  [&](int pos)
+    {
+        if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(pos)))
+            filenames.push_back(histData->cfgFile_);
+    });
+
+    if (!filenames.empty())
+        if (loadConfiguration(filenames))
+        {
+            //simulate button click on "compare"
+            wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED);
+            if (wxEvtHandler* evtHandler = m_buttonCompare->GetEventHandler())
+                evtHandler->ProcessEvent(dummy2); //synchronous call
+        }
+
+    //synchronize m_listBoxHistory and activeConfigFiles, see OnLoadFromHistory()
+    addFileToCfgHistory(activeConfigFiles);
 }
 
 
-void MainDialog::loadConfiguration(const std::vector<wxString>& filenames)
+bool MainDialog::loadConfiguration(const std::vector<wxString>& filenames)
 {
     if (filenames.empty())
-        return;
+        return true;
 
     if (!saveOldConfig())
-        return;
+        return false; //cancelled by user
 
     //load XML
     xmlAccess::XmlGuiConfig newGuiCfg;  //structure to receive gui settings, already defaulted!!
@@ -2586,6 +2611,7 @@ void MainDialog::loadConfiguration(const std::vector<wxString>& filenames)
 
         setConfig(newGuiCfg, filenames);
         //flashStatusInformation(_("Configuration loaded!")); -> irrelvant!?
+        return true;
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
@@ -2597,6 +2623,7 @@ void MainDialog::loadConfiguration(const std::vector<wxString>& filenames)
         }
         else
             wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR, this);
+        return false;
     }
 }
 
@@ -2670,7 +2697,7 @@ void MainDialog::onCheckRows(CheckRowsEvent& event)
             selectedRows.insert(i);
 
         std::vector<FileSystemObject*> objects = gridDataView->getAllFileRef(selectedRows);
-        setManualFilter(objects, event.setIncluded_);
+        setFilterManually(objects, event.setIncluded_);
     }
 }
 
@@ -2720,7 +2747,7 @@ void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::
     //evaluate new settings...
 
     //(re-)set view filter buttons
-    initViewFilterButtons();
+    initViewFilterButtons(newGuiCfg.mainCfg);
 
     updateFilterButtons();
 
@@ -2803,18 +2830,18 @@ const wxString& MainDialog::lastRunConfigName()
 }
 
 
-void MainDialog::updateGuiAfterFilterChange(int delay)
+void MainDialog::updateGuiDelayedIf(bool condition)
 {
-    //signal UI that grids need to be refreshed on next Update()
+    const int delay = 400;
 
-    if (!currentCfg.showFilteredElements)
+    if (condition)
     {
         gridview::refresh(*m_gridMainL, *m_gridMainC, *m_gridMainR);
         m_gridMainL->Update();
         m_gridMainC->Update();
         m_gridMainR->Update();
 
-        wxMilliSleep(delay); //some delay to show user the rows he has filtered out before they are removed
+        wxMilliSleep(delay); //some delay to show the changed GUI before removing rows from sight
     }
 
     updateGui();
@@ -2982,7 +3009,7 @@ wxBitmap buttonReleased(const std::string& name)
 }
 
 
-void MainDialog::initViewFilterButtons()
+void MainDialog::initViewFilterButtons(const MainConfiguration& mainCfg)
 {
     //compare result buttons
     m_bpButtonLeftOnly->init(buttonPressed("leftOnly"),
@@ -3061,7 +3088,6 @@ void MainDialog::initViewFilterButtons()
     m_bpButtonRightOnly-> setActive(true);
     m_bpButtonLeftNewer-> setActive(true);
     m_bpButtonRightNewer->setActive(true);
-    m_bpButtonEqual->     setActive(false);
     m_bpButtonDifferent-> setActive(true);
     m_bpButtonConflict->  setActive(true);
 
@@ -3072,7 +3098,46 @@ void MainDialog::initViewFilterButtons()
     m_bpButtonSyncDeleteRight->  setActive(true);
     m_bpButtonSyncDirOverwLeft-> setActive(true);
     m_bpButtonSyncDirOverwRight->setActive(true);
-    m_bpButtonSyncDirNone->      setActive(true);
+
+    m_bpButtonEqual->setActive(false);
+
+    //special case "m_bpButtonSyncDirNone": set always active, unless sync direction "none" is part of the rule set:
+    //e.g. for a "custom" config or "update" variant. Otherwise rows with sync direction "none" can only occur on grid if the user manually
+    //sets them, in which case these rows should not be hidden immediately, so m_bpButtonSyncDirNone must be active
+    const std::vector<FolderPairCfg>& cmpCfg = extractCompareCfg(mainCfg);
+    const bool syncDirNonePartOfConfig = std::any_of(cmpCfg.begin(), cmpCfg.end(),
+                                                     [&](const FolderPairCfg& fpCfg) -> bool
+    {
+        //attention: following is quite an amount of implicit/redundant knowledge here... let's hope our model is fundamental enough to not change any time soon!
+
+        if (fpCfg.directionCfg.var == DirectionConfig::AUTOMATIC)
+            return false;
+
+        const DirectionSet dirSet = extractDirections(fpCfg.directionCfg);
+
+        switch (fpCfg.compareVar)
+        {
+            case CMP_BY_TIME_SIZE:
+                return dirSet.exLeftSideOnly  == SYNC_DIR_NONE ||
+                dirSet.exRightSideOnly == SYNC_DIR_NONE ||
+                dirSet.leftNewer       == SYNC_DIR_NONE ||
+                dirSet.rightNewer      == SYNC_DIR_NONE;
+                //dirSet.different       == SYNC_DIR_NONE ||
+                //dirSet.conflict        == SYNC_DIR_NONE;
+
+            case CMP_BY_CONTENT:
+                return dirSet.exLeftSideOnly  == SYNC_DIR_NONE ||
+                dirSet.exRightSideOnly == SYNC_DIR_NONE ||
+                //dirSet.leftNewer       == SYNC_DIR_NONE ||
+                //dirSet.rightNewer      == SYNC_DIR_NONE ||
+                dirSet.different       == SYNC_DIR_NONE;
+                //dirSet.conflict        == SYNC_DIR_NONE;
+        }
+        assert(false);
+        return false;
+    });
+
+    m_bpButtonSyncDirNone->setActive(!syncDirNonePartOfConfig);
 }
 
 
@@ -3105,7 +3170,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     wxBusyCursor dummy; //show hourglass cursor
 
     wxWindow* oldFocus = wxWindow::FindFocus();
-    ZEN_ON_SCOPE_EXIT( if (oldFocus) oldFocus->SetFocus(); ); //e.g. keep focus on main grid after pressing F5
+    ZEN_ON_SCOPE_EXIT(if (oldFocus) oldFocus->SetFocus();) //e.g. keep focus on main grid after pressing F5
 
     int scrollPosX = 0;
     int scrollPosY = 0;
@@ -3169,7 +3234,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     //add to folder history after successful comparison only
     folderHistoryLeft ->addItem(toZ(m_directoryLeft->GetValue()));
     folderHistoryRight->addItem(toZ(m_directoryRight->GetValue()));
-
+	  
     //prepare status information
     if (allElementsEqual(folderCmp))
         flashStatusInformation(_("All folders are in sync!"));
@@ -3378,11 +3443,6 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                     syncProcessCfg,
                     folderCmp,
                     statusHandler);
-
-        //play (optional) sound notification after sync has completed (GUI and batch mode)
-        const wxString soundFile = toWx(zen::getResourceDir()) + L"Sync_Complete.wav";
-        if (fileExists(toZ(soundFile)))
-            wxSound::Play(soundFile, wxSOUND_ASYNC);
     }
     catch (GuiAbortProcess&)
     {
@@ -3674,7 +3734,9 @@ void MainDialog::updateGridViewData()
 void MainDialog::applyFilterConfig()
 {
     applyFiltering(folderCmp, getConfig().mainCfg);
-    updateGuiAfterFilterChange(400);
+
+    updateGui();
+    //updateGuiDelayedIf(!currentCfg.showFilteredElements); //show update GUI before removing rows
 }
 
 
@@ -3771,7 +3833,7 @@ void MainDialog::updateGuiForFolderPair()
     m_bpButtonLocalFilter->Show(showLocalCfgFirstPair);
     setImage(*m_bpButtonSwapSides, GlobalResources::getImage(showLocalCfgFirstPair ? L"swapSlim" : L"swap"));
     m_panelTopMiddle->Layout();      //both required to update button size for calculations below!!!
-	m_panelDirectoryPairs->Layout(); //   -> updates size of stretched m_panelTopLeft!
+    m_panelDirectoryPairs->Layout(); //   -> updates size of stretched m_panelTopLeft!
 
     int addPairMinimalHeight = 0;
     int addPairOptimalHeight = 0;

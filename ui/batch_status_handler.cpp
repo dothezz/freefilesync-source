@@ -135,7 +135,8 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
 
 BatchStatusHandler::~BatchStatusHandler()
 {
-    const int totalErrors = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
+    const int totalErrors   = errorLog.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
+    const int totalWarnings = errorLog.getItemCount(TYPE_WARNING);
 
     //finalize error log
     std::wstring finalStatus;
@@ -149,6 +150,12 @@ BatchStatusHandler::~BatchStatusHandler()
     {
         raiseReturnCode(returnCode_, FFS_RC_FINISHED_WITH_ERRORS);
         finalStatus = _("Synchronization completed with errors!");
+        errorLog.logMsg(finalStatus, TYPE_ERROR);
+    }
+    else if (totalWarnings > 0)
+    {
+        raiseReturnCode(returnCode_, FFS_RC_FINISHED_WITH_WARNINGS);
+        finalStatus = _("Synchronization completed with warnings!");
         errorLog.logMsg(finalStatus, TYPE_WARNING);
     }
     else
@@ -190,7 +197,7 @@ BatchStatusHandler::~BatchStatusHandler()
             switchBatchToGui_.execute(); //open FreeFileSync GUI
         }
         catch (...) {}
-        syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
+        syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is not main window anymore
     }
     else
     {
@@ -220,6 +227,8 @@ BatchStatusHandler::~BatchStatusHandler()
                 syncStatusFrame.processHasFinished(SyncStatus::RESULT_ABORTED, errorLog);  //enable okay and close events
             else if (totalErrors > 0)
                 syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_ERROR, errorLog);
+            else if (totalWarnings > 0)
+                syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_WARNINGS, errorLog);
             else
                 syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_SUCCESS, errorLog);
         }

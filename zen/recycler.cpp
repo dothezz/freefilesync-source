@@ -29,9 +29,9 @@
 using namespace zen;
 
 
+#ifdef FFS_WIN
 namespace
 {
-#ifdef FFS_WIN
 /*
 Performance test: delete 1000 files
 ------------------------------------
@@ -42,41 +42,42 @@ IFileOperation  - multiple files  2,1s
 
 => SHFileOperation and IFileOperation have nearly IDENTICAL performance characteristics!
 
-Nevertheless, let's use IFileOperation for better error reporting!
+Nevertheless, let's use IFileOperation for better error reporting (including details on locked files)!
 */
 const bool useIFileOperation = vistaOrLater(); //caveat: function scope static initialization is not thread-safe in VS 2010!
 
-//(try to) enhance error messages by showing which processed lock the file
-Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string if none found or error occurred
+struct CallbackData
 {
-    if (vistaOrLater())
-    {
-        using namespace fileop;
-        const DllFun<FunType_getLockingProcesses> getLockingProcesses(getDllName(), funName_getLockingProcesses);
-        const DllFun<FunType_freeString>          freeString         (getDllName(), funName_freeString);
+    CallbackData(CallbackRecycling* cb) :
+        userCallback(cb),
+        exceptionInUserCallback(false) {}
 
-        if (getLockingProcesses && freeString)
+    CallbackRecycling* const userCallback; //optional!
+    bool exceptionInUserCallback;
+};
+
+bool recyclerCallback(const wchar_t* filename, void* sink)
+{
+    CallbackData& cbd = *static_cast<CallbackData*>(sink); //sink is NOT optional here
+
+    if (cbd.userCallback)
+        try
         {
-            const wchar_t* procList = nullptr;
-            if (getLockingProcesses(filename.c_str(), procList))
-            {
-                ZEN_ON_SCOPE_EXIT(freeString(procList));
-                return procList;
-            }
+            cbd.userCallback->updateStatus(filename); //throw ?
         }
-    }
-    return Zstring();
+        catch (...)
+        {
+            cbd.exceptionInUserCallback = true; //try again outside the C call stack!
+            return false;
+        }
+    return true;
 }
-#endif
 }
 
-
-bool zen::recycleOrDelete(const Zstring& filename)  //throw FileError
+void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycling* callback)
 {
-    if (!somethingExists(filename))
-        return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
-
-#ifdef FFS_WIN
+    if (filenames.empty())
+        return;
     //::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_NORMAL);
     //warning: moving long file paths to recycler does not work!
     //both ::SHFileOperation() and ::IFileOperation() cannot delete a folder named "System Volume Information" with normal attributes but shamelessly report success
@@ -89,32 +90,40 @@ bool zen::recycleOrDelete(const Zstring& filename)  //throw FileError
         const DllFun<FunType_getLastError>     getLastError  (getDllName(), funName_getLastError);
 
         if (!moveToRecycler || !getLastError)
-            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filename)) + L"\n\n" +
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filenames[0])) + L"\n\n" +
                             replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(getDllName())));
 
-        std::vector<const wchar_t*> filenames;
-        filenames.push_back(filename.c_str());
+        std::vector<const wchar_t*> cNames;
+        for (auto iter = filenames.begin(); iter != filenames.end(); ++iter) //caution to not create temporary strings here!!
+            cNames.push_back(iter->c_str());
 
-        if (!moveToRecycler(&filenames[0], filenames.size()))
+        CallbackData cbd(callback);
+        if (!moveToRecycler(&cNames[0], cNames.size(), recyclerCallback, &cbd))
         {
-            const std::wstring shortMsg = replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filename));
+            if (cbd.exceptionInUserCallback) //now we may throw...
+                callback->updateStatus(Zstring()); //should throw again!
 
-            //if something is locking our file -> emit better error message!
-            const Zstring procList = getLockingProcessNames(filename); //throw()
-            if (!procList.empty())
-                throw FileError(shortMsg + L"\n\n" + _("The file is locked by another process:") + L"\n" + procList);
+            std::wstring filenameFmt = fmtFileName(filenames[0]); //probably not the correct file name for file lists larger than 1!
+            if (filenames.size() > 1)
+                filenameFmt += L", ..."; //give at least some hint that there are multiple files, and the error need not be related to the first one
 
-            throw FileError(shortMsg + L"\n\n" + getLastError());
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", filenameFmt) +
+                            L"\n\n" + getLastError()); //already includes details about locking errors!
         }
     }
     else //regular recycle bin usage: available since XP
     {
-        const Zstring& filenameDoubleNull = filename + L'\0';
+        Zstring filenamesDoubleNull;
+        for (auto iter = filenames.begin(); iter != filenames.end(); ++iter)
+        {
+            filenamesDoubleNull += *iter;
+            filenamesDoubleNull += L'\0';
+        }
 
         SHFILEOPSTRUCT fileOp = {};
         fileOp.hwnd   = nullptr;
         fileOp.wFunc  = FO_DELETE;
-        fileOp.pFrom  = filenameDoubleNull.c_str();
+        fileOp.pFrom  = filenamesDoubleNull.c_str();
         fileOp.pTo    = nullptr;
         fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI;
         fileOp.fAnyOperationsAborted = false;
@@ -124,9 +133,22 @@ bool zen::recycleOrDelete(const Zstring& filename)  //throw FileError
         //"You should use fully-qualified path names with this function. Using it with relative path names is not thread safe."
         if (::SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
         {
-            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filename)));
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filenames[0]))); //probably not the correct file name for file list larger than 1!
         }
     }
+}
+#endif
+
+
+bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
+{
+    if (!somethingExists(filename))
+        return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
+
+#ifdef FFS_WIN
+    std::vector<Zstring> filenames;
+    filenames.push_back(filename);
+    recycleOrDelete(filenames, nullptr); //throw FileError
 
 #elif defined FFS_LINUX
     GFile* file = g_file_new_for_path(filename.c_str()); //never fails according to docu

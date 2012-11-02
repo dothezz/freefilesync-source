@@ -537,7 +537,7 @@ IconBuffer::~IconBuffer()
 {
     setWorkload(std::vector<Zstring>()); //make sure interruption point is always reached!
     pimpl->worker.interrupt();
-    pimpl->worker.join();
+    pimpl->worker.join(); //we assume precondition "worker.joinable()"!!!
 }
 
 

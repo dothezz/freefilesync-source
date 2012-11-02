@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20120511;21275200">
+	<META NAME="CHANGED" CONTENT="20121017;18372400">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -50,7 +50,7 @@ but also sets up the command line to execute the </FONT><FONT FACE="Courier New,
 Now press &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Start</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
 to begin monitoring.</FONT></P>
 <UL>
-	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/RealtimeSync.png" NAME="Grafik3" ALIGN=MIDDLE BORDER=0></P>
+	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/RealtimeSync.png" NAME="Grafik3" ALIGN=MIDDLE WIDTH=469 HEIGHT=437 BORDER=0></P>
 </UL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
@@ -58,10 +58,10 @@ to begin monitoring.</FONT></P>
 	<UL>
 		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
-		command should </FONT><FONT FACE="Tahoma, sans-serif"><B>not</B></FONT><FONT FACE="Tahoma, sans-serif">
-		</FONT><FONT FACE="Tahoma, sans-serif"><B>block</B></FONT><FONT FACE="Tahoma, sans-serif">
-		progress. Make sure the FreeFileSync batch job does not show any
-		popup dialogs. See notes in <A HREF="Batch%20Scripting.html">Batch
+		command should </FONT><FONT FACE="Tahoma, sans-serif"><B>not</B></FONT>
+		<FONT FACE="Tahoma, sans-serif"><B>block</B></FONT> <FONT FACE="Tahoma, sans-serif">progress.
+		Make sure the FreeFileSync batch job does not show any popup
+		dialogs. See notes in <A HREF="Batch%20Scripting.html">Batch
 		Scripting</A>.</FONT><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></SPAN></P>
 		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
 		settings dialog can be skipped by passing a RealtimeSync
@@ -90,7 +90,7 @@ ffs_batch configuration into the USB stick's root directory and have
 it called when the stick is mounted. Then configure RealtimeSync as
 shown in the following:</FONT></P>
 <UL>
-	<P><IMG SRC="../img/WatchUsbInsert.png" NAME="Grafik2" ALIGN=BOTTOM BORDER=0></P>
+	<P><IMG SRC="../img/WatchUsbInsert.png" NAME="Grafik2" ALIGN=BOTTOM WIDTH=446 HEIGHT=411 BORDER=0></P>
 </UL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
@@ -106,9 +106,10 @@ files are modified in &quot;</FONT><FONT FACE="Courier New, monospace">H:\Data</
 <P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 	<UL>
 		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note<BR></B></FONT><FONT FACE="Tahoma, sans-serif">The
-		n</FONT><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif">ame
-		of the last changed file is written to an environment variable
-		named </FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace">&quot;changed_file&quot;.</FONT></SPAN></P>
+		full path of the last changed file and the action that triggered
+		the change notification (create, update or delete) are </FONT><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif">written
+		to the environment variables </FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace">&quot;change_path&quot;</FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif">
+		and </FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace">&quot;change_action&quot;.</FONT></SPAN></P>
 	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
@@ -121,9 +122,10 @@ directories. (Windows)</FONT></P>
 			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace"><FONT FACE="Tahoma, sans-serif">Show
 			which file or directory has triggered a change. Enter command
 			line:</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo
-			&quot;%changed_file%&quot; &amp; pause<BR><BR><FONT FACE="Tahoma, sans-serif">Write
+			%change_action% &quot;%change_path%&quot; &amp; pause<BR><BR><FONT FACE="Tahoma, sans-serif">Write
 			a list of all changes to a logfile:</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;cmd
-			/c echo &quot;%changed_file%&quot; &gt;&gt; c:\log.txt</FONT></P>
+			/c echo %change_action% &quot;%change_path%&quot; &gt;&gt;
+			c:\log.txt</FONT></P>
 		</UL>
 	</SPAN><BR CLEAR=LEFT>
 	</P>

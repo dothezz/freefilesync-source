@@ -76,18 +76,18 @@ ErrorCode getLastError()
 #ifdef FFS_WIN
     return ::GetLastError();
 #elif defined FFS_LINUX
-    return errno;
+    return errno; //don't use "::", errno is a macro!
 #endif
 }
 
 inline
 std::wstring getLastErrorFormatted(ErrorCode lastError)
 {
-#ifdef FFS_WIN
     //determine error code if none was specified
     if (lastError == 0)
-        lastError = ::GetLastError();
+        lastError = getLastError();
 
+#ifdef FFS_WIN
     std::wstring output = _("Windows Error Code %x:");
     replace(output, L"%x", numberTo<std::wstring>(lastError));
 
@@ -108,10 +108,6 @@ std::wstring getLastErrorFormatted(ErrorCode lastError)
     return output;
 
 #elif defined FFS_LINUX
-    //determine error code if none was specified
-    if (lastError == 0)
-        lastError = errno; //don't use "::", errno is a macro!
-
     std::wstring output = _("Linux Error Code %x:");
     replace(output, L"%x", numberTo<std::wstring>(lastError));
 

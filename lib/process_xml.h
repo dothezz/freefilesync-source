@@ -57,15 +57,17 @@ struct XmlGuiConfig
     bool showFilteredElements;
     OnGuiError handleError; //reaction on error situation during synchronization
     bool showSyncAction;
-
-    bool operator==(const XmlGuiConfig& other) const
-    {
-        return mainCfg              == other.mainCfg              &&
-               showFilteredElements == other.showFilteredElements &&
-               handleError          == other.handleError          &&
-               showSyncAction       == other.showSyncAction;
-    }
 };
+
+
+inline
+bool operator==(const XmlGuiConfig& lhs, const XmlGuiConfig& rhs)
+{
+    return lhs.mainCfg              == rhs.mainCfg              &&
+           lhs.showFilteredElements == rhs.showFilteredElements &&
+           lhs.handleError          == rhs.handleError          &&
+           lhs.showSyncAction       == rhs.showSyncAction;
+}
 
 
 struct XmlBatchConfig

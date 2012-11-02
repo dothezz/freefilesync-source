@@ -680,227 +680,247 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
     }
     //####################################### DST hack ###########################################
 
-    //privilege SE_BACKUP_NAME doesn't seem to be required here for symbolic links
-    //note: setting privileges requires admin rights!
-
-    //opening newly created target file may fail due to some AV-software scanning it: no error, we will wait!
-    //http://support.microsoft.com/?scid=kb%3Ben-us%3B316609&x=17&y=20
-    //-> enable as soon it turns out it is required!
-
-    /*const int retryInterval = 50;
-    const int maxRetries = 2000 / retryInterval;
-    for (int i = 0; i < maxRetries; ++i)
     {
-    */
+        //extra scope for debug check below
 
-    /*
-    if (hTarget == INVALID_HANDLE_VALUE && ::GetLastError() == ERROR_SHARING_VIOLATION)
-        ::Sleep(retryInterval); //wait then retry
-    else //success or unknown failure
-        break;
-    }
-    */
+        //privilege SE_BACKUP_NAME doesn't seem to be required here for symbolic links
+        //note: setting privileges requires admin rights!
 
-    //temporarily reset read-only flag if required
-    DWORD attribs = INVALID_FILE_ATTRIBUTES;
-    ZEN_ON_SCOPE_EXIT(
-        if (attribs != INVALID_FILE_ATTRIBUTES)
-        ::SetFileAttributes(applyLongPathPrefix(filename).c_str(), attribs);
-    );
+        //opening newly created target file may fail due to some AV-software scanning it: no error, we will wait!
+        //http://support.microsoft.com/?scid=kb%3Ben-us%3B316609&x=17&y=20
+        //-> enable as soon it turns out it is required!
 
-    auto removeReadonly = [&]() -> bool //may need to remove the readonly-attribute (e.g. on FAT usb drives)
-    {
-        if (attribs == INVALID_FILE_ATTRIBUTES)
+        /*const int retryInterval = 50;
+        const int maxRetries = 2000 / retryInterval;
+        for (int i = 0; i < maxRetries; ++i)
         {
-            const DWORD tmpAttr = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
-            if (tmpAttr == INVALID_FILE_ATTRIBUTES)
-                throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+        */
 
-            if (tmpAttr & FILE_ATTRIBUTE_READONLY)
-            {
-                if (!::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_NORMAL))
-                    throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
-
-                attribs = tmpAttr; //reapplied on scope exit
-                return true;
-            }
+        /*
+        if (hTarget == INVALID_HANDLE_VALUE && ::GetLastError() == ERROR_SHARING_VIOLATION)
+            ::Sleep(retryInterval); //wait then retry
+        else //success or unknown failure
+            break;
         }
-        return false;
-    };
+        */
+        //temporarily reset read-only flag if required
+        DWORD attribs = INVALID_FILE_ATTRIBUTES;
+        ZEN_ON_SCOPE_EXIT(
+            if (attribs != INVALID_FILE_ATTRIBUTES)
+            ::SetFileAttributes(applyLongPathPrefix(filename).c_str(), attribs);
+        );
 
-    auto openFile = [&](bool conservativeApproach)
-    {
-        return ::CreateFile(applyLongPathPrefix(filename).c_str(),
-                            (conservativeApproach ?
-                             //some NAS seem to have issues with FILE_WRITE_ATTRIBUTES, even worse, they may fail silently!
-                             //http://sourceforge.net/tracker/?func=detail&atid=1093081&aid=3536680&group_id=234430
-                             //Citrix shares seem to have this issue, too, but at least fail with "access denied" => try generic access first:
-                             GENERIC_READ | GENERIC_WRITE :
-                             //avoids mysterious "access denied" when using "GENERIC_READ | GENERIC_WRITE" on a read-only file, even *after* read-only was removed directly before the call!
-                             //http://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
-                             //since former gives an error notification we may very well try FILE_WRITE_ATTRIBUTES second.
-                             FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES),
-                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                            nullptr,
-                            OPEN_EXISTING,
-                            FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
-                            (procSl == SYMLINK_DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0), //process symlinks
-                            nullptr);
-    };
-
-    HANDLE hFile = INVALID_HANDLE_VALUE;
-    for (int i = 0; i < 2; ++i) //we will get this handle, no matter what! :)
-    {
-        //1. be conservative
-        hFile = openFile(true);
-        if (hFile == INVALID_HANDLE_VALUE)
+        auto removeReadonly = [&]() -> bool //may need to remove the readonly-attribute (e.g. on FAT usb drives)
         {
-            if (::GetLastError() == ERROR_ACCESS_DENIED) //fails if file is read-only (or for "other" reasons)
-                if (removeReadonly())
-                    continue;
+            if (attribs == INVALID_FILE_ATTRIBUTES)
+            {
+                const DWORD tmpAttr = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
+                if (tmpAttr == INVALID_FILE_ATTRIBUTES)
+                    throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
 
-            //2. be a *little* fancy
-            hFile = openFile(false);
+                if (tmpAttr & FILE_ATTRIBUTE_READONLY)
+                {
+                    if (!::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_NORMAL))
+                        throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+
+                    attribs = tmpAttr; //reapplied on scope exit
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        auto openFile = [&](bool conservativeApproach)
+        {
+            return ::CreateFile(applyLongPathPrefix(filename).c_str(),
+                                (conservativeApproach ?
+                                 //some NAS seem to have issues with FILE_WRITE_ATTRIBUTES, even worse, they may fail silently!
+                                 //http://sourceforge.net/tracker/?func=detail&atid=1093081&aid=3536680&group_id=234430
+                                 //Citrix shares seem to have this issue, too, but at least fail with "access denied" => try generic access first:
+                                 GENERIC_READ | GENERIC_WRITE :
+                                 //avoids mysterious "access denied" when using "GENERIC_READ | GENERIC_WRITE" on a read-only file, even *after* read-only was removed directly before the call!
+                                 //http://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
+                                 //since former gives an error notification we may very well try FILE_WRITE_ATTRIBUTES second.
+                                 FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES),
+                                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                nullptr,
+                                OPEN_EXISTING,
+                                FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
+                                (procSl == SYMLINK_DIRECT ? FILE_FLAG_OPEN_REPARSE_POINT : 0), //process symlinks
+                                nullptr);
+        };
+
+        HANDLE hFile = INVALID_HANDLE_VALUE;
+        for (int i = 0; i < 2; ++i) //we will get this handle, no matter what! :)
+        {
+            //1. be conservative
+            hFile = openFile(true);
             if (hFile == INVALID_HANDLE_VALUE)
             {
-                if (::GetLastError() == ERROR_ACCESS_DENIED)
+                if (::GetLastError() == ERROR_ACCESS_DENIED) //fails if file is read-only (or for "other" reasons)
                     if (removeReadonly())
                         continue;
 
-                //3. after these herculean stunts we give up...
-                throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+                //2. be a *little* fancy
+                hFile = openFile(false);
+                if (hFile == INVALID_HANDLE_VALUE)
+                {
+                    if (::GetLastError() == ERROR_ACCESS_DENIED)
+                        if (removeReadonly())
+                            continue;
+
+                    //3. after these herculean stunts we give up...
+                    throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+                }
             }
+            break;
         }
-        break;
-    }
-    ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
+        ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
 
-    auto isNullTime = [](const FILETIME& ft) { return ft.dwLowDateTime == 0 && ft.dwHighDateTime == 0; };
+        auto isNullTime = [](const FILETIME& ft) { return ft.dwLowDateTime == 0 && ft.dwHighDateTime == 0; };
 
-    if (!::SetFileTime(hFile,           //__in      HANDLE hFile,
-                       !isNullTime(creationTime) ? &creationTime : nullptr, //__in_opt  const FILETIME *lpCreationTime,
-                       nullptr,         //__in_opt  const FILETIME *lpLastAccessTime,
-                       &lastWriteTime)) //__in_opt  const FILETIME *lpLastWriteTime
-    {
-        auto lastErr = ::GetLastError();
-
-        //function may fail if file is read-only: https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
-        if (lastErr == ERROR_ACCESS_DENIED)
+        if (!::SetFileTime(hFile,           //__in      HANDLE hFile,
+                           !isNullTime(creationTime) ? &creationTime : nullptr, //__in_opt  const FILETIME *lpCreationTime,
+                           nullptr,         //__in_opt  const FILETIME *lpLastAccessTime,
+                           &lastWriteTime)) //__in_opt  const FILETIME *lpLastWriteTime
         {
-            //dynamically load windows API function: available with Windows Vista and later
-            typedef BOOL (WINAPI* SetFileInformationByHandleFunc)(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
+            auto lastErr = ::GetLastError();
 
-            const SysDllFun<SetFileInformationByHandleFunc> setFileInformationByHandle(L"kernel32.dll", "SetFileInformationByHandle");
-            if (setFileInformationByHandle) //if not: let the original error propagate!
+            //function may fail if file is read-only: https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
+            if (lastErr == ERROR_ACCESS_DENIED)
             {
-                auto setFileInfo = [&](FILE_BASIC_INFO basicInfo) //throw FileError; no const& since SetFileInformationByHandle() requires non-const parameter!
-                {
-                    if (!setFileInformationByHandle(hFile,              //__in  HANDLE hFile,
-                                                    FileBasicInfo,      //__in  FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
-                                                    &basicInfo,         //__in  LPVOID lpFileInformation,
-                                                    sizeof(basicInfo))) //__in  DWORD dwBufferSize
-                        throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
-                };
+                //dynamically load windows API function: available with Windows Vista and later
+                typedef BOOL (WINAPI* SetFileInformationByHandleFunc)(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
 
-                auto toLargeInteger = [](const FILETIME& ft) -> LARGE_INTEGER
+                const SysDllFun<SetFileInformationByHandleFunc> setFileInformationByHandle(L"kernel32.dll", "SetFileInformationByHandle");
+                if (setFileInformationByHandle) //if not: let the original error propagate!
                 {
-                    LARGE_INTEGER tmp = {};
-                    tmp.LowPart  = ft.dwLowDateTime;
-                    tmp.HighPart = ft.dwHighDateTime;
-                    return tmp;
-                };
-                //---------------------------------------------------------------------------
-
-                BY_HANDLE_FILE_INFORMATION fileInfo = {};
-                if (::GetFileInformationByHandle(hFile, &fileInfo))
-                    if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+                    auto setFileInfo = [&](FILE_BASIC_INFO basicInfo) //throw FileError; no const& since SetFileInformationByHandle() requires non-const parameter!
                     {
-                        FILE_BASIC_INFO basicInfo = {}; //undocumented: file times of "0" stand for "don't change"
-                        basicInfo.FileAttributes = FILE_ATTRIBUTE_NORMAL;        //[!] the bug in the ticket above requires we set this together with file times!!!
-                        basicInfo.LastWriteTime = toLargeInteger(lastWriteTime); //
-                        if (!isNullTime(creationTime))
-                            basicInfo.CreationTime = toLargeInteger(creationTime);
+                        if (!setFileInformationByHandle(hFile,              //__in  HANDLE hFile,
+                                                        FileBasicInfo,      //__in  FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
+                                                        &basicInfo,         //__in  LPVOID lpFileInformation,
+                                                        sizeof(basicInfo))) //__in  DWORD dwBufferSize
+                            throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+                    };
 
-                        //set file time + attributes
-                        setFileInfo(basicInfo); //throw FileError
+                    auto toLargeInteger = [](const FILETIME& ft) -> LARGE_INTEGER
+                    {
+                        LARGE_INTEGER tmp = {};
+                        tmp.LowPart  = ft.dwLowDateTime;
+                        tmp.HighPart = ft.dwHighDateTime;
+                        return tmp;
+                    };
+                    //---------------------------------------------------------------------------
 
-                        try //... to restore original file attributes
+                    BY_HANDLE_FILE_INFORMATION fileInfo = {};
+                    if (::GetFileInformationByHandle(hFile, &fileInfo))
+                        if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
                         {
-                            FILE_BASIC_INFO basicInfo2 = {};
-                            basicInfo2.FileAttributes = fileInfo.dwFileAttributes;
-                            setFileInfo(basicInfo2); //throw FileError
+                            FILE_BASIC_INFO basicInfo = {}; //undocumented: file times of "0" stand for "don't change"
+                            basicInfo.FileAttributes = FILE_ATTRIBUTE_NORMAL;        //[!] the bug in the ticket above requires we set this together with file times!!!
+                            basicInfo.LastWriteTime = toLargeInteger(lastWriteTime); //
+                            if (!isNullTime(creationTime))
+                                basicInfo.CreationTime = toLargeInteger(creationTime);
+
+                            //set file time + attributes
+                            setFileInfo(basicInfo); //throw FileError
+
+                            try //... to restore original file attributes
+                            {
+                                FILE_BASIC_INFO basicInfo2 = {};
+                                basicInfo2.FileAttributes = fileInfo.dwFileAttributes;
+                                setFileInfo(basicInfo2); //throw FileError
+                            }
+                            catch (FileError&) {}
+
+                            lastErr = ERROR_SUCCESS;
                         }
-                        catch (FileError&) {}
-
-                        lastErr = ERROR_SUCCESS;
-                    }
+                }
             }
-        }
 
-        std::wstring errorMsg = replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastErr);
+            std::wstring errorMsg = replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastErr);
 
-        //add more meaningful message: FAT accepts only a subset of the NTFS date range
-        if (lastErr == ERROR_INVALID_PARAMETER &&
-            dst::isFatDrive(filename))
-        {
-            //we need a low-level reliable routine to format a potentially invalid date => don't use strftime!!!
-            auto fmtDate = [](const FILETIME& ft) -> Zstring
+            //add more meaningful message: FAT accepts only a subset of the NTFS date range
+            if (lastErr == ERROR_INVALID_PARAMETER &&
+                dst::isFatDrive(filename))
             {
-                SYSTEMTIME st = {};
-                if (!::FileTimeToSystemTime(&ft,  //__in   const FILETIME *lpFileTime,
-                                            &st)) //__out  LPSYSTEMTIME lpSystemTime
-                    return Zstring();
-
-                Zstring dateTime;
+                //we need a low-level reliable routine to format a potentially invalid date => don't use strftime!!!
+                auto fmtDate = [](const FILETIME& ft) -> Zstring
                 {
-                    const int bufferSize = ::GetDateFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, nullptr, 0);
+                    SYSTEMTIME st = {};
+                    if (!::FileTimeToSystemTime(&ft,  //__in   const FILETIME *lpFileTime,
+                                                &st)) //__out  LPSYSTEMTIME lpSystemTime
+                        return Zstring();
+
+                    Zstring dateTime;
+                    {
+                        const int bufferSize = ::GetDateFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, nullptr, 0);
+                        if (bufferSize > 0)
+                        {
+                            std::vector<wchar_t> buffer(bufferSize);
+                            if (::GetDateFormat(LOCALE_USER_DEFAULT, //_In_       LCID Locale,
+                            0,                   //_In_       DWORD dwFlags,
+                            &st,				  //_In_opt_   const SYSTEMTIME *lpDate,
+                            nullptr,			  //_In_opt_   LPCTSTR lpFormat,
+                            &buffer[0],		  //_Out_opt_  LPTSTR lpDateStr,
+                            bufferSize) > 0)		  //_In_       int cchDate
+                                dateTime = &buffer[0]; //GetDateFormat() returns char count *including* 0-termination!
+                        }
+                    }
+
+                    const int bufferSize = ::GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, nullptr, 0);
                     if (bufferSize > 0)
                     {
                         std::vector<wchar_t> buffer(bufferSize);
-                        if (::GetDateFormat(LOCALE_USER_DEFAULT, //_In_       LCID Locale,
-                        0,                   //_In_       DWORD dwFlags,
-                        &st,				  //_In_opt_   const SYSTEMTIME *lpDate,
-                        nullptr,			  //_In_opt_   LPCTSTR lpFormat,
-                        &buffer[0],		  //_Out_opt_  LPTSTR lpDateStr,
-                        bufferSize) > 0)		  //_In_       int cchDate
-                            dateTime = &buffer[0]; //GetDateFormat() returns char count *including* 0-termination!
+                        if (::GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, &buffer[0], bufferSize) > 0)
+                        {
+                            dateTime += L" ";
+                            dateTime += &buffer[0]; //GetDateFormat() returns char count *including* 0-termination!
+                        }
                     }
-                }
+                    return dateTime;
+                };
 
-                const int bufferSize = ::GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, nullptr, 0);
-                if (bufferSize > 0)
-                {
-                    std::vector<wchar_t> buffer(bufferSize);
-                    if (::GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, &buffer[0], bufferSize) > 0)
-                    {
-                        dateTime += L" ";
-                        dateTime += &buffer[0]; //GetDateFormat() returns char count *including* 0-termination!
-                    }
-                }
-                return dateTime;
-            };
+                errorMsg += std::wstring(L"\nA FAT volume can only store dates between 1980 and 2107:\n") +
+                            L"\twrite (UTC): \t" + fmtDate(lastWriteTime) +
+                            (!isNullTime(creationTime) ? L"\n\tcreate (UTC): \t" + fmtDate(creationTime) : L"");
+            }
 
-            errorMsg += std::wstring(L"\nA FAT volume can only store dates between 1980 and 2107:\n") +
-                        L"\twrite (UTC): \t" + fmtDate(lastWriteTime) +
-                        (!isNullTime(creationTime) ? L"\n\tcreate (UTC): \t" + fmtDate(creationTime) : L"");
+            if (lastErr != ERROR_SUCCESS)
+                throw FileError(errorMsg);
         }
-
-        if (lastErr != ERROR_SUCCESS)
-            throw FileError(errorMsg);
     }
-
 #ifndef NDEBUG //dst hack: verify data written
     if (dst::isFatDrive(filename) && !dirExists(filename)) //throw()
     {
-        WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
-        assert(::GetFileAttributesEx(applyLongPathPrefix(filename).c_str(), //__in   LPCTSTR lpFileName,
-                                     GetFileExInfoStandard,                 //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
-                                     &debugeAttr));                         //__out  LPVOID lpFileInformation
+        FILETIME creationTimeDbg  = {};
+        FILETIME lastWriteTimeDbg = {};
 
-        assert(::CompareFileTime(&debugeAttr.ftCreationTime,  &creationTime)  == 0);
-        assert(::CompareFileTime(&debugeAttr.ftLastWriteTime, &lastWriteTime) == 0);
+        HANDLE hFile = ::CreateFile(applyLongPathPrefix(filename).c_str(),
+                                    FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,
+                                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                    nullptr,
+                                    OPEN_EXISTING,
+                                    0,
+                                    nullptr);
+        assert(hFile != INVALID_HANDLE_VALUE);
+        ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
+
+        assert(::GetFileTime(hFile, //probably more up to date than GetFileAttributesEx()!?
+                             &creationTimeDbg,
+                             nullptr,
+                             &lastWriteTimeDbg));
+
+        assert(::CompareFileTime(&creationTimeDbg,  &creationTime)  == 0);
+        assert(::CompareFileTime(&lastWriteTimeDbg, &lastWriteTime) == 0);
     }
+    //CAVEAT on FAT/FAT32: the sequence of deleting the target file and renaming "file.txt.ffs_tmp" to "file.txt" seems to
+    //NOT PRESERVE the creation time of the .ffs_tmp file, but "reuses" whatever creation time the old "file.txt" had!
+    //this problem is therefore NOT detected by the check above!
+    //However during the next comparison the DST hack will be applied correctly.
+
 #endif
 
 #elif defined FFS_LINUX
@@ -1736,7 +1756,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
 
     //stream-copy sourceFile to targetFile
     bool eof = false;
-    bool silentFailure = true; //try to detect failure reading encrypted files
+    bool someBytesWritten = false; //try to detect failure reading encrypted files
     do
     {
         DWORD bytesRead = 0;
@@ -1775,14 +1795,14 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
             callback->updateCopyStatus(Int64(bytesRead)); //throw X!
 
         if (bytesRead > 0)
-            silentFailure = false;
+            someBytesWritten = true;
     }
     while (!eof);
 
     //DST hack not required, since both source and target volumes cannot be FAT!
 
     //::BackupRead() silently fails reading encrypted files -> double check!
-    if (silentFailure && UInt64(fileInfoSource.nFileSizeLow, fileInfoSource.nFileSizeHigh) != 0U)
+    if (!someBytesWritten && UInt64(fileInfoSource.nFileSizeLow, fileInfoSource.nFileSizeHigh) != 0U)
         //note: there is no guaranteed ordering relation beween bytes transferred and file size! Consider ADS (>) and compressed/sparse files (<)!
         throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + L"(unknown error)");
 
@@ -2044,7 +2064,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
 
         //don't suppress "lastError == ERROR_REQUEST_ABORTED": a user aborted operation IS an error condition!
 
-        //trying to copy huge sparse files may fail with ERROR_DISK_FULL
+        //trying to copy huge sparse files may directly fail with ERROR_DISK_FULL before entering the callback function
         if (canCopyAsSparse(sourceFile, targetFile)) //throw ()
             throw ErrorShouldCopyAsSparse(L"sparse dummy value2");
 

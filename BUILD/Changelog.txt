@@ -2,6 +2,23 @@
 |FreeFileSync|
 --------------
 
+Changelog v5.9
+--------------
+Scroll grid directly under mouse cursor
+Move files directly to recycle bin without parent "FFS 2012-05-15 131513" temporary folders
+Offer $HOME directory alias in directory dropdown list (Linux)
+Support for tilde (~) character in input folder paths (Linux)
+New environment variables for RealtimeSync: %change_action%, "%change_path%
+Use Internet Explorer proxy settings for new version check (Windows)
+Show proper error message after failed symlink creation
+Start comparison directly when double-clicking config list
+New batch return code: "Synchronization completed with warnings"
+Hide files that won't be copied by default if direction "none" is part of the rule set (e.g. update variant)
+New sync completion sound
+Remember save config and folder picker dialog positions separately
+Fixed sync completion sound not playing (Ubuntu)
+
+
 Changelog v5.8
 --------------
 New icon theme

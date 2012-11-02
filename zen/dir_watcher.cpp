@@ -14,7 +14,6 @@
 #include "notify_removal.h"
 #include "win.h" //includes "windows.h"
 #include "long_path_prefix.h"
-//#include "privilege.h"
 
 #elif defined FFS_LINUX
 #include <sys/inotify.h>
@@ -36,10 +35,8 @@ public:
     {
         boost::lock_guard<boost::mutex> dummy(lockAccess);
 
-        std::set<Zstring>& output = changedFiles;
-
         if (bytesWritten == 0) //according to docu this may happen in case of internal buffer overflow: report some "dummy" change
-            output.insert(L"Overflow!");
+            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_CREATE, L"Overflow!"));
         else
         {
             const char* bufPos = &buffer[0];
@@ -50,10 +47,11 @@ public:
                 const Zstring fullname = dirname + Zstring(notifyInfo.FileName, notifyInfo.FileNameLength / sizeof(WCHAR));
 
                 //skip modifications sent by changed directories: reason for change, child element creation/deletion, will notify separately!
+                //and if this child element is a .ffs_lock file we'll want to ignore all associated events!
                 [&]
                 {
-                    if (notifyInfo.Action == FILE_ACTION_RENAMED_OLD_NAME) //reporting FILE_ACTION_RENAMED_NEW_NAME should suffice
-                        return;
+                    //if (notifyInfo.Action == FILE_ACTION_RENAMED_OLD_NAME) //reporting FILE_ACTION_RENAMED_NEW_NAME should suffice;
+                    //    return; //note: this is NOT a cross-directory move, which will show up as create + delete
 
                     if (notifyInfo.Action == FILE_ACTION_MODIFIED)
                     {
@@ -63,7 +61,20 @@ public:
                             return;
                     }
 
-                    output.insert(fullname);
+                    switch (notifyInfo.Action)
+                    {
+                        case FILE_ACTION_ADDED:
+                        case FILE_ACTION_RENAMED_NEW_NAME: //harmonize with "move" which is notified as "create + delete"
+                            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_CREATE, fullname));
+                            break;
+                        case FILE_ACTION_REMOVED:
+                        case FILE_ACTION_RENAMED_OLD_NAME:
+                            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_DELETE, fullname));
+                            break;
+                        case FILE_ACTION_MODIFIED:
+                            changedFiles.push_back(DirWatcher::Entry(DirWatcher::ACTION_UPDATE, fullname));
+                            break;
+                    }
                 }();
 
                 if (notifyInfo.NextEntryOffset == 0)
@@ -73,16 +84,16 @@ public:
         }
     }
 
-    //context of main thread
-    void addChange(const Zstring& dirname) //throw ()
-    {
-        boost::lock_guard<boost::mutex> dummy(lockAccess);
-        changedFiles.insert(dirname);
-    }
+    ////context of main thread
+    //void addChange(const Zstring& dirname) //throw ()
+    //{
+    //    boost::lock_guard<boost::mutex> dummy(lockAccess);
+    //    changedFiles.insert(dirname);
+    //}
 
 
     //context of main thread
-    void getChanges(std::vector<Zstring>& output) //throw FileError, ErrorNotExisting
+    void getChanges(std::vector<DirWatcher::Entry>& output) //throw FileError, ErrorNotExisting
     {
         boost::lock_guard<boost::mutex> dummy(lockAccess);
 
@@ -97,7 +108,7 @@ public:
             throw FileError(msg);
         }
 
-        output.assign(changedFiles.begin(), changedFiles.end());
+        output.swap(changedFiles);
         changedFiles.clear();
     }
 
@@ -113,7 +124,7 @@ private:
     typedef Zbase<wchar_t> BasicWString; //thread safe string class for UI texts
 
     boost::mutex lockAccess;
-    std::set<Zstring> changedFiles; //get rid of duplicate entries (actually occur!)
+    std::vector<DirWatcher::Entry> changedFiles;
     std::pair<BasicWString, DWORD> errorMsg; //non-empty if errors occured in thread
 };
 
@@ -269,7 +280,7 @@ private:
     {
         //must release hDir immediately => stop monitoring!
         worker_.interrupt();
-        worker_.join();
+        worker_.join(); //we assume precondition "worker.joinable()"!!!
         //now hDir should have been released
 
         removalRequested = true;
@@ -314,9 +325,9 @@ DirWatcher::~DirWatcher()
 }
 
 
-std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>& processGuiMessages) //throw FileError
+std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>& processGuiMessages) //throw FileError
 {
-    std::vector<Zstring> output;
+    std::vector<Entry> output;
 
     //wait until device removal is confirmed, to prevent locking hDir again by some new watch!
     if (pimpl_->volRemoval->requestReceived())
@@ -330,7 +341,7 @@ std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>& process
             boost::thread::sleep(boost::get_system_time() + boost::posix_time::milliseconds(50));
         }
 
-        output.push_back(pimpl_->dirname); //report removal as change to main directory
+        output.push_back(Entry(ACTION_DELETE, pimpl_->dirname)); //report removal as change to main directory
     }
     else //the normal case...
         pimpl_->shared->getChanges(output); //throw FileError
@@ -412,12 +423,13 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
         int wd = ::inotify_add_watch(pimpl_->notifDescr, subdir.c_str(),
                                      IN_ONLYDIR     | //watch directories only
                                      IN_DONT_FOLLOW | //don't follow symbolic links
+                                     IN_CREATE   	|
                                      IN_MODIFY 	    |
                                      IN_CLOSE_WRITE |
-                                     IN_MOVE        |
-                                     IN_CREATE   	|
                                      IN_DELETE 	    |
                                      IN_DELETE_SELF |
+                                     IN_MOVED_FROM  |
+                                     IN_MOVED_TO    |
                                      IN_MOVE_SELF);
         if (wd == -1)
         {
@@ -440,7 +452,7 @@ DirWatcher::~DirWatcher()
 }
 
 
-std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>&) //throw FileError
+std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>&) //throw FileError
 {
     //non-blocking call, see O_NONBLOCK
     std::vector<char> buffer(1024 * (sizeof(struct inotify_event) + 16));
@@ -450,12 +462,12 @@ std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>&) //thro
     {
         if (errno == EINTR || //Interrupted function call; When this happens, you should try the call again.
             errno == EAGAIN)  //Non-blocking I/O has been selected using O_NONBLOCK and no data was immediately available for reading
-            return std::vector<Zstring>();
+            return std::vector<Entry>();
 
         throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->dirname)) + L"\n\n" + getLastErrorFormatted());
     }
 
-    std::set<Zstring> tmp; //get rid of duplicate entries (actually occur!)
+    std::vector<Entry> output;
 
     ssize_t bytePos = 0;
     while (bytePos < bytesRead)
@@ -469,14 +481,26 @@ std::vector<Zstring> DirWatcher::getChanges(const std::function<void()>&) //thro
             {
                 //Note: evt.len is NOT the size of the evt.name c-string, but the array size including all padding 0 characters!
                 //It may be even 0 in which case evt.name must not be used!
-                tmp.insert(iter->second + evt.name);
+                const Zstring fullname = iter->second + evt.name;
+
+                if ((evt.mask & IN_CREATE) ||
+                    (evt.mask & IN_MOVED_TO))
+                    output.push_back(Entry(ACTION_CREATE, fullname));
+                else if ((evt.mask & IN_MODIFY) ||
+                         (evt.mask & IN_CLOSE_WRITE))
+                    output.push_back(Entry(ACTION_UPDATE, fullname));
+                else if ((evt.mask & IN_DELETE     ) ||
+                         (evt.mask & IN_DELETE_SELF) ||
+                         (evt.mask & IN_MOVE_SELF  ) ||
+                         (evt.mask & IN_MOVED_FROM))
+                    output.push_back(Entry(ACTION_DELETE, fullname));
             }
         }
 
         bytePos += sizeof(struct inotify_event) + evt.len;
     }
 
-    return std::vector<Zstring>(tmp.begin(), tmp.end());
+    return output;
 }
 
 #endif

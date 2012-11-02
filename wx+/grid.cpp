@@ -251,6 +251,18 @@ void drawTextLabelFitting(wxDC& dc, const wxString& text, const wxRect& rect, in
 {
     DcClipper clip(dc, rect); //wxDC::DrawLabel doesn't care about width, WTF?
 
+    /*
+    performance notes:
+    wxDC::DrawLabel() is implemented in terms of both wxDC::GetMultiLineTextExtent() and wxDC::DrawText()
+    wxDC::GetMultiLineTextExtent() is implemented in terms of wxDC::GetTextExtent()
+
+    average total times:
+    							Windows Linux
+    single wxDC::DrawText()		 7탎     50탎
+    wxDC::DrawLabel() +			10탎     90탎
+    repeated GetTextExtent()
+    */
+
     //truncate large texts and add ellipsis
     auto textFits = [&](const wxString& phrase) { return dc.GetTextExtent(phrase).GetWidth() <= rect.GetWidth(); };
     dc.DrawLabel(getTruncatedText(text, textFits), rect, alignment);
@@ -355,9 +367,9 @@ public:
         Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(SubWindow::onLeaveWindow    ), nullptr, this);
         Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(SubWindow::onMouseCaptureLost), nullptr, this);
 
-        Connect(wxEVT_CHAR,       wxKeyEventHandler(SubWindow::onChar   ), nullptr, this);
-        Connect(wxEVT_KEY_UP,     wxKeyEventHandler(SubWindow::onKeyUp  ), nullptr, this);
-        Connect(wxEVT_KEY_DOWN,   wxKeyEventHandler(SubWindow::onKeyDown), nullptr, this);
+        Connect(wxEVT_CHAR,     wxKeyEventHandler(SubWindow::onChar   ), nullptr, this);
+        Connect(wxEVT_KEY_UP,   wxKeyEventHandler(SubWindow::onKeyUp  ), nullptr, this);
+        Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(SubWindow::onKeyDown), nullptr, this);
     }
 
     Grid& refParent() { return parent_; }
@@ -385,8 +397,8 @@ protected:
             {
                 //wxWidgets bug: tooltip multiline property is defined by first tooltip text containing newlines or not (same is true for maximum width)
                 if (!tt)
-                    SetToolTip(new wxToolTip(wxT("a                                                                b\n\
-                                                           a                                                                b"))); //ugly, but is working (on Windows)
+                    SetToolTip(new wxToolTip(L"a                                                                b\n\
+                                                           a                                                                b")); //ugly, but is working (on Windows)
                 tt = GetToolTip(); //should be bound by now
                 if (tt)
                     tt->SetTip(text);
@@ -966,6 +978,7 @@ private:
 
         const int rowHeight = rowLabelWin_.getRowHeight();
 
+		//why again aren't we using RowLabelWin::getRowsOnClient() here?
         const wxPoint topLeft     = refParent().CalcUnscrolledPosition(rect.GetTopLeft());
         const wxPoint bottomRight = refParent().CalcUnscrolledPosition(rect.GetBottomRight());
 
@@ -990,10 +1003,10 @@ private:
                         drawBackground(*prov, dc, wxRect(cellAreaTL + wxPoint(0, row * rowHeight), wxSize(compWidth, rowHeight)), row, compPos);
                 }
 
-                //draw single cells
+                //draw single cells, column by column
                 for (auto iterCol = iterComp->begin(); iterCol != iterComp->end(); ++iterCol)
                 {
-                    const int width  = iterCol->width_; //don't use unsigned for calculations!
+                    const int width = iterCol->width_; //don't use unsigned for calculations!
 
                     if (cellAreaTL.x > rect.GetRight())
                         return; //done
@@ -1629,6 +1642,9 @@ void Grid::scrollDelta(int deltaX, int deltaY)
     scrollPosX += deltaX;
     scrollPosY += deltaY;
 
+	scrollPosX = std::max(0, scrollPosX); //wxScrollHelper::Scroll() will exit prematurely if input happens to be "-1"!
+	scrollPosY = std::max(0, scrollPosY); //
+
     //const int unitsTotalX = GetScrollLines(wxHORIZONTAL);
     //const int unitsTotalY = GetScrollLines(wxVERTICAL);
 
@@ -1819,7 +1835,9 @@ void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range,
 
 WXLRESULT Grid::MSWDefWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam)
 {
-    if (nMsg == WM_MOUSEHWHEEL)
+	//we land here if wxWindowMSW::MSWWindowProc() couldn't handle the message
+	//http://msdn.microsoft.com/en-us/library/windows/desktop/ms645614(v=vs.85).aspx
+    if (nMsg == WM_MOUSEHWHEEL) //horizontal wheel
     {
         const int distance  = GET_WHEEL_DELTA_WPARAM(wParam);
         const int delta     = WHEEL_DELTA;
@@ -1830,8 +1848,8 @@ WXLRESULT Grid::MSWDefWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam)
             if (!::SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &linesPerRotation, 0))
                 linesPerRotation = 3;
 
-        SetFocus();
         scrollDelta(rotations * linesPerRotation, 0); //in scroll units
+		return 0; //"If an application processes this message, it should return zero."
     }
 
     return wxScrolledWindow::MSWDefWindowProc(nMsg, wParam, lParam);

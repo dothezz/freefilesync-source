@@ -431,10 +431,19 @@ public:
                      size_t folderIndex,
                      const Zstring& baseDirPf, //with separator postfix
                      ProcessCallback& procCallback);
-    ~DeletionHandling() { try { tryCleanup(); } catch (...) {}  /*make sure this stays non-blocking!*/ } //always (try to) clean up, even if synchronization is aborted!
+    ~DeletionHandling()
+    {
+        try { tryCleanup(false); } //always (try to) clean up, even if synchronization is aborted!
+        catch (...) {}
+        /*
+        do not allow user callback:
+        - make sure this stays non-blocking!
+        - avoid throwing user abort exception again, leading to incomplete clean-up!
+        */
+    }
 
     //clean-up temporary directory (recycle bin optimization)
-    void tryCleanup(); //throw FileError -> call this in non-exceptional coding, i.e. somewhere after sync!
+    void tryCleanup(bool allowUserCallback = true); //throw FileError -> call this in non-exceptional coding, i.e. somewhere after sync!
 
     void removeFile  (const Zstring& relativeName); //throw FileError
     void removeFolder(const Zstring& relativeName) { removeFolderInt(relativeName, nullptr, nullptr); }; //throw FileError
@@ -470,9 +479,11 @@ private:
     const Zstring versioningDir_;
     const TimeComp timeStamp_;
     const int versionCountLimit_;
-    Zstring recyclerTmpDirPf; //temporary folder to move files to, before moving whole folder to recycler (postfixed with file name separator)
 
 #ifdef FFS_WIN
+    Zstring recyclerTmpDirPf; //temporary folder holding files/folders for *deferred* recycling (postfixed with file name separator)
+    std::vector<Zstring> toBeRecycled; //full path of files located in temporary folder, waiting to be recycled
+
     bool recFallbackDelPermantently;
 #endif
 
@@ -514,7 +525,6 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel, //nothrow!
             handleDel = DELETE_PERMANENTLY; //Windows' ::SHFileOperation() will do this anyway, but we have a better and faster deletion routine (e.g. on networks)
             recFallbackDelPermantently = true;
         }
-#endif
 
     //assemble temporary recycler bin directory
     if (!baseDirPf_.empty())
@@ -525,6 +535,7 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel, //nothrow!
 
         recyclerTmpDirPf = appendSeparator(tempDir);
     }
+#endif
 
     setDeletionPolicy(handleDel);
 }
@@ -556,8 +567,33 @@ void DeletionHandling::setDeletionPolicy(DeletionPolicy newPolicy)
     }
 }
 
+#ifdef FFS_WIN
+namespace
+{
+class CallbackMassRecycling : public CallbackRecycling
+{
+public:
+    CallbackMassRecycling(ProcessCallback& statusHandler) :
+        statusHandler_(statusHandler),
+        txtRecyclingFile(_("Moving file %x to recycle bin")) {}
 
-void DeletionHandling::tryCleanup() //throw FileError
+    //may throw: first exception is swallowed, updateStatus() is then called again where it should throw again and the exception will propagate as expected
+    virtual void updateStatus(const Zstring& currentItem)
+    {
+        if (!currentItem.empty())
+            statusHandler_.reportStatus(replaceCpy(txtRecyclingFile, L"%x", fmtFileName(currentItem))); //throw ?
+        else
+            statusHandler_.requestUiRefresh(); //throw ?
+    }
+
+private:
+    ProcessCallback& statusHandler_;
+    const std::wstring txtRecyclingFile;
+};
+}
+#endif
+
+void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError
 {
     if (!cleanedUp)
     {
@@ -567,16 +603,29 @@ void DeletionHandling::tryCleanup() //throw FileError
                 break;
 
             case DELETE_TO_RECYCLER:
-                //clean-up temporary directory (recycle bin)
-                if (!recyclerTmpDirPf.empty()) //folder input pair may be empty
-                    recycleOrDelete(beforeLast(recyclerTmpDirPf, FILE_NAME_SEPARATOR)); //throw FileError
+#ifdef FFS_WIN
+                if (!recyclerTmpDirPf.empty())
+                {
+                    //move content of temporary directory to recycle bin in a single call
+                    CallbackMassRecycling cbmr(procCallback_);
+                    recycleOrDelete(toBeRecycled, allowUserCallback ? &cbmr : nullptr); //throw FileError
+
+                    //clean up temp directory itself (should contain remnant empty directories only)
+                    removeDirectory(beforeLast(recyclerTmpDirPf, FILE_NAME_SEPARATOR)); //throw FileError
+                }
+#endif
                 break;
 
             case DELETE_TO_VERSIONING:
                 if (versioner.get())
                 {
-                    procCallback_.reportStatus(_("Removing old versions..."));
-                    versioner->limitVersions([&] { procCallback_.requestUiRefresh(); }); //throw FileError
+                    if (allowUserCallback)
+                    {
+                        procCallback_.reportStatus(_("Removing old versions...")); //throw ?
+                        versioner->limitVersions([&] { procCallback_.requestUiRefresh(); /*throw ? */ }); //throw FileError
+                    }
+                    else
+                        versioner->limitVersions([] {}); //throw FileError
                 }
                 break;
         }
@@ -674,36 +723,41 @@ void DeletionHandling::removeFile(const Zstring& relativeName)
             break;
 
         case DELETE_TO_RECYCLER:
-        {
-            const Zstring targetFile = recyclerTmpDirPf + relativeName; //ends with path separator
+#ifdef FFS_WIN
+            {
+                const Zstring targetFile = recyclerTmpDirPf + relativeName; //ends with path separator
 
-            try
-            {
-                //performance optimization: Instead of moving each object into recycle bin separately,
-                //we rename them one by one into a temporary directory and delete this directory only ONCE!
-                renameFile(fullName, targetFile); //throw FileError -> try to get away cheaply!
-            }
-            catch (FileError&)
-            {
-                if (somethingExists(fullName)) //no file at all is not an error (however a directory is *not* expected!)
-                    try
+                auto moveToTempDir = [&]
+                {
+                    //performance optimization: Instead of moving each object into recycle bin separately,
+                    //we rename them one by one into a temporary directory and batch-recycle this directory after sync
+                    renameFile(fullName, targetFile); //throw FileError
+                    toBeRecycled.push_back(targetFile);
+                };
+
+                try
+                {
+                    moveToTempDir(); //throw FileError
+                }
+                catch (FileError&)
+                {
+                    if (somethingExists(fullName))
                     {
                         const Zstring targetDir = beforeLast(targetFile, FILE_NAME_SEPARATOR);
-                        if (!dirExists(targetDir)) //no reason to update gui or overwrite status text!
+                        if (!dirExists(targetDir))
                         {
                             makeDirectory(targetDir); //throw FileError -> may legitimately fail on Linux if permissions are missing
-                            renameFile(fullName, targetFile); //throw FileError -> this should work now!
+                            moveToTempDir(); //throw FileError -> this should work now!
                         }
                         else
                             throw;
                     }
-                    catch (FileError&) //if anything went wrong, move to recycle bin the standard way (single file processing: slow)
-                    {
-                        recycleOrDelete(fullName); //throw FileError
-                    }
+                }
             }
-        }
-        break;
+#elif defined FFS_LINUX
+            recycleOrDelete(fullName); //throw FileError
+#endif
+            break;
 
         case DELETE_TO_VERSIONING:
         {
@@ -733,42 +787,47 @@ void DeletionHandling::removeFolderInt(const Zstring& relativeName, const int* o
         break;
 
         case DELETE_TO_RECYCLER:
-        {
-            const Zstring targetDir = recyclerTmpDirPf + relativeName;
+#ifdef FFS_WIN
+            {
+                const Zstring targetDir = recyclerTmpDirPf + relativeName;
 
-            try
-            {
-                //performance optimization: Instead of moving each object into recycle bin separately,
-                //we rename them one by one into a temporary directory and delete this directory only ONCE!
-                renameFile(fullName, targetDir); //throw FileError -> try to get away cheaply!
-            }
-            catch (FileError&)
-            {
-                if (somethingExists(fullName))
-                    try
+                auto moveToTempDir = [&]
+                {
+                    //performance optimization: Instead of moving each object into recycle bin separately,
+                    //we rename them one by one into a temporary directory and batch-recycle this directory after sync
+                    renameFile(fullName, targetDir); //throw FileError
+                    toBeRecycled.push_back(targetDir);
+                };
+
+                try
+                {
+                    moveToTempDir(); //throw FileError
+                }
+                catch (FileError&)
+                {
+                    if (somethingExists(fullName))
                     {
                         const Zstring targetSuperDir = beforeLast(targetDir, FILE_NAME_SEPARATOR);
-                        if (!dirExists(targetSuperDir)) //no reason to update gui or overwrite status text!
+                        if (!dirExists(targetSuperDir))
                         {
                             makeDirectory(targetSuperDir); //throw FileError -> may legitimately fail on Linux if permissions are missing
-                            renameFile(fullName, targetDir); //throw FileError -> this should work now!
+                            moveToTempDir(); //throw FileError -> this should work now!
                         }
                         else
                             throw;
                     }
-                    catch (FileError&) //if anything went wrong, move to recycle bin the standard way (single file processing: slow)
-                    {
-                        recycleOrDelete(fullName);  //throw FileError
-                    }
+                }
             }
-        }
+#elif defined FFS_LINUX
+            recycleOrDelete(fullName); //throw FileError
+#endif
 
-        if (objectsExpected) //even though we have only one disk access, we completed "objectsExpected" logical operations!
-        {
-            procCallback_.updateProcessedData(*objectsExpected, 0);
-            objectsReported += *objectsExpected;
-        }
-        break;
+            if (objectsExpected) //even though we have only one disk access, we completed "objectsExpected" logical operations!
+            {
+                procCallback_.updateProcessedData(*objectsExpected, 0);
+                objectsReported += *objectsExpected;
+            }
+            break;
 
         case DELETE_TO_VERSIONING:
         {
@@ -1460,7 +1519,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
             }
             catch (FileError&)
             {
-                if (fileExists(fileObj.getFullName<sideSrc>()))
+                if (somethingExists(fileObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should not be quiet about it!
                     throw;
                 //source deleted meanwhile...nothing was done (logical point of view!)
                 procCallback_.updateTotalData(-1, -to<zen::Int64>(fileObj.getFileSize<sideSrc>()));
@@ -1624,7 +1683,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
             }
             catch (FileError&)
             {
-                if (fileExists(linkObj.getFullName<sideSrc>()))
+                if (somethingExists(linkObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should not be quiet about it!
                     throw;
                 //source deleted meanwhile...nothing was done (logical point of view!)
                 procCallback_.updateTotalData(-1, 0);
@@ -1720,7 +1779,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
     {
         case SO_CREATE_NEW_LEFT:
         case SO_CREATE_NEW_RIGHT:
-            if (dirExists(dirObj.getFullName<sideSrc>()))
+            if (somethingExists(dirObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should not be quiet about it!
             {
                 const Zstring& target = dirObj.getBaseDirPf<sideTrg>() + dirObj.getRelativeName<sideSrc>();
 
@@ -2244,8 +2303,8 @@ void zen::synchronize(const TimeComp& timeStamp,
             ScopeGuard guardUpdateDb = makeGuard([&]
             {
                 if (folderPairCfg.inAutomaticMode)
-                    try { zen::saveLastSynchronousState(*j); }
-                    catch (...) {} //throw FileError
+                    try { zen::saveLastSynchronousState(*j); } //throw FileError
+                    catch (...) {}
             });
 
             //guarantee removal of invalid entries (where element on both sides is empty)

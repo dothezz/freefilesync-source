@@ -7,8 +7,7 @@
 #ifndef WATCHER_H_INCLUDED
 #define WATCHER_H_INCLUDED
 
-#include <zen/zstring.h>
-#include <vector>
+#include <zen/dir_watcher.h>
 #include <zen/file_error.h>
 
 
@@ -35,10 +34,12 @@ enum ChangeType
 
 struct WaitResult
 {
-    WaitResult(ChangeType tp, const Zstring& chgFile) : type(tp), filename(chgFile) {}
+    WaitResult(const zen::DirWatcher::Entry& changedItem) : type(CHANGE_DETECTED), changedItem_(changedItem) {}
+    WaitResult(const Zstring& dirname) : type(CHANGE_DIR_MISSING), dirname_(dirname) {}
 
     ChangeType type;
-    Zstring filename; //file or directory name
+    zen::DirWatcher::Entry changedItem_; //for type == CHANGE_DETECTED: file or directory
+    Zstring dirname_;                    //for type == CHANGE_DIR_MISSING
 };
 
 WaitResult waitForChanges(const std::vector<Zstring>& dirNamesNonFmt,

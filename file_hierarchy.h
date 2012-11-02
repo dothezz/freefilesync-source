@@ -86,8 +86,8 @@ class FileMapping;
 class SymLinkMapping;
 class FileSystemObject;
 
-
 //------------------------------------------------------------------
+
 /*
 ERD:
 	DirContainer 1 --> 0..n DirContainer
@@ -217,8 +217,8 @@ private:
     BaseDirMapping& root_;
 };
 
-
 //------------------------------------------------------------------
+
 class BaseDirMapping : public HierarchyObject //synchronization base directory
 {
 public:
@@ -429,6 +429,8 @@ private:
     SyncDirection syncDir;
     std::unique_ptr<std::wstring> syncDirConflict; //non-empty if we have a conflict setting sync-direction
     //get rid of std::wstring small string optimization (consumes 32/48 byte on VS2010 x86/x64!)
+
+    //Note: we model *four* states with last two variables => "syncDirConflict is empty or syncDir == NONE" is a class invariant!!!
 
     Zstring shortNameLeft_;   //slightly redundant under linux, but on windows the "same" filenames can differ in case
     Zstring shortNameRight_;  //use as indicator: an empty name means: not existing!

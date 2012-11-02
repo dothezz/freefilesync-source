@@ -8,7 +8,6 @@
 #include <memory>
 #include "ui/main_dlg.h"
 #include <wx/msgdlg.h>
-#include <wx/sound.h>
 #include <wx/tooltip.h> //wxWidgets v2.9
 #include <wx/log.h>
 #include <wx+/app_main.h>
@@ -19,7 +18,6 @@
 #include "ui/check_version.h"
 #include "ui/switch_to_gui.h"
 #include "lib/resources.h"
-#include "lib/ffs_paths.h"
 #include "lib/lock_holder.h"
 #include "lib/process_xml.h"
 #include "lib/error_log.h"
@@ -68,10 +66,10 @@ bool Application::OnInit()
 {
 #ifdef FFS_WIN
     std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
+    assert(!win8OrLater()); //another breadcrumb: test and add new OS entry to "compatibility" in application manifest
 #ifdef _MSC_VER
     _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
 #endif
-    assert(!win8OrLater()); //another breadcrumb: test and add new OS entry to "compatibility" in application manifest
 #endif
 
     returnCode = FFS_RC_SUCCESS;
@@ -446,14 +444,6 @@ void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
                     syncProcessCfg,
                     folderCmp,
                     statusHandler);
-
-        //play (optional) sound notification after sync has completed -> don't play in silent mode, consider RealtimeSync!
-        if (batchCfg.showProgress)
-        {
-            const wxString soundFile = toWx(getResourceDir()) + L"Sync_Complete.wav";
-            if (fileExists(toZ(soundFile)))
-                wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as a service!
-        }
     }
     catch (BatchAbortProcess&) {} //exit used by statusHandler
 

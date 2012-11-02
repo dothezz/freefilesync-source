@@ -5,7 +5,9 @@
 // **************************************************************************
 
 #include "debug_new.h"
-
+#include <string>
+#include <sstream>
+#include <cstdlib>   //malloc(), free()
 #include "win.h"     //includes "windows.h"
 #include "DbgHelp.h" //available for MSC only
 #pragma comment(lib, "Dbghelp.lib")
@@ -44,7 +46,7 @@ struct Dummy { Dummy() { ::SetUnhandledExceptionFilter(writeDumpOnException); }}
 }
 
 
-void mem_check::writeMinidump()
+void debug_tools::writeMinidump()
 {
     //force exception to catch the state of this thread and hopefully get a valid call stack
     __try
@@ -53,3 +55,60 @@ void mem_check::writeMinidump()
     }
     __except (writeDumpOnException(GetExceptionInformation()), EXCEPTION_CONTINUE_EXECUTION) {}
 }
+
+
+/*
+No need to include the "operator new" declarations into every compilation unit:
+
+[basic.stc.dynamic]
+"A C++ program shall provide at most one definition of a replaceable allocation or deallocation function.
+Any such function definition replaces the default version provided in the library (17.6.4.6).
+The following allocation and deallocation functions (18.6) are implicitly declared in global scope in each translation unit of a program.
+void* operator new(std::size_t);
+void* operator new[](std::size_t);
+void operator delete(void*);
+void operator delete[](void*);"
+*/
+
+namespace
+{
+class BadAllocDetailed : public std::bad_alloc
+{
+public:
+    explicit BadAllocDetailed(size_t allocSize)
+    {
+        errorMsg = "Memory allocation failed: ";
+        errorMsg += numberToString(allocSize);
+    }
+
+    virtual const char* what() const throw()
+    {
+        return errorMsg.c_str();
+    }
+
+private:
+    template <class T>
+    static std::string numberToString(const T& number) //convert number to string the C++ way
+    {
+        std::ostringstream ss;
+        ss << number;
+        return ss.str();
+    }
+
+    std::string errorMsg;
+};
+}
+
+void* operator new(size_t size)
+{
+    if (void* ptr = ::malloc(size))
+        return ptr;
+
+    debug_tools::writeMinidump();
+    throw debug_tools::BadAllocDetailed(size);
+}
+
+void operator delete(void* ptr) { ::free(ptr); }
+
+void* operator new[](size_t size) { return operator new(size); }
+void operator delete[](void* ptr) { operator delete(ptr); }

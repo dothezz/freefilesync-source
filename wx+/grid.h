@@ -18,7 +18,7 @@
 
 namespace zen
 {
-typedef enum { DUMMY_COLUMN_TYPE = static_cast<size_t>(-1) } ColumnType;
+typedef enum { DUMMY_COLUMN_TYPE = static_cast<unsigned int>(-1) } ColumnType;
 
 //----- Events -----------------------------------------------------------------------------------------------
 extern const wxEventType EVENT_GRID_COL_LABEL_MOUSE_LEFT;  //generates: GridClickEvent

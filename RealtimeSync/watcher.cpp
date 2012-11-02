@@ -75,18 +75,18 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
             while (!ftDirExists.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL)))
                 statusHandler.requestUiRefresh(); //may throw!
             if (!ftDirExists.get())
-                return WaitResult(CHANGE_DIR_MISSING, dirnameFmt);
+                return WaitResult(dirnameFmt);
 
             watches.push_back(std::make_pair(dirnameFmt, std::make_shared<DirWatcher>(dirnameFmt))); //throw FileError, ErrorNotExisting
         }
         catch (ErrorNotExisting&) //nice atomic behavior: *no* second directory existence check!!!
         {
-            return WaitResult(CHANGE_DIR_MISSING, dirnameFmt);
+            return WaitResult(dirnameFmt);
         }
         catch (FileError&) //play safe: remedy potential FileErrors that should have been ErrorNotExisting (e.g. Linux: errors during directory traversing)
         {
             if (!dirExists(dirnameFmt)) //file system race condition!!
-                return WaitResult(CHANGE_DIR_MISSING, dirnameFmt);
+                return WaitResult(dirnameFmt);
             throw;
         }
     }
@@ -115,38 +115,38 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
             //IMPORTANT CHECK: dirwatcher has problems detecting removal of top watched directories!
             if (checkDirExistNow)
                 if (!dirExists(dirname)) //catch errors related to directory removal, e.g. ERROR_NETNAME_DELETED
-                    return WaitResult(CHANGE_DIR_MISSING, dirname);
+                    return WaitResult(dirname);
 
             try
             {
-                std::vector<Zstring> changedFiles = watcher.getChanges([&] { statusHandler.requestUiRefresh(); }); //throw FileError, ErrorNotExisting
+                std::vector<DirWatcher::Entry> changedItems = watcher.getChanges([&] { statusHandler.requestUiRefresh(); }); //throw FileError, ErrorNotExisting
 
                 //remove to be ignored changes
-                vector_remove_if(changedFiles, [](const Zstring& name)
+                vector_remove_if(changedItems, [](const DirWatcher::Entry& e)
                 {
-                    return endsWith(name, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
-                           endsWith(name, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
+                    return endsWith(e.filename_, Zstr(".ffs_lock")) || //sync.ffs_lock, sync.Del.ffs_lock
+                           endsWith(e.filename_, Zstr(".ffs_db"));     //sync.ffs_db, .sync.tmp.ffs_db
                     //no need to ignore temporal recycle bin directory: this must be caused by a file deletion anyway
                 });
 
-                if (!changedFiles.empty())
+                if (!changedItems.empty())
                 {
                     /*
-                                    std::for_each(changedFiles.begin(), changedFiles.end(),
+                                    std::for_each(changedItems.begin(), changedItems.end(),
                                     [](const Zstring& fn) { wxMessageBox(toWx(fn));});
                     */
-                    return WaitResult(CHANGE_DETECTED, changedFiles[0]); //directory change detected
+                    return WaitResult(changedItems[0]); //directory change detected
                 }
 
             }
             catch (ErrorNotExisting&) //nice atomic behavior: *no* second directory existence check!!!
             {
-                return WaitResult(CHANGE_DIR_MISSING, dirname);
+                return WaitResult(dirname);
             }
             catch (FileError&) //play safe: remedy potential FileErrors that should have been ErrorNotExisting (e.g. Linux: errors during directory traversing)
             {
                 if (!dirExists(dirname)) //file system race condition!!
-                    return WaitResult(CHANGE_DIR_MISSING, dirname);
+                    return WaitResult(dirname);
                 throw;
             }
         }

@@ -36,10 +36,16 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
     /*##*/ SetMinSize(wxSize(150, -1)); //## workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
     //#####################################
 
-    Connect(wxEVT_KEY_DOWN,                      wxKeyEventHandler(FolderHistoryBox::OnKeyEvent  ), nullptr, this);
-    Connect(wxEVT_LEFT_DOWN,                        wxEventHandler(FolderHistoryBox::OnUpdateList), nullptr, this);
+    Connect(wxEVT_KEY_DOWN,                  wxKeyEventHandler(FolderHistoryBox::OnKeyEvent  ), nullptr, this);
     Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(FolderHistoryBox::OnSelection ), nullptr, this);
-    Connect(wxEVT_MOUSEWHEEL,                  wxMouseEventHandler(FolderHistoryBox::OnMouseWheel), nullptr, this);
+    Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler(FolderHistoryBox::OnMouseWheel), nullptr, this);
+#ifdef FFS_WIN //on Win, this event only fires, when clicking on the small down arrow, NOT when clicking on the text field
+    //thanks to wxWidgets' non-portability it's exactly the converse on Linux!
+    Connect(wxEVT_LEFT_DOWN,                 wxEventHandler(FolderHistoryBox::OnUpdateList), nullptr, this);
+#elif defined FFS_LINUX //update on each text change: maybe a little too often, but we have no choice as long as we don't have an event right before showing the drop-down list
+    Connect(wxEVT_COMMAND_TEXT_UPDATED,      wxEventHandler(FolderHistoryBox::OnUpdateList), nullptr, this);
+#endif
+
 
 #if wxCHECK_VERSION(2, 9, 1)
     Connect(wxEVT_COMMAND_COMBOBOX_DROPDOWN, wxCommandEventHandler(FolderHistoryBox::OnShowDropDown), nullptr, this);
@@ -73,10 +79,8 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
     std::list<Zstring> dirList;
 
     //add some aliases to allow user changing to volume name and back, if possible
-#ifdef FFS_WIN
     std::vector<Zstring> aliases = getDirectoryAliases(toZ(dirname));
     dirList.insert(dirList.end(), aliases.begin(), aliases.end());
-#endif
 
     if (sharedHistory_.get())
     {

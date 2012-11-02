@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20120511;23131500">
+	<META NAME="CHANGED" CONTENT="20121007;13361000">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -28,12 +28,12 @@ Strategies</FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>1.
 Full backup with versioning of old files</B></FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
-synchronization settings select and specify &quot;Versioning&quot;
-for deletion handling. FreeFileSync will place files that have been
-deleted or overwritten with newer versions into corresponding
-time-stamped sub directories. This provides a space-optimized way to
-save all older versions of files separately while the most recent
-ones are available in main source and target directories.</FONT></P>
+synchronization settings select &quot;Versioning&quot; for deletion
+handling. FreeFileSync will move files that have been deleted or
+overwritten with newer versions into the provided directory and
+append a time-stamp. This is effectively a space-optimized way to
+save all older versions of files separately while the recent ones are
+available in main source and target directories.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -58,7 +58,7 @@ Base directories are set up accordingly:</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Latter
-will be interactively replaced with the current date during
+will be dynamically replaced with the current date during
 synchronization. In order to further automate this process, you can
 create a *.ffs_batch file with this configuration and choose &quot;<I>ignore
 errors</I>&quot; to avoid the popup message that target directory is

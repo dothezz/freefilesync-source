@@ -14,6 +14,7 @@
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/context_menu.h>
 #include <zen/file_handling.h>
+#include "../ui/exec_finished_box.h"
 #include "../lib/help_provider.h"
 #include "folder_pair.h"
 #include "msg_popup.h"

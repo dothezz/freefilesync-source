@@ -351,6 +351,9 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Synchronization completed with errors!</source>
 <target>Synchronisation mit Fehlern abgeschlossen!</target>
 
+<source>Synchronization completed with warnings!</source>
+<target>Synchronisation mit Warnungen abgeschlossen!</target>
+
 <source>Nothing to synchronize!</source>
 <target>Es gibt nichts zu synchronisieren!</target>
 
@@ -444,17 +447,17 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Hibernate</source>
 <target>Ruhezustand</target>
 
-<source>1. &Compare</source>
-<target>1. &Vergleichen</target>
-
-<source>2. &Synchronize</source>
-<target>2. &Synchronisieren</target>
-
 <source>&New</source>
 <target>&Neu</target>
 
 <source>&Save</source>
 <target>&Speichern</target>
+
+<source>1. &Compare</source>
+<target>1. &Vergleichen</target>
+
+<source>2. &Synchronize</source>
+<target>2. &Synchronisieren</target>
 
 <source>&Language</source>
 <target>&Sprache</target>

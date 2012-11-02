@@ -209,10 +209,12 @@ public:
     typedef       Char&       reference;
     typedef const Char& const_reference;
     typedef       Char value_type;
-    const Char* begin() const;
-    const Char* end()   const;
     Char*       begin();
-    Char*       end();
+    Char*       end  ();
+    const Char* begin() const;
+    const Char* end  () const;
+	const Char* cbegin() const { return begin(); }
+	const Char* cend  () const { return end(); }
 
     //std::string functions
     size_t length() const;
@@ -235,7 +237,8 @@ public:
     void swap(Zbase& other);
     void push_back(Char val) { operator+=(val); } //STL access
 
-    Zbase& operator=(Zbase source);
+    Zbase& operator=(const Zbase& source);
+    Zbase& operator=(Zbase&& tmp);
     Zbase& operator=(const Char* source);
     Zbase& operator=(Char source);
     Zbase& operator+=(const Zbase& other);
@@ -653,9 +656,18 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::append(const Char* source, size_t len)
 
 
 template <class Char, template <class, class> class SP, class AP> inline
-Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(Zbase<Char, SP, AP> other) //unifying assignment: no need for r-value reference optimization!
+Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(const Zbase<Char, SP, AP>& other)
 {
-    swap(other);
+    Zbase<Char, SP, AP>(other).swap(*this);
+    return *this;
+}
+
+
+template <class Char, template <class, class> class SP, class AP> inline
+Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::operator=(Zbase<Char, SP, AP>&& tmp)
+{
+    //don't use unifying assignment but save one move-construction in the r-value case instead!
+    swap(tmp);
     return *this;
 }
 

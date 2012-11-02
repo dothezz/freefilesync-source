@@ -42,6 +42,8 @@ SyncOperation getIsolatedSyncOperation(CompareFilesResult cmpResult,
                                        SyncDirection syncDir,
                                        bool hasDirConflict) //perf: std::wstring was wasteful here
 {
+    assert(!hasDirConflict || syncDir == SYNC_DIR_NONE);
+
     if (!selectedForSynchronization)
         return cmpResult == FILE_EQUAL ?
                SO_EQUAL :

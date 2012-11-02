@@ -24,11 +24,11 @@ Zstring getFormattedDirectoryName(const Zstring& dirString); //throw() - non-blo
 //macro substitution only
 Zstring expandMacros(const Zstring& text);
 
+std::vector<Zstring> getDirectoryAliases(const Zstring& dirString);
+
 #ifdef FFS_WIN
 //*blocks* if network is not reachable or when showing login prompt dialog!
 void loginNetworkShare(const Zstring& dirname, bool allowUserInteraction); //throw() - user interaction: show OS password prompt
-
-std::vector<Zstring> getDirectoryAliases(const Zstring& dirString);
 #endif
 }
 

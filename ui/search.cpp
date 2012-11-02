@@ -9,6 +9,7 @@
 #include <wx/msgdlg.h>
 #include <wx/utils.h>
 #include <utility>
+#include <zen/string_tools.h>
 #include <wx+/mouse_move_dlg.h>
 
 using namespace zen;
