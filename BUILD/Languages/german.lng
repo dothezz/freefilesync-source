@@ -58,8 +58,8 @@
 <source>Clear filter settings</source>
 <target>Filtereinstellungen löschen</target>
 
-<source>Create a batch job</source>
-<target>Batch-Job erstellen</target>
+<source>Save as batch job</source>
+<target>Speichern als Batch-Job</target>
 
 <source>Comparison settings</source>
 <target>Vergleichseinstellungen</target>
@@ -345,6 +345,9 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>FreeFileSync batch</source>
 <target>FreeFileSync Batch</target>
 
+<source>Saving log file %x</source>
+<target>Speichere Logdatei %x</target>
+
 <source>Synchronization aborted!</source>
 <target>Synchronisation abgebrochen!</target>
 
@@ -453,6 +456,9 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>&Save</source>
 <target>&Speichern</target>
 
+<source>Save as &batch job...</source>
+<target>Speichern als &Batch-Job...</target>
+
 <source>1. &Compare</source>
 <target>1. &Vergleichen</target>
 
@@ -464,9 +470,6 @@ Die Befehlszeile wird ausgelöst wenn:
 
 <source>&Global settings...</source>
 <target>&Globale Einstellungen...</target>
-
-<source>&Create batch job...</source>
-<target>&Batch-Job erstellen...</target>
 
 <source>&Export file list...</source>
 <target>Dateiliste e&xportieren...</target>
@@ -501,8 +504,8 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Swap sides</source>
 <target>Seiten vertauschen</target>
 
-<source>Open...</source>
-<target>Öffnen...</target>
+<source>Open</source>
+<target>Öffnen</target>
 
 <source>Save</source>
 <target>Speichern</target>
@@ -989,8 +992,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <pluralform>%x objects deleted successfully!</pluralform>
 </source>
 <target>
-<pluralform>Objekt erfolgreich gelöscht!</pluralform>
-<pluralform>%x Objekte erfolgreich gelöscht!</pluralform>
+<pluralform>Element erfolgreich gelöscht!</pluralform>
+<pluralform>%x Elemente erfolgreich gelöscht!</pluralform>
 </target>
 
 <source>
@@ -1043,6 +1046,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Comparing content...</source>
 <target>Vergleiche Dateiinhalt...</target>
+
+<source>Copy</source>
+<target>Kopieren</target>
 
 <source>Paused</source>
 <target>Angehalten</target>
@@ -1199,6 +1205,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Cannot copy file %x to %y.</source>
 <target>Die Datei %x kann nicht nach %y kopiert werden.</target>
+
+<source>Type of item %x is not supported:</source>
+<target>Der Typ des Elements %x wird nicht unterstützt:</target>
 
 <source>Cannot open directory %x.</source>
 <target>Das Verzeichnis %x kann nicht geöffnet werden.</target>
@@ -1398,6 +1407,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Updating attributes of %x</source>
 <target>Aktualisiere Attribute von %x</target>
 
+<source>Target folder %x already existing.</source>
+<target>Der Zielordner %x existiert bereits.</target>
+
 <source>Target folder input field must not be empty.</source>
 <target>Das Eingabefeld für den Zielordner darf nicht leer sein.</target>
 
@@ -1433,9 +1445,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronisiere Ordnerpaar:</target>
-
-<source>Target folder %x already existing.</source>
-<target>Der Zielordner %x existiert bereits.</target>
 
 <source>Generating database...</source>
 <target>Erzeuge Synchronisationsdatenbank...</target>

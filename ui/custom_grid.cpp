@@ -11,6 +11,7 @@
 #include <zen/file_error.h>
 #include <zen/basic_math.h>
 #include <zen/format_unit.h>
+#include <zen/scope_guard.h>
 #include <wx+/tooltip.h>
 #include <wx+/string_conv.h>
 #include <wx+/rtl.h>
@@ -71,7 +72,7 @@ void refreshCell(Grid& grid, size_t row, ColumnType colType)
 }
 
 
-std::pair<ptrdiff_t, ptrdiff_t> getVisibleRows(Grid& grid) //returns range [from, to)
+std::pair<ptrdiff_t, ptrdiff_t> getVisibleRows(const Grid& grid) //returns range [from, to)
 {
     const wxSize clientSize = grid.getMainWin().GetClientSize();
     if (clientSize.GetHeight() > 0)
@@ -79,15 +80,15 @@ std::pair<ptrdiff_t, ptrdiff_t> getVisibleRows(Grid& grid) //returns range [from
         wxPoint topLeft = grid.CalcUnscrolledPosition(wxPoint(0, 0));
         wxPoint bottom  = grid.CalcUnscrolledPosition(wxPoint(0, clientSize.GetHeight() - 1));
 
-        ptrdiff_t rowFrom = grid.getRowAtPos(topLeft.y); //returns < 0 if column not found; absolute coordinates!
+        const ptrdiff_t rowCount = grid.getRowCount();
+        const ptrdiff_t rowFrom  = grid.getRowAtPos(topLeft.y); //return -1 for invalid position, rowCount if out of range
         if (rowFrom >= 0)
         {
-            ptrdiff_t rowEnd = grid.getRowAtPos(bottom.y); //returns < 0 if column not found; absolute coordinates!
-            if (rowEnd < 0)
-                rowEnd = grid.getRowCount();
+            const ptrdiff_t rowTo = grid.getRowAtPos(bottom.y);
+            if (0 <= rowTo && rowTo < rowCount)
+                return std::make_pair(rowFrom, rowTo + 1);
             else
-                ++rowEnd;
-            return std::make_pair(rowFrom, rowEnd);
+                return std::make_pair(rowFrom, rowCount);
         }
     }
     return std::make_pair(0, 0);
@@ -448,7 +449,6 @@ private:
 
     static const int CELL_BORDER = 2;
 
-
     virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
     {
         wxRect rectTmp = rect;
@@ -784,20 +784,20 @@ public:
         if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE &&
             row < refGrid().getRowCount())
         {
-            refGrid().clearSelection();
-            dragSelection.reset(new std::pair<size_t, BlockPosition>(row, mousePosToBlock(clientPos, row)));
+            refGrid().clearSelection(false); //don't emit event, prevent recursion!
+            dragSelection = make_unique<std::pair<size_t, BlockPosition>>(row, mousePosToBlock(clientPos, row));
         }
     }
 
-    void onSelectEnd(size_t rowFrom, size_t rowTo) //we cannot reuse row from "onSelectBegin": rowFrom and rowTo may be different if user is holding shift
+    void onSelectEnd(size_t rowFirst, size_t rowLast) //we cannot reuse row from "onSelectBegin": if user is holding shift, this may now be in the middle of the range!
     {
-        refGrid().clearSelection();
+        refGrid().clearSelection(false); //don't emit event, prevent recursion!
 
         //issue custom event
         if (dragSelection)
         {
-            if (rowFrom < refGrid().getRowCount() &&
-                rowTo   < refGrid().getRowCount()) //row is -1 on capture lost!
+            if (rowFirst < rowLast && //may be empty? probably not in this context
+                rowLast <= refGrid().getRowCount())
             {
                 if (wxEvtHandler* evtHandler = refGrid().GetEventHandler())
                     switch (dragSelection->second)
@@ -807,25 +807,25 @@ public:
                             const FileSystemObject* fsObj = getRawData(dragSelection->first);
                             const bool setIncluded = fsObj ? !fsObj->isActive() : true;
 
-                            CheckRowsEvent evt(rowFrom, rowTo, setIncluded);
+                            CheckRowsEvent evt(rowFirst, rowLast, setIncluded);
                             evtHandler->ProcessEvent(evt);
                         }
                         break;
                         case BLOCKPOS_LEFT:
                         {
-                            SyncDirectionEvent evt(rowFrom, rowTo, SYNC_DIR_LEFT);
+                            SyncDirectionEvent evt(rowFirst, rowLast, SYNC_DIR_LEFT);
                             evtHandler->ProcessEvent(evt);
                         }
                         break;
                         case BLOCKPOS_MIDDLE:
                         {
-                            SyncDirectionEvent evt(rowFrom, rowTo, SYNC_DIR_NONE);
+                            SyncDirectionEvent evt(rowFirst, rowLast, SYNC_DIR_NONE);
                             evtHandler->ProcessEvent(evt);
                         }
                         break;
                         case BLOCKPOS_RIGHT:
                         {
-                            SyncDirectionEvent evt(rowFrom, rowTo, SYNC_DIR_RIGHT);
+                            SyncDirectionEvent evt(rowFirst, rowLast, SYNC_DIR_RIGHT);
                             evtHandler->ProcessEvent(evt);
                         }
                         break;
@@ -844,12 +844,13 @@ public:
         }
         else
         {
-            if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE)
+            if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE &&
+                row < refGrid().getRowCount())
             {
                 if (highlight) //refresh old highlight
                     refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
 
-                highlight.reset(new std::pair<size_t, BlockPosition>(row, mousePosToBlock(clientPos, row)));
+                highlight = make_unique<std::pair<size_t, BlockPosition>>(row, mousePosToBlock(clientPos, row));
                 refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
 
                 //show custom tooltip
@@ -1193,7 +1194,8 @@ public:
                      GridDataMiddle& provMiddle,
                      GridDataRight& provRight) :
         gridL_(gridL), gridC_(gridC), gridR_(gridR), scrollMaster(nullptr),
-        provLeft_(provLeft), provMiddle_(provMiddle), provRight_(provRight)
+        provLeft_(provLeft), provMiddle_(provMiddle), provRight_(provRight),
+        scrollbarUpdatePending(false)
     {
         gridL_.Connect(EVENT_GRID_COL_RESIZE, GridColumnResizeEventHandler(GridEventManager::onResizeColumnL), nullptr, this);
         gridR_.Connect(EVENT_GRID_COL_RESIZE, GridColumnResizeEventHandler(GridEventManager::onResizeColumnR), nullptr, this);
@@ -1238,6 +1240,8 @@ public:
         Connect(EVENT_ALIGN_SCROLLBARS, wxEventHandler(GridEventManager::onAlignScrollBars), NULL, this);
     }
 
+    ~GridEventManager() { assert(!scrollbarUpdatePending); }
+
 private:
     void onCenterSelectBegin(GridClickEvent& event)
     {
@@ -1248,15 +1252,14 @@ private:
 
     void onCenterSelectEnd(GridRangeSelectEvent& event)
     {
-        if (event.positive_) //we do NOT want to react on GridRangeSelectEvent() within Grid::clearSelectionAll() directly following right mouse click!
-            provMiddle_.onSelectEnd(event.rowFrom_, event.rowTo_);
+        provMiddle_.onSelectEnd(event.rowFirst_, event.rowLast_);
         event.Skip();
     }
 
     void onCenterMouseMovement(wxMouseEvent& event)
     {
         const wxPoint& topLeftAbs = gridC_.CalcUnscrolledPosition(event.GetPosition());
-        const int row = gridC_.getRowAtPos(topLeftAbs.y); //returns < 0 if column not found; absolute coordinates!
+        const ptrdiff_t row = gridC_.getRowAtPos(topLeftAbs.y); //return -1 for invalid position, rowCount if one past the end
         if (auto colInfo = gridC_.getColumnAtPos(topLeftAbs.x)) //(column type, component position)
         {
             //redirect mouse movement to middle grid component
@@ -1277,7 +1280,7 @@ private:
     void onGridSelection(const Grid& grid, Grid& other)
     {
         if (!wxGetKeyState(WXK_CONTROL)) //clear other grid unless user is holding CTRL
-            other.clearSelection();
+            other.clearSelection(false); //don't emit event, prevent recursion!
     }
 
     void onKeyDownL(wxKeyEvent& event) {  onKeyDown(event, gridL_); }
@@ -1397,13 +1400,22 @@ private:
         //harmonize placement of horizontal scrollbar to avoid grids getting out of sync!
         //since this affects the grid that is currently repainted as well, we do work asynchronously!
         //avoids at least this problem: remaining graphics artifact when changing from Grid::SB_SHOW_ALWAYS to Grid::SB_SHOW_NEVER at location of old scrollbar (Windows only)
-        wxCommandEvent alignEvent(EVENT_ALIGN_SCROLLBARS);
-        AddPendingEvent(alignEvent); //waits until next idle event - may take up to a second if the app is busy on wxGTK!
+
+        //perf note: send one async event at most, else they may accumulate and create perf issues, see grid.cpp
+        if (!scrollbarUpdatePending)
+        {
+            scrollbarUpdatePending = true;
+            wxCommandEvent alignEvent(EVENT_ALIGN_SCROLLBARS);
+            AddPendingEvent(alignEvent); //waits until next idle event - may take up to a second if the app is busy on wxGTK!
+        }
     }
 
     void onAlignScrollBars(wxEvent& event)
     {
-        auto needsHorizontalScrollbars = [](Grid& grid) -> bool
+        ZEN_ON_SCOPE_EXIT(scrollbarUpdatePending = false);
+        assert(scrollbarUpdatePending);
+
+        auto needsHorizontalScrollbars = [](const Grid& grid) -> bool
         {
             const wxWindow& mainWin = grid.getMainWin();
             return mainWin.GetVirtualSize().GetWidth() > mainWin.GetClientSize().GetWidth();
@@ -1433,6 +1445,8 @@ private:
     GridDataLeft&   provLeft_;
     GridDataMiddle& provMiddle_;
     GridDataRight& provRight_;
+
+    bool scrollbarUpdatePending;
 };
 }
 
@@ -1541,6 +1555,7 @@ private:
 };
 }
 
+
 void gridview::setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, bool show, IconBuffer::IconSize sz)
 {
     auto* provLeft  = dynamic_cast<GridDataLeft*>(gridLeft .getDataProvider());
@@ -1548,7 +1563,7 @@ void gridview::setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, boo
 
     if (provLeft && provRight)
     {
-        int newRowHeight = 0;
+        int iconHeight = 0;
         if (show)
         {
             auto iconMgr = std::make_shared<IconManager>(sz);
@@ -1556,14 +1571,17 @@ void gridview::setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, boo
 
             provLeft ->setIconManager(iconMgr);
             provRight->setIconManager(iconMgr);
-            newRowHeight = iconMgr->iconBuffer.getSize() + 1; //+ 1 for line between rows
+            iconHeight = iconMgr->iconBuffer.getSize();
         }
         else
         {
             provLeft ->setIconManager(nullptr);
             provRight->setIconManager(nullptr);
-            newRowHeight = IconBuffer(IconBuffer::SIZE_SMALL).getSize() + 1; //+ 1 for line between rows
+            iconHeight = IconBuffer(IconBuffer::SIZE_SMALL).getSize();
         }
+
+        const int newRowHeight = std::max(iconHeight, gridLeft.getMainWin().GetCharHeight()) + 1; //add some space
+
         gridLeft  .setRowHeight(newRowHeight);
         gridCenter.setRowHeight(newRowHeight);
         gridRight .setRowHeight(newRowHeight);

@@ -636,12 +636,12 @@ std::shared_ptr<InSyncDir> zen::loadLastSynchronousState(const BaseDirMapping& b
     const Zstring fileNameLeft  = getDBFilename<LEFT_SIDE >(baseMapping);
     const Zstring fileNameRight = getDBFilename<RIGHT_SIDE>(baseMapping);
 
-    if (!baseMapping.wasExisting<LEFT_SIDE >() ||
-        !baseMapping.wasExisting<RIGHT_SIDE>())
+    if (!baseMapping.isExisting<LEFT_SIDE >() ||
+        !baseMapping.isExisting<RIGHT_SIDE>())
     {
         //avoid race condition with directory existence check: reading sync.ffs_db may succeed although first dir check had failed => conflicts!
         //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430
-        const Zstring filename = !baseMapping.wasExisting<LEFT_SIDE>() ? fileNameLeft : fileNameRight;
+        const Zstring filename = !baseMapping.isExisting<LEFT_SIDE>() ? fileNameLeft : fileNameRight;
         throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" + //it could be due to a to-be-created target directory not yet existing => FileErrorDatabaseNotExisting
                                            replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filename)));
     }

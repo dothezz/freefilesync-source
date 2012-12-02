@@ -59,7 +59,7 @@ void onTerminationRequested()
 void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
 #endif
 }
-#endif
+#endif 
 
 
 bool Application::OnInit()
@@ -386,6 +386,7 @@ void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
                                          timeStamp,
                                          batchCfg.logFileDirectory,
                                          batchCfg.logfilesCountLimit,
+                                         globalCfg.lastSyncsLogFileSizeMax,
                                          batchCfg.handleError,
                                          switchBatchToGui,
                                          returnCode,
@@ -410,13 +411,14 @@ void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
         std::unique_ptr<LockHolder> dummy;
         if (globalCfg.createLockFile)
         {
-            dummy.reset(new LockHolder(allowPwPrompt));
+            std::vector<Zstring> dirnames;
             std::for_each(cmpConfig.begin(), cmpConfig.end(),
                           [&](const FolderPairCfg& fpCfg)
             {
-                dummy->addDir(fpCfg.leftDirectoryFmt,  statusHandler);
-                dummy->addDir(fpCfg.rightDirectoryFmt, statusHandler);
+                dirnames.push_back(fpCfg.leftDirectoryFmt);
+                dirnames.push_back(fpCfg.rightDirectoryFmt);
             });
+            dummy = make_unique<LockHolder>(dirnames, statusHandler, allowPwPrompt);
         }
 
         //COMPARE DIRECTORIES

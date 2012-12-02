@@ -13,6 +13,8 @@
 namespace zen
 {
 //register simple file drop event (without issue of freezing dialogs and without wxFileDropTarget overdesign)
+//CAVEAT: a drop target window must not be directly or indirectly contained within a wxStaticBoxSizer until the following wxGTK bug
+//is fixed. According to wxWidgets release cycles this is expected to be: never http://trac.wxwidgets.org/ticket/2763
 
 //1. setup a window to emit EVENT_DROP_FILE
 void setupFileDrop(wxWindow& wnd);
@@ -39,7 +41,8 @@ void setupFileDrop(wxWindow& wnd);
 
 
 
-
+namespace impl
+{
 inline
 wxEventType createNewEventType()
 {
@@ -47,9 +50,11 @@ wxEventType createNewEventType()
     static wxEventType dummy = wxNewEventType();
     return dummy;
 }
+}
+
 
 //define new event type
-const wxEventType EVENT_DROP_FILE = createNewEventType();
+const wxEventType EVENT_DROP_FILE = impl::createNewEventType();
 
 class FileDropEvent : public wxCommandEvent
 {
@@ -78,6 +83,8 @@ typedef void (wxEvtHandler::*FileDropEventFunction)(FileDropEvent&);
     (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(FileDropEventFunction, &func)
 
 
+namespace impl
+{
 class WindowDropTarget : public wxFileDropTarget
 {
 public:
@@ -99,12 +106,13 @@ private:
 
     wxWindow& dropWindow_;
 };
+}
 
 
 inline
 void setupFileDrop(wxWindow& wnd)
 {
-    wnd.SetDropTarget(new WindowDropTarget(wnd)); //takes ownership
+    wnd.SetDropTarget(new impl::WindowDropTarget(wnd)); //takes ownership
 }
 }
 

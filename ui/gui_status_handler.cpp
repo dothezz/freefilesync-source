@@ -175,16 +175,18 @@ void CompareStatusHandler::abortThisProcess()
     requestAbortion(); //just make sure...
     throw GuiAbortProcess();
 }
+
 //########################################################################################################
 
-
 SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg,
+                                     size_t lastSyncsLogFileSizeMax,
                                      OnGuiError handleError,
                                      const std::wstring& jobName,
                                      const std::wstring& execWhenFinished,
                                      std::vector<std::wstring>& execFinishedHistory) :
     parentDlg_(parentDlg),
     syncStatusFrame(*this, *this, parentDlg, true, jobName, execWhenFinished, execFinishedHistory),
+    lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
     handleError_(handleError),
     jobName_(jobName)
 {
@@ -225,12 +227,17 @@ SyncStatusHandler::~SyncStatusHandler()
         errorLog.logMsg(finalStatus, TYPE_INFO);
     }
 
-    const Utf8String logStream = generateLogStream(errorLog, jobName_, finalStatus,
-                                                   getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
-                                                   getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING), totalTime.Time() / 1000);
+    const SummaryInfo summary =
+    {
+        jobName_, finalStatus,
+        getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
+        getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING),
+        totalTime.Time() / 1000
+    };
+
     try
     {
-        saveToLastSyncsLog(logStream); //throw FileError
+        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_); //throw FileError
     }
     catch (FileError&) {}
 

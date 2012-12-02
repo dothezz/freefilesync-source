@@ -10,28 +10,14 @@
 #include "gui_generated.h"
 #include <vector>
 #include <memory>
+#include <wx+/file_drop.h>
 #include "../ui/dir_name.h"
 
 namespace xmlAccess
 {
 struct XmlRealConfig;
 }
-
-
-class DirectoryPanel : public FolderGenerated
-{
-public:
-    DirectoryPanel(wxWindow* parent) :
-        FolderGenerated(parent),
-        dirName(*this, *m_buttonSelectDir, *m_txtCtrlDirectory) {}
-
-    void setName(const wxString& dirname) { dirName.setName(dirname); }
-    wxString getName() const { return dirName.getName(); }
-
-private:
-    zen::DirectoryName<wxTextCtrl> dirName;
-};
-
+class DirectoryPanel;
 
 
 class MainDialog: public MainDlgGenerated
@@ -40,9 +26,9 @@ public:
     MainDialog(wxDialog* dlg, const wxString& cfgFileName);
     ~MainDialog();
 
+private:
     void loadConfig(const wxString& filename);
 
-private:
     virtual void OnClose          (wxCloseEvent& event)   { Destroy(); }
     virtual void OnQuit           (wxCommandEvent& event) { Destroy(); }
     virtual void OnShowHelp       (wxCommandEvent& event);
@@ -54,6 +40,7 @@ private:
     virtual void OnStart          (wxCommandEvent& event);
     virtual void OnConfigSave     (wxCommandEvent& event);
     virtual void OnConfigLoad     (wxCommandEvent& event);
+    void onFilesDropped(zen::FileDropEvent& event);
 
     void setConfiguration(const xmlAccess::XmlRealConfig& cfg);
     xmlAccess::XmlRealConfig getConfiguration();

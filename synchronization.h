@@ -78,7 +78,6 @@ struct FolderPairSyncCfg
 };
 std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 
-class SynchronizeFolderPair;
 
 //FFS core routine:
 void synchronize(const TimeComp& timeStamp,

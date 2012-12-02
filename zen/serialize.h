@@ -162,7 +162,7 @@ BinContainer loadBinStream(const Zstring& filename) //throw FileError, ErrorNotE
     FileInput fileIn(filename); //throw FileError, ErrorNotExisting
 
     BinContainer contOut;
-    const size_t blockSize = 64 * 1024;
+    const size_t blockSize = 128 * 1024;
     do
     {
         contOut.resize(contOut.size() + blockSize);

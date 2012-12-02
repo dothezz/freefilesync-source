@@ -286,33 +286,44 @@ template <class S, class T, class U> inline
 S replaceCpy(const S& str, const T& oldTerm, const U& newTerm, bool replaceAll)
 {
     assert_static(IsStringLike<T>::value && IsStringLike<U>::value);
-
     typedef typename GetCharType<S>::Type CharType;
 
     const size_t oldLen = strLength(oldTerm);
-    const size_t newLen = strLength(newTerm);
-
-    S output;
+    if (oldLen == 0)
+    {
+        assert(false);
+        return str;
+    }
 
     const CharType*       strPos = strBegin(str);
     const CharType* const strEnd = strPos + strLength(str);
 
     const CharType* const oldBegin = strBegin(oldTerm);
+    const CharType* const oldEnd   = oldBegin + oldLen;
+
+    //optimize "oldTerm not found"
+    const CharType* strMatch = std::search(strPos, strEnd,
+                                           oldBegin, oldEnd);
+    if (strMatch == strEnd)
+        return str;
+
+    const size_t newLen = strLength(newTerm);
     const CharType* const newBegin = strBegin(newTerm);
+    S output;
 
     for (;;)
     {
-        const CharType* ptr = std::search(strPos, strEnd,
-                                          oldBegin, oldBegin + oldLen);
-        if (ptr == strEnd)
-            break;
-
-        implementation::stringAppend(output, strPos, ptr - strPos);
+        implementation::stringAppend(output, strPos, strMatch - strPos);
         implementation::stringAppend(output, newBegin, newLen);
 
-        strPos = ptr + oldLen;
+        strPos = strMatch + oldLen;
 
         if (!replaceAll)
+            break;
+
+        strMatch = std::search(strPos, strEnd,
+                               oldBegin, oldEnd);
+        if (strMatch == strEnd)
             break;
     }
     implementation::stringAppend(output, strPos, strEnd - strPos);

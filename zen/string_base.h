@@ -142,7 +142,8 @@ protected:
 
     static void destroy(Char* ptr)
     {
-        if (--descr(ptr)->refCount == 0)
+        assert(descr(ptr)->refCount > 0);
+        if (--descr(ptr)->refCount == 0) //operator--() is overloaded to decrement and evaluate in a single atomic operation!
         {
             descr(ptr)->~Descriptor();
             AP::deallocate(descr(ptr));
@@ -213,8 +214,8 @@ public:
     Char*       end  ();
     const Char* begin() const;
     const Char* end  () const;
-	const Char* cbegin() const { return begin(); }
-	const Char* cend  () const { return end(); }
+    const Char* cbegin() const { return begin(); }
+    const Char* cend  () const { return end(); }
 
     //std::string functions
     size_t length() const;
@@ -268,10 +269,15 @@ template <class Char, template <class, class> class SP, class AP> bool operator<
 template <class Char, template <class, class> class SP, class AP> bool operator<(const Zbase<Char, SP, AP>& lhs, const Char*                rhs);
 template <class Char, template <class, class> class SP, class AP> bool operator<(const Char*                lhs, const Zbase<Char, SP, AP>& rhs);
 
-//rvalue references: unified first argument!
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP> lhs, const Zbase<Char, SP, AP>& rhs) { return lhs += rhs; }
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP> lhs, const Char*                rhs) { return lhs += rhs; }
-template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP> lhs,       Char                 rhs) { return lhs += rhs; }
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs, const Char*                rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Zbase<Char, SP, AP>& lhs,       Char                 rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
+
+//don't use unified first argument but save one move-construction in the r-value case instead!
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs, const Zbase<Char, SP, AP>& rhs) { return std::move(lhs += rhs); } //is the move really needed?
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs, const Char*                rhs) { return std::move(lhs += rhs); } //lhs, is an l-vlaue in the function body...
+template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(Zbase<Char, SP, AP>&& lhs,       Char                 rhs) { return std::move(lhs += rhs); } //and not a local variable => no copy elision
+
 template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(      Char          lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
 template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Char*         lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
 

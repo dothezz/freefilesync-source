@@ -109,6 +109,7 @@
       <ForcedIncludeFiles>zen/warn_static.h;wx+/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MinimalRebuild>false</MinimalRebuild>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -116,6 +117,8 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>wxmsw28ud_aui.lib;wxmsw28ud_adv.lib;wxmsw28ud_core.lib;wxbase28ud_net.lib;wxbase28ud.lib;wxpngd.lib;wxzlibd.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\C++\Boost\stage\lib;C:\Program Files\C++\wxWidgets\lib\vc10_x86_debug_dll</AdditionalLibraryDirectories>
+      <LinkStatus>
+      </LinkStatus>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include</AdditionalIncludeDirectories>
@@ -137,6 +140,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MinimalRebuild>false</MinimalRebuild>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -176,6 +180,8 @@
       <AdditionalDependencies>wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files\C++\Boost\stage\lib;C:\Program Files\C++\wxWidgets\lib\vc10_x86_release_lib</AdditionalLibraryDirectories>
+      <LinkStatus>
+      </LinkStatus>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include</AdditionalIncludeDirectories>
@@ -207,6 +213,8 @@
       <AdditionalDependencies>wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files\C++\Boost\stage_x64\lib;C:\Program Files\C++\wxWidgets\lib\vc10_x64_release_lib</AdditionalLibraryDirectories>
+      <LinkStatus>
+      </LinkStatus>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include</AdditionalIncludeDirectories>
@@ -272,6 +280,7 @@
     <ClCompile Include="wx+\tooltip.cpp" />
     <ClCompile Include="wx+\zlib_wrap.cpp" />
     <ClCompile Include="zenxml\unit_test.cpp" />
+    <ClCompile Include="zen\debug_memory_leaks.cpp" />
     <ClCompile Include="zen\dst_hack.cpp" />
     <ClCompile Include="zen\file_handling.cpp" />
     <ClCompile Include="zen\file_id.cpp" />

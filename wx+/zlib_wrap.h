@@ -111,7 +111,7 @@ BinContainer decompress(const BinContainer& stream) //throw ZlibInternalError
         const size_t bytesWritten = impl::zlib_decompress(&*stream.begin() + sizeof(uncompressedSize),
                                                           stream.size() - sizeof(uncompressedSize),
                                                           &*contOut.begin(),
-                                                          uncompressedSize); //throw ZlibInternalError
+                                                          static_cast<size_t>(uncompressedSize)); //throw ZlibInternalError
         if (bytesWritten != static_cast<size_t>(uncompressedSize))
             throw ZlibInternalError();
     }

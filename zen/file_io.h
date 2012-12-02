@@ -7,15 +7,16 @@
 #ifndef FILEIO_H_INCLUDED
 #define FILEIO_H_INCLUDED
 
+#include "file_io_base.h"
+#include "file_error.h"
+
 #ifdef FFS_WIN
 #include "win.h" //includes "windows.h"
-
 #elif defined FFS_LINUX
 #include <cstdio>
+#include <sys/stat.h>
 #endif
 
-#include "zstring.h"
-#include "file_error.h"
 
 namespace zen
 {
@@ -25,7 +26,7 @@ static const char LINE_BREAK[] = "\r\n";
 static const char LINE_BREAK[] = "\n";
 #endif
 
-//file IO optimized for sequential read/write accesses + better error reporting + long path support (following symlinks)
+//buffered file IO optimized for sequential read/write accesses + better error reporting + long path support (following symlinks)
 
 #ifdef FFS_WIN
 typedef HANDLE FileHandle;
@@ -33,52 +34,66 @@ typedef HANDLE FileHandle;
 typedef FILE* FileHandle;
 #endif
 
-class FileInput
+class FileInput : public FileInputBase
 {
 public:
     FileInput(const Zstring& filename);                    //throw FileError, ErrorNotExisting
     FileInput(FileHandle handle, const Zstring& filename); //takes ownership!
     ~FileInput();
 
-    size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns actual number of bytes read
-    bool eof() { return eofReached; } //end of file reached
-
-    const Zstring& getFilename() const { return filename_; }
+    virtual size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns actual number of bytes read
+    //expected to fill buffer completely unless "end of file"
 
 private:
-    FileInput(const FileInput&);
-    FileInput& operator=(const FileInput&);
-
-    bool eofReached;
     FileHandle fileHandle;
-    const Zstring filename_;
 };
 
 
-class  FileOutput
+class FileOutput : public FileOutputBase
 {
 public:
-    enum AccessFlag
-    {
-        ACC_OVERWRITE,
-        ACC_CREATE_NEW
-    };
     FileOutput(const Zstring& filename, AccessFlag access); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
     FileOutput(FileHandle handle, const Zstring& filename); //takes ownership!
     ~FileOutput();
 
-    void write(const void* buffer, size_t bytesToWrite); //throw FileError
-
-    const Zstring& getFilename() const { return filename_; }
+    virtual void write(const void* buffer, size_t bytesToWrite); //throw FileError
 
 private:
-    FileOutput(const FileOutput&);
-    FileOutput& operator=(const FileOutput&);
-
     FileHandle fileHandle;
-    const Zstring filename_;
 };
 
+
+#ifdef FFS_LINUX
+class FileInputUnbuffered : public FileInputBase
+{
+public:
+    FileInputUnbuffered(const Zstring& filename); //throw FileError, ErrorNotExisting
+    ~FileInputUnbuffered();
+
+    //considering safe-read.c it seems buffer size should be a multiple of 8192
+    virtual size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns actual number of bytes read
+    //we should not rely on buffer being filled completely!
+
+    int getDescriptor() { return fdFile;}
+
+private:
+    int fdFile;
+};
+
+class FileOutputUnbuffered : public FileOutputBase
+{
+public:
+    //creates a new file (no overwrite allowed!)
+    FileOutputUnbuffered(const Zstring& filename, mode_t mode); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+    ~FileOutputUnbuffered();
+
+    virtual void write(const void* buffer, size_t bytesToWrite); //throw FileError
+    int getDescriptor() { return fdFile;}
+
+private:
+    int fdFile;
+};
+#endif
 }
 
 #endif // FILEIO_H_INCLUDED

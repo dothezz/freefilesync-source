@@ -10,12 +10,15 @@
 #include <wx/stopwatch.h>
 #include <wx/wupdlock.h>
 #include <wx/sound.h>
+#include <wx/clipbrd.h>
+#include <wx/msgdlg.h>
 #include <zen/basic_math.h>
 #include <zen/format_unit.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/toggle_button.h>
 #include <wx+/image_tools.h>
 #include <wx+/graph.h>
+#include <wx+/context_menu.h>
 #include <wx+/no_flicker.h>
 #include <zen/file_handling.h>
 #include "gui_generated.h"
@@ -272,7 +275,7 @@ namespace
 inline
 wxBitmap buttonPressed(const std::string& name)
 {
-    wxBitmap background = GlobalResources::getImage(wxT("log button pressed"));
+    wxBitmap background = GlobalResources::getImage(L"log button pressed");
     return layOver(GlobalResources::getImage(utfCvrtTo<wxString>(name)), background);
 }
 
@@ -287,17 +290,283 @@ wxBitmap buttonReleased(const std::string& name)
     zen::move(output, 0, -1); //move image right one pixel
     return output;
 }
+
+
+//a vector-view on ErrorLog considering multi-line messages: prepare consumption by Grid
+class MessageView
+{
+public:
+    MessageView(const ErrorLog& log) : log_(log) {}
+
+    size_t rowsOnView() const { return viewRef.size(); }
+
+    struct LogEntryView
+    {
+        time_t      time;
+        MessageType type;
+        MsgString   messageLine;
+        bool firstLine; //if LogEntry::message spans multiple rows
+    };
+    bool getEntry(size_t row, LogEntryView& out) const
+    {
+        if (row < viewRef.size())
+        {
+            const Line& line = viewRef[row];
+            out.time = line.entry_->time;
+            out.type = line.entry_->type;
+            out.messageLine = extractLine(line.entry_->message, line.rowNumber_);
+            out.firstLine = line.rowNumber_ == 0; //this is virtually always correct, unless first line of the original message is empty!
+            return true;
+        }
+        return false;
+    }
+
+    void updateView(int includedTypes) //TYPE_INFO | TYPE_WARNING, ect. see error_log.h
+    {
+        viewRef.clear();
+
+        for (auto iter = log_.begin(); iter != log_.end(); ++iter)
+            if (iter->type & includedTypes)
+            {
+                assert_static((IsSameType<GetCharType<MsgString>::Type, wchar_t>::value));
+                assert(!startsWith(iter->message, L'\n'));
+
+                size_t rowNumber = 0;
+                bool lastCharNewline = true;
+                std::for_each(iter->message.begin(), iter->message.end(),
+                              [&](wchar_t c)
+                {
+                    typedef Line Line; //workaround MSVC compiler bug!
+
+                    if (c == L'\n')
+                    {
+                        if (!lastCharNewline) //do not reference empty lines!
+                            viewRef.push_back(Line(&*iter, rowNumber));
+                        ++rowNumber;
+                        lastCharNewline = true;
+                    }
+                    else
+                        lastCharNewline = false;
+                });
+                if (!lastCharNewline)
+                    viewRef.push_back(Line(&*iter, rowNumber));
+            }
+    }
+
+private:
+    static MsgString extractLine(const MsgString& message, size_t textRow)
+    {
+        auto iter1 = message.begin();
+        for (;;)
+        {
+            auto iter2 = std::find_if(iter1, message.end(), [](wchar_t c) { return c == L'\n'; });
+            if (textRow == 0)
+                return iter1 == message.end() ? MsgString() : MsgString(&*iter1, iter2 - iter1); //must not dereference iterator pointing to "end"!
+
+            if (iter2 == message.end())
+            {
+                assert(false);
+                return MsgString();
+            }
+
+            iter1 = iter2 + 1; //skip newline
+            --textRow;
+        }
+    }
+
+    struct Line
+    {
+        Line(const LogEntry* entry, size_t rowNumber) : entry_(entry), rowNumber_(rowNumber) {}
+        const LogEntry* entry_; //always bound!
+        size_t rowNumber_; //LogEntry::message may span multiple rows
+    };
+
+    std::vector<Line> viewRef; //partial view on log_
+    /*          /|\
+                 | updateView()
+                 |                      */
+    const ErrorLog log_;
+};
+
+//-----------------------------------------------------------------------------
+
+enum ColumnTypeMsg
+{
+    COL_TYPE_MSG_TIME,
+    COL_TYPE_MSG_CATEGORY,
+    COL_TYPE_MSG_TEXT,
+};
+
+//Grid data implementation referencing MessageView
+class GridDataMessages : public GridData
+{
+    static const int COLUMN_BORDER_LEFT = 4; //for left-aligned text
+
+public:
+    GridDataMessages(const std::shared_ptr<MessageView>& msgView) : msgView_(msgView) {}
+
+    virtual size_t getRowCount() const { return msgView_ ? msgView_->rowsOnView() : 0; }
+
+    virtual wxString getValue(size_t row, ColumnType colType) const
+    {
+        MessageView::LogEntryView entry = {};
+        if (msgView_ && msgView_->getEntry(row, entry))
+            switch (static_cast<ColumnTypeMsg>(colType))
+            {
+                case COL_TYPE_MSG_TIME:
+                    if (entry.firstLine)
+                        return formatTime<wxString>(FORMAT_TIME, localTime(entry.time));
+                    break;
+
+                case COL_TYPE_MSG_CATEGORY:
+                    if (entry.firstLine)
+                        switch (entry.type)
+                        {
+                            case TYPE_INFO:
+                                return _("Info");
+                            case TYPE_WARNING:
+                                return _("Warning");
+                            case TYPE_ERROR:
+                                return _("Error");
+                            case TYPE_FATAL_ERROR:
+                                return _("Fatal Error");
+                        }
+                    break;
+
+                case COL_TYPE_MSG_TEXT:
+                    return copyStringTo<wxString>(entry.messageLine);
+            }
+        return wxEmptyString;
+    }
+
+    virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
+    {
+        wxRect rectTmp = rect;
+
+        const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
+
+        wxDCPenChanger dummy2(dc, wxPen(colorGridLine, 1, wxSOLID));
+        const bool drawBottomLine = [&]() -> bool //don't separate multi-line messages
+        {
+            MessageView::LogEntryView nextEntry = {};
+            if (msgView_ && msgView_->getEntry(row + 1, nextEntry))
+                return nextEntry.firstLine;
+            return true;
+        }();
+
+        if (drawBottomLine)
+        {
+            dc.DrawLine(rect.GetBottomLeft(),  rect.GetBottomRight() + wxPoint(1, 0));
+            --rectTmp.height;
+        }
+
+        //--------------------------------------------------------
+
+        MessageView::LogEntryView entry = {};
+        if (msgView_ && msgView_->getEntry(row, entry))
+            switch (static_cast<ColumnTypeMsg>(colType))
+            {
+                case COL_TYPE_MSG_TIME:
+                    drawCellText(dc, rectTmp, getValue(row, colType), grid.IsEnabled(), wxALIGN_CENTER);
+                    break;
+
+                case COL_TYPE_MSG_CATEGORY:
+                    if (entry.firstLine)
+                        switch (entry.type)
+                        {
+                            case TYPE_INFO:
+                                dc.DrawLabel(wxString(), GlobalResources::getImage(L"msg_small_info"), rectTmp, wxALIGN_CENTER);
+                                break;
+                            case TYPE_WARNING:
+                                dc.DrawLabel(wxString(), GlobalResources::getImage(L"msg_small_warning"), rectTmp, wxALIGN_CENTER);
+                                break;
+                            case TYPE_ERROR:
+                            case TYPE_FATAL_ERROR:
+                                dc.DrawLabel(wxString(), GlobalResources::getImage(L"msg_small_error"), rectTmp, wxALIGN_CENTER);
+                                break;
+                        }
+                    break;
+
+                case COL_TYPE_MSG_TEXT:
+                {
+                    rectTmp.x     += COLUMN_BORDER_LEFT;
+                    rectTmp.width -= COLUMN_BORDER_LEFT;
+                    drawCellText(dc, rectTmp, getValue(row, colType), grid.IsEnabled());
+                }
+                break;
+            }
+    }
+
+    virtual size_t getBestSize(wxDC& dc, size_t row, ColumnType colType)
+    {
+        // -> synchronize renderCell() <-> getBestSize()
+
+        MessageView::LogEntryView entry = {};
+        if (msgView_ && msgView_->getEntry(row, entry))
+            switch (static_cast<ColumnTypeMsg>(colType))
+            {
+                case COL_TYPE_MSG_TIME:
+                    return 2 * COLUMN_BORDER_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
+
+                case COL_TYPE_MSG_CATEGORY:
+                    return GlobalResources::getImage(L"msg_small_info").GetWidth();
+
+                case COL_TYPE_MSG_TEXT:
+                    return COLUMN_BORDER_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
+            }
+        return 0;
+    }
+
+    static int getColumnTimeDefaultWidth(Grid& grid)
+    {
+        wxClientDC dc(&grid.getMainWin());
+        dc.SetFont(grid.getMainWin().GetFont());
+        return 2 * COLUMN_BORDER_LEFT + dc.GetTextExtent(formatTime<wxString>(FORMAT_TIME)).GetWidth();
+    }
+
+    static int getColumnCategoryDefaultWidth()
+    {
+        return GlobalResources::getImage(L"msg_small_info").GetWidth();
+    }
+
+    static int getRowDefaultHeight(const Grid& grid)
+    {
+        return std::max(GlobalResources::getImage(L"msg_small_info").GetHeight(), grid.getMainWin().GetCharHeight() + 2) + 1; //+ some space + bottom border
+    }
+
+    virtual wxString getToolTip(size_t row, ColumnType colType) const
+    {
+        MessageView::LogEntryView entry = {};
+        if (msgView_ && msgView_->getEntry(row, entry))
+            switch (static_cast<ColumnTypeMsg>(colType))
+            {
+                case COL_TYPE_MSG_TIME:
+                case COL_TYPE_MSG_TEXT:
+                    break;
+
+                case COL_TYPE_MSG_CATEGORY:
+                    return getValue(row, colType);
+            }
+        return wxEmptyString;
+    }
+
+    virtual wxString getColumnLabel(ColumnType colType) const { return wxEmptyString; }
+
+private:
+    const std::shared_ptr<MessageView> msgView_;
+};
 }
 
 
 class LogControl : public LogControlGenerated
 {
 public:
-    LogControl(wxWindow* parent, const ErrorLog& log) : LogControlGenerated(parent), log_(log)
+    LogControl(wxWindow* parent, const ErrorLog& log) : LogControlGenerated(parent),
+        msgView(std::make_shared<MessageView>(log))
     {
-        const int errorCount   = log_.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR);
-        const int warningCount = log_.getItemCount(TYPE_WARNING);
-        const int infoCount    = log_.getItemCount(TYPE_INFO);
+        const int errorCount   = log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR);
+        const int warningCount = log.getItemCount(TYPE_WARNING);
+        const int infoCount    = log.getItemCount(TYPE_INFO);
 
         m_bpButtonErrors  ->init(buttonPressed ("msg_error"  ), buttonReleased("msg_error"  ), _("Error"  ) + wxString::Format(L" (%d)", errorCount  ));
         m_bpButtonWarnings->init(buttonPressed ("msg_warning"), buttonReleased("msg_warning"), _("Warning") + wxString::Format(L" (%d)", warningCount));
@@ -311,47 +580,49 @@ public:
         m_bpButtonWarnings->Show(warningCount != 0);
         m_bpButtonInfo    ->Show(infoCount    != 0);
 
-        m_textCtrlInfo->SetMaxLength(0); //allow large entries!
+        //init grid, determine default sizes
+        const int rowHeight           = GridDataMessages::getRowDefaultHeight(*m_gridMessages);
+        const int colMsgTimeWidth     = GridDataMessages::getColumnTimeDefaultWidth(*m_gridMessages);
+        const int colMsgCategoryWidth = GridDataMessages::getColumnCategoryDefaultWidth();
 
-        updateLogText();
+        m_gridMessages->setDataProvider(std::make_shared<GridDataMessages>(msgView));
+        m_gridMessages->setColumnLabelHeight(0);
+        m_gridMessages->showRowLabel(false);
+        m_gridMessages->setRowHeight(rowHeight);
+        std::vector<Grid::ColumnAttribute> attr;
+        attr.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_MSG_TIME    ), colMsgTimeWidth, 0));
+        attr.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_MSG_CATEGORY), colMsgCategoryWidth, 0));
+        attr.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_MSG_TEXT    ), -colMsgTimeWidth - colMsgCategoryWidth, 1));
+        m_gridMessages->setColumnConfig(attr);
 
-        m_textCtrlInfo->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(LogControl::onKeyEvent), nullptr, this);
+        //support for CTRL + C
+        m_gridMessages->getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(LogControl::onGridButtonEvent), nullptr, this);
+
+        m_gridMessages->Connect(EVENT_GRID_MOUSE_RIGHT_UP, GridClickEventHandler(LogControl::onMsgGridContext), nullptr, this);
+
+        updateGrid();
     }
 
 private:
     virtual void OnErrors(wxCommandEvent& event)
     {
         m_bpButtonErrors->toggle();
-        updateLogText();
+        updateGrid();
     }
 
     virtual void OnWarnings(wxCommandEvent& event)
     {
         m_bpButtonWarnings->toggle();
-        updateLogText();
+        updateGrid();
     }
 
     virtual void OnInfo(wxCommandEvent& event)
     {
         m_bpButtonInfo->toggle();
-        updateLogText();
+        updateGrid();
     }
 
-    void onKeyEvent(wxKeyEvent& event)
-    {
-        const int keyCode = event.GetKeyCode();
-
-        if (event.ControlDown())
-            switch (keyCode)
-            {
-                case 'A': //CTRL + A
-                    m_textCtrlInfo->SetSelection(-1, -1); //select all
-                    return;
-            }
-        event.Skip();
-    }
-
-    void updateLogText()
+    void updateGrid()
     {
         int includedTypes = 0;
         if (m_bpButtonErrors->isActive())
@@ -363,27 +634,83 @@ private:
         if (m_bpButtonInfo->isActive())
             includedTypes |= TYPE_INFO;
 
-        //fast replacement for wxString modelling exponential growth
-        MsgString logText;
-
-        const auto& entries = log_.getEntries();
-        for (auto iter = entries.begin(); iter != entries.end(); ++iter)
-            if (iter->type & includedTypes)
-            {
-                logText += formatMessage(*iter);
-                logText += L'\n';
-            }
-
-        if (logText.empty()) //if no messages match selected view filter, at least show final status message
-            if (!entries.empty())
-                logText = formatMessage(entries.back());
-
-        wxWindowUpdateLocker dummy(m_textCtrlInfo);
-        m_textCtrlInfo->ChangeValue(copyStringTo<wxString>(logText));
-        m_textCtrlInfo->ShowPosition(m_textCtrlInfo->GetLastPosition());
+        msgView->updateView(includedTypes); //update MVC "model"
+        m_gridMessages->Refresh();   //update MVC "view"
     }
 
-    const ErrorLog log_;
+
+    void onGridButtonEvent(wxKeyEvent& event)
+    {
+        int keyCode = event.GetKeyCode();
+
+        if (event.ControlDown())
+            switch (keyCode)
+            {
+                case 'C':
+                case WXK_INSERT: //CTRL + C || CTRL + INS
+                    copySelectionToClipboard();
+                    return; // -> swallow event! don't allow default grid commands!
+            }
+
+        event.Skip(); //unknown keypress: propagate
+    }
+
+    void onMsgGridContext(GridClickEvent& event)
+    {
+        const std::vector<size_t> selection = m_gridMessages->getSelectedRows();
+
+        ContextMenu menu;
+        menu.addItem(_("Copy") + L"\tCtrl+C", [this] { copySelectionToClipboard(); }, nullptr, !selection.empty(), wxID_COPY);
+        menu.popup(*this);
+    }
+
+    void copySelectionToClipboard()
+    {
+        try
+        {
+            typedef Zbase<wchar_t> zxString; //guaranteed exponential growth, unlike wxString
+            zxString clipboardString;
+
+            if (auto prov = m_gridMessages->getDataProvider())
+            {
+                std::vector<Grid::ColumnAttribute> colAttr = m_gridMessages->getColumnConfig();
+                vector_remove_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
+                if (!colAttr.empty())
+                {
+                    const std::vector<size_t> selection = m_gridMessages->getSelectedRows();
+                    std::for_each(selection.begin(), selection.end(),
+                                  [&](size_t row)
+                    {
+#ifdef _MSC_VER
+                        typedef zxString zxString; //workaround MSVC compiler bug!
+#endif
+                        std::for_each(colAttr.begin(), --colAttr.end(),
+                                      [&](const Grid::ColumnAttribute& ca)
+                        {
+                            clipboardString += copyStringTo<zxString>(prov->getValue(row, ca.type_));
+                            clipboardString += L'\t';
+                        });
+                        clipboardString += copyStringTo<zxString>(prov->getValue(row, colAttr.back().type_));
+                        clipboardString += L'\n';
+                    });
+                }
+            }
+
+            //finally write to clipboard
+            if (!clipboardString.empty())
+                if (wxClipboard::Get()->Open())
+                {
+                    ZEN_ON_SCOPE_EXIT(wxClipboard::Get()->Close());
+                    wxClipboard::Get()->SetData(new wxTextDataObject(copyStringTo<wxString>(clipboardString))); //ownership passed
+                }
+        }
+        catch (const std::bad_alloc& e)
+        {
+            wxMessageBox(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()), _("Error"), wxOK | wxICON_ERROR);
+        }
+    }
+
+    std::shared_ptr<MessageView> msgView; //bound!
 };
 
 //########################################################################################
@@ -983,12 +1310,12 @@ void SyncStatus::SyncStatusImpl::updateProgress(bool allowYield)
         if (paused_)
         {
             stopTimer();
+            ZEN_ON_SCOPE_EXIT(resumeTimer());
             while (paused_)
             {
                 wxMilliSleep(UI_UPDATE_INTERVAL);
                 updateUiNow(); //receive UI message that ends pause
             }
-            resumeTimer();
         }
         /*
             /|\
@@ -1242,7 +1569,7 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const E
     m_listbookResult->AddPage(logControl, _("Logging"), false);
     //bSizerHoldStretch->Insert(0, logControl, 1, wxEXPAND);
 
-    //show log instead of graph if errors occured! (not required for ignored warnings)
+    //show log instead of graph if errors occurred! (not required for ignored warnings)
     if (log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR) > 0)
         m_listbookResult->ChangeSelection(posLog);
 

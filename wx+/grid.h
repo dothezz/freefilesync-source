@@ -20,7 +20,7 @@ namespace zen
 {
 typedef enum { DUMMY_COLUMN_TYPE = static_cast<unsigned int>(-1) } ColumnType;
 
-//----- Events -----------------------------------------------------------------------------------------------
+//----- events ------------------------------------------------------------------------
 extern const wxEventType EVENT_GRID_COL_LABEL_MOUSE_LEFT;  //generates: GridClickEvent
 extern const wxEventType EVENT_GRID_COL_LABEL_MOUSE_RIGHT; //
 extern const wxEventType EVENT_GRID_COL_RESIZE;   //generates: GridColumnResizeEvent
@@ -33,17 +33,14 @@ extern const wxEventType EVENT_GRID_MOUSE_RIGHT_UP;    //
 
 extern const wxEventType EVENT_GRID_SELECT_RANGE; //generates: GridRangeSelectEvent
 //NOTE: neither first nor second row need to match EVENT_GRID_MOUSE_LEFT_DOWN/EVENT_GRID_MOUSE_LEFT_UP: user holding SHIFT; moving out of window...
-//=> range always specifies *valid* rows
 
 //example: wnd.Connect(EVENT_GRID_COL_LABEL_LEFT_CLICK, GridClickEventHandler(MyDlg::OnLeftClick), nullptr, this);
 
-
 struct GridClickEvent : public wxMouseEvent
 {
-    GridClickEvent(wxEventType et, const wxMouseEvent& me, int row, ColumnType colType, size_t compPos) : wxMouseEvent(me), row_(row), colType_(colType), compPos_(compPos) { SetEventType(et); }
+    GridClickEvent(wxEventType et, const wxMouseEvent& me, ptrdiff_t row, ColumnType colType, size_t compPos) : wxMouseEvent(me), row_(row), colType_(colType), compPos_(compPos) { SetEventType(et); }
     virtual wxEvent* Clone() const { return new GridClickEvent(*this); }
-
-    const int row_;
+    const ptrdiff_t row_; //-1 for invalid position, >= rowCount if out of range
     const ColumnType colType_;
     const size_t compPos_;
 };
@@ -60,11 +57,11 @@ struct GridColumnResizeEvent : public wxCommandEvent
 
 struct GridRangeSelectEvent : public wxCommandEvent
 {
-    GridRangeSelectEvent(int rowFrom, int rowTo, size_t compPos, bool positive) : wxCommandEvent(EVENT_GRID_SELECT_RANGE), rowFrom_(rowFrom), rowTo_(rowTo), compPos_(compPos), positive_(positive) {}
+    GridRangeSelectEvent(size_t rowFirst, size_t rowLast, size_t compPos, bool positive) : wxCommandEvent(EVENT_GRID_SELECT_RANGE), rowFirst_(rowFirst), rowLast_(rowLast), compPos_(compPos), positive_(positive) { assert(rowFirst <= rowLast); }
     virtual wxEvent* Clone() const { return new GridRangeSelectEvent(*this); }
 
-    const int    rowFrom_;
-    const int    rowTo_;
+    const size_t rowFirst_; //selected range: [rowFirst_, rowLast_)
+    const size_t rowLast_;  //range is empty when clearing selection
     const size_t compPos_;
     const bool   positive_;
 };
@@ -168,7 +165,7 @@ public:
     void showScrollBars(ScrollBarStatus horizontal, ScrollBarStatus vertical);
 
     std::vector<size_t> getSelectedRows(size_t compPos = 0) const;
-    void clearSelection(size_t compPos = 0);
+    void clearSelection(bool emitSelectRangeEvent = true, size_t compPos = 0); //turn off range selection event when calling this function in an event handler to avoid recursion!
 
     void scrollDelta(int deltaX, int deltaY); //in scroll units
 
@@ -176,8 +173,9 @@ public:
     wxWindow& getRowLabelWin();
     wxWindow& getColLabelWin();
     wxWindow& getMainWin    ();
+    const wxWindow& getMainWin() const;
 
-    ptrdiff_t getRowAtPos(int posY) const; //returns < 0 if column not found; absolute coordinates!
+    ptrdiff_t getRowAtPos(int posY) const; //return -1 for invalid position, >= rowCount if out of range; absolute coordinates!
     Opt<std::pair<ColumnType, size_t>> getColumnAtPos(int posX) const; //returns (column type, component pos)
 
     wxRect getCellArea(size_t row, ColumnType colType, size_t compPos = 0) const; //returns empty rect if column not found; absolute coordinates!
@@ -185,7 +183,7 @@ public:
     void enableColumnMove  (bool value, size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].allowColumnMove   = value; }
     void enableColumnResize(bool value, size_t compPos = 0) { if (compPos < comp.size()) comp[compPos].allowColumnResize = value; }
 
-    void setGridCursor(size_t row, size_t compPos = 0); //set + show + select cursor
+    void setGridCursor(size_t row, size_t compPos = 0); //set + show + select cursor (+ emit range selection event)
     std::pair<size_t, size_t> getGridCursor() const; //(row, component pos)
 
     void scrollTo(size_t row);
@@ -193,6 +191,7 @@ public:
     virtual void Refresh(bool eraseBackground = true, const wxRect* rect = nullptr);
     virtual bool Enable( bool enable = true) { Refresh(); return wxScrolledWindow::Enable(enable); }
     void autoSizeColumns(size_t compPos = 0);
+    //############################################################################################################
 
 private:
     void onPaintEvent(wxPaintEvent& event);
@@ -235,15 +234,16 @@ private:
 
         bool isSelected(size_t row) const { return row < rowSelectionValue.size() ? rowSelectionValue[row] != 0 : false; }
 
-        void selectRange(ptrdiff_t rowFrom, ptrdiff_t rowTo, bool positive = true) //select [rowFrom, rowTo], very tolerant: trims and swaps if required!
+        void selectRange(size_t rowFirst, size_t rowLast, bool positive = true) //select [rowFirst, rowLast), trims if required!
         {
-            auto rowFirst = std::min(rowFrom, rowTo);
-            auto rowLast  = std::max(rowFrom, rowTo) + 1;
+            if (rowFirst <= rowLast)
+            {
+                numeric::confine<size_t>(rowFirst, 0, rowSelectionValue.size());
+                numeric::confine<size_t>(rowLast,  0, rowSelectionValue.size());
 
-            numeric::confine<ptrdiff_t>(rowFirst, 0, rowSelectionValue.size());
-            numeric::confine<ptrdiff_t>(rowLast,  0, rowSelectionValue.size());
-
-            std::fill(rowSelectionValue.begin() + rowFirst, rowSelectionValue.begin() + rowLast, positive);
+                std::fill(rowSelectionValue.begin() + rowFirst, rowSelectionValue.begin() + rowLast, positive);
+            }
+            else assert(false);
         }
 
     private:
@@ -294,50 +294,11 @@ private:
 
     void setColWidthAndNotify(ptrdiff_t width, size_t col, size_t compPos, bool notifyAsync = false);
 
-    //ptrdiff_t getNormalizedColOffset(ptrdiff_t offset, ptrdiff_t stretchedWidth) const; //normalize so that "stretchedWidth + offset" gives reasonable width!
-
-    //Opt<ptrdiff_t> getColOffsetNorm(size_t col, size_t compPos) const //returns *normalized* offset!
-    //   {
-    //       if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
-    //       {
-    //           const VisibleColumn& vc = comp[compPos].visibleCols[col];
-    //           return getNormalizedColOffset(vc.offset_, getColStretchedWidth(vc.stretch_));
-    //       }
-    //       return NoValue();
-    //   }
-
-    //Opt<VisibleColumn> getColAttrib(size_t col, size_t compPos) const
-    //{
-    //       if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
-    //       return comp[compPos].visibleCols[col];
-    //       return NoValue();
-    //}
-
-    //Opt<ptrdiff_t> getColStretchedWidth(size_t col, size_t compPos) const
-    //   {
-    //       if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
-    //       {
-    //           const VisibleColumn& vc = comp[compPos].visibleCols[col];
-    //		return getColStretchedWidth(vc.stretch_);
-    //       }
-    //       return NoValue();
-    //   }
-
-
-    //void setColOffset(size_t col, size_t compPos, ptrdiff_t offset)
-    //   {
-    //       if (compPos < comp.size() && col < comp[compPos].visibleCols.size())
-    //       {
-    //           VisibleColumn& vc = comp[compPos].visibleCols[col];
-    //           vc.offset_ = offset;
-    //       }
-    //   }
-
     wxRect getColumnLabelArea(ColumnType colType, size_t compPos) const; //returns empty rect if column not found
 
-    void selectRange(ptrdiff_t rowFrom, ptrdiff_t rowTo, size_t compPos, bool positive = true); //select range + notify event!
+    void selectRangeAndNotify(ptrdiff_t rowFrom, ptrdiff_t rowTo, size_t compPos, bool positive = true); //select inclusive range [rowFrom, rowTo] + notify event!
 
-    void clearSelectionAll(); //clear selection + notify event
+    void clearSelectionAllAndNotify(); //clear selection + notify event
 
     bool isSelected(size_t row, size_t compPos) const { return compPos < comp.size() ? comp[compPos].selection.isSelected(row) : false; }
 
@@ -359,9 +320,9 @@ private:
     /*
     Visual layout:
         ------------------------------------------------
-        |CornerWin   | RowLabelWin:                    |
+        |CornerWin   | ColLabelWin:                    |
         |--------------------------  Comp1 | Comp2 ... |   row label and main window are vertically tiled into one or more "components"
-        |ColLabelWin | MainWin:                        |
+        |RowLabelWin | MainWin:                        |
         ------------------------------------------------
     */
     CornerWin*   cornerWin_;

@@ -9,7 +9,6 @@
 
 //temporary solution until C++11 thread becomes fully available
 #include <memory>
-#include "fixed_list.h"
 
 //fix this pathetic boost thread warning mess
 #ifdef __MINGW32__
@@ -64,12 +63,12 @@ public:
     bool timedWait(const Duration& duration) const; //true: "get()" is ready, false: time elapsed
 
     //return first value or none if all jobs failed; blocks until result is ready!
-    std::unique_ptr<T> get() const; //must be called only once!
+    std::unique_ptr<T> get() const; //may be called only once!
 
 private:
     class AsyncResult;
-    FixedList<boost::thread> workload; //note: we cannot use std::vector<boost::thread>: compiler error on GCC 4.7, probably a boost screw-up
     std::shared_ptr<AsyncResult> result;
+    size_t jobsTotal;
 };
 
 
@@ -93,11 +92,12 @@ private:
 #endif
 
 template <class T, class Function> inline
-auto async2(Function fun) -> boost::unique_future<T> //workaround VS2010 bug: bool (*fun)();  decltype(fun()) == int!
+auto async2(Function fun) -> boost::unique_future<T> //support for workaround of VS2010 bug: bool (*fun)();  decltype(fun()) == int!
 {
-    boost::packaged_task<T> pt([=] { return fun(); });
+    boost::packaged_task<T> pt(fun);
     auto fut = pt.get_future();
-    boost::thread(std::move(pt));
+    boost::thread t(std::move(pt));
+    t.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
     return std::move(fut); //compiler error without "move", why needed???
 }
 
@@ -181,28 +181,27 @@ private:
 
 
 template <class T> inline
-RunUntilFirstHit<T>::RunUntilFirstHit() : result(std::make_shared<AsyncResult>()) {}
+RunUntilFirstHit<T>::RunUntilFirstHit() : result(std::make_shared<AsyncResult>()), jobsTotal(0) {}
 
 
 template <class T>
 template <class Fun> inline
 void RunUntilFirstHit<T>::addJob(Fun f) //f must return a std::unique_ptr<T> containing a value on success
 {
-    auto result2 = result; //VC11: this is ridiculous!!!
-    workload.emplace_back([result2, f]
-    {
-        result2->reportFinished(f());
-    });
+    auto result2 = result; //MSVC2010: this is ridiculous!!!
+    boost::thread t([result2, f] { result2->reportFinished(f()); });
+    ++jobsTotal;
+    t.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
 }
 
 
 template <class T>
 template <class Duration> inline
-bool RunUntilFirstHit<T>::timedWait(const Duration& duration) const { return result->waitForResult(workload.size(), duration); }
+bool RunUntilFirstHit<T>::timedWait(const Duration& duration) const { return result->waitForResult(jobsTotal, duration); }
 
 
 template <class T> inline
-std::unique_ptr<T> RunUntilFirstHit<T>::get() const { return result->getResult(workload.size()); }
+std::unique_ptr<T> RunUntilFirstHit<T>::get() const { return result->getResult(jobsTotal); }
 }
 
 #endif //BOOST_THREAD_WRAP_H

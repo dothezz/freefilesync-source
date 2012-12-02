@@ -105,7 +105,7 @@ public:
 
 #elif defined FFS_LINUX
         const int fileHandle = ::open(lockfilename_.c_str(), O_WRONLY | O_APPEND);
-        if (fileHandle == -1)
+        if (fileHandle < 0)
             return;
         ZEN_ON_SCOPE_EXIT(::close(fileHandle));
 
@@ -418,20 +418,20 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
 
         while (true)
         {
-            const TickVal currentTime = getTicks();
+            const TickVal now = getTicks();
             const UInt64 fileSizeNew = ::getLockFileSize(lockfilename); //throw FileError, ErrorNotExisting
 
-            if (TICKS_PER_SEC <= 0 || !lastLifeSign.isValid() || !currentTime.isValid())
+            if (TICKS_PER_SEC <= 0 || !lastLifeSign.isValid() || !now.isValid())
                 throw FileError(L"System Timer failed!"); //no i18n: "should" never throw ;)
 
             if (fileSizeNew != fileSizeOld) //received life sign from lock
             {
                 fileSizeOld  = fileSizeNew;
-                lastLifeSign = currentTime;
+                lastLifeSign = now;
             }
 
             if (lockOwnderDead || //no need to wait any longer...
-                (currentTime - lastLifeSign) / TICKS_PER_SEC > DETECT_ABANDONED_INTERVAL)
+                dist(lastLifeSign, now) / TICKS_PER_SEC > DETECT_ABANDONED_INTERVAL)
             {
                 DirLock dummy(deleteAbandonedLockName(lockfilename), callback); //throw FileError
 
@@ -458,11 +458,9 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                 if (callback)
                 {
                     //one signal missed: it's likely this is an abandoned lock => show countdown
-                    if ((currentTime - lastLifeSign) / TICKS_PER_SEC > EMIT_LIFE_SIGN_INTERVAL)
+                    if (dist(lastLifeSign, now) / TICKS_PER_SEC > EMIT_LIFE_SIGN_INTERVAL)
                     {
-                        int remainingSeconds = DETECT_ABANDONED_INTERVAL - (getTicks() - lastLifeSign) / TICKS_PER_SEC;
-                        remainingSeconds = std::max(0, remainingSeconds);
-
+                        const int remainingSeconds = std::max<int>(0, DETECT_ABANDONED_INTERVAL - dist(lastLifeSign, getTicks()) / TICKS_PER_SEC);
                         const std::wstring remSecMsg = replaceCpy(_P("1 sec", "%x sec", remainingSeconds), L"%x", numberTo<std::wstring>(remainingSeconds));
                         callback->reportInfo(infoMsg + L" " + remSecMsg);
                     }

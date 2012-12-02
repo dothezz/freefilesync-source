@@ -123,7 +123,7 @@ public:
 
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName) { return nullptr; }
-    virtual HandleError onError(const std::wstring& msg) { return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleError onError(const std::wstring& msg) { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
 
 private:
     std::vector<Zstring>& lngFiles_;

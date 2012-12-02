@@ -29,6 +29,7 @@ public:
                        const zen::TimeComp& timeStamp,
                        const Zstring& logfileDirectory,
                        int logfilesCountLimit, //0: logging inactive; < 0: no limit
+                       size_t lastSyncsLogFileSizeMax,
                        const xmlAccess::OnError handleError,
                        const zen::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                        zen::FfsReturnCode& returnCode,
@@ -51,6 +52,7 @@ private:
     const zen::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
     bool showFinalResults;
     bool switchToGuiRequested;
+    const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnError handleError_;
     zen::ErrorLog errorLog; //list of non-resolved errors and warnings
     zen::FfsReturnCode& returnCode_;

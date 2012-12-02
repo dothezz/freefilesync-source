@@ -48,22 +48,22 @@ extern const wxEventType EVENT_GRID_SYNC_DIRECTION;
 
 struct CheckRowsEvent : public wxCommandEvent
 {
-    CheckRowsEvent(ptrdiff_t rowFrom, ptrdiff_t rowTo, bool setIncluded) : wxCommandEvent(EVENT_GRID_CHECK_ROWS), rowFrom_(rowFrom), rowTo_(rowTo), setIncluded_(setIncluded) {}
+    CheckRowsEvent(size_t rowFirst, size_t rowLast, bool setIncluded) : wxCommandEvent(EVENT_GRID_CHECK_ROWS), rowFirst_(rowFirst), rowLast_(rowLast), setIncluded_(setIncluded) { assert(rowFirst <= rowLast); }
     virtual wxEvent* Clone() const { return new CheckRowsEvent(*this); }
 
-    const ptrdiff_t rowFrom_;
-    const ptrdiff_t rowTo_;
+    const size_t rowFirst_; //selected range: [rowFirst_, rowLast_)
+    const size_t rowLast_;  //range is empty when clearing selection
     const bool setIncluded_;
 };
 
 
 struct SyncDirectionEvent : public wxCommandEvent
 {
-    SyncDirectionEvent(ptrdiff_t rowFrom, ptrdiff_t rowTo, SyncDirection direction) : wxCommandEvent(EVENT_GRID_SYNC_DIRECTION), rowFrom_(rowFrom), rowTo_(rowTo), direction_(direction) {}
+    SyncDirectionEvent(size_t rowFirst, size_t rowLast, SyncDirection direction) : wxCommandEvent(EVENT_GRID_SYNC_DIRECTION), rowFirst_(rowFirst), rowLast_(rowLast), direction_(direction) { assert(rowFirst <= rowLast); }
     virtual wxEvent* Clone() const { return new SyncDirectionEvent(*this); }
 
-    const ptrdiff_t rowFrom_;
-    const ptrdiff_t rowTo_;
+    const size_t rowFirst_; //see CheckRowsEvent
+    const size_t rowLast_;  //
     const SyncDirection direction_;
 };
 

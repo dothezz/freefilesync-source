@@ -18,7 +18,7 @@
 #include "lib/error_log.h"
 
 #ifdef FFS_WIN
-#include <zen/win_ver.h> 
+#include <zen/win_ver.h>
 #elif defined FFS_LINUX
 #include <gtk/gtk.h>
 #endif

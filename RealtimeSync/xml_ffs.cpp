@@ -79,7 +79,7 @@ int rts::getProgramLanguage()
     {
         xmlAccess::readConfig(settings);
     }
-    catch (const xmlAccess::FfsXmlError&) {} //user default language if error occured
+    catch (const xmlAccess::FfsXmlError&) {} //user default language if error occurred
 
     return settings.programLanguage;
 }

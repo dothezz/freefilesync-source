@@ -541,7 +541,7 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
         std::for_each(worker.begin(), worker.end(), [](boost::thread& wt) { wt.interrupt(); }); //interrupt all at once, then join
         std::for_each(worker.begin(), worker.end(), [](boost::thread& wt)
         {
-            if (wt.joinable()) //this is a precondition of thread::join()!!! Latter will throw an exception if violated!
+            if (wt.joinable()) //= precondition of thread::join(), which throws an exception if violated!
                 wt.join();     //in this context it is possible a thread is *not* joinable anymore due to the thread::timed_join() below!
         });
     });

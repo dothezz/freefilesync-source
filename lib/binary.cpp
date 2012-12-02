@@ -44,7 +44,7 @@ public:
 
 private:
     static const size_t BUFFER_SIZE_MIN   =        64 * 1024;
-    static const size_t BUFFER_SIZE_START =       512 * 1024; //512 kb seems to be a reasonable initial buffer size
+    static const size_t BUFFER_SIZE_START =       128 * 1024; //initial buffer size
     static const size_t BUFFER_SIZE_MAX   = 16 * 1024 * 1024;
 
     /*Tests on Win7 x64 show that buffer size does NOT matter if files are located on different physical disks!
@@ -99,23 +99,23 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
         const size_t length1 = file1.read(&memory1[0], bufferSize); //returns actual number of bytes read; throw FileError()
         const size_t length2 = file2.read(&memory2[0], bufferSize); //
 
-        const TickVal stopTime = getTicks();
+        const TickVal now = getTicks();
 
         //-------- dynamically set buffer size to keep callback interval between 100 - 500ms ---------------------
         if (TICKS_PER_SEC > 0)
         {
-            const std::int64_t loopTime = (stopTime - startTime) * 1000 / TICKS_PER_SEC; //unit: [ms]
+            const std::int64_t loopTime = dist(startTime, now) * 1000 / TICKS_PER_SEC; //unit: [ms]
             if (loopTime < 100)
             {
-                if ((stopTime - lastDelayViolation) / TICKS_PER_SEC > 2) //avoid "flipping back": e.g. DVD-Roms read 32MB at once, so first read may be > 500 ms, but second one will be 0ms!
+                if (dist(lastDelayViolation, now) / TICKS_PER_SEC > 2) //avoid "flipping back": e.g. DVD-Roms read 32MB at once, so first read may be > 500 ms, but second one will be 0ms!
                 {
-                    lastDelayViolation = stopTime;
+                    lastDelayViolation = now;
                     bufferSize.inc();
                 }
             }
             else if (loopTime > 500)
             {
-                lastDelayViolation = stopTime;
+                lastDelayViolation = now;
                 bufferSize.dec();
             }
         }

@@ -8,8 +8,10 @@
 #define ZEN_TICK_COUNT_HEADER_3807326
 
 #include <cstdint>
+#include <algorithm>
 #include "type_traits.h"
 #include "assert_static.h"
+#include <cmath>
 
 #ifdef FFS_WIN
 #include "win.h" //includes "windows.h"
@@ -21,14 +23,10 @@ namespace zen
 {
 //a portable "GetTickCount()" using "wall time equivalent" - e.g. no jumps due to ntp time corrections
 class TickVal;
-std::int64_t operator-(const TickVal& lhs, const TickVal& rhs);
+std::int64_t dist(const TickVal& lhs, const TickVal& rhs); //use absolute difference for paranoid security: even QueryPerformanceCounter "wraps-around" at *some* time
 
 std::int64_t ticksPerSec(); //return 0 on error
 TickVal getTicks();         //return invalid value on error: !TickVal::isValid()
-
-
-
-
 
 
 
@@ -58,19 +56,31 @@ public:
     explicit TickVal(const NativeVal& val) : val_(val) {}
 
     inline friend
-    std::int64_t operator-(const TickVal& lhs, const TickVal& rhs)
+    std::int64_t dist(const TickVal& lhs, const TickVal& rhs)
     {
 #ifdef FFS_WIN
         assert_static(IsSignedInt<decltype(lhs.val_.QuadPart)>::value);
-        return lhs.val_.QuadPart - rhs.val_.QuadPart;
+        return std::abs(lhs.val_.QuadPart - rhs.val_.QuadPart);
 #elif defined FFS_LINUX
         assert_static(IsSignedInt<decltype(lhs.val_.tv_sec)>::value);
         assert_static(IsSignedInt<decltype(lhs.val_.tv_nsec)>::value);
-        return static_cast<std::int64_t>(lhs.val_.tv_sec - rhs.val_.tv_sec) * 1000000000.0 + lhs.val_.tv_nsec - rhs.val_.tv_nsec;
+        return std::abs(static_cast<std::int64_t>(lhs.val_.tv_sec - rhs.val_.tv_sec) * 1000000000.0 + (lhs.val_.tv_nsec - rhs.val_.tv_nsec));
 #endif
     }
 
-    bool isValid() const { return *this - TickVal() != 0; }
+    inline friend
+    bool operator<(const TickVal& lhs, const TickVal& rhs) //evaluate directly rather than reuse operator-
+    {
+#ifdef FFS_WIN
+        return lhs.val_.QuadPart < rhs.val_.QuadPart;
+#elif defined FFS_LINUX
+        if (lhs.val_.tv_sec != rhs.val_.tv_sec)
+            return lhs.val_.tv_sec < rhs.val_.tv_sec;
+        return lhs.val_.tv_nsec < rhs.val_.tv_nsec;
+#endif
+    }
+
+    bool isValid() const { return dist(*this, TickVal()) != 0; }
 
 private:
     NativeVal val_;
@@ -82,7 +92,7 @@ std::int64_t ticksPerSec() //return 0 on error
 {
 #ifdef FFS_WIN
     LARGE_INTEGER frequency = {};
-    if (!::QueryPerformanceFrequency(&frequency))
+    if (!::QueryPerformanceFrequency(&frequency)) //MSDN promises: "The frequency cannot change while the system is running."
         return 0;
     assert_static(sizeof(std::int64_t) >= sizeof(frequency.QuadPart));
     return frequency.QuadPart;

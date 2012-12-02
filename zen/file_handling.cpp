@@ -28,9 +28,8 @@
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
-#include <time.h>
 #include <utime.h>
-#include <sys/time.h>
+#include <sys/time.h> //futimes
 #include <sys/vfs.h>
 
 #ifdef HAVE_SELINUX
@@ -926,7 +925,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
 #elif defined FFS_LINUX
     if (procSl == SYMLINK_FOLLOW)
     {
-        struct utimbuf newTimes = {};
+        struct ::utimbuf newTimes = {};
         newTimes.actime  = ::time(nullptr);
         newTimes.modtime = to<time_t>(modificationTime);
 
@@ -936,12 +935,9 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
     }
     else
     {
-        struct timeval newTimes[2] = {};
-        newTimes[0].tv_sec  = ::time(nullptr); //seconds
-        newTimes[0].tv_usec = 0;	           //microseconds
-
-        newTimes[1].tv_sec  = to<time_t>(modificationTime);
-        newTimes[1].tv_usec = 0;
+        struct ::timeval newTimes[2] = {};
+        newTimes[0].tv_sec = ::time(nullptr); //access time (seconds)
+        newTimes[1].tv_sec = to<time_t>(modificationTime); //modification time (seconds)
 
         if (::lutimes(filename.c_str(), newTimes) != 0)
             throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
@@ -1315,8 +1311,8 @@ void createDirectoryStraight(const Zstring& directory, //throw FileError, ErrorT
                 ::SetFileAttributes(applyLongPathPrefix(directory).c_str(), sourceAttr);
                 //copy "read-only and system attributes": http://blogs.msdn.com/b/oldnewthing/archive/2003/09/30/55100.aspx
 
-                const bool isCompressed = (sourceAttr & FILE_ATTRIBUTE_COMPRESSED)  != 0;
-                const bool isEncrypted  = (sourceAttr & FILE_ATTRIBUTE_ENCRYPTED)   != 0;
+                const bool isCompressed = (sourceAttr & FILE_ATTRIBUTE_COMPRESSED) != 0;
+                const bool isEncrypted  = (sourceAttr & FILE_ATTRIBUTE_ENCRYPTED)  != 0;
 
                 if (isEncrypted)
                     ::EncryptFile(directory.c_str()); //seems no long path is required (check passed!)
@@ -1492,7 +1488,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
         catch (...) {}
     });
 
-    //file times: essential for a symlink: enforce this! (don't just try!)
+    //file times: essential for sync'ing a symlink: enforce this! (don't just try!)
     {
         const Int64 modTime = getFileTime(sourceLink, SYMLINK_DIRECT); //throw FileError
         setFileTime(targetLink, modTime, SYMLINK_DIRECT); //throw FileError
@@ -1741,11 +1737,8 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     }
 
     //----------------------------------------------------------------------
-    const DWORD BUFFER_SIZE = 512 * 1024; //512 kb seems to be a reasonable buffer size - must be greater than sizeof(WIN32_STREAM_ID)
-    static boost::thread_specific_ptr<std::vector<BYTE>> cpyBuf;
-    if (!cpyBuf.get())
-        cpyBuf.reset(new std::vector<BYTE>(BUFFER_SIZE));
-    std::vector<BYTE>& buffer = *cpyBuf;
+    const DWORD BUFFER_SIZE = 128 * 1024; //must be greater than sizeof(WIN32_STREAM_ID)
+    std::vector<BYTE> buffer(BUFFER_SIZE);
 
     LPVOID contextRead  = nullptr; //manage context for BackupRead()/BackupWrite()
     LPVOID contextWrite = nullptr; //
@@ -2172,23 +2165,21 @@ void copyFileLinux(const Zstring& sourceFile,
                    FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 {
     zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (...) {} }); //transactional behavior: place guard before lifetime of FileOutput
+
+    //open sourceFile for reading
+    FileInputUnbuffered fileIn(sourceFile); //throw FileError, ErrorNotExisting
+
+    struct ::stat sourceInfo = {};
+    if (::fstat(fileIn.getDescriptor(), &sourceInfo) != 0) //read file attributes from source
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + getLastErrorFormatted());
+
     try
     {
-        //open sourceFile for reading
-        FileInput fileIn(sourceFile); //throw FileError
-
         //create targetFile and open it for writing
-        FileOutput fileOut(targetFile, FileOutput::ACC_CREATE_NEW); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
-
-        std::vector<char>& buffer = []() -> std::vector<char>&
-        {
-            static boost::thread_specific_ptr<std::vector<char>> cpyBuf;
-            if (!cpyBuf.get())
-                cpyBuf.reset(new std::vector<char>(512 * 1024)); //512 kb seems to be a reasonable buffer size
-            return *cpyBuf;
-        }();
+        FileOutputUnbuffered fileOut(targetFile, sourceInfo.st_mode); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 
         //copy contents of sourceFile to targetFile
+        std::vector<char> buffer(128 * 1024); //see comment in FileInputUnbuffered::read
         do
         {
             const size_t bytesRead = fileIn.read(&buffer[0], buffer.size()); //throw FileError
@@ -2200,38 +2191,33 @@ void copyFileLinux(const Zstring& sourceFile,
                 callback->updateCopyStatus(Int64(bytesRead)); //throw X!
         }
         while (!fileIn.eof());
+
+        //adapt target file modification time:
+        {
+            struct ::timeval newTimes[2] = {};
+            newTimes[0].tv_sec = sourceInfo.st_atime;
+            newTimes[1].tv_sec = sourceInfo.st_mtime;
+            if (::futimes(fileOut.getDescriptor(), newTimes) != 0) //by using the already open file handle, we avoid issues like: https://sourceforge.net/p/freefilesync/bugs/230/
+                throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
+
+            //read and return file statistics
+            struct ::stat targetInfo = {};
+            if (::fstat(fileOut.getDescriptor(), &targetInfo) != 0)
+                throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
+
+            if (newAttrib)
+            {
+                newAttrib->fileSize         = UInt64(sourceInfo.st_size);
+                newAttrib->modificationTime = sourceInfo.st_mtime;
+                newAttrib->sourceFileId     = extractFileID(sourceInfo);
+                newAttrib->targetFileId     = extractFileID(targetInfo);
+            }
+        }
     }
     catch (ErrorTargetExisting&)
     {
         guardTarget.dismiss(); //don't delete file that existed previously!
         throw;
-    }
-
-    //adapt file modification time:
-    {
-        struct ::stat srcInfo = {};
-        if (::stat(sourceFile.c_str(), &srcInfo) != 0) //read file attributes from source directory
-            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + getLastErrorFormatted());
-
-        struct ::utimbuf newTimes = {};
-        newTimes.actime  = srcInfo.st_atime;
-        newTimes.modtime = srcInfo.st_mtime;
-
-        //set new "last write time"
-        if (::utime(targetFile.c_str(), &newTimes) != 0)
-            throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
-
-        if (newAttrib)
-        {
-            struct ::stat trgInfo = {};
-            if (::stat(targetFile.c_str(), &trgInfo) != 0) //read file attributes from source directory
-                throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
-
-            newAttrib->fileSize         = UInt64(srcInfo.st_size);
-            newAttrib->modificationTime = srcInfo.st_mtime;
-            newAttrib->sourceFileId     = extractFileID(srcInfo);
-            newAttrib->targetFileId     = extractFileID(trgInfo);
-        }
     }
 
     guardTarget.dismiss(); //target has been created successfully!

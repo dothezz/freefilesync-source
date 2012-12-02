@@ -958,10 +958,10 @@ private:
     Int64 spaceNeededLeft;
     Int64 spaceNeededRight;
 };
-}
+
 //----------------------------------------------------------------------------------------
 
-class zen::SynchronizeFolderPair
+class SynchronizeFolderPair
 {
 public:
     SynchronizeFolderPair(ProcessCallback& procCallback,
@@ -1062,16 +1062,15 @@ private:
     const std::wstring txtWritingAttributes;
     const std::wstring txtMovingFile;
 };
+
 //---------------------------------------------------------------------------------------------------------------
-namespace zen
-{
+
 template <> inline
 DeletionHandling& SynchronizeFolderPair::getDelHandling<LEFT_SIDE>() { return delHandlingLeft_; }
 
 template <> inline
 DeletionHandling& SynchronizeFolderPair::getDelHandling<RIGHT_SIDE>() { return delHandlingRight_; }
 }
-
 
 /*
 __________________________
@@ -1578,8 +1577,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
             reportInfo(txtOverwritingFile, target);
 
             FileAttrib newAttr;
-            copyFileUpdatingTo<sideTrg>(fileObj,
-                                        [&] //delete target at appropriate time
+            copyFileUpdatingTo<sideTrg>(fileObj, [&] //delete target at appropriate time
             {
                 reportStatus(this->getDelHandling<sideTrg>().getTxtRemovingFile(), fileObj.getFullName<sideTrg>());
 
@@ -1876,6 +1874,51 @@ struct LessDependentDirectory : public std::binary_function<Zstring, Zstring, bo
     }
 };
 */
+
+template <SelectedSide side> //create base directories first (if not yet existing) -> no symlink or attribute copying!
+bool createBaseDirectory(BaseDirMapping& baseMap, ProcessCallback& callback) //nothrow; return false if fatal error occurred
+{
+    const Zstring dirname = beforeLast(baseMap.getBaseDirPf<side>(), FILE_NAME_SEPARATOR);
+    if (!dirname.empty())
+    {
+        if (baseMap.isExisting<side>()) //atomicity: do NOT check directory existence again!
+        {
+            //just convenience: exit sync right here instead of showing tons of error messages during file copy
+            return tryReportingError([&]
+            {
+                if (!dirExistsUpdating(dirname, false, callback))
+                    throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname))); //this should really be a "fatal error" if not recoverable
+            }, callback); //may throw in error-callback!
+        }
+        else //create target directory: user presumably ignored error "dir existing" in order to have it created automatically
+        {
+            bool temporaryNetworkDrop = false;
+            bool rv = tryReportingError([&]
+            {
+                try
+                {
+                    makeNewDirectory(dirname, Zstring(), false); //FileError, ErrorTargetExisting
+                    //a nice race-free check and set operation!
+                    baseMap.setExisting<side>(true); //update our model!
+                }
+                catch (const ErrorTargetExisting&)
+                {
+                    //TEMPORARY network drop: base directory not found during comparison, but reappears during synchronization
+                    //=> sync-directions are based on false assumptions! Abort.
+                    callback.reportFatalError(replaceCpy(_("Target folder %x already existing."), L"%x", fmtFileName(dirname)));
+                    temporaryNetworkDrop = true;
+
+                    //Is it possible we're catching a "false-positive" here, could FFS have created the directory indirectly after comparison?
+                    //	1. deletion handling: recycler       -> no, temp directory created only at first deletion
+                    //	2. deletion handling: versioning     -> "
+                    //	3. log file creates containing folder -> no, log only created in batch mode, and only *before* comparison
+                }
+            }, callback); //may throw in error-callback!
+            return rv && !temporaryNetworkDrop;
+        }
+    }
+    return true;
+}
 }
 
 
@@ -2086,8 +2129,8 @@ void zen::synchronize(const TimeComp& timeStamp,
                 }
                 return true;
             };
-            if (!checkSourceMissing(j->getBaseDirPf<LEFT_SIDE >(), j->wasExisting<LEFT_SIDE >()) ||
-                !checkSourceMissing(j->getBaseDirPf<RIGHT_SIDE>(), j->wasExisting<RIGHT_SIDE>()))
+            if (!checkSourceMissing(j->getBaseDirPf<LEFT_SIDE >(), j->isExisting<LEFT_SIDE >()) ||
+                !checkSourceMissing(j->getBaseDirPf<RIGHT_SIDE>(), j->isExisting<RIGHT_SIDE>()))
                 continue;
 
             //check if more than 50% of total number of files/dirs are to be created/overwritten/deleted
@@ -2250,50 +2293,8 @@ void zen::synchronize(const TimeComp& timeStamp,
                 continue;
 
             //create base directories first (if not yet existing) -> no symlink or attribute copying!
-            auto createDir = [&](const Zstring& baseDirPf, bool wasExisting) -> bool
-            {
-                const Zstring dirname = beforeLast(baseDirPf, FILE_NAME_SEPARATOR);
-                if (!dirname.empty())
-                {
-                    if (wasExisting) //atomicity: do NOT check directory existence again!
-                    {
-                        //just convenience: exit sync right here instead of showing tons of error messages during file copy
-                        return tryReportingError([&]
-                        {
-                            if (!dirExistsUpdating(dirname, false, callback))
-                                throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname))); //this should really be a "fatal error"
-                        }, callback); //may throw in error-callback!
-                    }
-                    else //create target directory: user presumably ignored error "dir existing" in order to have it created automatically
-                    {
-                        bool temporaryNetworkDrop = false;
-                        bool rv = tryReportingError([&]
-                        {
-                            try
-                            {
-                                makeNewDirectory(dirname, Zstring(), false); //FileError, ErrorTargetExisting
-                                //a nice race-free check and set operation!
-                            }
-                            catch (const ErrorTargetExisting&)
-                            {
-                                //TEMPORARY network drop: base directory not found during comparison, but reappears during synchronization
-                                //=> sync-directions are based on false assumptions! Abort.
-                                callback.reportFatalError(replaceCpy(_("Target folder %x already existing."), L"%x", fmtFileName(baseDirPf)));
-                                temporaryNetworkDrop = true;
-
-                                //Is it possible we're catching a "false-positive" here, could FFS have created the directory indirectly after comparison?
-                                //	1. deletion handling: recycler       -> no, temp directory created only at first deletion
-                                //	2. deletion handling: versioning     -> "
-                                //	3. log file creates containing folder -> no, log only created in batch mode, and only *before* comparison
-                            }
-                        }, callback); //may throw in error-callback!
-                        return rv && !temporaryNetworkDrop;
-                    }
-                }
-                return true;
-            };
-            if (!createDir(j->getBaseDirPf<LEFT_SIDE >(), j->wasExisting<LEFT_SIDE >()) ||
-                !createDir(j->getBaseDirPf<RIGHT_SIDE>(), j->wasExisting<RIGHT_SIDE>()))
+            if (!createBaseDirectory<LEFT_SIDE >(*j, callback) ||
+                !createBaseDirectory<RIGHT_SIDE>(*j, callback))
                 continue; //skip this folder pair
 
             //------------------------------------------------------------------------------------------

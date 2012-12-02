@@ -29,7 +29,7 @@ TickVal lastExec = getTicks();
 bool zen::updateUiIsAllowed()
 {
     const TickVal now = getTicks(); //0 on error
-    if (now - lastExec >= TICKS_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
+    if (dist(lastExec, now) >= TICKS_UPDATE_INTERVAL) //perform ui updates not more often than necessary
     {
         lastExec = now;
         return true;

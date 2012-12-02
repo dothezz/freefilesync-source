@@ -76,12 +76,12 @@ class MainDialogGenerated : public wxFrame
 		wxMenuItem* m_menuItemLoad;
 		wxMenuItem* m_menuItemSave;
 		wxMenuItem* m_menuItemSaveAs;
+		wxMenuItem* m_menuItem7;
 		wxMenuItem* m_menuItem10;
 		wxMenuItem* m_menuItem11;
 		wxMenu* m_menuAdvanced;
 		wxMenu* m_menuLanguages;
 		wxMenuItem* m_menuItemGlobSett;
-		wxMenuItem* m_menuItem7;
 		wxMenu* m_menuHelp;
 		wxMenuItem* m_menuItemManual;
 		wxMenuItem* m_menuItemCheckVer;
@@ -134,6 +134,7 @@ class MainDialogGenerated : public wxFrame
 		wxBoxSizer* bSizerConfig;
 		wxBitmapButton* m_bpButtonLoad;
 		wxBitmapButton* m_bpButtonSave;
+		wxBitmapButton* m_bpButtonBatchJob;
 		wxListBox* m_listBoxHistory;
 		wxPanel* m_panelFilter;
 		wxBitmapButton* m_bpButtonFilter;
@@ -177,11 +178,11 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnConfigLoad( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConfigSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConfigSaveAs( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMenuBatchJob( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCompare( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStartSync( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMenuQuit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMenuGlobalSettings( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMenuBatchJob( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMenuExportFileList( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMenuCheckVersion( wxCommandEvent& event ) { event.Skip(); }
@@ -366,7 +367,7 @@ class BatchDlgGenerated : public wxDialog
 		wxBitmapButton* m_bpButtonAltSyncCfg;
 		FolderHistoryBox* m_comboBoxLogfileDir;
 		
-		BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create a batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
+		BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Save as batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
 		~BatchDlgGenerated();
 	
 };
@@ -593,11 +594,12 @@ class LogControlGenerated : public wxPanel
 	private:
 	
 	protected:
+		wxStaticLine* m_staticline12;
 		ToggleButton* m_bpButtonErrors;
 		ToggleButton* m_bpButtonWarnings;
 		ToggleButton* m_bpButtonInfo;
 		wxStaticLine* m_staticline13;
-		wxTextCtrl* m_textCtrlInfo;
+		zen::Grid* m_gridMessages;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnErrors( wxCommandEvent& event ) { event.Skip(); }

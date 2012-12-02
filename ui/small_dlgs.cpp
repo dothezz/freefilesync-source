@@ -109,14 +109,10 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
         bmpLogo = wxBitmap(tmp);
     }
     {
-        wxMemoryDC dc;
-        dc.SelectObject(bmpLogo);
-
+        wxMemoryDC dc(bmpLogo);
         dc.SetTextForeground(*wxBLACK);
         dc.SetFont(wxFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"));
         dc.DrawLabel(wxString(L"FreeFileSync ") + zen::currentVersion, wxNullBitmap, wxRect(0, 0, bmpLogo.GetWidth(), bmpLogo.GetHeight()), wxALIGN_CENTER);
-
-        dc.SelectObject(wxNullBitmap);
     }
     m_bitmap11->SetBitmap(bmpLogo);
 

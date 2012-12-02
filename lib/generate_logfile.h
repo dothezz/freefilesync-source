@@ -16,16 +16,24 @@
 
 namespace zen
 {
-Utf8String generateLogStream(const ErrorLog& log,
-                             const std::wstring& jobName, //may be empty
-                             const std::wstring& finalStatus,
-                             int itemsSynced, Int64 dataSynced,
-                             int itemsTotal,  Int64 dataTotal,
-                             long totalTime); //unit: [sec]
+struct SummaryInfo
+{
+    std::wstring jobName; //may be empty
+    std::wstring finalStatus;
+    int itemsSynced;
+    Int64 dataSynced;
+    int itemsTotal;
+    Int64 dataTotal;
+    long totalTime; //unit: [sec]
+};
 
-void saveToLastSyncsLog(const Utf8String& logstream); //throw FileError
+void saveLogToFile(const SummaryInfo& summary, //throw FileError
+                   const ErrorLog& log,
+                   FileOutput& fileOut);
 
-
+void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
+                        const ErrorLog& log,
+                        size_t maxBytesToWrite);
 
 
 
@@ -34,114 +42,136 @@ void saveToLastSyncsLog(const Utf8String& logstream); //throw FileError
 //####################### implementation #######################
 namespace
 {
-Utf8String generateLogStream_impl(const ErrorLog& log,
-                                  const std::wstring& jobName, //may be empty
-                                  const std::wstring& finalStatus,
-                                  int itemsSynced, Int64 dataSynced,
-                                  int itemsTotal,  Int64 dataTotal,
-                                  long totalTime) //unit: [sec]
+std::wstring generateLogHeader(const SummaryInfo& s)
 {
-    assert(itemsSynced <= itemsTotal);
-    assert(dataSynced  <= dataTotal);
+    assert(s.itemsSynced <= s.itemsTotal);
+    assert(s.dataSynced  <= s.dataTotal);
 
-    Utf8String output;
+    std::wstring output;
 
     //write header
     std::wstring headerLine = formatTime<std::wstring>(FORMAT_DATE);
-    if (!jobName.empty())
-        headerLine += L" - " + jobName;
-    headerLine += L": " + finalStatus;
+    if (!s.jobName.empty())
+        headerLine += L" - " + s.jobName;
+    headerLine += L": " + s.finalStatus;
 
     //assemble results box
     std::vector<std::wstring> results;
     results.push_back(headerLine);
     results.push_back(L"");
 
-	const wchar_t tabSpace[] = L"    ";
+    const wchar_t tabSpace[] = L"    ";
 
-    std::wstring itemsProc = tabSpace + _("Items processed:") + L" " + toGuiString(itemsSynced); //show always, even if 0!
-    if (itemsSynced != 0 || dataSynced != 0) //[!] don't show 0 bytes processed if 0 items were processed
-        itemsProc += + L" (" + filesizeToShortString(dataSynced) + L")";
+    std::wstring itemsProc = tabSpace + _("Items processed:") + L" " + toGuiString(s.itemsSynced); //show always, even if 0!
+    if (s.itemsSynced != 0 || s.dataSynced != 0) //[!] don't show 0 bytes processed if 0 items were processed
+        itemsProc += + L" (" + filesizeToShortString(s.dataSynced) + L")";
     results.push_back(itemsProc);
 
-    if (itemsTotal != 0 || dataTotal != 0) //=: sync phase was reached and there were actual items to sync
+    if (s.itemsTotal != 0 || s.dataTotal != 0) //=: sync phase was reached and there were actual items to sync
     {
-        if (itemsSynced != itemsTotal ||
-            dataSynced  != dataTotal)
-            results.push_back(tabSpace + _("Items remaining:") + L" " + toGuiString(itemsTotal - itemsSynced) + L" (" + filesizeToShortString(dataTotal - dataSynced) + L")");
+        if (s.itemsSynced != s.itemsTotal ||
+            s.dataSynced  != s.dataTotal)
+            results.push_back(tabSpace + _("Items remaining:") + L" " + toGuiString(s.itemsTotal - s.itemsSynced) + L" (" + filesizeToShortString(s.dataTotal - s.dataSynced) + L")");
     }
 
-    results.push_back(tabSpace + _("Total time:") + L" " + copyStringTo<std::wstring>(wxTimeSpan::Seconds(totalTime).Format()));
+    results.push_back(tabSpace + _("Total time:") + L" " + copyStringTo<std::wstring>(wxTimeSpan::Seconds(s.totalTime).Format()));
 
     //calculate max width, this considers UTF-16 only, not true Unicode...
     size_t sepLineLen = 0;
     std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { sepLineLen = std::max(sepLineLen, str.size()); });
 
-    for (size_t i = 0; i < sepLineLen; ++i) output += '_'; //this considers UTF-16 only, not true Unicode!!!
-    output += "\n";
+    for (size_t i = 0; i < sepLineLen; ++i) output += L'_'; //this considers UTF-16 only, not true Unicode!!!
+    output += L'\n';
 
-    std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { output += utfCvrtTo<Utf8String>(str); output += '\n'; });
+    std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { output += str; output += L'\n'; });
 
-    for (size_t i = 0; i < sepLineLen; ++i) output += '_';
-    output += "\n\n";
+    for (size_t i = 0; i < sepLineLen; ++i) output += L'_';
+    output += L'\n';
 
-    //write log items
-    const auto& entries = log.getEntries();
-    for (auto iter = entries.begin(); iter != entries.end(); ++iter)
-    {
-        output += utfCvrtTo<Utf8String>(formatMessage(*iter));
-        output += '\n';
-    }
-
-    return replaceCpy(output, '\n', LINE_BREAK); //don't replace line break any earlier
+    return output;
 }
 }
 
 
 inline
-Utf8String generateLogStream(const ErrorLog& log,
-                             const std::wstring& jobName, //may be empty
-                             const std::wstring& finalStatus,
-                             int itemsSynced, Int64 dataSynced,
-                             int itemsTotal,  Int64 dataTotal,
-                             long totalTime) //unit: [sec]
+void saveLogToFile(const SummaryInfo& summary, //throw FileError
+                   const ErrorLog& log,
+                   FileOutput& fileOut)
 {
-    return generateLogStream_impl(log, jobName, finalStatus, itemsSynced, dataSynced, itemsTotal, dataTotal, totalTime);
+    Utf8String header = utfCvrtTo<Utf8String>(generateLogHeader(summary));
+    replace(header, '\n', LINE_BREAK); //don't replace line break any earlier
+    header += LINE_BREAK; //make sure string is not empty!
+
+    fileOut.write(&*header.begin(), header.size()); //throw FileError
+
+    //write log items one after the other instead of creating one big string: memory allocation might fail; think 1 million entries!
+    for (auto iter = log.begin(); iter != log.end(); ++iter)
+    {
+        Utf8String msg = replaceCpy(utfCvrtTo<Utf8String>(formatMessage<std::wstring>(*iter)), '\n', LINE_BREAK);
+        msg += LINE_BREAK; //make sure string is not empty!
+
+        fileOut.write(&*msg.begin(), msg.size()); //throw FileError
+    }
 }
 
 
 inline
-void saveToLastSyncsLog(const Utf8String& logstream) //throw FileError
+void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
+                        const ErrorLog& log,
+                        size_t maxBytesToWrite) //log may be *huge*, e.g. 1 million items; LastSyncs.log *must not* create performance problems!
+
 {
     const Zstring filename = getConfigDir() + Zstr("LastSyncs.log");
 
-    Utf8String oldStream;
-    try
+    Utf8String newStream = utfCvrtTo<Utf8String>(generateLogHeader(summary));
+    replace(newStream, '\n', LINE_BREAK); //don't replace line break any earlier
+    newStream += LINE_BREAK;
+
+    //write log items one after the other instead of creating one big string: memory allocation might fail; think 1 million entries!
+    for (auto iter = log.begin(); iter != log.end(); ++iter)
     {
-        oldStream = loadBinStream<Utf8String>(filename); //throw FileError, ErrorNotExisting
+        newStream += replaceCpy(utfCvrtTo<Utf8String>(formatMessage<std::wstring>(*iter)), '\n', LINE_BREAK);
+        newStream += LINE_BREAK;
+
+        if (newStream.size() > maxBytesToWrite)
+        {
+            newStream += "[...]";
+            newStream += LINE_BREAK;
+            break;
+        }
     }
-    catch (const ErrorNotExisting&) {}
 
-    Utf8String newStream = logstream;
-    if (!oldStream.empty())
+    //fill up the rest of permitted space by appending old log
+    if (newStream.size() < maxBytesToWrite)
     {
-        newStream += LINE_BREAK;
-        newStream += LINE_BREAK;
-        newStream += oldStream;
-    }
+        Utf8String oldStream;
+        try
+        {
+            oldStream = loadBinStream<Utf8String>(filename); //throw FileError, ErrorNotExisting
+        }
+        catch (const ErrorNotExisting&) {}
 
-    //limit file size: 128 kB (but do not truncate new log)
-    const size_t newSize = std::min(newStream.size(), std::max<size_t>(logstream.size(), 128 * 1024));
+        if (!oldStream.empty())
+        {
+            newStream += LINE_BREAK;
+            newStream += LINE_BREAK;
+            newStream += oldStream; //impliticly limited by "maxBytesToWrite"!
 
-    //do not cut in the middle of a row
-    auto iter = std::search(newStream.cbegin() + newSize, newStream.cend(), std::begin(LINE_BREAK), std::end(LINE_BREAK) - 1);
-    if (iter != newStream.cend())
-    {
-        newStream.resize(iter - newStream.cbegin());
+            //truncate size if required
+            if (newStream.size() > maxBytesToWrite)
+            {
+                //but do not cut in the middle of a row
+                auto iter = std::search(newStream.cbegin() + maxBytesToWrite, newStream.cend(), std::begin(LINE_BREAK), std::end(LINE_BREAK) - 1);
+                if (iter != newStream.cend())
+                {
+                    newStream.resize(iter - newStream.cbegin());
+                    newStream += LINE_BREAK;
 
-        newStream += LINE_BREAK;
-        newStream += "[...]";
-        newStream += LINE_BREAK;
+                    newStream += "[...]";
+                    newStream += LINE_BREAK;
+                }
+            }
+        }
     }
 
     saveBinStream(filename, newStream); //throw FileError

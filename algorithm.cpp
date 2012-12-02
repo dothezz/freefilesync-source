@@ -997,8 +997,7 @@ private:
 
 void zen::addHardFiltering(BaseDirMapping& baseMap, const Zstring& excludeFilter)
 {
-    ApplyHardFilter<STRATEGY_AND>(*HardFilter::FilterRef(
-                                      new NameFilter(FilterConfig().includeFilter, excludeFilter))).execute(baseMap);
+    ApplyHardFilter<STRATEGY_AND>(NameFilter(FilterConfig().includeFilter, excludeFilter)).execute(baseMap);
 }
 
 

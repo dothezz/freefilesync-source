@@ -48,7 +48,7 @@ public:
         if (!now.isValid())
             throw TimerError();
 
-        const auto delta = static_cast<long>(1000.0 * (now - startTime) / ticksPerSec_);
+        const auto delta = static_cast<long>(1000.0 * dist(startTime, now) / ticksPerSec_);
 #ifdef FFS_WIN
         std::ostringstream ss;
         ss << delta << " ms";

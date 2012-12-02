@@ -32,6 +32,8 @@ const T& max(const T& a, const T& b, const T& c);
 
 template <class T>
 void confine(T& val, const T& minVal, const T& maxVal); //make sure minVal <= val && val <= maxVal
+template <class T>
+T confineCpy(const T& val, const T& minVal, const T& maxVal);
 
 template <class InputIterator>
 std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last);
@@ -97,6 +99,7 @@ const double ln2   = 0.693147180559945309417;
 template <class T> inline
 T abs(T value)
 {
+    //static_assert(std::is_signed<T>::value, ""); might not compile for non-built-in arithmetic types; anyway "-value" should emit compiler error or warning for unsigned types
     if (value < 0)
         return -value; // operator "?:" caveat: may be different type than "value"
     else
@@ -130,6 +133,17 @@ const T& max(const T& a, const T& b, const T& c)
     return std::max(std::max(a, b), c);
 }
 
+
+template <class T> inline
+T confineCpy(const T& val, const T& minVal, const T& maxVal)
+{
+    assert(minVal <= maxVal);
+    if (val < minVal)
+        return minVal;
+    else if (val > maxVal)
+        return maxVal;
+	return val;
+}
 
 template <class T> inline
 void confine(T& val, const T& minVal, const T& maxVal) //name trim?

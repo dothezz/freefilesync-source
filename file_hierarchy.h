@@ -245,7 +245,8 @@ public:
     template <SelectedSide side> const Zstring& getBaseDirPf() const; //base sync directory postfixed with FILE_NAME_SEPARATOR (or empty!)
     static void removeEmpty(BaseDirMapping& baseDir) { baseDir.removeEmptyRec(); }; //physically remove all invalid entries (where both sides are empty) recursively
 
-    template <SelectedSide side> bool wasExisting() const; //status of directory existence at the time of comparison!
+    template <SelectedSide side> bool isExisting() const; //status of directory existence at the time of comparison!
+    template <SelectedSide side> void setExisting(bool value); //update after creating the directory in FFS
 
     //get settings which were used while creating BaseDirMapping
     const HardFilter&   getFilter() const { return *filter_; }
@@ -988,16 +989,27 @@ void DirMapping::removeObjectR()
 
 
 template <> inline
-bool BaseDirMapping::wasExisting<LEFT_SIDE>() const
+bool BaseDirMapping::isExisting<LEFT_SIDE>() const
 {
     return dirExistsLeft_;
 }
 
-
 template <> inline
-bool BaseDirMapping::wasExisting<RIGHT_SIDE>() const
+bool BaseDirMapping::isExisting<RIGHT_SIDE>() const
 {
     return dirExistsRight_;
+}
+
+template <> inline
+void BaseDirMapping::setExisting<LEFT_SIDE>(bool value)
+{
+    dirExistsLeft_ = value;
+}
+
+template <> inline
+void BaseDirMapping::setExisting<RIGHT_SIDE>(bool value)
+{
+    dirExistsRight_ = value;
 }
 
 

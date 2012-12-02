@@ -570,7 +570,7 @@ void BatchDialog::loadBatchFile(const std::vector<wxString>& filenames)
     const wxString activeFile = filenames.size() == 1 ? filenames[0] : wxString();
 
     if (activeFile.empty())
-        SetTitle(_("Create a batch job"));
+        SetTitle(_("Save as batch job"));
     else
         SetTitle(activeFile);
 

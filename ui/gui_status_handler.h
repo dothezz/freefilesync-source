@@ -49,6 +49,7 @@ class SyncStatusHandler : public zen::StatusHandler
 {
 public:
     SyncStatusHandler(MainDialog* parentDlg,
+                      size_t lastSyncsLogFileSizeMax,
                       xmlAccess::OnGuiError handleError,
                       const std::wstring& jobName,
                       const std::wstring& execWhenFinished,
@@ -69,6 +70,7 @@ private:
 
     MainDialog* parentDlg_;
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
+    const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnGuiError handleError_;
     zen::ErrorLog errorLog;
     const std::wstring jobName_;

@@ -128,8 +128,7 @@ wxBitmap BitmapButton::createBitmapFromText(const wxString& text)
     wxBitmap newBitmap(sizeNeeded.GetWidth(), sizeNeeded.GetHeight());
 
     {
-        wxMemoryDC dc;
-        dc.SelectObject(newBitmap);
+        wxMemoryDC dc(newBitmap);
 
         //set up white background
         dc.SetBackground(*wxWHITE_BRUSH);
@@ -150,8 +149,6 @@ wxBitmap BitmapButton::createBitmapFromText(const wxString& text)
         dc.SetFont(currentFont);
 
         dc.DrawLabel(textLabelFormatted, wxNullBitmap, wxRect(0, 0, newBitmap.GetWidth(), newBitmap.GetHeight()), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, indexAccel);
-
-        dc.SelectObject(wxNullBitmap);
     }
 
     //add alpha channel to image

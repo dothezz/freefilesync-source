@@ -82,19 +82,88 @@ void determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
                            bool allowUserInteraction,
                            ProcessCallback& callback)
 {
-    std::for_each(dirnames.begin(), dirnames.end(),
+    std::vector<Zstring> dirs(dirnames.begin(), dirnames.end());
+    vector_remove_if(dirs, [](const Zstring& dir) { return dir.empty(); });
+
+
+
+    warn_static("finish")
+    /*
+    //check existence of all directories in parallel! (avoid adding up search times if multiple network drives are not reachable)
+    FixedList<boost::unique_future<bool>> asyncDirChecks;
+    std::for_each(dirs.begin(), dirs.end(), [&](const Zstring& dirname)
+    {
+    asyncDirChecks.emplace_back(async([=]() -> bool
+    {
+    #ifdef FFS_WIN
+        //1. login to network share, if necessary
+        loginNetworkShare(dirname, allowUserInteraction);
+    #endif
+        //2. check dir existence
+        return zen::dirExists(dirname);
+    }));
+    });
+
+    auto timeMax = boost::get_system_time() + boost::posix_time::seconds(10); //limit total directory search time
+
+    auto iterCheckDir = asyncDirChecks.begin();
+    for (auto iter = dirs.begin(); iter != dirs.end(); ++iter, ++iterCheckDir)
+    {
+    const Zstring& dirname = *iter;
+    callback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", fmtFileName(dirname), false));
+
+    while (boost::get_system_time() < timeMax && !iterCheckDir->timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL)))
+        callback.requestUiRefresh(); //may throw!
+
+    //only (still) existing files should be included in the list
+    if (iterCheckDir->is_ready() && iterCheckDir->get())
+        dirnamesExisting.insert(dirname);
+    else
+    {
+
+        switch (callback.reportError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname)) + L"\n\n" +
+                _("You can ignore this error to consider the folder as empty."))) //may throw!
+        {
+            case ProcessCallback::IGNORE_ERROR:
+                break;
+            case ProcessCallback::RETRY:
+                break; //continue with loop
+        }
+
+
+        if (tryReportingError([&]
+    {
+        if (!dirExistsUpdating(dirname, allowUserInteraction, callback))
+                throw FileError();
+
+
+
+
+        }, callback))
+        dirnamesExisting.insert(dirname);
+    }
+    }
+    */
+
+
+
+
+
+
+
+
+
+
+    std::for_each(dirs.begin(), dirs.end(),
                   [&](const Zstring& dirname)
     {
-        if (!dirname.empty())
-        {
-            if (tryReportingError([&]
-        {
-            if (!dirExistsUpdating(dirname, allowUserInteraction, callback))
-                    throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname)) + L"\n\n" +
-                    _("You can ignore this error to consider the folder as empty."));
-            }, callback))
-            dirnamesExisting.insert(dirname);
-        }
+        if (tryReportingError([&]
+    {
+        if (!dirExistsUpdating(dirname, allowUserInteraction, callback))
+                throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname)) + L"\n\n" +
+                _("You can ignore this error to consider the folder as empty."));
+        }, callback))
+        dirnamesExisting.insert(dirname);
     });
 }
 

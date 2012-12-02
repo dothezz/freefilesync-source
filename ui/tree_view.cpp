@@ -939,7 +939,7 @@ private:
                     {
                         const int tolerance = 1;
                         const int xNodeStatusFirst = -tolerance + cellArea.x + static_cast<int>(node->level_) * widthLevelStep + CELL_BORDER + (showPercentBar ? widthPercentBar + 2 * CELL_BORDER : 0);
-                        const int xNodeStatusLast  = xNodeStatusFirst + widthNodeStatus + 2 * tolerance;
+                        const int xNodeStatusLast  = (xNodeStatusFirst + tolerance) + widthNodeStatus + tolerance;
                         // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
 
                         if (xNodeStatusFirst <= absX && absX < xNodeStatusLast)
@@ -948,7 +948,7 @@ private:
                 }
             //--------------------------------------------------------------------------------------------------
 
-            if (clickOnNodeStatus && event.row_ >= 0)
+            if (clickOnNodeStatus)
                 switch (treeDataView_->getStatus(event.row_))
                 {
                     case TreeView::STATUS_EXPANDED:
@@ -964,7 +964,7 @@ private:
 
     void onMouseLeftDouble(GridClickEvent& event)
     {
-        if (event.row_ >= 0 && treeDataView_)
+        if (treeDataView_)
             switch (treeDataView_->getStatus(event.row_))
             {
                 case TreeView::STATUS_EXPANDED:
@@ -1102,7 +1102,7 @@ private:
     void expandNode(size_t row)
     {
         treeDataView_->expandNode(row);
-        grid_.Refresh(); //this one clears selection (changed row count)
+        grid_.Refresh(); //implicitly clears selection (changed row count after expand)
         grid_.setGridCursor(row);
         //grid_.autoSizeColumns(); -> doesn't look as good as expected
     }
@@ -1110,9 +1110,8 @@ private:
     void reduceNode(size_t row)
     {
         treeDataView_->reduceNode(row);
-        grid_.Refresh(); //this one clears selection (changed row count)
+        grid_.Refresh();
         grid_.setGridCursor(row);
-        //grid_.autoSizeColumns(); -> doesn't look as good as expected
     }
 
     std::shared_ptr<TreeView> treeDataView_;
@@ -1134,7 +1133,9 @@ void treeview::init(Grid& grid, const std::shared_ptr<TreeView>& treeDataView)
 {
     grid.setDataProvider(std::make_shared<GridDataNavi>(grid, treeDataView));
     grid.showRowLabel(false);
-    grid.setRowHeight(IconBuffer(IconBuffer::SIZE_SMALL).getSize() + 2); //add some space
+
+    const int rowHeight = std::max(IconBuffer(IconBuffer::SIZE_SMALL).getSize(), grid.getMainWin().GetCharHeight()) + 1; //add some space
+    grid.setRowHeight(rowHeight);
 }
 
 

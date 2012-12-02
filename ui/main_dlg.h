@@ -163,7 +163,7 @@ private:
 
     void onGridDoubleClickL(zen::GridClickEvent& event);
     void onGridDoubleClickR(zen::GridClickEvent& event);
-    void onGridDoubleClickRim(int row, bool leftSide);
+    void onGridDoubleClickRim(size_t row, bool leftSide);
 
     void onGridLabelLeftClickC(zen::GridClickEvent& event);
     void onGridLabelLeftClickL(zen::GridClickEvent& event);

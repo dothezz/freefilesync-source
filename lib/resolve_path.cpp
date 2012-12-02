@@ -300,7 +300,7 @@ public:
         devices_.insert(std::make_pair(shortName, fullName));
         return nullptr; //DON'T traverse into subdirs
     }
-    virtual HandleError onError(const std::wstring& msg) { return ON_ERROR_IGNORE; }
+    virtual HandleError onError(const std::wstring& msg) { assert(false); return ON_ERROR_IGNORE; }
 
 private:
     DeviceList& devices_;

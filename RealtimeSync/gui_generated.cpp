@@ -84,9 +84,11 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     bSizer1->Add( bSizer13, 0, wxEXPAND|wxRIGHT|wxLEFT, 20 );
 
     m_staticline2 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    bSizer1->Add( m_staticline2, 0, wxEXPAND|wxTOP|wxBOTTOM, 10 );
+    bSizer1->Add( m_staticline2, 0, wxEXPAND|wxTOP, 5 );
 
-    sbSizerDirToWatch2 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Folders to watch") ), wxVERTICAL );
+    m_staticText7 = new wxStaticText( m_panelMain, wxID_ANY, _("Folders to watch"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText7->Wrap( -1 );
+    bSizer1->Add( m_staticText7, 0, wxALL, 5 );
 
     m_panelMainFolder = new wxPanel( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     wxBoxSizer* bSizer10;
@@ -134,43 +136,51 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_panelMainFolder->SetSizer( bSizer10 );
     m_panelMainFolder->Layout();
     bSizer10->Fit( m_panelMainFolder );
-    sbSizerDirToWatch2->Add( m_panelMainFolder, 0, wxEXPAND, 5 );
+    bSizer1->Add( m_panelMainFolder, 0, wxRIGHT|wxLEFT|wxEXPAND, 5 );
 
     m_scrolledWinFolders = new wxScrolledWindow( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
-    m_scrolledWinFolders->SetScrollRate( 5, 5 );
+    m_scrolledWinFolders->SetScrollRate( 10, 10 );
     bSizerFolders = new wxBoxSizer( wxVERTICAL );
 
 
     m_scrolledWinFolders->SetSizer( bSizerFolders );
     m_scrolledWinFolders->Layout();
     bSizerFolders->Fit( m_scrolledWinFolders );
-    sbSizerDirToWatch2->Add( m_scrolledWinFolders, 0, wxEXPAND, 5 );
+    bSizer1->Add( m_scrolledWinFolders, 1, wxRIGHT|wxLEFT|wxEXPAND, 5 );
+
+    m_staticline212 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    bSizer1->Add( m_staticline212, 0, wxEXPAND|wxTOP, 5 );
+
+    wxBoxSizer* bSizer14;
+    bSizer14 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_staticText8 = new wxStaticText( m_panelMain, wxID_ANY, _("Delay [seconds]"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText8->Wrap( -1 );
+    bSizer14->Add( m_staticText8, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer1->Add( sbSizerDirToWatch2, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
-
-    wxStaticBoxSizer* sbSizer4;
-    sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Delay [seconds]") ), wxVERTICAL );
+    bSizer14->Add( 0, 0, 1, wxEXPAND, 5 );
 
     m_spinCtrlDelay = new wxSpinCtrl( m_panelMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 2000000000, 0 );
     m_spinCtrlDelay->SetToolTip( _("Idle time between last detected change and execution of command") );
 
-    sbSizer4->Add( m_spinCtrlDelay, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer14->Add( m_spinCtrlDelay, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer1->Add( sbSizer4, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
+    bSizer1->Add( bSizer14, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
-    wxStaticBoxSizer* sbSizer3;
-    sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Command line") ), wxVERTICAL );
+    m_staticline211 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    bSizer1->Add( m_staticline211, 0, wxEXPAND|wxTOP, 5 );
+
+    m_staticText6 = new wxStaticText( m_panelMain, wxID_ANY, _("Command line"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText6->Wrap( -1 );
+    bSizer1->Add( m_staticText6, 0, wxALL, 5 );
 
     m_textCtrlCommand = new wxTextCtrl( m_panelMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
     m_textCtrlCommand->SetMaxLength( 0 );
     m_textCtrlCommand->SetToolTip( _("The command is triggered if:\n- files or subfolders change\n- new folders arrive (e.g. USB stick insert)") );
 
-    sbSizer3->Add( m_textCtrlCommand, 0, wxEXPAND, 5 );
-
-
-    bSizer1->Add( sbSizer3, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
+    bSizer1->Add( m_textCtrlCommand, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
 
     m_buttonStart = new zen::BitmapButton( m_panelMain, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,50 ), 0 );
     m_buttonStart->SetDefault();

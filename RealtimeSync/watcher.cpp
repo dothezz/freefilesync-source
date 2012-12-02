@@ -30,7 +30,7 @@ TickVal lastExec = getTicks();
 bool rts::updateUiIsAllowed()
 {
     const TickVal now = getTicks(); //0 on error
-    if (now - lastExec >= TICKS_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
+    if (dist(lastExec, now) >= TICKS_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
     {
         lastExec = now;
         return true;
@@ -98,7 +98,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
         const bool checkDirExistNow = [&]() -> bool //checking once per sec should suffice
         {
             const TickVal now = getTicks(); //0 on error
-            if (now - lastCheck >= TICKS_DIR_CHECK_INTERVAL)
+            if (dist(lastCheck, now) >= TICKS_DIR_CHECK_INTERVAL)
             {
                 lastCheck = now;
                 return true;

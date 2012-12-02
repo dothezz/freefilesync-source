@@ -59,7 +59,7 @@ protected:
     wxStaticText* m_staticText5;
     wxStaticText* m_staticText811;
     wxStaticLine* m_staticline2;
-    wxStaticBoxSizer* sbSizerDirToWatch2;
+    wxStaticText* m_staticText7;
     wxPanel* m_panelMainFolder;
     wxStaticText* m_staticTextFinalPath;
     wxBitmapButton* m_bpButtonAddFolder;
@@ -68,7 +68,11 @@ protected:
     wxButton* m_buttonSelectDirMain;
     wxScrolledWindow* m_scrolledWinFolders;
     wxBoxSizer* bSizerFolders;
+    wxStaticLine* m_staticline212;
+    wxStaticText* m_staticText8;
     wxSpinCtrl* m_spinCtrlDelay;
+    wxStaticLine* m_staticline211;
+    wxStaticText* m_staticText6;
     wxTextCtrl* m_textCtrlCommand;
     zen::BitmapButton* m_buttonStart;
     wxButton* m_buttonCancel;

@@ -129,9 +129,9 @@ class TrayIconHolder
 {
 public:
     TrayIconHolder(const wxString& jobname, AbortCallback& abortCb) :
-        jobName_(jobname)
+        jobName_(jobname),
+        trayMenu(new RtsTrayIconRaw(abortCb))
     {
-        trayMenu = new RtsTrayIconRaw(abortCb); //not in initialization list: give it a valid parent object!
         showIconActive();
     }
 
@@ -175,8 +175,8 @@ public:
     }
 
 private:
-    RtsTrayIconRaw* trayMenu;
     const wxString jobName_; //RTS job name, may be empty
+    RtsTrayIconRaw* trayMenu;
 };
 
 

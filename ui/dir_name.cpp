@@ -175,7 +175,7 @@ void DirectoryName<NameControl>::OnSelectDir(wxCommandEvent& event)
         }
     }
 
-    //wxDirDialog internally uses lame looking SHBrowseForFolder(); Better use IFileDialog() instead! (remembers size and position!)
+    //wxDirDialog internally uses lame-looking SHBrowseForFolder(); we better use IFileDialog() instead! (remembers size and position!)
     std::unique_ptr<wxString> newFolder;
 #ifdef FFS_WIN
     if (vistaOrLater())

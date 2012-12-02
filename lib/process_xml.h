@@ -124,6 +124,7 @@ struct XmlGlobalSettings
         copyFilePermissions(false),
         runWithBackgroundPriority(false),
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS
+        lastSyncsLogFileSizeMax(100000), //maximum size for LastSyncs.log: use a human-readable number
         verifyFileCopy(false),
         transactionalFileCopy(true),
         createLockFile(true) {}
@@ -135,6 +136,7 @@ struct XmlGlobalSettings
     bool runWithBackgroundPriority;
 
     size_t fileTimeTolerance; //max. allowed file time deviation
+    size_t lastSyncsLogFileSizeMax;
     bool verifyFileCopy;   //verify copied files
     bool transactionalFileCopy;
     bool createLockFile;

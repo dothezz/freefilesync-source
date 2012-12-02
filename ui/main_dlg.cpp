@@ -594,6 +594,8 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     m_bpButtonSyncConfig->SetBitmapLabel(GlobalResources::getImage(L"syncConfig"));
     m_bpButtonCmpConfig ->SetBitmapLabel(GlobalResources::getImage(L"cmpConfig"));
     m_bpButtonLoad      ->SetBitmapLabel(GlobalResources::getImage(L"load"));
+    m_bpButtonBatchJob  ->SetBitmapLabel(GlobalResources::getImage(L"batch"));
+
     m_bpButtonAddPair   ->SetBitmapLabel(GlobalResources::getImage(L"item_add"));
     {
         IconBuffer tmp(IconBuffer::SIZE_SMALL);
@@ -955,43 +957,50 @@ typedef Zbase<wchar_t> zxString; //guaranteed exponential growth
 
 void MainDialog::copySelectionToClipboard()
 {
-    zxString clipboardString;
-
-    auto addSelection = [&](const Grid& grid)
+    try
     {
-        if (auto prov = grid.getDataProvider())
+        zxString clipboardString;
+
+        auto addSelection = [&](const Grid& grid)
         {
-            std::vector<Grid::ColumnAttribute> colAttr = grid.getColumnConfig();
-            vector_remove_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
-            if (!colAttr.empty())
+            if (auto prov = grid.getDataProvider())
             {
-                const std::vector<size_t> selection = grid.getSelectedRows();
-                std::for_each(selection.begin(), selection.end(),
-                              [&](size_t row)
+                std::vector<Grid::ColumnAttribute> colAttr = grid.getColumnConfig();
+                vector_remove_if(colAttr, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
+                if (!colAttr.empty())
                 {
-                    std::for_each(colAttr.begin(), colAttr.end() - 1,
-                                  [&](const Grid::ColumnAttribute& ca)
+                    const std::vector<size_t> selection = grid.getSelectedRows();
+                    std::for_each(selection.begin(), selection.end(),
+                                  [&](size_t row)
                     {
-                        clipboardString += copyStringTo<zxString>(prov->getValue(row, ca.type_));
-                        clipboardString += L'\t';
+                        std::for_each(colAttr.begin(), colAttr.end() - 1,
+                                      [&](const Grid::ColumnAttribute& ca)
+                        {
+                            clipboardString += copyStringTo<zxString>(prov->getValue(row, ca.type_));
+                            clipboardString += L'\t';
+                        });
+                        clipboardString += copyStringTo<zxString>(prov->getValue(row, colAttr.back().type_));
+                        clipboardString += L'\n';
                     });
-                    clipboardString += copyStringTo<zxString>(prov->getValue(row, colAttr.back().type_));
-                    clipboardString += L'\n';
-                });
+                }
             }
-        }
-    };
+        };
 
-    addSelection(*m_gridMainL);
-    addSelection(*m_gridMainR);
+        addSelection(*m_gridMainL);
+        addSelection(*m_gridMainR);
 
-    //finally write to clipboard
-    if (!clipboardString.empty())
-        if (wxTheClipboard->Open())
-        {
-            wxTheClipboard->SetData(new wxTextDataObject(copyStringTo<wxString>(clipboardString))); //ownership passed
-            wxTheClipboard->Close();
-        }
+        //finally write to clipboard
+        if (!clipboardString.empty())
+            if (wxClipboard::Get()->Open())
+            {
+                ZEN_ON_SCOPE_EXIT(wxClipboard::Get()->Close());
+                wxClipboard::Get()->SetData(new wxTextDataObject(copyStringTo<wxString>(clipboardString))); //ownership passed
+            }
+    }
+    catch (const std::bad_alloc& e)
+    {
+        wxMessageBox(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()), _("Error"), wxOK | wxICON_ERROR);
+    }
 }
 
 
@@ -1625,7 +1634,7 @@ void MainDialog::onGridButtonEvent(wxKeyEvent& event, Grid& grid, bool leftSide)
             case WXK_SPACE:
             case WXK_NUMPAD_SPACE:
             {
-				const std::vector<FileSystemObject*>& selection = getGridSelection();
+                const std::vector<FileSystemObject*>& selection = getGridSelection();
                 if (!selection.empty())
                     setFilterManually(selection, !selection[0]->isActive());
             }
@@ -1730,7 +1739,7 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
                 {
                     m_gridMainL->SetFocus();
 
-					event.SetEventType(wxEVT_KEY_DOWN); //the grid event handler doesn't expect wxEVT_CHAR_HOOK!
+                    event.SetEventType(wxEVT_KEY_DOWN); //the grid event handler doesn't expect wxEVT_CHAR_HOOK!
                     evtHandler->ProcessEvent(event); //propagating event catched at wxTheApp to child leads to recursion, but we prevented it...
                     event.Skip(false); //definitively handled now!
                     return;
@@ -1746,24 +1755,25 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
 void MainDialog::onNaviSelection(GridRangeSelectEvent& event)
 {
     //scroll m_gridMain to user's new selection on m_gridNavi
-    int leadRow = -1;
-    if (std::unique_ptr<TreeView::Node> node = treeDataView->getLine(event.rowFrom_))
-    {
-        if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
-            leadRow = gridDataView->findRowFirstChild(&(root->baseMap_));
-        else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
+    ptrdiff_t leadRow = -1;
+    if (event.rowFirst_ != event.rowLast_)
+        if (std::unique_ptr<TreeView::Node> node = treeDataView->getLine(event.rowFirst_))
         {
-            leadRow = gridDataView->findRowDirect(&(dir->dirObj_));
-            if (leadRow < 0) //directory was filtered out! still on tree view (but NOT on grid view)
-                leadRow = gridDataView->findRowFirstChild(&(dir->dirObj_));
+            if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
+                leadRow = gridDataView->findRowFirstChild(&(root->baseMap_));
+            else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
+            {
+                leadRow = gridDataView->findRowDirect(&(dir->dirObj_));
+                if (leadRow < 0) //directory was filtered out! still on tree view (but NOT on grid view)
+                    leadRow = gridDataView->findRowFirstChild(&(dir->dirObj_));
+            }
+            else if (const TreeView::FilesNode* files = dynamic_cast<const TreeView::FilesNode*>(node.get()))
+                leadRow = gridDataView->findRowDirect(files->firstFile_.getId());
         }
-        else if (const TreeView::FilesNode* files = dynamic_cast<const TreeView::FilesNode*>(node.get()))
-            leadRow = gridDataView->findRowDirect(files->firstFile_.getId());
-    }
 
     if (leadRow >= 0)
     {
-        leadRow =std::max(0, leadRow - 1); //scroll one more row
+        leadRow = std::max<ptrdiff_t>(0, leadRow - 1); //scroll one more row
 
         m_gridMainL->scrollTo(leadRow);
         m_gridMainC->scrollTo(leadRow);
@@ -1857,7 +1867,7 @@ void MainDialog::onNaviGridContext(GridClickEvent& event)
     //----------------------------------------------------------------------------------------------------
     //CONTEXT_DELETE_FILES
     menu.addSeparator();
-    menu.addItem(_("Delete") + L"\tDel", [&] { deleteSelectedFiles(selection, selection); }, nullptr, !selection.empty());
+    menu.addItem(_("Delete") + L"\tDel", [&] { deleteSelectedFiles(selection, selection); }, nullptr, !selection.empty(), wxID_DELETE);
 
     menu.popup(*this);
 }
@@ -2454,7 +2464,7 @@ bool MainDialog::trySaveConfig(const wxString* fileName) //return true if saved 
 
     try
     {
-        xmlAccess::writeConfig(guiCfg, toZ(targetFilename)); //write config to XML
+        xmlAccess::writeConfig(guiCfg, toZ(targetFilename)); //throw FfsXmlError
         setLastUsedConfig(targetFilename, guiCfg);
 
         flashStatusInformation(_("Configuration saved!"));
@@ -2686,16 +2696,14 @@ void MainDialog::OnClose(wxCloseEvent& event)
 
 void MainDialog::onCheckRows(CheckRowsEvent& event)
 {
-    const int rowFirst = std::min(event.rowFrom_, event.rowTo_); // [rowFirst, rowLast)
-    int rowLast = std::max(event.rowFrom_, event.rowTo_) + 1; //
-    rowLast = std::min(rowLast, static_cast<int>(gridDataView->rowsOnView())); //consider dummy rows
+    std::set<size_t> selectedRows;
 
-    if (0 <= rowFirst && rowFirst < rowLast)
+    const size_t rowLast = std::min(event.rowLast_, gridDataView->rowsOnView()); //consider dummy rows
+    for (size_t i = event.rowFirst_; i < rowLast; ++i)
+        selectedRows.insert(i);
+
+    if (!selectedRows.empty())
     {
-        std::set<size_t> selectedRows;
-        for (int i = rowFirst; i < rowLast; ++i)
-            selectedRows.insert(i);
-
         std::vector<FileSystemObject*> objects = gridDataView->getAllFileRef(selectedRows);
         setFilterManually(objects, event.setIncluded_);
     }
@@ -2704,16 +2712,14 @@ void MainDialog::onCheckRows(CheckRowsEvent& event)
 
 void MainDialog::onSetSyncDirection(SyncDirectionEvent& event)
 {
-    const int rowFirst = std::min(event.rowFrom_, event.rowTo_); // [rowFirst, rowLast)
-    int rowLast = std::max(event.rowFrom_, event.rowTo_) + 1; //
-    rowLast = std::min(rowLast, static_cast<int>(gridDataView->rowsOnView())); //consider dummy rows
+    std::set<size_t> selectedRows;
 
-    if (0 <= rowFirst && rowFirst < rowLast)
+    const size_t rowLast = std::min(event.rowLast_, gridDataView->rowsOnView()); //consider dummy rows
+    for (size_t i = event.rowFirst_; i < rowLast; ++i)
+        selectedRows.insert(i);
+
+    if (!selectedRows.empty())
     {
-        std::set<size_t> selectedRows;
-        for (int i = rowFirst; i < rowLast; ++i)
-            selectedRows.insert(i);
-
         std::vector<FileSystemObject*> objects = gridDataView->getAllFileRef(selectedRows);
         setSyncDirManually(objects, event.direction_);
     }
@@ -3172,7 +3178,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     wxWindow* oldFocus = wxWindow::FindFocus();
     ZEN_ON_SCOPE_EXIT(if (oldFocus) oldFocus->SetFocus();) //e.g. keep focus on main grid after pressing F5
 
-    int scrollPosX = 0;
+        int scrollPosX = 0;
     int scrollPosY = 0;
     m_gridMainL->GetViewStart(&scrollPosX, &scrollPosY); //preserve current scroll position
     ZEN_ON_SCOPE_EXIT(
@@ -3193,12 +3199,14 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         std::unique_ptr<LockHolder> dummy2;
         if (globalCfg.createLockFile)
         {
-            dummy2.reset(new LockHolder(true)); //allow pw prompt
-            for (auto iter = cmpConfig.begin(); iter != cmpConfig.end(); ++iter)
+            std::vector<Zstring> dirnames;
+            std::for_each(cmpConfig.begin(), cmpConfig.end(),
+                          [&](const FolderPairCfg& fpCfg)
             {
-                dummy2->addDir(iter->leftDirectoryFmt,  statusHandler);
-                dummy2->addDir(iter->rightDirectoryFmt, statusHandler);
-            }
+                dirnames.push_back(fpCfg.leftDirectoryFmt);
+                dirnames.push_back(fpCfg.rightDirectoryFmt);
+            });
+            dummy2 = make_unique<LockHolder>(dirnames, statusHandler, true); //allow pw prompt
         }
 
         //COMPARE DIRECTORIES
@@ -3234,7 +3242,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     //add to folder history after successful comparison only
     folderHistoryLeft ->addItem(toZ(m_directoryLeft->GetValue()));
     folderHistoryRight->addItem(toZ(m_directoryRight->GetValue()));
-	  
+
     //prepare status information
     if (allElementsEqual(folderCmp))
         flashStatusInformation(_("All folders are in sync!"));
@@ -3378,7 +3386,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         if (wxEvtHandler* evtHandler = m_buttonCompare->GetEventHandler())
             evtHandler->ProcessEvent(dummy2); //synchronous call
 
-        if (folderCmp.empty()) //check if user aborted or error occured, ect...
+        if (folderCmp.empty()) //check if user aborted or error occurred, ect...
             return;
     }
 
@@ -3410,6 +3418,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
 
         //class handling status updates and error messages
         SyncStatusHandler statusHandler(this, //throw GuiAbortProcess
+                                        globalCfg.lastSyncsLogFileSizeMax,
                                         currentCfg.handleError,
                                         xmlAccess::extractJobName(activeFileName),
                                         guiCfg.mainCfg.onCompletion,
@@ -3419,12 +3428,13 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         std::unique_ptr<LockHolder> dummy2;
         if (globalCfg.createLockFile)
         {
-            dummy2.reset(new LockHolder(true)); //allow pw prompt
+            std::vector<Zstring> dirnames;
             for (auto iter = begin(folderCmp); iter != end(folderCmp); ++iter)
             {
-                dummy2->addDir(iter->getBaseDirPf<LEFT_SIDE >(), statusHandler);
-                dummy2->addDir(iter->getBaseDirPf<RIGHT_SIDE>(), statusHandler);
+                dirnames.push_back(iter->getBaseDirPf<LEFT_SIDE >());
+                dirnames.push_back(iter->getBaseDirPf<RIGHT_SIDE>());
             }
+            dummy2 = make_unique<LockHolder>(dirnames, statusHandler, true); //allow pw prompt
         }
 
         //START SYNCHRONIZATION
@@ -3465,7 +3475,7 @@ void MainDialog::onGridDoubleClickR(GridClickEvent& event)
     onGridDoubleClickRim(event.row_, false);
 }
 
-void MainDialog::onGridDoubleClickRim(int row, bool leftSide)
+void MainDialog::onGridDoubleClickRim(size_t row, bool leftSide)
 {
     if (!globalCfg.gui.externelApplications.empty())
         openExternalApplication(globalCfg.gui.externelApplications[0].second,
@@ -3966,8 +3976,8 @@ void MainDialog::clearAddFolderPairs()
     //m_scrolledWindowFolderPairs->SetMinSize(wxSize(-1, 0));
     //bSizer1->Layout();
 }
-//########################################################################################################
 
+//########################################################################################################
 
 //menu events
 void MainDialog::OnMenuGlobalSettings(wxCommandEvent& event)
@@ -3992,44 +4002,44 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
 
     const Zstring filename = utfCvrtTo<Zstring>(filePicker.GetPath());
 
-    Utf8String buffer; //perf: wxString doesn't model exponential growth and so is out, std::string doesn't give performance guarantee!
-    buffer += BYTE_ORDER_MARK_UTF8;
+    Utf8String header; //perf: wxString doesn't model exponential growth and so is out, std::string doesn't give performance guarantee!
+    header += BYTE_ORDER_MARK_UTF8;
 
     //write legend
-    buffer +=  utfCvrtTo<Utf8String>(_("Legend")) + '\n';
+    header +=  utfCvrtTo<Utf8String>(_("Legend")) + '\n';
     if (showSyncAction_)
     {
-        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_EQUAL))               + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_EQUAL))               + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_CREATE_NEW_LEFT))     + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_CREATE_NEW_LEFT))     + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_CREATE_NEW_RIGHT))    + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_CREATE_NEW_RIGHT))    + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_OVERWRITE_LEFT))      + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_OVERWRITE_LEFT))      + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_OVERWRITE_RIGHT))     + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_OVERWRITE_RIGHT))     + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_DELETE_LEFT))         + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_DELETE_LEFT))         + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_DELETE_RIGHT))        + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_DELETE_RIGHT))        + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_DO_NOTHING))          + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_DO_NOTHING))          + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_UNRESOLVED_CONFLICT)) + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_UNRESOLVED_CONFLICT)) + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_EQUAL))               + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_EQUAL))               + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_CREATE_NEW_LEFT))     + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_CREATE_NEW_LEFT))     + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_CREATE_NEW_RIGHT))    + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_CREATE_NEW_RIGHT))    + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_OVERWRITE_LEFT))      + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_OVERWRITE_LEFT))      + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_OVERWRITE_RIGHT))     + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_OVERWRITE_RIGHT))     + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_DELETE_LEFT))         + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_DELETE_LEFT))         + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_DELETE_RIGHT))        + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_DELETE_RIGHT))        + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_DO_NOTHING))          + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_DO_NOTHING))          + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getSyncOpDescription(SO_UNRESOLVED_CONFLICT)) + "\";" + utfCvrtTo<Utf8String>(getSymbol(SO_UNRESOLVED_CONFLICT)) + '\n';
     }
     else
     {
-        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_EQUAL))           + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_EQUAL))           + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_DIFFERENT))       + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_DIFFERENT))       + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_LEFT_SIDE_ONLY))  + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_LEFT_SIDE_ONLY))  + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_RIGHT_SIDE_ONLY)) + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_RIGHT_SIDE_ONLY)) + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_LEFT_NEWER))      + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_LEFT_NEWER))      + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_RIGHT_NEWER))     + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_RIGHT_NEWER))     + '\n';
-        buffer += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_CONFLICT))        + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_CONFLICT))        + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_EQUAL))           + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_EQUAL))           + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_DIFFERENT))       + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_DIFFERENT))       + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_LEFT_SIDE_ONLY))  + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_LEFT_SIDE_ONLY))  + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_RIGHT_SIDE_ONLY)) + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_RIGHT_SIDE_ONLY)) + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_LEFT_NEWER))      + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_LEFT_NEWER))      + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_RIGHT_NEWER))     + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_RIGHT_NEWER))     + '\n';
+        header += "\"" + utfCvrtTo<Utf8String>(getCategoryDescription(FILE_CONFLICT))        + "\";" + utfCvrtTo<Utf8String>(getSymbol(FILE_CONFLICT))        + '\n';
     }
-    buffer += '\n';
+    header += '\n';
 
     //base folders
-    buffer += utfCvrtTo<Utf8String>(_("Folder pairs")) + '\n' ;
+    header += utfCvrtTo<Utf8String>(_("Folder pairs")) + '\n' ;
     std::for_each(begin(folderCmp), end(folderCmp),
                   [&](BaseDirMapping& baseMap)
     {
-        buffer += utfCvrtTo<Utf8String>(baseMap.getBaseDirPf<LEFT_SIDE >()) + ';';
-        buffer += utfCvrtTo<Utf8String>(baseMap.getBaseDirPf<RIGHT_SIDE>()) + '\n';
+        header += utfCvrtTo<Utf8String>(baseMap.getBaseDirPf<LEFT_SIDE >()) + ';';
+        header += utfCvrtTo<Utf8String>(baseMap.getBaseDirPf<RIGHT_SIDE>()) + '\n';
     });
-    buffer += '\n';
+    header += '\n';
 
     //write header
     auto provLeft   = m_gridMainL->getDataProvider();
@@ -4044,12 +4054,12 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
     vector_remove_if(colAttrMiddle, [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
     vector_remove_if(colAttrRight , [](const Grid::ColumnAttribute& ca) { return !ca.visible_; });
 
-    auto addCellValue = [&](const wxString& val)
+    auto fmtCellValue = [](const wxString& val) -> Utf8String
     {
         if (val.find(L';') != wxString::npos)
-            buffer += '\"' + utfCvrtTo<Utf8String>(val) + '\"';
+            return '\"' + utfCvrtTo<Utf8String>(val) + '\"';
         else
-            buffer += utfCvrtTo<Utf8String>(val);
+            return utfCvrtTo<Utf8String>(val);
     };
 
     if (provLeft && provMiddle && provRight)
@@ -4057,62 +4067,73 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
         std::for_each(colAttrLeft.begin(), colAttrLeft.end(),
                       [&](const Grid::ColumnAttribute& ca)
         {
-            addCellValue(provLeft->getColumnLabel(ca.type_));
-            buffer += ';';
+            header += fmtCellValue(provLeft->getColumnLabel(ca.type_));
+            header += ';';
         });
         std::for_each(colAttrMiddle.begin(), colAttrMiddle.end(),
                       [&](const Grid::ColumnAttribute& ca)
         {
-            addCellValue(provMiddle->getColumnLabel(ca.type_));
-            buffer += ';';
+            header += fmtCellValue(provMiddle->getColumnLabel(ca.type_));
+            header += ';';
         });
         if (!colAttrRight.empty())
         {
             std::for_each(colAttrRight.begin(), colAttrRight.end() - 1,
                           [&](const Grid::ColumnAttribute& ca)
             {
-                addCellValue(provRight->getColumnLabel(ca.type_));
-                buffer += ';';
+                header += fmtCellValue(provRight->getColumnLabel(ca.type_));
+                header += ';';
             });
-            addCellValue(provRight->getColumnLabel(colAttrRight.back().type_));
+            header += fmtCellValue(provRight->getColumnLabel(colAttrRight.back().type_));
         }
-        buffer += '\n';
+        header += '\n';
 
-        //main grid
-        const size_t rowCount = m_gridMainL->getRowCount();
-        for (size_t row = 0; row < rowCount; ++row)
-        {
-            std::for_each(colAttrLeft.begin(), colAttrLeft.end(),
-                          [&](const Grid::ColumnAttribute& ca)
-            {
-                addCellValue(provLeft->getValue(row, ca.type_));
-                buffer += ';';
-            });
-            std::for_each(colAttrMiddle.begin(), colAttrMiddle.end(),
-                          [&](const Grid::ColumnAttribute& ca)
-            {
-                addCellValue(provMiddle->getValue(row, ca.type_));
-                buffer += ';';
-            });
-            if (!colAttrRight.empty())
-            {
-                std::for_each(colAttrRight.begin(), colAttrRight.end() - 1,
-                              [&](const Grid::ColumnAttribute& ca)
-                {
-                    addCellValue(provRight->getValue(row, ca.type_));
-                    buffer += ';';
-                });
-                addCellValue(provRight->getValue(row, colAttrRight.back().type_));
-            }
-            buffer += '\n';
-        }
-
-        //write file
         try
         {
-            replace(buffer, '\n', LINE_BREAK);
+            //write file
+            FileOutput fileOut(filename, zen::FileOutput::ACC_OVERWRITE); //throw FileError
 
-            saveBinStream(filename, buffer); //throw FileError
+            replace(header, '\n', LINE_BREAK);
+            fileOut.write(&*header.begin(), header.size()); //throw FileError
+
+            //main grid: write rows one after the other instead of creating one big string: memory allocation might fail; think 1 million rows!
+            /*
+            performance test case "export 600.000 rows" to CSV:
+            aproach 1. assemble single temporary string, then write file:	4.6s
+            aproach 2. write to buffered file output directly for each row: 6.4s
+            */
+            const size_t rowCount = m_gridMainL->getRowCount();
+            for (size_t row = 0; row < rowCount; ++row)
+            {
+                Utf8String tmp;
+
+                std::for_each(colAttrLeft.begin(), colAttrLeft.end(),
+                              [&](const Grid::ColumnAttribute& ca)
+                {
+                    tmp += fmtCellValue(provLeft->getValue(row, ca.type_));
+                    tmp += ';';
+                });
+                std::for_each(colAttrMiddle.begin(), colAttrMiddle.end(),
+                              [&](const Grid::ColumnAttribute& ca)
+                {
+                    tmp += fmtCellValue(provMiddle->getValue(row, ca.type_));
+                    tmp += ';';
+                });
+                if (!colAttrRight.empty())
+                {
+                    std::for_each(colAttrRight.begin(), colAttrRight.end() - 1,
+                                  [&](const Grid::ColumnAttribute& ca)
+                    {
+                        tmp += fmtCellValue(provRight->getValue(row, ca.type_));
+                        tmp += ';';
+                    });
+                    tmp += fmtCellValue(provRight->getValue(row, colAttrRight.back().type_));
+                }
+                tmp += '\n';
+
+                replace(tmp, '\n', LINE_BREAK);
+                fileOut.write(&*tmp.begin(), tmp.size()); //throw FileError
+            }
 
             flashStatusInformation(_("File list exported!"));
         }

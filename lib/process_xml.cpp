@@ -715,10 +715,10 @@ template <> inline
 void writeStruc(const ColumnAttributeRim& value, XmlElement& output)
 {
     XmlOut out(output);
-    out.attribute("Type",     value.type_);
-    out.attribute("Visible",  value.visible_);
-    out.attribute("Width",    value.offset_);
-    out.attribute("Stretch",  value.stretch_);
+    out.attribute("Type",    value.type_);
+    out.attribute("Visible", value.visible_);
+    out.attribute("Width",   value.offset_);
+    out.attribute("Stretch", value.stretch_);
 }
 
 
@@ -942,6 +942,8 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     //max. allowed file time deviation
     inShared["FileTimeTolerance"](config.fileTimeTolerance);
+
+    inShared["LastSyncsFileSizeMax"](config.lastSyncsLogFileSizeMax);
 
     XmlIn inOpt = inShared["OptionalDialogs"];
     inOpt["WarnUnresolvedConflicts"    ](config.optDialogs.warningUnresolvedConflicts);
@@ -1247,6 +1249,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
     //max. allowed file time deviation
     outShared["FileTimeTolerance"](config.fileTimeTolerance);
+
+    outShared["LastSyncsFileSizeMax"](config.lastSyncsLogFileSizeMax);
 
     XmlOut outOpt = outShared["OptionalDialogs"];
     outOpt["WarnUnresolvedConflicts"    ](config.optDialogs.warningUnresolvedConflicts);

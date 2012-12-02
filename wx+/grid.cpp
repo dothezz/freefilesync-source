@@ -41,11 +41,10 @@ namespace
 {
 //------------ Grid Constants --------------------------------
 const double MOUSE_DRAG_ACCELERATION = 1.5; //unit: [rows / (pixel * sec)] -> same value as Explorer!
-const int DEFAULT_ROW_HEIGHT       = 20;
 const int DEFAULT_COL_LABEL_HEIGHT = 24;
 const int COLUMN_BORDER_LEFT       = 4; //for left-aligned text
 const int COLUMN_LABEL_BORDER      = COLUMN_BORDER_LEFT;
-const int COLUMN_MOVE_DELAY        = 5; //unit: [pixel] (from Explorer)
+const int COLUMN_MOVE_DELAY        = 5;  //unit: [pixel] (from Explorer)
 const int COLUMN_MIN_WIDTH         = 40; //only honored when resizing manually!
 const int ROW_LABEL_BORDER         = 3;
 const int COLUMN_RESIZE_TOLERANCE  = 6; //unit [pixel]
@@ -200,10 +199,10 @@ void GridData::drawCellBackground(wxDC& dc, const wxRect& rect, bool enabled, bo
     {
         if (selected)
         {
-            if (hasFocus)
-                dc.GradientFillLinear(rect, getColorSelectionGradientFrom(), getColorSelectionGradientTo(), wxEAST);
-            else
-                dc.GradientFillLinear(rect, COLOR_SELECTION_GRADIENT_NO_FOCUS_FROM, COLOR_SELECTION_GRADIENT_NO_FOCUS_TO, wxEAST);
+            //if (hasFocus)
+            dc.GradientFillLinear(rect, getColorSelectionGradientFrom(), getColorSelectionGradientTo(), wxEAST);
+            //else -> doesn't look too good...
+            //    dc.GradientFillLinear(rect, COLOR_SELECTION_GRADIENT_NO_FOCUS_FROM, COLOR_SELECTION_GRADIENT_NO_FOCUS_TO, wxEAST);
         }
         else
             clearArea(dc, rect, backgroundColor);
@@ -323,7 +322,6 @@ void GridData::drawColumnLabelText(wxDC& dc, const wxRect& rect, const wxString&
 }
 
 //----------------------------------------------------------------------------------------------------------------
-
 /*
                   SubWindow
                      /|\
@@ -495,7 +493,8 @@ class Grid::RowLabelWin : public SubWindow
 public:
     RowLabelWin(Grid& parent) :
         SubWindow(parent),
-        rowHeight(DEFAULT_ROW_HEIGHT) {}
+        rowHeight(parent.GetCharHeight() + 2 + 1) {} //default height; don't call any functions on "parent" other than those from wxWindow during construction!
+    //2 for some more space, 1 for bottom border (gives 15 + 2 + 1 on Windows, 17 + 2 + 1 on Ubuntu)
 
     int getBestWidth(ptrdiff_t rowFrom, ptrdiff_t rowTo)
     {
@@ -509,13 +508,12 @@ public:
 
     size_t getLogicalHeight() const { return refParent().getRowCount() * rowHeight; }
 
-    ptrdiff_t getRowAtPos(ptrdiff_t posY) const //returns < 0 if row not found
+    ptrdiff_t getRowAtPos(ptrdiff_t posY) const //returns < 0 on invalid input, else row number within: [0, rowCount]; rowCount if out of range
     {
         if (posY >= 0 && rowHeight > 0)
         {
             const size_t row = posY / rowHeight;
-            if (row < refParent().getRowCount())
-                return row;
+            return std::min(row, refParent().getRowCount());
         }
         return -1;
     }
@@ -912,10 +910,13 @@ public:
             ColLabelWin& colLabelWin) : SubWindow(parent),
         rowLabelWin_(rowLabelWin),
         colLabelWin_(colLabelWin),
-        selectionAnchor(0)
+        selectionAnchor(0),
+        gridUpdatePending(false)
     {
-        Connect(EVENT_GRID_HAS_SCROLLED, wxCommandEventHandler(MainWin::updateAfterScroll), nullptr, this);
+        Connect(EVENT_GRID_HAS_SCROLLED, wxEventHandler(MainWin::onRequestWindowUpdate), nullptr, this);
     }
+
+    ~MainWin() { assert(!gridUpdatePending); }
 
     void makeRowVisible(size_t row)
     {
@@ -978,7 +979,7 @@ private:
 
         const int rowHeight = rowLabelWin_.getRowHeight();
 
-		//why again aren't we using RowLabelWin::getRowsOnClient() here?
+        //why again aren't we using RowLabelWin::getRowsOnClient() here?
         const wxPoint topLeft     = refParent().CalcUnscrolledPosition(rect.GetTopLeft());
         const wxPoint bottomRight = refParent().CalcUnscrolledPosition(rect.GetBottomRight());
 
@@ -1026,15 +1027,15 @@ private:
         }
     }
 
-    void drawBackground(GridData& prov, wxDC& dc, const wxRect& rect, int row, size_t compPos)
+    void drawBackground(GridData& prov, wxDC& dc, const wxRect& rect, size_t row, size_t compPos)
     {
         Grid& grid = refParent();
         //check if user is currently selecting with mouse
         bool drawSelection = grid.isSelected(row, compPos);
         if (activeSelection)
         {
-            const int rowFrom = std::min(activeSelection->getStartRow(), activeSelection->getCurrentRow());
-            const int rowTo   = std::max(activeSelection->getStartRow(), activeSelection->getCurrentRow());
+            const size_t rowFrom = std::min(activeSelection->getStartRow(), activeSelection->getCurrentRow());
+            const size_t rowTo   = std::max(activeSelection->getStartRow(), activeSelection->getCurrentRow());
 
             if (compPos == activeSelection->getComponentPos() && rowFrom <= row && row <= rowTo)
                 drawSelection = activeSelection->isPositiveSelect(); //overwrite default
@@ -1051,13 +1052,16 @@ private:
     virtual void onMouseLeftDouble(wxMouseEvent& event)
     {
         const wxPoint absPos = refParent().CalcUnscrolledPosition(event.GetPosition());
-        const auto row       = rowLabelWin_.getRowAtPos(absPos.y); //return -1 if no row at this position
-        const auto colInfo = refParent().getColumnAtPos(absPos.x); //returns (column type, compPos)
+        const auto row       = rowLabelWin_.getRowAtPos(absPos.y); //return -1 for invalid position; >= rowCount if out of range
+        if (row >= 0)
+        {
+            const auto colInfo = refParent().getColumnAtPos(absPos.x); //returns (column type, compPos)
 
-        const ColumnType colType = colInfo ? colInfo->first  : DUMMY_COLUMN_TYPE;
-        const ptrdiff_t  compPos = colInfo ? colInfo->second : -1;
-        //client is interested in all double-clicks, even those outside of the grid!
-        sendEventNow(GridClickEvent(EVENT_GRID_MOUSE_LEFT_DOUBLE, event, row, colType, compPos));
+            const ColumnType colType = colInfo ? colInfo->first  : DUMMY_COLUMN_TYPE;
+            const ptrdiff_t  compPos = colInfo ? colInfo->second : -1;
+            //client is interested in all double-clicks, even those outside of the grid!
+            sendEventNow(GridClickEvent(EVENT_GRID_MOUSE_LEFT_DOUBLE, event, row, colType, compPos));
+        }
         event.Skip();
     }
 
@@ -1067,76 +1071,83 @@ private:
             SetFocus();
 
         const wxPoint absPos = refParent().CalcUnscrolledPosition(event.GetPosition());
-
-        const ptrdiff_t  row     = rowLabelWin_.getRowAtPos(absPos.y); //return -1 if no row at this position
-        const auto       colInfo = refParent().getColumnAtPos(absPos.x); //returns (column type, compPos)
-        const ColumnType colType = colInfo ? colInfo->first  : DUMMY_COLUMN_TYPE;
-        const ptrdiff_t  compPos = colInfo ? colInfo->second : -1;
-
-        //notify event
-        GridClickEvent mouseEvent(event.RightDown() ? EVENT_GRID_MOUSE_RIGHT_DOWN : EVENT_GRID_MOUSE_LEFT_DOWN, event, row, colType, compPos);
-        if (!sendEventNow(mouseEvent)) //if event was not processed externally...
+        const ptrdiff_t  row = rowLabelWin_.getRowAtPos(absPos.y); //return -1 for invalid position; >= rowCount if out of range
+        if (row >= 0)
         {
+            const auto       colInfo = refParent().getColumnAtPos(absPos.x); //returns (column type, compPos)
+            const ColumnType colType = colInfo ? colInfo->first  : DUMMY_COLUMN_TYPE;
+            const ptrdiff_t  compPos = colInfo ? colInfo->second : -1;
+
             if (!event.RightDown() || !refParent().isSelected(row, compPos)) //do NOT start a new selection if user right-clicks on a selected area!
             {
-                if (row >= 0 && compPos >= 0)
-                    cursor = std::make_pair(row, compPos);
-
                 if (event.ControlDown())
                 {
-                    if (row >= 0 && compPos >= 0)
+                    if (compPos >= 0)
                         activeSelection.reset(new MouseSelection(*this, row, compPos, !refParent().isSelected(row, compPos)));
-                    selectionAnchor = cursor.first; //[!] anchor is coupled with cursor, *not* row
                 }
                 else if (event.ShiftDown())
                 {
-                    if (row >= 0 && compPos >= 0)
+                    if (compPos >= 0)
                         activeSelection.reset(new MouseSelection(*this, selectionAnchor, compPos, true));
-                    else
-                        selectionAnchor = cursor.first;
-                    refParent().clearSelectionAll();
+                    refParent().clearSelectionAllAndNotify();
                 }
                 else
                 {
-                    if (row >= 0 && compPos >= 0)
+                    if (compPos >= 0)
                         activeSelection.reset(new MouseSelection(*this, row, compPos, true));
-                    selectionAnchor = cursor.first;
-                    refParent().clearSelectionAll();
+                    refParent().clearSelectionAllAndNotify();
                 }
             }
+
+            //notify event *after* potential "clearSelectionAllAndNotify()" above: a client should first receive a GridRangeSelectEvent for clearing the grid, if necessary,
+            //then GridClickEvent and the associated GridRangeSelectEvent one after the other
+            GridClickEvent mouseEvent(event.RightDown() ? EVENT_GRID_MOUSE_RIGHT_DOWN : EVENT_GRID_MOUSE_LEFT_DOWN, event, row, colType, compPos);
+            sendEventNow(mouseEvent);
+
             Refresh();
         }
-
         event.Skip(); //allow changing focus
     }
 
     void onMouseUp(wxMouseEvent& event)
     {
-        //const int currentRow = clientPosToRow(event.GetPosition()); -> this one may point to row which is not in visible area!
-
         if (activeSelection)
         {
-            const auto rowFrom  = activeSelection->getStartRow();
-            const auto rowTo    = activeSelection->getCurrentRow();
-            const auto compPos  = activeSelection->getComponentPos();
-            const bool positive = activeSelection->isPositiveSelect();
+            const size_t rowCount = refParent().getRowCount();
+            if (rowCount > 0)
+            {
+                if (activeSelection->getCurrentRow() < rowCount)
+                {
+                    cursor.first = activeSelection->getCurrentRow();
+                    selectionAnchor = activeSelection->getStartRow(); //allowed to be "out of range"
+                }
+                else if (activeSelection->getStartRow() < rowCount) //don't change cursor if "to" and "from" are out of range
+                {
+                    cursor.first = rowCount - 1;
+                    selectionAnchor = activeSelection->getStartRow(); //allowed to be "out of range"
+                }
+                else //total selection "out of range"
+                    selectionAnchor = cursor.first;
+            }
+            //slight deviation from Explorer: change cursor while dragging mouse! -> unify behavior with shift + direction keys
 
-            cursor.first = activeSelection->getCurrentRow(); //slight deviation from Explorer: change cursor while dragging mouse! -> unify behavior with shift + direction keys
-            refParent().selectRange(rowFrom, rowTo, compPos, positive);
-
+            refParent().selectRangeAndNotify(activeSelection->getStartRow  (), //from
+                                             activeSelection->getCurrentRow(), //to
+                                             activeSelection->getComponentPos(),
+                                             activeSelection->isPositiveSelect());
             activeSelection.reset();
         }
 
         //this one may point to row which is not in visible area!
         const wxPoint absPos = refParent().CalcUnscrolledPosition(event.GetPosition());
 
-        const auto row     = rowLabelWin_.getRowAtPos(absPos.y); //return -1 if no row at this position
+        const auto row     = rowLabelWin_.getRowAtPos(absPos.y); //return -1 for invalid position; >= rowCount if out of range
         const auto colInfo = refParent().getColumnAtPos(absPos.x); //returns optional pair (column type, compPos)
 
         const ColumnType colType = colInfo ? colInfo->first  : DUMMY_COLUMN_TYPE; //we probably should notify even if colInfo is invalid!
         const ptrdiff_t  compPos = colInfo ? colInfo->second : -1;
 
-        //notify event
+        //notify click event after the range selection! e.g. this makes sure the selection is applied before showing a context menu
         sendEventNow(GridClickEvent(event.RightUp() ? EVENT_GRID_MOUSE_RIGHT_UP : EVENT_GRID_MOUSE_LEFT_UP, event, row, colType, compPos));
 
         Refresh();
@@ -1158,11 +1169,12 @@ private:
         //change tooltip
         const wxString toolTip = [&]() -> wxString
         {
+            const ptrdiff_t rowCount = refParent().getRowCount();
             const wxPoint absPos = refParent().CalcUnscrolledPosition(event.GetPosition());
 
-            const auto row     = rowLabelWin_.getRowAtPos(absPos.y); //return -1 if no row at this position
+            const auto row     = rowLabelWin_.getRowAtPos(absPos.y); //return -1 for invalid position; >= rowCount if out of range
             const auto colInfo = refParent().getColumnAtPos(absPos.x); //returns (column type, compPos)
-            if (colInfo && row >= 0)
+            if (colInfo && 0 <= row && row < rowCount)
             {
                 if (auto prov = refParent().getDataProvider(colInfo->second))
                     return prov->getToolTip(row, colInfo->first);
@@ -1212,7 +1224,7 @@ private:
 
             auto& comp = refParent().comp;
             std::for_each(comp.begin(), comp.end(), [](Grid::Component& c) { c.selection.clear(); }); //clear selection, do NOT fire event
-            refParent().selectRange(selectionAnchor, row, cursor.second); //set new selection + fire event
+            refParent().selectRangeAndNotify(selectionAnchor, row, cursor.second); //set new selection + fire event
 
             cursor.first = row; //don't call setCursor() since it writes to "selectionAnchor"!
             this->makeRowVisible(row);
@@ -1303,7 +1315,7 @@ private:
 
             case 'A':  //Ctrl + A - select all
                 if (event.ControlDown())
-                    refParent().selectRange(0, rowCount, cursor.second);
+                    refParent().selectRangeAndNotify(0, rowCount, cursor.second);
                 break;
 
             case WXK_NUMPAD_ADD: //CTRL + '+' - auto-size all
@@ -1320,7 +1332,7 @@ private:
     class MouseSelection : private wxEvtHandler
     {
     public:
-        MouseSelection(MainWin& wnd, ptrdiff_t rowStart, size_t compPos, bool positiveSelect) :
+        MouseSelection(MainWin& wnd, size_t rowStart, size_t compPos, bool positiveSelect) :
             wnd_(wnd), rowStart_(rowStart), compPos_(compPos), rowCurrent_(rowStart), positiveSelect_(positiveSelect), toScrollX(0), toScrollY(0),
             tickCountLast(getTicks()),
             ticksPerSec_(ticksPerSec())
@@ -1332,10 +1344,10 @@ private:
         }
         ~MouseSelection() { if (wnd_.HasCapture()) wnd_.ReleaseMouse(); }
 
-        ptrdiff_t getStartRow     () const { return rowStart_; }
-        size_t    getComponentPos () const { return compPos_; }
-        ptrdiff_t getCurrentRow   () const { return rowCurrent_; }
-        bool      isPositiveSelect() const { return positiveSelect_; } //are we selecting or unselecting?
+        size_t getStartRow     () const { return rowStart_; }
+        size_t getComponentPos () const { return compPos_; }
+        size_t getCurrentRow   () const { return rowCurrent_; }
+        bool   isPositiveSelect() const { return positiveSelect_; } //are we selecting or unselecting?
 
         void evalMousePos()
         {
@@ -1343,7 +1355,7 @@ private:
             if (ticksPerSec_ > 0)
             {
                 const TickVal now = getTicks(); //0 on error
-                deltaTime = static_cast<double>(now - tickCountLast) / ticksPerSec_; //unit: [sec]
+                deltaTime = static_cast<double>(dist(tickCountLast, now)) / ticksPerSec_; //unit: [sec]
                 tickCountLast = now;
             }
 
@@ -1389,18 +1401,14 @@ private:
                 wxPoint clientPosTrimmed = clientPos;
                 numeric::confine(clientPosTrimmed.y, 0, clientSize.GetHeight() - 1); //do not select row outside client window!
 
-                wxPoint absPos = wnd_.refParent().CalcUnscrolledPosition(clientPosTrimmed);
-
-                //make sure "current row" is always at a valid position while moving!
-                ptrdiff_t currentRow = wnd_.rowLabelWin_.getRowAtPos(absPos.y); //return -1 if no row at this position
-                if (currentRow < 0)
-                    currentRow = wnd_.refParent().getRowCount() - 1; //seems, we hit the empty space at the end: empty size covered!
-
-                if (currentRow >= 0 && rowCurrent_ != currentRow)
-                {
-                    rowCurrent_ = currentRow;
-                    wnd_.Refresh();
-                }
+                const wxPoint absPos = wnd_.refParent().CalcUnscrolledPosition(clientPosTrimmed);
+                const ptrdiff_t newRow = wnd_.rowLabelWin_.getRowAtPos(absPos.y); //return -1 for invalid position; >= rowCount if out of range
+                if (newRow >= 0)
+                    if (rowCurrent_ != newRow)
+                    {
+                        rowCurrent_ = newRow;
+                        wnd_.Refresh();
+                    }
             }
         }
 
@@ -1408,7 +1416,7 @@ private:
         void onTimer(wxEvent& event) { evalMousePos(); }
 
         MainWin& wnd_;
-        const ptrdiff_t rowStart_;
+        const size_t rowStart_;
         const size_t compPos_;
         ptrdiff_t rowCurrent_;
         const bool positiveSelect_;
@@ -1429,12 +1437,22 @@ private:
         //which *first* calls us, MainWin::ScrollWindow(), and *then* internally updates m_yScrollPosition
         //=> we cannot use CalcUnscrolledPosition() here which gives the wrong/outdated value!!!
         //=> we need to update asynchronously:
-        wxCommandEvent scrollEvent(EVENT_GRID_HAS_SCROLLED);
-        AddPendingEvent(scrollEvent); //asynchronously call updateAfterScroll()
+        //=> don't use plain async event => severe performance issues on wxGTK!
+        //=> can't use idle event neither: too few idle events on Windows, e.g. NO idle events while mouse drag-scrolling!
+        //=> solution: send single async event at most!
+        if (!gridUpdatePending) //without guarding, the number of outstanding async events can get very high during scrolling!! test case: Ubuntu: 170; Windows: 20
+        {
+            gridUpdatePending = true;
+            wxCommandEvent scrollEvent(EVENT_GRID_HAS_SCROLLED);
+            AddPendingEvent(scrollEvent); //asynchronously call updateAfterScroll()
+        }
     }
 
-    void updateAfterScroll(wxCommandEvent&)
+    void onRequestWindowUpdate(wxEvent& event)
     {
+        ZEN_ON_SCOPE_EXIT(gridUpdatePending = false);
+        assert(gridUpdatePending);
+
         refParent().updateWindowSizes(false); //row label width has changed -> do *not* update scrollbars: recursion on wxGTK! -> still a problem, now that we're called async??
         rowLabelWin_.Update(); //update while dragging scroll thumb
     }
@@ -1446,6 +1464,7 @@ private:
 
     std::pair<ptrdiff_t, ptrdiff_t> cursor; //(row, component position), always valid! still unsigned type to facilitate "onKeyDown()"
     size_t selectionAnchor;
+    bool gridUpdatePending;
 };
 
 //----------------------------------------------------------------------------------------------------------------
@@ -1642,15 +1661,8 @@ void Grid::scrollDelta(int deltaX, int deltaY)
     scrollPosX += deltaX;
     scrollPosY += deltaY;
 
-	scrollPosX = std::max(0, scrollPosX); //wxScrollHelper::Scroll() will exit prematurely if input happens to be "-1"!
-	scrollPosY = std::max(0, scrollPosY); //
-
-    //const int unitsTotalX = GetScrollLines(wxHORIZONTAL);
-    //const int unitsTotalY = GetScrollLines(wxVERTICAL);
-
-    //if (unitsTotalX <= 0 || unitsTotalY <= 0) return; -> premature
-    //numeric::confine(scrollPosX, 0, unitsTotalX - 1); //make sure scroll target is in valid range
-    //numeric::confine(scrollPosY, 0, unitsTotalY - 1); //
+    scrollPosX = std::max(0, scrollPosX); //wxScrollHelper::Scroll() will exit prematurely if input happens to be "-1"!
+    scrollPosY = std::max(0, scrollPosY); //
 
     Scroll(scrollPosX, scrollPosY);
     updateWindowSizes(); //may show horizontal scroll bar
@@ -1710,7 +1722,7 @@ void Grid::setColumnConfig(const std::vector<Grid::ColumnAttribute>& attr, size_
                 visibleCols.push_back(Grid::VisibleColumn(ca.type_, ca.offset_, ca.stretch_));
         });
 
-        //set ownership of visible columns
+        //"ownership" of visible columns is now within Grid
         comp[compPos].visibleCols = visibleCols;
 
         updateWindowSizes();
@@ -1723,34 +1735,30 @@ std::vector<Grid::ColumnAttribute> Grid::getColumnConfig(size_t compPos) const
 {
     if (compPos < comp.size())
     {
-        auto iterVcols    = comp[compPos].visibleCols.begin();
-        auto iterVcolsend = comp[compPos].visibleCols.end();
-
-        std::set<ColumnType> visibleTypes;
-        std::transform(iterVcols, iterVcolsend, std::inserter(visibleTypes, visibleTypes.begin()),
-        [](const VisibleColumn& vc) { return vc.type_; });
-
         //get non-visible columns (+ outdated visible ones)
         std::vector<ColumnAttribute> output = comp[compPos].oldColAttributes;
+
+        auto iterVcols    = comp[compPos].visibleCols.begin();
+        auto iterVcolsend = comp[compPos].visibleCols.end();
 
         //update visible columns but keep order of non-visible ones!
         std::for_each(output.begin(), output.end(),
                       [&](ColumnAttribute& ca)
         {
-            if (visibleTypes.find(ca.type_) != visibleTypes.end())
+            if (ca.visible_)
             {
                 if (iterVcols != iterVcolsend)
                 {
-                    ca.visible_ = true; //paranoia
                     ca.type_    = iterVcols->type_;
                     ca.stretch_ = iterVcols->stretch_;
                     ca.offset_  = iterVcols->offset_;
                     ++iterVcols;
                 }
+                else
+                    assert(false);
             }
-            else
-                ca.visible_ = false; //paranoia
         });
+        assert(iterVcols == iterVcolsend);
 
         return output;
     }
@@ -1835,13 +1843,16 @@ void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range,
 
 WXLRESULT Grid::MSWDefWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam)
 {
-	//we land here if wxWindowMSW::MSWWindowProc() couldn't handle the message
-	//http://msdn.microsoft.com/en-us/library/windows/desktop/ms645614(v=vs.85).aspx
+    //we land here if wxWindowMSW::MSWWindowProc() couldn't handle the message
+    //http://msdn.microsoft.com/en-us/library/windows/desktop/ms645614(v=vs.85).aspx
     if (nMsg == WM_MOUSEHWHEEL) //horizontal wheel
     {
         const int distance  = GET_WHEEL_DELTA_WPARAM(wParam);
         const int delta     = WHEEL_DELTA;
-        const int rotations = distance / delta;
+        int rotations = distance / delta;
+
+        if (GetLayoutDirection() == wxLayout_RightToLeft)
+            rotations = -rotations;
 
         static int linesPerRotation = -1;
         if (linesPerRotation < 0)
@@ -1849,7 +1860,7 @@ WXLRESULT Grid::MSWDefWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam)
                 linesPerRotation = 3;
 
         scrollDelta(rotations * linesPerRotation, 0); //in scroll units
-		return 0; //"If an application processes this message, it should return zero."
+        return 0; //"If an application processes this message, it should return zero."
     }
 
     return wxScrolledWindow::MSWDefWindowProc(nMsg, wParam, lParam);
@@ -1861,6 +1872,7 @@ wxWindow& Grid::getCornerWin  () { return *cornerWin_;   }
 wxWindow& Grid::getRowLabelWin() { return *rowLabelWin_; }
 wxWindow& Grid::getColLabelWin() { return *colLabelWin_; }
 wxWindow& Grid::getMainWin    () { return *mainWin_;     }
+const wxWindow& Grid::getMainWin() const { return *mainWin_; }
 
 
 wxRect Grid::getColumnLabelArea(ColumnType colType, size_t compPos) const
@@ -2018,16 +2030,6 @@ wxRect Grid::getCellArea(size_t row, ColumnType colType, size_t compPos) const
 }
 
 
-void Grid::clearSelection(size_t compPos)
-{
-    if (compPos < comp.size())
-    {
-        comp[compPos].selection.clear();
-        mainWin_->Refresh();
-    }
-}
-
-
 void Grid::setGridCursor(size_t row, size_t compPos)
 {
     if (compPos < comp.size())
@@ -2036,7 +2038,7 @@ void Grid::setGridCursor(size_t row, size_t compPos)
         mainWin_->makeRowVisible(row);
 
         std::for_each(comp.begin(), comp.end(), [](Grid::Component& c) { c.selection.clear(); }); //clear selection, do NOT fire event
-        selectRange(row, row, compPos); //set new selection + fire event
+        selectRangeAndNotify(row, row, compPos); //set new selection + fire event
 
         mainWin_->Refresh();
         rowLabelWin_->Refresh(); //row labels! (Kubuntu)
@@ -2044,14 +2046,22 @@ void Grid::setGridCursor(size_t row, size_t compPos)
 }
 
 
-void Grid::selectRange(ptrdiff_t rowFrom, ptrdiff_t rowTo, size_t compPos, bool positive)
+void Grid::selectRangeAndNotify(ptrdiff_t rowFrom, ptrdiff_t rowTo, size_t compPos, bool positive)
 {
     if (compPos < comp.size())
     {
-        comp[compPos].selection.selectRange(rowFrom, rowTo, positive);
+        //sort + convert to half-open range
+        auto rowFirst = std::min(rowFrom, rowTo);
+        auto rowLast  = std::max(rowFrom, rowTo) + 1;
+
+        const size_t rowCount = getRowCount();
+        numeric::confine<ptrdiff_t>(rowFirst, 0, rowCount);
+        numeric::confine<ptrdiff_t>(rowLast,  0, rowCount);
+
+        comp[compPos].selection.selectRange(rowFirst, rowLast, positive);
 
         //notify event
-        GridRangeSelectEvent selectionEvent(rowFrom, rowTo, compPos, positive);
+        GridRangeSelectEvent selectionEvent(rowFirst, rowLast, compPos, positive);
         if (wxEvtHandler* evtHandler = GetEventHandler())
             evtHandler->ProcessEvent(selectionEvent);
 
@@ -2060,19 +2070,28 @@ void Grid::selectRange(ptrdiff_t rowFrom, ptrdiff_t rowTo, size_t compPos, bool 
 }
 
 
-void Grid::clearSelectionAll()
+void Grid::clearSelection(bool emitSelectRangeEvent, size_t compPos)
 {
-    for (auto iter = comp.begin(); iter != comp.end(); ++iter)
+    if (compPos < comp.size())
     {
-        Grid::Component& c = *iter;
-        c.selection.clear();
+        comp[compPos].selection.clear();
+        mainWin_->Refresh();
 
-        //notify event
-        const size_t compPos = iter - comp.begin();
-        GridRangeSelectEvent unselectionEvent(-1, -1, compPos, false);
-        if (wxEvtHandler* evtHandler = GetEventHandler())
-            evtHandler->ProcessEvent(unselectionEvent);
+        if (emitSelectRangeEvent)
+        {
+            //notify event, even if we're not triggered by user interaction
+            GridRangeSelectEvent unselectionEvent(0, 0, compPos, false);
+            if (wxEvtHandler* evtHandler = GetEventHandler())
+                evtHandler->ProcessEvent(unselectionEvent);
+        }
     }
+}
+
+
+void Grid::clearSelectionAllAndNotify()
+{
+    for (size_t compPos = 0; compPos < comp.size(); ++compPos)
+        clearSelection(true, compPos);
 }
 
 
@@ -2111,7 +2130,7 @@ ptrdiff_t Grid::getBestColumnSize(size_t col, size_t compPos) const
 {
     if (compPos < comp.size())
     {
-        auto& visibleCols = comp[compPos].visibleCols;
+        const auto& visibleCols = comp[compPos].visibleCols;
         auto dataView = comp[compPos].dataView_;
         if (dataView && col < visibleCols.size())
         {
@@ -2140,26 +2159,35 @@ void Grid::setColWidthAndNotify(ptrdiff_t width, size_t col, size_t compPos, boo
         VisibleColumn& vcRs = comp[compPos].visibleCols[col];
         const int mainWinWidth = mainWin_->GetClientSize().GetWidth();
         const ptrdiff_t stretchTotal = getStretchTotal();
+        const ptrdiff_t stretchedWithCol = getColStretchedWidth(vcRs.stretch_, stretchTotal, mainWinWidth);
 
-        const ptrdiff_t offset = width - getColStretchedWidth(vcRs.stretch_, stretchTotal, mainWinWidth); //width := stretchedWidth + (normalized) offset
-        vcRs.offset_ = offset;
+        vcRs.offset_ = width - stretchedWithCol; //width := stretchedWidth + offset
 
-        //CAVEAT:
-        //I. width may be < COLUMN_MIN_WIDTH: for non-stretched columns this doesn't matter, since it's normalized in getColWidths() anyway,
-        //	for stretched columns on the other hand negative width would be evaluated *before* normalization! => need to normalize here!
-        //II. worse: resizing any column should normalize *all* other stretched columns' offsets considering current mainWinWidth!
-        //  Testcase: 1. make main window so small in width that horizontal scrollbars are shown despite existing streched column.
-        //	2. resize a fixed size column so that scrollbars vanish. 3. verify that the stretched column is resizing immediately while main dialog is enlarged
+        //CAVEATS:
+        //I. fixed-size columns: normalize offset so that resulting width is at least COLUMN_MIN_WIDTH: this is NOT enforced by getColWidths()!
+        //II. stretched columns: do not allow user to set offsets so small that they result in negative (non-normalized) widths: this gives an
+        //unusual delay when enlarging the column again later
+        vcRs.offset_ = std::max(vcRs.offset_, COLUMN_MIN_WIDTH - stretchedWithCol);
+
+        //III. resizing any column should normalize *all* other stretched columns' offsets considering current mainWinWidth!
+        // test case:
+        //1. have columns, both fixed-size and stretched, fit whole window width
+        //2. shrink main window width so that horizontal scrollbars are shown despite the streched column
+        //3. shrink a fixed-size column so that the scrollbars vanish and columns cover full width again
+        //4. now verify that the stretched column is resizing immediately if main window is enlarged again
         std::for_each(comp.begin(), comp.end(), [&](Component& c)
         {
             std::for_each(c.visibleCols.begin(), c.visibleCols.end(), [&](VisibleColumn& vc)
             {
-                const ptrdiff_t stretchedWidth = Grid::getColStretchedWidth(vc.stretch_, stretchTotal, mainWinWidth);
-                vc.offset_ = std::max(vc.offset_, COLUMN_MIN_WIDTH - stretchedWidth); //it would suffice to normalize stretched columns only
+                if (vc.stretch_ > 0) //normalize stretched columns only
+                {
+                    const ptrdiff_t stretchedWidth = Grid::getColStretchedWidth(vc.stretch_, stretchTotal, mainWinWidth);
+                    vc.offset_ = std::max(vc.offset_, COLUMN_MIN_WIDTH - stretchedWidth);
+                }
             });
         });
 
-        GridColumnResizeEvent sizeEvent(offset, vcRs.type_, compPos);
+        GridColumnResizeEvent sizeEvent(vcRs.offset_, vcRs.type_, compPos);
         if (wxEvtHandler* evtHandler = GetEventHandler())
         {
             if (notifyAsync)
@@ -2168,6 +2196,8 @@ void Grid::setColWidthAndNotify(ptrdiff_t width, size_t col, size_t compPos, boo
                 evtHandler->ProcessEvent(sizeEvent);
         }
     }
+    else
+        assert(false);
 }
 
 
@@ -2200,7 +2230,7 @@ ptrdiff_t Grid::getStretchTotal() const //sum of all stretch factors
 }
 
 
-ptrdiff_t Grid::getColStretchedWidth(ptrdiff_t stretch, ptrdiff_t stretchTotal, int mainWinWidth) //final width = stretchedWidth + (normalized) offset
+ptrdiff_t Grid::getColStretchedWidth(ptrdiff_t stretch, ptrdiff_t stretchTotal, int mainWinWidth) //final width := stretchedWidth + (normalized) offset
 {
     return stretchTotal > 0 ? mainWinWidth * stretch / stretchTotal : 0; //rounds down! => not all of clientWidth is correctly distributed according to stretch factors
 }
@@ -2225,8 +2255,12 @@ std::vector<std::vector<Grid::ColumnWidth>> Grid::getColWidths(int mainWinWidth)
 
         std::for_each(c.visibleCols.begin(), c.visibleCols.end(), [&](const VisibleColumn& vc)
         {
-            const ptrdiff_t stretchedWidth = Grid::getColStretchedWidth(vc.stretch_, stretchTotal, mainWinWidth);
-            const ptrdiff_t widthNormalized = std::max(stretchedWidth + vc.offset_, static_cast<ptrdiff_t>(COLUMN_MIN_WIDTH));
+            ptrdiff_t widthNormalized = Grid::getColStretchedWidth(vc.stretch_, stretchTotal, mainWinWidth) + vc.offset_;
+
+            if (vc.stretch_ > 0)
+                widthNormalized = std::max(widthNormalized, static_cast<ptrdiff_t>(COLUMN_MIN_WIDTH)); //normalization really needed here: e.g. smaller main window would result in negative width
+            else
+                widthNormalized = std::max(widthNormalized, static_cast<ptrdiff_t>(0)); //support smaller width than COLUMN_MIN_WIDTH if set via configuration
 
             compWidths.push_back(Grid::ColumnWidth(vc.type_, widthNormalized));
         });
@@ -2245,3 +2279,4 @@ ptrdiff_t Grid::getColWidthsSum(int mainWinWidth) const
         [](ptrdiff_t val2, const Grid::ColumnWidth& cw) { return val2 + cw.width_; });
     });
 };
+

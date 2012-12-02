@@ -28,6 +28,21 @@
 using namespace zen;
 
 
+class DirectoryPanel : public FolderGenerated
+{
+public:
+    DirectoryPanel(wxWindow* parent) :
+        FolderGenerated(parent),
+        dirName(*this, *m_buttonSelectDir, *m_txtCtrlDirectory) {}
+
+    void setName(const wxString& dirname) { dirName.setName(dirname); }
+    wxString getName() const { return dirName.getName(); }
+
+private:
+    zen::DirectoryName<wxTextCtrl> dirName;
+};
+
+
 MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     : MainDlgGenerated(dlg)
 {
@@ -59,7 +74,7 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     if (!cfgFileName.empty() || wxFileExists(lastConfigFileName()))
         try
         {
-            rts::readRealOrBatchConfig(toZ(currentConfigFile), newConfig);
+            rts::readRealOrBatchConfig(toZ(currentConfigFile), newConfig); //throw FfsXmlError
             loadCfgSuccess = true;
         }
         catch (const xmlAccess::FfsXmlError& error)
@@ -92,6 +107,10 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     }
     else
         m_buttonStart->SetFocus(); //don't "steal" focus if program is running from sys-tray"
+
+    //drag and drop .ffs_real and .ffs_batch on main dialog
+    setupFileDrop(*m_panelMain);
+    m_panelMain->Connect(EVENT_DROP_FILE, FileDropEventHandler(MainDialog::onFilesDropped), nullptr, this);
 }
 
 
@@ -102,7 +121,7 @@ MainDialog::~MainDialog()
 
     try //write config to XML
     {
-        writeRealConfig(currentCfg, toZ(lastConfigFileName()));
+        writeRealConfig(currentCfg, toZ(lastConfigFileName())); //throw FfsXmlError
     }
     catch (const xmlAccess::FfsXmlError& error)
     {
@@ -252,6 +271,14 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
                             wxFD_OPEN);
     if (filePicker.ShowModal() == wxID_OK)
         loadConfig(filePicker.GetPath());
+}
+
+
+void MainDialog::onFilesDropped(FileDropEvent& event)
+{
+    const auto& files = event.getFiles();
+    if (!files.empty())
+        loadConfig(files[0]);
 }
 
 

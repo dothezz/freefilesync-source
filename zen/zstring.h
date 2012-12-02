@@ -7,8 +7,8 @@
 #ifndef ZSTRING_H_INCLUDED
 #define ZSTRING_H_INCLUDED
 
-#include "string_base.h"
 #include <cstring> //strcmp()
+#include "string_base.h"
 
 #ifndef NDEBUG
 #include "thread.h" //includes <boost/thread.hpp>

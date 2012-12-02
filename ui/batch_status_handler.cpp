@@ -38,7 +38,7 @@ private:
     virtual std::shared_ptr<TraverseCallback>
     onDir (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
     virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual HandleError onError  (const std::wstring& msg) { return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleError onError  (const std::wstring& msg) { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
 
     const Zstring prefix_;
     std::vector<Zstring>& logfiles_;
@@ -100,6 +100,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        const TimeComp& timeStamp,
                                        const Zstring& logfileDirectory, //may be empty
                                        int logfilesCountLimit,
+                                       size_t lastSyncsLogFileSizeMax,
                                        const xmlAccess::OnError handleError,
                                        const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                                        FfsReturnCode& returnCode,
@@ -108,6 +109,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     switchBatchToGui_(switchBatchToGui),
     showFinalResults(showProgress), //=> exit immediately or wait when finished
     switchToGuiRequested(false),
+    lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
     handleError_(handleError),
     returnCode_(returnCode),
     syncStatusFrame(*this, *this, nullptr, showProgress, jobName, execWhenFinished, execFinishedHistory),
@@ -129,7 +131,7 @@ BatchStatusHandler::BatchStatusHandler(bool showProgress,
     totalTime.Start(); //measure total time
 
     //if (logFile)
-    //	::wxSetEnv(L"logfile", utfCvrtTo<wxString>(logFile->getFilename())); -> requires a command line interpreter to take advantage of
+    //	::wxSetEnv(L"logfile", utfCvrtTo<wxString>(logFile->getFilename()));
 }
 
 
@@ -168,24 +170,35 @@ BatchStatusHandler::~BatchStatusHandler()
         errorLog.logMsg(finalStatus, TYPE_INFO);
     }
 
-    const Utf8String logStream = generateLogStream(errorLog, jobName_, finalStatus,
-                                                   getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
-                                                   getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING), totalTime.Time() / 1000);
+    const SummaryInfo summary =
+    {
+        jobName_,
+        finalStatus,
+        getObjectsCurrent(PHASE_SYNCHRONIZING), getDataCurrent(PHASE_SYNCHRONIZING),
+        getObjectsTotal  (PHASE_SYNCHRONIZING), getDataTotal  (PHASE_SYNCHRONIZING),
+        totalTime.Time() / 1000
+    };
+
     //print the results list: logfile
     if (logFile.get())
     {
+        //saving log file below may take a *long* time, so report (without logging)
         try
         {
-            if (!logStream.empty())
-                logFile->write(&*logStream.begin(), logStream.size()); //throw FileError
+            reportStatus(replaceCpy(_("Saving log file %x"), L"%x", fmtFileName(logFile->getFilename()))); //throw?
+            forceUiRefresh(); //
+        }
+        catch (...) {}
+        try
+        {
+            saveLogToFile(summary, errorLog, *logFile); //throw FileError
         }
         catch (FileError&) {}
-
         logFile.reset(); //close file now: user may do something with it in "on completion"
     }
     try
     {
-        saveToLastSyncsLog(logStream); //throw FileError
+        saveToLastSyncsLog(summary, errorLog, lastSyncsLogFileSizeMax_); //throw FileError
     }
     catch (FileError&) {}
 

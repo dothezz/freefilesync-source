@@ -547,7 +547,6 @@ private:
             if (!dirEntry) //no more items or ignored error
                 return;
 
-
             //don't return "." and ".."
             const char* const shortName = dirEntry->d_name; //evaluate dirEntry *before* going into recursion => we use a single "buffer"!
             if (shortName[0] == '.' &&
@@ -597,12 +596,12 @@ private:
                                 if (const std::shared_ptr<TraverseCallback>& rv = sink.onDir(shortName, fullName))
                                     traverse(fullName, *rv, level + 1);
                             }
-                            else //a file
+                            else //a file or named pipe, ect.
                             {
                                 TraverseCallback::FileInfo fileInfo;
                                 fileInfo.fileSize         = zen::UInt64(statDataTrg.st_size);
                                 fileInfo.lastWriteTimeRaw = statDataTrg.st_mtime; //UTC time (time_t format); unit: 1 second
-                                //fileInfo.id               = extractFileID(statDataTrg); -> id from dereferenced symlink is problematic, since renaming will consider the link, not the target!
+                                //fileInfo.id               = extractFileID(statDataTrg); -> id from dereferenced symlink is problematic, since renaming would consider the link, not the target!
                                 sink.onFile(shortName, fullName, fileInfo);
                             }
                         }
@@ -619,7 +618,7 @@ private:
                 if (const std::shared_ptr<TraverseCallback>& rv = sink.onDir(shortName, fullName))
                     traverse(fullName, *rv, level + 1);
             }
-            else //a file
+            else //a file or named pipe, ect.
             {
                 TraverseCallback::FileInfo fileInfo;
                 fileInfo.fileSize         = zen::UInt64(statData.st_size);
@@ -628,6 +627,13 @@ private:
 
                 sink.onFile(shortName, fullName, fileInfo);
             }
+            /*
+            It may be a good idea to not check "S_ISREG(statData.st_mode)" explicitly and to not issue an error message on other types to support these scenarios:
+            - RTS setup watch (essentially wants to read directories only)
+            - removeDirectory (wants to delete everything; pipes can be deleted just like files via "unlink")
+
+            However an "open" on a pipe will block (https://sourceforge.net/p/freefilesync/bugs/221/), so the copy routines need to be smarter!!
+            */
         }
     }
 

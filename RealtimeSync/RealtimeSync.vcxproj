@@ -109,6 +109,7 @@
       <ForcedIncludeFiles>zen/warn_static.h;wx+/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MinimalRebuild>false</MinimalRebuild>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,6 +139,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MinimalRebuild>false</MinimalRebuild>
       <ShowIncludes>false</ShowIncludes>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -229,6 +231,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\wx+\mouse_move_dlg.cpp" />
+    <ClCompile Include="..\zen\debug_memory_leaks.cpp" />
     <ClCompile Include="..\zen\dir_watcher.cpp" />
     <ClCompile Include="..\zen\dst_hack.cpp" />
     <ClCompile Include="..\zen\file_handling.cpp" />

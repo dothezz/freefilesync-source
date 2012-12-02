@@ -97,7 +97,7 @@ public:
     {
         boost::lock_guard<boost::mutex> dummy(lockAccess);
 
-        //first check whether errors occured in thread
+        //first check whether errors occurred in thread
         if (!errorMsg.first.empty())
         {
             const std::wstring msg = errorMsg.first.c_str();
@@ -125,7 +125,7 @@ private:
 
     boost::mutex lockAccess;
     std::vector<DirWatcher::Entry> changedFiles;
-    std::pair<BasicWString, DWORD> errorMsg; //non-empty if errors occured in thread
+    std::pair<BasicWString, DWORD> errorMsg; //non-empty if errors occurred in thread
 };
 
 
@@ -279,9 +279,12 @@ private:
     virtual void onRequestRemoval(HANDLE hnd)
     {
         //must release hDir immediately => stop monitoring!
-        worker_.interrupt();
-        worker_.join(); //we assume precondition "worker.joinable()"!!!
-        //now hDir should have been released
+        if (worker_.joinable()) //= join() precondition: play safe; can't trust Windows to only call-back once
+        {
+            worker_.interrupt();
+            worker_.join(); //we assume precondition "worker.joinable()"!!!
+            //now hDir should have been released
+        }
 
         removalRequested = true;
     } //don't throw!
@@ -319,8 +322,13 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
 
 DirWatcher::~DirWatcher()
 {
-    pimpl_->worker.interrupt();
-    //pimpl_->worker.join(); -> we don't have time to wait... will take ~50ms anyway
+    if (pimpl_->worker.joinable()) //= thread::detach() precondition! -> may already be joined by HandleVolumeRemoval::onRequestRemoval()
+    {
+        pimpl_->worker.interrupt();
+        //if (pimpl_->worker.joinable()) pimpl_->worker.join(); -> we don't have time to wait... will take ~50ms anyway
+        pimpl_->worker.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
+    }
+
     //caveat: exitting the app may simply kill this thread!
 }
 
@@ -409,10 +417,11 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
 
     //set non-blocking mode
     bool initSuccess = false;
-    int flags = ::fcntl(pimpl_->notifDescr, F_GETFL);
-    if (flags != -1)
-        initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
-
+    {
+        int flags = ::fcntl(pimpl_->notifDescr, F_GETFL);
+        if (flags != -1)
+            initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
+    }
     if (!initSuccess)
         throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
 
@@ -455,13 +464,18 @@ DirWatcher::~DirWatcher()
 std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>&) //throw FileError
 {
     //non-blocking call, see O_NONBLOCK
-    std::vector<char> buffer(1024 * (sizeof(struct inotify_event) + 16));
-    ssize_t bytesRead = ::read(pimpl_->notifDescr, &buffer[0], buffer.size());
+    std::vector<char> buffer(1024 * (sizeof(struct ::inotify_event) + 16));
 
-    if (bytesRead == -1)
+    ssize_t bytesRead = 0;
+    do
     {
-        if (errno == EINTR || //Interrupted function call; When this happens, you should try the call again.
-            errno == EAGAIN)  //Non-blocking I/O has been selected using O_NONBLOCK and no data was immediately available for reading
+        bytesRead = ::read(pimpl_->notifDescr, &buffer[0], buffer.size());
+    }
+    while (bytesRead < 0 && errno == EINTR); //"Interrupted function call; When this happens, you should try the call again."
+
+    if (bytesRead < 0)
+    {
+        if (errno == EAGAIN)  //this error is ignored in all inotify wrappers I found
             return std::vector<Entry>();
 
         throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->dirname)) + L"\n\n" + getLastErrorFormatted());
@@ -472,7 +486,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
     ssize_t bytePos = 0;
     while (bytePos < bytesRead)
     {
-        struct inotify_event& evt = reinterpret_cast<struct inotify_event&>(buffer[bytePos]);
+        struct ::inotify_event& evt = reinterpret_cast<struct ::inotify_event&>(buffer[bytePos]);
 
         if (evt.len != 0) //exclude case: deletion of "self", already reported by parent directory watch
         {
@@ -497,7 +511,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
             }
         }
 
-        bytePos += sizeof(struct inotify_event) + evt.len;
+        bytePos += sizeof(struct ::inotify_event) + evt.len;
     }
 
     return output;

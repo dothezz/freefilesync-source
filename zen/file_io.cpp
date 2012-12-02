@@ -8,20 +8,46 @@
 
 #ifdef FFS_WIN
 #include "long_path_prefix.h"
+#elif defined FFS_LINUX
+#include <fcntl.h>  //open, close
+#include <unistd.h> //read, write
 #endif
 
 using namespace zen;
 
 
-FileInput::FileInput(FileHandle handle, const Zstring& filename) :
-    eofReached(false),
-    fileHandle(handle),
-    filename_(filename) {}
+FileInput::FileInput(FileHandle handle, const Zstring& filename) : FileInputBase(filename), fileHandle(handle) {}
+
+#ifdef FFS_LINUX
+//"filename" could be a named pipe which *blocks* forever during "open()"! https://sourceforge.net/p/freefilesync/bugs/221/
+void checkForUnsupportedType(const Zstring& filename) //throw FileError
+{
+    struct ::stat fileInfo = {};
+    if (::stat(filename.c_str(), &fileInfo) != 0) //follows symlinks
+        return; //let the caller handle errors like "not existing"
+
+    if (!S_ISREG(fileInfo.st_mode) &&
+        !S_ISLNK(fileInfo.st_mode) &&
+        !S_ISDIR(fileInfo.st_mode))
+    {
+        auto getTypeName = [](mode_t m) -> std::wstring
+        {
+            const wchar_t* name =
+            S_ISCHR (m) ? L"character device":
+            S_ISBLK (m) ? L"block device" :
+            S_ISFIFO(m) ? L"FIFO, named pipe" :
+            S_ISSOCK(m) ? L"socket" : nullptr;
+            const std::wstring numFmt = printNumber<std::wstring>(L"0%06o", m & __S_IFMT);
+            return name ? numFmt + L", " + name : numFmt;
+        };
+        throw FileError(replaceCpy(_("Type of item %x is not supported:"), L"%x", fmtFileName(filename)) + L" " + getTypeName(fileInfo.st_mode));
+    }
+}
+#endif
 
 
 FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExisting
-    eofReached(false),
-    filename_(filename)
+    FileInputBase(filename)
 {
 #ifdef FFS_WIN
     fileHandle = ::CreateFile(applyLongPathPrefix(filename).c_str(),
@@ -57,6 +83,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
                               nullptr);
     if (fileHandle == INVALID_HANDLE_VALUE)
 #elif defined FFS_LINUX
+    checkForUnsupportedType(filename); //throw FileError; reading a named pipe would block forever!
     fileHandle = ::fopen(filename.c_str(), "r,type=record,noseek"); //utilize UTF-8 filename
     if (!fileHandle)
 #endif
@@ -64,9 +91,9 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
         const ErrorCode lastError = getLastError();
 
         if (errorCodeForNotExisting(lastError))
-            throw ErrorNotExisting(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted(lastError));
+            throw ErrorNotExisting(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted(lastError));
 
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (open)");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted(lastError) + L" (open)");
     }
 }
 
@@ -83,6 +110,8 @@ FileInput::~FileInput()
 
 size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number of bytes read; throw FileError
 {
+    assert(!eof());
+    if (bytesToRead == 0) return 0;
 #ifdef FFS_WIN
     DWORD bytesRead = 0;
     if (!::ReadFile(fileHandle,    //__in         HANDLE hFile,
@@ -94,33 +123,33 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0) //checks status of stream, not fread()!
 #endif
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted() + L" (read)");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (read)");
 
 #ifdef FFS_WIN
     if (bytesRead < bytesToRead) //verify only!
-        eofReached = true;
+        setEof();
 
 #elif defined FFS_LINUX
     if (::feof(fileHandle) != 0)
-        eofReached = true;
+        setEof();
 
     if (bytesRead < bytesToRead)
-        if (!eofReached) //pathologic!?
-            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + L"Incomplete read!");
+        if (!eof()) //pathologic!?
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + L"Incomplete read!");
 #endif
 
     if (bytesRead > bytesToRead)
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + L"buffer overflow");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + L"buffer overflow");
 
     return bytesRead;
 }
 
 
-FileOutput::FileOutput(FileHandle handle, const Zstring& filename) : fileHandle(handle), filename_(filename) {}
+FileOutput::FileOutput(FileHandle handle, const Zstring& filename) : FileOutputBase(filename), fileHandle(handle) {}
 
 
 FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
-    filename_(filename)
+    FileOutputBase(filename)
 {
 #ifdef FFS_WIN
     const DWORD dwCreationDisposition = access == FileOutput::ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW;
@@ -160,7 +189,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
         //"regular" error handling
         if (fileHandle == INVALID_HANDLE_VALUE)
         {
-            const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + zen::getLastErrorFormatted(lastError);
+            const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + zen::getLastErrorFormatted(lastError);
 
             if (lastError == ERROR_FILE_EXISTS || //confirmed to be used
                 lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
@@ -174,13 +203,14 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
     }
 
 #elif defined FFS_LINUX
+    checkForUnsupportedType(filename); //throw FileError; writing a named pipe would block forever!
     fileHandle = ::fopen(filename.c_str(),
                          //GNU extension: https://www.securecoding.cert.org/confluence/display/cplusplus/FIO03-CPP.+Do+not+make+assumptions+about+fopen()+and+file+creation
                          access == ACC_OVERWRITE ? "w,type=record,noseek" : "wx,type=record,noseek");
     if (!fileHandle)
     {
         const int lastError = errno;
-        const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + zen::getLastErrorFormatted(lastError);
+        const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + zen::getLastErrorFormatted(lastError);
         if (lastError == EEXIST)
             throw ErrorTargetExisting(errorMessage);
 
@@ -216,8 +246,108 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
     if (::ferror(fileHandle) != 0) //checks status of stream, not fwrite()!
 #endif
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + getLastErrorFormatted() + L" (w)"); //w -> distinguish from fopen error message!
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (w)"); //w -> distinguish from fopen error message!
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename_)) + L"\n\n" + L"Incomplete write!");
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + L"Incomplete write!");
 }
+
+
+#ifdef FFS_LINUX
+//Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-5.0.tar.gz
+
+FileInputUnbuffered::FileInputUnbuffered(const Zstring& filename) : FileInputBase(filename) //throw FileError, ErrorNotExisting
+{
+    checkForUnsupportedType(filename); //throw FileError; reading a named pipe would block forever!
+
+    fdFile = ::open(filename.c_str(), O_RDONLY);
+    if (fdFile < 0)
+    {
+        const ErrorCode lastError = getLastError();
+
+        if (errorCodeForNotExisting(lastError))
+            throw ErrorNotExisting(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastError));
+
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (open)");
+    }
+}
+
+
+FileInputUnbuffered::~FileInputUnbuffered() { ::close(fdFile); }
+
+
+size_t FileInputUnbuffered::read(void* buffer, size_t bytesToRead) //throw FileError; returns actual number of bytes read
+{
+    assert(!eof());
+    if (bytesToRead == 0) return 0; //[!]
+
+    ssize_t bytesRead = 0;
+    do
+    {
+        bytesRead = ::read(fdFile, buffer, bytesToRead);
+    }
+    while (bytesRead < 0 && errno == EINTR);
+
+    if (bytesRead < 0)
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (read)");
+    else if (bytesRead == 0) //"zero indicates end of file"
+        setEof();
+    else if (bytesRead > static_cast<ssize_t>(bytesToRead)) //better safe than sorry
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + L"buffer overflow");
+    //if ::read is interrupted (EINTR) right in the middle, it will return successfully with "bytesRead < bytesToRead"!
+
+    return bytesRead;
+}
+
+
+FileOutputUnbuffered::FileOutputUnbuffered(const Zstring& filename, mode_t mode) : FileOutputBase(filename) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+{
+    //checkForUnsupportedType(filename); -> not needed, open() + O_EXCL shoul fail fast
+
+    //overwrite is: O_CREAT | O_WRONLY | O_TRUNC
+    fdFile = ::open(filename.c_str(), O_CREAT | O_WRONLY | O_EXCL, mode & (S_IRWXU | S_IRWXG | S_IRWXO));
+    if (fdFile < 0)
+    {
+        const int lastError = errno;
+        const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename)) + L"\n\n" + zen::getLastErrorFormatted(lastError);
+        if (lastError == EEXIST)
+            throw ErrorTargetExisting(errorMessage);
+
+        if (lastError == ENOENT)
+            throw ErrorTargetPathMissing(errorMessage);
+
+        throw FileError(errorMessage);
+    }
+}
+
+
+FileOutputUnbuffered::~FileOutputUnbuffered() { ::close(fdFile); }
+
+
+void FileOutputUnbuffered::write(const void* buffer, size_t bytesToWrite) //throw FileError
+{
+    while (bytesToWrite > 0)
+    {
+        ssize_t bytesWritten = 0;
+        do
+        {
+            bytesWritten = ::write(fdFile, buffer, bytesToWrite);
+        }
+        while (bytesWritten < 0 && errno == EINTR);
+
+        if (bytesWritten <= 0)
+        {
+            if (bytesWritten == 0) //comment in safe-read.c suggests to treat this as an error due to buggy drivers
+                errno = ENOSPC;
+
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (w)");
+        }
+        if (bytesWritten > static_cast<ssize_t>(bytesToWrite)) //better safe than sorry
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + L"buffer overflow");
+
+        //if ::write is interrupted (EINTR) right in the middle, it will return successfully with "bytesWritten < bytesToWrite"!
+        buffer = static_cast<const char*>(buffer) + bytesWritten; //suppress warning about pointer arithmetics on void*
+        bytesToWrite -= bytesWritten;
+    }
+}
+#endif

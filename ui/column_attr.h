@@ -44,8 +44,8 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
     attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY,  200, 0, false));
     attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,   200, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  -280, 1, true)); //stretch to full width and substract sum of fixed size widths!
-    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,        80, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,       112, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,        80, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,   60, 0, false));
     return attr;
 }
@@ -57,8 +57,8 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
     attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY, 200, 0, false));
     attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,  200, 0, false)); //already shown on left side
     attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  -80, 1, true));  //stretch to full width and substract sum of fixed size widths!
-    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,       80, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,      112, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,       80, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,  60, 0, false));
     return attr;
 }
@@ -71,7 +71,6 @@ enum ColumnTypeMiddle
     COL_TYPE_MIDDLE_VALUE,
     COL_TYPE_BORDER
 };
-
 
 //------------------------------------------------------------------
 

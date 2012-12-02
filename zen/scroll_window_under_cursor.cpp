@@ -4,16 +4,17 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#include <cassert>
-#include "win.h"     //includes "windows.h"
-#include "Windowsx.h" //WM_MOUSEWHEEL
-
 //redirect mouse wheel events directly to window under cursor rather than window having input focus
 //implementing new Windows Vista UI guidelines: http://msdn.microsoft.com/en-us/library/bb545459.aspx#wheel
 //this is confirmed to be required for at least Windows 2000 to Windows 8
 //on Ubuntu Linux, this is already the default behavior
 
 //Usage: just include this file into a Windows project
+
+#include <cassert>
+#include "win.h"     //includes "windows.h"
+#include "Windowsx.h" //WM_MOUSEWHEEL
+
 
 namespace
 {
@@ -25,7 +26,7 @@ LRESULT CALLBACK mouseInputHook(int nCode, WPARAM wParam, LPARAM lParam)
 {
     //"if nCode is less than zero, the hook procedure must pass the message to the CallNextHookEx function
     //without further processing and should return the value returned by CallNextHookEx"
-    if (nCode >= 0)
+    if (nCode == HC_ACTION) //the only valid value for this hook type
     {
         MSG& msgInfo = *reinterpret_cast<MSG*>(lParam);
 
@@ -37,8 +38,7 @@ LRESULT CALLBACK mouseInputHook(int nCode, WPARAM wParam, LPARAM lParam)
             pt.y = GET_Y_LPARAM(msgInfo.lParam); //
 
             //visible child window directly under cursor; attention: not necessarily from our process!
-            //http://blogs.msdn.com/b/oldnewthing/archive/2010/12/30/10110077.aspx
-            if (HWND hWin = ::WindowFromPoint(pt))
+            if (HWND hWin = ::WindowFromPoint(pt)) //http://blogs.msdn.com/b/oldnewthing/archive/2010/12/30/10110077.aspx
                 if (msgInfo.hwnd != hWin && ::GetCapture() == nullptr)
                 {
                     DWORD winProcessId = 0;
@@ -50,7 +50,6 @@ LRESULT CALLBACK mouseInputHook(int nCode, WPARAM wParam, LPARAM lParam)
                 }
         }
     }
-
     return ::CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
