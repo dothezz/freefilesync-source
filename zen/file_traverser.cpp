@@ -195,12 +195,17 @@ struct Win32Traverser
         hnd.searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryPf + L'*').c_str(), &hnd.data);
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
         if (hnd.searchHandle == INVALID_HANDLE_VALUE)
+        {
+            hnd.haveData = false;
+            if (::GetLastError() == ERROR_FILE_NOT_FOUND)
+            {
+                //1. directory may not exist *or* 2. it is completely empty: not all directories contain "., .." entries, e.g. a drive's root directory; NetDrive
+                // -> FindFirstFile() is a nice example of violation of API design principle of single responsibility
+                if (dirExists(directory)) //yes, a race-condition, still the best we can do
+                    return;
+            }
             throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
-
-        //::GetLastError() == ERROR_FILE_NOT_FOUND -> *usually* NOT okay:
-        //directory may not exist *or* it is completely empty: not all directories contain "., .." entries, e.g. a drive's root directory
-        //usually a directory is never completely empty due to "sync.ffs_lock", so we assume it's not existing and let the error propagate
-        // -> FindFirstFile() is a nice example of violation of API design principle of single responsibility
+        }
     }
 
     static void destroy(const DirHandle& hnd) { ::FindClose(hnd.searchHandle); } //throw()
@@ -208,6 +213,9 @@ struct Win32Traverser
     template <class FallbackFun>
     static bool getEntry(DirHandle& hnd, const Zstring& directory, FindData& fileInfo, FallbackFun) //throw FileError
     {
+        if (hnd.searchHandle == INVALID_HANDLE_VALUE) //handle special case of "truly empty directories"
+            return false;
+
         if (hnd.haveData)
         {
             hnd.haveData = false;
@@ -441,17 +449,17 @@ private:
         int failedAttempts  = 0;
         int filesToValidate = 50; //don't let data verification become a performance issue
 
-        for (auto iter = markForDstHack.begin(); iter != markForDstHack.end(); ++iter)
+        for (auto it = markForDstHack.begin(); it != markForDstHack.end(); ++it)
         {
             if (failedAttempts >= 10) //some cloud storages don't support changing creation/modification times => don't waste (a lot of) time trying to
                 return;
 
-            dstCallback.requestUiRefresh(iter->first);
+            dstCallback.requestUiRefresh(it->first);
 
             try
             {
                 //set modification time including DST hack: this function is too clever to not introduce this dependency
-                setFileTime(iter->first, iter->second, SYMLINK_FOLLOW); //throw FileError
+                setFileTime(it->first, it->second, SYMLINK_FOLLOW); //throw FileError
             }
             catch (FileError&)
             {
@@ -463,11 +471,11 @@ private:
             //even at this point it's not sure whether data was written correctly, again cloud storages tend to lie about success status
             if (filesToValidate-- > 0)
             {
-                const dst::RawTime encodedTime = dst::fatEncodeUtcTime(tofiletime(iter->second)); //throw std::runtime_error
+                const dst::RawTime encodedTime = dst::fatEncodeUtcTime(tofiletime(it->second)); //throw std::runtime_error
 
                 //dst hack: verify data written; attention: this check may fail for "sync.ffs_lock"
                 WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
-                ::GetFileAttributesEx(zen::applyLongPathPrefix(iter->first).c_str(), //__in   LPCTSTR lpFileName,
+                ::GetFileAttributesEx(zen::applyLongPathPrefix(it->first).c_str(), //__in   LPCTSTR lpFileName,
                                       GetFileExInfoStandard,                //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
                                       &debugeAttr);                         //__out  LPVOID lpFileInformation
 

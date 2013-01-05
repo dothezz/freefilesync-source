@@ -13,6 +13,7 @@
 #include <zen/zstring.h>
 #include <zen/int64.h>
 #include <zen/file_error.h>
+#include "../structures.h"
 
 namespace zen
 {
@@ -25,19 +26,20 @@ struct CallbackMoveFile;
 	- creates missing intermediate directories
 	- does not create empty directories
 	- handles symlinks
-	- ignores already existing target files/dirs (support retry)
-		=> (unlikely) risk of data loss: race-condition if two FFS instances start at the very same second and process the same filename!!
+	- replaces already existing target files/dirs (supports retry)
+		=> (unlikely) risk of data loss for naming convention "versioning":
+		race-condition if two FFS instances start at the very same second OR multiple folder pairs process the same filename!!
 */
 
 class FileVersioner
 {
 public:
     FileVersioner(const Zstring& versioningDirectory, //throw FileError
-                  const TimeComp& timeStamp,
-                  int versionCountLimit) : //max versions per file; < 0 := no limit
+                  VersioningStyle versioningStyle,
+                  const TimeComp& timeStamp) : //max versions per file; < 0 := no limit
+        versioningStyle_(versioningStyle),
         versioningDirectory_(versioningDirectory),
-        timeStamp_(formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp)), //e.g. "2012-05-15 131513"
-        versionCountLimit_(versionCountLimit)
+        timeStamp_(formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp)) //e.g. "2012-05-15 131513"
     {
         if (timeStamp_.size() != 17) //formatTime() returns empty string on error; unexpected length: e.g. problem in year 10000!
             throw FileError(_("Failure to create time stamp for versioning:") + L" \'" + timeStamp_ + L"\'");
@@ -46,14 +48,14 @@ public:
     void revisionFile(const Zstring& sourceFile, const Zstring& relativeName, CallbackMoveFile& callback); //throw FileError
     void revisionDir (const Zstring& sourceDir,  const Zstring& relativeName, CallbackMoveFile& callback); //throw FileError
 
-    void limitVersions(std::function<void()> updateUI); //throw FileError; call when done revisioning!
+    //void limitVersions(std::function<void()> updateUI); //throw FileError; call when done revisioning!
 
 private:
+    const VersioningStyle versioningStyle_;
     const Zstring versioningDirectory_;
     const Zstring timeStamp_;
-    const int versionCountLimit_;
 
-    std::vector<Zstring> fileRelNames; //store list of revisioned file and symlink relative names for limitVersions()
+    //std::vector<Zstring> fileRelNames; //store list of revisioned file and symlink relative names for limitVersions()
 };
 
 

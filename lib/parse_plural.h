@@ -152,6 +152,7 @@ private:
         };
 
         Token(Type t) : type(t), number(0) {}
+        Token(int num) : type(TK_CONST_NUMBER), number(num) {}
 
         Type type;
         int number; //if type == TK_CONST_NUMBER
@@ -195,13 +196,12 @@ private:
                 }
 
             auto digitEnd = std::find_if(pos, stream.end(), [](char c) { return !zen::isDigit(c); });
-            ptrdiff_t digitCount = digitEnd - pos;
-            if (digitCount != 0)
+
+            if (digitEnd != pos)
             {
-                Token out(Token::TK_CONST_NUMBER);
-                out.number = zen::stringTo<int>(std::string(&*pos, digitCount));
-                pos += digitCount;
-                return out;
+                int number = zen::stringTo<int>(std::string(&*pos, digitEnd - pos));
+                pos = digitEnd;
+                return number;
             }
 
             throw ParsingError(); //unknown token

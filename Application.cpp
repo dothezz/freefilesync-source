@@ -59,8 +59,7 @@ void onTerminationRequested()
 void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
 #endif
 }
-#endif 
-
+#endif
 
 bool Application::OnInit()
 {
@@ -96,12 +95,12 @@ std::vector<wxString> getCommandlineArgs(const wxApp& app)
         cmdLine.resize(cmdLine.size() - 1);
 
     auto iterStart = cmdLine.end(); //end() means: no token
-    for (auto iter = cmdLine.begin(); iter != cmdLine.end(); ++iter)
-        if (*iter == L' ') //space commits token
+    for (auto it = cmdLine.begin(); it != cmdLine.end(); ++it)
+        if (*it == L' ') //space commits token
         {
             if (iterStart != cmdLine.end())
             {
-                args.push_back(std::wstring(iterStart, iter));
+                args.push_back(std::wstring(iterStart, it));
                 iterStart = cmdLine.end(); //expect consecutive blanks!
             }
         }
@@ -109,12 +108,12 @@ std::vector<wxString> getCommandlineArgs(const wxApp& app)
         {
             //start new token
             if (iterStart == cmdLine.end())
-                iterStart = iter;
+                iterStart = it;
 
-            if (*iter == L'\"')
+            if (*it == L'\"')
             {
-                iter = std::find(iter + 1, cmdLine.end(), L'\"');
-                if (iter == cmdLine.end())
+                it = std::find(it + 1, cmdLine.end(), L'\"');
+                if (it == cmdLine.end())
                     break;
             }
         }
@@ -188,9 +187,9 @@ void Application::OnStartApplication(wxIdleEvent&)
             XmlGuiConfig guiCfg;
             guiCfg.mainCfg.syncCfg.directionCfg.var = DirectionConfig::MIRROR;
 
-            for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
+            for (auto it = commandArgs.begin(); it != commandArgs.end(); ++it)
             {
-                size_t index = iter - commandArgs.begin();
+                size_t index = it - commandArgs.begin();
 
                 FolderPairEnh& fp = [&]() -> FolderPairEnh&
                 {
@@ -202,25 +201,25 @@ void Application::OnStartApplication(wxIdleEvent&)
                 }();
 
                 if (index % 2 == 0)
-                    fp.leftDirectory = toZ(*iter);
+                    fp.leftDirectory = toZ(*it);
                 else
-                    fp.rightDirectory = toZ(*iter);
+                    fp.rightDirectory = toZ(*it);
             }
 
             runGuiMode(guiCfg);
         }
         else //mode 2: try to set config/batch-filename set by %1 parameter
         {
-            for (auto iter = commandArgs.begin(); iter != commandArgs.end(); ++iter)
+            for (auto it = commandArgs.begin(); it != commandArgs.end(); ++it)
             {
-                const Zstring& filename = toZ(*iter);
+                const Zstring& filename = toZ(*it);
 
                 if (!fileExists(filename)) //be a little tolerant
                 {
                     if (fileExists(filename + Zstr(".ffs_batch")))
-                        *iter += L".ffs_batch";
+                        *it += L".ffs_batch";
                     else if (fileExists(filename + Zstr(".ffs_gui")))
-                        *iter += L".ffs_gui";
+                        *it += L".ffs_gui";
                     else
                     {
                         wxMessageBox(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)), _("Error"), wxOK | wxICON_ERROR);

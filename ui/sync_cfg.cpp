@@ -6,9 +6,11 @@
 
 #include "sync_cfg.h"
 #include <memory>
+#include <zen/format_unit.h>
 #include <wx/wupdlock.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/rtl.h>
+#include <wx+/no_flicker.h>
 #include <wx+/choice_enum.h>
 #include <wx+/image_tools.h>
 #include "gui_generated.h"
@@ -52,29 +54,40 @@ private:
     virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSyncConfig::BUTTON_CANCEL); }
     virtual void OnApply (wxCommandEvent& event);
 
-    void updateGui();
+    virtual void OnParameterChange(wxCommandEvent& event) { updateGui(); }
 
     virtual void OnDeletionPermanent  (wxCommandEvent& event) { handleDeletion = DELETE_PERMANENTLY;   updateGui(); }
     virtual void OnDeletionRecycler   (wxCommandEvent& event) { handleDeletion = DELETE_TO_RECYCLER;   updateGui(); }
     virtual void OnDeletionVersioning (wxCommandEvent& event) { handleDeletion = DELETE_TO_VERSIONING; updateGui(); }
 
-    virtual void OnErrorPopup (wxCommandEvent& event) { handleGuiError = ON_GUIERROR_POPUP;  updateGui(); }
-    virtual void OnErrorIgnore(wxCommandEvent& event) { handleGuiError = ON_GUIERROR_IGNORE; updateGui(); }
+    virtual void OnErrorPopup (wxCommandEvent& event) { onGuiError = ON_GUIERROR_POPUP;  updateGui(); }
+    virtual void OnErrorIgnore(wxCommandEvent& event) { onGuiError = ON_GUIERROR_IGNORE; updateGui(); }
 
-    virtual void OnToggleVersionsLimit(wxCommandEvent& event) { updateGui(); }
+    struct Config
+    {
+        SyncConfig syncCfg;
+        xmlAccess::OnGuiError onGuiError;
+        std::wstring onCompletion;
+    };
+    void setConfig(const Config& cfg);
+    Config getConfig() const;
+
+    void updateGui();
 
     //parameters with ownership NOT within GUI controls!
     DirectionConfig directionCfg;
-    const CompareVariant cmpVariant;
     DeletionPolicy handleDeletion; //use Recycler, delete permanently or move to user-defined location
-    OnGuiError handleGuiError;
+    OnGuiError onGuiError;
 
-    //changing data
-    SyncConfig&            syncCfgOut;
-    xmlAccess::OnGuiError* refHandleError;
-    ExecWhenFinishedCfg*   refExecWhenFinished;
+    //output data
+    SyncConfig&            outSyncCfg;
+    xmlAccess::OnGuiError* outOptOnGuiError;
+    ExecWhenFinishedCfg*   outOptExecWhenFinished;
 
+    CompareVariant compareVar_;
     DirectoryName<FolderHistoryBox> versioningFolder;
+
+    EnumDescrList<VersioningStyle> enumVersioningStyle;
 };
 
 
@@ -195,48 +208,17 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
                              xmlAccess::OnGuiError* handleError,
                              ExecWhenFinishedCfg* execWhenFinished) :
     SyncCfgDlgGenerated(parent),
-    directionCfg(syncCfg.directionCfg),  //make working copy
-    cmpVariant(compareVar),
-    handleDeletion(syncCfg.handleDeletion),
-    handleGuiError(ON_GUIERROR_POPUP), //dummy init
-    syncCfgOut(syncCfg),
-    refHandleError(handleError),
-    refExecWhenFinished(execWhenFinished),
-    versioningFolder(*m_panelVersioning, *m_buttonSelectDirVersioning, *m_versioningFolder)
+    handleDeletion(DELETE_TO_RECYCLER), //
+    onGuiError(ON_GUIERROR_POPUP), //dummy init
+    outSyncCfg(syncCfg),
+    outOptOnGuiError(handleError),
+    outOptExecWhenFinished(execWhenFinished),
+    compareVar_(compareVar),
+    versioningFolder(*m_panelVersioning, *m_buttonSelectDirVersioning, *m_versioningFolder/*, m_staticTextResolvedPath*/)
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-
-    versioningFolder.setName(utfCvrtTo<wxString>(syncCfg.versioningDirectory));
-    //map single parameter "version limit" to both checkbox and spin ctrl:
-    m_checkBoxVersionsLimit->SetValue(syncCfg.versionCountLimit >= 0);
-    m_spinCtrlVersionsLimit->SetValue(syncCfg.versionCountLimit >= 0 ? syncCfg.versionCountLimit : 10 /*SyncConfig().versionCountLimit*/);
-    updateGui();
-
-    //error handling
-    if (handleError)
-        handleGuiError = *handleError;
-    else
-    {
-        sbSizerErrorHandling->Show(false);
-        Layout();
-    }
-
-    if (execWhenFinished)
-    {
-        m_comboBoxExecFinished->initHistory(*execWhenFinished->history, execWhenFinished->historyMax);
-        m_comboBoxExecFinished->setValue(*execWhenFinished->command);
-    }
-    else
-    {
-        sbSizerExecFinished->Show(false);
-        Layout();
-    }
-
-    //set sync config icons
-    updateGui();
-
     //set icons for this dialog
     m_bitmapLeftOnly  ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"leftOnly"  ))));
     m_bitmapRightOnly ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"rightOnly" ))));
@@ -244,20 +226,79 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     m_bitmapRightNewer->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"rightNewer"))));
     m_bitmapDifferent ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"different" ))));
     m_bitmapConflict  ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"conflict"  ))));
-    m_bitmapDatabase  ->SetBitmap(GlobalResources::getImage(wxT("database")));
+    m_bitmapDatabase  ->SetBitmap(GlobalResources::getImage(L"database"));
 
-    bSizer201->Layout(); //wxButtonWithImage size might have changed
+    enumVersioningStyle.
+    add(VER_STYLE_REPLACE,       _("Replace"),    _("Move files and replace if existing")).
+    add(VER_STYLE_ADD_TIMESTAMP, _("Versioning"), _("Append a timestamp to each file name"));
 
-    m_buttonOK->SetFocus();
+    //hide controls for optional parameters
+    if (!handleError && !execWhenFinished) //currently either both or neither are bound!
+    {
+        bSizerExtraConfig->Show(false);
+        Layout();
+    }
+
+    if (execWhenFinished)
+        m_comboBoxExecFinished->initHistory(*execWhenFinished->history, execWhenFinished->historyMax);
+
+    Config newCfg = { syncCfg,
+                      handleError ?* handleError : ON_GUIERROR_POPUP,
+                      execWhenFinished ?* execWhenFinished->command : std::wstring()
+                    };
+    setConfig(newCfg);
 
     Fit();
+    bSizerConfig->Layout(); //wxButtonWithImage size might have changed
+
+    m_buttonOK->SetFocus();
 }
 
 //#################################################################################################################
 
+void SyncCfgDialog::setConfig(const Config& cfg)
+{
+    directionCfg   = cfg.syncCfg.directionCfg;  //make working copy; ownership *not* on GUI
+    handleDeletion = cfg.syncCfg.handleDeletion;
+
+    versioningFolder.setName(utfCvrtTo<wxString>(cfg.syncCfg.versioningDirectory));
+    setEnumVal(enumVersioningStyle, *m_choiceVersioningStyle,  cfg.syncCfg.versioningStyle);
+
+    ////map single parameter "version limit" to both checkbox and spin ctrl:
+    //m_checkBoxVersionsLimit->SetValue(cfg.syncCfg.versionCountLimit >= 0);
+    //m_spinCtrlVersionsLimit->SetValue(cfg.syncCfg.versionCountLimit >= 0 ? cfg.syncCfg.versionCountLimit : 10 /*SyncConfig().versionCountLimit*/);
+
+    onGuiError = cfg.onGuiError;
+
+    m_comboBoxExecFinished->setValue(cfg.onCompletion);
+
+    updateGui();
+}
+
+
+SyncCfgDialog::Config SyncCfgDialog::getConfig() const
+{
+    Config output;
+
+    //write configuration to main dialog
+    output.syncCfg.directionCfg        = directionCfg;
+    output.syncCfg.handleDeletion      = handleDeletion;
+    output.syncCfg.versioningDirectory = utfCvrtTo<Zstring>(versioningFolder.getName());
+    output.syncCfg.versioningStyle     = getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle),
+
+                   ////get single parameter "version limit" from both checkbox and spin ctrl:
+                   //   output.syncCfg.versionCountLimit   = m_checkBoxVersionsLimit->GetValue() ? m_spinCtrlVersionsLimit->GetValue() : -1;
+
+                   output.onGuiError = onGuiError;
+
+    output.onCompletion = m_comboBoxExecFinished->getValue();
+    return output;
+}
+
+
 void SyncCfgDialog::updateGui()
 {
-    //wxWindowUpdateLocker dummy(this); //avoid display distortion
+    wxWindowUpdateLocker dummy(this); //avoid display distortion
     wxWindowUpdateLocker dummy2(m_panelVersioning); //avoid display distortion
     wxWindowUpdateLocker dummy3(m_bpButtonLeftOnly);
     wxWindowUpdateLocker dummy4(m_bpButtonRightOnly);
@@ -266,7 +307,9 @@ void SyncCfgDialog::updateGui()
     wxWindowUpdateLocker dummy7(m_bpButtonDifferent);
     wxWindowUpdateLocker dummy8(m_bpButtonConflict);
 
-    updateConfigIcons(directionCfg,
+    const Config cfg = getConfig(); //resolve parameter ownership: some on GUI controls, others member variables
+
+    updateConfigIcons(cfg.syncCfg.directionCfg,
                       m_bpButtonLeftOnly,
                       m_bpButtonRightOnly,
                       m_bpButtonLeftNewer,
@@ -275,10 +318,10 @@ void SyncCfgDialog::updateGui()
                       m_bpButtonConflict);
 
     //display only relevant sync options
-    m_bitmapDatabase     ->Show(directionCfg.var == DirectionConfig::AUTOMATIC);
-    sbSizerSyncDirections->Show(directionCfg.var != DirectionConfig::AUTOMATIC);
+    m_bitmapDatabase     ->Show(cfg.syncCfg.directionCfg.var == DirectionConfig::AUTOMATIC);
+    sbSizerSyncDirections->Show(cfg.syncCfg.directionCfg.var != DirectionConfig::AUTOMATIC);
 
-    switch (cmpVariant)
+    switch (compareVar_) //sbSizerSyncDirections->Show resets child sizers!
     {
         case CMP_BY_TIME_SIZE:
             bSizerDifferent ->Show(false);
@@ -301,7 +344,7 @@ void SyncCfgDialog::updateGui()
     m_toggleBtnUpdate   ->SetValue(false);
     m_toggleBtnCustom   ->SetValue(false);
 
-    switch (directionCfg.var)
+    switch (cfg.syncCfg.directionCfg.var)
     {
         case DirectionConfig::AUTOMATIC:
             m_toggleBtnAutomatic->SetValue(true);
@@ -324,7 +367,7 @@ void SyncCfgDialog::updateGui()
     m_toggleBtnPermanent ->SetValue(false);
     m_toggleBtnRecycler  ->SetValue(false);
     m_toggleBtnVersioning->SetValue(false);
-    switch (handleDeletion)
+    switch (cfg.syncCfg.handleDeletion)
     {
         case DELETE_PERMANENTLY:
             m_toggleBtnPermanent->SetValue(true);
@@ -337,14 +380,37 @@ void SyncCfgDialog::updateGui()
             break;
     }
 
-    m_panelVersioning      ->Show(handleDeletion == DELETE_TO_VERSIONING);
-    m_checkBoxVersionsLimit->Show(handleDeletion == DELETE_TO_VERSIONING);
-    m_spinCtrlVersionsLimit->Show(handleDeletion == DELETE_TO_VERSIONING);
-    m_spinCtrlVersionsLimit->Enable(m_checkBoxVersionsLimit->GetValue());
+    const bool versioningSelected = cfg.syncCfg.handleDeletion == DELETE_TO_VERSIONING;
+    bSizerVersioningNamingConvention->Show(versioningSelected);
+    bSizerVersioningStyle           ->Show(versioningSelected);
+    m_panelVersioning               ->Show(versioningSelected);
+
+    if (versioningSelected)
+    {
+        updateTooltipEnumVal(enumVersioningStyle, *m_choiceVersioningStyle);
+
+        const std::wstring pathSep = utfCvrtTo<std::wstring>(FILE_NAME_SEPARATOR);
+        switch (cfg.syncCfg.versioningStyle)
+        {
+            case VER_STYLE_REPLACE:
+                setText(*m_staticTextNamingCvtPart1, pathSep + _("Folder") + pathSep + _("File") + L".doc");
+                setText(*m_staticTextNamingCvtPart2Bold, L"");
+                setText(*m_staticTextNamingCvtPart3, L"");
+                break;
+
+            case VER_STYLE_ADD_TIMESTAMP:
+                setText(*m_staticTextNamingCvtPart1, pathSep + _("Folder") + pathSep + _("File") + L".doc ");
+                setText(*m_staticTextNamingCvtPart2Bold, _("YYYY-MM-DD hhmmss"));
+                setText(*m_staticTextNamingCvtPart3, L".doc");
+                break;
+        }
+    }
+
+    //m_spinCtrlVersionsLimit->Enable(m_checkBoxVersionsLimit->GetValue()); //enabled status is *not* directly dependent from resolved config! (but transitively)
 
     m_toggleBtnErrorIgnore->SetValue(false);
     m_toggleBtnErrorPopup ->SetValue(false);
-    switch (handleGuiError)
+    switch (cfg.onGuiError)
     {
         case ON_GUIERROR_IGNORE:
             m_toggleBtnErrorIgnore->SetValue(true);
@@ -362,19 +428,17 @@ void SyncCfgDialog::updateGui()
 
 void SyncCfgDialog::OnApply(wxCommandEvent& event)
 {
+    const Config cfg = getConfig();
+
     //write configuration to main dialog
-    syncCfgOut.directionCfg        = directionCfg;
-    syncCfgOut.handleDeletion      = handleDeletion;
-    syncCfgOut.versioningDirectory = utfCvrtTo<Zstring>(versioningFolder.getName());
-    //get single parameter "version limit" from both checkbox and spin ctrl:
-    syncCfgOut.versionCountLimit   = m_checkBoxVersionsLimit->GetValue() ? m_spinCtrlVersionsLimit->GetValue() : -1;
+    outSyncCfg = cfg.syncCfg;
 
-    if (refHandleError)
-        *refHandleError = handleGuiError;
+    if (outOptOnGuiError)
+        *outOptOnGuiError = cfg.onGuiError;
 
-    if (refExecWhenFinished)
+    if (outOptExecWhenFinished)
     {
-        *refExecWhenFinished->command = m_comboBoxExecFinished->getValue();
+        *outOptExecWhenFinished->command = cfg.onCompletion;
         //a good place to commit current "on completion" history item
         m_comboBoxExecFinished->addItemHistory();
     }

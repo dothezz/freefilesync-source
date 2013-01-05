@@ -268,10 +268,10 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
     zen::hash_set<const HierarchyObject*> expandedNodes;
     if (!flatTree.empty())
     {
-        auto iter = flatTree.begin();
-        for (auto iterNext = flatTree.begin() + 1; iterNext != flatTree.end(); ++iterNext, ++iter)
-            if (iter->level_ < iterNext->level_)
-                if (auto hierObj = getHierAlias(*iter))
+        auto it = flatTree.begin();
+        for (auto iterNext = flatTree.begin() + 1; iterNext != flatTree.end(); ++iterNext, ++it)
+            if (it->level_ < iterNext->level_)
+                if (auto hierObj = getHierAlias(*it))
                     expandedNodes.insert(hierObj);
     }
 
@@ -1048,19 +1048,19 @@ private:
         {
             auto colAttr = grid_.getColumnConfig();
 
-            for (auto iter = colAttr.begin(); iter != colAttr.end(); ++iter)
-                if (iter->type_ == ca.type_)
+            for (auto it = colAttr.begin(); it != colAttr.end(); ++it)
+                if (it->type_ == ca.type_)
                 {
-                    iter->visible_ = !ca.visible_;
+                    it->visible_ = !ca.visible_;
                     grid_.setColumnConfig(colAttr);
                     return;
                 }
         };
 
         const auto& colAttr = grid_.getColumnConfig();
-        for (auto iter = colAttr.begin(); iter != colAttr.end(); ++iter)
+        for (auto it = colAttr.begin(); it != colAttr.end(); ++it)
         {
-            const Grid::ColumnAttribute& ca = *iter;
+            const Grid::ColumnAttribute& ca = *it;
 
             menu.addCheckBox(getColumnLabel(ca.type_), [ca, toggleColumn]() { toggleColumn(ca); },
             ca.visible_, ca.type_ != static_cast<ColumnType>(COL_TYPE_NAVI_DIRECTORY)); //do not allow user to hide file name column!

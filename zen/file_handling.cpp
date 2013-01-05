@@ -217,7 +217,7 @@ UInt64 zen::getFreeDiskSpace(const Zstring& path) //throw FileError
 namespace
 {
 #ifdef FFS_WIN
-//(try to) enhance error messages by showing which processed lock the file
+//(try to) enhance error messages by showing which processes lock the file
 Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string if none found or error occurred
 {
     if (vistaOrLater())
@@ -316,8 +316,6 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
         if (errorCodeForNotExisting(lastError)) //no error situation if file is not existing! manual deletion relies on it!
             return false;
 
-        const std::wstring shortMsg = replaceCpy(_("Cannot delete file %x."), L"%x", fmtFileName(filename));
-
 #ifdef FFS_WIN
         if (lastError == ERROR_ACCESS_DENIED) //function fails if file is read-only
         {
@@ -327,7 +325,15 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
                 return true;
             lastError = ::GetLastError();
         }
+#endif
+        //after "lastError" evaluation it *may* be redundant to check existence again, but better be safe than sorry:
+        if (!somethingExists(filename)) //warning: changes global error code!!
+            return false; //neither file nor any other object (e.g. broken symlink) with that name existing
 
+        //begin of "regular" error reporting
+        const std::wstring shortMsg = replaceCpy(_("Cannot delete file %x."), L"%x", fmtFileName(filename));
+
+#ifdef FFS_WIN
         if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
             lastError == ERROR_LOCK_VIOLATION)
         {
@@ -336,10 +342,6 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
                 throw FileError(shortMsg + L"\n\n" + _("The file is locked by another process:") + L"\n" + procList);
         }
 #endif
-        //after "lastError" evaluation it *may* be redundant to check existence again, but better be safe than sorry:
-        if (!somethingExists(filename)) //warning: changes global error code!!
-            return false; //neither file nor any other object (e.g. broken symlink) with that name existing
-
         throw FileError(shortMsg + L"\n\n" + getLastErrorFormatted(lastError));
     }
     return true;
@@ -636,15 +638,15 @@ void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
     }
 
     //delete directories recursively
-    for (auto iter = dirList.begin(); iter != dirList.end(); ++iter)
-        removeDirectory(*iter, callback); //call recursively to correctly handle symbolic links
+    for (auto it = dirList.begin(); it != dirList.end(); ++it)
+        removeDirectory(*it, callback); //call recursively to correctly handle symbolic links
 
     //delete files
-    for (auto iter = fileList.begin(); iter != fileList.end(); ++iter)
+    for (auto it = fileList.begin(); it != fileList.end(); ++it)
     {
-        const bool workDone = removeFile(*iter);
+        const bool workDone = removeFile(*it);
         if (callback && workDone)
-            callback->notifyFileDeletion(*iter); //call once per file
+            callback->notifyFileDeletion(*it); //call once per file
     }
 
     //parent directory is deleted last
@@ -1923,6 +1925,7 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         CopyFileEx() processes multiple streams one after another, stream 1 is the file data stream and always available!
         Each stream is initialized with CALLBACK_STREAM_SWITCH and provides *new* hSourceFile, hDestinationFile.
         Calling GetFileInformationByHandle() on hDestinationFile for stream > 1 results in ERROR_ACCESS_DENIED!
+    	totalBytesTransferred contains size of *all* streams and so can be larger than the "file size" file attribute
     */
 
     CallbackData& cbd = *static_cast<CallbackData*>(lpData);

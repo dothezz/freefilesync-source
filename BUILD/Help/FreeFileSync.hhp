@@ -11,7 +11,7 @@ Title=FreeFileSync - Help
 
 [FILES]
 html\FreeFileSync.html
-html\Backup Strategies.html
+html\Versioning.html
 html\Batch Scripting.html
 html\Compare by File Size.html
 html\Comparison Settings.html

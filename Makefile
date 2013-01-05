@@ -5,17 +5,17 @@ SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 DOCSHAREDIR = $(SHAREDIR)/doc/$(APPNAME)
 
-COMMON_COMPILE_FLAGS = -Wall -pipe -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h" -include "zen/warn_static.h"
-COMMON_LINK_FLAGS    = -pthread -lrt -lz
+CPPFLAGS  = -Wall -pipe -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h" -include "zen/warn_static.h"
+LINKFLAGS = -pthread -lrt -lz
 
-#default build
-CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
-LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes` -lboost_thread -lboost_system
-
-#static std library linkage used for precompiled release
 ifeq ($(BUILD),release)
-CPPFLAGS  = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
-LINKFLAGS = $(COMMON_LINK_FLAGS) `wx-config --libs std,aui --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a /usr/local/lib/libboost_system.a
+#static wxWidgets and boost library linkage for precompiled release
+CPPFLAGS  += `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
+LINKFLAGS += `wx-config --libs std,aui --debug=no --unicode=yes --static=yes` -Wl,-Bstatic -lboost_thread -lboost_system -Wl,-Bdynamic
+else
+#default build
+CPPFLAGS  += `wx-config --cxxflags --debug=no --unicode=yes`
+LINKFLAGS += `wx-config --libs std,aui --debug=no --unicode=yes` -lboost_thread -lboost_system
 endif
 #####################################################################################################
 

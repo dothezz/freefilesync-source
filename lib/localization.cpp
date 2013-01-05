@@ -35,21 +35,21 @@ public:
     virtual std::wstring translate(const std::wstring& text)
     {
         //look for translation in buffer table
-        const Translation::const_iterator iter = transMapping.find(text);
-        if (iter != transMapping.end())
-            return iter->second;
+        const Translation::const_iterator it = transMapping.find(text);
+        if (it != transMapping.end())
+            return it->second;
 
         return text; //fallback
     }
 
     virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, int n)
     {
-        TranslationPlural::const_iterator iter = transMappingPl.find(std::make_pair(singular, plural));
-        if (iter != transMappingPl.end())
+        TranslationPlural::const_iterator it = transMappingPl.find(std::make_pair(singular, plural));
+        if (it != transMappingPl.end())
         {
             const int formNo = pluralParser->getForm(n);
-            if (0 <= formNo && formNo < static_cast<int>(iter->second.size()))
-                return iter->second[formNo];
+            if (0 <= formNo && formNo < static_cast<int>(it->second.size()))
+                return it->second[formNo];
         }
         return n == 1 ? singular : plural; //fallback
     }
@@ -72,7 +72,7 @@ FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(
     {
         inputStream = loadStream(filename); //throw XmlFileError
     }
-    catch (...)
+    catch (const XmlFileError&)
     {
         throw lngfile::ParsingError(0, 0);
     }
@@ -378,10 +378,10 @@ void zen::setLanguage(int language) //throw FileError
     //(try to) retrieve language file
     wxString languageFile;
 
-    for (auto iter = ExistingTranslations::get().begin(); iter != ExistingTranslations::get().end(); ++iter)
-        if (iter->languageID == language)
+    for (auto it = ExistingTranslations::get().begin(); it != ExistingTranslations::get().end(); ++it)
+        if (it->languageID == language)
         {
-            languageFile = iter->languageFile;
+            languageFile = it->languageFile;
             break;
         }
 
@@ -397,8 +397,8 @@ void zen::setLanguage(int language) //throw FileError
         {
             throw FileError(replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
                                                              L"%x", fmtFileName(toZ(languageFile))),
-                                                  L"%y", numberTo<std::wstring>(e.row)),
-                                       L"%z", numberTo<std::wstring>(e.col)));
+                                                  L"%y", numberTo<std::wstring>(e.row + 1)),
+                                       L"%z", numberTo<std::wstring>(e.col + 1)));
         }
         catch (PluralForm::ParsingError&)
         {

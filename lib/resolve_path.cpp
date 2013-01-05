@@ -212,6 +212,9 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
     if (equalNoCase(macro, Zstr("date")))
         return make_unique<Zstring>(formatTime<Zstring>(FORMAT_ISO_DATE));
 
+    if (equalNoCase(macro, Zstr("timestamp")))
+        return make_unique<Zstring>(formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"))); //e.g. "2012-05-15 131513"
+
     std::unique_ptr<Zstring> cand;
     auto processPhrase = [&](const Zchar* phrase, const Zchar* format) -> bool
     {
@@ -224,7 +227,7 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
 
     if (processPhrase(Zstr("weekday"), Zstr("%A"))) return cand;
     if (processPhrase(Zstr("day"    ), Zstr("%d"))) return cand;
-    if (processPhrase(Zstr("month"  ), Zstr("%B"))) return cand;
+    if (processPhrase(Zstr("month"  ), Zstr("%m"))) return cand;
     if (processPhrase(Zstr("week"   ), Zstr("%U"))) return cand;
     if (processPhrase(Zstr("year"   ), Zstr("%Y"))) return cand;
     if (processPhrase(Zstr("hour"   ), Zstr("%H"))) return cand;
@@ -233,9 +236,9 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
 
     //check domain-specific extensions
     {
-        auto iter = std::find_if(ext.begin(), ext.end(), [&](const std::pair<Zstring, Zstring>& p) { return equalNoCase(macro, p.first); });
-        if (iter != ext.end())
-            return make_unique<Zstring>(iter->second);
+        auto it = std::find_if(ext.begin(), ext.end(), [&](const std::pair<Zstring, Zstring>& p) { return equalNoCase(macro, p.first); });
+        if (it != ext.end())
+            return make_unique<Zstring>(it->second);
     }
 
     //try to resolve as environment variable
@@ -246,9 +249,9 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
     //try to resolve as CSIDL value
     {
         const auto& csidlMap = CsidlConstants::get();
-        auto iter = csidlMap.find(macro);
-        if (iter != csidlMap.end())
-            return make_unique<Zstring>(iter->second);
+        auto it = csidlMap.find(macro);
+        if (it != csidlMap.end())
+            return make_unique<Zstring>(it->second);
     }
 #endif
 
@@ -325,9 +328,9 @@ Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on
         //search for matching path in parallel until first hit
         RunUntilFirstHit<Zstring> findFirstMatch;
 
-        for (const wchar_t* iter = &buffer[0]; *iter != 0; iter += strLength(iter) + 1) //list terminated by empty c-string
+        for (const wchar_t* it = &buffer[0]; *it != 0; it += strLength(it) + 1) //list terminated by empty c-string
         {
-            const Zstring path = iter;
+            const Zstring path = it;
 
             findFirstMatch.addJob([path, volumeName]() -> std::unique_ptr<Zstring>
             {
@@ -364,9 +367,9 @@ Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on
     TraverseMedia traverser(deviceList);
     traverseFolder("/media", traverser); //traverse one level
 
-    TraverseMedia::DeviceList::const_iterator iter = deviceList.find(volumeName);
-    if (iter != deviceList.end())
-        return iter->second;
+    TraverseMedia::DeviceList::const_iterator it = deviceList.find(volumeName);
+    if (it != deviceList.end())
+        return it->second;
 #endif
     return Zstring();
 }

@@ -97,7 +97,6 @@ public:
         wxIcon newIcon; //attention: wxIcon uses reference counting!
 #ifdef FFS_WIN
         newIcon.SetHICON(clone.handle_);
-
         {
             //this block costs ~0.04 ms
             ICONINFO icoInfo = {};
@@ -129,8 +128,14 @@ public:
         //no stretching for now
         //newIcon.SetSize(expectedSize, expectedSize); //icon is stretched to this size if referenced HICON differs
 
-#elif defined FFS_LINUX                   //
-        newIcon.SetPixbuf(clone.handle_); // transfer ownership!!
+#elif defined FFS_LINUX
+        // transfer ownership!!
+#if wxCHECK_VERSION(2, 9, 4)
+        newIcon.CopyFromBitmap(wxBitmap(clone.handle_));
+#else
+        newIcon.SetPixbuf(clone.handle_);
+#endif
+
 #endif                                    //
         clone.handle_ = nullptr;          //
         return newIcon;
@@ -273,8 +278,8 @@ IconHolder getGenericFileIcon(IconBuffer::IconSize sz)
     const int requestedSize = cvrtSize(sz);
 
     if (GtkIconTheme* defaultTheme = gtk_icon_theme_get_default()) //not owned!
-        for (auto iter = std::begin(mimeFileIcons); iter != std::end(mimeFileIcons); ++iter)
-            if (GdkPixbuf* pixBuf = gtk_icon_theme_load_icon(defaultTheme, *iter, requestedSize, GTK_ICON_LOOKUP_USE_BUILTIN, nullptr))
+        for (auto it = std::begin(mimeFileIcons); it != std::end(mimeFileIcons); ++it)
+            if (GdkPixbuf* pixBuf = gtk_icon_theme_load_icon(defaultTheme, *it, requestedSize, GTK_ICON_LOOKUP_USE_BUILTIN, nullptr))
                 return IconHolder(pixBuf); //pass ownership (may be nullptr)
     return IconHolder();
 #endif
@@ -374,9 +379,7 @@ IconHolder getGenericDirectoryIcon(IconBuffer::IconSize sz)
 #endif
 }
 
-
 //################################################################################################################################################
-
 
 //---------------------- Shared Data -------------------------
 class WorkLoad
@@ -400,7 +403,8 @@ public:
             boost::unique_lock<boost::mutex> dummy(lockFiles);
             filesToLoad = newLoad;
         }
-        conditionNewFiles.notify_one();
+
+        conditionNewFiles.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
         //condition handling, see: http://www.boost.org/doc/libs/1_43_0/doc/html/thread/synchronization.html#thread.synchronization.condvar_ref
     }
 
@@ -411,7 +415,7 @@ private:
 };
 
 
-typedef std::map<Zstring, IconHolder, LessFilename> NameIconMap; //entryName/icon -> note: Zstring is thread-safe
+typedef std::map<Zstring, IconHolder, LessFilename> NameIconMap; //entryName/icon -> note: Zstring is "thread-safe like an int"
 typedef std::queue<Zstring> IconDbSequence; //entryName
 
 class Buffer
@@ -421,11 +425,11 @@ public:
     {
         boost::lock_guard<boost::mutex> dummy(lockBuffer);
 
-        auto iter = iconMappping.find(fileName);
-        if (iter != iconMappping.end())
+        auto it = iconMappping.find(fileName);
+        if (it != iconMappping.end())
         {
             if (icon != nullptr)
-                *icon = iter->second;
+                *icon = it->second;
             return true;
         }
         return false;

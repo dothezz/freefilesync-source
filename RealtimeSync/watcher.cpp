@@ -65,9 +65,9 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
     //detect when volumes are removed/are not available anymore
     std::vector<std::pair<Zstring, std::shared_ptr<DirWatcher>>> watches;
 
-    for (auto iter = dirNamesFmt.begin(); iter != dirNamesFmt.end(); ++iter)
+    for (auto it = dirNamesFmt.begin(); it != dirNamesFmt.end(); ++it)
     {
-        const Zstring& dirnameFmt = *iter;
+        const Zstring& dirnameFmt = *it;
         try
         {
             //a non-existent network path may block, so check existence asynchronously!
@@ -107,10 +107,10 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
         }();
 
 
-        for (auto iter = watches.begin(); iter != watches.end(); ++iter)
+        for (auto it = watches.begin(); it != watches.end(); ++it)
         {
-            const Zstring& dirname = iter->first;
-            DirWatcher& watcher = *(iter->second);
+            const Zstring& dirname = it->first;
+            DirWatcher& watcher = *(it->second);
 
             //IMPORTANT CHECK: dirwatcher has problems detecting removal of top watched directories!
             if (checkDirExistNow)
@@ -166,9 +166,9 @@ void rts::waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt, WaitCal
         const std::vector<Zstring>& dirNamesFmt = getFormattedDirs(dirNamesNonFmt); //throw FileError
 
         bool allExisting = true;
-        for (auto iter = dirNamesFmt.begin(); iter != dirNamesFmt.end(); ++iter)
+        for (auto it = dirNamesFmt.begin(); it != dirNamesFmt.end(); ++it)
         {
-            const Zstring dirnameFmt = *iter;
+            const Zstring dirnameFmt = *it;
             auto ftDirExisting = async([=]() -> bool
             {
 #ifdef FFS_WIN

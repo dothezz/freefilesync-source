@@ -30,7 +30,6 @@ private:
     void loadConfig(const wxString& filename);
 
     virtual void OnClose          (wxCloseEvent& event)   { Destroy(); }
-    virtual void OnQuit           (wxCommandEvent& event) { Destroy(); }
     virtual void OnShowHelp       (wxCommandEvent& event);
     virtual void OnMenuAbout      (wxCommandEvent& event);
     virtual void OnAddFolder      (wxCommandEvent& event);

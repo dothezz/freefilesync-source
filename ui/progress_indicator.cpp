@@ -325,15 +325,15 @@ public:
     {
         viewRef.clear();
 
-        for (auto iter = log_.begin(); iter != log_.end(); ++iter)
-            if (iter->type & includedTypes)
+        for (auto it = log_.begin(); it != log_.end(); ++it)
+            if (it->type & includedTypes)
             {
                 assert_static((IsSameType<GetCharType<MsgString>::Type, wchar_t>::value));
-                assert(!startsWith(iter->message, L'\n'));
+                assert(!startsWith(it->message, L'\n'));
 
                 size_t rowNumber = 0;
                 bool lastCharNewline = true;
-                std::for_each(iter->message.begin(), iter->message.end(),
+                std::for_each(it->message.begin(), it->message.end(),
                               [&](wchar_t c)
                 {
                     typedef Line Line; //workaround MSVC compiler bug!
@@ -341,7 +341,7 @@ public:
                     if (c == L'\n')
                     {
                         if (!lastCharNewline) //do not reference empty lines!
-                            viewRef.push_back(Line(&*iter, rowNumber));
+                            viewRef.push_back(Line(&*it, rowNumber));
                         ++rowNumber;
                         lastCharNewline = true;
                     }
@@ -349,7 +349,7 @@ public:
                         lastCharNewline = false;
                 });
                 if (!lastCharNewline)
-                    viewRef.push_back(Line(&*iter, rowNumber));
+                    viewRef.push_back(Line(&*it, rowNumber));
             }
     }
 
@@ -660,7 +660,7 @@ private:
         const std::vector<size_t> selection = m_gridMessages->getSelectedRows();
 
         ContextMenu menu;
-        menu.addItem(_("Copy") + L"\tCtrl+C", [this] { copySelectionToClipboard(); }, nullptr, !selection.empty(), wxID_COPY);
+        menu.addItem(_("Copy") + L"\tCtrl+C", [this] { copySelectionToClipboard(); }, nullptr, !selection.empty());
         menu.popup(*this);
     }
 
@@ -740,10 +740,10 @@ private:
 
     virtual double getValue(double x) const //x: seconds since begin
     {
-        auto iter = data.lower_bound(x * 1000);
-        if (iter == data.end())
+        auto it = data.lower_bound(x * 1000);
+        if (it == data.end())
             return data.empty() ? 0 : (--data.end())->second;
-        return iter->second;
+        return it->second;
     }
     //example: two-element range is accessible within [0, 2)
 
@@ -1001,15 +1001,18 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     graphDataBytes      = std::make_shared<GraphDataBytes>();
     graphDataBytesTotal = std::make_shared<GraphDataConstLine>();
 
-    m_panelGraph->setAttributes(Graph2D::GraphAttributes().
+    m_panelGraph->setAttributes(Graph2D::MainAttributes().
                                 setLabelX(Graph2D::X_LABEL_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
-                                setLabelY(Graph2D::Y_LABEL_RIGHT,  60, std::make_shared<LabelFormatterBytes>()));
+                                setLabelY(Graph2D::Y_LABEL_RIGHT,  70, std::make_shared<LabelFormatterBytes>()));
 
-    m_panelGraph->setData(graphDataBytesTotal, Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0,  64, 0))); //green
-    m_panelGraph->addData(graphDataBytes,      Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0))); //medium green
+    m_panelGraph->setData(graphDataBytes,
+                          Graph2D::CurveAttributes().setLineWidth(2)
+                          .setColor     (wxColor(  0, 192,   0))   //medium green
+                          .fillCurveArea(wxColor(192, 255, 192))); //faint green
+
+    m_panelGraph->addData(graphDataBytesTotal, Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(0, 64, 0))); //dark green
 
     //allow changing on completion command
-
     m_comboBoxExecFinished->initHistory(execFinishedHistory, execFinishedHistory.size()); //-> we won't use addItemHistory() later
     m_comboBoxExecFinished->setValue(execWhenFinished);
 
@@ -1242,6 +1245,7 @@ void SyncStatus::SyncStatusImpl::updateProgress(bool allowYield)
             //remaining objects and data
             setText(*m_staticTextRemainingObj, toGuiString(objectsTotal - objectsCurrent), &layoutChanged);
             setText(*m_staticTextDataRemaining, L"(" + filesizeToShortString(dataTotal - dataCurrent) + L")", &layoutChanged);
+            //it's possible data remaining becomes shortly negative if last file synced has ADS data and the dataTotal was not yet corrected!
 
             //remaining time and speed
             assert(perf);
@@ -1382,12 +1386,12 @@ void SyncStatus::SyncStatusImpl::updateDialogStatus() //depends on "syncStat_, p
 
             case RESULT_FINISHED_WITH_WARNINGS:
                 m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusFinishedWarnings"));
-                m_bitmapStatus->SetToolTip(_("Synchronization completed with warnings!"));
+                m_bitmapStatus->SetToolTip(_("Synchronization completed with warnings."));
                 break;
 
             case RESULT_FINISHED_WITH_SUCCESS:
                 m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusFinishedSuccess"));
-                m_bitmapStatus->SetToolTip(_("Synchronization completed successfully!"));
+                m_bitmapStatus->SetToolTip(_("Synchronization completed successfully."));
                 break;
         }
 
@@ -1484,6 +1488,7 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const E
             auto objectsTotal   = syncStat_->getObjectsTotal  (syncStat_->currentPhase());
             auto dataCurrent    = syncStat_->getDataCurrent   (syncStat_->currentPhase());
             auto dataTotal      = syncStat_->getDataTotal     (syncStat_->currentPhase());
+            assert(dataCurrent <= dataTotal);
 
             //set overall speed (instead of current speed)
             assert(perf);

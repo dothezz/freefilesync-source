@@ -18,8 +18,8 @@
 #pragma GCC diagnostic ignored "-Wshadow"
 #endif
 #ifdef _MSC_VER
-#pragma warning(disable : 4702) //unreachable code
-#pragma warning(disable : 4913) //user defined binary operator ',' exists but no overload could convert all operands, default built-in binary operator ',' used
+#pragma warning(push)
+#pragma warning(disable : 4702 4913) //unreachable code; user defined binary operator ',' exists but no overload could convert all operands, default built-in binary operator ',' used
 #endif
 
 #include <boost/thread.hpp>
@@ -28,8 +28,7 @@
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
-#pragma warning(default : 4702)
-#pragma warning(default : 4913)
+#pragma warning(pop)
 #endif
 
 namespace zen
@@ -94,7 +93,7 @@ private:
 template <class T, class Function> inline
 auto async2(Function fun) -> boost::unique_future<T> //support for workaround of VS2010 bug: bool (*fun)();  decltype(fun()) == int!
 {
-    boost::packaged_task<T> pt(fun);
+    boost::packaged_task<T> pt(std::move(fun)); //packaged task seems to even require r-value reference: https://sourceforge.net/p/freefilesync/bugs/234/
     auto fut = pt.get_future();
     boost::thread t(std::move(pt));
     t.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
@@ -110,12 +109,9 @@ template<class InputIterator, class Duration> inline
 bool wait_for_all_timed(InputIterator first, InputIterator last, const Duration& wait_duration)
 {
     const boost::system_time endTime = boost::get_system_time() + wait_duration;
-    while (first != last)
-    {
+    for (; first != last; ++first)
         if (!first->timed_wait_until(endTime))
             return false; //time elapsed
-        ++first;
-    }
     return true;
 }
 
@@ -139,7 +135,7 @@ public:
             if (!result_)
                 result_ = std::move(result);
         }
-        conditionJobDone.notify_one();
+        conditionJobDone.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
         //condition handling, see: http://www.boost.org/doc/libs/1_43_0/doc/html/thread/synchronization.html#thread.synchronization.condvar_ref
     }
 

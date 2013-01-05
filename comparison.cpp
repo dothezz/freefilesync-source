@@ -107,9 +107,9 @@ void determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
     auto timeMax = boost::get_system_time() + boost::posix_time::seconds(10); //limit total directory search time
 
     auto iterCheckDir = asyncDirChecks.begin();
-    for (auto iter = dirs.begin(); iter != dirs.end(); ++iter, ++iterCheckDir)
+    for (auto it = dirs.begin(); it != dirs.end(); ++it, ++iterCheckDir)
     {
-    const Zstring& dirname = *iter;
+    const Zstring& dirname = *it;
     callback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", fmtFileName(dirname), false));
 
     while (boost::get_system_time() < timeMax && !iterCheckDir->timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL)))
@@ -749,16 +749,16 @@ private:
 template <SelectedSide side>
 void MergeSides::fillOneSide(const DirContainer& dirCont, HierarchyObject& output)
 {
-    for (auto iter = dirCont.files.cbegin(); iter != dirCont.files.cend(); ++iter)
-        output.addSubFile<side>(iter->first, iter->second);
+    for (auto it = dirCont.files.cbegin(); it != dirCont.files.cend(); ++it)
+        output.addSubFile<side>(it->first, it->second);
 
-    for (auto iter = dirCont.links.cbegin(); iter != dirCont.links.cend(); ++iter)
-        output.addSubLink<side>(iter->first, iter->second);
+    for (auto it = dirCont.links.cbegin(); it != dirCont.links.cend(); ++it)
+        output.addSubLink<side>(it->first, it->second);
 
-    for (auto iter = dirCont.dirs.cbegin(); iter != dirCont.dirs.cend(); ++iter)
+    for (auto it = dirCont.dirs.cbegin(); it != dirCont.dirs.cend(); ++it)
     {
-        DirMapping& newDirMap = output.addSubDir<side>(iter->first);
-        fillOneSide<side>(iter->second, newDirMap); //recurse
+        DirMapping& newDirMap = output.addSubDir<side>(it->first);
+        fillOneSide<side>(it->second, newDirMap); //recurse
     }
 }
 
@@ -906,8 +906,8 @@ void ComparisonBuffer::performComparison(const FolderPairCfg& fpCfg,
     DirectoryValue emptyDummy;
     auto getDirValue = [&](const Zstring& dirnameFmt) -> const DirectoryValue&
     {
-        auto iter = directoryBuffer.find(DirectoryKey(dirnameFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
-        return iter == directoryBuffer.end() ? emptyDummy : iter->second;
+        auto it = directoryBuffer.find(DirectoryKey(dirnameFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
+        return it == directoryBuffer.end() ? emptyDummy : it->second;
     };
 
     const DirectoryValue& bufValueLeft  = getDirValue(fpCfg.leftDirectoryFmt);

@@ -142,7 +142,7 @@ T confineCpy(const T& val, const T& minVal, const T& maxVal)
         return minVal;
     else if (val > maxVal)
         return maxVal;
-	return val;
+    return val;
 }
 
 template <class T> inline

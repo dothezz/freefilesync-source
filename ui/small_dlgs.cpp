@@ -4,25 +4,25 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#include "gui_generated.h"
 #include "small_dlgs.h"
-#include "msg_popup.h"
-#include <zen/format_unit.h>
-#include "../lib/resources.h"
-#include "../algorithm.h"
-#include <wx+/choice_enum.h>
-#include "../synchronization.h"
-#include "custom_grid.h"
-#include <wx+/button.h>
-#include <zen/build_info.h>
 #include <wx/wupdlock.h>
-#include <wx/msgdlg.h>
+//#include <wx/msgdlg.h>
+#include <zen/format_unit.h>
+#include <zen/build_info.h>
+#include <zen/stl_tools.h>
+#include <wx+/choice_enum.h>
+#include <wx+/button.h>
+#include <wx+/rtl.h>
 #include <wx+/no_flicker.h>
 #include <wx+/mouse_move_dlg.h>
-#include <wx+/rtl.h>
-#include "../lib/help_provider.h"
 #include <wx+/image_tools.h>
-#include <zen/stl_tools.h>
+#include "gui_generated.h"
+#include "msg_popup.h"
+#include "custom_grid.h"
+#include "../lib/resources.h"
+#include "../algorithm.h"
+#include "../synchronization.h"
+#include "../lib/help_provider.h"
 #include "../lib/hard_filter.h"
 #include "../version/version.h"
 
@@ -51,20 +51,20 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     m_animCtrlWink->Play();
 
     //create language credits
-    for (auto iter = ExistingTranslations::get().begin(); iter != ExistingTranslations::get().end(); ++iter)
+    for (auto it = ExistingTranslations::get().begin(); it != ExistingTranslations::get().end(); ++it)
     {
         //flag
-        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::getImage(iter->languageFlag), wxDefaultPosition, wxSize(-1, 11), 0 );
+        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::getImage(it->languageFlag), wxDefaultPosition, wxSize(-1, 11), 0 );
         fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER);
 
         //language name
-        wxStaticText* staticTextLanguage = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, iter->languageName, wxDefaultPosition, wxDefaultSize, 0 );
+        wxStaticText* staticTextLanguage = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, it->languageName, wxDefaultPosition, wxDefaultSize, 0 );
         staticTextLanguage->Wrap(-1);
         staticTextLanguage->SetForegroundColour(*wxBLACK); //accessibility: always set both foreground AND background colors!
         fgSizerTranslators->Add(staticTextLanguage, 0, wxALIGN_CENTER_VERTICAL);
 
         //translator name
-        wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, iter->translatorName, wxDefaultPosition, wxDefaultSize, 0 );
+        wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, it->translatorName, wxDefaultPosition, wxDefaultSize, 0 );
         staticTextTranslator->Wrap(-1);
         staticTextTranslator->SetForegroundColour(*wxBLACK); //accessibility: always set both foreground AND background colors!
         fgSizerTranslators->Add(staticTextTranslator, 0, wxALIGN_CENTER_VERTICAL);
@@ -206,7 +206,8 @@ FilterDlg::FilterDlg(wxWindow* parent,
     //
     m_staticTexHeader->SetLabel(_("Filter"));
 
-    Fit();
+    Fit(); //child-element widths have changed: image was set
+    m_panelHeader->Layout();
 }
 
 
@@ -375,6 +376,9 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 
     updateGui();
 
+    Fit(); //child-element widths have changed: image was set: "fit" only *once* on construction!
+    m_panelHeader->Layout();
+
     m_buttonOK->SetFocus();
 }
 
@@ -406,7 +410,6 @@ void DeleteDialog::updateGui()
     const wxString& fileList = utfCvrtTo<wxString>(delInfo.first);
     m_textCtrlFileList->ChangeValue(fileList);
 
-    Fit(); //child-element widths have changed: image was set
     m_panelHeader->Layout();
     Layout();
 }
@@ -504,6 +507,7 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     setValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"deleteRightSmall");
 
     m_buttonStartSync->SetFocus();
+    m_panelHeader->Layout(); //m_buttonStartSync changed => this *is* required!
     Fit();
 }
 
@@ -701,13 +705,15 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     m_gridCustomCommand->GetGridColLabelWindow()->SetToolTip(toolTip);
     m_gridCustomCommand->SetMargins(0, 0);
 
-    m_buttonOkay->SetFocus();
-    Fit();
+    Fit(); //child-element widths have changed: image was set
+    m_panelHeader->Layout();
 
     //automatically fit column width to match totl grid width
     Connect(wxEVT_SIZE, wxSizeEventHandler(GlobalSettingsDlg::OnResize), nullptr, this);
     wxSizeEvent dummy;
     OnResize(dummy);
+
+    m_buttonOkay->SetFocus();
 }
 
 
@@ -744,7 +750,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
     if (showQuestionDlg(this, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                        _("Make hidden dialogs and warning messages visible again?")) == ReturnQuestionDlg::BUTTON_YES)
+                        _("Make hidden warnings and dialogs visible again?")) == ReturnQuestionDlg::BUTTON_YES)
         settings.optDialogs.resetDialogs();
 }
 
@@ -772,11 +778,11 @@ void GlobalSettingsDlg::set(const xmlAccess::ExternalApps& extApp)
         m_gridCustomCommand->DeleteRows(0, rowCount);
 
     m_gridCustomCommand->AppendRows(static_cast<int>(extAppTmp.size()));
-    for (auto iter = extAppTmp.begin(); iter != extAppTmp.end(); ++iter)
+    for (auto it = extAppTmp.begin(); it != extAppTmp.end(); ++it)
     {
-        const int row = iter - extAppTmp.begin();
-        m_gridCustomCommand->SetCellValue(row, 0, iter->first);  //description
-        m_gridCustomCommand->SetCellValue(row, 1, iter->second); //commandline
+        const int row = it - extAppTmp.begin();
+        m_gridCustomCommand->SetCellValue(row, 0, it->first);  //description
+        m_gridCustomCommand->SetCellValue(row, 1, it->second); //commandline
     }
     //Fit();
 }

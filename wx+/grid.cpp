@@ -7,7 +7,6 @@
 #include "grid.h"
 #include <cassert>
 #include <set>
-#include <wx/dcbuffer.h> //for macro: wxALWAYS_NATIVE_DOUBLE_BUFFER
 #include <wx/settings.h>
 #include <wx/listbox.h>
 #include <wx/tooltip.h>
@@ -19,6 +18,7 @@
 #include <zen/utf.h>
 #include <zen/format_unit.h>
 #include "image_tools.h"
+#include "rtl.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -63,48 +63,8 @@ const wxColor COLOR_LABEL_GRADIENT_TO_FOCUS   = COLOR_LABEL_GRADIENT_TO;
 wxColor getColorMainWinBackground() { return wxListBox::GetClassDefaultAttributes().colBg; } //cannot be initialized statically on wxGTK!
 
 const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
+
 //------------------------------------------------------------
-
-
-//a fix for a poor wxWidgets implementation (wxAutoBufferedPaintDC skips one pixel on left side when RTL layout is active)
-#ifndef wxALWAYS_NATIVE_DOUBLE_BUFFER
-#error we need this one!
-#endif
-
-#if wxALWAYS_NATIVE_DOUBLE_BUFFER
-struct BufferedPaintDC : public wxPaintDC { BufferedPaintDC(wxWindow& wnd, std::unique_ptr<wxBitmap>& buffer) : wxPaintDC(&wnd) {} };
-
-#else
-class BufferedPaintDC : public wxMemoryDC
-{
-public:
-    BufferedPaintDC(wxWindow& wnd, std::unique_ptr<wxBitmap>& buffer) : buffer_(buffer), paintDc(&wnd)
-    {
-        const wxSize clientSize = wnd.GetClientSize();
-        if (!buffer_ || clientSize != wxSize(buffer->GetWidth(), buffer->GetHeight()))
-            buffer.reset(new wxBitmap(clientSize.GetWidth(), clientSize.GetHeight()));
-
-        SelectObject(*buffer);
-
-        if (paintDc.IsOk())
-            SetLayoutDirection(paintDc.GetLayoutDirection());
-    }
-
-    ~BufferedPaintDC()
-    {
-        paintDc.SetLayoutDirection(wxLayout_LeftToRight); //workaround bug in wxDC::Blit()
-        SetLayoutDirection(wxLayout_LeftToRight);         //
-
-        const wxPoint origin = GetDeviceOrigin();
-        paintDc.Blit(0, 0, buffer_->GetWidth(), buffer_->GetHeight(), this, -origin.x, -origin.y);
-    }
-
-private:
-    std::unique_ptr<wxBitmap>& buffer_;
-    wxPaintDC paintDc;
-};
-#endif
-
 
 //another fix for yet another poor wxWidgets implementation (wxDCClipper does *not* stack)
 hash_map<wxDC*, wxRect> clippingAreas; //associate "active" clipping area with each DC
@@ -114,15 +74,15 @@ class DcClipper
 public:
     DcClipper(wxDC& dc, const wxRect& r) : dc_(dc)
     {
-        auto iter = clippingAreas.find(&dc);
-        if (iter != clippingAreas.end())
+        auto it = clippingAreas.find(&dc);
+        if (it != clippingAreas.end())
         {
-            oldRect.reset(new wxRect(iter->second));
+            oldRect.reset(new wxRect(it->second));
 
             wxRect tmp = r;
             tmp.Intersect(*oldRect);    //better safe than sorry
             dc_.SetClippingRegion(tmp); //
-            iter->second = tmp;
+            it->second = tmp;
         }
         else
         {
@@ -426,13 +386,13 @@ private:
     void onPaintEvent(wxPaintEvent& event)
     {
         //wxAutoBufferedPaintDC dc(this); -> this one happily fucks up for RTL layout by not drawing the first column (x = 0)!
-        BufferedPaintDC dc(*this, buffer);
+        BufferedPaintDC dc(*this, doubleBuffer);
 
         assert(GetSize() == GetClientSize());
 
         const wxRegion& updateReg = GetUpdateRegion();
-        for (wxRegionIterator iter = updateReg; iter; ++iter)
-            render(dc, iter.GetRect());
+        for (wxRegionIterator it = updateReg; it; ++it)
+            render(dc, it.GetRect());
     }
 
     void onSizeEvent(wxSizeEvent& event)
@@ -444,7 +404,7 @@ private:
     void onEraseBackGround(wxEraseEvent& event) {}
 
     Grid& parent_;
-    std::unique_ptr<wxBitmap> buffer;
+    std::unique_ptr<wxBitmap> doubleBuffer;
 };
 
 //----------------------------------------------------------------------------------------------------------------
@@ -2206,9 +2166,9 @@ void Grid::autoSizeColumns(size_t compPos)
     if (compPos < comp.size() && comp[compPos].allowColumnResize)
     {
         auto& visibleCols = comp[compPos].visibleCols;
-        for (auto iter = visibleCols.begin(); iter != visibleCols.end(); ++iter)
+        for (auto it = visibleCols.begin(); it != visibleCols.end(); ++it)
         {
-            const size_t col = iter - visibleCols.begin();
+            const size_t col = it - visibleCols.begin();
             const ptrdiff_t bestWidth = getBestColumnSize(col, compPos); //return -1 on error
             if (bestWidth >= 0)
                 setColWidthAndNotify(bestWidth, col, compPos, true);

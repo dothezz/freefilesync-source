@@ -93,7 +93,7 @@ void xmlAccess::OptionalDialogs::resetDialogs()
 }
 
 
-xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchConfig& batchCfg)
+xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchConfig& batchCfg) //noexcept
 {
     XmlGuiConfig output;
     output.mainCfg = batchCfg.mainCfg;
@@ -112,9 +112,10 @@ xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchCo
 }
 
 
-xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg, const Zstring& referenceFile)
+xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiConfig& guiCfg) //noexcept
 {
     XmlBatchConfig output; //use default batch-settings
+    output.mainCfg = guiCfg.mainCfg;
 
     switch (guiCfg.handleError)
     {
@@ -125,19 +126,25 @@ xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatch(const xmlAccess::XmlGuiCo
             output.handleError = ON_ERROR_IGNORE;
             break;
     }
+    return output;
+}
 
-    //try to take over batch-specific settings from reference
-    if (!referenceFile.empty() && getXmlType(referenceFile) == XML_TYPE_BATCH)
+
+xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatchPreservingExistingBatch(const xmlAccess::XmlGuiConfig& guiCfg, const Zstring& referenceBatchFile) //noexcept
+{
+    //try to take over batch-specific settings from reference file if possible
+    if (!referenceBatchFile.empty())
         try
         {
-            std::vector<Zstring> filenames;
-            filenames.push_back(referenceFile);
-            mergeConfigs(filenames, output); //throw xmlAccess::FfsXmlError
+            XmlBatchConfig batchCfg;
+            readConfig(referenceBatchFile, batchCfg); //throw FfsXmlError
+
+            batchCfg.mainCfg = guiCfg.mainCfg;
+            return batchCfg;
         }
         catch (xmlAccess::FfsXmlError&) {}
 
-    output.mainCfg = guiCfg.mainCfg;
-    return output;
+    return convertGuiToBatch(guiCfg);
 }
 
 
@@ -146,9 +153,9 @@ xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<Zstring>& filenam
     bool guiCfgExists   = false;
     bool batchCfgExists = false;
 
-    for (auto iter = filenames.begin(); iter != filenames.end(); ++iter)
+    for (auto it = filenames.begin(); it != filenames.end(); ++it)
     {
-        switch (xmlAccess::getXmlType(*iter)) //throw()
+        switch (xmlAccess::getXmlType(*it)) //throw()
         {
             case XML_TYPE_GUI:
                 guiCfgExists = true;
@@ -164,59 +171,60 @@ xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<Zstring>& filenam
         }
     }
 
-    if (guiCfgExists && batchCfgExists)
-        return MERGE_GUI_BATCH;
-    else if (guiCfgExists && !batchCfgExists)
-        return MERGE_GUI;
-    else if (!guiCfgExists && batchCfgExists)
-        return MERGE_BATCH;
+    if (guiCfgExists)
+        return batchCfgExists ? MERGE_GUI_BATCH : MERGE_GUI;
     else
-        return MERGE_OTHER;
+        return batchCfgExists ? MERGE_BATCH : MERGE_OTHER;
 }
 
 
 namespace
 {
 template <class XmlCfg>
-XmlCfg loadCfgImpl(const Zstring& filename, std::unique_ptr<xmlAccess::FfsXmlError>& warning) //throw xmlAccess::FfsXmlError
+XmlCfg readConfigNoWarnings(const Zstring& filename, std::unique_ptr<FfsXmlError>& warning) //throw FfsXmlError, but only if "FATAL"
 {
     XmlCfg cfg;
     try
     {
-        xmlAccess::readConfig(filename, cfg); //throw xmlAccess::FfsXmlError
+        readConfig(filename, cfg); //throw xmlAccess::FfsXmlError
     }
-    catch (const xmlAccess::FfsXmlError& e)
+    catch (const FfsXmlError& e)
     {
-        if (e.getSeverity() == xmlAccess::FfsXmlError::FATAL)
+        if (e.getSeverity() == FfsXmlError::FATAL)
             throw;
-        else
-            warning.reset(new xmlAccess::FfsXmlError(e));
+        else if (!warning.get()) warning = make_unique<FfsXmlError>(e);
     }
     return cfg;
 }
+}
 
 
-template <class XmlCfg>
-void mergeConfigFilesImpl(const std::vector<Zstring>& filenames, XmlCfg& config) //throw xmlAccess::FfsXmlError
+void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config) //throw FfsXmlError
 {
     assert(!filenames.empty());
-    if (filenames.empty())
-        return;
 
     std::vector<zen::MainConfiguration> mainCfgs;
     std::unique_ptr<FfsXmlError> savedWarning;
 
-    std::for_each(filenames.begin(), filenames.end(),
-                  [&](const Zstring& filename)
+    for (auto it = filenames.begin(); it != filenames.end(); ++it)
     {
+        const Zstring& filename = *it;
+        const bool firstLine = it == filenames.begin(); //init all non-"mainCfg" settings with first config file
+
         switch (getXmlType(filename))
         {
             case XML_TYPE_GUI:
-                mainCfgs.push_back(loadCfgImpl<XmlGuiConfig>(filename, savedWarning).mainCfg); //throw xmlAccess::FfsXmlError
+                if (firstLine)
+                    config = readConfigNoWarnings<XmlGuiConfig>(filename, savedWarning);
+                else
+                    mainCfgs.push_back(readConfigNoWarnings<XmlGuiConfig>(filename, savedWarning).mainCfg); //throw FfsXmlError
                 break;
 
             case XML_TYPE_BATCH:
-                mainCfgs.push_back(loadCfgImpl<XmlBatchConfig>(filename, savedWarning).mainCfg); //throw xmlAccess::FfsXmlError
+                if (firstLine)
+                    config = convertBatchToGui(readConfigNoWarnings<XmlBatchConfig>(filename, savedWarning));
+                else
+                    mainCfgs.push_back(readConfigNoWarnings<XmlBatchConfig>(filename, savedWarning).mainCfg); //throw FfsXmlError
                 break;
 
             case XML_TYPE_GLOBAL:
@@ -226,31 +234,13 @@ void mergeConfigFilesImpl(const std::vector<Zstring>& filenames, XmlCfg& config)
                 else
                     throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
         }
-    });
-
-    try //...to init all non-"mainCfg" settings with first config file
-    {
-        xmlAccess::readConfig(filenames[0], config); //throw xmlAccess::FfsXmlError
     }
-    catch (xmlAccess::FfsXmlError&) {}
+    mainCfgs.push_back(config.mainCfg); //save cfg from first line
 
     config.mainCfg = merge(mainCfgs);
 
     if (savedWarning.get()) //"re-throw" exception
         throw* savedWarning;
-}
-}
-
-
-void xmlAccess::mergeConfigs(const std::vector<Zstring>& filenames, XmlGuiConfig& config) //throw FfsXmlError
-{
-    mergeConfigFilesImpl(filenames, config); //throw FfsXmlError
-}
-
-
-void xmlAccess::mergeConfigs(const std::vector<Zstring>& filenames, XmlBatchConfig& config) //throw FfsXmlError
-{
-    mergeConfigFilesImpl(filenames, config);   //throw FfsXmlError
 }
 
 
@@ -662,6 +652,35 @@ bool readText(const std::string& input, UnitSize& value)
 
 
 template <> inline
+void writeText(const VersioningStyle& value, std::string& output)
+{
+    switch (value)
+    {
+        case VER_STYLE_REPLACE:
+            output = "Replace";
+            break;
+        case VER_STYLE_ADD_TIMESTAMP:
+            output = "AddTimeStamp";
+            break;
+    }
+}
+
+template <> inline
+bool readText(const std::string& input, VersioningStyle& value)
+{
+    std::string tmp = input;
+    zen::trim(tmp);
+    if (tmp == "Replace")
+        value = VER_STYLE_REPLACE;
+    else if (tmp == "AddTimeStamp")
+        value = VER_STYLE_ADD_TIMESTAMP;
+    else
+        return false;
+    return true;
+}
+
+
+template <> inline
 void writeText(const DirectionConfig::Variant& value, std::string& output)
 {
     switch (value)
@@ -776,15 +795,14 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
 
     warn_static("remove after migration?")
     if (in["CustomDeletionFolder"])
-    {
         in["CustomDeletionFolder"](syncCfg.versioningDirectory);//obsolete name
-        syncCfg.versionCountLimit = -1; //new parameter
-    }
     else
-    {
         in["VersioningFolder"](syncCfg.versioningDirectory);
-        in["VersioningFolder"].attribute("Limit", syncCfg.versionCountLimit);
-    }
+    warn_static("remove after migration?")
+    if (in["VersioningStyle"]) //new parameter
+        in["VersioningStyle"](syncCfg.versioningStyle);
+    else
+        syncCfg.versioningStyle = VER_STYLE_ADD_TIMESTAMP; //obsolete fallback
 }
 
 
@@ -893,12 +911,14 @@ void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
 
     warn_static("remove after migration?")
     if (inGuiCfg["HideFiltered"     ]) //obsolete name
+        inGuiCfg["HideFiltered"     ](config.hideExcludedItems);
+    else if (inGuiCfg["ShowFiltered"     ]) //obsolete name
     {
-        inGuiCfg["HideFiltered"     ](config.showFilteredElements);
-        config.showFilteredElements = !config.showFilteredElements;
+        inGuiCfg["ShowFiltered"](config.hideExcludedItems);
+        config.hideExcludedItems = !config.hideExcludedItems;
     }
     else
-        inGuiCfg["ShowFiltered"](config.showFilteredElements);
+        inGuiCfg["HideExcluded"](config.hideExcludedItems);
 
     inGuiCfg["HandleError"      ](config.handleError);
     inGuiCfg["SyncPreviewActive"](config.showSyncAction);
@@ -1035,12 +1055,12 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     warn_static("remove after migration?")
     //convert new internal macro naming convention: %name -> %item_path%; %dir -> %item_folder%
-    for (auto iter = config.gui.externelApplications.begin(); iter != config.gui.externelApplications.end(); ++iter)
+    for (auto it = config.gui.externelApplications.begin(); it != config.gui.externelApplications.end(); ++it)
     {
-        replace(iter->second, L"%nameCo", L"%item2_path%"); //unambiguous "Co" names first
-        replace(iter->second, L"%dirCo" , L"%item2_folder%");
-        replace(iter->second, L"%name"  , L"%item_path%");
-        replace(iter->second, L"%dir"   , L"%item_folder%");
+        replace(it->second, L"%nameCo", L"%item2_path%"); //unambiguous "Co" names first
+        replace(it->second, L"%dirCo" , L"%item2_folder%");
+        replace(it->second, L"%name"  , L"%item_path%");
+        replace(it->second, L"%dir"   , L"%item_folder%");
     }
 
 
@@ -1056,7 +1076,7 @@ template <class ConfigType>
 void readConfig(const Zstring& filename, XmlType type, ConfigType& config)
 {
     XmlDoc doc;
-    loadXmlDocument(filename, doc);  //throw FfsXmlError
+    loadXmlDocument(filename, doc); //throw FfsXmlError
 
     if (getXmlType(doc) != type) //throw()
         throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
@@ -1119,7 +1139,8 @@ void writeConfig(const SyncConfig& syncCfg, XmlOut& out)
 
     out["DeletionPolicy"  ](syncCfg.handleDeletion);
     out["VersioningFolder"](syncCfg.versioningDirectory);
-    out["VersioningFolder"].attribute("Limit", syncCfg.versionCountLimit);
+    //out["VersioningFolder"].attribute("Limit", syncCfg.versionCountLimit);
+    out["VersioningStyle"](syncCfg.versioningStyle);
 }
 
 
@@ -1213,7 +1234,7 @@ void writeConfig(const XmlGuiConfig& config, XmlOut& out)
     //write GUI specific config data
     XmlOut outGuiCfg = out["GuiConfig"];
 
-    outGuiCfg["ShowFiltered"     ](config.showFilteredElements);
+    outGuiCfg["HideExcluded"     ](config.hideExcludedItems);
     outGuiCfg["HandleError"      ](config.handleError);
     outGuiCfg["SyncPreviewActive"](config.showSyncAction);
 }

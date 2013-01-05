@@ -59,11 +59,11 @@ GlobalResources::GlobalResources()
 
 const wxBitmap& GlobalResources::getImageInt(const wxString& name) const
 {
-    auto iter = bitmaps.find(!contains(name, L'.') ? //assume .png ending if nothing else specified
+    auto it = bitmaps.find(!contains(name, L'.') ? //assume .png ending if nothing else specified
                              name + L".png" :
                              name);
-    if (iter != bitmaps.end())
-        return iter->second;
+    if (it != bitmaps.end())
+        return it->second;
     else
     {
         assert(false);

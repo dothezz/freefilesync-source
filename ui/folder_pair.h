@@ -7,17 +7,17 @@
 #ifndef FOLDERPAIR_H_INCLUDED
 #define FOLDERPAIR_H_INCLUDED
 
-#include "../structures.h"
-#include "dir_name.h"
-#include "../lib/resources.h"
-#include "small_dlgs.h"
-#include "sync_cfg.h"
 #include <wx/event.h>
-#include <wx+/context_menu.h>
 #include <wx/menu.h>
-#include "../lib/norm_filter.h"
+#include <wx+/context_menu.h>
 #include <wx+/button.h>
 #include <wx+/image_tools.h>
+#include "dir_name.h"
+#include "small_dlgs.h"
+#include "sync_cfg.h"
+#include "../lib/norm_filter.h"
+#include "../structures.h"
+#include "../lib/resources.h"
 
 namespace zen
 {

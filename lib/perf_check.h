@@ -13,8 +13,8 @@
 class PerfCheck
 {
 public:
-    PerfCheck(unsigned windowSizeRemainingTime,   //unit: [ms]
-              unsigned windowSizeBytesPerSecond); //
+    PerfCheck(unsigned int windowSizeRemainingTime,   //unit: [ms]
+              unsigned int windowSizeBytesPerSecond); //
     ~PerfCheck();
 
     void addSample(int objectsCurrent, double dataCurrent, long timeMs); //timeMs must be ascending!

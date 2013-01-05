@@ -29,8 +29,8 @@ LeakChecker::~LeakChecker()
         std::string leakingStrings;
 
         int items = 0;
-        for (auto iter = activeStrings.begin(); iter != activeStrings.end() && items < 20; ++iter, ++items)
-            leakingStrings += "\"" + rawMemToString(iter->first, iter->second) + "\"\n";
+        for (auto it = activeStrings.begin(); it != activeStrings.end() && items < 20; ++it, ++items)
+            leakingStrings += "\"" + rawMemToString(it->first, it->second) + "\"\n";
 
         const std::string message = std::string("Memory leak detected!") + "\n\n"
                                     + "Candidates:\n" + leakingStrings;
@@ -114,7 +114,7 @@ int z_impl::compareFilenamesWin(const wchar_t* lhs, const wchar_t* rhs, size_t s
                                             rhs,                       //__in  LPCWSTR lpString2,
                                             static_cast<int>(sizeRhs), //__in  int cchCount2,
                                             true);                     //__in  BOOL bIgnoreCase
-        if (rv == 0)
+        if (rv <= 0)
             throw std::runtime_error("Error comparing strings (ordinal)!");
         else
             return rv - 2; //convert to C-style string compare result
@@ -126,7 +126,6 @@ int z_impl::compareFilenamesWin(const wchar_t* lhs, const wchar_t* rhs, size_t s
 
         const auto minSize = static_cast<unsigned int>(std::min(sizeLhs, sizeRhs));
 
-        int rv = 0;
         if (minSize > 0) //LCMapString does not allow input sizes of 0!
         {
             if (minSize <= MAX_PATH) //performance optimization: stack
@@ -146,7 +145,9 @@ int z_impl::compareFilenamesWin(const wchar_t* lhs, const wchar_t* rhs, size_t s
                 if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, rhs, minSize, bufferB, MAX_PATH) == 0)
                     throw std::runtime_error("Error comparing strings! (LCMapString)");
 
-                rv = ::wmemcmp(bufferA, bufferB, minSize);
+                const int rv = ::wmemcmp(bufferA, bufferB, minSize);
+                if (rv != 0)
+                    return rv;
             }
             else //use freestore
             {
@@ -159,13 +160,13 @@ int z_impl::compareFilenamesWin(const wchar_t* lhs, const wchar_t* rhs, size_t s
                 if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, rhs, minSize, &bufferB[0], minSize) == 0)
                     throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
-                rv = ::wmemcmp(&bufferA[0], &bufferB[0], minSize);
+                const int rv = ::wmemcmp(&bufferA[0], &bufferB[0], minSize);
+                if (rv != 0)
+                    return rv;
             }
         }
 
-        return rv == 0 ?
-               static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs) :
-               rv;
+        return static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs);
     }
 
     //        const int rv = CompareString(

@@ -24,12 +24,11 @@ namespace zen { class BitmapButton; }
 #include <wx/settings.h>
 #include <wx/stattext.h>
 #include <wx/sizer.h>
-#include <wx/statbox.h>
+#include <wx/panel.h>
 #include <wx/statline.h>
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
-#include <wx/panel.h>
 #include <wx/scrolwin.h>
 #include <wx/spinctrl.h>
 #include <wx/frame.h>
@@ -54,6 +53,8 @@ protected:
     wxMenuItem* m_menuItemAbout;
     wxBoxSizer* bSizerMain;
     wxPanel* m_panelMain;
+    wxPanel* m_panel5;
+    wxStaticText* m_staticText9;
     wxStaticText* m_staticText3;
     wxStaticText* m_staticText4;
     wxStaticText* m_staticText5;
@@ -74,8 +75,9 @@ protected:
     wxStaticLine* m_staticline211;
     wxStaticText* m_staticText6;
     wxTextCtrl* m_textCtrlCommand;
+    wxStaticLine* m_staticline5;
+    wxPanel* m_panel4;
     zen::BitmapButton* m_buttonStart;
-    wxButton* m_buttonCancel;
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }

@@ -490,12 +490,12 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
 
         if (evt.len != 0) //exclude case: deletion of "self", already reported by parent directory watch
         {
-            auto iter = pimpl_->watchDescrs.find(evt.wd);
-            if (iter != pimpl_->watchDescrs.end())
+            auto it = pimpl_->watchDescrs.find(evt.wd);
+            if (it != pimpl_->watchDescrs.end())
             {
                 //Note: evt.len is NOT the size of the evt.name c-string, but the array size including all padding 0 characters!
                 //It may be even 0 in which case evt.name must not be used!
-                const Zstring fullname = iter->second + evt.name;
+                const Zstring fullname = it->second + evt.name;
 
                 if ((evt.mask & IN_CREATE) ||
                     (evt.mask & IN_MOVED_TO))

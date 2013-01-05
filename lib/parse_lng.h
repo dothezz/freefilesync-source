@@ -44,8 +44,8 @@ struct TransHeader
 struct ParsingError
 {
     ParsingError(size_t rowNo, size_t colNo) : row(rowNo), col(colNo) {}
-    size_t row;
-    size_t col;
+    size_t row; //starting with 0
+    size_t col; //
 };
 void parseLng(const std::string& fileStream, TransHeader& header, TranslationMap& out, TranslationPluralMap& pluralOut); //throw ParsingError
 void parseHeader(const std::string& fileStream, TransHeader& header); //throw ParsingError
@@ -104,11 +104,11 @@ public:
 
     bool untranslatedTextExists() const
     {
-        for (std::list<RegularItem>::const_iterator i = dump.begin(); i != dump.end(); ++i)
-            if (i->value.second.empty())
+        for (auto it = dump.begin(); it != dump.end(); ++it)
+            if (it->value.second.empty())
                 return true;
-        for (std::list<PluralItem>::const_iterator i = dumpPlural.begin(); i != dumpPlural.end(); ++i)
-            if (i->value.second.empty())
+        for (auto it = dumpPlural.begin(); it != dumpPlural.end(); ++it)
+            if (it->value.second.empty())
                 return true;
         return false;
     }
@@ -180,8 +180,8 @@ public:
 
     static std::string text(Token::Type t)
     {
-        TokenMap::const_iterator iter = asList().find(t);
-        return iter != asList().end() ? iter->second : std::string();
+        TokenMap::const_iterator it = asList().find(t);
+        return it != asList().end() ? it->second : std::string();
     }
 
 private:
@@ -198,8 +198,8 @@ private:
         tokens.insert(std::make_pair(Token::TK_LOCALE_NAME_END,   "</locale>"));
         tokens.insert(std::make_pair(Token::TK_FLAG_FILE_BEGIN,   "<flag file>"));
         tokens.insert(std::make_pair(Token::TK_FLAG_FILE_END,     "</flag file>"));
-        tokens.insert(std::make_pair(Token::TK_PLURAL_COUNT_BEGIN,  "<plural forms>"));
-        tokens.insert(std::make_pair(Token::TK_PLURAL_COUNT_END,    "</plural forms>"));
+        tokens.insert(std::make_pair(Token::TK_PLURAL_COUNT_BEGIN, "<plural forms>"));
+        tokens.insert(std::make_pair(Token::TK_PLURAL_COUNT_END,   "</plural forms>"));
         tokens.insert(std::make_pair(Token::TK_PLURAL_DEF_BEGIN,  "<plural definition>"));
         tokens.insert(std::make_pair(Token::TK_PLURAL_DEF_END,    "</plural definition>"));
 
@@ -252,28 +252,42 @@ public:
         return out;
     }
 
-    std::pair<size_t, size_t> position() const //current (row/col) beginning with 1
+    size_t posRow() const //current row beginning with 0
     {
-        //seek last line break
-        std::string::const_iterator iter = pos;
-        while (iter != stream.begin() && *iter != '\n')
-            --iter;
+        //count line endings
+        size_t crSum = 0; //carriage returns
+        size_t nlSum = 0; //new lines
+        for (auto it = stream.begin(); it != pos; ++it)
+            if (*it == '\r')
+                ++crSum;
+            else if (*it == '\n')
+                ++nlSum;
+        assert(crSum == 0 || nlSum == 0 || crSum == nlSum);
+        return std::max(crSum, nlSum); //be compatible with Linux/Mac/Win
+    }
 
-        return std::make_pair(std::count(stream.begin(), pos, '\n') + 1, pos - iter);
+    size_t posCol() const //current col beginning with 0
+    {
+        //seek beginning of line
+        for (auto it = pos; it != stream.begin(); )
+        {
+            --it;
+            if (*it == '\r' || *it == '\n')
+                return pos - it - 1;
+        }
+        return pos - stream.begin();
     }
 
 private:
     bool startsWithKnownTag() const
     {
-        for (KnownTokens::TokenMap::const_iterator i = KnownTokens::asList().begin(); i != KnownTokens::asList().end(); ++i)
-            if (startsWith(i->second))
-                return true;
-        return false;
+        return std::any_of(KnownTokens::asList().begin(), KnownTokens::asList().end(),
+        [&](const KnownTokens::TokenMap::value_type& p) { return startsWith(p.second); });
     }
 
     bool startsWith(const std::string& prefix) const
     {
-        if (stream.end() - pos < static_cast<int>(prefix.size()))
+        if (stream.end() - pos < static_cast<ptrdiff_t>(prefix.size()))
             return false;
         return std::equal(prefix.begin(), prefix.end(), pos);
     }
@@ -420,7 +434,7 @@ private:
         }
 
         if (!pluralList.empty() && static_cast<int>(pluralList.size()) != formCount) //invalid number of plural forms
-            throw ParsingError(scn.position().first, scn.position().second);
+            throw ParsingError(scn.posRow(), scn.posCol());
 
         consumeToken(Token::TK_TRG_END);
 
@@ -435,7 +449,7 @@ private:
     void consumeToken(Token::Type t)
     {
         if (token().type != t)
-            throw ParsingError(scn.position().first, scn.position().second);
+            throw ParsingError(scn.posRow(), scn.posCol());
         nextToken();
     }
 

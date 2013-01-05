@@ -84,8 +84,8 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
 
     if (sharedHistory_.get())
     {
-        auto tmp = sharedHistory_->getList();
-        //std::sort(tmp.begin(), tmp.end(), LessFilename());
+        std::vector<Zstring> tmp = sharedHistory_->getList();
+        std::sort(tmp.begin(), tmp.end(), LessFilename());
 
         if (!dirList.empty() && !tmp.empty())
             dirList.push_back(toZ(FolderHistory::separationLine()));

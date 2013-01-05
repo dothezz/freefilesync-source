@@ -281,8 +281,8 @@ std::vector<zen::FolderPairSyncCfg> zen::extractSyncCfg(const MainConfiguration&
         output.push_back(
             FolderPairSyncCfg(syncCfg.directionCfg.var == DirectionConfig::AUTOMATIC,
                               syncCfg.handleDeletion,
-                              getFormattedDirectoryName(syncCfg.versioningDirectory),
-                              syncCfg.versionCountLimit));
+                              syncCfg.versioningStyle,
+                              getFormattedDirectoryName(syncCfg.versioningDirectory)));
     }
     return output;
 }
@@ -426,8 +426,8 @@ class DeletionHandling //e.g. generate name of alternate deletion directory (uni
 public:
     DeletionHandling(DeletionPolicy handleDel, //nothrow!
                      const Zstring& versioningDir,
+                     VersioningStyle versioningStyle,
                      const TimeComp& timeStamp,
-                     int versionCountLimit,
                      size_t folderIndex,
                      const Zstring& baseDirPf, //with separator postfix
                      ProcessCallback& procCallback);
@@ -470,15 +470,15 @@ private:
     FileVersioner& getOrCreateVersioner() //throw FileError! => dont create in DeletionHandling()!!!
     {
         if (!versioner.get())
-            versioner = make_unique<FileVersioner>(versioningDir_, timeStamp_, versionCountLimit_); //throw FileError
+            versioner = make_unique<FileVersioner>(versioningDir_, versioningStyle_, timeStamp_); //throw FileError
         return *versioner;
     };
 
     ProcessCallback& procCallback_;
     const Zstring baseDirPf_;  //ends with path separator
     const Zstring versioningDir_;
+    const VersioningStyle versioningStyle_;
     const TimeComp timeStamp_;
-    const int versionCountLimit_;
 
 #ifdef FFS_WIN
     Zstring recyclerTmpDirPf; //temporary folder holding files/folders for *deferred* recycling (postfixed with file name separator)
@@ -502,16 +502,16 @@ private:
 
 DeletionHandling::DeletionHandling(DeletionPolicy handleDel, //nothrow!
                                    const Zstring& versioningDir,
+                                   VersioningStyle versioningStyle,
                                    const TimeComp& timeStamp,
-                                   int versionCountLimit,
                                    size_t folderIndex,
                                    const Zstring& baseDirPf, //with separator postfix
                                    ProcessCallback& procCallback) :
     procCallback_(procCallback),
     baseDirPf_(baseDirPf),
     versioningDir_(versioningDir),
+    versioningStyle_(versioningStyle),
     timeStamp_(timeStamp),
-    versionCountLimit_(versionCountLimit),
 #ifdef FFS_WIN
     recFallbackDelPermantently(false),
 #endif
@@ -617,16 +617,16 @@ void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError
                 break;
 
             case DELETE_TO_VERSIONING:
-                if (versioner.get())
-                {
-                    if (allowUserCallback)
-                    {
-                        procCallback_.reportStatus(_("Removing old versions...")); //throw ?
-                        versioner->limitVersions([&] { procCallback_.requestUiRefresh(); /*throw ? */ }); //throw FileError
-                    }
-                    else
-                        versioner->limitVersions([] {}); //throw FileError
-                }
+                //if (versioner.get())
+                //{
+                //    if (allowUserCallback)
+                //    {
+                //        procCallback_.reportStatus(_("Removing old versions...")); //throw ?
+                //        versioner->limitVersions([&] { procCallback_.requestUiRefresh(); /*throw ? */ }); //throw FileError
+                //    }
+                //    else
+                //        versioner->limitVersions([] {}); //throw FileError
+                //}
                 break;
         }
 
@@ -898,37 +898,37 @@ private:
         //don't process directories
 
         //process files
-        for (auto i = hierObj.refSubFiles().begin(); i != hierObj.refSubFiles().end(); ++i)
-            switch (i->getSyncOperation()) //evaluate comparison result and sync direction
+        for (auto it = hierObj.refSubFiles().begin(); it != hierObj.refSubFiles().end(); ++it)
+            switch (it->getSyncOperation()) //evaluate comparison result and sync direction
             {
                 case SO_CREATE_NEW_LEFT:
-                    spaceNeededLeft += to<Int64>(i->getFileSize<RIGHT_SIDE>());
+                    spaceNeededLeft += to<Int64>(it->getFileSize<RIGHT_SIDE>());
                     break;
 
                 case SO_CREATE_NEW_RIGHT:
-                    spaceNeededRight += to<Int64>(i->getFileSize<LEFT_SIDE>());
+                    spaceNeededRight += to<Int64>(it->getFileSize<LEFT_SIDE>());
                     break;
 
                 case SO_DELETE_LEFT:
                     if (freeSpaceDelLeft_)
-                        spaceNeededLeft -= to<Int64>(i->getFileSize<LEFT_SIDE>());
+                        spaceNeededLeft -= to<Int64>(it->getFileSize<LEFT_SIDE>());
                     break;
 
                 case SO_DELETE_RIGHT:
                     if (freeSpaceDelRight_)
-                        spaceNeededRight -= to<Int64>(i->getFileSize<RIGHT_SIDE>());
+                        spaceNeededRight -= to<Int64>(it->getFileSize<RIGHT_SIDE>());
                     break;
 
                 case SO_OVERWRITE_LEFT:
                     if (freeSpaceDelLeft_)
-                        spaceNeededLeft -= to<Int64>(i->getFileSize<LEFT_SIDE>());
-                    spaceNeededLeft += to<Int64>(i->getFileSize<RIGHT_SIDE>());
+                        spaceNeededLeft -= to<Int64>(it->getFileSize<LEFT_SIDE>());
+                    spaceNeededLeft += to<Int64>(it->getFileSize<RIGHT_SIDE>());
                     break;
 
                 case SO_OVERWRITE_RIGHT:
                     if (freeSpaceDelRight_)
-                        spaceNeededRight -= to<Int64>(i->getFileSize<RIGHT_SIDE>());
-                    spaceNeededRight += to<Int64>(i->getFileSize<LEFT_SIDE>());
+                        spaceNeededRight -= to<Int64>(it->getFileSize<RIGHT_SIDE>());
+                    spaceNeededRight += to<Int64>(it->getFileSize<LEFT_SIDE>());
                     break;
 
                 case SO_DO_NOTHING:
@@ -1242,9 +1242,9 @@ void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
 {
     //search for file move-operations
 
-    for (auto iter = hierObj.refSubFiles().begin(); iter != hierObj.refSubFiles().end(); ++iter) //VS 2010 crashes if we use for_each + lambda here...
+    for (auto it = hierObj.refSubFiles().begin(); it != hierObj.refSubFiles().end(); ++it) //VS 2010 crashes if we use for_each + lambda here...
     {
-        FileMapping& fileObj = *iter;
+        FileMapping& fileObj = *it;
 
         const SyncOperation syncOp = fileObj.getSyncOperation();
         switch (syncOp) //evaluate comparison result and sync direction
@@ -1969,16 +1969,16 @@ void zen::synchronize(const TimeComp& timeStamp,
 
         delHandlerL.emplace_back(folderPairCfg.handleDeletion,
                                  folderPairCfg.versioningFolder,
+                                 folderPairCfg.versioningStyle_,
                                  timeStamp,
-                                 folderPairCfg.versionCountLimit_,
                                  folderIndex,
                                  j->getBaseDirPf<LEFT_SIDE>(),
                                  callback);
 
         delHandlerR.emplace_back(folderPairCfg.handleDeletion,
                                  folderPairCfg.versioningFolder,
+                                 folderPairCfg.versioningStyle_,
                                  timeStamp,
-                                 folderPairCfg.versionCountLimit_,
                                  folderIndex,
                                  j->getBaseDirPf<RIGHT_SIDE>(),
                                  callback);
@@ -1997,20 +1997,20 @@ void zen::synchronize(const TimeComp& timeStamp,
     auto incReadCount = [&](const Zstring& baseDir)
     {
         dirReadWriteCount[baseDir]; //create entry
-        for (auto iter = dirReadWriteCount.begin(); iter != dirReadWriteCount.end(); ++iter)
+        for (auto it = dirReadWriteCount.begin(); it != dirReadWriteCount.end(); ++it)
         {
-            auto& countRef = iter->second;
-            if (dependentDir(baseDir, iter->first))
+            auto& countRef = it->second;
+            if (dependentDir(baseDir, it->first))
                 ++countRef.first;
         }
     };
     auto incWriteCount = [&](const Zstring& baseDir)
     {
         dirReadWriteCount[baseDir]; //create entry
-        for (auto iter = dirReadWriteCount.begin(); iter != dirReadWriteCount.end(); ++iter)
+        for (auto it = dirReadWriteCount.begin(); it != dirReadWriteCount.end(); ++it)
         {
-            auto& countRef = iter->second;
-            if (dependentDir(baseDir, iter->first))
+            auto& countRef = it->second;
+            if (dependentDir(baseDir, it->first))
                 ++countRef.second;
         }
     };
@@ -2178,17 +2178,11 @@ void zen::synchronize(const TimeComp& timeStamp,
     if (statisticsTotal.getConflict() > 0)
     {
         //show the first few conflicts in warning message also:
-        std::wstring warningMessage = _("Unresolved conflicts existing!") +
-                                      L" (" + toGuiString(statisticsTotal.getConflict()) + L")\n\n";
+        std::wstring warningMessage = _("The following items have unresolved conflicts and will not be synchronized:") + L"\n\n";
 
-        const auto& conflictMsgs = statisticsTotal.getConflictMessages(); //get first few sync conflicts
-        for (auto iter = conflictMsgs.begin(); iter != conflictMsgs.end(); ++iter)
-            warningMessage += fmtFileName(iter->first) + L": " + iter->second + L"\n\n";
-
-        //        if (statisticsTotal.getConflict() > static_cast<int>(conflictMsgs.size()))
-        //            warningMessage += L"[...]\n\n";
-
-        warningMessage += _("You can ignore conflicts and continue synchronization.");
+        const auto& conflictMsgs = statisticsTotal.getConflictMessages(); //get *all* sync conflicts
+        for (auto it = conflictMsgs.begin(); it != conflictMsgs.end(); ++it)
+            warningMessage += fmtFileName(it->first) + L": " + it->second + L"\n\n";
 
         callback.reportWarning(warningMessage, warnings.warningUnresolvedConflicts);
     }
@@ -2199,10 +2193,10 @@ void zen::synchronize(const TimeComp& timeStamp,
     {
         std::wstring warningMessage = _("Significant difference detected:");
 
-        for (auto iter = significantDiff.begin(); iter != significantDiff.end(); ++iter)
+        for (auto it = significantDiff.begin(); it != significantDiff.end(); ++it)
             warningMessage += std::wstring(L"\n\n") +
-                              iter->first + L" <-> " + L"\n" +
-                              iter->second;
+                              it->first + L" <-> " + L"\n" +
+                              it->second;
         warningMessage += L"\n\n";
         warningMessage += _("More than 50% of the total number of files will be copied or deleted!");
 
@@ -2241,12 +2235,12 @@ void zen::synchronize(const TimeComp& timeStamp,
 
     //check if folders are used by multiple pairs in read/write access
     std::vector<Zstring> conflictDirs;
-    for (auto iter = dirReadWriteCount.cbegin(); iter != dirReadWriteCount.cend(); ++iter)
+    for (auto it = dirReadWriteCount.cbegin(); it != dirReadWriteCount.cend(); ++it)
     {
-        const std::pair<size_t, size_t>& countRef = iter->second; //# read/write accesses
+        const std::pair<size_t, size_t>& countRef = it->second; //# read/write accesses
 
         if (countRef.first + countRef.second >= 2 && countRef.second >= 1) //race condition := multiple accesses of which at least one is a write
-            conflictDirs.push_back(iter->first);
+            conflictDirs.push_back(it->first);
     }
 
     if (!conflictDirs.empty())
@@ -2397,7 +2391,7 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
         //start of (possibly) long-running copy process: ensure status updates are performed regularly
 
         //in error situation: undo communication of processed amount of data
-        ScopeGuard guardStatistics = makeGuard([&]
+        auto guardStatistics = makeGuard([&]
         {
             procCallback_.updateProcessedData(0, -bytesReported);
             bytesReported = 0;
@@ -2415,13 +2409,13 @@ void SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, const
         //#################### Verification #############################
         if (verifyCopiedFiles_)
         {
-            ScopeGuard guardTarget = makeGuard([&] { removeFile(target); }); //delete target if verification fails
+            auto guardTarget = makeGuard([&] { removeFile(target); }); //delete target if verification fails
             verifyFileCopy(source, target); //throw FileError
             guardTarget.dismiss();
         }
         //#################### /Verification #############################
 
-        //inform about the (remaining) processed amount of data
+        //update statistics to consider the real amount of data, e.g. more than the "file size" for ADS streams or file changed in the meantime!
         if (bytesReported != expectedBytesToCpy)
             procCallback_.updateTotalData(0, bytesReported - expectedBytesToCpy);
 

@@ -32,7 +32,7 @@
 <target>Selezionata interruazione: conclusione dell'operazione...</target>
 
 <source>Failure to create time stamp for versioning:</source>
-<target></target>
+<target>Errore nella creazione di data e ora per il controllo delle versioni:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronizzazione automatizzata</target>
@@ -58,8 +58,8 @@
 <source>Clear filter settings</source>
 <target>Azzera impostazioni filtro</target>
 
-<source>Create a batch job</source>
-<target>Creazione di un attività batch</target>
+<source>Save as batch job</source>
+<target>Salva come processo batch</target>
 
 <source>Comparison settings</source>
 <target>Impostazioni di comparazione</target>
@@ -78,9 +78,6 @@
 
 <source>Global settings</source>
 <target>Preferenze</target>
-
-<source>Summary</source>
-<target>Sommario</target>
 
 <source>Find</source>
 <target>Trova</target>
@@ -274,8 +271,8 @@
 <source>Select a folder</source>
 <target>Seleziona una cartella</target>
 
-<source>Delay [seconds]</source>
-<target>Ritardo [secondi]</target>
+<source>Idle time [seconds]</source>
+<target>Tempo di attesa [secondi]</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Tempo di attesa tra ultimo cambiamento rilevato ed esecuzione dei comandi</target>
@@ -324,47 +321,29 @@ Il comando è attivato se:
 <source>A folder input field is empty.</source>
 <target>Un campo cartella input è vuoto.</target>
 
-<source>File time and size</source>
-<target>Ora e dimensione file</target>
-
-<source>File content</source>
-<target>Contenuto del file</target>
-
-<source><Automatic></source>
-<target><Automatico></target>
-
-<source>Mirror ->></source>
-<target>Mirror ->></target>
-
-<source>Update -></source>
-<target>Aggiorna -></target>
-
-<source>Custom</source>
-<target>Personalizza</target>
-
-<source>FreeFileSync batch</source>
-<target>FreeFileSync batch</target>
-
 <source>Synchronization aborted!</source>
 <target>Sincronizzazione abortita!</target>
 
 <source>Synchronization completed with errors!</source>
 <target>Sincronizzazione completata con errori!</target>
 
+<source>Synchronization completed with warnings.</source>
+<target>Sincronizzazione completata con avvisi.</target>
+
 <source>Nothing to synchronize!</source>
 <target>Non c'è nulla da sincronizzare!</target>
 
-<source>Synchronization completed successfully!</source>
-<target>Sincronizzazione completata con successo!</target>
+<source>Synchronization completed successfully.</source>
+<target>Sincronizzazione completata con successo.</target>
+
+<source>Saving log file %x...</source>
+<target>Salvataggio file di log %x...</target>
 
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
 <target>Premere "Passa" per risolvere i problemi nella finestra principale di FreeFileSync.</target>
 
 <source>Switching to FreeFileSync main dialog...</source>
 <target>Sto passando alla finestra principale di FreeFileSync...</target>
-
-<source>Unable to connect to sourceforge.net!</source>
-<target>Impossibile collegarsi a sourceforge.net!</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>E' disponibile una nuova versione di FreeFileSync:</target>
@@ -377,6 +356,12 @@ Il comando è attivato se:
 
 <source>Information</source>
 <target>Informazioni</target>
+
+<source>Unable to connect to sourceforge.net!</source>
+<target>Impossibile collegarsi a sourceforge.net!</target>
+
+<source>Current FreeFileSync version number was not found online! Do you want to check manually?</source>
+<target>La versione aggiornata di FreeFileSync non è stata trovata online! Vuoi controllare manualmente?</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Vuoi che FreeFileSync controlli automaticamente gli aggiornamenti ogni settimana?</target>
@@ -441,26 +426,26 @@ Il comando è attivato se:
 <source>Hibernate</source>
 <target>Iberna</target>
 
-<source>1. &Compare</source>
-<target>1. &Compara</target>
-
-<source>2. &Synchronize</source>
-<target>2. &Sincronizza</target>
-
 <source>&New</source>
 <target>&Nuovo</target>
 
 <source>&Save</source>
 <target>&Salva</target>
 
+<source>Save as &batch job...</source>
+<target>Salva come &processo batch...</target>
+
+<source>1. &Compare</source>
+<target>1. &Compara</target>
+
+<source>2. &Synchronize</source>
+<target>2. &Sincronizza</target>
+
 <source>&Language</source>
 <target>&Lingua</target>
 
 <source>&Global settings...</source>
 <target>&Preferenze...</target>
-
-<source>&Create batch job...</source>
-<target>&Crea una attività batch...</target>
 
 <source>&Export file list...</source>
 <target>&Esporta l'elenco dei file...</target>
@@ -495,17 +480,17 @@ Il comando è attivato se:
 <source>Swap sides</source>
 <target>Inverti i lati</target>
 
-<source>Load configuration from file</source>
-<target>Carica configurazione da file</target>
+<source>Open</source>
+<target>Apri</target>
 
-<source>Save current configuration to file</source>
-<target>Salva la configurazione corrente in un file</target>
+<source>Save</source>
+<target>Salva</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Ultima configurazione utilizzata (premi CANC per rimuovere dall'elenco)</target>
 
-<source>Show excluded items</source>
-<target>Mostra oggetti esclusi</target>
+<source>Hide excluded items</source>
+<target>Nascondi oggetti esclusi</target>
 
 <source>Show filtered or temporarily excluded files</source>
 <target>Mostra file filtrati o temporaneamente esclusi</target>
@@ -543,15 +528,6 @@ Il comando è attivato se:
 <source>Help</source>
 <target>?</target>
 
-<source>Filter files</source>
-<target>Filtro dei file</target>
-
-<source>Left</source>
-<target>Sinistra</target>
-
-<source>Right</source>
-<target>Destra</target>
-
 <source>Error handling</source>
 <target>Gestione degli errori</target>
 
@@ -568,19 +544,19 @@ Il comando è attivato se:
 <target>Mostra popup di errore o avviso</target>
 
 <source>Exit</source>
-<target></target>
+<target>Esci</target>
 
 <source>Abort synchronization on first error</source>
 <target>Abortisci sincronizzazione al primo errore</target>
 
-<source>On completion:</source>
-<target>In completamento:</target>
+<source>On completion</source>
+<target>In completamento</target>
 
 <source>Show progress dialog</source>
 <target>Mostra stato di avanzamento</target>
 
-<source>Generate log file</source>
-<target>Genera file log</target>
+<source>Save log</source>
+<target>Salva log</target>
 
 <source>Select folder to save log files</source>
 <target>Seleziona cartella dove salvare i file log</target>
@@ -591,11 +567,8 @@ Il comando è attivato se:
 <source>Limit maximum number of log files</source>
 <target>Limita il numero massimo di file log</target>
 
-<source>Batch settings</source>
-<target>Impostazioni batch</target>
-
-<source>Compare by...</source>
-<target>Compara per...</target>
+<source>Select variant</source>
+<target>Seleziona variante</target>
 
 <source>
 Files are found equal if
@@ -610,6 +583,9 @@ I file sono considerati identici se
 sono identici
 </target>
 
+<source>File time and size</source>
+<target>Ora e dimensione file</target>
+
 <source>
 Files are found equal if
      - file content
@@ -621,23 +597,35 @@ I file sono considerati identici se
 è identico
 </target>
 
+<source>File content</source>
+<target>Contenuto del file</target>
+
 <source>Symbolic Link handling</source>
 <target>Gestione Collegamenti</target>
 
 <source>OK</source>
 <target>OK</target>
 
-<source>Select variant:</source>
-<target>Seleziona una variante:</target>
+<source><- Two way -></source>
+<target><- Due vie -></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identifica e propaga modifiche su entrambi i lati usando un database. Cancellazioni, ridenominazioni e conflitti sono rilevati automaticamente.</target>
 
+<source>Mirror ->></source>
+<target>Mirror ->></target>
+
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Backup mirror della cartella di sinistra. La cartella destra verrà modificata per corrispondere esattamente alla cartella di sinistra dopo la sincronizzazione.</target>
 
+<source>Update -></source>
+<target>Aggiorna -></target>
+
 <source>Copy new or updated files to right folder.</source>
 <target>Copia file nuovi o aggiornati nella cartella di destra.</target>
+
+<source>Custom</source>
+<target>Personalizza</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Configura le tue regole di sincronizzazione.</target>
@@ -654,8 +642,8 @@ I file sono considerati identici se
 <source>Recycle Bin</source>
 <target>Cestino</target>
 
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Usa il Cestino quando si elimina o sovrascrive un file</target>
+<source>Use Recycle Bin for deleted and overwritten files</source>
+<target>Utilizza il Cestino per file cancellati e sovrascritti</target>
 
 <source>Versioning</source>
 <target>Versione</target>
@@ -663,8 +651,8 @@ I file sono considerati identici se
 <source>Move time-stamped files into specified folder</source>
 <target>Sposta file con indicazione datata nella cartella specifica</target>
 
-<source>Limit maximum number of versions per file</source>
-<target>Limita numero massimo di versioni per ogni file</target>
+<source>Naming convention:</source>
+<target>Modalità di rinomina:</target>
 
 <source>Configuration</source>
 <target>Configurazione</target>
@@ -813,6 +801,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Overview</source>
 <target>Anteprima</target>
 
+<source>Filter files</source>
+<target>Filtro dei file</target>
+
 <source>Select view</source>
 <target>Seleziona vista</target>
 
@@ -864,8 +855,14 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source><Last session></source>
 <target><Ultima sessione></target>
 
+<source>Folder Comparison and Synchronization</source>
+<target>Comparazione di cartelle e sincronizzazione</target>
+
 <source>Configuration saved!</source>
 <target>Configurazione salvata!</target>
+
+<source>FreeFileSync batch</source>
+<target>FreeFileSync batch</target>
 
 <source>Never save changes</source>
 <target>Non salvare mai le modifiche</target>
@@ -878,9 +875,6 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 
 <source>Configuration loaded!</source>
 <target>Configurazione caricata!</target>
-
-<source>Folder Comparison and Synchronization</source>
-<target>Comparazione di cartelle e sincronizzazione</target>
 
 <source>Hide files that exist on left side only</source>
 <target>Nascondi i file esistenti solo a sinistra</target>
@@ -1038,6 +1032,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Comparing content...</source>
 <target>Comparazione contenuto...</target>
 
+<source>Copy</source>
+<target>Copia</target>
+
 <source>Paused</source>
 <target>In pausa</target>
 
@@ -1110,14 +1107,14 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>- folder part only</source>
 <target>- solo porzione cartella</target>
 
-<source>- Other side's counterpart to %name</source>
-<target>- l'altro lato e' equivalente a %name</target>
+<source>- Other side's counterpart to %item_path%</source>
+<target>- Controparte sull'altro lato a %item_path%</target>
 
-<source>- Other side's counterpart to %dir</source>
-<target>- l'altro lato e' equivalente a %dir</target>
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- Controparte sull'altro lato a %item_folder%</target>
 
-<source>Make hidden dialogs and warning messages visible again?</source>
-<target>Vuoi rendere nuovamente visibili i dialoghi nascosti e i messaggi d'avviso?</target>
+<source>Make hidden warnings and dialogs visible again?</source>
+<target>Vuoi visualizzare nuovamente i dialoghi e avvisi nascosti?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1140,47 +1137,29 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Leave as unresolved conflict</source>
 <target>Lascia come conflitti irrisolti</target>
 
+<source>Replace</source>
+<target>Sostituisci</target>
+
+<source>Move files and replace if existing</source>
+<target>Sposta file e sostituisci se esistenti</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Accoda data e ora ad ogni nome di file</target>
+
+<source>Folder</source>
+<target>Cartella</target>
+
+<source>File</source>
+<target>File</target>
+
+<source>YYYY-MM-DD hhmmss</source>
+<target>AAAA-MM-GG hhmmss</target>
+
 <source>Files</source>
 <target>File</target>
 
 <source>Percentage</source>
 <target>Percentuale</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 ora</pluralform>
-<pluralform>%x ore</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 giorno</pluralform>
-<pluralform>%x giorni</pluralform>
-</target>
 
 <source>Cannot monitor directory %x.</source>
 <target>Impossibile monitorare la cartella %x.</target>
@@ -1230,6 +1209,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Cannot copy file %x to %y.</source>
 <target>Impossibile copiare file %x in %y.</target>
 
+<source>Type of item %x is not supported:</source>
+<target>Il tipo di oggetto %x non è supportato:</target>
+
 <source>Cannot open directory %x.</source>
 <target>Impossibile aprire cartella %x.</target>
 
@@ -1238,6 +1220,42 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 
 <source>Detected endless directory recursion.</source>
 <target>Rilevato percorso ricorsivo senza fine.</target>
+
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 ora</pluralform>
+<pluralform>%x ore</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 giorno</pluralform>
+<pluralform>%x giorni</pluralform>
+</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Impossibile impostare privilegi %x.</target>
@@ -1369,7 +1387,7 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <target>Spostamento collegamento %x in %y</target>
 
 <source>Removing old versions...</source>
-<target></target>
+<target>Rimozione di vecchie versioni...</target>
 
 <source>Creating file %x</source>
 <target>Creazione file %x</target>
@@ -1392,6 +1410,9 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Updating attributes of %x</source>
 <target>Aggiornamento attributi di %x</target>
 
+<source>Target folder %x already existing.</source>
+<target>La cartella di destinazione %x è già esistente.</target>
+
 <source>Target folder input field must not be empty.</source>
 <target>Il campo per la cartella di destinazione non può essere vuoto.</target>
 
@@ -1401,11 +1422,8 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>Source folder %x not found.</source>
 <target>Cartella sorgente %x non trovata.</target>
 
-<source>Unresolved conflicts existing!</source>
-<target>Sono presenti conflitti irrisolti!</target>
-
-<source>You can ignore conflicts and continue synchronization.</source>
-<target>Puoi ignorare i conflitti e continuare la sincronizzazione.</target>
+<source>The following items have unresolved conflicts and will not be synchronized:</source>
+<target>I seguenti oggetti hanno conflitti irrisolti e non saranno sincronizzati:</target>
 
 <source>Significant difference detected:</source>
 <target>Riscontrate differenze significative:</target>
@@ -1425,11 +1443,14 @@ Nota: I nomi dei file devono essere relativi alle cartelle di appartenenza!
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Verrà modificata una cartella che è parte di molteplici coppie di cartelle. Controlla le impostazioni di sincronizzazione.</target>
 
+<source>Left</source>
+<target>Sinistra</target>
+
+<source>Right</source>
+<target>Destra</target>
+
 <source>Synchronizing folder pair:</source>
 <target>Sincronizzazione della coppia di cartelle:</target>
-
-<source>Target folder %x already existing.</source>
-<target>La cartella di destinazione %x è già esistente.</target>
 
 <source>Generating database...</source>
 <target>Generazione database...</target>

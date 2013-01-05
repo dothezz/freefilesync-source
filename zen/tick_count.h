@@ -8,10 +8,17 @@
 #define ZEN_TICK_COUNT_HEADER_3807326
 
 #include <cstdint>
-#include <algorithm>
+//#include <algorithm>
 #include "type_traits.h"
-#include "assert_static.h"
-#include <cmath>
+#include "basic_math.h"
+//#include "assert_static.h"
+//#include <cmath>
+//template <class T> inline
+//T dist(T a, T b)
+//{
+//    return a > b ? a - b : b - a;
+//}
+
 
 #ifdef FFS_WIN
 #include "win.h" //includes "windows.h"
@@ -59,12 +66,15 @@ public:
     std::int64_t dist(const TickVal& lhs, const TickVal& rhs)
     {
 #ifdef FFS_WIN
-        assert_static(IsSignedInt<decltype(lhs.val_.QuadPart)>::value);
-        return std::abs(lhs.val_.QuadPart - rhs.val_.QuadPart);
+        return numeric::dist(lhs.val_.QuadPart, rhs.val_.QuadPart); //std::abs(a - b) can lead to overflow!
+
 #elif defined FFS_LINUX
-        assert_static(IsSignedInt<decltype(lhs.val_.tv_sec)>::value);
-        assert_static(IsSignedInt<decltype(lhs.val_.tv_nsec)>::value);
-        return std::abs(static_cast<std::int64_t>(lhs.val_.tv_sec - rhs.val_.tv_sec) * 1000000000.0 + (lhs.val_.tv_nsec - rhs.val_.tv_nsec));
+        const auto distSec  = numeric::dist(lhs.val_.tv_sec,  rhs.val_.tv_sec);
+        const auto distNsec = numeric::dist(lhs.val_.tv_nsec, rhs.val_.tv_nsec);
+
+        if (distSec > (std::numeric_limits<std::int64_t>::max() - distNsec) / 1000000000) //truncate instead of overflow!
+            return std::numeric_limits<std::int64_t>::max();
+        return distSec * 1000000000 + distNsec;
 #endif
     }
 
@@ -94,7 +104,7 @@ std::int64_t ticksPerSec() //return 0 on error
     LARGE_INTEGER frequency = {};
     if (!::QueryPerformanceFrequency(&frequency)) //MSDN promises: "The frequency cannot change while the system is running."
         return 0;
-    assert_static(sizeof(std::int64_t) >= sizeof(frequency.QuadPart));
+    static_assert(sizeof(std::int64_t) >= sizeof(frequency.QuadPart), "");
     return frequency.QuadPart;
 
 #elif defined FFS_LINUX

@@ -64,17 +64,17 @@ struct FolderPairSyncCfg
 {
     FolderPairSyncCfg(bool automaticMode,
                       const DeletionPolicy handleDel,
-                      const Zstring& versioningDirFmt,
-                      int versionCountLimit) :
+                      VersioningStyle versioningStyle,
+                      const Zstring& versioningDirFmt) :
         inAutomaticMode(automaticMode),
         handleDeletion(handleDel),
-        versioningFolder(versioningDirFmt),
-        versionCountLimit_(versionCountLimit) {}
+        versioningStyle_(versioningStyle),
+        versioningFolder(versioningDirFmt) {}
 
     bool inAutomaticMode; //update database if in automatic mode
     DeletionPolicy handleDeletion;
+    VersioningStyle versioningStyle_;
     Zstring versioningFolder; //formatted directory name
-    int versionCountLimit_;
 };
 std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 

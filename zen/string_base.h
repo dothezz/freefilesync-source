@@ -385,9 +385,9 @@ size_t Zbase<Char, SP, AP>::find(const Zbase& str, size_t pos) const
 {
     assert(pos <= length());
     const Char* thisEnd = end(); //respect embedded 0
-    const Char* iter = std::search(begin() + pos, thisEnd,
+    const Char* it = std::search(begin() + pos, thisEnd,
                                    str.begin(), str.end());
-    return iter == thisEnd ? npos : iter - begin();
+    return it == thisEnd ? npos : it - begin();
 }
 
 
@@ -396,9 +396,9 @@ size_t Zbase<Char, SP, AP>::find(const Char* str, size_t pos) const
 {
     assert(pos <= length());
     const Char* thisEnd = end(); //respect embedded 0
-    const Char* iter = std::search(begin() + pos, thisEnd,
+    const Char* it = std::search(begin() + pos, thisEnd,
                                    str, str + strLength(str));
-    return iter == thisEnd ? npos : iter - begin();
+    return it == thisEnd ? npos : it - begin();
 }
 
 
@@ -407,8 +407,8 @@ size_t Zbase<Char, SP, AP>::find(Char ch, size_t pos) const
 {
     assert(pos <= length());
     const Char* thisEnd = end();
-    const Char* iter = std::find(begin() + pos, thisEnd, ch); //respect embedded 0
-    return iter == thisEnd ? npos : iter - begin();
+    const Char* it = std::find(begin() + pos, thisEnd, ch); //respect embedded 0
+    return it == thisEnd ? npos : it - begin();
 }
 
 
@@ -419,8 +419,8 @@ size_t Zbase<Char, SP, AP>::rfind(Char ch, size_t pos) const
 
     const Char* currEnd = pos == npos ? end() : begin() + std::min(pos + 1, length());
 
-    const Char* iter = find_last(begin(), currEnd, ch);
-    return iter == currEnd ? npos : iter - begin();
+    const Char* it = find_last(begin(), currEnd, ch);
+    return it == currEnd ? npos : it - begin();
 }
 
 
@@ -432,9 +432,9 @@ size_t Zbase<Char, SP, AP>::rfind(const Char* str, size_t pos) const
     const size_t strLen = strLength(str);
     const Char* currEnd = pos == npos ? end() : begin() + std::min(pos + strLen, length());
 
-    const Char* iter = search_last(begin(), currEnd,
+    const Char* it = search_last(begin(), currEnd,
                                    str, str + strLen);
-    return iter == currEnd ? npos : iter - begin();
+    return it == currEnd ? npos : it - begin();
 }
 
 

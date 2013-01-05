@@ -20,14 +20,14 @@ Zstring getExtension(const Zstring& relativeName) //including "." if extension i
 
 bool impl::isMatchingVersion(const Zstring& shortname, const Zstring& shortnameVersion) //e.g. ("Sample.txt", "Sample.txt 2012-05-15 131513.txt")
 {
-    auto iter = shortnameVersion.begin();
+    auto it = shortnameVersion.begin();
     auto last = shortnameVersion.end();
 
     auto nextDigit = [&]() -> bool
     {
-        if (iter == last || !isDigit(*iter))
+        if (it == last || !isDigit(*it))
             return false;
-        ++iter;
+        ++it;
         return true;
     };
     auto nextDigits = [&](size_t count) -> bool
@@ -39,16 +39,16 @@ bool impl::isMatchingVersion(const Zstring& shortname, const Zstring& shortnameV
     };
     auto nextChar = [&](Zchar c) -> bool
     {
-        if (iter == last || *iter != c)
+        if (it == last || *it != c)
             return false;
-        ++iter;
+        ++it;
         return true;
     };
     auto nextStringI = [&](const Zstring& str) -> bool //windows: ignore case!
     {
-        if (last - iter < static_cast<ptrdiff_t>(str.size()) || !EqualFilename()(str, Zstring(&*iter, str.size())))
+        if (last - it < static_cast<ptrdiff_t>(str.size()) || !EqualFilename()(str, Zstring(&*it, str.size())))
             return false;
-        iter += str.size();
+        it += str.size();
         return true;
     };
 
@@ -62,25 +62,41 @@ bool impl::isMatchingVersion(const Zstring& shortname, const Zstring& shortnameV
            nextChar(Zstr(' ')) && //
            nextDigits(6)       && //HHMMSS
            nextStringI(getExtension(shortname)) &&
-           iter == last;
+           it == last;
 }
 
 
 namespace
 {
+/*
+- handle not existing source
+- create target super directories if missing
+*/
 template <class Function>
 void moveItemToVersioning(const Zstring& sourceObj, //throw FileError
                           const Zstring& relativeName,
                           const Zstring& versioningDirectory,
                           const Zstring& timestamp,
-                          Function moveObj) //move source -> target; allowed to throw FileError
+                          VersioningStyle versioningStyle,
+                          Function moveObj) //move source -> target; may throw FileError
 {
     assert(!startsWith(relativeName, FILE_NAME_SEPARATOR));
+    assert(!endsWith  (relativeName, FILE_NAME_SEPARATOR));
     assert(endsWith(sourceObj, relativeName)); //usually, yes, but we might relax this in the future
 
-    //assemble time-stamped version name
-    const Zstring targetObj = appendSeparator(versioningDirectory) + relativeName + Zstr(' ') + timestamp + getExtension(relativeName);
-    assert(impl::isMatchingVersion(afterLast(relativeName, FILE_NAME_SEPARATOR), afterLast(targetObj, FILE_NAME_SEPARATOR))); //paranoid? no!
+    Zstring targetObj;
+    switch (versioningStyle)
+    {
+        case VER_STYLE_REPLACE:
+            targetObj = appendSeparator(versioningDirectory) + relativeName;
+            break;
+
+        case VER_STYLE_ADD_TIMESTAMP:
+            //assemble time-stamped version name
+            targetObj = appendSeparator(versioningDirectory) + relativeName + Zstr(' ') + timestamp + getExtension(relativeName);
+            assert(impl::isMatchingVersion(afterLast(relativeName, FILE_NAME_SEPARATOR), afterLast(targetObj, FILE_NAME_SEPARATOR))); //paranoid? no!
+            break;
+    }
 
     try
     {
@@ -104,11 +120,18 @@ void moveItemToVersioning(const Zstring& sourceObj, //throw FileError
 }
 
 
-//move source to target across volumes; prerequisite: all super-directories of target exist
-//if target already contains some files/dirs they are seen as remnants of a previous incomplete move
-void moveFile(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile& callback) //throw FileError
+//move source to target across volumes
+//no need to check if: - super-directories of target exist - source exists
+//if target already exists, it is overwritten, even if it is a different type, e.g. a directory!
+template <class Function>
+void moveObject(const Zstring& sourceFile, //throw FileError
+                const Zstring& targetFile,
+                Function copyDelete) //fallback if move failed; may throw FileError
 {
+    assert(!dirExists(sourceFile) || symlinkExists(sourceFile)); //we process files and symlinks only
+
     //first try to move directly without copying
+    bool targetExisting = false;
     try
     {
         renameFile(sourceFile, targetFile); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
@@ -116,57 +139,57 @@ void moveFile(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopy
     }
     //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
     catch (const ErrorDifferentVolume&) {}
-    catch (const ErrorTargetExisting&) {}
+    catch (const ErrorTargetExisting&) { targetExisting = true; }
 
-    //create target
-    if (!fileExists(targetFile)) //check even if ErrorTargetExisting: me may have clashed with another item type of the same name!!!
+    if (!targetExisting)
+        targetExisting = somethingExists(targetFile);
+
+    //remove target object
+    if (targetExisting)
     {
-        //file is on a different volume: let's copy it
+        if (fileExists(targetFile)) //file or symlink
+            removeFile(targetFile); //throw FileError
+        else if (dirExists(targetFile)) //directory or symlink
+            removeDirectory(targetFile); //throw FileError
+        //we do not expect targetFile to be a directory in general => no callback required
+        else assert(false);
+    }
+
+    copyDelete();
+}
+
+
+void moveFile(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile& callback) //throw FileError
+{
+    moveObject(sourceFile, //throw FileError
+               targetFile,
+               [&]
+    {
+        //create target
         if (symlinkExists(sourceFile))
             copySymlink(sourceFile, targetFile, false); //throw FileError; don't copy filesystem permissions
         else
             copyFile(sourceFile, targetFile, false, true, &callback); //throw FileError - permissions "false", transactional copy "true"
-    }
 
-    //delete source
-    removeFile(sourceFile); //throw FileError; newly copied file is NOT deleted if exception is thrown here!
+        //delete source
+        removeFile(sourceFile); //throw FileError; newly copied file is NOT deleted if exception is thrown here!
+    });
 }
 
 
 void moveDirSymlink(const Zstring& sourceLink, const Zstring& targetLink) //throw FileError
 {
-    //first try to move directly without copying
-    try
+    moveObject(sourceLink, //throw FileError
+               targetLink,
+               [&]
     {
-        renameFile(sourceLink, targetLink); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
-        return; //great, we get away cheaply!
-    }
-    //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
-    catch (const ErrorDifferentVolume&) {}
-    catch (const ErrorTargetExisting&) {}
-
-    //create target
-    if (!symlinkExists(targetLink)) //check even if ErrorTargetExisting: me may have clashed with another item type of the same name!!!
-    {
-        //link is on a different volume: let's copy it
+        //create target
         copySymlink(sourceLink, targetLink, false); //throw FileError; don't copy filesystem permissions
-    }
 
-    //delete source
-    removeDirectory(sourceLink); //throw FileError; newly copied link is NOT deleted if exception is thrown here!
+        //delete source
+        removeDirectory(sourceLink); //throw FileError; newly copied link is NOT deleted if exception is thrown here!
+    });
 }
-
-
-struct CopyCallbackImpl : public CallbackCopyFile
-{
-    CopyCallbackImpl(CallbackMoveFile& callback) : callback_(callback) {}
-
-private:
-    virtual void deleteTargetFile(const Zstring& targetFile) { assert(!somethingExists(targetFile)); }
-    virtual void updateCopyStatus(Int64 bytesDelta) { callback_.updateStatus(bytesDelta); }
-
-    CallbackMoveFile& callback_;
-};
 
 
 class TraverseFilesOneLevel : public TraverseCallback
@@ -200,18 +223,6 @@ private:
     std::vector<Zstring>& files_;
     std::vector<Zstring>& dirs_;
 };
-
-
-struct RemoveCallbackImpl : public CallbackRemoveDir
-{
-    RemoveCallbackImpl(CallbackMoveFile& callback) : callback_(callback) {}
-
-private:
-    virtual void notifyFileDeletion(const Zstring& filename) { callback_.updateStatus(0); }
-    virtual void notifyDirDeletion (const Zstring& dirname ) { callback_.updateStatus(0); }
-
-    CallbackMoveFile& callback_;
-};
 }
 
 
@@ -221,25 +232,29 @@ void FileVersioner::revisionFile(const Zstring& sourceFile, const Zstring& relat
                          relativeName,
                          versioningDirectory_,
                          timeStamp_,
+                         versioningStyle_,
                          [&](const Zstring& source, const Zstring& target)
     {
-        callback.onBeforeFileMove(source, target);
+        struct CopyCallbackImpl : public CallbackCopyFile
+        {
+            CopyCallbackImpl(CallbackMoveFile& callback) : callback_(callback) {}
+        private:
+            virtual void deleteTargetFile(const Zstring& targetFile) { assert(!somethingExists(targetFile)); }
+            virtual void updateCopyStatus(Int64 bytesDelta) { callback_.updateStatus(bytesDelta); }
+            CallbackMoveFile& callback_;
+        } copyCallback(callback);
 
-        CopyCallbackImpl copyCallback(callback);
+        callback.onBeforeFileMove(source, target);
         moveFile(source, target, copyCallback); //throw FileError
         callback.objectProcessed();
     });
 
-    fileRelNames.push_back(relativeName);
+    //fileRelNames.push_back(relativeName);
 }
 
 
 void FileVersioner::revisionDir(const Zstring& sourceDir, const Zstring& relativeName, CallbackMoveFile& callback) //throw FileError
 {
-    //note: we cannot support "throw exception if target already exists": If we did, we would have to do a full cleanup
-    //removing all newly created directories in case of an exception so that subsequent tries would not fail with "target already existing".
-    //However an exception may also happen during final deletion of source folder, in which case cleanup effectively leads to data loss!
-
     //create target
     if (symlinkExists(sourceDir)) //on Linux there is just one type of symlinks, and since we do revision file symlinks, we should revision dir symlinks as well!
     {
@@ -247,6 +262,7 @@ void FileVersioner::revisionDir(const Zstring& sourceDir, const Zstring& relativ
                              relativeName,
                              versioningDirectory_,
                              timeStamp_,
+                             versioningStyle_,
                              [&](const Zstring& source, const Zstring& target)
         {
             callback.onBeforeDirMove(source, target);
@@ -254,12 +270,12 @@ void FileVersioner::revisionDir(const Zstring& sourceDir, const Zstring& relativ
             callback.objectProcessed();
         });
 
-        fileRelNames.push_back(relativeName);
+        //fileRelNames.push_back(relativeName);
     }
     else
     {
         assert(!startsWith(relativeName, FILE_NAME_SEPARATOR));
-        assert(endsWith(sourceDir, relativeName));
+        assert(endsWith(sourceDir, relativeName)); //usually, yes, but we might relax this in the future
         const Zstring targetDir = appendSeparator(versioningDirectory_) + relativeName;
 
         callback.onBeforeDirMove(sourceDir, targetDir);
@@ -272,7 +288,7 @@ void FileVersioner::revisionDir(const Zstring& sourceDir, const Zstring& relativ
         try
         {
             TraverseFilesOneLevel tol(fileList, dirList); //throw FileError
-            traverseFolder(sourceDir, tol);                   //
+            traverseFolder(sourceDir, tol);               //
         }
         catch (FileError&)
         {
@@ -293,7 +309,7 @@ void FileVersioner::revisionDir(const Zstring& sourceDir, const Zstring& relativ
                          callback);
         });
 
-        //move directories
+        //move items in subdirectories
         std::for_each(dirList.begin(), dirList.end(),
                       [&](const Zstring& shortname)
         {
@@ -303,7 +319,15 @@ void FileVersioner::revisionDir(const Zstring& sourceDir, const Zstring& relativ
         });
 
         //delete source
-        RemoveCallbackImpl removeCallback(callback);
+        struct RemoveCallbackImpl : public CallbackRemoveDir
+        {
+            RemoveCallbackImpl(CallbackMoveFile& callback) : callback_(callback) {}
+        private:
+            virtual void notifyFileDeletion(const Zstring& filename) { callback_.updateStatus(0); }
+            virtual void notifyDirDeletion (const Zstring& dirname ) { callback_.updateStatus(0); }
+            CallbackMoveFile& callback_;
+        } removeCallback(callback);
+
         removeDirectory(sourceDir, &removeCallback); //throw FileError
 
         callback.objectProcessed();
@@ -311,6 +335,7 @@ void FileVersioner::revisionDir(const Zstring& sourceDir, const Zstring& relativ
 }
 
 
+/*
 namespace
 {
 class TraverseVersionsOneLevel : public TraverseCallback
@@ -329,7 +354,6 @@ private:
 };
 }
 
-
 void FileVersioner::limitVersions(std::function<void()> updateUI) //throw FileError
 {
     if (versionCountLimit_ < 0) //no limit!
@@ -340,9 +364,9 @@ void FileVersioner::limitVersions(std::function<void()> updateUI) //throw FileEr
 
     auto getVersionsBuffered = [&](const Zstring& dirname) -> const std::vector<Zstring>&
     {
-        auto iter = dirBuffer.find(dirname);
-        if (iter != dirBuffer.end())
-            return iter->second;
+        auto it = dirBuffer.find(dirname);
+        if (it != dirBuffer.end())
+            return it->second;
 
         std::vector<Zstring> fileShortNames;
         TraverseVersionsOneLevel tol(fileShortNames, updateUI); //throw FileError
@@ -396,3 +420,4 @@ void FileVersioner::limitVersions(std::function<void()> updateUI) //throw FileEr
         });
     });
 }
+*/

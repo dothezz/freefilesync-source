@@ -23,9 +23,9 @@ public:
         std::vector<Zstring> dirs = dirnamesFmt;
         vector_remove_if(dirs, [](const Zstring& dir) { return dir.empty(); });
 
-        for (auto iter = dirs.begin(); iter != dirs.end(); ++iter)
+        for (auto it = dirs.begin(); it != dirs.end(); ++it)
         {
-            const Zstring& dirnameFmt = *iter;
+            const Zstring& dirnameFmt = *it;
 
             if (!dirExistsUpdating(dirnameFmt, allowUserInteraction_, procCallback))
                 continue;

@@ -28,19 +28,20 @@ namespace zen
 class ScopeGuardBase
 {
 public:
-    void dismiss() const { dismissed_ = true; }
+    void dismiss() { dismissed_ = true; }
 
 protected:
     ScopeGuardBase() : dismissed_(false) {}
-    ScopeGuardBase(const ScopeGuardBase& other) : dismissed_(other.dismissed_) { other.dismissed_ = true; } //take over responsibility
+    ScopeGuardBase(ScopeGuardBase&& other) : dismissed_(other.dismissed_) { other.dismiss(); } //take over responsibility
     ~ScopeGuardBase() {}
 
     bool isDismissed() const { return dismissed_; }
 
 private:
+    ScopeGuardBase(const ScopeGuardBase&); //delete
     ScopeGuardBase& operator=(const ScopeGuardBase&); // = delete;
 
-    mutable bool dismissed_;
+    bool dismissed_;
 };
 
 
@@ -48,7 +49,9 @@ template <typename F>
 class ScopeGuardImpl : public ScopeGuardBase
 {
 public:
-    ScopeGuardImpl(F fun) : fun_(fun) {}
+    explicit ScopeGuardImpl(const F& fun) : fun_(fun) {}
+    explicit ScopeGuardImpl(F&& fun) : fun_(std::move(fun)) {}
+    ScopeGuardImpl(ScopeGuardImpl&& other) : ScopeGuardBase(std::move(other)), fun_(std::move(other.fun_)) {}
 
     ~ScopeGuardImpl()
     {
@@ -64,10 +67,10 @@ private:
     F fun_;
 };
 
-typedef const ScopeGuardBase& ScopeGuard;
+typedef ScopeGuardBase&& ScopeGuard;
 
 template <class F> inline
-ScopeGuardImpl<F> makeGuard(F fun) { return ScopeGuardImpl<F>(fun); }
+ScopeGuardImpl<typename std::decay<F>::type> makeGuard(F&& fun) { return ScopeGuardImpl<typename std::decay<F>::type>(std::forward<F>(fun)); }
 }
 
 #define ZEN_CONCAT_SUB(X, Y) X ## Y

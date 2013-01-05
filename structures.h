@@ -189,27 +189,26 @@ enum DeletionPolicy
     DELETE_TO_VERSIONING
 };
 
+enum VersioningStyle
+{
+    VER_STYLE_REPLACE,
+    VER_STYLE_ADD_TIMESTAMP,
+};
 
 struct SyncConfig
 {
-    //SyncConfig(const DirectionConfig& directCfg,
-    //           const DeletionPolicy   handleDel,
-    //           const Zstring&         versionDir) :
-    //    directionCfg(directCfg),
-    //    handleDeletion(handleDel),
-    //    versioningDirectory(versionDir) {}
-
-    SyncConfig() :  //construct with default values
+    SyncConfig() :
         handleDeletion(DELETE_TO_RECYCLER),
-        versionCountLimit(-1) {}
+        versioningStyle(VER_STYLE_REPLACE) {}
 
     //sync direction settings
     DirectionConfig directionCfg;
 
-    //misc options
     DeletionPolicy handleDeletion; //use Recycle, delete permanently or move to user-defined location
+    //versioning options
+    VersioningStyle versioningStyle;
     Zstring versioningDirectory;
-    int versionCountLimit; //max versions per file (DELETE_TO_VERSIONING); < 0 := no limit
+    //int versionCountLimit; //max versions per file (DELETE_TO_VERSIONING); < 0 := no limit
 };
 
 inline
@@ -218,8 +217,8 @@ bool operator==(const SyncConfig& lhs, const SyncConfig& rhs)
     return lhs.directionCfg   == rhs.directionCfg   &&
            lhs.handleDeletion == rhs.handleDeletion &&
            (lhs.handleDeletion != DELETE_TO_VERSIONING || //only compare deletion directory if required!
-            (lhs.versioningDirectory == rhs.versioningDirectory &&
-             lhs.versionCountLimit   == rhs.versionCountLimit));
+            (lhs.versioningStyle   == rhs.versioningStyle &&
+             lhs.versioningDirectory == rhs.versioningDirectory));
 }
 
 

@@ -59,7 +59,7 @@
 <target>Filtereinstellungen löschen</target>
 
 <source>Save as batch job</source>
-<target>Speichern als Batch-Job</target>
+<target>Als Batch-Job speichern</target>
 
 <source>Comparison settings</source>
 <target>Vergleichseinstellungen</target>
@@ -78,9 +78,6 @@
 
 <source>Global settings</source>
 <target>Globale Einstellungen</target>
-
-<source>Summary</source>
-<target>Zusammenfassung</target>
 
 <source>Find</source>
 <target>Suchen</target>
@@ -274,8 +271,8 @@
 <source>Select a folder</source>
 <target>Ordner auswählen</target>
 
-<source>Delay [seconds]</source>
-<target>Verzögerung [Sekunden]</target>
+<source>Idle time [seconds]</source>
+<target>Ruhezeit [Sekunden]</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Ruhezeit zwischen der letzten erkannten Änderung und dem Aufruf der Befehlszeile</target>
@@ -324,44 +321,23 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>A folder input field is empty.</source>
 <target>Ein Ordnereingabefeld ist leer.</target>
 
-<source>File time and size</source>
-<target>Datum und Größe</target>
-
-<source>File content</source>
-<target>Dateiinhalt</target>
-
-<source><Automatic></source>
-<target><Automatik></target>
-
-<source>Mirror ->></source>
-<target>Spiegeln ->></target>
-
-<source>Update -></source>
-<target>Aktualisieren -></target>
-
-<source>Custom</source>
-<target>Eigene</target>
-
-<source>FreeFileSync batch</source>
-<target>FreeFileSync Batch</target>
-
-<source>Saving log file %x</source>
-<target>Speichere Logdatei %x</target>
-
 <source>Synchronization aborted!</source>
 <target>Synchronisation abgebrochen!</target>
 
 <source>Synchronization completed with errors!</source>
 <target>Synchronisation mit Fehlern abgeschlossen!</target>
 
-<source>Synchronization completed with warnings!</source>
-<target>Synchronisation mit Warnungen abgeschlossen!</target>
+<source>Synchronization completed with warnings.</source>
+<target>Synchronisation mit Warnungen abgeschlossen.</target>
 
 <source>Nothing to synchronize!</source>
 <target>Es gibt nichts zu synchronisieren!</target>
 
-<source>Synchronization completed successfully!</source>
-<target>Synchronisation erfolgreich abgeschlossen!</target>
+<source>Synchronization completed successfully.</source>
+<target>Synchronisation erfolgreich abgeschlossen.</target>
+
+<source>Saving log file %x...</source>
+<target>Speichere Logdatei %x...</target>
 
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
 <target>Drücken Sie "Wechseln", um die Probleme in FreeFileSyncs Hauptdialog zu beheben.</target>
@@ -513,8 +489,8 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Zuletzt benutzte Konfigurationen (Entf-Taste löscht Einträge)</target>
 
-<source>Show excluded items</source>
-<target>Ausgeschlossene Elemente anzeigen</target>
+<source>Hide excluded items</source>
+<target>Ausgeschlossene Elemente verstecken</target>
 
 <source>Show filtered or temporarily excluded files</source>
 <target>Gefilterte oder temporär ausgeschlossene Dateien zeigen</target>
@@ -552,15 +528,6 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Help</source>
 <target>Hilfe</target>
 
-<source>Filter files</source>
-<target>Dateien filtern</target>
-
-<source>Left</source>
-<target>Links</target>
-
-<source>Right</source>
-<target>Rechts</target>
-
 <source>Error handling</source>
 <target>Fehlerbehandlung</target>
 
@@ -582,14 +549,14 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Abort synchronization on first error</source>
 <target>Synchronisation beim ersten Fehler abbrechen</target>
 
-<source>On completion:</source>
-<target>Nach Abschluss:</target>
+<source>On completion</source>
+<target>Nach Abschluss</target>
 
 <source>Show progress dialog</source>
 <target>Fortschrittsdialog zeigen</target>
 
-<source>Generate log file</source>
-<target>Logdatei erzeugen</target>
+<source>Save log</source>
+<target>Log speichern</target>
 
 <source>Select folder to save log files</source>
 <target>Ordner zum speichern der Logdateien wählen</target>
@@ -600,11 +567,8 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Limit maximum number of log files</source>
 <target>Maximale Anzahl von Logdateien begrenzen</target>
 
-<source>Batch settings</source>
-<target>Batch Einstellungen</target>
-
-<source>Compare by...</source>
-<target>Vergleichen nach...</target>
+<source>Select variant</source>
+<target>Variante auswählen</target>
 
 <source>
 Files are found equal if
@@ -619,6 +583,9 @@ Dateien gelten als gleich, wenn
 gleich sind
 </target>
 
+<source>File time and size</source>
+<target>Datum und Größe</target>
+
 <source>
 Files are found equal if
      - file content
@@ -630,23 +597,35 @@ Dateien gelten als gleich, wenn
 gleich ist
 </target>
 
+<source>File content</source>
+<target>Dateiinhalt</target>
+
 <source>Symbolic Link handling</source>
-<target>Behandlung Symbolischer Links</target>
+<target>Symbolische Links</target>
 
 <source>OK</source>
 <target>OK</target>
 
-<source>Select variant:</source>
-<target>Variante auswählen:</target>
+<source><- Two way -></source>
+<target><- Zwei Wege -></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identifiziere und propagiere Änderungen auf beiden Seiten mit Hilfe einer Datenbank. Löschungen, Umbenennungen und Konflikte werden automatisch erkannt.</target>
 
+<source>Mirror ->></source>
+<target>Spiegeln ->></target>
+
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Spiegelkopie des linken Ordners erstellen. Der rechte Ordner wird dem linken exakt angeglichen.</target>
 
+<source>Update -></source>
+<target>Aktualisieren -></target>
+
 <source>Copy new or updated files to right folder.</source>
 <target>Neue oder aktualisierte Dateien in den rechten Ordner kopieren.</target>
+
+<source>Custom</source>
+<target>Eigene</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Eigene Synchronisationsregeln definieren.</target>
@@ -655,7 +634,7 @@ gleich ist
 <target>Behandlung von Löschungen</target>
 
 <source>Permanent</source>
-<target>Endgültig</target>
+<target>Permanent</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Dateien endgültig löschen oder überschreiben</target>
@@ -663,8 +642,8 @@ gleich ist
 <source>Recycle Bin</source>
 <target>Papierkorb</target>
 
-<source>Use Recycle Bin when deleting or overwriting files</source>
-<target>Papierkorb für zu löschende oder zu überschreibende Dateien nutzen</target>
+<source>Use Recycle Bin for deleted and overwritten files</source>
+<target>Verwende den Papierkorb für gelöschte und überschriebene Dateien</target>
 
 <source>Versioning</source>
 <target>Versionierung</target>
@@ -672,8 +651,8 @@ gleich ist
 <source>Move time-stamped files into specified folder</source>
 <target>Dateien mit Zeitstempel in den angegebenen Ordner verschieben</target>
 
-<source>Limit maximum number of versions per file</source>
-<target>Maximale Anzahl von Versionen pro Datei begrenzen</target>
+<source>Naming convention:</source>
+<target>Namenskonvention:</target>
 
 <source>Configuration</source>
 <target>Konfiguration</target>
@@ -822,6 +801,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Overview</source>
 <target>Übersicht</target>
 
+<source>Filter files</source>
+<target>Dateien filtern</target>
+
 <source>Select view</source>
 <target>Ansicht auswählen</target>
 
@@ -878,6 +860,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Configuration saved!</source>
 <target>Konfiguration gespeichert!</target>
+
+<source>FreeFileSync batch</source>
+<target>FreeFileSync Batch</target>
 
 <source>Never save changes</source>
 <target>Änderungen niemals speichern</target>
@@ -1128,8 +1113,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>- Other side's counterpart to %item_folder%</source>
 <target>- Entsprechung der anderen Seite zu %item_folder%</target>
 
-<source>Make hidden dialogs and warning messages visible again?</source>
-<target>Versteckte Dialoge und Warnungen wieder sichtbar machen?</target>
+<source>Make hidden warnings and dialogs visible again?</source>
+<target>Versteckte Warnungen und Dialoge wieder sichtbar machen?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1151,6 +1136,24 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Leave as unresolved conflict</source>
 <target>Als unbehandelten Konflikt belassen</target>
+
+<source>Replace</source>
+<target>Ersetzen</target>
+
+<source>Move files and replace if existing</source>
+<target>Dateien verschieben und bereits vorhandene ersetzen</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Einen Zeitstempel an jeden Dateinamen hinzufügen</target>
+
+<source>Folder</source>
+<target>Ordner</target>
+
+<source>File</source>
+<target>Datei</target>
+
+<source>YYYY-MM-DD hhmmss</source>
+<target>JJJJ-MM-TT hhmmss</target>
 
 <source>Files</source>
 <target>Dateien</target>
@@ -1419,11 +1422,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Source folder %x not found.</source>
 <target>Der Quellordner %x wurde nicht gefunden.</target>
 
-<source>Unresolved conflicts existing!</source>
-<target>Es existieren ungelöste Konflikte!</target>
-
-<source>You can ignore conflicts and continue synchronization.</source>
-<target>Die Konflikte können ignoriert und die Synchronisation fortgesetzt werden.</target>
+<source>The following items have unresolved conflicts and will not be synchronized:</source>
+<target>Die folgenden Elemente haben ungelöste Konflikte und werden nicht synchronisiert werden:</target>
 
 <source>Significant difference detected:</source>
 <target>Ein erheblicher Unterschied wurde festgestellt:</target>
@@ -1442,6 +1442,12 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Ein Ordner wird verändert werden, der Teil mehrerer Ordnerpaare ist. Bitte überprüfen Sie die Synchronisationseinstellungen.</target>
+
+<source>Left</source>
+<target>Links</target>
+
+<source>Right</source>
+<target>Rechts</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronisiere Ordnerpaar:</target>

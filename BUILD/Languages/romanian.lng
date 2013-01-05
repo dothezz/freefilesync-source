@@ -31,6 +31,9 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Abandonare solicitată: Se așteaptă terminarea operației în curs...</target>
 
+<source>Failure to create time stamp for versioning:</source>
+<target>Crearea marcajului temporal pentru versionare a eșuat</target>
+
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sincronizare Inteligentă</target>
 
@@ -55,8 +58,8 @@
 <source>Clear filter settings</source>
 <target>Curăță Setările Filtrului</target>
 
-<source>Create a batch job</source>
-<target>Creează o Sarcină Set [Batch Job]</target>
+<source>Save as batch job</source>
+<target>Salvează ca Sarcină Set</target>
 
 <source>Comparison settings</source>
 <target>Setările Comparării</target>
@@ -75,9 +78,6 @@
 
 <source>Global settings</source>
 <target>Setări Globale</target>
-
-<source>Summary</source>
-<target>Sumar</target>
 
 <source>Find</source>
 <target>Găsește</target>
@@ -274,8 +274,8 @@
 <source>Select a folder</source>
 <target>Selectează un Dosar</target>
 
-<source>Delay [seconds]</source>
-<target>Întîrziere [secunde]</target>
+<source>Idle time [seconds]</source>
+<target>Timp de inactivitate [secunde]</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Timpul de inactivitate între ultima schimbare detectată și executarea comenzii</target>
@@ -324,47 +324,29 @@ Comanda este declanșată dacă:
 <source>A folder input field is empty.</source>
 <target>Un cîmp de introducere a dosarului este gol.</target>
 
-<source>File time and size</source>
-<target>Timpul și Mărimea Filelor</target>
-
-<source>File content</source>
-<target>Conținutul Filelor</target>
-
-<source><Automatic></source>
-<target><Sincronizare Inteligentă></target>
-
-<source>Mirror ->></source>
-<target>Clonare =>></target>
-
-<source>Update -></source>
-<target>Actualizare =></target>
-
-<source>Custom</source>
-<target>Sincronizare Personalizată</target>
-
-<source>FreeFileSync batch</source>
-<target>Set FreeFileSync</target>
-
 <source>Synchronization aborted!</source>
 <target>Sincronizare abandonată!</target>
 
 <source>Synchronization completed with errors!</source>
 <target>Sincronizare terminată cu erori!</target>
 
+<source>Synchronization completed with warnings.</source>
+<target>Sincronizare realizată, dar cu avertismente.</target>
+
 <source>Nothing to synchronize!</source>
 <target>Nu e nimic de sincronizat!</target>
 
-<source>Synchronization completed successfully!</source>
-<target>Sincronizare terminată cu succes!</target>
+<source>Synchronization completed successfully.</source>
+<target>Sincronizare realizată cu succes.</target>
+
+<source>Saving log file %x...</source>
+<target>Salvez fila jurnal %x...</target>
 
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
 <target>Apasă "Comută" pentru a rezolva problemele din dialogul principal FreeFileSync.</target>
 
 <source>Switching to FreeFileSync main dialog...</source>
 <target>Comut la dialogul principal FreeFileSync...</target>
-
-<source>Unable to connect to sourceforge.net!</source>
-<target>Conectarea la situl sourceforge.net nu poate fi realizată!</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Este disponibilă o versiune nouă a softului:</target>
@@ -377,6 +359,12 @@ Comanda este declanșată dacă:
 
 <source>Information</source>
 <target>Informații</target>
+
+<source>Unable to connect to sourceforge.net!</source>
+<target>Conectarea la situl sourceforge.net nu poate fi realizată!</target>
+
+<source>Current FreeFileSync version number was not found online! Do you want to check manually?</source>
+<target>Numărul versiunii curente de FreeFileSync nu a fost găsit pe internet! Vrei să verifici manual?</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Vrei ca FreeFileSync să caute automat actualizări în fiecare săptămînă ?</target>
@@ -441,26 +429,26 @@ Comanda este declanșată dacă:
 <source>Hibernate</source>
 <target>Pune Calculatorul în Hibernare</target>
 
-<source>1. &Compare</source>
-<target>1. &Compară</target>
-
-<source>2. &Synchronize</source>
-<target>2. &Sincronizează</target>
-
 <source>&New</source>
 <target>Configurație &Nouă</target>
 
 <source>&Save</source>
 <target>&Salvează</target>
 
+<source>Save as &batch job...</source>
+<target>Salvea&ză ca Sarcină Set...</target>
+
+<source>1. &Compare</source>
+<target>1. &Compară</target>
+
+<source>2. &Synchronize</source>
+<target>2. &Sincronizează</target>
+
 <source>&Language</source>
 <target>&Limbă</target>
 
 <source>&Global settings...</source>
 <target>&Setări Globale...</target>
-
-<source>&Create batch job...</source>
-<target>&Creează o Sarcină Set...</target>
 
 <source>&Export file list...</source>
 <target>&Exportă Lista de File...</target>
@@ -495,17 +483,17 @@ Comanda este declanșată dacă:
 <source>Swap sides</source>
 <target>Schimbă compartimentele stîng și drept între ele</target>
 
-<source>Load configuration from file</source>
-<target>Deschide configurația dintr-o filă</target>
+<source>Open</source>
+<target>Deschide</target>
 
-<source>Save current configuration to file</source>
-<target>Salvează într-o filă modificările configurației curente</target>
+<source>Save</source>
+<target>Salvează</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>Ultimele configurații utilizate (apasă tasta DEL pentru a înlătura din listă)</target>
 
-<source>Show excluded items</source>
-<target>Arată itemurile excluse</target>
+<source>Hide excluded items</source>
+<target>Ascunde elementele excluse</target>
 
 <source>Show filtered or temporarily excluded files</source>
 <target>Arată filele filtrate sau excluse temporar</target>
@@ -543,15 +531,6 @@ Comanda este declanșată dacă:
 <source>Help</source>
 <target>Ajutor</target>
 
-<source>Filter files</source>
-<target>Filtru</target>
-
-<source>Left</source>
-<target>Stînga</target>
-
-<source>Right</source>
-<target>Dreapta</target>
-
 <source>Error handling</source>
 <target>Gestionarea Erorilor</target>
 
@@ -568,19 +547,19 @@ Comanda este declanșată dacă:
 <target>În caz de erori sau avertizări este arătată o fereastră popîc [popup]</target>
 
 <source>Exit</source>
-<target>Ieși</target>
+<target>Ieșire</target>
 
 <source>Abort synchronization on first error</source>
-<target>Abandonează sincronizarea la prima eroare</target>
+<target>Sincronizarea e abandonată la prima eroare</target>
 
-<source>On completion:</source>
-<target>La Terminare:</target>
+<source>On completion</source>
+<target>La Terminare</target>
 
 <source>Show progress dialog</source>
 <target>Arată progresul sincronizării</target>
 
-<source>Generate log file</source>
-<target>Generează filă jurnal [log]</target>
+<source>Save log</source>
+<target>Salvează jurnalul acțiunilor</target>
 
 <source>Select folder to save log files</source>
 <target>Selectează dosarul cu filele jurnal</target>
@@ -591,11 +570,8 @@ Comanda este declanșată dacă:
 <source>Limit maximum number of log files</source>
 <target>Limitează numărul maxim de file jurnal</target>
 
-<source>Batch settings</source>
-<target>Setările Setului</target>
-
-<source>Compare by...</source>
-<target>Compară după:</target>
+<source>Select variant</source>
+<target>Selectează varianta dorită</target>
 
 <source>
 Files are found equal if
@@ -610,6 +586,9 @@ Filele sînt considerate identice dacă
 sînt aceleași
 </target>
 
+<source>File time and size</source>
+<target>Timpul și Mărimea Filelor</target>
+
 <source>
 Files are found equal if
      - file content
@@ -621,23 +600,35 @@ Filele sînt considerate identice dacă
 este același
 </target>
 
+<source>File content</source>
+<target>Conținutul Filelor</target>
+
 <source>Symbolic Link handling</source>
 <target>Gestionarea Legăturilor Simbolice</target>
 
 <source>OK</source>
 <target>OK</target>
 
-<source>Select variant:</source>
-<target>Selectează Varianta de Sincronizare:</target>
+<source><- Two way -></source>
+<target><= Bidirecțională =></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Identificare și propagare a modificărilor din ambele părți folosind o bază de date. Ștergerile, renumirile și conflictele sînt detectate automat.</target>
 
+<source>Mirror ->></source>
+<target>Clonare =>></target>
+
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Conservare [backup] în oglindă a dosarului stîng. Dosarul drept e modificat pentru a fi identic după sincronizare cu cel stîng.</target>
 
+<source>Update -></source>
+<target>Actualizare =></target>
+
 <source>Copy new or updated files to right folder.</source>
 <target>Copiere în dosarul din dreapta a filelor actualizate sau noi.</target>
+
+<source>Custom</source>
+<target>Sincronizare Personalizată</target>
 
 <source>Configure your own synchronization rules.</source>
 <target>Reguli de sincronizare definite de utilizator pentru fiecare situație.</target>
@@ -654,7 +645,7 @@ este același
 <source>Recycle Bin</source>
 <target>Reciclator</target>
 
-<source>Use Recycle Bin when deleting or overwriting files</source>
+<source>Use Recycle Bin for deleted and overwritten files</source>
 <target>Filele șterse sau suprascrise sînt puse în Reciclator [Recycle Bin], de unde pot fi recuperate la nevoie</target>
 
 <source>Versioning</source>
@@ -663,8 +654,8 @@ este același
 <source>Move time-stamped files into specified folder</source>
 <target>Filelor le este adăugat un marcaj de timp și apoi sînt mutate în dosarul specificat</target>
 
-<source>Limit maximum number of versions per file</source>
-<target>Limitează numărul maxim de versiuni per filă</target>
+<source>Naming convention:</source>
+<target>Convenție de numire:</target>
 
 <source>Configuration</source>
 <target>Configurație</target>
@@ -706,7 +697,7 @@ este același
 <target>Multe mulțumiri pentru localizare:</target>
 
 <source>Feedback and suggestions are welcome</source>
-<target>Opiniile și sugestiile despre program sînt binevenite</target>
+<target>Opiniile și sugestiile despre program sînt binevenite.</target>
 
 <source>Homepage</source>
 <target>Situl Softului</target>
@@ -813,6 +804,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Overview</source>
 <target>Panoramă</target>
 
+<source>Filter files</source>
+<target>Filtru</target>
+
 <source>Select view</source>
 <target>Selectează Vederea</target>
 
@@ -864,8 +858,14 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source><Last session></source>
 <target><Ultima Sesiune></target>
 
+<source>Folder Comparison and Synchronization</source>
+<target>Comparare și Sincronizare de Dosare</target>
+
 <source>Configuration saved!</source>
 <target>Configurație salvată !</target>
+
+<source>FreeFileSync batch</source>
+<target>Set FreeFileSync</target>
 
 <source>Never save changes</source>
 <target>Nu salva niciodată modificările</target>
@@ -878,9 +878,6 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>Configuration loaded!</source>
 <target>Configurație deschisă !</target>
-
-<source>Folder Comparison and Synchronization</source>
-<target>Comparare și Sincronizare de Dosare</target>
 
 <source>Hide files that exist on left side only</source>
 <target>Ascunde filele care există doar în stînga</target>
@@ -1042,6 +1039,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Comparing content...</source>
 <target>Compar conținutul...</target>
 
+<source>Copy</source>
+<target>Copiază</target>
+
 <source>Paused</source>
 <target>Sincronizare Pauzată</target>
 
@@ -1114,13 +1114,13 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>- folder part only</source>
 <target>- doar pentru partea dosarului</target>
 
-<source>- Other side's counterpart to %name</source>
-<target>- corespondentul din partea opusă al lui %name</target>
+<source>- Other side's counterpart to %item_path%</source>
+<target>- corespondentul din partea opusă al lui %item_path%</target>
 
-<source>- Other side's counterpart to %dir</source>
-<target>- corespondentul din partea opusă al lui %dir</target>
+<source>- Other side's counterpart to %item_folder%</source>
+<target>- corespondentul din partea opusă al lui %item_folder%</target>
 
-<source>Make hidden dialogs and warning messages visible again?</source>
+<source>Make hidden warnings and dialogs visible again?</source>
 <target>Vrei ca dialogurile ascunse și mesajele de avertizare să fie vizibile din nou?</target>
 
 <source>
@@ -1146,50 +1146,29 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Leave as unresolved conflict</source>
 <target>Lasă ca Conflict Nerezolvat</target>
 
+<source>Replace</source>
+<target>Înlocuiește</target>
+
+<source>Move files and replace if existing</source>
+<target>Mută filele și înlocuiește-le pe cele existente</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Adaugă un marcaj temporal la numele fiecărei file</target>
+
+<source>Folder</source>
+<target>Dosar</target>
+
+<source>File</source>
+<target>Filă</target>
+
+<source>YYYY-MM-DD hhmmss</source>
+<target>AAAA-LL-ZZ hhmmss</target>
+
 <source>Files</source>
 <target>File</target>
 
 <source>Percentage</source>
 <target>Procent</target>
-
-<source>%x TB</source>
-<target>%x TB</target>
-
-<source>%x PB</source>
-<target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
-
-<source>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-</source>
-<target>
-<pluralform>1 min</pluralform>
-<pluralform>%x min</pluralform>
-<pluralform>%x de min</pluralform>
-</target>
-
-<source>
-<pluralform>1 hour</pluralform>
-<pluralform>%x hours</pluralform>
-</source>
-<target>
-<pluralform>1 oră</pluralform>
-<pluralform>%x ore</pluralform>
-<pluralform>%x de ore</pluralform>
-</target>
-
-<source>
-<pluralform>1 day</pluralform>
-<pluralform>%x days</pluralform>
-</source>
-<target>
-<pluralform>1 zi</pluralform>
-<pluralform>%x zile</pluralform>
-<pluralform>%x de zile</pluralform>
-</target>
 
 <source>Cannot monitor directory %x.</source>
 <target>Nu pot monitoriza dosarul %x.</target>
@@ -1239,6 +1218,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Cannot copy file %x to %y.</source>
 <target>Nu pot copia fila %x în %y.</target>
 
+<source>Type of item %x is not supported:</source>
+<target>Tipul de element %x nu e suportat:</target>
+
 <source>Cannot open directory %x.</source>
 <target>Nu pot deschide dosarul %x.</target>
 
@@ -1247,6 +1229,45 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>Detected endless directory recursion.</source>
 <target>A fost detectată o recursivitate infinită a dosarului.</target>
+
+<source>%x TB</source>
+<target>%x TB</target>
+
+<source>%x PB</source>
+<target>%x PB</target>
+
+<source>%x%</source>
+<target>%x%</target>
+
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+<pluralform>%x de min</pluralform>
+</target>
+
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 oră</pluralform>
+<pluralform>%x ore</pluralform>
+<pluralform>%x de ore</pluralform>
+</target>
+
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 zi</pluralform>
+<pluralform>%x zile</pluralform>
+<pluralform>%x de zile</pluralform>
+</target>
 
 <source>Cannot set privilege %x.</source>
 <target>Nu pot seta privilegiul %x.</target>
@@ -1297,7 +1318,7 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <target>Filele %x au dată identică, dar mărime diferită!</target>
 
 <source>Items differ in attributes only</source>
-<target>Itemurile diferă doar prin atributele lor</target>
+<target>Elementele diferă doar prin atributele lor</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
 <target>Legăturile simbolice %x au aceeași dată, dar ținte diferite.</target>
@@ -1377,6 +1398,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Moving symbolic link %x to %y</source>
 <target>Mut legătura simbolică %x în %y</target>
 
+<source>Removing old versions...</source>
+<target>Înlătur versiunile vechi...</target>
+
 <source>Creating file %x</source>
 <target>Creez fila %x</target>
 
@@ -1398,6 +1422,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Updating attributes of %x</source>
 <target>Actualizez atributele lui %x</target>
 
+<source>Target folder %x already existing.</source>
+<target>Dosarul țintă %x există deja.</target>
+
 <source>Target folder input field must not be empty.</source>
 <target>Cîmpul de introducere a dosarului țintă nu trebuie să fie gol.</target>
 
@@ -1407,11 +1434,8 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Source folder %x not found.</source>
 <target>Dosarul sursă %x nu a fost găsit.</target>
 
-<source>Unresolved conflicts existing!</source>
-<target>Există conflicte nerezolvate!</target>
-
-<source>You can ignore conflicts and continue synchronization.</source>
-<target>Poți ignora conflictele pentru a continua cu sincronizarea.</target>
+<source>The following items have unresolved conflicts and will not be synchronized:</source>
+<target>Elementele următoare au conflicte nerezolvate și nu vor fi sincronizate:</target>
 
 <source>Significant difference detected:</source>
 <target>Diferență semnificativă detectată:</target>
@@ -1431,11 +1455,14 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Va fi modificat un dosar care face parte din mai multe perechi de dosare! Reverifică setările de sincronizare!</target>
 
+<source>Left</source>
+<target>Stînga</target>
+
+<source>Right</source>
+<target>Dreapta</target>
+
 <source>Synchronizing folder pair:</source>
 <target>Sincronizez perechea de dosare:</target>
-
-<source>Target folder %x already existing.</source>
-<target>Dosarul țintă %x există deja.</target>
 
 <source>Generating database...</source>
 <target>Generez baza de date...</target>

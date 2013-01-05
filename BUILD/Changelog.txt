@@ -2,6 +2,26 @@
 |FreeFileSync|
 --------------
 
+Changelog v5.11
+---------------
+New file versioning scheme: move to folder replacing existing files
+Fixed high CPU consumption after longer syncs
+Improved .ffs_batch configuration file handling
+Allow to quick save .ffs_batch files on main dialog and program exit
+Convert batch-exclusive settings when opening a .ffs_batch file on main dialog
+Redesigned configuration dialog layout
+Enhanced all file I/O error messages to show locking processes (Windows Vista and later)
+Separator in CSV file now locale dependent
+Avoid "Windows Error Code 2" for truly empty directories
+Macro %month% resolves to decimal number
+New macro %timestamp%
+Revised sync progress graph
+Fixed progress graph graphics glitch for RTL layout
+Allow XML element values to contain non-escaped quotation marks
+Updated help file
+Updated translation files
+
+
 Changelog v5.10
 ---------------
 Show synchronization log as a grid in results dialog

@@ -48,13 +48,13 @@ typedef std::vector<std::pair<Description, Commandline> > ExternalApps;
 struct XmlGuiConfig
 {
     XmlGuiConfig() :
-        showFilteredElements(true),
+        hideExcludedItems(false),
         handleError(ON_GUIERROR_POPUP),
         showSyncAction(true) {} //initialize values
 
     zen::MainConfiguration mainCfg;
 
-    bool showFilteredElements;
+    bool hideExcludedItems;
     OnGuiError handleError; //reaction on error situation during synchronization
     bool showSyncAction;
 };
@@ -63,10 +63,10 @@ struct XmlGuiConfig
 inline
 bool operator==(const XmlGuiConfig& lhs, const XmlGuiConfig& rhs)
 {
-    return lhs.mainCfg              == rhs.mainCfg              &&
-           lhs.showFilteredElements == rhs.showFilteredElements &&
-           lhs.handleError          == rhs.handleError          &&
-           lhs.showSyncAction       == rhs.showSyncAction;
+    return lhs.mainCfg           == rhs.mainCfg           &&
+           lhs.hideExcludedItems == rhs.hideExcludedItems &&
+           lhs.handleError       == rhs.handleError       &&
+           lhs.showSyncAction    == rhs.showSyncAction;
 }
 
 
@@ -232,6 +232,7 @@ struct XmlGlobalSettings
     //struct Batch
 };
 
+//read/write specific config types
 void readConfig(const Zstring& filename, XmlGuiConfig&      config); //
 void readConfig(const Zstring& filename, XmlBatchConfig&    config); //throw FfsXmlError
 void readConfig(                         XmlGlobalSettings& config); //
@@ -239,11 +240,6 @@ void readConfig(                         XmlGlobalSettings& config); //
 void writeConfig(const XmlGuiConfig&      config, const Zstring& filename); //
 void writeConfig(const XmlBatchConfig&    config, const Zstring& filename); //throw FfsXmlError
 void writeConfig(const XmlGlobalSettings& config);                          //
-
-//config conversion utilities
-XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg);
-XmlBatchConfig convertGuiToBatch(const XmlGuiConfig& guiCfg, const Zstring& referenceFile);
-
 
 //convert (multiple) *.ffs_gui, *.ffs_batch files or combinations of both into target config structure:
 enum MergeType
@@ -253,10 +249,14 @@ enum MergeType
     MERGE_GUI_BATCH, //gui and batch files
     MERGE_OTHER
 };
-MergeType getMergeType(const std::vector<Zstring>& filenames);   //throw ()
+MergeType getMergeType(const std::vector<Zstring>& filenames); //noexcept
 
-void mergeConfigs(const std::vector<Zstring>& filenames, XmlGuiConfig&   config); //throw xmlAccess::FfsXmlError
-void mergeConfigs(const std::vector<Zstring>& filenames, XmlBatchConfig& config); //throw xmlAccess::FfsXmlError
+void readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config); //throw FfsXmlError
+
+//config conversion utilities
+XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg); //noexcept
+XmlBatchConfig convertGuiToBatch(const XmlGuiConfig&   guiCfg  ); //
+XmlBatchConfig convertGuiToBatchPreservingExistingBatch(const xmlAccess::XmlGuiConfig& guiCfg, const Zstring& referenceBatchFile); //noexcept
 
 std::wstring extractJobName(const Zstring& configFilename);
 }

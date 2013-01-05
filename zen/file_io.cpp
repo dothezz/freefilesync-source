@@ -8,6 +8,10 @@
 
 #ifdef FFS_WIN
 #include "long_path_prefix.h"
+#include "IFileOperation/file_op.h"
+#include "win_ver.h"
+#include "dll.h"
+
 #elif defined FFS_LINUX
 #include <fcntl.h>  //open, close
 #include <unistd.h> //read, write
@@ -16,9 +20,32 @@
 using namespace zen;
 
 
-FileInput::FileInput(FileHandle handle, const Zstring& filename) : FileInputBase(filename), fileHandle(handle) {}
+namespace
+{
+#ifdef FFS_WIN
+//(try to) enhance error messages by showing which processes lock the file
+Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string if none found or error occurred
+{
+    if (vistaOrLater())
+    {
+        using namespace fileop;
+        const DllFun<FunType_getLockingProcesses> getLockingProcesses(getDllName(), funName_getLockingProcesses);
+        const DllFun<FunType_freeString>          freeString         (getDllName(), funName_freeString);
 
-#ifdef FFS_LINUX
+        if (getLockingProcesses && freeString)
+        {
+            const wchar_t* procList = nullptr;
+            if (getLockingProcesses(filename.c_str(), procList))
+            {
+                ZEN_ON_SCOPE_EXIT(freeString(procList));
+                return procList;
+            }
+        }
+    }
+    return Zstring();
+}
+
+#elif defined FFS_LINUX
 //"filename" could be a named pipe which *blocks* forever during "open()"! https://sourceforge.net/p/freefilesync/bugs/221/
 void checkForUnsupportedType(const Zstring& filename) //throw FileError
 {
@@ -44,6 +71,10 @@ void checkForUnsupportedType(const Zstring& filename) //throw FileError
     }
 }
 #endif
+}
+
+
+FileInput::FileInput(FileHandle handle, const Zstring& filename) : FileInputBase(filename), fileHandle(handle) {}
 
 
 FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExisting
@@ -89,11 +120,25 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
 #endif
     {
         const ErrorCode lastError = getLastError();
+        const std::wstring shortMsg = errorCodeForNotExisting(lastError) ?
+                                      replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)) :
+                                      replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename));
+        std::wstring errorMsg = shortMsg + L"\n\n" + zen::getLastErrorFormatted(lastError);
+
+#ifdef FFS_WIN
+        if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
+            lastError == ERROR_LOCK_VIOLATION)
+        {
+            const Zstring procList = getLockingProcessNames(filename); //throw()
+            if (!procList.empty())
+                errorMsg = shortMsg + L"\n\n" + _("The file is locked by another process:") + L"\n" + procList;
+        }
+#endif
 
         if (errorCodeForNotExisting(lastError))
-            throw ErrorNotExisting(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted(lastError));
+            throw ErrorNotExisting(errorMsg);
 
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted(lastError) + L" (open)");
+        throw FileError(errorMsg + L" (open)");
     }
 }
 
@@ -186,19 +231,29 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
                 lastError = ::GetLastError();
             }
         }
-        //"regular" error handling
+
+        //begin of "regular" error reporting
         if (fileHandle == INVALID_HANDLE_VALUE)
         {
-            const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + zen::getLastErrorFormatted(lastError);
+            const std::wstring shortMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename));
+            std::wstring errorMsg = shortMsg + L"\n\n" + zen::getLastErrorFormatted(lastError);
+
+            if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
+                lastError == ERROR_LOCK_VIOLATION)
+            {
+                const Zstring procList = getLockingProcessNames(filename); //throw()
+                if (!procList.empty())
+                    errorMsg = shortMsg + L"\n\n" + _("The file is locked by another process:") + L"\n" + procList;
+            }
 
             if (lastError == ERROR_FILE_EXISTS || //confirmed to be used
                 lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
-                throw ErrorTargetExisting(errorMessage);
+                throw ErrorTargetExisting(errorMsg);
 
             if (lastError == ERROR_PATH_NOT_FOUND)
-                throw ErrorTargetPathMissing(errorMessage);
+                throw ErrorTargetPathMissing(errorMsg);
 
-            throw FileError(errorMessage);
+            throw FileError(errorMsg);
         }
     }
 

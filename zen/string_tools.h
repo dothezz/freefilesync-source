@@ -468,8 +468,8 @@ S formatInteger(Num n, bool hasMinus)
 {
     assert(n >= 0);
     typedef typename GetCharType<S>::Type CharType;
-    CharType buffer[2 + 5 * sizeof(Num) / 2]; //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
-    //minimum required chars (+ sign char): 1 + ceil(ln_10 (256^sizeof(n))) =~ 1 + ceil(sizeof(n) * 2.4082) < 2 + floor(sizeof(n) * 2.5)
+    CharType buffer[2 + sizeof(Num) * 5 / 2]; //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
+    //required chars (+ sign char): 1 + ceil(ln_10 (256^sizeof(n))) =~ 1 + ceil(sizeof(n) * 2.4082) < 2 + floor(sizeof(n) * 2.5)
 
     auto iter = std::end(buffer);
     do
@@ -556,7 +556,7 @@ Num extractInteger(const S& str, bool& hasMinusSign) //very fast conversion to i
         }
         else
         {
-            //rest of string should contain whitespace only
+            //rest of string should contain whitespace only, it's NOT a bug if there is some!
             //assert(std::all_of(iter, last, &isWhiteSpace<CharType>)); -> this is NO assert situation
             break;
         }

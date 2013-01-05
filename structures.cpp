@@ -33,7 +33,7 @@ std::wstring zen::getVariantName(DirectionConfig::Variant var)
     switch (var)
     {
         case DirectionConfig::AUTOMATIC:
-            return _("<Automatic>");
+            return _("<- Two way ->");
         case DirectionConfig::MIRROR:
             return _("Mirror ->>");
         case DirectionConfig::UPDATE:
@@ -441,22 +441,22 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
         {
             const CompConfig& cmpCfg = *fp->altCmpConfig;
 
-            auto iter = std::find_if(cmpCfgStat.begin(), cmpCfgStat.end(),
+            auto it = std::find_if(cmpCfgStat.begin(), cmpCfgStat.end(),
             [&](const std::pair<CompConfig, int>& entry) { return entry.first == cmpCfg; });
-            if (iter == cmpCfgStat.end())
+            if (it == cmpCfgStat.end())
                 cmpCfgStat.push_back(std::make_pair(cmpCfg, 1));
             else
-                ++(iter->second);
+                ++(it->second);
         }
         {
             const SyncConfig& syncCfg = *fp->altSyncConfig;
 
-            auto iter = std::find_if(syncCfgStat.begin(), syncCfgStat.end(),
+            auto it = std::find_if(syncCfgStat.begin(), syncCfgStat.end(),
             [&](const std::pair<SyncConfig, int>& entry) { return entry.first == syncCfg; });
-            if (iter == syncCfgStat.end())
+            if (it == syncCfgStat.end())
                 syncCfgStat.push_back(std::make_pair(syncCfg, 1));
             else
-                ++(iter->second);
+                ++(it->second);
         }
     }
 

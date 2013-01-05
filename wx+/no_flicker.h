@@ -7,7 +7,8 @@
 #ifndef NO_FLICKER_HEADER_893421590321532
 #define NO_FLICKER_HEADER_893421590321532
 
-#include <wx/window.h>
+#include <wx/textctrl.h>
+#include <wx/stattext.h>
 
 namespace zen
 {

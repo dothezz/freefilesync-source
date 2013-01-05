@@ -157,7 +157,7 @@ BatchStatusHandler::~BatchStatusHandler()
     else if (totalWarnings > 0)
     {
         raiseReturnCode(returnCode_, FFS_RC_FINISHED_WITH_WARNINGS);
-        finalStatus = _("Synchronization completed with warnings!");
+        finalStatus = _("Synchronization completed with warnings.");
         errorLog.logMsg(finalStatus, TYPE_WARNING);
     }
     else
@@ -166,7 +166,7 @@ BatchStatusHandler::~BatchStatusHandler()
             getDataTotal   (PHASE_SYNCHRONIZING) == 0)
             finalStatus = _("Nothing to synchronize!"); //even if "ignored conflicts" occurred!
         else
-            finalStatus = _("Synchronization completed successfully!");
+            finalStatus = _("Synchronization completed successfully.");
         errorLog.logMsg(finalStatus, TYPE_INFO);
     }
 
@@ -182,10 +182,10 @@ BatchStatusHandler::~BatchStatusHandler()
     //print the results list: logfile
     if (logFile.get())
     {
-        //saving log file below may take a *long* time, so report (without logging)
         try
         {
-            reportStatus(replaceCpy(_("Saving log file %x"), L"%x", fmtFileName(logFile->getFilename()))); //throw?
+            //saving log file below may take a *long* time, so report (without logging)
+            reportStatus(replaceCpy(_("Saving log file %x..."), L"%x", fmtFileName(logFile->getFilename()))); //throw?
             forceUiRefresh(); //
         }
         catch (...) {}

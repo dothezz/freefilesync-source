@@ -97,14 +97,14 @@ void GridView::updateView(Predicate pred)
 
 ptrdiff_t GridView::findRowDirect(FileSystemObject::ObjectIdConst objId) const
 {
-    auto iter = rowPositions.find(objId);
-    return iter != rowPositions.end() ? iter->second : -1;
+    auto it = rowPositions.find(objId);
+    return it != rowPositions.end() ? it->second : -1;
 }
 
 ptrdiff_t GridView::findRowFirstChild(const HierarchyObject* hierObj) const
 {
-    auto iter = rowPositionsFirstChild.find(hierObj);
-    return iter != rowPositionsFirstChild.end() ? iter->second : -1;
+    auto it = rowPositionsFirstChild.find(hierObj);
+    return it != rowPositionsFirstChild.end() ? it->second : -1;
 }
 
 
@@ -344,8 +344,8 @@ void GridView::setData(FolderComparison& folderCmp)
                !baseObj.getBaseDirPf<RIGHT_SIDE>().empty();
     });
 
-    for (auto iter = begin(folderCmp); iter != end(folderCmp); ++iter)
-        SerializeHierarchy(sortedRef, iter - begin(folderCmp)).execute(*iter);
+    for (auto it = begin(folderCmp); it != end(folderCmp); ++it)
+        SerializeHierarchy(sortedRef, it - begin(folderCmp)).execute(*it);
 }
 
 

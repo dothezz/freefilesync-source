@@ -20,10 +20,6 @@
 			<param name="Local" value="html\FreeFileSync.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Backup Strategies">
-			<param name="Local" value="html\Backup Strategies.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Batch Scripting">
 			<param name="Local" value="html\Batch Scripting.html">
 			</OBJECT>
@@ -62,6 +58,10 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Variable drive letters">
 			<param name="Local" value="html\Variable Drive Letters.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Versioning">
+			<param name="Local" value="html\Versioning.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Volume Shadow Copy">

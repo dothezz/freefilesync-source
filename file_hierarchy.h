@@ -230,11 +230,12 @@ public:
                    CompareVariant cmpVar,
                    size_t fileTimeTolerance) :
 #ifdef _MSC_VER
+#pragma warning(push)
 #pragma warning(disable : 4355) //"The this pointer is valid only within nonstatic member functions. It cannot be used in the initializer list for a base class."
 #endif
         HierarchyObject(Zstring(), *this),
 #ifdef _MSC_VER
-#pragma warning(default : 4355)
+#pragma warning(pop)
 #endif
         filter_(filter), cmpVar_(cmpVar), fileTimeTolerance_(fileTimeTolerance),
         baseDirPfL     (dirPostfixedLeft ),

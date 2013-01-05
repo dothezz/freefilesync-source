@@ -200,7 +200,6 @@ SyncStatusHandler::~SyncStatusHandler()
     const int totalWarnings = errorLog.getItemCount(TYPE_WARNING);
 
     //finalize error log
-    //finalize error log
     std::wstring finalStatus;
     if (abortIsRequested())
     {
@@ -214,7 +213,7 @@ SyncStatusHandler::~SyncStatusHandler()
     }
     else if (totalWarnings > 0)
     {
-        finalStatus = _("Synchronization completed with warnings!");
+        finalStatus = _("Synchronization completed with warnings.");
         errorLog.logMsg(finalStatus, TYPE_WARNING); //give status code same warning priority as display category!
     }
     else
@@ -223,7 +222,7 @@ SyncStatusHandler::~SyncStatusHandler()
             getDataTotal   (PHASE_SYNCHRONIZING) == 0)
             finalStatus = _("Nothing to synchronize!"); //even if "ignored conflicts" occurred!
         else
-            finalStatus = _("Synchronization completed successfully!");
+            finalStatus = _("Synchronization completed successfully.");
         errorLog.logMsg(finalStatus, TYPE_INFO);
     }
 

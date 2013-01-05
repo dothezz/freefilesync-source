@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.4.1  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20121230;16514190">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H2.cjk { font-family: "SimSun" }
+		H2.ctl { font-family: "Mangal" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">File
+Versioning</FONT></FONT></H2>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">When
+you need to preserve files that have been deleted or overwritten it's
+often sufficient to select &quot;Recycle Bin&quot; in synchronization
+settings. However this is only available on local drives and offers
+little control on how to store and how long to keep the files.
+FreeFileSync therefore has an additional option, &quot;Versioning&quot;.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>1.
+Keep all versions of old files</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
+synchronization settings set both deletion handling and naming
+convention to &quot;<B>Versioning</B>&quot;. FreeFileSync will move
+deleted files into the provided folder and add a time stamp to each
+file name. The structure of the synchronized folders is preserved so
+that old versions of a file can be conveniently accessed via a file
+browser.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example
+</B></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">(A
+file &quot;Folder\File.txt&quot; was updated three times and old
+versions were moved to folder &quot;C:\Revisions&quot;)</SPAN></FONT></P>
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">C:\Revisions\Folder\File.txt
+	</FONT><FONT FACE="Courier New, monospace"><B>2012-12-12
+	111111</B></FONT><FONT FACE="Courier New, monospace">.txt<BR>C:\Revisions\Folder\File.txt
+	</FONT><FONT FACE="Courier New, monospace"><B>2012-12-12
+	122222</B></FONT><FONT FACE="Courier New, monospace">.txt<BR>C:\Revisions\Folder\File.txt
+	</FONT><FONT FACE="Courier New, monospace"><B>2012-12-12 133333</B></FONT><FONT FACE="Courier New, monospace">.txt</FONT></FONT></P>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>2.
+Save only most recent version</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Set
+deletion handling to &quot;Versioning&quot; and naming convention to
+&quot;<B>Replace</B>&quot;. Deleted files will be moved to the
+specified folder without any decoration and will replace already
+existing older versions.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>3.
+Save versions at certain intervals</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">With
+naming convention &quot;</FONT><FONT FACE="Tahoma, sans-serif"><B>Replace</B></FONT><FONT FACE="Tahoma, sans-serif">&quot;
+it's possible to refine the granularity of versions to keep by adding
+<A HREF="Macros.html">macros</A> to the versioning folder path. For
+example you can save deleted files on a per sync session basis by
+adding the </FONT><FONT FACE="Tahoma, sans-serif"><B>%timestamp%</B></FONT>
+<FONT FACE="Tahoma, sans-serif">macro:</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example
+</B></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">(Using
+the dynamically generated folder name &quot;C:\Revisions\</SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">%timestamp%</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">&quot;)</SPAN></FONT></P>
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">C:\Revisions\</FONT><FONT FACE="Courier New, monospace"><B>2012-12-12
+	111111</B></FONT><FONT FACE="Courier New, monospace">\Folder\File.txt<BR>C:\Revisions\</FONT><FONT FACE="Courier New, monospace"><B>2012-12-12
+	122222</B></FONT><FONT FACE="Courier New, monospace">\Folder\File.txt<BR>C:\Revisions\</FONT><FONT FACE="Courier New, monospace"><B>2012-12-12
+	133333</B></FONT><FONT FACE="Courier New, monospace">\Folder\File.txt</FONT></FONT></P>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">This
+allows for a simple manual undo by moving the deleted files from the
+last synchronization session back to their original folders. Other
+macros like </FONT><FONT FACE="Tahoma, sans-serif"><B>%date%</B></FONT>
+<FONT FACE="Tahoma, sans-serif">or </FONT><FONT FACE="Tahoma, sans-serif"><B>%weekday%</B></FONT>
+<FONT FACE="Tahoma, sans-serif">can be used to reduce the granularity
+to days and weeks.</FONT></P>
+</BODY>
+</HTML>

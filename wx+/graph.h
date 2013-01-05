@@ -20,12 +20,12 @@ namespace zen
 /*
 Example:
     //init graph (optional)
-    m_panelGraph->setAttributes(Graph2D::GraphAttributes().
+    m_panelGraph->setAttributes(Graph2D::MainAttributes().
                                 setLabelX(Graph2D::POSLX_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
                                 setLabelY(Graph2D::POSLY_RIGHT,  60, std::make_shared<LabelFormatterBytes>()));
     //set graph data
     std::shared_ptr<GraphData> graphDataBytes = ...
-	m_panelGraph->setData(graphDataBytes, Graph2D::LineAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0)));
+	m_panelGraph->setData(graphDataBytes, Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0)));
 */
 
 //------------------------------------------------------------------------------------------------------------
@@ -148,24 +148,29 @@ public:
             long style           = wxTAB_TRAVERSAL | wxNO_BORDER,
             const wxString& name = wxPanelNameStr);
 
-    class LineAttributes
+    class CurveAttributes
     {
     public:
-        LineAttributes() : autoColor(true), lineWidth(2) {}
+        CurveAttributes() : autoColor(true), drawCurveArea(false), lineWidth(2) {}
 
-        LineAttributes& setColor(const wxColour& col) { color = col; autoColor = false; return *this; }
-        LineAttributes& setLineWidth(size_t width) { lineWidth = static_cast<int>(width); return *this; }
+        CurveAttributes& setColor     (const wxColour& col) { color = col; autoColor = false; return *this; }
+        CurveAttributes& fillCurveArea(const wxColour& col) { fillColor = col; drawCurveArea = true; return *this; }
+        CurveAttributes& setLineWidth(size_t width) { lineWidth = static_cast<int>(width); return *this; }
 
     private:
         friend class Graph2D;
 
-        bool     autoColor;
+        bool autoColor;
         wxColour color;
-        int      lineWidth;
+
+        bool drawCurveArea;
+        wxColour fillColor;
+
+        int lineWidth;
     };
 
-    void setData(const std::shared_ptr<GraphData>& data, const LineAttributes& attr = LineAttributes());
-    void addData(const std::shared_ptr<GraphData>& data, const LineAttributes& attr = LineAttributes());
+    void setData(const std::shared_ptr<GraphData>& data, const CurveAttributes& attr = CurveAttributes());
+    void addData(const std::shared_ptr<GraphData>& data, const CurveAttributes& attr = CurveAttributes());
 
     enum PosLabelY
     {
@@ -189,10 +194,10 @@ public:
         SELECT_Y_AXIS,
     };
 
-    class GraphAttributes
+    class MainAttributes
     {
     public:
-        GraphAttributes() :
+        MainAttributes() :
             minXauto(true),
             maxXauto(true),
             minX(0),
@@ -202,40 +207,40 @@ public:
             minY(0),
             maxY(0),
             labelposX(X_LABEL_BOTTOM),
-            labelHeightX(25),
-            labelFmtX(new DecimalNumberFormatter()),
+            xLabelHeight(25),
+            labelFmtX(std::make_shared<DecimalNumberFormatter>()),
             labelposY(Y_LABEL_LEFT),
-            labelWidthY(60),
-            labelFmtY(new DecimalNumberFormatter()),
+            yLabelWidth(60),
+            labelFmtY(std::make_shared<DecimalNumberFormatter>()),
             mouseSelMode(SELECT_RECTANGLE) {}
 
 
-        GraphAttributes& setMinX(double newMinX) { minX = newMinX; minXauto = false; return *this; }
-        GraphAttributes& setMaxX(double newMaxX) { maxX = newMaxX; maxXauto = false; return *this; }
+        MainAttributes& setMinX(double newMinX) { minX = newMinX; minXauto = false; return *this; }
+        MainAttributes& setMaxX(double newMaxX) { maxX = newMaxX; maxXauto = false; return *this; }
 
-        GraphAttributes& setMinY(double newMinY) { minY = newMinY; minYauto = false; return *this; }
-        GraphAttributes& setMaxY(double newMaxY) { maxY = newMaxY; maxYauto = false; return *this; }
+        MainAttributes& setMinY(double newMinY) { minY = newMinY; minYauto = false; return *this; }
+        MainAttributes& setMaxY(double newMaxY) { maxY = newMaxY; maxYauto = false; return *this; }
 
-        GraphAttributes& setAutoSize() { minXauto = true; maxXauto = true; minYauto = true; maxYauto = true; return *this; }
+        MainAttributes& setAutoSize() { minXauto = true; maxXauto = true; minYauto = true; maxYauto = true; return *this; }
 
         static const std::shared_ptr<LabelFormatter> defaultFormat;
 
-        GraphAttributes& setLabelX(PosLabelX posX, size_t height = 25, const std::shared_ptr<LabelFormatter>& newLabelFmt = defaultFormat)
+        MainAttributes& setLabelX(PosLabelX posX, size_t height = 25, const std::shared_ptr<LabelFormatter>& newLabelFmt = defaultFormat)
         {
             labelposX    = posX;
-            labelHeightX = static_cast<int>(height);
+            xLabelHeight = static_cast<int>(height);
             labelFmtX    = newLabelFmt;
             return *this;
         }
-        GraphAttributes& setLabelY(PosLabelY posY, size_t width = 60, const std::shared_ptr<LabelFormatter>& newLabelFmt = defaultFormat)
+        MainAttributes& setLabelY(PosLabelY posY, size_t width = 60, const std::shared_ptr<LabelFormatter>& newLabelFmt = defaultFormat)
         {
             labelposY    = posY;
-            labelWidthY  = static_cast<int>(width);
+            yLabelWidth  = static_cast<int>(width);
             labelFmtY    = newLabelFmt;
             return *this;
         }
 
-        GraphAttributes& setSelectionMode(SelMode mode) { mouseSelMode = mode; return *this; }
+        MainAttributes& setSelectionMode(SelMode mode) { mouseSelMode = mode; return *this; }
 
     private:
         friend class Graph2D;
@@ -251,17 +256,17 @@ public:
         double maxY;
 
         PosLabelX labelposX;
-        int labelHeightX;
+        int xLabelHeight;
         std::shared_ptr<LabelFormatter> labelFmtX;
 
         PosLabelY labelposY;
-        int labelWidthY;
+        int yLabelWidth;
         std::shared_ptr<LabelFormatter> labelFmtY;
 
         SelMode mouseSelMode;
     };
-    void setAttributes(const GraphAttributes& newAttr) { attr = newAttr; Refresh(); }
-    GraphAttributes getAttributes() const { return attr; }
+    void setAttributes(const MainAttributes& newAttr) { attr = newAttr; Refresh(); }
+    MainAttributes getAttributes() const { return attr; }
 
 
     std::vector<SelectionBlock> getSelections() const { return oldSel; }
@@ -279,13 +284,7 @@ private:
     void OnMouseLeftUp  (wxMouseEvent& event);
     void OnMouseCaptureLost(wxMouseCaptureLostEvent& event);
 
-    void onPaintEvent(wxPaintEvent& event)
-    {
-        wxAutoBufferedPaintDC dc(this); //this one happily fucks up for RTL layout by not drawing the first column (x = 0)!
-        //wxPaintDC dc(this);
-        render(dc);
-    }
-
+    void onPaintEvent(wxPaintEvent& event);
     void onSizeEvent(wxSizeEvent& event) { Refresh(); event.Skip(); }
     void onEraseBackGround(wxEraseEvent& event) {}
 
@@ -311,9 +310,11 @@ private:
     std::vector<SelectionBlock>     oldSel; //applied selections
     std::shared_ptr<MouseSelection> activeSel; //set during mouse selection
 
-    GraphAttributes attr; //global attributes
+    MainAttributes attr; //global attributes
 
-    typedef std::vector<std::pair<std::shared_ptr<GraphData>, LineAttributes>> GraphList;
+    std::unique_ptr<wxBitmap> doubleBuffer;
+
+    typedef std::vector<std::pair<std::shared_ptr<GraphData>, CurveAttributes>> GraphList;
     GraphList curves_;
 };
 }

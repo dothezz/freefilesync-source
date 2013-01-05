@@ -715,24 +715,24 @@ private:
                 {
                     if (dynamic_cast<const FileMapping*>(fsObj) || dynamic_cast<const SymLinkMapping*>(fsObj))
                     {
-                        for (auto iter = markedFiles_.begin(); iter != markedFiles_.end(); ++iter)
-                            if (*iter == &(fsObj->parent())) //mark files/links wich have the given parent
+                        for (auto it = markedFiles_.begin(); it != markedFiles_.end(); ++it)
+                            if (*it == &(fsObj->parent())) //mark files/links wich have the given parent
                                 return true;
                     }
                     else if (auto dirObj = dynamic_cast<const DirMapping*>(fsObj))
                     {
-                        for (auto iter = markedContainer_.begin(); iter != markedContainer_.end(); ++iter)
-                            if (*iter == dirObj) //mark directories which *are* the given HierarchyObject*
+                        for (auto it = markedContainer_.begin(); it != markedContainer_.end(); ++it)
+                            if (*it == dirObj) //mark directories which *are* the given HierarchyObject*
                                 return true;
                     }
 
-                    for (auto iter = markedContainer_.begin(); iter != markedContainer_.end(); ++iter)
+                    for (auto it = markedContainer_.begin(); it != markedContainer_.end(); ++it)
                     {
                         //mark all objects which have the HierarchyObject as *any* matching ancestor
                         const HierarchyObject* parent = &(fsObj->parent());
                         for (;;)
                         {
-                            if (*iter == parent)
+                            if (*it == parent)
                                 return true;
 
                             if (auto dirObj = dynamic_cast<const DirMapping*>(parent))
@@ -1336,10 +1336,10 @@ private:
     {
         //find stretch factor of resized column: type is unique due to makeConsistent()!
         std::vector<Grid::ColumnAttribute> cfgSrc = src.getColumnConfig();
-        auto iter = std::find_if(cfgSrc.begin(), cfgSrc.end(), [&](Grid::ColumnAttribute& ca) { return ca.type_ == type; });
-        if (iter == cfgSrc.end())
+        auto it = std::find_if(cfgSrc.begin(), cfgSrc.end(), [&](Grid::ColumnAttribute& ca) { return ca.type_ == type; });
+        if (it == cfgSrc.end())
             return;
-        const ptrdiff_t stretchSrc = iter->stretch_;
+        const ptrdiff_t stretchSrc = it->stretch_;
 
         //we do not propagate resizings on stretched columns to the other side: awkward user experience
         if (stretchSrc > 0)
@@ -1492,7 +1492,7 @@ std::vector<ColumnAttributeRim> makeConsistent(const std::vector<ColumnAttribute
     std::set<ColumnTypeRim> usedTypes;
 
     std::vector<ColumnAttributeRim> output;
-    //remove duplicates
+    //remove duplicates: required by GridEventManager::resizeOtherSide() to find corresponding column on other side
     std::copy_if(attribs.begin(), attribs.end(), std::back_inserter(output),
     [&](const ColumnAttributeRim& a) { return usedTypes.insert(a.type_).second; });
 

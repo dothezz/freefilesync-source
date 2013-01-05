@@ -80,7 +80,8 @@ private:
 
     bool loadConfiguration(const std::vector<wxString>& filenames); //return true if loaded successfully
 
-    bool trySaveConfig(const wxString* fileName); //return true if saved successfully
+    bool trySaveConfig     (const wxString* fileNameGui); //return true if saved successfully
+    bool trySaveBatchConfig(const wxString* fileNameBatch); //
     bool saveOldConfig(); //return false on user abort
 
     static const wxString& lastRunConfigName();
@@ -194,6 +195,7 @@ private:
     void OnConfigNew      (wxCommandEvent& event);
     void OnConfigSave     (wxCommandEvent& event);
     void OnConfigSaveAs   (wxCommandEvent& event);
+    void OnSaveAsBatchJob (wxCommandEvent& event);
     void OnConfigLoad     (wxCommandEvent& event);
     void OnLoadFromHistory(wxCommandEvent& event);
     void OnLoadFromHistoryDoubleClick(wxCommandEvent& event);
@@ -229,7 +231,6 @@ private:
     //menu events
     void OnMenuGlobalSettings(wxCommandEvent& event);
     void OnMenuExportFileList(wxCommandEvent& event);
-    void OnMenuBatchJob      (wxCommandEvent& event);
     void OnMenuCheckVersion  (wxCommandEvent& event);
     void OnMenuAbout         (wxCommandEvent& event);
     void OnShowHelp          (wxCommandEvent& event);

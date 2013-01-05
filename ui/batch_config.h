@@ -7,19 +7,16 @@
 #ifndef BATCHCONFIG_H_INCLUDED
 #define BATCHCONFIG_H_INCLUDED
 
+#include <wx/window.h>
 #include "../lib/process_xml.h"
-#include "folder_history_box.h"
-
 
 namespace zen
 {
-void showSyncBatchDlg(wxWindow* parent,
-                      const wxString& referenceFile,
-                      const xmlAccess::XmlBatchConfig& batchCfg,
-                      const std::shared_ptr<FolderHistory>& folderHistLeft,
-                      const std::shared_ptr<FolderHistory>& folderHistRight,
-                      std::vector<std::wstring>& execFinishedhistory,
-                      size_t execFinishedhistoryMax);
+//show and let user customize batch settings (without saving)
+bool customizeBatchConfig(wxWindow* parent, //return "false" if aborted, "true" on "do save"
+                          xmlAccess::XmlBatchConfig& batchCfg, //in/out
+                          std::vector<std::wstring>& execFinishedhistory,
+                          size_t execFinishedhistoryMax);
 }
 
 #endif // BATCHCONFIG_H_INCLUDED

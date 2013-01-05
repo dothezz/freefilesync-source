@@ -15,8 +15,8 @@
 using namespace zen;
 
 
-PerfCheck::PerfCheck(unsigned windowSizeRemainingTime,
-                     unsigned windowSizeBytesPerSecond) :
+PerfCheck::PerfCheck(unsigned int windowSizeRemainingTime,
+                     unsigned int windowSizeBytesPerSecond) :
     windowSizeRemTime(windowSizeRemainingTime),
     windowSizeBPS(windowSizeBytesPerSecond),
     windowMax(std::max(windowSizeRemainingTime, windowSizeBytesPerSecond)) {}
@@ -30,13 +30,13 @@ PerfCheck::~PerfCheck()
 
     outputFile.Write(wxT("Time(ms);Objects;Data\n"));
 
-    for (auto iter = samples.begin(); iter != samples.end(); ++iter)
+    for (auto it = samples.begin(); it != samples.end(); ++it)
     {
-        outputFile.Write(numberTo<wxString>(iter->first));
+        outputFile.Write(numberTo<wxString>(it->first));
         outputFile.Write(wxT(";"));
-        outputFile.Write(numberTo<wxString>(iter->second.objCount_));
+        outputFile.Write(numberTo<wxString>(it->second.objCount_));
         outputFile.Write(wxT(";"));
-    	outputFile.Write(numberTo<wxString>(iter->second.data_));
+    	outputFile.Write(numberTo<wxString>(it->second.data_));
         outputFile.Write(wxT("\n"));
     }
     */
@@ -108,6 +108,8 @@ wxString PerfCheck::getBytesPerSecond() const
 
 wxString PerfCheck::getOverallBytesPerSecond() const //for all samples
 {
+    warn_static("WTF!? tihs considers window only!")
+
     if (!samples.empty())
     {
         const auto& recordBack  = *samples.rbegin();

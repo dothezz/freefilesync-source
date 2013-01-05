@@ -110,8 +110,8 @@ void ExecFinishedBox::addItemHistory()
         //do not add built-in commands to history
         if (!skipCmd)
         {
-            for (auto iter = defaultCommands.begin(); iter != defaultCommands.end(); ++iter)
-                if (command == iter->first || command == iter->second)
+            for (auto it = defaultCommands.begin(); it != defaultCommands.end(); ++it)
+                if (command == it->first || command == it->second)
                 {
                     skipCmd = true;
                     break;
@@ -164,8 +164,8 @@ void ExecFinishedBox::setValueAndUpdateList(const std::wstring& value)
     items.push_back(implementation::translate(cmdTxtCloseProgressDlg));
 
     //2. built in commands
-    for (auto iter = defaultCommands.begin(); iter != defaultCommands.end(); ++iter)
-        items.push_back(iter->first);
+    for (auto it = defaultCommands.begin(); it != defaultCommands.end(); ++it)
+        items.push_back(it->first);
 
     //3. history elements
     if (history_ && !history_->empty())
@@ -209,9 +209,9 @@ void ExecFinishedBox::OnValidateSelection(wxCommandEvent& event)
     if (value == separationLine)
         setValueAndUpdateList(std::wstring());
     else
-        for (auto iter = defaultCommands.begin(); iter != defaultCommands.end(); ++iter)
-            if (iter->first == value)
-                return setValueAndUpdateList(iter->second); //replace GUI name by actual command string
+        for (auto it = defaultCommands.begin(); it != defaultCommands.end(); ++it)
+            if (it->first == value)
+                return setValueAndUpdateList(it->second); //replace GUI name by actual command string
 }
 
 

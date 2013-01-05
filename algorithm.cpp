@@ -400,9 +400,9 @@ private:
         const InSyncDir::FileList::value_type* dbEntry = nullptr;
         if (dbContainer)
         {
-            auto iter = dbContainer->files.find(fileObj.getObjShortName());
-            if (iter != dbContainer->files.end())
-                dbEntry = &*iter;
+            auto it = dbContainer->files.find(fileObj.getObjShortName());
+            if (it != dbContainer->files.end())
+                dbEntry = &*it;
         }
 
         //evaluation
@@ -436,9 +436,9 @@ private:
         const InSyncDir::LinkList::value_type* dbEntry = nullptr;
         if (dbContainer)
         {
-            auto iter = dbContainer->symlinks.find(linkObj.getObjShortName());
-            if (iter != dbContainer->symlinks.end())
-                dbEntry = &*iter;
+            auto it = dbContainer->symlinks.find(linkObj.getObjShortName());
+            if (it != dbContainer->symlinks.end())
+                dbEntry = &*it;
         }
 
         //evaluation
@@ -470,9 +470,9 @@ private:
         const InSyncDir::DirList::value_type* dbEntry = nullptr;
         if (dbContainer)
         {
-            auto iter = dbContainer->dirs.find(dirObj.getObjShortName());
-            if (iter != dbContainer->dirs.end())
-                dbEntry = &*iter;
+            auto it = dbContainer->dirs.find(dirObj.getObjShortName());
+            if (it != dbContainer->dirs.end())
+                dbEntry = &*it;
         }
 
         if (cat != DIR_EQUAL)
@@ -526,12 +526,12 @@ private:
     static typename Container::const_iterator findValue(const Container& cnt, const FileIdKey& key)
     {
         auto iterPair = cnt.equal_range(key); //since file id is already unique, we expect a single-element range at most
-        auto iter = std::find_if(iterPair.first, iterPair.second,
+        auto it = std::find_if(iterPair.first, iterPair.second,
                                  [&](const typename Container::value_type& item)
         {
             return sameFileTime(std::get<0>(item.first), std::get<0>(key), 2); //respect 2 second FAT/FAT32 precision
         });
-        return iter == iterPair.second ? cnt.end() : iter;
+        return it == iterPair.second ? cnt.end() : it;
     }
 
     void detectRenamedFiles() const
@@ -541,10 +541,10 @@ private:
         {
             const FileIdKey& keyLeft = RedetermineAuto::getFileIdKey<LEFT_SIDE>(*fileLeftOnly);
 
-            auto iter = findValue(onceEqual, keyLeft);
-            if (iter != onceEqual.end())
+            auto it = findValue(onceEqual, keyLeft);
+            if (it != onceEqual.end())
             {
-                const FileIdKey& keyRight = iter->second;
+                const FileIdKey& keyRight = it->second;
 
                 auto iter2 = findValue(exRightOnly, keyRight);
                 if (iter2 != exRightOnly.end())
@@ -683,10 +683,10 @@ void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderCompa
     if (folderCmp.size() != directCfgs.size())
         throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
-    for (auto iter = folderCmp.begin(); iter != folderCmp.end(); ++iter)
+    for (auto it = folderCmp.begin(); it != folderCmp.end(); ++it)
     {
-        const DirectionConfig& cfg = directCfgs[iter - folderCmp.begin()];
-        redetermineSyncDirection(cfg, **iter, reportWarning);
+        const DirectionConfig& cfg = directCfgs[it - folderCmp.begin()];
+        redetermineSyncDirection(cfg, **it, reportWarning);
     }
 }
 
@@ -1023,11 +1023,11 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
                     mainCfg.additionalPairs.end());
 
 
-    for (auto iter = allPairs.begin(); iter != allPairs.end(); ++iter)
+    for (auto it = allPairs.begin(); it != allPairs.end(); ++it)
     {
-        BaseDirMapping& baseDirectory = *folderCmp[iter - allPairs.begin()];
+        BaseDirMapping& baseDirectory = *folderCmp[it - allPairs.begin()];
 
-        const NormalizedFilter normFilter = normalizeFilters(mainCfg.globalFilter, iter->localFilter);
+        const NormalizedFilter normFilter = normalizeFilters(mainCfg.globalFilter, it->localFilter);
 
         //"set" hard filter
         ApplyHardFilter<STRATEGY_SET>(*normFilter.nameFilter).execute(baseDirectory);
@@ -1245,9 +1245,9 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& ptrList,
                                 bool useRecycleBin,
                                 DeleteFilesHandler& handler)
 {
-    for (auto iter = ptrList.begin(); iter != ptrList.end(); ++iter) //VS 2010 bug prevents replacing this by std::for_each + lamba
+    for (auto it = ptrList.begin(); it != ptrList.end(); ++it) //VS 2010 bug prevents replacing this by std::for_each + lamba
     {
-        FileSystemObject& fsObj = **iter; //all pointers are required(!) to be bound
+        FileSystemObject& fsObj = **it; //all pointers are required(!) to be bound
         if (fsObj.isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
             continue;
 
@@ -1282,22 +1282,22 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
 #ifdef FFS_WIN
         const Zstring& baseDirPf = fsObj.root().getBaseDirPf<side>();
 
-        auto iter = hasRecyclerBuffer.find(baseDirPf);
-        if (iter != hasRecyclerBuffer.end())
-            return iter->second;
+        auto it = hasRecyclerBuffer.find(baseDirPf);
+        if (it != hasRecyclerBuffer.end())
+            return it->second;
         return hasRecyclerBuffer.insert(std::make_pair(baseDirPf, recycleBinStatus(baseDirPf) == STATUS_REC_EXISTS)).first->second;
 #else
         return true;
 #endif
     };
 
-    for (auto iter = rowsIn.begin(); iter != rowsIn.end(); ++iter)
-        if (!(*iter)->isEmpty<side>())
+    for (auto it = rowsIn.begin(); it != rowsIn.end(); ++it)
+        if (!(*it)->isEmpty<side>())
         {
-            if (useRecycleBin && hasRecycler(**iter)) //Windows' ::SHFileOperation() will delete permanently anyway, but we have a superior deletion routine
-                deleteRecyler.push_back(*iter);
+            if (useRecycleBin && hasRecycler(**it)) //Windows' ::SHFileOperation() will delete permanently anyway, but we have a superior deletion routine
+                deleteRecyler.push_back(*it);
             else
-                deletePermanent.push_back(*iter);
+                deletePermanent.push_back(*it);
         }
 }
 }
@@ -1319,8 +1319,8 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
 
     //build up mapping from base directory to corresponding direction config
     hash_map<const BaseDirMapping*, DirectionConfig> baseDirCfgs;
-    for (auto iter = folderCmp.begin(); iter != folderCmp.end(); ++iter)
-        baseDirCfgs[&** iter] = directCfgs[iter - folderCmp.begin()];
+    for (auto it = folderCmp.begin(); it != folderCmp.end(); ++it)
+        baseDirCfgs[&** it] = directCfgs[it - folderCmp.begin()];
 
     std::set<FileSystemObject*> deleteLeft (rowsToDeleteOnLeft .begin(), rowsToDeleteOnLeft .end());
     std::set<FileSystemObject*> deleteRight(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
@@ -1340,9 +1340,9 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
         std::set<FileSystemObject*> deletedTotal = deleteLeft;
         deletedTotal.insert(deleteRight.begin(), deleteRight.end());
 
-        for (auto iter = deletedTotal.begin(); iter != deletedTotal.end(); ++iter)
+        for (auto it = deletedTotal.begin(); it != deletedTotal.end(); ++it)
         {
-            FileSystemObject& fsObj = **iter; //all pointers are required(!) to be bound
+            FileSystemObject& fsObj = **it; //all pointers are required(!) to be bound
 
             if (fsObj.isEmpty<LEFT_SIDE>() != fsObj.isEmpty<RIGHT_SIDE>()) //make sure objects exists on one side only
             {
@@ -1388,9 +1388,9 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
         std::wstring warningMessage = _("Recycle Bin is not available for the following paths! Files will be deleted permanently instead:");
         warningMessage += L"\n";
 
-        for (auto iter = hasRecyclerBuffer.begin(); iter != hasRecyclerBuffer.end(); ++iter)
-            if (!iter->second)
-                warningMessage += L"\n" + utfCvrtTo<std::wstring>(iter->first);
+        for (auto it = hasRecyclerBuffer.begin(); it != hasRecyclerBuffer.end(); ++it)
+            if (!it->second)
+                warningMessage += L"\n" + utfCvrtTo<std::wstring>(it->first);
 
         statusHandler.reportWarning(warningMessage, warningRecyclerMissing);
     }

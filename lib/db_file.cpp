@@ -68,10 +68,10 @@ void saveStreams(const StreamMapping& streamList, const Zstring& filename) //thr
     //save stream list
     writeNumber<std::uint32_t>(streamOut, static_cast<std::uint32_t>(streamList.size())); //number of streams, one for each sync-pair
 
-    for (auto iter = streamList.begin(); iter != streamList.end(); ++iter)
+    for (auto it = streamList.begin(); it != streamList.end(); ++it)
     {
-        writeContainer<std::string >(streamOut, iter->first );
-        writeContainer<BinaryStream>(streamOut, iter->second);
+        writeContainer<std::string >(streamOut, it->first );
+        writeContainer<BinaryStream>(streamOut, it->second);
     }
 
     saveBinStream(filename, streamOut.get()); //throw FileError
@@ -449,23 +449,23 @@ private:
     template <class M, class V>
     static V& updateItem(M& map, const Zstring& key, const V& value) //efficient create or update without "default-constructible" requirement (Effective STL, item 24)
     {
-        auto iter = map.lower_bound(key);
-        if (iter != map.end() && !(map.key_comp()(key, iter->first)))
+        auto it = map.lower_bound(key);
+        if (it != map.end() && !(map.key_comp()(key, it->first)))
         {
 #ifdef FFS_WIN //caveat: key might need to be updated, too, if there is a change in short name case!!!
-            if (iter->first != key)
+            if (it->first != key)
             {
-                map.erase(iter); //don't fiddle with decrementing "iter"! - you might lose while optimizing pointlessly
+                map.erase(it); //don't fiddle with decrementing "it"! - you might lose while optimizing pointlessly
                 return map.insert(typename M::value_type(key, value)).first->second;
             }
             else
 #endif
             {
-                iter->second = value;
-                return iter->second;
+                it->second = value;
+                return it->second;
             }
         }
-        return map.insert(iter, typename M::value_type(key, value))->second;
+        return map.insert(it, typename M::value_type(key, value))->second;
     }
 
     void process(const HierarchyObject::SubFileVec& currentFiles, const Zstring& parentRelativeNamePf, InSyncDir::FileList& dbFiles)
@@ -494,9 +494,9 @@ private:
                 }
                 else //not in sync: preserve last synchronous state
                 {
-                    auto iter = dbFiles.find(fileMap.getObjShortName());
-                    if (iter != dbFiles.end())
-                        toPreserve.insert(&iter->second);
+                    auto it = dbFiles.find(fileMap.getObjShortName());
+                    if (it != dbFiles.end())
+                        toPreserve.insert(&it->second);
                 }
             }
         });
@@ -533,9 +533,9 @@ private:
                 }
                 else //not in sync: preserve last synchronous state
                 {
-                    auto iter = dbLinks.find(linkMap.getObjShortName());
-                    if (iter != dbLinks.end())
-                        toPreserve.insert(&iter->second);
+                    auto it = dbLinks.find(linkMap.getObjShortName());
+                    if (it != dbLinks.end())
+                        toPreserve.insert(&it->second);
                 }
             }
         });
@@ -565,18 +565,18 @@ private:
                         //update directory entry only (shallow), but do *not touch* exising child elements!!!
                         const Zstring& key = dirMap.getObjShortName();
                         auto insertResult = dbDirs.insert(std::make_pair(key, InSyncDir(InSyncDir::STATUS_IN_SYNC))); //get or create
-                        auto iter = insertResult.first;
+                        auto it = insertResult.first;
 
 #ifdef FFS_WIN //caveat: key might need to be updated, too, if there is a change in short name case!!!
                         const bool alreadyExisting = !insertResult.second;
-                        if (alreadyExisting && iter->first != key)
+                        if (alreadyExisting && it->first != key)
                         {
-                            auto oldValue = std::move(iter->second);
-                            dbDirs.erase(iter); //don't fiddle with decrementing "iter"! - you might lose while optimizing pointlessly
-                            iter = dbDirs.insert(InSyncDir::DirList::value_type(key, std::move(oldValue))).first;
+                            auto oldValue = std::move(it->second);
+                            dbDirs.erase(it); //don't fiddle with decrementing "it"! - you might lose while optimizing pointlessly
+                            it = dbDirs.insert(InSyncDir::DirList::value_type(key, std::move(oldValue))).first;
                         }
 #endif
-                        InSyncDir& dir = iter->second;
+                        InSyncDir& dir = it->second;
                         dir.status = InSyncDir::STATUS_IN_SYNC; //update immediate directory entry
                         toPreserve.insert(&dir);
                         recurse(dirMap, dir);
@@ -599,11 +599,11 @@ private:
                     case DIR_LEFT_SIDE_ONLY:
                     case DIR_RIGHT_SIDE_ONLY:
                     {
-                        auto iter = dbDirs.find(dirMap.getObjShortName());
-                        if (iter != dbDirs.end())
+                        auto it = dbDirs.find(dirMap.getObjShortName());
+                        if (it != dbDirs.end())
                         {
-                            toPreserve.insert(&iter->second);
-                            recurse(dirMap, iter->second); //although existing sub-items cannot be in sync, items deleted on both sides *are* in-sync!!!
+                            toPreserve.insert(&it->second);
+                            recurse(dirMap, it->second); //although existing sub-items cannot be in sync, items deleted on both sides *are* in-sync!!!
                         }
                     }
                     break;

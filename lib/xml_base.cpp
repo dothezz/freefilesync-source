@@ -56,8 +56,8 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
         throw FfsXmlError(
             replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
                                              L"%x", fmtFileName(filename)),
-                                  L"%y", numberTo<std::wstring>(e.row)),
-                       L"%z", numberTo<std::wstring>(e.col)));
+                                  L"%y", numberTo<std::wstring>(e.row + 1)),
+                       L"%z", numberTo<std::wstring>(e.col + 1)));
     }
 }
 
