@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Abandonare solicitată: Se așteaptă terminarea operației în curs...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Crearea marcajului temporal pentru versionare a eșuat</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -684,7 +684,7 @@ este același
 <source>&Pause</source>
 <target>&Pauzează</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Cod sursă scris în C++ folosind:</target>
 
 <source>If you like FreeFileSync</source>

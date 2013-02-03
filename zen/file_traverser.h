@@ -12,7 +12,6 @@
 #include "int64.h"
 #include "file_id_def.h"
 
-
 //advanced file traverser returning metadata and hierarchical information on files and directories
 
 namespace zen
@@ -25,8 +24,8 @@ struct TraverseCallback
     {
         UInt64 fileSize;        //unit: bytes!
         Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
-        FileId id;              //optional: may be initial!
-        //bool isFollowedSymlink;
+        FileId id;              //optional: initial if not supported!
+        //std::unique_ptr<SymlinkInfo> symlinkInfo; //only filled if file is dereferenced symlink
     };
 
     struct SymlinkInfo
@@ -48,7 +47,6 @@ struct TraverseCallback
         ON_ERROR_IGNORE
     };
 
-    //overwrite these virtual methods
     virtual std::shared_ptr<TraverseCallback>  //nullptr: ignore directory, non-nullptr: traverse into using the (new) callback
     /**/                onDir    (const Zchar* shortName, const Zstring& fullName) = 0;
     virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo&    details) = 0;

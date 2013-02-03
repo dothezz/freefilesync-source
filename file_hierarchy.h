@@ -721,8 +721,7 @@ const Zstring& FileSystemObject::getShortName<RIGHT_SIDE>() const
 }
 
 
-template <SelectedSide side>
-inline
+template <SelectedSide side> inline
 Zstring FileSystemObject::getRelativeName() const
 {
     return isEmpty<side>() ? Zstring() : parent_.getObjRelativeNamePf() + getShortName<side>();
@@ -743,8 +742,7 @@ Zstring FileSystemObject::getObjShortName() const
 }
 
 
-template <SelectedSide side>
-inline
+template <SelectedSide side> inline
 Zstring FileSystemObject::getFullName() const
 {
     return isEmpty<side>() ? Zstring() : getBaseDirPf<side>() + parent_.getObjRelativeNamePf() + getShortName<side>();

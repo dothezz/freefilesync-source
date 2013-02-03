@@ -85,7 +85,6 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
     FileInput file2(filename2); //
 
     BufferSize bufferSize;
-    UInt64 bytesCompared;
 
     TickVal lastDelayViolation = getTicks();
 
@@ -96,14 +95,19 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
 
         const TickVal startTime = getTicks();
 
-        const size_t length1 = file1.read(&memory1[0], bufferSize); //returns actual number of bytes read; throw FileError()
-        const size_t length2 = file2.read(&memory2[0], bufferSize); //
+        const size_t length1 = file1.read(&memory1[0], bufferSize); //throw FileError()
+        const size_t length2 = file2.read(&memory2[0], bufferSize); //returns actual number of bytes read
+        //send progress updates immediately after reading to reliably allow speed calculations for our clients!
+        callback.updateCompareStatus(to<Int64>(std::max(length1, length2)));
 
-        const TickVal now = getTicks();
+        if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
+            return false;
 
         //-------- dynamically set buffer size to keep callback interval between 100 - 500ms ---------------------
         if (TICKS_PER_SEC > 0)
         {
+            const TickVal now = getTicks();
+
             const std::int64_t loopTime = dist(startTime, now) * 1000 / TICKS_PER_SEC; //unit: [ms]
             if (loopTime < 100)
             {
@@ -120,12 +124,6 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
             }
         }
         //------------------------------------------------------------------------------------------------
-
-        if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
-            return false;
-
-        bytesCompared += length1;
-        callback.updateCompareStatus(bytesCompared); //send progress updates
     }
     while (!file1.eof());
 

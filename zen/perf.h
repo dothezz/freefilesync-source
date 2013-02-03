@@ -29,11 +29,13 @@ public:
     class TimerError {};
 
     ZEN_DEPRECATE
-    PerfTimer() : ticksPerSec_(ticksPerSec()), startTime(), resultShown(false)
+    PerfTimer() : //throw TimerError
+        ticksPerSec_(ticksPerSec()), startTime(), resultShown(false)
     {
         //std::clock() - "counts CPU time in C and wall time in VC++" - WTF!???
 #ifdef FFS_WIN
-        if (::SetThreadAffinityMask(::GetCurrentThread(), 1) == 0) throw TimerError(); //"should not be required unless there are bugs in BIOS or HAL" - msdn, QueryPerformanceCounter
+        if (::SetThreadAffinityMask(::GetCurrentThread(), 1) == 0) //"should not be required unless there are bugs in BIOS or HAL" - msdn, QueryPerformanceCounter
+            throw TimerError();
 #endif
         startTime = getTicks();
         if (ticksPerSec_ == 0 || !startTime.isValid())

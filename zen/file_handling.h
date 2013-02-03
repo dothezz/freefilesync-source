@@ -47,7 +47,7 @@ UInt64 getFilesize(const Zstring& filename); //throw FileError
 UInt64 getFreeDiskSpace(const Zstring& path); //throw FileError
 
 //file handling
-bool removeFile(const Zstring& filename); //throw FileError; return "true" if file was actually deleted
+bool removeFile(const Zstring& filename); //throw FileError; return "false" if file is not existing
 void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = nullptr); //throw FileError
 
 //rename file or directory: no copying!!!
@@ -57,7 +57,7 @@ bool supportsPermissions(const Zstring& dirname); //throw FileError, derefernces
 
 //creates superdirectories automatically:
 void makeDirectory(const Zstring& directory); //throw FileError; do nothing if directory already exists!
-void makeNewDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //FileError, ErrorTargetExisting
+void makeNewDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //throw FileError, ErrorTargetExisting
 
 struct FileAttrib
 {
@@ -85,16 +85,15 @@ void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copy
 struct CallbackRemoveDir
 {
     virtual ~CallbackRemoveDir() {}
-    virtual void notifyFileDeletion(const Zstring& filename) = 0; //one call for each (existing) object!
-    virtual void notifyDirDeletion (const Zstring& dirname ) = 0; //
+    virtual void onBeforeFileDeletion(const Zstring& filename) = 0; //one call for each *existing* object!
+    virtual void onBeforeDirDeletion (const Zstring& dirname ) = 0; //
 };
-
 
 struct CallbackCopyFile
 {
     virtual ~CallbackCopyFile() {}
 
-    //if target is existing user needs to implement deletion: copyFile() NEVER deletes target if already existing!
+    //if target is existing user needs to implement deletion: copyFile() NEVER overwrites target if already existing!
     //if transactionalCopy == true, full read access on source had been proven at this point, so it's safe to delete it.
     virtual void deleteTargetFile(const Zstring& targetFile) = 0; //may throw exceptions
 

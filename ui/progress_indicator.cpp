@@ -123,7 +123,7 @@ void CompareStatus::CompareStatusImpl::finalize()
 void CompareStatus::CompareStatusImpl::switchToCompareBytewise()
 {
     //start to measure perf
-    perf.reset(new PerfCheck(WINDOW_REMAINING_TIME, WINDOW_BYTES_PER_SEC));
+    perf = make_unique<PerfCheck>(WINDOW_REMAINING_TIME, WINDOW_BYTES_PER_SEC);
     lastStatCallSpeed   = -1000000; //some big number
     lastStatCallRemTime = -1000000;
 
@@ -720,9 +720,9 @@ namespace
 class GraphDataBytes : public GraphData
 {
 public:
-    void addRecord(double dataCurrent, long timeMs)
+    void addRecord(double currentBytes, long timeMs)
     {
-        data.insert(data.end(), std::make_pair(timeMs, dataCurrent));
+        data.insert(data.end(), std::make_pair(timeMs, currentBytes));
         //documentation differs about whether "hint" should be before or after the to be inserted element!
         //however "std::map<>::end()" is interpreted correctly by GCC and VS2010
 
@@ -868,8 +868,8 @@ public:
     ~SyncStatusImpl();
 
     void initNewPhase();
-    void reportCurrentBytes(Int64 currentData);
-    void updateProgress(bool allowYield = true);
+    void notifyProgressChange();
+    void updateGui(bool allowYield = true);
 
     //call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
     void processHasFinished(SyncResult resultId, const ErrorLog& log);
@@ -922,6 +922,8 @@ private:
     std::unique_ptr<PerfCheck> perf;
     long lastStatCallSpeed;   //used for calculating intervals between collecting perf samples
     long lastStatCallRemTime; //
+    //help calculate total speed
+    long phaseStartMs; //begin of current phase in [ms]
 
     std::shared_ptr<GraphDataBytes> graphDataBytes;
     std::shared_ptr<GraphDataConstLine> graphDataBytesTotal;
@@ -953,7 +955,8 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     finalResult(RESULT_ABORTED), //dummy value
     isZombie(false),
     lastStatCallSpeed  (-1000000), //some big number
-    lastStatCallRemTime(-1000000)
+    lastStatCallRemTime(-1000000),
+    phaseStartMs(0)
 {
 #ifdef FFS_WIN
     new MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -1002,13 +1005,13 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     graphDataBytesTotal = std::make_shared<GraphDataConstLine>();
 
     m_panelGraph->setAttributes(Graph2D::MainAttributes().
-                                setLabelX(Graph2D::X_LABEL_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
-                                setLabelY(Graph2D::Y_LABEL_RIGHT,  70, std::make_shared<LabelFormatterBytes>()));
+    setLabelX(Graph2D::X_LABEL_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
+    setLabelY(Graph2D::Y_LABEL_RIGHT,  70, std::make_shared<LabelFormatterBytes>()));
 
     m_panelGraph->setData(graphDataBytes,
-                          Graph2D::CurveAttributes().setLineWidth(2)
-                          .setColor     (wxColor(  0, 192,   0))   //medium green
-                          .fillCurveArea(wxColor(192, 255, 192))); //faint green
+    Graph2D::CurveAttributes().setLineWidth(2)
+    .setColor     (wxColor(  0, 192,   0))   //medium green
+    .fillCurveArea(wxColor(192, 255, 192))); //faint green
 
     m_panelGraph->addData(graphDataBytesTotal, Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(0, 64, 0))); //dark green
 
@@ -1066,25 +1069,44 @@ void SyncStatus::SyncStatusImpl::initNewPhase()
 
     //reset graph (e.g. after binary comparison)
     graphDataBytes->clear();
-    reportCurrentBytes(0);
+    notifyProgressChange();
 
     //start new measurement
-    perf.reset(new PerfCheck(WINDOW_REMAINING_TIME, WINDOW_BYTES_PER_SEC));
+    perf = make_unique<PerfCheck>(WINDOW_REMAINING_TIME, WINDOW_BYTES_PER_SEC);
     lastStatCallSpeed   = -1000000; //some big number
     lastStatCallRemTime = -1000000;
 
+    phaseStartMs = timeElapsed.Time();
+
     //set to 0 even if totalDataToProcess is 0: due to a bug in wxGauge::SetValue, it doesn't change to determinate mode when setting the old value again
-    //so give updateProgress() a chance to set a different value
+    //so give updateGui() a chance to set a different value
     m_gauge1->SetValue(0);
 
-    updateProgress(false);
+    updateGui(false);
 }
 
 
-void SyncStatus::SyncStatusImpl::reportCurrentBytes(Int64 currentData)
+void SyncStatus::SyncStatusImpl::notifyProgressChange() //noexcept!
 {
-    //add sample for perf measurements + calc. of remaining time
-    graphDataBytes->addRecord(to<double>(currentData), timeElapsed.Time());
+    if (syncStat_)
+    {
+        switch (syncStat_->currentPhase())
+        {
+            case ProcessCallback::PHASE_NONE:
+                assert(false);
+            case ProcessCallback::PHASE_SCANNING:
+                break;
+            case ProcessCallback::PHASE_COMPARING_CONTENT:
+            case ProcessCallback::PHASE_SYNCHRONIZING:
+            {
+                const double currentData = to<double>(syncStat_->getDataCurrent(syncStat_->currentPhase()));
+
+                //add sample for perf measurements + calc. of remaining time
+                graphDataBytes->addRecord(currentData, timeElapsed.Time());
+            }
+            break;
+        }
+    }
 }
 
 
@@ -1180,7 +1202,7 @@ void SyncStatus::SyncStatusImpl::setExternalStatus(const wxString& status, const
 }
 
 
-void SyncStatus::SyncStatusImpl::updateProgress(bool allowYield)
+void SyncStatus::SyncStatusImpl::updateGui(bool allowYield)
 {
     assert(syncStat_);
     if (!syncStat_) //no sync running!!
@@ -1318,7 +1340,7 @@ void SyncStatus::SyncStatusImpl::updateProgress(bool allowYield)
             while (paused_)
             {
                 wxMilliSleep(UI_UPDATE_INTERVAL);
-                updateUiNow(); //receive UI message that ends pause
+                updateUiNow(); //receive UI message that end pause
             }
         }
         /*
@@ -1454,7 +1476,7 @@ void SyncStatus::SyncStatusImpl::closeWindowDirectly() //this should really be c
 
     //------- change class state -------
     abortCb_  = nullptr; //avoid callback to (maybe) deleted parent process
-    syncStat_ = nullptr; //set *after* last call to "updateProgress"
+    syncStat_ = nullptr; //set *after* last call to "updateGui"
     //----------------------------------
 
     Close();
@@ -1471,7 +1493,8 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const E
     paused_ = false; //you never know?
 
     //update numbers one last time (as if sync were still running)
-    updateProgress(false);
+    notifyProgressChange(); //make one last graph entry at the *current* time
+    updateGui(false);
 
     switch (syncStat_->currentPhase()) //no matter if paused or not
     {
@@ -1491,9 +1514,15 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const E
             assert(dataCurrent <= dataTotal);
 
             //set overall speed (instead of current speed)
-            assert(perf);
-            if (perf)
-                m_staticTextSpeed->SetLabel(perf->getOverallBytesPerSecond()); //note: we can't simply divide "sync total bytes" by "timeElapsed"
+            auto getOverallBytesPerSecond = [&]() -> wxString
+            {
+                const long timeDelta = timeElapsed.Time() - phaseStartMs; //we need to consider "time within current phase" not total "timeElapsed"!
+                if (timeDelta != 0)
+                    return filesizeToShortString(dataCurrent * 1000 / timeDelta) + _("/sec");
+                return L"-"; //fallback
+            };
+
+			m_staticTextSpeed->SetLabel(getOverallBytesPerSecond());
 
             //show new element "items processed"
             m_staticTextLabelItemsProc->Show(true);
@@ -1514,7 +1543,7 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncResult resultId, const E
 
     //------- change class state -------
     abortCb_    = nullptr; //avoid callback to (maybe) deleted parent process
-    syncStat_   = nullptr; //set *after* last call to "updateProgress"
+    syncStat_   = nullptr; //set *after* last call to "updateGui"
     finalResult = resultId;
     //----------------------------------
 
@@ -1665,7 +1694,7 @@ void SyncStatus::SyncStatusImpl::minimizeToTray()
     }
 
     if (syncStat_)
-        updateProgress(false); //set tray tooltip + progress: e.g. no updates while paused
+        updateGui(false); //set tray tooltip + progress: e.g. no updates while paused
 
     Hide();
     if (mainDialog)
@@ -1693,7 +1722,7 @@ void SyncStatus::SyncStatusImpl::resumeFromSystray()
 
     updateDialogStatus(); //restore Windows 7 task bar status (e.g. required in pause mode)
     if (syncStat_)
-        updateProgress(false); //restore Windows 7 task bar progress (e.g. required in pause mode)
+        updateGui(false); //restore Windows 7 task bar progress (e.g. required in pause mode)
 }
 
 
@@ -1713,7 +1742,7 @@ SyncStatus::SyncStatus(AbortCallback& abortCb,
     if (showProgress)
     {
         pimpl->Show();
-        pimpl->updateProgress(false); //clear gui flicker, remove dummy texts: window must be visible to make this work!
+        pimpl->updateGui(false); //clear gui flicker, remove dummy texts: window must be visible to make this work!
     }
     else
         pimpl->minimizeToTray();
@@ -1734,14 +1763,14 @@ void SyncStatus::initNewPhase()
     pimpl->initNewPhase();
 }
 
-void SyncStatus::reportCurrentBytes(Int64 currentData)
+void SyncStatus::notifyProgressChange()
 {
-    pimpl->reportCurrentBytes(currentData);
+    pimpl->notifyProgressChange();
 }
 
-void SyncStatus::updateProgress()
+void SyncStatus::updateGui()
 {
-    pimpl->updateProgress();
+    pimpl->updateGui();
 }
 
 std::wstring SyncStatus::getExecWhenFinishedCommand() const

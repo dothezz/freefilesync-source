@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Abort requested: Waiting for current operation to finish...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Failure to create time stamp for versioning:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -459,17 +459,11 @@ The command is triggered if:
 <source>Compare</source>
 <target>Compare</target>
 
-<source>Compare both sides</source>
-<target>Compare both sides</target>
-
 <source>&Abort</source>
 <target>&Abort</target>
 
 <source>Synchronize</source>
 <target>Synchronise</target>
-
-<source>Start synchronization</source>
-<target>Start synchronisation</target>
 
 <source>Add folder pair</source>
 <target>Add folder pair</target>
@@ -479,15 +473,6 @@ The command is triggered if:
 
 <source>Swap sides</source>
 <target>Swap sides</target>
-
-<source>Open</source>
-<target>Open</target>
-
-<source>Save</source>
-<target>Save</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Last used configurations (press DEL to remove from list)</target>
 
 <source>Hide excluded items</source>
 <target>Hide excluded items</target>
@@ -681,8 +666,8 @@ is the same
 <source>&Pause</source>
 <target>&Pause</target>
 
-<source>Source code written in C++ utilizing:</source>
-<target>Source code written in C++ utilising:</target>
+<source>Source code written in C++ using:</source>
+<target>Source code written in C++ using:</target>
 
 <source>If you like FreeFileSync</source>
 <target>If you like FreeFileSync</target>
@@ -771,6 +756,9 @@ Note: File names must be relative to base directories!
 <source>Description</source>
 <target>Description</target>
 
+<source>Start synchronization</source>
+<target>Start synchronisation</target>
+
 <source>Variant</source>
 <target>Variant</target>
 
@@ -806,6 +794,15 @@ Note: File names must be relative to base directories!
 
 <source>Select view</source>
 <target>Select view</target>
+
+<source>Open...</source>
+<target>Open...</target>
+
+<source>Save</source>
+<target>Save</target>
+
+<source>Compare both sides</source>
+<target>Compare both sides</target>
 
 <source>Set direction:</source>
 <target>Set direction:</target>
@@ -960,6 +957,9 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>Show files that won't be copied</target>
 
+<source>Set as default</source>
+<target>Set as default</target>
+
 <source>All folders are in sync!</source>
 <target>All folders are in sync!</target>
 
@@ -971,15 +971,6 @@ Note: File names must be relative to base directories!
 
 <source>File list exported!</source>
 <target>File list exported!</target>
-
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1137,14 +1128,14 @@ Note: File names must be relative to base directories!
 <source>Leave as unresolved conflict</source>
 <target>Leave as unresolved conflict</target>
 
+<source>Append a timestamp to each file name</source>
+<target>Append a timestamp to each file name</target>
+
 <source>Replace</source>
 <target>Replace</target>
 
 <source>Move files and replace if existing</source>
 <target>Move files and replace if existing</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Append a timestamp to each file name</target>
 
 <source>Folder</source>
 <target>Folder</target>
@@ -1278,6 +1269,27 @@ Note: File names must be relative to base directories!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Setting default synchronisation directions: Old files will be overwritten with newer files.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Checking recycle bin availability for folder %x...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>Moving file %x to recycle bin</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>Moving folder %x to recycle bin</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Moving symbolic link %x to recycle bin</target>
+
+<source>Deleting file %x</source>
+<target>Deleting file %x</target>
+
+<source>Deleting folder %x</source>
+<target>Deleting folder %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Deleting symbolic link %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</target>
 
@@ -1358,24 +1370,6 @@ Note: File names must be relative to base directories!
 
 <source>Multiple...</source>
 <target>Multiple...</target>
-
-<source>Deleting file %x</source>
-<target>Deleting file %x</target>
-
-<source>Deleting folder %x</source>
-<target>Deleting folder %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Deleting symbolic link %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Moving file %x to recycle bin</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Moving folder %x to recycle bin</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Moving symbolic link %x to recycle bin</target>
 
 <source>Moving file %x to %y</source>
 <target>Moving file %x to %y</target>

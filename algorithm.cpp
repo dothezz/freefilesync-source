@@ -12,12 +12,13 @@
 #include <zen/recycler.h>
 #include <zen/stl_tools.h>
 #include <zen/scope_guard.h>
-//#include <wx/msgdlg.h>
+#include <zen/thread.h>
 #include "lib/resources.h"
 #include "lib/norm_filter.h"
 #include "lib/db_file.h"
 #include "lib/cmp_filetime.h"
 #include "lib/norm_filter.h"
+#include "process_callback.h" //for UI_UPDATE_INTERVAL
 
 using namespace zen;
 using namespace std::rel_ops;
@@ -53,19 +54,22 @@ private:
 
     void operator()(FileMapping& fileObj) const
     {
-        switch (fileObj.getCategory())
+        const CompareFilesResult cat = fileObj.getCategory();
+
+        //##################### schedule old temporary files for deletion ####################
+        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+            return fileObj.setSyncDir(SYNC_DIR_LEFT);
+        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+            return fileObj.setSyncDir(SYNC_DIR_RIGHT);
+        //####################################################################################
+
+        switch (cat)
         {
             case FILE_LEFT_SIDE_ONLY:
-                if (endsWith(fileObj.getShortName<LEFT_SIDE>(), zen::TEMP_FILE_ENDING))
-                    fileObj.setSyncDir(SYNC_DIR_LEFT); //schedule potentially existing temporary files for deletion
-                else
-                    fileObj.setSyncDir(dirCfg.exLeftSideOnly);
+                fileObj.setSyncDir(dirCfg.exLeftSideOnly);
                 break;
             case FILE_RIGHT_SIDE_ONLY:
-                if (endsWith(fileObj.getShortName<RIGHT_SIDE>(), zen::TEMP_FILE_ENDING))
-                    fileObj.setSyncDir(SYNC_DIR_RIGHT); //schedule potentially existing temporary files for deletion
-                else
-                    fileObj.setSyncDir(dirCfg.exRightSideOnly);
+                fileObj.setSyncDir(dirCfg.exRightSideOnly);
                 break;
             case FILE_RIGHT_NEWER:
                 fileObj.setSyncDir(dirCfg.rightNewer);
@@ -123,7 +127,16 @@ private:
 
     void operator()(DirMapping& dirObj) const
     {
-        switch (dirObj.getDirCategory())
+        const CompareDirResult cat = dirObj.getDirCategory();
+
+        //########### schedule abandoned temporary recycle bin directory for deletion  ##########
+        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+            return setSyncDirectionRec(SYNC_DIR_LEFT, dirObj); //
+        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+            return setSyncDirectionRec(SYNC_DIR_RIGHT, dirObj); //don't recurse below!
+        //#######################################################################################
+
+        switch (cat)
         {
             case DIR_LEFT_SIDE_ONLY:
                 dirObj.setSyncDir(dirCfg.exLeftSideOnly);
@@ -148,8 +161,8 @@ private:
     const DirectionSet dirCfg;
 };
 
-
 //---------------------------------------------------------------------------------------------------------------
+
 struct AllEqual //test if non-equal items exist in scanned data
 {
     bool operator()(const HierarchyObject& hierObj) const
@@ -385,15 +398,9 @@ private:
 
         //##################### schedule old temporary files for deletion ####################
         if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
-        {
-            fileObj.setSyncDir(SYNC_DIR_LEFT);
-            return;
-        }
+            return fileObj.setSyncDir(SYNC_DIR_LEFT);
         else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
-        {
-            fileObj.setSyncDir(SYNC_DIR_RIGHT);
-            return;
-        }
+            return fileObj.setSyncDir(SYNC_DIR_RIGHT);
         //####################################################################################
 
         //try to find corresponding database entry
@@ -466,6 +473,13 @@ private:
     {
         const CompareDirResult cat = dirObj.getDirCategory();
 
+        //########### schedule abandoned temporary recycle bin directory for deletion  ##########
+        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+            return setSyncDirectionRec(SYNC_DIR_LEFT, dirObj); //
+        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+            return setSyncDirectionRec(SYNC_DIR_RIGHT, dirObj); //don't recurse below!
+        //#######################################################################################
+
         //try to find corresponding database entry
         const InSyncDir::DirList::value_type* dbEntry = nullptr;
         if (dbContainer)
@@ -527,9 +541,10 @@ private:
     {
         auto iterPair = cnt.equal_range(key); //since file id is already unique, we expect a single-element range at most
         auto it = std::find_if(iterPair.first, iterPair.second,
-                                 [&](const typename Container::value_type& item)
+                               [&](const typename Container::value_type& item)
         {
-            return sameFileTime(std::get<0>(item.first), std::get<0>(key), 2); //respect 2 second FAT/FAT32 precision
+            return sameFileTime(std::get<0>(item.first), std::get<0>(key), 2); //respect 2 second FAT/FAT32 precision!
+            //the file time could be inferred from the source side after a file copy while a slightly different time is stored on a FAT32 disk!
         });
         return it == iterPair.second ? cnt.end() : it;
     }
@@ -753,7 +768,6 @@ void zen::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsOb
     } recurse(dirSetter);
     fsObj.accept(recurse);
 }
-
 
 //--------------- functions related to filtering ------------------------------------------------------------------------------------
 
@@ -1192,82 +1206,18 @@ bool tryReportingError(Function cmd, DeleteFilesHandler& handler) //return "true
         }
 }
 
-
-struct RemoveCallbackImpl : public zen::CallbackRemoveDir
+#ifdef FFS_WIN
+//recycleBinStatus() blocks seriously if recycle bin is really full and drive is slow
+StatusRecycler recycleBinStatusUpdating(const Zstring& dirname, DeleteFilesHandler& callback)
 {
-    RemoveCallbackImpl(DeleteFilesHandler& handler) : handler_(handler) {}
+    const std::wstring msg = replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(dirname), false);
 
-    virtual void notifyFileDeletion(const Zstring& filename) { handler_.notifyDeletion(filename); }
-    virtual void notifyDirDeletion (const Zstring& dirname)  { handler_.notifyDeletion(dirname); }
-
-private:
-    DeleteFilesHandler& handler_;
-};
-
-
-template <SelectedSide side>
-struct PermanentDeleter : public FSObjectVisitor //throw FileError
-{
-    PermanentDeleter(DeleteFilesHandler& handler) : remCallback(handler) {}
-
-    virtual void visit(const FileMapping& fileObj)
-    {
-        if (zen::removeFile(fileObj.getFullName<side>())) //throw FileError
-            remCallback.notifyFileDeletion(fileObj.getFullName<side>());
-    }
-
-    virtual void visit(const SymLinkMapping& linkObj)
-    {
-        switch (linkObj.getLinkType<side>())
-        {
-            case LinkDescriptor::TYPE_DIR:
-                zen::removeDirectory(linkObj.getFullName<side>(), &remCallback); //throw FileError
-                break;
-            case LinkDescriptor::TYPE_FILE:
-                if (zen::removeFile(linkObj.getFullName<side>())) //throw FileError
-                    remCallback.notifyFileDeletion(linkObj.getFullName<side>());
-                break;
-        }
-    }
-
-    virtual void visit(const DirMapping& dirObj)
-    {
-        zen::removeDirectory(dirObj.getFullName<side>(), &remCallback); //throw FileError
-    }
-
-private:
-    RemoveCallbackImpl remCallback;
-};
-
-
-template <SelectedSide side>
-void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& ptrList,
-                                bool useRecycleBin,
-                                DeleteFilesHandler& handler)
-{
-    for (auto it = ptrList.begin(); it != ptrList.end(); ++it) //VS 2010 bug prevents replacing this by std::for_each + lamba
-    {
-        FileSystemObject& fsObj = **it; //all pointers are required(!) to be bound
-        if (fsObj.isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
-            continue;
-
-        tryReportingError([&]
-        {
-            if (useRecycleBin)
-            {
-                if (zen::recycleOrDelete(fsObj.getFullName<side>())) //throw FileError
-                    handler.notifyDeletion(fsObj.getFullName<side>());
-            }
-            else
-            {
-                PermanentDeleter<side> delPerm(handler); //throw FileError
-                fsObj.accept(delPerm);
-            }
-
-            fsObj.removeObject<side>(); //if directory: removes recursively!
-        }, handler);
-    }
+    auto ft = async([=] { return recycleBinStatus(dirname); });
+    while (!ft.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
+        callback.reportStatus(msg); //may throw!
+    return ft.get();
 }
+#endif
 
 
 template <SelectedSide side>
@@ -1275,7 +1225,8 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
                 std::vector<FileSystemObject*>& deletePermanent,
                 std::vector<FileSystemObject*>& deleteRecyler,
                 bool useRecycleBin,
-                std::map<Zstring, bool, LessFilename>& hasRecyclerBuffer)
+                std::map<Zstring, bool, LessFilename>& hasRecyclerBuffer,
+                DeleteFilesHandler& callback)
 {
     auto hasRecycler = [&](const FileSystemObject& fsObj) -> bool
     {
@@ -1285,7 +1236,7 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
         auto it = hasRecyclerBuffer.find(baseDirPf);
         if (it != hasRecyclerBuffer.end())
             return it->second;
-        return hasRecyclerBuffer.insert(std::make_pair(baseDirPf, recycleBinStatus(baseDirPf) == STATUS_REC_EXISTS)).first->second;
+        return hasRecyclerBuffer.insert(std::make_pair(baseDirPf, recycleBinStatusUpdating(baseDirPf, callback) == STATUS_REC_EXISTS)).first->second;
 #else
         return true;
 #endif
@@ -1300,8 +1251,116 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
                 deletePermanent.push_back(*it);
         }
 }
-}
 
+
+template <SelectedSide side>
+struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow constructor!!!
+{
+    ItemDeleter(bool useRecycleBin, DeleteFilesHandler& handler) :
+        handler_(handler), useRecycleBin_(useRecycleBin), remCallback(*this)
+    {
+        if (useRecycleBin_)
+        {
+            txtRemovingFile      = _("Moving file %x to recycle bin"         );
+            txtRemovingDirectory = _("Moving folder %x to recycle bin"       );
+            txtRemovingSymlink   = _("Moving symbolic link %x to recycle bin");
+        }
+        else
+        {
+            txtRemovingFile      = _("Deleting file %x"         );
+            txtRemovingDirectory = _("Deleting folder %x"       );
+            txtRemovingSymlink   = _("Deleting symbolic link %x");
+        }
+    }
+
+    virtual void visit(const FileMapping& fileObj)
+    {
+        notifyFileDeletion(fileObj.getFullName<side>());
+
+        if (useRecycleBin_)
+            zen::recycleOrDelete(fileObj.getFullName<side>()); //throw FileError
+        else
+            zen::removeFile(fileObj.getFullName<side>()); //throw FileError
+    }
+
+    virtual void visit(const SymLinkMapping& linkObj)
+    {
+        notifySymlinkDeletion(linkObj.getFullName<side>());
+
+        if (useRecycleBin_)
+            zen::recycleOrDelete(linkObj.getFullName<side>()); //throw FileError
+        else
+            switch (linkObj.getLinkType<side>())
+            {
+                case LinkDescriptor::TYPE_DIR:
+                    zen::removeDirectory(linkObj.getFullName<side>()); //throw FileError
+                    break;
+                case LinkDescriptor::TYPE_FILE:
+                    zen::removeFile(linkObj.getFullName<side>()); //throw FileError
+                    break;
+            }
+    }
+
+    virtual void visit(const DirMapping& dirObj)
+    {
+        notifyDirectoryDeletion(dirObj.getFullName<side>()); //notfied twice! see RemoveCallbackImpl -> no big deal
+
+        if (useRecycleBin_)
+            zen::recycleOrDelete(dirObj.getFullName<side>()); //throw FileError
+        else
+            zen::removeDirectory(dirObj.getFullName<side>(), &remCallback); //throw FileError
+    }
+
+private:
+    struct RemoveCallbackImpl : public zen::CallbackRemoveDir
+    {
+        RemoveCallbackImpl(ItemDeleter& itemDeleter) : itemDeleter_(itemDeleter) {}
+
+        virtual void onBeforeFileDeletion(const Zstring& filename) { itemDeleter_.notifyFileDeletion     (filename); }
+        virtual void onBeforeDirDeletion (const Zstring& dirname)  { itemDeleter_.notifyDirectoryDeletion(dirname ); }
+
+    private:
+        ItemDeleter& itemDeleter_;
+    };
+
+    void notifyFileDeletion     (const Zstring& objName) { notifyItemDeletion(txtRemovingFile     , objName); }
+    void notifyDirectoryDeletion(const Zstring& objName) { notifyItemDeletion(txtRemovingDirectory, objName); }
+    void notifySymlinkDeletion  (const Zstring& objName) { notifyItemDeletion(txtRemovingSymlink  , objName); }
+
+    void notifyItemDeletion(const std::wstring& statusText, const Zstring& objName)
+    {
+        handler_.reportStatus(replaceCpy(statusText, L"%x", fmtFileName(objName)));
+    }
+
+    DeleteFilesHandler& handler_;
+    const bool useRecycleBin_;
+    RemoveCallbackImpl remCallback;
+
+    std::wstring txtRemovingFile;
+    std::wstring txtRemovingDirectory;
+    std::wstring txtRemovingSymlink;
+};
+
+
+template <SelectedSide side>
+void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& ptrList,
+                                bool useRecycleBin,
+                                DeleteFilesHandler& handler)
+{
+    ItemDeleter<side> deleter(useRecycleBin, handler);
+
+    for (auto it = ptrList.begin(); it != ptrList.end(); ++it) //VS 2010 bug prevents replacing this by std::for_each + lamba
+    {
+        FileSystemObject& fsObj = **it; //all pointers are required(!) to be bound
+        if (!fsObj.isEmpty<side>()) //element may be implicitly deleted, e.g. if parent folder was deleted first
+            tryReportingError([&]
+        {
+            fsObj.accept(deleter); //throw FileError
+            fsObj.removeObject<side>(); //if directory: removes recursively!
+        }, handler);
+    }
+}
+}
 
 void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
                               const std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
@@ -1378,8 +1437,8 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     std::vector<FileSystemObject*> deleteRecylerRight;
 
     std::map<Zstring, bool, LessFilename> hasRecyclerBuffer;
-    categorize<LEFT_SIDE >(deleteLeft,  deletePermanentLeft,  deleteRecylerLeft,  useRecycleBin, hasRecyclerBuffer);
-    categorize<RIGHT_SIDE>(deleteRight, deletePermanentRight, deleteRecylerRight, useRecycleBin, hasRecyclerBuffer);
+    categorize<LEFT_SIDE >(deleteLeft,  deletePermanentLeft,  deleteRecylerLeft,  useRecycleBin, hasRecyclerBuffer, statusHandler);
+    categorize<RIGHT_SIDE>(deleteRight, deletePermanentRight, deleteRecylerRight, useRecycleBin, hasRecyclerBuffer, statusHandler);
 
     //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
     if (useRecycleBin &&

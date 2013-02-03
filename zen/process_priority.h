@@ -12,7 +12,7 @@ namespace zen
 struct PreventStandby //signal a "busy" state to the operating system
 {
 #ifdef FFS_WIN
-    PreventStandby() { ::SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED /* | ES_AWAYMODE_REQUIRED*/ ); }
+    PreventStandby () { ::SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED /* | ES_AWAYMODE_REQUIRED*/ ); }
     ~PreventStandby() { ::SetThreadExecutionState(ES_CONTINUOUS); }
 #endif
 };
@@ -26,8 +26,8 @@ struct ScheduleForBackgroundProcessing //lower CPU and file I/O priorities
 #define PROCESS_MODE_BACKGROUND_END       0x00200000 //
 #endif
 
-    ScheduleForBackgroundProcessing() { ::SetPriorityClass(::GetCurrentProcess(), PROCESS_MODE_BACKGROUND_BEGIN); } //this call lowers CPU priority, too!!
-    ~ScheduleForBackgroundProcessing() { ::SetPriorityClass(::GetCurrentProcess(), PROCESS_MODE_BACKGROUND_END); }
+    ScheduleForBackgroundProcessing () { ::SetPriorityClass(::GetCurrentProcess(), PROCESS_MODE_BACKGROUND_BEGIN); } //this call lowers CPU priority, too!!
+    ~ScheduleForBackgroundProcessing() { ::SetPriorityClass(::GetCurrentProcess(), PROCESS_MODE_BACKGROUND_END  ); }
 
 #elif defined FFS_LINUX
     /*

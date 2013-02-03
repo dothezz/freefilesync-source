@@ -98,29 +98,8 @@ wxString PerfCheck::getBytesPerSecond() const
         const double timeDelta = recordBack.first        - recordFront.first;
         const double dataDelta = recordBack.second.data_ - recordFront.second.data_;
 
-        if (!numeric::isNull(timeDelta))
-            if (dataDelta > 0) //may be negative if user cancels copying
+        if (!numeric::isNull(timeDelta) && dataDelta > 0)
                 return filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
-    }
-    return L"-"; //fallback
-}
-
-
-wxString PerfCheck::getOverallBytesPerSecond() const //for all samples
-{
-    warn_static("WTF!? tihs considers window only!")
-
-    if (!samples.empty())
-    {
-        const auto& recordBack  = *samples.rbegin();
-        const auto& recordFront = *samples.begin();
-        //-----------------------------------------------------------------------------------------------
-        const double timeDelta = recordBack.first        - recordFront.first;
-        const double dataDelta = recordBack.second.data_ - recordFront.second.data_;
-
-        if (!numeric::isNull(timeDelta))
-            if (dataDelta > 0) //may be negative if user cancels copying
-                return zen::filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
     }
     return L"-"; //fallback
 }

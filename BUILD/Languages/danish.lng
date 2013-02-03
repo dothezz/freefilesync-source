@@ -1,6 +1,6 @@
 <header>
 	<language name>Dansk</language name>
-	<translator>Kim Monberg</translator>
+	<translator>Regmos</translator>
 	<locale>da_DK</locale>
 	<flag file>denmark.png</flag file>
 	<plural forms>2</plural forms>
@@ -11,61 +11,61 @@
 <target>Søger efter mappen %x...</target>
 
 <source>Items processed:</source>
-<target>Enheder behandlet:</target>
+<target>Emner behandlet:</target>
 
 <source>Items remaining:</source>
-<target>Enheder tilbage:</target>
+<target>Emner tilbage:</target>
 
 <source>Total time:</source>
 <target>Samlet tid:</target>
 
 <source>Show in Explorer</source>
-<target>Vis i Explorer</target>
+<target>Åben filplacering</target>
 
 <source>Open with default application</source>
-<target>Åben med standard program</target>
+<target>Åben med standardprogram</target>
 
 <source>Browse directory</source>
-<target>Gennemse Bibliotek</target>
+<target>Gennemse mappe</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
-<target>Afbrydelse: Venter på nuværende opgave afsluttes...</target>
+<target>Afbrydelse: Venter på aktuel opgave afsluttes...</target>
 
-<source>Failure to create time stamp for versioning:</source>
-<target></target>
+<source>Failure to create timestamp for versioning:</source>
+<target>Kunne ikke oprette versioneringstid:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSynk - Automatisk Synkronisering</target>
+<target>Realtids synk - automatisk synkronisering</target>
 
 <source>Error</source>
 <target>Fejl</target>
 
 <source>Select alternate comparison settings</source>
-<target>Vælg alternative sammenlignings indstillinger</target>
+<target>Tilpas analyse</target>
 
 <source>Select alternate synchronization settings</source>
-<target>Vælg alternative indstillinger</target>
+<target>Tilpas synkronisering</target>
 
 <source>Filter is active</source>
-<target>Filter er aktivt</target>
+<target>Aktivt filter</target>
 
 <source>No filter selected</source>
 <target>Intet filter valgt</target>
 
 <source>Remove alternate settings</source>
-<target>Fjern alternative indstillinger</target>
+<target>Fjern tilpassede indstillinger</target>
 
 <source>Clear filter settings</source>
-<target>Ryd filter indstillinger</target>
+<target>Nulstil filter</target>
 
 <source>Save as batch job</source>
-<target></target>
+<target>Gem som batchfil</target>
 
 <source>Comparison settings</source>
-<target>Sammenlignings indstillinger</target>
+<target>Analyseindstillinger</target>
 
 <source>Synchronization settings</source>
-<target>Synkroniserings indstillinger</target>
+<target>Synkroniseringsindstillinger</target>
 
 <source>About</source>
 <target>Om</target>
@@ -77,13 +77,13 @@
 <target>Indstil filter</target>
 
 <source>Global settings</source>
-<target>Fælles indstillinger</target>
+<target>Programindstillinger</target>
 
 <source>Find</source>
-<target>Find</target>
+<target>Søg</target>
 
 <source>Select time span</source>
-<target>Vælg tids område</target>
+<target>Vælg tidsinterval</target>
 
 <source>Invalid command line:</source>
 <target>Ugyldig kommando:</target>
@@ -95,16 +95,16 @@
 <target>Advarsel</target>
 
 <source>Fatal Error</source>
-<target>Uoprettelig Fejl</target>
+<target>Fatal fejl</target>
 
 <source>Windows Error Code %x:</source>
-<target>Windows Fejl kode %x:</target>
+<target>Windows fejlkode %x:</target>
 
 <source>Linux Error Code %x:</source>
-<target>Linux Fejl kode %x:</target>
+<target>Linux fejlkode %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
-<target>Kan ikke følge linket %x.</target>
+<target>Kan ikke følge symlinket %x.</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -120,48 +120,48 @@
 <pluralform>%x Bytes</pluralform>
 </source>
 <target>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
 </target>
 
 <source>Database file %x is incompatible.</source>
-<target>Database filen %x er ikke kompatibel.</target>
+<target>Databasefilen %x er inkompatibel.</target>
 
 <source>Initial synchronization:</source>
-<target>Indledende synkronisering:</target>
+<target>Forbereder synkronisering:</target>
 
 <source>Database file %x does not yet exist.</source>
-<target>Database filen %x findes ikke.</target>
+<target>Databasefilen %x findes ikke.</target>
 
 <source>Database file is corrupt:</source>
-<target>Database filen er ødelagt:</target>
+<target>Databasefilen er ødelagt:</target>
 
 <source>Out of memory!</source>
-<target>Ude af hukommelse!</target>
+<target>Ikke nok hukommelse!</target>
 
 <source>Cannot write file %x.</source>
-<target>Kan ikke skrive filen %x.</target>
+<target>Kan ikke oprette filen %x.</target>
 
 <source>Cannot read file %x.</source>
 <target>Kan ikke læse filen %x.</target>
 
 <source>Database files do not share a common session.</source>
-<target>Database filen kan ikke deles.</target>
+<target>Databasefiler kan ikke dele handling.</target>
 
 <source>An exception occurred!</source>
-<target>En undtagelse er opstået!</target>
+<target>Undtagelse opstod!</target>
 
 <source>Cannot read file attributes of %x.</source>
-<target>Kan ikke læse fil attributterne på %x.</target>
+<target>Kan ikke læse filattributterne på %x.</target>
 
 <source>Cannot get process information.</source>
-<target>Kan ikke lave informationer over processen.</target>
+<target>Kan ikke hente procesinformation.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
-<target>Venter mens biblioteket er låst (%x)...</target>
+<target>Venter mens mappe låses (%x)...</target>
 
 <source>Cannot set directory lock %x.</source>
-<target>Kan ikke låse biblioteket %x.</target>
+<target>Kan ikke låse mappen %x.</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -173,21 +173,21 @@
 </target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
-<target>Fejl i videregivelse af filen %x, række %y, kolonne %z.</target>
+<target>Behandlingsfejl i filen %x, række %y, kolonne %z.</target>
 
 <source>Scanning:</source>
 <target>Skanner:</target>
 
 <source>Encoding extended time information: %x</source>
-<target>Finder udvidet tids information: %x</target>
+<target>Opretter udvidet tidsinformation: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
 <target>
-<pluralform>[1 Tråd]</pluralform>
-<pluralform>[%x Tråde]</pluralform>
+<pluralform>[1 tråd]</pluralform>
+<pluralform>[%x tråde]</pluralform>
 </target>
 
 <source>/sec</source>
@@ -197,67 +197,67 @@
 <target>Kan ikke finde filen %x.</target>
 
 <source>File %x does not contain a valid configuration.</source>
-<target>%x indeholder ikke en gyldig konfiguration.</target>
+<target>%x indeholder ikke gyldige indstillinger.</target>
 
 <source>Configuration file %x loaded partially only.</source>
-<target>Konfigurationsfilen %x er kun delvist hentet.</target>
+<target>Indstillingsfilen %x er kun delvist indlæst.</target>
 
 <source>Cannot access Volume Shadow Copy Service.</source>
-<target>Kan ikke få adgang til Drev Kopi Servicen.</target>
+<target>Kan ikke opnå adgang til VVS.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Brug venligst FreeFileSync 64-bit version for at lave en drev kopi på dette system.</target>
+<target>Brug FreeFileSync 64-bit til at lave VVS kopier på dette system.</target>
 
 <source>Cannot load file %x.</source>
-<target>Kan ikke læse filen %x.</target>
+<target>Kan ikke indlæse filen %x.</target>
 
 <source>Path %x does not contain a volume name.</source>
-<target>Stien %x indeholder ikke et drev navn.</target>
+<target>Stien %x indeholder ikke et drevnavn.</target>
 
 <source>Volume name %x not part of file name %y!</source>
-<target>Drev navn %x ikke en del af filnavn %y!</target>
+<target>Drevnavn %x findes ikke i filnavnet %y!</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>Kan ikke læse følgende XML emner:</target>
 
 <source>&Open...</source>
-<target>&Åben...</target>
+<target>Åben...</target>
 
 <source>Save &as...</source>
-<target>Gem &som...</target>
+<target>Gem som...</target>
 
 <source>&Quit</source>
-<target>&Afslut</target>
+<target>Afslut</target>
 
 <source>&Program</source>
-<target>&Program</target>
+<target>Filer</target>
 
 <source>&Content</source>
-<target>&Indhold</target>
+<target>Åben hjælp</target>
 
 <source>&About</source>
-<target>&Om</target>
+<target>Om</target>
 
 <source>&Help</source>
-<target>&Hjælp</target>
+<target>Hjælp</target>
 
 <source>Usage:</source>
-<target>Forbrug:</target>
+<target>Gør sådan:</target>
 
 <source>1. Select folders to watch.</source>
-<target>1. Vælg mappe at overvåge.</target>
+<target>1. Vælg mapper til jobbet.</target>
 
 <source>2. Enter a command line.</source>
-<target>2. Skriv en kommando linje.</target>
+<target>2. Angiv en kommando.</target>
 
 <source>3. Press 'Start'.</source>
-<target>3. Tryk 'Start'.</target>
+<target>3. Klik 'Start'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>Importer en .ffs_batch for at komme igang.</target>
+<target>Importer en .ffs_batchfil (Filer > Åben...) for at komme igang.</target>
 
 <source>Folders to watch</source>
-<target>Mapper der overvåges</target>
+<target>Jobbets mapper</target>
 
 <source>Add folder</source>
 <target>Tilføj mappe</target>
@@ -272,13 +272,13 @@
 <target>Vælg en mappe</target>
 
 <source>Idle time [seconds]</source>
-<target></target>
+<target>Køres når computeren har ledige resourcer  i [sek.]</target>
 
 <source>Idle time between last detected change and execution of command</source>
-<target>Tid imellem sidste ændring og udførelse</target>
+<target>Tid imellem sidst fundne ændring og udførsel</target>
 
 <source>Command line</source>
-<target>Kommando linje</target>
+<target>Kommando</target>
 
 <source>
 The command is triggered if:
@@ -288,65 +288,65 @@ The command is triggered if:
 <target>
 Kommandoen udføres hvis:
 - filer eller undermapper ændres
-- nye mapper ankommer (Hvis en USB nøgle sættes til)
+- nye mapper findes (f.eks USB nøgle)
 </target>
 
 <source>Start</source>
 <target>Start</target>
 
 <source>&Retry</source>
-<target>&Prøv igen</target>
+<target>Prøv igen</target>
 
 <source>Cancel</source>
-<target>Anuller</target>
+<target>Annuller</target>
 
 <source>Build: %x</source>
-<target>Build: %x</target>
+<target>Udgivet: %x</target>
 
 <source>All files</source>
 <target>Alle filer</target>
 
 <source>&Restore</source>
-<target>&Gendan</target>
+<target>Vis vindue</target>
 
 <source>&Exit</source>
-<target>&Afslut</target>
+<target>Luk</target>
 
 <source>Monitoring active...</source>
-<target>Overvågning aktiv...</target>
+<target>Overvågning kører...</target>
 
 <source>Waiting for missing directories...</source>
-<target>Venter på manglende biblioteker...</target>
+<target>Venter på manglende mapper...</target>
 
 <source>A folder input field is empty.</source>
-<target>Et mappe felt er tomt.</target>
+<target>Der findes et udefineret mappevalg.</target>
 
 <source>Synchronization aborted!</source>
 <target>Synkronisering afbrudt!</target>
 
 <source>Synchronization completed with errors!</source>
-<target>Synkronisering afsluttet med fejl!</target>
+<target>Synkronisering gennemført med fejl!</target>
 
 <source>Synchronization completed with warnings.</source>
-<target></target>
+<target>Synkronisering gennemført med advarsel</target>
 
 <source>Nothing to synchronize!</source>
-<target>Intet at synkronisere!</target>
+<target>Alt er synkroniseret!</target>
 
 <source>Synchronization completed successfully.</source>
-<target></target>
+<target>Synkronisering gennemført</target>
 
 <source>Saving log file %x...</source>
-<target></target>
+<target>Gemmer rapport %x...</target>
 
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>Tryk "Skift" for at løse problemer i hoved vinduet.</target>
+<target>Klik "Skift" for at løse problemerne fra hovedvinduet.</target>
 
 <source>Switching to FreeFileSync main dialog...</source>
-<target>Skift til hoved vinduet...</target>
+<target>Skifter til hovedvindue...</target>
 
 <source>A new version of FreeFileSync is available:</source>
-<target>En ny version af FreeFilesyns er tilgængelig:</target>
+<target>Opdatering tilgængelig:</target>
 
 <source>Download now?</source>
 <target>Download nu?</target>
@@ -358,16 +358,16 @@ Kommandoen udføres hvis:
 <target>Information</target>
 
 <source>Unable to connect to sourceforge.net!</source>
-<target>Kan ikke forbinde til sourceforge.net!</target>
+<target>Kan ikke kontakte sourceforge.net!</target>
 
 <source>Current FreeFileSync version number was not found online! Do you want to check manually?</source>
-<target></target>
+<target>Den aktuelle version blev ikke fundet! Vil du kontrollere manuelt</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
-<target>Skal FreeFileSync automatisk checke efter opdateringer hver uge?</target>
+<target>Skal FreeFileSync søge efter opdateringer en gang om ugen?</target>
 
 <source>(Requires an Internet connection!)</source>
-<target>(Kræver en Internet forbindelse!)</target>
+<target>(kræver internetforbindelse!)</target>
 
 <source><Symlink></source>
 <target><Symlink></target>
@@ -376,16 +376,16 @@ Kommandoen udføres hvis:
 <target><Mappe></target>
 
 <source>Full path</source>
-<target>Fuld Sti</target>
+<target>Fuld sti</target>
 
 <source>Name</source>
 <target>Navn</target>
 
 <source>Relative path</source>
-<target>Filsti</target>
+<target>Relativ sti</target>
 
 <source>Base folder</source>
-<target>Grund mappe</target>
+<target>Hovedmappe</target>
 
 <source>Size</source>
 <target>Størrelse</target>
@@ -394,10 +394,10 @@ Kommandoen udføres hvis:
 <target>Dato</target>
 
 <source>Extension</source>
-<target>Udvidelse</target>
+<target>Filtype</target>
 
 <source>Size:</source>
-<target>Størelse:</target>
+<target>Størrelse:</target>
 
 <source>Date:</source>
 <target>Dato:</target>
@@ -406,13 +406,13 @@ Kommandoen udføres hvis:
 <target>Handling</target>
 
 <source>Category</source>
-<target>Kategori</target>
+<target>Status</target>
 
 <source>Drag && drop</source>
-<target>Træk && slip</target>
+<target>Træk emner hertil</target>
 
 <source>Close progress dialog</source>
-<target>Luk dialog boksen</target>
+<target>Luk dialogen</target>
 
 <source>Standby</source>
 <target>Standby</target>
@@ -427,43 +427,43 @@ Kommandoen udføres hvis:
 <target>Dvale</target>
 
 <source>&New</source>
-<target>&Ny</target>
+<target>Ny</target>
 
 <source>&Save</source>
-<target>&Gem</target>
+<target>Gem</target>
 
 <source>Save as &batch job...</source>
-<target></target>
+<target>Gem som batchfil</target>
 
 <source>1. &Compare</source>
-<target>1. &Sammenlign</target>
+<target>1. Analyser</target>
 
 <source>2. &Synchronize</source>
-<target>2. &Synkroniser</target>
+<target>2. Synkroniser</target>
 
 <source>&Language</source>
-<target>&Sprog</target>
+<target>Sprog</target>
 
 <source>&Global settings...</source>
-<target>&Fælles indstillinger...</target>
+<target>Programindstillinger...</target>
 
 <source>&Export file list...</source>
-<target>&Eksporter fil liste...</target>
+<target>Eksporter filliste...</target>
 
 <source>&Advanced</source>
-<target>&Avanceret</target>
+<target>Indstillinger</target>
 
 <source>&Check for new version</source>
-<target>&Kig efter ny version</target>
+<target>Søg efter opdatering</target>
 
 <source>Compare</source>
-<target>Sammenlign</target>
+<target>Analyser</target>
 
 <source>Compare both sides</source>
-<target>Sammenlign begge sider</target>
+<target>Analyser begge sider</target>
 
 <source>&Abort</source>
-<target>&Afbryd</target>
+<target>Afbryd</target>
 
 <source>Synchronize</source>
 <target>Synkroniser</target>
@@ -472,103 +472,103 @@ Kommandoen udføres hvis:
 <target>Start synkronisering</target>
 
 <source>Add folder pair</source>
-<target>Tilføj mappe par</target>
+<target>Tilføj mappepar</target>
 
 <source>Remove folder pair</source>
-<target>Fjern mappe par</target>
+<target>Fjern mappepar</target>
 
 <source>Swap sides</source>
-<target>Byt sider</target>
+<target>Byt side</target>
 
 <source>Open</source>
-<target></target>
+<target>Åben</target>
 
 <source>Save</source>
-<target></target>
+<target>Gem job</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
-<target>Senest brugte konfigurationer (tryk DEL for at fjerne fra listen)</target>
+<target>Senest brugte konfigurationer (tast DEL for at slette)</target>
 
 <source>Hide excluded items</source>
-<target></target>
+<target>Skjul ekskluderede emner</target>
 
 <source>Show filtered or temporarily excluded files</source>
-<target>Vis filtrerede eller midlertidigt afviste filer</target>
+<target>Vis filtrerede eller midlertidigt ekskluderede filer</target>
 
 <source>Number of files and folders that will be created</source>
-<target>Antallet af filer og mapper der vil blive oprettet</target>
+<target>Antal filer og mapper der oprettes</target>
 
 <source>Number of files that will be overwritten</source>
-<target>Antal filer der vil blive overskrevet</target>
+<target>Antal filer der overskrives</target>
 
 <source>Number of files and folders that will be deleted</source>
-<target>Antal filer og mapper der vil blive slettet</target>
+<target>Antal filer og mapper der slettes</target>
 
 <source>Total bytes to copy</source>
-<target>Samlet antal bytes der skal kopieres</target>
+<target>Antal bytes der kopieres</target>
 
 <source>Items found:</source>
-<target>Enheder fundet:</target>
+<target>Emner fundet:</target>
 
 <source>Speed:</source>
 <target>Hastighed:</target>
 
 <source>Time remaining:</source>
-<target>Tid tilbage:</target>
+<target>Resterende tid:</target>
 
 <source>Time elapsed:</source>
-<target>Tid forbrugt:</target>
+<target>Brugt tid:</target>
 
 <source>Batch job</source>
-<target>Batch job</target>
+<target>Batchfil</target>
 
 <source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Opret en batch fil for at automatiserer synkronisering. Dobbelt-klik på denne fil eller planlæg den i dit systems opgavestyring: FreeFileSync.exe <opgave navn>.ffs_batch</target>
+<target>Opret en batchfil til automatisk synkronisering. Dobbeltklik på filen eller brug systemets opgavestyring: FreeFileSync.exe <opgave navn>.ffs_batch</target>
 
 <source>Help</source>
 <target>Hjælp</target>
 
 <source>Error handling</source>
-<target>Fejl håndtering</target>
+<target>Fejlhåndtering</target>
 
 <source>Ignore</source>
 <target>Ignorer</target>
 
 <source>Hide all error and warning messages</source>
-<target>Skjul beskeder om fejl og advarsler</target>
+<target>Skjul fejlbeskeder og advarsler</target>
 
 <source>Pop-up</source>
-<target>Pop-up</target>
+<target>Besked</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target>Vis pop-up ved fejl eller advarsler</target>
+<target>Vis fejlbeskeder og advarsler</target>
 
 <source>Exit</source>
-<target>Afslut</target>
+<target>Luk</target>
 
 <source>Abort synchronization on first error</source>
 <target>Stop synkronisering ved første fejl</target>
 
 <source>On completion</source>
-<target></target>
+<target>Ved gennemført</target>
 
 <source>Show progress dialog</source>
-<target>Vis dialog boks</target>
+<target>Vis fremskridt</target>
 
 <source>Save log</source>
-<target></target>
+<target>Gem rapport</target>
 
 <source>Select folder to save log files</source>
-<target>Vælg destinations mappe til log filer</target>
+<target>Vælg mappe til rapporter</target>
 
 <source>Limit</source>
-<target>Grænse</target>
+<target>Antal</target>
 
 <source>Limit maximum number of log files</source>
-<target>Maksimale antal log filer</target>
+<target>Begræns antal rapporter</target>
 
 <source>Select variant</source>
-<target></target>
+<target>Vælg type</target>
 
 <source>
 Files are found equal if
@@ -577,14 +577,14 @@ Files are found equal if
 are the same
 </source>
 <target>
-Filer bliver set som ens hvis
-     - sidst skrevne tid og dato
-     - fil størrelse
-er ens
+Filer betragtes som ens hvis
+     - senest ændret
+     - filstørrelse
+er identisk
 </target>
 
 <source>File time and size</source>
-<target>Fil tid og størrelse</target>
+<target>Størrelse og tid</target>
 
 <source>
 Files are found equal if
@@ -592,46 +592,46 @@ Files are found equal if
 is the same
 </source>
 <target>
-Filer er ens hvis
-     - fil indhold
-er det samme
+Filer betragtes som ens hvis
+     - filindhold
+er identisk
 </target>
 
 <source>File content</source>
-<target>Fil indhold</target>
+<target>Indhold</target>
 
 <source>Symbolic Link handling</source>
-<target>Link håndtering</target>
+<target>Symlink håndtering</target>
 
 <source>OK</source>
 <target>OK</target>
 
 <source><- Two way -></source>
-<target></target>
+<target>< Tovejs ></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>find ændringer på begge sider via. database. Sletninger, omdøbninger og konflikter bliver automatisk fundet.</target>
+<target>Find og udbred ændringer på begge sider via en database. Sletninger, omdøbninger og konflikter opdages automatisk.</target>
 
 <source>Mirror ->></source>
-<target>Spejl ->></target>
+<target>Spejling >></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Spejling af venstre mappe. Højre mappe tilpasses så den ligner den venstre efter synkronisering.</target>
+<target>Spejl venstre mappe. Efter synkronisering er højre mappe en kopi af venstre.</target>
 
 <source>Update -></source>
-<target>Opdater -></target>
+<target>Opdater ></target>
 
 <source>Copy new or updated files to right folder.</source>
-<target>Kopier nye eller opdaterede filer til højre mappe.</target>
+<target>Kopier nye og opdaterede filer til højre mappe.</target>
 
 <source>Custom</source>
-<target>Brugerdefineret</target>
+<target>Tilpasset</target>
 
 <source>Configure your own synchronization rules.</source>
-<target>Konfigurer dine egne synkroniserings regler.</target>
+<target>Opret dine egne synkroniseringsregler.</target>
 
 <source>Deletion handling</source>
-<target>Slette håndtering</target>
+<target>Sletning</target>
 
 <source>Permanent</source>
 <target>Permanent</target>
@@ -640,61 +640,61 @@ er det samme
 <target>Slet eller overskriv filer permanent</target>
 
 <source>Recycle Bin</source>
-<target>Skralsespand</target>
+<target>Papirkurv</target>
 
 <source>Use Recycle Bin for deleted and overwritten files</source>
-<target></target>
+<target>Slettede og overskrevne filer flyttes til papirkurv</target>
 
 <source>Versioning</source>
 <target>Versionering</target>
 
 <source>Move time-stamped files into specified folder</source>
-<target>Flyt tids-stemplede filer til den valgte mappe</target>
+<target>Flyt tidsstemplede filer til valgte mappe</target>
 
 <source>Naming convention:</source>
-<target></target>
+<target>Navneregler:</target>
 
 <source>Configuration</source>
-<target>Konfiguration</target>
+<target>Indstilling</target>
 
 <source>Item exists on left side only</source>
-<target>Enheden findes kun på venstre side</target>
+<target>Emnet findes kun på venstre side</target>
 
 <source>Item exists on right side only</source>
-<target>Enheden findes kun på højre side</target>
+<target>Emnet findes kun på højre side</target>
 
 <source>Left side is newer</source>
-<target>Venstre side er nyest</target>
+<target>Venstre er nyest</target>
 
 <source>Right side is newer</source>
-<target>Højre side er nyest</target>
+<target>Højre er nyest</target>
 
 <source>Items have different content</source>
-<target>Enhederne har forskelligt indhold</target>
+<target>Emnerne har forskelligt indhold</target>
 
 <source>Conflict/item cannot be categorized</source>
-<target>Advarsel/enheden kan ikke kategoriseres</target>
+<target>Konflikt/ukendt emne</target>
 
 <source>Synchronizing...</source>
 <target>Synkroniserer...</target>
 
 <source>&Pause</source>
-<target>&Pause</target>
+<target>Pause</target>
 
-<source>Source code written in C++ utilizing:</source>
-<target>Source code skrevet i C++:</target>
+<source>Source code written in C++ using:</source>
+<target>Kildekoden er skrevet i C++ med hjælp fra:</target>
 
 <source>If you like FreeFileSync</source>
-<target>Hvis du kan lide FreeFileSync</target>
+<target>Er du glad for FreeFileSync</target>
 
 <source>Donate with PayPal</source>
-<target>Doner med PayPal</target>
+<target>Donér med PayPal</target>
 
 <source>Many thanks for localization:</source>
-<target>Mange tak for oversættelse til:</target>
+<target>Tak for oversættelse:</target>
 
 <source>Feedback and suggestions are welcome</source>
-<target>Feedback og forslag er velkomne</target>
+<target>Kritik og forslag er meget velkomne</target>
 
 <source>Homepage</source>
 <target>Hjemmeside</target>
@@ -703,7 +703,7 @@ er det samme
 <target>FreeFileSync på Sourceforge</target>
 
 <source>Email</source>
-<target>E-mail</target>
+<target>Email</target>
 
 <source>Published under the GNU General Public License</source>
 <target>Udgivet under GNU General Public Licence</target>
@@ -712,28 +712,28 @@ er det samme
 <target>Slet på begge sider</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
-<target>Slet på begge sider selvom der kun er valgt en side</target>
+<target>Slet på begge sider selvom selvom filen kun er valgt på en side</target>
 
 <source>
 Only files that match all filter settings will be synchronized.
 Note: File names must be relative to base directories!
 </source>
 <target>
-Synkroniserer kun filer der passer alle filtre.
-Note: Fil navne må skal passe til grund bibliotekerne!
+Synkroniserer kun filer der opfylder alle betingelser.
+Bemærk: Filnavne skal relatere til grundmapperne!
 </target>
 
 <source>Include</source>
 <target>Inkluder</target>
 
 <source>Exclude</source>
-<target>Udeluk</target>
+<target>Ekskluder</target>
 
 <source>Time span</source>
-<target>Tidsrum</target>
+<target>Tidsinterval</target>
 
 <source>File size</source>
-<target>Fil Størrelse</target>
+<target>Filstørrelse</target>
 
 <source>Minimum</source>
 <target>Minimum</target>
@@ -742,25 +742,25 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Maksimum</target>
 
 <source>&Default</source>
-<target>&Standard</target>
+<target>Standard</target>
 
 <source>Fail-safe file copy</source>
-<target>Fejlsikret fil kopiering</target>
+<target>Sikker filkopiering</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Skriv til en midlertidig fil (*.ffs_tmp) først så omdøb den. Dette garanterer sikkerheden selv ved en kritisk fejl.</target>
+<target>Skriv først til en midlertidig fil (*.ffs_tmp) og omdøb derefter. Dette garanterer sikkerheden selv ved fatale fejl.</target>
 
 <source>Copy locked files</source>
 <target>Kopier låste filer</target>
 
 <source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Kopier delte eller låste filer ved hjælp af Drev Kopi Servicen (Kræver Administrator rettigheder)</target>
+<target>Kopier delte eller låste filer ved hjælp af VVS (kræver administrative rettigheder)</target>
 
 <source>Copy file access permissions</source>
-<target>Kopier fil adgangs tilladelser</target>
+<target>Kopier adgangstilladelser</target>
 
 <source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Overfør fil og mappe tilladelser (Kræver Administrator rettigheder)</target>
+<target>Overfør fil- og mappetilladelser (kræver administrative rettigheder)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Gendan skjulte dialoger</target>
@@ -772,43 +772,43 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Beskrivelse</target>
 
 <source>Variant</source>
-<target>Variation</target>
+<target>Jobtype</target>
 
 <source>Statistics</source>
-<target>Statestik</target>
+<target>Statistik</target>
 
 <source>Don't show this dialog again</source>
-<target>Vis ikke denne dialog boks igen</target>
+<target>Vis ikke igen</target>
 
 <source>Find what:</source>
-<target>Find:</target>
+<target>Søg efter:</target>
 
 <source>Match case</source>
-<target>Sammenlign stor og små bogstaver</target>
+<target>Versalfølsom (a/A)</target>
 
 <source>&Find next</source>
-<target>&Find næste</target>
+<target>Find næste</target>
 
 <source>Operation aborted!</source>
-<target>Operation afbrudt!</target>
+<target>Handling afbrudt!</target>
 
 <source>Main bar</source>
-<target>Hoved værktøjslinjen</target>
+<target>Hovedlinie</target>
 
 <source>Folder pairs</source>
-<target>Mappe par</target>
+<target>Mappepar</target>
 
 <source>Overview</source>
-<target>Overblik</target>
+<target>Oversigt</target>
 
 <source>Filter files</source>
-<target>Filter filer</target>
+<target>Filtre</target>
 
 <source>Select view</source>
-<target>Vælg udseende</target>
+<target>Tilpas visning</target>
 
 <source>Set direction:</source>
-<target>Sæt handlevejen:</target>
+<target>Retning:</target>
 
 <source>Exclude temporarily</source>
 <target>Ekskluder midlertidigt</target>
@@ -817,10 +817,10 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Inkluder midlertidigt</target>
 
 <source>Exclude via filter:</source>
-<target>Ekskluder via filter:</target>
+<target>Ekskluder m. filter:</target>
 
 <source><multiple selection></source>
-<target><flere valg></target>
+<target><vælg flere></target>
 
 <source>Delete</source>
 <target>Slet</target>
@@ -835,19 +835,19 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Vis ikoner:</target>
 
 <source>Small</source>
-<target>Lille</target>
+<target>Små</target>
 
 <source>Medium</source>
-<target>Mellem</target>
+<target>Medium</target>
 
 <source>Large</source>
-<target>Stor</target>
+<target>Store</target>
 
 <source>Select time span...</source>
-<target>Vælg tidsområde...</target>
+<target>Vælg tidsinterval...</target>
 
 <source>Default view</source>
-<target>Standard tilstand</target>
+<target>Standardvisning</target>
 
 <source>Show "%x"</source>
 <target>Vis "%x"</target>
@@ -856,28 +856,28 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target><Sidste opgave></target>
 
 <source>Folder Comparison and Synchronization</source>
-<target>Mappe sammenligning og synkronisering</target>
+<target>Mappeanalyse og synkronisering</target>
 
 <source>Configuration saved!</source>
-<target>Konfiguration gemt!</target>
+<target>Indstillinger gemt!</target>
 
 <source>FreeFileSync batch</source>
-<target>FreeFileSync batch</target>
+<target>FreeFileSync batchfil</target>
 
 <source>Never save changes</source>
-<target>Gem aldrig ændringer</target>
+<target>Gem aldrig</target>
 
 <source>Do you want to save changes to %x?</source>
-<target>Ønsker du at gemme ændringerne til %x?</target>
+<target>Vil du gemme ændringer i %x?</target>
 
 <source>Do&n't save</source>
 <target>Gem ikke</target>
 
 <source>Configuration loaded!</source>
-<target>Konfiguration hentet!</target>
+<target>Indstillinger indlæst!</target>
 
 <source>Hide files that exist on left side only</source>
-<target>Skjul filder der kun findes på venstre side</target>
+<target>Skjul filer der kun findes på venstre side</target>
 
 <source>Show files that exist on left side only</source>
 <target>Vis filer der kun findes på venstre side</target>
@@ -889,16 +889,16 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Vis filer der kun findes på højre side</target>
 
 <source>Hide files that are newer on left</source>
-<target>Skjul filer der er nyere til venstre</target>
+<target>Skjul nyere filer på venstre side</target>
 
 <source>Show files that are newer on left</source>
-<target>Vis filer der er nyere til venstre</target>
+<target>Vis nyere filer på venstre side</target>
 
 <source>Hide files that are newer on right</source>
-<target>Skjul filer der er nyere til højre</target>
+<target>Skjul nyere filer på højre side</target>
 
 <source>Show files that are newer on right</source>
-<target>Vis filer der er nyere til højre</target>
+<target>Vis nyere filer på højre side</target>
 
 <source>Hide files that are equal</source>
 <target>Skjul ens filer</target>
@@ -919,66 +919,66 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Vis konflikter</target>
 
 <source>Hide files that will be created on the left side</source>
-<target>Skjul filer der vil blive oprettet til venstre</target>
+<target>Skjul filer der oprettes på venstre side</target>
 
 <source>Show files that will be created on the left side</source>
-<target>Vis filer der vil blive oprettet til venstre</target>
+<target>Vis filer der oprettes på venstre side</target>
 
 <source>Hide files that will be created on the right side</source>
-<target>Skjul filer der vil blive oprettet til højre</target>
+<target>Skjul filer der oprettes på højre side</target>
 
 <source>Show files that will be created on the right side</source>
-<target>Vis filer der vil blive oprettet til højre</target>
+<target>Vis filer der oprettes på højre side</target>
 
 <source>Hide files that will be deleted on the left side</source>
-<target>Skjul filer der bliver slettet til venstre</target>
+<target>Skjul filer der slettes på venstre side</target>
 
 <source>Show files that will be deleted on the left side</source>
-<target>Vis filer der bliver slettet til venstre</target>
+<target>Vis filer der slettes på venstre side</target>
 
 <source>Hide files that will be deleted on the right side</source>
-<target>Skjul filer der bliver slettet til højre</target>
+<target>Skjul filer der slettes på højre side</target>
 
 <source>Show files that will be deleted on the right side</source>
-<target>Vis filer der bliver slettet til højre</target>
+<target>Vis filer der slettes på højre side</target>
 
 <source>Hide files that will be overwritten on left side</source>
-<target>Skjul filer der bliver overskrevet til venstre</target>
+<target>Skjul filer der overskrives på venstre side</target>
 
 <source>Show files that will be overwritten on left side</source>
-<target>Vis filer der bliver overskrevet til venstre</target>
+<target>Vis filer der overskrives på venstre side</target>
 
 <source>Hide files that will be overwritten on right side</source>
-<target>Skjul filer der bliver overskrevet til højre</target>
+<target>Skjul filer der overskrives på højre side</target>
 
 <source>Show files that will be overwritten on right side</source>
-<target>Vis filer der bliver overskrevet til højre</target>
+<target>Vis filer der overskrives på højre side</target>
 
 <source>Hide files that won't be copied</source>
-<target>Skjul filer der ikke bliver kopieret</target>
+<target>Skjul filer der ikke kopieres</target>
 
 <source>Show files that won't be copied</source>
-<target>Vis filer der ikke bliver kopieret</target>
+<target>Vis filer der ikke kopieres</target>
 
 <source>All folders are in sync!</source>
-<target>Alle mapper er synkroniserede</target>
+<target>Alle mapper er synkrone</target>
 
 <source>Comma separated list</source>
-<target>Komma separeret list</target>
+<target>Kommaopdelt liste</target>
 
 <source>Legend</source>
-<target>Legend</target>
+<target>Definitioner</target>
 
 <source>File list exported!</source>
-<target>Fil listen er eksporteret!</target>
+<target>Fillisten blev eksporteret!</target>
 
 <source>
 <pluralform>Object deleted successfully!</pluralform>
 <pluralform>%x objects deleted successfully!</pluralform>
 </source>
 <target>
-<pluralform>Emnet er slettet!</pluralform>
-<pluralform>%x emner er slettet!</pluralform>
+<pluralform>Emnet blev slettet!</pluralform>
+<pluralform>%x emner blev slettet!</pluralform>
 </target>
 
 <source>
@@ -986,8 +986,8 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <pluralform>%x directories</pluralform>
 </source>
 <target>
-<pluralform>1 bibliotek</pluralform>
-<pluralform>%x biblioteker</pluralform>
+<pluralform>1 mappe</pluralform>
+<pluralform>%x mapper</pluralform>
 </target>
 
 <source>
@@ -1012,40 +1012,40 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Ignorer fremtidige fejl</target>
 
 <source>&Ignore</source>
-<target>&Ignorer</target>
+<target>Ignorer</target>
 
 <source>&Switch</source>
-<target>&Skift</target>
+<target>Skift</target>
 
 <source>Question</source>
 <target>Spørgsmål</target>
 
 <source>&Yes</source>
-<target>&Ja</target>
+<target>Ja</target>
 
 <source>&No</source>
-<target>&Nej</target>
+<target>Nej</target>
 
 <source>Scanning...</source>
 <target>Skanner...</target>
 
 <source>Comparing content...</source>
-<target>Sammenligner indhold...</target>
+<target>Analyserer indhold...</target>
 
 <source>Copy</source>
-<target></target>
+<target>Kopier</target>
 
 <source>Paused</source>
 <target>Pauset</target>
 
 <source>Initializing...</source>
-<target>Initialiserer...</target>
+<target>Forbereder...</target>
 
 <source>Aborted</source>
 <target>Afbrudt</target>
 
 <source>Completed</source>
-<target>Fuldført</target>
+<target>Gennemført</target>
 
 <source>Continue</source>
 <target>Fortsæt</target>
@@ -1054,7 +1054,7 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Pause</target>
 
 <source>Logging</source>
-<target>Logger</target>
+<target>Rapporter</target>
 
 <source>Cannot find %x</source>
 <target>Kan ikke finde %x</target>
@@ -1099,30 +1099,30 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Kopier NTFS tilladelser</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Integrere eksterne programme. Følgende macroer er mulige:</target>
+<target>Integrer eksterne programmer i kontekstmenu. Brug følgende macroer:</target>
 
 <source>- full file or folder name</source>
-<target>- fulde fil eller mappe navn</target>
+<target>Komplet fil- eller mappenavn</target>
 
 <source>- folder part only</source>
-<target>- kun mappe delen</target>
+<target>Kun mappedelen</target>
 
 <source>- Other side's counterpart to %item_path%</source>
-<target></target>
+<target>Modsat sides pendant til %item_path%</target>
 
 <source>- Other side's counterpart to %item_folder%</source>
-<target></target>
+<target>Modsat sides pendant til %item_folder%</target>
 
 <source>Make hidden warnings and dialogs visible again?</source>
-<target></target>
+<target>Vis skjulte advarsler og dialoger igen?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
 <pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Vil du flytte emnet til skraldespanden?</pluralform>
-<pluralform>Vil du flytte følgende %x emner til skraldespanden?</pluralform>
+<pluralform>Vil du flytte emnet til papirkurven?</pluralform>
+<pluralform>Vil du flytte følgende %x emner til papirkurven?</pluralform>
 </target>
 
 <source>
@@ -1135,25 +1135,25 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 </target>
 
 <source>Leave as unresolved conflict</source>
-<target>Efterlad som uløste konflikter</target>
+<target>Efterlad som uløst konflikt</target>
 
 <source>Replace</source>
-<target></target>
+<target>Erstat</target>
 
 <source>Move files and replace if existing</source>
-<target></target>
+<target>Flyt fil og erstat eventuelt eksisterende</target>
 
 <source>Append a timestamp to each file name</source>
-<target></target>
+<target>Føj tidsstempel til hvert filnavn</target>
 
 <source>Folder</source>
-<target></target>
+<target>Mappe</target>
 
 <source>File</source>
-<target></target>
+<target>Fil</target>
 
 <source>YYYY-MM-DD hhmmss</source>
-<target></target>
+<target>YYYY-MM-DD hhmmss</target>
 
 <source>Files</source>
 <target>Filer</target>
@@ -1162,10 +1162,10 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Procent</target>
 
 <source>Cannot monitor directory %x.</source>
-<target>Kan ikke overvåge biblioteket %x.</target>
+<target>Kan ikke overvåge mappen %x.</target>
 
 <source>Conversion error:</source>
-<target>Konverterings fejl:</target>
+<target>Konverteringsfejl:</target>
 
 <source>Cannot delete file %x.</source>
 <target>Kan ikke slette filen %x.</target>
@@ -1177,22 +1177,22 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Kan ikke flytte filen %x til %y.</target>
 
 <source>Cannot delete directory %x.</source>
-<target>Kan ikke slette biblioteket %x.</target>
+<target>Kan ikke slette mappen %x.</target>
 
 <source>Cannot write file attributes of %x.</source>
-<target>Kan ikke skrive fil attributter til %x.</target>
+<target>Kan ikke skrive filattributter til %x.</target>
 
 <source>Cannot write modification time of %x.</source>
-<target>Kan ikke opdatere ændringstiden på %x.</target>
+<target>Kan ikke opdatere tidsændring på %x.</target>
 
 <source>Cannot find system function %x.</source>
 <target>Kan ikke finde systemfunktionen %x.</target>
 
 <source>Cannot read security context of %x.</source>
-<target>Kan ikke læse sikkerhedsindstillingerne på %x.</target>
+<target>Kan ikke læse sikkerhedsindstillinger på %x.</target>
 
 <source>Cannot write security context of %x.</source>
-<target>Kan ikke skrive sikkerhedsindstillingerne på %x.</target>
+<target>Kan ikke skrive sikkerhedsindstillinger til %x.</target>
 
 <source>Cannot read permissions of %x.</source>
 <target>Kan ikke læse tilladelserne på %x.</target>
@@ -1201,25 +1201,25 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Kan ikke skrive tilladelserne til %x.</target>
 
 <source>Cannot create directory %x.</source>
-<target>Kan ikke oprette biblioteket %x.</target>
+<target>Kan ikke oprette mappen %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
-<target>Kan ikke kopiere linket %x til %y.</target>
+<target>Kan ikke kopiere symlinket %x til %y.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Kan ikke kopiere filen %x til %y.</target>
 
 <source>Type of item %x is not supported:</source>
-<target></target>
+<target>Filtypen %x understøttes ikke:</target>
 
 <source>Cannot open directory %x.</source>
-<target>Kan ikke åbne bibliotek %x.</target>
+<target>Kan ikke åbne mappen %x.</target>
 
 <source>Cannot enumerate directory %x.</source>
-<target>Kan ikke optælle biblioteket %x.</target>
+<target>Kan ikke optælle mappen %x.</target>
 
 <source>Detected endless directory recursion.</source>
-<target>Opdaget en uendelig biblioteks løkke.</target>
+<target>Uendelig mappegentagelse fundet.</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1244,7 +1244,7 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <pluralform>%x hours</pluralform>
 </source>
 <target>
-<pluralform>1 timer</pluralform>
+<pluralform>1 time</pluralform>
 <pluralform>%x timer</pluralform>
 </target>
 
@@ -1258,46 +1258,46 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 </target>
 
 <source>Cannot set privilege %x.</source>
-<target>Kan ikke sætte privilegier til %x.</target>
+<target>Kan ikke sætte %x privilegier.</target>
 
 <source>Unable to move %x to the Recycle Bin!</source>
-<target>Ude af stand til at flytte %x til skraldespanden!</target>
+<target>Kan ikke flytte %x til papirkurv!</target>
 
 <source>Both sides have changed since last synchronization!</source>
-<target>Begge sider er ændret siden sidste synkronisering!</target>
+<target>Begge sider ændret siden sidste synkronisering!</target>
 
 <source>Cannot determine sync-direction:</source>
-<target>Kan ikke bestemme synkroniseringsvej:</target>
+<target>Kan ikke bestemme retning:</target>
 
 <source>No change since last synchronization!</source>
 <target>Ingen ændringer siden sidste synkronisering!</target>
 
 <source>The corresponding database entries are not in sync considering current settings.</source>
-<target>Databasen er ikke synkroniseret i forhold til nuværende indstillinger.</target>
+<target>Databasen er ikke synkroniseret i forhold til aktuelle indstillinger.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
-<target>Sætter standard synkroniseringsvej: Gamle filer bliver overskrevet med nyere.</target>
+<target>Sætter standardretning: Gamle filer overskrives med nyere.</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Papirkurven kan ikke bruges på følgende stier! Filerne vil blive slettet permanent i stedet for:</target>
+<target>Papirkurven kan ikke bruges på følgende stier! Filer slettes permanent:</target>
 
 <source>You can ignore this error to consider the folder as empty.</source>
-<target>Du kan ignorere denne fejl og betegne mappen som tom.</target>
+<target>Du kan ignorere denne fejl og betragte mappen som tom.</target>
 
 <source>Cannot find folder %x.</source>
 <target>Kan ikke finde mappen %x.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
-<target>Biblioteker er afhængige! Vær forsigtig når du laver synkroniserings reglerne:</target>
+<target>Afhængige mapper! Vær forsigtig når du laver synkroniseringsregler:</target>
 
 <source>Start comparison</source>
-<target>Start sammenligning</target>
+<target>Start analyse</target>
 
 <source>Preparing synchronization...</source>
 <target>Forbereder synkronisering...</target>
 
 <source>Conflict detected:</source>
-<target>Konflik fundet:</target>
+<target>Konflikt fundet:</target>
 
 <source>File %x has an invalid date!</source>
 <target>Filen %x har en ugyldig dato!</target>
@@ -1306,28 +1306,28 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Filerne %x har den samme dato men forskellig størrelse!</target>
 
 <source>Items differ in attributes only</source>
-<target>Enheder der kun har attributter til forskel</target>
+<target>Enhederne har kun attributter til forskel</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
-<target>Linksene %x har samme dato men forskellige mål.</target>
+<target>Symlinkene %x har samme dato men forskellige mål.</target>
 
 <source>Comparing content of files %x</source>
 <target>Sammenligner indhold af filer %x</target>
 
 <source>Comparing files by content failed.</source>
-<target>Fejl i sammenligning af filernes indhold.</target>
+<target>Fejl ved analyse af filindhold.</target>
 
 <source>Generating file list...</source>
-<target>Laver fil liste...</target>
+<target>Opretter filliste...</target>
 
 <source>Both sides are equal</source>
 <target>Begge sider er ens</target>
 
 <source>Copy new item to left</source>
-<target>Kopiere nyt emne mod venstre</target>
+<target>Kopier nyt emne mod venstre</target>
 
 <source>Copy new item to right</source>
-<target>Kopiere nyt emne mod højre</target>
+<target>Kopier nyt emne mod højre</target>
 
 <source>Delete left item</source>
 <target>Slet emne til venstre</target>
@@ -1342,10 +1342,10 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>flyt filen til højre</target>
 
 <source>Overwrite left item</source>
-<target>Overskriv emne til venstre</target>
+<target>Overskriv venstre emne</target>
 
 <source>Overwrite right item</source>
-<target>Overskriv emne til højre</target>
+<target>Overskriv højre emne</target>
 
 <source>Do nothing</source>
 <target>Gør intet</target>
@@ -1360,22 +1360,22 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Flere...</target>
 
 <source>Deleting file %x</source>
-<target>Sletter fil %x</target>
+<target>Sletter filen %x</target>
 
 <source>Deleting folder %x</source>
-<target>Sletter mappe %x</target>
+<target>Sletter mappen %x</target>
 
 <source>Deleting symbolic link %x</source>
-<target>Sletter symbolks link %x</target>
+<target>Sletter symlinket %x</target>
 
 <source>Moving file %x to recycle bin</source>
-<target>Flytter fil %x til papirkurven</target>
+<target>Flytter filen %x til papirkurven</target>
 
 <source>Moving folder %x to recycle bin</source>
 <target>Flytter mappe %x til papirkurven</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target>Flytter link %x til papirkurven</target>
+<target>Flytter symlinket %x til papirkurven</target>
 
 <source>Moving file %x to %y</source>
 <target>Flytter filen %x til %y</target>
@@ -1384,52 +1384,52 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Flytter mappen %x til %y</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target>Flytter linket %x til %y</target>
+<target>Flytter symlinket %x til %y</target>
 
 <source>Removing old versions...</source>
-<target></target>
+<target>Fjerner gamle udgaver...</target>
 
 <source>Creating file %x</source>
 <target>Opretter filen %x</target>
 
 <source>Creating symbolic link %x</source>
-<target>Opretter linket %x</target>
+<target>Opretter symlinket %x</target>
 
 <source>Creating folder %x</source>
-<target>Opretter mappe %x</target>
+<target>Opretter mappen %x</target>
 
 <source>Overwriting file %x</source>
 <target>Overskriver filen %x</target>
 
 <source>Overwriting symbolic link %x</source>
-<target>Overskriver linket %x</target>
+<target>Overskriver symlinket %x</target>
 
 <source>Verifying file %x</source>
-<target>Verificerer fil %x</target>
+<target>Verificerer filen %x</target>
 
 <source>Updating attributes of %x</source>
-<target>Opdaterer attributter af %x</target>
+<target>Opdaterer attributter for %x</target>
 
 <source>Target folder %x already existing.</source>
-<target>Destinations mappen %x eksisterer allerede.</target>
+<target>Destinationsmappen %x findes allerede.</target>
 
 <source>Target folder input field must not be empty.</source>
-<target>Destinations mappe feltet må ikke være tomt.</target>
+<target>Destinationsmappen skal angives.</target>
 
 <source>Folder input field for versioning must not be empty.</source>
-<target>Mappe input feltet for versionering må ikke være tomt.</target>
+<target>Mappe til versionering skal angives.</target>
 
 <source>Source folder %x not found.</source>
-<target>Kilde mappen %x blev ikke fundet.</target>
+<target>Kildemappen %x blev ikke fundet.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
-<target></target>
+<target>Følgende emner har uløste konflikter og synkroniseres ikke:</target>
 
 <source>Significant difference detected:</source>
-<target>Betydelig forskel fundet:</target>
+<target>Markant forskel:</target>
 
 <source>More than 50% of the total number of files will be copied or deleted!</source>
-<target>Mere end 50% af det samlede antal filer vil blive kopieret eller slettet!</target>
+<target>Mere end 50% af af filerne kopieres eller slettes!</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Ikke nok ledig diskplads på:</target>
@@ -1441,7 +1441,7 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Tilgængeligt:</target>
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>En mappe som er en del af flere mappe parringer vil blive ændret. Gennemse venligst synkroniserings indstillingerne.</target>
+<target>Der ændres en mappe der tilhører flere mappepar. Kontroller dine synkroniseringsindstillinger.</target>
 
 <source>Left</source>
 <target>Venstre</target>
@@ -1450,11 +1450,11 @@ Note: Fil navne må skal passe til grund bibliotekerne!
 <target>Højre</target>
 
 <source>Synchronizing folder pair:</source>
-<target>Synkroniserer mappe par:</target>
+<target>Synkroniserer mappepar:</target>
 
 <source>Generating database...</source>
 <target>Opretter database...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
-<target>Data godkendelses fejl: Kilde og destinations fil har forskelligt indhold!</target>
+<target>Godkendelsesfejl: Kilde- og destinationsfil har forskelligt indhold!</target>
 

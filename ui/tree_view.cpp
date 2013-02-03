@@ -395,6 +395,12 @@ TreeView::NodeStatus TreeView::getStatus(size_t row) const
 
 void TreeView::expandNode(size_t row)
 {
+    if (getStatus(row) != TreeView::STATUS_REDUCED)
+    {
+        assert(false);
+        return;
+    }
+
     if (row < flatTree.size())
     {
         std::vector<TreeLine> newLines;
@@ -1005,6 +1011,7 @@ private:
             {
                 case WXK_LEFT:
                 case WXK_NUMPAD_LEFT:
+                case WXK_NUMPAD_SUBTRACT: //http://msdn.microsoft.com/en-us/library/ms971323.aspx#atg_keyboardshortcuts_windows_shortcut_keys
                     if (treeDataView_)
                         switch (treeDataView_->getStatus(row))
                         {
@@ -1022,6 +1029,7 @@ private:
 
                 case WXK_RIGHT:
                 case WXK_NUMPAD_RIGHT:
+                case WXK_NUMPAD_ADD:
                     if (treeDataView_)
                         switch (treeDataView_->getStatus(row))
                         {

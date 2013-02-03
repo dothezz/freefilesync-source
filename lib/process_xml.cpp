@@ -75,7 +75,7 @@ void setXmlType(XmlDoc& doc, XmlType type) //throw()
 
 wxString xmlAccess::getGlobalConfigFile()
 {
-    return toWx(zen::getConfigDir()) + wxT("GlobalSettings.xml");
+    return toWx(zen::getConfigDir()) + L"GlobalSettings.xml";
 }
 
 
@@ -761,6 +761,64 @@ void writeStruc(const ColumnAttributeNavi& value, XmlElement& output)
     out.attribute("Width",   value.offset_);
     out.attribute("Stretch", value.stretch_);
 }
+
+
+template <> inline
+bool readStruc(const XmlElement& input, ViewFilterDefault& value)
+{
+    XmlIn in(input);
+
+    bool success = true;
+    auto readAttr = [&](XmlIn& elemIn, const char name[], bool& v)
+    {
+        if (!elemIn.attribute(name, v))
+            success = false;
+    };
+
+    XmlIn catView = in["CategoryView"];
+    readAttr(catView, "LeftOnly"  , value.leftOnly);
+    readAttr(catView, "RightOnly" , value.rightOnly);
+    readAttr(catView, "LeftNewer" , value.leftNewer);
+    readAttr(catView, "RightNewer", value.rightNewer);
+    readAttr(catView, "Different" , value.different);
+    readAttr(catView, "Equal"     , value.equal);
+    readAttr(catView, "Conflict"  , value.conflict);
+
+    XmlIn actView = in["ActionView"];
+    readAttr(actView, "CreateLeft" , value.createLeft);
+    readAttr(actView, "CreateRight", value.createRight);
+    readAttr(actView, "UpdateLeft" , value.updateLeft);
+    readAttr(actView, "UpdateRight", value.updateRight);
+    readAttr(actView, "DeleteLeft" , value.deleteLeft);
+    readAttr(actView, "DeleteRight", value.deleteRight);
+    readAttr(actView, "DoNothing"  , value.doNothing);
+
+    return success; //[!] avoid short-circuit evaluation above
+}
+
+template <> inline
+void writeStruc(const ViewFilterDefault& value, XmlElement& output)
+{
+    XmlOut out(output);
+
+    XmlOut catView = out["CategoryView"];
+    catView.attribute("LeftOnly"  , value.leftOnly);
+    catView.attribute("RightOnly" , value.rightOnly);
+    catView.attribute("LeftNewer" , value.leftNewer);
+    catView.attribute("RightNewer", value.rightNewer);
+    catView.attribute("Different" , value.different);
+    catView.attribute("Equal"     , value.equal);
+    catView.attribute("Conflict"  , value.conflict);
+
+    XmlOut actView = out["ActionView"];
+    actView.attribute("CreateLeft" , value.createLeft);
+    actView.attribute("CreateRight", value.createRight);
+    actView.attribute("UpdateLeft" , value.updateLeft);
+    actView.attribute("UpdateRight", value.updateRight);
+    actView.attribute("DeleteLeft" , value.deleteLeft);
+    actView.attribute("DeleteRight", value.deleteRight);
+    actView.attribute("DoNothing"  , value.doNothing);
+}
 }
 
 
@@ -798,8 +856,12 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
         in["CustomDeletionFolder"](syncCfg.versioningDirectory);//obsolete name
     else
         in["VersioningFolder"](syncCfg.versioningDirectory);
+
     warn_static("remove after migration?")
-    if (in["VersioningStyle"]) //new parameter
+    if (in["VersioningFolder"] &&
+        in["VersioningFolder"].get()->getAttribute("Style", syncCfg.versioningStyle)) //new parameter, do not complain when missing
+        ;
+    else if (in["VersioningStyle"]) //obsolete name
         in["VersioningStyle"](syncCfg.versioningStyle);
     else
         syncCfg.versioningStyle = VER_STYLE_ADD_TIMESTAMP; //obsolete fallback
@@ -921,7 +983,16 @@ void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
         inGuiCfg["HideExcluded"](config.hideExcludedItems);
 
     inGuiCfg["HandleError"      ](config.handleError);
-    inGuiCfg["SyncPreviewActive"](config.showSyncAction);
+
+    warn_static("remove after migration?")
+    if (inGuiCfg["SyncPreviewActive"]) //obsolete name
+        inGuiCfg["SyncPreviewActive"](config.showSyncAction);
+    else
+    {
+        std::string val;
+        if (inGuiCfg["MiddleGridView"](val)) //refactor into enum!?
+            config.showSyncAction = val == "Action";
+    }
 }
 
 
@@ -1003,7 +1074,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inWnd.attribute("Maximized", config.gui.isMaximized);
 
     XmlIn inManualDel = inWnd["ManualDeletion"];
-    inManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
+    //inManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
     inManualDel.attribute("UseRecycler"      , config.gui.useRecyclerForManualDeletion);
 
     inWnd["CaseSensitiveSearch"    ](config.gui.textSearchRespectCase);
@@ -1031,7 +1102,8 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inColRight(config.gui.columnAttribRight);
     //###########################################################
 
-    inWnd["Layout"](config.gui.guiPerspectiveLast);
+    inWnd["ViewFilterDefault"](config.gui.viewFilterDefault);
+    inWnd["Layout"           ](config.gui.guiPerspectiveLast);
 
     //load config file history
     warn_static("remove after migration?")
@@ -1140,7 +1212,7 @@ void writeConfig(const SyncConfig& syncCfg, XmlOut& out)
     out["DeletionPolicy"  ](syncCfg.handleDeletion);
     out["VersioningFolder"](syncCfg.versioningDirectory);
     //out["VersioningFolder"].attribute("Limit", syncCfg.versionCountLimit);
-    out["VersioningStyle"](syncCfg.versioningStyle);
+    out["VersioningFolder"].attribute("Style", syncCfg.versioningStyle);
 }
 
 
@@ -1234,9 +1306,9 @@ void writeConfig(const XmlGuiConfig& config, XmlOut& out)
     //write GUI specific config data
     XmlOut outGuiCfg = out["GuiConfig"];
 
-    outGuiCfg["HideExcluded"     ](config.hideExcludedItems);
-    outGuiCfg["HandleError"      ](config.handleError);
-    outGuiCfg["SyncPreviewActive"](config.showSyncAction);
+    outGuiCfg["HideExcluded"  ](config.hideExcludedItems);
+    outGuiCfg["HandleError"   ](config.handleError);
+    outGuiCfg["MiddleGridView"](config.showSyncAction ? "Action" : "Category"); //refactor into enum!?
 }
 
 void writeConfig(const XmlBatchConfig& config, XmlOut& out)
@@ -1296,7 +1368,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outWnd.attribute("Maximized", config.gui.isMaximized);
 
     XmlOut outManualDel = outWnd["ManualDeletion"];
-    outManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
+    //outManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
     outManualDel.attribute("UseRecycler"      , config.gui.useRecyclerForManualDeletion);
 
     outWnd["CaseSensitiveSearch"     ](config.gui.textSearchRespectCase);
@@ -1323,7 +1395,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outColRight(config.gui.columnAttribRight);
     //###########################################################
 
-    outWnd["Layout"](config.gui.guiPerspectiveLast);
+    outWnd["ViewFilterDefault"](config.gui.viewFilterDefault);
+    outWnd["Layout"           ](config.gui.guiPerspectiveLast);
 
     //load config file history
     outGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);

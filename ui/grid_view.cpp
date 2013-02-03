@@ -75,7 +75,7 @@ void GridView::updateView(Predicate pred)
                 //"this->" required by two-pass lookup as enforced by GCC 4.7
 
                 //save row position to identify first child *on sorted subview* of DirMapping or BaseDirMapping in case latter are filtered out
-                const HierarchyObject* parent = &(fsObj->parent());
+                const HierarchyObject* parent = &fsObj->parent();
                 for (;;) //map all yet unassociated parents to this row
                 {
                     const auto rv = this->rowPositionsFirstChild.insert(std::make_pair(parent, viewRef.size()));

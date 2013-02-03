@@ -33,8 +33,11 @@
 
 namespace zen
 {
-//until std::async is available:
 /*
+std::async replacement without crappy semantics: 
+	1. guaranteed to run asynchronous 
+	2. does not follow C++11 [futures.async], Paragraph 5, where std::future waits for thread in destructor
+
 Example:
         Zstring dirname = ...
         auto ft = zen::async([=](){ return zen::dirExists(dirname); });
@@ -93,10 +96,13 @@ private:
 template <class T, class Function> inline
 auto async2(Function fun) -> boost::unique_future<T> //support for workaround of VS2010 bug: bool (*fun)();  decltype(fun()) == int!
 {
-    boost::packaged_task<T> pt(std::move(fun)); //packaged task seems to even require r-value reference: https://sourceforge.net/p/freefilesync/bugs/234/
+#if defined BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK //mirror "boost/thread/future.hpp", hopefully they know what they're doing
+    boost::packaged_task<T()> pt(std::move(fun)); //packaged task seems to even require r-value reference: https://sourceforge.net/p/freefilesync/bugs/234/
+#else
+    boost::packaged_task<T> pt(std::move(fun)); 
+#endif
     auto fut = pt.get_future();
-    boost::thread t(std::move(pt));
-    t.detach(); //we have to be explicit since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
+    boost::thread(std::move(pt)).detach(); //we have to explicitly detach since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!
     return std::move(fut); //compiler error without "move", why needed???
 }
 

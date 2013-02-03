@@ -67,7 +67,7 @@ protected:
         refNumbers(numbersTotal_, currentPhase_) = std::make_pair(objectsTotal, dataTotal);
     }
 
-    virtual void updateProcessedData(int objectsDelta, Int64 dataDelta) { updateData(numbersCurrent_, objectsDelta, dataDelta); } //note: these methods should NOT throw in order
+    virtual void updateProcessedData(int objectsDelta, Int64 dataDelta) { updateData(numbersCurrent_, objectsDelta, dataDelta); } //note: these methods MUST NOT throw in order
     virtual void updateTotalData    (int objectsDelta, Int64 dataDelta) { updateData(numbersTotal_  , objectsDelta, dataDelta); } //to properly allow undoing setting of statistics!
 
     virtual void requestUiRefresh()

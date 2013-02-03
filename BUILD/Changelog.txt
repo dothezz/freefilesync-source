@@ -2,6 +2,22 @@
 |FreeFileSync|
 --------------
 
+Changelog v5.12
+---------------
+Dynamic statistics adjustment during synchronization
+Allow to save active view filter settings as default (context menu)
+Stay responsive while checking recycle bin existence on slow disks
+Reset option "Delete on both sides" upon each manual deletion
+Added context menu to allow deletion of last used configurations
+Support numpad add/subtract keys for overview tree
+Revised external application integration
+Call external applications for multiple selected items
+Automatically schedule abandoned recycle bin temp directories (.ffs_tmp) for deletion
+Binary comparison speed estimate considers errors and short-circuit evaluation
+Use full time window of sync phase when calculating overall speed
+Added Arabic language
+
+
 Changelog v5.11
 ---------------
 New file versioning scheme: move to folder replacing existing files
@@ -208,7 +224,7 @@ Support Ctrl + A in filter dialog
 Support large filter lists > 32 kByte
 Allow to hide file icons
 Avoid switching monitor when main dialog is maximized on multiple monitor systems
-Improved huge XML files loading times by a factor of 3000, saving by a factor of 3
+Improved huge XML file loading times by a factor of 3000, saving by a factor of 3
 Restore grid scroll position after repeated comparisons
 Show log after sync when non-fatal errors occurred
 Fixed crash in UTF8 conversion when processing a corrupted ffs_db file

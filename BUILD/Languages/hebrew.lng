@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>התקבלה בקשת ביטול: מחכה לפעולה הנוכחית להסתיים...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>נכשל ייצור תג זמן עבור עדכון גרסאות</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -681,7 +681,7 @@ is the same
 <source>&Pause</source>
 <target>&עצור</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>קוד מקור נכתב ב- C++ באמצעות:</target>
 
 <source>If you like FreeFileSync</source>

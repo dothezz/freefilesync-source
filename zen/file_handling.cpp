@@ -479,8 +479,7 @@ Zstring findUnused8Dot3Name(const Zstring& filename) //find a unique 8.3 short n
         if (!somethingExists(output)) //ensure uniqueness
             return output;
     }
-
-    throw std::runtime_error(std::string("100000000 files, one for each number, exist in this directory? You're kidding...\n") + utfCvrtTo<std::string>(pathPrefix));
+    throw std::runtime_error(std::string("100000000 files, one for each number, exist in this directory? You're kidding...") + utfCvrtTo<std::string>(pathPrefix));
 }
 
 
@@ -566,10 +565,12 @@ void zen::renameFile(const Zstring& oldName, const Zstring& newName) //throw Fil
 }
 
 
-class FilesDirsOnlyTraverser : public zen::TraverseCallback
+namespace
+{
+class CollectFilesFlat : public zen::TraverseCallback
 {
 public:
-    FilesDirsOnlyTraverser(std::vector<Zstring>& files, std::vector<Zstring>& dirs) :
+    CollectFilesFlat(std::vector<Zstring>& files, std::vector<Zstring>& dirs) :
         m_files(files),
         m_dirs(dirs) {}
 
@@ -593,19 +594,17 @@ public:
     virtual HandleError onError(const std::wstring& msg) { throw FileError(msg); }
 
 private:
-    FilesDirsOnlyTraverser(const FilesDirsOnlyTraverser&);
-    FilesDirsOnlyTraverser& operator=(const FilesDirsOnlyTraverser&);
+    CollectFilesFlat(const CollectFilesFlat&);
+    CollectFilesFlat& operator=(const CollectFilesFlat&);
 
     std::vector<Zstring>& m_files;
     std::vector<Zstring>& m_dirs;
 };
 
 
-void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
+void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) //throw FileError
 {
-    //no error situation if directory is not existing! manual deletion relies on it!
-    if (!somethingExists(directory))
-        return; //neither directory nor any other object (e.g. broken symlink) with that name existing
+    assert(somethingExists(directory)); //[!]
 
 #ifdef FFS_WIN
     const Zstring directoryFmt = applyLongPathPrefix(directory); //support for \\?\-prefix
@@ -617,53 +616,64 @@ void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
     //attention: check if directory is a symlink! Do NOT traverse into it deleting contained files!!!
     if (symlinkExists(directory)) //remove symlink directly
     {
+        if (callback) callback->onBeforeDirDeletion(directory); //once per symlink
 #ifdef FFS_WIN
         if (!::RemoveDirectory(directoryFmt.c_str()))
 #elif defined FFS_LINUX
         if (::unlink(directory.c_str()) != 0)
 #endif
             throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
-
-        if (callback)
-            callback->notifyDirDeletion(directory); //once per symlink
-        return;
     }
-
-    std::vector<Zstring> fileList;
-    std::vector<Zstring> dirList;
+    else
     {
-        //get all files and directories from current directory (WITHOUT subdirectories!)
-        FilesDirsOnlyTraverser traverser(fileList, dirList);
-        traverseFolder(directory, traverser); //don't follow symlinks
-    }
+        std::vector<Zstring> fileList;
+        std::vector<Zstring> dirList;
+        {
+            //get all files and directories from current directory (WITHOUT subdirectories!)
+            CollectFilesFlat cff(fileList, dirList);
+            traverseFolder(directory, cff); //don't follow symlinks
+        }
 
-    //delete directories recursively
-    for (auto it = dirList.begin(); it != dirList.end(); ++it)
-        removeDirectory(*it, callback); //call recursively to correctly handle symbolic links
+        //delete directories recursively
+        std::for_each(dirList.begin(), dirList.end(),
+                      [&](const Zstring& dirname)
+        {
+            removeDirectoryImpl(dirname, callback); //throw FileError; call recursively to correctly handle symbolic links
+        });
 
-    //delete files
-    for (auto it = fileList.begin(); it != fileList.end(); ++it)
-    {
-        const bool workDone = removeFile(*it);
-        if (callback && workDone)
-            callback->notifyFileDeletion(*it); //call once per file
-    }
+        //delete files
+        std::for_each(fileList.begin(), fileList.end(),
+                      [&](const Zstring& filename)
+        {
+            if (callback) callback->onBeforeFileDeletion(filename); //call once per file
+            removeFile(filename); //throw FileError
+        });
 
-    //parent directory is deleted last
+        //parent directory is deleted last
+        if (callback) callback->onBeforeDirDeletion(directory); //and once per folder
 #ifdef FFS_WIN
-    if (!::RemoveDirectory(directoryFmt.c_str()))
+        if (!::RemoveDirectory(directoryFmt.c_str()))
 #else
-    if (::rmdir(directory.c_str()) != 0)
+        if (::rmdir(directory.c_str()) != 0)
 #endif
-        throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
-    //may spuriously fail with ERROR_DIR_NOT_EMPTY(145) even though all child items have
-    //successfully been *marked* for deletion, but some application still has a handle open!
-    //e.g. Open "C:\Test\Dir1\Dir2" (filled with lots of files) in Explorer, then delete "C:\Test\Dir1" via ::RemoveDirectory() => Error 145
-    //Sample code: http://us.generation-nt.com/answer/createfile-directory-handles-removing-parent-help-29126332.html
-
-    if (callback)
-        callback->notifyDirDeletion(directory); //and once per folder
+            throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
+        //may spuriously fail with ERROR_DIR_NOT_EMPTY(145) even though all child items have
+        //successfully been *marked* for deletion, but some application still has a handle open!
+        //e.g. Open "C:\Test\Dir1\Dir2" (filled with lots of files) in Explorer, then delete "C:\Test\Dir1" via ::RemoveDirectory() => Error 145
+        //Sample code: http://us.generation-nt.com/answer/createfile-directory-handles-removing-parent-help-29126332.html
+    }
 }
+}
+
+
+void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
+{
+    //no error situation if directory is not existing! manual deletion relies on it!
+    if (!somethingExists(directory))
+        return; //neither directory nor any other object (e.g. broken symlink) with that name existing
+    removeDirectoryImpl(directory, callback);
+}
+
 
 
 void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, ProcSymlink procSl) //throw FileError
@@ -917,11 +927,6 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
         assert(::CompareFileTime(&creationTimeDbg,  &creationTime)  == 0);
         assert(::CompareFileTime(&lastWriteTimeDbg, &lastWriteTime) == 0);
     }
-    //CAVEAT on FAT/FAT32: the sequence of deleting the target file and renaming "file.txt.ffs_tmp" to "file.txt" seems to
-    //NOT PRESERVE the creation time of the .ffs_tmp file, but "reuses" whatever creation time the old "file.txt" had!
-    //this problem is therefore NOT detected by the check above!
-    //However during the next comparison the DST hack will be applied correctly.
-
 #endif
 
 #elif defined FFS_LINUX
@@ -2302,6 +2307,27 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
         //rename temporary file:
         //perf: this call is REALLY expensive on unbuffered volumes! ~40% performance decrease on FAT USB stick!
         renameFile(temporary, targetFile); //throw FileError
+
+        /*
+        CAVEAT on FAT/FAT32: the sequence of deleting the target file and renaming "file.txt.ffs_tmp" to "file.txt" does
+        NOT PRESERVE the creation time of the .ffs_tmp file, but SILENTLY "reuses" whatever creation time the old "file.txt" had!
+        This "feature" is called "File System Tunneling":
+        http://blogs.msdn.com/b/oldnewthing/archive/2005/07/15/439261.aspx
+        http://support.microsoft.com/kb/172190/en-us
+
+        However during the next comparison the DST hack will be applied correctly since the DST-hash of the mod.time is invalid.
+
+        EXCEPTION: the hash may match!!! reproduce:
+        1. set system time back to date within previous DST
+        2. save some file on FAT32 usb stick and FFS-compare to make sure the DST hack is applied correctly
+        4. pull out usb stick, put back in
+        3. restore system time
+        4. copy file from USB to local drive via explorer
+        =>
+        NTFS <-> FAT, file exists on both sides; mod times match, DST hack on USB stick causes 1-hour offset when comparing in FFS.
+        When syncing modification time is copied correctly, but new DST hack fails to apply and old creation time is reused (see above).
+        Unfortunately, the old DST hash matches mod time! => On next comparison FFS will *still* see both sides as different!!!!!!!!!
+        */
 
         guardTempFile.dismiss();
     }

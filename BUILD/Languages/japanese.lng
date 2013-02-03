@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>ユーザによる中断: 現在の処理を終了しています.. お待ちください...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>バージョン付けのタイムスタンプ作成に失敗:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -678,7 +678,7 @@ is the same
 <source>&Pause</source>
 <target>一時停止(&P)</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>ソースコードは C++ で書かれています</target>
 
 <source>If you like FreeFileSync</source>

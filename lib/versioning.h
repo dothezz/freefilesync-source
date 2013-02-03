@@ -17,6 +17,7 @@
 
 namespace zen
 {
+struct CallbackMoveDir;
 struct CallbackMoveFile;
 
 //e.g. move C:\Source\subdir\Sample.txt -> D:\Revisions\subdir\Sample.txt 2012-05-15 131513.txt
@@ -42,15 +43,18 @@ public:
         timeStamp_(formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp)) //e.g. "2012-05-15 131513"
     {
         if (timeStamp_.size() != 17) //formatTime() returns empty string on error; unexpected length: e.g. problem in year 10000!
-            throw FileError(_("Failure to create time stamp for versioning:") + L" \'" + timeStamp_ + L"\'");
+            throw FileError(_("Failure to create timestamp for versioning:") + L" \'" + timeStamp_ + L"\'");
     }
 
-    void revisionFile(const Zstring& sourceFile, const Zstring& relativeName, CallbackMoveFile& callback); //throw FileError
-    void revisionDir (const Zstring& sourceDir,  const Zstring& relativeName, CallbackMoveFile& callback); //throw FileError
+    bool revisionFile(const Zstring& sourceFile, const Zstring& relativeName, CallbackMoveFile& callback); //throw FileError; return "false" if file is not existing
+    void revisionDir (const Zstring& sourceDir,  const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
 
     //void limitVersions(std::function<void()> updateUI); //throw FileError; call when done revisioning!
 
 private:
+    bool revisionFileImpl(const Zstring& sourceFile, const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
+    void revisionDirImpl (const Zstring& sourceDir,  const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
+
     const VersioningStyle versioningStyle_;
     const Zstring versioningDirectory_;
     const Zstring timeStamp_;
@@ -59,22 +63,20 @@ private:
 };
 
 
-struct CallbackMoveFile
+struct CallbackMoveFile //see CallbackCopyFile for limitations when throwing exceptions!
 {
-    virtual ~CallbackMoveFile() {} //see CallbackCopyFile for limitations when throwing exceptions!
-
-    virtual void onBeforeFileMove(const Zstring& fileFrom, const Zstring& fileTo) = 0; //one call before each (planned) move
-    virtual void onBeforeDirMove (const Zstring& dirFrom,  const Zstring& dirTo ) = 0; //
-    virtual void objectProcessed() = 0; //one call after each completed move (count objects total)
-
-    //called frequently if move has to revert to copy + delete:
-    virtual void updateStatus(Int64 bytesDelta) = 0;
+    virtual ~CallbackMoveFile() {}
+    virtual void updateStatus(Int64 bytesDelta) = 0; //called frequently if move has to revert to copy + delete:
 };
 
+struct CallbackMoveDir //see CallbackCopyFile for limitations when throwing exceptions!
+{
+    virtual ~CallbackMoveDir() {}
 
-
-
-
+    virtual void onBeforeFileMove(const Zstring& fileFrom, const Zstring& fileTo) = 0; //one call for each *existing* object!
+    virtual void onBeforeDirMove (const Zstring& dirFrom,  const Zstring& dirTo ) = 0; //
+    virtual void updateStatus(Int64 bytesDelta) = 0; //called frequently if move has to revert to copy + delete:
+};
 
 
 

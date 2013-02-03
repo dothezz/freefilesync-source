@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Tha thu airson sgur dheth: A' feitheamh gus an crìochnaich an gnìomh làithreach...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Cha b' urrainn dhuinn stampa-ama a chruthachadh airson versioning:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -686,7 +686,7 @@ Bidh dà fhaidhle co-ionnann 'nar beachd-sa
 <source>&Pause</source>
 <target>&Cuir 'na stad</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Chaidh an còd tùsail a sgrìobhadh ann an C++ le taic:</target>
 
 <source>If you like FreeFileSync</source>

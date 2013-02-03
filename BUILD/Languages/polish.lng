@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Żądanie przerwania: Oczekiwanie na koniec aktualnie wykonywanego zadania...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Nie można utworzyć sygnatury czasu na potrzeby wersjonowania:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -684,7 +684,7 @@ jest identyczna
 <source>&Pause</source>
 <target>&Pauza</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Kod stworzony w C++ z wykorzystaniem:</target>
 
 <source>If you like FreeFileSync</source>

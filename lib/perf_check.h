@@ -21,7 +21,6 @@ public:
 
     wxString getRemainingTime(double dataRemaining) const;
     wxString getBytesPerSecond() const; //for window
-    wxString getOverallBytesPerSecond() const; //for all samples
 
 private:
     const long windowSizeRemTime; //unit: [ms]

@@ -146,7 +146,7 @@ T confineCpy(const T& val, const T& minVal, const T& maxVal)
 }
 
 template <class T> inline
-void confine(T& val, const T& minVal, const T& maxVal) //name trim?
+void confine(T& val, const T& minVal, const T& maxVal) //name trim, clamp?
 {
     assert(minVal <= maxVal);
     if (val < minVal)

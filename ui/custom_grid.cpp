@@ -1171,7 +1171,7 @@ private:
             toolTip.hide(); //if invalid row...
     }
 
-    virtual wxString getToolTip(ColumnType colType) const { return showSyncAction_ ? _("Action") : _("Category"); }
+    virtual wxString getToolTip(ColumnType colType) const { return showSyncAction_ ? _("Action") + L" (F8)" : _("Category") + L" (F8)"; }
 
     bool showSyncAction_;
     std::unique_ptr<std::pair<size_t, BlockPosition>> highlight; //(row, block) current mouse highlight

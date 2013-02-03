@@ -16,7 +16,7 @@ namespace zen
 struct CompareCallback
 {
     virtual ~CompareCallback() {}
-    virtual void updateCompareStatus(UInt64 totalBytes) = 0;
+    virtual void updateCompareStatus(Int64 bytesDelta) = 0;
 };
 
 bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback); //throw FileError

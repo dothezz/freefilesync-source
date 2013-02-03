@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Запрос отмены: Ожидайте, пока текущая операция завершится...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Неспособность создать отметку времени для архивации файлов:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -682,7 +682,7 @@ is the same
 <source>&Pause</source>
 <target>&Пауза</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Исходный код написан на C++ с использованием:</target>
 
 <source>If you like FreeFileSync</source>

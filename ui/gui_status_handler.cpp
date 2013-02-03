@@ -250,7 +250,7 @@ SyncStatusHandler::~SyncStatusHandler()
             showFinalResults = false; //take precedence over current visibility status
         else if (!finalCommand.empty())
         {
-            auto cmdexp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(finalCommand)));
+            auto cmdexp = expandMacros(utfCvrtTo<Zstring>(finalCommand));
             shellExecute(cmdexp);
         }
     }
@@ -283,7 +283,7 @@ void SyncStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase ph
 void SyncStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
 {
     StatusHandler::updateProcessedData(objectsDelta, dataDelta);
-    syncStatusFrame.reportCurrentBytes(getDataCurrent(currentPhase())); //throw ()
+    syncStatusFrame.notifyProgressChange(); //noexcept
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!
 }
 
@@ -410,7 +410,7 @@ void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& 
 
 void SyncStatusHandler::forceUiRefresh()
 {
-    syncStatusFrame.updateProgress();
+    syncStatusFrame.updateGui();
 }
 
 

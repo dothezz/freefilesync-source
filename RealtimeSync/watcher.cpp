@@ -72,7 +72,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
         {
             //a non-existent network path may block, so check existence asynchronously!
             auto ftDirExists = async([=] { return zen::dirExists(dirnameFmt); });
-            while (!ftDirExists.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL)))
+            while (!ftDirExists.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
                 statusHandler.requestUiRefresh(); //may throw!
             if (!ftDirExists.get())
                 return WaitResult(dirnameFmt);
@@ -151,7 +151,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, 
             }
         }
 
-        boost::this_thread::sleep(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL));
+        boost::this_thread::sleep(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL / 2));
         statusHandler.requestUiRefresh(true); //throw ?: may start sync at this presumably idle time
     }
 }
@@ -178,7 +178,7 @@ void rts::waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt, WaitCal
                 //2. check dir existence
                 return zen::dirExists(dirnameFmt);
             });
-            while (!ftDirExisting.timed_wait(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL)))
+            while (!ftDirExisting.timed_wait(boost::posix_time::milliseconds(rts::UI_UPDATE_INTERVAL / 2)))
                 statusHandler.requestUiRefresh(); //may throw!
 
             if (!ftDirExisting.get())
@@ -191,10 +191,11 @@ void rts::waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt, WaitCal
             return;
 
         //wait some time...
-        assert_static(1000 * CHECK_DIR_INTERVAL % UI_UPDATE_INTERVAL == 0);
-        for (int i = 0; i < 1000 * CHECK_DIR_INTERVAL / UI_UPDATE_INTERVAL; ++i)
+        const int refreshInterval = UI_UPDATE_INTERVAL / 2;
+        assert_static(1000 * CHECK_DIR_INTERVAL % refreshInterval == 0);
+        for (int i = 0; i < 1000 * CHECK_DIR_INTERVAL / refreshInterval; ++i)
         {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(refreshInterval));
             statusHandler.requestUiRefresh();
         }
     }

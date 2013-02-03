@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Avbryter: Väntar på att aktuell process skall slutföras...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Kunde inte skapa tidsstämpel för versionshantering</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -681,7 +681,7 @@ Filerna betecknas som lika om,
 <source>&Pause</source>
 <target>&Paus</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Källkod skriven i C++ med hjälp av:</target>
 
 <source>If you like FreeFileSync</source>

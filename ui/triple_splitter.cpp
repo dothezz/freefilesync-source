@@ -198,8 +198,12 @@ void TripleSplitter::onMouseMovement(wxMouseEvent& event)
     }
     else
     {
-        //we receive those only while above the sash, not the managed windows!
-        SetCursor(wxCURSOR_SIZEWE); //set window-local only!
+        //we receive those only while above the sash, not the managed windows (except when the managed windows are disabled!)
+        const int posX = event.GetPosition().x;
+        if (hitOnSashLine(posX))
+            SetCursor(wxCURSOR_SIZEWE); //set window-local only!
+        else
+            SetCursor(*wxSTANDARD_CURSOR);
     }
     event.Skip();
 }

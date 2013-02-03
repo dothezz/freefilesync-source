@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>中止請求：正在等待目前操作完成...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>無法新建時間戳記的版本控制：</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -669,7 +669,7 @@ is the same
 <source>&Pause</source>
 <target>暫停(&P)</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>使用C++編寫的原始碼</target>
 
 <source>If you like FreeFileSync</source>

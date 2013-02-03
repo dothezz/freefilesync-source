@@ -42,13 +42,14 @@ enum StatusRecycler
     STATUS_REC_UNKNOWN
 };
 StatusRecycler recycleBinStatus(const Zstring& pathName); //test existence of Recycle Bin API for certain path
+//Win: blocks heavily if recycle bin is really full and drive is slow!!!
 
 struct CallbackRecycling
 {
     virtual ~CallbackRecycling() {}
 
     //may throw: first exception is swallowed, updateStatus() is then called again where it should throw again and the exception will propagate as expected
-    virtual void updateStatus(const Zstring& currentItem) = 0;
+    virtual void updateStatus(const Zstring& currentItem) = 0; //currentItem may be empty
 };
 
 void recycleOrDelete(const std::vector<Zstring>& filenames, //throw FileError, return "true" if file/dir was actually deleted

@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>사용자에 의한 작업 중단 : 현재 작업 종료 대기 중...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>버저닝을 위한 타임 스탬프 생성 실패 :</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -678,7 +678,7 @@ is the same
 <source>&Pause</source>
 <target>일시정지(&P)</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>소스코드는 C++ 언어로 아래 툴을 사용하여 작성되었습니다 :</target>
 
 <source>If you like FreeFileSync</source>

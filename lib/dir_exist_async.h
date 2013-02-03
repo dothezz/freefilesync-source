@@ -31,7 +31,7 @@ bool dirExistsUpdating(const Zstring& dirname, bool allowUserInteraction, Proces
         //2. check dir existence
         return zen::dirExists(dirname);
     });
-    while (!ft.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL)))
+    while (!ft.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
         procCallback.requestUiRefresh(); //may throw!
     return ft.get();
 }

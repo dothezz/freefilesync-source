@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Nutraukti: laukiama kol baigsis esama operacija...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Nepavyo sukurti laiko žymės versijavimui:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -687,7 +687,7 @@ yra toks pats
 <source>&Pause</source>
 <target>&Pauzė</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Šaltinio kodas parašytas su C++ naudojant:</target>
 
 <source>If you like FreeFileSync</source>

@@ -112,6 +112,18 @@ enum FileIconSize
 };
 
 
+struct ViewFilterDefault
+{
+    ViewFilterDefault() : equal(false)
+    {
+        leftOnly = rightOnly = leftNewer = rightNewer = different = conflict = true;
+        createLeft = createRight = updateLeft = updateRight = deleteLeft = deleteRight = doNothing = true;
+    }
+    bool equal;
+    bool leftOnly, rightOnly, leftNewer, rightNewer, different, conflict; //category view
+    bool createLeft, createRight, updateLeft, updateRight, deleteLeft, deleteRight, doNothing; //action view
+};
+
 wxString getGlobalConfigFile();
 
 struct XmlGlobalSettings
@@ -161,7 +173,7 @@ struct XmlGlobalSettings
             cfgFileHistMax(30),
             folderHistMax(15),
             onCompletionHistoryMax(8),
-            deleteOnBothSides(false),
+            //deleteOnBothSides(false),
             useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
 #ifdef FFS_WIN
             textSearchRespectCase(false),
@@ -216,7 +228,7 @@ struct XmlGlobalSettings
         std::vector<std::wstring> onCompletionHistory;
         size_t onCompletionHistoryMax;
 
-        bool deleteOnBothSides;
+        //bool deleteOnBothSides;
         bool useRecyclerForManualDeletion;
         bool textSearchRespectCase;
 
@@ -225,6 +237,7 @@ struct XmlGlobalSettings
 
         long lastUpdateCheck;          //time of last update check
 
+        ViewFilterDefault viewFilterDefault;
         wxString guiPerspectiveLast; //used by wxAuiManager
     } gui;
 

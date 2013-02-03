@@ -35,7 +35,7 @@ enum ExecutionType
     EXEC_TYPE_ASYNC
 };
 
-void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
+void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
 {
 #ifdef FFS_WIN
     //parse commandline
@@ -47,8 +47,8 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
         ::LocalFree(tmp);
     }
 
-    wxString filename;
-    wxString arguments;
+    std::wstring filename;
+    std::wstring arguments;
     if (!argv.empty())
     {
         filename = argv[0];
@@ -86,10 +86,10 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
     if (type == EXEC_TYPE_SYNC)
     {
         //Posix::system - execute a shell command
-        int rv = ::system(utfCvrtTo<std::string>(command).c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
+        int rv = ::system(command.c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
         if (rv == -1 || WEXITSTATUS(rv) == 127) //http://linux.die.net/man/3/system    "In case /bin/sh could not be executed, the exit status will be that of a command that does exit(127)"
         {
-            wxMessageBox(_("Invalid command line:") + L"\n" + command);
+            wxMessageBox(_("Invalid command line:") + L"\n" + utfCvrtTo<wxString>(command));
             return;
         }
     }
@@ -100,7 +100,7 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
         //by default wxExecute uses a zero sized dummy window as a hack to keep focus which leaves a useless empty icon in ALT-TAB list
         //=> use wxEXEC_NODISABLE and roll our own window disabler! (see comment in  app.cpp: void *wxGUIAppTraits::BeforeChildWaitLoop())
         wxWindowDisabler dummy; //disables all top level windows
-        wxExecute(command, wxEXEC_ASYNC | wxEXEC_NODISABLE);
+        wxExecute(utfCvrtTo<wxString>(command), wxEXEC_ASYNC | wxEXEC_NODISABLE);
         wxLog::FlushActive(); //show wxWidgets error messages (if any)
     }
 #endif

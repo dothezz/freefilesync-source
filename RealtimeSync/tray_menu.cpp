@@ -401,7 +401,7 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
                 lastChangeDetected = DirWatcher::Entry(); //make sure old name is not shown again after a directory reappears
 
                 //execute command
-                auto cmdLineExp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(cmdLine)));
+                auto cmdLineExp = expandMacros(utfCvrtTo<Zstring>(cmdLine));
                 zen::shellExecute(cmdLineExp, zen::EXEC_TYPE_SYNC);
                 callback.clearSchedule();
             }

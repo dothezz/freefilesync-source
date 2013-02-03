@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Selezionata interruazione: conclusione dell'operazione...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Errore nella creazione di data e ora per il controllo delle versioni:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -681,7 +681,7 @@ I file sono considerati identici se
 <source>&Pause</source>
 <target>&Pausa</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Codice sorgente scritto in C++ utilizzando:</target>
 
 <source>If you like FreeFileSync</source>

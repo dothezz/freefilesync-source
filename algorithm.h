@@ -36,15 +36,13 @@ void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or
 
 
 //manual deletion of files on main grid
-std::pair<Zstring, int> deleteFromGridAndHDPreview(      //returns wxString with elements to be deleted and total count of selected(!) objects, NOT total files/dirs!
+std::pair<Zstring, int> deleteFromGridAndHDPreview(       //returns string with elements to be deleted and total count of selected(!) objects, NOT total files/dirs!
     const std::vector<FileSystemObject*>& selectionLeft,  //all pointers need to be bound!
     const std::vector<FileSystemObject*>& selectionRight, //
     bool deleteOnBothSides);
 
-class DeleteFilesHandler
+struct DeleteFilesHandler
 {
-public:
-    DeleteFilesHandler() {}
     virtual ~DeleteFilesHandler() {}
 
     enum Response
@@ -54,9 +52,7 @@ public:
     };
     virtual Response reportError  (const std::wstring& msg) = 0;
     virtual void     reportWarning(const std::wstring& msg, bool& warningActive) = 0;
-
-    //virtual void totalFilesToDelete(int objectsTotal) = 0; //informs about the total number of files to be deleted
-    virtual void notifyDeletion(const Zstring& currentObject) = 0; //called for each file/folder that has been deleted
+    virtual void     reportStatus (const std::wstring& msg) = 0;
 };
 void deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
                          const std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!

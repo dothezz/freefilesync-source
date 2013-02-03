@@ -225,7 +225,7 @@ BatchStatusHandler::~BatchStatusHandler()
                 showFinalResults = false; //take precedence over current visibility status
             else if (!finalCommand.empty())
             {
-                auto cmdexp = utfCvrtTo<wxString>(expandMacros(utfCvrtTo<Zstring>(finalCommand)));
+                auto cmdexp = expandMacros(utfCvrtTo<Zstring>(finalCommand));
                 shellExecute(cmdexp);
             }
         }
@@ -262,17 +262,7 @@ void BatchStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
 {
     StatusHandler::updateProcessedData(objectsDelta, dataDelta);
 
-    switch (currentPhase())
-    {
-        case ProcessCallback::PHASE_NONE:
-            assert(false);
-        case ProcessCallback::PHASE_SCANNING:
-            break;
-        case ProcessCallback::PHASE_COMPARING_CONTENT:
-        case ProcessCallback::PHASE_SYNCHRONIZING:
-            syncStatusFrame.reportCurrentBytes(getDataCurrent(currentPhase()));
-            break;
-    }
+           syncStatusFrame.notifyProgressChange(); //noexcept
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!
 }
 
@@ -415,7 +405,7 @@ void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
 
 void BatchStatusHandler::forceUiRefresh()
 {
-    syncStatusFrame.updateProgress();
+    syncStatusFrame.updateGui();
 }
 
 

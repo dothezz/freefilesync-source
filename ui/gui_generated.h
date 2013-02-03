@@ -93,7 +93,7 @@ protected:
     wxBitmapButton* m_bpButtonCmpConfig;
     wxStaticText* m_staticTextSyncVariant;
     wxBitmapButton* m_bpButtonSyncConfig;
-    zen::BitmapButton* m_buttonStartSync;
+    zen::BitmapButton* m_buttonSync;
     wxPanel* m_panelDirectoryPairs;
     wxStaticText* m_staticTextResolvedPathL;
     wxBitmapButton* m_bpButtonAddPair;
@@ -111,6 +111,8 @@ protected:
     zen::Grid* m_gridMainC;
     zen::Grid* m_gridMainR;
     wxPanel* m_panelStatusBar;
+    wxBoxSizer* bSizerFileStatus;
+    wxBoxSizer* bSizerStatusLeft;
     wxBoxSizer* bSizerStatusLeftDirectories;
     wxStaticBitmap* m_bitmapSmallDirectoryLeft;
     wxStaticText* m_staticTextStatusLeftDirs;
@@ -120,6 +122,7 @@ protected:
     wxStaticText* m_staticTextStatusLeftBytes;
     wxStaticLine* m_staticline9;
     wxStaticText* m_staticTextStatusMiddle;
+    wxBoxSizer* bSizerStatusRight;
     wxStaticLine* m_staticline10;
     wxBoxSizer* bSizerStatusRightDirectories;
     wxStaticBitmap* m_bitmapSmallDirectoryRight;
@@ -128,9 +131,10 @@ protected:
     wxStaticBitmap* m_bitmapSmallFileRight;
     wxStaticText* m_staticTextStatusRightFiles;
     wxStaticText* m_staticTextStatusRightBytes;
+    wxStaticText* m_staticTextFullStatus;
     wxPanel* m_panelConfig;
     wxBoxSizer* bSizerConfig;
-    wxBitmapButton* m_bpButtonLoad;
+    wxBitmapButton* m_bpButtonOpen;
     wxBitmapButton* m_bpButtonSave;
     wxBitmapButton* m_bpButtonBatchJob;
     wxListBox* m_listBoxHistory;
@@ -155,20 +159,20 @@ protected:
     wxStaticText* m_staticTextCreateRight;
     wxPanel* m_panelViewFilter;
     wxBoxSizer* bSizerViewFilter;
-    ToggleButton* m_bpButtonSyncCreateLeft;
-    ToggleButton* m_bpButtonSyncDirOverwLeft;
-    ToggleButton* m_bpButtonSyncDeleteLeft;
-    ToggleButton* m_bpButtonLeftOnly;
-    ToggleButton* m_bpButtonLeftNewer;
-    ToggleButton* m_bpButtonEqual;
-    ToggleButton* m_bpButtonDifferent;
-    ToggleButton* m_bpButtonSyncDirNone;
-    ToggleButton* m_bpButtonRightNewer;
-    ToggleButton* m_bpButtonRightOnly;
-    ToggleButton* m_bpButtonSyncDeleteRight;
-    ToggleButton* m_bpButtonSyncDirOverwRight;
-    ToggleButton* m_bpButtonSyncCreateRight;
-    ToggleButton* m_bpButtonConflict;
+    ToggleButton* m_bpButtonShowCreateLeft;
+    ToggleButton* m_bpButtonShowUpdateLeft;
+    ToggleButton* m_bpButtonShowDeleteLeft;
+    ToggleButton* m_bpButtonShowLeftOnly;
+    ToggleButton* m_bpButtonShowLeftNewer;
+    ToggleButton* m_bpButtonShowEqual;
+    ToggleButton* m_bpButtonShowDifferent;
+    ToggleButton* m_bpButtonShowDoNothing;
+    ToggleButton* m_bpButtonShowRightNewer;
+    ToggleButton* m_bpButtonShowRightOnly;
+    ToggleButton* m_bpButtonShowDeleteRight;
+    ToggleButton* m_bpButtonShowUpdateRight;
+    ToggleButton* m_bpButtonShowCreateRight;
+    ToggleButton* m_bpButtonShowConflict;
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
@@ -186,29 +190,21 @@ protected:
     virtual void OnMenuCheckVersion( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCmpSettings( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnCompSettingsContext( wxMouseEvent& event ) { event.Skip(); }
     virtual void OnSyncSettings( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnSyncSettingsContext( wxMouseEvent& event ) { event.Skip(); }
     virtual void OnAddFolderPair( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnRemoveTopFolderPair( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnSwapSides( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCfgHistoryKeyEvent( wxKeyEvent& event ) { event.Skip(); }
     virtual void OnLoadFromHistory( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnLoadFromHistoryDoubleClick( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnCfgHistoryRightClick( wxMouseEvent& event ) { event.Skip(); }
     virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnGlobalFilterContext( wxMouseEvent& event ) { event.Skip(); }
     virtual void OnShowExcluded( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncCreateLeft( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDirLeft( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDeleteLeft( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnLeftOnlyFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnLeftNewerFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnEqualFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDifferentFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDirNone( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnRightNewerFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnRightOnlyFiles( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDeleteRight( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncDirRight( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncCreateRight( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnConflictFiles( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnToggleViewButton( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnViewButtonRightClick( wxMouseEvent& event ) { event.Skip(); }
 
 
 public:
@@ -594,17 +590,16 @@ protected:
     wxPanel* m_panel33;
     wxBoxSizer* bSizerCodeInfo;
     wxStaticText* m_staticText72;
-    wxHyperlinkCtrl* m_hyperlink9;
     wxHyperlinkCtrl* m_hyperlink11;
+    wxHyperlinkCtrl* m_hyperlink9;
     wxHyperlinkCtrl* m_hyperlink10;
-    wxHyperlinkCtrl* m_hyperlink13;
     wxHyperlinkCtrl* m_hyperlink7;
-    wxHyperlinkCtrl* m_hyperlink16;
-    wxHyperlinkCtrl* m_hyperlink8;
+    wxHyperlinkCtrl* m_hyperlink14;
     wxHyperlinkCtrl* m_hyperlink15;
+    wxHyperlinkCtrl* m_hyperlink13;
+    wxHyperlinkCtrl* m_hyperlink16;
     wxHyperlinkCtrl* m_hyperlink12;
     wxHyperlinkCtrl* m_hyperlink18;
-    wxHyperlinkCtrl* m_hyperlink14;
     wxHyperlinkCtrl* m_hyperlink21;
     wxPanel* m_panel40;
     wxPanel* m_panel39;

@@ -90,8 +90,10 @@ private:
     //used when saving configuration
     std::vector<wxString> activeConfigFiles; //name of currently loaded config file (may be more than 1)
 
-    void initViewFilterButtons(const zen::MainConfiguration& mainCfg);
-    void updateFilterButtons();
+    void updateFilterButtons(); //file exclusion
+
+    void initViewFilterButtons();
+    void setViewFilterDefault();
 
     void addFileToCfgHistory(const std::vector<wxString>& filenames); //= update/insert + apply selection
 
@@ -119,14 +121,15 @@ private:
     void deleteSelectedFiles(const std::vector<zen::FileSystemObject*>& selectionLeft,
                              const std::vector<zen::FileSystemObject*>& selectionRight);
 
-    void openExternalApplication(const wxString& commandline, const zen::FileSystemObject* fsObj, bool leftSide); //fsObj may be nullptr
+    void openExternalApplication(const wxString& commandline, const std::vector<zen::FileSystemObject*>& selection, bool leftSide); //selection may be empty
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
 
-    //delayed status information restore
-    void setStatusInformation(const wxString& msg);  //set main status
-    void flashStatusInformation(const wxString& msg); //temporarily show different status
+    //status bar supports one of the following two states at a time:
+    void setStatusBarFullText(const wxString& msg);
+    void setStatusBarFileStatistics(size_t filesOnLeftView, size_t foldersOnLeftView, size_t filesOnRightView, size_t foldersOnRightView, zen::UInt64 filesizeLeftView, zen::UInt64 filesizeRightView);
+    void flashStatusInformation(const wxString& msg); //temporarily show different status (only valid for setStatusBarFullText)
 
     //events
     void onGridButtonEventL(wxKeyEvent& event);
@@ -138,9 +141,10 @@ private:
     void OnContextSetLayout(wxMouseEvent& event);
     void OnGlobalKeyEvent  (wxKeyEvent& event);
 
-    void OnCompSettingsContext(wxMouseEvent& event);
-    void OnSyncSettingsContext(wxMouseEvent& event);
-    void OnGlobalFilterContext(wxCommandEvent& event);
+    virtual void OnCompSettingsContext(wxMouseEvent& event);
+    virtual void OnSyncSettingsContext(wxMouseEvent& event);
+    virtual void OnGlobalFilterContext(wxMouseEvent& event);
+    virtual void OnViewButtonRightClick(wxMouseEvent& event);
 
     void applyCompareConfig(bool switchMiddleGrid = false);
 
@@ -176,21 +180,7 @@ private:
     void onGridLabelContextR(zen::GridClickEvent& event);
     void onGridLabelContext(zen::Grid& grid, zen::ColumnTypeRim type, const std::vector<zen::ColumnAttributeRim>& defaultColumnAttributes);
 
-    void OnLeftOnlyFiles  (wxCommandEvent& event);
-    void OnRightOnlyFiles (wxCommandEvent& event);
-    void OnLeftNewerFiles (wxCommandEvent& event);
-    void OnRightNewerFiles(wxCommandEvent& event);
-    void OnEqualFiles     (wxCommandEvent& event);
-    void OnDifferentFiles (wxCommandEvent& event);
-    void OnConflictFiles  (wxCommandEvent& event);
-
-    void OnSyncCreateLeft (wxCommandEvent& event);
-    void OnSyncCreateRight(wxCommandEvent& event);
-    void OnSyncDeleteLeft (wxCommandEvent& event);
-    void OnSyncDeleteRight(wxCommandEvent& event);
-    void OnSyncDirLeft    (wxCommandEvent& event);
-    void OnSyncDirRight   (wxCommandEvent& event);
-    void OnSyncDirNone    (wxCommandEvent& event);
+    void OnToggleViewButton(wxCommandEvent& event);
 
     void OnConfigNew      (wxCommandEvent& event);
     void OnConfigSave     (wxCommandEvent& event);
@@ -200,7 +190,10 @@ private:
     void OnLoadFromHistory(wxCommandEvent& event);
     void OnLoadFromHistoryDoubleClick(wxCommandEvent& event);
 
+    void deleteSelectedCfgHistoryItems();
+
     void OnCfgHistoryKeyEvent(wxKeyEvent& event);
+    void OnCfgHistoryRightClick(wxMouseEvent& event);
     void OnRegularUpdateCheck(wxIdleEvent& event);
     void OnLayoutWindowAsync (wxIdleEvent& event);
 
@@ -270,7 +263,7 @@ private:
     //***********************************************
     //status information
     wxLongLong lastStatusChange;
-    std::vector<wxString> statusMsgStack;
+    std::unique_ptr<wxString> oldStatusMsg;
 
     //compare status panel (hidden on start, shown when comparing)
     std::unique_ptr<CompareStatus> compareStatus; //always bound

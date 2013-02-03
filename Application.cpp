@@ -164,7 +164,7 @@ void Application::OnStartApplication(wxIdleEvent&)
 #ifdef FFS_WIN
     wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only (as of 2.9.2)
 #endif
-    wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
+    wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s is default for Windows: http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
 #endif
 
     try

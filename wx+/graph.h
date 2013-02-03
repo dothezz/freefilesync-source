@@ -39,7 +39,6 @@ struct GraphData
 
 
 //reference data implementation
-
 class RangeData : public GraphData
 {
 public:
@@ -57,7 +56,7 @@ private:
     std::vector<double> data;
 };
 
-
+/*
 //reference data implementation
 class VectorData : public GraphData
 {
@@ -75,6 +74,7 @@ private:
 
     std::vector<double> data;
 };
+*/
 
 //------------------------------------------------------------------------------------------------------------
 struct LabelFormatter
@@ -88,7 +88,7 @@ struct LabelFormatter
     virtual wxString formatText(double value, double optimalBlockSize) const = 0;
 };
 
-double nextNiceNumber(double blockSize); //round to next number which is convenient to read, e.g. 2.13 -> 2; 2.7 -> 2.5; 7 -> 5
+double nextNiceNumber(double blockSize); //round to next number which is convenient to read, e.g. 2.13 -> 2; 2.7 -> 2.5
 
 struct DecimalNumberFormatter : public LabelFormatter
 {
@@ -97,10 +97,10 @@ struct DecimalNumberFormatter : public LabelFormatter
 };
 
 //------------------------------------------------------------------------------------------------------------
+
 //emit data selection event
 //Usage: wnd.Connect(wxEVT_GRAPH_SELECTION, GraphSelectEventHandler(MyDlg::OnGraphSelection), nullptr, this);
 //       void MyDlg::OnGraphSelection(GraphSelectEvent& event);
-
 
 extern const wxEventType wxEVT_GRAPH_SELECTION;
 
@@ -122,7 +122,6 @@ class GraphSelectEvent : public wxCommandEvent
 {
 public:
     GraphSelectEvent(const SelectionBlock& selBlock) : wxCommandEvent(wxEVT_GRAPH_SELECTION), selBlock_(selBlock) {}
-
     virtual wxEvent* Clone() const { return new GraphSelectEvent(selBlock_); }
 
     SelectionBlock getSelection() { return selBlock_; }
@@ -169,8 +168,8 @@ public:
         int lineWidth;
     };
 
-    void setData(const std::shared_ptr<GraphData>& data, const CurveAttributes& attr = CurveAttributes());
-    void addData(const std::shared_ptr<GraphData>& data, const CurveAttributes& attr = CurveAttributes());
+    void setData(const std::shared_ptr<GraphData>& data, const CurveAttributes& ca = CurveAttributes());
+    void addData(const std::shared_ptr<GraphData>& data, const CurveAttributes& ca = CurveAttributes());
 
     enum PosLabelY
     {
@@ -214,14 +213,13 @@ public:
             labelFmtY(std::make_shared<DecimalNumberFormatter>()),
             mouseSelMode(SELECT_RECTANGLE) {}
 
-
         MainAttributes& setMinX(double newMinX) { minX = newMinX; minXauto = false; return *this; }
         MainAttributes& setMaxX(double newMaxX) { maxX = newMaxX; maxXauto = false; return *this; }
 
         MainAttributes& setMinY(double newMinY) { minY = newMinY; minYauto = false; return *this; }
         MainAttributes& setMaxY(double newMaxY) { maxY = newMaxY; maxYauto = false; return *this; }
 
-        MainAttributes& setAutoSize() { minXauto = true; maxXauto = true; minYauto = true; maxYauto = true; return *this; }
+        MainAttributes& setAutoSize() { minXauto = maxXauto = minYauto = maxYauto = true; return *this; }
 
         static const std::shared_ptr<LabelFormatter> defaultFormat;
 
@@ -268,7 +266,6 @@ public:
     void setAttributes(const MainAttributes& newAttr) { attr = newAttr; Refresh(); }
     MainAttributes getAttributes() const { return attr; }
 
-
     std::vector<SelectionBlock> getSelections() const { return oldSel; }
     void setSelections(const std::vector<SelectionBlock>& sel)
     {
@@ -299,7 +296,7 @@ private:
         wxPoint getStartPos() const { return posDragStart_; }
         wxPoint& refCurrentPos() { return posDragCurrent; }
 
-        SelectionBlock& refSelection() { return selBlock; } //set when selection is drawn: this is fine, 'cause only what's shown should be selected!
+        SelectionBlock& refSelection() { return selBlock; } //updated in Graph2d::render(): this is fine, since only what's shown is selected!
 
     private:
         wxWindow& wnd_;
@@ -318,6 +315,5 @@ private:
     GraphList curves_;
 };
 }
-
 
 #endif //WX_PLOT_HEADER_2344252459

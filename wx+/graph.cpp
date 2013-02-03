@@ -18,8 +18,6 @@ using namespace numeric;
 
 //todo: support zoom via mouse wheel
 
-warn_static("reviewreviewreviewreviewreview")
-
 const wxEventType zen::wxEVT_GRAPH_SELECTION = wxNewEventType();
 
 const std::shared_ptr<LabelFormatter> Graph2D::MainAttributes::defaultFormat = std::make_shared<DecimalNumberFormatter>(); //for some buggy reason MSVC isn't able to use a temporary as a default argument
@@ -85,9 +83,9 @@ wxColor getDefaultColor(size_t pos)
             return wxColor(75, 31, 111); //purple
         case 9:
             return wxColor(255, 149, 14); //orange
-        default:
-            return *wxBLACK;
     }
+    assert(false);
+    return *wxBLACK;
 }
 
 
@@ -107,7 +105,6 @@ public:
     {
         return (realPos - min_) * scaleToScr;
     }
-
     int realToScreenRound(double realPos) const //useful to find "proper" y-pixel positions
     {
         return numeric::round(realToScreen(realPos));
@@ -120,7 +117,7 @@ private:
 };
 
 
-//enlarge range to a multiple of a "useful" block size
+//enlarge value range to display to a multiple of a "useful" block size
 void widenRange(double& valMin, double& valMax, //in/out
                 int& blockCount, //out
                 int graphAreaSize,   //in pixel
@@ -162,10 +159,10 @@ void drawXLabel(wxDC& dc, double xMin, double xMax, int blockCount, const Conver
         const int x = graphArea.x + cvrtX.realToScreenRound(valX);
 
         if (graphArea.height > 0)
-            dc.DrawLine(wxPoint(x, graphArea.y), wxPoint(x, graphArea.y + graphArea.height));
+            dc.DrawLine(wxPoint(x, graphArea.y), wxPoint(x, graphArea.y + graphArea.height)); //wxDC::DrawLine() doesn't draw last pixel
 
         //draw x axis labels
-        const wxString label = labelFmt.formatText(xMin + i * valRangePerBlock, valRangePerBlock);
+        const wxString label = labelFmt.formatText(valX, valRangePerBlock);
         wxSize labelExtent = dc.GetMultiLineTextExtent(label);
         dc.DrawText(label, wxPoint(x - labelExtent.GetWidth() / 2, labelArea.y + (labelArea.height - labelExtent.GetHeight()) / 2)); //center
     }
@@ -191,7 +188,7 @@ void drawYLabel(wxDC& dc, double yMin, double yMax, int blockCount, const Conver
         const int y = graphArea.y + cvrtY.realToScreenRound(valY);
 
         if (graphArea.width > 0)
-            dc.DrawLine(wxPoint(graphArea.x, y), wxPoint(graphArea.x + graphArea.width, y));
+            dc.DrawLine(wxPoint(graphArea.x, y), wxPoint(graphArea.x + graphArea.width, y)); //wxDC::DrawLine() doesn't draw last pixel
 
         //draw y axis labels
         const wxString label = labelFmt.formatText(valY, valRangePerBlock);
@@ -206,14 +203,13 @@ void subsample(StdContainter& cont, size_t factor)
 {
     if (factor <= 1) return;
 
-    auto iterOut = cont.begin();
-    for (auto iterIn = cont.begin(); cont.end() - iterIn >= static_cast<ptrdiff_t>(factor); iterIn += factor) //don't even let iterator point out of range!
-        *iterOut++ = std::accumulate(iterIn, iterIn + factor, 0.0) / static_cast<double>(factor);
+    auto itOut = cont.begin();
+    for (auto itIn = cont.begin(); cont.end() - itIn >= static_cast<ptrdiff_t>(factor); itIn += factor) //don't even let iterator point out of range!
+        *itOut++ = std::accumulate(itIn, itIn + factor, 0.0) / static_cast<double>(factor);
 
-    cont.erase(iterOut, cont.end());
+    cont.erase(itOut, cont.end());
 }
 }
-
 
 Graph2D::Graph2D(wxWindow* parent,
                  wxWindowID winid,
@@ -223,12 +219,11 @@ Graph2D::Graph2D(wxWindow* parent,
                  const wxString& name) : wxPanel(parent, winid, pos, size, style, name)
 {
     Connect(wxEVT_PAINT, wxPaintEventHandler(Graph2D::onPaintEvent), nullptr, this);
-    Connect(wxEVT_SIZE,  wxSizeEventHandler (Graph2D::onSizeEvent ),  nullptr, this);
+    Connect(wxEVT_SIZE,  wxSizeEventHandler (Graph2D::onSizeEvent ), nullptr, this);
     //http://wiki.wxwidgets.org/Flicker-Free_Drawing
     Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Graph2D::onEraseBackGround), nullptr, this);
 
     //SetDoubleBuffered(true); slow as hell!
-
 #if wxCHECK_VERSION(2, 9, 1)
     SetBackgroundStyle(wxBG_STYLE_PAINT);
 #else
@@ -256,7 +251,6 @@ void Graph2D::OnMouseLeftDown(wxMouseEvent& event)
 
     if (!event.ControlDown())
         oldSel.clear();
-
     Refresh();
 }
 
@@ -265,7 +259,7 @@ void Graph2D::OnMouseMovement(wxMouseEvent& event)
 {
     if (activeSel.get())
     {
-        activeSel->refCurrentPos() = event.GetPosition();
+        activeSel->refCurrentPos() = event.GetPosition(); //corresponding activeSel->refSelection() is updated in Graph2D::render()
         Refresh();
     }
 }
@@ -277,12 +271,11 @@ void Graph2D::OnMouseLeftUp(wxMouseEvent& event)
     {
         if (activeSel->getStartPos() != activeSel->refCurrentPos()) //if it's just a single mouse click: discard selection
         {
-            //fire off GraphSelectEvent
-            GraphSelectEvent selEvent(activeSel->refSelection());
+            GraphSelectEvent selEvent(activeSel->refSelection()); //fire off GraphSelectEvent
             if (wxEvtHandler* handler = GetEventHandler())
                 handler->AddPendingEvent(selEvent);
 
-            oldSel.push_back(activeSel->refSelection());
+            oldSel.push_back(activeSel->refSelection()); //commit selection
         }
 
         activeSel.reset();
@@ -298,50 +291,45 @@ void Graph2D::OnMouseCaptureLost(wxMouseCaptureLostEvent& event)
 }
 
 
-void Graph2D::setData(const std::shared_ptr<GraphData>& data, const CurveAttributes& la)
+void Graph2D::setData(const std::shared_ptr<GraphData>& data, const CurveAttributes& ca)
 {
     curves_.clear();
-    addData(data, la);
+    addData(data, ca);
 }
 
 
-void Graph2D::addData(const std::shared_ptr<GraphData>& data, const CurveAttributes& la)
+void Graph2D::addData(const std::shared_ptr<GraphData>& data, const CurveAttributes& ca)
 {
-    CurveAttributes newAttr = la;
+    CurveAttributes newAttr = ca;
     if (newAttr.autoColor)
         newAttr.setColor(getDefaultColor(curves_.size()));
     curves_.push_back(std::make_pair(data, newAttr));
     Refresh();
 }
 
-
-namespace
+namespace //putting this into function scope makes MSVC crash...
 {
-class DcBackgroundChanger
+struct CurveSamples
 {
-public:
-    DcBackgroundChanger(wxDC& dc, const wxBrush& brush) : dc_(dc), old(dc.GetBackground()) { dc.SetBackground(brush); }
-    ~DcBackgroundChanger() { if (old.Ok()) dc_.SetBackground(old); }
-private:
-    wxDC& dc_;
-    const wxBrush old;
+    CurveSamples() : offsetX(0) {}
+    std::vector<double> yValues; //actual y-values at each screen pixel position
+    int offsetX;                 //x-value offset in pixels
 };
 }
 
-
 void Graph2D::render(wxDC& dc) const
 {
+    const wxRect clientRect = GetClientRect(); //DON'T use wxDC::GetSize()! DC may be larger than visible area!
     {
-        //clear everything, set label background color
-        //        const wxColor backColor = wxPanel::GetClassDefaultAttributes().colBg != wxNullColour ?
-        //                                  wxPanel::GetClassDefaultAttributes().colBg :
-        //                                  wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
-        const wxColor backColor = GetBackgroundColour(); //user-configurable!
-        DcBackgroundChanger dummy(dc, backColor); //use wxDC::SetBackground instead of wxDC::SetBrush
-        dc.Clear();
+        //clear complete client area; set label background color
+        const wxColor backCol = GetBackgroundColour(); //user-configurable!
+        //wxPanel::GetClassDefaultAttributes().colBg :
+        //wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE);
+        wxDCPenChanger   dummy (dc, backCol);
+        wxDCBrushChanger dummy2(dc, backCol);
+        dc.DrawRectangle(clientRect);
     }
 
-    //note: DON'T use wxDC::GetSize()! DC may be larger than visible area!
     /*
     -----------------------
     |        |   x-label  |
@@ -349,8 +337,7 @@ void Graph2D::render(wxDC& dc) const
     |y-label | graph area |
     |----------------------
     */
-    const wxRect clientRect = GetClientSize(); //data window only
-    wxRect graphArea  = clientRect; //data window only
+    wxRect graphArea  = clientRect;
     int xLabelPosY = clientRect.y;
     int yLabelPosX = clientRect.x;
 
@@ -367,7 +354,6 @@ void Graph2D::render(wxDC& dc) const
         case X_LABEL_NONE:
             break;
     }
-
     switch (attr.labelposY)
     {
         case Y_LABEL_LEFT:
@@ -383,17 +369,16 @@ void Graph2D::render(wxDC& dc) const
     }
 
     {
-        //paint actual graph background (without labels)
-        DcBackgroundChanger dummy(dc, *wxWHITE); //accessibility: we have to set both back- and foreground colors or none at all!
-        wxDCPenChanger dummy2(dc, wxColour(130, 135, 144)); //medium grey, the same Win7 uses for other frame borders
-        //dc.DrawRectangle(static_cast<const wxRect&>(graphArea).Inflate(1, 1)); //correct wxWidgets design mistakes
+        //paint graph background (excluding label area)
+        wxDCPenChanger   dummy (dc, wxColour(130, 135, 144)); //medium grey, the same Win7 uses for other frame borders
+        wxDCBrushChanger dummy2(dc, *wxWHITE); //accessibility: we have to set both back- and foreground colors or none at all!
         dc.DrawRectangle(graphArea);
-        graphArea.Deflate(1, 1); //do not draw on border
+        graphArea.Deflate(1, 1); //attention more wxWidgets design mistakes: behavior of wxRect::Deflate depends on object being const/non-const!!!
     }
 
     //set label areas respecting graph area border!
-    wxRect xLabelArea(graphArea.x, xLabelPosY, graphArea.width, attr.xLabelHeight);
-    wxRect yLabelArea(yLabelPosX, graphArea.y, attr.yLabelWidth, graphArea.height);
+    const wxRect xLabelArea(graphArea.x, xLabelPosY, graphArea.width, attr.xLabelHeight);
+    const wxRect yLabelArea(yLabelPosX, graphArea.y, attr.yLabelWidth, graphArea.height);
 
     const wxPoint graphAreaOrigin = graphArea.GetTopLeft();
 
@@ -426,7 +411,7 @@ void Graph2D::render(wxDC& dc) const
                        *attr.labelFmtX);
 
         //detect y value range
-        std::vector<std::pair<std::vector<double>, int>> yValuesList(curves_.size());
+        std::vector<CurveSamples> yValuesList(curves_.size());
         double minY = attr.minYauto ?  std::numeric_limits<double>::infinity() : attr.minY; //automatic: ensure values are initialized by first curve
         double maxY = attr.maxYauto ? -std::numeric_limits<double>::infinity() : attr.maxY; //
         {
@@ -434,34 +419,26 @@ void Graph2D::render(wxDC& dc) const
             const ConvertCoord cvrtX(minX, maxX, graphArea.width * AVG_FACTOR);
 
             for (auto it = curves_.begin(); it != curves_.end(); ++it)
-                if (it->first.get())
+                if (const GraphData* graph = it->first.get())
                 {
-                    const size_t index = it - curves_.begin();
-                    const GraphData& graph = *it->first;
-
-                    std::vector<double>& yValues = yValuesList[index].first;  //actual y-values
-                    int& offsetX                 = yValuesList[index].second; //x-value offset in pixel
+                    CurveSamples& samples = yValuesList[it - curves_.begin()];
                     {
-                        const double xBegin = graph.getXBegin();
-                        const double xEnd   = graph.getXEnd();
-
-                        const int posFirst = std::ceil(cvrtX.realToScreen(std::max(xBegin, minX))); //apply min/max *before* calling realToScreen()!
-                        const int posLast  = std::ceil(cvrtX.realToScreen(std::min(xEnd,   maxX))); //do not step outside [xBegin, xEnd) range => 2 x ceil!
-                        //conversion from std::ceil double to int is loss-free for full value range of int! tested successfully on MSVC
+                        const int posFirst = std::ceil(cvrtX.realToScreen(std::max(graph->getXBegin(), minX))); //do not step outside [xBegin, xEnd) range => 2 x ceil!
+                        const int posLast  = std::ceil(cvrtX.realToScreen(std::min(graph->getXEnd  (), maxX))); //
+                        //conversion from std::ceil double return valute to int is loss-free for full value range of 32-bit int! tested successfully on MSVC
 
                         for (int i = posFirst; i < posLast; ++i)
-                            yValues.push_back(graph.getValue(cvrtX.screenToReal(i)));
+                            samples.yValues.push_back(graph->getValue(cvrtX.screenToReal(i)));
 
-                        subsample(yValues, AVG_FACTOR);
-                        offsetX = posFirst / AVG_FACTOR;
+                        subsample(samples.yValues, AVG_FACTOR);
+                        samples.offsetX = posFirst / AVG_FACTOR;
                     }
-
-                    if (!yValues.empty())
+                    if (!samples.yValues.empty())
                     {
                         if (attr.minYauto)
-                            minY = std::min(minY, *std::min_element(yValues.begin(), yValues.end()));
+                            minY = std::min(minY, *std::min_element(samples.yValues.begin(), samples.yValues.end()));
                         if (attr.maxYauto)
-                            maxY = std::max(maxY, *std::max_element(yValues.begin(), yValues.end()));
+                            maxY = std::max(maxY, *std::max_element(samples.yValues.begin(), samples.yValues.end()));
                     }
                 }
         }
@@ -484,25 +461,24 @@ void Graph2D::render(wxDC& dc) const
             {
                 if (index < yValuesList.size())
                 {
-                    const std::vector<double>& yValues = yValuesList[index].first;  //actual y-values
-                    const int offsetX                  = yValuesList[index].second; //x-value offset in pixel
+                    CurveSamples& samples = yValuesList[index];
 
-                    for (auto i = yValues.begin(); i != yValues.end(); ++i)
-                        points.push_back(wxPoint(offsetX + (i - yValues.begin()),
-                                                 cvrtY.realToScreenRound(*i)) + graphAreaOrigin);
+                    for (auto it = samples.yValues.begin(); it != samples.yValues.end(); ++it)
+                        points.push_back(wxPoint(samples.offsetX + (it - samples.yValues.begin()),
+                                                 cvrtY.realToScreenRound(*it)) + graphAreaOrigin);
                 }
             };
 
             //update active mouse selection
             if (activeSel.get() &&
-                graphArea.width  > 0  && graphArea.height > 0)
+                graphArea.width > 0 && graphArea.height > 0)
             {
-                wxPoint startPos   = activeSel->getStartPos()   - graphAreaOrigin; //pos relative to graphArea
+                wxPoint startPos   = activeSel->getStartPos()   - graphAreaOrigin; //make relative to graphArea
                 wxPoint currentPos = activeSel->refCurrentPos() - graphAreaOrigin;
 
                 //normalize positions: a mouse selection is symmetric and *not* an half-open range!
-                confine(startPos  .x, 0, graphArea.width - 1);
-                confine(currentPos.x, 0, graphArea.width - 1);
+                confine(startPos  .x, 0, graphArea.width  - 1);
+                confine(currentPos.x, 0, graphArea.width  - 1);
                 confine(startPos  .y, 0, graphArea.height - 1);
                 confine(currentPos.y, 0, graphArea.height - 1);
 
@@ -544,14 +520,14 @@ void Graph2D::render(wxDC& dc) const
                 wxDCBrushChanger dummy(dc, wxColor(168, 202, 236)); //light blue
                 wxDCPenChanger  dummy2(dc, wxColor(51,  153, 255)); //dark blue
 
-                for (auto i = allSelections.begin(); i != allSelections.end(); ++i)
+                for (auto it = allSelections.begin(); it != allSelections.end(); ++it)
                 {
                     //harmonize with active mouse selection above!
-                    wxPoint pixelFrom(cvrtX.realToScreenRound(i->from.x),
-                                      cvrtY.realToScreenRound(i->from.y));
-                    wxPoint pixelTo(cvrtX.realToScreenRound(i->to.x),
-                                    cvrtY.realToScreenRound(i->to.y));
-					 //convert half-open to inclusive ranges for use with wxDC::DrawRectangle
+                    wxPoint pixelFrom(cvrtX.realToScreenRound(it->from.x),
+                                      cvrtY.realToScreenRound(it->from.y));
+                    wxPoint pixelTo(cvrtX.realToScreenRound(it->to.x),
+                                    cvrtY.realToScreenRound(it->to.y));
+                    //convert half-open to inclusive ranges for use with wxDC::DrawRectangle
                     if (pixelFrom.x != pixelTo.x) //no matter how small the selection, always draw at least one pixel!
                     {
                         pixelFrom.x -= pixelFrom.x < pixelTo.x ? 0 : 1;
@@ -562,8 +538,8 @@ void Graph2D::render(wxDC& dc) const
                         pixelFrom.y -= pixelFrom.y < pixelTo.y ? 0 : 1;
                         pixelTo  .y -= pixelFrom.y < pixelTo.y ? 1 : 0;
                     }
-                    confine(pixelFrom.x, 0, graphArea.width - 1);
-                    confine(pixelTo  .x, 0, graphArea.width - 1);
+                    confine(pixelFrom.x, 0, graphArea.width  - 1);
+                    confine(pixelTo  .x, 0, graphArea.width  - 1);
                     confine(pixelFrom.y, 0, graphArea.height - 1);
                     confine(pixelTo  .y, 0, graphArea.height - 1);
 
@@ -600,7 +576,7 @@ void Graph2D::render(wxDC& dc) const
                 {
                     wxDCPenChanger dummy(dc, wxPen(it->second.color, it->second.lineWidth));
                     dc.DrawLines(static_cast<int>(points.size()), &points[0]);
-                    dc.DrawPoint(points.back()); //last pixel omitted by DrawLines
+                    dc.DrawPoint(points.back()); //wxDC::DrawLines() doesn't draw last pixel
                 }
             }
         }

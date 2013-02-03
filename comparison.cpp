@@ -112,7 +112,7 @@ void determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
     const Zstring& dirname = *it;
     callback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", fmtFileName(dirname), false));
 
-    while (boost::get_system_time() < timeMax && !iterCheckDir->timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL)))
+    while (boost::get_system_time() < timeMax && !iterCheckDir->timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
         callback.requestUiRefresh(); //may throw!
 
     //only (still) existing files should be included in the list
@@ -192,10 +192,10 @@ std::wstring checkFolderDependency(const std::vector<FolderPairCfg>& folderPairs
     if (!dependentDirs.empty())
     {
         warningMsg = _("Directories are dependent! Be careful when setting up synchronization rules:");
-        for (auto i = dependentDirs.begin(); i != dependentDirs.end(); ++i)
+        for (auto it = dependentDirs.begin(); it != dependentDirs.end(); ++it)
             warningMsg += L"\n\n" +
-                          fmtFileName(i->first) + L"\n" +
-                          fmtFileName(i->second);
+                          fmtFileName(it->first) + L"\n" +
+                          fmtFileName(it->second);
     }
     return warningMsg;
 }
@@ -205,40 +205,41 @@ std::wstring checkFolderDependency(const std::vector<FolderPairCfg>& folderPairs
 class CmpCallbackImpl : public CompareCallback
 {
 public:
-    CmpCallbackImpl(ProcessCallback& pc, UInt64& bytesReported) :
+    CmpCallbackImpl(ProcessCallback& pc, Int64& bytesReported) :
         pc_(pc),
         bytesReported_(bytesReported) {}
 
-    virtual void updateCompareStatus(UInt64 totalBytes)
+    virtual void updateCompareStatus(Int64 bytesDelta)
     {
         //inform about the (differential) processed amount of data
-        pc_.updateProcessedData(0, to<Int64>(totalBytes) - to<Int64>(bytesReported_)); //throw()! -> this ensures client and service provider are in sync!
-        bytesReported_ = totalBytes;                                                   //
+        pc_.updateProcessedData(0, bytesDelta); //throw()! -> ensure client and service provider are in sync!
+        bytesReported_ += bytesDelta;           //
 
         pc_.requestUiRefresh(); //may throw
     }
 
 private:
     ProcessCallback& pc_;
-    UInt64& bytesReported_;
+    Int64& bytesReported_;
 };
 
 
-bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filename2, UInt64 totalBytesToCmp, ProcessCallback& pc) //throw FileError
+bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filename2, Int64 expectedBytesToCmp, ProcessCallback& pc) //throw FileError
 {
-    UInt64 bytesReported; //amount of bytes that have been compared and communicated to status handler
+    Int64 bytesReported; //amount of bytes that have been compared and communicated to status handler
 
-    //in error situation: undo communication of processed amount of data
-    zen::ScopeGuard guardStatistics = zen::makeGuard([&] { pc.updateProcessedData(0, -1 * to<Int64>(bytesReported)); });
+    //error = unexpected increase of total workload
+    zen::ScopeGuard guardStatistics = zen::makeGuard([&] { pc.updateTotalData(0, bytesReported); });
 
     CmpCallbackImpl callback(pc, bytesReported);
     bool sameContent = filesHaveSameContent(filename1, filename2, callback); //throw FileError
 
-    //inform about the (remaining) processed amount of data
-    pc.updateProcessedData(0, to<Int64>(totalBytesToCmp) - to<Int64>(bytesReported));
-    bytesReported = totalBytesToCmp;
-
     guardStatistics.dismiss();
+
+    //update statistics to consider the real amount of data processed: consider short-cut behavior if first bytes differ!
+    if (bytesReported != expectedBytesToCmp)
+        pc.updateTotalData(0, bytesReported - expectedBytesToCmp);
+
     return sameContent;
 }
 }
@@ -286,7 +287,7 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead,
 
         virtual void reportStatus(const std::wstring& statusMsg, int itemsTotal)
         {
-            callback_.updateProcessedData(itemsTotal - itemsReported, 0); //processed data is communicated in subfunctions!
+            callback_.updateProcessedData(itemsTotal - itemsReported, 0); //processed bytes are reported in subfunctions!
             itemsReported = itemsTotal;
 
             callback_.reportStatus(statusMsg); //may throw
@@ -316,7 +317,7 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead,
     fillBuffer(keysToRead, //in
                directoryBuffer, //out
                cb,
-               UI_UPDATE_INTERVAL / 4); //every ~25 ms
+               UI_UPDATE_INTERVAL / 2); //every ~50 ms
 }
 
 
@@ -331,7 +332,7 @@ void zen::compare(size_t fileTimeTolerance,
     //specify process and resource handling priorities
     std::unique_ptr<ScheduleForBackgroundProcessing> backgroundPrio;
     if (runWithBackgroundPriority)
-        backgroundPrio.reset(new ScheduleForBackgroundProcessing);
+        backgroundPrio = make_unique<ScheduleForBackgroundProcessing>();
 
     //prevent operating system going into sleep state
     PreventStandby dummy2;
@@ -699,7 +700,7 @@ void ComparisonBuffer::compareByContent(std::vector<std::pair<FolderPairCfg, Bas
     {
         if (filesHaveSameContentUpdating(fileObj->getFullName<LEFT_SIDE>(), //throw FileError
             fileObj->getFullName<RIGHT_SIDE>(),
-            fileObj->getFileSize<LEFT_SIDE >(),
+            to<Int64>(fileObj->getFileSize<LEFT_SIDE>()),
             callback_))
             {
                 //Caveat:
@@ -715,7 +716,7 @@ void ComparisonBuffer::compareByContent(std::vector<std::pair<FolderPairCfg, Bas
             else
                 fileObj->setCategory<FILE_DIFFERENT>();
 
-            callback_.updateProcessedData(1, 0); //processed data is communicated in subfunctions!
+            callback_.updateProcessedData(1, 0); //processed bytes are reported in subfunctions!
 
         }, callback_))
         fileObj->setCategoryConflict(_("Conflict detected:") + L"\n" + _("Comparing files by content failed."));

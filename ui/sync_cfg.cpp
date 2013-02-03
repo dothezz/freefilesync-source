@@ -229,8 +229,8 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     m_bitmapDatabase  ->SetBitmap(GlobalResources::getImage(L"database"));
 
     enumVersioningStyle.
-    add(VER_STYLE_REPLACE,       _("Replace"),    _("Move files and replace if existing")).
-    add(VER_STYLE_ADD_TIMESTAMP, _("Versioning"), _("Append a timestamp to each file name"));
+    add(VER_STYLE_ADD_TIMESTAMP, _("Versioning"), _("Append a timestamp to each file name")).
+    add(VER_STYLE_REPLACE,       _("Replace"),    _("Move files and replace if existing"));
 
     //hide controls for optional parameters
     if (!handleError && !execWhenFinished) //currently either both or neither are bound!

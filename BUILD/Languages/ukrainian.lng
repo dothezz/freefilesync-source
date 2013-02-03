@@ -31,8 +31,8 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Запит переривання: В очікуванні завершення поточної операції...</target>
 
-<source>Failure to create time stamp for versioning:</source>
-<target></target>
+<source>Failure to create timestamp for versioning:</source>
+<target>Не вдається створити часової мітки для версій:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Автоматична синхронізація</target>
@@ -59,7 +59,7 @@
 <target>Очистити налаштування фільтра</target>
 
 <source>Save as batch job</source>
-<target></target>
+<target>Зберегти як пакетне завдання</target>
 
 <source>Comparison settings</source>
 <target>Налаштування порівнювання</target>
@@ -275,7 +275,7 @@
 <target>Вибрати папку</target>
 
 <source>Idle time [seconds]</source>
-<target></target>
+<target>Час простою [секунд]</target>
 
 <source>Idle time between last detected change and execution of command</source>
 <target>Час простою між виявленням останньої зміни та виконанням команди</target>
@@ -331,16 +331,16 @@ The command is triggered if:
 <target>Синхронізація закінчилася з помилками!</target>
 
 <source>Synchronization completed with warnings.</source>
-<target></target>
+<target>Синхронізація завершена з попередженнями.</target>
 
 <source>Nothing to synchronize!</source>
 <target>Нічого синхронізувати!</target>
 
 <source>Synchronization completed successfully.</source>
-<target></target>
+<target>Синхронізація успішно завершена.</target>
 
 <source>Saving log file %x...</source>
-<target></target>
+<target>Збереження файла журналу %x...</target>
 
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
 <target>Натисніть "Змінити" для вирішення питань у головному вікні FreeFileSync.</target>
@@ -364,7 +364,7 @@ The command is triggered if:
 <target>Не можна з’єднатися з sourceforge.net!</target>
 
 <source>Current FreeFileSync version number was not found online! Do you want to check manually?</source>
-<target></target>
+<target>Номер поточної версії FreeFileSync не знайдений онлайн! Хочете перевірити вручну?</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>Ви хочете, щоб FreeFileSync автоматично перевіряв наявність оновлень щотижня?</target>
@@ -436,7 +436,7 @@ The command is triggered if:
 <target>Зберегти</target>
 
 <source>Save as &batch job...</source>
-<target></target>
+<target>Зберегти як пакетне завдання</target>
 
 <source>1. &Compare</source>
 <target>1. &Порівняти</target>
@@ -484,10 +484,10 @@ The command is triggered if:
 <target>Поміняти місцями</target>
 
 <source>Open</source>
-<target></target>
+<target>Відкрити</target>
 
 <source>Save</source>
-<target></target>
+<target>Зберегти</target>
 
 <source>Last used configurations (press DEL to remove from list)</source>
 <target>
@@ -496,7 +496,7 @@ The command is triggered if:
 </target>
 
 <source>Hide excluded items</source>
-<target></target>
+<target>Приховати виключені елементи</target>
 
 <source>Show filtered or temporarily excluded files</source>
 <target>Показати відфільтровані чи тимчасово виключені елементи</target>
@@ -556,13 +556,13 @@ The command is triggered if:
 <target>Перервати синхронізацію при першій помилці</target>
 
 <source>On completion</source>
-<target></target>
+<target>Після завершення</target>
 
 <source>Show progress dialog</source>
 <target>Показувати вікно прогресу</target>
 
 <source>Save log</source>
-<target></target>
+<target>Зберегти журнал</target>
 
 <source>Select folder to save log files</source>
 <target>Виберіть папку для файлів журналу</target>
@@ -574,7 +574,7 @@ The command is triggered if:
 <target>Обмежити максимальну кількість файлів журналу</target>
 
 <source>Select variant</source>
-<target></target>
+<target>Виберіть варіант</target>
 
 <source>
 Files are found equal if
@@ -609,7 +609,7 @@ is the same
 <target>OK</target>
 
 <source><- Two way -></source>
-<target></target>
+<target><- Обидва напрямки -></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
 <target>Виявити та поширити зміни на обидві сторони використовуючи базу даних. Видалення, перейменування та конфлікти визначаються автоматично.</target>
@@ -645,7 +645,7 @@ is the same
 <target>Корзина</target>
 
 <source>Use Recycle Bin for deleted and overwritten files</source>
-<target></target>
+<target>Використати Корзину для видалених і перезаписаних файлів</target>
 
 <source>Versioning</source>
 <target>Запис версій</target>
@@ -654,7 +654,7 @@ is the same
 <target>Перемістити файли з часовою міткою у вказану папку</target>
 
 <source>Naming convention:</source>
-<target></target>
+<target>Метод іменування:</target>
 
 <source>Configuration</source>
 <target>Налаштування</target>
@@ -683,7 +683,7 @@ is the same
 <source>&Pause</source>
 <target>&Пауза</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Код програми написаний на C++ з використанням:</target>
 
 <source>If you like FreeFileSync</source>
@@ -808,6 +808,12 @@ Note: File names must be relative to base directories!
 
 <source>Select view</source>
 <target>Список файлів</target>
+
+<source>Deleting file %x</source>
+<target>Вилучення файлу %x</target>
+
+<source>Deleting %x</source>
+<target></target>
 
 <source>Set direction:</source>
 <target>Виберіть напрям:</target>
@@ -962,6 +968,9 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>Показати файли, які не будуть зкопійовані</target>
 
+<source>Set as default</source>
+<target></target>
+
 <source>All folders are in sync!</source>
 <target>Всі папки синхронізовано!</target>
 
@@ -973,16 +982,6 @@ Note: File names must be relative to base directories!
 
 <source>File list exported!</source>
 <target>Список файлів експортовано!</target>
-
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>%x об'єкт успішно вилучено!</pluralform>
-<pluralform>%x об'єкти успішно вилучено!</pluralform>
-<pluralform>%x об'єктів успішно вилучено!</pluralform>
-</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1039,7 +1038,7 @@ Note: File names must be relative to base directories!
 <target>Порівнювання вмісту...</target>
 
 <source>Copy</source>
-<target></target>
+<target>Копія</target>
 
 <source>Paused</source>
 <target>Призупинено</target>
@@ -1114,13 +1113,13 @@ Note: File names must be relative to base directories!
 <target>- тільки папка</target>
 
 <source>- Other side's counterpart to %item_path%</source>
-<target></target>
+<target>- Елемент з протилежної сторони до %item_path%</target>
 
 <source>- Other side's counterpart to %item_folder%</source>
-<target></target>
+<target>- Елемент з протилежної сторони до %item_folder%</target>
 
 <source>Make hidden warnings and dialogs visible again?</source>
-<target></target>
+<target>Зробити приховані попередження та діалоги ​​знову видимими?</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
@@ -1146,22 +1145,22 @@ Note: File names must be relative to base directories!
 <target>Залишити як невирішений конфлікт</target>
 
 <source>Replace</source>
-<target></target>
+<target>Замінити</target>
 
 <source>Move files and replace if existing</source>
-<target></target>
+<target>Перемістити файли замінюючи існуючі</target>
 
 <source>Append a timestamp to each file name</source>
-<target></target>
+<target>Додати часову мітку до кожного імені файлу</target>
 
 <source>Folder</source>
-<target></target>
+<target>Папка</target>
 
 <source>File</source>
-<target></target>
+<target>Файл</target>
 
 <source>YYYY-MM-DD hhmmss</source>
-<target></target>
+<target>YYYY-MM-DD hhmmss</target>
 
 <source>Files</source>
 <target>Файли</target>
@@ -1218,7 +1217,7 @@ Note: File names must be relative to base directories!
 <target>Не вдається зкопіювати файл %х до %y.</target>
 
 <source>Type of item %x is not supported:</source>
-<target></target>
+<target>Тип елемента %х не підтримується:</target>
 
 <source>Cannot open directory %x.</source>
 <target>Не вдається відкрити каталогу %x.</target>
@@ -1291,6 +1290,9 @@ Note: File names must be relative to base directories!
 Налаштування напряму синхронізації за замовчуванням:
 Старі файли будуть замінені новішими файлами.
 </target>
+
+<source>Checking recycle bin availability for folder %x...</source>
+<target></target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Корзина для цього шляху недоступна. Файли будуть вилучені назавжди:</target>
@@ -1373,9 +1375,6 @@ Note: File names must be relative to base directories!
 <source>Multiple...</source>
 <target>Різні варіанти...</target>
 
-<source>Deleting file %x</source>
-<target>Вилучення файлу %x</target>
-
 <source>Deleting folder %x</source>
 <target>Вилучення папки %x</target>
 
@@ -1401,7 +1400,7 @@ Note: File names must be relative to base directories!
 <target>Переміщення символьного посилання %x до %y</target>
 
 <source>Removing old versions...</source>
-<target></target>
+<target>Видалення старих версій...</target>
 
 <source>Creating file %x</source>
 <target>Створення файлу %x</target>
@@ -1437,7 +1436,7 @@ Note: File names must be relative to base directories!
 <target>Вихідний каталог %x не знайдено.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
-<target></target>
+<target>Наступні елементи мають невирішені конфлікти і не будуть синхронізовані:</target>
 
 <source>Significant difference detected:</source>
 <target>Виявлена істотна різниця:</target>

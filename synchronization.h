@@ -41,7 +41,6 @@ public:
     size_t     getRowCount() const { return rowsTotal; }
 
 private:
-    //static const size_t MAX_CONFLICTS = 3;
     void init();
 
     void recurse(const HierarchyObject& hierObj);
@@ -53,7 +52,6 @@ private:
     int createLeft, createRight;
     int updateLeft, updateRight;
     int deleteLeft, deleteRight;
-    //    int conflict;
     ConflictTexts conflictMsgs; //conflict texts to display as a warning message
     Int64 dataToProcess;
     size_t rowsTotal;

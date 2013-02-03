@@ -328,6 +328,8 @@ public:
         Connect(wxEVT_CHAR,     wxKeyEventHandler(SubWindow::onChar   ), nullptr, this);
         Connect(wxEVT_KEY_UP,   wxKeyEventHandler(SubWindow::onKeyUp  ), nullptr, this);
         Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(SubWindow::onKeyDown), nullptr, this);
+
+        assert(GetClientAreaOrigin() == wxPoint()); //generally assumed when dealing with coordinates below
     }
 
     Grid& refParent() { return parent_; }
@@ -483,6 +485,7 @@ public:
 
     wxRect getRowLabelArea(ptrdiff_t row) const
     {
+        assert(GetClientAreaOrigin() == wxPoint());
         return wxRect(wxPoint(0, rowHeight * row),
                       wxSize(GetClientSize().GetWidth(), rowHeight));
     }
@@ -1304,9 +1307,9 @@ private:
         }
         ~MouseSelection() { if (wnd_.HasCapture()) wnd_.ReleaseMouse(); }
 
-        size_t getStartRow     () const { return rowStart_; }
-        size_t getComponentPos () const { return compPos_; }
-        size_t getCurrentRow   () const { return rowCurrent_; }
+        size_t getStartRow     () const { return rowStart_;       }
+        size_t getComponentPos () const { return compPos_;        }
+        size_t getCurrentRow   () const { return rowCurrent_;     }
         bool   isPositiveSelect() const { return positiveSelect_; } //are we selecting or unselecting?
 
         void evalMousePos()
@@ -1322,6 +1325,7 @@ private:
             wxMouseState mouseState = wxGetMouseState();
             const wxPoint clientPos = wnd_.ScreenToClient(wxPoint(mouseState.GetX(), mouseState.GetY()));
             const wxSize clientSize = wnd_.GetClientSize();
+            assert(wnd_.GetClientAreaOrigin() == wxPoint());
 
             //scroll while dragging mouse
             const int overlapPixY = clientPos.y < 0 ? clientPos.y :

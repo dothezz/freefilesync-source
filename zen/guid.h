@@ -28,7 +28,8 @@ namespace zen
 inline
 std::string generateGUID() //creates a 16 byte GUID
 {
-    boost::uuids::uuid nativeRep = boost::uuids::random_generator()(); //generator is thread-safe like an int
+    boost::uuids::uuid nativeRep = boost::uuids::random_generator()();
+    //generator is only thread-safe like an int, so we keep it local until we need to optimize perf
     //perf: generator: 0.22ms per call; retrieve GUID: 0.12µs per call
     return std::string(nativeRep.begin(), nativeRep.end());
 }

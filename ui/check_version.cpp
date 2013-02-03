@@ -68,7 +68,7 @@ public:
         if (statusCode != HTTP_STATUS_OK)
             throw InternetConnectionError(); //e.g. 404 - HTTP_STATUS_NOT_FOUND
 
-        guardRequest.dismiss();
+        guardRequest .dismiss();
         guardInternet.dismiss();
     }
 
@@ -113,10 +113,7 @@ bool canAccessUrl(const wchar_t* url) //throw ()
         (void)WinInetAccess(url); //throw InternetConnectionError
         return true;
     }
-    catch (const InternetConnectionError&)
-    {
-        return false;
-    }
+    catch (const InternetConnectionError&) { return false; }
 }
 
 

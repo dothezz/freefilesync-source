@@ -15,7 +15,6 @@
 
 //Zbase - a policy based string class optimizing performance and genericity
 
-
 namespace zen
 {
 /*
@@ -59,8 +58,8 @@ template <typename Char, //Character Type
     void setLength(Char* ptr, size_t newLength)
 */
 
-template <typename Char, //Character Type
-         class    AP>   //Allocator Policy
+template <class Char, //Character Type
+         class AP>   //Allocator Policy
 class StorageDeepCopy : public AP
 {
 protected:
@@ -112,8 +111,8 @@ private:
 };
 
 
-template <typename Char, //Character Type
-         class AP>      //Allocator Policy
+template <class Char, //Character Type
+         class AP>   //Allocator Policy
 class StorageRefCountThreadSafe : public AP
 {
 protected:
@@ -169,7 +168,7 @@ private:
     {
         Descriptor(long rc, size_t len, size_t cap) :
             refCount(rc),
-            length(static_cast<std::uint32_t>(len)),
+            length  (static_cast<std::uint32_t>(len)),
             capacity(static_cast<std::uint32_t>(cap)) {}
 
         boost::detail::atomic_count refCount; //practically no perf loss: ~0.2%! (FFS comparison)
@@ -181,8 +180,8 @@ private:
     static       Descriptor* descr(      Char* ptr) { return reinterpret_cast<      Descriptor*>(ptr) - 1; }
     static const Descriptor* descr(const Char* ptr) { return reinterpret_cast<const Descriptor*>(ptr) - 1; }
 };
-//################################################################################################################################################################
 
+//################################################################################################################################################################
 
 //perf note: interstingly StorageDeepCopy and StorageRefCountThreadSafe show same performance in FFS comparison
 
@@ -386,7 +385,7 @@ size_t Zbase<Char, SP, AP>::find(const Zbase& str, size_t pos) const
     assert(pos <= length());
     const Char* thisEnd = end(); //respect embedded 0
     const Char* it = std::search(begin() + pos, thisEnd,
-                                   str.begin(), str.end());
+                                 str.begin(), str.end());
     return it == thisEnd ? npos : it - begin();
 }
 
@@ -397,7 +396,7 @@ size_t Zbase<Char, SP, AP>::find(const Char* str, size_t pos) const
     assert(pos <= length());
     const Char* thisEnd = end(); //respect embedded 0
     const Char* it = std::search(begin() + pos, thisEnd,
-                                   str, str + strLength(str));
+                                 str, str + strLength(str));
     return it == thisEnd ? npos : it - begin();
 }
 
@@ -433,7 +432,7 @@ size_t Zbase<Char, SP, AP>::rfind(const Char* str, size_t pos) const
     const Char* currEnd = pos == npos ? end() : begin() + std::min(pos + strLen, length());
 
     const Char* it = search_last(begin(), currEnd,
-                                   str, str + strLen);
+                                 str, str + strLen);
     return it == currEnd ? npos : it - begin();
 }
 

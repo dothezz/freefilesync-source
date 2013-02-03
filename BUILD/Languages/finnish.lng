@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Keskeytys pyydetty: Odotetaan toiminnon loppumista...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Ongelma luoda aikaleimaa versionnissa:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -681,7 +681,7 @@ on sama
 <source>&Pause</source>
 <target>&Keskeytä</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Koodikieli on C++ käyttäen:</target>
 
 <source>If you like FreeFileSync</source>

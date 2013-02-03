@@ -29,9 +29,9 @@
 <target>Verzeichnis öffnen</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
-<target>Abbruch initiiert: Warte, bis aktuelle Operation beendet ist...</target>
+<target>Abbruch initiiert: Warte bis die aktuelle Operation beendet ist...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Der Zeitstempel für die Versionierung kann nicht erstellt werden:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -459,17 +459,11 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Compare</source>
 <target>Vergleichen</target>
 
-<source>Compare both sides</source>
-<target>Beide Seiten vergleichen</target>
-
 <source>&Abort</source>
 <target>&Abbrechen</target>
 
 <source>Synchronize</source>
 <target>Synchronisieren</target>
-
-<source>Start synchronization</source>
-<target>Synchronisation starten</target>
 
 <source>Add folder pair</source>
 <target>Ordnerpaar hinzufügen</target>
@@ -479,15 +473,6 @@ Die Befehlszeile wird ausgelöst wenn:
 
 <source>Swap sides</source>
 <target>Seiten vertauschen</target>
-
-<source>Open</source>
-<target>Öffnen</target>
-
-<source>Save</source>
-<target>Speichern</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Zuletzt benutzte Konfigurationen (Entf-Taste löscht Einträge)</target>
 
 <source>Hide excluded items</source>
 <target>Ausgeschlossene Elemente verstecken</target>
@@ -681,7 +666,7 @@ gleich ist
 <source>&Pause</source>
 <target>&Pause</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Sourcecode in C++ geschrieben mit Hilfe von:</target>
 
 <source>If you like FreeFileSync</source>
@@ -771,6 +756,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Description</source>
 <target>Beschreibung</target>
 
+<source>Start synchronization</source>
+<target>Synchronisation starten</target>
+
 <source>Variant</source>
 <target>Variante</target>
 
@@ -806,6 +794,15 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Select view</source>
 <target>Ansicht auswählen</target>
+
+<source>Open...</source>
+<target>Öffnen...</target>
+
+<source>Save</source>
+<target>Speichern</target>
+
+<source>Compare both sides</source>
+<target>Beide Seiten vergleichen</target>
 
 <source>Set direction:</source>
 <target>Setze Richtung:</target>
@@ -960,6 +957,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Show files that won't be copied</source>
 <target>Dateien die nicht kopiert werden anzeigen</target>
 
+<source>Set as default</source>
+<target>Als Standard festlegen</target>
+
 <source>All folders are in sync!</source>
 <target>Alle Ordner sind synchron!</target>
 
@@ -971,15 +971,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>File list exported!</source>
 <target>Dateiliste exportiert!</target>
-
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>Element erfolgreich gelöscht!</pluralform>
-<pluralform>%x Elemente erfolgreich gelöscht!</pluralform>
-</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1137,14 +1128,14 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Leave as unresolved conflict</source>
 <target>Als unbehandelten Konflikt belassen</target>
 
+<source>Append a timestamp to each file name</source>
+<target>Einen Zeitstempel an jeden Dateinamen hinzufügen</target>
+
 <source>Replace</source>
 <target>Ersetzen</target>
 
 <source>Move files and replace if existing</source>
 <target>Dateien verschieben und bereits vorhandene ersetzen</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Einen Zeitstempel an jeden Dateinamen hinzufügen</target>
 
 <source>Folder</source>
 <target>Ordner</target>
@@ -1278,6 +1269,27 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Setze Standardwerte für Synchronisationsrichtungen: Alte Dateien werden durch neuere überschrieben.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Prüfe Verfügbarkeit des Papierkorbs für Ordner %x...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>Verschiebe Datei %x in den Papierkorb</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>Verschiebe Ordner %x in den Papierkorb</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Verschiebe Symbolischen Link %x in den Papierkorb</target>
+
+<source>Deleting file %x</source>
+<target>Lösche Datei %x</target>
+
+<source>Deleting folder %x</source>
+<target>Lösche Ordner %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Lösche Symbolischen Link %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Der Papierkorb ist für die folgenden Pfade nicht verfügbar! Die Dateien werden stattdessen permanent gelöscht:</target>
 
@@ -1358,24 +1370,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Multiple...</source>
 <target>Verschiedene...</target>
-
-<source>Deleting file %x</source>
-<target>Lösche Datei %x</target>
-
-<source>Deleting folder %x</source>
-<target>Lösche Ordner %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Lösche Symbolischen Link %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Verschiebe Datei %x in den Papierkorb</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Verschiebe Ordner %x in den Papierkorb</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Verschiebe Symbolischen Link %x in den Papierkorb</target>
 
 <source>Moving file %x to %y</source>
 <target>Verschiebe Datei %x nach %y</target>

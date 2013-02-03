@@ -31,7 +31,7 @@
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...</target>
 
-<source>Failure to create time stamp for versioning:</source>
+<source>Failure to create timestamp for versioning:</source>
 <target>Napaka pri ustvarjanju časovne oznake pri ustvarjanju različic:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
@@ -687,7 +687,7 @@ enaka
 <source>&Pause</source>
 <target>&Premor</target>
 
-<source>Source code written in C++ utilizing:</source>
+<source>Source code written in C++ using:</source>
 <target>Izvorna koda napisana v C++ z uporabo:</target>
 
 <source>If you like FreeFileSync</source>

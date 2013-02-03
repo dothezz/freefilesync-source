@@ -51,19 +51,7 @@ void parseLng(const std::string& fileStream, TransHeader& header, TranslationMap
 void parseHeader(const std::string& fileStream, TransHeader& header); //throw ParsingError
 
 class TranslationList; //unordered list of unique translation items
-void generateLng(const TranslationList& in, const TransHeader& header, std::string& fileStream);
-
-
-
-
-
-
-
-
-
-
-
-
+std::string generateLng(const TranslationList& in, const TransHeader& header);
 
 
 
@@ -114,7 +102,7 @@ public:
     }
 
 private:
-    friend void generateLng(const TranslationList& in, const TransHeader& header, std::string& fileStream);
+    friend std::string generateLng(const TranslationList& in, const TransHeader& header);
 
     struct Item {virtual ~Item() {} };
     struct RegularItem : public Item { RegularItem(const TranslationMap      ::value_type& val) : value(val) {} TranslationMap      ::value_type value; };
@@ -218,7 +206,11 @@ private:
 class Scanner
 {
 public:
-    Scanner(const std::string& fileStream) : stream(fileStream), pos(stream.begin()) {}
+    Scanner(const std::string& fileStream) : stream(fileStream), pos(stream.begin())
+    {
+        if (zen::startsWith(stream, zen::BYTE_ORDER_MARK_UTF8))
+            pos += zen::strLength(zen::BYTE_ORDER_MARK_UTF8);
+    }
 
     Token nextToken()
     {
@@ -228,19 +220,19 @@ public:
         if (pos == stream.end())
             return Token(Token::TK_END);
 
-        for (KnownTokens::TokenMap::const_iterator i = KnownTokens::asList().begin(); i != KnownTokens::asList().end(); ++i)
-            if (startsWith(i->second))
+        for (auto it = KnownTokens::asList().begin(); it != KnownTokens::asList().end(); ++it)
+            if (startsWith(it->second))
             {
-                pos += i->second.size();
-                return Token(i->first);
+                pos += it->second.size();
+                return Token(it->first);
             }
 
         //rest must be "text"
-        std::string::const_iterator textBegin = pos;
+        std::string::const_iterator itBegin = pos;
         while (pos != stream.end() && !startsWithKnownTag())
             pos = std::find(pos + 1, stream.end(), '<');
 
-        std::string text(textBegin, pos);
+        std::string text(itBegin, pos);
 
         normalize(text); //remove whitespace from end ect.
 
@@ -255,13 +247,8 @@ public:
     size_t posRow() const //current row beginning with 0
     {
         //count line endings
-        size_t crSum = 0; //carriage returns
-        size_t nlSum = 0; //new lines
-        for (auto it = stream.begin(); it != pos; ++it)
-            if (*it == '\r')
-                ++crSum;
-            else if (*it == '\n')
-                ++nlSum;
+        const size_t crSum = std::count(stream.begin(), pos, '\r'); //carriage returns
+        const size_t nlSum = std::count(stream.begin(), pos, '\n'); //new lines
         assert(crSum == 0 || nlSum == 0 || crSum == nlSum);
         return std::max(crSum, nlSum); //be compatible with Linux/Mac/Win
     }
@@ -294,32 +281,15 @@ private:
 
     static void normalize(std::string& text)
     {
-        //remmove whitespace from end
-        while (!text.empty() && zen::isWhiteSpace(*text.rbegin()))
-            text.resize(text.size() - 1);
-
-        //ensure c-style line breaks
+        zen::trim(text); //remmove whitespace from end
 
         //Delimiter:
         //----------
         //Linux: 0xA        \n
         //Mac:   0xD        \r
         //Win:   0xD 0xA    \r\n    <- language files are in Windows format
-        if (text.find('\r') != std::string::npos)
-        {
-            std::string tmp;
-            for (std::string::const_iterator i = text.begin(); i != text.end(); ++i)
-                if (*i == '\r')
-                {
-                    std::string::const_iterator next = i + 1;
-                    if (next != text.end() && *next == '\n')
-                        ++i;
-                    tmp += '\n';
-                }
-                else
-                    tmp += *i;
-            text = tmp;
-        }
+        zen::replace(text, "\r\n", '\n'); //
+        zen::replace(text, "\r",   '\n'); //ensure c-style line breaks
     }
 
     const std::string stream;
@@ -334,7 +304,6 @@ public:
 
     void parse(TranslationMap& out, TranslationPluralMap& pluralOut, TransHeader& header)
     {
-        //header
         parseHeader(header);
 
         //items
@@ -399,9 +368,7 @@ private:
             nextToken();
         }
         consumeToken(Token::TK_TRG_END);
-
-        if (!translation.empty()) //only add if translation is existing
-            out.insert(std::make_pair(original, translation));
+        out.insert(std::make_pair(original, translation));
     }
 
     void parsePlural(TranslationPluralMap& pluralOut, int formCount)
@@ -437,20 +404,23 @@ private:
             throw ParsingError(scn.posRow(), scn.posCol());
 
         consumeToken(Token::TK_TRG_END);
-
-        if (!pluralList.empty()) //only add if translation is existing
-            pluralOut.insert(std::make_pair(SingularPluralPair(engSingular, engPlural), pluralList));
+        pluralOut.insert(std::make_pair(SingularPluralPair(engSingular, engPlural), pluralList));
     }
 
 
     void nextToken() { tk = scn.nextToken(); }
     const Token& token() const { return tk; }
 
-    void consumeToken(Token::Type t)
+    void consumeToken(Token::Type t) //throw ParsingError
+    {
+        expectToken(t); //throw ParsingError
+        nextToken();
+    }
+
+    void expectToken(Token::Type t) //throw ParsingError
     {
         if (token().type != t)
             throw ParsingError(scn.posRow(), scn.posCol());
-        nextToken();
     }
 
     Scanner scn;
@@ -464,24 +434,22 @@ void parseLng(const std::string& fileStream, TransHeader& header, TranslationMap
     out.clear();
     pluralOut.clear();
 
-    //skip UTF-8 Byte Ordering Mark
-    LngParser prs(zen::startsWith(fileStream, zen::BYTE_ORDER_MARK_UTF8) ? fileStream.substr(3) : fileStream);
-    prs.parse(out, pluralOut, header);
+    LngParser(fileStream).parse(out, pluralOut, header);
 }
 
 
 inline
 void parseHeader(const std::string& fileStream, TransHeader& header) //throw ParsingError
 {
-    //skip UTF-8 Byte Ordering Mark
-    LngParser prs(zen::startsWith(fileStream, zen::BYTE_ORDER_MARK_UTF8) ? fileStream.substr(3) : fileStream);
-    prs.parseHeader(header);
+    LngParser(fileStream).parseHeader(header);
 }
 
 
 inline
 void formatMultiLineText(std::string& text)
 {
+    assert(!zen::contains(text, "\r\n"));
+
     if (text.find('\n') != std::string::npos) //multiple lines
     {
         if (*text.begin() != '\n')
@@ -492,49 +460,46 @@ void formatMultiLineText(std::string& text)
 }
 
 
-const std::string LB = "\n";
-const std::string TAB = "\t";
-
-
-void generateLng(const TranslationList& in, const TransHeader& header, std::string& fileStream)
+std::string generateLng(const TranslationList& in, const TransHeader& header)
 {
+    std::string out;
     //header
-    fileStream += KnownTokens::text(Token::TK_HEADER_BEGIN) + LB;
+    out += KnownTokens::text(Token::TK_HEADER_BEGIN) + '\n';
 
-    fileStream += TAB + KnownTokens::text(Token::TK_LANG_NAME_BEGIN);
-    fileStream += header.languageName;
-    fileStream += KnownTokens::text(Token::TK_LANG_NAME_END) + LB;
+    out += '\t' + KnownTokens::text(Token::TK_LANG_NAME_BEGIN);
+    out += header.languageName;
+    out += KnownTokens::text(Token::TK_LANG_NAME_END) + '\n';
 
-    fileStream += TAB + KnownTokens::text(Token::TK_TRANS_NAME_BEGIN);
-    fileStream += header.translatorName;
-    fileStream += KnownTokens::text(Token::TK_TRANS_NAME_END) + LB;
+    out += '\t' + KnownTokens::text(Token::TK_TRANS_NAME_BEGIN);
+    out += header.translatorName;
+    out += KnownTokens::text(Token::TK_TRANS_NAME_END) + '\n';
 
-    fileStream += TAB + KnownTokens::text(Token::TK_LOCALE_NAME_BEGIN);
-    fileStream += header.localeName;
-    fileStream += KnownTokens::text(Token::TK_LOCALE_NAME_END) + LB;
+    out += '\t' + KnownTokens::text(Token::TK_LOCALE_NAME_BEGIN);
+    out += header.localeName;
+    out += KnownTokens::text(Token::TK_LOCALE_NAME_END) + '\n';
 
-    fileStream += TAB + KnownTokens::text(Token::TK_FLAG_FILE_BEGIN);
-    fileStream += header.flagFile;
-    fileStream += KnownTokens::text(Token::TK_FLAG_FILE_END) + LB;
+    out += '\t' + KnownTokens::text(Token::TK_FLAG_FILE_BEGIN);
+    out += header.flagFile;
+    out += KnownTokens::text(Token::TK_FLAG_FILE_END) + '\n';
 
-    fileStream += TAB + KnownTokens::text(Token::TK_PLURAL_COUNT_BEGIN);
-    fileStream += zen::numberTo<std::string>(header.pluralCount);
-    fileStream += KnownTokens::text(Token::TK_PLURAL_COUNT_END) + LB;
+    out += '\t' + KnownTokens::text(Token::TK_PLURAL_COUNT_BEGIN);
+    out += zen::numberTo<std::string>(header.pluralCount);
+    out += KnownTokens::text(Token::TK_PLURAL_COUNT_END) + '\n';
 
-    fileStream += TAB + KnownTokens::text(Token::TK_PLURAL_DEF_BEGIN);
-    fileStream += header.pluralDefinition;
-    fileStream += KnownTokens::text(Token::TK_PLURAL_DEF_END) + LB;
+    out += '\t' + KnownTokens::text(Token::TK_PLURAL_DEF_BEGIN);
+    out += header.pluralDefinition;
+    out += KnownTokens::text(Token::TK_PLURAL_DEF_END) + '\n';
 
-    fileStream += KnownTokens::text(Token::TK_HEADER_END) + LB;
+    out += KnownTokens::text(Token::TK_HEADER_END) + '\n';
 
-    fileStream += LB;
+    out += '\n';
 
 
     //items
-    for (std::vector<TranslationList::Item*>::const_iterator i = in.sequence.begin(); i != in.sequence.end(); ++i)
+    for (auto it = in.sequence.begin(); it != in.sequence.end(); ++it)
     {
-        const TranslationList::RegularItem* regular = dynamic_cast<const TranslationList::RegularItem*>(*i);
-        const TranslationList::PluralItem*  plural  = dynamic_cast<const TranslationList::PluralItem*>(*i);
+        const TranslationList::RegularItem* regular = dynamic_cast<const TranslationList::RegularItem*>(*it);
+        const TranslationList::PluralItem*  plural  = dynamic_cast<const TranslationList::PluralItem* >(*it);
 
         if (regular)
         {
@@ -544,13 +509,13 @@ void generateLng(const TranslationList& in, const TransHeader& header, std::stri
             formatMultiLineText(original);
             formatMultiLineText(translation);
 
-            fileStream += KnownTokens::text(Token::TK_SRC_BEGIN);
-            fileStream += original;
-            fileStream += KnownTokens::text(Token::TK_SRC_END) + LB;
+            out += KnownTokens::text(Token::TK_SRC_BEGIN);
+            out += original;
+            out += KnownTokens::text(Token::TK_SRC_END) + '\n';
 
-            fileStream += KnownTokens::text(Token::TK_TRG_BEGIN);
-            fileStream += translation;
-            fileStream += KnownTokens::text(Token::TK_TRG_END) + LB + LB;
+            out += KnownTokens::text(Token::TK_TRG_BEGIN);
+            out += translation;
+            out += KnownTokens::text(Token::TK_TRG_END) + '\n' + '\n';
 
         }
         else if (plural)
@@ -562,34 +527,36 @@ void generateLng(const TranslationList& in, const TransHeader& header, std::stri
             formatMultiLineText(engSingular);
             formatMultiLineText(engPlural);
 
-            fileStream += KnownTokens::text(Token::TK_SRC_BEGIN) + LB;
-            fileStream += KnownTokens::text(Token::TK_PLURAL_BEGIN);
-            fileStream += engSingular;
-            fileStream += KnownTokens::text(Token::TK_PLURAL_END) + LB;
-            fileStream += KnownTokens::text(Token::TK_PLURAL_BEGIN);
-            fileStream += engPlural;
-            fileStream += KnownTokens::text(Token::TK_PLURAL_END) + LB;
-            fileStream += KnownTokens::text(Token::TK_SRC_END) + LB;
+            out += KnownTokens::text(Token::TK_SRC_BEGIN) + '\n';
+            out += KnownTokens::text(Token::TK_PLURAL_BEGIN);
+            out += engSingular;
+            out += KnownTokens::text(Token::TK_PLURAL_END) + '\n';
+            out += KnownTokens::text(Token::TK_PLURAL_BEGIN);
+            out += engPlural;
+            out += KnownTokens::text(Token::TK_PLURAL_END) + '\n';
+            out += KnownTokens::text(Token::TK_SRC_END) + '\n';
 
-            fileStream += KnownTokens::text(Token::TK_TRG_BEGIN);
-            if (!forms.empty()) fileStream += LB;
+            out += KnownTokens::text(Token::TK_TRG_BEGIN);
+            if (!forms.empty()) out += '\n';
 
             for (PluralForms::const_iterator j = forms.begin(); j != forms.end(); ++j)
             {
                 std::string plForm = *j;
                 formatMultiLineText(plForm);
 
-                fileStream += KnownTokens::text(Token::TK_PLURAL_BEGIN);
-                fileStream += plForm;
-                fileStream += KnownTokens::text(Token::TK_PLURAL_END) + LB;
+                out += KnownTokens::text(Token::TK_PLURAL_BEGIN);
+                out += plForm;
+                out += KnownTokens::text(Token::TK_PLURAL_END) + '\n';
             }
-            fileStream += KnownTokens::text(Token::TK_TRG_END) + LB + LB;
+            out += KnownTokens::text(Token::TK_TRG_END) + '\n' + '\n';
         }
         else
         {
             throw std::logic_error("that's what you get for brittle design ;)");
         }
     }
+    assert(!zen::contains(out, "\r\n") && !zen::contains(out, "\r"));
+    return zen::replaceCpy(out, '\n', "\r\n"); //back to win line endings
 }
 }
 

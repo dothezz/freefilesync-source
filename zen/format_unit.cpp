@@ -199,7 +199,7 @@ private:
             //convert LOCALE_SGROUPING to Grouping: http://blogs.msdn.com/b/oldnewthing/archive/2006/04/18/578251.aspx
             replace(grouping, L';', L"");
             if (endsWith(grouping, L'0'))
-                grouping.resize(grouping.size() - 1);
+                grouping.pop_back();
             else
                 grouping += L'0';
             fmt.Grouping = stringTo<UINT>(grouping);
@@ -253,7 +253,7 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
         if (i <= 3)
             break;
         i -= 3;
-        if (!isDigit(output[i - 1]))
+        if (!isDigit(output[i - 1])) //stop on +, - signs
             break;
         output.insert(i, thousandSep);
     }

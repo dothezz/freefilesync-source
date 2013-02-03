@@ -49,8 +49,8 @@ public:
 
     void initNewPhase(); //call after "StatusHandler::initNewPhase"
 
-    void reportCurrentBytes(zen::Int64 currentData); //throw (), required by graph!
-    void updateProgress();
+    void notifyProgressChange(); //throw (), required by graph!
+    void updateGui();
 
     std::wstring getExecWhenFinishedCommand() const; //final value (after possible user modification)
 
