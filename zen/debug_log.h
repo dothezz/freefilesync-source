@@ -25,14 +25,9 @@ namespace zen
 {
 #ifdef FFS_WIN
 const char ZEN_FILE_NAME_SEPARATOR = '\\';
-
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 const char ZEN_FILE_NAME_SEPARATOR = '/';
-
-#else
-#error specify platform!
 #endif
-
 
 class DebugLog
 {

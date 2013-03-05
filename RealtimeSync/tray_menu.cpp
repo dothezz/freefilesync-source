@@ -153,10 +153,10 @@ public:
     void showIconActive()
     {
         wxIcon realtimeIcon;
-#ifdef FFS_WIN
-        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_win")); //use a 16x16 bitmap
+#if defined FFS_WIN || defined FFS_MAC //16x16 seems to be the only size that is shown correctly on OS X
+        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_16x16")); //use a 16x16 bitmap
 #elif defined FFS_LINUX
-        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_linux")); //use a 22x22 bitmap for perfect fit
+        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_24x24")); //use a 24x24 bitmap for perfect fit
 #endif
         const wxString postFix = jobName_.empty() ? wxString() : (L"\n\"" + jobName_ + L"\"");
         trayMenu->SetIcon(realtimeIcon, _("Monitoring active...") + postFix);
@@ -165,10 +165,10 @@ public:
     void showIconWaiting()
     {
         wxIcon realtimeIcon;
-#ifdef FFS_WIN
-        realtimeIcon.CopyFromBitmap(greyScale(GlobalResources::getImage(L"RTS_tray_win"))); //use a 16x16 bitmap
+#if defined FFS_WIN || defined FFS_MAC
+        realtimeIcon.CopyFromBitmap(greyScale(GlobalResources::getImage(L"RTS_tray_16x16")));
 #elif defined FFS_LINUX
-        realtimeIcon.CopyFromBitmap(greyScale(GlobalResources::getImage(L"RTS_tray_linux"))); //use a 22x22 bitmap for perfect fit
+        realtimeIcon.CopyFromBitmap(greyScale(GlobalResources::getImage(L"RTS_tray_24x24")));
 #endif
         const wxString postFix = jobName_.empty() ? wxString() : (L"\n\"" + jobName_ + L"\"");
         trayMenu->SetIcon(realtimeIcon, _("Waiting for missing directories...") + postFix);

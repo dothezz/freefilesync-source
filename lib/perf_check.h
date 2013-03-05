@@ -8,7 +8,7 @@
 #define STATISTICS_H_INCLUDED
 
 #include <map>
-#include <wx/string.h>
+#include <string>
 
 class PerfCheck
 {
@@ -19,8 +19,8 @@ public:
 
     void addSample(int objectsCurrent, double dataCurrent, long timeMs); //timeMs must be ascending!
 
-    wxString getRemainingTime(double dataRemaining) const;
-    wxString getBytesPerSecond() const; //for window
+    std::wstring getRemainingTime(double dataRemaining) const;
+    std::wstring getBytesPerSecond() const; //for window
 
 private:
     const long windowSizeRemTime; //unit: [ms]

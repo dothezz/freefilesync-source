@@ -8,6 +8,7 @@
 #include <memory>
 #include <zen/string_tools.h>
 #include <zen/i18n.h>
+#include <zen/utf.h>
 #include <wx/msgdlg.h>
 #include <wx/protocol/http.h>
 #include <wx/sstream.h>
@@ -15,7 +16,7 @@
 #include <wx/timer.h>
 #include "msg_popup.h"
 #include "../version/version.h"
-#include "../lib/ffs_paths.h"
+//#include "../lib/ffs_paths.h"
 #include <zen/scope_guard.h>
 
 #ifdef FFS_WIN
@@ -150,7 +151,7 @@ GetVerResult getOnlineVersion(wxString& version) //empty string on error;
     version = utfCvrtTo<wxString>(&output[0]);
     return GET_VER_SUCCESS;
 
-#else
+#elif defined FFS_LINUX || defined FFS_MAC
     wxWindowDisabler dummy;
 
     auto getStringFromUrl = [](const wxString& server, const wxString& page, int timeout, wxString* output) -> bool //true on successful connection
@@ -246,11 +247,6 @@ void zen::checkForUpdateNow(wxWindow* parent)
 
 void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
 {
-#ifdef FFS_LINUX
-    if (!zen::isPortableVersion()) //don't check for updates in locally installed version -> handled by system updater
-        return;
-#endif
-
     if (lastUpdateCheck != -1)
     {
         if (lastUpdateCheck == 0)

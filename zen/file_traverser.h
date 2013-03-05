@@ -61,7 +61,7 @@ struct DstHackCallback
     virtual ~DstHackCallback() {}
     virtual void requestUiRefresh(const Zstring& filename) = 0; //applying DST hack imposes significant one-time performance drawback => callback to inform user
 };
-#else
+#elif defined FFS_LINUX || defined FFS_MAC
 struct DstHackCallback; //DST hack not required on Linux
 #endif
 

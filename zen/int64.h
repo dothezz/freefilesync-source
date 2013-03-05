@@ -182,7 +182,7 @@ public:
     inline friend bool operator>=(const UInt64& lhs, const UInt64& rhs) { return lhs.value >= rhs.value; }
 
     //checked conversion to arbitrary target integer type
-    template <class T> inline friend T to(UInt64 number) { checkRange<T>(number.value); return static_cast<T>(number.value); }
+    template <class T> friend T to(UInt64 number);
 
     template <class T> inline friend std::basic_istream<T>& operator>>(std::basic_istream<T>& lhs, UInt64& rhs) { lhs >> rhs.value; return lhs; }
     template <class T> inline friend std::basic_ostream<T>& operator<<(std::basic_ostream<T>& lhs, const UInt64& rhs) { lhs << rhs.value; return lhs; }
@@ -190,6 +190,8 @@ public:
 private:
     std::uint64_t value;
 };
+
+template <class T> inline T to(UInt64 number) { checkRange<T>(number.value); return static_cast<T>(number.value); } //Clang 3.2 doesn't properly handle inline-friends defined in class definition
 
 inline UInt64 operator+ (const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) += rhs; }
 inline UInt64 operator- (const UInt64& lhs, const UInt64& rhs) { return UInt64(lhs) -= rhs; }

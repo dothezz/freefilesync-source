@@ -44,7 +44,7 @@ Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
     //make sure they end with ".ffs_db". These files will be excluded from comparison
 #ifdef FFS_WIN
     Zstring dbname = Zstring(Zstr("sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     //files beginning with dots are hidden e.g. in Nautilus
     Zstring dbname = Zstring(Zstr(".sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
 #endif
@@ -452,7 +452,7 @@ private:
         auto it = map.lower_bound(key);
         if (it != map.end() && !(map.key_comp()(key, it->first)))
         {
-#ifdef FFS_WIN //caveat: key might need to be updated, too, if there is a change in short name case!!!
+#if defined FFS_WIN || defined FFS_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
             if (it->first != key)
             {
                 map.erase(it); //don't fiddle with decrementing "it"! - you might lose while optimizing pointlessly
@@ -567,7 +567,7 @@ private:
                         auto insertResult = dbDirs.insert(std::make_pair(key, InSyncDir(InSyncDir::STATUS_IN_SYNC))); //get or create
                         auto it = insertResult.first;
 
-#ifdef FFS_WIN //caveat: key might need to be updated, too, if there is a change in short name case!!!
+#if defined FFS_WIN || defined FFS_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
                         const bool alreadyExisting = !insertResult.second;
                         if (alreadyExisting && it->first != key)
                         {
@@ -620,7 +620,9 @@ private:
             const Zstring& shortName = v.first;
             return filter_.passDirFilter(parentRelativeNamePf + shortName, nullptr);
             //if directory is not included in "currentDirs", it is either not existing anymore, in which case it should be deleted from database
-            //or it was excluded via filter, in which case the database entry should be preserved -> we can't tell and need to preserve the old db entry
+            //or it was excluded via filter, in which case the database entry should be preserved
+            //-> we can't tell and need to preserve the old db entry -> all child db elements are preserved since they are not recursed in the loop above!!!
+            //-> no problem with filter logic of excluding complete directory subtrees, if top folder is excluded directly!
         });
     }
 

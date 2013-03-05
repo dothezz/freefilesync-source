@@ -14,7 +14,7 @@
 #ifdef FFS_WIN
 #include "win.h" //includes "windows.h"
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <cstring>
 #include <cerrno>
 #endif
@@ -25,7 +25,7 @@ namespace zen
 //evaluate GetLastError()/errno and assemble specific error message
 #ifdef FFS_WIN
 typedef DWORD ErrorCode;
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 typedef int ErrorCode;
 #endif
 
@@ -42,40 +42,13 @@ bool errorCodeForNotExisting(ErrorCode lastError); //check for "not existing" al
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //######################## implementation ########################
 inline
 ErrorCode getLastError()
 {
 #ifdef FFS_WIN
     return ::GetLastError();
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     return errno; //don't use "::", errno is a macro!
 #endif
 }
@@ -87,17 +60,16 @@ std::wstring getLastErrorFormatted(ErrorCode lastError)
     if (lastError == 0)
         lastError = getLastError();
 
-#ifdef FFS_WIN
-    std::wstring output = _("Windows Error Code %x:");
+    std::wstring output = _("Error Code %x:");
     replace(output, L"%x", numberTo<std::wstring>(lastError));
-
+#ifdef FFS_WIN
     LPWSTR buffer = nullptr;
     if (::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM    |
                         FORMAT_MESSAGE_MAX_WIDTH_MASK |
                         FORMAT_MESSAGE_IGNORE_INSERTS | //important: without this flag ::FormatMessage() will fail if message contains placeholders
                         FORMAT_MESSAGE_ALLOCATE_BUFFER, nullptr, lastError, 0, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr) != 0)
     {
-        if (buffer) //just to be sure
+        if (buffer) //"don't trust nobody"
         {
             output += L" ";
             output += buffer;
@@ -105,18 +77,14 @@ std::wstring getLastErrorFormatted(ErrorCode lastError)
         }
     }
     ::SetLastError(lastError); //restore last error
-    return output;
 
-#elif defined FFS_LINUX
-    std::wstring output = _("Linux Error Code %x:");
-    replace(output, L"%x", numberTo<std::wstring>(lastError));
-
+#elif defined FFS_LINUX || defined FFS_MAC
     output += L" ";
     output += utfCvrtTo<std::wstring>(::strerror(lastError));
 
     errno = lastError; //restore errno
-    return output;
 #endif
+    return output;
 }
 
 
@@ -128,8 +96,7 @@ bool errorCodeForNotExisting(ErrorCode lastError)
            lastError == ERROR_PATH_NOT_FOUND ||
            lastError == ERROR_BAD_NETPATH    ||
            lastError == ERROR_NETNAME_DELETED;
-
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     return lastError == ENOENT;
 #endif
 }

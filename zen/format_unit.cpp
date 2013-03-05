@@ -16,7 +16,7 @@
 #include <zen/win.h> //includes "windows.h"
 #include <zen/win_ver.h>
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <clocale>    //thousands separator
 #include <zen/utf.h> //
 #endif
@@ -26,53 +26,50 @@ using namespace zen;
 
 std::wstring zen::filesizeToShortString(Int64 size)
 {
-    //if (size < 0) return _("Error"); -> really? there's at least one exceptional case: a failed rename operation falls-back to copy + delete, reducing "bytes transferred" to potentially < 0!
+    //if (size < 0) return _("Error"); -> really?
 
     if (numeric::abs(size) <= 999)
-        return replaceCpy(_P("1 Byte", "%x Bytes", to<int>(size)),
-                          L"%x",
-                          numberTo<std::wstring>(size));
-    else
-    {
-        double filesize = to<double>(size);
+        return replaceCpy(_P("1 Byte", "%x Bytes", to<int>(size)), L"%x", numberTo<std::wstring>(size));
 
-        filesize /= 1024;
-        std::wstring output = _("%x KB");
-        if (numeric::abs(filesize) > 999)
-        {
-            filesize /= 1024;
-            output = _("%x MB");
-            if (numeric::abs(filesize) > 999)
-            {
-                filesize /= 1024;
-                output = _("%x GB");
-                if (numeric::abs(filesize) > 999)
-                {
-                    filesize /= 1024;
-                    output = _("%x TB");
-                    if (numeric::abs(filesize) > 999)
-                    {
-                        filesize /= 1024;
-                        output = _("%x PB");
-                    }
-                }
-            }
-        }
+    auto formatUnitSize = [](double sizeInUnit, const std::wstring& unitTxt) -> std::wstring
+    {
         //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
-        const size_t fullunits = static_cast<size_t>(numeric::abs(filesize));
+        const size_t fullunits = static_cast<size_t>(numeric::abs(sizeInUnit));
         const int precisionDigits = fullunits < 10 ? 2 : fullunits < 100 ? 1 : 0; //sprintf requires "int"
 
         wchar_t buffer[50];
 #ifdef __MINGW32__
-        int charsWritten =   ::snwprintf(buffer, 50, L"%.*f", precisionDigits, filesize); //MinGW does not comply to the C standard here
+        int charsWritten =   ::_snwprintf(buffer, 50, L"%.*f", precisionDigits, sizeInUnit); //MinGW does not comply to the C standard here
 #else
-        int charsWritten = std::swprintf(buffer, 50, L"%.*f", precisionDigits, filesize);
+        int charsWritten = std::swprintf(buffer, 50, L"%.*f", precisionDigits, sizeInUnit);
 #endif
-        return charsWritten > 0 ? replaceCpy(output, L"%x", std::wstring(buffer, charsWritten)) : _("Error");
-    }
+        return charsWritten > 0 ? replaceCpy(unitTxt, L"%x", std::wstring(buffer, charsWritten)) : _("Error");
+    };
+
+    double sizeInUnit = to<double>(size);
+    sizeInUnit /= 1024;
+    if (numeric::abs(sizeInUnit) <= 999)
+        return formatUnitSize(sizeInUnit, _("%x KB"));
+
+    sizeInUnit /= 1024;
+    if (numeric::abs(sizeInUnit) <= 999)
+        return formatUnitSize(sizeInUnit, _("%x MB"));
+
+    sizeInUnit /= 1024;
+    if (numeric::abs(sizeInUnit) <= 999)
+        return formatUnitSize(sizeInUnit, _("%x GB"));
+
+    sizeInUnit /= 1024;
+    if (numeric::abs(sizeInUnit) <= 999)
+        return formatUnitSize(sizeInUnit, _("%x TB"));
+
+    sizeInUnit /= 1024;
+    return formatUnitSize(sizeInUnit, _("%x PB"));
 }
 
 
+namespace
+{
 enum UnitRemTime
 {
     URT_SEC,
@@ -81,56 +78,75 @@ enum UnitRemTime
     URT_DAY
 };
 
-std::wstring zen::remainingTimeToShortString(double timeInSec)
+
+std::wstring formatUnitTime(int val, UnitRemTime unit)
 {
-    double remainingTime = timeInSec;
-
-    //determine preferred unit
-    UnitRemTime unit = URT_SEC;
-    if (remainingTime > 59)
-    {
-        unit = URT_MIN;
-        remainingTime /= 60;
-        if (remainingTime > 59)
-        {
-            unit = URT_HOUR;
-            remainingTime /= 60;
-            if (remainingTime > 23)
-            {
-                unit = URT_DAY;
-                remainingTime /= 24;
-            }
-        }
-    }
-
-    int formattedTime = numeric::round(remainingTime);
-
-    //reduce precision to 5 seconds
-    if (unit == URT_SEC)
-        formattedTime = static_cast<int>(std::ceil(formattedTime / 5.0) * 5);
-
-    //generate output message
-    std::wstring output;
+    auto subst = [&](const std::wstring& output) { return replaceCpy(output, L"%x", zen::numberTo<std::wstring>(val)); };
     switch (unit)
     {
         case URT_SEC:
-            output = _P("1 sec", "%x sec", formattedTime);
-            break;
+            return subst(_P("1 sec", "%x sec", val));
         case URT_MIN:
-            output = _P("1 min", "%x min", formattedTime);
-            break;
+            return subst(_P("1 min", "%x min", val));
         case URT_HOUR:
-            output = _P("1 hour", "%x hours", formattedTime);
-            break;
+            return subst(_P("1 hour", "%x hours", val));
         case URT_DAY:
-            output = _P("1 day", "%x days", formattedTime);
-            break;
+            return subst(_P("1 day", "%x days", val));
     }
-    return replaceCpy(output, L"%x", zen::numberTo<std::wstring>(formattedTime));
+    assert(false);
+    return _("Error");
 }
 
 
-std::wstring zen::fractionToShortString(double fraction)
+template <int M, int N>
+std::wstring roundToBlock(double timeHigh,
+                          UnitRemTime unitHigh, const int (&stepsHigh)[M],
+                          int unitLowPerHigh,
+                          UnitRemTime unitLow, const int (&stepsLow)[N])
+{
+    assert(unitLowPerHigh > 0);
+    const double granularity = 0.1;
+    const double timeLow = timeHigh * unitLowPerHigh;
+    const int blockSizeLow = granularity * timeHigh < 1 ?
+                             numeric::nearMatch(granularity * timeLow,  std::begin(stepsLow),  std::end(stepsLow)):
+                             numeric::nearMatch(granularity * timeHigh, std::begin(stepsHigh), std::end(stepsHigh)) * unitLowPerHigh;
+    const int roundedTimeLow = numeric::round(timeLow / blockSizeLow) * blockSizeLow;
+
+    std::wstring output = formatUnitTime(roundedTimeLow / unitLowPerHigh, unitHigh);
+    if (unitLowPerHigh > blockSizeLow)
+        output += L" " + formatUnitTime(roundedTimeLow % unitLowPerHigh, unitLow);
+    return output;
+};
+}
+
+
+std::wstring zen::remainingTimeToString(double timeInSec)
+{
+    const int steps10[] = { 1, 2, 5, 10 };
+    const int steps24[] = { 1, 2, 3, 4, 6, 8, 12, 24 };
+    const int steps60[] = { 1, 2, 5, 10, 15, 20, 30, 60 };
+
+    //determine preferred unit
+    double timeInUnit = timeInSec;
+    if (timeInUnit <= 60)
+        return roundToBlock(timeInUnit, URT_SEC, steps60, 1, URT_SEC, steps60);
+
+    timeInUnit /= 60;
+    if (timeInUnit <= 60)
+        return roundToBlock(timeInUnit, URT_MIN, steps60, 60, URT_SEC, steps60);
+
+    timeInUnit /= 60;
+    if (timeInUnit <= 24)
+        return roundToBlock(timeInUnit, URT_HOUR, steps24, 60, URT_MIN, steps60);
+
+    timeInUnit /= 24;
+    return roundToBlock(timeInUnit, URT_DAY, steps10, 24, URT_HOUR, steps24);
+    //note: for 10% granularity steps10 yields a valid blocksize only up to timeInUnit == 100!
+    //for larger time sizes this results in a finer granularity than expected: 10 days -> should not be a problem considering "usual" remaining time for synchronization
+}
+
+
+std::wstring zen::fractionToString(double fraction)
 {
     //return replaceCpy(_("%x%"), L"%x", printNumber<std::wstring>(L"%3.2f", fraction * 100.0), false);
     return printNumber<std::wstring>(L"%3.2f", fraction * 100.0) + L'%'; //no need to internationalize fraction!?
@@ -236,7 +252,7 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
     }
     return number;
 
-#else
+#elif defined FFS_LINUX || defined FFS_MAC
     //we have to include thousands separator ourselves; this doesn't work for all countries (e.g india), but is better than nothing
 
     //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
@@ -261,28 +277,6 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 #endif
 }
 
-/*
-#include <wx/scrolwin.h>
-
-void zen::scrollToBottom(wxScrolledWindow* scrWindow)
-{
-    int height = 0;
-    scrWindow->GetClientSize(nullptr, &height);
-
-    int pixelPerLine = 0;
-    scrWindow->GetScrollPixelsPerUnit(nullptr, &pixelPerLine);
-
-    if (height > 0 && pixelPerLine > 0)
-    {
-        const int scrollLinesTotal    = scrWindow->GetScrollLines(wxVERTICAL);
-        const int scrollLinesOnScreen = height / pixelPerLine;
-        const int scrollPosBottom     = scrollLinesTotal - scrollLinesOnScreen;
-
-        if (0 <= scrollPosBottom)
-            scrWindow->Scroll(0, scrollPosBottom);
-    }
-}
-*/
 
 #ifdef FFS_WIN
 namespace
@@ -333,7 +327,7 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
     loc.minute = systemTimeLocal.wMinute;
     loc.second = systemTimeLocal.wSecond;
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     zen::TimeComp loc = zen::localTime(to<time_t>(utcTime));
 #endif
 

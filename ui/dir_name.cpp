@@ -243,5 +243,8 @@ void DirectoryName<NameControl>::setName(const wxString& dirname)
 
 
 //explicit template instantiations
+namespace zen
+{
 template class DirectoryName<wxTextCtrl>;
 template class DirectoryName<FolderHistoryBox>;
+}

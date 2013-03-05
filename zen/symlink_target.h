@@ -16,7 +16,7 @@
 #include "privilege.h"
 #include "long_path_prefix.h"
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <unistd.h>
 #endif
 
@@ -30,14 +30,6 @@ bool isSymlink(DWORD fileAttributes, DWORD reparseTag);
 
 Zstring getSymlinkRawTargetString(const Zstring& linkPath); //throw FileError
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -145,7 +137,7 @@ Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileErro
 
     return output;
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     const int BUFFER_SIZE = 10000;
     std::vector<char> buffer(BUFFER_SIZE);
 

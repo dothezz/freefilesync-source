@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.4.1  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20121226;13095515">
+	<META NAME="CHANGED" CONTENT="20130206;19332267">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -22,14 +22,13 @@
 </HEAD>
 <BODY LANG="de-DE" DIR="LTR">
 <H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Macros</FONT></FONT></H2>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">All
 directory names may contain macros that are expanded during
-synchronization. Begin and end of each macro is marked by a '%'
-character. Besides special macros handling time and date, the
-<SPAN STYLE="text-decoration: none"><B>operating system's environment
-variables</B></SPAN> can also be used.</FONT></P>
+synchronization. Begin and end of each macro is marked by a </FONT><FONT FACE="Tahoma, sans-serif"><B>%</B></FONT>
+<FONT FACE="Tahoma, sans-serif">character. Besides special macros
+handling time and date, the </FONT><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif"><B>operating
+system's environment variables</B></FONT></SPAN> <FONT FACE="Tahoma, sans-serif">can
+also be used.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Internal
@@ -94,9 +93,10 @@ folder locations </B><SPAN STYLE="font-weight: normal">(Windows)</SPAN></FONT></
 	<FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\AppData\Roaming\Microsoft\Windows\Start
 	Menu\Programs\StartUp<BR>%csidl_Templates%&nbsp;&nbsp;&nbsp;</FONT>e.
 	g. <FONT FACE="Courier New, monospace">C:\Users\&lt;username&gt;\AppData\Roaming\Microsoft\Windows\Templates</FONT></FONT></P>
-</SPAN><BR CLEAR=LEFT>Note: Most macros listed here also have a
-variant for public folders. E.g. <FONT FACE="Courier New, monospace">csidl_MyMusic</FONT>
-&rarr; <FONT FACE="Courier New, monospace">csidl_PublicMusic</FONT> 
+</SPAN><BR CLEAR=LEFT><FONT FACE="Tahoma, sans-serif">Note: Most
+macros listed here also have a variant for public folders.</FONT>
+E.g. <FONT FACE="Courier New, monospace">csidl_MyMusic</FONT> &rarr;
+<FONT FACE="Courier New, monospace">csidl_PublicMusic</FONT> 
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
@@ -120,9 +120,8 @@ add a great amount of flexibility to batch synchronization
 *.bat/*.cmd file that are evaluated by FreeFileSync at runtime!</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
-FreeFileSync batch file <FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
+The FreeFileSync batch file <FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch
 </FONT>contains macro <FONT FACE="Courier New, monospace">%MyVar%
 </FONT>instead of an absolute target folder and is invoked by a *.cmd
 file:</FONT></P>

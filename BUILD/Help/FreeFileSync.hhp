@@ -1,7 +1,7 @@
 [OPTIONS]
 Compatibility=1.1 or later
 Compiled file=..\FreeFileSync.chm
-Contents file=Table of Contents.hhc
+Contents file=FreeFileSync.hhc
 Default topic=html\FreeFileSync.html
 Display compile progress=No
 Full-text search=Yes

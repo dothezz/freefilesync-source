@@ -7,7 +7,7 @@
 #include "zlib_wrap.h"
 #ifdef FFS_WIN
 #include <wx/../../src/zlib/zlib.h> //not really a "nice" place to look for a stable solution
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <zlib.h> //let's pray this is the same version wxWidgets is linking against!
 #endif
 

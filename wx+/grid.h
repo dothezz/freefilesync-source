@@ -202,9 +202,12 @@ private:
 
     void redirectRowLabelEvent(wxMouseEvent& event);
 
+#if defined FFS_WIN && !wxCHECK_VERSION(2, 9, 0)
+    virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh); //get rid of scrollbars, but preserve scrolling behavior!
+#endif
+
 #ifdef FFS_WIN
     virtual WXLRESULT MSWDefWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam); //support horizontal mouse wheel
-    void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh); //get rid of scrollbars, but preserve scrolling behavior!
 #endif
 
     ptrdiff_t getBestColumnSize(size_t col, size_t compPos) const; //return -1 on error

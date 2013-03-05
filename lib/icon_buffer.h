@@ -8,6 +8,7 @@
 #define ICONBUFFER_H_INCLUDED
 
 #include <memory>
+#include <wx/bitmap.h>
 #include <wx/icon.h>
 #include <zen/zstring.h>
 
@@ -27,10 +28,11 @@ public:
     IconBuffer(IconSize sz);
     ~IconBuffer();
 
+    static int getSize(IconSize icoSize); //*maximum* icon size in pixel
+    int getSize() const { return getSize(icoSize); } //
+
     const wxIcon& genericFileIcon() { return genFileIcon; }
     const wxIcon& genericDirIcon () { return genDirIcon;  }
-
-    int getSize() const; //*maximum* icon size in pixel
 
     bool requestFileIcon(const Zstring& filename, wxIcon* icon = nullptr); //returns false if icon is not in buffer
     void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;

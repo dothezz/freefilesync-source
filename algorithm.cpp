@@ -1237,7 +1237,7 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
         if (it != hasRecyclerBuffer.end())
             return it->second;
         return hasRecyclerBuffer.insert(std::make_pair(baseDirPf, recycleBinStatusUpdating(baseDirPf, callback) == STATUS_REC_EXISTS)).first->second;
-#else
+#elif defined FFS_LINUX || defined FFS_MAC
         return true;
 #endif
     };
@@ -1444,14 +1444,13 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     if (useRecycleBin &&
     std::any_of(hasRecyclerBuffer.begin(), hasRecyclerBuffer.end(), [](std::pair<Zstring, bool> item) { return !item.second; }))
     {
-        std::wstring warningMessage = _("Recycle Bin is not available for the following paths! Files will be deleted permanently instead:");
-        warningMessage += L"\n";
+        std::wstring msg = _("Recycle Bin is not available for the following paths! Files will be deleted permanently instead:") + L"\n";
 
         for (auto it = hasRecyclerBuffer.begin(); it != hasRecyclerBuffer.end(); ++it)
             if (!it->second)
-                warningMessage += L"\n" + utfCvrtTo<std::wstring>(it->first);
+                msg += std::wstring(L"\n") + it->first;
 
-        statusHandler.reportWarning(warningMessage, warningRecyclerMissing);
+        statusHandler.reportWarning(msg, warningRecyclerMissing);
     }
 
     deleteFromGridAndHDOneSide<LEFT_SIDE>(deleteRecylerLeft,   true,  statusHandler);

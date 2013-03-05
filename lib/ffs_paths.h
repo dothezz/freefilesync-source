@@ -7,10 +7,7 @@
 #ifndef STANDARDPATHS_H_INCLUDED
 #define STANDARDPATHS_H_INCLUDED
 
-#include <wx/stdpaths.h>
 #include <zen/zstring.h>
-#include <zen/file_handling.h>
-#include <wx+/string_conv.h>
 
 namespace zen
 {
@@ -18,108 +15,11 @@ namespace zen
 //global program directories
 //------------------------------------------------------------------------------
 Zstring getResourceDir(); //resource directory WITH path separator at end
-Zstring getConfigDir();   //config directory WITH path separator at end
+Zstring getConfigDir  (); //config directory WITH path separator at end
 //------------------------------------------------------------------------------
 
-Zstring getLauncher();    //full path to application launcher C:\...\FreeFileSync.exe
-bool isPortableVersion();
-
-
-
-
-
-
-
-
-
-
-
-
-
-//---------------- implementation ----------------
-namespace impl
-{
-inline
-const Zstring& getBinaryDir() //directory containing executable WITH path separator at end
-{
-    static Zstring instance = beforeLast(utfCvrtTo<Zstring>(wxStandardPaths::Get().GetExecutablePath()), FILE_NAME_SEPARATOR) + Zstring(FILE_NAME_SEPARATOR); //extern linkage!
-    return instance;
-}
-
-#ifdef FFS_WIN
-inline
-Zstring getInstallDir() //root install directory WITH path separator at end
-{
-    return beforeLast(beforeLast(getBinaryDir(), FILE_NAME_SEPARATOR), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR;
-}
-#endif
-}
-
-
-inline
-bool isPortableVersion()
-{
-#ifdef FFS_WIN
-    static const bool isPortable = !fileExists(impl::getInstallDir() + L"uninstall.exe"); //this check is a bit lame...
-
-#elif defined FFS_LINUX
-    static const bool isPortable = !endsWith(impl::getBinaryDir(), "/bin/"); //this check is a bit lame...
-#endif
-    return isPortable;
-}
-
-
-inline
-Zstring getResourceDir()
-{
-#ifdef FFS_WIN
-    return impl::getInstallDir();
-
-#elif defined FFS_LINUX
-    if (isPortableVersion())
-        return impl::getBinaryDir();
-    else //use OS' standard paths
-        return appendSeparator(toZ(wxStandardPathsBase::Get().GetResourcesDir()));
-#endif
-}
-
-
-inline
-Zstring getConfigDir()
-{
-    if (isPortableVersion())
-#ifdef FFS_WIN
-        return impl::getInstallDir();
-#elif defined FFS_LINUX
-        //wxString(wxT(".")) + zToWx(FILE_NAME_SEPARATOR) -> don't use current working directory
-        //avoid surprises with GlobalSettings.xml being newly created in each working directory
-        return impl::getBinaryDir();
-#endif
-    else //use OS' standard paths
-    {
-        Zstring userDirectory = toZ(wxStandardPathsBase::Get().GetUserDataDir());
-
-        if (!dirExists(userDirectory))
-            try
-            {
-                makeDirectory(userDirectory); //only top directory needs to be created: no recursion necessary
-            }
-            catch (const FileError&) {}
-
-        return appendSeparator(userDirectory);
-    }
-}
-
-
-inline
-Zstring getLauncher()
-{
-#ifdef FFS_WIN
-    return impl::getInstallDir() + Zstr("FreeFileSync.exe");
-#elif defined FFS_LINUX
-    return impl::getBinaryDir() + Zstr("FreeFileSync");
-#endif
-}
+Zstring getFreeFileSyncLauncher(); //full path to application launcher C:\...\FreeFileSync.exe
+bool manualProgramUpdateRequired();
 }
 
 #endif // STANDARDPATHS_H_INCLUDED

@@ -6,11 +6,13 @@
 
 #include "folder_history_box.h"
 #include <list>
+#include <zen/scope_guard.h>
 #include <wx/scrolwin.h>
-#include "../lib/resolve_path.h"
 #include <wx+/string_conv.h>
+#include "../lib/resolve_path.h"
 
 using namespace zen;
+
 
 namespace
 {
@@ -29,27 +31,37 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
                                    const wxString& name) :
     wxComboBox(parent, id, value, pos, size, n, choices, style, validator, name)
 #if wxCHECK_VERSION(2, 9, 1)
-    , dropDownShown(false)
+    ,dropDownShown(false)
 #endif
 {
     //#####################################
     /*##*/ SetMinSize(wxSize(150, -1)); //## workaround yet another wxWidgets bug: default minimum size is much too large for a wxComboBox
     //#####################################
 
-    Connect(wxEVT_KEY_DOWN,                  wxKeyEventHandler(FolderHistoryBox::OnKeyEvent  ), nullptr, this);
+    Connect(wxEVT_KEY_DOWN,                  wxKeyEventHandler    (FolderHistoryBox::OnKeyEvent  ), nullptr, this);
     Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(FolderHistoryBox::OnSelection ), nullptr, this);
-    Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler(FolderHistoryBox::OnMouseWheel), nullptr, this);
-#ifdef FFS_WIN //on Win, this event only fires, when clicking on the small down arrow, NOT when clicking on the text field
+    Connect(wxEVT_MOUSEWHEEL,                wxMouseEventHandler  (FolderHistoryBox::OnMouseWheel), nullptr, this);
+
+    warn_static("mac")
+
+#if defined FFS_WIN
+    //on Win, this mouse click event only fires, when clicking on the small down arrow, NOT when clicking on the text field
     //thanks to wxWidgets' non-portability it's exactly the converse on Linux!
-    Connect(wxEVT_LEFT_DOWN,                 wxEventHandler(FolderHistoryBox::OnUpdateList), nullptr, this);
-#elif defined FFS_LINUX //update on each text change: maybe a little too often, but we have no choice as long as we don't have an event right before showing the drop-down list
-    Connect(wxEVT_COMMAND_TEXT_UPDATED,      wxEventHandler(FolderHistoryBox::OnUpdateList), nullptr, this);
+    Connect(wxEVT_LEFT_DOWN,            wxEventHandler(FolderHistoryBox::OnMouseClick), nullptr, this);
+#elif defined FFS_LINUX  //update on each text change: maybe a little too often, but we have no choice as long as we don't have an event right before showing the drop-down list
+    Connect(wxEVT_COMMAND_TEXT_UPDATED, wxEventHandler(FolderHistoryBox::OnMouseClick), nullptr, this);
+#elif defined FFS_MAC
+    /*
+    calling setValueAndUpdateList()...
+    - on wxEVT_COMMAND_TEXT_UPDATED leads to endless loop (SetValue() seems to emit another wxEVT_COMMAND_TEXT_UPDATED asychronously)
+    - on wxEVT_LEFT_DOWN leads to occasional crashes, especially when double-clicking
+
+    */
 #endif
 
-
 #if wxCHECK_VERSION(2, 9, 1)
-    Connect(wxEVT_COMMAND_COMBOBOX_DROPDOWN, wxCommandEventHandler(FolderHistoryBox::OnShowDropDown), nullptr, this);
-    Connect(wxEVT_COMMAND_COMBOBOX_CLOSEUP, wxCommandEventHandler(FolderHistoryBox::OnHideDropDown), nullptr, this);
+    Connect(wxEVT_COMMAND_COMBOBOX_DROPDOWN, wxCommandEventHandler(FolderHistoryBox::OnShowDropDown), nullptr, this); //only supported on Win/GTK
+    Connect(wxEVT_COMMAND_COMBOBOX_CLOSEUP,  wxCommandEventHandler(FolderHistoryBox::OnHideDropDown), nullptr, this); //
 #endif
 
     Connect(wxEVT_VALIDATE_USER_SELECTION, wxCommandEventHandler(FolderHistoryBox::OnValidateSelection), nullptr, this);
@@ -110,7 +122,7 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
 void FolderHistoryBox::OnSelection(wxCommandEvent& event)
 {
     wxCommandEvent dummy2(wxEVT_VALIDATE_USER_SELECTION); //we cannot replace built-in commands at this position in call stack, so defer to a later time!
-    if (auto handler = GetEventHandler())
+    if (wxEvtHandler* handler = GetEventHandler())
         handler->AddPendingEvent(dummy2);
 
     event.Skip();

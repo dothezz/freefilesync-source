@@ -16,6 +16,7 @@
 #include <zen/int64.h>
 #include <zen/file_handling.h>
 #include <zen/serialize.h>
+#include <zen/optional.h>
 
 #ifdef FFS_WIN
 #include <tlhelp32.h>
@@ -24,10 +25,12 @@
 #include <Sddl.h> //login sid
 #include <Lmcons.h> //UNLEN
 
-#elif defined FFS_LINUX
-#include <fcntl.h>    //::open()
+#elif defined FFS_LINUX || defined FFS_MAC
+#include <fcntl.h>    //open()
 #include <sys/stat.h> //
-#include <unistd.h>
+#include <unistd.h> //getsid()
+#include <signal.h> //kill()
+#include <pwd.h> //getpwuid_r()
 #endif
 
 using namespace zen;
@@ -103,7 +106,7 @@ public:
                     &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
                     nullptr);      //__inout_opt  LPOVERLAPPED lpOverlapped
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
         const int fileHandle = ::open(lockfilename_.c_str(), O_WRONLY | O_APPEND);
         if (fileHandle < 0)
             return;
@@ -132,7 +135,7 @@ UInt64 getLockFileSize(const Zstring& filename) //throw FileError, ErrorNotExist
         return UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
     }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     struct ::stat fileInfo = {};
     if (::stat(filename.c_str(), &fileInfo) == 0) //follow symbolic links
         return UInt64(fileInfo.st_size);
@@ -159,13 +162,13 @@ Zstring deleteAbandonedLockName(const Zstring& lockfilename) //make sure to NOT 
 
 
 #ifdef FFS_WIN
-std::wstring getLoginSid() //throw FileError
+Zstring getLoginSid() //throw FileError
 {
     HANDLE hToken = 0;
     if (!::OpenProcessToken(::GetCurrentProcess(), //__in   HANDLE ProcessHandle,
                             TOKEN_ALL_ACCESS,      //__in   DWORD DesiredAccess,
                             &hToken))              //__out  PHANDLE TokenHandle
-        throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot get process information.") + L" (OpenProcessToken)" + L"\n\n" + getLastErrorFormatted());
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hToken));
 
     DWORD bufferSize = 0;
@@ -177,7 +180,7 @@ std::wstring getLoginSid() //throw FileError
                                &buffer[0],   //__out_opt  LPVOID TokenInformation,
                                bufferSize,   //__in       DWORD TokenInformationLength,
                                &bufferSize)) //__out      PDWORD ReturnLength
-        throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot get process information.") + L" (GetTokenInformation)" + L"\n\n" + getLastErrorFormatted());
 
     auto groups = reinterpret_cast<const TOKEN_GROUPS*>(&buffer[0]);
 
@@ -187,14 +190,63 @@ std::wstring getLoginSid() //throw FileError
             LPTSTR sidStr = nullptr;
             if (!::ConvertSidToStringSid(groups->Groups[i].Sid, //__in   PSID Sid,
                                          &sidStr))              //__out  LPTSTR *StringSid
-                throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
+                throw FileError(_("Cannot get process information.") + L" (ConvertSidToStringSid)" + L"\n\n" + getLastErrorFormatted());
             ZEN_ON_SCOPE_EXIT(::LocalFree(sidStr));
 
             return sidStr;
         }
-    throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted() + L"(no login found)"); //shouldn't happen
+    throw FileError(_("Cannot get process information.") +  L" (no login found)" + L"\n\n" + getLastErrorFormatted()); //shouldn't happen
 }
 #endif
+
+
+#ifdef FFS_WIN
+typedef DWORD ProcessId;
+typedef DWORD SessionId;
+#elif defined FFS_LINUX || defined FFS_MAC
+typedef pid_t ProcessId;
+typedef pid_t SessionId;
+#endif
+
+//return ppid on Windows, sid on Linux/Mac, "no value" if process corresponding to "processId" is not existing
+Opt<SessionId> getSessionId(ProcessId processId) //throw FileError
+{
+#ifdef FFS_WIN
+    //note: ::OpenProcess() is no alternative as it may successfully return for crashed processes! -> remark: "WaitForSingleObject" may identify this case!
+    HANDLE snapshot = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, //__in  DWORD dwFlags,
+                                                 0);                 //__in  DWORD th32ProcessID
+    if (snapshot == INVALID_HANDLE_VALUE)
+        throw FileError(_("Cannot get process information.") + L" (CreateToolhelp32Snapshot)" + L"\n\n" + getLastErrorFormatted());
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(snapshot));
+
+    PROCESSENTRY32 processEntry = {};
+    processEntry.dwSize = sizeof(processEntry);
+
+    if (!::Process32First(snapshot,       //__in     HANDLE hSnapshot,
+                          &processEntry)) //__inout  LPPROCESSENTRY32 lppe
+        throw FileError(_("Cannot get process information.") + L" (Process32First)" + L"\n\n" + getLastErrorFormatted()); //ERROR_NO_MORE_FILES not possible
+    do
+    {
+        if (processEntry.th32ProcessID == processId) //yes, MSDN says this is the way: http://msdn.microsoft.com/en-us/library/windows/desktop/ms684868(v=vs.85).aspx
+            return processEntry.th32ParentProcessID; //parent id is stable, even if parent process has already terminated!
+    }
+    while (::Process32Next(snapshot, &processEntry));
+    if (::GetLastError() != ERROR_NO_MORE_FILES) //yes, they call it "files"
+        throw FileError(_("Cannot get process information.") + L" (Process32Next)" + L"\n\n" + getLastErrorFormatted());
+
+    return NoValue();
+
+#elif defined FFS_LINUX || defined FFS_MAC
+    if (::kill(processId, 0) != 0) //sig == 0: no signal sent, just existence check
+        return NoValue();
+
+    pid_t procSid = ::getsid(processId); //NOT to be confused with "login session", e.g. not stable on OS X!!!
+    if (procSid == -1)
+        throw FileError(_("Cannot get process information.") + L" (getsid)" + L"\n\n" + getLastErrorFormatted());
+
+    return procSid;
+#endif
+}
 
 
 class FromCurrentProcess {}; //tag
@@ -203,51 +255,61 @@ struct LockInformation //throw FileError
 {
     explicit LockInformation(FromCurrentProcess) :
         lockId(zen::generateGUID()),
+        sessionId(), //dummy value
 #ifdef FFS_WIN
-        sessionId(utfCvrtTo<std::string>(getLoginSid())), //throw FileError
         processId(::GetCurrentProcessId()) //never fails
     {
         DWORD bufferSize = 0;
         ::GetComputerNameEx(ComputerNameDnsFullyQualified, nullptr, &bufferSize); //get required buffer size
 
         std::vector<wchar_t> buffer(bufferSize);
-        if (!GetComputerNameEx(ComputerNameDnsFullyQualified, //__in     COMPUTER_NAME_FORMAT NameType,
-                               &buffer[0],                    //__out    LPTSTR lpBuffer,
-                               &bufferSize))                  //__inout  LPDWORD lpnSize
-            throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
+        if (!::GetComputerNameEx(ComputerNameDnsFullyQualified, //__in     COMPUTER_NAME_FORMAT NameType,
+                                 &buffer[0],                    //__out    LPTSTR lpBuffer,
+                                 &bufferSize))                  //__inout  LPDWORD lpnSize
+            throw FileError(_("Cannot get process information.") + L" (GetComputerNameEx)" + L"\n\n" + getLastErrorFormatted());
         computerName = "Windows." + utfCvrtTo<std::string>(&buffer[0]);
 
         bufferSize = UNLEN + 1;
         buffer.resize(bufferSize);
         if (!::GetUserName(&buffer[0],   //__out    LPTSTR lpBuffer,
                            &bufferSize)) //__inout  LPDWORD lpnSize
-            throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
+            throw FileError(_("Cannot get process information.") + L" (GetUserName)" + L"\n\n" + getLastErrorFormatted());
         userId = utfCvrtTo<std::string>(&buffer[0]);
-    }
-#elif defined FFS_LINUX
+
+#elif defined FFS_LINUX || defined FFS_MAC
         processId(::getpid()) //never fails
     {
         std::vector<char> buffer(10000);
-        if (::gethostname(&buffer[0], buffer.size()) != 0)
-            throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
 
+        if (::gethostname(&buffer[0], buffer.size()) != 0)
+            throw FileError(_("Cannot get process information.") + L" (gethostname)" + L"\n\n" + getLastErrorFormatted());
         computerName += "Linux."; //distinguish linux/windows lock files
         computerName += &buffer[0];
 
         if (::getdomainname(&buffer[0], buffer.size()) != 0)
-            throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
+            throw FileError(_("Cannot get process information.") + L" (getdomainname)" + L"\n\n" + getLastErrorFormatted());
         computerName += ".";
         computerName += &buffer[0];
 
-        uid_t userIdTmp = ::getuid(); //never fails
-        userId.assign(reinterpret_cast<const char*>(&userIdTmp), sizeof(userIdTmp));
+        const uid_t userIdNo = ::getuid(); //never fails
+        userId.assign(reinterpret_cast<const char*>(&userIdNo), sizeof(userIdNo));
 
-        pid_t sessionIdTmp = ::getsid(0); //new after each restart!
-        if (sessionIdTmp == -1)
-            throw FileError(_("Cannot get process information.") + L"\n\n" + getLastErrorFormatted());
-        sessionId.assign(reinterpret_cast<const char*>(&sessionIdTmp), sizeof(sessionIdTmp));
-    }
+        //the id alone is not very distinctive, e.g. often 1000 on Ubuntu => add name
+        buffer.resize(std::max<long>(buffer.size(), ::sysconf(_SC_GETPW_R_SIZE_MAX))); //::sysconf may return long(-1)
+        struct passwd buffer2 = {};
+        struct passwd* pwsEntry = nullptr;
+        if (::getpwuid_r(userIdNo, &buffer2, &buffer[0], buffer.size(), &pwsEntry) != 0) //getlogin() is deprecated and not working on Ubuntu at all!!!
+            throw FileError(_("Cannot get process information.") +  L" (getpwuid_r)" + L"\n\n" + getLastErrorFormatted());
+        if (!pwsEntry)
+            throw FileError(_("Cannot get process information.") + L" (no login found)" + L"\n\n" + getLastErrorFormatted());
+        userId += pwsEntry->pw_name;
 #endif
+
+        Opt<SessionId> sessionIdTmp = getSessionId(processId); //throw FileError
+        if (!sessionIdTmp)
+            throw FileError(_("Cannot get process information.") + L" (getSessionId)" + L"\n\n" + getLastErrorFormatted());
+        sessionId = *sessionIdTmp;
+    }
 
     explicit LockInformation(BinStreamIn& stream) //throw UnexpectedEndOfStreamError
     {
@@ -262,8 +324,8 @@ struct LockInformation //throw FileError
         lockId       = readContainer<std::string>(stream); //
         computerName = readContainer<std::string>(stream); //UnexpectedEndOfStreamError
         userId       = readContainer<std::string>(stream); //
-        sessionId    = readContainer<std::string>(stream); //
-        processId = static_cast<decltype(processId)>(readNumber<std::uint64_t>(stream)); //[!] conversion
+        sessionId    = static_cast<SessionId>(readNumber<std::uint64_t>(stream)); //[!] conversion
+        processId    = static_cast<ProcessId>(readNumber<std::uint64_t>(stream)); //[!] conversion
     }
 
     void toStream(BinStreamOut& stream) const //throw ()
@@ -271,25 +333,25 @@ struct LockInformation //throw FileError
         writeArray(stream, LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
         writeNumber<boost::int32_t>(stream, LOCK_FORMAT_VER);
 
-        assert_static(sizeof(processId) <= sizeof(std::uint64_t)); //ensure portability
+        assert_static(sizeof(processId) <= sizeof(std::uint64_t)); //ensure cross-platform compatibility!
+        assert_static(sizeof(sessionId) <= sizeof(std::uint64_t)); //
 
         writeContainer(stream, lockId);
         writeContainer(stream, computerName);
         writeContainer(stream, userId);
-        writeContainer(stream, sessionId);
+        writeNumber<std::uint64_t>(stream, sessionId);
         writeNumber<std::uint64_t>(stream, processId);
     }
 
     std::string lockId; //16 byte GUID - a universal identifier for this lock (no matter what the path is, considering symlinks, distributed network, etc.)
 
+    //identify local computer
     std::string computerName; //format: HostName.DomainName
-    std::string userId;    //non-readable!
-    std::string sessionId; //
-#ifdef FFS_WIN
-    DWORD processId;
-#elif defined FFS_LINUX
-    pid_t processId;
-#endif
+    std::string userId;
+
+    //identify running process
+    SessionId sessionId; //Windows: parent process id; Linux/OS X: session of the process, NOT the user
+    ProcessId processId;
 };
 
 
@@ -325,71 +387,40 @@ std::string retrieveLockId(const Zstring& lockfilename) //throw FileError, Error
 }
 
 
-//true: process not available, false: cannot say anything
 enum ProcessStatus
 {
     PROC_STATUS_NOT_RUNNING,
     PROC_STATUS_RUNNING,
     PROC_STATUS_ITS_US,
-    PROC_STATUS_NO_IDEA
+    PROC_STATUS_CANT_TELL
 };
+
 ProcessStatus getProcessStatus(const LockInformation& lockInfo) //throw FileError
 {
     const LockInformation localInfo((FromCurrentProcess())); //throw FileError
 
     if (lockInfo.computerName != localInfo.computerName ||
         lockInfo.userId != localInfo.userId) //another user may run a session right now!
-        return PROC_STATUS_NO_IDEA; //lock owned by different computer in this network
+        return PROC_STATUS_CANT_TELL; //lock owned by different computer in this network
 
-    if (lockInfo.sessionId != localInfo.sessionId)
-        return PROC_STATUS_NOT_RUNNING; //different session but same user? there can be only one
-
-    if (lockInfo.processId == localInfo.processId) //obscure, but possible: deletion failed or a lock file is "stolen" and put back while the program is running
+    if (lockInfo.sessionId == localInfo.sessionId &&
+        lockInfo.processId == localInfo.processId) //obscure, but possible: deletion failed or a lock file is "stolen" and put back while the program is running
         return PROC_STATUS_ITS_US;
 
-#ifdef FFS_WIN
-    //note: ::OpenProcess() is no alternative as it may successfully return for crashed processes! -> remark: "WaitForSingleObject" may identify this case!
-    HANDLE snapshot = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, //__in  DWORD dwFlags,
-                                                 0);                 //__in  DWORD th32ProcessID
-    if (snapshot == INVALID_HANDLE_VALUE)
-        return PROC_STATUS_NO_IDEA;
-    ZEN_ON_SCOPE_EXIT(::CloseHandle(snapshot));
-
-    PROCESSENTRY32 processEntry = {};
-    processEntry.dwSize = sizeof(processEntry);
-
-    if (!::Process32First(snapshot,       //__in     HANDLE hSnapshot,
-                          &processEntry)) //__inout  LPPROCESSENTRY32 lppe
-        return PROC_STATUS_NO_IDEA; //ERROR_NO_MORE_FILES not possible
-    do
-    {
-        if (processEntry.th32ProcessID == lockInfo.processId)
-            return PROC_STATUS_RUNNING; //process still running
-    }
-    while (::Process32Next(snapshot, &processEntry));
-    if (::GetLastError() != ERROR_NO_MORE_FILES) //yes, they call it "files"
-        return PROC_STATUS_NO_IDEA;
-
+    if (Opt<SessionId> sessionId = getSessionId(lockInfo.processId)) //throw FileError
+        return *sessionId == lockInfo.sessionId ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
     return PROC_STATUS_NOT_RUNNING;
-
-#elif defined FFS_LINUX
-    if (lockInfo.processId <= 0 || lockInfo.processId >= 65536)
-        return PROC_STATUS_NO_IDEA; //invalid process id
-
-    return zen::dirExists("/proc/" + zen::numberTo<Zstring>(lockInfo.processId)) ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
-#endif
 }
 
 
 const std::int64_t TICKS_PER_SEC = ticksPerSec(); //= 0 on error
-
 
 void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
 {
     const std::wstring infoMsg = replaceCpy(_("Waiting while directory is locked (%x)..."), L"%x", fmtFileName(lockfilename));
 
     if (callback)
-        callback->reportInfo(infoMsg);
+        callback->reportStatus(infoMsg);
     //---------------------------------------------------------------
     try
     {
@@ -407,7 +438,7 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                     lockOwnderDead = true;
                     break;
                 case PROC_STATUS_RUNNING:
-                case PROC_STATUS_NO_IDEA:
+                case PROC_STATUS_CANT_TELL:
                     break;
             }
         }
@@ -462,10 +493,10 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                     {
                         const int remainingSeconds = std::max<int>(0, DETECT_ABANDONED_INTERVAL - dist(lastLifeSign, getTicks()) / TICKS_PER_SEC);
                         const std::wstring remSecMsg = replaceCpy(_P("1 sec", "%x sec", remainingSeconds), L"%x", numberTo<std::wstring>(remainingSeconds));
-                        callback->reportInfo(infoMsg + L" " + remSecMsg);
+                        callback->reportStatus(infoMsg + L" " + remSecMsg);
                     }
                     else
-                        callback->reportInfo(infoMsg); //emit a message in any case (might clear other one)
+                        callback->reportStatus(infoMsg); //emit a message in any case (might clear other one)
                 }
             }
         }
@@ -510,7 +541,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
 
     ::SetFileAttributes(applyLongPathPrefix(lockfilename).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide it
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     //O_EXCL contains a race condition on NFS file systems: http://linux.die.net/man/2/open
     ::umask(0); //important! -> why?
     const int fileHandle = ::open(lockfilename.c_str(), O_CREAT | O_WRONLY | O_EXCL, S_IRWXU | S_IRWXG | S_IRWXO);
@@ -538,7 +569,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
 class DirLock::SharedDirLock
 {
 public:
-    SharedDirLock(const Zstring& lockfilename, DirLockCallback* callback = nullptr) : //throw FileError
+    SharedDirLock(const Zstring& lockfilename, DirLockCallback* callback) : //throw FileError
         lockfilename_(lockfilename)
     {
         while (!::tryLock(lockfilename))             //throw FileError
@@ -560,7 +591,6 @@ private:
     SharedDirLock& operator=(const DirLock&);
 
     const Zstring lockfilename_;
-
     boost::thread threadObj;
 };
 
@@ -633,6 +663,9 @@ private:
 
 DirLock::DirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
 {
+    if (callback)
+        callback->reportStatus(replaceCpy(_("Creating file %x"), L"%x", fmtFileName(lockfilename)));
+
 #ifdef FFS_WIN
     const DWORD bufferSize = 10000;
     std::vector<wchar_t> volName(bufferSize);

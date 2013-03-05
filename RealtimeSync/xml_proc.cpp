@@ -18,8 +18,8 @@ namespace
 void readConfig(const XmlIn& in, XmlRealConfig& config)
 {
     in["Directories"](config.directories);
-    in["Commandline"](config.commandline);
     in["Delay"      ](config.delay);
+    in["Commandline"](config.commandline);
 }
 
 
@@ -58,8 +58,8 @@ namespace
 void writeConfig(const XmlRealConfig& config, XmlOut& out)
 {
     out["Directories"](config.directories);
-    out["Commandline"](config.commandline);
     out["Delay"      ](config.delay);
+    out["Commandline"](config.commandline);
 }
 }
 
@@ -72,5 +72,5 @@ void xmlAccess::writeRealConfig(const XmlRealConfig& config, const Zstring& file
     XmlOut out(doc);
     writeConfig(config, out);
 
-    saveXmlDocument(doc, filename); //throw (FfsXmlError)
+    saveXmlDocument(doc, filename); //throw FfsXmlError
 }

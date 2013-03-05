@@ -280,7 +280,8 @@ Int64 resolve(size_t value, UnitTime unit, Int64 defaultVal)
 
 UInt64 resolve(size_t value, UnitSize unit, UInt64 defaultVal)
 {
-    double out = 0;
+    const UInt64 maxVal =std::numeric_limits<zen::UInt64>::max();
+
     switch (unit)
     {
         case USIZE_NONE:
@@ -288,15 +289,14 @@ UInt64 resolve(size_t value, UnitSize unit, UInt64 defaultVal)
         case USIZE_BYTE:
             return value;
         case USIZE_KB:
-            out = 1024.0 * value;
-            break;
+            return value > maxVal / 1024U ? maxVal : //prevent overflow!!!
+                   1024U * value;
         case USIZE_MB:
-            out = 1024 * 1024.0 * value;
-            break;
+            return value > maxVal / (1024 * 1024U) ? maxVal : //prevent overflow!!!
+                   1024 * 1024U * value;
     }
-    return out >= to<double>(std::numeric_limits<zen::UInt64>::max()) ? //prevent overflow!!!
-           std::numeric_limits<zen::UInt64>::max() :
-           zen::UInt64(out);
+    assert(false);
+    return defaultVal;
 }
 }
 

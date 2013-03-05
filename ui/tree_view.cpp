@@ -615,7 +615,7 @@ const wxColour COLOR_LEVEL9 (0xff, 0xff, 0xcc);
 const wxColour COLOR_LEVEL10(0xcc, 0xcc, 0xcc);
 const wxColour COLOR_LEVEL11(0xff, 0xcc, 0x99);
 
-const wxColour COLOR_PERCENTAGE_BORDER(198, 198, 198);
+const wxColour COLOR_PERCENTAGE_BORDER    (198, 198, 198);
 const wxColour COLOR_PERCENTAGE_BACKGROUND(0xf8, 0xf8, 0xf8);
 
 //const wxColor COLOR_TREE_SELECTION_GRADIENT_FROM = wxColor( 89, 255,  99); //green: HSV: 88, 255, 172
@@ -623,6 +623,7 @@ const wxColour COLOR_PERCENTAGE_BACKGROUND(0xf8, 0xf8, 0xf8);
 const wxColor COLOR_TREE_SELECTION_GRADIENT_FROM = getColorSelectionGradientFrom();
 const wxColor COLOR_TREE_SELECTION_GRADIENT_TO   = getColorSelectionGradientTo  ();
 
+const int iconSizeSmall = IconBuffer::getSize(IconBuffer::SIZE_SMALL);
 
 class GridDataNavi : private wxEvtHandler, public GridData
 {
@@ -630,8 +631,8 @@ public:
     GridDataNavi(Grid& grid, const std::shared_ptr<TreeView>& treeDataView) : treeDataView_(treeDataView),
         fileIcon(IconBuffer(IconBuffer::SIZE_SMALL).genericFileIcon()),
         dirIcon (IconBuffer(IconBuffer::SIZE_SMALL).genericDirIcon ()),
-        rootBmp(GlobalResources::getImage(L"rootFolder").ConvertToImage().Scale(fileIcon.GetWidth(), fileIcon.GetHeight(), wxIMAGE_QUALITY_HIGH)),
-        widthNodeIcon(dirIcon.GetWidth()),
+        rootBmp(GlobalResources::getImage(L"rootFolder").ConvertToImage().Scale(iconSizeSmall, iconSizeSmall, wxIMAGE_QUALITY_HIGH)),
+        widthNodeIcon(iconSizeSmall),
         widthLevelStep(widthNodeIcon),
         widthNodeStatus(GlobalResources::getImage(L"nodeExpanded").GetWidth()),
         grid_(grid),
@@ -688,10 +689,10 @@ private:
         wxRect rectInside = drawColumnLabelBorder(dc, rect);
         drawColumnLabelBackground(dc, rectInside, highlighted);
 
-        const int COLUMN_BORDER_LEFT = 4;
+        const int COLUMN_GAP_LEFT = 4;
 
-        rectInside.x     += COLUMN_BORDER_LEFT;
-        rectInside.width -= COLUMN_BORDER_LEFT;
+        rectInside.x     += COLUMN_GAP_LEFT;
+        rectInside.width -= COLUMN_GAP_LEFT;
         drawColumnLabelText(dc, rectInside, getColumnLabel(colType));
 
         if (treeDataView_) //draw sort marker
@@ -701,12 +702,12 @@ private:
             {
                 const wxBitmap& marker = GlobalResources::getImage(sortInfo.second ? L"sortAscending" : L"sortDescending");
                 wxPoint markerBegin = rectInside.GetTopLeft() + wxPoint((rectInside.width - marker.GetWidth()) / 2, 0);
-                dc.DrawBitmap(marker, markerBegin, true); //respect 2-pixel border
+                dc.DrawBitmap(marker, markerBegin, true); //respect 2-pixel gap
             }
         }
     }
 
-    static const int CELL_BORDER = 2;
+    static const int GAP_SIZE = 2;
 
     virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus)
     {
@@ -728,9 +729,9 @@ private:
         wxRect rectTmp = rect;
 
         //  Partitioning:
-        //   ___________________________________________________________________________________________
-        //  | space | border | percentage bar | 2 x border | node status | border |icon | border | rest |
-        //   --------------------------------------------------------------------------------------------
+        //   ________________________________________________________________________________
+        //  | space | gap | percentage bar | 2 x gap | node status | gap |icon | gap | rest |
+        //   --------------------------------------------------------------------------------
         // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
 
         if (static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_DIRECTORY && treeDataView_)
@@ -739,17 +740,17 @@ private:
             {
                 ////clear first secion:
                 //clearArea(dc, wxRect(rect.GetTopLeft(), wxSize(
-                //                         node->level_ * widthLevelStep + CELL_BORDER + //width
-                //                         (showPercentBar ? widthPercentBar + 2 * CELL_BORDER : 0) + //
-                //                         widthNodeStatus + CELL_BORDER + widthNodeIcon + CELL_BORDER, //
+                //                         node->level_ * widthLevelStep + GAP_SIZE + //width
+                //                         (showPercentBar ? widthPercentBar + 2 * GAP_SIZE : 0) + //
+                //                         widthNodeStatus + GAP_SIZE + widthNodeIcon + GAP_SIZE, //
                 //                         rect.height)), wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 
                 //consume space
                 rectTmp.x     += static_cast<int>(node->level_) * widthLevelStep;
                 rectTmp.width -= static_cast<int>(node->level_) * widthLevelStep;
 
-                rectTmp.x     += CELL_BORDER;
-                rectTmp.width -= CELL_BORDER;
+                rectTmp.x     += GAP_SIZE;
+                rectTmp.width -= GAP_SIZE;
 
                 if (rectTmp.width > 0)
                 {
@@ -789,31 +790,26 @@ private:
 
                         const wxRect areaPerc(rectTmp.x, rectTmp.y + 2, widthPercentBar, rectTmp.height - 4);
                         {
-                            //background
-                            wxDCPenChanger dummy(dc, *wxTRANSPARENT_PEN);
+                            //clear background
+                            wxDCPenChanger   dummy (dc, COLOR_PERCENTAGE_BORDER);
                             wxDCBrushChanger dummy2(dc, COLOR_PERCENTAGE_BACKGROUND);
                             dc.DrawRectangle(areaPerc);
 
                             //inner area
+                            dc.SetPen  (brushCol);
                             dc.SetBrush(brushCol);
 
                             wxRect areaPercTmp = areaPerc;
-                            areaPercTmp.width -= 2; //do not include left/right border
-                            areaPercTmp.x += 1;     //
-                            areaPercTmp.width *= node->percent_ / 100.0;
+                            areaPercTmp.Deflate(1); //do not include border
+                            areaPercTmp.width = numeric::round(areaPercTmp.width * node->percent_ / 100.0);
                             dc.DrawRectangle(areaPercTmp);
-
-                            //outer border
-                            dc.SetPen(COLOR_PERCENTAGE_BORDER);
-                            dc.SetBrush(*wxTRANSPARENT_BRUSH);
-                            dc.DrawRectangle(areaPerc);
                         }
 
                         wxDCTextColourChanger dummy3(dc, *wxBLACK); //accessibility: always set both foreground AND background colors!
                         dc.DrawLabel(numberTo<wxString>(node->percent_) + L"%", areaPerc, wxALIGN_CENTER);
 
-                        rectTmp.x     += widthPercentBar + 2 * CELL_BORDER;
-                        rectTmp.width -= widthPercentBar + 2 * CELL_BORDER;
+                        rectTmp.x     += widthPercentBar + 2 * GAP_SIZE;
+                        rectTmp.width -= widthPercentBar + 2 * GAP_SIZE;
                     }
                     if (rectTmp.width > 0)
                     {
@@ -842,8 +838,8 @@ private:
                                 break;
                         }
 
-                        rectTmp.x     += widthNodeStatus + CELL_BORDER;
-                        rectTmp.width -= widthNodeStatus + CELL_BORDER;
+                        rectTmp.x     += widthNodeStatus + GAP_SIZE;
+                        rectTmp.width -= widthNodeStatus + GAP_SIZE;
                         if (rectTmp.width > 0)
                         {
                             bool isActive = true;
@@ -871,8 +867,8 @@ private:
                                 dc.Blit(rectTmp.x, rectTmp.y, widthNodeIcon, rectTmp.height, &memDc, 0, 0); //blit out
                             }
 
-                            rectTmp.x     += widthNodeIcon + CELL_BORDER;
-                            rectTmp.width -= widthNodeIcon + CELL_BORDER;
+                            rectTmp.x     += widthNodeIcon + GAP_SIZE;
+                            rectTmp.width -= widthNodeIcon + GAP_SIZE;
 
                             if (rectTmp.width > 0)
                                 drawCellText(dc, rectTmp, getValue(row, colType), grid.IsEnabled(), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
@@ -888,13 +884,13 @@ private:
             //have file size right-justified (but don't change for RTL languages)
             if (static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_BYTES && grid.GetLayoutDirection() != wxLayout_RightToLeft)
             {
-                rectTmp.width -= 2 * CELL_BORDER;
+                rectTmp.width -= 2 * GAP_SIZE;
                 alignment = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
             }
             else //left-justified
             {
-                rectTmp.x     += 2 * CELL_BORDER;
-                rectTmp.width -= 2 * CELL_BORDER;
+                rectTmp.x     += 2 * GAP_SIZE;
+                rectTmp.width -= 2 * GAP_SIZE;
             }
 
             drawCellText(dc, rectTmp, getValue(row, colType), grid.IsEnabled(), alignment);
@@ -908,15 +904,15 @@ private:
         if (static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_DIRECTORY && treeDataView_)
         {
             if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
-                return node->level_ * widthLevelStep + CELL_BORDER + (showPercentBar ? widthPercentBar + 2 * CELL_BORDER : 0) + widthNodeStatus + CELL_BORDER
-                       + widthNodeIcon + CELL_BORDER + dc.GetTextExtent(getValue(row, colType)).GetWidth() +
-                       CELL_BORDER; //additional border from right
+                return node->level_ * widthLevelStep + GAP_SIZE + (showPercentBar ? widthPercentBar + 2 * GAP_SIZE : 0) + widthNodeStatus + GAP_SIZE
+                       + widthNodeIcon + GAP_SIZE + dc.GetTextExtent(getValue(row, colType)).GetWidth() +
+                       GAP_SIZE; //additional gap from right
             else
                 return 0;
         }
         else
-            return 2 * CELL_BORDER + dc.GetTextExtent(getValue(row, colType)).GetWidth() +
-                   2 * CELL_BORDER; //include border from right!
+            return 2 * GAP_SIZE + dc.GetTextExtent(getValue(row, colType)).GetWidth() +
+                   2 * GAP_SIZE; //include gap from right!
     }
 
     virtual wxString getColumnLabel(ColumnType colType) const
@@ -944,7 +940,7 @@ private:
                     if (cellArea.width > 0 && cellArea.height > 0)
                     {
                         const int tolerance = 1;
-                        const int xNodeStatusFirst = -tolerance + cellArea.x + static_cast<int>(node->level_) * widthLevelStep + CELL_BORDER + (showPercentBar ? widthPercentBar + 2 * CELL_BORDER : 0);
+                        const int xNodeStatusFirst = -tolerance + cellArea.x + static_cast<int>(node->level_) * widthLevelStep + GAP_SIZE + (showPercentBar ? widthPercentBar + 2 * GAP_SIZE : 0);
                         const int xNodeStatusLast  = (xNodeStatusFirst + tolerance) + widthNodeStatus + tolerance;
                         // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
 
@@ -1142,7 +1138,7 @@ void treeview::init(Grid& grid, const std::shared_ptr<TreeView>& treeDataView)
     grid.setDataProvider(std::make_shared<GridDataNavi>(grid, treeDataView));
     grid.showRowLabel(false);
 
-    const int rowHeight = std::max(IconBuffer(IconBuffer::SIZE_SMALL).getSize(), grid.getMainWin().GetCharHeight()) + 1; //add some space
+    const int rowHeight = std::max(IconBuffer::getSize(IconBuffer::SIZE_SMALL), grid.getMainWin().GetCharHeight()) + 1; //add some space
     grid.setRowHeight(rowHeight);
 }
 

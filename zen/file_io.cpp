@@ -12,7 +12,7 @@
 #include "win_ver.h"
 #include "dll.h"
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <fcntl.h>  //open, close
 #include <unistd.h> //read, write
 #endif
@@ -45,7 +45,7 @@ Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string 
     return Zstring();
 }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 //"filename" could be a named pipe which *blocks* forever during "open()"! https://sourceforge.net/p/freefilesync/bugs/221/
 void checkForUnsupportedType(const Zstring& filename) //throw FileError
 {
@@ -64,7 +64,7 @@ void checkForUnsupportedType(const Zstring& filename) //throw FileError
             S_ISBLK (m) ? L"block device" :
             S_ISFIFO(m) ? L"FIFO, named pipe" :
             S_ISSOCK(m) ? L"socket" : nullptr;
-            const std::wstring numFmt = printNumber<std::wstring>(L"0%06o", m & __S_IFMT);
+            const std::wstring numFmt = printNumber<std::wstring>(L"0%06o", m & S_IFMT);
             return name ? numFmt + L", " + name : numFmt;
         };
         throw FileError(replaceCpy(_("Type of item %x is not supported:"), L"%x", fmtFileName(filename)) + L" " + getTypeName(fileInfo.st_mode));
@@ -113,7 +113,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError, ErrorNotExis
                                */
                               nullptr);
     if (fileHandle == INVALID_HANDLE_VALUE)
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     checkForUnsupportedType(filename); //throw FileError; reading a named pipe would block forever!
     fileHandle = ::fopen(filename.c_str(), "r,type=record,noseek"); //utilize UTF-8 filename
     if (!fileHandle)
@@ -147,7 +147,7 @@ FileInput::~FileInput()
 {
 #ifdef FFS_WIN
     ::CloseHandle(fileHandle);
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     ::fclose(fileHandle); //NEVER allow passing nullptr to fclose! -> crash!; fileHandle != nullptr in this context!
 #endif
 }
@@ -164,7 +164,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
                     static_cast<DWORD>(bytesToRead), //__in         DWORD nNumberOfBytesToRead,
                     &bytesRead,    //__out_opt    LPDWORD lpNumberOfBytesRead,
                     nullptr))      //__inout_opt  LPOVERLAPPED lpOverlapped
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0) //checks status of stream, not fread()!
 #endif
@@ -174,7 +174,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
     if (bytesRead < bytesToRead) //verify only!
         setEof();
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     if (::feof(fileHandle) != 0)
         setEof();
 
@@ -257,7 +257,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
         }
     }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     checkForUnsupportedType(filename); //throw FileError; writing a named pipe would block forever!
     fileHandle = ::fopen(filename.c_str(),
                          //GNU extension: https://www.securecoding.cert.org/confluence/display/cplusplus/FIO03-CPP.+Do+not+make+assumptions+about+fopen()+and+file+creation
@@ -282,7 +282,7 @@ FileOutput::~FileOutput()
 {
 #ifdef FFS_WIN
     ::CloseHandle(fileHandle);
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     ::fclose(fileHandle); //NEVER allow passing nullptr to fclose! -> crash!
 #endif
 }
@@ -297,7 +297,7 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
                      static_cast<DWORD>(bytesToWrite),  //__in         DWORD nNumberOfBytesToWrite,
                      &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
                      nullptr))      //__inout_opt  LPOVERLAPPED lpOverlapped
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
     if (::ferror(fileHandle) != 0) //checks status of stream, not fwrite()!
 #endif
@@ -308,7 +308,7 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
 }
 
 
-#ifdef FFS_LINUX
+#if defined FFS_LINUX || defined FFS_MAC
 //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-5.0.tar.gz
 
 FileInputUnbuffered::FileInputUnbuffered(const Zstring& filename) : FileInputBase(filename) //throw FileError, ErrorNotExisting

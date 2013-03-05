@@ -71,7 +71,7 @@ const std::wstring xmlAccess::getErrorMessageFormatted(const XmlIn& in)
     {
         msg = _("Cannot read the following XML elements:") + L"\n";
         std::for_each(failedElements.begin(), failedElements.end(),
-        [&](const std::wstring& str) { msg += str + L'\n'; });
+        [&](const std::wstring& elem) { msg += L"\n" + elem; });
     }
 
     return msg;

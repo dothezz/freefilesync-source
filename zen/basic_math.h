@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
+#include <cmath>
 #include <functional>
 #include <cassert>
 
@@ -39,6 +40,9 @@ template <class InputIterator>
 std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last);
 template <class InputIterator, class Compare>
 std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last, Compare comp);
+
+template <class T, class InputIterator> //precondition: range must be sorted!
+auto nearMatch(const T& val, InputIterator first, InputIterator last) -> typename std::iterator_traits<InputIterator>::value_type;
 
 template <class T>
 bool isNull(T value);
@@ -195,6 +199,25 @@ template <class InputIterator> inline
 std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last)
 {
     return minMaxElement(first, last, std::less<typename std::iterator_traits<InputIterator>::value_type>());
+}
+
+
+template <class T, class InputIterator> inline
+auto nearMatch(const T& val, InputIterator first, InputIterator last) -> typename std::iterator_traits<InputIterator>::value_type
+{
+    if (first == last)
+        return 0;
+
+    assert(std::is_sorted(first, last));
+    InputIterator it = std::lower_bound(first, last, val);
+    if (it == last)
+        return *--last;
+    if (it == first)
+        return *first;
+
+    const auto nextVal = *it;
+    const auto prevVal = *--it;
+    return val - prevVal < nextVal - val ? prevVal : nextVal;
 }
 
 

@@ -349,16 +349,17 @@ bool operator==(const FolderPairEnh& lhs, const FolderPairEnh& rhs)
 struct MainConfiguration
 {
     MainConfiguration() :
-#ifdef FFS_WIN
         globalFilter(Zstr("*"),
+#ifdef FFS_WIN
                      Zstr("\\System Volume Information\\\n")
                      Zstr("\\$Recycle.Bin\\\n")
                      Zstr("\\RECYCLER\\\n")
                      Zstr("\\RECYCLED\\\n")) {}
 #elif defined FFS_LINUX
-        globalFilter(Zstr("*"),
                      Zstr("/.Trash-*/\n")
                      Zstr("/.recycle/\n")) {}
+#elif defined FFS_MAC
+                     Zstr("/.Trashes/\n")) {}
 #endif
 
     CompConfig   cmpConfig;    //global compare settings:         may be overwritten by folder pair settings

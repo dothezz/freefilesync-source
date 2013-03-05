@@ -50,8 +50,8 @@ public:
 
 Tooltip::Tooltip() : tipWindow(new PopupFrameGenerated(nullptr))
 {
-#ifdef FFS_WIN //neither looks good nor works at all on Linux
-    tipWindow->Disable(); //prevent window stealing focus!
+#if defined FFS_WIN //prevent window stealing focus!
+    tipWindow->Disable(); //neither looks good nor works at all on Linux; no visible difference on OS X
 #endif
     hide();
 }
@@ -68,7 +68,10 @@ void Tooltip::show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp)
     const wxBitmap& newBmp = bmp ? *bmp : wxNullBitmap;
 
     if (!isEqual(tipWindow->m_bitmapLeft->GetBitmap(), newBmp))
+    {
         tipWindow->m_bitmapLeft->SetBitmap(newBmp);
+        tipWindow->Refresh(); //needed if bitmap size changed!
+    }
 
     if (text != tipWindow->m_staticTextMain->GetLabel())
     {

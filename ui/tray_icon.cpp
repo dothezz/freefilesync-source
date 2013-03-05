@@ -5,27 +5,19 @@
 // **************************************************************************
 
 #include "tray_icon.h"
-#include "../lib/resources.h"
-#include "small_dlgs.h"
+#include <zen/basic_math.h>
 #include <wx/taskbar.h>
-#include <cmath>
-#include <wx/image.h>
 #include <wx/menu.h>
 #include <wx/icon.h> //req. by Linux
 #include <wx+/image_tools.h>
+#include "small_dlgs.h"
+#include "../lib/resources.h"
 
 
 const wxEventType FFS_REQUEST_RESUME_TRAY_EVENT = wxNewEventType();
 
-
 namespace
 {
-inline
-int roundNum(double d) //little rounding function
-{
-    return static_cast<int>(d < 0 ? d - .5 : d + .5);
-}
-
 void fillRange(wxImage& img, int pixelFirst, int pixelLast, const wxColor& col)
 {
     const int pixelCount = img.GetWidth() >= 0 ? img.GetWidth() * img.GetHeight() : -1;
@@ -47,26 +39,20 @@ void fillRange(wxImage& img, int pixelFirst, int pixelLast, const wxColor& col)
     }
 }
 
-wxIcon generateIcon(double fraction) //generate icon with progress indicator
+wxIcon generateProgressIcon(const wxImage& logo, double fraction) //generate icon with progress indicator
 {
-#ifdef FFS_WIN
-    static const wxBitmap trayIcon = GlobalResources::getImage(wxT("FFS_tray_win.png"));
-#elif defined FFS_LINUX
-    static const wxBitmap trayIcon = GlobalResources::getImage(wxT("FFS_tray_linux.png"));
-#endif
-
-    const int pixelCount = trayIcon.GetWidth() * trayIcon.GetHeight();
-    const int startFillPixel = std::min(roundNum(fraction * pixelCount), pixelCount);
+    const int pixelCount = logo.GetWidth() * logo.GetHeight();
+    const int startFillPixel = std::min(numeric::round(fraction * pixelCount), pixelCount);
 
     //minor optimization
     static std::pair<int, wxIcon> buffer = std::make_pair(-1, wxNullIcon);
     if (buffer.first == startFillPixel)
         return buffer.second;
 
-    wxIcon genIcon;
+    wxIcon progIcon;
 
     {
-        wxImage genImage(trayIcon.ConvertToImage());
+        wxImage genImage(logo);
 
         //gradually make FFS icon brighter while nearing completion
         zen::brighten(genImage, -200 * (1 - fraction));
@@ -135,26 +121,24 @@ wxIcon generateIcon(double fraction) //generate icon with progress indicator
                             ::memset(alpha + row * genImage.GetWidth() + indicatorXBegin, wxIMAGE_ALPHA_OPAQUE, indicatorWidth);
                     }
             */
-            genIcon.CopyFromBitmap(wxBitmap(genImage));
+            progIcon.CopyFromBitmap(wxBitmap(genImage));
         }
-        else //fallback
-            genIcon.CopyFromBitmap(trayIcon);
     }
 
     //fill buffer
     buffer.first  = startFillPixel;
-    buffer.second = genIcon;
-    return genIcon;
+    buffer.second = progIcon;
+    return progIcon;
 }
-}
-
 
 //------------------------------------------------------------------------------------------------
+
 enum Selection
 {
     CONTEXT_RESTORE,
     CONTEXT_ABOUT
 };
+}
 
 
 class FfsTrayIcon::TaskBarImpl : public wxTaskBarIcon
@@ -186,9 +170,14 @@ private:
 
 FfsTrayIcon::FfsTrayIcon() :
     trayIcon(new TaskBarImpl(*this)),
-    fractionLast(1) //show FFS logo by default
+    fractionLast(1), //show FFS logo by default
+#if defined FFS_WIN || defined FFS_MAC //16x16 seems to be the only size that is shown correctly on OS X
+    logo(GlobalResources::getImage(L"FFS_tray_16x16").ConvertToImage())
+#elif defined FFS_LINUX
+    logo(GlobalResources::getImage(L"FFS_tray_24x24").ConvertToImage())
+#endif
 {
-    trayIcon->SetIcon(generateIcon(fractionLast), L"FreeFileSync");
+    trayIcon->SetIcon(generateProgressIcon(logo, fractionLast), L"FreeFileSync");
     trayIcon->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(FfsTrayIcon::OnDoubleClick), nullptr, this); //register double-click
 }
 
@@ -208,14 +197,14 @@ FfsTrayIcon::~FfsTrayIcon()
 void FfsTrayIcon::setToolTip(const wxString& toolTip)
 {
     toolTipLast = toolTip;
-    trayIcon->SetIcon(generateIcon(fractionLast), toolTip); //another wxWidgets design bug: non-orthogonal method!
+    trayIcon->SetIcon(generateProgressIcon(logo, fractionLast), toolTip); //another wxWidgets design bug: non-orthogonal method!
 }
 
 
 void FfsTrayIcon::setProgress(double fraction)
 {
     fractionLast = fraction;
-    trayIcon->SetIcon(generateIcon(fraction), toolTipLast);
+    trayIcon->SetIcon(generateProgressIcon(logo, fraction), toolTipLast);
 }
 
 

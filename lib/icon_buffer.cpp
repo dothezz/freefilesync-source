@@ -21,31 +21,21 @@
 
 using namespace zen;
 
+warn_static("mac")
+
+#if defined FFS_MAC
+struct IconBuffer::Pimpl {};
+IconBuffer::IconBuffer(IconSize sz): pimpl(), icoSize(sz), genDirIcon(), genFileIcon() {}
+IconBuffer::~IconBuffer() {}
+int IconBuffer::getSize(IconSize icoSize) {return 16; }
+bool IconBuffer::requestFileIcon(const Zstring& filename, wxIcon* icon) { return false; }
+void IconBuffer::setWorkload(const std::vector<Zstring>& load) {}
+#else
+
 
 namespace
 {
 const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to buffer
-
-inline
-int cvrtSize(IconBuffer::IconSize sz) //get size in pixel
-{
-    switch (sz)
-    {
-        case IconBuffer::SIZE_SMALL:
-#ifdef FFS_WIN
-            return 16;
-#elif defined FFS_LINUX
-            return 24;
-#endif
-        case IconBuffer::SIZE_MEDIUM:
-            return 48;
-        case IconBuffer::SIZE_LARGE:
-            return 128;
-    }
-    assert(false);
-    return 0;
-}
-
 
 class IconHolder //handle HICON/GdkPixbuf ownership WITHOUT ref-counting to allow thread-safe usage (in contrast to wxIcon)
 {
@@ -259,23 +249,22 @@ IconHolder getThumbnail(const Zstring& filename, int requestedSize) //return 0 o
 }
 
 
-const char* mimeFileIcons[] =
-{
-    "application-x-zerosize", //Kubuntu: /usr/share/icons/oxygen/48x48/mimetypes
-    "text-x-generic",         //http://live.gnome.org/GnomeArt/Tutorials/IconThemes
-    "empty",            //
-    "gtk-file",         //Ubuntu: /usr/share/icons/Humanity/mimes/48
-    "gnome-fs-regular", //
-};
-
-
 IconHolder getGenericFileIcon(IconBuffer::IconSize sz)
 {
 #ifdef FFS_WIN
     return getIconByAttribute(L"dummy", FILE_ATTRIBUTE_NORMAL, sz);
 
 #elif defined FFS_LINUX
-    const int requestedSize = cvrtSize(sz);
+    const char* mimeFileIcons[] =
+    {
+        "application-x-zerosize", //Kubuntu: /usr/share/icons/oxygen/48x48/mimetypes
+        "text-x-generic",         //http://live.gnome.org/GnomeArt/Tutorials/IconThemes
+        "empty",            //
+        "gtk-file",         //Ubuntu: /usr/share/icons/Humanity/mimes/48
+        "gnome-fs-regular", //
+    };
+
+    const int requestedSize = IconBuffer::getSize(sz);
 
     if (GtkIconTheme* defaultTheme = gtk_icon_theme_get_default()) //not owned!
         for (auto it = std::begin(mimeFileIcons); it != std::end(mimeFileIcons); ++it)
@@ -296,7 +285,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
         case IconBuffer::SIZE_MEDIUM:
         case IconBuffer::SIZE_LARGE:
         {
-            IconHolder ico = getThumbnail(filename, cvrtSize(sz));
+            IconHolder ico = getThumbnail(filename, IconBuffer::getSize(sz));
             if (ico)
                 return ico;
             //else: fallback to non-thumbnail icon
@@ -314,11 +303,12 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     //which means the access to get thumbnail failed: thumbnail failure is not dependent from extension in general!
 
     SHFILEINFO fileInfo = {};
-    DWORD_PTR imgList = ::SHGetFileInfo(filename.c_str(), //zen::removeLongPathPrefix(fileName), //::SHGetFileInfo() can't handle \\?\-prefix!
-                                        0,
-                                        &fileInfo,
-                                        sizeof(fileInfo),
-                                        SHGFI_SYSICONINDEX);
+    DWORD_PTR imgList = ::SHGetFileInfo(filename.c_str(),    //_In_     LPCTSTR pszPath, -> note: ::SHGetFileInfo() can't handle \\?\-prefix!
+                                        0,                   //DWORD dwFileAttributes,
+                                        &fileInfo,           //_Inout_  SHFILEINFO *psfi,
+                                        sizeof(fileInfo),    //UINT cbFileInfo,
+                                        SHGFI_SYSICONINDEX); //UINT uFlags
+
     //Quote: "The IImageList pointer type, such as that returned in the ppv parameter, can be cast as an HIMAGELIST as
     //        needed; for example, for use in a list view. Conversely, an HIMAGELIST can be cast as a pointer to an IImageList."
     //http://msdn.microsoft.com/en-us/library/windows/desktop/bb762185(v=vs.85).aspx
@@ -328,14 +318,14 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     //imgList->Release(); //empiric study: crash on XP if we release this! Seems we do not own it... -> also no GDI leak on Win7 -> okay
     //another comment on http://msdn.microsoft.com/en-us/library/bb762179(v=VS.85).aspx describes exact same behavior on Win7/XP
 
-    boost::call_once(initGetIconByIndexOnce, [] //thread-safe init
+   boost::call_once(initGetIconByIndexOnce, [] //thread-safe init
     {
         getIconByIndex = DllFun<thumb::FunType_getIconByIndex>(thumb::getDllName(), thumb::funName_getIconByIndex);
     });
     return IconHolder(getIconByIndex ? static_cast<HICON>(getIconByIndex(fileInfo.iIcon, getShilIconType(sz))) : nullptr);
 
 #elif defined FFS_LINUX
-    const int requestedSize = cvrtSize(sz);
+    const int requestedSize = IconBuffer::getSize(sz);
 
     GFile* file = g_file_new_for_path(filename.c_str()); //never fails
     ZEN_ON_SCOPE_EXIT(g_object_unref(file);)
@@ -403,7 +393,6 @@ public:
             boost::unique_lock<boost::mutex> dummy(lockFiles);
             filesToLoad = newLoad;
         }
-
         conditionNewFiles.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
         //condition handling, see: http://www.boost.org/doc/libs/1_43_0/doc/html/thread/synchronization.html#thread.synchronization.condvar_ref
     }
@@ -428,7 +417,7 @@ public:
         auto it = iconMappping.find(fileName);
         if (it != iconMappping.end())
         {
-            if (icon != nullptr)
+            if (icon)
                 *icon = it->second;
             return true;
         }
@@ -460,7 +449,7 @@ private:
     NameIconMap    iconMappping; //use synchronisation when accessing this!
     IconDbSequence iconSequence; //save sequence of buffer entry to delete oldest elements
 };
-//-------------------------------------------------------------
+
 //################################################################################################################################################
 
 class WorkerThread //lifetime is part of icon buffer
@@ -516,8 +505,7 @@ void WorkerThread::operator()() //thread entry
 
 struct IconBuffer::Pimpl
 {
-    Pimpl() :
-        workload(std::make_shared<WorkLoad>()),
+    Pimpl() : workload(std::make_shared<WorkLoad>()),
         buffer(std::make_shared<Buffer>()) {}
 
     std::shared_ptr<WorkLoad> workload;
@@ -527,11 +515,10 @@ struct IconBuffer::Pimpl
 };
 
 
-IconBuffer::IconBuffer(IconSize sz) :
-    pimpl(new Pimpl),
+IconBuffer::IconBuffer(IconSize sz) : pimpl(make_unique<Pimpl>()),
     icoSize(sz),
-    genDirIcon(::getGenericDirectoryIcon(sz).toWxIcon(cvrtSize(icoSize))),
-    genFileIcon(::getGenericFileIcon(sz).toWxIcon(cvrtSize(icoSize)))
+    genDirIcon(::getGenericDirectoryIcon(sz).toWxIcon(IconBuffer::getSize(icoSize))),
+    genFileIcon(::getGenericFileIcon(sz).toWxIcon(IconBuffer::getSize(icoSize)))
 {
     pimpl->worker = boost::thread(WorkerThread(pimpl->workload, pimpl->buffer, sz));
 }
@@ -545,9 +532,23 @@ IconBuffer::~IconBuffer()
 }
 
 
-int IconBuffer::getSize() const
+int IconBuffer::getSize(IconSize icoSize)
 {
-    return cvrtSize(icoSize);
+    switch (icoSize)
+    {
+        case IconBuffer::SIZE_SMALL:
+#if defined FFS_WIN || defined FFS_MAC
+            return 16;
+#elif defined FFS_LINUX
+            return 24;
+#endif
+        case IconBuffer::SIZE_MEDIUM:
+            return 48;
+        case IconBuffer::SIZE_LARGE:
+            return 128;
+    }
+    assert(false);
+    return 0;
 }
 
 
@@ -561,7 +562,7 @@ bool IconBuffer::requestFileIcon(const Zstring& filename, wxIcon* icon)
         IconHolder heldIcon;
         if (!pimpl->buffer->requestFileIcon(entryName, &heldIcon))
             return false;
-        *icon = heldIcon.toWxIcon(cvrtSize(icoSize));
+        *icon = heldIcon.toWxIcon(IconBuffer::getSize(icoSize));
         return true;
     };
 
@@ -577,7 +578,7 @@ bool IconBuffer::requestFileIcon(const Zstring& filename, wxIcon* icon)
                 IconHolder heldIcon = getAssociatedIconByExt(extension, icoSize); //fast!
                 pimpl->buffer->insertIntoBuffer(extension, heldIcon);
                 if (icon)
-                    *icon = heldIcon.toWxIcon(cvrtSize(icoSize));
+                    *icon = heldIcon.toWxIcon(IconBuffer::getSize(icoSize));
             }
             return true;
         }
@@ -588,3 +589,4 @@ bool IconBuffer::requestFileIcon(const Zstring& filename, wxIcon* icon)
 }
 
 void IconBuffer::setWorkload(const std::vector<Zstring>& load) { pimpl->workload->setWorkload(load); }
+#endif

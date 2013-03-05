@@ -48,7 +48,7 @@ private:
 void limitLogfileCount(const Zstring& logdir, const std::wstring& jobname, size_t maxCount) //throw()
 {
     std::vector<Zstring> logFiles;
-    FindLogfiles traverseCallback(toZ(jobname), logFiles); //throw()!
+    FindLogfiles traverseCallback(utfCvrtTo<Zstring>(jobname), logFiles); //throw()!
 
     traverseFolder(logdir,
                    traverseCallback);
@@ -76,7 +76,7 @@ std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, /
     makeDirectory(logfileDir); //throw FileError
 
     //assemble logfile name
-    const Zstring body = appendSeparator(logfileDir) + toZ(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp);
+    const Zstring body = appendSeparator(logfileDir) + utfCvrtTo<Zstring>(jobName) + Zstr(" ") + formatTime<Zstring>(Zstr("%Y-%m-%d %H%M%S"), timeStamp);
 
     //ensure uniqueness
     for (int i = 0;; ++i)
@@ -237,13 +237,13 @@ BatchStatusHandler::~BatchStatusHandler()
 
             //notify to syncStatusFrame that current process has ended
             if (abortIsRequested())
-                syncStatusFrame.processHasFinished(SyncStatus::RESULT_ABORTED, errorLog);  //enable okay and close events
+                syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog);  //enable okay and close events
             else if (totalErrors > 0)
-                syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_ERROR, errorLog);
+                syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog);
             else if (totalWarnings > 0)
-                syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_WARNINGS, errorLog);
+                syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog);
             else
-                syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_SUCCESS, errorLog);
+                syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog);
         }
         else
             syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
@@ -262,7 +262,7 @@ void BatchStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
 {
     StatusHandler::updateProcessedData(objectsDelta, dataDelta);
 
-           syncStatusFrame.notifyProgressChange(); //noexcept
+    syncStatusFrame.notifyProgressChange(); //noexcept
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!
 }
 

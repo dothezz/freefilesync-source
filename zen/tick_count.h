@@ -8,9 +8,18 @@
 #define ZEN_TICK_COUNT_HEADER_3807326
 
 #include <cstdint>
-//#include <algorithm>
 #include "type_traits.h"
 #include "basic_math.h"
+#ifdef FFS_WIN
+#include "win.h" //includes "windows.h"
+
+#elif defined FFS_LINUX
+#include <time.h> //Posix ::clock_gettime()
+
+#elif defined FFS_MAC
+#include <mach/mach_time.h>
+#endif
+//#include <algorithm>
 //#include "assert_static.h"
 //#include <cmath>
 //template <class T> inline
@@ -20,11 +29,6 @@
 //}
 
 
-#ifdef FFS_WIN
-#include "win.h" //includes "windows.h"
-#elif defined FFS_LINUX
-#include <time.h> //Posix ::clock_gettime()
-#endif
 
 namespace zen
 {
@@ -57,6 +61,8 @@ public:
     typedef LARGE_INTEGER NativeVal;
 #elif defined FFS_LINUX
     typedef timespec NativeVal;
+#elif defined FFS_MAC
+    typedef uint64_t NativeVal;
 #endif
 
     TickVal() : val_() {}
@@ -67,7 +73,6 @@ public:
     {
 #ifdef FFS_WIN
         return numeric::dist(lhs.val_.QuadPart, rhs.val_.QuadPart); //std::abs(a - b) can lead to overflow!
-
 #elif defined FFS_LINUX
         const auto distSec  = numeric::dist(lhs.val_.tv_sec,  rhs.val_.tv_sec);
         const auto distNsec = numeric::dist(lhs.val_.tv_nsec, rhs.val_.tv_nsec);
@@ -75,11 +80,13 @@ public:
         if (distSec > (std::numeric_limits<std::int64_t>::max() - distNsec) / 1000000000) //truncate instead of overflow!
             return std::numeric_limits<std::int64_t>::max();
         return distSec * 1000000000 + distNsec;
+#elif defined FFS_MAC
+        return numeric::dist(lhs.val_, rhs.val_);
 #endif
     }
 
     inline friend
-    bool operator<(const TickVal& lhs, const TickVal& rhs) //evaluate directly rather than reuse operator-
+    bool operator<(const TickVal& lhs, const TickVal& rhs)
     {
 #ifdef FFS_WIN
         return lhs.val_.QuadPart < rhs.val_.QuadPart;
@@ -87,6 +94,8 @@ public:
         if (lhs.val_.tv_sec != rhs.val_.tv_sec)
             return lhs.val_.tv_sec < rhs.val_.tv_sec;
         return lhs.val_.tv_nsec < rhs.val_.tv_nsec;
+#elif defined FFS_MAC
+        return lhs.val_ < rhs.val_;
 #endif
     }
 
@@ -109,6 +118,12 @@ std::int64_t ticksPerSec() //return 0 on error
 
 #elif defined FFS_LINUX
     return 1000000000; //precision: nanoseconds
+
+#elif defined FFS_MAC
+    mach_timebase_info_data_t tbi = {};
+    if (::mach_timebase_info(&tbi) != KERN_SUCCESS)
+        return 0;
+    return 1000000000 * tbi.denom / tbi.numer;
 #endif
 }
 
@@ -126,6 +141,9 @@ TickVal getTicks() //return 0 on error
     timespec now = {};
     if (::clock_gettime(CLOCK_MONOTONIC_RAW, &now) != 0) //CLOCK_MONOTONIC measures time reliably across processors!
         return TickVal();
+
+#elif defined FFS_MAC
+    uint64_t now = ::mach_absolute_time(); //can this call fail???
 #endif
     return TickVal(now);
 }

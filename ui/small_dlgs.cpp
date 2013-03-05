@@ -6,7 +6,6 @@
 
 #include "small_dlgs.h"
 #include <wx/wupdlock.h>
-//#include <wx/msgdlg.h>
 #include <zen/format_unit.h>
 #include <zen/build_info.h>
 #include <zen/stl_tools.h>
@@ -16,6 +15,7 @@
 #include <wx+/no_flicker.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/image_tools.h>
+#include <wx+/font_size.h>
 #include "gui_generated.h"
 #include "msg_popup.h"
 #include "custom_grid.h"
@@ -42,6 +42,8 @@ private:
 
 AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 {
+    setRelativeFontSize(*m_hyperlinkDonate, 1.25);
+
     m_bitmap9 ->SetBitmap(GlobalResources::getImage(L"website"));
     m_bitmap10->SetBitmap(GlobalResources::getImage(L"email"));
     m_bitmap13->SetBitmap(GlobalResources::getImage(L"gpl"));
@@ -60,13 +62,11 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
         //language name
         wxStaticText* staticTextLanguage = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, it->languageName, wxDefaultPosition, wxDefaultSize, 0 );
         staticTextLanguage->Wrap(-1);
-        staticTextLanguage->SetForegroundColour(*wxBLACK); //accessibility: always set both foreground AND background colors!
         fgSizerTranslators->Add(staticTextLanguage, 0, wxALIGN_CENTER_VERTICAL);
 
         //translator name
         wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, it->translatorName, wxDefaultPosition, wxDefaultSize, 0 );
         staticTextTranslator->Wrap(-1);
-        staticTextTranslator->SetForegroundColour(*wxBLACK); //accessibility: always set both foreground AND background colors!
         fgSizerTranslators->Add(staticTextTranslator, 0, wxALIGN_CENTER_VERTICAL);
     }
 
@@ -105,16 +105,17 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     wxBitmap bmpLogo;
     {
         wxImage tmp = GlobalResources::getImage(L"logo").ConvertToImage();
-        tmp.Resize(wxSize(m_panelLogo->GetClientSize().GetWidth(), tmp.GetHeight()), wxPoint(0, 0), 255, 255, 255); //enlarge to fit full width
+        tmp.Resize(wxSize(GetClientSize().GetWidth(), tmp.GetHeight()), wxPoint(0, 0), 255, 255, 255); //enlarge to fit full width
         bmpLogo = wxBitmap(tmp);
     }
+
     {
         wxMemoryDC dc(bmpLogo);
-        dc.SetTextForeground(*wxBLACK);
-        dc.SetFont(wxFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"));
+        dc.SetTextForeground(wxColor(2, 2, 2)); //for some unknown reason SetBitmap below seems to replace wxBLACK with white on accessibility high contrast schemes!!
+        dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize() * 1.8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, L"Tahoma"));
         dc.DrawLabel(wxString(L"FreeFileSync ") + zen::currentVersion, wxNullBitmap, wxRect(0, 0, bmpLogo.GetWidth(), bmpLogo.GetHeight()), wxALIGN_CENTER);
     }
-    m_bitmap11->SetBitmap(bmpLogo);
+    m_bitmapLogo->SetBitmap(bmpLogo);
 
     Fit(); //child-element widths have changed: image was set
 
@@ -127,8 +128,8 @@ void zen::showAboutDialog(wxWindow* parent)
     AboutDlg aboutDlg(parent);
     aboutDlg.ShowModal();
 }
-//########################################################################################
 
+//########################################################################################
 
 class FilterDlg : public FilterDlgGenerated
 {
@@ -141,7 +142,7 @@ public:
 private:
     void OnClose       (  wxCloseEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnCancel      (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Exclude Items.html"); }
+    void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Exclude Items.html", this); }
     void OnDefault     (wxCommandEvent& event);
     void OnApply       (wxCommandEvent& event);
     void OnUpdateChoice(wxCommandEvent& event) { updateGui(); }
@@ -170,6 +171,8 @@ FilterDlg::FilterDlg(wxWindow* parent,
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+
+    setRelativeFontSize(*m_staticTextHeader, 1.25);
 
     m_textCtrlInclude->SetMaxLength(0); //allow large filter entries!
     m_textCtrlExclude->SetMaxLength(0); //
@@ -204,7 +207,7 @@ FilterDlg::FilterDlg(wxWindow* parent,
     //    else
     //        m_staticTexHeader->SetLabel("Filter single folder pair"));
     //
-    m_staticTexHeader->SetLabel(_("Filter"));
+    m_staticTextHeader->SetLabel(_("Filter"));
 
     Fit(); //child-element widths have changed: image was set
     m_panelHeader->Layout();
@@ -262,8 +265,8 @@ void FilterDlg::updateGui()
 
 void FilterDlg::setFilter(const FilterConfig& filter)
 {
-    m_textCtrlInclude->ChangeValue(toWx(filter.includeFilter));
-    m_textCtrlExclude->ChangeValue(toWx(filter.excludeFilter));
+    m_textCtrlInclude->ChangeValue(utfCvrtTo<wxString>(filter.includeFilter));
+    m_textCtrlExclude->ChangeValue(utfCvrtTo<wxString>(filter.excludeFilter));
 
     setEnumVal(enumTimeDescr, *m_choiceUnitTimespan, filter.unitTimeSpan);
     setEnumVal(enumSizeDescr, *m_choiceUnitMinSize,  filter.unitSizeMin);
@@ -279,8 +282,8 @@ void FilterDlg::setFilter(const FilterConfig& filter)
 
 FilterConfig FilterDlg::getFilter() const
 {
-    return FilterConfig(toZ(m_textCtrlInclude->GetValue()),
-                        toZ(m_textCtrlExclude->GetValue()),
+    return FilterConfig(utfCvrtTo<Zstring>(m_textCtrlInclude->GetValue()),
+                        utfCvrtTo<Zstring>(m_textCtrlExclude->GetValue()),
                         m_spinCtrlTimespan->GetValue(),
                         getEnumVal(enumTimeDescr, *m_choiceUnitTimespan),
                         m_spinCtrlMinSize->GetValue(),
@@ -396,13 +399,13 @@ void DeleteDialog::updateGui()
     {
         header = _P("Do you really want to move the following object to the Recycle Bin?",
                     "Do you really want to move the following %x objects to the Recycle Bin?", delInfo.second);
-        m_bitmap12->SetBitmap(GlobalResources::getImage(L"recycler"));
+        m_bitmapDeleteType->SetBitmap(GlobalResources::getImage(L"recycler"));
     }
     else
     {
         header = _P("Do you really want to delete the following object?",
                     "Do you really want to delete the following %x objects?", delInfo.second);
-        m_bitmap12->SetBitmap(GlobalResources::getImage(L"deleteFile"));
+        m_bitmapDeleteType->SetBitmap(GlobalResources::getImage(L"deleteFile"));
     }
     replace(header, L"%x", toGuiString(delInfo.second));
     m_staticTextHeader->SetLabel(header);
@@ -478,7 +481,10 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
+    setRelativeFontSize(*m_buttonStartSync, 1.5);
+    m_buttonStartSync->setInnerBorderSize(8);
     m_buttonStartSync->setBitmapFront(GlobalResources::getImage(L"sync"), 5);
+
     m_staticTextVariant->SetLabel(variantName);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -543,7 +549,7 @@ private:
     void OnOkay(wxCommandEvent& event);
     void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnShowHelp(wxCommandEvent& event) { displayHelpEntry(L"html/Comparison Settings.html"); }
+    void OnShowHelp(wxCommandEvent& event) { displayHelpEntry(L"html/Comparison Settings.html", this); }
 
     void OnTimeSize(wxCommandEvent& event) { compareVar = CMP_BY_TIME_SIZE; updateGui(); }
     void OnContent (wxCommandEvent& event) { compareVar = CMP_BY_CONTENT;   updateGui(); }
@@ -569,6 +575,9 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    setRelativeFontSize(*m_toggleBtnTimeSize, 1.25);
+    setRelativeFontSize(*m_toggleBtnContent,  1.25);
+
     m_bpButtonHelp->SetBitmapLabel(GlobalResources::getImage(L"help"));
 
     enumDescrHandleSyml.
@@ -677,6 +686,8 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     new zen::MouseMoveWindow(*this); //allow moving dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
+    setRelativeFontSize(*m_staticTextHeader, 1.25);
+
     m_bitmapSettings    ->SetBitmap     (GlobalResources::getImage(L"settings"));
     m_buttonResetDialogs->setBitmapFront(GlobalResources::getImage(L"warningSmall"), 5);
     m_bpButtonAddRow    ->SetBitmapLabel(GlobalResources::getImage(L"item_add"));
@@ -688,7 +699,7 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
 
 #ifdef FFS_WIN
     m_checkBoxCopyPermissions->SetLabel(_("Copy NTFS permissions"));
-#else
+#elif defined FFS_LINUX || defined FFS_MAC
     m_checkBoxCopyLocked->Hide();
     m_staticTextCopyLocked->Hide();
 #endif
@@ -891,10 +902,10 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
 
 #ifdef FFS_WIN
     DWORD firstDayOfWeek = 0;
-    if (::GetLocaleInfo(LOCALE_USER_DEFAULT,                   //__in   LCID Locale,
-                        LOCALE_IFIRSTDAYOFWEEK |               // first day of week specifier, 0-6, 0=Monday, 6=Sunday
-                        LOCALE_RETURN_NUMBER,                  //__in   LCTYPE LCType,
-                        reinterpret_cast<LPTSTR>(&firstDayOfWeek),      //__out  LPTSTR lpLCData,
+    if (::GetLocaleInfo(LOCALE_USER_DEFAULT,     //__in   LCID Locale,
+                        LOCALE_IFIRSTDAYOFWEEK | // first day of week specifier, 0-6, 0=Monday, 6=Sunday
+                        LOCALE_RETURN_NUMBER,    //__in   LCTYPE LCType,
+                        reinterpret_cast<LPTSTR>(&firstDayOfWeek),     //__out  LPTSTR lpLCData,
                         sizeof(firstDayOfWeek) / sizeof(TCHAR)) > 0 && //__in   int cchData
         firstDayOfWeek == 6)
         style |= wxCAL_SUNDAY_FIRST;

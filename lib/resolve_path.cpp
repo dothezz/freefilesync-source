@@ -1,25 +1,21 @@
 #include "resolve_path.h"
+#include <set> //not necessarily included by <map>!
 #include <map>
-#include <set>
 #include <zen/time.h>
-#include <zen/scope_guard.h>
 #include <zen/thread.h>
-#include <wx/utils.h>
-#include <wx+/string_conv.h>
+#include <zen/utf.h>
+#include <wx/utils.h> //wxGetEnv
 
 #ifdef FFS_WIN
-#include <zen/dll.h>
-#include <Shlobj.h>
 #include <zen/win.h> //includes "windows.h"
+#include <Shlobj.h>
 #include <zen/long_path_prefix.h>
 #include <zen/file_handling.h>
 #ifdef _MSC_VER
 #pragma comment(lib, "Mpr.lib")
 #endif
 
-#elif defined FFS_LINUX
-#include <zen/file_traverser.h>
-#include <unistd.h>
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <stdlib.h> //getenv()
 #endif
 
@@ -44,7 +40,7 @@ Zstring resolveRelativePath(const Zstring& relativeName) //note: ::GetFullPathNa
     return removeLongPathPrefix(Zstring(&buffer[0], charsWritten)); //GetFullPathName() preserves long path prefix -> a low-level detail we don't want to leak out!
 }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 Zstring resolveRelativePath(const Zstring& relativeName)
 {
     //http://linux.die.net/man/2/path_resolution
@@ -70,21 +66,12 @@ Zstring resolveRelativePath(const Zstring& relativeName)
                 return homeDir;
         }
 
-        //unfortunately ::realpath only resolves *existing* relative paths, so we need to do it by ourselves
+        //we cannot use ::realpath() since it resolves *existing* relative paths only!
         std::vector<char> buffer(10000);
         if (::getcwd(&buffer[0], buffer.size()) != nullptr)
             return appendSeparator(&buffer[0]) + relativeName;
     }
     return relativeName;
-
-    /*
-        char* absPath = ::realpath(relativeName.c_str(), nullptr);
-        if (!absPath)
-            return relativeName; //ERROR! Don't do anything
-        ZEN_ON_SCOPE_EXIT(::free(absPath));
-
-        return Zstring(absPath);
-        */
 }
 #endif
 
@@ -288,33 +275,10 @@ Zstring zen::expandMacros(const Zstring& text) { return ::expandMacros(text, std
 
 namespace
 {
-#ifdef FFS_LINUX
-class TraverseMedia : public zen::TraverseCallback
-{
-public:
-    typedef std::map<Zstring, Zstring> DeviceList; //device name -> device path mapping
-
-    TraverseMedia(DeviceList& devices) : devices_(devices) {}
-
-    virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
-    virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
-    {
-        devices_.insert(std::make_pair(shortName, fullName));
-        return nullptr; //DON'T traverse into subdirs
-    }
-    virtual HandleError onError(const std::wstring& msg) { assert(false); return ON_ERROR_IGNORE; }
-
-private:
-    DeviceList& devices_;
-};
-#endif
-
-
+#ifdef FFS_WIN
 //networks and cdrom excluded - this should not block
 Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on error
 {
-#ifdef FFS_WIN
     //FindFirstVolume(): traverses volumes on local hard disks only!
     //GetLogicalDriveStrings(): traverses all *logical* volumes, including CD-ROM, FreeOTFE virtual volumes
 
@@ -335,8 +299,7 @@ Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on
             findFirstMatch.addJob([path, volumeName]() -> std::unique_ptr<Zstring>
             {
                 UINT type = ::GetDriveType(path.c_str()); //non-blocking call!
-                if (type == DRIVE_REMOTE ||
-                type == DRIVE_CDROM)
+                if (type == DRIVE_REMOTE || type == DRIVE_CDROM)
                     return nullptr;
 
                 //next call seriously blocks for non-existing network drives!
@@ -359,29 +322,15 @@ Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on
             return *result;
     }
 
-#elif defined FFS_LINUX
-    //due to the naming convention on Linux /media/<volume name> this function is not that useful, but...
-
-    TraverseMedia::DeviceList deviceList;
-
-    TraverseMedia traverser(deviceList);
-    traverseFolder("/media", traverser); //traverse one level
-
-    TraverseMedia::DeviceList::const_iterator it = deviceList.find(volumeName);
-    if (it != deviceList.end())
-        return it->second;
-#endif
     return Zstring();
 }
 
 
-#ifdef FFS_WIN
 //networks and cdrom excluded - this should not block
 Zstring getVolumeName(const Zstring& volumePath) //return empty string on error
 {
     UINT rv = ::GetDriveType(volumePath.c_str()); //non-blocking call!
-    if (rv != DRIVE_REMOTE &&
-        rv != DRIVE_CDROM)
+    if (rv != DRIVE_REMOTE && rv != DRIVE_CDROM)
     {
         std::vector<wchar_t> buffer(MAX_PATH + 1);
         if (::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
@@ -420,7 +369,7 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
                 rest = afterFirst(rest, Zstr(':'));
             if (startsWith(rest, FILE_NAME_SEPARATOR))
                 rest = afterFirst(rest, FILE_NAME_SEPARATOR);
-
+#ifdef FFS_WIN
             //[.*] pattern was found...
             if (!volname.empty())
             {
@@ -435,11 +384,10 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
                  ?:\[FFS USB]\FreeFileSync\  - Windows
                /.../[FFS USB]/FreeFileSync/  - Linux
                             instead of:
-               C:\Program Files\FreeFileSync\[FFS USB]\FreeFileSync\
-                                                                                        */
-#ifdef FFS_WIN
+               C:\Program Files\FreeFileSync\[FFS USB]\FreeFileSync\                                                                                        */
             return L"?:\\[" + volname + L"]\\" + rest;
-#elif defined FFS_LINUX
+
+#elif defined FFS_LINUX || defined FFS_MAC //neither supported nor needed
             return "/.../[" + volname + "]/" + rest;
 #endif
         }
@@ -500,13 +448,13 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         const auto& csidlMap = CsidlConstants::get();
         envToDir.insert(csidlMap.begin(), csidlMap.end());
 
-#elif defined FFS_LINUX
-        addEnvVar("HOME");           // /home/zenju
+#elif defined FFS_LINUX || defined FFS_MAC
+        addEnvVar("HOME"); //Linux: /home/zenju  Mac: /Users/zenju
 #endif
         //substitute paths by symbolic names
         auto pathStartsWith = [](const Zstring& path, const Zstring& prefix) -> bool
         {
-#ifdef FFS_WIN
+#if defined FFS_WIN || defined FFS_MAC
             Zstring tmp = path;
             Zstring tmp2 = prefix;
             ::makeUpper(tmp);

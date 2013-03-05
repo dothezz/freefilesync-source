@@ -22,7 +22,7 @@
 
 //class FolderHistory;
 class DirectoryPair;
-class CompareStatus;
+class CompareProgressDialog;
 class DirectoryPairFirst;
 
 
@@ -42,7 +42,7 @@ public:
                        bool startComparison);
 
     void disableAllElements(bool enableAbort); //dis-/enables all elements (except abort button) that might receive user input
-    void enableAllElements();                   //during long-running processes: comparison, deletion
+    void enableAllElements();                  //during long-running processes: comparison, deletion
 
     void onQueryEndSession(); //last chance to do something useful before killing the application!
 
@@ -266,7 +266,7 @@ private:
     std::unique_ptr<wxString> oldStatusMsg;
 
     //compare status panel (hidden on start, shown when comparing)
-    std::unique_ptr<CompareStatus> compareStatus; //always bound
+    std::unique_ptr<CompareProgressDialog> compareStatus; //always bound
 
     bool cleanedUp;
 

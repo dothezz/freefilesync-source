@@ -7,6 +7,7 @@
 #include "batch_config.h"
 #include <wx/wupdlock.h>
 #include <wx+/mouse_move_dlg.h>
+#include <wx+/font_size.h>
 #include "gui_generated.h"
 #include "dir_name.h"
 #include "../ui/exec_finished_box.h"
@@ -35,7 +36,7 @@ public:
                 size_t onCompletionHistoryMax);
 
 private:
-    virtual void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Schedule a Batch Job.html"); }
+    virtual void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Schedule a Batch Job.html", this); }
     virtual void OnClose       (wxCloseEvent&   event) { EndModal(BUTTON_CANCEL); }
     virtual void OnCancel      (wxCommandEvent& event) { EndModal(BUTTON_CANCEL); }
     virtual void OnSaveBatchJob(wxCommandEvent& event);
@@ -66,12 +67,13 @@ BatchDialog::BatchDialog(wxWindow* parent,
     BatchDlgGenerated(parent),
     batchCfgOutRef(batchCfg)
 {
-    m_comboBoxExecFinished->initHistory(onCompletionHistory, onCompletionHistoryMax);
-
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
     wxWindowUpdateLocker dummy(this); //avoid display distortion
+    setRelativeFontSize(*m_staticTextHeader, 1.25);
+
+    m_comboBoxExecFinished->initHistory(onCompletionHistory, onCompletionHistoryMax);
 
     m_bpButtonHelp  ->SetBitmapLabel(GlobalResources::getImage(L"help"));
     m_bitmapBatchJob->SetBitmap     (GlobalResources::getImage(L"batch"));

@@ -19,6 +19,9 @@
 #include <sys/inotify.h>
 #include <fcntl.h>
 #include "file_traverser.h"
+
+#elif defined FFS_MAC
+//#include <CoreFoundation/FSEvents.h>
 #endif
 
 using namespace zen;
@@ -133,7 +136,7 @@ class ReadChangesAsync
 {
 public:
     //constructed in main thread!
-    ReadChangesAsync(const Zstring& directory, //make sure to not leak in thread-unsafe types!
+    ReadChangesAsync(const Zstring& directory, //make sure to not leak-in thread-unsafe types!
                      const std::shared_ptr<SharedData>& shared) :
         shared_(shared),
         dirnamePf(appendSeparator(directory)),
@@ -510,11 +513,35 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
                     output.push_back(Entry(ACTION_DELETE, fullname));
             }
         }
-
         bytePos += sizeof(struct ::inotify_event) + evt.len;
     }
 
     return output;
 }
 
+#elif defined FFS_MAC
+
+warn_static("finish")
+struct DirWatcher::Pimpl
+{
+
+};
+
+
+DirWatcher::DirWatcher(const Zstring& directory)  //throw FileError
+{
+
+}
+
+
+DirWatcher::~DirWatcher()
+{
+}
+
+
+std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()>&) //throw FileError
+{
+    std::vector<Entry> output;
+    return output;
+}
 #endif

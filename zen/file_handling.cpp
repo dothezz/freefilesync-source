@@ -27,14 +27,20 @@
 #include "IFileOperation/file_op.h"
 
 #elif defined FFS_LINUX
-#include <sys/stat.h>
-#include <utime.h>
-#include <sys/time.h> //futimes
-#include <sys/vfs.h>
-
+#include <sys/vfs.h> //statfs
+#include <fcntl.h> //AT_SYMLINK_NOFOLLOW, UTIME_OMIT
 #ifdef HAVE_SELINUX
 #include <selinux/selinux.h>
 #endif
+
+#elif defined FFS_MAC
+#include <sys/mount.h> //statfs
+#include <utime.h>
+#endif
+
+#if defined FFS_LINUX || defined FFS_MAC
+#include <sys/stat.h>
+//#include <sys/time.h> 
 #endif
 
 using namespace zen;
@@ -47,7 +53,7 @@ bool zen::fileExists(const Zstring& filename)
     const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
     return ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY) == 0; //returns true for (file-)symlinks also
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     struct stat fileInfo = {};
     return ::lstat(filename.c_str(), &fileInfo) == 0 &&
            (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
@@ -62,7 +68,7 @@ bool zen::dirExists(const Zstring& dirname)
     const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
     return ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY) != 0; //returns true for (dir-)symlinks also
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     struct stat dirInfo = {};
     return ::lstat(dirname.c_str(), &dirInfo) == 0 &&
            (S_ISLNK(dirInfo.st_mode) || S_ISDIR(dirInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
@@ -82,7 +88,7 @@ bool zen::symlinkExists(const Zstring& linkname)
     }
     return isSymlink(fileInfo);
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     struct stat fileInfo = {};
     return ::lstat(linkname.c_str(), &fileInfo) == 0 &&
            S_ISLNK(fileInfo.st_mode); //symbolic link
@@ -96,7 +102,7 @@ bool zen::somethingExists(const Zstring& objname)
     const DWORD rv = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
     return rv != INVALID_FILE_ATTRIBUTES || ::GetLastError() == ERROR_SHARING_VIOLATION; //"C:\pagefile.sys"
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     struct stat fileInfo = {};
     return ::lstat(objname.c_str(), &fileInfo) == 0;
 #endif
@@ -160,7 +166,7 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
         attr.modificationTime = toTimeT(fileInfoHnd.ftLastWriteTime);
     }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     struct stat fileInfo = {};
 
     const int rv = procSl == SYMLINK_FOLLOW ?
@@ -204,7 +210,7 @@ UInt64 zen::getFreeDiskSpace(const Zstring& path) //throw FileError
 
     return UInt64(bytesFree.LowPart, bytesFree.HighPart);
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     struct statfs info = {};
     if (::statfs(path.c_str(), &info) != 0)
         throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(path)) + L"\n\n" + getLastErrorFormatted());
@@ -269,7 +275,7 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
     return volumeSerial;
 }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 dev_t retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
 {
     Zstring volumePathName = pathName;
@@ -308,7 +314,7 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
 #ifdef FFS_WIN
     const Zstring& filenameFmt = applyLongPathPrefix(filename);
     if (!::DeleteFile(filenameFmt.c_str()))
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     if (::unlink(filename.c_str()) != 0)
 #endif
     {
@@ -419,7 +425,7 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
             throw FileError(errorMessage);
     }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     if (::rename(oldName.c_str(), newName.c_str()) != 0)
     {
         const int lastError = errno;
@@ -619,7 +625,7 @@ void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) 
         if (callback) callback->onBeforeDirDeletion(directory); //once per symlink
 #ifdef FFS_WIN
         if (!::RemoveDirectory(directoryFmt.c_str()))
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
         if (::unlink(directory.c_str()) != 0)
 #endif
             throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
@@ -653,7 +659,7 @@ void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) 
         if (callback) callback->onBeforeDirDeletion(directory); //and once per folder
 #ifdef FFS_WIN
         if (!::RemoveDirectory(directoryFmt.c_str()))
-#else
+#elif defined FFS_LINUX || defined FFS_MAC
         if (::rmdir(directory.c_str()) != 0)
 #endif
             throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
@@ -676,11 +682,11 @@ void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
 
 
 
-void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, ProcSymlink procSl) //throw FileError
+void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink procSl) //throw FileError
 {
 #ifdef FFS_WIN
     FILETIME creationTime  = {};
-    FILETIME lastWriteTime = tofiletime(modificationTime);
+    FILETIME lastWriteTime = tofiletime(modTime);
 
     //####################################### DST hack ###########################################
     if (dst::isFatDrive(filename)) //throw()
@@ -930,25 +936,23 @@ void zen::setFileTime(const Zstring& filename, const Int64& modificationTime, Pr
 #endif
 
 #elif defined FFS_LINUX
-    if (procSl == SYMLINK_FOLLOW)
-    {
-        struct ::utimbuf newTimes = {};
-        newTimes.actime  = ::time(nullptr);
-        newTimes.modtime = to<time_t>(modificationTime);
+    struct ::timespec newTimes[2] = {};
+    newTimes[0].tv_nsec = UTIME_OMIT; //omit access time
+    newTimes[1].tv_sec = to<time_t>(modTime); //modification time (seconds)
 
-        // set new "last write time"
-        if (::utime(filename.c_str(), &newTimes) != 0)
-            throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
-    }
-    else
-    {
-        struct ::timeval newTimes[2] = {};
-        newTimes[0].tv_sec = ::time(nullptr); //access time (seconds)
-        newTimes[1].tv_sec = to<time_t>(modificationTime); //modification time (seconds)
+    if (::utimensat(AT_FDCWD, filename.c_str(), newTimes, procSl == SYMLINK_DIRECT ? AT_SYMLINK_NOFOLLOW : 0) != 0)
+        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
 
-        if (::lutimes(filename.c_str(), newTimes) != 0)
-            throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
-    }
+#elif defined FFS_MAC
+    struct ::timeval newTimes[2] = {};
+    newTimes[0].tv_sec = ::time(nullptr); //access time (seconds)
+    newTimes[1].tv_sec = to<time_t>(modTime); //modification time (seconds)
+
+    const int rv = procSl == SYMLINK_FOLLOW ?
+                   :: utimes(filename.c_str(), newTimes) : //utimensat() not yet implemented on OS X
+                   ::lutimes(filename.c_str(), newTimes);
+    if (rv != 0)
+        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
 #endif
 }
 
@@ -976,7 +980,7 @@ bool zen::supportsPermissions(const Zstring& dirname) //throw FileError
 
     return (fsFlags & FILE_PERSISTENT_ACLS) != 0;
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     return true;
 #endif
 }
@@ -1226,7 +1230,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
         throw FileError
     		*/
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 
 #ifdef HAVE_SELINUX  //copy SELinux security context
     copySecurityContext(source, target, procSl); //throw FileError
@@ -1277,7 +1281,7 @@ void createDirectoryStraight(const Zstring& directory, //throw FileError, ErrorT
         throw FileError(msg);
     }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     if (::mkdir(directory.c_str(), 0755) != 0) //mode: drwxr-xr-x
     {
         const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted();
@@ -1474,7 +1478,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     if (!createSymbolicLink(targetLink.c_str(), //__in  LPTSTR lpSymlinkFileName, - seems no long path prefix is required...
                             linkPath.c_str(),   //__in  LPTSTR lpTargetFileName,
                             (isDirLink ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0))) //__in  DWORD dwFlags
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     if (::symlink(linkPath.c_str(), targetLink.c_str()) != 0)
 #endif
         throw FileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."), L"%x", fmtFileName(sourceLink)), L"%y", fmtFileName(targetLink)) +
@@ -2166,14 +2170,13 @@ void copyFileWindows(const Zstring& sourceFile, const Zstring& targetFile, Callb
     }
 }
 
-#elif defined FFS_LINUX
-void copyFileLinux(const Zstring& sourceFile,
-                   const Zstring& targetFile,
-                   CallbackCopyFile* callback,
-                   FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
-{
-    zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (...) {} }); //transactional behavior: place guard before lifetime of FileOutput
 
+#elif defined FFS_LINUX || defined FFS_MAC
+void copyFileLinuxMac(const Zstring& sourceFile,
+                      const Zstring& targetFile,
+                      CallbackCopyFile* callback,
+                      FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+{
     //open sourceFile for reading
     FileInputUnbuffered fileIn(sourceFile); //throw FileError, ErrorNotExisting
 
@@ -2181,6 +2184,7 @@ void copyFileLinux(const Zstring& sourceFile,
     if (::fstat(fileIn.getDescriptor(), &sourceInfo) != 0) //read file attributes from source
         throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + getLastErrorFormatted());
 
+    zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (...) {} }); //transactional behavior: place guard before lifetime of FileOutput
     try
     {
         //create targetFile and open it for writing
@@ -2202,12 +2206,6 @@ void copyFileLinux(const Zstring& sourceFile,
 
         //adapt target file modification time:
         {
-            struct ::timeval newTimes[2] = {};
-            newTimes[0].tv_sec = sourceInfo.st_atime;
-            newTimes[1].tv_sec = sourceInfo.st_mtime;
-            if (::futimes(fileOut.getDescriptor(), newTimes) != 0) //by using the already open file handle, we avoid issues like: https://sourceforge.net/p/freefilesync/bugs/230/
-                throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
-
             //read and return file statistics
             struct ::stat targetInfo = {};
             if (::fstat(fileOut.getDescriptor(), &targetInfo) != 0)
@@ -2222,11 +2220,18 @@ void copyFileLinux(const Zstring& sourceFile,
             }
         }
     }
-    catch (ErrorTargetExisting&)
+    catch (const ErrorTargetExisting&)
     {
         guardTarget.dismiss(); //don't delete file that existed previously!
         throw;
     }
+
+    //we cannot set the target file times while the file descriptor is open and being written:
+    //this triggers bugs on samba shares where the modification time is set to current time instead.
+    //http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=340236
+    //http://comments.gmane.org/gmane.linux.file-systems.cifs/2854
+    //on the other hand we thereby have to reopen https://sourceforge.net/p/freefilesync/bugs/230/
+    setFileTime(targetFile, sourceInfo.st_mtime, SYMLINK_FOLLOW); //throw FileError
 
     guardTarget.dismiss(); //target has been created successfully!
 }
@@ -2246,14 +2251,14 @@ Zstring findUnusedTempName(const Zstring& filename)
 
 
 /*
-      File Copy Layers
-      ================
-
-         copyFile (setup transactional behavior)
-             |
-      copyFileSelectOs
-      /               \
-copyFileLinux  copyFileWindows (solve 8.3 issue)
+      ------------------
+      |File Copy Layers|
+      ------------------
+          copyFile (setup transactional behavior)
+               |
+        copyFileSelectOs
+       /                \
+copyFileLinuxMac  copyFileWindows (solve 8.3 issue)
                        |
 			  copyFileWindowsSelectRoutine
 	          /                           \
@@ -2266,8 +2271,8 @@ void copyFileSelectOs(const Zstring& sourceFile, const Zstring& targetFile, Call
 #ifdef FFS_WIN
     copyFileWindows(sourceFile, targetFile, callback, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
 
-#elif defined FFS_LINUX
-    copyFileLinux(sourceFile, targetFile, callback, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+#elif defined FFS_LINUX || defined FFS_MAC
+    copyFileLinuxMac(sourceFile, targetFile, callback, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 #endif
 }
 }

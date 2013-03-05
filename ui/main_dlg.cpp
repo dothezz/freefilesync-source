@@ -16,6 +16,7 @@
 #include <zen/file_id.h>
 #include <zen/thread.h>
 #include <wx+/context_menu.h>
+#include <wx+/string_conv.h>
 #include <wx+/button.h>
 #include <wx+/shell_execute.h>
 #include <wx+/app_main.h>
@@ -23,6 +24,7 @@
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/no_flicker.h>
 #include <wx+/rtl.h>
+#include <wx+/font_size.h>
 #include "check_version.h"
 #include "gui_status_handler.h"
 #include "sync_cfg.h"
@@ -348,7 +350,7 @@ void MainDialog::create(const std::vector<wxString>& cfgFileNames)
     std::vector<wxString> filenames;
     if (!cfgFileNames.empty()) //1. this one has priority
         filenames = cfgFileNames;
-    else //next: use last used selection
+    else //FFS default startup: use last used selection
     {
         filenames = globalSettings.gui.lastUsedConfigFiles; //2. now try last used files
 
@@ -367,7 +369,7 @@ void MainDialog::create(const std::vector<wxString>& cfgFileNames)
         const bool allFilesExist = findFirstMissing.timedWait(boost::posix_time::milliseconds(500)) && //false: time elapsed
                                    !findFirstMissing.get(); //no missing
         if (!allFilesExist)
-            filenames.clear();
+            filenames.clear(); //we do NOT want to show an error due to last config file missing on application start!
         //------------------------------------------------------------------------------------------
 
         if (filenames.empty())
@@ -457,6 +459,11 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
 
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
+    setRelativeFontSize(*m_buttonCompare, 1.5);
+    setRelativeFontSize(*m_buttonSync,    1.5);
+    setRelativeFontSize(*m_buttonAbort,   1.5);
+	    m_buttonAbort->refreshButtonLabel(); //required after font change!
+
     //---------------- support for dockable gui style --------------------------------
     bSizerPanelHolder->Detach(m_panelTopButtons);
     bSizerPanelHolder->Detach(m_panelDirectoryPairs);
@@ -472,10 +479,11 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
 
     //caption required for all panes that can be manipulated by the users => used by context menu
     auiMgr.AddPane(m_panelTopButtons,
-                   wxAuiPaneInfo().Name(wxT("Panel1")).Layer(4).Top().Caption(_("Main bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(-1, m_panelTopButtons->GetSize().GetHeight() - 5));
+                   wxAuiPaneInfo().Name(wxT("Panel1")).Layer(4).Top().Caption(_("Main bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(-1, m_panelTopButtons->GetSize().GetHeight()));
     //note: min height is calculated incorrectly by wxAuiManager if panes with and without caption are in the same row => use smaller min-size
 
-    compareStatus.reset(new CompareStatus(*this)); //integrate the compare status panel (in hidden state)
+    compareStatus = make_unique<CompareProgressDialog>(*this); //integrate the compare status panel (in hidden state)
+
     auiMgr.AddPane(compareStatus->getAsWindow(),
                    wxAuiPaneInfo().Name(wxT("Panel9")).Layer(4).Top().Row(1).CaptionVisible(false).PaneBorder(false).Hide()); //name "CmpStatus" used by context menu
 
@@ -507,7 +515,11 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     {
         wxFont font = artProvider->GetFont(wxAUI_DOCKART_CAPTION_FONT);
         font.SetWeight(wxFONTWEIGHT_BOLD);
+        font.SetPointSize(wxNORMAL_FONT->GetPointSize()); //= larger than the wxAuiDockArt default; looks better on OS X
         artProvider->SetFont(wxAUI_DOCKART_CAPTION_FONT, font);
+
+        //accessibility: fix wxAUI drawing black text on black background on high-contrast color schemes:
+        artProvider->SetColor(wxAUI_DOCKART_INACTIVE_CAPTION_TEXT_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
     }
 
     auiMgr.GetPane(m_gridNavi).MinSize(-1, -1); //we successfully tricked wxAuiManager into setting an initial Window size :> incomplete API anyone??
@@ -620,9 +632,8 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     setMenuItemImage(m_menuItemManual, GlobalResources::getImage(L"helpSmall"));
     setMenuItemImage(m_menuItemAbout,  GlobalResources::getImage(L"aboutSmall"));
 
-#ifdef FFS_LINUX
-    m_menuItemCheckVer->Enable(zen::isPortableVersion()); //disable update check for Linux installer-based version -> handled by .deb
-#endif
+    if (!manualProgramUpdateRequired())
+        m_menuItemCheckVer->Enable(false);
 
     //create language selection menu
     std::for_each(zen::ExistingTranslations::get().begin(), ExistingTranslations::get().end(),
@@ -866,16 +877,14 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
 
     //--------------------------------------------------------------------------------
     //write list of last used configuration files
-    typedef std::pair<wxString, int> HistItem; //(cfg-file/last use index)
-    std::vector<HistItem> historyDetail;
+    std::map<int, wxString> historyDetail; //(cfg-file/last use index)
     for (unsigned int i = 0; i < m_listBoxHistory->GetCount(); ++i)
         if (auto clientString = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
-            historyDetail.push_back(std::make_pair(clientString->cfgFile_, clientString->lastUseIndex_));
-    //sort by last use, most recent items *first* (looks better in xml than the reverse)
-    std::sort(historyDetail.begin(), historyDetail.end(), [](const HistItem& lhs, const HistItem& rhs) { return lhs.second > rhs.second; });
+            historyDetail.insert(std::make_pair(clientString->lastUseIndex_, clientString->cfgFile_));
 
+    //sort by last use; put most recent items *first* (looks better in xml than the reverse)
     std::vector<wxString> history;
-    std::transform(historyDetail.begin(), historyDetail.end(), std::back_inserter(history), [](const HistItem& item) { return item.first; });
+    std::transform(historyDetail.rbegin(), historyDetail.rend(), std::back_inserter(history), [](const std::pair<int, wxString>& item) { return item.second; });
 
     if (history.size() > globalSettings.gui.cfgFileHistMax) //erase oldest elements
         history.resize(globalSettings.gui.cfgFileHistMax);
@@ -1269,6 +1278,8 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
             zen::shellExecute(L"\"" + fallbackDir + L"\"");
 #elif defined FFS_LINUX
             zen::shellExecute("xdg-open \"" + fallbackDir + "\"");
+#elif defined FFS_MAC
+            zen::shellExecute("open \"" + fallbackDir + "\"");
 #endif
             return;
         }
@@ -1353,6 +1364,7 @@ void MainDialog::setStatusBarFileStatistics(size_t filesOnLeftView,
 
 void MainDialog::setStatusBarFullText(const wxString& msg)
 {
+    const bool needLayoutUpdate = !m_staticTextFullStatus->IsShown();
     //select state
     bSizerFileStatus->Show(false);
     m_staticTextFullStatus->Show();
@@ -1360,6 +1372,9 @@ void MainDialog::setStatusBarFullText(const wxString& msg)
     //update status information
     setText(*m_staticTextFullStatus, msg);
     m_panelStatusBar->Layout();
+
+    if (needLayoutUpdate)
+        auiMgr.Update(); //fix status bar height (needed on OS X)
 }
 
 
@@ -1372,6 +1387,8 @@ void MainDialog::flashStatusInformation(const wxString& text)
     m_staticTextStatusMiddle->SetLabel(text);
     m_staticTextStatusMiddle->SetForegroundColour(wxColour(31, 57, 226)); //highlight color: blue
     m_panelStatusBar->Layout();
+
+    //if (needLayoutUpdate) auiMgr.Update(); -> not needed here, this is called anyway in updateGui()
 }
 
 
@@ -1381,7 +1398,7 @@ void MainDialog::OnIdleEvent(wxEvent& event)
     if (oldStatusMsg)  //check if there is some work to do
     {
         wxMilliClock_t currentTime = wxGetLocalTimeMillis();
-        if (numeric::dist(currentTime, lastStatusChange) > 2500) //restore stackObject after two seconds
+        if (numeric::dist(currentTime, lastStatusChange) > 2500) //restore after two seconds
         {
             lastStatusChange = currentTime;
 
@@ -2322,7 +2339,7 @@ void MainDialog::onDirManualCorrection(wxCommandEvent& event)
 wxString getFormattedHistoryElement(const wxString& filename)
 {
     wxString output = afterLast(filename, utfCvrtTo<wxString>(FILE_NAME_SEPARATOR));
-    if (endsWith(output, ".ffs_gui"))
+    if (endsWith(output, L".ffs_gui"))
         output = beforeLast(output, L'.');
     return output;
 }
@@ -2355,37 +2372,37 @@ void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
 
     auto futIter = fileEx.begin();
     for (auto it = filenames.begin(); it != filenames.end(); ++it, ++futIter)
-    {
-        //only (still) existing files should be included in the list
-        if (futIter->is_ready() && !futIter->get())
-            continue;
-
-        const wxString& filename = *it;
-
-        auto findItem = [&]() -> int
+        if (!futIter->is_ready() || futIter->get()) //only existing files should be included in the list (and also those with no result yet)
         {
-            for (int i = 0; i < static_cast<int>(m_listBoxHistory->GetCount()); ++i)
-                if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
-                    if (samePhysicalFile(toZ(filename), toZ(histData->cfgFile_)))
-                        return i;
-            return -1;
-        };
+            const wxString& filename = *it;
 
-        const int itemPos = findItem();
-        if (itemPos >= 0) //update
-        {
-            if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(itemPos)))
-                histData->lastUseIndex_ = ++lastUseIndexMax;
-            selections[itemPos] = true;
+            warn_static("perf!!!!? samePhysicalFile : andere setllen?")
+
+            auto findItem = [&]() -> int
+            {
+                const int itemCount = static_cast<int>(m_listBoxHistory->GetCount());
+                for (int i = 0; i < itemCount; ++i)
+                    if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
+                        if (samePhysicalFile(toZ(filename), toZ(histData->cfgFile_)))
+                            return i;
+                return -1;
+            };
+
+            const int itemPos = findItem();
+            if (itemPos >= 0) //update
+            {
+                if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(itemPos)))
+                    histData->lastUseIndex_ = ++lastUseIndexMax;
+                selections[itemPos] = true;
+            }
+            else //insert
+            {
+                const wxString label = samePhysicalFile(toZ(lastRunConfigName()), toZ(filename)) ? //give default config file a different name
+                                       _("<Last session>") : getFormattedHistoryElement(filename);
+                const int newPos = m_listBoxHistory->Append(label, new wxClientHistoryData(filename, ++lastUseIndexMax)); //*insert* into sorted list
+                selections.insert(selections.begin() + newPos, true);
+            }
         }
-        else //insert
-        {
-            const wxString label = samePhysicalFile(toZ(lastRunConfigName()), toZ(filename)) ? //give default config file a different name
-                                   _("<Last session>") : getFormattedHistoryElement(filename);
-            const int newPos = m_listBoxHistory->Append(label, new wxClientHistoryData(filename, ++lastUseIndexMax)); //*insert* into sorted list
-            selections.insert(selections.begin() + newPos, true);
-        }
-    }
 
     assert(selections.size() == m_listBoxHistory->GetCount());
 
@@ -4179,7 +4196,8 @@ void MainDialog::OnRegularUpdateCheck(wxIdleEvent& event)
     //execute just once per startup!
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnRegularUpdateCheck), nullptr, this);
 
-    zen::checkForUpdatePeriodically(this, globalCfg.gui.lastUpdateCheck);
+    if (manualProgramUpdateRequired())
+        zen::checkForUpdatePeriodically(this, globalCfg.gui.lastUpdateCheck);
 }
 
 
@@ -4208,7 +4226,7 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
 
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
-    zen::displayHelpEntry();
+    zen::displayHelpEntry(this);
 }
 
 

@@ -35,8 +35,7 @@ struct ColumnAttributeRim
 };
 
 
-namespace
-{
+inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
 {
     std::vector<ColumnAttributeRim> attr;
@@ -50,6 +49,7 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
     return attr;
 }
 
+inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
 {
     std::vector<ColumnAttributeRim> attr;
@@ -61,7 +61,6 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
     attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,       80, 0, true));
     attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,  60, 0, false));
     return attr;
-}
 }
 
 //------------------------------------------------------------------
@@ -93,15 +92,15 @@ struct ColumnAttributeNavi
 };
 
 
-static const bool defaultValueShowPercentage = true;
-static const ColumnTypeNavi defaultValueLastSortColumn = COL_TYPE_NAVI_DIRECTORY; //remember sort on navigation panel
-static const bool defaultValueLastSortAscending = true; //
+const bool defaultValueShowPercentage = true;
+const ColumnTypeNavi defaultValueLastSortColumn = COL_TYPE_NAVI_DIRECTORY; //remember sort on navigation panel
+const bool defaultValueLastSortAscending = true; //
 
 inline
 std::vector<ColumnAttributeNavi> getDefaultColumnAttributesNavi()
 {
     std::vector<ColumnAttributeNavi> attr;
-    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_DIRECTORY, -60, 1, true)); //stretch to full width and substract sum of fixed size widths!
+    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_DIRECTORY, -60, 1, true)); //stretch to full width and substract sum of fixed size widths
     attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_BYTES,      60, 0, true)); //GTK needs a few pixels width more
     return attr;
 }

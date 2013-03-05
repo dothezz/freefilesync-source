@@ -49,57 +49,54 @@ void PerfCheck::addSample(int objectsCurrent, double dataCurrent, long timeMs)
 
     //remove all records earlier than "now - windowMax"
     const long newBegin = timeMs - windowMax;
-    auto iterWindowBegin = samples.upper_bound(newBegin);
-    if (iterWindowBegin != samples.begin())
-        samples.erase(samples.begin(), --iterWindowBegin); //keep one point before newBegin in order to handle "measurement holes"
+    auto it = samples.upper_bound(newBegin);
+    if (it != samples.begin())
+        samples.erase(samples.begin(), --it); //keep one point before newBegin in order to handle "measurement holes"
 }
 
 
-wxString PerfCheck::getRemainingTime(double dataRemaining) const
+std::wstring PerfCheck::getRemainingTime(double dataRemaining) const
 {
     if (!samples.empty())
     {
         const auto& recordBack = *samples.rbegin();
         //find start of records "window"
-        auto iterFront = samples.upper_bound(recordBack.first - windowSizeRemTime);
-        if (iterFront != samples.begin())
-            --iterFront; //one point before window begin in order to handle "measurement holes"
+        auto itFront = samples.upper_bound(recordBack.first - windowSizeRemTime);
+        if (itFront != samples.begin())
+            --itFront; //one point before window begin in order to handle "measurement holes"
 
-        const auto& recordFront = *iterFront;
+        const auto& recordFront = *itFront;
         //-----------------------------------------------------------------------------------------------
-        const double timeDelta = recordBack.first        - recordFront.first;
+        const long   timeDelta = recordBack.first        - recordFront.first;
         const double dataDelta = recordBack.second.data_ - recordFront.second.data_;
 
-        //objects do *NOT* correspond to disk accesses, so we better play safe and use "bytes" only!
-        //https://sourceforge.net/tracker/index.php?func=detail&aid=3452469&group_id=234430&atid=1093083
+        //objects model logical operations *NOT* disk accesses, so we better play safe and use "bytes" only!
+        //http://sourceforge.net/p/freefilesync/feature-requests/197/
 
         if (!numeric::isNull(dataDelta)) //sign(dataRemaining) != sign(dataDelta) usually an error, so show it!
-        {
-            const double remTimeSec = dataRemaining * timeDelta / (1000.0 * dataDelta);
-            return remainingTimeToShortString(remTimeSec);
-        }
+            return remainingTimeToString(dataRemaining * timeDelta / (1000.0 * dataDelta));
     }
     return L"-"; //fallback
 }
 
 
-wxString PerfCheck::getBytesPerSecond() const
+std::wstring PerfCheck::getBytesPerSecond() const
 {
     if (!samples.empty())
     {
         const auto& recordBack = *samples.rbegin();
         //find start of records "window"
-        auto iterFront = samples.upper_bound(recordBack.first - windowSizeBPS);
-        if (iterFront != samples.begin())
-            --iterFront; //one point before window begin in order to handle "measurement holes"
+        auto itFront = samples.upper_bound(recordBack.first - windowSizeBPS);
+        if (itFront != samples.begin())
+            --itFront; //one point before window begin in order to handle "measurement holes"
 
-        const auto& recordFront = *iterFront;
+        const auto& recordFront = *itFront;
         //-----------------------------------------------------------------------------------------------
-        const double timeDelta = recordBack.first        - recordFront.first;
+        const long   timeDelta = recordBack.first        - recordFront.first;
         const double dataDelta = recordBack.second.data_ - recordFront.second.data_;
 
-        if (!numeric::isNull(timeDelta) && dataDelta > 0)
-                return filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
+        if (timeDelta != 0 && dataDelta > 0)
+            return filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
     }
     return L"-"; //fallback
 }

@@ -1,6 +1,6 @@
 <header>
 	<language name>العربية</language name>
-	<translator>Awadh Al-Ghaamdi</translator>
+	<translator></translator>
 	<locale>ar</locale>
 	<flag file>arabic.png</flag file>
 	<plural forms>6</plural forms>
@@ -97,11 +97,8 @@
 <source>Fatal Error</source>
 <target>خطأ فادح</target>
 
-<source>Windows Error Code %x:</source>
-<target>رمز خطأ Windows  %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>رمز الخطأ لينكس  %x:</target>
+<source>Error Code %x:</source>
+<target></target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>لا يمكن حل الارتباط الرمزي  %x.</target>
@@ -159,6 +156,9 @@
 
 <source>Cannot set directory lock %x.</source>
 <target>لا يمكن تعيين الدليل قفل  %x.</target>
+
+<source>Creating file %x</source>
+<target>إنشاء ملف  %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -450,17 +450,11 @@ The command is triggered if:
 <source>Compare</source>
 <target>قارن</target>
 
-<source>Compare both sides</source>
-<target>المقارنة بين كلا الجانبين</target>
-
 <source>&Abort</source>
 <target>إحباط</target>
 
 <source>Synchronize</source>
 <target>مزامنة</target>
-
-<source>Start synchronization</source>
-<target>بدء تشغيل المزامنة</target>
 
 <source>Add folder pair</source>
 <target>إضافة مجلد زوج</target>
@@ -470,15 +464,6 @@ The command is triggered if:
 
 <source>Swap sides</source>
 <target>مبادلة الجانبين</target>
-
-<source>Open</source>
-<target>فتح</target>
-
-<source>Save</source>
-<target>حفظ</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>آخر استخدام تكوينات  (اضغط DEL لإزالة من القائمة)</target>
 
 <source>Hide excluded items</source>
 <target>إخفاء العناصر المستبعدة</target>
@@ -512,6 +497,9 @@ The command is triggered if:
 
 <source>Batch job</source>
 <target>مهمة المجموعة</target>
+
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target></target>
 
 <source>Help</source>
 <target>تعليمات</target>
@@ -759,6 +747,9 @@ Note: File names must be relative to base directories!
 <source>Description</source>
 <target>الوصف</target>
 
+<source>Start synchronization</source>
+<target>بدء تشغيل المزامنة</target>
+
 <source>Variant</source>
 <target>البديل</target>
 
@@ -794,6 +785,15 @@ Note: File names must be relative to base directories!
 
 <source>Select view</source>
 <target>حدد طريقة العرض</target>
+
+<source>Open...</source>
+<target></target>
+
+<source>Save</source>
+<target>حفظ</target>
+
+<source>Compare both sides</source>
+<target>المقارنة بين كلا الجانبين</target>
 
 <source>Set direction:</source>
 <target>تحديد الاتجاه:</target>
@@ -948,6 +948,9 @@ Note: File names must be relative to base directories!
 <source>Show files that won't be copied</source>
 <target>إظهار الملفات التي لن يتم نسخها</target>
 
+<source>Set as default</source>
+<target></target>
+
 <source>All folders are in sync!</source>
 <target>تكون الكل المجلدات متزامنة</target>
 
@@ -959,12 +962,6 @@ Note: File names must be relative to base directories!
 
 <source>File list exported!</source>
 <target>تصدير قائمة الملف</target>
-
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target></target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1107,14 +1104,14 @@ Note: File names must be relative to base directories!
 <source>Leave as unresolved conflict</source>
 <target>ترك كالصراعات التي لم تحل</target>
 
+<source>Append a timestamp to each file name</source>
+<target>إلحاق طابع زمني لكل ملف اسم</target>
+
 <source>Replace</source>
 <target>استبدال</target>
 
 <source>Move files and replace if existing</source>
 <target>نقل الملفات واستبدال إذا كان موجود</target>
-
-<source>Append a timestamp to each file name</source>
-<target>إلحاق طابع زمني لكل ملف اسم</target>
 
 <source>Folder</source>
 <target>مجلد</target>
@@ -1239,14 +1236,35 @@ Note: File names must be relative to base directories!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>الإعداد الافتراضي في الاتجاهين المزامنة: ستتم الكتابة فوق الملفات القديمة بالملفات الأحدث.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target></target>
+
+<source>Moving file %x to recycle bin</source>
+<target>نقل ملف  %x سلة المحذوفات</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>نقل المجلد  %x سلة المحذوفات</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>نقل الارتباط الرمزي  %x سلة المحذوفات</target>
+
+<source>Deleting file %x</source>
+<target>حذف الملف  %x</target>
+
+<source>Deleting folder %x</source>
+<target>حذف المجلد  %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>حذف الارتباط الرمزي  %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>سلة المهملات غير متوفر للمسارات التالية! سيتم حذف الملفات بشكل دائم بدلاً من ذلك:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>يمكنك تجاهل هذا الخطأ للنظر في مجلد فارغ.</target>
+<source>You can ignore this error to consider each folder as empty.</source>
+<target></target>
 
-<source>Cannot find folder %x.</source>
-<target>لا يمكن العثور على المجلد  %x.</target>
+<source>Cannot find the following folders:</source>
+<target></target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>تعتمد الدلائل! كن حذراً عند إعداد قواعد المزامنة:</target>
@@ -1320,24 +1338,6 @@ Note: File names must be relative to base directories!
 <source>Multiple...</source>
 <target>متعددة...</target>
 
-<source>Deleting file %x</source>
-<target>حذف الملف  %x</target>
-
-<source>Deleting folder %x</source>
-<target>حذف المجلد  %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>حذف الارتباط الرمزي  %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>نقل ملف  %x سلة المحذوفات</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>نقل المجلد  %x سلة المحذوفات</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>نقل الارتباط الرمزي  %x سلة المحذوفات</target>
-
 <source>Moving file %x to %y</source>
 <target>نقل ملف  %x إلى  %y</target>
 
@@ -1349,9 +1349,6 @@ Note: File names must be relative to base directories!
 
 <source>Removing old versions...</source>
 <target>إزالة الإصدارات القديمة...</target>
-
-<source>Creating file %x</source>
-<target>إنشاء ملف  %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>إنشاء ارتباط رمزي  %x</target>
@@ -1370,6 +1367,9 @@ Note: File names must be relative to base directories!
 
 <source>Updating attributes of %x</source>
 <target>تحديث سمات  %x</target>
+
+<source>Cannot find %x.</source>
+<target></target>
 
 <source>Target folder %x already existing.</source>
 <target>المجلد الهدف  %x الموجودة بالفعل.</target>

@@ -11,7 +11,7 @@
 #include <memory>
 
 //fix this pathetic boost thread warning mess
-#ifdef __MINGW32__
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -24,7 +24,7 @@
 
 #include <boost/thread.hpp>
 
-#ifdef __MINGW32__
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
@@ -34,8 +34,8 @@
 namespace zen
 {
 /*
-std::async replacement without crappy semantics: 
-	1. guaranteed to run asynchronous 
+std::async replacement without crappy semantics:
+	1. guaranteed to run asynchronous
 	2. does not follow C++11 [futures.async], Paragraph 5, where std::future waits for thread in destructor
 
 Example:
@@ -79,15 +79,6 @@ private:
 
 
 
-
-
-
-
-
-
-
-
-
 //###################### implementation ######################
 #ifndef BOOST_HAS_THREADS
 #error just some paranoia check...
@@ -99,7 +90,7 @@ auto async2(Function fun) -> boost::unique_future<T> //support for workaround of
 #if defined BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK //mirror "boost/thread/future.hpp", hopefully they know what they're doing
     boost::packaged_task<T()> pt(std::move(fun)); //packaged task seems to even require r-value reference: https://sourceforge.net/p/freefilesync/bugs/234/
 #else
-    boost::packaged_task<T> pt(std::move(fun)); 
+    boost::packaged_task<T> pt(std::move(fun));
 #endif
     auto fut = pt.get_future();
     boost::thread(std::move(pt)).detach(); //we have to explicitly detach since C++11: [thread.thread.destr] ~thread() calls std::terminate() if joinable()!!!

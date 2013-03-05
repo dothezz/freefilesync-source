@@ -14,6 +14,7 @@
 #include <wx+/button.h>
 #include <wx+/string_conv.h>
 #include <wx+/mouse_move_dlg.h>
+#include <wx+/font_size.h>
 #include <zen/assert_static.h>
 #include <zen/file_handling.h>
 #include <zen/build_info.h>
@@ -46,7 +47,15 @@ private:
 MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     : MainDlgGenerated(dlg)
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this); //ownership passed to "this"
+#endif
     wxWindowUpdateLocker dummy(this); //avoid display distortion
+
+ SetIcon(GlobalResources::instance().programIcon); //set application icon
+
+    setRelativeFontSize(*m_buttonStart, 1.5);
+    m_buttonStart->setInnerBorderSize(8);
 
     m_bpButtonRemoveTopFolder->Hide();
     m_panelMainFolder->Layout();
@@ -61,15 +70,10 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     //prepare drag & drop
     dirNameFirst.reset(new DirectoryName<wxTextCtrl>(*m_panelMainFolder, *m_buttonSelectDirMain, *m_txtCtrlDirectoryMain, m_staticTextFinalPath));
 
-#ifdef FFS_WIN
-    new MouseMoveWindow(*this); //ownership passed to "this"
-#endif
-
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
 
     const wxString currentConfigFile = cfgFileName.empty() ? lastConfigFileName() : cfgFileName;
-
     bool loadCfgSuccess = false;
     if (!cfgFileName.empty() || wxFileExists(lastConfigFileName()))
         try
@@ -139,7 +143,7 @@ const wxString& MainDialog::lastConfigFileName()
 
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
-    zen::displayHelpEntry(L"html/RealtimeSync.html");
+    zen::displayHelpEntry(L"html/RealtimeSync.html", this);
 }
 
 
@@ -363,7 +367,7 @@ void MainDialog::OnRemoveTopFolder(wxCommandEvent& event)
 
 #ifdef FFS_WIN
 static const size_t MAX_ADD_FOLDERS = 8;
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 static const size_t MAX_ADD_FOLDERS = 6;
 #endif
 

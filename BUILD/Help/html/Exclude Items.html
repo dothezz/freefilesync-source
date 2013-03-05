@@ -3,9 +3,9 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.4.1  (Win32)">
+	<META NAME="GENERATOR" CONTENT="LibreOffice 4.0.0.3 (Windows)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20130109;13371476">
+	<META NAME="CHANGED" CONTENT="20130211;23214007">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -16,7 +16,6 @@
 		P { margin-bottom: 0.21cm }
 		H2.cjk { font-family: "SimSun" }
 		H2.ctl { font-family: "Mangal" }
-		A:link { so-language: zxx }
 	-->
 	</STYLE>
 </HEAD>
@@ -25,16 +24,17 @@
 items</FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Files
 and directories are only considered for synchronization if they pass
-the filter. They have to match at least one entry in the include list
-and none of the entries in the exclude list:</FONT></P>
+the filter. They have to match <B>at least one</B> entry in the
+include list and <B>none</B> of the entries in the exclude list:</FONT></P>
 <OL>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Each
 	list item must be a file or directory path </FONT><FONT FACE="Tahoma, sans-serif"><B>relative</B></FONT>
-	<FONT FACE="Tahoma, sans-serif">to synchronization base directories</FONT></P>
+	<FONT FACE="Tahoma, sans-serif">to synchronization base directories.</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Multiple
-	items must be separated by ';' or a new line</FONT></P>
+	items must be separated by <B>;</B> or a new line.</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Wild
-	cards like '*' or '?' may be used</FONT></P>
+	cards <B>*</B> and <B>?</B> may be used: <B>*</B> means zero or more
+	characters while <B>?</B> represents exactly one character.</FONT></P>
 </OL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
@@ -64,7 +64,7 @@ Exclude items for m<SPAN STYLE="font-weight: normal">irror-sync from
 	in their path:<BR></SPAN></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Exclude:
 	</SPAN></FONT><FONT FACE="Courier New, monospace">*temp*</FONT></P>
 	<P ALIGN=LEFT STYLE="margin-left: 0.82cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Multiple
-	entries separated by semicolon:<BR></SPAN><FONT FACE="Times New Roman, serif"><SPAN STYLE="font-weight: normal">&nbsp;&nbsp;&nbsp;&nbsp;</SPAN></FONT><SPAN STYLE="font-weight: normal">Exclude:
+	entries separated by semicolon:<BR></SPAN>&nbsp;&nbsp;&nbsp;&nbsp;<SPAN STYLE="font-weight: normal">Exclude:
 	</SPAN><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">*.tmp;
 	*.doc; *.bak</SPAN></FONT></FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
@@ -93,11 +93,10 @@ located in subdirectories of base directories</SPAN></FONT></P>
 		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">For
 		simple exclusions just right-click and exclude one or a list of
 		items directly on main grid via context menu.</FONT></P>
-		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm; font-style: normal">
+		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm; font-variant: normal; font-style: normal">
 		<FONT FACE="Tahoma, sans-serif">A filter string is compared against
 		both file and directory paths. If you want to consider directories
-		only, you can give a hint by appending a path separator:
-		&quot;dirname<FONT FACE="Courier New, monospace">\</FONT>&quot;.</FONT></P>
+		only, you can give a hint by appending a path separator (<FONT FACE="Courier New, monospace"><B>\</B></FONT>).</FONT></P>
 	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>

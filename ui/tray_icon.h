@@ -8,6 +8,7 @@
 #define TRAYICON_H_INCLUDED
 
 #include <wx/event.h>
+#include <wx/image.h>
 
 //show tray icon with progress during lifetime of this instance
 //emits the following wxCommandEvent in case user double-clicks on tray icon or selects corresponding context menu item:
@@ -34,6 +35,7 @@ private:
 
     wxString toolTipLast;
     double fractionLast;
+    wxImage logo;
 };
 
 #endif // TRAYICON_H_INCLUDED

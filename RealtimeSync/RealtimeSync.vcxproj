@@ -218,6 +218,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\lib\ffs_paths.cpp" />
     <ClCompile Include="..\lib\localization.cpp" />
     <ClCompile Include="..\lib\process_xml.cpp" />
     <ClCompile Include="..\lib\resolve_path.cpp" />

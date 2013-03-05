@@ -236,6 +236,7 @@
     <ClCompile Include="lib\binary.cpp" />
     <ClCompile Include="lib\db_file.cpp" />
     <ClCompile Include="lib\dir_lock.cpp" />
+    <ClCompile Include="lib\ffs_paths.cpp" />
     <ClCompile Include="lib\hard_filter.cpp" />
     <ClCompile Include="lib\icon_buffer.cpp" />
     <ClCompile Include="lib\localization.cpp" />
@@ -289,6 +290,7 @@
     <ClCompile Include="zen\file_traverser.cpp" />
     <ClCompile Include="zen\format_unit.cpp" />
     <ClCompile Include="zen\privilege.cpp" />
+    <ClCompile Include="zen\process_priority.cpp" />
     <ClCompile Include="zen\recycler.cpp" />
     <ClCompile Include="zen\scroll_window_under_cursor.cpp" />
     <ClCompile Include="zen\zstring.cpp" />

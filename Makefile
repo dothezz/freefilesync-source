@@ -1,3 +1,5 @@
+BLAH_BLUBB_123=
+#for some buggy reason the first row in the make file has no effect on Suse Linux! => make sure there's no important command
 APPNAME     = FreeFileSync
 prefix      = /usr
 BINDIR      = $(DESTDIR)$(prefix)/bin
@@ -5,23 +7,20 @@ SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 DOCSHAREDIR = $(SHAREDIR)/doc/$(APPNAME)
 
-CPPFLAGS  = -Wall -pipe -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h" -include "zen/warn_static.h"
-LINKFLAGS = -pthread -lrt -lz
+CPPFLAGS  = -std=c++11 -Wall -pipe -O3 -DNDEBUG -DwxUSE_UNICODE -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h" -include "zen/warn_static.h"
+LINKFLAGS =
 
-ifeq ($(BUILD),release)
-#static wxWidgets and boost library linkage for precompiled release
-CPPFLAGS  += `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
-LINKFLAGS += `wx-config --libs std,aui --debug=no --unicode=yes --static=yes` -Wl,-Bstatic -lboost_thread -lboost_system -Wl,-Bdynamic
-else
-#default build
-CPPFLAGS  += `wx-config --cxxflags --debug=no --unicode=yes`
-LINKFLAGS += `wx-config --libs std,aui --debug=no --unicode=yes` -lboost_thread -lboost_system
-endif
-#####################################################################################################
+#distinguish Linux/OSX builds
+OPERATING_SYSTEM_NAME := $(shell uname)
 
-#Gtk - recycler/icon loading
+#################### Linux ############################
+ifeq ($(OPERATING_SYSTEM_NAME), Linux)
+COMPILER_BIN=g++ -pthread
+CPPFLAGS += -DFFS_LINUX
+
+#Gtk - support recycler/icon loading/no button border/grid scrolling
 CPPFLAGS  += `pkg-config --cflags gtk+-2.0`
-LINKFLAGS += `pkg-config --libs gtk+-2.0`
+LINKFLAGS += `pkg-config --libs   gtk+-2.0`
 
 #support for SELinux (optional)
 SELINUX_EXISTING=$(shell pkg-config --exists libselinux && echo YES)
@@ -36,6 +35,40 @@ ifeq ($(UNITY_EXISTING),YES)
 CPPFLAGS  += `pkg-config --cflags unity` -DHAVE_UBUNTU_UNITY
 LINKFLAGS += `pkg-config --libs unity`
 endif
+
+ifeq ($(BUILD),Launchpad)
+#default build/Launchpad
+CPPFLAGS  += `wx-config --cxxflags      --debug=no`
+LINKFLAGS += `wx-config --libs std, aui --debug=no` -lboost_thread -lboost_system
+else
+#static wxWidgets and boost library linkage for precompiled release
+WX_CONFIG_BIN =$(HOME)/Desktop/wxGTK-2.8.12/lib/release/bin/wx-config
+CPPFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
+BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_53_0/stage/lib
+
+CPPFLAGS  += `$(WX_CONFIG_BIN) --cxxflags      --debug=no --static=yes`
+LINKFLAGS += `$(WX_CONFIG_BIN) --libs std, aui --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
+endif
+
+endif
+#################### OS X ############################
+ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
+COMPILER_BIN=clang++ -stdlib=libc++
+CPPFLAGS += -DFFS_MAC
+
+WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.4/lib/release/bin/wx-config
+CPPFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
+BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_53_0/stage/lib
+MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+
+#-Wl,-Bstatic not supported on OSX!
+
+# link wxWidgets and boost statically -> check dependencies with: otool -L FreeFileSync
+CPPFLAGS  += $(MACOS_SDK) `$(WX_CONFIG_BIN) --cxxflags      --debug=no --static=yes`
+LINKFLAGS += $(MACOS_SDK) `$(WX_CONFIG_BIN) --libs std, aui --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
+
+endif
+#####################################################################################################
 
 CPP_LIST= #internal list of all *.cpp files needed for compilation
 CPP_LIST+=algorithm.cpp
@@ -77,6 +110,7 @@ CPP_LIST+=lib/resources.cpp
 CPP_LIST+=lib/perf_check.cpp
 CPP_LIST+=lib/status_handler.cpp
 CPP_LIST+=lib/versioning.cpp
+CPP_LIST+=lib/ffs_paths.cpp
 CPP_LIST+=lib/xml_base.cpp
 CPP_LIST+=zen/recycler.cpp
 CPP_LIST+=zen/file_handling.cpp
@@ -85,28 +119,41 @@ CPP_LIST+=zen/file_io.cpp
 CPP_LIST+=zen/file_traverser.cpp
 CPP_LIST+=zen/zstring.cpp
 CPP_LIST+=zen/format_unit.cpp
+CPP_LIST+=zen/process_priority.cpp
 CPP_LIST+=wx+/grid.cpp
 CPP_LIST+=wx+/button.cpp
 CPP_LIST+=wx+/graph.cpp
 CPP_LIST+=wx+/tooltip.cpp
 CPP_LIST+=wx+/zlib_wrap.cpp
 
+# OS X
+ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
+MM_LIST= #objective C files
+MM_LIST+=ui/osx_dock.mm
+endif
+
 #list of all *.o files
-OBJECT_LIST=$(CPP_LIST:%.cpp=OBJ/FFS_Release_GCC_Make/%.o)
+OBJECT_LIST =  $(CPP_LIST:%.cpp=OBJ/FFS_Release_GCC_Make/%.o)
+OBJECT_LIST += $(MM_LIST:%.mm=OBJ/FFS_Release_GCC_Make/%.mm.o)
 
 all: FreeFileSync
 
+OBJ/FFS_Release_GCC_Make/%.mm.o : %.mm
+	mkdir -p $(dir $@)
+	$(COMPILER_BIN) $(CPPFLAGS) -c $< -o $@
+
 OBJ/FFS_Release_GCC_Make/%.o : %.cpp
 	mkdir -p $(dir $@)
-	g++ $(CPPFLAGS) -c $< -o $@
+	$(COMPILER_BIN) $(CPPFLAGS) -c $< -o $@
 
 FreeFileSync: $(OBJECT_LIST)
-	g++ -o ./BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
+	$(COMPILER_BIN) -o ./BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:
 #-f doesn't work when deleting directories
 	if [ -d OBJ/FFS_Release_GCC_Make ]; then rm -rf OBJ/FFS_Release_GCC_Make; fi
 	rm -f BUILD/$(APPNAME)
+	rm -f wx+/pch.h.gch
 
 install:
 	mkdir -p $(BINDIR)
@@ -118,7 +165,7 @@ install:
 	BUILD/Compare_Complete.wav \
 	BUILD/Sync_Complete.wav \
 	BUILD/Resources.zip \
-	BUILD/styles.rc \
+	BUILD/styles.gtk_rc \
 	$(APPSHAREDIR)
 
 	mkdir -p $(DOCSHAREDIR)

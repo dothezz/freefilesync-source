@@ -6,11 +6,12 @@
 
 #include "application.h"
 #include "main_dlg.h"
+#include <zen/file_handling.h>
 #include <wx/event.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 #include <wx+/string_conv.h>
-#include "resources.h"
+//#include "resources.h"
 #include "xml_ffs.h"
 #include "../lib/localization.h"
 #include "../lib/ffs_paths.h"
@@ -75,16 +76,17 @@ void Application::OnStartApplication(wxIdleEvent& event)
 {
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
 
+    warn_static("fix")
+
     //if appname is not set, the default is the executable's name!
-    SetAppName(wxT("FreeFileSync")); //use a different app name, to have "GetUserDataDir()" return the same directory as for FreeFileSync
+    SetAppName(L"FreeFileSync"); //abuse FFS's name, to have "GetUserDataDir()" return the same directory
 
 #ifdef FFS_WIN
     //Quote: "Best practice is that all applications call the process-wide SetErrorMode function with a parameter of
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
-
 #elif defined FFS_LINUX
-    ::gtk_rc_parse((zen::getResourceDir() + "styles.rc").c_str()); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((zen::getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
     //set program language
@@ -124,7 +126,6 @@ void Application::OnStartApplication(wxIdleEvent& event)
         cfgFilename = commandArgs[0];
 
     MainDialog* frame = new MainDialog(nullptr, cfgFilename);
-    frame->SetIcon(GlobalResources::instance().programIcon); //set application icon
     frame->Show();
 }
 

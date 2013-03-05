@@ -90,7 +90,7 @@ private:
     void OnMouseWheel(wxMouseEvent& event);
     void OnSelection(wxCommandEvent& event);
     void OnValidateSelection(wxCommandEvent& event);
-    void OnUpdateList(wxEvent& event) { setValueAndUpdateList(GetValue()); event.Skip(); }
+    void OnMouseClick(wxEvent& event) { setValueAndUpdateList(GetValue()); event.Skip(); }
 
     void setValueAndUpdateList(const wxString& dirname);
 

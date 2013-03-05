@@ -5,14 +5,13 @@
 // **************************************************************************
 
 #include "recycler.h"
-#include <stdexcept>
-#include <iterator>
+//#include <stdexcept>
+//#include <iterator>
 #include <zen/file_handling.h>
 
 #ifdef FFS_WIN
-#include <algorithm>
-#include <functional>
-#include <vector>
+//#include <algorithm>
+//#include <functional>
 #include <zen/dll.h>
 #include <zen/win.h> //includes "windows.h"
 #include <zen/assert_static.h>
@@ -24,6 +23,9 @@
 #include <zen/scope_guard.h>
 #include <sys/stat.h>
 #include <gio/gio.h>
+
+#elif defined FFS_MAC
+#include <CoreServices/CoreServices.h>
 #endif
 
 using namespace zen;
@@ -142,7 +144,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
 
 bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
 {
-    if (!somethingExists(filename))
+    if (!somethingExists(filename)) //[!] do not optimize away, OS X needs this for reliable detection of "recycle bin missing"
         return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
 
 #ifdef FFS_WIN
@@ -151,13 +153,13 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
     recycleOrDelete(filenames, nullptr); //throw FileError
 
 #elif defined FFS_LINUX
-    GFile* file = g_file_new_for_path(filename.c_str()); //never fails according to docu
+    GFile* file = ::g_file_new_for_path(filename.c_str()); //never fails according to docu
     ZEN_ON_SCOPE_EXIT(g_object_unref(file);)
 
     GError* error = nullptr;
-    ZEN_ON_SCOPE_EXIT(if (error) g_error_free(error););
+    ZEN_ON_SCOPE_EXIT(if (error) ::g_error_free(error););
 
-    if (!g_file_trash(file, nullptr, &error))
+    if (!::g_file_trash(file, nullptr, &error))
     {
         const std::wstring shortMsg = replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filename));
 
@@ -180,6 +182,53 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
 
         throw FileError(shortMsg + L"\n\n" + L"Glib Error Code " + numberTo<std::wstring>(error->code) + /* L", " +
                                           g_quark_to_string(error->domain) + */ L": " + utfCvrtTo<std::wstring>(error->message));
+    }
+
+#elif defined FFS_MAC
+    //we cannot use FSPathMoveObjectToTrashSync directly since it follows symlinks!
+
+    assert_static(sizeof(Zchar) == sizeof(char));
+    const UInt8* filenameUtf8 = reinterpret_cast<const UInt8*>(filename.c_str());
+
+    auto throwFileError = [&](OSStatus oss)
+    {
+        std::wstring msg = replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filename)) + L"\n\n"
+                           + L"Result Code " + numberTo<std::wstring>(oss);
+        const char* description = GetMacOSStatusCommentString(oss);
+        if (description) //found no documentation for proper use of GetMacOSStatusCommentString
+            msg += L": " + utfCvrtTo<std::wstring>(description);
+        throw FileError(msg);
+    };
+
+    FSRef objectRef;
+    OSStatus rv = ::FSPathMakeRefWithOptions(filenameUtf8, //const UInt8 *path,
+                                             kFSPathMakeRefDoNotFollowLeafSymlink, //OptionBits options,
+                                             &objectRef,  //FSRef *ref,
+                                             nullptr);    //Boolean *isDirectory
+    if (rv != noErr)
+        throwFileError(rv);
+
+    //deprecated since OS X 10.8!!! "trashItemAtURL" should be used instead
+    OSStatus rv2 = ::FSMoveObjectToTrashSync(&objectRef, //const FSRef *source,
+                                             nullptr,    //FSRef *target,
+                                             kFSFileOperationDefaultOptions); //OptionBits options
+    if (rv2 != noErr)
+    {
+        //implement same behavior as in Windows: if recycler is not existing, delete permanently
+        if (rv2 == -120) //=="Directory not found or incomplete pathname." but should really be "recycle bin directory not found"!
+        {
+            struct stat fileInfo = {};
+            if (::lstat(filename.c_str(), &fileInfo) != 0)
+                return false;
+
+            if (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode))
+                removeFile(filename); //throw FileError
+            else if (S_ISDIR(fileInfo.st_mode))
+                removeDirectory(filename); //throw FileError
+            return true;
+        }
+
+        throwFileError(rv2);
     }
 #endif
     return true;
@@ -275,7 +324,7 @@ StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
     */
 }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 /*
 We really need access to a similar function to check whether a directory supports trashing and emit a warning if it does not!
 

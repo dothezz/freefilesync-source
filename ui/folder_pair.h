@@ -47,8 +47,7 @@ public:
         if (altCompConfig.get())
         {
             setImage(*basicPanel_.m_bpButtonAltCompCfg, GlobalResources::getImage(L"cmpConfigSmall"));
-            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Select alternate comparison settings") +  L" \n" +
-                                                         L"(" + getVariantName(altCompConfig->compareVar) + L")");
+            basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Selected variant:") +  L" " + getVariantName(altCompConfig->compareVar));
         }
         else
         {
@@ -59,8 +58,7 @@ public:
         if (altSyncConfig.get())
         {
             setImage(*basicPanel_.m_bpButtonAltSyncCfg, GlobalResources::getImage(L"syncConfigSmall"));
-            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings") +  L" \n" +
-                                                         L"(" + getVariantName(altSyncConfig->directionCfg.var) + L")");
+            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Selected variant:") +  L" " + getVariantName(altSyncConfig->directionCfg.var));
         }
         else
         {

@@ -32,7 +32,6 @@ public:
 
     enum Status
     {
-        STATUS_NOPROGRESS,
         STATUS_INDETERMINATE,
         STATUS_NORMAL,
         STATUS_ERROR,

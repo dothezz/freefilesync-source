@@ -9,31 +9,62 @@
 
 #include <zen/thread.h>
 #include <zen/file_handling.h>
-#include "process_callback.h"
 #include <zen/file_error.h>
+#include "process_callback.h"
 #include "resolve_path.h"
 
-//dir existence checking may hang for non-existent network drives => run asynchronously and update UI!
 namespace
 {
-bool dirExistsUpdating(const Zstring& dirname, bool allowUserInteraction, ProcessCallback& procCallback)
+//directory existence checking may hang for non-existent network drives => run asynchronously and update UI!
+//- check existence of all directories in parallel! (avoid adding up search times if multiple network drives are not reachable)
+//- add reasonable time-out time!
+std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::vector<Zstring>& dirnames, bool allowUserInteraction, ProcessCallback& procCallback)
 {
     using namespace zen;
 
-    procCallback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", fmtFileName(dirname), false));
+    std::list<boost::unique_future<bool>> dirEx;
 
-    auto ft = async([=]() -> bool
+    std::for_each(dirnames.begin(), dirnames.end(),
+                  [&](const Zstring& dirname)
     {
+        dirEx.push_back(zen::async2<bool>([=]() -> bool
+        {
+            if (dirname.empty())
+                return false;
 #ifdef FFS_WIN
-        //1. login to network share, if necessary
-        loginNetworkShare(dirname, allowUserInteraction);
+            //1. login to network share, if necessary
+            loginNetworkShare(dirname, allowUserInteraction);
 #endif
-        //2. check dir existence
-        return zen::dirExists(dirname);
+            //2. check dir existence
+            return dirExists(dirname);
+        }));
     });
-    while (!ft.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
-        procCallback.requestUiRefresh(); //may throw!
-    return ft.get();
+
+    std::set<Zstring, LessFilename> output;
+    const boost::system_time endTime = boost::get_system_time() + boost::posix_time::seconds(10); //10 sec should be enough even if Win32 waits much longer
+
+    auto itDirname = dirnames.begin();
+    for (auto it = dirEx.begin(); it != dirEx.end(); ++it, ++itDirname)
+    {
+        procCallback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", fmtFileName(*itDirname), false)); //may throw!
+
+        while (boost::get_system_time() < endTime &&
+               !it->timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
+            procCallback.requestUiRefresh(); //may throw!
+
+        if (it->is_ready() && it->get())
+            output.insert(*itDirname);
+    }
+    return output;
+}
+
+
+bool dirExistsUpdating(const Zstring& dirname, bool allowUserInteraction, ProcessCallback& procCallback)
+{
+    std::vector<Zstring> dirnames;
+    dirnames.push_back(dirname);
+    std::set<Zstring, LessFilename> dirsEx = getExistingDirsUpdating(dirnames, allowUserInteraction, procCallback);
+    return dirsEx.find(dirname) != dirsEx.end();
 }
 }
 

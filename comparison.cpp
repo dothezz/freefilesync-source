@@ -72,99 +72,36 @@ void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, 
     {
         if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-dir scenario
             throw FileError(_("A folder input field is empty.") + L" \n\n" +
-            _("You can ignore this error to consider the folder as empty."));
+            _("You can ignore this error to consider each folder as empty."));
     }, callback);
 }
 
 
-void determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
-                           std::set<Zstring, LessFilename>& dirnamesExisting,
-                           bool allowUserInteraction,
-                           ProcessCallback& callback)
+std::set<Zstring, LessFilename> determineExistentDirs(const std::vector<Zstring>& dirnames,
+                                                      bool allowUserInteraction,
+                                                      ProcessCallback& callback)
 {
-    std::vector<Zstring> dirs(dirnames.begin(), dirnames.end());
-    vector_remove_if(dirs, [](const Zstring& dir) { return dir.empty(); });
+    std::set<Zstring, LessFilename> dirsEx;
 
-
-
-    warn_static("finish")
-    /*
-    //check existence of all directories in parallel! (avoid adding up search times if multiple network drives are not reachable)
-    FixedList<boost::unique_future<bool>> asyncDirChecks;
-    std::for_each(dirs.begin(), dirs.end(), [&](const Zstring& dirname)
+    tryReportingError([&]
     {
-    asyncDirChecks.emplace_back(async([=]() -> bool
-    {
-    #ifdef FFS_WIN
-        //1. login to network share, if necessary
-        loginNetworkShare(dirname, allowUserInteraction);
-    #endif
-        //2. check dir existence
-        return zen::dirExists(dirname);
-    }));
-    });
+        dirsEx = getExistingDirsUpdating(dirnames, allowUserInteraction, callback); //check *all* directories on each try!
 
-    auto timeMax = boost::get_system_time() + boost::posix_time::seconds(10); //limit total directory search time
+        //get list of not existing directories
+        std::vector<Zstring> dirsMissing = dirnames;
+        vector_remove_if(dirsMissing, [&](const Zstring& dirname) { return dirname.empty() || dirsEx.find(dirname) != dirsEx.end(); });
 
-    auto iterCheckDir = asyncDirChecks.begin();
-    for (auto it = dirs.begin(); it != dirs.end(); ++it, ++iterCheckDir)
-    {
-    const Zstring& dirname = *it;
-    callback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", fmtFileName(dirname), false));
-
-    while (boost::get_system_time() < timeMax && !iterCheckDir->timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
-        callback.requestUiRefresh(); //may throw!
-
-    //only (still) existing files should be included in the list
-    if (iterCheckDir->is_ready() && iterCheckDir->get())
-        dirnamesExisting.insert(dirname);
-    else
-    {
-
-        switch (callback.reportError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname)) + L"\n\n" +
-                _("You can ignore this error to consider the folder as empty."))) //may throw!
+        if (!dirsMissing.empty())
         {
-            case ProcessCallback::IGNORE_ERROR:
-                break;
-            case ProcessCallback::RETRY:
-                break; //continue with loop
+            std::wstring msg = _("Cannot find the following folders:") + L"\n";
+            std::for_each(dirsMissing.begin(), dirsMissing.end(),
+            [&](const Zstring& dirname) { msg += std::wstring(L"\n") + dirname; });
+            msg += L"\n\n" + _("You can ignore this error to consider each folder as empty.");
+            throw FileError(msg);
         }
+    }, callback);
 
-
-        if (tryReportingError([&]
-    {
-        if (!dirExistsUpdating(dirname, allowUserInteraction, callback))
-                throw FileError();
-
-
-
-
-        }, callback))
-        dirnamesExisting.insert(dirname);
-    }
-    }
-    */
-
-
-
-
-
-
-
-
-
-
-    std::for_each(dirs.begin(), dirs.end(),
-                  [&](const Zstring& dirname)
-    {
-        if (tryReportingError([&]
-    {
-        if (!dirExistsUpdating(dirname, allowUserInteraction, callback))
-                throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname)) + L"\n\n" +
-                _("You can ignore this error to consider the folder as empty."));
-        }, callback))
-        dirnamesExisting.insert(dirname);
-    });
+    return dirsEx;
 }
 
 
@@ -193,9 +130,9 @@ std::wstring checkFolderDependency(const std::vector<FolderPairCfg>& folderPairs
     {
         warningMsg = _("Directories are dependent! Be careful when setting up synchronization rules:");
         for (auto it = dependentDirs.begin(); it != dependentDirs.end(); ++it)
-            warningMsg += L"\n\n" +
-                          fmtFileName(it->first) + L"\n" +
-                          fmtFileName(it->second);
+            warningMsg += std::wstring(L"\n\n") +
+                          it->first + L"\n" +
+                          it->second;
     }
     return warningMsg;
 }
@@ -332,11 +269,27 @@ void zen::compare(size_t fileTimeTolerance,
     //specify process and resource handling priorities
     std::unique_ptr<ScheduleForBackgroundProcessing> backgroundPrio;
     if (runWithBackgroundPriority)
-        backgroundPrio = make_unique<ScheduleForBackgroundProcessing>();
+        try
+        {
+            backgroundPrio = make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
+        }
+        catch (const FileError& e)
+        {
+            //not an error in this context
+            callback.reportInfo(e.toString()); //may throw!
+        }
 
     //prevent operating system going into sleep state
-    PreventStandby dummy2;
-    (void)dummy2;
+    std::unique_ptr<PreventStandby> noStandby;
+    try
+    {
+        noStandby = make_unique<PreventStandby>(); //throw FileError
+    }
+    catch (const FileError& e)
+    {
+        //not an error in this context
+        callback.reportInfo(e.toString()); //may throw!
+    }
 
     //PERF_START;
 
@@ -354,14 +307,14 @@ void zen::compare(size_t fileTimeTolerance,
     //list of directories that are *expected* to be existent (and need to be scanned)!
     //directory existence only checked *once* to avoid race conditions!
     {
-        std::set<Zstring, LessFilename> dirnames;
+        std::vector<Zstring> dirnames;
         std::for_each(cfgList.begin(), cfgList.end(),
                       [&](const FolderPairCfg& fpCfg)
         {
-            dirnames.insert(fpCfg.leftDirectoryFmt);
-            dirnames.insert(fpCfg.rightDirectoryFmt);
+            dirnames.push_back(fpCfg.leftDirectoryFmt);
+            dirnames.push_back(fpCfg.rightDirectoryFmt);
         });
-        determineExistentDirs(dirnames, dirnamesExisting, allowUserInteraction, callback);
+        dirnamesExisting = determineExistentDirs(dirnames, allowUserInteraction, callback);
     }
     auto dirAvailable = [&](const Zstring& dirnameFmt) { return dirnamesExisting.find(dirnameFmt) != dirnamesExisting.end(); };
 
@@ -904,21 +857,21 @@ void ComparisonBuffer::performComparison(const FolderPairCfg& fpCfg,
 
     //PERF_START;
 
-    DirectoryValue emptyDummy;
-    auto getDirValue = [&](const Zstring& dirnameFmt) -> const DirectoryValue&
+    auto getDirValue = [&](const Zstring& dirnameFmt) -> const DirectoryValue*
     {
         auto it = directoryBuffer.find(DirectoryKey(dirnameFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
-        return it == directoryBuffer.end() ? emptyDummy : it->second;
+        return it != directoryBuffer.end() ? &it->second : nullptr;
     };
 
-    const DirectoryValue& bufValueLeft  = getDirValue(fpCfg.leftDirectoryFmt);
-    const DirectoryValue& bufValueRight = getDirValue(fpCfg.rightDirectoryFmt);
+    const DirectoryValue* bufValueLeft  = getDirValue(fpCfg.leftDirectoryFmt);
+    const DirectoryValue* bufValueRight = getDirValue(fpCfg.rightDirectoryFmt);
 
     callback_.reportStatus(_("Generating file list..."));
     callback_.forceUiRefresh();
 
     //PERF_START;
-    MergeSides(undefinedFiles, undefinedLinks).execute(bufValueLeft.dirCont, bufValueRight.dirCont, output);
+    MergeSides(undefinedFiles, undefinedLinks).execute(bufValueLeft  ? bufValueLeft ->dirCont : DirContainer(),
+                                                       bufValueRight ? bufValueRight->dirCont : DirContainer(), output);
     //PERF_STOP;
 
     //##################### in/exclude rows according to filtering #####################
@@ -932,8 +885,8 @@ void ComparisonBuffer::performComparison(const FolderPairCfg& fpCfg,
 
     //properly handle (user-ignored) traversing errors: just uncheck them, no need to physically delete them (<automatic> mode will be grateful)
     std::set<Zstring> failedReads;
-    failedReads.insert(bufValueLeft .failedReads.begin(), bufValueLeft .failedReads.end());
-    failedReads.insert(bufValueRight.failedReads.begin(), bufValueRight.failedReads.end());
+    if (bufValueLeft ) failedReads.insert(bufValueLeft ->failedReads.begin(), bufValueLeft ->failedReads.end());
+    if (bufValueRight) failedReads.insert(bufValueRight->failedReads.begin(), bufValueRight->failedReads.end());
 
     if (!failedReads.empty())
     {

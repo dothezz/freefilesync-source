@@ -13,7 +13,7 @@
 #ifdef FFS_WIN
 #include "win.h" //includes "windows.h"
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <sys/stat.h>
 #endif
 
@@ -49,7 +49,7 @@ assert_static(sizeof(FileId().second) == sizeof(BY_HANDLE_FILE_INFORMATION().nFi
 assert_static(sizeof(FileId().second) == sizeof(ULARGE_INTEGER));
 
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 namespace impl { typedef struct ::stat StatDummy; } //sigh...
 
 typedef decltype(impl::StatDummy::st_dev) DeviceId;

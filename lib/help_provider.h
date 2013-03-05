@@ -8,12 +8,14 @@
 #define HELPPROVIDER_H_INCLUDED
 
 #include <wx/help.h>
-#include "ffs_paths.h"
 #include <zen/zstring.h>
+#include "ffs_paths.h"
 
 namespace zen
 {
-void displayHelpEntry(const wxString& section = wxEmptyString); //use '/' as path separator!
+//use '/' as path separator!
+void displayHelpEntry(wxWindow* parent);
+void displayHelpEntry(const wxString& section, wxWindow* parent);
 
 
 
@@ -36,10 +38,10 @@ wxHelpController& getHelpCtrl()
     if (!initialized)
     {
         initialized = true;
-        controller.Initialize(toWx(zen::getResourceDir()) +
+        controller.Initialize(utfCvrtTo<wxString>(zen::getResourceDir()) +
 #ifdef FFS_WIN
                               L"FreeFileSync.chm");
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
                               L"Help/FreeFileSync.hhp");
 #endif
     }
@@ -48,12 +50,20 @@ wxHelpController& getHelpCtrl()
 
 
 inline
-void displayHelpEntry(const wxString& section)
+void displayHelpEntry(const wxString& section, wxWindow* parent)
 {
-    if (section.empty())
-        getHelpCtrl().DisplayContents();
-    else
-        getHelpCtrl().DisplaySection(replaceCpy(section, L'/', utfCvrtTo<std::wstring>(FILE_NAME_SEPARATOR)));
+    getHelpCtrl().SetParentWindow(parent); //this nicely solves modal issues on OSX with help file going to the background
+    getHelpCtrl().DisplaySection(replaceCpy(section, L'/', utfCvrtTo<wxString>(FILE_NAME_SEPARATOR)));
+    getHelpCtrl().SetParentWindow(nullptr);
+}
+
+
+inline
+void displayHelpEntry(wxWindow* parent)
+{
+    getHelpCtrl().SetParentWindow(parent);
+    getHelpCtrl().DisplayContents();
+    getHelpCtrl().SetParentWindow(nullptr);
 }
 }
 

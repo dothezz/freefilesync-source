@@ -5,6 +5,7 @@ using namespace zen;
 
 namespace
 {
+warn_static("superfluous method")
 std::string detectLineBreak(const Zstring& filename) //throw FileError
 {
     //read a (hopefully) significant portion of data
@@ -51,6 +52,7 @@ ExtractLines::ExtractLines(const Zstring& filename, const std::string& lineBreak
 
 bool ExtractLines::getLine(std::string& output) //throw FileError
 {
+    warn_static("don't use lineBreak, but support any of r, n, rn!!!")
     for (;;)
     {
         //check if full line is in buffer

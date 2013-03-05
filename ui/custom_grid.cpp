@@ -48,7 +48,7 @@ const size_t ROW_COUNT_NO_DATA = 10;
 
 /*
 class hierarchy:
-                                 GridDataBase
+                                GridDataBase
                                     /|\
                      ________________|________________
                     |                                |
@@ -56,7 +56,7 @@ class hierarchy:
                    /|\                               |
           __________|__________                      |
          |                    |                      |
-  GridDataLeftRim      GridDataRight           GridDataMiddle
+   GridDataLeft         GridDataRight          GridDataMiddle
 */
 
 
@@ -103,12 +103,17 @@ Zstring getExtension(const Zstring& shortName)
 
 class IconUpdater;
 class GridEventManager;
-
+class GridDataLeft;
+class GridDataRight;
 
 struct IconManager
 {
-    IconManager(IconBuffer::IconSize sz) : iconBuffer(sz) {}
+    IconManager(GridDataLeft& provLeft, GridDataRight& provRight, IconBuffer::IconSize sz) : iconBuffer(sz),
+        iconUpdater(make_unique<IconUpdater>(provLeft, provRight, iconBuffer)) {}
 
+    void startIconUpdater();
+    IconBuffer& refIconBuffer() { return iconBuffer; }
+private:
     IconBuffer iconBuffer;
     std::unique_ptr<IconUpdater> iconUpdater; //bind ownership to GridDataRim<>!
 };
@@ -165,7 +170,7 @@ public:
 
     void setIconManager(const std::shared_ptr<IconManager>& iconMgr) { iconMgr_ = iconMgr; }
 
-    void addIconsToBeLoaded(std::vector<Zstring>& newLoad) //loads all (not yet) drawn icons
+    void updateNewAndGetMissingIcons(std::vector<Zstring>& newLoad) //loads all (not yet) drawn icons
     {
         //don't check too often! give worker thread some time to fetch data
         if (iconMgr_)
@@ -189,7 +194,7 @@ public:
                     if (!fileName.empty())
                     {
                         //test if they are already loaded in buffer:
-                        if (iconMgr_->iconBuffer.requestFileIcon(fileName))
+                        if (iconMgr_->refIconBuffer().requestFileIcon(fileName))
                         {
                             //do a *full* refresh for *every* failed load to update partial DC updates while scrolling
                             refreshCell(refGrid(), currentRow, static_cast<ColumnType>(COL_TYPE_FILENAME));
@@ -203,16 +208,21 @@ public:
         }
     }
 
+private:
+    bool isFailedLoad(size_t row) const { return row < failedLoads.size() ? failedLoads[row] != 0 : false; }
+
     void setFailedLoad(size_t row, bool failed)
     {
+        if (failed) //let's only pay for iconupdater when needed
+            if (iconMgr_)
+                iconMgr_->startIconUpdater();
+
         if (failedLoads.size() != refGrid().getRowCount())
             failedLoads.resize(refGrid().getRowCount());
 
         if (row < failedLoads.size())
             failedLoads[row] = failed;
     }
-
-    bool isFailedLoad(size_t row) const { return row < failedLoads.size() ? failedLoads[row] != 0 : false; }
 
 protected:
     virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus)
@@ -447,7 +457,7 @@ private:
         return wxEmptyString;
     }
 
-    static const int CELL_BORDER = 2;
+    static const int GAP_SIZE = 2;
 
     virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
     {
@@ -475,16 +485,16 @@ private:
         if (static_cast<ColumnTypeRim>(colType) == COL_TYPE_FILENAME &&
             iconMgr_)
         {
-            rectTmp.x     += CELL_BORDER;
-            rectTmp.width -= CELL_BORDER;
+            rectTmp.x     += GAP_SIZE;
+            rectTmp.width -= GAP_SIZE;
 
-            const int iconSize = iconMgr_->iconBuffer.getSize();
+            const int iconSize = iconMgr_->refIconBuffer().getSize();
             if (rectTmp.GetWidth() >= iconSize)
             {
                 //  Partitioning:
-                //   _______________________________
-                //  | border | icon | border | text |
-                //   -------------------------------
+                //   __________________________
+                //  | gap | icon | gap | text |
+                //   --------------------------
 
                 const Zstring fileName = getIconFile(row);
                 if (!fileName.empty())
@@ -493,12 +503,12 @@ private:
 
                     //first check if it is a directory icon:
                     if (fileName == ICON_FILE_FOLDER)
-                        icon = iconMgr_->iconBuffer.genericDirIcon();
+                        icon = iconMgr_->refIconBuffer().genericDirIcon();
                     else //retrieve file icon
                     {
-                        if (!iconMgr_->iconBuffer.requestFileIcon(fileName, &icon)) //returns false if icon is not in buffer
+                        if (!iconMgr_->refIconBuffer().requestFileIcon(fileName, &icon)) //returns false if icon is not in buffer
                         {
-                            icon = iconMgr_->iconBuffer.genericFileIcon(); //better than nothing
+                            icon = iconMgr_->refIconBuffer().genericFileIcon(); //better than nothing
                             setFailedLoad(row, true); //save status of failed icon load -> used for async. icon loading
                             //falsify only! we want to avoid writing incorrect success values when only partially updating the DC, e.g. when scrolling,
                             //see repaint behavior of ::ScrollWindow() function!
@@ -520,7 +530,7 @@ private:
                             wxMemoryDC memDc(bmp);
                             memDc.Blit(0, 0, icon.GetWidth(), icon.GetHeight(), &dc, posX, posY); //blit in
 
-                            bmp = wxBitmap(bmp.ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3)); //treat all channels equally!
+                            bmp = wxBitmap(bmp.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)); //treat all channels equally!
                             memDc.SelectObject(bmp);
 
                             dc.Blit(posX, posY, icon.GetWidth(), icon.GetHeight(), &memDc, 0, 0); //blit out
@@ -540,13 +550,13 @@ private:
         if (static_cast<ColumnTypeRim>(colType) == COL_TYPE_SIZE && grid.GetLayoutDirection() != wxLayout_RightToLeft)
         {
             //have file size right-justified (but don't change for RTL languages)
-            rectTmp.width -= CELL_BORDER;
+            rectTmp.width -= GAP_SIZE;
             drawCellText(dc, rectTmp, getValue(row, colType), isActive, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
         }
         else
         {
-            rectTmp.x     += CELL_BORDER;
-            rectTmp.width -= CELL_BORDER;
+            rectTmp.x     += GAP_SIZE;
+            rectTmp.width -= GAP_SIZE;
             drawCellText(dc, rectTmp, getValue(row, colType), isActive, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
         }
     }
@@ -554,15 +564,15 @@ private:
     virtual size_t getBestSize(wxDC& dc, size_t row, ColumnType colType)
     {
         //  Partitioning:
-        //   ________________________________________
-        //  | border | icon | border | text | border |
-        //   ----------------------------------------
+        //   ________________________________
+        //  | gap | icon | gap | text | gap |
+        //   --------------------------------
 
         int bestSize = 0;
         if (static_cast<ColumnTypeRim>(colType) == COL_TYPE_FILENAME && iconMgr_)
-            bestSize += CELL_BORDER + iconMgr_->iconBuffer.getSize();
+            bestSize += GAP_SIZE + iconMgr_->refIconBuffer().getSize();
 
-        bestSize += CELL_BORDER + dc.GetTextExtent(getValue(row, colType)).GetWidth() + CELL_BORDER;
+        bestSize += GAP_SIZE + dc.GetTextExtent(getValue(row, colType)).GetWidth() + GAP_SIZE;
 
         return bestSize; // + 1 pix for cell border line -> not used anymore!
     }
@@ -594,10 +604,10 @@ private:
         wxRect rectInside = drawColumnLabelBorder(dc, rect);
         drawColumnLabelBackground(dc, rectInside, highlighted);
 
-        const int COLUMN_BORDER_LEFT = 4;
+        const int COLUMN_GAP_LEFT = 4;
 
-        rectInside.x     += COLUMN_BORDER_LEFT;
-        rectInside.width -= COLUMN_BORDER_LEFT;
+        rectInside.x     += COLUMN_GAP_LEFT;
+        rectInside.width -= COLUMN_GAP_LEFT;
         drawColumnLabelText(dc, rectInside, getColumnLabel(colType));
 
         //draw sort marker
@@ -610,7 +620,7 @@ private:
                 {
                     const wxBitmap& marker = GlobalResources::getImage(sortInfo->ascending_ ? L"sortAscending" : L"sortDescending");
                     wxPoint markerBegin = rectInside.GetTopLeft() + wxPoint((rectInside.width - marker.GetWidth()) / 2, 0);
-                    dc.DrawBitmap(marker, markerBegin, true); //respect 2-pixel border
+                    dc.DrawBitmap(marker, markerBegin, true); //respect 2-pixel gap
                 }
             }
         }
@@ -769,7 +779,6 @@ public:
     GridDataRight(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) : GridDataRim<RIGHT_SIDE>(gridDataView, grid) {}
 };
 
-
 //########################################################################################################
 
 class GridDataMiddle : public GridDataBase
@@ -786,6 +795,7 @@ public:
         {
             refGrid().clearSelection(false); //don't emit event, prevent recursion!
             dragSelection = make_unique<std::pair<size_t, BlockPosition>>(row, mousePosToBlock(clientPos, row));
+            toolTip.hide(); //handle custom tooltip
         }
     }
 
@@ -833,25 +843,28 @@ public:
             }
             dragSelection.reset();
         }
+
+        //update highlight and tooltip: on OS X no mouse movement event is generated after a mouse button click (unlike on Windows)
+        onMouseMovement(refGrid().getMainWin().ScreenToClient(wxGetMousePosition()));
     }
 
-    void onMouseMovement(const wxPoint& clientPos, size_t row, ColumnType colType)
+    void onMouseMovement(const wxPoint& clientPos)
     {
         //manage block highlighting and custom tooltip
-        if (dragSelection)
+        if (!dragSelection)
         {
-            toolTip.hide(); //handle custom tooltip
-        }
-        else
-        {
-            if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE &&
-                row < refGrid().getRowCount())
+            const wxPoint& topLeftAbs = refGrid().CalcUnscrolledPosition(clientPos);
+            const size_t row = refGrid().getRowAtPos(topLeftAbs.y); //return -1 for invalid position, rowCount if one past the end
+            auto colInfo = refGrid().getColumnAtPos(topLeftAbs.x); //(column type, component position)
+
+            if (row < refGrid().getRowCount() &&
+                colInfo && static_cast<ColumnTypeMiddle>(colInfo->first) == COL_TYPE_MIDDLE_VALUE)
             {
                 if (highlight) //refresh old highlight
-                    refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
+                    refreshCell(refGrid(), highlight->row_, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
 
-                highlight = make_unique<std::pair<size_t, BlockPosition>>(row, mousePosToBlock(clientPos, row));
-                refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
+                highlight = make_unique<MouseHighlight>(row, mousePosToBlock(clientPos, row));
+                refreshCell(refGrid(), highlight->row_, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
 
                 //show custom tooltip
                 showToolTip(row, refGrid().getMainWin().ClientToScreen(clientPos));
@@ -861,15 +874,17 @@ public:
         }
     }
 
-    void onMouseLeave()
+    void onMouseLeave() //wxEVT_LEAVE_WINDOW does not respect mouse capture!
     {
-        if (highlight)
+        if (!dragSelection)
         {
-            refreshCell(refGrid(), highlight->first, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
-            highlight.reset();
+            if (highlight)
+            {
+                refreshCell(refGrid(), highlight->row_, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
+                highlight.reset();
+            }
+            toolTip.hide(); //handle custom tooltip
         }
-
-        toolTip.hide(); //handle custom tooltip
     }
 
     void showSyncAction(bool value) { showSyncAction_ = value; }
@@ -909,8 +924,8 @@ private:
                     wxRect checkBoxArea = rectInside;
                     checkBoxArea.SetWidth(CHECK_BOX_IMAGE);
 
-                    const bool          rowHighlighted = dragSelection ? row == dragSelection->first : highlight ? row == highlight->first : false;
-                    const BlockPosition highlightBlock = dragSelection ? dragSelection->second       : highlight ? highlight->second       : BLOCKPOS_CHECK_BOX;
+                    const bool          rowHighlighted = dragSelection ? row == dragSelection->first : highlight ? row == highlight->row_ : false;
+                    const BlockPosition highlightBlock = dragSelection ? dragSelection->second       : highlight ? highlight->blockPos_ : BLOCKPOS_CHECK_BOX;
 
                     if (rowHighlighted && highlightBlock == BLOCKPOS_CHECK_BOX)
                         drawBitmapRtlMirror(dc, GlobalResources::getImage(fsObj->isActive() ? L"checkboxTrueFocus" : L"checkboxFalseFocus"), checkBoxArea, wxALIGN_CENTER, buffer);
@@ -1174,7 +1189,14 @@ private:
     virtual wxString getToolTip(ColumnType colType) const { return showSyncAction_ ? _("Action") + L" (F8)" : _("Category") + L" (F8)"; }
 
     bool showSyncAction_;
-    std::unique_ptr<std::pair<size_t, BlockPosition>> highlight; //(row, block) current mouse highlight
+
+    struct MouseHighlight
+    {
+        MouseHighlight(size_t row, BlockPosition blockPos) : row_(row), blockPos_(blockPos) {}
+        const size_t row_;
+        const BlockPosition blockPos_;
+    };
+    std::unique_ptr<MouseHighlight> highlight; //current mouse highlight
     std::unique_ptr<std::pair<size_t, BlockPosition>> dragSelection; //(row, block)
     std::unique_ptr<wxBitmap> buffer; //avoid costs of recreating this temporal variable
     zen::Tooltip toolTip;
@@ -1190,11 +1212,9 @@ public:
     GridEventManager(Grid& gridL,
                      Grid& gridC,
                      Grid& gridR,
-                     GridDataLeft& provLeft,
-                     GridDataMiddle& provMiddle,
-                     GridDataRight& provRight) :
+                     GridDataMiddle& provMiddle) :
         gridL_(gridL), gridC_(gridC), gridR_(gridR), scrollMaster(nullptr),
-        provLeft_(provLeft), provMiddle_(provMiddle), provRight_(provRight),
+        provMiddle_(provMiddle),
         scrollbarUpdatePending(false)
     {
         gridL_.Connect(EVENT_GRID_COL_RESIZE, GridColumnResizeEventHandler(GridEventManager::onResizeColumnL), nullptr, this);
@@ -1258,13 +1278,7 @@ private:
 
     void onCenterMouseMovement(wxMouseEvent& event)
     {
-        const wxPoint& topLeftAbs = gridC_.CalcUnscrolledPosition(event.GetPosition());
-        const ptrdiff_t row = gridC_.getRowAtPos(topLeftAbs.y); //return -1 for invalid position, rowCount if one past the end
-        if (auto colInfo = gridC_.getColumnAtPos(topLeftAbs.x)) //(column type, component position)
-        {
-            //redirect mouse movement to middle grid component
-            provMiddle_.onMouseMovement(event.GetPosition(), row, colInfo->first);
-        }
+        provMiddle_.onMouseMovement(event.GetPosition());
         event.Skip();
     }
 
@@ -1442,10 +1456,7 @@ private:
     const Grid* scrollMaster; //for address check only; this needn't be the grid having focus!
     //e.g. mouse wheel events should set window under cursor as scrollMaster, but *not* change focus
 
-    GridDataLeft&   provLeft_;
     GridDataMiddle& provMiddle_;
-    GridDataRight& provRight_;
-
     bool scrollbarUpdatePending;
 };
 }
@@ -1462,7 +1473,7 @@ void gridview::init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std
     gridCenter.setDataProvider(provMiddle_); //ownership must belong *exclusively* to grid!
     gridRight .setDataProvider(provRight_);
 
-    auto evtMgr = std::make_shared<GridEventManager>(gridLeft, gridCenter, gridRight, *provLeft_, *provMiddle_, *provRight_);
+    auto evtMgr = std::make_shared<GridEventManager>(gridLeft, gridCenter, gridRight, *provMiddle_);
     provLeft_  ->holdOwnership(evtMgr);
     provMiddle_->holdOwnership(evtMgr);
     provRight_ ->holdOwnership(evtMgr);
@@ -1536,16 +1547,22 @@ public:
     IconUpdater(GridDataLeft& provLeft, GridDataRight& provRight, IconBuffer& iconBuffer) : provLeft_(provLeft), provRight_(provRight), iconBuffer_(iconBuffer)
     {
         timer.Connect(wxEVT_TIMER, wxEventHandler(IconUpdater::loadIconsAsynchronously), nullptr, this);
-        timer.Start(50); //timer interval in ms
     }
 
+    void start() { if (!timer.IsRunning()) timer.Start(50); } //timer interval in [ms]
+
 private:
+    void stop() { if ( timer.IsRunning()) timer.Stop(); }
+
     void loadIconsAsynchronously(wxEvent& event) //loads all (not yet) drawn icons
     {
         std::vector<Zstring> newLoad;
-        provLeft_ .addIconsToBeLoaded(newLoad); //loads all (not yet) drawn icons
-        provRight_.addIconsToBeLoaded(newLoad); //
+        provLeft_ .updateNewAndGetMissingIcons(newLoad);
+        provRight_.updateNewAndGetMissingIcons(newLoad);
         iconBuffer_.setWorkload(newLoad);
+
+        if (newLoad.empty()) //let's only pay for iconupdater when needed
+            stop();
     }
 
     GridDataLeft& provLeft_;
@@ -1553,6 +1570,11 @@ private:
     IconBuffer& iconBuffer_;
     wxTimer timer;
 };
+
+
+//resolve circular linker dependencies
+inline
+void IconManager::startIconUpdater() { if (iconUpdater) iconUpdater->start(); }
 }
 
 
@@ -1566,18 +1588,16 @@ void gridview::setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, boo
         int iconHeight = 0;
         if (show)
         {
-            auto iconMgr = std::make_shared<IconManager>(sz);
-            iconMgr->iconUpdater.reset(new IconUpdater(*provLeft, *provRight, iconMgr->iconBuffer));
-
+            auto iconMgr = std::make_shared<IconManager>(*provLeft, *provRight, sz);
             provLeft ->setIconManager(iconMgr);
             provRight->setIconManager(iconMgr);
-            iconHeight = iconMgr->iconBuffer.getSize();
+            iconHeight = iconMgr->refIconBuffer().getSize();
         }
         else
         {
             provLeft ->setIconManager(nullptr);
             provRight->setIconManager(nullptr);
-            iconHeight = IconBuffer(IconBuffer::SIZE_SMALL).getSize();
+            iconHeight = IconBuffer::getSize(IconBuffer::SIZE_SMALL);
         }
 
         const int newRowHeight = std::max(iconHeight, gridLeft.getMainWin().GetCharHeight()) + 1; //add some space

@@ -11,6 +11,7 @@
 #include <wx/tooltip.h> //wxWidgets v2.9
 #include <wx/log.h>
 #include <wx+/app_main.h>
+#include <wx+/string_conv.h>
 #include "comparison.h"
 #include "algorithm.h"
 #include "synchronization.h"
@@ -37,7 +38,6 @@ IMPLEMENT_APP(Application)
 void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg);
 void runGuiMode(const std::vector<wxString>& cfgFileName);
 void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode);
-
 
 #ifdef FFS_WIN
 namespace
@@ -154,10 +154,9 @@ void Application::OnStartApplication(wxIdleEvent&)
     //Quote: "Best practice is that all applications call the process-wide ::SetErrorMode() function with a parameter of
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
-
 #elif defined FFS_LINUX
     ::gtk_init(nullptr, nullptr);
-    ::gtk_rc_parse((getResourceDir() + "styles.rc").c_str()); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
 #if wxCHECK_VERSION(2, 9, 1)
@@ -191,19 +190,19 @@ void Application::OnStartApplication(wxIdleEvent&)
             {
                 size_t index = it - commandArgs.begin();
 
-                FolderPairEnh& fp = [&]() -> FolderPairEnh&
+                FolderPairEnh* fp = nullptr;
+                if (index < 2)
+                    fp = &guiCfg.mainCfg.firstPair;
+                else
                 {
-                    if (index < 2)
-                        return guiCfg.mainCfg.firstPair;
-
                     guiCfg.mainCfg.additionalPairs.resize((index - 2) / 2 + 1);
-                    return guiCfg.mainCfg.additionalPairs.back();
-                }();
+                    fp = &guiCfg.mainCfg.additionalPairs.back();
+                }
 
                 if (index % 2 == 0)
-                    fp.leftDirectory = toZ(*it);
+                    fp->leftDirectory = toZ(*it);
                 else
-                    fp.rightDirectory = toZ(*it);
+                    fp->rightDirectory = toZ(*it);
             }
 
             runGuiMode(guiCfg);
@@ -369,7 +368,7 @@ void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
     //all settings have been read successfully...
 
     //regular check for program updates -> disabled for batch
-    //if (batchCfg.showProgress)
+    //if (batchCfg.showProgress && manualProgramUpdateRequired())
     //    checkForUpdatePeriodically(globalCfg.lastUpdateCheck);
 
     try //begin of synchronization process (all in one try-catch block)

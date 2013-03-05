@@ -15,8 +15,6 @@
 #include "../lib/process_xml.h"
 #include "main_dlg.h"
 
-class SyncStatus;
-class wxCommandEvent;
 
 //Exception class used to abort the "compare" and "sync" process
 class GuiAbortProcess {};
@@ -69,7 +67,7 @@ private:
     virtual void abortThisProcess(); //throw GuiAbortProcess
 
     MainDialog* parentDlg_;
-    SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
+    SyncProgressDialog syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
     const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnGuiError handleError_;
     zen::ErrorLog errorLog;

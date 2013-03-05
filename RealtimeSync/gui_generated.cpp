@@ -127,12 +127,12 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     wxBoxSizer* bSizer20;
     bSizer20 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_bpButtonAddFolder = new wxBitmapButton( m_panelMainFolder, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 24,24 ), wxBU_AUTODRAW );
+    m_bpButtonAddFolder = new wxBitmapButton( m_panelMainFolder, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 25,25 ), wxBU_AUTODRAW );
     m_bpButtonAddFolder->SetToolTip( _("Add folder") );
 
     bSizer20->Add( m_bpButtonAddFolder, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_bpButtonRemoveTopFolder = new wxBitmapButton( m_panelMainFolder, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 24,24 ), wxBU_AUTODRAW );
+    m_bpButtonRemoveTopFolder = new wxBitmapButton( m_panelMainFolder, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 25,25 ), wxBU_AUTODRAW );
     m_bpButtonRemoveTopFolder->SetToolTip( _("Remove folder") );
 
     bSizer20->Add( m_bpButtonRemoveTopFolder, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
@@ -217,9 +217,9 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 
     bSizer141->Add( 0, 0, 1, wxEXPAND, 5 );
 
-    m_buttonStart = new zen::BitmapButton( m_panel4, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,50 ), 0 );
+    m_buttonStart = new zen::BitmapButton( m_panel4, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonStart->SetDefault();
-    m_buttonStart->SetFont( wxFont( 14, 74, 90, 92, false, wxT("Arial Black") ) );
+    m_buttonStart->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
     bSizer141->Add( m_buttonStart, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
 
@@ -275,7 +275,7 @@ FolderGenerated::FolderGenerated( wxWindow* parent, wxWindowID id, const wxPoint
     wxBoxSizer* bSizer114;
     bSizer114 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_bpButtonRemoveFolder = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 24,24 ), wxBU_AUTODRAW );
+    m_bpButtonRemoveFolder = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 25,25 ), wxBU_AUTODRAW );
     m_bpButtonRemoveFolder->SetToolTip( _("Remove folder") );
 
     bSizer114->Add( m_bpButtonRemoveFolder, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -337,12 +337,12 @@ ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     m_buttonRetry = new wxButton( m_panel3, wxID_RETRY, _("&Retry"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonRetry->SetDefault();
-    m_buttonRetry->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+    m_buttonRetry->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
 
     bSizer13->Add( m_buttonRetry, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_buttonAbort = new wxButton( m_panel3, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonAbort->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
+    m_buttonAbort->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
 
     bSizer13->Add( m_buttonAbort, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 

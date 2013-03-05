@@ -22,7 +22,7 @@ void zen::updateUiNow()
 
 namespace
 {
-const std::int64_t TICKS_UPDATE_INTERVAL = UI_UPDATE_INTERVAL * ticksPerSec() / 1000;
+const std::int64_t TICKS_UPDATE_INTERVAL = UI_UPDATE_INTERVAL* ticksPerSec() / 1000;
 TickVal lastExec = getTicks();
 };
 

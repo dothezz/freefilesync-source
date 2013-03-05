@@ -3,9 +3,9 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.4.1  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20120512;16135500">
+	<META NAME="CHANGED" CONTENT="20130207;1441045">
 	<STYLE TYPE="text/css">
 	<!--
 		@page { margin: 2cm }
@@ -19,27 +19,27 @@
 <BODY LANG="de-DE" DIR="LTR">
 <H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Schedule
 a Batch Job</FONT></FONT></H2>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
 <OL>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Create
-	a new batch job via FreeFileSync's main
-	dialog:<BR></FONT><FONT FACE="Tahoma, sans-serif"><I>Menu-&gt;Advanced-&gt;Create
-	batch job</I></FONT><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></P>
+	a new batch job via FreeFileSync's main dialog: </FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Menu
+	&rarr; Program &rarr; Save as batch job...</B></SPAN></FONT><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
 	the batch job shall run without user interaction or as part of an
 	unattended batch script, make sure that no popup dialog stops the
-	progress:<BR>Disable checkbox &quot;<I>Show progress dialog</I>&quot;
-	to avoid blocking while showing the result after synchronization.
-	Alternatively you can select the &quot;On completion&quot; action
-	&quot;Close progress dialog&quot; located in synchronization
-	settings. <B>Note:</B> Even if the progress dialog is not shown at
-	the beginning, a user can make it visible <B>during</B>
-	synchronization by double-clicking the FreeFileSync systray icon.<BR><IMG SRC="../img/SetupBatch.png" NAME="Grafik3" ALIGN=BOTTOM BORDER=0></FONT></P>
+	progress:<BR>Disable checkbox <SPAN STYLE="font-style: normal"><B>Show
+	progress dialog</B></SPAN> to avoid blocking while showing the
+	result after synchronization. Alternatively you can select the &quot;On
+	completion&quot; action <B>Close progress dialog</B> located in
+	synchronization settings.<BR><B>Note:</B> Even if the progress
+	dialog is not shown at the beginning, a user can make it visible
+	<B>during</B> synchronization by double-clicking the FreeFileSync
+	systray icon.<BR><IMG SRC="../img/SetupBatch.png" NAME="Grafik3" ALIGN=BOTTOM WIDTH=660 HEIGHT=263 BORDER=0></FONT></P>
 	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
 	order to prevent error or warning popup messages from stopping
-	progress, set &quot;<I>Error handling</I>&quot; to either &quot;<I>Ignore</I>&quot; or &quot;<I>Exit</I>&quot;.</FONT></P>
+	progress, set <SPAN STYLE="font-style: normal"><B>Error handling</B></SPAN>
+	to either <SPAN STYLE="font-style: normal"><B>Ignore</B></SPAN> or
+	<SPAN STYLE="font-style: normal"><B>Exit</B></SPAN>.</FONT></P>
 	<P STYLE="margin-bottom: 0cm">&nbsp;</P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Setup
 	your operating system's scheduler</FONT></P>
@@ -50,33 +50,26 @@ a Batch Job</FONT></FONT></H2>
 		7 Task Scheduler:</B></FONT></P>
 		<UL>
 			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Go
-			to Start and e</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><FONT SIZE=3><SPAN STYLE="font-weight: normal">nter
-			</SPAN></FONT></FONT><FONT FACE="Courier New, monospace"><FONT SIZE=3><SPAN STYLE="font-weight: normal">&quot;</SPAN></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><FONT SIZE=3><SPAN STYLE="font-weight: normal">taskschd.msc&quot;</SPAN></FONT></FONT></FONT></P>
+			to Start and run</SPAN></FONT> <FONT FACE="Tahoma, sans-serif"><FONT SIZE=3><B>taskschd.msc</B></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=3><SPAN STYLE="font-weight: normal">.</SPAN></FONT></FONT></FONT></P>
 			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT COLOR="#000000"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=3>Create
 			a new basic task and follow the wizard.</FONT></FONT></FONT></P>
 			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT COLOR="#000000"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=3>Make
-			&quot;Program/script&quot; point to the location of
-			FreeFileSync.exe and specify the ffs_batch file under &quot;Add
-			arguments&quot;.</FONT></FONT></FONT></P>
-		</UL>
-	</OL>
-</OL>
-<OL>
-	<OL TYPE=A>
-		<UL>
+			<B>Program/script</B> point to the location of FreeFileSync.exe
+			and insert the <FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
+			file into <B>Add arguments</B>.</FONT></FONT></FONT></P>
 			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif"><FONT COLOR="#000000"><FONT SIZE=3>Use
-			quotes if any paths contain spaces, e.g.: </FONT></FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><FONT SIZE=3>&quot;C:\some
-			folder\SyncJob.ffs_batch&quot;</FONT></FONT></FONT><FONT COLOR="#000000"><FONT SIZE=3><BR></FONT></FONT><IMG SRC="../img/win7scheduler.png" NAME="Grafik1" ALIGN=BOTTOM BORDER=0></FONT></P>
+			quotation marks to protect spaces in path names, e.g.: </FONT></FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><FONT SIZE=3>&quot;C:\some
+			folder\SyncJob.ffs_batch&quot;</FONT></FONT></FONT><FONT COLOR="#000000"><FONT SIZE=3><BR></FONT></FONT><IMG SRC="../img/win7scheduler.png" NAME="Grafik1" ALIGN=BOTTOM WIDTH=708 HEIGHT=284 BORDER=0></FONT></P>
 		</UL>
 	</OL>
 	<P STYLE="margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 		<FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT><FONT FACE="Tahoma, sans-serif"><BR>Beginning
-		with Windows Vista the &quot;Program/script&quot; always needs to
-		be a path to &quot;FreeFileSync.exe&quot; even if ffs_batch file
-		associations are set!</FONT> <FONT FACE="Tahoma, sans-serif">Else
-		the task will return with error code 0xC1, &quot;%1 is not a valid
-		Win32 application&quot; if a ffs_batch file is entered directly.</FONT></P>
+		with Windows Vista the &quot;Program/script&quot; always needs
+		point to an executable file like &quot;FreeFileSync.exe&quot; even
+		if ffs_batch file associations have been set!</FONT> I<FONT FACE="Tahoma, sans-serif">f
+		a ffs_batch file were entered instead the task would return with
+		error code 0xC1, &quot;%1 is not a valid Win32 application&quot;.</FONT></P>
 	</SPAN><BR CLEAR=LEFT>&nbsp; 
 	</P>
 </OL>
@@ -86,14 +79,15 @@ a Batch Job</FONT></FONT></H2>
 		XP Scheduled Tasks:</B></FONT></P>
 		<UL>
 			<LI VALUE=1><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Go
-			to <I>Start &rarr; Control Panel &rarr; Scheduled Tasks</I> and
-			select &quot;<I>Add Scheduled Task</I>&quot;.</FONT></P>
+			to <SPAN STYLE="font-style: normal"><B>Start &rarr; Control Panel
+			&rarr; Scheduled Tasks</B></SPAN> and select <SPAN STYLE="font-style: normal"><B>Add
+			Scheduled Task</B></SPAN>.</FONT></P>
 			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Follow
 			the wizard and select FreeFileSync.exe as program to run.</FONT></P>
-			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif">Enter
-			&quot;Run:&quot; as: <FONT FACE="Courier New, monospace">&lt;FreeFileSync
-			installation directory&gt;\FreeFileSync.exe &lt;job
-			name&gt;.ffs_batch</FONT><BR><IMG SRC="../img/ScheduleBatch.png" NAME="Grafik2" ALIGN=BOTTOM BORDER=0><BR>&nbsp;</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif">Fill
+			input field <B>Run:</B> as: <FONT FACE="Courier New, monospace">&lt;FreeFileSync
+			installation folder&gt;\FreeFileSync.exe &lt;job
+			name&gt;.ffs_batch</FONT><BR><IMG SRC="../img/ScheduleBatch.png" NAME="Grafik2" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0><BR>&nbsp;</FONT></P>
 		</UL>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Ubuntu
 		Linux Gnome-schedule:</B></FONT></P>
@@ -101,24 +95,13 @@ a Batch Job</FONT></FONT></H2>
 			<LI><P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif">Install
 			Gnome-schedule, if necessary: <FONT FACE="Courier New, monospace">sudo
 			apt-get install gnome-schedule</FONT></FONT></P>
-		</UL>
-	</OL>
-</OL>
-<OL>
-	<OL TYPE=A START=2>
-		<UL>
 			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Go
-			to </SPAN></FONT><FONT FACE="Tahoma, sans-serif"><I>System -&gt;
-			Preferences -&gt; Scheduled tasks</I></FONT></P>
-		</UL>
-	</OL>
-</OL>
-<OL>
-	<OL TYPE=A START=2>
-		<UL>
-			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">Specify
-			the command as:</SPAN></SPAN></FONT> <FONT FACE="Courier New, monospace"><I><SPAN STYLE="font-weight: normal">&lt;FreeFileSync
-			installation directory&gt;/FreeFileSync &lt;job name&gt;.ffs_batch<BR></SPAN></I></FONT><IMG SRC="../img/ubuntuScheduler.png" NAME="Grafik5" ALIGN=BOTTOM BORDER=0></P>
+			to </SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>System
+			&rarr; Preferences &rarr; Scheduled tasks</B></SPAN></FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">Enter
+			the command </SPAN></SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">as:</SPAN></SPAN></FONT><SPAN STYLE="font-style: normal">
+			</SPAN><FONT FACE="Courier New, monospace"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">&lt;FreeFileSync
+			installation folder&gt;/FreeFileSync &lt;job name&gt;.ffs_batch</SPAN></SPAN></FONT><FONT FACE="Courier New, monospace"><I><SPAN STYLE="font-weight: normal"><BR></SPAN></I></FONT><IMG SRC="../img/ubuntuScheduler.png" NAME="Grafik5" ALIGN=BOTTOM WIDTH=629 HEIGHT=560 BORDER=0></P>
 		</UL>
 	</OL>
 </OL>

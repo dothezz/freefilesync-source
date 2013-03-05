@@ -12,7 +12,7 @@
 
 #ifdef FFS_WIN
 #include "win.h" //includes "windows.h"
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <cstdio>
 #include <sys/stat.h>
 #endif
@@ -24,13 +24,15 @@ namespace zen
 static const char LINE_BREAK[] = "\r\n";
 #elif defined FFS_LINUX
 static const char LINE_BREAK[] = "\n";
+#elif defined FFS_MAC
+static const char LINE_BREAK[] = "\r";
 #endif
 
 //buffered file IO optimized for sequential read/write accesses + better error reporting + long path support (following symlinks)
 
 #ifdef FFS_WIN
 typedef HANDLE FileHandle;
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 typedef FILE* FileHandle;
 #endif
 
@@ -62,8 +64,7 @@ private:
     FileHandle fileHandle;
 };
 
-
-#ifdef FFS_LINUX
+#if defined FFS_LINUX || defined FFS_MAC
 class FileInputUnbuffered : public FileInputBase
 {
 public:

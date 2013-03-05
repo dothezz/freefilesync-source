@@ -291,7 +291,6 @@ void GridData::drawColumnLabelText(wxDC& dc, const wxRect& rect, const wxString&
 CornerWin  RowLabelWin  ColLabelWin  MainWin
 
 */
-
 class Grid::SubWindow : public wxWindow
 {
 public:
@@ -323,6 +322,7 @@ public:
         Connect(wxEVT_RIGHT_UP,     wxMouseEventHandler(SubWindow::onMouseRightUp   ), nullptr, this);
         Connect(wxEVT_MOTION,       wxMouseEventHandler(SubWindow::onMouseMovement  ), nullptr, this);
         Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(SubWindow::onLeaveWindow    ), nullptr, this);
+        Connect(wxEVT_MOUSEWHEEL,   wxMouseEventHandler(SubWindow::onMouseWheel     ), nullptr, this);
         Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(SubWindow::onMouseCaptureLost), nullptr, this);
 
         Connect(wxEVT_CHAR,     wxKeyEventHandler(SubWindow::onChar   ), nullptr, this);
@@ -331,7 +331,6 @@ public:
 
         assert(GetClientAreaOrigin() == wxPoint()); //generally assumed when dealing with coordinates below
     }
-
     Grid& refParent() { return parent_; }
     const Grid& refParent() const { return parent_; }
 
@@ -380,10 +379,25 @@ private:
     virtual void onMouseMovement  (wxMouseEvent& event) { event.Skip(); }
     virtual void onLeaveWindow    (wxMouseEvent& event) { event.Skip(); }
     virtual void onMouseCaptureLost(wxMouseCaptureLostEvent& event) { event.Skip(); }
-
     virtual void onChar   (wxKeyEvent& event) { event.Skip(); }
     virtual void onKeyUp  (wxKeyEvent& event) { event.Skip(); }
     virtual void onKeyDown(wxKeyEvent& event) { event.Skip(); }
+
+    void onMouseWheel(wxMouseEvent& event)
+    {
+        /*
+          MSDN, WM_MOUSEWHEEL: "Sent to the focus window when the mouse wheel is rotated.
+          The DefWindowProc function propagates the message to the window's parent.
+          There should be no internal forwarding of the message, since DefWindowProc propagates
+          it up the parent chain until it finds a window that processes it."
+
+          On OS X there is no such propagation! => we need a redirection (the same wxGrid implements)
+         */
+        if (wxEvtHandler* evtHandler = parent_.GetEventHandler())
+            if (evtHandler->ProcessEvent(event))
+                return;
+        event.Skip();
+    }
 
     void onPaintEvent(wxPaintEvent& event)
     {
@@ -514,8 +528,6 @@ private:
         wxFont labelFont = GetFont();
         labelFont.SetWeight(wxFONTWEIGHT_BOLD);
         dc.SetFont(labelFont);
-
-        wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
 
         auto rowRange = getRowsOnClient(rect); //returns range [begin, end)
         for (auto row = rowRange.first; row < rowRange.second; ++row)
@@ -838,7 +850,7 @@ private:
 
     virtual void onLeaveWindow(wxMouseEvent& event)
     {
-        highlight.reset(); //onLeaveWindow() does not respect mouse capture! -> however highlight is drawn unconditionally during move/resize!
+        highlight.reset(); //wxEVT_LEAVE_WINDOW does not respect mouse capture! -> however highlight is drawn unconditionally during move/resize!
         Refresh();
         event.Skip();
     }
@@ -1414,8 +1426,8 @@ private:
 
     void onRequestWindowUpdate(wxEvent& event)
     {
-        ZEN_ON_SCOPE_EXIT(gridUpdatePending = false);
         assert(gridUpdatePending);
+        ZEN_ON_SCOPE_EXIT(gridUpdatePending = false);
 
         refParent().updateWindowSizes(false); //row label width has changed -> do *not* update scrollbars: recursion on wxGTK! -> still a problem, now that we're called async??
         rowLabelWin_.Update(); //update while dragging scroll thumb
@@ -1732,15 +1744,29 @@ std::vector<Grid::ColumnAttribute> Grid::getColumnConfig(size_t compPos) const
 
 void Grid::showScrollBars(Grid::ScrollBarStatus horizontal, Grid::ScrollBarStatus vertical)
 {
-#if wxCHECK_VERSION(2, 9, 1)
-    int weShouldMigrateToWxWidgetsShowScrollBarsInstead; //lousy compile-time warning, I know ;)
-#endif
-
     if (showScrollbarX == horizontal &&
         showScrollbarY == vertical) return; //support polling!
 
     showScrollbarX = horizontal;
     showScrollbarY = vertical;
+
+#if wxCHECK_VERSION(2, 9, 0)
+    auto mapStatus = [](ScrollBarStatus sbStatus) -> wxScrollbarVisibility
+    {
+        switch (sbStatus)
+        {
+            case SB_SHOW_AUTOMATIC:
+                return wxSHOW_SB_DEFAULT;
+            case SB_SHOW_ALWAYS:
+                return wxSHOW_SB_ALWAYS;
+            case SB_SHOW_NEVER:
+                return wxSHOW_SB_NEVER;
+        }
+        assert(false);
+        return wxSHOW_SB_DEFAULT;
+    };
+    ShowScrollbars(mapStatus(horizontal), mapStatus(vertical));
+#else //support older wxWidgets API
 
 #ifdef FFS_LINUX //get rid of scrollbars, but preserve scrolling behavior!
     //the following wxGTK approach is pretty much identical to wxWidgets 2.9 ShowScrollbars() code!
@@ -1765,12 +1791,15 @@ void Grid::showScrollBars(Grid::ScrollBarStatus horizontal, Grid::ScrollBarStatu
     gtk_scrolled_window_set_policy(scrolledWindow,
                                    mapStatus(horizontal),
                                    mapStatus(vertical));
+#elif defined FFS_MAC
+#error function not implemented! Upgrade to wxWidgets 2.9 or newer
 #endif
+#endif
+
     updateWindowSizes();
 }
 
-
-#ifdef FFS_WIN //get rid of scrollbars, but preserve scrolling behavior!
+#if defined FFS_WIN && !wxCHECK_VERSION(2, 9, 0) //support older wxWidgets API
 void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh)
 {
     ScrollBarStatus sbStatus = SB_SHOW_AUTOMATIC;
@@ -1799,8 +1828,9 @@ void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range,
             break;
     }
 }
+#endif
 
-
+#ifdef FFS_WIN //get rid of scrollbars, but preserve scrolling behavior!
 #ifndef WM_MOUSEHWHEEL //MinGW is clueless...
 #define WM_MOUSEHWHEEL                  0x020E
 #endif

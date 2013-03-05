@@ -69,7 +69,7 @@ void addFilterEntry(const Zstring& filtername, std::vector<Zstring>& fileFilter,
 {
     Zstring filterFormatted = filtername;
 
-#ifdef FFS_WIN
+#if defined FFS_WIN || defined FFS_MAC
     //Windows does NOT distinguish between upper/lower-case
     makeUpper(filterFormatted);
 #elif defined FFS_LINUX
@@ -289,7 +289,7 @@ NameFilter::NameFilter(const Zstring& includeFilter, const Zstring& excludeFilte
 
 bool NameFilter::passFileFilter(const Zstring& relFilename) const
 {
-#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
+#if defined FFS_WIN || defined FFS_MAC //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = relFilename;
     makeUpper(nameFormatted);
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
@@ -305,7 +305,7 @@ bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch
 {
     assert(!subObjMightMatch || *subObjMightMatch == true); //check correct usage
 
-#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
+#if defined FFS_WIN || defined FFS_MAC //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = relDirname;
     makeUpper(nameFormatted);
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case

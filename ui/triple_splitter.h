@@ -36,6 +36,8 @@ public:
                    const wxSize& size = wxDefaultSize,
                    long style = 0);
 
+    ~TripleSplitter();
+
     void setupWindows(wxWindow* winL, wxWindow* winC, wxWindow* winR)
     {
         assert(winL->GetParent() == this && winC->GetParent() == this && winR->GetParent() == this && !GetSizer());

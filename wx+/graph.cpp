@@ -13,7 +13,6 @@
 #include "rtl.h"
 
 using namespace zen;
-using namespace numeric;
 
 
 //todo: support zoom via mouse wheel
@@ -21,12 +20,6 @@ using namespace numeric;
 const wxEventType zen::wxEVT_GRAPH_SELECTION = wxNewEventType();
 
 const std::shared_ptr<LabelFormatter> Graph2D::MainAttributes::defaultFormat = std::make_shared<DecimalNumberFormatter>(); //for some buggy reason MSVC isn't able to use a temporary as a default argument
-
-namespace
-{
-inline
-double bestFit(double val, double low, double high) { return val < (high + low) / 2 ? low : high; }
-}
 
 
 double zen::nextNiceNumber(double blockSize) //round to next number which is a convenient to read block size
@@ -36,24 +29,14 @@ double zen::nextNiceNumber(double blockSize) //round to next number which is a c
 
     const double k = std::floor(std::log10(blockSize));
     const double e = std::pow(10, k);
-    if (isNull(e))
+    if (numeric::isNull(e))
         return 0;
     const double a = blockSize / e; //blockSize = a * 10^k with a in (1, 10)
+    assert(1 < a && a < 10);
 
     //have a look at leading two digits: "nice" numbers start with 1, 2, 2.5 and 5
-    if (a <= 2)
-        return bestFit(a, 1, 2) * e;
-    else if (a <= 2.5)
-        return bestFit(a, 2, 2.5) * e;
-    else if (a <= 5)
-        return bestFit(a, 2.5, 5) * e;
-    else if (a < 10)
-        return bestFit(a, 5, 10) * e;
-    else
-    {
-        assert(false);
-        return 10 * e;
-    }
+    const double steps[] = { 1, 2, 2.5, 5, 10 };
+    return e * numeric::nearMatch(a, std::begin(steps), std::end(steps));
 }
 
 
@@ -95,7 +78,7 @@ public:
     ConvertCoord(double valMin, double valMax, size_t screenSize) :
         min_(valMin),
         scaleToReal(screenSize == 0 ? 0 : (valMax - valMin) / screenSize),
-        scaleToScr(isNull((valMax - valMin)) ? 0 : screenSize / (valMax - valMin)) {}
+        scaleToScr(numeric::isNull((valMax - valMin)) ? 0 : screenSize / (valMax - valMin)) {}
 
     double screenToReal(double screenPos) const //input value: [0, screenSize - 1]
     {
@@ -128,7 +111,7 @@ void widenRange(double& valMin, double& valMax, //in/out
     {
         double valRangePerBlock = (valMax - valMin) * optimalBlockSize / graphAreaSize; //proposal
         valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
-        if (!isNull(valRangePerBlock))
+        if (!numeric::isNull(valRangePerBlock))
         {
             valMin = std::floor(valMin / valRangePerBlock) * valRangePerBlock;
             valMax = std::ceil (valMax / valRangePerBlock) * valRangePerBlock;
@@ -319,6 +302,8 @@ struct CurveSamples
 
 void Graph2D::render(wxDC& dc) const
 {
+    using namespace numeric;
+
     const wxRect clientRect = GetClientRect(); //DON'T use wxDC::GetSize()! DC may be larger than visible area!
     {
         //clear complete client area; set label background color

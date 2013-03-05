@@ -18,20 +18,14 @@ class LockHolder
 public:
     LockHolder(const std::vector<Zstring>& dirnamesFmt, //resolved dirname ending with path separator
                ProcessCallback& procCallback,
-               bool allowUserInteraction) : allowUserInteraction_(allowUserInteraction)
+               bool allowUserInteraction)
     {
-        std::vector<Zstring> dirs = dirnamesFmt;
-        vector_remove_if(dirs, [](const Zstring& dir) { return dir.empty(); });
+        std::set<Zstring, LessFilename> existingDirs = getExistingDirsUpdating(dirnamesFmt, allowUserInteraction, procCallback);
 
-        for (auto it = dirs.begin(); it != dirs.end(); ++it)
+        for (auto it = existingDirs.begin(); it != existingDirs.end(); ++it)
         {
             const Zstring& dirnameFmt = *it;
 
-            if (!dirExistsUpdating(dirnameFmt, allowUserInteraction_, procCallback))
-                continue;
-
-            if (lockHolder.find(dirnameFmt) != lockHolder.end())
-                continue;
             assert(endsWith(dirnameFmt, FILE_NAME_SEPARATOR)); //this is really the contract, formatting does other things as well, e.g. macro substitution
 
             class WaitOnLockHandler : public DirLockCallback
@@ -39,7 +33,7 @@ public:
             public:
                 WaitOnLockHandler(ProcessCallback& pc) : pc_(pc) {}
                 virtual void requestUiRefresh() { pc_.requestUiRefresh(); }  //allowed to throw exceptions
-                virtual void reportInfo(const std::wstring& text) { pc_.reportStatus(text); }
+                virtual void reportStatus(const std::wstring& text) { pc_.reportStatus(text); }
             private:
                 ProcessCallback& pc_;
             } callback(procCallback);
@@ -47,8 +41,7 @@ public:
             try
             {
                 //lock file creation is synchronous and may block noticeably for very slow devices (usb sticks, mapped cloud storages)
-                procCallback.forceUiRefresh(); //=> make sure the right folder name is shown on GUI during this time!
-                lockHolder.insert(std::make_pair(dirnameFmt, DirLock(dirnameFmt + Zstr("sync") + LOCK_FILE_ENDING, &callback)));
+                lockHolder.push_back(DirLock(dirnameFmt + Zstr("sync") + LOCK_FILE_ENDING, &callback)); //throw FileError
             }
             catch (const FileError& e)
             {
@@ -59,9 +52,7 @@ public:
     }
 
 private:
-    typedef std::map<Zstring, DirLock, LessFilename> DirnameLockMap;
-    DirnameLockMap lockHolder;
-    const bool allowUserInteraction_;
+    std::vector<DirLock> lockHolder;
 };
 
 }

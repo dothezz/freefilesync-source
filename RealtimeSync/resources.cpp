@@ -6,6 +6,7 @@
 
 #include "resources.h"
 #include <memory>
+#include <zen/utf.h>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 #include <wx/image.h>
@@ -23,7 +24,7 @@ const GlobalResources& GlobalResources::instance()
 
 GlobalResources::GlobalResources()
 {
-    wxFFileInputStream input(toWx(zen::getResourceDir()) + L"Resources.zip");
+    wxFFileInputStream input(utfCvrtTo<wxString>(zen::getResourceDir()) + L"Resources.zip");
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
@@ -49,11 +50,11 @@ GlobalResources::GlobalResources()
 #ifdef FFS_WIN
     //for compatibility it seems we need to stick with a "real" icon
     programIcon = wxIcon(L"A_PROGRAM_ICON");
-#else
-    //use big logo bitmap for better quality
-    programIcon.CopyFromBitmap(getImageInt(L"RealtimeSync.png"));
-#endif
 
+#elif defined FFS_LINUX || defined FFS_MAC
+    //use big logo bitmap for better quality
+    programIcon.CopyFromBitmap(getImageInt(L"RealtimeSync"));
+#endif
 }
 
 

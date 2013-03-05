@@ -2,6 +2,21 @@
 |FreeFileSync|
 --------------
 
+Changelog v5.13
+---------------
+Time out for not existing directories after 10 seconds
+Check directory existence in parallel
+Inform about all missing directories via a single error message
+Show remaining time considering relative error of 10%
+Check for grid icon updates only when needed
+Revised directory lock process detection
+Implemented high resolution icons
+Accessibility: fixed unreadable labels
+Prepared support for new build on Mac OS X
+More polished user interfaces
+Fixed time stamp not being set on NFS/Samba shares (Linux)
+
+
 Changelog v5.12
 ---------------
 Dynamic statistics adjustment during synchronization

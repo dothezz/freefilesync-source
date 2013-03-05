@@ -49,6 +49,8 @@ TripleSplitter::TripleSplitter(wxWindow* parent,
     Connect(wxEVT_LEFT_DCLICK,  wxMouseEventHandler(TripleSplitter::onMouseLeftDouble), nullptr, this);
 }
 
+TripleSplitter::~TripleSplitter() {} //make sure correct destructor gets created for std::unique_ptr<SashMove>
+
 
 void TripleSplitter::updateWindowSizes()
 {

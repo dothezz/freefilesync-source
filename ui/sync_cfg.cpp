@@ -13,6 +13,7 @@
 #include <wx+/no_flicker.h>
 #include <wx+/choice_enum.h>
 #include <wx+/image_tools.h>
+#include <wx+/font_size.h>
 #include "gui_generated.h"
 #include "exec_finished_box.h"
 #include "dir_name.h"
@@ -227,6 +228,13 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     m_bitmapDifferent ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"different" ))));
     m_bitmapConflict  ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"conflict"  ))));
     m_bitmapDatabase  ->SetBitmap(GlobalResources::getImage(L"database"));
+
+    setRelativeFontSize(*m_toggleBtnAutomatic, 1.25);
+    setRelativeFontSize(*m_toggleBtnMirror,    1.25);
+    setRelativeFontSize(*m_toggleBtnUpdate,    1.25);
+    setRelativeFontSize(*m_toggleBtnCustom,    1.25);
+    setRelativeFontSize(*m_staticTextHeaderCategory, 0.90);
+    setRelativeFontSize(*m_staticTextHeaderAction,   0.90);
 
     enumVersioningStyle.
     add(VER_STYLE_ADD_TIMESTAMP, _("Versioning"), _("Append a timestamp to each file name")).

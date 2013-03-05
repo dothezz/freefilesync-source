@@ -20,6 +20,10 @@
 #include "parse_lng.h"
 #include "ffs_paths.h"
 
+#ifdef FFS_MAC
+#include <CoreServices/CoreServices.h>
+#endif
+
 using namespace zen;
 
 
@@ -129,8 +133,8 @@ struct LessTranslation : public std::binary_function<ExistingTranslations::Entry
 {
     bool operator()(const ExistingTranslations::Entry& lhs, const ExistingTranslations::Entry& rhs) const
     {
+        //use a more "natural" sort: ignore case and diacritics
 #ifdef FFS_WIN
-        //use a more "natural" sort, that is ignore case and diacritics
         const int rv = ::CompareString(LOCALE_USER_DEFAULT,      //__in  LCID Locale,
                                        NORM_IGNORECASE,          //__in  DWORD dwCmpFlags,
                                        lhs.languageName.c_str(), //__in  LPCTSTR lpString1,
@@ -141,8 +145,25 @@ struct LessTranslation : public std::binary_function<ExistingTranslations::Entry
             throw std::runtime_error("Error comparing strings!");
         else
             return rv == CSTR_LESS_THAN; //convert to C-style string compare result
-#else
-        return lhs.languageName < rhs.languageName;
+
+#elif defined FFS_LINUX
+        return lhs.languageName.CmpNoCase(rhs.languageName) < 0;
+
+#elif defined FFS_MAC
+        auto allocCFStringRef = [](const wxString& str) -> CFStringRef //output not owned!
+        {
+            return ::CFStringCreateWithCString(nullptr, //CFAllocatorRef alloc,
+            utfCvrtTo<std::string>(str).c_str(), //const char *cStr,
+            kCFStringEncodingUTF8);              //CFStringEncoding encoding
+        };
+
+        CFStringRef langL = allocCFStringRef(lhs.languageName);
+        ZEN_ON_SCOPE_EXIT(::CFRelease(langL));
+
+        CFStringRef langR = allocCFStringRef(rhs.languageName);
+        ZEN_ON_SCOPE_EXIT(::CFRelease(langR));
+
+        return::CFStringCompare(langL, langR, kCFCompareLocalized | kCFCompareCaseInsensitive) == kCFCompareLessThan; //no-fail
 #endif
     }
 };
@@ -405,7 +426,7 @@ void zen::setLanguage(int language) //throw FileError
         catch (lngfile::ParsingError& e)
         {
             throw FileError(replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
-                                                             L"%x", fmtFileName(toZ(languageFile))),
+                                                             L"%x", fmtFileName(utfCvrtTo<Zstring>(languageFile))),
                                                   L"%y", numberTo<std::wstring>(e.row + 1)),
                                        L"%z", numberTo<std::wstring>(e.col + 1)));
         }

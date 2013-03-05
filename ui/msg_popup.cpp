@@ -44,7 +44,6 @@ ErrorDlg::ErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageT
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-
     SetTitle(!caption.empty() ? caption : _("Error"));
     m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"msg_error"));
     m_textCtrlMessage->SetValue(messageText);
@@ -141,12 +140,10 @@ WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& mes
     buttonIgnore(*m_buttonCustom1),
     buttonSwitch(*m_buttonCustom2),
     checkBoxDontShowAgain(*m_checkBoxCustom)
-
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-
     SetTitle(_("Warning"));
     m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"msg_warning"));
     m_textCtrlMessage->SetValue(messageText);
@@ -235,7 +232,6 @@ QuestionDlg::QuestionDlg(wxWindow* parent,
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-
     SetTitle(!caption.empty()? caption : _("Question"));
     m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"msg_question"));
     m_textCtrlMessage->SetValue(messageText);

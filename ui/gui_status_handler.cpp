@@ -7,6 +7,7 @@
 #include "gui_status_handler.h"
 #include <wx/wupdlock.h>
 #include <wx+/shell_execute.h>
+#include <wx+/button.h>
 #include "msg_popup.h"
 #include "main_dlg.h"
 #include "exec_finished_box.h"
@@ -259,13 +260,13 @@ SyncStatusHandler::~SyncStatusHandler()
     if (showFinalResults)
     {
         if (abortIsRequested())
-            syncStatusFrame.processHasFinished(SyncStatus::RESULT_ABORTED, errorLog);  //enable okay and close events
+            syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog);  //enable okay and close events
         else if (totalErrors > 0)
-            syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_ERROR, errorLog);
+            syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog);
         else if (totalWarnings > 0)
-            syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_WARNINGS, errorLog);
+            syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog);
         else
-            syncStatusFrame.processHasFinished(SyncStatus::RESULT_FINISHED_WITH_SUCCESS, errorLog);
+            syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog);
     }
     else
         syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly

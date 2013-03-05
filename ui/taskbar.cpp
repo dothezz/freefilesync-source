@@ -3,18 +3,21 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
-//
+
 #include "taskbar.h"
 
 #ifdef FFS_WIN
-#include <zen/win.h> //includes "windows.h"
 #include <zen/dll.h>
-#include <zen/assert_static.h>
 #include <zen/win_ver.h>
 #include "Taskbar_Seven/taskbar.h"
 
 #elif defined HAVE_UBUNTU_UNITY
 #include <unity/unity/unity.h>
+
+#elif defined FFS_MAC
+#include <zen/basic_math.h>
+#include <zen/string_tools.h>
+#include "osx_dock.h"
 #endif
 
 using namespace zen;
@@ -39,16 +42,13 @@ public:
             throw TaskbarNotAvailable();
     }
 
-    ~Pimpl() { setStatus(STATUS_NOPROGRESS); }
+    ~Pimpl() { setStatus_(assocWindow, tbseven::STATUS_NOPROGRESS); }
 
     void setStatus(Status status)
     {
         TaskBarStatus tbSevenStatus = tbseven::STATUS_NORMAL;
         switch (status)
         {
-            case Taskbar::STATUS_NOPROGRESS:
-                tbSevenStatus = tbseven::STATUS_NOPROGRESS;
-                break;
             case Taskbar::STATUS_INDETERMINATE:
                 tbSevenStatus = tbseven::STATUS_INDETERMINATE;
                 break;
@@ -94,7 +94,7 @@ public:
             throw TaskbarNotAvailable();
     }
 
-    ~Pimpl() { setStatus(STATUS_NOPROGRESS); } //it seems UnityLauncherEntry* does not need destruction
+    ~Pimpl() { setStatus(STATUS_INDETERMINATE); } //it seems UnityLauncherEntry* does not need destruction
 
     void setStatus(Status status)
     {
@@ -104,7 +104,6 @@ public:
                 unity_launcher_entry_set_urgent(tbEntry, true);
                 break;
 
-            case Taskbar::STATUS_NOPROGRESS:
             case Taskbar::STATUS_INDETERMINATE:
                 unity_launcher_entry_set_urgent(tbEntry, false);
                 unity_launcher_entry_set_progress_visible(tbEntry, false);
@@ -116,7 +115,7 @@ public:
                 break;
 
             case Taskbar::STATUS_PAUSED:
-                unity_launcher_entry_set_urgent (tbEntry, false);
+                unity_launcher_entry_set_urgent(tbEntry, false);
                 break;
         }
     }
@@ -130,20 +129,46 @@ private:
     UnityLauncherEntry* tbEntry;
 };
 
+#elif defined FFS_MAC
+class Taskbar::Pimpl
+{
+public:
+    Pimpl(const wxTopLevelWindow& window) {}
 
-#else //no taskbar support yet
+    ~Pimpl() { setDockText(""); }
+
+    void setStatus(Status status) {}
+
+    void setProgress(double fraction)
+    {
+        //no decimal places to make output less noisy
+        setDockText((numberTo<std::string>(numeric::round(fraction * 100.0)) + '%').c_str()); //no need to internationalize fraction!?
+    }
+
+private:
+    void setDockText(const char* str)
+    {
+        try
+        {
+            osx::dockIconSetText(str); //throw OsxError
+        }
+        catch (const osx::OsxError& e) { assert(false); }
+    }
+};
+
+
+#else //no taskbar support
 class Taskbar::Pimpl
 {
 public:
     Pimpl(const wxTopLevelWindow& window) { throw TaskbarNotAvailable(); }
     void setStatus(Status status) {}
     void setProgress(double fraction) {}
-
 };
 #endif
 
-
 //########################################################################################################
+
 Taskbar::Taskbar(const wxTopLevelWindow& window) : pimpl_(new Pimpl(window)) {} //throw TaskbarNotAvailable
 Taskbar::~Taskbar() {}
 

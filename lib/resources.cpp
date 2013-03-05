@@ -10,6 +10,7 @@
 #include <wx/zipstrm.h>
 #include <wx/image.h>
 #include <wx/mstream.h>
+#include <zen/utf.h>
 #include "ffs_paths.h"
 
 using namespace zen;
@@ -45,7 +46,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation& anim)
 
 GlobalResources::GlobalResources()
 {
-    wxFFileInputStream input(toWx(zen::getResourceDir()) + L"Resources.zip");
+    wxFFileInputStream input(utfCvrtTo<wxString>(zen::getResourceDir()) + L"Resources.zip");
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
@@ -57,7 +58,7 @@ GlobalResources::GlobalResources()
         while (true)
         {
             std::unique_ptr<wxZipEntry> entry(resourceFile.GetNextEntry()); //take ownership!
-            if (entry.get() == nullptr)
+            if (!entry)
                 break;
 
             const wxString name = entry->GetName();
@@ -75,9 +76,10 @@ GlobalResources::GlobalResources()
 #ifdef FFS_WIN
     //for compatibility it seems we need to stick with a "real" icon
     programIcon = wxIcon(L"A_PROGRAM_ICON");
-#else
+
+#elif defined FFS_LINUX || defined FFS_MAC
     //use big logo bitmap for better quality
-    programIcon.CopyFromBitmap(getImageInt(L"FreeFileSync.png"));
+    programIcon.CopyFromBitmap(getImageInt(L"FreeFileSync"));
     //attention: this is the reason we need a member getImage -> it must not implicitly create static object instance!!!
     //erroneously calling static object constructor twice will deadlock on Linux!!
 #endif

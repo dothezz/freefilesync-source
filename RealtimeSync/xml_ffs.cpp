@@ -39,7 +39,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
     std::transform(uniqueFolders.begin(), uniqueFolders.end(), std::back_inserter(output.directories),
     [](const Zstring & fn) { return toWx(fn); });
 
-    output.commandline = std::wstring(L"\"") + zen::getLauncher() + L"\"" +
+    output.commandline = std::wstring(L"\"") + zen::getFreeFileSyncLauncher() + L"\"" +
                          L" \"" + filename + L"\"";
 
     return output;

@@ -26,9 +26,8 @@ Usage:
 #define ZEN_CONCAT(X, Y) ZEN_CONCAT_SUB(X, Y)
 
 #define warn_static(TXT) \
-    typedef int STATIC_WARNING __attribute__ ((deprecated)); \
-    enum { ZEN_CONCAT(warn_static_dummy_value, __LINE__) = sizeof(STATIC_WARNING) };
+    typedef int STATIC_WARNING_87903124 __attribute__ ((deprecated)); \
+    enum { ZEN_CONCAT(warn_static_dummy_value, __LINE__) = sizeof(STATIC_WARNING_87903124) };
 #endif
-
 
 #endif //WARN_STATIC_HEADER_08724567834560832745

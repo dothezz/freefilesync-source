@@ -8,14 +8,14 @@
 #define FMT_UNIT_8702184019487324
 
 #include <string>
-#include <zen/string_tools.h>
 #include <zen/int64.h>
+#include <zen/string_tools.h>
 
 namespace zen
 {
 std::wstring filesizeToShortString(Int64 filesize);
-std::wstring remainingTimeToShortString(double timeInSec);
-std::wstring fractionToShortString(double fraction); //within [0, 1]
+std::wstring remainingTimeToString(double timeInSec);
+std::wstring fractionToString(double fraction); //within [0, 1]
 
 template <class NumberType>
 std::wstring toGuiString(NumberType number); //format integer number including thousands separator

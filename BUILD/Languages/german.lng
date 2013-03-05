@@ -1293,8 +1293,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Der Papierkorb ist für die folgenden Pfade nicht verfügbar! Die Dateien werden stattdessen permanent gelöscht:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Dieser Fehler kann ignoriert werden, um den Ordner als leer anzusehen.</target>
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Dieser Fehler kann ignoriert werden, um alle Ordner als leer anzusehen.</target>
 
 <source>Cannot find folder %x.</source>
 <target>Der Ordner %x wurde nicht gefunden.</target>

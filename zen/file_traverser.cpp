@@ -17,7 +17,7 @@
 #include "dll.h"
 #include "FindFilePlus/find_file_plus.h"
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <sys/stat.h>
 #include <dirent.h>
 #endif
@@ -498,8 +498,7 @@ private:
     const DWORD volumeSerial; //may be 0!
 };
 
-
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 class DirTraverser
 {
 public:
@@ -515,7 +514,7 @@ public:
                    the buffer whose address is passed in entry as follows:
                        len = offsetof(struct dirent, d_name) + pathconf(dirpath, _PC_NAME_MAX) + 1
                        entryp = malloc(len); */
-        const long maxPath = std::max<long>(::pathconf(directoryFormatted.c_str(), _PC_NAME_MAX), 10000); //::pathconf may return -1
+        const size_t maxPath = std::max<long>(::pathconf(directoryFormatted.c_str(), _PC_NAME_MAX), 10000); //::pathconf may return long(-1)
         buffer.resize(offsetof(struct ::dirent, d_name) + maxPath + 1);
 
         traverse(directoryFormatted, sink, 0);

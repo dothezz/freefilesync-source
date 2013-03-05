@@ -3,9 +3,9 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.4.1  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20121017;18372400">
+	<META NAME="CHANGED" CONTENT="20130206;20451343">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -23,16 +23,14 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H3 CLASS="western" ALIGN=CENTER><IMG SRC="../img/rtsicon.png" NAME="Grafik6" ALIGN=ABSMIDDLE WIDTH=36 HEIGHT=36 BORDER=0>
-<FONT SIZE=4 STYLE="font-size: 16pt">RealtimeSync<BR></FONT><FONT SIZE=3><I><SPAN STYLE="font-weight: normal">-
-Automated Synchronization -</SPAN></I></FONT></H3>
-<P ALIGN=LEFT><BR><BR>
-</P>
+<H3 CLASS="western" ALIGN=CENTER><IMG SRC="../img/RTS_logo.png" NAME="Grafik6" ALIGN=ABSMIDDLE WIDTH=269 HEIGHT=59 BORDER=0><FONT SIZE=4 STYLE="font-size: 16pt"><BR></FONT><FONT SIZE=3><I><SPAN STYLE="font-weight: normal">Automated
+Synchronization</SPAN></I></FONT></H3>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">RealtimeSync
 is a small tool which executes a command line each time it detects
-changes in one of the monitored directories <SPAN STYLE="font-style: normal"><B>or</B></SPAN>
-a directory becomes available (e. g. insert of a USB-stick). Usually
-this command line will simply trigger a FreeFileSync batch job.</FONT></P>
+changes in one of the monitored directories </FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>or</B></SPAN></FONT>
+<FONT FACE="Tahoma, sans-serif">a directory becomes available (e. g.
+insert of a USB-stick). Usually this command line will simply trigger
+a FreeFileSync batch job.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
@@ -42,15 +40,15 @@ combination with FreeFileSync</FONT></P>
 RealtimeSync.exe located in FreeFileSync's installation directory.
 Then specify all folders that shall be monitored. Instead of doing
 this manually you can import a </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
-<FONT FACE="Tahoma, sans-serif">file via </FONT><FONT FACE="Tahoma, sans-serif"><I>Menu
--&gt; Program -&gt; Open</I></FONT><FONT FACE="Tahoma, sans-serif">.
+<FONT FACE="Tahoma, sans-serif">file via </FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Menu
+&rarr; Program &rarr; Open</B></SPAN></FONT><FONT FACE="Tahoma, sans-serif">.
 This not only extracts all directories relevant for synchronization
 but also sets up the command line to execute the </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
 <FONT FACE="Tahoma, sans-serif">file each time changes are detected.
-Now press &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Start</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
-to begin monitoring.</FONT></P>
+Now press </FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Start</B></SPAN></FONT>
+<FONT FACE="Tahoma, sans-serif">to begin monitoring.</FONT></P>
 <UL>
-	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/RealtimeSync.png" NAME="Grafik3" ALIGN=MIDDLE BORDER=0></P>
+	<P STYLE="margin-bottom: 0cm"><IMG SRC="../img/RealtimeSync.png" NAME="Grafik3" ALIGN=MIDDLE WIDTH=461 HEIGHT=388 BORDER=0></P>
 </UL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
@@ -67,7 +65,7 @@ to begin monitoring.</FONT></P>
 		settings dialog can be skipped by passing a RealtimeSync
 		configuration file (<FONT FACE="Courier New, monospace">*.ffs_real</FONT>)
 		<B>or</B> a FreeFileSync batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
-		as first command-line argument to RealtimeSync.exe. This can be
+		as first command line argument to RealtimeSync.exe. This can be
 		integrated into the operating system's auto start
 		facility:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Courier New, monospace">&quot;C:\Program
 		Files\FreeFileSync\RealtimeSync.exe&quot;
@@ -90,7 +88,7 @@ ffs_batch configuration into the USB stick's root directory and have
 it called when the stick is mounted. Then configure RealtimeSync as
 shown in the following:</FONT></P>
 <UL>
-	<P><IMG SRC="../img/WatchUsbInsert.png" NAME="Grafik2" ALIGN=BOTTOM BORDER=0></P>
+	<P><IMG SRC="../img/WatchUsbInsert.png" NAME="Grafik2" ALIGN=BOTTOM WIDTH=437 HEIGHT=362 BORDER=0></P>
 </UL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
@@ -108,8 +106,9 @@ files are modified in &quot;</FONT><FONT FACE="Courier New, monospace">H:\Data</
 		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note<BR></B></FONT><FONT FACE="Tahoma, sans-serif">The
 		full path of the last changed file and the action that triggered
 		the change notification (create, update or delete) are </FONT><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif">written
-		to the environment variables </FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace">&quot;change_path&quot;</FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif">
-		and </FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace">&quot;change_action&quot;.</FONT></SPAN></P>
+		to the environment variables </FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace"><B>%change_path%</B></FONT></SPAN><SPAN STYLE="text-decoration: none">
+		</SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif">and
+		</FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace"><B>%change_action%</B></FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace">.</FONT></SPAN></P>
 	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
@@ -147,7 +146,7 @@ directories. (Windows)</FONT></P>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Tahoma, sans-serif">Limitations:</FONT></P>
+<P STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Tahoma, sans-serif"><B>Limitations</B>:</FONT></P>
 <UL>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
 	multiple changes happen at the same time, only the name of the first

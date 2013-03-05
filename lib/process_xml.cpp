@@ -75,7 +75,7 @@ void setXmlType(XmlDoc& doc, XmlType type) //throw()
 
 wxString xmlAccess::getGlobalConfigFile()
 {
-    return toWx(zen::getConfigDir()) + L"GlobalSettings.xml";
+    return utfCvrtTo<wxString>(zen::getConfigDir()) + L"GlobalSettings.xml";
 }
 
 
@@ -1177,7 +1177,7 @@ void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlBatchConfig& c
 
 void xmlAccess::readConfig(xmlAccess::XmlGlobalSettings& config)
 {
-    ::readConfig(toZ(getGlobalConfigFile()), XML_TYPE_GLOBAL, config);
+    ::readConfig(utfCvrtTo<Zstring>(getGlobalConfigFile()), XML_TYPE_GLOBAL, config);
 }
 
 
@@ -1448,7 +1448,7 @@ void xmlAccess::writeConfig(const XmlBatchConfig& config, const Zstring& filenam
 
 void xmlAccess::writeConfig(const XmlGlobalSettings& config)
 {
-    ::writeConfig(config, XML_TYPE_GLOBAL, toZ(getGlobalConfigFile())); //throw FfsXmlError
+    ::writeConfig(config, XML_TYPE_GLOBAL, utfCvrtTo<Zstring>(getGlobalConfigFile())); //throw FfsXmlError
 }
 
 

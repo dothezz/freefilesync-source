@@ -11,7 +11,7 @@
 #include "long_path_prefix.h"
 #include "scope_guard.h"
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <sys/stat.h>
 #endif
 
@@ -40,9 +40,9 @@ zen::FileId zen::getFileID(const Zstring& filename)
             return extractFileID(fileInfo);
     }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     struct ::stat fileInfo = {};
-    if (::stat(filename.c_str(), &fileInfo) == 0) //stat() follows symlinks
+    if (::lstat(filename.c_str(), &fileInfo) == 0)
         return extractFileID(fileInfo);
 #endif
 

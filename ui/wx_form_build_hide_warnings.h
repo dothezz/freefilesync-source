@@ -10,8 +10,10 @@
 //pamper over wxFormBuilder "sub-optimal" code
 
 #ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #pragma GCC diagnostic ignored "-Wunused-variable"
+#ifndef __clang__ //clang seems to define __GNUC__, but doesn't support this warning
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
 #elif defined _MSC_VER
 #pragma warning(disable: 4189)

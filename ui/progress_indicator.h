@@ -14,10 +14,10 @@
 #include "main_dlg.h"
 
 
-class CompareStatus
+class CompareProgressDialog
 {
 public:
-    CompareStatus(wxTopLevelWindow& parentWindow); //CompareStatus will be owned by parentWindow!
+    CompareProgressDialog(wxTopLevelWindow& parentWindow); //CompareProgressDialog will be owned by parentWindow!
 
     wxWindow* getAsWindow(); //convenience! don't abuse!
 
@@ -28,22 +28,22 @@ public:
     void updateStatusPanelNow();
 
 private:
-    class CompareStatusImpl;
-    CompareStatusImpl* const pimpl;
+    class Pimpl;
+    Pimpl* const pimpl;
 };
 
 
-class SyncStatus
+class SyncProgressDialog
 {
 public:
-    SyncStatus(zen::AbortCallback& abortCb,
-               const zen::Statistics& syncStat,
-               MainDialog* parentWindow, //may be nullptr
-               bool showProgress,
-               const wxString& jobName,
-               const std::wstring& execWhenFinished,
-               std::vector<std::wstring>& execFinishedHistory); //changing parameter!
-    ~SyncStatus();
+    SyncProgressDialog(zen::AbortCallback& abortCb,
+                       const zen::Statistics& syncStat,
+                       MainDialog* parentWindow, //may be nullptr
+                       bool showProgress,
+                       const wxString& jobName,
+                       const std::wstring& execWhenFinished,
+                       std::vector<std::wstring>& execFinishedHistory); //changing parameter!
+    ~SyncProgressDialog();
 
     wxWindow* getAsWindow(); //convenience! don't abuse!
 
@@ -70,18 +70,18 @@ public:
     void closeWindowDirectly(); //don't wait for user
 
 private:
-    class SyncStatusImpl;
-    SyncStatusImpl* const pimpl;
+    class Pimpl;
+    Pimpl* const pimpl;
 };
 
 
 class PauseTimers
 {
 public:
-    PauseTimers(SyncStatus& ss) : ss_(ss) { ss_.stopTimer(); }
+    PauseTimers(SyncProgressDialog& ss) : ss_(ss) { ss_.stopTimer(); }
     ~PauseTimers() { ss_.resumeTimer(); }
 private:
-    SyncStatus& ss_;
+    SyncProgressDialog& ss_;
 };
 
 

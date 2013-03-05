@@ -7,6 +7,7 @@
 #ifndef EXECUTE_HEADER_23482134578134134
 #define EXECUTE_HEADER_23482134578134134
 
+#include <zen/zstring.h>
 #include <wx/msgdlg.h>
 
 #ifdef FFS_WIN
@@ -16,7 +17,7 @@
 #include <zen/win.h> //includes "windows.h"
 //#include <zen/scope_guard.h>
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
 #include <stdlib.h>
 #include <wx/utils.h>
 #include <wx/log.h>
@@ -82,7 +83,7 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
         ::CloseHandle(execInfo.hProcess);
     }
 
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     if (type == EXEC_TYPE_SYNC)
     {
         //Posix::system - execute a shell command

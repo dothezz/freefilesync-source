@@ -17,7 +17,7 @@ struct DirLockCallback //while waiting for the lock
 {
     virtual ~DirLockCallback() {}
     virtual void requestUiRefresh() = 0;  //allowed to throw exceptions
-    virtual void reportInfo(const std::wstring& text) = 0;
+    virtual void reportStatus(const std::wstring& text) = 0;
 };
 
 /*

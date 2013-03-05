@@ -418,7 +418,7 @@ The command is triggered if:
 <target>Закрыть окно процесса</target>
 
 <source>Standby</source>
-<target>Перейти в оджидание</target>
+<target>Перейти в ожидании</target>
 
 <source>Log off</source>
 <target>Выйти из системы (разлогиниться)</target>

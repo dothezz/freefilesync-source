@@ -57,7 +57,7 @@ private:
     zen::ErrorLog errorLog; //list of non-resolved errors and warnings
     zen::FfsReturnCode& returnCode_;
 
-    SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
+    SyncProgressDialog syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
     std::unique_ptr<zen::FileOutput> logFile; //optional!
 
     const std::wstring jobName_;

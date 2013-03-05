@@ -24,19 +24,25 @@ public:
                  const wxValidator& validator = wxDefaultValidator,
                  const wxString& name         = wxButtonNameStr);
 
-    void setBitmapFront(const wxBitmap& bitmap, size_t spaceAfter = 0); //...and enlarge button if required!
-    void setTextLabel(  const wxString& text);
-    void setBitmapBack( const wxBitmap& bitmap, size_t spaceBefore = 0); //
+    void setBitmapFront(const wxBitmap& bitmap, int spaceAfter = 0); //...and enlarge button if required!
+    void setBitmapBack (const wxBitmap& bitmap, int spaceBefore = 0); //
+
+    void setInnerBorderSize(int sz) { innerBorderSize = sz; refreshButtonLabel(); }
+
+    virtual void SetLabel(const wxString& label);
+
+    void refreshButtonLabel(); //e.g. after font change
 
 private:
     wxBitmap createBitmapFromText(const wxString& text);
-    void refreshButtonLabel();
 
     wxBitmap bitmapFront;
-    unsigned int m_spaceAfter;
-    wxString textLabel;
-    unsigned int m_spaceBefore;
+    int spaceAfter_;
+    ///wxString textLabel;
+    int spaceBefore_;
     wxBitmap bitmapBack;
+
+    int innerBorderSize;
 };
 
 //set bitmap label flicker free!

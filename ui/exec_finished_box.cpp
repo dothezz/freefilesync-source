@@ -52,6 +52,10 @@ std::vector<std::pair<std::wstring, std::wstring>> getDefaultCommands() //(gui n
     //addEntry(_("Hibernate"), L"sudo pm-hibernate");
     //alternative: "pmi action suspend" and "pmi action hibernate", require "sudo apt-get install powermanagement-interaface"
 
+#elif defined FFS_MAC
+    addEntry(_("Standby"  ), L"osascript -e \'tell application \"System Events\" to sleep\'");
+    addEntry(_("Log off"  ), L"osascript -e \'tell application \"System Events\" to log out\'");
+    addEntry(_("Shut down"), L"osascript -e \'tell application \"System Events\" to shut down\'");
 #endif
     return output;
 }

@@ -175,7 +175,7 @@ struct XmlGlobalSettings
             onCompletionHistoryMax(8),
             //deleteOnBothSides(false),
             useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
-#ifdef FFS_WIN
+#if defined FFS_WIN || defined FFS_MAC
             textSearchRespectCase(false),
 #elif defined FFS_LINUX
             textSearchRespectCase(true),
@@ -186,15 +186,17 @@ struct XmlGlobalSettings
         {
             //default external apps will be translated "on the fly"!!! First entry will be used for [Enter] or mouse double-click!
 #ifdef FFS_WIN
-            externelApplications.push_back(std::make_pair(L"Show in Explorer", //mark for extraction: _("Show in Explorer")
-                                                          L"explorer /select, \"%item_path%\""));
-            externelApplications.push_back(std::make_pair(L"Open with default application", //mark for extraction: _("Open with default application")
-                                                          L"\"%item_path%\""));
+            externelApplications.push_back(std::make_pair(L"Show in Explorer",              L"explorer /select, \"%item_path%\""));
+            externelApplications.push_back(std::make_pair(L"Open with default application", L"\"%item_path%\""));
+            //mark for extraction: _("Show in Explorer")
+            //mark for extraction: _("Open with default application")
 #elif defined FFS_LINUX
-            externelApplications.push_back(std::make_pair(L"Browse directory", //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
-                                                          L"xdg-open \"%item_folder%\""));
-            externelApplications.push_back(std::make_pair(L"Open with default application", //mark for extraction: _("Open with default application")
-                                                          L"xdg-open \"%item_path%\""));
+            externelApplications.push_back(std::make_pair(L"Browse directory",              L"xdg-open \"%item_folder%\""));
+            externelApplications.push_back(std::make_pair(L"Open with default application", L"xdg-open \"%item_path%\""));
+            //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
+#elif defined FFS_MAC
+            externelApplications.push_back(std::make_pair(L"Browse directory",              L"open -R \"%item_path%\""));
+            externelApplications.push_back(std::make_pair(L"Open with default application", L"open \"%item_path%\""));
 #endif
         }
 

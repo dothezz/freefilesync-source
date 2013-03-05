@@ -683,7 +683,7 @@ void DeletionHandling::removeDirUpdating(const Zstring& relativeName, Int64 byte
                         throw;
                 }
             }
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
             const bool deleted = recycleOrDelete(fullName); //throw FileError
 #endif
             if (deleted)
@@ -755,7 +755,7 @@ void DeletionHandling::removeFileUpdating(const Zstring& relativeName, Int64 byt
                     }
                 }
             }
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
             deleted = recycleOrDelete(fullName); //throw FileError
 #endif
             break;
@@ -1649,7 +1649,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
                 int objectsReported = 0;
                 auto guardStatistics = makeGuard([&] { procCallback_.updateTotalData(objectsReported, 0); }); //error = unexpected increase of total workload
                 const int objectsExpected = 1;
-				const Int64 bytesExpected = 0;
+                const Int64 bytesExpected = 0;
 
                 getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getObjRelativeName(), bytesExpected, [&] //throw FileError
                 {
@@ -1672,7 +1672,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
             reportInfo(txtOverwritingLink, target);
 
             reportStatus(getDelHandling<sideTrg>().getTxtRemovingSymLink(), linkObj.getFullName<sideTrg>());
-            getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getObjRelativeName(), 0, []{}, linkObj.getLinkType<sideTrg>()); //throw FileError
+            getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getObjRelativeName(), 0, [] {}, linkObj.getLinkType<sideTrg>()); //throw FileError
             linkObj.removeObject<sideTrg>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
 
             reportStatus(txtOverwritingLink, target); //restore status text
@@ -1773,8 +1773,8 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
                 auto guardStatistics = makeGuard([&] { procCallback_.updateTotalData(objectsReported, 0); }); //error = unexpected increase of total workload
                 const SyncStatistics subStats(dirObj); //counts sub-objects only!
                 const int objectsExpected = 1 + getCUD(subStats);
-				const Int64 bytesExpected = subStats.getDataToProcess();
-				assert(bytesExpected == 0);
+                const Int64 bytesExpected = subStats.getDataToProcess();
+                assert(bytesExpected == 0);
 
                 getDelHandling<sideTrg>().removeDirUpdating(dirObj.getObjRelativeName(), bytesExpected, [&] //throw FileError
                 {
@@ -1848,7 +1848,7 @@ struct LessDependentDirectory : public std::binary_function<Zstring, Zstring, bo
 template <SelectedSide side> //create base directories first (if not yet existing) -> no symlink or attribute copying!
 bool createBaseDirectory(BaseDirMapping& baseMap, ProcessCallback& callback) //nothrow; return false if fatal error occurred
 {
-    const Zstring dirname = beforeLast(baseMap.getBaseDirPf<side>(), FILE_NAME_SEPARATOR);
+    const Zstring dirname = beforeLast(baseMap.getBaseDirPf<side>(), FILE_NAME_SEPARATOR); //what about C:\ ???
     if (!dirname.empty())
     {
         if (baseMap.isExisting<side>()) //atomicity: do NOT check directory existence again!
@@ -1857,7 +1857,7 @@ bool createBaseDirectory(BaseDirMapping& baseMap, ProcessCallback& callback) //n
             return tryReportingError([&]
             {
                 if (!dirExistsUpdating(dirname, false, callback))
-                    throw FileError(replaceCpy(_("Cannot find folder %x."), L"%x", fmtFileName(dirname))); //this should really be a "fatal error" if not recoverable
+                    throw FileError(replaceCpy(_("Cannot find %x."), L"%x", fmtFileName(dirname))); //this should really be a "fatal error" if not recoverable
             }, callback); //may throw in error-callback!
         }
         else //create target directory: user presumably ignored error "dir existing" in order to have it created automatically
@@ -1906,11 +1906,27 @@ void zen::synchronize(const TimeComp& timeStamp,
     //specify process and resource handling priorities
     std::unique_ptr<ScheduleForBackgroundProcessing> backgroundPrio;
     if (runWithBackgroundPriority)
-        backgroundPrio = make_unique<ScheduleForBackgroundProcessing>();
+        try
+        {
+            backgroundPrio = make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
+        }
+        catch (const FileError& e)
+        {
+            //not an error in this context
+            callback.reportInfo(e.toString()); //may throw!
+        }
 
     //prevent operating system going into sleep state
-    PreventStandby dummy;
-    (void)dummy;
+    std::unique_ptr<PreventStandby> noStandby;
+    try
+    {
+        noStandby = make_unique<PreventStandby>(); //throw FileError
+    }
+    catch (const FileError& e)
+    {
+        //not an error in this context
+        callback.reportInfo(e.toString()); //may throw!
+    }
 
     //PERF_START;
 
@@ -2146,58 +2162,55 @@ void zen::synchronize(const TimeComp& timeStamp,
     if (statisticsTotal.getConflict() > 0)
     {
         //show the first few conflicts in warning message also:
-        std::wstring warningMessage = _("The following items have unresolved conflicts and will not be synchronized:") + L"\n\n";
+        std::wstring msg = _("The following items have unresolved conflicts and will not be synchronized:");
 
         const auto& conflictMsgs = statisticsTotal.getConflictMessages(); //get *all* sync conflicts
         for (auto it = conflictMsgs.begin(); it != conflictMsgs.end(); ++it)
-            warningMessage += fmtFileName(it->first) + L": " + it->second + L"\n\n";
+            msg += L"\n\n" + fmtFileName(it->first) + L": " + it->second;
 
-        callback.reportWarning(warningMessage, warnings.warningUnresolvedConflicts);
+        callback.reportWarning(msg, warnings.warningUnresolvedConflicts);
     }
 
 
     //check if user accidentally selected wrong directories for sync
     if (!significantDiff.empty())
     {
-        std::wstring warningMessage = _("Significant difference detected:");
+        std::wstring msg = _("Significant difference detected:");
 
         for (auto it = significantDiff.begin(); it != significantDiff.end(); ++it)
-            warningMessage += std::wstring(L"\n\n") +
-                              it->first + L" <-> " + L"\n" +
-                              it->second;
-        warningMessage += L"\n\n";
-        warningMessage += _("More than 50% of the total number of files will be copied or deleted!");
+            msg += std::wstring(L"\n\n") +
+                   it->first + L" <-> " + L"\n" +
+                   it->second;
+        msg += L"\n\n";
+        msg += _("More than 50% of the total number of files will be copied or deleted!");
 
-        callback.reportWarning(warningMessage, warnings.warningSignificantDifference);
+        callback.reportWarning(msg, warnings.warningSignificantDifference);
     }
 
 
     //check for sufficient free diskspace
     if (!diskSpaceMissing.empty())
     {
-        std::wstring warningMessage = _("Not enough free disk space available in:");
+        std::wstring msg = _("Not enough free disk space available in:");
 
         for (auto it = diskSpaceMissing.begin(); it != diskSpaceMissing.end(); ++it)
-            warningMessage += std::wstring(L"\n\n") +
-                              fmtFileName(it->first) + L"\n" +
-                              _("Required:")  + L" " + filesizeToShortString(it->second.first)  + L"\n" +
-                              _("Available:") + L" " + filesizeToShortString(it->second.second);
+            msg += std::wstring(L"\n\n") +
+                   it->first + L"\n" +
+                   _("Required:")  + L" " + filesizeToShortString(it->second.first)  + L"\n" +
+                   _("Available:") + L" " + filesizeToShortString(it->second.second);
 
-        callback.reportWarning(warningMessage, warnings.warningNotEnoughDiskSpace);
+        callback.reportWarning(msg, warnings.warningNotEnoughDiskSpace);
     }
 
-
-    //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
 #ifdef FFS_WIN
+    //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
     if (!recyclMissing.empty())
     {
-        std::wstring warningMessage = _("Recycle Bin is not available for the following paths! Files will be deleted permanently instead:");
-        warningMessage += L"\n";
-
+        std::wstring msg = _("Recycle Bin is not available for the following paths! Files will be deleted permanently instead:") + L"\n";
         std::for_each(recyclMissing.begin(), recyclMissing.end(),
-        [&](const Zstring& path) { warningMessage += L"\n" + utfCvrtTo<std::wstring>(path); });
+        [&](const Zstring& path) { msg += std::wstring(L"\n") + path; });
 
-        callback.reportWarning(warningMessage, warnings.warningRecyclerMissing);
+        callback.reportWarning(msg, warnings.warningRecyclerMissing);
     }
 #endif
 
@@ -2213,10 +2226,11 @@ void zen::synchronize(const TimeComp& timeStamp,
 
     if (!conflictDirs.empty())
     {
-        std::wstring warningMessage = _("A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.") + L"\n";
-        for (auto it = conflictDirs.begin(); it != conflictDirs.end(); ++it)
-            warningMessage += L"\n" + fmtFileName(*it);
-        callback.reportWarning(warningMessage, warnings.warningFolderPairRaceCondition);
+        std::wstring msg = _("A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.") + L"\n";
+        std::for_each(conflictDirs.begin(), conflictDirs.end(),
+        [&](const Zstring& dirname) { msg += std::wstring(L"\n") + dirname; });
+
+        callback.reportWarning(msg, warnings.warningFolderPairRaceCondition);
     }
 
     //-------------------end of basic checks------------------------------------------
@@ -2244,8 +2258,8 @@ void zen::synchronize(const TimeComp& timeStamp,
             makeSameLength(left, right);
 
             callback.reportInfo(_("Synchronizing folder pair:") + L"\n" +
-                                L"    " + left  + fmtFileName(j->getBaseDirPf<LEFT_SIDE >()) + L"\n" +
-                                L"    " + right + fmtFileName(j->getBaseDirPf<RIGHT_SIDE>()));
+                                L"    " + left  + j->getBaseDirPf<LEFT_SIDE >() + L"\n" +
+                                L"    " + right + j->getBaseDirPf<RIGHT_SIDE>());
             //------------------------------------------------------------------------------------------
 
             const size_t folderIndex = j - begin(folderCmp);
@@ -2433,7 +2447,7 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& c
 
 #ifdef FFS_WIN
     wxFile file1(applyLongPathPrefix(source).c_str(), wxFile::read); //don't use buffered file input for verification!
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     wxFile file1(::open(source.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
     if (!file1.IsOpened())
@@ -2441,7 +2455,7 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& c
 
 #ifdef FFS_WIN
     wxFile file2(applyLongPathPrefix(target).c_str(), wxFile::read); //don't use buffered file input for verification!
-#elif defined FFS_LINUX
+#elif defined FFS_LINUX || defined FFS_MAC
     wxFile file2(::open(target.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
     if (!file2.IsOpened()) //NO cleanup necessary for (wxFile) file1

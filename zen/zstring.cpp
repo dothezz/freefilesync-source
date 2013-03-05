@@ -6,92 +6,140 @@
 
 #include "zstring.h"
 #include <stdexcept>
-#include <zen/stl_tools.h>
 
 #ifdef FFS_WIN
 #include "dll.h"
 #include "win_ver.h"
+
+#elif defined FFS_MAC
+#include <ctype.h> //toupper()
 #endif
 
 #ifndef NDEBUG
+#include "thread.h" //includes <boost/thread.hpp>
 #include <iostream>
-#include <cstdlib>
 #endif
 
 using namespace zen;
 
 
 #ifndef NDEBUG
-LeakChecker::~LeakChecker()
-{
-    if (!activeStrings.empty())
-    {
-        std::string leakingStrings;
-
-        int items = 0;
-        for (auto it = activeStrings.begin(); it != activeStrings.end() && items < 20; ++it, ++items)
-            leakingStrings += "\"" + rawMemToString(it->first, it->second) + "\"\n";
-
-        const std::string message = std::string("Memory leak detected!") + "\n\n"
-                                    + "Candidates:\n" + leakingStrings;
-#ifdef FFS_WIN
-        MessageBoxA(nullptr, message.c_str(), "Error", 0);
-#else
-        std::cerr << message;
-        std::abort();
-#endif
-    }
-}
-
-
-LeakChecker& LeakChecker::instance()
-{
-    static LeakChecker inst;
-    return inst;
-}
-
-//caveat: function scope static initialization is not thread-safe in VS 2010! => make sure to call at app start!
 namespace
 {
+class LeakChecker //small test for memory leaks
+{
+public:
+    void insert(const void* ptr, size_t size)
+    {
+        boost::lock_guard<boost::mutex> dummy(lockActStrings);
+        if (activeStrings.find(ptr) != activeStrings.end())
+            reportProblem("Fatal Error: New memory points into occupied space: " + rawMemToString(ptr, size));
+
+        activeStrings[ptr] = size;
+    }
+
+    void remove(const void* ptr)
+    {
+        boost::lock_guard<boost::mutex> dummy(lockActStrings);
+        if (activeStrings.find(ptr) == activeStrings.end())
+            reportProblem("Fatal Error: No memory available for deallocation at this location!");
+
+        activeStrings.erase(ptr);
+    }
+
+    static LeakChecker& instance() { static LeakChecker inst; return inst; }
+
+private:
+    LeakChecker() {}
+    ~LeakChecker()
+    {
+        if (!activeStrings.empty())
+        {
+            std::string leakingStrings;
+
+            int items = 0;
+            for (auto it = activeStrings.begin(); it != activeStrings.end() && items < 20; ++it, ++items)
+                leakingStrings += "\"" + rawMemToString(it->first, it->second) + "\"\n";
+
+            const std::string message = std::string("Memory leak detected!") + "\n\n"
+                                        + "Candidates:\n" + leakingStrings;
+#ifdef FFS_WIN
+            MessageBoxA(nullptr, message.c_str(), "Error", 0);
+#else
+            std::cerr << message;
+            std::abort();
+#endif
+        }
+    }
+
+    LeakChecker(const LeakChecker&);
+    LeakChecker& operator=(const LeakChecker&);
+
+    static std::string rawMemToString(const void* ptr, size_t size)
+    {
+        std::string output(reinterpret_cast<const char*>(ptr), size);
+        vector_remove_if(output, [](char& c) { return c == 0; }); //remove intermediate 0-termination
+        if (output.size() > 100)
+            output.resize(100);
+        return output;
+    }
+
+    void reportProblem(const std::string& message) //throw std::logic_error
+    {
+#ifdef FFS_WIN
+        ::MessageBoxA(nullptr, message.c_str(), "Error", 0);
+#else
+        std::cerr << message;
+#endif
+        throw std::logic_error("Memory leak! " + message);
+    }
+
+    boost::mutex lockActStrings;
+    zen::hash_map<const void*, size_t> activeStrings;
+};
+
+//caveat: function scope static initialization is not thread-safe in VS 2010! => make sure to call at app start!
 const LeakChecker& dummy = LeakChecker::instance();
 }
 
-
-std::string LeakChecker::rawMemToString(const void* ptr, size_t size)
-{
-    std::string output = std::string(reinterpret_cast<const char*>(ptr), size);
-    vector_remove_if(output, [](char& c) { return c == 0; }); //remove intermediate 0-termination
-    if (output.size() > 100)
-        output.resize(100);
-    return output;
-}
-
-
-void LeakChecker::reportProblem(const std::string& message) //throw std::logic_error
-{
-#ifdef FFS_WIN
-    ::MessageBoxA(nullptr, message.c_str(), "Error", 0);
-#else
-    std::cerr << message;
-#endif
-    throw std::logic_error("Memory leak! " + message);
-}
+void z_impl::leakCheckerInsert(const void* ptr, size_t size) { LeakChecker::instance().insert(ptr, size); }
+void z_impl::leakCheckerRemove(const void* ptr             ) { LeakChecker::instance().remove(ptr); }
 #endif //NDEBUG
+
+
+/*
+Perf test: compare strings 10 mio times; 64 bit build
+-----------------------------------------------------
+	string a = "Fjk84$%kgfj$%T\\\\Gffg\\gsdgf\\fgsx----------d-"
+	string b = "fjK84$%kgfj$%T\\\\gfFg\\gsdgf\\fgSy----------dfdf"
+
+Windows (UTF16 wchar_t)
+  4 ns | wcscmp
+ 67 ns | CompareStringOrdinalFunc+ + bIgnoreCase
+314 ns | LCMapString + wmemcmp
+
+OS X (UTF8 char)
+   6 ns | strcmp
+  98 ns | strcasecmp
+ 120 ns | strncasecmp + std::min(sizeLhs, sizeRhs);
+ 856 ns | CFStringCreateWithCString       + CFStringCompare(kCFCompareCaseInsensitive)
+1110 ns | CFStringCreateWithCStringNoCopy + CFStringCompare(kCFCompareCaseInsensitive)
+________________________
+time per call | function
+*/
 
 
 #ifdef FFS_WIN
 namespace
 {
-#ifndef LOCALE_INVARIANT //invariant locale has been introduced with XP
-#define LOCALE_INVARIANT                0x007f
+#ifndef LOCALE_INVARIANT //not known to MinGW
+#define LOCALE_INVARIANT 0x007f
 #endif
-
 
 //warning: LOCALE_INVARIANT is NOT available with Windows 2000, so we have to make yet another distinction...
 const LCID ZSTRING_INVARIANT_LOCALE = zen::winXpOrLater() ?
                                       LOCALE_INVARIANT :
                                       MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT); //see: http://msdn.microsoft.com/en-us/goglobal/bb688122.aspx
-
 
 //try to call "CompareStringOrdinal" for low-level string comparison: unfortunately available not before Windows Vista!
 //by a factor ~3 faster than old string comparison using "LCMapString"
@@ -104,7 +152,7 @@ const SysDllFun<CompareStringOrdinalFunc> compareStringOrdinal = SysDllFun<Compa
 }
 
 
-int z_impl::compareFilenamesWin(const wchar_t* lhs, const wchar_t* rhs, size_t sizeLhs, size_t sizeRhs)
+int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_t sizeLhs, size_t sizeRhs)
 {
     //caveat: function scope static initialization is not thread-safe in VS 2010!
     if (compareStringOrdinal) //this additional test has no noticeable performance impact
@@ -165,26 +213,12 @@ int z_impl::compareFilenamesWin(const wchar_t* lhs, const wchar_t* rhs, size_t s
                     return rv;
             }
         }
-
         return static_cast<int>(sizeLhs) - static_cast<int>(sizeRhs);
     }
-
-    //        const int rv = CompareString(
-    //                           invariantLocale,    //locale independent
-    //                           NORM_IGNORECASE | SORT_STRINGSORT, //comparison-style options
-    //                           a,  	                //pointer to first string
-    //                           aCount,	            //size, in bytes or characters, of first string
-    //                           b,	                //pointer to second string
-    //                           bCount); 	        //size, in bytes or characters, of second string
-    //
-    //        if (rv == 0)
-    //            throw std::runtime_error("Error comparing strings!");
-    //        else
-    //            return rv - 2; //convert to C-style string compare result
 }
 
 
-void z_impl::makeUpperCaseWin(wchar_t* str, size_t size)
+void z_impl::makeFilenameUpperCase(wchar_t* str, size_t size)
 {
     if (size == 0) //LCMapString does not allow input sizes of 0!
         return;
@@ -194,38 +228,10 @@ void z_impl::makeUpperCaseWin(wchar_t* str, size_t size)
         throw std::runtime_error("Error converting to upper case! (LCMapString)");
 }
 
-
-/*
-#include <fstream>
- extern std::wofstream statShared;
-extern std::wofstream statLowCapacity;
-extern std::wofstream statOverwrite;
-
-std::wstring p(ptr);
-p.erase(std::remove(p.begin(), p.end(), L'\n'), p.end());
-p.erase(std::remove(p.begin(), p.end(), L','), p.end());
-
- if (descr(ptr)->refCount > 1)
-    statShared <<
-               minCapacity          << L"," <<
-               descr(ptr)->refCount << L"," <<
-               descr(ptr)->length   << L"," <<
-               descr(ptr)->capacity << L"," <<
-               p << L"\n";
-else if (minCapacity > descr(ptr)->capacity)
-    statLowCapacity <<
-                    minCapacity          << L"," <<
-                    descr(ptr)->refCount << L"," <<
-                    descr(ptr)->length   << L"," <<
-                    descr(ptr)->capacity << L"," <<
-                    p << L"\n";
-else
-    statOverwrite <<
-                  minCapacity          << L"," <<
-                  descr(ptr)->refCount << L"," <<
-                  descr(ptr)->length   << L"," <<
-                  descr(ptr)->capacity << L"," <<
-                  p << L"\n";
-*/
-
-#endif //FFS_WIN
+#elif defined FFS_MAC
+void z_impl::makeFilenameUpperCase(char* str, size_t size)
+{
+    std::for_each(str, str + size, [](char& c) { c = static_cast<char>(::toupper(static_cast<unsigned char>(c))); }); //locale-dependent!
+    //result of toupper() is an unsigned char mapped to int range, so the char representation is in the last 8 bits and we need not care about signedness!
+}
+#endif

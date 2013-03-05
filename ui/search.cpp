@@ -105,7 +105,6 @@ private:
 
 //###########################################################################################
 
-
 template <bool respectCase>
 ptrdiff_t findRow(const Grid& grid, //return -1 if no matching row found
                   const wxString& searchString,
