@@ -75,15 +75,15 @@ BatchDialog::BatchDialog(wxWindow* parent,
 
     m_comboBoxExecFinished->initHistory(onCompletionHistory, onCompletionHistoryMax);
 
-    m_bpButtonHelp  ->SetBitmapLabel(GlobalResources::getImage(L"help"));
-    m_bitmapBatchJob->SetBitmap     (GlobalResources::getImage(L"batch"));
+    m_bpButtonHelp  ->SetBitmapLabel(getResourceImage(L"help"));
+    m_bitmapBatchJob->SetBitmap     (getResourceImage(L"batch"));
 
-    logfileDir = make_unique<DirectoryName<FolderHistoryBox>>(*this, *m_buttonSelectLogfileDir, *m_comboBoxLogfileDir);
+    logfileDir = make_unique<DirectoryName<FolderHistoryBox>>(*this, *m_buttonSelectLogfileDir, *m_logfileDir);
 
     setConfig(batchCfg);
 
     Fit(); //child-element widths have changed: image was set
-    m_panelHeader->Layout();
+    Layout();
 
     m_buttonSave->SetFocus();
 }

@@ -17,7 +17,7 @@ class GlobalResources
 public:
     static const GlobalResources& instance();
 
-    static const wxBitmap& getImage(const wxString& name) { return instance().getImageInt(name); }
+    const wxBitmap& getImage(const wxString& name) const;
 
     //image resource objects
     wxIcon programIcon;
@@ -27,9 +27,10 @@ private:
     GlobalResources(const GlobalResources&); //=delete
     GlobalResources& operator=(const GlobalResources&); //=delete
 
-    const wxBitmap& getImageInt(const wxString& name) const;
-
     std::map<wxString, wxBitmap> bitmaps;
 };
+
+inline
+const wxBitmap& getResourceImage(const wxString& name) { return GlobalResources::instance().getImage(name); }
 
 #endif //RESOURCES_H_INCLUDED_870857342085670826521345

@@ -11,6 +11,15 @@
 
 using namespace zen;
 
+namespace
+{
+void setAsStandard(wxButton& btn)
+{
+    btn.SetDefault();
+    btn.SetFocus();
+}
+}
+
 
 class ErrorDlg : public MessageDlgGenerated
 {
@@ -28,8 +37,8 @@ private:
     void OnButton2(wxCommandEvent& event);
 
     bool* ignoreErrors;
-    wxButton& buttonIgnore;           //
-    wxButton& buttonRetry;            // map generic controls
+    wxButton& buttonRetry;            //
+    wxButton& buttonIgnore;           // map generic controls
     wxCheckBox& checkBoxIgnoreErrors; //
 };
 
@@ -37,21 +46,21 @@ private:
 ErrorDlg::ErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const wxString& caption, bool* ignoreNextErrors) :
     MessageDlgGenerated(parent),
     ignoreErrors(ignoreNextErrors),
-    buttonIgnore(*m_buttonCustom1),
-    buttonRetry (*m_buttonCustom2),
+    buttonRetry (*m_buttonCustom1),
+    buttonIgnore(*m_buttonCustom2),
     checkBoxIgnoreErrors(*m_checkBoxCustom)
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
     SetTitle(!caption.empty() ? caption : _("Error"));
-    m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"msg_error"));
+    m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_error"));
     m_textCtrlMessage->SetValue(messageText);
     checkBoxIgnoreErrors.SetLabel(_("Ignore further errors"));
     buttonIgnore.SetLabel(_("&Ignore"));
     buttonRetry .SetLabel(_("&Retry"));
-    buttonIgnore.SetId(wxID_IGNORE);
-    buttonRetry .SetId(wxID_RETRY);
+    //buttonIgnore.SetId(wxID_IGNORE); -> setting id after button creation breaks "mouse snap to" functionality
+    //buttonRetry .SetId(wxID_RETRY);  -> also wxWidgets docs seem to hide some info: "Normally, the identifier should be provided on creation and should not be modified subsequently."
 
     if (ignoreNextErrors)
         checkBoxIgnoreErrors.SetValue(*ignoreNextErrors);
@@ -72,29 +81,29 @@ ErrorDlg::ErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageT
 
     //set button focus precedence
     if (activeButtons & ReturnErrorDlg::BUTTON_RETRY)
-        buttonRetry.SetFocus();
+        setAsStandard(buttonRetry);
     else if (activeButtons & ReturnErrorDlg::BUTTON_IGNORE)
-        buttonIgnore.SetFocus();
+        setAsStandard(buttonIgnore);
     else if (activeButtons & ReturnErrorDlg::BUTTON_CANCEL)
-        m_buttonCancel->SetFocus();
+        setAsStandard(*m_buttonCancel);
 
     Fit(); //child-element widths have changed: image was set
 }
 
 
-void ErrorDlg::OnButton1(wxCommandEvent& event) //ignore
-{
-    if (ignoreErrors)
-        *ignoreErrors = checkBoxIgnoreErrors.GetValue();
-    EndModal(ReturnErrorDlg::BUTTON_IGNORE);
-}
-
-
-void ErrorDlg::OnButton2(wxCommandEvent& event) //retry
+void ErrorDlg::OnButton1(wxCommandEvent& event) //retry
 {
     if (ignoreErrors)
         *ignoreErrors = checkBoxIgnoreErrors.GetValue();
     EndModal(ReturnErrorDlg::BUTTON_RETRY);
+}
+
+
+void ErrorDlg::OnButton2(wxCommandEvent& event) //ignore
+{
+    if (ignoreErrors)
+        *ignoreErrors = checkBoxIgnoreErrors.GetValue();
+    EndModal(ReturnErrorDlg::BUTTON_IGNORE);
 }
 
 
@@ -145,13 +154,13 @@ WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& mes
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
     SetTitle(_("Warning"));
-    m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"msg_warning"));
+    m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_warning"));
     m_textCtrlMessage->SetValue(messageText);
     checkBoxDontShowAgain.SetLabel(_("Don't show this dialog again"));
     buttonIgnore.SetLabel(_("&Ignore"));
     buttonSwitch.SetLabel(_("&Switch"));
-    buttonIgnore.SetId(wxID_IGNORE);
-    buttonSwitch.SetId(wxID_MORE);
+    //buttonIgnore.SetId(wxID_IGNORE); -> see comment in ErrorDlg
+    //buttonSwitch.SetId(wxID_MORE);
 
     checkBoxDontShowAgain.SetValue(dontShowAgain);
 
@@ -169,9 +178,9 @@ WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& mes
 
     //set button focus precedence
     if (activeButtons & ReturnWarningDlg::BUTTON_IGNORE)
-        buttonIgnore.SetFocus();
+        setAsStandard(buttonIgnore);
     else if (activeButtons & ReturnWarningDlg::BUTTON_CANCEL)
-        m_buttonCancel->SetFocus();
+        setAsStandard(*m_buttonCancel);
 
     Fit(); //child-element widths have changed: image was set
 }
@@ -197,13 +206,13 @@ ReturnWarningDlg::ButtonPressed zen::showWarningDlg(wxWindow* parent, int active
     warningDlg.Raise();
     return static_cast<ReturnWarningDlg::ButtonPressed>(warningDlg.ShowModal());
 }
-//########################################################################################
 
+//########################################################################################
 
 class QuestionDlg : public MessageDlgGenerated
 {
 public:
-    QuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const wxString& caption, const wxString& labelYes, const wxString& labelNo, CheckBox* checkbox);
+    QuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const wxString& caption, const wxString& labelYes, const wxString& labelNo, bool* checkBoxValue, const wxString& checkBoxLabel);
 
 private:
     void OnClose (wxCloseEvent&   event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
@@ -211,7 +220,7 @@ private:
     void OnButton1(wxCommandEvent& event);
     void OnButton2(wxCommandEvent& event);
 
-    CheckBox* checkbox_; //optional
+    bool* checkBoxValue_; //optional
     wxButton& buttonYes; // map generic controls
     wxButton& buttonNo;  //
 };
@@ -223,9 +232,11 @@ QuestionDlg::QuestionDlg(wxWindow* parent,
                          const wxString& caption, //optional
                          const wxString& labelYes,
                          const wxString& labelNo,
-                         CheckBox* checkbox) :
+                         //optional checkbox:
+                         bool* checkBoxValue,
+                         const wxString& checkBoxLabel) :
     MessageDlgGenerated(parent),
-    checkbox_(checkbox),
+    checkBoxValue_(checkBoxValue),
     buttonYes(*m_buttonCustom1),
     buttonNo (*m_buttonCustom2)
 {
@@ -233,17 +244,17 @@ QuestionDlg::QuestionDlg(wxWindow* parent,
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
     SetTitle(!caption.empty()? caption : _("Question"));
-    m_bitmapMsgType->SetBitmap(GlobalResources::getImage(L"msg_question"));
+    m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_question"));
     m_textCtrlMessage->SetValue(messageText);
     buttonYes.SetLabel(!labelYes.empty() ? labelYes : _("&Yes"));
     buttonNo .SetLabel(!labelNo .empty() ? labelNo  : _("&No"));
-    buttonYes.SetId(wxID_YES);
-    buttonNo .SetId(wxID_NO);
+    //buttonYes.SetId(wxID_YES); -> see comment in ErrorDlg
+    //buttonNo .SetId(wxID_NO);
 
-    if (checkbox_)
+    if (checkBoxValue)
     {
-        m_checkBoxCustom->SetValue(checkbox_->value_);
-        m_checkBoxCustom->SetLabel(checkbox_->label_);
+        m_checkBoxCustom->SetValue(*checkBoxValue);
+        m_checkBoxCustom->SetLabel(checkBoxLabel);
     }
     else
         m_checkBoxCustom->Hide();
@@ -259,26 +270,26 @@ QuestionDlg::QuestionDlg(wxWindow* parent,
 
     //set button focus precedence
     if (activeButtons & ReturnQuestionDlg::BUTTON_YES)
-        buttonYes.SetFocus();
-    else if (activeButtons & ReturnQuestionDlg::BUTTON_CANCEL)
-        m_buttonCancel->SetFocus();
+        setAsStandard(buttonYes);
     else if (activeButtons & ReturnQuestionDlg::BUTTON_NO)
-        buttonNo.SetFocus();
+        setAsStandard(buttonNo);
+    else if (activeButtons & ReturnQuestionDlg::BUTTON_CANCEL)
+        setAsStandard(*m_buttonCancel);
 
     Fit(); //child-element widths have changed: image was set
 }
 
 void QuestionDlg::OnButton1(wxCommandEvent& event) //yes
 {
-    if (checkbox_)
-        checkbox_->value_ = m_checkBoxCustom->GetValue();
+    if (checkBoxValue_)
+        *checkBoxValue_ = m_checkBoxCustom->GetValue();
     EndModal(ReturnQuestionDlg::BUTTON_YES);
 }
 
 void QuestionDlg::OnButton2(wxCommandEvent& event) //no
 {
-    if (checkbox_)
-        checkbox_->value_ = m_checkBoxCustom->GetValue();
+    if (checkBoxValue_)
+        *checkBoxValue_ = m_checkBoxCustom->GetValue();
     EndModal(ReturnQuestionDlg::BUTTON_NO);
 }
 
@@ -286,11 +297,9 @@ void QuestionDlg::OnButton2(wxCommandEvent& event) //no
 ReturnQuestionDlg::ButtonPressed zen::showQuestionDlg(wxWindow* parent,
                                                       int activeButtons,
                                                       const wxString& messageText,
-                                                      const wxString& caption, //optional
-                                                      const wxString& labelYes, const wxString& labelNo,
-                                                      CheckBox* checkbox)
+                                                      const QuestConfig& cfg)
 {
-    QuestionDlg qtnDlg(parent, activeButtons, messageText, caption, labelYes, labelNo, checkbox);
+    QuestionDlg qtnDlg(parent, activeButtons, messageText, cfg.caption, cfg.labelYes, cfg.labelNo, cfg.checkBoxValue, cfg.checkBoxLabel);
     qtnDlg.Raise();
     return static_cast<ReturnQuestionDlg::ButtonPressed>(qtnDlg.ShowModal());
 }

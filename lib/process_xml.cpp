@@ -1047,21 +1047,6 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inOpt["PromptSaveConfig"           ](config.optDialogs.popupOnConfigChange);
     inOpt["ConfirmSyncStart"           ](config.optDialogs.confirmSyncStart);
 
-    warn_static("remove after migration?")
-    if (!inOpt)
-    {
-        inOpt = inShared["ShowOptionalDialogs"];
-        inOpt["CheckForDependentFolders"     ](config.optDialogs.warningDependentFolders);
-        inOpt["CheckForMultipleWriteAccess"  ](config.optDialogs.warningFolderPairRaceCondition);
-        inOpt["CheckForSignificantDifference"](config.optDialogs.warningSignificantDifference);
-        inOpt["CheckForFreeDiskSpace"](config.optDialogs.warningNotEnoughDiskSpace);
-        inOpt["CheckForUnresolvedConflicts"](config.optDialogs.warningUnresolvedConflicts);
-        inOpt["NotifyDatabaseError"   ](config.optDialogs.warningDatabaseError);
-        inOpt["CheckMissingRecycleBin"](config.optDialogs.warningRecyclerMissing);
-        inOpt["PopupOnConfigChange"   ](config.optDialogs.popupOnConfigChange);
-        inOpt["SummaryBeforeSync"     ](config.optDialogs.confirmSyncStart);
-    }
-
     //gui specific global settings (optional)
     XmlIn inGui = in["Gui"];
     XmlIn inWnd = inGui["MainDialog"];
@@ -1106,10 +1091,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inWnd["Layout"           ](config.gui.guiPerspectiveLast);
 
     //load config file history
-    warn_static("remove after migration?")
-    if (inGui["LastConfigActive"]) inGui["LastConfigActive"](config.gui.lastUsedConfigFiles);//obsolete name
-    else
-        inGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
+     inGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
 
     inGui["ConfigHistory"](config.gui.cfgFileHistory);
     inGui["ConfigHistory"].attribute("MaxSize", config.gui.cfgFileHistMax);
@@ -1123,18 +1105,6 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 
     //external applications
     inGui["ExternalApplications"](config.gui.externelApplications);
-
-
-    warn_static("remove after migration?")
-    //convert new internal macro naming convention: %name -> %item_path%; %dir -> %item_folder%
-    for (auto it = config.gui.externelApplications.begin(); it != config.gui.externelApplications.end(); ++it)
-    {
-        replace(it->second, L"%nameCo", L"%item2_path%"); //unambiguous "Co" names first
-        replace(it->second, L"%dirCo" , L"%item2_folder%");
-        replace(it->second, L"%name"  , L"%item_path%");
-        replace(it->second, L"%dir"   , L"%item_folder%");
-    }
-
 
     //last update check
     inGui["LastUpdateCheck"](config.gui.lastUpdateCheck);

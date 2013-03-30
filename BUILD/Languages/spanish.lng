@@ -168,8 +168,8 @@
 <pluralform>%x sec</pluralform>
 </source>
 <target>
-<pluralform>1 segundo</pluralform>
-<pluralform>%x segundos</pluralform>
+<pluralform>1 seg</pluralform>
+<pluralform>%x segs</pluralform>
 </target>
 
 <source>Error parsing file %x, row %y, column %z.</source>

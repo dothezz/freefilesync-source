@@ -12,6 +12,7 @@
 #include "win_ver.h"
 
 #elif defined FFS_MAC
+//#include <zen/scope_guard.h>
 #include <ctype.h> //toupper()
 #endif
 
@@ -132,7 +133,7 @@ time per call | function
 #ifdef FFS_WIN
 namespace
 {
-#ifndef LOCALE_INVARIANT //not known to MinGW
+#ifdef __MINGW32__ //MinGW is clueless...
 #define LOCALE_INVARIANT 0x007f
 #endif
 
@@ -169,7 +170,7 @@ int z_impl::compareFilenamesNoCase(const wchar_t* lhs, const wchar_t* rhs, size_
     }
     else //fallback
     {
-        //do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "wei√ü" == "weiss"!!!
+        //do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiﬂ" == "weiss"!!!
         //the only reliable way to compare filenames (with XP) is to call "CharUpper" or "LCMapString":
 
         const auto minSize = static_cast<unsigned int>(std::min(sizeLhs, sizeRhs));
@@ -229,9 +230,16 @@ void z_impl::makeFilenameUpperCase(wchar_t* str, size_t size)
 }
 
 #elif defined FFS_MAC
+int z_impl::compareFilenamesNoCase(const char* lhs, const char* rhs, size_t sizeLhs, size_t sizeRhs)
+{
+    return ::strcasecmp(lhs, rhs); //locale-dependent!
+}
+
+
 void z_impl::makeFilenameUpperCase(char* str, size_t size)
 {
     std::for_each(str, str + size, [](char& c) { c = static_cast<char>(::toupper(static_cast<unsigned char>(c))); }); //locale-dependent!
     //result of toupper() is an unsigned char mapped to int range, so the char representation is in the last 8 bits and we need not care about signedness!
+    //this should work for UTF-8, too: all chars >= 128 are mapped upon themselves!
 }
 #endif

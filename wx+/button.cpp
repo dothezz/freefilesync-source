@@ -71,10 +71,11 @@ void BitmapButton::setBitmapBack(const wxBitmap& bitmap, int spaceBefore)
 }
 
 
+namespace
+{
 void makeWhiteTransparent(wxImage& image) //assume black text on white background
 {
-    unsigned char* alphaFirst = image.GetAlpha();
-    if (alphaFirst)
+    if (unsigned char* alphaFirst = image.GetAlpha())
     {
         unsigned char* alphaLast = alphaFirst + image.GetWidth() * image.GetHeight();
 
@@ -86,11 +87,13 @@ void makeWhiteTransparent(wxImage& image) //assume black text on white backgroun
         for (unsigned char* j = alphaFirst; j != alphaLast; ++j)
         {
             unsigned char r = *bytePos++; //
-            unsigned char g = *bytePos++; //each pixel consists of three chars
+            unsigned char g = *bytePos++; //each pixel consists of three bytes
             unsigned char b = *bytePos++; //
 
             //dist((r,g,b), white)
-            double distColWhite = std::sqrt((255.0 - r) * (255.0 - r) + (255.0 - g) * (255.0 - g) + (255.0 - b) * (255.0 - b));
+            double distColWhite = std::sqrt((255.0 - r) * (255.0 - r) +
+                                            (255.0 - g) * (255.0 - g) +
+                                            (255.0 - b) * (255.0 - b));
 
             //black(0,0,0) becomes fully opaque(255), while white(255,255,255) becomes transparent(0)
             *j = distColWhite / distBlackWhite * wxIMAGE_ALPHA_OPAQUE;
@@ -101,15 +104,15 @@ void makeWhiteTransparent(wxImage& image) //assume black text on white backgroun
 
 wxSize getSizeNeeded(const wxString& text, wxFont& font)
 {
-    const wxString& textFormatted = replaceCpy(text, L"&", L"", false); //remove accelerator
-
     wxCoord width  = 0;
     wxCoord height = 0;
 
-    wxMemoryDC dc;
-    dc.GetMultiLineTextExtent(textFormatted, &width, &height, nullptr, &font);
+    //the context used for bitmaps...
+    wxMemoryDC().GetMultiLineTextExtent(replaceCpy(text, L"&", L"", false),  //remove accelerator
+                                        &width, &height, nullptr, &font);
 
     return wxSize(width, height);
+}
 }
 
 
@@ -134,29 +137,22 @@ wxBitmap BitmapButton::createBitmapFromText(const wxString& text)
         dc.Clear();
 
         //find position of accelerator
-        int indexAccel = -1;
-        wxString textLabelFormatted = text;
-        size_t accelPos = text.find(L"&");
-        if (accelPos != wxString::npos)
-        {
-            replace(textLabelFormatted, L"&", L"", false); //remove accelerator
-            indexAccel = static_cast<int>(accelPos);
-        }
+        const size_t accelPos = text.find(L"&");
+        const int indexAccel = accelPos != wxString::npos ? static_cast<int>(accelPos) : -1;
 
         dc.SetTextForeground(*wxBLACK); //for use in makeWhiteTransparent
         dc.SetTextBackground(*wxWHITE); //
         dc.SetFont(currentFont);
 
-        dc.DrawLabel(textLabelFormatted, wxNullBitmap, wxRect(0, 0, newBitmap.GetWidth(), newBitmap.GetHeight()), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, indexAccel);
+        dc.DrawLabel(replaceCpy(text, L"&", L"", false), //remove accelerator
+                     wxNullBitmap, wxRect(0, 0, newBitmap.GetWidth(), newBitmap.GetHeight()), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, indexAccel);
     }
 
     //add alpha channel to image
     wxImage finalImage(newBitmap.ConvertToImage());
     finalImage.SetAlpha();
 
-    //linearInterpolation(finalImage);
-
-    //calculate values for alpha channel
+    //set values for alpha channel
     makeWhiteTransparent(finalImage);
 
     //now apply real text color
@@ -261,19 +257,11 @@ void writeToImage(const wxImage& source, const wxPoint& pos, wxImage& target)
 }
 
 
-namespace
-{
-inline
-wxSize getSize(const wxBitmap& bmp)
-{
-    return bmp.IsOk() ? wxSize(bmp.GetWidth(), bmp.GetHeight()) : wxSize(0, 0);
-}
-}
-
-
 void BitmapButton::refreshButtonLabel()
 {
     wxBitmap bitmapText = createBitmapFromText(GetLabel());
+
+    auto getSize = [](const wxBitmap& bmp) { return bmp.IsOk() ? wxSize(bmp.GetWidth(), bmp.GetHeight()) : wxSize(0, 0); };
 
     wxSize szFront = getSize(bitmapFront); //
     wxSize szText  = getSize(bitmapText);  //make sure to NOT access null-bitmaps!
@@ -309,7 +297,8 @@ void BitmapButton::refreshButtonLabel()
     wxSize minSize = GetMinSize();
 
     //SetMinSize() instead of SetSize() is needed here for wxWindows layout determination to work corretly
-    wxBitmapButton::SetMinSize(wxSize(std::max(width + 2 * innerBorderSize, minSize.GetWidth()), std::max(height + 2 * innerBorderSize, minSize.GetHeight())));
+    wxBitmapButton::SetMinSize(wxSize(std::max(width  + 2 * innerBorderSize, minSize.GetWidth()),
+                                      std::max(height + 2 * innerBorderSize, minSize.GetHeight())));
 
     //finally set bitmap
     wxBitmapButton::SetBitmapLabel(wxBitmap(transparentImage));

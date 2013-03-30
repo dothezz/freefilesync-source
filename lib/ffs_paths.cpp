@@ -12,7 +12,9 @@
 #ifdef FFS_MAC
 #include <vector>
 #include <zen/scope_guard.h>
-#include <CoreServices/CoreServices.h> //keep in .cpp file to not pollute global namespace! e.g. with UInt64
+#include <zen/osx_string.h>
+//keep in .cpp file to not pollute global namespace! e.g. with UInt64:
+#include <ApplicationServices/ApplicationServices.h> //LSFindApplicationForInfo
 #endif
 
 using namespace zen;
@@ -102,26 +104,11 @@ Zstring zen::getFreeFileSyncLauncher()
 {
 #ifdef FFS_WIN
     return getInstallDir() + Zstr("FreeFileSync.exe");
+
 #elif defined FFS_LINUX
     return getExecutableDir() + Zstr("FreeFileSync");
+
 #elif defined FFS_MAC
-    auto CFStringRefToUtf8 = [](const CFStringRef& cfs) -> Zstring
-    {
-        if (cfs)
-        {
-            CFIndex length = ::CFStringGetLength(cfs);
-            if (length > 0)
-            {
-                CFIndex bufferSize = ::CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
-                std::vector<char> buffer(bufferSize);
-
-                if (::CFStringGetCString(cfs, &buffer[0], bufferSize, kCFStringEncodingUTF8))
-                    return Zstring(&buffer[0]);
-            }
-        }
-        return Zstring();
-    };
-
     CFURLRef appURL = nullptr;
     ZEN_ON_SCOPE_EXIT(if (appURL) ::CFRelease(appURL));
 
@@ -138,7 +125,7 @@ Zstring zen::getFreeFileSyncLauncher()
                 if (CFStringRef path = ::CFURLCopyFileSystemPath(absUrl, kCFURLPOSIXPathStyle))
                 {
                     ZEN_ON_SCOPE_EXIT(::CFRelease(path));
-                    return appendSeparator(CFStringRefToUtf8(path)) + "Contents/MacOS/FreeFileSync";
+                    return appendSeparator(osx::cfStringToZstring(path)) + "Contents/MacOS/FreeFileSync";
                 }
             }
     return Zstr("./FreeFileSync"); //fallback: at least give some hint...

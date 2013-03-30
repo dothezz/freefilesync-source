@@ -5,6 +5,7 @@
 // **************************************************************************
 
 #include "tooltip.h"
+#include <wx/dialog.h>
 #include <wx/stattext.h>
 #include <wx/sizer.h>
 #include <wx/statbmp.h>
@@ -15,23 +16,23 @@
 using namespace zen;
 
 
-class Tooltip::PopupFrameGenerated : public wxFrame
+class Tooltip::PopupDialogGenerated : public wxDialog
 {
 public:
-    PopupFrameGenerated(wxWindow* parent,
-                        wxWindowID id = wxID_ANY,
-                        const wxString& title = wxEmptyString,
-                        const wxPoint& pos = wxDefaultPosition,
-                        const wxSize& size = wxSize( -1, -1 ),
-                        long style = wxFRAME_NO_TASKBAR | wxSTAY_ON_TOP | wxSTATIC_BORDER) : wxFrame(parent, id, title, pos, size, style)
+    PopupDialogGenerated(wxWindow* parent,
+                         wxWindowID id = wxID_ANY,
+                         const wxString& title = wxEmptyString,
+                         const wxPoint& pos = wxDefaultPosition,
+                         const wxSize& size = wxDefaultSize,
+                         long style = 0) : wxDialog(parent, id, title, pos, size, style)
     {
+        //Suse Linux/X11: needs parent window, else there are z-order issues
+
         this->SetSizeHints(wxDefaultSize, wxDefaultSize);
         this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));   //both required: on Ubuntu background is black, foreground white!
         this->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT)); //
 
-        wxBoxSizer* bSizer158;
-        bSizer158 = new wxBoxSizer(wxHORIZONTAL);
-
+        wxBoxSizer* bSizer158 = new wxBoxSizer(wxHORIZONTAL);
         m_bitmapLeft = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0);
         bSizer158->Add(m_bitmapLeft, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 
@@ -41,6 +42,10 @@ public:
         this->SetSizer(bSizer158);
         this->Layout();
         bSizer158->Fit(this);
+
+#if defined FFS_WIN //prevent window stealing focus!
+        Disable(); //= dark/grey text and image on Linux; no visible difference on OS X
+#endif
     }
 
     wxStaticText* m_staticTextMain;
@@ -48,23 +53,11 @@ public:
 };
 
 
-Tooltip::Tooltip() : tipWindow(new PopupFrameGenerated(nullptr))
-{
-#if defined FFS_WIN //prevent window stealing focus!
-    tipWindow->Disable(); //neither looks good nor works at all on Linux; no visible difference on OS X
-#endif
-    hide();
-}
-
-
-Tooltip::~Tooltip()
-{
-    tipWindow->Destroy();
-}
-
-
 void Tooltip::show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp)
 {
+    if (!tipWindow)
+        tipWindow = new PopupDialogGenerated(&parent_); //ownership passed to parent
+
     const wxBitmap& newBmp = bmp ? *bmp : wxNullBitmap;
 
     if (!isEqual(tipWindow->m_bitmapLeft->GetBitmap(), newBmp))
@@ -97,12 +90,14 @@ void Tooltip::show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp)
 
 void Tooltip::hide()
 {
+    if (tipWindow)
+    {
 #ifdef FFS_LINUX
-    //on wxGTK the tip window occassionally goes blank and stays that way. This is somehow triggered by wxWindow::Hide() and doesn't seem to be a wxWidgets bug (=> GTK?)
-    //apply brute force:
-    tipWindow->Destroy();
-    tipWindow = new PopupFrameGenerated(nullptr);
+        //on wxGTK the tooltip is sometimes not shown again after it was hidden: e.g. drag-selection on middle grid
+        tipWindow->Destroy(); //apply brute force:
+        tipWindow = nullptr;  //
+#else
+        tipWindow->Hide();
 #endif
-
-    tipWindow->Hide();
+    }
 }

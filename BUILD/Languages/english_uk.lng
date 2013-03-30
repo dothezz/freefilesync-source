@@ -40,6 +40,9 @@
 <source>Error</source>
 <target>Error</target>
 
+<source>Selected variant:</source>
+<target>Selected variant:</target>
+
 <source>Select alternate comparison settings</source>
 <target>Select alternate comparison settings</target>
 
@@ -97,11 +100,8 @@
 <source>Fatal Error</source>
 <target>Fatal Error</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows Error Code %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Error Code %x:</target>
+<source>Error Code %x:</source>
+<target>Error Code %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Cannot resolve symbolic link %x.</target>
@@ -162,6 +162,9 @@
 
 <source>Cannot set directory lock %x.</source>
 <target>Cannot set directory lock %x.</target>
+
+<source>Creating file %x</source>
+<target>Creating file %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -504,6 +507,18 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>Time elapsed:</target>
 
+<source>Synchronizing...</source>
+<target>Synchronising...</target>
+
+<source>On completion</source>
+<target>On completion</target>
+
+<source>OK</source>
+<target>OK</target>
+
+<source>&Pause</source>
+<target>&Pause</target>
+
 <source>Batch job</source>
 <target>Batch job</target>
 
@@ -533,9 +548,6 @@ The command is triggered if:
 
 <source>Abort synchronization on first error</source>
 <target>Abort synchronisation on first error</target>
-
-<source>On completion</source>
-<target>On completion</target>
 
 <source>Show progress dialog</source>
 <target>Show progress dialogue</target>
@@ -587,9 +599,6 @@ is the same
 
 <source>Symbolic Link handling</source>
 <target>Symbolic Link handling</target>
-
-<source>OK</source>
-<target>OK</target>
 
 <source><- Two way -></source>
 <target><- Two way -></target>
@@ -659,12 +668,6 @@ is the same
 
 <source>Conflict/item cannot be categorized</source>
 <target>Conflict/item cannot be categorised</target>
-
-<source>Synchronizing...</source>
-<target>Synchronising...</target>
-
-<source>&Pause</source>
-<target>&Pause</target>
 
 <source>Source code written in C++ using:</source>
 <target>Source code written in C++ using:</target>
@@ -1251,6 +1254,12 @@ Note: File names must be relative to base directories!
 <source>Cannot set privilege %x.</source>
 <target>Cannot set privilege %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Failed to suspend system sleep mode.</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Cannot change process I/O priorities.</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Unable to move %x to the Recycle Bin!</target>
 
@@ -1293,11 +1302,11 @@ Note: File names must be relative to base directories!
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>You can ignore this error to consider the folder as empty.</target>
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>You can ignore this error to consider each folder as empty.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Cannot find folder %x.</target>
+<source>Cannot find the following folders:</source>
+<target>Cannot find the following folders:</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Directories are dependent! Be careful when setting up synchronisation rules:</target>
@@ -1383,9 +1392,6 @@ Note: File names must be relative to base directories!
 <source>Removing old versions...</source>
 <target>Removing old versions...</target>
 
-<source>Creating file %x</source>
-<target>Creating file %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Creating symbolic link %x</target>
 
@@ -1403,6 +1409,9 @@ Note: File names must be relative to base directories!
 
 <source>Updating attributes of %x</source>
 <target>Updating attributes of %x</target>
+
+<source>Cannot find %x.</source>
+<target>Cannot find %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Target folder %x already existing.</target>

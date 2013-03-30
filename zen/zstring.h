@@ -11,7 +11,7 @@
 #ifdef FFS_LINUX
 #include <cstring> //strcmp
 #elif defined FFS_MAC
-#include <strings.h> //strcasecmp
+//#include <strings.h> //strcasecmp
 #endif
 
 
@@ -101,10 +101,8 @@ Zstring appendSeparator(Zstring path) //support rvalue references!
 //################################# inline implementation ########################################
 namespace z_impl
 {
-#if defined FFS_WIN
-int compareFilenamesNoCase(const Zchar* lhs, const Zchar* rhs, size_t sizeLhs, size_t sizeRhs);
-#endif
 #if defined FFS_WIN || defined FFS_MAC
+int compareFilenamesNoCase(const Zchar* lhs, const Zchar* rhs, size_t sizeLhs, size_t sizeRhs);
 void makeFilenameUpperCase(Zchar* str, size_t size);
 #endif
 }
@@ -113,12 +111,12 @@ void makeFilenameUpperCase(Zchar* str, size_t size);
 template <template <class, class> class SP, class AP> inline
 int cmpFileName(const zen::Zbase<Zchar, SP, AP>& lhs, const zen::Zbase<Zchar, SP, AP>& rhs)
 {
-#if defined FFS_WIN
+#if defined FFS_WIN || defined FFS_MAC
     return z_impl::compareFilenamesNoCase(lhs.data(), rhs.data(), lhs.length(), rhs.length());
 #elif defined FFS_LINUX
     return std::strcmp(lhs.c_str(), rhs.c_str()); //POSIX filenames don't have embedded 0
-#elif defined FFS_MAC
-    return ::strcasecmp(lhs.c_str(), rhs.c_str()); //locale-dependent!
+    //#elif defined FFS_MAC
+    //  return ::strcasecmp(lhs.c_str(), rhs.c_str()); //locale-dependent!
 #endif
 }
 

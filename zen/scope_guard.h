@@ -15,7 +15,7 @@ namespace zen
 {
 //Scope Guard
 /*
-    zen::ScopeGuard lockAio = zen::makeGuard([&]() { ::CancelIo(hDir); });
+    zen::ScopeGuard lockAio = zen::makeGuard([&] { ::CancelIo(hDir); });
 		...
 	lockAio.dismiss();
 */
@@ -33,13 +33,13 @@ public:
 protected:
     ScopeGuardBase() : dismissed_(false) {}
     ScopeGuardBase(ScopeGuardBase&& other) : dismissed_(other.dismissed_) { other.dismiss(); } //take over responsibility
-    ~ScopeGuardBase() {}
+    ~ScopeGuardBase() {} //[!] protected non-virtual base class destructor
 
     bool isDismissed() const { return dismissed_; }
 
 private:
-    ScopeGuardBase(const ScopeGuardBase&); //delete
-    ScopeGuardBase& operator=(const ScopeGuardBase&); // = delete;
+    ScopeGuardBase           (const ScopeGuardBase&); // = delete
+    ScopeGuardBase& operator=(const ScopeGuardBase&); //
 
     bool dismissed_;
 };
@@ -76,6 +76,6 @@ ScopeGuardImpl<typename std::decay<F>::type> makeGuard(F&& fun) { return ScopeGu
 #define ZEN_CONCAT_SUB(X, Y) X ## Y
 #define ZEN_CONCAT(X, Y) ZEN_CONCAT_SUB(X, Y)
 
-#define ZEN_ON_SCOPE_EXIT(X) zen::ScopeGuard ZEN_CONCAT(dummy, __LINE__) = zen::makeGuard([&]{ X; }); (void)ZEN_CONCAT(dummy, __LINE__);
+#define ZEN_ON_SCOPE_EXIT(X) auto ZEN_CONCAT(dummy, __LINE__) = zen::makeGuard([&]{ X; }); (void)ZEN_CONCAT(dummy, __LINE__);
 
 #endif //ZEN_SCOPEGUARD_8971632487321434

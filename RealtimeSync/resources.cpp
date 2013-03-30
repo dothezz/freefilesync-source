@@ -51,14 +51,20 @@ GlobalResources::GlobalResources()
     //for compatibility it seems we need to stick with a "real" icon
     programIcon = wxIcon(L"A_PROGRAM_ICON");
 
-#elif defined FFS_LINUX || defined FFS_MAC
-    //use big logo bitmap for better quality
-    programIcon.CopyFromBitmap(getImageInt(L"RealtimeSync"));
+#elif defined FFS_LINUX
+    programIcon.CopyFromBitmap(getImage(L"RealtimeSync"));
+
+#elif defined FFS_MAC
+    assert(getImage(L"RealtimeSync").GetWidth () == getImage(L"RealtimeSync").GetHeight() &&
+           getImage(L"RealtimeSync").GetWidth() % 128 == 0);
+    //wxWidgets' bitmap to icon conversion on OS X can only deal with very specific sizes
+    programIcon.CopyFromBitmap(getImage(L"RealtimeSync").ConvertToImage().Scale(128, 128, wxIMAGE_QUALITY_HIGH));
 #endif
+
 }
 
 
-const wxBitmap& GlobalResources::getImageInt(const wxString& name) const
+const wxBitmap& GlobalResources::getImage(const wxString& name) const
 {
     auto it = bitmaps.find(!contains(name, L'.') ? //assume .png ending if nothing else specified
                            name + L".png" :

@@ -14,6 +14,7 @@
 MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
     this->SetSizeHints( wxSize( 420,350 ), wxDefaultSize );
+    this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
 
     m_menubar1 = new wxMenuBar( 0 );
     m_menuFile = new wxMenu();
@@ -49,22 +50,10 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 
     bSizerMain = new wxBoxSizer( wxVERTICAL );
 
-    m_panelMain = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panelMain->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-
-    wxBoxSizer* bSizer1;
-    bSizer1 = new wxBoxSizer( wxVERTICAL );
-
-    m_panel5 = new wxPanel( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel5->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-
-    wxBoxSizer* bSizer17;
-    bSizer17 = new wxBoxSizer( wxVERTICAL );
-
     wxBoxSizer* bSizer16;
     bSizer16 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_staticText9 = new wxStaticText( m_panel5, wxID_ANY, _("Usage:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText9 = new wxStaticText( this, wxID_ANY, _("Usage:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText9->Wrap( -1 );
     m_staticText9->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
@@ -73,15 +62,15 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     wxBoxSizer* bSizer15;
     bSizer15 = new wxBoxSizer( wxVERTICAL );
 
-    m_staticText3 = new wxStaticText( m_panel5, wxID_ANY, _("1. Select folders to watch."), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText3 = new wxStaticText( this, wxID_ANY, _("1. Select folders to watch."), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText3->Wrap( -1 );
     bSizer15->Add( m_staticText3, 0, wxLEFT, 10 );
 
-    m_staticText4 = new wxStaticText( m_panel5, wxID_ANY, _("2. Enter a command line."), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText4 = new wxStaticText( this, wxID_ANY, _("2. Enter a command line."), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText4->Wrap( -1 );
     bSizer15->Add( m_staticText4, 0, wxLEFT, 10 );
 
-    m_staticText5 = new wxStaticText( m_panel5, wxID_ANY, _("3. Press 'Start'."), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText5 = new wxStaticText( this, wxID_ANY, _("3. Press 'Start'."), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText5->Wrap( -1 );
     bSizer15->Add( m_staticText5, 0, wxLEFT, 10 );
 
@@ -89,22 +78,22 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     bSizer16->Add( bSizer15, 0, wxTOP|wxLEFT, 5 );
 
 
-    bSizer17->Add( bSizer16, 0, 0, 5 );
+    bSizerMain->Add( bSizer16, 0, 0, 5 );
 
-    m_staticText811 = new wxStaticText( m_panel5, wxID_ANY, _("To get started just import a .ffs_batch file."), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText811 = new wxStaticText( this, wxID_ANY, _("To get started just import a .ffs_batch file."), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText811->Wrap( -1 );
     m_staticText811->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_GRAYTEXT ) );
 
-    bSizer17->Add( m_staticText811, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizerMain->Add( m_staticText811, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
+    m_staticline2 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    bSizerMain->Add( m_staticline2, 0, wxEXPAND, 5 );
 
-    m_panel5->SetSizer( bSizer17 );
-    m_panel5->Layout();
-    bSizer17->Fit( m_panel5 );
-    bSizer1->Add( m_panel5, 0, wxEXPAND, 5 );
+    m_panelMain = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panelMain->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
-    m_staticline2 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    bSizer1->Add( m_staticline2, 0, wxEXPAND, 5 );
+    wxBoxSizer* bSizer1;
+    bSizer1 = new wxBoxSizer( wxVERTICAL );
 
     m_staticText7 = new wxStaticText( m_panelMain, wxID_ANY, _("Folders to watch"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText7->Wrap( -1 );
@@ -205,38 +194,20 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 
     bSizer1->Add( m_textCtrlCommand, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 
-    m_staticline5 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    bSizer1->Add( m_staticline5, 0, wxEXPAND, 5 );
-
-    m_panel4 = new wxPanel( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel4->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-
-    wxBoxSizer* bSizer141;
-    bSizer141 = new wxBoxSizer( wxHORIZONTAL );
-
-
-    bSizer141->Add( 0, 0, 1, wxEXPAND, 5 );
-
-    m_buttonStart = new zen::BitmapButton( m_panel4, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-    m_buttonStart->SetDefault();
-    m_buttonStart->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
-
-    bSizer141->Add( m_buttonStart, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
-
-
-    bSizer141->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    m_panel4->SetSizer( bSizer141 );
-    m_panel4->Layout();
-    bSizer141->Fit( m_panel4 );
-    bSizer1->Add( m_panel4, 0, wxEXPAND, 5 );
-
 
     m_panelMain->SetSizer( bSizer1 );
     m_panelMain->Layout();
     bSizer1->Fit( m_panelMain );
     bSizerMain->Add( m_panelMain, 1, wxEXPAND, 5 );
+
+    m_staticline5 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    bSizerMain->Add( m_staticline5, 0, wxEXPAND, 5 );
+
+    m_buttonStart = new zen::BitmapButton( this, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    m_buttonStart->SetDefault();
+    m_buttonStart->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+
+    bSizerMain->Add( m_buttonStart, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
 
 
     this->SetSizer( bSizerMain );
@@ -247,7 +218,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MainDlgGenerated::OnClose ) );
     this->Connect( m_menuItem13->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnConfigLoad ) );
     this->Connect( m_menuItem14->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnConfigSave ) );
-    this->Connect( m_menuItem4->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnQuit ) );
+    this->Connect( m_menuItem4->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnMenuQuit ) );
     this->Connect( m_menuItemContent->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnShowHelp ) );
     this->Connect( m_menuItemAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnMenuAbout ) );
     m_bpButtonAddFolder->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDlgGenerated::OnAddFolder ), NULL, this );
@@ -261,7 +232,7 @@ MainDlgGenerated::~MainDlgGenerated()
     this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MainDlgGenerated::OnClose ) );
     this->Disconnect( wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnConfigLoad ) );
     this->Disconnect( wxID_SAVEAS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnConfigSave ) );
-    this->Disconnect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnQuit ) );
+    this->Disconnect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnMenuQuit ) );
     this->Disconnect( wxID_HELP, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnShowHelp ) );
     this->Disconnect( wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDlgGenerated::OnMenuAbout ) );
     m_bpButtonAddFolder->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDlgGenerated::OnAddFolder ), NULL, this );
@@ -302,58 +273,54 @@ FolderGenerated::~FolderGenerated()
 ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
     this->SetSizeHints( wxSize( 300,160 ), wxDefaultSize );
-    this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+    this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
 
     wxBoxSizer* bSizer24;
     bSizer24 = new wxBoxSizer( wxVERTICAL );
 
+    m_panel3 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panel3->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
 
-    bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
+    wxBoxSizer* bSizer16;
+    bSizer16 = new wxBoxSizer( wxVERTICAL );
+
+
+    bSizer16->Add( 0, 10, 0, wxEXPAND, 5 );
 
     wxBoxSizer* bSizer26;
     bSizer26 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_bitmap10 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
-    bSizer26->Add( m_bitmap10, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+    m_bitmap10 = new wxStaticBitmap( m_panel3, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    bSizer26->Add( m_bitmap10, 0, wxRIGHT|wxLEFT, 5 );
 
-    m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400,150 ), wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
+    m_textCtrl8 = new wxTextCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400,150 ), wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
     m_textCtrl8->SetMaxLength( 0 );
     bSizer26->Add( m_textCtrl8, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer24->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+    bSizer16->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+
+
+    m_panel3->SetSizer( bSizer16 );
+    m_panel3->Layout();
+    bSizer16->Fit( m_panel3 );
+    bSizer24->Add( m_panel3, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 
     m_staticline2 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizer24->Add( m_staticline2, 0, wxEXPAND, 5 );
 
-    m_panel3 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-    m_panel3->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-
     wxBoxSizer* bSizer13;
     bSizer13 = new wxBoxSizer( wxHORIZONTAL );
 
-
-    bSizer13->Add( 0, 0, 1, wxEXPAND, 5 );
-
-    m_buttonRetry = new wxButton( m_panel3, wxID_RETRY, _("&Retry"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+    m_buttonRetry = new wxButton( this, wxID_RETRY, _("&Retry"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     m_buttonRetry->SetDefault();
-    m_buttonRetry->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
-
     bSizer13->Add( m_buttonRetry, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_buttonAbort = new wxButton( m_panel3, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-    m_buttonAbort->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
-
+    m_buttonAbort = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
     bSizer13->Add( m_buttonAbort, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
 
-    bSizer13->Add( 0, 0, 1, wxEXPAND, 5 );
-
-
-    m_panel3->SetSizer( bSizer13 );
-    m_panel3->Layout();
-    bSizer13->Fit( m_panel3 );
-    bSizer24->Add( m_panel3, 0, wxEXPAND, 5 );
+    bSizer24->Add( bSizer13, 0, wxALIGN_RIGHT, 5 );
 
 
     this->SetSizer( bSizer24 );

@@ -202,7 +202,9 @@ private:
 
     void redirectRowLabelEvent(wxMouseEvent& event);
 
-#if defined FFS_WIN && !wxCHECK_VERSION(2, 9, 0)
+    virtual wxSize GetSizeAvailableForScrollTarget(const wxSize& size); //required since wxWidgets 2.9 if SetTargetWindow() is used
+
+#if defined FFS_WIN || defined FFS_MAC
     virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh); //get rid of scrollbars, but preserve scrolling behavior!
 #endif
 

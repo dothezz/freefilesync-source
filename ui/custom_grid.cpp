@@ -170,7 +170,7 @@ public:
 
     void setIconManager(const std::shared_ptr<IconManager>& iconMgr) { iconMgr_ = iconMgr; }
 
-    void updateNewAndGetMissingIcons(std::vector<Zstring>& newLoad) //loads all (not yet) drawn icons
+    void updateNewAndGetMissingIcons(std::list<Zstring>& newLoad) //loads all (not yet) drawn icons
     {
         //don't check too often! give worker thread some time to fetch data
         if (iconMgr_)
@@ -190,18 +190,18 @@ public:
 
                 if (isFailedLoad(currentRow)) //find failed attempts to load icon
                 {
-                    const Zstring fileName = getIconFile(currentRow);
-                    if (!fileName.empty())
+                    const Zstring filename = getIconFile(currentRow);
+                    if (!filename.empty() && filename != ICON_FILE_FOLDER)
                     {
                         //test if they are already loaded in buffer:
-                        if (iconMgr_->refIconBuffer().requestFileIcon(fileName))
+                        if (iconMgr_->refIconBuffer().readyForRetrieval(filename))
                         {
                             //do a *full* refresh for *every* failed load to update partial DC updates while scrolling
                             refreshCell(refGrid(), currentRow, static_cast<ColumnType>(COL_TYPE_FILENAME));
                             setFailedLoad(currentRow, false);
                         }
                         else //not yet in buffer: mark for async. loading
-                            newLoad.push_back(fileName);
+                            newLoad.push_back(filename);
                     }
                 }
             }
@@ -496,45 +496,36 @@ private:
                 //  | gap | icon | gap | text |
                 //   --------------------------
 
-                const Zstring fileName = getIconFile(row);
-                if (!fileName.empty())
+                const Zstring filename = getIconFile(row);
+                if (!filename.empty())
                 {
-                    wxIcon icon;
+                    wxBitmap fileIcon;
 
                     //first check if it is a directory icon:
-                    if (fileName == ICON_FILE_FOLDER)
-                        icon = iconMgr_->refIconBuffer().genericDirIcon();
+                    if (filename == ICON_FILE_FOLDER)
+                        fileIcon = iconMgr_->refIconBuffer().genericDirIcon();
                     else //retrieve file icon
                     {
-                        if (!iconMgr_->refIconBuffer().requestFileIcon(fileName, &icon)) //returns false if icon is not in buffer
+                        if (Opt<wxBitmap> tmpIco = iconMgr_->refIconBuffer().retrieveFileIcon(filename))
+                            fileIcon = *tmpIco;
+                        else
                         {
-                            icon = iconMgr_->refIconBuffer().genericFileIcon(); //better than nothing
+                            fileIcon = iconMgr_->refIconBuffer().genericFileIcon(); //better than nothing
                             setFailedLoad(row, true); //save status of failed icon load -> used for async. icon loading
                             //falsify only! we want to avoid writing incorrect success values when only partially updating the DC, e.g. when scrolling,
                             //see repaint behavior of ::ScrollWindow() function!
                         }
                     }
 
-                    if (icon.IsOk())
+                    if (fileIcon.IsOk())
                     {
-                        //center icon if it is too small
-                        const int posX = rectTmp.GetX() + std::max(0, (iconSize - icon.GetWidth()) / 2);
-                        const int posY = rectTmp.GetY() + std::max(0, (rectTmp.GetHeight() - icon.GetHeight()) / 2);
-
-                        drawIconRtlNoMirror(dc, icon, wxPoint(posX, posY), buffer);
-
-                        //convert icon to greyscale if row is not active
-                        if (!isActive)
-                        {
-                            wxBitmap bmp(icon.GetWidth(), icon.GetHeight());
-                            wxMemoryDC memDc(bmp);
-                            memDc.Blit(0, 0, icon.GetWidth(), icon.GetHeight(), &dc, posX, posY); //blit in
-
-                            bmp = wxBitmap(bmp.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)); //treat all channels equally!
-                            memDc.SelectObject(bmp);
-
-                            dc.Blit(posX, posY, icon.GetWidth(), icon.GetHeight(), &memDc, 0, 0); //blit out
-                        }
+                        wxRect rectIcon = rectTmp;
+                        rectIcon.width = iconSize; //support small thumbnail centering
+                        if (isActive)
+                            drawBitmapRtlNoMirror(dc, fileIcon, rectIcon, wxALIGN_CENTER, buffer);
+                        else
+                            drawBitmapRtlNoMirror(dc, wxBitmap(fileIcon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)), //treat all channels equally!
+                                                  rectIcon, wxALIGN_CENTER, buffer);
                     }
                 }
             }
@@ -618,7 +609,7 @@ private:
             {
                 if (colType == static_cast<ColumnType>(sortInfo->type_) && (side == LEFT_SIDE) == sortInfo->onLeft_)
                 {
-                    const wxBitmap& marker = GlobalResources::getImage(sortInfo->ascending_ ? L"sortAscending" : L"sortDescending");
+                    const wxBitmap& marker = getResourceImage(sortInfo->ascending_ ? L"sortAscending" : L"sortDescending");
                     wxPoint markerBegin = rectInside.GetTopLeft() + wxPoint((rectInside.width - marker.GetWidth()) / 2, 0);
                     dc.DrawBitmap(marker, markerBegin, true); //respect 2-pixel gap
                 }
@@ -786,7 +777,8 @@ class GridDataMiddle : public GridDataBase
 public:
     GridDataMiddle(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) :
         GridDataBase(grid, gridDataView),
-        showSyncAction_(true) {}
+        showSyncAction_(true),
+        toolTip(grid) {} //tool tip must not live longer than grid!
 
     void onSelectBegin(const wxPoint& clientPos, size_t row, ColumnType colType)
     {
@@ -928,9 +920,9 @@ private:
                     const BlockPosition highlightBlock = dragSelection ? dragSelection->second       : highlight ? highlight->blockPos_ : BLOCKPOS_CHECK_BOX;
 
                     if (rowHighlighted && highlightBlock == BLOCKPOS_CHECK_BOX)
-                        drawBitmapRtlMirror(dc, GlobalResources::getImage(fsObj->isActive() ? L"checkboxTrueFocus" : L"checkboxFalseFocus"), checkBoxArea, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrueFocus" : L"checkboxFalseFocus"), checkBoxArea, wxALIGN_CENTER, buffer);
                     else //default
-                        drawBitmapRtlMirror(dc, GlobalResources::getImage(fsObj->isActive() ? L"checkboxTrue"      : L"checkboxFalse"     ), checkBoxArea, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrue"      : L"checkboxFalse"     ), checkBoxArea, wxALIGN_CENTER, buffer);
 
                     rectInside.width -= CHECK_BOX_IMAGE;
                     rectInside.x += CHECK_BOX_IMAGE;
@@ -978,8 +970,8 @@ private:
                 wxRect rectInside = drawColumnLabelBorder(dc, rect);
                 drawColumnLabelBackground(dc, rectInside, highlighted);
 
-                const wxBitmap& cmpIcon  = GlobalResources::getImage(L"compareSmall");
-                const wxBitmap& syncIcon = GlobalResources::getImage(L"syncSmall");
+                const wxBitmap& cmpIcon  = getResourceImage(L"compareSmall");
+                const wxBitmap& syncIcon = getResourceImage(L"syncSmall");
 
                 const int space = 8;
                 const int imageWidthTotal = cmpIcon.GetWidth() + space + syncIcon.GetWidth();
@@ -1149,7 +1141,7 @@ private:
                     assert(false);
                     return L"";
                 }();
-                const auto& img = mirrorIfRtl(GlobalResources::getImage(imageName));
+                const auto& img = mirrorIfRtl(getResourceImage(imageName));
                 toolTip.show(getSyncOpDescription(*fsObj), posScreen, &img);
             }
             else
@@ -1178,7 +1170,7 @@ private:
                     assert(false);
                     return L"";
                 }();
-                const auto& img = mirrorIfRtl(GlobalResources::getImage(imageName));
+                const auto& img = mirrorIfRtl(getResourceImage(imageName));
                 toolTip.show(getCategoryDescription(*fsObj), posScreen, &img);
             }
         }
@@ -1199,7 +1191,7 @@ private:
     std::unique_ptr<MouseHighlight> highlight; //current mouse highlight
     std::unique_ptr<std::pair<size_t, BlockPosition>> dragSelection; //(row, block)
     std::unique_ptr<wxBitmap> buffer; //avoid costs of recreating this temporal variable
-    zen::Tooltip toolTip;
+    Tooltip toolTip;
 };
 
 //########################################################################################################
@@ -1248,10 +1240,14 @@ public:
             grid.Connect(wxEVT_SCROLLWIN_PAGEUP,     func, nullptr, this);
             grid.Connect(wxEVT_SCROLLWIN_PAGEDOWN,   func, nullptr, this);
             grid.Connect(wxEVT_SCROLLWIN_THUMBTRACK, func, nullptr, this);
-
-            grid.getMainWin().Connect(wxEVT_SET_FOCUS, func, nullptr, this);
-            //on wxEVT_KILL_FOCUS, there's no need to reset "scrollMaster"
-
+            //wxEVT_KILL_FOCUS -> there's no need to reset "scrollMaster"
+            //wxEVT_SET_FOCUS -> not good enough:
+            //e.g.: left grid has input, right grid is "scrollMaster" due to dragging scroll thumb via mouse.
+            //=> Next keyboard input on left does *not* emit focus change event, but still "scrollMaster" needs to change
+            //=> hook keyboard input instead of focus event:
+            grid.getMainWin().Connect(wxEVT_CHAR,     func, nullptr, this);
+            grid.getMainWin().Connect(wxEVT_KEY_UP,   func, nullptr, this);
+            grid.getMainWin().Connect(wxEVT_KEY_DOWN, func, nullptr, this);
         };
         connectGridAccess(gridL_, wxEventHandler(GridEventManager::onGridAccessL));
         connectGridAccess(gridC_, wxEventHandler(GridEventManager::onGridAccessC));
@@ -1556,7 +1552,7 @@ private:
 
     void loadIconsAsynchronously(wxEvent& event) //loads all (not yet) drawn icons
     {
-        std::vector<Zstring> newLoad;
+        std::list<Zstring> newLoad;
         provLeft_ .updateNewAndGetMissingIcons(newLoad);
         provRight_.updateNewAndGetMissingIcons(newLoad);
         iconBuffer_.setWorkload(newLoad);
@@ -1651,35 +1647,35 @@ wxBitmap zen::getSyncOpImage(SyncOperation syncOp)
     switch (syncOp) //evaluate comparison result and sync direction
     {
         case SO_CREATE_NEW_LEFT:
-            return GlobalResources::getImage(L"createLeftSmall");
+            return getResourceImage(L"createLeftSmall");
         case SO_CREATE_NEW_RIGHT:
-            return GlobalResources::getImage(L"createRightSmall");
+            return getResourceImage(L"createRightSmall");
         case SO_DELETE_LEFT:
-            return GlobalResources::getImage(L"deleteLeftSmall");
+            return getResourceImage(L"deleteLeftSmall");
         case SO_DELETE_RIGHT:
-            return GlobalResources::getImage(L"deleteRightSmall");
+            return getResourceImage(L"deleteRightSmall");
         case SO_MOVE_LEFT_SOURCE:
-            return GlobalResources::getImage(L"moveLeftSourceSmall");
+            return getResourceImage(L"moveLeftSourceSmall");
         case SO_MOVE_LEFT_TARGET:
-            return GlobalResources::getImage(L"moveLeftTargetSmall");
+            return getResourceImage(L"moveLeftTargetSmall");
         case SO_MOVE_RIGHT_SOURCE:
-            return GlobalResources::getImage(L"moveRightSourceSmall");
+            return getResourceImage(L"moveRightSourceSmall");
         case SO_MOVE_RIGHT_TARGET:
-            return GlobalResources::getImage(L"moveRightTargetSmall");
+            return getResourceImage(L"moveRightTargetSmall");
         case SO_OVERWRITE_RIGHT:
-            return GlobalResources::getImage(L"updateRightSmall");
+            return getResourceImage(L"updateRightSmall");
         case SO_COPY_METADATA_TO_RIGHT:
-            return GlobalResources::getImage(L"moveRightSmall");
+            return getResourceImage(L"moveRightSmall");
         case SO_OVERWRITE_LEFT:
-            return GlobalResources::getImage(L"updateLeftSmall");
+            return getResourceImage(L"updateLeftSmall");
         case SO_COPY_METADATA_TO_LEFT:
-            return GlobalResources::getImage(L"moveLeftSmall");
+            return getResourceImage(L"moveLeftSmall");
         case SO_DO_NOTHING:
-            return GlobalResources::getImage(L"noneSmall");
+            return getResourceImage(L"noneSmall");
         case SO_EQUAL:
-            return GlobalResources::getImage(L"equalSmall");
+            return getResourceImage(L"equalSmall");
         case SO_UNRESOLVED_CONFLICT:
-            return GlobalResources::getImage(L"conflictSmall");
+            return getResourceImage(L"conflictSmall");
     }
     return wxNullBitmap;
 }
@@ -1690,20 +1686,20 @@ wxBitmap zen::getCmpResultImage(CompareFilesResult cmpResult)
     switch (cmpResult)
     {
         case FILE_LEFT_SIDE_ONLY:
-            return GlobalResources::getImage(L"leftOnlySmall");
+            return getResourceImage(L"leftOnlySmall");
         case FILE_RIGHT_SIDE_ONLY:
-            return GlobalResources::getImage(L"rightOnlySmall");
+            return getResourceImage(L"rightOnlySmall");
         case FILE_LEFT_NEWER:
-            return GlobalResources::getImage(L"leftNewerSmall");
+            return getResourceImage(L"leftNewerSmall");
         case FILE_RIGHT_NEWER:
-            return GlobalResources::getImage(L"rightNewerSmall");
+            return getResourceImage(L"rightNewerSmall");
         case FILE_DIFFERENT:
-            return GlobalResources::getImage(L"differentSmall");
+            return getResourceImage(L"differentSmall");
         case FILE_EQUAL:
         case FILE_DIFFERENT_METADATA: //= sub-category of equal
-            return GlobalResources::getImage(L"equalSmall");
+            return getResourceImage(L"equalSmall");
         case FILE_CONFLICT:
-            return GlobalResources::getImage(L"conflictSmall");
+            return getResourceImage(L"conflictSmall");
     }
     return wxNullBitmap;
 }

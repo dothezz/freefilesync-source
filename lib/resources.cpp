@@ -27,7 +27,7 @@ namespace
 {
 void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation& anim)
 {
-    //Workaround for wxWidgets:
+    //work around wxWidgets bug:
     //construct seekable input stream (zip-input stream is non-seekable) for wxAnimation::Load()
     //luckily this method call is very fast: below measurement precision!
     std::vector<char> data;
@@ -53,7 +53,7 @@ GlobalResources::GlobalResources()
         wxImage::AddHandler(new wxPNGHandler); //ownership passed
 
         wxZipInputStream resourceFile(input, wxConvUTF8);
-        //do NOT rely on wxConvLocal! ON failure shows unhelpful popup "Cannot convert from the charset 'Unknown encoding (-1)'!"
+        //do NOT rely on wxConvLocal! On failure shows unhelpful popup "Cannot convert from the charset 'Unknown encoding (-1)'!"
 
         while (true)
         {
@@ -77,16 +77,20 @@ GlobalResources::GlobalResources()
     //for compatibility it seems we need to stick with a "real" icon
     programIcon = wxIcon(L"A_PROGRAM_ICON");
 
-#elif defined FFS_LINUX || defined FFS_MAC
-    //use big logo bitmap for better quality
-    programIcon.CopyFromBitmap(getImageInt(L"FreeFileSync"));
-    //attention: this is the reason we need a member getImage -> it must not implicitly create static object instance!!!
-    //erroneously calling static object constructor twice will deadlock on Linux!!
+#elif defined FFS_LINUX
+    //attention: make sure to not implicitly call "instance()" again => deadlock on Linux
+    programIcon.CopyFromBitmap(getImage(L"FreeFileSync")); //use big logo bitmap for better quality
+
+#elif defined FFS_MAC
+    assert(getImage(L"FreeFileSync").GetWidth () == getImage(L"FreeFileSync").GetHeight() &&
+           getImage(L"FreeFileSync").GetWidth() % 128 == 0);
+    //wxWidgets' bitmap to icon conversion on OS X can only deal with very specific sizes
+    programIcon.CopyFromBitmap(getImage(L"FreeFileSync").ConvertToImage().Scale(128, 128, wxIMAGE_QUALITY_HIGH)); //"von hinten durch die Brust ins Auge"
 #endif
 }
 
 
-const wxBitmap& GlobalResources::getImageInt(const wxString& imageName) const
+const wxBitmap& GlobalResources::getImage(const wxString& imageName) const
 {
     auto it = bitmaps.find(!contains(imageName, L'.') ? //assume .png ending if nothing else specified
                            imageName + L".png" :

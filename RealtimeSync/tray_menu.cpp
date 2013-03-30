@@ -56,9 +56,9 @@ public:
 private:
     enum Selection
     {
-        CONTEXT_ABORT,
-        CONTEXT_RESTORE,
-        CONTEXT_ABOUT
+        CONTEXT_RESTORE = 1, //wxWidgets: "A MenuItem ID of Zero does not work under Mac"
+        CONTEXT_ABORT = wxID_EXIT,
+        CONTEXT_ABOUT = wxID_ABOUT
     };
 
     virtual wxMenu* CreatePopupMenu()
@@ -154,9 +154,9 @@ public:
     {
         wxIcon realtimeIcon;
 #if defined FFS_WIN || defined FFS_MAC //16x16 seems to be the only size that is shown correctly on OS X
-        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_16x16")); //use a 16x16 bitmap
+        realtimeIcon.CopyFromBitmap(getResourceImage(L"RTS_tray_16x16")); //use a 16x16 bitmap
 #elif defined FFS_LINUX
-        realtimeIcon.CopyFromBitmap(GlobalResources::getImage(L"RTS_tray_24x24")); //use a 24x24 bitmap for perfect fit
+        realtimeIcon.CopyFromBitmap(getResourceImage(L"RTS_tray_24x24")); //use a 24x24 bitmap for perfect fit
 #endif
         const wxString postFix = jobName_.empty() ? wxString() : (L"\n\"" + jobName_ + L"\"");
         trayMenu->SetIcon(realtimeIcon, _("Monitoring active...") + postFix);
@@ -166,9 +166,9 @@ public:
     {
         wxIcon realtimeIcon;
 #if defined FFS_WIN || defined FFS_MAC
-        realtimeIcon.CopyFromBitmap(greyScale(GlobalResources::getImage(L"RTS_tray_16x16")));
+        realtimeIcon.CopyFromBitmap(greyScale(getResourceImage(L"RTS_tray_16x16")));
 #elif defined FFS_LINUX
-        realtimeIcon.CopyFromBitmap(greyScale(GlobalResources::getImage(L"RTS_tray_24x24")));
+        realtimeIcon.CopyFromBitmap(greyScale(getResourceImage(L"RTS_tray_24x24")));
 #endif
         const wxString postFix = jobName_.empty() ? wxString() : (L"\n\"" + jobName_ + L"\"");
         trayMenu->SetIcon(realtimeIcon, _("Waiting for missing directories...") + postFix);
@@ -247,9 +247,8 @@ public:
 #ifdef FFS_WIN
         new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-        m_bitmap10->SetBitmap(GlobalResources::getImage(L"msg_error"));
+        m_bitmap10->SetBitmap(getResourceImage(L"msg_error"));
         m_textCtrl8->SetValue(messageText);
-        m_buttonRetry->SetFocus();
 
         //count down X seconds then automatically press "retry"
         timer.Connect(wxEVT_TIMER, wxEventHandler(ErrorDlgWithTimeout::OnTimerEvent), nullptr, this);
@@ -257,6 +256,7 @@ public:
         updateButtonLabel();
 
         Fit(); //child-element widths have changed: image was set
+        m_buttonRetry->SetFocus();
     }
 
     enum ButtonPressed
@@ -339,7 +339,14 @@ startDirectoryMonitor() (wire dir-changes and execution of commandline)
 
 rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& config, const wxString& jobname)
 {
-    const std::vector<Zstring> dirList = toZ(config.directories);
+    std::vector<Zstring> dirList = toZ(config.directories);
+    vector_remove_if(dirList, [](Zstring str) -> bool { trim(str); return str.empty(); }); //remove empty entries WITHOUT formatting dirList yet!
+
+    if (dirList.empty())
+    {
+        wxMessageBox(_("A folder input field is empty."), _("Error"), wxOK | wxICON_ERROR);
+        return SHOW_GUI;
+    }
 
     wxString cmdLine = config.commandline;
     trim(cmdLine);
@@ -347,11 +354,6 @@ rts::AbortReason rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& conf
     if (cmdLine.empty())
     {
         wxMessageBox(_("Invalid command line:") + L" \"\"", _("Error"), wxOK | wxICON_ERROR);
-        return SHOW_GUI;
-    }
-    if (dirList.empty() || std::any_of(dirList.begin(), dirList.end(), [](Zstring str) -> bool { trim(str); return str.empty(); }))
-    {
-        wxMessageBox(_("A folder input field is empty."), _("Error"), wxOK | wxICON_ERROR);
         return SHOW_GUI;
     }
 

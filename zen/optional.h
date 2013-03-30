@@ -10,7 +10,7 @@
 namespace zen
 {
 /*
-Optional return value with static memory allocation!
+Optional return value without heap memory allocation!
  -> interface like a pointer, performance like a value
 
  Usage:

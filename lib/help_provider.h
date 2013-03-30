@@ -7,8 +7,14 @@
 #ifndef HELPPROVIDER_H_INCLUDED
 #define HELPPROVIDER_H_INCLUDED
 
-#include <wx/help.h>
+#ifdef FFS_WIN
 #include <zen/zstring.h>
+#include <wx/msw/helpchm.h>
+
+#elif defined FFS_LINUX || defined FFS_MAC
+#include <wx/html/helpctrl.h>
+#endif
+
 #include "ffs_paths.h"
 
 namespace zen
@@ -25,45 +31,67 @@ void displayHelpEntry(const wxString& section, wxWindow* parent);
 
 
 
-
-
-
-
 //######################## implementation ########################
-inline
-wxHelpController& getHelpCtrl()
+namespace impl
 {
-    static wxHelpController controller; //external linkage, despite inline definition!
-    static bool initialized = false;
-    if (!initialized)
-    {
-        initialized = true;
-        controller.Initialize(utfCvrtTo<wxString>(zen::getResourceDir()) +
+//finish wxWidgets' job
 #ifdef FFS_WIN
-                              L"FreeFileSync.chm");
-#elif defined FFS_LINUX || defined FFS_MAC
-                              L"Help/FreeFileSync.hhp");
-#endif
+class FfsHelpController
+{
+public:
+    FfsHelpController()
+    {
+        chmHlp.Initialize(utfCvrtTo<wxString>(zen::getResourceDir()) + L"FreeFileSync.chm");
     }
-    return controller;
+
+    void openSection(const wxString& section, wxWindow* parent)
+    {
+        if (section.empty())
+            chmHlp.DisplayContents();
+        else
+            chmHlp.DisplaySection(replaceCpy(section, L'/', utfCvrtTo<wxString>(FILE_NAME_SEPARATOR)));
+    }
+private:
+    wxCHMHelpController chmHlp;
+};
+
+#elif defined FFS_LINUX || defined FFS_MAC
+class FfsHelpController
+{
+public:
+    void openSection(const wxString& section, wxWindow* parent)
+    {
+        wxHtmlModalHelp dlg(parent, utfCvrtTo<wxString>(zen::getResourceDir()) + L"Help/FreeFileSync.hhp", section,
+                            wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL | wxHF_MERGE_BOOKS);
+        (void)dlg;
+        //-> solves modal help craziness on OSX!
+        //-> Suse Linux: avoids program hang on exit if user closed help parent dialog before the help dialog itself was closed (why is this even possible???)
+        //               avoids ESC key not being recognized by help dialog (but by parent dialog instead)
+    }
+};
+#endif
+
+
+inline
+FfsHelpController& getHelpCtrl()
+{
+    static FfsHelpController ctrl; //external linkage, despite inline definition!
+    return ctrl;
+}
 }
 
 
 inline
 void displayHelpEntry(const wxString& section, wxWindow* parent)
 {
-    getHelpCtrl().SetParentWindow(parent); //this nicely solves modal issues on OSX with help file going to the background
-    getHelpCtrl().DisplaySection(replaceCpy(section, L'/', utfCvrtTo<wxString>(FILE_NAME_SEPARATOR)));
-    getHelpCtrl().SetParentWindow(nullptr);
+    impl::getHelpCtrl().openSection(section, parent);
 }
 
 
 inline
 void displayHelpEntry(wxWindow* parent)
 {
-    getHelpCtrl().SetParentWindow(parent);
-    getHelpCtrl().DisplayContents();
-    getHelpCtrl().SetParentWindow(nullptr);
+    impl::getHelpCtrl().openSection(wxString(), parent);
 }
 }
 

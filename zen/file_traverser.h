@@ -62,12 +62,13 @@ struct DstHackCallback
     virtual void requestUiRefresh(const Zstring& filename) = 0; //applying DST hack imposes significant one-time performance drawback => callback to inform user
 };
 #elif defined FFS_LINUX || defined FFS_MAC
-struct DstHackCallback; //DST hack not required on Linux
+struct DstHackCallback; //DST hack not required on Unix
 #endif
 
 //custom traverser with detail information about files
+//Win: client needs to handle duplicate file notifications! (FilePlusTraverser fallback)
 //directory may end with PATH_SEPARATOR
-void traverseFolder(const Zstring& directory, //throw();
+void traverseFolder(const Zstring& directory, //throw()
                     TraverseCallback& sink,
                     DstHackCallback* dstCallback = nullptr); //apply DST hack if callback is supplied
 }

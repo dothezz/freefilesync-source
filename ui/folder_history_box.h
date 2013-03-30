@@ -80,26 +80,15 @@ public:
 
     void setValue(const wxString& dirname)
     {
-        setValueAndUpdateList(dirname); //required for setting value correctly + Linux to ensure the dropdown is shown as being populated
+        setValueAndUpdateList(dirname); //required for setting value correctly; Linux: ensure the dropdown is shown as being populated
     }
 
     // GetValue
 
 private:
     void OnKeyEvent(wxKeyEvent& event);
-    void OnMouseWheel(wxMouseEvent& event);
-    void OnSelection(wxCommandEvent& event);
-    void OnValidateSelection(wxCommandEvent& event);
-    void OnMouseClick(wxEvent& event) { setValueAndUpdateList(GetValue()); event.Skip(); }
-
+    void OnRequireHistoryUpdate(wxEvent& event);
     void setValueAndUpdateList(const wxString& dirname);
-
-#if wxCHECK_VERSION(2, 9, 1)
-    void OnShowDropDown(wxCommandEvent& event);
-    void OnHideDropDown(wxCommandEvent& event);
-
-    bool dropDownShown;
-#endif
 
     std::shared_ptr<FolderHistory> sharedHistory_;
 };

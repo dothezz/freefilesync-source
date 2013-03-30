@@ -40,6 +40,9 @@
 <source>Error</source>
 <target>Fehler</target>
 
+<source>Selected variant:</source>
+<target>Ausgewählte Variante:</target>
+
 <source>Select alternate comparison settings</source>
 <target>Alternative Vergleichseinstellungen auswählen</target>
 
@@ -97,11 +100,8 @@
 <source>Fatal Error</source>
 <target>Schwerer Fehler</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows Fehlercode %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Fehlercode %x:</target>
+<source>Error Code %x:</source>
+<target>Fehlercode %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Der Symbolische Link %x kann nicht aufgelöst werden.</target>
@@ -162,6 +162,9 @@
 
 <source>Cannot set directory lock %x.</source>
 <target>Die Verzeichnissperre %x kann nicht gesetzt werden.</target>
+
+<source>Creating file %x</source>
+<target>Erstelle Datei %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -459,9 +462,6 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Compare</source>
 <target>Vergleichen</target>
 
-<source>&Abort</source>
-<target>&Abbrechen</target>
-
 <source>Synchronize</source>
 <target>Synchronisieren</target>
 
@@ -504,6 +504,18 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>Time elapsed:</source>
 <target>Vergangene Zeit:</target>
 
+<source>Synchronizing...</source>
+<target>Synchronisiere...</target>
+
+<source>On completion</source>
+<target>Nach Abschluss</target>
+
+<source>Close</source>
+<target>Schließen</target>
+
+<source>&Pause</source>
+<target>&Pause</target>
+
 <source>Batch job</source>
 <target>Batch-Job</target>
 
@@ -533,9 +545,6 @@ Die Befehlszeile wird ausgelöst wenn:
 
 <source>Abort synchronization on first error</source>
 <target>Synchronisation beim ersten Fehler abbrechen</target>
-
-<source>On completion</source>
-<target>Nach Abschluss</target>
 
 <source>Show progress dialog</source>
 <target>Fortschrittsdialog zeigen</target>
@@ -659,12 +668,6 @@ gleich ist
 
 <source>Conflict/item cannot be categorized</source>
 <target>Konflikt/Element, das nicht eingeordnet werden kann</target>
-
-<source>Synchronizing...</source>
-<target>Synchronisiere...</target>
-
-<source>&Pause</source>
-<target>&Pause</target>
 
 <source>Source code written in C++ using:</source>
 <target>Sourcecode in C++ geschrieben mit Hilfe von:</target>
@@ -861,14 +864,14 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>FreeFileSync batch</source>
 <target>FreeFileSync Batch</target>
 
-<source>Never save changes</source>
-<target>Änderungen niemals speichern</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Möchten Sie die Änderungen an %x speichern?</target>
 
 <source>Do&n't save</source>
 <target>&Nicht speichern</target>
+
+<source>Never save changes</source>
+<target>Änderungen niemals speichern</target>
 
 <source>Configuration loaded!</source>
 <target>Konfiguration geladen!</target>
@@ -1251,6 +1254,12 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Cannot set privilege %x.</source>
 <target>Das Privileg %x kann nicht gesetzt werden.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Der Schlafmodus des Betriebssystems konnte nicht ausgesetzt werden.</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Die Eingabe/Ausgabe Prioritäten für den Prozess konnten nicht geändert werden.</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>%x kann nicht in den Papierkorb verschoben werden!</target>
 
@@ -1294,10 +1303,10 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <target>Der Papierkorb ist für die folgenden Pfade nicht verfügbar! Die Dateien werden stattdessen permanent gelöscht:</target>
 
 <source>You can ignore this error to consider each folder as empty.</source>
-<target>Dieser Fehler kann ignoriert werden, um alle Ordner als leer anzusehen.</target>
+<target>Dieser Fehler kann ignoriert werden, um die Ordner als leer anzusehen.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Der Ordner %x wurde nicht gefunden.</target>
+<source>Cannot find the following folders:</source>
+<target>Die folgenden Ordner wurden nicht gefunden:</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationsregeln:</target>
@@ -1383,9 +1392,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Removing old versions...</source>
 <target>Entferne alte Versionen...</target>
 
-<source>Creating file %x</source>
-<target>Erstelle Datei %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Erstelle Symbolischen Link %x</target>
 
@@ -1403,6 +1409,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Updating attributes of %x</source>
 <target>Aktualisiere Attribute von %x</target>
+
+<source>Cannot find %x.</source>
+<target>%x wurde nicht gefunden.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Der Zielordner %x existiert bereits.</target>

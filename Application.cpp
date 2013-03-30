@@ -25,8 +25,12 @@
 
 #ifdef FFS_WIN
 #include <zen/win_ver.h>
+
 #elif defined FFS_LINUX
 #include <gtk/gtk.h>
+
+#elif defined FFS_MAC
+#include <ApplicationServices/ApplicationServices.h>
 #endif
 
 using namespace zen;
@@ -35,53 +39,23 @@ using namespace xmlAccess;
 
 IMPLEMENT_APP(Application)
 
-void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg);
-void runGuiMode(const std::vector<wxString>& cfgFileName);
-void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode);
-
-#ifdef FFS_WIN
 namespace
 {
-const DWORD mainThreadId = ::GetCurrentThreadId();
+boost::thread::id mainThreadId = boost::this_thread::get_id();
 
 void onTerminationRequested()
 {
-    std::wstring msg = ::GetCurrentThreadId() == mainThreadId ?
+    std::wstring msg = boost::this_thread::get_id() == mainThreadId ?
                        L"Termination requested in main thread!\n\n" :
                        L"Termination requested in worker thread!\n\n";
     msg += L"Please take a screenshot and file a bug report at: http://sourceforge.net/projects/freefilesync";
 
-    ::MessageBox(0, msg.c_str(), _("An exception occurred!").c_str(), 0);
+    wxSafeShowMessage(_("An exception occurred!"), msg);
     std::abort();
 }
-
 #ifdef _MSC_VER
 void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
 #endif
-}
-#endif
-
-bool Application::OnInit()
-{
-#ifdef FFS_WIN
-    std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
-    assert(!win8OrLater()); //another breadcrumb: test and add new OS entry to "compatibility" in application manifest
-#ifdef _MSC_VER
-    _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
-#endif
-#endif
-
-    returnCode = FFS_RC_SUCCESS;
-    //do not call wxApp::OnInit() to avoid using default commandline parser
-
-    //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: batch mode requires the wxApp eventhandler to be established
-    //for UI update events. This is not the case at the time of OnInit().
-    Connect(wxEVT_IDLE,              wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
-    Connect(wxEVT_QUERY_END_SESSION, wxEventHandler    (Application::OnQueryEndSession ), nullptr, this);
-    Connect(wxEVT_END_SESSION,       wxEventHandler    (Application::OnQueryEndSession ), nullptr, this);
-
-    return true;
-}
 
 
 std::vector<wxString> getCommandlineArgs(const wxApp& app)
@@ -137,34 +111,162 @@ std::vector<wxString> getCommandlineArgs(const wxApp& app)
     return args;
 }
 
+const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
+}
 
-void Application::OnStartApplication(wxIdleEvent&)
+//##################################################################################################################
+
+bool Application::OnInit()
 {
-    Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
-
-    //wxWidgets app exit handling is weird... we want the app to exit only if the logical main window is closed
-    wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
-    auto app = wxTheApp; //fix lambda/wxWigets/VC fuck up
-    ZEN_ON_SCOPE_EXIT(if (!mainWindowWasSet()) app->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
-
-    //if appname is not set, the default is the executable's name!
-    SetAppName(L"FreeFileSync");
+    std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
 
 #ifdef FFS_WIN
+#ifdef _MSC_VER
+    _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
+#endif
     //Quote: "Best practice is that all applications call the process-wide ::SetErrorMode() function with a parameter of
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
+
 #elif defined FFS_LINUX
     ::gtk_init(nullptr, nullptr);
     ::gtk_rc_parse((getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
+
+#elif defined FFS_MAC
+    ProcessSerialNumber psn = { 0, kCurrentProcess };
+    ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //behave like an application bundle, even when the app is not packaged (yet)
 #endif
 
 #if wxCHECK_VERSION(2, 9, 1)
 #ifdef FFS_WIN
-    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only (as of 2.9.2)
+    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
 #endif
     wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s is default for Windows: http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
 #endif
+
+    SetAppName(L"FreeFileSync"); //if not set, the default is the executable's name!
+
+    Connect(wxEVT_QUERY_END_SESSION, wxEventHandler(Application::onQueryEndSession), nullptr, this);
+    Connect(wxEVT_END_SESSION,       wxEventHandler(Application::onQueryEndSession), nullptr, this);
+
+    //do not call wxApp::OnInit() to avoid using default commandline parser
+
+    //Note: app start is deferred: batch mode requires the wxApp eventhandler to be established for UI update events. This is not the case at the time of OnInit()!
+    Connect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
+    wxCommandEvent scrollEvent(EVENT_ENTER_EVENT_LOOP);
+    AddPendingEvent(scrollEvent);
+
+    return true; //true: continue processing; false: exit immediately.
+}
+
+
+void Application::onEnterEventLoop(wxEvent& event)
+{
+    Disconnect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
+
+    //determine FFS mode of operation
+    std::vector<wxString> commandArgs = getCommandlineArgs(*this);
+    launch(commandArgs);
+}
+
+warn_static("finish")
+
+#ifdef FFS_MAC
+/*
+Initialization call sequences on OS X
+-------------------------------------
+1. double click FFS app bundle or execute from command line without arguments
+	OnInit()
+	OnRun()
+	onEnterEventLoop()
+	MacNewFile()
+
+2. double-click .ffs_gui file
+	OnInit()
+	OnRun()
+	onEnterEventLoop()
+	MacOpenFiles()
+
+3. start from command line with .ffs_gui file as first argument
+	OnInit()
+	OnRun()
+	MacOpenFiles() -> WTF!?
+	onEnterEventLoop()
+	MacNewFile()   -> yes, wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/14558
+*/
+void Application::MacOpenFiles(const wxArrayString& filenames)
+{
+
+    //	long wxExecute(const wxString& command, int sync = wxEXEC_ASYNC, wxProcess *callback = NULL)
+
+    //  std::vector<wxString>(filenames.begin(), filenames.end())
+    //	startApplication(commandArgs);
+
+    //if (!fileNames.empty())
+    //	wxMessageBox(fileNames[0]);
+    wxApp::MacOpenFiles(filenames);
+}
+
+
+void Application::MacNewFile()
+{
+    wxApp::MacNewFile();
+}
+
+//virtual void wxApp::MacReopenApp 	( 		)
+#endif
+
+
+int Application::OnRun()
+{
+    auto processException = [](const std::wstring& msg)
+    {
+        //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
+        logError(utfCvrtTo<std::string>(msg));
+        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", msg);
+    };
+
+    try
+    {
+        wxApp::OnRun();
+    }
+    catch (const std::exception& e) //catch all STL exceptions
+    {
+        processException(utfCvrtTo<std::wstring>(e.what()));
+        return FFS_RC_EXCEPTION;
+    }
+    catch (...) //catch the rest
+    {
+        processException(L"Unknown error.");
+        return FFS_RC_EXCEPTION;
+    }
+
+    return returnCode;
+}
+
+
+void Application::onQueryEndSession(wxEvent& event)
+{
+    //alas wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/3069
+    if (auto mainWin = dynamic_cast<MainDialog*>(GetTopWindow()))
+        mainWin->onQueryEndSession();
+    OnExit();
+    //wxEntryCleanup(); -> gives popup "dll init failed" on XP
+    std::exit(returnCode); //Windows will terminate anyway: destruct global objects
+}
+
+
+void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg);
+void runGuiMode(const std::vector<wxString>& cfgFileName);
+void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode);
+
+
+void Application::launch(const std::vector<wxString>& commandArgs)
+{
+    //wxWidgets app exit handling is weird... we want the app to exit only if the logical main window is closed
+    wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
+    auto app = wxTheApp; //fix lambda/wxWigets/VC fuck up
+    ZEN_ON_SCOPE_EXIT(if (!mainWindowWasSet()) app->ExitMainLoop();); //quit application, if no main window was set (batch silent mode)
 
     try
     {
@@ -172,9 +274,6 @@ void Application::OnStartApplication(wxIdleEvent&)
         setLanguage(xmlAccess::XmlGlobalSettings().programLanguage); //throw FileError
     }
     catch (const FileError&) {} //no messagebox: consider batch job!
-
-    //determine FFS mode of operation
-    std::vector<wxString> commandArgs = getCommandlineArgs(*this);
 
     if (commandArgs.empty())
         runGuiMode(commandArgs);
@@ -209,11 +308,13 @@ void Application::OnStartApplication(wxIdleEvent&)
         }
         else //mode 2: try to set config/batch-filename set by %1 parameter
         {
-            for (auto it = commandArgs.begin(); it != commandArgs.end(); ++it)
+            std::vector<wxString> argsTmp = commandArgs;
+
+            for (auto it = argsTmp.begin(); it != argsTmp.end(); ++it)
             {
                 const Zstring& filename = toZ(*it);
 
-                if (!fileExists(filename)) //be a little tolerant
+                if (!fileExists(filename)) //...be a little tolerant
                 {
                     if (fileExists(filename + Zstr(".ffs_batch")))
                         *it += L".ffs_batch";
@@ -227,23 +328,23 @@ void Application::OnStartApplication(wxIdleEvent&)
                 }
             }
 
-            switch (getMergeType(toZ(commandArgs))) //throw ()
+            switch (getMergeType(toZ(argsTmp))) //throw ()
             {
                 case MERGE_BATCH: //pure batch config files
-                    if (commandArgs.size() == 1)
-                        runBatchMode(utfCvrtTo<Zstring>(commandArgs[0]), returnCode);
+                    if (argsTmp.size() == 1)
+                        runBatchMode(utfCvrtTo<Zstring>(argsTmp[0]), returnCode);
                     else
-                        runGuiMode(commandArgs);
+                        runGuiMode(argsTmp);
                     break;
 
                 case MERGE_GUI:       //pure gui config files
                 case MERGE_GUI_BATCH: //gui and batch files
-                    runGuiMode(commandArgs);
+                    runGuiMode(argsTmp);
                     break;
 
                 case MERGE_OTHER: //= none or unknown;
-                    //commandArgs are not empty and contain at least one non-gui/non-batch config file: find it!
-                    std::find_if(commandArgs.begin(), commandArgs.end(),
+                    //argsTmp are not empty and contain at least one non-gui/non-batch config file: find it!
+                    std::find_if(argsTmp.begin(), argsTmp.end(),
                                  [](const wxString& filename) -> bool
                     {
                         switch (getXmlType(toZ(filename))) //throw()
@@ -263,45 +364,6 @@ void Application::OnStartApplication(wxIdleEvent&)
             }
         }
     }
-}
-
-
-int Application::OnRun()
-{
-    auto processException = [](const std::wstring& msg)
-    {
-        //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
-        logError(utfCvrtTo<std::string>(msg));
-        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", msg);
-    };
-
-    try
-    {
-        wxApp::OnRun();
-    }
-    catch (const std::exception& e) //catch all STL exceptions
-    {
-        processException(utfCvrtTo<std::wstring>(e.what()));
-        return FFS_RC_EXCEPTION;
-    }
-    catch (...) //catch the rest
-    {
-        processException(L"Unknown error.");
-        return FFS_RC_EXCEPTION;
-    }
-
-    return returnCode;
-}
-
-
-void Application::OnQueryEndSession(wxEvent& event)
-{
-    //alas wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/3069
-    if (auto mainWin = dynamic_cast<MainDialog*>(GetTopWindow()))
-        mainWin->onQueryEndSession();
-    OnExit();
-    //wxEntryCleanup(); -> gives popup "dll init failed" on XP
-    std::exit(returnCode); //Windows will terminate anyway: destruct global objects
 }
 
 

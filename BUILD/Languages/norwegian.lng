@@ -8,19 +8,19 @@
 </header>
 
 <source>Searching for folder %x...</source>
-<target>Leter etter mappen %x</target>
+<target>Søker etter mappen %x...</target>
 
 <source>Items processed:</source>
 <target>Elementer behandlet:</target>
 
 <source>Items remaining:</source>
-<target>Elementer igjen:</target>
+<target>Gjenværende elementer:</target>
 
 <source>Total time:</source>
 <target>Total tid:</target>
 
 <source>Show in Explorer</source>
-<target>Vis i Utforsker</target>
+<target>Vis i utforsker</target>
 
 <source>Open with default application</source>
 <target>Åpne med standardprogram</target>
@@ -29,16 +29,19 @@
 <target>Utforsk mappe</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
-<target>Avbrytelse forespurt: Venter på at gjeldende handling avsluttes...</target>
+<target>Handling avbrutt: Venter på at nåværende handling fullføres...</target>
 
 <source>Failure to create timestamp for versioning:</source>
-<target></target>
+<target>Feil ved opprettelse av tidsstempel for versjon:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Automatisk synkronisering</target>
 
 <source>Error</source>
 <target>Feil</target>
+
+<source>Selected variant:</source>
+<target>Valgt variant:</target>
 
 <source>Select alternate comparison settings</source>
 <target>Velg alternative innstillinger for sammenligning</target>
@@ -56,7 +59,7 @@
 <target>Fjern alternative innstillinger</target>
 
 <source>Clear filter settings</source>
-<target>Nullstill filterinnstillinger</target>
+<target>Fjern filterinnstillinger</target>
 
 <source>Save as batch job</source>
 <target>Lagre som sammensatt oppgave</target>
@@ -77,13 +80,13 @@
 <target>Still inn filter</target>
 
 <source>Global settings</source>
-<target>Felles innstillinger</target>
+<target>Globale innstillinger</target>
 
 <source>Find</source>
 <target>Søk</target>
 
 <source>Select time span</source>
-<target>Velg tidsområde</target>
+<target>Velg tidsrom</target>
 
 <source>Invalid command line:</source>
 <target>Ugyldig kommando:</target>
@@ -97,11 +100,8 @@
 <source>Fatal Error</source>
 <target>Fatal feil</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows feilkode %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux feilkode %x:</target>
+<source>Error Code %x:</source>
+<target>Feil kode %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Kan ikke følge symbolsk lenke %x.</target>
@@ -121,14 +121,14 @@
 </source>
 <target>
 <pluralform>1 Byte</pluralform>
-<pluralform>%x Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
 </target>
 
 <source>Database file %x is incompatible.</source>
 <target>Databasefil %x er inkompatibel.</target>
 
 <source>Initial synchronization:</source>
-<target>Innledende synkronisering:</target>
+<target>Førstegangs synkronisering:</target>
 
 <source>Database file %x does not yet exist.</source>
 <target>Databasefil %x finnes ikke ennå.</target>
@@ -149,7 +149,7 @@
 <target>Databasefiler deler ikke en felles synkroniseringsøkt.</target>
 
 <source>An exception occurred!</source>
-<target>En unntagelse skjedde!</target>
+<target>Et avvik har oppstått!</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>Kan ikke lese filattributter fra %x.</target>
@@ -162,6 +162,9 @@
 
 <source>Cannot set directory lock %x.</source>
 <target>Kan ikke sette mappelås %x.</target>
+
+<source>Creating file %x</source>
+<target>Oppretter fil %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -197,7 +200,7 @@
 <target>Kan ikke finne filen %x.</target>
 
 <source>File %x does not contain a valid configuration.</source>
-<target>Filen %x inneholder ikke en gyldig innstilling.</target>
+<target>Filen %x inneholder en ugyldig innstilling.</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Innstillingsfilen %x bare delvis lastet.</target>
@@ -221,10 +224,10 @@
 <target>Kan ikke lese følgende XML-elementer:</target>
 
 <source>&Open...</source>
-<target>&Åpne</target>
+<target>&Åpne...</target>
 
 <source>Save &as...</source>
-<target>Lagre &som</target>
+<target>Lagre &som...</target>
 
 <source>&Quit</source>
 <target>&Avslutt</target>
@@ -248,13 +251,13 @@
 <target>1. Velg mapper å overvåke.</target>
 
 <source>2. Enter a command line.</source>
-<target>2. Oppfør en kommandolinje.</target>
+<target>2. Skriv en kommandolinje.</target>
 
 <source>3. Press 'Start'.</source>
 <target>3. Trykk 'Start'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>Importer en .ffs_barch-fil for å komme i gang</target>
+<target>Importer en .ffs_batch-fil for å komme i gang</target>
 
 <source>Folders to watch</source>
 <target>Mapper å overvåke</target>
@@ -272,10 +275,10 @@
 <target>Velg en mappe</target>
 
 <source>Idle time [seconds]</source>
-<target>Ventetid [sekunder]</target>
+<target>Inaktiv tid [sekunder]</target>
 
 <source>Idle time between last detected change and execution of command</source>
-<target>Ventetid mellom forrige endring og utførelse av kommando</target>
+<target>Inaktiv tid mellom forrige endring og utførelse av kommando</target>
 
 <source>Command line</source>
 <target>Kommandolinje</target>
@@ -343,7 +346,7 @@ Kommandoen utløses hvis:
 <target>Trykk "Skift" for å løse problemer i FreeFileSync hovedvindu.</target>
 
 <source>Switching to FreeFileSync main dialog...</source>
-<target>Skifter til FreeFileSync hovedvindu...</target>
+<target>Endrer til FreeFileSync hovedvindu...</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>En ny versjon av FreeFileSync er tilgjengelig</target>
@@ -358,7 +361,7 @@ Kommandoen utløses hvis:
 <target>Informasjon</target>
 
 <source>Unable to connect to sourceforge.net!</source>
-<target>Ikke i stand til å koble til sourceforge.net!</target>
+<target>Kan ikke koble til sourceforge.net!</target>
 
 <source>Current FreeFileSync version number was not found online! Do you want to check manually?</source>
 <target>Nyeste FreeFileSyncversjon ble ikke funnet online! Vil du sjekke manuelt?</target>
@@ -412,7 +415,7 @@ Kommandoen utløses hvis:
 <target>Dra && slipp</target>
 
 <source>Close progress dialog</source>
-<target>Lukk framdriftsvindu</target>
+<target>Lukk status vindu</target>
 
 <source>Standby</source>
 <target>Standby</target>
@@ -459,9 +462,6 @@ Kommandoen utløses hvis:
 <source>Compare</source>
 <target>Sammenlign</target>
 
-<source>&Abort</source>
-<target>&Avbryt</target>
-
 <source>Synchronize</source>
 <target>Synkroniser</target>
 
@@ -475,7 +475,7 @@ Kommandoen utløses hvis:
 <target>Bytt sider</target>
 
 <source>Hide excluded items</source>
-<target>Gjem ekskluderte elementer</target>
+<target>Skjul ekskluderte elementer</target>
 
 <source>Show filtered or temporarily excluded files</source>
 <target>Vis filtrerte eller midlertidig ekskluderte filer</target>
@@ -503,6 +503,18 @@ Kommandoen utløses hvis:
 
 <source>Time elapsed:</source>
 <target>Tid gått:</target>
+
+<source>Synchronizing...</source>
+<target>Synkroniserer...</target>
+
+<source>On completion</source>
+<target>Ved fullføring</target>
+
+<source>Close</source>
+<target>Lukk</target>
+
+<source>&Pause</source>
+<target>&Pause</target>
 
 <source>Batch job</source>
 <target>Batch-jobb</target>
@@ -534,17 +546,14 @@ Kommandoen utløses hvis:
 <source>Abort synchronization on first error</source>
 <target>Stopp synkronisering ved første feil</target>
 
-<source>On completion</source>
-<target>Ved fullføring</target>
-
 <source>Show progress dialog</source>
-<target>Vis dialogboks</target>
+<target>Vis statuslinje</target>
 
 <source>Save log</source>
 <target>Lagre logg</target>
 
 <source>Select folder to save log files</source>
-<target>Velg mappe du vil lagre loggfiler i</target>
+<target>Velg mappe for lagring av loggfiler</target>
 
 <source>Limit</source>
 <target>Grense</target>
@@ -569,7 +578,7 @@ er den samme
 </target>
 
 <source>File time and size</source>
-<target>Fildato og størrelse</target>
+<target>Filtid og størrelse</target>
 
 <source>
 Files are found equal if
@@ -659,12 +668,6 @@ er det samme
 
 <source>Conflict/item cannot be categorized</source>
 <target>Konflikt/element kan ikke kategoriseres</target>
-
-<source>Synchronizing...</source>
-<target>Synkroniserer...</target>
-
-<source>&Pause</source>
-<target>&Pause</target>
 
 <source>Source code written in C++ using:</source>
 <target>Kildekode skrevet i C++ med hjelp fra:</target>
@@ -796,7 +799,7 @@ Merk: Filnavn må være relative til basismapper!
 <target>Velg visning</target>
 
 <source>Open...</source>
-<target></target>
+<target>Åpne...</target>
 
 <source>Save</source>
 <target>Lagre</target>
@@ -861,14 +864,14 @@ Merk: Filnavn må være relative til basismapper!
 <source>FreeFileSync batch</source>
 <target>FreeFileSync batch</target>
 
-<source>Never save changes</source>
-<target>Aldri lagre endringer</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Vil du lagre endringene til %x?</target>
 
 <source>Do&n't save</source>
 <target>&Ikke lagre</target>
+
+<source>Never save changes</source>
+<target>Aldri lagre endringer</target>
 
 <source>Configuration loaded!</source>
 <target>Innstilling lastet!</target>
@@ -958,7 +961,7 @@ Merk: Filnavn må være relative til basismapper!
 <target>Vis filer som ikke blir kopiert</target>
 
 <source>Set as default</source>
-<target></target>
+<target>Set som standard</target>
 
 <source>All folders are in sync!</source>
 <target>Alle mapper er synkroniserte!</target>
@@ -1251,6 +1254,12 @@ Merk: Filnavn må være relative til basismapper!
 <source>Cannot set privilege %x.</source>
 <target>Kan ikke sette privilegie %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Kan ikke sette systemet i hvilemodus</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Kan ikke endre I/O prioriet på prosess</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Ikke i stand til å flytte %x til papirkurven!</target>
 
@@ -1270,7 +1279,7 @@ Merk: Filnavn må være relative til basismapper!
 <target>Stiller inn standard synkroniseringsretning: Gamle filer blir overskrevet med nyere filer.</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
-<target></target>
+<target>Sjekker søppelbøtte for tilgjengelig mappe %x...</target>
 
 <source>Moving file %x to recycle bin</source>
 <target>Flytter fil %x til papirkurv</target>
@@ -1293,11 +1302,11 @@ Merk: Filnavn må være relative til basismapper!
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Papirkurv er ikke tilgjengelig for de følgende baner! Filer blir isteden slettet permanent:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Du kan ignorere denne feilen og anse mappen som top</target>
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Denne feilen kan ignoreres dersom mappen er tom.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Kan ikke finne mappen %x.</target>
+<source>Cannot find the following folders:</source>
+<target>Kan ikke finne følgende mapper:</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Mapper er avhengige av hverandre! Vær forsiktig når du setter opp synkroniseringsregler:</target>
@@ -1383,9 +1392,6 @@ Merk: Filnavn må være relative til basismapper!
 <source>Removing old versions...</source>
 <target>Fjerner gamle versjoner...</target>
 
-<source>Creating file %x</source>
-<target>Oppretter fil %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Oppretter symbolsk lenke %x</target>
 
@@ -1403,6 +1409,9 @@ Merk: Filnavn må være relative til basismapper!
 
 <source>Updating attributes of %x</source>
 <target>Oppdaterer attributter til %x</target>
+
+<source>Cannot find %x.</source>
+<target>Kan ikke finne %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Målmappe %x eksisterer allerede.</target>

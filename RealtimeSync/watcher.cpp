@@ -59,7 +59,7 @@ std::vector<Zstring> getFormattedDirs(const std::vector<Zstring>& dirs) //throw 
 rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNamesNonFmt, WaitCallback& statusHandler) //throw FileError
 {
     const std::vector<Zstring> dirNamesFmt = getFormattedDirs(dirNamesNonFmt); //throw FileError
-    if (dirNamesFmt.empty()) //pathological case, but check is needed nevertheless
+    if (dirNamesFmt.empty()) //pathological case, but we have to check else this function will wait endlessly
         throw zen::FileError(_("A folder input field is empty.")); //should have been checked by caller!
 
     //detect when volumes are removed/are not available anymore

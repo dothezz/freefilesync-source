@@ -22,7 +22,7 @@
 
 namespace zen
 {
-//implement handler to enable program wide localizations
+//implement handler to enable program wide localizations: implement THREAD-SAFE ACCESS!
 struct TranslationHandler
 {
     virtual ~TranslationHandler() {}

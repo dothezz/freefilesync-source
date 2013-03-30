@@ -15,6 +15,7 @@
 #include <zen/process_priority.h>
 #include <zen/file_handling.h>
 #include <zen/recycler.h>
+#include <zen/optional.h>
 #include "lib/resolve_path.h"
 #include "lib/db_file.h"
 #include "lib/dir_exist_async.h"
@@ -499,7 +500,7 @@ Zstring createUniqueRandomTempDir(const Zstring& baseDirPf) //throw FileError
         try
         {
             Zstring dirname = generatePath();
-            makeNewDirectory(dirname, Zstring(), false); //FileError, ErrorTargetExisting
+            makeDirectory(dirname, /*bool failIfExists*/ true); //throw FileError, ErrorTargetExisting
             return dirname;
         }
         catch (const ErrorTargetExisting&) {}
@@ -612,7 +613,7 @@ private:
     void notifyMove(const std::wstring& statusText, const Zstring& fileFrom, const Zstring& fileTo) const
     {
         notifyItemDeletion_(); //it would be more correct to report *after* work was done!
-        callback_.reportStatus(replaceCpy(replaceCpy(statusText, L"%x", fmtFileName(fileFrom)), L"%y", fmtFileName(fileTo)));
+        callback_.reportStatus(replaceCpy(replaceCpy(statusText, L"%x", L"\n" + fmtFileName(fileFrom)), L"%y", L"\n" + fmtFileName(fileTo)));
     };
 
     virtual void updateStatus(Int64 bytesDelta)
@@ -673,7 +674,7 @@ void DeletionHandling::removeDirUpdating(const Zstring& relativeName, Int64 byte
             {
                 if (somethingExists(fullName))
                 {
-                    const Zstring targetSuperDir = beforeLast(targetDir, FILE_NAME_SEPARATOR);
+                    const Zstring targetSuperDir = beforeLast(targetDir, FILE_NAME_SEPARATOR); //what if C:\ ?
                     if (!dirExists(targetSuperDir))
                     {
                         makeDirectory(targetSuperDir); //throw FileError -> may legitimately fail on Linux if permissions are missing
@@ -987,8 +988,14 @@ private:
     void synchronizeFolder(DirMapping& dirObj);
     template <SelectedSide sideTrg> void synchronizeFolderInt(DirMapping& dirObj, SyncOperation syncOp);
 
-    void reportInfo  (const std::wstring& rawText, const Zstring& objname) const { procCallback_.reportInfo  (replaceCpy(rawText, L"%x", fmtFileName(objname))); };
     void reportStatus(const std::wstring& rawText, const Zstring& objname) const { procCallback_.reportStatus(replaceCpy(rawText, L"%x", fmtFileName(objname))); };
+    void reportInfo  (const std::wstring& rawText, const Zstring& objname) const { procCallback_.reportInfo  (replaceCpy(rawText, L"%x", fmtFileName(objname))); };
+    void reportInfo  (const std::wstring& rawText,
+                      const Zstring& objname1,
+                      const Zstring& objname2) const
+    {
+        procCallback_.reportInfo(replaceCpy(replaceCpy(rawText, L"%x", L"\n" + fmtFileName(objname1)), L"%y", L"\n" + fmtFileName(objname2)));
+    };
 
     template <SelectedSide sideTrg, class Function>
     FileAttrib copyFileUpdatingTo(const FileMapping& fileObj, Function delTargetCommand) const; //throw FileError; reports data delta via updateProcessedData()
@@ -1090,7 +1097,7 @@ void SynchronizeFolderPair::prepare2StepMove(FileMapping& sourceObj,
     //the very same (.ffs_tmp) name and is copied before the second step of the move is executed
     //good news: even in this pathologic case, this may only prevent the copy of the other file, but not the move
 
-    reportInfo(replaceCpy(txtMovingFile, L"%y", fmtFileName(tmpTarget)), source);
+    reportInfo(txtMovingFile, source, tmpTarget);
 
     renameFile(source, tmpTarget); //throw FileError
 
@@ -1102,6 +1109,8 @@ void SynchronizeFolderPair::prepare2StepMove(FileMapping& sourceObj,
     sourceObj.removeObject<side>();
 
     FileMapping& tempFile = sourceObj.root().addSubFile<side>(afterLast(tmpTarget, FILE_NAME_SEPARATOR), descrSource);
+    static_assert(IsSameType<FixedList<FileMapping>, HierarchyObject::SubFileVec>::value,
+                  "ATTENTION: we're adding to the file list WHILE looping over it! This is only working because FixedList iterators are not invalidated by this!");
 
     //prepare move in second pass
     tempFile.setSyncDir(side == LEFT_SIDE ? SYNC_DIR_LEFT : SYNC_DIR_RIGHT);
@@ -1190,7 +1199,7 @@ void SynchronizeFolderPair::manageFileMove(FileMapping& sourceObj,
         synchronizeFile(sourceObj); //throw FileError
     }
     //else: sourceObj will not be deleted, and is not standing in the way => delay to second pass
-    //note: this case may include "move sources" from two-step sub-routine!
+    //note: this case may include new "move sources" from two-step sub-routine!!!
 }
 
 
@@ -1261,8 +1270,8 @@ void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
     std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
     [&](DirMapping& dirObj) { this->runZeroPass(dirObj); /*recurse */ });
 }
-//---------------------------------------------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------------------------------------------
 
 //1st, 2nd pass requirements:
 // - avoid disk space shortage: 1. delete files, 2. overwrite big with small files first
@@ -1287,7 +1296,7 @@ SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const FileMapping& 
         case SO_MOVE_RIGHT_SOURCE: // [!]
             return PASS_NEVER;
         case SO_MOVE_LEFT_TARGET:  //
-        case SO_MOVE_RIGHT_TARGET: //to be processed in second pass, after "move target" parent directory was created!
+        case SO_MOVE_RIGHT_TARGET: //make sure 2-step move is processed in second pass, after move *target* parent directory was created!
             return PASS_TWO;
 
         case SO_CREATE_NEW_LEFT:
@@ -1399,7 +1408,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
 namespace
 {
 inline
-bool getTargetDirection(SyncOperation syncOp, SelectedSide* side)
+Opt<SelectedSide> getTargetDirection(SyncOperation syncOp)
 {
     switch (syncOp)
     {
@@ -1409,8 +1418,7 @@ bool getTargetDirection(SyncOperation syncOp, SelectedSide* side)
         case SO_COPY_METADATA_TO_LEFT:
         case SO_MOVE_LEFT_SOURCE:
         case SO_MOVE_LEFT_TARGET:
-            *side = LEFT_SIDE;
-            return true;
+            return LEFT_SIDE;
 
         case SO_CREATE_NEW_RIGHT:
         case SO_DELETE_RIGHT:
@@ -1418,15 +1426,14 @@ bool getTargetDirection(SyncOperation syncOp, SelectedSide* side)
         case SO_COPY_METADATA_TO_RIGHT:
         case SO_MOVE_RIGHT_SOURCE:
         case SO_MOVE_RIGHT_TARGET:
-            *side = RIGHT_SIDE;
-            return true;
+            return RIGHT_SIDE;
 
         case SO_DO_NOTHING:
         case SO_EQUAL:
         case SO_UNRESOLVED_CONFLICT:
             break; //nothing to do
     }
-    return false;
+    return NoValue();
 }
 }
 
@@ -1436,11 +1443,9 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj)
 {
     const SyncOperation syncOp = fileObj.getSyncOperation();
 
-    SelectedSide sideTrg = LEFT_SIDE;
-
-    if (getTargetDirection(syncOp, &sideTrg))
+    if (Opt<SelectedSide> sideTrg = getTargetDirection(syncOp))
     {
-        if (sideTrg == LEFT_SIDE)
+        if (*sideTrg == LEFT_SIDE)
             synchronizeFileInt<LEFT_SIDE>(fileObj, syncOp);
         else
             synchronizeFileInt<RIGHT_SIDE>(fileObj, syncOp);
@@ -1458,6 +1463,10 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
         case SO_CREATE_NEW_LEFT:
         case SO_CREATE_NEW_RIGHT:
         {
+            if (const DirMapping* parentDir = dynamic_cast<DirMapping*>(&fileObj.parent()))
+                if (parentDir->isEmpty<sideTrg>()) //BaseDirMapping OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
+                    return; //if parent directory creation failed, there's no reason to show more errors!
+
             const Zstring& target = fileObj.getBaseDirPf<sideTrg>() + fileObj.getRelativeName<sideSrc>(); //can't use "getFullName" as target is not yet existing
             reportInfo(txtCreatingFile, target);
 
@@ -1512,7 +1521,8 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
             {
                 FileMapping* sourceObj = &fileObj;
 
-                if (syncOp != SO_MOVE_LEFT_SOURCE && syncOp != SO_MOVE_RIGHT_SOURCE)
+                if (syncOp != SO_MOVE_LEFT_SOURCE &&
+                    syncOp != SO_MOVE_RIGHT_SOURCE)
                     std::swap(sourceObj, targetObj);
 
                 assert((sourceObj->getSyncOperation() == SO_MOVE_LEFT_SOURCE  && targetObj->getSyncOperation() == SO_MOVE_LEFT_TARGET  && sideTrg == LEFT_SIDE) ||
@@ -1521,7 +1531,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
                 const Zstring& source = sourceObj->getFullName<sideTrg>();
                 const Zstring& target = targetObj->getBaseDirPf<sideTrg>() + targetObj->getRelativeName<sideSrc>();
 
-                reportInfo(replaceCpy(txtMovingFile, L"%y", fmtFileName(target)), source);
+                reportInfo(txtMovingFile, source, target);
 
                 renameFile(source, target); //throw FileError
 
@@ -1598,11 +1608,9 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj)
 {
     const SyncOperation syncOp = linkObj.getSyncOperation();
 
-    SelectedSide sideTrg = LEFT_SIDE;
-
-    if (getTargetDirection(syncOp, &sideTrg))
+    if (Opt<SelectedSide> sideTrg = getTargetDirection(syncOp))
     {
-        if (sideTrg == LEFT_SIDE)
+        if (*sideTrg == LEFT_SIDE)
             synchronizeLinkInt<LEFT_SIDE>(linkObj, syncOp);
         else
             synchronizeLinkInt<RIGHT_SIDE>(linkObj, syncOp);
@@ -1620,6 +1628,10 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
         case SO_CREATE_NEW_LEFT:
         case SO_CREATE_NEW_RIGHT:
         {
+            if (const DirMapping* parentDir = dynamic_cast<DirMapping*>(&linkObj.parent()))
+                if (parentDir->isEmpty<sideTrg>()) //BaseDirMapping OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
+                    return; //if parent directory creation failed, there's no reason to show more errors!
+
             const Zstring& target = linkObj.getBaseDirPf<sideTrg>() + linkObj.getRelativeName<sideSrc>();
 
             reportInfo(txtCreatingLink, target);
@@ -1718,11 +1730,9 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj)
 {
     const SyncOperation syncOp = dirObj.getSyncOperation();
 
-    SelectedSide sideTrg = LEFT_SIDE;
-
-    if (getTargetDirection(syncOp, &sideTrg))
+    if (Opt<SelectedSide> sideTrg = getTargetDirection(syncOp))
     {
-        if (sideTrg == LEFT_SIDE)
+        if (*sideTrg == LEFT_SIDE)
             synchronizeFolderInt<LEFT_SIDE>(dirObj, syncOp);
         else
             synchronizeFolderInt<RIGHT_SIDE>(dirObj, syncOp);
@@ -1739,6 +1749,10 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
     {
         case SO_CREATE_NEW_LEFT:
         case SO_CREATE_NEW_RIGHT:
+            if (const DirMapping* parentDir = dynamic_cast<DirMapping*>(&dirObj.parent()))
+                if (parentDir->isEmpty<sideTrg>()) //BaseDirMapping OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
+                    return; //if parent directory creation failed, there's no reason to show more errors!
+
             if (somethingExists(dirObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should error out!
             {
                 const Zstring& target = dirObj.getBaseDirPf<sideTrg>() + dirObj.getRelativeName<sideSrc>();
@@ -1746,7 +1760,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
                 reportInfo(txtCreatingFolder, target);
                 try
                 {
-                    makeNewDirectory(target, dirObj.getFullName<sideSrc>(), copyFilePermissions_); //throw FileError, ErrorTargetExisting
+                    makeDirectoryPlain(target, dirObj.getFullName<sideSrc>(), copyFilePermissions_); //throw FileError, ErrorTargetExisting, (ErrorTargetPathMissing)
                 }
                 catch (const ErrorTargetExisting&) { if (!dirExists(target)) throw; } //detect clash with file (dir-symlink OTOH is okay)
                 dirObj.copyTo<sideTrg>(); //update DirMapping
@@ -1849,45 +1863,44 @@ template <SelectedSide side> //create base directories first (if not yet existin
 bool createBaseDirectory(BaseDirMapping& baseMap, ProcessCallback& callback) //nothrow; return false if fatal error occurred
 {
     const Zstring dirname = beforeLast(baseMap.getBaseDirPf<side>(), FILE_NAME_SEPARATOR); //what about C:\ ???
-    if (!dirname.empty())
-    {
-        if (baseMap.isExisting<side>()) //atomicity: do NOT check directory existence again!
-        {
-            //just convenience: exit sync right here instead of showing tons of error messages during file copy
-            return tryReportingError([&]
-            {
-                if (!dirExistsUpdating(dirname, false, callback))
-                    throw FileError(replaceCpy(_("Cannot find %x."), L"%x", fmtFileName(dirname))); //this should really be a "fatal error" if not recoverable
-            }, callback); //may throw in error-callback!
-        }
-        else //create target directory: user presumably ignored error "dir existing" in order to have it created automatically
-        {
-            bool temporaryNetworkDrop = false;
-            bool rv = tryReportingError([&]
-            {
-                try
-                {
-                    makeNewDirectory(dirname, Zstring(), false); //FileError, ErrorTargetExisting
-                    //a nice race-free check and set operation!
-                    baseMap.setExisting<side>(true); //update our model!
-                }
-                catch (const ErrorTargetExisting&)
-                {
-                    //TEMPORARY network drop: base directory not found during comparison, but reappears during synchronization
-                    //=> sync-directions are based on false assumptions! Abort.
-                    callback.reportFatalError(replaceCpy(_("Target folder %x already existing."), L"%x", fmtFileName(dirname)));
-                    temporaryNetworkDrop = true;
+    if (dirname.empty())
+        return true;
 
-                    //Is it possible we're catching a "false-positive" here, could FFS have created the directory indirectly after comparison?
-                    //	1. deletion handling: recycler       -> no, temp directory created only at first deletion
-                    //	2. deletion handling: versioning     -> "
-                    //	3. log file creates containing folder -> no, log only created in batch mode, and only *before* comparison
-                }
-            }, callback); //may throw in error-callback!
-            return rv && !temporaryNetworkDrop;
-        }
+    if (baseMap.isExisting<side>()) //atomicity: do NOT check directory existence again!
+    {
+        //just convenience: exit sync right here instead of showing tons of error messages during file copy
+        return tryReportingError([&]
+        {
+            if (!dirExistsUpdating(dirname, false, callback))
+                throw FileError(replaceCpy(_("Cannot find %x."), L"%x", fmtFileName(dirname))); //this should really be a "fatal error" if not recoverable
+        }, callback); //may throw in error-callback!
     }
-    return true;
+    else //create target directory: user presumably ignored error "dir existing" in order to have it created automatically
+    {
+        bool temporaryNetworkDrop = false;
+        bool rv = tryReportingError([&]
+        {
+            try
+            {
+                //a nice race-free check and set operation:
+                makeDirectory(dirname, /*bool failIfExists*/ true); //throw FileError, ErrorTargetExisting
+                baseMap.setExisting<side>(true); //update our model!
+            }
+            catch (const ErrorTargetExisting&)
+            {
+                //TEMPORARY network drop: base directory not found during comparison, but reappears during synchronization
+                //=> sync-directions are based on false assumptions! Abort.
+                callback.reportFatalError(replaceCpy(_("Target folder %x already existing."), L"%x", fmtFileName(dirname)));
+                temporaryNetworkDrop = true;
+
+                //Is it possible we're catching a "false-positive" here, could FFS have created the directory indirectly after comparison?
+                //	1. deletion handling: recycler       -> no, temp directory created only at first deletion
+                //	2. deletion handling: versioning     -> "
+                //	3. log file creates containing folder -> no, log only created in batch mode, and only *before* comparison
+            }
+        }, callback); //may throw in error-callback!
+        return rv && !temporaryNetworkDrop;
+    }
 }
 }
 
@@ -2093,8 +2106,7 @@ void zen::synchronize(const TimeComp& timeStamp,
             //the following scenario is covered by base directory creation below in case source directory exists (accessible or not), but latter doesn't cover not-yet-created source!!!
             auto checkSourceMissing = [&](const Zstring& baseDirPf, bool wasExisting) -> bool //avoid race-condition: we need to evaluate existence status from time of comparison!
             {
-                const Zstring dirname = beforeLast(baseDirPf, FILE_NAME_SEPARATOR);
-                if (!dirname.empty())
+                if (!baseDirPf.empty())
                 {
                     //PERMANENT network drop: avoid data loss when source directory is not found AND user chose to ignore errors (else we wouldn't arrive here)
                     if (folderPairStat.getCreate() +
@@ -2237,7 +2249,9 @@ void zen::synchronize(const TimeComp& timeStamp,
 
 #ifdef FFS_WIN
     //shadow copy buffer: per sync-instance, not folder pair
-    std::unique_ptr<shadow::ShadowCopy> shadowCopyHandler(copyLockedFiles ? new shadow::ShadowCopy : nullptr);
+    std::unique_ptr<shadow::ShadowCopy> shadowCopyHandler;
+    if (copyLockedFiles)
+        shadowCopyHandler = make_unique<shadow::ShadowCopy>();
 #endif
 
     try

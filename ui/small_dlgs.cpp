@@ -35,19 +35,22 @@ public:
     AboutDlg(wxWindow* parent);
 
 private:
-    void OnClose(wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnOK   (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_OKAY); }
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnOK    (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_OKAY); }
+    virtual void OnDonate(wxCommandEvent& event) { wxLaunchDefaultBrowser(L"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=zenju@gmx.de&no_shipping=1&lc=US&currency_code=EUR"); }
 };
 
 
 AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 {
-    setRelativeFontSize(*m_hyperlinkDonate, 1.25);
+    setRelativeFontSize(*m_buttonDonate, 1.25);
 
-    m_bitmap9 ->SetBitmap(GlobalResources::getImage(L"website"));
-    m_bitmap10->SetBitmap(GlobalResources::getImage(L"email"));
-    m_bitmap13->SetBitmap(GlobalResources::getImage(L"gpl"));
-    //m_bitmapSmiley->SetBitmap(GlobalResources::getImage(L"smiley"));
+    assert(m_buttonClose->GetId() == wxID_OK); //we cannot use wxID_CLOSE else Esc key won't work: yet another wxWidgets bug??
+
+    m_bitmap9 ->SetBitmap(getResourceImage(L"website"));
+    m_bitmap10->SetBitmap(getResourceImage(L"email"));
+    m_bitmap13->SetBitmap(getResourceImage(L"gpl"));
+    //m_bitmapSmiley->SetBitmap(getResourceImage(L"smiley"));
 
     m_animCtrlWink->SetAnimation(GlobalResources::instance().aniWink);
     m_animCtrlWink->Play();
@@ -56,7 +59,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
     for (auto it = ExistingTranslations::get().begin(); it != ExistingTranslations::get().end(); ++it)
     {
         //flag
-        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::getImage(it->languageFlag), wxDefaultPosition, wxSize(-1, 11), 0 );
+        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, getResourceImage(it->languageFlag), wxDefaultPosition, wxSize(-1, 11), 0 );
         fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER);
 
         //language name
@@ -93,9 +96,6 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
     m_build->SetLabel(replaceCpy(_("Build: %x"), L"%x", build));
 
-    //m_animationControl1->SetAnimation(GlobalResources::instance().animationMoney);
-    //m_animationControl1->Play();
-
     Fit(); //child-element widths have changed: image was set
 
     //generate logo
@@ -104,7 +104,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
     wxBitmap bmpLogo;
     {
-        wxImage tmp = GlobalResources::getImage(L"logo").ConvertToImage();
+        wxImage tmp = getResourceImage(L"logo").ConvertToImage();
         tmp.Resize(wxSize(GetClientSize().GetWidth(), tmp.GetHeight()), wxPoint(0, 0), 255, 255, 255); //enlarge to fit full width
         bmpLogo = wxBitmap(tmp);
     }
@@ -119,7 +119,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
     Fit(); //child-element widths have changed: image was set
 
-    m_buttonOkay->SetFocus();
+    m_buttonClose->SetFocus(); //on GTK ESC is only associated with wxID_OK correctly if we set at least *any* focus at all!!!
 }
 
 
@@ -140,13 +140,13 @@ public:
     ~FilterDlg() {}
 
 private:
-    void OnClose       (  wxCloseEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnCancel      (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Exclude Items.html", this); }
-    void OnDefault     (wxCommandEvent& event);
-    void OnApply       (wxCommandEvent& event);
-    void OnUpdateChoice(wxCommandEvent& event) { updateGui(); }
-    void OnUpdateNameFilter(wxCommandEvent& event) { updateGui(); }
+    virtual void OnClose       (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnCancel      (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Exclude Items.html", this); }
+    virtual void OnDefault     (wxCommandEvent& event);
+    virtual void OnApply       (wxCommandEvent& event);
+    virtual void OnUpdateChoice(wxCommandEvent& event) { updateGui(); }
+    virtual void OnUpdateNameFilter(wxCommandEvent& event) { updateGui(); }
 
     void updateGui();
     void setFilter(const FilterConfig& filter);
@@ -194,8 +194,8 @@ FilterDlg::FilterDlg(wxWindow* parent,
     add(USIZE_KB,   _("KB")).
     add(USIZE_MB,   _("MB"));
 
-    m_bitmap26->SetBitmap(GlobalResources::getImage(L"filter"));
-    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getImage(L"help"));
+    m_bitmap26->SetBitmap(getResourceImage(L"filter"));
+    m_bpButtonHelp->SetBitmapLabel(getResourceImage(L"help"));
 
     setFilter(filter);
 
@@ -210,7 +210,7 @@ FilterDlg::FilterDlg(wxWindow* parent,
     m_staticTextHeader->SetLabel(_("Filter"));
 
     Fit(); //child-element widths have changed: image was set
-    m_panelHeader->Layout();
+    Layout();
 }
 
 
@@ -222,11 +222,9 @@ void FilterDlg::onKeyEvent(wxKeyEvent& event)
         switch (keyCode)
         {
             case 'A': //CTRL + A
-            {
                 if (auto textCtrl = dynamic_cast<wxTextCtrl*>(event.GetEventObject()))
                     textCtrl->SetSelection(-1, -1); //select all
                 return;
-            }
         }
     event.Skip();
 }
@@ -238,24 +236,24 @@ void FilterDlg::updateGui()
 
     m_bitmapInclude->SetBitmap(
         !NameFilter::isNull(activeCfg.includeFilter, FilterConfig().excludeFilter) ?
-        GlobalResources::getImage(L"filter_include") :
-        greyScale(GlobalResources::getImage(L"filter_include")));
+        getResourceImage(L"filter_include") :
+        greyScale(getResourceImage(L"filter_include")));
 
     m_bitmapExclude->SetBitmap(
         !NameFilter::isNull(FilterConfig().includeFilter, activeCfg.excludeFilter) ?
-        GlobalResources::getImage(L"filter_exclude") :
-        greyScale(GlobalResources::getImage(L"filter_exclude")));
+        getResourceImage(L"filter_exclude") :
+        greyScale(getResourceImage(L"filter_exclude")));
 
     m_bitmapFilterDate->SetBitmap(
         activeCfg.unitTimeSpan != UTIME_NONE ?
-        GlobalResources::getImage(L"clock") :
-        greyScale(GlobalResources::getImage(L"clock")));
+        getResourceImage(L"clock") :
+        greyScale(getResourceImage(L"clock")));
 
     m_bitmapFilterSize->SetBitmap(
         activeCfg.unitSizeMin != USIZE_NONE ||
         activeCfg.unitSizeMax != USIZE_NONE ?
-        GlobalResources::getImage(L"size") :
-        greyScale(GlobalResources::getImage(L"size")));
+        getResourceImage(L"size") :
+        greyScale(getResourceImage(L"size")));
 
     m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan == UTIME_LAST_X_DAYS);
     m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != USIZE_NONE);
@@ -335,11 +333,11 @@ public:
                  bool& useRecycleBin);
 
 private:
-    void OnOK(wxCommandEvent& event);
-    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnDelOnBothSides(wxCommandEvent& event);
-    void OnUseRecycler(wxCommandEvent& event);
+    virtual void OnOK(wxCommandEvent& event);
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnDelOnBothSides(wxCommandEvent& event);
+    virtual void OnUseRecycler(wxCommandEvent& event);
 
     void updateGui();
 
@@ -380,7 +378,7 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
     updateGui();
 
     Fit(); //child-element widths have changed: image was set: "fit" only *once* on construction!
-    m_panelHeader->Layout();
+    Layout();
 
     m_buttonOK->SetFocus();
 }
@@ -388,7 +386,7 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
 
 void DeleteDialog::updateGui()
 {
-    wxWindowUpdateLocker dummy(m_panelHeader); //avoid display distortion
+    wxWindowUpdateLocker dummy(this); //avoid display distortion
 
     const std::pair<Zstring, int> delInfo = zen::deleteFromGridAndHDPreview(
                                                 rowsToDeleteOnLeft,
@@ -399,13 +397,13 @@ void DeleteDialog::updateGui()
     {
         header = _P("Do you really want to move the following object to the Recycle Bin?",
                     "Do you really want to move the following %x objects to the Recycle Bin?", delInfo.second);
-        m_bitmapDeleteType->SetBitmap(GlobalResources::getImage(L"recycler"));
+        m_bitmapDeleteType->SetBitmap(getResourceImage(L"recycler"));
     }
     else
     {
         header = _P("Do you really want to delete the following object?",
                     "Do you really want to delete the following %x objects?", delInfo.second);
-        m_bitmapDeleteType->SetBitmap(GlobalResources::getImage(L"deleteFile"));
+        m_bitmapDeleteType->SetBitmap(getResourceImage(L"deleteFile"));
     }
     replace(header, L"%x", toGuiString(delInfo.second));
     m_staticTextHeader->SetLabel(header);
@@ -413,7 +411,6 @@ void DeleteDialog::updateGui()
     const wxString& fileList = utfCvrtTo<wxString>(delInfo.first);
     m_textCtrlFileList->ChangeValue(fileList);
 
-    m_panelHeader->Layout();
     Layout();
 }
 
@@ -462,9 +459,9 @@ public:
                    const zen::SyncStatistics& st,
                    bool& dontShowAgain);
 private:
-    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnStartSync(wxCommandEvent& event);
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnStartSync(wxCommandEvent& event);
 
     bool& m_dontShowAgain;
 };
@@ -483,7 +480,7 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
 
     setRelativeFontSize(*m_buttonStartSync, 1.5);
     m_buttonStartSync->setInnerBorderSize(8);
-    m_buttonStartSync->setBitmapFront(GlobalResources::getImage(L"sync"), 5);
+    m_buttonStartSync->setBitmapFront(getResourceImage(L"sync"), 5);
 
     m_staticTextVariant->SetLabel(variantName);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
@@ -491,18 +488,18 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     //update preview of item count and bytes to be transferred:
     setText(*m_staticTextData, filesizeToShortString(st.getDataToProcess()));
     if (st.getDataToProcess() == 0)
-        m_bitmapData->SetBitmap(greyScale(GlobalResources::getImage(L"data")));
+        m_bitmapData->SetBitmap(greyScale(getResourceImage(L"data")));
     else
-        m_bitmapData->SetBitmap(GlobalResources::getImage(L"data"));
+        m_bitmapData->SetBitmap(getResourceImage(L"data"));
 
     auto setValue = [](wxStaticText& txtControl, int value, wxStaticBitmap& bmpControl, const wchar_t* bmpName)
     {
         setText(txtControl, toGuiString(value));
 
         if (value == 0)
-            bmpControl.SetBitmap(greyScale(mirrorIfRtl(GlobalResources::getImage(bmpName))));
+            bmpControl.SetBitmap(greyScale(mirrorIfRtl(getResourceImage(bmpName))));
         else
-            bmpControl.SetBitmap(mirrorIfRtl(GlobalResources::getImage(bmpName)));
+            bmpControl.SetBitmap(mirrorIfRtl(getResourceImage(bmpName)));
     };
 
     setValue(*m_staticTextCreateLeft,  st.getCreate<LEFT_SIDE >(), *m_bitmapCreateLeft,  L"createLeftSmall");
@@ -512,9 +509,10 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
     setValue(*m_staticTextUpdateRight, st.getUpdate<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"updateRightSmall");
     setValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"deleteRightSmall");
 
-    m_buttonStartSync->SetFocus();
-    m_panelHeader->Layout(); //m_buttonStartSync changed => this *is* required!
+    m_panelStatistics->Layout(); //m_buttonStartSync changed => this *is* required!
+
     Fit();
+    m_buttonStartSync->SetFocus();
 }
 
 
@@ -537,8 +535,8 @@ ReturnSmallDlg::ButtonPressed zen::showSyncPreviewDlg(wxWindow* parent,
 
     return static_cast<ReturnSmallDlg::ButtonPressed>(preview.ShowModal());
 }
-//########################################################################################
 
+//########################################################################################
 
 class CompareCfgDialog : public CmpCfgDlgGenerated
 {
@@ -546,17 +544,16 @@ public:
     CompareCfgDialog(wxWindow* parent, CompConfig& cmpConfig);
 
 private:
-    void OnOkay(wxCommandEvent& event);
-    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnShowHelp(wxCommandEvent& event) { displayHelpEntry(L"html/Comparison Settings.html", this); }
+    virtual void OnOkay(wxCommandEvent& event);
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnShowHelp(wxCommandEvent& event) { displayHelpEntry(L"html/Comparison Settings.html", this); }
 
-    void OnTimeSize(wxCommandEvent& event) { compareVar = CMP_BY_TIME_SIZE; updateGui(); }
-    void OnContent (wxCommandEvent& event) { compareVar = CMP_BY_CONTENT;   updateGui(); }
+    virtual void OnTimeSize(wxCommandEvent& event) { compareVar = CMP_BY_TIME_SIZE; updateGui(); }
+    virtual void OnContent (wxCommandEvent& event) { compareVar = CMP_BY_CONTENT;   updateGui(); }
 
-    void OnTimeSizeDouble(wxMouseEvent& event);
-    void OnFilesizeDouble(wxMouseEvent& event);
-    void OnContentDouble(wxMouseEvent& event);
+    virtual void OnTimeSizeDouble(wxMouseEvent& event);
+    virtual void OnContentDouble(wxMouseEvent& event);
 
     void updateGui();
 
@@ -578,7 +575,7 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
     setRelativeFontSize(*m_toggleBtnTimeSize, 1.25);
     setRelativeFontSize(*m_toggleBtnContent,  1.25);
 
-    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getImage(L"help"));
+    m_bpButtonHelp->SetBitmapLabel(getResourceImage(L"help"));
 
     enumDescrHandleSyml.
     add(SYMLINK_IGNORE,       _("Exclude")).
@@ -592,6 +589,8 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
 
     updateGui();
     Fit();
+
+    m_buttonOkay->SetFocus();
 }
 
 
@@ -618,8 +617,8 @@ void CompareCfgDialog::updateGui()
         else
             bmpCtrl.SetBitmap(greyScale(bmp));
     };
-    setBitmap(*m_bitmapByTime,    compareVar == CMP_BY_TIME_SIZE, GlobalResources::getImage(L"clock"));
-    setBitmap(*m_bitmapByContent, compareVar == CMP_BY_CONTENT,   GlobalResources::getImage(L"cmpByContent"));
+    setBitmap(*m_bitmapByTime,    compareVar == CMP_BY_TIME_SIZE, getResourceImage(L"clock"));
+    setBitmap(*m_bitmapByContent, compareVar == CMP_BY_CONTENT,   getResourceImage(L"cmpByContent"));
 }
 
 
@@ -662,14 +661,14 @@ public:
     GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
 private:
-    void OnOkay(wxCommandEvent& event);
-    void OnResetDialogs(wxCommandEvent& event);
-    void OnDefault(wxCommandEvent& event);
-    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnAddRow(wxCommandEvent& event);
-    void OnRemoveRow(wxCommandEvent& event);
-    void OnResize(wxSizeEvent& event);
+    virtual void OnOkay(wxCommandEvent& event);
+    virtual void OnResetDialogs(wxCommandEvent& event);
+    virtual void OnDefault(wxCommandEvent& event);
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnAddRow(wxCommandEvent& event);
+    virtual void OnRemoveRow(wxCommandEvent& event);
+    void onResize(wxSizeEvent& event);
 
     void set(const xmlAccess::ExternalApps& extApp);
     xmlAccess::ExternalApps getExtApp();
@@ -688,10 +687,10 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
 
     setRelativeFontSize(*m_staticTextHeader, 1.25);
 
-    m_bitmapSettings    ->SetBitmap     (GlobalResources::getImage(L"settings"));
-    m_buttonResetDialogs->setBitmapFront(GlobalResources::getImage(L"warningSmall"), 5);
-    m_bpButtonAddRow    ->SetBitmapLabel(GlobalResources::getImage(L"item_add"));
-    m_bpButtonRemoveRow ->SetBitmapLabel(GlobalResources::getImage(L"item_delete"));
+    m_bitmapSettings    ->SetBitmap     (getResourceImage(L"settings"));
+    m_buttonResetDialogs->setBitmapFront(getResourceImage(L"warningSmall"), 5);
+    m_bpButtonAddRow    ->SetBitmapLabel(getResourceImage(L"item_add"));
+    m_bpButtonRemoveRow ->SetBitmapLabel(getResourceImage(L"item_delete"));
 
     m_checkBoxCopyLocked     ->SetValue(globalSettings.copyLockedFiles);
     m_checkBoxTransCopy      ->SetValue(globalSettings.transactionalFileCopy);
@@ -717,18 +716,18 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     m_gridCustomCommand->SetMargins(0, 0);
 
     Fit(); //child-element widths have changed: image was set
-    m_panelHeader->Layout();
+    Layout();
 
     //automatically fit column width to match totl grid width
-    Connect(wxEVT_SIZE, wxSizeEventHandler(GlobalSettingsDlg::OnResize), nullptr, this);
+    Connect(wxEVT_SIZE, wxSizeEventHandler(GlobalSettingsDlg::onResize), nullptr, this);
     wxSizeEvent dummy;
-    OnResize(dummy);
+    onResize(dummy);
 
     m_buttonOkay->SetFocus();
 }
 
 
-void GlobalSettingsDlg::OnResize(wxSizeEvent& event)
+void GlobalSettingsDlg::onResize(wxSizeEvent& event)
 {
     const int widthTotal = m_gridCustomCommand->GetGridWindow()->GetClientSize().GetWidth() - 20;
 
@@ -848,8 +847,8 @@ ReturnSmallDlg::ButtonPressed zen::showGlobalSettingsDlg(wxWindow* parent, xmlAc
     GlobalSettingsDlg settingsDlg(parent, globalSettings);
     return static_cast<ReturnSmallDlg::ButtonPressed>(settingsDlg.ShowModal());
 }
-//########################################################################################
 
+//########################################################################################
 
 class SelectTimespanDlg : public SelectTimespanDlgGenerated
 {
@@ -857,9 +856,9 @@ public:
     SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& timeTo);
 
 private:
-    void OnOkay(wxCommandEvent& event);
-    void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
-    void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnOkay(wxCommandEvent& event);
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
 
     virtual void OnChangeSelectionFrom(wxCalendarEvent& event)
     {
@@ -925,8 +924,6 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
     m_calendarFrom->SetDate(utcToLocalDateTime(to<time_t>(timeFrom_)));
     m_calendarTo  ->SetDate(utcToLocalDateTime(to<time_t>(timeTo_)));
 
-    m_buttonOkay->SetFocus();
-
     //wxDatePickerCtrl::BestSize() does not respect year field and trims it, both wxMSW/wxGTK - why isn't there anybody testing this wxWidgets stuff???
     wxSize minSz = m_calendarFrom->GetBestSize();
     minSz.x += 30;
@@ -934,6 +931,7 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
     m_calendarTo  ->SetMinSize(minSz);
 
     Fit();
+    m_buttonOkay->SetFocus();
 }
 
 

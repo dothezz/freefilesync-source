@@ -13,6 +13,8 @@
 #include "process_callback.h"
 #include "resolve_path.h"
 
+namespace zen
+{
 namespace
 {
 //directory existence checking may hang for non-existent network drives => run asynchronously and update UI!
@@ -57,8 +59,9 @@ std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::vector<Zstrin
     }
     return output;
 }
+}
 
-
+inline //also silences Clang "unused function" for compilation units depending from getExistingDirsUpdating() only
 bool dirExistsUpdating(const Zstring& dirname, bool allowUserInteraction, ProcessCallback& procCallback)
 {
     std::vector<Zstring> dirnames;

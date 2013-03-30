@@ -107,15 +107,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.exLeftSideOnly)
         {
             case SYNC_DIR_RIGHT:
-                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"createRight")));
+                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"createRight")));
                 buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"deleteLeft")));
+                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"deleteLeft")));
                 buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DELETE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"none")));
+                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
                 buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -123,15 +123,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.exRightSideOnly)
         {
             case SYNC_DIR_RIGHT:
-                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"deleteRight")));
+                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"deleteRight")));
                 buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DELETE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"createLeft")));
+                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"createLeft")));
                 buttonRightOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"none")));
+                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
                 buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -139,15 +139,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.leftNewer)
         {
             case SYNC_DIR_RIGHT:
-                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"updateRight")));
+                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateRight")));
                 buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"updateLeft")));
+                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateLeft")));
                 buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"none")));
+                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
                 buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -155,15 +155,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.rightNewer)
         {
             case SYNC_DIR_RIGHT:
-                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"updateRight")));
+                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateRight")));
                 buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"updateLeft")));
+                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateLeft")));
                 buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"none")));
+                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
                 buttonRightNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -171,15 +171,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.different)
         {
             case SYNC_DIR_RIGHT:
-                buttonDifferent->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"updateRight")));
+                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateRight")));
                 buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonDifferent->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"updateLeft")));
+                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateLeft")));
                 buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonDifferent->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"none")));
+                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
                 buttonDifferent->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -187,15 +187,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.conflict)
         {
             case SYNC_DIR_RIGHT:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"updateRight")));
+                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateRight")));
                 buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"updateLeft")));
+                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateLeft")));
                 buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(GlobalResources::getImage(L"conflict"))); //silent dependency to algorithm.cpp::Redetermine!!!
+                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"conflict"))); //silent dependency to algorithm.cpp::Redetermine!!!
                 buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
                 break;
         }
@@ -221,13 +221,13 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
     //set icons for this dialog
-    m_bitmapLeftOnly  ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"leftOnly"  ))));
-    m_bitmapRightOnly ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"rightOnly" ))));
-    m_bitmapLeftNewer ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"leftNewer" ))));
-    m_bitmapRightNewer->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"rightNewer"))));
-    m_bitmapDifferent ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"different" ))));
-    m_bitmapConflict  ->SetBitmap(mirrorIfRtl(greyScale(GlobalResources::getImage(L"conflict"  ))));
-    m_bitmapDatabase  ->SetBitmap(GlobalResources::getImage(L"database"));
+    m_bitmapLeftOnly  ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"leftOnly"  ))));
+    m_bitmapRightOnly ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"rightOnly" ))));
+    m_bitmapLeftNewer ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"leftNewer" ))));
+    m_bitmapRightNewer->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"rightNewer"))));
+    m_bitmapDifferent ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"different" ))));
+    m_bitmapConflict  ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"conflict"  ))));
+    m_bitmapDatabase  ->SetBitmap(getResourceImage(L"database"));
 
     setRelativeFontSize(*m_toggleBtnAutomatic, 1.25);
     setRelativeFontSize(*m_toggleBtnMirror,    1.25);
@@ -257,7 +257,6 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     setConfig(newCfg);
 
     Fit();
-    bSizerConfig->Layout(); //wxButtonWithImage size might have changed
 
     m_buttonOK->SetFocus();
 }
@@ -340,6 +339,7 @@ void SyncCfgDialog::updateGui()
             bSizerRightNewer->Show(false);
             break;
     }
+    bSizerConfig->Layout(); //[!]
 
     //update toggle buttons -> they have no parameter-ownership at all!
     m_staticTextAutomatic->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
@@ -429,6 +429,7 @@ void SyncCfgDialog::updateGui()
     }
 
     Layout();
+    bSizerNamingConvention->Layout(); //[!] not handled by previous "Layout"
     Refresh(); //removes a few artifacts when toggling display of versioning folder
     GetSizer()->SetSizeHints(this); //this works like a charm for GTK2 with window resizing problems!!! (includes call to Fit())
 }

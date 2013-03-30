@@ -13,6 +13,7 @@
 #include <wx/statbox.h>
 #include <wx/dirdlg.h>
 #include <wx/msgdlg.h>
+#include <wx/scrolwin.h>
 #include <wx+/string_conv.h>
 #include "../lib/resolve_path.h"
 #include "folder_history_box.h"
@@ -88,34 +89,56 @@ DirectoryName<NameControl>::DirectoryName(wxWindow&     dropWindow,
 {
     //prepare drag & drop
     setupFileDrop(dropWindow_);
-    dropWindow_.Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
+    dropWindow_.Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::onFilesDropped), nullptr, this);
 
     if (dropWindow2_)
     {
         setupFileDrop(*dropWindow2_);
-        dropWindow2_->Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
+        dropWindow2_->Connect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::onFilesDropped), nullptr, this);
     }
 
     //keep dirPicker and dirName synchronous
-    dirName_     .Connect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler      (DirectoryName::OnWriteDirManually), nullptr, this);
-    selectButton_.Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler      (DirectoryName::OnSelectDir       ), nullptr, this);
+    dirName_     .Connect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (DirectoryName::onMouseWheel), nullptr, this);
+    dirName_     .Connect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(DirectoryName::onWriteDirManually), nullptr, this);
+    selectButton_.Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DirectoryName::onSelectDir       ), nullptr, this);
 }
 
 
 template <class NameControl>
 DirectoryName<NameControl>::~DirectoryName()
 {
-    dropWindow_.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
+    dropWindow_.Disconnect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::onFilesDropped), nullptr, this);
     if (dropWindow2_)
-        dropWindow2_->Disconnect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::OnFilesDropped), nullptr, this);
+        dropWindow2_->Disconnect(EVENT_DROP_FILE, FileDropEventHandler(DirectoryName::onFilesDropped), nullptr, this);
 
-    dirName_     .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler      (DirectoryName::OnWriteDirManually), nullptr, this);
-    selectButton_.Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler      (DirectoryName::OnSelectDir       ), nullptr, this);
+    dirName_     .Disconnect(wxEVT_MOUSEWHEEL,             wxMouseEventHandler  (DirectoryName::onMouseWheel), nullptr, this);
+    dirName_     .Disconnect(wxEVT_COMMAND_TEXT_UPDATED,   wxCommandEventHandler(DirectoryName::onWriteDirManually), nullptr, this);
+    selectButton_.Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DirectoryName::onSelectDir       ), nullptr, this);
 }
 
 
 template <class NameControl>
-void DirectoryName<NameControl>::OnFilesDropped(FileDropEvent& event)
+void DirectoryName<NameControl>::onMouseWheel(wxMouseEvent& event)
+{
+    //for combobox: although switching through available items is wxWidgets default, this is NOT windows default, e.g. explorer
+    //additionally this will delete manual entries, although all the users wanted is scroll the parent window!
+
+    //redirect to parent scrolled window!
+    wxWindow* wnd = &dirName_;
+    while ((wnd = wnd->GetParent()) != nullptr) //silence MSVC warning
+        if (dynamic_cast<wxScrolledWindow*>(wnd) != nullptr)
+            if (wxEvtHandler* evtHandler = wnd->GetEventHandler())
+            {
+                evtHandler->AddPendingEvent(event);
+                break;
+            }
+
+    //	event.Skip();
+}
+
+
+template <class NameControl>
+void DirectoryName<NameControl>::onFilesDropped(FileDropEvent& event)
 {
     const auto& files = event.getFiles();
     if (files.empty())
@@ -149,7 +172,7 @@ void DirectoryName<NameControl>::OnFilesDropped(FileDropEvent& event)
 
 
 template <class NameControl>
-void DirectoryName<NameControl>::OnWriteDirManually(wxCommandEvent& event)
+void DirectoryName<NameControl>::onWriteDirManually(wxCommandEvent& event)
 {
     setDirectoryName(event.GetString(), static_cast<NameControl*>(nullptr), dirName_, staticText_);
 
@@ -160,7 +183,7 @@ void DirectoryName<NameControl>::OnWriteDirManually(wxCommandEvent& event)
 
 
 template <class NameControl>
-void DirectoryName<NameControl>::OnSelectDir(wxCommandEvent& event)
+void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
 {
     wxString defaultDirname; //default selection for dir picker
     {

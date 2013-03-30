@@ -205,6 +205,8 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
                     //current speed -> Win 7 copy uses 1 sec update interval
                     setText(*m_staticTextSpeed, perf->getBytesPerSecond(), &layoutChanged);
                 }
+
+                warn_static("more often: eveyr 100 ms?")
                 //remaining time
                 setText(*m_staticTextRemTime, perf->getRemainingTime(to<double>(dataTotal - dataCurrent)), &layoutChanged);
             }
@@ -270,16 +272,16 @@ namespace
 inline
 wxBitmap buttonPressed(const std::string& name)
 {
-    wxBitmap background = GlobalResources::getImage(L"log button pressed");
-    return layOver(GlobalResources::getImage(utfCvrtTo<wxString>(name)), background);
+    wxBitmap background = getResourceImage(L"log button pressed");
+    return layOver(getResourceImage(utfCvrtTo<wxString>(name)), background);
 }
 
 
 inline
 wxBitmap buttonReleased(const std::string& name)
 {
-    wxImage output = greyScale(GlobalResources::getImage(utfCvrtTo<wxString>(name))).ConvertToImage();
-    //GlobalResources::getImage(utfCvrtTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
+    wxImage output = greyScale(getResourceImage(utfCvrtTo<wxString>(name))).ConvertToImage();
+    //getResourceImage(utfCvrtTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
     //brighten(output, 30);
 
     zen::move(output, 0, -1); //move image right one pixel
@@ -470,14 +472,14 @@ public:
                         switch (entry.type)
                         {
                             case TYPE_INFO:
-                                dc.DrawLabel(wxString(), GlobalResources::getImage(L"msg_small_info"), rectTmp, wxALIGN_CENTER);
+                                dc.DrawLabel(wxString(), getResourceImage(L"msg_small_info"), rectTmp, wxALIGN_CENTER);
                                 break;
                             case TYPE_WARNING:
-                                dc.DrawLabel(wxString(), GlobalResources::getImage(L"msg_small_warning"), rectTmp, wxALIGN_CENTER);
+                                dc.DrawLabel(wxString(), getResourceImage(L"msg_small_warning"), rectTmp, wxALIGN_CENTER);
                                 break;
                             case TYPE_ERROR:
                             case TYPE_FATAL_ERROR:
-                                dc.DrawLabel(wxString(), GlobalResources::getImage(L"msg_small_error"), rectTmp, wxALIGN_CENTER);
+                                dc.DrawLabel(wxString(), getResourceImage(L"msg_small_error"), rectTmp, wxALIGN_CENTER);
                                 break;
                         }
                     break;
@@ -504,7 +506,7 @@ public:
                     return 2 * COLUMN_BORDER_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
 
                 case COL_TYPE_MSG_CATEGORY:
-                    return GlobalResources::getImage(L"msg_small_info").GetWidth();
+                    return getResourceImage(L"msg_small_info").GetWidth();
 
                 case COL_TYPE_MSG_TEXT:
                     return COLUMN_BORDER_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
@@ -521,12 +523,12 @@ public:
 
     static int getColumnCategoryDefaultWidth()
     {
-        return GlobalResources::getImage(L"msg_small_info").GetWidth();
+        return getResourceImage(L"msg_small_info").GetWidth();
     }
 
     static int getRowDefaultHeight(const Grid& grid)
     {
-        return std::max(GlobalResources::getImage(L"msg_small_info").GetHeight(), grid.getMainWin().GetCharHeight() + 2) + 1; //+ some space + bottom border
+        return std::max(getResourceImage(L"msg_small_info").GetHeight(), grid.getMainWin().GetCharHeight() + 2) + 1; //+ some space + bottom border
     }
 
     virtual wxString getToolTip(size_t row, ColumnType colType) const
@@ -927,12 +929,14 @@ SyncProgressDialog::Pimpl::Pimpl(AbortCallback& abortCb,
     paused_   (false),
     finalResult(RESULT_ABORTED), //dummy value
     isZombie(false),
-    lastStatCallSpeed  (-1000000), //some big number
+    lastStatCallSpeed(-1000000), //some big number
     phaseStartMs(0)
 {
 #ifdef FFS_WIN
     new MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+
+    assert(m_buttonClose->GetId() == wxID_OK); //we cannot use wxID_CLOSE else Esc key won't work: yet another wxWidgets bug??
 
     setRelativeFontSize(*m_staticTextPhase, 1.5);
 
@@ -951,6 +955,8 @@ SyncProgressDialog::Pimpl::Pimpl(AbortCallback& abortCb,
     m_gauge1->SetRange(GAUGE_FULL_RANGE);
     m_gauge1->SetValue(0);
 
+    warn_static("not honored on osx")
+
     EnableCloseButton(false);
 
     if (IsShown()) //don't steal focus when starting in sys-tray!
@@ -960,16 +966,16 @@ SyncProgressDialog::Pimpl::Pimpl(AbortCallback& abortCb,
 
     try //try to get access to Windows 7/Ubuntu taskbar
     {
-        taskbar_.reset(new Taskbar(mainDialog ? *static_cast<wxTopLevelWindow*>(mainDialog) : *this));
+        taskbar_ = make_unique<Taskbar>(mainDialog ? *static_cast<wxTopLevelWindow*>(mainDialog) : *this);
     }
     catch (const TaskbarNotAvailable&) {}
 
     //hide "processed" statistics until end of process
-    bSizerFinalStat           ->Show(false);
+    m_listbookResult          ->Hide();
     m_staticTextLabelItemsProc->Show(false);
     bSizerItemsProc           ->Show(false);
-    m_buttonOK                ->Show(false);
-    m_panelFooter->Layout();
+    m_buttonClose             ->Show(false);
+    Layout();
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(Pimpl::OnKeyPressed), nullptr, this);
@@ -980,12 +986,13 @@ SyncProgressDialog::Pimpl::Pimpl(AbortCallback& abortCb,
 
     m_panelGraph->setAttributes(Graph2D::MainAttributes().
                                 setLabelX(Graph2D::X_LABEL_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
-                                setLabelY(Graph2D::Y_LABEL_RIGHT,  70, std::make_shared<LabelFormatterBytes>()));
+                                setLabelY(Graph2D::Y_LABEL_RIGHT,  70, std::make_shared<LabelFormatterBytes>()).
+                                setSelectionMode(Graph2D::SELECT_NONE));
 
     m_panelGraph->setData(graphDataBytes,
-                          Graph2D::CurveAttributes().setLineWidth(2)
-                          .setColor     (wxColor(  0, 192,   0))   //medium green
-                          .fillCurveArea(wxColor(192, 255, 192))); //faint green
+                          Graph2D::CurveAttributes().setLineWidth(2).
+                          setColor     (wxColor(  0, 192,   0)).  //medium green
+                          fillCurveArea(wxColor(192, 255, 192))); //faint green
 
     m_panelGraph->addData(graphDataBytesTotal, Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(0, 64, 0))); //dark green
 
@@ -1005,8 +1012,12 @@ SyncProgressDialog::Pimpl::~Pimpl()
     {
         mainDialog->enableAllElements();
         mainDialog->SetTitle(titelTextBackup); //restore title text
-        mainDialog->Raise();
-        mainDialog->SetFocus();
+
+        //make sure main dialog is shown again if still "minimized to systray"! see SyncProgressDialog::closeWindowDirectly()
+        if (mainDialog->IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
+            mainDialog->Iconize(false);
+
+        mainDialog->Show();
     }
 }
 
@@ -1025,9 +1036,9 @@ void SyncProgressDialog::Pimpl::OnKeyPressed(wxKeyEvent& event)
                 handler->ProcessEvent(dummy);
             return;
         }
-        else if (m_buttonOK->IsShown())
+        else if (m_buttonClose->IsShown())
         {
-            if (wxEvtHandler* handler = m_buttonOK->GetEventHandler())
+            if (wxEvtHandler* handler = m_buttonClose->GetEventHandler())
                 handler->ProcessEvent(dummy);
             return;
         }
@@ -1340,7 +1351,7 @@ void SyncProgressDialog::Pimpl::updateDialogStatus() //depends on "syncStat_, pa
     if (syncStat_) //sync running
     {
         if (paused_)
-            m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusPause"));
+            m_bitmapStatus->SetBitmap(getResourceImage(L"statusPause"));
         else
             switch (syncStat_->currentPhase())
             {
@@ -1348,15 +1359,15 @@ void SyncProgressDialog::Pimpl::updateDialogStatus() //depends on "syncStat_, pa
                     break;
 
                 case ProcessCallback::PHASE_SCANNING:
-                    m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusScanning"));
+                    m_bitmapStatus->SetBitmap(getResourceImage(L"statusScanning"));
                     break;
 
                 case ProcessCallback::PHASE_COMPARING_CONTENT:
-                    m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusBinaryCompare"));
+                    m_bitmapStatus->SetBitmap(getResourceImage(L"statusBinaryCompare"));
                     break;
 
                 case ProcessCallback::PHASE_SYNCHRONIZING:
-                    m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusSyncing"));
+                    m_bitmapStatus->SetBitmap(getResourceImage(L"statusSyncing"));
                     break;
             }
 
@@ -1366,22 +1377,22 @@ void SyncProgressDialog::Pimpl::updateDialogStatus() //depends on "syncStat_, pa
         switch (finalResult)
         {
             case RESULT_ABORTED:
-                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusAborted"));
+                m_bitmapStatus->SetBitmap(getResourceImage(L"statusAborted"));
                 m_bitmapStatus->SetToolTip(_("Synchronization aborted!"));
                 break;
 
             case RESULT_FINISHED_WITH_ERROR:
-                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusFinishedErrors"));
+                m_bitmapStatus->SetBitmap(getResourceImage(L"statusFinishedErrors"));
                 m_bitmapStatus->SetToolTip(_("Synchronization completed with errors!"));
                 break;
 
             case RESULT_FINISHED_WITH_WARNINGS:
-                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusFinishedWarnings"));
+                m_bitmapStatus->SetBitmap(getResourceImage(L"statusFinishedWarnings"));
                 m_bitmapStatus->SetToolTip(_("Synchronization completed with warnings."));
                 break;
 
             case RESULT_FINISHED_WITH_SUCCESS:
-                m_bitmapStatus->SetBitmap(GlobalResources::getImage(L"statusFinishedSuccess"));
+                m_bitmapStatus->SetBitmap(getResourceImage(L"statusFinishedSuccess"));
                 m_bitmapStatus->SetToolTip(_("Synchronization completed successfully."));
                 break;
         }
@@ -1431,7 +1442,6 @@ void SyncProgressDialog::Pimpl::updateDialogStatus() //depends on "syncStat_, pa
             m_buttonPause->SetLabel(_("Pause"));
     }
 
-    m_panelHeader->Layout();
     Layout();
 }
 
@@ -1449,6 +1459,8 @@ void SyncProgressDialog::Pimpl::closeWindowDirectly() //this should really be ca
     abortCb_  = nullptr; //avoid callback to (maybe) deleted parent process
     syncStat_ = nullptr; //set *after* last call to "updateGui"
     //----------------------------------
+
+    //resumeFromSystray(); -> NO, instead ~Pimpl() makes sure that main dialog is shown again!
 
     Close();
 }
@@ -1523,31 +1535,32 @@ void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const Er
 
     resumeFromSystray(); //if in tray mode...
 
-    warn_static("not honored on osx")
-
     EnableCloseButton(true);
 
     m_buttonAbort->Disable();
     m_buttonAbort->Hide();
     m_buttonPause->Disable();
     m_buttonPause->Hide();
-    m_buttonOK->Show();
-    m_buttonOK->Enable();
+    m_buttonClose->Show();
+    m_buttonClose->Enable();
 
     if (IsShown()) //don't steal focus when residing in sys-tray!
-        m_buttonOK->SetFocus();
+        m_buttonClose->SetFocus();
 
     m_animationControl1->Stop();
     m_animationControl1->Hide();
 
     //hide current operation status
-    m_staticlineHeader->Hide();
     m_staticTextStatus->Hide();
 
     bSizerExecFinished->Show(false);
 
     //show and prepare final statistics
-    bSizerFinalStat->Show(true);
+    m_listbookResult->Show();
+
+#ifdef FFS_WIN
+    m_staticlineHeader->Hide(); //win: m_listbookResult already has a window frame
+#endif
 
     //show total time
     m_staticTextLabelElapsedTime->SetLabel(_("Total time:")); //it's not "elapsed time" anymore
@@ -1563,10 +1576,10 @@ void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const Er
     //note: alternative solutions involving wxLC_LIST, wxLC_REPORT and SetWindowStyleFlag() do not work portably! wxListBook using wxLC_ICON is obviously a class invariant!
 
     //1. re-arrange graph into results listbook
-    bSizerTop->Detach(m_panelProgress);
+    bSizerRoot->Detach(m_panelProgress);
     m_panelProgress->Reparent(m_listbookResult);
 #ifdef FFS_LINUX //does not seem to be required on Win or OS X
-    wxYield(); //wxGTK 2.9.3 fails miserably at "reparent" whithout this
+    wxTheApp->Yield(); //wxGTK 2.9.3 fails miserably at "reparent" whithout this
 #endif
     m_listbookResult->AddPage(m_panelProgress, _("Statistics"), true); //AddPage() takes ownership!
 
@@ -1580,7 +1593,6 @@ void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const Er
     if (log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR) > 0)
         m_listbookResult->ChangeSelection(posLog);
 
-    m_panelFooter->Layout();
     Layout();
 
     //play (optional) sound notification after sync has completed -> only play when waiting on results dialog, seems to be pointless otherwise!
@@ -1661,7 +1673,7 @@ void SyncProgressDialog::Pimpl::minimizeToTray()
 {
     if (!trayIcon.get())
     {
-        trayIcon.reset(new FfsTrayIcon);
+        trayIcon = make_unique<FfsTrayIcon>();
         trayIcon->Connect(FFS_REQUEST_RESUME_TRAY_EVENT, wxCommandEventHandler(SyncProgressDialog::Pimpl::OnResumeFromTray), nullptr, this);
         //tray icon has shorter lifetime than this => no need to disconnect event later
     }
@@ -1700,7 +1712,6 @@ void SyncProgressDialog::Pimpl::resumeFromSystray()
 
 
 //########################################################################################
-
 
 //redirect to implementation
 SyncProgressDialog::SyncProgressDialog(AbortCallback& abortCb,

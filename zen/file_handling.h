@@ -55,9 +55,13 @@ void renameFile(const Zstring& oldName, const Zstring& newName); //throw FileErr
 
 bool supportsPermissions(const Zstring& dirname); //throw FileError, derefernces symlinks
 
-//creates superdirectories automatically:
-void makeDirectory(const Zstring& directory); //throw FileError; do nothing if directory already exists!
-void makeNewDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //throw FileError, ErrorTargetExisting
+//if parent directory not existing: create recursively:
+void makeDirectory(const Zstring& directory, bool failIfExists = false); //throw FileError, ErrorTargetExisting
+
+//fail if already existing or parent not existing:
+//directory should not end with path separator
+//templateDir may be empty
+void makeDirectoryPlain(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
 
 struct FileAttrib
 {

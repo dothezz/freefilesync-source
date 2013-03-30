@@ -47,9 +47,10 @@ public:
 private:
     virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd) { return true; }; //return true if drop should be processed
 
-    void OnFilesDropped    (FileDropEvent& event);
-    void OnWriteDirManually(wxCommandEvent& event);
-    void OnSelectDir       (wxCommandEvent& event);
+    void onMouseWheel      (wxMouseEvent& event);
+    void onFilesDropped    (FileDropEvent& event);
+    void onWriteDirManually(wxCommandEvent& event);
+    void onSelectDir       (wxCommandEvent& event);
 
     wxWindow&     dropWindow_;
     wxWindow*     dropWindow2_;

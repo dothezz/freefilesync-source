@@ -222,12 +222,13 @@ private:
     void applySyncConfig();
 
     //menu events
-    void OnMenuGlobalSettings(wxCommandEvent& event);
-    void OnMenuExportFileList(wxCommandEvent& event);
-    void OnMenuCheckVersion  (wxCommandEvent& event);
-    void OnMenuAbout         (wxCommandEvent& event);
-    void OnShowHelp          (wxCommandEvent& event);
-    void OnMenuQuit          (wxCommandEvent& event);
+    virtual void OnMenuGlobalSettings(wxCommandEvent& event);
+    virtual void OnMenuExportFileList(wxCommandEvent& event);
+    virtual void OnMenuCheckVersion  (wxCommandEvent& event);
+    virtual void OnMenuAbout         (wxCommandEvent& event);
+    virtual void OnShowHelp          (wxCommandEvent& event);
+    virtual void OnMenuQuit          (wxCommandEvent& event) { Close(); }
+
     void OnMenuLanguageSwitch(wxCommandEvent& event);
 
     void switchProgramLanguage(int langID);

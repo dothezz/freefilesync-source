@@ -52,7 +52,7 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
 #endif
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
- SetIcon(GlobalResources::instance().programIcon); //set application icon
+    SetIcon(GlobalResources::instance().programIcon); //set application icon
 
     setRelativeFontSize(*m_buttonStart, 1.5);
     m_buttonStart->setInnerBorderSize(8);
@@ -60,9 +60,9 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     m_bpButtonRemoveTopFolder->Hide();
     m_panelMainFolder->Layout();
 
-    m_bpButtonAddFolder      ->SetBitmapLabel(GlobalResources::getImage(L"item_add"));
-    m_bpButtonRemoveTopFolder->SetBitmapLabel(GlobalResources::getImage(L"item_delete"));
-    m_buttonStart            ->setBitmapFront(GlobalResources::getImage(L"startRts"), 5);
+    m_bpButtonAddFolder      ->SetBitmapLabel(getResourceImage(L"item_add"));
+    m_bpButtonRemoveTopFolder->SetBitmapLabel(getResourceImage(L"item_delete"));
+    m_buttonStart            ->setBitmapFront(getResourceImage(L"startRts"), 5);
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), nullptr, this);
@@ -384,7 +384,7 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
     {
         //add new folder pair
         DirectoryPanel* newFolder = new DirectoryPanel(m_scrolledWinFolders);
-        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(GlobalResources::getImage(L"item_delete"));
+        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(getResourceImage(L"item_delete"));
 
         //get size of scrolled window
         folderHeight = newFolder->GetSize().GetHeight();

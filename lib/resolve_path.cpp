@@ -7,10 +7,11 @@
 #include <wx/utils.h> //wxGetEnv
 
 #ifdef FFS_WIN
-#include <zen/win.h> //includes "windows.h"
-#include <Shlobj.h>
 #include <zen/long_path_prefix.h>
 #include <zen/file_handling.h>
+#include <zen/win.h> //includes "windows.h"
+#include <zen/dll.h>
+#include <Shlobj.h>
 #ifdef _MSC_VER
 #pragma comment(lib, "Mpr.lib")
 #endif
@@ -106,6 +107,37 @@ private:
             }
         };
 
+        //================================================================================================
+        //SHGetKnownFolderPath: API available only with Windows Vista and later:
+#ifdef __MINGW32__ //MinGW is clueless about Vista...
+#define REFKNOWNFOLDERID const GUID&
+#define KF_FLAG_DONT_VERIFY 0x00004000
+        const GUID FOLDERID_Downloads       = { 0x374de290, 0x123f, 0x4565, { 0x91, 0x64, 0x39, 0xc4, 0x92, 0x5e, 0x46, 0x7b} };
+        const GUID FOLDERID_PublicDownloads = { 0x3d644c9b, 0x1fb8, 0x4f30, { 0x9b, 0x45, 0xf6, 0x70, 0x23, 0x5f, 0x79, 0xc0} };
+        const GUID FOLDERID_QuickLaunch     = { 0x52a4f021, 0x7b75, 0x48a9, { 0x9f, 0x6b, 0x4b, 0x87, 0xa2, 0x10, 0xbc, 0x8f} };
+#endif
+        typedef HRESULT (STDAPICALLTYPE* SHGetKnownFolderPathFunc)(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath);
+        const SysDllFun<SHGetKnownFolderPathFunc> shGetKnownFolderPath(L"Shell32.dll", "SHGetKnownFolderPath");
+
+        auto addFolderId = [&](REFKNOWNFOLDERID rfid, const Zstring& paramName)
+        {
+            if (shGetKnownFolderPath != nullptr) //[!] avoid bogus MSVC "performance warning"
+            {
+                PWSTR path = nullptr;
+                if (SUCCEEDED(shGetKnownFolderPath(rfid,                //_In_      REFKNOWNFOLDERID rfid,
+                                                   KF_FLAG_DONT_VERIFY, //_In_      DWORD dwFlags,
+                                                   nullptr,             //_In_opt_  HANDLE hToken,
+                                                   &path)))             //_Out_     PWSTR *ppszPath
+                {
+                    ZEN_ON_SCOPE_EXIT(::CoTaskMemFree(path));
+
+                    Zstring dirname = path;
+                    if (!dirname.empty())
+                        csidlToDir.insert(std::make_pair(paramName, dirname));
+                }
+            }
+        };
+
         addCsidl(CSIDL_DESKTOPDIRECTORY,        L"csidl_Desktop");       // C:\Users\<user>\Desktop
         addCsidl(CSIDL_COMMON_DESKTOPDIRECTORY, L"csidl_PublicDesktop"); // C:\Users\All Users\Desktop
 
@@ -140,6 +172,12 @@ private:
         addCsidl(CSIDL_TEMPLATES,        L"csidl_Templates");       // C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Templates
         addCsidl(CSIDL_COMMON_TEMPLATES, L"csidl_PublicTemplates"); // C:\ProgramData\Microsoft\Windows\Templates
 
+        //Vista and later:
+        addFolderId(FOLDERID_Downloads,       L"csidl_Downloads");       // C:\Users\<user>\Downloads
+        addFolderId(FOLDERID_PublicDownloads, L"csidl_PublicDownloads"); // C:\Users\Public\Downloads
+
+        addFolderId(FOLDERID_QuickLaunch,     L"csidl_QuickLaunch");     // C:\Users\<user>\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch
+
         /*
         CSIDL_APPDATA				covered by %AppData%
         CSIDL_LOCAL_APPDATA			covered by %LocalAppData% -> not on XP!
@@ -154,6 +192,8 @@ private:
         CSIDL_PROGRAM_FILES_COMMONX86	covered by %CommonProgramFiles(x86)% -> not on XP!
         CSIDL_ADMINTOOLS			not relevant?
         CSIDL_COMMON_ADMINTOOLS		not relevant?
+
+        FOLDERID_Public				covered by %Public%
         */
     }
 
@@ -298,14 +338,14 @@ Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on
 
             findFirstMatch.addJob([path, volumeName]() -> std::unique_ptr<Zstring>
             {
-                UINT type = ::GetDriveType(path.c_str()); //non-blocking call!
+                UINT type = ::GetDriveType(appendSeparator(path).c_str()); //non-blocking call!
                 if (type == DRIVE_REMOTE || type == DRIVE_CDROM)
                     return nullptr;
 
                 //next call seriously blocks for non-existing network drives!
                 std::vector<wchar_t> volName(MAX_PATH + 1); //docu says so
 
-                if (::GetVolumeInformation(path.c_str(),        //__in_opt   LPCTSTR lpRootPathName,
+                if (::GetVolumeInformation(appendSeparator(path).c_str(),        //__in_opt   LPCTSTR lpRootPathName,
                 &volName[0], //__out      LPTSTR lpVolumeNameBuffer,
                 static_cast<DWORD>(volName.size()), //__in       DWORD nVolumeNameSize,
                 nullptr,     //__out_opt  LPDWORD lpVolumeSerialNumber,
@@ -329,18 +369,20 @@ Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on
 //networks and cdrom excluded - this should not block
 Zstring getVolumeName(const Zstring& volumePath) //return empty string on error
 {
-    UINT rv = ::GetDriveType(volumePath.c_str()); //non-blocking call!
-    if (rv != DRIVE_REMOTE && rv != DRIVE_CDROM)
+    UINT rv = ::GetDriveType(appendSeparator(volumePath).c_str()); //non-blocking call!
+    if (rv != DRIVE_REMOTE &&
+        rv != DRIVE_CDROM)
     {
-        std::vector<wchar_t> buffer(MAX_PATH + 1);
-        if (::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
-                                   &buffer[0],         //__out      LPTSTR lpVolumeNameBuffer,
-                                   static_cast<DWORD>(buffer.size()), //__in       DWORD nVolumeNameSize,
-                                   nullptr,            //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                   nullptr,            //__out_opt  LPDWORD lpMaximumComponentLength,
-                                   nullptr,            //__out_opt  LPDWORD lpFileSystemFlags,
-                                   nullptr,            //__out      LPTSTR lpFileSystemNameBuffer,
-                                   0))                 //__in       DWORD nFileSystemNameSize
+        const DWORD bufferSize = MAX_PATH + 1;
+        std::vector<wchar_t> buffer(bufferSize);
+        if (::GetVolumeInformation(appendSeparator(volumePath).c_str(), //__in_opt   LPCTSTR lpRootPathName,
+                                   &buffer[0], //__out      LPTSTR lpVolumeNameBuffer,
+                                   bufferSize, //__in       DWORD nVolumeNameSize,
+                                   nullptr,    //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                   nullptr,    //__out_opt  LPDWORD lpMaximumComponentLength,
+                                   nullptr,    //__out_opt  LPDWORD lpFileSystemFlags,
+                                   nullptr,    //__out      LPTSTR lpFileSystemNameBuffer,
+                                   0))         //__in       DWORD nFileSystemNameSize
             return &buffer[0];
     }
     return Zstring();
@@ -420,7 +462,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
     }
 #endif
 
-    //3. environment variables: C:\Users\username -> %USERPROFILE%
+    //3. environment variables: C:\Users\<user> -> %USERPROFILE%
     {
         std::map<Zstring, Zstring> envToDir;
 
@@ -432,15 +474,15 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         };
 #ifdef FFS_WIN
         addEnvVar(L"AllUsersProfile");  // C:\ProgramData
-        addEnvVar(L"AppData");          // C:\Users\username\AppData\Roaming
-        addEnvVar(L"LocalAppData");     // C:\Users\username\AppData\Local
+        addEnvVar(L"AppData");          // C:\Users\<user>\AppData\Roaming
+        addEnvVar(L"LocalAppData");     // C:\Users\<user>\AppData\Local
         addEnvVar(L"ProgramData");      // C:\ProgramData
         addEnvVar(L"ProgramFiles");     // C:\Program Files
         addEnvVar(L"ProgramFiles(x86)");// C:\Program Files (x86)
         addEnvVar(L"CommonProgramFiles");      // C:\Program Files\Common Files
         addEnvVar(L"CommonProgramFiles(x86)"); // C:\Program Files (x86)\Common Files
         addEnvVar(L"Public");           // C:\Users\Public
-        addEnvVar(L"UserProfile");      // C:\Users\username
+        addEnvVar(L"UserProfile");      // C:\Users\<user>
         addEnvVar(L"WinDir");           // C:\Windows
         addEnvVar(L"Temp");             // C:\Windows\Temp
 
@@ -449,7 +491,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         envToDir.insert(csidlMap.begin(), csidlMap.end());
 
 #elif defined FFS_LINUX || defined FFS_MAC
-        addEnvVar("HOME"); //Linux: /home/zenju  Mac: /Users/zenju
+        addEnvVar("HOME"); //Linux: /home/<user>  Mac: /Users/<user>
 #endif
         //substitute paths by symbolic names
         auto pathStartsWith = [](const Zstring& path, const Zstring& prefix) -> bool
@@ -472,7 +514,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         });
     }
 
-    //4. replace (all) macros: %USERPROFILE% -> C:\Users\username
+    //4. replace (all) macros: %USERPROFILE% -> C:\Users\<user>
     {
         Zstring testMacros = expandMacros(dirname);
         if (testMacros != dirname)

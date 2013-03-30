@@ -476,6 +476,10 @@ public:
     {
         wxClientDC dc(this);
 
+        wxFont labelFont = GetFont();
+        labelFont.SetWeight(wxFONTWEIGHT_BOLD);
+        dc.SetFont(labelFont); //harmonize with RowLabelWin::render()!
+
         int bestWidth = 0;
         for (ptrdiff_t i = rowFrom; i <= rowTo; ++i)
             bestWidth = std::max(bestWidth, dc.GetTextExtent(formatRow(i)).GetWidth() + 2 * ROW_LABEL_BORDER);
@@ -527,7 +531,7 @@ private:
 
         wxFont labelFont = GetFont();
         labelFont.SetWeight(wxFONTWEIGHT_BOLD);
-        dc.SetFont(labelFont);
+        dc.SetFont(labelFont); //harmonize with RowLabelWin::getBestWidth()!
 
         auto rowRange = getRowsOnClient(rect); //returns range [begin, end)
         for (auto row = rowRange.first; row < rowRange.second; ++row)
@@ -636,7 +640,6 @@ private:
 };
 }
 
-//----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 
 class Grid::ColLabelWin : public SubWindow
@@ -948,7 +951,7 @@ private:
         else
             clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
 
-        dc.SetFont(GetFont());
+        dc.SetFont(GetFont()); //harmonize with Grid::getBestColumnSize()
 
         wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
 
@@ -1503,6 +1506,8 @@ void Grid::updateWindowSizes(bool updateScrollbar)
 
     //break this vicious circle:
 
+    //harmonize with Grid::GetSizeAvailableForScrollTarget()!
+
     //1. calculate row label width independent from scrollbars
     const int mainWinHeightGross = std::max(GetSize().GetHeight() - colLabelHeight, 0); //independent from client sizes and scrollbars!
     const ptrdiff_t logicalHeight = rowLabelWin_->getLogicalHeight();                   //
@@ -1602,6 +1607,32 @@ void Grid::updateWindowSizes(bool updateScrollbar)
             */
         }
     }
+}
+
+
+wxSize Grid::GetSizeAvailableForScrollTarget(const wxSize& size)
+{
+    //harmonize with Grid::updateWindowSizes()!
+
+    //1. calculate row label width independent from scrollbars
+    const int mainWinHeightGross = std::max(size.GetHeight() - colLabelHeight, 0); //independent from client sizes and scrollbars!
+    const ptrdiff_t logicalHeight = rowLabelWin_->getLogicalHeight();              //
+
+    int rowLabelWidth = 0;
+    if (drawRowLabel && logicalHeight > 0)
+    {
+        ptrdiff_t yFrom = CalcUnscrolledPosition(wxPoint(0, 0)).y;
+        ptrdiff_t yTo   = CalcUnscrolledPosition(wxPoint(0, mainWinHeightGross - 1)).y ;
+        numeric::confine<ptrdiff_t>(yFrom, 0, logicalHeight - 1);
+        numeric::confine<ptrdiff_t>(yTo,   0, logicalHeight - 1);
+
+        const ptrdiff_t rowFrom = rowLabelWin_->getRowAtPos(yFrom);
+        const ptrdiff_t rowTo   = rowLabelWin_->getRowAtPos(yTo);
+        if (rowFrom >= 0 && rowTo >= 0)
+            rowLabelWidth = rowLabelWin_->getBestWidth(rowFrom, rowTo);
+    }
+
+    return size - wxSize(rowLabelWidth, colLabelHeight);
 }
 
 
@@ -1750,25 +1781,9 @@ void Grid::showScrollBars(Grid::ScrollBarStatus horizontal, Grid::ScrollBarStatu
     showScrollbarX = horizontal;
     showScrollbarY = vertical;
 
-#if wxCHECK_VERSION(2, 9, 0)
-    auto mapStatus = [](ScrollBarStatus sbStatus) -> wxScrollbarVisibility
-    {
-        switch (sbStatus)
-        {
-            case SB_SHOW_AUTOMATIC:
-                return wxSHOW_SB_DEFAULT;
-            case SB_SHOW_ALWAYS:
-                return wxSHOW_SB_ALWAYS;
-            case SB_SHOW_NEVER:
-                return wxSHOW_SB_NEVER;
-        }
-        assert(false);
-        return wxSHOW_SB_DEFAULT;
-    };
-    ShowScrollbars(mapStatus(horizontal), mapStatus(vertical));
-#else //support older wxWidgets API
-
-#ifdef FFS_LINUX //get rid of scrollbars, but preserve scrolling behavior!
+#if defined FFS_WIN || defined FFS_MAC
+    //handled by Grid::SetScrollbar
+#elif defined FFS_LINUX //get rid of scrollbars, but preserve scrolling behavior!
     //the following wxGTK approach is pretty much identical to wxWidgets 2.9 ShowScrollbars() code!
 
     auto mapStatus = [](ScrollBarStatus sbStatus) -> GtkPolicyType
@@ -1788,18 +1803,38 @@ void Grid::showScrollBars(Grid::ScrollBarStatus horizontal, Grid::ScrollBarStatu
 
     GtkWidget* gridWidget = wxWindow::m_widget;
     GtkScrolledWindow* scrolledWindow = GTK_SCROLLED_WINDOW(gridWidget);
-    gtk_scrolled_window_set_policy(scrolledWindow,
-                                   mapStatus(horizontal),
-                                   mapStatus(vertical));
-#elif defined FFS_MAC
-#error function not implemented! Upgrade to wxWidgets 2.9 or newer
-#endif
+    ::gtk_scrolled_window_set_policy(scrolledWindow,
+                                     mapStatus(horizontal),
+                                     mapStatus(vertical));
 #endif
 
     updateWindowSizes();
+
+    /*
+    wxWidgets >= 2.9 ShowScrollbars() is next to useless since it doesn't
+    honor wxSHOW_SB_ALWAYS on OS X, so let's ditch it and avoid more non-portability surprises
+
+    #if wxCHECK_VERSION(2, 9, 0)
+    auto mapStatus = [](ScrollBarStatus sbStatus) -> wxScrollbarVisibility
+    {
+        switch (sbStatus)
+        {
+            case SB_SHOW_AUTOMATIC:
+                return wxSHOW_SB_DEFAULT;
+            case SB_SHOW_ALWAYS:
+                return wxSHOW_SB_ALWAYS;
+            case SB_SHOW_NEVER:
+                return wxSHOW_SB_NEVER;
+        }
+        assert(false);
+        return wxSHOW_SB_DEFAULT;
+    };
+    ShowScrollbars(mapStatus(horizontal), mapStatus(vertical));
+    #endif
+    */
 }
 
-#if defined FFS_WIN && !wxCHECK_VERSION(2, 9, 0) //support older wxWidgets API
+#if defined FFS_WIN || defined FFS_MAC
 void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh)
 {
     ScrollBarStatus sbStatus = SB_SHOW_AUTOMATIC;
@@ -1830,8 +1865,9 @@ void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range,
 }
 #endif
 
-#ifdef FFS_WIN //get rid of scrollbars, but preserve scrolling behavior!
-#ifndef WM_MOUSEHWHEEL //MinGW is clueless...
+ //get rid of scrollbars, but preserve scrolling behavior!
+#ifdef FFS_WIN
+#ifdef __MINGW32__ //MinGW is clueless...
 #define WM_MOUSEHWHEEL                  0x020E
 #endif
 
@@ -2131,7 +2167,7 @@ ptrdiff_t Grid::getBestColumnSize(size_t col, size_t compPos) const
             const ColumnType type = visibleCols[col].type_;
 
             wxClientDC dc(mainWin_);
-            dc.SetFont(mainWin_->GetFont());
+            dc.SetFont(mainWin_->GetFont()); //harmonize with MainWin::render()
 
             size_t maxSize = 0;
 

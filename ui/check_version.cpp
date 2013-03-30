@@ -249,26 +249,27 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
 {
     if (lastUpdateCheck != -1)
     {
-        if (lastUpdateCheck == 0)
-        {
-            switch (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
-                                    _("Do you want FreeFileSync to automatically check for updates every week?") + L"\n" +
-                                    _("(Requires an Internet connection!)")))
-            {
-                case ReturnQuestionDlg::BUTTON_YES:
-                    lastUpdateCheck = 123; //some old date (few seconds after 1970) different from 0 and -1
-                    checkForUpdatePeriodically(parent, lastUpdateCheck); //check for updates now
-                    break;
+        //if (lastUpdateCheck == 0)
+        //{
+        //    switch (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
+        //                            _("Do you want FreeFileSync to automatically check for updates every week?") + L"\n" +
+        //                            _("(Requires an Internet connection!)")))
+        //    {
+        //        case ReturnQuestionDlg::BUTTON_YES:
+        //            lastUpdateCheck = 123; //some old date (few seconds after 1970) different from 0 and -1
+        //            checkForUpdatePeriodically(parent, lastUpdateCheck); //check for updates now
+        //            break;
 
-                case ReturnQuestionDlg::BUTTON_NO:
-                    lastUpdateCheck = -1; //don't check for updates anymore
-                    break;
+        //        case ReturnQuestionDlg::BUTTON_NO:
+        //            lastUpdateCheck = -1; //don't check for updates anymore
+        //            break;
 
-                case ReturnQuestionDlg::BUTTON_CANCEL:
-                    break;
-            }
-        }
-        else if (wxGetLocalTime() >= lastUpdateCheck + 7 * 24 * 3600) //check weekly
+        //        case ReturnQuestionDlg::BUTTON_CANCEL:
+        //            break;
+        //    }
+        //}
+        //else 
+		if (wxGetLocalTime() >= lastUpdateCheck + 7 * 24 * 3600) //check weekly
         {
             wxString onlineVersion;
             switch (getOnlineVersion(onlineVersion))

@@ -1,6 +1,6 @@
 <header>
 	<language name>العربية</language name>
-	<translator></translator>
+	<translator>MEinea</translator>
 	<locale>ar</locale>
 	<flag file>arabic.png</flag file>
 	<plural forms>6</plural forms>
@@ -20,40 +20,43 @@
 <target>مجموع الوقت:</target>
 
 <source>Show in Explorer</source>
-<target>إظهار في مستكشف</target>
+<target>إظهار في المستكشف</target>
 
 <source>Open with default application</source>
 <target>فتح باستخدام التطبيق الافتراضي</target>
 
 <source>Browse directory</source>
-<target>تصفح الدليل</target>
+<target>تصفح المسار</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
-<target>إحباط وطلبت: في انتظار انتهاء العملية الحالية...</target>
+<target>طلب إحباط المهمة: في انتظار انتهاء المهمة الحالية...</target>
 
 <source>Failure to create timestamp for versioning:</source>
-<target>فشل إنشاء الطابع الزمني للإصدارات:</target>
+<target>فشل إنشاء طبعة زمنية من أجل عملية الوسم حسب الإصدار:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
-<target>المزامنة التلقائية</target>
+<target>المزامنة اللحظية - المزمنة التلقائية</target>
 
 <source>Error</source>
 <target>خطأ</target>
 
+<source>Selected variant:</source>
+<target>المتغير المختار:</target>
+
 <source>Select alternate comparison settings</source>
-<target>حدد إعدادات المقارنة البديل</target>
+<target>تحديد إعدادات المقارنة البديلة</target>
 
 <source>Select alternate synchronization settings</source>
-<target>حدد إعدادات المزامنة البديل</target>
+<target>تحديد إعدادات المزامنة البديلة</target>
 
 <source>Filter is active</source>
 <target>عامل التصفية نشط</target>
 
 <source>No filter selected</source>
-<target>لا يوجد عامل تصفية مختارة</target>
+<target>لا يوجد عامل تصفية مختار</target>
 
 <source>Remove alternate settings</source>
-<target>إزالة إعدادات البديل</target>
+<target>إزالة الإعدادات البديلة</target>
 
 <source>Clear filter settings</source>
 <target>مسح إعدادات عامل التصفية</target>
@@ -74,7 +77,7 @@
 <target>تأكيد</target>
 
 <source>Configure filter</source>
-<target>تكوين عامل تصفية</target>
+<target>ضبط عامل التصفية</target>
 
 <source>Global settings</source>
 <target>الإعدادات العامة</target>
@@ -83,7 +86,7 @@
 <target>بحث</target>
 
 <source>Select time span</source>
-<target>حدد الفترة الزمنية</target>
+<target>حدد المجال الزمني</target>
 
 <source>Invalid command line:</source>
 <target>سطر الأوامر غير صالح:</target>
@@ -98,16 +101,16 @@
 <target>خطأ فادح</target>
 
 <source>Error Code %x:</source>
-<target></target>
+<target>خطأ رقم %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>لا يمكن حل الارتباط الرمزي  %x.</target>
 
 <source>%x MB</source>
-<target>%x مب</target>
+<target>%x MB</target>
 
 <source>%x KB</source>
-<target>%x ك. بايت</target>
+<target>%x KB</target>
 
 <source>%x GB</source>
 <target>%x GB</target>
@@ -116,7 +119,14 @@
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>%x Bytes</pluralform>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+<pluralform>%x Bytes</pluralform>
+<pluralform>%x Bytes</pluralform>
+<pluralform>%x Bytes</pluralform>
+</target>
 
 <source>Database file %x is incompatible.</source>
 <target>ملف قاعدة البيانات  %x غير متوافق.</target>
@@ -128,127 +138,141 @@
 <target>ملف قاعدة البيانات  %x غير موجود حتى الآن.</target>
 
 <source>Database file is corrupt:</source>
-<target>ملف قاعدة البيانات معطوبة:</target>
+<target>ملف قاعدة البيانات معطوب:</target>
 
 <source>Out of memory!</source>
-<target>نفاد في الذاكرة</target>
+<target>نفدت الذاكرة</target>
 
 <source>Cannot write file %x.</source>
-<target>لا يمكن كتابة ملف  %x.</target>
+<target>لا يمكن كتابة الملف  %x.</target>
 
 <source>Cannot read file %x.</source>
 <target>لا يمكن قراءة الملف  %x.</target>
 
 <source>Database files do not share a common session.</source>
-<target>عدم مشاركة ملفات قاعدة بيانات جلسة عمل مشتركة.</target>
+<target>ملفات قواعد البيانات لا تشترك في جلسة عمل مشتركة.</target>
 
 <source>An exception occurred!</source>
 <target>حدث استثناء</target>
 
 <source>Cannot read file attributes of %x.</source>
-<target>لا يمكن قراءة سمات الملف من  %x.</target>
+<target>لا يمكن قراءة سمات الملف %x.</target>
 
 <source>Cannot get process information.</source>
-<target>لا يمكن الحصول على معلومات عملية.</target>
+<target>لا يمكن الحصول على معلومات العملية.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
-<target>في انتظار أثناء الدليل مؤمناً  (%x)...</target>
+<target>في انتظار تأمين قفل للمسار (%x)...</target>
 
 <source>Cannot set directory lock %x.</source>
-<target>لا يمكن تعيين الدليل قفل  %x.</target>
+<target>لا يمكن تعيين قفل للمسار %x.</target>
 
 <source>Creating file %x</source>
-<target>إنشاء ملف  %x</target>
+<target>إنشاء الملف %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>ولا ثانية</pluralform>
+<pluralform>ثانية واحدة</pluralform>
+<pluralform>ثانيتين</pluralform>
+<pluralform>%x ثواني</pluralform>
+<pluralform>%x ثانية</pluralform>
+<pluralform>%x ثانية</pluralform>
+</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
-<target>حدث خطأ أثناء تحليل ملف  %x، صف  %y، وعمود  %z.</target>
+<target>حدث خطأ أثناء تحليل الملف  %x، الصف  %y، و العمود  %z.</target>
 
 <source>Scanning:</source>
-<target>المسح الضوئي:</target>
+<target>الفحص:</target>
 
 <source>Encoding extended time information: %x</source>
-<target>ترميز المعلومات تمديد الوقت:  %x</target>
+<target>ترميز المعلومات الموسعة للوقت: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>ولا بند</pluralform>
+<pluralform>بند واحد</pluralform>
+<pluralform>بندان</pluralform>
+<pluralform>%x بنداً</pluralform>
+<pluralform>%x بنداً</pluralform>
+<pluralform>%x بند</pluralform>
+</target>
 
 <source>/sec</source>
-<target>/ثانية</target>
+<target>\ثانية</target>
 
 <source>Cannot find file %x.</source>
 <target>لا يمكن العثور على الملف  %x.</target>
 
 <source>File %x does not contain a valid configuration.</source>
-<target>لا يحتوي ملف  %x تكويناً صحيحاً.</target>
+<target>لا يحتوي الملف %x تكويناً صحيحاً.</target>
 
 <source>Configuration file %x loaded partially only.</source>
-<target>تحميل ملف التكوين  %x جزئيا فقط.</target>
+<target>تم تحميل ملف التكوين %x بشكلٍ جزئي فقط.</target>
 
 <source>Cannot access Volume Shadow Copy Service.</source>
-<target>لا يمكن الوصول إلى "خدمة نسخة الظل لوحدة التخزين".</target>
+<target>لا يمكن الوصول إلى خدمة "نسخ الظل لوحدة التخزين".</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>الرجاء استخدام الإصدار البرنامج 64-بت لإنشاء ملفات الظل الاحتياطية على هذا النظام.</target>
+<target>الرجاء استخدام إصدار الـ 64-bit للبرنامج لإنشاء ملفات الظل الاحتياطية على هذا النظام.</target>
 
 <source>Cannot load file %x.</source>
-<target>لا يمكن تحميل الملف  %x.</target>
+<target>لا يمكن فتح الملف  %x.</target>
 
 <source>Path %x does not contain a volume name.</source>
-<target>المسار  %x لا يحتوي على اسم وحدة تخزين.</target>
+<target>المسار %x لا يحتوي على اسم وحدة تخزين.</target>
 
 <source>Volume name %x not part of file name %y!</source>
-<target>اسم وحدة التخزين ليست جزءا من اسم الملف %x</target>
+<target>اسم وحدة التخزين %x ليس جزءاُ من اسم الملف %y !</target>
 
 <source>Cannot read the following XML elements:</source>
 <target>لا يمكن قراءة عناصر XML التالية:</target>
 
 <source>&Open...</source>
-<target>فتح...</target>
+<target>&فتح...</target>
 
 <source>Save &as...</source>
-<target>حفظ باسم...</target>
+<target>&حفظ باسم...</target>
 
 <source>&Quit</source>
-<target>إنهاء</target>
+<target>&إنهاء</target>
 
 <source>&Program</source>
-<target>البرنامج</target>
+<target>&البرنامج</target>
 
 <source>&Content</source>
-<target>المحتوى</target>
+<target>&المحتوى</target>
 
 <source>&About</source>
-<target>حول</target>
+<target>&حول</target>
 
 <source>&Help</source>
-<target>تعليمات</target>
+<target>&تعليمات</target>
 
 <source>Usage:</source>
 <target>الاستخدام:</target>
 
 <source>1. Select folders to watch.</source>
-<target>1. حدد المجلدات لمشاهدة.</target>
+<target>1. حدد المجلدات للمتابعة.</target>
 
 <source>2. Enter a command line.</source>
-<target>2. إدخال سطر الأوامر.</target>
+<target>2. إدخال سطر أوامر.</target>
 
 <source>3. Press 'Start'.</source>
 <target>3. اضغط على 'ابدأ'.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>للحصول على بدء تشغيل الاستيراد فقط ملف .ffs_batch.</target>
+<target>للبدء قم باستيراد ملف .ffs_batch.</target>
 
 <source>Folders to watch</source>
-<target>المجلدات لمشاهدة</target>
+<target>المجلدات للمتابعة</target>
 
 <source>Add folder</source>
 <target>إضافة مجلد</target>
@@ -260,13 +284,13 @@
 <target>تصفح</target>
 
 <source>Select a folder</source>
-<target>حدد مجلد</target>
+<target>تحديد مجلد</target>
 
 <source>Idle time [seconds]</source>
-<target>وقت الخمول  [ثانية]</target>
+<target>وقت الخمول [ثواني]</target>
 
 <source>Idle time between last detected change and execution of command</source>
-<target>وقت الخمول بين آخر تغيير تم الكشف عنها وتنفيذ الأوامر</target>
+<target>وقت الخمول بين آخر تغيير تم الكشف عنه وتنفيذ الأوامر</target>
 
 <source>Command line</source>
 <target>سطر الأوامر</target>
@@ -278,69 +302,69 @@ The command is triggered if:
 </source>
 <target>
 يتم تشغيل الأمر إذا:
--تغيير الملفات أو المجلدات الفرعية
---يصل إلى المجلدات الجديدة  (مثل إدراج عصا الناقل التسلسلي العام)
+-حدوث تغيير في الملفات أو المجلدات الفرعية
+-ظهور مجلدات جديدة (مثال: إدخال USB stick)
 </target>
 
 <source>Start</source>
-<target>بدء تشغيل</target>
+<target>ابدأ</target>
 
 <source>&Retry</source>
-<target>إعادة المحاولة</target>
+<target>&إعادة المحاولة</target>
 
 <source>Cancel</source>
 <target>إلغاء الأمر</target>
 
 <source>Build: %x</source>
-<target>بناء:  %x</target>
+<target>بناء: %x</target>
 
 <source>All files</source>
 <target>جميع الملفات</target>
 
 <source>&Restore</source>
-<target>استعادة</target>
+<target>&استعادة</target>
 
 <source>&Exit</source>
-<target>خروج</target>
+<target>&خروج</target>
 
 <source>Monitoring active...</source>
-<target>الرصد النشط...</target>
+<target>المراقبة نشطة...</target>
 
 <source>Waiting for missing directories...</source>
-<target>في انتظار الدلائل مفقود...</target>
+<target>في انتظار المسارات المفقود...</target>
 
 <source>A folder input field is empty.</source>
-<target>حقل إدخال مجلد فارغ.</target>
+<target>حقل إدخال خاص بمجلد فارغ.</target>
 
 <source>Synchronization aborted!</source>
-<target>تم إحباط المزامنة</target>
+<target>تم إحباط المزامنة!</target>
 
 <source>Synchronization completed with errors!</source>
-<target>تزامن إكمال مع وجود خطأ!</target>
+<target>انتهاء عملية المزامنة مع وجود أخطء!</target>
 
 <source>Synchronization completed with warnings.</source>
-<target>تزامن الانتهاء مع التحذيرات.</target>
+<target>انتهاء عملية المزامنة مع وجود تحذيرات!</target>
 
 <source>Nothing to synchronize!</source>
-<target>لا شيء لمزامنة</target>
+<target>لا يوجد شيء للمزامنة!</target>
 
 <source>Synchronization completed successfully.</source>
-<target>تمت المزامنة بنجاح</target>
+<target>تمت المزامنة بنجاح.</target>
 
 <source>Saving log file %x...</source>
 <target>حفظ ملف السجل  %x...</target>
 
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>اضغط على "التبديل" لحل القضايا في الحوار الرئيسي البرنامج.</target>
+<target>اضغط على "تبديل" لحل المشاكل في نافذة الحوار الرئيسي البرنامج.</target>
 
 <source>Switching to FreeFileSync main dialog...</source>
-<target>التحول إلى الحوار الرئيسي البرنامج...</target>
+<target>الانتقال إلى نافذة الحوار الرئيسية للبرنامج...</target>
 
 <source>A new version of FreeFileSync is available:</source>
-<target>يتوفر إصدار جديد من البرنامج:</target>
+<target>يتوفر إصدار جديد من FreeFileSync:</target>
 
 <source>Download now?</source>
-<target>تحميل الآن؟</target>
+<target>تنزيل الآن؟</target>
 
 <source>FreeFileSync is up to date!</source>
 <target>البرنامج هو الأحدث حتى الآن!</target>
@@ -349,19 +373,19 @@ The command is triggered if:
 <target>معلومات</target>
 
 <source>Unable to connect to sourceforge.net!</source>
-<target>غير قادر على الاتصال إلى sourceforge.net!</target>
+<target>تعذر الاتصال بـ sourceforge.net!</target>
 
 <source>Current FreeFileSync version number was not found online! Do you want to check manually?</source>
 <target>لم يتم العثور على رقم الإصدار الحالي من البرنامج على الإنترنت! هل تريد التحقق يدوياً؟</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
-<target>هل تريد التحقق تلقائياً من وجود تحديثات كل أسبوع؟</target>
+<target>هل تريد التحقق تلقائياً من وجود تحديثات بشكل إسبوعي؟</target>
 
 <source>(Requires an Internet connection!)</source>
-<target>(يتطلب اتصال إنترنت)!</target>
+<target>(يتطلب الاتصال بالإنترنت!)</target>
 
 <source><Symlink></source>
-<target><Symlink></target>
+<target><ارتباط-رمزي></target>
 
 <source><Folder></source>
 <target><المجلد></target>
@@ -373,10 +397,10 @@ The command is triggered if:
 <target>الاسم</target>
 
 <source>Relative path</source>
-<target>مسار نسبي</target>
+<target>المسار النسبي</target>
 
 <source>Base folder</source>
-<target>المجلد الأساسي</target>
+<target>المجلد الأساسي (القاعدي)</target>
 
 <source>Size</source>
 <target>الحجم</target>
@@ -385,7 +409,7 @@ The command is triggered if:
 <target>تاريخ</target>
 
 <source>Extension</source>
-<target>ملحق</target>
+<target>اللاحقة</target>
 
 <source>Size:</source>
 <target>الحجم:</target>
@@ -394,16 +418,16 @@ The command is triggered if:
 <target>التاريخ:</target>
 
 <source>Action</source>
-<target>عمل</target>
+<target>نشاط</target>
 
 <source>Category</source>
 <target>الفئة</target>
 
 <source>Drag && drop</source>
-<target>سحب إفلات</target>
+<target>سحب و إفلات</target>
 
 <source>Close progress dialog</source>
-<target>تقدم وثيقة الحوار</target>
+<target>إنهاء نافذة حوار تقدم العملية</target>
 
 <source>Standby</source>
 <target>وضع الاستعداد</target>
@@ -418,49 +442,46 @@ The command is triggered if:
 <target>السبات</target>
 
 <source>&New</source>
-<target>الجديد</target>
+<target>&جديد</target>
 
 <source>&Save</source>
-<target>حفظ</target>
+<target>&حفظ</target>
 
 <source>Save as &batch job...</source>
-<target>حفظ كمهمة دفعية...</target>
+<target>&حفظ كمهمة دفعية...</target>
 
 <source>1. &Compare</source>
-<target>1-مقارنة</target>
+<target>1-&مقارنة</target>
 
 <source>2. &Synchronize</source>
-<target>2. مزامنة</target>
+<target>2. &مزامنة</target>
 
 <source>&Language</source>
-<target>اللغة</target>
+<target>&اللغة</target>
 
 <source>&Global settings...</source>
-<target>الإعدادات العمومية...</target>
+<target>&الإعدادات العامة...</target>
 
 <source>&Export file list...</source>
-<target>تصدير قائمة ملف...</target>
+<target>&تصدير قائمة الملفات...</target>
 
 <source>&Advanced</source>
-<target>متقدم</target>
+<target>&متقدم</target>
 
 <source>&Check for new version</source>
-<target>التحقق من الإصدار الجديد</target>
+<target>&التحقق من وجود إصدار جديد</target>
 
 <source>Compare</source>
 <target>قارن</target>
-
-<source>&Abort</source>
-<target>إحباط</target>
 
 <source>Synchronize</source>
 <target>مزامنة</target>
 
 <source>Add folder pair</source>
-<target>إضافة مجلد زوج</target>
+<target>إضافة زوج مجلدات</target>
 
 <source>Remove folder pair</source>
-<target>إزالة المجلد الثاني</target>
+<target>إزالة زوج مجلدات</target>
 
 <source>Swap sides</source>
 <target>مبادلة الجانبين</target>
@@ -469,19 +490,19 @@ The command is triggered if:
 <target>إخفاء العناصر المستبعدة</target>
 
 <source>Show filtered or temporarily excluded files</source>
-<target>عرض تمت تصفيتها أو مؤقتاً استبعاد الملفات</target>
+<target>إظهار الملفات التي تم تصفيتها أو استبعادها بشكل مؤقت</target>
 
 <source>Number of files and folders that will be created</source>
-<target>عدد من الملفات والمجلدات التي سيتم إنشاؤها</target>
+<target>عدد الملفات و المجلدات التي سيتم إنشاؤها</target>
 
 <source>Number of files that will be overwritten</source>
-<target>عدد الملفات التي سيتم الكتابة فوق</target>
+<target>عدد الملفات التي سيتم استبدالها</target>
 
 <source>Number of files and folders that will be deleted</source>
-<target>عدد من الملفات والمجلدات التي سيتم حذفها</target>
+<target>عدد الملفات و المجلدات التي سيتم حذفها</target>
 
 <source>Total bytes to copy</source>
-<target>إجمالي وحدات البايت لنسخ</target>
+<target>إجمالي عدد الـ bytes التي سيتم نسخها</target>
 
 <source>Items found:</source>
 <target>العناصر التي تم العثور عليها:</target>
@@ -495,11 +516,23 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>الوقت المنقضي:</target>
 
+<source>Synchronizing...</source>
+<target>مزامنة...</target>
+
+<source>On completion</source>
+<target>عند الانتهاء</target>
+
+<source>Close</source>
+<target>إغلاق</target>
+
+<source>&Pause</source>
+<target>&إيقاف مؤقت</target>
+
 <source>Batch job</source>
-<target>مهمة المجموعة</target>
+<target>مهمة دفعية</target>
 
 <source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target></target>
+<target>إنشاء ملف دفعي لتحويل المزامنةإلى تلقائية. بالنقر المزدوج على الملف أو جدولته ضمن task planner الخاص بالنظام: FreeFileSync.exe <job name>.ffs_batch</target>
 
 <source>Help</source>
 <target>تعليمات</target>
@@ -511,25 +544,22 @@ The command is triggered if:
 <target>تجاهل</target>
 
 <source>Hide all error and warning messages</source>
-<target>إخفاء جميع الخطأ ورسائل تحذير</target>
+<target>إخفاء جميع رسائل الأخطاء و التحذير</target>
 
 <source>Pop-up</source>
 <target>إطار منبثق</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target>إظهار المنبثقة عن أخطاء أو تحذيرات</target>
+<target>إظهار إطارات منبثقة عند حصول أخطاء أو تحذيرات</target>
 
 <source>Exit</source>
 <target>خروج</target>
 
 <source>Abort synchronization on first error</source>
-<target>إحباط المزامنة على الخطأ الأول</target>
-
-<source>On completion</source>
-<target>وعند الانتهاء</target>
+<target>إحباط المزامنة عند أول خطأ</target>
 
 <source>Show progress dialog</source>
-<target>إظهار التقدم في الحوار</target>
+<target>إظهار نافذة حوار تقدم العملية</target>
 
 <source>Save log</source>
 <target>حفظ سجل</target>
@@ -544,7 +574,7 @@ The command is triggered if:
 <target>تقييد الحد الأقصى لعدد ملفات السجل</target>
 
 <source>Select variant</source>
-<target>حدد الخيار</target>
+<target>تحديد المتغير</target>
 
 <source>
 Files are found equal if
@@ -553,14 +583,14 @@ Files are found equal if
 are the same
 </source>
 <target>
-تم العثور على ملفات متساوية إذا
-     -آخر كتابة الوقت والتاريخ
+يتم تعريف الملفات على أنها متماثلة إذا كان
+     -آخر وقت و تاريخ كتابة
      -حجم الملف
-هي نفسها
+متطابقين
 </target>
 
 <source>File time and size</source>
-<target>وقت الملف والحجم</target>
+<target>وقت الملف و حجمه</target>
 
 <source>
 Files are found equal if
@@ -568,49 +598,49 @@ Files are found equal if
 is the same
 </source>
 <target>
-تم العثور على ملفات متساوية إذا
-     --محتوى الملف
-هو نفسه
+يتم تعريف الملفات على أنها متماثلة إذا كان
+     -محتوى الملف
+متطابقين
 </target>
 
 <source>File content</source>
 <target>محتوى الملف</target>
 
 <source>Symbolic Link handling</source>
-<target>التعامل مع ارتباط رمزي</target>
+<target>التعامل مع الارتباط رمزي</target>
 
 <source>OK</source>
-<target>حسنا</target>
+<target>حسناً</target>
 
 <source><- Two way -></source>
-<target><- إتجاهان -></target>
+<target><- بالاتجاهين -></target>
 
 <source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>تحديد ونشر التغييرات في كلا الجانبين باستخدام قاعدة بيانات. عمليات حذف وإعادة تسمية والصراعات هي الكشف عن تلقائياً.</target>
+<target>تحديد التغييرات في كلا الجانبين باستخدام قواعد بيانات. حيث يتم الكشف عن عمليات الحذف وإعادة التسمية والاختلافات بشكل تلقائي.</target>
 
 <source>Mirror ->></source>
-<target>مرآة->></target>
+<target>انعكاس ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>مرآة احتياطية من المجلد الأيسر. يتم تعديل المجلد الصحيح بالضبط مطابقة المجلد الأيسر بعد المزامنة.</target>
+<target>نسخ احتياطي انعكاس للمجلد الأيسر. يتم تعديل المجلد الأيمن ليطابق المجلد الأيسر بعد المزامنة.</target>
 
 <source>Update -></source>
-<target>تحديث-></target>
+<target>تحديث -></target>
 
 <source>Copy new or updated files to right folder.</source>
-<target>نسخ الملفات الجديدة أو المحدثة إلى المجلد الصحيح.</target>
+<target>نسخ الملفات الجديدة أو المحدثة إلى المجلد الأيمن.</target>
 
 <source>Custom</source>
 <target>مخصص</target>
 
 <source>Configure your own synchronization rules.</source>
-<target>تكوين قواعد المزامنة الخاصة بك.</target>
+<target>تحديد قواعد المزامنة الخاصة بك.</target>
 
 <source>Deletion handling</source>
 <target>التعامل مع الحذف</target>
 
 <source>Permanent</source>
-<target>الدائمة</target>
+<target>الدائم</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>حذف أو الكتابة فوق الملفات بشكل دائم</target>
@@ -619,13 +649,13 @@ is the same
 <target>سلة المحذوفات</target>
 
 <source>Use Recycle Bin for deleted and overwritten files</source>
-<target>استخدام "سلة المحذوفات" للملفات المحذوفة والكتابة</target>
+<target>استخدام سلة المحذوفات للملفات المحذوفة و الكتابة فوق الملفات</target>
 
 <source>Versioning</source>
-<target>تعيين الإصدار</target>
+<target>الوسم برقم الإصدار</target>
 
 <source>Move time-stamped files into specified folder</source>
-<target>نقل ختم الوقت الملفات في المجلد المحدد</target>
+<target>نقل الملفات المحددة بختم زمني إلى المجلد المحدد</target>
 
 <source>Naming convention:</source>
 <target>اصطلاح التسمية:</target>
@@ -640,73 +670,67 @@ is the same
 <target>العنصر موجود في الجانب الأيمن فقط</target>
 
 <source>Left side is newer</source>
-<target>الجانب الأيسر الأحدث</target>
+<target>الجانب الأيسر أحدث</target>
 
 <source>Right side is newer</source>
-<target>الجانب الأيمن الأحدث</target>
+<target>الجانب الأيمن أحدث</target>
 
 <source>Items have different content</source>
-<target>وقد عناصر المحتوى المختلفة</target>
+<target>العناصر مختلفة بالمحتوى</target>
 
 <source>Conflict/item cannot be categorized</source>
-<target>لا يمكن أن تصنف الصراع/الصنف</target>
-
-<source>Synchronizing...</source>
-<target>مزامنة...</target>
-
-<source>&Pause</source>
-<target>إيقاف مؤقت</target>
+<target>الاختلاف\العنصر لا يمكن تصنيفه</target>
 
 <source>Source code written in C++ using:</source>
-<target>منتديات عميد التعريب :</target>
+<target>الرماز المصدري مكتوب بلغة C++ باستخدام:</target>
 
 <source>If you like FreeFileSync</source>
-<target>المصدر الأول لتعريب البرامج في العالم العربي</target>
+<target>إذا أعجبك FreeFileSync</target>
 
 <source>Donate with PayPal</source>
-<target>منتديات عميد التعريب</target>
+<target>تبرع باستخدام PayPal</target>
 
 <source>Many thanks for localization:</source>
-<target>شكرا جزيلا للتعريب:</target>
+<target>شكرا جزيلا للترجمة:</target>
 
 <source>Feedback and suggestions are welcome</source>
-<target>تعليقات واقتراحات موضع ترحيب</target>
+<target>التعليقات و الاقتراحات موضع ترحيب</target>
 
 <source>Homepage</source>
 <target>الصفحة الرئيسية</target>
 
 <source>FreeFileSync at Sourceforge</source>
-<target>البرنامج في سورس</target>
+<target>البرنامج في Sourceforge</target>
 
 <source>Email</source>
 <target>البريد الإلكتروني</target>
 
 <source>Published under the GNU General Public License</source>
-<target>نشر تحت رخصة جنو العمومية العامة</target>
+<target>نشر تحت رخصة GNU General Public License</target>
 
 <source>Delete on both sides</source>
 <target>حذف على كلا الجانبين</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
-<target>حذف على كلا الجانبين حتى إذا تم تحديد الملف على جانب واحد فقط</target>
+<target>حذف الملف في كلا الجانبين حتى إذا كان الملف محدداً على جانب واحد فقط</target>
 
 <source>
 Only files that match all filter settings will be synchronized.
 Note: File names must be relative to base directories!
 </source>
 <target>
-وسوف تكون متزامنة فقط الملفات التي تطابق كافة إعدادات عامل التصفية.
-ملاحظة: يجب أن تكون أسماء الملفات بالنسبة إلى قاعدة الدلائل!
+سوف تتم متزامنة فقط الملفات التي تطابق كافة إعدادات عامل التصفية.
+ملاحظة: يجب أن تكون أسماء الملفات منسوبة إلى بنية المسارات!
 </target>
 
 <source>Include</source>
-<target>وتشمل</target>
+<target>شمول</target>
 
 <source>Exclude</source>
 <target>استبعاد</target>
 
 <source>Time span</source>
-<target>الفترة الزمنية</target>
+<target>المجال الزمني</target>
 
 <source>File size</source>
 <target>حجم الملف</target>
@@ -718,28 +742,28 @@ Note: File names must be relative to base directories!
 <target>الحد الأقصى</target>
 
 <source>&Default</source>
-<target>الافتراضي</target>
+<target>&الافتراضي</target>
 
 <source>Fail-safe file copy</source>
-<target>نسخ ملف آمنة من الفشل</target>
+<target>نسخ ملفات آمن من الفشل</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>الكتابة إلى ملف مؤقت  (*.ffs_tmp) أولاً، ثم إعادة تسميته. وهذا يضمن حالة متناسقة حتى في حالة حدوث خطأ فادح.</target>
+<target>الكتابة إلى ملف مؤقت (*.ffs_tmp) أولاً، ثم إعادة تسميته. وهذا يضمن حالة متناسقة حتى في حالة حدوث خطأ فادح.</target>
 
 <source>Copy locked files</source>
 <target>نسخ الملفات المقفلة</target>
 
 <source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>نسخ الملفات المشتركة أو مؤمن باستخدام "خدمة النسخ الاحتياطي لوحدة التخزين"  (حقوق المسؤول يتطلب)</target>
+<target>نسخ الملفات المشاركة أو المقفلة باستخدام "خدمة النسخ الاحتياطي لوحدة التخزين" (بحاجة لصلاحيات المدير)</target>
 
 <source>Copy file access permissions</source>
 <target>نسخ أذونات الوصول إلى الملف</target>
 
 <source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>نقل أذونات الملفات والمجلدات  (حقوق المسؤول يتطلب)</target>
+<target>نقل أذونات الوصول إلى الملفات و المجلدات (بحاجة لصلاحيات المدير)</target>
 
 <source>Restore hidden dialogs</source>
-<target>استعادة الحوارات الخفية</target>
+<target>استعادة نوافذ الحوار المخفية</target>
 
 <source>External applications</source>
 <target>تطبيقات خارجية</target>
@@ -748,34 +772,34 @@ Note: File names must be relative to base directories!
 <target>الوصف</target>
 
 <source>Start synchronization</source>
-<target>بدء تشغيل المزامنة</target>
+<target>بدء المزامنة</target>
 
 <source>Variant</source>
-<target>البديل</target>
+<target>المتغير</target>
 
 <source>Statistics</source>
 <target>الإحصاءات</target>
 
 <source>Don't show this dialog again</source>
-<target>عدم إظهار هذا الحوار مرة أخرى</target>
+<target>عدم إظهار نافذة الحوار هذه مرة أخرى</target>
 
 <source>Find what:</source>
 <target>بحث عن:</target>
 
 <source>Match case</source>
-<target>مطابقة حالة الأحرف</target>
+<target>مطابقة حالة الأحرف (Match case)</target>
 
 <source>&Find next</source>
-<target>بحث عن التالي</target>
+<target>&بحث عن التالي</target>
 
 <source>Operation aborted!</source>
 <target>تم إحباط العملية!</target>
 
 <source>Main bar</source>
-<target>شريط الرئيسي</target>
+<target>الشريط الرئيسي</target>
 
 <source>Folder pairs</source>
-<target>أزواج المجلد</target>
+<target>أزواج المجلدات</target>
 
 <source>Overview</source>
 <target>نظرة عامة</target>
@@ -787,13 +811,13 @@ Note: File names must be relative to base directories!
 <target>حدد طريقة العرض</target>
 
 <source>Open...</source>
-<target></target>
+<target>فتح...</target>
 
 <source>Save</source>
 <target>حفظ</target>
 
 <source>Compare both sides</source>
-<target>المقارنة بين كلا الجانبين</target>
+<target>مقارنة بين كلا الجانبين</target>
 
 <source>Set direction:</source>
 <target>تحديد الاتجاه:</target>
@@ -802,10 +826,10 @@ Note: File names must be relative to base directories!
 <target>استبعاد مؤقتاً</target>
 
 <source>Include temporarily</source>
-<target>وتشمل مؤقتاً</target>
+<target>شمول مؤقتاً</target>
 
 <source>Exclude via filter:</source>
-<target>استبعاد عن طريق التصفية:</target>
+<target>استبعاد باستخدام عامل التصفية:</target>
 
 <source><multiple selection></source>
 <target><تحديد متعدد></target>
@@ -814,13 +838,13 @@ Note: File names must be relative to base directories!
 <target>حذف</target>
 
 <source>Include all</source>
-<target>وتشمل جميع</target>
+<target>شمول الكل</target>
 
 <source>Exclude all</source>
 <target>استبعاد الكل</target>
 
 <source>Show icons:</source>
-<target>إظهار رموز:</target>
+<target>إظهار الأيقونات:</target>
 
 <source>Small</source>
 <target>صغيرة</target>
@@ -832,7 +856,7 @@ Note: File names must be relative to base directories!
 <target>كبيرة</target>
 
 <source>Select time span...</source>
-<target>حدد الفترة الزمنية...</target>
+<target>حدد المجال الزمني...</target>
 
 <source>Default view</source>
 <target>طريقة العرض الافتراضية</target>
@@ -841,106 +865,106 @@ Note: File names must be relative to base directories!
 <target>إظهار "%x"</target>
 
 <source><Last session></source>
-<target><آخر جلسة></target>
+<target><مصدر الجلسة></target>
 
 <source>Folder Comparison and Synchronization</source>
-<target>مقارنة بين مجلد وتزامن</target>
+<target>مقارنة و مزامنة المجلد</target>
 
 <source>Configuration saved!</source>
-<target>حفظ التكوين!</target>
+<target>تم حفظ التكوين!</target>
 
 <source>FreeFileSync batch</source>
-<target>دفعة البرنامج</target>
-
-<source>Never save changes</source>
-<target>ابدأ بحفظ التغييرات</target>
+<target>دفعة FreeFileSync</target>
 
 <source>Do you want to save changes to %x?</source>
-<target>هل تريد حفظ التغييرات إلى  %x؟</target>
+<target>هل تريد حفظ التغييرات إلى %x؟</target>
 
 <source>Do&n't save</source>
-<target>لا تحفظ</target>
+<target>&لا تحفظ</target>
+
+<source>Never save changes</source>
+<target>لا تحفظ التغييرات أبداً</target>
 
 <source>Configuration loaded!</source>
-<target>تحميل تكوين!</target>
+<target>تم فتح التكوين!</target>
 
 <source>Hide files that exist on left side only</source>
-<target>إخفاء الملفات الموجودة على الجانب الأيسر فقط</target>
+<target>إخفاء الملفات الموجودة في الجانب الأيسر فقط</target>
 
 <source>Show files that exist on left side only</source>
-<target>إظهار الملفات الموجودة على الجانب الأيسر فقط</target>
+<target>إظهار الملفات الموجودة في الجانب الأيسر فقط</target>
 
 <source>Hide files that exist on right side only</source>
-<target>إخفاء الملفات الموجودة على الجانب الأيمن فقط</target>
+<target>إخفاء الملفات الموجودة في الجانب الأيمن فقط</target>
 
 <source>Show files that exist on right side only</source>
-<target>إظهار الملفات الموجودة على الجانب الأيمن فقط</target>
+<target>إظهار الملفات الموجودة في الجانب الأيمن فقط</target>
 
 <source>Hide files that are newer on left</source>
-<target>إخفاء الملفات التي الأحدث على اليسار</target>
+<target>إخفاء الملفات الأحدث في اليسار</target>
 
 <source>Show files that are newer on left</source>
-<target>إظهار الملفات التي الأحدث على اليسار</target>
+<target>إظهار الملفات الأحدث في اليسار</target>
 
 <source>Hide files that are newer on right</source>
-<target>إخفاء الملفات التي الأحدث في حق</target>
+<target>إخفاء الملفات الأحدث في اليمين</target>
 
 <source>Show files that are newer on right</source>
-<target>إظهار الملفات التي الأحدث في حق</target>
+<target>إظهار الملفات الأحدث في اليمين</target>
 
 <source>Hide files that are equal</source>
-<target>إخفاء الملفات التي على قدم المساواة</target>
+<target>إخفاء الملفات المتماثلة على الطرفين</target>
 
 <source>Show files that are equal</source>
-<target>إظهار الملفات التي على قدم المساواة</target>
+<target>إظهار الملفات المتماثلة على الطرفين</target>
 
 <source>Hide files that are different</source>
-<target>إخفاء ملفات مختلفة</target>
+<target>إخفاء الملفات المختلفة على الطرفين</target>
 
 <source>Show files that are different</source>
-<target>إظهار ملفات مختلفة</target>
+<target>إظهار الملفات المختلفة على الطرفين</target>
 
 <source>Hide conflicts</source>
-<target>إخفاء الصراعات</target>
+<target>إخفاء الاختلافات</target>
 
 <source>Show conflicts</source>
-<target>إظهار الصراعات</target>
+<target>إظهار الاختلافات</target>
 
 <source>Hide files that will be created on the left side</source>
-<target>إخفاء الملفات التي سيتم إنشاؤها على الجانب الأيسر</target>
+<target>إخفاء الملفات التي سيتم إنشاؤها في الجانب الأيسر</target>
 
 <source>Show files that will be created on the left side</source>
-<target>إظهار الملفات التي سيتم إنشاؤها على الجانب الأيسر</target>
+<target>إظهار الملفات التي سيتم إنشاؤها في الجانب الأيسر</target>
 
 <source>Hide files that will be created on the right side</source>
-<target>إخفاء الملفات التي سيتم إنشاؤها على الجانب الأيمن</target>
+<target>إخفاء الملفات التي سيتم إنشاؤها في الجانب الأيمن</target>
 
 <source>Show files that will be created on the right side</source>
-<target>إظهار الملفات التي سيتم إنشاؤها على الجانب الأيمن</target>
+<target>إظهار الملفات التي سيتم إنشاؤها في الجانب الأيمن</target>
 
 <source>Hide files that will be deleted on the left side</source>
-<target>إخفاء الملفات التي سيتم حذفها على الجانب الأيسر</target>
+<target>إخفاء الملفات التي سيتم حذفها من الجانب الأيسر</target>
 
 <source>Show files that will be deleted on the left side</source>
-<target>إظهار الملفات التي سيتم حذفها من على الجانب الأيسر</target>
+<target>إظهار الملفات التي سيتم حذفها من من الجانب الأيسر</target>
 
 <source>Hide files that will be deleted on the right side</source>
-<target>إخفاء الملفات التي سيتم حذفها على الجانب الأيمن</target>
+<target>إخفاء الملفات التي سيتم حذفها من الجانب الأيمن</target>
 
 <source>Show files that will be deleted on the right side</source>
-<target>إظهار الملفات التي سيتم حذفها على الجانب الأيمن</target>
+<target>إظهار الملفات التي سيتم حذفها من الجانب الأيمن</target>
 
 <source>Hide files that will be overwritten on left side</source>
-<target>إخفاء الملفات التي سيتم الكتابة فوق على الجانب الأيسر</target>
+<target>إخفاء الملفات التي سيتم الكتابة فوقها في الجانب الأيسر</target>
 
 <source>Show files that will be overwritten on left side</source>
-<target>إظهار الملفات التي سيتم الكتابة فوق على الجانب الأيسر</target>
+<target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيسر</target>
 
 <source>Hide files that will be overwritten on right side</source>
-<target>إخفاء الملفات التي سيتم الكتابة فوق الجانب الأيمن</target>
+<target>إخفاء الملفات التي سيتم الكتابة فوقها في الجانب الأيمن</target>
 
 <source>Show files that will be overwritten on right side</source>
-<target>إظهار الملفات التي سيتم الكتابة فوق الجانب الأيمن</target>
+<target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيمن</target>
 
 <source>Hide files that won't be copied</source>
 <target>إخفاء الملفات التي لن يتم نسخها</target>
@@ -949,76 +973,97 @@ Note: File names must be relative to base directories!
 <target>إظهار الملفات التي لن يتم نسخها</target>
 
 <source>Set as default</source>
-<target></target>
+<target>تحديد كوضع افتراضي</target>
 
 <source>All folders are in sync!</source>
-<target>تكون الكل المجلدات متزامنة</target>
+<target>جميع المجلدات متزامنة!</target>
 
 <source>Comma separated list</source>
 <target>قائمة مفصولة بفواصل</target>
 
 <source>Legend</source>
-<target>أسطورة</target>
+<target>مفتاح الرموز</target>
 
 <source>File list exported!</source>
-<target>تصدير قائمة الملف</target>
+<target>تم تصدير قائمة الملفات!</target>
 
 <source>
 <pluralform>1 directory</pluralform>
 <pluralform>%x directories</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>ولا مسار</pluralform>
+<pluralform>مسار واحد</pluralform>
+<pluralform>مساران</pluralform>
+<pluralform>%x مسارات</pluralform>
+<pluralform>%x مساراً</pluralform>
+<pluralform>%x مسار</pluralform>
+</target>
 
 <source>
 <pluralform>1 file</pluralform>
 <pluralform>%x files</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>ولا ملف</pluralform>
+<pluralform>ملف واحد</pluralform>
+<pluralform>ملفان</pluralform>
+<pluralform>%x ملفات</pluralform>
+<pluralform>%x ملفاً</pluralform>
+<pluralform>%x ملف</pluralform>
+</target>
 
 <source>
 <pluralform>%x of 1 row in view</pluralform>
 <pluralform>%x of %y rows in view</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>عرض %x من ولا صف</pluralform>
+<pluralform>عرض %x من صف واحد</pluralform>
+<pluralform>عرض %x من صفين</pluralform>
+<pluralform>عرض %x من %y صفاً</pluralform>
+<pluralform>عرض %x من %y صفاً</pluralform>
+<pluralform>عرض %x من %y صفاً</pluralform>
+</target>
 
 <source>Ignore further errors</source>
-<target>تجاهل المزيد من الأخطاء</target>
+<target>تجاهل أي أخطاء أخرى</target>
 
 <source>&Ignore</source>
-<target>تجاهل</target>
+<target>&تجاهل</target>
 
 <source>&Switch</source>
-<target>رمز التبديل</target>
+<target>&تبديل</target>
 
 <source>Question</source>
 <target>سؤال</target>
 
 <source>&Yes</source>
-<target>نعم</target>
+<target>&نعم</target>
 
 <source>&No</source>
-<target>لا</target>
+<target>&لا</target>
 
 <source>Scanning...</source>
-<target>المسح الضوئي...</target>
+<target>جاري الفحص...</target>
 
 <source>Comparing content...</source>
 <target>مقارنة المحتوى...</target>
 
 <source>Copy</source>
-<target>نسخة</target>
+<target>نسخ</target>
 
 <source>Paused</source>
-<target>تم إيقاف مؤقتاً</target>
+<target>تم الإيقاف مؤقتاً</target>
 
 <source>Initializing...</source>
-<target>شمل...</target>
+<target>التجهيز للبدأ...</target>
 
 <source>Aborted</source>
-<target>تم إحباط</target>
+<target>تم الإحباط</target>
 
 <source>Completed</source>
-<target>أكملت</target>
+<target>تم الإنتهاء</target>
 
 <source>Continue</source>
 <target>مواصلة</target>
@@ -1027,13 +1072,13 @@ Note: File names must be relative to base directories!
 <target>إيقاف مؤقت</target>
 
 <source>Logging</source>
-<target>تسجيل الدخول</target>
+<target>التسجيل</target>
 
 <source>Cannot find %x</source>
 <target>لا يمكن العثور على  %x</target>
 
 <source>Inactive</source>
-<target>غير نشط</target>
+<target>خامل</target>
 
 <source>Today</source>
 <target>اليوم</target>
@@ -1048,16 +1093,16 @@ Note: File names must be relative to base directories!
 <target>هذه السنة</target>
 
 <source>Last x days</source>
-<target>الماضية X الأيام</target>
+<target>الأيام x الماضية</target>
 
 <source>Byte</source>
-<target>بايت</target>
+<target>Byte</target>
 
 <source>KB</source>
-<target>كب</target>
+<target>KB</target>
 
 <source>MB</source>
-<target>مب</target>
+<target>MB</target>
 
 <source>Filter</source>
 <target>عامل التصفية</target>
@@ -1072,235 +1117,276 @@ Note: File names must be relative to base directories!
 <target>نسخ أذونات NTFS</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
-<target>دمج تطبيقات خارجية في قائمة السياق. كما تتوفر وحدات الماكرو التالية:</target>
+<target>دمج تطبيقات خارجية في قائمة السياق. تتوفر وحدات الماكرو التالية:</target>
 
 <source>- full file or folder name</source>
-<target>-اسم الملف أو المجلد كامل</target>
+<target>- اسم الملف أو المجلد كاملاً</target>
 
 <source>- folder part only</source>
-<target>--مجلد جزء فقط</target>
+<target>- جزء مجلد فقط</target>
 
 <source>- Other side's counterpart to %item_path%</source>
-<target>-النظيرة الجانب الأخرى إلى  %item_path %</target>
+<target>- النظير للجانب الآخر لـ  %item_path%</target>
 
 <source>- Other side's counterpart to %item_folder%</source>
-<target>-النظيرة الجانب الأخرى إلى  %item_folder %</target>
+<target>- االنظير للجانب الآخر لـ  %item_folder%</target>
 
 <source>Make hidden warnings and dialogs visible again?</source>
-<target>جعل التحذيرات الخفية وحوارات مرئية مرة أخرى؟</target>
+<target>جعل التحذيرات و نوافذ الحوارات المخفية مرئية من جديد؟</target>
 
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
 <pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>هل تريد حقاً نقل ولا ملف</pluralform>
+<pluralform>هل تريد حقاً نقل هذا الملف ؟</pluralform>
+<pluralform>هل تريد حقاً نقل هذين الملفين ؟</pluralform>
+<pluralform>هل تريد حقاً نقل هذه الـ %x ملفاً ؟</pluralform>
+<pluralform>هل تريد حقاً نقل هذه الـ %x ملفاً ؟</pluralform>
+<pluralform>هل تريد حقاً نقل هذه الـ %x ملفاً ؟</pluralform>
+</target>
 
 <source>
 <pluralform>Do you really want to delete the following object?</pluralform>
 <pluralform>Do you really want to delete the following %x objects?</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>هل تريد حقاً حذف ولا ملف</pluralform>
+<pluralform>هل تريد حقاً حذف هذا الملف ؟</pluralform>
+<pluralform>هل تريد حقاً حذف هذين الملفين ؟</pluralform>
+<pluralform>هل تريد حقاً حذف هذه الـ %x ملفاً ؟</pluralform>
+<pluralform>هل تريد حقاً حذف هذه الـ %x ملفاً ؟</pluralform>
+<pluralform>هل تريد حقاً حذف هذه الـ %x ملفاً ؟</pluralform>
+</target>
 
 <source>Leave as unresolved conflict</source>
-<target>ترك كالصراعات التي لم تحل</target>
+<target>ترك كاختلافات من دون حل</target>
 
 <source>Append a timestamp to each file name</source>
-<target>إلحاق طابع زمني لكل ملف اسم</target>
+<target>إلحاق طابع زمني اسم كل ملف</target>
 
 <source>Replace</source>
 <target>استبدال</target>
 
 <source>Move files and replace if existing</source>
-<target>نقل الملفات واستبدال إذا كان موجود</target>
+<target>نقل الملفات و استبدال الموجودة بها إن وجدت</target>
 
 <source>Folder</source>
 <target>مجلد</target>
 
 <source>File</source>
-<target>الملف</target>
+<target>ملف</target>
 
 <source>YYYY-MM-DD hhmmss</source>
-<target>Hhmmss YYYY-MM-DD</target>
+<target>YYYY-MM-DD hhmmss</target>
 
 <source>Files</source>
-<target>الملفات</target>
+<target>ملفات</target>
 
 <source>Percentage</source>
 <target>النسبة المئوية</target>
 
 <source>Cannot monitor directory %x.</source>
-<target>لا يمكن رصد الدليل  %x.</target>
+<target>لا يمكن مراقبة المسار %x.</target>
 
 <source>Conversion error:</source>
-<target>خطأ تحويل:</target>
+<target>خطأ في تحويل:</target>
 
 <source>Cannot delete file %x.</source>
 <target>لا يمكن حذف الملف  %x.</target>
 
 <source>The file is locked by another process:</source>
-<target>الملف مؤمن من قبل عملية أخرى:</target>
+<target>الملف مقفول من قبل عملية أخرى:</target>
 
 <source>Cannot move file %x to %y.</source>
-<target>لا يمكن نقل الملف  %x إلى  %y.</target>
+<target>لا يمكن نقل الملف  %x إلى %y.</target>
 
 <source>Cannot delete directory %x.</source>
-<target>لا يمكن حذف الدليل  %x.</target>
+<target>لا يمكن حذف المسار %x.</target>
 
 <source>Cannot write file attributes of %x.</source>
-<target>لا يمكن كتابة سمات الملف من  %x.</target>
+<target>لا يمكن كتابة سمات الملف %x.</target>
 
 <source>Cannot write modification time of %x.</source>
-<target>لا يمكن كتابة وقت التعديل من  %x.</target>
+<target>لا يمكن كتابة وقت تعديل %x.</target>
 
 <source>Cannot find system function %x.</source>
-<target>لا يمكن العثور على وظيفة نظام  %x.</target>
+<target>لا يمكن العثور على وظيفة نظام %x.</target>
 
 <source>Cannot read security context of %x.</source>
-<target>لا يمكن قراءة سياق الأمان من  %x.</target>
+<target>لا يمكن قراءة سياق الأمان %x.</target>
 
 <source>Cannot write security context of %x.</source>
-<target>لا يمكن كتابة سياق الأمان من  %x.</target>
+<target>لا يمكن كتابة سياق الأمان %x.</target>
 
 <source>Cannot read permissions of %x.</source>
-<target>لا يمكن قراءة أذونات  %x.</target>
+<target>لا يمكن قراءة أذونات %x.</target>
 
 <source>Cannot write permissions of %x.</source>
-<target>لا يمكن كتابة أذونات  %x.</target>
+<target>لا يمكن كتابة أذونات %x.</target>
 
 <source>Cannot create directory %x.</source>
-<target>لا يمكن إنشاء الدليل  %x.</target>
+<target>لا يمكن إنشاء المسار %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
-<target>لا يمكن نسخ الارتباط الرمزي  %x إلى  %y.</target>
+<target>لا يمكن نسخ الارتباط الرمزي %x إلى %y.</target>
 
 <source>Cannot copy file %x to %y.</source>
-<target>لا يمكن نسخ الملف  %x إلى  %y.</target>
+<target>لا يمكن نسخ الملف %x إلى %y.</target>
 
 <source>Type of item %x is not supported:</source>
-<target>نوع عنصر  %x غير معتمد:</target>
+<target>نوع العنصر %x غير مدعوم:</target>
 
 <source>Cannot open directory %x.</source>
-<target>لا يمكن فتح الدليل  %x.</target>
+<target>لا يمكن فتح المسار %x.</target>
 
 <source>Cannot enumerate directory %x.</source>
-<target>لا يمكن تعداد الدليل  %x.</target>
+<target>لا يمكن تعداد المسار %x.</target>
 
 <source>Detected endless directory recursion.</source>
-<target>تم الكشف عن العودية الدليل التي لا نهاية لها.</target>
+<target>تم الكشف عن العودية اللا نهاية لها للمسار.</target>
 
 <source>%x TB</source>
-<target>%x السل</target>
+<target>%x TB</target>
 
 <source>%x PB</source>
-<target>PB %x</target>
+<target>%x PB</target>
 
 <source>%x%</source>
-<target>%%x</target>
+<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
 <pluralform>%x min</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>ولا دقيقة</pluralform>
+<pluralform>دقيقة واحدة</pluralform>
+<pluralform>دقيقتان</pluralform>
+<pluralform>%x دقائق</pluralform>
+<pluralform>%x دقيقة</pluralform>
+<pluralform>%x دقيقة</pluralform>
+</target>
 
 <source>
 <pluralform>1 hour</pluralform>
 <pluralform>%x hours</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>ولا ساعة</pluralform>
+<pluralform>ساعة واحدة</pluralform>
+<pluralform>ساعتين</pluralform>
+<pluralform>%x ساعات</pluralform>
+<pluralform>%x ساعة</pluralform>
+<pluralform>%x ساعة</pluralform>
+</target>
 
 <source>
 <pluralform>1 day</pluralform>
 <pluralform>%x days</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>ولا يوم</pluralform>
+<pluralform>يوم واحد</pluralform>
+<pluralform>يومان</pluralform>
+<pluralform>%x أيام</pluralform>
+<pluralform>%x يوماً</pluralform>
+<pluralform>%x يوم</pluralform>
+</target>
 
 <source>Cannot set privilege %x.</source>
-<target>لا يمكن تعيين امتياز  %x.</target>
+<target>لا يمكن تعيين امتيازات %x.</target>
+
+<source>Failed to suspend system sleep mode.</source>
+<target>تعذر تعليق وضع النوم للنظام.</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>تعذر تغيير أولويات I/O للعملية</target>
 
 <source>Unable to move %x to the Recycle Bin!</source>
-<target>غير قادر على نقل  %x إلى "سلة المحذوفات"</target>
+<target>تعذر نقل %x إلى سلة المحذوفات</target>
 
 <source>Both sides have changed since last synchronization!</source>
-<target>كلا الجانبين قد تغيرت منذ المزامنة الأخيرة</target>
+<target>كلا الجانبين قد تغير منذ المزامنة الأخيرة</target>
 
 <source>Cannot determine sync-direction:</source>
-<target>لا يمكن تحديد الاتجاه المزامنة:</target>
+<target>لا يمكن تحديد اتجاه المزامنة:</target>
 
 <source>No change since last synchronization!</source>
-<target>أي تغيير منذ المزامنة الأخيرة</target>
+<target>لم يطرأ أي تغيير منذ المزامنة الأخيرة</target>
 
 <source>The corresponding database entries are not in sync considering current settings.</source>
-<target>إدخالات قاعدة البيانات المطابقة ليست في تزامن النظر في الإعدادات الحالية.</target>
+<target>إدخالات قاعدة البيانات الموافقة ليست في تزامن بالنسبة للإعدادات الحالية.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
-<target>الإعداد الافتراضي في الاتجاهين المزامنة: ستتم الكتابة فوق الملفات القديمة بالملفات الأحدث.</target>
+<target>تحديد الاتجاهات الافتراضية للمزامنة: ستتم الكتابة فوق الملفات القديمة بالملفات الأحدث.</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
-<target></target>
+<target>التحقق من توافر سلة المحذوفات من أجل المجلد %x...</target>
 
 <source>Moving file %x to recycle bin</source>
-<target>نقل ملف  %x سلة المحذوفات</target>
+<target>نقل الملف %x إلى سلة المحذوفات</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target>نقل المجلد  %x سلة المحذوفات</target>
+<target>نقل المجلد %x إلى سلة المحذوفات</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
-<target>نقل الارتباط الرمزي  %x سلة المحذوفات</target>
+<target>نقل الارتباط الرمزي %x إلى سلة المحذوفات</target>
 
 <source>Deleting file %x</source>
-<target>حذف الملف  %x</target>
+<target>حذف الملف %x</target>
 
 <source>Deleting folder %x</source>
-<target>حذف المجلد  %x</target>
+<target>حذف المجلد %x</target>
 
 <source>Deleting symbolic link %x</source>
-<target>حذف الارتباط الرمزي  %x</target>
+<target>حذف الارتباط الرمزي %x</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>سلة المهملات غير متوفر للمسارات التالية! سيتم حذف الملفات بشكل دائم بدلاً من ذلك:</target>
 
 <source>You can ignore this error to consider each folder as empty.</source>
-<target></target>
+<target>بإمكانك تجاهل هذا الخطأ باعتبالا كل مجلد و كأنه فارغ</target>
 
 <source>Cannot find the following folders:</source>
-<target></target>
+<target>تعذر العثور على المجلدات التالية:</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
-<target>تعتمد الدلائل! كن حذراً عند إعداد قواعد المزامنة:</target>
+<target>المسارات تلعية! كن حذراً عند إعداد قواعد المزامنة:</target>
 
 <source>Start comparison</source>
-<target>مقارنة ابدأ</target>
+<target>ابدأ المقارنة</target>
 
 <source>Preparing synchronization...</source>
-<target>إعداد المزامنة...</target>
+<target>تهيئة المزامنة...</target>
 
 <source>Conflict detected:</source>
 <target>تم الكشف عن تعارض:</target>
 
 <source>File %x has an invalid date!</source>
-<target>يحتوي الملف  %x تاريخ غير صالح</target>
+<target>يحتوي الملف %x تاريخ غير صالح</target>
 
 <source>Files %x have the same date but a different size!</source>
-<target>ملفات  %x بنفس التاريخ ولكن حجم مختلف</target>
+<target>الملفات %x لها نفس التاريخ ولكن حجم مختلف</target>
 
 <source>Items differ in attributes only</source>
-<target>تختلف عناصر في سمات فقط</target>
+<target>العناصر مختلفة في السمات فقط</target>
 
 <source>Symbolic links %x have the same date but a different target.</source>
-<target>الارتباطات الرمزية  %x لها نفس التاريخ لكن هدفا مختلفاً.</target>
+<target>الارتباطات الرمزية %x لها نفس التاريخ لكن هدف مختلف.</target>
 
 <source>Comparing content of files %x</source>
-<target>مقارنة محتويات ملفات  %x</target>
+<target>مقارنة محتويات الملفات %x</target>
 
 <source>Comparing files by content failed.</source>
-<target>مقارنة الملفات حسب المحتوى التي فشلت.</target>
+<target>فشلت مقارنة الملفات حسب المحتوى.</target>
 
 <source>Generating file list...</source>
 <target>إنشاء قائمة الملفات...</target>
 
 <source>Both sides are equal</source>
-<target>كلا الجانبين على قدم المساواة</target>
+<target>كلا الجانبين متماثلان</target>
 
 <source>Copy new item to left</source>
 <target>نسخ عنصر جديد إلى اليسار</target>
@@ -1312,7 +1398,7 @@ Note: File names must be relative to base directories!
 <target>حذف العنصر الأيسر</target>
 
 <source>Delete right item</source>
-<target>حذف البند الصحيح</target>
+<target>حذف العنصر الأيمن</target>
 
 <source>Move file on left</source>
 <target>نقل ملف على اليسار</target>
@@ -1324,76 +1410,76 @@ Note: File names must be relative to base directories!
 <target>الكتابة فوق العنصر الأيسر</target>
 
 <source>Overwrite right item</source>
-<target>الكتابة فوق العنصر الصحيح</target>
+<target>الكتابة فوق العنصر الأيمن</target>
 
 <source>Do nothing</source>
 <target>لا تفعل شيئا</target>
 
 <source>Update attributes on left</source>
-<target>تحديث سمات على اليسار</target>
+<target>تحديث السمات على اليسار</target>
 
 <source>Update attributes on right</source>
-<target>تحديث سمات على حق</target>
+<target>تحديث السمات على اليمين</target>
 
 <source>Multiple...</source>
 <target>متعددة...</target>
 
 <source>Moving file %x to %y</source>
-<target>نقل ملف  %x إلى  %y</target>
+<target>نقل الملف %x إلى %y</target>
 
 <source>Moving folder %x to %y</source>
-<target>نقل المجلد  %x إلى  %y</target>
+<target>نقل المجلد %x إلى %y</target>
 
 <source>Moving symbolic link %x to %y</source>
-<target>نقل الارتباط الرمزي  %x إلى  %y</target>
+<target>نقل الارتباط الرمزي %x إلى %y</target>
 
 <source>Removing old versions...</source>
 <target>إزالة الإصدارات القديمة...</target>
 
 <source>Creating symbolic link %x</source>
-<target>إنشاء ارتباط رمزي  %x</target>
+<target>إنشاء ارتباط رمزي %x</target>
 
 <source>Creating folder %x</source>
-<target>إنشاء مجلد  %x</target>
+<target>إنشاء مجلد %x</target>
 
 <source>Overwriting file %x</source>
-<target>الكتابة فوق الملف  %x</target>
+<target>الكتابة فوق الملف %x</target>
 
 <source>Overwriting symbolic link %x</source>
-<target>الكتابة فوق الارتباط الرمزي  %x</target>
+<target>الكتابة فوق الارتباط الرمزي %x</target>
 
 <source>Verifying file %x</source>
-<target>التحقق من ملف  %x</target>
+<target>التحقق من الملف %x</target>
 
 <source>Updating attributes of %x</source>
-<target>تحديث سمات  %x</target>
+<target>تحديث سمات %x</target>
 
 <source>Cannot find %x.</source>
-<target></target>
+<target>تعذر العثور على %x.</target>
 
 <source>Target folder %x already existing.</source>
-<target>المجلد الهدف  %x الموجودة بالفعل.</target>
+<target>المجلد الهدف %x موجود سابقاً.</target>
 
 <source>Target folder input field must not be empty.</source>
-<target>يجب أن لا يكون الحقل الإدخال المجلد الهدف فارغة.</target>
+<target>يجب أن لا يكون حقل إدخال المجلد الهدف فارغاً.</target>
 
 <source>Folder input field for versioning must not be empty.</source>
-<target>حقل الإدخال المجلد لتعيين الإصدار ويجب أن لا يكون فارغاً.</target>
+<target>يجب أن لا يكون حقل إدخال المجلد من أجل الإصدارات فارغاً.</target>
 
 <source>Source folder %x not found.</source>
-<target>المجلد المصدر  %x لم يتم العثور على.</target>
+<target>لم يتم العثور على المجلد المصدر %x.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
-<target>البنود التالية دون حل الصراعات، وسوف لا تكون متزامنة:</target>
+<target>العناصر التالية لم تحل اختلافاتها، و لن يتم مزامنتها:</target>
 
 <source>Significant difference detected:</source>
 <target>تم الكشف عن فرق كبير:</target>
 
 <source>More than 50% of the total number of files will be copied or deleted!</source>
-<target>أكثر من 50% من إجمالي عدد الملفات التي سيتم نسخها أو حذف</target>
+<target>أكثر من 50% من إجمالي عدد الملفات  سيتم نسخها أو حذفها!</target>
 
 <source>Not enough free disk space available in:</source>
-<target>غير كافية مساحة القرص الحرة المتوفرة في:</target>
+<target>المساحة الحرة المتوفرة على القرص غير كافية:</target>
 
 <source>Required:</source>
 <target>مطلوب:</target>
@@ -1402,7 +1488,7 @@ Note: File names must be relative to base directories!
 <target>متاح:</target>
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>سيتم تعديل مجلد الذي هو جزء من أزواج المجلد متعددة. الرجاء مراجعة إعدادات المزامنة.</target>
+<target>سيتم تعديل مجلد الذي هو جزء من أزواج المجلدات المتعددة. الرجاء مراجعة إعدادات المزامنة.</target>
 
 <source>Left</source>
 <target>اليسار</target>
@@ -1411,11 +1497,11 @@ Note: File names must be relative to base directories!
 <target>حق</target>
 
 <source>Synchronizing folder pair:</source>
-<target>مزامنة مجلد زوج:</target>
+<target>مزامنة زوج مجلدات:</target>
 
 <source>Generating database...</source>
 <target>إنشاء قاعدة بيانات...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
-<target>بيانات التحقق خطأ: الملف المصدر والهدف يكون محتوى مختلفة</target>
+<target>خطأ تحقق بيانات: للملف المصدر والملف الهدف محتويات مختلفة!</target>
 

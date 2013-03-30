@@ -7,22 +7,25 @@
 #ifndef CUSTOMTOOLTIP_H_INCLUDED
 #define CUSTOMTOOLTIP_H_INCLUDED
 
-#include <wx/frame.h>
+#include <wx/window.h>
 
 namespace zen
 {
 class Tooltip
 {
 public:
-    Tooltip();
-    ~Tooltip();
+    Tooltip(wxWindow& parent) : //parent needs to live at least as long as this instance!
+        tipWindow(nullptr), parent_(parent) {}
 
-    void show(const wxString& text, wxPoint mousePos, const wxBitmap* bmp = nullptr); //absolute screen coordinates
+    void show(const wxString& text,
+              wxPoint mousePos, //absolute screen coordinates
+              const wxBitmap* bmp = nullptr);
     void hide();
 
 private:
-    class PopupFrameGenerated;
-    PopupFrameGenerated* tipWindow;
+    class PopupDialogGenerated;
+    PopupDialogGenerated* tipWindow;
+    wxWindow& parent_;
 };
 }
 

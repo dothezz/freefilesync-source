@@ -7,11 +7,11 @@
 #ifndef ICONBUFFER_H_INCLUDED
 #define ICONBUFFER_H_INCLUDED
 
+#include <list>
 #include <memory>
-#include <wx/bitmap.h>
-#include <wx/icon.h>
 #include <zen/zstring.h>
-
+#include <zen/optional.h>
+#include <wx/bitmap.h>
 
 namespace zen
 {
@@ -28,22 +28,24 @@ public:
     IconBuffer(IconSize sz);
     ~IconBuffer();
 
-    static int getSize(IconSize icoSize); //*maximum* icon size in pixel
-    int getSize() const { return getSize(icoSize); } //
+    static int getSize(IconSize icoSizeType); //expected and *maximum* icon size in pixel
+    int getSize() const { return getSize(iconSizeType); } //
 
-    const wxIcon& genericFileIcon() { return genFileIcon; }
-    const wxIcon& genericDirIcon () { return genDirIcon;  }
+    const wxBitmap& genericFileIcon() { return genFileIcon; }
+    const wxBitmap& genericDirIcon () { return genDirIcon;  }
 
-    bool requestFileIcon(const Zstring& filename, wxIcon* icon = nullptr); //returns false if icon is not in buffer
-    void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
+    bool readyForRetrieval(const Zstring& filename);
+    Opt<wxBitmap> retrieveFileIcon(const Zstring& filename);
+
+    void setWorkload(const std::list<Zstring>& load); //(re-)set new workload of icons to be retrieved;
 
 private:
     struct Pimpl;
     std::unique_ptr<Pimpl> pimpl;
 
-    const IconSize icoSize;
-    const wxIcon genDirIcon;
-    const wxIcon genFileIcon;
+    const IconSize iconSizeType;
+    const wxBitmap genDirIcon;
+    const wxBitmap genFileIcon;
 };
 }
 

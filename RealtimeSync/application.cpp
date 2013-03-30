@@ -7,6 +7,7 @@
 #include "application.h"
 #include "main_dlg.h"
 #include <zen/file_handling.h>
+#include <zen/thread.h>
 #include <wx/event.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
@@ -20,8 +21,12 @@
 
 #ifdef FFS_WIN
 #include <zen/win_ver.h>
+
 #elif defined FFS_LINUX
 #include <gtk/gtk.h>
+
+#elif defined FFS_MAC
+#include <ApplicationServices/ApplicationServices.h>
 #endif
 
 using namespace zen;
@@ -29,67 +34,67 @@ using namespace zen;
 
 IMPLEMENT_APP(Application);
 
-#ifdef FFS_WIN
 namespace
 {
-const DWORD mainThreadId = ::GetCurrentThreadId();
+boost::thread::id mainThreadId = boost::this_thread::get_id();
 
 void onTerminationRequested()
 {
-    std::wstring msg = ::GetCurrentThreadId() == mainThreadId ?
+    std::wstring msg = boost::this_thread::get_id() == mainThreadId ?
                        L"Termination requested in main thread!\n\n" :
                        L"Termination requested in worker thread!\n\n";
     msg += L"Please take a screenshot and file a bug report at: http://sourceforge.net/projects/freefilesync";
 
-    ::MessageBox(0, msg.c_str(), _("An exception occurred!").c_str(), 0);
+    wxSafeShowMessage(_("An exception occurred!"), msg);
     std::abort();
 }
 
 #ifdef _MSC_VER
 void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
 #endif
+
+const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 }
-#endif
 
 
 bool Application::OnInit()
 {
-#ifdef FFS_WIN
     std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
-    assert(!win8OrLater()); //another breadcrumb: test and add new OS entry to "compatibility" in application manifest
+
+#ifdef FFS_WIN
 #ifdef _MSC_VER
     _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
 #endif
-#endif
-
-    //do not call wxApp::OnInit() to avoid using default commandline parser
-
-    //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
-    //for UI update events. This is not the case at the time of OnInit().
-    Connect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
-
-    return true;
-}
-
-
-void Application::OnStartApplication(wxIdleEvent& event)
-{
-    Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), nullptr, this);
-
-    warn_static("fix")
-
-    //if appname is not set, the default is the executable's name!
-    SetAppName(L"FreeFileSync"); //abuse FFS's name, to have "GetUserDataDir()" return the same directory
-
-#ifdef FFS_WIN
     //Quote: "Best practice is that all applications call the process-wide SetErrorMode function with a parameter of
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
+
 #elif defined FFS_LINUX
     ::gtk_rc_parse((zen::getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
+
+#elif defined FFS_MAC
+    ProcessSerialNumber psn = { 0, kCurrentProcess };
+    ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //behave like an application bundle, even when the app is not packaged (yet)
 #endif
 
-    //set program language
+    warn_static("fix")
+    SetAppName(L"FreeFileSync"); //abuse FFS's name, to have "GetUserDataDir()" return the same directory
+
+    //do not call wxApp::OnInit() to avoid using default commandline parser
+
+    //Note: app start is deferred:  -> see FreeFileSync
+    Connect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
+    wxCommandEvent scrollEvent(EVENT_ENTER_EVENT_LOOP);
+    AddPendingEvent(scrollEvent);
+
+    return true; //true: continue processing; false: exit immediately.
+}
+
+
+void Application::onEnterEventLoop(wxEvent& event)
+{
+    Disconnect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
+
     try
     {
         setLanguage(rts::getProgramLanguage()); //throw FileError

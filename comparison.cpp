@@ -68,6 +68,7 @@ void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, 
             haveFullPair = true;
     });
 
+    warn_static("seltsame fehlermeldung + each folder macht keinen sinn")
     tryReportingError([&]
     {
         if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-dir scenario

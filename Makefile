@@ -7,7 +7,7 @@ SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 DOCSHAREDIR = $(SHAREDIR)/doc/$(APPNAME)
 
-CPPFLAGS  = -std=c++11 -Wall -pipe -O3 -DNDEBUG -DwxUSE_UNICODE -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h" -include "zen/warn_static.h"
+CXXFLAGS  = -std=c++11 -Wall -pipe -O3 -DNDEBUG -DwxUSE_UNICODE -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h" -include "zen/warn_static.h"
 LINKFLAGS =
 
 #distinguish Linux/OSX builds
@@ -16,37 +16,37 @@ OPERATING_SYSTEM_NAME := $(shell uname)
 #################### Linux ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Linux)
 COMPILER_BIN=g++ -pthread
-CPPFLAGS += -DFFS_LINUX
+CXXFLAGS += -DFFS_LINUX
 
 #Gtk - support recycler/icon loading/no button border/grid scrolling
-CPPFLAGS  += `pkg-config --cflags gtk+-2.0`
+CXXFLAGS  += `pkg-config --cflags gtk+-2.0`
 LINKFLAGS += `pkg-config --libs   gtk+-2.0`
 
 #support for SELinux (optional)
 SELINUX_EXISTING=$(shell pkg-config --exists libselinux && echo YES)
 ifeq ($(SELINUX_EXISTING),YES)
-CPPFLAGS  += `pkg-config --cflags libselinux` -DHAVE_SELINUX
+CXXFLAGS  += `pkg-config --cflags libselinux` -DHAVE_SELINUX
 LINKFLAGS += `pkg-config --libs libselinux`
 endif
 
 #support for Ubuntu Unity (optional)
 UNITY_EXISTING=$(shell pkg-config --exists unity && echo YES)
 ifeq ($(UNITY_EXISTING),YES)
-CPPFLAGS  += `pkg-config --cflags unity` -DHAVE_UBUNTU_UNITY
+CXXFLAGS  += `pkg-config --cflags unity` -DHAVE_UBUNTU_UNITY
 LINKFLAGS += `pkg-config --libs unity`
 endif
 
 ifeq ($(BUILD),Launchpad)
 #default build/Launchpad
-CPPFLAGS  += `wx-config --cxxflags      --debug=no`
+CXXFLAGS  += `wx-config --cxxflags      --debug=no`
 LINKFLAGS += `wx-config --libs std, aui --debug=no` -lboost_thread -lboost_system
 else
 #static wxWidgets and boost library linkage for precompiled release
 WX_CONFIG_BIN =$(HOME)/Desktop/wxGTK-2.8.12/lib/release/bin/wx-config
-CPPFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
+CXXFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
 BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_53_0/stage/lib
 
-CPPFLAGS  += `$(WX_CONFIG_BIN) --cxxflags      --debug=no --static=yes`
+CXXFLAGS  += `$(WX_CONFIG_BIN) --cxxflags      --debug=no --static=yes`
 LINKFLAGS += `$(WX_CONFIG_BIN) --libs std, aui --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
 endif
 
@@ -54,17 +54,17 @@ endif
 #################### OS X ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
 COMPILER_BIN=clang++ -stdlib=libc++
-CPPFLAGS += -DFFS_MAC
+CXXFLAGS += -DFFS_MAC
 
 WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.4/lib/release/bin/wx-config
-CPPFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
+CXXFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
 BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_53_0/stage/lib
 MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
 
 #-Wl,-Bstatic not supported on OSX!
 
 # link wxWidgets and boost statically -> check dependencies with: otool -L FreeFileSync
-CPPFLAGS  += $(MACOS_SDK) `$(WX_CONFIG_BIN) --cxxflags      --debug=no --static=yes`
+CXXFLAGS  += $(MACOS_SDK) `$(WX_CONFIG_BIN) --cxxflags      --debug=no --static=yes`
 LINKFLAGS += $(MACOS_SDK) `$(WX_CONFIG_BIN) --libs std, aui --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
 
 endif
@@ -130,6 +130,7 @@ CPP_LIST+=wx+/zlib_wrap.cpp
 ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
 MM_LIST= #objective C files
 MM_LIST+=ui/osx_dock.mm
+MM_LIST+=lib/osx_file_icon.mm
 endif
 
 #list of all *.o files
@@ -140,18 +141,17 @@ all: FreeFileSync
 
 OBJ/FFS_Release_GCC_Make/%.mm.o : %.mm
 	mkdir -p $(dir $@)
-	$(COMPILER_BIN) $(CPPFLAGS) -c $< -o $@
+	$(COMPILER_BIN) $(CXXFLAGS) -c $< -o $@
 
 OBJ/FFS_Release_GCC_Make/%.o : %.cpp
 	mkdir -p $(dir $@)
-	$(COMPILER_BIN) $(CPPFLAGS) -c $< -o $@
+	$(COMPILER_BIN) $(CXXFLAGS) -c $< -o $@
 
 FreeFileSync: $(OBJECT_LIST)
 	$(COMPILER_BIN) -o ./BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:
-#-f doesn't work when deleting directories
-	if [ -d OBJ/FFS_Release_GCC_Make ]; then rm -rf OBJ/FFS_Release_GCC_Make; fi
+	rm -rf OBJ/FFS_Release_GCC_Make
 	rm -f BUILD/$(APPNAME)
 	rm -f wx+/pch.h.gch
 

@@ -19,8 +19,8 @@ struct ReturnErrorDlg
 {
     enum ButtonPressed
     {
-        BUTTON_IGNORE = 1,
-        BUTTON_RETRY  = 2,
+        BUTTON_RETRY  = 1,
+        BUTTON_IGNORE = 2,
         BUTTON_CANCEL = 4
     };
 };
@@ -60,21 +60,30 @@ struct ReturnQuestionDlg
     };
 };
 
-struct CheckBox
-{
-    CheckBox(const wxString& label, bool& value) : label_(label), value_(value) {}
+class QuestConfig;
+ReturnQuestionDlg::ButtonPressed showQuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const QuestConfig& cfg);
 
-    wxString label_; //in
-    bool& value_;    //in/out
+class QuestConfig
+{
+public:
+    QuestConfig() : checkBoxValue() {}
+    QuestConfig& setCaption (const wxString& label) { caption  = label; return *this; }
+    QuestConfig& setLabelYes(const wxString& label) { labelYes = label; return *this; }
+    QuestConfig& setLabelNo (const wxString& label) { labelNo  = label; return *this; }
+    QuestConfig& showCheckBox(bool& value, const wxString& label) { checkBoxLabel = label; checkBoxValue = &value; return *this; }
+
+private:
+    friend ReturnQuestionDlg::ButtonPressed showQuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const QuestConfig& cfg);
+
+    wxString caption;
+    wxString labelYes; //overwrite default "Yes, No" labels
+    wxString labelNo;  //
+    //optional checkbox:
+    bool* checkBoxValue;    //in/out
+    wxString checkBoxLabel; //in
 };
 
-ReturnQuestionDlg::ButtonPressed showQuestionDlg(wxWindow* parent,
-                                                 int activeButtons,
-                                                 const wxString& messageText,
-                                                 const wxString& caption  = wxString(),
-                                                 const wxString& labelYes = wxString(), //overwrite default "Yes, No" labels
-                                                 const wxString& labelNo  = wxString(), //
-                                                 CheckBox* checkbox = nullptr);
+ReturnQuestionDlg::ButtonPressed showQuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const QuestConfig& cfg = QuestConfig());
 }
 
 #endif // MESSAGEPOPUP_H_INCLUDED

@@ -93,8 +93,8 @@ std::unique_ptr<FileOutput> prepareNewLogfile(const Zstring& logfileDirectory, /
 }
 }
 
-
 //##############################################################################################################################
+
 BatchStatusHandler::BatchStatusHandler(bool showProgress,
                                        const std::wstring& jobName,
                                        const TimeComp& timeStamp,

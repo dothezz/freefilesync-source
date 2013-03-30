@@ -46,35 +46,35 @@ public:
     {
         if (altCompConfig.get())
         {
-            setImage(*basicPanel_.m_bpButtonAltCompCfg, GlobalResources::getImage(L"cmpConfigSmall"));
+            setImage(*basicPanel_.m_bpButtonAltCompCfg, getResourceImage(L"cmpConfigSmall"));
             basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Selected variant:") +  L" " + getVariantName(altCompConfig->compareVar));
         }
         else
         {
-            setImage(*basicPanel_.m_bpButtonAltCompCfg, greyScale(GlobalResources::getImage(L"cmpConfigSmall")));
+            setImage(*basicPanel_.m_bpButtonAltCompCfg, greyScale(getResourceImage(L"cmpConfigSmall")));
             basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Select alternate comparison settings"));
         }
 
         if (altSyncConfig.get())
         {
-            setImage(*basicPanel_.m_bpButtonAltSyncCfg, GlobalResources::getImage(L"syncConfigSmall"));
+            setImage(*basicPanel_.m_bpButtonAltSyncCfg, getResourceImage(L"syncConfigSmall"));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Selected variant:") +  L" " + getVariantName(altSyncConfig->directionCfg.var));
         }
         else
         {
-            setImage(*basicPanel_.m_bpButtonAltSyncCfg, greyScale(GlobalResources::getImage(L"syncConfigSmall")));
+            setImage(*basicPanel_.m_bpButtonAltSyncCfg, greyScale(getResourceImage(L"syncConfigSmall")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
         }
 
         //test for Null-filter
         if (!isNullFilter(localFilter))
         {
-            setImage(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::getImage(L"filterSmall"));
+            setImage(*basicPanel_.m_bpButtonLocalFilter, getResourceImage(L"filterSmall"));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter is active"));
         }
         else
         {
-            setImage(*basicPanel_.m_bpButtonLocalFilter, greyScale(GlobalResources::getImage(L"filterSmall")));
+            setImage(*basicPanel_.m_bpButtonLocalFilter, greyScale(getResourceImage(L"filterSmall")));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
         }
     }
@@ -92,7 +92,7 @@ protected:
         basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg    ), nullptr, this);
         basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), nullptr, this);
 
-        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(GlobalResources::getImage(L"item_delete"));
+        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(getResourceImage(L"item_delete"));
     }
 
     virtual void removeAltCompCfg()

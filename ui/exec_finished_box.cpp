@@ -115,7 +115,8 @@ void ExecFinishedBox::addItemHistory()
         if (!skipCmd)
         {
             for (auto it = defaultCommands.begin(); it != defaultCommands.end(); ++it)
-                if (command == it->first || command == it->second)
+                if (command == it->first ||
+                    command == it->second)
                 {
                     skipCmd = true;
                     break;

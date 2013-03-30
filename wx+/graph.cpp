@@ -131,7 +131,6 @@ void drawXLabel(wxDC& dc, double xMin, double xMax, int blockCount, const Conver
 
     wxDCPenChanger dummy(dc, wxPen(wxColor(192, 192, 192))); //light grey
     wxDCTextColourChanger dummy2(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
-    dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial"));
 
     const double valRangePerBlock = (xMax - xMin) / blockCount;
 
@@ -160,7 +159,6 @@ void drawYLabel(wxDC& dc, double yMin, double yMax, int blockCount, const Conver
 
     wxDCPenChanger dummy(dc, wxPen(wxColor(192, 192, 192))); //light grey
     wxDCTextColourChanger dummy2(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
-    dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial"));
 
     const double valRangePerBlock = (yMax - yMin) / blockCount;
 
@@ -303,6 +301,9 @@ struct CurveSamples
 void Graph2D::render(wxDC& dc) const
 {
     using namespace numeric;
+
+    //set label font right at the start so that it is considered by wxDC::GetTextExtent below!
+    dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial"));
 
     const wxRect clientRect = GetClientRect(); //DON'T use wxDC::GetSize()! DC may be larger than visible area!
     {

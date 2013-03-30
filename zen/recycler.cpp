@@ -13,7 +13,6 @@
 //#include <algorithm>
 //#include <functional>
 #include <zen/dll.h>
-#include <zen/win.h> //includes "windows.h"
 #include <zen/assert_static.h>
 #include <zen/win_ver.h>
 #include <zen/long_path_prefix.h>

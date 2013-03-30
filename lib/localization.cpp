@@ -5,7 +5,6 @@
 // **************************************************************************
 
 #include "localization.h"
-//#include <fstream>
 #include <map>
 #include <list>
 #include <iterator>
@@ -15,7 +14,6 @@
 #include <zen/i18n.h>
 #include <zen/format_unit.h>
 #include <wx/intl.h>
-//#include <wx/msgdlg.h>
 #include "parse_plural.h"
 #include "parse_lng.h"
 #include "ffs_paths.h"
@@ -214,9 +212,9 @@ ExistingTranslations::ExistingTranslations()
                     locMapping.push_back(newEntry);
                 }
             }
-            catch (lngfile::ParsingError&) {} //better not show an error message here; scenario: batch jobs
+            catch (lngfile::ParsingError&) { assert(false); } //better not show an error message here; scenario: batch jobs
         }
-        catch (...) {}
+        catch (...) { assert(false); }
 
     std::sort(locMapping.begin(), locMapping.end(), LessTranslation());
 }

@@ -8,10 +8,8 @@
 #define SORTING_H_INCLUDED
 
 #include <zen/assert_static.h>
-#include "../file_hierarchy.h"
 #include <zen/type_tools.h>
-//#include "../synchronization.h"
-
+#include "../file_hierarchy.h"
 
 namespace zen
 {

@@ -18,49 +18,60 @@ const wxEventType FFS_REQUEST_RESUME_TRAY_EVENT = wxNewEventType();
 
 namespace
 {
-void fillRange(wxImage& img, int pixelFirst, int pixelLast, const wxColor& col)
+void fillRange(wxImage& img, int pixelFirst, int pixelLast, const wxColor& col) //tolerant input range
 {
-    const int pixelCount = img.GetWidth() >= 0 ? img.GetWidth() * img.GetHeight() : -1;
-
-    if (0 <= pixelFirst && pixelFirst < pixelLast && pixelLast <= pixelCount)
+    if (img.IsOk())
     {
-        unsigned char* const bytesBegin = img.GetData() + pixelFirst * 3;
-        unsigned char* const bytesEnd   = img.GetData() + pixelLast  * 3;
+        const int width  = img.GetWidth ();
+        const int height = img.GetHeight();
 
-        for (unsigned char* bytePos = bytesBegin; bytePos < bytesEnd; bytePos += 3)
+        if (width > 0 && height > 0)
         {
-            bytePos[0] = col.Red  ();
-            bytePos[1] = col.Green();
-            bytePos[2] = col.Blue ();
-        }
+            pixelFirst = std::max(pixelFirst, 0);
+            pixelLast  = std::min(pixelLast, width * height);
 
-        if (img.HasAlpha()) //make progress indicator fully opaque:
-            std::fill(img.GetAlpha() + pixelFirst, img.GetAlpha() + pixelLast, wxIMAGE_ALPHA_OPAQUE);
+            if (pixelFirst < pixelLast)
+            {
+                unsigned char* const bytesBegin = img.GetData() + pixelFirst * 3;
+                unsigned char* const bytesEnd   = img.GetData() + pixelLast  * 3;
+
+                for (unsigned char* bytePos = bytesBegin; bytePos < bytesEnd; bytePos += 3)
+                {
+                    bytePos[0] = col.Red  ();
+                    bytePos[1] = col.Green();
+                    bytePos[2] = col.Blue ();
+                }
+
+                if (img.HasAlpha()) //make progress indicator fully opaque:
+                    std::fill(img.GetAlpha() + pixelFirst, img.GetAlpha() + pixelLast, wxIMAGE_ALPHA_OPAQUE);
+            }
+        }
     }
 }
 
+
 wxIcon generateProgressIcon(const wxImage& logo, double fraction) //generate icon with progress indicator
 {
+    if (!logo.IsOk())
+        return wxIcon();
+
     const int pixelCount = logo.GetWidth() * logo.GetHeight();
     const int startFillPixel = std::min(numeric::round(fraction * pixelCount), pixelCount);
 
     //minor optimization
     static std::pair<int, wxIcon> buffer = std::make_pair(-1, wxNullIcon);
-    if (buffer.first == startFillPixel)
-        return buffer.second;
 
-    wxIcon progIcon;
-
+    if (buffer.first != startFillPixel)
     {
-        wxImage genImage(logo);
-
-        //gradually make FFS icon brighter while nearing completion
-        zen::brighten(genImage, -200 * (1 - fraction));
-
         //progress bar
-        if (genImage.GetWidth()  > 0 &&
-            genImage.GetHeight() > 0)
+        if (logo.GetWidth()  > 0 &&
+            logo.GetHeight() > 0)
         {
+            wxImage genImage(logo.Copy()); //workaround wxWidgets' screwed-up design from hell: their copy-construction implements reference-counting WITHOUT copy-on-write!
+
+            //gradually make FFS icon brighter while nearing completion
+            zen::brighten(genImage, -200 * (1 - fraction));
+
             //fill black border row
             if (startFillPixel <= pixelCount - genImage.GetWidth())
             {
@@ -73,9 +84,9 @@ wxIcon generateProgressIcon(const wxImage& logo, double fraction) //generate ico
                 int bStart = startFillPixel - genImage.GetWidth();
                 if (bStart % genImage.GetWidth() != 0) //add one more black pixel, see ascii-art
                     --bStart;
-                fillRange(genImage, std::max(bStart, 0), startFillPixel, *wxBLACK);
+                fillRange(genImage, bStart, startFillPixel, *wxBLACK);
             }
-            else if (startFillPixel != pixelCount)
+            else if (startFillPixel < pixelCount)
             {
                 //special handling for last row
                 /*
@@ -85,9 +96,9 @@ wxIcon generateProgressIcon(const wxImage& logo, double fraction) //generate ico
                         ---bSyyy  S : start yellow remainder
                 */
                 int bStart = startFillPixel - genImage.GetWidth() - 1;
-                int bEnd = (bStart / genImage.GetWidth() + 1) * (genImage.GetWidth());
+                int bEnd = (bStart / genImage.GetWidth() + 1) * genImage.GetWidth();
 
-                fillRange(genImage, std::max(bStart, 0), bEnd, *wxBLACK);
+                fillRange(genImage, bStart, bEnd, *wxBLACK);
                 fillRange(genImage, startFillPixel - 1, startFillPixel, *wxBLACK);
             }
 
@@ -121,22 +132,21 @@ wxIcon generateProgressIcon(const wxImage& logo, double fraction) //generate ico
                             ::memset(alpha + row * genImage.GetWidth() + indicatorXBegin, wxIMAGE_ALPHA_OPAQUE, indicatorWidth);
                     }
             */
-            progIcon.CopyFromBitmap(wxBitmap(genImage));
+            buffer.second.CopyFromBitmap(wxBitmap(genImage));
         }
+        else
+            buffer.second = wxIcon();
     }
 
-    //fill buffer
-    buffer.first  = startFillPixel;
-    buffer.second = progIcon;
-    return progIcon;
+    return buffer.second;
 }
 
 //------------------------------------------------------------------------------------------------
 
 enum Selection
 {
-    CONTEXT_RESTORE,
-    CONTEXT_ABOUT
+    CONTEXT_RESTORE = 1, //wxWidgets: "A MenuItem ID of Zero does not work under Mac"
+    CONTEXT_ABOUT = wxID_ABOUT
 };
 }
 
@@ -172,9 +182,9 @@ FfsTrayIcon::FfsTrayIcon() :
     trayIcon(new TaskBarImpl(*this)),
     fractionLast(1), //show FFS logo by default
 #if defined FFS_WIN || defined FFS_MAC //16x16 seems to be the only size that is shown correctly on OS X
-    logo(GlobalResources::getImage(L"FFS_tray_16x16").ConvertToImage())
+    logo(getResourceImage(L"FFS_tray_16x16").ConvertToImage())
 #elif defined FFS_LINUX
-    logo(GlobalResources::getImage(L"FFS_tray_24x24").ConvertToImage())
+    logo(getResourceImage(L"FFS_tray_24x24").ConvertToImage())
 #endif
 {
     trayIcon->SetIcon(generateProgressIcon(logo, fractionLast), L"FreeFileSync");

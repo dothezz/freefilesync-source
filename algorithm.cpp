@@ -261,7 +261,7 @@ bool isEqual(const SymLinkMapping& linkObj, const InSyncDir::LinkList::value_typ
     const LinkDescriptor& descrDb = getDescriptor<side>(dbLink->second);
 
     return linkObj.getShortName<side>() == shortNameDb &&
-           //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
+           //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes its modification date by up to 2 seconds
            sameFileTime(linkObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2) &&
 #ifdef FFS_WIN //comparison of symbolic link type is relevant for Windows only
            linkObj.getLinkType<side>() == descrDb.type &&

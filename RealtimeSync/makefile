@@ -1,8 +1,10 @@
+BLAH_BLUBB_123=
+#for some buggy reason the first row in the make file has no effect on Suse Linux! => make sure there's no important command
 APPNAME = RealtimeSync
 prefix = /usr
 BINDIR = $(DESTDIR)$(prefix)/bin
 
-CPPFLAGS  = -std=c++11 -Wall -pipe -O3 -DNDEBUG -DwxUSE_UNICODE -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I.. -include "zen/i18n.h" -include "zen/warn_static.h"
+CXXFLAGS  = -std=c++11 -Wall -pipe -O3 -DNDEBUG -DwxUSE_UNICODE -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I.. -include "zen/i18n.h" -include "zen/warn_static.h"
 LINKFLAGS =
 
 #distinguish Linux/Mac builds
@@ -11,23 +13,23 @@ OPERATING_SYSTEM_NAME := $(shell uname)
 #################### Linux ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Linux)
 COMPILER_BIN=g++ -pthread
-CPPFLAGS += -DFFS_LINUX
+CXXFLAGS += -DFFS_LINUX
 
 #Gtk - support "no button border"
-CPPFLAGS  += `pkg-config --cflags gtk+-2.0`
+CXXFLAGS  += `pkg-config --cflags gtk+-2.0`
 LINKFLAGS += `pkg-config --libs   gtk+-2.0`
 
 ifeq ($(BUILD),Launchpad)
 #default build/Launchpad
-CPPFLAGS  += `wx-config --cxxflags --debug=no`
+CXXFLAGS  += `wx-config --cxxflags --debug=no`
 LINKFLAGS += `wx-config --libs     --debug=no` -lboost_thread -lboost_system
 else
 #static wxWidgets and boost library linkage for precompiled release
 WX_CONFIG_BIN =$(HOME)/Desktop/wxGTK-2.8.12/lib/release/bin/wx-config
-CPPFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
+CXXFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
 BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_53_0/stage/lib
 
-CPPFLAGS  += `$(WX_CONFIG_BIN) --cxxflags --debug=no --static=yes`
+CXXFLAGS  += `$(WX_CONFIG_BIN) --cxxflags --debug=no --static=yes`
 LINKFLAGS += `$(WX_CONFIG_BIN) --libs     --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
 endif
 
@@ -35,16 +37,16 @@ endif
 #################### OS X ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
 COMPILER_BIN=clang++ -stdlib=libc++
-CPPFLAGS += -DFFS_MAC
+CXXFLAGS += -DFFS_MAC
 
 WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.4/lib/release/bin/wx-config
-CPPFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
+CXXFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
 BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_53_0/stage/lib
 MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
 #-Wl,-Bstatic not supported on OSX!
 
 # link wxWidgets and boost statically -> check dependencies with: otool -L RealtimeSync
-CPPFLAGS  += $(MACOS_SDK) `$(WX_CONFIG_BIN) --cxxflags --debug=no --static=yes`
+CXXFLAGS  += $(MACOS_SDK) `$(WX_CONFIG_BIN) --cxxflags --debug=no --static=yes`
 LINKFLAGS += $(MACOS_SDK) `$(WX_CONFIG_BIN) --libs     --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
 
 endif
@@ -81,14 +83,13 @@ all: RealtimeSync
 
 ../OBJ/RTS_Release_GCC_Make/RTS/%.o : %.cpp
 	mkdir -p $(dir $@)
-	$(COMPILER_BIN) $(CPPFLAGS) -c $< -o $@
+	$(COMPILER_BIN) $(CXXFLAGS) -c $< -o $@
 
 RealtimeSync: $(OBJECT_LIST)
 	$(COMPILER_BIN) -o ../BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:
-#-f doesn't work when deleting directories
-	if [ -d ../OBJ/RTS_Release_GCC_Make ]; then rm -rf ../OBJ/RTS_Release_GCC_Make; fi
+	rm -rf ../OBJ/RTS_Release_GCC_Make
 	rm -f ../BUILD/$(APPNAME)
 	rm -f ../wx+/pch.h.gch
 

@@ -40,7 +40,7 @@
 
 #if defined FFS_LINUX || defined FFS_MAC
 #include <sys/stat.h>
-//#include <sys/time.h> 
+//#include <sys/time.h>
 #endif
 
 using namespace zen;
@@ -250,26 +250,24 @@ DWORD retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
 {
     //note: this even works for network shares: \\share\dirname
 
-    const DWORD BUFFER_SIZE = 10000;
-    std::vector<wchar_t> buffer(BUFFER_SIZE);
+    const DWORD bufferSize = 10000;
+    std::vector<wchar_t> buffer(bufferSize);
 
     //full pathName need not yet exist!
     if (!::GetVolumePathName(pathName.c_str(), //__in   LPCTSTR lpszFileName,
                              &buffer[0],       //__out  LPTSTR lpszVolumePathName,
-                             BUFFER_SIZE))     //__in   DWORD cchBufferLength
+                             bufferSize))     //__in   DWORD cchBufferLength
         return 0;
 
-    Zstring volumePath = appendSeparator(&buffer[0]);
-
     DWORD volumeSerial = 0;
-    if (!::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
-                                nullptr,            //__out      LPTSTR lpVolumeNameBuffer,
-                                0,                  //__in       DWORD nVolumeNameSize,
-                                &volumeSerial,      //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                nullptr,            //__out_opt  LPDWORD lpMaximumComponentLength,
-                                nullptr,            //__out_opt  LPDWORD lpFileSystemFlags,
-                                nullptr,            //__out      LPTSTR lpFileSystemNameBuffer,
-                                0))                 //__in       DWORD nFileSystemNameSize
+    if (!::GetVolumeInformation(&buffer[0],    //__in_opt   LPCTSTR lpRootPathName,
+                                nullptr,       //__out      LPTSTR lpVolumeNameBuffer,
+                                0,             //__in       DWORD nVolumeNameSize,
+                                &volumeSerial, //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                nullptr,       //__out_opt  LPDWORD lpMaximumComponentLength,
+                                nullptr,       //__out_opt  LPDWORD lpFileSystemFlags,
+                                nullptr,       //__out      LPTSTR lpFileSystemNameBuffer,
+                                0))            //__in       DWORD nFileSystemNameSize
         return 0;
 
     return volumeSerial;
@@ -376,7 +374,7 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
     {
         DWORD lastError = ::GetLastError();
 
-        const std::wstring shortMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", fmtFileName(oldName)), L"%y", fmtFileName(newName));
+        const std::wstring shortMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
 
         if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
             lastError == ERROR_LOCK_VIOLATION)
@@ -429,7 +427,7 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
     if (::rename(oldName.c_str(), newName.c_str()) != 0)
     {
         const int lastError = errno;
-        std::wstring errorMessage = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", fmtFileName(oldName)), L"%y", fmtFileName(newName)) +
+        std::wstring errorMessage = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName)) +
                                     L"\n\n" + getLastErrorFormatted(lastError);
 
         if (lastError == EXDEV)
@@ -513,7 +511,7 @@ bool have8dot3NameClash(const Zstring& filename)
     return false;
 }
 
-class Fix8Dot3NameClash
+class Fix8Dot3NameClash //throw FileError
 {
 public:
     Fix8Dot3NameClash(const Zstring& filename)
@@ -560,7 +558,7 @@ void zen::renameFile(const Zstring& oldName, const Zstring& newName) //throw Fil
         //try to handle issues with already existing short 8.3 file names on Windows
         if (have8dot3NameClash(newName))
         {
-            Fix8Dot3NameClash dummy(newName); //move clashing filename to the side
+            Fix8Dot3NameClash dummy(newName); //throw FileError; move clashing filename to the side
             //now try again...
             renameFile_sub(oldName, newName); //throw FileError
             return;
@@ -1259,11 +1257,96 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
 }
 
 
-void createDirectoryStraight(const Zstring& directory, //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+void makeDirectoryRecursively(const Zstring& directory) //FileError, ErrorTargetExisting
+{
+    assert(!endsWith(directory, FILE_NAME_SEPARATOR)); //even "C:\" should be "C:" as input!
+
+    try
+    {
+        makeDirectoryPlain(directory, Zstring(), false); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
+    }
+    catch (const ErrorTargetPathMissing&)
+    {
+        //we need to create parent directories first
+        const Zstring dirParent = beforeLast(directory, FILE_NAME_SEPARATOR);
+        if (!dirParent.empty())
+        {
+            //recurse...
+            try
+            {
+                makeDirectoryRecursively(dirParent); //throw FileError, (ErrorTargetExisting)
+            }
+            catch (const ErrorTargetExisting& e) { throw FileError(e.toString()); }
+            //yes it's pathological, but we do not want to emit ErrorTargetExisting when creating parent directories!
+
+            //now try again...
+            makeDirectoryPlain(directory, Zstring(), false); //throw FileError, ErrorTargetExisting, (ErrorTargetPathMissing)
+            return;
+        }
+        throw;
+    }
+}
+}
+
+
+void zen::makeDirectory(const Zstring& directory, bool failIfExists) //throw FileError, ErrorTargetExisting
+{
+    //remove trailing separator (even for C:\ root directories)
+    const Zstring dirFormatted = endsWith(directory, FILE_NAME_SEPARATOR) ?
+                                 beforeLast(directory, FILE_NAME_SEPARATOR) :
+                                 directory;
+
+    try
+    {
+        makeDirectoryRecursively(dirFormatted); //FileError, ErrorTargetExisting
+    }
+    catch (const ErrorTargetExisting&)
+    {
+        //avoid any file system race-condition by *not* checking directory existence again here!!!
+        if (failIfExists)
+            throw;
+    }
+    catch (const FileError&)
+    {
+        if (dirExists(directory)) //a file system race-condition!
+        {
+            /*
+            could there be situations where a directory/network path exists,
+            but creation fails with error different than "ErrorTargetExisting"??
+            - creation of C:\ fails with ERROR_ACCESS_DENIED rather than ERROR_ALREADY_EXISTS
+            */
+            assert(false);
+            if (failIfExists)
+                throw; //do NOT convert to ErrorTargetExisting: if "failIfExists", not getting a ErrorTargetExisting *atomically* is unexpected!
+        }
+        else
+            throw;
+    }
+}
+
+
+void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
                              const Zstring& templateDir,
                              bool copyFilePermissions)
 {
 #ifdef FFS_WIN
+    //special handling for volume root: trying to create existing root directory results in ERROR_ACCESS_DENIED rather than ERROR_ALREADY_EXISTS!
+    Zstring dirTmp = removeLongPathPrefix(endsWith(directory, FILE_NAME_SEPARATOR) ?
+                                          beforeLast(directory, FILE_NAME_SEPARATOR) :
+                                          directory);
+    if (dirTmp.size() == 2 &&
+        std::iswalpha(dirTmp[0]) && dirTmp[1] == L':')
+    {
+        dirTmp += FILE_NAME_SEPARATOR; //we do not support "C:" to represent a relative path!
+
+        const ErrorCode lastError = dirExists(dirTmp) ? ERROR_ALREADY_EXISTS : ERROR_PATH_NOT_FOUND;
+
+        const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(dirTmp)) + L"\n\n" + getLastErrorFormatted(lastError);
+        if (lastError == ERROR_ALREADY_EXISTS)
+            throw ErrorTargetExisting(msg);
+        throw FileError(msg); //[!] this is NOT a ErrorTargetPathMissing case!
+    }
+
     //don't use ::CreateDirectoryEx:
     //- it may fail with "wrong parameter (error code 87)" when source is on mapped online storage
     //- automatically copies symbolic links if encountered: unfortunately it doesn't copy symlinks over network shares but silently creates empty folders instead (on XP)!
@@ -1271,14 +1354,30 @@ void createDirectoryStraight(const Zstring& directory, //throw FileError, ErrorT
     if (!::CreateDirectory(applyLongPathPrefixCreateDir(directory).c_str(), //__in      LPCTSTR lpPathName,
                            nullptr))                                        //__in_opt  LPSECURITY_ATTRIBUTES lpSecurityAttributes
     {
-        const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted();
-        const ErrorCode lastError = getLastError();
+        ErrorCode lastError = getLastError();
 
+        //handle issues with already existing short 8.3 file names on Windows
         if (lastError == ERROR_ALREADY_EXISTS)
-            throw ErrorTargetExisting(msg);
-        else if (lastError == ERROR_PATH_NOT_FOUND)
-            throw ErrorTargetPathMissing(msg);
-        throw FileError(msg);
+            if (have8dot3NameClash(directory))
+            {
+                Fix8Dot3NameClash dummy(directory); //throw FileError; move clashing object to the side
+
+                //now try again...
+                if (::CreateDirectory(applyLongPathPrefixCreateDir(directory).c_str(), nullptr))
+                    lastError = ERROR_SUCCESS;
+                else
+                    lastError = getLastError();
+            }
+
+        if (lastError != ERROR_SUCCESS)
+        {
+            const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted(lastError);
+            if (lastError == ERROR_ALREADY_EXISTS)
+                throw ErrorTargetExisting(msg);
+            else if (lastError == ERROR_PATH_NOT_FOUND)
+                throw ErrorTargetPathMissing(msg);
+            throw FileError(msg);
+        }
     }
 
 #elif defined FFS_LINUX || defined FFS_MAC
@@ -1301,19 +1400,17 @@ void createDirectoryStraight(const Zstring& directory, //throw FileError, ErrorT
         //try to copy file attributes
         Zstring sourcePath;
 
-        if (symlinkExists(templateDir)) //dereference symlink!
-        {
+        if (symlinkExists(templateDir))
             try
             {
                 //get target directory of symbolic link
                 sourcePath = getSymlinkTargetPath(templateDir); //throw FileError
             }
             catch (FileError&) {} //dereferencing a symbolic link usually fails if it is located on network drive or client is XP: NOT really an error...
-        }
-        else     //no symbolic link
+        else
             sourcePath = templateDir;
 
-        //try to copy file attributes
+        //*try* to copy file attributes
         if (!sourcePath.empty())
         {
             const DWORD sourceAttr = ::GetFileAttributes(applyLongPathPrefix(sourcePath).c_str());
@@ -1368,95 +1465,6 @@ void createDirectoryStraight(const Zstring& directory, //throw FileError, ErrorT
 }
 
 
-void createDirectoryRecursively(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions) //FileError, ErrorTargetExisting
-{
-    try
-    {
-        createDirectoryStraight(directory, templateDir, copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
-    }
-    catch (const ErrorTargetExisting&)
-    {
-#ifdef FFS_WIN
-        //handle issues with already existing short 8.3 file names on Windows
-        if (have8dot3NameClash(directory))
-        {
-            Fix8Dot3NameClash dummy(directory); //move clashing object to the side
-
-            //now try again...
-            createDirectoryStraight(directory, templateDir, copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
-            return;
-        }
-#endif
-        throw;
-    }
-    catch (const ErrorTargetPathMissing&)
-    {
-        //we need to create parent directories first
-        const Zstring dirParent = beforeLast(directory, FILE_NAME_SEPARATOR);
-        if (!dirParent.empty())
-        {
-            //call function recursively
-            const Zstring templateParent = beforeLast(templateDir, FILE_NAME_SEPARATOR); //returns empty string if ch not found
-            createDirectoryRecursively(dirParent, templateParent, copyFilePermissions); //throw
-
-            //now try again...
-            createDirectoryStraight(directory, templateDir, copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
-            return;
-        }
-        throw;
-    }
-}
-}
-
-
-void zen::makeNewDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions) //FileError, ErrorTargetExisting
-{
-#ifdef FFS_WIN
-    //special handling for volume root: trying to create existing root directory results in ERROR_ACCESS_DENIED rather than ERROR_ALREADY_EXISTS!
-    const Zstring dirTmp = removeLongPathPrefix(directory);
-    if (dirTmp.size() == 3 &&
-        std::iswalpha(dirTmp[0]) && endsWith(dirTmp, L":\\"))
-    {
-        const ErrorCode lastError = dirExists(dirTmp) ? ERROR_ALREADY_EXISTS : ERROR_PATH_NOT_FOUND;
-
-        const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(dirTmp)) + L"\n\n" + getLastErrorFormatted(lastError);
-        if (lastError == ERROR_ALREADY_EXISTS)
-            throw ErrorTargetExisting(msg);
-        throw FileError(msg);
-    }
-#endif
-    //remove trailing separator (except for volume root directories!)
-    const Zstring dirFormatted = endsWith(directory, FILE_NAME_SEPARATOR) ?
-                                 beforeLast(directory, FILE_NAME_SEPARATOR) :
-                                 directory;
-
-    const Zstring templateFormatted = endsWith(templateDir, FILE_NAME_SEPARATOR) ?
-                                      beforeLast(templateDir, FILE_NAME_SEPARATOR) :
-                                      templateDir;
-
-    createDirectoryRecursively(dirFormatted, templateFormatted, copyFilePermissions); //FileError, ErrorTargetExisting
-}
-
-
-void zen::makeDirectory(const Zstring& directory)
-{
-    try
-    {
-        makeNewDirectory(directory, Zstring(), false); //FileError, ErrorTargetExisting
-    }
-    catch (const FileError& e)
-    {
-        assert(dynamic_cast<const ErrorTargetExisting*>(&e));
-        (void)e;
-        //could there be situations where a directory/network path exists, but creation fails with
-        //error different than "ErrorTargetExisting"?? => better catch all "FileError" and check existence again
-        if (dirExists(directory)) //technically a file system race-condition!
-            return;
-        throw;
-    }
-}
-
-
 void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions) //throw FileError
 {
     const Zstring linkPath = getSymlinkRawTargetString(sourceLink); //accept broken symlinks; throw FileError
@@ -1481,7 +1489,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
 #elif defined FFS_LINUX || defined FFS_MAC
     if (::symlink(linkPath.c_str(), targetLink.c_str()) != 0)
 #endif
-        throw FileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."), L"%x", fmtFileName(sourceLink)), L"%y", fmtFileName(targetLink)) +
+        throw FileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."), L"%x", L"\n" + fmtFileName(sourceLink)), L"%y", L"\n" + fmtFileName(targetLink)) +
                         L"\n\n" + getLastErrorFormatted());
 
     //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist
@@ -1996,15 +2004,8 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
 
     //called after copy operation is finished - note: for 0-sized files this callback is invoked just ONCE!
     //if (totalFileSize.QuadPart == totalBytesTransferred.QuadPart && dwStreamNumber == 1) {}
-    if (cbd.userCallback)
-    {
-        //some odd check for some possible(?) error condition
-        if (totalBytesTransferred.QuadPart < 0) //let's see if someone answers the call...
-            ::MessageBox(nullptr, L"You've just discovered a bug in WIN32 API function \"CopyFileEx\"! \n\n\
-            Please write a mail to the author of FreeFileSync at zenju@gmx.de and simply state that\n\
-            \"totalBytesTransferred.HighPart can be below zero\"!\n\n\
-            This will then be handled in future versions of FreeFileSync.\n\nThanks -Zenju",
-                         nullptr, 0);
+    if (cbd.userCallback &&
+        totalBytesTransferred.QuadPart >= 0) //should be always true, but let's still check
         try
         {
             cbd.userCallback->updateCopyStatus(totalBytesTransferred.QuadPart - cbd.bytesReported); //throw X!
@@ -2017,13 +2018,12 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
             cbd.errorHandler.reportUserException(*cbd.userCallback);
             return PROGRESS_CANCEL;
         }
-    }
     return PROGRESS_CONTINUE;
 }
 
 
 const bool supportNonEncryptedDestination = winXpOrLater(); //encrypted destination is not supported with Windows 2000
-//const bool supportUnbufferedCopy          = vistaOrLater();
+//const bool supportUnbufferedCopy        = vistaOrLater();
 //caveat: function scope static initialization is not thread-safe in VS 2010!
 
 
@@ -2074,7 +2074,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
             throw ErrorShouldCopyAsSparse(L"sparse dummy value2");
 
         //assemble error message...
-        std::wstring errorMessage = replaceCpy(replaceCpy(_("Cannot copy file %x to %y."), L"%x", fmtFileName(sourceFile)), L"%y", fmtFileName(targetFile)) +
+        std::wstring errorMessage = replaceCpy(replaceCpy(_("Cannot copy file %x to %y."), L"%x", L"\n" + fmtFileName(sourceFile)), L"%y", L"\n" + fmtFileName(targetFile)) +
                                     L"\n\n" + getLastErrorFormatted(lastError);
 
         //if file is locked throw "ErrorFileLocked" instead!
@@ -2162,7 +2162,7 @@ void copyFileWindows(const Zstring& sourceFile, const Zstring& targetFile, Callb
         //try to handle issues with already existing short 8.3 file names on Windows
         if (have8dot3NameClash(targetFile))
         {
-            Fix8Dot3NameClash dummy(targetFile); //move clashing filename to the side
+            Fix8Dot3NameClash dummy(targetFile); //throw FileError; move clashing filename to the side
             copyFileWindowsSelectRoutine(sourceFile, targetFile, callback, sourceAttr); //throw FileError; the short filename name clash is solved, this should work now
             return;
         }

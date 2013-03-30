@@ -7,7 +7,7 @@
 #ifndef BOOST_THREAD_WRAP_H
 #define BOOST_THREAD_WRAP_H
 
-//temporary solution until C++11 thread becomes fully available
+//temporary solution until C++11 thread becomes fully available (considering std::thread's non-interruptibility and std::async craziness, this may be NEVER)
 #include <memory>
 
 //fix this pathetic boost thread warning mess

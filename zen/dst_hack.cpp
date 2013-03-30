@@ -52,22 +52,22 @@ Zstring getVolumeName(const Zstring& filename)
 
 bool dst::isFatDrive(const Zstring& fileName) //throw()
 {
-    const size_t BUFFER_SIZE = MAX_PATH + 1;
-    wchar_t fsName[BUFFER_SIZE];
-
     const Zstring volumePath = getVolumeName(fileName);
     if (volumePath.empty())
         return false;
 
+    const DWORD bufferSize = MAX_PATH + 1;
+    wchar_t fsName[bufferSize];
+
     //suprisingly fast: ca. 0.03 ms per call!
-    if (!::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
-                                nullptr,            //__out      LPTSTR lpVolumeNameBuffer,
-                                0,                  //__in       DWORD nVolumeNameSize,
-                                nullptr,            //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                nullptr,            //__out_opt  LPDWORD lpMaximumComponentLength,
-                                nullptr,            //__out_opt  LPDWORD lpFileSystemFlags,
-                                fsName,             //__out      LPTSTR lpFileSystemNameBuffer,
-                                BUFFER_SIZE))       //__in       DWORD nFileSystemNameSize
+    if (!::GetVolumeInformation(appendSeparator(volumePath).c_str(), //__in_opt   LPCTSTR lpRootPathName,
+                                nullptr,     //__out      LPTSTR lpVolumeNameBuffer,
+                                0,           //__in       DWORD nVolumeNameSize,
+                                nullptr,     //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                nullptr,     //__out_opt  LPDWORD lpMaximumComponentLength,
+                                nullptr,     //__out_opt  LPDWORD lpFileSystemFlags,
+                                fsName,      //__out      LPTSTR lpFileSystemNameBuffer,
+                                bufferSize)) //__in       DWORD nFileSystemNameSize
     {
         assert(false); //shouldn't happen
         return false;

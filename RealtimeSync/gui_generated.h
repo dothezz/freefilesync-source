@@ -24,11 +24,11 @@ namespace zen { class BitmapButton; }
 #include <wx/settings.h>
 #include <wx/stattext.h>
 #include <wx/sizer.h>
-#include <wx/panel.h>
 #include <wx/statline.h>
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
+#include <wx/panel.h>
 #include <wx/scrolwin.h>
 #include <wx/spinctrl.h>
 #include <wx/frame.h>
@@ -52,14 +52,13 @@ protected:
     wxMenu* m_menuHelp;
     wxMenuItem* m_menuItemAbout;
     wxBoxSizer* bSizerMain;
-    wxPanel* m_panelMain;
-    wxPanel* m_panel5;
     wxStaticText* m_staticText9;
     wxStaticText* m_staticText3;
     wxStaticText* m_staticText4;
     wxStaticText* m_staticText5;
     wxStaticText* m_staticText811;
     wxStaticLine* m_staticline2;
+    wxPanel* m_panelMain;
     wxStaticText* m_staticText7;
     wxPanel* m_panelMainFolder;
     wxStaticText* m_staticTextFinalPath;
@@ -76,14 +75,13 @@ protected:
     wxStaticText* m_staticText6;
     wxTextCtrl* m_textCtrlCommand;
     wxStaticLine* m_staticline5;
-    wxPanel* m_panel4;
     zen::BitmapButton* m_buttonStart;
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
     virtual void OnConfigLoad( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnConfigSave( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnMenuQuit( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnAddFolder( wxCommandEvent& event ) { event.Skip(); }
@@ -113,7 +111,7 @@ public:
     wxBitmapButton* m_bpButtonRemoveFolder;
     wxTextCtrl* m_txtCtrlDirectory;
 
-    FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+    FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = 0 );
     ~FolderGenerated();
 
 };
@@ -126,10 +124,10 @@ class ErrorDlgGenerated : public wxDialog
 private:
 
 protected:
+    wxPanel* m_panel3;
     wxStaticBitmap* m_bitmap10;
     wxTextCtrl* m_textCtrl8;
     wxStaticLine* m_staticline2;
-    wxPanel* m_panel3;
     wxButton* m_buttonRetry;
     wxButton* m_buttonAbort;
 

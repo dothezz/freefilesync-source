@@ -17,7 +17,7 @@ public:
     virtual bool OnExceptionInMainLoop() { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
 
 private:
-    void OnStartApplication(wxIdleEvent& event);
+    void onEnterEventLoop(wxEvent& event);
     //virtual wxLayoutDirection GetLayoutDirection() const { return wxLayout_LeftToRight; }
 };
 

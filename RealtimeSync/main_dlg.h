@@ -39,6 +39,7 @@ private:
     virtual void OnStart          (wxCommandEvent& event);
     virtual void OnConfigSave     (wxCommandEvent& event);
     virtual void OnConfigLoad     (wxCommandEvent& event);
+    virtual void OnMenuQuit       (wxCommandEvent& event) { Close(); }
     void onFilesDropped(zen::FileDropEvent& event);
 
     void setConfiguration(const xmlAccess::XmlRealConfig& cfg);

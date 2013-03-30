@@ -17,7 +17,11 @@
 #include "dll.h"
 #include "FindFilePlus/find_file_plus.h"
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined FFS_MAC
+#include <zen/osx_string.h>
+#endif
+
+#if defined FFS_LINUX || defined FFS_MAC
 #include <sys/stat.h>
 #include <dirent.h>
 #endif
@@ -284,7 +288,7 @@ struct FilePlusTraverser
             */
             if (lastError == ERROR_NOT_SUPPORTED)
             {
-                fb(); //fallback should apply to whole directory sub-tree!
+                fb(); //fallback should apply to whole directory sub-tree! => client needs to handle duplicate file notifications!
                 return false;
             }
 
@@ -555,11 +559,30 @@ private:
                 return;
 
             //don't return "." and ".."
-            const char* const shortName = dirEntry->d_name; //evaluate dirEntry *before* going into recursion => we use a single "buffer"!
+            const char* shortName = dirEntry->d_name; //evaluate dirEntry *before* going into recursion => we use a single "buffer"!
             if (shortName[0] == '.' &&
                 (shortName[1] == 0 || (shortName[1] == '.' && shortName[2] == 0)))
                 continue;
+#ifdef FFS_MAC
+            //some file system abstraction layers fail to properly return decomposed UTF8: http://developer.apple.com/library/mac/#qa/qa1173/_index.html
+            //so we need to do it ourselves; perf: ~600 ns per conversion
+			//note: it's not sufficient to apply this in z_impl::compareFilenamesNoCase: if UTF8 forms differ, FFS assumes a rename in case sensitivity and 
+			//   will try to propagate the rename => this won't work if target drive reports a particular UTF8 form only!
+            if (CFStringRef cfStr = osx::createCFString(shortName))
+            {
+                ZEN_ON_SCOPE_EXIT(::CFRelease(cfStr));
 
+                CFIndex lenMax = ::CFStringGetMaximumSizeOfFileSystemRepresentation(cfStr); //"could be much larger than the actual space required" => don't store in Zstring
+                if (lenMax > 0)
+                {
+                    bufferUtfDecomposed.resize(lenMax);
+                    if (::CFStringGetFileSystemRepresentation(cfStr, &bufferUtfDecomposed[0], lenMax)) //get decomposed UTF form (verified!) despite ambiguous documentation
+                        shortName = &bufferUtfDecomposed[0];
+                }
+            }
+            //const char* sampleDecomposed  = "\x6f\xcc\x81.txt";
+            //const char* samplePrecomposed = "\xc3\xb3.txt";
+#endif
             const Zstring& fullName = appendSeparator(directory) + shortName;
 
             struct ::stat statData = {};
@@ -645,6 +668,9 @@ private:
     }
 
     std::vector<char> buffer;
+#ifdef FFS_MAC
+    std::vector<char> bufferUtfDecomposed;
+#endif
 };
 #endif
 }

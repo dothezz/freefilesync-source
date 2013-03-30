@@ -631,10 +631,10 @@ public:
     GridDataNavi(Grid& grid, const std::shared_ptr<TreeView>& treeDataView) : treeDataView_(treeDataView),
         fileIcon(IconBuffer(IconBuffer::SIZE_SMALL).genericFileIcon()),
         dirIcon (IconBuffer(IconBuffer::SIZE_SMALL).genericDirIcon ()),
-        rootBmp(GlobalResources::getImage(L"rootFolder").ConvertToImage().Scale(iconSizeSmall, iconSizeSmall, wxIMAGE_QUALITY_HIGH)),
+        rootBmp(getResourceImage(L"rootFolder").ConvertToImage().Scale(iconSizeSmall, iconSizeSmall, wxIMAGE_QUALITY_HIGH)),
         widthNodeIcon(iconSizeSmall),
         widthLevelStep(widthNodeIcon),
-        widthNodeStatus(GlobalResources::getImage(L"nodeExpanded").GetWidth()),
+        widthNodeStatus(getResourceImage(L"nodeExpanded").GetWidth()),
         grid_(grid),
         showPercentBar(true)
     {
@@ -700,7 +700,7 @@ private:
             auto sortInfo = treeDataView_->getSortDirection();
             if (colType == static_cast<ColumnType>(sortInfo.first))
             {
-                const wxBitmap& marker = GlobalResources::getImage(sortInfo.second ? L"sortAscending" : L"sortDescending");
+                const wxBitmap& marker = getResourceImage(sortInfo.second ? L"sortAscending" : L"sortDescending");
                 wxPoint markerBegin = rectInside.GetTopLeft() + wxPoint((rectInside.width - marker.GetWidth()) / 2, 0);
                 dc.DrawBitmap(marker, markerBegin, true); //respect 2-pixel gap
             }
@@ -816,7 +816,7 @@ private:
                         //node status
                         auto drawStatus = [&](const wchar_t* image)
                         {
-                            const wxBitmap& bmp = GlobalResources::getImage(image);
+                            const wxBitmap& bmp = getResourceImage(image);
 
                             wxRect rectStat(rectTmp.GetTopLeft(), wxSize(bmp.GetWidth(), bmp.GetHeight()));
                             rectStat.y += (rectTmp.height - rectStat.height) / 2;
@@ -842,30 +842,25 @@ private:
                         rectTmp.width -= widthNodeStatus + GAP_SIZE;
                         if (rectTmp.width > 0)
                         {
+                            wxBitmap nodeIcon;
                             bool isActive = true;
                             //icon
                             if (dynamic_cast<const TreeView::RootNode*>(node.get()))
-                                drawBitmapRtlNoMirror(dc, rootBmp, rectTmp, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
+                                nodeIcon = rootBmp;
                             else if (auto dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
                             {
-                                drawIconRtlNoMirror(dc, dirIcon, rectTmp.GetTopLeft() + wxPoint(0, (rectTmp.height - dirIcon.GetHeight()) / 2), buffer);
+                                nodeIcon = dirIcon;
                                 isActive = dir->dirObj_.isActive();
                             }
                             else if (dynamic_cast<const TreeView::FilesNode*>(node.get()))
-                                drawIconRtlNoMirror(dc, fileIcon, rectTmp.GetTopLeft() + wxPoint(0, (rectTmp.height - fileIcon.GetHeight()) / 2), buffer);
+                                nodeIcon = fileIcon;
 
-                            //convert icon to greyscale if row is not active
-                            if (!isActive)
-                            {
-                                wxBitmap bmp(widthNodeIcon, rectTmp.height);
-                                wxMemoryDC memDc(bmp);
-                                memDc.Blit(0, 0, widthNodeIcon, rectTmp.height, &dc, rectTmp.x, rectTmp.y); //blit in
+                            if (isActive)
+                                drawBitmapRtlNoMirror(dc, nodeIcon, rectTmp, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
 
-                                bmp = wxBitmap(bmp.ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3)); //treat all channels equally!
-                                memDc.SelectObject(bmp);
-
-                                dc.Blit(rectTmp.x, rectTmp.y, widthNodeIcon, rectTmp.height, &memDc, 0, 0); //blit out
-                            }
+                            else
+                                drawBitmapRtlNoMirror(dc, wxBitmap(nodeIcon.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3)), //treat all channels equally!
+                                                      rectTmp, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
 
                             rectTmp.x     += widthNodeIcon + GAP_SIZE;
                             rectTmp.width -= widthNodeIcon + GAP_SIZE;
@@ -1119,8 +1114,8 @@ private:
     }
 
     std::shared_ptr<TreeView> treeDataView_;
-    const wxIcon fileIcon;
-    const wxIcon dirIcon;
+    const wxBitmap fileIcon;
+    const wxBitmap dirIcon;
     const wxBitmap rootBmp;
     std::unique_ptr<wxBitmap> buffer; //avoid costs of recreating this temporal variable
     const int widthNodeIcon;
@@ -1138,7 +1133,7 @@ void treeview::init(Grid& grid, const std::shared_ptr<TreeView>& treeDataView)
     grid.setDataProvider(std::make_shared<GridDataNavi>(grid, treeDataView));
     grid.showRowLabel(false);
 
-    const int rowHeight = std::max(IconBuffer::getSize(IconBuffer::SIZE_SMALL), grid.getMainWin().GetCharHeight()) + 1; //add some space
+    const int rowHeight = std::max(IconBuffer::getSize(IconBuffer::SIZE_SMALL), grid.getMainWin().GetCharHeight()) + 2; //allow 1 pixel space on top and bottom; dearly needed on OS X!
     grid.setRowHeight(rowHeight);
 }
 
