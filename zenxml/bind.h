@@ -195,7 +195,7 @@ public:
         {
             auto iterPair = refList[refIndex]->getChildren(name);
             std::for_each(iterPair.first, iterPair.second,
-            [&](const XmlElement & child) { childList.push_back(&child); });
+            [&](const XmlElement& child) { childList.push_back(&child); });
         }
 
         return XmlIn(childList, childList.empty() ? getChildNameFormatted(name) : std::string(), log);

@@ -1865,7 +1865,7 @@ void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range,
 }
 #endif
 
- //get rid of scrollbars, but preserve scrolling behavior!
+//get rid of scrollbars, but preserve scrolling behavior!
 #ifdef FFS_WIN
 #ifdef __MINGW32__ //MinGW is clueless...
 #define WM_MOUSEHWHEEL                  0x020E

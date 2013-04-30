@@ -1,4 +1,4 @@
-﻿// **************************************************************************
+// **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
@@ -17,6 +17,14 @@ using namespace xmlAccess; //functionally needed for correct overload resolution
 
 using namespace std::rel_ops;
 
+namespace
+{
+//-------------------------------------------------------------------------------------------------------------------------------
+const int XML_FORMAT_VER_GLOBAL    = 1;
+const int XML_FORMAT_VER_FFS_GUI   = 1;
+const int XML_FORMAT_VER_FFS_BATCH = 1;
+//-------------------------------------------------------------------------------------------------------------------------------
+}
 
 XmlType getXmlType(const zen::XmlDoc& doc) //throw()
 {
@@ -73,9 +81,9 @@ void setXmlType(XmlDoc& doc, XmlType type) //throw()
 }
 //################################################################################################################
 
-wxString xmlAccess::getGlobalConfigFile()
+Zstring xmlAccess::getGlobalConfigFile()
 {
-    return utfCvrtTo<wxString>(zen::getConfigDir()) + L"GlobalSettings.xml";
+    return zen::getConfigDir() + Zstr("GlobalSettings.xml");
 }
 
 
@@ -88,6 +96,8 @@ void xmlAccess::OptionalDialogs::resetDialogs()
     warningUnresolvedConflicts     = true;
     warningDatabaseError           = true;
     warningRecyclerMissing         = true;
+    warningInputFieldEmpty         = true;
+    warningDirectoryLockFailed     = true;
     popupOnConfigChange            = true;
     confirmSyncStart               = true;
 }
@@ -180,67 +190,21 @@ xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<Zstring>& filenam
 
 namespace
 {
-template <class XmlCfg>
-XmlCfg readConfigNoWarnings(const Zstring& filename, std::unique_ptr<FfsXmlError>& warning) //throw FfsXmlError, but only if "FATAL"
+std::vector<Zstring> splitFilterByLines(const Zstring& filterPhrase)
 {
-    XmlCfg cfg;
-    try
-    {
-        readConfig(filename, cfg); //throw xmlAccess::FfsXmlError
-    }
-    catch (const FfsXmlError& e)
-    {
-        if (e.getSeverity() == FfsXmlError::FATAL)
-            throw;
-        else if (!warning.get()) warning = make_unique<FfsXmlError>(e);
-    }
-    return cfg;
-}
+    if (filterPhrase.empty())
+        return std::vector<Zstring>();
+    return split(filterPhrase, Zstr('\n'));
 }
 
-
-void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config) //throw FfsXmlError
+Zstring mergeFilterLines(const std::vector<Zstring>& filterLines)
 {
-    assert(!filenames.empty());
-
-    std::vector<zen::MainConfiguration> mainCfgs;
-    std::unique_ptr<FfsXmlError> savedWarning;
-
-    for (auto it = filenames.begin(); it != filenames.end(); ++it)
-    {
-        const Zstring& filename = *it;
-        const bool firstLine = it == filenames.begin(); //init all non-"mainCfg" settings with first config file
-
-        switch (getXmlType(filename))
-        {
-            case XML_TYPE_GUI:
-                if (firstLine)
-                    config = readConfigNoWarnings<XmlGuiConfig>(filename, savedWarning);
-                else
-                    mainCfgs.push_back(readConfigNoWarnings<XmlGuiConfig>(filename, savedWarning).mainCfg); //throw FfsXmlError
-                break;
-
-            case XML_TYPE_BATCH:
-                if (firstLine)
-                    config = convertBatchToGui(readConfigNoWarnings<XmlBatchConfig>(filename, savedWarning));
-                else
-                    mainCfgs.push_back(readConfigNoWarnings<XmlBatchConfig>(filename, savedWarning).mainCfg); //throw FfsXmlError
-                break;
-
-            case XML_TYPE_GLOBAL:
-            case XML_TYPE_OTHER:
-                if (!fileExists(filename))
-                    throw FfsXmlError(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)));
-                else
-                    throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
-        }
-    }
-    mainCfgs.push_back(config.mainCfg); //save cfg from first line
-
-    config.mainCfg = merge(mainCfgs);
-
-    if (savedWarning.get()) //"re-throw" exception
-        throw* savedWarning;
+    if (filterLines.empty())
+        return Zstring();
+    Zstring out = filterLines[0];
+    std::for_each(filterLines.begin() + 1, filterLines.end(), [&](const Zstring& line) { out += Zstr('\n'); out += line; });
+    return out;
+}
 }
 
 
@@ -594,6 +558,9 @@ void writeText(const ColumnTypeNavi& value, std::string& output)
         case COL_TYPE_NAVI_DIRECTORY:
             output = "Tree";
             break;
+        case COL_TYPE_NAVI_ITEM_COUNT:
+            output = "Count";
+            break;
     }
 }
 
@@ -606,6 +573,8 @@ bool readText(const std::string& input, ColumnTypeNavi& value)
         value = COL_TYPE_NAVI_BYTES;
     else if (tmp == "Tree")
         value = COL_TYPE_NAVI_DIRECTORY;
+    else if (tmp == "Count")
+        value = COL_TYPE_NAVI_ITEM_COUNT;
     else
         return false;
     return true;
@@ -870,8 +839,33 @@ void readConfig(const XmlIn& in, SyncConfig& syncCfg)
 
 void readConfig(const XmlIn& in, FilterConfig& filter)
 {
-    in["Include"](filter.includeFilter);
-    in["Exclude"](filter.excludeFilter);
+    warn_static("remove after migration?")
+    auto haveFilterAsSingleString = [&]() -> bool
+    {
+        if (in["Include"])
+            if (auto elem = in["Include"].get())
+            {
+                std::string tmp;
+                if (elem->getValue(tmp))
+                    return !tmp.empty();
+            }
+        return false;
+    };
+    if (haveFilterAsSingleString()) //obsolete style
+    {
+        in["Include"](filter.includeFilter);
+        in["Exclude"](filter.excludeFilter);
+    }
+    else
+    {
+        std::vector<Zstring> tmp = splitFilterByLines(filter.includeFilter); //default value
+        in["Include"](tmp);
+        filter.includeFilter = mergeFilterLines(tmp);
+
+        std::vector<Zstring> tmp2 = splitFilterByLines(filter.excludeFilter); //default value
+        in["Exclude"](tmp2);
+        filter.excludeFilter = mergeFilterLines(tmp2);
+    }
 
     in["TimeSpan"](filter.timeSpan);
     warn_static("remove after migration?")
@@ -942,15 +936,15 @@ void readConfig(const XmlIn& in, MainConfiguration& mainCfg)
     //read all folder pairs
     mainCfg.additionalPairs.clear();
 
-    bool firstIter = true;
+    bool firstItem = true;
     for (XmlIn inPair = inMain["FolderPairs"]["Pair"]; inPair; inPair.next())
     {
         FolderPairEnh newPair;
         readConfig(inPair, newPair);
 
-        if (firstIter)
+        if (firstItem)
         {
-            firstIter = false;
+            firstItem = false;
             mainCfg.firstPair = newPair; //set first folder pair
         }
         else
@@ -966,7 +960,7 @@ void readConfig(const XmlIn& in, MainConfiguration& mainCfg)
 
 void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
 {
-    ::readConfig(in, config.mainCfg); //read main config
+    readConfig(in, config.mainCfg); //read main config
 
     //read GUI specific config data
     XmlIn inGuiCfg = in["GuiConfig"];
@@ -998,7 +992,7 @@ void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
 
 void readConfig(const XmlIn& in, xmlAccess::XmlBatchConfig& config)
 {
-    ::readConfig(in, config.mainCfg); //read main config
+    readConfig(in, config.mainCfg); //read main config
 
     //read GUI specific config data
     XmlIn inBatchCfg = in["BatchConfig"];
@@ -1021,31 +1015,29 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 {
     XmlIn inShared = in["Shared"];
 
-    //try to read program language setting
-    inShared["Language"](config.programLanguage);
+    inShared["Language"].attribute("id", config.programLanguage);
 
-    inShared["CopyLockedFiles"      ](config.copyLockedFiles);
-    inShared["CopyFilePermissions"  ](config.copyFilePermissions);
-    inShared["TransactionalFileCopy"](config.transactionalFileCopy);
-    inShared["LockDirectoriesDuringSync"](config.createLockFile);
-    inShared["VerifyCopiedFiles"        ](config.verifyFileCopy);
-    inShared["RunWithBackgroundPriority"](config.runWithBackgroundPriority);
-
-    //max. allowed file time deviation
-    inShared["FileTimeTolerance"](config.fileTimeTolerance);
-
-    inShared["LastSyncsFileSizeMax"](config.lastSyncsLogFileSizeMax);
+    inShared["FailSafeFileCopy"         ].attribute("Enabled", config.transactionalFileCopy);
+    inShared["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
+    inShared["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
+    inShared["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
+    inShared["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
+    inShared["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
+    inShared["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
+    inShared["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
 
     XmlIn inOpt = inShared["OptionalDialogs"];
-    inOpt["WarnUnresolvedConflicts"    ](config.optDialogs.warningUnresolvedConflicts);
-    inOpt["WarnNotEnoughDiskSpace"     ](config.optDialogs.warningNotEnoughDiskSpace);
-    inOpt["WarnSignificantDifference"  ](config.optDialogs.warningSignificantDifference);
-    inOpt["WarnRecycleBinNotAvailable" ](config.optDialogs.warningRecyclerMissing);
-    inOpt["WarnDatabaseError"          ](config.optDialogs.warningDatabaseError);
-    inOpt["WarnDependentFolders"       ](config.optDialogs.warningDependentFolders);
-    inOpt["WarnFolderPairRaceCondition"](config.optDialogs.warningFolderPairRaceCondition);
-    inOpt["PromptSaveConfig"           ](config.optDialogs.popupOnConfigChange);
-    inOpt["ConfirmSyncStart"           ](config.optDialogs.confirmSyncStart);
+    inOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);
+    inOpt["WarnNotEnoughDiskSpace"     ].attribute("Enabled", config.optDialogs.warningNotEnoughDiskSpace);
+    inOpt["WarnSignificantDifference"  ].attribute("Enabled", config.optDialogs.warningSignificantDifference);
+    inOpt["WarnRecycleBinNotAvailable" ].attribute("Enabled", config.optDialogs.warningRecyclerMissing);
+    inOpt["WarnInputFieldEmpty"        ].attribute("Enabled", config.optDialogs.warningInputFieldEmpty);
+    inOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warningDatabaseError);
+    inOpt["WarnDependentFolders"       ].attribute("Enabled", config.optDialogs.warningDependentFolders);
+    inOpt["WarnFolderPairRaceCondition"].attribute("Enabled", config.optDialogs.warningFolderPairRaceCondition);
+    inOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warningDirectoryLockFailed);
+    inOpt["ConfirmSaveConfig"          ].attribute("Enabled", config.optDialogs.popupOnConfigChange);
+    inOpt["ConfirmStartSync"           ].attribute("Enabled", config.optDialogs.confirmSyncStart);
 
     //gui specific global settings (optional)
     XmlIn inGui = in["Gui"];
@@ -1062,23 +1054,24 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //inManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
     inManualDel.attribute("UseRecycler"      , config.gui.useRecyclerForManualDeletion);
 
-    inWnd["CaseSensitiveSearch"    ](config.gui.textSearchRespectCase);
-    inWnd["MaxFolderPairsVisible"](config.gui.maxFolderPairsVisible);
+    inWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.textSearchRespectCase);
+    inWnd["FolderPairsVisible" ].attribute("Max",     config.gui.maxFolderPairsVisible);
 
     //###########################################################
-    //read column attributes
-    XmlIn inColNavi = inWnd["OverviewColumns"];
-    inColNavi(config.gui.columnAttribNavi);
 
-    inColNavi.attribute("ShowPercentage", config.gui.showPercentBar);
-    inColNavi.attribute("SortByColumn",   config.gui.naviLastSortColumn);
-    inColNavi.attribute("SortAscending",  config.gui.naviLastSortAscending);
+    XmlIn inOverview = inWnd["OverviewPanel"];
+    inOverview.attribute("ShowPercentage", config.gui.showPercentBar);
+    inOverview.attribute("SortByColumn",   config.gui.naviLastSortColumn);
+    inOverview.attribute("SortAscending",  config.gui.naviLastSortAscending);
+
+    //read column attributes
+    XmlIn inColNavi = inOverview["Columns"];
+    inColNavi(config.gui.columnAttribNavi);
 
     XmlIn inMainGrid = inWnd["MainGrid"];
     inMainGrid.attribute("ShowIcons",  config.gui.showIcons);
     inMainGrid.attribute("IconSize",   config.gui.iconSize);
     inMainGrid.attribute("SashOffset", config.gui.sashOffset);
-
 
     XmlIn inColLeft = inMainGrid["ColumnsLeft"];
     inColLeft(config.gui.columnAttribLeft);
@@ -1088,11 +1081,14 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //###########################################################
 
     inWnd["ViewFilterDefault"](config.gui.viewFilterDefault);
-    inWnd["Layout"           ](config.gui.guiPerspectiveLast);
+    inWnd["Perspective"      ](config.gui.guiPerspectiveLast);
+
+    std::vector<Zstring> tmp = splitFilterByLines(config.gui.defaultExclusionFilter); //default value
+    inGui["DefaultExclusionFilter"](tmp);
+    config.gui.defaultExclusionFilter = mergeFilterLines(tmp);
 
     //load config file history
-     inGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
-
+    inGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
     inGui["ConfigHistory"](config.gui.cfgFileHistory);
     inGui["ConfigHistory"].attribute("MaxSize", config.gui.cfgFileHistMax);
 
@@ -1114,44 +1110,146 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 }
 
 
+bool needsMigration(const XmlDoc& doc, int currentXmlFormatVer)
+{
+    //(try to) migrate old configuration if needed
+    int xmlFormatVer = 0;
+    /*bool success = */doc.root().getAttribute("XmlFormat", xmlFormatVer);
+    return xmlFormatVer < currentXmlFormatVer;
+}
+
+
 template <class ConfigType>
-void readConfig(const Zstring& filename, XmlType type, ConfigType& config)
+void readConfig(const Zstring& filename, XmlType type, ConfigType& cfg, int currentXmlFormatVer, bool& needMigration) //throw FfsXmlError
 {
     XmlDoc doc;
     loadXmlDocument(filename, doc); //throw FfsXmlError
-
+	 
     if (getXmlType(doc) != type) //throw()
         throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
 
     XmlIn in(doc);
-    ::readConfig(in, config);
+    ::readConfig(in, cfg);
 
     if (in.errorsOccured())
         throw FfsXmlError(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filename)) + L"\n\n" +
-                          getErrorMessageFormatted(in), FfsXmlError::WARNING);
+                          getErrorMessageFormatted(in.getErrorsAs<std::wstring>()), FfsXmlError::WARNING);
+
+    //(try to) migrate old configuration if needed
+    needMigration = needsMigration(doc, currentXmlFormatVer);
 }
 }
 
 
-void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlGuiConfig& config)
+void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlGuiConfig& cfg)
 {
-    ::readConfig(filename, XML_TYPE_GUI, config);
+    bool needMigration = false;
+    ::readConfig(filename, XML_TYPE_GUI, cfg, XML_FORMAT_VER_FFS_GUI, needMigration); //throw FfsXmlError
+
+    if (needMigration) //(try to) migrate old configuration
+        try { xmlAccess::writeConfig(cfg, filename); /*throw FfsXmlError*/ }
+        catch (FfsXmlError&) { assert(false); }   //don't bother user!
 }
 
 
-void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlBatchConfig& config)
+void xmlAccess::readConfig(const Zstring& filename, xmlAccess::XmlBatchConfig& cfg)
 {
-    ::readConfig(filename, XML_TYPE_BATCH, config);
+    bool needMigration = false;
+    ::readConfig(filename, XML_TYPE_BATCH, cfg, XML_FORMAT_VER_FFS_BATCH, needMigration); //throw FfsXmlError
+
+    if (needMigration) //(try to) migrate old configuration
+        try { xmlAccess::writeConfig(cfg, filename); /*throw FfsXmlError*/ }
+        catch (FfsXmlError&) { assert(false); }   //don't bother user!
 }
 
 
-void xmlAccess::readConfig(xmlAccess::XmlGlobalSettings& config)
+void xmlAccess::readConfig(xmlAccess::XmlGlobalSettings& cfg)
 {
-    ::readConfig(utfCvrtTo<Zstring>(getGlobalConfigFile()), XML_TYPE_GLOBAL, config);
+    bool needMigration = false;
+    ::readConfig(getGlobalConfigFile(), XML_TYPE_GLOBAL, cfg, XML_FORMAT_VER_GLOBAL, needMigration); //throw FfsXmlError
 }
 
+
+namespace
+{
+template <class XmlCfg>
+XmlCfg parseConfig(const XmlDoc& doc, const Zstring& filename, int currentXmlFormatVer, std::unique_ptr<FfsXmlError>& warning) //nothrow
+{
+    XmlCfg cfg;
+    XmlIn in(doc);
+    ::readConfig(in, cfg);
+
+    if (in.errorsOccured())
+    {
+        if (!warning)
+            warning = make_unique<FfsXmlError>(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filename)) + L"\n\n" +
+                                               getErrorMessageFormatted(in.getErrorsAs<std::wstring>()), FfsXmlError::WARNING);
+    }
+    else
+    {
+        //(try to) migrate old configuration if needed
+        if (needsMigration(doc, currentXmlFormatVer))
+            try { xmlAccess::writeConfig(cfg, filename); /*throw FfsXmlError*/ }
+            catch (FfsXmlError&) { assert(false); }   //don't bother user!
+    }
+    return cfg;
+}
+}
+
+
+void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config) //throw FfsXmlError
+{
+    assert(!filenames.empty());
+
+    std::vector<zen::MainConfiguration> mainCfgs;
+    std::unique_ptr<FfsXmlError> warning;
+
+    for (auto it = filenames.begin(); it != filenames.end(); ++it)
+    {
+        const Zstring& filename = *it;
+        const bool firstItem = it == filenames.begin(); //init all non-"mainCfg" settings with first config file
+
+        XmlDoc doc;
+        loadXmlDocument(filename, doc); //throw FfsXmlError
+        //do NOT use zen::loadStream as it will superfluously load even huge files!
+
+        switch (::getXmlType(doc))
+        {
+            case XML_TYPE_GUI:
+            {
+                XmlGuiConfig guiCfg = parseConfig<XmlGuiConfig>(doc, filename, XML_FORMAT_VER_FFS_GUI, warning); //nothrow
+                if (firstItem)
+                    config = guiCfg;
+                else
+                    mainCfgs.push_back(guiCfg.mainCfg);
+            }
+            break;
+
+            case XML_TYPE_BATCH:
+            {
+                XmlBatchConfig batchCfg = parseConfig<XmlBatchConfig>(doc, filename, XML_FORMAT_VER_FFS_BATCH, warning); //nothrow
+                if (firstItem)
+                    config = convertBatchToGui(batchCfg);
+                else
+                    mainCfgs.push_back(batchCfg.mainCfg);
+            }
+            break;
+
+            case XML_TYPE_GLOBAL:
+            case XML_TYPE_OTHER:
+                throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
+        }
+    }
+    mainCfgs.push_back(config.mainCfg); //save cfg from first line
+
+    config.mainCfg = merge(mainCfgs);
+
+    if (warning)
+        throw* warning;
+}
 
 //################################################################################################
+
 namespace
 {
 void writeConfig(const CompConfig& cmpConfig, XmlOut& out)
@@ -1188,8 +1286,8 @@ void writeConfig(const SyncConfig& syncCfg, XmlOut& out)
 
 void writeConfig(const FilterConfig& filter, XmlOut& out)
 {
-    out["Include"](filter.includeFilter);
-    out["Exclude"](filter.excludeFilter);
+    out["Include"](splitFilterByLines(filter.includeFilter));
+    out["Exclude"](splitFilterByLines(filter.excludeFilter));
 
     out["TimeSpan"](filter.timeSpan);
     out["TimeSpan"].attribute("Type", filter.unitTimeSpan);
@@ -1300,31 +1398,29 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 {
     XmlOut outShared = out["Shared"];
 
-    //write program language setting
-    outShared["Language"](config.programLanguage);
+    outShared["Language"].attribute("id", config.programLanguage);
 
-    outShared["CopyLockedFiles"      ](config.copyLockedFiles);
-    outShared["CopyFilePermissions"  ](config.copyFilePermissions);
-    outShared["TransactionalFileCopy"](config.transactionalFileCopy);
-    outShared["LockDirectoriesDuringSync"](config.createLockFile);
-    outShared["VerifyCopiedFiles"        ](config.verifyFileCopy);
-    outShared["RunWithBackgroundPriority"](config.runWithBackgroundPriority);
-
-    //max. allowed file time deviation
-    outShared["FileTimeTolerance"](config.fileTimeTolerance);
-
-    outShared["LastSyncsFileSizeMax"](config.lastSyncsLogFileSizeMax);
+    outShared["FailSafeFileCopy"         ].attribute("Enabled", config.transactionalFileCopy);
+    outShared["CopyLockedFiles"          ].attribute("Enabled", config.copyLockedFiles);
+    outShared["CopyFilePermissions"      ].attribute("Enabled", config.copyFilePermissions);
+    outShared["RunWithBackgroundPriority"].attribute("Enabled", config.runWithBackgroundPriority);
+    outShared["LockDirectoriesDuringSync"].attribute("Enabled", config.createLockFile);
+    outShared["VerifyCopiedFiles"        ].attribute("Enabled", config.verifyFileCopy);
+    outShared["FileTimeTolerance"        ].attribute("Seconds", config.fileTimeTolerance);
+    outShared["LastSyncsLogSizeMax"      ].attribute("Bytes"  , config.lastSyncsLogFileSizeMax);
 
     XmlOut outOpt = outShared["OptionalDialogs"];
-    outOpt["WarnUnresolvedConflicts"    ](config.optDialogs.warningUnresolvedConflicts);
-    outOpt["WarnNotEnoughDiskSpace"     ](config.optDialogs.warningNotEnoughDiskSpace);
-    outOpt["WarnSignificantDifference"  ](config.optDialogs.warningSignificantDifference);
-    outOpt["WarnRecycleBinNotAvailable" ](config.optDialogs.warningRecyclerMissing);
-    outOpt["WarnDatabaseError"          ](config.optDialogs.warningDatabaseError);
-    outOpt["WarnDependentFolders"       ](config.optDialogs.warningDependentFolders);
-    outOpt["WarnFolderPairRaceCondition"](config.optDialogs.warningFolderPairRaceCondition);
-    outOpt["PromptSaveConfig"           ](config.optDialogs.popupOnConfigChange);
-    outOpt["ConfirmSyncStart"           ](config.optDialogs.confirmSyncStart);
+    outOpt["WarnUnresolvedConflicts"    ].attribute("Enabled", config.optDialogs.warningUnresolvedConflicts);
+    outOpt["WarnNotEnoughDiskSpace"     ].attribute("Enabled", config.optDialogs.warningNotEnoughDiskSpace);
+    outOpt["WarnSignificantDifference"  ].attribute("Enabled", config.optDialogs.warningSignificantDifference);
+    outOpt["WarnRecycleBinNotAvailable" ].attribute("Enabled", config.optDialogs.warningRecyclerMissing);
+    outOpt["WarnInputFieldEmpty"        ].attribute("Enabled", config.optDialogs.warningInputFieldEmpty);
+    outOpt["WarnDatabaseError"          ].attribute("Enabled", config.optDialogs.warningDatabaseError);
+    outOpt["WarnDependentFolders"       ].attribute("Enabled", config.optDialogs.warningDependentFolders);
+    outOpt["WarnFolderPairRaceCondition"].attribute("Enabled", config.optDialogs.warningFolderPairRaceCondition);
+    outOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warningDirectoryLockFailed);
+    outOpt["ConfirmSaveConfig"          ].attribute("Enabled", config.optDialogs.popupOnConfigChange);
+    outOpt["ConfirmStartSync"           ].attribute("Enabled", config.optDialogs.confirmSyncStart);
 
     //gui specific global settings (optional)
     XmlOut outGui = out["Gui"];
@@ -1341,17 +1437,19 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //outManualDel.attribute("DeleteOnBothSides", config.gui.deleteOnBothSides);
     outManualDel.attribute("UseRecycler"      , config.gui.useRecyclerForManualDeletion);
 
-    outWnd["CaseSensitiveSearch"     ](config.gui.textSearchRespectCase);
-    outWnd["MaxFolderPairsVisible"](config.gui.maxFolderPairsVisible);
+    outWnd["CaseSensitiveSearch"].attribute("Enabled", config.gui.textSearchRespectCase);
+    outWnd["FolderPairsVisible" ].attribute("Max",     config.gui.maxFolderPairsVisible);
 
     //###########################################################
-    //write column attributes
-    XmlOut outColNavi = outWnd["OverviewColumns"];
-    outColNavi(config.gui.columnAttribNavi);
 
-    outColNavi.attribute("ShowPercentage", config.gui.showPercentBar);
-    outColNavi.attribute("SortByColumn",   config.gui.naviLastSortColumn);
-    outColNavi.attribute("SortAscending",  config.gui.naviLastSortAscending);
+    XmlOut outOverview = outWnd["OverviewPanel"];
+    outOverview.attribute("ShowPercentage", config.gui.showPercentBar);
+    outOverview.attribute("SortByColumn",   config.gui.naviLastSortColumn);
+    outOverview.attribute("SortAscending",  config.gui.naviLastSortAscending);
+
+    //write column attributes
+    XmlOut outColNavi = outOverview["Columns"];
+    outColNavi(config.gui.columnAttribNavi);
 
     XmlOut outMainGrid = outWnd["MainGrid"];
     outMainGrid.attribute("ShowIcons",  config.gui.showIcons);
@@ -1366,7 +1464,9 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //###########################################################
 
     outWnd["ViewFilterDefault"](config.gui.viewFilterDefault);
-    outWnd["Layout"           ](config.gui.guiPerspectiveLast);
+    outWnd["Perspective"      ](config.gui.guiPerspectiveLast);
+
+    outGui["DefaultExclusionFilter"](splitFilterByLines(config.gui.defaultExclusionFilter));
 
     //load config file history
     outGui["LastUsedConfig"](config.gui.lastUsedConfigFiles);
@@ -1392,10 +1492,12 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
 
 
 template <class ConfigType>
-void writeConfig(const ConfigType& config, XmlType type, const Zstring& filename)
+void writeConfig(const ConfigType& config, XmlType type, int xmlFormatVer, const Zstring& filename)
 {
     XmlDoc doc("FreeFileSync");
     setXmlType(doc, type); //throw()
+
+    doc.root().setAttribute("XmlFormat", xmlFormatVer);
 
     XmlOut out(doc);
     writeConfig(config, out);
@@ -1404,21 +1506,21 @@ void writeConfig(const ConfigType& config, XmlType type, const Zstring& filename
 }
 }
 
-void xmlAccess::writeConfig(const XmlGuiConfig& config, const Zstring& filename)
+void xmlAccess::writeConfig(const XmlGuiConfig& cfg, const Zstring& filename)
 {
-    ::writeConfig(config, XML_TYPE_GUI, filename); //throw FfsXmlError
+    ::writeConfig(cfg, XML_TYPE_GUI, XML_FORMAT_VER_FFS_GUI, filename); //throw FfsXmlError
 }
 
 
-void xmlAccess::writeConfig(const XmlBatchConfig& config, const Zstring& filename)
+void xmlAccess::writeConfig(const XmlBatchConfig& cfg, const Zstring& filename)
 {
-    ::writeConfig(config, XML_TYPE_BATCH, filename); //throw FfsXmlError
+    ::writeConfig(cfg, XML_TYPE_BATCH, XML_FORMAT_VER_FFS_BATCH, filename); //throw FfsXmlError
 }
 
 
-void xmlAccess::writeConfig(const XmlGlobalSettings& config)
+void xmlAccess::writeConfig(const XmlGlobalSettings& cfg)
 {
-    ::writeConfig(config, XML_TYPE_GLOBAL, utfCvrtTo<Zstring>(getGlobalConfigFile())); //throw FfsXmlError
+    ::writeConfig(cfg, XML_TYPE_GLOBAL, XML_FORMAT_VER_GLOBAL, getGlobalConfigFile()); //throw FfsXmlError
 }
 
 

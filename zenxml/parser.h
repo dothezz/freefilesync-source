@@ -89,7 +89,7 @@ std::pair<char, char> hexify(unsigned char c)
 {
     auto hexifyDigit = [](int num) -> char //input [0, 15], output 0-9, A-F
     {
-        assert(0 <= num && num <= 15); //guaranteed by design below!
+        assert(0 <= num&&  num <= 15); //guaranteed by design below!
         return static_cast<char>(num <= 9 ? //no signed/unsigned char problem here!
         '0' + num :
         'A' + (num - 10));

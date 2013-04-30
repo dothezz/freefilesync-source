@@ -28,8 +28,7 @@ public:
 
     void init(const wxBitmap& activeBmp,
               const wxBitmap& inactiveBmp,
-              const wxString& activeTooltip,
-              const wxString& inactiveTooltip = wxString());
+              const wxString& tooltip);
 
     void setActive(bool value);
     bool isActive() const { return active; }
@@ -38,11 +37,8 @@ public:
 private:
     bool active;
 
-    wxBitmap m_activeBmp;
-    wxString m_activeTooltip;
-
-    wxBitmap m_inactiveBmp;
-    wxString m_inactiveTooltip;
+    wxBitmap activeBmp_;
+    wxBitmap inactiveBmp_;
 };
 
 
@@ -61,15 +57,13 @@ private:
 inline
 void ToggleButton::init(const wxBitmap& activeBmp,
                         const wxBitmap& inactiveBmp,
-                        const wxString& activeTooltip,
-                        const wxString& inactiveTooltip)
+                        const wxString& tooltip)
 {
-    m_activeBmp       = activeBmp;
-    m_activeTooltip   = activeTooltip;
-    m_inactiveBmp     = inactiveBmp;
-    m_inactiveTooltip = inactiveTooltip.empty() ? activeTooltip : inactiveTooltip;
+    SetToolTip(tooltip);
 
-    //load resources
+    activeBmp_   = activeBmp;
+    inactiveBmp_ = inactiveBmp;
+
     setActive(active);
 }
 
@@ -78,17 +72,7 @@ inline
 void ToggleButton::setActive(bool value)
 {
     active = value;
-
-    if (active)
-    {
-        SetBitmapLabel(m_activeBmp);
-        SetToolTip(m_activeTooltip);
-    }
-    else
-    {
-        SetBitmapLabel(m_inactiveBmp);
-        SetToolTip(m_inactiveTooltip);
-    }
+    SetBitmapLabel(active ? activeBmp_ : inactiveBmp_);
 }
 
 #endif // TOGGLEBUTTON_H_INCLUDED

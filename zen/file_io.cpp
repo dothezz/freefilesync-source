@@ -291,7 +291,7 @@ FileOutput::~FileOutput()
 void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileError
 {
 #ifdef FFS_WIN
-    DWORD bytesWritten = 0;
+    DWORD bytesWritten = 0; //this parameter is NOT optional: http://blogs.msdn.com/b/oldnewthing/archive/2013/04/04/10407417.aspx
     if (!::WriteFile(fileHandle,    //__in         HANDLE hFile,
                      buffer,        //__out        LPVOID lpBuffer,
                      static_cast<DWORD>(bytesToWrite),  //__in         DWORD nNumberOfBytesToWrite,

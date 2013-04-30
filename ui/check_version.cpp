@@ -5,22 +5,25 @@
 // **************************************************************************
 
 #include "check_version.h"
-#include <memory>
+//#include <memory>
 #include <zen/string_tools.h>
 #include <zen/i18n.h>
 #include <zen/utf.h>
 #include <wx/msgdlg.h>
-#include <wx/protocol/http.h>
-#include <wx/sstream.h>
-#include <wx/utils.h>
 #include <wx/timer.h>
+#include <wx/utils.h>
 #include "msg_popup.h"
 #include "../version/version.h"
-//#include "../lib/ffs_paths.h"
+////#include "../lib/ffs_paths.h"
 #include <zen/scope_guard.h>
 
 #ifdef FFS_WIN
+#include <zen/win.h> //tame wininet include
 #include <wininet.h>
+
+#elif defined FFS_LINUX || defined FFS_MAC
+#include <wx/protocol/http.h>
+#include <wx/sstream.h>
 #endif
 
 using namespace zen;
@@ -158,7 +161,7 @@ GetVerResult getOnlineVersion(wxString& version) //empty string on error;
     {
         wxHTTP webAccess;
         webAccess.SetHeader(L"content-type", L"text/html; charset=utf-8");
-        webAccess.SetTimeout(timeout); //default: 10 minutes(WTF are they thinking???)...
+        webAccess.SetTimeout(timeout); //default: 10 minutes(WTF are these wxWidgets people thinking???)...
 
         if (webAccess.Connect(server)) //will *not* fail for non-reachable url here!
         {
@@ -245,7 +248,7 @@ void zen::checkForUpdateNow(wxWindow* parent)
 }
 
 
-void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
+void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, const std::function<void()>& onBeforeInternetAccess)
 {
     if (lastUpdateCheck != -1)
     {
@@ -268,9 +271,10 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck)
         //            break;
         //    }
         //}
-        //else 
-		if (wxGetLocalTime() >= lastUpdateCheck + 7 * 24 * 3600) //check weekly
+        //else
+        if (wxGetLocalTime() >= lastUpdateCheck + 7 * 24 * 3600) //check weekly
         {
+            onBeforeInternetAccess(); //notify client before (potentially) blocking some time
             wxString onlineVersion;
             switch (getOnlineVersion(onlineVersion))
             {

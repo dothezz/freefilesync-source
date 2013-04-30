@@ -188,6 +188,8 @@ public:
 
                 ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
 
+                DWORD bytesReturned = 0; //should not be needed for async calls, still pass it to help broken drivers
+
                 //asynchronous variant: runs on this thread's APC queue!
                 if (!::ReadDirectoryChangesW(hDir,                              //  __in   HANDLE hDirectory,
                                              &buffer[0],                        //  __out  LPVOID lpBuffer,
@@ -197,7 +199,7 @@ public:
                                              FILE_NOTIFY_CHANGE_DIR_NAME  |
                                              FILE_NOTIFY_CHANGE_SIZE      |
                                              FILE_NOTIFY_CHANGE_LAST_WRITE, //  __in         DWORD dwNotifyFilter,
-                                             nullptr,                       //  __out_opt    LPDWORD lpBytesReturned,
+                                             &bytesReturned,                //  __out_opt    LPDWORD lpBytesReturned,
                                              &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
                                              nullptr))                      //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
                     return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)) + L" (ReadDirectoryChangesW)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());

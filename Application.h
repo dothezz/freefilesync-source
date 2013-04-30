@@ -11,6 +11,7 @@
 #include <wx/app.h>
 //#include "lib/process_xml.h"
 #include "lib/return_codes.h"
+#include <zen/zstring.h>
 
 
 class Application : public wxApp
@@ -31,7 +32,7 @@ private:
 
     void onEnterEventLoop(wxEvent& event);
     void onQueryEndSession(wxEvent& event);
-    void launch(const std::vector<wxString>& commandArgs);
+    void launch(const std::vector<Zstring>& commandArgs);
 
     zen::FfsReturnCode returnCode;
 };

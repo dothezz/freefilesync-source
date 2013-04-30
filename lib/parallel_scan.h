@@ -35,8 +35,9 @@ bool operator<(const DirectoryKey& lhs, const DirectoryKey& rhs)
     if (lhs.handleSymlinks_ != rhs.handleSymlinks_)
         return lhs.handleSymlinks_ < rhs.handleSymlinks_;
 
-    if (!EqualFilename()(lhs.dirnameFull_, rhs.dirnameFull_))
-        return LessFilename()(lhs.dirnameFull_, rhs.dirnameFull_);
+    const int cmpName = cmpFileName(lhs.dirnameFull_, rhs.dirnameFull_);
+    if (cmpName != 0)
+        return cmpName < 0;
 
     return *lhs.filter_ < *rhs.filter_;
 }

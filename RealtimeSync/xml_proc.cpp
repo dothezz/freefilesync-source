@@ -49,7 +49,7 @@ void xmlAccess::readRealConfig(const Zstring& filename, XmlRealConfig& config)
 
     if (in.errorsOccured())
         throw FfsXmlError(replaceCpy(_("Configuration file %x loaded partially only."), L"%x", fmtFileName(filename)) + L"\n\n" +
-                          getErrorMessageFormatted(in), FfsXmlError::WARNING);
+                          getErrorMessageFormatted(in.getErrorsAs<std::wstring>()), FfsXmlError::WARNING);
 }
 
 

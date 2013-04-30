@@ -7,14 +7,14 @@
 #ifndef UPDATEVERSION_H_INCLUDED
 #define UPDATEVERSION_H_INCLUDED
 
+#include <functional>
 #include <wx/window.h>
 
 
 namespace zen
 {
 void checkForUpdateNow(wxWindow* parent);
-
-void checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck);
+void checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, const std::function<void()>& onBeforeInternetAccess); //-1: check never
 }
 
 #endif // UPDATEVERSION_H_INCLUDED

@@ -39,7 +39,7 @@ endif
 ifeq ($(BUILD),Launchpad)
 #default build/Launchpad
 CXXFLAGS  += `wx-config --cxxflags      --debug=no`
-LINKFLAGS += `wx-config --libs std, aui --debug=no` -lboost_thread -lboost_system
+LINKFLAGS += `wx-config --libs std, aui --debug=no` -lboost_thread -lboost_system -lz
 else
 #static wxWidgets and boost library linkage for precompiled release
 WX_CONFIG_BIN =$(HOME)/Desktop/wxGTK-2.8.12/lib/release/bin/wx-config
@@ -47,7 +47,7 @@ CXXFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
 BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_53_0/stage/lib
 
 CXXFLAGS  += `$(WX_CONFIG_BIN) --cxxflags      --debug=no --static=yes`
-LINKFLAGS += `$(WX_CONFIG_BIN) --libs std, aui --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
+LINKFLAGS += `$(WX_CONFIG_BIN) --libs std, aui --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a -lX11
 endif
 
 endif

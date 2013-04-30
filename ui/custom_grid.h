@@ -31,8 +31,8 @@ void refresh(Grid& gridLeft, Grid& gridCenter, Grid& gridRight);
 
 //mark rows selected in navigation/compressed tree and navigate to leading object
 void setNavigationMarker(Grid& gridLeft,
-                         std::vector<const HierarchyObject*>&& markedFiles,      //mark files/symlinks directly within a container
-                         std::vector<const HierarchyObject*>&& markedContainer); //mark full container including child-objects
+                         hash_set<const FileSystemObject*>&& markedFilesAndLinks,//mark files/symlinks directly within a container
+                         hash_set<const HierarchyObject*>&& markedContainer);   //mark full container including child-objects
 }
 
 wxBitmap getSyncOpImage(SyncOperation syncOp);

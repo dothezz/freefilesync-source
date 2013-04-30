@@ -666,6 +666,7 @@ void FileSystemObject::setSyncDirConflict(const std::wstring& description)
 inline
 std::wstring FileSystemObject::getSyncOpConflict() const
 {
+    assert(getSyncOperation() == SO_UNRESOLVED_CONFLICT);
     return syncDirConflict ? *syncDirConflict : std::wstring();
 }
 

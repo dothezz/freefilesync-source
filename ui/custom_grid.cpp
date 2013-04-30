@@ -695,11 +695,11 @@ class GridDataLeft : public GridDataRim<LEFT_SIDE>
 public:
     GridDataLeft(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) : GridDataRim<LEFT_SIDE>(gridDataView, grid) {}
 
-    void setNavigationMarker(std::vector<const HierarchyObject*>&& markedFiles,
-                             std::vector<const HierarchyObject*>&& markedContainer)
+    void setNavigationMarker(hash_set<const FileSystemObject*>&& markedFilesAndLinks,
+                             hash_set<const HierarchyObject*>&& markedContainer)
     {
-        markedFiles_    .swap(markedFiles);
-        markedContainer_.swap(markedContainer);
+        markedFilesAndLinks_.swap(markedFilesAndLinks);
+        markedContainer_    .swap(markedContainer);
     }
 
 private:
@@ -714,33 +714,26 @@ private:
             {
                 if (const FileSystemObject* fsObj = getRawData(row))
                 {
-                    if (dynamic_cast<const FileMapping*>(fsObj) || dynamic_cast<const SymLinkMapping*>(fsObj))
+                    if (markedFilesAndLinks_.find(fsObj) != markedFilesAndLinks_.end()) //mark files/links directly
+                        return true;
+
+                    if (auto dirObj = dynamic_cast<const DirMapping*>(fsObj))
                     {
-                        for (auto it = markedFiles_.begin(); it != markedFiles_.end(); ++it)
-                            if (*it == &(fsObj->parent())) //mark files/links wich have the given parent
-                                return true;
-                    }
-                    else if (auto dirObj = dynamic_cast<const DirMapping*>(fsObj))
-                    {
-                        for (auto it = markedContainer_.begin(); it != markedContainer_.end(); ++it)
-                            if (*it == dirObj) //mark directories which *are* the given HierarchyObject*
-                                return true;
+                        if (markedContainer_.find(dirObj) != markedContainer_.end()) //mark directories which *are* the given HierarchyObject*
+                            return true;
                     }
 
-                    for (auto it = markedContainer_.begin(); it != markedContainer_.end(); ++it)
+                    //mark all objects which have the HierarchyObject as *any* matching ancestor
+                    const HierarchyObject* parent = &(fsObj->parent());
+                    for (;;)
                     {
-                        //mark all objects which have the HierarchyObject as *any* matching ancestor
-                        const HierarchyObject* parent = &(fsObj->parent());
-                        for (;;)
-                        {
-                            if (*it == parent)
-                                return true;
+                        if (markedContainer_.find(parent) != markedContainer_.end())
+                            return true;
 
-                            if (auto dirObj = dynamic_cast<const DirMapping*>(parent))
-                                parent = &(dirObj->parent());
-                            else
-                                break;
-                        }
+                        if (auto dirObj = dynamic_cast<const DirMapping*>(parent))
+                            parent = &(dirObj->parent());
+                        else
+                            break;
                     }
                 }
                 return false;
@@ -758,8 +751,8 @@ private:
         }
     }
 
-    std::vector<const HierarchyObject*> markedFiles_;     //mark files/symlinks directly within a container
-    std::vector<const HierarchyObject*> markedContainer_; //mark full container including all child-objects
+    hash_set<const FileSystemObject*> markedFilesAndLinks_; //mark files/symlinks directly within a container
+    hash_set<const HierarchyObject*> markedContainer_;      //mark full container including all child-objects
     //DO NOT DEREFERENCE!!!! NOT GUARANTEED TO BE VALID!!!
 };
 
@@ -837,7 +830,8 @@ public:
         }
 
         //update highlight and tooltip: on OS X no mouse movement event is generated after a mouse button click (unlike on Windows)
-        onMouseMovement(refGrid().getMainWin().ScreenToClient(wxGetMousePosition()));
+        wxPoint clientPos = refGrid().getMainWin().ScreenToClient(wxGetMousePosition());
+        onMouseMovement(clientPos);
     }
 
     void onMouseMovement(const wxPoint& clientPos)
@@ -859,7 +853,8 @@ public:
                 refreshCell(refGrid(), highlight->row_, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
 
                 //show custom tooltip
-                showToolTip(row, refGrid().getMainWin().ClientToScreen(clientPos));
+                if (refGrid().getMainWin().GetClientRect().Contains(clientPos)) //cursor might have moved outside visible client area
+                    showToolTip(row, refGrid().getMainWin().ClientToScreen(clientPos));
             }
             else
                 onMouseLeave();
@@ -1623,11 +1618,11 @@ void gridview::refresh(Grid& gridLeft, Grid& gridCenter, Grid& gridRight)
 
 
 void gridview::setNavigationMarker(Grid& gridLeft,
-                                   std::vector<const HierarchyObject*>&& markedFiles,
-                                   std::vector<const HierarchyObject*>&& markedContainer)
+                                   hash_set<const FileSystemObject*>&& markedFilesAndLinks,
+                                   hash_set<const HierarchyObject*>&& markedContainer)
 {
     if (auto* provLeft  = dynamic_cast<GridDataLeft*>(gridLeft.getDataProvider()))
-        provLeft->setNavigationMarker(std::move(markedFiles), std::move(markedContainer));
+        provLeft->setNavigationMarker(std::move(markedFilesAndLinks), std::move(markedContainer));
     else
         assert(false);
     gridLeft.Refresh();

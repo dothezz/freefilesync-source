@@ -175,12 +175,13 @@ template <class K, class V> class hash_map : public std::unordered_map<K, V> {};
 #endif
 
 //as long as variadic templates are not available in MSVC
-template<class T>                                                             inline std::unique_ptr<T> make_unique()                                                                { return std::unique_ptr<T>(new T); }
-template<class T, class Arg1>                                                 inline std::unique_ptr<T> make_unique(Arg1&& arg1)                                                     { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1))); }
-template<class T, class Arg1, class Arg2>                                     inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2)                                        { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2))); }
-template<class T, class Arg1, class Arg2, class Arg3>                         inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3)                           { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3))); }
-template<class T, class Arg1, class Arg2, class Arg3, class Arg4>             inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4)              { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4))); }
-template<class T, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5> inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4, Arg5&& arg5) { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4), std::forward<Arg5>(arg5))); }
+template<class T>																	      inline std::unique_ptr<T> make_unique()																		      { return std::unique_ptr<T>(new T); }
+template<class T, class Arg1>														      inline std::unique_ptr<T> make_unique(Arg1&& arg1)															      { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1))); }
+template<class T, class Arg1, class Arg2>											      inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2)												      { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2))); }
+template<class T, class Arg1, class Arg2, class Arg3>								      inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3)										  { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3))); }
+template<class T, class Arg1, class Arg2, class Arg3, class Arg4>						  inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4)							  { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4))); }
+template<class T, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>			  inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4, Arg5&& arg5)              { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4), std::forward<Arg5>(arg5))); }
+template<class T, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6> inline std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4, Arg5&& arg5, Arg6&& arg6) { return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Arg3>(arg3), std::forward<Arg4>(arg4), std::forward<Arg5>(arg5), std::forward<Arg6>(arg6))); }
 
 //template<typename T, typename ...Args> inline
 //std::unique_ptr<T> make_unique(Args&& ...args)

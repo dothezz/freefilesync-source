@@ -239,10 +239,10 @@ void MainDialog::loadConfig(const wxString& filename)
     catch (const xmlAccess::FfsXmlError& error)
     {
         if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
-            wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
+            wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING, this);
         else
         {
-            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR, this);
             return;
         }
     }

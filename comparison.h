@@ -11,6 +11,8 @@
 #include "lib/process_xml.h"
 #include "process_callback.h"
 #include "lib/norm_filter.h"
+#include "lib/lock_holder.h"
+
 
 namespace zen
 {
@@ -47,9 +49,10 @@ void compare(size_t fileTimeTolerance, //max allowed file time deviation
              xmlAccess::OptionalDialogs& warnings,
              bool allowUserInteraction,
              bool runWithBackgroundPriority,
-
+             bool createDirLocks,
+             std::unique_ptr<LockHolder>& dirLocks, //out
              const std::vector<FolderPairCfg>& cfgList,
-             FolderComparison& output,
+             FolderComparison& output, //out
              ProcessCallback& callback);
 }
 

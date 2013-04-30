@@ -566,8 +566,8 @@ private:
 #ifdef FFS_MAC
             //some file system abstraction layers fail to properly return decomposed UTF8: http://developer.apple.com/library/mac/#qa/qa1173/_index.html
             //so we need to do it ourselves; perf: ~600 ns per conversion
-			//note: it's not sufficient to apply this in z_impl::compareFilenamesNoCase: if UTF8 forms differ, FFS assumes a rename in case sensitivity and 
-			//   will try to propagate the rename => this won't work if target drive reports a particular UTF8 form only!
+            //note: it's not sufficient to apply this in z_impl::compareFilenamesNoCase: if UTF8 forms differ, FFS assumes a rename in case sensitivity and
+            //   will try to propagate the rename => this won't work if target drive reports a particular UTF8 form only!
             if (CFStringRef cfStr = osx::createCFString(shortName))
             {
                 ZEN_ON_SCOPE_EXIT(::CFRelease(cfStr));

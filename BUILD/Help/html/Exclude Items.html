@@ -3,9 +3,9 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="LibreOffice 4.0.0.3 (Windows)">
+	<META NAME="GENERATOR" CONTENT="LibreOffice 4.0.2.2 (Windows)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20130211;23214007">
+	<META NAME="CHANGED" CONTENT="20130418;20440768">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -14,6 +14,7 @@
 	<!--
 		@page { margin: 2cm }
 		P { margin-bottom: 0.21cm }
+		TD P { margin-bottom: 0.21cm }
 		H2.cjk { font-family: "SimSun" }
 		H2.ctl { font-family: "Mangal" }
 	-->
@@ -26,78 +27,125 @@ items</FONT></FONT></H2>
 and directories are only considered for synchronization if they pass
 the filter. They have to match <B>at least one</B> entry in the
 include list and <B>none</B> of the entries in the exclude list:</FONT></P>
-<OL>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Each
-	list item must be a file or directory path </FONT><FONT FACE="Tahoma, sans-serif"><B>relative</B></FONT>
-	<FONT FACE="Tahoma, sans-serif">to synchronization base directories.</FONT></P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Multiple
-	items must be separated by <B>;</B> or a new line.</FONT></P>
-	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Wild
-	cards <B>*</B> and <B>?</B> may be used: <B>*</B> means zero or more
-	characters while <B>?</B> represents exactly one character.</FONT></P>
-</OL>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
-Exclude items for m<SPAN STYLE="font-weight: normal">irror-sync from
-</SPAN><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">C:\Source</SPAN></FONT>
-<SPAN STYLE="font-weight: normal">to </SPAN><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">D:\Target</SPAN></FONT></FONT></P>
-<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-	<P STYLE="margin-left: 0.82cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Single
-	file </SPAN></FONT><FONT FACE="Courier New, monospace">C:\Source\file.txt:<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Exclude:
-	</SPAN></FONT><FONT FACE="Courier New, monospace">\file.txt</FONT></P>
-	<P STYLE="margin-left: 0.82cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Single
-	folder </SPAN></FONT><FONT FACE="Courier New, monospace">C:\Source\subfolder:<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Exclude:
-	</SPAN></FONT><FONT FACE="Courier New, monospace">\subfolder\</FONT></P>
-	<P STYLE="margin-left: 0.82cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">All
-	files (and folders) named </SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">thumbs.db</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">:<BR></SPAN></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Exclude:
-	</SPAN></FONT><FONT FACE="Courier New, monospace">*\thumbs.db</FONT></P>
-	<P STYLE="margin-left: 0.82cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">All
-	</SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">*.tmp</SPAN></FONT>
-	<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">files
-	located in </SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">subfolder</SPAN></FONT>
-	<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">only:<BR></SPAN></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Exclude:
-	</SPAN></FONT><FONT FACE="Courier New, monospace">\subfolder\*.tmp</FONT></P>
-	<P STYLE="margin-left: 0.82cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Files
-	and folders containing </SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">temp</SPAN></FONT>
-	<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">somewhere
-	in their path:<BR></SPAN></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Exclude:
-	</SPAN></FONT><FONT FACE="Courier New, monospace">*temp*</FONT></P>
-	<P ALIGN=LEFT STYLE="margin-left: 0.82cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Multiple
-	entries separated by semicolon:<BR></SPAN>&nbsp;&nbsp;&nbsp;&nbsp;<SPAN STYLE="font-weight: normal">Exclude:
-	</SPAN><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">*.tmp;
-	*.doc; *.bak</SPAN></FONT></FONT></P>
+
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%;  border: none; padding: 0cm; background: #e6e6e6">
+		<LI><P STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Each
+		list item must be a file or directory path </FONT><FONT FACE="Tahoma, sans-serif"><B>relative</B></FONT>
+		<FONT FACE="Tahoma, sans-serif">to synchronization base directories.</FONT></P>
+		<LI><P STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Multiple
+		items must be separated by <B>;</B> or a new line.</FONT></P>
+		<LI><P STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Wild
+		cards <B>*</B> and <B>?</B> may be used: <B>*</B> means zero or more
+		characters while <B>?</B> represents exactly one character.</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
+</P>
+
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
+<FONT FACE="Tahoma, sans-serif">Exclude items for mirror-sync from
+</FONT><FONT FACE="Courier New, monospace">C:\Source</FONT> <FONT FACE="Tahoma, sans-serif">to
+</FONT><FONT FACE="Courier New, monospace">D:\Target</FONT></P>
+
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; border: none; padding: 0cm; background: #e6e6e6">
+	<TABLE DIR="LTR" WIDTH=100% CELLPADDING=0 CELLSPACING=0>
+		<TR>
+			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 2px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif"><B>Description</B></FONT></P>
+			</TD>
+			<TD WIDTH=35% STYLE="border-top: none; border-bottom: 2px solid #000000; border-left: 1.00pt solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0.05cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif"><B>Exclude</B></FONT></P>
+			</TD>
+		</TR>
+		<TR>
+			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">Single file
+				<FONT FACE="Courier New, monospace">C:\Source\file.txt</FONT></FONT></P>
+			</TD>
+			<TD WIDTH=35% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0.05cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">\file.txt</FONT></P>
+			</TD>
+		</TR>
+		<TR>
+			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">Single folder
+				<FONT FACE="Courier New, monospace">C:\Source\subfolder</FONT></FONT></P>
+			</TD>
+			<TD WIDTH=35% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0.05cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">\subfolder\</FONT></P>
+			</TD>
+		</TR>
+		<TR>
+			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">All files (and
+				folders) named <FONT FACE="Courier New, monospace">thumbs.db</FONT>
+				</FONT>
+				</P>
+			</TD>
+			<TD WIDTH=35% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0.05cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">*\thumbs.db</FONT></P>
+			</TD>
+		</TR>
+		<TR>
+			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">All <FONT FACE="Courier New, monospace">*.tmp</FONT>
+				files located in <FONT FACE="Courier New, monospace">subfolder</FONT>
+				only</FONT></P>
+			</TD>
+			<TD WIDTH=35% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0.05cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">\subfolder\*.tmp</FONT></P>
+			</TD>
+		</TR>
+		<TR>
+			<TD WIDTH=65% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">Files and folders
+				containing <FONT FACE="Courier New, monospace">temp</FONT>
+				somewhere in their path</FONT></P>
+			</TD>
+			<TD WIDTH=35% STYLE="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0.05cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">*temp*</FONT></P>
+			</TD>
+		</TR>
+		<TR>
+			<TD WIDTH=65% STYLE="border: none; padding: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Tahoma, sans-serif">Multiple entries
+				separated by semicolon</FONT></P>
+			</TD>
+			<TD WIDTH=35% STYLE="border-top: none; border-bottom: none; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.05cm; padding-right: 0cm">
+				<P ALIGN=LEFT STYLE="margin-left: 0.79cm"><FONT FACE="Courier New, monospace">*.tmp; *.doc;
+				*.bak</FONT></P>
+			</TD>
+		</TR>
+	</TABLE>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
 Exclude all files and folders located in subdirectories of base
 directories</FONT></P>
-<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%;  border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif">Exclude: <FONT FACE="Courier New, monospace">*\*</FONT></FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
 Include only <SPAN STYLE="font-weight: normal">files and folders
 located in subdirectories of base directories</SPAN></FONT></P>
-<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%;  border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif">Include: <FONT FACE="Courier New, monospace">*\*</FONT></FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen4" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-	<UL>
-		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT></P>
-		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">For
-		simple exclusions just right-click and exclude one or a list of
-		items directly on main grid via context menu.</FONT></P>
-		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm; font-variant: normal; font-style: normal">
-		<FONT FACE="Tahoma, sans-serif">A filter string is compared against
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen4" DIR="LTR" STYLE="float: left; width: 80%; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">For
+		simple exclusions just right-click and exclude one item or a list
+		of items directly on main grid via context menu.</FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm; font-variant: normal; font-style: normal">
+		<FONT FACE="Tahoma, sans-serif">A filter phrase is compared against
 		both file and directory paths. If you want to consider directories
 		only, you can give a hint by appending a path separator (<FONT FACE="Courier New, monospace"><B>\</B></FONT>).</FONT></P>
-	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>

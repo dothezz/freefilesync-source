@@ -168,13 +168,13 @@ struct AllEqual //test if non-equal items exist in scanned data
     bool operator()(const HierarchyObject& hierObj) const
     {
         return std::all_of(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-        [](const FileMapping& fileObj) { return fileObj.getCategory() == FILE_EQUAL; }) && //files
+        [](const FileMapping& fileObj) { return fileObj.getCategory() == FILE_EQUAL; })&&  //files
 
-               std::all_of(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-        [](const SymLinkMapping& linkObj) { return linkObj.getLinkCategory() == SYMLINK_EQUAL; }) && //symlinks
+        std::all_of(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
+        [](const SymLinkMapping& linkObj) { return linkObj.getLinkCategory() == SYMLINK_EQUAL; })&&  //symlinks
 
-               std::all_of(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(),
-                           [](const DirMapping& dirObj)
+        std::all_of(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(),
+                    [](const DirMapping& dirObj)
         {
             return dirObj.getDirCategory() == DIR_EQUAL && AllEqual()(dirObj); //short circuit-behavior!
         });    //directories
@@ -1035,7 +1035,6 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
     allPairs.insert(allPairs.end(),
                     mainCfg.additionalPairs.begin(), //add additional pairs
                     mainCfg.additionalPairs.end());
-
 
     for (auto it = allPairs.begin(); it != allPairs.end(); ++it)
     {

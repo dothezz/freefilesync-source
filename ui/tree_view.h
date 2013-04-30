@@ -7,10 +7,11 @@
 #ifndef TREE_H_INCLUDED_841703190201835280256673425
 #define TREE_H_INCLUDED_841703190201835280256673425
 
-#include <wx+/grid.h>
-#include "../file_hierarchy.h"
-#include "column_attr.h"
+#include <functional>
 #include <zen/optional.h>
+#include <wx+/grid.h>
+#include "column_attr.h"
+#include "../file_hierarchy.h"
 
 namespace zen
 {
@@ -56,31 +57,32 @@ public:
     //---------------------------------------------------------------------
     struct Node
     {
-        Node(int percent, size_t level, NodeStatus status, UInt64 bytes) :
-            percent_(percent), level_(level), status_(status), bytes_(bytes) {}
+        Node(int percent, UInt64 bytes, int itemCount, size_t level, NodeStatus status) :
+            percent_(percent), level_(level), status_(status), bytes_(bytes), itemCount_(itemCount) {}
         virtual ~Node() {}
 
         const int percent_; //[0, 100]
         const size_t level_;
         const NodeStatus status_;
         const UInt64 bytes_;
+        const int itemCount_;
     };
 
     struct FilesNode : public Node
     {
-        FilesNode(int percent, size_t level, UInt64 bytes, FileSystemObject& firstFile) : Node(percent, level, STATUS_EMPTY, bytes), firstFile_(firstFile)  {}
-        FileSystemObject& firstFile_; //or symlink
+        FilesNode(int percent, UInt64 bytes, int itemCount, size_t level, const std::vector<FileSystemObject*>& filesAndLinks) : Node(percent, bytes, itemCount, level, STATUS_EMPTY), filesAndLinks_(filesAndLinks)  {}
+        std::vector<FileSystemObject*> filesAndLinks_; //files or symlinks; pointers are bound!
     };
 
     struct DirNode : public Node
     {
-        DirNode(int percent, size_t level, NodeStatus status, UInt64 bytes, DirMapping& dirObj) : Node(percent, level, status, bytes), dirObj_(dirObj) {}
+        DirNode(int percent, UInt64 bytes, int itemCount, size_t level, NodeStatus status, DirMapping& dirObj) : Node(percent, bytes, itemCount, level, status), dirObj_(dirObj) {}
         DirMapping& dirObj_;
     };
 
     struct RootNode : public Node
     {
-        RootNode(int percent, NodeStatus status, UInt64 bytes, BaseDirMapping& baseMap) : Node(percent, 0, status, bytes), baseMap_(baseMap) {}
+        RootNode(int percent, UInt64 bytes, int itemCount, NodeStatus status, BaseDirMapping& baseMap) : Node(percent, bytes, itemCount, 0, status), baseMap_(baseMap) {}
         BaseDirMapping& baseMap_;
     };
 
@@ -101,11 +103,17 @@ private:
 
     struct Container
     {
-        Container() : firstFile(nullptr) {}
+        Container() : itemCountGross(), itemCountNet(), firstFileId(nullptr) {}
         UInt64 bytesGross;
-        UInt64 bytesNet;  //files in this directory only
+        UInt64 bytesNet;  //bytes for files on view in this directory only
+        int itemCountGross;
+        int itemCountNet;   //number of files on view for in this directory only
+
         std::vector<DirNodeImpl> subDirs;
-        FileSystemObject::ObjectId firstFile; //weak pointer to first FileMapping or SymLinkMapping
+        FileSystemObject::ObjectId firstFileId; //weak pointer to first FileMapping or SymLinkMapping
+        //- "compress" algorithm may hide file nodes for directories with a single included file, i.e. itemCountGross == itemCountNet == 1
+        //- a HierarchyObject* would a better fit, but we need weak pointer semantics!
+        //- a std::vector<FileSystemObject::ObjectId> would be a better design, but we don't want a second memory structure as large as custom grid!
     };
 
     struct DirNodeImpl : public Container
@@ -134,13 +142,13 @@ private:
         size_t level_;
         int percent_;      //[0, 100]
         const Container* node_; //
-        NodeType type_;    //we choose to increase size of "flatTree" rather than "folderCmpView" by not using dynamic polymorphism!
+        NodeType type_;         //we choose to increase size of "flatTree" rather than "folderCmpView" by not using dynamic polymorphism!
     };
 
     static void compressNode(Container& cont);
     template <class Function>
     static void extractVisibleSubtree(HierarchyObject& hierObj, Container& cont, Function includeObject);
-    void getChildren(const Container& cont,  size_t level, std::vector<TreeLine>& output);
+    void getChildren(const Container& cont, size_t level, std::vector<TreeLine>& output);
     template <class Predicate> void updateView(Predicate pred);
     void applySubView(std::vector<RootNodeImpl>&& newView);
 
@@ -152,6 +160,7 @@ private:
                     | (update...)
                     |                         */
     std::vector<RootNodeImpl> folderCmpView; //partial view on folderCmp -> unsorted (cannot be, because files are not a separate entity)
+    std::function<bool(const FileSystemObject& fsObj)> lastViewFilterPred; //buffer view filter predicate for lazy evaluation of files/symlinks corresponding to a TYPE_FILES node
     /*             /|\
                     | (update...)
                     |                         */

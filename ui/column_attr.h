@@ -76,7 +76,8 @@ enum ColumnTypeMiddle
 enum ColumnTypeNavi
 {
     COL_TYPE_NAVI_BYTES,
-    COL_TYPE_NAVI_DIRECTORY
+    COL_TYPE_NAVI_DIRECTORY,
+    COL_TYPE_NAVI_ITEM_COUNT
 };
 
 
@@ -93,15 +94,16 @@ struct ColumnAttributeNavi
 
 
 const bool defaultValueShowPercentage = true;
-const ColumnTypeNavi defaultValueLastSortColumn = COL_TYPE_NAVI_DIRECTORY; //remember sort on navigation panel
-const bool defaultValueLastSortAscending = true; //
+const ColumnTypeNavi defaultValueLastSortColumn = COL_TYPE_NAVI_BYTES; //remember sort on navigation panel
+const bool defaultValueLastSortAscending = false;                      //
 
 inline
 std::vector<ColumnAttributeNavi> getDefaultColumnAttributesNavi()
 {
     std::vector<ColumnAttributeNavi> attr;
-    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_DIRECTORY, -60, 1, true)); //stretch to full width and substract sum of fixed size widths
-    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_BYTES,      60, 0, true)); //GTK needs a few pixels width more
+    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_DIRECTORY, -120, 1, true)); //stretch to full width and substract sum of fixed size widths
+    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_ITEM_COUNT,  60, 0, true));
+    attr.push_back(ColumnAttributeNavi(COL_TYPE_NAVI_BYTES,       60, 0, true)); //GTK needs a few pixels width more
     return attr;
 }
 }

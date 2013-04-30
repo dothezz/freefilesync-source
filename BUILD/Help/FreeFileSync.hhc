@@ -20,36 +20,36 @@
 			<param name="Local" value="html\FreeFileSync.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Batch Scripting">
-			<param name="Local" value="html\Batch Scripting.html">
+			<param name="Name" value="Batch scripting">
+			<param name="Local" value="html\Batch scripting.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Compare by file size only">
-			<param name="Local" value="html\Compare by File Size.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Comparison Settings">
-			<param name="Local" value="html\Comparison Settings.html">
+			<param name="Name" value="Comparison settings">
+			<param name="Local" value="html\Comparison settings.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Daylight saving time">
-			<param name="Local" value="html\Daylight Saving Time.html">
+			<param name="Local" value="html\Daylight saving time.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Exclude items">
-			<param name="Local" value="html\Exclude Items.html">
+			<param name="Local" value="html\Exclude items.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Expert settings">
+			<param name="Local" value="html\Expert settings.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="External applications">
-			<param name="Local" value="html\External Applications.html">
+			<param name="Local" value="html\External applications.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Macros">
 			<param name="Local" value="html\Macros.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Schedule a Batch Job">
-			<param name="Local" value="html\Schedule a Batch Job.html">
+			<param name="Name" value="Schedule a batch job">
+			<param name="Local" value="html\Schedule a batch job.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Synchronize with FTP">
@@ -57,7 +57,7 @@
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Variable drive letters">
-			<param name="Local" value="html\Variable Drive Letters.html">
+			<param name="Local" value="html\Variable drive letters.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Versioning">
@@ -79,8 +79,8 @@
 			<param name="Local" value="html\RealtimeSync.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Run as Service">
-			<param name="Local" value="html\Run as Service.html">
+			<param name="Name" value="Run as service">
+			<param name="Local" value="html\Run as service.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">

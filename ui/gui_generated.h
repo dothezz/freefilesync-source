@@ -82,7 +82,9 @@ protected:
     wxMenuItem* m_menuItemGlobSett;
     wxMenu* m_menuHelp;
     wxMenuItem* m_menuItemManual;
-    wxMenuItem* m_menuItemCheckVer;
+    wxMenu* m_menuCheckVersion;
+    wxMenuItem* m_menuItemCheckVersionNow;
+    wxMenuItem* m_menuItemCheckVersionAuto;
     wxMenuItem* m_menuItemAbout;
     wxBoxSizer* bSizerPanelHolder;
     wxPanel* m_panelTopButtons;
@@ -188,6 +190,7 @@ protected:
     virtual void OnMenuExportFileList( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuCheckVersion( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnMenuCheckVersionAutomatically( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCmpSettings( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCompSettingsContext( wxMouseEvent& event ) { event.Skip(); }
@@ -482,11 +485,10 @@ protected:
     wxButton* m_buttonSelectDirVersioning;
     wxStaticLine* m_staticline31;
     wxBoxSizer* bSizerConfig;
-    wxStaticText* m_staticText90;
+    wxStaticText* m_staticTextHeaderCategory1;
+    wxStaticText* m_staticTextHeaderAction1;
     wxStaticBitmap* m_bitmapDatabase;
     wxBoxSizer* sbSizerSyncDirections;
-    wxStaticText* m_staticTextHeaderCategory;
-    wxStaticText* m_staticTextHeaderAction;
     wxBoxSizer* bSizerLeftOnly;
     wxStaticBitmap* m_bitmapLeftOnly;
     wxBitmapButton* m_bpButtonLeftOnly;
@@ -730,7 +732,7 @@ protected:
     wxSpinCtrl* m_spinCtrlMaxSize;
     wxChoice* m_choiceUnitMaxSize;
     wxStaticLine* m_staticline16;
-    wxButton* m_button9;
+    wxButton* m_buttonClear;
     wxButton* m_buttonOk;
     wxButton* m_button17;
 
@@ -739,14 +741,14 @@ protected:
     virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnUpdateNameFilter( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnUpdateChoice( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnDefault( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnClear( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnApply( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
 
 
 public:
 
-    FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+    FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
     ~FilterDlgGenerated();
 
 };

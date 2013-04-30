@@ -209,6 +209,8 @@ public:
     typedef       Char&       reference;
     typedef const Char& const_reference;
     typedef       Char value_type;
+
+    Zbase(const_iterator first, const_iterator last);
     Char*       begin();
     Char*       end  ();
     const Char* begin() const;
@@ -334,6 +336,17 @@ Zbase<Char, SP, AP>::Zbase(const Char* source, size_t sourceLen)
 {
     rawStr = this->create(sourceLen);
     std::copy(source, source + sourceLen, rawStr);
+    rawStr[sourceLen] = 0;
+}
+
+
+template <class Char, template <class, class> class SP, class AP>
+Zbase<Char, SP, AP>::Zbase(const_iterator first, const_iterator last)
+{
+    assert(first <= last);
+    const size_t sourceLen = last - first;
+    rawStr = this->create(sourceLen);
+    std::copy(first, last, rawStr);
     rawStr[sourceLen] = 0;
 }
 

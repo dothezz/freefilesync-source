@@ -13,7 +13,7 @@
 #include <zen/format_unit.h>
 #include <zen/file_handling.h>
 #include <zen/serialize.h>
-#include <zen/file_id.h>
+//#include <zen/file_id.h>
 #include <zen/thread.h>
 #include <wx+/context_menu.h>
 #include <wx+/string_conv.h>
@@ -54,9 +54,9 @@ namespace
 {
 struct wxClientHistoryData: public wxClientData //we need a wxClientData derived class to tell wxWidgets to take object ownership!
 {
-    wxClientHistoryData(const wxString& cfgFile, int lastUseIndex) : cfgFile_(cfgFile), lastUseIndex_(lastUseIndex) {}
+    wxClientHistoryData(const Zstring& cfgFile, int lastUseIndex) : cfgFile_(cfgFile), lastUseIndex_(lastUseIndex) {}
 
-    wxString cfgFile_;
+    Zstring cfgFile_;
     int lastUseIndex_; //support sorting history by last usage, the higher the index the more recent the usage
 };
 
@@ -99,7 +99,7 @@ public:
             case xmlAccess::MERGE_BATCH:
             case xmlAccess::MERGE_GUI:
             case xmlAccess::MERGE_GUI_BATCH:
-                mainDlg_.loadConfiguration(droppedFiles);
+                mainDlg_.loadConfiguration(toZ(droppedFiles));
                 return false;
 
             case xmlAccess::MERGE_OTHER:
@@ -142,34 +142,13 @@ public:
         mainDlg(mainDialog) {}
 
 private:
-    virtual wxWindow* getParentWindow()
-    {
-        return &mainDlg;
-    }
-
     virtual MainConfiguration getMainConfig() const { return mainDlg.getConfig().mainCfg; }
-    virtual void OnAltCompCfgChange() { mainDlg.applyCompareConfig(); }
-    virtual void OnAltSyncCfgChange() { mainDlg.applySyncConfig   (); }
+    virtual wxWindow* getParentWindow() { return &mainDlg; }
+    virtual std::unique_ptr<FilterConfig>& getFilterCfgOnClipboardRef() { return mainDlg.filterCfgOnClipboard; }
 
-    virtual void removeAltCompCfg()
-    {
-        FolderPairPanelBasic<GuiPanel>::removeAltCompCfg();
-        mainDlg.applyCompareConfig();
-    }
-
-    virtual void removeAltSyncCfg()
-    {
-        FolderPairPanelBasic<GuiPanel>::removeAltSyncCfg();
-        mainDlg.applySyncConfig();
-    }
-
-    virtual void OnLocalFilterCfgChange() { mainDlg.applyFilterConfig(); } //re-apply filter
-
-    virtual void removeLocalFilterCfg()
-    {
-        FolderPairPanelBasic<GuiPanel>::removeLocalFilterCfg();
-        mainDlg.applyFilterConfig(); //update filter
-    }
+    virtual void onAltCompCfgChange    () { mainDlg.applyCompareConfig(); }
+    virtual void onAltSyncCfgChange    () { mainDlg.applySyncConfig(); }
+    virtual void onLocalFilterCfgChange() { mainDlg.applyFilterConfig(); } //re-apply filter
 
     MainDialog& mainDlg;
 };
@@ -193,18 +172,18 @@ public:
         dirNameRight.Connect(EVENT_ON_DIR_MANUAL_CORRECTION, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
     }
 
-    void setValues(const wxString& leftDir,
-                   const wxString& rightDir,
+    void setValues(const Zstring& leftDir,
+                   const Zstring& rightDir,
                    AltCompCfgPtr cmpCfg,
                    AltSyncCfgPtr syncCfg,
                    const FilterConfig& filter)
     {
         setConfig(cmpCfg, syncCfg, filter);
-        dirNameLeft.setName(leftDir);
-        dirNameRight.setName(rightDir);
+        dirNameLeft .setName(toWx(leftDir));
+        dirNameRight.setName(toWx(rightDir));
     }
-    wxString getLeftDir () const { return dirNameLeft .getName(); }
-    wxString getRightDir() const { return dirNameRight.getName(); }
+    Zstring getLeftDir () const { return toZ(dirNameLeft .getName()); }
+    Zstring getRightDir() const { return toZ(dirNameRight.getName()); }
 
 private:
     //support for drag and drop
@@ -240,18 +219,18 @@ public:
         dirNameRight.Connect(EVENT_ON_DIR_MANUAL_CORRECTION, wxCommandEventHandler(MainDialog::onDirManualCorrection), nullptr, &mainDialog);
     }
 
-    void setValues(const wxString& leftDir,
-                   const wxString& rightDir,
+    void setValues(const Zstring& leftDir,
+                   const Zstring& rightDir,
                    AltCompCfgPtr cmpCfg,
                    AltSyncCfgPtr syncCfg,
                    const FilterConfig& filter)
     {
         setConfig(cmpCfg, syncCfg, filter);
-        dirNameLeft.setName(leftDir);
-        dirNameRight.setName(rightDir);
+        dirNameLeft .setName(toWx(leftDir));
+        dirNameRight.setName(toWx(rightDir));
     }
-    wxString getLeftDir () const { return dirNameLeft .getName(); }
-    wxString getRightDir() const { return dirNameRight.getName(); }
+    Zstring getLeftDir () const { return toZ(dirNameLeft .getName()); }
+    Zstring getRightDir() const { return toZ(dirNameRight.getName()); }
 
 private:
     //support for drag and drop
@@ -328,12 +307,13 @@ xmlAccess::XmlGlobalSettings retrieveGlobalCfgFromDisk() //blocks on GUI on erro
     XmlGlobalSettings globalCfg;
     try
     {
-        if (fileExists(toZ(getGlobalConfigFile())))
+        if (fileExists(getGlobalConfigFile()))
             readConfig(globalCfg); //throw FfsXmlError
         //else: globalCfg already has default values
     }
     catch (const FfsXmlError& e)
     {
+        assert(false);
         if (e.getSeverity() != FfsXmlError::WARNING) //ignore parsing errors: should be migration problems only *cross-fingers*
             wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR);
     }
@@ -342,12 +322,12 @@ xmlAccess::XmlGlobalSettings retrieveGlobalCfgFromDisk() //blocks on GUI on erro
 }
 
 
-void MainDialog::create(const std::vector<wxString>& cfgFileNames)
+void MainDialog::create(const std::vector<Zstring>& cfgFileNames)
 {
     using namespace xmlAccess;
     const XmlGlobalSettings globalSettings = retrieveGlobalCfgFromDisk();
 
-    std::vector<wxString> filenames;
+    std::vector<Zstring> filenames;
     if (!cfgFileNames.empty()) //1. this one has priority
         filenames = cfgFileNames;
     else //FFS default startup: use last used selection
@@ -359,11 +339,9 @@ void MainDialog::create(const std::vector<wxString>& cfgFileNames)
 
         RunUntilFirstHit<NullType> findFirstMissing;
 
-        std::for_each(filenames.begin(), filenames.end(),
-                      [&](const wxString& filename)
+        std::for_each(filenames.begin(), filenames.end(), [&](const Zstring& filename)
         {
-            const Zstring filenameFmt = toZ(filename); //convert to Zstring first: we don't want to pass wxString by value and risk MT issues!
-            findFirstMissing.addJob([=] { return filenameFmt.empty() /*ever empty??*/ || !fileExists(filenameFmt) ? zen::make_unique<NullType>() : nullptr; });
+            findFirstMissing.addJob([=] { return filename.empty() /*ever empty??*/ || !fileExists(filename) ? zen::make_unique<NullType>() : nullptr; });
         });
         //potentially slow network access: give all checks 500ms to finish
         const bool allFilesExist = findFirstMissing.timedWait(boost::posix_time::milliseconds(500)) && //false: time elapsed
@@ -374,7 +352,7 @@ void MainDialog::create(const std::vector<wxString>& cfgFileNames)
 
         if (filenames.empty())
         {
-            if (zen::fileExists(zen::toZ(lastRunConfigName()))) //3. try to load auto-save config
+            if (zen::fileExists(lastRunConfigName())) //3. try to load auto-save config
                 filenames.push_back(lastRunConfigName());
         }
     }
@@ -382,10 +360,19 @@ void MainDialog::create(const std::vector<wxString>& cfgFileNames)
     XmlGuiConfig guiCfg; //structure to receive gui settings with default values
 
     bool loadCfgSuccess = false;
-    if (!filenames.empty())
+    if (filenames.empty())
+    {
+        //add default exclusion filter: this is only ever relevant when creating new configurations!
+        //a default XmlGuiConfig does not need these user-specific exclusions!
+        Zstring& excludeFilter = guiCfg.mainCfg.globalFilter.excludeFilter;
+        if (!excludeFilter.empty() && !endsWith(excludeFilter, Zstr("\n")))
+            excludeFilter += Zstr("\n");
+        excludeFilter += globalSettings.gui.defaultExclusionFilter;
+    }
+    else
         try
         {
-            readAnyConfig(toZ(filenames), guiCfg); //throw FfsXmlError
+            readAnyConfig(filenames, guiCfg); //throw FfsXmlError
             loadCfgSuccess = true;
         }
         catch (const FfsXmlError& error)
@@ -396,6 +383,7 @@ void MainDialog::create(const std::vector<wxString>& cfgFileNames)
             else
                 wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
         }
+
     const bool startComparisonImmediately = !cfgFileNames.empty() && loadCfgSuccess;
 
     //------------------------------------------------------------------------------------------
@@ -407,12 +395,12 @@ void MainDialog::create(const std::vector<wxString>& cfgFileNames)
 void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
                         bool startComparison)
 {
-    create_impl(guiCfg, std::vector<wxString>(), retrieveGlobalCfgFromDisk(), startComparison);
+    create_impl(guiCfg, std::vector<Zstring>(), retrieveGlobalCfgFromDisk(), startComparison);
 }
 
 
 void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
-                        const std::vector<wxString>& referenceFiles,
+                        const std::vector<Zstring>& referenceFiles,
                         const xmlAccess::XmlGlobalSettings& globalSettings,
                         bool startComparison)
 {
@@ -421,7 +409,7 @@ void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
 
 
 void MainDialog::create_impl(const xmlAccess::XmlGuiConfig& guiCfg,
-                             const std::vector<wxString>& referenceFiles,
+                             const std::vector<Zstring>& referenceFiles,
                              const xmlAccess::XmlGlobalSettings& globalSettings,
                              bool startComparison)
 {
@@ -442,7 +430,7 @@ void MainDialog::create_impl(const xmlAccess::XmlGuiConfig& guiCfg,
 
 
 MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
-                       const std::vector<wxString>& referenceFiles,
+                       const std::vector<Zstring>& referenceFiles,
                        const xmlAccess::XmlGlobalSettings& globalSettings,
                        bool startComparison) :
     MainDialogGenerated(nullptr),
@@ -479,34 +467,34 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
 
     //caption required for all panes that can be manipulated by the users => used by context menu
     auiMgr.AddPane(m_panelTopButtons,
-                   wxAuiPaneInfo().Name(wxT("Panel1")).Layer(4).Top().Caption(_("Main bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(-1, m_panelTopButtons->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"Panel1").Layer(4).Top().Caption(_("Main bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(-1, m_panelTopButtons->GetSize().GetHeight()));
     //note: min height is calculated incorrectly by wxAuiManager if panes with and without caption are in the same row => use smaller min-size
 
     compareStatus = make_unique<CompareProgressDialog>(*this); //integrate the compare status panel (in hidden state)
 
     auiMgr.AddPane(compareStatus->getAsWindow(),
-                   wxAuiPaneInfo().Name(wxT("Panel9")).Layer(4).Top().Row(1).CaptionVisible(false).PaneBorder(false).Hide()); //name "CmpStatus" used by context menu
+                   wxAuiPaneInfo().Name(L"Panel9").Layer(4).Top().Row(1).CaptionVisible(false).PaneBorder(false).Hide()); //name "CmpStatus" used by context menu
 
     auiMgr.AddPane(m_panelDirectoryPairs,
-                   wxAuiPaneInfo().Name(wxT("Panel2")).Layer(2).Top().Row(2).Caption(_("Folder pairs")).CaptionVisible(false).PaneBorder(false).Gripper());
+                   wxAuiPaneInfo().Name(L"Panel2").Layer(2).Top().Row(2).Caption(_("Folder pairs")).CaptionVisible(false).PaneBorder(false).Gripper());
 
     auiMgr.AddPane(m_panelCenter,
-                   wxAuiPaneInfo().Name(wxT("Panel3")).CenterPane().PaneBorder(false));
+                   wxAuiPaneInfo().Name(L"Panel3").CenterPane().PaneBorder(false));
 
     auiMgr.AddPane(m_gridNavi,
-                   wxAuiPaneInfo().Name(L"Panel10").Left().Layer(3).Caption(_("Overview")).MinSize(230, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
+                   wxAuiPaneInfo().Name(L"Panel10").Left().Layer(3).Caption(_("Overview")).MinSize(300, m_gridNavi->GetSize().GetHeight())); //MinSize(): just default size, see comment below
 
     auiMgr.AddPane(m_panelConfig,
-                   wxAuiPaneInfo().Name(wxT("Panel4")).Layer(4).Bottom().Row(1).Position(0).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"Panel4").Layer(4).Bottom().Row(1).Position(0).Caption(_("Configuration")).MinSize(m_listBoxHistory->GetSize().GetWidth(), m_panelConfig->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_panelFilter,
-                   wxAuiPaneInfo().Name(wxT("Panel5")).Layer(4).Bottom().Row(1).Position(1).Caption(_("Filter files")).MinSize(m_bpButtonFilter->GetSize().GetWidth(), m_panelFilter->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"Panel5").Layer(4).Bottom().Row(1).Position(1).Caption(_("Filter files")).MinSize(m_bpButtonFilter->GetSize().GetWidth(), m_panelFilter->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_panelViewFilter,
-                   wxAuiPaneInfo().Name(wxT("Panel6")).Layer(4).Bottom().Row(1).Position(2).Caption(_("Select view")).MinSize(m_bpButtonShowDoNothing->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"Panel6").Layer(4).Bottom().Row(1).Position(2).Caption(_("Select view")).MinSize(m_bpButtonShowDoNothing->GetSize().GetWidth(), m_panelViewFilter->GetSize().GetHeight()));
 
     auiMgr.AddPane(m_panelStatistics,
-                   wxAuiPaneInfo().Name(wxT("Panel7")).Layer(4).Bottom().Row(1).Position(3).Caption(_("Statistics")).MinSize(m_bitmapData->GetSize().GetWidth() + m_staticTextData->GetSize().GetWidth(), m_panelStatistics->GetSize().GetHeight()));
+                   wxAuiPaneInfo().Name(L"Panel7").Layer(4).Bottom().Row(1).Position(3).Caption(_("Statistics")).MinSize(m_bitmapData->GetSize().GetWidth() + m_staticTextData->GetSize().GetWidth(), m_panelStatistics->GetSize().GetHeight()));
 
     auiMgr.Update();
 
@@ -632,7 +620,16 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     setMenuItemImage(m_menuItemAbout,  getResourceImage(L"aboutSmall"));
 
     if (!manualProgramUpdateRequired())
-        m_menuItemCheckVer->Enable(false);
+    {
+        m_menuItemCheckVersionNow ->Enable(false);
+        m_menuItemCheckVersionAuto->Enable(false);
+
+        //wxFormbuilder doesn't give us a wxMenuItem for m_menuCheckVersion, so we need this abomination:
+        wxMenuItemList& items = m_menuHelp->GetMenuItems();
+        for (auto it = items.begin(); it != items.end(); ++it)
+            if ((*it)->GetSubMenu() == m_menuCheckVersion)
+                (*it)->Enable(false);
+    }
 
     //create language selection menu
     std::for_each(zen::ExistingTranslations::get().begin(), ExistingTranslations::get().end(),
@@ -664,7 +661,7 @@ MainDialog::MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
     setupFileDrop(*m_gridNavi);
     m_gridNavi->Connect(EVENT_DROP_FILE, FileDropEventHandler(MainDialog::onNaviPanelFilesDropped), nullptr, this);
 
-    Connect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleEvent), nullptr, this);
+    timerForAsyncTasks.Connect(wxEVT_TIMER, wxEventHandler(MainDialog::onProcessAsyncTasks), nullptr, this);
 
     //Connect(wxEVT_SIZE, wxSizeEventHandler(MainDialog::OnResize), nullptr, this);
     //Connect(wxEVT_MOVE, wxSizeEventHandler(MainDialog::OnResize), nullptr, this);
@@ -760,7 +757,7 @@ MainDialog::~MainDialog()
 
     try //save "LastRun.ffs_gui"
     {
-        xmlAccess::writeConfig(getConfig(), toZ(lastRunConfigName())); //throw FfsXmlError
+        xmlAccess::writeConfig(getConfig(), lastRunConfigName()); //throw FfsXmlError
     }
     //don't annoy users on read-only drives: it's enough to show a single error message when saving global config
     catch (const xmlAccess::FfsXmlError&) {}
@@ -781,7 +778,7 @@ void MainDialog::onQueryEndSession()
     try { xmlAccess::writeConfig(getGlobalCfgBeforeExit()); }
     catch (const xmlAccess::FfsXmlError&) {} //we try our best do to something useful in this extreme situation - no reason to notify or even log errors here!
 
-    try { xmlAccess::writeConfig(getConfig(), toZ(lastRunConfigName())); }
+    try { xmlAccess::writeConfig(getConfig(), lastRunConfigName()); }
     catch (const xmlAccess::FfsXmlError&) {}
 }
 
@@ -818,11 +815,12 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
 
     //--------------------------------------------------------------------------------
     //load list of last used configuration files
-    std::vector<wxString> cfgFileNames = globalSettings.gui.cfgFileHistory;
+    std::vector<Zstring> cfgFileNames = globalSettings.gui.cfgFileHistory;
     std::reverse(cfgFileNames.begin(), cfgFileNames.end()); //list is stored with last used files first in xml, however addFileToCfgHistory() needs them last!!!
 
     cfgFileNames.push_back(lastRunConfigName()); //make sure <Last session> is always part of history list (if existing)
     addFileToCfgHistory(cfgFileNames);
+    removeObsoleteCfgHistoryItems(cfgFileNames); //remove non-existent items (we need this only on startup)
     //--------------------------------------------------------------------------------
 
     //load list of last used folders
@@ -848,6 +846,8 @@ void MainDialog::setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSe
 
     //if MainDialog::onQueryEndSession() is called while comparison is active, this panel is saved and restored as "visible"
     auiMgr.GetPane(compareStatus->getAsWindow()).Hide();
+
+    m_menuItemCheckVersionAuto->Check(globalCfg.gui.lastUpdateCheck != -1);
 
     auiMgr.Update();
 }
@@ -876,14 +876,14 @@ xmlAccess::XmlGlobalSettings MainDialog::getGlobalCfgBeforeExit()
 
     //--------------------------------------------------------------------------------
     //write list of last used configuration files
-    std::map<int, wxString> historyDetail; //(cfg-file/last use index)
+    std::map<int, Zstring> historyDetail; //(cfg-file/last use index)
     for (unsigned int i = 0; i < m_listBoxHistory->GetCount(); ++i)
         if (auto clientString = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
             historyDetail.insert(std::make_pair(clientString->lastUseIndex_, clientString->cfgFile_));
 
     //sort by last use; put most recent items *first* (looks better in xml than the reverse)
-    std::vector<wxString> history;
-    std::transform(historyDetail.rbegin(), historyDetail.rend(), std::back_inserter(history), [](const std::pair<int, wxString>& item) { return item.second; });
+    std::vector<Zstring> history;
+    std::transform(historyDetail.rbegin(), historyDetail.rend(), std::back_inserter(history), [](const std::pair<int, Zstring>& item) { return item.second; });
 
     if (history.size() > globalSettings.gui.cfgFileHistMax) //erase oldest elements
         history.resize(globalSettings.gui.cfgFileHistMax);
@@ -952,7 +952,7 @@ namespace
 typedef Zbase<wchar_t> zxString; //guaranteed exponential growth
 }
 
-void MainDialog::copySelectionToClipboard()
+void MainDialog::copySelectionToClipboard(const std::vector<const Grid*>& gridRefs)
 {
     try
     {
@@ -983,8 +983,8 @@ void MainDialog::copySelectionToClipboard()
             }
         };
 
-        addSelection(*m_gridMainL);
-        addSelection(*m_gridMainR);
+        for (auto it = gridRefs.begin(); it != gridRefs.end(); ++it)
+            addSelection(**it);
 
         //finally write to clipboard
         if (!clipboardString.empty())
@@ -996,7 +996,7 @@ void MainDialog::copySelectionToClipboard()
     }
     catch (const std::bad_alloc& e)
     {
-        wxMessageBox(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()), _("Error"), wxOK | wxICON_ERROR, this);
     }
 }
 
@@ -1023,9 +1023,9 @@ std::vector<FileSystemObject*> MainDialog::getGridSelection(bool fromLeft, bool 
 
 std::vector<FileSystemObject*> MainDialog::getTreeSelection() const
 {
-    const std::vector<size_t>& sel = m_gridNavi->getSelectedRows();
-
     std::vector<FileSystemObject*> output;
+
+    const std::vector<size_t>& sel = m_gridNavi->getSelectedRows();
     std::for_each(sel.begin(), sel.end(),
                   [&](size_t row)
     {
@@ -1042,12 +1042,7 @@ std::vector<FileSystemObject*> MainDialog::getTreeSelection() const
             else if (auto dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
                 output.push_back(&(dir->dirObj_));
             else if (auto file = dynamic_cast<const TreeView::FilesNode*>(node.get()))
-            {
-                //does a "little more" than what is shown on main grid: we return ALL files
-                HierarchyObject& parent = file->firstFile_.parent();
-                std::transform(parent.refSubFiles().begin(), parent.refSubFiles().end(), std::back_inserter(output), [](FileSystemObject& fsObj) { return &fsObj; });
-                std::transform(parent.refSubLinks().begin(), parent.refSubLinks().end(), std::back_inserter(output), [](FileSystemObject& fsObj) { return &fsObj; });
-            }
+                output.insert(output.end(), file->filesAndLinks_.begin(), file->filesAndLinks_.end());
         }
     });
     return output;
@@ -1266,8 +1261,8 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
             Zstring fallbackDir;
             if (selectionTmp.empty())
                 fallbackDir = leftSide ?
-                              getFormattedDirectoryName(toZ(firstFolderPair->getLeftDir())) :
-                              getFormattedDirectoryName(toZ(firstFolderPair->getRightDir()));
+                              getFormattedDirectoryName(firstFolderPair->getLeftDir()) :
+                              getFormattedDirectoryName(firstFolderPair->getRightDir());
 
             else
                 fallbackDir = leftSide ?
@@ -1350,12 +1345,11 @@ void MainDialog::setStatusBarFileStatistics(size_t filesOnLeftView,
     setText(*m_staticTextStatusRightFiles, replaceCpy(_P("1 file", "%x files", filesOnRightView), L"%x", toGuiString(filesOnRightView), false));
     setText(*m_staticTextStatusRightBytes, filesizeToShortString(to<Int64>(filesizeRightView)));
 
-
     //fill middle text (considering flashStatusInformation())
-    if (!oldStatusMsg)
+    if (oldStatusMsgs.empty())
         setText(*m_staticTextStatusMiddle, statusMiddleNew);
     else
-        *oldStatusMsg = statusMiddleNew;
+        oldStatusMsgs.front() = statusMiddleNew;
 
     m_panelStatusBar->Layout();
 }
@@ -1379,36 +1373,42 @@ void MainDialog::setStatusBarFullText(const wxString& msg)
 
 void MainDialog::flashStatusInformation(const wxString& text)
 {
-    if (!oldStatusMsg)
-        oldStatusMsg = make_unique<wxString>(m_staticTextStatusMiddle->GetLabel());
+    oldStatusMsgs.push_back(m_staticTextStatusMiddle->GetLabel());
 
-    lastStatusChange = wxGetLocalTimeMillis();
     m_staticTextStatusMiddle->SetLabel(text);
     m_staticTextStatusMiddle->SetForegroundColour(wxColour(31, 57, 226)); //highlight color: blue
     m_panelStatusBar->Layout();
-
     //if (needLayoutUpdate) auiMgr.Update(); -> not needed here, this is called anyway in updateGui()
+
+    asyncTasks.add2([] { boost::this_thread::sleep(boost::posix_time::millisec(2500)); },
+                    [this] { this->restoreStatusInformation(); });
+    startProcessingAsyncTasks();
 }
 
 
-void MainDialog::OnIdleEvent(wxEvent& event)
+void MainDialog::restoreStatusInformation()
 {
-    //small routine to restore status information after some time
-    if (oldStatusMsg)  //check if there is some work to do
+    if (!oldStatusMsgs.empty())
     {
-        wxMilliClock_t currentTime = wxGetLocalTimeMillis();
-        if (numeric::dist(currentTime, lastStatusChange) > 2500) //restore after two seconds
-        {
-            lastStatusChange = currentTime;
+        wxString oldMsg = oldStatusMsgs.back();
+        oldStatusMsgs.pop_back();
 
-            m_staticTextStatusMiddle->SetLabel(*oldStatusMsg);
+        if (oldStatusMsgs.empty()) //restore original status text
+        {
+            m_staticTextStatusMiddle->SetLabel(oldMsg);
             m_staticTextStatusMiddle->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //reset color
             m_panelStatusBar->Layout();
-            oldStatusMsg.reset();
         }
     }
+}
 
-    event.Skip();
+
+void MainDialog::onProcessAsyncTasks(wxEvent& event)
+{
+    //schedule and run long-running tasks asynchronously
+    asyncTasks.evalResults(); //process results on GUI queue
+    if (asyncTasks.empty())
+        timerForAsyncTasks.Stop();
 }
 
 
@@ -1569,7 +1569,17 @@ void MainDialog::onTreeButtonEvent(wxKeyEvent& event)
     }
 
     if (event.ControlDown())
-        ;
+        switch (keyCode)
+        {
+            case 'C':
+            case WXK_INSERT: //CTRL + C || CTRL + INS
+            {
+                std::vector<const Grid*> gridRefs;
+                gridRefs.push_back(m_gridNavi);
+                copySelectionToClipboard(gridRefs);
+            }
+            return;
+        }
     else if (event.AltDown())
         switch (keyCode)
         {
@@ -1646,8 +1656,13 @@ void MainDialog::onGridButtonEvent(wxKeyEvent& event, Grid& grid, bool leftSide)
         {
             case 'C':
             case WXK_INSERT: //CTRL + C || CTRL + INS
-                copySelectionToClipboard();
-                return; // -> swallow event! don't allow default grid commands!
+            {
+                std::vector<const Grid*> gridRefs;
+                gridRefs.push_back(m_gridMainL);
+                gridRefs.push_back(m_gridMainR);
+                copySelectionToClipboard(gridRefs);
+            }
+            return; // -> swallow event! don't allow default grid commands!
         }
 
     else if (event.AltDown())
@@ -1813,7 +1828,11 @@ void MainDialog::onNaviSelection(GridRangeSelectEvent& event)
                     leadRow = gridDataView->findRowFirstChild(&(dir->dirObj_));
             }
             else if (const TreeView::FilesNode* files = dynamic_cast<const TreeView::FilesNode*>(node.get()))
-                leadRow = gridDataView->findRowDirect(files->firstFile_.getId());
+            {
+                assert(!files->filesAndLinks_.empty());
+                if (!files->filesAndLinks_.empty())
+                    leadRow = gridDataView->findRowDirect(files->filesAndLinks_[0]->getId());
+            }
         }
 
     if (leadRow >= 0)
@@ -1829,8 +1848,8 @@ void MainDialog::onNaviSelection(GridRangeSelectEvent& event)
     }
 
     //get selection on navigation tree and set corresponding markers on main grid
-    std::vector<const HierarchyObject*> markedFiles;     //mark files/symlinks directly within a container
-    std::vector<const HierarchyObject*> markedContainer; //mark full container including child-objects
+    hash_set<const FileSystemObject*> markedFilesAndLinks; //mark files/symlinks directly
+    hash_set<const HierarchyObject*>  markedContainer;     //mark full container including child-objects
 
     const std::vector<size_t>& selection = m_gridNavi->getSelectedRows();
     std::for_each(selection.begin(), selection.end(),
@@ -1839,15 +1858,15 @@ void MainDialog::onNaviSelection(GridRangeSelectEvent& event)
         if (std::unique_ptr<TreeView::Node> node = treeDataView->getLine(row))
         {
             if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
-                markedContainer.push_back(&(root->baseMap_));
+                markedContainer.insert(&(root->baseMap_));
             else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
-                markedContainer.push_back(&(dir->dirObj_));
+                markedContainer.insert(&(dir->dirObj_));
             else if (const TreeView::FilesNode* files = dynamic_cast<const TreeView::FilesNode*>(node.get()))
-                markedFiles.push_back(&(files->firstFile_.parent()));
+                markedFilesAndLinks.insert(files->filesAndLinks_.begin(), files->filesAndLinks_.end());
         }
     });
 
-    gridview::setNavigationMarker(*m_gridMainL, std::move(markedFiles), std::move(markedContainer));
+    gridview::setNavigationMarker(*m_gridMainL, std::move(markedFilesAndLinks), std::move(markedContainer));
 
     event.Skip();
 }
@@ -2068,11 +2087,11 @@ void MainDialog::excludeExtension(const Zstring& extension)
 
     //add to filter config
     Zstring& excludeFilter = currentCfg.mainCfg.globalFilter.excludeFilter;
-    if (!excludeFilter.empty() && !endsWith(excludeFilter, Zstr(";")))
+    if (!excludeFilter.empty() && !endsWith(excludeFilter, Zstr(";")) && !endsWith(excludeFilter, Zstr("\n")))
         excludeFilter += Zstr("\n");
     excludeFilter += newExclude + Zstr(";"); //';' is appended to 'mark' that next exclude extension entry won't write to new line
 
-    updateFilterButtons();
+    updateGlobalFilterButton();
 
     //do not fully apply filter, just exclude new items
     std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirMapping& baseMap) { addHardFiltering(baseMap, newExclude); });
@@ -2093,7 +2112,7 @@ void MainDialog::excludeShortname(const FileSystemObject& fsObj)
         excludeFilter += Zstr("\n");
     excludeFilter += newExclude;
 
-    updateFilterButtons();
+    updateGlobalFilterButton();
 
     //do not fully apply filter, just exclude new items
     std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirMapping& baseMap) { addHardFiltering(baseMap, newExclude); });
@@ -2127,7 +2146,7 @@ void MainDialog::excludeItems(const std::vector<FileSystemObject*>& selection)
             excludeFilter += Zstr("\n");
         excludeFilter += newExclude;
 
-        updateFilterButtons();
+        updateGlobalFilterButton();
 
         //do not fully apply filter, just exclude new items
         std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirMapping& baseMap) { addHardFiltering(baseMap, newExclude); });
@@ -2305,9 +2324,9 @@ void MainDialog::OnSyncSettingsContext(wxMouseEvent& event)
     const auto currentVar = getConfig().mainCfg.syncCfg.directionCfg.var;
 
     menu.addRadio(_("<- Two way ->"), [&] { setVariant(DirectionConfig::AUTOMATIC); }, currentVar == DirectionConfig::AUTOMATIC);
-    menu.addRadio(_("Mirror ->>") , [&] { setVariant(DirectionConfig::MIRROR);    }, currentVar == DirectionConfig::MIRROR);
-    menu.addRadio(_("Update ->")  , [&] { setVariant(DirectionConfig::UPDATE);    }, currentVar == DirectionConfig::UPDATE);
-    menu.addRadio(_("Custom")     , [&] { setVariant(DirectionConfig::CUSTOM);    }, currentVar == DirectionConfig::CUSTOM);
+    menu.addRadio(_("Mirror ->>")   , [&] { setVariant(DirectionConfig::MIRROR);    }, currentVar == DirectionConfig::MIRROR);
+    menu.addRadio(_("Update ->")    , [&] { setVariant(DirectionConfig::UPDATE);    }, currentVar == DirectionConfig::UPDATE);
+    menu.addRadio(_("Custom")       , [&] { setVariant(DirectionConfig::CUSTOM);    }, currentVar == DirectionConfig::CUSTOM);
 
     menu.popup(*this);
 }
@@ -2315,7 +2334,7 @@ void MainDialog::OnSyncSettingsContext(wxMouseEvent& event)
 
 void MainDialog::onNaviPanelFilesDropped(FileDropEvent& event)
 {
-    loadConfiguration(event.getFiles());
+    loadConfiguration(toZ(event.getFiles()));
     event.Skip();
 }
 
@@ -2335,31 +2354,17 @@ void MainDialog::onDirManualCorrection(wxCommandEvent& event)
 }
 
 
-wxString getFormattedHistoryElement(const wxString& filename)
+wxString getFormattedHistoryElement(const Zstring& filename)
 {
-    wxString output = afterLast(filename, utfCvrtTo<wxString>(FILE_NAME_SEPARATOR));
-    if (endsWith(output, L".ffs_gui"))
-        output = beforeLast(output, L'.');
-    return output;
+    Zstring output = afterLast(filename, FILE_NAME_SEPARATOR);
+    if (endsWith(output, Zstr(".ffs_gui")))
+        output = beforeLast(output, Zstr('.'));
+    return utfCvrtTo<wxString>(output);
 }
 
 
-void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
+void MainDialog::addFileToCfgHistory(const std::vector<Zstring>& filenames)
 {
-    //check existence of all config files in parallel!
-    std::list<boost::unique_future<bool>> fileEx;
-    std::for_each(filenames.begin(), filenames.end(),
-                  [&](const wxString& filename)
-    {
-        const Zstring file = toZ(filename); //convert to Zstring first: we don't want to pass wxString by value and risk MT issues!
-        fileEx.push_back(zen::async2<bool>([=]() { return zen::fileExists(file); }));
-    });
-
-    //potentially slow network access: give all checks 500ms to finish
-    wait_for_all_timed(fileEx.begin(), fileEx.end(), boost::posix_time::milliseconds(500));
-
-    //------------------------------------------------------------------------------------------
-
     //determine highest "last use" index number of m_listBoxHistory
     int lastUseIndexMax = 0;
     for (int i = 0; i < static_cast<int>(m_listBoxHistory->GetCount()); ++i)
@@ -2369,39 +2374,36 @@ void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
 
     std::deque<bool> selections(m_listBoxHistory->GetCount()); //items to select after update of history list
 
-    auto futIter = fileEx.begin();
-    for (auto it = filenames.begin(); it != filenames.end(); ++it, ++futIter)
-        if (!futIter->is_ready() || futIter->get()) //only existing files should be included in the list (and also those with no result yet)
+    for (auto it = filenames.begin(); it != filenames.end(); ++it)
+    {
+        const Zstring& filename = *it;
+
+        //Do we need to additionally check for aliases of the same physical files here? (and aliases for lastRunConfigName?)
+
+        const int itemPos = [&]() -> int
         {
-            const wxString& filename = *it;
+            const int itemCount = static_cast<int>(m_listBoxHistory->GetCount());
+            for (int i = 0; i < itemCount; ++i)
+                if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
+                    if (EqualFilename()(filename, histData->cfgFile_))
+                        return i;
+            return -1;
+        }();
 
-            warn_static("perf!!!!? samePhysicalFile : andere setllen?")
-
-            auto findItem = [&]() -> int
-            {
-                const int itemCount = static_cast<int>(m_listBoxHistory->GetCount());
-                for (int i = 0; i < itemCount; ++i)
-                    if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
-                        if (samePhysicalFile(toZ(filename), toZ(histData->cfgFile_)))
-                            return i;
-                return -1;
-            };
-
-            const int itemPos = findItem();
-            if (itemPos >= 0) //update
-            {
-                if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(itemPos)))
-                    histData->lastUseIndex_ = ++lastUseIndexMax;
-                selections[itemPos] = true;
-            }
-            else //insert
-            {
-                const wxString label = samePhysicalFile(toZ(lastRunConfigName()), toZ(filename)) ? //give default config file a different name
-                                       _("<Last session>") : getFormattedHistoryElement(filename);
-                const int newPos = m_listBoxHistory->Append(label, new wxClientHistoryData(filename, ++lastUseIndexMax)); //*insert* into sorted list
-                selections.insert(selections.begin() + newPos, true);
-            }
+        if (itemPos >= 0) //update
+        {
+            if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(itemPos)))
+                histData->lastUseIndex_ = ++lastUseIndexMax;
+            selections[itemPos] = true;
         }
+        else //insert
+        {
+            const wxString label = EqualFilename()(filename, lastRunConfigName()) ? //give default config file a different name
+                                   _("<Last session>") : getFormattedHistoryElement(filename);
+            const int newPos = m_listBoxHistory->Append(label, new wxClientHistoryData(filename, ++lastUseIndexMax)); //*insert* into sorted list
+            selections.insert(selections.begin() + newPos, true);
+        }
+    }
 
     assert(selections.size() == m_listBoxHistory->GetCount());
 
@@ -2418,9 +2420,61 @@ void MainDialog::addFileToCfgHistory(const std::vector<wxString>& filenames)
 }
 
 
+void MainDialog::removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filenames)
+{
+    //don't use wxString: NOT thread-safe! (e.g. non-atomic ref-count)
+
+    auto getMissingFilesAsync = [filenames]() -> std::vector<Zstring>
+    {
+        //boost::this_thread::sleep(boost::posix_time::millisec(5000));
+
+        //check existence of all config files in parallel!
+        std::list<boost::unique_future<bool>> fileEx;
+
+        for (auto it = filenames.begin(); it != filenames.end(); ++it) //avoid VC11 compiler issues with std::for_each
+        {
+            const Zstring filename = *it; //don't reference iterator in lambda!
+            fileEx.push_back(zen::async2<bool>([=] { return fileExists(filename); }));
+        }
+
+        //potentially slow network access => limit maximum wait time!
+        wait_for_all_timed(fileEx.begin(), fileEx.end(), boost::posix_time::milliseconds(1000));
+
+        std::vector<Zstring> missingFiles;
+
+        auto itFut = fileEx.begin();
+        for (auto it = filenames.begin(); it != filenames.end(); ++it, ++itFut)
+            if (itFut->is_ready() && !itFut->get()) //remove only files that are confirmed to be non-existent
+                missingFiles.push_back(*it);
+
+        return missingFiles;
+    };
+
+    asyncTasks.add(getMissingFilesAsync,
+    [this](const std::vector<Zstring>& files) { removeCfgHistoryItems(files); });
+    startProcessingAsyncTasks();
+}
+
+
+void MainDialog::removeCfgHistoryItems(const std::vector<Zstring>& filenames)
+{
+    std::for_each(filenames.begin(), filenames.end(), [&](const Zstring& filename)
+    {
+        const int histSize = m_listBoxHistory->GetCount();
+        for (int i = 0; i < histSize; ++i)
+            if (auto histData = dynamic_cast<wxClientHistoryData*>(m_listBoxHistory->GetClientObject(i)))
+                if (EqualFilename()(filename, histData->cfgFile_))
+                {
+                    m_listBoxHistory->Delete(i);
+                    break;
+                }
+    });
+}
+
+
 void MainDialog::updateUnsavedCfgStatus()
 {
-    const wxString activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : wxString();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : Zstring();
 
     const bool haveUnsavedCfg = lastConfigurationSaved != getConfig();
 
@@ -2446,15 +2500,15 @@ void MainDialog::updateUnsavedCfgStatus()
         title += L'*';
 
     if (!activeCfgFilename.empty())
-        title += activeCfgFilename;
+        title += toWx(activeCfgFilename);
     else if (activeConfigFiles.size() > 1)
     {
 #ifdef _MSC_VER
 #pragma warning(disable:4428)	// VC wrongly issues warning C4428: universal-character-name encountered in source
 #endif
         const wchar_t* EM_DASH = L" \u2014 ";
-        title += xmlAccess::extractJobName(toZ(activeConfigFiles[0]));
-        std::for_each(activeConfigFiles.begin() + 1, activeConfigFiles.end(), [&](const wxString& filename) { title += EM_DASH + xmlAccess::extractJobName(toZ(filename)); });
+        title += xmlAccess::extractJobName(activeConfigFiles[0]);
+        std::for_each(activeConfigFiles.begin() + 1, activeConfigFiles.end(), [&](const Zstring& filename) { title += EM_DASH + xmlAccess::extractJobName(filename); });
     }
     else
         title += L"FreeFileSync - " + _("Folder Comparison and Synchronization");
@@ -2465,7 +2519,7 @@ void MainDialog::updateUnsavedCfgStatus()
 
 void MainDialog::OnConfigSave(wxCommandEvent& event)
 {
-    const wxString activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : wxString();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : Zstring();
 
     //if we work on a single named configuration document: save directly if changed
     //else: always show file dialog
@@ -2473,7 +2527,7 @@ void MainDialog::OnConfigSave(wxCommandEvent& event)
     {
         using namespace xmlAccess;
 
-        switch (getXmlType(utfCvrtTo<Zstring>(activeCfgFilename))) //throw()
+        switch (getXmlType(activeCfgFilename)) //throw()
         {
             case XML_TYPE_GUI:
                 trySaveConfig(&activeCfgFilename);
@@ -2504,18 +2558,18 @@ void MainDialog::OnSaveAsBatchJob(wxCommandEvent& event)
 }
 
 
-bool MainDialog::trySaveConfig(const wxString* fileNameGui) //return true if saved successfully
+bool MainDialog::trySaveConfig(const Zstring* fileNameGui) //return true if saved successfully
 {
-    wxString targetFilename;
+    Zstring targetFilename;
 
     if (fileNameGui)
     {
         targetFilename = *fileNameGui;
-        assert(endsWith(targetFilename, L".ffs_gui"));
+        assert(endsWith(targetFilename, Zstr(".ffs_gui")));
     }
     else
     {
-        wxString defaultFileName = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : L"SyncSettings.ffs_gui";
+        wxString defaultFileName = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? toWx(activeConfigFiles[0]) : L"SyncSettings.ffs_gui";
         //attention: activeConfigFiles may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
         if (endsWith(defaultFileName, L".ffs_batch"))
             replace(defaultFileName, L".ffs_batch", L".ffs_gui", false);
@@ -2528,14 +2582,14 @@ bool MainDialog::trySaveConfig(const wxString* fileNameGui) //return true if sav
                                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (filePicker.ShowModal() != wxID_OK)
             return false;
-        targetFilename = filePicker.GetPath();
+        targetFilename = toZ(filePicker.GetPath());
     }
 
     const xmlAccess::XmlGuiConfig guiCfg = getConfig();
 
     try
     {
-        xmlAccess::writeConfig(guiCfg, toZ(targetFilename)); //throw FfsXmlError
+        xmlAccess::writeConfig(guiCfg, targetFilename); //throw FfsXmlError
         setLastUsedConfig(targetFilename, guiCfg);
 
         flashStatusInformation(_("Configuration saved!"));
@@ -2549,25 +2603,25 @@ bool MainDialog::trySaveConfig(const wxString* fileNameGui) //return true if sav
 }
 
 
-bool MainDialog::trySaveBatchConfig(const wxString* fileNameBatch)
+bool MainDialog::trySaveBatchConfig(const Zstring* fileNameBatch)
 {
     //essentially behave like trySaveConfig(): the collateral damage of not saving GUI-only settings "hideExcludedItems, showSyncAction" is negliable
 
     const xmlAccess::XmlGuiConfig guiCfg = getConfig();
 
-    wxString targetFilename;
+    Zstring targetFilename;
     xmlAccess::XmlBatchConfig batchCfg;
 
     if (fileNameBatch)
     {
         targetFilename = *fileNameBatch;
-        batchCfg = convertGuiToBatchPreservingExistingBatch(guiCfg, toZ(*fileNameBatch));
-        assert(endsWith(targetFilename, L".ffs_batch"));
+        batchCfg = convertGuiToBatchPreservingExistingBatch(guiCfg, *fileNameBatch);
+        assert(endsWith(targetFilename, Zstr(".ffs_batch")));
     }
     else
     {
-        const wxString activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : wxString();
-        batchCfg = convertGuiToBatchPreservingExistingBatch(guiCfg, toZ(activeCfgFilename));
+        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : Zstring();
+        batchCfg = convertGuiToBatchPreservingExistingBatch(guiCfg, activeCfgFilename);
 
         //let user change batch config: this should change batch-exclusive settings only, else the "setLastUsedConfig" below would be somewhat of a lie
         if (!customizeBatchConfig(this,
@@ -2576,7 +2630,7 @@ bool MainDialog::trySaveBatchConfig(const wxString* fileNameBatch)
                                   globalCfg.gui.onCompletionHistoryMax))
             return false;
 
-        wxString defaultFileName = !activeCfgFilename.empty() ? activeCfgFilename : L"BatchRun.ffs_batch";
+        wxString defaultFileName = !activeCfgFilename.empty() ? toWx(activeCfgFilename) : L"BatchRun.ffs_batch";
         //attention: activeConfigFiles may be a *.ffs_gui file! We don't want to overwrite it with a BATCH config!
         if (endsWith(defaultFileName, L".ffs_gui"))
             replace(defaultFileName, L".ffs_gui", L".ffs_batch");
@@ -2589,12 +2643,12 @@ bool MainDialog::trySaveBatchConfig(const wxString* fileNameBatch)
                                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (filePicker.ShowModal() != wxID_OK)
             return false;
-        targetFilename = filePicker.GetPath();
+        targetFilename = toZ(filePicker.GetPath());
     }
 
     try
     {
-        xmlAccess::writeConfig(batchCfg, toZ(targetFilename)); //throw FfsXmlError
+        xmlAccess::writeConfig(batchCfg, targetFilename); //throw FfsXmlError
 
         setLastUsedConfig(targetFilename, guiCfg); //[!] behave as if we had saved guiCfg
         flashStatusInformation(_("Configuration saved!"));
@@ -2612,7 +2666,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
 {
     if (lastConfigurationSaved != getConfig())
     {
-        const wxString activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : wxString();
+        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : Zstring();
 
         //notify user about changed settings
         if (globalCfg.optDialogs.popupOnConfigChange)
@@ -2623,8 +2677,8 @@ bool MainDialog::saveOldConfig() //return false on user abort
 
                 switch (showQuestionDlg(this,
                                         ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
-                                        replaceCpy(_("Do you want to save changes to %x?"), L"%x", fmtFileName(afterLast(utfCvrtTo<Zstring>(activeCfgFilename), FILE_NAME_SEPARATOR))),
-                                        QuestConfig().setCaption(activeCfgFilename).
+                                        replaceCpy(_("Do you want to save changes to %x?"), L"%x", fmtFileName(afterLast(activeCfgFilename, FILE_NAME_SEPARATOR))),
+                                        QuestConfig().setCaption(toWx(activeCfgFilename)).
                                         setLabelYes(_("&Save")).
                                         setLabelNo(_("Do&n't save")).
                                         showCheckBox(neverSave, _("Never save changes"))))
@@ -2632,7 +2686,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
                     case ReturnQuestionDlg::BUTTON_YES:
 
                         using namespace xmlAccess;
-                        switch (getXmlType(utfCvrtTo<Zstring>(activeCfgFilename))) //throw()
+                        switch (getXmlType(activeCfgFilename)) //throw()
                         {
                             case XML_TYPE_GUI:
                                 return trySaveConfig(&activeCfgFilename);
@@ -2654,7 +2708,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
             }
 
         //discard current reference file(s), this ensures next app start will load <last session> instead of the original non-modified config selection
-        setLastUsedConfig(std::vector<wxString>(), lastConfigurationSaved);
+        setLastUsedConfig(std::vector<Zstring>(), lastConfigurationSaved);
         //this seems to make theoretical sense also: the job of this function is to make sure current (volatile) config and reference file name are in sync
         // => if user does not save cfg, it is not attached to a physical file names anymore!
     }
@@ -2664,11 +2718,11 @@ bool MainDialog::saveOldConfig() //return false on user abort
 
 void MainDialog::OnConfigLoad(wxCommandEvent& event)
 {
-    const wxString activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : wxString();
+    const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : Zstring();
 
     wxFileDialog filePicker(this,
                             wxEmptyString,
-                            beforeLast(activeCfgFilename, utfCvrtTo<wxString>(FILE_NAME_SEPARATOR)), //set default dir: empty string if "activeConfigFiles" is empty or has no path separator
+                            toWx(beforeLast(activeCfgFilename, FILE_NAME_SEPARATOR)), //set default dir: empty string if "activeConfigFiles" is empty or has no path separator
                             wxEmptyString,
                             wxString(L"FreeFileSync (*.ffs_gui;*.ffs_batch)|*.ffs_gui;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN | wxFD_MULTIPLE);
@@ -2677,9 +2731,9 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
     {
         wxArrayString tmp;
         filePicker.GetPaths(tmp);
-        std::vector<wxString> fileNames(tmp.begin(), tmp.end());
+        std::vector<wxString> filenames(tmp.begin(), tmp.end());
 
-        loadConfiguration(fileNames);
+        loadConfiguration(toZ(filenames));
     }
 }
 
@@ -2689,7 +2743,16 @@ void MainDialog::OnConfigNew(wxCommandEvent& event)
     if (!saveOldConfig()) //notify user about changed settings
         return;
 
-    setConfig(xmlAccess::XmlGuiConfig(), std::vector<wxString>());
+    xmlAccess::XmlGuiConfig newConfig;
+
+    //add default exclusion filter: this is only ever relevant when creating new configurations!
+    //a default XmlGuiConfig does not need these user-specific exclusions!
+    Zstring& excludeFilter = newConfig.mainCfg.globalFilter.excludeFilter;
+    if (!excludeFilter.empty() && !endsWith(excludeFilter, Zstr("\n")))
+        excludeFilter += Zstr("\n");
+    excludeFilter += globalCfg.gui.defaultExclusionFilter;
+
+    setConfig(newConfig, std::vector<Zstring>());
 }
 
 
@@ -2698,7 +2761,7 @@ void MainDialog::OnLoadFromHistory(wxCommandEvent& event)
     wxArrayInt selections;
     m_listBoxHistory->GetSelections(selections);
 
-    std::vector<wxString> filenames;
+    std::vector<Zstring> filenames;
     std::for_each(selections.begin(), selections.end(),
                   [&](int pos)
     {
@@ -2709,7 +2772,7 @@ void MainDialog::OnLoadFromHistory(wxCommandEvent& event)
     if (!filenames.empty())
         loadConfiguration(filenames);
 
-    //user changed m_listBoxHistory selection so it's this method's responsibility to synchronize with activeConfigFiles
+    //user changed m_listBoxHistory selection so it's this method's responsibility to synchronize with activeConfigFiles:
     //- if user cancelled saving old config
     //- there's an error loading new config
     //- filenames is empty and user tried to unselect the current config
@@ -2722,9 +2785,8 @@ void MainDialog::OnLoadFromHistoryDoubleClick(wxCommandEvent& event)
     wxArrayInt selections;
     m_listBoxHistory->GetSelections(selections);
 
-    std::vector<wxString> filenames;
-    std::for_each(selections.begin(), selections.end(),
-                  [&](int pos)
+    std::vector<Zstring> filenames;
+    std::for_each(selections.begin(), selections.end(), [&](int pos)
     {
         if (auto histData = dynamic_cast<const wxClientHistoryData*>(m_listBoxHistory->GetClientObject(pos)))
             filenames.push_back(histData->cfgFile_);
@@ -2744,7 +2806,7 @@ void MainDialog::OnLoadFromHistoryDoubleClick(wxCommandEvent& event)
 }
 
 
-bool MainDialog::loadConfiguration(const std::vector<wxString>& filenames)
+bool MainDialog::loadConfiguration(const std::vector<Zstring>& filenames)
 {
     if (filenames.empty())
         return true;
@@ -2757,7 +2819,7 @@ bool MainDialog::loadConfiguration(const std::vector<wxString>& filenames)
     try
     {
         //allow reading batch configurations also
-        xmlAccess::readAnyConfig(toZ(filenames), newGuiCfg); //throw FfsXmlError
+        xmlAccess::readAnyConfig(filenames, newGuiCfg); //throw FfsXmlError
 
         setConfig(newGuiCfg, filenames);
         //flashStatusInformation(_("Configuration loaded!")); -> irrelevant!?
@@ -2783,14 +2845,8 @@ void MainDialog::deleteSelectedCfgHistoryItems()
     m_listBoxHistory->GetSelections(tmp);
 
     std::set<int> selections(tmp.begin(), tmp.end()); //sort ascending!
-
-    int shift = 0;
-    std::for_each(selections.begin(), selections.end(),
-                  [&](int pos)
-    {
-        m_listBoxHistory->Delete(pos + shift);
-        --shift;
-    });
+    //delete starting with high positions:
+    std::for_each(selections.rbegin(), selections.rend(), [&](int pos) { m_listBoxHistory->Delete(pos); });
 
     //set active selection on next element to allow "batch-deletion" by holding down DEL key
     if (!selections.empty() && m_listBoxHistory->GetCount() > 0)
@@ -2876,15 +2932,15 @@ void MainDialog::onSetSyncDirection(SyncDirectionEvent& event)
 }
 
 
-void MainDialog::setLastUsedConfig(const wxString& filename, const xmlAccess::XmlGuiConfig& guiConfig)
+void MainDialog::setLastUsedConfig(const Zstring& filename, const xmlAccess::XmlGuiConfig& guiConfig)
 {
-    std::vector<wxString> filenames;
+    std::vector<Zstring> filenames;
     filenames.push_back(filename);
     setLastUsedConfig(filenames, guiConfig);
 }
 
 
-void MainDialog::setLastUsedConfig(const std::vector<wxString>& filenames,
+void MainDialog::setLastUsedConfig(const std::vector<Zstring>& filenames,
                                    const xmlAccess::XmlGuiConfig& guiConfig)
 {
     activeConfigFiles = filenames;
@@ -2896,7 +2952,7 @@ void MainDialog::setLastUsedConfig(const std::vector<wxString>& filenames,
 }
 
 
-void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::vector<wxString>& referenceFiles)
+void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::vector<Zstring>& referenceFiles)
 {
     currentCfg = newGuiCfg;
 
@@ -2905,11 +2961,11 @@ void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::
     //(re-)set view filter buttons
     setViewFilterDefault();
 
-    updateFilterButtons();
+    updateGlobalFilterButton();
 
     //set first folder pair
-    firstFolderPair->setValues(toWx(currentCfg.mainCfg.firstPair.leftDirectory),
-                               toWx(currentCfg.mainCfg.firstPair.rightDirectory),
+    firstFolderPair->setValues(currentCfg.mainCfg.firstPair.leftDirectory,
+                               currentCfg.mainCfg.firstPair.rightDirectory,
                                currentCfg.mainCfg.firstPair.altCmpConfig,
                                currentCfg.mainCfg.firstPair.altSyncConfig,
                                currentCfg.mainCfg.firstPair.localFilter);
@@ -2946,8 +3002,8 @@ void MainDialog::setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::
 inline
 FolderPairEnh getEnhancedPair(const DirectoryPair* panel)
 {
-    return FolderPairEnh(toZ(panel->getLeftDir()),
-                         toZ(panel->getRightDir()),
+    return FolderPairEnh(panel->getLeftDir(),
+                         panel->getRightDir(),
                          panel->getAltCompConfig(),
                          panel->getAltSyncConfig(),
                          panel->getAltFilterConfig());
@@ -2961,8 +3017,8 @@ xmlAccess::XmlGuiConfig MainDialog::getConfig() const
     //load settings whose ownership lies not in currentCfg:
 
     //first folder pair
-    guiCfg.mainCfg.firstPair = FolderPairEnh(toZ(firstFolderPair->getLeftDir()),
-                                             toZ(firstFolderPair->getRightDir()),
+    guiCfg.mainCfg.firstPair = FolderPairEnh(firstFolderPair->getLeftDir(),
+                                             firstFolderPair->getRightDir(),
                                              firstFolderPair->getAltCompConfig(),
                                              firstFolderPair->getAltSyncConfig(),
                                              firstFolderPair->getAltFilterConfig());
@@ -2979,9 +3035,9 @@ xmlAccess::XmlGuiConfig MainDialog::getConfig() const
 }
 
 
-const wxString& MainDialog::lastRunConfigName()
+const Zstring& MainDialog::lastRunConfigName()
 {
-    static wxString instance = toWx(zen::getConfigDir()) + L"LastRun.ffs_gui";
+    static Zstring instance = zen::getConfigDir() + Zstr("LastRun.ffs_gui");
     return instance;
 }
 
@@ -3021,7 +3077,7 @@ void MainDialog::OnConfigureFilter(wxCommandEvent& event)
                          true, //is main filter dialog
                          currentCfg.mainCfg.globalFilter) == ReturnSmallDlg::BUTTON_OKAY)
     {
-        updateFilterButtons(); //refresh global filter icon
+        updateGlobalFilterButton(); //refresh global filter icon
         applyFilterConfig();  //re-apply filter
     }
 
@@ -3031,17 +3087,28 @@ void MainDialog::OnConfigureFilter(wxCommandEvent& event)
 
 void MainDialog::OnGlobalFilterContext(wxMouseEvent& event)
 {
-    ContextMenu menu;
-
     auto clearFilter = [&]
     {
         currentCfg.mainCfg.globalFilter = FilterConfig();
-
-        updateFilterButtons(); //refresh global filter icon
+        updateGlobalFilterButton(); //refresh global filter icon
         applyFilterConfig();  //re-apply filter
     };
-    menu.addItem( _("Clear filter settings"), clearFilter, nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
+    auto copyFilter  = [&] { filterCfgOnClipboard = make_unique<FilterConfig>(currentCfg.mainCfg.globalFilter); };
+    auto pasteFilter = [&]
+    {
+        if (filterCfgOnClipboard)
+        {
+            currentCfg.mainCfg.globalFilter = *filterCfgOnClipboard;
+            updateGlobalFilterButton(); //refresh global filter icon
+            applyFilterConfig();  //re-apply filter
+        }
+    };
 
+    ContextMenu menu;
+    menu.addItem( _("Clear filter settings"), clearFilter, nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
+    menu.addSeparator();
+    menu.addItem( _("Copy"),  copyFilter,  nullptr, !isNullFilter(currentCfg.mainCfg.globalFilter));
+    menu.addItem( _("Paste"), pasteFilter, nullptr, filterCfgOnClipboard.get() != nullptr);
     menu.popup(*this);
 }
 
@@ -3063,8 +3130,7 @@ wxBitmap buttonPressed(const std::string& name)
 {
     wxBitmap background = getResourceImage(L"buttonPressed");
     return mirrorIfRtl(
-               layOver(
-                   getResourceImage(utfCvrtTo<wxString>(name)), background));
+               layOver(getResourceImage(utfCvrtTo<wxString>(name)), background));
 }
 
 
@@ -3084,73 +3150,59 @@ void MainDialog::initViewFilterButtons()
     //compare result buttons
     m_bpButtonShowLeftOnly->init(buttonPressed("leftOnly"),
                                  buttonReleased("leftOnly"),
-                                 _("Hide files that exist on left side only"),
                                  _("Show files that exist on left side only"));
 
     m_bpButtonShowRightOnly->init(buttonPressed("rightOnly"),
                                   buttonReleased("rightOnly"),
-                                  _("Hide files that exist on right side only"),
                                   _("Show files that exist on right side only"));
 
     m_bpButtonShowLeftNewer->init(buttonPressed("leftNewer"),
                                   buttonReleased("leftNewer"),
-                                  _("Hide files that are newer on left"),
                                   _("Show files that are newer on left"));
 
     m_bpButtonShowRightNewer->init(buttonPressed("rightNewer"),
                                    buttonReleased("rightNewer"),
-                                   _("Hide files that are newer on right"),
                                    _("Show files that are newer on right"));
 
     m_bpButtonShowEqual->init(buttonPressed("equal"),
                               buttonReleased("equal"),
-                              _("Hide files that are equal"),
                               _("Show files that are equal"));
 
     m_bpButtonShowDifferent->init(buttonPressed("different"),
                                   buttonReleased("different"),
-                                  _("Hide files that are different"),
                                   _("Show files that are different"));
 
     m_bpButtonShowConflict->init(buttonPressed("conflict"),
                                  buttonReleased("conflict"),
-                                 _("Hide conflicts"),
                                  _("Show conflicts"));
 
     //sync preview buttons
     m_bpButtonShowCreateLeft->init(buttonPressed("createLeft"),
                                    buttonReleased("createLeft"),
-                                   _("Hide files that will be created on the left side"),
                                    _("Show files that will be created on the left side"));
 
     m_bpButtonShowCreateRight->init(buttonPressed("createRight"),
                                     buttonReleased("createRight"),
-                                    _("Hide files that will be created on the right side"),
                                     _("Show files that will be created on the right side"));
 
     m_bpButtonShowDeleteLeft->init(buttonPressed("deleteLeft"),
                                    buttonReleased("deleteLeft"),
-                                   _("Hide files that will be deleted on the left side"),
                                    _("Show files that will be deleted on the left side"));
 
     m_bpButtonShowDeleteRight->init(buttonPressed("deleteRight"),
                                     buttonReleased("deleteRight"),
-                                    _("Hide files that will be deleted on the right side"),
                                     _("Show files that will be deleted on the right side"));
 
     m_bpButtonShowUpdateLeft->init(buttonPressed("updateLeft"),
                                    buttonReleased("updateLeft"),
-                                   _("Hide files that will be overwritten on left side"),
                                    _("Show files that will be overwritten on left side"));
 
     m_bpButtonShowUpdateRight->init(buttonPressed("updateRight"),
                                     buttonReleased("updateRight"),
-                                    _("Hide files that will be overwritten on right side"),
                                     _("Show files that will be overwritten on right side"));
 
     m_bpButtonShowDoNothing->init(buttonPressed("none"),
                                   buttonReleased("none"),
-                                  _("Hide files that won't be copied"),
                                   _("Show files that won't be copied"));
 }
 
@@ -3212,7 +3264,7 @@ void MainDialog::OnViewButtonRightClick(wxMouseEvent& event)
 }
 
 
-void MainDialog::updateFilterButtons()
+void MainDialog::updateGlobalFilterButton()
 {
     //global filter: test for Null-filter
     if (!isNullFilter(currentCfg.mainCfg.globalFilter))
@@ -3225,12 +3277,6 @@ void MainDialog::updateFilterButtons()
         setImage(*m_bpButtonFilter, greyScale(getResourceImage(L"filter")));
         m_bpButtonFilter->SetToolTip(_("No filter selected"));
     }
-
-    //update local filter buttons
-    firstFolderPair->refreshButtons();
-
-    std::for_each(additionalFolderPairs.begin(), additionalFolderPairs.end(),
-    [&](DirectoryPair* dirPair) { dirPair->refreshButtons(); });
 }
 
 
@@ -3261,24 +3307,15 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         const std::vector<zen::FolderPairCfg> cmpConfig = zen::extractCompareCfg(getConfig().mainCfg);
 
         //GUI mode: place directory locks on directories isolated(!) during both comparison and synchronization
-        std::unique_ptr<LockHolder> dummy2;
-        if (globalCfg.createLockFile)
-        {
-            std::vector<Zstring> dirnames;
-            std::for_each(cmpConfig.begin(), cmpConfig.end(),
-                          [&](const FolderPairCfg& fpCfg)
-            {
-                dirnames.push_back(fpCfg.leftDirectoryFmt);
-                dirnames.push_back(fpCfg.rightDirectoryFmt);
-            });
-            dummy2 = make_unique<LockHolder>(dirnames, statusHandler, true); //allow pw prompt
-        }
+        std::unique_ptr<LockHolder> dirLocks;
 
         //COMPARE DIRECTORIES
         compare(globalCfg.fileTimeTolerance,
                 globalCfg.optDialogs,
                 true, //allow pw prompt
                 globalCfg.runWithBackgroundPriority,
+                globalCfg.createLockFile,
+                dirLocks,
                 cmpConfig,
                 folderCmp,
                 statusHandler); //throw GuiAbortProcess
@@ -3300,12 +3337,12 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     m_gridNavi->clearSelection();
 
     //play (optional) sound notification after sync has completed (GUI and batch mode)
-    const wxString soundFile = toWx(zen::getResourceDir()) + L"Compare_Complete.wav";
-    if (fileExists(toZ(soundFile)))
-        wxSound::Play(soundFile, wxSOUND_ASYNC);
+    const Zstring soundFile = zen::getResourceDir() + Zstr("Compare_Complete.wav");
+    if (fileExists(soundFile))
+        wxSound::Play(toWx(soundFile), wxSOUND_ASYNC);
 
     //add to folder history after successful comparison only
-    folderHistoryLeft ->addItem(toZ(m_directoryLeft->GetValue()));
+    folderHistoryLeft ->addItem(toZ(m_directoryLeft ->GetValue()));
     folderHistoryRight->addItem(toZ(m_directoryRight->GetValue()));
 
     //prepare status information
@@ -3474,7 +3511,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
     try
     {
         //PERF_START;
-        const wxString activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : wxString();
+        const Zstring activeCfgFilename = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : Zstring();
 
         const auto& guiCfg = getConfig();
 
@@ -3482,21 +3519,23 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         SyncStatusHandler statusHandler(this, //throw GuiAbortProcess
                                         globalCfg.lastSyncsLogFileSizeMax,
                                         currentCfg.handleError,
-                                        xmlAccess::extractJobName(utfCvrtTo<Zstring>(activeCfgFilename)),
+                                        xmlAccess::extractJobName(activeCfgFilename),
                                         guiCfg.mainCfg.onCompletion,
                                         globalCfg.gui.onCompletionHistory);
 
         //GUI mode: place directory locks on directories isolated(!) during both comparison and synchronization
-        std::unique_ptr<LockHolder> dummy2;
+        std::unique_ptr<LockHolder> dirLocks;
         if (globalCfg.createLockFile)
         {
-            std::vector<Zstring> dirnames;
+            std::set<Zstring, LessFilename> dirnamesExisting;
             for (auto it = begin(folderCmp); it != end(folderCmp); ++it)
             {
-                dirnames.push_back(it->getBaseDirPf<LEFT_SIDE >());
-                dirnames.push_back(it->getBaseDirPf<RIGHT_SIDE>());
+                if (it->isExisting<LEFT_SIDE>()) //do NOT check directory existence again!
+                    dirnamesExisting.insert(it->getBaseDirPf<LEFT_SIDE >());
+                if (it->isExisting<RIGHT_SIDE>())
+                    dirnamesExisting.insert(it->getBaseDirPf<RIGHT_SIDE>());
             }
-            dummy2 = make_unique<LockHolder>(dirnames, statusHandler, true); //allow pw prompt
+            dirLocks = make_unique<LockHolder>(dirnamesExisting, globalCfg.optDialogs.warningDirectoryLockFailed, statusHandler);
         }
 
         //START SYNCHRONIZATION
@@ -3818,8 +3857,8 @@ void MainDialog::OnAddFolderPair(wxCommandEvent& event)
 
     //clear first pair
     const FolderPairEnh cfgEmpty;
-    firstFolderPair->setValues(toWx(cfgEmpty.leftDirectory),
-                               toWx(cfgEmpty.rightDirectory),
+    firstFolderPair->setValues(cfgEmpty.leftDirectory,
+                               cfgEmpty.rightDirectory,
                                cfgEmpty.altCmpConfig,
                                cfgEmpty.altSyncConfig,
                                cfgEmpty.localFilter);
@@ -3839,8 +3878,8 @@ void MainDialog::OnRemoveTopFolderPair(wxCommandEvent& event)
         const FolderPairEnh cfgSecond = getEnhancedPair(additionalFolderPairs[0]);
 
         //reset first pair
-        firstFolderPair->setValues(toWx(cfgSecond.leftDirectory),
-                                   toWx(cfgSecond.rightDirectory),
+        firstFolderPair->setValues(cfgSecond.leftDirectory,
+                                   cfgSecond.rightDirectory,
                                    cfgSecond.altCmpConfig,
                                    cfgSecond.altSyncConfig,
                                    cfgSecond.localFilter);
@@ -3897,7 +3936,8 @@ void MainDialog::updateGuiForFolderPair()
         addPairOptimalHeight = std::max(addPairOptimalHeight, addPairMinimalHeight); //implicitly handle corrupted values for "maxFolderPairsVisible"
     }
 
-    const int firstPairHeight = m_panelDirectoryPairs->ClientToWindowSize(m_panelTopLeft->GetSize()).GetHeight(); //include m_panelDirectoryPairs window borders!
+    const int firstPairHeight = std::max(m_panelDirectoryPairs->ClientToWindowSize(m_panelTopLeft  ->GetSize()).GetHeight(),  //include m_panelDirectoryPairs window borders!
+                                         m_panelDirectoryPairs->ClientToWindowSize(m_panelTopMiddle->GetSize()).GetHeight()); //
 
     //########################################################################################################################
     //wxAUI hack: set minimum height to desired value, then call wxAuiPaneInfo::Fixed() to apply it
@@ -3963,8 +4003,8 @@ void MainDialog::addFolderPair(const std::vector<FolderPairEnh>& newPairs, bool 
     updateGuiForFolderPair();
 
     for (auto it = newPairs.begin(); it != newPairs.end(); ++it)//set alternate configuration
-        newEntries[it - newPairs.begin()]->setValues(toWx(it->leftDirectory),
-                                                     toWx(it->rightDirectory),
+        newEntries[it - newPairs.begin()]->setValues(it->leftDirectory,
+                                                     it->rightDirectory,
                                                      it->altCmpConfig,
                                                      it->altSyncConfig,
                                                      it->localFilter);
@@ -4198,20 +4238,26 @@ void MainDialog::OnMenuCheckVersion(wxCommandEvent& event)
 }
 
 
+void MainDialog::OnMenuCheckVersionAutomatically(wxCommandEvent& event)
+{
+    globalCfg.gui.lastUpdateCheck = globalCfg.gui.lastUpdateCheck == -1 ? 0 : -1;
+    m_menuItemCheckVersionAuto->Check(globalCfg.gui.lastUpdateCheck != -1);
+    zen::checkForUpdatePeriodically(this, globalCfg.gui.lastUpdateCheck, [&] { flashStatusInformation(_("Searching for program updates...")); });
+}
+
+
 void MainDialog::OnRegularUpdateCheck(wxIdleEvent& event)
 {
     //execute just once per startup!
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnRegularUpdateCheck), nullptr, this);
 
     if (manualProgramUpdateRequired())
-        zen::checkForUpdatePeriodically(this, globalCfg.gui.lastUpdateCheck);
+        zen::checkForUpdatePeriodically(this, globalCfg.gui.lastUpdateCheck, [&] { flashStatusInformation(_("Searching for program updates...")); });
 }
 
 
 void MainDialog::OnLayoutWindowAsync(wxIdleEvent& event)
 {
-    warn_static("harmonize with async version check?")
-
     //execute just once per startup!
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnLayoutWindowAsync), nullptr, this);
 

@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Ukupno vrijeme:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>Ne mogu zaključiti mapu %x.</target>
+
 <source>Show in Explorer</source>
 <target>Prikaži u Exploreru</target>
 
@@ -40,6 +43,9 @@
 <source>Error</source>
 <target>Greška</target>
 
+<source>Selected variant:</source>
+<target>Odaberite način</target>
+
 <source>Select alternate comparison settings</source>
 <target>Izaberite alternativne postavke usporedbe</target>
 
@@ -57,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Počisti postavke filtera</target>
+
+<source>Copy</source>
+<target>Kopiraj</target>
+
+<source>Paste</source>
+<target>Zalijepi</target>
 
 <source>Save as batch job</source>
 <target>Spremi kao slijedni zadatak</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Kritična greška</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows greška %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux greška %x:</target>
+<source>Error Code %x:</source>
+<target>Pogreška broj %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Ne mogu riješiti simboličnu poveznicu</target>
@@ -161,8 +170,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Čekam dok se direktorij zaključava (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Ne mogu zaključati direktorij %x.</target>
+<source>Creating file %x</source>
+<target>Izrađujem datoteku %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -196,9 +205,6 @@
 <source>/sec</source>
 <target>/sek</target>
 
-<source>Cannot find file %x.</source>
-<target>Ne mogu pronaći datoteku %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Datoteka %x ne sadrži valjanu konfiguraciju</target>
 
@@ -222,6 +228,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Ne mogu čitati slijedeće XML elemente</target>
+
+<source>Cannot find file %x.</source>
+<target>Ne mogu pronaći datoteku %x.</target>
 
 <source>&Open...</source>
 <target>&Otvori...</target>
@@ -456,23 +465,20 @@ Naredba će biti pokrenuta ako se:
 <source>&Advanced</source>
 <target>&Napredno</target>
 
-<source>&Check for new version</source>
-<target>&Provjeri za novu verziju</target>
+<source>&Check now</source>
+<target>&Provjeri sada</target>
+
+<source>Check &automatically once a week</source>
+<target>Provjeri &automatski jednom tjedno</target>
+
+<source>Check for new version</source>
+<target>Potraži noviju verziju</target>
 
 <source>Compare</source>
 <target>Usporedi</target>
 
-<source>Compare both sides</source>
-<target>Usporedi obje strane</target>
-
-<source>&Abort</source>
-<target>&Odustani</target>
-
 <source>Synchronize</source>
 <target>Sinkroniziraj</target>
-
-<source>Start synchronization</source>
-<target>Započni sinkronizaciju</target>
 
 <source>Add folder pair</source>
 <target>Dodaj mapu</target>
@@ -482,15 +488,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>Swap sides</source>
 <target>Zamjeni strane</target>
-
-<source>Open</source>
-<target>Otvori</target>
-
-<source>Save</source>
-<target>Spremi</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Zadnje korištene postavke (pretisite DEL za ukloniti s liste)</target>
 
 <source>Hide excluded items</source>
 <target>Sakrij isključene stavke</target>
@@ -522,6 +519,18 @@ Naredba će biti pokrenuta ako se:
 <source>Time elapsed:</source>
 <target>Proteklo vremena:</target>
 
+<source>Synchronizing...</source>
+<target>Sinkroniziram...</target>
+
+<source>On completion</source>
+<target>Pri završetku</target>
+
+<source>Close</source>
+<target>Zatvori</target>
+
+<source>&Pause</source>
+<target>&Pauziraj</target>
+
 <source>Batch job</source>
 <target>Slijedni zadatak</target>
 
@@ -551,9 +560,6 @@ Naredba će biti pokrenuta ako se:
 
 <source>Abort synchronization on first error</source>
 <target>Prekini sinkronizaciju pri prvoj pogrešci</target>
-
-<source>On completion</source>
-<target>Pri završetku</target>
 
 <source>Show progress dialog</source>
 <target>Prikaži napredak</target>
@@ -612,8 +618,8 @@ jednak
 <source><- Two way -></source>
 <target>Dvosmjerno</target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identificiraj i izvedi promjene na obje strane koristeći bazu podataka. Brisanja, preimenovanja i sukobi se automatski detektiraju</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Pronađi i izvrši izmjene na obje strane. Izbrisano, premješteno te sukobe se otkrije automatski pomoću baze.</target>
 
 <source>Mirror ->></source>
 <target>Zrcalno ->></target>
@@ -651,14 +657,11 @@ jednak
 <source>Versioning</source>
 <target>Označi</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Premjesti vremenski-označene datoteke u određenu mapu</target>
+<source>Move files to user-defined folder</source>
+<target>Premjesti datoteke u određenu mapu</target>
 
 <source>Naming convention:</source>
 <target>Pravilo imena:</target>
-
-<source>Configuration</source>
-<target>Postavke</target>
 
 <source>Item exists on left side only</source>
 <target>Stavka postoji samo na lijevoj strani</target>
@@ -677,12 +680,6 @@ jednak
 
 <source>Conflict/item cannot be categorized</source>
 <target>Sukob/stavka ne može biti razvrstana</target>
-
-<source>Synchronizing...</source>
-<target>Sinkroniziram...</target>
-
-<source>&Pause</source>
-<target>&Pauziraj</target>
 
 <source>Source code written in C++ using:</source>
 <target>Izvorni kod napisan u C++ uz korištenje:</target>
@@ -744,8 +741,8 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Maximum</source>
 <target>Maksimum</target>
 
-<source>&Default</source>
-<target>&Zadano</target>
+<source>&Clear</source>
+<target>&Brisati</target>
 
 <source>Fail-safe file copy</source>
 <target>Kopiranje zaštićeno od grešaka</target>
@@ -773,6 +770,12 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>Description</source>
 <target>Opis</target>
+
+<source>&Default</source>
+<target>&Zadano</target>
+
+<source>Start synchronization</source>
+<target>Započni sinkronizaciju</target>
 
 <source>Variant</source>
 <target>Način</target>
@@ -804,11 +807,23 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Overview</source>
 <target>Pregled</target>
 
+<source>Configuration</source>
+<target>Postavke</target>
+
 <source>Filter files</source>
 <target>Filtriraj datoteke</target>
 
 <source>Select view</source>
 <target>Izaberite pogled</target>
+
+<source>Open...</source>
+<target>Otvori...</target>
+
+<source>Save</source>
+<target>Spremi</target>
+
+<source>Compare both sides</source>
+<target>Usporedi obje strane</target>
 
 <source>Set direction:</source>
 <target>Odaberi smijer:</target>
@@ -867,101 +882,62 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>FreeFileSync batch</source>
 <target>FreeFileSync slijedni zadatak</target>
 
-<source>Never save changes</source>
-<target>Nikad ne spremaj promjene</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Da li želite spremiti izmjene za %x?</target>
 
 <source>Do&n't save</source>
 <target>Ne spremaj</target>
 
+<source>Never save changes</source>
+<target>Nikad ne spremaj promjene</target>
+
 <source>Configuration loaded!</source>
 <target>Postavke učitane!</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Sakrij datoteke koje postoje samo na lijevoj strani</target>
 
 <source>Show files that exist on left side only</source>
 <target>Prikaži datoteke koje postoje samo na lijevoj strani</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Sakrij datoteke koje koje postoje samo na desnoj strani</target>
-
 <source>Show files that exist on right side only</source>
 <target>Prikaži datoteke koje postoje samo na desnoj strani</target>
-
-<source>Hide files that are newer on left</source>
-<target>Sakrij datoteke koje su novije lijevo</target>
 
 <source>Show files that are newer on left</source>
 <target>Prikaži datoteke koje su novije lijevo</target>
 
-<source>Hide files that are newer on right</source>
-<target>Skrij datoteke koje su novije desno</target>
-
 <source>Show files that are newer on right</source>
 <target>Prikaži datoteke koje su novije desno</target>
-
-<source>Hide files that are equal</source>
-<target>Skrij jednake datoteke</target>
 
 <source>Show files that are equal</source>
 <target>Prikaži jednake datoteke</target>
 
-<source>Hide files that are different</source>
-<target>Sakrij datoteke koje su različite</target>
-
 <source>Show files that are different</source>
 <target>Prikaži datoteke koje su različite</target>
-
-<source>Hide conflicts</source>
-<target>Sakrij sukobe</target>
 
 <source>Show conflicts</source>
 <target>Prikaži spore</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>Sakrij datoteke koje će biti napravljene na lijevoj strani</target>
-
 <source>Show files that will be created on the left side</source>
 <target>Prikaži datoteke koje će biti napravljene na lijevoj strani</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>Sakrij datoteke koje će biti napravljene na desnoj strani</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Prikaži datoteke koje će biti napravljene na desnoj strani</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>Sakrij datoteke koje će biti izbrisane na lijevoj strani</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>Prikaži datoteke koje će biti izbrisane na lijevoj strani</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>Skrij datoteke koje će biti izbrisane na desnoj strani</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Prikaži datoteke koje će biti izbrisane na desnoj strani</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>Skrij datoteke koje će biti prepisane na lijevoj strani</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>Prikaži datoteke koje će biti prepisane na lijevoj strani</target>
-
-<source>Hide files that will be overwritten on right side</source>
-<target>Skrij datoteke koje će biti prepisane na desnoj strani</target>
 
 <source>Show files that will be overwritten on right side</source>
 <target>Prikaži datoteke koje će biti prepisane na desnoj strani</target>
 
-<source>Hide files that won't be copied</source>
-<target>Sakrij datoteke koje neće biti kopirane</target>
-
 <source>Show files that won't be copied</source>
 <target>Prikaži datoteke koje neće biti kopirane</target>
+
+<source>Set as default</source>
+<target>Postavi kao zadano</target>
 
 <source>All folders are in sync!</source>
 <target>Sve mape su u sinkronizaciji!</target>
@@ -975,15 +951,8 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>File list exported!</source>
 <target>Datotečna lista izvezena!</target>
 
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>%x Objekt uspješno izbrisan!</pluralform>
-<pluralform>%x objekta uspješno izbrisana!</pluralform>
-<pluralform>%x objekata uspješno izbrisano!</pluralform>
-</target>
+<source>Searching for program updates...</source>
+<target>Pretražujem ažuriranja programa...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1021,6 +990,9 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>&Ignore</source>
 <target>&Ignoriraj</target>
 
+<source>Don't show this warning again</source>
+<target>Ne prikazuj ovo upozorenje ponovno</target>
+
 <source>&Switch</source>
 <target>&Zamjeni</target>
 
@@ -1038,9 +1010,6 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>Comparing content...</source>
 <target>Uspoređujem sadržaj...</target>
-
-<source>Copy</source>
-<target>Kopiraj</target>
 
 <source>Paused</source>
 <target>Pauzirano</target>
@@ -1124,36 +1093,31 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <target>Vrati skrivena upozorenja i dijaloški okvir ponovno vidljivim?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
-<target>
-<pluralform>Dali zaista želite prebaciti navedeni %x objekt u Koš za smeće?</pluralform>
-<pluralform>Dali zaista želite prebaciti navedena %x objekta u Koš za smeće?</pluralform>
-<pluralform>Dali zaista želite prebaciti navedenih %x objekata u Koš za smeće?</pluralform>
-</target>
+<target></target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
-<target>
-<pluralform>Dali zaista želite izbrisati navedeni %x objekt?</pluralform>
-<pluralform>Dali zaista želite izbrisati navedena %x objekta?</pluralform>
-<pluralform>Dali zaista želite izbrisati navedenih %x objekata?</pluralform>
-</target>
+<target></target>
 
 <source>Leave as unresolved conflict</source>
 <target>Ostavi kao neriješeni sukob</target>
+
+<source>Time stamp</source>
+<target>Vremenska oznaka</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Dodaj vremensku oznaku svakom imenu datoteke</target>
 
 <source>Replace</source>
 <target>Zamjeni</target>
 
 <source>Move files and replace if existing</source>
 <target>Premjesti datoteke i zamjeni ako već postoji</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Dodaj vremensku oznaku svakom imenu datoteke</target>
 
 <source>Folder</source>
 <target>Mapa</target>
@@ -1166,6 +1130,9 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>Files</source>
 <target>Datoteke</target>
+
+<source>Items</source>
+<target></target>
 
 <source>Percentage</source>
 <target>Postotak</target>
@@ -1272,6 +1239,12 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Cannot set privilege %x.</source>
 <target>Ne mogu postaviti prava za %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Nije moguće odgoditi mod spavanja računala</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Ne može se promjeniti proces I/O prioriteta</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Nije moguće prebaciti u Koš za smeće</target>
 
@@ -1290,14 +1263,38 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Postavljam zadani sinkronizacijski smijer: Stare datoteke će biti prepisane novim datotekama.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Provjeravam dosupnost koša za smeće za mapu %x...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>Premještam datoteku %x u Koš za smeće</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>Premještam mapu %x u Koš za smeće</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Premještam simboličnu poveznicu %x u Koš za smeće</target>
+
+<source>Deleting file %x</source>
+<target>Brisanje datoteke %x</target>
+
+<source>Deleting folder %x</source>
+<target>Brisanje mape %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Brisanje simboličnih poveznica %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Koš za smeće nije dostupan za navedene putanje! Umjesto toga datoteke će biti trajno izbrisane:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Možete ignorirati ovu pogrešku i smatrati mapu praznom</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>Odgovarajuća mapa će se smatrati prazna.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Ne mogu pronaći mapu %x.</target>
+<source>Cannot find the following folders:</source>
+<target>Ne mogu pronaći slijedeće mape:</target>
+
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target></target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Direktoriji su u ovisnosti! Budite oprezni pri postavljanju sinkronizacijskih pravila:</target>
@@ -1305,8 +1302,8 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Start comparison</source>
 <target>Započni usporedbu</target>
 
-<source>Preparing synchronization...</source>
-<target>Pripremam sinkronizaciju</target>
+<source>Calculating sync directions...</source>
+<target>Izračunavam smjerove sinkronizacije...</target>
 
 <source>Conflict detected:</source>
 <target>Sukob pronađen:</target>
@@ -1371,24 +1368,6 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Multiple...</source>
 <target>Mnogostruko...</target>
 
-<source>Deleting file %x</source>
-<target>Brisanje datoteke %x</target>
-
-<source>Deleting folder %x</source>
-<target>Brisanje mape %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Brisanje simboličnih poveznica %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Premještam datoteku %x u Koš za smeće</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Premještam mapu %x u Koš za smeće</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Premještam simboličnu poveznicu %x u Koš za smeće</target>
-
 <source>Moving file %x to %y</source>
 <target>Premještam datoteku %x u %y</target>
 
@@ -1400,9 +1379,6 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>Removing old versions...</source>
 <target>Uklanjam starije verzije...</target>
-
-<source>Creating file %x</source>
-<target>Izrađujem datoteku %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Izrađujem simboličnu poveznicu %x</target>
@@ -1421,6 +1397,9 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>Updating attributes of %x</source>
 <target>Obnavljam atribute od %x</target>
+
+<source>Cannot find %x.</source>
+<target>Ne mogu pronaći %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Odredišna mapa %x već postoji.</target>
@@ -1466,6 +1445,9 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>Generating database...</source>
 <target>Izrađujem bazu podataka...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Izrađujem Volume Shadow Kopiju za %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Greška pri provjeravanju podataka: Izvorna i ciljna datoteka imaju različit sadržaj!</target>

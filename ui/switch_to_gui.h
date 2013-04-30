@@ -16,7 +16,7 @@ namespace zen
 class SwitchToGui
 {
 public:
-    SwitchToGui(const wxString& referenceFile,
+    SwitchToGui(const Zstring& referenceFile,
                 const xmlAccess::XmlBatchConfig& batchCfg,
                 xmlAccess::XmlGlobalSettings& globalSettings) :
         guiCfg(xmlAccess::convertBatchToGui(batchCfg)),
@@ -31,7 +31,7 @@ public:
     }
 
 private:
-    std::vector<wxString> referenceFiles;
+    std::vector<Zstring> referenceFiles;
     const xmlAccess::XmlGuiConfig guiCfg;
     xmlAccess::XmlGlobalSettings& globalSettings_;
 };

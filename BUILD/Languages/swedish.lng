@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Total tid:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>Kan inte låsa %x.</target>
+
 <source>Show in Explorer</source>
 <target>Visa i Utforskaren</target>
 
@@ -40,6 +43,9 @@
 <source>Error</source>
 <target>Fel</target>
 
+<source>Selected variant:</source>
+<target>Vald variant:</target>
+
 <source>Select alternate comparison settings</source>
 <target>Välj alternativa jämförelseinställningar</target>
 
@@ -57,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Rensa filterinställningar</target>
+
+<source>Copy</source>
+<target>Kopiera</target>
+
+<source>Paste</source>
+<target>Klistra in</target>
 
 <source>Save as batch job</source>
 <target>Spara som batch-fil</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Allvarligt fel</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows Felkod %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Felkod %x:</target>
+<source>Error Code %x:</source>
+<target>Felkod %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Den symboliska länken %x kan inte matchas.</target>
@@ -160,8 +169,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Väntar medan mappen låses (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Kan inte låsa mappen %x.</target>
+<source>Creating file %x</source>
+<target>Skapar fil %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -193,9 +202,6 @@
 <source>/sec</source>
 <target>/s</target>
 
-<source>Cannot find file %x.</source>
-<target>Filen %x kan inte hittas</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Filen %x innehåller ingen giltig konfiguration.</target>
 
@@ -219,6 +225,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Kan inte läsa följande XML-element:</target>
+
+<source>Cannot find file %x.</source>
+<target>Filen %x kan inte hittas</target>
 
 <source>&Open...</source>
 <target>&Öppna...</target>
@@ -453,23 +462,20 @@ Kommandot triggas om:
 <source>&Advanced</source>
 <target>&Avancerat</target>
 
-<source>&Check for new version</source>
-<target>&Sök efter uppdatering</target>
+<source>&Check now</source>
+<target>&Sök nu</target>
+
+<source>Check &automatically once a week</source>
+<target>Sök automatiskt en gång per vecka</target>
+
+<source>Check for new version</source>
+<target>Sök efter ny version</target>
 
 <source>Compare</source>
 <target>Jämför</target>
 
-<source>Compare both sides</source>
-<target>Jämför båda sidor</target>
-
-<source>&Abort</source>
-<target>&Avbryt</target>
-
 <source>Synchronize</source>
 <target>Synkronisera</target>
-
-<source>Start synchronization</source>
-<target>Starta synkronisering</target>
 
 <source>Add folder pair</source>
 <target>Lägg till mapp-par</target>
@@ -479,15 +485,6 @@ Kommandot triggas om:
 
 <source>Swap sides</source>
 <target>Byt sida</target>
-
-<source>Open</source>
-<target>Öppna</target>
-
-<source>Save</source>
-<target>Spara</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Senast använda konfigurationer (Tryck DEL för att ta bort)</target>
 
 <source>Hide excluded items</source>
 <target>Dölj undantagna objekt</target>
@@ -519,6 +516,18 @@ Kommandot triggas om:
 <source>Time elapsed:</source>
 <target>Förfluten tid:</target>
 
+<source>Synchronizing...</source>
+<target>Synkroniserar...</target>
+
+<source>On completion</source>
+<target>Vid slutfört</target>
+
+<source>Close</source>
+<target>Stäng</target>
+
+<source>&Pause</source>
+<target>&Paus</target>
+
 <source>Batch job</source>
 <target>Batch-jobb</target>
 
@@ -548,9 +557,6 @@ Kommandot triggas om:
 
 <source>Abort synchronization on first error</source>
 <target>Avbryt synkronisering vid första felet</target>
-
-<source>On completion</source>
-<target>Vid slutfört</target>
 
 <source>Show progress dialog</source>
 <target>Visa förloppsindikator</target>
@@ -609,8 +615,8 @@ Filerna betecknas som lika om,
 <source><- Two way -></source>
 <target><- Tvåvägs -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Använd en databas för att identifiera och sprida ändringar på båda sidor. Borttagning, namnbyte och konflikter upptäcks automatiskt</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identifierar och sprider förändringar på båda sidor. Borttagningar, förflyttningar och konflikter detekteras automatiskt med hjälp av en databas.</target>
 
 <source>Mirror ->></source>
 <target>Spegla ->></target>
@@ -648,14 +654,11 @@ Filerna betecknas som lika om,
 <source>Versioning</source>
 <target>Versionshantering</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Flytta tidsstämplade filer till specificerad mapp</target>
+<source>Move files to user-defined folder</source>
+<target>Flytta filer till användardefinierad mapp</target>
 
 <source>Naming convention:</source>
 <target>Regler för namngivning</target>
-
-<source>Configuration</source>
-<target>Inställningar</target>
 
 <source>Item exists on left side only</source>
 <target>Objektet finns bara på vänster sida</target>
@@ -674,12 +677,6 @@ Filerna betecknas som lika om,
 
 <source>Conflict/item cannot be categorized</source>
 <target>Konflikten/Objektet kan inte kategoriseras</target>
-
-<source>Synchronizing...</source>
-<target>Synkroniserar...</target>
-
-<source>&Pause</source>
-<target>&Paus</target>
 
 <source>Source code written in C++ using:</source>
 <target>Källkod skriven i C++ med hjälp av:</target>
@@ -741,8 +738,8 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Maximum</source>
 <target>Maximum</target>
 
-<source>&Default</source>
-<target>&Standard</target>
+<source>&Clear</source>
+<target>&Rensa</target>
 
 <source>Fail-safe file copy</source>
 <target>Felsäker filkopiering</target>
@@ -770,6 +767,12 @@ OBS! Filnamnen måste anges relativt till basmappar
 
 <source>Description</source>
 <target>Beskrivning</target>
+
+<source>&Default</source>
+<target>&Standard</target>
+
+<source>Start synchronization</source>
+<target>Starta synkronisering</target>
 
 <source>Variant</source>
 <target>Variant</target>
@@ -801,11 +804,23 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Overview</source>
 <target>Översikt</target>
 
+<source>Configuration</source>
+<target>Inställningar</target>
+
 <source>Filter files</source>
 <target>Undantag</target>
 
 <source>Select view</source>
 <target>Välj vy</target>
+
+<source>Open...</source>
+<target>Öppna...</target>
+
+<source>Save</source>
+<target>Spara</target>
+
+<source>Compare both sides</source>
+<target>Jämför båda sidor</target>
 
 <source>Set direction:</source>
 <target>Ange riktning:</target>
@@ -864,101 +879,62 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>FreeFileSync batch</source>
 <target>FreeFileSync batch</target>
 
-<source>Never save changes</source>
-<target>Spara aldrig ändringar</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Vill du spara ändringar till %x?</target>
 
 <source>Do&n't save</source>
 <target>Spara &inte</target>
 
+<source>Never save changes</source>
+<target>Spara aldrig ändringar</target>
+
 <source>Configuration loaded!</source>
 <target>Inställningar inlästa!</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Visa inte filer som endast finns till vänster</target>
 
 <source>Show files that exist on left side only</source>
 <target>Visa filer som endast finns till vänster</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Visa inte filer som endast finns till höger</target>
-
 <source>Show files that exist on right side only</source>
 <target>Visa filer som endast finns till höger</target>
-
-<source>Hide files that are newer on left</source>
-<target>Visa inte filer som är nyare till vänster</target>
 
 <source>Show files that are newer on left</source>
 <target>Visa filer som är nyare till vänster</target>
 
-<source>Hide files that are newer on right</source>
-<target>Visa inte filer som är nyare till höger</target>
-
 <source>Show files that are newer on right</source>
 <target>Visa filer som är nyare till höger</target>
-
-<source>Hide files that are equal</source>
-<target>Visa inte filer som är lika</target>
 
 <source>Show files that are equal</source>
 <target>Visa filer som är lika</target>
 
-<source>Hide files that are different</source>
-<target>Visa inte filer som är olika</target>
-
 <source>Show files that are different</source>
 <target>Visa filer som är olika</target>
-
-<source>Hide conflicts</source>
-<target>Visa inte konflikter</target>
 
 <source>Show conflicts</source>
 <target>Visa konflikter</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>Visa inte filer som kommer att skapas på vänster sida</target>
-
 <source>Show files that will be created on the left side</source>
 <target>Visa filer som kommer att skapas till vänster</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>Visa inte filer som kommer att skapas på höger sida</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Visa filer som kommer att skapas till höger</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>Visa inte filer som kommer att tas bort på vänster sida</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>Visa filer som kommer att tas bort till vänster</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>Visa inte filer som kommer att tas bort på höger sida</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Visa filer som kommer att tas bort till höger</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>Visa inte filer som kommer att skrivas över på vänster sida</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>Visa filer som skrivas över till vänster</target>
-
-<source>Hide files that will be overwritten on right side</source>
-<target>Visa inte filer som kommer att skrivas över på höger sida</target>
 
 <source>Show files that will be overwritten on right side</source>
 <target>Visa filer som skrivas över till höger</target>
 
-<source>Hide files that won't be copied</source>
-<target>Visa inte filer som som inte kopieras</target>
-
 <source>Show files that won't be copied</source>
 <target>Visa filer som inte kommer att kopieras</target>
+
+<source>Set as default</source>
+<target>Ange som standard</target>
 
 <source>All folders are in sync!</source>
 <target>Alla mappar är synkroniserade!</target>
@@ -972,14 +948,8 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>File list exported!</source>
 <target>Fillista exporterad!</target>
 
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>Objektet borttaget!</pluralform>
-<pluralform>%x objekt borttagna!</pluralform>
-</target>
+<source>Searching for program updates...</source>
+<target>Söker efter programuppdateringar...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1014,6 +984,9 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>&Ignore</source>
 <target>&Ignorera</target>
 
+<source>Don't show this warning again</source>
+<target>Visa inte denna varning igen.</target>
+
 <source>&Switch</source>
 <target>&Växla</target>
 
@@ -1031,9 +1004,6 @@ OBS! Filnamnen måste anges relativt till basmappar
 
 <source>Comparing content...</source>
 <target>Jämför innehåll...</target>
-
-<source>Copy</source>
-<target>Kopiera</target>
 
 <source>Paused</source>
 <target>Pausad</target>
@@ -1117,17 +1087,17 @@ OBS! Filnamnen måste anges relativt till basmappar
 <target>Vill du göra dolda varningar och dialoger, synliga igen?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Vill du verkligen flytta följande objekt till Papperskorgen?</pluralform>
-<pluralform>Vill du verkligen flytta följande %x objekt till Papperskorgen?</pluralform>
+<pluralform>Vill du verkligen flytta följande objekt till papperskorgen?</pluralform>
+<pluralform>Vill du verkligen flytta följande %x objekt till papperskorgen?</pluralform>
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
 <pluralform>Vill du verkligen ta bort följande objekt?</pluralform>
@@ -1137,14 +1107,17 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Leave as unresolved conflict</source>
 <target>Ignorera konflikt</target>
 
+<source>Time stamp</source>
+<target>Tidsstämpel</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Lägg till en tidsstämpel till varje filnamn</target>
+
 <source>Replace</source>
 <target>Byt ut</target>
 
 <source>Move files and replace if existing</source>
 <target>Flytta filer och byt ut om de redan finns</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Lägg till en tidsstämpel till varje filnamn</target>
 
 <source>Folder</source>
 <target>Mapp</target>
@@ -1260,6 +1233,12 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Cannot set privilege %x.</source>
 <target>Kan inte att ange behörigheten %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Kunde inte avbryta systemet vänteläge</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Kan inte ändra process I/O-prioritet</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Kan inte flytta %x till Papperskorgen</target>
 
@@ -1278,14 +1257,38 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Standardsynkronisering: Gamla filer kommer att skrivas över av nyare versioner.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Kontrollerar papperskorgens tillgänglighet för %x...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>Flyttar filen %x till papperskorgen</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>Flyttar mappen %x till papperskorgen</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Flyttar den symboliska länken %x till papperskorgen</target>
+
+<source>Deleting file %x</source>
+<target>Tar bort filen %x</target>
+
+<source>Deleting folder %x</source>
+<target>Tar bort mappen %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Tar bort den symboliska länken %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Papperskorgen är inte tillgänglig för följande sökvägar! Filerna tas i stället bort permanent.</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Du kan ignorera detta fel och betrakta mappen som tom</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>Motsvarande mapp kommer att betraktas som tom.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Kan inte hitta mappen %x.</target>
+<source>Cannot find the following folders:</source>
+<target>Kan inte hitta följande mappar:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Du kan ignorera det här felet och betrakta varje mappa som tom.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Mappar är beroende! Var försiktig när du sätter upp synkroniseringsregler:</target>
@@ -1293,8 +1296,8 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Start comparison</source>
 <target>Starta jämförelse</target>
 
-<source>Preparing synchronization...</source>
-<target>Förbereder synkronisering...</target>
+<source>Calculating sync directions...</source>
+<target>Beräknar synkroniseringsmappar...</target>
 
 <source>Conflict detected:</source>
 <target>Konflikt upptäckt:</target>
@@ -1359,24 +1362,6 @@ OBS! Filnamnen måste anges relativt till basmappar
 <source>Multiple...</source>
 <target>Flera...</target>
 
-<source>Deleting file %x</source>
-<target>Tar bort filen %x</target>
-
-<source>Deleting folder %x</source>
-<target>Tar bort mappen %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Tar bort den symboliska länken %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Flyttar filen %x till papperskorgen</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Flyttar mappen %x till papperskorgen</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Flyttar den symboliska länken %x till papperskorgen</target>
-
 <source>Moving file %x to %y</source>
 <target>Flyttar filen %x till %y</target>
 
@@ -1388,9 +1373,6 @@ OBS! Filnamnen måste anges relativt till basmappar
 
 <source>Removing old versions...</source>
 <target>Tar bort gamla versioner...</target>
-
-<source>Creating file %x</source>
-<target>Skapar fil %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Skapar den symboliska länken %x</target>
@@ -1409,6 +1391,9 @@ OBS! Filnamnen måste anges relativt till basmappar
 
 <source>Updating attributes of %x</source>
 <target>Uppdaterar attribut för %x</target>
+
+<source>Cannot find %x.</source>
+<target>Kan inte hitta %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Målmappen %x finns redan.</target>
@@ -1454,6 +1439,9 @@ OBS! Filnamnen måste anges relativt till basmappar
 
 <source>Generating database...</source>
 <target>Skapar databas...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Skapar Volume Shadow Copy för %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Verifikationsfel: Källfil och målfil har olika innehåll!</target>

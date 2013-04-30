@@ -102,7 +102,7 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
             wxMessageBox(_("Invalid command line:") + L"\n" + utfCvrtTo<wxString>(command));
     }
     else
-        async([=] { /*int rv = */ ::system(command.c_str()); });
+        async([=] { int rv = ::system(command.c_str()); (void)rv; });
     //unfortunately we are not allowed to show a wxMessageBox from a worker thread
 #endif
 }

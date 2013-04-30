@@ -119,7 +119,6 @@ inline
 void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
                         const ErrorLog& log,
                         size_t maxBytesToWrite) //log may be *huge*, e.g. 1 million items; LastSyncs.log *must not* create performance problems!
-
 {
     const Zstring filename = getConfigDir() + Zstr("LastSyncs.log");
 
@@ -127,7 +126,7 @@ void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
     replace(newStream, '\n', LINE_BREAK); //don't replace line break any earlier
     newStream += LINE_BREAK;
 
-    //write log items one after the other instead of creating one big string: memory allocation might fail; think 1 million entries!
+    //check size of "newStream": memory allocation might fail - think 1 million entries!
     for (auto iter = log.begin(); iter != log.end(); ++iter)
     {
         newStream += replaceCpy(utfCvrtTo<Utf8String>(formatMessage<std::wstring>(*iter)), '\n', LINE_BREAK);

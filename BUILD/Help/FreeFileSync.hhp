@@ -12,19 +12,19 @@ Title=FreeFileSync - Help
 [FILES]
 html\FreeFileSync.html
 html\Versioning.html
-html\Batch Scripting.html
-html\Compare by File Size.html
-html\Comparison Settings.html
-html\Daylight Saving Time.html
-html\Exclude Items.html
-html\External Applications.html
+html\Batch scripting.html
+html\Expert settings.html
+html\Comparison settings.html
+html\Daylight Saving time.html
+html\Exclude items.html
+html\External applications.html
 html\Macros.html
-html\Schedule a Batch Job.html
+html\Schedule a batch job.html
 html\Synchronize with FTP.html
-html\Variable Drive Letters.html
+html\Variable drive letters.html
 html\Volume Shadow Copy.html
 html\RealtimeSync.html
-html\Run as Service.html
+html\Run as service.html
 html\Links.html
 
 [INFOTYPES]

@@ -54,7 +54,7 @@ std::vector<FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainC
 //------------------------------------------------------------------------------------------
 namespace
 {
-void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, ProcessCallback& callback)
+void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, bool& warningInputFieldEmpty, ProcessCallback& callback)
 {
     bool havePartialPair = false;
     bool haveFullPair    = false;
@@ -68,13 +68,9 @@ void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, 
             haveFullPair = true;
     });
 
-    warn_static("seltsame fehlermeldung + each folder macht keinen sinn")
-    tryReportingError([&]
-    {
-        if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-dir scenario
-            throw FileError(_("A folder input field is empty.") + L" \n\n" +
-            _("You can ignore this error to consider each folder as empty."));
-    }, callback);
+    if (havePartialPair == haveFullPair) //error if: all empty or exist both full and partial pairs -> support single-dir scenario
+        callback.reportWarning(_("A folder input field is empty.") + L" \n\n" +
+                               _("The corresponding folder will be considered as empty."), warningInputFieldEmpty);
 }
 
 
@@ -97,7 +93,7 @@ std::set<Zstring, LessFilename> determineExistentDirs(const std::vector<Zstring>
             std::wstring msg = _("Cannot find the following folders:") + L"\n";
             std::for_each(dirsMissing.begin(), dirsMissing.end(),
             [&](const Zstring& dirname) { msg += std::wstring(L"\n") + dirname; });
-            msg += L"\n\n" + _("You can ignore this error to consider each folder as empty.");
+            msg += L"\n\n" + _("You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.");
             throw FileError(msg);
         }
     }, callback);
@@ -108,7 +104,7 @@ std::set<Zstring, LessFilename> determineExistentDirs(const std::vector<Zstring>
 
 //check whether one side is subdirectory of other side (folder pair wise!)
 //similar check if one directory is read/written by multiple pairs not before beginning of synchronization
-std::wstring checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm) //returns warning message, empty if all ok
+void checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm, bool& warningDependentFolders, ProcessCallback& callback) //returns warning message, empty if all ok
 {
     std::vector<std::pair<Zstring, Zstring>> dependentDirs;
 
@@ -125,17 +121,16 @@ std::wstring checkFolderDependency(const std::vector<FolderPairCfg>& folderPairs
                 dependentDirs.push_back(std::make_pair(i->leftDirectoryFmt, i->rightDirectoryFmt));
         }
 
-    std::wstring warningMsg;
-
     if (!dependentDirs.empty())
     {
-        warningMsg = _("Directories are dependent! Be careful when setting up synchronization rules:");
+        std::wstring warningMsg = _("Directories are dependent! Be careful when setting up synchronization rules:");
         for (auto it = dependentDirs.begin(); it != dependentDirs.end(); ++it)
             warningMsg += std::wstring(L"\n\n") +
                           it->first + L"\n" +
                           it->second;
+
+        callback.reportWarning(warningMsg, warningDependentFolders);
     }
-    return warningMsg;
 }
 
 
@@ -263,6 +258,8 @@ void zen::compare(size_t fileTimeTolerance,
                   xmlAccess::OptionalDialogs& warnings,
                   bool allowUserInteraction,
                   bool runWithBackgroundPriority,
+                  bool createDirLocks,
+                  std::unique_ptr<LockHolder>& dirLocks,
                   const std::vector<FolderPairCfg>& cfgList,
                   FolderComparison& output,
                   ProcessCallback& callback)
@@ -301,8 +298,8 @@ void zen::compare(size_t fileTimeTolerance,
 
     //-------------------some basic checks:------------------------------------------
 
-    checkForIncompleteInput(cfgList, callback);
-
+    checkForIncompleteInput(cfgList, warnings.warningInputFieldEmpty,  callback);
+    checkFolderDependency  (cfgList, warnings.warningDependentFolders, callback);
 
     std::set<Zstring, LessFilename> dirnamesExisting;
     //list of directories that are *expected* to be existent (and need to be scanned)!
@@ -317,27 +314,24 @@ void zen::compare(size_t fileTimeTolerance,
         });
         dirnamesExisting = determineExistentDirs(dirnames, allowUserInteraction, callback);
     }
+
     auto dirAvailable = [&](const Zstring& dirnameFmt) { return dirnamesExisting.find(dirnameFmt) != dirnamesExisting.end(); };
-
-
-    {
-        //check if folders have dependencies
-        std::wstring warningMessage = checkFolderDependency(cfgList);
-        if (!warningMessage.empty())
-            callback.reportWarning(warningMessage, warnings.warningDependentFolders);
-    }
 
     //-------------------end of basic checks------------------------------------------
 
     try
     {
+        //lock (existing) directories before comparison
+        if (createDirLocks)
+            dirLocks = make_unique<LockHolder>(dirnamesExisting, warnings.warningDirectoryLockFailed, callback);
+
         //------------------- fill directory buffer ---------------------------------------------------
         std::set<DirectoryKey> keysToRead;
 
         std::for_each(cfgList.begin(), cfgList.end(),
                       [&](const FolderPairCfg& fpCfg)
         {
-            if (dirAvailable(fpCfg.leftDirectoryFmt)) //only request *currently existing * directories: at this point user is aware that non-ex + empty string are seen as empty folder!
+            if (dirAvailable(fpCfg.leftDirectoryFmt)) //only request *currently existing* directories: at this point user is aware that non-ex + empty string are seen as empty folder!
                 keysToRead.insert(DirectoryKey(fpCfg.leftDirectoryFmt,  fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
             if (dirAvailable(fpCfg.rightDirectoryFmt))
                 keysToRead.insert(DirectoryKey(fpCfg.rightDirectoryFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
@@ -386,7 +380,7 @@ void zen::compare(size_t fileTimeTolerance,
         {
             const FolderPairCfg& fpCfg = cfgList[j - output_tmp.begin()];
 
-            callback.reportStatus(_("Preparing synchronization..."));
+            callback.reportStatus(_("Calculating sync directions..."));
             callback.forceUiRefresh();
             zen::redetermineSyncDirection(fpCfg.directionCfg, *j,
             [&](const std::wstring& warning) { callback.reportWarning(warning, warnings.warningDatabaseError); });

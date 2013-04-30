@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Tempo total:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>Não é possível colocar o bloqueio de directório para %x.</target>
+
 <source>Show in Explorer</source>
 <target>Mostrar no Explorer</target>
 
@@ -40,6 +43,9 @@
 <source>Error</source>
 <target>Erro</target>
 
+<source>Selected variant:</source>
+<target>Variante selecionada:</target>
+
 <source>Select alternate comparison settings</source>
 <target>Selecionar opções alternativas de comparação</target>
 
@@ -57,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Limpar opções do filtro</target>
+
+<source>Copy</source>
+<target>Copiar</target>
+
+<source>Paste</source>
+<target>Colar</target>
 
 <source>Save as batch job</source>
 <target>Guardar como batch</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Erro crítico</target>
 
-<source>Windows Error Code %x:</source>
-<target>Código de erro do Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Código de erro do Linux %x:</target>
+<source>Error Code %x:</source>
+<target>Código de erro %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Não é possível resolver o link simbólico %x.</target>
@@ -160,8 +169,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Aguardar enquanto o directório é bloqueado (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Não é possível bloquear o directório %x.</target>
+<source>Creating file %x</source>
+<target>Criar ficheiro %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -193,9 +202,6 @@
 <source>/sec</source>
 <target>/seg</target>
 
-<source>Cannot find file %x.</source>
-<target>Não é possível encontrar o ficheiro %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Ficheiro %x não tem uma configuração válida.</target>
 
@@ -219,6 +225,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Não é possível ler os elementos XML:</target>
+
+<source>Cannot find file %x.</source>
+<target>Não é possível encontrar o ficheiro %x.</target>
 
 <source>&Open...</source>
 <target>&Abrir...</target>
@@ -453,23 +462,20 @@ O comando é executado se:
 <source>&Advanced</source>
 <target>&Avançado</target>
 
-<source>&Check for new version</source>
-<target>&Procurar actualizações</target>
+<source>&Check now</source>
+<target>&Verificar agora</target>
+
+<source>Check &automatically once a week</source>
+<target>Verificar &automaticamente uma vez por semana</target>
+
+<source>Check for new version</source>
+<target>Verificar se há nova versão</target>
 
 <source>Compare</source>
 <target>Comparar</target>
 
-<source>Compare both sides</source>
-<target>Comparar listas</target>
-
-<source>&Abort</source>
-<target>&Abortar</target>
-
 <source>Synchronize</source>
 <target>Sincronizar</target>
-
-<source>Start synchronization</source>
-<target>Iniciar a sincronização</target>
 
 <source>Add folder pair</source>
 <target>Adicionar um par de pastas</target>
@@ -479,15 +485,6 @@ O comando é executado se:
 
 <source>Swap sides</source>
 <target>Trocar lados</target>
-
-<source>Open</source>
-<target>Abrir</target>
-
-<source>Save</source>
-<target>Guardar</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Última configuração utilizada (pressione DEL para remover da lista)</target>
 
 <source>Hide excluded items</source>
 <target>Esconder itens excluídos</target>
@@ -519,6 +516,18 @@ O comando é executado se:
 <source>Time elapsed:</source>
 <target>Tempo decorrido</target>
 
+<source>Synchronizing...</source>
+<target>A sincronizar...</target>
+
+<source>On completion</source>
+<target>Ao terminar</target>
+
+<source>Close</source>
+<target>Fechar</target>
+
+<source>&Pause</source>
+<target>&Pausa</target>
+
 <source>Batch job</source>
 <target>Ficheiro Batch</target>
 
@@ -548,9 +557,6 @@ O comando é executado se:
 
 <source>Abort synchronization on first error</source>
 <target>Abortar sincronização ao primeiro erro</target>
-
-<source>On completion</source>
-<target>Ao terminar</target>
 
 <source>Show progress dialog</source>
 <target>Mostrar diálogo de progresso</target>
@@ -608,8 +614,8 @@ Os ficheiros são considerados iguais se
 <source><- Two way -></source>
 <target><- Duas vias -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identificar e propagar mudanças em ambos os lados utilizando base de dados. Itens eliminados, renomeados e conflitos são detetados automaticamente.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identificar e propagar mudanças nos dois lados. Eliminações, cópias e conflitos são detectados automaticamente usando base de dados.</target>
 
 <source>Mirror ->></source>
 <target>Espelhar ->></target>
@@ -647,14 +653,11 @@ Os ficheiros são considerados iguais se
 <source>Versioning</source>
 <target>Manter versões anteriores</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Mover ficheiros datados para a pasta especificada</target>
+<source>Move files to user-defined folder</source>
+<target>Mover ficheiros para directório definido pelo utilizador</target>
 
 <source>Naming convention:</source>
 <target>Convenção de nomes:</target>
-
-<source>Configuration</source>
-<target>Configuração</target>
 
 <source>Item exists on left side only</source>
 <target>Item existe apenas à esquerda</target>
@@ -673,12 +676,6 @@ Os ficheiros são considerados iguais se
 
 <source>Conflict/item cannot be categorized</source>
 <target>Conflito/item não pode ser categorizado</target>
-
-<source>Synchronizing...</source>
-<target>A sincronizar...</target>
-
-<source>&Pause</source>
-<target>&Pausa</target>
 
 <source>Source code written in C++ using:</source>
 <target>Código fonte escrito em C++ utilizando:</target>
@@ -740,8 +737,8 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Maximum</source>
 <target>Máximo</target>
 
-<source>&Default</source>
-<target>&Config. Iniciais</target>
+<source>&Clear</source>
+<target>&Limpar</target>
 
 <source>Fail-safe file copy</source>
 <target>Cópia à prova de falhas</target>
@@ -769,6 +766,12 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 
 <source>Description</source>
 <target>Descrição</target>
+
+<source>&Default</source>
+<target>&Config. Iniciais</target>
+
+<source>Start synchronization</source>
+<target>Iniciar a sincronização</target>
 
 <source>Variant</source>
 <target>Variável</target>
@@ -800,11 +803,23 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Overview</source>
 <target>Vista</target>
 
+<source>Configuration</source>
+<target>Configuração</target>
+
 <source>Filter files</source>
 <target>Filtrar ficheiros</target>
 
 <source>Select view</source>
 <target>Selecionar vista</target>
+
+<source>Open...</source>
+<target>Abrir...</target>
+
+<source>Save</source>
+<target>Guardar</target>
+
+<source>Compare both sides</source>
+<target>Comparar listas</target>
 
 <source>Set direction:</source>
 <target>Escolher direcção:</target>
@@ -863,101 +878,62 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>FreeFileSync batch</source>
 <target>FreeFileSync batch</target>
 
-<source>Never save changes</source>
-<target>Nunca guardar alterações</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Deseja guardar as alterações a %x?</target>
 
 <source>Do&n't save</source>
 <target>Não g&uardar</target>
 
+<source>Never save changes</source>
+<target>Nunca guardar alterações</target>
+
 <source>Configuration loaded!</source>
 <target>Configuração carregada!</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Ocultar ficheiros existentes somente à esquerda</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mostrar ficheiros existentes somente à esquerda</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Ocultar ficheiros existentes somente à direita</target>
-
 <source>Show files that exist on right side only</source>
 <target>Mostrar ficheiros existentes somente à direita</target>
-
-<source>Hide files that are newer on left</source>
-<target>Ocultar ficheiros mais recentes à esquerda</target>
 
 <source>Show files that are newer on left</source>
 <target>Mostrar ficheiros mais recentes à esquerda</target>
 
-<source>Hide files that are newer on right</source>
-<target>Ocultar ficheiros mais recentes à direita</target>
-
 <source>Show files that are newer on right</source>
 <target>Mostrar ficheiros mais recentes à direita</target>
-
-<source>Hide files that are equal</source>
-<target>Ocultar ficheiros iguais</target>
 
 <source>Show files that are equal</source>
 <target>Mostrar ficheiros iguais</target>
 
-<source>Hide files that are different</source>
-<target>Ocultar ficheiros diferentes</target>
-
 <source>Show files that are different</source>
 <target>Mostrar ficheiros diferentes</target>
-
-<source>Hide conflicts</source>
-<target>Ocultar conflitos</target>
 
 <source>Show conflicts</source>
 <target>Mostrar conflitos</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>Ocultar ficheiros a ser criados à esquerda</target>
-
 <source>Show files that will be created on the left side</source>
 <target>Mostrar ficheiros a ser criados à esquerda</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>Ocultar ficheiros a ser criados à direita</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Mostrar ficheiros a ser criados à direita</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>Ocultar ficheiros a ser apagados à esquerda</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>Mostrar ficheiros a ser apagados à esquerda</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>Ocultar ficheiros a ser apagados à direita</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Mostrar ficheiros a ser apagados à direita</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>Ocultar ficheiros a ser substituidos do lado esquerdo</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>Mostrar ficheiros a ser substituidos do lado esquerdo</target>
-
-<source>Hide files that will be overwritten on right side</source>
-<target>Ocultar ficheiros a ser substituidos do lado direito</target>
 
 <source>Show files that will be overwritten on right side</source>
 <target>Mostrar ficheiros a ser substituidos do lado direito</target>
 
-<source>Hide files that won't be copied</source>
-<target>Ocultar ficheiros que não serão copiados</target>
-
 <source>Show files that won't be copied</source>
 <target>Mostrar ficheiros que não serão copiados</target>
+
+<source>Set as default</source>
+<target>Definir como padrão</target>
 
 <source>All folders are in sync!</source>
 <target>Todas as pastas estão sincronizadas!</target>
@@ -971,14 +947,8 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>File list exported!</source>
 <target>Lista dos ficheiros exportada!</target>
 
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>Objecto eliminado com sucesso!</pluralform>
-<pluralform>%x objectos eliminados com sucesso!</pluralform>
-</target>
+<source>Searching for program updates...</source>
+<target>A procurar actualizações do programa...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1013,6 +983,9 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>&Ignore</source>
 <target>&Ignorar</target>
 
+<source>Don't show this warning again</source>
+<target>Não mostrar este aviso novamente</target>
+
 <source>&Switch</source>
 <target>&Trocar</target>
 
@@ -1030,9 +1003,6 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 
 <source>Comparing content...</source>
 <target>A comparar...</target>
-
-<source>Copy</source>
-<target>Copiar</target>
 
 <source>Paused</source>
 <target>Em pausa</target>
@@ -1116,34 +1086,37 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <target>Tornar visiveis os diálogos e avisos escondidos novamente?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Deseja mesmo mover o objecto para a Reciclagem?</pluralform>
-<pluralform>Deseja mesmo mover os %x objectos para a Reciclagem?</pluralform>
+<pluralform>Deseja mesmo mover o seguinte item para a Reciclagem?</pluralform>
+<pluralform>Deseja mesmo mover os seguintes %x itens para a Reciclagem?</pluralform>
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Deseja mesmo eliminar o seguinte objecto?</pluralform>
-<pluralform>Deseja mesmo eliminar os seguintes %x objectos?</pluralform>
+<pluralform>Deseja mesmo eliminar o seguinte item?</pluralform>
+<pluralform>Deseja mesmo eliminar os seguintes %x itens?</pluralform>
 </target>
 
 <source>Leave as unresolved conflict</source>
 <target>Deixar como conflito</target>
+
+<source>Time stamp</source>
+<target>Selo temporal</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Juntar selo temporal a cada nome de ficheiro</target>
 
 <source>Replace</source>
 <target>Substituir</target>
 
 <source>Move files and replace if existing</source>
 <target>Mover ficheiros e substituir se existirem</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Juntar selo temporal a cada nome de ficheiro</target>
 
 <source>Folder</source>
 <target>Pasta</target>
@@ -1259,6 +1232,12 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Cannot set privilege %x.</source>
 <target>Não é possível definir o privilégio %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Falha ao suspender o modo de hibernação do sistema.</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Não é possível alterar as prioridades de E / S do processo.</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Não é possível mover %x para a Reciclagem!</target>
 
@@ -1277,14 +1256,38 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Escolher direcção de sincronização por defeito: Os ficheiros antigos serão substituídos pelos novos.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>A verificar a disponibilidade da reciclagem para a pasta %x...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>Mover ficheiro %x para a Reciclagem</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>Mover pasta %x para a Reciclagem</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Mover link simbólico %x para a Reciclagem</target>
+
+<source>Deleting file %x</source>
+<target>Apagar ficheiro %x</target>
+
+<source>Deleting folder %x</source>
+<target>Apagar pasta %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Eliminar link simbólico %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Reciclagem não disponível para os seguintes caminhos! Os ficheiros serão apagados permanentemente:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Pode ignorar este erro para considerar a pasta como vazia.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>A pasta correspondente será considerada como vazia.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Não consigo encontrar a pasta %x.</target>
+<source>Cannot find the following folders:</source>
+<target>Não é possível encontrar as seguintes pastas:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Pode ignorar este erro para considerar cada pasta como vazia.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Directórios são dependentes! Cuidado ao definir as regras de sincronização:</target>
@@ -1292,8 +1295,8 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Start comparison</source>
 <target>Iniciar comparação</target>
 
-<source>Preparing synchronization...</source>
-<target>A preparar sincronização...</target>
+<source>Calculating sync directions...</source>
+<target>A calcular a direcção de sincronização...</target>
 
 <source>Conflict detected:</source>
 <target>Conflito detectado:</target>
@@ -1358,24 +1361,6 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 <source>Multiple...</source>
 <target>Multiplo...</target>
 
-<source>Deleting file %x</source>
-<target>Apagar ficheiro %x</target>
-
-<source>Deleting folder %x</source>
-<target>Apagar pasta %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Eliminar link simbólico %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Mover ficheiro %x para a Reciclagem</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Mover pasta %x para a Reciclagem</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Mover link simbólico %x para a Reciclagem</target>
-
 <source>Moving file %x to %y</source>
 <target>Mover ficheiro %x para %y</target>
 
@@ -1387,9 +1372,6 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 
 <source>Removing old versions...</source>
 <target>A remover versões antigas...</target>
-
-<source>Creating file %x</source>
-<target>Criar ficheiro %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Criar link simbólico %x</target>
@@ -1408,6 +1390,9 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 
 <source>Updating attributes of %x</source>
 <target>Actualizar atributos de %x</target>
+
+<source>Cannot find %x.</source>
+<target>Não é possível encontrar %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Directório de destino %x já existe.</target>
@@ -1453,6 +1438,9 @@ Nota: Nome dos ficheiros tem que ser relativo aos diretórios base!
 
 <source>Generating database...</source>
 <target>A gerar base de dados...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>A criar Volume Shadow Copy para %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Erro na verificação de dados: ficheiro fonte e de destino têm conteúdo diferente!</target>

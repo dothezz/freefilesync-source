@@ -69,11 +69,11 @@ ZEN_INIT_DETECT_MEMBER(insert) //
 template <typename T>
 struct IsStlContainer :
         StaticBool<
-        impl_2384343::HasMemberType_value_type    <T>::value &&
-        impl_2384343::HasMemberType_iterator      <T>::value &&
-        impl_2384343::HasMemberType_const_iterator<T>::value &&
-        impl_2384343::HasMember_begin             <T>::value &&
-        impl_2384343::HasMember_end               <T>::value &&
+        impl_2384343::HasMemberType_value_type    <T>::value&&
+        impl_2384343::HasMemberType_iterator      <T>::value&&
+        impl_2384343::HasMemberType_const_iterator<T>::value&&
+        impl_2384343::HasMember_begin             <T>::value&&
+        impl_2384343::HasMember_end               <T>::value&&
         impl_2384343::HasMember_insert            <T>::value> {};
 
 
@@ -89,9 +89,9 @@ ZEN_INIT_DETECT_MEMBER(second)  //
 template <typename T>
 struct IsStlPair :
         StaticBool<
-        impl_2384343::HasMemberType_first_type <T>::value &&
-        impl_2384343::HasMemberType_second_type<T>::value &&
-        impl_2384343::HasMember_first          <T>::value &&
+        impl_2384343::HasMemberType_first_type <T>::value&&
+        impl_2384343::HasMemberType_second_type<T>::value&&
+        impl_2384343::HasMember_first          <T>::value&&
         impl_2384343::HasMember_second         <T>::value> {};
 
 //######################################################################################

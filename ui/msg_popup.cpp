@@ -156,7 +156,7 @@ WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& mes
     SetTitle(_("Warning"));
     m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_warning"));
     m_textCtrlMessage->SetValue(messageText);
-    checkBoxDontShowAgain.SetLabel(_("Don't show this dialog again"));
+    checkBoxDontShowAgain.SetLabel(_("Don't show this warning again"));
     buttonIgnore.SetLabel(_("&Ignore"));
     buttonSwitch.SetLabel(_("&Switch"));
     //buttonIgnore.SetId(wxID_IGNORE); -> see comment in ErrorDlg

@@ -99,6 +99,8 @@ struct OptionalDialogs
     bool warningUnresolvedConflicts;
     bool warningDatabaseError;
     bool warningRecyclerMissing;
+    bool warningInputFieldEmpty;
+    bool warningDirectoryLockFailed;
     bool popupOnConfigChange;
     bool confirmSyncStart;
 };
@@ -124,7 +126,7 @@ struct ViewFilterDefault
     bool createLeft, createRight, updateLeft, updateRight, deleteLeft, deleteRight, doNothing; //action view
 };
 
-wxString getGlobalConfigFile();
+Zstring getGlobalConfigFile();
 
 struct XmlGlobalSettings
 {
@@ -173,6 +175,23 @@ struct XmlGlobalSettings
             cfgFileHistMax(30),
             folderHistMax(15),
             onCompletionHistoryMax(8),
+#ifdef FFS_WIN
+            defaultExclusionFilter(Zstr("\\System Volume Information\\") Zstr("\n")
+                                   Zstr("\\$Recycle.Bin\\")              Zstr("\n")
+                                   Zstr("\\RECYCLER\\")                  Zstr("\n")
+                                   Zstr("\\RECYCLED\\")                  Zstr("\n")
+                                   Zstr("*\\desktop.ini")                Zstr("\n")
+                                   Zstr("*\\thumbs.db")),
+#elif defined FFS_LINUX
+            defaultExclusionFilter(Zstr("/.Trash-*/") Zstr("\n")
+                                   Zstr("/.recycle/")),
+#elif defined FFS_MAC
+            defaultExclusionFilter(Zstr("/.fseventsd/")      Zstr("\n")
+                                   Zstr("/.Spotlight-V100/") Zstr("\n")
+                                   Zstr("/.Trashes/")        Zstr("\n")
+                                   Zstr("/._.Trashes")       Zstr("\n")
+                                   Zstr("*/.DS_Store")),
+#endif
             //deleteOnBothSides(false),
             useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
 #if defined FFS_WIN || defined FFS_MAC
@@ -218,10 +237,10 @@ struct XmlGlobalSettings
 
         ExternalApps externelApplications;
 
-        std::vector<wxString> cfgFileHistory;
+        std::vector<Zstring> cfgFileHistory;
         size_t cfgFileHistMax;
 
-        std::vector<wxString> lastUsedConfigFiles;
+        std::vector<Zstring> lastUsedConfigFiles;
 
         std::vector<Zstring> folderHistoryLeft;
         std::vector<Zstring> folderHistoryRight;
@@ -229,6 +248,8 @@ struct XmlGlobalSettings
 
         std::vector<std::wstring> onCompletionHistory;
         size_t onCompletionHistoryMax;
+
+        Zstring defaultExclusionFilter;
 
         //bool deleteOnBothSides;
         bool useRecyclerForManualDeletion;

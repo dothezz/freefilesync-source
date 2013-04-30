@@ -7,18 +7,19 @@
 #ifndef MAINDIALOG_H
 #define MAINDIALOG_H
 
-#include <memory>
 #include <map>
 #include <set>
-#include <wx/aui/aui.h>
-#include <zen/int64.h>
 #include <stack>
+#include <memory>
+#include <zen/int64.h>
+#include <zen/async_task.h>
+#include <wx+/file_drop.h>
+#include <wx/aui/aui.h>
 #include "gui_generated.h"
-#include "../lib/process_xml.h"
 #include "custom_grid.h"
 #include "tree_view.h"
-#include <wx+/file_drop.h>
 #include "folder_history_box.h"
+#include "../lib/process_xml.h"
 
 //class FolderHistory;
 class DirectoryPair;
@@ -30,14 +31,14 @@ class MainDialog : public MainDialogGenerated
 {
 public:
     //default behavior, application start
-    static void create(const std::vector<wxString>& cfgFileNames); //cfgFileNames empty: restore last config; non-empty load/merge given set of config files
+    static void create(const std::vector<Zstring>& cfgFileNames); //cfgFileNames empty: restore last config; non-empty load/merge given set of config files
 
     //load dynamically assembled config
     static void create(const xmlAccess::XmlGuiConfig& guiCfg, bool startComparison);
 
     //when switching language or switching from batch run to GUI on warnings
     static void create(const xmlAccess::XmlGuiConfig& guiCfg,
-                       const std::vector<wxString>& referenceFiles,
+                       const std::vector<Zstring>& referenceFiles,
                        const xmlAccess::XmlGlobalSettings& globalSettings, //take over ownership => save on exit
                        bool startComparison);
 
@@ -48,12 +49,12 @@ public:
 
 private:
     static void create_impl(const xmlAccess::XmlGuiConfig& guiCfg,
-                            const std::vector<wxString>& referenceFiles,
+                            const std::vector<Zstring>& referenceFiles,
                             const xmlAccess::XmlGlobalSettings& globalSettings,
                             bool startComparison);
 
     MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
-               const std::vector<wxString>& referenceFiles,
+               const std::vector<Zstring>& referenceFiles,
                const xmlAccess::XmlGlobalSettings& globalSettings, //take over ownership => save on exit
                bool startComparison);
     ~MainDialog();
@@ -69,33 +70,35 @@ private:
     friend class PanelMoveWindow;
 
     //configuration load/save
-    void setLastUsedConfig(const wxString& filename, const xmlAccess::XmlGuiConfig& guiConfig);
-    void setLastUsedConfig(const std::vector<wxString>& filenames, const xmlAccess::XmlGuiConfig& guiConfig);
+    void setLastUsedConfig(const Zstring& filename, const xmlAccess::XmlGuiConfig& guiConfig);
+    void setLastUsedConfig(const std::vector<Zstring>& filenames, const xmlAccess::XmlGuiConfig& guiConfig);
 
     xmlAccess::XmlGuiConfig getConfig() const;
-    void setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::vector<wxString>& referenceFiles);
+    void setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg, const std::vector<Zstring>& referenceFiles);
 
     void setGlobalCfgOnInit(const xmlAccess::XmlGlobalSettings& globalSettings); //messes with Maximize(), window sizes, so call just once!
     xmlAccess::XmlGlobalSettings getGlobalCfgBeforeExit(); //destructive "get" thanks to "Iconize(false), Maximize(false)"
 
-    bool loadConfiguration(const std::vector<wxString>& filenames); //return true if loaded successfully
+    bool loadConfiguration(const std::vector<Zstring>& filenames); //return true if loaded successfully
 
-    bool trySaveConfig     (const wxString* fileNameGui); //return true if saved successfully
-    bool trySaveBatchConfig(const wxString* fileNameBatch); //
+    bool trySaveConfig     (const Zstring* fileNameGui); //return true if saved successfully
+    bool trySaveBatchConfig(const Zstring* fileNameBatch); //
     bool saveOldConfig(); //return false on user abort
 
-    static const wxString& lastRunConfigName();
+    static const Zstring& lastRunConfigName();
 
     xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
     //used when saving configuration
-    std::vector<wxString> activeConfigFiles; //name of currently loaded config file (may be more than 1)
+    std::vector<Zstring> activeConfigFiles; //name of currently loaded config file (may be more than 1)
 
-    void updateFilterButtons(); //file exclusion
+    void updateGlobalFilterButton();
 
     void initViewFilterButtons();
     void setViewFilterDefault();
 
-    void addFileToCfgHistory(const std::vector<wxString>& filenames); //= update/insert + apply selection
+    void addFileToCfgHistory(const std::vector<Zstring>& filenames); //= update/insert + apply selection
+    void removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filenames);
+    void removeCfgHistoryItems(const std::vector<Zstring>& filenames);
 
     void addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
     void removeAddFolderPair(size_t pos);
@@ -117,19 +120,22 @@ private:
 
     void setSyncDirManually(const std::vector<zen::FileSystemObject*>& selection, zen::SyncDirection direction);
     void setFilterManually(const std::vector<zen::FileSystemObject*>& selection, bool setIncluded);
-    void copySelectionToClipboard();
+    void copySelectionToClipboard(const std::vector<const zen::Grid*>& gridRefs);
     void deleteSelectedFiles(const std::vector<zen::FileSystemObject*>& selectionLeft,
                              const std::vector<zen::FileSystemObject*>& selectionRight);
 
     void openExternalApplication(const wxString& commandline, const std::vector<zen::FileSystemObject*>& selection, bool leftSide); //selection may be empty
 
-    //work to be done in idle time
-    void OnIdleEvent(wxEvent& event);
+    //don't use wxWidgets idle handling => repeated idle requests/consumption hogs 100% cpu!
+    void startProcessingAsyncTasks() { timerForAsyncTasks.Start(50); } //timer interval in [ms]
+    void onProcessAsyncTasks(wxEvent& event);
 
     //status bar supports one of the following two states at a time:
     void setStatusBarFullText(const wxString& msg);
     void setStatusBarFileStatistics(size_t filesOnLeftView, size_t foldersOnLeftView, size_t filesOnRightView, size_t foldersOnRightView, zen::UInt64 filesizeLeftView, zen::UInt64 filesizeRightView);
+
     void flashStatusInformation(const wxString& msg); //temporarily show different status (only valid for setStatusBarFullText)
+    void restoreStatusInformation();                  //called automatically after a few seconds
 
     //events
     void onGridButtonEventL(wxKeyEvent& event);
@@ -225,6 +231,7 @@ private:
     virtual void OnMenuGlobalSettings(wxCommandEvent& event);
     virtual void OnMenuExportFileList(wxCommandEvent& event);
     virtual void OnMenuCheckVersion  (wxCommandEvent& event);
+    virtual void OnMenuCheckVersionAutomatically(wxCommandEvent& event);
     virtual void OnMenuAbout         (wxCommandEvent& event);
     virtual void OnShowHelp          (wxCommandEvent& event);
     virtual void OnMenuQuit          (wxCommandEvent& event) { Close(); }
@@ -263,8 +270,7 @@ private:
 
     //***********************************************
     //status information
-    wxLongLong lastStatusChange;
-    std::unique_ptr<wxString> oldStatusMsg;
+    std::list<wxString> oldStatusMsgs; //the first one is the original/non-flash status message
 
     //compare status panel (hidden on start, shown when comparing)
     std::unique_ptr<CompareProgressDialog> compareStatus; //always bound
@@ -285,6 +291,12 @@ private:
 
     std::shared_ptr<FolderHistory> folderHistoryLeft;  //shared by all wxComboBox dropdown controls
     std::shared_ptr<FolderHistory> folderHistoryRight; //always bound!
+
+    //schedule and run long-running tasks asynchronously, but process results on GUI queue
+    zen::AsyncTasks asyncTasks;
+    wxTimer timerForAsyncTasks; //don't use wxWidgets idle handling => repeated idle requests/consumption hogs 100% cpu!
+
+    std::unique_ptr<zen::FilterConfig> filterCfgOnClipboard; //copy/paste of filter config
 };
 
 #endif // MAINDIALOG_H

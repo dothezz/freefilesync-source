@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Gesamtzeit:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>Die Verzeichnissperre für %x kann nicht gesetzt werden.</target>
+
 <source>Show in Explorer</source>
 <target>Im Explorer anzeigen</target>
 
@@ -60,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Filtereinstellungen löschen</target>
+
+<source>Copy</source>
+<target>Kopieren</target>
+
+<source>Paste</source>
+<target>Einfügen</target>
 
 <source>Save as batch job</source>
 <target>Als Batch-Job speichern</target>
@@ -160,9 +169,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Warte während Verzeichnis gesperrt ist (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Die Verzeichnissperre %x kann nicht gesetzt werden.</target>
-
 <source>Creating file %x</source>
 <target>Erstelle Datei %x</target>
 
@@ -196,9 +202,6 @@
 <source>/sec</source>
 <target>/s</target>
 
-<source>Cannot find file %x.</source>
-<target>Die Datei %x wurde nicht gefunden.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Die Datei %x enthält keine gültige Konfiguration.</target>
 
@@ -222,6 +225,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Die folgenden XML-Elemente können nicht gelesen werden:</target>
+
+<source>Cannot find file %x.</source>
+<target>Die Datei %x wurde nicht gefunden.</target>
 
 <source>&Open...</source>
 <target>Ö&ffnen...</target>
@@ -456,8 +462,14 @@ Die Befehlszeile wird ausgelöst wenn:
 <source>&Advanced</source>
 <target>&Erweitert</target>
 
-<source>&Check for new version</source>
-<target>&Auf neuere Version prüfen</target>
+<source>&Check now</source>
+<target>&Jetzt prüfen</target>
+
+<source>Check &automatically once a week</source>
+<target>&Automatisch wöchentlich prüfen</target>
+
+<source>Check for new version</source>
+<target>Auf neuere Version prüfen</target>
 
 <source>Compare</source>
 <target>Vergleichen</target>
@@ -603,8 +615,8 @@ gleich ist
 <source><- Two way -></source>
 <target><- Zwei Wege -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identifiziere und propagiere Änderungen auf beiden Seiten mit Hilfe einer Datenbank. Löschungen, Umbenennungen und Konflikte werden automatisch erkannt.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identifiziere und propagiere Änderungen auf beiden Seiten. Löschungen, Verschiebungen und Konflikte werden automatisch mit Hilfe einer Datenbank erkannt.</target>
 
 <source>Mirror ->></source>
 <target>Spiegeln ->></target>
@@ -642,14 +654,11 @@ gleich ist
 <source>Versioning</source>
 <target>Versionierung</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Dateien mit Zeitstempel in den angegebenen Ordner verschieben</target>
+<source>Move files to user-defined folder</source>
+<target>Dateien in den benutzerdefinierten Ordner verschieben</target>
 
 <source>Naming convention:</source>
 <target>Namenskonvention:</target>
-
-<source>Configuration</source>
-<target>Konfiguration</target>
 
 <source>Item exists on left side only</source>
 <target>Element existiert nur links</target>
@@ -729,8 +738,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Maximum</source>
 <target>Maximum</target>
 
-<source>&Default</source>
-<target>&Standard</target>
+<source>&Clear</source>
+<target>&Löschen</target>
 
 <source>Fail-safe file copy</source>
 <target>Dateien ausfallsicher kopieren</target>
@@ -758,6 +767,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Description</source>
 <target>Beschreibung</target>
+
+<source>&Default</source>
+<target>&Standard</target>
 
 <source>Start synchronization</source>
 <target>Synchronisation starten</target>
@@ -791,6 +803,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Overview</source>
 <target>Übersicht</target>
+
+<source>Configuration</source>
+<target>Konfiguration</target>
 
 <source>Filter files</source>
 <target>Dateien filtern</target>
@@ -876,86 +891,44 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Configuration loaded!</source>
 <target>Konfiguration geladen!</target>
 
-<source>Hide files that exist on left side only</source>
-<target>Nur links existierende Dateien ausblenden</target>
-
 <source>Show files that exist on left side only</source>
 <target>Nur links existierende Dateien anzeigen</target>
-
-<source>Hide files that exist on right side only</source>
-<target>Nur rechts existierende Dateien ausblenden</target>
 
 <source>Show files that exist on right side only</source>
 <target>Nur rechts existierende Dateien anzeigen</target>
 
-<source>Hide files that are newer on left</source>
-<target>Auf beiden Seiten existierende Dateien ausblenden; linke Datei ist neuer</target>
-
 <source>Show files that are newer on left</source>
 <target>Auf beiden Seiten existierende Dateien anzeigen; linke Datei ist neuer</target>
-
-<source>Hide files that are newer on right</source>
-<target>Auf beiden Seiten existierende Dateien ausblenden; rechte Datei ist neuer</target>
 
 <source>Show files that are newer on right</source>
 <target>Auf beiden Seiten existierende Dateien anzeigen; rechte Datei ist neuer</target>
 
-<source>Hide files that are equal</source>
-<target>Gleiche Dateien ausblenden</target>
-
 <source>Show files that are equal</source>
 <target>Gleiche Dateien anzeigen</target>
-
-<source>Hide files that are different</source>
-<target>Ungleiche Dateien ausblenden</target>
 
 <source>Show files that are different</source>
 <target>Ungleiche Dateien anzeigen</target>
 
-<source>Hide conflicts</source>
-<target>Konflikte ausblenden</target>
-
 <source>Show conflicts</source>
 <target>Konflikte zeigen</target>
-
-<source>Hide files that will be created on the left side</source>
-<target>Dateien die links erstellt werden ausblenden</target>
 
 <source>Show files that will be created on the left side</source>
 <target>Dateien die links erstellt werden anzeigen</target>
 
-<source>Hide files that will be created on the right side</source>
-<target>Dateien die rechts erstellt werden ausblenden</target>
-
 <source>Show files that will be created on the right side</source>
 <target>Dateien die rechts erstellt werden anzeigen</target>
-
-<source>Hide files that will be deleted on the left side</source>
-<target>Dateien die links gelöscht werden ausblenden</target>
 
 <source>Show files that will be deleted on the left side</source>
 <target>Dateien die links gelöscht werden anzeigen</target>
 
-<source>Hide files that will be deleted on the right side</source>
-<target>Dateien die rechts gelöscht werden ausblenden</target>
-
 <source>Show files that will be deleted on the right side</source>
 <target>Dateien die rechts gelöscht werden anzeigen</target>
-
-<source>Hide files that will be overwritten on left side</source>
-<target>Dateien die links überschrieben werden ausblenden</target>
 
 <source>Show files that will be overwritten on left side</source>
 <target>Dateien die links überschrieben werden anzeigen</target>
 
-<source>Hide files that will be overwritten on right side</source>
-<target>Dateien die rechts überschrieben werden ausblenden</target>
-
 <source>Show files that will be overwritten on right side</source>
 <target>Dateien die rechts überschrieben werden anzeigen</target>
-
-<source>Hide files that won't be copied</source>
-<target>Dateien die nicht kopiert werden ausblenden</target>
 
 <source>Show files that won't be copied</source>
 <target>Dateien die nicht kopiert werden anzeigen</target>
@@ -974,6 +947,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>File list exported!</source>
 <target>Dateiliste exportiert!</target>
+
+<source>Searching for program updates...</source>
+<target>Suche nach aktualisierten Programmversionen...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1008,6 +984,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>&Ignore</source>
 <target>&Ignorieren</target>
 
+<source>Don't show this warning again</source>
+<target>Diese Warnung nicht mehr anzeigen</target>
+
 <source>&Switch</source>
 <target>&Wechseln</target>
 
@@ -1025,9 +1004,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Comparing content...</source>
 <target>Vergleiche Dateiinhalt...</target>
-
-<source>Copy</source>
-<target>Kopieren</target>
 
 <source>Paused</source>
 <target>Angehalten</target>
@@ -1111,8 +1087,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <target>Versteckte Warnungen und Dialoge wieder sichtbar machen?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
 <pluralform>Soll das folgende Element wirklich in den Papierkorb verschoben werden?</pluralform>
@@ -1120,8 +1096,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
 <pluralform>Soll das folgende Element wirklich gelöscht werden?</pluralform>
@@ -1131,14 +1107,17 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Leave as unresolved conflict</source>
 <target>Als unbehandelten Konflikt belassen</target>
 
+<source>Time stamp</source>
+<target>Zeitstempel</target>
+
 <source>Append a timestamp to each file name</source>
-<target>Einen Zeitstempel an jeden Dateinamen hinzufügen</target>
+<target>Einen Zeitstempel an jeden Dateinamen anhängen</target>
 
 <source>Replace</source>
 <target>Ersetzen</target>
 
 <source>Move files and replace if existing</source>
-<target>Dateien verschieben und bereits vorhandene ersetzen</target>
+<target>Dateien verschieben und vorhandene ersetzen</target>
 
 <source>Folder</source>
 <target>Ordner</target>
@@ -1151,6 +1130,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Files</source>
 <target>Dateien</target>
+
+<source>Items</source>
+<target>Elemente</target>
 
 <source>Percentage</source>
 <target>Prozent</target>
@@ -1302,11 +1284,14 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Der Papierkorb ist für die folgenden Pfade nicht verfügbar! Die Dateien werden stattdessen permanent gelöscht:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Dieser Fehler kann ignoriert werden, um die Ordner als leer anzusehen.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>Der entsprechende Ordner wird als leer angesehen.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Die folgenden Ordner wurden nicht gefunden:</target>
+
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>Dieser Fehler kann ignoriert werden, um die Ordner als leer anzusehen. Die Ordner werden dann beim Synchronisieren automatisch erstellt.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationsregeln:</target>
@@ -1314,8 +1299,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 <source>Start comparison</source>
 <target>Starte Vergleich</target>
 
-<source>Preparing synchronization...</source>
-<target>Bereite Synchronisation vor...</target>
+<source>Calculating sync directions...</source>
+<target>Berechne Synchronisationsrichtungen...</target>
 
 <source>Conflict detected:</source>
 <target>Ein Konflikt wurde erkannt:</target>
@@ -1457,6 +1442,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein!
 
 <source>Generating database...</source>
 <target>Erzeuge Synchronisationsdatenbank...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Erstelle Volumenschattenkopie für %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Verifizierungsfehler: Quell- und Zieldatei haben unterschiedlichen Inhalt!</target>

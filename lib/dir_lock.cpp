@@ -98,7 +98,7 @@ public:
                                 FILE_END))  //__in       DWORD dwMoveMethod
             return;
 
-        DWORD bytesWritten = 0;
+        DWORD bytesWritten = 0; //this parameter is NOT optional: http://blogs.msdn.com/b/oldnewthing/archive/2013/04/04/10407417.aspx
         /*bool rv = */
         ::WriteFile(fileHandle,    //__in         HANDLE hFile,
                     buffer,        //__out        LPVOID lpBuffer,
@@ -375,7 +375,7 @@ LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw FileError,
     }
     catch (UnexpectedEndOfStreamError&)
     {
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(lockfilename)));
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(lockfilename)) + L" (unexpected end of stream)");
     }
 }
 
@@ -535,7 +535,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
             lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
             return false;
         else
-            throw FileError(replaceCpy(_("Cannot set directory lock %x."), L"%x", fmtFileName(lockfilename)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilename)) + L"\n\n" + zen::getLastErrorFormatted());
     }
     ::CloseHandle(fileHandle);
 
@@ -550,7 +550,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
         if (errno == EEXIST)
             return false;
         else
-            throw FileError(replaceCpy(_("Cannot set directory lock %x."), L"%x", fmtFileName(lockfilename)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilename)) + L"\n\n" + zen::getLastErrorFormatted());
     }
     ::close(fileHandle);
 #endif

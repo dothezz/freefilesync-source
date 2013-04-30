@@ -196,17 +196,17 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
             //remaining time and speed: only visible during binary comparison
             if (perf)
             {
-                if (numeric::dist(lastStatCallSpeed, timeElapsed.Time()) >= 500)
+                const long timeNow = timeElapsed.Time();
+                if (numeric::dist(lastStatCallSpeed, timeNow) >= 500)
                 {
-                    lastStatCallSpeed = timeElapsed.Time();
+                    lastStatCallSpeed = timeNow;
 
-                    perf->addSample(objectsCurrent, to<double>(dataCurrent), timeElapsed.Time());
+                    perf->addSample(objectsCurrent, to<double>(dataCurrent), timeNow);
 
                     //current speed -> Win 7 copy uses 1 sec update interval
                     setText(*m_staticTextSpeed, perf->getBytesPerSecond(), &layoutChanged);
                 }
 
-                warn_static("more often: eveyr 100 ms?")
                 //remaining time
                 setText(*m_staticTextRemTime, perf->getRemainingTime(to<double>(dataTotal - dataCurrent)), &layoutChanged);
             }
@@ -1257,11 +1257,12 @@ void SyncProgressDialog::Pimpl::updateGui(bool allowYield)
             assert(perf);
             if (perf)
             {
-                if (numeric::dist(lastStatCallSpeed, timeElapsed.Time()) >= 500)
+                const long timeNow = timeElapsed.Time();
+                if (numeric::dist(lastStatCallSpeed, timeNow) >= 500)
                 {
-                    lastStatCallSpeed = timeElapsed.Time();
+                    lastStatCallSpeed = timeNow;
 
-                    perf->addSample(objectsCurrent, to<double>(dataCurrent), timeElapsed.Time());
+                    perf->addSample(objectsCurrent, to<double>(dataCurrent), timeNow);
 
                     //current speed -> Win 7 copy uses 1 sec update interval
                     setText(*m_staticTextSpeed, perf->getBytesPerSecond(), &layoutChanged);
@@ -1617,6 +1618,7 @@ void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const Er
 
 void SyncProgressDialog::Pimpl::OnOkay(wxCommandEvent& event)
 {
+    isZombie = true; //on Fedora the iconize event is executed *before* entering SyncProgressDialog::Pimpl::OnClose()!!!
     Close(); //generate close event: do NOT destroy window unconditionally!
 }
 
@@ -1726,7 +1728,9 @@ SyncProgressDialog::SyncProgressDialog(AbortCallback& abortCb,
     if (showProgress)
     {
         pimpl->Show();
-        pimpl->updateGui(false); //clear gui flicker, remove dummy texts: window must be visible to make this work!
+        warn_static("problem??")
+        //clear gui flicker, remove dummy texts: window must be visible to make this work!
+        pimpl->updateGui(true); //at least on OS X a real Yield() is required to flush pending GUI updates; Update() is not enough
     }
     else
         pimpl->minimizeToTray();

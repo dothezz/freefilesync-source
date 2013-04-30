@@ -522,6 +522,7 @@ Zstring DeletionHandling::getOrCreateRecyclerTempDirPf() //throw FileError
 }
 #endif
 
+
 void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError
 {
     if (!cleanedUp)
@@ -562,6 +563,7 @@ void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError
         cleanedUp = true;
     }
 }
+
 
 namespace
 {
@@ -2429,7 +2431,12 @@ FileAttrib SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj,
         try
         {
             //contains prefix: E.g. "\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Program Files\FFS\sample.dat"
-            source = shadowCopyHandler_->makeShadowCopy(source); //throw FileError
+            source = shadowCopyHandler_->makeShadowCopy(source,  //throw FileError
+                                                        [&](const Zstring& volumeName)
+            {
+                procCallback_.reportStatus(replaceCpy(_("Creating Volume Shadow Copy for %x..."), L"%x", fmtFileName(volumeName)));
+                procCallback_.forceUiRefresh();
+            });
         }
         catch (const FileError& e2)
         {

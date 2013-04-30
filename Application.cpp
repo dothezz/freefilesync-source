@@ -6,7 +6,7 @@
 
 #include "application.h"
 #include <memory>
-#include "ui/main_dlg.h"
+#include <zen/file_handling.h>
 #include <wx/msgdlg.h>
 #include <wx/tooltip.h> //wxWidgets v2.9
 #include <wx/log.h>
@@ -17,9 +17,9 @@
 #include "synchronization.h"
 #include "ui/batch_status_handler.h"
 #include "ui/check_version.h"
+#include "ui/main_dlg.h"
 #include "ui/switch_to_gui.h"
 #include "lib/resources.h"
-#include "lib/lock_holder.h"
 #include "lib/process_xml.h"
 #include "lib/error_log.h"
 
@@ -58,13 +58,13 @@ void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* functi
 #endif
 
 
-std::vector<wxString> getCommandlineArgs(const wxApp& app)
+std::vector<Zstring> getCommandlineArgs(const wxApp& app)
 {
-    std::vector<wxString> args;
+    std::vector<Zstring> args;
 #ifdef FFS_WIN
     //we do the job ourselves! both wxWidgets and ::CommandLineToArgvW() parse "C:\" "D:\" as single line C:\" D:\"
     //-> "solution": we just don't support protected quotation mark!
-    std::wstring cmdLine = ::GetCommandLine(); //only way to get a unicode commandline
+    Zstring cmdLine = ::GetCommandLine(); //only way to get a unicode commandline
     while (endsWith(cmdLine, L' ')) //may end with space
         cmdLine.resize(cmdLine.size() - 1);
 
@@ -74,7 +74,7 @@ std::vector<wxString> getCommandlineArgs(const wxApp& app)
         {
             if (iterStart != cmdLine.end())
             {
-                args.push_back(std::wstring(iterStart, it));
+                args.push_back(Zstring(iterStart, it));
                 iterStart = cmdLine.end(); //expect consecutive blanks!
             }
         }
@@ -92,21 +92,21 @@ std::vector<wxString> getCommandlineArgs(const wxApp& app)
             }
         }
     if (iterStart != cmdLine.end())
-        args.push_back(std::wstring(iterStart, cmdLine.end()));
+        args.push_back(Zstring(iterStart, cmdLine.end()));
 
     if (!args.empty())
         args.erase(args.begin()); //remove first argument which is exe path by convention: http://blogs.msdn.com/b/oldnewthing/archive/2006/05/15/597984.aspx
 
     std::for_each(args.begin(), args.end(),
-                  [](wxString& str)
+                  [](Zstring& str)
     {
         if (str.size() >= 2 && startsWith(str, L'\"') && endsWith(str, L'\"'))
-            str = wxString(str.c_str() + 1, str.size() - 2);
+            str = Zstring(str.c_str() + 1, str.size() - 2);
     });
 
 #else
     for (int i = 1; i < app.argc; ++i) //wxWidgets screws up once again making "argv implicitly convertible to a wxChar**" in 2.9.3,
-        args.push_back(app.argv[i]);   //so we are forced to use this pitiful excuse for a range construction!!
+        args.push_back(toZ(wxString(app.argv[i])));   //so we are forced to use this pitiful excuse for a range construction!!
 #endif
     return args;
 }
@@ -165,7 +165,7 @@ void Application::onEnterEventLoop(wxEvent& event)
     Disconnect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
 
     //determine FFS mode of operation
-    std::vector<wxString> commandArgs = getCommandlineArgs(*this);
+    std::vector<Zstring> commandArgs = getCommandlineArgs(*this);
     launch(commandArgs);
 }
 
@@ -257,11 +257,11 @@ void Application::onQueryEndSession(wxEvent& event)
 
 
 void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg);
-void runGuiMode(const std::vector<wxString>& cfgFileName);
+void runGuiMode(const std::vector<Zstring>& cfgFileName);
 void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode);
 
 
-void Application::launch(const std::vector<wxString>& commandArgs)
+void Application::launch(const std::vector<Zstring>& commandArgs)
 {
     //wxWidgets app exit handling is weird... we want the app to exit only if the logical main window is closed
     wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
@@ -279,7 +279,7 @@ void Application::launch(const std::vector<wxString>& commandArgs)
         runGuiMode(commandArgs);
     else
     {
-        const bool gotDirNames = std::any_of(commandArgs.begin(), commandArgs.end(), [](const wxString& dirname) { return dirExists(toZ(dirname)); });
+        const bool gotDirNames = std::any_of(commandArgs.begin(), commandArgs.end(), [](const Zstring& dirname) { return dirExists(dirname); });
         if (gotDirNames) //mode 1: create temp configuration based on directory names passed
         {
             XmlGuiConfig guiCfg;
@@ -299,27 +299,27 @@ void Application::launch(const std::vector<wxString>& commandArgs)
                 }
 
                 if (index % 2 == 0)
-                    fp->leftDirectory = toZ(*it);
+                    fp->leftDirectory = *it;
                 else
-                    fp->rightDirectory = toZ(*it);
+                    fp->rightDirectory = *it;
             }
 
             runGuiMode(guiCfg);
         }
         else //mode 2: try to set config/batch-filename set by %1 parameter
         {
-            std::vector<wxString> argsTmp = commandArgs;
+            std::vector<Zstring> argsTmp = commandArgs;
 
             for (auto it = argsTmp.begin(); it != argsTmp.end(); ++it)
             {
-                const Zstring& filename = toZ(*it);
+                const Zstring& filename = *it;
 
                 if (!fileExists(filename)) //...be a little tolerant
                 {
                     if (fileExists(filename + Zstr(".ffs_batch")))
-                        *it += L".ffs_batch";
+                        *it += Zstr(".ffs_batch");
                     else if (fileExists(filename + Zstr(".ffs_gui")))
-                        *it += L".ffs_gui";
+                        *it += Zstr(".ffs_gui");
                     else
                     {
                         wxMessageBox(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)), _("Error"), wxOK | wxICON_ERROR);
@@ -328,11 +328,11 @@ void Application::launch(const std::vector<wxString>& commandArgs)
                 }
             }
 
-            switch (getMergeType(toZ(argsTmp))) //throw ()
+            switch (getMergeType(argsTmp)) //throw ()
             {
                 case MERGE_BATCH: //pure batch config files
                     if (argsTmp.size() == 1)
-                        runBatchMode(utfCvrtTo<Zstring>(argsTmp[0]), returnCode);
+                        runBatchMode(argsTmp[0], returnCode);
                     else
                         runGuiMode(argsTmp);
                     break;
@@ -345,13 +345,13 @@ void Application::launch(const std::vector<wxString>& commandArgs)
                 case MERGE_OTHER: //= none or unknown;
                     //argsTmp are not empty and contain at least one non-gui/non-batch config file: find it!
                     std::find_if(argsTmp.begin(), argsTmp.end(),
-                                 [](const wxString& filename) -> bool
+                                 [](const Zstring& filename) -> bool
                     {
-                        switch (getXmlType(toZ(filename))) //throw()
+                        switch (getXmlType(filename)) //throw()
                         {
                             case XML_TYPE_GLOBAL:
                             case XML_TYPE_OTHER:
-                                wxMessageBox(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(toZ(filename))), _("Error"), wxOK | wxICON_ERROR);
+                                wxMessageBox(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)), _("Error"), wxOK | wxICON_ERROR);
                                 return true;
 
                             case XML_TYPE_GUI:
@@ -373,7 +373,7 @@ void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg)
 }
 
 
-void runGuiMode(const std::vector<wxString>& cfgFileNames)
+void runGuiMode(const std::vector<Zstring>& cfgFileNames)
 {
     MainDialog::create(cfgFileNames);
 }
@@ -407,12 +407,13 @@ void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
     XmlGlobalSettings globalCfg;
     try
     {
-        if (fileExists(toZ(getGlobalConfigFile())))
+        if (fileExists(getGlobalConfigFile()))
             readConfig(globalCfg); //throw FfsXmlError
         //else: globalCfg already has default values
     }
     catch (const xmlAccess::FfsXmlError& e)
     {
+        assert(false);
         if (e.getSeverity() != FfsXmlError::WARNING) //ignore parsing errors: should be migration problems only *cross-fingers*
             return notifyError(e.toString()); //abort sync!
     }
@@ -438,7 +439,7 @@ void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
 
         const TimeComp timeStamp = localTime();
 
-        const SwitchToGui switchBatchToGui(utfCvrtTo<wxString>(filename), batchCfg, globalCfg); //prepare potential operational switch
+        const SwitchToGui switchBatchToGui(filename, batchCfg, globalCfg); //prepare potential operational switch
 
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(batchCfg.showProgress, //throw BatchAbortProcess
@@ -467,19 +468,7 @@ void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
         }
 
         //batch mode: place directory locks on directories during both comparison AND synchronization
-
-        std::unique_ptr<LockHolder> dummy;
-        if (globalCfg.createLockFile)
-        {
-            std::vector<Zstring> dirnames;
-            std::for_each(cmpConfig.begin(), cmpConfig.end(),
-                          [&](const FolderPairCfg& fpCfg)
-            {
-                dirnames.push_back(fpCfg.leftDirectoryFmt);
-                dirnames.push_back(fpCfg.rightDirectoryFmt);
-            });
-            dummy = make_unique<LockHolder>(dirnames, statusHandler, allowPwPrompt);
-        }
+        std::unique_ptr<LockHolder> dirLocks;
 
         //COMPARE DIRECTORIES
         FolderComparison folderCmp;
@@ -487,6 +476,8 @@ void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
                 globalCfg.optDialogs,
                 allowPwPrompt,
                 globalCfg.runWithBackgroundPriority,
+                globalCfg.createLockFile,
+                dirLocks,
                 cmpConfig,
                 folderCmp,
                 statusHandler);

@@ -19,28 +19,30 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
     std::string stream;
     try
     {
+        FileInput inputFile(filename); //throw FileError
         {
             //quick test whether input is an XML: avoid loading large binary files up front!
             const std::string xmlBegin = "<?xml version=";
-            std::vector<char> buffer(xmlBegin.size() + sizeof(zen::BYTE_ORDER_MARK_UTF8));
+            stream.resize(strLength(zen::BYTE_ORDER_MARK_UTF8) + xmlBegin.size());
 
-            FileInput inputFile(filename); //throw FileError
-            const size_t bytesRead = inputFile.read(&buffer[0], buffer.size()); //throw FileError
+            const size_t bytesRead = inputFile.read(&stream[0], stream.size()); //throw FileError
+            stream.resize(bytesRead);
 
-            const std::string fileBegin(&buffer[0], bytesRead);
-
-            if (!startsWith(fileBegin, xmlBegin) &&
-                !startsWith(fileBegin, zen::BYTE_ORDER_MARK_UTF8 + xmlBegin)) //respect BOM!
+            if (!startsWith(stream, xmlBegin) &&
+                !startsWith(stream, zen::BYTE_ORDER_MARK_UTF8 + xmlBegin)) //respect BOM!
                 throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
         }
 
-        const zen::UInt64 fs = zen::getFilesize(filename); //throw FileError
-        stream.resize(to<size_t>(fs));
+        const size_t blockSize = 128 * 1024;
+        do
+        {
+            stream.resize(stream.size() + blockSize);
 
-        FileInput inputFile(filename); //throw FileError
-        const size_t bytesRead = inputFile.read(&stream[0], stream.size()); //throw FileError
-        if (bytesRead < to<size_t>(fs))
-            throw FfsXmlError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename)));
+            const size_t bytesRead = inputFile.read(&*stream.begin() + stream.size() - blockSize, blockSize); //throw FileError
+            if (bytesRead < blockSize)
+                stream.resize(stream.size() - (blockSize - bytesRead)); //caveat: unsigned arithmetics
+        }
+        while (!inputFile.eof());
     }
     catch (const FileError& error)
     {
@@ -62,16 +64,14 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
 }
 
 
-const std::wstring xmlAccess::getErrorMessageFormatted(const XmlIn& in)
+const std::wstring xmlAccess::getErrorMessageFormatted(const std::vector<std::wstring>& failedElements)
 {
     std::wstring msg;
 
-    const auto& failedElements = in.getErrorsAs<std::wstring>();
     if (!failedElements.empty())
     {
         msg = _("Cannot read the following XML elements:") + L"\n";
-        std::for_each(failedElements.begin(), failedElements.end(),
-        [&](const std::wstring& elem) { msg += L"\n" + elem; });
+        std::for_each(failedElements.begin(), failedElements.end(), [&](const std::wstring& elem) { msg += L"\n" + elem; });
     }
 
     return msg;

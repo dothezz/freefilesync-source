@@ -233,12 +233,10 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     setRelativeFontSize(*m_toggleBtnMirror,    1.25);
     setRelativeFontSize(*m_toggleBtnUpdate,    1.25);
     setRelativeFontSize(*m_toggleBtnCustom,    1.25);
-    setRelativeFontSize(*m_staticTextHeaderCategory, 0.90);
-    setRelativeFontSize(*m_staticTextHeaderAction,   0.90);
 
     enumVersioningStyle.
-    add(VER_STYLE_ADD_TIMESTAMP, _("Versioning"), _("Append a timestamp to each file name")).
-    add(VER_STYLE_REPLACE,       _("Replace"),    _("Move files and replace if existing"));
+    add(VER_STYLE_ADD_TIMESTAMP, _("Time stamp"), _("Append a timestamp to each file name")).
+    add(VER_STYLE_REPLACE,       _("Replace"),        _("Move files and replace if existing"));
 
     //hide controls for optional parameters
     if (!handleError && !execWhenFinished) //currently either both or neither are bound!

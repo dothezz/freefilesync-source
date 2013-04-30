@@ -359,11 +359,12 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
                                             sizeof(fileInfo), //UINT cbFileInfo,
                                             SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES)) //UINT uFlags
     {
+        (void)imgList;
         //imgList->Release(); //empiric study: crash on XP if we release this! Seems we do not own it... -> also no GDI leak on Win7 -> okay
         //another comment on http://msdn.microsoft.com/en-us/library/bb762179(v=VS.85).aspx describes exact same behavior on Win7/XP
 
-        //Quote: "The IImageList pointer type, such as that returned in the ppv parameter, can be cast as an HIMAGELIST as
-        //        needed; for example, for use in a list view. Conversely, an HIMAGELIST can be cast as a pointer to an IImageList."
+        //Quote: "The IImageList pointer type, such as that returned in the ppv parameter, can be cast as an HIMAGELIST as needed;
+        //        for example, for use in a list view. Conversely, an HIMAGELIST can be cast as a pointer to an IImageList."
         //http://msdn.microsoft.com/en-us/library/windows/desktop/bb762185(v=vs.85).aspx
 
 #ifndef SFGAO_LINK //Shobjidl.h

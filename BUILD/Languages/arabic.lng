@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>مجموع الوقت:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target></target>
+
 <source>Show in Explorer</source>
 <target>إظهار في المستكشف</target>
 
@@ -60,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>مسح إعدادات عامل التصفية</target>
+
+<source>Copy</source>
+<target>نسخ</target>
+
+<source>Paste</source>
+<target></target>
 
 <source>Save as batch job</source>
 <target>حفظ كمهمة دفعية</target>
@@ -164,9 +173,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>في انتظار تأمين قفل للمسار (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>لا يمكن تعيين قفل للمسار %x.</target>
-
 <source>Creating file %x</source>
 <target>إنشاء الملف %x</target>
 
@@ -208,9 +214,6 @@
 <source>/sec</source>
 <target>\ثانية</target>
 
-<source>Cannot find file %x.</source>
-<target>لا يمكن العثور على الملف  %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>لا يحتوي الملف %x تكويناً صحيحاً.</target>
 
@@ -234,6 +237,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>لا يمكن قراءة عناصر XML التالية:</target>
+
+<source>Cannot find file %x.</source>
+<target>لا يمكن العثور على الملف  %x.</target>
 
 <source>&Open...</source>
 <target>&فتح...</target>
@@ -468,8 +474,14 @@ The command is triggered if:
 <source>&Advanced</source>
 <target>&متقدم</target>
 
-<source>&Check for new version</source>
-<target>&التحقق من وجود إصدار جديد</target>
+<source>&Check now</source>
+<target></target>
+
+<source>Check &automatically once a week</source>
+<target></target>
+
+<source>Check for new version</source>
+<target></target>
 
 <source>Compare</source>
 <target>قارن</target>
@@ -615,8 +627,8 @@ is the same
 <source><- Two way -></source>
 <target><- بالاتجاهين -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>تحديد التغييرات في كلا الجانبين باستخدام قواعد بيانات. حيث يتم الكشف عن عمليات الحذف وإعادة التسمية والاختلافات بشكل تلقائي.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target></target>
 
 <source>Mirror ->></source>
 <target>انعكاس ->></target>
@@ -654,14 +666,11 @@ is the same
 <source>Versioning</source>
 <target>الوسم برقم الإصدار</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>نقل الملفات المحددة بختم زمني إلى المجلد المحدد</target>
+<source>Move files to user-defined folder</source>
+<target></target>
 
 <source>Naming convention:</source>
 <target>اصطلاح التسمية:</target>
-
-<source>Configuration</source>
-<target>التكوين</target>
 
 <source>Item exists on left side only</source>
 <target>العنصر موجود على الجانب الأيسر فقط</target>
@@ -741,8 +750,8 @@ Note: File names must be relative to base directories!
 <source>Maximum</source>
 <target>الحد الأقصى</target>
 
-<source>&Default</source>
-<target>&الافتراضي</target>
+<source>&Clear</source>
+<target></target>
 
 <source>Fail-safe file copy</source>
 <target>نسخ ملفات آمن من الفشل</target>
@@ -770,6 +779,9 @@ Note: File names must be relative to base directories!
 
 <source>Description</source>
 <target>الوصف</target>
+
+<source>&Default</source>
+<target>&الافتراضي</target>
 
 <source>Start synchronization</source>
 <target>بدء المزامنة</target>
@@ -803,6 +815,9 @@ Note: File names must be relative to base directories!
 
 <source>Overview</source>
 <target>نظرة عامة</target>
+
+<source>Configuration</source>
+<target>التكوين</target>
 
 <source>Filter files</source>
 <target>تصفية الملفات</target>
@@ -888,86 +903,44 @@ Note: File names must be relative to base directories!
 <source>Configuration loaded!</source>
 <target>تم فتح التكوين!</target>
 
-<source>Hide files that exist on left side only</source>
-<target>إخفاء الملفات الموجودة في الجانب الأيسر فقط</target>
-
 <source>Show files that exist on left side only</source>
 <target>إظهار الملفات الموجودة في الجانب الأيسر فقط</target>
-
-<source>Hide files that exist on right side only</source>
-<target>إخفاء الملفات الموجودة في الجانب الأيمن فقط</target>
 
 <source>Show files that exist on right side only</source>
 <target>إظهار الملفات الموجودة في الجانب الأيمن فقط</target>
 
-<source>Hide files that are newer on left</source>
-<target>إخفاء الملفات الأحدث في اليسار</target>
-
 <source>Show files that are newer on left</source>
 <target>إظهار الملفات الأحدث في اليسار</target>
-
-<source>Hide files that are newer on right</source>
-<target>إخفاء الملفات الأحدث في اليمين</target>
 
 <source>Show files that are newer on right</source>
 <target>إظهار الملفات الأحدث في اليمين</target>
 
-<source>Hide files that are equal</source>
-<target>إخفاء الملفات المتماثلة على الطرفين</target>
-
 <source>Show files that are equal</source>
 <target>إظهار الملفات المتماثلة على الطرفين</target>
-
-<source>Hide files that are different</source>
-<target>إخفاء الملفات المختلفة على الطرفين</target>
 
 <source>Show files that are different</source>
 <target>إظهار الملفات المختلفة على الطرفين</target>
 
-<source>Hide conflicts</source>
-<target>إخفاء الاختلافات</target>
-
 <source>Show conflicts</source>
 <target>إظهار الاختلافات</target>
-
-<source>Hide files that will be created on the left side</source>
-<target>إخفاء الملفات التي سيتم إنشاؤها في الجانب الأيسر</target>
 
 <source>Show files that will be created on the left side</source>
 <target>إظهار الملفات التي سيتم إنشاؤها في الجانب الأيسر</target>
 
-<source>Hide files that will be created on the right side</source>
-<target>إخفاء الملفات التي سيتم إنشاؤها في الجانب الأيمن</target>
-
 <source>Show files that will be created on the right side</source>
 <target>إظهار الملفات التي سيتم إنشاؤها في الجانب الأيمن</target>
-
-<source>Hide files that will be deleted on the left side</source>
-<target>إخفاء الملفات التي سيتم حذفها من الجانب الأيسر</target>
 
 <source>Show files that will be deleted on the left side</source>
 <target>إظهار الملفات التي سيتم حذفها من من الجانب الأيسر</target>
 
-<source>Hide files that will be deleted on the right side</source>
-<target>إخفاء الملفات التي سيتم حذفها من الجانب الأيمن</target>
-
 <source>Show files that will be deleted on the right side</source>
 <target>إظهار الملفات التي سيتم حذفها من الجانب الأيمن</target>
-
-<source>Hide files that will be overwritten on left side</source>
-<target>إخفاء الملفات التي سيتم الكتابة فوقها في الجانب الأيسر</target>
 
 <source>Show files that will be overwritten on left side</source>
 <target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيسر</target>
 
-<source>Hide files that will be overwritten on right side</source>
-<target>إخفاء الملفات التي سيتم الكتابة فوقها في الجانب الأيمن</target>
-
 <source>Show files that will be overwritten on right side</source>
 <target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيمن</target>
-
-<source>Hide files that won't be copied</source>
-<target>إخفاء الملفات التي لن يتم نسخها</target>
 
 <source>Show files that won't be copied</source>
 <target>إظهار الملفات التي لن يتم نسخها</target>
@@ -986,6 +959,9 @@ Note: File names must be relative to base directories!
 
 <source>File list exported!</source>
 <target>تم تصدير قائمة الملفات!</target>
+
+<source>Searching for program updates...</source>
+<target></target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1032,6 +1008,9 @@ Note: File names must be relative to base directories!
 <source>&Ignore</source>
 <target>&تجاهل</target>
 
+<source>Don't show this warning again</source>
+<target></target>
+
 <source>&Switch</source>
 <target>&تبديل</target>
 
@@ -1049,9 +1028,6 @@ Note: File names must be relative to base directories!
 
 <source>Comparing content...</source>
 <target>مقارنة المحتوى...</target>
-
-<source>Copy</source>
-<target>نسخ</target>
 
 <source>Paused</source>
 <target>تم الإيقاف مؤقتاً</target>
@@ -1135,33 +1111,22 @@ Note: File names must be relative to base directories!
 <target>جعل التحذيرات و نوافذ الحوارات المخفية مرئية من جديد؟</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
-<target>
-<pluralform>هل تريد حقاً نقل ولا ملف</pluralform>
-<pluralform>هل تريد حقاً نقل هذا الملف ؟</pluralform>
-<pluralform>هل تريد حقاً نقل هذين الملفين ؟</pluralform>
-<pluralform>هل تريد حقاً نقل هذه الـ %x ملفاً ؟</pluralform>
-<pluralform>هل تريد حقاً نقل هذه الـ %x ملفاً ؟</pluralform>
-<pluralform>هل تريد حقاً نقل هذه الـ %x ملفاً ؟</pluralform>
-</target>
+<target></target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
-<target>
-<pluralform>هل تريد حقاً حذف ولا ملف</pluralform>
-<pluralform>هل تريد حقاً حذف هذا الملف ؟</pluralform>
-<pluralform>هل تريد حقاً حذف هذين الملفين ؟</pluralform>
-<pluralform>هل تريد حقاً حذف هذه الـ %x ملفاً ؟</pluralform>
-<pluralform>هل تريد حقاً حذف هذه الـ %x ملفاً ؟</pluralform>
-<pluralform>هل تريد حقاً حذف هذه الـ %x ملفاً ؟</pluralform>
-</target>
+<target></target>
 
 <source>Leave as unresolved conflict</source>
 <target>ترك كاختلافات من دون حل</target>
+
+<source>Time stamp</source>
+<target></target>
 
 <source>Append a timestamp to each file name</source>
 <target>إلحاق طابع زمني اسم كل ملف</target>
@@ -1346,11 +1311,14 @@ Note: File names must be relative to base directories!
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>سلة المهملات غير متوفر للمسارات التالية! سيتم حذف الملفات بشكل دائم بدلاً من ذلك:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>بإمكانك تجاهل هذا الخطأ باعتبالا كل مجلد و كأنه فارغ</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target></target>
 
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>بإمكانك تجاهل هذا الخطأ باعتبالا كل مجلد و كأنه فارغ</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>المسارات تلعية! كن حذراً عند إعداد قواعد المزامنة:</target>
@@ -1358,8 +1326,8 @@ Note: File names must be relative to base directories!
 <source>Start comparison</source>
 <target>ابدأ المقارنة</target>
 
-<source>Preparing synchronization...</source>
-<target>تهيئة المزامنة...</target>
+<source>Calculating sync directions...</source>
+<target></target>
 
 <source>Conflict detected:</source>
 <target>تم الكشف عن تعارض:</target>
@@ -1501,6 +1469,9 @@ Note: File names must be relative to base directories!
 
 <source>Generating database...</source>
 <target>إنشاء قاعدة بيانات...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target></target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>خطأ تحقق بيانات: للملف المصدر والملف الهدف محتويات مختلفة!</target>

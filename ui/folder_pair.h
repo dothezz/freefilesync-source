@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef FOLDERPAIR_H_INCLUDED
-#define FOLDERPAIR_H_INCLUDED
+#ifndef FOLDERPAIR_H_89341750847252345
+#define FOLDERPAIR_H_89341750847252345
 
 #include <wx/event.h>
 #include <wx/menu.h>
@@ -30,10 +30,6 @@ public:
     typedef std::shared_ptr<const CompConfig> AltCompCfgPtr;
     typedef std::shared_ptr<const SyncConfig> AltSyncCfgPtr;
 
-    AltCompCfgPtr getAltCompConfig() const { return altCompConfig; }
-    AltSyncCfgPtr getAltSyncConfig() const { return altSyncConfig; }
-    FilterConfig getAltFilterConfig() const { return localFilter; }
-
     void setConfig(AltCompCfgPtr compConfig, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
     {
         altCompConfig = compConfig;
@@ -42,6 +38,27 @@ public:
         refreshButtons();
     }
 
+    AltCompCfgPtr getAltCompConfig() const { return altCompConfig; }
+    AltSyncCfgPtr getAltSyncConfig() const { return altSyncConfig; }
+    FilterConfig getAltFilterConfig() const { return localFilter; }
+
+
+    FolderPairPanelBasic(GuiPanel& basicPanel) : //takes reference on basic panel to be enhanced
+        basicPanel_(basicPanel)
+    {
+        //register events for removal of alternate configuration
+        basicPanel_.m_bpButtonAltCompCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfgContext    ), nullptr, this);
+        basicPanel_.m_bpButtonAltSyncCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgContext    ), nullptr, this);
+        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgContext), nullptr, this);
+
+        basicPanel_.m_bpButtonAltCompCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfg    ), nullptr, this);
+        basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg    ), nullptr, this);
+        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), nullptr, this);
+
+        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(getResourceImage(L"item_delete"));
+    }
+
+private:
     void refreshButtons()
     {
         if (altCompConfig.get())
@@ -79,69 +96,72 @@ public:
         }
     }
 
-protected:
-    FolderPairPanelBasic(GuiPanel& basicPanel) : //takes reference on basic panel to be enhanced
-        basicPanel_(basicPanel)
-    {
-        //register events for removal of alternate configuration
-        basicPanel_.m_bpButtonAltCompCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfgContext    ), nullptr, this);
-        basicPanel_.m_bpButtonAltSyncCfg ->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgContext    ), nullptr, this);
-        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgContext), nullptr, this);
-
-        basicPanel_.m_bpButtonAltCompCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltCompCfg    ), nullptr, this);
-        basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg    ), nullptr, this);
-        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), nullptr, this);
-
-        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(getResourceImage(L"item_delete"));
-    }
-
-    virtual void removeAltCompCfg()
-    {
-        altCompConfig.reset();
-        refreshButtons();
-    }
-
-    virtual void removeAltSyncCfg()
-    {
-        altSyncConfig.reset();
-        refreshButtons();
-    }
-
-    virtual void removeLocalFilterCfg()
-    {
-        localFilter = FilterConfig();
-        refreshButtons();
-    }
-
-private:
     void OnAltCompCfgContext(wxCommandEvent& event)
     {
+        auto removeAltCompCfg = [&]
+        {
+            this->altCompConfig.reset(); //"this->" galore: workaround GCC compiler bugs
+            this->refreshButtons();
+            this->onAltCompCfgChange();
+        };
+
         ContextMenu menu;
-        menu.addItem(_("Remove alternate settings"), [this] { this->removeAltCompCfg(); }, nullptr, altCompConfig.get() != nullptr);
+        menu.addItem(_("Remove alternate settings"), removeAltCompCfg, nullptr, altCompConfig.get() != nullptr);
         menu.popup(basicPanel_);
     }
 
     void OnAltSyncCfgContext(wxCommandEvent& event)
     {
+        auto removeAltSyncCfg = [&]
+        {
+            this->altSyncConfig.reset();
+            this->refreshButtons();
+            this->onAltSyncCfgChange();
+        };
+
         ContextMenu menu;
-        menu.addItem(_("Remove alternate settings"), [this] { this->removeAltSyncCfg(); }, nullptr, altSyncConfig.get() != nullptr);
+        menu.addItem(_("Remove alternate settings"), removeAltSyncCfg, nullptr, altSyncConfig.get() != nullptr);
         menu.popup(basicPanel_);
     }
 
     void OnLocalFilterCfgContext(wxCommandEvent& event)
     {
+        auto removeLocalFilterCfg = [&]
+        {
+            this->localFilter = FilterConfig();
+            this->refreshButtons();
+            this->onLocalFilterCfgChange();
+        };
+
+        std::unique_ptr<FilterConfig>& filterCfgOnClipboard = getFilterCfgOnClipboardRef();
+
+        auto copyFilter  = [&] { filterCfgOnClipboard = make_unique<FilterConfig>(this->localFilter); };
+        auto pasteFilter = [&]
+        {
+            if (filterCfgOnClipboard)
+            {
+                this->localFilter = *filterCfgOnClipboard;
+                this->refreshButtons();
+                this->onLocalFilterCfgChange();
+            }
+        };
+
         ContextMenu menu;
-        menu.addItem(_("Clear filter settings"), [this] { this->removeLocalFilterCfg(); }, nullptr, !isNullFilter(localFilter));
+        menu.addItem(_("Clear filter settings"), removeLocalFilterCfg, nullptr, !isNullFilter(localFilter));
+        menu.addSeparator();
+        menu.addItem( _("Copy"),  copyFilter,  nullptr, !isNullFilter(localFilter));
+        menu.addItem( _("Paste"), pasteFilter, nullptr, filterCfgOnClipboard.get() != nullptr);
         menu.popup(basicPanel_);
     }
 
 
     virtual MainConfiguration getMainConfig() const = 0;
     virtual wxWindow* getParentWindow() = 0;
+    virtual std::unique_ptr<FilterConfig>& getFilterCfgOnClipboardRef() = 0;
 
-    virtual void OnAltCompCfgChange() = 0;
-    virtual void OnAltSyncCfgChange() = 0;
-    virtual void OnLocalFilterCfgChange() {};
+    virtual void onAltCompCfgChange() = 0;
+    virtual void onAltSyncCfgChange() = 0;
+    virtual void onLocalFilterCfgChange() = 0;
 
     void OnAltCompCfg(wxCommandEvent& event)
     {
@@ -153,8 +173,7 @@ private:
         {
             altCompConfig = std::make_shared<CompConfig>(cmpCfg);
             refreshButtons();
-
-            OnAltCompCfgChange();
+            onAltCompCfgChange();
         }
     }
 
@@ -173,8 +192,7 @@ private:
         {
             altSyncConfig = std::make_shared<SyncConfig>(syncCfg);
             refreshButtons();
-
-            OnAltSyncCfgChange();
+            onAltSyncCfgChange();
         }
     }
 
@@ -188,8 +206,7 @@ private:
         {
             localFilter = localFiltTmp;
             refreshButtons();
-
-            OnLocalFilterCfgChange();
+            onLocalFilterCfgChange();
         }
     }
 
@@ -203,6 +220,4 @@ private:
 }
 
 
-#endif // FOLDERPAIR_H_INCLUDED
-
-
+#endif //FOLDERPAIR_H_89341750847252345

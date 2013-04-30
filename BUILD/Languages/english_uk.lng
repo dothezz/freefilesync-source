@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Total time:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>Cannot set directory lock for %x.</target>
+
 <source>Show in Explorer</source>
 <target>Show in Explorer</target>
 
@@ -60,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Clear filter settings</target>
+
+<source>Copy</source>
+<target>Copy</target>
+
+<source>Paste</source>
+<target>Paste</target>
 
 <source>Save as batch job</source>
 <target>Save as batch job</target>
@@ -160,9 +169,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Waiting while directory is locked (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Cannot set directory lock %x.</target>
-
 <source>Creating file %x</source>
 <target>Creating file %x</target>
 
@@ -196,9 +202,6 @@
 <source>/sec</source>
 <target>/sec</target>
 
-<source>Cannot find file %x.</source>
-<target>Cannot find file %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>File %x does not contain a valid configuration.</target>
 
@@ -222,6 +225,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Cannot read the following XML elements:</target>
+
+<source>Cannot find file %x.</source>
+<target>Cannot find file %x.</target>
 
 <source>&Open...</source>
 <target>&Open...</target>
@@ -456,14 +462,17 @@ The command is triggered if:
 <source>&Advanced</source>
 <target>&Advanced</target>
 
-<source>&Check for new version</source>
-<target>&Check for new version</target>
+<source>&Check now</source>
+<target>&Check now</target>
+
+<source>Check &automatically once a week</source>
+<target>Check &automatically once a week</target>
+
+<source>Check for new version</source>
+<target>Check for new version</target>
 
 <source>Compare</source>
 <target>Compare</target>
-
-<source>&Abort</source>
-<target>&Abort</target>
 
 <source>Synchronize</source>
 <target>Synchronise</target>
@@ -513,8 +522,8 @@ The command is triggered if:
 <source>On completion</source>
 <target>On completion</target>
 
-<source>OK</source>
-<target>OK</target>
+<source>Close</source>
+<target>Close</target>
 
 <source>&Pause</source>
 <target>&Pause</target>
@@ -600,11 +609,14 @@ is the same
 <source>Symbolic Link handling</source>
 <target>Symbolic Link handling</target>
 
+<source>OK</source>
+<target>OK</target>
+
 <source><- Two way -></source>
 <target><- Two way -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</target>
 
 <source>Mirror ->></source>
 <target>Mirror ->></target>
@@ -642,14 +654,11 @@ is the same
 <source>Versioning</source>
 <target>Versioning</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Move time-stamped files into specified folder</target>
+<source>Move files to user-defined folder</source>
+<target>Move files to user-defined folder</target>
 
 <source>Naming convention:</source>
 <target>Naming convention:</target>
-
-<source>Configuration</source>
-<target>Configuration</target>
 
 <source>Item exists on left side only</source>
 <target>Item exists on left side only</target>
@@ -729,8 +738,8 @@ Note: File names must be relative to base directories!
 <source>Maximum</source>
 <target>Maximum</target>
 
-<source>&Default</source>
-<target>&Default</target>
+<source>&Clear</source>
+<target>&Clear</target>
 
 <source>Fail-safe file copy</source>
 <target>Fail-safe file copy</target>
@@ -758,6 +767,9 @@ Note: File names must be relative to base directories!
 
 <source>Description</source>
 <target>Description</target>
+
+<source>&Default</source>
+<target>&Default</target>
 
 <source>Start synchronization</source>
 <target>Start synchronisation</target>
@@ -791,6 +803,9 @@ Note: File names must be relative to base directories!
 
 <source>Overview</source>
 <target>Overview</target>
+
+<source>Configuration</source>
+<target>Configuration</target>
 
 <source>Filter files</source>
 <target>Filter files</target>
@@ -864,98 +879,56 @@ Note: File names must be relative to base directories!
 <source>FreeFileSync batch</source>
 <target>FreeFileSync batch</target>
 
-<source>Never save changes</source>
-<target>Never save changes</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Do you want to save changes to %x?</target>
 
 <source>Do&n't save</source>
 <target>Do&n't save</target>
 
+<source>Never save changes</source>
+<target>Never save changes</target>
+
 <source>Configuration loaded!</source>
 <target>Configuration loaded!</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Hide files that exist on left side only</target>
 
 <source>Show files that exist on left side only</source>
 <target>Show files that exist on left side only</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Hide files that exist on right side only</target>
-
 <source>Show files that exist on right side only</source>
 <target>Show files that exist on right side only</target>
-
-<source>Hide files that are newer on left</source>
-<target>Hide files that are newer on left</target>
 
 <source>Show files that are newer on left</source>
 <target>Show files that are newer on left</target>
 
-<source>Hide files that are newer on right</source>
-<target>Hide files that are newer on right</target>
-
 <source>Show files that are newer on right</source>
 <target>Show files that are newer on right</target>
-
-<source>Hide files that are equal</source>
-<target>Hide files that are equal</target>
 
 <source>Show files that are equal</source>
 <target>Show files that are equal</target>
 
-<source>Hide files that are different</source>
-<target>Hide files that are different</target>
-
 <source>Show files that are different</source>
 <target>Show files that are different</target>
-
-<source>Hide conflicts</source>
-<target>Hide conflicts</target>
 
 <source>Show conflicts</source>
 <target>Show conflicts</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>Hide files that will be created on the left side</target>
-
 <source>Show files that will be created on the left side</source>
 <target>Show files that will be created on the left side</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>Hide files that will be created on the right side</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Show files that will be created on the right side</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>Hide files that will be deleted on the left side</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>Show files that will be deleted on the left side</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>Hide files that will be deleted on the right side</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Show files that will be deleted on the right side</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>Hide files that will be overwritten on left side</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>Show files that will be overwritten on left side</target>
 
-<source>Hide files that will be overwritten on right side</source>
-<target>Hide files that will be overwritten on right side</target>
-
 <source>Show files that will be overwritten on right side</source>
 <target>Show files that will be overwritten on right side</target>
-
-<source>Hide files that won't be copied</source>
-<target>Hide files that won't be copied</target>
 
 <source>Show files that won't be copied</source>
 <target>Show files that won't be copied</target>
@@ -974,6 +947,9 @@ Note: File names must be relative to base directories!
 
 <source>File list exported!</source>
 <target>File list exported!</target>
+
+<source>Searching for program updates...</source>
+<target>Searching for program updates...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1008,6 +984,9 @@ Note: File names must be relative to base directories!
 <source>&Ignore</source>
 <target>&Ignore</target>
 
+<source>Don't show this warning again</source>
+<target>Don't show this warning again</target>
+
 <source>&Switch</source>
 <target>&Switch</target>
 
@@ -1025,9 +1004,6 @@ Note: File names must be relative to base directories!
 
 <source>Comparing content...</source>
 <target>Comparing content...</target>
-
-<source>Copy</source>
-<target>Copy</target>
 
 <source>Paused</source>
 <target>Paused</target>
@@ -1111,25 +1087,28 @@ Note: File names must be relative to base directories!
 <target>Make hidden warnings and dialogues visible again?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </target>
 
 <source>Leave as unresolved conflict</source>
 <target>Leave as unresolved conflict</target>
+
+<source>Time stamp</source>
+<target>Time stamp</target>
 
 <source>Append a timestamp to each file name</source>
 <target>Append a timestamp to each file name</target>
@@ -1302,11 +1281,14 @@ Note: File names must be relative to base directories!
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>You can ignore this error to consider each folder as empty.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>The corresponding folder will be considered as empty.</target>
 
 <source>Cannot find the following folders:</source>
 <target>Cannot find the following folders:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>You can ignore this error to consider each folder as empty.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Directories are dependent! Be careful when setting up synchronisation rules:</target>
@@ -1314,8 +1296,8 @@ Note: File names must be relative to base directories!
 <source>Start comparison</source>
 <target>Start comparison</target>
 
-<source>Preparing synchronization...</source>
-<target>Preparing synchronisation...</target>
+<source>Calculating sync directions...</source>
+<target>Calculating sync directions...</target>
 
 <source>Conflict detected:</source>
 <target>Conflict detected:</target>
@@ -1457,6 +1439,9 @@ Note: File names must be relative to base directories!
 
 <source>Generating database...</source>
 <target>Generating database...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Creating Volume Shadow Copy for %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Data verification error: Source and target file have different content!</target>

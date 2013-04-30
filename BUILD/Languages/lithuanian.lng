@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Visas laikas:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>Nepavyksta nustatyti katalogo užrakto %x.</target>
+
 <source>Show in Explorer</source>
 <target>Rodyti naršyklėje</target>
 
@@ -40,6 +43,9 @@
 <source>Error</source>
 <target>Klaida</target>
 
+<source>Selected variant:</source>
+<target>Pasirinktas variantas:</target>
+
 <source>Select alternate comparison settings</source>
 <target>Pasirinkite alternatyvius sulyginimo nustatymus</target>
 
@@ -57,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Išvalyti filtro nustatymus</target>
+
+<source>Copy</source>
+<target>Kopijuoti</target>
+
+<source>Paste</source>
+<target>Įklijuoti</target>
 
 <source>Save as batch job</source>
 <target>Išsaugoti kaip paketinį darbą</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Kritinė klaida</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows klaidos kodas %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux klaidos kodas %x:</target>
+<source>Error Code %x:</source>
+<target>Klaidos kodas %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nepavyksta išspręsti simbolinės nuorodos.</target>
@@ -162,8 +171,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Laikiama kol katalogas bus užrakintas (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Nepavyksta nustatyti katalogo užrakto %x.</target>
+<source>Creating file %x</source>
+<target>Kuriamas failas %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -199,9 +208,6 @@
 <source>/sec</source>
 <target>/sek.</target>
 
-<source>Cannot find file %x.</source>
-<target>Nepavyksta rasti failo %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Failas %x neturi tinkamų nustatymų.</target>
 
@@ -225,6 +231,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Nepavyksta perskaityti sekančių XML elementų:</target>
+
+<source>Cannot find file %x.</source>
+<target>Nepavyksta rasti failo %x.</target>
 
 <source>&Open...</source>
 <target>&Atverti...</target>
@@ -379,7 +388,7 @@ Komanda inicijuojama jei:
 <target><Simbolinė nuoroda></target>
 
 <source><Folder></source>
-<target><Aplankai></target>
+<target><Aplankas></target>
 
 <source>Full path</source>
 <target>Pilnas kelias</target>
@@ -459,23 +468,20 @@ Komanda inicijuojama jei:
 <source>&Advanced</source>
 <target>&Išsamiau</target>
 
-<source>&Check for new version</source>
-<target>&Tikrinti dėl atnaujinimų</target>
+<source>&Check now</source>
+<target>&Tikrinti dabar</target>
+
+<source>Check &automatically once a week</source>
+<target>Tikrinti &automatiškai kartą per savaitę</target>
+
+<source>Check for new version</source>
+<target>Tikrinti ar yra nauja versija</target>
 
 <source>Compare</source>
 <target>Sulyginti</target>
 
-<source>Compare both sides</source>
-<target>Sulyginti abi puses</target>
-
-<source>&Abort</source>
-<target>&Nutraukti</target>
-
 <source>Synchronize</source>
 <target>Sinchronizuoti</target>
-
-<source>Start synchronization</source>
-<target>Pradėti sinchronizavimą</target>
 
 <source>Add folder pair</source>
 <target>Pridėti aplankų porą</target>
@@ -485,15 +491,6 @@ Komanda inicijuojama jei:
 
 <source>Swap sides</source>
 <target>Sukeisti puses</target>
-
-<source>Open</source>
-<target>Atverti</target>
-
-<source>Save</source>
-<target>Išsaugoti</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Paskiausiai naudoti nustatymai (spauskite DEL, kad pašalinti iš sąrašo)</target>
 
 <source>Hide excluded items</source>
 <target>Slėpti išskirtus elementus</target>
@@ -525,6 +522,18 @@ Komanda inicijuojama jei:
 <source>Time elapsed:</source>
 <target>Praėjęs laikas:</target>
 
+<source>Synchronizing...</source>
+<target>Sinchronizuojama...</target>
+
+<source>On completion</source>
+<target>Baigus</target>
+
+<source>Close</source>
+<target>Uždaryti</target>
+
+<source>&Pause</source>
+<target>&Pauzė</target>
+
 <source>Batch job</source>
 <target>Paketinė užduotis</target>
 
@@ -554,9 +563,6 @@ Komanda inicijuojama jei:
 
 <source>Abort synchronization on first error</source>
 <target>Nutraukti sinchronizavimą su pirma klaida</target>
-
-<source>On completion</source>
-<target>Baigus</target>
 
 <source>Show progress dialog</source>
 <target>Rodyti eigos langą</target>
@@ -615,8 +621,8 @@ yra toks pats
 <source><- Two way -></source>
 <target><- Dvipusis -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Nustatyti ir siūlyti pokeitimus abiejose pusėse naudojant duomenų bazę. Trinimai, pervardinimas ir konfliktai yra nustatomi automatiškai.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Nustatyti ir skatinti pokyčius apbiejose pusėse. Trinimai, perkėlimai ir konfliktai yra aptinkami automatiškai naudojant duomenų bazę.</target>
 
 <source>Mirror ->></source>
 <target>Veidrodis ->></target>
@@ -654,14 +660,11 @@ yra toks pats
 <source>Versioning</source>
 <target>Versijavimas</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Perkelti su laiko žyme failus į nurodytą aplanką</target>
+<source>Move files to user-defined folder</source>
+<target>Perkelti failus į naudotojo nurodytą aplanką</target>
 
 <source>Naming convention:</source>
 <target>Pavadinimų taisyklės:</target>
-
-<source>Configuration</source>
-<target>Nustatymai</target>
 
 <source>Item exists on left side only</source>
 <target>Elementas egzistuoja tik kairėje pusėje</target>
@@ -680,12 +683,6 @@ yra toks pats
 
 <source>Conflict/item cannot be categorized</source>
 <target>Konfliktas/elementas negali būti kategorizuojamas</target>
-
-<source>Synchronizing...</source>
-<target>Sinchronizuojama...</target>
-
-<source>&Pause</source>
-<target>&Pauzė</target>
 
 <source>Source code written in C++ using:</source>
 <target>Šaltinio kodas parašytas su C++ naudojant:</target>
@@ -747,8 +744,8 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Maximum</source>
 <target>Daugiausiai</target>
 
-<source>&Default</source>
-<target>&Numatyta</target>
+<source>&Clear</source>
+<target>&Išvalyti</target>
 
 <source>Fail-safe file copy</source>
 <target>Apsauginė failo kopija</target>
@@ -776,6 +773,12 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Description</source>
 <target>Apibūdinimas</target>
+
+<source>&Default</source>
+<target>&Numatyta</target>
+
+<source>Start synchronization</source>
+<target>Pradėti sinchronizavimą</target>
 
 <source>Variant</source>
 <target>Variantas</target>
@@ -807,11 +810,23 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Overview</source>
 <target>Apžvalga</target>
 
+<source>Configuration</source>
+<target>Nustatymai</target>
+
 <source>Filter files</source>
 <target>Filtruoti failus</target>
 
 <source>Select view</source>
 <target>Pasirinkti rodomus</target>
+
+<source>Open...</source>
+<target>Atverti...</target>
+
+<source>Save</source>
+<target>Išsaugoti</target>
+
+<source>Compare both sides</source>
+<target>Sulyginti abi puses</target>
 
 <source>Set direction:</source>
 <target>Nustatyti kryptį:</target>
@@ -870,101 +885,62 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>FreeFileSync batch</source>
 <target>FreeFileSync paketinė užduotis</target>
 
-<source>Never save changes</source>
-<target>Niekada nesaugoti pakeitimų</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Ar norite išsaugoti %x pakeitimus?</target>
 
 <source>Do&n't save</source>
 <target>&Nesaugoti</target>
 
+<source>Never save changes</source>
+<target>Niekada nesaugoti pakeitimų</target>
+
 <source>Configuration loaded!</source>
 <target>Nustatymai įkelti!</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Slėpti failus, kurie egzistuoja tik kairėje pusėje</target>
 
 <source>Show files that exist on left side only</source>
 <target>Rodyti failus, kurie egzistuoja tik kairėje pusėje</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Slėpti failus, kurie egzistuoja tik dešinėje pusėje</target>
-
 <source>Show files that exist on right side only</source>
 <target>Rodyti failus, kurie egzistuoja tik dešinėje pusėje</target>
-
-<source>Hide files that are newer on left</source>
-<target>Slėpti failus, kurie yra naujesni kairėje</target>
 
 <source>Show files that are newer on left</source>
 <target>Rodyti failus, kurie yra naujesni kairėje</target>
 
-<source>Hide files that are newer on right</source>
-<target>Slėpti failus, kurie yra naujesni dešinėje</target>
-
 <source>Show files that are newer on right</source>
 <target>Rodyti failus, kurie yra naujesni dešinėje</target>
-
-<source>Hide files that are equal</source>
-<target>Slėpti failus, kurie yra lygūs</target>
 
 <source>Show files that are equal</source>
 <target>Rodyti failus, kurie yra lygūs</target>
 
-<source>Hide files that are different</source>
-<target>Slėpti failus, kurie yra skirtingi</target>
-
 <source>Show files that are different</source>
 <target>Rodyti failus, kurie yra skirtingi</target>
-
-<source>Hide conflicts</source>
-<target>Slėpti konfliktus</target>
 
 <source>Show conflicts</source>
 <target>Rodyti konfliktus</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>Slėpti failus, kurie bus sukurti kairėje pusėje</target>
-
 <source>Show files that will be created on the left side</source>
 <target>Rodyti failus, kurie bus sukurti kairėje pusėje</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>Slėpti failus, kurie bus sukurti dešinėje pusėje</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Rodyti failus, kurie bus sukurti dešinėje pusėje</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>Slėpti failus, kurie bus ištrinti kairėje pusėje</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>Rodyti failus, kurie bus ištrinti kairėje pusėje</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>Slėpti failus, kurie bus ištrinti dešinėje pusėje</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Rodyti failus, kurie bus ištrinti dešinėje pusėje</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>Slėpti failus, kurie bus perrašyti kairėje pusėje</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>Rodyti failus, kurie bus perrašyti kairėje pusėje</target>
-
-<source>Hide files that will be overwritten on right side</source>
-<target>Slėpti failus, kurie bus perrašyti dešinėje pusėje</target>
 
 <source>Show files that will be overwritten on right side</source>
 <target>Rodyti failus, kurie bus perrašyti dešinėje pusėje</target>
 
-<source>Hide files that won't be copied</source>
-<target>Slėpti failus, kurie ne bus kopijuojami</target>
-
 <source>Show files that won't be copied</source>
 <target>Rodyti failus, kurie ne bus kopijuojami</target>
+
+<source>Set as default</source>
+<target>Nustatyti kaip numatytą</target>
 
 <source>All folders are in sync!</source>
 <target>Visi aplankai susinchronizuoti!</target>
@@ -978,16 +954,8 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>File list exported!</source>
 <target>Failų sąrašas eksportuotas!</target>
 
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>Objektas sėkmingai ištrintas!</pluralform>
-<pluralform>%x objektai sėkmingai ištrinti!</pluralform>
-<pluralform>%x objektų sėkmingai ištrinti!</pluralform>
-<pluralform>%x objektas sėkmingai ištrintas!</pluralform>
-</target>
+<source>Searching for program updates...</source>
+<target>Ieškoma programos atnaujinimų...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1028,6 +996,9 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>&Ignore</source>
 <target>&Ignoruoti</target>
 
+<source>Don't show this warning again</source>
+<target>Neberodyti daugiau šio perspėjimo</target>
+
 <source>&Switch</source>
 <target>&Perjungti</target>
 
@@ -1045,9 +1016,6 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Comparing content...</source>
 <target>Sulyginamas turinys...</target>
-
-<source>Copy</source>
-<target>Kopijuoti</target>
 
 <source>Paused</source>
 <target>Pristabdyta</target>
@@ -1131,38 +1099,41 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <target>Ar vėl rodyti paslėptus perspėjimus ir langus?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Ar tikrai norite perkelti sekantį objektą į šiukšliadėžę?</pluralform>
-<pluralform>Ar tikrai norite perkelti sekančius %x objektus į šiukšliadėžę?</pluralform>
-<pluralform>Ar tikrai norite perkelti sekančius %x objektų į šiukšliadėžę?</pluralform>
-<pluralform>Ar tikrai norite perkelti sekančius %x objektą į šiukšliadėžę?</pluralform>
+<pluralform>Ar tikrai norite perkelti šį elementą į šiukšliadėžę?</pluralform>
+<pluralform>Ar tikrai norite perkelti šiuos %x elementus į šiukšliadėžę?</pluralform>
+<pluralform>Ar tikrai norite perkelti šiuos %x elementų į šiukšliadėžę?</pluralform>
+<pluralform>Ar tikrai norite perkelti šį %x elementą į šiukšliadėžę?</pluralform>
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Ar tikrai norite ištrinti sekantį objektą?</pluralform>
-<pluralform>Ar tikrai norite ištrinti sekantčius %x objektus?</pluralform>
-<pluralform>Ar tikrai norite ištrinti sekantčius %x objektų?</pluralform>
-<pluralform>Ar tikrai norite ištrinti sekantčius %x objektą?</pluralform>
+<pluralform>Ar tikrai norite ištrinti šį elementą?</pluralform>
+<pluralform>Ar tikrai norite ištrinti šiuos %x elementus?</pluralform>
+<pluralform>Ar tikrai norite ištrinti šiuos %x elementų?</pluralform>
+<pluralform>Ar tikrai norite ištrinti šį %x elementą?</pluralform>
 </target>
 
 <source>Leave as unresolved conflict</source>
 <target>Palikti kaip neišpręstą konfliktą</target>
+
+<source>Time stamp</source>
+<target>Laiko žymė</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Pridėti laiko žymę kiekvieno failo pavadinime</target>
 
 <source>Replace</source>
 <target>Pakeisti</target>
 
 <source>Move files and replace if existing</source>
 <target>Perkelti failus ir pakeisti jei egzistuoja</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Pridėti laiko žymę kiekvieno failo pavadinime</target>
 
 <source>Folder</source>
 <target>Aplankas</target>
@@ -1284,6 +1255,12 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Cannot set privilege %x.</source>
 <target>Nepavyksta nustatyti privilegijos %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Nepavyko sustabdyti sistemos į miegojimo veikseną.</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Nepavyksta pakeisti proceso I/O prioritetų.</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Nepavyksta perkelti %x į šiukšliadėžę!</target>
 
@@ -1302,14 +1279,38 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Nustatomos numatytos sinchronizavimo kryptys: Seni failai bus perrašyti naujesniais failais.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Tikrinamas šiukšliadėžės prieinamumas aplankui %x...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>Perkeliamas failas %x į šiukšliadėžę</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>Perkeliamas aplankas %x į šiukšliadėžę</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Perkeliama simbolinė nuoroda %x į šiukšliadėžę</target>
+
+<source>Deleting file %x</source>
+<target>Trinamas failas %x</target>
+
+<source>Deleting folder %x</source>
+<target>Trinamas aplankas %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Tinama simbolinė nuoroda %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Šiukšliadėžė nepasiekiama sekantiems keliams! Failai bus ištrinti visam laikui išskyrus:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Galite ignoruoti šią klaidą, kad laikyti aplanką tuščiu.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>Atitinkamas aplankas bus laikomas tuščiu.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Nepavyksta rasti aplanko %x.</target>
+<source>Cannot find the following folders:</source>
+<target>Nepavyksta rasti šių aplankų:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Galite ignoruoti šią klaidą, kad kiekvienas aplankas būtų laikomas tuščiu.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Katalogai yra priklausomi! Būkite atsargūs nustatydami sinchronizavimo taisykles:</target>
@@ -1317,8 +1318,8 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Start comparison</source>
 <target>Pradėti palyginimą</target>
 
-<source>Preparing synchronization...</source>
-<target>Ruošiamas sinchronizavimas...</target>
+<source>Calculating sync directions...</source>
+<target>Apskaičiuojamos sinchrinizacijos kryptys...</target>
 
 <source>Conflict detected:</source>
 <target>Aptiktas konfliktas:</target>
@@ -1383,24 +1384,6 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Multiple...</source>
 <target>Keletas...</target>
 
-<source>Deleting file %x</source>
-<target>Trinamas failas %x</target>
-
-<source>Deleting folder %x</source>
-<target>Trinamas aplankas %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Tinama simbolinė nuoroda %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Perkeliamas failas %x į šiukšliadėžę</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Perkeliamas aplankas %x į šiukšliadėžę</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Perkeliama simbolinė nuoroda %x į šiukšliadėžę</target>
-
 <source>Moving file %x to %y</source>
 <target>Perkeliamas failas %x į %y</target>
 
@@ -1412,9 +1395,6 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Removing old versions...</source>
 <target>Šalinamos senos versijos...</target>
-
-<source>Creating file %x</source>
-<target>Kuriamas failas %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Kuriama simbolinė nuoroda %x</target>
@@ -1433,6 +1413,9 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Updating attributes of %x</source>
 <target>Atnaujinami atributai %x</target>
+
+<source>Cannot find %x.</source>
+<target>Nepavyksta rasti %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Tikslo aplankas %x jau yra.</target>
@@ -1478,6 +1461,9 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Generating database...</source>
 <target>Generuojama duomenų bazė...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Kuriama vietos šėšėlinė kopija dėl %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Duomenų patikrinimo klaida: Šaltinio ir tikslo failas turi skirtingus turinius!</target>

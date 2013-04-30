@@ -7,6 +7,7 @@
 #ifndef FILE_DROP_H_INCLUDED
 #define FILE_DROP_H_INCLUDED
 
+#include <wx/window.h>
 #include <wx/event.h>
 #include <wx/dnd.h>
 

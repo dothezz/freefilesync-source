@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Total tid:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target></target>
+
 <source>Show in Explorer</source>
 <target>Vis i utforsker</target>
 
@@ -60,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Fjern filterinnstillinger</target>
+
+<source>Copy</source>
+<target>Kopier</target>
+
+<source>Paste</source>
+<target></target>
 
 <source>Save as batch job</source>
 <target>Lagre som sammensatt oppgave</target>
@@ -160,9 +169,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Venter mens mappe er låst (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Kan ikke sette mappelås %x.</target>
-
 <source>Creating file %x</source>
 <target>Oppretter fil %x</target>
 
@@ -196,9 +202,6 @@
 <source>/sec</source>
 <target>/sekund</target>
 
-<source>Cannot find file %x.</source>
-<target>Kan ikke finne filen %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Filen %x inneholder en ugyldig innstilling.</target>
 
@@ -222,6 +225,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Kan ikke lese følgende XML-elementer:</target>
+
+<source>Cannot find file %x.</source>
+<target>Kan ikke finne filen %x.</target>
 
 <source>&Open...</source>
 <target>&Åpne...</target>
@@ -456,8 +462,14 @@ Kommandoen utløses hvis:
 <source>&Advanced</source>
 <target>&Avansert</target>
 
-<source>&Check for new version</source>
-<target>&Se etter ny versjon</target>
+<source>&Check now</source>
+<target></target>
+
+<source>Check &automatically once a week</source>
+<target></target>
+
+<source>Check for new version</source>
+<target></target>
 
 <source>Compare</source>
 <target>Sammenlign</target>
@@ -603,8 +615,8 @@ er det samme
 <source><- Two way -></source>
 <target><- Toveis -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identifiser og spre endringer på begge sider ved å bruke en database. Slettinger, navneendringer og konflikter blir automatisk oppdaget.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target></target>
 
 <source>Mirror ->></source>
 <target>Speile ->></target>
@@ -642,14 +654,11 @@ er det samme
 <source>Versioning</source>
 <target>Versjonshåndtering</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Flytt tidsstemplede filer den valgte mappen</target>
+<source>Move files to user-defined folder</source>
+<target></target>
 
 <source>Naming convention:</source>
 <target>Navnekonvensjon:</target>
-
-<source>Configuration</source>
-<target>Innstilling</target>
 
 <source>Item exists on left side only</source>
 <target>Element eksisterer kun på venstre side</target>
@@ -729,8 +738,8 @@ Merk: Filnavn må være relative til basismapper!
 <source>Maximum</source>
 <target>Maksimum</target>
 
-<source>&Default</source>
-<target>&Standard</target>
+<source>&Clear</source>
+<target></target>
 
 <source>Fail-safe file copy</source>
 <target>Trygg filkopi</target>
@@ -758,6 +767,9 @@ Merk: Filnavn må være relative til basismapper!
 
 <source>Description</source>
 <target>Beskrivelse</target>
+
+<source>&Default</source>
+<target>&Standard</target>
 
 <source>Start synchronization</source>
 <target>Start synkronisering</target>
@@ -791,6 +803,9 @@ Merk: Filnavn må være relative til basismapper!
 
 <source>Overview</source>
 <target>Oversikt</target>
+
+<source>Configuration</source>
+<target>Innstilling</target>
 
 <source>Filter files</source>
 <target>Filtrer filer</target>
@@ -876,86 +891,44 @@ Merk: Filnavn må være relative til basismapper!
 <source>Configuration loaded!</source>
 <target>Innstilling lastet!</target>
 
-<source>Hide files that exist on left side only</source>
-<target>Skjul filer som bare finnes på venstre side</target>
-
 <source>Show files that exist on left side only</source>
 <target>Vis filer som bare finnes på venstre side</target>
-
-<source>Hide files that exist on right side only</source>
-<target>Skjul filer som bare finnes på høyre side</target>
 
 <source>Show files that exist on right side only</source>
 <target>Vis filer som bare finnes på høyre side</target>
 
-<source>Hide files that are newer on left</source>
-<target>Skjul filer som er nyere til venstre</target>
-
 <source>Show files that are newer on left</source>
 <target>Vis filer som er nyere til venstre</target>
-
-<source>Hide files that are newer on right</source>
-<target>Skjul filer som er nyere til høyre</target>
 
 <source>Show files that are newer on right</source>
 <target>Vis filer som er nyere til høyre</target>
 
-<source>Hide files that are equal</source>
-<target>Skjul filer som er like</target>
-
 <source>Show files that are equal</source>
 <target>Vis filer som er like</target>
-
-<source>Hide files that are different</source>
-<target>Skjul filer som er forskjellige</target>
 
 <source>Show files that are different</source>
 <target>Vis filer som er forskjellige</target>
 
-<source>Hide conflicts</source>
-<target>Skjul konflikter</target>
-
 <source>Show conflicts</source>
 <target>Vis konflikter</target>
-
-<source>Hide files that will be created on the left side</source>
-<target>Skjul filer som blir opprettet på venstre side</target>
 
 <source>Show files that will be created on the left side</source>
 <target>Vis filer som blir opprettet på venstre side</target>
 
-<source>Hide files that will be created on the right side</source>
-<target>Skjul filer som blir opprettet på høyre side</target>
-
 <source>Show files that will be created on the right side</source>
 <target>Vis filer som blir opprettet på høyre side</target>
-
-<source>Hide files that will be deleted on the left side</source>
-<target>Skjul filer som blir slettet på venstre side</target>
 
 <source>Show files that will be deleted on the left side</source>
 <target>Vis filer som blir slettet på venstre side</target>
 
-<source>Hide files that will be deleted on the right side</source>
-<target>Skjul filer som blir slettet på høyre side</target>
-
 <source>Show files that will be deleted on the right side</source>
 <target>Vis filer som blir slettet på høyre side</target>
-
-<source>Hide files that will be overwritten on left side</source>
-<target>Skjul filer som blir overskrevet på venstre side</target>
 
 <source>Show files that will be overwritten on left side</source>
 <target>Vis filer som blir overskrevet på venstre side</target>
 
-<source>Hide files that will be overwritten on right side</source>
-<target>Skjul filer som blir overskrevet på høyre side</target>
-
 <source>Show files that will be overwritten on right side</source>
 <target>Vis filer som blir overskrevet på høyre side</target>
-
-<source>Hide files that won't be copied</source>
-<target>Skjul filer som ikke blir kopiert</target>
 
 <source>Show files that won't be copied</source>
 <target>Vis filer som ikke blir kopiert</target>
@@ -974,6 +947,9 @@ Merk: Filnavn må være relative til basismapper!
 
 <source>File list exported!</source>
 <target>Filliste eksportert!</target>
+
+<source>Searching for program updates...</source>
+<target></target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1008,6 +984,9 @@ Merk: Filnavn må være relative til basismapper!
 <source>&Ignore</source>
 <target>&Ignorer</target>
 
+<source>Don't show this warning again</source>
+<target></target>
+
 <source>&Switch</source>
 <target>&Skift</target>
 
@@ -1025,9 +1004,6 @@ Merk: Filnavn må være relative til basismapper!
 
 <source>Comparing content...</source>
 <target>Sammenligner innhold...</target>
-
-<source>Copy</source>
-<target>Kopier</target>
 
 <source>Paused</source>
 <target>Pauset</target>
@@ -1111,25 +1087,22 @@ Merk: Filnavn må være relative til basismapper!
 <target>Gjør skjylte advarsler og dialoger synlige igjen?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
-<target>
-<pluralform>Vil du flytte det følgende objektet til papirkurven?</pluralform>
-<pluralform>Vil du flytte de følgende %x objekter til papirkurven?</pluralform>
-</target>
+<target></target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
-<target>
-<pluralform>Vil du slette det følgende objektet?</pluralform>
-<pluralform>Vil du slette de følgende %x objekter?</pluralform>
-</target>
+<target></target>
 
 <source>Leave as unresolved conflict</source>
 <target>Etterlat som uløste konflikter</target>
+
+<source>Time stamp</source>
+<target></target>
 
 <source>Append a timestamp to each file name</source>
 <target>Legg til et tidsstempel til hvert filnavn</target>
@@ -1302,11 +1275,14 @@ Merk: Filnavn må være relative til basismapper!
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Papirkurv er ikke tilgjengelig for de følgende baner! Filer blir isteden slettet permanent:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Denne feilen kan ignoreres dersom mappen er tom.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target></target>
 
 <source>Cannot find the following folders:</source>
 <target>Kan ikke finne følgende mapper:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Denne feilen kan ignoreres dersom mappen er tom.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Mapper er avhengige av hverandre! Vær forsiktig når du setter opp synkroniseringsregler:</target>
@@ -1314,8 +1290,8 @@ Merk: Filnavn må være relative til basismapper!
 <source>Start comparison</source>
 <target>Start sammenligning</target>
 
-<source>Preparing synchronization...</source>
-<target>Forbereder synkronisering...</target>
+<source>Calculating sync directions...</source>
+<target></target>
 
 <source>Conflict detected:</source>
 <target>Konflikt oppdaget:</target>
@@ -1457,6 +1433,9 @@ Merk: Filnavn må være relative til basismapper!
 
 <source>Generating database...</source>
 <target>Oppretter database...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target></target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Dataverifiseringsfeil: Kilde- og målfil har forskjellig innhold!</target>

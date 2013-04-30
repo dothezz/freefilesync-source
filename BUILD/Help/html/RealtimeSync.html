@@ -18,7 +18,6 @@
 		H3.western { font-family: "Arial", sans-serif }
 		H3.cjk { font-family: "MS Mincho" }
 		H3.ctl { font-family: "Mangal" }
-		A:link { so-language: zxx }
 	-->
 	</STYLE>
 </HEAD>
@@ -52,16 +51,15 @@ Now press </FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal
 </UL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-	<UL>
-		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT></P>
-		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%;  border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note</B></FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
 		command should </FONT><FONT FACE="Tahoma, sans-serif"><B>not</B></FONT>
 		<FONT FACE="Tahoma, sans-serif"><B>block</B></FONT> <FONT FACE="Tahoma, sans-serif">progress.
 		Make sure the FreeFileSync batch job does not show any popup
 		dialogs. See notes in <A HREF="Batch%20Scripting.html">Batch
 		Scripting</A>.</FONT><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif"><BR>&nbsp;</FONT></SPAN></P>
-		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
+		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
 		settings dialog can be skipped by passing a RealtimeSync
 		configuration file (<FONT FACE="Courier New, monospace">*.ffs_real</FONT>)
 		<B>or</B> a FreeFileSync batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
@@ -71,11 +69,10 @@ Now press </FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal
 		Files\FreeFileSync\RealtimeSync.exe&quot;
 		&quot;C:\SyncJob.ffs_real&quot;<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Courier New, monospace">&quot;C:\Program
 		Files\FreeFileSync\RealtimeSync.exe&quot; &quot;C:\SyncJob.ffs_batch&quot;</FONT><BR>&nbsp;</FONT></P>
-		<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Using
+		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Using
 		RealtimeSync is not restricted to starting FreeFileSync. It can
 		also be used in other scenarios, like sending an email whenever a
 		certain directory is modified.</FONT></P>
-	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -101,47 +98,41 @@ files are modified in &quot;</FONT><FONT FACE="Courier New, monospace">H:\Data</
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-	<UL>
-		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note<BR></B></FONT><FONT FACE="Tahoma, sans-serif">The
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%;  border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note<BR></B></FONT><FONT FACE="Tahoma, sans-serif">The
 		full path of the last changed file and the action that triggered
 		the change notification (create, update or delete) are </FONT><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif">written
 		to the environment variables </FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace"><B>%change_path%</B></FONT></SPAN><SPAN STYLE="text-decoration: none">
 		</SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Tahoma, sans-serif">and
 		</FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace"><B>%change_action%</B></FONT></SPAN><SPAN STYLE="text-decoration: none"><FONT FACE="Courier New, monospace">.</FONT></SPAN></P>
-	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
 <FONT FACE="Tahoma, sans-serif">Show names of changed files or
 directories. (Windows)</FONT></P>
-<UL>
-	<P><SPAN ID="Rahmen4" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-		<UL>
-			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace"><FONT FACE="Tahoma, sans-serif">Show
+
+	<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen4" DIR="LTR" STYLE="float: left; width: 80%;  border: none; padding: 0cm; background: #e6e6e6">
+			<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm"><FONT FACE="Courier New, monospace"><FONT FACE="Tahoma, sans-serif">Show
 			which file or directory has triggered a change. Enter command
 			line:</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;cmd /c echo
 			%change_action% &quot;%change_path%&quot; &amp; pause<BR><BR><FONT FACE="Tahoma, sans-serif">Write
 			a list of all changes to a logfile:</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;cmd
 			/c echo %change_action% &quot;%change_path%&quot; &gt;&gt;
 			c:\log.txt</FONT></P>
-		</UL>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
-</UL>
+	
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-	<UL>
-		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note<BR></B></FONT><FONT FACE="Tahoma, sans-serif">During
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%;  border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note<BR></B></FONT><FONT FACE="Tahoma, sans-serif">During
 		execution of a Windows Batch file (*.bat/*.cmd) a black console
 		window is shown. You can hide it using the Visual Basic script
 		&quot;HideConsole.vbs&quot; located in FreeFileSync's installation
 		directory:</FONT></P>
-		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace"><B>wscript
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm"><FONT FACE="Courier New, monospace"><B>wscript
 		&quot;C:\Program files\FreeFileSync\HideConsole.vbs&quot;
 		C:\MyBatchFile.cmd</B></FONT></P>
-	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>

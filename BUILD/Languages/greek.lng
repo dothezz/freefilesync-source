@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Συνολική διάρκεια:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>Ο υποκατάλογος για το %x δεν μπορεί να κλειδωθεί.</target>
+
 <source>Show in Explorer</source>
 <target>Εμφάνιση στην Εξερεύνηση</target>
 
@@ -32,13 +35,16 @@
 <target>Ζητήθηκε ματαίωση: Αναμονή για την λήξη της τρέχουσας εργασίας...</target>
 
 <source>Failure to create timestamp for versioning:</source>
-<target></target>
+<target>Αποτυχία να δημιουργηθεί χρονική σήμανση για τη διατήρηση παλιών εκδόσεων:</target>
 
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Αυτοματοποιημένος Συγχρονισμός</target>
 
 <source>Error</source>
 <target>Σφάλματα</target>
+
+<source>Selected variant:</source>
+<target>Μέθοδος που επιλέχθηκε:</target>
 
 <source>Select alternate comparison settings</source>
 <target>Επιλογή διαφοροποιημένων ρυθμίσεων σύγκρισης</target>
@@ -57,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Διαγραφή όλων των ρυθμίσεων φίλτρου</target>
+
+<source>Copy</source>
+<target>Αντιγραφή</target>
+
+<source>Paste</source>
+<target>Επικόλληση</target>
 
 <source>Save as batch job</source>
 <target>Αποθήκευση ως δέσμη ενεργειών</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Σημαντικό Σφάλμα</target>
 
-<source>Windows Error Code %x:</source>
-<target>Κωδικός Σφάλματος των Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Κωδικός Σφάλματος του Linux %x:</target>
+<source>Error Code %x:</source>
+<target>Κωδικός Σφάλματος %x</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Ο συμβολικός δεσμός %x δεν μπορεί να επιλυθεί</target>
@@ -160,8 +169,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Αναμονή μέχρι να κλειδωθεί ο υποκατάλογος (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Δεν μπορεί να κλειδωθεί ο υπολατάλογος %x.</target>
+<source>Creating file %x</source>
+<target>Δημιουργία του αρχείου %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -193,9 +202,6 @@
 <source>/sec</source>
 <target>/δευτερόλεπτο</target>
 
-<source>Cannot find file %x.</source>
-<target>Το αρχείο %x δε βρέθηκε.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Το αρχείο %x δεν περιέχει μια έγκυρη διάταξη.</target>
 
@@ -219,6 +225,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Δεν ήταν δυνατό να αναγνωσθούν τα ακόλουθα στοιχεία XML:</target>
+
+<source>Cannot find file %x.</source>
+<target>Το αρχείο %x δε βρέθηκε.</target>
 
 <source>&Open...</source>
 <target>Ά&νοιγμα...</target>
@@ -453,14 +462,17 @@ The command is triggered if:
 <source>&Advanced</source>
 <target>&Για προχωρημένους</target>
 
-<source>&Check for new version</source>
-<target>Έ&λεγχος για νέα έκδοση</target>
+<source>&Check now</source>
+<target>Έλεγχος &τώρα</target>
+
+<source>Check &automatically once a week</source>
+<target>&Aυτόματος έλεγχος μια φορά την εβδομάδα</target>
+
+<source>Check for new version</source>
+<target>Έλεγχος για νέα έκδοση</target>
 
 <source>Compare</source>
 <target>Σύγκριση</target>
-
-<source>&Abort</source>
-<target>&Άκυρο</target>
 
 <source>Synchronize</source>
 <target>Συγχρονισμός</target>
@@ -504,6 +516,18 @@ The command is triggered if:
 <source>Time elapsed:</source>
 <target>Πέρασε χρόνος:</target>
 
+<source>Synchronizing...</source>
+<target>Γίνεται συγχρονισμός...</target>
+
+<source>On completion</source>
+<target>Μετά την ολοκλήρωση</target>
+
+<source>Close</source>
+<target>Κλείσιμο</target>
+
+<source>&Pause</source>
+<target>&Παύση</target>
+
 <source>Batch job</source>
 <target>Δέσμη ενεργειών</target>
 
@@ -533,9 +557,6 @@ The command is triggered if:
 
 <source>Abort synchronization on first error</source>
 <target>Ματαίωση του συγχρονισμού με το πρώτο σφάλμα</target>
-
-<source>On completion</source>
-<target>Μετά την ολοκλήρωση</target>
 
 <source>Show progress dialog</source>
 <target>Εμφάνιση της αναφοράς προόδου</target>
@@ -594,8 +615,8 @@ is the same
 <source><- Two way -></source>
 <target><- Διπλής κατεύθυνσης -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Αναγνώριση και αναπαραγωγή των αλλαγών και στις δύο πλευρές με τη χρήση μιας βάσης δεδομένων. Διαγραφές, μετονομασίες και διενέξεις ανιχνεύονται αυτόματα.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Αναγνώριση και εφαρμογή αλλαγών και στις δυο πλευρές. Οι διαγραφές, οι μεταφορές και οι διενέξεις αναγνωρίζονται αυτόματα με τη βοήθεια μιας βάσης δεδομένων.</target>
 
 <source>Mirror ->></source>
 <target>Κατοπτρισμός ->></target>
@@ -633,14 +654,11 @@ is the same
 <source>Versioning</source>
 <target>Διατήρηση παλιών εκδόσεων</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Μεταφορά χρονοσημασμένων αρχείων σε συγκεκριμένο υποκατάλογο</target>
+<source>Move files to user-defined folder</source>
+<target>Μεταφορά των αρχείων σε έναν υποκατάλογο που ορίζεται από το χρήστη</target>
 
 <source>Naming convention:</source>
 <target>Τρόπος ονομασίας:</target>
-
-<source>Configuration</source>
-<target>Διάταξη</target>
 
 <source>Item exists on left side only</source>
 <target>Το αντικείμενο υπάρχει μόνο στην αριστερή πλευρά</target>
@@ -659,12 +677,6 @@ is the same
 
 <source>Conflict/item cannot be categorized</source>
 <target>Διένεξη/το αντικείμενο δεν μπορεί να κατηγοριοποιηθεί</target>
-
-<source>Synchronizing...</source>
-<target>Γίνεται συγχρονισμός...</target>
-
-<source>&Pause</source>
-<target>&Παύση</target>
 
 <source>Source code written in C++ using:</source>
 <target>Ο πηγαίος κώδικας γράφτηκε σε C++ χρησιμοποιώντας τα:</target>
@@ -726,8 +738,8 @@ Note: File names must be relative to base directories!
 <source>Maximum</source>
 <target>Μέγιστο</target>
 
-<source>&Default</source>
-<target>&Προεπιλογή</target>
+<source>&Clear</source>
+<target>&Καθαρισμός</target>
 
 <source>Fail-safe file copy</source>
 <target>Ασφαλής αντιγραφή αρχείων</target>
@@ -755,6 +767,9 @@ Note: File names must be relative to base directories!
 
 <source>Description</source>
 <target>Περιγραφή</target>
+
+<source>&Default</source>
+<target>&Προεπιλογή</target>
 
 <source>Start synchronization</source>
 <target>Έναρξη του συγχρονισμού</target>
@@ -789,6 +804,9 @@ Note: File names must be relative to base directories!
 <source>Overview</source>
 <target>Σύνοψη</target>
 
+<source>Configuration</source>
+<target>Διάταξη</target>
+
 <source>Filter files</source>
 <target>Φιλτράρισμα</target>
 
@@ -796,7 +814,7 @@ Note: File names must be relative to base directories!
 <target>Επιλογή εμφάνισης</target>
 
 <source>Open...</source>
-<target></target>
+<target>Άνοιγμα...</target>
 
 <source>Save</source>
 <target>Αποθήκευση</target>
@@ -861,104 +879,62 @@ Note: File names must be relative to base directories!
 <source>FreeFileSync batch</source>
 <target>Δέσμη ενεργειών του FreeFileSync</target>
 
-<source>Never save changes</source>
-<target>Να μην αποθηκεύονται οι αλλαγές</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Θέλετε να αποθηκεύσετε τις αλλαγές στο %x;</target>
 
 <source>Do&n't save</source>
 <target>Να &μην αποθηκευθούν</target>
 
+<source>Never save changes</source>
+<target>Να μην αποθηκεύονται οι αλλαγές</target>
+
 <source>Configuration loaded!</source>
 <target>Η διάταξη έχει ανοιχθεί!</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Απόκρυψη των αρχείων που υπάρχουν μόνο στα αριστερά</target>
 
 <source>Show files that exist on left side only</source>
 <target>Εμφάνιση των αρχείων που υπάρχουν μόνο στα αριστερά</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Απόκρυψη των αρχείων που υπάρχουν μόνο στα δεξιά</target>
-
 <source>Show files that exist on right side only</source>
 <target>Εμφάνιση των αρχείων που υπάρχουν μόνο στα δεξιά</target>
-
-<source>Hide files that are newer on left</source>
-<target>Απόκρυψη των αρχείων που είναι πιο πρόσφατα στα αριστερά</target>
 
 <source>Show files that are newer on left</source>
 <target>Εμφάνιση των αρχείων που είναι πιο πρόσφατα στα αριστερά</target>
 
-<source>Hide files that are newer on right</source>
-<target>Απόκρυψη των αρχείων που είναι πιο πρόσφατα στα δεξιά</target>
-
 <source>Show files that are newer on right</source>
 <target>Εμφάνιση των αρχείων που είναι πιο πρόσφατα στα δεξιά</target>
-
-<source>Hide files that are equal</source>
-<target>Απόκρυψη των αρχείων που είναι ίδια</target>
 
 <source>Show files that are equal</source>
 <target>Εμφάνιση των αρχείων που είναι ίδια</target>
 
-<source>Hide files that are different</source>
-<target>Απόκρυψη των αρχείων που είναι διαφορετικά</target>
-
 <source>Show files that are different</source>
 <target>Εμφάνιση των αρχείων που είναι διαφορετικά</target>
-
-<source>Hide conflicts</source>
-<target>Απόκρυψη διενέξεων</target>
 
 <source>Show conflicts</source>
 <target>Εμφάνιση διενέξεων</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>Απόκρυψη των αρχείων που θα δημιουργηθούν στα αριστερά</target>
-
 <source>Show files that will be created on the left side</source>
 <target>Εμφάνιση των αρχείων που θα δημιουργηθούν στα αριστερά</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>Απόκρυψη των αρχείων που θα δημιουργηθούν στα δεξιά</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Εμφάνιση των αρχείων που θα δημιουργηθούν στα δεξιά</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>Απόκρυψη των αρχείων που θα διαγραφούν στα αριστερά</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>Εμφάνιση των αρχείων που θα διαγραφούν στα αριστερά</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>Απόκρυψη των αρχείων που θα διαγραφούν στα δεξιά</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Εμφάνιση των αρχείων που θα διαγραφούν στα δεξιά</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>Απόκρυψη των αρχείων που θα αντικατασταθούν στα αριστερά</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>Εμφάνιση των αρχείων που θα αντικατασταθούν στα αριστερά</target>
 
-<source>Hide files that will be overwritten on right side</source>
-<target>Απόκρυψη των αρχείων που θα αντικατασταθούν στα δεξιά</target>
-
 <source>Show files that will be overwritten on right side</source>
 <target>Εμφάνιση των αρχείων που θα αντικατασταθούν στα αριστερά</target>
-
-<source>Hide files that won't be copied</source>
-<target>Απόκρυψη των αρχείων που δε θα αντιγραφούν</target>
 
 <source>Show files that won't be copied</source>
 <target>Εμφάνιση των αρχείων που δε θα αντιγραφούν</target>
 
 <source>Set as default</source>
-<target></target>
+<target>Ορισμός ως προεπιλογής</target>
 
 <source>All folders are in sync!</source>
 <target>Όλοι οι υποκατάλογοι είναι συγχρονισμένοι!</target>
@@ -971,6 +947,9 @@ Note: File names must be relative to base directories!
 
 <source>File list exported!</source>
 <target>Ο κατάλογος των αρχείων έχει εξαχθεί!</target>
+
+<source>Searching for program updates...</source>
+<target>Αναζήτηση καινούριας έκδοσης...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1005,6 +984,9 @@ Note: File names must be relative to base directories!
 <source>&Ignore</source>
 <target>&Παράβλεψη</target>
 
+<source>Don't show this warning again</source>
+<target>Να μην εμφανιστεί ξανά αυτή η προειδοποίηση</target>
+
 <source>&Switch</source>
 <target>&Εναλλαγή</target>
 
@@ -1022,9 +1004,6 @@ Note: File names must be relative to base directories!
 
 <source>Comparing content...</source>
 <target>Σύγκριση του περιεχομένου...</target>
-
-<source>Copy</source>
-<target>Αντιγραφή</target>
 
 <source>Paused</source>
 <target>Σε παύση</target>
@@ -1081,10 +1060,10 @@ Note: File names must be relative to base directories!
 <target>Φίλτρο</target>
 
 <source>Direct</source>
-<target>Ως δεσμό</target>
+<target>Ως δεσμού</target>
 
 <source>Follow</source>
-<target>Ως περιεχόμενο</target>
+<target>Ως περιεχομένου</target>
 
 <source>Copy NTFS permissions</source>
 <target>Αντιγραφή αδειών προσπέλασης NTFS</target>
@@ -1108,25 +1087,28 @@ Note: File names must be relative to base directories!
 <target>Να επανεμφανιστούν τα κρυμμένα μηνύματα και προειδοποιήσεις;</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Είστε σίγουροι ότι θέλετε να μετακινήσετε το ακόλουθο αντικείμενο στον Κάδο Ανακύκλωσης;</pluralform>
-<pluralform>Είστε σίγουροι ότι θέλετε να μετακινήσετε τα ακόλουθα %x αντικείμενα στον Κάδο Ανακύκλωσης;</pluralform>
+<pluralform>Είσαι σίγουρος ότι θέλεις να μεταφερθεί το ακόλουθο αντικείμενο στον Κάδο Ανακύκλωσης;</pluralform>
+<pluralform>Είσαι σίγουρος ότι θέλεις να μεταφερθούν τα ακόλουθα %x αντικείμενα στον Κάδο Ανακύκλωσης;</pluralform>
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Είστε σίγουροι ότι θέλετε να διαγράψετε το ακόλουθο αντικείμενο;</pluralform>
-<pluralform>Είστε σίγουροι ότι θέλετε να διαγράψετε τα ακόλουθα %x αντικείμενα;</pluralform>
+<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφεί το ακόλουθο αντικείμενο;</pluralform>
+<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφούν τα ακόλουθα %x αντικείμενα;</pluralform>
 </target>
 
 <source>Leave as unresolved conflict</source>
 <target>Παράβλεψη ως ανεπίλυτη διένεξη</target>
+
+<source>Time stamp</source>
+<target>Χρονική σήμανση</target>
 
 <source>Append a timestamp to each file name</source>
 <target>Προσάρτηση χρονικής σήμανσης σε κάθε όνομα αρχείου</target>
@@ -1251,6 +1233,12 @@ Note: File names must be relative to base directories!
 <source>Cannot set privilege %x.</source>
 <target>Τα δικαιώματα %x δεν μπορούν να οριστούν.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Απέτυχε η αναβολή της αναστολής λειτουργίας του υπολογιστή.</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Δεν μπορούν να αλλάξουν οι προτεραιότητες I/O της διεργασίας.</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Το αρχείο %x δεν ήταν δυνατό να μεταφερθεί στον Κάδο Ανακύκλωσης!</target>
 
@@ -1270,7 +1258,7 @@ Note: File names must be relative to base directories!
 <target>Ρύθμιση προεπιλεγμένης κατεύθυνσης συγχρονισμού: Τα νεότερα αρχεία θα αντικαταστήσουν τα παλιότερα.</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
-<target></target>
+<target>Έλεγχος της διαθεσιμότητας του κάδου ανακύκλωσης για τον υποκατάλογο %x...</target>
 
 <source>Moving file %x to recycle bin</source>
 <target>Μεταφορά του αρχείου %x στον κάδο ανακύκλωσης</target>
@@ -1293,11 +1281,14 @@ Note: File names must be relative to base directories!
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Ο Κάδος Ανακύκλωσης δεν είναι διαθέσιμος για τις ακόλουθες διαδρομές! Τα αρχεία θα διαγραφούν μόνιμα:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Μπορείτε να αγνοήσετε αυτό το λάθος, για να θεωρήσετε ότι ο υποκατάλογος είναι κενός.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>Ο αντίστοιχος υποκατάλογος θα θεωρηθεί κενός.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Ο υποκατάλογος %x δεν μπορεί να βρεθεί.</target>
+<source>Cannot find the following folders:</source>
+<target>Οι ακόλουθοι υποκατάλογοι δεν ήταν δυνατό να βρεθούν:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Μπορείτε να αγνοήσετε αυτό το σφάλμα, για να αντιμετωπίσετε κάθε υποκατάλογο ως κενό.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Οι υποκατάλογοι είναι εξαρτώμενοι. Προσοχή κατά την εισαγωγή των κανόνων συγχρονισμού:</target>
@@ -1305,8 +1296,8 @@ Note: File names must be relative to base directories!
 <source>Start comparison</source>
 <target>Έναρξη σύγκρισης</target>
 
-<source>Preparing synchronization...</source>
-<target>Προετοιμασία του συγχρονισμού...</target>
+<source>Calculating sync directions...</source>
+<target>Υπολογισμός των κατευθύνσεων συγχρονισμού...</target>
 
 <source>Conflict detected:</source>
 <target>Ανιχνεύθηκε διένεξη:</target>
@@ -1383,9 +1374,6 @@ Note: File names must be relative to base directories!
 <source>Removing old versions...</source>
 <target>Διαγραφή παλιών εκδόσεων...</target>
 
-<source>Creating file %x</source>
-<target>Δημιουργία του αρχείου %x</target>
-
 <source>Creating symbolic link %x</source>
 <target>Δημιουργία του συμβολικού δεσμού %x</target>
 
@@ -1403,6 +1391,9 @@ Note: File names must be relative to base directories!
 
 <source>Updating attributes of %x</source>
 <target>Ενημέρωση των χαρακτηριστικών αρχείου του %x</target>
+
+<source>Cannot find %x.</source>
+<target>Το %x δεν μπορεί να βρεθεί.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Ο υποκατάλογος-στόχος %x υπάρχει ήδη.</target>
@@ -1448,6 +1439,9 @@ Note: File names must be relative to base directories!
 
 <source>Generating database...</source>
 <target>Δημιουργία βάσης δεδομένων...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Δημιουργία Σκιώδους Αντίγραφου Τόμου για το %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Σφάλμα επικύρωσης δεδομένων: Τα αρχεία προέλευσης και προορισμού έχουν διαφορετικό περιεχόμενο!</target>

@@ -52,11 +52,11 @@ public:
     Int64()                 : value(0) {}
     Int64(const Int64& rhs) : value(rhs.value) {}
     template <class T>
-    Int64(T rhs, typename EnableIf<IsSignedInt<T>::value && sizeof(T) <= sizeof(std::int64_t)>::Type* = nullptr) :
+    Int64(T rhs, typename EnableIf<IsSignedInt<T>::value&&  sizeof(T) <= sizeof(std::int64_t)>::Type* = nullptr) :
         value(static_cast<std::int64_t>(rhs)) {}
 
     //unsafe explicit but checked conversion for all other integer types
-    template <class T> explicit Int64(T rhs, typename EnableIf<!(IsSignedInt<T>::value && sizeof(T) <= sizeof(std::int64_t))>::Type* = nullptr) :
+    template <class T> explicit Int64(T rhs, typename EnableIf<!(IsSignedInt<T>::value&&  sizeof(T) <= sizeof(std::int64_t))>::Type* = nullptr) :
         value(static_cast<std::int64_t>(rhs)) { checkRange<std::int64_t>(rhs); }
 
     Int64& operator=(const Int64& rhs) { value = rhs.value; return *this; }
@@ -131,11 +131,11 @@ public:
     UInt64()                  : value(0) {}
     UInt64(const UInt64& rhs) : value(rhs.value) {}
     template <class T>
-    UInt64(T rhs, typename EnableIf<IsUnsignedInt<T>::value && sizeof(T) <= sizeof(std::uint64_t)>::Type* = nullptr) :
+    UInt64(T rhs, typename EnableIf<IsUnsignedInt<T>::value&&  sizeof(T) <= sizeof(std::uint64_t)>::Type* = nullptr) :
         value(static_cast<std::uint64_t>(rhs)) {}
 
     //unsafe explicit but checked conversion for all other integer types
-    template <class T> explicit UInt64(T rhs, typename EnableIf<!(IsUnsignedInt<T>::value && sizeof(T) <= sizeof(std::uint64_t))>::Type* = nullptr) :
+    template <class T> explicit UInt64(T rhs, typename EnableIf<!(IsUnsignedInt<T>::value&&  sizeof(T) <= sizeof(std::uint64_t))>::Type* = nullptr) :
         value(static_cast<std::uint64_t>(rhs)) { checkRange<std::uint64_t>(rhs); }
 
     UInt64& operator=(const UInt64& rhs) { value = rhs.value; return *this; }

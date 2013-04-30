@@ -19,9 +19,7 @@
 zen::FileId zen::getFileID(const Zstring& filename)
 {
 #ifdef FFS_WIN
-    //WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is cheap!
-    //http://msdn.microsoft.com/en-us/library/aa363788(VS.85).aspx
-
+    //WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is cheap! http://msdn.microsoft.com/en-us/library/aa363788(VS.85).aspx
     //privilege SE_BACKUP_NAME doesn't seem to be required here at all
 
     const HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
@@ -49,17 +47,19 @@ zen::FileId zen::getFileID(const Zstring& filename)
     return zen::FileId();
 }
 
-
-bool zen::samePhysicalFile(const Zstring& file1, const Zstring& file2)
-{
-    if (EqualFilename()(file1, file2)) //quick check
-        return true;
-
-    const auto id1 = getFileID(file1);
-    const auto id2 = getFileID(file2);
-
-    if (id1 == zen::FileId() || id2 == zen::FileId())
-        return false;
-
-    return id1 == id2;
-}
+//test whether two distinct paths point to the same file or directory:
+//      true: paths point to same files/dirs
+//      false: error occurred OR point to different files/dirs
+//bool zen::samePhysicalFile(const Zstring& file1, const Zstring& file2)
+//{
+//    if (EqualFilename()(file1, file2)) //quick check
+//        return true;
+//
+//    const auto id1 = getFileID(file1);
+//    const auto id2 = getFileID(file2);
+//
+//    if (id1 == zen::FileId() || id2 == zen::FileId())
+//        return false;
+//
+//    return id1 == id2;
+//}

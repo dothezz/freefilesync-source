@@ -24,7 +24,7 @@ namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
 const char FILE_FORMAT_DESCR[] = "FreeFileSync";
-const int FILE_FORMAT_VER = 9;
+const int DB_FILE_FORMAT_VER = 9;
 //-------------------------------------------------------------------------------------------------------------------------------
 
 typedef std::string UniqueId;
@@ -39,6 +39,7 @@ template <SelectedSide side> inline
 Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
 {
     //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity?
+	//what about endianess!?
     //however 32 and 64 bit db files *are* designed to be binary compatible!
     //Give db files different names.
     //make sure they end with ".ffs_db". These files will be excluded from comparison
@@ -63,7 +64,7 @@ void saveStreams(const StreamMapping& streamList, const Zstring& filename) //thr
     writeArray(streamOut, FILE_FORMAT_DESCR, sizeof(FILE_FORMAT_DESCR));
 
     //save file format version
-    writeNumber<std::int32_t>(streamOut, FILE_FORMAT_VER);
+    writeNumber<std::int32_t>(streamOut, DB_FILE_FORMAT_VER);
 
     //save stream list
     writeNumber<std::uint32_t>(streamOut, static_cast<std::uint32_t>(streamList.size())); //number of streams, one for each sync-pair
@@ -96,7 +97,7 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError, FileErrorD
             throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
 
         const int version = readNumber<std::int32_t>(streamIn); //throw UnexpectedEndOfStreamError
-        if (version != FILE_FORMAT_VER) //read file format version#
+        if (version != DB_FILE_FORMAT_VER) //read file format version#
             throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
 
         //read stream lists
@@ -363,7 +364,7 @@ private:
     void recurse(InSyncDir& container)
     {
         size_t fileCount = readNumber<std::uint32_t>(inputBoth);
-        while (fileCount-- != 0) //files
+        while (fileCount-- != 0) 
         {
             const Zstring shortName = readUtf8(inputBoth);
             const auto inSyncType = static_cast<InSyncFile::InSyncType>(readNumber<std::int32_t>(inputBoth));
@@ -377,7 +378,7 @@ private:
         }
 
         size_t linkCount = readNumber<std::uint32_t>(inputBoth);
-        while (linkCount-- != 0) //files
+        while (linkCount-- != 0) 
         {
             const Zstring shortName = readUtf8(inputBoth);
 
@@ -390,7 +391,7 @@ private:
         }
 
         size_t dirCount = readNumber<std::uint32_t>(inputBoth);
-        while (dirCount-- != 0) //files
+        while (dirCount-- != 0) 
         {
             const Zstring shortName = readUtf8(inputBoth);
 

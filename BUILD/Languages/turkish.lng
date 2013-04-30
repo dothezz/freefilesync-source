@@ -19,14 +19,17 @@
 <source>Total time:</source>
 <target>Toplam süre:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>%x için klasör kilidi uygulanamıyor.</target>
+
 <source>Show in Explorer</source>
-<target>Tarayıcıda Göster</target>
+<target>Tarayıcıda Görüntüleyin</target>
 
 <source>Open with default application</source>
-<target>Varsayılan uygulama ile aç</target>
+<target>Varsayılan uygulama ile açın</target>
 
 <source>Browse directory</source>
-<target>Klasöre gözat</target>
+<target>Klasöre gözatın</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Vazgeçildi: Yürürlükteki işlemin bitmesi bekleniyor...</target>
@@ -39,6 +42,9 @@
 
 <source>Error</source>
 <target>Hata</target>
+
+<source>Selected variant:</source>
+<target>Seçilmiş çeşit:</target>
 
 <source>Select alternate comparison settings</source>
 <target>Alternatif karşılaştırma ayarlarını seçin</target>
@@ -53,13 +59,19 @@
 <target>Seçilmiş süzgeç yok</target>
 
 <source>Remove alternate settings</source>
-<target>Alternatif ayarları sil</target>
+<target>Alternatif ayarları silin</target>
 
 <source>Clear filter settings</source>
-<target>Süzgeç ayarlarını temizle</target>
+<target>Süzgeç ayarlarını temizleyin</target>
+
+<source>Copy</source>
+<target>Kopyalayın</target>
+
+<source>Paste</source>
+<target>Yapıştırın</target>
 
 <source>Save as batch job</source>
-<target>Toplu iş olarak kaydet</target>
+<target>Toplu iş olarak kaydedin</target>
 
 <source>Comparison settings</source>
 <target>Karşılaştırma ayarları</target>
@@ -80,7 +92,7 @@
 <target>Genel ayarlar</target>
 
 <source>Find</source>
-<target>Bul</target>
+<target>Arayın</target>
 
 <source>Select time span</source>
 <target>Zaman aralığı</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Ölümcül Hata</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows Hata Kodu %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux Hata Kodu %x:</target>
+<source>Error Code %x:</source>
+<target>Hata Kodu %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>%x simge bağlantısı çözümlenemedi</target>
@@ -160,8 +169,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Klasör kilitli olduğundan bekleniyor (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>%x klasörü kilitlenemedi.</target>
+<source>Creating file %x</source>
+<target>%x dosyası ekleniyor</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -191,10 +200,7 @@
 </target>
 
 <source>/sec</source>
-<target>/san</target>
-
-<source>Cannot find file %x.</source>
-<target>%x dosyası bulunamadı.</target>
+<target>/saniye</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>%x dosyası geçerli ayar bilgilerini içermiyor.</target>
@@ -220,14 +226,17 @@
 <source>Cannot read the following XML elements:</source>
 <target>Şu XML elemanları okunamadı:</target>
 
+<source>Cannot find file %x.</source>
+<target>%x dosyası bulunamadı.</target>
+
 <source>&Open...</source>
-<target>&Aç...</target>
+<target>&Açın...</target>
 
 <source>Save &as...</source>
-<target>F&arklı kaydet...</target>
+<target>F&arklı kaydedin...</target>
 
 <source>&Quit</source>
-<target>Çı&k</target>
+<target>Çı&kın</target>
 
 <source>&Program</source>
 <target>&Dosya</target>
@@ -260,13 +269,13 @@
 <target>İzlenecek klasörler</target>
 
 <source>Add folder</source>
-<target>Klasör ekle</target>
+<target>Klasör ekleyin</target>
 
 <source>Remove folder</source>
-<target>Klasörü sil</target>
+<target>Klasörü silin</target>
 
 <source>Browse</source>
-<target>Gözat</target>
+<target>Gözatın</target>
 
 <source>Select a folder</source>
 <target>Bir klasör seçin</target>
@@ -275,7 +284,7 @@
 <target>Boşta bekleme süresi {saniye]</target>
 
 <source>Idle time between last detected change and execution of command</source>
-<target>Son algılanan değişiklik ile komutun yürütülmesi arasındaki bekleme süresi</target>
+<target>Son algılanan değişiklik ile komutun yürütülmesi arasında beklenecek süre</target>
 
 <source>Command line</source>
 <target>Komut satırı</target>
@@ -292,13 +301,13 @@ Komut şu durumlarda yürütülür:
 </target>
 
 <source>Start</source>
-<target>Başla</target>
+<target>Başlayın</target>
 
 <source>&Retry</source>
-<target>&Yeniden dene</target>
+<target>&Yeniden deneyin</target>
 
 <source>Cancel</source>
-<target>İptal</target>
+<target>İptal Edin</target>
 
 <source>Build: %x</source>
 <target>Yapım: %x</target>
@@ -307,10 +316,10 @@ Komut şu durumlarda yürütülür:
 <target>Tüm dosyalar</target>
 
 <source>&Restore</source>
-<target>Ge&ri yükle</target>
+<target>Ge&ri yükleyin</target>
 
 <source>&Exit</source>
-<target>Çı&kış</target>
+<target>Çı&kın</target>
 
 <source>Monitoring active...</source>
 <target>İzleme etkin...</target>
@@ -325,7 +334,7 @@ Komut şu durumlarda yürütülür:
 <target>Eşleştirme durduruldu!</target>
 
 <source>Synchronization completed with errors!</source>
-<target>Eşleştirme hatalarla tamamlandı!</target>
+<target>Eşleştirme bazı hatalarla tamamlandı!</target>
 
 <source>Synchronization completed with warnings.</source>
 <target>Eşleştirme işlemi bazı uyarılarla tamamlandı.</target>
@@ -340,7 +349,7 @@ Komut şu durumlarda yürütülür:
 <target>%x günlük dosyası kaydediliyor...</target>
 
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
-<target>FreeFileSync ana penceresindeki sorunları çözmek için "Değiştir" düğmesine tıklayın.</target>
+<target>FreeFileSync ana penceresindeki sorunları çözmek için "Değiştirin" düğmesine tıklayın.</target>
 
 <source>Switching to FreeFileSync main dialog...</source>
 <target>FreeFileSync ana penceresine geçiliyor...</target>
@@ -349,7 +358,7 @@ Komut şu durumlarda yürütülür:
 <target>Yeni bir FreeFileSync sürümü yayınlanmış:</target>
 
 <source>Download now?</source>
-<target>Şimdi indir?</target>
+<target>İndirilsin mi?</target>
 
 <source>FreeFileSync is up to date!</source>
 <target>FreeFileSync güncel!</target>
@@ -412,34 +421,34 @@ Komut şu durumlarda yürütülür:
 <target>Klasör ya da dosyaları sürükleyip buraya bırakabilirsiniz</target>
 
 <source>Close progress dialog</source>
-<target>İşlem penceresini kapat</target>
+<target>İşlem penceresini kapatılsın</target>
 
 <source>Standby</source>
-<target>Uykuya dal</target>
+<target>Uykuya dalınsın</target>
 
 <source>Log off</source>
-<target>Oturumu kapat</target>
+<target>Oturum kapatılsın</target>
 
 <source>Shut down</source>
-<target>Bilgisayarı kapat</target>
+<target>Bilgisayar kapatılsın</target>
 
 <source>Hibernate</source>
-<target>Hazırda beklet</target>
+<target>Hazırda bekletilsin</target>
 
 <source>&New</source>
 <target>Ye&ni</target>
 
 <source>&Save</source>
-<target>&Kaydet</target>
+<target>&Kaydedin</target>
 
 <source>Save as &batch job...</source>
-<target>&Toplu iş olarak kaydet...</target>
+<target>&Toplu iş olarak kaydedin...</target>
 
 <source>1. &Compare</source>
-<target>1. &Karşılaştır</target>
+<target>1. &Karşılaştırın</target>
 
 <source>2. &Synchronize</source>
-<target>2. &Eşleştir</target>
+<target>2. &Eşleştirin</target>
 
 <source>&Language</source>
 <target>Di&l</target>
@@ -448,46 +457,34 @@ Komut şu durumlarda yürütülür:
 <target>&Genel ayarlar...</target>
 
 <source>&Export file list...</source>
-<target>Dosya list&esini ver...</target>
+<target>Dosya list&esini verin...</target>
 
 <source>&Advanced</source>
 <target>&Araçlar</target>
 
-<source>&Check for new version</source>
-<target>Yeni &sürüm denetimi</target>
+<source>&Check now</source>
+<target>Sürümü &Denetleyin</target>
+
+<source>Check &automatically once a week</source>
+<target>Kendiliğinden haftada bir denetlensin</target>
+
+<source>Check for new version</source>
+<target>Yeni sürüm denetimi</target>
 
 <source>Compare</source>
-<target>Karşılaştır</target>
-
-<source>Compare both sides</source>
-<target>İki tarafı karşılaştırır</target>
-
-<source>&Abort</source>
-<target>V&azgeç</target>
+<target>Karşılaştırın</target>
 
 <source>Synchronize</source>
-<target>Eşleştir</target>
-
-<source>Start synchronization</source>
-<target>Eşleştirmeyi başlatır</target>
+<target>Eşleştirin</target>
 
 <source>Add folder pair</source>
-<target>Klasör çifti ekle</target>
+<target>Klasör çifti ekleyin</target>
 
 <source>Remove folder pair</source>
-<target>Klasör çiftini sil</target>
+<target>Klasör çiftini silin</target>
 
 <source>Swap sides</source>
-<target>Sağ ve sol tarafları değiştir</target>
-
-<source>Open</source>
-<target>Aç</target>
-
-<source>Save</source>
-<target>Kaydet</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Son kullanılan ayarlar (listeden silmek için DEL tuşuna basın)</target>
+<target>Sağ ve sol tarafları değiştirin</target>
 
 <source>Hide excluded items</source>
 <target>Katılmayan ögeler görüntülensin</target>
@@ -519,11 +516,23 @@ Komut şu durumlarda yürütülür:
 <source>Time elapsed:</source>
 <target>Geçen süre:</target>
 
+<source>Synchronizing...</source>
+<target>Eşleştiriliyor...</target>
+
+<source>On completion</source>
+<target>İşlem tamamlandığında:</target>
+
+<source>Close</source>
+<target>Kapatılsın</target>
+
+<source>&Pause</source>
+<target>&Duraklatılsın</target>
+
 <source>Batch job</source>
 <target>Toplu iş</target>
 
 <source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Toplu iş dosyası ile otomatik eşleştirme yapılabilir. Dosya, çift tıklanarak ya da sisteminizdeki görev zamanlayıcıya; FreeFileSync.exe <görev adı>.ffs_batch şeklinde eklenerek yürütülebilir.</target>
+<target>Toplu iş dosyası ile otomatik eşleştirme yapılabilir. Dosyadaki işlemler, çift tıklanarak ya da sisteminizdeki görev zamanlayıcıya; FreeFileSync.exe <görev adı>.ffs_batch şeklinde eklenerek yürütülebilir.</target>
 
 <source>Help</source>
 <target>Yardım</target>
@@ -532,31 +541,28 @@ Komut şu durumlarda yürütülür:
 <target>Hata olursa:</target>
 
 <source>Ignore</source>
-<target>Yoksay</target>
+<target>Yoksayılsın</target>
 
 <source>Hide all error and warning messages</source>
 <target>Tüm hata ve uyarı iletileri gizlenir</target>
 
 <source>Pop-up</source>
-<target>Görüntüle</target>
+<target>Görüntülensin</target>
 
 <source>Show pop-up on errors or warnings</source>
-<target>Hata ya da uyarılar açılır pencerede gösterilir</target>
+<target>Hata ya da uyarılar açılır pencerede görüntülenir</target>
 
 <source>Exit</source>
-<target>Çık</target>
+<target>Çıkın</target>
 
 <source>Abort synchronization on first error</source>
 <target>Oluşacak ilk hatada eşleştirme durdurulur</target>
 
-<source>On completion</source>
-<target>İşlem tamamlandığında:</target>
-
 <source>Show progress dialog</source>
-<target>İşlem penceresini görüntüle</target>
+<target>İşlem penceresi görüntülensin</target>
 
 <source>Save log</source>
-<target>Günlüğe kaydet</target>
+<target>Günlüğe kaydedilsin</target>
 
 <source>Select folder to save log files</source>
 <target>Günlük dosyalarının kaydedileceği klasörü seçin</target>
@@ -601,7 +607,7 @@ aynı olmalıdır
 <target>İçeriğe göre</target>
 
 <source>Symbolic Link handling</source>
-<target>Sembolik bağlantılar:</target>
+<target>Sembolik bağlantı işleme:</target>
 
 <source>OK</source>
 <target>Tamam</target>
@@ -609,17 +615,17 @@ aynı olmalıdır
 <source><- Two way -></source>
 <target><- Çift yönlü -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>İki taraftaki değişiklikler, bir veritabanı kullanarak belirlenir ve görüntülenir. Silme, yeniden adlandırma ve uyuşmazlık durumları kendiliğinden algılanır.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>İki taraftaki değişiklikler belirlenir ve kopyalanır. Silme, taşıma ve çakışmalar, veritabanı kullanılarak kendiliğinden algılanır.</target>
 
 <source>Mirror ->></source>
-<target>Yansıt ->></target>
+<target>Yansıtma ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>Sol taraftaki klasör sağ tarafa yansıtılır. Eşleştirme sonrası sağ klasör, sol klasörün tamamen aynısı olur.</target>
 
 <source>Update -></source>
-<target>Güncelle -></target>
+<target>Güncelleme -></target>
 
 <source>Copy new or updated files to right folder.</source>
 <target>Sol taraftaki yeni ya da güncellenmiş dosyalar sağ tarafa kopyalanır.</target>
@@ -628,34 +634,31 @@ aynı olmalıdır
 <target>Özel</target>
 
 <source>Configure your own synchronization rules.</source>
-<target>Eşleştirme kuralları istendiği şekilde ayarlanabilir.</target>
+<target>Eşleştirme kurallarını istediğiniz şekilde ayarlayabilirsiniz.</target>
 
 <source>Deletion handling</source>
-<target>Silinen dosyaları:</target>
+<target>Silinen dosyalar:</target>
 
 <source>Permanent</source>
-<target>Kalıcı olarak sil</target>
+<target>Kalıcı olarak silinsin</target>
 
 <source>Delete or overwrite files permanently</source>
 <target>Dosyalar kalıcı olarak silinir ya da üzerine yazılır</target>
 
 <source>Recycle Bin</source>
-<target>Geri dönüşüm kutusuna at</target>
+<target>Geri Dönüşüm Kutusuna gönderilsin</target>
 
 <source>Use Recycle Bin for deleted and overwritten files</source>
-<target>Silinen ve üzerine yazılan dosyalar Geri Dönüşüm Kutusuna atılır</target>
+<target>Silinen ve üzerine yazılan dosyalar Geri Dönüşüm Kutusuna gönderilir</target>
 
 <source>Versioning</source>
-<target>Eski sürüm olarak sakla</target>
+<target>Eski sürüm olarak saklansın</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Dosyalar, zaman damgası eklenerek belirtilen klasöre taşınır</target>
+<source>Move files to user-defined folder</source>
+<target>Dosyalar kullanıcı tarafından belirlenen bir klasöre taşınsın</target>
 
 <source>Naming convention:</source>
 <target>Adlandırma kuralı:</target>
-
-<source>Configuration</source>
-<target>İşlemler</target>
 
 <source>Item exists on left side only</source>
 <target>Sol taraftaki ögeler</target>
@@ -675,12 +678,6 @@ aynı olmalıdır
 <source>Conflict/item cannot be categorized</source>
 <target>Uyuşmayan/sınıflanamayan ögeler</target>
 
-<source>Synchronizing...</source>
-<target>Eşleştiriliyor...</target>
-
-<source>&Pause</source>
-<target>&Duraklat</target>
-
 <source>Source code written in C++ using:</source>
 <target>Kaynak kodu C++ kullanılarak yazılmıştır:</target>
 
@@ -688,7 +685,7 @@ aynı olmalıdır
 <target>FreeFileSync’i beğendiyseniz</target>
 
 <source>Donate with PayPal</source>
-<target>PayPal ile bağış yapın</target>
+<target>PayPal üzerinden bağış yapın</target>
 
 <source>Many thanks for localization:</source>
 <target>Çeviriler için çok teşekkürler:</target>
@@ -709,7 +706,7 @@ aynı olmalıdır
 <target>GNU Genel Kamu Lisansı koşulları altında yayınlanmıştır</target>
 
 <source>Delete on both sides</source>
-<target>Her iki taraftakini de sil</target>
+<target>Her iki taraftaki de silinsin</target>
 
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Dosya yalnız bir tarafta seçili olsa bile her iki taraftaki de silinir</target>
@@ -741,14 +738,14 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <source>Maximum</source>
 <target>En büyük</target>
 
-<source>&Default</source>
-<target>&Varsayılan</target>
+<source>&Clear</source>
+<target>&Temizleyin</target>
 
 <source>Fail-safe file copy</source>
 <target>Dosyalar hatasız kopyalansın</target>
 
 <source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Kopyalama önce geçici bir dosyaya (*.ffs_tmp) yapılır. Sonra dosya yeniden adlandırılır. Böylece hatalara karşı daha sağlıklı bir ortam sağlanır.</target>
+<target>Kopyalama önce geçici bir dosyaya (*.ffs_tmp) yapılır. Sonra dosya yeniden adlandırılır. Böylece hatalara karşı daha sağlıklı bir çalışma ortamı sağlanır.</target>
 
 <source>Copy locked files</source>
 <target>Kilitli dosyalar da kopyalansın</target>
@@ -771,6 +768,12 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <source>Description</source>
 <target>Açıklama</target>
 
+<source>&Default</source>
+<target>&Varsayılan</target>
+
+<source>Start synchronization</source>
+<target>Eşleştirmeyi başlatın</target>
+
 <source>Variant</source>
 <target>İşlem tipi</target>
 
@@ -778,16 +781,16 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <target>İstatistikler</target>
 
 <source>Don't show this dialog again</source>
-<target>Bu iletiyi bir daha gösterme</target>
+<target>Bu ileti artık görüntülenmesin</target>
 
 <source>Find what:</source>
 <target>Aranacak:</target>
 
 <source>Match case</source>
-<target>Büyük/küçük harf uydur</target>
+<target>Büyük/küçük harfe uyulsun</target>
 
 <source>&Find next</source>
-<target>&Sonrakini bul</target>
+<target>&Sonrakini bulun</target>
 
 <source>Operation aborted!</source>
 <target>İşlemden vazgeçildi!</target>
@@ -801,38 +804,50 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <source>Overview</source>
 <target>Genel</target>
 
+<source>Configuration</source>
+<target>İşlemler</target>
+
 <source>Filter files</source>
 <target>Dosya süzgeci</target>
 
 <source>Select view</source>
 <target>Görünüm</target>
 
+<source>Open...</source>
+<target>Açın...</target>
+
+<source>Save</source>
+<target>Kaydedin</target>
+
+<source>Compare both sides</source>
+<target>İki tarafı karşılaştırır</target>
+
 <source>Set direction:</source>
 <target>Yönü seçin:</target>
 
 <source>Exclude temporarily</source>
-<target>Geçici olarak katma</target>
+<target>Geçici olarak katılmasın</target>
 
 <source>Include temporarily</source>
-<target>Geçici olarak kat</target>
+<target>Geçici olarak katılsın</target>
 
 <source>Exclude via filter:</source>
-<target>Süzerek dışarda bırak:</target>
+<target>Süzerek dışarda bırakılsın:</target>
 
 <source><multiple selection></source>
 <target><çoklu seçim></target>
 
 <source>Delete</source>
-<target>Sil</target>
+<target>Silin</target>
 
 <source>Include all</source>
-<target>Tümünü kat</target>
+<target>Tümü katılsın</target>
 
 <source>Exclude all</source>
-<target>Hiçbirini katma</target>
+<target>Hiçbiri katılmasın</target>
 
 <source>Show icons:</source>
-<target>Simgeleri göster:</target>
+<target>Simgeler görüntülensin:</target>
 
 <source>Small</source>
 <target>Küçük</target>
@@ -850,7 +865,7 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <target>Varsayılan görünüm</target>
 
 <source>Show "%x"</source>
-<target>"%x" panelini göster</target>
+<target>"%x" panelini görüntülensin</target>
 
 <source><Last session></source>
 <target><Önceki oturum></target>
@@ -864,101 +879,62 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <source>FreeFileSync batch</source>
 <target>FreeFileSync toplu işi</target>
 
-<source>Never save changes</source>
-<target>Asla değişiklikleri kaydetme</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Değişiklikleri %x dosyasına kaydetmek istiyor musunuz?</target>
 
 <source>Do&n't save</source>
-<target>Kaydetme</target>
+<target>Kaydedilmesin</target>
+
+<source>Never save changes</source>
+<target>Değişiklikler asla kaydedilmesin</target>
 
 <source>Configuration loaded!</source>
 <target>Ayarlar yüklendi!</target>
 
-<source>Hide files that exist on left side only</source>
-<target>Yalnız sol tarafta bulunan dosyalar gizlensin</target>
-
 <source>Show files that exist on left side only</source>
 <target>Yalnız sol tarafta bulunan dosyalar görüntülensin</target>
-
-<source>Hide files that exist on right side only</source>
-<target>Yalnız sağ tarafta bulunan dosyalar gizlensin</target>
 
 <source>Show files that exist on right side only</source>
 <target>Yalnız sağ tarafta bulunan dosyalar görüntülensin</target>
 
-<source>Hide files that are newer on left</source>
-<target>Solda daha yeni olan dosyalar gizlensin</target>
-
 <source>Show files that are newer on left</source>
 <target>Solda daha yeni olan dosyalar görüntülensin</target>
-
-<source>Hide files that are newer on right</source>
-<target>Sağda daha yeni olan dosyalar gizlensin</target>
 
 <source>Show files that are newer on right</source>
 <target>Sağda daha yeni olan dosyalar görüntülensin</target>
 
-<source>Hide files that are equal</source>
-<target>Aynı olan dosyalar gizlensin</target>
-
 <source>Show files that are equal</source>
 <target>Aynı olan dosyalar görüntülensin</target>
-
-<source>Hide files that are different</source>
-<target>Farklı olan dosyalar gizlensin</target>
 
 <source>Show files that are different</source>
 <target>Farklı olan dosyalar görüntülensin</target>
 
-<source>Hide conflicts</source>
-<target>Uyuşmazlıklar gizlensin</target>
-
 <source>Show conflicts</source>
 <target>Uyuşmazlıklar görüntülensin</target>
-
-<source>Hide files that will be created on the left side</source>
-<target>Sol tarafa eklenecek dosyalar gizlensin</target>
 
 <source>Show files that will be created on the left side</source>
 <target>Sol tarafa eklenecek dosyalar görüntülensin</target>
 
-<source>Hide files that will be created on the right side</source>
-<target>Sağ tarafa eklenecek dosyalar gizlensin</target>
-
 <source>Show files that will be created on the right side</source>
 <target>Sağ tarafa eklenecek dosyalar görüntülensin</target>
-
-<source>Hide files that will be deleted on the left side</source>
-<target>Sol tarafta silinecek dosyalar gizlensin</target>
 
 <source>Show files that will be deleted on the left side</source>
 <target>Sol tarafta silinecek dosyalar görüntülensin</target>
 
-<source>Hide files that will be deleted on the right side</source>
-<target>Sağ tarafta silinecek dosyalar gizlensin</target>
-
 <source>Show files that will be deleted on the right side</source>
 <target>Sağ tarafta silinecek dosyalar görüntülensin</target>
-
-<source>Hide files that will be overwritten on left side</source>
-<target>Sol tarafta üzerine yazılacak dosyalar gizlensin</target>
 
 <source>Show files that will be overwritten on left side</source>
 <target>Sol tarafta üzerine yazılacak dosyalar görüntülensin</target>
 
-<source>Hide files that will be overwritten on right side</source>
-<target>Sağ tarafta üzerine yazılacak dosyalar gizlensin</target>
-
 <source>Show files that will be overwritten on right side</source>
 <target>Sağ tarafta üzerine yazılacak dosyalar görüntülensin</target>
 
-<source>Hide files that won't be copied</source>
-<target>Kopyalanmayacak dosyalar gizlensin</target>
-
 <source>Show files that won't be copied</source>
 <target>Kopyalanmayacak dosyalar görüntülensin</target>
+
+<source>Set as default</source>
+<target>Varsayılan olarak belirleyin</target>
 
 <source>All folders are in sync!</source>
 <target>Tüm klasörler eşleştirildi.</target>
@@ -970,16 +946,10 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <target>Gösterge</target>
 
 <source>File list exported!</source>
-<target>Dosya listesi verilmiş!</target>
+<target>Dosya listesi verildi!</target>
 
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>Nesne silindi!</pluralform>
-<pluralform>%x nesne silindi!</pluralform>
-</target>
+<source>Searching for program updates...</source>
+<target>Yazılım güncellemesine bakılıyor...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1009,13 +979,16 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 </target>
 
 <source>Ignore further errors</source>
-<target>Sonraki hataları yoksay</target>
+<target>Sonraki hatalar yoksayılsın</target>
 
 <source>&Ignore</source>
-<target>&Yoksay</target>
+<target>&Yoksayın</target>
+
+<source>Don't show this warning again</source>
+<target>Bu uyarı artık görüntülenmesin</target>
 
 <source>&Switch</source>
-<target>&Değiştir</target>
+<target>&Değiştirin</target>
 
 <source>Question</source>
 <target>Soru</target>
@@ -1032,9 +1005,6 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <source>Comparing content...</source>
 <target>İçerik karşılaştırılıyor...</target>
 
-<source>Copy</source>
-<target>Kopyala</target>
-
 <source>Paused</source>
 <target>Duraklatıldı</target>
 
@@ -1048,10 +1018,10 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <target>Tamamlandı</target>
 
 <source>Continue</source>
-<target>Devam et</target>
+<target>Devam edin</target>
 
 <source>Pause</source>
-<target>Duraklat</target>
+<target>Duraklatın</target>
 
 <source>Logging</source>
 <target>Günlükleme</target>
@@ -1117,34 +1087,37 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <target>Gizlenmiş iletiler yeniden görüntülensin mi?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Şu ögeyi geri dönüşüm kutusuna taşımak istediğinizden emin misiniz?</pluralform>
-<pluralform>Şu %x ögeyi geri dönüşüm kutusuna taşımak istediğinizden emin misiniz?</pluralform>
+<pluralform>Aşağıdaki ögeyi Geri Dönüşüm Kutusuna göndermek istediğinize emin misiniz?</pluralform>
+<pluralform>Aşağıdaki ögeleri Geri Dönüşüm Kutusuna göndermek istediğinize emin misiniz?</pluralform>
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Şu ögeyi silmek istiyor musunuz?</pluralform>
-<pluralform>Şu %x ögeyi silmek istiyor musunuz?</pluralform>
+<pluralform>Aşağıdaki ögeyi silmek istediğinize emin misiniz?</pluralform>
+<pluralform>Aşağıdaki ögeleri silmek istediğinize emin misiniz?</pluralform>
 </target>
 
 <source>Leave as unresolved conflict</source>
-<target>Uyuşmazlık çözülmeden kalsın</target>
+<target>Uyuşmazlık çözülmeden bırakılsın</target>
 
-<source>Replace</source>
-<target>Değiştir</target>
-
-<source>Move files and replace if existing</source>
-<target>Dosyaları taşı ve varsa üzerine yaz</target>
+<source>Time stamp</source>
+<target>Zaman Damgası</target>
 
 <source>Append a timestamp to each file name</source>
-<target>Dosya adlarına zaman damgası ekle</target>
+<target>Dosya adlarına zaman damgası eklensin</target>
+
+<source>Replace</source>
+<target>Değiştirin</target>
+
+<source>Move files and replace if existing</source>
+<target>Dosyalar taşınsın ve varsa üzerine yazılsın</target>
 
 <source>Folder</source>
 <target>Klasör</target>
@@ -1260,6 +1233,12 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <source>Cannot set privilege %x.</source>
 <target>%x izni verilemedi.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Sistem uyku kipine geçirilemedi.</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Giriş/Çıkış işlemi öncelikleri değiştirilemedi</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>%x Geri Dönüşüm Kutusuna gönderilemedi</target>
 
@@ -1273,28 +1252,52 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <target>Son eşleştirmeden bu yana bir değişiklik olmamış!</target>
 
 <source>The corresponding database entries are not in sync considering current settings.</source>
-<target>Karşı düşen veritabanı kayıtları, geçerli ayarlar göz önüne alındığında eşleşmiyor.</target>
+<target>Geçerli ayarlar ile ilgili veritabanı kayıtları eşleşmiyor.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Varsayılan eşleştirme yönleri ayarlanıyor: Yeni dosyalar eski dosyaların üzerine yazılacak.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>%x klasörü için Geri Dönüşüm Kutusu kullanılabilir mi diye bakılıyor...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>%x dosyası geri dönüşüm kutusuna atılıyor</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>%x klasörü geri dönüşüm kutusuna atılıyor</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>%x sembolik bağlantısı geri dönüşüm kutusuna atılıyor</target>
+
+<source>Deleting file %x</source>
+<target>%x dosyası siliniyor</target>
+
+<source>Deleting folder %x</source>
+<target>%x klasörü siliniyor</target>
+
+<source>Deleting symbolic link %x</source>
+<target>%x sembolik bağlantısı siliniyor</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Şu yollar için geri dönüşüm kutusu kullanılamaz! Dosyalar anında ve tamamen silinir:</target>
+<target>Aşağıdaki yollar için Geri Dönüşüm Kutusu kullanılamaz! Dosyalar anında ve tamamen silinir:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Bu hatayı yoksayarak, klasörün boş olarak kabul edilmesini sağlayabilirsiniz.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>Karşıdaki klasör boş olarak kabul edilecek.</target>
 
-<source>Cannot find folder %x.</source>
-<target>%x klasörü bulunamıyor.</target>
+<source>Cannot find the following folders:</source>
+<target>Aşağıdaki klasörler bulunamadı:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Bu hatayı yok sayarak karşıdaki klasörleri boş kabul edebilirsiniz.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Klasörler bağımlı! Eşleştirme kurallarını koyarken dikkatli olun:</target>
 
 <source>Start comparison</source>
-<target>Karşılaştırmaya başla</target>
+<target>Karşılaştırmaya başlayın</target>
 
-<source>Preparing synchronization...</source>
-<target>Eşleştirmeye hazırlanıyor...</target>
+<source>Calculating sync directions...</source>
+<target>Eşleştirme yönleri hesaplanıyor...</target>
 
 <source>Conflict detected:</source>
 <target>Uyuşmazlık bulundu:</target>
@@ -1354,28 +1357,10 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <target>Soldaki öznitelikleri güncelle</target>
 
 <source>Update attributes on right</source>
-<target>Sağdaki öznitelikleri güncelle</target>
+<target>Sağdaki öznitelikler güncellensin</target>
 
 <source>Multiple...</source>
 <target>Çoklu...</target>
-
-<source>Deleting file %x</source>
-<target>%x dosyası siliniyor</target>
-
-<source>Deleting folder %x</source>
-<target>%x klasörü siliniyor</target>
-
-<source>Deleting symbolic link %x</source>
-<target>%x sembolik bağlantısı siliniyor</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>%x dosyası geri dönüşüm kutusuna atılıyor</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>%x klasörü geri dönüşüm kutusuna atılıyor</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>%x sembolik bağlantısı geri dönüşüm kutusuna atılıyor</target>
 
 <source>Moving file %x to %y</source>
 <target>%x dosyası %y içine taşınıyor</target>
@@ -1388,9 +1373,6 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 
 <source>Removing old versions...</source>
 <target>Eski sürümler siliniyor...</target>
-
-<source>Creating file %x</source>
-<target>%x dosyası ekleniyor</target>
 
 <source>Creating symbolic link %x</source>
 <target>%x sembolik bağlantısı ekleniyor</target>
@@ -1409,6 +1391,9 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 
 <source>Updating attributes of %x</source>
 <target>%x öznitelikleri güncelleniyor</target>
+
+<source>Cannot find %x.</source>
+<target>%x bulunamadı.</target>
 
 <source>Target folder %x already existing.</source>
 <target>%x hedef klasörü zaten var.</target>
@@ -1455,6 +1440,9 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır!
 <source>Generating database...</source>
 <target>Veri tabanı oluşturuluyor...</target>
 
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>%x için Birim Gölge Kopyası oluşturuluyor...</target>
+
 <source>Data verification error: Source and target file have different content!</source>
-<target>Veri doğrulama hatası: Kaynak ve hedef dosyası içeriği farklı!</target>
+<target>Veri doğrulama hatası: Kaynak ve hedef dosyanın içerikleri farklı!</target>
 

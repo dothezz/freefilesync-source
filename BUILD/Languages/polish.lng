@@ -11,13 +11,16 @@
 <target>Wyszukiwanie katalogu %x...</target>
 
 <source>Items processed:</source>
-<target>Przetworzeone elementy:</target>
+<target>Przetworzone elementy:</target>
 
 <source>Items remaining:</source>
 <target>Pozostałe elementy:</target>
 
 <source>Total time:</source>
 <target>Całkowity czas:</target>
+
+<source>Cannot set directory lock for %x.</source>
+<target>Nie można utworzyć blokady dla katalogu %x.</target>
 
 <source>Show in Explorer</source>
 <target>Wyświetl w Eksploratorze</target>
@@ -40,6 +43,9 @@
 <source>Error</source>
 <target>Błąd</target>
 
+<source>Selected variant:</source>
+<target>Określ wariant:</target>
+
 <source>Select alternate comparison settings</source>
 <target>Określ alternatywne ustawienia porównywania</target>
 
@@ -57,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Wyczyść ustawienia filtra</target>
+
+<source>Copy</source>
+<target>Kopiuj</target>
+
+<source>Paste</source>
+<target>Wklej</target>
 
 <source>Save as batch job</source>
 <target>Zapisz w trybie wsadowym</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Błąd krytyczny</target>
 
-<source>Windows Error Code %x:</source>
-<target>Błąd systemu Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Błąd systemu Linux %x:</target>
+<source>Error Code %x:</source>
+<target>Kod błędu %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nie można określić położenia dowiązania symbolicznego %x.</target>
@@ -126,7 +135,7 @@
 </target>
 
 <source>Database file %x is incompatible.</source>
-<target>Plika bazy danych %x nie jest kompatybilny.</target>
+<target>Plik bazy danych %x nie jest kompatybilny.</target>
 
 <source>Initial synchronization:</source>
 <target>Wstępna synchronizacja:</target>
@@ -161,8 +170,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Blokada katalogu (%x), oczekiwanie...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Nie można utworzyć blokady katalogu %x.</target>
+<source>Creating file %x</source>
+<target>Tworzenie pliku %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -196,9 +205,6 @@
 <source>/sec</source>
 <target>/sekundę</target>
 
-<source>Cannot find file %x.</source>
-<target>Nie można znaleźć pliku %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Plik %x nie zawiera prawidłowej konfiguracji</target>
 
@@ -222,6 +228,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Nie można odczytać elementu XML:</target>
+
+<source>Cannot find file %x.</source>
+<target>Nie można znaleźć pliku %x.</target>
 
 <source>&Open...</source>
 <target>&Otwórz...</target>
@@ -456,23 +465,20 @@ Komenda jest wykonywana gdy:
 <source>&Advanced</source>
 <target>&Zaawansowane</target>
 
-<source>&Check for new version</source>
-<target>&Aktualizuj</target>
+<source>&Check now</source>
+<target>Spra&wdź teraz</target>
+
+<source>Check &automatically once a week</source>
+<target>Sprawdzaj &automatycznie raz w tygodniu</target>
+
+<source>Check for new version</source>
+<target>Sprawdź dostępność aktualizacji</target>
 
 <source>Compare</source>
 <target>Porównaj</target>
 
-<source>Compare both sides</source>
-<target>Porównaj foldery</target>
-
-<source>&Abort</source>
-<target>&Przerwij</target>
-
 <source>Synchronize</source>
 <target>Synchronizuj</target>
-
-<source>Start synchronization</source>
-<target>Rozpocznij synchronizację</target>
 
 <source>Add folder pair</source>
 <target>Dodaj katalogi do porównania</target>
@@ -482,15 +488,6 @@ Komenda jest wykonywana gdy:
 
 <source>Swap sides</source>
 <target>Zamień stronami</target>
-
-<source>Open</source>
-<target>Otwórz</target>
-
-<source>Save</source>
-<target>Zapisz</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Ostatnio użyta konfiguracja (naciśnij DEL żeby usunąć z listy)</target>
 
 <source>Hide excluded items</source>
 <target>Ukryj wykluczone elementy</target>
@@ -522,6 +519,18 @@ Komenda jest wykonywana gdy:
 <source>Time elapsed:</source>
 <target>Szacowany czas:</target>
 
+<source>Synchronizing...</source>
+<target>Synchronizuję...</target>
+
+<source>On completion</source>
+<target>Po zakończeniu</target>
+
+<source>Close</source>
+<target>Zamknij</target>
+
+<source>&Pause</source>
+<target>&Pauza</target>
+
 <source>Batch job</source>
 <target>Plik wsadowy</target>
 
@@ -551,9 +560,6 @@ Komenda jest wykonywana gdy:
 
 <source>Abort synchronization on first error</source>
 <target>Zakończ synchronizację przy pierwszym błędzie</target>
-
-<source>On completion</source>
-<target>Po zakończeniu</target>
 
 <source>Show progress dialog</source>
 <target>Pokaż okno postępu</target>
@@ -612,8 +618,8 @@ jest identyczna
 <source><- Two way -></source>
 <target><- Obustronna -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Znajdź i zastosuj zmiany po obu stronach przy pomocy bazy danych. Usunięnia, zmiany nazwy plików oraz konflikty są usuwane automatycznie.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Wyszukaj oraz zastosuj zmiany po obu stronach. Wszystkie operacje na plikach takie jak usunięcia, zmiany oraz konflikty wykrywane są automatycznie przy użyciu bazy danych.</target>
 
 <source>Mirror ->></source>
 <target>Lustrzana ->></target>
@@ -651,14 +657,11 @@ jest identyczna
 <source>Versioning</source>
 <target>Wersjonowanie</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Pliki wersji oznaczone datą przenieś do określonego katalogu</target>
+<source>Move files to user-defined folder</source>
+<target>Przenieś pliki do katalogu wskazanego przez użytkownika</target>
 
 <source>Naming convention:</source>
 <target>Konwencja nazewnictwa:</target>
-
-<source>Configuration</source>
-<target>Konfiguracja</target>
 
 <source>Item exists on left side only</source>
 <target>Element istnieje tylko po lewej stronie</target>
@@ -677,12 +680,6 @@ jest identyczna
 
 <source>Conflict/item cannot be categorized</source>
 <target>Konflikt/element nie może zostać skategoryzowany</target>
-
-<source>Synchronizing...</source>
-<target>Synchronizuję...</target>
-
-<source>&Pause</source>
-<target>&Pauza</target>
 
 <source>Source code written in C++ using:</source>
 <target>Kod stworzony w C++ z wykorzystaniem:</target>
@@ -744,8 +741,8 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>Maximum</source>
 <target>Maksimum</target>
 
-<source>&Default</source>
-<target>&Domyślne</target>
+<source>&Clear</source>
+<target>W&yczyść</target>
 
 <source>Fail-safe file copy</source>
 <target>Bezpieczne kopiowanie</target>
@@ -773,6 +770,12 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>Description</source>
 <target>Opis</target>
+
+<source>&Default</source>
+<target>&Domyślne</target>
+
+<source>Start synchronization</source>
+<target>Rozpocznij synchronizację</target>
 
 <source>Variant</source>
 <target>Wariant</target>
@@ -804,11 +807,23 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>Overview</source>
 <target>Przegląd</target>
 
+<source>Configuration</source>
+<target>Konfiguracja</target>
+
 <source>Filter files</source>
 <target>Filtruj pliki</target>
 
 <source>Select view</source>
 <target>Określ widok</target>
+
+<source>Open...</source>
+<target>Otwórz...</target>
+
+<source>Save</source>
+<target>Zapisz</target>
+
+<source>Compare both sides</source>
+<target>Porównaj foldery</target>
 
 <source>Set direction:</source>
 <target>Kierunek  synchronizacji:</target>
@@ -867,101 +882,62 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>FreeFileSync batch</source>
 <target>Plik wsadowy FreeFileSync</target>
 
-<source>Never save changes</source>
-<target>Nigdy nie zapisuj zmian</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Czy chcesz zapisać zmiany w %x?</target>
 
 <source>Do&n't save</source>
 <target>&Nie zapisuj</target>
 
+<source>Never save changes</source>
+<target>Nigdy nie zapisuj zmian</target>
+
 <source>Configuration loaded!</source>
 <target>Konfiguracja wczytana!</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Ukryj pliki, które istnieją tylko po lewej stronie</target>
 
 <source>Show files that exist on left side only</source>
 <target>Pokaż pliki istniejące tylko po lewej stronie</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Ukryj pliki, które istnieją tylko po prawej stronie</target>
-
 <source>Show files that exist on right side only</source>
 <target>Pokaż pliki istniejące tylko po prawej stronie</target>
-
-<source>Hide files that are newer on left</source>
-<target>Ukryj pliki, które są nowsze po lewej stronie</target>
 
 <source>Show files that are newer on left</source>
 <target>Pokaż pliki nowsze po lewej stronie</target>
 
-<source>Hide files that are newer on right</source>
-<target>Ukryj pliki, które są nowsze po prawej stronie</target>
-
 <source>Show files that are newer on right</source>
 <target>Pokaż pliki nowsze po prawej stronie</target>
-
-<source>Hide files that are equal</source>
-<target>Ukryj pliki, które są równe</target>
 
 <source>Show files that are equal</source>
 <target>Pokaż pliki, które są równe</target>
 
-<source>Hide files that are different</source>
-<target>Ukryj pliki, które są różne</target>
-
 <source>Show files that are different</source>
 <target>Pokaż pliki, które się różnią</target>
-
-<source>Hide conflicts</source>
-<target>Ukryj konflikty</target>
 
 <source>Show conflicts</source>
 <target>Pokaż konflikty</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>Ukryj pliki, które będą utworzone po lewej stronie</target>
-
 <source>Show files that will be created on the left side</source>
 <target>Pokaż pliki, które będą utworzone po lewej stronie</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>Ukryj pliki, które będą utworzone po prawej stronie</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Pokaż pliki, które będą utworzone po prawej stronie</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>Ukryj pliki, które będą usunięte po lewej stronie</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>Pokaż pliki, które będą usunięte po lewej stronie</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>Ukryj pliki, które będą usunięte po lewej stronie</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Pokaż pliki, które będą usunięte po prawej stronie</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>Ukryj pliki, które zostaną nadpisane po lewej stronie</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>Pokaż pliki, które zostaną nadpisane po lewej stronie</target>
-
-<source>Hide files that will be overwritten on right side</source>
-<target>Ukryj pliki, które zostaną nadpisane po prawej stronie</target>
 
 <source>Show files that will be overwritten on right side</source>
 <target>Pokaż pliki, które zostaną nadpisane po prawej stronie</target>
 
-<source>Hide files that won't be copied</source>
-<target>Ukryj pliki, które nie będą kopiowane</target>
-
 <source>Show files that won't be copied</source>
 <target>Pokaż pliki, które nie będą kopiowane</target>
+
+<source>Set as default</source>
+<target>Zapisz jako domyślne</target>
 
 <source>All folders are in sync!</source>
 <target>Wszystkie katalogi są zsynchronizowane!</target>
@@ -975,15 +951,8 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>File list exported!</source>
 <target>Lista plików wyeksportowana!</target>
 
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>Obiekt pomyślnie usunięty!</pluralform>
-<pluralform>%x obiekty pomyślnie usunięte!</pluralform>
-<pluralform>%x pomyślnie usuniętych!</pluralform>
-</target>
+<source>Searching for program updates...</source>
+<target>Wyszukiwanie aktualizacji...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1021,6 +990,9 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>&Ignore</source>
 <target>&Ignoruj</target>
 
+<source>Don't show this warning again</source>
+<target>Nie pokazuj więcej tego ostrzeżenia</target>
+
 <source>&Switch</source>
 <target>&Zamień</target>
 
@@ -1038,9 +1010,6 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>Comparing content...</source>
 <target>Porównywanie zawartości...</target>
-
-<source>Copy</source>
-<target>Kopiuj</target>
 
 <source>Paused</source>
 <target>Pauza</target>
@@ -1106,7 +1075,7 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <target>Kopiuj uprawnienia NTFS</target>
 
 <source>Integrate external applications into context menu. The following macros are available:</source>
-<target>Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne macra:</target>
+<target>Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne makra:</target>
 
 <source>- full file or folder name</source>
 <target>- pełna nazwa pliku lub katalogu</target>
@@ -1124,36 +1093,39 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <target>Przywrócić ukryte powiadomienia i dialogi?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Czy na pewno chcesz przenieś ten obiekt do kosza?</pluralform>
-<pluralform>Czy na pewno chcesz przenieś %x obiekty do kosza?</pluralform>
-<pluralform>Czy na pewno chcesz przenieś %x obiektów do kosza?</pluralform>
+<pluralform>Czy na pewno chcesz przenieść do kosza następujący element?</pluralform>
+<pluralform>Czy na pewno chcesz przenieść do kosza %x następujące elementy?</pluralform>
+<pluralform>Czy na pewno chcesz przenieść do kosza %x następujących elementów?</pluralform>
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Czy na pewno chcesz usunuąc ten obiekt do kosza?</pluralform>
-<pluralform>Czy na pewno chcesz usunąc %x obiekty do kosza?</pluralform>
-<pluralform>Czy na pewno chcesz usunąć %x obiektów do kosza?</pluralform>
+<pluralform>Czy na pewno chcesz usunąć następujący element?</pluralform>
+<pluralform>Czy na pewno chcesz usunąć %x następujące elementy?</pluralform>
+<pluralform>Czy na pewno chcesz usunąć %x następujących elementów?</pluralform>
 </target>
 
 <source>Leave as unresolved conflict</source>
 <target>Zostaw jako nierozwiązany konflikt</target>
+
+<source>Time stamp</source>
+<target>Znacznik czasu</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Dołącz znacznik czasu do nazwy każdego pliku</target>
 
 <source>Replace</source>
 <target>Zamień</target>
 
 <source>Move files and replace if existing</source>
 <target>Przenieś pliki i nadpisz jeżeli już istnieją</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Dołącz znacznik czasu do nazwy każdego pliku</target>
 
 <source>Folder</source>
 <target>Katalog</target>
@@ -1166,6 +1138,9 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>Files</source>
 <target>Pliki</target>
+
+<source>Items</source>
+<target></target>
 
 <source>Percentage</source>
 <target>Procentowo</target>
@@ -1272,6 +1247,12 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>Cannot set privilege %x.</source>
 <target>Nie można ustawić uprawnień %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Program nie mógł wyłączyć trybu uśpienia systemu.</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Nie można zmienić priorytetu I/O procesu.</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Nie można przenieść %x do kosza!</target>
 
@@ -1290,14 +1271,38 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Ustawianie domyślnego kierunku synchronizacji: Stare pliki zostaną nadpisane nowszymi.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Sprawdzanie dostępności kosza dla katalogu %x...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>Przenoszenie pliku %x do kosza</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>Przenoszenie katalogu %x do kosza</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Przenoszenie dowiązania symbolicznego %x do kosza</target>
+
+<source>Deleting file %x</source>
+<target>Usuwanie pliku %x</target>
+
+<source>Deleting folder %x</source>
+<target>Usuwanie folderu %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Usuwanie dowiązania symbolicznego %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Kosz nie jest dostępny dla określonych ścieżek! Pliki zostaną nieodwracalnie usuniętę:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Możesz zignorować ten błąd traktując katalog jako pusty.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>Katalog będzie oznaczony jako pusty.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Nie można znaleźć katalogu %x.</target>
+<source>Cannot find the following folders:</source>
+<target>Nie można znaleźć następujących katalogów:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Możesz zignorować ten błąd aby uznając katalogi jako puste.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Katalogi są zależne! Pamiętaj o tym podczas ustawiania zasad synchronizacji:</target>
@@ -1305,8 +1310,8 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>Start comparison</source>
 <target>Rozpocznij porównywanie</target>
 
-<source>Preparing synchronization...</source>
-<target>Przygotowywanie synchronizacji...</target>
+<source>Calculating sync directions...</source>
+<target>Obliczanie kierunków synchronizacji...</target>
 
 <source>Conflict detected:</source>
 <target>Wykryto konflikt:</target>
@@ -1371,24 +1376,6 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>Multiple...</source>
 <target>Wiele...</target>
 
-<source>Deleting file %x</source>
-<target>Usuwanie pliku %x</target>
-
-<source>Deleting folder %x</source>
-<target>Usuwanie folderu %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Usuwanie dowiązania symbolicznego %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Przenoszenie pliku %x do kosza</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Przenoszenie katalogu %x do kosza</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Przenoszenie dowiązania symbolicznego %x do kosza</target>
-
 <source>Moving file %x to %y</source>
 <target>Przenoszenie pliku %x do %y</target>
 
@@ -1400,9 +1387,6 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>Removing old versions...</source>
 <target>Usuwanie starszych wersji...</target>
-
-<source>Creating file %x</source>
-<target>Tworzenie pliku %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Tworzenie dowiązania symbolicznego %x</target>
@@ -1421,6 +1405,9 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>Updating attributes of %x</source>
 <target>Aktualizowanie atrybutów %x</target>
+
+<source>Cannot find %x.</source>
+<target>Nie można znaleźć %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Katalog docelowy %x już istnieje.</target>
@@ -1466,6 +1453,9 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>Generating database...</source>
 <target>Generowanie bazy danych...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Tworzenie Volume Shadow Copy dla %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Błąd weryfikacji danych: Plik źródłowy i docelowy różnią się zawartością!</target>

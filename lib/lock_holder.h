@@ -1,31 +1,29 @@
-#ifndef LOCK_HOLDER_H_INCLUDED
-#define LOCK_HOLDER_H_INCLUDED
+#ifndef LOCK_HOLDER_H_489572039485723453425
+#define LOCK_HOLDER_H_489572039485723453425
 
-#include <map>
+#include <set>
 #include <zen/zstring.h>
 #include <zen/stl_tools.h>
 #include "dir_lock.h"
 #include "status_handler.h"
-#include "dir_exist_async.h"
+//#include "dir_exist_async.h"
 
 namespace zen
 {
 const Zstring LOCK_FILE_ENDING = Zstr(".ffs_lock"); //intermediate locks created by DirLock use this extension, too!
 
 //hold locks for a number of directories without blocking during lock creation
+//call after having checked directory existence!
 class LockHolder
 {
 public:
-    LockHolder(const std::vector<Zstring>& dirnamesFmt, //resolved dirname ending with path separator
-               ProcessCallback& procCallback,
-               bool allowUserInteraction)
+    LockHolder(const std::set<Zstring, LessFilename>& dirnamesExisting, //resolved dirname ending with path separator
+               bool& warningDirectoryLockFailed,
+               ProcessCallback& procCallback)
     {
-        std::set<Zstring, LessFilename> existingDirs = getExistingDirsUpdating(dirnamesFmt, allowUserInteraction, procCallback);
-
-        for (auto it = existingDirs.begin(); it != existingDirs.end(); ++it)
+        for (auto it = dirnamesExisting.begin(); it != dirnamesExisting.end(); ++it)
         {
             const Zstring& dirnameFmt = *it;
-
             assert(endsWith(dirnameFmt, FILE_NAME_SEPARATOR)); //this is really the contract, formatting does other things as well, e.g. macro substitution
 
             class WaitOnLockHandler : public DirLockCallback
@@ -45,8 +43,8 @@ public:
             }
             catch (const FileError& e)
             {
-                bool dummy = false; //this warning shall not be shown but logged only
-                procCallback.reportWarning(e.toString(), dummy); //may throw!
+                const std::wstring msg = replaceCpy(_("Cannot set directory lock for %x."), L"%x", fmtFileName(dirnameFmt)) + L"\n\n" + e.toString();
+                procCallback.reportWarning(msg, warningDirectoryLockFailed); //may throw!
             }
         }
     }
@@ -54,8 +52,6 @@ public:
 private:
     std::vector<DirLock> lockHolder;
 };
-
 }
 
-
-#endif // LOCK_HOLDER_H_INCLUDED
+#endif //LOCK_HOLDER_H_489572039485723453425

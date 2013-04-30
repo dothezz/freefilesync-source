@@ -16,38 +16,37 @@
 		P { margin-bottom: 0.21cm }
 		H2.cjk { font-family: "SimSun" }
 		H2.ctl { font-family: "Mangal" }
-		A:link { so-language: zxx }
 	-->
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <H2 CLASS="western"><FONT FACE="Tahoma, sans-serif"><FONT SIZE=4 STYLE="font-size: 15pt">Batch
-Scripting</FONT></FONT></H2>
+scripting</FONT></FONT></H2>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
 can be called from command line and supports integration into batch
 scripts. This section gives some general hints and examples for
 Windows <FONT FACE="Courier New, monospace">*.cmd</FONT> and <FONT FACE="Courier New, monospace">*.bat</FONT>
 scripts.</FONT></P>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
+
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">When
 FreeFileSync is started in batch mode (a <FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
 file is passed as argument) it returns one of the following status
 codes:</FONT></P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-	<UL>
-		<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Return
+
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen6" DIR="LTR" STYLE="float: left; width: 80%;  border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm">
+<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Return
 		Codes</B></SPAN><SPAN STYLE="font-style: normal"><BR>0 -
 		Synchronization completed successfully<BR>1 - Synchronization
 		completed with warnings<BR>2 - Synchronization completed with
-		errors<BR>3 - Synchronization was aborted</SPAN></FONT></P>
-	</UL>
+		errors<BR>3 - Synchronization was aborted</SPAN></FONT>	</P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
+
 <P STYLE="margin-bottom: 0cm; font-weight: normal"><FONT FACE="Tahoma, sans-serif">Now
 you can check if synchronization was successful from a script:</FONT></P>
-<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen6" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen6" DIR="LTR" STYLE="float: left; width: 80%;  border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">&quot;C:\Program
 	Files\FreeFileSync\FreeFileSync.exe&quot; &quot;H:\some
 	folder\SyncJob.ffs_batch&quot;<BR>if errorlevel 1 (<BR>&nbsp;&nbsp;</FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::if
@@ -62,24 +61,22 @@ email notification (using a third party tool).</FONT>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen3" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+<P STYLE="margin-left: 1.32cm; margin-bottom: 0cm"><SPAN ID="Rahmen3" DIR="LTR" STYLE="float: left; width: 80%;  border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm;  margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif"><B>Attention<BR></B>Make sure your
 	script is not blocked by a popup dialog. Consider the following
 	options when setting up a FreeFileSync batch job:</FONT></P>
-	<UL>
-		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Disable
+		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Disable
 		checkbox <SPAN STYLE="font-style: normal"><B>Show progress dialog</B></SPAN>
 		or have <B>On completion</B> automatically close the results dialog
 		after synchronization.</FONT></P>
-		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Set
+		<LI><P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Set
 		e</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">rror
 		handling</SPAN></SPAN></FONT> <FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">to
 		</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Exit
 		instantly</B></SPAN></FONT> <FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">or
 		</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal"><B>Ignore
 		errors</B></SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">.</SPAN></FONT></P>
-	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>

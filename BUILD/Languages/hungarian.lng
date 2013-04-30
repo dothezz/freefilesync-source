@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Becsült idő:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>A következő mappa zárolása sikertelen: %x.</target>
+
 <source>Show in Explorer</source>
 <target>Mutatás az Intézőben</target>
 
@@ -40,6 +43,9 @@
 <source>Error</source>
 <target>Hiba</target>
 
+<source>Selected variant:</source>
+<target>Változat kiválasztása:</target>
+
 <source>Select alternate comparison settings</source>
 <target>Alternatív összehasonlítás beállításai</target>
 
@@ -57,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Szűrőbeállítások törlése</target>
+
+<source>Copy</source>
+<target>Másolás</target>
+
+<source>Paste</source>
+<target>Beillesztés</target>
 
 <source>Save as batch job</source>
 <target>Mentés kötegelt feladatként</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Kritikus hiba</target>
 
-<source>Windows Error Code %x:</source>
-<target>Windows hibakód %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Linux hibakód %x:</target>
+<source>Error Code %x:</source>
+<target>Hibakód %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Sikertelen a következő symlink feloldása: %x.</target>
@@ -160,8 +169,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Várakozás a mappa zárolásának a feloldására (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>A következő mappa zárolása sikertelen: %x.</target>
+<source>Creating file %x</source>
+<target>%x fájl létrehozása</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -193,9 +202,6 @@
 <source>/sec</source>
 <target>/másodperc</target>
 
-<source>Cannot find file %x.</source>
-<target>Nem található a következő fájl: %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>A következő fájl nem tartalmaz érvényes beállításokat: %x.</target>
 
@@ -219,6 +225,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>A következő XML elemek olvasása sikertelen:</target>
+
+<source>Cannot find file %x.</source>
+<target>Nem található a következő fájl: %x.</target>
 
 <source>&Open...</source>
 <target>&Megnyitás...</target>
@@ -453,23 +462,20 @@ A parancs végrehajtódik, ha:
 <source>&Advanced</source>
 <target>&Haladó</target>
 
-<source>&Check for new version</source>
-<target>&Új verzió keresése</target>
+<source>&Check now</source>
+<target>&Ellenőrzés most</target>
+
+<source>Check &automatically once a week</source>
+<target>&Automatikus ellenőrzés hetente</target>
+
+<source>Check for new version</source>
+<target>Új verzió keresése</target>
 
 <source>Compare</source>
 <target>Összehasonlítás</target>
 
-<source>Compare both sides</source>
-<target>Mindkét oldal összehasonlítása</target>
-
-<source>&Abort</source>
-<target>&Megszakít</target>
-
 <source>Synchronize</source>
 <target>Szinkronizálás</target>
-
-<source>Start synchronization</source>
-<target>Szinkronizáció indítása</target>
 
 <source>Add folder pair</source>
 <target>Mappa pár megadása</target>
@@ -479,15 +485,6 @@ A parancs végrehajtódik, ha:
 
 <source>Swap sides</source>
 <target>Oldalak felcserélése</target>
-
-<source>Open</source>
-<target>Megnyitás</target>
-
-<source>Save</source>
-<target>Mentés</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Utoljára használt beállítások (DEL billentyűvel törölhető a listából)</target>
 
 <source>Hide excluded items</source>
 <target>Kizárt elemek elrejtése</target>
@@ -519,6 +516,18 @@ A parancs végrehajtódik, ha:
 <source>Time elapsed:</source>
 <target>Eltelt idő:</target>
 
+<source>Synchronizing...</source>
+<target>Szinkronizálás folyamatban...</target>
+
+<source>On completion</source>
+<target>Befejezés esetén</target>
+
+<source>Close</source>
+<target>Bezárás</target>
+
+<source>&Pause</source>
+<target>&Szünet</target>
+
 <source>Batch job</source>
 <target>Kötegelt feladat</target>
 
@@ -548,9 +557,6 @@ A parancs végrehajtódik, ha:
 
 <source>Abort synchronization on first error</source>
 <target>Szinkronizáció leállítása az első hibánál</target>
-
-<source>On completion</source>
-<target>Befejezés esetén</target>
 
 <source>Show progress dialog</source>
 <target>Folyamatjelző párbeszédablak mutatása</target>
@@ -607,8 +613,8 @@ A fájlok megegyeznek, ha megegyezik
 <source><- Two way -></source>
 <target><- Kétirányú -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Változások azonosítása és végrehajtása mindkét oldalon adatbázis segítségével. Automatikusan felismerődnek a törlések, átnevezések és ütközések.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Változások keresése mindkét oldalon. A törlések, mozgatások és ütközések automatikus felismerése adatbázis segítségével.</target>
 
 <source>Mirror ->></source>
 <target>Tükrözés ->></target>
@@ -646,14 +652,11 @@ A fájlok megegyeznek, ha megegyezik
 <source>Versioning</source>
 <target>Verziókövetés</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Időbélyeges fájlok mozgatása a megadott mappába</target>
+<source>Move files to user-defined folder</source>
+<target>Fájlok mozgatása előre megadott mappába</target>
 
 <source>Naming convention:</source>
 <target>Elnevezési konvenció:</target>
-
-<source>Configuration</source>
-<target>Beállítás</target>
 
 <source>Item exists on left side only</source>
 <target>Az elem csak a bal oldalon létezik</target>
@@ -672,12 +675,6 @@ A fájlok megegyeznek, ha megegyezik
 
 <source>Conflict/item cannot be categorized</source>
 <target>Az ütközés vagy elem nem kategorizálható</target>
-
-<source>Synchronizing...</source>
-<target>Szinkronizálás folyamatban...</target>
-
-<source>&Pause</source>
-<target>&Szünet</target>
 
 <source>Source code written in C++ using:</source>
 <target>A programot C++-ban fejlesztették a következők felhasználásával:</target>
@@ -739,8 +736,8 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Maximum</source>
 <target>Maximum</target>
 
-<source>&Default</source>
-<target>&Alapértelmezett</target>
+<source>&Clear</source>
+<target>&Törlés</target>
 
 <source>Fail-safe file copy</source>
 <target>Hibamentes fájlmásolás</target>
@@ -768,6 +765,12 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>Description</source>
 <target>Megjegyzés</target>
+
+<source>&Default</source>
+<target>&Alapértelmezett</target>
+
+<source>Start synchronization</source>
+<target>Szinkronizáció indítása</target>
 
 <source>Variant</source>
 <target>Variáns</target>
@@ -799,11 +802,23 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Overview</source>
 <target>Összefoglaló</target>
 
+<source>Configuration</source>
+<target>Beállítás</target>
+
 <source>Filter files</source>
 <target>Fájlok szűrése</target>
 
 <source>Select view</source>
 <target>Nézet kiválasztása</target>
+
+<source>Open...</source>
+<target>Megnyitás...</target>
+
+<source>Save</source>
+<target>Mentés</target>
+
+<source>Compare both sides</source>
+<target>Mindkét oldal összehasonlítása</target>
 
 <source>Set direction:</source>
 <target>Irány</target>
@@ -862,104 +877,62 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>FreeFileSync batch</source>
 <target>FreeFileSync kötegelt fájl</target>
 
-<source>Never save changes</source>
-<target>Változtatások figyelmen kívül hagyása</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Akarod menteni a %x változtatásait?</target>
 
 <source>Do&n't save</source>
 <target>Ne mentsd</target>
 
+<source>Never save changes</source>
+<target>Változtatások figyelmen kívül hagyása</target>
+
 <source>Configuration loaded!</source>
 <target>Beállítások betöltve!</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Csak a bal oldalon létező fájlok elrejtése</target>
 
 <source>Show files that exist on left side only</source>
 <target>Csak a bal oldalon létező fájlok mutatása</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Csak a jobb oldalon létező fájlok elrejtése</target>
-
 <source>Show files that exist on right side only</source>
 <target>Csak a jobb oldalon létező fájlok mutatása</target>
-
-<source>Hide files that are newer on left</source>
-<target>A bal oldalon lévő újabb fájlok elrejtése</target>
 
 <source>Show files that are newer on left</source>
 <target>A bal oldali újabb fájlok mutatása</target>
 
-<source>Hide files that are newer on right</source>
-<target>A jobb oldalon lévő újabb fájlok elrejtése</target>
-
 <source>Show files that are newer on right</source>
 <target>A jobb oldali újabb fájlok mutatása</target>
-
-<source>Hide files that are equal</source>
-<target>Az egyező fájlok elrejtése</target>
 
 <source>Show files that are equal</source>
 <target>Egyező fájlok mutatása</target>
 
-<source>Hide files that are different</source>
-<target>A nem egyező fájlok elrejtése</target>
-
 <source>Show files that are different</source>
 <target>Eltérő fájlok mutatása</target>
-
-<source>Hide conflicts</source>
-<target>Ütközések elrejtése</target>
 
 <source>Show conflicts</source>
 <target>Ütközések mutatása</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>A bal oldalon létrehozandó fájlok elrejtése.</target>
-
 <source>Show files that will be created on the left side</source>
 <target>A bal oldalon létrehozandó fájlok mutatása</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>A jobb oldalon létrehozandó fájlok elrejtése.</target>
 
 <source>Show files that will be created on the right side</source>
 <target>A jobb oldalon létrehozandó fájlok mutatása</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>A bal oldalon törlendő fájlok elrejtése.</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>A bal oldalon törlendő fájlok mutatása</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>A jobb oldalon törlendő fájlok elrejtése.</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>A jobb oldalon törlendő fájlok mutatása</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>A bal oldalon felülírandó fájlok elrejtése</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>A bal oldalon felülírandó fájlok mutatása</target>
 
-<source>Hide files that will be overwritten on right side</source>
-<target>A jobb oldalon felülírandó fájlok elrejtése</target>
-
 <source>Show files that will be overwritten on right side</source>
 <target>A jobb oldalon felülírandó fájlok mutatása</target>
-
-<source>Hide files that won't be copied</source>
-<target>A nem másolandó fájlok elrejtése</target>
 
 <source>Show files that won't be copied</source>
 <target>A nem másolandó fájlok mutatása</target>
 
 <source>Set as default</source>
-<target></target>
+<target>Beállítás alapértelmezettként</target>
 
 <source>All folders are in sync!</source>
 <target>Minden mappa szinkronban!</target>
@@ -972,6 +945,9 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>File list exported!</source>
 <target>A fájllista exportálása befejeződött!</target>
+
+<source>Searching for program updates...</source>
+<target>Szoftverfrissítés keresése...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1006,6 +982,9 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>&Ignore</source>
 <target>&Kihagy</target>
 
+<source>Don't show this warning again</source>
+<target>Figyelmeztetés elrejtése legközelebb</target>
+
 <source>&Switch</source>
 <target>&Váltás</target>
 
@@ -1023,9 +1002,6 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>Comparing content...</source>
 <target>Tartalom összehasonlítása...</target>
-
-<source>Copy</source>
-<target>Másolás</target>
 
 <source>Paused</source>
 <target>Szüneteltetve</target>
@@ -1109,25 +1085,28 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <target>Tegyük újra láthatóvá a rejtett figyelmeztetéseket és párbeszédablakokat?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Valóban a Lomtárba (Recycle Bin) akarod mozgatni a következő objektumot?</pluralform>
-<pluralform>Valóban a Lomtárba (Recycle Bin) akarod mozgatni a következő %x objektumot?</pluralform>
+<pluralform>Valóban a Lomtárba akarod mozgatni a következő elemet?</pluralform>
+<pluralform>Valóban a Lomtárba akarod mozgatni a következő %x elemet?</pluralform>
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Valóban törölni akarod a következő objektumot?</pluralform>
-<pluralform>Valóban törölni akarod a következő %x objektumot?</pluralform>
+<pluralform>Valóban törölni akarod a következő elemet?</pluralform>
+<pluralform>Valóban törölni akarod a következő %x elemet?</pluralform>
 </target>
 
 <source>Leave as unresolved conflict</source>
 <target>Feloldatlan ütközésként hagyni</target>
+
+<source>Time stamp</source>
+<target>Időbélyeg</target>
 
 <source>Append a timestamp to each file name</source>
 <target>Időbélyeg hozzáadása a minden fájlnévhez</target>
@@ -1149,6 +1128,9 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>Files</source>
 <target>Fájlok</target>
+
+<source>Items</source>
+<target></target>
 
 <source>Percentage</source>
 <target>Százalék</target>
@@ -1252,6 +1234,12 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Cannot set privilege %x.</source>
 <target>A következő privilégium beállítása sikertelen: %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>A rendszer alvó üzemmódjának felfüggesztése sikertelen.</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>A feladat I/O priorításainak megváltoztatása sikertelen!</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>%x Lomtárba helyezése sikertelen!</target>
 
@@ -1271,7 +1259,7 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <target>Alapértelmezett szinkronizációs irányok beállítása: a régebbi fájlok felülíródnak az újabbakkal.</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
-<target></target>
+<target>A következő mappa meglétének ellenőrzése a Lomtárban: %x.</target>
 
 <source>Moving file %x to recycle bin</source>
 <target>%x fájl mozgatása a Lomtárba (Recycle Bin)</target>
@@ -1294,11 +1282,14 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>A Lomtár (Recycle Bin) nem elérhető a következő útvonalakhoz! A fájlok azonnali törlésre kerülnek helyette:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Figyelmen kívül hagyhatod ezt a hibát ezzel üresnek tekintve a mappát.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>A megfelelő mappa üresként lesz kezelve.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Nem található a következő mappa: %x.</target>
+<source>Cannot find the following folders:</source>
+<target>A következő mappák nem találhatóak:</target>
+
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target></target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>A mappák függenek egymástól! Legyen óvatos, amikor megadja a szinkronizálási szabályokat:</target>
@@ -1306,8 +1297,8 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Start comparison</source>
 <target>Összehasonlítás megkezdése</target>
 
-<source>Preparing synchronization...</source>
-<target>Szinkronizálás előkészítése...</target>
+<source>Calculating sync directions...</source>
+<target>Szinkronizációs irányok számítása...</target>
 
 <source>Conflict detected:</source>
 <target>Ütközés történt:</target>
@@ -1384,9 +1375,6 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 <source>Removing old versions...</source>
 <target>Régi verziók eltávolítása...</target>
 
-<source>Creating file %x</source>
-<target>%x fájl létrehozása</target>
-
 <source>Creating symbolic link %x</source>
 <target>%x symlink létrehozása</target>
 
@@ -1404,6 +1392,9 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>Updating attributes of %x</source>
 <target>A(z) %x attribútumainak frissítése</target>
+
+<source>Cannot find %x.</source>
+<target>A(z) %x nem található.</target>
 
 <source>Target folder %x already existing.</source>
 <target>A következő célmappa már létezik: %x.</target>
@@ -1449,6 +1440,9 @@ Megjegyzés: A fájlneveknek relatívnak kell lenniük az alap mappához viszony
 
 <source>Generating database...</source>
 <target>Adatbázis generálása...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Volume Shadow Copy létrehozása %x számára...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Adatellenőrzési hiba: A forrás és cél fájl tartalma különbözik!</target>

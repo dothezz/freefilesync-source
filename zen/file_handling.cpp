@@ -35,12 +35,12 @@
 
 #elif defined FFS_MAC
 #include <sys/mount.h> //statfs
-#include <utime.h>
+//#include <utime.h>
 #endif
 
 #if defined FFS_LINUX || defined FFS_MAC
 #include <sys/stat.h>
-//#include <sys/time.h>
+#include <sys/time.h> //lutimes
 #endif
 
 using namespace zen;
@@ -933,15 +933,18 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
     }
 #endif
 
-#elif defined FFS_LINUX
-    struct ::timespec newTimes[2] = {};
-    newTimes[0].tv_nsec = UTIME_OMIT; //omit access time
-    newTimes[1].tv_sec = to<time_t>(modTime); //modification time (seconds)
+#elif defined FFS_LINUX || defined FFS_MAC
+    //sigh, we can't use utimensat on NTFS volumes on Ubuntu: silent failure!!! what morons are programming this shit???
 
-    if (::utimensat(AT_FDCWD, filename.c_str(), newTimes, procSl == SYMLINK_DIRECT ? AT_SYMLINK_NOFOLLOW : 0) != 0)
-        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+    //    struct ::timespec newTimes[2] = {};
+    //    newTimes[0].tv_nsec = UTIME_OMIT; //omit access time
+    //    newTimes[1].tv_sec = to<time_t>(modTime); //modification time (seconds)
+    //
+    //    if (::utimensat(AT_FDCWD, filename.c_str(), newTimes, procSl == SYMLINK_DIRECT ? AT_SYMLINK_NOFOLLOW : 0) != 0)
+    //        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
 
-#elif defined FFS_MAC
+    //=> fallback to "retarded-idiot version"! -- DarkByte
+
     struct ::timeval newTimes[2] = {};
     newTimes[0].tv_sec = ::time(nullptr); //access time (seconds)
     newTimes[1].tv_sec = to<time_t>(modTime); //modification time (seconds)

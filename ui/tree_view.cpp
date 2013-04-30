@@ -24,13 +24,13 @@ inline
 void TreeView::compressNode(Container& cont) //remove single-element sub-trees -> gain clarity + usability (call *after* inclusion check!!!)
 {
     if (cont.subDirs.empty() || //single files node or...
-        (cont.firstFile == nullptr && //single dir node...
+        (cont.firstFileId == nullptr && //single dir node...
          cont.subDirs.size() == 1  && //
-         cont.subDirs[0].firstFile == nullptr && //...that is empty
+         cont.subDirs[0].firstFileId == nullptr && //...that is empty
          cont.subDirs[0].subDirs.empty()))       //
     {
         cont.subDirs.clear();
-        cont.firstFile = nullptr;
+        cont.firstFileId = nullptr;
     }
 }
 
@@ -56,50 +56,57 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
         return std::max(fileObj.getFileSize<LEFT_SIDE>(), fileObj.getFileSize<RIGHT_SIDE>());
     };
 
-
-    cont.firstFile = nullptr;
+    cont.firstFileId = nullptr;
     std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
                   [&](FileMapping& fileObj)
     {
         if (pred(fileObj))
         {
             cont.bytesNet += getBytes(fileObj);
+            ++cont.itemCountNet;
 
-            if (!cont.firstFile)
-                cont.firstFile = fileObj.getId();
+            if (!cont.firstFileId)
+                cont.firstFileId = fileObj.getId();
         }
     });
-    cont.bytesGross += cont.bytesNet;
 
-    if (!cont.firstFile)
-        std::find_if(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-                     [&](SymLinkMapping& linkObj) -> bool
+    std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
+                  [&](SymLinkMapping& linkObj)
     {
         if (pred(linkObj))
         {
-            cont.firstFile = linkObj.getId();
-            return true;
+            ++cont.itemCountNet;
+
+            if (!cont.firstFileId)
+                cont.firstFileId = linkObj.getId();
         }
-        return false;
     });
+    cont.bytesGross     += cont.bytesNet;
+    cont.itemCountGross += cont.itemCountNet;
 
     cont.subDirs.reserve(hierObj.refSubDirs().size()); //avoid expensive reallocations!
 
     std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
                   [&cont, pred](DirMapping& subDirObj)
     {
+        const bool included = pred(subDirObj);
+
         cont.subDirs.push_back(TreeView::DirNodeImpl()); //
         auto& subDirView = cont.subDirs.back();
         TreeView::extractVisibleSubtree(subDirObj, subDirView, pred);
-        cont.bytesGross += subDirView.bytesGross;
+        if (included)
+            ++subDirView.itemCountGross;
 
-        if (pred(subDirObj) || subDirView.firstFile || !subDirView.subDirs.empty())
+        cont.bytesGross     += subDirView.bytesGross;
+        cont.itemCountGross += subDirView.itemCountGross;
+
+        if (!included && !subDirView.firstFileId && subDirView.subDirs.empty())
+            cont.subDirs.pop_back();
+        else
         {
             subDirView.objId = subDirObj.getId();
             compressNode(subDirView);
         }
-        else
-            cont.subDirs.pop_back();
     });
 }
 
@@ -202,7 +209,23 @@ void TreeView::sortSingleLevel(std::vector<TreeLine>& items, ColumnTypeNavi colu
         return 0U;
     };
 
+    auto getCount = [](const TreeLine& line) -> int
+    {
+        switch (line.type_)
+        {
+            case TreeView::TYPE_ROOT:
+            case TreeView::TYPE_DIRECTORY:
+                return line.node_->itemCountGross;
+
+            case TreeView::TYPE_FILES:
+                return line.node_->itemCountNet;
+        }
+        assert(false);
+        return 0;
+    };
+
     const auto lessBytes = [&](const TreeLine& lhs, const TreeLine& rhs) { return getBytes(lhs) < getBytes(rhs); };
+    const auto lessCount = [&](const TreeLine& lhs, const TreeLine& rhs) { return getCount(lhs) < getCount(rhs); };
 
     switch (columnType)
     {
@@ -212,6 +235,10 @@ void TreeView::sortSingleLevel(std::vector<TreeLine>& items, ColumnTypeNavi colu
 
         case COL_TYPE_NAVI_DIRECTORY:
             std::sort(items.begin(), items.end(), LessShortName<ascending>());
+            break;
+
+        case COL_TYPE_NAVI_ITEM_COUNT:
+            std::sort(items.begin(), items.end(), makeSortDirection(lessCount, Int2Type<ascending>()));
             break;
     }
 }
@@ -230,7 +257,7 @@ void TreeView::getChildren(const Container& cont, size_t level, std::vector<Tree
         workList.push_back(std::make_pair(subDir.bytesGross, &output.back().percent_));
     });
 
-    if (cont.firstFile)
+    if (cont.firstFileId)
     {
         output.push_back(TreeLine(level, 0, &cont, TreeView::TYPE_FILES));
         workList.push_back(std::make_pair(cont.bytesNet, &output.back().percent_));
@@ -302,7 +329,7 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
     }
 
     //restore node expansion status
-    for (size_t row = 0; row < flatTree.size(); ++row) //flatTree size changes within loop!
+    for (size_t row = 0; row < flatTree.size(); ++row) //flatTree size changes during loop!
     {
         const TreeLine& line = flatTree[row];
 
@@ -334,15 +361,16 @@ void TreeView::updateView(Predicate pred)
 
         //warning: the following lines are almost 1:1 copy from extractVisibleSubtree:
         //however we *cannot* reuse code here; this were only possible if we could replace "std::vector<RootNodeImpl>" by "Container"!
-        if (root.firstFile || !root.subDirs.empty())
+        if (!root.firstFileId && root.subDirs.empty())
+            newView.pop_back();
+        else
         {
             root.baseMap = baseObj;
             this->compressNode(root); //"this->" required by two-pass lookup as enforced by GCC 4.7
         }
-        else
-            newView.pop_back();
     });
 
+    lastViewFilterPred = pred;
     applySubView(std::move(newView));
 }
 
@@ -365,6 +393,8 @@ bool TreeView::getDefaultSortDirection(ColumnTypeNavi colType)
             return false;
         case COL_TYPE_NAVI_DIRECTORY:
             return true;
+        case COL_TYPE_NAVI_ITEM_COUNT:
+            return false;
     }
     assert(false);
     return true;
@@ -383,7 +413,7 @@ TreeView::NodeStatus TreeView::getStatus(size_t row) const
         {
             case TreeView::TYPE_DIRECTORY:
             case TreeView::TYPE_ROOT:
-                return flatTree[row].node_->firstFile || !flatTree[row].node_->subDirs.empty() ? TreeView::STATUS_REDUCED : TreeView::STATUS_EMPTY;
+                return flatTree[row].node_->firstFileId || !flatTree[row].node_->subDirs.empty() ? TreeView::STATUS_REDUCED : TreeView::STATUS_EMPTY;
 
             case TreeView::TYPE_FILES:
                 return TreeView::STATUS_EMPTY;
@@ -466,7 +496,14 @@ void TreeView::updateCmpResult(bool hideFiltered,
                                bool equalFilesActive,
                                bool conflictFilesActive)
 {
-    updateView([&](const FileSystemObject& fsObj) -> bool
+    updateView([hideFiltered, //make sure the predicate can be stored safely!
+                leftOnlyFilesActive,
+                rightOnlyFilesActive,
+                leftNewerFilesActive,
+                rightNewerFilesActive,
+                differentFilesActive,
+                equalFilesActive,
+                conflictFilesActive](const FileSystemObject& fsObj) -> bool
     {
         if (hideFiltered && !fsObj.isActive())
             return false;
@@ -506,7 +543,16 @@ void TreeView::updateSyncPreview(bool hideFiltered,
                                  bool syncEqualActive,
                                  bool conflictFilesActive)
 {
-    updateView([&](const FileSystemObject& fsObj) -> bool
+    updateView([hideFiltered, //make sure the predicate can be stored safely!
+                syncCreateLeftActive,
+                syncCreateRightActive,
+                syncDeleteLeftActive,
+                syncDeleteRightActive,
+                syncDirOverwLeftActive,
+                syncDirOverwRightActive,
+                syncDirNoneActive,
+                syncEqualActive,
+                conflictFilesActive](const FileSystemObject& fsObj) -> bool
     {
         if (hideFiltered && !fsObj.isActive())
             return false;
@@ -564,14 +610,14 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
     if (row < flatTree.size())
     {
         const auto level = flatTree[row].level_;
-
         const int percent = flatTree[row].percent_;
+
         switch (flatTree[row].type_)
         {
             case TreeView::TYPE_ROOT:
             {
                 const auto* root = static_cast<const TreeView::RootNodeImpl*>(flatTree[row].node_);
-                return make_unique<TreeView::RootNode>(percent, getStatus(row), root->bytesGross, *(root->baseMap));
+                return make_unique<TreeView::RootNode>(percent, root->bytesGross, root->itemCountGross, getStatus(row), *(root->baseMap));
             }
             break;
 
@@ -579,15 +625,34 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
             {
                 const auto* dir = static_cast<const TreeView::DirNodeImpl*>(flatTree[row].node_);
                 if (auto dirObj = dynamic_cast<DirMapping*>(FileSystemObject::retrieve(dir->objId)))
-                    return make_unique<TreeView::DirNode>(percent, level, getStatus(row), dir->bytesGross, *dirObj);
+                    return make_unique<TreeView::DirNode>(percent, dir->bytesGross, dir->itemCountGross, level, getStatus(row), *dirObj);
             }
             break;
 
             case TreeView::TYPE_FILES:
             {
                 const auto* parentDir = flatTree[row].node_;
-                if (auto firstFile = FileSystemObject::retrieve(parentDir->firstFile))
-                    return make_unique<TreeView::FilesNode>(percent, level, parentDir->bytesNet, *firstFile);
+                if (auto firstFile = FileSystemObject::retrieve(parentDir->firstFileId))
+                {
+                    std::vector<FileSystemObject*> filesAndLinks;
+                    HierarchyObject& parent = firstFile->parent();
+
+                    //lazy evaluation: recheck "lastViewFilterPred" again rather than buffer and bloat "lastViewFilterPred"
+                    std::for_each(parent.refSubFiles().begin(), parent.refSubFiles().end(),
+                                  [&](FileSystemObject& fsObj)
+                    {
+                        if (lastViewFilterPred(fsObj))
+                            filesAndLinks.push_back(&fsObj);
+                    });
+                    std::for_each(parent.refSubLinks().begin(), parent.refSubLinks().end(),
+                                  [&](FileSystemObject& fsObj)
+                    {
+                        if (lastViewFilterPred(fsObj))
+                            filesAndLinks.push_back(&fsObj);
+                    });
+
+                    return make_unique<TreeView::FilesNode>(percent, parentDir->bytesNet, parentDir->itemCountNet, level, filesAndLinks);
+                }
             }
             break;
         }
@@ -672,13 +737,16 @@ private:
                             else if (dirRight.empty())
                                 return dirLeft;
                             else
-                                return utfCvrtTo<wxString>(dirLeft + L" \x2212 " + dirRight); //\x2212 = unicode minus
+                                return dirLeft + L" \x2212 " + dirRight; //\x2212 = unicode minus
                         }
                         else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
                             return utfCvrtTo<wxString>(dir->dirObj_.getObjShortName());
                         else if (dynamic_cast<const TreeView::FilesNode*>(node.get()))
                             return _("Files");
                         break;
+
+                    case COL_TYPE_NAVI_ITEM_COUNT:
+                        return toGuiString(node->itemCount_);
                 }
         }
         return wxEmptyString;
@@ -876,8 +944,9 @@ private:
         {
             int alignment = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
 
-            //have file size right-justified (but don't change for RTL languages)
-            if (static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_BYTES && grid.GetLayoutDirection() != wxLayout_RightToLeft)
+            //have file size and item count right-justified (but don't change for RTL languages)
+            if ((static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_BYTES ||
+                 static_cast<ColumnTypeNavi>(colType) == COL_TYPE_NAVI_ITEM_COUNT) && grid.GetLayoutDirection() != wxLayout_RightToLeft)
             {
                 rectTmp.width -= 2 * GAP_SIZE;
                 alignment = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
@@ -918,6 +987,8 @@ private:
                 return _("Size");
             case COL_TYPE_NAVI_DIRECTORY:
                 return _("Name");
+            case COL_TYPE_NAVI_ITEM_COUNT:
+                return _("Items");
         }
         return wxEmptyString;
     }
@@ -1043,6 +1114,8 @@ private:
         ContextMenu menu;
 
         //--------------------------------------------------------------------------------------------------------
+        menu.addCheckBox(_("Percentage"), [this] { setShowPercentage(!getShowPercentage()); }, getShowPercentage());
+        //--------------------------------------------------------------------------------------------------------
         auto toggleColumn = [&](const Grid::ColumnAttribute& ca)
         {
             auto colAttr = grid_.getColumnConfig();
@@ -1064,8 +1137,6 @@ private:
             menu.addCheckBox(getColumnLabel(ca.type_), [ca, toggleColumn]() { toggleColumn(ca); },
             ca.visible_, ca.type_ != static_cast<ColumnType>(COL_TYPE_NAVI_DIRECTORY)); //do not allow user to hide file name column!
         }
-        //--------------------------------------------------------------------------------------------------------
-        menu.addCheckBox(_("Percentage"), [this] { setShowPercentage(!getShowPercentage()); }, getShowPercentage());
         //--------------------------------------------------------------------------------------------------------
         menu.addSeparator();
 

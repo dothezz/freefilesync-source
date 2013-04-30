@@ -143,7 +143,7 @@ private:
     virtual void OnClose       (wxCloseEvent&   event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     virtual void OnCancel      (wxCommandEvent& event) { EndModal(ReturnSmallDlg::BUTTON_CANCEL); }
     virtual void OnHelp        (wxCommandEvent& event) { displayHelpEntry(L"html/Exclude Items.html", this); }
-    virtual void OnDefault     (wxCommandEvent& event);
+    virtual void OnClear       (wxCommandEvent& event);
     virtual void OnApply       (wxCommandEvent& event);
     virtual void OnUpdateChoice(wxCommandEvent& event) { updateGui(); }
     virtual void OnUpdateNameFilter(wxCommandEvent& event) { updateGui(); }
@@ -153,7 +153,6 @@ private:
     FilterConfig getFilter() const;
     void onKeyEvent(wxKeyEvent& event);
 
-    const bool isGlobalFilter_;
     FilterConfig& outputRef;
 
     EnumDescrList<UnitTime> enumTimeDescr;
@@ -165,7 +164,6 @@ FilterDlg::FilterDlg(wxWindow* parent,
                      bool isGlobalFilter, //global or local filter dialog?
                      FilterConfig& filter) :
     FilterDlgGenerated(parent),
-    isGlobalFilter_(isGlobalFilter),
     outputRef(filter) //just hold reference
 {
 #ifdef FFS_WIN
@@ -207,6 +205,7 @@ FilterDlg::FilterDlg(wxWindow* parent,
     //    else
     //        m_staticTexHeader->SetLabel("Filter single folder pair"));
     //
+
     m_staticTextHeader->SetLabel(_("Filter"));
 
     Fit(); //child-element widths have changed: image was set
@@ -234,30 +233,23 @@ void FilterDlg::updateGui()
 {
     FilterConfig activeCfg = getFilter();
 
-    m_bitmapInclude->SetBitmap(
-        !NameFilter::isNull(activeCfg.includeFilter, FilterConfig().excludeFilter) ?
-        getResourceImage(L"filter_include") :
-        greyScale(getResourceImage(L"filter_include")));
-
-    m_bitmapExclude->SetBitmap(
-        !NameFilter::isNull(FilterConfig().includeFilter, activeCfg.excludeFilter) ?
-        getResourceImage(L"filter_exclude") :
-        greyScale(getResourceImage(L"filter_exclude")));
-
-    m_bitmapFilterDate->SetBitmap(
-        activeCfg.unitTimeSpan != UTIME_NONE ?
-        getResourceImage(L"clock") :
-        greyScale(getResourceImage(L"clock")));
-
-    m_bitmapFilterSize->SetBitmap(
-        activeCfg.unitSizeMin != USIZE_NONE ||
-        activeCfg.unitSizeMax != USIZE_NONE ?
-        getResourceImage(L"size") :
-        greyScale(getResourceImage(L"size")));
+    auto setStatusBitmap = [&](wxStaticBitmap& staticBmp, const wxString& bmpName, bool active)
+    {
+        if (active)
+            staticBmp.SetBitmap(getResourceImage(bmpName));
+        else
+            staticBmp.SetBitmap(greyScale(getResourceImage(bmpName)));
+    };
+    setStatusBitmap(*m_bitmapInclude,    L"filter_include", !NameFilter::isNull(activeCfg.includeFilter, FilterConfig().excludeFilter));
+    setStatusBitmap(*m_bitmapExclude,    L"filter_exclude", !NameFilter::isNull(FilterConfig().includeFilter, activeCfg.excludeFilter));
+    setStatusBitmap(*m_bitmapFilterDate, L"clock", activeCfg.unitTimeSpan != UTIME_NONE);
+    setStatusBitmap(*m_bitmapFilterSize, L"size", activeCfg.unitSizeMin != USIZE_NONE || activeCfg.unitSizeMax != USIZE_NONE);
 
     m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan == UTIME_LAST_X_DAYS);
     m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin != USIZE_NONE);
     m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax != USIZE_NONE);
+
+    m_buttonClear  ->Enable(!(activeCfg == FilterConfig()));
 }
 
 
@@ -291,21 +283,15 @@ FilterConfig FilterDlg::getFilter() const
 }
 
 
-void FilterDlg::OnDefault(wxCommandEvent& event)
+void FilterDlg::OnClear(wxCommandEvent& event)
 {
-    if (isGlobalFilter_)
-        setFilter(MainConfiguration().globalFilter);
-    else
-        setFilter(FilterConfig());
-
-    //changes to mainDialog are only committed when the OK button is pressed
-    Fit();
+    setFilter(FilterConfig());
 }
 
 
 void FilterDlg::OnApply(wxCommandEvent& event)
 {
-    //only if user presses ApplyFilter, he wants the changes to be committed
+    //changes to mainDialog are only committed when the OK button is pressed
     outputRef = getFilter();
 
     //when leaving dialog: filter and redraw grid, if filter is active
@@ -395,14 +381,14 @@ void DeleteDialog::updateGui()
     wxString header;
     if (m_checkBoxUseRecycler->GetValue())
     {
-        header = _P("Do you really want to move the following object to the Recycle Bin?",
-                    "Do you really want to move the following %x objects to the Recycle Bin?", delInfo.second);
+        header = _P("Do you really want to move the following item to the Recycle Bin?",
+                    "Do you really want to move the following %x items to the Recycle Bin?", delInfo.second);
         m_bitmapDeleteType->SetBitmap(getResourceImage(L"recycler"));
     }
     else
     {
-        header = _P("Do you really want to delete the following object?",
-                    "Do you really want to delete the following %x objects?", delInfo.second);
+        header = _P("Do you really want to delete the following item?",
+                    "Do you really want to delete the following %x items?", delInfo.second);
         m_bitmapDeleteType->SetBitmap(getResourceImage(L"deleteFile"));
     }
     replace(header, L"%x", toGuiString(delInfo.second));

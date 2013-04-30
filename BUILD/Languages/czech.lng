@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Celkový čas:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>Nelze nastavit zámek adresáře %x.</target>
+
 <source>Show in Explorer</source>
 <target>Zobrazit v Průzkumníkovi</target>
 
@@ -40,6 +43,9 @@
 <source>Error</source>
 <target>Chyba</target>
 
+<source>Selected variant:</source>
+<target>Vybraná varianta:</target>
+
 <source>Select alternate comparison settings</source>
 <target>Změnit nastavení porovnání</target>
 
@@ -57,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Zrušit nastavení filtru</target>
+
+<source>Copy</source>
+<target>Kopírovat</target>
+
+<source>Paste</source>
+<target>Vložit</target>
 
 <source>Save as batch job</source>
 <target>Uložit jako dávku</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Závažná chyba</target>
 
-<source>Windows Error Code %x:</source>
-<target>Chybový kód Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Chybový kód Linux %x:</target>
+<source>Error Code %x:</source>
+<target>Chybový kód %x</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nelze najít odkaz zástupce %x.</target>
@@ -161,8 +170,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Čekání na uzamčení adresáře (%x)</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Nelze nastavit zámek adresáře %x.</target>
+<source>Creating file %x</source>
+<target>Vytváření souboru %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -196,9 +205,6 @@
 <source>/sec</source>
 <target>/s</target>
 
-<source>Cannot find file %x.</source>
-<target>Nelze najít soubor %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Soubor %x neobsahuje platnou konfiguraci.</target>
 
@@ -206,10 +212,10 @@
 <target>Konfigurace ze souboru %x byla načtena jen částečně.</target>
 
 <source>Cannot access Volume Shadow Copy Service.</source>
-<target>Nepodařil se přístup ke službě Volume Shadow Copy Service.</target>
+<target>Nepodařil se přístup ke službě Stínové kopie.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Prosím použijte FreeFileSync 64-bitovou verzi pro použití služby Volume Shadow Copy.</target>
+<target>Prosím použijte FreeFileSync 64-bitovou verzi pro použití služby Stínové kopie.</target>
 
 <source>Cannot load file %x.</source>
 <target>Nelze načíst soubor %x.</target>
@@ -222,6 +228,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Nelze načíst následující XML elementy:</target>
+
+<source>Cannot find file %x.</source>
+<target>Nelze najít soubor %x.</target>
 
 <source>&Open...</source>
 <target>&Otevřít...</target>
@@ -456,23 +465,20 @@ Příkaz je spuštěn když:
 <source>&Advanced</source>
 <target>&Upřesnit</target>
 
-<source>&Check for new version</source>
-<target>Zkontrolovat &aktualizace</target>
+<source>&Check now</source>
+<target>Zkontrolovat &nyní</target>
+
+<source>Check &automatically once a week</source>
+<target>Kontrolovat &automaticky jendou týdně</target>
+
+<source>Check for new version</source>
+<target>&Zkontrolovat aktualizace</target>
 
 <source>Compare</source>
 <target>Porovnání</target>
 
-<source>Compare both sides</source>
-<target>Porovnat obě strany</target>
-
-<source>&Abort</source>
-<target>&Ukončit</target>
-
 <source>Synchronize</source>
 <target>Synchronizace</target>
-
-<source>Start synchronization</source>
-<target>Start synchronizace</target>
 
 <source>Add folder pair</source>
 <target>Přidat adresář pro porovnání</target>
@@ -482,15 +488,6 @@ Příkaz je spuštěn když:
 
 <source>Swap sides</source>
 <target>Změna stran</target>
-
-<source>Open</source>
-<target>Načíst</target>
-
-<source>Save</source>
-<target>Uložit</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Posledně použité konfigurace (pomocí DEL můžete položku smazat)</target>
 
 <source>Hide excluded items</source>
 <target>Skrýt vynechané položky</target>
@@ -522,6 +519,18 @@ Příkaz je spuštěn když:
 <source>Time elapsed:</source>
 <target>Uplynulý čas:</target>
 
+<source>Synchronizing...</source>
+<target>Synchronizuji...</target>
+
+<source>On completion</source>
+<target>Po dokončení</target>
+
+<source>Close</source>
+<target>Zavřít</target>
+
+<source>&Pause</source>
+<target>&Pauza</target>
+
 <source>Batch job</source>
 <target>Dávkový soubor</target>
 
@@ -551,9 +560,6 @@ Příkaz je spuštěn když:
 
 <source>Abort synchronization on first error</source>
 <target>Ukončit synchronizaci při první chybě</target>
-
-<source>On completion</source>
-<target>Po dokončení</target>
 
 <source>Show progress dialog</source>
 <target>Zobrazit průběh zpracování</target>
@@ -612,8 +618,8 @@ je stejný
 <source><- Two way -></source>
 <target><- Databáze -></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Rozpoznat a provést změny na obou stranách pomocí databáze. Odstraněné nebo přejmenované soubory a konflikty budou detekovány automaticky.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Rozpoznat a provést změny na obou stranách. Odstraněné, přesunuté nebo přejmenované soubory a konflikty budou detekovány automaticky pomocí databáze.</target>
 
 <source>Mirror ->></source>
 <target>Zrcadlení ->></target>
@@ -651,14 +657,11 @@ je stejný
 <source>Versioning</source>
 <target>Verzování</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Přesunout časově označení soubory do zvláštního adresáře</target>
+<source>Move files to user-defined folder</source>
+<target>Přesunout soubory do uživatelského adresáře</target>
 
 <source>Naming convention:</source>
 <target>Pojmenování:</target>
-
-<source>Configuration</source>
-<target>Konfigurace</target>
 
 <source>Item exists on left side only</source>
 <target>Položky existující pouze vlevo</target>
@@ -677,12 +680,6 @@ je stejný
 
 <source>Conflict/item cannot be categorized</source>
 <target>Konflikty/položky které nelze zařadit</target>
-
-<source>Synchronizing...</source>
-<target>Synchronizuji...</target>
-
-<source>&Pause</source>
-<target>&Pauza</target>
 
 <source>Source code written in C++ using:</source>
 <target>Zdrojový kód byl napsán kompletně v C++ pomocí:</target>
@@ -744,8 +741,8 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Maximum</source>
 <target>Do</target>
 
-<source>&Default</source>
-<target>&Předdefinované</target>
+<source>&Clear</source>
+<target>&Smazat</target>
 
 <source>Fail-safe file copy</source>
 <target>Bezpečné kopírování souborů</target>
@@ -757,7 +754,7 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Kopírovat zamčené soubory</target>
 
 <source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Kopírovat sdílené nebo zamčené soubory pomocí Volume Shadow Copy Service (Vyžaduje administrátorské oprávnění)</target>
+<target>Kopírovat sdílené nebo zamčené soubory pomocí služby Stínové kopie (Vyžaduje administrátorské oprávnění)</target>
 
 <source>Copy file access permissions</source>
 <target>Kopírovat přístupová oprávnění k souborům</target>
@@ -773,6 +770,12 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Description</source>
 <target>Popis</target>
+
+<source>&Default</source>
+<target>&Předdefinované</target>
+
+<source>Start synchronization</source>
+<target>Start synchronizace</target>
 
 <source>Variant</source>
 <target>Varianta</target>
@@ -804,11 +807,23 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Overview</source>
 <target>Přehled</target>
 
+<source>Configuration</source>
+<target>Konfigurace</target>
+
 <source>Filter files</source>
 <target>Filtr souborů</target>
 
 <source>Select view</source>
 <target>Vyberte zobrazení</target>
+
+<source>Open...</source>
+<target>Otevřít...</target>
+
+<source>Save</source>
+<target>Uložit</target>
+
+<source>Compare both sides</source>
+<target>Porovnat obě strany</target>
 
 <source>Set direction:</source>
 <target>Nastavit adresář:</target>
@@ -867,101 +882,62 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>FreeFileSync batch</source>
 <target>FreeFileSync dávka</target>
 
-<source>Never save changes</source>
-<target>Nikdy neukládat změny</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Uložit změny do %x?</target>
 
 <source>Do&n't save</source>
 <target>Neukládat</target>
 
+<source>Never save changes</source>
+<target>Nikdy neukládat změny</target>
+
 <source>Configuration loaded!</source>
 <target>Konfigurace načtena.</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Skrýt soubory existující pouze vlevo</target>
 
 <source>Show files that exist on left side only</source>
 <target>Zobrazit soubory existující pouze vlevo</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Skrýt soubory existující pouze vpravo</target>
-
 <source>Show files that exist on right side only</source>
 <target>Zobrazit soubory existující pouze vpravo</target>
-
-<source>Hide files that are newer on left</source>
-<target>Skrýt novější zleva</target>
 
 <source>Show files that are newer on left</source>
 <target>Zobrazit soubory novější vlevo</target>
 
-<source>Hide files that are newer on right</source>
-<target>Skrýt novější zprava</target>
-
 <source>Show files that are newer on right</source>
 <target>Zobrazit soubory novější vpravo</target>
-
-<source>Hide files that are equal</source>
-<target>Skrýt shodné soubory</target>
 
 <source>Show files that are equal</source>
 <target>Zobrazit shodné soubory</target>
 
-<source>Hide files that are different</source>
-<target>Skrýt rozdílné soubory</target>
-
 <source>Show files that are different</source>
 <target>Zobrazit rozdílené soubory</target>
-
-<source>Hide conflicts</source>
-<target>Skrýt konflikty</target>
 
 <source>Show conflicts</source>
 <target>Zobrazit konflikty</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>Skrýt soubory, které budou vlevo vytvořeny</target>
-
 <source>Show files that will be created on the left side</source>
 <target>Zobrazit soubory, které budou vlevo vytvořeny</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>Skrýt soubory, které budou vpravo vytvořeny</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Zobrazit soubory, které budou vpravo vytvořeny</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>Skrýt soubory, které budou vlevo smazány</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>Zobrazit soubory, které budou vlevo smazány</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>Skrýt soubory, které budou vpravo smazány</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Zobrazit soubory, které budou vpravo smazány</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>Skrýt soubory, které budou vlevo přepsány</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>Zobrazit soubory, které budou vlevo přepsány</target>
-
-<source>Hide files that will be overwritten on right side</source>
-<target>Skrýt soubory, které budou vpravo přepsány</target>
 
 <source>Show files that will be overwritten on right side</source>
 <target>Zobrazit soubory, které budou vpravo přepsány</target>
 
-<source>Hide files that won't be copied</source>
-<target>Skrýt soubory, které nebudou kopírovány</target>
-
 <source>Show files that won't be copied</source>
 <target>Zobrazit soubory, které nebudou kopírovány</target>
+
+<source>Set as default</source>
+<target>Nastavit jako výchozí</target>
 
 <source>All folders are in sync!</source>
 <target>Všechny složky jsou synchronizovány!</target>
@@ -975,15 +951,8 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>File list exported!</source>
 <target>Seznam souborů exportován!</target>
 
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>Objekt úspěšně smazán!</pluralform>
-<pluralform>%x objekty úspěšně smazány!</pluralform>
-<pluralform>%x objektů úspěšně smazáno!</pluralform>
-</target>
+<source>Searching for program updates...</source>
+<target>Hledání aktualizací programu ...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1021,6 +990,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>&Ignore</source>
 <target>&Pokračovat</target>
 
+<source>Don't show this warning again</source>
+<target>Nezobrazovat již příště toto varování</target>
+
 <source>&Switch</source>
 <target>&Přepnout</target>
 
@@ -1038,9 +1010,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Comparing content...</source>
 <target>Porovnávání obsahu...</target>
-
-<source>Copy</source>
-<target>Kopírovat</target>
 
 <source>Paused</source>
 <target>Pauza</target>
@@ -1124,36 +1093,39 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Povolit opět zobrazování skrytých dialogů a hlášení?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>Opravdu chcete přesunout následující objekt?</pluralform>
-<pluralform>Opravdu chcete přesunout následující %x objekty?</pluralform>
-<pluralform>Opravdu chcete přesunout následujících %x objektů?</pluralform>
+<pluralform>Opravdu chcete přesunout následující položku do Koše?</pluralform>
+<pluralform>Opravdu chcete přesunout následující %x položky do Koše?</pluralform>
+<pluralform>Opravdu chcete přesunout následujících %x položek do Koše?</pluralform>
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>Opravdu chcete smazat následující objekt?</pluralform>
-<pluralform>Opravdu chcete smazat následující %x objekty?</pluralform>
-<pluralform>Opravdu chcete smazat následujících %x objektů?</pluralform>
+<pluralform>Opravdu chcete smazat následující položku?</pluralform>
+<pluralform>Opravdu chcete smazat následující %x položky?</pluralform>
+<pluralform>Opravdu chcete smazat následujících %x položek?</pluralform>
 </target>
 
 <source>Leave as unresolved conflict</source>
 <target>Ponechat jako nevyřešený konflikt</target>
+
+<source>Time stamp</source>
+<target>Časová značka</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Přidat časovou značku ke jménu souboru</target>
 
 <source>Replace</source>
 <target>Nahradit</target>
 
 <source>Move files and replace if existing</source>
 <target>Přesunout a nahradit pokud soubory existují</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Přidat časovou značku ke jménu souboru</target>
 
 <source>Folder</source>
 <target>Složka</target>
@@ -1166,6 +1138,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Files</source>
 <target>Soubory</target>
+
+<source>Items</source>
+<target></target>
 
 <source>Percentage</source>
 <target>Procentní podíl</target>
@@ -1272,6 +1247,12 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Cannot set privilege %x.</source>
 <target>Nelze nastavit práva pro %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Nepodařilo se uspat systém</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Nelze nastavit priority procesu.</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Není možné přesunout %x do Koše!</target>
 
@@ -1290,14 +1271,38 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Nastaven výchozí způsob synchronizace: Staré soubory budou nahrazeny novými.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Kontrola Koše na složku %x ...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>Přesouvání souboru %x do Koše</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>Přesouvání afresáře %x do Koše</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Přesouvání symbolického odkazu %x do Koše</target>
+
+<source>Deleting file %x</source>
+<target>Mazání souboru %x</target>
+
+<source>Deleting folder %x</source>
+<target>Mazání adresáře %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Mazání symbolického odkazu %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
 <target>Nelze použít Koš pro následující umístění! Soubory budou odstraněny trvale:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Tuto chybu můžete přeskočit a považovat neexistující složku jako prázdnou.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>Odpovídající složku bude považován za prázdný.</target>
 
-<source>Cannot find folder %x.</source>
-<target>>Nelze najít složku %x.</target>
+<source>Cannot find the following folders:</source>
+<target>Nelze najít následující složky:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Tuto chybu můžete přeskočit a považovat neexistující složku jako prázdnou.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Adresáře jsou závislé! Buďte opatrní s definicí synchronizačních pravidel:</target>
@@ -1305,8 +1310,8 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Start comparison</source>
 <target>Spustit porovnání</target>
 
-<source>Preparing synchronization...</source>
-<target>Příprava synchronizace...</target>
+<source>Calculating sync directions...</source>
+<target>Příprava adresářů synchronizace...</target>
 
 <source>Conflict detected:</source>
 <target>Zaznamenán konflikt:</target>
@@ -1371,24 +1376,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Multiple...</source>
 <target>Různé...</target>
 
-<source>Deleting file %x</source>
-<target>Mazání souboru %x</target>
-
-<source>Deleting folder %x</source>
-<target>Mazání adresáře %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Mazání symbolického odkazu %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Přesouvání souboru %x do Koše</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Přesouvání afresáře %x do Koše</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Přesouvání symbolického odkazu %x do Koše</target>
-
 <source>Moving file %x to %y</source>
 <target>Přesouvání souboru %x do %y</target>
 
@@ -1400,9 +1387,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Removing old versions...</source>
 <target>Odstraňování starých verzí...</target>
-
-<source>Creating file %x</source>
-<target>Vytváření souboru %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Vytváření symbolického odkazu %x</target>
@@ -1421,6 +1405,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Updating attributes of %x</source>
 <target>Aktualizace atributů souboru %x</target>
+
+<source>Cannot find %x.</source>
+<target>Nelze najít %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>Cílova složka %x již existuje.</target>
@@ -1466,6 +1453,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Generating database...</source>
 <target>Vytváření databáze...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Vytváření Stínové kopie pro %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Nezdařila se verifikace dat: Zdrojový a cílový soubor mají rozdílný obsah!</target>

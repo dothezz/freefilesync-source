@@ -19,6 +19,9 @@
 <source>Total time:</source>
 <target>Timp Total:</target>
 
+<source>Cannot set directory lock for %x.</source>
+<target>Nu pot face zăvorîrea dosarului %x.</target>
+
 <source>Show in Explorer</source>
 <target>Arată în Exploratorul de File</target>
 
@@ -40,6 +43,9 @@
 <source>Error</source>
 <target>Eroare</target>
 
+<source>Selected variant:</source>
+<target>Varianta selectată:</target>
+
 <source>Select alternate comparison settings</source>
 <target>Selectează setările alternative de comparare</target>
 
@@ -57,6 +63,12 @@
 
 <source>Clear filter settings</source>
 <target>Curăță Setările Filtrului</target>
+
+<source>Copy</source>
+<target>Copiază</target>
+
+<source>Paste</source>
+<target>Lipește</target>
 
 <source>Save as batch job</source>
 <target>Salvează ca Sarcină Set</target>
@@ -97,11 +109,8 @@
 <source>Fatal Error</source>
 <target>Eroare Fatală</target>
 
-<source>Windows Error Code %x:</source>
-<target>Codul Erorii Windows %x:</target>
-
-<source>Linux Error Code %x:</source>
-<target>Codul Erorii Linux %x:</target>
+<source>Error Code %x:</source>
+<target>Cod de Eroare %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nu pot rezolva legătura simbolică %x.</target>
@@ -161,8 +170,8 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Aștept ca dosarul să fie zăvorît (%x)...</target>
 
-<source>Cannot set directory lock %x.</source>
-<target>Nu pot seta zăvorîrea dosarului %x.</target>
+<source>Creating file %x</source>
+<target>Creez fila %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -196,9 +205,6 @@
 <source>/sec</source>
 <target>/sec</target>
 
-<source>Cannot find file %x.</source>
-<target>Nu pot găsi fila %x.</target>
-
 <source>File %x does not contain a valid configuration.</source>
 <target>Fila %x nu conține o configurație validă.</target>
 
@@ -222,6 +228,9 @@
 
 <source>Cannot read the following XML elements:</source>
 <target>Nu pot citi următoarele elemente XML:</target>
+
+<source>Cannot find file %x.</source>
+<target>Nu pot găsi fila %x.</target>
 
 <source>&Open...</source>
 <target>&Deschide...</target>
@@ -456,23 +465,20 @@ Comanda este declanșată dacă:
 <source>&Advanced</source>
 <target>&Avansate</target>
 
-<source>&Check for new version</source>
-<target>&Caută Versiune Nouă a Softului</target>
+<source>&Check now</source>
+<target>&Caută Acum</target>
+
+<source>Check &automatically once a week</source>
+<target>Caută &Automat în Fiecare Săptămînă</target>
+
+<source>Check for new version</source>
+<target>Caută Versiune Nouă</target>
 
 <source>Compare</source>
 <target>Compară</target>
 
-<source>Compare both sides</source>
-<target>Compară Părțile Stîngă și Dreaptă</target>
-
-<source>&Abort</source>
-<target>&Anulează</target>
-
 <source>Synchronize</source>
 <target>Sincronizează</target>
-
-<source>Start synchronization</source>
-<target>Pornește Sincronizarea</target>
 
 <source>Add folder pair</source>
 <target>Adaugă Pereche Nouă de Dosare</target>
@@ -482,15 +488,6 @@ Comanda este declanșată dacă:
 
 <source>Swap sides</source>
 <target>Schimbă compartimentele stîng și drept între ele</target>
-
-<source>Open</source>
-<target>Deschide</target>
-
-<source>Save</source>
-<target>Salvează</target>
-
-<source>Last used configurations (press DEL to remove from list)</source>
-<target>Ultimele configurații utilizate (apasă tasta DEL pentru a înlătura din listă)</target>
 
 <source>Hide excluded items</source>
 <target>Ascunde elementele excluse</target>
@@ -522,6 +519,18 @@ Comanda este declanșată dacă:
 <source>Time elapsed:</source>
 <target>Timp Scurs:</target>
 
+<source>Synchronizing...</source>
+<target>Sincronizare Aflată în Curs...</target>
+
+<source>On completion</source>
+<target>La Terminare</target>
+
+<source>Close</source>
+<target>Închide</target>
+
+<source>&Pause</source>
+<target>&Pauzează</target>
+
 <source>Batch job</source>
 <target>Sarcină Set</target>
 
@@ -551,9 +560,6 @@ Comanda este declanșată dacă:
 
 <source>Abort synchronization on first error</source>
 <target>Sincronizarea e abandonată la prima eroare</target>
-
-<source>On completion</source>
-<target>La Terminare</target>
 
 <source>Show progress dialog</source>
 <target>Arată progresul sincronizării</target>
@@ -612,8 +618,8 @@ este același
 <source><- Two way -></source>
 <target><= Bidirecțională =></target>
 
-<source>Identify and propagate changes on both sides using a database. Deletions, renaming and conflicts are detected automatically.</source>
-<target>Identificare și propagare a modificărilor din ambele părți folosind o bază de date. Ștergerile, renumirile și conflictele sînt detectate automat.</target>
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identificare și propagare a modificărilor din ambele părți. Ștergerile, renumirile și conflictele sînt detectate automat, folosind o bază de date.</target>
 
 <source>Mirror ->></source>
 <target>Clonare =>></target>
@@ -651,14 +657,11 @@ este același
 <source>Versioning</source>
 <target>Versionare</target>
 
-<source>Move time-stamped files into specified folder</source>
-<target>Filelor le este adăugat un marcaj de timp și apoi sînt mutate în dosarul specificat</target>
+<source>Move files to user-defined folder</source>
+<target>Mută filele în dosarul stabilit de utilizator</target>
 
 <source>Naming convention:</source>
 <target>Convenție de numire:</target>
-
-<source>Configuration</source>
-<target>Configurație</target>
 
 <source>Item exists on left side only</source>
 <target>Elementul există doar în partea stîngă</target>
@@ -677,12 +680,6 @@ este același
 
 <source>Conflict/item cannot be categorized</source>
 <target>Conflictul/elementul nu poate fi inclus într-o anumită categorie</target>
-
-<source>Synchronizing...</source>
-<target>Sincronizare Aflată în Curs...</target>
-
-<source>&Pause</source>
-<target>&Pauzează</target>
 
 <source>Source code written in C++ using:</source>
 <target>Cod sursă scris în C++ folosind:</target>
@@ -744,8 +741,8 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Maximum</source>
 <target>Maxim</target>
 
-<source>&Default</source>
-<target>Coloanele &Implicite</target>
+<source>&Clear</source>
+<target>&Curăță</target>
 
 <source>Fail-safe file copy</source>
 <target>Copiază filele în modul protejat la eșec [fail-safe]</target>
@@ -773,6 +770,12 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>Description</source>
 <target>Descriere</target>
+
+<source>&Default</source>
+<target>Coloanele &Implicite</target>
+
+<source>Start synchronization</source>
+<target>Pornește Sincronizarea</target>
 
 <source>Variant</source>
 <target>Varianta Sincronizării</target>
@@ -804,11 +807,23 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Overview</source>
 <target>Panoramă</target>
 
+<source>Configuration</source>
+<target>Configurație</target>
+
 <source>Filter files</source>
 <target>Filtru</target>
 
 <source>Select view</source>
 <target>Selectează Vederea</target>
+
+<source>Open...</source>
+<target>Deschide...</target>
+
+<source>Save</source>
+<target>Salvează</target>
+
+<source>Compare both sides</source>
+<target>Compară Părțile Stîngă și Dreaptă</target>
 
 <source>Set direction:</source>
 <target>Setează Acțiunea ca în Icoana Alăturată:</target>
@@ -867,101 +882,62 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>FreeFileSync batch</source>
 <target>Set FreeFileSync</target>
 
-<source>Never save changes</source>
-<target>Nu salva niciodată modificările</target>
-
 <source>Do you want to save changes to %x?</source>
 <target>Vrei să salvezi modificările făcute la %x?</target>
 
 <source>Do&n't save</source>
 <target>&Nu salva</target>
 
+<source>Never save changes</source>
+<target>Nu salva niciodată modificările</target>
+
 <source>Configuration loaded!</source>
 <target>Configurație deschisă !</target>
-
-<source>Hide files that exist on left side only</source>
-<target>Ascunde filele care există doar în stînga</target>
 
 <source>Show files that exist on left side only</source>
 <target>Arată filele care există doar în stînga</target>
 
-<source>Hide files that exist on right side only</source>
-<target>Ascunde filele care există doar în dreapta</target>
-
 <source>Show files that exist on right side only</source>
 <target>Arată filele care există doar în dreapta</target>
-
-<source>Hide files that are newer on left</source>
-<target>Ascunde filele care sînt mai noi în stînga</target>
 
 <source>Show files that are newer on left</source>
 <target>Arată filele din stînga mai noi decît cele din dreapta</target>
 
-<source>Hide files that are newer on right</source>
-<target>Ascunde filele care sînt mai noi în dreapta</target>
-
 <source>Show files that are newer on right</source>
 <target>Arată filele din dreapta mai noi decît cele din stînga</target>
-
-<source>Hide files that are equal</source>
-<target>Ascunde elementele (file/dosare) identice</target>
 
 <source>Show files that are equal</source>
 <target>Arată elementele (file/dosare) identice</target>
 
-<source>Hide files that are different</source>
-<target>Ascunde elementele (file/dosare) care sînt diferite</target>
-
 <source>Show files that are different</source>
 <target>Arată elementele (file/dosare) diferite</target>
-
-<source>Hide conflicts</source>
-<target>Ascunde conflictele</target>
 
 <source>Show conflicts</source>
 <target>Arată conflictele</target>
 
-<source>Hide files that will be created on the left side</source>
-<target>Ascunde elementele (file/dosare) care vor fi create în stînga</target>
-
 <source>Show files that will be created on the left side</source>
 <target>Arată elementele (file/dosare) care vor fi create în stînga</target>
-
-<source>Hide files that will be created on the right side</source>
-<target>Ascunde elementele (file/dosare) care vor fi create în dreapta</target>
 
 <source>Show files that will be created on the right side</source>
 <target>Arată elementele (file/dosare) care vor fi create în dreapta</target>
 
-<source>Hide files that will be deleted on the left side</source>
-<target>Ascunde elementele (file/dosare) care vor fi șterse în stînga</target>
-
 <source>Show files that will be deleted on the left side</source>
 <target>Arată elementele (file/dosare) care vor fi șterse în stînga</target>
-
-<source>Hide files that will be deleted on the right side</source>
-<target>Ascunde elementele (file/dosare) care vor fi șterse în dreapta</target>
 
 <source>Show files that will be deleted on the right side</source>
 <target>Arată elementele (file/dosare) care vor fi șterse în dreapta</target>
 
-<source>Hide files that will be overwritten on left side</source>
-<target>Ascunde elementele (file/dosare) care vor fi suprascrise în stînga</target>
-
 <source>Show files that will be overwritten on left side</source>
 <target>Arată elementele (file/dosare) care vor fi suprascrise în stînga</target>
-
-<source>Hide files that will be overwritten on right side</source>
-<target>Ascunde elementele (file/dosare) care vor fi suprascrise în dreapta</target>
 
 <source>Show files that will be overwritten on right side</source>
 <target>Arată elementele (file/dosare) care vor fi suprascrise în dreapta</target>
 
-<source>Hide files that won't be copied</source>
-<target>Ascunde elementele (file/dosare) care nu vor fi copiate</target>
-
 <source>Show files that won't be copied</source>
 <target>Arată elementele (file/dosare) care nu vor fi copiate</target>
+
+<source>Set as default</source>
+<target>Setează ca implicit</target>
 
 <source>All folders are in sync!</source>
 <target>Toate dosarele sînt sincronizate!</target>
@@ -975,15 +951,8 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>File list exported!</source>
 <target>Lista de file a fost exportată!</target>
 
-<source>
-<pluralform>Object deleted successfully!</pluralform>
-<pluralform>%x objects deleted successfully!</pluralform>
-</source>
-<target>
-<pluralform>Element șters cu succes!</pluralform>
-<pluralform>%x elemente șterse cu succes!</pluralform>
-<pluralform>%x de elemente șterse cu succes!</pluralform>
-</target>
+<source>Searching for program updates...</source>
+<target>Caut actualizări ale programului...</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1021,6 +990,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>&Ignore</source>
 <target>&OK</target>
 
+<source>Don't show this warning again</source>
+<target>Nu arăta această atenționare din nou</target>
+
 <source>&Switch</source>
 <target>&Comută</target>
 
@@ -1038,9 +1010,6 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>Comparing content...</source>
 <target>Compar conținutul...</target>
-
-<source>Copy</source>
-<target>Copiază</target>
 
 <source>Paused</source>
 <target>Sincronizare Pauzată</target>
@@ -1124,8 +1093,8 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <target>Vrei ca dialogurile ascunse și mesajele de avertizare să fie vizibile din nou?</target>
 
 <source>
-<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
 <pluralform>Sigur vrei să muți în Reciclator elementul următor?</pluralform>
@@ -1134,8 +1103,8 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 </target>
 
 <source>
-<pluralform>Do you really want to delete the following object?</pluralform>
-<pluralform>Do you really want to delete the following %x objects?</pluralform>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
 <pluralform>Sigur vrei să ștergi definitiv elementul următor?</pluralform>
@@ -1146,14 +1115,17 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Leave as unresolved conflict</source>
 <target>Lasă ca Conflict Nerezolvat</target>
 
+<source>Time stamp</source>
+<target>Marcaj Temporal</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Adaugă un marcaj temporal la numele fiecărei file</target>
+
 <source>Replace</source>
 <target>Înlocuiește</target>
 
 <source>Move files and replace if existing</source>
 <target>Mută filele și înlocuiește-le pe cele existente</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Adaugă un marcaj temporal la numele fiecărei file</target>
 
 <source>Folder</source>
 <target>Dosar</target>
@@ -1272,6 +1244,12 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Cannot set privilege %x.</source>
 <target>Nu pot seta privilegiul %x.</target>
 
+<source>Failed to suspend system sleep mode.</source>
+<target>Nu pot suspenda intrarea sistemului în adormire (repaus).</target>
+
+<source>Cannot change process I/O priorities.</source>
+<target>Nu pot schimba prioritățile I/O ale procesului.</target>
+
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>Nu pot muta %x în Reciclator!</target>
 
@@ -1279,7 +1257,7 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <target>Ambele părți s-au modificat de la ultima sincronizare!</target>
 
 <source>Cannot determine sync-direction:</source>
-<target>Nu se poate determina sensul de sincronizare:</target>
+<target>Nu pot determina sensul de sincronizare:</target>
 
 <source>No change since last synchronization!</source>
 <target>Nu sînt schimbări de la ultima sincronizare!</target>
@@ -1290,14 +1268,38 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Baza de date existentă va fi făcută compatibilă cu versiunea softului și apoi va fi setat sensul implicit de sincronizare: Filele vechi vor fi suprascrise de cele noi.</target>
 
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Verific dacă Reciclatorul e disponibil pentru dosarul %x...</target>
+
+<source>Moving file %x to recycle bin</source>
+<target>Mut fila %x în Reciclator</target>
+
+<source>Moving folder %x to recycle bin</source>
+<target>Mut dosarul %x în Reciclator</target>
+
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Mut legătura simbolică %x în Reciclator</target>
+
+<source>Deleting file %x</source>
+<target>Șterg fila %x</target>
+
+<source>Deleting folder %x</source>
+<target>Șterg dosarul %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Șterg legătura simbolică %x</target>
+
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Reciclatorul nu este disponibil pentru căile următoare! Filele vor fi deci șterse definitiv:</target>
+<target>Reciclatorul nu este disponibil pentru căile următoare! Filele de acolo vor fi deci șterse definitiv:</target>
 
-<source>You can ignore this error to consider the folder as empty.</source>
-<target>Poți ignora această eroare dacă vrei ca dosarul să fie considerat gol.</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>Dosarul corespondent va fi considerat ca fiind gol.</target>
 
-<source>Cannot find folder %x.</source>
-<target>Nu pot găsi dosarul %x.</target>
+<source>Cannot find the following folders:</source>
+<target>Nu pot găsi dosarele următoare:</target>
+
+<source>You can ignore this error to consider each folder as empty.</source>
+<target>Poți ignora această eroare dacă vrei ca dosarele din ambele părți să fie considerate goale.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Dosarele sînt interdependente! Atenție la setarea regulilor de sincronizare:</target>
@@ -1305,8 +1307,8 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Start comparison</source>
 <target>Pornește compararea</target>
 
-<source>Preparing synchronization...</source>
-<target>Pregătesc sincronizarea...</target>
+<source>Calculating sync directions...</source>
+<target>Calculez acțiunile de sincronizare...</target>
 
 <source>Conflict detected:</source>
 <target>Conflict detectat:</target>
@@ -1371,24 +1373,6 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Multiple...</source>
 <target>Multiplu...</target>
 
-<source>Deleting file %x</source>
-<target>Șterg fila %x</target>
-
-<source>Deleting folder %x</source>
-<target>Șterg dosarul %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Șterg legătura simbolică %x</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Mut fila %x în Reciclator</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Mut dosarul %x în Reciclator</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Mut legătura simbolică %x în Reciclator</target>
-
 <source>Moving file %x to %y</source>
 <target>Mut fila %x în %y</target>
 
@@ -1400,9 +1384,6 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>Removing old versions...</source>
 <target>Înlătur versiunile vechi...</target>
-
-<source>Creating file %x</source>
-<target>Creez fila %x</target>
 
 <source>Creating symbolic link %x</source>
 <target>Creez legătura simbolică %x</target>
@@ -1422,6 +1403,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Updating attributes of %x</source>
 <target>Actualizez atributele lui %x</target>
 
+<source>Cannot find %x.</source>
+<target>Nu pot găsi %x.</target>
+
 <source>Target folder %x already existing.</source>
 <target>Dosarul țintă %x există deja.</target>
 
@@ -1435,7 +1419,7 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <target>Dosarul sursă %x nu a fost găsit.</target>
 
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
-<target>Elementele următoare au conflicte nerezolvate și nu vor fi sincronizate:</target>
+<target>Există conflicte nerezolvate la elementele listate mai jos, deci ele nu vor fi sincronizate:</target>
 
 <source>Significant difference detected:</source>
 <target>Diferență semnificativă detectată:</target>
@@ -1466,6 +1450,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>Generating database...</source>
 <target>Generez baza de date...</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Creez Conservare a Volumului [Volume Shadow Copy] pentru %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>Eroare la verificarea datelor: Filele sursă și țintă au conținut diferit!</target>
