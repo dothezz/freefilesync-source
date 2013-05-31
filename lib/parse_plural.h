@@ -38,7 +38,20 @@ private:
 };
 
 
+//validate plural form
+class InvalidPluralForm {};
 
+class PluralFormInfo
+{
+public:
+    PluralFormInfo(const std::string& definition, int pluralCount); //throw InvalidPluralForm
+
+    int getCount() const { return static_cast<int>(formCount.size()); }
+    bool isSingleNumberForm(int n) const { return 0 <= n && n < static_cast<int>(formCount.size()) ? formCount[n] == 1 : false; }
+
+private:
+    std::vector<int> formCount;
+};
 
 
 
@@ -409,6 +422,40 @@ private:
     Token tk;
     int& n_;
 };
+}
+
+
+inline
+PluralFormInfo::PluralFormInfo(const std::string& definition, int pluralCount) //throw InvalidPluralForm
+{
+    if (pluralCount < 1)
+        throw InvalidPluralForm();
+
+    formCount.resize(pluralCount);
+    try
+    {
+        parse_plural::PluralForm pf(definition); //throw parse_plural::ParsingError
+        //PERF_START
+
+        //perf: 80ns per iteration max (for arabic)
+        //=> 1000 iterations should be fast enough and still detect all "single number forms"
+        for (int j = 0; j < 1000; ++j)
+        {
+            int form = pf.getForm(j);
+            if (0 <= form && form < static_cast<int>(formCount.size()))
+                ++formCount[form];
+            else
+                throw InvalidPluralForm();
+        }
+    }
+    catch (const parse_plural::ParsingError&)
+    {
+        throw InvalidPluralForm();
+    }
+
+    //ensure each form is used at least once:
+    if (!std::all_of(formCount.begin(), formCount.end(), [](int count) { return count >= 1; }))
+    throw InvalidPluralForm();
 }
 
 

@@ -12,6 +12,7 @@
 #include <memory>
 #include <wx+/file_drop.h>
 #include "../ui/dir_name.h"
+#include <zen/async_task.h>
 
 namespace xmlAccess
 {
@@ -50,7 +51,7 @@ private:
 
     void addFolder(const wxString& dirname, bool addFront = false);
     void addFolder(const std::vector<wxString>& newFolders, bool addFront = false);
-    void removeAddFolder(int pos); //keep it an int, allow negative values!
+    void removeAddFolder(size_t pos);
     void clearAddFolders();
 
     static const wxString& lastConfigFileName();
@@ -59,6 +60,17 @@ private:
     std::vector<DirectoryPanel*> dirNamesExtra; //additional pairs to the standard pair
 
     wxString currentConfigFileName;
+
+    void onProcessAsyncTasks(wxEvent& event);
+
+    template <class Fun, class Fun2>
+    void processAsync(Fun doAsync, Fun2 evalOnGui) { asyncTasks.add(doAsync, evalOnGui); timerForAsyncTasks.Start(50); /*timer interval in [ms] */ }
+    template <class Fun, class Fun2>
+    void processAsync2(Fun doAsync, Fun2 evalOnGui) { asyncTasks.add2(doAsync, evalOnGui); timerForAsyncTasks.Start(50); /*timer interval in [ms] */ }
+
+    //schedule and run long-running tasks asynchronously, but process results on GUI queue
+    zen::AsyncTasks asyncTasks;
+    wxTimer timerForAsyncTasks; //don't use wxWidgets idle handling => repeated idle requests/consumption hogs 100% cpu!
 };
 
 #endif // REALTIMESYNCMAIN_H

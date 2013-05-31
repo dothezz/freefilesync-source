@@ -18,7 +18,6 @@
 #endif
 
 
-
 //enhancements for <algorithm>
 namespace zen
 {
@@ -46,6 +45,10 @@ BidirectionalIterator find_last(BidirectionalIterator first, BidirectionalIterat
 template <class BidirectionalIterator1, class BidirectionalIterator2>
 BidirectionalIterator1 search_last(BidirectionalIterator1 first1, BidirectionalIterator1 last1,
                                    BidirectionalIterator2 first2, BidirectionalIterator2 last2);
+
+template <class InputIterator1, class InputIterator2>
+bool equal(InputIterator1 first1, InputIterator1 last1,
+           InputIterator2 first2, InputIterator2 last2);
 
 //hash container: proper name + mitigate MSVC performance bug
 template <class T> class hash_set;
@@ -163,6 +166,14 @@ BidirectionalIterator1 search_last(const BidirectionalIterator1 first1, Bidirect
         }
         --last1;
     }
+}
+
+
+template <class InputIterator1, class InputIterator2> inline
+bool equal(InputIterator1 first1, InputIterator1 last1,
+           InputIterator2 first2, InputIterator2 last2)
+{
+    return last1 - first1 == last2 - first2 && std::equal(first1, last1, first2);
 }
 
 

@@ -790,6 +790,9 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_panelViewFilter = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     bSizerViewFilter = new wxBoxSizer( wxHORIZONTAL );
 
+    m_bpButtonViewTypeSyncAction = new ToggleButton( m_panelViewFilter, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 42,42 ), wxBU_AUTODRAW );
+    bSizerViewFilter->Add( m_bpButtonViewTypeSyncAction, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
 
     bSizerViewFilter->Add( 0, 0, 1, wxEXPAND, 5 );
 
@@ -883,6 +886,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_bpButtonFilter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigureFilter ), NULL, this );
     m_bpButtonFilter->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( MainDialogGenerated::OnGlobalFilterContext ), NULL, this );
     m_checkBoxHideExcluded->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnShowExcluded ), NULL, this );
+    m_bpButtonViewTypeSyncAction->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnToggleViewType ), NULL, this );
     m_bpButtonShowCreateLeft->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnToggleViewButton ), NULL, this );
     m_bpButtonShowCreateLeft->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( MainDialogGenerated::OnViewButtonRightClick ), NULL, this );
     m_bpButtonShowUpdateLeft->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnToggleViewButton ), NULL, this );
@@ -950,6 +954,7 @@ MainDialogGenerated::~MainDialogGenerated()
     m_bpButtonFilter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConfigureFilter ), NULL, this );
     m_bpButtonFilter->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( MainDialogGenerated::OnGlobalFilterContext ), NULL, this );
     m_checkBoxHideExcluded->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnShowExcluded ), NULL, this );
+    m_bpButtonViewTypeSyncAction->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnToggleViewType ), NULL, this );
     m_bpButtonShowCreateLeft->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnToggleViewButton ), NULL, this );
     m_bpButtonShowCreateLeft->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( MainDialogGenerated::OnViewButtonRightClick ), NULL, this );
     m_bpButtonShowUpdateLeft->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnToggleViewButton ), NULL, this );
@@ -1355,7 +1360,7 @@ SyncProgressDlgGenerated::SyncProgressDlgGenerated( wxWindow* parent, wxWindowID
     bSizerRoot->Add( m_panelProgress, 1, wxEXPAND, 5 );
 
     m_listbookResult = new wxListbook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLB_TOP );
-    wxSize m_listbookResultImageSize = wxSize( 180,1 );
+    wxSize m_listbookResultImageSize = wxSize( 170,1 );
     int m_listbookResultIndex = 0;
     wxImageList* m_listbookResultImages = new wxImageList( m_listbookResultImageSize.GetWidth(), m_listbookResultImageSize.GetHeight() );
     m_listbookResult->AssignImageList( m_listbookResultImages );
@@ -1406,7 +1411,7 @@ SyncProgressDlgGenerated::SyncProgressDlgGenerated( wxWindow* parent, wxWindowID
     this->Centre( wxBOTH );
 
     // Connect Events
-    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncProgressDlgGenerated::OnCloseBtn ) );
+    this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncProgressDlgGenerated::OnClose ) );
     this->Connect( wxEVT_ICONIZE, wxIconizeEventHandler( SyncProgressDlgGenerated::OnIconize ) );
     m_buttonClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnOkay ), NULL, this );
     m_buttonPause->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnPause ), NULL, this );
@@ -1416,7 +1421,7 @@ SyncProgressDlgGenerated::SyncProgressDlgGenerated( wxWindow* parent, wxWindowID
 SyncProgressDlgGenerated::~SyncProgressDlgGenerated()
 {
     // Disconnect Events
-    this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncProgressDlgGenerated::OnCloseBtn ) );
+    this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncProgressDlgGenerated::OnClose ) );
     this->Disconnect( wxEVT_ICONIZE, wxIconizeEventHandler( SyncProgressDlgGenerated::OnIconize ) );
     m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnOkay ), NULL, this );
     m_buttonPause->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnPause ), NULL, this );
@@ -1998,20 +2003,20 @@ SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const
     m_bitmapDatabase = new wxStaticBitmap( m_panel37, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
     bSizerConfig->Add( m_bitmapDatabase, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 10 );
 
-    wxBoxSizer* sbSizerKeepWidthStable;
-    sbSizerKeepWidthStable = new wxBoxSizer( wxHORIZONTAL );
+    wxBoxSizer* sbSizerKeepWidthStableIfSyncDirsNotShown;
+    sbSizerKeepWidthStableIfSyncDirsNotShown = new wxBoxSizer( wxHORIZONTAL );
 
 
-    sbSizerKeepWidthStable->Add( 45, 0, 0, 0, 5 );
+    sbSizerKeepWidthStableIfSyncDirsNotShown->Add( 45, 0, 0, 0, 5 );
 
 
-    sbSizerKeepWidthStable->Add( 5, 0, 0, 0, 5 );
+    sbSizerKeepWidthStableIfSyncDirsNotShown->Add( 5, 0, 0, 0, 5 );
 
 
-    sbSizerKeepWidthStable->Add( 46, 0, 0, 0, 5 );
+    sbSizerKeepWidthStableIfSyncDirsNotShown->Add( 46, 0, 0, 0, 5 );
 
 
-    bSizerConfig->Add( sbSizerKeepWidthStable, 0, 0, 5 );
+    bSizerConfig->Add( sbSizerKeepWidthStableIfSyncDirsNotShown, 0, 0, 5 );
 
     sbSizerSyncDirections = new wxBoxSizer( wxVERTICAL );
 
@@ -2626,6 +2631,7 @@ MessageDlgGenerated::MessageDlgGenerated( wxWindow* parent, wxWindowID id, const
 
     // Connect Events
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MessageDlgGenerated::OnClose ) );
+    m_checkBoxCustom->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnCheckBoxClick ), NULL, this );
     m_buttonCustom1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnButton1 ), NULL, this );
     m_buttonCustom2->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnButton2 ), NULL, this );
     m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnCancel ), NULL, this );
@@ -2635,6 +2641,7 @@ MessageDlgGenerated::~MessageDlgGenerated()
 {
     // Disconnect Events
     this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( MessageDlgGenerated::OnClose ) );
+    m_checkBoxCustom->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnCheckBoxClick ), NULL, this );
     m_buttonCustom1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnButton1 ), NULL, this );
     m_buttonCustom2->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnButton2 ), NULL, this );
     m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MessageDlgGenerated::OnCancel ), NULL, this );
@@ -2653,14 +2660,14 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer41 = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapDeleteType = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), 0 );
-    bSizer41->Add( m_bitmapDeleteType, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+    bSizer41->Add( m_bitmapDeleteType, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     m_staticTextHeader = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticTextHeader->Wrap( -1 );
     bSizer41->Add( m_staticTextHeader, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer24->Add( bSizer41, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
+    bSizer24->Add( bSizer41, 0, 0, 5 );
 
     m_staticline91 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizer24->Add( m_staticline91, 0, wxEXPAND, 5 );
@@ -2682,6 +2689,7 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
     bSizer99->Add( m_checkBoxUseRecycler, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 5 );
 
     m_checkBoxDeleteBothSides = new wxCheckBox( this, wxID_ANY, _("Delete on both sides"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_checkBoxDeleteBothSides->Hide();
     m_checkBoxDeleteBothSides->SetToolTip( _("Delete on both sides even if the file is selected on one side only") );
 
     bSizer99->Add( m_checkBoxDeleteBothSides, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );

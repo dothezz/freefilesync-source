@@ -69,7 +69,7 @@ Zstring zen::getResourceDir()
     else //use OS' standard paths
         return appendSeparator(toZ(wxStandardPathsBase::Get().GetResourcesDir()));
 #elif defined FFS_MAC
-    return appendSeparator(toZ(wxStandardPathsBase::Get().GetResourcesDir()));
+    return appendSeparator(toZ(wxStandardPathsBase::Get().GetResourcesDir())); //if packaged, used "Contents/Resources", else the executable directory
 #endif
 }
 

@@ -10,11 +10,12 @@
 //temporary solution until C++11 thread becomes fully available (considering std::thread's non-interruptibility and std::async craziness, this may be NEVER)
 #include <memory>
 
-//fix this pathetic boost thread warning mess
+//workaround this pathetic boost thread warning mess
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#pragma GCC diagnostic ignored "-Wredundant-decls"
 #pragma GCC diagnostic ignored "-Wshadow"
 #endif
 #ifdef _MSC_VER

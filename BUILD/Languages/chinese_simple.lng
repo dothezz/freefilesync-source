@@ -20,7 +20,7 @@
 <target>总共时间:</target>
 
 <source>Cannot set directory lock for %x.</source>
-<target></target>
+<target>无法为 %x 设置目录锁定.</target>
 
 <source>Show in Explorer</source>
 <target>在Explorer中显示</target>
@@ -44,7 +44,7 @@
 <target>错误</target>
 
 <source>Selected variant:</source>
-<target></target>
+<target>选定的变化:</target>
 
 <source>Select alternate comparison settings</source>
 <target>选择替换的比较设置</target>
@@ -68,7 +68,7 @@
 <target>复制</target>
 
 <source>Paste</source>
-<target></target>
+<target>粘贴</target>
 
 <source>Save as batch job</source>
 <target>另存为批处理作业</target>
@@ -110,10 +110,18 @@
 <target>致命错误</target>
 
 <source>Error Code %x:</source>
-<target></target>
+<target>错误代码 %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
 <target>无法解决符号连接 %x.</target>
+
+<source>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</source>
+<target>
+<pluralform>%x 字节</pluralform>
+</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -123,14 +131,6 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
-
-<source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-</source>
-<target>
-<pluralform>%x 字节</pluralform>
-</target>
 
 <source>Database file %x is incompatible.</source>
 <target>数据库文件 %x 不兼容.</target>
@@ -168,9 +168,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>由于目录已锁定而正在等待(%x)...</target>
 
-<source>Creating file %x</source>
-<target>正在创建文件 %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -179,14 +176,14 @@
 <pluralform>%x 秒</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>正在创建文件 %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>当分析文件 %x , 行 %y, 列 %z 时出错.</target>
 
 <source>Scanning:</source>
 <target>扫描中:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>正在编码扩展时间信息:%x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -195,6 +192,9 @@
 <target>
 <pluralform>[%x 线程]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>正在编码扩展时间信息:%x</target>
 
 <source>/sec</source>
 <target>/秒</target>
@@ -460,13 +460,13 @@ The command is triggered if:
 <target>高级(&A)</target>
 
 <source>&Check now</source>
-<target></target>
+<target>现在检查(&C)</target>
 
 <source>Check &automatically once a week</source>
-<target></target>
+<target>每周自动检查一次(&A)</target>
 
 <source>Check for new version</source>
-<target></target>
+<target>检查新版本</target>
 
 <source>Compare</source>
 <target>比较</target>
@@ -520,7 +520,7 @@ The command is triggered if:
 <target>在完成时</target>
 
 <source>Close</source>
-<target></target>
+<target>关闭</target>
 
 <source>&Pause</source>
 <target>暂停(&P)</target>
@@ -613,7 +613,7 @@ is the same
 <target><-双向-></target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target></target>
+<target>识别和传播两侧的变化. 删除, 移动和冲突会使用一个数据库来自动检测.</target>
 
 <source>Mirror ->></source>
 <target>镜像 ->></target>
@@ -652,7 +652,7 @@ is the same
 <target>保留历史版本</target>
 
 <source>Move files to user-defined folder</source>
-<target></target>
+<target>移动文件至用户定义文件夹</target>
 
 <source>Naming convention:</source>
 <target>命名规则:</target>
@@ -736,7 +736,7 @@ Note: File names must be relative to base directories!
 <target>最大</target>
 
 <source>&Clear</source>
-<target></target>
+<target>清除(&C)</target>
 
 <source>Fail-safe file copy</source>
 <target>无风险的文件复制</target>
@@ -811,13 +811,37 @@ Note: File names must be relative to base directories!
 <target>选择视图</target>
 
 <source>Open...</source>
-<target></target>
+<target>打开...</target>
 
 <source>Save</source>
 <target>保存</target>
 
 <source>Compare both sides</source>
 <target>比较两侧</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>%x 目录</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>%x 文件</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>%x 中的 %y 行在视图中</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>设置方向:</target>
@@ -931,7 +955,7 @@ Note: File names must be relative to base directories!
 <target>显示将不被复制的文件</target>
 
 <source>Set as default</source>
-<target></target>
+<target>设置为默认值</target>
 
 <source>All folders are in sync!</source>
 <target>所有文件夹都是同步的!</target>
@@ -946,31 +970,7 @@ Note: File names must be relative to base directories!
 <target>文件清单已经导出!</target>
 
 <source>Searching for program updates...</source>
-<target></target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>%x 目录</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>%x 文件</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%y 中的 %x 行可见</pluralform>
-</target>
+<target>正在搜索程序的更新...</target>
 
 <source>Ignore further errors</source>
 <target>忽略之后出现的错误</target>
@@ -979,7 +979,7 @@ Note: File names must be relative to base directories!
 <target>忽略(&I)</target>
 
 <source>Don't show this warning again</source>
-<target></target>
+<target>不要再显示这个警告</target>
 
 <source>&Switch</source>
 <target>切换(&S)</target>
@@ -1053,6 +1053,22 @@ Note: File names must be relative to base directories!
 <source>Filter</source>
 <target>过滤器</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>是否真的要移动如下 %x 个项目到回收站?</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>是否真的要删除如下 %x 个项目?</pluralform>
+</target>
+
 <source>Direct</source>
 <target>直接</target>
 
@@ -1080,23 +1096,11 @@ Note: File names must be relative to base directories!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>重新让已经隐藏的警告和对话框变为可见?</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target></target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target></target>
-
 <source>Leave as unresolved conflict</source>
 <target>遗留为未解决的冲突</target>
 
 <source>Time stamp</source>
-<target></target>
+<target>时间戳</target>
 
 <source>Append a timestamp to each file name</source>
 <target>附加时间戳到每一个文件名</target>
@@ -1118,6 +1122,9 @@ Note: File names must be relative to base directories!
 
 <source>Files</source>
 <target>文件</target>
+
+<source>Items</source>
+<target>项目</target>
 
 <source>Percentage</source>
 <target>百分比</target>
@@ -1188,9 +1195,6 @@ Note: File names must be relative to base directories!
 <source>%x PB</source>
 <target>%x PB</target>
 
-<source>%x%</source>
-<target>%x%</target>
-
 <source>
 <pluralform>1 min</pluralform>
 <pluralform>%x min</pluralform>
@@ -1219,10 +1223,10 @@ Note: File names must be relative to base directories!
 <target>无法设置 %x 的特权.</target>
 
 <source>Failed to suspend system sleep mode.</source>
-<target></target>
+<target>中止系统睡眠模式失败.</target>
 
 <source>Cannot change process I/O priorities.</source>
-<target></target>
+<target>无法更改进程的I/O优先级.</target>
 
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>无法移动 %x 到回收站!</target>
@@ -1243,7 +1247,7 @@ Note: File names must be relative to base directories!
 <target>设置默认的同步方向:旧文件会被新文件覆盖.</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
-<target></target>
+<target>正在为文件夹 %x 检测回收站可用性...</target>
 
 <source>Moving file %x to recycle bin</source>
 <target>正在移动文件 %x 到回收站</target>
@@ -1267,13 +1271,13 @@ Note: File names must be relative to base directories!
 <target>如下路径的回收站不可用! 文件会被永久删除:</target>
 
 <source>The corresponding folder will be considered as empty.</source>
-<target></target>
+<target>相应的文件夹将被视为空.</target>
 
 <source>Cannot find the following folders:</source>
-<target></target>
+<target>无法找到如下文件夹:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target></target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>你可忽略此错误而将每个文件夹视为空. 这些文件夹将会在同步过程中被自动创建.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目录有依赖性！在设立同步规则时请小心:</target>
@@ -1282,7 +1286,7 @@ Note: File names must be relative to base directories!
 <target>开始比较</target>
 
 <source>Calculating sync directions...</source>
-<target></target>
+<target>正在计算同步方向...</target>
 
 <source>Conflict detected:</source>
 <target>检测到的冲突:</target>
@@ -1378,7 +1382,7 @@ Note: File names must be relative to base directories!
 <target>更新 %x 的属性</target>
 
 <source>Cannot find %x.</source>
-<target></target>
+<target>无法找到 %x.</target>
 
 <source>Target folder %x already existing.</source>
 <target>目标文件夹 %x 已经存在.</target>
@@ -1426,7 +1430,7 @@ Note: File names must be relative to base directories!
 <target>正在生成数据库...</target>
 
 <source>Creating Volume Shadow Copy for %x...</source>
-<target></target>
+<target>正在为 %x 创建卷影响复制...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>数据校验错误:源文件和目标文件内容不同!</target>

@@ -115,15 +115,6 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nie można określić położenia dowiązania symbolicznego %x.</target>
 
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
@@ -133,6 +124,15 @@
 <pluralform>%x Bajty</pluralform>
 <pluralform>%x Bajtów</pluralform>
 </target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Plik bazy danych %x nie jest kompatybilny.</target>
@@ -170,9 +170,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Blokada katalogu (%x), oczekiwanie...</target>
 
-<source>Creating file %x</source>
-<target>Tworzenie pliku %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -183,14 +180,14 @@
 <pluralform>%x sekund</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>Tworzenie pliku %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Błąd podczas parsowania pliku %x, rząd %y, kolumna %z.</target>
 
 <source>Scanning:</source>
 <target>Skanowanie:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>Odkodowywanie rozszerzonych informacji o czasie: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -201,6 +198,9 @@
 <pluralform>[%x Wątki]</pluralform>
 <pluralform>[%x Wątków]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>Odkodowywanie rozszerzonych informacji o czasie: %x</target>
 
 <source>/sec</source>
 <target>/sekundę</target>
@@ -795,9 +795,6 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>&Find next</source>
 <target>&Znajdź następny</target>
 
-<source>Operation aborted!</source>
-<target>Operacja przerwana!</target>
-
 <source>Main bar</source>
 <target>Główny pasek</target>
 
@@ -824,6 +821,36 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>Compare both sides</source>
 <target>Porównaj foldery</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 katalog</pluralform>
+<pluralform>%x katalogi</pluralform>
+<pluralform>%x katalogów</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 plik</pluralform>
+<pluralform>%x pliki</pluralform>
+<pluralform>%x plików</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>Widok %y z 1 lini</pluralform>
+<pluralform>Widok %y z %x lini</pluralform>
+<pluralform>Widok %y z %x lini</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>Kierunek  synchronizacji:</target>
@@ -939,6 +966,9 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>Set as default</source>
 <target>Zapisz jako domyślne</target>
 
+<source>Operation aborted!</source>
+<target>Operacja przerwana!</target>
+
 <source>All folders are in sync!</source>
 <target>Wszystkie katalogi są zsynchronizowane!</target>
 
@@ -953,36 +983,6 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>Searching for program updates...</source>
 <target>Wyszukiwanie aktualizacji...</target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>1 katalog</pluralform>
-<pluralform>%x katalogi</pluralform>
-<pluralform>%x katalogów</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>1 plik</pluralform>
-<pluralform>%x pliki</pluralform>
-<pluralform>%x plików</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x z 1 rzędu w widoku</pluralform>
-<pluralform>%x z %y rzędów w widoku</pluralform>
-<pluralform>%x z %y rzędów w widoku</pluralform>
-</target>
 
 <source>Ignore further errors</source>
 <target>Ignoruj kolejne błędy</target>
@@ -1065,6 +1065,26 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>Filter</source>
 <target>Filtr</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Czy na pewno chcesz przenieść do kosza następujący element?</pluralform>
+<pluralform>Czy na pewno chcesz przenieść do kosza %x następujące elementy?</pluralform>
+<pluralform>Czy na pewno chcesz przenieść do kosza %x następujących elementów?</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Czy na pewno chcesz usunąć następujący element?</pluralform>
+<pluralform>Czy na pewno chcesz usunąć %x następujące elementy?</pluralform>
+<pluralform>Czy na pewno chcesz usunąć %x następujących elementów?</pluralform>
+</target>
+
 <source>Direct</source>
 <target>Bezpośrednio</target>
 
@@ -1091,26 +1111,6 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>Przywrócić ukryte powiadomienia i dialogi?</target>
-
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>Czy na pewno chcesz przenieść do kosza następujący element?</pluralform>
-<pluralform>Czy na pewno chcesz przenieść do kosza %x następujące elementy?</pluralform>
-<pluralform>Czy na pewno chcesz przenieść do kosza %x następujących elementów?</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Czy na pewno chcesz usunąć następujący element?</pluralform>
-<pluralform>Czy na pewno chcesz usunąć %x następujące elementy?</pluralform>
-<pluralform>Czy na pewno chcesz usunąć %x następujących elementów?</pluralform>
-</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Zostaw jako nierozwiązany konflikt</target>
@@ -1140,7 +1140,7 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <target>Pliki</target>
 
 <source>Items</source>
-<target></target>
+<target>Elementy</target>
 
 <source>Percentage</source>
 <target>Procentowo</target>
@@ -1210,9 +1210,6 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1301,8 +1298,8 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 <source>Cannot find the following folders:</source>
 <target>Nie można znaleźć następujących katalogów:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Możesz zignorować ten błąd aby uznając katalogi jako puste.</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>Możesz zignorować ten błąd aby uznając katalogi jako puste. Katalog zostanie utworzony automatycznie podczas synchronizacji.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Katalogi są zależne! Pamiętaj o tym podczas ustawiania zasad synchronizacji:</target>
@@ -1441,12 +1438,6 @@ Uwaga: Nazwy plików muszą być podane jako relatywne względem katalogu bazowe
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Katalog zostanie zmodyfikowany w związku z synchronizacją wielu katalogów. Zweryfikuj ustawienia synchronizacji.</target>
-
-<source>Left</source>
-<target>Lewy</target>
-
-<source>Right</source>
-<target>Prawy</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronizacja katalgów:</target>

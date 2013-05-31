@@ -10,6 +10,7 @@
 #include <zen/perf.h>
 #include <zen/scope_guard.h>
 #include <zen/process_priority.h>
+#include <zen/symlink_target.h>
 #include <zen/format_unit.h>
 #include "algorithm.h"
 #include "lib/parallel_scan.h"
@@ -74,19 +75,19 @@ void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, 
 }
 
 
-std::set<Zstring, LessFilename> determineExistentDirs(const std::vector<Zstring>& dirnames,
+std::set<Zstring, LessFilename> determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
                                                       bool allowUserInteraction,
                                                       ProcessCallback& callback)
 {
     std::set<Zstring, LessFilename> dirsEx;
 
-    tryReportingError([&]
+    tryReportingError2([&]
     {
         dirsEx = getExistingDirsUpdating(dirnames, allowUserInteraction, callback); //check *all* directories on each try!
 
         //get list of not existing directories
-        std::vector<Zstring> dirsMissing = dirnames;
-        vector_remove_if(dirsMissing, [&](const Zstring& dirname) { return dirname.empty() || dirsEx.find(dirname) != dirsEx.end(); });
+        std::set<Zstring, LessFilename> dirsMissing = dirnames;
+        set_remove_if(dirsMissing, [&](const Zstring& dirname) { return dirname.empty() || dirsEx.find(dirname) != dirsEx.end(); });
 
         if (!dirsMissing.empty())
         {
@@ -175,7 +176,6 @@ bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filen
 
     return sameContent;
 }
-}
 
 //#############################################################################################################################
 
@@ -254,156 +254,8 @@ ComparisonBuffer::ComparisonBuffer(const std::set<DirectoryKey>& keysToRead,
 }
 
 
-void zen::compare(size_t fileTimeTolerance,
-                  xmlAccess::OptionalDialogs& warnings,
-                  bool allowUserInteraction,
-                  bool runWithBackgroundPriority,
-                  bool createDirLocks,
-                  std::unique_ptr<LockHolder>& dirLocks,
-                  const std::vector<FolderPairCfg>& cfgList,
-                  FolderComparison& output,
-                  ProcessCallback& callback)
-{
-    //specify process and resource handling priorities
-    std::unique_ptr<ScheduleForBackgroundProcessing> backgroundPrio;
-    if (runWithBackgroundPriority)
-        try
-        {
-            backgroundPrio = make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
-        }
-        catch (const FileError& e)
-        {
-            //not an error in this context
-            callback.reportInfo(e.toString()); //may throw!
-        }
-
-    //prevent operating system going into sleep state
-    std::unique_ptr<PreventStandby> noStandby;
-    try
-    {
-        noStandby = make_unique<PreventStandby>(); //throw FileError
-    }
-    catch (const FileError& e)
-    {
-        //not an error in this context
-        callback.reportInfo(e.toString()); //may throw!
-    }
-
-    //PERF_START;
-
-    callback.reportInfo(_("Start comparison")); //we want some indicator at the very beginning to make sense of "total time"
-
-    //init process: keep at beginning so that all gui elements are initialized properly
-    callback.initNewPhase(-1, 0, ProcessCallback::PHASE_SCANNING); //it's not known how many files will be scanned => -1 objects
-
-    //-------------------some basic checks:------------------------------------------
-
-    checkForIncompleteInput(cfgList, warnings.warningInputFieldEmpty,  callback);
-    checkFolderDependency  (cfgList, warnings.warningDependentFolders, callback);
-
-    std::set<Zstring, LessFilename> dirnamesExisting;
-    //list of directories that are *expected* to be existent (and need to be scanned)!
-    //directory existence only checked *once* to avoid race conditions!
-    {
-        std::vector<Zstring> dirnames;
-        std::for_each(cfgList.begin(), cfgList.end(),
-                      [&](const FolderPairCfg& fpCfg)
-        {
-            dirnames.push_back(fpCfg.leftDirectoryFmt);
-            dirnames.push_back(fpCfg.rightDirectoryFmt);
-        });
-        dirnamesExisting = determineExistentDirs(dirnames, allowUserInteraction, callback);
-    }
-
-    auto dirAvailable = [&](const Zstring& dirnameFmt) { return dirnamesExisting.find(dirnameFmt) != dirnamesExisting.end(); };
-
-    //-------------------end of basic checks------------------------------------------
-
-    try
-    {
-        //lock (existing) directories before comparison
-        if (createDirLocks)
-            dirLocks = make_unique<LockHolder>(dirnamesExisting, warnings.warningDirectoryLockFailed, callback);
-
-        //------------------- fill directory buffer ---------------------------------------------------
-        std::set<DirectoryKey> keysToRead;
-
-        std::for_each(cfgList.begin(), cfgList.end(),
-                      [&](const FolderPairCfg& fpCfg)
-        {
-            if (dirAvailable(fpCfg.leftDirectoryFmt)) //only request *currently existing* directories: at this point user is aware that non-ex + empty string are seen as empty folder!
-                keysToRead.insert(DirectoryKey(fpCfg.leftDirectoryFmt,  fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
-            if (dirAvailable(fpCfg.rightDirectoryFmt))
-                keysToRead.insert(DirectoryKey(fpCfg.rightDirectoryFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
-        });
-
-        ComparisonBuffer cmpBuff(keysToRead,
-                                 fileTimeTolerance,
-                                 callback);
-
-        //------------ traverse/read folders -----------------------------------------------------
-
-        FolderComparison output_tmp; //write to output not before END of process!
-
-        //buffer "config"/"result of binary comparison" for latter processing as a single block
-        std::vector<std::pair<FolderPairCfg, BaseDirMapping*>> workLoadBinary;
-
-        std::for_each(cfgList.begin(), cfgList.end(),
-                      [&](const FolderPairCfg& fpCfg)
-        {
-            //a pity VC11 screws up on std::make_shared with 7 arguments...
-            output_tmp.push_back(std::shared_ptr<BaseDirMapping>(new BaseDirMapping(fpCfg.leftDirectoryFmt,
-                                                                                    dirAvailable(fpCfg.leftDirectoryFmt),
-                                                                                    fpCfg.rightDirectoryFmt,
-                                                                                    dirAvailable(fpCfg.rightDirectoryFmt),
-                                                                                    fpCfg.filter.nameFilter,
-                                                                                    fpCfg.compareVar,
-                                                                                    fileTimeTolerance)));
-            switch (fpCfg.compareVar)
-            {
-                case CMP_BY_TIME_SIZE:
-                    cmpBuff.compareByTimeSize(fpCfg, *output_tmp.back());
-                    break;
-                case CMP_BY_CONTENT:
-                    workLoadBinary.push_back(std::make_pair(fpCfg, &*output_tmp.back()));
-                    break;
-            }
-        });
-        //process binary comparison in one block
-        cmpBuff.compareByContent(workLoadBinary);
-
-        assert(output_tmp.size() == cfgList.size());
-
-        //--------- set initial sync-direction --------------------------------------------------
-
-        for (auto j = begin(output_tmp); j != end(output_tmp); ++j)
-        {
-            const FolderPairCfg& fpCfg = cfgList[j - output_tmp.begin()];
-
-            callback.reportStatus(_("Calculating sync directions..."));
-            callback.forceUiRefresh();
-            zen::redetermineSyncDirection(fpCfg.directionCfg, *j,
-            [&](const std::wstring& warning) { callback.reportWarning(warning, warnings.warningDatabaseError); });
-        }
-
-        //only if everything was processed correctly output is written to!
-        //note: output mustn't change during this process to be in sync with GUI grid view!!!
-        output_tmp.swap(output);
-    }
-    catch (const std::bad_alloc& e)
-    {
-        callback.reportFatalError(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()));
-    }
-    catch (const std::exception& e)
-    {
-        callback.reportFatalError(utfCvrtTo<std::wstring>(e.what()));
-    }
-}
-
 //--------------------assemble conflict descriptions---------------------------
 
-namespace
-{
 //const wchar_t arrowLeft [] = L"\u2190";
 //const wchar_t arrowRight[] = L"\u2192"; unicode arrows -> too small
 const wchar_t arrowLeft [] = L"<--";
@@ -413,8 +265,7 @@ const wchar_t arrowRight[] = L"-->";
 //check for very old dates or date2s in the future
 std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 {
-    return _("Conflict detected:") + L"\n" +
-           replaceCpy(_("File %x has an invalid date!"), L"%x", fmtFileName(fileNameFull)) + L"\n" +
+    return _("Conflict detected:") + L" " + replaceCpy(_("File %x has an invalid date!"), L"%x", fmtFileName(fileNameFull)) + L"\n" +
            _("Date:") + L" " + utcToLocalTimeString(utcTime);
 }
 
@@ -422,8 +273,7 @@ std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 //check for changed files with same modification date
 std::wstring getConflictSameDateDiffSize(const FileMapping& fileObj)
 {
-    return _("Conflict detected:") + L"\n" +
-           replaceCpy(_("Files %x have the same date but a different size!"), L"%x", fmtFileName(fileObj.getObjRelativeName())) + L"\n" +
+    return _("Conflict detected:") + L" " + replaceCpy(_("Files %x have the same date but a different size!"), L"%x", fmtFileName(fileObj.getObjRelativeName())) + L"\n" +
            arrowLeft  + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
            arrowRight + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<RIGHT_SIDE>());
 }
@@ -445,12 +295,9 @@ std::wstring getDescrDiffMetaDate(const FileOrLinkMapping& fileObj)
            arrowLeft  + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.template getLastWriteTime<LEFT_SIDE >()) + L"\n" +
            arrowRight + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.template getLastWriteTime<RIGHT_SIDE>());
 }
-}
 
 //-----------------------------------------------------------------------------
 
-namespace
-{
 void categorizeSymlinkByTime(SymLinkMapping& linkObj, size_t fileTimeTolerance)
 {
     //categorize symlinks that exist on both sides
@@ -458,29 +305,14 @@ void categorizeSymlinkByTime(SymLinkMapping& linkObj, size_t fileTimeTolerance)
                                    linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance))
     {
         case CmpFileTime::TIME_EQUAL:
-            if (linkObj.getTargetPath<LEFT_SIDE>().empty())
-                linkObj.setCategoryConflict(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkObj.getFullName<LEFT_SIDE>())));
-            else if (linkObj.getTargetPath<RIGHT_SIDE>().empty())
-                linkObj.setCategoryConflict(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkObj.getFullName<RIGHT_SIDE>())));
+            //Caveat:
+            //1. SYMLINK_EQUAL may only be set if short names match in case: InSyncDir's mapping tables use short name as a key! see db_file.cpp
+            //2. harmonize with "bool stillInSync()" in algorithm.cpp
 
-            else if (
-#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
-                linkObj.getLinkType<LEFT_SIDE>() == linkObj.getLinkType<RIGHT_SIDE>() &&
-#endif
-                linkObj.getTargetPath<LEFT_SIDE>() == linkObj.getTargetPath<RIGHT_SIDE>()) //may both be empty if reading link content failed
-            {
-                //Caveat:
-                //1. SYMLINK_EQUAL may only be set if short names match in case: InSyncDir's mapping tables use short name as a key! see db_file.cpp
-                //2. harmonize with "bool stillInSync()" in algorithm.cpp
-
-                if (linkObj.getShortName<LEFT_SIDE>() == linkObj.getShortName<RIGHT_SIDE>())
-                    linkObj.setCategory<FILE_EQUAL>();
-                else
-                    linkObj.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(linkObj));
-            }
+            if (linkObj.getShortName<LEFT_SIDE>() == linkObj.getShortName<RIGHT_SIDE>())
+                linkObj.setCategory<FILE_EQUAL>();
             else
-                linkObj.setCategoryConflict(_("Conflict detected:") + L"\n" +
-                                            replaceCpy(_("Symbolic links %x have the same date but a different target."), L"%x", fmtFileName(linkObj.getObjRelativeName())));
+                linkObj.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(linkObj));
             break;
 
         case CmpFileTime::TIME_LEFT_NEWER:
@@ -500,7 +332,7 @@ void categorizeSymlinkByTime(SymLinkMapping& linkObj, size_t fileTimeTolerance)
             break;
     }
 }
-}
+
 
 void ComparisonBuffer::compareByTimeSize(const FolderPairCfg& fpConfig, BaseDirMapping& output)
 {
@@ -555,39 +387,51 @@ void ComparisonBuffer::compareByTimeSize(const FolderPairCfg& fpConfig, BaseDirM
     });
 }
 
-namespace
-{
-void categorizeSymlinkByContent(SymLinkMapping& linkObj, size_t fileTimeTolerance)
+
+void categorizeSymlinkByContent(SymLinkMapping& linkObj, size_t fileTimeTolerance, ProcessCallback& callback)
 {
     //categorize symlinks that exist on both sides
-    if (linkObj.getTargetPath<LEFT_SIDE>().empty())
-        linkObj.setCategoryConflict(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkObj.getFullName<LEFT_SIDE>())));
-    else if (linkObj.getTargetPath<RIGHT_SIDE>().empty())
-        linkObj.setCategoryConflict(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkObj.getFullName<RIGHT_SIDE>())));
-    //if one of these is empty it's handled like reading "file content" failed
-
-    else if (
-#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
-        linkObj.getLinkType<LEFT_SIDE>() == linkObj.getLinkType<RIGHT_SIDE>() &&
-#endif
-        linkObj.getTargetPath<LEFT_SIDE>() == linkObj.getTargetPath<RIGHT_SIDE>()) //may both be empty if determination failed!!!
+    Zstring targetPathRawL;
+    Zstring targetPathRawR;
+    Opt<std::wstring> errMsg = tryReportingError2([&]
     {
-        //Caveat:
-        //1. SYMLINK_EQUAL may only be set if short names match in case: InSyncDir's mapping tables use short name as a key! see db_file.cpp
-        //2. harmonize with "bool stillInSync()" in algorithm.cpp
+        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtFileName(linkObj.getFullName<LEFT_SIDE>())));
+        targetPathRawL = getSymlinkTargetRaw(linkObj.getFullName<LEFT_SIDE>()); //throw FileError
 
-        //symlinks have same "content"
-        if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>())
-            linkObj.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(linkObj));
-        else if (CmpFileTime::getResult(linkObj.getLastWriteTime<LEFT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance) != CmpFileTime::TIME_EQUAL)
-            linkObj.setCategoryDiffMetadata(getDescrDiffMetaDate(linkObj));
-        else
-            linkObj.setCategory<FILE_EQUAL>();
-    }
+        callback.reportStatus(replaceCpy(_("Resolving symbolic link %x"), L"%x", fmtFileName(linkObj.getFullName<RIGHT_SIDE>())));
+        targetPathRawR = getSymlinkTargetRaw(linkObj.getFullName<RIGHT_SIDE>()); //throw FileError
+    }, callback);
+
+    if (errMsg)
+        linkObj.setCategoryConflict(_("Conflict detected:") + L" " + *errMsg);
     else
-        linkObj.setCategory<FILE_DIFFERENT>();
+    {
+        if (targetPathRawL == targetPathRawR
+#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
+            &&
+            getSymlinkType(linkObj.getFullName<LEFT_SIDE >()) ==
+            getSymlinkType(linkObj.getFullName<RIGHT_SIDE>())
+#endif
+           )
+        {
+            //Caveat:
+            //1. SYMLINK_EQUAL may only be set if short names match in case: InSyncDir's mapping tables use short name as a key! see db_file.cpp
+            //2. harmonize with "bool stillInSync()" in algorithm.cpp
+
+            //symlinks have same "content"
+            if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>())
+                linkObj.setCategoryDiffMetadata(getDescrDiffMetaShortnameCase(linkObj));
+            else if (CmpFileTime::getResult(linkObj.getLastWriteTime<LEFT_SIDE>(),
+                                            linkObj.getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance) != CmpFileTime::TIME_EQUAL)
+                linkObj.setCategoryDiffMetadata(getDescrDiffMetaDate(linkObj));
+            else
+                linkObj.setCategory<FILE_EQUAL>();
+        }
+        else
+            linkObj.setCategory<FILE_DIFFERENT>();
+    }
 }
-}
+
 
 void ComparisonBuffer::compareByContent(std::vector<std::pair<FolderPairCfg, BaseDirMapping*>>& workLoad)
 {
@@ -606,7 +450,7 @@ void ComparisonBuffer::compareByContent(std::vector<std::pair<FolderPairCfg, Bas
 
         //finish symlink categorization
         std::for_each(uncategorizedLinks.begin(), uncategorizedLinks.end(),
-        [&](SymLinkMapping* linkMap) { categorizeSymlinkByContent(*linkMap, fileTimeTolerance); });
+        [&](SymLinkMapping* linkMap) { categorizeSymlinkByContent(*linkMap, fileTimeTolerance, callback_); });
     }
 
     //finish categorization...
@@ -634,7 +478,7 @@ void ComparisonBuffer::compareByContent(std::vector<std::pair<FolderPairCfg, Bas
                            to<Int64>(bytesTotal),
                            ProcessCallback::PHASE_COMPARING_CONTENT);
 
-    const std::wstring txtComparingContentOfFiles = replaceCpy(_("Comparing content of files %x"), L"%x", L"\n%x", false);
+    const std::wstring txtComparingContentOfFiles = _("Comparing content of files %x");
 
     //compare files (that have same size) bytewise...
     std::for_each(filesToCompareBytewise.begin(), filesToCompareBytewise.end(),
@@ -644,12 +488,23 @@ void ComparisonBuffer::compareByContent(std::vector<std::pair<FolderPairCfg, Bas
 
         //check files that exist in left and right model but have different content
 
-        if (!tryReportingError([&]
-    {
-        if (filesHaveSameContentUpdating(fileObj->getFullName<LEFT_SIDE>(), //throw FileError
+        bool haveSameContent = false;
+        Opt<std::wstring> errMsg = tryReportingError2([&]
+        {
+            haveSameContent = filesHaveSameContentUpdating(fileObj->getFullName<LEFT_SIDE>(), //throw FileError
             fileObj->getFullName<RIGHT_SIDE>(),
             to<Int64>(fileObj->getFileSize<LEFT_SIDE>()),
-            callback_))
+            callback_);
+
+            callback_.updateProcessedData(1, 0); //processed bytes are reported in subfunctions!
+            callback_.requestUiRefresh(); //may throw
+        }, callback_);
+
+        if (errMsg)
+            fileObj->setCategoryConflict(_("Conflict detected:") + L" " + *errMsg);
+        else
+        {
+            if (haveSameContent)
             {
                 //Caveat:
                 //1. FILE_EQUAL may only be set if short names match in case: InSyncDir's mapping tables use short name as a key! see db_file.cpp
@@ -663,19 +518,11 @@ void ComparisonBuffer::compareByContent(std::vector<std::pair<FolderPairCfg, Bas
             }
             else
                 fileObj->setCategory<FILE_DIFFERENT>();
-
-            callback_.updateProcessedData(1, 0); //processed bytes are reported in subfunctions!
-
-        }, callback_))
-        fileObj->setCategoryConflict(_("Conflict detected:") + L"\n" + _("Comparing files by content failed."));
-
-        callback_.requestUiRefresh(); //may throw
+        }
     });
 }
 
 
-namespace
-{
 class MergeSides
 {
 public:
@@ -837,7 +684,6 @@ void processFilteredDirs(HierarchyObject& hierObj, const HardFilter& filterProc)
                dirObj.refSubFiles().empty();
     });
 }
-}
 
 
 //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedLinks are appended!
@@ -879,19 +725,171 @@ void ComparisonBuffer::performComparison(const FolderPairCfg& fpCfg,
     addSoftFiltering(output, fpCfg.filter.timeSizeFilter);
 
     //properly handle (user-ignored) traversing errors: just uncheck them, no need to physically delete them (<automatic> mode will be grateful)
-    std::set<Zstring> failedReads;
-    if (bufValueLeft ) failedReads.insert(bufValueLeft ->failedReads.begin(), bufValueLeft ->failedReads.end());
-    if (bufValueRight) failedReads.insert(bufValueRight->failedReads.begin(), bufValueRight->failedReads.end());
+    auto addToSet = [](std::set<Zstring>& s, const std::set<Zstring>& v) { s.insert(v.begin(), v.end()); };
+    std::set<Zstring> failedDirReads;
+    if (bufValueLeft ) addToSet(failedDirReads, bufValueLeft ->failedDirReads);
+    if (bufValueRight) addToSet(failedDirReads, bufValueRight->failedDirReads);
 
-    if (!failedReads.empty())
+    std::set<Zstring> failedItemReads;
+    if (bufValueLeft ) addToSet(failedItemReads, bufValueLeft ->failedItemReads);
+    if (bufValueRight) addToSet(failedItemReads, bufValueRight->failedItemReads);
+
+    if (!failedDirReads.empty() || !failedItemReads.empty())
     {
         Zstring filterFailedRead;
-        //exclude subfolders only
-        std::for_each(failedReads.begin(), failedReads.end(),
-        [&](const Zstring& relDirPf) { filterFailedRead += relDirPf + Zstr("?*\n"); });
         //note: relDirPf is empty for base dir, otherwise postfixed! e.g. "subdir\"
+        std::for_each(failedDirReads .begin(), failedDirReads .end(), [&](const Zstring& relDirPf) { filterFailedRead += relDirPf + Zstr("?*\n"); }); //exclude child items only!
+        std::for_each(failedItemReads.begin(), failedItemReads.end(), [&](const Zstring& relItem ) { filterFailedRead += relItem + Zstr("\n");    }); //exclude item AND child items!
 
         addHardFiltering(output, filterFailedRead);
     }
     //##################################################################################
+}
+}
+
+
+void zen::compare(size_t fileTimeTolerance,
+                  xmlAccess::OptionalDialogs& warnings,
+                  bool allowUserInteraction,
+                  bool runWithBackgroundPriority,
+                  bool createDirLocks,
+                  std::unique_ptr<LockHolder>& dirLocks,
+                  const std::vector<FolderPairCfg>& cfgList,
+                  FolderComparison& output,
+                  ProcessCallback& callback)
+{
+    //specify process and resource handling priorities
+    std::unique_ptr<ScheduleForBackgroundProcessing> backgroundPrio;
+    if (runWithBackgroundPriority)
+        try
+        {
+            backgroundPrio = make_unique<ScheduleForBackgroundProcessing>(); //throw FileError
+        }
+        catch (const FileError& e)
+        {
+            //not an error in this context
+            callback.reportInfo(e.toString()); //may throw!
+        }
+
+    //prevent operating system going into sleep state
+    std::unique_ptr<PreventStandby> noStandby;
+    try
+    {
+        noStandby = make_unique<PreventStandby>(); //throw FileError
+    }
+    catch (const FileError& e)
+    {
+        //not an error in this context
+        callback.reportInfo(e.toString()); //may throw!
+    }
+
+    //PERF_START;
+
+    callback.reportInfo(_("Start comparison")); //we want some indicator at the very beginning to make sense of "total time"
+
+    //init process: keep at beginning so that all gui elements are initialized properly
+    callback.initNewPhase(-1, 0, ProcessCallback::PHASE_SCANNING); //it's not known how many files will be scanned => -1 objects
+
+    //-------------------some basic checks:------------------------------------------
+
+    checkForIncompleteInput(cfgList, warnings.warningInputFieldEmpty,  callback);
+    checkFolderDependency  (cfgList, warnings.warningDependentFolders, callback);
+
+    std::set<Zstring, LessFilename> dirnamesExisting;
+    //list of directories that are *expected* to be existent (and need to be scanned)!
+    //directory existence only checked *once* to avoid race conditions!
+    {
+        std::set<Zstring, LessFilename> dirnames;
+        std::for_each(cfgList.begin(), cfgList.end(),
+                      [&](const FolderPairCfg& fpCfg)
+        {
+            dirnames.insert(fpCfg.leftDirectoryFmt);
+            dirnames.insert(fpCfg.rightDirectoryFmt);
+        });
+        dirnamesExisting = determineExistentDirs(dirnames, allowUserInteraction, callback);
+    }
+
+    auto dirAvailable = [&](const Zstring& dirnameFmt) { return dirnamesExisting.find(dirnameFmt) != dirnamesExisting.end(); };
+
+    //-------------------end of basic checks------------------------------------------
+
+    try
+    {
+        //lock (existing) directories before comparison
+        if (createDirLocks)
+            dirLocks = make_unique<LockHolder>(dirnamesExisting, warnings.warningDirectoryLockFailed, callback);
+
+        //------------------- fill directory buffer ---------------------------------------------------
+        std::set<DirectoryKey> keysToRead;
+
+        std::for_each(cfgList.begin(), cfgList.end(),
+                      [&](const FolderPairCfg& fpCfg)
+        {
+            if (dirAvailable(fpCfg.leftDirectoryFmt)) //only request *currently existing* directories: at this point user is aware that non-ex + empty string are seen as empty folder!
+                keysToRead.insert(DirectoryKey(fpCfg.leftDirectoryFmt,  fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
+            if (dirAvailable(fpCfg.rightDirectoryFmt))
+                keysToRead.insert(DirectoryKey(fpCfg.rightDirectoryFmt, fpCfg.filter.nameFilter, fpCfg.handleSymlinks));
+        });
+
+        ComparisonBuffer cmpBuff(keysToRead,
+                                 fileTimeTolerance,
+                                 callback);
+
+        //------------ traverse/read folders -----------------------------------------------------
+
+        FolderComparison output_tmp; //write to output not before END of process!
+
+        //buffer "config"/"result of binary comparison" for latter processing as a single block
+        std::vector<std::pair<FolderPairCfg, BaseDirMapping*>> workLoadBinary;
+
+        std::for_each(cfgList.begin(), cfgList.end(),
+                      [&](const FolderPairCfg& fpCfg)
+        {
+            //a pity VC11 screws up on std::make_shared with 7 arguments...
+            output_tmp.push_back(std::shared_ptr<BaseDirMapping>(new BaseDirMapping(fpCfg.leftDirectoryFmt,
+                                                                                    dirAvailable(fpCfg.leftDirectoryFmt),
+                                                                                    fpCfg.rightDirectoryFmt,
+                                                                                    dirAvailable(fpCfg.rightDirectoryFmt),
+                                                                                    fpCfg.filter.nameFilter,
+                                                                                    fpCfg.compareVar,
+                                                                                    fileTimeTolerance)));
+            switch (fpCfg.compareVar)
+            {
+                case CMP_BY_TIME_SIZE:
+                    cmpBuff.compareByTimeSize(fpCfg, *output_tmp.back());
+                    break;
+                case CMP_BY_CONTENT:
+                    workLoadBinary.push_back(std::make_pair(fpCfg, &*output_tmp.back()));
+                    break;
+            }
+        });
+        //process binary comparison in one block
+        cmpBuff.compareByContent(workLoadBinary);
+
+        assert(output_tmp.size() == cfgList.size());
+
+        //--------- set initial sync-direction --------------------------------------------------
+
+        for (auto j = begin(output_tmp); j != end(output_tmp); ++j)
+        {
+            const FolderPairCfg& fpCfg = cfgList[j - output_tmp.begin()];
+
+            callback.reportStatus(_("Calculating sync directions..."));
+            callback.forceUiRefresh();
+            zen::redetermineSyncDirection(fpCfg.directionCfg, *j,
+            [&](const std::wstring& warning) { callback.reportWarning(warning, warnings.warningDatabaseError); });
+        }
+
+        //only if everything was processed correctly output is written to!
+        //note: output mustn't change during this process to be in sync with GUI grid view!!!
+        output_tmp.swap(output);
+    }
+    catch (const std::bad_alloc& e)
+    {
+        callback.reportFatalError(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()));
+    }
+    catch (const std::exception& e)
+    {
+        callback.reportFatalError(utfCvrtTo<std::wstring>(e.what()));
+    }
 }

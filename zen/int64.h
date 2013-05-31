@@ -14,7 +14,6 @@
 #include <ostream>
 #include "assert_static.h"
 #include "type_tools.h"
-#include "type_traits.h"
 
 #ifdef FFS_WIN
 #include "win.h"

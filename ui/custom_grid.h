@@ -22,7 +22,7 @@ void init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std::shared_p
 std::vector<Grid::ColumnAttribute> convertConfig(const std::vector<ColumnAttributeRim>& attribs); //+ make consistent
 std::vector<ColumnAttributeRim>    convertConfig(const std::vector<Grid::ColumnAttribute>& attribs); //
 
-void showSyncAction(Grid& gridCenter, bool value);
+void highlightSyncAction(Grid& gridCenter, bool value);
 
 void setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, bool show, IconBuffer::IconSize sz);
 

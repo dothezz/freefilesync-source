@@ -35,8 +35,9 @@ boost::thread::id mainThreadId = boost::this_thread::get_id();
 #endif
 
 #ifdef FFS_WIN
-#define DEF_DLL_FUN(name) DllFun<thumb::FunType_##name> name(thumb::getDllName(), thumb::funName_##name);
+const bool isXpOrLater = winXpOrLater(); //VS2010 compiled DLLs are not supported on Win 2000: Popup dialog "DecodePointer not found"
 
+#define DEF_DLL_FUN(name) const auto name = isXpOrLater ? DllFun<thumb::FunType_##name>(thumb::getDllName(), thumb::funName_##name) : DllFun<thumb::FunType_##name>();
 DEF_DLL_FUN(getIconByIndex);   //
 DEF_DLL_FUN(getThumbnail);     //let's spare the boost::call_once hustle and allocate statically
 DEF_DLL_FUN(releaseImageData); //
@@ -67,7 +68,7 @@ public:
     {
         if (handle_ != nullptr)
 #ifdef FFS_WIN
-            releaseImageData(handle_);
+            releaseImageData(handle_); //should be checked already before creating IconHolder!
 #elif defined FFS_LINUX
             ::g_object_unref(handle_); //superseedes "::gdk_pixbuf_unref"!
 #elif defined FFS_MAC
@@ -203,10 +204,10 @@ IconHolder getIconByAttribute(LPCWSTR pszPath, DWORD dwFileAttributes, IconBuffe
     if (!imgList) //no need to IUnknown::Release() imgList!
         return IconHolder();
 
-    if (!getIconByIndex)
-        return IconHolder();
+    if (getIconByIndex && releaseImageData)
+        return IconHolder(getIconByIndex(fileInfo.iIcon, getThumbSizeType(sz)));
 
-    return IconHolder(getIconByIndex(fileInfo.iIcon, getThumbSizeType(sz)));
+    return IconHolder();
 }
 
 
@@ -237,7 +238,7 @@ IconHolder iconHolderFromGicon(GIcon* gicon, IconBuffer::IconSize sz)
 IconHolder getThumbnailIcon(const Zstring& filename, int requestedSize) //return 0 on failure
 {
 #ifdef FFS_WIN
-    if (getThumbnail)
+    if (getThumbnail && releaseImageData)
         return IconHolder(getThumbnail(filename.c_str(), requestedSize));
 
 #elif defined FFS_LINUX
@@ -375,13 +376,13 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
 
         const bool isLink = (fileInfo.dwAttributes & SFGAO_LINK) != 0;
 
-        if (getIconByIndex)
+        if (getIconByIndex && releaseImageData)
             if (const thumb::ImageData* imgData = getIconByIndex(fileInfo.iIcon, getThumbSizeType(sz)))
                 return IconHolder(imgData);
     }
 
 #elif defined FFS_LINUX
-    GFile* file = ::g_file_new_for_path(filename.c_str()); //never fails
+    GFile* file = ::g_file_new_for_path(filename.c_str()); //documented to "never fail"
     ZEN_ON_SCOPE_EXIT(::g_object_unref(file);)
 
     if (GFileInfo* fileInfo = ::g_file_query_info(file, G_FILE_ATTRIBUTE_STANDARD_ICON, G_FILE_QUERY_INFO_NONE, nullptr, nullptr))
@@ -462,7 +463,7 @@ public:
     //must be called by main thread only! => wxBitmap is NOT thread-safe like an int (non-atomic ref-count!!!)
     Opt<wxBitmap> retrieveFileIcon(const Zstring& fileName)
     {
-        assert(boost::this_thread::get_id() == mainThreadId );
+        assert(boost::this_thread::get_id() == mainThreadId);
         boost::lock_guard<boost::mutex> dummy(lockIconList);
         auto it = iconList.find(fileName);
         if (it == iconList.end())
@@ -481,7 +482,7 @@ public:
     //call at an appropriate time, e.g.	after Workload::setWorkload()
     void limitBufferSize() //critical because GDI resources are limited (e.g. 10000 on XP per process)
     {
-        assert(boost::this_thread::get_id() == mainThreadId );
+        assert(boost::this_thread::get_id() == mainThreadId);
         boost::lock_guard<boost::mutex> dummy(lockIconList);
         while (iconList.size() > BUFFER_SIZE_MAX)
         {

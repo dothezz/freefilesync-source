@@ -161,6 +161,7 @@ protected:
     wxStaticText* m_staticTextCreateRight;
     wxPanel* m_panelViewFilter;
     wxBoxSizer* bSizerViewFilter;
+    ToggleButton* m_bpButtonViewTypeSyncAction;
     ToggleButton* m_bpButtonShowCreateLeft;
     ToggleButton* m_bpButtonShowUpdateLeft;
     ToggleButton* m_bpButtonShowDeleteLeft;
@@ -206,6 +207,7 @@ protected:
     virtual void OnConfigureFilter( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnGlobalFilterContext( wxMouseEvent& event ) { event.Skip(); }
     virtual void OnShowExcluded( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnToggleViewType( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnToggleViewButton( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnViewButtonRightClick( wxMouseEvent& event ) { event.Skip(); }
 
@@ -331,7 +333,7 @@ protected:
     wxButton* m_buttonAbort;
 
     // Virtual event handlers, overide them in your derived class
-    virtual void OnCloseBtn( wxCloseEvent& event ) { event.Skip(); }
+    virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
     virtual void OnIconize( wxIconizeEvent& event ) { event.Skip(); }
     virtual void OnOkay( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnPause( wxCommandEvent& event ) { event.Skip(); }
@@ -651,6 +653,7 @@ protected:
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+    virtual void OnCheckBoxClick( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnButton1( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnButton2( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }

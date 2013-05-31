@@ -25,8 +25,6 @@ void raiseReturnCode(FfsReturnCode& rc, FfsReturnCode rcProposed)
     if (rc < rcProposed)
         rc = rcProposed;
 }
-
 }
-
 
 #endif // RETURN_CODES_H_INCLUDED

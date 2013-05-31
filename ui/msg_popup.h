@@ -4,12 +4,13 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef MESSAGEPOPUP_H_INCLUDED
-#define MESSAGEPOPUP_H_INCLUDED
+#ifndef MESSAGEPOPUP_H_820780154723456
+#define MESSAGEPOPUP_H_820780154723456
 
 #include <wx/window.h>
 #include <wx/string.h>
 
+class QuestionDlg;
 
 namespace zen
 {
@@ -60,20 +61,17 @@ struct ReturnQuestionDlg
     };
 };
 
-class QuestConfig;
-ReturnQuestionDlg::ButtonPressed showQuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const QuestConfig& cfg);
-
 class QuestConfig
 {
 public:
-    QuestConfig() : checkBoxValue() {}
+    QuestConfig() : checkBoxValue(), disabledButtonsWhenChecked_() {}
     QuestConfig& setCaption (const wxString& label) { caption  = label; return *this; }
     QuestConfig& setLabelYes(const wxString& label) { labelYes = label; return *this; }
     QuestConfig& setLabelNo (const wxString& label) { labelNo  = label; return *this; }
-    QuestConfig& showCheckBox(bool& value, const wxString& label) { checkBoxLabel = label; checkBoxValue = &value; return *this; }
+    QuestConfig& showCheckBox(bool& value, const wxString& label, int disabledButtonsWhenChecked) { checkBoxValue = &value; checkBoxLabel = label; disabledButtonsWhenChecked_ = disabledButtonsWhenChecked; return *this; }
 
 private:
-    friend ReturnQuestionDlg::ButtonPressed showQuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const QuestConfig& cfg);
+    friend class ::QuestionDlg;
 
     wxString caption;
     wxString labelYes; //overwrite default "Yes, No" labels
@@ -81,9 +79,10 @@ private:
     //optional checkbox:
     bool* checkBoxValue;    //in/out
     wxString checkBoxLabel; //in
+    int disabledButtonsWhenChecked_;
 };
 
 ReturnQuestionDlg::ButtonPressed showQuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const QuestConfig& cfg = QuestConfig());
 }
 
-#endif // MESSAGEPOPUP_H_INCLUDED
+#endif //MESSAGEPOPUP_H_820780154723456

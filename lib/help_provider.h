@@ -95,4 +95,4 @@ void displayHelpEntry(wxWindow* parent)
 }
 }
 
-#endif // HELPPROVIDER_H_INCLUDED
+#endif //HELPPROVIDER_H_INCLUDED

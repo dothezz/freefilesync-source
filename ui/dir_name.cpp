@@ -44,8 +44,9 @@ void setDirectoryNameImpl(const wxString& dirname, wxWindow& tooltipWnd, wxStati
         //change static box label only if there is a real difference to what is shown in wxTextCtrl anyway
         wxString dirNormalized = dirname;
         trim(dirNormalized);
-        if (!dirNormalized.empty() && !endsWith(dirNormalized, FILE_NAME_SEPARATOR))
-            dirNormalized += FILE_NAME_SEPARATOR;
+        if (!dirNormalized.empty())
+            if (!endsWith(dirNormalized, FILE_NAME_SEPARATOR))
+                dirNormalized += FILE_NAME_SEPARATOR;
 
         staticText->SetLabel(dirNormalized == dirFormatted ? wxString(_("Drag && drop")) : dirFormatted);
     }

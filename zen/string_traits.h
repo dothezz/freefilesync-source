@@ -23,33 +23,32 @@ GetCharType<>::Type:
 	GetCharType<std::wstring>::Type  //equals wchar_t
 	GetCharType<wchar_t[5]>  ::Type  //equals wchar_t
 
-strBegin():
+strLength():
+	strLength(str);   //equals str.length()
+	strLength(array); //equals cStringLength(array)
+
+strBegin():         -> not null-terminated! -> may be nullptr if length is 0!
 	std::wstring str(L"dummy");
 	char array[] = "dummy";
 	strBegin(str);   //returns str.c_str()
 	strBegin(array); //returns array
-
-strLength():
-	strLength(str);   //equals str.length()
-	strLength(array); //equals cStringLength(array)
 */
 
-//reference a sub-string or a char* as an intermediate string class when the length is already known
+//reference a sub-string for consumption by zen string_tools
 template <class Char>
-class StringProxy
+class StringRef
 {
 public:
-    StringProxy(const Char* cstr, size_t len              ) : cstr_(cstr),  length_(len) {}
-    StringProxy(const Char* cstrBegin, const Char* cstrEnd) : cstr_(cstrBegin),  length_(cstrEnd - cstrBegin) {}
+    template <class Iterator>
+    StringRef(Iterator first, Iterator last) : length_(last - first), data_(first != last ? &*first : nullptr) {}
 
-    const Char* c_str() const { return cstr_; }
     size_t length() const { return length_; }
+    const Char* data() const { return data_; } //1. no null-termination! 2. may be nullptr!
 
 private:
-    const Char* cstr_;
     size_t length_;
+    const Char* data_;
 };
-
 
 
 
@@ -129,6 +128,28 @@ public:
         IsSameType<CharType, wchar_t>::value
     };
 };
+
+
+template <> class StringTraits<StringRef<char>>
+{
+public:
+    enum
+    {
+        isStringClass = false,
+        isStringLike = true
+    };
+    typedef char CharType;
+};
+template <> class StringTraits<StringRef<wchar_t>>
+{
+public:
+    enum
+    {
+        isStringClass = false,
+        isStringLike = true
+    };
+    typedef wchar_t CharType;
+};
 }
 
 template <class T>
@@ -162,6 +183,8 @@ inline const char*    strBegin(const char*    str) { return str; }
 inline const wchar_t* strBegin(const wchar_t* str) { return str; }
 inline const char*    strBegin(const char&    ch)  { return &ch; }
 inline const wchar_t* strBegin(const wchar_t& ch)  { return &ch; }
+inline const char*     strBegin(const StringRef<char   >& ref) { return ref.data(); }
+inline const wchar_t*  strBegin(const StringRef<wchar_t>& ref) { return ref.data(); }
 
 
 template <class S> inline
@@ -174,6 +197,8 @@ inline size_t strLength(const char*    str) { return implementation::cStringLeng
 inline size_t strLength(const wchar_t* str) { return implementation::cStringLength(str); }
 inline size_t strLength(char)            { return 1; }
 inline size_t strLength(wchar_t)         { return 1; }
+inline size_t strLength(const StringRef<char   >& ref) { return ref.length(); }
+inline size_t strLength(const StringRef<wchar_t>& ref) { return ref.length(); }
 }
 
 #endif //STRING_TRAITS_HEADER_813274321443234

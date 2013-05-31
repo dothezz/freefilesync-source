@@ -35,6 +35,8 @@ private:
     void OnCancel(wxCommandEvent& event) { EndModal(ReturnErrorDlg::BUTTON_CANCEL); }
     void OnButton1(wxCommandEvent& event);
     void OnButton2(wxCommandEvent& event);
+    void OnCheckBoxClick(wxCommandEvent& event) { updateGui(); event.Skip(); }
+    void updateGui();
 
     bool* ignoreErrors;
     wxButton& buttonRetry;            //
@@ -87,7 +89,14 @@ ErrorDlg::ErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageT
     else if (activeButtons & ReturnErrorDlg::BUTTON_CANCEL)
         setAsStandard(*m_buttonCancel);
 
+    updateGui();
     Fit(); //child-element widths have changed: image was set
+}
+
+void ErrorDlg::updateGui()
+{
+    //button doesn't make sense when checkbox is set!
+    buttonRetry.Enable(!checkBoxIgnoreErrors.GetValue());
 }
 
 
@@ -135,6 +144,8 @@ private:
     void OnCancel(wxCommandEvent& event) { EndModal(ReturnWarningDlg::BUTTON_CANCEL); }
     void OnButton1(wxCommandEvent& event);
     void OnButton2(wxCommandEvent& event);
+    void OnCheckBoxClick(wxCommandEvent& event) { updateGui(); event.Skip(); }
+    void updateGui();
 
     bool& dontShowAgain;
     wxButton& buttonIgnore;            //
@@ -182,7 +193,15 @@ WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& mes
     else if (activeButtons & ReturnWarningDlg::BUTTON_CANCEL)
         setAsStandard(*m_buttonCancel);
 
+    updateGui();
     Fit(); //child-element widths have changed: image was set
+}
+
+
+void WarningDlg::updateGui()
+{
+    //button doesn't make sense when checkbox is set!
+    buttonSwitch.Enable(!checkBoxDontShowAgain.GetValue());
 }
 
 
@@ -212,49 +231,49 @@ ReturnWarningDlg::ButtonPressed zen::showWarningDlg(wxWindow* parent, int active
 class QuestionDlg : public MessageDlgGenerated
 {
 public:
-    QuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const wxString& caption, const wxString& labelYes, const wxString& labelNo, bool* checkBoxValue, const wxString& checkBoxLabel);
+    QuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const QuestConfig& cfg);
 
 private:
     void OnClose (wxCloseEvent&   event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
     void OnCancel(wxCommandEvent& event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
     void OnButton1(wxCommandEvent& event);
     void OnButton2(wxCommandEvent& event);
+    void OnCheckBoxClick(wxCommandEvent& event) { updateGui(); event.Skip(); }
+    void updateGui();
 
-    bool* checkBoxValue_; //optional
     wxButton& buttonYes; // map generic controls
     wxButton& buttonNo;  //
+
+    bool* const checkBoxValue_; //optional
+    const int disabledButtonsWhenChecked_;
 };
 
 
 QuestionDlg::QuestionDlg(wxWindow* parent,
                          int activeButtons,
                          const wxString& messageText,
-                         const wxString& caption, //optional
-                         const wxString& labelYes,
-                         const wxString& labelNo,
-                         //optional checkbox:
-                         bool* checkBoxValue,
-                         const wxString& checkBoxLabel) :
+                         const QuestConfig& cfg) :
     MessageDlgGenerated(parent),
-    checkBoxValue_(checkBoxValue),
     buttonYes(*m_buttonCustom1),
-    buttonNo (*m_buttonCustom2)
+    buttonNo (*m_buttonCustom2),
+    checkBoxValue_(cfg.checkBoxValue),
+    disabledButtonsWhenChecked_(cfg.disabledButtonsWhenChecked_)
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
-    SetTitle(!caption.empty()? caption : _("Question"));
+    SetTitle(!cfg.caption.empty()? cfg.caption : _("Question"));
     m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_question"));
     m_textCtrlMessage->SetValue(messageText);
-    buttonYes.SetLabel(!labelYes.empty() ? labelYes : _("&Yes"));
-    buttonNo .SetLabel(!labelNo .empty() ? labelNo  : _("&No"));
+    buttonYes.SetLabel(!cfg.labelYes.empty() ? cfg.labelYes : _("&Yes"));
+    buttonNo .SetLabel(!cfg.labelNo .empty() ? cfg.labelNo  : _("&No"));
     //buttonYes.SetId(wxID_YES); -> see comment in ErrorDlg
     //buttonNo .SetId(wxID_NO);
 
-    if (checkBoxValue)
+    if (cfg.checkBoxValue)
     {
-        m_checkBoxCustom->SetValue(*checkBoxValue);
-        m_checkBoxCustom->SetLabel(checkBoxLabel);
+        m_checkBoxCustom->SetValue(*cfg.checkBoxValue);
+        m_checkBoxCustom->SetLabel(cfg.checkBoxLabel);
     }
     else
         m_checkBoxCustom->Hide();
@@ -276,8 +295,23 @@ QuestionDlg::QuestionDlg(wxWindow* parent,
     else if (activeButtons & ReturnQuestionDlg::BUTTON_CANCEL)
         setAsStandard(*m_buttonCancel);
 
+    updateGui();
     Fit(); //child-element widths have changed: image was set
 }
+
+
+void QuestionDlg::updateGui()
+{
+    auto updateEnabledStatus =  [&](wxButton& btn, ReturnQuestionDlg::ButtonPressed btnId)
+    {
+        if (disabledButtonsWhenChecked_ & btnId)
+            btn.Enable(!m_checkBoxCustom->GetValue());
+    };
+    updateEnabledStatus(buttonYes,       ReturnQuestionDlg::BUTTON_YES);
+    updateEnabledStatus(buttonNo,        ReturnQuestionDlg::BUTTON_NO);
+    updateEnabledStatus(*m_buttonCancel, ReturnQuestionDlg::BUTTON_CANCEL);
+}
+
 
 void QuestionDlg::OnButton1(wxCommandEvent& event) //yes
 {
@@ -299,7 +333,7 @@ ReturnQuestionDlg::ButtonPressed zen::showQuestionDlg(wxWindow* parent,
                                                       const wxString& messageText,
                                                       const QuestConfig& cfg)
 {
-    QuestionDlg qtnDlg(parent, activeButtons, messageText, cfg.caption, cfg.labelYes, cfg.labelNo, cfg.checkBoxValue, cfg.checkBoxLabel);
+    QuestionDlg qtnDlg(parent, activeButtons, messageText, cfg);
     qtnDlg.Raise();
     return static_cast<ReturnQuestionDlg::ButtonPressed>(qtnDlg.ShowModal());
 }

@@ -67,8 +67,9 @@ std::vector<ColumnAttributeRim> getDefaultColumnAttributesRight()
 
 enum ColumnTypeMiddle
 {
-    COL_TYPE_MIDDLE_VALUE,
-    COL_TYPE_BORDER
+    COL_TYPE_CHECKBOX,
+    COL_TYPE_CMP_CATEGORY,
+    COL_TYPE_SYNC_ACTION,
 };
 
 //------------------------------------------------------------------

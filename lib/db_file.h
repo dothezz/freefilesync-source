@@ -14,15 +14,15 @@ namespace zen
 {
 const Zstring SYNC_DB_FILE_ENDING = Zstr(".ffs_db");
 
+enum InSyncType
+{
+    IN_SYNC_BINARY_EQUAL,     //checked file content
+    IN_SYNC_ATTRIBUTES_EQUAL, //only "looks" like they're equal
+};
+
 //artificial hierarchy of last synchronous state:
 struct InSyncFile
 {
-    enum InSyncType
-    {
-        IN_SYNC_BINARY_EQUAL,     //checked file content
-        IN_SYNC_ATTRIBUTES_EQUAL, //only "looks" like they're equal
-    };
-
     InSyncFile(const FileDescriptor& l, const FileDescriptor& r, InSyncType type) : left(l), right(r), inSyncType(type) {}
     FileDescriptor left;
     FileDescriptor right;
@@ -31,9 +31,10 @@ struct InSyncFile
 
 struct InSyncSymlink
 {
-    InSyncSymlink(const LinkDescriptor& l, const LinkDescriptor& r) : left(l), right(r) {}
+    InSyncSymlink(const LinkDescriptor& l, const LinkDescriptor& r, InSyncType type) : left(l), right(r), inSyncType(type) {}
     LinkDescriptor left;
     LinkDescriptor right;
+    InSyncType inSyncType;
 };
 
 struct InSyncDir
@@ -66,14 +67,14 @@ struct InSyncDir
         return dirs.insert(std::make_pair(shortName, InSyncDir(statusIn))).first->second;
     }
 
-    void addFile(const Zstring& shortName, const FileDescriptor& dataL, const FileDescriptor& dataR, InSyncFile::InSyncType type)
+    void addFile(const Zstring& shortName, const FileDescriptor& dataL, const FileDescriptor& dataR, InSyncType type)
     {
         files.insert(std::make_pair(shortName, InSyncFile(dataL, dataR, type)));
     }
 
-    void addSymlink(const Zstring& shortName, const LinkDescriptor& dataL, const LinkDescriptor& dataR)
+    void addSymlink(const Zstring& shortName, const LinkDescriptor& dataL, const LinkDescriptor& dataR, InSyncType type)
     {
-        symlinks.insert(std::make_pair(shortName, InSyncSymlink(dataL, dataR)));
+        symlinks.insert(std::make_pair(shortName, InSyncSymlink(dataL, dataR, type)));
     }
 };
 
@@ -85,4 +86,4 @@ std::shared_ptr<InSyncDir> loadLastSynchronousState(const BaseDirMapping& baseMa
 void saveLastSynchronousState(const BaseDirMapping& baseMapping); //throw FileError
 }
 
-#endif // DBFILE_H_INCLUDED
+#endif //DBFILE_H_INCLUDED

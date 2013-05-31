@@ -664,6 +664,70 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
 
 namespace
 {
+#ifdef _MSC_VER
+#pragma warning(disable:4428)	// VC wrongly issues warning C4428: universal-character-name encountered in source
+#endif
+
+wxString getShortDisplayNameForFolderPair(const Zstring& dirLeftPf, const Zstring& dirRightPf) //post-fixed with separator
+{
+    assert(endsWith(dirLeftPf,  FILE_NAME_SEPARATOR) || dirLeftPf .empty());
+    assert(endsWith(dirRightPf, FILE_NAME_SEPARATOR) || dirRightPf.empty());
+
+    auto itL = dirLeftPf .end();
+    auto itR = dirRightPf.end();
+
+    for (;;)
+    {
+        auto itLPrev = find_last(dirLeftPf .begin(), itL, FILE_NAME_SEPARATOR);
+        auto itRPrev = find_last(dirRightPf.begin(), itR, FILE_NAME_SEPARATOR);
+
+        if (itLPrev == itL ||
+            itRPrev == itR)
+        {
+            if (itLPrev == itL)
+                itLPrev = dirLeftPf.begin();
+            else
+                ++itLPrev; //skip separator
+            if (itRPrev == itR)
+                itRPrev = dirRightPf.begin();
+            else
+                ++itRPrev;
+
+            if (equal(itLPrev, itL, itRPrev, itR))
+            {
+                itL = itLPrev;
+                itR = itRPrev;
+            }
+            break;
+        }
+
+        if (!equal(itLPrev, itL, itRPrev, itR))
+            break;
+        itL = itLPrev;
+        itR = itRPrev;
+    }
+
+    Zstring commonPostfix(itL, dirLeftPf.end());
+    if (startsWith(commonPostfix, FILE_NAME_SEPARATOR))
+        commonPostfix = afterFirst(commonPostfix, FILE_NAME_SEPARATOR);
+    if (endsWith(commonPostfix, FILE_NAME_SEPARATOR))
+        commonPostfix.resize(commonPostfix.size() - 1);
+
+    if (commonPostfix.empty())
+    {
+        auto getLastComponent = [](const Zstring& dirPf) { return utfCvrtTo<wxString>(afterLast(beforeLast(dirPf, FILE_NAME_SEPARATOR), FILE_NAME_SEPARATOR)); }; //returns the whole string if term not found
+        if (dirLeftPf.empty())
+            return getLastComponent(dirRightPf);
+        else if (dirRightPf.empty())
+            return getLastComponent(dirLeftPf);
+        else
+            return getLastComponent(dirLeftPf) + L" \u2212 " + //= unicode minus
+                   getLastComponent(dirRightPf);
+    }
+    return utfCvrtTo<wxString>(commonPostfix);
+}
+
+
 const wxColour COLOR_LEVEL0(0xcc, 0xcc, 0xff);
 const wxColour COLOR_LEVEL1(0xcc, 0xff, 0xcc);
 const wxColour COLOR_LEVEL2(0xff, 0xff, 0x99);
@@ -716,6 +780,32 @@ public:
 private:
     virtual size_t getRowCount() const { return treeDataView_ ? treeDataView_->linesTotal() : 0; }
 
+    virtual wxString getToolTip(size_t row, ColumnType colType) const
+    {
+        switch (static_cast<ColumnTypeNavi>(colType))
+        {
+            case COL_TYPE_NAVI_BYTES:
+            case COL_TYPE_NAVI_ITEM_COUNT:
+                break;
+
+            case COL_TYPE_NAVI_DIRECTORY:
+                if (treeDataView_)
+                    if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
+                        if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
+                        {
+                            const wxString& dirLeft  = utfCvrtTo<wxString>(root->baseMap_.getBaseDirPf<LEFT_SIDE >());
+                            const wxString& dirRight = utfCvrtTo<wxString>(root->baseMap_.getBaseDirPf<RIGHT_SIDE>());
+                            if (dirLeft.empty())
+                                return dirRight;
+                            else if (dirRight.empty())
+                                return dirLeft;
+                            return dirLeft + L" \u2212 \n" + dirRight; //\u2212 = unicode minus
+                        }
+                break;
+        }
+        return wxString();
+    }
+
     virtual wxString getValue(size_t row, ColumnType colType) const
     {
         if (treeDataView_)
@@ -728,17 +818,8 @@ private:
 
                     case COL_TYPE_NAVI_DIRECTORY:
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
-                        {
-                            const wxString dirLeft  = utfCvrtTo<wxString>(beforeLast(root->baseMap_.getBaseDirPf<LEFT_SIDE >(), FILE_NAME_SEPARATOR));
-                            const wxString dirRight = utfCvrtTo<wxString>(beforeLast(root->baseMap_.getBaseDirPf<RIGHT_SIDE>(), FILE_NAME_SEPARATOR));
-
-                            if (dirLeft.empty())
-                                return dirRight;
-                            else if (dirRight.empty())
-                                return dirLeft;
-                            else
-                                return dirLeft + L" \x2212 " + dirRight; //\x2212 = unicode minus
-                        }
+                            return getShortDisplayNameForFolderPair(root->baseMap_.getBaseDirPf<LEFT_SIDE >(),
+                                                                    root->baseMap_.getBaseDirPf<RIGHT_SIDE>());
                         else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
                             return utfCvrtTo<wxString>(dir->dirObj_.getObjShortName());
                         else if (dynamic_cast<const TreeView::FilesNode*>(node.get()))
@@ -749,7 +830,7 @@ private:
                         return toGuiString(node->itemCount_);
                 }
         }
-        return wxEmptyString;
+        return wxString();
     }
 
     virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted)

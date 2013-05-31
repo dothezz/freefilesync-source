@@ -115,15 +115,6 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>Kan ikke følge symlinket %x.</target>
 
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
@@ -132,6 +123,15 @@
 <pluralform>1 byte</pluralform>
 <pluralform>%x byte</pluralform>
 </target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Databasefilen %x er inkompatibel.</target>
@@ -169,9 +169,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Venter mens mappe låses (%x)...</target>
 
-<source>Creating file %x</source>
-<target>Opretter filen %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -181,14 +178,14 @@
 <pluralform>%x sek</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>Opretter filen %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Behandlingsfejl i filen %x, række %y, kolonne %z.</target>
 
 <source>Scanning:</source>
 <target>Skanner:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>Opretter udvidet tidsinformation: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -198,6 +195,9 @@
 <pluralform>[1 tråd]</pluralform>
 <pluralform>[%x tråde]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>Opretter udvidet tidsinformation: %x</target>
 
 <source>/sec</source>
 <target>/sek</target>
@@ -209,10 +209,10 @@
 <target>Indstillingsfilen %x er kun delvist indlæst.</target>
 
 <source>Cannot access Volume Shadow Copy Service.</source>
-<target>Kan ikke opnå adgang til VVS.</target>
+<target>Kan ikke opnå adgang til VSS.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
-<target>Brug FreeFileSync 64-bit til at lave VVS kopier på dette system.</target>
+<target>Brug FreeFileSync 64-bit til at lave VSS kopier på dette system.</target>
 
 <source>Cannot load file %x.</source>
 <target>Kan ikke indlæse filen %x.</target>
@@ -328,7 +328,7 @@ Kommandoen udføres hvis:
 <target>Venter på manglende mapper...</target>
 
 <source>A folder input field is empty.</source>
-<target>Der findes et udefineret mappevalg.</target>
+<target>Der er ikke valgt nogen mapper.</target>
 
 <source>Synchronization aborted!</source>
 <target>Synkronisering afbrudt!</target>
@@ -751,7 +751,7 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 <target>Kopier låste filer</target>
 
 <source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Kopier delte eller låste filer ved hjælp af VVS (kræver administrative rettigheder)</target>
+<target>Kopier delte eller låste filer ved hjælp af VSS (kræver administrative rettigheder)</target>
 
 <source>Copy file access permissions</source>
 <target>Kopier adgangstilladelser</target>
@@ -792,9 +792,6 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 <source>&Find next</source>
 <target>Find næste</target>
 
-<source>Operation aborted!</source>
-<target>Handling afbrudt!</target>
-
 <source>Main bar</source>
 <target>Hovedlinie</target>
 
@@ -821,6 +818,33 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 
 <source>Compare both sides</source>
 <target>Analyser begge sider</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 mappe</pluralform>
+<pluralform>%x mapper</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 fil</pluralform>
+<pluralform>%x filer</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>%y af 1 række i visning</pluralform>
+<pluralform>%y af %x rækker i visning</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>Retning:</target>
@@ -936,6 +960,9 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 <source>Set as default</source>
 <target>Sæt som standard</target>
 
+<source>Operation aborted!</source>
+<target>Handling afbrudt!</target>
+
 <source>All folders are in sync!</source>
 <target>Alle mapper er synkrone</target>
 
@@ -950,33 +977,6 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 
 <source>Searching for program updates...</source>
 <target>Søger efter opdatering...</target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>1 mappe</pluralform>
-<pluralform>%x mapper</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>1 fil</pluralform>
-<pluralform>%x filer</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x af 1 række</pluralform>
-<pluralform>%x af %y rækker</pluralform>
-</target>
 
 <source>Ignore further errors</source>
 <target>Ignorer fremtidige fejl</target>
@@ -1059,6 +1059,24 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 <source>Filter</source>
 <target>Filter</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Vil du flytte emnet til papirkurven?</pluralform>
+<pluralform>Vil du flytte følgende %x emner til papirkurven?</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Vil du slette følgende emne?</pluralform>
+<pluralform>Vil du slette følgende %x emner?</pluralform>
+</target>
+
 <source>Direct</source>
 <target>Direkte</target>
 
@@ -1086,24 +1104,6 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>Vis skjulte advarsler og dialoger igen?</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>Vil du flytte emnet til papirkurven?</pluralform>
-<pluralform>Vil du flytte følgende %x emner til papirkurven?</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Vil du slette følgende emne?</pluralform>
-<pluralform>Vil du slette følgende %x emner?</pluralform>
-</target>
-
 <source>Leave as unresolved conflict</source>
 <target>Efterlad som uløst konflikt</target>
 
@@ -1130,6 +1130,9 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 
 <source>Files</source>
 <target>Filer</target>
+
+<source>Items</source>
+<target>Emner</target>
 
 <source>Percentage</source>
 <target>Procent</target>
@@ -1199,9 +1202,6 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1287,8 +1287,8 @@ Bemærk: Filnavne skal relatere til grundmapperne!
 <source>Cannot find the following folders:</source>
 <target>Kan ikke finde følgende mapper:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Ignorer denne fejl for at betragte hver mappe som tom.</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>Ignorer denne fejl for at betragte hver mappe som tom. Mapperne bliver så automatisk oprettet ved synkronisering.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Afhængige mapper! Vær forsigtig når du laver synkroniseringsregler:</target>

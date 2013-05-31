@@ -8,6 +8,7 @@
 #include <wx/wupdlock.h>
 #include <zen/format_unit.h>
 #include <zen/build_info.h>
+#include <zen/tick_count.h>
 #include <zen/stl_tools.h>
 #include <wx+/choice_enum.h>
 #include <wx+/button.h>
@@ -306,8 +307,8 @@ ReturnSmallDlg::ButtonPressed zen::showFilterDialog(wxWindow* parent, bool isGlo
                         filter);
     return static_cast<ReturnSmallDlg::ButtonPressed>(filterDlg.ShowModal());
 }
-//########################################################################################
 
+//########################################################################################
 
 class DeleteDialog : public DeleteDlgGenerated
 {
@@ -331,6 +332,8 @@ private:
     const std::vector<zen::FileSystemObject*>& rowsToDeleteOnRight;
     bool& outRefdeleteOnBothSides;
     bool& outRefuseRecycleBin;
+    const TickVal tickCountStartup;
+    const std::int64_t ticksPerSec_;
 };
 
 
@@ -343,7 +346,9 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
     rowsToDeleteOnLeft(rowsOnLeft),
     rowsToDeleteOnRight(rowsOnRight),
     outRefdeleteOnBothSides(deleteOnBothSides),
-    outRefuseRecycleBin(useRecycleBin)
+    outRefuseRecycleBin(useRecycleBin),
+    tickCountStartup(getTicks()),
+    ticksPerSec_(ticksPerSec())
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -403,6 +408,12 @@ void DeleteDialog::updateGui()
 
 void DeleteDialog::OnOK(wxCommandEvent& event)
 {
+    //additional safety net, similar to Windows Explorer: time delta between DEL and ENTER must be at least 50ms to avoid accidental deletion!
+    const TickVal now = getTicks(); //0 on error
+    if (now.isValid() && tickCountStartup.isValid() && ticksPerSec_ != 0)
+        if (dist(tickCountStartup, now) * 1000 / ticksPerSec_ < 50)
+            return;
+
     outRefuseRecycleBin = m_checkBoxUseRecycler->GetValue();
     if (rowsToDeleteOnLeft != rowsToDeleteOnRight)
         outRefdeleteOnBothSides = m_checkBoxDeleteBothSides->GetValue();
@@ -746,7 +757,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
     if (showQuestionDlg(this, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                        _("Make hidden warnings and dialogs visible again?")) == ReturnQuestionDlg::BUTTON_YES)
+                        _("Make hidden warnings and dialogs visible again?"), QuestConfig().setLabelYes(_("&Restore"))) == ReturnQuestionDlg::BUTTON_YES)
         settings.optDialogs.resetDialogs();
 }
 

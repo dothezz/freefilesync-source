@@ -31,14 +31,15 @@ Zstring resolveRelativePath(const Zstring& relativeName) //note: ::GetFullPathNa
     const DWORD bufferSize = 10000;
     std::vector<wchar_t> buffer(bufferSize);
 
-    const DWORD charsWritten = ::GetFullPathName(applyLongPathPrefix(relativeName).c_str(), //__in   LPCTSTR lpFileName,
+    //don't use long path prefix! does not work with relative paths "." and ".."
+    const DWORD charsWritten = ::GetFullPathName(relativeName.c_str(), //__in   LPCTSTR lpFileName,
                                                  bufferSize, //__in   DWORD nBufferLength,
                                                  &buffer[0], //__out  LPTSTR lpBuffer,
                                                  nullptr);   //__out  LPTSTR *lpFilePart
     if (charsWritten == 0 || charsWritten >= bufferSize) //theoretically, charsWritten cannot be == "bufferSize"
         return relativeName; //ERROR! Don't do anything
 
-    return removeLongPathPrefix(Zstring(&buffer[0], charsWritten)); //GetFullPathName() preserves long path prefix -> a low-level detail we don't want to leak out!
+    return Zstring(&buffer[0], charsWritten);
 }
 
 #elif defined FFS_LINUX || defined FFS_MAC
@@ -545,17 +546,18 @@ Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()
 {
     //formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
 
-    Zstring dirname = expandMacros(dirString);
+    Zstring dirname = dirString;
 
-    dirname = expandVolumeName(dirname); //should not block
-
-    //remove leading/trailing whitespace
+    //remove leading/trailing whitespace before allowing misinterpretation in applyLongPathPrefix()
     trim(dirname, true, false);
     while (endsWith(dirname, Zstr(' '))) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
         dirname.resize(dirname.size() - 1);
 
     if (dirname.empty()) //an empty string would later be resolved as "\"; this is not desired
         return Zstring();
+
+    dirname = expandMacros(dirname);
+    dirname = expandVolumeName(dirname); //should not block
 
     /*
     need to resolve relative paths:

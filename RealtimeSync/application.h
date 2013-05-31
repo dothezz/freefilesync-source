@@ -13,6 +13,7 @@ class Application : public wxApp
 {
 public:
     virtual bool OnInit();
+    virtual int OnExit();
     virtual int OnRun();
     virtual bool OnExceptionInMainLoop() { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
 

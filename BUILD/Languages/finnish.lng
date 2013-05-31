@@ -115,15 +115,6 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>Tämä linkki on virheellinen %x.</target>
 
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
@@ -132,6 +123,15 @@
 <pluralform>1 tavu</pluralform>
 <pluralform>%x tavua</pluralform>
 </target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Tietokanta %x vierasta muotoa.</target>
@@ -161,16 +161,13 @@
 <target>Virhe havaittu!</target>
 
 <source>Cannot read file attributes of %x.</source>
-<target>x% -ominaisuudet ei tunnisteta.</target>
+<target>Tiedoston %x määritteitä ei voitu lukea.</target>
 
 <source>Cannot get process information.</source>
 <target>Prosessin tietoja ei saada.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Odotan hakemiston lukitusta (%x)...</target>
-
-<source>Creating file %x</source>
-<target>Luodaan tiedosto %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -181,14 +178,14 @@
 <pluralform>%x s</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>Luodaan tiedosto %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Virhe jäsennys tiedo %x, rivi %y, sarake %z.</target>
 
 <source>Scanning:</source>
 <target>Skannaus:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>Tulkitaan laajennettua aikatietoa: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -198,6 +195,9 @@
 <pluralform>[1 säije]</pluralform>
 <pluralform>[%x säijettä]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>Tulkitaan laajennettua aikatietoa: %x</target>
 
 <source>/sec</source>
 <target>/s</target>
@@ -792,9 +792,6 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>&Find next</source>
 <target>&Etsi seuraava</target>
 
-<source>Operation aborted!</source>
-<target>Toiminto lopetettiin!</target>
-
 <source>Main bar</source>
 <target>Pääpalkki</target>
 
@@ -821,6 +818,33 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 
 <source>Compare both sides</source>
 <target>Vertaile molemmat puolet</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 hakemisto</pluralform>
+<pluralform>%x hakemistoja</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 tiedosto</pluralform>
+<pluralform>%x tiedostoja</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>%y rivi 1:stä näytetään</pluralform>
+<pluralform>%y riviä %x:stä näytetään</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>Aseta suunta:</target>
@@ -936,6 +960,9 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Set as default</source>
 <target>Aseta oletukseksi</target>
 
+<source>Operation aborted!</source>
+<target>Toiminto lopetettiin!</target>
+
 <source>All folders are in sync!</source>
 <target>Kaikki hakemistot täsmäytetty!</target>
 
@@ -950,33 +977,6 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 
 <source>Searching for program updates...</source>
 <target>Ohjelmapäivytys haetaa...</target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>1 hakemisto</pluralform>
-<pluralform>%x hakemistoja</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>1 tiedosto</pluralform>
-<pluralform>%x tiedostoja</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x / 1:stä rivistä näytössä</pluralform>
-<pluralform>%x / %y:tä rivistä näytössä</pluralform>
-</target>
 
 <source>Ignore further errors</source>
 <target>Hylkää toistuvat virheviestit</target>
@@ -1059,6 +1059,24 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Filter</source>
 <target>Suodin</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Haluatko todella siirtää tätä Roskakoriin?</pluralform>
+<pluralform>Haluatko todella siirtää nämä %x kohdetta Roskakoriin?</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Haluatko todella poistta tämä?</pluralform>
+<pluralform>Haluatko todella poistaa nämä %x kohdetta?</pluralform>
+</target>
+
 <source>Direct</source>
 <target>Suoraan</target>
 
@@ -1085,24 +1103,6 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>Näytä piiloitetut varoitukset/ikkunnat uudestaan?</target>
-
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>Haluatko todella siirtää tätä Roskakoriin?</pluralform>
-<pluralform>Haluatko todella siirtää nämä %x kohdetta Roskakoriin?</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Haluatko todella poistta tämä?</pluralform>
-<pluralform>Haluatko todella poistaa nämä %x kohdetta?</pluralform>
-</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Jätä ratkaisemattomana virheenä</target>
@@ -1132,7 +1132,7 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <target>Tiedostot</target>
 
 <source>Items</source>
-<target></target>
+<target>Kappaletta</target>
 
 <source>Percentage</source>
 <target>Prosenttia</target>
@@ -1192,7 +1192,7 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <target>Hakemistoa %x ei voida avata.</target>
 
 <source>Cannot enumerate directory %x.</source>
-<target>Hakemistoa ei voida luetella.</target>
+<target>Hakemistoa %x ei voitu luetella.</target>
 
 <source>Detected endless directory recursion.</source>
 <target>Päättymätön hakemiston toisto.</target>
@@ -1202,9 +1202,6 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1290,8 +1287,8 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>Cannot find the following folders:</source>
 <target>Hakemistot ei löydy:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Ohita tämä virhe olettamalla hakemistot tyhjäksi.</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>Voit ohita virhe olettamalla hakemistot tyhjiksi. Hakemistot luodaan täsmäytyksen aikana.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Hakemistot riippuvuussuhteessa! Aseta täsmäyssääntöjä varovasti:</target>
@@ -1431,20 +1428,11 @@ Huom: Tiedostojen nimet täytyy olla suhteessa pää hakemistoihin!
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Moniosaisen hakemistoparin hakemistoa muutetaan. Tarkista täsmäytyksen asetuksia.</target>
 
-<source>Left</source>
-<target>Vasen</target>
-
-<source>Right</source>
-<target>Oikea</target>
-
 <source>Synchronizing folder pair:</source>
 <target>Täsmäytetään  hakemistoparia:</target>
 
 <source>Generating database...</source>
-<target>
-Tietokanta luodaan.
-..
-</target>
+<target>Tietokanta luodaan...</target>
 
 <source>Creating Volume Shadow Copy for %x...</source>
 <target>Luodaan Volume Shadow Copy %x:lle...</target>

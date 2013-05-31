@@ -44,23 +44,10 @@ FileId getFileId(const FileDescriptor& fd) { return FileId(fd.devId, fd.fileIdx)
 
 struct LinkDescriptor
 {
-    enum LinkType
-    {
-        TYPE_DIR, //Windows: dir  symlink; Linux: dir symlink
-        TYPE_FILE //Windows: file symlink; Linux: file symlink or broken link (or other symlink, pathological)
-    };
+    LinkDescriptor() {}
+    explicit LinkDescriptor(Int64 lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
 
-    LinkDescriptor() : type(TYPE_FILE) {}
-    LinkDescriptor(Int64 lastWriteTimeRawIn,
-                   const Zstring& targetPathIn,
-                   LinkType lt) :
-        lastWriteTimeRaw(lastWriteTimeRawIn),
-        targetPath(targetPathIn),
-        type(lt) {}
-
-    Int64    lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
-    Zstring  targetPath;       //optional: symlink "content", may be empty if determination failed
-    LinkType type;             //type is required for Windows only! On Linux there is no such thing => consider this when comparing Symbolic Links!
+    Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
 };
 
 
@@ -424,10 +411,11 @@ private:
     virtual void removeObjectR() = 0;
 
     //categorization
-    CompareFilesResult cmpResult;
     std::unique_ptr<std::wstring> cmpResultDescr; //only filled if getCategory() == FILE_CONFLICT or FILE_DIFFERENT_METADATA
+    CompareFilesResult cmpResult;
 
     bool selectedForSynchronization;
+
     SyncDirection syncDir;
     std::unique_ptr<std::wstring> syncDirConflict; //non-empty if we have a conflict setting sync-direction
     //get rid of std::wstring small string optimization (consumes 32/48 byte on VS2010 x86/x64!)
@@ -530,8 +518,6 @@ public:
     virtual void accept(FSObjectVisitor& visitor) const;
 
     template <SelectedSide side> zen::Int64 getLastWriteTime() const; //write time of the link, NOT target!
-    template <SelectedSide side> LinkDescriptor::LinkType getLinkType() const;
-    template <SelectedSide side> const Zstring& getTargetPath() const;
 
     CompareSymlinkResult getLinkCategory()   const; //returns actually used subset of CompareFilesResult
 
@@ -1142,34 +1128,6 @@ template <> inline
 zen::Int64 SymLinkMapping::getLastWriteTime<RIGHT_SIDE>() const
 {
     return dataRight.lastWriteTimeRaw;
-}
-
-
-template <> inline
-LinkDescriptor::LinkType SymLinkMapping::getLinkType<LEFT_SIDE>() const
-{
-    return dataLeft.type;
-}
-
-
-template <> inline
-LinkDescriptor::LinkType SymLinkMapping::getLinkType<RIGHT_SIDE>() const
-{
-    return dataRight.type;
-}
-
-
-template <> inline
-const Zstring& SymLinkMapping::getTargetPath<LEFT_SIDE>() const
-{
-    return dataLeft.targetPath;
-}
-
-
-template <> inline
-const Zstring& SymLinkMapping::getTargetPath<RIGHT_SIDE>() const
-{
-    return dataRight.targetPath;
 }
 
 

@@ -115,6 +115,14 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>シンボリックリンク %x を解決できません.</target>
 
+<source>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</source>
+<target>
+<pluralform>%x バイト</pluralform>
+</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -123,14 +131,6 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
-
-<source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-</source>
-<target>
-<pluralform>%x バイト</pluralform>
-</target>
 
 <source>Database file %x is incompatible.</source>
 <target>データベース %x とは互換性がありません.</target>
@@ -168,9 +168,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>待機時間中ディレクトリはロックされます(%x)...</target>
 
-<source>Creating file %x</source>
-<target>ファイル %x を作成中</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -179,14 +176,14 @@
 <pluralform>%x 秒.</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>ファイル %x を作成中</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>ファイル %x の構文解析エラー, 行 %y, 列 %z.</target>
 
 <source>Scanning:</source>
 <target>スキャン:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>拡張された時間情報のエンコーディング: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -195,6 +192,9 @@
 <target>
 <pluralform>[%x スレッド]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>拡張された時間情報のエンコーディング: %x</target>
 
 <source>/sec</source>
 <target>/秒</target>
@@ -819,6 +819,30 @@ Note: File names must be relative to base directories!
 <source>Compare both sides</source>
 <target>両方を比較</target>
 
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>%x ディレクトリ</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>%x ファイル</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>%y の %x 行(表示内)</pluralform>
+</target>
+
 <source>Set direction:</source>
 <target>方向の設定:</target>
 
@@ -948,30 +972,6 @@ Note: File names must be relative to base directories!
 <source>Searching for program updates...</source>
 <target>アップデートを検索しています...</target>
 
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>%x ディレクトリ</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>%x ファイル</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x / %y 行を表示</pluralform>
-</target>
-
 <source>Ignore further errors</source>
 <target>以降のエラーを無視</target>
 
@@ -1053,6 +1053,22 @@ Note: File names must be relative to base directories!
 <source>Filter</source>
 <target>フィルター</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>本当に以下の %x 個の項目をゴミ箱に移動しますか</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>本当に以下の %x 個の項目を削除しますか</pluralform>
+</target>
+
 <source>Direct</source>
 <target>ダイレクト</target>
 
@@ -1080,22 +1096,6 @@ Note: File names must be relative to base directories!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>非表示にした警告ダイアログを再び表示しますか?</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>本当に以下の %x 個の項目をゴミ箱に移動しますか</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>本当に以下の %x 個の項目を削除しますか</pluralform>
-</target>
-
 <source>Leave as unresolved conflict</source>
 <target>未解決の競合はそのまま残す</target>
 
@@ -1122,6 +1122,9 @@ Note: File names must be relative to base directories!
 
 <source>Files</source>
 <target>ファイル</target>
+
+<source>Items</source>
+<target>項目</target>
 
 <source>Percentage</source>
 <target>パーセント</target>
@@ -1191,9 +1194,6 @@ Note: File names must be relative to base directories!
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1276,8 +1276,8 @@ Note: File names must be relative to base directories!
 <source>Cannot find the following folders:</source>
 <target>以下のフォルダがみつかりません:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>各フォルダを空とみなす場合は、このエラーは無視できます</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>各フォルダを空とみなす場合はこのエラーを無視することができます。このフォルダは、同期処理を実行する際自動的に作成されるものです。</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>ディレクトリが依存関係にあります! 同期規則の設定時には注意してください:</target>
@@ -1313,7 +1313,7 @@ Note: File names must be relative to base directories!
 <target>ファイル一覧を作成中...</target>
 
 <source>Both sides are equal</source>
-<target>両側とも等しく</target>
+<target>両側とも等しい</target>
 
 <source>Copy new item to left</source>
 <target>新しい項目を左にコピー</target>

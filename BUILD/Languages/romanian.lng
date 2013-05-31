@@ -115,15 +115,6 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nu pot rezolva legătura simbolică %x.</target>
 
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
@@ -133,6 +124,15 @@
 <pluralform>%x Baiți</pluralform>
 <pluralform>%x de Baiți</pluralform>
 </target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Fila cu baza de date %x este incompatibilă.</target>
@@ -170,9 +170,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Aștept ca dosarul să fie zăvorît (%x)...</target>
 
-<source>Creating file %x</source>
-<target>Creez fila %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -183,14 +180,14 @@
 <pluralform>%x de sec</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>Creez fila %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Eroare la parsarea filei %x, rîndul %y, coloana %z.</target>
 
 <source>Scanning:</source>
 <target>Scanez:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>Codez informațiile extinse despre timp: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -201,6 +198,9 @@
 <pluralform>[%x Fire]</pluralform>
 <pluralform>[%x de Fire]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>Codez informațiile extinse despre timp: %x</target>
 
 <source>/sec</source>
 <target>/sec</target>
@@ -795,9 +795,6 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>&Find next</source>
 <target>&Găsește Următorul</target>
 
-<source>Operation aborted!</source>
-<target>Operație abandonată!</target>
-
 <source>Main bar</source>
 <target>Bara Principală</target>
 
@@ -824,6 +821,36 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>Compare both sides</source>
 <target>Compară Părțile Stîngă și Dreaptă</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 dosar</pluralform>
+<pluralform>%x dosare</pluralform>
+<pluralform>%x de dosare</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 filă</pluralform>
+<pluralform>%x file</pluralform>
+<pluralform>%x de file</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>%y din 1 rînd afișat</pluralform>
+<pluralform>%y din %x rînduri afișate</pluralform>
+<pluralform>%y din %x de rînduri afișate</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>Setează Acțiunea ca în Icoana Alăturată:</target>
@@ -939,6 +966,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Set as default</source>
 <target>Setează ca implicit</target>
 
+<source>Operation aborted!</source>
+<target>Operație abandonată!</target>
+
 <source>All folders are in sync!</source>
 <target>Toate dosarele sînt sincronizate!</target>
 
@@ -953,36 +983,6 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>Searching for program updates...</source>
 <target>Caut actualizări ale programului...</target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>1 dosar</pluralform>
-<pluralform>%x dosare</pluralform>
-<pluralform>%x de dosare</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>1 filă</pluralform>
-<pluralform>%x file</pluralform>
-<pluralform>%x de file</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x din 1 rînduri afișate</pluralform>
-<pluralform>%x din %y rînduri afișate</pluralform>
-<pluralform>%x din %y de rînduri afișate</pluralform>
-</target>
 
 <source>Ignore further errors</source>
 <target>Ignoră erorile ulterioare</target>
@@ -1065,6 +1065,26 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Filter</source>
 <target>Filtru</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Sigur vrei să muți în Reciclator elementul următor?</pluralform>
+<pluralform>Sigur vrei să muți în Reciclator următoarele %x elemente?</pluralform>
+<pluralform>Sigur vrei să muți în Reciclator următoarele %x de elemente?</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Sigur vrei să ștergi definitiv elementul următor?</pluralform>
+<pluralform>Sigur vrei să ștergi definitiv următoarele %x elemente?</pluralform>
+<pluralform>Sigur vrei să ștergi definitiv următoarele %x de elemente?</pluralform>
+</target>
+
 <source>Direct</source>
 <target>Direcționează</target>
 
@@ -1092,26 +1112,6 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>Vrei ca dialogurile ascunse și mesajele de avertizare să fie vizibile din nou?</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>Sigur vrei să muți în Reciclator elementul următor?</pluralform>
-<pluralform>Sigur vrei să muți în Reciclator următoarele %x elemente?</pluralform>
-<pluralform>Sigur vrei să muți în Reciclator următoarele %x de elemente?</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Sigur vrei să ștergi definitiv elementul următor?</pluralform>
-<pluralform>Sigur vrei să ștergi definitiv următoarele %x elemente?</pluralform>
-<pluralform>Sigur vrei să ștergi definitiv următoarele %x de elemente?</pluralform>
-</target>
-
 <source>Leave as unresolved conflict</source>
 <target>Lasă ca Conflict Nerezolvat</target>
 
@@ -1138,6 +1138,9 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>Files</source>
 <target>File</target>
+
+<source>Items</source>
+<target>Elemente</target>
 
 <source>Percentage</source>
 <target>Procent</target>
@@ -1207,9 +1210,6 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1290,7 +1290,7 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <target>Șterg legătura simbolică %x</target>
 
 <source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>Reciclatorul nu este disponibil pentru căile următoare! Filele de acolo vor fi deci șterse definitiv:</target>
+<target>Reciclatorul nu este disponibil pentru căile următoare! Filele de acolo care trebuie șterse ca urmare a sincronizării, vor fi deci șterse definitiv:</target>
 
 <source>The corresponding folder will be considered as empty.</source>
 <target>Dosarul corespondent va fi considerat ca fiind gol.</target>
@@ -1298,8 +1298,8 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 <source>Cannot find the following folders:</source>
 <target>Nu pot găsi dosarele următoare:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Poți ignora această eroare dacă vrei ca dosarele din ambele părți să fie considerate goale.</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>Poți ignora această eroare dacă vrei ca ambele dosare să fie considerate goale. Dosarele vor fi apoi create automat în timpul sincronizării.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Dosarele sînt interdependente! Atenție la setarea regulilor de sincronizare:</target>
@@ -1438,12 +1438,6 @@ Notă: Numele filelor trebuie să fie relative la dosarele bază (rădăcină)!
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Va fi modificat un dosar care face parte din mai multe perechi de dosare! Reverifică setările de sincronizare!</target>
-
-<source>Left</source>
-<target>Stînga</target>
-
-<source>Right</source>
-<target>Dreapta</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Sincronizez perechea de dosare:</target>

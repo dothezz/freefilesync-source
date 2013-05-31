@@ -168,7 +168,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0) //checks status of stream, not fread()!
 #endif
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (read)");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (ReadFile)");
 
 #ifdef FFS_WIN
     if (bytesRead < bytesToRead) //verify only!
@@ -227,7 +227,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw Fil
             const DWORD attrib = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
             if (attrib != INVALID_FILE_ATTRIBUTES)
             {
-                fileHandle = getHandle(attrib); //retry
+                fileHandle = getHandle(attrib); //retry: alas this may still fail for hidden file, e.g. accessing shared folder in XP as Virtual Box guest!
                 lastError = ::GetLastError();
             }
         }
@@ -301,7 +301,7 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
     if (::ferror(fileHandle) != 0) //checks status of stream, not fwrite()!
 #endif
-        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (w)"); //w -> distinguish from fopen error message!
+        throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (WriteFile)");
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
         throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + L"Incomplete write!");
@@ -316,7 +316,7 @@ FileInputUnbuffered::FileInputUnbuffered(const Zstring& filename) : FileInputBas
     checkForUnsupportedType(filename); //throw FileError; reading a named pipe would block forever!
 
     fdFile = ::open(filename.c_str(), O_RDONLY);
-    if (fdFile < 0)
+    if (fdFile == -1)
     {
         const ErrorCode lastError = getLastError();
 
@@ -361,7 +361,7 @@ FileOutputUnbuffered::FileOutputUnbuffered(const Zstring& filename, mode_t mode)
 
     //overwrite is: O_CREAT | O_WRONLY | O_TRUNC
     fdFile = ::open(filename.c_str(), O_CREAT | O_WRONLY | O_EXCL, mode & (S_IRWXU | S_IRWXG | S_IRWXO));
-    if (fdFile < 0)
+    if (fdFile == -1)
     {
         const int lastError = errno;
         const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename)) + L"\n\n" + zen::getLastErrorFormatted(lastError);
@@ -375,6 +375,7 @@ FileOutputUnbuffered::FileOutputUnbuffered(const Zstring& filename, mode_t mode)
     }
 }
 
+FileOutputUnbuffered::FileOutputUnbuffered(int fd, const Zstring& filename) : FileOutputBase(filename), fdFile(fd) {}
 
 FileOutputUnbuffered::~FileOutputUnbuffered() { ::close(fdFile); }
 
@@ -395,7 +396,7 @@ void FileOutputUnbuffered::write(const void* buffer, size_t bytesToWrite) //thro
             if (bytesWritten == 0) //comment in safe-read.c suggests to treat this as an error due to buggy drivers
                 errno = ENOSPC;
 
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (w)");
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + getLastErrorFormatted() + L" (write)");
         }
         if (bytesWritten > static_cast<ssize_t>(bytesToWrite)) //better safe than sorry
             throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(getFilename())) + L"\n\n" + L"buffer overflow");

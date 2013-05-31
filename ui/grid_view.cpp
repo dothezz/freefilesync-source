@@ -554,4 +554,3 @@ void GridView::sortView(ColumnTypeRim type, bool onLeft, bool ascending)
             break;
     }
 }
-

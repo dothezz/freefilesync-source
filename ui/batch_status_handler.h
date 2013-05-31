@@ -21,6 +21,7 @@
 class BatchAbortProcess {};
 
 
+//BatchStatusHandler(SyncProgressDialog) will internally process Window messages! disable GUI controls to avoid unexpected callbacks!
 class BatchStatusHandler : public zen::StatusHandler //throw BatchAbortProcess
 {
 public:
@@ -37,7 +38,7 @@ public:
                        std::vector<std::wstring>& execFinishedHistory);
     ~BatchStatusHandler();
 
-    virtual void initNewPhase     (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
+    virtual void initNewPhase       (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
     virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
@@ -48,6 +49,7 @@ public:
 
 private:
     virtual void abortThisProcess(); //throw BatchAbortProcess
+    void onProgressDialogTerminate();
 
     const zen::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
     bool showFinalResults;
@@ -57,7 +59,7 @@ private:
     zen::ErrorLog errorLog; //list of non-resolved errors and warnings
     zen::FfsReturnCode& returnCode_;
 
-    SyncProgressDialog syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
+    SyncProgressDialog* progressDlg; //managed to have shorter lifetime than this handler!
     std::unique_ptr<zen::FileOutput> logFile; //optional!
 
     const std::wstring jobName_;

@@ -75,7 +75,6 @@ public:
     void emitLifeSign() const //try to append one byte...; throw()
     {
         const char buffer[1] = {' '};
-
 #ifdef FFS_WIN
         //ATTENTION: setting file pointer IS required! => use CreateFile/GENERIC_WRITE + SetFilePointerEx!
         //although CreateFile/FILE_APPEND_DATA without SetFilePointerEx works locally, it MAY NOT work on some network shares creating a 4 gig file!!!
@@ -99,16 +98,16 @@ public:
             return;
 
         DWORD bytesWritten = 0; //this parameter is NOT optional: http://blogs.msdn.com/b/oldnewthing/archive/2013/04/04/10407417.aspx
-        /*bool rv = */
-        ::WriteFile(fileHandle,    //__in         HANDLE hFile,
-                    buffer,        //__out        LPVOID lpBuffer,
-                    1,             //__in         DWORD nNumberOfBytesToWrite,
-                    &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
-                    nullptr);      //__inout_opt  LPOVERLAPPED lpOverlapped
+        if (!::WriteFile(fileHandle,    //_In_         HANDLE hFile,
+                         buffer,        //_In_         LPCVOID lpBuffer,
+                         1,             //_In_         DWORD nNumberOfBytesToWrite,
+                         &bytesWritten, //_Out_opt_    LPDWORD lpNumberOfBytesWritten,
+                         nullptr))      //_Inout_opt_  LPOVERLAPPED lpOverlapped
+            return;
 
 #elif defined FFS_LINUX || defined FFS_MAC
         const int fileHandle = ::open(lockfilename_.c_str(), O_WRONLY | O_APPEND);
-        if (fileHandle < 0)
+        if (fileHandle == -1)
             return;
         ZEN_ON_SCOPE_EXIT(::close(fileHandle));
 
@@ -537,13 +536,15 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
         else
             throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilename)) + L"\n\n" + zen::getLastErrorFormatted());
     }
-    ::CloseHandle(fileHandle);
+    ScopeGuard guardLockFile = zen::makeGuard([&] { removeFile(lockfilename); });
+    FileOutput fileOut(fileHandle, lockfilename); //pass handle ownership
 
-    ::SetFileAttributes(applyLongPathPrefix(lockfilename).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide it
+    //be careful to avoid CreateFile() + CREATE_ALWAYS on a hidden file -> see file_io.cpp
+    //=> we don't need it that badly //::SetFileAttributes(applyLongPathPrefix(lockfilename).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide it
 
 #elif defined FFS_LINUX || defined FFS_MAC
-    //O_EXCL contains a race condition on NFS file systems: http://linux.die.net/man/2/open
     ::umask(0); //important! -> why?
+    //O_EXCL contains a race condition on NFS file systems: http://linux.die.net/man/2/open
     const int fileHandle = ::open(lockfilename.c_str(), O_CREAT | O_WRONLY | O_EXCL, S_IRWXU | S_IRWXG | S_IRWXO);
     if (fileHandle == -1)
     {
@@ -552,13 +553,19 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
         else
             throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilename)) + L"\n\n" + zen::getLastErrorFormatted());
     }
-    ::close(fileHandle);
+    ScopeGuard guardLockFile = zen::makeGuard([&] { removeFile(lockfilename); });
+    FileOutputUnbuffered fileOut(fileHandle, lockfilename); //pass handle ownership
 #endif
 
-    ScopeGuard guardLockFile = zen::makeGuard([&] { removeFile(lockfilename); });
-
     //write housekeeping info: user, process info, lock GUID
-    writeLockInfo(lockfilename); //throw FileError
+    BinaryStream binStream;
+    {
+        BinStreamOut streamOut;
+        LockInformation(FromCurrentProcess()).toStream(streamOut);
+        binStream = streamOut.get();
+    }
+    if (!binStream.empty())
+        fileOut.write(&*binStream.begin(), binStream.size()); //throw FileError
 
     guardLockFile.dismiss(); //lockfile created successfully
     return true;
@@ -639,6 +646,8 @@ public:
 
 private:
     LockAdmin() {}
+    LockAdmin(const LockAdmin&); //=delete
+    LockAdmin& operator=(const LockAdmin&); //=delete
 
     typedef std::string UniqueId;
     typedef std::map<Zstring, UniqueId, LessFilename>        FileToGuidMap; //n:1 handle uppper/lower case correctly

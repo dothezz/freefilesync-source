@@ -77,8 +77,7 @@ bool Application::OnInit()
     ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //behave like an application bundle, even when the app is not packaged (yet)
 #endif
 
-    warn_static("fix")
-    SetAppName(L"FreeFileSync"); //abuse FFS's name, to have "GetUserDataDir()" return the same directory
+    SetAppName(L"FreeFileSync"); //reuse FFS's name, to have "GetUserDataDir()/GetResourcesDir()" return the same directory in ffs_paths.cpp
 
     //do not call wxApp::OnInit() to avoid using default commandline parser
 
@@ -88,6 +87,13 @@ bool Application::OnInit()
     AddPendingEvent(scrollEvent);
 
     return true; //true: continue processing; false: exit immediately.
+}
+
+
+int Application::OnExit()
+{
+    releaseWxLocale();
+    return wxApp::OnExit();
 }
 
 
@@ -162,4 +168,3 @@ int Application::OnRun()
 
     return FFS_RC_SUCCESS; //program's return code
 }
-

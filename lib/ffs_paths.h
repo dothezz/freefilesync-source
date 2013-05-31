@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef STANDARDPATHS_H_INCLUDED
-#define STANDARDPATHS_H_INCLUDED
+#ifndef STANDARDPATHS_H_84275908342534253425
+#define STANDARDPATHS_H_84275908342534253425
 
 #include <zen/zstring.h>
 
@@ -22,4 +22,4 @@ Zstring getFreeFileSyncLauncher(); //full path to application launcher C:\...\Fr
 bool manualProgramUpdateRequired();
 }
 
-#endif // STANDARDPATHS_H_INCLUDED
+#endif //STANDARDPATHS_H_84275908342534253425

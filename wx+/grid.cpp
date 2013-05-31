@@ -1332,7 +1332,7 @@ private:
             double deltaTime = 0;
             if (ticksPerSec_ > 0)
             {
-                const TickVal now = getTicks(); //0 on error
+                const TickVal now = getTicks(); //isValid() on error
                 deltaTime = static_cast<double>(dist(tickCountLast, now)) / ticksPerSec_; //unit: [sec]
                 tickCountLast = now;
             }

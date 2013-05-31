@@ -115,15 +115,6 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>Nelze najít odkaz zástupce %x.</target>
 
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
@@ -133,6 +124,15 @@
 <pluralform>%x B</pluralform>
 <pluralform>%x B</pluralform>
 </target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Chybný formát databáze %x.</target>
@@ -170,9 +170,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Čekání na uzamčení adresáře (%x)</target>
 
-<source>Creating file %x</source>
-<target>Vytváření souboru %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -183,14 +180,14 @@
 <pluralform>%x sekund</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>Vytváření souboru %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Chyba zpracování souboru %x: na řádku %y ve sloupci %z</target>
 
 <source>Scanning:</source>
 <target>Zpracováváno:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>Zpracování rozšířené informace o čase: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -201,6 +198,9 @@
 <pluralform>[%x procesy]</pluralform>
 <pluralform>[%x procesů]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>Zpracování rozšířené informace o čase: %x</target>
 
 <source>/sec</source>
 <target>/s</target>
@@ -266,7 +266,7 @@
 <target>3. Zmáčkněte 'Start'</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>Můžete načíst také konfigurační soubor soubor .ffs_batch</target>
+<target>Můžete načíst také konfigurační soubor .ffs_batch</target>
 
 <source>Folders to watch</source>
 <target>Složka ke sledování</target>
@@ -469,7 +469,7 @@ Příkaz je spuštěn když:
 <target>Zkontrolovat &nyní</target>
 
 <source>Check &automatically once a week</source>
-<target>Kontrolovat &automaticky jendou týdně</target>
+<target>Kontrolovat &automaticky jednou týdně</target>
 
 <source>Check for new version</source>
 <target>&Zkontrolovat aktualizace</target>
@@ -550,7 +550,7 @@ Příkaz je spuštěn když:
 <target>Skrýt všechny chyby a varování</target>
 
 <source>Pop-up</source>
-<target>Hlašení</target>
+<target>Hlášení</target>
 
 <source>Show pop-up on errors or warnings</source>
 <target>Zobrazit hlášení při chybě nebo varování</target>
@@ -760,7 +760,7 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Kopírovat přístupová oprávnění k souborům</target>
 
 <source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Přenést přístupová oprávnění souborů a složek (Vyžaduje administrátorké oprávnění)</target>
+<target>Přenést přístupová oprávnění souborů a složek (Vyžaduje administrátorské oprávnění)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Obnovit skryté dialogy</target>
@@ -795,9 +795,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>&Find next</source>
 <target>&Najít další</target>
 
-<source>Operation aborted!</source>
-<target>Operace zrušena!</target>
-
 <source>Main bar</source>
 <target>Hlavní lišta</target>
 
@@ -824,6 +821,36 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Compare both sides</source>
 <target>Porovnat obě strany</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 adresář</pluralform>
+<pluralform>%x adresáře</pluralform>
+<pluralform>%x adresářů</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 soubor</pluralform>
+<pluralform>%x soubory</pluralform>
+<pluralform>%x souborů</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>%y z 1 řádku</pluralform>
+<pluralform>%y z %x řádků</pluralform>
+<pluralform>%y z %x řádků</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>Nastavit adresář:</target>
@@ -939,6 +966,9 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Set as default</source>
 <target>Nastavit jako výchozí</target>
 
+<source>Operation aborted!</source>
+<target>Operace zrušena!</target>
+
 <source>All folders are in sync!</source>
 <target>Všechny složky jsou synchronizovány!</target>
 
@@ -953,36 +983,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Searching for program updates...</source>
 <target>Hledání aktualizací programu ...</target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>1 adresář</pluralform>
-<pluralform>%x adresáře</pluralform>
-<pluralform>%x adresářů</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>1 soubor</pluralform>
-<pluralform>%x soubory</pluralform>
-<pluralform>%x souborů</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x z 1 řádku</pluralform>
-<pluralform>%x z %y řádků</pluralform>
-<pluralform>%x z %y řádků</pluralform>
-</target>
 
 <source>Ignore further errors</source>
 <target>Přeskočit další chyby</target>
@@ -1065,6 +1065,26 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Filter</source>
 <target>Filtr</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Opravdu chcete přesunout následující položku do Koše?</pluralform>
+<pluralform>Opravdu chcete přesunout následující %x položky do Koše?</pluralform>
+<pluralform>Opravdu chcete přesunout následujících %x položek do Koše?</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Opravdu chcete smazat následující položku?</pluralform>
+<pluralform>Opravdu chcete smazat následující %x položky?</pluralform>
+<pluralform>Opravdu chcete smazat následujících %x položek?</pluralform>
+</target>
+
 <source>Direct</source>
 <target>Zachovat</target>
 
@@ -1091,26 +1111,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>Povolit opět zobrazování skrytých dialogů a hlášení?</target>
-
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>Opravdu chcete přesunout následující položku do Koše?</pluralform>
-<pluralform>Opravdu chcete přesunout následující %x položky do Koše?</pluralform>
-<pluralform>Opravdu chcete přesunout následujících %x položek do Koše?</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Opravdu chcete smazat následující položku?</pluralform>
-<pluralform>Opravdu chcete smazat následující %x položky?</pluralform>
-<pluralform>Opravdu chcete smazat následujících %x položek?</pluralform>
-</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Ponechat jako nevyřešený konflikt</target>
@@ -1140,7 +1140,7 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Soubory</target>
 
 <source>Items</source>
-<target></target>
+<target>Položky</target>
 
 <source>Percentage</source>
 <target>Procentní podíl</target>
@@ -1188,7 +1188,7 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Nelze vytvořit adresář %x.</target>
 
 <source>Cannot copy symbolic link %x to %y.</source>
-<target>Nelze kopítovat zástupce %x do %y.</target>
+<target>Nelze kopírovat zástupce %x do %y.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Nelze kopírovat soubor %x do %y.</target>
@@ -1210,9 +1210,6 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1278,7 +1275,7 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Přesouvání souboru %x do Koše</target>
 
 <source>Moving folder %x to recycle bin</source>
-<target>Přesouvání afresáře %x do Koše</target>
+<target>Přesouvání adresáře %x do Koše</target>
 
 <source>Moving symbolic link %x to recycle bin</source>
 <target>Přesouvání symbolického odkazu %x do Koše</target>
@@ -1301,8 +1298,8 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <source>Cannot find the following folders:</source>
 <target>Nelze najít následující složky:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Tuto chybu můžete přeskočit a považovat neexistující složku jako prázdnou.</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>Tuto chybu můžete přeskočit a považovat neexistující složku za prázdnou. Složka pak bude vytvořena při synchronizaci automaticky.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Adresáře jsou závislé! Buďte opatrní s definicí synchronizačních pravidel:</target>
@@ -1341,16 +1338,16 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Obě strany jsou shodné</target>
 
 <source>Copy new item to left</source>
-<target>Kopírovat novou položku do leva</target>
+<target>Kopírovat novou položku doleva</target>
 
 <source>Copy new item to right</source>
-<target>Kopírovat novou položku do prava</target>
+<target>Kopírovat novou položku doprava</target>
 
 <source>Delete left item</source>
-<target>Smazat položku z leva</target>
+<target>Smazat položku zleva</target>
 
 <source>Delete right item</source>
-<target>Smazat položku z prava</target>
+<target>Smazat položku zprava</target>
 
 <source>Move file on left</source>
 <target>Přesunout soubor nalevo</target>
@@ -1359,19 +1356,19 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Přesunout soubor napravo</target>
 
 <source>Overwrite left item</source>
-<target>Přepsat levou položku tou z prava</target>
+<target>Přepsat levou položku tou zprava</target>
 
 <source>Overwrite right item</source>
-<target>Přepsat pravou položku tou z leva</target>
+<target>Přepsat pravou položku tou zleva</target>
 
 <source>Do nothing</source>
 <target>Nic nedělat</target>
 
 <source>Update attributes on left</source>
-<target>Nastavit vlastnosti v levo</target>
+<target>Nastavit vlastnosti vlevo</target>
 
 <source>Update attributes on right</source>
-<target>Nastavit vlastnoti v pravo</target>
+<target>Nastavit vlastnosti vpravo</target>
 
 <source>Multiple...</source>
 <target>Různé...</target>
@@ -1410,7 +1407,7 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>Nelze najít %x.</target>
 
 <source>Target folder %x already existing.</source>
-<target>Cílova složka %x již existuje.</target>
+<target>Cílová složka %x již existuje.</target>
 
 <source>Target folder input field must not be empty.</source>
 <target>Cílová složka nesmí být prázdná.</target>
@@ -1440,7 +1437,7 @@ Poznámka: Filtr je aplikován relativně k základním adresářům.
 <target>K dispozici</target>
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Bude změněna složka, která je součástí adresářového páru vícenásobného porovnání. Prosím zkontrolujte si nastavení synchronizacem.</target>
+<target>Bude změněna složka, která je součástí adresářového páru vícenásobného porovnání. Prosím zkontrolujte si nastavení synchronizace.</target>
 
 <source>Left</source>
 <target>Levý</target>

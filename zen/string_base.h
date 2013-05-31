@@ -13,7 +13,7 @@
 #include "string_tools.h"
 #include <boost/detail/atomic_count.hpp>
 
-//Zbase - a policy based string class optimizing performance and genericity
+//Zbase - a policy based string class optimizing performance and flexibility
 
 namespace zen
 {
@@ -183,7 +183,7 @@ private:
 
 //################################################################################################################################################################
 
-//perf note: interstingly StorageDeepCopy and StorageRefCountThreadSafe show same performance in FFS comparison
+//perf note: interestingly StorageDeepCopy and StorageRefCountThreadSafe show same performance in FFS comparison
 
 template <class Char,  							                       //Character Type
          template <class, class> class SP = StorageRefCountThreadSafe, //Storage Policy
@@ -231,7 +231,7 @@ public:
     size_t find (Char  ch,         size_t pos = 0)    const; //returns "npos" if not found
     size_t rfind(Char  ch,         size_t pos = npos) const; //
     size_t rfind(const Char* str,  size_t pos = npos) const; //
-    Zbase& replace(size_t pos1, size_t n1, const Zbase& str);
+    //Zbase& replace(size_t pos1, size_t n1, const Zbase& str);
     void reserve(size_t minCapacity);
     Zbase& assign(const Char* source, size_t len);
     Zbase& append(const Char* source, size_t len);
@@ -361,11 +361,11 @@ Zbase<Char, SP, AP>::Zbase(const Zbase<Char, SP, AP>& source)
 template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>::Zbase(Zbase<Char, SP, AP>&& tmp)
 {
-    //rawStr = this->clone(tmp.rawStr); NO! do not increment ref-count of a potentially unshared string! We'd lose optimization opportunity of reusing it!
-    //instead create a dummy string and swap:
-    if (this->canWrite(tmp.rawStr, 0)) //perf: this check saves about 4%
+    if (this->canWrite(tmp.rawStr, 0)) //perf: following optimization saves about 4%
     {
-        rawStr    = this->create(0); //no perf issue! see comment in default constructor
+        //do not increment ref-count of an unshared string! We'd lose optimization opportunity of reusing its memory!
+        //instead create a dummy string and swap:
+        rawStr = this->create(0); //no perf issue! see comment in default constructor
         rawStr[0] = 0;
         swap(tmp);
     }
@@ -450,6 +450,7 @@ size_t Zbase<Char, SP, AP>::rfind(const Char* str, size_t pos) const
 }
 
 
+/* -> dead code ahead: better use zen::replace template instead!
 template <class Char, template <class, class> class SP, class AP>
 Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::replace(size_t pos1, size_t n1, const Zbase& str)
 {
@@ -493,7 +494,7 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::replace(size_t pos1, size_t n1, const 
     }
     return *this;
 }
-
+*/
 
 template <class Char, template <class, class> class SP, class AP> inline
 void Zbase<Char, SP, AP>::resize(size_t newSize, Char fillChar)

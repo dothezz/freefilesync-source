@@ -115,15 +115,6 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>Ο συμβολικός δεσμός %x δεν μπορεί να επιλυθεί</target>
 
-<source>%x MB</source>
-<target>%x MB</target>
-
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
-
 <source>
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
@@ -132,6 +123,15 @@
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
 </target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Το αρχείο βάσης δεδομένων %x δεν είναι συμβατό</target>
@@ -169,9 +169,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Αναμονή μέχρι να κλειδωθεί ο υποκατάλογος (%x)...</target>
 
-<source>Creating file %x</source>
-<target>Δημιουργία του αρχείου %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -181,14 +178,14 @@
 <pluralform>%x δ/λεπτα</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>Δημιουργία του αρχείου %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Σφάλμα κατά την ανάλυση του αρχείου %x, γραμμή %y, στήλη %z.</target>
 
 <source>Scanning:</source>
 <target>Ανίχνευση:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>Κωδικοποίηση εκτεταμένων πληροφοριών για την ώρα: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -198,6 +195,9 @@
 <pluralform>[1 Νήμα]</pluralform>
 <pluralform>[%x Νήματα]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>Κωδικοποίηση εκτεταμένων πληροφοριών για την ώρα: %x</target>
 
 <source>/sec</source>
 <target>/δευτερόλεπτο</target>
@@ -822,6 +822,33 @@ Note: File names must be relative to base directories!
 <source>Compare both sides</source>
 <target>Σύγκριση των δύο πλευρών</target>
 
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 υποκατάλογος</pluralform>
+<pluralform>%x υποκατάλογοι</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 αρχείο</pluralform>
+<pluralform>%x αρχεία</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>%y από τη 1 φανερή γραμμή</pluralform>
+<pluralform>%y από τις %x φανερές γραμμές</pluralform>
+</target>
+
 <source>Set direction:</source>
 <target>Επιλογή κατεύθυνσης:</target>
 
@@ -951,33 +978,6 @@ Note: File names must be relative to base directories!
 <source>Searching for program updates...</source>
 <target>Αναζήτηση καινούριας έκδοσης...</target>
 
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>1 υποκατάλογος</pluralform>
-<pluralform>%x υποκατάλογοι</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>1 αρχείο</pluralform>
-<pluralform>%x αρχεία</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x από τη 1 φανερή γραμμή</pluralform>
-<pluralform>%x από τις %y φανερές γραμμές</pluralform>
-</target>
-
 <source>Ignore further errors</source>
 <target>Αγνόηση επόμενων σφαλμάτων</target>
 
@@ -1059,6 +1059,24 @@ Note: File names must be relative to base directories!
 <source>Filter</source>
 <target>Φίλτρο</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Είσαι σίγουρος ότι θέλεις να μεταφερθεί το ακόλουθο αντικείμενο στον Κάδο Ανακύκλωσης;</pluralform>
+<pluralform>Είσαι σίγουρος ότι θέλεις να μεταφερθούν τα ακόλουθα %x αντικείμενα στον Κάδο Ανακύκλωσης;</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφεί το ακόλουθο αντικείμενο;</pluralform>
+<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφούν τα ακόλουθα %x αντικείμενα;</pluralform>
+</target>
+
 <source>Direct</source>
 <target>Ως δεσμού</target>
 
@@ -1086,24 +1104,6 @@ Note: File names must be relative to base directories!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>Να επανεμφανιστούν τα κρυμμένα μηνύματα και προειδοποιήσεις;</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>Είσαι σίγουρος ότι θέλεις να μεταφερθεί το ακόλουθο αντικείμενο στον Κάδο Ανακύκλωσης;</pluralform>
-<pluralform>Είσαι σίγουρος ότι θέλεις να μεταφερθούν τα ακόλουθα %x αντικείμενα στον Κάδο Ανακύκλωσης;</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφεί το ακόλουθο αντικείμενο;</pluralform>
-<pluralform>Είσαι σίγουρος ότι θέλεις να διαγραφούν τα ακόλουθα %x αντικείμενα;</pluralform>
-</target>
-
 <source>Leave as unresolved conflict</source>
 <target>Παράβλεψη ως ανεπίλυτη διένεξη</target>
 
@@ -1130,6 +1130,9 @@ Note: File names must be relative to base directories!
 
 <source>Files</source>
 <target>Αρχεία</target>
+
+<source>Items</source>
+<target>Στοιχεία</target>
 
 <source>Percentage</source>
 <target>Ποσοστό</target>
@@ -1162,10 +1165,10 @@ Note: File names must be relative to base directories!
 <target>Δεν ανευρίσκεται η λειτουργία συστήματος %x.</target>
 
 <source>Cannot read security context of %x.</source>
-<target>Δεν μπορεί να αναγνωσθεί το περιβάλλον ασφαλείας του x%.</target>
+<target>Δεν μπορεί να αναγνωσθεί το περιβάλλον ασφαλείας του %x.</target>
 
 <source>Cannot write security context of %x.</source>
-<target>Δεν μπορεί να γίνει εγγραφή του περιβάλλοντος ασφαλείας του x%.</target>
+<target>Δεν μπορεί να γίνει εγγραφή του περιβάλλοντος ασφαλείας του %x.</target>
 
 <source>Cannot read permissions of %x.</source>
 <target>Δεν μπορούν να αναγνωσθούν οι άδειες προσπέλασης του %x.</target>
@@ -1199,9 +1202,6 @@ Note: File names must be relative to base directories!
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1287,8 +1287,8 @@ Note: File names must be relative to base directories!
 <source>Cannot find the following folders:</source>
 <target>Οι ακόλουθοι υποκατάλογοι δεν ήταν δυνατό να βρεθούν:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Μπορείτε να αγνοήσετε αυτό το σφάλμα, για να αντιμετωπίσετε κάθε υποκατάλογο ως κενό.</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>Μπορείτε να αγνοήσετε αυτό το σφάλμα, για να αντιμετωπίσετε κάθε υποκατάλογο ως κενό. Οι υποκατάλογοι θα δημιουργηθούν αυτόματα κατά τη διάρκεια του συγχρονισμού.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Οι υποκατάλογοι είναι εξαρτώμενοι. Προσοχή κατά την εισαγωγή των κανόνων συγχρονισμού:</target>

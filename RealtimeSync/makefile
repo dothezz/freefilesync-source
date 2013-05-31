@@ -77,11 +77,11 @@ CPP_LIST+=../zen/zstring.cpp
 CPP_LIST+=../wx+/button.cpp
 
 #list of all *.o files (we need the "RTS" subdirectory to handle "../*.cpp" files
-OBJECT_LIST=$(CPP_LIST:%.cpp=../OBJ/RTS_Release_GCC_Make/RTS/%.o)
+OBJECT_LIST=$(CPP_LIST:%.cpp=../OBJ/RTS_GCC_Make_Release/RTS/%.o)
 
 all: RealtimeSync
 
-../OBJ/RTS_Release_GCC_Make/RTS/%.o : %.cpp
+../OBJ/RTS_GCC_Make_Release/RTS/%.o : %.cpp
 	mkdir -p $(dir $@)
 	$(COMPILER_BIN) $(CXXFLAGS) -c $< -o $@
 
@@ -89,7 +89,7 @@ RealtimeSync: $(OBJECT_LIST)
 	$(COMPILER_BIN) -o ../BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:
-	rm -rf ../OBJ/RTS_Release_GCC_Make
+	rm -rf ../OBJ/RTS_GCC_Make_Release
 	rm -f ../BUILD/$(APPNAME)
 	rm -f ../wx+/pch.h.gch
 

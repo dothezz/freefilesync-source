@@ -326,7 +326,7 @@ public:
 
     template <class Function> void removeFileUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion); //throw FileError
     template <class Function> void removeDirUpdating (const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion); //reports ONLY data delta via updateProcessedData()!
-    template <class Function> void removeLinkUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion, LinkDescriptor::LinkType lt); //
+    template <class Function> void removeLinkUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion); //
 
     const std::wstring& getTxtRemovingFile   () const { return txtRemovingFile;      } //
     const std::wstring& getTxtRemovingSymLink() const { return txtRemovingSymlink;   } //buffered status texts
@@ -795,14 +795,16 @@ void DeletionHandling::removeFileUpdating(const Zstring& relativeName, Int64 byt
 }
 
 template <class Function> inline
-void DeletionHandling::removeLinkUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion, LinkDescriptor::LinkType lt) //throw FileError
+void DeletionHandling::removeLinkUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion) //throw FileError
 {
-    switch (lt)
+    const Zstring fullName = baseDirPf_ + relativeName;
+    switch (getSymlinkType(fullName))
     {
-        case LinkDescriptor::TYPE_DIR:
+        case SYMLINK_TYPE_DIR:
             return removeDirUpdating(relativeName, bytesExpected, notifyItemDeletion); //throw FileError
 
-        case LinkDescriptor::TYPE_FILE: //Windows: true file symlink; Linux: file-link or broken link
+        case SYMLINK_TYPE_FILE:
+        case SYMLINK_TYPE_UNKNOWN:
             return removeFileUpdating(relativeName, bytesExpected, notifyItemDeletion); //throw FileError
     }
 }
@@ -1101,6 +1103,8 @@ void SynchronizeFolderPair::prepare2StepMove(FileMapping& sourceObj,
 
     reportInfo(txtMovingFile, source, tmpTarget);
 
+	warn_static("was wenn diff volume: symlink aliasing!") //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+
     renameFile(source, tmpTarget); //throw FileError
 
     //update file hierarchy
@@ -1143,7 +1147,7 @@ bool SynchronizeFolderPair::createParentDir(FileSystemObject& fsObj) //throw Fil
         assert(parentDir->getSyncOperation() != SO_DELETE_LEFT &&
                parentDir->getSyncOperation() != SO_DELETE_RIGHT);
 
-        synchronizeFolder(*parentDir);  //throw FileError
+        synchronizeFolder(*parentDir); //throw FileError
     }
     return true;
 }
@@ -1205,10 +1209,9 @@ void SynchronizeFolderPair::manageFileMove(FileMapping& sourceObj,
 }
 
 
+    //search for file move-operations
 void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
 {
-    //search for file move-operations
-
     for (auto it = hierObj.refSubFiles().begin(); it != hierObj.refSubFiles().end(); ++it) //VS 2010 crashes if we use for_each + lambda here...
     {
         FileMapping& fileObj = *it;
@@ -1222,13 +1225,15 @@ void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
                 FileMapping* sourceObj = &fileObj;
                 if (FileMapping* targetObj = dynamic_cast<FileMapping*>(FileSystemObject::retrieve(fileObj.getMoveRef())))
                 {
-                    if (!tryReportingError([&]
-                {
-                    if (syncOp == SO_MOVE_LEFT_SOURCE)
-                            this->manageFileMove<LEFT_SIDE>(*sourceObj, *targetObj);
+                    zen::Opt<std::wstring> errMsg = tryReportingError2([&]
+                    {
+                        if (syncOp == SO_MOVE_LEFT_SOURCE)
+                            this->manageFileMove<LEFT_SIDE>(*sourceObj, *targetObj); //throw FileError
                         else
-                            this->manageFileMove<RIGHT_SIDE>(*sourceObj, *targetObj);
-                    }, procCallback_))
+                            this->manageFileMove<RIGHT_SIDE>(*sourceObj, *targetObj); //
+                    }, procCallback_);
+
+                    if (errMsg)
                     {
                         //move operation has failed! We cannot allow to continue and have move source's parent directory deleted, messing up statistics!
                         // => revert to ordinary "copy + delete"
@@ -1383,7 +1388,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
                   [&](FileMapping& fileObj)
     {
         if (pass == this->getPass(fileObj)) //"this->" required by two-pass lookup as enforced by GCC 4.7
-            tryReportingError([&] { synchronizeFile(fileObj); }, procCallback_);
+            tryReportingError2([&] { synchronizeFile(fileObj); }, procCallback_);
     });
 
     //synchronize symbolic links:
@@ -1391,7 +1396,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
                   [&](SymLinkMapping& linkObj)
     {
         if (pass == this->getPass(linkObj))
-            tryReportingError([&] { synchronizeLink(linkObj); }, procCallback_);
+            tryReportingError2([&] { synchronizeLink(linkObj); }, procCallback_);
     });
 
     //synchronize folders:
@@ -1399,7 +1404,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
                   [&](DirMapping& dirObj)
     {
         if (pass == this->getPass(dirObj))
-            tryReportingError([&] { synchronizeFolder(dirObj); }, procCallback_);
+            tryReportingError2([&] { synchronizeFolder(dirObj); }, procCallback_);
 
         this->runPass<pass>(dirObj); //recurse
     });
@@ -1534,7 +1539,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
                 const Zstring& target = targetObj->getBaseDirPf<sideTrg>() + targetObj->getRelativeName<sideSrc>();
 
                 reportInfo(txtMovingFile, source, target);
-
+				warn_static("was wenn diff volume: symlink aliasing!") //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
                 renameFile(source, target); //throw FileError
 
                 const FileDescriptor descrTarget(sourceObj->getLastWriteTime<sideTrg>(),
@@ -1669,7 +1674,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
                 {
                     procCallback_.updateProcessedData(1, 0); //noexcept
                     ++objectsReported;
-                }, linkObj.getLinkType<sideTrg>());
+                });
 
                 guardStatistics.dismiss(); //update statistics to consider the real amount of data
                 if (objectsReported != objectsExpected)
@@ -1686,7 +1691,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
             reportInfo(txtOverwritingLink, target);
 
             reportStatus(getDelHandling<sideTrg>().getTxtRemovingSymLink(), linkObj.getFullName<sideTrg>());
-            getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getObjRelativeName(), 0, [] {}, linkObj.getLinkType<sideTrg>()); //throw FileError
+            getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getObjRelativeName(), 0, [] {}); //throw FileError
             linkObj.removeObject<sideTrg>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
 
             reportStatus(txtOverwritingLink, target); //restore status text
@@ -1840,14 +1845,6 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
 
 namespace
 {
-void makeSameLength(std::wstring& first, std::wstring& second)
-{
-    const size_t maxPref = std::max(first.length(), second.length());
-    first .resize(maxPref, L' ');
-    second.resize(maxPref, L' ');
-}
-
-
 /*
 struct LessDependentDirectory : public std::binary_function<Zstring, Zstring, bool>
 {
@@ -1871,16 +1868,18 @@ bool createBaseDirectory(BaseDirMapping& baseMap, ProcessCallback& callback) //n
     if (baseMap.isExisting<side>()) //atomicity: do NOT check directory existence again!
     {
         //just convenience: exit sync right here instead of showing tons of error messages during file copy
-        return tryReportingError([&]
+        zen::Opt<std::wstring> errMsg = tryReportingError2([&]
         {
             if (!dirExistsUpdating(dirname, false, callback))
                 throw FileError(replaceCpy(_("Cannot find %x."), L"%x", fmtFileName(dirname))); //this should really be a "fatal error" if not recoverable
         }, callback); //may throw in error-callback!
+
+        return !errMsg;
     }
     else //create target directory: user presumably ignored error "dir existing" in order to have it created automatically
     {
         bool temporaryNetworkDrop = false;
-        bool rv = tryReportingError([&]
+        zen::Opt<std::wstring> errMsg = tryReportingError2([&]
         {
             try
             {
@@ -1901,7 +1900,7 @@ bool createBaseDirectory(BaseDirMapping& baseMap, ProcessCallback& callback) //n
                 //	3. log file creates containing folder -> no, log only created in batch mode, and only *before* comparison
             }
         }, callback); //may throw in error-callback!
-        return rv && !temporaryNetworkDrop;
+        return !errMsg && !temporaryNetworkDrop;
     }
 }
 }
@@ -2105,7 +2104,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                 }
             }
 
-            //the following scenario is covered by base directory creation below in case source directory exists (accessible or not), but latter doesn't cover not-yet-created source!!!
+            //the following scenario is covered by base directory creation below in case source directory exists (accessible or not), but latter doesn't cover source created after comparison, but before sync!!!
             auto checkSourceMissing = [&](const Zstring& baseDirPf, bool wasExisting) -> bool //avoid race-condition: we need to evaluate existence status from time of comparison!
             {
                 if (!baseDirPf.empty())
@@ -2269,13 +2268,9 @@ void zen::synchronize(const TimeComp& timeStamp,
 
             //------------------------------------------------------------------------------------------
             //always report folder pairs for log file, even if there is no work to do
-            std::wstring left  = _("Left")  + L": ";
-            std::wstring right = _("Right") + L": ";
-            makeSameLength(left, right);
-
             callback.reportInfo(_("Synchronizing folder pair:") + L"\n" +
-                                L"    " + left  + j->getBaseDirPf<LEFT_SIDE >() + L"\n" +
-                                L"    " + right + j->getBaseDirPf<RIGHT_SIDE>());
+                                L"    " + j->getBaseDirPf<LEFT_SIDE >() + L"\n" +
+                                L"    " + j->getBaseDirPf<RIGHT_SIDE>());
             //------------------------------------------------------------------------------------------
 
             const size_t folderIndex = j - begin(folderCmp);
@@ -2304,7 +2299,7 @@ void zen::synchronize(const TimeComp& timeStamp,
             ZEN_ON_SCOPE_EXIT(BaseDirMapping::removeEmpty(*j););
 
             bool copyPermissionsFp = false;
-            tryReportingError([&]
+            tryReportingError2([&]
             {
                 copyPermissionsFp = copyFilePermissions && //copy permissions only if asked for and supported by *both* sides!
                 !j->getBaseDirPf<LEFT_SIDE >().empty() && //scenario: directory selected on one side only
@@ -2321,8 +2316,8 @@ void zen::synchronize(const TimeComp& timeStamp,
             syncFP.startSync(*j);
 
             //(try to gracefully) cleanup temporary Recycle bin folders and versioning -> will be done in ~DeletionHandling anyway...
-            tryReportingError([&] { iterDelHandlerL->tryCleanup(); }, callback); //show error dialog if necessary
-            tryReportingError([&] { iterDelHandlerR->tryCleanup(); }, callback); //
+            tryReportingError2([&] { iterDelHandlerL->tryCleanup(); }, callback); //show error dialog if necessary
+            tryReportingError2([&] { iterDelHandlerR->tryCleanup(); }, callback); //
 
             //(try to gracefully) write database file (will be done in ~EnforceUpdateDatabase anyway...)
             if (folderPairCfg.inAutomaticMode)
@@ -2330,7 +2325,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                 callback.reportStatus(_("Generating database..."));
                 callback.forceUiRefresh();
 
-                tryReportingError([&] { zen::saveLastSynchronousState(*j); }, callback); //throw FileError
+                tryReportingError2([&] { zen::saveLastSynchronousState(*j); }, callback); //throw FileError
                 guardUpdateDb.dismiss();
             }
         }
@@ -2521,6 +2516,5 @@ void SynchronizeFolderPair::verifyFileCopy(const Zstring& source, const Zstring&
     procCallback_.reportInfo(replaceCpy(txtVerifying, L"%x", fmtFileName(target)));
 
     VerifyStatusUpdater callback(procCallback_);
-
-    tryReportingError([&] { ::verifyFiles(source, target, callback); }, procCallback_);
+    tryReportingError2([&] { ::verifyFiles(source, target, callback); }, procCallback_);
 }

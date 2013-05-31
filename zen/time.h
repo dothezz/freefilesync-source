@@ -291,7 +291,7 @@ bool parseTime(const String& format, const String& str, TimeComp& comp) //return
         if (std::any_of(iterStr, iterStr + digitCount, [](CharType c) { return !isDigit(c); }))
         return false;
 
-        result = zen::stringTo<int>(StringProxy<CharType>(iterStr, digitCount));
+        result = zen::stringTo<int>(StringRef<CharType>(iterStr, iterStr + digitCount));
         iterStr += digitCount;
         return true;
     };

@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef FILEIO_H_INCLUDED
-#define FILEIO_H_INCLUDED
+#ifndef FILEIO_89578342758342572345
+#define FILEIO_89578342758342572345
 
 #include "file_io_base.h"
 #include "file_error.h"
@@ -73,7 +73,7 @@ public:
 
     //considering safe-read.c it seems buffer size should be a multiple of 8192
     virtual size_t read(void* buffer, size_t bytesToRead); //throw FileError; returns actual number of bytes read
-    //we should not rely on buffer being filled completely!
+    //do NOT rely on partially filled buffer meaning EOF!
 
     int getDescriptor() { return fdFile;}
 
@@ -86,6 +86,7 @@ class FileOutputUnbuffered : public FileOutputBase
 public:
     //creates a new file (no overwrite allowed!)
     FileOutputUnbuffered(const Zstring& filename, mode_t mode); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
+    FileOutputUnbuffered(int fd, const Zstring& filename); //takes ownership!
     ~FileOutputUnbuffered();
 
     virtual void write(const void* buffer, size_t bytesToWrite); //throw FileError
@@ -97,4 +98,4 @@ private:
 #endif
 }
 
-#endif // FILEIO_H_INCLUDED
+#endif //FILEIO_89578342758342572345

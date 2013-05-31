@@ -7,28 +7,52 @@
 #ifndef STATUSHANDLER_IMPL_H_INCLUDED
 #define STATUSHANDLER_IMPL_H_INCLUDED
 
+#include <zen/optional.h>
 #include <zen/file_error.h>
 #include "process_callback.h"
 
+//template <typename Function> inline
+//bool tryReportingError(Function cmd, ProcessCallback& handler) //return "true" on success, "false" if error was ignored
+//{
+//    for (;;)
+//        try
+//        {
+//            cmd(); //throw FileError
+//            return true;
+//        }
+//        catch (zen::FileError& error)
+//        {
+//            switch (handler.reportError(error.toString())) //may throw!
+//            {
+//                case ProcessCallback::IGNORE_ERROR:
+//                    return false;
+//                case ProcessCallback::RETRY:
+//                    break; //continue with loop
+//            }
+//        }
+//}
+
+
 template <typename Function> inline
-bool tryReportingError(Function cmd, ProcessCallback& handler) //return "true" on success, "false" if error was ignored
+zen::Opt<std::wstring> tryReportingError2(Function cmd, ProcessCallback& handler) //return ignored error message if available
 {
     for (;;)
         try
         {
             cmd(); //throw FileError
-            return true;
+            return zen::NoValue();
         }
         catch (zen::FileError& error)
         {
             switch (handler.reportError(error.toString())) //may throw!
             {
                 case ProcessCallback::IGNORE_ERROR:
-                    return false;
+                    return error.toString();
                 case ProcessCallback::RETRY:
                     break; //continue with loop
             }
         }
 }
+
 
 #endif //STATUSHANDLER_IMPL_H_INCLUDED

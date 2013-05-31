@@ -78,10 +78,8 @@ private:
 
     static std::string rawMemToString(const void* ptr, size_t size)
     {
-        std::string output(reinterpret_cast<const char*>(ptr), size);
-        vector_remove_if(output, [](char& c) { return c == 0; }); //remove intermediate 0-termination
-        if (output.size() > 100)
-            output.resize(100);
+        std::string output(reinterpret_cast<const char*>(ptr), std::min<size_t>(size, 100));
+        std::replace(output.begin(), output.end(), '\0', ' '); //don't stop at 0-termination
         return output;
     }
 

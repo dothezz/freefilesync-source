@@ -386,7 +386,8 @@ public:
         dirs_.push_back(fullName);
         return otherMe_;
     }
-    virtual HandleError onError(const std::wstring& msg) { throw FileError(msg); }
+    virtual HandleError reportDirError (const std::wstring& msg)                         { throw FileError(msg); }
+    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { throw FileError(msg); }
 
 private:
     const std::shared_ptr<TraverseCallback>& otherMe_; //lifetime management, two options: 1. use std::weak_ptr 2. ref to shared_ptr

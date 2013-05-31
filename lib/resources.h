@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef RESOURCES_H_INCLUDED
-#define RESOURCES_H_INCLUDED
+#ifndef RESOURCES_H_8740257825342532457
+#define RESOURCES_H_8740257825342532457
 
 #include <map>
 #include <wx/bitmap.h>
@@ -23,7 +23,7 @@ public:
     //global image resource objects
     wxAnimation aniWink;
     wxAnimation aniSync;
-    wxIcon      programIcon;
+    wxIcon      programIconFFS;
 
 private:
     GlobalResources();
@@ -37,4 +37,4 @@ private:
 inline
 const wxBitmap& getResourceImage(const wxString& name) { return GlobalResources::instance().getImage(name); }
 
-#endif // RESOURCES_H_INCLUDED
+#endif //RESOURCES_H_8740257825342532457

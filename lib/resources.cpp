@@ -75,17 +75,17 @@ GlobalResources::GlobalResources()
 
 #ifdef FFS_WIN
     //for compatibility it seems we need to stick with a "real" icon
-    programIcon = wxIcon(L"A_PROGRAM_ICON");
+    programIconFFS = wxIcon(L"A_FFS_ICON");
 
 #elif defined FFS_LINUX
     //attention: make sure to not implicitly call "instance()" again => deadlock on Linux
-    programIcon.CopyFromBitmap(getImage(L"FreeFileSync")); //use big logo bitmap for better quality
+    programIconFFS.CopyFromBitmap(getImage(L"FreeFileSync")); //use big logo bitmap for better quality
 
 #elif defined FFS_MAC
     assert(getImage(L"FreeFileSync").GetWidth () == getImage(L"FreeFileSync").GetHeight() &&
            getImage(L"FreeFileSync").GetWidth() % 128 == 0);
     //wxWidgets' bitmap to icon conversion on OS X can only deal with very specific sizes
-    programIcon.CopyFromBitmap(getImage(L"FreeFileSync").ConvertToImage().Scale(128, 128, wxIMAGE_QUALITY_HIGH)); //"von hinten durch die Brust ins Auge"
+    programIconFFS.CopyFromBitmap(getImage(L"FreeFileSync").ConvertToImage().Scale(128, 128, wxIMAGE_QUALITY_HIGH)); //"von hinten durch die Brust ins Auge"
 #endif
 }
 

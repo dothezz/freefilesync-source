@@ -149,7 +149,7 @@ bool Application::OnInit()
     Connect(wxEVT_QUERY_END_SESSION, wxEventHandler(Application::onQueryEndSession), nullptr, this);
     Connect(wxEVT_END_SESSION,       wxEventHandler(Application::onQueryEndSession), nullptr, this);
 
-    //do not call wxApp::OnInit() to avoid using default commandline parser
+    //do not call wxApp::OnInit() to avoid using wxWidgets command line parser
 
     //Note: app start is deferred: batch mode requires the wxApp eventhandler to be established for UI update events. This is not the case at the time of OnInit()!
     Connect(EVENT_ENTER_EVENT_LOOP, wxEventHandler(Application::onEnterEventLoop), nullptr, this);
@@ -157,6 +157,13 @@ bool Application::OnInit()
     AddPendingEvent(scrollEvent);
 
     return true; //true: continue processing; false: exit immediately.
+}
+
+
+int Application::OnExit()
+{
+    releaseWxLocale();
+    return wxApp::OnExit();
 }
 
 

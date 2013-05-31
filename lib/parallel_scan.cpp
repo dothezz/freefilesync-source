@@ -5,15 +5,14 @@
 // **************************************************************************
 
 #include "parallel_scan.h"
-#include <boost/detail/atomic_count.hpp>
-#include "db_file.h"
-#include "lock_holder.h"
 #include <zen/file_traverser.h>
 #include <zen/file_error.h>
 #include <zen/thread.h> //includes <boost/thread.hpp>
 #include <zen/scope_guard.h>
 #include <zen/fixed_list.h>
 #include <boost/detail/atomic_count.hpp>
+#include "db_file.h"
+#include "lock_holder.h"
 
 using namespace zen;
 
@@ -283,21 +282,24 @@ public:
     TraverserShared(long threadID,
                     SymLinkHandling handleSymlinks,
                     const HardFilter::FilterRef& filter,
-                    std::set<Zstring>& failedReads,
+                    std::set<Zstring>& failedDirReads,
+                    std::set<Zstring>& failedItemReads,
                     AsyncCallback& acb) :
         handleSymlinks_(handleSymlinks),
         filterInstance(filter),
-        failedReads_(failedReads),
+        failedDirReads_(failedDirReads),
+		failedItemReads_(failedItemReads),
         acb_(acb),
         threadID_(threadID) {}
 
     const SymLinkHandling handleSymlinks_;
     const HardFilter::FilterRef filterInstance; //always bound!
 
-    std::set<Zstring>& failedReads_; //relative postfixed names of directories that could not be read (empty for root)
+    std::set<Zstring>& failedDirReads_;
+	std::set<Zstring>& failedItemReads_;
 
     AsyncCallback& acb_;
-    long threadID_;
+    const long threadID_;
 };
 
 
@@ -315,7 +317,8 @@ public:
     onDir    (const Zchar* shortName, const Zstring& fullName);
     virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details);
     virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details);
-    virtual HandleError onError  (const std::wstring& msg);
+    virtual HandleError reportDirError (const std::wstring& msg);
+    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName);
 
 private:
     TraverserShared& cfg;
@@ -343,9 +346,7 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
     if (!cfg.filterInstance->passFileFilter(relNameParentPf_ + fileNameShort))
         return;
 
-    //    std::string fileId = details.fileSize >=  1024 * 1024U ?
-    //                                           util::retrieveFileID(fullName) :
-    //                                          std::string();
+    //    std::string fileId = details.fileSize >=  1024 * 1024U ? util::retrieveFileID(fullName) : std::string();
     /*
     Perf test Windows 7, SSD, 350k files, 50k dirs, files > 1MB: 7000
     	regular:            6.9s
@@ -356,7 +357,7 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
     	Linux: retrieveFileID takes about 50% longer in VM! (avoidable because of redundant stat() call!)
     */
 
-    output_.addSubFile(fileNameShort, FileDescriptor(details.lastWriteTimeRaw, details.fileSize, details.id));
+    output_.addSubFile(fileNameShort, FileDescriptor(details.lastWriteTime, details.fileSize, details.id));
 
     cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 }
@@ -382,7 +383,7 @@ DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zst
             //apply filter before processing (use relative name!)
             if (cfg.filterInstance->passFileFilter(relName)) //always use file filter: Link type may not be "stable" on Linux!
             {
-                output_.addSubLink(shortName, LinkDescriptor(details.lastWriteTimeRaw, details.targetPath, details.dirLink ? LinkDescriptor::TYPE_DIR : LinkDescriptor::TYPE_FILE));
+                output_.addSubLink(shortName, LinkDescriptor(details.lastWriteTime));
                 cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
             }
         }
@@ -422,18 +423,33 @@ std::shared_ptr<TraverseCallback> DirCallback::onDir(const Zchar* shortName, con
 }
 
 
-DirCallback::HandleError DirCallback::onError(const std::wstring& msg)
+DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg)
 {
     switch (cfg.acb_.reportError(msg))
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
-            cfg.failedReads_.insert(relNameParentPf_);
+			cfg.failedDirReads_.insert(relNameParentPf_);
             return ON_ERROR_IGNORE;
 
         case FillBufferCallback::ON_ERROR_RETRY:
             return ON_ERROR_RETRY;
     }
+    assert(false);
+    return ON_ERROR_IGNORE;
+}
 
+
+DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, const Zchar* shortName)
+{
+    switch (cfg.acb_.reportError(msg))
+    {
+        case FillBufferCallback::ON_ERROR_IGNORE:
+			cfg.failedItemReads_.insert(relNameParentPf_ + shortName);
+            return ON_ERROR_IGNORE;
+
+        case FillBufferCallback::ON_ERROR_RETRY:
+            return ON_ERROR_RETRY;
+    }
     assert(false);
     return ON_ERROR_IGNORE;
 }
@@ -484,7 +500,8 @@ public:
         TraverserShared travCfg(threadID_,
                                 dirKey_.handleSymlinks_, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
                                 dirKey_.filter_,
-                                dirOutput_.failedReads,
+                                dirOutput_.failedDirReads,
+								dirOutput_.failedItemReads,
                                 *acb_);
 
         DirCallback traverser(travCfg,

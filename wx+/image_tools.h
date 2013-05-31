@@ -54,6 +54,8 @@ void move(wxImage& img, int up, int left)
 inline
 wxBitmap greyScale(const wxBitmap& bmp)
 {
+    assert(!bmp.GetMask()); //wxWidgets screws up for the gazillionth time applying a mask instead of alpha channel if the .png image has only 0 and 0xff opacity values!!!
+
     wxImage output = bmp.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3); //treat all channels equally!
     //wxImage output = bmp.ConvertToImage().ConvertToGreyscale();
     adjustBrightness(output, 160);

@@ -127,8 +127,12 @@ private:
     void openExternalApplication(const wxString& commandline, const std::vector<zen::FileSystemObject*>& selection, bool leftSide); //selection may be empty
 
     //don't use wxWidgets idle handling => repeated idle requests/consumption hogs 100% cpu!
-    void startProcessingAsyncTasks() { timerForAsyncTasks.Start(50); } //timer interval in [ms]
     void onProcessAsyncTasks(wxEvent& event);
+
+    template <class Fun, class Fun2>
+    void processAsync(Fun doAsync, Fun2 evalOnGui) { asyncTasks.add(doAsync, evalOnGui); timerForAsyncTasks.Start(50); /*timer interval in [ms] */ }
+    template <class Fun, class Fun2>
+    void processAsync2(Fun doAsync, Fun2 evalOnGui) { asyncTasks.add2(doAsync, evalOnGui); timerForAsyncTasks.Start(50); /*timer interval in [ms] */ }
 
     //status bar supports one of the following two states at a time:
     void setStatusBarFullText(const wxString& msg);
@@ -186,6 +190,7 @@ private:
     void onGridLabelContextR(zen::GridClickEvent& event);
     void onGridLabelContext(zen::Grid& grid, zen::ColumnTypeRim type, const std::vector<zen::ColumnAttributeRim>& defaultColumnAttributes);
 
+    void OnToggleViewType  (wxCommandEvent& event);
     void OnToggleViewButton(wxCommandEvent& event);
 
     void OnConfigNew      (wxCommandEvent& event);
@@ -279,9 +284,10 @@ private:
 
     bool processingGlobalKeyEvent; //indicator to notify recursion in OnGlobalKeyEvent()
 
-    bool showSyncAction_; //toggle to display configuration preview instead of comparison result
-    //use this methods when changing values!
-    void showSyncAction(bool value);
+    //toggle to display configuration preview instead of comparison result:
+    //for read access use: m_bpButtonViewTypeSyncAction->isActive()
+    //when changing value use:
+    void setViewTypeSyncAction(bool value);
 
     wxAuiManager auiMgr; //implement dockable GUI design
 

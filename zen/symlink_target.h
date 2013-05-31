@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef SYMLINK_WIN_H_INCLUDED
-#define SYMLINK_WIN_H_INCLUDED
+#ifndef SYMLINK_80178347019835748321473214
+#define SYMLINK_80178347019835748321473214
 
 #include "scope_guard.h"
 #include "file_error.h"
@@ -15,6 +15,7 @@
 #include "WinIoCtl.h"
 #include "privilege.h"
 #include "long_path_prefix.h"
+#include "dll.h"
 
 #elif defined FFS_LINUX || defined FFS_MAC
 #include <unistd.h>
@@ -26,9 +27,11 @@ namespace zen
 #ifdef FFS_WIN
 bool isSymlink(const WIN32_FIND_DATA& data); //*not* a simple FILE_ATTRIBUTE_REPARSE_POINT check!
 bool isSymlink(DWORD fileAttributes, DWORD reparseTag);
+
+Zstring getResolvedFilePath(const Zstring& filename); //throw FileError; requires Vista or later!
 #endif
 
-Zstring getSymlinkRawTargetString(const Zstring& linkPath); //throw FileError
+Zstring getSymlinkTargetRaw(const Zstring& linkPath); //throw FileError
 }
 
 
@@ -90,7 +93,7 @@ Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileErro
     catch (FileError&) {} //This shall not cause an error in user mode!
 
     const HANDLE hLink = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),
-                                      GENERIC_READ,
+                                      0, //it seems we do not even need GENERIC_READ!
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                       nullptr,
                                       OPEN_EXISTING,
@@ -138,32 +141,78 @@ Zstring getSymlinkRawTargetString_impl(const Zstring& linkPath) //throw FileErro
     return output;
 
 #elif defined FFS_LINUX || defined FFS_MAC
-    const int BUFFER_SIZE = 10000;
+    const size_t BUFFER_SIZE = 10000;
     std::vector<char> buffer(BUFFER_SIZE);
 
-    const int bytesWritten = ::readlink(linkPath.c_str(), &buffer[0], BUFFER_SIZE);
-    if (bytesWritten < 0 || bytesWritten >= BUFFER_SIZE)
+    const ssize_t bytesWritten = ::readlink(linkPath.c_str(), &buffer[0], BUFFER_SIZE);
+    if (bytesWritten < 0 || bytesWritten >= static_cast<ssize_t>(BUFFER_SIZE)) //detect truncation!
     {
         std::wstring errorMessage = replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkPath));
         if (bytesWritten < 0)
             errorMessage += L"\n\n" + getLastErrorFormatted();
         throw FileError(errorMessage);
     }
-    buffer[bytesWritten] = 0; //set null-terminating char
-
-    return Zstring(&buffer[0], bytesWritten);
+    return Zstring(&buffer[0], bytesWritten); //readlink does not append 0-termination!
 #endif
 }
+
+
+#ifdef FFS_WIN
+Zstring getResolvedFilePath_impl(const Zstring& filename) //throw FileError
+{
+    using namespace zen;
+
+    const HANDLE hDir = ::CreateFile(applyLongPathPrefix(filename).c_str(),
+                                     0,
+                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                     nullptr,
+                                     OPEN_EXISTING,
+                                     FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory
+                                     nullptr);
+    if (hDir == INVALID_HANDLE_VALUE)
+        throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted() + L" (CreateFile)");
+    ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
+
+    //GetFinalPathNameByHandle() is not available before Vista!
+    typedef DWORD (WINAPI* GetFinalPathNameByHandleWFunc)(HANDLE hFile, LPTSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+    const SysDllFun<GetFinalPathNameByHandleWFunc> getFinalPathNameByHandle(L"kernel32.dll", "GetFinalPathNameByHandleW");
+
+    if (!getFinalPathNameByHandle)
+        throw FileError(replaceCpy(_("Cannot find system function %x."), L"%x", L"\"GetFinalPathNameByHandleW\""));
+
+    const DWORD bufferSize = getFinalPathNameByHandle(hDir, nullptr, 0, 0);
+    if (bufferSize == 0)
+        throw FileError(replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+
+    std::vector<wchar_t> targetPath(bufferSize);
+    const DWORD charsWritten = getFinalPathNameByHandle(hDir,           //__in   HANDLE hFile,
+                                                        &targetPath[0], //__out  LPTSTR lpszFilePath,
+                                                        bufferSize,     //__in   DWORD cchFilePath,
+                                                        0);             //__in   DWORD dwFlags
+    if (charsWritten == 0 || charsWritten >= bufferSize)
+    {
+        std::wstring errorMessage = replaceCpy(_("Cannot determine final path for %x."), L"%x", fmtFileName(filename));
+        if (charsWritten == 0)
+            errorMessage += L"\n\n" + getLastErrorFormatted();
+        throw FileError(errorMessage);
+    }
+
+    return Zstring(&targetPath[0], charsWritten);
+}
+#endif
 }
 
 
 namespace zen
 {
 inline
-Zstring getSymlinkRawTargetString(const Zstring& linkPath) { return getSymlinkRawTargetString_impl(linkPath); }
+Zstring getSymlinkTargetRaw(const Zstring& linkPath) { return getSymlinkRawTargetString_impl(linkPath); }
 
 
 #ifdef FFS_WIN
+inline
+Zstring getResolvedFilePath(const Zstring& filename) { return getResolvedFilePath_impl(filename); }
+
 /*
  Reparse Point Tags
 	http://msdn.microsoft.com/en-us/library/windows/desktop/aa365511(v=vs.85).aspx
@@ -190,4 +239,4 @@ bool isSymlink(const WIN32_FIND_DATA& data)
 #endif
 }
 
-#endif // SYMLINK_WIN_H_INCLUDED
+#endif //SYMLINK_80178347019835748321473214

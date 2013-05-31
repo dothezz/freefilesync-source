@@ -980,12 +980,12 @@ void readConfig(const XmlIn& in, xmlAccess::XmlGuiConfig& config)
 
     warn_static("remove after migration?")
     if (inGuiCfg["SyncPreviewActive"]) //obsolete name
-        inGuiCfg["SyncPreviewActive"](config.showSyncAction);
+        inGuiCfg["SyncPreviewActive"](config.highlightSyncAction);
     else
     {
         std::string val;
         if (inGuiCfg["MiddleGridView"](val)) //refactor into enum!?
-            config.showSyncAction = val == "Action";
+            config.highlightSyncAction = val == "Action";
     }
 }
 
@@ -1124,7 +1124,7 @@ void readConfig(const Zstring& filename, XmlType type, ConfigType& cfg, int curr
 {
     XmlDoc doc;
     loadXmlDocument(filename, doc); //throw FfsXmlError
-	 
+
     if (getXmlType(doc) != type) //throw()
         throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
 
@@ -1376,7 +1376,7 @@ void writeConfig(const XmlGuiConfig& config, XmlOut& out)
 
     outGuiCfg["HideExcluded"  ](config.hideExcludedItems);
     outGuiCfg["HandleError"   ](config.handleError);
-    outGuiCfg["MiddleGridView"](config.showSyncAction ? "Action" : "Category"); //refactor into enum!?
+    outGuiCfg["MiddleGridView"](config.highlightSyncAction ? "Action" : "Category"); //refactor into enum!?
 }
 
 void writeConfig(const XmlBatchConfig& config, XmlOut& out)

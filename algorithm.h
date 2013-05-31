@@ -65,4 +65,4 @@ void deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDeleteOnLef
                          bool& warningRecyclerMissing);
 }
 
-#endif // ALGORITHM_H_INCLUDED
+#endif //ALGORITHM_H_INCLUDED

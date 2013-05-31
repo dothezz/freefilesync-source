@@ -50,23 +50,23 @@ struct XmlGuiConfig
     XmlGuiConfig() :
         hideExcludedItems(false),
         handleError(ON_GUIERROR_POPUP),
-        showSyncAction(true) {} //initialize values
+        highlightSyncAction(true) {} //initialize values
 
     zen::MainConfiguration mainCfg;
 
     bool hideExcludedItems;
     OnGuiError handleError; //reaction on error situation during synchronization
-    bool showSyncAction;
+    bool highlightSyncAction;
 };
 
 
 inline
 bool operator==(const XmlGuiConfig& lhs, const XmlGuiConfig& rhs)
 {
-    return lhs.mainCfg           == rhs.mainCfg           &&
-           lhs.hideExcludedItems == rhs.hideExcludedItems &&
-           lhs.handleError       == rhs.handleError       &&
-           lhs.showSyncAction    == rhs.showSyncAction;
+    return lhs.mainCfg             == rhs.mainCfg           &&
+           lhs.hideExcludedItems   == rhs.hideExcludedItems &&
+           lhs.handleError         == rhs.handleError       &&
+           lhs.highlightSyncAction == rhs.highlightSyncAction;
 }
 
 

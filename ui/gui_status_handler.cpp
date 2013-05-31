@@ -25,39 +25,29 @@ CompareStatusHandler::CompareStatusHandler(MainDialog& dlg) :
     {
         wxWindowUpdateLocker dummy(&mainDlg); //avoid display distortion
 
-        //prevent user input during "compare", do not disable maindialog since abort-button would also be disabled
-        mainDlg.disableAllElements(true);
-
         //display status panel during compare
         mainDlg.compareStatus->init(*this); //clear old values before showing panel
         mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Show();
         mainDlg.auiMgr.Update();
-
-        //register keys
-        mainDlg.Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
-        mainDlg.m_buttonCancel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
     }
+
     mainDlg.Update(); //don't wait until idle event!
+
+    //register keys
+    mainDlg.Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
+    mainDlg.m_buttonCancel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
 }
 
 
 CompareStatusHandler::~CompareStatusHandler()
 {
-    updateUiNow(); //ui update before enabling buttons again: prevent strange behaviour of delayed button clicks
-
-    //reenable complete main dialog
-    mainDlg.enableAllElements();
-
-    mainDlg.compareStatus->finalize();
-    mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Hide();
-    mainDlg.auiMgr.Update();
-
     //unregister keys
     mainDlg.Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), nullptr, this);
     mainDlg.m_buttonCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), nullptr, this);
 
-    if (abortIsRequested())
-        mainDlg.flashStatusInformation(_("Operation aborted!"));
+    mainDlg.compareStatus->finalize();
+    mainDlg.auiMgr.GetPane(mainDlg.compareStatus->getAsWindow()).Hide();
+    mainDlg.auiMgr.Update();
 }
 
 
@@ -179,17 +169,17 @@ void CompareStatusHandler::abortThisProcess()
 
 //########################################################################################################
 
-SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg,
+SyncStatusHandler::SyncStatusHandler(wxTopLevelWindow* parentDlg,
                                      size_t lastSyncsLogFileSizeMax,
                                      OnGuiError handleError,
                                      const std::wstring& jobName,
                                      const std::wstring& execWhenFinished,
                                      std::vector<std::wstring>& execFinishedHistory) :
     parentDlg_(parentDlg),
-    syncStatusFrame(*this, *this, parentDlg, true, jobName, execWhenFinished, execFinishedHistory),
-    lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
-    handleError_(handleError),
-    jobName_(jobName)
+    progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, parentDlg, true, jobName, execWhenFinished, execFinishedHistory)),
+            lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
+            handleError_(handleError),
+            jobName_(jobName)
 {
     totalTime.Start(); //measure total time
 }
@@ -241,35 +231,46 @@ SyncStatusHandler::~SyncStatusHandler()
     }
     catch (FileError&) {}
 
-    bool showFinalResults = true;
-
-    //execute "on completion" command (even in case of ignored errors)
-    if (!abortIsRequested()) //if aborted (manually), we don't execute the command
+    if (progressDlg)
     {
-        const std::wstring finalCommand = syncStatusFrame.getExecWhenFinishedCommand(); //final value (after possible user modification)
-        if (isCloseProgressDlgCommand(finalCommand))
-            showFinalResults = false; //take precedence over current visibility status
-        else if (!finalCommand.empty())
+        bool showFinalResults = true;
+        //execute "on completion" command (even in case of ignored errors)
+        if (!abortIsRequested()) //if aborted (manually), we don't execute the command
         {
-            auto cmdexp = expandMacros(utfCvrtTo<Zstring>(finalCommand));
-            shellExecute(cmdexp);
+            const std::wstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
+            if (isCloseProgressDlgCommand(finalCommand))
+                showFinalResults = false; //take precedence over current visibility status
+            else if (!finalCommand.empty())
+            {
+                auto cmdexp = expandMacros(utfCvrtTo<Zstring>(finalCommand));
+                shellExecute(cmdexp);
+            }
+        }
+
+        //notify to progressDlg that current process has ended
+        if (showFinalResults)
+        {
+            if (abortIsRequested())
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog);  //enable okay and close events
+            else if (totalErrors > 0)
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog);
+            else if (totalWarnings > 0)
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog);
+            else
+                progressDlg->processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog);
+        }
+        else
+            progressDlg->closeWindowDirectly();
+
+        //wait until progress dialog notified shutdown via onProgressDialogTerminate()
+        //-> required since it has our "this" pointer captured in lambda "notifyWindowTerminate"!
+        //-> nicely manages dialog lifetime
+        while (progressDlg)
+        {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
+            updateUiNow();
         }
     }
-
-    //notify to syncStatusFrame that current process has ended
-    if (showFinalResults)
-    {
-        if (abortIsRequested())
-            syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_ABORTED, errorLog);  //enable okay and close events
-        else if (totalErrors > 0)
-            syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_ERROR, errorLog);
-        else if (totalWarnings > 0)
-            syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_WARNINGS, errorLog);
-        else
-            syncStatusFrame.processHasFinished(SyncProgressDialog::RESULT_FINISHED_WITH_SUCCESS, errorLog);
-    }
-    else
-        syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
 }
 
 
@@ -277,14 +278,16 @@ void SyncStatusHandler::initNewPhase(int objectsTotal, Int64 dataTotal, Phase ph
 {
     assert(phaseID == PHASE_SYNCHRONIZING);
     StatusHandler::initNewPhase(objectsTotal, dataTotal, phaseID);
-    syncStatusFrame.initNewPhase(); //call after "StatusHandler::initNewPhase"
+    if (progressDlg)
+        progressDlg->initNewPhase(); //call after "StatusHandler::initNewPhase"
 }
 
 
 void SyncStatusHandler::updateProcessedData(int objectsDelta, Int64 dataDelta)
 {
     StatusHandler::updateProcessedData(objectsDelta, dataDelta);
-    syncStatusFrame.notifyProgressChange(); //noexcept
+    if (progressDlg)
+        progressDlg->notifyProgressChange(); //noexcept
     //note: this method should NOT throw in order to properly allow undoing setting of statistics!
 }
 
@@ -304,7 +307,8 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
     {
         case ON_GUIERROR_POPUP:
         {
-            PauseTimers dummy(syncStatusFrame);
+            if (!progressDlg) abortThisProcess();
+            PauseTimers dummy(*progressDlg);
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
@@ -345,7 +349,8 @@ void SyncStatusHandler::reportFatalError(const std::wstring& errorMessage)
     {
         case ON_GUIERROR_POPUP:
         {
-            PauseTimers dummy(syncStatusFrame);
+            if (!progressDlg) abortThisProcess();
+            PauseTimers dummy(*progressDlg);
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
@@ -382,7 +387,8 @@ void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& 
     {
         case ON_GUIERROR_POPUP:
         {
-            PauseTimers dummy(syncStatusFrame);
+            if (!progressDlg) abortThisProcess();
+            PauseTimers dummy(*progressDlg);
             forceUiRefresh();
 
             bool dontWarnAgain = false;
@@ -411,12 +417,20 @@ void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& 
 
 void SyncStatusHandler::forceUiRefresh()
 {
-    syncStatusFrame.updateGui();
+    if (progressDlg)
+        progressDlg->updateGui();
 }
 
 
 void SyncStatusHandler::abortThisProcess()
 {
     requestAbortion(); //just make sure...
-    throw GuiAbortProcess();  //abort can be triggered by syncStatusFrame
+    throw GuiAbortProcess();  //abort can be triggered by progressDlg
+}
+
+
+void SyncStatusHandler::onProgressDialogTerminate()
+{
+    //it's responsibility of "progressDlg" to call requestAbortion() when closing dialog
+    progressDlg = nullptr;
 }

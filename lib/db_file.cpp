@@ -38,8 +38,8 @@ typedef std::map<UniqueId, BinaryStream> StreamMapping; //list of streams ordere
 template <SelectedSide side> inline
 Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
 {
-    //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity?
-	//what about endianess!?
+    //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity? are UTC file times really compatible?
+    //what about endianess!?
     //however 32 and 64 bit db files *are* designed to be binary compatible!
     //Give db files different names.
     //make sure they end with ".ffs_db". These files will be excluded from comparison
@@ -49,13 +49,11 @@ Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
     //files beginning with dots are hidden e.g. in Nautilus
     Zstring dbname = Zstring(Zstr(".sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
 #endif
-
     return baseMap.getBaseDirPf<side>() + dbname;
 }
 
 //#######################################################################################################################################
 
-//save/load streams
 void saveStreams(const StreamMapping& streamList, const Zstring& filename) //throw FileError
 {
     BinStreamOut streamOut;
@@ -75,9 +73,11 @@ void saveStreams(const StreamMapping& streamList, const Zstring& filename) //thr
         writeContainer<BinaryStream>(streamOut, it->second);
     }
 
+    assert(!somethingExists(filename)); //orphan tmp files should be cleaned up already at this point!
     saveBinStream(filename, streamOut.get()); //throw FileError
 
 #ifdef FFS_WIN
+    //be careful to avoid CreateFile() + CREATE_ALWAYS on a hidden file -> see file_io.cpp
     ::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide database file
 #endif
 }
@@ -97,7 +97,7 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError, FileErrorD
             throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
 
         const int version = readNumber<std::int32_t>(streamIn); //throw UnexpectedEndOfStreamError
-        if (version != DB_FILE_FORMAT_VER) //read file format version#
+        if (version != DB_FILE_FORMAT_VER) //read file format version number
             throw FileError(replaceCpy(_("Database file %x is incompatible."), L"%x", fmtFileName(filename)));
 
         //read stream lists
@@ -228,8 +228,12 @@ private:
     static void write(BinStreamOut& output, const LinkDescriptor& descr)
     {
         writeNumber<std::int64_t>(output, to<std:: int64_t>(descr.lastWriteTimeRaw));
-        writeUtf8(output, descr.targetPath);
-        writeNumber<std::int32_t>(output, descr.type);
+
+        warn_static("implement proper migration!")
+        //writeUtf8(output, descr.targetPath);
+        writeUtf8(output, Zstring());
+        //writeNumber<std::int32_t>(output, descr.type);
+        writeNumber<std::int32_t>(output, 0);
     }
 
     static void write(BinStreamOut& output, const InSyncDir::InSyncStatus& status)
@@ -249,6 +253,10 @@ private:
     void process(const std::pair<Zstring, InSyncSymlink>& symlinkPair)
     {
         writeUtf8(outputBoth, symlinkPair.first);
+
+        warn_static("new parameter: imp proper migration!")
+        //writeNumber<std::int32_t>(outputBoth, symlinkPair.second.inSyncType);
+
         write(outputLeft,  symlinkPair.second.left);
         write(outputRight, symlinkPair.second.right);
     }
@@ -352,8 +360,12 @@ private:
     static void read(BinStreamIn& input, LinkDescriptor& descr)
     {
         descr.lastWriteTimeRaw = readNumber<std::int64_t>(input);
-        descr.targetPath       = readUtf8(input); //file name
-        descr.type             = static_cast<LinkDescriptor::LinkType>(readNumber<std::int32_t>(input));
+
+        warn_static("implement proper migration!")
+        //descr.targetPath       = readUtf8(input);
+        readUtf8(input);
+        //descr.type             = static_cast<LinkDescriptor::LinkType>(readNumber<std::int32_t>(input));
+        readNumber<std::int32_t>(input);
     }
 
     static void read(BinStreamIn& input, InSyncDir::InSyncStatus& status)
@@ -364,10 +376,10 @@ private:
     void recurse(InSyncDir& container)
     {
         size_t fileCount = readNumber<std::uint32_t>(inputBoth);
-        while (fileCount-- != 0) 
+        while (fileCount-- != 0)
         {
             const Zstring shortName = readUtf8(inputBoth);
-            const auto inSyncType = static_cast<InSyncFile::InSyncType>(readNumber<std::int32_t>(inputBoth));
+            const auto inSyncType = static_cast<InSyncType>(readNumber<std::int32_t>(inputBoth));
 
             FileDescriptor dataL;
             FileDescriptor dataR;
@@ -378,20 +390,24 @@ private:
         }
 
         size_t linkCount = readNumber<std::uint32_t>(inputBoth);
-        while (linkCount-- != 0) 
+        while (linkCount-- != 0)
         {
             const Zstring shortName = readUtf8(inputBoth);
+
+            warn_static("new parameter: imp proper migration!")
+			const auto inSyncType = IN_SYNC_BINARY_EQUAL;
+            //const auto inSyncType = static_cast<InSyncType>(readNumber<std::int32_t>(inputBoth));
 
             LinkDescriptor dataL;
             LinkDescriptor dataR;
             read(inputLeft,  dataL);
             read(inputRight, dataR);
 
-            container.addSymlink(shortName, dataL, dataR);
+            container.addSymlink(shortName, dataL, dataR, inSyncType);
         }
 
         size_t dirCount = readNumber<std::uint32_t>(inputBoth);
-        while (dirCount-- != 0) 
+        while (dirCount-- != 0)
         {
             const Zstring shortName = readUtf8(inputBoth);
 
@@ -448,25 +464,44 @@ private:
     }
 
     template <class M, class V>
-    static V& updateItem(M& map, const Zstring& key, const V& value) //efficient create or update without "default-constructible" requirement (Effective STL, item 24)
+    static V& updateItem(M& map, const Zstring& key, const V& value)
     {
+        auto rv = map.insert(typename M::value_type(key, value));
+        if (!rv.second)
+        {
+#if defined FFS_WIN || defined FFS_MAC //caveat: key must be updated, if there is a change in short name case!!!
+            if (rv.first->first != key)
+            {
+                map.erase(rv.first);
+                return map.insert(typename M::value_type(key, value)).first->second;
+            }
+#endif
+            rv.first->second = value;
+        }
+        return rv.first->second;
+
+        //www.cplusplus.com claims that hint position for map<>::insert(iterator position, const value_type& val) changed with C++11 -> standard is unclear in [map.modifiers]
+        // => let's use the more generic and potentially less performant version above!
+
+        /*
+        //efficient create or update without "default-constructible" requirement (Effective STL, item 24)
+
+        //first check if key already exists (if yes, we're saving a value construction/destruction compared to std::map<>::insert
         auto it = map.lower_bound(key);
         if (it != map.end() && !(map.key_comp()(key, it->first)))
         {
-#if defined FFS_WIN || defined FFS_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
+        #if defined FFS_WIN || defined FFS_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
             if (it->first != key)
             {
                 map.erase(it); //don't fiddle with decrementing "it"! - you might lose while optimizing pointlessly
                 return map.insert(typename M::value_type(key, value)).first->second;
             }
-            else
-#endif
-            {
-                it->second = value;
-                return it->second;
-            }
+        #endif
+            it->second = value;
+            return it->second;
         }
         return map.insert(it, typename M::value_type(key, value))->second;
+        */
     }
 
     void process(const HierarchyObject::SubFileVec& currentFiles, const Zstring& parentRelativeNamePf, InSyncDir::FileList& dbFiles)
@@ -478,6 +513,10 @@ private:
             {
                 if (fileMap.getCategory() == FILE_EQUAL) //data in sync: write current state
                 {
+                    //Caveat: If FILE_EQUAL, we *implicitly* assume equal left and right short names matching case: InSyncDir's mapping tables use short name as a key!
+                    //This makes us silently dependent from code in algorithm.h!!!
+                    assert(fileMap.getShortName<LEFT_SIDE>() == fileMap.getShortName<RIGHT_SIDE>());
+
                     //create or update new "in-sync" state
                     InSyncFile& file = updateItem(dbFiles, fileMap.getObjShortName(),
                                                   InSyncFile(FileDescriptor(fileMap.getLastWriteTime<LEFT_SIDE>(),
@@ -487,10 +526,8 @@ private:
                                                                             fileMap.getFileSize     <RIGHT_SIDE>(),
                                                                             fileMap.getFileId       <RIGHT_SIDE>()),
                                                              binaryComparison_ ?
-                                                             InSyncFile::IN_SYNC_BINARY_EQUAL :
-                                                             InSyncFile::IN_SYNC_ATTRIBUTES_EQUAL)); //efficient add or update (Effective STL, item 24)
-                    //Caveat: If FILE_EQUAL, we *implicitly* assume equal left and right short names matching case: InSyncDir's mapping tables use short name as a key!
-                    //This makes us silently dependent from code in algorithm.h!!!
+                                                             IN_SYNC_BINARY_EQUAL :
+                                                             IN_SYNC_ATTRIBUTES_EQUAL));
                     toPreserve.insert(&file);
                 }
                 else //not in sync: preserve last synchronous state
@@ -522,14 +559,15 @@ private:
             {
                 if (linkMap.getLinkCategory() == SYMLINK_EQUAL) //data in sync: write current state
                 {
+                    assert(linkMap.getShortName<LEFT_SIDE>() == linkMap.getShortName<RIGHT_SIDE>());
+
                     //create or update new "in-sync" state
                     InSyncSymlink& link = updateItem(dbLinks, linkMap.getObjShortName(),
-                                                     InSyncSymlink(LinkDescriptor(linkMap.getLastWriteTime<LEFT_SIDE>(),
-                                                                                  linkMap.getTargetPath   <LEFT_SIDE>(),
-                                                                                  linkMap.getLinkType     <LEFT_SIDE>()),
-                                                                   LinkDescriptor(linkMap.getLastWriteTime<RIGHT_SIDE>(),
-                                                                                  linkMap.getTargetPath   <RIGHT_SIDE>(),
-                                                                                  linkMap.getLinkType     <RIGHT_SIDE>()))); //efficient add or update (Effective STL, item 24)
+                                                     InSyncSymlink(LinkDescriptor(linkMap.getLastWriteTime<LEFT_SIDE>()),
+                                                                   LinkDescriptor(linkMap.getLastWriteTime<RIGHT_SIDE>()),
+                                                                   binaryComparison_ ?
+                                                                   IN_SYNC_BINARY_EQUAL :
+                                                                   IN_SYNC_ATTRIBUTES_EQUAL));
                     toPreserve.insert(&link);
                 }
                 else //not in sync: preserve last synchronous state
@@ -563,6 +601,8 @@ private:
                 {
                     case DIR_EQUAL:
                     {
+                        assert(dirMap.getShortName<LEFT_SIDE>() == dirMap.getShortName<RIGHT_SIDE>());
+
                         //update directory entry only (shallow), but do *not touch* exising child elements!!!
                         const Zstring& key = dirMap.getObjShortName();
                         auto insertResult = dbDirs.insert(std::make_pair(key, InSyncDir(InSyncDir::STATUS_IN_SYNC))); //get or create

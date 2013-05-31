@@ -113,16 +113,13 @@
 <target>Pogreška broj %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
-<target>Ne mogu riješiti simboličnu poveznicu</target>
+<target>Ne mogu odrediti poveznicu %x.</target>
 
-<source>%x MB</source>
-<target>%x MB</target>
+<source>Cannot determine final path for %x.</source>
+<target></target>
 
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
+<source>Cannot find system function %x.</source>
+<target>Ne mogu pronaći sistemsku funkciju %x.</target>
 
 <source>
 <pluralform>1 Byte</pluralform>
@@ -133,6 +130,15 @@
 <pluralform>%x Bajta</pluralform>
 <pluralform>%x Bajtova</pluralform>
 </target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Datoteka baze %x je nekompatibilna</target>
@@ -150,10 +156,10 @@
 <target>Nedostatak memorije</target>
 
 <source>Cannot write file %x.</source>
-<target>Ne mogu zapisati datoteku</target>
+<target>Ne mogu zapisati datoteku %x.</target>
 
 <source>Cannot read file %x.</source>
-<target>Ne mogu čitati datoteku</target>
+<target>Ne mogu čitati datoteku %x.</target>
 
 <source>Database files do not share a common session.</source>
 <target>Datoteke baze ne dijele zajednički protokol</target>
@@ -170,9 +176,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>Čekam dok se direktorij zaključava (%x)...</target>
 
-<source>Creating file %x</source>
-<target>Izrađujem datoteku %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -183,14 +186,14 @@
 <pluralform>%x sek</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>Izrađujem datoteku %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Greška u analizi datoteke %x, red %y, stupac %z.</target>
 
 <source>Scanning:</source>
 <target>Pretražujem:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>:Spremam informacije o vremenu %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -199,8 +202,11 @@
 <target>
 <pluralform>%x Stavka</pluralform>
 <pluralform>%x Stavke</pluralform>
-<pluralform>% Stavki</pluralform>
+<pluralform>%x Stavki</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>:Spremam informacije o vremenu %x</target>
 
 <source>/sec</source>
 <target>/sek</target>
@@ -414,11 +420,11 @@ Naredba će biti pokrenuta ako se:
 <source>Date:</source>
 <target>Datum:</target>
 
-<source>Action</source>
-<target>Radnja</target>
-
 <source>Category</source>
 <target>Kategorija</target>
+
+<source>Action</source>
+<target>Radnja</target>
 
 <source>Drag && drop</source>
 <target>Povuci && ispusti</target>
@@ -795,12 +801,6 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>&Find next</source>
 <target>&Nađi slijedeće</target>
 
-<source>Operation aborted!</source>
-<target>Operacija otkazana!</target>
-
-<source>Main bar</source>
-<target>Glavna traka</target>
-
 <source>Folder pairs</source>
 <target>Par mape</target>
 
@@ -809,6 +809,9 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>Configuration</source>
 <target>Postavke</target>
+
+<source>Main bar</source>
+<target>Glavna traka</target>
 
 <source>Filter files</source>
 <target>Filtriraj datoteke</target>
@@ -824,6 +827,32 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>Compare both sides</source>
 <target>Usporedi obje strane</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>%x direktorij</pluralform>
+<pluralform>%x direktorija</pluralform>
+<pluralform>%x direktorija</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>%x datoteka</pluralform>
+<pluralform>%x datoteke</pluralform>
+<pluralform>%x datoteka</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target></target>
 
 <source>Set direction:</source>
 <target>Odaberi smijer:</target>
@@ -939,50 +968,20 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Set as default</source>
 <target>Postavi kao zadano</target>
 
+<source>Operation aborted!</source>
+<target>Operacija otkazana!</target>
+
 <source>All folders are in sync!</source>
 <target>Sve mape su u sinkronizaciji!</target>
 
 <source>Comma separated list</source>
 <target>Zarezom odvojene liste</target>
 
-<source>Legend</source>
-<target>Legenda</target>
-
 <source>File list exported!</source>
 <target>Datotečna lista izvezena!</target>
 
 <source>Searching for program updates...</source>
 <target>Pretražujem ažuriranja programa...</target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>%x direktorij</pluralform>
-<pluralform>%x direktorija</pluralform>
-<pluralform>%x direktorija</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>%x datoteka</pluralform>
-<pluralform>%x datoteke</pluralform>
-<pluralform>%x datoteka</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x od %y red u prikazu</pluralform>
-<pluralform>%x od %y reda u prikazu</pluralform>
-<pluralform>%x od %y redova u prikazu</pluralform>
-</target>
 
 <source>Ignore further errors</source>
 <target>Zanemari buduće greške</target>
@@ -1065,6 +1064,18 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Filter</source>
 <target>Filtriranje</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target></target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target></target>
+
 <source>Direct</source>
 <target>Neposredno</target>
 
@@ -1092,32 +1103,20 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>Vrati skrivena upozorenja i dijaloški okvir ponovno vidljivim?</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target></target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target></target>
-
 <source>Leave as unresolved conflict</source>
 <target>Ostavi kao neriješeni sukob</target>
-
-<source>Time stamp</source>
-<target>Vremenska oznaka</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Dodaj vremensku oznaku svakom imenu datoteke</target>
 
 <source>Replace</source>
 <target>Zamjeni</target>
 
 <source>Move files and replace if existing</source>
 <target>Premjesti datoteke i zamjeni ako već postoji</target>
+
+<source>Time stamp</source>
+<target>Vremenska oznaka</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Dodaj vremensku oznaku svakom imenu datoteke</target>
 
 <source>Folder</source>
 <target>Mapa</target>
@@ -1132,7 +1131,7 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <target>Datoteke</target>
 
 <source>Items</source>
-<target></target>
+<target>Stavke</target>
 
 <source>Percentage</source>
 <target>Postotak</target>
@@ -1161,9 +1160,6 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Cannot write modification time of %x.</source>
 <target>Ne mogu zapisati vrijeme izmjene %x.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Ne mogu pronaći sistemsku funkciju %x.</target>
-
 <source>Cannot read security context of %x.</source>
 <target>Ne mogu čitati zaštićeni sadržaj %x.</target>
 
@@ -1179,8 +1175,8 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Cannot create directory %x.</source>
 <target>Ne mogu izraditi mapu %x.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Ne mogu kopirati simboličnu poveznicu %x na %y.</target>
+<source>Cannot create symbolic link %x.</source>
+<target></target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Ne mogu kopirati datoteku %x na %y.</target>
@@ -1202,9 +1198,6 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1246,7 +1239,7 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <target>Ne može se promjeniti proces I/O prioriteta</target>
 
 <source>Unable to move %x to the Recycle Bin!</source>
-<target>Nije moguće prebaciti u Koš za smeće</target>
+<target>Nije moguće premjestiti %x u koš za smeće!</target>
 
 <source>Both sides have changed since last synchronization!</source>
 <target>Obje su strane promjenjene od posljednje sinkronizacije!</target>
@@ -1294,16 +1287,10 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <target>Ne mogu pronaći slijedeće mape:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target></target>
+<target>Možete ignorirati ovu pogrešku te uzeti u obzir svaku mapu praznom. Mape se tada stvaraju automatski tokom sinkronizacije.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Direktoriji su u ovisnosti! Budite oprezni pri postavljanju sinkronizacijskih pravila:</target>
-
-<source>Start comparison</source>
-<target>Započni usporedbu</target>
-
-<source>Calculating sync directions...</source>
-<target>Izračunavam smjerove sinkronizacije...</target>
 
 <source>Conflict detected:</source>
 <target>Sukob pronađen:</target>
@@ -1317,17 +1304,20 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 <source>Items differ in attributes only</source>
 <target>Stavke se razlikuju samo u atributima</target>
 
-<source>Symbolic links %x have the same date but a different target.</source>
-<target>Simbolične poveznice %x imaju isti datum ali drugačiji cilj</target>
+<source>Resolving symbolic link %x</source>
+<target></target>
 
 <source>Comparing content of files %x</source>
 <target>Uspoređujem sadržaj datoteka %x</target>
 
-<source>Comparing files by content failed.</source>
-<target>Usporedba datoteka prema sadržaju nije uspjela.</target>
-
 <source>Generating file list...</source>
 <target>Generiram listu datoteka...</target>
+
+<source>Start comparison</source>
+<target>Započni usporedbu</target>
+
+<source>Calculating sync directions...</source>
+<target>Izračunavam smjerove sinkronizacije...</target>
 
 <source>Both sides are equal</source>
 <target>Obje strane su jednake</target>
@@ -1433,12 +1423,6 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama!
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Mapa će biti uređena koja je dio više pari mapa. Molimo provjerite sinkronizacijske postavke.</target>
-
-<source>Left</source>
-<target>Lijevo</target>
-
-<source>Right</source>
-<target>Desno</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Par sinkronizirane mape:</target>

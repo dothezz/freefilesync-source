@@ -20,7 +20,7 @@
 <target>مجموع الوقت:</target>
 
 <source>Cannot set directory lock for %x.</source>
-<target></target>
+<target>تعذر إنشاء قفل للمسار %x.</target>
 
 <source>Show in Explorer</source>
 <target>إظهار في المستكشف</target>
@@ -68,7 +68,7 @@
 <target>نسخ</target>
 
 <source>Paste</source>
-<target></target>
+<target>لصق</target>
 
 <source>Save as batch job</source>
 <target>حفظ كمهمة دفعية</target>
@@ -115,6 +115,19 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>لا يمكن حل الارتباط الرمزي  %x.</target>
 
+<source>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</source>
+<target>
+<pluralform>0 Bytes</pluralform>
+<pluralform>1 Byte</pluralform>
+<pluralform>2 Bytes</pluralform>
+<pluralform>%x Bytes</pluralform>
+<pluralform>%x Bytes</pluralform>
+<pluralform>%x Bytes</pluralform>
+</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -123,19 +136,6 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
-
-<source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-</source>
-<target>
-<pluralform>%x Bytes</pluralform>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-<pluralform>%x Bytes</pluralform>
-<pluralform>%x Bytes</pluralform>
-<pluralform>%x Bytes</pluralform>
-</target>
 
 <source>Database file %x is incompatible.</source>
 <target>ملف قاعدة البيانات  %x غير متوافق.</target>
@@ -173,21 +173,21 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>في انتظار تأمين قفل للمسار (%x)...</target>
 
-<source>Creating file %x</source>
-<target>إنشاء الملف %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
 </source>
 <target>
-<pluralform>ولا ثانية</pluralform>
-<pluralform>ثانية واحدة</pluralform>
-<pluralform>ثانيتين</pluralform>
+<pluralform>0 ثانية</pluralform>
+<pluralform>1 ثانية واحدة</pluralform>
+<pluralform>2 ثانيتين</pluralform>
 <pluralform>%x ثواني</pluralform>
 <pluralform>%x ثانية</pluralform>
 <pluralform>%x ثانية</pluralform>
 </target>
+
+<source>Creating file %x</source>
+<target>إنشاء الملف %x</target>
 
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>حدث خطأ أثناء تحليل الملف  %x، الصف  %y، و العمود  %z.</target>
@@ -195,21 +195,21 @@
 <source>Scanning:</source>
 <target>الفحص:</target>
 
-<source>Encoding extended time information: %x</source>
-<target>ترميز المعلومات الموسعة للوقت: %x</target>
-
 <source>
 <pluralform>[1 Thread]</pluralform>
 <pluralform>[%x Threads]</pluralform>
 </source>
 <target>
-<pluralform>ولا بند</pluralform>
-<pluralform>بند واحد</pluralform>
-<pluralform>بندان</pluralform>
-<pluralform>%x بنداً</pluralform>
+<pluralform>0 بند</pluralform>
+<pluralform>1 بند واحد</pluralform>
+<pluralform>2 بندان</pluralform>
+<pluralform>%x بنود</pluralform>
 <pluralform>%x بنداً</pluralform>
 <pluralform>%x بند</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>ترميز المعلومات الموسعة للوقت: %x</target>
 
 <source>/sec</source>
 <target>\ثانية</target>
@@ -424,7 +424,7 @@ The command is triggered if:
 <target>التاريخ:</target>
 
 <source>Action</source>
-<target>نشاط</target>
+<target>التصرف</target>
 
 <source>Category</source>
 <target>الفئة</target>
@@ -475,13 +475,13 @@ The command is triggered if:
 <target>&متقدم</target>
 
 <source>&Check now</source>
-<target></target>
+<target>&تحقق الآن</target>
 
 <source>Check &automatically once a week</source>
-<target></target>
+<target>تحقق &أوتوماتيكياً بشكل أسبوعي</target>
 
 <source>Check for new version</source>
-<target></target>
+<target>التحقق من وجود نسخة جديدة</target>
 
 <source>Compare</source>
 <target>قارن</target>
@@ -602,7 +602,7 @@ are the same
 </target>
 
 <source>File time and size</source>
-<target>وقت الملف و حجمه</target>
+<target>تاريخ الملف و حجمه</target>
 
 <source>
 Files are found equal if
@@ -622,19 +622,19 @@ is the same
 <target>التعامل مع الارتباط رمزي</target>
 
 <source>OK</source>
-<target>حسناً</target>
+<target>موافق</target>
 
 <source><- Two way -></source>
 <target><- بالاتجاهين -></target>
 
 <source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target></target>
+<target>تحديد التغيرات و مواكبتها على الجانبين. عمليات الحذف, النقل و المشاكل المكتشفة بواسطة قواعد البيانات</target>
 
 <source>Mirror ->></source>
 <target>انعكاس ->></target>
 
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>نسخ احتياطي انعكاس للمجلد الأيسر. يتم تعديل المجلد الأيمن ليطابق المجلد الأيسر بعد المزامنة.</target>
+<target>إنشاء نسخة منعكسة عن المجلد الأيمن. يتم تعديل المجلد الأيسر ليطابق المجلد الأيمن.</target>
 
 <source>Update -></source>
 <target>تحديث -></target>
@@ -667,22 +667,22 @@ is the same
 <target>الوسم برقم الإصدار</target>
 
 <source>Move files to user-defined folder</source>
-<target></target>
+<target>نقل الملفات إلى مجلد يحدده المستخدم</target>
 
 <source>Naming convention:</source>
 <target>اصطلاح التسمية:</target>
 
 <source>Item exists on left side only</source>
-<target>العنصر موجود على الجانب الأيسر فقط</target>
+<target>العنصر موجود على الجانب الأيمن فقط</target>
 
 <source>Item exists on right side only</source>
-<target>العنصر موجود في الجانب الأيمن فقط</target>
+<target>العنصر موجود في الجانب الأيسر فقط</target>
 
 <source>Left side is newer</source>
-<target>الجانب الأيسر أحدث</target>
+<target>الجانب الأيمن أحدث</target>
 
 <source>Right side is newer</source>
-<target>الجانب الأيمن أحدث</target>
+<target>الجانب الأيسر أحدث</target>
 
 <source>Items have different content</source>
 <target>العناصر مختلفة بالمحتوى</target>
@@ -751,7 +751,7 @@ Note: File names must be relative to base directories!
 <target>الحد الأقصى</target>
 
 <source>&Clear</source>
-<target></target>
+<target>&إزالة</target>
 
 <source>Fail-safe file copy</source>
 <target>نسخ ملفات آمن من الفشل</target>
@@ -790,7 +790,7 @@ Note: File names must be relative to base directories!
 <target>المتغير</target>
 
 <source>Statistics</source>
-<target>الإحصاءات</target>
+<target>إحصائيات</target>
 
 <source>Don't show this dialog again</source>
 <target>عدم إظهار نافذة الحوار هذه مرة أخرى</target>
@@ -803,9 +803,6 @@ Note: File names must be relative to base directories!
 
 <source>&Find next</source>
 <target>&بحث عن التالي</target>
-
-<source>Operation aborted!</source>
-<target>تم إحباط العملية!</target>
 
 <source>Main bar</source>
 <target>الشريط الرئيسي</target>
@@ -833,6 +830,45 @@ Note: File names must be relative to base directories!
 
 <source>Compare both sides</source>
 <target>مقارنة بين كلا الجانبين</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>0 مسار</pluralform>
+<pluralform>1 مسار واحد</pluralform>
+<pluralform>2 مساران</pluralform>
+<pluralform>%x مسارات</pluralform>
+<pluralform>%x مساراً</pluralform>
+<pluralform>%x مسار</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>0 ملف</pluralform>
+<pluralform>1 ملف واحد</pluralform>
+<pluralform>2 ملفان</pluralform>
+<pluralform>%x ملفات</pluralform>
+<pluralform>%x ملفاً</pluralform>
+<pluralform>%x ملف</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>الظاهر %y من أصل 0 سطر</pluralform>
+<pluralform>الظاهر %y من أصل 1 (سطر وحيد)</pluralform>
+<pluralform>الظاهر %y من أصل 2 (سطرين)</pluralform>
+<pluralform>الظاهر %y من أصل %x سطور</pluralform>
+<pluralform>الظاهر %y من أصل %x سطراً</pluralform>
+<pluralform>الظاهر %y من أصل %x سطر</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>تحديد الاتجاه:</target>
@@ -904,16 +940,16 @@ Note: File names must be relative to base directories!
 <target>تم فتح التكوين!</target>
 
 <source>Show files that exist on left side only</source>
-<target>إظهار الملفات الموجودة في الجانب الأيسر فقط</target>
-
-<source>Show files that exist on right side only</source>
 <target>إظهار الملفات الموجودة في الجانب الأيمن فقط</target>
 
+<source>Show files that exist on right side only</source>
+<target>إظهار الملفات الموجودة في الجانب الأيسر فقط</target>
+
 <source>Show files that are newer on left</source>
-<target>إظهار الملفات الأحدث في اليسار</target>
+<target>إظهار الملفات الأحدث في اليمين</target>
 
 <source>Show files that are newer on right</source>
-<target>إظهار الملفات الأحدث في اليمين</target>
+<target>إظهار الملفات الأحدث في اليسار</target>
 
 <source>Show files that are equal</source>
 <target>إظهار الملفات المتماثلة على الطرفين</target>
@@ -925,28 +961,31 @@ Note: File names must be relative to base directories!
 <target>إظهار الاختلافات</target>
 
 <source>Show files that will be created on the left side</source>
-<target>إظهار الملفات التي سيتم إنشاؤها في الجانب الأيسر</target>
-
-<source>Show files that will be created on the right side</source>
 <target>إظهار الملفات التي سيتم إنشاؤها في الجانب الأيمن</target>
 
+<source>Show files that will be created on the right side</source>
+<target>إظهار الملفات التي سيتم إنشاؤها في الجانب الأيسر</target>
+
 <source>Show files that will be deleted on the left side</source>
-<target>إظهار الملفات التي سيتم حذفها من من الجانب الأيسر</target>
+<target>إظهار الملفات التي سيتم حذفها من من الجانب الأيمن</target>
 
 <source>Show files that will be deleted on the right side</source>
-<target>إظهار الملفات التي سيتم حذفها من الجانب الأيمن</target>
+<target>إظهار الملفات التي سيتم حذفها من الجانب الأيسر</target>
 
 <source>Show files that will be overwritten on left side</source>
-<target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيسر</target>
+<target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيمن</target>
 
 <source>Show files that will be overwritten on right side</source>
-<target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيمن</target>
+<target>إظهار الملفات التي سيتم الكتابة فوقها في الجانب الأيسر</target>
 
 <source>Show files that won't be copied</source>
 <target>إظهار الملفات التي لن يتم نسخها</target>
 
 <source>Set as default</source>
 <target>تحديد كوضع افتراضي</target>
+
+<source>Operation aborted!</source>
+<target>تم إحباط العملية!</target>
 
 <source>All folders are in sync!</source>
 <target>جميع المجلدات متزامنة!</target>
@@ -961,46 +1000,7 @@ Note: File names must be relative to base directories!
 <target>تم تصدير قائمة الملفات!</target>
 
 <source>Searching for program updates...</source>
-<target></target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>ولا مسار</pluralform>
-<pluralform>مسار واحد</pluralform>
-<pluralform>مساران</pluralform>
-<pluralform>%x مسارات</pluralform>
-<pluralform>%x مساراً</pluralform>
-<pluralform>%x مسار</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>ولا ملف</pluralform>
-<pluralform>ملف واحد</pluralform>
-<pluralform>ملفان</pluralform>
-<pluralform>%x ملفات</pluralform>
-<pluralform>%x ملفاً</pluralform>
-<pluralform>%x ملف</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>عرض %x من ولا صف</pluralform>
-<pluralform>عرض %x من صف واحد</pluralform>
-<pluralform>عرض %x من صفين</pluralform>
-<pluralform>عرض %x من %y صفاً</pluralform>
-<pluralform>عرض %x من %y صفاً</pluralform>
-<pluralform>عرض %x من %y صفاً</pluralform>
-</target>
+<target>جاري البحث عن تحديثات للبرنامج...</target>
 
 <source>Ignore further errors</source>
 <target>تجاهل أي أخطاء أخرى</target>
@@ -1009,7 +1009,7 @@ Note: File names must be relative to base directories!
 <target>&تجاهل</target>
 
 <source>Don't show this warning again</source>
-<target></target>
+<target>لا تظهر هذا التنبيه ثانية</target>
 
 <source>&Switch</source>
 <target>&تبديل</target>
@@ -1083,6 +1083,32 @@ Note: File names must be relative to base directories!
 <source>Filter</source>
 <target>عامل التصفية</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>هل تريد حقاً نقل 0 ملف التالي إلى سلة المهملات ؟</pluralform>
+<pluralform>هل تريد حقاً نقل الملف 1 التالي إلى سلة المهملات ؟</pluralform>
+<pluralform>هل تريد حقاً نقل الملفين 2 التاليين إلى سلة المهملات ؟</pluralform>
+<pluralform>هل تريد حقاً نقل الـ %x ملفات التالية إلى سلة المهملات ؟</pluralform>
+<pluralform>هل تريد حقاً نقل الـ %x ملفاً التالية إلى سلة المهملات ؟</pluralform>
+<pluralform>هل تريد حقاً نقل الـ %x ملف التالية إلى سلة المهملات ؟</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>هل تريد حقاً حذف 0 ملف التالي ؟</pluralform>
+<pluralform>هل تريد حقاً حذف الملف 1 التالي ؟</pluralform>
+<pluralform>هل تريد حقاً حذف الملفين 2 التاليين ؟</pluralform>
+<pluralform>هل تريد حقاً حذف الـ %x ملفات التالية ؟</pluralform>
+<pluralform>هل تريد حقاً حذف الـ %x ملفاً التالية ؟</pluralform>
+<pluralform>هل تريد حقاً حذف الـ %x ملف التالية ؟</pluralform>
+</target>
+
 <source>Direct</source>
 <target>مباشر</target>
 
@@ -1110,23 +1136,11 @@ Note: File names must be relative to base directories!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>جعل التحذيرات و نوافذ الحوارات المخفية مرئية من جديد؟</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target></target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target></target>
-
 <source>Leave as unresolved conflict</source>
 <target>ترك كاختلافات من دون حل</target>
 
 <source>Time stamp</source>
-<target></target>
+<target>البصمة الزمنية</target>
 
 <source>Append a timestamp to each file name</source>
 <target>إلحاق طابع زمني اسم كل ملف</target>
@@ -1148,6 +1162,9 @@ Note: File names must be relative to base directories!
 
 <source>Files</source>
 <target>ملفات</target>
+
+<source>Items</source>
+<target>عناصر</target>
 
 <source>Percentage</source>
 <target>النسبة المئوية</target>
@@ -1218,17 +1235,14 @@ Note: File names must be relative to base directories!
 <source>%x PB</source>
 <target>%x PB</target>
 
-<source>%x%</source>
-<target>%x%</target>
-
 <source>
 <pluralform>1 min</pluralform>
 <pluralform>%x min</pluralform>
 </source>
 <target>
-<pluralform>ولا دقيقة</pluralform>
-<pluralform>دقيقة واحدة</pluralform>
-<pluralform>دقيقتان</pluralform>
+<pluralform>0 دقيقة</pluralform>
+<pluralform>1 دقيقة واحدة</pluralform>
+<pluralform>2 دقيقتان</pluralform>
 <pluralform>%x دقائق</pluralform>
 <pluralform>%x دقيقة</pluralform>
 <pluralform>%x دقيقة</pluralform>
@@ -1239,9 +1253,9 @@ Note: File names must be relative to base directories!
 <pluralform>%x hours</pluralform>
 </source>
 <target>
-<pluralform>ولا ساعة</pluralform>
-<pluralform>ساعة واحدة</pluralform>
-<pluralform>ساعتين</pluralform>
+<pluralform>0 ساعة</pluralform>
+<pluralform>1 ساعة واحدة</pluralform>
+<pluralform>2 ساعتين</pluralform>
 <pluralform>%x ساعات</pluralform>
 <pluralform>%x ساعة</pluralform>
 <pluralform>%x ساعة</pluralform>
@@ -1252,9 +1266,9 @@ Note: File names must be relative to base directories!
 <pluralform>%x days</pluralform>
 </source>
 <target>
-<pluralform>ولا يوم</pluralform>
-<pluralform>يوم واحد</pluralform>
-<pluralform>يومان</pluralform>
+<pluralform>0 يوم</pluralform>
+<pluralform>1 يوم واحد</pluralform>
+<pluralform>2 يومان</pluralform>
 <pluralform>%x أيام</pluralform>
 <pluralform>%x يوماً</pluralform>
 <pluralform>%x يوم</pluralform>
@@ -1312,13 +1326,13 @@ Note: File names must be relative to base directories!
 <target>سلة المهملات غير متوفر للمسارات التالية! سيتم حذف الملفات بشكل دائم بدلاً من ذلك:</target>
 
 <source>The corresponding folder will be considered as empty.</source>
-<target></target>
+<target>سيتم اعتبار المجلد الموافق كمجلد فارغ</target>
 
 <source>Cannot find the following folders:</source>
 <target>تعذر العثور على المجلدات التالية:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>بإمكانك تجاهل هذا الخطأ باعتبالا كل مجلد و كأنه فارغ</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>بإمكانك إهمال هذا الخطأ لاعتبار كل مجلد على أنه مجلد فارغ. سيتم إنشاء المجلدات تلقائياً خلال المزامنة</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>المسارات تلعية! كن حذراً عند إعداد قواعد المزامنة:</target>
@@ -1327,7 +1341,7 @@ Note: File names must be relative to base directories!
 <target>ابدأ المقارنة</target>
 
 <source>Calculating sync directions...</source>
-<target></target>
+<target>جاري حساب اتجاهات المزامنة...</target>
 
 <source>Conflict detected:</source>
 <target>تم الكشف عن تعارض:</target>
@@ -1357,37 +1371,37 @@ Note: File names must be relative to base directories!
 <target>كلا الجانبين متماثلان</target>
 
 <source>Copy new item to left</source>
-<target>نسخ عنصر جديد إلى اليسار</target>
-
-<source>Copy new item to right</source>
 <target>نسخ عنصر جديد إلى اليمين</target>
 
-<source>Delete left item</source>
-<target>حذف العنصر الأيسر</target>
+<source>Copy new item to right</source>
+<target>نسخ عنصر جديد إلى اليسار</target>
 
-<source>Delete right item</source>
+<source>Delete left item</source>
 <target>حذف العنصر الأيمن</target>
 
-<source>Move file on left</source>
-<target>نقل ملف على اليسار</target>
+<source>Delete right item</source>
+<target>حذف العنصر الأيسر</target>
 
-<source>Move file on right</source>
+<source>Move file on left</source>
 <target>نقل ملف على اليمين</target>
 
+<source>Move file on right</source>
+<target>نقل ملف على اليسار</target>
+
 <source>Overwrite left item</source>
-<target>الكتابة فوق العنصر الأيسر</target>
+<target>الكتابة فوق العنصر الأيمن</target>
 
 <source>Overwrite right item</source>
-<target>الكتابة فوق العنصر الأيمن</target>
+<target>الكتابة فوق العنصر الأيسر</target>
 
 <source>Do nothing</source>
 <target>لا تفعل شيئا</target>
 
 <source>Update attributes on left</source>
-<target>تحديث السمات على اليسار</target>
+<target>تحديث السمات على اليمين</target>
 
 <source>Update attributes on right</source>
-<target>تحديث السمات على اليمين</target>
+<target>تحديث السمات على اليسار</target>
 
 <source>Multiple...</source>
 <target>متعددة...</target>
@@ -1458,12 +1472,6 @@ Note: File names must be relative to base directories!
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>سيتم تعديل مجلد الذي هو جزء من أزواج المجلدات المتعددة. الرجاء مراجعة إعدادات المزامنة.</target>
 
-<source>Left</source>
-<target>اليسار</target>
-
-<source>Right</source>
-<target>حق</target>
-
 <source>Synchronizing folder pair:</source>
 <target>مزامنة زوج مجلدات:</target>
 
@@ -1471,7 +1479,7 @@ Note: File names must be relative to base directories!
 <target>إنشاء قاعدة بيانات...</target>
 
 <source>Creating Volume Shadow Copy for %x...</source>
-<target></target>
+<target>جاري إنشاء نسخة ظلية لـ %x...</target>
 
 <source>Data verification error: Source and target file have different content!</source>
 <target>خطأ تحقق بيانات: للملف المصدر والملف الهدف محتويات مختلفة!</target>

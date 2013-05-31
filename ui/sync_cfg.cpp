@@ -235,8 +235,8 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     setRelativeFontSize(*m_toggleBtnCustom,    1.25);
 
     enumVersioningStyle.
-    add(VER_STYLE_ADD_TIMESTAMP, _("Time stamp"), _("Append a timestamp to each file name")).
-    add(VER_STYLE_REPLACE,       _("Replace"),        _("Move files and replace if existing"));
+    add(VER_STYLE_REPLACE,       _("Replace"),    _("Move files and replace if existing")).
+    add(VER_STYLE_ADD_TIMESTAMP, _("Time stamp"), _("Append a timestamp to each file name"));
 
     //hide controls for optional parameters
     if (!handleError && !execWhenFinished) //currently either both or neither are bound!

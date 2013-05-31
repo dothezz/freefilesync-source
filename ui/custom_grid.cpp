@@ -39,11 +39,6 @@ const wxColour COLOR_NOT_ACTIVE  (228, 228, 228); //light grey
 
 
 const Zstring ICON_FILE_FOLDER = Zstr("folder");
-
-const int CHECK_BOX_IMAGE = 12; //width of checkbox image
-const int CHECK_BOX_SPACE_LEFT = 2;
-const int CHECK_BOX_WIDTH = CHECK_BOX_SPACE_LEFT + CHECK_BOX_IMAGE; //width of first block
-
 const size_t ROW_COUNT_NO_DATA = 10;
 
 /*
@@ -92,6 +87,51 @@ std::pair<ptrdiff_t, ptrdiff_t> getVisibleRows(const Grid& grid) //returns range
         }
     }
     return std::make_pair(0, 0);
+}
+
+
+void fillBackgroundDefaultColorAlternating(wxDC& dc, const wxRect& rect, bool evenRowNumber)
+{
+    //alternate background color to improve readability (while lacking cell borders)
+    if (!evenRowNumber)
+    {
+        //accessibility, support high-contrast schemes => work with user-defined background color!
+        const auto backCol = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+
+        auto incChannel = [](unsigned char c, int diff) { return static_cast<unsigned char>(std::max(0, std::min(255, c + diff))); };
+
+        auto getAdjustedColor = [&](int diff)
+        {
+            return wxColor(incChannel(backCol.Red  (), diff),
+                           incChannel(backCol.Green(), diff),
+                           incChannel(backCol.Blue (), diff));
+        };
+
+        auto colorDist = [](const wxColor& lhs, const wxColor& rhs) //just some metric
+        {
+            return numeric::power<2>(static_cast<int>(lhs.Red  ()) - static_cast<int>(rhs.Red  ())) +
+                   numeric::power<2>(static_cast<int>(lhs.Green()) - static_cast<int>(rhs.Green())) +
+                   numeric::power<2>(static_cast<int>(lhs.Blue ()) - static_cast<int>(rhs.Blue ()));
+        };
+
+        const int signLevel = colorDist(backCol, *wxBLACK) < colorDist(backCol, *wxWHITE) ? 1 : -1; //brighten or darken
+
+        const wxColor colOutter = getAdjustedColor(signLevel * 14); //just some very faint gradient to avoid visual distraction
+        const wxColor colInner  = getAdjustedColor(signLevel * 11); //
+
+        //clearArea(dc, rect, backColAlt);
+
+        //add some nice background gradient
+        wxRect rectUpper = rect;
+        rectUpper.height /= 2;
+        wxRect rectLower = rect;
+        rectLower.y += rectUpper.height;
+        rectLower.height -= rectUpper.height;
+        dc.GradientFillLinear(rectUpper, colOutter, colInner, wxSOUTH);
+        dc.GradientFillLinear(rectLower, colOutter, colInner, wxNORTH);
+    }
+    else
+        clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 }
 
 
@@ -235,43 +275,8 @@ protected:
             else
             {
                 //alternate background color to improve readability (while lacking cell borders)
-                if (getRowDisplayType(row) == DISP_TYPE_NORMAL && row % 2 == 1)
-                {
-                    //accessibility, support high-contrast schemes => work with user-defined background color!
-                    const auto backCol = getBackGroundColor(row);
-
-                    auto incChannel = [](unsigned char c, int diff) { return static_cast<unsigned char>(std::max(0, std::min(255, c + diff))); };
-
-                    auto getAdjustedColor = [&](int diff)
-                    {
-                        return wxColor(incChannel(backCol.Red  (), diff),
-                                       incChannel(backCol.Green(), diff),
-                                       incChannel(backCol.Blue (), diff));
-                    };
-
-                    auto colorDist = [](const wxColor& lhs, const wxColor& rhs) //just some metric
-                    {
-                        return numeric::power<2>(static_cast<int>(lhs.Red  ()) - static_cast<int>(rhs.Red  ())) +
-                               numeric::power<2>(static_cast<int>(lhs.Green()) - static_cast<int>(rhs.Green())) +
-                               numeric::power<2>(static_cast<int>(lhs.Blue ()) - static_cast<int>(rhs.Blue ()));
-                    };
-
-                    const int signLevel = colorDist(backCol, *wxBLACK) < colorDist(backCol, *wxWHITE) ? 1 : -1; //brighten or darken
-
-                    const wxColor colOutter = getAdjustedColor(signLevel * 14); //just some very faint gradient to avoid visual distraction
-                    const wxColor colInner  = getAdjustedColor(signLevel * 11); //
-
-                    //clearArea(dc, rect, backColAlt);
-
-                    //add some nice background gradient
-                    wxRect rectUpper = rect;
-                    rectUpper.height /= 2;
-                    wxRect rectLower = rect;
-                    rectLower.y += rectUpper.height;
-                    rectLower.height -= rectUpper.height;
-                    dc.GradientFillLinear(rectUpper, colOutter, colInner, wxSOUTH);
-                    dc.GradientFillLinear(rectLower, colOutter, colInner, wxNORTH);
-                }
+                if (getRowDisplayType(row) == DISP_TYPE_NORMAL)
+                    fillBackgroundDefaultColorAlternating(dc, rect, row % 2 == 0);
                 else
                     clearArea(dc, rect, getBackGroundColor(row));
             }
@@ -295,7 +300,6 @@ protected:
                 return COLOR_ORANGE;
             case DISP_TYPE_INACTIVE:
                 return COLOR_NOT_ACTIVE;
-
         }
         return wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
     }
@@ -630,9 +634,7 @@ private:
                 }
                 virtual void visit(const SymLinkMapping& linkObj)
                 {
-                    iconName = linkObj.getLinkType<side>() == LinkDescriptor::TYPE_DIR ?
-                               ICON_FILE_FOLDER :
-                               linkObj.getFullName<side>();
+                    iconName = linkObj.getFullName<side>();
                 }
                 virtual void visit(const DirMapping& dirObj)
                 {
@@ -770,16 +772,16 @@ class GridDataMiddle : public GridDataBase
 public:
     GridDataMiddle(const std::shared_ptr<const zen::GridView>& gridDataView, Grid& grid) :
         GridDataBase(grid, gridDataView),
-        showSyncAction_(true),
-        toolTip(grid) {} //tool tip must not live longer than grid!
+        highlightSyncAction_(false),
+        toolTip(grid), //tool tip must not live longer than grid!
+        notch(getResourceImage(L"notch").ConvertToImage()) {}
 
     void onSelectBegin(const wxPoint& clientPos, size_t row, ColumnType colType)
     {
-        if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE &&
-            row < refGrid().getRowCount())
+        if (row < refGrid().getRowCount())
         {
             refGrid().clearSelection(false); //don't emit event, prevent recursion!
-            dragSelection = make_unique<std::pair<size_t, BlockPosition>>(row, mousePosToBlock(clientPos, row));
+            dragSelection = make_unique<std::pair<size_t, BlockPosition>>(row, mousePosToBlock(clientPos, row, static_cast<ColumnTypeMiddle>(colType)));
             toolTip.hide(); //handle custom tooltip
         }
     }
@@ -839,22 +841,27 @@ public:
         //manage block highlighting and custom tooltip
         if (!dragSelection)
         {
+            auto refreshHighlight = [&](size_t row)
+            {
+                refreshCell(refGrid(), row, static_cast<ColumnType>(COL_TYPE_CHECKBOX));
+                refreshCell(refGrid(), row, static_cast<ColumnType>(COL_TYPE_SYNC_ACTION));
+            };
+
             const wxPoint& topLeftAbs = refGrid().CalcUnscrolledPosition(clientPos);
             const size_t row = refGrid().getRowAtPos(topLeftAbs.y); //return -1 for invalid position, rowCount if one past the end
             auto colInfo = refGrid().getColumnAtPos(topLeftAbs.x); //(column type, component position)
 
-            if (row < refGrid().getRowCount() &&
-                colInfo && static_cast<ColumnTypeMiddle>(colInfo->first) == COL_TYPE_MIDDLE_VALUE)
+            if (row < refGrid().getRowCount() && colInfo)
             {
-                if (highlight) //refresh old highlight
-                    refreshCell(refGrid(), highlight->row_, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
+                if (highlight) refreshHighlight(highlight->row_); //refresh old highlight
 
-                highlight = make_unique<MouseHighlight>(row, mousePosToBlock(clientPos, row));
-                refreshCell(refGrid(), highlight->row_, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
+                highlight = make_unique<MouseHighlight>(row, mousePosToBlock(clientPos, row, static_cast<ColumnTypeMiddle>(colInfo->first)));
+
+                refreshHighlight(highlight->row_);
 
                 //show custom tooltip
                 if (refGrid().getMainWin().GetClientRect().Contains(clientPos)) //cursor might have moved outside visible client area
-                    showToolTip(row, refGrid().getMainWin().ClientToScreen(clientPos));
+                    showToolTip(row, static_cast<ColumnTypeMiddle>(colInfo->first), refGrid().getMainWin().ClientToScreen(clientPos));
             }
             else
                 onMouseLeave();
@@ -867,184 +874,231 @@ public:
         {
             if (highlight)
             {
-                refreshCell(refGrid(), highlight->row_, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE));
+                refreshCell(refGrid(), highlight->row_, static_cast<ColumnType>(COL_TYPE_CHECKBOX));
+                refreshCell(refGrid(), highlight->row_, static_cast<ColumnType>(COL_TYPE_SYNC_ACTION));
                 highlight.reset();
             }
             toolTip.hide(); //handle custom tooltip
         }
     }
 
-    void showSyncAction(bool value) { showSyncAction_ = value; }
+    void highlightSyncAction(bool value) { highlightSyncAction_ = value; }
 
 private:
     virtual wxString getValue(size_t row, ColumnType colType) const
     {
-        if (static_cast<ColumnTypeMiddle>(colType) == COL_TYPE_MIDDLE_VALUE)
-        {
-            if (const FileSystemObject* fsObj = getRawData(row))
-                return showSyncAction_ ? getSymbol(fsObj->getSyncOperation()) : getSymbol(fsObj->getCategory());
-        }
-        return wxEmptyString;
+        if (const FileSystemObject* fsObj = getRawData(row))
+            switch (static_cast<ColumnTypeMiddle>(colType))
+            {
+                case COL_TYPE_CHECKBOX:
+                    break;
+                case COL_TYPE_CMP_CATEGORY:
+                    return getSymbol(fsObj->getCategory());
+                case COL_TYPE_SYNC_ACTION:
+                    return getSymbol(fsObj->getSyncOperation());
+            }
+        return wxString();
     }
-
 
     virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus)
     {
-        drawCellBackground(dc, rect, enabled, selected, hasFocus, getBackGroundColor(row));
+        const FileSystemObject* fsObj = getRawData(row);
+        GridData::drawCellBackground(dc, rect, enabled, selected, hasFocus, highlightSyncAction_ ?
+                                     getBackGroundColorSyncAction(fsObj) :
+                                     getBackGroundColorCmpCategory(fsObj));
     }
 
     virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
     {
         switch (static_cast<ColumnTypeMiddle>(colType))
         {
-            case COL_TYPE_MIDDLE_VALUE:
-            {
+            case COL_TYPE_CHECKBOX:
                 if (const FileSystemObject* fsObj = getRawData(row))
                 {
-                    //wxRect rectInside = drawCellBorder(dc, rect);
                     wxRect rectInside = rect;
 
-                    rectInside.width -= CHECK_BOX_SPACE_LEFT;
-                    rectInside.x += CHECK_BOX_SPACE_LEFT;
-
-                    //draw checkbox
-                    wxRect checkBoxArea = rectInside;
-                    checkBoxArea.SetWidth(CHECK_BOX_IMAGE);
+                    //if sync action is shown draw notch on left side, right side otherwise
+                    if (notch.GetHeight() != rectInside.GetHeight())
+                        notch.Rescale(notch.GetWidth(), rectInside.GetHeight());
+                    if (highlightSyncAction_)
+                    {
+                        drawBitmapRtlMirror(dc, notch, rectInside, wxALIGN_LEFT, buffer);
+                        rectInside.x     += notch.GetWidth();
+                        rectInside.width -= notch.GetWidth();
+                    }
+                    else
+                    {
+                        //wxWidgets screws up again and has wxALIGN_RIGHT off by one pixel! -> use wxALIGN_LEFT instead
+                        wxRect rectNotch(rectInside.x + rectInside.width - notch.GetWidth(), rectInside.y,
+                                         notch.GetWidth(), rectInside.height);
+                        drawBitmapRtlMirror(dc, notch, rectNotch, wxALIGN_LEFT, buffer);
+                        rectInside.width -= notch.GetWidth();
+                    }
 
                     const bool          rowHighlighted = dragSelection ? row == dragSelection->first : highlight ? row == highlight->row_ : false;
                     const BlockPosition highlightBlock = dragSelection ? dragSelection->second       : highlight ? highlight->blockPos_ : BLOCKPOS_CHECK_BOX;
 
                     if (rowHighlighted && highlightBlock == BLOCKPOS_CHECK_BOX)
-                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrueFocus" : L"checkboxFalseFocus"), checkBoxArea, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrueFocus" : L"checkboxFalseFocus"), rectInside, wxALIGN_CENTER, buffer);
                     else //default
-                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrue"      : L"checkboxFalse"     ), checkBoxArea, wxALIGN_CENTER, buffer);
+                        drawBitmapRtlMirror(dc, getResourceImage(fsObj->isActive() ? L"checkboxTrue"      : L"checkboxFalse"     ), rectInside, wxALIGN_CENTER, buffer);
+                }
+                break;
 
-                    rectInside.width -= CHECK_BOX_IMAGE;
-                    rectInside.x += CHECK_BOX_IMAGE;
+            case COL_TYPE_CMP_CATEGORY:
+                if (const FileSystemObject* fsObj = getRawData(row))
+                {
+                    if (highlightSyncAction_)
+                        fillBackgroundDefaultColorAlternating(dc, rect, row % 2 == 0);
+
+                    const wxBitmap& cmpImg = getCmpResultImage(fsObj->getCategory());
+                    drawBitmapRtlMirror(dc, highlightSyncAction_ ? greyScale(cmpImg) : cmpImg, rect, wxALIGN_CENTER, buffer);
+                }
+                break;
+
+            case COL_TYPE_SYNC_ACTION:
+                if (const FileSystemObject* fsObj = getRawData(row))
+                {
+                    if (!highlightSyncAction_)
+                        fillBackgroundDefaultColorAlternating(dc, rect, row % 2 == 0);
+
+                    const bool          rowHighlighted = dragSelection ? row == dragSelection->first : highlight ? row == highlight->row_ : false;
+                    const BlockPosition highlightBlock = dragSelection ? dragSelection->second       : highlight ? highlight->blockPos_ : BLOCKPOS_CHECK_BOX;
 
                     //synchronization preview
-                    if (showSyncAction_)
+                    if (rowHighlighted && highlightBlock != BLOCKPOS_CHECK_BOX)
+                        switch (highlightBlock)
+                        {
+                            case BLOCKPOS_CHECK_BOX:
+                                break;
+                            case BLOCKPOS_LEFT:
+                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_LEFT)), rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
+                                break;
+                            case BLOCKPOS_MIDDLE:
+                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_NONE)), rect, wxALIGN_CENTER, buffer);
+                                break;
+                            case BLOCKPOS_RIGHT:
+                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_RIGHT)), rect, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, buffer);
+                                break;
+                        }
+                    else //default
                     {
-                        if (rowHighlighted && highlightBlock != BLOCKPOS_CHECK_BOX)
-                            switch (highlightBlock)
-                            {
-                                case BLOCKPOS_CHECK_BOX:
-                                    break;
-                                case BLOCKPOS_LEFT:
-                                    drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_LEFT)), rectInside, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
-                                    break;
-                                case BLOCKPOS_MIDDLE:
-                                    drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_NONE)), rectInside, wxALIGN_CENTER, buffer);
-                                    break;
-                                case BLOCKPOS_RIGHT:
-                                    drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_RIGHT)), rectInside, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, buffer);
-                                    break;
-                            }
-                        else //default
-                            drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->getSyncOperation()), rectInside, wxALIGN_CENTER, buffer);
+                        const wxBitmap& opImg = getSyncOpImage(fsObj->getSyncOperation());
+                        drawBitmapRtlMirror(dc, highlightSyncAction_ ? opImg : greyScale(opImg), rect, wxALIGN_CENTER, buffer);
                     }
-                    else //comparison results view
-                        drawBitmapRtlMirror(dc, getCmpResultImage(fsObj->getCategory()), rectInside, wxALIGN_CENTER, buffer);
                 }
-            }
-            break;
-            case COL_TYPE_BORDER:
-                clearArea(dc, rect, wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW));
                 break;
         }
     }
 
-    virtual wxString getColumnLabel(ColumnType colType) const { return wxEmptyString; }
+    virtual wxString getColumnLabel(ColumnType colType) const
+    {
+        switch (static_cast<ColumnTypeMiddle>(colType))
+        {
+            case COL_TYPE_CHECKBOX:
+                break;
+            case COL_TYPE_CMP_CATEGORY:
+                return _("Category");
+            case COL_TYPE_SYNC_ACTION:
+                return _("Action");
+        }
+        return wxEmptyString;
+    }
+
+    virtual wxString getToolTip(ColumnType colType) const { return getColumnLabel(colType); }
 
     virtual void renderColumnLabel(Grid& tree, wxDC& dc, const wxRect& rect, ColumnType colType, bool highlighted)
     {
         switch (static_cast<ColumnTypeMiddle>(colType))
         {
-            case COL_TYPE_MIDDLE_VALUE:
+            case COL_TYPE_CHECKBOX:
+                drawColumnLabelBackground(dc, rect, false);
+                break;
+
+            case COL_TYPE_CMP_CATEGORY:
             {
                 wxRect rectInside = drawColumnLabelBorder(dc, rect);
                 drawColumnLabelBackground(dc, rectInside, highlighted);
 
-                const wxBitmap& cmpIcon  = getResourceImage(L"compareSmall");
-                const wxBitmap& syncIcon = getResourceImage(L"syncSmall");
-
-                const int space = 8;
-                const int imageWidthTotal = cmpIcon.GetWidth() + space + syncIcon.GetWidth();
-
-                const int posX = (rectInside.GetWidth () - imageWidthTotal) / 2;
-                const int posY = (rectInside.GetHeight() - cmpIcon.GetHeight()) / 2;
-                assert(cmpIcon.GetHeight() == syncIcon.GetHeight());
-
-                dc.DrawBitmap(showSyncAction_ ? greyScale(cmpIcon) : cmpIcon, posX, posY, true);
-                dc.DrawBitmap(showSyncAction_ ? syncIcon : greyScale(syncIcon), posX + cmpIcon.GetWidth() + space, posY, true);
+                const wxBitmap& cmpIcon = getResourceImage(L"compareSmall");
+                drawBitmapRtlNoMirror(dc, highlightSyncAction_ ? greyScale(cmpIcon) : cmpIcon, rectInside, wxALIGN_CENTER, buffer);
             }
             break;
 
-            case COL_TYPE_BORDER:
-                drawCellBackground(dc, rect, true, false, true, wxSystemSettings::GetColour(wxSYS_COLOUR_3DSHADOW));
-                break;
+            case COL_TYPE_SYNC_ACTION:
+            {
+                wxRect rectInside = drawColumnLabelBorder(dc, rect);
+                drawColumnLabelBackground(dc, rectInside, highlighted);
+
+                const wxBitmap& syncIcon = getResourceImage(L"syncSmall");
+                drawBitmapRtlNoMirror(dc, highlightSyncAction_ ? syncIcon : greyScale(syncIcon), rectInside, wxALIGN_CENTER, buffer);
+            }
+            break;
         }
     }
 
-    wxColor getBackGroundColor(size_t row) const
+    static wxColor getBackGroundColorSyncAction(const FileSystemObject* fsObj)
     {
-        if (const FileSystemObject* fsObj = getRawData(row))
+        if (fsObj)
         {
             if (!fsObj->isActive())
                 return COLOR_NOT_ACTIVE;
-            else
+
+            switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
             {
-                if (showSyncAction_) //synchronization preview
-                {
-                    switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
-                    {
-                        case SO_DO_NOTHING:
-                            //return COLOR_NOT_ACTIVE;
-                        case SO_EQUAL:
-                            break; //usually white
+                case SO_DO_NOTHING:
+                    return COLOR_NOT_ACTIVE;
+                case SO_EQUAL:
+                    break; //usually white
 
-                        case SO_CREATE_NEW_LEFT:
-                        case SO_OVERWRITE_LEFT:
-                        case SO_DELETE_LEFT:
-                        case SO_MOVE_LEFT_SOURCE:
-                        case SO_MOVE_LEFT_TARGET:
-                        case SO_COPY_METADATA_TO_LEFT:
-                            return COLOR_SYNC_BLUE;
+                case SO_CREATE_NEW_LEFT:
+                case SO_OVERWRITE_LEFT:
+                case SO_DELETE_LEFT:
+                case SO_MOVE_LEFT_SOURCE:
+                case SO_MOVE_LEFT_TARGET:
+                case SO_COPY_METADATA_TO_LEFT:
+                    return COLOR_SYNC_BLUE;
 
-                        case SO_CREATE_NEW_RIGHT:
-                        case SO_OVERWRITE_RIGHT:
-                        case SO_DELETE_RIGHT:
-                        case SO_MOVE_RIGHT_SOURCE:
-                        case SO_MOVE_RIGHT_TARGET:
-                        case SO_COPY_METADATA_TO_RIGHT:
-                            return COLOR_SYNC_GREEN;
+                case SO_CREATE_NEW_RIGHT:
+                case SO_OVERWRITE_RIGHT:
+                case SO_DELETE_RIGHT:
+                case SO_MOVE_RIGHT_SOURCE:
+                case SO_MOVE_RIGHT_TARGET:
+                case SO_COPY_METADATA_TO_RIGHT:
+                    return COLOR_SYNC_GREEN;
 
-                        case SO_UNRESOLVED_CONFLICT:
-                            return COLOR_YELLOW;
-                    }
-                }
-                else //comparison results view
-                {
-                    switch (fsObj->getCategory())
-                    {
-                        case FILE_LEFT_SIDE_ONLY:
-                        case FILE_LEFT_NEWER:
-                            return COLOR_SYNC_BLUE; //COLOR_CMP_BLUE;
+                case SO_UNRESOLVED_CONFLICT:
+                    return COLOR_YELLOW;
+            }
+        }
+        return wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+    }
 
-                        case FILE_RIGHT_SIDE_ONLY:
-                        case FILE_RIGHT_NEWER:
-                            return COLOR_SYNC_GREEN; //COLOR_CMP_GREEN;
+    static wxColor getBackGroundColorCmpCategory(const FileSystemObject* fsObj)
+    {
+        if (fsObj)
+        {
+            if (!fsObj->isActive())
+                return COLOR_NOT_ACTIVE;
 
-                        case FILE_DIFFERENT:
-                            return COLOR_CMP_RED;
-                        case FILE_EQUAL:
-                            break; //usually white
-                        case FILE_CONFLICT:
-                        case FILE_DIFFERENT_METADATA: //= sub-category of equal, but hint via background that sync direction follows conflict-setting
-                            return COLOR_YELLOW;
-                            //return COLOR_YELLOW_LIGHT;
-                    }
-                }
+            switch (fsObj->getCategory())
+            {
+                case FILE_LEFT_SIDE_ONLY:
+                case FILE_LEFT_NEWER:
+                    return COLOR_SYNC_BLUE; //COLOR_CMP_BLUE;
+
+                case FILE_RIGHT_SIDE_ONLY:
+                case FILE_RIGHT_NEWER:
+                    return COLOR_SYNC_GREEN; //COLOR_CMP_GREEN;
+
+                case FILE_DIFFERENT:
+                    return COLOR_CMP_RED;
+                case FILE_EQUAL:
+                    break; //usually white
+                case FILE_CONFLICT:
+                case FILE_DIFFERENT_METADATA: //= sub-category of equal, but hint via background that sync direction follows conflict-setting
+                    return COLOR_YELLOW;
+                    //return COLOR_YELLOW_LIGHT;
             }
         }
         return wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
@@ -1058,44 +1112,60 @@ private:
         BLOCKPOS_RIGHT
     };
 
-    //determine blockposition within cell
-    BlockPosition mousePosToBlock(const wxPoint& clientPos, size_t row) const
+    //determine block position within cell
+    BlockPosition mousePosToBlock(const wxPoint& clientPos, size_t row, ColumnTypeMiddle colType) const
     {
-        const int absX = refGrid().CalcUnscrolledPosition(clientPos).x;
-
-        const wxRect rect = refGrid().getCellArea(row, static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE)); //returns empty rect if column not found; absolute coordinates!
-        if (rect.width > CHECK_BOX_WIDTH && rect.height > 0)
+        switch (static_cast<ColumnTypeMiddle>(colType))
         {
-            const FileSystemObject* const fsObj = getRawData(row);
-            if (fsObj && showSyncAction_ &&
-                fsObj->getSyncOperation() != SO_EQUAL) //in sync-preview equal files shall be treated as in cmp result, i.e. as full checkbox
+            case COL_TYPE_CHECKBOX:
+            case COL_TYPE_CMP_CATEGORY:
+                break;
+
+            case COL_TYPE_SYNC_ACTION:
             {
-                // cell:
-                //  ----------------------------------
-                // | checkbox | left | middle | right|
-                //  ----------------------------------
+                const int absX = refGrid().CalcUnscrolledPosition(clientPos).x;
 
-                const double blockWidth = (rect.GetWidth() - CHECK_BOX_WIDTH) / 3.0;
-                if (rect.GetX() + CHECK_BOX_WIDTH <= absX && absX < rect.GetX() + rect.GetWidth())
-                {
-                    if (absX < rect.GetX() + CHECK_BOX_WIDTH + blockWidth)
-                        return BLOCKPOS_LEFT;
-                    else if (absX < rect.GetX() + CHECK_BOX_WIDTH + 2 * blockWidth)
-                        return BLOCKPOS_MIDDLE;
-                    else
-                        return BLOCKPOS_RIGHT;
-                }
+                const wxRect rect = refGrid().getCellArea(row, static_cast<ColumnType>(COL_TYPE_SYNC_ACTION)); //returns empty rect if column not found; absolute coordinates!
+                if (rect.width > 0 && rect.height > 0)
+                    if (const FileSystemObject* const fsObj = getRawData(row))
+                        if (fsObj->getSyncOperation() != SO_EQUAL) //in sync-preview equal files shall be treated like a checkbox
+                            // cell:
+                            //  -----------------------
+                            // | left | middle | right|
+                            //  -----------------------
+                            if (rect.GetX() <= absX)
+                            {
+                                if (absX < rect.GetX() + rect.GetWidth() / 3)
+                                    return BLOCKPOS_LEFT;
+                                else if (absX < rect.GetX() + 2 * rect.GetWidth() / 3)
+                                    return BLOCKPOS_MIDDLE;
+                                else if  (absX < rect.GetX() + rect.GetWidth())
+                                    return BLOCKPOS_RIGHT;
+                            }
             }
-
+            break;
         }
         return BLOCKPOS_CHECK_BOX;
     }
 
-    void showToolTip(size_t row, wxPoint posScreen)
+    void showToolTip(size_t row, ColumnTypeMiddle colType, wxPoint posScreen)
     {
         if (const FileSystemObject* fsObj = getRawData(row))
         {
-            if (showSyncAction_) //synchronization preview
+            bool showTooltipSyncAction = true;
+            switch (colType)
+            {
+                case COL_TYPE_CHECKBOX:
+                    showTooltipSyncAction = highlightSyncAction_;
+                    break;
+                case COL_TYPE_CMP_CATEGORY:
+                    showTooltipSyncAction = false;
+                    break;
+                case COL_TYPE_SYNC_ACTION:
+                    break;
+            }
+
+            if (showTooltipSyncAction) //synchronization preview
             {
                 const wchar_t* imageName = [&]() -> const wchar_t*
                 {
@@ -1173,9 +1243,7 @@ private:
             toolTip.hide(); //if invalid row...
     }
 
-    virtual wxString getToolTip(ColumnType colType) const { return showSyncAction_ ? _("Action") + L" (F8)" : _("Category") + L" (F8)"; }
-
-    bool showSyncAction_;
+    bool highlightSyncAction_;
 
     struct MouseHighlight
     {
@@ -1184,9 +1252,10 @@ private:
         const BlockPosition blockPos_;
     };
     std::unique_ptr<MouseHighlight> highlight; //current mouse highlight
-    std::unique_ptr<std::pair<size_t, BlockPosition>> dragSelection; //(row, block)
+    std::unique_ptr<std::pair<size_t, BlockPosition>> dragSelection; //(row, block); area clicked when beginning selection
     std::unique_ptr<wxBitmap> buffer; //avoid costs of recreating this temporal variable
     Tooltip toolTip;
+    wxImage notch;
 };
 
 //########################################################################################################
@@ -1478,11 +1547,15 @@ void gridview::init(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, const std
     //gridLeft  .showScrollBars(Grid::SB_SHOW_AUTOMATIC, Grid::SB_SHOW_NEVER); -> redundant: configuration happens in GridEventManager::onAlignScrollBars()
     //gridCenter.showScrollBars(Grid::SB_SHOW_NEVER,     Grid::SB_SHOW_NEVER);
 
-    gridCenter.SetSize(60 /*+ 2 * 5*/, -1);
+    const int widthCategory = 30;
+    const int widthCheckbox = getResourceImage(L"checkboxTrue").GetWidth() + 4 + getResourceImage(L"notch").GetWidth();
+    const int widthAction   = 45;
+    gridCenter.SetSize(widthCategory + widthCheckbox + widthAction, -1);
+
     std::vector<Grid::ColumnAttribute> attribMiddle;
-    //attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_BORDER), 5, 0, true));
-    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_MIDDLE_VALUE), 60, 0, true));
-    //attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_BORDER), 5, 0, true));
+    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_CMP_CATEGORY), widthCategory, 0, true));
+    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_CHECKBOX    ), widthCheckbox, 0, true));
+    attribMiddle.push_back(Grid::ColumnAttribute(static_cast<ColumnType>(COL_TYPE_SYNC_ACTION ), widthAction,   0, true));
     gridCenter.setColumnConfig(attribMiddle);
 }
 
@@ -1629,10 +1702,10 @@ void gridview::setNavigationMarker(Grid& gridLeft,
 }
 
 
-void gridview::showSyncAction(Grid& gridCenter, bool value)
+void gridview::highlightSyncAction(Grid& gridCenter, bool value)
 {
     if (auto* provMiddle = dynamic_cast<GridDataMiddle*>(gridCenter.getDataProvider()))
-        provMiddle->showSyncAction(value);
+        provMiddle->highlightSyncAction(value);
     else
         assert(false);
 }

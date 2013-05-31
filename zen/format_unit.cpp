@@ -39,7 +39,7 @@ std::wstring zen::filesizeToShortString(Int64 size)
 
         wchar_t buffer[50];
 #ifdef __MINGW32__
-        int charsWritten =   ::_snwprintf(buffer, 50, L"%.*f", precisionDigits, sizeInUnit); //MinGW does not comply to the C standard here
+        int charsWritten =  ::_snwprintf(buffer, 50, L"%.*f", precisionDigits, sizeInUnit); //MinGW does not comply to the C standard here
 #else
         int charsWritten = std::swprintf(buffer, 50, L"%.*f", precisionDigits, sizeInUnit);
 #endif
@@ -148,7 +148,6 @@ std::wstring zen::remainingTimeToString(double timeInSec)
 
 std::wstring zen::fractionToString(double fraction)
 {
-    //return replaceCpy(_("%x%"), L"%x", printNumber<std::wstring>(L"%3.2f", fraction * 100.0), false);
     return printNumber<std::wstring>(L"%3.2f", fraction * 100.0) + L'%'; //no need to internationalize fraction!?
 }
 

@@ -20,13 +20,15 @@
 class GuiAbortProcess {};
 
 //classes handling sync and compare error as well as status information
+
+//CompareStatusHandler(CompareProgressDialog) will internally process Window messages! disable GUI controls to avoid unexpected callbacks!
 class CompareStatusHandler : private wxEvtHandler, public zen::StatusHandler //throw GuiAbortProcess
 {
 public:
     CompareStatusHandler(MainDialog& dlg);
     ~CompareStatusHandler();
 
-    virtual void initNewPhase     (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
+    virtual void initNewPhase(int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
     virtual void forceUiRefresh();
 
     virtual Response reportError(const std::wstring& text);
@@ -43,10 +45,11 @@ private:
 };
 
 
+//SyncStatusHandler(SyncProgressDialog) will internally process Window messages! disable GUI controls to avoid unexpected callbacks!
 class SyncStatusHandler : public zen::StatusHandler
 {
 public:
-    SyncStatusHandler(MainDialog* parentDlg,
+    SyncStatusHandler(wxTopLevelWindow* parentDlg,
                       size_t lastSyncsLogFileSizeMax,
                       xmlAccess::OnGuiError handleError,
                       const std::wstring& jobName,
@@ -54,7 +57,7 @@ public:
                       std::vector<std::wstring>& execFinishedHistory);
     ~SyncStatusHandler();
 
-    virtual void initNewPhase     (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
+    virtual void initNewPhase       (int objectsTotal, zen::Int64 dataTotal, Phase phaseID);
     virtual void updateProcessedData(int objectsDelta, zen::Int64 dataDelta);
     virtual void reportInfo(const std::wstring& text);
     virtual void forceUiRefresh();
@@ -65,9 +68,10 @@ public:
 
 private:
     virtual void abortThisProcess(); //throw GuiAbortProcess
+    void onProgressDialogTerminate();
 
-    MainDialog* parentDlg_;
-    SyncProgressDialog syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
+    wxTopLevelWindow* parentDlg_;
+    SyncProgressDialog* progressDlg; //managed to have shorter lifetime than this handler!
     const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnGuiError handleError_;
     zen::ErrorLog errorLog;

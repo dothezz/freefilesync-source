@@ -58,8 +58,8 @@ Zstring applyLongPathPrefixImpl(const Zstring& path)
     assert(!zen::isWhiteSpace(path[0]));
 
     if (path.length() >= maxPath || //maximum allowed path length without prefix is (MAX_PATH - 1)
-        endsWith(path, L' ')     || //by default all Win32 APIs trim trailing spaces and period, unless long path prefix is supplied!
-        endsWith(path, L'.'))       //
+        endsWith(path, L' ') || //by default all Win32 APIs trim trailing spaces and period, unless long path prefix is supplied!
+        endsWith(path, L'.'))   //note: adding long path prefix might screw up relative paths "." and ".."!
         if (!startsWith(path, LONG_PATH_PREFIX))
         {
             if (startsWith(path, L"\\\\")) //UNC-name, e.g. \\zenju-pc\Users

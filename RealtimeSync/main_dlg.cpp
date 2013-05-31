@@ -52,7 +52,7 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
 #endif
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-    SetIcon(GlobalResources::instance().programIcon); //set application icon
+    SetIcon(GlobalResources::instance().programIconRTS); //set application icon
 
     setRelativeFontSize(*m_buttonStart, 1.5);
     m_buttonStart->setInnerBorderSize(8);
@@ -115,6 +115,8 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     //drag and drop .ffs_real and .ffs_batch on main dialog
     setupFileDrop(*m_panelMain);
     m_panelMain->Connect(EVENT_DROP_FILE, FileDropEventHandler(MainDialog::onFilesDropped), nullptr, this);
+
+    timerForAsyncTasks.Connect(wxEVT_TIMER, wxEventHandler(MainDialog::onProcessAsyncTasks), nullptr, this);
 }
 
 
@@ -131,6 +133,15 @@ MainDialog::~MainDialog()
     {
         wxMessageBox(error.toString().c_str(), _("Error"), wxOK | wxICON_ERROR, this);
     }
+}
+
+
+void MainDialog::onProcessAsyncTasks(wxEvent& event)
+{
+    //schedule and run long-running tasks asynchronously
+    asyncTasks.evalResults(); //process results on GUI queue
+    if (asyncTasks.empty())
+        timerForAsyncTasks.Stop();
 }
 
 
@@ -423,20 +434,23 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
 }
 
 
-void MainDialog::removeAddFolder(int pos)
+void MainDialog::removeAddFolder(size_t pos)
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-    if (0 <= pos && pos < static_cast<int>(dirNamesExtra.size()))
+    if (pos < dirNamesExtra.size())
     {
         //remove folder pairs from window
-        DirectoryPanel* dirToDelete = dirNamesExtra[pos];
-        const int folderHeight = dirToDelete->GetSize().GetHeight();
+        DirectoryPanel* pairToDelete = dirNamesExtra[pos];
+        const int folderHeight = pairToDelete->GetSize().GetHeight();
 
-        bSizerFolders->Detach(dirToDelete); //Remove() does not work on Window*, so do it manually
-        dirToDelete->Destroy();                 //
+        bSizerFolders->Detach(pairToDelete); //Remove() does not work on Window*, so do it manually
         dirNamesExtra.erase(dirNamesExtra.begin() + pos); //remove last element in vector
-
+        //more (non-portable) wxWidgets bullshit: on OS X wxWindow::Destroy() screws up and calls "operator delete" directly rather than
+        //the deferred deletion it is expected to do (and which is implemented correctly on Windows and Linux)
+        //http://bb10.com/python-wxpython-devel/2012-09/msg00004.html
+        //=> since we're in a mouse button callback of a sub-component of "pairToDelete" we need to delay deletion ourselves:
+        processAsync2([] {}, [pairToDelete] { pairToDelete->Destroy(); });
 
         //set size of scrolled window
         const size_t additionalRows = std::min(dirNamesExtra.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown

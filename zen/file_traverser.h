@@ -22,17 +22,15 @@ struct TraverseCallback
 
     struct FileInfo
     {
-        UInt64 fileSize;        //unit: bytes!
-        Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
-        FileId id;              //optional: initial if not supported!
+        UInt64 fileSize;     //unit: bytes!
+        Int64 lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
+        FileId id;           //optional: initial if not supported!
         //std::unique_ptr<SymlinkInfo> symlinkInfo; //only filled if file is dereferenced symlink
     };
 
     struct SymlinkInfo
     {
-        Int64   lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
-        Zstring targetPath;       //optional: empty if something goes wrong
-        bool    dirLink;          //"true": point to dir; "false": point to file (or broken Link on Linux)
+        Int64 lastWriteTime; //number of seconds since Jan. 1st 1970 UTC
     };
 
     enum HandleLink
@@ -51,7 +49,8 @@ struct TraverseCallback
     /**/                onDir    (const Zchar* shortName, const Zstring& fullName) = 0;
     virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo&    details) = 0;
     virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) = 0;
-    virtual HandleError onError  (const std::wstring& msg) = 0;
+    virtual HandleError reportDirError (const std::wstring& msg) = 0; //failed directory traversal -> consider directory data as incomplete!
+    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) = 0; //failed to get single file/dir/symlink only!
 };
 
 
@@ -68,7 +67,7 @@ struct DstHackCallback; //DST hack not required on Unix
 //custom traverser with detail information about files
 //Win: client needs to handle duplicate file notifications! (FilePlusTraverser fallback)
 //directory may end with PATH_SEPARATOR
-void traverseFolder(const Zstring& directory, //throw()
+void traverseFolder(const Zstring& dirname, //throw()
                     TraverseCallback& sink,
                     DstHackCallback* dstCallback = nullptr); //apply DST hack if callback is supplied
 }

@@ -8,10 +8,10 @@
 #define FREEFILESYNCAPP_H
 
 #include <vector>
+#include <zen/zstring.h>
 #include <wx/app.h>
 //#include "lib/process_xml.h"
 #include "lib/return_codes.h"
-#include <zen/zstring.h>
 
 
 class Application : public wxApp
@@ -21,8 +21,8 @@ public:
 
 private:
     virtual bool OnInit();
+    virtual int  OnExit();
     virtual int  OnRun();
-    virtual int  OnExit() { return 0; }
     virtual bool OnExceptionInMainLoop() { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
 
 #ifdef FFS_MAC

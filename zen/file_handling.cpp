@@ -50,11 +50,11 @@ bool zen::fileExists(const Zstring& filename)
 {
     //symbolic links (broken or not) are also treated as existing files!
 #ifdef FFS_WIN
-    const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
-    return ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY) == 0; //returns true for (file-)symlinks also
+    const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
+    return attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0; //returns true for (file-)symlinks also
 
 #elif defined FFS_LINUX || defined FFS_MAC
-    struct stat fileInfo = {};
+    struct ::stat fileInfo = {};
     return ::lstat(filename.c_str(), &fileInfo) == 0 &&
            (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
 #endif
@@ -65,11 +65,11 @@ bool zen::dirExists(const Zstring& dirname)
 {
     //symbolic links (broken or not) are also treated as existing directories!
 #ifdef FFS_WIN
-    const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
-    return ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY) != 0; //returns true for (dir-)symlinks also
+    const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
+    return attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) != 0; //returns true for (dir-)symlinks also
 
 #elif defined FFS_LINUX || defined FFS_MAC
-    struct stat dirInfo = {};
+    struct ::stat dirInfo = {};
     return ::lstat(dirname.c_str(), &dirInfo) == 0 &&
            (S_ISLNK(dirInfo.st_mode) || S_ISDIR(dirInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
 #endif
@@ -89,7 +89,7 @@ bool zen::symlinkExists(const Zstring& linkname)
     return isSymlink(fileInfo);
 
 #elif defined FFS_LINUX || defined FFS_MAC
-    struct stat fileInfo = {};
+    struct ::stat fileInfo = {};
     return ::lstat(linkname.c_str(), &fileInfo) == 0 &&
            S_ISLNK(fileInfo.st_mode); //symbolic link
 #endif
@@ -99,12 +99,31 @@ bool zen::symlinkExists(const Zstring& linkname)
 bool zen::somethingExists(const Zstring& objname)
 {
 #ifdef FFS_WIN
-    const DWORD rv = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
-    return rv != INVALID_FILE_ATTRIBUTES || ::GetLastError() == ERROR_SHARING_VIOLATION; //"C:\pagefile.sys"
+    const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
+    return attr != INVALID_FILE_ATTRIBUTES || ::GetLastError() == ERROR_SHARING_VIOLATION; //"C:\pagefile.sys"
 
 #elif defined FFS_LINUX || defined FFS_MAC
-    struct stat fileInfo = {};
+    struct ::stat fileInfo = {};
     return ::lstat(objname.c_str(), &fileInfo) == 0;
+#endif
+}
+
+
+SymLinkType zen::getSymlinkType(const Zstring& linkname) //throw()
+{
+    assert(symlinkExists(linkname));
+#ifdef FFS_WIN
+    const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(linkname).c_str());
+    if (attr == INVALID_FILE_ATTRIBUTES)
+        return SYMLINK_TYPE_UNKNOWN;
+    return (attr & FILE_ATTRIBUTE_DIRECTORY) ? SYMLINK_TYPE_DIR : SYMLINK_TYPE_FILE;
+
+#elif defined FFS_LINUX || defined FFS_MAC
+    //S_ISDIR and S_ISLNK are mutually exclusive on Linux => explicitly need to follow link
+    struct ::stat fileInfo = {};
+    if (::stat(linkname.c_str(), &fileInfo) != 0)
+        return SYMLINK_TYPE_UNKNOWN;
+    return S_ISDIR(fileInfo.st_mode) ? SYMLINK_TYPE_DIR : SYMLINK_TYPE_FILE;
 #endif
 }
 
@@ -155,7 +174,6 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
                                           nullptr);
         if (hFile == INVALID_HANDLE_VALUE)
             throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
-
         ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
         BY_HANDLE_FILE_INFORMATION fileInfoHnd = {};
@@ -167,7 +185,7 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
     }
 
 #elif defined FFS_LINUX || defined FFS_MAC
-    struct stat fileInfo = {};
+    struct ::stat fileInfo = {};
 
     const int rv = procSl == SYMLINK_FOLLOW ?
                    :: stat(filename.c_str(), &fileInfo) :
@@ -575,34 +593,42 @@ class CollectFilesFlat : public zen::TraverseCallback
 {
 public:
     CollectFilesFlat(std::vector<Zstring>& files, std::vector<Zstring>& dirs) :
-        m_files(files),
-        m_dirs(dirs) {}
+        files_(files),
+        dirs_(dirs) {}
 
     virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
     {
-        m_files.push_back(fullName);
+        files_.push_back(fullName);
     }
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
     {
-        if (details.dirLink)
-            m_dirs.push_back(fullName);
-        else
-            m_files.push_back(fullName);
+        switch (getSymlinkType(fullName))
+        {
+            case SYMLINK_TYPE_DIR:
+                dirs_.push_back(shortName);
+                break;
+
+            case SYMLINK_TYPE_FILE:
+            case SYMLINK_TYPE_UNKNOWN:
+                files_.push_back(shortName);
+                break;
+        }
         return LINK_SKIP;
     }
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
     {
-        m_dirs.push_back(fullName);
+        dirs_.push_back(fullName);
         return nullptr; //DON'T traverse into subdirs; removeDirectory works recursively!
     }
-    virtual HandleError onError(const std::wstring& msg) { throw FileError(msg); }
+    virtual HandleError reportDirError (const std::wstring& msg)                         { throw FileError(msg); }
+    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { throw FileError(msg); }
 
 private:
     CollectFilesFlat(const CollectFilesFlat&);
     CollectFilesFlat& operator=(const CollectFilesFlat&);
 
-    std::vector<Zstring>& m_files;
-    std::vector<Zstring>& m_dirs;
+    std::vector<Zstring>& files_;
+    std::vector<Zstring>& dirs_;
 };
 
 
@@ -989,49 +1015,6 @@ bool zen::supportsPermissions(const Zstring& dirname) //throw FileError
 
 namespace
 {
-#ifdef FFS_WIN
-Zstring getSymlinkTargetPath(const Zstring& symlink) //throw FileError
-{
-    //open handle to target of symbolic link
-    const HANDLE hDir = ::CreateFile(applyLongPathPrefix(symlink).c_str(),
-                                     0,
-                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                     nullptr,
-                                     OPEN_EXISTING,
-                                     FILE_FLAG_BACKUP_SEMANTICS,  //needed to open a directory
-                                     nullptr);
-    if (hDir == INVALID_HANDLE_VALUE)
-        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(symlink)) + L"\n\n" + getLastErrorFormatted());
-    ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
-
-    //dynamically load windows API function
-    typedef DWORD (WINAPI* GetFinalPathNameByHandleWFunc)(HANDLE hFile,
-                                                          LPTSTR lpszFilePath,
-                                                          DWORD cchFilePath,
-                                                          DWORD dwFlags);
-    const SysDllFun<GetFinalPathNameByHandleWFunc> getFinalPathNameByHandle(L"kernel32.dll", "GetFinalPathNameByHandleW");
-    if (!getFinalPathNameByHandle)
-        throw FileError(replaceCpy(_("Cannot find system function %x."), L"%x", L"\"GetFinalPathNameByHandleW\""));
-
-    const DWORD BUFFER_SIZE = 10000;
-    std::vector<wchar_t> targetPath(BUFFER_SIZE);
-    const DWORD charsWritten = getFinalPathNameByHandle(hDir,                  //__in   HANDLE hFile,
-                                                        &targetPath[0],        //__out  LPTSTR lpszFilePath,
-                                                        BUFFER_SIZE,           //__in   DWORD cchFilePath,
-                                                        FILE_NAME_NORMALIZED); //__in   DWORD dwFlags
-    if (charsWritten >= BUFFER_SIZE || charsWritten == 0)
-    {
-        std::wstring errorMessage = replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(symlink));
-        if (charsWritten == 0)
-            errorMessage += L"\n\n" + getLastErrorFormatted();
-        throw FileError(errorMessage);
-    }
-
-    return Zstring(&targetPath[0], charsWritten);
-}
-#endif
-
-
 #ifdef HAVE_SELINUX
 //copy SELinux security context
 void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymlink procSl) //throw FileError
@@ -1086,9 +1069,9 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     //in contrast to ::SetSecurityInfo(), ::SetFileSecurity() seems to honor the "inherit DACL/SACL" flags
     //CAVEAT: if a file system does not support ACLs, GetFileSecurity() will return successfully with a *valid* security descriptor containing *no* ACL entries!
 
-    //NOTE: ::GetFileSecurity()/::SetFileSecurity() do NOT follow Symlinks!
-    const Zstring sourceResolved = procSl == SYMLINK_FOLLOW && symlinkExists(source) ? getSymlinkTargetPath(source) : source;
-    const Zstring targetResolved = procSl == SYMLINK_FOLLOW && symlinkExists(target) ? getSymlinkTargetPath(target) : target;
+    //NOTE: ::GetFileSecurity()/::SetFileSecurity() do NOT follow Symlinks! getResolvedFilePath() requires Vista or later!
+    const Zstring sourceResolved = procSl == SYMLINK_FOLLOW && symlinkExists(source) ? getResolvedFilePath(source) : source; //throw FileError
+    const Zstring targetResolved = procSl == SYMLINK_FOLLOW && symlinkExists(target) ? getResolvedFilePath(target) : target; //
 
     //setting privileges requires admin rights!
     try
@@ -1400,50 +1383,46 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
     if (!templateDir.empty())
     {
 #ifdef FFS_WIN
-        //try to copy file attributes
-        Zstring sourcePath;
-
-        if (symlinkExists(templateDir))
-            try
-            {
-                //get target directory of symbolic link
-                sourcePath = getSymlinkTargetPath(templateDir); //throw FileError
-            }
-            catch (FileError&) {} //dereferencing a symbolic link usually fails if it is located on network drive or client is XP: NOT really an error...
-        else
-            sourcePath = templateDir;
-
-        //*try* to copy file attributes
-        if (!sourcePath.empty())
+        //try to copy file attributes (dereference symlinks and junctions)
+        const HANDLE hDirSrc = ::CreateFile(zen::applyLongPathPrefix(templateDir).c_str(),
+                                            0,
+                                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                            nullptr,
+                                            OPEN_EXISTING,
+                                            FILE_FLAG_BACKUP_SEMANTICS /*needed to open a directory*/ /*| FILE_FLAG_OPEN_REPARSE_POINT -> no, we follow symlinks!*/ ,
+                                            nullptr);
+        if (hDirSrc != INVALID_HANDLE_VALUE) //dereferencing a symbolic link usually fails if it is located on network drive or client is XP: NOT really an error...
         {
-            const DWORD sourceAttr = ::GetFileAttributes(applyLongPathPrefix(sourcePath).c_str());
-            if (sourceAttr != INVALID_FILE_ATTRIBUTES)
+            ZEN_ON_SCOPE_EXIT(::CloseHandle(hDirSrc));
+
+            BY_HANDLE_FILE_INFORMATION dirInfo = {};
+            if (::GetFileInformationByHandle(hDirSrc, &dirInfo))
             {
-                ::SetFileAttributes(applyLongPathPrefix(directory).c_str(), sourceAttr);
+                ::SetFileAttributes(applyLongPathPrefix(directory).c_str(), dirInfo.dwFileAttributes);
                 //copy "read-only and system attributes": http://blogs.msdn.com/b/oldnewthing/archive/2003/09/30/55100.aspx
 
-                const bool isCompressed = (sourceAttr & FILE_ATTRIBUTE_COMPRESSED) != 0;
-                const bool isEncrypted  = (sourceAttr & FILE_ATTRIBUTE_ENCRYPTED)  != 0;
+                const bool isCompressed = (dirInfo.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0;
+                const bool isEncrypted  = (dirInfo.dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED)  != 0;
 
                 if (isEncrypted)
                     ::EncryptFile(directory.c_str()); //seems no long path is required (check passed!)
 
                 if (isCompressed)
                 {
-                    HANDLE hDir = ::CreateFile(applyLongPathPrefix(directory).c_str(),
-                                               GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
-                                               FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                               nullptr,
-                                               OPEN_EXISTING,
-                                               FILE_FLAG_BACKUP_SEMANTICS,
-                                               nullptr);
-                    if (hDir != INVALID_HANDLE_VALUE)
+                    HANDLE hDirTrg = ::CreateFile(applyLongPathPrefix(directory).c_str(),
+                                                  GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
+                                                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                                  nullptr,
+                                                  OPEN_EXISTING,
+                                                  FILE_FLAG_BACKUP_SEMANTICS,
+                                                  nullptr);
+                    if (hDirTrg != INVALID_HANDLE_VALUE)
                     {
-                        ZEN_ON_SCOPE_EXIT(::CloseHandle(hDir));
+                        ZEN_ON_SCOPE_EXIT(::CloseHandle(hDirTrg));
 
                         USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
                         DWORD bytesReturned = 0;
-                        ::DeviceIoControl(hDir,                  //handle to file or directory
+                        ::DeviceIoControl(hDirTrg,               //handle to file or directory
                                           FSCTL_SET_COMPRESSION, //dwIoControlCode
                                           &cmpState,             //input buffer
                                           sizeof(cmpState),      //size of input buffer
@@ -1470,19 +1449,19 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
 
 void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions) //throw FileError
 {
-    const Zstring linkPath = getSymlinkRawTargetString(sourceLink); //accept broken symlinks; throw FileError
+    const Zstring linkPath = getSymlinkTargetRaw(sourceLink); //throw FileError; accept broken symlinks
 
 #ifdef FFS_WIN
     const bool isDirLink = [&]() -> bool
     {
         const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(sourceLink).c_str());
-        return ret != INVALID_FILE_ATTRIBUTES && (ret& FILE_ATTRIBUTE_DIRECTORY);
+        return ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY);
     }();
 
     //dynamically load windows API function
     typedef BOOLEAN (WINAPI* CreateSymbolicLinkFunc)(LPCTSTR lpSymlinkFileName, LPCTSTR lpTargetFileName, DWORD dwFlags);
-
     const SysDllFun<CreateSymbolicLinkFunc> createSymbolicLink(L"kernel32.dll", "CreateSymbolicLinkW");
+
     if (!createSymbolicLink)
         throw FileError(replaceCpy(_("Cannot find system function %x."), L"%x", L"\"CreateSymbolicLinkW\""));
 
@@ -1492,8 +1471,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
 #elif defined FFS_LINUX || defined FFS_MAC
     if (::symlink(linkPath.c_str(), targetLink.c_str()) != 0)
 #endif
-        throw FileError(replaceCpy(replaceCpy(_("Cannot copy symbolic link %x to %y."), L"%x", L"\n" + fmtFileName(sourceLink)), L"%y", L"\n" + fmtFileName(targetLink)) +
-                        L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot create symbolic link %x."), L"%x", fmtFileName(targetLink)) + L"\n\n" + getLastErrorFormatted());
 
     //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist
     zen::ScopeGuard guardNewDir = zen::makeGuard([&]

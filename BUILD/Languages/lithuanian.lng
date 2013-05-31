@@ -113,16 +113,13 @@
 <target>Klaidos kodas %x:</target>
 
 <source>Cannot resolve symbolic link %x.</source>
-<target>Nepavyksta išspręsti simbolinės nuorodos.</target>
+<target></target>
 
-<source>%x MB</source>
-<target>%x MB</target>
+<source>Cannot determine final path for %x.</source>
+<target></target>
 
-<source>%x KB</source>
-<target>%x KB</target>
-
-<source>%x GB</source>
-<target>%x GB</target>
+<source>Cannot find system function %x.</source>
+<target>Nepavyksta rasti sistemos funkcijos %x.</target>
 
 <source>
 <pluralform>1 Byte</pluralform>
@@ -134,6 +131,15 @@
 <pluralform>%x Baitų</pluralform>
 <pluralform>%x Baitas</pluralform>
 </target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
 
 <source>Database file %x is incompatible.</source>
 <target>Duomenų bazė %x yra netinkama.</target>
@@ -163,16 +169,13 @@
 <target>Atsirado išimtis!</target>
 
 <source>Cannot read file attributes of %x.</source>
-<target>Nepavyksta nuskaityti failo atributų</target>
+<target></target>
 
 <source>Cannot get process information.</source>
 <target>Nepavyksta gauti eigos informacijos.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
 <target>Laikiama kol katalogas bus užrakintas (%x)...</target>
-
-<source>Creating file %x</source>
-<target>Kuriamas failas %x</target>
 
 <source>
 <pluralform>1 sec</pluralform>
@@ -185,14 +188,14 @@
 <pluralform>%x sek</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>Kuriamas failas %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Klaida trinant failą %x, eilė %y, stulpelis %z.</target>
 
 <source>Scanning:</source>
 <target>Skenuojama:</target>
-
-<source>Encoding extended time information: %x</source>
-<target>Koduojama išplėstinė laiko informacija: %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -204,6 +207,9 @@
 <pluralform>[%x Grėsmių]</pluralform>
 <pluralform>[%x Grėsmė]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>Koduojama išplėstinė laiko informacija: %x</target>
 
 <source>/sec</source>
 <target>/sek.</target>
@@ -417,11 +423,11 @@ Komanda inicijuojama jei:
 <source>Date:</source>
 <target>Data:</target>
 
-<source>Action</source>
-<target>Veiksmas</target>
-
 <source>Category</source>
 <target>Kategorija</target>
+
+<source>Action</source>
+<target>Veiksmas</target>
 
 <source>Drag && drop</source>
 <target>Vilkti ir numesti</target>
@@ -798,12 +804,6 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>&Find next</source>
 <target>&Rasti kitą</target>
 
-<source>Operation aborted!</source>
-<target>Operacija nutraukta!</target>
-
-<source>Main bar</source>
-<target>Pagrindinė juosta</target>
-
 <source>Folder pairs</source>
 <target>Aplankų poros</target>
 
@@ -812,6 +812,9 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Configuration</source>
 <target>Nustatymai</target>
+
+<source>Main bar</source>
+<target>Pagrindinė juosta</target>
 
 <source>Filter files</source>
 <target>Filtruoti failus</target>
@@ -827,6 +830,34 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Compare both sides</source>
 <target>Sulyginti abi puses</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 katalogas</pluralform>
+<pluralform>%x katalogai</pluralform>
+<pluralform>%x katalogų</pluralform>
+<pluralform>%x katalogas</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 failas</pluralform>
+<pluralform>%x failai</pluralform>
+<pluralform>%x failų</pluralform>
+<pluralform>%x failas</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target></target>
 
 <source>Set direction:</source>
 <target>Nustatyti kryptį:</target>
@@ -942,53 +973,20 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Set as default</source>
 <target>Nustatyti kaip numatytą</target>
 
+<source>Operation aborted!</source>
+<target>Operacija nutraukta!</target>
+
 <source>All folders are in sync!</source>
 <target>Visi aplankai susinchronizuoti!</target>
 
 <source>Comma separated list</source>
 <target>Kableliais atksirtas sąrašas</target>
 
-<source>Legend</source>
-<target>Legenda</target>
-
 <source>File list exported!</source>
 <target>Failų sąrašas eksportuotas!</target>
 
 <source>Searching for program updates...</source>
 <target>Ieškoma programos atnaujinimų...</target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>1 katalogas</pluralform>
-<pluralform>%x katalogai</pluralform>
-<pluralform>%x katalogų</pluralform>
-<pluralform>%x katalogas</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>1 failas</pluralform>
-<pluralform>%x failai</pluralform>
-<pluralform>%x failų</pluralform>
-<pluralform>%x failas</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x iš 1 eilės rodmenyje</pluralform>
-<pluralform>%x iš %y eilių rodmenyje</pluralform>
-<pluralform>%x iš %y eilių rodmenyje</pluralform>
-<pluralform>%x iš %y eilės rodmenyje</pluralform>
-</target>
 
 <source>Ignore further errors</source>
 <target>Ignoruoti tolimesnes klaidas</target>
@@ -1071,6 +1069,28 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Filter</source>
 <target>Filtras</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Ar tikrai norite perkelti šį elementą į šiukšliadėžę?</pluralform>
+<pluralform>Ar tikrai norite perkelti šiuos %x elementus į šiukšliadėžę?</pluralform>
+<pluralform>Ar tikrai norite perkelti šiuos %x elementų į šiukšliadėžę?</pluralform>
+<pluralform>Ar tikrai norite perkelti šį %x elementą į šiukšliadėžę?</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Ar tikrai norite ištrinti šį elementą?</pluralform>
+<pluralform>Ar tikrai norite ištrinti šiuos %x elementus?</pluralform>
+<pluralform>Ar tikrai norite ištrinti šiuos %x elementų?</pluralform>
+<pluralform>Ar tikrai norite ištrinti šį %x elementą?</pluralform>
+</target>
+
 <source>Direct</source>
 <target>Tiesiogiai</target>
 
@@ -1098,42 +1118,20 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>Ar vėl rodyti paslėptus perspėjimus ir langus?</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>Ar tikrai norite perkelti šį elementą į šiukšliadėžę?</pluralform>
-<pluralform>Ar tikrai norite perkelti šiuos %x elementus į šiukšliadėžę?</pluralform>
-<pluralform>Ar tikrai norite perkelti šiuos %x elementų į šiukšliadėžę?</pluralform>
-<pluralform>Ar tikrai norite perkelti šį %x elementą į šiukšliadėžę?</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Ar tikrai norite ištrinti šį elementą?</pluralform>
-<pluralform>Ar tikrai norite ištrinti šiuos %x elementus?</pluralform>
-<pluralform>Ar tikrai norite ištrinti šiuos %x elementų?</pluralform>
-<pluralform>Ar tikrai norite ištrinti šį %x elementą?</pluralform>
-</target>
-
 <source>Leave as unresolved conflict</source>
 <target>Palikti kaip neišpręstą konfliktą</target>
-
-<source>Time stamp</source>
-<target>Laiko žymė</target>
-
-<source>Append a timestamp to each file name</source>
-<target>Pridėti laiko žymę kiekvieno failo pavadinime</target>
 
 <source>Replace</source>
 <target>Pakeisti</target>
 
 <source>Move files and replace if existing</source>
 <target>Perkelti failus ir pakeisti jei egzistuoja</target>
+
+<source>Time stamp</source>
+<target>Laiko žymė</target>
+
+<source>Append a timestamp to each file name</source>
+<target>Pridėti laiko žymę kiekvieno failo pavadinime</target>
 
 <source>Folder</source>
 <target>Aplankas</target>
@@ -1146,6 +1144,9 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>Files</source>
 <target>Failai</target>
+
+<source>Items</source>
+<target></target>
 
 <source>Percentage</source>
 <target>Procentai</target>
@@ -1174,9 +1175,6 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Cannot write modification time of %x.</source>
 <target>Nepavyksta šrašyti pakeitimo datos %x.</target>
 
-<source>Cannot find system function %x.</source>
-<target>Nepavyksta rasti sistemos funkcijos %x.</target>
-
 <source>Cannot read security context of %x.</source>
 <target>Nepavyksta perskaityti %x saugumo konteksto.</target>
 
@@ -1192,8 +1190,8 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Cannot create directory %x.</source>
 <target>Nepavyksta sukurti katalogo %x.</target>
 
-<source>Cannot copy symbolic link %x to %y.</source>
-<target>Nepavyksta nukopijuoti simbolinės nuorodos %x į %y.</target>
+<source>Cannot create symbolic link %x.</source>
+<target></target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>Nepavyksta nukopijuoti failo %x į %y.</target>
@@ -1215,9 +1213,6 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1309,17 +1304,11 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Cannot find the following folders:</source>
 <target>Nepavyksta rasti šių aplankų:</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Galite ignoruoti šią klaidą, kad kiekvienas aplankas būtų laikomas tuščiu.</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target></target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Katalogai yra priklausomi! Būkite atsargūs nustatydami sinchronizavimo taisykles:</target>
-
-<source>Start comparison</source>
-<target>Pradėti palyginimą</target>
-
-<source>Calculating sync directions...</source>
-<target>Apskaičiuojamos sinchrinizacijos kryptys...</target>
 
 <source>Conflict detected:</source>
 <target>Aptiktas konfliktas:</target>
@@ -1333,17 +1322,20 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 <source>Items differ in attributes only</source>
 <target>Elementai skiriasi tik atributais</target>
 
-<source>Symbolic links %x have the same date but a different target.</source>
-<target>Simbolinės nuorodos %x turi tokią pačią datą bet skirtingus tikslus</target>
+<source>Resolving symbolic link %x</source>
+<target></target>
 
 <source>Comparing content of files %x</source>
 <target>Sulyginamas failų turinys %x</target>
 
-<source>Comparing files by content failed.</source>
-<target>Nepavyko failų sulyginimas pagal turinį.</target>
-
 <source>Generating file list...</source>
 <target>Generuojamas failų sąrašas...</target>
+
+<source>Start comparison</source>
+<target>Pradėti palyginimą</target>
+
+<source>Calculating sync directions...</source>
+<target>Apskaičiuojamos sinchrinizacijos kryptys...</target>
 
 <source>Both sides are equal</source>
 <target>Abi pusės yra lygios</target>
@@ -1449,12 +1441,6 @@ Pastaba: Failų pavadinimai privalo atitikti bazinius katalogus!
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Aplankas, kuris yra dalis keletos aplankų porų, bus pakeistas. Prašome peržiūrėti sinchronizavimo nustatymus.</target>
-
-<source>Left</source>
-<target>Kairė</target>
-
-<source>Right</source>
-<target>Dešinė</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Sinchrinizuojama aplankų pora:</target>

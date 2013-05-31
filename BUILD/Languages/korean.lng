@@ -115,6 +115,14 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>심볼릭 링크 %x 을(를) 해결할 수 없습니다.</target>
 
+<source>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</source>
+<target>
+<pluralform>%x 바이트</pluralform>
+</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -123,14 +131,6 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
-
-<source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-</source>
-<target>
-<pluralform>%x 바이트</pluralform>
-</target>
 
 <source>Database file %x is incompatible.</source>
 <target>데이터베이스 파일 %x 은(는) 호환 불가능합니다.</target>
@@ -168,9 +168,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>디렉토리 잠금 대기 중 (%x)...</target>
 
-<source>Creating file %x</source>
-<target>파일 %x 생성 중</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -179,14 +176,14 @@
 <pluralform>%x초</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>파일 %x 생성 중</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>분석 오류 - 파일: %x; 행: %y; 열: %z</target>
 
 <source>Scanning:</source>
 <target>스캔 :</target>
-
-<source>Encoding extended time information: %x</source>
-<target>인코딩 확장 시간 정보 : %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -195,6 +192,9 @@
 <target>
 <pluralform>[%x 스레드]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>인코딩 확장 시간 정보 : %x</target>
 
 <source>/sec</source>
 <target>/초</target>
@@ -819,6 +819,30 @@ Note: File names must be relative to base directories!
 <source>Compare both sides</source>
 <target>양측 비교</target>
 
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>%x개 디렉토리</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>%x개 파일</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>보기에 나타난 %x 행의 %y</pluralform>
+</target>
+
 <source>Set direction:</source>
 <target>방향 설정 :</target>
 
@@ -948,30 +972,6 @@ Note: File names must be relative to base directories!
 <source>Searching for program updates...</source>
 <target>프로그램 업데이트 검색 중...</target>
 
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>%x개 디렉토리</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>%x개 파일</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>보기에 나타난 %y개 행의 %x개 대상</pluralform>
-</target>
-
 <source>Ignore further errors</source>
 <target>더 이상의 오류는 무시</target>
 
@@ -1053,6 +1053,22 @@ Note: File names must be relative to base directories!
 <source>Filter</source>
 <target>필터</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>정말로 다음 %x 항목(들)을 휴지통으로 이동하시겠습니까?</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>정말로 다음 %x 항목(들)을 삭제하시겠습니까?</pluralform>
+</target>
+
 <source>Direct</source>
 <target>다이렉트</target>
 
@@ -1080,22 +1096,6 @@ Note: File names must be relative to base directories!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>숨겨진 경고 창 또는 대화 창을 다시 보이게 하시겠습니까?</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>정말로 다음 %x 항목(들)을 휴지통으로 이동하시겠습니까?</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>정말로 다음 %x 항목(들)을 삭제하시겠습니까?</pluralform>
-</target>
-
 <source>Leave as unresolved conflict</source>
 <target>미해결 충돌로 놔두기</target>
 
@@ -1122,6 +1122,9 @@ Note: File names must be relative to base directories!
 
 <source>Files</source>
 <target>파일</target>
+
+<source>Items</source>
+<target>항목</target>
 
 <source>Percentage</source>
 <target>백분율(%)</target>
@@ -1191,9 +1194,6 @@ Note: File names must be relative to base directories!
 
 <source>%x PB</source>
 <target>%x PB</target>
-
-<source>%x%</source>
-<target>%x%</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1276,8 +1276,8 @@ Note: File names must be relative to base directories!
 <source>Cannot find the following folders:</source>
 <target>다음 폴더를 찾을 수 없습니다 :</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>이 오류를 무시하고 각 폴더를 비어 있는 상태로 간주해도 무방합니다.</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>각 폴더를 비어있는 상태로 간주할 경우 이 오류는 무시될 수 있습니다. 폴더들은 동기화가 진행되는 동안 자동 생성됩니다.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>디렉토리가 의존 관계에 있습니다. 동기화 규칙 설정시 주의하십시오.</target>

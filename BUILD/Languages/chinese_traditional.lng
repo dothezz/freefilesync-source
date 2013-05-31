@@ -113,7 +113,15 @@
 <target>錯誤代碼 %x：</target>
 
 <source>Cannot resolve symbolic link %x.</source>
-<target>無法解析符號連結 %X。</target>
+<target>無法解析符號連結 %x。</target>
+
+<source>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</source>
+<target>
+<pluralform>%x 位元組</pluralform>
+</target>
 
 <source>%x MB</source>
 <target>%x MB</target>
@@ -123,14 +131,6 @@
 
 <source>%x GB</source>
 <target>%x GB</target>
-
-<source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-</source>
-<target>
-<pluralform>%x 位元組</pluralform>
-</target>
 
 <source>Database file %x is incompatible.</source>
 <target>資料庫檔案 %x 是不相容的。</target>
@@ -148,10 +148,10 @@
 <target>記憶體不足！</target>
 
 <source>Cannot write file %x.</source>
-<target>無法寫入檔案 %X。</target>
+<target>無法寫入檔案 %x。</target>
 
 <source>Cannot read file %x.</source>
-<target>無法讀取檔案 %X。</target>
+<target>無法讀取檔案 %x。</target>
 
 <source>Database files do not share a common session.</source>
 <target>資料庫檔案不會共享一個共同的連線。</target>
@@ -168,9 +168,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>等待同時目錄被鎖定(%x)...</target>
 
-<source>Creating file %x</source>
-<target>正在新建檔案 %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -179,14 +176,14 @@
 <pluralform>%x 秒</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>正在新建檔案 %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>解析 %x 檔案，第 %y 列，第 %z 行出現錯誤。</target>
 
 <source>Scanning:</source>
 <target>正在掃瞄：</target>
-
-<source>Encoding extended time information: %x</source>
-<target>編碼延長時間資訊：%x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -195,6 +192,9 @@
 <target>
 <pluralform>[%x 個執行緒]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>編碼延長時間資訊：%x</target>
 
 <source>/sec</source>
 <target>/秒</target>
@@ -367,7 +367,7 @@ The command is triggered if:
 <target>無法連接到sourceforge.net！</target>
 
 <source>Current FreeFileSync version number was not found online! Do you want to check manually?</source>
-<target>目前連線未找到FreeFileSync版號！是否要手動檢查？</target>
+<target>目前連線找不到FreeFileSync版號！是否要手動檢查？</target>
 
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
 <target>要每週自動檢查更新FreeFileSync嗎？</target>
@@ -439,7 +439,7 @@ The command is triggered if:
 <target>儲存(&S)</target>
 
 <source>Save as &batch job...</source>
-<target>另存為批次處理作業(&B)</target>
+<target>另存為批次處理作業(&b)</target>
 
 <source>1. &Compare</source>
 <target>1. 比對(&C)</target>
@@ -493,7 +493,7 @@ The command is triggered if:
 <target>將被新建的檔案和資料夾數量</target>
 
 <source>Number of files that will be overwritten</source>
-<target>一些檔案和目錄將被覆蓋</target>
+<target>一些檔案和目錄會被覆蓋</target>
 
 <source>Number of files and folders that will be deleted</source>
 <target>將被刪除的檔案和資料夾數量</target>
@@ -780,9 +780,6 @@ Note: File names must be relative to base directories!
 <source>&Find next</source>
 <target>找下一個(&F)</target>
 
-<source>Operation aborted!</source>
-<target>操作已中止！</target>
-
 <source>Main bar</source>
 <target>主欄位</target>
 
@@ -809,6 +806,30 @@ Note: File names must be relative to base directories!
 
 <source>Compare both sides</source>
 <target>比對兩邊</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>%x 個目錄</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>%x 個檔案</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>視圖中的第 %x 列中的第 %y 列</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>設定方向：</target>
@@ -924,6 +945,9 @@ Note: File names must be relative to base directories!
 <source>Set as default</source>
 <target>設為預設值</target>
 
+<source>Operation aborted!</source>
+<target>操作已中止！</target>
+
 <source>All folders are in sync!</source>
 <target>所有資料夾都是同步的！</target>
 
@@ -938,30 +962,6 @@ Note: File names must be relative to base directories!
 
 <source>Searching for program updates...</source>
 <target>正在搜尋程式更新...</target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>%x 個目錄</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>%x 個檔案</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>檢視中的 %x 之 %y 列</pluralform>
-</target>
 
 <source>Ignore further errors</source>
 <target>忽略進一步錯誤</target>
@@ -1044,6 +1044,22 @@ Note: File names must be relative to base directories!
 <source>Filter</source>
 <target>篩選器</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>您確定要將下列 %x 項目移動到資源回收筒嗎？</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>您確定要將下列 %x 項目刪除嗎？</pluralform>
+</target>
+
 <source>Direct</source>
 <target>直接</target>
 
@@ -1071,22 +1087,6 @@ Note: File names must be relative to base directories!
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>使隱藏的警告和對話框再次可見？</target>
 
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>您確定要將下列 %x 項目移動到資源回收筒嗎？</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>您確定要將下列 %x 項目刪除嗎？</pluralform>
-</target>
-
 <source>Leave as unresolved conflict</source>
 <target>保留給未解決的衝突</target>
 
@@ -1113,6 +1113,9 @@ Note: File names must be relative to base directories!
 
 <source>Files</source>
 <target>檔案</target>
+
+<source>Items</source>
+<target>項目</target>
 
 <source>Percentage</source>
 <target>百分比</target>
@@ -1183,9 +1186,6 @@ Note: File names must be relative to base directories!
 <source>%x PB</source>
 <target>%x PB</target>
 
-<source>%x%</source>
-<target>%x%</target>
-
 <source>
 <pluralform>1 min</pluralform>
 <pluralform>%x min</pluralform>
@@ -1217,7 +1217,7 @@ Note: File names must be relative to base directories!
 <target>中止系統睡眠模式失敗。</target>
 
 <source>Cannot change process I/O priorities.</source>
-<target>無法更改 I/O 處理優先順序。</target>
+<target>無法更改I/O處理優先順序。</target>
 
 <source>Unable to move %x to the Recycle Bin!</source>
 <target>無法將 %x 移動到資源回收筒！</target>
@@ -1232,7 +1232,7 @@ Note: File names must be relative to base directories!
 <target>自上次同步以來都沒有變更！</target>
 
 <source>The corresponding database entries are not in sync considering current settings.</source>
-<target>相應的資料庫條目在同步時，不考慮到目前的設定。</target>
+<target>相應的資料庫條目在同步時，不會考慮到目前的設定。</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>設定預設同步方向：舊檔案會被較新的檔案覆蓋。</target>
@@ -1267,8 +1267,8 @@ Note: File names must be relative to base directories!
 <source>Cannot find the following folders:</source>
 <target>找不到下列資料夾：</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>您可以忽略將每個資料夾視為空的錯誤。</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>您可以忽略每個資料夾視為空的錯誤。資料夾會在同步過程中自動新建。</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>目錄有依靠性！請小心設定同步規則：</target>
@@ -1394,7 +1394,7 @@ Note: File names must be relative to base directories!
 <target>檢測到顯著的差異：</target>
 
 <source>More than 50% of the total number of files will be copied or deleted!</source>
-<target>超過總數 50% 以上的檔案將被複製或刪除！</target>
+<target>超過總數 50% 以上的檔案會被複製或刪除！</target>
 
 <source>Not enough free disk space available in:</source>
 <target>沒有足夠的可用空間：</target>
@@ -1407,12 +1407,6 @@ Note: File names must be relative to base directories!
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>一個將被修改的資料夾，是多個配對資料夾的一部分。請檢查同步設定。</target>
-
-<source>Left</source>
-<target>左邊</target>
-
-<source>Right</source>
-<target>右邊</target>
 
 <source>Synchronizing folder pair:</source>
 <target>同步配對資料夾：</target>

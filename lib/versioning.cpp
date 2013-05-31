@@ -205,10 +205,17 @@ private:
 
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
     {
-        if (details.dirLink)
-            dirs_.push_back(shortName);
-        else
-            files_.push_back(shortName);
+        switch (getSymlinkType(fullName))
+        {
+            case SYMLINK_TYPE_DIR:
+                dirs_.push_back(shortName);
+                break;
+
+            case SYMLINK_TYPE_FILE:
+            case SYMLINK_TYPE_UNKNOWN:
+                files_.push_back(shortName);
+                break;
+        }
         return LINK_SKIP;
     }
 
@@ -218,7 +225,8 @@ private:
         return nullptr; //DON'T traverse into subdirs; moveDirectory works recursively!
     }
 
-    virtual HandleError onError(const std::wstring& msg) { throw FileError(msg); }
+    virtual HandleError reportDirError (const std::wstring& msg)                         { throw FileError(msg); }
+    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { throw FileError(msg); }
 
     std::vector<Zstring>& files_;
     std::vector<Zstring>& dirs_;
@@ -286,7 +294,7 @@ void FileVersioner::revisionDirImpl(const Zstring& sourceDir, const Zstring& rel
     assert(somethingExists(sourceDir)); //[!]
 
     //create target
-    if (symlinkExists(sourceDir)) //on Linux there is just one type of symlinks, and since we do revision file symlinks, we should revision dir symlinks as well!
+    if (symlinkExists(sourceDir)) //on Linux there is just one type of symlink, and since we do revision file symlinks, we should revision dir symlinks as well!
     {
         moveItemToVersioning(sourceDir, //throw FileError
                              relativeName,
@@ -355,7 +363,8 @@ private:
     virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details) { files_.push_back(shortName); updateUI_(); }
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { files_.push_back(shortName); updateUI_(); return LINK_SKIP; }
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName) { updateUI_(); return nullptr; } //DON'T traverse into subdirs
-    virtual HandleError onError(const std::wstring& msg) { throw FileError(msg); }
+    virtual HandleError reportDirError (const std::wstring& msg)                         { throw FileError(msg); }
+    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { throw FileError(msg); }
 
     std::vector<Zstring>& files_;
     std::function<void()> updateUI_;

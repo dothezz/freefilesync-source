@@ -134,16 +134,16 @@ MM_LIST+=lib/osx_file_icon.mm
 endif
 
 #list of all *.o files
-OBJECT_LIST =  $(CPP_LIST:%.cpp=OBJ/FFS_Release_GCC_Make/%.o)
-OBJECT_LIST += $(MM_LIST:%.mm=OBJ/FFS_Release_GCC_Make/%.mm.o)
+OBJECT_LIST =  $(CPP_LIST:%.cpp=OBJ/FFS_GCC_Make_Release/%.o)
+OBJECT_LIST += $(MM_LIST:%.mm=OBJ/FFS_GCC_Make_Release/%.mm.o)
 
 all: FreeFileSync
 
-OBJ/FFS_Release_GCC_Make/%.mm.o : %.mm
+OBJ/FFS_GCC_Make_Release/%.mm.o : %.mm
 	mkdir -p $(dir $@)
 	$(COMPILER_BIN) $(CXXFLAGS) -c $< -o $@
 
-OBJ/FFS_Release_GCC_Make/%.o : %.cpp
+OBJ/FFS_GCC_Make_Release/%.o : %.cpp
 	mkdir -p $(dir $@)
 	$(COMPILER_BIN) $(CXXFLAGS) -c $< -o $@
 
@@ -151,7 +151,7 @@ FreeFileSync: $(OBJECT_LIST)
 	$(COMPILER_BIN) -o ./BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:
-	rm -rf OBJ/FFS_Release_GCC_Make
+	rm -rf OBJ/FFS_GCC_Make_Release
 	rm -f BUILD/$(APPNAME)
 	rm -f wx+/pch.h.gch
 
@@ -162,7 +162,6 @@ install:
 	mkdir -p $(APPSHAREDIR)
 	cp -R BUILD/Languages/ \
 	BUILD/Help/ \
-	BUILD/Compare_Complete.wav \
 	BUILD/Sync_Complete.wav \
 	BUILD/Resources.zip \
 	BUILD/styles.gtk_rc \

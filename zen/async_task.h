@@ -11,6 +11,7 @@
 #include <functional>
 #include <zen/thread.h>
 #include <zen/scope_guard.h>
+//#include "type_tools.h"
 
 namespace zen
 {
@@ -34,7 +35,7 @@ public:
     }
 
     template <class Fun, class Fun2>
-    void add2(Fun doAsync, Fun2 evalOnGui) //for doAsync returning void
+    void add2(Fun doAsync, Fun2 evalOnGui) //for evalOnGui taking no parameters
     {
         tasks.push_back(zen::async([=]() -> std::function<void()> { doAsync(); return [=]{ evalOnGui(); }; }));
     }
@@ -64,7 +65,6 @@ private:
     bool inRecursion;
     std::list<boost::unique_future<std::function<void()>>> tasks;
 };
-
 }
 
 #endif //ASYNC_JOB_839147839170432143214321

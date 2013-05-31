@@ -20,7 +20,7 @@ public:
     const wxBitmap& getImage(const wxString& name) const;
 
     //image resource objects
-    wxIcon programIcon;
+    wxIcon programIconRTS;
 
 private:
     GlobalResources();

@@ -76,16 +76,17 @@ std::wstring generateLogHeader(const SummaryInfo& s)
 
     results.push_back(tabSpace + _("Total time:") + L" " + copyStringTo<std::wstring>(wxTimeSpan::Seconds(s.totalTime).Format()));
 
-    //calculate max width, this considers UTF-16 only, not true Unicode...
+    //calculate max width, this considers UTF-16 only, not true Unicode...but maybe good idea? those 2-char-UTF16 codes are usually wider than fixed width chars anyway!
     size_t sepLineLen = 0;
     std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { sepLineLen = std::max(sepLineLen, str.size()); });
 
-    for (size_t i = 0; i < sepLineLen; ++i) output += L'_'; //this considers UTF-16 only, not true Unicode!!!
+    output.resize(output.size() + sepLineLen + 1, L'_');
     output += L'\n';
 
-    std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { output += str; output += L'\n'; });
+    std::for_each(results.begin(), results.end(), [&](const std::wstring& str) { output += L'|'; output += str; output += L'\n'; });
 
-    for (size_t i = 0; i < sepLineLen; ++i) output += L'_';
+    output += L'|';
+    output.resize(output.size() + sepLineLen, L'_');
     output += L'\n';
 
     return output;

@@ -20,7 +20,7 @@ struct CompileTimeReminder : public FSObjectVisitor
     virtual void visit(const FileMapping&    fileObj) {}
     virtual void visit(const SymLinkMapping& linkObj) {}
     virtual void visit(const DirMapping&     dirObj ) {}
-} checkDymanicCasts; //just a compile-time reminder to check dynamic casts in this file
+} checkDymanicCasts; //just a compile-time reminder to manually check dynamic casts in this file when needed
 }
 
 inline

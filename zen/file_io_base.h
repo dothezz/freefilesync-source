@@ -21,8 +21,8 @@ protected:
     ~FileBase() {}
 
 private:
-    FileBase(const FileBase&);
-    FileBase& operator=(const FileBase&);
+    FileBase(const FileBase&);            //=delete
+    FileBase& operator=(const FileBase&); //
 
     const Zstring filename_;
 };

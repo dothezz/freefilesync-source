@@ -20,7 +20,8 @@ namespace
 //directory existence checking may hang for non-existent network drives => run asynchronously and update UI!
 //- check existence of all directories in parallel! (avoid adding up search times if multiple network drives are not reachable)
 //- add reasonable time-out time!
-std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::vector<Zstring>& dirnames, bool allowUserInteraction, ProcessCallback& procCallback)
+//- avoid checking duplicate entries by design: set<Zstring, LessFilename>
+std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::set<Zstring, LessFilename>& dirnames, bool allowUserInteraction, ProcessCallback& procCallback)
 {
     using namespace zen;
 
@@ -64,8 +65,8 @@ std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::vector<Zstrin
 inline //also silences Clang "unused function" for compilation units depending from getExistingDirsUpdating() only
 bool dirExistsUpdating(const Zstring& dirname, bool allowUserInteraction, ProcessCallback& procCallback)
 {
-    std::vector<Zstring> dirnames;
-    dirnames.push_back(dirname);
+    std::set<Zstring, LessFilename> dirnames;
+    dirnames.insert(dirname);
     std::set<Zstring, LessFilename> dirsEx = getExistingDirsUpdating(dirnames, allowUserInteraction, procCallback);
     return dirsEx.find(dirname) != dirsEx.end();
 }

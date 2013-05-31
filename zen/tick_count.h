@@ -129,7 +129,7 @@ std::int64_t ticksPerSec() //return 0 on error
 
 
 inline
-TickVal getTicks() //return 0 on error
+TickVal getTicks() //return !isValid() on error
 {
 #ifdef FFS_WIN
     LARGE_INTEGER now = {};

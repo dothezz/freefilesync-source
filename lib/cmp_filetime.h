@@ -11,9 +11,9 @@ inline
 bool sameFileTime(const Int64& a, const Int64& b, size_t tolerance)
 {
     if (a < b)
-        return b <= a + static_cast<int>(tolerance);
+        return b <= a + static_cast<ptrdiff_t>(tolerance);
     else
-        return a <= b + static_cast<int>(tolerance);
+        return a <= b + static_cast<ptrdiff_t>(tolerance);
 }
 //---------------------------------------------------------------------------------------------------------------
 

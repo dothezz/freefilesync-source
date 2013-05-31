@@ -86,6 +86,7 @@ struct BinStreamIn //throw UnexpectedEndOfStreamError
 
     const void* requestRead(size_t len) //throw UnexpectedEndOfStreamError
     {
+        if (len == 0) return nullptr; //don't allow for possibility to access empty buffer
         if (pos + len > buffer.size())
             throw UnexpectedEndOfStreamError();
         size_t oldPos = pos;
@@ -102,8 +103,9 @@ struct BinStreamOut
 {
     void* requestWrite(size_t len)
     {
-        size_t oldSize = buffer.size();
-        buffer.resize(buffer.size() + len);
+        if (len == 0) return nullptr; //don't allow for possibility to access empty buffer
+        const size_t oldSize = buffer.size();
+        buffer.resize(oldSize + len);
         return &*buffer.begin() + oldSize;
     }
 

@@ -7,11 +7,12 @@
 #ifndef PROGRESSINDICATOR_H_INCLUDED
 #define PROGRESSINDICATOR_H_INCLUDED
 
+#include <functional>
 #include <zen/error_log.h>
-#include <zen/zstring.h>
+//#include <zen/zstring.h>
 #include <wx/toplevel.h>
 #include "../lib/status_handler.h"
-#include "main_dlg.h"
+//#include "main_dlg.h"
 
 
 class CompareProgressDialog
@@ -33,30 +34,10 @@ private:
 };
 
 
-class SyncProgressDialog
+//SyncStatusHandler will internally process Window messages => disable GUI controls to avoid unexpected callbacks!
+
+struct SyncProgressDialog
 {
-public:
-    SyncProgressDialog(zen::AbortCallback& abortCb,
-                       const zen::Statistics& syncStat,
-                       MainDialog* parentWindow, //may be nullptr
-                       bool showProgress,
-                       const wxString& jobName,
-                       const std::wstring& execWhenFinished,
-                       std::vector<std::wstring>& execFinishedHistory); //changing parameter!
-    ~SyncProgressDialog();
-
-    wxWindow* getAsWindow(); //convenience! don't abuse!
-
-    void initNewPhase(); //call after "StatusHandler::initNewPhase"
-
-    void notifyProgressChange(); //throw (), required by graph!
-    void updateGui();
-
-    std::wstring getExecWhenFinishedCommand() const; //final value (after possible user modification)
-
-    void stopTimer();   //halt all internal counters!
-    void resumeTimer(); //
-
     enum SyncResult
     {
         RESULT_ABORTED,
@@ -64,15 +45,38 @@ public:
         RESULT_FINISHED_WITH_WARNINGS,
         RESULT_FINISHED_WITH_SUCCESS
     };
-    //essential to call one of these two methods in StatusUpdater derived class destructor at the LATEST(!)
+    //essential to call one of these two methods in StatusUpdater derived class' destructor at the LATEST(!)
     //to prevent access to callback to updater (e.g. request abort)
-    void processHasFinished(SyncResult resultId, const zen::ErrorLog& log); //sync finished, still dialog may live on
-    void closeWindowDirectly(); //don't wait for user
+    virtual void processHasFinished(SyncResult resultId, const zen::ErrorLog& log) = 0; //sync finished, still dialog may live on
+    virtual void closeWindowDirectly() = 0; //don't wait for user
 
-private:
-    class Pimpl;
-    Pimpl* const pimpl;
+    //---------------------------------------------------------------------------
+
+    virtual wxWindow* getAsWindow() = 0; //convenience! don't abuse!
+
+    virtual void initNewPhase() = 0; //call after "StatusHandler::initNewPhase"
+    virtual void notifyProgressChange() = 0; //throw (), required by graph!
+    virtual void updateGui() = 0; //update GUI and process Window messages
+
+    virtual std::wstring getExecWhenFinishedCommand() const = 0; //final value (after possible user modification)
+
+    virtual void stopTimer() = 0;   //halt all internal timers!
+    virtual void resumeTimer() = 0; //
+
+protected:
+    ~SyncProgressDialog() {}
 };
+
+
+SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
+                                         const std::function<void()>& notifyWindowTerminate, //note: user closing window cannot be prevented on OS X! (And neither on Windows during system shutdown!)
+                                         const zen::Statistics& syncStat,
+                                         wxTopLevelWindow* parentWindow, //may be nullptr
+                                         bool showProgress,
+                                         const wxString& jobName,
+                                         const std::wstring& execWhenFinished,
+                                         std::vector<std::wstring>& execFinishedHistory); //changing parameter!
+//DON'T delete the pointer! it will be deleted by the user clicking "OK/Cancel"/wxWindow::Destroy() after processHasFinished() or closeWindowDirectly()
 
 
 class PauseTimers

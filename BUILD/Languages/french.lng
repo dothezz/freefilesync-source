@@ -115,15 +115,6 @@
 <source>Cannot resolve symbolic link %x.</source>
 <target>Impossible de résoudre le lien symbolique %x.</target>
 
-<source>%x MB</source>
-<target>%x Mo</target>
-
-<source>%x KB</source>
-<target>%x Ko</target>
-
-<source>%x GB</source>
-<target>%x Go</target>
-
 <source>
 <pluralform>1 Byte</pluralform>
 <pluralform>%x Bytes</pluralform>
@@ -132,6 +123,15 @@
 <pluralform>%x octet</pluralform>
 <pluralform>%x octets</pluralform>
 </target>
+
+<source>%x MB</source>
+<target>%x Mo</target>
+
+<source>%x KB</source>
+<target>%x Ko</target>
+
+<source>%x GB</source>
+<target>%x Go</target>
 
 <source>Database file %x is incompatible.</source>
 <target>La base de données %x n'est pas compatible.</target>
@@ -169,9 +169,6 @@
 <source>Waiting while directory is locked (%x)...</source>
 <target>En attente tant que le répertoire est verrouillé (%x)...</target>
 
-<source>Creating file %x</source>
-<target>Création du fichier %x</target>
-
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
@@ -181,14 +178,14 @@
 <pluralform>%x sec</pluralform>
 </target>
 
+<source>Creating file %x</source>
+<target>Création du fichier %x</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Erreur lors de l'analyse du fichier %x, ligne %y, colonne %z.</target>
 
 <source>Scanning:</source>
 <target>Lecture en cours :</target>
-
-<source>Encoding extended time information: %x</source>
-<target>Codage de l'heure au format étendu : %x</target>
 
 <source>
 <pluralform>[1 Thread]</pluralform>
@@ -198,6 +195,9 @@
 <pluralform>[%x Tâche]</pluralform>
 <pluralform>[%x Tâches]</pluralform>
 </target>
+
+<source>Encoding extended time information: %x</source>
+<target>Codage de l'heure au format étendu : %x</target>
 
 <source>/sec</source>
 <target>/sec</target>
@@ -792,9 +792,6 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 <source>&Find next</source>
 <target>&Chercher le suivant</target>
 
-<source>Operation aborted!</source>
-<target>Opération abandonnée !</target>
-
 <source>Main bar</source>
 <target>Barre principale</target>
 
@@ -821,6 +818,33 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 
 <source>Compare both sides</source>
 <target>Comparer les deux listes</target>
+
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>%x répertoire</pluralform>
+<pluralform>%x répertoires</pluralform>
+</target>
+
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>%x fichier</pluralform>
+<pluralform>%x fichiers</pluralform>
+</target>
+
+<source>
+<pluralform>%y of 1 row in view</pluralform>
+<pluralform>%y of %x rows in view</pluralform>
+</source>
+<target>
+<pluralform>vue de %y ligne sur %x</pluralform>
+<pluralform>vue de %y lignes sur %x</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>Choix de la direction :</target>
@@ -936,6 +960,9 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 <source>Set as default</source>
 <target>Définir par défaut</target>
 
+<source>Operation aborted!</source>
+<target>Opération abandonnée !</target>
+
 <source>All folders are in sync!</source>
 <target>Tous les dossiers sont synchronisés !</target>
 
@@ -950,33 +977,6 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 
 <source>Searching for program updates...</source>
 <target>Recherche de mises à jour ...</target>
-
-<source>
-<pluralform>1 directory</pluralform>
-<pluralform>%x directories</pluralform>
-</source>
-<target>
-<pluralform>%x répertoire</pluralform>
-<pluralform>%x répertoires</pluralform>
-</target>
-
-<source>
-<pluralform>1 file</pluralform>
-<pluralform>%x files</pluralform>
-</source>
-<target>
-<pluralform>%x fichier</pluralform>
-<pluralform>%x fichiers</pluralform>
-</target>
-
-<source>
-<pluralform>%x of 1 row in view</pluralform>
-<pluralform>%x of %y rows in view</pluralform>
-</source>
-<target>
-<pluralform>%x of %y ligne affichée</pluralform>
-<pluralform>%x of %y lignes affichées</pluralform>
-</target>
 
 <source>Ignore further errors</source>
 <target>Ignorer les erreurs suivantes</target>
@@ -1059,6 +1059,24 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 <source>Filter</source>
 <target>Filtre</target>
 
+<source>
+<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Voulez-vous vraiment mettre dans la corbeille %x élément ?</pluralform>
+<pluralform>Voulez-vous vraiment mettre dans la corbeille ces %x éléments ?</pluralform>
+</target>
+
+<source>
+<pluralform>Do you really want to delete the following item?</pluralform>
+<pluralform>Do you really want to delete the following %x items?</pluralform>
+</source>
+<target>
+<pluralform>Voulez-vous vraiment supprimer %x élément ?</pluralform>
+<pluralform>Voulez-vous vraiment supprimer ces %x éléments ?</pluralform>
+</target>
+
 <source>Direct</source>
 <target>Direct</target>
 
@@ -1081,28 +1099,10 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 <target>- Duplication vers %item_path%</target>
 
 <source>- Other side's counterpart to %item_folder%</source>
-<target>Duplication vers %item_folder%</target>
+<target>- Duplication vers %item_folder%</target>
 
 <source>Make hidden warnings and dialogs visible again?</source>
 <target>Voulez-vous réafficher les avertissements et les boîtes de dialogue ?</target>
-
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>Voulez-vous vraiment mettre à la Corbeille l'élément suivant ?</pluralform>
-<pluralform>Voulez-vous vraiment mettre à la Corbeille les %x éléments suivants ?</pluralform>
-</target>
-
-<source>
-<pluralform>Do you really want to delete the following item?</pluralform>
-<pluralform>Do you really want to delete the following %x items?</pluralform>
-</source>
-<target>
-<pluralform>Voulez-vous vraiment supprimer l'élément suivant ?</pluralform>
-<pluralform>Voulez-vous vraiment supprimer les %x éléments suivants ?</pluralform>
-</target>
 
 <source>Leave as unresolved conflict</source>
 <target>Abandonner en tant que conflit non résolu</target>
@@ -1130,6 +1130,9 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 
 <source>Files</source>
 <target>Fichiers</target>
+
+<source>Items</source>
+<target>Éléments</target>
 
 <source>Percentage</source>
 <target>Pourcentage</target>
@@ -1180,7 +1183,7 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 <target>Impossible de copier le lien symbolique %x vers %y.</target>
 
 <source>Cannot copy file %x to %y.</source>
-<target>Impossible de copier le fichier %X vers %y.</target>
+<target>Impossible de copier le fichier %x vers %y.</target>
 
 <source>Type of item %x is not supported:</source>
 <target>Le type de l'élément %x n'est pas accepté :</target>
@@ -1199,9 +1202,6 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 
 <source>%x PB</source>
 <target>%x Po</target>
-
-<source>%x%</source>
-<target>%x %</target>
 
 <source>
 <pluralform>1 min</pluralform>
@@ -1287,8 +1287,8 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 <source>Cannot find the following folders:</source>
 <target>Impossible de trouver les dossiers suivants :</target>
 
-<source>You can ignore this error to consider each folder as empty.</source>
-<target>Vous pouvez ignorer cette erreur et considérer chaque dossier comme vide.</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>Vous pouvez ignorer cette erreur en considérant chaque dossier comme vide. Les dossiers seront automatiquement créés pendant la synchronisation.</target>
 
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
 <target>Les répertoires sont imbriqués ! Attention à la mise à jour des règles de synchronisation :</target>
@@ -1427,12 +1427,6 @@ Attention : les noms de fichiers doivent être relatifs aux répertoires de base
 
 <source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
 <target>Un dossier faisant partie de paires multiples sera modifié. Veuillez vérifier les paramètres de synchronisation.</target>
-
-<source>Left</source>
-<target>Gauche</target>
-
-<source>Right</source>
-<target>Droite</target>
 
 <source>Synchronizing folder pair:</source>
 <target>Synchronisation de la paire de dossiers</target>

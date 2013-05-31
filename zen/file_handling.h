@@ -33,6 +33,14 @@ enum ResponseSame
 };
 ResponseSame onSameVolume(const Zstring& folderLeft, const Zstring& folderRight); //throw()
 
+enum SymLinkType
+{
+    SYMLINK_TYPE_DIR,     //Windows: may be broken
+    SYMLINK_TYPE_FILE,    //Windows: may be broken
+    SYMLINK_TYPE_UNKNOWN, //Windows: unable to determine type; Linux: broken Symlink
+};
+SymLinkType getSymlinkType(const Zstring& linkname); //throw()
+
 enum ProcSymlink
 {
     SYMLINK_DIRECT,

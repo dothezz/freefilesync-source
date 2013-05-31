@@ -27,8 +27,7 @@ public:
     }
 
     void init(const wxBitmap& activeBmp,
-              const wxBitmap& inactiveBmp,
-              const wxString& tooltip);
+              const wxBitmap& inactiveBmp);
 
     void setActive(bool value);
     bool isActive() const { return active; }
@@ -56,11 +55,8 @@ private:
 //######################## implementation ########################
 inline
 void ToggleButton::init(const wxBitmap& activeBmp,
-                        const wxBitmap& inactiveBmp,
-                        const wxString& tooltip)
+                        const wxBitmap& inactiveBmp)
 {
-    SetToolTip(tooltip);
-
     activeBmp_   = activeBmp;
     inactiveBmp_ = inactiveBmp;
 

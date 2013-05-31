@@ -4,12 +4,12 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef MISC_H_INCLUDED
-#define MISC_H_INCLUDED
+#ifndef LOCALIZATION_H_8917342083178321534
+#define LOCALIZATION_H_8917342083178321534
 
 #include <vector>
 #include <zen/file_error.h>
-#include <wx/string.h>
+//#include <wx/string.h>
 
 namespace zen
 {
@@ -19,10 +19,10 @@ public:
     struct Entry
     {
         int languageID;
-        wxString languageName;
-        wxString languageFile;
-        wxString translatorName;
-        wxString languageFlag;
+        std::wstring languageName;
+        std::wstring languageFile;
+        std::wstring translatorName;
+        std::wstring languageFlag;
     };
     static const std::vector<Entry>& get();
 
@@ -34,9 +34,13 @@ private:
     std::vector<Entry> locMapping;
 };
 
+
 void setLanguage(int language); //throw FileError
 int getLanguage();
 int retrieveSystemLanguage();
+
+void releaseWxLocale(); //wxLocale crashes miserably on wxGTK when destructor runs during global cleanup => call in wxApp::OnExit
+//"You should delete all wxWidgets object that you created by the time OnExit finishes. In particular, do not destroy them from application class' destructor!"
 }
 
-#endif // MISC_H_INCLUDED
+#endif //LOCALIZATION_H_8917342083178321534

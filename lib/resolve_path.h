@@ -19,7 +19,7 @@ FULL directory format:
 	- convert relative paths into absolute
 	- trim whitespace and append file name separator
 */
-Zstring getFormattedDirectoryName(const Zstring& dirString); //throw() - non-blocking! no I/O!
+Zstring getFormattedDirectoryName(const Zstring& dirString); //throw() - non-blocking! no I/O! not thread-safe!!!(see ::GetFullPathName())
 
 //macro substitution only
 Zstring expandMacros(const Zstring& text);

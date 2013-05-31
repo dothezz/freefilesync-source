@@ -12,8 +12,11 @@
 #include <wx/sound.h>
 #include <wx/clipbrd.h>
 #include <wx/msgdlg.h>
+#include <wx/dataobj.h> //wxTextDataObject
 #include <zen/basic_math.h>
 #include <zen/format_unit.h>
+#include <zen/scope_guard.h>
+#include <wx+/grid.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/toggle_button.h>
 #include <wx+/image_tools.h>
@@ -38,7 +41,7 @@ namespace
 const int GAUGE_FULL_RANGE = 50000;
 
 //window size used for statistics in milliseconds
-const int WINDOW_REMAINING_TIME = 60000; //some use cases have dropouts of 40 seconds -> 60 sec. window size handles them well
+const int WINDOW_REMAINING_TIME = 60000; //some scenarios have dropouts of 40 seconds -> 60 sec. window size handles them well
 const int WINDOW_BYTES_PER_SEC  =  5000; //
 }
 
@@ -59,6 +62,7 @@ private:
     wxString titleTextBackup;
 
     wxStopWatch timeElapsed;
+    long binCompStartMs; //begin of binary comparison phase in [ms]
 
     const Statistics* syncStat_; //only bound while sync is running
 
@@ -72,8 +76,9 @@ private:
 CompareProgressDialog::Pimpl::Pimpl(wxTopLevelWindow& parentWindow) :
     CompareProgressDlgGenerated(&parentWindow),
     parentWindow_(parentWindow),
+    binCompStartMs(0),
     syncStat_(nullptr),
-    lastStatCallSpeed  (-1000000) //some big number
+    lastStatCallSpeed(-1000000) //some big number
 {
     //init(); -> needed?
 }
@@ -125,6 +130,8 @@ void CompareProgressDialog::Pimpl::switchToCompareBytewise()
     perf = make_unique<PerfCheck>(WINDOW_REMAINING_TIME, WINDOW_BYTES_PER_SEC);
     lastStatCallSpeed   = -1000000; //some big number
 
+    binCompStartMs = timeElapsed.Time();
+
     //show status for comparing bytewise
     bSizerFilesFound    ->Show(false);
     bSizerFilesRemaining->Show(true);
@@ -153,6 +160,7 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
     };
 
     bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
+    const long timeNow = timeElapsed.Time();
 
     //status texts
     setText(*m_textCtrlStatus, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
@@ -194,22 +202,22 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
             setText(*m_staticTextDataRemaining, L"(" + filesizeToShortString(dataTotal - dataCurrent) + L")", &layoutChanged);
 
             //remaining time and speed: only visible during binary comparison
+            assert(perf);
             if (perf)
-            {
-                const long timeNow = timeElapsed.Time();
                 if (numeric::dist(lastStatCallSpeed, timeNow) >= 500)
                 {
                     lastStatCallSpeed = timeNow;
 
-                    perf->addSample(objectsCurrent, to<double>(dataCurrent), timeNow);
+                    if (numeric::dist(binCompStartMs, timeNow) >= 1000) //discard stats for first second: probably messy
+                        perf->addSample(objectsCurrent, to<double>(dataCurrent), timeNow);
 
-                    //current speed -> Win 7 copy uses 1 sec update interval
+                    //current speed -> Win 7 copy uses 1 sec update interval instead
                     setText(*m_staticTextSpeed, perf->getBytesPerSecond(), &layoutChanged);
-                }
 
-                //remaining time
-                setText(*m_staticTextRemTime, perf->getRemainingTime(to<double>(dataTotal - dataCurrent)), &layoutChanged);
-            }
+                    //remaining time: display with relative error of 10% - based on samples taken every 0.5 sec only
+                    //-> call more often than once per second to correctly show last few seconds countdown, but don't call too often to avoid occasional jitter
+                    setText(*m_staticTextRemTime, perf->getRemainingTime(to<double>(dataTotal - dataCurrent)), &layoutChanged);
+                }
         }
         break;
 
@@ -222,7 +230,7 @@ void CompareProgressDialog::Pimpl::updateStatusPanelNow()
     setText(*m_staticTextScanned, scannedObjects, &layoutChanged);
 
     //time elapsed
-    const long timeElapSec = timeElapsed.Time() / 1000;
+    const long timeElapSec = timeNow / 1000;
     setText(*m_staticTextTimeElapsed,
             timeElapSec < 3600 ?
             wxTimeSpan::Seconds(timeElapSec).Format(   L"%M:%S") :
@@ -565,9 +573,11 @@ public:
         const int warningCount = log.getItemCount(TYPE_WARNING);
         const int infoCount    = log.getItemCount(TYPE_INFO);
 
-        m_bpButtonErrors  ->init(buttonPressed ("msg_error"  ), buttonReleased("msg_error"  ), _("Error"  ) + wxString::Format(L" (%d)", errorCount  ));
-        m_bpButtonWarnings->init(buttonPressed ("msg_warning"), buttonReleased("msg_warning"), _("Warning") + wxString::Format(L" (%d)", warningCount));
-        m_bpButtonInfo    ->init(buttonPressed ("msg_info"   ), buttonReleased("msg_info"   ), _("Info"   ) + wxString::Format(L" (%d)", infoCount   ));
+        auto initButton = [](ToggleButton& btn, const char* imgName, const wxString& tooltip) { btn.init(buttonPressed(imgName), buttonReleased(imgName)); btn.SetToolTip(tooltip); };
+
+        initButton(*m_bpButtonErrors,   "msg_error",   _("Error"  ) + wxString::Format(L" (%d)", errorCount  ));
+        initButton(*m_bpButtonWarnings, "msg_warning", _("Warning") + wxString::Format(L" (%d)", warningCount));
+        initButton(*m_bpButtonInfo,     "msg_info",    _("Info"   ) + wxString::Format(L" (%d)", infoCount   ));
 
         m_bpButtonErrors  ->setActive(true);
         m_bpButtonWarnings->setActive(true);
@@ -832,41 +842,45 @@ struct LabelFormatterTimeElapsed : public LabelFormatter
 }
 
 
-class SyncProgressDialog::Pimpl : public SyncProgressDlgGenerated
+class SyncProgressDialogImpl : private SyncProgressDlgGenerated, public SyncProgressDialog
 {
 public:
-    Pimpl(AbortCallback& abortCb,
-          const Statistics& syncStat,
-          MainDialog* parentWindow,
-          const wxString& jobName,
-          const std::wstring& execWhenFinished,
-          std::vector<std::wstring>& execFinishedHistory);
-    ~Pimpl();
-
-    void initNewPhase();
-    void notifyProgressChange();
-    void updateGui(bool allowYield = true);
+    SyncProgressDialogImpl(AbortCallback& abortCb,
+                           const std::function<void()>& notifyWindowTerminate,
+                           const Statistics& syncStat,
+                           wxTopLevelWindow* parentWindow,
+                           bool showProgress,
+                           const wxString& jobName,
+                           const std::wstring& execWhenFinished,
+                           std::vector<std::wstring>& execFinishedHistory);
+    ~SyncProgressDialogImpl();
 
     //call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
-    void processHasFinished(SyncResult resultId, const ErrorLog& log);
-    void closeWindowDirectly();
+    virtual void processHasFinished(SyncResult resultId, const ErrorLog& log);
+    virtual void closeWindowDirectly();
 
-    std::wstring getExecWhenFinishedCommand() const;
+    virtual wxWindow* getAsWindow() { return this; }
+    virtual void initNewPhase();
+    virtual void notifyProgressChange();
+    virtual void updateGui() { updateGuiInt(true); }
 
-    void stopTimer() //halt all internal counters!
+    virtual std::wstring getExecWhenFinishedCommand() const;
+
+    virtual void stopTimer() //halt all internal counters!
     {
         m_animationControl1->Stop();
         timeElapsed.Pause ();
     }
-    void resumeTimer()
+    virtual void resumeTimer()
     {
         m_animationControl1->Play();
         timeElapsed.Resume();
     }
 
+private:
+    void updateGuiInt(bool allowYield);
     void minimizeToTray();
 
-private:
     void OnKeyPressed(wxKeyEvent& event);
     virtual void OnOkay   (wxCommandEvent& event);
     virtual void OnPause  (wxCommandEvent& event);
@@ -884,11 +898,13 @@ private:
     const wxString jobName_;
     wxStopWatch timeElapsed;
 
-    MainDialog* mainDialog; //optional
+    wxTopLevelWindow* mainDialog; //optional
+
+    std::function<void()> notifyWindowTerminate_; //call once in OnClose(), NOT in destructor which is called far too late somewhere in wxWidgets main loop!
 
     //status variables
-    AbortCallback*    abortCb_;  //temporarily bound while sync is running
-    const Statistics* syncStat_; //
+    const Statistics* syncStat_;                  //
+    AbortCallback*    abortCb_;                   //valid only while sync is running
     bool paused_; //valid only while sync is running
     SyncResult finalResult; //set after sync
 
@@ -909,12 +925,14 @@ private:
 };
 
 
-SyncProgressDialog::Pimpl::Pimpl(AbortCallback& abortCb,
-                                 const Statistics& syncStat,
-                                 MainDialog* parentWindow,
-                                 const wxString& jobName,
-                                 const std::wstring& execWhenFinished,
-                                 std::vector<std::wstring>& execFinishedHistory) :
+SyncProgressDialogImpl::SyncProgressDialogImpl(AbortCallback& abortCb,
+                                               const std::function<void()>& notifyWindowTerminate,
+                                               const Statistics& syncStat,
+                                               wxTopLevelWindow* parentWindow,
+                                               bool showProgress,
+                                               const wxString& jobName,
+                                               const std::wstring& execWhenFinished,
+                                               std::vector<std::wstring>& execFinishedHistory) :
     SyncProgressDlgGenerated(parentWindow,
                              wxID_ANY,
                              parentWindow ? wxString() : (wxString(L"FreeFileSync - ") + _("Folder Comparison and Synchronization")),
@@ -924,8 +942,9 @@ SyncProgressDialog::Pimpl::Pimpl(AbortCallback& abortCb,
                              wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
     jobName_  (jobName),
     mainDialog(parentWindow),
-    abortCb_  (&abortCb),
+    notifyWindowTerminate_(notifyWindowTerminate),
     syncStat_ (&syncStat),
+    abortCb_  (&abortCb),
     paused_   (false),
     finalResult(RESULT_ABORTED), //dummy value
     isZombie(false),
@@ -941,23 +960,18 @@ SyncProgressDialog::Pimpl::Pimpl(AbortCallback& abortCb,
     setRelativeFontSize(*m_staticTextPhase, 1.5);
 
     if (mainDialog)
-    {
         titelTextBackup = mainDialog->GetTitle(); //save old title (will be used as progress indicator)
-        mainDialog->disableAllElements(false); //disable all child elements
-    }
 
     m_animationControl1->SetAnimation(GlobalResources::instance().aniSync);
     m_animationControl1->Play();
 
-    SetIcon(GlobalResources::instance().programIcon);
+    SetIcon(GlobalResources::instance().programIconFFS);
 
     //initialize gauge
     m_gauge1->SetRange(GAUGE_FULL_RANGE);
     m_gauge1->SetValue(0);
 
-    warn_static("not honored on osx")
-
-    EnableCloseButton(false);
+    EnableCloseButton(false); //this is NOT honored on OS X or during system shutdown on Windows!
 
     if (IsShown()) //don't steal focus when starting in sys-tray!
         m_buttonAbort->SetFocus();
@@ -978,7 +992,7 @@ SyncProgressDialog::Pimpl::Pimpl(AbortCallback& abortCb,
     Layout();
 
     //register key event
-    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(Pimpl::OnKeyPressed), nullptr, this);
+    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncProgressDialogImpl::OnKeyPressed), nullptr, this);
 
     //init graph
     graphDataBytes      = std::make_shared<GraphDataBytes>();
@@ -1003,14 +1017,22 @@ SyncProgressDialog::Pimpl::Pimpl(AbortCallback& abortCb,
     updateDialogStatus(); //null-status will be shown while waiting for dir locks (if at all)
 
     Fit();
+
+    if (showProgress)
+    {
+        Show();
+        //clear gui flicker, remove dummy texts: window must be visible to make this work!
+        updateGuiInt(true); //at least on OS X a real Yield() is required to flush pending GUI updates; Update() is not enough
+    }
+    else
+        minimizeToTray();
 }
 
 
-SyncProgressDialog::Pimpl::~Pimpl()
+SyncProgressDialogImpl::~SyncProgressDialogImpl()
 {
     if (mainDialog)
     {
-        mainDialog->enableAllElements();
         mainDialog->SetTitle(titelTextBackup); //restore title text
 
         //make sure main dialog is shown again if still "minimized to systray"! see SyncProgressDialog::closeWindowDirectly()
@@ -1019,10 +1041,12 @@ SyncProgressDialog::Pimpl::~Pimpl()
 
         mainDialog->Show();
     }
+
+    //our client is NOT expecting a second call vianotifyWindowTerminate_()!
 }
 
 
-void SyncProgressDialog::Pimpl::OnKeyPressed(wxKeyEvent& event)
+void SyncProgressDialogImpl::OnKeyPressed(wxKeyEvent& event)
 {
     const int keyCode = event.GetKeyCode();
     if (keyCode == WXK_ESCAPE)
@@ -1048,7 +1072,7 @@ void SyncProgressDialog::Pimpl::OnKeyPressed(wxKeyEvent& event)
 }
 
 
-void SyncProgressDialog::Pimpl::initNewPhase()
+void SyncProgressDialogImpl::initNewPhase()
 {
     updateDialogStatus(); //evaluates "syncStat_->currentPhase()"
 
@@ -1066,14 +1090,13 @@ void SyncProgressDialog::Pimpl::initNewPhase()
     //so give updateGui() a chance to set a different value
     m_gauge1->SetValue(0);
 
-    updateGui(false);
+    updateGuiInt(false);
 }
 
 
-void SyncProgressDialog::Pimpl::notifyProgressChange() //noexcept!
+void SyncProgressDialogImpl::notifyProgressChange() //noexcept!
 {
-    if (syncStat_)
-    {
+    if (syncStat_) //sync running
         switch (syncStat_->currentPhase())
         {
             case ProcessCallback::PHASE_NONE:
@@ -1090,7 +1113,6 @@ void SyncProgressDialog::Pimpl::notifyProgressChange() //noexcept!
             }
             break;
         }
-    }
 }
 
 
@@ -1157,7 +1179,7 @@ std::wstring getDialogPhaseText(const Statistics* syncStat, bool paused, SyncPro
 }
 
 
-void SyncProgressDialog::Pimpl::setExternalStatus(const wxString& status, const wxString& progress) //progress may be empty!
+void SyncProgressDialogImpl::setExternalStatus(const wxString& status, const wxString& progress) //progress may be empty!
 {
     //sys tray: order "top-down": jobname, status, progress
     wxString newTrayInfo = jobName_.empty() ? status : L"\"" + jobName_ + L"\"\n" + status;
@@ -1186,15 +1208,15 @@ void SyncProgressDialog::Pimpl::setExternalStatus(const wxString& status, const 
 }
 
 
-void SyncProgressDialog::Pimpl::updateGui(bool allowYield)
+void SyncProgressDialogImpl::updateGuiInt(bool allowYield)
 {
-    assert(syncStat_);
-    if (!syncStat_) //no sync running!!
+    if (!syncStat_) //sync not running
         return;
 
     //wxWindowUpdateLocker dummy(this); -> not needed
 
     bool layoutChanged = false; //avoid screen flicker by calling layout() only if necessary
+    const long timeNow = timeElapsed.Time();
 
     //sync status text
     setText(*m_staticTextStatus, replaceCpy(syncStat_->currentStatusText(), L'\n', L' ')); //no layout update for status texts!
@@ -1256,20 +1278,20 @@ void SyncProgressDialog::Pimpl::updateGui(bool allowYield)
             //remaining time and speed
             assert(perf);
             if (perf)
-            {
-                const long timeNow = timeElapsed.Time();
                 if (numeric::dist(lastStatCallSpeed, timeNow) >= 500)
                 {
                     lastStatCallSpeed = timeNow;
 
-                    perf->addSample(objectsCurrent, to<double>(dataCurrent), timeNow);
+                    if (numeric::dist(phaseStartMs, timeNow) >= 1000) //discard stats for first second: probably messy
+                        perf->addSample(objectsCurrent, to<double>(dataCurrent), timeNow);
 
-                    //current speed -> Win 7 copy uses 1 sec update interval
+                    //current speed -> Win 7 copy uses 1 sec update interval instead
                     setText(*m_staticTextSpeed, perf->getBytesPerSecond(), &layoutChanged);
+
+                    //remaining time: display with relative error of 10% - based on samples taken every 0.5 sec only
+                    //-> call more often than once per second to correctly show last few seconds countdown, but don't call too often to avoid occasional jitter
+                    setText(*m_staticTextRemTime, perf->getRemainingTime(to<double>(dataTotal - dataCurrent)), &layoutChanged);
                 }
-                //remaining time: display with relative error of 10% - based on samples taken every 0.5 sec only - accuracy of prediction grows with time
-                setText(*m_staticTextRemTime, perf->getRemainingTime(to<double>(dataTotal - dataCurrent)), &layoutChanged);
-            }
         }
         break;
     }
@@ -1279,7 +1301,7 @@ void SyncProgressDialog::Pimpl::updateGui(bool allowYield)
     m_panelGraph->Refresh();
 
     //time elapsed
-    const long timeElapSec = timeElapsed.Time() / 1000;
+    const long timeElapSec = timeNow / 1000;
     setText(*m_staticTextTimeElapsed,
             timeElapSec < 3600 ?
             wxTimeSpan::Seconds(timeElapSec).Format(   L"%M:%S") :
@@ -1336,13 +1358,13 @@ void SyncProgressDialog::Pimpl::updateGui(bool allowYield)
 }
 
 
-std::wstring SyncProgressDialog::Pimpl::getExecWhenFinishedCommand() const
+std::wstring SyncProgressDialogImpl::getExecWhenFinishedCommand() const
 {
     return m_comboBoxExecFinished->getValue();
 }
 
 
-void SyncProgressDialog::Pimpl::updateDialogStatus() //depends on "syncStat_, paused_, finalResult"
+void SyncProgressDialogImpl::updateDialogStatus() //depends on "syncStat_, paused_, finalResult"
 {
     const wxString dlgStatusTxt = getDialogPhaseText(syncStat_, paused_, finalResult);
 
@@ -1449,25 +1471,20 @@ void SyncProgressDialog::Pimpl::updateDialogStatus() //depends on "syncStat_, pa
 warn_static("osx: minimize to systray?")
 
 
-void SyncProgressDialog::Pimpl::closeWindowDirectly() //this should really be called: do not call back + schedule deletion
+void SyncProgressDialogImpl::closeWindowDirectly() //this should really be called: do not call back + schedule deletion
 {
     paused_ = false; //you never know?
-
-    //ATTENTION: dialog may live a little longer, so cut callbacks!
+    //ATTENTION: dialog may live a little longer, so watch callbacks!
     //e.g. wxGTK calls OnIconize after wxWindow::Close() (better not ask why) and before physical destruction! => indirectly calls updateDialogStatus(), which reads syncStat_!!!
+    syncStat_ = nullptr;
+    abortCb_  = nullptr;
+    //resumeFromSystray(); -> NO, instead ~SyncProgressDialogImpl() makes sure that main dialog is shown again!
 
-    //------- change class state -------
-    abortCb_  = nullptr; //avoid callback to (maybe) deleted parent process
-    syncStat_ = nullptr; //set *after* last call to "updateGui"
-    //----------------------------------
-
-    //resumeFromSystray(); -> NO, instead ~Pimpl() makes sure that main dialog is shown again!
-
-    Close();
+    Close(); //generate close event: do NOT destroy window unconditionally!
 }
 
 
-void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const ErrorLog& log) //essential to call this in StatusHandler derived class destructor
+void SyncProgressDialogImpl::processHasFinished(SyncResult resultId, const ErrorLog& log) //essential to call this in StatusHandler derived class destructor
 {
     //at the LATEST(!) to prevent access to currentStatusHandler
     //enable okay and close events; may be set in this method ONLY
@@ -1478,7 +1495,7 @@ void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const Er
 
     //update numbers one last time (as if sync were still running)
     notifyProgressChange(); //make one last graph entry at the *current* time
-    updateGui(false);
+    updateGuiInt(false);
 
     switch (syncStat_->currentPhase()) //no matter if paused or not
     {
@@ -1526,9 +1543,10 @@ void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const Er
     }
 
     //------- change class state -------
-    abortCb_    = nullptr; //avoid callback to (maybe) deleted parent process
-    syncStat_   = nullptr; //set *after* last call to "updateGui"
     finalResult = resultId;
+
+    syncStat_ = nullptr;
+    abortCb_  = nullptr;
     //----------------------------------
 
     updateDialogStatus();
@@ -1573,7 +1591,7 @@ void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const Er
     //workaround wxListBox bug on Windows XP: labels are drawn on top of each other
     assert(m_listbookResult->GetImageList()); //make sure listbook keeps *any* image list
     //due to some crazy reasons that aren't worth debugging, this needs to be done directly in wxFormBuilder,
-    //the following call is *not* sufficient: m_listbookResult->AssignImageList(new wxImageList(180, 1));
+    //the following call is *not* sufficient: m_listbookResult->AssignImageList(new wxImageList(170, 1));
     //note: alternative solutions involving wxLC_LIST, wxLC_REPORT and SetWindowStyleFlag() do not work portably! wxListBook using wxLC_ICON is obviously a class invariant!
 
     //1. re-arrange graph into results listbook
@@ -1595,7 +1613,6 @@ void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const Er
         m_listbookResult->ChangeSelection(posLog);
 
     Layout();
-
     //play (optional) sound notification after sync has completed -> only play when waiting on results dialog, seems to be pointless otherwise!
     switch (finalResult)
     {
@@ -1616,14 +1633,14 @@ void SyncProgressDialog::Pimpl::processHasFinished(SyncResult resultId, const Er
 }
 
 
-void SyncProgressDialog::Pimpl::OnOkay(wxCommandEvent& event)
+void SyncProgressDialogImpl::OnOkay(wxCommandEvent& event)
 {
-    isZombie = true; //on Fedora the iconize event is executed *before* entering SyncProgressDialog::Pimpl::OnClose()!!!
+    isZombie = true; //on Fedora an iconize event is issued *before* entering SyncProgressDialogImpl::OnClose()!!!
     Close(); //generate close event: do NOT destroy window unconditionally!
 }
 
 
-void SyncProgressDialog::Pimpl::OnAbort(wxCommandEvent& event)
+void SyncProgressDialogImpl::OnAbort(wxCommandEvent& event)
 {
     paused_ = false;
     updateDialogStatus(); //update status + pause button
@@ -1634,27 +1651,36 @@ void SyncProgressDialog::Pimpl::OnAbort(wxCommandEvent& event)
 }
 
 
-void SyncProgressDialog::Pimpl::OnPause(wxCommandEvent& event)
+void SyncProgressDialogImpl::OnPause(wxCommandEvent& event)
 {
     paused_ = !paused_;
     updateDialogStatus(); //update status + pause button
 }
 
 
-void SyncProgressDialog::Pimpl::OnClose(wxCloseEvent& event)
+void SyncProgressDialogImpl::OnClose(wxCloseEvent& event)
 {
-    //this event handler may be called due to a system shutdown DURING synchronization!
+    //this event handler may be called *during* sync, e.g. due to a system shutdown (Windows), anytime (OS X)
     //try to stop sync gracefully and cross fingers:
     if (abortCb_)
         abortCb_->requestAbortion();
-    //Note: we must NOT veto dialog destruction, else we will cancel system shutdown if this dialog is application main window (as in batch mode)
+    //Note: we must NOT veto dialog destruction, else we will cancel system shutdown if this dialog is application main window (like in batch mode)
+
+    notifyWindowTerminate_(); //don't wait until delayed "Destroy()" finally calls destructor -> avoid calls to processHasFinished()/closeWindowDirectly()
+
+    paused_ = false; //[!] we could be pausing here!
+
+    //now that we notified window termination prematurely, and since processHasFinished()/closeWindowDirectly() won't be called, make sure we don't call back, too!
+    //e.g. the second notifyWindowTerminate_() in ~SyncProgressDialogImpl()!!!
+    syncStat_ = nullptr;
+    abortCb_  = nullptr;
 
     isZombie = true; //it "lives" until cleanup in next idle event
     Destroy();
 }
 
 
-void SyncProgressDialog::Pimpl::OnIconize(wxIconizeEvent& event)
+void SyncProgressDialogImpl::OnIconize(wxIconizeEvent& event)
 {
     if (isZombie) return; //wxGTK sends iconize event *after* wxWindow::Destroy, sigh...
 
@@ -1665,23 +1691,22 @@ void SyncProgressDialog::Pimpl::OnIconize(wxIconizeEvent& event)
 }
 
 
-void SyncProgressDialog::Pimpl::OnResumeFromTray(wxCommandEvent& event)
+void SyncProgressDialogImpl::OnResumeFromTray(wxCommandEvent& event)
 {
     resumeFromSystray();
 }
 
 
-void SyncProgressDialog::Pimpl::minimizeToTray()
+void SyncProgressDialogImpl::minimizeToTray()
 {
     if (!trayIcon.get())
     {
         trayIcon = make_unique<FfsTrayIcon>();
-        trayIcon->Connect(FFS_REQUEST_RESUME_TRAY_EVENT, wxCommandEventHandler(SyncProgressDialog::Pimpl::OnResumeFromTray), nullptr, this);
+        trayIcon->Connect(FFS_REQUEST_RESUME_TRAY_EVENT, wxCommandEventHandler(SyncProgressDialogImpl::OnResumeFromTray), nullptr, this);
         //tray icon has shorter lifetime than this => no need to disconnect event later
     }
 
-    if (syncStat_)
-        updateGui(false); //set tray tooltip + progress: e.g. no updates while paused
+    updateGuiInt(false); //set tray tooltip + progress: e.g. no updates while paused
 
     Hide();
     if (mainDialog)
@@ -1689,7 +1714,7 @@ void SyncProgressDialog::Pimpl::minimizeToTray()
 }
 
 
-void SyncProgressDialog::Pimpl::resumeFromSystray()
+void SyncProgressDialogImpl::resumeFromSystray()
 {
     trayIcon.reset();
 
@@ -1708,80 +1733,19 @@ void SyncProgressDialog::Pimpl::resumeFromSystray()
     SetFocus();
 
     updateDialogStatus(); //restore Windows 7 task bar status (e.g. required in pause mode)
-    if (syncStat_)
-        updateGui(false); //restore Windows 7 task bar progress (e.g. required in pause mode)
+    updateGuiInt(false); //restore Windows 7 task bar progress (e.g. required in pause mode)
 }
-
 
 //########################################################################################
 
-//redirect to implementation
-SyncProgressDialog::SyncProgressDialog(AbortCallback& abortCb,
-                                       const Statistics& syncStat,
-                                       MainDialog* parentWindow,
-                                       bool showProgress,
-                                       const wxString& jobName,
-                                       const std::wstring& execWhenFinished,
-                                       std::vector<std::wstring>& execFinishedHistory) :
-    pimpl(new Pimpl(abortCb, syncStat, parentWindow, jobName, execWhenFinished, execFinishedHistory))
+SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
+                                         const std::function<void()>& notifyWindowTerminate, //note: user closing window cannot be prevented on OS X! (And neither on Windows during system shutdown!)
+                                         const zen::Statistics& syncStat,
+                                         wxTopLevelWindow* parentWindow, //may be nullptr
+                                         bool showProgress,
+                                         const wxString& jobName,
+                                         const std::wstring& execWhenFinished,
+                                         std::vector<std::wstring>& execFinishedHistory)
 {
-    if (showProgress)
-    {
-        pimpl->Show();
-        warn_static("problem??")
-        //clear gui flicker, remove dummy texts: window must be visible to make this work!
-        pimpl->updateGui(true); //at least on OS X a real Yield() is required to flush pending GUI updates; Update() is not enough
-    }
-    else
-        pimpl->minimizeToTray();
-}
-
-SyncProgressDialog::~SyncProgressDialog()
-{
-    //DON'T delete pimpl! it will be deleted by the user clicking "OK/Cancel" -> (wxWindow::Destroy())
-}
-
-wxWindow* SyncProgressDialog::getAsWindow()
-{
-    return pimpl;
-}
-
-void SyncProgressDialog::initNewPhase()
-{
-    pimpl->initNewPhase();
-}
-
-void SyncProgressDialog::notifyProgressChange()
-{
-    pimpl->notifyProgressChange();
-}
-
-void SyncProgressDialog::updateGui()
-{
-    pimpl->updateGui();
-}
-
-std::wstring SyncProgressDialog::getExecWhenFinishedCommand() const
-{
-    return pimpl->getExecWhenFinishedCommand();
-}
-
-void SyncProgressDialog::stopTimer()
-{
-    return pimpl->stopTimer();
-}
-
-void SyncProgressDialog::resumeTimer()
-{
-    return pimpl->resumeTimer();
-}
-
-void SyncProgressDialog::processHasFinished(SyncResult resultId, const ErrorLog& log)
-{
-    pimpl->processHasFinished(resultId, log);
-}
-
-void SyncProgressDialog::closeWindowDirectly() //don't wait for user (silent mode)
-{
-    pimpl->closeWindowDirectly();
+    return new SyncProgressDialogImpl(abortCb, notifyWindowTerminate, syncStat, parentWindow, showProgress, jobName, execWhenFinished, execFinishedHistory);
 }

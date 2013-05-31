@@ -18,7 +18,10 @@
 #include "parse_lng.h"
 #include "ffs_paths.h"
 
-#ifdef FFS_MAC
+#ifdef FFS_LINUX
+#include <wchar.h> //wcscasecmp
+
+#elif defined FFS_MAC
 #include <CoreServices/CoreServices.h>
 #endif
 
@@ -27,10 +30,10 @@ using namespace zen;
 
 namespace
 {
-class FFSLocale : public TranslationHandler
+class FFSTranslation : public TranslationHandler
 {
 public:
-    FFSLocale(const wxString& filename, wxLanguage languageId); //throw lngfile::ParsingError, parse_plural::ParsingError
+    FFSTranslation(const std::wstring& filename, wxLanguage languageId); //throw lngfile::ParsingError, parse_plural::ParsingError
 
     wxLanguage langId() const { return langId_; }
 
@@ -48,8 +51,8 @@ public:
         auto it = transMappingPl.find(std::make_pair(singular, plural));
         if (it != transMappingPl.end())
         {
-            const int formNo = pluralParser->getForm(n);
-            if (0 <= formNo && formNo < static_cast<int>(it->second.size()))
+            const size_t formNo = pluralParser->getForm(n);
+            if (formNo < it->second.size())
                 return it->second[formNo];
         }
         return n == 1 ? singular : plural; //fallback
@@ -57,7 +60,7 @@ public:
 
 private:
     typedef hash_map<std::wstring, std::wstring> Translation; //hash_map is 15% faster than std::map on GCC
-    typedef std::map<std::pair<std::wstring, std::wstring>, std::vector<std::wstring> > TranslationPlural;
+    typedef std::map<std::pair<std::wstring, std::wstring>, std::vector<std::wstring>> TranslationPlural;
 
     Translation       transMapping; //map original text |-> translation
     TranslationPlural transMappingPl;
@@ -66,7 +69,7 @@ private:
 };
 
 
-FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(languageId) //throw lngfile::ParsingError, parse_plural::ParsingError
+FFSTranslation::FFSTranslation(const std::wstring& filename, wxLanguage languageId) : langId_(languageId) //throw lngfile::ParsingError, parse_plural::ParsingError
 {
     std::string inputStream;
     try
@@ -120,7 +123,8 @@ public:
 
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
     virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName) { return nullptr; }
-    virtual HandleError onError(const std::wstring& msg) { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleError reportDirError (const std::wstring& msg)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
+    virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
 
 private:
     std::vector<Zstring>& lngFiles_;
@@ -145,10 +149,11 @@ struct LessTranslation : public std::binary_function<ExistingTranslations::Entry
             return rv == CSTR_LESS_THAN; //convert to C-style string compare result
 
 #elif defined FFS_LINUX
-        return lhs.languageName.CmpNoCase(rhs.languageName) < 0;
+        return ::wcscasecmp(lhs.languageName.c_str(), rhs.languageName.c_str()) < 0; //ignores case; locale-dependent!
+        //return lhs.languageName.CmpNoCase(rhs.languageName) < 0;
 
 #elif defined FFS_MAC
-        auto allocCFStringRef = [](const wxString& str) -> CFStringRef //output not owned!
+        auto allocCFStringRef = [](const std::wstring& str) -> CFStringRef //output not owned!
         {
             return ::CFStringCreateWithCString(nullptr, //CFAllocatorRef alloc,
             utfCvrtTo<std::string>(str).c_str(), //const char *cStr,
@@ -205,10 +210,10 @@ ExistingTranslations::ExistingTranslations()
                 {
                     ExistingTranslations::Entry newEntry;
                     newEntry.languageID     = locInfo->Language;
-                    newEntry.languageName   = utfCvrtTo<wxString>(lngHeader.languageName);
-                    newEntry.languageFile   = utfCvrtTo<wxString>(*it);
-                    newEntry.translatorName = utfCvrtTo<wxString>(lngHeader.translatorName);
-                    newEntry.languageFlag   = utfCvrtTo<wxString>(lngHeader.flagFile);
+                    newEntry.languageName   = utfCvrtTo<std::wstring>(lngHeader.languageName);
+                    newEntry.languageFile   = utfCvrtTo<std::wstring>(*it);
+                    newEntry.translatorName = utfCvrtTo<std::wstring>(lngHeader.translatorName);
+                    newEntry.languageFlag   = utfCvrtTo<std::wstring>(lngHeader.flagFile);
                     locMapping.push_back(newEntry);
                 }
             }
@@ -253,6 +258,21 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_ARABIC_YEMEN:
             return wxLANGUAGE_ARABIC;
 
+            //variants of wxLANGUAGE_CHINESE_SIMPLIFIED
+        case wxLANGUAGE_CHINESE:
+        case wxLANGUAGE_CHINESE_SINGAPORE:
+            return wxLANGUAGE_CHINESE_SIMPLIFIED;
+
+            //variants of wxLANGUAGE_CHINESE_TRADITIONAL
+        case wxLANGUAGE_CHINESE_TAIWAN:
+        case wxLANGUAGE_CHINESE_HONGKONG:
+        case wxLANGUAGE_CHINESE_MACAU:
+            return wxLANGUAGE_CHINESE_TRADITIONAL;
+
+            //variants of wxLANGUAGE_DUTCH
+        case wxLANGUAGE_DUTCH_BELGIAN:
+            return wxLANGUAGE_DUTCH;
+
             //variants of wxLANGUAGE_ENGLISH_UK
         case wxLANGUAGE_ENGLISH_AUSTRALIA:
         case wxLANGUAGE_ENGLISH_NEW_ZEALAND:
@@ -273,14 +293,6 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_ENGLISH_PHILIPPINES:
             return wxLANGUAGE_ENGLISH_US;
 
-            //variants of wxLANGUAGE_GERMAN
-        case wxLANGUAGE_GERMAN_AUSTRIAN:
-        case wxLANGUAGE_GERMAN_BELGIUM:
-        case wxLANGUAGE_GERMAN_LIECHTENSTEIN:
-        case wxLANGUAGE_GERMAN_LUXEMBOURG:
-        case wxLANGUAGE_GERMAN_SWISS:
-            return wxLANGUAGE_GERMAN;
-
             //variants of wxLANGUAGE_FRENCH
         case wxLANGUAGE_FRENCH_BELGIAN:
         case wxLANGUAGE_FRENCH_CANADIAN:
@@ -289,28 +301,35 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_FRENCH_SWISS:
             return wxLANGUAGE_FRENCH;
 
-            //variants of wxLANGUAGE_DUTCH
-        case wxLANGUAGE_DUTCH_BELGIAN:
-            return wxLANGUAGE_DUTCH;
+            //variants of wxLANGUAGE_GERMAN
+        case wxLANGUAGE_GERMAN_AUSTRIAN:
+        case wxLANGUAGE_GERMAN_BELGIUM:
+        case wxLANGUAGE_GERMAN_LIECHTENSTEIN:
+        case wxLANGUAGE_GERMAN_LUXEMBOURG:
+        case wxLANGUAGE_GERMAN_SWISS:
+            return wxLANGUAGE_GERMAN;
 
             //variants of wxLANGUAGE_ITALIAN
         case wxLANGUAGE_ITALIAN_SWISS:
             return wxLANGUAGE_ITALIAN;
 
-            //variants of wxLANGUAGE_CHINESE_SIMPLIFIED
-        case wxLANGUAGE_CHINESE:
-        case wxLANGUAGE_CHINESE_SINGAPORE:
-            return wxLANGUAGE_CHINESE_SIMPLIFIED;
+            //variants of wxLANGUAGE_NORWEGIAN_BOKMAL
+        case wxLANGUAGE_NORWEGIAN_NYNORSK:
+            return wxLANGUAGE_NORWEGIAN_BOKMAL;
 
-            //variants of wxLANGUAGE_CHINESE_TRADITIONAL
-        case wxLANGUAGE_CHINESE_TAIWAN:
-        case wxLANGUAGE_CHINESE_HONGKONG:
-        case wxLANGUAGE_CHINESE_MACAU:
-            return wxLANGUAGE_CHINESE_TRADITIONAL;
+            //variants of wxLANGUAGE_ROMANIAN
+        case wxLANGUAGE_MOLDAVIAN:
+            return wxLANGUAGE_ROMANIAN;
 
             //variants of wxLANGUAGE_RUSSIAN
         case wxLANGUAGE_RUSSIAN_UKRAINE:
             return wxLANGUAGE_RUSSIAN;
+
+            //variants of wxLANGUAGE_SERBIAN
+        case wxLANGUAGE_SERBIAN_CYRILLIC:
+        case wxLANGUAGE_SERBIAN_LATIN:
+        case wxLANGUAGE_SERBO_CROATIAN:
+            return wxLANGUAGE_SERBIAN;
 
             //variants of wxLANGUAGE_SPANISH
         case wxLANGUAGE_SPANISH_ARGENTINA:
@@ -339,26 +358,24 @@ wxLanguage mapLanguageDialect(wxLanguage language)
         case wxLANGUAGE_SWEDISH_FINLAND:
             return wxLANGUAGE_SWEDISH;
 
-            //variants of wxLANGUAGE_NORWEGIAN_BOKMAL
-        case wxLANGUAGE_NORWEGIAN_NYNORSK:
-            return wxLANGUAGE_NORWEGIAN_BOKMAL;
-
             //languages without variants:
+            //case wxLANGUAGE_CROATIAN:
             //case wxLANGUAGE_CZECH:
             //case wxLANGUAGE_DANISH:
             //case wxLANGUAGE_FINNISH:
             //case wxLANGUAGE_GREEK:
+            //case wxLANGUAGE_HEBREW:
+            //case wxLANGUAGE_HUNGARIAN:
             //case wxLANGUAGE_JAPANESE:
+            //case wxLANGUAGE_KOREAN:
             //case wxLANGUAGE_LITHUANIAN:
             //case wxLANGUAGE_POLISH:
-            //case wxLANGUAGE_SLOVENIAN:
-            //case wxLANGUAGE_HUNGARIAN:
             //case wxLANGUAGE_PORTUGUESE:
             //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
             //case wxLANGUAGE_SCOTS_GAELIC:
-            //case wxLANGUAGE_KOREAN:
+            //case wxLANGUAGE_SLOVENIAN:
+            //case wxLANGUAGE_TURKISH:
             //case wxLANGUAGE_UKRAINIAN:
-            //case wxLANGUAGE_CROATIAN:
         default:
             return language;
     }
@@ -387,6 +404,8 @@ public:
         locLng = lng;
     }
 
+    static void release() { locale.reset(); locLng = wxLANGUAGE_UNKNOWN; }
+
     static wxLanguage getLanguage() { return locLng; }
 
 private:
@@ -394,7 +413,13 @@ private:
     static wxLanguage locLng;
 };
 std::unique_ptr<wxLocale> wxWidgetsLocale::locale;
-wxLanguage wxWidgetsLocale::locLng = wxLANGUAGE_UNKNOWN;
+wxLanguage                wxWidgetsLocale::locLng = wxLANGUAGE_UNKNOWN;
+}
+
+
+void zen::releaseWxLocale()
+{
+    wxWidgetsLocale::release();
 }
 
 
@@ -404,7 +429,7 @@ void zen::setLanguage(int language) //throw FileError
         return; //support polling
 
     //(try to) retrieve language file
-    wxString languageFile;
+    std::wstring languageFile;
 
     for (auto it = ExistingTranslations::get().begin(); it != ExistingTranslations::get().end(); ++it)
         if (it->languageID == language)
@@ -419,7 +444,7 @@ void zen::setLanguage(int language) //throw FileError
     else
         try
         {
-            zen::setTranslator(new FFSLocale(languageFile, static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, parse_plural::ParsingError
+            zen::setTranslator(new FFSTranslation(languageFile, static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, parse_plural::ParsingError
         }
         catch (lngfile::ParsingError& e)
         {
@@ -438,10 +463,9 @@ void zen::setLanguage(int language) //throw FileError
 }
 
 
-
 int zen::getLanguage()
 {
-    const FFSLocale* loc = dynamic_cast<const FFSLocale*>(zen::getTranslator());
+    const FFSTranslation* loc = dynamic_cast<const FFSTranslation*>(zen::getTranslator());
     return loc ? loc->langId() : wxLANGUAGE_ENGLISH_US;
 }
 

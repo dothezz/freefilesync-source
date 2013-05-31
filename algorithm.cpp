@@ -7,7 +7,6 @@
 #include "algorithm.h"
 #include <set>
 #include <stdexcept>
-#include <tuple>
 #include <zen/file_handling.h>
 #include <zen/recycler.h>
 #include <zen/stl_tools.h>
@@ -225,14 +224,15 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, size_t fil
     switch (compareVar)
     {
         case CMP_BY_TIME_SIZE:
-            return dbFile.inSyncType == InSyncFile::IN_SYNC_BINARY_EQUAL || //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
-                   //case-sensitive short name match is a database invariant!
-                   (CmpFileTime::getResult(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL &&
-                    dbFile.left.fileSize == dbFile.right.fileSize);
+            if (dbFile.inSyncType == IN_SYNC_BINARY_EQUAL) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
+
+            return //case-sensitive short name match is a database invariant!
+                CmpFileTime::getResult(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL &&
+                dbFile.left.fileSize == dbFile.right.fileSize;
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
-            return dbFile.inSyncType == InSyncFile::IN_SYNC_BINARY_EQUAL;
+            return dbFile.inSyncType == IN_SYNC_BINARY_EQUAL;
             //in contrast to comparison, we don't care about modification time here!
     }
     assert(false);
@@ -262,26 +262,29 @@ bool isEqual(const SymLinkMapping& linkObj, const InSyncDir::LinkList::value_typ
 
     return linkObj.getShortName<side>() == shortNameDb &&
            //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes its modification date by up to 2 seconds
-           sameFileTime(linkObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2) &&
-#ifdef FFS_WIN //comparison of symbolic link type is relevant for Windows only
-           linkObj.getLinkType<side>() == descrDb.type &&
-#endif
-           linkObj.getTargetPath<side>() == descrDb.targetPath;
+           sameFileTime(linkObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2);
 }
 
 
 //check whether database entry is in sync considering *current* comparison settings
 inline
-bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar)
+bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, size_t fileTimeTolerance)
 {
-    return !dbLink.left .targetPath.empty() && //if one of these is empty, we can't make a statement whether both sides are in sync
-           !dbLink.right.targetPath.empty() && //
-#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
-           dbLink.left.type == dbLink.right.type &&
-#endif
-           dbLink.left.targetPath == dbLink.right.targetPath;
-    //case-sensitive short name match is a database invariant!
-    //in contrast to comparison, we don't care about modification time!
+    switch (compareVar)
+    {
+        case CMP_BY_TIME_SIZE:
+            if (dbLink.inSyncType == IN_SYNC_BINARY_EQUAL) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
+
+            return //case-sensitive short name match is a database invariant!
+                CmpFileTime::getResult(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL;
+
+        case CMP_BY_CONTENT:
+            //case-sensitive short name match is a database invariant!
+            return dbLink.inSyncType == IN_SYNC_BINARY_EQUAL;
+            //in contrast to comparison, we don't care about modification time here!
+    }
+    assert(false);
+    return false;
 }
 
 //--------------------------------------------------------------------
@@ -349,10 +352,7 @@ private:
 
         //----------- detect renamed files -----------------
         if (!exLeftOnly.empty() && !exRightOnly.empty())
-        {
-            collectEqualDbEntries(*lastSyncState); //fill map "onceEqual"
-            detectRenamedFiles();
-        }
+            detectRenamedFiles(*lastSyncState);
     }
 
     std::shared_ptr<InSyncDir> loadDBFile(const BaseDirMapping& baseMap) //return nullptr on failure
@@ -387,12 +387,22 @@ private:
         if (cat == FILE_LEFT_SIDE_ONLY)
         {
             if (fileObj.getFileId<LEFT_SIDE>() != FileId())
-                exLeftOnly.push_back(&fileObj);
+            {
+                auto rv = exLeftOnly.insert(std::make_pair(fileObj.getFileId<LEFT_SIDE>(), &fileObj));
+                assert(rv.second);
+                if (!rv.second) //duplicate file ID!
+                    rv.first->second = nullptr;
+            }
         }
         else if (cat == FILE_RIGHT_SIDE_ONLY)
         {
             if (fileObj.getFileId<RIGHT_SIDE>() != FileId())
-                exRightOnly.insert(std::make_pair(getFileIdKey<RIGHT_SIDE>(fileObj), &fileObj));
+            {
+                auto rv = exRightOnly.insert(std::make_pair(fileObj.getFileId<RIGHT_SIDE>(), &fileObj));
+                assert(rv.second);
+                if (!rv.second) //duplicate file ID!
+                    rv.first->second = nullptr;
+            }
         }
         //----------------------------------------------------------------------
 
@@ -455,7 +465,7 @@ private:
         if (changeOnLeft != changeOnRight)
         {
             //if database entry not in sync according to current settings! -> do not set direction based on async status!
-            if (dbEntry && !stillInSync(dbEntry->second, cmpVar))
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
                 linkObj.setSyncDirConflict(txtDbNotInSync);
             else
                 linkObj.setSyncDir(changeOnLeft ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT);
@@ -515,63 +525,51 @@ private:
         recurse(dirObj, dbEntry ? &dbEntry->second : nullptr); //recursion
     }
 
-    void collectEqualDbEntries(const InSyncDir& container)
+    //note: - we cannot integrate this traversal into "recurse()" since it may take a *slightly* different path: e.g. file renamed on both sides
+    void detectRenamedFiles(InSyncDir& container)
     {
-        //note: we cannot integrate this traversal into "recurse()" since it may take a *slightly* different path: e.g. file renamed on both sides
-
         std::for_each(container.files.begin(), container.files.end(),
-                      [&](const std::pair<Zstring, InSyncFile>& filePair)
-        {
-            if (getFileId(filePair.second.left ) != FileId() &&
-                getFileId(filePair.second.right) != FileId() &&
-                stillInSync(filePair.second, cmpVar, fileTimeTolerance))
-                onceEqual.insert(std::make_pair(getFileIdKey(filePair.second.left), getFileIdKey(filePair.second.right)));
-        });
+        [&](std::pair<const Zstring, InSyncFile>& filePair) { findAndSetMovePair(filePair.second); });
 
         std::for_each(container.dirs.begin(), container.dirs.end(),
-        [&](const std::pair<Zstring, InSyncDir>& dirPair) { collectEqualDbEntries(dirPair.second); });
+        [&](std::pair<const Zstring, InSyncDir>& dirPair) { detectRenamedFiles(dirPair.second); });
     }
 
-    typedef std::tuple<Int64, UInt64, FileId> FileIdKey; //(date, size, file ID)
-
-
-    //modification date is *not* considered as part of container key, so check here!
-    template <class Container>
-    static typename Container::const_iterator findValue(const Container& cnt, const FileIdKey& key)
+    template <SelectedSide side>
+    static bool sameSizeAndDate(const FileMapping& fsObj, const FileDescriptor& fileDescr)
     {
-        auto iterPair = cnt.equal_range(key); //since file id is already unique, we expect a single-element range at most
-        auto it = std::find_if(iterPair.first, iterPair.second,
-                               [&](const typename Container::value_type& item)
-        {
-            return sameFileTime(std::get<0>(item.first), std::get<0>(key), 2); //respect 2 second FAT/FAT32 precision!
-            //the file time could be inferred from the source side after a file copy while a slightly different time is stored on a FAT32 disk!
-        });
-        return it == iterPair.second ? cnt.end() : it;
+        return fsObj.getFileSize<side>() == fileDescr.fileSize &&
+               sameFileTime(fsObj.getLastWriteTime<side>(), fileDescr.lastWriteTimeRaw, 2); //respect 2 second FAT/FAT32 precision!
+        //PS: *never* allow 2 sec tolerance as container predicate!!
+        // => no strict weak ordering relation! reason: no transitivity of equivalence!
     }
 
-    void detectRenamedFiles() const
+    void findAndSetMovePair(const InSyncFile& dbEntry) const
     {
-        std::for_each(exLeftOnly.begin(), exLeftOnly.end(),
-                      [&](FileMapping* fileLeftOnly)
+        const FileId idLeft  = getFileId(dbEntry.left);
+        const FileId idRight = getFileId(dbEntry.right);
+
+        if (idLeft  != FileId() &&
+            idRight != FileId() &&
+            stillInSync(dbEntry, cmpVar, fileTimeTolerance))
         {
-            const FileIdKey& keyLeft = RedetermineAuto::getFileIdKey<LEFT_SIDE>(*fileLeftOnly);
-
-            auto it = findValue(onceEqual, keyLeft);
-            if (it != onceEqual.end())
-            {
-                const FileIdKey& keyRight = it->second;
-
-                auto iter2 = findValue(exRightOnly, keyRight);
-                if (iter2 != exRightOnly.end())
-                {
-                    FileMapping* fileRightOnly = iter2->second;
-
-                    //found a pair, mark it!
-                    fileLeftOnly ->setMoveRef(fileRightOnly->getId());
-                    fileRightOnly->setMoveRef(fileLeftOnly ->getId());
-                }
-            }
-        });
+            auto itL = exLeftOnly.find(idLeft);
+            if (itL != exLeftOnly.end())
+                if (FileMapping* fileLeftOnly = itL->second) //= nullptr, if duplicate ID!
+                    if (sameSizeAndDate<LEFT_SIDE>(*fileLeftOnly, dbEntry.left))
+                    {
+                        auto itR = exRightOnly.find(idRight);
+                        if (itR != exRightOnly.end())
+                            if (FileMapping* fileRightOnly = itR->second) //= nullptr, if duplicate ID!
+                                if (sameSizeAndDate<RIGHT_SIDE>(*fileRightOnly, dbEntry.right))
+                                    if (fileLeftOnly ->getMoveRef() == nullptr && //the db may contain duplicate file ids on left or right side: e.g. consider aliasing through symlinks
+                                        fileRightOnly->getMoveRef() == nullptr)   //=> should not be a problem (same id, size, date => alias!) but don't let a row participate in two move pairs!
+                                    {
+                                        fileLeftOnly ->setMoveRef(fileRightOnly->getId()); //found a pair, mark it!
+                                        fileRightOnly->setMoveRef(fileLeftOnly ->getId()); //
+                                    }
+                    }
+        }
     }
 
     const std::wstring txtBothSidesChanged;
@@ -580,36 +578,10 @@ private:
 
     const CompareVariant cmpVar;
     const size_t fileTimeTolerance;
-
     std::function<void(const std::wstring&)> reportWarning_;
 
-    //detection of renamed files
-    template <SelectedSide side>
-    static FileIdKey getFileIdKey(const FileMapping& fsObj) { return std::make_tuple(fsObj.getLastWriteTime<side>(), fsObj.getFileSize<side>(), fsObj.getFileId<side>()); }
-    static FileIdKey getFileIdKey(const FileDescriptor& fileDescr) { return std::make_tuple(fileDescr.lastWriteTimeRaw, fileDescr.fileSize, getFileId(fileDescr)); }
-
-    struct LessFileIdKey
-    {
-        bool operator()(const FileIdKey& lhs, const FileIdKey& rhs) const
-        {
-            //caveat: *don't* allow 2 sec tolerance as container predicate!!
-            // => no strict weak ordering relation! reason: no transitivity of equivalence!
-
-            //-> bad: if (!sameFileTime(std::get<0>(lhs), std::get<0>(rhs), 2))
-            //    return std::get<0>(lhs) < std::get<0>(rhs);
-
-            if (std::get<1>(lhs) != std::get<1>(rhs)) //file size
-                return std::get<1>(lhs) < std::get<1>(rhs);
-
-            return std::get<2>(lhs) < std::get<2>(rhs); //file id
-        }
-    };
-
-    std::vector<FileMapping*> exLeftOnly;
-
-    std::multimap<FileIdKey, FileIdKey, LessFileIdKey> onceEqual; //associates left and right database entries which are considered "equal" := "same name, size, date"
-
-    std::multimap<FileIdKey, FileMapping*, LessFileIdKey> exRightOnly;
+    std::map<FileId, FileMapping*> exLeftOnly;  //FileMapping* == nullptr for duplicate ids! => consider aliasing through symlinks!
+    std::map<FileId, FileMapping*> exRightOnly; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
 
     /*
     detect renamed files
@@ -623,10 +595,10 @@ private:
 
     Algorithm:
     ----------
-    DB-file left  --- (name, size, date) --->    DB-file right
-      /|\                                             |
+    DB-file left  <--- (name, size, date) --->   DB-file right
+       |                                              |
        |  (file ID, size, date)                       |  (file ID, size, date)
-       |                                             \|/
+      \|/                                            \|/
     file left only                               file right only
 
        FAT caveat: File Ids are generally not stable when file is either moved or renamed!
@@ -1289,12 +1261,14 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
         if (useRecycleBin_)
             zen::recycleOrDelete(linkObj.getFullName<side>()); //throw FileError
         else
-            switch (linkObj.getLinkType<side>())
+            switch (getSymlinkType(linkObj.getFullName<side>()))
             {
-                case LinkDescriptor::TYPE_DIR:
+                case SYMLINK_TYPE_DIR:
                     zen::removeDirectory(linkObj.getFullName<side>()); //throw FileError
                     break;
-                case LinkDescriptor::TYPE_FILE:
+
+                case SYMLINK_TYPE_FILE:
+                case SYMLINK_TYPE_UNKNOWN:
                     zen::removeFile(linkObj.getFullName<side>()); //throw FileError
                     break;
             }
