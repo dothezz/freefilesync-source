@@ -1,5 +1,5 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
+// * This file is part of the zen::Xml project. It is distributed under the *
 // * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
@@ -25,15 +25,15 @@ Convenience function that does nothing more than calling loadStream() and parse(
 
 \tparam String Arbitrary string-like type: e.g. std::string, wchar_t*, char[], wchar_t, wxString, MyStringClass, ...
 \param filename Input file name
-\param doc The XML document to load
+\returns The loaded XML document
 \throw XmlFileError
 \throw XmlParsingError
 */
 template <class String> inline
-void load(const String& filename, XmlDoc& doc) //throw XmlFileError, XmlParsingError
+XmlDoc load(const String& filename) //throw XmlFileError, XmlParsingError
 {
     std::string stream = loadStream(filename); //throw XmlFileError
-    parse(stream, doc); //throw XmlParsingError
+    return parse(stream); //throw XmlParsingError
 }
 
 
@@ -69,9 +69,9 @@ public:
         zen::XmlDoc doc;
 
         zen::XmlOut out(doc);
-        out["elem1"](value1); //
-        out["elem2"](value2); //write data of variables "value1", "value2", "value3" into XML elements
-        out["elem3"](value3); //
+        out["elem1"]( 1); //
+        out["elem2"]( 2); //write data into XML elements
+        out["elem3"](-3); //
 
     	save(doc, "out.xml"); //throw XmlFileError
       \endcode
@@ -80,12 +80,12 @@ public:
       <?xml version="1.0" encoding="UTF-8"?>
       <Root>
           <elem1>1</elem1>
-          <elem2>2.000000</elem2>
+          <elem2>2</elem2>
           <elem3>-3</elem3>
       </Root>
       \endverbatim
     */
-    XmlOut(XmlDoc& doc)         : ref_(&doc.root()) {}
+    XmlOut(XmlDoc& doc) : ref_(&doc.root()) {}
     ///Construct an output proxy for a single XML element
     /**
       \sa XmlOut(XmlDoc& doc)
@@ -121,9 +121,9 @@ public:
         zen::XmlDoc doc;
 
         zen::XmlOut out(doc);
-        out["elem"].attribute("attr1", value1); //
-        out["elem"].attribute("attr2", value2); //write data of variables "value1", "value2", "value3" into XML attributes
-        out["elem"].attribute("attr3", value3); //
+        out["elem"].attribute("attr1",  1); //
+        out["elem"].attribute("attr2",  2); //write data into XML attributes
+        out["elem"].attribute("attr3", -3); //
 
     	save(doc, "out.xml"); //throw XmlFileError
       \endcode
@@ -131,12 +131,12 @@ public:
       \verbatim
       <?xml version="1.0" encoding="UTF-8"?>
       <Root>
-          <elem attr1="1" attr2="2.000000" attr3="-3"/>
+          <elem attr1="1" attr2="2" attr3="-3"/>
       </Root>
       \endverbatim
 
     \tparam String Arbitrary string-like type: e.g. std::string, wchar_t*, char[], wchar_t, wxString, MyStringClass, ...
-    \tparam T User type that is converted into an XML attribute value.
+    \tparam T String-convertible user data type: e.g. any string-like type, all built-in arithmetic numbers
     \sa XmlElement::setAttribute()
     */
     template <class String, class T>
@@ -164,7 +164,7 @@ public:
     	  ... //load document
         zen::XmlIn in(doc);
         in["elem1"](value1); //
-        in["elem2"](value2); //write data of XML elements into variables "value1", "value2", "value3"
+        in["elem2"](value2); //read data from XML elements into variables "value1", "value2", "value3"
         in["elem3"](value3); //
       \endcode
     */
@@ -182,7 +182,7 @@ public:
 
     ///Retrieve a handle to an XML child element for reading
     /**
-    It is \b not an error if the child element does not exist, but a subsequent conversion to user data will fail.
+    It is \b not an error if the child element does not exist, but only later if a conversion to user data is attempted.
     \tparam String Arbitrary string-like type: e.g. std::string, wchar_t*, char[], wchar_t, wxString, MyStringClass, ...
     \param name The name of the child element
     */
@@ -256,12 +256,13 @@ public:
     	  ... //load document
         zen::XmlIn in(doc);
     	in["elem"].attribute("attr1", value1); //
-        in["elem"].attribute("attr2", value2); //write data of XML attributes into variables "value1", "value2", "value3"
+        in["elem"].attribute("attr2", value2); //read data from XML attributes into variables "value1", "value2", "value3"
         in["elem"].attribute("attr3", value3); //
     \endcode
 
     \tparam String Arbitrary string-like type: e.g. std::string, wchar_t*, char[], wchar_t, wxString, MyStringClass, ...
-    \tparam T User type that is converted into an XML attribute value.
+    \tparam T String-convertible user data type: e.g. any string-like type, all built-in arithmetic numbers
+    \returns "true" if the attribute was found and the conversion to the output value was successful.
     \sa XmlElement::getAttribute()
     */
     template <class String, class T>
@@ -284,7 +285,7 @@ public:
     ///Return a pointer to the underlying Xml element, may be nullptr
     const XmlElement* get() const { return refIndex < refList.size() ? refList[refIndex] : nullptr; }
 
-    ///Test whether underlying XML element exists
+    ///Test whether the underlying XML element exists
     /**
       \code
          XmlIn in(doc);
@@ -304,7 +305,7 @@ public:
     	XmlIn inItem = in["item1"];
 
     	int value = 0;
-    	inItem(value); //assume this conversion failed
+    	inItem(value); //let's assume this conversion failed
 
     	assert(in.errorsOccured() == inItem.errorsOccured());
     	assert(in.getErrorsAs<std::string>() == inItem.getErrorsAs<std::string>());

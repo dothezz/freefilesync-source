@@ -181,9 +181,9 @@ private:
 FfsTrayIcon::FfsTrayIcon() :
     trayIcon(new TaskBarImpl(*this)),
     fractionLast(1), //show FFS logo by default
-#if defined FFS_WIN || defined FFS_MAC //16x16 seems to be the only size that is shown correctly on OS X
+#if defined ZEN_WIN || defined ZEN_MAC //16x16 seems to be the only size that is shown correctly on OS X
     logo(getResourceImage(L"FFS_tray_16x16").ConvertToImage())
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     logo(getResourceImage(L"FFS_tray_24x24").ConvertToImage())
 #endif
 {

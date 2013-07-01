@@ -14,7 +14,7 @@ using namespace zen;
 //loadXmlDocument vs loadStream:
 //1. better error reporting
 //2. quick exit if (potentially large) input file is not an XML
-void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw FfsXmlError
+XmlDoc xmlAccess::loadXmlDocument(const Zstring& filename) //throw FfsXmlError
 {
     std::string stream;
     try
@@ -51,7 +51,7 @@ void xmlAccess::loadXmlDocument(const Zstring& filename, XmlDoc& doc) //throw Ff
 
     try
     {
-        zen::parse(stream, doc); //throw XmlParsingError
+        return zen::parse(stream); //throw XmlParsingError
     }
     catch (const XmlParsingError& e)
     {

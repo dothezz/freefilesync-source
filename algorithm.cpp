@@ -25,7 +25,7 @@ using namespace std::rel_ops;
 
 void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
-    std::for_each(begin(folderCmp), end(folderCmp), std::mem_fun_ref(&BaseDirMapping::flip));
+    std::for_each(begin(folderCmp), end(folderCmp), std::mem_fun_ref(&BaseDirPair::flip));
     redetermineSyncDirection(config, folderCmp, [](const std::wstring&) {});
 }
 
@@ -46,12 +46,12 @@ private:
 
     void recurse(HierarchyObject& hierObj) const
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
     }
 
-    void operator()(FileMapping& fileObj) const
+    void operator()(FilePair& fileObj) const
     {
         const CompareFilesResult cat = fileObj.getCategory();
 
@@ -92,7 +92,7 @@ private:
         }
     }
 
-    void operator()(SymLinkMapping& linkObj) const
+    void operator()(SymlinkPair& linkObj) const
     {
         switch (linkObj.getLinkCategory())
         {
@@ -124,7 +124,7 @@ private:
         }
     }
 
-    void operator()(DirMapping& dirObj) const
+    void operator()(DirPair& dirObj) const
     {
         const CompareDirResult cat = dirObj.getDirCategory();
 
@@ -167,13 +167,13 @@ struct AllEqual //test if non-equal items exist in scanned data
     bool operator()(const HierarchyObject& hierObj) const
     {
         return std::all_of(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-        [](const FileMapping& fileObj) { return fileObj.getCategory() == FILE_EQUAL; })&&  //files
+        [](const FilePair& fileObj) { return fileObj.getCategory() == FILE_EQUAL; })&&  //files
 
         std::all_of(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-        [](const SymLinkMapping& linkObj) { return linkObj.getLinkCategory() == SYMLINK_EQUAL; })&&  //symlinks
+        [](const SymlinkPair& linkObj) { return linkObj.getLinkCategory() == SYMLINK_EQUAL; })&&  //symlinks
 
         std::all_of(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(),
-                    [](const DirMapping& dirObj)
+                    [](const DirPair& dirObj)
         {
             return dirObj.getDirCategory() == DIR_EQUAL && AllEqual()(dirObj); //short circuit-behavior!
         });    //directories
@@ -191,15 +191,15 @@ bool zen::allElementsEqual(const FolderComparison& folderCmp)
 namespace
 {
 template <SelectedSide side> inline
-const FileDescriptor& getDescriptor(const InSyncFile& dbFile) { return dbFile.left; }
+const InSyncDescrFile& getDescriptor(const InSyncFile& dbFile) { return dbFile.left; }
 
 template <> inline
-const FileDescriptor& getDescriptor<RIGHT_SIDE>(const InSyncFile& dbFile) { return dbFile.right; }
+const InSyncDescrFile& getDescriptor<RIGHT_SIDE>(const InSyncFile& dbFile) { return dbFile.right; }
 
 
 //check whether database entry and current item match: *irrespective* of current comparison settings
 template <SelectedSide side> inline
-bool isEqual(const FileMapping& fileObj, const InSyncDir::FileList::value_type* dbFile)
+bool isEqual(const FilePair& fileObj, const InSyncDir::FileList::value_type* dbFile)
 {
     if (fileObj.isEmpty<side>())
         return !dbFile;
@@ -207,12 +207,12 @@ bool isEqual(const FileMapping& fileObj, const InSyncDir::FileList::value_type* 
         return false;
 
     const Zstring&    shortNameDb = dbFile->first;
-    const FileDescriptor& descrDb = getDescriptor<side>(dbFile->second);
+    const InSyncDescrFile& descrDb = getDescriptor<side>(dbFile->second);
 
     return fileObj.getShortName<side>() == shortNameDb && //detect changes in case (windows)
            //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
            sameFileTime(fileObj.getLastWriteTime<side>(), descrDb.lastWriteTimeRaw, 2) &&
-           fileObj.getFileSize<side>() == descrDb.fileSize;
+           fileObj.getFileSize<side>() == dbFile->second.fileSize;
     //note: we do *not* consider FileId here, but are only interested in *visual* changes. Consider user moving data to some other medium, this is not a change!
 }
 
@@ -227,8 +227,8 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, size_t fil
             if (dbFile.inSyncType == IN_SYNC_BINARY_EQUAL) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
-                CmpFileTime::getResult(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL &&
-                dbFile.left.fileSize == dbFile.right.fileSize;
+                CmpFileTime::getResult(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL;
+            //dbFile.left.fileSize == dbFile.right.fileSize;
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
@@ -242,15 +242,15 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, size_t fil
 //--------------------------------------------------------------------
 
 template <SelectedSide side> inline
-const LinkDescriptor& getDescriptor(const InSyncSymlink& dbLink) { return dbLink.left; }
+const InSyncDescrLink& getDescriptor(const InSyncSymlink& dbLink) { return dbLink.left; }
 
 template <> inline
-const LinkDescriptor& getDescriptor<RIGHT_SIDE>(const InSyncSymlink& dbLink) { return dbLink.right; }
+const InSyncDescrLink& getDescriptor<RIGHT_SIDE>(const InSyncSymlink& dbLink) { return dbLink.right; }
 
 
 //check whether database entry and current item match: *irrespective* of current comparison settings
 template <SelectedSide side> inline
-bool isEqual(const SymLinkMapping& linkObj, const InSyncDir::LinkList::value_type* dbLink)
+bool isEqual(const SymlinkPair& linkObj, const InSyncDir::LinkList::value_type* dbLink)
 {
     if (linkObj.isEmpty<side>())
         return !dbLink;
@@ -258,7 +258,7 @@ bool isEqual(const SymLinkMapping& linkObj, const InSyncDir::LinkList::value_typ
         return false;
 
     const Zstring&    shortNameDb = dbLink->first;
-    const LinkDescriptor& descrDb = getDescriptor<side>(dbLink->second);
+    const InSyncDescrLink& descrDb = getDescriptor<side>(dbLink->second);
 
     return linkObj.getShortName<side>() == shortNameDb &&
            //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes its modification date by up to 2 seconds
@@ -291,11 +291,11 @@ bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, size_t 
 
 //check whether database entry and current item match: *irrespective* of current comparison settings
 template <SelectedSide side> inline
-bool isEqual(const DirMapping& dirObj, const InSyncDir::DirList::value_type* dbDir)
+bool isEqual(const DirPair& dirObj, const InSyncDir::DirList::value_type* dbDir)
 {
     if (dirObj.isEmpty<side>())
-        return !dbDir || dbDir->second.status == InSyncDir::STATUS_STRAW_MAN;
-    else if (!dbDir || dbDir->second.status == InSyncDir::STATUS_STRAW_MAN)
+        return !dbDir || dbDir->second.status == InSyncDir::DIR_STATUS_STRAW_MAN;
+    else if (!dbDir || dbDir->second.status == InSyncDir::DIR_STATUS_STRAW_MAN)
         return false;
 
     const Zstring& shortNameDb = dbDir->first;
@@ -308,7 +308,7 @@ inline
 bool stillInSync(const InSyncDir& dbDir)
 {
     //case-sensitive short name match is a database invariant!
-    //InSyncDir::STATUS_STRAW_MAN considered
+    //InSyncDir::DIR_STATUS_STRAW_MAN considered
     return true;
 }
 
@@ -317,16 +317,16 @@ bool stillInSync(const InSyncDir& dbDir)
 class RedetermineAuto
 {
 public:
-    static void execute(BaseDirMapping& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
+    static void execute(BaseDirPair& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
     {
         RedetermineAuto(baseDirectory, reportWarning);
     }
 
 private:
-    RedetermineAuto(BaseDirMapping& baseDirectory, std::function<void(const std::wstring&)> reportWarning) :
-        txtBothSidesChanged(_("Both sides have changed since last synchronization!")),
-        txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization!")),
-        txtDbNotInSync(_("Cannot determine sync-direction:") + L" \n" + _("The corresponding database entries are not in sync considering current settings.")),
+    RedetermineAuto(BaseDirPair& baseDirectory, std::function<void(const std::wstring&)> reportWarning) :
+        txtBothSidesChanged(_("Both sides have changed since last synchronization.")),
+        txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization.")),
+        txtDbNotInSync(_("Cannot determine sync-direction:") + L" \n" + _("The database entry is not in sync considering current settings.")),
         cmpVar(baseDirectory.getCompVariant()),
         fileTimeTolerance(baseDirectory.getFileTimeTolerance()),
         reportWarning_(reportWarning)
@@ -355,11 +355,11 @@ private:
             detectRenamedFiles(*lastSyncState);
     }
 
-    std::shared_ptr<InSyncDir> loadDBFile(const BaseDirMapping& baseMap) //return nullptr on failure
+    std::shared_ptr<InSyncDir> loadDBFile(const BaseDirPair& baseDirObj) //return nullptr on failure
     {
         try
         {
-            return loadLastSynchronousState(baseMap); //throw FileError, FileErrorDatabaseNotExisting
+            return loadLastSynchronousState(baseDirObj); //throw FileError, FileErrorDatabaseNotExisting
         }
         catch (FileErrorDatabaseNotExisting&) {} //let's ignore this error, it seems there's no value in reporting it other than confuse users
         catch (FileError& error) //e.g. incompatible database version
@@ -372,12 +372,12 @@ private:
 
     void recurse(HierarchyObject& hierObj, const InSyncDir* dbContainer)
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { processFile   (fileMap, dbContainer); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { processSymlink(linkMap, dbContainer); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { processDir    (dirMap,  dbContainer); });
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { processFile   (fileObj, dbContainer); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { processSymlink(linkObj, dbContainer); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { processDir    (dirObj,  dbContainer); });
     }
 
-    void processFile(FileMapping& fileObj, const InSyncDir* dbContainer)
+    void processFile(FilePair& fileObj, const InSyncDir* dbContainer)
     {
         const CompareFilesResult cat = fileObj.getCategory();
         if (cat == FILE_EQUAL)
@@ -443,7 +443,7 @@ private:
         }
     }
 
-    void processSymlink(SymLinkMapping& linkObj, const InSyncDir* dbContainer)
+    void processSymlink(SymlinkPair& linkObj, const InSyncDir* dbContainer)
     {
         const CompareSymlinkResult cat = linkObj.getLinkCategory();
         if (cat == SYMLINK_EQUAL)
@@ -479,7 +479,7 @@ private:
         }
     }
 
-    void processDir(DirMapping& dirObj, const InSyncDir* dbContainer)
+    void processDir(DirPair& dirObj, const InSyncDir* dbContainer)
     {
         const CompareDirResult cat = dirObj.getDirCategory();
 
@@ -529,25 +529,29 @@ private:
     void detectRenamedFiles(InSyncDir& container)
     {
         std::for_each(container.files.begin(), container.files.end(),
-        [&](std::pair<const Zstring, InSyncFile>& filePair) { findAndSetMovePair(filePair.second); });
+        [&](std::pair<const Zstring, InSyncFile>& dbFile) { findAndSetMovePair(dbFile.second); });
 
         std::for_each(container.dirs.begin(), container.dirs.end(),
-        [&](std::pair<const Zstring, InSyncDir>& dirPair) { detectRenamedFiles(dirPair.second); });
+        [&](std::pair<const Zstring, InSyncDir>& dbDir) { detectRenamedFiles(dbDir.second); });
     }
 
-    template <SelectedSide side>
-    static bool sameSizeAndDate(const FileMapping& fsObj, const FileDescriptor& fileDescr)
+    static bool sameSizeAndDateLeft(const FilePair& fsObj, const InSyncFile& dbEntry)
     {
-        return fsObj.getFileSize<side>() == fileDescr.fileSize &&
-               sameFileTime(fsObj.getLastWriteTime<side>(), fileDescr.lastWriteTimeRaw, 2); //respect 2 second FAT/FAT32 precision!
+        return fsObj.getFileSize<LEFT_SIDE>() == dbEntry.fileSize &&
+               sameFileTime(fsObj.getLastWriteTime<LEFT_SIDE>(), dbEntry.left.lastWriteTimeRaw, 2); //respect 2 second FAT/FAT32 precision!
         //PS: *never* allow 2 sec tolerance as container predicate!!
         // => no strict weak ordering relation! reason: no transitivity of equivalence!
+    }
+    static bool sameSizeAndDateRight(const FilePair& fsObj, const InSyncFile& dbEntry)
+    {
+        return fsObj.getFileSize<RIGHT_SIDE>() == dbEntry.fileSize &&
+               sameFileTime(fsObj.getLastWriteTime<RIGHT_SIDE>(), dbEntry.right.lastWriteTimeRaw, 2);
     }
 
     void findAndSetMovePair(const InSyncFile& dbEntry) const
     {
-        const FileId idLeft  = getFileId(dbEntry.left);
-        const FileId idRight = getFileId(dbEntry.right);
+        const FileId idLeft  = dbEntry.left .fileId;
+        const FileId idRight = dbEntry.right.fileId;
 
         if (idLeft  != FileId() &&
             idRight != FileId() &&
@@ -555,13 +559,13 @@ private:
         {
             auto itL = exLeftOnly.find(idLeft);
             if (itL != exLeftOnly.end())
-                if (FileMapping* fileLeftOnly = itL->second) //= nullptr, if duplicate ID!
-                    if (sameSizeAndDate<LEFT_SIDE>(*fileLeftOnly, dbEntry.left))
+                if (FilePair* fileLeftOnly = itL->second) //= nullptr, if duplicate ID!
+                    if (sameSizeAndDateLeft(*fileLeftOnly, dbEntry))
                     {
                         auto itR = exRightOnly.find(idRight);
                         if (itR != exRightOnly.end())
-                            if (FileMapping* fileRightOnly = itR->second) //= nullptr, if duplicate ID!
-                                if (sameSizeAndDate<RIGHT_SIDE>(*fileRightOnly, dbEntry.right))
+                            if (FilePair* fileRightOnly = itR->second) //= nullptr, if duplicate ID!
+                                if (sameSizeAndDateRight(*fileRightOnly, dbEntry))
                                     if (fileLeftOnly ->getMoveRef() == nullptr && //the db may contain duplicate file ids on left or right side: e.g. consider aliasing through symlinks
                                         fileRightOnly->getMoveRef() == nullptr)   //=> should not be a problem (same id, size, date => alias!) but don't let a row participate in two move pairs!
                                     {
@@ -580,8 +584,8 @@ private:
     const size_t fileTimeTolerance;
     std::function<void(const std::wstring&)> reportWarning_;
 
-    std::map<FileId, FileMapping*> exLeftOnly;  //FileMapping* == nullptr for duplicate ids! => consider aliasing through symlinks!
-    std::map<FileId, FileMapping*> exRightOnly; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
+    std::map<FileId, FilePair*> exLeftOnly;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
+    std::map<FileId, FilePair*> exRightOnly; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
 
     /*
     detect renamed files
@@ -618,8 +622,8 @@ private:
     	std::map: FielId |-> DB* rightIdToDbRight
 
     3. collect files on one side during determination of sync directions:
-    	std::vector<FileMapping*, DB*>   exLeftOnlyToDbRight   -> first try to use file Id, if failed associate via file name instead
-    	std::hash_map<DB*, FileMapping*> dbRightToexRightOnly  ->
+    	std::vector<FilePair*, DB*>   exLeftOnlyToDbRight   -> first try to use file Id, if failed associate via file name instead
+    	std::hash_map<DB*, FilePair*> dbRightToexRightOnly  ->
 
     4. find renamed pairs
     */
@@ -648,7 +652,7 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
 }
 
 
-void zen::redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirMapping& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
+void zen::redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirPair& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
 {
     if (directConfig.var == DirectionConfig::AUTOMATIC)
         RedetermineAuto::execute(baseDirectory, reportWarning);
@@ -684,19 +688,19 @@ class SetNewDirection
 public:
     SetNewDirection(SyncDirection newDirection) : newDirection_(newDirection) {}
 
-    void operator()(FileMapping& fileObj) const
+    void operator()(FilePair& fileObj) const
     {
         if (fileObj.getCategory() != FILE_EQUAL)
             fileObj.setSyncDir(newDirection_);
     }
 
-    void operator()(SymLinkMapping& linkObj) const
+    void operator()(SymlinkPair& linkObj) const
     {
         if (linkObj.getLinkCategory() != SYMLINK_EQUAL)
             linkObj.setSyncDir(newDirection_);
     }
 
-    void operator()(DirMapping& dirObj) const
+    void operator()(DirPair& dirObj) const
     {
         if (dirObj.getDirCategory() != DIR_EQUAL)
             dirObj.setSyncDir(newDirection_);
@@ -706,9 +710,9 @@ public:
 private:
     void execute(HierarchyObject& hierObj) const
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
     }
 
     const SyncDirection newDirection_;
@@ -723,17 +727,17 @@ void zen::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsOb
     struct Recurse: public FSObjectVisitor
     {
         Recurse(const SetNewDirection& ds) : dirSetter_(ds) {}
-        virtual void visit(const FileMapping& fileObj)
+        virtual void visit(const FilePair& fileObj)
         {
-            dirSetter_(const_cast<FileMapping&>(fileObj)); //phyiscal object is not const in this method anyway
+            dirSetter_(const_cast<FilePair&>(fileObj)); //phyiscal object is not const in this method anyway
         }
-        virtual void visit(const SymLinkMapping& linkObj)
+        virtual void visit(const SymlinkPair& linkObj)
         {
-            dirSetter_(const_cast<SymLinkMapping&>(linkObj)); //
+            dirSetter_(const_cast<SymlinkPair&>(linkObj)); //
         }
-        virtual void visit(const DirMapping& dirObj)
+        virtual void visit(const DirPair& dirObj)
         {
-            dirSetter_(const_cast<DirMapping&>(dirObj)); //
+            dirSetter_(const_cast<DirPair&>(dirObj)); //
         }
     private:
         const SetNewDirection& dirSetter_;
@@ -747,30 +751,30 @@ template <bool include>
 class InOrExcludeAllRows
 {
 public:
-    void operator()(zen::BaseDirMapping& baseDirectory) const //be careful with operator() to no get called by std::for_each!
+    void operator()(zen::BaseDirPair& baseDirectory) const //be careful with operator() to no get called by std::for_each!
     {
         execute(baseDirectory);
     }
 
     void execute(zen::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
     }
 
 private:
-    void operator()(zen::FileMapping& fileObj) const
+    void operator()(zen::FilePair& fileObj) const
     {
         fileObj.setActive(include);
     }
 
-    void operator()(zen::SymLinkMapping& linkObj) const
+    void operator()(zen::SymlinkPair& linkObj) const
     {
         linkObj.setActive(include);
     }
 
-    void operator()(zen::DirMapping& dirObj) const
+    void operator()(zen::DirPair& dirObj) const
     {
         dirObj.setActive(include);
         execute(dirObj); //recursion
@@ -795,14 +799,14 @@ void zen::setActiveStatus(bool newStatus, zen::FileSystemObject& fsObj)
     struct Recurse: public FSObjectVisitor
     {
         Recurse(bool newStat) : newStatus_(newStat) {}
-        virtual void visit(const FileMapping& fileObj) {}
-        virtual void visit(const SymLinkMapping& linkObj) {}
-        virtual void visit(const DirMapping& dirObj)
+        virtual void visit(const FilePair& fileObj) {}
+        virtual void visit(const SymlinkPair& linkObj) {}
+        virtual void visit(const DirPair& dirObj)
         {
             if (newStatus_)
-                InOrExcludeAllRows<true>().execute(const_cast<DirMapping&>(dirObj)); //object is not physically const here anyway
+                InOrExcludeAllRows<true>().execute(const_cast<DirPair&>(dirObj)); //object is not physically const here anyway
             else
-                InOrExcludeAllRows<false>().execute(const_cast<DirMapping&>(dirObj)); //
+                InOrExcludeAllRows<false>().execute(const_cast<DirPair&>(dirObj)); //
         }
     private:
         const bool newStatus_;
@@ -851,25 +855,25 @@ public:
 
     void execute(zen::HierarchyObject& hierObj) const
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
     };
 
 private:
-    void operator()(zen::FileMapping& fileObj) const
+    void operator()(zen::FilePair& fileObj) const
     {
         if (Eval<strategy>().process(fileObj))
             fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
     }
 
-    void operator()(zen::SymLinkMapping& linkObj) const
+    void operator()(zen::SymlinkPair& linkObj) const
     {
         if (Eval<strategy>().process(linkObj))
             linkObj.setActive(filterProc.passFileFilter(linkObj.getObjRelativeName()));
     }
 
-    void operator()(zen::DirMapping& dirObj) const
+    void operator()(zen::DirPair& dirObj) const
     {
         bool subObjMightMatch = true;
         const bool filterPassed = filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch);
@@ -901,13 +905,13 @@ public:
 
     void execute(zen::HierarchyObject& hierObj) const
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
     };
 
 private:
-    void operator()(zen::FileMapping& fileObj) const
+    void operator()(zen::FilePair& fileObj) const
     {
         if (Eval<strategy>().process(fileObj))
         {
@@ -942,7 +946,7 @@ private:
         }
     }
 
-    void operator()(zen::SymLinkMapping& linkObj) const
+    void operator()(zen::SymlinkPair& linkObj) const
     {
         if (Eval<strategy>().process(linkObj))
         {
@@ -956,7 +960,7 @@ private:
         }
     }
 
-    void operator()(zen::DirMapping& dirObj) const
+    void operator()(zen::DirPair& dirObj) const
     {
         if (Eval<strategy>().process(dirObj))
             dirObj.setActive(timeSizeFilter_.matchFolder()); //if date filter is active we deactivate all folders: effectively gets rid of empty folders!
@@ -981,16 +985,16 @@ private:
 }
 
 
-void zen::addHardFiltering(BaseDirMapping& baseMap, const Zstring& excludeFilter)
+void zen::addHardFiltering(BaseDirPair& baseDirObj, const Zstring& excludeFilter)
 {
-    ApplyHardFilter<STRATEGY_AND>(NameFilter(FilterConfig().includeFilter, excludeFilter)).execute(baseMap);
+    ApplyHardFilter<STRATEGY_AND>(NameFilter(FilterConfig().includeFilter, excludeFilter)).execute(baseDirObj);
 }
 
 
-void zen::addSoftFiltering(BaseDirMapping& baseMap, const SoftFilter& timeSizeFilter)
+void zen::addSoftFiltering(BaseDirPair& baseDirObj, const SoftFilter& timeSizeFilter)
 {
     if (!timeSizeFilter.isNull()) //since we use STRATEGY_AND, we may skip a "null" filter
-        ApplySoftFilter<STRATEGY_AND>(timeSizeFilter).execute(baseMap);
+        ApplySoftFilter<STRATEGY_AND>(timeSizeFilter).execute(baseDirObj);
 }
 
 
@@ -1010,7 +1014,7 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
 
     for (auto it = allPairs.begin(); it != allPairs.end(); ++it)
     {
-        BaseDirMapping& baseDirectory = *folderCmp[it - allPairs.begin()];
+        BaseDirPair& baseDirectory = *folderCmp[it - allPairs.begin()];
 
         const NormalizedFilter normFilter = normalizeFilters(mainCfg.globalFilter, it->localFilter);
 
@@ -1033,13 +1037,13 @@ public:
 
     void execute(zen::HierarchyObject& hierObj) const
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FileMapping&    fileMap) { (*this)(fileMap); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymLinkMapping& linkMap) { (*this)(linkMap); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirMapping&      dirMap) { (*this)(dirMap); });
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
     };
 
 private:
-    void operator()(zen::FileMapping& fileObj) const
+    void operator()(zen::FilePair& fileObj) const
     {
         if (fileObj.isEmpty<LEFT_SIDE>())
             fileObj.setActive(matchTime<RIGHT_SIDE>(fileObj));
@@ -1050,7 +1054,7 @@ private:
                               matchTime<LEFT_SIDE>(fileObj));
     }
 
-    void operator()(zen::SymLinkMapping& linkObj) const
+    void operator()(zen::SymlinkPair& linkObj) const
     {
         if (linkObj.isEmpty<LEFT_SIDE>())
             linkObj.setActive(matchTime<RIGHT_SIDE>(linkObj));
@@ -1061,7 +1065,7 @@ private:
                               matchTime<LEFT_SIDE> (linkObj));
     }
 
-    void operator()(zen::DirMapping& dirObj) const
+    void operator()(zen::DirPair& dirObj) const
     {
         dirObj.setActive(false);
         execute(dirObj);  //recursion
@@ -1082,8 +1086,7 @@ private:
 void zen::applyTimeSpanFilter(FolderComparison& folderCmp, const Int64& timeFrom, const Int64& timeTo)
 {
     FilterByTimeSpan spanFilter(timeFrom, timeTo);
-
-    std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirMapping& baseMap) { spanFilter.execute(baseMap); });
+    std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirPair& baseDirObj) { spanFilter.execute(baseDirObj); });
 }
 
 
@@ -1177,7 +1180,7 @@ bool tryReportingError(Function cmd, DeleteFilesHandler& handler) //return "true
         }
 }
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 //recycleBinStatus() blocks seriously if recycle bin is really full and drive is slow
 StatusRecycler recycleBinStatusUpdating(const Zstring& dirname, DeleteFilesHandler& callback)
 {
@@ -1201,14 +1204,14 @@ void categorize(const std::set<FileSystemObject*>& rowsIn,
 {
     auto hasRecycler = [&](const FileSystemObject& fsObj) -> bool
     {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         const Zstring& baseDirPf = fsObj.root().getBaseDirPf<side>();
 
         auto it = hasRecyclerBuffer.find(baseDirPf);
         if (it != hasRecyclerBuffer.end())
             return it->second;
         return hasRecyclerBuffer.insert(std::make_pair(baseDirPf, recycleBinStatusUpdating(baseDirPf, callback) == STATUS_REC_EXISTS)).first->second;
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
         return true;
 #endif
     };
@@ -1244,7 +1247,7 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
         }
     }
 
-    virtual void visit(const FileMapping& fileObj)
+    virtual void visit(const FilePair& fileObj)
     {
         notifyFileDeletion(fileObj.getFullName<side>());
 
@@ -1254,7 +1257,7 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
             zen::removeFile(fileObj.getFullName<side>()); //throw FileError
     }
 
-    virtual void visit(const SymLinkMapping& linkObj)
+    virtual void visit(const SymlinkPair& linkObj)
     {
         notifySymlinkDeletion(linkObj.getFullName<side>());
 
@@ -1274,7 +1277,7 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
             }
     }
 
-    virtual void visit(const DirMapping& dirObj)
+    virtual void visit(const DirPair& dirObj)
     {
         notifyDirectoryDeletion(dirObj.getFullName<side>()); //notfied twice! see RemoveCallbackImpl -> no big deal
 
@@ -1350,7 +1353,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
         throw std::logic_error("Programming Error: Contract violation! " + std::string(__FILE__) + ":" + numberTo<std::string>(__LINE__));
 
     //build up mapping from base directory to corresponding direction config
-    hash_map<const BaseDirMapping*, DirectionConfig> baseDirCfgs;
+    hash_map<const BaseDirPair*, DirectionConfig> baseDirCfgs;
     for (auto it = folderCmp.begin(); it != folderCmp.end(); ++it)
         baseDirCfgs[&** it] = directCfgs[it - folderCmp.begin()];
 
@@ -1399,7 +1402,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
         }
 
         //last step: cleanup empty rows: this one invalidates all pointers!
-        std::for_each(begin(folderCmp), end(folderCmp), BaseDirMapping::removeEmpty);
+        std::for_each(begin(folderCmp), end(folderCmp), BaseDirPair::removeEmpty);
     };
     ZEN_ON_SCOPE_EXIT(updateDirection()); //MSVC: assert is a macro and it doesn't play nice with ZEN_ON_SCOPE_EXIT, surprise... wasn't there something about macros being "evil"?
 
@@ -1417,7 +1420,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     if (useRecycleBin &&
     std::any_of(hasRecyclerBuffer.begin(), hasRecyclerBuffer.end(), [](std::pair<Zstring, bool> item) { return !item.second; }))
     {
-        std::wstring msg = _("Recycle Bin is not available for the following paths! Files will be deleted permanently instead:") + L"\n";
+        std::wstring msg = _("The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:") + L"\n";
 
         for (auto it = hasRecyclerBuffer.begin(); it != hasRecyclerBuffer.end(); ++it)
             if (!it->second)

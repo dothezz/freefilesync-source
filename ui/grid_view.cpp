@@ -20,7 +20,7 @@ void getNumbers(const FileSystemObject& fsObj, StatusResult& result)
     {
         GetValues(StatusResult& res) : result_(res) {}
 
-        virtual void visit(const FileMapping& fileObj)
+        virtual void visit(const FilePair& fileObj)
         {
             if (!fileObj.isEmpty<LEFT_SIDE>())
             {
@@ -34,7 +34,7 @@ void getNumbers(const FileSystemObject& fsObj, StatusResult& result)
             }
         }
 
-        virtual void visit(const SymLinkMapping& linkObj)
+        virtual void visit(const SymlinkPair& linkObj)
         {
             if (!linkObj.isEmpty<LEFT_SIDE>())
                 ++result_.filesOnLeftView;
@@ -43,7 +43,7 @@ void getNumbers(const FileSystemObject& fsObj, StatusResult& result)
                 ++result_.filesOnRightView;
         }
 
-        virtual void visit(const DirMapping& dirObj)
+        virtual void visit(const DirPair& dirObj)
         {
             if (!dirObj.isEmpty<LEFT_SIDE>())
                 ++result_.foldersOnLeftView;
@@ -70,11 +70,11 @@ void GridView::updateView(Predicate pred)
         if (const FileSystemObject* fsObj = FileSystemObject::retrieve(ref.objId))
             if (pred(*fsObj))
             {
-                //save row position for direct random access to FileMapping or DirMapping
+                //save row position for direct random access to FilePair or DirPair
                 this->rowPositions.insert(std::make_pair(ref.objId, viewRef.size())); //costs: 0.28 µs per call - MSVC based on std::set
                 //"this->" required by two-pass lookup as enforced by GCC 4.7
 
-                //save row position to identify first child *on sorted subview* of DirMapping or BaseDirMapping in case latter are filtered out
+                //save row position to identify first child *on sorted subview* of DirPair or BaseDirPair in case latter are filtered out
                 const HierarchyObject* parent = &fsObj->parent();
                 for (;;) //map all yet unassociated parents to this row
                 {
@@ -82,7 +82,7 @@ void GridView::updateView(Predicate pred)
                     if (!rv.second)
                         break;
 
-                    if (auto dirObj = dynamic_cast<const DirMapping*>(parent))
+                    if (auto dirObj = dynamic_cast<const DirPair*>(parent))
                         parent = &(dirObj->parent());
                     else
                         break;
@@ -216,32 +216,32 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
         switch (fsObj.getSyncOperation()) //evaluate comparison result and sync direction
         {
             case SO_CREATE_NEW_LEFT:
-            case SO_MOVE_LEFT_TARGET:
                 output.existsSyncCreateLeft = true;
                 if (!syncCreateLeftActive) return false;
                 break;
             case SO_CREATE_NEW_RIGHT:
-            case SO_MOVE_RIGHT_TARGET:
                 output.existsSyncCreateRight = true;
                 if (!syncCreateRightActive) return false;
                 break;
             case SO_DELETE_LEFT:
-            case SO_MOVE_LEFT_SOURCE:
                 output.existsSyncDeleteLeft = true;
                 if (!syncDeleteLeftActive) return false;
                 break;
             case SO_DELETE_RIGHT:
-            case SO_MOVE_RIGHT_SOURCE:
                 output.existsSyncDeleteRight = true;
                 if (!syncDeleteRightActive) return false;
                 break;
             case SO_OVERWRITE_RIGHT:
             case SO_COPY_METADATA_TO_RIGHT: //no extra button on screen
+            case SO_MOVE_RIGHT_SOURCE:
+            case SO_MOVE_RIGHT_TARGET:
                 output.existsSyncDirRight = true;
                 if (!syncDirOverwRightActive) return false;
                 break;
             case SO_OVERWRITE_LEFT:
             case SO_COPY_METADATA_TO_LEFT: //no extra button on screen
+            case SO_MOVE_LEFT_TARGET:
+            case SO_MOVE_LEFT_SOURCE:
                 output.existsSyncDirLeft = true;
                 if (!syncDirOverwLeftActive) return false;
                 break;
@@ -308,17 +308,17 @@ public:
         std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), *this);
     }
 
-    void operator()(FileMapping& fileObj)
+    void operator()(FilePair& fileObj)
     {
         sortedRef_.push_back(RefIndex(index_, fileObj.getId()));
     }
 
-    void operator()(SymLinkMapping& linkObj)
+    void operator()(SymlinkPair& linkObj)
     {
         sortedRef_.push_back(RefIndex(index_, linkObj.getId()));
     }
 
-    void operator()(DirMapping& dirObj)
+    void operator()(DirPair& dirObj)
     {
         sortedRef_.push_back(RefIndex(index_, dirObj.getId()));
         execute(dirObj); //add recursion here to list sub-objects directly below parent!
@@ -338,7 +338,7 @@ void GridView::setData(FolderComparison& folderCmp)
     currentSort.reset();
 
     folderPairCount = std::count_if(begin(folderCmp), end(folderCmp),
-                                    [](const BaseDirMapping& baseObj) //count non-empty pairs to distinguish single/multiple folder pair cases
+                                    [](const BaseDirPair& baseObj) //count non-empty pairs to distinguish single/multiple folder pair cases
     {
         return !baseObj.getBaseDirPf<LEFT_SIDE >().empty() ||
                !baseObj.getBaseDirPf<RIGHT_SIDE>().empty();

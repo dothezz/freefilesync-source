@@ -1,5 +1,5 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
+// * This file is part of the zen::Xml project. It is distributed under the *
 // * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
@@ -463,41 +463,69 @@ perf: integer to string: (executed 10 mio. times)
 	formatInteger     -   778 ms
 */
 
-template <class S, class Num> inline
-S formatInteger(Num n, bool hasMinus)
+template <class OutputIterator, class Num> inline
+void formatNegativeInteger(Num n, OutputIterator& it)
 {
-    assert(n >= 0);
-    typedef typename GetCharType<S>::Type CharType;
-    CharType buffer[2 + sizeof(Num) * 5 / 2]; //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
-    //required chars (+ sign char): 1 + ceil(ln_10 (256^sizeof(n))) =~ 1 + ceil(sizeof(n) * 2.4082) < 2 + floor(sizeof(n) * 2.5)
-
-    auto iter = std::end(buffer);
+    assert(n < 0);
+    typedef typename std::iterator_traits<OutputIterator>::value_type CharType;
     do
     {
         const Num tmp = n / 10;
-        *--iter = static_cast<CharType>('0' + (n - tmp * 10)); //8% faster than using modulus operator!
+        *--it = static_cast<CharType>('0' + (tmp * 10 - n)); //8% faster than using modulus operator!
         n = tmp;
     }
     while (n != 0);
 
-    if (hasMinus)
-        *--iter = static_cast<CharType>('-');
-
-    return S(&*iter, std::end(buffer) - iter);
+    *--it = static_cast<CharType>('-');
 }
+
+template <class OutputIterator, class Num> inline
+void formatPositiveInteger(Num n, OutputIterator& it)
+{
+    assert(n >= 0);
+    typedef typename std::iterator_traits<OutputIterator>::value_type CharType;
+    do
+    {
+        const Num tmp = n / 10;
+        *--it = static_cast<CharType>('0' + (n - tmp * 10)); //8% faster than using modulus operator!
+        n = tmp;
+    }
+    while (n != 0);
+}
+
 
 template <class S, class Num> inline
 S numberTo(const Num& number, Int2Type<NUM_TYPE_SIGNED_INT>)
 {
-    return formatInteger<S>(number < 0 ? -number : number, number < 0);
-    //bug for "INT_MIN"! technically -INT_MIN == INT_MIN -> not worth the trouble
+    typedef typename GetCharType<S>::Type CharType;
+    CharType buffer[2 + sizeof(Num) * 241 / 100]; //it's generally faster to use a buffer than to rely on String::operator+=() (in)efficiency
+    //required chars (+ sign char): 1 + ceil(ln_10(256^sizeof(n) / 2 + 1))    -> divide by 2 for signed half-range; second +1 since one half starts with 1!
+    // <= 1 + ceil(ln_10(256^sizeof(n))) =~ 1 + ceil(sizeof(n) * 2.4082) <= 2 + floor(sizeof(n) * 2.41)
+
+    //caveat: consider INT_MIN: technically -INT_MIN == INT_MIN
+    auto it = std::end(buffer);
+    if (number < 0)
+        formatNegativeInteger(number, it);
+    else
+        formatPositiveInteger(number, it);
+    assert(it >= std::begin(buffer));
+
+    return S(&*it, std::end(buffer) - it);
 }
 
 
 template <class S, class Num> inline
 S numberTo(const Num& number, Int2Type<NUM_TYPE_UNSIGNED_INT>)
 {
-    return formatInteger<S>(number, false);
+    typedef typename GetCharType<S>::Type CharType;
+    CharType buffer[1 + sizeof(Num) * 241 / 100];
+    //required chars: ceil(ln_10(256^sizeof(n))) =~ ceil(sizeof(n) * 2.4082) <= 1 + floor(sizeof(n) * 2.41)
+
+    auto it = std::end(buffer);
+    formatPositiveInteger(number, it);
+    assert(it >= std::begin(buffer));
+
+    return S(&*it, std::end(buffer) - it);
 }
 
 //--------------------------------------------------------------------------------

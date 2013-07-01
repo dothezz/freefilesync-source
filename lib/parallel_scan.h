@@ -47,7 +47,7 @@ struct DirectoryValue
 {
     DirContainer dirCont;
     std::set<Zstring> failedDirReads;  //relative postfixed names (or empty string for root) for directories that could not be read (completely), e.g. access denied, or temporal network drop
-	std::set<Zstring> failedItemReads; //relative postfixed names (never empty) for failure to read single file/dir/symlink 
+    std::set<Zstring> failedItemReads; //relative postfixed names (never empty) for failure to read single file/dir/symlink
 };
 
 

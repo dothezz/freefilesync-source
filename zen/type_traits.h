@@ -1,5 +1,5 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
+// * This file is part of the zen::Xml project. It is distributed under the *
 // * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
@@ -65,11 +65,6 @@ template <class T> struct IsArithmetic; //IsInteger or IsFloat
 	Example: 1. ZEN_INIT_DETECT_MEMBER_TYPE(value_type);
 	         2. HasMemberType_value_type<T>::value     -> use as boolean
 */
-
-
-
-
-
 
 
 

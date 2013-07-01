@@ -28,7 +28,7 @@ void HierarchyObject::removeEmptyRec()
     refSubDirs ().remove_if(isEmpty);
 
     if (emptyExisting) //notify if actual deletion happened
-        notifySyncCfgChanged(); //mustn't call this in ~FileSystemObject(), since parent, usually a DirMapping, is already partially destroyed and existing as a pure HierarchyObject!
+        notifySyncCfgChanged(); //mustn't call this in ~FileSystemObject(), since parent, usually a DirPair, is already partially destroyed and existing as a pure HierarchyObject!
 
     //	for (auto& subDir : refSubDirs())
     //      subDir.removeEmptyRec(); //recurse
@@ -130,15 +130,15 @@ SyncOperation FileSystemObject::testSyncOperation(SyncDirection testSyncDir) con
 
 SyncOperation FileSystemObject::getSyncOperation() const
 {
-    return getIsolatedSyncOperation(getCategory(), selectedForSynchronization, syncDir, syncDirConflict.get() != nullptr);
-    //no *not* make a virtual call to testSyncOperation()! See FileMapping::testSyncOperation()! <- better not implement one in terms of the other!!!
+    return getIsolatedSyncOperation(getCategory(), selectedForSynchronization, getSyncDir(), syncDirConflict.get() != nullptr);
+    //no *not* make a virtual call to testSyncOperation()! See FilePair::testSyncOperation()! <- better not implement one in terms of the other!!!
 }
 
 
-//SyncOperation DirMapping::testSyncOperation() const -> no recursion: we do NOT want to consider child elements when testing!
+//SyncOperation DirPair::testSyncOperation() const -> no recursion: we do NOT want to consider child elements when testing!
 
 
-SyncOperation DirMapping::getSyncOperation() const
+SyncOperation DirPair::getSyncOperation() const
 {
     if (!syncOpUpToDate)
     {
@@ -224,14 +224,14 @@ SyncOperation DirMapping::getSyncOperation() const
 
 
 inline //it's private!
-SyncOperation FileMapping::applyMoveOptimization(SyncOperation op) const
+SyncOperation FilePair::applyMoveOptimization(SyncOperation op) const
 {
     /*
         check whether we can optimize "create + delete" via "move":
         note: as long as we consider "create + delete" cases only, detection of renamed files, should be fine even for "binary" comparison variant!
     */
     if (moveFileRef)
-        if (auto refFile = dynamic_cast<const FileMapping*>(FileSystemObject::retrieve(moveFileRef))) //we expect a "FileMapping", but only need a "FileSystemObject"
+        if (auto refFile = dynamic_cast<const FilePair*>(FileSystemObject::retrieve(moveFileRef))) //we expect a "FilePair", but only need a "FileSystemObject"
         {
             SyncOperation opRef = refFile->FileSystemObject::getSyncOperation(); //do *not* make a virtual call!
 
@@ -252,13 +252,13 @@ SyncOperation FileMapping::applyMoveOptimization(SyncOperation op) const
 }
 
 
-SyncOperation FileMapping::testSyncOperation(SyncDirection testSyncDir) const
+SyncOperation FilePair::testSyncOperation(SyncDirection testSyncDir) const
 {
     return applyMoveOptimization(FileSystemObject::testSyncOperation(testSyncDir));
 }
 
 
-SyncOperation FileMapping::getSyncOperation() const
+SyncOperation FilePair::getSyncOperation() const
 {
     return applyMoveOptimization(FileSystemObject::getSyncOperation());
 }
@@ -360,8 +360,8 @@ std::wstring zen::getSyncOpDescription(const FileSystemObject& fsObj)
         case SO_MOVE_LEFT_TARGET:
         case SO_MOVE_RIGHT_SOURCE:
         case SO_MOVE_RIGHT_TARGET:
-            if (const FileMapping* sourceFile = dynamic_cast<const FileMapping*>(&fsObj))
-                if (const FileMapping* targetFile = dynamic_cast<const FileMapping*>(FileSystemObject::retrieve(sourceFile->getMoveRef())))
+            if (const FilePair* sourceFile = dynamic_cast<const FilePair*>(&fsObj))
+                if (const FilePair* targetFile = dynamic_cast<const FilePair*>(FileSystemObject::retrieve(sourceFile->getMoveRef())))
                 {
                     const bool onLeft   = op == SO_MOVE_LEFT_SOURCE || op == SO_MOVE_LEFT_TARGET;
                     const bool isSource = op == SO_MOVE_LEFT_SOURCE || op == SO_MOVE_RIGHT_SOURCE;

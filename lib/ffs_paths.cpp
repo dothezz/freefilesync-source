@@ -9,7 +9,7 @@
 #include <wx/stdpaths.h>
 #include <wx+/string_conv.h>
 
-#ifdef FFS_MAC
+#ifdef ZEN_MAC
 #include <vector>
 #include <zen/scope_guard.h>
 #include <zen/osx_string.h>
@@ -22,7 +22,7 @@ using namespace zen;
 
 namespace
 {
-#if defined FFS_WIN || defined FFS_LINUX
+#if defined ZEN_WIN || defined ZEN_LINUX
 inline
 Zstring getExecutableDir() //directory containing executable WITH path separator at end
 {
@@ -30,7 +30,7 @@ Zstring getExecutableDir() //directory containing executable WITH path separator
 }
 #endif
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 inline
 Zstring getInstallDir() //root install directory WITH path separator at end
 {
@@ -39,10 +39,10 @@ Zstring getInstallDir() //root install directory WITH path separator at end
 #endif
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 inline
 bool isPortableVersion() { return !fileExists(getInstallDir() + L"uninstall.exe"); } //this check is a bit lame...
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 inline
 bool isPortableVersion() { return !endsWith(getExecutableDir(), "/bin/"); } //this check is a bit lame...
 #endif
@@ -51,9 +51,9 @@ bool isPortableVersion() { return !endsWith(getExecutableDir(), "/bin/"); } //th
 
 bool zen::manualProgramUpdateRequired()
 {
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
     return true;
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     return isPortableVersion(); //locally installed version is updated by system
 #endif
 }
@@ -61,14 +61,14 @@ bool zen::manualProgramUpdateRequired()
 
 Zstring zen::getResourceDir()
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     return getInstallDir();
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     if (isPortableVersion())
         return getExecutableDir();
     else //use OS' standard paths
         return appendSeparator(toZ(wxStandardPathsBase::Get().GetResourcesDir()));
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     return appendSeparator(toZ(wxStandardPathsBase::Get().GetResourcesDir())); //if packaged, used "Contents/Resources", else the executable directory
 #endif
 }
@@ -76,13 +76,13 @@ Zstring zen::getResourceDir()
 
 Zstring zen::getConfigDir()
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     if (isPortableVersion())
         return getInstallDir();
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     if (isPortableVersion())
         return getExecutableDir();
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     //portable apps do not seem common on OS - fine with me: http://theocacao.com/document.page/319
 #endif
     //use OS' standard paths
@@ -102,13 +102,13 @@ Zstring zen::getConfigDir()
 //this function is called by RealtimeSync!!!
 Zstring zen::getFreeFileSyncLauncher()
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     return getInstallDir() + Zstr("FreeFileSync.exe");
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     return getExecutableDir() + Zstr("FreeFileSync");
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     CFURLRef appURL = nullptr;
     ZEN_ON_SCOPE_EXIT(if (appURL) ::CFRelease(appURL));
 

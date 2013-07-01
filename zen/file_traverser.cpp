@@ -5,11 +5,11 @@
 // **************************************************************************
 
 #include "file_traverser.h"
-#include "last_error.h"
+#include "sys_error.h"
 #include "assert_static.h"
 #include "symlink_target.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/win_ver.h>
 #include "long_path_prefix.h"
 #include "dst_hack.h"
@@ -17,11 +17,11 @@
 #include "dll.h"
 #include "FindFilePlus/find_file_plus.h"
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 #include <zen/osx_string.h>
 #endif
 
-#if defined FFS_LINUX || defined FFS_MAC
+#if defined ZEN_LINUX || defined ZEN_MAC
 #include <sys/stat.h>
 #include <dirent.h>
 #endif
@@ -76,7 +76,7 @@ bool tryReportingItemError(Command cmd, zen::TraverseCallback& callback, const Z
 }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 void getInfoFromFileSymlink(const Zstring& linkName, zen::TraverseCallback::FileInfo& output) //throw FileError
 {
     //open handle to target of symbolic link
@@ -88,24 +88,25 @@ void getInfoFromFileSymlink(const Zstring& linkName, zen::TraverseCallback::File
                                 FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory -> keep it even if we expect to open a file! See comment below
                                 nullptr);
     if (hFile == INVALID_HANDLE_VALUE)
-        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)) + L"\n\n" + getLastErrorFormatted() + L" (CreateFile)");
+        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)), formatSystemError(L"CreateFile", getLastError()));
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
     BY_HANDLE_FILE_INFORMATION fileInfo = {};
     if (!::GetFileInformationByHandle(hFile, &fileInfo))
-        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)) + L"\n\n" + getLastErrorFormatted() + L" (GetFileInformationByHandle)");
+        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
 
     //a file symlink may incorrectly point to a directory, but both CreateFile() and GetFileInformationByHandle() will succeed and return garbage!
-	//- if we did not use FILE_FLAG_BACKUP_SEMANTICS above, CreateFile() would error out with an even less helpful ERROR_ACCESS_DENIED!
+    //- if we did not use FILE_FLAG_BACKUP_SEMANTICS above, CreateFile() would error out with an even less helpful ERROR_ACCESS_DENIED!
     //- reinterpreting the link as a directory symlink would still fail during traversal, so just show an error here
     //- OTOH a directory symlink that points to a file fails immediately in ::FindFirstFile() with ERROR_DIRECTORY! -> nothing to do in this case
     if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)) + L"\n\n" + getLastErrorFormatted(ERROR_FILE_INVALID) + L" (GetFileInformationByHandle)");
+        throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(linkName)), formatSystemError(L"GetFileInformationByHandle", static_cast<DWORD>(ERROR_FILE_INVALID)));
 
     //write output
     output.fileSize      = UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
     output.lastWriteTime = toTimeT(fileInfo.ftLastWriteTime);
     output.id            = extractFileID(fileInfo); //consider detection of moved files: allow for duplicate file ids, renaming affects symlink, not target, ...
+    //output.symlinkInfo -> not filled here
 }
 
 
@@ -191,15 +192,16 @@ struct Win32Traverser
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
         if (hnd.searchHandle == INVALID_HANDLE_VALUE)
         {
+            const ErrorCode lastError = getLastError(); //copy before making other system calls!
             hnd.haveData = false;
-            if (::GetLastError() == ERROR_FILE_NOT_FOUND)
+            if (lastError == ERROR_FILE_NOT_FOUND)
             {
                 //1. directory may not exist *or* 2. it is completely empty: not all directories contain "., .." entries, e.g. a drive's root directory; NetDrive
                 // -> FindFirstFile() is a nice example of violation of API design principle of single responsibility
                 if (dirExists(dirname)) //yes, a race-condition, still the best we can do
                     return;
             }
-            throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"FindFirstFile", lastError));
         }
     }
 
@@ -220,10 +222,11 @@ struct Win32Traverser
 
         if (!::FindNextFile(hnd.searchHandle, &fileInfo))
         {
-            if (::GetLastError() == ERROR_NO_MORE_FILES) //not an error situation
+            const ErrorCode lastError = getLastError(); //copy before making other system calls!
+            if (lastError == ERROR_NO_MORE_FILES) //not an error situation
                 return false;
             //else we have a problem... report it:
-            throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"FindNextFile", lastError));
         }
         return true;
     }
@@ -259,7 +262,7 @@ struct FilePlusTraverser
     {
         hnd.searchHandle = ::openDir(applyLongPathPrefix(dirname).c_str());
         if (hnd.searchHandle == nullptr)
-            throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted() + L" (+)");
+            throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"openDir", getLastError()));
     }
 
     static void destroy(DirHandle hnd) { ::closeDir(hnd.searchHandle); } //throw()
@@ -284,7 +287,7 @@ struct FilePlusTraverser
             }
 
             //else we have a problem... report it:
-            throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (+)");
+            throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"readDir", lastError));
         }
 
         return true;
@@ -310,10 +313,8 @@ class DirTraverser
 {
 public:
     DirTraverser(const Zstring& baseDirectory, TraverseCallback& sink, DstHackCallback* dstCallback) :
-        isFatFileSystem(dst::isFatDrive(baseDirectory))
+        needDstHack(dstCallback ? dst::isFatDrive(baseDirectory) : false)
     {
-        warn_static("ineffizient, wenn kein dst hack/file ids gebraucht werden???")
-
         try //traversing certain folders with restricted permissions requires this privilege! (but copying these files may still fail)
         {
             activatePrivilege(SE_BACKUP_NAME); //throw FileError
@@ -326,8 +327,9 @@ public:
             traverse<Win32Traverser>(baseDirectory, sink, 0);
 
         //apply daylight saving time hack AFTER file traversing, to give separate feedback to user
-        if (dstCallback && isFatFileSystem)
-            applyDstHack(*dstCallback);
+        if (needDstHack)
+            if (dstCallback) //bound if "needDstHack == true"
+                applyDstHack(*dstCallback);
     }
 
 private:
@@ -378,8 +380,11 @@ private:
                     case TraverseCallback::LINK_FOLLOW:
                         if (Trav::isDirectory(findData))
                         {
-                            if (const std::shared_ptr<TraverseCallback>& rv = sink.onDir(shortName, fullName))
-                                traverse<Trav>(fullName, *rv, retrieveVolumeSerial(fullName)); //symlink may link to different volume => redetermine volume serial!
+                            if (TraverseCallback* trav = sink.onDir(shortName, fullName))
+                            {
+                                ZEN_ON_SCOPE_EXIT(sink.releaseDirTraverser(trav));
+                                traverse<Trav>(fullName, *trav, retrieveVolumeSerial(fullName)); //symlink may link to different volume => redetermine volume serial!
+                            }
                         }
                         else //a file
                         {
@@ -387,13 +392,12 @@ private:
                             const bool validLink = tryReportingItemError([&] //try to resolve symlink (and report error on failure!!!)
                             {
                                 getInfoFromFileSymlink(fullName, targetInfo); //throw FileError
+                                targetInfo.symlinkInfo = &linkInfo;
                             }, sink, shortName);
 
                             if (validLink)
                                 sink.onFile(shortName, fullName, targetInfo);
-                            //   else //broken symlink
-                            //      sink.onFile(shortName, fullName, TraverseCallback::FileInfo());
-                            warn_static("impact of ignored broken file/incomplete dir read on two-way variant!?")
+                            // else //broken symlink -> ignore: it's client's responsibility to handle error!
                         }
                         break;
 
@@ -403,8 +407,11 @@ private:
             }
             else if (Trav::isDirectory(findData))
             {
-                if (const std::shared_ptr<TraverseCallback>& rv = sink.onDir(shortName, fullName))
-                    traverse<Trav>(fullName, *rv, volumeSerial);
+                if (TraverseCallback* trav = sink.onDir(shortName, fullName))
+                {
+                    ZEN_ON_SCOPE_EXIT(sink.releaseDirTraverser(trav));
+                    traverse<Trav>(fullName, *trav, volumeSerial);
+                }
             }
             else //a file
             {
@@ -412,12 +419,12 @@ private:
                 Trav::extractFileInfo(findData, volumeSerial, fileInfo);
 
                 //####################################### DST hack ###########################################
-                if (isFatFileSystem)
+                if (needDstHack)
                 {
                     const dst::RawTime rawTime(Trav::getCreateTimeRaw(findData), Trav::getModTimeRaw(findData));
 
                     if (dst::fatHasUtcEncoded(rawTime)) //throw std::runtime_error
-                        fileInfo.lastWriteTime = toTimeT(dst::fatDecodeUtcTime(rawTime)); //return real UTC time; throw (std::runtime_error)
+                        fileInfo.lastWriteTime = toTimeT(dst::fatDecodeUtcTime(rawTime)); //return real UTC time; throw std::runtime_error
                     else
                         markForDstHack.push_back(std::make_pair(fullName, toTimeT(rawTime.writeTimeRaw)));
                 }
@@ -476,13 +483,13 @@ private:
         }
     }
 
-    const bool isFatFileSystem;
-    typedef std::vector<std::pair<Zstring, Int64> > FilenameTimeList;
+    const bool needDstHack;
+    typedef std::vector<std::pair<Zstring, Int64>> FilenameTimeList;
     FilenameTimeList markForDstHack;
     //####################################### DST hack ###########################################
 };
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 class DirTraverser
 {
 public:
@@ -498,8 +505,8 @@ public:
                    the buffer whose address is passed in entry as follows:
                        len = offsetof(struct dirent, d_name) + pathconf(dirpath, _PC_NAME_MAX) + 1
                        entryp = malloc(len); */
-        const size_t maxPath = std::max<long>(::pathconf(directoryFormatted.c_str(), _PC_NAME_MAX), 10000); //::pathconf may return long(-1)
-        buffer.resize(offsetof(struct ::dirent, d_name) + maxPath + 1);
+        const size_t nameMax = std::max<long>(::pathconf(directoryFormatted.c_str(), _PC_NAME_MAX), 10000); //::pathconf may return long(-1)
+        buffer.resize(offsetof(struct ::dirent, d_name) + nameMax + 1);
 
         traverse(directoryFormatted, sink);
     }
@@ -517,7 +524,7 @@ private:
     {
         dirObj = ::opendir(dirname.c_str()); //directory must NOT end with path separator, except "/"
             if (!dirObj)
-                throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
+                throw FileError(replaceCpy(_("Cannot open directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"opendir", getLastError()));
         }, sink))
         return; //ignored error
         ZEN_ON_SCOPE_EXIT(::closedir(dirObj)); //never close nullptr handles! -> crash
@@ -528,7 +535,7 @@ private:
             tryReportingDirError([&]
             {
                 if (::readdir_r(dirObj, reinterpret_cast< ::dirent*>(&buffer[0]), &dirEntry) != 0)
-                    throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
+                    throw FileError(replaceCpy(_("Cannot enumerate directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"readdir_r", getLastError()));
             }, sink);
             if (!dirEntry) //no more items or ignored error
                 return;
@@ -538,7 +545,7 @@ private:
             if (shortName[0] == '.' &&
                 (shortName[1] == 0 || (shortName[1] == '.' && shortName[2] == 0)))
                 continue;
-#ifdef FFS_MAC
+#ifdef ZEN_MAC
             //some file system abstraction layers fail to properly return decomposed UTF8: http://developer.apple.com/library/mac/#qa/qa1173/_index.html
             //so we need to do it ourselves; perf: ~600 ns per conversion
             //note: it's not sufficient to apply this in z_impl::compareFilenamesNoCase: if UTF8 forms differ, FFS assumes a rename in case sensitivity and
@@ -564,7 +571,7 @@ private:
             if (!tryReportingItemError([&]
         {
             if (::lstat(fullName.c_str(), &statData) != 0) //lstat() does not resolve symlinks
-                    throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(fullName)) + L"\n\n" + getLastErrorFormatted());
+                    throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(fullName)), formatSystemError(L"lstat", getLastError()));
             }, sink, shortName))
             continue; //ignore error: skip file
 
@@ -582,15 +589,18 @@ private:
                         bool validLink = tryReportingItemError([&]
                         {
                             if (::stat(fullName.c_str(), &statDataTrg) != 0)
-                                throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(fullName)) + L"\n\n" + getLastErrorFormatted());
+                                throw FileError(replaceCpy(_("Cannot resolve symbolic link %x."), L"%x", fmtFileName(fullName)), formatSystemError(L"stat", getLastError()));
                         }, sink, shortName);
 
                         if (validLink)
                         {
                             if (S_ISDIR(statDataTrg.st_mode)) //a directory
                             {
-                                if (const std::shared_ptr<TraverseCallback>& rv = sink.onDir(shortName, fullName))
-                                    traverse(fullName, *rv);
+                                if (TraverseCallback* trav = sink.onDir(shortName, fullName))
+                                {
+                                    ZEN_ON_SCOPE_EXIT(sink.releaseDirTraverser(trav));
+                                    traverse(fullName, *trav);
+                                }
                             }
                             else //a file or named pipe, ect.
                             {
@@ -598,11 +608,11 @@ private:
                                 fileInfo.fileSize      = zen::UInt64(statDataTrg.st_size);
                                 fileInfo.lastWriteTime = statDataTrg.st_mtime; //UTC time (time_t format); unit: 1 second
                                 fileInfo.id            = extractFileID(statDataTrg);
+                                fileInfo.symlinkInfo   = &linkInfo;
                                 sink.onFile(shortName, fullName, fileInfo);
                             }
                         }
-                        // else //report broken symlink as file!
-                        //     sink.onFile(shortName, fullName, TraverseCallback::FileInfo());
+                        // else //broken symlink -> ignore: it's client's responsibility to handle error!
                     }
                     break;
 
@@ -612,8 +622,11 @@ private:
             }
             else if (S_ISDIR(statData.st_mode)) //a directory
             {
-                if (const std::shared_ptr<TraverseCallback>& rv = sink.onDir(shortName, fullName))
-                    traverse(fullName, *rv);
+                if (TraverseCallback* trav = sink.onDir(shortName, fullName))
+                {
+                    ZEN_ON_SCOPE_EXIT(sink.releaseDirTraverser(trav));
+                    traverse(fullName, *trav);
+                }
             }
             else //a file or named pipe, ect.
             {
@@ -635,7 +648,7 @@ private:
     }
 
     std::vector<char> buffer;
-#ifdef FFS_MAC
+#ifdef ZEN_MAC
     std::vector<char> bufferUtfDecomposed;
 #endif
 };

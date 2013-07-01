@@ -1,6 +1,6 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
-// * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -197,8 +197,8 @@ template <class CharType> inline
 size_t strftimeWrap(CharType* buffer, size_t bufferSize, const CharType* format, const struct std::tm* timeptr)
 {
 #if defined _MSC_VER && !defined NDEBUG
-    //it's no use: application init must register an invalid parameter that does nothing !!!
-    //=> strftime will abort with 0 and set errno to EINVAL instead of CRASH THE APPLICATION!
+    //there's no way around: application init must register an invalid parameter handler that does nothing !!!
+    //=> strftime will abort with 0 and set errno to EINVAL instead of CRASHING THE APPLICATION!
     _invalid_parameter_handler oldHandler = _set_invalid_parameter_handler(nullptr);
     assert(oldHandler);
     _set_invalid_parameter_handler(oldHandler);

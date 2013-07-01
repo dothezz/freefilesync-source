@@ -17,11 +17,11 @@
 ////#include "../lib/ffs_paths.h"
 #include <zen/scope_guard.h>
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/win.h> //tame wininet include
 #include <wininet.h>
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <wx/protocol/http.h>
 #include <wx/sstream.h>
 #endif
@@ -31,7 +31,7 @@ using namespace zen;
 
 namespace
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 class InternetConnectionError {};
 
 class WinInetAccess //using IE proxy settings! :)
@@ -138,7 +138,7 @@ enum GetVerResult
 
 GetVerResult getOnlineVersion(wxString& version) //empty string on error;
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //internet access supporting proxy connections
     std::vector<char> output;
     try
@@ -154,7 +154,7 @@ GetVerResult getOnlineVersion(wxString& version) //empty string on error;
     version = utfCvrtTo<wxString>(&output[0]);
     return GET_VER_SUCCESS;
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     wxWindowDisabler dummy;
 
     auto getStringFromUrl = [](const wxString& server, const wxString& page, int timeout, wxString* output) -> bool //true on successful connection
@@ -228,21 +228,23 @@ void zen::checkForUpdateNow(wxWindow* parent)
             if (haveNewerVersion(onlineVersion))
             {
                 if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                    _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
-                    wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
+                                    _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?"),
+                                    QuestConfig().setCaption(_("New version found")).setLabelYes(_("&Download"))) == ReturnQuestionDlg::BUTTON_YES)
+                    wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/get_latest.php");
             }
             else
-                wxMessageBox(_("FreeFileSync is up to date!"), _("Information"), wxICON_INFORMATION, parent);
+                wxMessageBox(_("FreeFileSync is up to date."), _("Information"), wxOK | wxICON_INFORMATION, parent);
             break;
 
         case GET_VER_NO_CONNECTION:
-            wxMessageBox(_("Unable to connect to sourceforge.net!"), _("Error"), wxOK | wxICON_ERROR, parent);
+            wxMessageBox(_("Unable to connect to sourceforge.net."), _("Error"), wxOK | wxICON_ERROR, parent);
             break;
 
         case GET_VER_PAGE_NOT_FOUND:
             if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                _("Current FreeFileSync version number was not found online! Do you want to check manually?")) == ReturnQuestionDlg::BUTTON_YES)
-                wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/");
+                                _("Cannot find current FreeFileSync version number online. Do you want to check manually?"),
+                                QuestConfig().setCaption(_("Error"))) == ReturnQuestionDlg::BUTTON_YES)
+                wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/");
             break;
     }
 }
@@ -255,8 +257,8 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, co
         //if (lastUpdateCheck == 0)
         //{
         //    switch (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
-        //                            _("Do you want FreeFileSync to automatically check for updates every week?") + L"\n" +
-        //                            _("(Requires an Internet connection!)")))
+        //                            ("Do you want FreeFileSync to automatically check for updates every week?") + L"\n" +
+        //                            ("(Requires an Internet connection!)")))
         //    {
         //        case ReturnQuestionDlg::BUTTON_YES:
         //            lastUpdateCheck = 123; //some old date (few seconds after 1970) different from 0 and -1
@@ -284,9 +286,9 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, co
                     if (haveNewerVersion(onlineVersion))
                     {
                         if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                            _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" +
-                                            _("Download now?")) == ReturnQuestionDlg::BUTTON_YES)
-                            wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/files/freefilesync/v" + onlineVersion + L"/");
+                                            _("A new version of FreeFileSync is available:")  + L" " + onlineVersion + L"\n\n" + _("Download now?"),
+                                            QuestConfig().setCaption(_("New version found")).setLabelYes(_("&Download"))) == ReturnQuestionDlg::BUTTON_YES)
+                            wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/get_latest.php");
                     }
                     break;
 
@@ -295,8 +297,9 @@ void zen::checkForUpdatePeriodically(wxWindow* parent, long& lastUpdateCheck, co
 
                 case GET_VER_PAGE_NOT_FOUND:
                     if (showQuestionDlg(parent, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                                        _("Current FreeFileSync version number was not found online! Do you want to check manually?")) == ReturnQuestionDlg::BUTTON_YES)
-                        wxLaunchDefaultBrowser(L"http://sourceforge.net/projects/freefilesync/");
+                                        _("Cannot find current FreeFileSync version number online. Do you want to check manually?"),
+                                        QuestConfig().setCaption(_("Error"))) == ReturnQuestionDlg::BUTTON_YES)
+                        wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/");
                     break;
             }
         }

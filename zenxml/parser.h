@@ -1,5 +1,5 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
+// * This file is part of the zen::Xml project. It is distributed under the *
 // * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
@@ -35,9 +35,9 @@ std::string serialize(const XmlDoc& doc,
 struct XmlParsingError : public XmlError
 {
     XmlParsingError(size_t rowNo, size_t colNo) : row(rowNo), col(colNo) {}
-    ///Input file row where the parsing error occured
+    ///Input file row where the parsing error occured (zero-based)
     size_t row; //beginning with 0
-    ///Input file column where the parsing error occured
+    ///Input file column where the parsing error occured (zero-based)
     size_t col; //
 };
 
@@ -45,20 +45,10 @@ struct XmlParsingError : public XmlError
 ///Load XML document from a byte stream
 /**
 \param stream Input byte stream
-\param doc Output XML document
+\returns Output XML document
 \throw XmlParsingError
 */
-void parse(const std::string& stream, XmlDoc& doc); //throw XmlParsingError
-
-
-
-
-
-
-
-
-
-
+XmlDoc parse(const std::string& stream); //throw XmlParsingError
 
 
 
@@ -169,6 +159,20 @@ std::string normalizeAttribValue(const std::string& str)
 }
 
 
+template <class CharIterator, size_t N> inline
+bool checkEntity(CharIterator& first, CharIterator last, const char (&placeholder)[N])
+{
+    assert(placeholder[N - 1] == 0);
+    const ptrdiff_t strLen = N - 1; //don't count null-terminator
+    if (last - first >= strLen && std::equal(first, first + strLen, placeholder))
+    {
+        first += strLen - 1;
+        return true;
+    }
+    return false;
+}
+
+
 namespace
 {
 std::string denormalize(const std::string& str)
@@ -180,42 +184,26 @@ std::string denormalize(const std::string& str)
 
         if (c == '&')
         {
-            auto checkEntity = [&](const char* placeholder, char realVal) -> bool
+            if (checkEntity(it, str.end(), "&amp;"))
+                output += '&';
+            else if (checkEntity(it, str.end(), "&lt;"))
+                output += '<';
+            else if (checkEntity(it, str.end(), "&gt;"))
+                output += '>';
+            else if (checkEntity(it, str.end(), "&apos;"))
+                output += '\'';
+            else if (checkEntity(it, str.end(), "&quot;"))
+                output += '\"';
+            else if (str.end() - it >= 6 &&
+                     it[1] == '#' &&
+                     it[2] == 'x' &&
+                     it[5] == ';')
             {
-                size_t strLen = strLength(placeholder);
-
-                if (str.end() - it >= static_cast<int>(strLen) && std::equal(it, it + strLen, placeholder))
-                {
-                    output += realVal;
-                    it += strLen - 1;
-                    return true;
-                }
-                return false;
-            };
-
-            if (checkEntity("&amp;", '&'))
-                continue;
-            if (checkEntity("&lt;", '<'))
-                continue;
-            if (checkEntity("&gt;", '>'))
-                continue;
-            if (checkEntity("&apos;", '\''))
-                continue;
-            if (checkEntity("&quot;", '\"'))
-                continue;
-
-            if (str.end() - it >= 6 &&
-                it[1] == '#' &&
-                it[2] == 'x' &&
-                it[5] == ';')
-            {
-                output += unhexify(it[3], it[4]);
+                output += unhexify(it[3], it[4]); //unhexify beats "::sscanf(&it[3], "%02X", &tmp)" by a factor of 3000 for ~250000 calls!!!
                 it += 5;
-                continue;
-                //unhexify beats "::sscanf(&it[3], "%02X", &tmp)" by a factor of 3000 for ~250000 calls!!!
             }
-
-            output += c; //unexpected char!
+            else
+                output += c; //unexpected char!
         }
         else if (c == '\r') //map all end-of-line characters to \n http://www.w3.org/TR/xml/#sec-line-ends
         {
@@ -245,7 +233,7 @@ void serialize(const XmlElement& element, std::string& stream,
 
     auto attr = element.getAttributes();
     for (auto it = attr.first; it != attr.second; ++it)
-        stream += ' ' + normalizeName(it->first) + "=\"" + normalizeAttribValue(it->second) + "\"";
+        stream += ' ' + normalizeName(it->first) + "=\"" + normalizeAttribValue(it->second) + '\"';
 
     //no support for mixed-mode content
     auto iterPair = element.getChildren();
@@ -278,15 +266,15 @@ std::string serialize(const XmlDoc& doc,
 {
     std::string version = doc.getVersionAs<std::string>();
     if (!version.empty())
-        version = " version=\"" + normalizeAttribValue(version) + "\"";
+        version = " version=\"" + normalizeAttribValue(version) + '\"';
 
     std::string encoding = doc.getEncodingAs<std::string>();
     if (!encoding.empty())
-        encoding = " encoding=\"" + normalizeAttribValue(encoding) + "\"";
+        encoding = " encoding=\"" + normalizeAttribValue(encoding) + '\"';
 
     std::string standalone = doc.getStandaloneAs<std::string>();
     if (!standalone.empty())
-        standalone = " standalone=\"" + normalizeAttribValue(standalone) + "\"";
+        standalone = " standalone=\"" + normalizeAttribValue(standalone) + '\"';
 
     std::string output = "<?xml" + version + encoding + standalone + "?>" + lineBreak;
     serialize(doc.root(), output, lineBreak, indent, 0);
@@ -352,7 +340,11 @@ struct Token
 class Scanner
 {
 public:
-    Scanner(const std::string& stream) : stream_(stream), pos(stream_.begin())
+    Scanner(const std::string& stream) :
+        xmlCommentBegin("<!--"),
+        xmlCommentEnd  ("-->"),
+        stream_(stream),
+        pos(stream_.begin())
     {
         if (zen::startsWith(stream_, BYTE_ORDER_MARK_UTF8))
             pos += strLength(BYTE_ORDER_MARK_UTF8);
@@ -376,8 +368,19 @@ public:
         if (pos == stream_.end())
             return Token::TK_END;
 
+        //skip XML comments
+        if (startsWith(xmlCommentBegin))
+        {
+            auto it = std::search(pos + xmlCommentBegin.size(), stream_.end(), xmlCommentEnd.begin(), xmlCommentEnd.end());
+            if (it != stream_.end())
+            {
+                pos = it + xmlCommentEnd.size();
+                return nextToken();
+            }
+        }
+
         for (auto it = tokens.begin(); it != tokens.end(); ++it)
-            if (startsWith(pos, it->first))
+            if (startsWith(it->first))
             {
                 pos += it->first.size();
                 return it->second;
@@ -455,15 +458,18 @@ private:
     Scanner(const Scanner&);
     Scanner& operator=(const Scanner&);
 
-    bool startsWith(std::string::const_iterator it, const std::string& prefix) const
+    bool startsWith(const std::string& prefix) const
     {
-        if (stream_.end() - it < static_cast<ptrdiff_t>(prefix.size()))
+        if (stream_.end() - pos < static_cast<ptrdiff_t>(prefix.size()))
             return false;
-        return std::equal(prefix.begin(), prefix.end(), it);
+        return std::equal(prefix.begin(), prefix.end(), pos);
     }
 
     typedef std::vector<std::pair<std::string, Token::Type> > TokenList;
     TokenList tokens;
+
+    const std::string xmlCommentBegin;
+    const std::string xmlCommentEnd;
 
     const std::string stream_;
     std::string::const_iterator pos;
@@ -477,8 +483,10 @@ public:
         scn(stream),
         tk(scn.nextToken()) {}
 
-    void parse(XmlDoc& doc) //throw XmlParsingError
+    XmlDoc parse() //throw XmlParsingError
     {
+        XmlDoc doc;
+
         //declaration (optional)
         if (token().type == Token::TK_DECL_BEGIN)
         {
@@ -515,6 +523,7 @@ public:
             doc.root().swap(*iterPair.first);
 
         expectToken(Token::TK_END);
+        return doc;
     };
 
 private:
@@ -600,9 +609,9 @@ private:
 }
 
 inline
-void parse(const std::string& stream, XmlDoc& doc) //throw XmlParsingError
+XmlDoc parse(const std::string& stream) //throw XmlParsingError
 {
-    implementation::XmlParser(stream).parse(doc);  //throw XmlParsingError
+    return implementation::XmlParser(stream).parse();  //throw XmlParsingError
 }
 }
 

@@ -1,143 +1,164 @@
 <header>
-	<language name>Español</language name>
-	<translator>Alexis Martínez</translator>
+	<language>Español</language>
+	<translator>I.R.Maturana (irmlab.com)</translator>
 	<locale>es_ES</locale>
-	<flag file>spain.png</flag file>
-	<plural forms>2</plural forms>
-	<plural definition>n == 1 ? 0 : 1</plural definition>
+	<flag_image>flag_spain.png</flag_image>
+	<plural_form_count>2</plural_form_count>
+	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Searching for folder %x...</source>
-<target>Buscando carpeta %x...</target>
+<source>Both sides have changed since last synchronization.</source>
+<target>Ambos lados han cambiado desde la última sincronización.</target>
 
-<source>Items processed:</source>
-<target>Elementos procesados:</target>
+<source>Cannot determine sync-direction:</source>
+<target>No se puede determinar la dirección de la sincronización:</target>
 
-<source>Items remaining:</source>
-<target>Elementos restantes:</target>
+<source>No change since last synchronization.</source>
+<target>Ningún cambio desde la última sincronización.</target>
 
-<source>Total time:</source>
-<target>Tiempo total:</target>
+<source>The database entry is not in sync considering current settings.</source>
+<target>La entrada de la base de datos no está sincronizada, de acuerdo con la configuración actual.</target>
 
-<source>Cannot set directory lock for %x.</source>
-<target>No se pudo bloquear el directorio %x.</target>
+<source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
+<target>Fijando direcciones de sincronización predeterminadas: los archivos nuevos sobrescribirán los archivos antiguos.</target>
 
-<source>Show in Explorer</source>
-<target>Mostrar en Explorer</target>
+<source>Checking recycle bin availability for folder %x...</source>
+<target>Comprobando disponibilidad de la papelera de reciclaje para la carpeta %x…</target>
 
-<source>Open with default application</source>
-<target>Abrir con la aplicación por defecto</target>
+<source>Moving file %x to recycle bin</source>
+<target>Mover archivo %x a la papelera de reciclaje</target>
 
-<source>Browse directory</source>
-<target>Examinar directorio</target>
+<source>Moving folder %x to recycle bin</source>
+<target>Mover carpeta %x a la papelera de reciclaje</target>
 
-<source>Abort requested: Waiting for current operation to finish...</source>
-<target>Solicitud de aborto: Esperando a que la operación actual finalice...</target>
+<source>Moving symbolic link %x to recycle bin</source>
+<target>Mover vínculo simbólico %x a la papelera de reciclaje</target>
 
-<source>Failure to create timestamp for versioning:</source>
-<target>Fallo al crear fecha y hora para el versionado:</target>
+<source>Deleting file %x</source>
+<target>Borrar archivo %x</target>
 
-<source>RealtimeSync - Automated Synchronization</source>
-<target>RealtimeSync - Sincronización Automática</target>
+<source>Deleting folder %x</source>
+<target>Borrar carpeta %x</target>
+
+<source>Deleting symbolic link %x</source>
+<target>Borrar vínculo simbólico %x</target>
+
+<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>La Papelera de reciclaje no está disponible para las carpetas siguientes. Los archivos se borrarán de forma permanente:</target>
+
+<source>An exception occurred</source>
+<target>Ha ocurrido una excepción</target>
+
+<source>Cannot find file %x.</source>
+<target>No se puede encontrar el archivo %x.</target>
 
 <source>Error</source>
 <target>Error</target>
 
-<source>Selected variant:</source>
-<target>Seleccionar variante:</target>
+<source>File %x does not contain a valid configuration.</source>
+<target>El archivo %x no contiene una configuración válida.</target>
 
-<source>Select alternate comparison settings</source>
-<target>Seleccionar opciones alternativas de comparación</target>
+<source>A folder input field is empty.</source>
+<target>Un campo de entrada de la carpeta está vacío.</target>
 
-<source>Select alternate synchronization settings</source>
-<target>Seleccione opciones alternativas de sincronización</target>
+<source>The corresponding folder will be considered as empty.</source>
+<target>La siguiente carpeta será considerada como vacía.</target>
 
-<source>Filter is active</source>
-<target>Filtro activo</target>
+<source>Cannot find the following folders:</source>
+<target>No se pudieron encontrar las siguiente carpetas:</target>
 
-<source>No filter selected</source>
-<target>Ningún filtro seleccionado</target>
+<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
+<target>Ignore este error si desea tratar cada carpeta como vacía. En tal caso, se crearán estas carpetas automáticamente durante la sincronización.</target>
 
-<source>Remove alternate settings</source>
-<target>Eliminar opciones alternativas</target>
+<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
+<target>Las carpetas siguientes usan rutas dependientes. Tenga cuidado al definir reglas de sincronización:</target>
 
-<source>Clear filter settings</source>
-<target>Limpiar opciones del filtrado</target>
+<source>File %x has an invalid date.</source>
+<target>El archivo %x tiene una fecha inválida.</target>
 
-<source>Copy</source>
-<target>Copiar</target>
+<source>Date:</source>
+<target>Fecha:</target>
 
-<source>Paste</source>
-<target>Pegar</target>
+<source>Files %x have the same date but a different size.</source>
+<target>Los archivos %x tienen la misma fecha pero un tamaño diferente.</target>
 
-<source>Save as batch job</source>
-<target>Salvar como tarea batch</target>
+<source>Size:</source>
+<target>Tamaño:</target>
 
-<source>Comparison settings</source>
-<target>Opciones de comparación</target>
+<source>Items differ in attributes only</source>
+<target>Los elementos sólo se diferencian en los atributos</target>
 
-<source>Synchronization settings</source>
-<target>Opciones de sincronización</target>
+<source>Resolving symbolic link %x</source>
+<target>Resolviendo el vínculo simbólico %x</target>
 
-<source>About</source>
-<target>Acerca de</target>
+<source>Comparing content of files %x</source>
+<target>Comparación del contenido de los archivos %x</target>
 
-<source>Confirm</source>
-<target>Confirmar</target>
+<source>Generating file list...</source>
+<target>Generando lista de archivos…</target>
 
-<source>Configure filter</source>
-<target>Configurar filtro</target>
+<source>Starting comparison</source>
+<target>Iniciando la comparación</target>
 
-<source>Global settings</source>
-<target>Opciones globales</target>
+<source>Calculating sync directions...</source>
+<target>Calculando direcciones de sincronización…</target>
 
-<source>Find</source>
-<target>Buscar</target>
+<source>Out of memory.</source>
+<target>Sin memoria.</target>
 
-<source>Select time span</source>
-<target>Seleccionar duración</target>
+<source>Item exists on left side only</source>
+<target>El elemento existe sólo en el lado izquierdo</target>
 
-<source>Invalid command line:</source>
-<target>Línea de comandos errónea:</target>
+<source>Item exists on right side only</source>
+<target>El elemento existe sólo en el lado derecho</target>
 
-<source>Info</source>
-<target>Info</target>
+<source>Left side is newer</source>
+<target>El lado izquierdo es más nuevo</target>
 
-<source>Warning</source>
-<target>Atención</target>
+<source>Right side is newer</source>
+<target>El lado derecho es más nuevo</target>
 
-<source>Fatal Error</source>
-<target>Error fatal</target>
+<source>Items have different content</source>
+<target>Los elementos tienen contenido distinto</target>
 
-<source>Error Code %x:</source>
-<target>Error: %x:</target>
+<source>Both sides are equal</source>
+<target>Ambos lados son iguales</target>
 
-<source>Cannot resolve symbolic link %x.</source>
-<target>No se puede resolver el enlace simbólico %x.</target>
+<source>Conflict/item cannot be categorized</source>
+<target>Conflicto</target>
 
-<source>Cannot determine final path for %x.</source>
-<target></target>
+<source>Copy new item to left</source>
+<target>Copiar nuevo elemento a la izquierda</target>
 
-<source>Cannot find system function %x.</source>
-<target>No se puede encontrar la función del sistema %x.</target>
+<source>Copy new item to right</source>
+<target>Copiar nuevo elemento a la derecha</target>
 
-<source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-</source>
-<target>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-</target>
+<source>Delete left item</source>
+<target>Eliminar elemento izquierdo</target>
 
-<source>%x MB</source>
-<target>%x MB</target>
+<source>Delete right item</source>
+<target>Eliminar elemento derecho</target>
 
-<source>%x KB</source>
-<target>%x KB</target>
+<source>Move file on left</source>
+<target>Mover archivo a la izquierda</target>
 
-<source>%x GB</source>
-<target>%x GB</target>
+<source>Move file on right</source>
+<target>Mover archivo a la derecha</target>
+
+<source>Overwrite left item</source>
+<target>Sobrescribir elemento izquierdo</target>
+
+<source>Overwrite right item</source>
+<target>Sobrescribir elemento derecho</target>
+
+<source>Do nothing</source>
+<target>No hacer nada</target>
+
+<source>Update attributes on left</source>
+<target>Actualizar atributos en la izquierda</target>
+
+<source>Update attributes on right</source>
+<target>Actualizar atributos en la derecha</target>
 
 <source>Database file %x is incompatible.</source>
 <target>El archivo de base de datos %x es incompatible</target>
@@ -151,9 +172,6 @@
 <source>Database file is corrupt:</source>
 <target>El archivo de base de datos está dañado:</target>
 
-<source>Out of memory!</source>
-<target>¡Sin memoria!</target>
-
 <source>Cannot write file %x.</source>
 <target>No se puede escribir el archivo %x</target>
 
@@ -163,8 +181,8 @@
 <source>Database files do not share a common session.</source>
 <target>Los archivos de base de datos no comparten una sesión común</target>
 
-<source>An exception occurred!</source>
-<target>¡Ha ocurrido una excepción!</target>
+<source>Searching for folder %x...</source>
+<target>Buscando carpeta %x…</target>
 
 <source>Cannot read file attributes of %x.</source>
 <target>No se puede leer archivo de atributos de %x</target>
@@ -173,22 +191,52 @@
 <target>No se puede obtener información del proceso.</target>
 
 <source>Waiting while directory is locked (%x)...</source>
-<target>Esperando mientras el directorio se encuentre bloqueado (%x)...</target>
+<target>Esperando mientras el directorio se encuentre bloqueado (%x)…</target>
 
 <source>
 <pluralform>1 sec</pluralform>
 <pluralform>%x sec</pluralform>
 </source>
 <target>
-<pluralform>1 seg</pluralform>
-<pluralform>%x segs</pluralform>
+<pluralform>1 seg.</pluralform>
+<pluralform>%x seg.</pluralform>
 </target>
 
 <source>Creating file %x</source>
 <target>Creando archivo %x</target>
 
+<source>Items processed:</source>
+<target>Elementos procesados:</target>
+
+<source>Items remaining:</source>
+<target>Elementos restantes:</target>
+
+<source>Total time:</source>
+<target>Tiempo total:</target>
+
+<source>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</target>
+
+<source>%x MB</source>
+<target>%x MB</target>
+
+<source>%x KB</source>
+<target>%x KB</target>
+
+<source>%x GB</source>
+<target>%x GB</target>
+
 <source>Error parsing file %x, row %y, column %z.</source>
 <target>Error analizando archivo %x, fila %y, columna %z.</target>
+
+<source>Cannot set directory lock for %x.</source>
+<target>No se pudo bloquear el directorio %x.</target>
 
 <source>Scanning:</source>
 <target>Escanear:</target>
@@ -198,48 +246,57 @@
 <pluralform>[%x Threads]</pluralform>
 </source>
 <target>
-<pluralform>[1 Hilo]</pluralform>
-<pluralform>[%x Hilos]</pluralform>
+<pluralform>[1 hilo]</pluralform>
+<pluralform>[%x hilos]</pluralform>
 </target>
 
 <source>Encoding extended time information: %x</source>
-<target>Información temporal extendida de la codificación: %x</target>
+<target>Condificando información de hora extendida: %x</target>
 
 <source>/sec</source>
 <target>/seg</target>
 
-<source>File %x does not contain a valid configuration.</source>
-<target>El archivo %x no contiene una configuración válida.</target>
-
 <source>Configuration file %x loaded partially only.</source>
 <target>Archivo de configuración %x cargado sólo parcialmente.</target>
 
+<source>Show in Explorer</source>
+<target>Mostrar en el Explorador</target>
+
+<source>Open with default application</source>
+<target>Abrir con la aplicación predeterminada</target>
+
+<source>Browse directory</source>
+<target>Examinar directorio</target>
+
 <source>Cannot access Volume Shadow Copy Service.</source>
-<target>No se puede acceder al servicio de copia Volume Shadow.</target>
+<target>No se puede acceder al servicio de Instantánea de volumen.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Por favor, use la versión de 64 bits de FreeFileSync para crear copias de Shadow en el sistema.</target>
 
 <source>Cannot load file %x.</source>
-<target>No se ha podido cargar el archivo %x.</target>
+<target>No se puede cargar el archivo %x.</target>
 
-<source>Path %x does not contain a volume name.</source>
-<target>La ruta %x no contiene un nombre de volumen.</target>
+<source>Cannot determine volume name for %x.</source>
+<target>No se puede determinar nombre del volumen de %x.</target>
 
-<source>Volume name %x not part of file name %y!</source>
-<target>El nombre del volumen %x no es una parte del nombre de archivo %y</target>
+<source>Volume name %x not part of file name %y.</source>
+<target>El nombre de volumen %x no es parte del nombre de archivo %y.</target>
+
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Anulación solicitada: esperando a que la operación actual finalice…</target>
+
+<source>Failure to create timestamp for versioning:</source>
+<target>Fallo al crear fecha y hora para el versionado:</target>
 
 <source>Cannot read the following XML elements:</source>
-<target>Incapaz de leer los siguientes elementos XML:</target>
-
-<source>Cannot find file %x.</source>
-<target>No se puede encontrar el archivo %x.</target>
+<target>No se pueden leer los siguientes elementos XML:</target>
 
 <source>&Open...</source>
-<target>&Abrir...</target>
+<target>&Abrir…</target>
 
 <source>Save &as...</source>
-<target>Guardar &como...</target>
+<target>Guardar &como…</target>
 
 <source>&Quit</source>
 <target>&Salir</target>
@@ -260,16 +317,16 @@
 <target>Uso:</target>
 
 <source>1. Select folders to watch.</source>
-<target>1. Seleccionar carpetar para ver.</target>
+<target>1. Seleccionar carpetas para mostrar.</target>
 
 <source>2. Enter a command line.</source>
 <target>2. Introduzca una línea de comandos.</target>
 
 <source>3. Press 'Start'.</source>
-<target>3. Presione 'Inicio'.</target>
+<target>3. Presione ’Inicio’.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>Para empezar, importe un archivo .ffs_batch</target>
+<target>Para comenzar, importe un archivo .ffs_batch</target>
 
 <source>Folders to watch</source>
 <target>Carpetas para ver</target>
@@ -315,8 +372,17 @@ El comando es disparado si::
 <source>Cancel</source>
 <target>Cancelar</target>
 
+<source>RealtimeSync - Automated Synchronization</source>
+<target>RealtimeSync - Sincronización Automática</target>
+
+<source>Warning</source>
+<target>Atención</target>
+
 <source>Build: %x</source>
 <target>Completado: %x</target>
+
+<source>About</source>
+<target>Acerca de</target>
 
 <source>All files</source>
 <target>Todos los archivos</target>
@@ -327,38 +393,134 @@ El comando es disparado si::
 <source>&Exit</source>
 <target>&Salir</target>
 
-<source>Monitoring active...</source>
-<target>Visualización activa...</target>
-
 <source>Waiting for missing directories...</source>
-<target>Esperando directorios faltantes...</target>
+<target>Esperando directorios faltantes…</target>
 
-<source>A folder input field is empty.</source>
-<target>Un campo de entrada de la carpeta está vacío.</target>
+<source>Invalid command line:</source>
+<target>Línea de comandos errónea:</target>
 
-<source>Synchronization aborted!</source>
-<target>¡Sincronización abortada!</target>
+<source>File content</source>
+<target>Contenido del archivo</target>
 
-<source>Synchronization completed with errors!</source>
-<target>¡Sincronización completada con errores!</target>
+<source>File time and size</source>
+<target>Fecha y tamaño del archivo</target>
 
-<source>Synchronization completed with warnings.</source>
-<target>Sincronización completada con avisos.</target>
+<source> Two way </source>
+<target> Dos formas </target>
 
-<source>Nothing to synchronize!</source>
-<target>¡Nada que sincronizar!</target>
+<source>Mirror</source>
+<target>Espejo </target>
 
-<source>Synchronization completed successfully.</source>
-<target>Sincronización completada satisfactoriamente.</target>
+<source>Update</source>
+<target>Actualizar </target>
+
+<source>Custom</source>
+<target>Personalizado</target>
+
+<source>Multiple...</source>
+<target>Múltiple…</target>
+
+<source>Moving file %x to %y</source>
+<target>Mover archivo de %x a %y</target>
+
+<source>Moving folder %x to %y</source>
+<target>Mover carpeta de %x a %y</target>
+
+<source>Moving symbolic link %x to %y</source>
+<target>Mover vínculo simbólico de %x a %y</target>
+
+<source>Removing old versions...</source>
+<target>Eliminando versiones antiguas…</target>
+
+<source>Creating symbolic link %x</source>
+<target>Creando vínculo simbólico %x</target>
+
+<source>Creating folder %x</source>
+<target>Creando carpeta %x</target>
+
+<source>Overwriting file %x</source>
+<target>Sobrescribir archivo %x</target>
+
+<source>Overwriting symbolic link %x</source>
+<target>Sobrescribir vínculo simbólico %x</target>
+
+<source>Verifying file %x</source>
+<target>Verificación del archivo %x</target>
+
+<source>Updating attributes of %x</source>
+<target>Actualizar atributos de %x</target>
+
+<source>Cannot find %x.</source>
+<target>No se pudo encontrar %x.</target>
+
+<source>Target folder %x already existing.</source>
+<target>La carpeta de destino %x ya existe.</target>
+
+<source>Target folder input field must not be empty.</source>
+<target>El campo de entrada de la carpeta de destino no debe estar vacío.</target>
+
+<source>Folder input field for versioning must not be empty.</source>
+<target>El campo de entrada de la carpeta para el control de versiones no debe estar vacío.</target>
+
+<source>Source folder %x not found.</source>
+<target>El archivo de origen %x no ha sido encontrado.</target>
+
+<source>The following items have unresolved conflicts and will not be synchronized:</source>
+<target>Los siguientes elementos tienen conflictos sin resolver y no serán sincronizados:</target>
+
+<source>Significant difference detected:</source>
+<target>Diferencia significante detectada:</target>
+
+<source>More than 50% of the total number of files will be copied or deleted.</source>
+<target>Más del 50% del número total de archivos serán copiados o eliminados.</target>
+
+<source>Not enough free disk space available in:</source>
+<target>Espacio en disco insuficiente en:</target>
+
+<source>Required:</source>
+<target>Requerido:</target>
+
+<source>Available:</source>
+<target>Disponible:</target>
+
+<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
+<target>Una carpeta, que es parte de múltiple pares de carpetas, será modificada. Por favor, revise las opciones de sincronización.</target>
+
+<source>Synchronizing folder pair:</source>
+<target>Sincronizando par de carpetas:</target>
+
+<source>Generating database...</source>
+<target>Generando base de datos…</target>
+
+<source>Creating Volume Shadow Copy for %x...</source>
+<target>Creando Instantánea de volumen para %x…</target>
+
+<source>Data verification error: %x and %y have different content.</source>
+<target>Error al comprobar los datos: %x y %y tienen contenidos diferentes.</target>
+
+<source>Synchronization aborted</source>
+<target>Sincronización anulada</target>
+
+<source>Synchronization completed with errors</source>
+<target>Sincronización completada con errores</target>
+
+<source>Synchronization completed with warnings</source>
+<target>Sincronización completada con avisos</target>
+
+<source>Nothing to synchronize</source>
+<target>Nada que sincronizar</target>
+
+<source>Synchronization completed successfully</source>
+<target>Sincronización completada satisfactoriamente</target>
 
 <source>Saving log file %x...</source>
-<target>Guardando registro %x...</target>
+<target>Guardando registro %x…</target>
 
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
 <target>Presione "Cambiar" para resolver los problemas en el diálogo principal de FreeFileSync.</target>
 
-<source>Switching to FreeFileSync main dialog...</source>
-<target>Cambiando al diálogo principal de FreeFileSync...</target>
+<source>Switching to FreeFileSync main dialog</source>
+<target>Cambiando a la ventana principal de FreeFileSync</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Una nueva versión de FreeFileSync está disponible:</target>
@@ -366,29 +528,29 @@ El comando es disparado si::
 <source>Download now?</source>
 <target>¿Descargar ahora?</target>
 
-<source>FreeFileSync is up to date!</source>
-<target>¡FreeFileSync está actualizado!</target>
+<source>New version found</source>
+<target>Se encontró una nueva versión</target>
+
+<source>&Download</source>
+<target>&Descargar</target>
+
+<source>FreeFileSync is up to date.</source>
+<target>FreeFileSync está actualizado.</target>
 
 <source>Information</source>
 <target>Información</target>
 
-<source>Unable to connect to sourceforge.net!</source>
-<target>¡Incapaz de conectar con sourceforge.net!</target>
+<source>Unable to connect to sourceforge.net.</source>
+<target>No se puede conectar con sourceforge.net.</target>
 
-<source>Current FreeFileSync version number was not found online! Do you want to check manually?</source>
-<target>El numero de versión de FreeFileSync no se encontro en linea! ¿Desea comprobarlo manualmente?</target>
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>No se encuentra el número de versión actual de FreeFileSync en línea. ¿Desea comprobarla manualmente?</target>
 
-<source>Do you want FreeFileSync to automatically check for updates every week?</source>
-<target>¿Quiere que FreeFileSync detecte automáticamente actualizaciones cada semana?</target>
+<source>Symlink</source>
+<target>Enlace simbólico</target>
 
-<source>(Requires an Internet connection!)</source>
-<target>(¡Conexión a Internet necesaria!)</target>
-
-<source><Symlink></source>
-<target><Enlace simbólico></target>
-
-<source><Folder></source>
-<target><Carpeta></target>
+<source>Folder</source>
+<target>Carpeta</target>
 
 <source>Full path</source>
 <target>Ruta completa</target>
@@ -410,12 +572,6 @@ El comando es disparado si::
 
 <source>Extension</source>
 <target>Extensión</target>
-
-<source>Size:</source>
-<target>Tamaño:</target>
-
-<source>Date:</source>
-<target>Fecha:</target>
 
 <source>Category</source>
 <target>Categoría</target>
@@ -441,6 +597,33 @@ El comando es disparado si::
 <source>Hibernate</source>
 <target>Hibernar</target>
 
+<source>Selected variant:</source>
+<target>Seleccionar variante:</target>
+
+<source>Select alternate comparison settings</source>
+<target>Seleccionar opciones alternativas de comparación</target>
+
+<source>Select alternate synchronization settings</source>
+<target>Seleccione opciones alternativas de sincronización</target>
+
+<source>Filter is active</source>
+<target>Filtro activo</target>
+
+<source>No filter selected</source>
+<target>Ningún filtro seleccionado</target>
+
+<source>Remove alternate settings</source>
+<target>Eliminar opciones alternativas</target>
+
+<source>Clear filter settings</source>
+<target>Limpiar opciones del filtrado</target>
+
+<source>Copy</source>
+<target>Copiar</target>
+
+<source>Paste</source>
+<target>Pegar</target>
+
 <source>&New</source>
 <target>&Nuevo</target>
 
@@ -448,7 +631,7 @@ El comando es disparado si::
 <target>&Guardar</target>
 
 <source>Save as &batch job...</source>
-<target>Guardar como trabajo &batch ...</target>
+<target>Guardar como trabajo &batch …</target>
 
 <source>1. &Compare</source>
 <target>1. &Comparar</target>
@@ -459,26 +642,32 @@ El comando es disparado si::
 <source>&Language</source>
 <target>&Idioma</target>
 
-<source>&Global settings...</source>
-<target>&Opciones globales...</target>
-
 <source>&Export file list...</source>
-<target>&Exportar lista de archivos...</target>
+<target>&Exportar lista de archivos…</target>
 
-<source>&Advanced</source>
-<target>&Avanzado</target>
+<source>&Global settings...</source>
+<target>&Opciones globales…</target>
+
+<source>&Tools</source>
+<target>Herramien&tas</target>
 
 <source>&Check now</source>
 <target>&Comprobar ahora</target>
 
 <source>Check &automatically once a week</source>
-<target>Comprobar automáticamente una vez a la  semana</target>
+<target>Comprobar &automáticamente una vez por semana</target>
 
-<source>Check for new version</source>
-<target>Comprobar nueva versión</target>
+<source>Check for new &version</source>
+<target>Comprobar si hay una nueva &versión</target>
 
 <source>Compare</source>
 <target>Comparar</target>
+
+<source>Comparison settings</source>
+<target>Opciones de comparación</target>
+
+<source>Synchronization settings</source>
+<target>Opciones de sincronización</target>
 
 <source>Synchronize</source>
 <target>Sincronizar</target>
@@ -492,6 +681,9 @@ El comando es disparado si::
 <source>Swap sides</source>
 <target>Intercambiar lados</target>
 
+<source>Save as batch job</source>
+<target>Salvar como tarea batch</target>
+
 <source>Hide excluded items</source>
 <target>Ocultar elementos excluidos</target>
 
@@ -502,7 +694,7 @@ El comando es disparado si::
 <target>Número de archivos y carpetas que serán creados</target>
 
 <source>Number of files that will be overwritten</source>
-<target>Número de archivos que serán sobreescritos</target>
+<target>Número de archivos que serán sobrescritos</target>
 
 <source>Number of files and folders that will be deleted</source>
 <target>Número de archivos y carpetas que serán eliminados</target>
@@ -523,7 +715,7 @@ El comando es disparado si::
 <target>Tiempo transcurrido:</target>
 
 <source>Synchronizing...</source>
-<target>Sincronizando...</target>
+<target>Sincronizando…</target>
 
 <source>On completion</source>
 <target>Al completar</target>
@@ -534,14 +726,53 @@ El comando es disparado si::
 <source>&Pause</source>
 <target>&Pausa</target>
 
-<source>Batch job</source>
-<target>Tarea por lotes</target>
+<source>Select a variant</source>
+<target>Seleccione una variante</target>
 
-<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Crear archivo batch para sincronización automática. Haga doble clic en este archivo o prográmelo en el planificador de tareas del sistema: FreeFileSync.exe <job name>.ffs_batch</target>
+<source>
+Files are found equal if
+     - last write time and date
+     - file size
+are the same
+</source>
+<target>
+Los archivos serán considerados iguales si
+	- última hora y fecha de escritura
+	- tamaño del archivo
+son iguales
+</target>
+
+<source>
+Files are found equal if
+     - file content
+is the same
+</source>
+<target>
+Los archivos serán considerados iguales si
+     - el contenido del archivo
+es el mismo
+</target>
+
+<source>Symbolic Link handling</source>
+<target>Gestión de vínculos simbólicos</target>
 
 <source>Help</source>
 <target>Ayuda</target>
+
+<source>OK</source>
+<target>OK</target>
+
+<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
+<target>Identificar y propagar cambios en ambos lados. Eliminaciones, movimientos y conflictos serán detectados automáticamente usando una base de datos.</target>
+
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Copia de seguridad en espejo de la carpeta izquierda. La carpeta derecha es modificada exactamente como la carpeta izquierda después de la sincronización.</target>
+
+<source>Copy new or updated files to right folder.</source>
+<target>Copiar archivos nuevos o actualizados a la carpeta de la derecha.</target>
+
+<source>Configure your own synchronization rules.</source>
+<target>Configuración de sus propias reglas de sincronización.</target>
 
 <source>Error handling</source>
 <target>Gestión de errores</target>
@@ -558,11 +789,41 @@ El comando es disparado si::
 <source>Show pop-up on errors or warnings</source>
 <target>Mostrar ventana emergente de errores o avisos</target>
 
+<source>Deletion handling</source>
+<target>Gestión de borrado</target>
+
+<source>Permanent</source>
+<target>Permanente</target>
+
+<source>Delete or overwrite files permanently</source>
+<target>Borrar o Sobrescribir archivos permanentemente</target>
+
+<source>Recycle Bin</source>
+<target>Papelera de reciclaje</target>
+
+<source>Use Recycle Bin for deleted and overwritten files</source>
+<target>Utilizar la papelera de reciclaje para archivos eliminados y sobrescritos</target>
+
+<source>Versioning</source>
+<target>Control de versiones</target>
+
+<source>Move files to user-defined folder</source>
+<target>Mover archivos a una carpeta definida por el usuario</target>
+
+<source>Naming convention:</source>
+<target>Convención de nomenclatura:</target>
+
+<source>Batch job</source>
+<target>Tarea por lotes</target>
+
+<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
+<target>Crear archivo batch para sincronización automática. Haga doble clic en este archivo o prográmelo en el planificador de tareas del sistema: FreeFileSync.exe <job name>.ffs_batch</target>
+
 <source>Exit</source>
 <target>Salir</target>
 
 <source>Abort synchronization on first error</source>
-<target>Abortar sincronización al primer error</target>
+<target>Anular la sincronización al primer error</target>
 
 <source>Show progress dialog</source>
 <target>Mostrar diálogo de progreso</target>
@@ -578,111 +839,6 @@ El comando es disparado si::
 
 <source>Limit maximum number of log files</source>
 <target>Limitar el número máximo de archivos de registro</target>
-
-<source>Select variant</source>
-<target>Seleccionar variante</target>
-
-<source>
-Files are found equal if
-     - last write time and date
-     - file size
-are the same
-</source>
-<target>
-Los archivos serán considerados iguales si
-	- última hora y fecha de escritura
-	- tamaño del archivo
-son iguales
-</target>
-
-<source>File time and size</source>
-<target>Fecha y tamaño del archivo</target>
-
-<source>
-Files are found equal if
-     - file content
-is the same
-</source>
-<target>
-Los archivos serán considerados iguales si
-     - el contenido del archivo
-es el mismo
-</target>
-
-<source>File content</source>
-<target>Contenido del archivo</target>
-
-<source>Symbolic Link handling</source>
-<target>Gestión de enlaces simbólicos</target>
-
-<source>OK</source>
-<target>OK</target>
-
-<source><- Two way -></source>
-<target><- Dos formas -></target>
-
-<source>Identify and propagate changes on both sides. Deletions, moves and conflicts are detected automatically using a database.</source>
-<target>Identificar y propagar cambios en ambos lados. Eliminaciones, movimientos y conflictos seran detectados automaticamente usando una base de datos.</target>
-
-<source>Mirror ->></source>
-<target>Espejo ->></target>
-
-<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
-<target>Copia de seguridad en espejo de la carpeta izquierda. La carpeta derecha es modificada exactamente como la carpeta izquierda después de la sincronización.</target>
-
-<source>Update -></source>
-<target>Actualizar -></target>
-
-<source>Copy new or updated files to right folder.</source>
-<target>Copiar archivos nuevos o actualizados a la carpeta de la derecha.</target>
-
-<source>Custom</source>
-<target>Personalizado</target>
-
-<source>Configure your own synchronization rules.</source>
-<target>Configuración de sus propias reglas de sincronización.</target>
-
-<source>Deletion handling</source>
-<target>Gestión de borrado</target>
-
-<source>Permanent</source>
-<target>Permanente</target>
-
-<source>Delete or overwrite files permanently</source>
-<target>Borrar o sobreescribir archivos permanentemente</target>
-
-<source>Recycle Bin</source>
-<target>Papelera de reciclaje</target>
-
-<source>Use Recycle Bin for deleted and overwritten files</source>
-<target>Utilizar la papelera de reciclaje para archivos eliminados y sobreescritos</target>
-
-<source>Versioning</source>
-<target>Control de versiones</target>
-
-<source>Move files to user-defined folder</source>
-<target>Mover archivos a una carpeta definida por el usuario</target>
-
-<source>Naming convention:</source>
-<target>Convención de nomenclatura:</target>
-
-<source>Item exists on left side only</source>
-<target>El elemento existe sólo en el lado izquierdo</target>
-
-<source>Item exists on right side only</source>
-<target>El elemento existe sólo en el lado derecho</target>
-
-<source>Left side is newer</source>
-<target>El lado izquierdo es más nuevo</target>
-
-<source>Right side is newer</source>
-<target>El lado derecho es más nuevo</target>
-
-<source>Items have different content</source>
-<target>Los elementos tienen contenido distinto</target>
-
-<source>Conflict/item cannot be categorized</source>
-<target>Conflicto</target>
 
 <source>Source code written in C++ using:</source>
 <target>Código fuente escrito en C++ utilizando:</target>
@@ -702,14 +858,11 @@ es el mismo
 <source>Homepage</source>
 <target>Página de inicio</target>
 
-<source>FreeFileSync at Sourceforge</source>
-<target>FreeFileSync en Sourceforge</target>
-
 <source>Email</source>
 <target>Correo electrónico</target>
 
 <source>Published under the GNU General Public License</source>
-<target>Publicado bajo "GNU General Public License"</target>
+<target>Publicado bajo GNU General Public License</target>
 
 <source>Delete on both sides</source>
 <target>Borrar en ambos lados</target>
@@ -719,11 +872,11 @@ es el mismo
 
 <source>
 Only files that match all filter settings will be synchronized.
-Note: File names must be relative to base directories!
+Note: File names must be relative to base directories.
 </source>
 <target>
 Sólo archivos en que coincidan todos los filtros serán sincronizados.
-Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
+Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 </target>
 
 <source>Include</source>
@@ -747,6 +900,9 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <source>&Clear</source>
 <target>&Borrar</target>
 
+<source>Global settings</source>
+<target>Opciones globales</target>
+
 <source>Fail-safe file copy</source>
 <target>Copia de archivo a prueba de fallos</target>
 
@@ -757,7 +913,7 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <target>Copiar archivos bloqueados</target>
 
 <source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Copiar archivos compartidos o bloqueados usando el servicio "Volume Shadow Copy" (Requiere derechos de administrador)</target>
+<target>Copiar archivos compartidos o bloqueados usando el servicio "Instantánea de volumen" (Requiere derechos de administrador)</target>
 
 <source>Copy file access permissions</source>
 <target>Copiar permisos de acceso al archivo</target>
@@ -775,10 +931,7 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <target>Descripción</target>
 
 <source>&Default</source>
-<target>&Configuración por defecto</target>
-
-<source>Start synchronization</source>
-<target>Iniciar sincronización</target>
+<target>&Configuración predeterminada</target>
 
 <source>Variant</source>
 <target>Tipo</target>
@@ -797,6 +950,21 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 
 <source>&Find next</source>
 <target>&Buscar siguiente</target>
+
+<source>Delete</source>
+<target>Eliminar</target>
+
+<source>Configure filter</source>
+<target>Configurar filtro</target>
+
+<source>Start synchronization</source>
+<target>Iniciar sincronización</target>
+
+<source>Find</source>
+<target>Buscar</target>
+
+<source>Select time span</source>
+<target>Seleccionar duración</target>
 
 <source>Folder pairs</source>
 <target>Pares de carpetas</target>
@@ -817,7 +985,7 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <target>Seleccione vista</target>
 
 <source>Open...</source>
-<target>Abrir...</target>
+<target>Abrir…</target>
 
 <source>Save</source>
 <target>Guardar</target>
@@ -847,7 +1015,10 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <pluralform>%y of 1 row in view</pluralform>
 <pluralform>%y of %x rows in view</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>%y de 1 fila en la vista</pluralform>
+<pluralform>%y de %x filas en vista</pluralform>
+</target>
 
 <source>Set direction:</source>
 <target>Indicar dirección:</target>
@@ -861,11 +1032,8 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <source>Exclude via filter:</source>
 <target>Excluir a través del filtro:</target>
 
-<source><multiple selection></source>
-<target><selección múltiple></target>
-
-<source>Delete</source>
-<target>Eliminar</target>
+<source>multiple selection</source>
+<target>selección múltiple</target>
 
 <source>Include all</source>
 <target>Incluir todo</target>
@@ -886,22 +1054,22 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <target>Grande</target>
 
 <source>Select time span...</source>
-<target>Seleccionar duración</target>
+<target>Seleccionar duración…</target>
 
 <source>Default view</source>
-<target>Vista por defecto</target>
+<target>Vista predeterminada</target>
 
 <source>Show "%x"</source>
 <target>Mostrar "%x"</target>
 
-<source><Last session></source>
-<target><Última sesión></target>
+<source>Last session</source>
+<target>Última sesión</target>
 
 <source>Folder Comparison and Synchronization</source>
-<target>Comparación y Sincronización de Carpetas</target>
+<target>Comparación y sincronización de carpetas</target>
 
-<source>Configuration saved!</source>
-<target>¡Configuración guardada!</target>
+<source>Configuration saved</source>
+<target>Configuración guardada</target>
 
 <source>FreeFileSync batch</source>
 <target>Batch de FreeFileSync</target>
@@ -910,13 +1078,10 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <target>¿Quiere guardar los cambios de %x?</target>
 
 <source>Do&n't save</source>
-<target>No salvar</target>
+<target>&No guardar</target>
 
 <source>Never save changes</source>
 <target>Nunca guardar cambios</target>
-
-<source>Configuration loaded!</source>
-<target>¡Configuración cargada!</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mostrar sólo archivos existentes en la izquierda</target>
@@ -952,31 +1117,31 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <target>Mostrar archivos que serán eliminados en el lado derecho</target>
 
 <source>Show files that will be overwritten on left side</source>
-<target>Mostrar archivos que serán sobreescritos en el lado izquierdo</target>
+<target>Mostrar archivos que serán sobrescritos en el lado izquierdo</target>
 
 <source>Show files that will be overwritten on right side</source>
-<target>Mostrar archivos que serán sobreescritos en el lado derecho</target>
+<target>Mostrar archivos que serán sobrescritos en el lado derecho</target>
 
 <source>Show files that won't be copied</source>
 <target>Mostrar archivos que no serán copiados</target>
 
 <source>Set as default</source>
-<target>Establecer por defecto</target>
+<target>Predeterminado</target>
 
-<source>Operation aborted!</source>
-<target>¡Operación abortada!</target>
+<source>Operation aborted</source>
+<target>Operación anulada</target>
 
-<source>All folders are in sync!</source>
-<target>¡Todas las carpetas están sincronizadas!</target>
+<source>All folders are in sync</source>
+<target>Todas las carpetas están sincronizadas</target>
 
 <source>Comma separated list</source>
 <target>Lista separada por comas</target>
 
-<source>File list exported!</source>
-<target>¡Lista de archivos exportada!</target>
+<source>File list exported</source>
+<target>Lista de archivos exportada</target>
 
 <source>Searching for program updates...</source>
-<target>Buscando actualizaciones del programa...</target>
+<target>Buscando actualizaciones del programa…</target>
 
 <source>Ignore further errors</source>
 <target>Ignorar más errores</target>
@@ -984,8 +1149,11 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <source>&Ignore</source>
 <target>&Ignorar</target>
 
+<source>Fatal Error</source>
+<target>Error fatal</target>
+
 <source>Don't show this warning again</source>
-<target>No mostar más este aviso</target>
+<target>No volver a mostrar este aviso</target>
 
 <source>&Switch</source>
 <target>&Cambiar</target>
@@ -1000,19 +1168,22 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <target>&No</target>
 
 <source>Scanning...</source>
-<target>Escaneando...</target>
+<target>Escaneando…</target>
 
 <source>Comparing content...</source>
-<target>Comparando contenido...</target>
+<target>Comparando contenido…</target>
+
+<source>Info</source>
+<target>Info</target>
 
 <source>Paused</source>
 <target>Pausado</target>
 
 <source>Initializing...</source>
-<target>Inicializando...</target>
+<target>Inicializando…</target>
 
 <source>Aborted</source>
-<target>Abortado</target>
+<target>Anulado</target>
 
 <source>Completed</source>
 <target>Terminado</target>
@@ -1064,15 +1235,18 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
 </source>
 <target>
-<pluralform>¿De verdad quiere mover el siguiente objecto a la papelera de reciclaje?</pluralform>
-<pluralform>¿De verdad quiere mover los siguientes objectos %x a la papelera de reciclaje?</pluralform>
+<pluralform>¿Realmente desea mover este objeto a la papelera de reciclaje?</pluralform>
+<pluralform>¿Realmente desea mover estos %x objetos a la papelera de reciclaje?</pluralform>
 </target>
 
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
 <pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
-<target></target>
+<target>
+<pluralform>¿Realmente desea eliminar este elemento?</pluralform>
+<pluralform>¿Realmente desea eliminar estos %x elementos?</pluralform>
+</target>
 
 <source>Direct</source>
 <target>Enviar</target>
@@ -1129,7 +1303,7 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <target>Archivos</target>
 
 <source>Items</source>
-<target></target>
+<target>Elementos</target>
 
 <source>Percentage</source>
 <target>Porcentaje</target>
@@ -1174,7 +1348,10 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <target>No se puede crear el directorio %x.</target>
 
 <source>Cannot create symbolic link %x.</source>
-<target></target>
+<target>No se puede crear el vínculo simbólico %x.</target>
+
+<source>Cannot find system function %x.</source>
+<target>No se puede encontrar la función del sistema %x.</target>
 
 <source>Cannot copy file %x to %y.</source>
 <target>No se puede copiar el archivo %x a %y.</target>
@@ -1182,14 +1359,14 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <source>Type of item %x is not supported:</source>
 <target>El tipo de objeto %x no esta soportado:</target>
 
+<source>Cannot resolve symbolic link %x.</source>
+<target>No se puede resolver el vínculo simbólico %x.</target>
+
 <source>Cannot open directory %x.</source>
 <target>No se puede abrir el directorio %x.</target>
 
 <source>Cannot enumerate directory %x.</source>
 <target>No se puede enumerar el directorio %x.</target>
-
-<source>Detected endless directory recursion.</source>
-<target>Detectada recursividad de directorios sin fin.</target>
 
 <source>%x TB</source>
 <target>%x TB</target>
@@ -1224,210 +1401,24 @@ Aviso: ¡Los nombres de archivos deben ser relativos a los directorios base!
 <pluralform>%x días</pluralform>
 </target>
 
+<source>Failed to register to receive system messages.</source>
+<target>Fallo al registrar la recepción de mensajes sistema.</target>
+
 <source>Cannot set privilege %x.</source>
 <target>No se puede asignar el privilegio %x.</target>
 
 <source>Failed to suspend system sleep mode.</source>
-<target>Se ha fallado al intentar suspender el sistema.</target>
+<target>Fallo al intentar suspender el sistema.</target>
 
 <source>Cannot change process I/O priorities.</source>
 <target>No se pudieron cambiar las priridades de E/S del proceso.</target>
 
-<source>Unable to move %x to the Recycle Bin!</source>
-<target>¡Incapaz de mover %x a la Papelera de reciclaje!</target>
+<source>Unable to move %x to the Recycle Bin.</source>
+<target>No se puede mover %x a la Papelera de reciclaje.</target>
 
-<source>Both sides have changed since last synchronization!</source>
-<target>¡Ambos lados han cambiado desde la última sincronizacion!</target>
+<source>Cannot determine final path for %x.</source>
+<target>No se puede determinar la ruta final de %x.</target>
 
-<source>Cannot determine sync-direction:</source>
-<target>No se puede determinar la dirección de la sincronización:</target>
-
-<source>No change since last synchronization!</source>
-<target>¡Ningún cambio desde la última sincronización!</target>
-
-<source>The corresponding database entries are not in sync considering current settings.</source>
-<target>Las correspondientes entradas de la base de datos no se encuentran en sincronización, considerando la configuración actual.</target>
-
-<source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
-<target>Fijando direcciones de sincronización por defecto: Los archivos viejos serán sobreescritos por los archivos nuevos.</target>
-
-<source>Checking recycle bin availability for folder %x...</source>
-<target>Comprobando disponibilidad de la papelera de reciclaje para la carpeta %x...</target>
-
-<source>Moving file %x to recycle bin</source>
-<target>Mover archivo %x a la papelera de reciclaje</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Mover carpeta %x a la papelera de reciclaje</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Mover enlace simbólico %x a la papelera de reciclaje</target>
-
-<source>Deleting file %x</source>
-<target>Borrar archivo %x</target>
-
-<source>Deleting folder %x</source>
-<target>Borrar carpeta %x</target>
-
-<source>Deleting symbolic link %x</source>
-<target>Borrar enlace simbólico %x</target>
-
-<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
-<target>¡La papelera de reciclaje no está disponible para las siguientes rutas! Los archivos serán eliminados permanentemente:</target>
-
-<source>The corresponding folder will be considered as empty.</source>
-<target>La siguiente carpeta será considerada como vacia.</target>
-
-<source>Cannot find the following folders:</source>
-<target>No se pudieron encontrar las siguiente carpetas:</target>
-
-<source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target></target>
-
-<source>Directories are dependent! Be careful when setting up synchronization rules:</source>
-<target>¡Los directorios son dependientes! Tenga cuidado al establecer las reglas de sincronización:</target>
-
-<source>Conflict detected:</source>
-<target>Conflicto detectado:</target>
-
-<source>File %x has an invalid date!</source>
-<target>¡El archivo %x tiene una fecha inválida!</target>
-
-<source>Files %x have the same date but a different size!</source>
-<target>¡Los archivos %x tienen la misma fecha pero un tamaño diferente!</target>
-
-<source>Items differ in attributes only</source>
-<target>Los elementos sólo se diferencian en los atributos</target>
-
-<source>Resolving symbolic link %x</source>
-<target></target>
-
-<source>Comparing content of files %x</source>
-<target>Comparación del contenido de los archivos %x</target>
-
-<source>Generating file list...</source>
-<target>Generando lista de archivos...</target>
-
-<source>Start comparison</source>
-<target>Empezar comparación</target>
-
-<source>Calculating sync directions...</source>
-<target>Calculando direcciones de sincronización...</target>
-
-<source>Both sides are equal</source>
-<target>Ambos lados son iguales</target>
-
-<source>Copy new item to left</source>
-<target>Copiar nuevo elemento a la izquierda</target>
-
-<source>Copy new item to right</source>
-<target>Copiar nuevo elemento a la derecha</target>
-
-<source>Delete left item</source>
-<target>Eliminar elemento izquierdo</target>
-
-<source>Delete right item</source>
-<target>Eliminar elemento derecho</target>
-
-<source>Move file on left</source>
-<target>Mover archivo a la izquierda</target>
-
-<source>Move file on right</source>
-<target>Mover archivo a la derecha</target>
-
-<source>Overwrite left item</source>
-<target>Sobreescribir elemento izquierdo</target>
-
-<source>Overwrite right item</source>
-<target>Sobreescribir elemento derecho</target>
-
-<source>Do nothing</source>
-<target>No hacer nada</target>
-
-<source>Update attributes on left</source>
-<target>Actualizar atributos en la izquierda</target>
-
-<source>Update attributes on right</source>
-<target>Actualizar atributos en la derecha</target>
-
-<source>Multiple...</source>
-<target>Múltiple...</target>
-
-<source>Moving file %x to %y</source>
-<target>Mover archivo de %x a %y</target>
-
-<source>Moving folder %x to %y</source>
-<target>Mover carpeta de %x a %y</target>
-
-<source>Moving symbolic link %x to %y</source>
-<target>Mover enlace simbólico de %x a %y</target>
-
-<source>Removing old versions...</source>
-<target>Eliminando versiones antiguas...</target>
-
-<source>Creating symbolic link %x</source>
-<target>Creando enlace simbólico %x</target>
-
-<source>Creating folder %x</source>
-<target>Creando carpeta %x</target>
-
-<source>Overwriting file %x</source>
-<target>Sobreescribir archivo %x</target>
-
-<source>Overwriting symbolic link %x</source>
-<target>Sobreescribir enlance simbólico %x</target>
-
-<source>Verifying file %x</source>
-<target>Verificación del archivo %x</target>
-
-<source>Updating attributes of %x</source>
-<target>Actualizar atributos de %x</target>
-
-<source>Cannot find %x.</source>
-<target>No se pudo encontrar %x.</target>
-
-<source>Target folder %x already existing.</source>
-<target>La carpeta de destino %x ya existe.</target>
-
-<source>Target folder input field must not be empty.</source>
-<target>El campo de entrada de la carpeta de destino no debe estar vacío.</target>
-
-<source>Folder input field for versioning must not be empty.</source>
-<target>El campo de entrada de la carpeta para el control de versiones no debe estar vacío.</target>
-
-<source>Source folder %x not found.</source>
-<target>El archivo de origen %x no ha sido encontrado.</target>
-
-<source>The following items have unresolved conflicts and will not be synchronized:</source>
-<target>Los siguientes elementos tienen conflictos sin resolver y no serán sincronizados:</target>
-
-<source>Significant difference detected:</source>
-<target>Diferencia significante detectada:</target>
-
-<source>More than 50% of the total number of files will be copied or deleted!</source>
-<target>¡Más del 50% del número total de archivos serán copiados o eliminados!</target>
-
-<source>Not enough free disk space available in:</source>
-<target>Espacio en disco insuficiente en:</target>
-
-<source>Required:</source>
-<target>Requerido:</target>
-
-<source>Available:</source>
-<target>Disponible:</target>
-
-<source>A folder will be modified which is part of multiple folder pairs. Please review synchronization settings.</source>
-<target>Una carpeta, que es parte de múltiple pares de carpetas, será modificada. Por favor, revise las opciones de sincronización.</target>
-
-<source>Synchronizing folder pair:</source>
-<target>Sincronizando par de carpetas:</target>
-
-<source>Generating database...</source>
-<target>Generando base de datos...</target>
-
-<source>Creating Volume Shadow Copy for %x...</source>
-<target>Creando copia instantanea para %x...</target>
-
-<source>Data verification error: Source and target file have different content!</source>
-<target>Error de verificación de datos: ¡Los archivos de origen y destino tienen un contenido diferente!</target>
+<source>Error Code %x:</source>
+<target>Error: %x:</target>
 

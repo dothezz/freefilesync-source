@@ -7,7 +7,6 @@
 #ifndef NOTIFY_H_INCLUDED
 #define NOTIFY_H_INCLUDED
 
-#include <vector>
 #include <memory>
 #include "win.h" //includes "windows.h"
 #include "file_error.h"

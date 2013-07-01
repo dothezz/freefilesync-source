@@ -7,7 +7,7 @@ SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 DOCSHAREDIR = $(SHAREDIR)/doc/$(APPNAME)
 
-CXXFLAGS  = -std=c++11 -Wall -pipe -O3 -DNDEBUG -DwxUSE_UNICODE -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h" -include "zen/warn_static.h"
+CXXFLAGS  = -std=c++11 -Wall -pipe -O3 -DNDEBUG -DwxUSE_UNICODE -DWXINTL_NO_GETTEXT_MACRO -I. -include "zen/i18n.h" -include "zen/warn_static.h"
 LINKFLAGS =
 
 #distinguish Linux/OSX builds
@@ -16,7 +16,7 @@ OPERATING_SYSTEM_NAME := $(shell uname)
 #################### Linux ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Linux)
 COMPILER_BIN=g++ -pthread
-CXXFLAGS += -DFFS_LINUX
+CXXFLAGS += -DZEN_LINUX
 
 #Gtk - support recycler/icon loading/no button border/grid scrolling
 CXXFLAGS  += `pkg-config --cflags gtk+-2.0`
@@ -43,8 +43,8 @@ LINKFLAGS += `wx-config --libs std, aui --debug=no` -lboost_thread -lboost_syste
 else
 #static wxWidgets and boost library linkage for precompiled release
 WX_CONFIG_BIN =$(HOME)/Desktop/wxGTK-2.8.12/lib/release/bin/wx-config
-CXXFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
-BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_53_0/stage/lib
+CXXFLAGS  += -I$(HOME)/Desktop/boost_1_54_0
+BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_54_0/stage/lib
 
 CXXFLAGS  += `$(WX_CONFIG_BIN) --cxxflags      --debug=no --static=yes`
 LINKFLAGS += `$(WX_CONFIG_BIN) --libs std, aui --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a -lX11
@@ -54,11 +54,11 @@ endif
 #################### OS X ############################
 ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
 COMPILER_BIN=clang++ -stdlib=libc++
-CXXFLAGS += -DFFS_MAC
+CXXFLAGS += -DZEN_MAC
 
 WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.4/lib/release/bin/wx-config
-CXXFLAGS  += -I$(HOME)/Desktop/boost_1_53_0
-BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_53_0/stage/lib
+CXXFLAGS  += -I$(HOME)/Desktop/boost_1_54_0
+BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_54_0/stage/lib
 MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
 
 #-Wl,-Bstatic not supported on OSX!

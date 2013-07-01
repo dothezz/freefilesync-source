@@ -1,5 +1,5 @@
 ﻿// **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
+// * This file is part of the zen::Xml project. It is distributed under the *
 // * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
@@ -22,31 +22,34 @@
 
 \section sec_Rationale Rationale
 
-zenXML is an XML library that enables serialization of structured user data in a convenient way.
-Using compile-time information gathered by techniques of template metaprogramming it minimizes the manual overhead required and frees the user from applying fundamental type conversions
-by himself. Basic data types such as \b all built-in arithmetic numbers, \b all kinds of string classes and "string-like" types, \b all types defined as STL containers are processed automatically.
-Thereby a large number of recurring problems is finally solved by the library:
+zen::Xml is an XML library serializing structured user data in a convenient way.
+Using compile-time information gathered by techniques of template metaprogramming it minimizes the manual overhead required and frees the user from implementing fundamental type conversions
+by himself. Basic data types such as
+- \b all built-in arithmetic numbers, 
+- \b all kinds of string classes and "string-like" types,
+- \b all types defined as STL containers
+
+are handled automatically. Thereby a large number of recurring problems is solved by the library:
 - generic number to string conversions
-- generic char to wchar_t conversions for custom string classes in a platform independent manner
-- serialization of STL container types
+- generic char to wchar_t conversions (UTF) for custom string classes in a platform independent manner
+- serialization of arbitrary STL container types
 - simple integration: header-only, no extra dependencies, fully portable
-- support (but not enforce) wide characters everywhere: for file names, XML element names, attribute names, values, ...
-- integrate XML library with focus on elegance, minimal code size, flexibility and performance
-- nonintrusive API: allow for internationalization, fine-granular error handling, and custom file I/O
-- it's a toolkit, not a framework: different layers of software architecture offer, but do not enforce, specific programming models
+- support arbitrary string classes everywhere: for file names, XML element names, attribute names, values, ...
+- XML library built on C++11 with focus on elegance, minimal code size, flexibility and performance
+- easily extensible API: allow for internationalization, fine-granular error handling, and custom file I/O
 
 The design follows the philosophy of the Loki library: \n
 http://loki-lib.sourceforge.net/index.php?n=Main.Philosophy
 
 \section sec_Quick_Start Quick Start
 
-1. Download zenXML: http://sourceforge.net/projects/zenxml
+1. Download zen::Xml: http://sourceforge.net/projects/zenxml
 
-2. Setup a preprocessor macro for your project to identify the platform (this is required for C-stream file IO only)
+2. Setup one of the following preprocessor macros for your project to identify the platform (this is only required if you use C-stream-based file IO)
 \code
-    ZEN_PLATFORM_WINDOWS
-    or
-    ZEN_PLATFORM_OTHER
+    ZEN_WIN
+    ZEN_LINUX	
+	ZEN_MAC
 \endcode
 
 3. For optimal performance define this global macro in release build: (following convention of the <tt>assert</tt> macro)
@@ -70,7 +73,7 @@ int    c = -1;
 \code
 zen::XmlDoc doc; //empty XML document
 
-zen::XmlOut out(doc); //fill the document via a data output proxy
+zen::XmlOut out(doc); //the simplest way to fill the document is to use a data output proxy
 out["elem1"](a); //
 out["elem2"](b); //map data types to XML elements
 out["elem3"](c); //
@@ -102,23 +105,23 @@ try
 }
 catch (const zen::XmlError& e) { /* handle error */ }
 
-zen::XmlIn in(doc); //read document into user data via an input proxy
+zen::XmlIn in(doc); //the simplest way to read the document is to use a data input proxy
 in["elem1"](a); //
 in["elem2"](b); //map XML elements into user data
 in["elem3"](c); //
 
-//check for mapping errors, i.e. missing elements or conversion errors: these MAY be considered warnings only
+//check for mapping errors, i.e. missing elements or conversion errors: you may consider these as warnings only
 if (in.errorsOccured())
 {
    std::vector<std::wstring> failedElements = in.getErrorsAs<std::wstring>();
-   /* show mapping errors */
+   /* generate error message showing the XML element names that failed to convert */
 }
 \endcode
 
 
 \section sec_Supported_Platforms Supported Platforms
 
-zenXML is written in a platform independent manner and runs on any rudimentary C++11 compliant compiler.
+zen::Xml is written in a platform independent manner and runs on any rudimentary C++11 compliant compiler.
 It has been tested successfully under:
 
 - Windows:
@@ -126,12 +129,16 @@ It has been tested successfully under:
    -# Visual C++ 2010 - 64 bit
    -# MinGW: GCC 4.5.2 - 32 bit
 
-- Linux (Ubuntu):
+- Linux:
    -# GCC 4.5.2 - 32 bit
    -# GCC 4.5.2 - 64 bit
 
+- Mac OS X:
+   -# Clang 3.2 - 64 bit
+
 <b>Note:</b> In order to enable C++11 features in GCC it is required to specify either of the following compiler options:
 \verbatim
+-std=c++11
 -std=c++0x
 -std=gnu++0x
 \endverbatim
@@ -139,7 +146,7 @@ It has been tested successfully under:
 
 \section sec_Flexible_Programming_Model Flexible Programming Model
 
-Depending on what granularity of control is required in a particular application, zenXML allows the user to choose between full control or simplicity.
+Depending on what granularity of control is required in a particular application, zen::Xml allows the user to choose between full control or simplicity.
 \n\n
 The library is structured into the following parts, each of which can be used in isolation:
 \n\n
@@ -161,29 +168,26 @@ The library is structured into the following parts, each of which can be used in
 - Save an XML document to memory
 \code
 zen::XmlDoc doc;
-    ...
+    ... //fill it
 std::string stream = serialize(doc); //throw ()
+/* you now have a binary XML stream */
 
-/* have fun with stream */
-
-//default behavior - already available via zen::save()
 saveStream(stream, "file.xml"); //throw XmlFileError
+//if all you need is to store XmlDoc in a file direcly you can use zen::save() instead
 \endcode
 
 - Load XML document from memory
 \code
-/* get XML byte stream */
-//e.g. from a file - already available via zen::load()
+//get XML byte stream:
 std::string stream = loadStream("file.xml"); //throw XmlFileError
 
 zen::XmlDoc doc;
-//parse byte stream into an XML document
+//parse byte stream into an XML document:
 parse(stream, doc); //throw XmlParsingError
-
-/* process XML document */
+//if all you need is to load an XmlDoc from a file you can use zen::load() directly
 \endcode
 
-- Fine-granular error checking
+- Fine-granular error checking with the data input proxy
 \code
 zen::XmlIn in(doc);
 //map XML elements into user data
@@ -194,20 +198,21 @@ if (!in["elem2"](b))
 if (!in["elem3"](c))
    throw MyCustomException();
 
-//if (in.errorsOccured()) ...  <- not required anymore since each conversion was already checked 
+//if (in.errorsOccured()) ...  <- not required here: contains the same conversion errors checked manually before
 \endcode
 
-- Document Object Model centered programming model
+- Access the Document Object Model directly (without input/output proxy)
 \n\n
 The full power of type conversions which is available via the input/output proxy classes zen::XmlIn and zen::XmlOut is also available for the document object model!
 \code
 using namespace zen;
+
 XmlDoc doc;
 
 XmlElement& child = doc.root().addChild("elem1");
 child.setValue(1234);
 
-zen::save(doc, "file.xml"); //throw XmlFileError
+save(doc, "file.xml"); //throw XmlFileError
 \endcode
 \n
 \code
@@ -221,17 +226,17 @@ if (child)
 {
     int value = -1;
     if (!child->getValue(value))
-      /* handle error */
+        ... //handle conversion error
 }
 else
-   ...
+    ... //XML element not found
 \endcode
 
 
 \section sec_Structured_XML_element_access Structured XML element access
 
 \code
-//write value into one deeply nested XML element - note the different types used seamlessly: char[], wchar_t[], char, wchar_t, int
+//write a value into one deeply nested XML element - note the different types used seamlessly: char[], wchar_t[], char, wchar_t, int
 zen::XmlOut out(doc);
 out["elemento1"][L"элемент2"][L"要素3"][L"στοιχείο4"]["elem5"][L"元素6"][L'元']['z'](-1234);
 \endcode
@@ -284,16 +289,16 @@ The resulting XML:
 \section sec_Automatic_conversion_built_in Automatic conversion for built-in arithmetic types
 
 All built-in arithmetic types and <tt>bool</tt> are detected at compile time and a proper conversion is applied. 
-Common conversions for integer-like types such as <tt>long</tt>, <tt>long long</tt>, <tt>__int64</tt> or <tt>size_t</tt> as well as floating point types are optimized for maximum performance.
+Common conversions for integer-like types such as <tt>int</tt>, <tt>long</tt>, <tt>long long</tt>, ect. as well as floating point types are optimized for maximum performance.
 
 \code
 zen::XmlOut out(doc);
 
-out["int"]      (-1234);
-out["double"]   (1.23);
-out["float"]    (4.56f);
-out["usignlong"](1234UL);
-out["bool"]     (false);
+out["int"]   (-1234);
+out["double"](1.23);
+out["float"] (4.56f);
+out["ulong"] (1234UL);
+out["bool"]  (false);
 \endcode
 
 The resulting XML:
@@ -301,9 +306,9 @@ The resulting XML:
 <?xml version="1.0" encoding="UTF-8"?>
 <Root>
     <int>-1234</int>
-    <double>1.230000</double>
-    <float>4.560000</float>
-    <usignlong>1234</usignlong>
+    <double>1.23</double>
+    <float>4.56</float>
+    <ulong>1234</ulong>
     <bool>false</bool>
 </Root>
 \endverbatim
@@ -311,14 +316,14 @@ The resulting XML:
 
 \section sec_Automatic_conversion_string Automatic conversion for string-like types
 
-The document object model of zenXML internally stores all names and values as a std::string. Consequently everything that is not a std::string but is "string-like" is converted automatically
-into a std::string representation. By default zenXML accepts all character arrays like <tt>char[]</tt>, <tt>wchar_t[]</tt>, <tt>char*</tt>, <tt>wchar_t*</tt>, single characters like 
-<tt>char</tt>, <tt>wchar_t</tt>, standard string classes like <tt>std::string</tt>, <tt>std::wstring</tt> and user defined string classes.
+The document object model of zen::Xml internally stores all names and values as a std::string. Consequently everything that is not a std::string but is "string-like" is UTF-converted
+into a std::string representation. By default zen::Xml accepts all character arrays like <tt>char[]</tt>, <tt>wchar_t[]</tt>, <tt>char*</tt>, <tt>wchar_t*</tt>, single characters like 
+<tt>char</tt>, <tt>wchar_t</tt>, standard string classes like <tt>std::string</tt>, <tt>std::wstring</tt> and user-defined string classes.
 If the input string is based on <tt>char</tt>, it will simply be copied and thereby preserves any local encodings. If the input string is based on <tt>wchar_t</tt> it will
 be converted to an UTF-8 encoded <tt>std::string</tt>. The correct <tt>wchar_t</tt> encoding of the system will be detected at compile time, for example UTF-16 on Windows, 
-UTF-32 on certain Linux variants.
+UTF-32 on most Linux distributions.
 
-<b>Note:</b> User defined string classes are implicitly supported if they fulfill the following string concept by defining:
+<b>Note:</b> User-defined string classes are automatically supported if they fulfill the following <b>string concept</b> by defining:
     -# A typedef named <tt>value_type</tt> for the underlying character type: must be \p char or \p wchar_t
     -# A member function <tt>c_str()</tt> returning something that can be converted into a <tt>const value_type*</tt>
     -# A member function <tt>length()</tt> returning the number of characters returned by <tt>c_str()</tt>
@@ -359,7 +364,7 @@ The resulting XML:
 
 \section sec_Automatic_conversion_STL Automatic conversion for STL container types
 
-- User defined STL compatible types are implicitly supported if they fulfill the following container concept by defining:
+- User-defined STL compatible types are automatically supported if they fulfill the following <b>container concept</b> by defining:
     -# A typedef named <tt>value_type</tt> for the underlying element type of the container
     -# A typedef named <tt>iterator</tt> for a non-const iterator into the container
     -# A typedef named <tt>const_iterator</tt> for a const iterator into the container
@@ -367,9 +372,10 @@ The resulting XML:
     -# A member function <tt>begin()</tt> returning an iterator pointing to the first element in the container
     -# A member function <tt>end()</tt> returning an iterator pointing just after the last element in the container
     -# A member function <tt>insert()</tt> with the signature <tt>iterator insert(iterator position, const value_type& x)</tt>
+    -# A member function <tt>clear()</tt> removing all elements from the container
 
 - In order to support combinations of user types and STL containers such as <tt>std::vector<MyType></tt> or <tt>std::vector<std::list<MyType>></tt> it is sufficient to 
-integrate <tt>MyType</tt> into zenXML. \n
+only integrate <tt>MyType</tt> into zen::Xml. \n
 See \ref sec_Support_user_defined
     
 \code
@@ -403,8 +409,8 @@ The resulting XML:
 <?xml version="1.0" encoding="UTF-8"?>
 <Root>
     <deque>
-        <Item>1.234000</Item>
-        <Item>5.678000</Item>
+        <Item>1.234</Item>
+        <Item>5.678</Item>
     </deque>
     <list>
         <Item>1</Item>
@@ -412,26 +418,26 @@ The resulting XML:
     </list>
     <map>
         <Item>
-            <one>1.100000</one>
+            <one>1.1</one>
             <two>a</two>
         </Item>
         <Item>
-            <one>2.200000</one>
+            <one>2.2</one>
             <two>b</two>
         </Item>
     </map>
     <multimap>
         <Item>
             <one>3</one>
-            <two>99.000000</two>
+            <two>99</two>
         </Item>
         <Item>
             <one>3</one>
-            <two>100.000000</two>
+            <two>100</two>
         </Item>
         <Item>
             <one>4</one>
-            <two>101.000000</two>
+            <two>101</two>
         </Item>
     </multimap>
     <set>
@@ -467,9 +473,9 @@ The resulting XML:
 \endverbatim
 
 
-\section sec_Support_user_defined Support for user defined types
+\section sec_Support_user_defined Support for user-defined types
 
-User types can be integrated into zenXML by providing specializations of zen::readText() and zen::writeText() or zen::readStruc() and zen::writeStruc().
+User types can be integrated into zen::Xml by providing specializations of zen::readText() and zen::writeText() or zen::readStruc() and zen::writeStruc().
 The first pair should be used for all non-structured types that can be represented as a simple text string. This specialization is then used to convert the type to XML elements
 and XML attributes. The second pair should be specialized for structured types that require an XML representation as a hierarchy of elements. This specialization is used when converting
 the type to XML elements only.
@@ -523,13 +529,13 @@ namespace zen
 template <> inline
 void writeText(const EnumType& value, std::string& output)
 {
-    output = zen::toString<std::string>(value); //treat enum as an integer
+    output = zen::numberTo<std::string>(static_cast<int>(value)); //treat enum like an integer
 }
 
 template <> inline
 bool readText(const std::string& input, EnumType& value)
 {
-    value = static_cast<EnumType>(zen::toNumber<int>(input)); //treat enum as an integer
+    value = static_cast<EnumType>(zen::stringTo<int>(input)); //treat enum like an integer
     return true;
 }
 }
@@ -565,14 +571,13 @@ bool readStruc(const XmlElement& input, Config& value)
 
 int main()
 {
-    Config cfg;
-    cfg.a = 2;
-     ...
+    Config cfg = { 2,  L"Abc 3" };
+
     std::vector<Config> cfgList;
     cfgList.push_back(cfg);
 
     zen::XmlDoc doc;
-    zen::XmlOut out(doc);
+    zen::XmlOut out(doc); //write to Xml via output proxy
     out["config"](cfgList);
     save(doc, "file.xml"); //throw XmlFileError
 }
@@ -595,7 +600,7 @@ The resulting XML:
 \section sec_Structured_user_types Structured user types
 
 Although it is possible to enable conversion of structured user types by specializing zen::readStruc() and zen::writeStruc() (see \ref sec_Support_user_defined), 
-this approach has one drawback: If a mapping error occurs when converting an XML element to structured user data, like one child-element is missing,
+this approach has one drawback: If a mapping error occurs when converting an XML element to structured user data, for example a child-element is missing,
 the input proxy class zen::XmlIn is only able to detect that the whole conversion failed. It cannot say which child-elements in particular failed to convert.
 \n\n
 Therefore it may be appropriate to convert structured types by calling subroutines in order to enable fine-granular logging:
@@ -603,13 +608,12 @@ Therefore it may be appropriate to convert structured types by calling subroutin
 \code
 void readConfig(const zen::XmlIn& in, Config& cfg)
 {
-    in["number" ](value.a); //failed conversion will now be logged for each single item by XmlIn
-    in["address"](value.b); //instead of once for the complete Config type!
+    in["number" ](value.a); //failed conversions will now be logged for each single item by XmlIn
+    in["address"](value.b); //instead of only once for the complete Config type!
 }
-\endcode
-\n
-\code
-void readConfig(const wxString& filename, Config& cfg)
+
+
+void loadConfig(const wxString& filename, Config& cfg)
 {
     zen::XmlDoc doc; //empty XML document
 
@@ -634,8 +638,8 @@ void readConfig(const wxString& filename, Config& cfg)
 
 \section sec_Type_Safety Type Safety
 
-zenXML heavily utilizes methods of compile-time introspection in order to free the user from managing basic type conversions by himself. 
-Thereby it is important to find the right balance between automatic conversions and type safety so that program correctness is not compromized.
+zen::Xml heavily uses methods of compile-time introspection in order to free the user from managing basic type conversions by himself. 
+Thereby it is important to find the right balance between automatic conversions and type safety so that program correctness is not compromised.
 In the context of XML processing three fundamental type categories can be recognized:
 
 - <b>string-like types</b>: <tt>std::string, wchar_t*, char[], wchar_t, wxString, MyStringClass, ...</tt>
@@ -663,15 +667,15 @@ out[1234](someValue); //compiler error: an integer is NOT "string-like"!
 \endcode
 \n
 \code
-int valInt = 0;
-std::vector<int> valVec;
+int i = 0;
+std::vector<int> v;
 
 zen::XmlOut out(doc);
-out["elem1"](valInt); //fine: both valInt and valVec can be converted to an XML element
-out["elem2"](valVec); //
+out["elem1"](i); //fine: both i and v can be converted to an XML element
+out["elem2"](v); //
 
-out["elem"].attribute("attr1", valInt); //fine: an integer can be converted to an XML attribute
-out["elem"].attribute("attr2", valVec); //compiler error: a std::vector<int> is NOT "to-string-convertible"!
+out["elem"].attribute("attr1", i); //fine: an integer can be converted to an XML attribute
+out["elem"].attribute("attr2", v); //compiler error: a std::vector<int> is NOT "to-string-convertible"!
 \endcode
 
   \author \b Zenju 

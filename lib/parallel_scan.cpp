@@ -20,7 +20,7 @@ using namespace zen;
 namespace
 {
 /*
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 
 struct DiskInfo
 {
@@ -288,7 +288,7 @@ public:
         handleSymlinks_(handleSymlinks),
         filterInstance(filter),
         failedDirReads_(failedDirReads),
-		failedItemReads_(failedItemReads),
+        failedItemReads_(failedItemReads),
         acb_(acb),
         threadID_(threadID) {}
 
@@ -296,7 +296,7 @@ public:
     const HardFilter::FilterRef filterInstance; //always bound!
 
     std::set<Zstring>& failedDirReads_;
-	std::set<Zstring>& failedItemReads_;
+    std::set<Zstring>& failedItemReads_;
 
     AsyncCallback& acb_;
     const long threadID_;
@@ -313,10 +313,11 @@ public:
         relNameParentPf_(relNameParentPf),
         output_(output) {}
 
-    virtual std::shared_ptr<TraverseCallback>
-    onDir    (const Zchar* shortName, const Zstring& fullName);
     virtual void        onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details);
     virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details);
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName);
+    virtual void releaseDirTraverser(TraverseCallback* trav);
+
     virtual HandleError reportDirError (const std::wstring& msg);
     virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName);
 
@@ -357,7 +358,7 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
     	Linux: retrieveFileID takes about 50% longer in VM! (avoidable because of redundant stat() call!)
     */
 
-    output_.addSubFile(fileNameShort, FileDescriptor(details.lastWriteTime, details.fileSize, details.id));
+    output_.addSubFile(fileNameShort, FileDescriptor(details.lastWriteTime, details.fileSize, details.id, details.symlinkInfo != nullptr));
 
     cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 }
@@ -398,7 +399,7 @@ DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zst
 }
 
 
-std::shared_ptr<TraverseCallback> DirCallback::onDir(const Zchar* shortName, const Zstring& fullName)
+TraverseCallback* DirCallback::onDir(const Zchar* shortName, const Zstring& fullName)
 {
     boost::this_thread::interruption_point();
 
@@ -419,7 +420,14 @@ std::shared_ptr<TraverseCallback> DirCallback::onDir(const Zchar* shortName, con
     if (passFilter)
         cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
 
-    return std::make_shared<DirCallback>(cfg, relName + FILE_NAME_SEPARATOR, subDir);
+    return new DirCallback(cfg, relName + FILE_NAME_SEPARATOR, subDir); //releaseDirTraverser() is guaranteed to be called in any case
+}
+
+
+void DirCallback::releaseDirTraverser(TraverseCallback* trav)
+{
+    TraverseCallback::releaseDirTraverser(trav); //no-op, introduce compile-time coupling
+    delete trav;
 }
 
 
@@ -428,7 +436,7 @@ DirCallback::HandleError DirCallback::reportDirError(const std::wstring& msg)
     switch (cfg.acb_.reportError(msg))
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
-			cfg.failedDirReads_.insert(relNameParentPf_);
+            cfg.failedDirReads_.insert(relNameParentPf_);
             return ON_ERROR_IGNORE;
 
         case FillBufferCallback::ON_ERROR_RETRY:
@@ -444,7 +452,7 @@ DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, c
     switch (cfg.acb_.reportError(msg))
     {
         case FillBufferCallback::ON_ERROR_IGNORE:
-			cfg.failedItemReads_.insert(relNameParentPf_ + shortName);
+            cfg.failedItemReads_.insert(relNameParentPf_ + shortName);
             return ON_ERROR_IGNORE;
 
         case FillBufferCallback::ON_ERROR_RETRY:
@@ -455,7 +463,7 @@ DirCallback::HandleError DirCallback::reportItemError(const std::wstring& msg, c
 }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 class DstHackCallbackImpl : public DstHackCallback
 {
 public:
@@ -501,7 +509,7 @@ public:
                                 dirKey_.handleSymlinks_, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
                                 dirKey_.filter_,
                                 dirOutput_.failedDirReads,
-								dirOutput_.failedItemReads,
+                                dirOutput_.failedItemReads,
                                 *acb_);
 
         DirCallback traverser(travCfg,
@@ -509,7 +517,7 @@ public:
                               dirOutput_.dirCont);
 
         DstHackCallback* dstCallbackPtr = nullptr;
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         DstHackCallbackImpl dstCallback(*acb_, threadID_);
         dstCallbackPtr = &dstCallback;
 #endif

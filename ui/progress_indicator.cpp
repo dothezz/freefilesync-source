@@ -24,6 +24,7 @@
 #include <wx+/context_menu.h>
 #include <wx+/no_flicker.h>
 #include <wx+/font_size.h>
+#include <wx+/std_button_order.h>
 #include <zen/file_handling.h>
 #include "gui_generated.h"
 #include "../lib/ffs_paths.h"
@@ -32,6 +33,7 @@
 #include "tray_icon.h"
 #include "taskbar.h"
 #include "exec_finished_box.h"
+//#include <wx/msgdlg.h>
 
 using namespace zen;
 
@@ -480,14 +482,14 @@ public:
                         switch (entry.type)
                         {
                             case TYPE_INFO:
-                                dc.DrawLabel(wxString(), getResourceImage(L"msg_small_info"), rectTmp, wxALIGN_CENTER);
+                                dc.DrawLabel(wxString(), getResourceImage(L"msg_info_small"), rectTmp, wxALIGN_CENTER);
                                 break;
                             case TYPE_WARNING:
-                                dc.DrawLabel(wxString(), getResourceImage(L"msg_small_warning"), rectTmp, wxALIGN_CENTER);
+                                dc.DrawLabel(wxString(), getResourceImage(L"msg_warning_small"), rectTmp, wxALIGN_CENTER);
                                 break;
                             case TYPE_ERROR:
                             case TYPE_FATAL_ERROR:
-                                dc.DrawLabel(wxString(), getResourceImage(L"msg_small_error"), rectTmp, wxALIGN_CENTER);
+                                dc.DrawLabel(wxString(), getResourceImage(L"msg_error_small"), rectTmp, wxALIGN_CENTER);
                                 break;
                         }
                     break;
@@ -514,7 +516,7 @@ public:
                     return 2 * COLUMN_BORDER_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
 
                 case COL_TYPE_MSG_CATEGORY:
-                    return getResourceImage(L"msg_small_info").GetWidth();
+                    return getResourceImage(L"msg_info_small").GetWidth();
 
                 case COL_TYPE_MSG_TEXT:
                     return COLUMN_BORDER_LEFT + dc.GetTextExtent(getValue(row, colType)).GetWidth();
@@ -531,12 +533,12 @@ public:
 
     static int getColumnCategoryDefaultWidth()
     {
-        return getResourceImage(L"msg_small_info").GetWidth();
+        return getResourceImage(L"msg_info_small").GetWidth();
     }
 
     static int getRowDefaultHeight(const Grid& grid)
     {
-        return std::max(getResourceImage(L"msg_small_info").GetHeight(), grid.getMainWin().GetCharHeight() + 2) + 1; //+ some space + bottom border
+        return std::max(getResourceImage(L"msg_info_small").GetHeight(), grid.getMainWin().GetCharHeight() + 2) + 1; //+ some space + bottom border
     }
 
     virtual wxString getToolTip(size_t row, ColumnType colType) const
@@ -563,10 +565,10 @@ private:
 }
 
 
-class LogControl : public LogControlGenerated
+class LogPanel : public LogPanelGenerated
 {
 public:
-    LogControl(wxWindow* parent, const ErrorLog& log) : LogControlGenerated(parent),
+    LogPanel(wxWindow* parent, const ErrorLog& log) : LogPanelGenerated(parent),
         msgView(std::make_shared<MessageView>(log))
     {
         const int errorCount   = log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR);
@@ -603,9 +605,9 @@ public:
         m_gridMessages->setColumnConfig(attr);
 
         //support for CTRL + C
-        m_gridMessages->getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(LogControl::onGridButtonEvent), nullptr, this);
+        m_gridMessages->getMainWin().Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(LogPanel::onGridButtonEvent), nullptr, this);
 
-        m_gridMessages->Connect(EVENT_GRID_MOUSE_RIGHT_UP, GridClickEventHandler(LogControl::onMsgGridContext), nullptr, this);
+        m_gridMessages->Connect(EVENT_GRID_MOUSE_RIGHT_UP, GridClickEventHandler(LogPanel::onMsgGridContext), nullptr, this);
 
         updateGrid();
     }
@@ -713,7 +715,7 @@ private:
         }
         catch (const std::bad_alloc& e)
         {
-            wxMessageBox(_("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()), _("Error"), wxOK | wxICON_ERROR);
         }
     }
 
@@ -868,12 +870,12 @@ public:
 
     virtual void stopTimer() //halt all internal counters!
     {
-        m_animationControl1->Stop();
+        m_animCtrlSyncing->Stop();
         timeElapsed.Pause ();
     }
     virtual void resumeTimer()
     {
-        m_animationControl1->Play();
+        m_animCtrlSyncing->Play();
         timeElapsed.Resume();
     }
 
@@ -884,7 +886,7 @@ private:
     void OnKeyPressed(wxKeyEvent& event);
     virtual void OnOkay   (wxCommandEvent& event);
     virtual void OnPause  (wxCommandEvent& event);
-    virtual void OnAbort  (wxCommandEvent& event);
+    virtual void OnCancel (wxCommandEvent& event);
     virtual void OnClose  (wxCloseEvent& event);
     virtual void OnIconize(wxIconizeEvent& event);
 
@@ -951,7 +953,7 @@ SyncProgressDialogImpl::SyncProgressDialogImpl(AbortCallback& abortCb,
     lastStatCallSpeed(-1000000), //some big number
     phaseStartMs(0)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
@@ -962,8 +964,8 @@ SyncProgressDialogImpl::SyncProgressDialogImpl(AbortCallback& abortCb,
     if (mainDialog)
         titelTextBackup = mainDialog->GetTitle(); //save old title (will be used as progress indicator)
 
-    m_animationControl1->SetAnimation(GlobalResources::instance().aniSync);
-    m_animationControl1->Play();
+    m_animCtrlSyncing->SetAnimation(GlobalResources::instance().aniWorking);
+    m_animCtrlSyncing->Play();
 
     SetIcon(GlobalResources::instance().programIconFFS);
 
@@ -974,7 +976,7 @@ SyncProgressDialogImpl::SyncProgressDialogImpl(AbortCallback& abortCb,
     EnableCloseButton(false); //this is NOT honored on OS X or during system shutdown on Windows!
 
     if (IsShown()) //don't steal focus when starting in sys-tray!
-        m_buttonAbort->SetFocus();
+        m_buttonCancel->SetFocus();
 
     timeElapsed.Start(); //measure total time
 
@@ -985,11 +987,12 @@ SyncProgressDialogImpl::SyncProgressDialogImpl(AbortCallback& abortCb,
     catch (const TaskbarNotAvailable&) {}
 
     //hide "processed" statistics until end of process
-    m_listbookResult          ->Hide();
+    m_notebookResult          ->Hide();
     m_staticTextLabelItemsProc->Show(false);
     bSizerItemsProc           ->Show(false);
     m_buttonClose             ->Show(false);
-    Layout();
+    //set std order after button visibility was set
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonPause).setCancel(m_buttonCancel));
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncProgressDialogImpl::OnKeyPressed), nullptr, this);
@@ -1017,6 +1020,7 @@ SyncProgressDialogImpl::SyncProgressDialogImpl(AbortCallback& abortCb,
     updateDialogStatus(); //null-status will be shown while waiting for dir locks (if at all)
 
     Fit();
+    Layout();
 
     if (showProgress)
     {
@@ -1042,7 +1046,7 @@ SyncProgressDialogImpl::~SyncProgressDialogImpl()
         mainDialog->Show();
     }
 
-    //our client is NOT expecting a second call vianotifyWindowTerminate_()!
+    //our client is NOT expecting a second call via notifyWindowTerminate_()!
 }
 
 
@@ -1054,9 +1058,9 @@ void SyncProgressDialogImpl::OnKeyPressed(wxKeyEvent& event)
         wxCommandEvent dummy(wxEVT_COMMAND_BUTTON_CLICKED);
 
         //simulate click on abort button
-        if (m_buttonAbort->IsShown()) //delegate to "abort" button if available
+        if (m_buttonCancel->IsShown()) //delegate to "cancel" button if available
         {
-            if (wxEvtHandler* handler = m_buttonAbort->GetEventHandler())
+            if (wxEvtHandler* handler = m_buttonCancel->GetEventHandler())
                 handler->ProcessEvent(dummy);
             return;
         }
@@ -1118,7 +1122,7 @@ void SyncProgressDialogImpl::notifyProgressChange() //noexcept!
 
 namespace
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 enum Zorder
 {
     ZORDER_CORRECT,
@@ -1319,7 +1323,7 @@ void SyncProgressDialogImpl::updateGuiInt(bool allowYield)
         //-> it seems this layout is not required, and even harmful: resets m_comboBoxExecFinished dropdown while user is selecting!
     }
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //workaround Windows 7 bug messing up z-order after temporary application hangs: https://sourceforge.net/tracker/index.php?func=detail&aid=3376523&group_id=234430&atid=1093080
     if (mainDialog)
         if (evaluateZorder(*this, *mainDialog) == ZORDER_WRONG)
@@ -1373,52 +1377,69 @@ void SyncProgressDialogImpl::updateDialogStatus() //depends on "syncStat_, pause
     //status bitmap
     if (syncStat_) //sync running
     {
+        auto setStatusBitmap = [&](const wchar_t* bmpName)
+        {
+            m_animCtrlSyncing->Hide();
+            m_bitmapStatus->SetBitmap(getResourceImage(bmpName));
+            m_bitmapStatus->SetToolTip(dlgStatusTxt);
+            m_bitmapStatus->Show();
+        };
+
         if (paused_)
-            m_bitmapStatus->SetBitmap(getResourceImage(L"statusPause"));
+            setStatusBitmap(L"status_pause");
         else
             switch (syncStat_->currentPhase())
             {
                 case ProcessCallback::PHASE_NONE:
+                    m_animCtrlSyncing->Hide();
+                    m_bitmapStatus->Hide();
                     break;
 
                 case ProcessCallback::PHASE_SCANNING:
-                    m_bitmapStatus->SetBitmap(getResourceImage(L"statusScanning"));
+                    setStatusBitmap(L"status_scanning");
                     break;
 
                 case ProcessCallback::PHASE_COMPARING_CONTENT:
-                    m_bitmapStatus->SetBitmap(getResourceImage(L"statusBinaryCompare"));
+                    setStatusBitmap(L"status_binary_compare");
                     break;
 
                 case ProcessCallback::PHASE_SYNCHRONIZING:
-                    m_bitmapStatus->SetBitmap(getResourceImage(L"statusSyncing"));
+                    m_bitmapStatus->SetBitmap(getResourceImage(L"status_syncing"));
+                    m_bitmapStatus->SetToolTip(dlgStatusTxt);
+                    m_bitmapStatus->Show();
+                    m_animCtrlSyncing->Show();
+                    m_animCtrlSyncing->SetToolTip(dlgStatusTxt);
                     break;
             }
-
-        m_bitmapStatus->SetToolTip(dlgStatusTxt);
     }
     else //sync finished
+    {
+        auto setStatusBitmap = [&](const wchar_t* bmpName, const std::wstring& tooltip)
+        {
+            m_animCtrlSyncing->Hide();
+            m_bitmapStatus->SetBitmap(getResourceImage(bmpName));
+            m_bitmapStatus->Show();
+            m_bitmapStatus->SetToolTip(tooltip);
+        };
         switch (finalResult)
         {
             case RESULT_ABORTED:
-                m_bitmapStatus->SetBitmap(getResourceImage(L"statusAborted"));
-                m_bitmapStatus->SetToolTip(_("Synchronization aborted!"));
+                setStatusBitmap(L"status_aborted", _("Synchronization aborted"));
                 break;
 
             case RESULT_FINISHED_WITH_ERROR:
-                m_bitmapStatus->SetBitmap(getResourceImage(L"statusFinishedErrors"));
-                m_bitmapStatus->SetToolTip(_("Synchronization completed with errors!"));
+                setStatusBitmap(L"status_finished_errors", _("Synchronization completed with errors"));
                 break;
 
             case RESULT_FINISHED_WITH_WARNINGS:
-                m_bitmapStatus->SetBitmap(getResourceImage(L"statusFinishedWarnings"));
-                m_bitmapStatus->SetToolTip(_("Synchronization completed with warnings."));
+                setStatusBitmap(L"status_finished_warnings", _("Synchronization completed with warnings"));
                 break;
 
             case RESULT_FINISHED_WITH_SUCCESS:
-                m_bitmapStatus->SetBitmap(getResourceImage(L"statusFinishedSuccess"));
-                m_bitmapStatus->SetToolTip(_("Synchronization completed successfully."));
+                setStatusBitmap(L"status_finished_success", _("Synchronization completed successfully"));
                 break;
         }
+    }
 
     //show status on Windows 7 taskbar
     if (taskbar_.get())
@@ -1466,6 +1487,7 @@ void SyncProgressDialogImpl::updateDialogStatus() //depends on "syncStat_, pause
     }
 
     Layout();
+    Refresh(); //a few pixels below the status text need refreshing
 }
 
 warn_static("osx: minimize to systray?")
@@ -1556,29 +1578,32 @@ void SyncProgressDialogImpl::processHasFinished(SyncResult resultId, const Error
 
     EnableCloseButton(true);
 
-    m_buttonAbort->Disable();
-    m_buttonAbort->Hide();
+    m_buttonCancel->Disable();
+    m_buttonCancel->Hide();
     m_buttonPause->Disable();
     m_buttonPause->Hide();
     m_buttonClose->Show();
     m_buttonClose->Enable();
 
+    bSizerExecFinished->Show(false);
+
+    //set std order after button visibility was set
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonClose));
+
     if (IsShown()) //don't steal focus when residing in sys-tray!
         m_buttonClose->SetFocus();
 
-    m_animationControl1->Stop();
-    m_animationControl1->Hide();
+    //m_animCtrlSyncing->Stop();
+    //m_animCtrlSyncing->Hide();
 
     //hide current operation status
     m_staticTextStatus->Hide();
 
-    bSizerExecFinished->Show(false);
-
     //show and prepare final statistics
-    m_listbookResult->Show();
+    m_notebookResult->Show();
 
-#ifdef FFS_WIN
-    m_staticlineHeader->Hide(); //win: m_listbookResult already has a window frame
+#if defined ZEN_WIN || defined ZEN_LINUX
+    m_staticlineFooter->Hide(); //win: m_notebookResult already has a window frame
 #endif
 
     //show total time
@@ -1588,29 +1613,23 @@ void SyncProgressDialogImpl::processHasFinished(SyncResult resultId, const Error
     m_staticTextLabelRemTime->Show(false);
     m_staticTextRemTime     ->Show(false);
 
-    //workaround wxListBox bug on Windows XP: labels are drawn on top of each other
-    assert(m_listbookResult->GetImageList()); //make sure listbook keeps *any* image list
-    //due to some crazy reasons that aren't worth debugging, this needs to be done directly in wxFormBuilder,
-    //the following call is *not* sufficient: m_listbookResult->AssignImageList(new wxImageList(170, 1));
-    //note: alternative solutions involving wxLC_LIST, wxLC_REPORT and SetWindowStyleFlag() do not work portably! wxListBook using wxLC_ICON is obviously a class invariant!
-
     //1. re-arrange graph into results listbook
     bSizerRoot->Detach(m_panelProgress);
-    m_panelProgress->Reparent(m_listbookResult);
-#ifdef FFS_LINUX //does not seem to be required on Win or OS X
+    m_panelProgress->Reparent(m_notebookResult);
+#ifdef ZEN_LINUX //does not seem to be required on Win or OS X
     wxTheApp->Yield(); //wxGTK 2.9.3 fails miserably at "reparent" whithout this
 #endif
-    m_listbookResult->AddPage(m_panelProgress, _("Statistics"), true); //AddPage() takes ownership!
+    m_notebookResult->AddPage(m_panelProgress, _("Statistics"), true); //AddPage() takes ownership!
 
     //2. log file
     const size_t posLog = 1;
-    LogControl* logControl = new LogControl(m_listbookResult, log); //owned by m_listbookResult
-    m_listbookResult->AddPage(logControl, _("Logging"), false);
-    //bSizerHoldStretch->Insert(0, logControl, 1, wxEXPAND);
+    LogPanel* logPanel = new LogPanel(m_notebookResult, log); //owned by m_notebookResult
+    m_notebookResult->AddPage(logPanel, _("Logging"), false);
+    //bSizerHoldStretch->Insert(0, logPanel, 1, wxEXPAND);
 
     //show log instead of graph if errors occurred! (not required for ignored warnings)
     if (log.getItemCount(TYPE_ERROR | TYPE_FATAL_ERROR) > 0)
-        m_listbookResult->ChangeSelection(posLog);
+        m_notebookResult->ChangeSelection(posLog);
 
     Layout();
     //play (optional) sound notification after sync has completed -> only play when waiting on results dialog, seems to be pointless otherwise!
@@ -1630,6 +1649,7 @@ void SyncProgressDialogImpl::processHasFinished(SyncResult resultId, const Error
     }
 
     //Raise(); -> don't! user may be watching a movie in the meantime ;)
+    warn_static("was ist mit resumeFromSystray:: Raise()??")
 }
 
 
@@ -1640,7 +1660,7 @@ void SyncProgressDialogImpl::OnOkay(wxCommandEvent& event)
 }
 
 
-void SyncProgressDialogImpl::OnAbort(wxCommandEvent& event)
+void SyncProgressDialogImpl::OnCancel(wxCommandEvent& event)
 {
     paused_ = false;
     updateDialogStatus(); //update status + pause button
@@ -1699,41 +1719,46 @@ void SyncProgressDialogImpl::OnResumeFromTray(wxCommandEvent& event)
 
 void SyncProgressDialogImpl::minimizeToTray()
 {
+//    wxMessageBox(L"hi");
+
     if (!trayIcon.get())
     {
         trayIcon = make_unique<FfsTrayIcon>();
         trayIcon->Connect(FFS_REQUEST_RESUME_TRAY_EVENT, wxCommandEventHandler(SyncProgressDialogImpl::OnResumeFromTray), nullptr, this);
         //tray icon has shorter lifetime than this => no need to disconnect event later
+
+        updateGuiInt(false); //set tray tooltip + progress: e.g. no updates while paused
+
+        Hide();
+        if (mainDialog)
+            mainDialog->Hide();
     }
-
-    updateGuiInt(false); //set tray tooltip + progress: e.g. no updates while paused
-
-    Hide();
-    if (mainDialog)
-        mainDialog->Hide();
 }
 
 
 void SyncProgressDialogImpl::resumeFromSystray()
 {
-    trayIcon.reset();
-
-    if (mainDialog)
+    if (trayIcon)
     {
-        if (mainDialog->IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
-            mainDialog->Iconize(false);
-        mainDialog->Show();
-        mainDialog->Raise();
+        trayIcon.reset();
+
+        if (mainDialog)
+        {
+            if (mainDialog->IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
+                mainDialog->Iconize(false);
+            mainDialog->Show();
+            mainDialog->Raise();
+        }
+
+        if (IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
+            Iconize(false);
+        Show();
+        Raise();
+        SetFocus();
+
+        updateDialogStatus(); //restore Windows 7 task bar status (e.g. required in pause mode)
+        updateGuiInt(false);  //restore Windows 7 task bar progress (e.g. required in pause mode)
     }
-
-    if (IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
-        Iconize(false);
-    Show();
-    Raise();
-    SetFocus();
-
-    updateDialogStatus(); //restore Windows 7 task bar status (e.g. required in pause mode)
-    updateGuiInt(false); //restore Windows 7 task bar progress (e.g. required in pause mode)
 }
 
 //########################################################################################

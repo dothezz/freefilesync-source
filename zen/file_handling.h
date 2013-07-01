@@ -4,13 +4,13 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef FILE_HANDLING_H_INCLUDED
-#define FILE_HANDLING_H_INCLUDED
+#ifndef FILE_HANDLING_H_8017341345614857
+#define FILE_HANDLING_H_8017341345614857
 
 #include "zstring.h"
 #include "file_error.h"
-#include "int64.h"
 #include "file_id_def.h"
+#include "int64.h"
 
 namespace zen
 {
@@ -18,20 +18,10 @@ struct CallbackRemoveDir;
 struct CallbackCopyFile;
 
 
-bool fileExists     (const Zstring& filename); //throw()       check whether file      or symlink exists
-bool dirExists      (const Zstring& dirname);  //throw()       check whether directory or symlink exists
-bool symlinkExists  (const Zstring& linkname); //throw()       check whether a symbolic link exists
-bool somethingExists(const Zstring& objname);  //throw()       check whether any object with this name exists
-
-//check whether two folders are located on the same (logical) volume
-//left and right directories NEED NOT yet exist! volume prefix is sufficient! path may end with PATH_SEPARATOR
-enum ResponseSame
-{
-    IS_SAME_YES,
-    IS_SAME_NO,
-    IS_SAME_CANT_SAY
-};
-ResponseSame onSameVolume(const Zstring& folderLeft, const Zstring& folderRight); //throw()
+bool fileExists     (const Zstring& filename); //noexcept; check whether file      *or* (file) symlink exists
+bool dirExists      (const Zstring& dirname);  //noexcept; check whether directory *or* (dir)  symlink exists
+bool symlinkExists  (const Zstring& linkname); //noexcept; check whether a symbolic link exists
+bool somethingExists(const Zstring& objname);  //noexcept; check whether any object with this name exists
 
 enum SymLinkType
 {
@@ -39,7 +29,7 @@ enum SymLinkType
     SYMLINK_TYPE_FILE,    //Windows: may be broken
     SYMLINK_TYPE_UNKNOWN, //Windows: unable to determine type; Linux: broken Symlink
 };
-SymLinkType getSymlinkType(const Zstring& linkname); //throw()
+SymLinkType getSymlinkType(const Zstring& linkname); //noexcept
 
 enum ProcSymlink
 {
@@ -66,7 +56,7 @@ bool supportsPermissions(const Zstring& dirname); //throw FileError, derefernces
 //if parent directory not existing: create recursively:
 void makeDirectory(const Zstring& directory, bool failIfExists = false); //throw FileError, ErrorTargetExisting
 
-//fail if already existing or parent not existing:
+//fail if already existing or parent directory not existing:
 //directory should not end with path separator
 //templateDir may be empty
 void makeDirectoryPlain(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //throw FileError, ErrorTargetExisting, ErrorTargetPathMissing
@@ -116,4 +106,4 @@ struct CallbackCopyFile
 };
 }
 
-#endif //FILE_HANDLING_H_INCLUDED
+#endif //FILE_HANDLING_H_8017341345614857

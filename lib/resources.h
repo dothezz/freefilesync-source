@@ -22,7 +22,7 @@ public:
 
     //global image resource objects
     wxAnimation aniWink;
-    wxAnimation aniSync;
+    wxAnimation aniWorking;
     wxIcon      programIconFFS;
 
 private:

@@ -7,6 +7,7 @@
 #include "batch_config.h"
 #include <wx/wupdlock.h>
 #include <wx+/mouse_move_dlg.h>
+#include <wx+/std_button_order.h>
 #include <wx+/font_size.h>
 #include "gui_generated.h"
 #include "dir_name.h"
@@ -67,9 +68,11 @@ BatchDialog::BatchDialog(wxWindow* parent,
     BatchDlgGenerated(parent),
     batchCfgOutRef(batchCfg)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonSaveAs).setCancel(m_buttonCancel));
+
     wxWindowUpdateLocker dummy(this); //avoid display distortion
     setRelativeFontSize(*m_staticTextHeader, 1.25);
 
@@ -85,7 +88,7 @@ BatchDialog::BatchDialog(wxWindow* parent,
     Fit(); //child-element widths have changed: image was set
     Layout();
 
-    m_buttonSave->SetFocus();
+    m_buttonSaveAs->SetFocus();
 }
 
 

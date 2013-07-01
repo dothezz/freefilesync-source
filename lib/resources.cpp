@@ -69,19 +69,19 @@ GlobalResources::GlobalResources()
             else if (name == L"wink.gif")
                 loadAnimFromZip(resourceFile, aniWink);
             else if (name == L"working.gif")
-                loadAnimFromZip(resourceFile, aniSync);
+                loadAnimFromZip(resourceFile, aniWorking);
         }
     }
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //for compatibility it seems we need to stick with a "real" icon
     programIconFFS = wxIcon(L"A_FFS_ICON");
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     //attention: make sure to not implicitly call "instance()" again => deadlock on Linux
     programIconFFS.CopyFromBitmap(getImage(L"FreeFileSync")); //use big logo bitmap for better quality
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     assert(getImage(L"FreeFileSync").GetWidth () == getImage(L"FreeFileSync").GetHeight() &&
            getImage(L"FreeFileSync").GetWidth() % 128 == 0);
     //wxWidgets' bitmap to icon conversion on OS X can only deal with very specific sizes

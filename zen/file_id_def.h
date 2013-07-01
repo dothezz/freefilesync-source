@@ -10,17 +10,17 @@
 #include <utility>
 #include "assert_static.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <sys/stat.h>
 #endif
 
 
 namespace zen
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 typedef DWORD DeviceId;
 typedef ULONGLONG FileIndex;
 
@@ -49,7 +49,7 @@ assert_static(sizeof(FileId().second) == sizeof(BY_HANDLE_FILE_INFORMATION().nFi
 assert_static(sizeof(FileId().second) == sizeof(ULARGE_INTEGER));
 
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 namespace impl { typedef struct ::stat StatDummy; } //sigh...
 
 typedef decltype(impl::StatDummy::st_dev) DeviceId;

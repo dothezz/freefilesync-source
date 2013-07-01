@@ -51,7 +51,7 @@ considered equal. This is required by FAT/FAT32 file systems which
 store file times with a 2 second precision only.<BR>This setting
 can also be used to simulate a &quot;compare by file size&quot;,
 ignoring last modification times: If tolerance is set to some high
-value, e.g. 2.000.000.000, then changed files will be detected as a
+value, e.g. 2000000000, then changed files will be detected as a
 conflict (same date, different file size) and the
 synchronization direction for conflicts can be set accordingly.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -72,7 +72,7 @@ in a network out of the box.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>VerifyCopiedFiles:</B></FONT><BR><FONT FACE="Tahoma, sans-serif">If
-active FreeFileSync will binary-compare source and target files after
+active, FreeFileSync will binary-compare source and target files after
 copying and report verification errors. Note that this may double
 file copy times and is no guarantee that data has not already been
 corrupted prior to copying and corruption is not hidden by

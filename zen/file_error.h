@@ -4,36 +4,37 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef FILEERROR_H_INCLUDED
-#define FILEERROR_H_INCLUDED
+#ifndef FILEERROR_H_INCLUDED_839567308565656789
+#define FILEERROR_H_INCLUDED_839567308565656789
 
 #include <string>
 #include "zstring.h"
 #include "utf.h"
-#include "last_error.h" //we'll need this later anyway!
+#include "sys_error.h" //we'll need this later anyway!
 
 namespace zen
 {
-class FileError //Exception base class used to notify file/directory copy/delete errors
+//A high-level exception class giving detailed context information for end users
+class FileError
 {
 public:
-    explicit FileError(const std::wstring& message) : errorMessage(message) {}
+    explicit FileError(const std::wstring& msg) : msg_(msg) {}
+    FileError(const std::wstring& msg, const std::wstring& details) : msg_(msg + L"\n\n" + details) {}
     virtual ~FileError() {}
 
-    const std::wstring& toString() const { return errorMessage; }
+    const std::wstring& toString() const { return msg_; }
 
 private:
-    std::wstring errorMessage;
+    std::wstring msg_;
 };
 
-#define DEFINE_NEW_FILE_ERROR(X) struct X : public FileError { X(const std::wstring& message) : FileError(message) {} };
+#define DEFINE_NEW_FILE_ERROR(X) struct X : public FileError { X(const std::wstring& msg) : FileError(msg) {} X(const std::wstring& msg, const std::wstring& descr) : FileError(msg, descr) {} };
 
 DEFINE_NEW_FILE_ERROR(ErrorNotExisting);
 DEFINE_NEW_FILE_ERROR(ErrorTargetExisting);
 DEFINE_NEW_FILE_ERROR(ErrorTargetPathMissing);
 DEFINE_NEW_FILE_ERROR(ErrorFileLocked);
 DEFINE_NEW_FILE_ERROR(ErrorDifferentVolume);
-
 
 
 //----------- facilitate usage of std::wstring for error messages --------------------
@@ -56,4 +57,4 @@ std::wstring fmtFileName(const Zstring& filename)
 }
 }
 
-#endif // FILEERROR_H_INCLUDED
+#endif //FILEERROR_H_INCLUDED_839567308565656789

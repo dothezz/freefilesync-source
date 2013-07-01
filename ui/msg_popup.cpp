@@ -5,9 +5,10 @@
 // **************************************************************************
 
 #include "msg_popup.h"
-#include "../lib/resources.h"
 #include <wx+/mouse_move_dlg.h>
+#include <wx+/std_button_order.h>
 #include "gui_generated.h"
+#include "../lib/resources.h"
 
 using namespace zen;
 
@@ -31,11 +32,11 @@ public:
              bool* ignoreNextErrors);
 
 private:
-    void OnClose (wxCloseEvent&   event) { EndModal(ReturnErrorDlg::BUTTON_CANCEL); }
-    void OnCancel(wxCommandEvent& event) { EndModal(ReturnErrorDlg::BUTTON_CANCEL); }
-    void OnButton1(wxCommandEvent& event);
-    void OnButton2(wxCommandEvent& event);
-    void OnCheckBoxClick(wxCommandEvent& event) { updateGui(); event.Skip(); }
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnErrorDlg::BUTTON_CANCEL); }
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnErrorDlg::BUTTON_CANCEL); }
+    virtual void OnButtonAffirmative(wxCommandEvent& event);
+    virtual void OnButtonNegative   (wxCommandEvent& event);
+    virtual void OnCheckBoxClick(wxCommandEvent& event) { updateGui(); event.Skip(); }
     void updateGui();
 
     bool* ignoreErrors;
@@ -48,13 +49,14 @@ private:
 ErrorDlg::ErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const wxString& caption, bool* ignoreNextErrors) :
     MessageDlgGenerated(parent),
     ignoreErrors(ignoreNextErrors),
-    buttonRetry (*m_buttonCustom1),
-    buttonIgnore(*m_buttonCustom2),
+    buttonRetry (*m_buttonAffirmative),
+    buttonIgnore(*m_buttonNegative),
     checkBoxIgnoreErrors(*m_checkBoxCustom)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+
     SetTitle(!caption.empty() ? caption : _("Error"));
     m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_error"));
     m_textCtrlMessage->SetValue(messageText);
@@ -89,9 +91,13 @@ ErrorDlg::ErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageT
     else if (activeButtons & ReturnErrorDlg::BUTTON_CANCEL)
         setAsStandard(*m_buttonCancel);
 
+    //set std order after button visibility was set
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(&buttonRetry).setNegative(&buttonIgnore).setCancel(m_buttonCancel));
+
     updateGui();
     Fit(); //child-element widths have changed: image was set
 }
+
 
 void ErrorDlg::updateGui()
 {
@@ -100,7 +106,7 @@ void ErrorDlg::updateGui()
 }
 
 
-void ErrorDlg::OnButton1(wxCommandEvent& event) //retry
+void ErrorDlg::OnButtonAffirmative(wxCommandEvent& event) //retry
 {
     if (ignoreErrors)
         *ignoreErrors = checkBoxIgnoreErrors.GetValue();
@@ -108,7 +114,7 @@ void ErrorDlg::OnButton1(wxCommandEvent& event) //retry
 }
 
 
-void ErrorDlg::OnButton2(wxCommandEvent& event) //ignore
+void ErrorDlg::OnButtonNegative(wxCommandEvent& event) //ignore
 {
     if (ignoreErrors)
         *ignoreErrors = checkBoxIgnoreErrors.GetValue();
@@ -140,16 +146,16 @@ public:
     WarningDlg(wxWindow* parent, int activeButtons, const wxString& messageText, bool& dontShowAgain);
 
 private:
-    void OnClose (wxCloseEvent&   event) { EndModal(ReturnWarningDlg::BUTTON_CANCEL); }
-    void OnCancel(wxCommandEvent& event) { EndModal(ReturnWarningDlg::BUTTON_CANCEL); }
-    void OnButton1(wxCommandEvent& event);
-    void OnButton2(wxCommandEvent& event);
-    void OnCheckBoxClick(wxCommandEvent& event) { updateGui(); event.Skip(); }
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnWarningDlg::BUTTON_CANCEL); }
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnWarningDlg::BUTTON_CANCEL); }
+    virtual void OnButtonAffirmative(wxCommandEvent& event);
+    virtual void OnButtonNegative   (wxCommandEvent& event);
+    virtual void OnCheckBoxClick(wxCommandEvent& event) { updateGui(); event.Skip(); }
     void updateGui();
 
     bool& dontShowAgain;
-    wxButton& buttonIgnore;            //
-    wxButton& buttonSwitch;            // map generic controls
+    wxButton& buttonSwitch;            //
+    wxButton& buttonIgnore;            //map generic controls
     wxCheckBox& checkBoxDontShowAgain; //
 };
 
@@ -157,13 +163,14 @@ private:
 WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& messageText, bool& dontShowDlgAgain) :
     MessageDlgGenerated(parent),
     dontShowAgain(dontShowDlgAgain),
-    buttonIgnore(*m_buttonCustom1),
-    buttonSwitch(*m_buttonCustom2),
+    buttonSwitch(*m_buttonAffirmative),
+    buttonIgnore(*m_buttonNegative),
     checkBoxDontShowAgain(*m_checkBoxCustom)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+
     SetTitle(_("Warning"));
     m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_warning"));
     m_textCtrlMessage->SetValue(messageText);
@@ -193,6 +200,9 @@ WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& mes
     else if (activeButtons & ReturnWarningDlg::BUTTON_CANCEL)
         setAsStandard(*m_buttonCancel);
 
+    //set std order after button visibility was set
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(&buttonSwitch).setNegative(&buttonIgnore).setCancel(m_buttonCancel));
+
     updateGui();
     Fit(); //child-element widths have changed: image was set
 }
@@ -205,17 +215,17 @@ void WarningDlg::updateGui()
 }
 
 
-void WarningDlg::OnButton1(wxCommandEvent& event) //ignore
-{
-    dontShowAgain = checkBoxDontShowAgain.GetValue();
-    EndModal(ReturnWarningDlg::BUTTON_IGNORE);
-}
-
-
-void WarningDlg::OnButton2(wxCommandEvent& event) //switch
+void WarningDlg::OnButtonAffirmative(wxCommandEvent& event) //switch
 {
     dontShowAgain = checkBoxDontShowAgain.GetValue();
     EndModal(ReturnWarningDlg::BUTTON_SWITCH);
+}
+
+
+void WarningDlg::OnButtonNegative(wxCommandEvent& event) //ignore
+{
+    dontShowAgain = checkBoxDontShowAgain.GetValue();
+    EndModal(ReturnWarningDlg::BUTTON_IGNORE);
 }
 
 
@@ -234,11 +244,11 @@ public:
     QuestionDlg(wxWindow* parent, int activeButtons, const wxString& messageText, const QuestConfig& cfg);
 
 private:
-    void OnClose (wxCloseEvent&   event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
-    void OnCancel(wxCommandEvent& event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
-    void OnButton1(wxCommandEvent& event);
-    void OnButton2(wxCommandEvent& event);
-    void OnCheckBoxClick(wxCommandEvent& event) { updateGui(); event.Skip(); }
+    virtual void OnClose (wxCloseEvent&   event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
+    virtual void OnCancel(wxCommandEvent& event) { EndModal(ReturnQuestionDlg::BUTTON_CANCEL); }
+    virtual void OnButtonAffirmative(wxCommandEvent& event);
+    virtual void OnButtonNegative   (wxCommandEvent& event);
+    virtual void OnCheckBoxClick(wxCommandEvent& event) { updateGui(); event.Skip(); }
     void updateGui();
 
     wxButton& buttonYes; // map generic controls
@@ -254,14 +264,15 @@ QuestionDlg::QuestionDlg(wxWindow* parent,
                          const wxString& messageText,
                          const QuestConfig& cfg) :
     MessageDlgGenerated(parent),
-    buttonYes(*m_buttonCustom1),
-    buttonNo (*m_buttonCustom2),
+    buttonYes(*m_buttonAffirmative),
+    buttonNo (*m_buttonNegative),
     checkBoxValue_(cfg.checkBoxValue),
     disabledButtonsWhenChecked_(cfg.disabledButtonsWhenChecked_)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    assert(!cfg.caption.empty()); //"Question" is not a good caption!
     SetTitle(!cfg.caption.empty()? cfg.caption : _("Question"));
     m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_question"));
     m_textCtrlMessage->SetValue(messageText);
@@ -295,6 +306,9 @@ QuestionDlg::QuestionDlg(wxWindow* parent,
     else if (activeButtons & ReturnQuestionDlg::BUTTON_CANCEL)
         setAsStandard(*m_buttonCancel);
 
+    //set std order after button visibility was set
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(&buttonYes).setNegative(&buttonNo).setCancel(m_buttonCancel));
+
     updateGui();
     Fit(); //child-element widths have changed: image was set
 }
@@ -313,14 +327,15 @@ void QuestionDlg::updateGui()
 }
 
 
-void QuestionDlg::OnButton1(wxCommandEvent& event) //yes
+void QuestionDlg::OnButtonAffirmative(wxCommandEvent& event) //yes
 {
     if (checkBoxValue_)
         *checkBoxValue_ = m_checkBoxCustom->GetValue();
     EndModal(ReturnQuestionDlg::BUTTON_YES);
 }
 
-void QuestionDlg::OnButton2(wxCommandEvent& event) //no
+
+void QuestionDlg::OnButtonNegative(wxCommandEvent& event) //no
 {
     if (checkBoxValue_)
         *checkBoxValue_ = m_checkBoxCustom->GetValue();

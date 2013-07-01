@@ -23,13 +23,13 @@
 #include "lib/process_xml.h"
 #include "lib/error_log.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/win_ver.h>
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 #include <gtk/gtk.h>
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
@@ -48,9 +48,9 @@ void onTerminationRequested()
     std::wstring msg = boost::this_thread::get_id() == mainThreadId ?
                        L"Termination requested in main thread!\n\n" :
                        L"Termination requested in worker thread!\n\n";
-    msg += L"Please take a screenshot and file a bug report at: http://sourceforge.net/projects/freefilesync";
+    msg += L"Please file a bug report at: http://sourceforge.net/projects/freefilesync";
 
-    wxSafeShowMessage(_("An exception occurred!"), msg);
+    wxSafeShowMessage(_("An exception occurred"), msg);
     std::abort();
 }
 #ifdef _MSC_VER
@@ -61,7 +61,7 @@ void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* functi
 std::vector<Zstring> getCommandlineArgs(const wxApp& app)
 {
     std::vector<Zstring> args;
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //we do the job ourselves! both wxWidgets and ::CommandLineToArgvW() parse "C:\" "D:\" as single line C:\" D:\"
     //-> "solution": we just don't support protected quotation mark!
     Zstring cmdLine = ::GetCommandLine(); //only way to get a unicode commandline
@@ -120,7 +120,7 @@ bool Application::OnInit()
 {
     std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #ifdef _MSC_VER
     _set_invalid_parameter_handler(crtInvalidParameterHandler); //see comment in <zen/time.h>
 #endif
@@ -128,17 +128,17 @@ bool Application::OnInit()
     //SEM_FAILCRITICALERRORS at startup. This is to prevent error mode dialogs from hanging the application."
     ::SetErrorMode(SEM_FAILCRITICALERRORS);
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     ::gtk_init(nullptr, nullptr);
     ::gtk_rc_parse((getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     ProcessSerialNumber psn = { 0, kCurrentProcess };
     ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //behave like an application bundle, even when the app is not packaged (yet)
 #endif
 
 #if wxCHECK_VERSION(2, 9, 1)
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
 #endif
     wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s is default for Windows: http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
@@ -178,7 +178,7 @@ void Application::onEnterEventLoop(wxEvent& event)
 
 warn_static("finish")
 
-#ifdef FFS_MAC
+#ifdef ZEN_MAC
 /*
 Initialization call sequences on OS X
 -------------------------------------
@@ -230,7 +230,7 @@ int Application::OnRun()
     {
         //it's not always possible to display a message box, e.g. corrupted stack, however low-level file output works!
         logError(utfCvrtTo<std::string>(msg));
-        wxSafeShowMessage(_("An exception occurred!") + L" - FFS", msg);
+        wxSafeShowMessage(_("An exception occurred"), msg);
     };
 
     try
@@ -254,10 +254,9 @@ int Application::OnRun()
 
 void Application::onQueryEndSession(wxEvent& event)
 {
-    //alas wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/3069
     if (auto mainWin = dynamic_cast<MainDialog*>(GetTopWindow()))
         mainWin->onQueryEndSession();
-    OnExit();
+    OnExit(); //wxWidgets screws up again: http://trac.wxwidgets.org/ticket/3069
     //wxEntryCleanup(); -> gives popup "dll init failed" on XP
     std::exit(returnCode); //Windows will terminate anyway: destruct global objects
 }

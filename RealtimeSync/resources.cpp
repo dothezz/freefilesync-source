@@ -47,14 +47,14 @@ GlobalResources::GlobalResources()
         }
     }
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //for compatibility it seems we need to stick with a "real" icon
     programIconRTS = wxIcon(L"A_RTS_ICON");
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     programIconRTS.CopyFromBitmap(getImage(L"RealtimeSync"));
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     assert(getImage(L"RealtimeSync").GetWidth () == getImage(L"RealtimeSync").GetHeight() &&
            getImage(L"RealtimeSync").GetWidth() % 128 == 0);
     //wxWidgets' bitmap to icon conversion on OS X can only deal with very specific sizes

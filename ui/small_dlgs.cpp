@@ -17,6 +17,7 @@
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/image_tools.h>
 #include <wx+/font_size.h>
+#include <wx+/std_button_order.h>
 #include "gui_generated.h"
 #include "msg_popup.h"
 #include "custom_grid.h"
@@ -44,6 +45,8 @@ private:
 
 AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 {
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonClose));
+
     setRelativeFontSize(*m_buttonDonate, 1.25);
 
     assert(m_buttonClose->GetId() == wxID_OK); //we cannot use wxID_CLOSE else Esc key won't work: yet another wxWidgets bug??
@@ -76,7 +79,7 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 
     bSizerTranslators->Fit(m_scrolledWindowTranslators);
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //-> put *after* creating credits
 #endif
 
@@ -167,9 +170,10 @@ FilterDlg::FilterDlg(wxWindow* parent,
     FilterDlgGenerated(parent),
     outputRef(filter) //just hold reference
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOk).setCancel(m_buttonCancel));
 
     setRelativeFontSize(*m_staticTextHeader, 1.25);
 
@@ -350,9 +354,10 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
     tickCountStartup(getTicks()),
     ticksPerSec_(ticksPerSec())
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
 
     m_checkBoxDeleteBothSides->SetValue(deleteOnBothSides);
     m_checkBoxUseRecycler->SetValue(useRecycleBin);
@@ -448,7 +453,7 @@ ReturnSmallDlg::ButtonPressed zen::showDeleteDialog(wxWindow* parent,
 
 //########################################################################################
 
-class SyncPreviewDlg : public SyncPreviewDlgGenerated
+class SyncPreviewDlg : public SyncConfirmationDlgGenerated
 {
 public:
     SyncPreviewDlg(wxWindow* parent,
@@ -468,16 +473,16 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
                                const wxString& variantName,
                                const SyncStatistics& st,
                                bool& dontShowAgain) :
-    SyncPreviewDlgGenerated(parent),
+    SyncConfirmationDlgGenerated(parent),
     m_dontShowAgain(dontShowAgain)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonStartSync).setCancel(m_buttonCancel));
 
-    setRelativeFontSize(*m_buttonStartSync, 1.5);
-    m_buttonStartSync->setInnerBorderSize(8);
-    m_buttonStartSync->setBitmapFront(getResourceImage(L"sync"), 5);
+    //setRelativeFontSize(*m_buttonStartSync, 1.5);
+    m_bitmapSync->SetBitmap(getResourceImage(L"sync"));
 
     m_staticTextVariant->SetLabel(variantName);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
@@ -499,12 +504,12 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
             bmpControl.SetBitmap(mirrorIfRtl(getResourceImage(bmpName)));
     };
 
-    setValue(*m_staticTextCreateLeft,  st.getCreate<LEFT_SIDE >(), *m_bitmapCreateLeft,  L"createLeftSmall");
-    setValue(*m_staticTextUpdateLeft,  st.getUpdate<LEFT_SIDE >(), *m_bitmapUpdateLeft,  L"updateLeftSmall");
-    setValue(*m_staticTextDeleteLeft,  st.getDelete<LEFT_SIDE >(), *m_bitmapDeleteLeft,  L"deleteLeftSmall");
-    setValue(*m_staticTextCreateRight, st.getCreate<RIGHT_SIDE>(), *m_bitmapCreateRight, L"createRightSmall");
-    setValue(*m_staticTextUpdateRight, st.getUpdate<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"updateRightSmall");
-    setValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"deleteRightSmall");
+    setValue(*m_staticTextCreateLeft,  st.getCreate<LEFT_SIDE >(), *m_bitmapCreateLeft,  L"so_create_left_small");
+    setValue(*m_staticTextUpdateLeft,  st.getUpdate<LEFT_SIDE >(), *m_bitmapUpdateLeft,  L"so_update_left_small");
+    setValue(*m_staticTextDeleteLeft,  st.getDelete<LEFT_SIDE >(), *m_bitmapDeleteLeft,  L"so_delete_left_small");
+    setValue(*m_staticTextCreateRight, st.getCreate<RIGHT_SIDE>(), *m_bitmapCreateRight, L"so_create_right_small");
+    setValue(*m_staticTextUpdateRight, st.getUpdate<RIGHT_SIDE>(), *m_bitmapUpdateRight, L"so_update_right_small");
+    setValue(*m_staticTextDeleteRight, st.getDelete<RIGHT_SIDE>(), *m_bitmapDeleteRight, L"so_delete_right_small");
 
     m_panelStatistics->Layout(); //m_buttonStartSync changed => this *is* required!
 
@@ -566,9 +571,11 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
     cmpConfigOut(cmpConfig),
     compareVar(cmpConfig.compareVar)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
+
     setRelativeFontSize(*m_toggleBtnTimeSize, 1.25);
     setRelativeFontSize(*m_toggleBtnContent,  1.25);
 
@@ -678,24 +685,25 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     GlobalSettingsDlgGenerated(parent),
     settings(globalSettings)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
     setRelativeFontSize(*m_staticTextHeader, 1.25);
 
     m_bitmapSettings    ->SetBitmap     (getResourceImage(L"settings"));
-    m_buttonResetDialogs->setBitmapFront(getResourceImage(L"warningSmall"), 5);
+    m_buttonResetDialogs->setBitmapFront(getResourceImage(L"reset_dialogs"), 5);
     m_bpButtonAddRow    ->SetBitmapLabel(getResourceImage(L"item_add"));
-    m_bpButtonRemoveRow ->SetBitmapLabel(getResourceImage(L"item_delete"));
+    m_bpButtonRemoveRow ->SetBitmapLabel(getResourceImage(L"item_remove"));
 
     m_checkBoxCopyLocked     ->SetValue(globalSettings.copyLockedFiles);
     m_checkBoxTransCopy      ->SetValue(globalSettings.transactionalFileCopy);
     m_checkBoxCopyPermissions->SetValue(globalSettings.copyFilePermissions);
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     m_checkBoxCopyPermissions->SetLabel(_("Copy NTFS permissions"));
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     m_checkBoxCopyLocked->Hide();
     m_staticTextCopyLocked->Hide();
 #endif
@@ -757,7 +765,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
     if (showQuestionDlg(this, ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
-                        _("Make hidden warnings and dialogs visible again?"), QuestConfig().setLabelYes(_("&Restore"))) == ReturnQuestionDlg::BUTTON_YES)
+                        _("Make hidden warnings and dialogs visible again?"), QuestConfig().setCaption(_("Restore hidden dialogs")).setLabelYes(_("&Restore"))) == ReturnQuestionDlg::BUTTON_YES)
         settings.optDialogs.resetDialogs();
 }
 
@@ -890,13 +898,14 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
     timeFrom_(timeFrom),
     timeTo_(timeTo)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOkay).setCancel(m_buttonCancel));
 
     long style = wxCAL_SHOW_HOLIDAYS | wxCAL_SHOW_SURROUNDING_WEEKS;
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     DWORD firstDayOfWeek = 0;
     if (::GetLocaleInfo(LOCALE_USER_DEFAULT,     //__in   LCID Locale,
                         LOCALE_IFIRSTDAYOFWEEK | // first day of week specifier, 0-6, 0=Monday, 6=Sunday

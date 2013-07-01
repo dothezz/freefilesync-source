@@ -24,19 +24,22 @@ namespace zen
 {
 struct FileDescriptor
 {
-    FileDescriptor() : fileIdx(), devId() {}
-    FileDescriptor(Int64  lastWriteTimeRawIn,
-                   UInt64 fileSizeIn,
-                   const FileId& idIn) :
+    FileDescriptor() : fileIdx(), devId(), isFollowedSymlink() {}
+    FileDescriptor(const Int64& lastWriteTimeRawIn,
+                   const UInt64& fileSizeIn,
+                   const FileId& idIn,
+                   bool isSymlink) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
         fileSize(fileSizeIn),
         fileIdx(idIn.second),
-        devId(idIn.first) {}
+        devId(idIn.first),
+        isFollowedSymlink(isSymlink) {}
 
     Int64  lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
     UInt64 fileSize;
     FileIndex fileIdx; // == file id: optional! (however, always set on Linux, and *generally* available on Windows)
-    DeviceId  devId;   //split into file id into components to avoid padding overhead of a struct!
+    DeviceId  devId;   //split into file id into components to avoid padding overhead of a std::pair!
+    bool isFollowedSymlink;
 };
 
 inline
@@ -45,7 +48,7 @@ FileId getFileId(const FileDescriptor& fd) { return FileId(fd.devId, fd.fileIdx)
 struct LinkDescriptor
 {
     LinkDescriptor() {}
-    explicit LinkDescriptor(Int64 lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
+    explicit LinkDescriptor(const Int64& lastWriteTimeRawIn) : lastWriteTimeRaw(lastWriteTimeRawIn) {}
 
     Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
 };
@@ -67,10 +70,28 @@ template <>
 struct OtherSide<RIGHT_SIDE> { static const SelectedSide result = LEFT_SIDE; };
 
 
-class BaseDirMapping;
-class DirMapping;
-class FileMapping;
-class SymLinkMapping;
+template <SelectedSide side>
+struct SelectParam;
+
+template <>
+struct SelectParam<LEFT_SIDE>
+{
+    template <class T>
+    static T& get(T& left, T& right) { return left; }
+};
+
+template <>
+struct SelectParam<RIGHT_SIDE>
+{
+    template <class T>
+    static T& get(T& left, T& right) { return right; }
+};
+
+
+class BaseDirPair;
+class DirPair;
+class FilePair;
+class SymlinkPair;
 class FileSystemObject;
 
 //------------------------------------------------------------------
@@ -113,8 +134,8 @@ struct DirContainer
     }
 };
 
-//------------------------------------------------------------------
-/*    inheritance diagram:
+/*------------------------------------------------------------------
+    inheritance diagram:
 
                   ObjectMgr
                      /|\
@@ -123,47 +144,47 @@ struct DirContainer
                      /|\                      /|\
        _______________|______________    ______|______
       |               |              |  |             |
-SymLinkMapping    FileMapping     DirMapping    BaseDirMapping
-*/
+ SymlinkPair       FilePair         DirPair      BaseDirPair
 
-//------------------------------------------------------------------
+------------------------------------------------------------------*/
+
 class HierarchyObject
 {
-    friend class DirMapping;
+    friend class DirPair;
     friend class FileSystemObject;
 
 public:
-    typedef zen::FixedList<FileMapping>    SubFileVec; //MergeSides::execute() requires a structure that doesn't invalidate pointers after push_back()
-    typedef zen::FixedList<SymLinkMapping> SubLinkVec; //Note: deque<> has circular dependency in VCPP!
-    typedef zen::FixedList<DirMapping>     SubDirVec;
+    typedef zen::FixedList<FilePair>    SubFileVec; //MergeSides::execute() requires a structure that doesn't invalidate pointers after push_back()
+    typedef zen::FixedList<SymlinkPair> SubLinkVec; //Note: deque<> has circular dependency in VCPP!
+    typedef zen::FixedList<DirPair>     SubDirVec;
 
-    DirMapping& addSubDir(const Zstring& shortNameLeft,
-                          const Zstring& shortNameRight,
-                          CompareDirResult defaultCmpResult);
+    DirPair& addSubDir(const Zstring& shortNameLeft,
+                       const Zstring& shortNameRight,
+                       CompareDirResult defaultCmpResult);
 
     template <SelectedSide side>
-    DirMapping& addSubDir(const Zstring& shortName); //dir exists on one side only
+    DirPair& addSubDir(const Zstring& shortName); //dir exists on one side only
 
 
-    FileMapping& addSubFile(const Zstring&        shortNameLeft,
-                            const FileDescriptor& left,          //file exists on both sides
-                            CompareFilesResult    defaultCmpResult,
+    FilePair& addSubFile(const Zstring&        shortNameLeft,
+                         const FileDescriptor& left,          //file exists on both sides
+                         CompareFilesResult    defaultCmpResult,
+                         const Zstring&        shortNameRight,
+                         const FileDescriptor& right);
+
+    template <SelectedSide side>
+    FilePair& addSubFile(const Zstring&          shortNameRight, //file exists on one side only
+                         const FileDescriptor&   right);
+
+    SymlinkPair& addSubLink(const Zstring&        shortNameLeft,
+                            const LinkDescriptor& left,  //link exists on both sides
+                            CompareSymlinkResult  defaultCmpResult,
                             const Zstring&        shortNameRight,
-                            const FileDescriptor& right);
+                            const LinkDescriptor& right);
 
     template <SelectedSide side>
-    FileMapping& addSubFile(const Zstring&          shortNameRight, //file exists on one side only
-                            const FileDescriptor&   right);
-
-    SymLinkMapping& addSubLink(const Zstring&        shortNameLeft,
-                               const LinkDescriptor& left,  //link exists on both sides
-                               CompareSymlinkResult  defaultCmpResult,
-                               const Zstring&        shortNameRight,
-                               const LinkDescriptor& right);
-
-    template <SelectedSide side>
-    SymLinkMapping& addSubLink(const Zstring&        shortName, //link exists on one side only
-                               const LinkDescriptor& descr);
+    SymlinkPair& addSubLink(const Zstring&        shortName, //link exists on one side only
+                            const LinkDescriptor& descr);
 
     const SubFileVec& refSubFiles() const { return subFiles; }
     /**/  SubFileVec& refSubFiles()       { return subFiles; }
@@ -174,15 +195,15 @@ public:
     const SubDirVec& refSubDirs() const { return subDirs; }
     /**/  SubDirVec& refSubDirs()       { return subDirs; }
 
-    BaseDirMapping& getRoot() { return root_; }
+    BaseDirPair& getRoot() { return root_; }
 
     const Zstring& getObjRelativeNamePf() const { return objRelNamePf; } //postfixed or empty!
 
 protected:
     HierarchyObject(const Zstring& relativeNamePf,
-                    BaseDirMapping& baseMap) :
+                    BaseDirPair& baseDirObj) :
         objRelNamePf(relativeNamePf),
-        root_(baseMap) {}
+        root_(baseDirObj) {}
 
     ~HierarchyObject() {} //don't need polymorphic deletion
 
@@ -201,21 +222,21 @@ private:
     SubDirVec  subDirs;  //contained directory maps
 
     Zstring objRelNamePf; //postfixed or empty
-    BaseDirMapping& root_;
+    BaseDirPair& root_;
 };
 
 //------------------------------------------------------------------
 
-class BaseDirMapping : public HierarchyObject //synchronization base directory
+class BaseDirPair : public HierarchyObject //synchronization base directory
 {
 public:
-    BaseDirMapping(const Zstring& dirPostfixedLeft,
-                   bool dirExistsLeft,
-                   const Zstring& dirPostfixedRight,
-                   bool dirExistsRight,
-                   const HardFilter::FilterRef& filter,
-                   CompareVariant cmpVar,
-                   size_t fileTimeTolerance) :
+    BaseDirPair(const Zstring& dirPostfixedLeft,
+                bool dirExistsLeft,
+                const Zstring& dirPostfixedRight,
+                bool dirExistsRight,
+                const HardFilter::FilterRef& filter,
+                CompareVariant cmpVar,
+                size_t fileTimeTolerance) :
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4355) //"The this pointer is valid only within nonstatic member functions. It cannot be used in the initializer list for a base class."
@@ -231,12 +252,12 @@ public:
         dirExistsRight_(dirExistsRight) {}
 
     template <SelectedSide side> const Zstring& getBaseDirPf() const; //base sync directory postfixed with FILE_NAME_SEPARATOR (or empty!)
-    static void removeEmpty(BaseDirMapping& baseDir) { baseDir.removeEmptyRec(); }; //physically remove all invalid entries (where both sides are empty) recursively
+    static void removeEmpty(BaseDirPair& baseDir) { baseDir.removeEmptyRec(); }; //physically remove all invalid entries (where both sides are empty) recursively
 
     template <SelectedSide side> bool isExisting() const; //status of directory existence at the time of comparison!
     template <SelectedSide side> void setExisting(bool value); //update after creating the directory in FFS
 
-    //get settings which were used while creating BaseDirMapping
+    //get settings which were used while creating BaseDirPair
     const HardFilter&   getFilter() const { return *filter_; }
     CompareVariant getCompVariant() const { return cmpVar_; }
     size_t   getFileTimeTolerance() const { return fileTimeTolerance_; }
@@ -244,8 +265,8 @@ public:
     virtual void flip();
 
 private:
-    BaseDirMapping(const BaseDirMapping&);            //this class is referenced by HierarchyObject => make it non-copyable/movable!
-    BaseDirMapping& operator=(const BaseDirMapping&); //
+    BaseDirPair(const BaseDirPair&);            //this class is referenced by HierarchyObject => make it non-copyable/movable!
+    BaseDirPair& operator=(const BaseDirPair&); //
 
     HardFilter::FilterRef filter_; //filter used while scanning directory: represents sub-view of actual files!
     CompareVariant cmpVar_;
@@ -260,15 +281,15 @@ private:
 
 
 template <> inline
-const Zstring& BaseDirMapping::getBaseDirPf<LEFT_SIDE>() const { return baseDirPfL; }
+const Zstring& BaseDirPair::getBaseDirPf<LEFT_SIDE>() const { return baseDirPfL; }
 
 template <> inline
-const Zstring& BaseDirMapping::getBaseDirPf<RIGHT_SIDE>() const { return baseDirPfR; }
+const Zstring& BaseDirPair::getBaseDirPf<RIGHT_SIDE>() const { return baseDirPfR; }
 
 
 //get rid of shared_ptr indirection
-template < class IterTy,     //underlying iterator type
-         class U >           //target object type
+template <class IterTy,     //underlying iterator type
+         class U>           //target object type
 class DerefIter : public std::iterator<std::bidirectional_iterator_tag, U>
 {
 public:
@@ -288,22 +309,22 @@ private:
     IterTy iter;
 };
 
-typedef std::vector<std::shared_ptr<BaseDirMapping>> FolderComparison; //make sure pointers to sub-elements remain valid
-//don't change this back to std::vector<BaseDirMapping> too easily: comparison uses push_back to add entries which may result in a full copy!
+typedef std::vector<std::shared_ptr<BaseDirPair>> FolderComparison; //make sure pointers to sub-elements remain valid
+//don't change this back to std::vector<BaseDirPair> too easily: comparison uses push_back to add entries which may result in a full copy!
 
-DerefIter<typename FolderComparison::iterator, BaseDirMapping> inline begin(FolderComparison& vect) { return vect.begin(); }
-DerefIter<typename FolderComparison::iterator, BaseDirMapping> inline end  (FolderComparison& vect) { return vect.end  (); }
-DerefIter<typename FolderComparison::const_iterator, const BaseDirMapping> inline begin(const FolderComparison& vect) { return vect.begin(); }
-DerefIter<typename FolderComparison::const_iterator, const BaseDirMapping> inline end  (const FolderComparison& vect) { return vect.end  (); }
+DerefIter<typename FolderComparison::iterator, BaseDirPair> inline begin(FolderComparison& vect) { return vect.begin(); }
+DerefIter<typename FolderComparison::iterator, BaseDirPair> inline end  (FolderComparison& vect) { return vect.end  (); }
+DerefIter<typename FolderComparison::const_iterator, const BaseDirPair> inline begin(const FolderComparison& vect) { return vect.begin(); }
+DerefIter<typename FolderComparison::const_iterator, const BaseDirPair> inline end  (const FolderComparison& vect) { return vect.end  (); }
 
 //------------------------------------------------------------------
 class FSObjectVisitor
 {
 public:
     virtual ~FSObjectVisitor() {}
-    virtual void visit(const FileMapping&    fileObj) = 0;
-    virtual void visit(const SymLinkMapping& linkObj) = 0;
-    virtual void visit(const DirMapping&      dirObj) = 0;
+    virtual void visit(const FilePair&    fileObj) = 0;
+    virtual void visit(const SymlinkPair& linkObj) = 0;
+    virtual void visit(const DirPair&      dirObj) = 0;
 };
 
 //inherit from this class to allow safe random access by id instead of unsafe raw pointer
@@ -335,6 +356,7 @@ private:
 
     static zen::hash_set<const ObjectMgr*>& activeObjects() { static zen::hash_set<const ObjectMgr*> inst; return inst; } //external linkage (even in header file!)
 };
+
 //------------------------------------------------------------------
 
 class FileSystemObject : public ObjectMgr<FileSystemObject>
@@ -354,18 +376,18 @@ public:
     CompareFilesResult getCategory() const { return cmpResult; }
     std::wstring getCatExtraDescription() const; //only filled if getCategory() == FILE_CONFLICT or FILE_DIFFERENT_METADATA
 
+    //sync settings
+    SyncDirection getSyncDir() const;
+    void setSyncDir(SyncDirection newDir);
+    void setSyncDirConflict(const std::wstring& description); //set syncDir = SYNC_DIR_NONE + fill conflict description
+
+    bool isActive() const;
+    void setActive(bool active);
+
     //sync operation
     virtual SyncOperation testSyncOperation(SyncDirection testSyncDir) const; //semantics: "what if"! assumes "active, no conflict, no recursion (directory)!
     virtual SyncOperation getSyncOperation() const;
     std::wstring getSyncOpConflict() const; //return conflict when determining sync direction or (still unresolved) conflict during categorization
-
-    //sync settings
-    void setSyncDir(SyncDirection newDir);
-    void setSyncDirConflict(const std::wstring& description); //set syncDir = SYNC_DIR_NONE + fill conflict description
-    SyncDirection getSyncDir() const { return syncDir; }
-
-    bool isActive() const;
-    void setActive(bool active);
 
     template <SelectedSide side> void removeObject();    //removes file or directory (recursively!) without physically removing the element: used by manual deletion
 
@@ -373,8 +395,8 @@ public:
 
     const HierarchyObject& parent() const { return parent_; }
     /**/  HierarchyObject& parent()       { return parent_; }
-    const BaseDirMapping& root() const  { return parent_.getRoot(); }
-    /**/  BaseDirMapping& root()        { return parent_.getRoot(); }
+    const BaseDirPair& root() const  { return parent_.getRoot(); }
+    /**/  BaseDirPair& root()        { return parent_.getRoot(); }
 
     //for use during init in "CompareProcess" only:
     template <CompareFilesResult res> void setCategory();
@@ -388,7 +410,7 @@ protected:
                      CompareFilesResult defaultCmpResult) :
         cmpResult(defaultCmpResult),
         selectedForSynchronization(true),
-        syncDir(SYNC_DIR_NONE),
+        syncDir_(static_cast<unsigned char>(SYNC_DIR_NONE)),
         shortNameLeft_(shortNameLeft),
         shortNameRight_(shortNameRight),
         //shortNameRight_(shortNameRight == shortNameLeft ? shortNameLeft : shortNameRight), -> strangely doesn't seem to shrink peak memory consumption at all!
@@ -403,8 +425,7 @@ protected:
     virtual void flip();
     virtual void notifySyncCfgChanged() { parent().notifySyncCfgChanged(); /*propagate!*/ }
 
-    void copyToL();
-    void copyToR();
+    void setSynced(const Zstring& shortName);
 
 private:
     virtual void removeObjectL() = 0;
@@ -412,24 +433,25 @@ private:
 
     //categorization
     std::unique_ptr<std::wstring> cmpResultDescr; //only filled if getCategory() == FILE_CONFLICT or FILE_DIFFERENT_METADATA
-    CompareFilesResult cmpResult;
+    CompareFilesResult cmpResult; //although this uses 4 bytes there is currently *no* space wasted in class layout!
 
     bool selectedForSynchronization;
 
-    SyncDirection syncDir;
+    unsigned char syncDir_; //use "char" instead of "SyncDirection" lacking C++11 custom size enum classes to optimize memory layout!
     std::unique_ptr<std::wstring> syncDirConflict; //non-empty if we have a conflict setting sync-direction
     //get rid of std::wstring small string optimization (consumes 32/48 byte on VS2010 x86/x64!)
 
     //Note: we model *four* states with last two variables => "syncDirConflict is empty or syncDir == NONE" is a class invariant!!!
 
-    Zstring shortNameLeft_;   //slightly redundant under linux, but on windows the "same" filenames can differ in case
-    Zstring shortNameRight_;  //use as indicator: an empty name means: not existing!
+    Zstring shortNameLeft_;  //slightly redundant under linux, but on windows the "same" filenames can differ in case
+    Zstring shortNameRight_; //use as indicator: an empty name means: not existing!
 
     HierarchyObject& parent_;
 };
 
 //------------------------------------------------------------------
-class DirMapping : public FileSystemObject, public HierarchyObject
+
+class DirPair : public FileSystemObject, public HierarchyObject
 {
     friend class HierarchyObject;
 
@@ -438,10 +460,10 @@ public:
 
     CompareDirResult getDirCategory() const; //returns actually used subset of CompareFilesResult
 
-    DirMapping(const Zstring& shortNameLeft,  //use empty shortname if "not existing"
-               const Zstring& shortNameRight, //
-               HierarchyObject& parentObj,
-               CompareDirResult defaultCmpResult) :
+    DirPair(const Zstring& shortNameLeft,  //use empty shortname if "not existing"
+            const Zstring& shortNameRight, //
+            HierarchyObject& parentObj,
+            CompareDirResult defaultCmpResult) :
         FileSystemObject(shortNameLeft, shortNameRight, parentObj, static_cast<CompareFilesResult>(defaultCmpResult)),
         HierarchyObject(getObjRelativeName() + FILE_NAME_SEPARATOR, parentObj.getRoot()),
         syncOpBuffered(SO_DO_NOTHING),
@@ -449,41 +471,42 @@ public:
 
     virtual SyncOperation getSyncOperation() const;
 
-    template <SelectedSide side> void copyTo(); //copy dir
+    void setSyncedTo(const Zstring& shortName); //call after sync, sets DIR_EQUAL
 
 private:
     virtual void flip();
     virtual void removeObjectL();
     virtual void removeObjectR();
     virtual void notifySyncCfgChanged() { syncOpUpToDate = false; FileSystemObject::notifySyncCfgChanged(); HierarchyObject::notifySyncCfgChanged(); }
-    //------------------------------------------------------------------
 
     mutable SyncOperation syncOpBuffered; //determining sync-op for directory may be expensive as it depends on child-objects -> buffer it
-    mutable bool syncOpUpToDate;         //
+    mutable bool syncOpUpToDate;          //
 };
 
 //------------------------------------------------------------------
-class FileMapping : public FileSystemObject
+
+class FilePair : public FileSystemObject
 {
     friend class HierarchyObject; //construction
 
 public:
     virtual void accept(FSObjectVisitor& visitor) const;
 
-    FileMapping(const Zstring&        shortNameLeft, //use empty string if "not existing"
-                const FileDescriptor& left,
-                CompareFilesResult    defaultCmpResult,
-                const Zstring&        shortNameRight, //
-                const FileDescriptor& right,
-                HierarchyObject& parentObj) :
+    FilePair(const Zstring&        shortNameLeft, //use empty string if "not existing"
+             const FileDescriptor& left,
+             CompareFilesResult    defaultCmpResult,
+             const Zstring&        shortNameRight, //
+             const FileDescriptor& right,
+             HierarchyObject& parentObj) :
         FileSystemObject(shortNameLeft, shortNameRight, parentObj, defaultCmpResult),
         dataLeft(left),
         dataRight(right),
         moveFileRef(nullptr) {}
 
-    template <SelectedSide side> Int64  getLastWriteTime() const;
-    template <SelectedSide side> UInt64 getFileSize     () const;
-    template <SelectedSide side> FileId getFileId       () const;
+    template <SelectedSide side> Int64  getLastWriteTime () const;
+    template <SelectedSide side> UInt64 getFileSize      () const;
+    template <SelectedSide side> FileId getFileId        () const;
+    template <SelectedSide side> bool   isFollowedSymlink() const;
 
     void setMoveRef(ObjectId refId) { moveFileRef = refId; } //reference to corresponding renamed file
     ObjectId getMoveRef() const { return moveFileRef; } //may be nullptr
@@ -493,7 +516,15 @@ public:
     virtual SyncOperation testSyncOperation(SyncDirection testSyncDir) const; //semantics: "what if"! assumes "active, no conflict, no recursion (directory)!
     virtual SyncOperation getSyncOperation() const;
 
-    template <SelectedSide side> void syncTo(const FileDescriptor& descrTarget, const FileDescriptor* descrSource = nullptr); //copy + update file attributes (optional)
+    template <SelectedSide sideTrg>
+    void setSyncedTo(const Zstring& shortName, //call after sync, sets FILE_EQUAL
+                     const UInt64& fileSize,
+                     const Int64& lastWriteTimeTrg,
+                     const Int64& lastWriteTimeSrc,
+                     const FileId& fileIdTrg,
+                     const FileId& fileIdSrc,
+                     bool isSymlinkTrg,
+                     bool isSymlinkSrc);
 
 private:
     SyncOperation applyMoveOptimization(SyncOperation op) const;
@@ -501,7 +532,6 @@ private:
     virtual void flip();
     virtual void removeObjectL();
     virtual void removeObjectR();
-    //------------------------------------------------------------------
 
     FileDescriptor dataLeft;
     FileDescriptor dataRight;
@@ -510,7 +540,8 @@ private:
 };
 
 //------------------------------------------------------------------
-class SymLinkMapping : public FileSystemObject //this class models a TRUE symbolic link, i.e. one that is NEVER dereferenced: deref-links should be directly placed in class File/DirMapping
+
+class SymlinkPair : public FileSystemObject //this class models a TRUE symbolic link, i.e. one that is NEVER dereferenced: deref-links should be directly placed in class File/DirPair
 {
     friend class HierarchyObject; //construction
 
@@ -521,23 +552,25 @@ public:
 
     CompareSymlinkResult getLinkCategory()   const; //returns actually used subset of CompareFilesResult
 
-    SymLinkMapping(const Zstring&         shortNameLeft, //use empty string if "not existing"
-                   const LinkDescriptor&  left,
-                   CompareSymlinkResult   defaultCmpResult,
-                   const Zstring&         shortNameRight, //use empty string if "not existing"
-                   const LinkDescriptor&  right,
-                   HierarchyObject& parentObj) :
+    SymlinkPair(const Zstring&         shortNameLeft, //use empty string if "not existing"
+                const LinkDescriptor&  left,
+                CompareSymlinkResult   defaultCmpResult,
+                const Zstring&         shortNameRight, //use empty string if "not existing"
+                const LinkDescriptor&  right,
+                HierarchyObject& parentObj) :
         FileSystemObject(shortNameLeft, shortNameRight, parentObj, static_cast<CompareFilesResult>(defaultCmpResult)),
         dataLeft(left),
         dataRight(right) {}
 
-    template <SelectedSide side> void copyTo(); //copy
+    template <SelectedSide sideTrg>
+    void setSyncedTo(const Zstring& shortName, //call after sync, sets SYMLINK_EQUAL
+                     const Int64& lastWriteTimeTrg,
+                     const Int64& lastWriteTimeSrc);
 
 private:
     virtual void flip();
     virtual void removeObjectL();
     virtual void removeObjectR();
-    //------------------------------------------------------------------
 
     LinkDescriptor dataLeft;
     LinkDescriptor dataRight;
@@ -576,58 +609,24 @@ std::wstring getSyncOpDescription  (const FileSystemObject& fsObj);
 
 
 
-
-
-
-
-
-
-
-
-
 //---------------Inline Implementation---------------------------------------------------
-inline //inline virtual... admittedly its use may be limited
-void FileMapping::accept(FSObjectVisitor& visitor) const
-{
-    visitor.visit(*this);
-}
+//inline virtual... admittedly its use may be limited
+inline void FilePair   ::accept(FSObjectVisitor& visitor) const { visitor.visit(*this); }
+inline void DirPair    ::accept(FSObjectVisitor& visitor) const { visitor.visit(*this); }
+inline void SymlinkPair::accept(FSObjectVisitor& visitor) const { visitor.visit(*this); }
 
 
 inline
-void DirMapping::accept(FSObjectVisitor& visitor) const
-{
-    visitor.visit(*this);
-}
-
-
-inline
-void SymLinkMapping::accept(FSObjectVisitor& visitor) const
-{
-    visitor.visit(*this);
-}
-
-
-inline
-CompareFilesResult FileMapping::getFileCategory() const
+CompareFilesResult FilePair::getFileCategory() const
 {
     return getCategory();
 }
 
 
 inline
-CompareDirResult DirMapping::getDirCategory() const
+CompareDirResult DirPair::getDirCategory() const
 {
     return static_cast<CompareDirResult>(getCategory());
-}
-
-
-inline
-void FileSystemObject::setSyncDir(SyncDirection newDir)
-{
-    syncDir = newDir; //should be safe by design
-    syncDirConflict.reset();
-
-    notifySyncCfgChanged();
 }
 
 
@@ -640,9 +639,26 @@ std::wstring FileSystemObject::getCatExtraDescription() const
 
 
 inline
+SyncDirection FileSystemObject::getSyncDir() const
+{
+    return static_cast<SyncDirection>(syncDir_);
+}
+
+
+inline
+void FileSystemObject::setSyncDir(SyncDirection newDir)
+{
+    syncDir_ = static_cast<unsigned char>(newDir);
+    syncDirConflict.reset();
+
+    notifySyncCfgChanged();
+}
+
+
+inline
 void FileSystemObject::setSyncDirConflict(const std::wstring& description)
 {
-    syncDir = SYNC_DIR_NONE;
+    syncDir_ = static_cast<unsigned char>(SYNC_DIR_NONE);
     syncDirConflict.reset(new std::wstring(description));
 
     notifySyncCfgChanged();
@@ -668,22 +684,14 @@ inline
 void FileSystemObject::setActive(bool active)
 {
     selectedForSynchronization = active;
-
     notifySyncCfgChanged();
 }
 
 
-template <> inline
-bool FileSystemObject::isEmpty<LEFT_SIDE>() const
+template <SelectedSide side> inline
+bool FileSystemObject::isEmpty() const
 {
-    return shortNameLeft_.empty();
-}
-
-
-template <> inline
-bool FileSystemObject::isEmpty<RIGHT_SIDE>() const
-{
-    return shortNameRight_.empty();
+    return SelectParam<side>::get(shortNameLeft_, shortNameRight_).empty();
 }
 
 
@@ -694,17 +702,10 @@ bool FileSystemObject::isEmpty() const
 }
 
 
-template <> inline
-const Zstring& FileSystemObject::getShortName<LEFT_SIDE>() const
+template <SelectedSide side> inline
+const Zstring& FileSystemObject::getShortName() const
 {
-    return shortNameLeft_; //empty if not existing
-}
-
-
-template <> inline
-const Zstring& FileSystemObject::getShortName<RIGHT_SIDE>() const
-{
-    return shortNameRight_; //empty if not existing
+    return SelectParam<side>::get(shortNameLeft_, shortNameRight_); //empty if not existing
 }
 
 
@@ -736,17 +737,10 @@ Zstring FileSystemObject::getFullName() const
 }
 
 
-template <> inline
-const Zstring& FileSystemObject::getBaseDirPf<LEFT_SIDE>() const
+template <SelectedSide side> inline
+const Zstring& FileSystemObject::getBaseDirPf() const
 {
-    return root().getBaseDirPf<LEFT_SIDE>();
-}
-
-
-template <> inline
-const Zstring& FileSystemObject::getBaseDirPf<RIGHT_SIDE>() const
-{
-    return root().getBaseDirPf<RIGHT_SIDE>();
+    return root().getBaseDirPf<side>();
 }
 
 
@@ -773,20 +767,10 @@ void FileSystemObject::removeObject<RIGHT_SIDE>()
 
 
 inline
-void FileSystemObject::copyToL()
+void FileSystemObject::setSynced(const Zstring& shortName)
 {
     assert(!isEmpty());
-    shortNameLeft_ = shortNameRight_;
-    cmpResult = FILE_EQUAL;
-    setSyncDir(SYNC_DIR_NONE);
-}
-
-
-inline
-void FileSystemObject::copyToR()
-{
-    assert(!isEmpty());
-    shortNameRight_ = shortNameLeft_;
+    shortNameRight_ = shortNameLeft_ = shortName;
     cmpResult = FILE_EQUAL;
     setSyncDir(SYNC_DIR_NONE);
 }
@@ -849,16 +833,16 @@ void FileSystemObject::flip()
 inline
 void HierarchyObject::flip()
 {
-    std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileMapping   ::flip));
-    std::for_each(refSubDirs ().begin(), refSubDirs ().end(), std::mem_fun_ref(&DirMapping    ::flip));
-    std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&SymLinkMapping::flip));
+    std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FilePair   ::flip));
+    std::for_each(refSubDirs ().begin(), refSubDirs ().end(), std::mem_fun_ref(&DirPair    ::flip));
+    std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&SymlinkPair::flip));
 }
 
 
 inline
-DirMapping& HierarchyObject::addSubDir(const Zstring& shortNameLeft,
-                                       const Zstring& shortNameRight,
-                                       CompareDirResult defaultCmpResult)
+DirPair& HierarchyObject::addSubDir(const Zstring& shortNameLeft,
+                                    const Zstring& shortNameRight,
+                                    CompareDirResult defaultCmpResult)
 {
     subDirs.emplace_back(shortNameLeft, shortNameRight, *this, defaultCmpResult);
     return subDirs.back();
@@ -866,7 +850,7 @@ DirMapping& HierarchyObject::addSubDir(const Zstring& shortNameLeft,
 
 
 template <> inline
-DirMapping& HierarchyObject::addSubDir<LEFT_SIDE>(const Zstring& shortName)
+DirPair& HierarchyObject::addSubDir<LEFT_SIDE>(const Zstring& shortName)
 {
     subDirs.emplace_back(shortName, Zstring(), *this, DIR_LEFT_SIDE_ONLY);
     return subDirs.back();
@@ -874,7 +858,7 @@ DirMapping& HierarchyObject::addSubDir<LEFT_SIDE>(const Zstring& shortName)
 
 
 template <> inline
-DirMapping& HierarchyObject::addSubDir<RIGHT_SIDE>(const Zstring& shortName)
+DirPair& HierarchyObject::addSubDir<RIGHT_SIDE>(const Zstring& shortName)
 {
     subDirs.emplace_back(Zstring(), shortName, *this, DIR_RIGHT_SIDE_ONLY);
     return subDirs.back();
@@ -882,12 +866,11 @@ DirMapping& HierarchyObject::addSubDir<RIGHT_SIDE>(const Zstring& shortName)
 
 
 inline
-FileMapping& HierarchyObject::addSubFile(
-    const Zstring&        shortNameLeft,
-    const FileDescriptor& left,          //file exists on both sides
-    CompareFilesResult    defaultCmpResult,
-    const Zstring&        shortNameRight,
-    const FileDescriptor& right)
+FilePair& HierarchyObject::addSubFile(const Zstring&        shortNameLeft,
+                                      const FileDescriptor& left,          //file exists on both sides
+                                      CompareFilesResult    defaultCmpResult,
+                                      const Zstring&        shortNameRight,
+                                      const FileDescriptor& right)
 {
     subFiles.emplace_back(shortNameLeft, left, defaultCmpResult, shortNameRight, right, *this);
     return subFiles.back();
@@ -895,7 +878,7 @@ FileMapping& HierarchyObject::addSubFile(
 
 
 template <> inline
-FileMapping& HierarchyObject::addSubFile<LEFT_SIDE>(const Zstring& shortName, const FileDescriptor& descr)
+FilePair& HierarchyObject::addSubFile<LEFT_SIDE>(const Zstring& shortName, const FileDescriptor& descr)
 {
     subFiles.emplace_back(shortName, descr, FILE_LEFT_SIDE_ONLY, Zstring(), FileDescriptor(), *this);
     return subFiles.back();
@@ -903,7 +886,7 @@ FileMapping& HierarchyObject::addSubFile<LEFT_SIDE>(const Zstring& shortName, co
 
 
 template <> inline
-FileMapping& HierarchyObject::addSubFile<RIGHT_SIDE>(const Zstring& shortName, const FileDescriptor& descr)
+FilePair& HierarchyObject::addSubFile<RIGHT_SIDE>(const Zstring& shortName, const FileDescriptor& descr)
 {
     subFiles.emplace_back(Zstring(), FileDescriptor(), FILE_RIGHT_SIDE_ONLY, shortName, descr, *this);
     return subFiles.back();
@@ -911,7 +894,7 @@ FileMapping& HierarchyObject::addSubFile<RIGHT_SIDE>(const Zstring& shortName, c
 
 
 inline
-SymLinkMapping& HierarchyObject::addSubLink(
+SymlinkPair& HierarchyObject::addSubLink(
     const Zstring&        shortNameLeft,
     const LinkDescriptor& left,  //link exists on both sides
     CompareSymlinkResult  defaultCmpResult,
@@ -924,7 +907,7 @@ SymLinkMapping& HierarchyObject::addSubLink(
 
 
 template <> inline
-SymLinkMapping& HierarchyObject::addSubLink<LEFT_SIDE>(const Zstring& shortName, const LinkDescriptor& descr)
+SymlinkPair& HierarchyObject::addSubLink<LEFT_SIDE>(const Zstring& shortName, const LinkDescriptor& descr)
 {
     subLinks.emplace_back(shortName, descr, SYMLINK_LEFT_SIDE_ONLY, Zstring(), LinkDescriptor(), *this);
     return subLinks.back();
@@ -932,7 +915,7 @@ SymLinkMapping& HierarchyObject::addSubLink<LEFT_SIDE>(const Zstring& shortName,
 
 
 template <> inline
-SymLinkMapping& HierarchyObject::addSubLink<RIGHT_SIDE>(const Zstring& shortName, const LinkDescriptor& descr)
+SymlinkPair& HierarchyObject::addSubLink<RIGHT_SIDE>(const Zstring& shortName, const LinkDescriptor& descr)
 {
     subLinks.emplace_back(Zstring(), LinkDescriptor(), SYMLINK_RIGHT_SIDE_ONLY, shortName, descr, *this);
     return subLinks.back();
@@ -940,7 +923,7 @@ SymLinkMapping& HierarchyObject::addSubLink<RIGHT_SIDE>(const Zstring& shortName
 
 
 inline
-void BaseDirMapping::flip()
+void BaseDirPair::flip()
 {
     HierarchyObject::flip();
     std::swap(baseDirPfL, baseDirPfR);
@@ -949,7 +932,7 @@ void BaseDirMapping::flip()
 
 
 inline
-void DirMapping::flip()
+void DirPair::flip()
 {
     HierarchyObject ::flip(); //call base class versions
     FileSystemObject::flip(); //
@@ -957,7 +940,7 @@ void DirMapping::flip()
 
 
 inline
-void DirMapping::removeObjectL()
+void DirPair::removeObjectL()
 {
     std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
     std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
@@ -966,7 +949,7 @@ void DirMapping::removeObjectL()
 
 
 inline
-void DirMapping::removeObjectR()
+void DirPair::removeObjectR()
 {
     std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
     std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
@@ -974,33 +957,22 @@ void DirMapping::removeObjectR()
 }
 
 
-template <> inline
-bool BaseDirMapping::isExisting<LEFT_SIDE>() const
+template <SelectedSide side> inline
+bool BaseDirPair::isExisting() const
 {
-    return dirExistsLeft_;
+    return SelectParam<side>::get(dirExistsLeft_, dirExistsRight_);
 }
 
-template <> inline
-bool BaseDirMapping::isExisting<RIGHT_SIDE>() const
-{
-    return dirExistsRight_;
-}
 
-template <> inline
-void BaseDirMapping::setExisting<LEFT_SIDE>(bool value)
+template <SelectedSide side> inline
+void BaseDirPair::setExisting(bool value)
 {
-    dirExistsLeft_ = value;
-}
-
-template <> inline
-void BaseDirMapping::setExisting<RIGHT_SIDE>(bool value)
-{
-    dirExistsRight_ = value;
+    SelectParam<side>::get(dirExistsLeft_, dirExistsRight_) = value;
 }
 
 
 inline
-void FileMapping::flip()
+void FilePair::flip()
 {
     FileSystemObject::flip(); //call base class version
     std::swap(dataLeft, dataRight);
@@ -1008,138 +980,106 @@ void FileMapping::flip()
 
 
 inline
-void FileMapping::removeObjectL()
+void FilePair::removeObjectL()
 {
-    dataLeft  = FileDescriptor();
+    dataLeft = FileDescriptor();
 }
 
 
 inline
-void FileMapping::removeObjectR()
+void FilePair::removeObjectR()
 {
     dataRight = FileDescriptor();
 }
 
 
-template <> inline
-zen::Int64 FileMapping::getLastWriteTime<LEFT_SIDE>() const
+template <SelectedSide side> inline
+zen::Int64 FilePair::getLastWriteTime() const
 {
-    return dataLeft.lastWriteTimeRaw;
+    return SelectParam<side>::get(dataLeft, dataRight).lastWriteTimeRaw;
 }
 
 
-template <> inline
-zen::Int64 FileMapping::getLastWriteTime<RIGHT_SIDE>() const
+template <SelectedSide side> inline
+zen::UInt64 FilePair::getFileSize() const
 {
-    return dataRight.lastWriteTimeRaw;
+    return SelectParam<side>::get(dataLeft, dataRight).fileSize;
 }
 
 
-template <> inline
-zen::UInt64 FileMapping::getFileSize<LEFT_SIDE>() const
+template <SelectedSide side> inline
+FileId FilePair::getFileId() const
 {
-    return dataLeft.fileSize;
+    return FileId(SelectParam<side>::get(dataLeft, dataRight).devId,
+                  SelectParam<side>::get(dataLeft, dataRight).fileIdx);
 }
 
 
-template <> inline
-zen::UInt64 FileMapping::getFileSize<RIGHT_SIDE>() const
+template <SelectedSide side> inline
+bool FilePair::isFollowedSymlink() const
 {
-    return dataRight.fileSize;
+    return SelectParam<side>::get(dataLeft, dataRight).isFollowedSymlink;
 }
 
 
-template <> inline
-FileId FileMapping::getFileId<LEFT_SIDE>() const
+template <SelectedSide sideTrg> inline
+void FilePair::setSyncedTo(const Zstring& shortName,
+                           const UInt64& fileSize,
+                           const Int64& lastWriteTimeTrg,
+                           const Int64& lastWriteTimeSrc,
+                           const FileId& fileIdTrg,
+                           const FileId& fileIdSrc,
+                           bool isSymlinkTrg,
+                           bool isSymlinkSrc)
 {
-    return FileId(dataLeft.devId, dataLeft.fileIdx);
-}
+    //FILE_EQUAL is only allowed for same short name and file size: enforced by this method!
+    static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
 
-
-template <> inline
-FileId FileMapping::getFileId<RIGHT_SIDE>() const
-{
-    return FileId(dataRight.devId, dataRight.fileIdx);
-}
-
-
-template <> inline
-void FileMapping::syncTo<LEFT_SIDE>(const FileDescriptor& descrTarget, const FileDescriptor* descrSource) //copy + update file attributes
-{
-    dataLeft = descrTarget;
-    if (descrSource)
-        dataRight = *descrSource;
+    SelectParam<sideTrg>::get(dataLeft, dataRight) = FileDescriptor(lastWriteTimeTrg, fileSize, fileIdTrg, isSymlinkTrg);
+    SelectParam<sideSrc>::get(dataLeft, dataRight) = FileDescriptor(lastWriteTimeSrc, fileSize, fileIdSrc, isSymlinkSrc);
 
     moveFileRef = nullptr;
-    copyToL(); //copy FileSystemObject specific part
+    FileSystemObject::setSynced(shortName); //set FileSystemObject specific part
 }
 
 
-template <> inline
-void FileMapping::syncTo<RIGHT_SIDE>(const FileDescriptor& descrTarget, const FileDescriptor* descrSource) //copy + update file attributes
+template <SelectedSide sideTrg> inline
+void SymlinkPair::setSyncedTo(const Zstring& shortName,
+                              const Int64& lastWriteTimeTrg,
+                              const Int64& lastWriteTimeSrc)
 {
-    dataRight = descrTarget;
-    if (descrSource)
-        dataLeft = *descrSource;
+    static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
 
-    moveFileRef = nullptr;
-    copyToR(); //copy FileSystemObject specific part
-}
+    SelectParam<sideTrg>::get(dataLeft, dataRight) = LinkDescriptor(lastWriteTimeTrg);
+    SelectParam<sideSrc>::get(dataLeft, dataRight) = LinkDescriptor(lastWriteTimeSrc);
 
-
-template <> inline
-void SymLinkMapping::copyTo<LEFT_SIDE>() //copy + update link attributes
-{
-    dataLeft  = dataRight;
-    copyToL(); //copy FileSystemObject specific part
-}
-
-
-template <> inline
-void SymLinkMapping::copyTo<RIGHT_SIDE>() //copy + update link attributes
-{
-    dataRight = dataLeft;
-    copyToR(); //copy FileSystemObject specific part
-}
-
-
-template <> inline
-void DirMapping::copyTo<LEFT_SIDE>()
-{
-    copyToL(); //copy FileSystemObject specific part
-}
-
-
-template <> inline
-void DirMapping::copyTo<RIGHT_SIDE>()
-{
-    copyToR(); //copy FileSystemObject specific part
-}
-
-
-template <> inline
-zen::Int64 SymLinkMapping::getLastWriteTime<LEFT_SIDE>() const
-{
-    return dataLeft.lastWriteTimeRaw;
-}
-
-
-template <> inline
-zen::Int64 SymLinkMapping::getLastWriteTime<RIGHT_SIDE>() const
-{
-    return dataRight.lastWriteTimeRaw;
+    FileSystemObject::setSynced(shortName); //set FileSystemObject specific part
 }
 
 
 inline
-CompareSymlinkResult SymLinkMapping::getLinkCategory() const
+void DirPair::setSyncedTo(const Zstring& shortName)
+{
+    FileSystemObject::setSynced(shortName); //set FileSystemObject specific part
+}
+
+
+template <SelectedSide side> inline
+zen::Int64 SymlinkPair::getLastWriteTime() const
+{
+    return SelectParam<side>::get(dataLeft, dataRight).lastWriteTimeRaw;
+}
+
+
+inline
+CompareSymlinkResult SymlinkPair::getLinkCategory() const
 {
     return static_cast<CompareSymlinkResult>(getCategory());
 }
 
 
 inline
-void SymLinkMapping::flip()
+void SymlinkPair::flip()
 {
     FileSystemObject::flip(); //call base class versions
     std::swap(dataLeft, dataRight);
@@ -1147,14 +1087,14 @@ void SymLinkMapping::flip()
 
 
 inline
-void SymLinkMapping::removeObjectL()
+void SymlinkPair::removeObjectL()
 {
-    dataLeft  = LinkDescriptor();
+    dataLeft = LinkDescriptor();
 }
 
 
 inline
-void SymLinkMapping::removeObjectR()
+void SymlinkPair::removeObjectR()
 {
     dataRight = LinkDescriptor();
 }

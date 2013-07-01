@@ -166,10 +166,10 @@ FILETIME utcToLocal(const FILETIME& utcTime) //throw std::runtime_error
             &utcTime,    //__in   const FILETIME *lpFileTime,
             &localTime)) //__out  LPFILETIME lpLocalFileTime
     {
-        const std::wstring errorMessage = _("Conversion error:") + L" FILETIME -> local FILETIME: " + L"(" +
-                                          L"High: " + numberTo<std::wstring>(utcTime.dwHighDateTime) + L" " +
-                                          L"Low: "  + numberTo<std::wstring>(utcTime.dwLowDateTime) + L") " + L"\n\n" + getLastErrorFormatted();
-        throw std::runtime_error(utfCvrtTo<std::string>(errorMessage));
+        const std::wstring errorMsg = _("Conversion error:") + L" FILETIME -> local FILETIME: " + L"(" +
+                                      L"High: " + numberTo<std::wstring>(utcTime.dwHighDateTime) + L" " +
+                                      L"Low: "  + numberTo<std::wstring>(utcTime.dwLowDateTime) + L") " + L"\n\n" + formatSystemError(L"FileTimeToLocalFileTime", getLastError());
+        throw std::runtime_error(utfCvrtTo<std::string>(errorMsg));
     }
     return localTime;
 }
@@ -184,10 +184,10 @@ FILETIME localToUtc(const FILETIME& localTime) //throw std::runtime_error
             &localTime, //__in   const FILETIME *lpLocalFileTime,
             &utcTime))  //__out  LPFILETIME lpFileTime
     {
-        const std::wstring errorMessage = _("Conversion error:") + L" local FILETIME -> FILETIME: " + L"(" +
-                                          L"High: " + numberTo<std::wstring>(localTime.dwHighDateTime) + L" " +
-                                          L"Low: "  + numberTo<std::wstring>(localTime.dwLowDateTime) + L") " + L"\n\n" + getLastErrorFormatted();
-        throw std::runtime_error(utfCvrtTo<std::string>(errorMessage));
+        const std::wstring errorMsg = _("Conversion error:") + L" local FILETIME -> FILETIME: " + L"(" +
+                                      L"High: " + numberTo<std::wstring>(localTime.dwHighDateTime) + L" " +
+                                      L"Low: "  + numberTo<std::wstring>(localTime.dwLowDateTime) + L") " + L"\n\n" + formatSystemError(L"LocalFileTimeToFileTime", getLastError());
+        throw std::runtime_error(utfCvrtTo<std::string>(errorMsg));
     }
     return utcTime;
 }
@@ -286,9 +286,8 @@ std::bitset<UTC_LOCAL_OFFSET_BITS> getUtcLocalShift()
     if (std::bitset < UTC_LOCAL_OFFSET_BITS - 1 > (absValue).to_ulong() != static_cast<unsigned long>(absValue) || //time shifts that big shouldn't be possible!
         timeShiftSec % (60 * 15) != 0) //all known time shift have at least 15 minute granularity!
     {
-        const std::wstring errorMessage = _("Conversion error:") + L" Unexpected UTC <-> local time shift: " +
-                                          L"(" + numberTo<std::wstring>(timeShiftSec) + L") " + L"\n\n" + getLastErrorFormatted();
-        throw std::runtime_error(utfCvrtTo<std::string>(errorMessage));
+        const std::wstring errorMsg = _("Conversion error:") + L" Unexpected UTC <-> local time shift: " + L"(" + numberTo<std::wstring>(timeShiftSec) + L")";
+        throw std::runtime_error(utfCvrtTo<std::string>(errorMsg));
     }
 
     std::bitset<UTC_LOCAL_OFFSET_BITS> output(absValue);

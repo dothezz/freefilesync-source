@@ -194,26 +194,26 @@ SyncStatusHandler::~SyncStatusHandler()
     std::wstring finalStatus;
     if (abortIsRequested())
     {
-        finalStatus = _("Synchronization aborted!");
+        finalStatus = _("Synchronization aborted");
         errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalErrors > 0)
     {
-        finalStatus = _("Synchronization completed with errors!");
+        finalStatus = _("Synchronization completed with errors");
         errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalWarnings > 0)
     {
-        finalStatus = _("Synchronization completed with warnings.");
+        finalStatus = _("Synchronization completed with warnings");
         errorLog.logMsg(finalStatus, TYPE_WARNING); //give status code same warning priority as display category!
     }
     else
     {
         if (getObjectsTotal(PHASE_SYNCHRONIZING) == 0 && //we're past "initNewPhase(PHASE_SYNCHRONIZING)" at this point!
             getDataTotal   (PHASE_SYNCHRONIZING) == 0)
-            finalStatus = _("Nothing to synchronize!"); //even if "ignored conflicts" occurred!
+            finalStatus = _("Nothing to synchronize"); //even if "ignored conflicts" occurred!
         else
-            finalStatus = _("Synchronization completed successfully.");
+            finalStatus = _("Synchronization completed successfully");
         errorLog.logMsg(finalStatus, TYPE_INFO);
     }
 
@@ -267,8 +267,8 @@ SyncStatusHandler::~SyncStatusHandler()
         //-> nicely manages dialog lifetime
         while (progressDlg)
         {
+            updateUiNow(); //*first* refresh GUI (removing flicker) before sleeping!
             boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
-            updateUiNow();
         }
     }
 }
@@ -301,7 +301,8 @@ void SyncStatusHandler::reportInfo(const std::wstring& text)
 
 ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& errorMessage)
 {
-    errorLog.logMsg(errorMessage, TYPE_ERROR); //always, even for "retry"
+    //always, except for "retry":
+    zen::ScopeGuard guardWriteLog = zen::makeGuard([&] { errorLog.logMsg(errorMessage, TYPE_ERROR); });
 
     switch (handleError_)
     {
@@ -323,6 +324,8 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
                     return ProcessCallback::IGNORE_ERROR;
 
                 case ReturnErrorDlg::BUTTON_RETRY:
+                    guardWriteLog.dismiss();
+                    errorLog.logMsg(_("Retrying operation after error:") + L" " + errorMessage, TYPE_INFO); //explain why there are duplicate "doing operation X" info messages in the log!
                     return ProcessCallback::RETRY;
 
                 case ReturnErrorDlg::BUTTON_CANCEL:

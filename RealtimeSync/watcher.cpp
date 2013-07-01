@@ -171,7 +171,7 @@ void rts::waitForMissingDirs(const std::vector<Zstring>& dirNamesNonFmt, WaitCal
             const Zstring dirnameFmt = *it;
             auto ftDirExisting = async([=]() -> bool
             {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
                 //1. login to network share, if necessary -> we probably do NOT want multiple concurrent runs: GUI!?
                 loginNetworkShare(dirnameFmt, false); //login networks shares, no PW prompt -> is this really RTS's job?
 #endif

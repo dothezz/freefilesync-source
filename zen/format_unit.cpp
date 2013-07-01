@@ -12,12 +12,12 @@
 #include <ctime>
 #include <cstdio>
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/win.h> //includes "windows.h"
 #include <zen/win_ver.h>
 
-#elif defined FFS_LINUX || defined FFS_MAC
-#include <clocale>    //thousands separator
+#elif defined ZEN_LINUX || defined ZEN_MAC
+#include <clocale>   //thousands separator
 #include <zen/utf.h> //
 #endif
 
@@ -152,7 +152,7 @@ std::wstring zen::fractionToString(double fraction)
 }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 namespace
 {
 bool getUserSetting(LCTYPE lt, UINT& setting)
@@ -233,7 +233,7 @@ private:
 
 std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     if (IntegerFormat::isValid())
     {
         int bufferSize = ::GetNumberFormat(LOCALE_USER_DEFAULT, 0, number.c_str(), &IntegerFormat::get(), nullptr, 0);
@@ -251,7 +251,7 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
     }
     return number;
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     //we have to include thousands separator ourselves; this doesn't work for all countries (e.g india), but is better than nothing
 
     //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
@@ -277,7 +277,7 @@ std::wstring zen::ffs_Impl::includeNumberSeparator(const std::wstring& number)
 }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 namespace
 {
 const bool useNewLocalTimeCalculation = zen::vistaOrLater();
@@ -289,7 +289,7 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
 {
     auto errorMsg = [&] { return _("Error") + L" (time_t: " + numberTo<std::wstring>(utcTime) + L")"; };
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     FILETIME lastWriteTimeUtc = tofiletime(utcTime); //convert ansi C time to FILETIME
 
     SYSTEMTIME systemTimeLocal = {};
@@ -326,7 +326,7 @@ std::wstring zen::utcToLocalTimeString(Int64 utcTime)
     loc.minute = systemTimeLocal.wMinute;
     loc.second = systemTimeLocal.wSecond;
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     zen::TimeComp loc = zen::localTime(to<time_t>(utcTime));
 #endif
 

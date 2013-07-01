@@ -40,7 +40,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
                                      TreeView::Container& cont, //out
                                      Function pred)
 {
-    auto getBytes = [](const FileMapping& fileObj) -> UInt64 //MSVC screws up miserably if we put this lambda into std::for_each
+    auto getBytes = [](const FilePair& fileObj) -> UInt64 //MSVC screws up miserably if we put this lambda into std::for_each
     {
         //give accumulated bytes the semantics of a sync preview!
         if (fileObj.isActive())
@@ -58,7 +58,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
 
     cont.firstFileId = nullptr;
     std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-                  [&](FileMapping& fileObj)
+                  [&](FilePair& fileObj)
     {
         if (pred(fileObj))
         {
@@ -71,7 +71,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
     });
 
     std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-                  [&](SymLinkMapping& linkObj)
+                  [&](SymlinkPair& linkObj)
     {
         if (pred(linkObj))
         {
@@ -87,7 +87,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
     cont.subDirs.reserve(hierObj.refSubDirs().size()); //avoid expensive reallocations!
 
     std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
-                  [&cont, pred](DirMapping& subDirObj)
+                  [&cont, pred](DirPair& subDirObj)
     {
         const bool included = pred(subDirObj);
 
@@ -172,8 +172,8 @@ struct TreeView::LessShortName
 
             case TreeView::TYPE_DIRECTORY:
             {
-                const auto* dirObjL = dynamic_cast<const DirMapping*>(FileSystemObject::retrieve(static_cast<const TreeView::DirNodeImpl*>(lhs.node_)->objId));
-                const auto* dirObjR = dynamic_cast<const DirMapping*>(FileSystemObject::retrieve(static_cast<const TreeView::DirNodeImpl*>(rhs.node_)->objId));
+                const auto* dirObjL = dynamic_cast<const DirPair*>(FileSystemObject::retrieve(static_cast<const TreeView::DirNodeImpl*>(lhs.node_)->objId));
+                const auto* dirObjR = dynamic_cast<const DirPair*>(FileSystemObject::retrieve(static_cast<const TreeView::DirNodeImpl*>(rhs.node_)->objId));
 
                 if (!dirObjL)  //might be pathologic, but it's covered
                     return false;
@@ -279,10 +279,10 @@ void TreeView::applySubView(std::vector<RootNodeImpl>&& newView)
         switch (tl.type_)
         {
             case TreeView::TYPE_ROOT:
-                return static_cast<const RootNodeImpl*>(tl.node_)->baseMap.get();
+                return static_cast<const RootNodeImpl*>(tl.node_)->baseDirObj.get();
 
             case TreeView::TYPE_DIRECTORY:
-                if (auto dirObj = dynamic_cast<const DirMapping*>(FileSystemObject::retrieve(static_cast<const DirNodeImpl*>(tl.node_)->objId)))
+                if (auto dirObj = dynamic_cast<const DirPair*>(FileSystemObject::retrieve(static_cast<const DirNodeImpl*>(tl.node_)->objId)))
                     return dirObj;
                 break;
 
@@ -353,7 +353,7 @@ void TreeView::updateView(Predicate pred)
     newView.reserve(folderCmp.size()); //avoid expensive reallocations!
 
     std::for_each(folderCmp.begin(), folderCmp.end(),
-                  [&](const std::shared_ptr<BaseDirMapping>& baseObj)
+                  [&](const std::shared_ptr<BaseDirPair>& baseObj)
     {
         newView.push_back(TreeView::RootNodeImpl());
         RootNodeImpl& root = newView.back();
@@ -365,7 +365,7 @@ void TreeView::updateView(Predicate pred)
             newView.pop_back();
         else
         {
-            root.baseMap = baseObj;
+            root.baseDirObj = baseObj;
             this->compressNode(root); //"this->" required by two-pass lookup as enforced by GCC 4.7
         }
     });
@@ -560,22 +560,22 @@ void TreeView::updateSyncPreview(bool hideFiltered,
         switch (fsObj.getSyncOperation())
         {
             case SO_CREATE_NEW_LEFT:
-            case SO_MOVE_LEFT_TARGET:
                 return syncCreateLeftActive;
             case SO_CREATE_NEW_RIGHT:
-            case SO_MOVE_RIGHT_TARGET:
                 return syncCreateRightActive;
             case SO_DELETE_LEFT:
-            case SO_MOVE_LEFT_SOURCE:
                 return syncDeleteLeftActive;
             case SO_DELETE_RIGHT:
-            case SO_MOVE_RIGHT_SOURCE:
                 return syncDeleteRightActive;
             case SO_OVERWRITE_RIGHT:
             case SO_COPY_METADATA_TO_RIGHT:
+            case SO_MOVE_RIGHT_SOURCE:
+            case SO_MOVE_RIGHT_TARGET:
                 return syncDirOverwRightActive;
             case SO_OVERWRITE_LEFT:
             case SO_COPY_METADATA_TO_LEFT:
+            case SO_MOVE_LEFT_SOURCE:
+            case SO_MOVE_LEFT_TARGET:
                 return syncDirOverwLeftActive;
             case SO_DO_NOTHING:
                 return syncDirNoneActive;
@@ -597,7 +597,7 @@ void TreeView::setData(FolderComparison& newData)
     folderCmp = newData;
 
     //remove truly empty folder pairs as early as this: we want to distinguish single/multiple folder pair cases by looking at "folderCmp"
-    vector_remove_if(folderCmp, [](const std::shared_ptr<BaseDirMapping>& baseObj)
+    vector_remove_if(folderCmp, [](const std::shared_ptr<BaseDirPair>& baseObj)
     {
         return baseObj->getBaseDirPf<LEFT_SIDE >().empty() &&
                baseObj->getBaseDirPf<RIGHT_SIDE>().empty();
@@ -617,14 +617,14 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
             case TreeView::TYPE_ROOT:
             {
                 const auto* root = static_cast<const TreeView::RootNodeImpl*>(flatTree[row].node_);
-                return make_unique<TreeView::RootNode>(percent, root->bytesGross, root->itemCountGross, getStatus(row), *(root->baseMap));
+                return make_unique<TreeView::RootNode>(percent, root->bytesGross, root->itemCountGross, getStatus(row), *(root->baseDirObj));
             }
             break;
 
             case TreeView::TYPE_DIRECTORY:
             {
                 const auto* dir = static_cast<const TreeView::DirNodeImpl*>(flatTree[row].node_);
-                if (auto dirObj = dynamic_cast<DirMapping*>(FileSystemObject::retrieve(dir->objId)))
+                if (auto dirObj = dynamic_cast<DirPair*>(FileSystemObject::retrieve(dir->objId)))
                     return make_unique<TreeView::DirNode>(percent, dir->bytesGross, dir->itemCountGross, level, getStatus(row), *dirObj);
             }
             break;
@@ -732,7 +732,7 @@ const wxColour COLOR_LEVEL0(0xcc, 0xcc, 0xff);
 const wxColour COLOR_LEVEL1(0xcc, 0xff, 0xcc);
 const wxColour COLOR_LEVEL2(0xff, 0xff, 0x99);
 
-const wxColour COLOR_LEVEL3(0xcc, 0xff, 0xff);
+const wxColour COLOR_LEVEL3(0xcc, 0xcc, 0xcc);
 const wxColour COLOR_LEVEL4(0xff, 0xcc, 0xff);
 const wxColour COLOR_LEVEL5(0x99, 0xff, 0xcc);
 
@@ -741,7 +741,7 @@ const wxColour COLOR_LEVEL7(0xff, 0xcc, 0xcc);
 const wxColour COLOR_LEVEL8(0xcc, 0xff, 0x99);
 
 const wxColour COLOR_LEVEL9 (0xff, 0xff, 0xcc);
-const wxColour COLOR_LEVEL10(0xcc, 0xcc, 0xcc);
+const wxColour COLOR_LEVEL10(0xcc, 0xff, 0xff);
 const wxColour COLOR_LEVEL11(0xff, 0xcc, 0x99);
 
 const wxColour COLOR_PERCENTAGE_BORDER    (198, 198, 198);
@@ -793,8 +793,8 @@ private:
                     if (std::unique_ptr<TreeView::Node> node = treeDataView_->getLine(row))
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
                         {
-                            const wxString& dirLeft  = utfCvrtTo<wxString>(root->baseMap_.getBaseDirPf<LEFT_SIDE >());
-                            const wxString& dirRight = utfCvrtTo<wxString>(root->baseMap_.getBaseDirPf<RIGHT_SIDE>());
+                            const wxString& dirLeft  = utfCvrtTo<wxString>(root->baseDirObj_.getBaseDirPf<LEFT_SIDE >());
+                            const wxString& dirRight = utfCvrtTo<wxString>(root->baseDirObj_.getBaseDirPf<RIGHT_SIDE>());
                             if (dirLeft.empty())
                                 return dirRight;
                             else if (dirRight.empty())
@@ -818,8 +818,8 @@ private:
 
                     case COL_TYPE_NAVI_DIRECTORY:
                         if (const TreeView::RootNode* root = dynamic_cast<const TreeView::RootNode*>(node.get()))
-                            return getShortDisplayNameForFolderPair(root->baseMap_.getBaseDirPf<LEFT_SIDE >(),
-                                                                    root->baseMap_.getBaseDirPf<RIGHT_SIDE>());
+                            return getShortDisplayNameForFolderPair(root->baseDirObj_.getBaseDirPf<LEFT_SIDE >(),
+                                                                    root->baseDirObj_.getBaseDirPf<RIGHT_SIDE>());
                         else if (const TreeView::DirNode* dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
                             return utfCvrtTo<wxString>(dir->dirObj_.getObjShortName());
                         else if (dynamic_cast<const TreeView::FilesNode*>(node.get()))

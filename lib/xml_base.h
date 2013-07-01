@@ -11,7 +11,7 @@
 #include <zen/zstring.h>
 #include <zen/file_error.h>
 
-//bind zenxml and zen file handling together
+//bind zen::Xml and zen file handling together
 
 namespace xmlAccess
 {
@@ -34,7 +34,7 @@ private:
 };
 
 void saveXmlDocument(const zen::XmlDoc& doc, const Zstring& filename); //throw FfsXmlError
-void loadXmlDocument(const Zstring& filename, zen::XmlDoc& doc); //throw FfsXmlError
+zen::XmlDoc loadXmlDocument(const Zstring& filename); //throw FfsXmlError
 
 const std::wstring getErrorMessageFormatted(const std::vector<std::wstring>& failedElements);
 }

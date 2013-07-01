@@ -12,7 +12,7 @@
 #include <zen/serialize.h>
 #include <wx+/zlib_wrap.h>
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/win.h> //includes "windows.h"
 #include <zen/long_path_prefix.h>
 #endif
@@ -25,6 +25,11 @@ namespace
 //-------------------------------------------------------------------------------------------------------------------------------
 const char FILE_FORMAT_DESCR[] = "FreeFileSync";
 const int DB_FILE_FORMAT_VER = 9;
+
+warn_static("wee need two version ids!")
+//const int DB_FILE_FORMAT_CONTAINER = 10;
+//const int DB_FILE_FORMAT_STREAM    = 1;
+
 //-------------------------------------------------------------------------------------------------------------------------------
 
 typedef std::string UniqueId;
@@ -34,22 +39,21 @@ typedef std::map<UniqueId, BinaryStream> StreamMapping; //list of streams ordere
 //| ensure 32/64 bit portability: use fixed size data types only e.g. std::uint32_t |
 //-----------------------------------------------------------------------------------
 
-
 template <SelectedSide side> inline
-Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
+Zstring getDBFilename(const BaseDirPair& baseDirObj, bool tempfile = false)
 {
     //Linux and Windows builds are binary incompatible: different file id?, problem with case sensitivity? are UTC file times really compatible?
     //what about endianess!?
     //however 32 and 64 bit db files *are* designed to be binary compatible!
     //Give db files different names.
     //make sure they end with ".ffs_db". These files will be excluded from comparison
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     Zstring dbname = Zstring(Zstr("sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     //files beginning with dots are hidden e.g. in Nautilus
     Zstring dbname = Zstring(Zstr(".sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
 #endif
-    return baseMap.getBaseDirPf<side>() + dbname;
+    return baseDirObj.getBaseDirPf<side>() + dbname;
 }
 
 //#######################################################################################################################################
@@ -76,7 +80,7 @@ void saveStreams(const StreamMapping& streamList, const Zstring& filename) //thr
     assert(!somethingExists(filename)); //orphan tmp files should be cleaned up already at this point!
     saveBinStream(filename, streamOut.get()); //throw FileError
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //be careful to avoid CreateFile() + CREATE_ALWAYS on a hidden file -> see file_io.cpp
     ::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide database file
 #endif
@@ -125,8 +129,8 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError, FileErrorD
     }
     catch (const std::bad_alloc& e) //still required?
     {
-        throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filename) + L"\n\n" +
-                        _("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()));
+        throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filename),
+                        _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
     }
 }
 
@@ -167,7 +171,7 @@ public:
             }
             catch (ZlibInternalError&)
             {
-                throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename)) + L" (zlib error)");
+                throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(filename)), L"zlib internal error");
             }
         };
 
@@ -201,31 +205,31 @@ public:
 private:
     void recurse(const InSyncDir& container)
     {
-        // for (const auto& filePair : container.files) { processFile(filePair); }); !
+        // for (const auto& dbFile : container.files) { processFile(dbFile); }); !
 
         writeNumber<std::uint32_t>(outputBoth, static_cast<std::uint32_t>(container.files.size()));
-        std::for_each(container.files.begin(), container.files.end(), [&](const std::pair<Zstring, InSyncFile>& filePair) { this->process(filePair); });
+        std::for_each(container.files.begin(), container.files.end(), [&](const std::pair<Zstring, InSyncFile>& dbFile) { this->process(dbFile); });
 
         writeNumber<std::uint32_t>(outputBoth, static_cast<std::uint32_t>(container.symlinks.size()));
-        std::for_each(container.symlinks.begin(), container.symlinks.end(), [&](const std::pair<Zstring, InSyncSymlink>& symlinkPair) { this->process(symlinkPair); });
+        std::for_each(container.symlinks.begin(), container.symlinks.end(), [&](const std::pair<Zstring, InSyncSymlink>& dbSymlink) { this->process(dbSymlink); });
 
         writeNumber<std::uint32_t>(outputBoth, static_cast<std::uint32_t>(container.dirs.size()));
-        std::for_each(container.dirs.begin(), container.dirs.end(), [&](const std::pair<Zstring, InSyncDir>& dirPair) { this->process(dirPair); });
+        std::for_each(container.dirs.begin(), container.dirs.end(), [&](const std::pair<Zstring, InSyncDir>& dbDir) { this->process(dbDir); });
     }
 
     static void writeUtf8(BinStreamOut& output, const Zstring& str) { writeContainer(output, utfCvrtTo<Zbase<char>>(str)); }
 
-    static void write(BinStreamOut& output, const FileDescriptor& descr)
+    static void writeFile(BinStreamOut& output, const InSyncDescrFile& descr, const UInt64& fileSize)
     {
         writeNumber<std:: int64_t>(output, to<std:: int64_t>(descr.lastWriteTimeRaw));
-        writeNumber<std::uint64_t>(output, to<std::uint64_t>(descr.fileSize));
-        writeNumber<std::uint64_t>(output, descr.devId);
-        writeNumber<std::uint64_t>(output, descr.fileIdx);
-        assert_static(sizeof(descr.devId  ) <= sizeof(std::uint64_t));
-        assert_static(sizeof(descr.fileIdx) <= sizeof(std::uint64_t));
+        writeNumber<std::uint64_t>(output, to<std::uint64_t>(fileSize));
+        writeNumber<std::uint64_t>(output, descr.fileId.first);
+        writeNumber<std::uint64_t>(output, descr.fileId.second);
+        assert_static(sizeof(descr.fileId.first ) <= sizeof(std::uint64_t));
+        assert_static(sizeof(descr.fileId.second) <= sizeof(std::uint64_t));
     }
 
-    static void write(BinStreamOut& output, const LinkDescriptor& descr)
+    static void writeLink(BinStreamOut& output, const InSyncDescrLink& descr)
     {
         writeNumber<std::int64_t>(output, to<std:: int64_t>(descr.lastWriteTimeRaw));
 
@@ -236,37 +240,39 @@ private:
         writeNumber<std::int32_t>(output, 0);
     }
 
-    static void write(BinStreamOut& output, const InSyncDir::InSyncStatus& status)
+    static void writeDir(BinStreamOut& output, const InSyncDir::InSyncStatus& status)
     {
         writeNumber<std::int32_t>(output, status);
     }
 
-    void process(const std::pair<Zstring, InSyncFile>& filePair)
+    void process(const std::pair<Zstring, InSyncFile>& dbFile)
     {
-        writeUtf8(outputBoth, filePair.first);
-        writeNumber<std::int32_t>(outputBoth, filePair.second.inSyncType);
+        writeUtf8(outputBoth, dbFile.first);
+        writeNumber<std::int32_t>(outputBoth, dbFile.second.inSyncType);
 
-        write(outputLeft,  filePair.second.left);
-        write(outputRight, filePair.second.right);
+        warn_static("implement proper migration: get rid of duplicate fileSize!")
+
+        writeFile(outputLeft,  dbFile.second.left,  dbFile.second.fileSize);
+        writeFile(outputRight, dbFile.second.right, dbFile.second.fileSize);
     }
 
-    void process(const std::pair<Zstring, InSyncSymlink>& symlinkPair)
+    void process(const std::pair<Zstring, InSyncSymlink>& dbSymlink)
     {
-        writeUtf8(outputBoth, symlinkPair.first);
+        writeUtf8(outputBoth, dbSymlink.first);
 
         warn_static("new parameter: imp proper migration!")
-        //writeNumber<std::int32_t>(outputBoth, symlinkPair.second.inSyncType);
+        //writeNumber<std::int32_t>(outputBoth, dbSymlink.second.inSyncType);
 
-        write(outputLeft,  symlinkPair.second.left);
-        write(outputRight, symlinkPair.second.right);
+        writeLink(outputLeft,  dbSymlink.second.left);
+        writeLink(outputRight, dbSymlink.second.right);
     }
 
-    void process(const std::pair<Zstring, InSyncDir>& dirPair)
+    void process(const std::pair<Zstring, InSyncDir>& dbDir)
     {
-        writeUtf8(outputBoth, dirPair.first);
-        write(outputBoth, dirPair.second.status);
+        writeUtf8(outputBoth, dbDir.first);
+        writeDir(outputBoth, dbDir.second.status);
 
-        recurse(dirPair.second);
+        recurse(dbDir.second);
     }
 
     BinStreamOut outputLeft;  //data related to one side only
@@ -291,7 +297,7 @@ public:
             }
             catch (ZlibInternalError&)
             {
-                throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename)) + L" (zlib error)");
+                throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename)), L"zlib internal error");
             }
         };
 
@@ -319,11 +325,11 @@ public:
             const BinaryStream tmpL = readContainer<BinaryStream>(inL);
             const BinaryStream tmpR = readContainer<BinaryStream>(inR);
 
-            auto output = std::make_shared<InSyncDir>(InSyncDir::STATUS_IN_SYNC);
-            StreamParser(decompStream(tmpL, filenameL),
-                         decompStream(tmpR, filenameR),
-                         decompStream(tmpB, filenameL + Zstr("/") + filenameR),
-                         *output); //throw UnexpectedEndOfStreamError
+            auto output = std::make_shared<InSyncDir>(InSyncDir::DIR_STATUS_IN_SYNC);
+            StreamParser parser(decompStream(tmpL, filenameL),
+                                decompStream(tmpR, filenameR),
+                                decompStream(tmpB, filenameL + Zstr("/") + filenameR));
+            parser.recurse(*output); //throw UnexpectedEndOfStreamError
             return output;
         }
         catch (const UnexpectedEndOfStreamError&)
@@ -332,43 +338,46 @@ public:
         }
         catch (const std::bad_alloc& e) //still required?
         {
-            throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filenameL) + L"\n" + fmtFileName(filenameR) + L"\n\n" +
-                            _("Out of memory!") + L" " + utfCvrtTo<std::wstring>(e.what()));
+            throw FileError(_("Database file is corrupt:") + L"\n" + fmtFileName(filenameL) + L"\n" + fmtFileName(filenameR),
+                            _("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()));
         }
     }
 
 private:
     StreamParser(const BinaryStream& bufferL,
                  const BinaryStream& bufferR,
-                 const BinaryStream& bufferB,
-                 InSyncDir& container) :
+                 const BinaryStream& bufferB) :
         inputLeft (bufferL),
         inputRight(bufferR),
-        inputBoth (bufferB) { recurse(container); }
+        inputBoth (bufferB) {}
 
     static Zstring readUtf8(BinStreamIn& input) { return utfCvrtTo<Zstring>(readContainer<Zbase<char>>(input)); } //throw UnexpectedEndOfStreamError
 
-    static void read(BinStreamIn& input, FileDescriptor& descr)
+    static InSyncDescrFile readFile(BinStreamIn& input, UInt64& fileSize)
     {
         //attention: order of function argument evaluation is undefined! So do it one after the other...
-        descr.lastWriteTimeRaw = readNumber<std::int64_t>(input); //throw UnexpectedEndOfStreamError
-        descr.fileSize         = readNumber<std::uint64_t>(input);
-        descr.devId            = static_cast<DeviceId >(readNumber<std::uint64_t>(input)); //
-        descr.fileIdx          = static_cast<FileIndex>(readNumber<std::uint64_t>(input)); //silence "loss of precision" compiler warnings
+        auto lastWriteTimeRaw = readNumber<std::int64_t>(input); //throw UnexpectedEndOfStreamError
+        warn_static("implement proper migration!")
+        fileSize         = readNumber<std::uint64_t>(input);
+        auto devId            = static_cast<DeviceId >(readNumber<std::uint64_t>(input)); //
+        auto fileIdx          = static_cast<FileIndex>(readNumber<std::uint64_t>(input)); //silence "loss of precision" compiler warnings
+        return InSyncDescrFile(lastWriteTimeRaw, FileId(devId, fileIdx));
     }
 
-    static void read(BinStreamIn& input, LinkDescriptor& descr)
+    static InSyncDescrLink readLink(BinStreamIn& input)
     {
-        descr.lastWriteTimeRaw = readNumber<std::int64_t>(input);
+        auto lastWriteTimeRaw = readNumber<std::int64_t>(input);
 
         warn_static("implement proper migration!")
         //descr.targetPath       = readUtf8(input);
         readUtf8(input);
         //descr.type             = static_cast<LinkDescriptor::LinkType>(readNumber<std::int32_t>(input));
         readNumber<std::int32_t>(input);
+
+        return InSyncDescrLink(lastWriteTimeRaw);
     }
 
-    static void read(BinStreamIn& input, InSyncDir::InSyncStatus& status)
+    static void readDir(BinStreamIn& input, InSyncDir::InSyncStatus& status)
     {
         status = static_cast<InSyncDir::InSyncStatus>(readNumber<std::int32_t>(input));
     }
@@ -378,15 +387,16 @@ private:
         size_t fileCount = readNumber<std::uint32_t>(inputBoth);
         while (fileCount-- != 0)
         {
+            warn_static("migrate from InSyncType to CompareVariant!!!")
             const Zstring shortName = readUtf8(inputBoth);
             const auto inSyncType = static_cast<InSyncType>(readNumber<std::int32_t>(inputBoth));
 
-            FileDescriptor dataL;
-            FileDescriptor dataR;
-            read(inputLeft,  dataL);
-            read(inputRight, dataR);
+            warn_static("implement proper migration: get rid of duplicate fileSize!")
 
-            container.addFile(shortName, dataL, dataR, inSyncType);
+            UInt64 fileSize;
+            const InSyncDescrFile dataL = readFile(inputLeft,  fileSize);
+            const InSyncDescrFile dataR = readFile(inputRight, fileSize);
+            container.addFile(shortName, dataL, dataR, inSyncType, fileSize);
         }
 
         size_t linkCount = readNumber<std::uint32_t>(inputBoth);
@@ -395,14 +405,11 @@ private:
             const Zstring shortName = readUtf8(inputBoth);
 
             warn_static("new parameter: imp proper migration!")
-			const auto inSyncType = IN_SYNC_BINARY_EQUAL;
+            const auto inSyncType = IN_SYNC_BINARY_EQUAL;
             //const auto inSyncType = static_cast<InSyncType>(readNumber<std::int32_t>(inputBoth));
 
-            LinkDescriptor dataL;
-            LinkDescriptor dataR;
-            read(inputLeft,  dataL);
-            read(inputRight, dataR);
-
+            InSyncDescrLink dataL = readLink(inputLeft);
+            InSyncDescrLink dataR = readLink(inputRight);
             container.addSymlink(shortName, dataL, dataR, inSyncType);
         }
 
@@ -411,8 +418,8 @@ private:
         {
             const Zstring shortName = readUtf8(inputBoth);
 
-            InSyncDir::InSyncStatus status = InSyncDir::STATUS_STRAW_MAN;
-            read(inputBoth, status);
+            InSyncDir::InSyncStatus status = InSyncDir::DIR_STATUS_STRAW_MAN;
+            readDir(inputBoth, status);
 
             InSyncDir& subDir = container.addDir(shortName, status);
             recurse(subDir);
@@ -435,10 +442,10 @@ class UpdateLastSynchronousState
         => update all database entries!
     */
 public:
-    static void execute(const BaseDirMapping& baseMapping, InSyncDir& dir)
+    static void execute(const BaseDirPair& baseDirObj, InSyncDir& dir)
     {
         bool binaryComparison = false;
-        switch (baseMapping.getCompVariant())
+        switch (baseDirObj.getCompVariant())
         {
             case CMP_BY_TIME_SIZE:
                 break;
@@ -447,8 +454,8 @@ public:
                 break;
         }
 
-        UpdateLastSynchronousState updater(baseMapping.getFilter(), binaryComparison);
-        updater.recurse(baseMapping, dir);
+        UpdateLastSynchronousState updater(baseDirObj.getFilter(), binaryComparison);
+        updater.recurse(baseDirObj, dir);
     }
 
 private:
@@ -469,7 +476,7 @@ private:
         auto rv = map.insert(typename M::value_type(key, value));
         if (!rv.second)
         {
-#if defined FFS_WIN || defined FFS_MAC //caveat: key must be updated, if there is a change in short name case!!!
+#if defined ZEN_WIN || defined ZEN_MAC //caveat: key must be updated, if there is a change in short name case!!!
             if (rv.first->first != key)
             {
                 map.erase(rv.first);
@@ -490,7 +497,7 @@ private:
         auto it = map.lower_bound(key);
         if (it != map.end() && !(map.key_comp()(key, it->first)))
         {
-        #if defined FFS_WIN || defined FFS_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
+        #if defined ZEN_WIN || defined ZEN_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
             if (it->first != key)
             {
                 map.erase(it); //don't fiddle with decrementing "it"! - you might lose while optimizing pointlessly
@@ -507,38 +514,40 @@ private:
     void process(const HierarchyObject::SubFileVec& currentFiles, const Zstring& parentRelativeNamePf, InSyncDir::FileList& dbFiles)
     {
         hash_set<const InSyncFile*> toPreserve; //referencing fixed-in-memory std::map elements
-        std::for_each(currentFiles.begin(), currentFiles.end(), [&](const FileMapping& fileMap)
+        std::for_each(currentFiles.begin(), currentFiles.end(), [&](const FilePair& fileObj)
         {
-            if (!fileMap.isEmpty())
+            if (!fileObj.isEmpty())
             {
-                if (fileMap.getCategory() == FILE_EQUAL) //data in sync: write current state
+                if (fileObj.getCategory() == FILE_EQUAL) //data in sync: write current state
                 {
                     //Caveat: If FILE_EQUAL, we *implicitly* assume equal left and right short names matching case: InSyncDir's mapping tables use short name as a key!
                     //This makes us silently dependent from code in algorithm.h!!!
-                    assert(fileMap.getShortName<LEFT_SIDE>() == fileMap.getShortName<RIGHT_SIDE>());
+                    assert(fileObj.getShortName<LEFT_SIDE>() == fileObj.getShortName<RIGHT_SIDE>());
+                    //this should be taken for granted:
+                    assert(fileObj.getFileSize<LEFT_SIDE>() == fileObj.getFileSize<RIGHT_SIDE>());
 
                     //create or update new "in-sync" state
-                    InSyncFile& file = updateItem(dbFiles, fileMap.getObjShortName(),
-                                                  InSyncFile(FileDescriptor(fileMap.getLastWriteTime<LEFT_SIDE>(),
-                                                                            fileMap.getFileSize     <LEFT_SIDE>(),
-                                                                            fileMap.getFileId       <LEFT_SIDE>()),
-                                                             FileDescriptor(fileMap.getLastWriteTime<RIGHT_SIDE>(),
-                                                                            fileMap.getFileSize     <RIGHT_SIDE>(),
-                                                                            fileMap.getFileId       <RIGHT_SIDE>()),
+                    InSyncFile& file = updateItem(dbFiles, fileObj.getObjShortName(),
+                                                  InSyncFile(InSyncDescrFile(fileObj.getLastWriteTime<LEFT_SIDE>(),
+                                                                             fileObj.getFileId       <LEFT_SIDE>()),
+                                                             InSyncDescrFile(fileObj.getLastWriteTime<RIGHT_SIDE>(),
+                                                                             fileObj.getFileId       <RIGHT_SIDE>()),
                                                              binaryComparison_ ?
                                                              IN_SYNC_BINARY_EQUAL :
-                                                             IN_SYNC_ATTRIBUTES_EQUAL));
+                                                             IN_SYNC_ATTRIBUTES_EQUAL,
+                                                             fileObj.getFileSize<LEFT_SIDE>()));
                     toPreserve.insert(&file);
                 }
                 else //not in sync: preserve last synchronous state
                 {
-                    auto it = dbFiles.find(fileMap.getObjShortName());
+                    auto it = dbFiles.find(fileObj.getObjShortName());
                     if (it != dbFiles.end())
                         toPreserve.insert(&it->second);
                 }
             }
         });
 
+        warn_static("consider temporarily excluded items due to traveral error just like a fixed file filter here!?")
         //delete removed items (= "in-sync") from database
         map_remove_if(dbFiles, [&](const InSyncDir::FileList::value_type& v) -> bool
         {
@@ -553,18 +562,18 @@ private:
     void process(const HierarchyObject::SubLinkVec& currentLinks, const Zstring& parentRelativeNamePf, InSyncDir::LinkList& dbLinks)
     {
         hash_set<const InSyncSymlink*> toPreserve;
-        std::for_each(currentLinks.begin(), currentLinks.end(), [&](const SymLinkMapping& linkMap)
+        std::for_each(currentLinks.begin(), currentLinks.end(), [&](const SymlinkPair& linkObj)
         {
-            if (!linkMap.isEmpty())
+            if (!linkObj.isEmpty())
             {
-                if (linkMap.getLinkCategory() == SYMLINK_EQUAL) //data in sync: write current state
+                if (linkObj.getLinkCategory() == SYMLINK_EQUAL) //data in sync: write current state
                 {
-                    assert(linkMap.getShortName<LEFT_SIDE>() == linkMap.getShortName<RIGHT_SIDE>());
+                    assert(linkObj.getShortName<LEFT_SIDE>() == linkObj.getShortName<RIGHT_SIDE>());
 
                     //create or update new "in-sync" state
-                    InSyncSymlink& link = updateItem(dbLinks, linkMap.getObjShortName(),
-                                                     InSyncSymlink(LinkDescriptor(linkMap.getLastWriteTime<LEFT_SIDE>()),
-                                                                   LinkDescriptor(linkMap.getLastWriteTime<RIGHT_SIDE>()),
+                    InSyncSymlink& link = updateItem(dbLinks, linkObj.getObjShortName(),
+                                                     InSyncSymlink(InSyncDescrLink(linkObj.getLastWriteTime<LEFT_SIDE>()),
+                                                                   InSyncDescrLink(linkObj.getLastWriteTime<RIGHT_SIDE>()),
                                                                    binaryComparison_ ?
                                                                    IN_SYNC_BINARY_EQUAL :
                                                                    IN_SYNC_ATTRIBUTES_EQUAL));
@@ -572,7 +581,7 @@ private:
                 }
                 else //not in sync: preserve last synchronous state
                 {
-                    auto it = dbLinks.find(linkMap.getObjShortName());
+                    auto it = dbLinks.find(linkObj.getObjShortName());
                     if (it != dbLinks.end())
                         toPreserve.insert(&it->second);
                 }
@@ -593,22 +602,21 @@ private:
     void process(const HierarchyObject::SubDirVec& currentDirs, const Zstring& parentRelativeNamePf, InSyncDir::DirList& dbDirs)
     {
         hash_set<const InSyncDir*> toPreserve;
-        std::for_each(currentDirs.begin(), currentDirs.end(), [&](const DirMapping& dirMap)
+        std::for_each(currentDirs.begin(), currentDirs.end(), [&](const DirPair& dirObj)
         {
-            if (!dirMap.isEmpty())
-            {
-                switch (dirMap.getDirCategory())
+            if (!dirObj.isEmpty())
+                switch (dirObj.getDirCategory())
                 {
                     case DIR_EQUAL:
                     {
-                        assert(dirMap.getShortName<LEFT_SIDE>() == dirMap.getShortName<RIGHT_SIDE>());
+                        assert(dirObj.getShortName<LEFT_SIDE>() == dirObj.getShortName<RIGHT_SIDE>());
 
                         //update directory entry only (shallow), but do *not touch* exising child elements!!!
-                        const Zstring& key = dirMap.getObjShortName();
-                        auto insertResult = dbDirs.insert(std::make_pair(key, InSyncDir(InSyncDir::STATUS_IN_SYNC))); //get or create
+                        const Zstring& key = dirObj.getObjShortName();
+                        auto insertResult = dbDirs.insert(std::make_pair(key, InSyncDir(InSyncDir::DIR_STATUS_IN_SYNC))); //get or create
                         auto it = insertResult.first;
 
-#if defined FFS_WIN || defined FFS_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
+#if defined ZEN_WIN || defined ZEN_MAC //caveat: key might need to be updated, too, if there is a change in short name case!!!
                         const bool alreadyExisting = !insertResult.second;
                         if (alreadyExisting && it->first != key)
                         {
@@ -618,9 +626,9 @@ private:
                         }
 #endif
                         InSyncDir& dir = it->second;
-                        dir.status = InSyncDir::STATUS_IN_SYNC; //update immediate directory entry
+                        dir.status = InSyncDir::DIR_STATUS_IN_SYNC; //update immediate directory entry
                         toPreserve.insert(&dir);
-                        recurse(dirMap, dir);
+                        recurse(dirObj, dir);
                     }
                     break;
 
@@ -630,9 +638,9 @@ private:
                         //Example: directories on left and right differ in case while sub-files are equal
                     {
                         //reuse last "in-sync" if available or insert strawman entry (do not try to update thereby removing child elements!!!)
-                        InSyncDir& dir = dbDirs.insert(std::make_pair(dirMap.getObjShortName(), InSyncDir(InSyncDir::STATUS_STRAW_MAN))).first->second;
+                        InSyncDir& dir = dbDirs.insert(std::make_pair(dirObj.getObjShortName(), InSyncDir(InSyncDir::DIR_STATUS_STRAW_MAN))).first->second;
                         toPreserve.insert(&dir);
-                        recurse(dirMap, dir);
+                        recurse(dirObj, dir);
                     }
                     break;
 
@@ -640,16 +648,15 @@ private:
                     case DIR_LEFT_SIDE_ONLY:
                     case DIR_RIGHT_SIDE_ONLY:
                     {
-                        auto it = dbDirs.find(dirMap.getObjShortName());
+                        auto it = dbDirs.find(dirObj.getObjShortName());
                         if (it != dbDirs.end())
                         {
                             toPreserve.insert(&it->second);
-                            recurse(dirMap, it->second); //although existing sub-items cannot be in sync, items deleted on both sides *are* in-sync!!!
+                            recurse(dirObj, it->second); //although existing sub-items cannot be in sync, items deleted on both sides *are* in-sync!!!
                         }
                     }
                     break;
                 }
-            }
         });
 
         //delete removed items (= "in-sync") from database
@@ -657,13 +664,12 @@ private:
         {
             if (toPreserve.find(&v.second) != toPreserve.end())
                 return false;
-            //all items not existing in "currentDirs" have either been deleted meanwhile or been excluded via filter:
             const Zstring& shortName = v.first;
             return filter_.passDirFilter(parentRelativeNamePf + shortName, nullptr);
             //if directory is not included in "currentDirs", it is either not existing anymore, in which case it should be deleted from database
-            //or it was excluded via filter, in which case the database entry should be preserved
-            //-> we can't tell and need to preserve the old db entry -> all child db elements are preserved since they are not recursed in the loop above!!!
-            //-> no problem with filter logic of excluding complete directory subtrees, if top folder is excluded directly!
+            //or it was excluded via filter, in which case the database entry should be preserved:
+            //=> all child db elements are also preserved since they are not recursed in the loop above!!!
+            //=> no problem with filter logic of excluding complete directory subtrees, if top folder is excluded directly!
         });
     }
 
@@ -674,17 +680,17 @@ private:
 
 //#######################################################################################################################################
 
-std::shared_ptr<InSyncDir> zen::loadLastSynchronousState(const BaseDirMapping& baseMapping) //throw FileError, FileErrorDatabaseNotExisting -> return value always bound!
+std::shared_ptr<InSyncDir> zen::loadLastSynchronousState(const BaseDirPair& baseDirObj) //throw FileError, FileErrorDatabaseNotExisting -> return value always bound!
 {
-    const Zstring fileNameLeft  = getDBFilename<LEFT_SIDE >(baseMapping);
-    const Zstring fileNameRight = getDBFilename<RIGHT_SIDE>(baseMapping);
+    const Zstring fileNameLeft  = getDBFilename<LEFT_SIDE >(baseDirObj);
+    const Zstring fileNameRight = getDBFilename<RIGHT_SIDE>(baseDirObj);
 
-    if (!baseMapping.isExisting<LEFT_SIDE >() ||
-        !baseMapping.isExisting<RIGHT_SIDE>())
+    if (!baseDirObj.isExisting<LEFT_SIDE >() ||
+        !baseDirObj.isExisting<RIGHT_SIDE>())
     {
         //avoid race condition with directory existence check: reading sync.ffs_db may succeed although first dir check had failed => conflicts!
         //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430
-        const Zstring filename = !baseMapping.isExisting<LEFT_SIDE>() ? fileNameLeft : fileNameRight;
+        const Zstring filename = !baseDirObj.isExisting<LEFT_SIDE>() ? fileNameLeft : fileNameRight;
         throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" + //it could be due to a to-be-created target directory not yet existing => FileErrorDatabaseNotExisting
                                            replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filename)));
     }
@@ -710,14 +716,14 @@ std::shared_ptr<InSyncDir> zen::loadLastSynchronousState(const BaseDirMapping& b
 }
 
 
-void zen::saveLastSynchronousState(const BaseDirMapping& baseMapping) //throw FileError
+void zen::saveLastSynchronousState(const BaseDirPair& baseDirObj) //throw FileError
 {
     //transactional behaviour! write to tmp files first
-    const Zstring dbNameLeftTmp  = getDBFilename<LEFT_SIDE >(baseMapping, true);
-    const Zstring dbNameRightTmp = getDBFilename<RIGHT_SIDE>(baseMapping, true);
+    const Zstring dbNameLeftTmp  = getDBFilename<LEFT_SIDE >(baseDirObj, true);
+    const Zstring dbNameRightTmp = getDBFilename<RIGHT_SIDE>(baseDirObj, true);
 
-    const Zstring dbNameLeft  = getDBFilename<LEFT_SIDE >(baseMapping);
-    const Zstring dbNameRight = getDBFilename<RIGHT_SIDE>(baseMapping);
+    const Zstring dbNameLeft  = getDBFilename<LEFT_SIDE >(baseDirObj);
+    const Zstring dbNameRight = getDBFilename<RIGHT_SIDE>(baseDirObj);
 
     //delete old tmp file, if necessary -> throws if deletion fails!
     removeFile(dbNameLeftTmp);  //
@@ -749,7 +755,7 @@ void zen::saveLastSynchronousState(const BaseDirMapping& baseMapping) //throw Fi
     }
 
     //load last synchrounous state
-    std::shared_ptr<InSyncDir> lastSyncState = std::make_shared<InSyncDir>(InSyncDir::STATUS_IN_SYNC);
+    std::shared_ptr<InSyncDir> lastSyncState = std::make_shared<InSyncDir>(InSyncDir::DIR_STATUS_IN_SYNC);
     if (streamIterLeftOld  != streamListLeft .end() &&
         streamIterRightOld != streamListRight.end())
         try
@@ -762,7 +768,7 @@ void zen::saveLastSynchronousState(const BaseDirMapping& baseMapping) //throw Fi
         catch (FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
 
     //update last synchrounous state
-    UpdateLastSynchronousState::execute(baseMapping, *lastSyncState);
+    UpdateLastSynchronousState::execute(baseDirObj, *lastSyncState);
 
     //serialize again
     BinaryStream updatedStreamLeft;

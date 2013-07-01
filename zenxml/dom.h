@@ -1,5 +1,5 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
+// * This file is part of the zen::Xml project. It is distributed under the *
 // * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
@@ -31,7 +31,7 @@ public:
     ///Retrieve the name of this XML element.
     /**
       \tparam String Arbitrary string class: e.g. std::string, std::wstring, wxString, MyStringClass, ...
-      \returns Name of the XML element
+      \returns Name of the XML element.
     */
     template <class String>
     String getNameAs() const { return utfCvrtTo<String>(name_); }
@@ -79,7 +79,7 @@ public:
         std::string attrValue;
         writeText(value, attrValue);
         attributes[utfCvrtTo<std::string>(name)] = attrValue;
-    } //create or update
+    }
 
     ///Remove the attribute with the given name.
     /**
@@ -98,7 +98,6 @@ public:
     {
         std::string utf8Name = utfCvrtTo<std::string>(name);
         auto newElement = std::make_shared<XmlElement>(utf8Name, this, PrivateConstruction());
-        //std::shared_ptr<XmlElement> newElement(new XmlElement(utf8Name, this));
         childElements.push_back(newElement);
         childElementsSorted.insert(std::make_pair(utf8Name, newElement));
         return *newElement;
@@ -108,7 +107,7 @@ public:
     /**
       \tparam String Arbitrary string-like type: e.g. std::string, wchar_t*, char[], wchar_t, wxString, MyStringClass, ...
       \param name The name of the child element to be retrieved.
-      \return A pointer to the child element or nullptr if none was found
+      \return A pointer to the child element or nullptr if none was found.
     */
     template <class String>
     const XmlElement* getChild(const String& name) const
@@ -159,7 +158,7 @@ public:
     		[](const XmlElement& child) { ... });
       \endcode
       \param name The name of the child elements to be retrieved.
-      \return A pair of STL begin/end iterators to access all child elements sequentially.
+      \return A pair of STL begin/end iterators to access the child elements sequentially.
     */
     template <class String>
     std::pair<ChildIterConst2, ChildIterConst2> getChildren(const String& name) const { return childElementsSorted.equal_range(utfCvrtTo<std::string>(name)); }
@@ -253,10 +252,13 @@ public:
     ///Default constructor setting up an empty XML document with a standard declaration: <?xml version="1.0" encoding="UTF-8" ?>
     XmlDoc() : version_("1.0"), encoding_("UTF-8"), rootElement("Root", nullptr, XmlElement::PrivateConstruction()) {}
 
+    XmlDoc(XmlDoc&& tmp) : rootElement("Root", nullptr, XmlElement::PrivateConstruction()) { swap(tmp); }
+    XmlDoc& operator=(XmlDoc&& tmp) { swap(tmp); return *this; }
+
     //Setup an empty XML document
     /**
       \tparam String Arbitrary string-like type: e.g. std::string, wchar_t*, char[], wchar_t, wxString, MyStringClass, ...
-      \param rootName The name of the XML document's root element
+      \param rootName The name of the XML document's root element.
     */
     template <class String>
     XmlDoc(String rootName) : version_("1.0"), encoding_("UTF-8"), rootElement(rootName, nullptr, XmlElement::PrivateConstruction()) {}
@@ -308,8 +310,17 @@ public:
     template <class String>
     void setStandalone(const String& standalone) { standalone_ = utfCvrtTo<std::string>(standalone); }
 
+    //Transactionally swap two elements.  -> disabled documentation extraction
+    void swap(XmlDoc& other)
+    {
+        version_   .swap(other.version_);
+        encoding_  .swap(other.encoding_);
+        standalone_.swap(other.standalone_);
+        rootElement.swap(other.rootElement);
+    }
+
 private:
-    XmlDoc(const XmlDoc&);        //not implemented, thanks to XmlElement::parent_
+    XmlDoc(const XmlDoc&);            //not implemented, thanks to XmlElement::parent_
     XmlDoc& operator=(const XmlDoc&); //
 
     std::string version_;

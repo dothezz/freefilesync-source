@@ -7,11 +7,11 @@
 #include "zstring.h"
 #include <stdexcept>
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include "dll.h"
 #include "win_ver.h"
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 //#include <zen/scope_guard.h>
 #include <ctype.h> //toupper()
 #endif
@@ -64,7 +64,7 @@ private:
 
             const std::string message = std::string("Memory leak detected!") + "\n\n"
                                         + "Candidates:\n" + leakingStrings;
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             MessageBoxA(nullptr, message.c_str(), "Error", 0);
 #else
             std::cerr << message;
@@ -85,7 +85,7 @@ private:
 
     void reportProblem(const std::string& message) //throw std::logic_error
     {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         ::MessageBoxA(nullptr, message.c_str(), "Error", 0);
 #else
         std::cerr << message;
@@ -128,7 +128,7 @@ time per call | function
 */
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 namespace
 {
 #ifdef __MINGW32__ //MinGW is clueless...
@@ -227,7 +227,7 @@ void z_impl::makeFilenameUpperCase(wchar_t* str, size_t size)
         throw std::runtime_error("Error converting to upper case! (LCMapString)");
 }
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 int z_impl::compareFilenamesNoCase(const char* lhs, const char* rhs, size_t sizeLhs, size_t sizeRhs)
 {
     return ::strcasecmp(lhs, rhs); //locale-dependent!

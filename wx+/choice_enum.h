@@ -64,12 +64,7 @@ template <class Enum> void updateTooltipEnumVal(const EnumDescrList<Enum>& mappi
 
 
 
-
-
-
-
-
-//--------------- inline impelementation -------------------------------------------
+//--------------- impelementation -------------------------------------------
 template <class Enum>
 void setEnumVal(const EnumDescrList<Enum>& mapping, wxChoice& ctrl, Enum value)
 {

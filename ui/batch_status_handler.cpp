@@ -35,8 +35,7 @@ private:
             logfiles_.push_back(fullName);
     }
 
-    virtual std::shared_ptr<TraverseCallback>
-    onDir (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
+    virtual TraverseCallback* onDir (const Zchar* shortName, const Zstring& fullName) { return nullptr; } //DON'T traverse into subdirs
     virtual HandleLink  onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
     virtual HandleError reportDirError (const std::wstring& msg)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
     virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
@@ -147,28 +146,28 @@ BatchStatusHandler::~BatchStatusHandler()
     if (abortIsRequested())
     {
         raiseReturnCode(returnCode_, FFS_RC_ABORTED);
-        finalStatus = _("Synchronization aborted!");
+        finalStatus = _("Synchronization aborted");
         errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalErrors > 0)
     {
         raiseReturnCode(returnCode_, FFS_RC_FINISHED_WITH_ERRORS);
-        finalStatus = _("Synchronization completed with errors!");
+        finalStatus = _("Synchronization completed with errors");
         errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalWarnings > 0)
     {
         raiseReturnCode(returnCode_, FFS_RC_FINISHED_WITH_WARNINGS);
-        finalStatus = _("Synchronization completed with warnings.");
+        finalStatus = _("Synchronization completed with warnings");
         errorLog.logMsg(finalStatus, TYPE_WARNING);
     }
     else
     {
         if (getObjectsTotal(PHASE_SYNCHRONIZING) == 0 && //we're past "initNewPhase(PHASE_SYNCHRONIZING)" at this point!
             getDataTotal   (PHASE_SYNCHRONIZING) == 0)
-            finalStatus = _("Nothing to synchronize!"); //even if "ignored conflicts" occurred!
+            finalStatus = _("Nothing to synchronize"); //even if "ignored conflicts" occurred!
         else
-            finalStatus = _("Synchronization completed successfully.");
+            finalStatus = _("Synchronization completed successfully");
         errorLog.logMsg(finalStatus, TYPE_INFO);
     }
 
@@ -258,8 +257,8 @@ BatchStatusHandler::~BatchStatusHandler()
         //-> nicely manages dialog lifetime
         while (progressDlg)
         {
+            updateUiNow(); //*first* refresh GUI (removing flicker) before sleeping!
             boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
-            updateUiNow();
         }
     }
 }
@@ -317,7 +316,7 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
                     break;
 
                 case ReturnWarningDlg::BUTTON_SWITCH:
-                    errorLog.logMsg(_("Switching to FreeFileSync main dialog..."), TYPE_INFO);
+                    errorLog.logMsg(_("Switching to FreeFileSync main dialog"), TYPE_INFO);
                     switchToGuiRequested = true;
                     abortThisProcess();
                     break;
@@ -341,7 +340,8 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
 
 ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& errorMessage)
 {
-    errorLog.logMsg(errorMessage, TYPE_ERROR); //always, even for "retry"
+    //always, except for "retry":
+    zen::ScopeGuard guardWriteLog = zen::makeGuard([&] { errorLog.logMsg(errorMessage, TYPE_ERROR); });
 
     switch (handleError_)
     {
@@ -362,6 +362,8 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
                     return ProcessCallback::IGNORE_ERROR;
 
                 case ReturnErrorDlg::BUTTON_RETRY:
+                    guardWriteLog.dismiss();
+                    errorLog.logMsg(_("Retrying operation after error:") + L" " + errorMessage, TYPE_INFO);
                     return ProcessCallback::RETRY;
 
                 case ReturnErrorDlg::BUTTON_CANCEL:

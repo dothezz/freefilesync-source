@@ -20,7 +20,7 @@
 #include "image_tools.h"
 #include "rtl.h"
 
-#ifdef FFS_LINUX
+#ifdef ZEN_LINUX
 #include <gtk/gtk.h>
 #endif
 
@@ -939,6 +939,7 @@ public:
     void setCursor(size_t row, size_t compPos)
     {
         cursor = std::make_pair(row, compPos);
+        activeSelection.reset(); //e.g. user might search with F3 while holding down left mouse button
         selectionAnchor = row;
     }
     std::pair<size_t, size_t> getCursor() const { return cursor; } // (row, component position)
@@ -1781,9 +1782,9 @@ void Grid::showScrollBars(Grid::ScrollBarStatus horizontal, Grid::ScrollBarStatu
     showScrollbarX = horizontal;
     showScrollbarY = vertical;
 
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
     //handled by Grid::SetScrollbar
-#elif defined FFS_LINUX //get rid of scrollbars, but preserve scrolling behavior!
+#elif defined ZEN_LINUX //get rid of scrollbars, but preserve scrolling behavior!
     //the following wxGTK approach is pretty much identical to wxWidgets 2.9 ShowScrollbars() code!
 
     auto mapStatus = [](ScrollBarStatus sbStatus) -> GtkPolicyType
@@ -1834,7 +1835,7 @@ void Grid::showScrollBars(Grid::ScrollBarStatus horizontal, Grid::ScrollBarStatu
     */
 }
 
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
 void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh)
 {
     ScrollBarStatus sbStatus = SB_SHOW_AUTOMATIC;
@@ -1866,7 +1867,7 @@ void Grid::SetScrollbar(int orientation, int position, int thumbSize, int range,
 #endif
 
 //get rid of scrollbars, but preserve scrolling behavior!
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #ifdef __MINGW32__ //MinGW is clueless...
 #define WM_MOUSEHWHEEL                  0x020E
 #endif

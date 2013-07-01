@@ -105,8 +105,8 @@ String formatMessageImpl(const LogEntry& entry) //internal linkage
     String formattedText = L"[" + formatTime<String>(FORMAT_TIME, localTime(entry.time)) + L"] " + copyStringTo<String>(getTypeName()) + L": ";
     const size_t prefixLen = formattedText.size();
 
-    for (auto iter = entry.message.begin(); iter != entry.message.end(); )
-        if (*iter == L'\n')
+    for (auto it = entry.message.begin(); it != entry.message.end(); )
+        if (*it == L'\n')
         {
             formattedText += L'\n';
 
@@ -116,12 +116,12 @@ String formatMessageImpl(const LogEntry& entry) //internal linkage
 
             do //skip duplicate newlines
             {
-                ++iter;
+                ++it;
             }
-            while (iter != entry.message.end() && *iter == L'\n');
+            while (it != entry.message.end() && *it == L'\n');
         }
         else
-            formattedText += *iter++;
+            formattedText += *it++;
 
     return formattedText;
 }

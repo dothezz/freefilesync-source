@@ -14,6 +14,7 @@
 #include <wx+/choice_enum.h>
 #include <wx+/image_tools.h>
 #include <wx+/font_size.h>
+#include <wx+/std_button_order.h>
 #include "gui_generated.h"
 #include "exec_finished_box.h"
 #include "dir_name.h"
@@ -34,15 +35,15 @@ public:
                   ExecWhenFinishedCfg* execWhenFinished); //optional input parameter
 
 private:
-    virtual void OnSyncAutomatic(wxCommandEvent& event) { directionCfg.var = DirectionConfig::AUTOMATIC; updateGui(); }
-    virtual void OnSyncMirror   (wxCommandEvent& event) { directionCfg.var = DirectionConfig::MIRROR;    updateGui(); }
-    virtual void OnSyncUpdate   (wxCommandEvent& event) { directionCfg.var = DirectionConfig::UPDATE;    updateGui(); }
-    virtual void OnSyncCustom   (wxCommandEvent& event) { directionCfg.var = DirectionConfig::CUSTOM;    updateGui(); }
+    virtual void OnSyncTwoWay(wxCommandEvent& event) { directionCfg.var = DirectionConfig::AUTOMATIC; updateGui(); }
+    virtual void OnSyncMirror(wxCommandEvent& event) { directionCfg.var = DirectionConfig::MIRROR;    updateGui(); }
+    virtual void OnSyncUpdate(wxCommandEvent& event) { directionCfg.var = DirectionConfig::UPDATE;    updateGui(); }
+    virtual void OnSyncCustom(wxCommandEvent& event) { directionCfg.var = DirectionConfig::CUSTOM;    updateGui(); }
 
-    virtual void OnSyncAutomaticDouble(wxMouseEvent& event);
-    virtual void OnSyncMirrorDouble   (wxMouseEvent& event);
-    virtual void OnSyncUpdateDouble   (wxMouseEvent& event);
-    virtual void OnSyncCustomDouble   (wxMouseEvent& event);
+    virtual void OnSyncTwoWayDouble(wxMouseEvent& event);
+    virtual void OnSyncMirrorDouble(wxMouseEvent& event);
+    virtual void OnSyncUpdateDouble(wxMouseEvent& event);
+    virtual void OnSyncCustomDouble(wxMouseEvent& event);
 
     virtual void OnExLeftSideOnly (wxCommandEvent& event);
     virtual void OnExRightSideOnly(wxCommandEvent& event);
@@ -107,15 +108,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.exLeftSideOnly)
         {
             case SYNC_DIR_RIGHT:
-                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"createRight")));
+                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_create_right")));
                 buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"deleteLeft")));
+                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_delete_left")));
                 buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DELETE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
+                buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -123,15 +124,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.exRightSideOnly)
         {
             case SYNC_DIR_RIGHT:
-                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"deleteRight")));
+                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_delete_right")));
                 buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DELETE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"createLeft")));
+                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_create_left")));
                 buttonRightOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
+                buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -139,15 +140,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.leftNewer)
         {
             case SYNC_DIR_RIGHT:
-                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateRight")));
+                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
                 buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateLeft")));
+                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
                 buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
+                buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -155,15 +156,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.rightNewer)
         {
             case SYNC_DIR_RIGHT:
-                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateRight")));
+                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
                 buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateLeft")));
+                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
                 buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
+                buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonRightNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -171,15 +172,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.different)
         {
             case SYNC_DIR_RIGHT:
-                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateRight")));
+                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
                 buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateLeft")));
+                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
                 buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"none")));
+                buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonDifferent->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
         }
@@ -187,15 +188,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
         switch (dirCfg.conflict)
         {
             case SYNC_DIR_RIGHT:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateRight")));
+                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
                 buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
             case SYNC_DIR_LEFT:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"updateLeft")));
+                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
                 buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
             case SYNC_DIR_NONE:
-                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"conflict"))); //silent dependency to algorithm.cpp::Redetermine!!!
+                buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"cat_conflict"))); //silent dependency to algorithm.cpp::Redetermine!!!
                 buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
                 break;
         }
@@ -217,22 +218,28 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
     compareVar_(compareVar),
     versioningFolder(*m_panelVersioning, *m_buttonSelectDirVersioning, *m_versioningFolder/*, m_staticTextResolvedPath*/)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+    setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonOK).setCancel(m_buttonCancel));
+
     //set icons for this dialog
-    m_bitmapLeftOnly  ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"leftOnly"  ))));
-    m_bitmapRightOnly ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"rightOnly" ))));
-    m_bitmapLeftNewer ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"leftNewer" ))));
-    m_bitmapRightNewer->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"rightNewer"))));
-    m_bitmapDifferent ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"different" ))));
-    m_bitmapConflict  ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"conflict"  ))));
+    m_bitmapLeftOnly  ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_left_only"  ))));
+    m_bitmapRightOnly ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_right_only" ))));
+    m_bitmapLeftNewer ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_left_newer" ))));
+    m_bitmapRightNewer->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_right_newer"))));
+    m_bitmapDifferent ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_different"  ))));
+    m_bitmapConflict  ->SetBitmap(mirrorIfRtl(greyScale(getResourceImage(L"cat_conflict"   ))));
     m_bitmapDatabase  ->SetBitmap(getResourceImage(L"database"));
 
-    setRelativeFontSize(*m_toggleBtnAutomatic, 1.25);
-    setRelativeFontSize(*m_toggleBtnMirror,    1.25);
-    setRelativeFontSize(*m_toggleBtnUpdate,    1.25);
-    setRelativeFontSize(*m_toggleBtnCustom,    1.25);
+    m_toggleBtnTwoWay->SetLabel(L"<- " + _("Two way") + L" ->");
+    m_toggleBtnMirror->SetLabel(         _("Mirror")  + L" ->>");
+    m_toggleBtnUpdate->SetLabel(         _("Update")  + L" ->");
+
+    setRelativeFontSize(*m_toggleBtnTwoWay, 1.25);
+    setRelativeFontSize(*m_toggleBtnMirror, 1.25);
+    setRelativeFontSize(*m_toggleBtnUpdate, 1.25);
+    setRelativeFontSize(*m_toggleBtnCustom, 1.25);
 
     enumVersioningStyle.
     add(VER_STYLE_REPLACE,       _("Replace"),    _("Move files and replace if existing")).
@@ -345,15 +352,15 @@ void SyncCfgDialog::updateGui()
     m_staticTextUpdate   ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     m_staticTextCustom   ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
 
-    m_toggleBtnAutomatic->SetValue(false);
-    m_toggleBtnMirror   ->SetValue(false);
-    m_toggleBtnUpdate   ->SetValue(false);
-    m_toggleBtnCustom   ->SetValue(false);
+    m_toggleBtnTwoWay->SetValue(false);
+    m_toggleBtnMirror->SetValue(false);
+    m_toggleBtnUpdate->SetValue(false);
+    m_toggleBtnCustom->SetValue(false);
 
     switch (cfg.syncCfg.directionCfg.var)
     {
         case DirectionConfig::AUTOMATIC:
-            m_toggleBtnAutomatic->SetValue(true);
+            m_toggleBtnTwoWay->SetValue(true);
             m_staticTextAutomatic->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
             break;
         case DirectionConfig::MIRROR:
@@ -454,10 +461,10 @@ void SyncCfgDialog::OnApply(wxCommandEvent& event)
 }
 
 
-void SyncCfgDialog::OnSyncAutomaticDouble(wxMouseEvent& event)
+void SyncCfgDialog::OnSyncTwoWayDouble(wxMouseEvent& event)
 {
     wxCommandEvent dummy;
-    OnSyncAutomatic(dummy);
+    OnSyncTwoWay(dummy);
     OnApply(dummy);
 }
 

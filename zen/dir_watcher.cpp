@@ -10,24 +10,24 @@
 #include "thread.h" //includes <boost/thread.hpp>
 #include "scope_guard.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include "notify_removal.h"
 #include "win.h" //includes "windows.h"
 #include "long_path_prefix.h"
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 #include <sys/inotify.h>
 #include <fcntl.h>
 #include "file_traverser.h"
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 //#include <CoreFoundation/FSEvents.h>
 #endif
 
 using namespace zen;
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 namespace
 {
 class SharedData
@@ -101,14 +101,14 @@ public:
         boost::lock_guard<boost::mutex> dummy(lockAccess);
 
         //first check whether errors occurred in thread
-        if (!errorMsg.first.empty())
+        if (errorInfo)
         {
-            const std::wstring msg = errorMsg.first.c_str();
-            const DWORD lastError = errorMsg.second;
+            const std::wstring msg   = copyStringTo<std::wstring>(errorInfo->msg);
+            const std::wstring descr = copyStringTo<std::wstring>(errorInfo->descr);
 
-            if (errorCodeForNotExisting(lastError))
-                throw ErrorNotExisting(msg);
-            throw FileError(msg);
+            if (errorCodeForNotExisting(errorInfo->errorCode))
+                throw ErrorNotExisting(msg, descr);
+            throw FileError(msg, descr);
         }
 
         output.swap(changedFiles);
@@ -117,10 +117,12 @@ public:
 
 
     //context of worker thread
-    void reportError(const std::wstring& msg, DWORD errorCode) //throw()
+    void reportError(const std::wstring& msg, const std::wstring& description, DWORD errorCode) //throw()
     {
         boost::lock_guard<boost::mutex> dummy(lockAccess);
-        errorMsg = std::make_pair(copyStringTo<BasicWString>(msg), errorCode);
+
+        ErrorInfo newInfo = { copyStringTo<BasicWString>(msg), copyStringTo<BasicWString>(description), errorCode };
+        errorInfo = make_unique<ErrorInfo>(newInfo);
     }
 
 private:
@@ -128,7 +130,14 @@ private:
 
     boost::mutex lockAccess;
     std::vector<DirWatcher::Entry> changedFiles;
-    std::pair<BasicWString, DWORD> errorMsg; //non-empty if errors occurred in thread
+
+    struct ErrorInfo
+    {
+        BasicWString msg;
+        BasicWString descr;
+        DWORD errorCode;
+    };
+    std::unique_ptr<ErrorInfo> errorInfo; //non-empty if errors occurred in thread
 };
 
 
@@ -151,11 +160,13 @@ public:
                             nullptr);
         if (hDir == INVALID_HANDLE_VALUE)
         {
-            const DWORD lastError = ::GetLastError();
-            const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted(lastError);
+            const DWORD lastError = ::GetLastError(); //copy before making other system calls!
+            const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory));
+            const std::wstring errorDescr = formatSystemError(L"CreateFile", lastError);
+
             if (errorCodeForNotExisting(lastError))
-                throw ErrorNotExisting(errorMsg);
-            throw FileError(errorMsg);
+                throw ErrorNotExisting(errorMsg, errorDescr);
+            throw FileError(errorMsg, errorDescr);
         }
 
         //end of constructor, no need to start managing "hDir"
@@ -184,7 +195,10 @@ public:
                                                   false,    //__in      BOOL bInitialState,
                                                   nullptr); //__in_opt  LPCTSTR lpName
                 if (overlapped.hEvent == nullptr)
-                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)) + L" (CreateEvent)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+                {
+                    const DWORD lastError = ::GetLastError(); //copy before making other system calls!
+                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"CreateEvent", lastError), lastError);
+                }
 
                 ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
 
@@ -202,7 +216,10 @@ public:
                                              &bytesReturned,                //  __out_opt    LPDWORD lpBytesReturned,
                                              &overlapped,                   //  __inout_opt  LPOVERLAPPED lpOverlapped,
                                              nullptr))                      //  __in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
-                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)) + L" (ReadDirectoryChangesW)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+                {
+                    const DWORD lastError = ::GetLastError(); //copy before making other system calls!
+                    return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"ReadDirectoryChangesW", lastError), lastError);
+                }
 
                 //async I/O is a resource that needs to be guarded since it will write to local variable "buffer"!
                 zen::ScopeGuard guardAio = zen::makeGuard([&]
@@ -223,8 +240,9 @@ public:
                                               &bytesWritten, //__out  LPDWORD lpNumberOfBytesTransferred,
                                               false))        //__in   BOOL bWait
                 {
-                    if (::GetLastError() != ERROR_IO_INCOMPLETE)
-                        return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)) + L" (GetOverlappedResult)" L"\n\n" + getLastErrorFormatted(), ::GetLastError());
+                    const DWORD lastError = ::GetLastError(); //copy before making other system calls!
+                    if (lastError != ERROR_IO_INCOMPLETE)
+                        return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"GetOverlappedResult", lastError), lastError);
 
                     //execute asynchronous procedure calls (APC) queued on this thread
                     ::SleepEx(50,    // __in  DWORD dwMilliseconds,
@@ -362,7 +380,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
 }
 
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 struct DirWatcher::Pimpl
 {
     Zstring dirname;
@@ -376,21 +394,19 @@ namespace
 class DirsOnlyTraverser : public zen::TraverseCallback
 {
 public:
-    DirsOnlyTraverser(std::vector<Zstring>& dirs,
-                      const std::shared_ptr<TraverseCallback>& otherMe) : otherMe_(otherMe), dirs_(dirs) {}
+    DirsOnlyTraverser(std::vector<Zstring>& dirs) : dirs_(dirs) {}
 
     virtual void onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName)
     {
         dirs_.push_back(fullName);
-        return otherMe_;
+        return this;
     }
     virtual HandleError reportDirError (const std::wstring& msg)                         { throw FileError(msg); }
     virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { throw FileError(msg); }
 
 private:
-    const std::shared_ptr<TraverseCallback>& otherMe_; //lifetime management, two options: 1. use std::weak_ptr 2. ref to shared_ptr
     std::vector<Zstring>& dirs_;
 };
 }
@@ -408,16 +424,14 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
     std::vector<Zstring> fullDirList;
     fullDirList.push_back(dirname);
 
-    std::shared_ptr<TraverseCallback> traverser;
-    traverser = std::make_shared<DirsOnlyTraverser>(fullDirList, traverser); //throw FileError
-
-    zen::traverseFolder(dirname, *traverser); //don't traverse into symlinks (analog to windows build)
+    DirsOnlyTraverser traverser(fullDirList); //throw FileError
+    zen::traverseFolder(dirname, traverser); //don't traverse into symlinks (analog to windows build)
 
     //init
     pimpl_->dirname    = directory;
     pimpl_->notifDescr = ::inotify_init();
     if (pimpl_->notifDescr == -1)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"inotify_init", getLastError()));
 
     zen::ScopeGuard guardDescr = zen::makeGuard([&] { ::close(pimpl_->notifDescr); });
 
@@ -429,7 +443,7 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
             initSuccess = ::fcntl(pimpl_->notifDescr, F_SETFL, flags | O_NONBLOCK) != -1;
     }
     if (!initSuccess)
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"fcntl", getLastError()));
 
     //add watches
     std::for_each(fullDirList.begin(), fullDirList.end(),
@@ -448,10 +462,13 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
                                      IN_MOVE_SELF);
         if (wd == -1)
         {
-            const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir)) + L"\n\n" + getLastErrorFormatted();
-            if (errorCodeForNotExisting(errno))
-                throw ErrorNotExisting(errorMsg);
-            throw FileError(errorMsg);
+            const ErrorCode lastError = getLastError(); //copy before making other system calls!
+            const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir));
+            const std::wstring errorDescr = formatSystemError(L"inotify_add_watch", lastError);
+
+            if (errorCodeForNotExisting(lastError))
+                throw ErrorNotExisting(errorMsg, errorDescr);
+            throw FileError(errorMsg, errorDescr);
         }
 
         pimpl_->watchDescrs.insert(std::make_pair(wd, appendSeparator(subdir)));
@@ -484,7 +501,7 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
         if (errno == EAGAIN)  //this error is ignored in all inotify wrappers I found
             return std::vector<Entry>();
 
-        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->dirname)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(pimpl_->dirname)), formatSystemError(L"read", getLastError()));
     }
 
     std::vector<Entry> output;
@@ -522,18 +539,17 @@ std::vector<DirWatcher::Entry> DirWatcher::getChanges(const std::function<void()
     return output;
 }
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 
 warn_static("finish")
 struct DirWatcher::Pimpl
 {
-
 };
 
 
 DirWatcher::DirWatcher(const Zstring& directory)  //throw FileError
 {
-
+    throw FileError(L"Dir Watcher is not yet implemented!");
 }
 
 

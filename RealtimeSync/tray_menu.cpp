@@ -15,6 +15,7 @@
 #include <wx+/image_tools.h>
 #include <wx+/string_conv.h>
 #include <wx+/shell_execute.h>
+#include <wx+/std_button_order.h>
 #include <wx/msgdlg.h>
 #include <wx/taskbar.h>
 #include <wx/app.h>
@@ -153,25 +154,29 @@ public:
     void showIconActive()
     {
         wxIcon realtimeIcon;
-#if defined FFS_WIN || defined FFS_MAC //16x16 seems to be the only size that is shown correctly on OS X
+#if defined ZEN_WIN || defined ZEN_MAC //16x16 seems to be the only size that is shown correctly on OS X
         realtimeIcon.CopyFromBitmap(getResourceImage(L"RTS_tray_16x16")); //use a 16x16 bitmap
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
         realtimeIcon.CopyFromBitmap(getResourceImage(L"RTS_tray_24x24")); //use a 24x24 bitmap for perfect fit
 #endif
-        const wxString postFix = jobName_.empty() ? wxString() : (L"\n\"" + jobName_ + L"\"");
-        trayMenu->SetIcon(realtimeIcon, _("Monitoring active...") + postFix);
+        wxString tooltip = L"RealtimeSync";
+        if (!jobName_.empty())
+            tooltip += L"\n\"" + jobName_ + L"\"";
+        trayMenu->SetIcon(realtimeIcon, tooltip);
     }
 
     void showIconWaiting()
     {
         wxIcon realtimeIcon;
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
         realtimeIcon.CopyFromBitmap(greyScale(getResourceImage(L"RTS_tray_16x16")));
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
         realtimeIcon.CopyFromBitmap(greyScale(getResourceImage(L"RTS_tray_24x24")));
 #endif
-        const wxString postFix = jobName_.empty() ? wxString() : (L"\n\"" + jobName_ + L"\"");
-        trayMenu->SetIcon(realtimeIcon, _("Waiting for missing directories...") + postFix);
+        wxString tooltip = _("Waiting for missing directories...");
+        if (!jobName_.empty())
+            tooltip += L"\n\"" + jobName_ + L"\"";
+        trayMenu->SetIcon(realtimeIcon, tooltip);
     }
 
 private:
@@ -244,9 +249,11 @@ public:
         ErrorDlgGenerated(parent),
         secondsLeft(15) //give user some time to read msg!?
     {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
+        setStandardButtonOrder(*bSizerStdButtons, StdButtons().setAffirmative(m_buttonRetry).setCancel(m_buttonCancel));
+
         m_bitmap10->SetBitmap(getResourceImage(L"msg_error"));
         m_textCtrl8->SetValue(messageText);
 

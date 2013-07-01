@@ -460,7 +460,7 @@ PluralFormInfo::PluralFormInfo(const std::string& definition, int pluralCount) /
 
 
 inline
-PluralForm::PluralForm(const std::string& stream) : expr(implementation::Parser(stream, n_).parse()) {}  //throw ParsingError
+PluralForm::PluralForm(const std::string& stream) : expr(implementation::Parser(stream, n_).parse()) {} //throw ParsingError
 }
 
 #endif // PARSE_PLURAL_H_INCLUDED

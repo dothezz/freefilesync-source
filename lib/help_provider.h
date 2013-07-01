@@ -7,11 +7,11 @@
 #ifndef HELPPROVIDER_H_INCLUDED
 #define HELPPROVIDER_H_INCLUDED
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/zstring.h>
 #include <wx/msw/helpchm.h>
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <wx/html/helpctrl.h>
 #endif
 
@@ -35,7 +35,7 @@ void displayHelpEntry(const wxString& section, wxWindow* parent);
 namespace impl
 {
 //finish wxWidgets' job
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 class FfsHelpController
 {
 public:
@@ -55,7 +55,7 @@ private:
     wxCHMHelpController chmHlp;
 };
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 class FfsHelpController
 {
 public:

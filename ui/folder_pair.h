@@ -55,7 +55,7 @@ public:
         basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg    ), nullptr, this);
         basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), nullptr, this);
 
-        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(getResourceImage(L"item_delete"));
+        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(getResourceImage(L"item_remove"));
     }
 
 private:
@@ -63,23 +63,23 @@ private:
     {
         if (altCompConfig.get())
         {
-            setImage(*basicPanel_.m_bpButtonAltCompCfg, getResourceImage(L"cmpConfigSmall"));
+            setImage(*basicPanel_.m_bpButtonAltCompCfg, getResourceImage(L"cfg_compare_small"));
             basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Selected variant:") +  L" " + getVariantName(altCompConfig->compareVar));
         }
         else
         {
-            setImage(*basicPanel_.m_bpButtonAltCompCfg, greyScale(getResourceImage(L"cmpConfigSmall")));
+            setImage(*basicPanel_.m_bpButtonAltCompCfg, greyScale(getResourceImage(L"cfg_compare_small")));
             basicPanel_.m_bpButtonAltCompCfg->SetToolTip(_("Select alternate comparison settings"));
         }
 
         if (altSyncConfig.get())
         {
-            setImage(*basicPanel_.m_bpButtonAltSyncCfg, getResourceImage(L"syncConfigSmall"));
+            setImage(*basicPanel_.m_bpButtonAltSyncCfg, getResourceImage(L"cfg_sync_small"));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Selected variant:") +  L" " + getVariantName(altSyncConfig->directionCfg.var));
         }
         else
         {
-            setImage(*basicPanel_.m_bpButtonAltSyncCfg, greyScale(getResourceImage(L"syncConfigSmall")));
+            setImage(*basicPanel_.m_bpButtonAltSyncCfg, greyScale(getResourceImage(L"cfg_sync_small")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
         }
 

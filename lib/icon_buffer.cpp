@@ -10,16 +10,16 @@
 #include <zen/thread.h> //includes <boost/thread.hpp>
 #include <zen/scope_guard.h>
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/dll.h>
 #include <zen/win_ver.h>
 #include <wx/image.h>
 #include "Thumbnail/thumbnail.h"
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 #include <gtk/gtk.h>
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 #include "osx_file_icon.h"
 #endif
 
@@ -34,7 +34,7 @@ const size_t BUFFER_SIZE_MAX = 600; //maximum number of icons to hold in buffer
 boost::thread::id mainThreadId = boost::this_thread::get_id();
 #endif
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 const bool isXpOrLater = winXpOrLater(); //VS2010 compiled DLLs are not supported on Win 2000: Popup dialog "DecodePointer not found"
 
 #define DEF_DLL_FUN(name) const auto name = isXpOrLater ? DllFun<thumb::FunType_##name>(thumb::getDllName(), thumb::funName_##name) : DllFun<thumb::FunType_##name>();
@@ -46,11 +46,11 @@ DEF_DLL_FUN(releaseImageData); //
 class IconHolder //handle HICON/GdkPixbuf ownership supporting thread-safe usage (in contrast to wxIcon/wxBitmap)
 {
 public:
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     typedef const thumb::ImageData* HandleType;
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     typedef GdkPixbuf* HandleType;
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     typedef osx::ImageData* HandleType;
 #endif
 
@@ -67,11 +67,11 @@ public:
     ~IconHolder()
     {
         if (handle_ != nullptr)
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             releaseImageData(handle_); //should be checked already before creating IconHolder!
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
             ::g_object_unref(handle_); //superseedes "::gdk_pixbuf_unref"!
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
             delete handle_;
 #endif
     }
@@ -93,7 +93,7 @@ public:
         if (!handle_)
             return wxNullBitmap;
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         ZEN_ON_SCOPE_EXIT(IconHolder().swap(*this)); //destroy after extraction
 
         //let wxImage reference data without taking ownership:
@@ -101,7 +101,7 @@ public:
         fileIcon.SetAlpha(handle_->alpha, true);
         return wxBitmap(fileIcon);
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 #if wxCHECK_VERSION(2, 9, 4)
         return wxBitmap(release()); //ownership passed!
 #else
@@ -110,7 +110,7 @@ public:
         return newIcon;
 #endif
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
         ZEN_ON_SCOPE_EXIT(IconHolder().swap(*this)); //destroy after extraction
 
         //let wxImage reference data without taking ownership:
@@ -137,7 +137,7 @@ public:
 };
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 Zstring getFileExtension(const Zstring& filename)
 {
     const Zstring shortName = afterLast(filename, Zchar('\\')); //warning: using windows file name separator!
@@ -217,7 +217,7 @@ IconHolder getAssociatedIconByExt(const Zstring& extension, IconBuffer::IconSize
     return getIconByAttribute((L"dummy." + extension).c_str(), FILE_ATTRIBUTE_NORMAL, sz);
 }
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 IconHolder iconHolderFromGicon(GIcon* gicon, IconBuffer::IconSize sz)
 {
     if (gicon)
@@ -237,11 +237,11 @@ IconHolder iconHolderFromGicon(GIcon* gicon, IconBuffer::IconSize sz)
 
 IconHolder getThumbnailIcon(const Zstring& filename, int requestedSize) //return 0 on failure
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     if (getThumbnail && releaseImageData)
         return IconHolder(getThumbnail(filename.c_str(), requestedSize));
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     gint width  = 0;
     gint height = 0;
     if (GdkPixbufFormat* fmt = ::gdk_pixbuf_get_file_info(filename.c_str(), &width, &height))
@@ -263,12 +263,12 @@ IconHolder getThumbnailIcon(const Zstring& filename, int requestedSize) //return
         }
     }
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     try
     {
-        return IconHolder(new osx::ImageData(osx::getThumbnail(filename.c_str(), requestedSize))); //throw OsxError
+        return IconHolder(new osx::ImageData(osx::getThumbnail(filename.c_str(), requestedSize))); //throw SysError
     }
-    catch (osx::OsxError&) {}
+    catch (zen::SysError&) {}
 #endif
     return IconHolder();
 }
@@ -277,10 +277,10 @@ IconHolder getThumbnailIcon(const Zstring& filename, int requestedSize) //return
 IconHolder getGenericFileIcon(IconBuffer::IconSize sz)
 {
     //we're called by getAssociatedIcon()! -> avoid endless recursion!
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     return getIconByAttribute(L"dummy", FILE_ATTRIBUTE_NORMAL, sz);
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     const char* mimeFileIcons[] =
     {
         "application-x-zerosize", //Kubuntu: /usr/share/icons/oxygen/48x48/mimetypes
@@ -296,12 +296,12 @@ IconHolder getGenericFileIcon(IconBuffer::IconSize sz)
                 return IconHolder(pixBuf); //pass ownership
     return IconHolder();
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     try
     {
-        return IconHolder(new osx::ImageData(osx::getDefaultFileIcon(IconBuffer::getSize(sz)))); //throw OsxError
+        return IconHolder(new osx::ImageData(osx::getDefaultFileIcon(IconBuffer::getSize(sz)))); //throw SysError
     }
-    catch (osx::OsxError&) {}
+    catch (zen::SysError&) {}
     return IconHolder();
 #endif
 }
@@ -309,20 +309,20 @@ IconHolder getGenericFileIcon(IconBuffer::IconSize sz)
 
 IconHolder getGenericDirectoryIcon(IconBuffer::IconSize sz)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     return getIconByAttribute(L"dummy", //Windows 7 doesn't like this parameter to be an empty string!
                               FILE_ATTRIBUTE_DIRECTORY, sz);
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     if (GIcon* dirIcon = ::g_content_type_get_icon("inode/directory")) //should contain fallback to GTK_STOCK_DIRECTORY ("gtk-directory")
         return iconHolderFromGicon(dirIcon, sz);
     return IconHolder();
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     try
     {
-        return IconHolder(new osx::ImageData(osx::getDefaultFolderIcon(IconBuffer::getSize(sz)))); //throw OsxError
+        return IconHolder(new osx::ImageData(osx::getDefaultFolderIcon(IconBuffer::getSize(sz)))); //throw SysError
     }
-    catch (osx::OsxError&) { return IconHolder(); }
+    catch (zen::SysError&) { return IconHolder(); }
 #endif
 }
 
@@ -345,7 +345,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     warn_static("problem: für folder links ist getThumbnail erfolgreich => SFGAO_LINK nicht gecheckt!")
 
     //2. retrieve file icons
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //perf: optimize fallback case for SIZE_MEDIUM and SIZE_LARGE:
     const Zstring& extension = getFileExtension(filename);
     if (isCheapExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
@@ -381,7 +381,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
                 return IconHolder(imgData);
     }
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     GFile* file = ::g_file_new_for_path(filename.c_str()); //documented to "never fail"
     ZEN_ON_SCOPE_EXIT(::g_object_unref(file);)
 
@@ -393,12 +393,12 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     }
     //need fallback: icon lookup may fail because some icons are currently not present on system
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     try
     {
-        return IconHolder(new osx::ImageData(osx::getFileIcon(filename.c_str(), IconBuffer::getSize(sz)))); //throw OsxError
+        return IconHolder(new osx::ImageData(osx::getFileIcon(filename.c_str(), IconBuffer::getSize(sz)))); //throw SysError
     }
-    catch (osx::OsxError&) {}
+    catch (zen::SysError&) {}
 #endif
     return ::getGenericFileIcon(sz); //make sure this does not internally call getAssociatedIcon("someDefaultFile.txt")!!! => endless recursion!
 }
@@ -548,7 +548,7 @@ private:
 void WorkerThread::operator()() //thread entry
 {
     //failure to initialize COM for each thread is a source of hard to reproduce bugs: https://sourceforge.net/tracker/?func=detail&aid=3160472&group_id=234430&atid=1093080
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //Prerequisites, see thumbnail.h
 
     //1. Initialize COM
@@ -611,13 +611,13 @@ int IconBuffer::getSize(IconSize icoSize)
     switch (icoSize)
     {
         case IconBuffer::SIZE_SMALL:
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
             return 16;
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
             return 24;
 #endif
         case IconBuffer::SIZE_MEDIUM:
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             if (!wereVistaOrLater) return 32; //48x48 doesn't look sharp on XP
 #endif
             return 48;
@@ -632,7 +632,7 @@ int IconBuffer::getSize(IconSize icoSize)
 
 bool IconBuffer::readyForRetrieval(const Zstring& filename)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     if (iconSizeType == IconBuffer::SIZE_SMALL)
         if (isCheapExtension(getFileExtension(filename)))
             return true;
@@ -643,7 +643,7 @@ bool IconBuffer::readyForRetrieval(const Zstring& filename)
 
 Opt<wxBitmap> IconBuffer::retrieveFileIcon(const Zstring& filename)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //perf: let's read icons which don't need file access right away! No async delay justified!
     if (iconSizeType == IconBuffer::SIZE_SMALL) //non-thumbnail view, we need file type icons only!
     {

@@ -17,7 +17,7 @@ void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp);
 
 std::vector<DirectionConfig> extractDirectionCfg(const MainConfiguration& mainCfg);
 
-void redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirMapping& baseDirectory, std::function<void(const std::wstring&)> reportWarning);
+void redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirPair& baseDirectory, std::function<void(const std::wstring&)> reportWarning);
 void redetermineSyncDirection(const MainConfiguration& mainCfg,    FolderComparison& folderCmp,   std::function<void(const std::wstring&)> reportWarning);
 
 void setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj); //set new direction (recursively)
@@ -26,8 +26,8 @@ bool allElementsEqual(const FolderComparison& folderCmp);
 
 //filtering
 void applyFiltering  (FolderComparison& folderCmp, const MainConfiguration& mainCfg); //full filter apply
-void addHardFiltering(BaseDirMapping& baseMap, const Zstring& excludeFilter);     //exclude additional entries only
-void addSoftFiltering(BaseDirMapping& baseMap, const SoftFilter& timeSizeFilter); //exclude additional entries only
+void addHardFiltering(BaseDirPair& baseDirObj, const Zstring& excludeFilter);     //exclude additional entries only
+void addSoftFiltering(BaseDirPair& baseDirObj, const SoftFilter& timeSizeFilter); //exclude additional entries only
 
 void applyTimeSpanFilter(FolderComparison& folderCmp, const Int64& timeFrom, const Int64& timeTo); //overwrite current active/inactive settings
 

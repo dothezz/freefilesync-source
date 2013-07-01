@@ -1,6 +1,6 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
-// * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
@@ -10,13 +10,13 @@
 #include <cstdint>
 #include "type_traits.h"
 #include "basic_math.h"
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 #include <time.h> //Posix ::clock_gettime()
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 #include <mach/mach_time.h>
 #endif
 //#include <algorithm>
@@ -57,11 +57,11 @@ TickVal getTicks();         //return invalid value on error: !TickVal::isValid()
 class TickVal
 {
 public:
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     typedef LARGE_INTEGER NativeVal;
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     typedef timespec NativeVal;
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     typedef uint64_t NativeVal;
 #endif
 
@@ -71,16 +71,16 @@ public:
     inline friend
     std::int64_t dist(const TickVal& lhs, const TickVal& rhs)
     {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         return numeric::dist(lhs.val_.QuadPart, rhs.val_.QuadPart); //std::abs(a - b) can lead to overflow!
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
         const auto distSec  = numeric::dist(lhs.val_.tv_sec,  rhs.val_.tv_sec);
         const auto distNsec = numeric::dist(lhs.val_.tv_nsec, rhs.val_.tv_nsec);
 
         if (distSec > (std::numeric_limits<std::int64_t>::max() - distNsec) / 1000000000) //truncate instead of overflow!
             return std::numeric_limits<std::int64_t>::max();
         return distSec * 1000000000 + distNsec;
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
         return numeric::dist(lhs.val_, rhs.val_);
 #endif
     }
@@ -88,13 +88,13 @@ public:
     inline friend
     bool operator<(const TickVal& lhs, const TickVal& rhs)
     {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         return lhs.val_.QuadPart < rhs.val_.QuadPart;
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
         if (lhs.val_.tv_sec != rhs.val_.tv_sec)
             return lhs.val_.tv_sec < rhs.val_.tv_sec;
         return lhs.val_.tv_nsec < rhs.val_.tv_nsec;
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
         return lhs.val_ < rhs.val_;
 #endif
     }
@@ -109,17 +109,17 @@ private:
 inline
 std::int64_t ticksPerSec() //return 0 on error
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     LARGE_INTEGER frequency = {};
     if (!::QueryPerformanceFrequency(&frequency)) //MSDN promises: "The frequency cannot change while the system is running."
         return 0;
     static_assert(sizeof(std::int64_t) >= sizeof(frequency.QuadPart), "");
     return frequency.QuadPart;
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     return 1000000000; //precision: nanoseconds
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     mach_timebase_info_data_t tbi = {};
     if (::mach_timebase_info(&tbi) != KERN_SUCCESS)
         return 0;
@@ -131,18 +131,18 @@ std::int64_t ticksPerSec() //return 0 on error
 inline
 TickVal getTicks() //return !isValid() on error
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     LARGE_INTEGER now = {};
     if (!::QueryPerformanceCounter(&now)) //msdn: SetThreadAffinityMask() may be required if there are bugs in BIOS or HAL"
         return TickVal();
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     //gettimeofday() seems fine but is deprecated
     timespec now = {};
     if (::clock_gettime(CLOCK_MONOTONIC_RAW, &now) != 0) //CLOCK_MONOTONIC measures time reliably across processors!
         return TickVal();
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     uint64_t now = ::mach_absolute_time(); //can this call fail???
 #endif
     return TickVal(now);

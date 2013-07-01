@@ -42,7 +42,7 @@ SearchDlg::SearchDlg(wxWindow* parent, wxString& searchText, bool& respectCase) 
     searchText_(searchText),
     respectCase_(respectCase)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 

@@ -15,7 +15,7 @@
 #include "assert_static.h"
 #include "type_tools.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include "win.h"
 #endif
 
@@ -60,7 +60,7 @@ public:
 
     Int64& operator=(const Int64& rhs) { value = rhs.value; return *this; }
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     Int64(DWORD low, LONG high)
     {
         assert_static(sizeof(low) + sizeof(high) == sizeof(value));
@@ -139,7 +139,7 @@ public:
 
     UInt64& operator=(const UInt64& rhs) { value = rhs.value; return *this; }
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     UInt64(DWORD low, DWORD high)
     {
         assert_static(sizeof(low) + sizeof(high) == sizeof(value));
@@ -206,7 +206,7 @@ template <> inline UInt64 to(Int64 number) { checkRange<std::uint64_t>(number.va
 template <> inline Int64 to(UInt64 number) { checkRange<std:: int64_t>(number.value); return  Int64(number.value); }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 //convert FILETIME (number of 100-nanosecond intervals since January 1, 1601 UTC)
 //       to time_t (number of seconds since Jan. 1st 1970 UTC)
 //

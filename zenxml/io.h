@@ -1,5 +1,5 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
+// * This file is part of the zen::Xml project. It is distributed under the *
 // * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
@@ -20,9 +20,10 @@ namespace zen
 \brief Save and load byte streams from files
 */
 
-#if !defined(ZEN_PLATFORM_WINDOWS) && !defined(ZEN_PLATFORM_OTHER)
-#error Please specify your platform: #define ZEN_PLATFORM_WINDOWS or ZEN_PLATFORM_OTHER
+#if !defined(ZEN_WIN) && !defined(ZEN_LINUX) && !defined(ZEN_MAC)
+#error Please specify your platform: #define ZEN_WIN, ZEN_LINUX or ZEN_MAC
 #endif
+
 
 ///Exception thrown due to failed file I/O
 struct XmlFileError : public XmlError
@@ -35,7 +36,7 @@ struct XmlFileError : public XmlError
 };
 
 
-#ifdef ZEN_PLATFORM_WINDOWS
+#ifdef ZEN_WIN
 namespace implemenation //sad but true
 {
 template <class String> inline
@@ -64,7 +65,7 @@ FILE* fopen(const String& filename, const wchar_t* mode)
 template <class String>
 void saveStream(const std::string& stream, const String& filename) //throw XmlFileError
 {
-#ifdef ZEN_PLATFORM_WINDOWS
+#ifdef ZEN_WIN
     FILE* handle = implemenation::fopen(utfCvrtTo<std::wstring>(filename).c_str(), L"wb");
 #else
     FILE* handle = ::fopen(utfCvrtTo<std::string>(filename).c_str(), "w");
@@ -92,7 +93,7 @@ void saveStream(const std::string& stream, const String& filename) //throw XmlFi
 template <class String>
 std::string loadStream(const String& filename) //throw XmlFileError
 {
-#ifdef ZEN_PLATFORM_WINDOWS
+#ifdef ZEN_WIN
     FILE* handle = implemenation::fopen(utfCvrtTo<std::wstring>(filename).c_str(), L"rb");
 #else
     FILE* handle = ::fopen(utfCvrtTo<std::string>(filename).c_str(), "r");

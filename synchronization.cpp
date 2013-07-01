@@ -16,6 +16,7 @@
 #include <zen/file_handling.h>
 #include <zen/recycler.h>
 #include <zen/optional.h>
+#include <zen/symlink_target.h>
 #include "lib/resolve_path.h"
 #include "lib/db_file.h"
 #include "lib/dir_exist_async.h"
@@ -25,7 +26,7 @@
 #include "lib/status_handler_impl.h"
 #include "lib/versioning.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/long_path_prefix.h>
 #include <zen/perf.h>
 #include "lib/shadow.h"
@@ -60,7 +61,7 @@ void SyncStatistics::init()
 SyncStatistics::SyncStatistics(const FolderComparison& folderCmp)
 {
     init();
-    std::for_each(begin(folderCmp), end(folderCmp), [&](const BaseDirMapping& baseMap) { recurse(baseMap); });
+    std::for_each(begin(folderCmp), end(folderCmp), [&](const BaseDirPair& baseDirObj) { recurse(baseDirObj); });
 }
 
 
@@ -71,7 +72,7 @@ SyncStatistics::SyncStatistics(const HierarchyObject&  hierObj)
 }
 
 
-SyncStatistics::SyncStatistics(const FileMapping& fileObj)
+SyncStatistics::SyncStatistics(const FilePair& fileObj)
 {
     init();
     calcStats(fileObj);
@@ -82,9 +83,9 @@ SyncStatistics::SyncStatistics(const FileMapping& fileObj)
 inline
 void SyncStatistics::recurse(const HierarchyObject& hierObj)
 {
-    std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](const DirMapping&     dirObj ) { calcStats(dirObj ); });
-    std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](const FileMapping&    fileObj) { calcStats(fileObj); });
-    std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](const SymLinkMapping& linkObj) { calcStats(linkObj); });
+    std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](const DirPair&     dirObj ) { calcStats(dirObj ); });
+    std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](const FilePair&    fileObj) { calcStats(fileObj); });
+    std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](const SymlinkPair& linkObj) { calcStats(linkObj); });
 
     rowsTotal += hierObj.refSubDirs(). size();
     rowsTotal += hierObj.refSubFiles().size();
@@ -93,7 +94,7 @@ void SyncStatistics::recurse(const HierarchyObject& hierObj)
 
 
 inline
-void SyncStatistics::calcStats(const FileMapping& fileObj)
+void SyncStatistics::calcStats(const FilePair& fileObj)
 {
     switch (fileObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
@@ -157,7 +158,7 @@ void SyncStatistics::calcStats(const FileMapping& fileObj)
 
 
 inline
-void SyncStatistics::calcStats(const SymLinkMapping& linkObj)
+void SyncStatistics::calcStats(const SymlinkPair& linkObj)
 {
     switch (linkObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
@@ -204,7 +205,7 @@ void SyncStatistics::calcStats(const SymLinkMapping& linkObj)
 
 
 inline
-void SyncStatistics::calcStats(const DirMapping& dirObj)
+void SyncStatistics::calcStats(const DirPair& dirObj)
 {
     switch (dirObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
@@ -324,25 +325,17 @@ public:
     //clean-up temporary directory (recycle bin optimization)
     void tryCleanup(bool allowUserCallback = true); //throw FileError -> call this in non-exceptional coding, i.e. somewhere after sync!
 
-    template <class Function> void removeFileUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion); //throw FileError
-    template <class Function> void removeDirUpdating (const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion); //reports ONLY data delta via updateProcessedData()!
-    template <class Function> void removeLinkUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion); //
+    template <class Function> void removeFileUpdating(const Zstring& fullName, const Zstring& relativeName, const Int64& bytesExpected, Function notifyItemDeletion); //throw FileError
+    template <class Function> void removeDirUpdating (const Zstring& fullName, const Zstring& relativeName, const Int64& bytesExpected, Function notifyItemDeletion); //reports ONLY data delta via updateProcessedData()!
+    template <class Function> void removeLinkUpdating(const Zstring& fullName, const Zstring& relativeName, const Int64& bytesExpected, Function notifyItemDeletion); //
 
     const std::wstring& getTxtRemovingFile   () const { return txtRemovingFile;      } //
     const std::wstring& getTxtRemovingSymLink() const { return txtRemovingSymlink;   } //buffered status texts
     const std::wstring& getTxtRemovingDir    () const { return txtRemovingDirectory; } //
 
-    //evaluate whether a deletion will actually free space within a volume
-    bool deletionFreesSpace() const;
-#ifdef FFS_WIN
-    bool recyclerFallbackOnDelete() const { return recFallbackDelPermantently; }
-#endif
-
 private:
     DeletionHandling(const DeletionHandling&);
     DeletionHandling& operator=(const DeletionHandling&);
-
-    void setDeletionPolicy(DeletionPolicy newPolicy);
 
     FileVersioner& getOrCreateVersioner() //throw FileError! => dont create in DeletionHandling()!!!
     {
@@ -357,16 +350,14 @@ private:
     const VersioningStyle versioningStyle_;
     const TimeComp timeStamp_;
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     Zstring getOrCreateRecyclerTempDirPf(); //throw FileError
     Zstring recyclerTmpDir; //temporary folder holding files/folders for *deferred* recycling
     std::vector<Zstring> toBeRecycled; //full path of files located in temporary folder, waiting for batch-recycling
-
-    bool recFallbackDelPermantently;
 #endif
 
     //magage three states: allow dynamic fallback from recycler to permanent deletion
-    DeletionPolicy deletionPolicy_;
+    const DeletionPolicy deletionPolicy_;
     std::unique_ptr<FileVersioner> versioner; //used for DELETE_TO_VERSIONING; throw FileError in constructor => create on demand!
 
     //buffer status texts:
@@ -376,23 +367,6 @@ private:
 
     bool cleanedUp;
 };
-
-namespace
-{
-#ifdef FFS_WIN
-//recycleBinStatus() blocks seriously if recycle bin is really full and drive is slow
-StatusRecycler recycleBinStatusUpdating(const Zstring& dirname, ProcessCallback& procCallback)
-{
-    procCallback.reportStatus(replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(dirname), false));
-
-    auto ft = async([=] { return recycleBinStatus(dirname); });
-
-    while (!ft.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
-        procCallback.requestUiRefresh(); //may throw!
-    return ft.get();
-}
-#endif
-}
 
 
 DeletionHandling::DeletionHandling(DeletionPolicy handleDel, //nothrow!
@@ -406,29 +380,9 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel, //nothrow!
     versioningDir_(versioningDir),
     versioningStyle_(versioningStyle),
     timeStamp_(timeStamp),
-#ifdef FFS_WIN
-    recFallbackDelPermantently(false),
-#endif
-    deletionPolicy_(DELETE_TO_RECYCLER),
+    deletionPolicy_(handleDel),
     cleanedUp(false)
 {
-#ifdef FFS_WIN
-    if (!baseDirPf.empty())
-        if (handleDel == DELETE_TO_RECYCLER && recycleBinStatusUpdating(baseDirPf, procCallback_) != STATUS_REC_EXISTS)
-        {
-            handleDel = DELETE_PERMANENTLY; //Windows' ::SHFileOperation() will do this anyway, but we have a better and faster deletion routine (e.g. on networks)
-            recFallbackDelPermantently = true;
-        }
-#endif
-
-    setDeletionPolicy(handleDel);
-}
-
-
-void DeletionHandling::setDeletionPolicy(DeletionPolicy newPolicy)
-{
-    deletionPolicy_ = newPolicy;
-
     switch (deletionPolicy_)
     {
         case DELETE_PERMANENTLY:
@@ -451,7 +405,8 @@ void DeletionHandling::setDeletionPolicy(DeletionPolicy newPolicy)
     }
 }
 
-#ifdef FFS_WIN
+
+#ifdef ZEN_WIN
 namespace
 {
 class CallbackMassRecycling : public CallbackRecycling
@@ -533,7 +488,7 @@ void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError
                 break;
 
             case DELETE_TO_RECYCLER:
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
                 if (!recyclerTmpDir.empty())
                 {
                     //move content of temporary directory to recycle bin in a single call
@@ -636,11 +591,10 @@ private:
 
 
 template <class Function>
-void DeletionHandling::removeDirUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion) //throw FileError
+void DeletionHandling::removeDirUpdating(const Zstring& fullName,
+                                         const Zstring& relativeName,
+                                         const Int64& bytesExpected, Function notifyItemDeletion) //throw FileError
 {
-    assert(!baseDirPf_.empty());
-    const Zstring fullName = baseDirPf_ + relativeName;
-
     Int64 bytesReported;
     ScopeGuard guardStatistics = makeGuard([&] { procCallback_.updateTotalData(0, bytesReported); }); //error = unexpected increase of total workload
 
@@ -655,22 +609,29 @@ void DeletionHandling::removeDirUpdating(const Zstring& relativeName, Int64 byte
 
         case DELETE_TO_RECYCLER:
         {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             const Zstring targetDir = getOrCreateRecyclerTempDirPf() + relativeName; //throw FileError
             bool deleted = false;
 
             auto moveToTempDir = [&]
             {
-                //performance optimization: Instead of moving each object into recycle bin separately,
-                //we rename them one by one into a temporary directory and batch-recycle this directory after sync
-                renameFile(fullName, targetDir); //throw FileError
-                this->toBeRecycled.push_back(targetDir);
-                deleted = true;
+                try
+                {
+                    //performance optimization: Instead of moving each object into recycle bin separately,
+                    //we rename them one by one into a temporary directory and batch-recycle this directory after sync
+                    renameFile(fullName, targetDir); //throw FileError, ErrorDifferentVolume
+                    this->toBeRecycled.push_back(targetDir);
+                    deleted = true;
+                }
+                catch (ErrorDifferentVolume&) //MoveFileEx() returns ERROR_PATH_NOT_FOUND *before* considering ERROR_NOT_SAME_DEVICE! => we have to create targetDir in any case!
+                {
+                    deleted = recycleOrDelete(fullName); //throw FileError
+                }
             };
 
             try
             {
-                moveToTempDir(); //throw FileError
+                moveToTempDir(); //throw FileError, ErrorDifferentVolume
             }
             catch (FileError&)
             {
@@ -686,7 +647,7 @@ void DeletionHandling::removeDirUpdating(const Zstring& relativeName, Int64 byte
                         throw;
                 }
             }
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
             const bool deleted = recycleOrDelete(fullName); //throw FileError
 #endif
             if (deleted)
@@ -710,11 +671,10 @@ void DeletionHandling::removeDirUpdating(const Zstring& relativeName, Int64 byte
 
 
 template <class Function>
-void DeletionHandling::removeFileUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion) //throw FileError
+void DeletionHandling::removeFileUpdating(const Zstring& fullName,
+                                          const Zstring& relativeName,
+                                          const Int64& bytesExpected, Function notifyItemDeletion) //throw FileError
 {
-    assert(!baseDirPf_.empty());
-    const Zstring fullName = baseDirPf_ + relativeName;
-
     Int64 bytesReported;
     auto guardStatistics = makeGuard([&] { procCallback_.updateTotalData(0, bytesReported); }); //error = unexpected increase of total workload
     bool deleted = false;
@@ -726,22 +686,29 @@ void DeletionHandling::removeFileUpdating(const Zstring& relativeName, Int64 byt
             break;
 
         case DELETE_TO_RECYCLER:
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             {
                 const Zstring targetFile = getOrCreateRecyclerTempDirPf() + relativeName; //throw FileError
 
                 auto moveToTempDir = [&]
                 {
-                    //performance optimization: Instead of moving each object into recycle bin separately,
-                    //we rename them one by one into a temporary directory and batch-recycle this directory after sync
-                    renameFile(fullName, targetFile); //throw FileError
-                    this->toBeRecycled.push_back(targetFile);
-                    deleted = true;
+                    try
+                    {
+                        //performance optimization: Instead of moving each object into recycle bin separately,
+                        //we rename them one by one into a temporary directory and batch-recycle this directory after sync
+                        renameFile(fullName, targetFile); //throw FileError, ErrorDifferentVolume
+                        this->toBeRecycled.push_back(targetFile);
+                        deleted = true;
+                    }
+                    catch (ErrorDifferentVolume&) //MoveFileEx() returns ERROR_PATH_NOT_FOUND *before* considering ERROR_NOT_SAME_DEVICE! => we have to create targetDir in any case!
+                    {
+                        deleted = recycleOrDelete(fullName); //throw FileError
+                    }
                 };
 
                 try
                 {
-                    moveToTempDir(); //throw FileError
+                    moveToTempDir(); //throw FileError, ErrorDifferentVolume
                 }
                 catch (FileError&)
                 {
@@ -758,7 +725,7 @@ void DeletionHandling::removeFileUpdating(const Zstring& relativeName, Int64 byt
                     }
                 }
             }
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
             deleted = recycleOrDelete(fullName); //throw FileError
 #endif
             break;
@@ -794,66 +761,46 @@ void DeletionHandling::removeFileUpdating(const Zstring& relativeName, Int64 byt
         procCallback_.updateTotalData(0, bytesReported - bytesExpected); //noexcept!
 }
 
+
 template <class Function> inline
-void DeletionHandling::removeLinkUpdating(const Zstring& relativeName, Int64 bytesExpected, Function notifyItemDeletion) //throw FileError
+void DeletionHandling::removeLinkUpdating(const Zstring& fullName, const Zstring& relativeName, const Int64& bytesExpected, Function notifyItemDeletion) //throw FileError
 {
-    const Zstring fullName = baseDirPf_ + relativeName;
     switch (getSymlinkType(fullName))
     {
         case SYMLINK_TYPE_DIR:
-            return removeDirUpdating(relativeName, bytesExpected, notifyItemDeletion); //throw FileError
+            return removeDirUpdating(fullName, relativeName, bytesExpected, notifyItemDeletion); //throw FileError
 
         case SYMLINK_TYPE_FILE:
         case SYMLINK_TYPE_UNKNOWN:
-            return removeFileUpdating(relativeName, bytesExpected, notifyItemDeletion); //throw FileError
+            return removeFileUpdating(fullName, relativeName, bytesExpected, notifyItemDeletion); //throw FileError
     }
-}
-
-
-//evaluate whether a deletion will actually free space within a volume
-bool DeletionHandling::deletionFreesSpace() const
-{
-    switch (deletionPolicy_)
-    {
-        case DELETE_PERMANENTLY:
-            return true;
-        case DELETE_TO_RECYCLER:
-            return false; //in general... (unless Recycle Bin is full)
-        case DELETE_TO_VERSIONING:
-            switch (zen::onSameVolume(baseDirPf_, versioningDir_))
-            {
-                case IS_SAME_YES:
-                    return false;
-                case IS_SAME_NO:
-                    return true; //but other volume (versioningDir) may become full...
-                case IS_SAME_CANT_SAY:
-                    return true; //a rough guess!
-            }
-    }
-    assert(false);
-    return true;
 }
 
 //------------------------------------------------------------------------------------------------------------
 
 namespace
 {
-class DiskSpaceNeeded
+/*
+  DELETE_PERMANENTLY:   deletion frees space
+  DELETE_TO_RECYCLER:   won't free space until recycler is full, but then frees space
+  DELETE_TO_VERSIONING: depends on whether versioning folder is on a different volume
+-> if deleted item is a followed symlink, no space is freed
+-> created/updated/deleted item may be on a different volume than base directory: consider symlinks, junctions!
+
+=> generally assume deletion frees space; may avoid false positive disk space warnings for recycler and versioning
+*/
+class MinimumDiskSpaceNeeded
 {
 public:
-    static std::pair<Int64, Int64> calculate(const BaseDirMapping& baseObj, bool freeSpaceDelLeft, bool freeSpaceDelRight)
+    static std::pair<Int64, Int64> calculate(const BaseDirPair& baseObj)
     {
-        DiskSpaceNeeded inst(baseObj, freeSpaceDelLeft, freeSpaceDelRight);
+        MinimumDiskSpaceNeeded inst;
+        inst.recurse(baseObj);
         return std::make_pair(inst.spaceNeededLeft, inst.spaceNeededRight);
     }
 
 private:
-    DiskSpaceNeeded(const BaseDirMapping& baseObj, bool freeSpaceDelLeft, bool freeSpaceDelRight) :
-        freeSpaceDelLeft_(freeSpaceDelLeft),
-        freeSpaceDelRight_(freeSpaceDelRight)
-    {
-        recurse(baseObj);
-    }
+    MinimumDiskSpaceNeeded() {}
 
     void recurse(const HierarchyObject& hierObj)
     {
@@ -872,24 +819,24 @@ private:
                     break;
 
                 case SO_DELETE_LEFT:
-                    if (freeSpaceDelLeft_)
-                        spaceNeededLeft -= to<Int64>(it->getFileSize<LEFT_SIDE>());
+                    //if (freeSpaceDelLeft_)
+                    spaceNeededLeft -= to<Int64>(it->getFileSize<LEFT_SIDE>());
                     break;
 
                 case SO_DELETE_RIGHT:
-                    if (freeSpaceDelRight_)
-                        spaceNeededRight -= to<Int64>(it->getFileSize<RIGHT_SIDE>());
+                    //if (freeSpaceDelRight_)
+                    spaceNeededRight -= to<Int64>(it->getFileSize<RIGHT_SIDE>());
                     break;
 
                 case SO_OVERWRITE_LEFT:
-                    if (freeSpaceDelLeft_)
-                        spaceNeededLeft -= to<Int64>(it->getFileSize<LEFT_SIDE>());
+                    //if (freeSpaceDelLeft_)
+                    spaceNeededLeft -= to<Int64>(it->getFileSize<LEFT_SIDE>());
                     spaceNeededLeft += to<Int64>(it->getFileSize<RIGHT_SIDE>());
                     break;
 
                 case SO_OVERWRITE_RIGHT:
-                    if (freeSpaceDelRight_)
-                        spaceNeededRight -= to<Int64>(it->getFileSize<RIGHT_SIDE>());
+                    //if (freeSpaceDelRight_)
+                    spaceNeededRight -= to<Int64>(it->getFileSize<RIGHT_SIDE>());
                     spaceNeededRight += to<Int64>(it->getFileSize<LEFT_SIDE>());
                     break;
 
@@ -914,9 +861,6 @@ private:
         //      recurse(subDir);
     }
 
-    const bool freeSpaceDelLeft_;
-    const bool freeSpaceDelRight_;
-
     Int64 spaceNeededLeft;
     Int64 spaceNeededRight;
 };
@@ -930,13 +874,13 @@ public:
                           bool verifyCopiedFiles,
                           bool copyFilePermissions,
                           bool transactionalFileCopy,
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
                           shadow::ShadowCopy* shadowCopyHandler,
 #endif
                           DeletionHandling& delHandlingLeft,
                           DeletionHandling& delHandlingRight) :
         procCallback_(procCallback),
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         shadowCopyHandler_(shadowCopyHandler),
 #endif
         delHandlingLeft_(delHandlingLeft),
@@ -954,11 +898,11 @@ public:
         txtMovingFile       (_("Moving file %x to %y"))
     {}
 
-    void startSync(BaseDirMapping& baseMap)
+    void startSync(BaseDirPair& baseDirObj)
     {
-        runZeroPass(baseMap);       //first process file moves
-        runPass<PASS_ONE>(baseMap); //delete files (or overwrite big ones with smaller ones)
-        runPass<PASS_TWO>(baseMap); //copy rest
+        runZeroPass(baseDirObj);       //first process file moves
+        runPass<PASS_ONE>(baseDirObj); //delete files (or overwrite big ones with smaller ones)
+        runPass<PASS_TWO>(baseDirObj); //copy rest
     }
 
 private:
@@ -969,28 +913,28 @@ private:
         PASS_NEVER //skip
     };
 
-    static PassId getPass(const FileMapping&    fileObj);
-    static PassId getPass(const SymLinkMapping& linkObj);
-    static PassId getPass(const DirMapping&     dirObj);
+    static PassId getPass(const FilePair&    fileObj);
+    static PassId getPass(const SymlinkPair& linkObj);
+    static PassId getPass(const DirPair&     dirObj);
 
     template <SelectedSide side>
-    void prepare2StepMove(FileMapping& sourceObj, FileMapping& targetObj); //throw FileError
+    void prepare2StepMove(FilePair& sourceObj, FilePair& targetObj); //throw FileError
     bool createParentDir(FileSystemObject& fsObj); //throw FileError
     template <SelectedSide side>
-    void manageFileMove(FileMapping& sourceObj, FileMapping& targetObj); //throw FileError
+    void manageFileMove(FilePair& sourceObj, FilePair& targetObj); //throw FileError
 
     void runZeroPass(HierarchyObject& hierObj);
     template <PassId pass>
     void runPass(HierarchyObject& hierObj);
 
-    void synchronizeFile(FileMapping& fileObj);
-    template <SelectedSide side> void synchronizeFileInt(FileMapping& fileObj, SyncOperation syncOp);
+    void synchronizeFile(FilePair& fileObj);
+    template <SelectedSide side> void synchronizeFileInt(FilePair& fileObj, SyncOperation syncOp);
 
-    void synchronizeLink(SymLinkMapping& linkObj);
-    template <SelectedSide sideTrg> void synchronizeLinkInt(SymLinkMapping& linkObj, SyncOperation syncOp);
+    void synchronizeLink(SymlinkPair& linkObj);
+    template <SelectedSide sideTrg> void synchronizeLinkInt(SymlinkPair& linkObj, SyncOperation syncOp);
 
-    void synchronizeFolder(DirMapping& dirObj);
-    template <SelectedSide sideTrg> void synchronizeFolderInt(DirMapping& dirObj, SyncOperation syncOp);
+    void synchronizeFolder(DirPair& dirObj);
+    template <SelectedSide sideTrg> void synchronizeFolderInt(DirPair& dirObj, SyncOperation syncOp);
 
     void reportStatus(const std::wstring& rawText, const Zstring& objname) const { procCallback_.reportStatus(replaceCpy(rawText, L"%x", fmtFileName(objname))); };
     void reportInfo  (const std::wstring& rawText, const Zstring& objname) const { procCallback_.reportInfo  (replaceCpy(rawText, L"%x", fmtFileName(objname))); };
@@ -1001,15 +945,15 @@ private:
         procCallback_.reportInfo(replaceCpy(replaceCpy(rawText, L"%x", L"\n" + fmtFileName(objname1)), L"%y", L"\n" + fmtFileName(objname2)));
     };
 
-    template <SelectedSide sideTrg, class Function>
-    FileAttrib copyFileUpdatingTo(const FileMapping& fileObj, Function delTargetCommand) const; //throw FileError; reports data delta via updateProcessedData()
+    template <class Function>
+    FileAttrib copyFileUpdating(const Zstring& sourceFile, const Zstring& targetFile, const Int64& bytesExpected, Function delTargetCommand) const; //throw FileError; reports data delta via updateProcessedData()
     void verifyFileCopy(const Zstring& source, const Zstring& target) const;
 
     template <SelectedSide side>
     DeletionHandling& getDelHandling();
 
     ProcessCallback& procCallback_;
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     shadow::ShadowCopy* shadowCopyHandler_; //optional!
 #endif
     DeletionHandling& delHandlingLeft_;
@@ -1070,11 +1014,11 @@ III) c -> d      caveat: move-sequence needs to be processed in correct order!
 
 namespace
 {
-template <class Mapping> inline
-bool haveNameClash(const Zstring& shortname, Mapping& m)
+template <class List> inline
+bool haveNameClash(const Zstring& shortname, List& m)
 {
     return std::any_of(m.begin(), m.end(),
-    [&](const typename Mapping::value_type& obj) { return EqualFilename()(obj.getObjShortName(), shortname); });
+    [&](const typename List::value_type& obj) { return EqualFilename()(obj.getObjShortName(), shortname); });
 }
 
 
@@ -1092,8 +1036,8 @@ Zstring findUnusedTempName(const Zstring& filename)
 
 
 template <SelectedSide side>
-void SynchronizeFolderPair::prepare2StepMove(FileMapping& sourceObj,
-                                             FileMapping& targetObj) //throw FileError
+void SynchronizeFolderPair::prepare2StepMove(FilePair& sourceObj,
+                                             FilePair& targetObj) //throw FileError
 {
     const Zstring& source = sourceObj.getFullName<side>();
     const Zstring& tmpTarget = findUnusedTempName(sourceObj.getBaseDirPf<side>() + sourceObj.getShortName<side>());
@@ -1103,20 +1047,20 @@ void SynchronizeFolderPair::prepare2StepMove(FileMapping& sourceObj,
 
     reportInfo(txtMovingFile, source, tmpTarget);
 
-	warn_static("was wenn diff volume: symlink aliasing!") //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+    warn_static("was wenn diff volume: symlink aliasing!") //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 
     renameFile(source, tmpTarget); //throw FileError
 
     //update file hierarchy
-    const FileDescriptor descrSource(sourceObj.getLastWriteTime<side>(),
-                                     sourceObj.getFileSize     <side>(),
-                                     sourceObj.getFileId       <side>());
+    const FileDescriptor descrSource(sourceObj.getLastWriteTime <side>(),
+                                     sourceObj.getFileSize      <side>(),
+                                     sourceObj.getFileId        <side>(),
+                                     sourceObj.isFollowedSymlink<side>());
 
-    sourceObj.removeObject<side>();
-
-    FileMapping& tempFile = sourceObj.root().addSubFile<side>(afterLast(tmpTarget, FILE_NAME_SEPARATOR), descrSource);
-    static_assert(IsSameType<FixedList<FileMapping>, HierarchyObject::SubFileVec>::value,
-                  "ATTENTION: we're adding to the file list WHILE looping over it! This is only working because FixedList iterators are not invalidated by this!");
+    FilePair& tempFile = sourceObj.root().addSubFile<side>(afterLast(tmpTarget, FILE_NAME_SEPARATOR), descrSource);
+    static_assert(IsSameType<FixedList<FilePair>, HierarchyObject::SubFileVec>::value,
+                  "ATTENTION: we're adding to the file list WHILE looping over it! This is only working because FixedList iterators are not invalidated by insertion!");
+    sourceObj.removeObject<side>(); //remove only *after* evaluating "sourceObj, side"!
 
     //prepare move in second pass
     tempFile.setSyncDir(side == LEFT_SIDE ? SYNC_DIR_LEFT : SYNC_DIR_RIGHT);
@@ -1131,7 +1075,7 @@ void SynchronizeFolderPair::prepare2StepMove(FileMapping& sourceObj,
 
 bool SynchronizeFolderPair::createParentDir(FileSystemObject& fsObj) //throw FileError, "false" on name clash
 {
-    if (DirMapping* parentDir = dynamic_cast<DirMapping*>(&fsObj.parent()))
+    if (DirPair* parentDir = dynamic_cast<DirPair*>(&fsObj.parent()))
     {
         if (!createParentDir(*parentDir))
             return false;
@@ -1154,15 +1098,15 @@ bool SynchronizeFolderPair::createParentDir(FileSystemObject& fsObj) //throw Fil
 
 
 template <SelectedSide side>
-void SynchronizeFolderPair::manageFileMove(FileMapping& sourceObj,
-                                           FileMapping& targetObj) //throw FileError
+void SynchronizeFolderPair::manageFileMove(FilePair& sourceObj,
+                                           FilePair& targetObj) //throw FileError
 {
     assert((sourceObj.getSyncOperation() == SO_MOVE_LEFT_SOURCE  && targetObj.getSyncOperation() == SO_MOVE_LEFT_TARGET  && side == LEFT_SIDE) ||
            (sourceObj.getSyncOperation() == SO_MOVE_RIGHT_SOURCE && targetObj.getSyncOperation() == SO_MOVE_RIGHT_TARGET && side == RIGHT_SIDE));
 
     const bool sourceWillBeDeleted = [&]() -> bool
     {
-        if (DirMapping* parentDir = dynamic_cast<DirMapping*>(&sourceObj.parent()))
+        if (DirPair* parentDir = dynamic_cast<DirPair*>(&sourceObj.parent()))
         {
             switch (parentDir->getSyncOperation()) //evaluate comparison result and sync direction
             {
@@ -1188,7 +1132,7 @@ void SynchronizeFolderPair::manageFileMove(FileMapping& sourceObj,
         return false;
     }();
 
-    auto haveNameClash = [](const FileMapping& fileObj)
+    auto haveNameClash = [](const FilePair& fileObj)
     {
         return ::haveNameClash(fileObj.getObjShortName(), fileObj.parent().refSubLinks()) ||
                ::haveNameClash(fileObj.getObjShortName(), fileObj.parent().refSubDirs());
@@ -1209,12 +1153,12 @@ void SynchronizeFolderPair::manageFileMove(FileMapping& sourceObj,
 }
 
 
-    //search for file move-operations
+//search for file move-operations
 void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
 {
     for (auto it = hierObj.refSubFiles().begin(); it != hierObj.refSubFiles().end(); ++it) //VS 2010 crashes if we use for_each + lambda here...
     {
-        FileMapping& fileObj = *it;
+        FilePair& fileObj = *it;
 
         const SyncOperation syncOp = fileObj.getSyncOperation();
         switch (syncOp) //evaluate comparison result and sync direction
@@ -1222,8 +1166,8 @@ void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
             case SO_MOVE_LEFT_SOURCE:
             case SO_MOVE_RIGHT_SOURCE:
             {
-                FileMapping* sourceObj = &fileObj;
-                if (FileMapping* targetObj = dynamic_cast<FileMapping*>(FileSystemObject::retrieve(fileObj.getMoveRef())))
+                FilePair* sourceObj = &fileObj;
+                if (FilePair* targetObj = dynamic_cast<FilePair*>(FileSystemObject::retrieve(fileObj.getMoveRef())))
                 {
                     zen::Opt<std::wstring> errMsg = tryReportingError2([&]
                     {
@@ -1275,7 +1219,7 @@ void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
     }
 
     std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
-    [&](DirMapping& dirObj) { this->runZeroPass(dirObj); /*recurse */ });
+    [&](DirPair& dirObj) { this->runZeroPass(dirObj); /*recurse */ });
 }
 
 //---------------------------------------------------------------------------------------------------------------
@@ -1285,7 +1229,7 @@ void SynchronizeFolderPair::runZeroPass(HierarchyObject& hierObj)
 // - support change in type: overwrite file by directory, symlink by file, ect.
 
 inline
-SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const FileMapping& fileObj)
+SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const FilePair& fileObj)
 {
     switch (fileObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
@@ -1308,12 +1252,14 @@ SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const FileMapping& 
 
         case SO_CREATE_NEW_LEFT:
         case SO_CREATE_NEW_RIGHT:
-        case SO_DO_NOTHING:
-        case SO_EQUAL:
-        case SO_UNRESOLVED_CONFLICT:
         case SO_COPY_METADATA_TO_LEFT:
         case SO_COPY_METADATA_TO_RIGHT:
             return PASS_TWO;
+
+        case SO_DO_NOTHING:
+        case SO_EQUAL:
+        case SO_UNRESOLVED_CONFLICT:
+            return PASS_NEVER;
     }
     assert(false);
     return PASS_TWO; //dummy
@@ -1321,7 +1267,7 @@ SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const FileMapping& 
 
 
 inline
-SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const SymLinkMapping& linkObj)
+SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const SymlinkPair& linkObj)
 {
     switch (linkObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
@@ -1329,21 +1275,23 @@ SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const SymLinkMappin
         case SO_DELETE_RIGHT:
             return PASS_ONE; //make sure to delete symlinks in first pass, and equally named file or dir in second pass: usecase "overwrite symlink with regular file"!
 
+        case SO_OVERWRITE_LEFT:
+        case SO_OVERWRITE_RIGHT:
+        case SO_CREATE_NEW_LEFT:
+        case SO_CREATE_NEW_RIGHT:
+        case SO_COPY_METADATA_TO_LEFT:
+        case SO_COPY_METADATA_TO_RIGHT:
+            return PASS_TWO;
+
         case SO_MOVE_LEFT_SOURCE:
         case SO_MOVE_RIGHT_SOURCE:
         case SO_MOVE_LEFT_TARGET:
         case SO_MOVE_RIGHT_TARGET:
             assert(false);
-        case SO_OVERWRITE_LEFT:
-        case SO_OVERWRITE_RIGHT:
-        case SO_CREATE_NEW_LEFT:
-        case SO_CREATE_NEW_RIGHT:
         case SO_DO_NOTHING:
         case SO_EQUAL:
         case SO_UNRESOLVED_CONFLICT:
-        case SO_COPY_METADATA_TO_LEFT:
-        case SO_COPY_METADATA_TO_RIGHT:
-            return PASS_TWO;
+            return PASS_NEVER;
     }
     assert(false);
     return PASS_TWO; //dummy
@@ -1351,13 +1299,19 @@ SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const SymLinkMappin
 
 
 inline
-SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const DirMapping& dirObj)
+SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const DirPair& dirObj)
 {
     switch (dirObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
         case SO_DELETE_LEFT:
         case SO_DELETE_RIGHT:
             return PASS_ONE;
+
+        case SO_CREATE_NEW_LEFT:
+        case SO_CREATE_NEW_RIGHT:
+        case SO_COPY_METADATA_TO_LEFT:
+        case SO_COPY_METADATA_TO_RIGHT:
+            return PASS_TWO;
 
         case SO_OVERWRITE_LEFT:
         case SO_OVERWRITE_RIGHT:
@@ -1366,14 +1320,10 @@ SynchronizeFolderPair::PassId SynchronizeFolderPair::getPass(const DirMapping& d
         case SO_MOVE_LEFT_TARGET:
         case SO_MOVE_RIGHT_TARGET:
             assert(false);
-        case SO_CREATE_NEW_LEFT:
-        case SO_CREATE_NEW_RIGHT:
         case SO_DO_NOTHING:
         case SO_EQUAL:
         case SO_UNRESOLVED_CONFLICT:
-        case SO_COPY_METADATA_TO_LEFT:
-        case SO_COPY_METADATA_TO_RIGHT:
-            return PASS_TWO;
+            return PASS_NEVER;
     }
     assert(false);
     return PASS_TWO; //dummy
@@ -1385,7 +1335,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
 {
     //synchronize files:
     std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-                  [&](FileMapping& fileObj)
+                  [&](FilePair& fileObj)
     {
         if (pass == this->getPass(fileObj)) //"this->" required by two-pass lookup as enforced by GCC 4.7
             tryReportingError2([&] { synchronizeFile(fileObj); }, procCallback_);
@@ -1393,7 +1343,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
 
     //synchronize symbolic links:
     std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-                  [&](SymLinkMapping& linkObj)
+                  [&](SymlinkPair& linkObj)
     {
         if (pass == this->getPass(linkObj))
             tryReportingError2([&] { synchronizeLink(linkObj); }, procCallback_);
@@ -1401,7 +1351,7 @@ void SynchronizeFolderPair::runPass(HierarchyObject& hierObj)
 
     //synchronize folders:
     std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
-                  [&](DirMapping& dirObj)
+                  [&](DirPair& dirObj)
     {
         if (pass == this->getPass(dirObj))
             tryReportingError2([&] { synchronizeFolder(dirObj); }, procCallback_);
@@ -1446,7 +1396,7 @@ Opt<SelectedSide> getTargetDirection(SyncOperation syncOp)
 
 
 inline
-void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj)
+void SynchronizeFolderPair::synchronizeFile(FilePair& fileObj)
 {
     const SyncOperation syncOp = fileObj.getSyncOperation();
 
@@ -1461,7 +1411,7 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj)
 
 
 template <SelectedSide sideTrg>
-void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperation syncOp)
+void SynchronizeFolderPair::synchronizeFileInt(FilePair& fileObj, SyncOperation syncOp)
 {
     static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
 
@@ -1470,8 +1420,8 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
         case SO_CREATE_NEW_LEFT:
         case SO_CREATE_NEW_RIGHT:
         {
-            if (const DirMapping* parentDir = dynamic_cast<DirMapping*>(&fileObj.parent()))
-                if (parentDir->isEmpty<sideTrg>()) //BaseDirMapping OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
+            if (const DirPair* parentDir = dynamic_cast<DirPair*>(&fileObj.parent()))
+                if (parentDir->isEmpty<sideTrg>()) //BaseDirPair OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
                     return; //if parent directory creation failed, there's no reason to show more errors!
 
             const Zstring& target = fileObj.getBaseDirPf<sideTrg>() + fileObj.getRelativeName<sideSrc>(); //can't use "getFullName" as target is not yet existing
@@ -1479,21 +1429,26 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
 
             try
             {
-                const FileAttrib newAttr = copyFileUpdatingTo<sideTrg>(fileObj, [] {} /*no target to delete*/); //throw FileError
+                const FileAttrib newAttr = copyFileUpdating(fileObj.getFullName<sideSrc>(),
+                                                            target,
+                                                            to<Int64>(fileObj.getFileSize<sideSrc>()), [] {} /*no target to delete*/); //throw FileError
+                //update FilePair
+                fileObj.setSyncedTo<sideTrg>(fileObj.getShortName<sideSrc>(), newAttr.fileSize,
+                                             newAttr.modificationTime, //target time set from source
+                                             newAttr.modificationTime,
+                                             newAttr.targetFileId,
+                                             newAttr.sourceFileId,
+                                             false, fileObj.isFollowedSymlink<sideSrc>());
 
-                const FileDescriptor descrSource(newAttr.modificationTime, newAttr.fileSize, newAttr.sourceFileId);
-                const FileDescriptor descrTarget(newAttr.modificationTime, newAttr.fileSize, newAttr.targetFileId);
-                fileObj.syncTo<sideTrg>(descrTarget, &descrSource); //update FileMapping
-
-                procCallback_.updateProcessedData(1, 0); //processed bytes are reported in copyFileUpdatingTo()!
+                procCallback_.updateProcessedData(1, 0); //processed bytes are reported in copyFileUpdating()!
             }
             catch (FileError&)
             {
                 if (somethingExists(fileObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should error out!
                     throw;
                 //source deleted meanwhile...nothing was done (logical point of view!)
-                fileObj.removeObject<sideSrc>();
                 procCallback_.updateTotalData(-1, -to<zen::Int64>(fileObj.getFileSize<sideSrc>()));
+                fileObj.removeObject<sideSrc>(); //remove only *after* evaluating "fileObj, sideSrc"!
             }
         }
         break;
@@ -1507,7 +1462,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
                 const int objectsExpected = 1;
                 const Int64 bytesExpected = 0;
 
-                getDelHandling<sideTrg>().removeFileUpdating(fileObj.getObjRelativeName(), bytesExpected, [&] //throw FileError
+                getDelHandling<sideTrg>().removeFileUpdating(fileObj.getFullName<sideTrg>(), fileObj.getObjRelativeName(), bytesExpected, [&] //throw FileError
                 {
                     procCallback_.updateProcessedData(1, 0); //noexcept
                     ++objectsReported;
@@ -1517,37 +1472,35 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
                 if (objectsReported != objectsExpected)
                     procCallback_.updateTotalData(objectsReported - objectsExpected, 0); //noexcept!
             }
-            fileObj.removeObject<sideTrg>(); //update FileMapping
+            fileObj.removeObject<sideTrg>(); //update FilePair
             break;
 
-        case SO_MOVE_LEFT_SOURCE:
         case SO_MOVE_LEFT_TARGET:
-        case SO_MOVE_RIGHT_SOURCE:
         case SO_MOVE_RIGHT_TARGET:
-            if (FileMapping* targetObj = dynamic_cast<FileMapping*>(FileSystemObject::retrieve(fileObj.getMoveRef())))
+            if (FilePair* moveSource = dynamic_cast<FilePair*>(FileSystemObject::retrieve(fileObj.getMoveRef())))
             {
-                FileMapping* sourceObj = &fileObj;
+                FilePair* moveTarget = &fileObj;
 
-                if (syncOp != SO_MOVE_LEFT_SOURCE &&
-                    syncOp != SO_MOVE_RIGHT_SOURCE)
-                    std::swap(sourceObj, targetObj);
+                assert((moveSource->getSyncOperation() == SO_MOVE_LEFT_SOURCE  && moveTarget->getSyncOperation() == SO_MOVE_LEFT_TARGET  && sideTrg == LEFT_SIDE) ||
+                       (moveSource->getSyncOperation() == SO_MOVE_RIGHT_SOURCE && moveTarget->getSyncOperation() == SO_MOVE_RIGHT_TARGET && sideTrg == RIGHT_SIDE));
 
-                assert((sourceObj->getSyncOperation() == SO_MOVE_LEFT_SOURCE  && targetObj->getSyncOperation() == SO_MOVE_LEFT_TARGET  && sideTrg == LEFT_SIDE) ||
-                       (sourceObj->getSyncOperation() == SO_MOVE_RIGHT_SOURCE && targetObj->getSyncOperation() == SO_MOVE_RIGHT_TARGET && sideTrg == RIGHT_SIDE));
+                const Zstring& oldName = moveSource->getFullName<sideTrg>();
+                const Zstring& newName = moveSource->getBaseDirPf<sideTrg>() + moveTarget->getRelativeName<sideSrc>();
 
-                const Zstring& source = sourceObj->getFullName<sideTrg>();
-                const Zstring& target = targetObj->getBaseDirPf<sideTrg>() + targetObj->getRelativeName<sideSrc>();
+                reportInfo(txtMovingFile, oldName, newName);
+                warn_static("was wenn diff volume: symlink aliasing!") //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+                renameFile(oldName, newName); //throw FileError
 
-                reportInfo(txtMovingFile, source, target);
-				warn_static("was wenn diff volume: symlink aliasing!") //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
-                renameFile(source, target); //throw FileError
-
-                const FileDescriptor descrTarget(sourceObj->getLastWriteTime<sideTrg>(),
-                                                 sourceObj->getFileSize     <sideTrg>(),
-                                                 sourceObj->getFileId       <sideTrg>());
-
-                sourceObj->removeObject<sideTrg>();      //update FileMapping
-                targetObj->syncTo<sideTrg>(descrTarget); //
+                //update FilePair
+                assert(moveSource->getFileSize<sideTrg>() == moveTarget->getFileSize<sideSrc>());
+                moveTarget->setSyncedTo<sideTrg>(moveTarget->getShortName<sideSrc>(), moveTarget->getFileSize<sideSrc>(),
+                                                 moveSource->getLastWriteTime<sideTrg>(), //awkward naming! moveSource is renamed on "sideTrg" side!
+                                                 moveTarget->getLastWriteTime<sideSrc>(),
+                                                 moveSource->getFileId<sideTrg>(),
+                                                 moveTarget->getFileId<sideSrc>(),
+                                                 moveSource->isFollowedSymlink<sideTrg>(),
+                                                 moveTarget->isFollowedSymlink<sideSrc>());
+                moveSource->removeObject<sideTrg>(); //remove only *after* evaluating "moveSource, sideTrg"!
 
                 procCallback_.updateProcessedData(1, 0);
             }
@@ -1556,23 +1509,40 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
         case SO_OVERWRITE_LEFT:
         case SO_OVERWRITE_RIGHT:
         {
-            const Zstring& target = fileObj.getBaseDirPf<sideTrg>() + fileObj.getRelativeName<sideSrc>(); //respect differences in case of source object
-            reportInfo(txtOverwritingFile, target);
+            const Zstring targetFile = fileObj.isFollowedSymlink<sideTrg>() ? //follow link when updating file rather than delete it and replace with regular file!!!
+                                       zen::getResolvedFilePath(fileObj.getFullName<sideTrg>()) : //throw FileError
+                                       fileObj.getBaseDirPf<sideTrg>() + fileObj.getRelativeName<sideSrc>(); //respect differences in case of source object
 
-            const FileAttrib newAttr = copyFileUpdatingTo<sideTrg>(fileObj, [&] //delete target at appropriate time
+            reportInfo(txtOverwritingFile, targetFile);
+
+            if (fileObj.isFollowedSymlink<sideTrg>()) //since we follow the link, we need to handle case sensitivity of the link manually!
+                if (fileObj.getShortName<sideTrg>() != fileObj.getShortName<sideSrc>()) //adapt difference in case (windows only)
+                    renameFile(fileObj.getFullName<sideTrg>(),
+                               beforeLast(fileObj.getFullName<sideTrg>(), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + fileObj.getShortName<sideSrc>()); //throw FileError
+
+            const FileAttrib newAttr = copyFileUpdating(fileObj.getFullName<sideSrc>(),
+                                                        targetFile,
+                                                        to<Int64>(fileObj.getFileSize<sideSrc>()),
+                                                        [&] //delete target at appropriate time
             {
-                reportStatus(this->getDelHandling<sideTrg>().getTxtRemovingFile(), fileObj.getFullName<sideTrg>());
+                reportStatus(this->getDelHandling<sideTrg>().getTxtRemovingFile(), targetFile);
 
-                this->getDelHandling<sideTrg>().removeFileUpdating(fileObj.getObjRelativeName(), 0, []{}); //throw FileError;
+                this->getDelHandling<sideTrg>().removeFileUpdating(targetFile, fileObj.getObjRelativeName(), 0, [] {}); //throw FileError;
                 //no (logical) item count update desired - but total byte count may change, e.g. move(copy) deleted file to versioning dir
-                fileObj.removeObject<sideTrg>(); //update FileMapping
 
-                reportStatus(txtOverwritingFile, target); //restore status text copy file
-            });
+                //fileObj.removeObject<sideTrg>(); -> doesn't make sense for isFollowedSymlink(); "fileObj, sideTrg" evaluated below!
 
-            const FileDescriptor descrSource(newAttr.modificationTime, newAttr.fileSize, newAttr.sourceFileId);
-            const FileDescriptor descrTarget(newAttr.modificationTime, newAttr.fileSize, newAttr.targetFileId);
-            fileObj.syncTo<sideTrg>(descrTarget, &descrSource); //update FileMapping
+                reportStatus(txtOverwritingFile, targetFile); //restore status text copy file
+            }); //throw FileError
+
+            //update FilePair
+            fileObj.setSyncedTo<sideTrg>(fileObj.getShortName<sideSrc>(), newAttr.fileSize,
+                                         newAttr.modificationTime, //target time set from source
+                                         newAttr.modificationTime,
+                                         newAttr.targetFileId,
+                                         newAttr.sourceFileId,
+                                         fileObj.isFollowedSymlink<sideTrg>(),
+                                         fileObj.isFollowedSymlink<sideSrc>());
 
             procCallback_.updateProcessedData(1, 0); //we model "delete + copy" as ONE logical operation
         }
@@ -1591,18 +1561,26 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
                 setFileTime(fileObj.getFullName<sideTrg>(), fileObj.getLastWriteTime<sideSrc>(), SYMLINK_FOLLOW); //throw FileError
             //do NOT read *current* source file time, but use buffered value which corresponds to time of comparison!
 
-            const FileDescriptor descrTarget(fileObj.getLastWriteTime<sideSrc>(),
-                                             fileObj.getFileSize     <sideTrg >(),
-                                             fileObj.getFileId       <sideTrg >());
-            fileObj.syncTo<sideTrg>(descrTarget); //-> both sides *should* be completely equal now...
+            //-> both sides *should* be completely equal now...
+            assert(fileObj.getFileSize<sideTrg>() == fileObj.getFileSize<sideSrc>());
+            fileObj.setSyncedTo<sideTrg>(fileObj.getShortName<sideSrc>(), fileObj.getFileSize<sideSrc>(),
+                                         fileObj.getLastWriteTime<sideSrc>(), //target time set from source
+                                         fileObj.getLastWriteTime<sideSrc>(),
+                                         fileObj.getFileId       <sideTrg>(),
+                                         fileObj.getFileId       <sideSrc>(),
+                                         fileObj.isFollowedSymlink<sideTrg>(),
+                                         fileObj.isFollowedSymlink<sideSrc>());
 
             procCallback_.updateProcessedData(1, 0);
         }
         break;
 
+        case SO_MOVE_LEFT_SOURCE:
+        case SO_MOVE_RIGHT_SOURCE:
         case SO_DO_NOTHING:
         case SO_EQUAL:
         case SO_UNRESOLVED_CONFLICT:
+            assert(false); //should have been filtered out by SynchronizeFolderPair::getPass()
             return; //no update on processed data!
     }
 
@@ -1611,7 +1589,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FileMapping& fileObj, SyncOperati
 
 
 inline
-void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj)
+void SynchronizeFolderPair::synchronizeLink(SymlinkPair& linkObj)
 {
     const SyncOperation syncOp = linkObj.getSyncOperation();
 
@@ -1626,7 +1604,7 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj)
 
 
 template <SelectedSide sideTrg>
-void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOperation syncOp)
+void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& linkObj, SyncOperation syncOp)
 {
     static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
 
@@ -1635,8 +1613,8 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
         case SO_CREATE_NEW_LEFT:
         case SO_CREATE_NEW_RIGHT:
         {
-            if (const DirMapping* parentDir = dynamic_cast<DirMapping*>(&linkObj.parent()))
-                if (parentDir->isEmpty<sideTrg>()) //BaseDirMapping OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
+            if (const DirPair* parentDir = dynamic_cast<DirPair*>(&linkObj.parent()))
+                if (parentDir->isEmpty<sideTrg>()) //BaseDirPair OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
                     return; //if parent directory creation failed, there's no reason to show more errors!
 
             const Zstring& target = linkObj.getBaseDirPf<sideTrg>() + linkObj.getRelativeName<sideSrc>();
@@ -1646,7 +1624,10 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
             try
             {
                 zen::copySymlink(linkObj.getFullName<sideSrc>(), target, copyFilePermissions_); //throw FileError
-                linkObj.copyTo<sideTrg>(); //update SymLinkMapping
+                //update SymlinkPair
+                linkObj.setSyncedTo<sideTrg>(linkObj.getShortName<sideSrc>(),
+                                             linkObj.getLastWriteTime<sideSrc>(), //target time set from source
+                                             linkObj.getLastWriteTime<sideSrc>());
 
                 procCallback_.updateProcessedData(1, 0);
             }
@@ -1655,8 +1636,8 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
                 if (somethingExists(linkObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should not be quiet about it!
                     throw;
                 //source deleted meanwhile...nothing was done (logical point of view!)
-                linkObj.removeObject<sideSrc>();
                 procCallback_.updateTotalData(-1, 0);
+                linkObj.removeObject<sideSrc>();
             }
         }
         break;
@@ -1670,7 +1651,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
                 const int objectsExpected = 1;
                 const Int64 bytesExpected = 0;
 
-                getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getObjRelativeName(), bytesExpected, [&] //throw FileError
+                getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getFullName<sideTrg>(), linkObj.getObjRelativeName(), bytesExpected, [&] //throw FileError
                 {
                     procCallback_.updateProcessedData(1, 0); //noexcept
                     ++objectsReported;
@@ -1680,27 +1661,30 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
                 if (objectsReported != objectsExpected)
                     procCallback_.updateTotalData(objectsReported - objectsExpected, 0); //noexcept!
             }
-            linkObj.removeObject<sideTrg>(); //update SymLinkMapping
+            linkObj.removeObject<sideTrg>(); //update SymlinkPair
             break;
 
         case SO_OVERWRITE_LEFT:
         case SO_OVERWRITE_RIGHT:
-        {
-            const Zstring& target = linkObj.getBaseDirPf<sideTrg>() + linkObj.getRelativeName<sideSrc>(); //respect differences in case of source object
-
-            reportInfo(txtOverwritingLink, target);
+            reportInfo(txtOverwritingLink, linkObj.getFullName<sideTrg>());
 
             reportStatus(getDelHandling<sideTrg>().getTxtRemovingSymLink(), linkObj.getFullName<sideTrg>());
-            getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getObjRelativeName(), 0, [] {}); //throw FileError
-            linkObj.removeObject<sideTrg>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+            getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getFullName<sideTrg>(), linkObj.getObjRelativeName(), 0, [] {}); //throw FileError
 
-            reportStatus(txtOverwritingLink, target); //restore status text
-            zen::copySymlink(linkObj.getFullName<sideSrc>(), target, copyFilePermissions_); //throw FileError
-            linkObj.copyTo<sideTrg>(); //update SymLinkMapping
+            //linkObj.removeObject<sideTrg>(); -> "linkObj, sideTrg" evaluated below!
+
+            reportStatus(txtOverwritingLink, linkObj.getFullName<sideTrg>()); //restore status text
+            zen::copySymlink(linkObj.getFullName<sideSrc>(),
+                             linkObj.getBaseDirPf<sideTrg>() + linkObj.getRelativeName<sideSrc>(), //respect differences in case of source object
+                             copyFilePermissions_); //throw FileError
+
+            //update SymlinkPair
+            linkObj.setSyncedTo<sideTrg>(linkObj.getShortName<sideSrc>(),
+                                         linkObj.getLastWriteTime<sideSrc>(), //target time set from source
+                                         linkObj.getLastWriteTime<sideSrc>());
 
             procCallback_.updateProcessedData(1, 0); //we model "delete + copy" as ONE logical operation
-        }
-        break;
+            break;
 
         case SO_COPY_METADATA_TO_LEFT:
         case SO_COPY_METADATA_TO_RIGHT:
@@ -1712,7 +1696,11 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
 
             if (!sameFileTime(linkObj.getLastWriteTime<sideTrg>(), linkObj.getLastWriteTime<sideSrc>(), 2)) //respect 2 second FAT/FAT32 precision
                 setFileTime(linkObj.getFullName<sideTrg>(), linkObj.getLastWriteTime<sideSrc>(), SYMLINK_DIRECT); //throw FileError
-            linkObj.copyTo<sideTrg>(); //-> both sides *should* be completely equal now...
+
+            //-> both sides *should* be completely equal now...
+            linkObj.setSyncedTo<sideTrg>(linkObj.getShortName<sideSrc>(),
+                                         linkObj.getLastWriteTime<sideSrc>(), //target time set from source
+                                         linkObj.getLastWriteTime<sideSrc>());
 
             procCallback_.updateProcessedData(1, 0);
             break;
@@ -1721,10 +1709,10 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
         case SO_MOVE_RIGHT_SOURCE:
         case SO_MOVE_LEFT_TARGET:
         case SO_MOVE_RIGHT_TARGET:
-            assert(false);
         case SO_DO_NOTHING:
         case SO_EQUAL:
         case SO_UNRESOLVED_CONFLICT:
+            assert(false); //should have been filtered out by SynchronizeFolderPair::getPass()
             return; //no update on processed data!
     }
 
@@ -1733,7 +1721,7 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymLinkMapping& linkObj, SyncOper
 
 
 inline
-void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj)
+void SynchronizeFolderPair::synchronizeFolder(DirPair& dirObj)
 {
     const SyncOperation syncOp = dirObj.getSyncOperation();
 
@@ -1748,7 +1736,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj)
 
 
 template <SelectedSide sideTrg>
-void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperation syncOp)
+void SynchronizeFolderPair::synchronizeFolderInt(DirPair& dirObj, SyncOperation syncOp)
 {
     static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
 
@@ -1756,8 +1744,8 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
     {
         case SO_CREATE_NEW_LEFT:
         case SO_CREATE_NEW_RIGHT:
-            if (const DirMapping* parentDir = dynamic_cast<DirMapping*>(&dirObj.parent()))
-                if (parentDir->isEmpty<sideTrg>()) //BaseDirMapping OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
+            if (const DirPair* parentDir = dynamic_cast<DirPair*>(&dirObj.parent()))
+                if (parentDir->isEmpty<sideTrg>()) //BaseDirPair OTOH is always non-empty and existing in this context => else: fatal error in zen::synchronize()
                     return; //if parent directory creation failed, there's no reason to show more errors!
 
             if (somethingExists(dirObj.getFullName<sideSrc>())) //do not check on type (symlink, file, folder) -> if there is a type change, FFS should error out!
@@ -1770,19 +1758,22 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
                     makeDirectoryPlain(target, dirObj.getFullName<sideSrc>(), copyFilePermissions_); //throw FileError, ErrorTargetExisting, (ErrorTargetPathMissing)
                 }
                 catch (const ErrorTargetExisting&) { if (!dirExists(target)) throw; } //detect clash with file (dir-symlink OTOH is okay)
-                dirObj.copyTo<sideTrg>(); //update DirMapping
+
+                //update DirPair
+                dirObj.setSyncedTo(dirObj.getShortName<sideSrc>());
 
                 procCallback_.updateProcessedData(1, 0);
             }
             else //source deleted meanwhile...nothing was done (logical point of view!) -> uh....what about a temporary network drop???
             {
-                dirObj.refSubFiles().clear();   //
-                dirObj.refSubLinks().clear();   //update DirMapping
-                dirObj.refSubDirs ().clear();   //
-                dirObj.removeObject<sideSrc>(); //
-
                 const SyncStatistics subStats(dirObj);
                 procCallback_.updateTotalData(-getCUD(subStats) - 1, -subStats.getDataToProcess());
+
+                //remove only *after* evaluating dirObj!!
+                dirObj.refSubFiles().clear();   //
+                dirObj.refSubLinks().clear();   //update DirPair
+                dirObj.refSubDirs ().clear();   //
+                dirObj.removeObject<sideSrc>(); //
             }
             break;
 
@@ -1797,7 +1788,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
                 const Int64 bytesExpected = subStats.getDataToProcess();
                 assert(bytesExpected == 0);
 
-                getDelHandling<sideTrg>().removeDirUpdating(dirObj.getObjRelativeName(), bytesExpected, [&] //throw FileError
+                getDelHandling<sideTrg>().removeDirUpdating(dirObj.getFullName<sideTrg>(), dirObj.getObjRelativeName(), bytesExpected, [&] //throw FileError
                 {
                     procCallback_.updateProcessedData(1, 0); //noexcept
                     ++objectsReported;
@@ -1808,7 +1799,7 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
                     procCallback_.updateTotalData(objectsReported - objectsExpected, 0); //noexcept!
             }
             dirObj.refSubFiles().clear();   //
-            dirObj.refSubLinks().clear();   //update DirMapping
+            dirObj.refSubLinks().clear();   //update DirPair
             dirObj.refSubDirs ().clear();   //
             dirObj.removeObject<sideTrg>(); //
             break;
@@ -1821,21 +1812,23 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
                 renameFile(dirObj.getFullName<sideTrg>(),
                            beforeLast(dirObj.getFullName<sideTrg>(), FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR + dirObj.getShortName<sideSrc>()); //throw FileError
             //copyFileTimes -> useless: modification time changes with each child-object creation/deletion
-            dirObj.copyTo<sideTrg>(); //-> both sides *should* be completely equal now...
+
+            //-> both sides *should* be completely equal now...
+            dirObj.setSyncedTo(dirObj.getShortName<sideSrc>());
 
             procCallback_.updateProcessedData(1, 0);
             break;
 
-        case SO_OVERWRITE_RIGHT:
         case SO_OVERWRITE_LEFT:
+        case SO_OVERWRITE_RIGHT:
         case SO_MOVE_LEFT_SOURCE:
         case SO_MOVE_RIGHT_SOURCE:
         case SO_MOVE_LEFT_TARGET:
         case SO_MOVE_RIGHT_TARGET:
-            assert(false);
-        case SO_UNRESOLVED_CONFLICT:
         case SO_DO_NOTHING:
         case SO_EQUAL:
+        case SO_UNRESOLVED_CONFLICT:
+            assert(false); //should have been filtered out by SynchronizeFolderPair::getPass()
             return; //no update on processed data!
     }
 
@@ -1845,6 +1838,21 @@ void SynchronizeFolderPair::synchronizeFolderInt(DirMapping& dirObj, SyncOperati
 
 namespace
 {
+#ifdef ZEN_WIN
+//recycleBinStatus() blocks seriously if recycle bin is really full and drive is slow
+StatusRecycler recycleBinStatusUpdating(const Zstring& dirname, ProcessCallback& procCallback)
+{
+    procCallback.reportStatus(replaceCpy(_("Checking recycle bin availability for folder %x..."), L"%x", fmtFileName(dirname), false));
+
+    auto ft = async([=] { return recycleBinStatus(dirname); });
+
+    while (!ft.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL / 2)))
+        procCallback.requestUiRefresh(); //may throw!
+    return ft.get();
+}
+#endif
+
+
 /*
 struct LessDependentDirectory : public std::binary_function<Zstring, Zstring, bool>
 {
@@ -1859,13 +1867,13 @@ struct LessDependentDirectory : public std::binary_function<Zstring, Zstring, bo
 */
 
 template <SelectedSide side> //create base directories first (if not yet existing) -> no symlink or attribute copying!
-bool createBaseDirectory(BaseDirMapping& baseMap, ProcessCallback& callback) //nothrow; return false if fatal error occurred
+bool createBaseDirectory(BaseDirPair& baseDirObj, ProcessCallback& callback) //nothrow; return false if fatal error occurred
 {
-    const Zstring dirname = beforeLast(baseMap.getBaseDirPf<side>(), FILE_NAME_SEPARATOR); //what about C:\ ???
+    const Zstring dirname = beforeLast(baseDirObj.getBaseDirPf<side>(), FILE_NAME_SEPARATOR); //what about C:\ ???
     if (dirname.empty())
         return true;
 
-    if (baseMap.isExisting<side>()) //atomicity: do NOT check directory existence again!
+    if (baseDirObj.isExisting<side>()) //atomicity: do NOT check directory existence again!
     {
         //just convenience: exit sync right here instead of showing tons of error messages during file copy
         zen::Opt<std::wstring> errMsg = tryReportingError2([&]
@@ -1885,7 +1893,7 @@ bool createBaseDirectory(BaseDirMapping& baseMap, ProcessCallback& callback) //n
             {
                 //a nice race-free check and set operation:
                 makeDirectory(dirname, /*bool failIfExists*/ true); //throw FileError, ErrorTargetExisting
-                baseMap.setExisting<side>(true); //update our model!
+                baseDirObj.setExisting<side>(true); //update our model!
             }
             catch (const ErrorTargetExisting&)
             {
@@ -1958,30 +1966,6 @@ void zen::synchronize(const TimeComp& timeStamp,
 
     std::deque<bool> skipFolderPair(folderCmp.size()); //folder pairs may be skipped after fatal errors were found
 
-
-    //initialize deletion handling: already required when checking for warnings
-    FixedList<DeletionHandling> delHandlerL; //we can't use a FixedList<std::pair<>> because DeletionHandling is not copy-constructable
-    FixedList<DeletionHandling> delHandlerR;
-    for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
-    {
-        const size_t folderIndex = j - folderCmp.begin();
-        const FolderPairSyncCfg& folderPairCfg = syncConfig[folderIndex];
-
-        delHandlerL.emplace_back(folderPairCfg.handleDeletion,
-                                 folderPairCfg.versioningFolder,
-                                 folderPairCfg.versioningStyle_,
-                                 timeStamp,
-                                 j->getBaseDirPf<LEFT_SIDE>(),
-                                 callback);
-
-        delHandlerR.emplace_back(folderPairCfg.handleDeletion,
-                                 folderPairCfg.versioningFolder,
-                                 folderPairCfg.versioningStyle_,
-                                 timeStamp,
-                                 j->getBaseDirPf<RIGHT_SIDE>(),
-                                 callback);
-    }
-
     //-------------------execute basic checks all at once before starting sync--------------------------------------
 
     auto dependentDir = [](const Zstring& lhs, const Zstring& rhs) //note: this is NOT an equivalence relation!
@@ -2019,156 +2003,156 @@ void zen::synchronize(const TimeComp& timeStamp,
     typedef std::vector<std::pair<Zstring, std::pair<Int64, Int64>>> DirSpaceRequAvailList; //dirname / space required / space available
     DirSpaceRequAvailList diskSpaceMissing;
 
-#ifdef FFS_WIN
-    std::set<Zstring, LessFilename> recyclMissing;
+#ifdef ZEN_WIN
+    //status of base directories which are set to DELETE_TO_RECYCLER (and contain actual items to be deleted)
+    std::map<Zstring, bool, LessFilename> baseDirHasRecycler; //might be expensive to determine => buffer + check recycle bin existence only once per base directory!
 #endif
 
     //start checking folder pairs
+    for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
     {
-        auto iterDelHandlerL = delHandlerL.cbegin();
-        auto iterDelHandlerR = delHandlerR.cbegin();
-        for (auto j = begin(folderCmp); j != end(folderCmp); ++j, ++iterDelHandlerL, ++iterDelHandlerR)
+        const size_t folderIndex = j - begin(folderCmp);
+
+        //exclude some pathological case (leftdir, rightdir are empty)
+        if (EqualFilename()(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()))
+            continue;
+
+        const FolderPairSyncCfg& folderPairCfg = syncConfig[folderIndex];
+
+        const SyncStatistics folderPairStat(*j);
+
+        //aggregate basic information
+        const bool writeLeft = folderPairStat.getCreate<LEFT_SIDE>() +
+                               folderPairStat.getUpdate<LEFT_SIDE>() +
+                               folderPairStat.getDelete<LEFT_SIDE>() > 0;
+
+        const bool writeRight = folderPairStat.getCreate<RIGHT_SIDE>() +
+                                folderPairStat.getUpdate<RIGHT_SIDE>() +
+                                folderPairStat.getDelete<RIGHT_SIDE>() > 0;
+
+        //skip folder pair if there is nothing to do (except for automatic mode, where data base needs to be written even in this case)
+        if (!writeLeft && !writeRight &&
+            !folderPairCfg.inAutomaticMode)
         {
-            const size_t folderIndex = j - begin(folderCmp);
+            skipFolderPair[folderIndex] = true; //skip creating (not yet existing) base directories in particular if there's no need
+            continue;
+        }
 
-            //exclude some pathological case (leftdir, rightdir are empty)
-            if (EqualFilename()(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()))
-                continue;
 
-            const FolderPairSyncCfg& folderPairCfg = syncConfig[folderIndex];
+        //check empty input fields: basically this only makes sense if empty field is not target (and not automatic mode: because of db file creation)
+        if ((j->getBaseDirPf<LEFT_SIDE >().empty() && (writeLeft  || folderPairCfg.inAutomaticMode)) ||
+            (j->getBaseDirPf<RIGHT_SIDE>().empty() && (writeRight || folderPairCfg.inAutomaticMode)))
+        {
+            callback.reportFatalError(_("Target folder input field must not be empty."));
+            skipFolderPair[folderIndex] = true;
+            continue;
+        }
 
-            const SyncStatistics folderPairStat(*j);
-
-            //aggregate basic information
-            const bool writeLeft = folderPairStat.getCreate<LEFT_SIDE>() +
-                                   folderPairStat.getUpdate<LEFT_SIDE>() +
-                                   folderPairStat.getDelete<LEFT_SIDE>() > 0;
-
-            const bool writeRight = folderPairStat.getCreate<RIGHT_SIDE>() +
-                                    folderPairStat.getUpdate<RIGHT_SIDE>() +
-                                    folderPairStat.getDelete<RIGHT_SIDE>() > 0;
-
-            //skip folder pair if there is nothing to do (except for automatic mode, where data base needs to be written even in this case)
-            if (!writeLeft && !writeRight &&
-                !folderPairCfg.inAutomaticMode)
+        //aggregate information of folders used by multiple pairs in read/write access
+        if (!dependentDir(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>())) //true in general
+        {
+            if (writeLeft && writeRight)
             {
-                skipFolderPair[folderIndex] = true; //skip creating (not yet existing) base directories in particular if there's no need
-                continue;
+                incWriteCount(j->getBaseDirPf<LEFT_SIDE >());
+                incWriteCount(j->getBaseDirPf<RIGHT_SIDE>());
             }
-
-
-            //check empty input fields: basically this only makes sense if empty field is not target (and not automatic mode: because of db file creation)
-            if ((j->getBaseDirPf<LEFT_SIDE >().empty() && (writeLeft  || folderPairCfg.inAutomaticMode)) ||
-                (j->getBaseDirPf<RIGHT_SIDE>().empty() && (writeRight || folderPairCfg.inAutomaticMode)))
+            else if (writeLeft)
             {
-                callback.reportFatalError(_("Target folder input field must not be empty."));
+                incWriteCount(j->getBaseDirPf<LEFT_SIDE>());
+                incReadCount (j->getBaseDirPf<RIGHT_SIDE>());
+            }
+            else if (writeRight)
+            {
+                incReadCount (j->getBaseDirPf<LEFT_SIDE>());
+                incWriteCount(j->getBaseDirPf<RIGHT_SIDE>());
+            }
+        }
+        else //if folder pair contains two dependent folders, a warning was already issued after comparison; in this context treat as one write access at most
+        {
+            if (writeLeft || writeRight)
+                incWriteCount(j->getBaseDirPf<LEFT_SIDE>());
+        }
+
+
+        if (folderPairStat.getUpdate() + folderPairStat.getDelete() > 0 &&
+            folderPairCfg.handleDeletion == zen::DELETE_TO_VERSIONING)
+        {
+            //check if user-defined directory for deletion was specified
+            if (folderPairCfg.versioningFolder.empty()) //already trimmed by getFormattedDirectoryName()
+            {
+                callback.reportFatalError(_("Folder input field for versioning must not be empty."));
                 skipFolderPair[folderIndex] = true;
                 continue;
             }
+        }
 
-            //aggregate information of folders used by multiple pairs in read/write access
-            if (!dependentDir(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>())) //true in general
+        //the following scenario is covered by base directory creation below in case source directory exists (accessible or not), but latter doesn't cover source created after comparison, but before sync!!!
+        auto checkSourceMissing = [&](const Zstring& baseDirPf, bool wasExisting) -> bool //avoid race-condition: we need to evaluate existence status from time of comparison!
+        {
+            if (!baseDirPf.empty())
             {
-                if (writeLeft && writeRight)
+                //PERMANENT network drop: avoid data loss when source directory is not found AND user chose to ignore errors (else we wouldn't arrive here)
+                if (folderPairStat.getCreate() +
+                folderPairStat.getUpdate() == 0 &&
+                folderPairStat.getDelete() > 0) //deletions only... (respect filtered items!)
+                    //folderPairStat.getConflict() == 0 && -> there COULD be conflicts for <automatic> if directory existence check fails, but loading sync.ffs_db succeeds
+                    //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430 -> fixed, but still better not consider conflicts
                 {
-                    incWriteCount(j->getBaseDirPf<LEFT_SIDE >());
-                    incWriteCount(j->getBaseDirPf<RIGHT_SIDE>());
-                }
-                else if (writeLeft)
-                {
-                    incWriteCount(j->getBaseDirPf<LEFT_SIDE>());
-                    incReadCount (j->getBaseDirPf<RIGHT_SIDE>());
-                }
-                else if (writeRight)
-                {
-                    incReadCount (j->getBaseDirPf<LEFT_SIDE>());
-                    incWriteCount(j->getBaseDirPf<RIGHT_SIDE>());
-                }
-            }
-            else //if folder pair contains two dependent folders, a warning was already issued after comparison; in this context treat as one write access at most
-            {
-                if (writeLeft || writeRight)
-                    incWriteCount(j->getBaseDirPf<LEFT_SIDE>());
-            }
-
-
-            if (folderPairStat.getUpdate() + folderPairStat.getDelete() > 0 &&
-                folderPairCfg.handleDeletion == zen::DELETE_TO_VERSIONING)
-            {
-                //check if user-defined directory for deletion was specified
-                if (folderPairCfg.versioningFolder.empty()) //already trimmed by getFormattedDirectoryName()
-                {
-                    callback.reportFatalError(_("Folder input field for versioning must not be empty."));
-                    skipFolderPair[folderIndex] = true;
-                    continue;
-                }
-            }
-
-            //the following scenario is covered by base directory creation below in case source directory exists (accessible or not), but latter doesn't cover source created after comparison, but before sync!!!
-            auto checkSourceMissing = [&](const Zstring& baseDirPf, bool wasExisting) -> bool //avoid race-condition: we need to evaluate existence status from time of comparison!
-            {
-                if (!baseDirPf.empty())
-                {
-                    //PERMANENT network drop: avoid data loss when source directory is not found AND user chose to ignore errors (else we wouldn't arrive here)
-                    if (folderPairStat.getCreate() +
-                    folderPairStat.getUpdate() == 0 &&
-                    folderPairStat.getDelete() > 0) //deletions only... (respect filtered items!)
-                        //folderPairStat.getConflict() == 0 && -> there COULD be conflicts for <automatic> if directory existence check fails, but loading sync.ffs_db succeeds
-                        //https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3531351&group_id=234430 -> fixed, but still better not consider conflicts
+                    if (!wasExisting) //avoid race-condition: we need to evaluate existence status from time of comparison!
                     {
-                        if (!wasExisting) //avoid race-condition: we need to evaluate existence status from time of comparison!
-                        {
-                            callback.reportFatalError(replaceCpy(_("Source folder %x not found."), L"%x", fmtFileName(baseDirPf)));
-                            skipFolderPair[folderIndex] = true;
-                            return false;
-                        }
+                        callback.reportFatalError(replaceCpy(_("Source folder %x not found."), L"%x", fmtFileName(baseDirPf)));
+                        skipFolderPair[folderIndex] = true;
+                        return false;
                     }
                 }
-                return true;
-            };
-            if (!checkSourceMissing(j->getBaseDirPf<LEFT_SIDE >(), j->isExisting<LEFT_SIDE >()) ||
-                !checkSourceMissing(j->getBaseDirPf<RIGHT_SIDE>(), j->isExisting<RIGHT_SIDE>()))
-                continue;
-
-            //check if more than 50% of total number of files/dirs are to be created/overwritten/deleted
-            if (significantDifferenceDetected(folderPairStat))
-                significantDiff.push_back(std::make_pair(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()));
-
-            //check for sufficient free diskspace
-            auto checkSpace = [&](const Zstring& baseDirPf, const Int64& spaceRequired)
-            {
-                try
-                {
-                    Int64 freeSpace = to<Int64>(getFreeDiskSpace(baseDirPf)); //throw FileError
-
-                    if (0 < freeSpace && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
-                        freeSpace < spaceRequired)
-                        diskSpaceMissing.push_back(std::make_pair(baseDirPf, std::make_pair(spaceRequired, freeSpace)));
-                }
-                catch (FileError&) {}
-            };
-            const std::pair<Int64, Int64> spaceNeeded = DiskSpaceNeeded::calculate(*j,
-                                                                                   iterDelHandlerL->deletionFreesSpace(),
-                                                                                   iterDelHandlerR->deletionFreesSpace());
-            checkSpace(j->getBaseDirPf<LEFT_SIDE >(), spaceNeeded.first);
-            checkSpace(j->getBaseDirPf<RIGHT_SIDE>(), spaceNeeded.second);
-
-#ifdef FFS_WIN
-            //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
-            if (folderPairCfg.handleDeletion == DELETE_TO_RECYCLER)
-            {
-                if (folderPairStat.getUpdate<LEFT_SIDE>() +
-                    folderPairStat.getDelete<LEFT_SIDE>() > 0 &&
-                    iterDelHandlerL->recyclerFallbackOnDelete())
-                    recyclMissing.insert(j->getBaseDirPf<LEFT_SIDE>());
-
-                if (folderPairStat.getUpdate<RIGHT_SIDE>() +
-                    folderPairStat.getDelete<RIGHT_SIDE>() > 0 &&
-                    iterDelHandlerR->recyclerFallbackOnDelete())
-                    recyclMissing.insert(j->getBaseDirPf<RIGHT_SIDE>());
             }
-#endif
+            return true;
+        };
+        if (!checkSourceMissing(j->getBaseDirPf<LEFT_SIDE >(), j->isExisting<LEFT_SIDE >()) ||
+            !checkSourceMissing(j->getBaseDirPf<RIGHT_SIDE>(), j->isExisting<RIGHT_SIDE>()))
+            continue;
+
+        //check if more than 50% of total number of files/dirs are to be created/overwritten/deleted
+        if (significantDifferenceDetected(folderPairStat))
+            significantDiff.push_back(std::make_pair(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()));
+
+        //check for sufficient free diskspace
+        auto checkSpace = [&](const Zstring& baseDirPf, const Int64& minSpaceNeeded)
+        {
+            try
+            {
+                const Int64 freeSpace = to<Int64>(getFreeDiskSpace(baseDirPf)); //throw FileError
+
+                if (0 < freeSpace && //zero disk space probably means "request not supported" (e.g. see WebDav)
+                    freeSpace < minSpaceNeeded)
+                    diskSpaceMissing.push_back(std::make_pair(baseDirPf, std::make_pair(minSpaceNeeded, freeSpace)));
+            }
+            catch (FileError&) {}
+        };
+        const std::pair<Int64, Int64> spaceNeeded = MinimumDiskSpaceNeeded::calculate(*j);
+        checkSpace(j->getBaseDirPf<LEFT_SIDE >(), spaceNeeded.first);
+        checkSpace(j->getBaseDirPf<RIGHT_SIDE>(), spaceNeeded.second);
+
+#ifdef ZEN_WIN
+        //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
+        auto checkRecycler = [&](const Zstring& baseDirPf)
+        {
+            if (!baseDirPf.empty()) //should be
+                if (baseDirHasRecycler.find(baseDirPf) == baseDirHasRecycler.end()) //perf: avoid duplicate checks!
+                    baseDirHasRecycler[baseDirPf] = recycleBinStatusUpdating(baseDirPf, callback) == STATUS_REC_EXISTS;
+        };
+
+        if (folderPairCfg.handleDeletion == DELETE_TO_RECYCLER)
+        {
+            if (folderPairStat.getUpdate<LEFT_SIDE>() +
+                folderPairStat.getDelete<LEFT_SIDE>() > 0)
+                checkRecycler(j->getBaseDirPf<LEFT_SIDE>());
+
+            if (folderPairStat.getUpdate<RIGHT_SIDE>() +
+                folderPairStat.getDelete<RIGHT_SIDE>() > 0)
+                checkRecycler(j->getBaseDirPf<RIGHT_SIDE>());
         }
+#endif
     }
 
     //check if unresolved conflicts exist
@@ -2195,7 +2179,7 @@ void zen::synchronize(const TimeComp& timeStamp,
                    it->first + L" <-> " + L"\n" +
                    it->second;
         msg += L"\n\n";
-        msg += _("More than 50% of the total number of files will be copied or deleted!");
+        msg += _("More than 50% of the total number of files will be copied or deleted.");
 
         callback.reportWarning(msg, warnings.warningSignificantDifference);
     }
@@ -2215,15 +2199,16 @@ void zen::synchronize(const TimeComp& timeStamp,
         callback.reportWarning(msg, warnings.warningNotEnoughDiskSpace);
     }
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //windows: check if recycle bin really exists; if not, Windows will silently delete, which is wrong
-    if (!recyclMissing.empty())
     {
-        std::wstring msg = _("Recycle Bin is not available for the following paths! Files will be deleted permanently instead:") + L"\n";
-        std::for_each(recyclMissing.begin(), recyclMissing.end(),
-        [&](const Zstring& path) { msg += std::wstring(L"\n") + path; });
+        std::wstring dirListMissingRecycler;
+        for (auto it = baseDirHasRecycler.begin(); it != baseDirHasRecycler.end(); ++it)
+            if (!it->second)
+                dirListMissingRecycler += std::wstring(L"\n") + it->first;
 
-        callback.reportWarning(msg, warnings.warningRecyclerMissing);
+        if (!dirListMissingRecycler.empty())
+            callback.reportWarning(_("The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:") + L"\n" + dirListMissingRecycler, warnings.warningRecyclerMissing);
     }
 #endif
 
@@ -2248,7 +2233,7 @@ void zen::synchronize(const TimeComp& timeStamp,
 
     //-------------------end of basic checks------------------------------------------
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //shadow copy buffer: per sync-instance, not folder pair
     std::unique_ptr<shadow::ShadowCopy> shadowCopyHandler;
     if (copyLockedFiles)
@@ -2258,9 +2243,7 @@ void zen::synchronize(const TimeComp& timeStamp,
     try
     {
         //loop through all directory pairs
-        auto iterDelHandlerL = delHandlerL.begin();
-        auto iterDelHandlerR = delHandlerR.begin();
-        for (auto j = begin(folderCmp); j != end(folderCmp); ++j, ++iterDelHandlerL, ++iterDelHandlerR)
+        for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
         {
             //exclude some pathological case (leftdir, rightdir are empty)
             if (EqualFilename()(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()))
@@ -2296,7 +2279,7 @@ void zen::synchronize(const TimeComp& timeStamp,
             });
 
             //guarantee removal of invalid entries (where element on both sides is empty)
-            ZEN_ON_SCOPE_EXIT(BaseDirMapping::removeEmpty(*j););
+            ZEN_ON_SCOPE_EXIT(BaseDirPair::removeEmpty(*j););
 
             bool copyPermissionsFp = false;
             tryReportingError2([&]
@@ -2308,16 +2291,47 @@ void zen::synchronize(const TimeComp& timeStamp,
                 supportsPermissions(beforeLast(j->getBaseDirPf<RIGHT_SIDE>(), FILE_NAME_SEPARATOR));
             }, callback); //show error dialog if necessary
 
+
+            auto getEffectiveDeletionPolicy = [&](const Zstring& baseDirPf) -> DeletionPolicy
+            {
+#ifdef ZEN_WIN
+                if (folderPairCfg.handleDeletion == DELETE_TO_RECYCLER)
+                {
+                    auto it = baseDirHasRecycler.find(baseDirPf);
+                    if (it != baseDirHasRecycler.end())
+                        if (!it->second)
+                            return DELETE_PERMANENTLY; //Windows' ::SHFileOperation() will do this anyway, but we have a better and faster deletion routine (e.g. on networks)
+                }
+#endif
+                return folderPairCfg.handleDeletion;
+            };
+
+
+            DeletionHandling delHandlerL(getEffectiveDeletionPolicy(j->getBaseDirPf<LEFT_SIDE>()),
+                                         folderPairCfg.versioningFolder,
+                                         folderPairCfg.versioningStyle_,
+                                         timeStamp,
+                                         j->getBaseDirPf<LEFT_SIDE>(),
+                                         callback);
+
+            DeletionHandling delHandlerR(getEffectiveDeletionPolicy(j->getBaseDirPf<RIGHT_SIDE>()),
+                                         folderPairCfg.versioningFolder,
+                                         folderPairCfg.versioningStyle_,
+                                         timeStamp,
+                                         j->getBaseDirPf<RIGHT_SIDE>(),
+                                         callback);
+
+
             SynchronizeFolderPair syncFP(callback, verifyCopiedFiles, copyPermissionsFp, transactionalFileCopy,
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
                                          shadowCopyHandler.get(),
 #endif
-                                         *iterDelHandlerL, *iterDelHandlerR);
+                                         delHandlerL, delHandlerR);
             syncFP.startSync(*j);
 
             //(try to gracefully) cleanup temporary Recycle bin folders and versioning -> will be done in ~DeletionHandling anyway...
-            tryReportingError2([&] { iterDelHandlerL->tryCleanup(); }, callback); //show error dialog if necessary
-            tryReportingError2([&] { iterDelHandlerR->tryCleanup(); }, callback); //
+            tryReportingError2([&] { delHandlerL.tryCleanup(); }, callback); //show error dialog if necessary
+            tryReportingError2([&] { delHandlerR.tryCleanup(); }, callback); //
 
             //(try to gracefully) write database file (will be done in ~EnforceUpdateDatabase anyway...)
             if (folderPairCfg.inAutomaticMode)
@@ -2367,16 +2381,12 @@ private:
 
 
 //throw FileError; reports data delta via updateProcessedData()
-template <SelectedSide sideTrg, class Function>
-FileAttrib SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj, Function delTargetCommand) const //returns current attributes of source file
+template <class Function>
+FileAttrib SynchronizeFolderPair::copyFileUpdating(const Zstring& sourceFile,
+                                                   const Zstring& targetFile, const Int64& bytesExpected, Function delTargetCommand) const //returns current attributes of source file
 {
-    static const SelectedSide sideSrc = OtherSide<sideTrg>::result;
-
+    Zstring source = sourceFile;
     FileAttrib newAttr;
-    const Int64 bytesExpected = to<Int64>(fileObj.getFileSize<sideSrc>());
-    Zstring source = fileObj.getFullName<sideSrc>();
-    const Zstring& target = fileObj.getBaseDirPf<sideTrg>() + fileObj.getRelativeName<sideSrc>();
-
     Int64 bytesReported;
 
     auto copyOperation = [&]
@@ -2390,7 +2400,7 @@ FileAttrib SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj,
         WhileCopying<Function> callback(bytesReported, procCallback_, delTargetCommand);
 
         copyFile(source, //type File implicitly means symlinks need to be dereferenced!
-        target,
+        targetFile,
         copyFilePermissions_,
         transactionalFileCopy_,
         &callback,
@@ -2399,8 +2409,8 @@ FileAttrib SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj,
         //#################### Verification #############################
         if (verifyCopiedFiles_)
         {
-            auto guardTarget = makeGuard([&] { removeFile(target); }); //delete target if verification fails
-            verifyFileCopy(source, target); //throw FileError
+            auto guardTarget = makeGuard([&] { removeFile(targetFile); }); //delete target if verification fails
+            verifyFileCopy(source, targetFile); //throw FileError
             guardTarget.dismiss();
         }
         //#################### /Verification #############################
@@ -2413,7 +2423,7 @@ FileAttrib SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj,
         guardStatistics.dismiss();
     };
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     try
     {
         copyOperation();
@@ -2435,7 +2445,7 @@ FileAttrib SynchronizeFolderPair::copyFileUpdatingTo(const FileMapping& fileObj,
         }
         catch (const FileError& e2)
         {
-            throw FileError(e1.toString() + L"\n\n" + e2.toString());
+            throw FileError(e1.toString(), e2.toString());
         }
 
         //now try again
@@ -2456,46 +2466,46 @@ struct VerifyCallback
     virtual void updateStatus() = 0;
 };
 
-void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& callback) // throw (FileError)
+void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& callback) //throw FileError
 {
     static std::vector<char> memory1(1024 * 1024); //1024 kb seems to be a reasonable buffer size
     static std::vector<char> memory2(1024 * 1024);
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     wxFile file1(applyLongPathPrefix(source).c_str(), wxFile::read); //don't use buffered file input for verification!
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     wxFile file1(::open(source.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
     if (!file1.IsOpened())
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(source)));
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(source)) + L" (open)");
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     wxFile file2(applyLongPathPrefix(target).c_str(), wxFile::read); //don't use buffered file input for verification!
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     wxFile file2(::open(target.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
     if (!file2.IsOpened()) //NO cleanup necessary for (wxFile) file1
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(target)));
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(target)) + L" (open)");
 
     do
     {
         const size_t length1 = file1.Read(&memory1[0], memory1.size());
         if (file1.Error())
-            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(source)) + L" (r)");
-        callback.updateStatus(); //send progress updates
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(source)));
+        callback.updateStatus();
 
         const size_t length2 = file2.Read(&memory2[0], memory2.size());
         if (file2.Error())
-            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(target)) + L" (r)");
-        callback.updateStatus(); //send progress updates
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(target)));
+        callback.updateStatus();
 
         if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
-            throw FileError(_("Data verification error: Source and target file have different content!") + L"\n" + fmtFileName(source) + L" -> \n" + fmtFileName(target));
+            throw FileError(replaceCpy(replaceCpy(_("Data verification error: %x and %y have different content."), L"%x", L"\n" + fmtFileName(source)), L"%y", L"\n" + fmtFileName(target)));
     }
     while (!file1.Eof());
 
     if (!file2.Eof())
-        throw FileError(_("Data verification error: Source and target file have different content!") + L"\n" + fmtFileName(source) + L" -> \n" + fmtFileName(target));
+        throw FileError(replaceCpy(replaceCpy(_("Data verification error: %x and %y have different content."), L"%x", L"\n" + fmtFileName(source)), L"%y", L"\n" + fmtFileName(target)));
 }
 
 

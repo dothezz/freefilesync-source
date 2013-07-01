@@ -46,7 +46,7 @@ private:
     MessageProvider(const MessageProvider&);
     MessageProvider& operator=(const MessageProvider&);
 
-    static const wchar_t WINDOW_NAME[];
+    static const wchar_t dummyWindowName[];
 
     friend LRESULT CALLBACK topWndProc(HWND, UINT, WPARAM, LPARAM);
     void processMessage(UINT message, WPARAM wParam, LPARAM lParam);
@@ -58,7 +58,7 @@ private:
 };
 
 
-const wchar_t MessageProvider::WINDOW_NAME[] = L"E6AD5EB1-527B-4EEF-AC75-27883B233380"; //random name
+const wchar_t MessageProvider::dummyWindowName[] = L"E6AD5EB1-527B-4EEF-AC75-27883B233380"; //random name
 
 
 LRESULT CALLBACK topWndProc(HWND hwnd,     //handle to window
@@ -82,22 +82,22 @@ MessageProvider::MessageProvider() :
     windowHandle(nullptr)
 {
     if (!hMainModule)
-        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (GetModuleHandle)");
+        throw FileError(_("Failed to register to receive system messages."), formatSystemError(L"GetModuleHandle", getLastError()));
 
     //register the main window class
     WNDCLASS wc = {};
     wc.lpfnWndProc   = topWndProc;
     wc.hInstance     = hMainModule;
-    wc.lpszClassName = WINDOW_NAME;
+    wc.lpszClassName = dummyWindowName;
 
     if (::RegisterClass(&wc) == 0)
-        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (RegisterClass)");
+        throw FileError(_("Failed to register to receive system messages."), formatSystemError(L"RegisterClass", getLastError()));
 
-    ScopeGuard guardClass = makeGuard([&] { ::UnregisterClass(WINDOW_NAME, hMainModule); });
+    ScopeGuard guardClass = makeGuard([&] { ::UnregisterClass(dummyWindowName, hMainModule); });
 
     //create dummy-window
-    windowHandle = ::CreateWindow(WINDOW_NAME, //LPCTSTR lpClassName OR ATOM in low-order word!
-                                  nullptr,     //LPCTSTR lpWindowName,
+    windowHandle = ::CreateWindow(dummyWindowName, //LPCTSTR lpClassName OR ATOM in low-order word!
+                                  nullptr,         //LPCTSTR lpWindowName,
                                   0, //DWORD dwStyle,
                                   0, //int x,
                                   0, //int y,
@@ -108,7 +108,7 @@ MessageProvider::MessageProvider() :
                                   hMainModule, //HINSTANCE hInstance,
                                   nullptr);    //LPVOID lpParam
     if (!windowHandle)
-        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + L"\n\n" + getLastErrorFormatted() + L" (CreateWindow)");
+        throw FileError(_("Failed to register to receive system messages."), formatSystemError(L"CreateWindow", getLastError()));
 
     guardClass.dismiss();
 }
@@ -118,7 +118,7 @@ MessageProvider::~MessageProvider()
 {
     //clean-up in reverse order
     ::DestroyWindow(windowHandle);
-    ::UnregisterClass(WINDOW_NAME, //LPCTSTR lpClassName OR ATOM in low-order word!
+    ::UnregisterClass(dummyWindowName, //LPCTSTR lpClassName OR ATOM in low-order word!
                       hMainModule); //HINSTANCE hInstance
 }
 
@@ -128,8 +128,8 @@ void MessageProvider::processMessage(UINT message, WPARAM wParam, LPARAM lParam)
     std::for_each(listener.begin(), listener.end(),
     [&](Listener* ls) { ls->onMessage(message, wParam, lParam); });
 }
-//####################################################################################################
 
+//####################################################################################################
 
 class NotifyRequestDeviceRemoval::Pimpl : private MessageProvider::Listener
 {
@@ -138,6 +138,8 @@ public:
         parent_(parent)
     {
         MessageProvider::instance().registerListener(*this); //throw FileError
+
+        ScopeGuard guardProvider = makeGuard([&] { MessageProvider::instance().unregisterListener(*this); });
 
         //register handles to receive notifications
         DEV_BROADCAST_HANDLE filter = {};
@@ -154,13 +156,16 @@ public:
             if (lastError != ERROR_CALL_NOT_IMPLEMENTED   && //fail on SAMBA share: this shouldn't be a showstopper!
                 lastError != ERROR_SERVICE_SPECIFIC_ERROR && //neither should be fail for "Pogoplug" mapped network drives
                 lastError != ERROR_INVALID_DATA)             //this seems to happen for a NetDrive-mapped FTP server
-                throw zen::FileError(L"Could not register device removal notifications:" L"\n\n" + getLastErrorFormatted(lastError));
+                throw zen::FileError(_("Failed to register to receive system messages."), formatSystemError(L"RegisterDeviceNotification", lastError));
         }
+
+        guardProvider.dismiss();
     }
 
     ~Pimpl()
     {
-        ::UnregisterDeviceNotification(hNotification);
+        if (hNotification)
+            ::UnregisterDeviceNotification(hNotification);
         MessageProvider::instance().unregisterListener(*this);
     }
 
@@ -172,10 +177,9 @@ private:
     {
         //DBT_DEVICEQUERYREMOVE example: http://msdn.microsoft.com/en-us/library/aa363427(v=VS.85).aspx
         if (message == WM_DEVICECHANGE)
-        {
-            if (    wParam == DBT_DEVICEQUERYREMOVE       ||
-                    wParam == DBT_DEVICEQUERYREMOVEFAILED ||
-                    wParam == DBT_DEVICEREMOVECOMPLETE)
+            if (wParam == DBT_DEVICEQUERYREMOVE       ||
+                wParam == DBT_DEVICEQUERYREMOVEFAILED ||
+                wParam == DBT_DEVICEREMOVECOMPLETE)
             {
                 PDEV_BROADCAST_HDR header = reinterpret_cast<PDEV_BROADCAST_HDR>(lParam);
                 if (header->dbch_devicetype == DBT_DEVTYP_HANDLE)
@@ -202,14 +206,13 @@ private:
                         }
                 }
             }
-        }
     }
 
     NotifyRequestDeviceRemoval& parent_;
     HDEVNOTIFY hNotification;
 };
-//####################################################################################################
 
+//####################################################################################################
 
 NotifyRequestDeviceRemoval::NotifyRequestDeviceRemoval(HANDLE hDir)
 {
@@ -217,4 +220,4 @@ NotifyRequestDeviceRemoval::NotifyRequestDeviceRemoval(HANDLE hDir)
 }
 
 
-NotifyRequestDeviceRemoval::~NotifyRequestDeviceRemoval() {} //make sure ~auto_ptr() works with complete type
+NotifyRequestDeviceRemoval::~NotifyRequestDeviceRemoval() {} //make sure ~unique_ptr() works with complete type

@@ -16,7 +16,7 @@
 #include "file_id_def.h"
 #include <boost/thread/tss.hpp>
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <Aclapi.h>
 #include "privilege.h"
 #include "dll.h"
@@ -26,19 +26,19 @@
 #include "win_ver.h"
 #include "IFileOperation/file_op.h"
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 #include <sys/vfs.h> //statfs
 #include <fcntl.h> //AT_SYMLINK_NOFOLLOW, UTIME_OMIT
 #ifdef HAVE_SELINUX
 #include <selinux/selinux.h>
 #endif
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 #include <sys/mount.h> //statfs
 //#include <utime.h>
 #endif
 
-#if defined FFS_LINUX || defined FFS_MAC
+#if defined ZEN_LINUX || defined ZEN_MAC
 #include <sys/stat.h>
 #include <sys/time.h> //lutimes
 #endif
@@ -49,11 +49,11 @@ using namespace zen;
 bool zen::fileExists(const Zstring& filename)
 {
     //symbolic links (broken or not) are also treated as existing files!
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
     return attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0; //returns true for (file-)symlinks also
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
     return ::lstat(filename.c_str(), &fileInfo) == 0 &&
            (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
@@ -64,11 +64,11 @@ bool zen::fileExists(const Zstring& filename)
 bool zen::dirExists(const Zstring& dirname)
 {
     //symbolic links (broken or not) are also treated as existing directories!
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
     return attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) != 0; //returns true for (dir-)symlinks also
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat dirInfo = {};
     return ::lstat(dirname.c_str(), &dirInfo) == 0 &&
            (S_ISLNK(dirInfo.st_mode) || S_ISDIR(dirInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
@@ -78,7 +78,7 @@ bool zen::dirExists(const Zstring& dirname)
 
 bool zen::symlinkExists(const Zstring& linkname)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     WIN32_FIND_DATA fileInfo = {};
     {
         const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(linkname).c_str(), &fileInfo);
@@ -88,7 +88,7 @@ bool zen::symlinkExists(const Zstring& linkname)
     }
     return isSymlink(fileInfo);
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
     return ::lstat(linkname.c_str(), &fileInfo) == 0 &&
            S_ISLNK(fileInfo.st_mode); //symbolic link
@@ -98,11 +98,11 @@ bool zen::symlinkExists(const Zstring& linkname)
 
 bool zen::somethingExists(const Zstring& objname)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
     return attr != INVALID_FILE_ATTRIBUTES || ::GetLastError() == ERROR_SHARING_VIOLATION; //"C:\pagefile.sys"
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
     return ::lstat(objname.c_str(), &fileInfo) == 0;
 #endif
@@ -112,13 +112,13 @@ bool zen::somethingExists(const Zstring& objname)
 SymLinkType zen::getSymlinkType(const Zstring& linkname) //throw()
 {
     assert(symlinkExists(linkname));
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(linkname).c_str());
     if (attr == INVALID_FILE_ATTRIBUTES)
         return SYMLINK_TYPE_UNKNOWN;
     return (attr & FILE_ATTRIBUTE_DIRECTORY) ? SYMLINK_TYPE_DIR : SYMLINK_TYPE_FILE;
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     //S_ISDIR and S_ISLNK are mutually exclusive on Linux => explicitly need to follow link
     struct ::stat fileInfo = {};
     if (::stat(linkname.c_str(), &fileInfo) != 0)
@@ -130,14 +130,39 @@ SymLinkType zen::getSymlinkType(const Zstring& linkname) //throw()
 
 namespace
 {
+#ifdef ZEN_WIN
+//(try to) enhance error messages by showing which processes lock the file
+Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string if none found or error occurred
+{
+    if (vistaOrLater())
+    {
+        using namespace fileop;
+        const DllFun<FunType_getLockingProcesses> getLockingProcesses(getDllName(), funName_getLockingProcesses);
+        const DllFun<FunType_freeString>          freeString         (getDllName(), funName_freeString);
+
+        if (getLockingProcesses && freeString)
+        {
+            const wchar_t* procList = nullptr;
+            if (getLockingProcesses(filename.c_str(), procList))
+            {
+                ZEN_ON_SCOPE_EXIT(freeString(procList));
+                return procList;
+            }
+        }
+    }
+    return Zstring();
+}
+#endif
+
+
 void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl) //throw FileError
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     WIN32_FIND_DATA fileInfo = {};
     {
         const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(filename).c_str(), &fileInfo);
         if (searchHandle == INVALID_HANDLE_VALUE)
-            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"FindFirstFile", getLastError()));
         ::FindClose(searchHandle);
     }
     //        WIN32_FILE_ATTRIBUTE_DATA sourceAttr = {};
@@ -173,25 +198,25 @@ void getFileAttrib(const Zstring& filename, FileAttrib& attr, ProcSymlink procSl
                                           FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory
                                           nullptr);
         if (hFile == INVALID_HANDLE_VALUE)
-            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"CreateFile", getLastError()));
         ZEN_ON_SCOPE_EXIT(::CloseHandle(hFile));
 
         BY_HANDLE_FILE_INFORMATION fileInfoHnd = {};
         if (!::GetFileInformationByHandle(hFile, &fileInfoHnd))
-            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
 
         attr.fileSize         = UInt64(fileInfoHnd.nFileSizeLow, fileInfoHnd.nFileSizeHigh);
         attr.modificationTime = toTimeT(fileInfoHnd.ftLastWriteTime);
     }
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
 
     const int rv = procSl == SYMLINK_FOLLOW ?
                    :: stat(filename.c_str(), &fileInfo) :
                    ::lstat(filename.c_str(), &fileInfo);
     if (rv != 0) //follow symbolic links
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"stat", getLastError()));
 
     attr.fileSize         = UInt64(fileInfo.st_size);
     attr.modificationTime = fileInfo.st_mtime;
@@ -218,119 +243,34 @@ Int64 zen::getFileTime(const Zstring& filename, ProcSymlink procSl) //throw File
 
 UInt64 zen::getFreeDiskSpace(const Zstring& path) //throw FileError
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     ULARGE_INTEGER bytesFree = {};
     if (!::GetDiskFreeSpaceEx(appendSeparator(path).c_str(), //__in_opt   LPCTSTR lpDirectoryName, -> "UNC name [...] must include a trailing backslash, for example, "\\MyServer\MyShare\"
                               &bytesFree,                    //__out_opt  PULARGE_INTEGER lpFreeBytesAvailable,
                               nullptr,                       //__out_opt  PULARGE_INTEGER lpTotalNumberOfBytes,
                               nullptr))                      //__out_opt  PULARGE_INTEGER lpTotalNumberOfFreeBytes
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(path)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(path)), formatSystemError(L"GetDiskFreeSpaceEx", getLastError()));
 
     return UInt64(bytesFree.LowPart, bytesFree.HighPart);
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     struct statfs info = {};
     if (::statfs(path.c_str(), &info) != 0)
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(path)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(path)), formatSystemError(L"statfs", getLastError()));
 
     return UInt64(info.f_bsize) * info.f_bavail;
 #endif
 }
 
 
-namespace
-{
-#ifdef FFS_WIN
-//(try to) enhance error messages by showing which processes lock the file
-Zstring getLockingProcessNames(const Zstring& filename) //throw(), empty string if none found or error occurred
-{
-    if (vistaOrLater())
-    {
-        using namespace fileop;
-        const DllFun<FunType_getLockingProcesses> getLockingProcesses(getDllName(), funName_getLockingProcesses);
-        const DllFun<FunType_freeString>          freeString         (getDllName(), funName_freeString);
-
-        if (getLockingProcesses && freeString)
-        {
-            const wchar_t* procList = nullptr;
-            if (getLockingProcesses(filename.c_str(), procList))
-            {
-                ZEN_ON_SCOPE_EXIT(freeString(procList));
-                return procList;
-            }
-        }
-    }
-    return Zstring();
-}
-
-
-DWORD retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
-{
-    //note: this even works for network shares: \\share\dirname
-
-    const DWORD bufferSize = 10000;
-    std::vector<wchar_t> buffer(bufferSize);
-
-    //full pathName need not yet exist!
-    if (!::GetVolumePathName(pathName.c_str(), //__in   LPCTSTR lpszFileName,
-                             &buffer[0],       //__out  LPTSTR lpszVolumePathName,
-                             bufferSize))     //__in   DWORD cchBufferLength
-        return 0;
-
-    DWORD volumeSerial = 0;
-    if (!::GetVolumeInformation(&buffer[0],    //__in_opt   LPCTSTR lpRootPathName,
-                                nullptr,       //__out      LPTSTR lpVolumeNameBuffer,
-                                0,             //__in       DWORD nVolumeNameSize,
-                                &volumeSerial, //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                nullptr,       //__out_opt  LPDWORD lpMaximumComponentLength,
-                                nullptr,       //__out_opt  LPDWORD lpFileSystemFlags,
-                                nullptr,       //__out      LPTSTR lpFileSystemNameBuffer,
-                                0))            //__in       DWORD nFileSystemNameSize
-        return 0;
-
-    return volumeSerial;
-}
-
-#elif defined FFS_LINUX || defined FFS_MAC
-dev_t retrieveVolumeSerial(const Zstring& pathName) //return 0 on error!
-{
-    Zstring volumePathName = pathName;
-
-    //remove trailing slash
-    if (volumePathName.size() > 1 && endsWith(volumePathName, FILE_NAME_SEPARATOR))  //exception: allow '/'
-        volumePathName = beforeLast(volumePathName, FILE_NAME_SEPARATOR);
-
-    struct stat fileInfo = {};
-    while (::lstat(volumePathName.c_str(), &fileInfo) != 0) //go up in folder hierarchy until existing folder is found
-    {
-        volumePathName = beforeLast(volumePathName, FILE_NAME_SEPARATOR); //returns empty string if ch not found
-        if (volumePathName.empty())
-            return 0;  //this includes path "/" also!
-    }
-
-    return fileInfo.st_dev;
-}
-#endif
-}
-
-
-zen::ResponseSame zen::onSameVolume(const Zstring& folderLeft, const Zstring& folderRight) //throw()
-{
-    const auto serialLeft  = retrieveVolumeSerial(folderLeft);  //returns 0 on error!
-    const auto serialRight = retrieveVolumeSerial(folderRight); //returns 0 on error!
-    if (serialLeft == 0 || serialRight == 0)
-        return IS_SAME_CANT_SAY;
-
-    return serialLeft == serialRight ? IS_SAME_YES : IS_SAME_NO;
-}
-
-
 bool zen::removeFile(const Zstring& filename) //throw FileError
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
+    const wchar_t functionName[] = L"DeleteFile";
     const Zstring& filenameFmt = applyLongPathPrefix(filename);
     if (!::DeleteFile(filenameFmt.c_str()))
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
+    const wchar_t functionName[] = L"unlink";
     if (::unlink(filename.c_str()) != 0)
 #endif
     {
@@ -338,7 +278,7 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
         if (errorCodeForNotExisting(lastError)) //no error situation if file is not existing! manual deletion relies on it!
             return false;
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         if (lastError == ERROR_ACCESS_DENIED) //function fails if file is read-only
         {
             ::SetFileAttributes(filenameFmt.c_str(), FILE_ATTRIBUTE_NORMAL); //(try to) normalize file attributes
@@ -353,18 +293,19 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
             return false; //neither file nor any other object (e.g. broken symlink) with that name existing
 
         //begin of "regular" error reporting
-        const std::wstring shortMsg = replaceCpy(_("Cannot delete file %x."), L"%x", fmtFileName(filename));
+        const std::wstring errorMsg = replaceCpy(_("Cannot delete file %x."), L"%x", fmtFileName(filename));
+        std::wstring errorDescr = formatSystemError(functionName, lastError);
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
             lastError == ERROR_LOCK_VIOLATION)
         {
             const Zstring procList = getLockingProcessNames(filename); //throw()
             if (!procList.empty())
-                throw FileError(shortMsg + L"\n\n" + _("The file is locked by another process:") + L"\n" + procList);
+                errorDescr =  _("The file is locked by another process:") + L"\n" + procList;
         }
 #endif
-        throw FileError(shortMsg + L"\n\n" + getLastErrorFormatted(lastError));
+        throw FileError(errorMsg, errorDescr);
     }
     return true;
 }
@@ -382,7 +323,7 @@ namespace
 //wrapper for file system rename function:
 void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const Zstring oldNameFmt = applyLongPathPrefix(oldName);
     const Zstring newNameFmt = applyLongPathPrefix(newName);
 
@@ -391,16 +332,6 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
                       0))                 //__in      DWORD dwFlags
     {
         DWORD lastError = ::GetLastError();
-
-        const std::wstring shortMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
-
-        if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
-            lastError == ERROR_LOCK_VIOLATION)
-        {
-            const Zstring procList = getLockingProcessNames(oldName); //throw()
-            if (!procList.empty())
-                throw FileError(shortMsg + L"\n\n" + _("The file is locked by another process:") + L"\n" + procList);
-        }
 
         if (lastError == ERROR_ACCESS_DENIED) //MoveFileEx may fail to rename a read-only file on a SAMBA-share -> (try to) handle this
         {
@@ -421,7 +352,6 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
                     else
                     {
                         lastError = ::GetLastError(); //use error code from second call to ::MoveFileEx()
-
                         //cleanup: (try to) restore file attributes: assume oldName is still existing
                         ::SetFileAttributes(oldNameFmt.c_str(), oldAttr);
                     }
@@ -429,37 +359,45 @@ void renameFile_sub(const Zstring& oldName, const Zstring& newName) //throw File
             }
         }
 
-        std::wstring errorMessage = shortMsg + L"\n\n" + getLastErrorFormatted(lastError);
+        const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
+        std::wstring errorDescr = formatSystemError(L"MoveFileEx", lastError);
+
+        if (lastError == ERROR_SHARING_VIOLATION || //-> enhance error message!
+            lastError == ERROR_LOCK_VIOLATION)
+        {
+            const Zstring procList = getLockingProcessNames(oldName); //throw()
+            if (!procList.empty())
+                errorDescr = _("The file is locked by another process:") + L"\n" + procList;
+        }
 
         if (lastError == ERROR_NOT_SAME_DEVICE)
-            throw ErrorDifferentVolume(errorMessage);
-
+            throw ErrorDifferentVolume(errorMsg, errorDescr);
         else if (lastError == ERROR_ALREADY_EXISTS || //-> used on Win7 x64
                  lastError == ERROR_FILE_EXISTS)      //-> used by XP???
-            throw ErrorTargetExisting(errorMessage);
+            throw ErrorTargetExisting(errorMsg, errorDescr);
         else
-            throw FileError(errorMessage);
+            throw FileError(errorMsg, errorDescr);
     }
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     if (::rename(oldName.c_str(), newName.c_str()) != 0)
     {
-        const int lastError = errno;
-        std::wstring errorMessage = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName)) +
-                                    L"\n\n" + getLastErrorFormatted(lastError);
+        const int lastError = errno; //copy before making other system calls!
+        std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot move file %x to %y."), L"%x", L"\n" + fmtFileName(oldName)), L"%y", L"\n" + fmtFileName(newName));
+        const std::wstring errorDescr = formatSystemError(L"rename", lastError);
 
         if (lastError == EXDEV)
-            throw ErrorDifferentVolume(errorMessage);
+            throw ErrorDifferentVolume(errorMsg, errorDescr);
         else if (lastError == EEXIST)
-            throw ErrorTargetExisting(errorMessage);
+            throw ErrorTargetExisting(errorMsg, errorDescr);
         else
-            throw FileError(errorMessage);
+            throw FileError(errorMsg, errorDescr);
     }
 #endif
 }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 /*small wrapper around
 ::GetShortPathName()
 ::GetLongPathName() */
@@ -474,10 +412,10 @@ Zstring getFilenameFmt(const Zstring& filename, Function fun) //throw(); returns
 
     std::vector<wchar_t> buffer(bufferSize);
 
-    const DWORD rv = fun(filenameFmt.c_str(), //__in   LPCTSTR lpszShortPath,
-                         &buffer[0],          //__out  LPTSTR  lpszLongPath,
-                         bufferSize);         //__in   DWORD   cchBuffer
-    if (rv == 0 || rv >= bufferSize)
+    const DWORD charsWritten = fun(filenameFmt.c_str(), //__in   LPCTSTR lpszShortPath,
+                                   &buffer[0],          //__out  LPTSTR  lpszLongPath,
+                                   bufferSize);         //__in   DWORD   cchBuffer
+    if (charsWritten == 0 || charsWritten >= bufferSize)
         return Zstring();
 
     return &buffer[0];
@@ -572,7 +510,7 @@ void zen::renameFile(const Zstring& oldName, const Zstring& newName) //throw Fil
     }
     catch (const ErrorTargetExisting&)
     {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         //try to handle issues with already existing short 8.3 file names on Windows
         if (have8dot3NameClash(newName))
         {
@@ -615,7 +553,7 @@ public:
         }
         return LINK_SKIP;
     }
-    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName)
     {
         dirs_.push_back(fullName);
         return nullptr; //DON'T traverse into subdirs; removeDirectory works recursively!
@@ -636,7 +574,7 @@ void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) 
 {
     assert(somethingExists(directory)); //[!]
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const Zstring directoryFmt = applyLongPathPrefix(directory); //support for \\?\-prefix
 
     //(try to) normalize file attributes: actually NEEDED for symbolic links also!
@@ -647,12 +585,14 @@ void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) 
     if (symlinkExists(directory)) //remove symlink directly
     {
         if (callback) callback->onBeforeDirDeletion(directory); //once per symlink
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
+        const wchar_t functionName[] = L"RemoveDirectory";
         if (!::RemoveDirectory(directoryFmt.c_str()))
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
+        const wchar_t functionName[] = L"unlink";
         if (::unlink(directory.c_str()) != 0)
 #endif
-            throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)), formatSystemError(functionName, getLastError()));
     }
     else
     {
@@ -681,12 +621,14 @@ void removeDirectoryImpl(const Zstring& directory, CallbackRemoveDir* callback) 
 
         //parent directory is deleted last
         if (callback) callback->onBeforeDirDeletion(directory); //and once per folder
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
+        const wchar_t functionName[] = L"RemoveDirectory";
         if (!::RemoveDirectory(directoryFmt.c_str()))
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
+        const wchar_t functionName[] = L"rmdir";
         if (::rmdir(directory.c_str()) != 0)
 #endif
-            throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot delete directory %x."), L"%x", fmtFileName(directory)), formatSystemError(functionName, getLastError()));
         //may spuriously fail with ERROR_DIR_NOT_EMPTY(145) even though all child items have
         //successfully been *marked* for deletion, but some application still has a handle open!
         //e.g. Open "C:\Test\Dir1\Dir2" (filled with lots of files) in Explorer, then delete "C:\Test\Dir1" via ::RemoveDirectory() => Error 145
@@ -708,7 +650,7 @@ void zen::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback)
 
 void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink procSl) //throw FileError
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     FILETIME creationTime  = {};
     FILETIME lastWriteTime = tofiletime(modTime);
 
@@ -751,18 +693,18 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
             ::SetFileAttributes(applyLongPathPrefix(filename).c_str(), attribs);
         );
 
-        auto removeReadonly = [&]() -> bool //may need to remove the readonly-attribute (e.g. on FAT usb drives)
+        auto removeReadonly = [&]() -> bool //throw FileError; may need to remove the readonly-attribute (e.g. on FAT usb drives)
         {
             if (attribs == INVALID_FILE_ATTRIBUTES)
             {
                 const DWORD tmpAttr = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
                 if (tmpAttr == INVALID_FILE_ATTRIBUTES)
-                    throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+                    throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"GetFileAttributes", getLastError()));
 
                 if (tmpAttr & FILE_ATTRIBUTE_READONLY)
                 {
                     if (!::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_NORMAL))
-                        throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+                        throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"SetFileAttributes", getLastError()));
 
                     attribs = tmpAttr; //reapplied on scope exit
                     return true;
@@ -799,19 +741,20 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
             if (hFile == INVALID_HANDLE_VALUE)
             {
                 if (::GetLastError() == ERROR_ACCESS_DENIED) //fails if file is read-only (or for "other" reasons)
-                    if (removeReadonly())
+                    if (removeReadonly()) //throw FileError
                         continue;
 
                 //2. be a *little* fancy
                 hFile = openFile(false);
                 if (hFile == INVALID_HANDLE_VALUE)
                 {
-                    if (::GetLastError() == ERROR_ACCESS_DENIED)
-                        if (removeReadonly())
+                    const ErrorCode lastError = getLastError(); //copy before making other system calls!
+                    if (lastError == ERROR_ACCESS_DENIED)
+                        if (removeReadonly()) //throw FileError
                             continue;
 
                     //3. after these herculean stunts we give up...
-                    throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+                    throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"CreateFile", lastError));
                 }
             }
             break;
@@ -826,15 +769,15 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
                            nullptr,         //__in_opt  const FILETIME *lpLastAccessTime,
                            &lastWriteTime)) //__in_opt  const FILETIME *lpLastWriteTime
         {
-            auto lastErr = ::GetLastError();
+            ErrorCode lastError = getLastError(); //copy before making other system calls!
 
             //function may fail if file is read-only: https://sourceforge.net/tracker/?func=detail&atid=1093080&aid=3514569&group_id=234430
-            if (lastErr == ERROR_ACCESS_DENIED)
+            if (lastError == ERROR_ACCESS_DENIED)
             {
                 //dynamically load windows API function: available with Windows Vista and later
                 typedef BOOL (WINAPI* SetFileInformationByHandleFunc)(HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
-
                 const SysDllFun<SetFileInformationByHandleFunc> setFileInformationByHandle(L"kernel32.dll", "SetFileInformationByHandle");
+
                 if (setFileInformationByHandle) //if not: let the original error propagate!
                 {
                     auto setFileInfo = [&](FILE_BASIC_INFO basicInfo) //throw FileError; no const& since SetFileInformationByHandle() requires non-const parameter!
@@ -843,7 +786,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
                                                         FileBasicInfo,      //__in  FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
                                                         &basicInfo,         //__in  LPVOID lpFileInformation,
                                                         sizeof(basicInfo))) //__in  DWORD dwBufferSize
-                            throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+                            throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"SetFileInformationByHandle", getLastError()));
                     };
 
                     auto toLargeInteger = [](const FILETIME& ft) -> LARGE_INTEGER
@@ -876,15 +819,16 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
                             }
                             catch (FileError&) {}
 
-                            lastErr = ERROR_SUCCESS;
+                            lastError = ERROR_SUCCESS;
                         }
                 }
             }
 
-            std::wstring errorMsg = replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastErr);
+            std::wstring errorMsg = replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename));
+            const std::wstring errorDescr = formatSystemError(L"SetFileTime", lastError);
 
             //add more meaningful message: FAT accepts only a subset of the NTFS date range
-            if (lastErr == ERROR_INVALID_PARAMETER &&
+            if (lastError == ERROR_INVALID_PARAMETER &&
                 dst::isFatDrive(filename))
             {
                 //we need a low-level reliable routine to format a potentially invalid date => don't use strftime!!!
@@ -929,8 +873,8 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
                             (!isNullTime(creationTime) ? L"\n\tcreate (UTC): \t" + fmtDate(creationTime) : L"");
             }
 
-            if (lastErr != ERROR_SUCCESS)
-                throw FileError(errorMsg);
+            if (lastError != ERROR_SUCCESS)
+                throw FileError(errorMsg, errorDescr);
         }
     }
 #ifndef NDEBUG //dst hack: verify data written
@@ -959,7 +903,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
     }
 #endif
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     //sigh, we can't use utimensat on NTFS volumes on Ubuntu: silent failure!!! what morons are programming this shit???
 
     //    struct ::timespec newTimes[2] = {};
@@ -967,7 +911,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
     //    newTimes[1].tv_sec = to<time_t>(modTime); //modification time (seconds)
     //
     //    if (::utimensat(AT_FDCWD, filename.c_str(), newTimes, procSl == SYMLINK_DIRECT ? AT_SYMLINK_NOFOLLOW : 0) != 0)
-    //        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+    //        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"utimensat", getLastError()));
 
     //=> fallback to "retarded-idiot version"! -- DarkByte
 
@@ -979,20 +923,20 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
                    :: utimes(filename.c_str(), newTimes) : //utimensat() not yet implemented on OS X
                    ::lutimes(filename.c_str(), newTimes);
     if (rv != 0)
-        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(filename)), formatSystemError(L"utimes", getLastError()));
 #endif
 }
 
 
 bool zen::supportsPermissions(const Zstring& dirname) //throw FileError
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const DWORD bufferSize = MAX_PATH + 1;
     std::vector<wchar_t> buffer(bufferSize);
     if (!::GetVolumePathName(dirname.c_str(), //__in   LPCTSTR lpszFileName,
                              &buffer[0],      //__out  LPTSTR lpszVolumePathName,
                              bufferSize))     //__in   DWORD cchBufferLength
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"GetVolumePathName", getLastError()));
 
     DWORD fsFlags = 0;
     if (!::GetVolumeInformation(&buffer[0], //__in_opt   LPCTSTR lpRootPathName,
@@ -1003,11 +947,11 @@ bool zen::supportsPermissions(const Zstring& dirname) //throw FileError
                                 &fsFlags,   //__out_opt  LPDWORD lpFileSystemFlags,
                                 nullptr,    //__out      LPTSTR  lpFileSystemNameBuffer,
                                 0))         //__in       DWORD   nFileSystemNameSize
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(dirname)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(dirname)), formatSystemError(L"GetVolumeInformation", getLastError()));
 
     return (fsFlags & FILE_PERSISTENT_ACLS) != 0;
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     return true;
 #endif
 }
@@ -1029,7 +973,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
             errno == EOPNOTSUPP) //extended attributes are not supported by the filesystem
             return;
 
-        throw FileError(replaceCpy(_("Cannot read security context of %x."), L"%x", fmtFileName(source)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot read security context of %x."), L"%x", fmtFileName(source)), formatSystemError(L"getfilecon", getLastError()));
     }
     ZEN_ON_SCOPE_EXIT(::freecon(contextSource));
 
@@ -1057,7 +1001,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
                     ::setfilecon(target.c_str(), contextSource) :
                     ::lsetfilecon(target.c_str(), contextSource);
     if (rv3 < 0)
-        throw FileError(replaceCpy(_("Cannot write security context of %x."), L"%x", fmtFileName(target)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot write security context of %x."), L"%x", fmtFileName(target)), formatSystemError(L"setfilecon", getLastError()));
 }
 #endif //HAVE_SELINUX
 
@@ -1065,7 +1009,7 @@ void copySecurityContext(const Zstring& source, const Zstring& target, ProcSymli
 //copy permissions for files, directories or symbolic links: requires admin rights
 void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSymlink procSl) //throw FileError
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //in contrast to ::SetSecurityInfo(), ::SetFileSecurity() seems to honor the "inherit DACL/SACL" flags
     //CAVEAT: if a file system does not support ACLs, GetFileSecurity() will return successfully with a *valid* security descriptor containing *no* ACL entries!
 
@@ -1089,7 +1033,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     }
     catch (const FileError& e)//add some more context description (e.g. user is not an admin)
     {
-        throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(sourceResolved)) + L"\n\n" + e.toString());
+        throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(sourceResolved)), e.toString());
     }
 
 
@@ -1108,7 +1052,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
         if (bytesNeeded > buffer.size())
             buffer.resize(bytesNeeded);
         else
-            throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(sourceResolved)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(sourceResolved)), formatSystemError(L"GetFileSecurity", getLastError()));
     }
     SECURITY_DESCRIPTOR& secDescr = reinterpret_cast<SECURITY_DESCRIPTOR&>(buffer[0]);
 
@@ -1132,7 +1076,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
                            OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION |
                            DACL_SECURITY_INFORMATION  | SACL_SECURITY_INFORMATION, //__in  SECURITY_INFORMATION SecurityInformation,
                            &secDescr)) //__in  PSECURITY_DESCRIPTOR pSecurityDescriptor
-        throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(targetResolved)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(targetResolved)), formatSystemError(L"SetFileSecurity", getLastError()));
 
     /*
     PSECURITY_DESCRIPTOR buffer = nullptr;
@@ -1214,7 +1158,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
         throw FileError
     		*/
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 
 #ifdef HAVE_SELINUX  //copy SELinux security context
     copySecurityContext(source, target, procSl); //throw FileError
@@ -1224,20 +1168,24 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, ProcSym
     if (procSl == SYMLINK_FOLLOW)
     {
         if (::stat(source.c_str(), &fileInfo) != 0)
-            throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(source)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(source)), formatSystemError(L"stat", getLastError()));
 
-        if (::chown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0 || // may require admin rights!
-            ::chmod(target.c_str(), fileInfo.st_mode) != 0)
-            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)) + L"\n\n" + getLastErrorFormatted());
+        if (::chown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0) // may require admin rights!
+            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), formatSystemError(L"chown", getLastError()));
+
+        if (::chmod(target.c_str(), fileInfo.st_mode) != 0)
+            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), formatSystemError(L"chmod", getLastError()));
     }
     else
     {
         if (::lstat(source.c_str(), &fileInfo) != 0)
-            throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(source)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot read permissions of %x."), L"%x", fmtFileName(source)), formatSystemError(L"lstat", getLastError()));
 
-        if (::lchown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0 || // may require admin rights!
-            (!symlinkExists(target) && ::chmod(target.c_str(), fileInfo.st_mode) != 0)) //setting access permissions doesn't make sense for symlinks on Linux: there is no lchmod()
-            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)) + L"\n\n" + getLastErrorFormatted());
+        if (::lchown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0) // may require admin rights!
+            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), formatSystemError(L"lchown", getLastError()));
+
+        if (!symlinkExists(target) && ::chmod(target.c_str(), fileInfo.st_mode) != 0) //setting access permissions doesn't make sense for symlinks on Linux: there is no lchmod()
+            throw FileError(replaceCpy(_("Cannot write permissions of %x."), L"%x", fmtFileName(target)), formatSystemError(L"chmod", getLastError()));
     }
 #endif
 }
@@ -1315,7 +1263,7 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
                              const Zstring& templateDir,
                              bool copyFilePermissions)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //special handling for volume root: trying to create existing root directory results in ERROR_ACCESS_DENIED rather than ERROR_ALREADY_EXISTS!
     Zstring dirTmp = removeLongPathPrefix(endsWith(directory, FILE_NAME_SEPARATOR) ?
                                           beforeLast(directory, FILE_NAME_SEPARATOR) :
@@ -1327,10 +1275,12 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
 
         const ErrorCode lastError = dirExists(dirTmp) ? ERROR_ALREADY_EXISTS : ERROR_PATH_NOT_FOUND;
 
-        const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(dirTmp)) + L"\n\n" + getLastErrorFormatted(lastError);
+        const std::wstring errorMsg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(dirTmp));
+        const std::wstring errorDescr = formatSystemError(L"CreateDirectory", lastError);
+
         if (lastError == ERROR_ALREADY_EXISTS)
-            throw ErrorTargetExisting(msg);
-        throw FileError(msg); //[!] this is NOT a ErrorTargetPathMissing case!
+            throw ErrorTargetExisting(errorMsg, errorDescr);
+        throw FileError(errorMsg, errorDescr); //[!] this is NOT a ErrorTargetPathMissing case!
     }
 
     //don't use ::CreateDirectoryEx:
@@ -1357,32 +1307,35 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
 
         if (lastError != ERROR_SUCCESS)
         {
-            const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted(lastError);
+            const std::wstring errorMsg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory));
+            const std::wstring errorDescr = formatSystemError(L"CreateDirectory", lastError);
+
             if (lastError == ERROR_ALREADY_EXISTS)
-                throw ErrorTargetExisting(msg);
+                throw ErrorTargetExisting(errorMsg, errorDescr);
             else if (lastError == ERROR_PATH_NOT_FOUND)
-                throw ErrorTargetPathMissing(msg);
-            throw FileError(msg);
+                throw ErrorTargetPathMissing(errorMsg, errorDescr);
+            throw FileError(errorMsg, errorDescr);
         }
     }
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     if (::mkdir(directory.c_str(), 0755) != 0) //mode: drwxr-xr-x
     {
-        const std::wstring msg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory)) + L"\n\n" + getLastErrorFormatted();
         const ErrorCode lastError = getLastError();
+        const std::wstring errorMsg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(directory));
+        const std::wstring errorDescr = formatSystemError(L"mkdir", lastError);
 
         if (lastError == EEXIST)
-            throw ErrorTargetExisting(msg);
+            throw ErrorTargetExisting(errorMsg, errorDescr);
         else if (lastError == ENOENT)
-            throw ErrorTargetPathMissing(msg);
-        throw FileError(msg);
+            throw ErrorTargetPathMissing(errorMsg, errorDescr);
+        throw FileError(errorMsg, errorDescr);
     }
 #endif
 
     if (!templateDir.empty())
     {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         //try to copy file attributes (dereference symlinks and junctions)
         const HANDLE hDirSrc = ::CreateFile(zen::applyLongPathPrefix(templateDir).c_str(),
                                             0,
@@ -1451,7 +1404,7 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
 {
     const Zstring linkPath = getSymlinkTargetRaw(sourceLink); //throw FileError; accept broken symlinks
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const bool isDirLink = [&]() -> bool
     {
         const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(sourceLink).c_str());
@@ -1463,22 +1416,24 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     const SysDllFun<CreateSymbolicLinkFunc> createSymbolicLink(L"kernel32.dll", "CreateSymbolicLinkW");
 
     if (!createSymbolicLink)
-        throw FileError(replaceCpy(_("Cannot find system function %x."), L"%x", L"\"CreateSymbolicLinkW\""));
+        throw FileError(replaceCpy(_("Cannot create symbolic link %x."), L"%x", fmtFileName(targetLink)), replaceCpy(_("Cannot find system function %x."), L"%x", L"\"CreateSymbolicLinkW\""));
 
+    const wchar_t functionName[] = L"CreateSymbolicLinkW";
     if (!createSymbolicLink(targetLink.c_str(), //__in  LPTSTR lpSymlinkFileName, - seems no long path prefix is required...
                             linkPath.c_str(),   //__in  LPTSTR lpTargetFileName,
                             (isDirLink ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0))) //__in  DWORD dwFlags
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
+    const wchar_t functionName[] = L"symlink";
     if (::symlink(linkPath.c_str(), targetLink.c_str()) != 0)
 #endif
-        throw FileError(replaceCpy(_("Cannot create symbolic link %x."), L"%x", fmtFileName(targetLink)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot create symbolic link %x."), L"%x", fmtFileName(targetLink)), formatSystemError(functionName, getLastError()));
 
     //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist
-    zen::ScopeGuard guardNewDir = zen::makeGuard([&]
+    zen::ScopeGuard guardNewLink = zen::makeGuard([&]
     {
         try
         {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             if (isDirLink)
                 removeDirectory(targetLink);
             else
@@ -1497,13 +1452,13 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
     if (copyFilePermissions)
         copyObjectPermissions(sourceLink, targetLink, SYMLINK_DIRECT); //throw FileError
 
-    guardNewDir.dismiss(); //target has been created successfully!
+    guardNewLink.dismiss(); //target has been created successfully!
 }
 
 
 namespace
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 /*
             CopyFileEx()    BackupRead()      FileRead()
 			--------------------------------------------
@@ -1626,24 +1581,27 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     {
         const DWORD lastError = ::GetLastError();
 
-        const std::wstring shortMsg = replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile));
+        const std::wstring errorMsg = replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile));
+        std::wstring errorDescr = formatSystemError(L"CreateFile", lastError);
 
         //if file is locked throw "ErrorFileLocked" instead!
         if (lastError == ERROR_SHARING_VIOLATION ||
             lastError == ERROR_LOCK_VIOLATION)
         {
             const Zstring procList = getLockingProcessNames(sourceFile); //throw()
-            throw ErrorFileLocked(shortMsg + L"\n\n" + (!procList.empty() ? _("The file is locked by another process:") + L"\n" + procList : getLastErrorFormatted(lastError)));
+            if (!procList.empty())
+                errorDescr = _("The file is locked by another process:") + L"\n" + procList;
+            throw ErrorFileLocked(errorMsg, errorDescr);
         }
 
-        throw FileError(shortMsg + L"\n\n" + getLastErrorFormatted(lastError) + L" (open)");
+        throw FileError(errorMsg, errorDescr);
     }
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFileSource));
 
     //----------------------------------------------------------------------
     BY_HANDLE_FILE_INFORMATION fileInfoSource = {};
     if (!::GetFileInformationByHandle(hFileSource, &fileInfoSource))
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
 
     //----------------------------------------------------------------------
     const DWORD validAttribs = FILE_ATTRIBUTE_NORMAL   | //"This attribute is valid only if used alone."
@@ -1665,17 +1623,18 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                                       nullptr);
     if (hFileTarget == INVALID_HANDLE_VALUE)
     {
-        const DWORD lastError = ::GetLastError();
-        const std::wstring errorMessage = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted(lastError) + L" (open)";
+        const ErrorCode lastError = getLastError(); //copy before making other system calls!
+        const std::wstring errorMsg = replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile));
+        const std::wstring errorDescr = formatSystemError(L"CreateFile", lastError);
 
         if (lastError == ERROR_FILE_EXISTS || //confirmed to be used
             lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
-            throw ErrorTargetExisting(errorMessage);
+            throw ErrorTargetExisting(errorMsg, errorDescr);
 
         if (lastError == ERROR_PATH_NOT_FOUND)
-            throw ErrorTargetPathMissing(errorMessage);
+            throw ErrorTargetPathMissing(errorMsg, errorDescr);
 
-        throw FileError(errorMessage);
+        throw FileError(errorMsg, errorDescr);
     }
     ScopeGuard guardTarget = makeGuard([&] { try { removeFile(targetFile); } catch (...) {} }); //transactional behavior: guard just after opening target and before managing hFileOut
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFileTarget));
@@ -1683,7 +1642,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     //----------------------------------------------------------------------
     BY_HANDLE_FILE_INFORMATION fileInfoTarget = {};
     if (!::GetFileInformationByHandle(hFileTarget, &fileInfoTarget))
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
 
     //return up-to-date file attributes
     if (newAttrib)
@@ -1732,8 +1691,8 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                                0,                //OutBufferSize
                                &bytesReturned,   //number of bytes returned
                                nullptr))         //OVERLAPPED structure
-            throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(targetFile)) +
-                            L"\n\n" + zen::getLastErrorFormatted() + L" (NTFS sparse)");
+            throw FileError(replaceCpy(_("Cannot write file attributes of %x."), L"%x", fmtFileName(targetFile)),
+                            formatSystemError(L"DeviceIoControl, FSCTL_SET_SPARSE", getLastError()));
     }
 
     //----------------------------------------------------------------------
@@ -1760,10 +1719,10 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                           false,         //__in   BOOL bAbort,
                           false,         //__in   BOOL bProcessSecurity,
                           &contextRead)) //__out  LPVOID *lpContext
-            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + getLastErrorFormatted()); //better use fine-granular error messages "reading/writing"!
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), formatSystemError(L"BackupRead", getLastError())); //better use fine-granular error messages "reading/writing"!
 
         if (bytesRead > BUFFER_SIZE)
-            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + L"(buffer overflow)");
+            throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), L"buffer overflow"); //user should never see this
 
         if (bytesRead < BUFFER_SIZE)
             eof = true;
@@ -1776,10 +1735,10 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
                            false,          //__in   BOOL bAbort,
                            false,          //__in   BOOL bProcessSecurity,
                            &contextWrite)) //__out  LPVOID *lpContext
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)), formatSystemError(L"BackupWrite", getLastError()));
 
         if (bytesWritten != bytesRead)
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + L"(incomplete write)");
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(targetFile)), L"incomplete write"); //user should never see this
 
         //total bytes transferred may be larger than file size! context information + ADS or smaller (sparse, compressed)!
 
@@ -1797,14 +1756,14 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
     //::BackupRead() silently fails reading encrypted files -> double check!
     if (!someBytesWritten && UInt64(fileInfoSource.nFileSizeLow, fileInfoSource.nFileSizeHigh) != 0U)
         //note: there is no guaranteed ordering relation beween bytes transferred and file size! Consider ADS (>) and compressed/sparse files (<)!
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + L"(unknown error)");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), L"unknown error"); //user should never see this -> this method is called only if "canCopyAsSparse()"
 
     //time needs to be set at the end: BackupWrite() changes modification time
     if (!::SetFileTime(hFileTarget,
                        &fileInfoSource.ftCreationTime,
                        nullptr,
                        &fileInfoSource.ftLastWriteTime))
-        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot write modification time of %x."), L"%x", fmtFileName(targetFile)), formatSystemError(L"SetFileTime", getLastError()));
 
     guardTarget.dismiss();
 
@@ -1854,7 +1813,7 @@ public:
 
     void reportUserException(CallbackCopyFile& userCallback) { exceptionInUserCallback = &userCallback; }
 
-    void reportError(const std::wstring& message) { errorMsg = message; }
+    void reportError(const std::wstring& msg, const std::wstring& description) { errorMsg = std::make_pair(msg, description); }
 
     //call context: copyFileWindowsDefault()
     void evaluateErrors() //throw X
@@ -1865,14 +1824,14 @@ public:
         if (exceptionInUserCallback)
             exceptionInUserCallback->updateCopyStatus(0); //rethrow (hopefully!)
 
-        if (!errorMsg.empty())
-            throw FileError(errorMsg);
+        if (!errorMsg.first.empty())
+            throw FileError(errorMsg.first, errorMsg.second);
     }
 
 private:
-    bool shouldCopyAsSparse;                   //
-    std::wstring errorMsg;                     //these are exclusive!
-    CallbackCopyFile* exceptionInUserCallback; //
+    bool shouldCopyAsSparse;                        //
+    std::pair<std::wstring, std::wstring> errorMsg; //these are exclusive!
+    CallbackCopyFile* exceptionInUserCallback;      //
 };
 
 
@@ -1935,14 +1894,14 @@ DWORD CALLBACK copyCallbackInternal(LARGE_INTEGER totalFileSize,
         BY_HANDLE_FILE_INFORMATION fileInfoSrc = {};
         if (!::GetFileInformationByHandle(hSourceFile, &fileInfoSrc))
         {
-            cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.sourceFile_)) + L"\n\n" + getLastErrorFormatted());
+            cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.sourceFile_)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
             return PROGRESS_CANCEL;
         }
 
         BY_HANDLE_FILE_INFORMATION fileInfoTrg = {};
         if (!::GetFileInformationByHandle(hDestinationFile, &fileInfoTrg))
         {
-            cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.targetFile_)) + L"\n\n" + getLastErrorFormatted());
+            cbd.errorHandler.reportError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(cbd.targetFile_)), formatSystemError(L"GetFileInformationByHandle", getLastError()));
             return PROGRESS_CANCEL;
         }
 
@@ -2055,16 +2014,17 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
             throw ErrorShouldCopyAsSparse(L"sparse dummy value2");
 
         //assemble error message...
-        std::wstring errorMessage = replaceCpy(replaceCpy(_("Cannot copy file %x to %y."), L"%x", L"\n" + fmtFileName(sourceFile)), L"%y", L"\n" + fmtFileName(targetFile)) +
-                                    L"\n\n" + getLastErrorFormatted(lastError);
+        const std::wstring errorMsg = replaceCpy(replaceCpy(_("Cannot copy file %x to %y."), L"%x", L"\n" + fmtFileName(sourceFile)), L"%y", L"\n" + fmtFileName(targetFile));
+        std::wstring errorDescr = formatSystemError(L"CopyFileEx", lastError);
 
         //if file is locked throw "ErrorFileLocked" instead!
         if (lastError == ERROR_SHARING_VIOLATION ||
             lastError == ERROR_LOCK_VIOLATION)
         {
             const Zstring procList = getLockingProcessNames(sourceFile); //throw() -> enhance error message!
-            throw ErrorFileLocked(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" +
-                                  (!procList.empty() ? _("The file is locked by another process:") + L"\n" + procList : getLastErrorFormatted(lastError)));
+            if (!procList.empty())
+                errorDescr = _("The file is locked by another process:") + L"\n" + procList;
+            throw ErrorFileLocked(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(sourceFile)), errorDescr);
         }
 
         //if target is existing this functions is expected to throw ErrorTargetExisting!!!
@@ -2072,13 +2032,13 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
             lastError == ERROR_ALREADY_EXISTS) //not sure if used -> better be safe than sorry!!!
         {
             guardTarget.dismiss(); //don't delete file that existed previously!
-            throw ErrorTargetExisting(errorMessage);
+            throw ErrorTargetExisting(errorMsg, errorDescr);
         }
 
         if (lastError == ERROR_PATH_NOT_FOUND)
         {
             guardTarget.dismiss(); //not relevant
-            throw ErrorTargetPathMissing(errorMessage);
+            throw ErrorTargetPathMissing(errorMsg, errorDescr);
         }
 
         try //add more meaningful message
@@ -2087,13 +2047,13 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
             if (lastError == ERROR_INVALID_PARAMETER &&
                 dst::isFatDrive(targetFile) &&
                 getFilesize(sourceFile) >= 4U * UInt64(1024U * 1024 * 1024)) //throw FileError
-                errorMessage += L"\nFAT volume cannot store files larger than 4 gigabyte!";
+                errorDescr += L"\nFAT volume cannot store files larger than 4 gigabyte!";
 
             //note: ERROR_INVALID_PARAMETER can also occur when copying to a SharePoint server or MS SkyDrive and the target filename is of a restricted type.
         }
         catch (...) {}
 
-        throw FileError(errorMessage);
+        throw FileError(errorMsg, errorDescr);
     }
 
     if (newAttrib)
@@ -2152,7 +2112,7 @@ void copyFileWindows(const Zstring& sourceFile, const Zstring& targetFile, Callb
 }
 
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 void copyFileLinuxMac(const Zstring& sourceFile,
                       const Zstring& targetFile,
                       CallbackCopyFile* callback,
@@ -2163,7 +2123,7 @@ void copyFileLinuxMac(const Zstring& sourceFile,
 
     struct ::stat sourceInfo = {};
     if (::fstat(fileIn.getDescriptor(), &sourceInfo) != 0) //read file attributes from source
-        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)) + L"\n\n" + getLastErrorFormatted());
+        throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)), formatSystemError(L"fstat", getLastError()));
 
     zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (...) {} }); //transactional behavior: place guard before lifetime of FileOutput
     try
@@ -2190,7 +2150,7 @@ void copyFileLinuxMac(const Zstring& sourceFile,
             //read and return file statistics
             struct ::stat targetInfo = {};
             if (::fstat(fileOut.getDescriptor(), &targetInfo) != 0)
-                throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)) + L"\n\n" + getLastErrorFormatted());
+                throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(targetFile)), formatSystemError(L"fstat", getLastError()));
 
             if (newAttrib)
             {
@@ -2249,10 +2209,10 @@ copyFileWindowsDefault(::CopyFileEx)  copyFileWindowsSparse(::BackupRead/::Backu
 inline
 void copyFileSelectOs(const Zstring& sourceFile, const Zstring& targetFile, CallbackCopyFile* callback, FileAttrib* sourceAttr)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     copyFileWindows(sourceFile, targetFile, callback, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     copyFileLinuxMac(sourceFile, targetFile, callback, sourceAttr); //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 #endif
 }

@@ -73,7 +73,7 @@ namespace
 - create target super directories if missing
 */
 template <class Function>
-void moveItemToVersioning(const Zstring& sourceObj, //throw FileError
+void moveItemToVersioning(const Zstring& fullName, //throw FileError
                           const Zstring& relativeName,
                           const Zstring& versioningDirectory,
                           const Zstring& timestamp,
@@ -82,37 +82,36 @@ void moveItemToVersioning(const Zstring& sourceObj, //throw FileError
 {
     assert(!startsWith(relativeName, FILE_NAME_SEPARATOR));
     assert(!endsWith  (relativeName, FILE_NAME_SEPARATOR));
-    assert(endsWith(sourceObj, relativeName)); //usually, yes, but we might relax this in the future
 
-    Zstring targetObj;
+    Zstring targetName;
     switch (versioningStyle)
     {
         case VER_STYLE_REPLACE:
-            targetObj = appendSeparator(versioningDirectory) + relativeName;
+            targetName = appendSeparator(versioningDirectory) + relativeName;
             break;
 
         case VER_STYLE_ADD_TIMESTAMP:
             //assemble time-stamped version name
-            targetObj = appendSeparator(versioningDirectory) + relativeName + Zstr(' ') + timestamp + getExtension(relativeName);
-            assert(impl::isMatchingVersion(afterLast(relativeName, FILE_NAME_SEPARATOR), afterLast(targetObj, FILE_NAME_SEPARATOR))); //paranoid? no!
+            targetName = appendSeparator(versioningDirectory) + relativeName + Zstr(' ') + timestamp + getExtension(relativeName);
+            assert(impl::isMatchingVersion(afterLast(relativeName, FILE_NAME_SEPARATOR), afterLast(targetName, FILE_NAME_SEPARATOR))); //paranoid? no!
             break;
     }
 
     try
     {
-        moveObj(sourceObj, targetObj); //throw FileError
+        moveObj(fullName, targetName); //throw FileError
     }
     catch (FileError&) //expected to fail if target directory is not yet existing!
     {
-        if (!somethingExists(sourceObj)) //no source at all is not an error (however a directory as source when a file is expected, *is* an error!)
+        if (!somethingExists(fullName)) //no source at all is not an error (however a directory as source when a file is expected, *is* an error!)
             return; //object *not* processed
 
         //create intermediate directories if missing
-        const Zstring targetDir = beforeLast(targetObj, FILE_NAME_SEPARATOR);
+        const Zstring targetDir = beforeLast(targetName, FILE_NAME_SEPARATOR);
         if (!dirExists(targetDir)) //->(minor) file system race condition!
         {
             makeDirectory(targetDir); //throw FileError
-            moveObj(sourceObj, targetObj); //throw FileError -> this should work now!
+            moveObj(fullName, targetName); //throw FileError -> this should work now!
         }
         else
             throw;
@@ -126,36 +125,45 @@ void moveItemToVersioning(const Zstring& sourceObj, //throw FileError
 template <class Function>
 void moveObject(const Zstring& sourceFile, //throw FileError
                 const Zstring& targetFile,
-                Function copyDelete) //fallback if move failed; may throw FileError
+                Function copyDelete) //throw FileError; fallback if move failed
 {
     assert(!dirExists(sourceFile) || symlinkExists(sourceFile)); //we process files and symlinks only
 
-    //first try to move directly without copying
-    bool targetExisting = false;
-    try
+    auto removeTarget = [&]()
     {
-        renameFile(sourceFile, targetFile); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
-        return; //great, we get away cheaply!
-    }
-    //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
-    catch (const ErrorDifferentVolume&) {}
-    catch (const ErrorTargetExisting&) { targetExisting = true; }
-
-    if (!targetExisting)
-        targetExisting = somethingExists(targetFile);
-
-    //remove target object
-    if (targetExisting)
-    {
+        //remove target object
         if (fileExists(targetFile)) //file or symlink
             removeFile(targetFile); //throw FileError
         else if (dirExists(targetFile)) //directory or symlink
             removeDirectory(targetFile); //throw FileError
         //we do not expect targetFile to be a directory in general => no callback required
         else assert(false);
-    }
+    };
 
-    copyDelete();
+    //first try to move directly without copying
+    try
+    {
+        renameFile(sourceFile, targetFile); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+        return; //great, we get away cheaply!
+    }
+    //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
+    catch (const ErrorDifferentVolume&)
+    {
+        removeTarget(); //throw FileError
+        copyDelete();   //
+    }
+    catch (const ErrorTargetExisting&)
+    {
+        removeTarget(); //throw FileError
+        try
+        {
+            renameFile(sourceFile, targetFile); //throw FileError, ErrorDifferentVolume, ErrorTargetExisting
+        }
+        catch (const ErrorDifferentVolume&)
+        {
+            copyDelete(); //throw FileError
+        }
+    }
 }
 
 
@@ -219,7 +227,7 @@ private:
         return LINK_SKIP;
     }
 
-    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName)
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName)
     {
         dirs_.push_back(shortName);
         return nullptr; //DON'T traverse into subdirs; moveDirectory works recursively!
@@ -234,7 +242,7 @@ private:
 }
 
 
-bool FileVersioner::revisionFile(const Zstring& sourceFile, const Zstring& relativeName, CallbackMoveFile& callback) //throw FileError
+bool FileVersioner::revisionFile(const Zstring& fullName, const Zstring& relativeName, CallbackMoveFile& callback) //throw FileError
 {
     struct CallbackMoveFileImpl : public CallbackMoveDir
     {
@@ -246,15 +254,15 @@ bool FileVersioner::revisionFile(const Zstring& sourceFile, const Zstring& relat
         CallbackMoveFile& callback_;
     } cb(callback);
 
-    return revisionFileImpl(sourceFile, relativeName, cb); //throw FileError
+    return revisionFileImpl(fullName, relativeName, cb); //throw FileError
 }
 
 
-bool FileVersioner::revisionFileImpl(const Zstring& sourceFile, const Zstring& relativeName, CallbackMoveDir& callback) //throw FileError
+bool FileVersioner::revisionFileImpl(const Zstring& fullName, const Zstring& relativeName, CallbackMoveDir& callback) //throw FileError
 {
     bool moveSuccessful = false;
 
-    moveItemToVersioning(sourceFile, //throw FileError
+    moveItemToVersioning(fullName, //throw FileError
                          relativeName,
                          versioningDirectory_,
                          timeStamp_,
@@ -280,23 +288,23 @@ bool FileVersioner::revisionFileImpl(const Zstring& sourceFile, const Zstring& r
 }
 
 
-void FileVersioner::revisionDir(const Zstring& sourceDir, const Zstring& relativeName, CallbackMoveDir& callback) //throw FileError
+void FileVersioner::revisionDir(const Zstring& fullName, const Zstring& relativeName, CallbackMoveDir& callback) //throw FileError
 {
     //no error situation if directory is not existing! manual deletion relies on it!
-    if (!somethingExists(sourceDir))
+    if (!somethingExists(fullName))
         return; //neither directory nor any other object (e.g. broken symlink) with that name existing
-    revisionDirImpl(sourceDir, relativeName, callback); //throw FileError
+    revisionDirImpl(fullName, relativeName, callback); //throw FileError
 }
 
 
-void FileVersioner::revisionDirImpl(const Zstring& sourceDir, const Zstring& relativeName, CallbackMoveDir& callback) //throw FileError
+void FileVersioner::revisionDirImpl(const Zstring& fullName, const Zstring& relativeName, CallbackMoveDir& callback) //throw FileError
 {
-    assert(somethingExists(sourceDir)); //[!]
+    assert(somethingExists(fullName)); //[!]
 
     //create target
-    if (symlinkExists(sourceDir)) //on Linux there is just one type of symlink, and since we do revision file symlinks, we should revision dir symlinks as well!
+    if (symlinkExists(fullName)) //on Linux there is just one type of symlink, and since we do revision file symlinks, we should revision dir symlinks as well!
     {
-        moveItemToVersioning(sourceDir, //throw FileError
+        moveItemToVersioning(fullName, //throw FileError
                              relativeName,
                              versioningDirectory_,
                              timeStamp_,
@@ -310,7 +318,7 @@ void FileVersioner::revisionDirImpl(const Zstring& sourceDir, const Zstring& rel
     else
     {
         assert(!startsWith(relativeName, FILE_NAME_SEPARATOR));
-        assert(endsWith(sourceDir, relativeName)); //usually, yes, but we might relax this in the future
+        assert(endsWith(fullName, relativeName)); //usually, yes, but we might relax this in the future
         const Zstring targetDir = appendSeparator(versioningDirectory_) + relativeName;
 
         //makeDirectory(targetDir); //FileError -> create only when needed in moveFileToVersioning(); avoids empty directories
@@ -320,17 +328,17 @@ void FileVersioner::revisionDirImpl(const Zstring& sourceDir, const Zstring& rel
         std::vector<Zstring> dirList;  //
         {
             TraverseFilesOneLevel tol(fileList, dirList); //throw FileError
-            traverseFolder(sourceDir, tol);               //
+            traverseFolder(fullName, tol);               //
         }
 
-        const Zstring sourceDirPf = appendSeparator(sourceDir);
+        const Zstring fullNamePf = appendSeparator(fullName);
         const Zstring relnamePf   = appendSeparator(relativeName);
 
         //move files
         std::for_each(fileList.begin(), fileList.end(),
                       [&](const Zstring& shortname)
         {
-            revisionFileImpl(sourceDirPf + shortname, //throw FileError
+            revisionFileImpl(fullNamePf + shortname, //throw FileError
                              relnamePf + shortname,
                              callback);
         });
@@ -339,14 +347,14 @@ void FileVersioner::revisionDirImpl(const Zstring& sourceDir, const Zstring& rel
         std::for_each(dirList.begin(), dirList.end(),
                       [&](const Zstring& shortname)
         {
-            revisionDirImpl(sourceDirPf + shortname, //throw FileError
+            revisionDirImpl(fullNamePf + shortname, //throw FileError
                             relnamePf + shortname,
                             callback);
         });
 
         //delete source
-        callback.onBeforeDirMove(sourceDir, targetDir);
-        removeDirectory(sourceDir); //throw FileError
+        callback.onBeforeDirMove(fullName, targetDir);
+        removeDirectory(fullName); //throw FileError
     }
 }
 
@@ -427,7 +435,7 @@ void FileVersioner::limitVersions(std::function<void()> updateUI) //throw FileEr
             }
             catch (FileError&)
             {
-#ifdef FFS_WIN //if it's a directory symlink:
+#ifdef ZEN_WIN //if it's a directory symlink:
                 if (symlinkExists(fullnameVer) && dirExists(fullnameVer))
                     removeDirectory(fullnameVer); //throw FileError
                 else

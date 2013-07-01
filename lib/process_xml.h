@@ -175,17 +175,17 @@ struct XmlGlobalSettings
             cfgFileHistMax(30),
             folderHistMax(15),
             onCompletionHistoryMax(8),
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             defaultExclusionFilter(Zstr("\\System Volume Information\\") Zstr("\n")
                                    Zstr("\\$Recycle.Bin\\")              Zstr("\n")
                                    Zstr("\\RECYCLER\\")                  Zstr("\n")
                                    Zstr("\\RECYCLED\\")                  Zstr("\n")
                                    Zstr("*\\desktop.ini")                Zstr("\n")
                                    Zstr("*\\thumbs.db")),
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
             defaultExclusionFilter(Zstr("/.Trash-*/") Zstr("\n")
                                    Zstr("/.recycle/")),
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
             defaultExclusionFilter(Zstr("/.fseventsd/")      Zstr("\n")
                                    Zstr("/.Spotlight-V100/") Zstr("\n")
                                    Zstr("/.Trashes/")        Zstr("\n")
@@ -194,9 +194,9 @@ struct XmlGlobalSettings
 #endif
             //deleteOnBothSides(false),
             useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
             textSearchRespectCase(false),
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
             textSearchRespectCase(true),
 #endif
             showIcons(true),
@@ -204,16 +204,16 @@ struct XmlGlobalSettings
             lastUpdateCheck(0)
         {
             //default external apps will be translated "on the fly"!!! First entry will be used for [Enter] or mouse double-click!
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             externelApplications.push_back(std::make_pair(L"Show in Explorer",              L"explorer /select, \"%item_path%\""));
             externelApplications.push_back(std::make_pair(L"Open with default application", L"\"%item_path%\""));
             //mark for extraction: _("Show in Explorer")
             //mark for extraction: _("Open with default application")
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
             externelApplications.push_back(std::make_pair(L"Browse directory",              L"xdg-open \"%item_folder%\""));
             externelApplications.push_back(std::make_pair(L"Open with default application", L"xdg-open \"%item_path%\""));
             //mark for extraction: _("Browse directory") Linux doesn't use the term "folder"
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
             externelApplications.push_back(std::make_pair(L"Browse directory",              L"open -R \"%item_path%\""));
             externelApplications.push_back(std::make_pair(L"Open with default application", L"open \"%item_path%\""));
 #endif

@@ -18,7 +18,7 @@
 #include "../lib/resolve_path.h"
 #include "folder_history_box.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/dll.h>
 #include <zen/win_ver.h>
 #include "IFileDialog_Vista\ifile_dialog.h"
@@ -34,7 +34,7 @@ namespace
 {
 void setDirectoryNameImpl(const wxString& dirname, wxWindow& tooltipWnd, wxStaticText* staticText)
 {
-    const wxString dirFormatted = utfCvrtTo<wxString>(getFormattedDirectoryName(toZ(dirname)));
+    const wxString dirFormatted = utfCvrtTo<wxString>(getFormattedDirectoryName(toZ(dirname))); //may block when resolving [<volume name>]
 
     tooltipWnd.SetToolTip(nullptr); //workaround wxComboBox bug http://trac.wxwidgets.org/ticket/10512 / http://trac.wxwidgets.org/ticket/12659
     tooltipWnd.SetToolTip(dirFormatted); //who knows when the real bugfix reaches mere mortals via an official release...
@@ -153,7 +153,7 @@ void DirectoryName<NameControl>::onFilesDropped(FileDropEvent& event)
         else
         {
             wxString parentName = beforeLast(fileName, utfCvrtTo<wxString>(FILE_NAME_SEPARATOR)); //returns empty string if ch not found
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             if (endsWith(parentName, L":")) //volume name
                 parentName += FILE_NAME_SEPARATOR;
 #endif
@@ -201,7 +201,7 @@ void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
 
     //wxDirDialog internally uses lame-looking SHBrowseForFolder(); we better use IFileDialog() instead! (remembers size and position!)
     std::unique_ptr<wxString> newFolder;
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     if (vistaOrLater())
     {
         using namespace ifile;

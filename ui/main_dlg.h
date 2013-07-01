@@ -21,10 +21,9 @@
 #include "folder_history_box.h"
 #include "../lib/process_xml.h"
 
-//class FolderHistory;
-class DirectoryPair;
+class FolderPairFirst;
+class FolderPairPanel;
 class CompareProgressDialog;
-class DirectoryPairFirst;
 
 
 class MainDialog : public MainDialogGenerated
@@ -62,8 +61,8 @@ private:
     friend class CompareStatusHandler;
     friend class SyncStatusHandler;
     friend class ManualDeletionHandler;
-    friend class DirectoryPairFirst;
-    friend class DirectoryPair;
+    friend class FolderPairFirst;
+    friend class FolderPairPanel;
     friend class DirectoryNameMainImpl;
     template <class GuiPanel>
     friend class FolderPairCallback;
@@ -269,8 +268,8 @@ private:
     xmlAccess::XmlGuiConfig currentCfg;
 
     //folder pairs:
-    std::unique_ptr<DirectoryPairFirst> firstFolderPair; //always bound!!!
-    std::vector<DirectoryPair*> additionalFolderPairs; //additional pairs to the first pair
+    std::unique_ptr<FolderPairFirst> firstFolderPair; //always bound!!!
+    std::vector<FolderPairPanel*> additionalFolderPairs; //additional pairs to the first pair
     //-------------------------------------
 
     //***********************************************

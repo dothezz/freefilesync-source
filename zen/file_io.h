@@ -10,9 +10,9 @@
 #include "file_io_base.h"
 #include "file_error.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <cstdio>
 #include <sys/stat.h>
 #endif
@@ -20,19 +20,19 @@
 
 namespace zen
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 static const char LINE_BREAK[] = "\r\n";
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 static const char LINE_BREAK[] = "\n";
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 static const char LINE_BREAK[] = "\r";
 #endif
 
 //buffered file IO optimized for sequential read/write accesses + better error reporting + long path support (following symlinks)
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 typedef HANDLE FileHandle;
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 typedef FILE* FileHandle;
 #endif
 
@@ -64,7 +64,7 @@ private:
     FileHandle fileHandle;
 };
 
-#if defined FFS_LINUX || defined FFS_MAC
+#if defined ZEN_LINUX || defined ZEN_MAC
 class FileInputUnbuffered : public FileInputBase
 {
 public:

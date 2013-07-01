@@ -34,7 +34,7 @@ Already included in package "gtk+-2.0"!
 bool recycleOrDelete(const Zstring& filename); //throw FileError, return "true" if file/dir was actually deleted
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 enum StatusRecycler
 {
     STATUS_REC_EXISTS,

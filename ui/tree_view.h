@@ -76,14 +76,14 @@ public:
 
     struct DirNode : public Node
     {
-        DirNode(int percent, UInt64 bytes, int itemCount, size_t level, NodeStatus status, DirMapping& dirObj) : Node(percent, bytes, itemCount, level, status), dirObj_(dirObj) {}
-        DirMapping& dirObj_;
+        DirNode(int percent, UInt64 bytes, int itemCount, size_t level, NodeStatus status, DirPair& dirObj) : Node(percent, bytes, itemCount, level, status), dirObj_(dirObj) {}
+        DirPair& dirObj_;
     };
 
     struct RootNode : public Node
     {
-        RootNode(int percent, UInt64 bytes, int itemCount, NodeStatus status, BaseDirMapping& baseMap) : Node(percent, bytes, itemCount, 0, status), baseMap_(baseMap) {}
-        BaseDirMapping& baseMap_;
+        RootNode(int percent, UInt64 bytes, int itemCount, NodeStatus status, BaseDirPair& baseDirObj) : Node(percent, bytes, itemCount, 0, status), baseDirObj_(baseDirObj) {}
+        BaseDirPair& baseDirObj_;
     };
 
     std::unique_ptr<Node> getLine(size_t row) const; //return nullptr on error
@@ -110,7 +110,7 @@ private:
         int itemCountNet;   //number of files on view for in this directory only
 
         std::vector<DirNodeImpl> subDirs;
-        FileSystemObject::ObjectId firstFileId; //weak pointer to first FileMapping or SymLinkMapping
+        FileSystemObject::ObjectId firstFileId; //weak pointer to first FilePair or SymlinkPair
         //- "compress" algorithm may hide file nodes for directories with a single included file, i.e. itemCountGross == itemCountNet == 1
         //- a HierarchyObject* would a better fit, but we need weak pointer semantics!
         //- a std::vector<FileSystemObject::ObjectId> would be a better design, but we don't want a second memory structure as large as custom grid!
@@ -119,13 +119,13 @@ private:
     struct DirNodeImpl : public Container
     {
         DirNodeImpl() : objId(nullptr) {}
-        FileSystemObject::ObjectId objId; //weak pointer to DirMapping
+        FileSystemObject::ObjectId objId; //weak pointer to DirPair
     };
 
     struct RootNodeImpl : public Container
     {
         RootNodeImpl() {}
-        std::shared_ptr<BaseDirMapping> baseMap;
+        std::shared_ptr<BaseDirPair> baseDirObj;
     };
 
     enum NodeType
@@ -164,7 +164,7 @@ private:
     /*             /|\
                     | (update...)
                     |                         */
-    std::vector<std::shared_ptr<BaseDirMapping>> folderCmp; //full raw data
+    std::vector<std::shared_ptr<BaseDirPair>> folderCmp; //full raw data
 
     ColumnTypeNavi sortColumn;
     bool sortAscending;

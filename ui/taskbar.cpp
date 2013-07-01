@@ -6,7 +6,7 @@
 
 #include "taskbar.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/dll.h>
 #include <zen/win_ver.h>
 #include "Taskbar_Seven/taskbar.h"
@@ -14,7 +14,7 @@
 #elif defined HAVE_UBUNTU_UNITY
 #include <unity/unity/unity.h>
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 #include <zen/basic_math.h>
 #include <zen/string_tools.h>
 #include "osx_dock.h"
@@ -23,7 +23,7 @@
 using namespace zen;
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 using namespace tbseven;
 
 
@@ -129,7 +129,7 @@ private:
     UnityLauncherEntry* tbEntry;
 };
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 class Taskbar::Pimpl
 {
 public:
@@ -150,9 +150,9 @@ private:
     {
         try
         {
-            osx::dockIconSetText(str); //throw OsxError
+            osx::dockIconSetText(str); //throw SysError
         }
-        catch (const osx::OsxError& e) { assert(false); }
+        catch (const zen::SysError& e) { assert(false); }
     }
 };
 

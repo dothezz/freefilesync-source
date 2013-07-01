@@ -95,7 +95,7 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
 
         const TickVal startTime = getTicks();
 
-        const size_t length1 = file1.read(&memory1[0], bufferSize); //throw FileError()
+        const size_t length1 = file1.read(&memory1[0], bufferSize); //throw FileError
         const size_t length2 = file2.read(&memory2[0], bufferSize); //returns actual number of bytes read
         //send progress updates immediately after reading to reliably allow speed calculations for our clients!
         callback.updateCompareStatus(to<Int64>(std::max(length1, length2)));

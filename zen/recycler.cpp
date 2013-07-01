@@ -9,7 +9,7 @@
 //#include <iterator>
 #include <zen/file_handling.h>
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 //#include <algorithm>
 //#include <functional>
 #include <zen/dll.h>
@@ -18,19 +18,19 @@
 #include <zen/long_path_prefix.h>
 #include "IFileOperation/file_op.h"
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 #include <zen/scope_guard.h>
 #include <sys/stat.h>
 #include <gio/gio.h>
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 #include <CoreServices/CoreServices.h>
 #endif
 
 using namespace zen;
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 namespace
 {
 /*
@@ -91,7 +91,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
         const DllFun<FunType_getLastError>     getLastError  (getDllName(), funName_getLastError);
 
         if (!moveToRecycler || !getLastError)
-            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filenames[0])) + L"\n\n" +
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", fmtFileName(filenames[0])),
                             replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(getDllName())));
 
         std::vector<const wchar_t*> cNames;
@@ -108,8 +108,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
             if (filenames.size() > 1)
                 filenameFmt += L", ..."; //give at least some hint that there are multiple files, and the error need not be related to the first one
 
-            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", filenameFmt) +
-                            L"\n\n" + getLastError()); //already includes details about locking errors!
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", filenameFmt), getLastError()); //already includes details about locking errors!
         }
     }
     else //regular recycle bin usage: available since XP
@@ -134,7 +133,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
         //"You should use fully-qualified path names with this function. Using it with relative path names is not thread safe."
         if (::SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
         {
-            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filenames[0]))); //probably not the correct file name for file list larger than 1!
+            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", fmtFileName(filenames[0]))); //probably not the correct file name for file list larger than 1!
         }
     }
 }
@@ -146,12 +145,12 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
     if (!somethingExists(filename)) //[!] do not optimize away, OS X needs this for reliable detection of "recycle bin missing"
         return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     std::vector<Zstring> filenames;
     filenames.push_back(filename);
     recycleOrDelete(filenames, nullptr); //throw FileError
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     GFile* file = ::g_file_new_for_path(filename.c_str()); //never fails according to docu
     ZEN_ON_SCOPE_EXIT(g_object_unref(file);)
 
@@ -160,10 +159,10 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
 
     if (!::g_file_trash(file, nullptr, &error))
     {
-        const std::wstring shortMsg = replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filename));
+        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", fmtFileName(filename));
 
         if (!error)
-            throw FileError(shortMsg + L"\n\n" + L"Unknown error.");
+            throw FileError(errorMsg, L"Unknown error."); //user should never see this
 
         //implement same behavior as in Windows: if recycler is not existing, delete permanently
         if (error->code == G_IO_ERROR_NOT_SUPPORTED)
@@ -179,11 +178,11 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
             return true;
         }
 
-        throw FileError(shortMsg + L"\n\n" + L"Glib Error Code " + numberTo<std::wstring>(error->code) + /* L", " +
-                                          g_quark_to_string(error->domain) + */ L": " + utfCvrtTo<std::wstring>(error->message));
+        throw FileError(errorMsg, replaceCpy<std::wstring>(L"Glib Error Code %x:", L"%x", numberTo<std::wstring>(error->code)) + L" " + utfCvrtTo<std::wstring>(error->message));
+        //g_quark_to_string(error->domain)
     }
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     //we cannot use FSPathMoveObjectToTrashSync directly since it follows symlinks!
 
     assert_static(sizeof(Zchar) == sizeof(char));
@@ -191,12 +190,12 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
 
     auto throwFileError = [&](OSStatus oss)
     {
-        std::wstring msg = replaceCpy(_("Unable to move %x to the Recycle Bin!"), L"%x", fmtFileName(filename)) + L"\n\n"
-                           + L"Result Code " + numberTo<std::wstring>(oss);
-        const char* description = GetMacOSStatusCommentString(oss);
-        if (description) //found no documentation for proper use of GetMacOSStatusCommentString
-            msg += L": " + utfCvrtTo<std::wstring>(description);
-        throw FileError(msg);
+        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", fmtFileName(filename));
+        std::wstring errorDescr = L"OSStatus Code " + numberTo<std::wstring>(oss);
+
+        if (const char* description = ::GetMacOSStatusCommentString(oss)) //found no documentation for proper use of GetMacOSStatusCommentString
+            errorDescr += L": " + utfCvrtTo<std::wstring>(description);
+        throw FileError(errorMsg, errorDescr);
     };
 
     FSRef objectRef;
@@ -234,7 +233,7 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
 }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
 {
     const DWORD bufferSize = MAX_PATH + 1;
@@ -323,7 +322,7 @@ StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
     */
 }
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 /*
 We really need access to a similar function to check whether a directory supports trashing and emit a warning if it does not!
 

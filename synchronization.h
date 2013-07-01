@@ -21,7 +21,7 @@ class SyncStatistics //this class counts *logical* operations, (create, update, 
 public:
     SyncStatistics(const HierarchyObject&  hierObj);
     SyncStatistics(const FolderComparison& folderCmp);
-    SyncStatistics(const FileMapping& fileObj);
+    SyncStatistics(const FilePair& fileObj);
 
     int getCreate() const;
     template <SelectedSide side> int getCreate() const;
@@ -45,9 +45,9 @@ private:
 
     void recurse(const HierarchyObject& hierObj);
 
-    void calcStats(const FileMapping& fileObj);
-    void calcStats(const SymLinkMapping& linkObj);
-    void calcStats(const DirMapping& dirObj);
+    void calcStats(const FilePair& fileObj);
+    void calcStats(const SymlinkPair& linkObj);
+    void calcStats(const DirPair& dirObj);
 
     int createLeft, createRight;
     int updateLeft, updateRight;

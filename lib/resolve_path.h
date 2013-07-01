@@ -19,14 +19,14 @@ FULL directory format:
 	- convert relative paths into absolute
 	- trim whitespace and append file name separator
 */
-Zstring getFormattedDirectoryName(const Zstring& dirString); //throw() - non-blocking! no I/O! not thread-safe!!!(see ::GetFullPathName())
+Zstring getFormattedDirectoryName(const Zstring& dirString); //throw() - may still block for slow USB sticks! not thread-safe!!!(see ::GetFullPathName())
 
 //macro substitution only
 Zstring expandMacros(const Zstring& text);
 
-std::vector<Zstring> getDirectoryAliases(const Zstring& dirString);
+std::vector<Zstring> getDirectoryAliases(const Zstring& dirString); //may block for slow USB sticks when resolving [<volume name>]
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 //*blocks* if network is not reachable or when showing login prompt dialog!
 void loginNetworkShare(const Zstring& dirname, bool allowUserInteraction); //throw() - user interaction: show OS password prompt
 #endif

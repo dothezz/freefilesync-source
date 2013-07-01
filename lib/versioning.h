@@ -46,14 +46,14 @@ public:
             throw FileError(_("Failure to create timestamp for versioning:") + L" \'" + timeStamp_ + L"\'");
     }
 
-    bool revisionFile(const Zstring& sourceFile, const Zstring& relativeName, CallbackMoveFile& callback); //throw FileError; return "false" if file is not existing
-    void revisionDir (const Zstring& sourceDir,  const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
+    bool revisionFile(const Zstring& fullName, const Zstring& relativeName, CallbackMoveFile& callback); //throw FileError; return "false" if file is not existing
+    void revisionDir (const Zstring& fullName,  const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
 
     //void limitVersions(std::function<void()> updateUI); //throw FileError; call when done revisioning!
 
 private:
-    bool revisionFileImpl(const Zstring& sourceFile, const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
-    void revisionDirImpl (const Zstring& sourceDir,  const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
+    bool revisionFileImpl(const Zstring& fullName, const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
+    void revisionDirImpl (const Zstring& fullName,  const Zstring& relativeName, CallbackMoveDir& callback); //throw FileError
 
     const VersioningStyle versioningStyle_;
     const Zstring versioningDirectory_;

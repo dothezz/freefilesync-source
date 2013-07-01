@@ -1,5 +1,5 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
+// * This file is part of the zen::Xml project. It is distributed under the *
 // * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
@@ -75,23 +75,16 @@ template <class T> void writeText(const T& value, std::string& output);
 
 /* Different classes of data types:
 
----------------------------
-| structured              |  readStruc/writeStruc - e.g. string-convertible types, STL containers, std::pair, structured user types
-| ----------------------  |
-| | string-convertible |  |  readText/writeText   - e.g. string-like types, all built-in arithmetic numbers, bool
-| | ---------------    |  |
-| | | string-like |    |  |  utfCvrtTo            - e.g. std::string, wchar_t*, char[], wchar_t, wxString, MyStringClass, ...
-| | ---------------    |  |
-| ----------------------  |
----------------------------
+-----------------------------
+| structured                |  readStruc/writeStruc - e.g. string-convertible types, STL containers, std::pair, structured user types
+| ------------------------- |
+| | to-string-convertible | |  readText/writeText   - e.g. string-like types, all built-in arithmetic numbers, bool
+| | ---------------       | |
+| | | string-like |       | |  utfCvrtTo            - e.g. std::string, wchar_t*, char[], wchar_t, wxString, MyStringClass, ...
+| | ---------------       | |
+| ------------------------- |
+-----------------------------
 */
-
-
-
-
-
-
-
 
 
 
@@ -196,7 +189,7 @@ struct ConvertText<T, TEXT_TYPE_OTHER>
     //###########################################################################################################################################
     assert_static(sizeof(T) == -1);
     /*
-        ATTENTION: The data type T is yet unknown to the zenXML framework!
+        ATTENTION: The data type T is yet unknown to the zen::Xml framework!
 
         Please provide a specialization for T of the following two functions in order to handle conversions to XML elements and attributes
 

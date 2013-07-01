@@ -69,10 +69,10 @@ void addFilterEntry(const Zstring& filtername, std::vector<Zstring>& fileFilter,
 {
     Zstring filterFormatted = filtername;
 
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
     //Windows does NOT distinguish between upper/lower-case
     makeUpper(filterFormatted);
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
     if (startsWith(filterFormatted, FILE_NAME_SEPARATOR)) // \abc
@@ -289,10 +289,10 @@ NameFilter::NameFilter(const Zstring& includeFilter, const Zstring& excludeFilte
 
 bool NameFilter::passFileFilter(const Zstring& relFilename) const
 {
-#if defined FFS_WIN || defined FFS_MAC //Windows does NOT distinguish between upper/lower-case
+#if defined ZEN_WIN || defined ZEN_MAC //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = relFilename;
     makeUpper(nameFormatted);
-#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
+#elif defined ZEN_LINUX //Linux DOES distinguish between upper/lower-case
     const Zstring& nameFormatted = relFilename; //nothing to do here
 #endif
 
@@ -305,10 +305,10 @@ bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch
 {
     assert(!subObjMightMatch || *subObjMightMatch == true); //check correct usage
 
-#if defined FFS_WIN || defined FFS_MAC //Windows does NOT distinguish between upper/lower-case
+#if defined ZEN_WIN || defined ZEN_MAC //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = relDirname;
     makeUpper(nameFormatted);
-#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
+#elif defined ZEN_LINUX //Linux DOES distinguish between upper/lower-case
     const Zstring& nameFormatted = relDirname; //nothing to do here
 #endif
 

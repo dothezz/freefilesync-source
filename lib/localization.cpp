@@ -10,18 +10,19 @@
 #include <iterator>
 #include <zen/string_tools.h>
 #include <zen/file_traverser.h>
-#include <zenxml/io.h>
+#include <zen/serialize.h>
 #include <zen/i18n.h>
 #include <zen/format_unit.h>
 #include <wx/intl.h>
+#include <wx/log.h>
 #include "parse_plural.h"
 #include "parse_lng.h"
 #include "ffs_paths.h"
 
-#ifdef FFS_LINUX
+#ifdef ZEN_LINUX
 #include <wchar.h> //wcscasecmp
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 #include <CoreServices/CoreServices.h>
 #endif
 
@@ -33,7 +34,7 @@ namespace
 class FFSTranslation : public TranslationHandler
 {
 public:
-    FFSTranslation(const std::wstring& filename, wxLanguage languageId); //throw lngfile::ParsingError, parse_plural::ParsingError
+    FFSTranslation(const Zstring& filename, wxLanguage languageId); //throw lngfile::ParsingError, parse_plural::ParsingError
 
     wxLanguage langId() const { return langId_; }
 
@@ -69,16 +70,16 @@ private:
 };
 
 
-FFSTranslation::FFSTranslation(const std::wstring& filename, wxLanguage languageId) : langId_(languageId) //throw lngfile::ParsingError, parse_plural::ParsingError
+FFSTranslation::FFSTranslation(const Zstring& filename, wxLanguage languageId) : langId_(languageId) //throw lngfile::ParsingError, parse_plural::ParsingError
 {
     std::string inputStream;
     try
     {
-        inputStream = loadStream(filename); //throw XmlFileError
+        inputStream = loadBinStream<std::string>(filename); //throw FileError
     }
-    catch (const XmlFileError&)
+    catch (const FileError& e)
     {
-        throw lngfile::ParsingError(0, 0);
+        throw lngfile::ParsingError(e.toString(), 0, 0); //passing FileError is too high a level for Parsing error, OTOH user is unlikely to see this since file I/O issues are sorted out by ExistingTranslations()!
     }
 
     lngfile::TransHeader          header;
@@ -122,7 +123,7 @@ public:
     }
 
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) { return LINK_SKIP; }
-    virtual std::shared_ptr<TraverseCallback> onDir(const Zchar* shortName, const Zstring& fullName) { return nullptr; }
+    virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName) { return nullptr; }
     virtual HandleError reportDirError (const std::wstring& msg)                         { assert(false); return ON_ERROR_IGNORE; } //errors are not really critical in this context
     virtual HandleError reportItemError(const std::wstring& msg, const Zchar* shortName) { assert(false); return ON_ERROR_IGNORE; } //
 
@@ -136,7 +137,7 @@ struct LessTranslation : public std::binary_function<ExistingTranslations::Entry
     bool operator()(const ExistingTranslations::Entry& lhs, const ExistingTranslations::Entry& rhs) const
     {
         //use a more "natural" sort: ignore case and diacritics
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         const int rv = ::CompareString(LOCALE_USER_DEFAULT,      //__in  LCID Locale,
                                        NORM_IGNORECASE,          //__in  DWORD dwCmpFlags,
                                        lhs.languageName.c_str(), //__in  LPCTSTR lpString1,
@@ -148,11 +149,11 @@ struct LessTranslation : public std::binary_function<ExistingTranslations::Entry
         else
             return rv == CSTR_LESS_THAN; //convert to C-style string compare result
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
         return ::wcscasecmp(lhs.languageName.c_str(), rhs.languageName.c_str()) < 0; //ignores case; locale-dependent!
         //return lhs.languageName.CmpNoCase(rhs.languageName) < 0;
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
         auto allocCFStringRef = [](const std::wstring& str) -> CFStringRef //output not owned!
         {
             return ::CFStringCreateWithCString(nullptr, //CFAllocatorRef alloc,
@@ -182,7 +183,7 @@ ExistingTranslations::ExistingTranslations()
         newEntry.languageName   = L"English (US)";
         newEntry.languageFile   = L"";
         newEntry.translatorName = L"Zenju";
-        newEntry.languageFlag   = L"usa.png";
+        newEntry.languageFlag   = L"flag_usa.png";
         locMapping.push_back(newEntry);
     }
 
@@ -196,30 +197,33 @@ ExistingTranslations::ExistingTranslations()
     for (auto it = lngFiles.begin(); it != lngFiles.end(); ++it)
         try
         {
-            std::string stream = loadStream(*it); //throw XmlFileError
-            try
-            {
-                lngfile::TransHeader lngHeader;
-                lngfile::parseHeader(stream, lngHeader); //throw ParsingError
+            const std::string stream = loadBinStream<std::string>(utfCvrtTo<Zstring>(*it)); //throw FileError
 
-                /*
-                There is some buggy behavior in wxWidgets which maps "zh_TW" to simplified chinese.
-                Fortunately locales can be also entered as description. I changed to "Chinese (Traditional)" which works fine.
-                */
-                if (const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utfCvrtTo<wxString>(lngHeader.localeName)))
-                {
-                    ExistingTranslations::Entry newEntry;
-                    newEntry.languageID     = locInfo->Language;
-                    newEntry.languageName   = utfCvrtTo<std::wstring>(lngHeader.languageName);
-                    newEntry.languageFile   = utfCvrtTo<std::wstring>(*it);
-                    newEntry.translatorName = utfCvrtTo<std::wstring>(lngHeader.translatorName);
-                    newEntry.languageFlag   = utfCvrtTo<std::wstring>(lngHeader.flagFile);
-                    locMapping.push_back(newEntry);
-                }
+            lngfile::TransHeader lngHeader;
+            lngfile::parseHeader(stream, lngHeader); //throw ParsingError
+
+            assert(!lngHeader.languageName  .empty());
+            assert(!lngHeader.translatorName.empty());
+            assert(!lngHeader.localeName    .empty());
+            assert(!lngHeader.flagFile      .empty());
+            /*
+            There is some buggy behavior in wxWidgets which maps "zh_TW" to simplified chinese.
+            Fortunately locales can be also entered as description. I changed to "Chinese (Traditional)" which works fine.
+            */
+            if (const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utfCvrtTo<wxString>(lngHeader.localeName)))
+            {
+                ExistingTranslations::Entry newEntry;
+                newEntry.languageID     = locInfo->Language;
+                newEntry.languageName   = utfCvrtTo<std::wstring>(lngHeader.languageName);
+                newEntry.languageFile   = utfCvrtTo<std::wstring>(*it);
+                newEntry.translatorName = utfCvrtTo<std::wstring>(lngHeader.translatorName);
+                newEntry.languageFlag   = utfCvrtTo<std::wstring>(lngHeader.flagFile);
+                locMapping.push_back(newEntry);
             }
-            catch (lngfile::ParsingError&) { assert(false); } //better not show an error message here; scenario: batch jobs
+            else assert(false);
         }
-        catch (...) { assert(false); }
+        catch (FileError&) { assert(false); }
+        catch (lngfile::ParsingError&) { assert(false); } //better not show an error message here; scenario: batch jobs
 
     std::sort(locMapping.begin(), locMapping.end(), LessTranslation());
 }
@@ -397,6 +401,9 @@ public:
         const bool sysLangIsRTL      = sysLngInfo ? sysLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
         const bool selectedLangIsRTL = selLngInfo ? selLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
 
+#ifdef NDEBUG
+        wxLogNull dummy; //rather than implementing a reasonable error handling wxWidgets decides to shows a modal dialog in wxLocale::Init -> at least we can shut it up!
+#endif
         if (sysLangIsRTL == selectedLangIsRTL)
             locale->Init(wxLANGUAGE_DEFAULT); //use sys-lang to preserve sub-language specific rules (e.g. german swiss number punctation)
         else
@@ -444,18 +451,19 @@ void zen::setLanguage(int language) //throw FileError
     else
         try
         {
-            zen::setTranslator(new FFSTranslation(languageFile, static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, parse_plural::ParsingError
+            zen::setTranslator(new FFSTranslation(utfCvrtTo<Zstring>(languageFile), static_cast<wxLanguage>(language))); //throw lngfile::ParsingError, parse_plural::ParsingError
         }
         catch (lngfile::ParsingError& e)
         {
             throw FileError(replaceCpy(replaceCpy(replaceCpy(_("Error parsing file %x, row %y, column %z."),
                                                              L"%x", fmtFileName(utfCvrtTo<Zstring>(languageFile))),
-                                                  L"%y", numberTo<std::wstring>(e.row + 1)),
-                                       L"%z", numberTo<std::wstring>(e.col + 1)));
+                                                  L"%y", numberTo<std::wstring>(e.row_ + 1)),
+                                       L"%z", numberTo<std::wstring>(e.col_ + 1))
+                            + L"\n\n" + e.msg_);
         }
         catch (parse_plural::ParsingError&)
         {
-            throw FileError(L"Invalid Plural Form");
+            throw FileError(L"Invalid plural form definition"); //user should never see this!
         }
 
     //handle RTL swapping: we need wxWidgets to do this

@@ -167,7 +167,7 @@ BinContainer loadBinStream(const Zstring& filename) //throw FileError, ErrorNotE
     const size_t blockSize = 128 * 1024;
     do
     {
-        contOut.resize(contOut.size() + blockSize);
+        contOut.resize(contOut.size() + blockSize); //container better implement exponential growth!
 
         const size_t bytesRead = fileIn.read(&*contOut.begin() + contOut.size() - blockSize, blockSize); //throw FileError
         if (bytesRead < blockSize)

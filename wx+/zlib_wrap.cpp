@@ -5,9 +5,9 @@
 // **************************************************************************
 
 #include "zlib_wrap.h"
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <wx/../../src/zlib/zlib.h> //not really a "nice" place to look for a stable solution
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <zlib.h> //let's pray this is the same version wxWidgets is linking against!
 #endif
 

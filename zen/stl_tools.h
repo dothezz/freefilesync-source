@@ -1,5 +1,5 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
+// * This file is part of the zen::Xml project. It is distributed under the *
 // * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
@@ -129,7 +129,7 @@ ForwardIterator binary_search(ForwardIterator first, ForwardIterator last, const
 
 
 template <class BidirectionalIterator, class T> inline
-BidirectionalIterator find_last(const BidirectionalIterator first, BidirectionalIterator last, const T& value)
+BidirectionalIterator find_last(const BidirectionalIterator first, const BidirectionalIterator last, const T& value)
 {
     for (BidirectionalIterator iter = last; iter != first;) //reverse iteration: 1. check 2. decrement 3. evaluate
     {
@@ -143,8 +143,8 @@ BidirectionalIterator find_last(const BidirectionalIterator first, Bidirectional
 
 
 template <class BidirectionalIterator1, class BidirectionalIterator2> inline
-BidirectionalIterator1 search_last(const BidirectionalIterator1 first1, BidirectionalIterator1 last1,
-                                   const BidirectionalIterator2 first2, BidirectionalIterator2 last2)
+BidirectionalIterator1 search_last(const BidirectionalIterator1 first1,       BidirectionalIterator1 last1,
+                                   const BidirectionalIterator2 first2, const BidirectionalIterator2 last2)
 {
     const BidirectionalIterator1 iterNotFound = last1;
 

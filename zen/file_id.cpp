@@ -6,19 +6,19 @@
 
 #include "file_id.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
 #include "long_path_prefix.h"
 #include "scope_guard.h"
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <sys/stat.h>
 #endif
 
 
 zen::FileId zen::getFileID(const Zstring& filename)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is cheap! http://msdn.microsoft.com/en-us/library/aa363788(VS.85).aspx
     //privilege SE_BACKUP_NAME doesn't seem to be required here at all
 
@@ -38,7 +38,7 @@ zen::FileId zen::getFileID(const Zstring& filename)
             return extractFileID(fileInfo);
     }
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
     if (::lstat(filename.c_str(), &fileInfo) == 0)
         return extractFileID(fileInfo);

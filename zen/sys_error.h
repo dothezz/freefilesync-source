@@ -4,17 +4,18 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef SYSTEMFUNCTIONS_H_INCLUDED
-#define SYSTEMFUNCTIONS_H_INCLUDED
+#ifndef LAST_ERROR_H_3284791347018951324534
+#define LAST_ERROR_H_3284791347018951324534
 
 #include <string>
 #include "utf.h"
 #include "i18n.h"
+#include "scope_guard.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <cstring>
 #include <cerrno>
 #endif
@@ -23,17 +24,29 @@
 namespace zen
 {
 //evaluate GetLastError()/errno and assemble specific error message
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 typedef DWORD ErrorCode;
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 typedef int ErrorCode;
 #endif
 
-std::wstring getLastErrorFormatted(ErrorCode lastError = 0);
 ErrorCode getLastError();
+
+std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastError);
 
 bool errorCodeForNotExisting(ErrorCode lastError); //check for "not existing" aliases
 
+
+//A low-level exception class giving (non-translated) detail information only - same conceptional level like "GetLastError()"!
+class SysError
+{
+public:
+    explicit SysError(const std::wstring& msg) : msg_(msg) {}
+    const std::wstring& toString() const { return msg_; }
+
+private:
+    std::wstring msg_;
+};
 
 
 
@@ -46,44 +59,50 @@ bool errorCodeForNotExisting(ErrorCode lastError); //check for "not existing" al
 inline
 ErrorCode getLastError()
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     return ::GetLastError();
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     return errno; //don't use "::", errno is a macro!
 #endif
 }
 
+
+std::wstring formatSystemError(const std::wstring& functionName, long long lastError); //not implemented! intentional overload ambiguity to catch usage errors with HRESULT!
+
+
 inline
-std::wstring getLastErrorFormatted(ErrorCode lastError)
+std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastError)
 {
-    //determine error code if none was specified
+    //determine error code if none was specified -> still required??
     if (lastError == 0)
         lastError = getLastError();
 
-    std::wstring output = _("Error Code %x:");
-    replace(output, L"%x", numberTo<std::wstring>(lastError));
-#ifdef FFS_WIN
+    std::wstring output = replaceCpy(_("Error Code %x:"), L"%x", numberTo<std::wstring>(lastError));
+
+#ifdef ZEN_WIN
     LPWSTR buffer = nullptr;
     if (::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM    |
                         FORMAT_MESSAGE_MAX_WIDTH_MASK |
                         FORMAT_MESSAGE_IGNORE_INSERTS | //important: without this flag ::FormatMessage() will fail if message contains placeholders
                         FORMAT_MESSAGE_ALLOCATE_BUFFER, nullptr, lastError, 0, reinterpret_cast<LPWSTR>(&buffer), 0, nullptr) != 0)
-    {
         if (buffer) //"don't trust nobody"
         {
+            ZEN_ON_SCOPE_EXIT(::LocalFree(buffer));
             output += L" ";
             output += buffer;
-            ::LocalFree(buffer);
         }
-    }
     ::SetLastError(lastError); //restore last error
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     output += L" ";
     output += utfCvrtTo<std::wstring>(::strerror(lastError));
 
     errno = lastError; //restore errno
 #endif
+    if (!endsWith(output, L" ")) //Windows messages seem to end with a blank...
+        output += L" ";
+    output += L"(" + functionName + L")";
+
     return output;
 }
 
@@ -91,15 +110,15 @@ std::wstring getLastErrorFormatted(ErrorCode lastError)
 inline
 bool errorCodeForNotExisting(ErrorCode lastError)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     return lastError == ERROR_FILE_NOT_FOUND ||
            lastError == ERROR_PATH_NOT_FOUND ||
            lastError == ERROR_BAD_NETPATH    ||
            lastError == ERROR_NETNAME_DELETED;
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     return lastError == ENOENT;
 #endif
 }
 }
 
-#endif // SYSTEMFUNCTIONS_H_INCLUDED
+#endif //LAST_ERROR_H_3284791347018951324534

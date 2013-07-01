@@ -1,8 +1,9 @@
 // **************************************************************************
-// * This file is part of the zenXML project. It is distributed under the   *
-// * Boost Software License: http://www.boost.org/LICENSE_1_0.txt           *
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
+
 #ifndef BASE64_HEADER_08473021856321840873021487213453214
 #define BASE64_HEADER_08473021856321840873021487213453214
 

@@ -47,7 +47,7 @@ private:
 MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     : MainDlgGenerated(dlg)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     new MouseMoveWindow(*this); //ownership passed to "this"
 #endif
     wxWindowUpdateLocker dummy(this); //avoid display distortion
@@ -61,7 +61,7 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     m_panelMainFolder->Layout();
 
     m_bpButtonAddFolder      ->SetBitmapLabel(getResourceImage(L"item_add"));
-    m_bpButtonRemoveTopFolder->SetBitmapLabel(getResourceImage(L"item_delete"));
+    m_bpButtonRemoveTopFolder->SetBitmapLabel(getResourceImage(L"item_remove"));
     m_buttonStart            ->setBitmapFront(getResourceImage(L"startRts"), 5);
 
     //register key event
@@ -376,9 +376,9 @@ void MainDialog::OnRemoveTopFolder(wxCommandEvent& event)
 }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 static const size_t MAX_ADD_FOLDERS = 8;
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 static const size_t MAX_ADD_FOLDERS = 6;
 #endif
 
@@ -395,7 +395,7 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
     {
         //add new folder pair
         DirectoryPanel* newFolder = new DirectoryPanel(m_scrolledWinFolders);
-        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(getResourceImage(L"item_delete"));
+        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(getResourceImage(L"item_remove"));
 
         //get size of scrolled window
         folderHeight = newFolder->GetSize().GetHeight();

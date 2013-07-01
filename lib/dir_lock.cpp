@@ -7,7 +7,7 @@
 #include <utility>
 #include <wx/log.h>
 #include <memory>
-#include <zen/last_error.h>
+#include <zen/sys_error.h>
 #include <zen/thread.h> //includes <boost/thread.hpp>
 #include <zen/scope_guard.h>
 #include <zen/guid.h>
@@ -18,14 +18,14 @@
 #include <zen/serialize.h>
 #include <zen/optional.h>
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <tlhelp32.h>
 #include <zen/win.h> //includes "windows.h"
 #include <zen/long_path_prefix.h>
 #include <Sddl.h> //login sid
 #include <Lmcons.h> //UNLEN
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <fcntl.h>    //open()
 #include <sys/stat.h> //
 #include <unistd.h> //getsid()
@@ -68,14 +68,14 @@ public:
         }
         catch (const std::exception& e) //exceptions must be catched per thread
         {
-            wxSafeShowMessage(_("An exception occurred!") + L" (Dirlock)", utfCvrtTo<wxString>(e.what())); //simple wxMessageBox won't do for threads
+            wxSafeShowMessage(_("An exception occurred"), utfCvrtTo<wxString>(e.what()) + L" (Dirlock)"); //simple wxMessageBox won't do for threads
         }
     }
 
     void emitLifeSign() const //try to append one byte...; throw()
     {
         const char buffer[1] = {' '};
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         //ATTENTION: setting file pointer IS required! => use CreateFile/GENERIC_WRITE + SetFilePointerEx!
         //although CreateFile/FILE_APPEND_DATA without SetFilePointerEx works locally, it MAY NOT work on some network shares creating a 4 gig file!!!
 
@@ -105,7 +105,7 @@ public:
                          nullptr))      //_Inout_opt_  LPOVERLAPPED lpOverlapped
             return;
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
         const int fileHandle = ::open(lockfilename_.c_str(), O_WRONLY | O_APPEND);
         if (fileHandle == -1)
             return;
@@ -125,7 +125,7 @@ namespace
 {
 UInt64 getLockFileSize(const Zstring& filename) //throw FileError, ErrorNotExisting
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     WIN32_FIND_DATA fileInfo = {};
     const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(filename).c_str(), &fileInfo);
     if (searchHandle != INVALID_HANDLE_VALUE)
@@ -133,20 +133,22 @@ UInt64 getLockFileSize(const Zstring& filename) //throw FileError, ErrorNotExist
         ::FindClose(searchHandle);
         return UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
     }
-
-#elif defined FFS_LINUX || defined FFS_MAC
+    const wchar_t functionName[] = L"FindFirstFile";
+#elif defined ZEN_LINUX || defined ZEN_MAC
     struct ::stat fileInfo = {};
     if (::stat(filename.c_str(), &fileInfo) == 0) //follow symbolic links
         return UInt64(fileInfo.st_size);
+    const wchar_t functionName[] = L"stat";
 #endif
 
     const ErrorCode lastError = getLastError();
-    const std::wstring errorMessage = replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename)) + L"\n\n" + getLastErrorFormatted(lastError);
+    const std::wstring errorMsg = replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename));
+    const std::wstring errorDescr = formatSystemError(functionName, lastError);
 
     if (errorCodeForNotExisting(lastError))
-        throw ErrorNotExisting(errorMessage);
+        throw ErrorNotExisting(errorMsg, errorDescr);
     else
-        throw FileError(errorMessage);
+        throw FileError(errorMsg, errorDescr);
 }
 
 
@@ -160,14 +162,14 @@ Zstring deleteAbandonedLockName(const Zstring& lockfilename) //make sure to NOT 
 }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 Zstring getLoginSid() //throw FileError
 {
     HANDLE hToken = 0;
     if (!::OpenProcessToken(::GetCurrentProcess(), //__in   HANDLE ProcessHandle,
                             TOKEN_ALL_ACCESS,      //__in   DWORD DesiredAccess,
                             &hToken))              //__out  PHANDLE TokenHandle
-        throw FileError(_("Cannot get process information.") + L" (OpenProcessToken)" + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot get process information."), formatSystemError(L"OpenProcessToken", getLastError()));
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hToken));
 
     DWORD bufferSize = 0;
@@ -179,7 +181,7 @@ Zstring getLoginSid() //throw FileError
                                &buffer[0],   //__out_opt  LPVOID TokenInformation,
                                bufferSize,   //__in       DWORD TokenInformationLength,
                                &bufferSize)) //__out      PDWORD ReturnLength
-        throw FileError(_("Cannot get process information.") + L" (GetTokenInformation)" + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot get process information."), formatSystemError(L"GetTokenInformation", getLastError()));
 
     auto groups = reinterpret_cast<const TOKEN_GROUPS*>(&buffer[0]);
 
@@ -189,20 +191,19 @@ Zstring getLoginSid() //throw FileError
             LPTSTR sidStr = nullptr;
             if (!::ConvertSidToStringSid(groups->Groups[i].Sid, //__in   PSID Sid,
                                          &sidStr))              //__out  LPTSTR *StringSid
-                throw FileError(_("Cannot get process information.") + L" (ConvertSidToStringSid)" + L"\n\n" + getLastErrorFormatted());
+                throw FileError(_("Cannot get process information."), formatSystemError(L"ConvertSidToStringSid", getLastError()));
             ZEN_ON_SCOPE_EXIT(::LocalFree(sidStr));
-
             return sidStr;
         }
-    throw FileError(_("Cannot get process information.") +  L" (no login found)" + L"\n\n" + getLastErrorFormatted()); //shouldn't happen
+    throw FileError(_("Cannot get process information."), L"no login found"); //shouldn't happen
 }
 #endif
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 typedef DWORD ProcessId;
 typedef DWORD SessionId;
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 typedef pid_t ProcessId;
 typedef pid_t SessionId;
 #endif
@@ -210,12 +211,12 @@ typedef pid_t SessionId;
 //return ppid on Windows, sid on Linux/Mac, "no value" if process corresponding to "processId" is not existing
 Opt<SessionId> getSessionId(ProcessId processId) //throw FileError
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //note: ::OpenProcess() is no alternative as it may successfully return for crashed processes! -> remark: "WaitForSingleObject" may identify this case!
     HANDLE snapshot = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, //__in  DWORD dwFlags,
                                                  0);                 //__in  DWORD th32ProcessID
     if (snapshot == INVALID_HANDLE_VALUE)
-        throw FileError(_("Cannot get process information.") + L" (CreateToolhelp32Snapshot)" + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot get process information."), formatSystemError(L"CreateToolhelp32Snapshot", getLastError()));
     ZEN_ON_SCOPE_EXIT(::CloseHandle(snapshot));
 
     PROCESSENTRY32 processEntry = {};
@@ -223,7 +224,7 @@ Opt<SessionId> getSessionId(ProcessId processId) //throw FileError
 
     if (!::Process32First(snapshot,       //__in     HANDLE hSnapshot,
                           &processEntry)) //__inout  LPPROCESSENTRY32 lppe
-        throw FileError(_("Cannot get process information.") + L" (Process32First)" + L"\n\n" + getLastErrorFormatted()); //ERROR_NO_MORE_FILES not possible
+        throw FileError(_("Cannot get process information."), formatSystemError(L"Process32First", getLastError())); //ERROR_NO_MORE_FILES not possible
     do
     {
         if (processEntry.th32ProcessID == processId) //yes, MSDN says this is the way: http://msdn.microsoft.com/en-us/library/windows/desktop/ms684868(v=vs.85).aspx
@@ -231,17 +232,17 @@ Opt<SessionId> getSessionId(ProcessId processId) //throw FileError
     }
     while (::Process32Next(snapshot, &processEntry));
     if (::GetLastError() != ERROR_NO_MORE_FILES) //yes, they call it "files"
-        throw FileError(_("Cannot get process information.") + L" (Process32Next)" + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot get process information."), formatSystemError(L"Process32Next", getLastError()));
 
     return NoValue();
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     if (::kill(processId, 0) != 0) //sig == 0: no signal sent, just existence check
         return NoValue();
 
     pid_t procSid = ::getsid(processId); //NOT to be confused with "login session", e.g. not stable on OS X!!!
     if (procSid == -1)
-        throw FileError(_("Cannot get process information.") + L" (getsid)" + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot get process information."), formatSystemError(L"getsid", getLastError()));
 
     return procSid;
 #endif
@@ -255,7 +256,7 @@ struct LockInformation //throw FileError
     explicit LockInformation(FromCurrentProcess) :
         lockId(zen::generateGUID()),
         sessionId(), //dummy value
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         processId(::GetCurrentProcessId()) //never fails
     {
         DWORD bufferSize = 0;
@@ -265,28 +266,29 @@ struct LockInformation //throw FileError
         if (!::GetComputerNameEx(ComputerNameDnsFullyQualified, //__in     COMPUTER_NAME_FORMAT NameType,
                                  &buffer[0],                    //__out    LPTSTR lpBuffer,
                                  &bufferSize))                  //__inout  LPDWORD lpnSize
-            throw FileError(_("Cannot get process information.") + L" (GetComputerNameEx)" + L"\n\n" + getLastErrorFormatted());
+            throw FileError(_("Cannot get process information."), formatSystemError(L"GetComputerNameEx", getLastError()));
+
         computerName = "Windows." + utfCvrtTo<std::string>(&buffer[0]);
 
         bufferSize = UNLEN + 1;
         buffer.resize(bufferSize);
         if (!::GetUserName(&buffer[0],   //__out    LPTSTR lpBuffer,
                            &bufferSize)) //__inout  LPDWORD lpnSize
-            throw FileError(_("Cannot get process information.") + L" (GetUserName)" + L"\n\n" + getLastErrorFormatted());
+            throw FileError(_("Cannot get process information."), formatSystemError(L"GetUserName", getLastError()));
         userId = utfCvrtTo<std::string>(&buffer[0]);
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
         processId(::getpid()) //never fails
     {
         std::vector<char> buffer(10000);
 
         if (::gethostname(&buffer[0], buffer.size()) != 0)
-            throw FileError(_("Cannot get process information.") + L" (gethostname)" + L"\n\n" + getLastErrorFormatted());
+            throw FileError(_("Cannot get process information."), formatSystemError(L"gethostname", getLastError()));
         computerName += "Linux."; //distinguish linux/windows lock files
         computerName += &buffer[0];
 
         if (::getdomainname(&buffer[0], buffer.size()) != 0)
-            throw FileError(_("Cannot get process information.") + L" (getdomainname)" + L"\n\n" + getLastErrorFormatted());
+            throw FileError(_("Cannot get process information."), formatSystemError(L"getdomainname", getLastError()));
         computerName += ".";
         computerName += &buffer[0];
 
@@ -298,15 +300,15 @@ struct LockInformation //throw FileError
         struct passwd buffer2 = {};
         struct passwd* pwsEntry = nullptr;
         if (::getpwuid_r(userIdNo, &buffer2, &buffer[0], buffer.size(), &pwsEntry) != 0) //getlogin() is deprecated and not working on Ubuntu at all!!!
-            throw FileError(_("Cannot get process information.") +  L" (getpwuid_r)" + L"\n\n" + getLastErrorFormatted());
+            throw FileError(_("Cannot get process information."), formatSystemError(L"getpwuid_r", getLastError()));
         if (!pwsEntry)
-            throw FileError(_("Cannot get process information.") + L" (no login found)" + L"\n\n" + getLastErrorFormatted());
+            throw FileError(_("Cannot get process information."), L"no login found"); //should not happen?
         userId += pwsEntry->pw_name;
 #endif
 
         Opt<SessionId> sessionIdTmp = getSessionId(processId); //throw FileError
         if (!sessionIdTmp)
-            throw FileError(_("Cannot get process information.") + L" (getSessionId)" + L"\n\n" + getLastErrorFormatted());
+            throw FileError(_("Cannot get process information."), L"no session id found"); //should not happen?
         sessionId = *sessionIdTmp;
     }
 
@@ -357,14 +359,6 @@ struct LockInformation //throw FileError
 //wxGetFullHostName() is a performance killer for some users, so don't touch!
 
 
-void writeLockInfo(const Zstring& lockfilename) //throw FileError
-{
-    BinStreamOut streamOut;
-    LockInformation(FromCurrentProcess()).toStream(streamOut);
-    saveBinStream(lockfilename, streamOut.get()); //throw FileError
-}
-
-
 LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw FileError, ErrorNotExisting
 {
     BinStreamIn streamIn = loadBinStream<BinaryStream>(lockfilename); //throw FileError, ErrorNotExisting
@@ -374,7 +368,7 @@ LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw FileError,
     }
     catch (UnexpectedEndOfStreamError&)
     {
-        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(lockfilename)) + L" (unexpected end of stream)");
+        throw FileError(replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(lockfilename)), L"unexpected end of stream");
     }
 }
 
@@ -519,7 +513,7 @@ void releaseLock(const Zstring& lockfilename) //throw ()
 
 bool tryLock(const Zstring& lockfilename) //throw FileError
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename).c_str(),
                                            GENERIC_READ | GENERIC_WRITE, //use both when writing over network, see comment in file_io.cpp
                                            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -534,7 +528,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
             lastError == ERROR_ALREADY_EXISTS) //comment on msdn claims, this one is used on Windows Mobile 6
             return false;
         else
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilename)) + L"\n\n" + zen::getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilename)), formatSystemError(L"CreateFile", getLastError()));
     }
     ScopeGuard guardLockFile = zen::makeGuard([&] { removeFile(lockfilename); });
     FileOutput fileOut(fileHandle, lockfilename); //pass handle ownership
@@ -542,7 +536,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
     //be careful to avoid CreateFile() + CREATE_ALWAYS on a hidden file -> see file_io.cpp
     //=> we don't need it that badly //::SetFileAttributes(applyLongPathPrefix(lockfilename).c_str(), FILE_ATTRIBUTE_HIDDEN); //(try to) hide it
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     ::umask(0); //important! -> why?
     //O_EXCL contains a race condition on NFS file systems: http://linux.die.net/man/2/open
     const int fileHandle = ::open(lockfilename.c_str(), O_CREAT | O_WRONLY | O_EXCL, S_IRWXU | S_IRWXG | S_IRWXO);
@@ -551,7 +545,7 @@ bool tryLock(const Zstring& lockfilename) //throw FileError
         if (errno == EEXIST)
             return false;
         else
-            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilename)) + L"\n\n" + zen::getLastErrorFormatted());
+            throw FileError(replaceCpy(_("Cannot write file %x."), L"%x", fmtFileName(lockfilename)), formatSystemError(L"open", getLastError()));
     }
     ScopeGuard guardLockFile = zen::makeGuard([&] { removeFile(lockfilename); });
     FileOutputUnbuffered fileOut(fileHandle, lockfilename); //pass handle ownership
@@ -675,7 +669,7 @@ DirLock::DirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw
     if (callback)
         callback->reportStatus(replaceCpy(_("Creating file %x"), L"%x", fmtFileName(lockfilename)));
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     const DWORD bufferSize = 10000;
     std::vector<wchar_t> volName(bufferSize);
     if (::GetVolumePathName(lockfilename.c_str(), //__in   LPCTSTR lpszFileName,

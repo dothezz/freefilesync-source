@@ -13,12 +13,12 @@
 #include <zen/utf.h>
 #include <wx/msgdlg.h>
 
-#ifdef FFS_WIN
-#include <zen/last_error.h>
+#ifdef ZEN_WIN
+#include <zen/sys_error.h>
 //#include <zen/string_tools.h>
 #include <zen/win.h> //includes "windows.h"
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <zen/thread.h>
 #include <stdlib.h> //::system()
 //#include <wx/utils.h>
@@ -40,7 +40,7 @@ namespace
 {
 void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //parse commandline
     std::vector<std::wstring> argv;
     int argc = 0;
@@ -74,7 +74,7 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
     {
         wxString cmdFmt = L"File: " + filename + L"\nArg: " + arguments;
-        wxMessageBox(_("Invalid command line:") + L"\n" + cmdFmt + L"\n\n" + getLastErrorFormatted());
+        wxMessageBox(_("Invalid command line:") + L"\n" + cmdFmt + L"\n\n" + formatSystemError(L"ShellExecuteEx", getLastError()));
         return;
     }
 
@@ -86,7 +86,7 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
             ::WaitForSingleObject(execInfo.hProcess, INFINITE);
     }
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     /*
     we cannot use wxExecute due to various issues:
     - screws up encoding on OS X for non-ASCII characters

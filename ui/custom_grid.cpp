@@ -332,12 +332,12 @@ private:
         {
             GetRowType(DisplayType& result) : result_(result) {}
 
-            virtual void visit(const FileMapping& fileObj) {}
-            virtual void visit(const SymLinkMapping& linkObj)
+            virtual void visit(const FilePair& fileObj) {}
+            virtual void visit(const SymlinkPair& linkObj)
             {
                 result_ = DISP_TYPE_SYMLINK;
             }
-            virtual void visit(const DirMapping& dirObj)
+            virtual void visit(const DirPair& dirObj)
             {
                 result_ = DISP_TYPE_FOLDER;
             }
@@ -356,7 +356,7 @@ private:
             {
                 GetTextValue(ColumnTypeRim colType, const FileSystemObject& fso) : colType_(colType), fsObj_(fso) {}
 
-                virtual void visit(const FileMapping& fileObj)
+                virtual void visit(const FilePair& fileObj)
                 {
                     switch (colType_)
                     {
@@ -390,7 +390,7 @@ private:
                     }
                 }
 
-                virtual void visit(const SymLinkMapping& linkObj)
+                virtual void visit(const SymlinkPair& linkObj)
                 {
                     switch (colType_)
                     {
@@ -408,7 +408,7 @@ private:
                             break;
                         case COL_TYPE_SIZE: //file size
                             if (!fsObj_.isEmpty<side>())
-                                value = _("<Symlink>");
+                                value = L"<" + _("Symlink") + L">";
                             break;
                         case COL_TYPE_DATE: //date
                             if (!fsObj_.isEmpty<side>())
@@ -420,7 +420,7 @@ private:
                     }
                 }
 
-                virtual void visit(const DirMapping& dirObj)
+                virtual void visit(const DirPair& dirObj)
                 {
                     switch (colType_)
                     {
@@ -438,7 +438,7 @@ private:
                             break;
                         case COL_TYPE_SIZE: //file size
                             if (!fsObj_.isEmpty<side>())
-                                value = _("<Folder>");
+                                value = L"<" + _("Folder") + L">";
                             break;
                         case COL_TYPE_DATE: //date
                             if (!fsObj_.isEmpty<side>())
@@ -468,8 +468,9 @@ private:
         wxRect rectTmp = rect;
 
         //draw horizontal border if required
-        auto dispTp = getRowDisplayType(row);
-        if (dispTp == getRowDisplayType(row + 1) && dispTp != DISP_TYPE_NORMAL)
+        DisplayType dispTp = getRowDisplayType(row);
+        if (dispTp != DISP_TYPE_NORMAL &&
+            dispTp == getRowDisplayType(row + 1))
         {
             const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
             wxDCPenChanger dummy2(dc, wxPen(colorGridLine, 1, wxSOLID));
@@ -628,15 +629,15 @@ private:
         {
             struct GetIcon : public FSObjectVisitor
             {
-                virtual void visit(const FileMapping& fileObj)
+                virtual void visit(const FilePair& fileObj)
                 {
                     iconName = fileObj.getFullName<side>();
                 }
-                virtual void visit(const SymLinkMapping& linkObj)
+                virtual void visit(const SymlinkPair& linkObj)
                 {
                     iconName = linkObj.getFullName<side>();
                 }
-                virtual void visit(const DirMapping& dirObj)
+                virtual void visit(const DirPair& dirObj)
                 {
                     iconName = ICON_FILE_FOLDER;
                 }
@@ -664,20 +665,20 @@ private:
             {
                 AssembleTooltip(wxString& tipMsg) : tipMsg_(tipMsg) {}
 
-                virtual void visit(const FileMapping& fileObj)
+                virtual void visit(const FilePair& fileObj)
                 {
                     tipMsg_ += L"\n" +
                                _("Size:") + L" " + zen::filesizeToShortString(to<Int64>(fileObj.getFileSize<side>())) + L"\n" +
                                _("Date:") + L" " + zen::utcToLocalTimeString(fileObj.getLastWriteTime<side>());
                 }
 
-                virtual void visit(const SymLinkMapping& linkObj)
+                virtual void visit(const SymlinkPair& linkObj)
                 {
                     tipMsg_ += L"\n" +
                                _("Date:") + L" " + zen::utcToLocalTimeString(linkObj.getLastWriteTime<side>());
                 }
 
-                virtual void visit(const DirMapping& dirObj) {}
+                virtual void visit(const DirPair& dirObj) {}
 
                 wxString& tipMsg_;
             } assembler(toolTip);
@@ -719,7 +720,7 @@ private:
                     if (markedFilesAndLinks_.find(fsObj) != markedFilesAndLinks_.end()) //mark files/links directly
                         return true;
 
-                    if (auto dirObj = dynamic_cast<const DirMapping*>(fsObj))
+                    if (auto dirObj = dynamic_cast<const DirPair*>(fsObj))
                     {
                         if (markedContainer_.find(dirObj) != markedContainer_.end()) //mark directories which *are* the given HierarchyObject*
                             return true;
@@ -732,7 +733,7 @@ private:
                         if (markedContainer_.find(parent) != markedContainer_.end())
                             return true;
 
-                        if (auto dirObj = dynamic_cast<const DirMapping*>(parent))
+                        if (auto dirObj = dynamic_cast<const DirPair*>(parent))
                             parent = &(dirObj->parent());
                         else
                             break;
@@ -910,6 +911,14 @@ private:
 
     virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType)
     {
+        auto drawInactiveColumBackground = [&](const FileSystemObject& fsObj)
+        {
+            if (fsObj.isActive())
+                fillBackgroundDefaultColorAlternating(dc, rect, row % 2 == 0);
+            else
+                clearArea(dc, rect, COLOR_NOT_ACTIVE);
+        };
+
         switch (static_cast<ColumnTypeMiddle>(colType))
         {
             case COL_TYPE_CHECKBOX:
@@ -949,10 +958,12 @@ private:
                 if (const FileSystemObject* fsObj = getRawData(row))
                 {
                     if (highlightSyncAction_)
-                        fillBackgroundDefaultColorAlternating(dc, rect, row % 2 == 0);
+                        drawInactiveColumBackground(*fsObj);
 
-                    const wxBitmap& cmpImg = getCmpResultImage(fsObj->getCategory());
-                    drawBitmapRtlMirror(dc, highlightSyncAction_ ? greyScale(cmpImg) : cmpImg, rect, wxALIGN_CENTER, buffer);
+                    if (!highlightSyncAction_)
+                        drawBitmapRtlMirror(dc, getCmpResultImage(fsObj->getCategory()), rect, wxALIGN_CENTER, buffer);
+                    else if (fsObj->getCategory() != FILE_EQUAL) //don't show = in both middle columns
+                        drawBitmapRtlMirror(dc, greyScale(getCmpResultImage(fsObj->getCategory())), rect, wxALIGN_CENTER, buffer);
                 }
                 break;
 
@@ -960,7 +971,7 @@ private:
                 if (const FileSystemObject* fsObj = getRawData(row))
                 {
                     if (!highlightSyncAction_)
-                        fillBackgroundDefaultColorAlternating(dc, rect, row % 2 == 0);
+                        drawInactiveColumBackground(*fsObj);
 
                     const bool          rowHighlighted = dragSelection ? row == dragSelection->first : highlight ? row == highlight->row_ : false;
                     const BlockPosition highlightBlock = dragSelection ? dragSelection->second       : highlight ? highlight->blockPos_ : BLOCKPOS_CHECK_BOX;
@@ -983,8 +994,10 @@ private:
                         }
                     else //default
                     {
-                        const wxBitmap& opImg = getSyncOpImage(fsObj->getSyncOperation());
-                        drawBitmapRtlMirror(dc, highlightSyncAction_ ? opImg : greyScale(opImg), rect, wxALIGN_CENTER, buffer);
+                        if (highlightSyncAction_)
+                            drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->getSyncOperation()), rect, wxALIGN_CENTER, buffer);
+                        else if (fsObj->getSyncOperation() != SO_EQUAL) //don't show = in both middle columns
+                            drawBitmapRtlMirror(dc, greyScale(getSyncOpImage(fsObj->getSyncOperation())), rect, wxALIGN_CENTER, buffer);
                     }
                 }
                 break;
@@ -1020,7 +1033,7 @@ private:
                 wxRect rectInside = drawColumnLabelBorder(dc, rect);
                 drawColumnLabelBackground(dc, rectInside, highlighted);
 
-                const wxBitmap& cmpIcon = getResourceImage(L"compareSmall");
+                const wxBitmap& cmpIcon = getResourceImage(L"compare_small");
                 drawBitmapRtlNoMirror(dc, highlightSyncAction_ ? greyScale(cmpIcon) : cmpIcon, rectInside, wxALIGN_CENTER, buffer);
             }
             break;
@@ -1030,7 +1043,7 @@ private:
                 wxRect rectInside = drawColumnLabelBorder(dc, rect);
                 drawColumnLabelBackground(dc, rectInside, highlighted);
 
-                const wxBitmap& syncIcon = getResourceImage(L"syncSmall");
+                const wxBitmap& syncIcon = getResourceImage(L"sync_small");
                 drawBitmapRtlNoMirror(dc, highlightSyncAction_ ? syncIcon : greyScale(syncIcon), rectInside, wxALIGN_CENTER, buffer);
             }
             break;
@@ -1173,35 +1186,35 @@ private:
                     switch (syncOp)
                     {
                         case SO_CREATE_NEW_LEFT:
-                            return L"createLeft";
+                            return L"so_create_left";
                         case SO_CREATE_NEW_RIGHT:
-                            return L"createRight";
+                            return L"so_create_right";
                         case SO_DELETE_LEFT:
-                            return L"deleteLeft";
+                            return L"so_delete_left";
                         case SO_DELETE_RIGHT:
-                            return L"deleteRight";
+                            return L"so_delete_right";
                         case SO_MOVE_LEFT_SOURCE:
-                            return L"moveLeftSource";
+                            return L"so_move_left_source";
                         case SO_MOVE_LEFT_TARGET:
-                            return L"moveLeftTarget";
+                            return L"so_move_left_target";
                         case SO_MOVE_RIGHT_SOURCE:
-                            return L"moveRightSource";
+                            return L"so_move_right_source";
                         case SO_MOVE_RIGHT_TARGET:
-                            return L"moveRightTarget";
+                            return L"so_move_right_target";
                         case SO_OVERWRITE_LEFT:
-                            return L"updateLeft";
-                        case SO_COPY_METADATA_TO_LEFT:
-                            return L"moveLeft";
+                            return L"so_update_left";
                         case SO_OVERWRITE_RIGHT:
-                            return L"updateRight";
+                            return L"so_update_right";
+                        case SO_COPY_METADATA_TO_LEFT:
+                            return L"so_move_left";
                         case SO_COPY_METADATA_TO_RIGHT:
-                            return L"moveRight";
+                            return L"so_move_right";
                         case SO_DO_NOTHING:
-                            return L"none";
+                            return L"so_none";
                         case SO_EQUAL:
-                            return L"equal";
+                            return L"cat_equal";
                         case SO_UNRESOLVED_CONFLICT:
-                            return L"conflict";
+                            return L"cat_conflict";
                     };
                     assert(false);
                     return L"";
@@ -1217,20 +1230,20 @@ private:
                     switch (cmpRes)
                     {
                         case FILE_LEFT_SIDE_ONLY:
-                            return L"leftOnly";
+                            return L"cat_left_only";
                         case FILE_RIGHT_SIDE_ONLY:
-                            return L"rightOnly";
+                            return L"cat_right_only";
                         case FILE_LEFT_NEWER:
-                            return L"leftNewer";
+                            return L"cat_left_newer";
                         case FILE_RIGHT_NEWER:
-                            return L"rightNewer";
+                            return L"cat_right_newer";
                         case FILE_DIFFERENT:
-                            return L"different";
+                            return L"cat_different";
                         case FILE_EQUAL:
                         case FILE_DIFFERENT_METADATA: //= sub-category of equal
-                            return L"equal";
+                            return L"cat_equal";
                         case FILE_CONFLICT:
-                            return L"conflict";
+                            return L"cat_conflict";
                     }
                     assert(false);
                     return L"";
@@ -1313,9 +1326,9 @@ public:
             grid.getMainWin().Connect(wxEVT_KEY_UP,   func, nullptr, this);
             grid.getMainWin().Connect(wxEVT_KEY_DOWN, func, nullptr, this);
         };
-        connectGridAccess(gridL_, wxEventHandler(GridEventManager::onGridAccessL));
-        connectGridAccess(gridC_, wxEventHandler(GridEventManager::onGridAccessC));
-        connectGridAccess(gridR_, wxEventHandler(GridEventManager::onGridAccessR));
+        connectGridAccess(gridL_, wxEventHandler(GridEventManager::onGridAccessL)); //
+        connectGridAccess(gridC_, wxEventHandler(GridEventManager::onGridAccessC)); //connect *after* onKeyDown() in order to receive callback *before*!!!
+        connectGridAccess(gridR_, wxEventHandler(GridEventManager::onGridAccessR)); //
 
         Connect(EVENT_ALIGN_SCROLLBARS, wxEventHandler(GridEventManager::onAlignScrollBars), NULL, this);
     }
@@ -1391,12 +1404,15 @@ private:
                 case WXK_NUMPAD_LEFT:
                     gridL_.setGridCursor(row);
                     gridL_.SetFocus();
+                    //since key event is likely originating from right grid, we need to set scrollMaster manually!
+                    scrollMaster = &gridL_; //onKeyDown is called *after* onGridAccessL()!
                     return; //swallow event
 
                 case WXK_RIGHT:
                 case WXK_NUMPAD_RIGHT:
                     gridR_.setGridCursor(row);
                     gridR_.SetFocus();
+                    scrollMaster = &gridR_;
                     return; //swallow event
             }
 
@@ -1715,35 +1731,35 @@ wxBitmap zen::getSyncOpImage(SyncOperation syncOp)
     switch (syncOp) //evaluate comparison result and sync direction
     {
         case SO_CREATE_NEW_LEFT:
-            return getResourceImage(L"createLeftSmall");
+            return getResourceImage(L"so_create_left_small");
         case SO_CREATE_NEW_RIGHT:
-            return getResourceImage(L"createRightSmall");
+            return getResourceImage(L"so_create_right_small");
         case SO_DELETE_LEFT:
-            return getResourceImage(L"deleteLeftSmall");
+            return getResourceImage(L"so_delete_left_small");
         case SO_DELETE_RIGHT:
-            return getResourceImage(L"deleteRightSmall");
+            return getResourceImage(L"so_delete_right_small");
         case SO_MOVE_LEFT_SOURCE:
-            return getResourceImage(L"moveLeftSourceSmall");
+            return getResourceImage(L"so_move_left_source_small");
         case SO_MOVE_LEFT_TARGET:
-            return getResourceImage(L"moveLeftTargetSmall");
+            return getResourceImage(L"so_move_left_target_small");
         case SO_MOVE_RIGHT_SOURCE:
-            return getResourceImage(L"moveRightSourceSmall");
+            return getResourceImage(L"so_move_right_source_small");
         case SO_MOVE_RIGHT_TARGET:
-            return getResourceImage(L"moveRightTargetSmall");
-        case SO_OVERWRITE_RIGHT:
-            return getResourceImage(L"updateRightSmall");
-        case SO_COPY_METADATA_TO_RIGHT:
-            return getResourceImage(L"moveRightSmall");
+            return getResourceImage(L"so_move_right_target_small");
         case SO_OVERWRITE_LEFT:
-            return getResourceImage(L"updateLeftSmall");
+            return getResourceImage(L"so_update_left_small");
+        case SO_OVERWRITE_RIGHT:
+            return getResourceImage(L"so_update_right_small");
         case SO_COPY_METADATA_TO_LEFT:
-            return getResourceImage(L"moveLeftSmall");
+            return getResourceImage(L"so_move_left_small");
+        case SO_COPY_METADATA_TO_RIGHT:
+            return getResourceImage(L"so_move_right_small");
         case SO_DO_NOTHING:
-            return getResourceImage(L"noneSmall");
+            return getResourceImage(L"so_none_small");
         case SO_EQUAL:
-            return getResourceImage(L"equalSmall");
+            return getResourceImage(L"cat_equal_small");
         case SO_UNRESOLVED_CONFLICT:
-            return getResourceImage(L"conflictSmall");
+            return getResourceImage(L"cat_conflict_small");
     }
     return wxNullBitmap;
 }
@@ -1754,20 +1770,20 @@ wxBitmap zen::getCmpResultImage(CompareFilesResult cmpResult)
     switch (cmpResult)
     {
         case FILE_LEFT_SIDE_ONLY:
-            return getResourceImage(L"leftOnlySmall");
+            return getResourceImage(L"cat_left_only_small");
         case FILE_RIGHT_SIDE_ONLY:
-            return getResourceImage(L"rightOnlySmall");
+            return getResourceImage(L"cat_right_only_small");
         case FILE_LEFT_NEWER:
-            return getResourceImage(L"leftNewerSmall");
+            return getResourceImage(L"cat_left_newer_small");
         case FILE_RIGHT_NEWER:
-            return getResourceImage(L"rightNewerSmall");
+            return getResourceImage(L"cat_right_newer_small");
         case FILE_DIFFERENT:
-            return getResourceImage(L"differentSmall");
+            return getResourceImage(L"cat_different_small");
         case FILE_EQUAL:
         case FILE_DIFFERENT_METADATA: //= sub-category of equal
-            return getResourceImage(L"equalSmall");
+            return getResourceImage(L"cat_equal_small");
         case FILE_CONFLICT:
-            return getResourceImage(L"conflictSmall");
+            return getResourceImage(L"cat_conflict_small");
     }
     return wxNullBitmap;
 }

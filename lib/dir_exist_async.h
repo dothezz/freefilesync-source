@@ -34,7 +34,7 @@ std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::set<Zstring, 
         {
             if (dirname.empty())
                 return false;
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             //1. login to network share, if necessary
             loginNetworkShare(dirname, allowUserInteraction);
 #endif

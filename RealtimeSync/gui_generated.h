@@ -128,8 +128,9 @@ protected:
     wxStaticBitmap* m_bitmap10;
     wxTextCtrl* m_textCtrl8;
     wxStaticLine* m_staticline2;
+    wxBoxSizer* bSizerStdButtons;
     wxButton* m_buttonRetry;
-    wxButton* m_buttonAbort;
+    wxButton* m_buttonCancel;
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }

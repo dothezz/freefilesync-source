@@ -9,7 +9,7 @@
 #include <zen/i18n.h>
 #include <algorithm>
 #include <zen/stl_tools.h>
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/win_ver.h>
 #endif
 
@@ -28,7 +28,7 @@ std::vector<std::pair<std::wstring, std::wstring>> getDefaultCommands() //(gui n
 
     auto addEntry = [&](const std::wstring& name, const std::wstring& value) { output.push_back(std::make_pair(name, value)); };
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     if (zen::vistaOrLater())
     {
         addEntry(_("Standby"  ), L"rundll32.exe powrprof.dll,SetSuspendState Sleep"); //suspend/Suspend to RAM/sleep
@@ -44,7 +44,7 @@ std::vector<std::pair<std::wstring, std::wstring>> getDefaultCommands() //(gui n
         //no suspend on XP?
     }
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     addEntry(_("Standby"  ), L"sudo pm-suspend");
     addEntry(_("Log off"  ), L"gnome-session-quit"); //alternative requiring admin: sudo killall Xorg
     addEntry(_("Shut down"), L"dbus-send --print-reply --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.RequestShutdown");
@@ -52,7 +52,7 @@ std::vector<std::pair<std::wstring, std::wstring>> getDefaultCommands() //(gui n
     //addEntry(_("Hibernate"), L"sudo pm-hibernate");
     //alternative: "pmi action suspend" and "pmi action hibernate", require "sudo apt-get install powermanagement-interaface"
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
     addEntry(_("Standby"  ), L"osascript -e \'tell application \"System Events\" to sleep\'");
     addEntry(_("Log off"  ), L"osascript -e \'tell application \"System Events\" to log out\'");
     addEntry(_("Shut down"), L"osascript -e \'tell application \"System Events\" to shut down\'");

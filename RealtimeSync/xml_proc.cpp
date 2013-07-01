@@ -38,8 +38,7 @@ bool isXmlTypeRTS(const XmlDoc& doc) //throw()
 
 void xmlAccess::readRealConfig(const Zstring& filename, XmlRealConfig& config)
 {
-    XmlDoc doc;
-    loadXmlDocument(filename, doc); //throw FfsXmlError
+    XmlDoc doc = loadXmlDocument(filename); //throw FfsXmlError
 
     if (!isXmlTypeRTS(doc))
         throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));

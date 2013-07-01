@@ -47,17 +47,16 @@ XmlType getXmlType(const zen::XmlDoc& doc) //throw()
 
 XmlType xmlAccess::getXmlType(const Zstring& filename) //throw()
 {
-    XmlDoc doc;
     try
     {
         //do NOT use zen::loadStream as it will superfluously load even huge files!
-        loadXmlDocument(filename, doc); //throw FfsXmlError, quick exit if file is not an FFS XML
+        XmlDoc doc = loadXmlDocument(filename); //throw FfsXmlError, quick exit if file is not an FFS XML
+        return ::getXmlType(doc);
     }
     catch (const FfsXmlError&)
     {
         return XML_TYPE_OTHER;
     }
-    return ::getXmlType(doc);
 }
 
 
@@ -1122,8 +1121,7 @@ bool needsMigration(const XmlDoc& doc, int currentXmlFormatVer)
 template <class ConfigType>
 void readConfig(const Zstring& filename, XmlType type, ConfigType& cfg, int currentXmlFormatVer, bool& needMigration) //throw FfsXmlError
 {
-    XmlDoc doc;
-    loadXmlDocument(filename, doc); //throw FfsXmlError
+    XmlDoc doc = loadXmlDocument(filename); //throw FfsXmlError
 
     if (getXmlType(doc) != type) //throw()
         throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
@@ -1209,8 +1207,7 @@ void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfi
         const Zstring& filename = *it;
         const bool firstItem = it == filenames.begin(); //init all non-"mainCfg" settings with first config file
 
-        XmlDoc doc;
-        loadXmlDocument(filename, doc); //throw FfsXmlError
+        XmlDoc doc = loadXmlDocument(filename); //throw FfsXmlError
         //do NOT use zen::loadStream as it will superfluously load even huge files!
 
         switch (::getXmlType(doc))
@@ -1220,8 +1217,7 @@ void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfi
                 XmlGuiConfig guiCfg = parseConfig<XmlGuiConfig>(doc, filename, XML_FORMAT_VER_FFS_GUI, warning); //nothrow
                 if (firstItem)
                     config = guiCfg;
-                else
-                    mainCfgs.push_back(guiCfg.mainCfg);
+                mainCfgs.push_back(guiCfg.mainCfg);
             }
             break;
 
@@ -1230,8 +1226,7 @@ void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfi
                 XmlBatchConfig batchCfg = parseConfig<XmlBatchConfig>(doc, filename, XML_FORMAT_VER_FFS_BATCH, warning); //nothrow
                 if (firstItem)
                     config = convertBatchToGui(batchCfg);
-                else
-                    mainCfgs.push_back(batchCfg.mainCfg);
+                mainCfgs.push_back(batchCfg.mainCfg);
             }
             break;
 
@@ -1240,7 +1235,6 @@ void xmlAccess::readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfi
                 throw FfsXmlError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)));
         }
     }
-    mainCfgs.push_back(config.mainCfg); //save cfg from first line
 
     config.mainCfg = merge(mainCfgs);
 

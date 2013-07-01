@@ -114,7 +114,7 @@ public:
     const SortInfo* getSortInfo() const { return currentSort.get(); } //return nullptr if currently not sorted
 
     ptrdiff_t findRowDirect(FileSystemObject::ObjectIdConst objId) const; // find an object's row position on view list directly, return < 0 if not found
-    ptrdiff_t findRowFirstChild(const HierarchyObject* hierObj)    const; // find first child of DirMapping or BaseDirMapping *on sorted sub view*
+    ptrdiff_t findRowFirstChild(const HierarchyObject* hierObj)    const; // find first child of DirPair or BaseDirPair *on sorted sub view*
     //"hierObj" may be invalid, it is NOT dereferenced, return < 0 if not found
 
     size_t getFolderPairCount() const { return folderPairCount; } //count non-empty pairs to distinguish single/multiple folder pair cases
@@ -123,9 +123,9 @@ private:
     struct RefIndex
     {
         RefIndex(size_t folderInd, FileSystemObject::ObjectId id) :
-            folderIndex(static_cast<unsigned int>(folderInd)),
+            folderIndex(folderInd),
             objId(id) {}
-        unsigned int folderIndex;
+        size_t folderIndex; //because of alignment there's no benefit in using "unsigned int" in 64-bit code here!
         FileSystemObject::ObjectId objId;
     };
 

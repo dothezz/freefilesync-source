@@ -31,7 +31,7 @@ struct FolderPairCfg
         filter(filterIn),
         directionCfg(directCfg) {}
 
-    Zstring leftDirectoryFmt;  //resolved folder pairs!!!
+    Zstring leftDirectoryFmt;  //resolved directory names!
     Zstring rightDirectoryFmt; //
 
     CompareVariant compareVar;

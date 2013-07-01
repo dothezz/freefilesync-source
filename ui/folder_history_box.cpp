@@ -35,11 +35,11 @@ FolderHistoryBox::FolderHistoryBox(wxWindow* parent,
     warn_static("mac")
     warn_static("linux")
 
-#if defined FFS_WIN
+#if defined ZEN_WIN
     //on Win, this mouse click event only fires, when clicking on the small down arrow, NOT when clicking on the text field
     //thanks to wxWidgets' non-portability it's exactly the converse on Linux!
     Connect(wxEVT_LEFT_DOWN, wxEventHandler(FolderHistoryBox::OnRequireHistoryUpdate), nullptr, this);
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
     /*
     we can't attach to wxEVT_COMMAND_TEXT_UPDATED, since setValueAndUpdateList() will implicitly emit wxEVT_COMMAND_TEXT_UPDATED again when calling Clear()!
     => Crash on Suse/X11/wxWidgets 2.9.4 on startup (setting a flag to guard against recursion does not work, still crash)
@@ -63,7 +63,7 @@ void FolderHistoryBox::setValueAndUpdateList(const wxString& dirname)
     std::vector<wxString> dirList;
     {
         //add some aliases to allow user changing to volume name and back, if possible
-        std::vector<Zstring> aliases = getDirectoryAliases(toZ(dirname));
+        std::vector<Zstring> aliases = getDirectoryAliases(toZ(dirname)); //may block when resolving [<volume name>]
         std::transform(aliases.begin(), aliases.end(), std::back_inserter(dirList), [](const Zstring& str) { return utfCvrtTo<wxString>(str); });
     }
     if (sharedHistory_.get())

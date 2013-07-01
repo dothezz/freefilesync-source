@@ -23,9 +23,9 @@
 
 namespace zen
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 const char ZEN_FILE_NAME_SEPARATOR = '\\';
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 const char ZEN_FILE_NAME_SEPARATOR = '/';
 #endif
 

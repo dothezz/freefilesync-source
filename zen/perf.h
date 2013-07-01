@@ -10,7 +10,7 @@
 #include "deprecate.h"
 #include "tick_count.h"
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <sstream>
 #else
 #include <iostream>
@@ -33,7 +33,7 @@ public:
         ticksPerSec_(ticksPerSec()), startTime(), resultShown(false)
     {
         //std::clock() - "counts CPU time in C and wall time in VC++" - WTF!???
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         if (::SetThreadAffinityMask(::GetCurrentThread(), 1) == 0) //"should not be required unless there are bugs in BIOS or HAL" - msdn, QueryPerformanceCounter
             throw TimerError();
 #endif
@@ -51,7 +51,7 @@ public:
             throw TimerError();
 
         const auto delta = static_cast<long>(1000.0 * dist(startTime, now) / ticksPerSec_);
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         std::ostringstream ss;
         ss << delta << " ms";
         ::MessageBoxA(nullptr, ss.str().c_str(), "Timer", 0);

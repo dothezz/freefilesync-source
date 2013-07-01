@@ -33,11 +33,11 @@ std::wstring zen::getVariantName(DirectionConfig::Variant var)
     switch (var)
     {
         case DirectionConfig::AUTOMATIC:
-            return _("<- Two way ->");
+            return L"<- " + _("Two way") + L" ->";
         case DirectionConfig::MIRROR:
-            return _("Mirror ->>");
+            return _("Mirror") + L" ->>";
         case DirectionConfig::UPDATE:
-            return _("Update ->");
+            return _("Update") + L" ->";
         case DirectionConfig::CUSTOM:
             return _("Custom");
     }
@@ -207,7 +207,7 @@ assert_static(std::numeric_limits<zen::UInt64>::is_specialized);
 int daysSinceBeginOfWeek(int dayOfWeek) //0-6, 0=Monday, 6=Sunday
 {
     assert(0 <= dayOfWeek && dayOfWeek <= 6);
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     DWORD firstDayOfWeek = 0;
     if (::GetLocaleInfo(LOCALE_USER_DEFAULT,                 //__in   LCID Locale,
                         LOCALE_IFIRSTDAYOFWEEK |             // first day of week specifier, 0-6, 0=Monday, 6=Sunday

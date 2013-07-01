@@ -17,16 +17,16 @@ namespace
 {
 struct CompileTimeReminder : public FSObjectVisitor
 {
-    virtual void visit(const FileMapping&    fileObj) {}
-    virtual void visit(const SymLinkMapping& linkObj) {}
-    virtual void visit(const DirMapping&     dirObj ) {}
+    virtual void visit(const FilePair&    fileObj) {}
+    virtual void visit(const SymlinkPair& linkObj) {}
+    virtual void visit(const DirPair&     dirObj ) {}
 } checkDymanicCasts; //just a compile-time reminder to manually check dynamic casts in this file when needed
 }
 
 inline
-bool isDirectoryMapping(const FileSystemObject& fsObj)
+bool isDirectoryPair(const FileSystemObject& fsObj)
 {
-    return dynamic_cast<const DirMapping*>(&fsObj) != nullptr;
+    return dynamic_cast<const DirPair*>(&fsObj) != nullptr;
 }
 
 
@@ -40,16 +40,16 @@ bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
         return true;  //empty rows always last
 
 
-    if (isDirectoryMapping(a)) //sort directories by relative name
+    if (isDirectoryPair(a)) //sort directories by relative name
     {
-        if (isDirectoryMapping(b))
+        if (isDirectoryPair(b))
             return LessFilename()(a.getRelativeName<side>(), b.getRelativeName<side>());
         else
             return false;
     }
     else
     {
-        if (isDirectoryMapping(b))
+        if (isDirectoryPair(b))
             return true;
         else
             return makeSortDirection(LessFilename(), Int2Type<ascending>())(a.getShortName<side>(), b.getShortName<side>());
@@ -60,12 +60,12 @@ bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
 template <bool ascending> //side currently unused!
 bool lessRelativeName(const FileSystemObject& a, const FileSystemObject& b)
 {
-    const bool isDirectoryA = isDirectoryMapping(a);
+    const bool isDirectoryA = isDirectoryPair(a);
     const Zstring& relDirNameA = isDirectoryA ?
                                  a.getObjRelativeName() : //directory
                                  beforeLast(a.getObjRelativeName(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
 
-    const bool isDirectoryB = isDirectoryMapping(b);
+    const bool isDirectoryB = isDirectoryPair(b);
     const Zstring& relDirNameB = isDirectoryB ?
                                  b.getObjRelativeName() : //directory
                                  beforeLast(b.getObjRelativeName(), FILE_NAME_SEPARATOR); //returns empty string if ch not found
@@ -95,8 +95,8 @@ bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;
 
-    const bool isDirA = dynamic_cast<const DirMapping*>(&a) != nullptr;
-    const bool isDirB = dynamic_cast<const DirMapping*>(&b) != nullptr;
+    const bool isDirA = dynamic_cast<const DirPair*>(&a) != nullptr;
+    const bool isDirB = dynamic_cast<const DirPair*>(&b) != nullptr;
 
     //directories second last
     if (isDirA)
@@ -104,8 +104,8 @@ bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
     else if (isDirB)
         return true;
 
-    const FileMapping* fileObjA = dynamic_cast<const FileMapping*>(&a);
-    const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
+    const FilePair* fileObjA = dynamic_cast<const FilePair*>(&a);
+    const FilePair* fileObjB = dynamic_cast<const FilePair*>(&b);
 
     //then symlinks
     if (!fileObjA)
@@ -127,11 +127,11 @@ bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
         return true;  //empty rows always last
 
 
-    const FileMapping* fileObjA = dynamic_cast<const FileMapping*>(&a);
-    const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
+    const FilePair* fileObjA = dynamic_cast<const FilePair*>(&a);
+    const FilePair* fileObjB = dynamic_cast<const FilePair*>(&b);
 
-    const SymLinkMapping* linkObjA = dynamic_cast<const SymLinkMapping*>(&a);
-    const SymLinkMapping* linkObjB = dynamic_cast<const SymLinkMapping*>(&b);
+    const SymlinkPair* linkObjA = dynamic_cast<const SymlinkPair*>(&a);
+    const SymlinkPair* linkObjB = dynamic_cast<const SymlinkPair*>(&b);
 
     if (!fileObjA && !linkObjA)
         return false; //directories last
@@ -154,9 +154,9 @@ bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;  //empty rows always last
 
-    if (dynamic_cast<const DirMapping*>(&a))
+    if (dynamic_cast<const DirPair*>(&a))
         return false; //directories last
-    else if (dynamic_cast<const DirMapping*>(&b))
+    else if (dynamic_cast<const DirPair*>(&b))
         return true;  //directories last
 
     auto getExtension = [&](const FileSystemObject& fsObj) -> Zstring

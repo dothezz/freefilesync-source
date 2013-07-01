@@ -5,16 +5,16 @@
 // **************************************************************************
 
 #include "process_priority.h"
-#include <zen/last_error.h>
+#include <zen/sys_error.h>
 #include <zen/i18n.h>
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 //#include <sys/syscall.h>
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 #include <sys/resource.h> //getiopolicy_np
 #include <IOKit/pwr_mgt/IOPMLib.h> //keep in .cpp file to not pollute global namespace! e.g. with UInt64
 #endif
@@ -22,7 +22,7 @@
 using namespace zen;
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 struct PreventStandby::Pimpl {};
 
 PreventStandby::PreventStandby()
@@ -49,7 +49,7 @@ struct ScheduleForBackgroundProcessing::Pimpl {};
 ScheduleForBackgroundProcessing::ScheduleForBackgroundProcessing()
 {
     if (!::SetPriorityClass(::GetCurrentProcess(), PROCESS_MODE_BACKGROUND_BEGIN)) //this call lowers CPU priority, too!!
-        throw FileError(_("Cannot change process I/O priorities.") + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot change process I/O priorities."), formatSystemError(L"SetPriorityClass", getLastError()));
 }
 
 
@@ -58,7 +58,7 @@ ScheduleForBackgroundProcessing::~ScheduleForBackgroundProcessing()
     ::SetPriorityClass(::GetCurrentProcess(), PROCESS_MODE_BACKGROUND_END);
 }
 
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
 struct PreventStandby::Pimpl {};
 PreventStandby::PreventStandby() {}
 PreventStandby::~PreventStandby() {}
@@ -101,7 +101,7 @@ private:
 };
 */
 
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 //https://developer.apple.com/library/mac/#qa/qa1340
 struct PreventStandby::Pimpl
 {
@@ -111,11 +111,12 @@ struct PreventStandby::Pimpl
 
 PreventStandby::PreventStandby() : pimpl(make_unique<Pimpl>())
 {
-    if (::IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep,
-                                      kIOPMAssertionLevelOn,
-                                      CFSTR("FreeFileSync"),
-                                      &pimpl->assertionID) != kIOReturnSuccess)
-        throw FileError(_("Failed to suspend system sleep mode."));
+    IOReturn rv = ::IOPMAssertionCreateWithName(kIOPMAssertionTypeNoIdleSleep,
+                                                kIOPMAssertionLevelOn,
+                                                CFSTR("FreeFileSync"),
+                                                &pimpl->assertionID);
+    if (rv != kIOReturnSuccess)
+        throw FileError(_("Failed to suspend system sleep mode."), replaceCpy<std::wstring>(L"IOReturn Code %x", L"%x", numberTo<std::wstring>(rv))); //could not find a better way to convert IOReturn to string
 }
 
 PreventStandby::~PreventStandby()
@@ -135,10 +136,10 @@ ScheduleForBackgroundProcessing::ScheduleForBackgroundProcessing() : pimpl(make_
 {
     pimpl->oldIoPrio = ::getiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS);
     if (pimpl->oldIoPrio == -1)
-        throw FileError(_("Cannot change process I/O priorities.") + L" (r)" + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot change process I/O priorities."), formatSystemError(L"getiopolicy_np", getLastError()));
 
     if (::setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS, IOPOL_THROTTLE) != 0)
-        throw FileError(_("Cannot change process I/O priorities.") + L" (w)" + L"\n\n" + getLastErrorFormatted());
+        throw FileError(_("Cannot change process I/O priorities."), formatSystemError(L"setiopolicy_np", getLastError()));
 }
 
 

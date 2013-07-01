@@ -4,9 +4,10 @@
 #include <zen/time.h>
 #include <zen/thread.h>
 #include <zen/utf.h>
+#include <zen/scope_guard.h>
 #include <wx/utils.h> //wxGetEnv
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 #include <zen/long_path_prefix.h>
 #include <zen/file_handling.h>
 #include <zen/win.h> //includes "windows.h"
@@ -16,8 +17,9 @@
 #pragma comment(lib, "Mpr.lib")
 #endif
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 #include <stdlib.h> //getenv()
+#include <unistd.h> //getcwd
 #endif
 
 using namespace zen;
@@ -25,24 +27,25 @@ using namespace zen;
 
 namespace
 {
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 Zstring resolveRelativePath(const Zstring& relativeName) //note: ::GetFullPathName() is documented not threadsafe!
 {
-    const DWORD bufferSize = 10000;
-    std::vector<wchar_t> buffer(bufferSize);
-
     //don't use long path prefix! does not work with relative paths "." and ".."
-    const DWORD charsWritten = ::GetFullPathName(relativeName.c_str(), //__in   LPCTSTR lpFileName,
-                                                 bufferSize, //__in   DWORD nBufferLength,
-                                                 &buffer[0], //__out  LPTSTR lpBuffer,
-                                                 nullptr);   //__out  LPTSTR *lpFilePart
-    if (charsWritten == 0 || charsWritten >= bufferSize) //theoretically, charsWritten cannot be == "bufferSize"
-        return relativeName; //ERROR! Don't do anything
-
-    return Zstring(&buffer[0], charsWritten);
+    const DWORD bufferSize = ::GetFullPathName(relativeName.c_str(), 0, nullptr, nullptr);
+    if (bufferSize > 0)
+    {
+        std::vector<wchar_t> buffer(bufferSize);
+        const DWORD charsWritten = ::GetFullPathName(relativeName.c_str(), //__in   LPCTSTR lpFileName,
+                                                     bufferSize, //__in   DWORD nBufferLength,
+                                                     &buffer[0], //__out  LPTSTR lpBuffer,
+                                                     nullptr);   //__out  LPTSTR *lpFilePart
+        if (0 < charsWritten && charsWritten < bufferSize) //theoretically, charsWritten can never be == "bufferSize"
+            return Zstring(&buffer[0], charsWritten);
+    }
+    return relativeName; //ERROR! Don't do anything
 }
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
 Zstring resolveRelativePath(const Zstring& relativeName)
 {
     //http://linux.die.net/man/2/path_resolution
@@ -69,16 +72,18 @@ Zstring resolveRelativePath(const Zstring& relativeName)
         }
 
         //we cannot use ::realpath() since it resolves *existing* relative paths only!
-        std::vector<char> buffer(10000);
-        if (::getcwd(&buffer[0], buffer.size()) != nullptr)
-            return appendSeparator(&buffer[0]) + relativeName;
+        if (char* dirpath = ::getcwd(nullptr, 0))
+        {
+            ZEN_ON_SCOPE_EXIT(::free(dirpath));
+            return appendSeparator(dirpath) + relativeName;
+        }
     }
     return relativeName;
 }
 #endif
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 class CsidlConstants
 {
 public:
@@ -273,7 +278,7 @@ std::unique_ptr<Zstring> resolveMacro(const Zstring& macro, //macro without %-ch
     if (std::unique_ptr<Zstring> value = getEnvironmentVar(macro))
         return value;
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
     //try to resolve as CSIDL value
     {
         const auto& csidlMap = CsidlConstants::get();
@@ -316,8 +321,8 @@ Zstring zen::expandMacros(const Zstring& text) { return ::expandMacros(text, std
 
 namespace
 {
-#ifdef FFS_WIN
-//networks and cdrom excluded - this should not block
+#ifdef ZEN_WIN
+//networks and cdrom excluded - may still block for slow USB sticks!
 Zstring getPathByVolumenName(const Zstring& volumeName) //return empty string on error
 {
     //FindFirstVolume(): traverses volumes on local hard disks only!
@@ -412,11 +417,11 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
                 rest = afterFirst(rest, Zstr(':'));
             if (startsWith(rest, FILE_NAME_SEPARATOR))
                 rest = afterFirst(rest, FILE_NAME_SEPARATOR);
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
             //[.*] pattern was found...
             if (!volname.empty())
             {
-                Zstring volPath = getPathByVolumenName(volname); //should not block?!
+                Zstring volPath = getPathByVolumenName(volname); //may block for slow USB sticks!
                 if (!volPath.empty())
                     return appendSeparator(volPath) + rest; //successfully replaced pattern
             }
@@ -430,7 +435,7 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
                C:\Program Files\FreeFileSync\[FFS USB]\FreeFileSync\                                                                                        */
             return L"?:\\[" + volname + L"]\\" + rest;
 
-#elif defined FFS_LINUX || defined FFS_MAC //neither supported nor needed
+#elif defined ZEN_LINUX || defined ZEN_MAC //neither supported nor needed
             return "/.../[" + volname + "]/" + rest;
 #endif
         }
@@ -442,8 +447,8 @@ Zstring expandVolumeName(const Zstring& text)  // [volname]:\folder       [volna
 
 void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, LessFilename>& output)
 {
-#ifdef FFS_WIN
-    //1. replace volume path by volume name: c:\dirname ->  [SYSTEM]\dirname
+#ifdef ZEN_WIN
+    //1. replace volume path by volume name: c:\dirname -> [SYSTEM]\dirname
     if (dirname.size() >= 3 &&
         std::iswalpha(dirname[0]) &&
         dirname[1] == L':' &&
@@ -473,7 +478,7 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
             if (std::unique_ptr<Zstring> value = getEnvironmentVar(envName))
                 envToDir.insert(std::make_pair(envName, *value));
         };
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
         addEnvVar(L"AllUsersProfile");  // C:\ProgramData
         addEnvVar(L"AppData");          // C:\Users\<user>\AppData\Roaming
         addEnvVar(L"LocalAppData");     // C:\Users\<user>\AppData\Local
@@ -491,19 +496,19 @@ void getDirectoryAliasesRecursive(const Zstring& dirname, std::set<Zstring, Less
         const auto& csidlMap = CsidlConstants::get();
         envToDir.insert(csidlMap.begin(), csidlMap.end());
 
-#elif defined FFS_LINUX || defined FFS_MAC
+#elif defined ZEN_LINUX || defined ZEN_MAC
         addEnvVar("HOME"); //Linux: /home/<user>  Mac: /Users/<user>
 #endif
         //substitute paths by symbolic names
         auto pathStartsWith = [](const Zstring& path, const Zstring& prefix) -> bool
         {
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
             Zstring tmp = path;
             Zstring tmp2 = prefix;
             ::makeUpper(tmp);
             ::makeUpper(tmp2);
             return startsWith(tmp, tmp2);
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
             return startsWith(path, prefix);
 #endif
         };
@@ -557,7 +562,7 @@ Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()
         return Zstring();
 
     dirname = expandMacros(dirname);
-    dirname = expandVolumeName(dirname); //should not block
+    dirname = expandVolumeName(dirname); //may block for slow USB sticks!
 
     /*
     need to resolve relative paths:
@@ -575,7 +580,7 @@ Zstring zen::getFormattedDirectoryName(const Zstring& dirString) // throw()
 }
 
 
-#ifdef FFS_WIN
+#ifdef ZEN_WIN
 void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteraction) //throw() - user interaction: show OS password prompt
 {
     /*

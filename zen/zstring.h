@@ -8,9 +8,9 @@
 #define ZSTRING_H_INCLUDED
 
 #include "string_base.h"
-#ifdef FFS_LINUX
+#ifdef ZEN_LINUX
 #include <cstring> //strcmp
-#elif defined FFS_MAC
+#elif defined ZEN_MAC
 //#include <strings.h> //strcasecmp
 #endif
 
@@ -49,12 +49,12 @@ public:
 
 //############################## helper functions #############################################
 
-#ifdef FFS_WIN //Windows encodes Unicode as UTF-16 wchar_t
+#ifdef ZEN_WIN //Windows encodes Unicode as UTF-16 wchar_t
 typedef wchar_t Zchar;
 #define Zstr(x) L ## x
 const Zchar FILE_NAME_SEPARATOR = L'\\';
 
-#elif defined FFS_LINUX || defined FFS_MAC //Linux uses UTF-8
+#elif defined ZEN_LINUX || defined ZEN_MAC //Linux uses UTF-8
 typedef char Zchar;
 #define Zstr(x) x
 const Zchar FILE_NAME_SEPARATOR = '/';
@@ -82,7 +82,7 @@ struct EqualFilename //case-insensitive on Windows, case-sensitive on Linux
     bool operator()(const zen::Zbase<Zchar, SP, AP>& lhs, const zen::Zbase<Zchar, SP, AP>& rhs) const { return cmpFileName(lhs, rhs) == 0; }
 };
 
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
 template <template <class, class> class SP, class AP>
 void makeUpper(zen::Zbase<Zchar, SP, AP>& str);
 #endif
@@ -101,7 +101,7 @@ Zstring appendSeparator(Zstring path) //support rvalue references!
 //################################# inline implementation ########################################
 namespace z_impl
 {
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
 int compareFilenamesNoCase(const Zchar* lhs, const Zchar* rhs, size_t sizeLhs, size_t sizeRhs);
 void makeFilenameUpperCase(Zchar* str, size_t size);
 #endif
@@ -111,17 +111,17 @@ void makeFilenameUpperCase(Zchar* str, size_t size);
 template <template <class, class> class SP, class AP> inline
 int cmpFileName(const zen::Zbase<Zchar, SP, AP>& lhs, const zen::Zbase<Zchar, SP, AP>& rhs)
 {
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
     return z_impl::compareFilenamesNoCase(lhs.data(), rhs.data(), lhs.length(), rhs.length());
-#elif defined FFS_LINUX
+#elif defined ZEN_LINUX
     return std::strcmp(lhs.c_str(), rhs.c_str()); //POSIX filenames don't have embedded 0
-    //#elif defined FFS_MAC
+    //#elif defined ZEN_MAC
     //  return ::strcasecmp(lhs.c_str(), rhs.c_str()); //locale-dependent!
 #endif
 }
 
 
-#if defined FFS_WIN || defined FFS_MAC
+#if defined ZEN_WIN || defined ZEN_MAC
 template <template <class, class> class SP, class AP> inline
 void makeUpper(zen::Zbase<Zchar, SP, AP>& str)
 {
