@@ -7,61 +7,7 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Cannot determine final path for %x.</source>
-<target></target>
-
-<source>Failed to register to receive system messages.</source>
-<target></target>
-
-<source>Cannot create symbolic link %x.</source>
-<target></target>
-
-<source>Do&n't save</source>
-<target></target>
-
-<source>Select a variant</source>
-<target></target>
-
-<source>Check for new &version</source>
-<target></target>
-
-<source>&Tools</source>
-<target></target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target></target>
-
-<source>&Download</source>
-<target></target>
-
-<source>New version found</source>
-<target></target>
-
 <source>Retrying operation after error:</source>
-<target></target>
-
-<source>Switching to FreeFileSync main dialog</source>
-<target></target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target></target>
-
-<source>Cannot determine volume name for %x.</source>
-<target></target>
-
-<source>Starting comparison</source>
-<target></target>
-
-<source>Resolving symbolic link %x</source>
-<target></target>
-
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target></target>
-
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target></target>
-
-<source>The database entry is not in sync considering current settings.</source>
 <target></target>
 
 <source>Both sides have changed since last synchronization.</source>
@@ -72,6 +18,9 @@
 
 <source>No change since last synchronization.</source>
 <target>Son eşleştirmeden bu yana bir değişiklik olmamış.</target>
+
+<source>The database entry is not in sync considering current settings.</source>
+<target>Geçerli kayıtlar ile veritabanı kaydı aynı değil.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Varsayılan eşleştirme yönleri ayarlanıyor: Yeni dosyalar eski dosyaların üzerine yazılacak.</target>
@@ -97,6 +46,9 @@
 <source>Deleting symbolic link %x</source>
 <target>%x sembolik bağlantısı siliniyor</target>
 
+<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>Şu klasörler için Geri Dönüşüm Kutusu kullanılamaz. Dosyalar geri döndürülemeyecek şekilde silinir:</target>
+
 <source>An exception occurred</source>
 <target>Olağan dışı bir durumla karşılaşıldı</target>
 
@@ -121,6 +73,9 @@
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>Bu hatayı yok sayarak karşıdaki klasörleri boş kabul edebilirsiniz. Bu klasörler eşleştirme sırasında kendiliğinden oluşturulur.</target>
 
+<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
+<target>Şu klasörlerin bağlı yolları var. Eşleştirme kurallarını ayarlarken dikkatli olun:</target>
+
 <source>File %x has an invalid date.</source>
 <target>%x dosyasının tarihi geçersiz.</target>
 
@@ -136,11 +91,17 @@
 <source>Items differ in attributes only</source>
 <target>Yalnız öznitelikleri farklı ögeler</target>
 
+<source>Resolving symbolic link %x</source>
+<target>%x sembolik bağlantısı çözümleniyor</target>
+
 <source>Comparing content of files %x</source>
 <target>%x dosyalarının içeriği karşılaştırılıyor</target>
 
 <source>Generating file list...</source>
 <target>Dosya listesi oluşturuluyor...</target>
+
+<source>Starting comparison</source>
+<target>Karşılaştırmaya başlanıyor</target>
 
 <source>Calculating sync directions...</source>
 <target>Eşleştirme yönleri hesaplanıyor...</target>
@@ -319,6 +280,9 @@
 <source>Cannot load file %x.</source>
 <target>%x dosyası yüklenemedi.</target>
 
+<source>Cannot determine volume name for %x.</source>
+<target>%x için birim adı belirlenemedi.</target>
+
 <source>Volume name %x not part of file name %y.</source>
 <target>%x birim adı, %y dosya adının parçası değil.</target>
 
@@ -444,14 +408,14 @@ Komut şu durumlarda yürütülür:
 <source>File time and size</source>
 <target>Tarih ve saate göre</target>
 
-<source> Two way </source>
-<target> Çift yönlü </target>
+<source>Two way</source>
+<target>Çift yönlü</target>
 
 <source>Mirror</source>
-<target>Yansıtma </target>
+<target>Yansıtma</target>
 
 <source>Update</source>
-<target>Güncelleme </target>
+<target>Güncelleme</target>
 
 <source>Custom</source>
 <target>Özel</target>
@@ -534,6 +498,9 @@ Komut şu durumlarda yürütülür:
 <source>Creating Volume Shadow Copy for %x...</source>
 <target>%x için Birim Gölge Kopyası oluşturuluyor...</target>
 
+<source>Data verification error: %x and %y have different content.</source>
+<target>Veri doğrulama hatası: %x ve %y farklı içeriklere sahip.</target>
+
 <source>Synchronization aborted</source>
 <target>Eşleştirme durduruldu</target>
 
@@ -555,11 +522,20 @@ Komut şu durumlarda yürütülür:
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
 <target>FreeFileSync ana penceresindeki sorunları çözmek için "Değiştirin" düğmesine tıklayın.</target>
 
+<source>Switching to FreeFileSync main dialog</source>
+<target>FreeFileSync ana penceresine geçiliyor</target>
+
 <source>A new version of FreeFileSync is available:</source>
 <target>Yeni bir FreeFileSync sürümü yayınlanmış:</target>
 
 <source>Download now?</source>
 <target>İndirilsin mi?</target>
+
+<source>New version found</source>
+<target>Yeni bir sürüm yayınlanmış</target>
+
+<source>&Download</source>
+<target>İn&dirin</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>FreeFileSync güncel.</target>
@@ -569,6 +545,9 @@ Komut şu durumlarda yürütülür:
 
 <source>Unable to connect to sourceforge.net.</source>
 <target>sourceforge.net sitesine bağlanılamıyor.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Geçerli FreeFileSync sürüm numarası çevrimiçi olarak bulunamıyor. El ile denetlemek ister misiniz?</target>
 
 <source>Symlink</source>
 <target>Smblkbağlantı</target>
@@ -672,11 +651,17 @@ Komut şu durumlarda yürütülür:
 <source>&Global settings...</source>
 <target>&Genel ayarlar...</target>
 
+<source>&Tools</source>
+<target>A&raçlar</target>
+
 <source>&Check now</source>
-<target>Sürümü &Denetleyin</target>
+<target>&Sürümü Denetleyin</target>
 
 <source>Check &automatically once a week</source>
 <target>&Kendiliğinden haftada bir denetlensin</target>
+
+<source>Check for new &version</source>
+<target>Yeni &sürümü denetleyin</target>
 
 <source>Compare</source>
 <target>Karşılaştırın</target>
@@ -743,6 +728,9 @@ Komut şu durumlarda yürütülür:
 
 <source>&Pause</source>
 <target>&Duraklatılsın</target>
+
+<source>Select a variant</source>
+<target>Bir çeşit seçin</target>
 
 <source>
 Files are found equal if
@@ -1092,6 +1080,9 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır.
 <source>Do you want to save changes to %x?</source>
 <target>Değişiklikleri %x dosyasına kaydetmek istiyor musunuz?</target>
 
+<source>Do&n't save</source>
+<target>Kaydedilmesi&n</target>
+
 <source>Never save changes</source>
 <target>Değişiklikler asla kaydedilmesin</target>
 
@@ -1302,9 +1293,6 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır.
 <source>Append a timestamp to each file name</source>
 <target>Dosya adlarına zaman damgası eklensin</target>
 
-<source>Folder</source>
-<target>Klasör</target>
-
 <source>File</source>
 <target>Dosya</target>
 
@@ -1359,6 +1347,9 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır.
 <source>Cannot create directory %x.</source>
 <target>%x klasörü eklenemedi.</target>
 
+<source>Cannot create symbolic link %x.</source>
+<target>%x sembolik bağlantısı oluşturulamadı.</target>
+
 <source>Cannot find system function %x.</source>
 <target>%x sistem işlevi bulunamadı.</target>
 
@@ -1410,6 +1401,9 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır.
 <pluralform>%x gün</pluralform>
 </target>
 
+<source>Failed to register to receive system messages.</source>
+<target>Sistem iletileri alınacak şekilde kayıt yapılamadı.</target>
+
 <source>Cannot set privilege %x.</source>
 <target>%x izni verilemedi.</target>
 
@@ -1421,6 +1415,9 @@ Not: Dosya adları kök klasörlere göre bağıl olmalıdır.
 
 <source>Unable to move %x to the Recycle Bin.</source>
 <target>%x Geri Dönüşüm Kutusuna gönderilemedi.</target>
+
+<source>Cannot determine final path for %x.</source>
+<target>Son %x yolu belirlenemedi.</target>
 
 <source>Error Code %x:</source>
 <target>Hata Kodu %x:</target>

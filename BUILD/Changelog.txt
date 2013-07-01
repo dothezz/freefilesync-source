@@ -1,3 +1,8 @@
+FreeFileSync 5.18
+-----------------
+Workaround boost 1.54 bug "Procedure Entry Point Not Found in Kernel32.dll" (Windows XP)
+
+
 FreeFileSync 5.17
 -----------------
 Consider target file when updating followed file symlinks
