@@ -99,6 +99,7 @@ void xmlAccess::OptionalDialogs::resetDialogs()
     warningDirectoryLockFailed     = true;
     popupOnConfigChange            = true;
     confirmSyncStart               = true;
+    confirmExternalCommandMassInvoke = true;
 }
 
 
@@ -154,36 +155,6 @@ xmlAccess::XmlBatchConfig xmlAccess::convertGuiToBatchPreservingExistingBatch(co
         catch (xmlAccess::FfsXmlError&) {}
 
     return convertGuiToBatch(guiCfg);
-}
-
-
-xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<Zstring>& filenames)  //throw()
-{
-    bool guiCfgExists   = false;
-    bool batchCfgExists = false;
-
-    for (auto it = filenames.begin(); it != filenames.end(); ++it)
-    {
-        switch (xmlAccess::getXmlType(*it)) //throw()
-        {
-            case XML_TYPE_GUI:
-                guiCfgExists = true;
-                break;
-
-            case XML_TYPE_BATCH:
-                batchCfgExists = true;
-                break;
-
-            case XML_TYPE_GLOBAL:
-            case XML_TYPE_OTHER:
-                return MERGE_OTHER;
-        }
-    }
-
-    if (guiCfgExists)
-        return batchCfgExists ? MERGE_GUI_BATCH : MERGE_GUI;
-    else
-        return batchCfgExists ? MERGE_BATCH : MERGE_OTHER;
 }
 
 
@@ -243,13 +214,13 @@ void writeText(const SyncDirection& value, std::string& output)
 {
     switch (value)
     {
-        case SYNC_DIR_LEFT:
+        case SyncDirection::LEFT:
             output = "left";
             break;
-        case SYNC_DIR_RIGHT:
+        case SyncDirection::RIGHT:
             output = "right";
             break;
-        case SYNC_DIR_NONE:
+        case SyncDirection::NONE:
             output = "none";
             break;
     }
@@ -261,11 +232,11 @@ bool readText(const std::string& input, SyncDirection& value)
     std::string tmp = input;
     zen::trim(tmp);
     if (tmp == "left")
-        value = SYNC_DIR_LEFT;
+        value = SyncDirection::LEFT;
     else if (tmp == "right")
-        value = SYNC_DIR_RIGHT;
+        value = SyncDirection::RIGHT;
     else if (tmp == "none")
-        value = SYNC_DIR_NONE;
+        value = SyncDirection::NONE;
     else
         return false;
     return true;
@@ -1037,6 +1008,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warningDirectoryLockFailed);
     inOpt["ConfirmSaveConfig"          ].attribute("Enabled", config.optDialogs.popupOnConfigChange);
     inOpt["ConfirmStartSync"           ].attribute("Enabled", config.optDialogs.confirmSyncStart);
+    inOpt["ConfirmExternalCommandMassInvoke"].attribute("Enabled", config.optDialogs.confirmExternalCommandMassInvoke);
 
     //gui specific global settings (optional)
     XmlIn inGui = in["Gui"];
@@ -1415,6 +1387,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outOpt["WarnDirectoryLockFailed"    ].attribute("Enabled", config.optDialogs.warningDirectoryLockFailed);
     outOpt["ConfirmSaveConfig"          ].attribute("Enabled", config.optDialogs.popupOnConfigChange);
     outOpt["ConfirmStartSync"           ].attribute("Enabled", config.optDialogs.confirmSyncStart);
+    outOpt["ConfirmExternalCommandMassInvoke"].attribute("Enabled", config.optDialogs.confirmExternalCommandMassInvoke);
 
     //gui specific global settings (optional)
     XmlOut outGui = out["Gui"];

@@ -31,11 +31,11 @@ enum SymLinkHandling
 };
 
 
-enum SyncDirection
+enum class SyncDirection : unsigned char //we need to save space for use in FileSystemObject!
 {
-    SYNC_DIR_LEFT = 0,
-    SYNC_DIR_RIGHT,
-    SYNC_DIR_NONE
+    LEFT = 0,
+    RIGHT,
+    NONE
 };
 
 
@@ -104,12 +104,12 @@ std::wstring getSymbol     (SyncOperation op); //method used for exporting .csv 
 struct DirectionSet
 {
     DirectionSet() :
-        exLeftSideOnly (SYNC_DIR_RIGHT),
-        exRightSideOnly(SYNC_DIR_LEFT),
-        leftNewer      (SYNC_DIR_RIGHT),
-        rightNewer     (SYNC_DIR_LEFT),
-        different      (SYNC_DIR_NONE),
-        conflict       (SYNC_DIR_NONE) {}
+        exLeftSideOnly (SyncDirection::RIGHT),
+        exRightSideOnly(SyncDirection::LEFT),
+        leftNewer      (SyncDirection::RIGHT),
+        rightNewer     (SyncDirection::LEFT),
+        different      (SyncDirection::NONE),
+        conflict       (SyncDirection::NONE) {}
 
     SyncDirection exLeftSideOnly;
     SyncDirection exRightSideOnly;

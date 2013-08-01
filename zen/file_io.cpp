@@ -77,8 +77,7 @@ void checkForUnsupportedType(const Zstring& filename) //throw FileError
 FileInput::FileInput(FileHandle handle, const Zstring& filename) : FileInputBase(filename), fileHandle(handle) {}
 
 
-FileInput::FileInput(const Zstring& filename) : //throw FileError, ErrorNotExisting
-    FileInputBase(filename)
+FileInput::FileInput(const Zstring& filename) : FileInputBase(filename) //throw FileError
 {
 #ifdef ZEN_WIN
     const wchar_t functionName[] = L"CreateFile";
@@ -104,8 +103,8 @@ FileInput::FileInput(const Zstring& filename) : //throw FileError, ErrorNotExist
                                 while FILE_FLAG_RANDOM_ACCESS offers best performance for
                                 - same physical disk (HDD <-> HDD)
 
-                              Problem: bad XP implementation of prefetch makes flag FILE_FLAG_SEQUENTIAL_SCAN effectively load two files at once from one drive
-                              swapping every 64 kB (or similar). File access times explode!
+                              Problem: bad XP implementation of prefetch makes flag FILE_FLAG_SEQUENTIAL_SCAN effectively load two files at the same time
+                              from one drive, swapping every 64 kB (or similar). File access times explode!
                               => For XP it is critical to use FILE_FLAG_RANDOM_ACCESS (to disable prefetch) if reading two files on same disk and
                               FILE_FLAG_SEQUENTIAL_SCAN when reading from different disk (e.g. massive performance improvement compared to random access for DVD <-> HDD!)
                               => there is no compromise that satisfies all cases! (on XP)
@@ -122,9 +121,7 @@ FileInput::FileInput(const Zstring& filename) : //throw FileError, ErrorNotExist
 #endif
     {
         const ErrorCode lastError = getLastError(); //copy before making other system calls!
-        const std::wstring errorMsg = errorCodeForNotExisting(lastError) ?
-                                      replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)) :
-                                      replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename));
+        const std::wstring errorMsg = replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename));
         std::wstring errorDescr = formatSystemError(functionName, lastError);
 
 #ifdef ZEN_WIN
@@ -136,10 +133,6 @@ FileInput::FileInput(const Zstring& filename) : //throw FileError, ErrorNotExist
                 errorDescr = _("The file is locked by another process:") + L"\n" + procList;
         }
 #endif
-
-        if (errorCodeForNotExisting(lastError))
-            throw ErrorNotExisting(errorMsg, errorDescr);
-
         throw FileError(errorMsg, errorDescr);
     }
 }
@@ -319,7 +312,7 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
 #if defined ZEN_LINUX || defined ZEN_MAC
 //Compare copy_reg() in copy.c: ftp://ftp.gnu.org/gnu/coreutils/coreutils-5.0.tar.gz
 
-FileInputUnbuffered::FileInputUnbuffered(const Zstring& filename) : FileInputBase(filename) //throw FileError, ErrorNotExisting
+FileInputUnbuffered::FileInputUnbuffered(const Zstring& filename) : FileInputBase(filename) //throw FileError
 {
     checkForUnsupportedType(filename); //throw FileError; reading a named pipe would block forever!
 
@@ -327,15 +320,8 @@ FileInputUnbuffered::FileInputUnbuffered(const Zstring& filename) : FileInputBas
     if (fdFile == -1) //don't check "< 0" -> docu seems to allow "-2" to be a valid file handle
     {
         const ErrorCode lastError = getLastError(); //copy before making other system calls!
-
-        const std::wstring errorMsg = errorCodeForNotExisting(lastError) ?
-                                      replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)) :
-                                      replaceCpy(_("Cannot read file %x."), L"%x", fmtFileName(filename));
+        const std::wstring errorMsg = replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename));
         const std::wstring errorDescr = formatSystemError(L"open", lastError);
-
-        if (errorCodeForNotExisting(lastError))
-            throw ErrorNotExisting(errorMsg, errorDescr);
-
         throw FileError(errorMsg, errorDescr);
     }
 }

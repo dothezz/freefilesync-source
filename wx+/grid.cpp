@@ -17,8 +17,9 @@
 #include <zen/scope_guard.h>
 #include <zen/utf.h>
 #include <zen/format_unit.h>
-#include "image_tools.h"
-#include "rtl.h"
+//#include "image_tools.h"
+//#include "rtl.h"
+#include "dc.h"
 
 #ifdef ZEN_LINUX
 #include <gtk/gtk.h>
@@ -63,50 +64,6 @@ const wxColor COLOR_LABEL_GRADIENT_TO_FOCUS   = COLOR_LABEL_GRADIENT_TO;
 wxColor getColorMainWinBackground() { return wxListBox::GetClassDefaultAttributes().colBg; } //cannot be initialized statically on wxGTK!
 
 const wxColor colorGridLine = wxColour(192, 192, 192); //light grey
-
-//------------------------------------------------------------
-
-//another fix for yet another poor wxWidgets implementation (wxDCClipper does *not* stack)
-hash_map<wxDC*, wxRect> clippingAreas; //associate "active" clipping area with each DC
-
-class DcClipper
-{
-public:
-    DcClipper(wxDC& dc, const wxRect& r) : dc_(dc)
-    {
-        auto it = clippingAreas.find(&dc);
-        if (it != clippingAreas.end())
-        {
-            oldRect.reset(new wxRect(it->second));
-
-            wxRect tmp = r;
-            tmp.Intersect(*oldRect);    //better safe than sorry
-            dc_.SetClippingRegion(tmp); //
-            it->second = tmp;
-        }
-        else
-        {
-            dc_.SetClippingRegion(r);
-            clippingAreas.insert(std::make_pair(&dc_, r));
-        }
-    }
-
-    ~DcClipper()
-    {
-        dc_.DestroyClippingRegion();
-        if (oldRect.get() != nullptr)
-        {
-            dc_.SetClippingRegion(*oldRect);
-            clippingAreas[&dc_] = *oldRect;
-        }
-        else
-            clippingAreas.erase(&dc_);
-    }
-
-private:
-    std::unique_ptr<wxRect> oldRect;
-    wxDC& dc_;
-};
 }
 
 //----------------------------------------------------------------------------------------------------------------
@@ -208,7 +165,7 @@ wxString getTruncatedText(const wxString& text, Function textFits)
 
 void drawTextLabelFitting(wxDC& dc, const wxString& text, const wxRect& rect, int alignment)
 {
-    DcClipper clip(dc, rect); //wxDC::DrawLabel doesn't care about width, WTF?
+    RecursiveDcClipper clip(dc, rect); //wxDC::DrawLabel doesn't care about width, WTF?
 
     /*
     performance notes:
@@ -555,7 +512,7 @@ private:
         wxRect textRect = rect;
         textRect.Deflate(1);
         {
-            DcClipper clip(dc, textRect); //wxDC::DrawLabel doesn't care about with, WTF?
+            RecursiveDcClipper clip(dc, textRect); //wxDC::DrawLabel doesn't care about with, WTF?
             dc.DrawLabel(formatRow(row), textRect, wxALIGN_CENTRE);
         }
 
@@ -691,7 +648,7 @@ private:
                                        highlight      ? col == highlight->first                && compPos == highlight->second :
                                        false;
 
-            DcClipper clip(dc, rect);
+            RecursiveDcClipper clip(dc, rect);
             dataView->renderColumnLabel(refParent(), dc, rect, colType, isHighlighted);
 
             //draw move target location
@@ -978,7 +935,7 @@ private:
             {
                 //draw background lines
                 {
-                    DcClipper dummy2(dc, rect); //solve issues with drawBackground() painting in area outside of rect (which is not also refreshed by renderCell()) -> keep small scope!
+                    RecursiveDcClipper dummy2(dc, rect); //solve issues with drawBackground() painting in area outside of rect (which is not also refreshed by renderCell()) -> keep small scope!
                     for (int row = rowFirst; row < rowLast; ++row)
                         drawBackground(*prov, dc, wxRect(cellAreaTL + wxPoint(0, row * rowHeight), wxSize(compWidth, rowHeight)), row, compPos);
                 }
@@ -995,7 +952,7 @@ private:
                         for (int row = rowFirst; row < rowLast; ++row)
                         {
                             const wxRect& cellRect = wxRect(cellAreaTL.x, cellAreaTL.y + row * rowHeight, width, rowHeight);
-                            DcClipper clip(dc, cellRect);
+                            RecursiveDcClipper clip(dc, cellRect);
                             prov->renderCell(refParent(), dc, cellRect, row, iterCol->type_);
                         }
                     cellAreaTL.x += width;

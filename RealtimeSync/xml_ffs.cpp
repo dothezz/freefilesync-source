@@ -7,7 +7,7 @@
 #include "xml_ffs.h"
 #include "../lib/ffs_paths.h"
 #include <zen/zstring.h>
-#include <wx+/string_conv.h>
+//#include <wx+/string_conv.h>
 
 //include FreeFileSync xml headers
 #include "../lib/process_xml.h"
@@ -17,8 +17,6 @@ using namespace zen;
 
 xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& batchCfg, const Zstring& filename)
 {
-    xmlAccess::XmlRealConfig output;
-
     std::set<Zstring, LessFilename> uniqueFolders;
 
     //add main folders
@@ -35,13 +33,9 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 
     uniqueFolders.erase(Zstring());
 
-    output.directories.clear();
-    std::transform(uniqueFolders.begin(), uniqueFolders.end(), std::back_inserter(output.directories),
-    [](const Zstring & fn) { return toWx(fn); });
-
-    output.commandline = std::wstring(L"\"") + zen::getFreeFileSyncLauncher() + L"\"" +
-                         L" \"" + filename + L"\"";
-
+    xmlAccess::XmlRealConfig output;
+    output.directories.assign(uniqueFolders.begin(), uniqueFolders.end());
+    output.commandline = Zstr("\"") + zen::getFreeFileSyncLauncher() + Zstr("\" \"") + filename + Zstr("\"");
     return output;
 }
 

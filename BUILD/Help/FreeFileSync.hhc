@@ -20,8 +20,8 @@
 			<param name="Local" value="html\FreeFileSync.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Batch scripting">
-			<param name="Local" value="html\Batch scripting.html">
+			<param name="Name" value="Command line">
+			<param name="Local" value="html\Command line.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Comparison settings">

@@ -28,13 +28,13 @@ namespace zen
 typedef DWORD ErrorCode;
 #elif defined ZEN_LINUX || defined ZEN_MAC
 typedef int ErrorCode;
+#else
+#error define a platform!
 #endif
 
 ErrorCode getLastError();
 
 std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastError);
-
-bool errorCodeForNotExisting(ErrorCode lastError); //check for "not existing" aliases
 
 
 //A low-level exception class giving (non-translated) detail information only - same conceptional level like "GetLastError()"!
@@ -104,20 +104,6 @@ std::wstring formatSystemError(const std::wstring& functionName, ErrorCode lastE
     output += L"(" + functionName + L")";
 
     return output;
-}
-
-
-inline
-bool errorCodeForNotExisting(ErrorCode lastError)
-{
-#ifdef ZEN_WIN
-    return lastError == ERROR_FILE_NOT_FOUND ||
-           lastError == ERROR_PATH_NOT_FOUND ||
-           lastError == ERROR_BAD_NETPATH    ||
-           lastError == ERROR_NETNAME_DELETED;
-#elif defined ZEN_LINUX || defined ZEN_MAC
-    return lastError == ENOENT;
-#endif
 }
 }
 

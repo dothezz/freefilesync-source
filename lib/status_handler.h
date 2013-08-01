@@ -16,13 +16,12 @@
 namespace zen
 {
 bool updateUiIsAllowed(); //test if a specific amount of time is over
-void updateUiNow();       //do the updating
 
 /*
 Updating GUI is fast!
     time per single call to ProcessCallback::forceUiRefresh()
-    - Comparison        25 µs
-    - Synchronization  0.6 ms   (despite complex graph control!)
+    - Comparison       0.025 ms
+    - Synchronization  0.74 ms (despite complex graph control!)
 */
 
 //gui may want to abort process
@@ -72,11 +71,13 @@ protected:
 
     virtual void requestUiRefresh()
     {
-        if (updateUiIsAllowed())  //test if specific time span between ui updates is over
+        if (abortRequested) //triggered by requestAbortion()
+        {
             forceUiRefresh();
-
-        if (abortRequested) //check *after* GUI update, to have up-to-date screen
-            abortThisProcess();  //triggered by requestAbortion()
+            abortThisProcess();
+        }
+        else if (updateUiIsAllowed()) //test if specific time span between ui updates is over
+            forceUiRefresh();
     }
 
     virtual void reportStatus(const std::wstring& text) { statusText_ = text; requestUiRefresh(); /*throw AbortThisProcess */ }

@@ -16,10 +16,10 @@ using namespace zen;
 
 
 PerfCheck::PerfCheck(unsigned int windowSizeRemainingTime,
-                     unsigned int windowSizeBytesPerSecond) :
+                     unsigned int windowSizeSpeed) :
     windowSizeRemTime(windowSizeRemainingTime),
-    windowSizeBPS(windowSizeBytesPerSecond),
-    windowMax(std::max(windowSizeRemainingTime, windowSizeBytesPerSecond)) {}
+    windowSizeSpeed_(windowSizeSpeed),
+    windowMax(std::max(windowSizeRemainingTime, windowSizeSpeed)) {}
 
 
 PerfCheck::~PerfCheck()
@@ -43,9 +43,9 @@ PerfCheck::~PerfCheck()
 }
 
 
-void PerfCheck::addSample(int objectsCurrent, double dataCurrent, long timeMs)
+void PerfCheck::addSample(int itemsCurrent, double dataCurrent, long timeMs)
 {
-    samples.insert(samples.end(), std::make_pair(timeMs, Record(objectsCurrent, dataCurrent))); //use fact that time is monotonously ascending
+    samples.insert(samples.end(), std::make_pair(timeMs, Record(itemsCurrent, dataCurrent))); //use fact that time is monotonously ascending
 
     //remove all records earlier than "now - windowMax"
     const long newBegin = timeMs - windowMax;
@@ -55,20 +55,32 @@ void PerfCheck::addSample(int objectsCurrent, double dataCurrent, long timeMs)
 }
 
 
-std::wstring PerfCheck::getRemainingTime(double dataRemaining) const
+inline
+std::pair<const std::multimap<long, PerfCheck::Record>::value_type*, const std::multimap<long, PerfCheck::Record>::value_type*> PerfCheck::getBlockFromEnd(long windowSize) const
 {
     if (!samples.empty())
     {
-        const auto& recordBack = *samples.rbegin();
+        auto itBack = samples.rbegin();
         //find start of records "window"
-        auto itFront = samples.upper_bound(recordBack.first - windowSizeRemTime);
+        auto itFront = samples.upper_bound(itBack->first - windowSize);
         if (itFront != samples.begin())
             --itFront; //one point before window begin in order to handle "measurement holes"
+        return std::make_pair(&*itFront, &*itBack);
+    }
+    return std::make_pair(nullptr, nullptr);
+}
 
-        const auto& recordFront = *itFront;
+
+zen::Opt<std::wstring> PerfCheck::getRemainingTime(double dataRemaining) const
+{
+    auto blk = getBlockFromEnd(windowSizeRemTime);
+    if (blk.first && blk.second)
+    {
+        const auto& itemFront = *blk.first;
+        const auto& itemBack  = *blk.second;
         //-----------------------------------------------------------------------------------------------
-        const long   timeDelta = recordBack.first        - recordFront.first;
-        const double dataDelta = recordBack.second.data_ - recordFront.second.data_;
+        const long   timeDelta = itemBack.first        - itemFront.first;
+        const double dataDelta = itemBack.second.data_ - itemFront.second.data_;
 
         //objects model logical operations *NOT* disk accesses, so we better play safe and use "bytes" only!
         //http://sourceforge.net/p/freefilesync/feature-requests/197/
@@ -76,29 +88,43 @@ std::wstring PerfCheck::getRemainingTime(double dataRemaining) const
         if (!numeric::isNull(dataDelta)) //sign(dataRemaining) != sign(dataDelta) usually an error, so show it!
             return remainingTimeToString(dataRemaining * timeDelta / (1000.0 * dataDelta));
     }
-    return L"-"; //fallback
+    return NoValue();
 }
 
 
-std::wstring PerfCheck::getBytesPerSecond() const
+zen::Opt<std::wstring> PerfCheck::getBytesPerSecond() const
 {
-    if (!samples.empty())
+    auto blk = getBlockFromEnd(windowSizeSpeed_);
+    if (blk.first && blk.second)
     {
-        const auto& recordBack = *samples.rbegin();
-        //find start of records "window"
-        auto itFront = samples.upper_bound(recordBack.first - windowSizeBPS);
-        if (itFront != samples.begin())
-            --itFront; //one point before window begin in order to handle "measurement holes"
-
-        const auto& recordFront = *itFront;
+        const auto& itemFront = *blk.first;
+        const auto& itemBack  = *blk.second;
         //-----------------------------------------------------------------------------------------------
-        const long   timeDelta = recordBack.first        - recordFront.first;
-        const double dataDelta = recordBack.second.data_ - recordFront.second.data_;
+        const long   timeDelta = itemBack.first        - itemFront.first;
+        const double dataDelta = itemBack.second.data_ - itemFront.second.data_;
 
-        if (timeDelta != 0 && dataDelta > 0)
-            return filesizeToShortString(zen::Int64(dataDelta * 1000 / timeDelta)) + _("/sec");
+        if (timeDelta != 0/* && dataDelta > 0*/)
+            return filesizeToShortString(zen::Int64(dataDelta * 1000.0 / timeDelta)) + _("/sec");
     }
-    return L"-"; //fallback
+    return NoValue();
+}
+
+
+zen::Opt<std::wstring> PerfCheck::getItemsPerSecond() const
+{
+    auto blk = getBlockFromEnd(windowSizeSpeed_);
+    if (blk.first && blk.second)
+    {
+        const auto& itemFront = *blk.first;
+        const auto& itemBack  = *blk.second;
+        //-----------------------------------------------------------------------------------------------
+        const long timeDelta  = itemBack.first             - itemFront.first;
+        const int  itemsDelta = itemBack.second.itemCount_ - itemFront.second.itemCount_;
+
+        if (timeDelta != 0)
+            return replaceCpy(_("%x items"), L"%x", formatThreeDigitPrecision(itemsDelta * 1000.0 / timeDelta)) + _("/sec");
+    }
+    return NoValue();
 }
 
 

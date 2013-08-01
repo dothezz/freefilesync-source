@@ -8,8 +8,9 @@
 #include <zen/file_handling.h>
 #include <zen/file_traverser.h>
 #include <zen/format_unit.h>
-#include <wx+/app_main.h>
+//#include <wx+/app_main.h>
 #include <wx+/shell_execute.h>
+#include <wx/app.h>
 #include "msg_popup.h"
 #include "exec_finished_box.h"
 #include "../lib/ffs_paths.h"
@@ -217,7 +218,7 @@ BatchStatusHandler::~BatchStatusHandler()
         }
         else
         {
-            if (progressDlg->getAsWindow()->IsShown())
+            if (progressDlg->getWindowIfVisible())
                 showFinalResults = true;
 
             //execute "on completion" command (even in case of ignored errors)
@@ -236,7 +237,7 @@ BatchStatusHandler::~BatchStatusHandler()
             if (showFinalResults) //warning: wxWindow::Show() is called within processHasFinished()!
             {
                 //notify about (logical) application main window => program won't quit, but stay on this dialog
-                setMainWindow(progressDlg->getAsWindow());
+                //setMainWindow(progressDlg->getAsWindow()); -> not required anymore since we block waiting until dialog is closed below
 
                 //notify to progressDlg that current process has ended
                 if (abortIsRequested())
@@ -257,7 +258,7 @@ BatchStatusHandler::~BatchStatusHandler()
         //-> nicely manages dialog lifetime
         while (progressDlg)
         {
-            updateUiNow(); //*first* refresh GUI (removing flicker) before sleeping!
+            wxTheApp->Yield(); //*first* refresh GUI (removing flicker) before sleeping!
             boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
         }
     }
@@ -306,7 +307,7 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
             forceUiRefresh();
 
             bool dontWarnAgain = false;
-            switch (showWarningDlg(progressDlg->getAsWindow(),
+            switch (showWarningDlg(progressDlg->getWindowIfVisible(),
                                    ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_SWITCH | ReturnWarningDlg::BUTTON_CANCEL,
                                    warningMessage + L"\n\n" + _("Press \"Switch\" to resolve issues in FreeFileSync main dialog."),
                                    dontWarnAgain))
@@ -352,7 +353,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showErrorDlg(progressDlg->getAsWindow(),
+            switch (showErrorDlg(progressDlg->getWindowIfVisible(),
                                  ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
                                  errorMessage, &ignoreNextErrors))
             {
@@ -399,7 +400,7 @@ void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showFatalErrorDlg(progressDlg->getAsWindow(),
+            switch (showFatalErrorDlg(progressDlg->getWindowIfVisible(),
                                       ReturnFatalErrorDlg::BUTTON_IGNORE |  ReturnFatalErrorDlg::BUTTON_CANCEL,
                                       errorMessage, &ignoreNextErrors))
             {

@@ -7,6 +7,7 @@
 #ifndef MESSAGEPOPUP_H_820780154723456
 #define MESSAGEPOPUP_H_820780154723456
 
+#include <zen/string_tools.h>
 #include <wx/window.h>
 #include <wx/string.h>
 
@@ -66,9 +67,11 @@ class QuestConfig
 public:
     QuestConfig() : checkBoxValue(), disabledButtonsWhenChecked_() {}
     QuestConfig& setCaption (const wxString& label) { caption  = label; return *this; }
-    QuestConfig& setLabelYes(const wxString& label) { labelYes = label; return *this; }
-    QuestConfig& setLabelNo (const wxString& label) { labelNo  = label; return *this; }
-    QuestConfig& showCheckBox(bool& value, const wxString& label, int disabledButtonsWhenChecked) { checkBoxValue = &value; checkBoxLabel = label; disabledButtonsWhenChecked_ = disabledButtonsWhenChecked; return *this; }
+    QuestConfig& setLabelYes(const wxString& label) { assert(contains(label, L"&")); labelYes = label; return *this; }
+    QuestConfig& setLabelNo (const wxString& label) { assert(contains(label, L"&")); labelNo  = label; return *this; }
+    QuestConfig& showCheckBox(bool& value,
+                              const wxString& label,
+                              int disabledButtonsWhenChecked) { assert(contains(label, L"&")); checkBoxValue = &value; checkBoxLabel = label; disabledButtonsWhenChecked_ = disabledButtonsWhenChecked; return *this; }
 
 private:
     friend class ::QuestionDlg;

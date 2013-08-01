@@ -27,12 +27,12 @@ namespace zen
 			 Renaming of top watched directory handled incorrectly: Not notified(!) + additional changes in subfolders
 			 now do report FILE_ACTION_MODIFIED for directory (check that should prevent this fails!)
 
-	Overcome all issues portably: check existence of top watched directory externally + reinstall watch after changes in directory structure (added directories) are possible
+	Overcome all issues portably: check existence of top watched directory externally + reinstall watch after changes in directory structure (added directories) are detected
 */
 class DirWatcher
 {
 public:
-    DirWatcher(const Zstring& directory); //throw FileError, ErrorNotExisting
+    DirWatcher(const Zstring& directory); //throw FileError
     ~DirWatcher();
 
     enum ActionType

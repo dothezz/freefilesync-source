@@ -107,15 +107,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
 
         switch (dirCfg.exLeftSideOnly)
         {
-            case SYNC_DIR_RIGHT:
+            case SyncDirection::RIGHT:
                 buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_create_right")));
                 buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_RIGHT));
                 break;
-            case SYNC_DIR_LEFT:
+            case SyncDirection::LEFT:
                 buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_delete_left")));
                 buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DELETE_LEFT));
                 break;
-            case SYNC_DIR_NONE:
+            case SyncDirection::NONE:
                 buttonLeftOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonLeftOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
@@ -123,15 +123,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
 
         switch (dirCfg.exRightSideOnly)
         {
-            case SYNC_DIR_RIGHT:
+            case SyncDirection::RIGHT:
                 buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_delete_right")));
                 buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DELETE_RIGHT));
                 break;
-            case SYNC_DIR_LEFT:
+            case SyncDirection::LEFT:
                 buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_create_left")));
                 buttonRightOnly->SetToolTip(getSyncOpDescription(SO_CREATE_NEW_LEFT));
                 break;
-            case SYNC_DIR_NONE:
+            case SyncDirection::NONE:
                 buttonRightOnly->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonRightOnly->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
@@ -139,15 +139,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
 
         switch (dirCfg.leftNewer)
         {
-            case SYNC_DIR_RIGHT:
+            case SyncDirection::RIGHT:
                 buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
                 buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
-            case SYNC_DIR_LEFT:
+            case SyncDirection::LEFT:
                 buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
                 buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
-            case SYNC_DIR_NONE:
+            case SyncDirection::NONE:
                 buttonLeftNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonLeftNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
@@ -155,15 +155,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
 
         switch (dirCfg.rightNewer)
         {
-            case SYNC_DIR_RIGHT:
+            case SyncDirection::RIGHT:
                 buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
                 buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
-            case SYNC_DIR_LEFT:
+            case SyncDirection::LEFT:
                 buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
                 buttonRightNewer->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
-            case SYNC_DIR_NONE:
+            case SyncDirection::NONE:
                 buttonRightNewer->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonRightNewer->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
@@ -171,15 +171,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
 
         switch (dirCfg.different)
         {
-            case SYNC_DIR_RIGHT:
+            case SyncDirection::RIGHT:
                 buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
                 buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
-            case SYNC_DIR_LEFT:
+            case SyncDirection::LEFT:
                 buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
                 buttonDifferent->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
-            case SYNC_DIR_NONE:
+            case SyncDirection::NONE:
                 buttonDifferent->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_none")));
                 buttonDifferent->SetToolTip(getSyncOpDescription(SO_DO_NOTHING));
                 break;
@@ -187,15 +187,15 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
 
         switch (dirCfg.conflict)
         {
-            case SYNC_DIR_RIGHT:
+            case SyncDirection::RIGHT:
                 buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_right")));
                 buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_RIGHT));
                 break;
-            case SYNC_DIR_LEFT:
+            case SyncDirection::LEFT:
                 buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"so_update_left")));
                 buttonConflict->SetToolTip(getSyncOpDescription(SO_OVERWRITE_LEFT));
                 break;
-            case SYNC_DIR_NONE:
+            case SyncDirection::NONE:
                 buttonConflict->SetBitmapLabel(mirrorIfRtl(getResourceImage(L"cat_conflict"))); //silent dependency to algorithm.cpp::Redetermine!!!
                 buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
                 break;
@@ -495,14 +495,14 @@ void toggleSyncDirection(SyncDirection& current)
 {
     switch (current)
     {
-        case SYNC_DIR_RIGHT:
-            current = SYNC_DIR_LEFT;
+        case SyncDirection::RIGHT:
+            current = SyncDirection::LEFT;
             break;
-        case SYNC_DIR_LEFT:
-            current = SYNC_DIR_NONE;
+        case SyncDirection::LEFT:
+            current = SyncDirection::NONE;
             break;
-        case SYNC_DIR_NONE:
-            current = SYNC_DIR_RIGHT;
+        case SyncDirection::NONE:
+            current = SyncDirection::RIGHT;
             break;
     }
 }

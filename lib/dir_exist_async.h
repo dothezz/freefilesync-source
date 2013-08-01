@@ -47,7 +47,7 @@ std::set<Zstring, LessFilename> getExistingDirsUpdating(const std::set<Zstring, 
     const boost::system_time endTime = boost::get_system_time() + boost::posix_time::seconds(10); //10 sec should be enough even if Win32 waits much longer
 
     auto itDirname = dirnames.begin();
-    for (auto it = dirEx.begin(); it != dirEx.end(); ++it, ++itDirname)
+    for (auto it = dirEx.begin(); it != dirEx.end(); (void)++it, ++itDirname) //void: prevent ADL from dragging in boost's ,-overload: "MSVC warning C4913: user defined binary operator ',' exists but no overload could convert all operands"
     {
         procCallback.reportStatus(replaceCpy(_("Searching for folder %x..."), L"%x", fmtFileName(*itDirname), false)); //may throw!
 

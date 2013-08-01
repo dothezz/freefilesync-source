@@ -147,9 +147,9 @@ void saveToLastSyncsLog(const SummaryInfo& summary,  //throw FileError
         Utf8String oldStream;
         try
         {
-            oldStream = loadBinStream<Utf8String>(filename); //throw FileError, ErrorNotExisting
+            oldStream = loadBinStream<Utf8String>(filename); //throw FileError
         }
-        catch (const ErrorNotExisting&) {}
+        catch (FileError&) {}
 
         if (!oldStream.empty())
         {

@@ -51,7 +51,7 @@ struct ProcessCallback
 
     //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
     virtual void requestUiRefresh() = 0; //throw ?
-    virtual void forceUiRefresh  () = 0; //throw ? - called before starting long running task which doesn't update regularly
+    virtual void forceUiRefresh  () = 0; //throw ? - called before starting long running tasks which don't update regularly
 
     //called periodically after data was processed: expected(!) to request GUI update
     virtual void reportStatus(const std::wstring& text) = 0; //UI info only, should not be logged!

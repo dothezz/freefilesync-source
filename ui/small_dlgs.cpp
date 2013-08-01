@@ -384,10 +384,9 @@ void DeleteDialog::updateGui()
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-    const std::pair<Zstring, int> delInfo = zen::deleteFromGridAndHDPreview(
-                                                rowsToDeleteOnLeft,
-                                                rowsToDeleteOnRight,
-                                                m_checkBoxDeleteBothSides->GetValue());
+    const std::pair<Zstring, int> delInfo = zen::deleteFromGridAndHDPreview(rowsToDeleteOnLeft,
+                                                                            rowsToDeleteOnRight,
+                                                                            m_checkBoxDeleteBothSides->GetValue());
     wxString header;
     if (m_checkBoxUseRecycler->GetValue())
     {
@@ -406,7 +405,13 @@ void DeleteDialog::updateGui()
 
     const wxString& fileList = utfCvrtTo<wxString>(delInfo.first);
     m_textCtrlFileList->ChangeValue(fileList);
-
+    /*
+    There is a nasty bug on wxGTK under Ubuntu: If a multi-line wxTextCtrl contains so many lines that scrollbars are shown,
+    it re-enables all windows that are supposed to be disabled during the current modal loop!
+    This only affects Ubuntu/wxGTK! No such issue on Debian/wxGTK or Suse/wxGTK
+    => another Unity problem like the following?
+    http://trac.wxwidgets.org/ticket/14823 "Menu not disabled when showing modal dialogs in wxGTK under Unity"
+    */
     Layout();
 }
 

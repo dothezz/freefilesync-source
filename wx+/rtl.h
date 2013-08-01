@@ -13,7 +13,6 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/app.h>
-#include <wx/dcbuffer.h> //for macro: wxALWAYS_NATIVE_DOUBLE_BUFFER
 
 namespace zen
 {
@@ -37,17 +36,6 @@ void drawIconRtlNoMirror(wxDC& dc, //wxDC::DrawIcon DOES mirror by default
                          std::unique_ptr<wxBitmap>& buffer);
 
 wxBitmap mirrorIfRtl(const wxBitmap& bmp);
-
-
-/*
-class BufferedPaintDC
-{
-public:
-    BufferedPaintDC(wxWindow& wnd, std::unique_ptr<wxBitmap>& buffer);
-};
-*/
-//a fix for a poor wxWidgets implementation (wxAutoBufferedPaintDC skips one pixel on left side when RTL layout is active)
-
 
 //manual text flow correction: http://www.w3.org/International/articles/inline-bidi-markup/
 
@@ -127,48 +115,6 @@ wxBitmap mirrorIfRtl(const wxBitmap& bmp)
     else
         return bmp;
 }
-
-
-#ifndef wxALWAYS_NATIVE_DOUBLE_BUFFER
-#error we need this one!
-#endif
-
-#if wxALWAYS_NATIVE_DOUBLE_BUFFER
-struct BufferedPaintDC : public wxPaintDC { BufferedPaintDC(wxWindow& wnd, std::unique_ptr<wxBitmap>& buffer) : wxPaintDC(&wnd) {} };
-
-#else
-class BufferedPaintDC : public wxMemoryDC
-{
-public:
-    BufferedPaintDC(wxWindow& wnd, std::unique_ptr<wxBitmap>& buffer) : buffer_(buffer), paintDc(&wnd)
-    {
-        const wxSize clientSize = wnd.GetClientSize();
-        if (!buffer_ || clientSize != wxSize(buffer->GetWidth(), buffer->GetHeight()))
-            buffer.reset(new wxBitmap(clientSize.GetWidth(), clientSize.GetHeight()));
-
-        SelectObject(*buffer);
-
-        if (paintDc.IsOk() && paintDc.GetLayoutDirection() == wxLayout_RightToLeft)
-            SetLayoutDirection(wxLayout_RightToLeft);
-    }
-
-    ~BufferedPaintDC()
-    {
-        if (GetLayoutDirection() == wxLayout_RightToLeft)
-        {
-            paintDc.SetLayoutDirection(wxLayout_LeftToRight); //workaround bug in wxDC::Blit()
-            SetLayoutDirection(wxLayout_LeftToRight);         //
-        }
-
-        const wxPoint origin = GetDeviceOrigin();
-        paintDc.Blit(0, 0, buffer_->GetWidth(), buffer_->GetHeight(), this, -origin.x, -origin.y);
-    }
-
-private:
-    std::unique_ptr<wxBitmap>& buffer_;
-    wxPaintDC paintDc;
-};
-#endif
 }
 
 #endif //RTL_H_0183487180058718273432148

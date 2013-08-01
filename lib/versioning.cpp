@@ -129,15 +129,14 @@ void moveObject(const Zstring& sourceFile, //throw FileError
 {
     assert(!dirExists(sourceFile) || symlinkExists(sourceFile)); //we process files and symlinks only
 
-    auto removeTarget = [&]()
+    auto removeTarget = [&]
     {
         //remove target object
         if (fileExists(targetFile)) //file or symlink
             removeFile(targetFile); //throw FileError
         else if (dirExists(targetFile)) //directory or symlink
-            removeDirectory(targetFile); //throw FileError
-        //we do not expect targetFile to be a directory in general => no callback required
-        else assert(false);
+            removeDirectory(targetFile); //throw FileError; we do not expect targetFile to be a directory in general => no callback required
+        //else assert(false); -> may simply not exist if ErrorDifferentVolume!
     };
 
     //first try to move directly without copying

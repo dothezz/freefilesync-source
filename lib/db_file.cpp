@@ -91,7 +91,7 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError, FileErrorD
 {
     try
     {
-        BinStreamIn streamIn = loadBinStream<BinaryStream>(filename); //throw FileError, ErrorNotExisting
+        BinStreamIn streamIn = loadBinStream<BinaryStream>(filename); //throw FileError
 
         //read FreeFileSync file identifier
         char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
@@ -118,10 +118,12 @@ StreamMapping loadStreams(const Zstring& filename) //throw FileError, FileErrorD
         }
         return output;
     }
-    catch (ErrorNotExisting&)
+    catch (FileError&)
     {
-        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
-                                           replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filename)));
+        if (!somethingExists(filename)) //a benign(?) race condition with FileError
+            throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + L" \n" +
+                                               replaceCpy(_("Database file %x does not yet exist."), L"%x", fmtFileName(filename)));
+        throw;
     }
     catch (UnexpectedEndOfStreamError&)
     {

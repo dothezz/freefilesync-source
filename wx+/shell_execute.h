@@ -42,12 +42,15 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
 {
 #ifdef ZEN_WIN
     //parse commandline
+    Zstring commandTmp = command;
+    trim(commandTmp, true, false); //CommandLineToArgvW() does not like leading spaces
+
     std::vector<std::wstring> argv;
     int argc = 0;
-    if (LPWSTR* tmp = ::CommandLineToArgvW(command.c_str(), &argc))
+    if (LPWSTR* tmp = ::CommandLineToArgvW(commandTmp.c_str(), &argc))
     {
+        ZEN_ON_SCOPE_EXIT(::LocalFree(tmp));
         std::copy(tmp, tmp + argc, std::back_inserter(argv));
-        ::LocalFree(tmp);
     }
 
     std::wstring filename;
@@ -74,7 +77,7 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
     {
         wxString cmdFmt = L"File: " + filename + L"\nArg: " + arguments;
-        wxMessageBox(_("Invalid command line:") + L"\n" + cmdFmt + L"\n\n" + formatSystemError(L"ShellExecuteEx", getLastError()));
+        wxMessageBox(_("Invalid command line:") + L"\n" + cmdFmt + L"\n\n" + formatSystemError(L"ShellExecuteEx", getLastError()), /*L"FreeFileSync - " + */_("Error"), wxOK | wxICON_ERROR);
         return;
     }
 
@@ -99,7 +102,7 @@ void shellExecute(const Zstring& command, ExecutionType type = EXEC_TYPE_ASYNC)
         //Posix::system - execute a shell command
         int rv = ::system(command.c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
         if (rv == -1 || WEXITSTATUS(rv) == 127) //http://linux.die.net/man/3/system    "In case /bin/sh could not be executed, the exit status will be that of a command that does exit(127)"
-            wxMessageBox(_("Invalid command line:") + L"\n" + utfCvrtTo<wxString>(command));
+            wxMessageBox(_("Invalid command line:") + L"\n" + utfCvrtTo<wxString>(command), /*L"FreeFileSync - " +*/ _("Error"), wxOK | wxICON_ERROR);
     }
     else
         async([=] { int rv = ::system(command.c_str()); (void)rv; });

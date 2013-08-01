@@ -10,9 +10,10 @@
 #include "gui_generated.h"
 #include <vector>
 #include <memory>
+#include <zen/zstring.h>
+#include <zen/async_task.h>
 #include <wx+/file_drop.h>
 #include "../ui/dir_name.h"
-#include <zen/async_task.h>
 
 namespace xmlAccess
 {
@@ -24,11 +25,11 @@ class DirectoryPanel;
 class MainDialog: public MainDlgGenerated
 {
 public:
-    MainDialog(wxDialog* dlg, const wxString& cfgFileName);
+    MainDialog(wxDialog* dlg, const Zstring& cfgFileName);
     ~MainDialog();
 
 private:
-    void loadConfig(const wxString& filename);
+    void loadConfig(const Zstring& filename);
 
     virtual void OnClose          (wxCloseEvent& event)   { Destroy(); }
     virtual void OnShowHelp       (wxCommandEvent& event);
@@ -45,21 +46,21 @@ private:
 
     void setConfiguration(const xmlAccess::XmlRealConfig& cfg);
     xmlAccess::XmlRealConfig getConfiguration();
-    void setLastUsedConfig(const wxString& filename);
+    void setLastUsedConfig(const Zstring& filename);
 
     void layoutAsync(); //call Layout() asynchronously
 
-    void addFolder(const wxString& dirname, bool addFront = false);
-    void addFolder(const std::vector<wxString>& newFolders, bool addFront = false);
+    //void addFolder(const Zstring& dirname, bool addFront = false);
+    void addFolder(const std::vector<Zstring>& newFolders, bool addFront = false);
     void removeAddFolder(size_t pos);
     void clearAddFolders();
 
-    static const wxString& lastConfigFileName();
+    static const Zstring& lastConfigFileName();
 
     std::unique_ptr<zen::DirectoryName<wxTextCtrl>> dirNameFirst;
     std::vector<DirectoryPanel*> dirNamesExtra; //additional pairs to the standard pair
 
-    wxString currentConfigFileName;
+    Zstring currentConfigFileName;
 
     void onProcessAsyncTasks(wxEvent& event);
 

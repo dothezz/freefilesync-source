@@ -29,16 +29,15 @@ class CompareProgressDialog;
 class MainDialog : public MainDialogGenerated
 {
 public:
-    //default behavior, application start
-    static void create(const std::vector<Zstring>& cfgFileNames); //cfgFileNames empty: restore last config; non-empty load/merge given set of config files
+    //default behavior, application start, restores last used config
+    static void create();
 
-    //load dynamically assembled config
-    static void create(const xmlAccess::XmlGuiConfig& guiCfg, bool startComparison);
-
-    //when switching language or switching from batch run to GUI on warnings
+    //when loading dynamically assembled config,
+    //when switching language,
+    //or switching from batch run to GUI on warnings
     static void create(const xmlAccess::XmlGuiConfig& guiCfg,
                        const std::vector<Zstring>& referenceFiles,
-                       const xmlAccess::XmlGlobalSettings& globalSettings, //take over ownership => save on exit
+                       const xmlAccess::XmlGlobalSettings* globalSettings, //optional: take over ownership => save on exit
                        bool startComparison);
 
     void disableAllElements(bool enableAbort); //dis-/enables all elements (except abort button) that might receive user input
@@ -47,11 +46,6 @@ public:
     void onQueryEndSession(); //last chance to do something useful before killing the application!
 
 private:
-    static void create_impl(const xmlAccess::XmlGuiConfig& guiCfg,
-                            const std::vector<Zstring>& referenceFiles,
-                            const xmlAccess::XmlGlobalSettings& globalSettings,
-                            bool startComparison);
-
     MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
                const std::vector<Zstring>& referenceFiles,
                const xmlAccess::XmlGlobalSettings& globalSettings, //take over ownership => save on exit

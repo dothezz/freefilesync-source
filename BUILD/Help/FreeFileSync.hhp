@@ -12,7 +12,7 @@ Title=FreeFileSync - Help
 [FILES]
 html\FreeFileSync.html
 html\Versioning.html
-html\Batch scripting.html
+html\Command line.html
 html\Expert settings.html
 html\Comparison settings.html
 html\Daylight Saving time.html

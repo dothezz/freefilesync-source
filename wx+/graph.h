@@ -7,13 +7,15 @@
 #ifndef WX_PLOT_HEADER_2344252459
 #define WX_PLOT_HEADER_2344252459
 
+#include <map>
 #include <vector>
 #include <memory>
 #include <wx/panel.h>
-#include <wx/dcbuffer.h>
+//#include <wx/dcbuffer.h>
 #include <zen/string_tools.h>
+#include <zen/optional.h>
 
-//simple 2D graph as wxPanel specialization
+//elegant 2D graph as wxPanel specialization
 
 namespace zen
 {
@@ -21,62 +23,90 @@ namespace zen
 Example:
     //init graph (optional)
     m_panelGraph->setAttributes(Graph2D::MainAttributes().
-                                setLabelX(Graph2D::POSLX_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
-                                setLabelY(Graph2D::POSLY_RIGHT,  60, std::make_shared<LabelFormatterBytes>()));
+                                setLabelX(Graph2D::X_LABEL_BOTTOM, 20, std::make_shared<LabelFormatterTimeElapsed>()).
+                                setLabelY(Graph2D::Y_LABEL_RIGHT,  60, std::make_shared<LabelFormatterBytes>()));
     //set graph data
-    std::shared_ptr<GraphData> graphDataBytes = ...
-	m_panelGraph->setData(graphDataBytes, Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0)));
+    std::shared_ptr<CurveData> curveDataBytes = ...
+	m_panelGraph->setCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).setColor(wxColor(0, 192, 0)));
 */
 
-//------------------------------------------------------------------------------------------------------------
-struct GraphData
+struct CurvePoint
 {
-    virtual ~GraphData() {}
-    virtual double getValue (double x) const = 0;
-    virtual double getXBegin()         const = 0;
-    virtual double getXEnd  ()         const = 0; //upper bound for x, getValue() is NOT evaluated at this position! Similar to std::vector::end()
+    CurvePoint() : x(0), y(0) {}
+    CurvePoint(double xVal, double yVal) : x(xVal), y(yVal) {}
+    double x;
+    double y;
+};
+inline bool operator==(const CurvePoint& lhs, const CurvePoint& rhs) { return lhs.x == rhs.x && lhs.y == rhs.y; }
+inline bool operator!=(const CurvePoint& lhs, const CurvePoint& rhs) { return !(lhs == rhs); }
+
+struct CurveData
+{
+    virtual ~CurveData() {}
+
+    virtual std::pair<double, double> getRangeX() const = 0;
+    virtual void getPoints(double minX, double maxX, int pixelWidth,
+                           std::vector<CurvePoint>& points) const = 0; //points outside the draw area are automatically trimmed!
 };
 
-
-//reference data implementation
-class RangeData : public GraphData
+//special curve types:
+struct ContinuousCurveData : public CurveData
 {
-public:
-    std::vector<double>& refData() { return data; }
+    virtual double getValue(double x) const = 0;
 
 private:
-    virtual double getValue(double x) const
-    {
-        const size_t pos = static_cast<size_t>(x);
-        return pos < data.size() ? data[pos] : 0;
-    }
-    virtual double getXBegin() const { return 0; }
-    virtual double getXEnd() const { return data.size(); } //example: two-element range is accessible within [0, 2)
-
-    std::vector<double> data;
+    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const final;
 };
 
-/*
-//reference data implementation
-class VectorData : public GraphData
+struct SparseCurveData : public CurveData
 {
-public:
-    operator std::vector<double>& () { return data; }
+    SparseCurveData(bool addSteps = false) : addSteps_(addSteps) {} //addSteps: add points to get a staircase effect or connect points via a direct line
+
+    virtual Opt<CurvePoint> getLessEq   (double x) const = 0;
+    virtual Opt<CurvePoint> getGreaterEq(double x) const = 0;
 
 private:
-    virtual double getValue(double x) const
-    {
-        const size_t pos = static_cast<size_t>(x);
-        return pos < data.size() ? data[pos] : 0;
-    }
-    virtual double getXBegin() const { return 0; }
-    virtual double getXEnd() const { return data.size(); } //example: two-element range is accessible within [0, 2)
-
-    std::vector<double> data;
+    virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const final;
+    bool addSteps_;
 };
-*/
+
+struct ArrayCurveData : public SparseCurveData
+{
+    virtual double getValue(size_t pos) const = 0;
+    virtual size_t getSize() const = 0;
+
+private:
+    virtual std::pair<double, double> getRangeX() const final { const size_t sz = getSize(); return std::make_pair(0.0, sz == 0 ? 0.0 : sz - 1.0); }
+
+    virtual Opt<CurvePoint> getLessEq(double x) const final
+    {
+        const size_t sz = getSize();
+        const size_t pos = std::min<ptrdiff_t>(std::floor(x), sz - 1); //[!] expect unsigned underflow if empty!
+        if (pos < sz)
+            return CurvePoint(pos, getValue(pos));
+        return NoValue();
+    }
+
+    virtual Opt<CurvePoint> getGreaterEq(double x) const final
+    {
+        const size_t pos = std::max<ptrdiff_t>(std::ceil(x), 0); //[!] use std::max with signed type!
+        if (pos < getSize())
+            return CurvePoint(pos, getValue(pos));
+        return NoValue();
+    }
+};
+
+struct VectorCurveData : public ArrayCurveData
+{
+	std::vector<double>& refData() { return data; }
+private:
+	virtual double getValue(size_t pos) const final { return pos < data.size() ? data[pos] : 0; }
+	virtual size_t getSize() const final { return data.size(); }
+	std::vector<double> data;
+};
 
 //------------------------------------------------------------------------------------------------------------
+
 struct LabelFormatter
 {
     virtual ~LabelFormatter() {}
@@ -106,16 +136,8 @@ extern const wxEventType wxEVT_GRAPH_SELECTION;
 
 struct SelectionBlock
 {
-    struct Point
-    {
-        Point() : x(0), y(0) {}
-        Point(double xVal, double yVal) : x(xVal), y(yVal) {}
-        double x;
-        double y;
-    };
-
-    Point from;
-    Point to;
+    CurvePoint from;
+    CurvePoint to;
 };
 
 class GraphSelectEvent : public wxCommandEvent
@@ -135,8 +157,8 @@ typedef void (wxEvtHandler::*GraphSelectEventFunction)(GraphSelectEvent&);
 #define GraphSelectEventHandler(func) \
     (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(GraphSelectEventFunction, &func)
 
-
 //------------------------------------------------------------------------------------------------------------
+
 class Graph2D : public wxPanel
 {
 public:
@@ -168,8 +190,8 @@ public:
         int lineWidth;
     };
 
-    void setData(const std::shared_ptr<GraphData>& data, const CurveAttributes& ca = CurveAttributes());
-    void addData(const std::shared_ptr<GraphData>& data, const CurveAttributes& ca = CurveAttributes());
+    void setCurve(const std::shared_ptr<CurveData>& data, const CurveAttributes& ca = CurveAttributes());
+    void addCurve(const std::shared_ptr<CurveData>& data, const CurveAttributes& ca = CurveAttributes());
 
     enum PosLabelY
     {
@@ -183,6 +205,14 @@ public:
         X_LABEL_TOP,
         X_LABEL_BOTTOM,
         X_LABEL_NONE
+    };
+
+    enum PosCorner
+    {
+        CORNER_TOP_LEFT,
+        CORNER_TOP_RIGHT,
+        CORNER_BOTTOM_LEFT,
+        CORNER_BOTTOM_RIGHT,
     };
 
     enum SelMode
@@ -238,6 +268,8 @@ public:
             return *this;
         }
 
+        MainAttributes& setCornerText(const wxString& txt, PosCorner pos) { cornerTexts[pos] = txt; return *this; }
+
         MainAttributes& setSelectionMode(SelMode mode) { mouseSelMode = mode; return *this; }
 
     private:
@@ -260,6 +292,8 @@ public:
         PosLabelY labelposY;
         int yLabelWidth;
         std::shared_ptr<LabelFormatter> labelFmtY;
+
+        std::map<PosCorner, wxString> cornerTexts;
 
         SelMode mouseSelMode;
     };
@@ -311,8 +345,9 @@ private:
 
     std::unique_ptr<wxBitmap> doubleBuffer;
 
-    typedef std::vector<std::pair<std::shared_ptr<GraphData>, CurveAttributes>> GraphList;
-    GraphList curves_;
+    typedef std::vector<std::pair<std::shared_ptr<CurveData>, CurveAttributes>> CurveList;
+    CurveList curves_;
+	wxFont labelFont; //perf!!! generating the font is *very* expensive! don't do this repeatedly in Graph2D::render()!
 };
 }
 

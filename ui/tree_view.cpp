@@ -46,11 +46,11 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
         if (fileObj.isActive())
             switch (fileObj.getSyncDir())
             {
-                case SYNC_DIR_LEFT:
+                case SyncDirection::LEFT:
                     return fileObj.getFileSize<RIGHT_SIDE>();
-                case SYNC_DIR_RIGHT:
+                case SyncDirection::RIGHT:
                     return fileObj.getFileSize<LEFT_SIDE>();
-                case SYNC_DIR_NONE:
+                case SyncDirection::NONE:
                     break;
             }
         return std::max(fileObj.getFileSize<LEFT_SIDE>(), fileObj.getFileSize<RIGHT_SIDE>());

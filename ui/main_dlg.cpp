@@ -8,7 +8,6 @@
 #include <zen/format_unit.h>
 #include <zen/file_handling.h>
 #include <zen/serialize.h>
-//#include <zen/file_id.h>
 //#include <zen/perf.h>
 #include <zen/thread.h>
 #include <wx/clipbrd.h>
@@ -97,23 +96,26 @@ public:
 
     virtual bool acceptDrop(const std::vector<wxString>& droppedFiles, const wxPoint& clientPos, const wxWindow& wnd)
     {
-        if (droppedFiles.empty())
+        if (std::any_of(droppedFiles.begin(), droppedFiles.end(), [](const wxString& filename)
+    {
+        using namespace xmlAccess;
+        switch (getXmlType(utfCvrtTo<Zstring>(filename))) //throw()
+            {
+                case XML_TYPE_GUI:
+                case XML_TYPE_BATCH:
+                    return true;
+                case XML_TYPE_GLOBAL:
+                case XML_TYPE_OTHER:
+                    break;
+            }
             return false;
-
-        switch (xmlAccess::getMergeType(toZ(droppedFiles))) //throw()
+        }))
         {
-            case xmlAccess::MERGE_BATCH:
-            case xmlAccess::MERGE_GUI:
-            case xmlAccess::MERGE_GUI_BATCH:
-                mainDlg_.loadConfiguration(toZ(droppedFiles));
-                return false;
-
-            case xmlAccess::MERGE_OTHER:
-                //=> return true: change directory selection via drag and drop
-                break;
+            mainDlg_.loadConfiguration(toZ(droppedFiles));
+            return false;
         }
 
-        //mainDlg_.clearGrid();
+        //=> return true: change directory selection via drag and drop
         return true;
     }
 
@@ -321,51 +323,43 @@ xmlAccess::XmlGlobalSettings retrieveGlobalCfgFromDisk() //blocks on GUI on erro
     {
         assert(false);
         if (e.getSeverity() != FfsXmlError::WARNING) //ignore parsing errors: should be migration problems only *cross-fingers*
-            wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(e.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
     }
     return globalCfg;
 }
 }
 
 
-void MainDialog::create(const std::vector<Zstring>& cfgFileNames)
+void MainDialog::create()
 {
     using namespace xmlAccess;
     const XmlGlobalSettings globalSettings = retrieveGlobalCfgFromDisk();
 
-    std::vector<Zstring> filenames;
-    if (!cfgFileNames.empty()) //1. this one has priority
-        filenames = cfgFileNames;
-    else //FFS default startup: use last used selection
+    std::vector<Zstring> filenames = globalSettings.gui.lastUsedConfigFiles; //2. now try last used files
+
+    //------------------------------------------------------------------------------------------
+    //check existence of all files in parallel:
+    RunUntilFirstHit<NullType> findFirstMissing;
+
+    std::for_each(filenames.begin(), filenames.end(), [&](const Zstring& filename)
     {
-        filenames = globalSettings.gui.lastUsedConfigFiles; //2. now try last used files
+        findFirstMissing.addJob([=] { return filename.empty() /*ever empty??*/ || !fileExists(filename) ? zen::make_unique<NullType>() : nullptr; });
+    });
+    //potentially slow network access: give all checks 500ms to finish
+    const bool allFilesExist = findFirstMissing.timedWait(boost::posix_time::milliseconds(500)) && //false: time elapsed
+                               !findFirstMissing.get(); //no missing
+    if (!allFilesExist)
+        filenames.clear(); //we do NOT want to show an error due to last config file missing on application start!
+    //------------------------------------------------------------------------------------------
 
-        //------------------------------------------------------------------------------------------
-        //check existence of all directories in parallel!
-
-        RunUntilFirstHit<NullType> findFirstMissing;
-
-        std::for_each(filenames.begin(), filenames.end(), [&](const Zstring& filename)
-        {
-            findFirstMissing.addJob([=] { return filename.empty() /*ever empty??*/ || !fileExists(filename) ? zen::make_unique<NullType>() : nullptr; });
-        });
-        //potentially slow network access: give all checks 500ms to finish
-        const bool allFilesExist = findFirstMissing.timedWait(boost::posix_time::milliseconds(500)) && //false: time elapsed
-                                   !findFirstMissing.get(); //no missing
-        if (!allFilesExist)
-            filenames.clear(); //we do NOT want to show an error due to last config file missing on application start!
-        //------------------------------------------------------------------------------------------
-
-        if (filenames.empty())
-        {
-            if (zen::fileExists(lastRunConfigName())) //3. try to load auto-save config
-                filenames.push_back(lastRunConfigName());
-        }
+    if (filenames.empty())
+    {
+        if (zen::fileExists(lastRunConfigName())) //3. try to load auto-save config
+            filenames.push_back(lastRunConfigName());
     }
 
     XmlGuiConfig guiCfg; //structure to receive gui settings with default values
 
-    bool loadCfgSuccess = false;
     if (filenames.empty())
     {
         //add default exclusion filter: this is only ever relevant when creating new configurations!
@@ -379,58 +373,40 @@ void MainDialog::create(const std::vector<Zstring>& cfgFileNames)
         try
         {
             readAnyConfig(filenames, guiCfg); //throw FfsXmlError
-            loadCfgSuccess = true;
         }
         catch (const FfsXmlError& error)
         {
             if (error.getSeverity() == FfsXmlError::WARNING)
-                wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING);
+                wxMessageBox(error.toString(), L"FreeFileSync - " + _("Warning"), wxOK | wxICON_WARNING);
             //what about simulating changed config on parsing errors????
             else
-                wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR);
+                wxMessageBox(error.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
         }
-
-    const bool startComparisonImmediately = !cfgFileNames.empty() && loadCfgSuccess;
 
     //------------------------------------------------------------------------------------------
 
-    create_impl(guiCfg, filenames, globalSettings, startComparisonImmediately);
-}
-
-
-void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
-                        bool startComparison)
-{
-    create_impl(guiCfg, std::vector<Zstring>(), retrieveGlobalCfgFromDisk(), startComparison);
+    create(guiCfg, filenames, &globalSettings, false);
 }
 
 
 void MainDialog::create(const xmlAccess::XmlGuiConfig& guiCfg,
                         const std::vector<Zstring>& referenceFiles,
-                        const xmlAccess::XmlGlobalSettings& globalSettings,
+                        const xmlAccess::XmlGlobalSettings* globalSettings,
                         bool startComparison)
 {
-    create_impl(guiCfg, referenceFiles, globalSettings, startComparison);
-}
-
-
-void MainDialog::create_impl(const xmlAccess::XmlGuiConfig& guiCfg,
-                             const std::vector<Zstring>& referenceFiles,
-                             const xmlAccess::XmlGlobalSettings& globalSettings,
-                             bool startComparison)
-{
+    const xmlAccess::XmlGlobalSettings& globSett = globalSettings ? *globalSettings : retrieveGlobalCfgFromDisk();
     try
     {
         //we need to set language *before* creating MainDialog!
-        setLanguage(globalSettings.programLanguage); //throw FileError
+        setLanguage(globSett.programLanguage); //throw FileError
     }
     catch (const FileError& e)
     {
-        wxMessageBox(e.toString().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(e.toString().c_str(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
         //continue!
     }
 
-    MainDialog* frame = new MainDialog(guiCfg, referenceFiles, globalSettings, startComparison);
+    MainDialog* frame = new MainDialog(guiCfg, referenceFiles, globSett, startComparison);
     frame->Show();
 }
 
@@ -757,7 +733,7 @@ MainDialog::~MainDialog()
     }
     catch (const xmlAccess::FfsXmlError& e)
     {
-        wxMessageBox(e.toString().c_str(), _("Error"), wxOK | wxICON_ERROR, this);
+        wxMessageBox(e.toString().c_str(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR, this);
     }
 
     try //save "LastRun.ffs_gui"
@@ -1026,7 +1002,7 @@ void MainDialog::copySelectionToClipboard(const std::vector<const Grid*>& gridRe
     }
     catch (const std::bad_alloc& e)
     {
-        wxMessageBox(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()), _("Error"), wxOK | wxICON_ERROR, this);
+        wxMessageBox(_("Out of memory.") + L" " + utfCvrtTo<std::wstring>(e.what()), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR, this);
     }
 }
 
@@ -1064,10 +1040,9 @@ std::vector<FileSystemObject*> MainDialog::getTreeSelection() const
             if (auto root = dynamic_cast<const TreeView::RootNode*>(node.get()))
             {
                 //select first level of child elements
-                std::transform(root->baseDirObj_.refSubDirs ().begin(), root->baseDirObj_.refSubDirs ().end(), std::back_inserter(output), [](FileSystemObject& fsObj) { return &fsObj; });
-                std::transform(root->baseDirObj_.refSubFiles().begin(), root->baseDirObj_.refSubFiles().end(), std::back_inserter(output), [](FileSystemObject& fsObj) { return &fsObj; });
-                std::transform(root->baseDirObj_.refSubLinks().begin(), root->baseDirObj_.refSubLinks().end(), std::back_inserter(output), [](FileSystemObject& fsObj) { return &fsObj; });
-                //for (auto& fsObj : root->baseDirObj_.refSubLinks()) output.push_back(&fsObj); -> seriously MSVC, stop this disgrace and implement "range for"!
+                for (auto& fsObj : root->baseDirObj_.refSubDirs ()) output.push_back(&fsObj);
+                for (auto& fsObj : root->baseDirObj_.refSubFiles()) output.push_back(&fsObj);
+                for (auto& fsObj : root->baseDirObj_.refSubLinks()) output.push_back(&fsObj);
             }
             else if (auto dir = dynamic_cast<const TreeView::DirNode*>(node.get()))
                 output.push_back(&(dir->dirObj_));
@@ -1170,7 +1145,7 @@ private:
     {
         //std::wstring msg = toGuiString(deletionCount) +
         mainDlg.setStatusBarFullText(statusMsg);
-        updateUiNow();
+        wxTheApp->Yield();
     }
 
     //context: C callstack message loop => throw()!
@@ -1314,6 +1289,31 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
         }
     }
 
+    const size_t massInvokeThreshold = 10; //more than this is likely a user mistake
+
+    if (selectionTmp.size() > massInvokeThreshold)
+        if (globalCfg.optDialogs.confirmExternalCommandMassInvoke)
+        {
+            bool dontAskAgain = false;
+            switch (showQuestionDlg(this,
+                                    ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+                                    replaceCpy(replaceCpy(_P("Do you really want to execute the command %y for 1 item?",
+                                                             "Do you really want to execute the command %y for %x items?", selectionTmp.size()),
+                                                          L"%x", toGuiString(selectionTmp.size())), L"%y", L'\'' + commandline + L'\''),
+                                    QuestConfig().setCaption(_("Confirm")).setLabelYes(_("&Execute")).
+                                    showCheckBox(dontAskAgain, _("&Don't show this dialog again"), 0)))
+            {
+                case ReturnQuestionDlg::BUTTON_YES:
+                    globalCfg.optDialogs.confirmExternalCommandMassInvoke = !dontAskAgain;
+                    break;
+
+                case ReturnQuestionDlg::BUTTON_NO:
+                    assert(false);
+                case ReturnQuestionDlg::BUTTON_CANCEL:
+                    return;
+            }
+        }
+
     //regular command evaluation
     for (auto it = selectionTmp.begin(); it != selectionTmp.end(); ++it) //context menu calls this function only if selection is not empty!
     {
@@ -1338,7 +1338,8 @@ void MainDialog::openExternalApplication(const wxString& commandline, const std:
         replace(command, Zstr("%item2_folder%"), dir2 );
 
         auto cmdExp = expandMacros(command);
-        zen::shellExecute(cmdExp); //shows error message if command is malformed
+        //caveat: spawning too many threads asynchronously can easily kill a user's desktop session!
+        zen::shellExecute(cmdExp, selectionTmp.size() > massInvokeThreshold ? EXEC_TYPE_SYNC : EXEC_TYPE_ASYNC);
     }
 }
 
@@ -1448,27 +1449,26 @@ void MainDialog::onProcessAsyncTasks(wxEvent& event)
 
 void MainDialog::disableAllElements(bool enableAbort)
 {
+    //disables all elements (except abort button) that might receive user input during long-running processes:
     //when changing consider: comparison, synchronization, manual deletion
 
     EnableCloseButton(false); //not allowed for synchronization! progress indicator is top window! -> not honored on OS X!
 
-    //disables all elements (except abort button) that might receive user input during long-running processes: comparison, deletion
-    m_panelViewFilter    ->Disable();
-    m_bpButtonCmpConfig  ->Disable();
-    m_panelFilter        ->Disable();
-    m_panelConfig        ->Disable();
-    m_bpButtonSyncConfig ->Disable();
-    m_buttonSync         ->Disable();
-    m_gridMainL          ->Disable();
-    m_gridMainC          ->Disable();
-    m_gridMainR          ->Disable();
-    m_panelStatistics    ->Disable();
-    m_gridNavi           ->Disable();
-    m_panelDirectoryPairs->Disable();
-    m_splitterMain       ->Disable();
+    //OS X: wxWidgets portability promise is again a mess: http://wxwidgets.10942.n7.nabble.com/Disable-panel-and-appropriate-children-windows-linux-macos-td35357.html
+
     m_menubar1->EnableTop(0, false);
     m_menubar1->EnableTop(1, false);
     m_menubar1->EnableTop(2, false);
+    m_bpButtonCmpConfig  ->Disable();
+    m_bpButtonSyncConfig ->Disable();
+    m_buttonSync         ->Disable();
+    m_panelDirectoryPairs->Disable();
+    m_panelCenter        ->Disable();
+    m_panelViewFilter    ->Disable();
+    m_panelFilter        ->Disable();
+    m_panelConfig        ->Disable();
+    m_panelStatistics    ->Disable();
+    m_gridNavi           ->Disable();
 
     if (enableAbort)
     {
@@ -1492,22 +1492,19 @@ void MainDialog::enableAllElements()
 
     EnableCloseButton(true);
 
-    m_panelViewFilter    ->Enable();
-    m_bpButtonCmpConfig  ->Enable();
-    m_panelFilter        ->Enable();
-    m_panelConfig        ->Enable();
-    m_bpButtonSyncConfig ->Enable();
-    m_buttonSync         ->Enable();
-    m_gridMainL          ->Enable();
-    m_gridMainC          ->Enable();
-    m_gridMainR          ->Enable();
-    m_panelStatistics    ->Enable();
-    m_gridNavi           ->Enable();
-    m_panelDirectoryPairs->Enable();
-    m_splitterMain       ->Enable();
     m_menubar1->EnableTop(0, true);
     m_menubar1->EnableTop(1, true);
     m_menubar1->EnableTop(2, true);
+    m_bpButtonCmpConfig  ->Enable();
+    m_bpButtonSyncConfig ->Enable();
+    m_buttonSync         ->Enable();
+    m_panelDirectoryPairs->Enable();
+    m_panelCenter        ->Enable();
+    m_panelViewFilter    ->Enable();
+    m_panelFilter        ->Enable();
+    m_panelConfig        ->Enable();
+    m_panelStatistics    ->Enable();
+    m_gridNavi           ->Enable();
 
     //show compare button
     m_buttonCancel->Disable();
@@ -1517,6 +1514,9 @@ void MainDialog::enableAllElements()
 
     m_panelTopButtons->Layout();
     m_panelTopButtons->Enable();
+
+    //at least wxWidgets on OS X fails to do this after enabling:
+    Refresh();
 }
 
 
@@ -1540,11 +1540,13 @@ void MainDialog::OnResizeConfigPanel(wxEvent& event)
     event.Skip();
 }
 
+
 void MainDialog::OnResizeViewPanel(wxEvent& event)
 {
     updateSizerOrientation(*bSizerViewFilter, *m_panelViewFilter, 1.0);
     event.Skip();
 }
+
 
 void MainDialog::OnResizeStatisticsPanel(wxEvent& event)
 {
@@ -1619,19 +1621,19 @@ void MainDialog::onTreeButtonEvent(wxKeyEvent& event)
         {
             case WXK_NUMPAD_LEFT:
             case WXK_LEFT: //ALT + <-
-                setSyncDirManually(getTreeSelection(), SYNC_DIR_LEFT);
+                setSyncDirManually(getTreeSelection(), SyncDirection::LEFT);
                 return;
 
             case WXK_NUMPAD_RIGHT:
             case WXK_RIGHT: //ALT + ->
-                setSyncDirManually(getTreeSelection(), SYNC_DIR_RIGHT);
+                setSyncDirManually(getTreeSelection(), SyncDirection::RIGHT);
                 return;
 
             case WXK_NUMPAD_UP:
             case WXK_NUMPAD_DOWN:
             case WXK_UP:   /* ALT + /|\   */
             case WXK_DOWN: /* ALT + \|/   */
-                setSyncDirManually(getTreeSelection(), SYNC_DIR_NONE);
+                setSyncDirManually(getTreeSelection(), SyncDirection::NONE);
                 return;
         }
 
@@ -1704,19 +1706,19 @@ void MainDialog::onGridButtonEvent(wxKeyEvent& event, Grid& grid, bool leftSide)
         {
             case WXK_NUMPAD_LEFT:
             case WXK_LEFT: //ALT + <-
-                setSyncDirManually(getGridSelection(), SYNC_DIR_LEFT);
+                setSyncDirManually(getGridSelection(), SyncDirection::LEFT);
                 return;
 
             case WXK_NUMPAD_RIGHT:
             case WXK_RIGHT: //ALT + ->
-                setSyncDirManually(getGridSelection(), SYNC_DIR_RIGHT);
+                setSyncDirManually(getGridSelection(), SyncDirection::RIGHT);
                 return;
 
             case WXK_NUMPAD_UP:
             case WXK_NUMPAD_DOWN:
             case WXK_UP:   /* ALT + /|\   */
             case WXK_DOWN: /* ALT + \|/   */
-                setSyncDirManually(getGridSelection(), SYNC_DIR_NONE);
+                setSyncDirManually(getGridSelection(), SyncDirection::NONE);
                 return;
         }
 
@@ -1920,18 +1922,18 @@ void MainDialog::onNaviGridContext(GridClickEvent& event)
             return mirrorIfRtl(getSyncOpImage(selection[0]->getSyncOperation() != SO_EQUAL ?
                                               selection[0]->testSyncOperation(dir) : soDefault));
         };
-        const wxBitmap opRight = getImage(SYNC_DIR_RIGHT, SO_OVERWRITE_RIGHT);
-        const wxBitmap opNone  = getImage(SYNC_DIR_NONE,  SO_DO_NOTHING     );
-        const wxBitmap opLeft  = getImage(SYNC_DIR_LEFT,  SO_OVERWRITE_LEFT );
+        const wxBitmap opRight = getImage(SyncDirection::RIGHT, SO_OVERWRITE_RIGHT);
+        const wxBitmap opNone  = getImage(SyncDirection::NONE,  SO_DO_NOTHING     );
+        const wxBitmap opLeft  = getImage(SyncDirection::LEFT,  SO_OVERWRITE_LEFT );
 
         wxString shortCutLeft  = L"\tAlt+Left";
         wxString shortCutRight = L"\tAlt+Right";
         if (wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft)
             std::swap(shortCutLeft, shortCutRight);
 
-        menu.addItem(_("Set direction:") + L" ->" + shortCutRight, [this, &selection] { setSyncDirManually(selection, SYNC_DIR_RIGHT); }, &opRight);
-        menu.addItem(_("Set direction:") + L" -" L"\tAlt+Down",    [this, &selection] { setSyncDirManually(selection, SYNC_DIR_NONE);  }, &opNone);
-        menu.addItem(_("Set direction:") + L" <-" + shortCutLeft,  [this, &selection] { setSyncDirManually(selection, SYNC_DIR_LEFT);  }, &opLeft);
+        menu.addItem(_("Set direction:") + L" ->" + shortCutRight, [this, &selection] { setSyncDirManually(selection, SyncDirection::RIGHT); }, &opRight);
+        menu.addItem(_("Set direction:") + L" -" L"\tAlt+Down",    [this, &selection] { setSyncDirManually(selection, SyncDirection::NONE);  }, &opNone);
+        menu.addItem(_("Set direction:") + L" <-" + shortCutLeft,  [this, &selection] { setSyncDirManually(selection, SyncDirection::LEFT);  }, &opLeft);
         //Gtk needs a direction, "<-", because it has no context menu icons!
         //Gtk requires "no spaces" for shortcut identifiers!
         menu.addSeparator();
@@ -2012,18 +2014,18 @@ void MainDialog::onMainGridContextRim(bool leftSide)
             return mirrorIfRtl(getSyncOpImage(selection[0]->getSyncOperation() != SO_EQUAL ?
                                               selection[0]->testSyncOperation(dir) : soDefault));
         };
-        const wxBitmap opRight = getImage(SYNC_DIR_RIGHT, SO_OVERWRITE_RIGHT);
-        const wxBitmap opNone  = getImage(SYNC_DIR_NONE,  SO_DO_NOTHING     );
-        const wxBitmap opLeft  = getImage(SYNC_DIR_LEFT,  SO_OVERWRITE_LEFT );
+        const wxBitmap opRight = getImage(SyncDirection::RIGHT, SO_OVERWRITE_RIGHT);
+        const wxBitmap opNone  = getImage(SyncDirection::NONE,  SO_DO_NOTHING     );
+        const wxBitmap opLeft  = getImage(SyncDirection::LEFT,  SO_OVERWRITE_LEFT );
 
         wxString shortCutLeft  = L"\tAlt+Left";
         wxString shortCutRight = L"\tAlt+Right";
         if (wxTheApp->GetLayoutDirection() == wxLayout_RightToLeft)
             std::swap(shortCutLeft, shortCutRight);
 
-        menu.addItem(_("Set direction:") + L" ->" + shortCutRight, [this, &selection] { setSyncDirManually(selection, SYNC_DIR_RIGHT); }, &opRight);
-        menu.addItem(_("Set direction:") + L" -" L"\tAlt+Down",    [this, &selection] { setSyncDirManually(selection, SYNC_DIR_NONE);  }, &opNone);
-        menu.addItem(_("Set direction:") + L" <-" + shortCutLeft,  [this, &selection] { setSyncDirManually(selection, SYNC_DIR_LEFT);  }, &opLeft);
+        menu.addItem(_("Set direction:") + L" ->" + shortCutRight, [this, &selection] { setSyncDirManually(selection, SyncDirection::RIGHT); }, &opRight);
+        menu.addItem(_("Set direction:") + L" -" L"\tAlt+Down",    [this, &selection] { setSyncDirManually(selection, SyncDirection::NONE);  }, &opNone);
+        menu.addItem(_("Set direction:") + L" <-" + shortCutLeft,  [this, &selection] { setSyncDirManually(selection, SyncDirection::LEFT);  }, &opLeft);
         //Gtk needs a direction, "<-", because it has no context menu icons!
         //Gtk requires "no spaces" for shortcut identifiers!
         menu.addSeparator();
@@ -2482,7 +2484,7 @@ void MainDialog::removeObsoleteCfgHistoryItems(const std::vector<Zstring>& filen
         std::vector<Zstring> missingFiles;
 
         auto itFut = fileEx.begin();
-        for (auto it = filenames.begin(); it != filenames.end(); ++it, ++itFut)
+        for (auto it = filenames.begin(); it != filenames.end(); ++it, (void)++itFut) //void: prevent ADL from dragging in boost's ,-overload: "MSVC warning C4913: user defined binary operator ',' exists but no overload could convert all operands"
             if (itFut->is_ready() && !itFut->get()) //remove only files that are confirmed to be non-existent
                 missingFiles.push_back(*it);
 
@@ -2606,15 +2608,16 @@ bool MainDialog::trySaveConfig(const Zstring* fileNameGui) //return true if save
     }
     else
     {
-        wxString defaultFileName = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? toWx(activeConfigFiles[0]) : L"SyncSettings.ffs_gui";
+        Zstring defaultFileName = activeConfigFiles.size() == 1 && activeConfigFiles[0] != lastRunConfigName() ? activeConfigFiles[0] : Zstr("SyncSettings.ffs_gui");
         //attention: activeConfigFiles may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
-        if (endsWith(defaultFileName, L".ffs_batch"))
-            replace(defaultFileName, L".ffs_batch", L".ffs_gui", false);
+        if (endsWith(defaultFileName, Zstr(".ffs_batch")))
+            replace(defaultFileName, Zstr(".ffs_batch"), Zstr(".ffs_gui"), false);
 
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
                                 wxEmptyString,
-                                wxEmptyString,
-                                defaultFileName,
+                                //OS X really needs dir/file separated like this:
+                                utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR)), //default dir; empty string if / not found
+                                utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR)), //default file; whole string if / not found
                                 wxString(L"FreeFileSync (*.ffs_gui)|*.ffs_gui") + L"|" +_("All files") + L" (*.*)|*",
                                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (filePicker.ShowModal() != wxID_OK)
@@ -2634,7 +2637,7 @@ bool MainDialog::trySaveConfig(const Zstring* fileNameGui) //return true if save
     }
     catch (const xmlAccess::FfsXmlError& e)
     {
-        wxMessageBox(e.toString().c_str(), _("Error"), wxOK | wxICON_ERROR, this);
+        wxMessageBox(e.toString().c_str(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR, this);
         return false;
     }
 }
@@ -2667,15 +2670,16 @@ bool MainDialog::trySaveBatchConfig(const Zstring* fileNameBatch)
                                   globalCfg.gui.onCompletionHistoryMax))
             return false;
 
-        wxString defaultFileName = !activeCfgFilename.empty() ? toWx(activeCfgFilename) : L"BatchRun.ffs_batch";
+        Zstring defaultFileName = !activeCfgFilename.empty() ? activeCfgFilename : Zstr("BatchRun.ffs_batch");
         //attention: activeConfigFiles may be a *.ffs_gui file! We don't want to overwrite it with a BATCH config!
-        if (endsWith(defaultFileName, L".ffs_gui"))
-            replace(defaultFileName, L".ffs_gui", L".ffs_batch");
+        if (endsWith(defaultFileName, Zstr(".ffs_gui")))
+            replace(defaultFileName, Zstr(".ffs_gui"), Zstr(".ffs_batch"));
 
         wxFileDialog filePicker(this, //put modal dialog on stack: creating this on freestore leads to memleak!
                                 wxEmptyString,
-                                wxEmptyString,
-                                defaultFileName,
+                                //OS X really needs dir/file separated like this:
+                                utfCvrtTo<wxString>(beforeLast(defaultFileName, FILE_NAME_SEPARATOR)), //default dir; empty string if / not found
+                                utfCvrtTo<wxString>(afterLast (defaultFileName, FILE_NAME_SEPARATOR)), //default file; whole string if / not found
                                 _("FreeFileSync batch") + L" (*.ffs_batch)|*.ffs_batch" + L"|" +_("All files") + L" (*.*)|*",
                                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (filePicker.ShowModal() != wxID_OK)
@@ -2693,7 +2697,7 @@ bool MainDialog::trySaveBatchConfig(const Zstring* fileNameBatch)
     }
     catch (const xmlAccess::FfsXmlError& e)
     {
-        wxMessageBox(e.toString().c_str(), _("Error"), wxOK | wxICON_ERROR, this);
+        wxMessageBox(e.toString().c_str(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR, this);
         return false;
     }
 }
@@ -2710,7 +2714,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
             if (!activeCfgFilename.empty())
                 //only if check is active and non-default config file loaded
             {
-                bool neverSave = !globalCfg.optDialogs.popupOnConfigChange;
+                bool dontAskAgain = false;
 
                 switch (showQuestionDlg(this,
                                         ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO | ReturnQuestionDlg::BUTTON_CANCEL,
@@ -2718,7 +2722,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
                                         QuestConfig().setCaption(toWx(activeCfgFilename)).
                                         setLabelYes(_("&Save")).
                                         setLabelNo(_("Do&n't save")).
-                                        showCheckBox(neverSave, _("Never save changes"), ReturnQuestionDlg::BUTTON_YES)))
+                                        showCheckBox(dontAskAgain, _("Never save changes"), ReturnQuestionDlg::BUTTON_YES)))
                 {
                     case ReturnQuestionDlg::BUTTON_YES:
 
@@ -2736,7 +2740,7 @@ bool MainDialog::saveOldConfig() //return false on user abort
                         }
 
                     case ReturnQuestionDlg::BUTTON_NO:
-                        globalCfg.optDialogs.popupOnConfigChange = !neverSave;
+                        globalCfg.optDialogs.popupOnConfigChange = !dontAskAgain;
                         break;
 
                     case ReturnQuestionDlg::BUTTON_CANCEL:
@@ -2759,7 +2763,7 @@ void MainDialog::OnConfigLoad(wxCommandEvent& event)
 
     wxFileDialog filePicker(this,
                             wxEmptyString,
-                            toWx(beforeLast(activeCfgFilename, FILE_NAME_SEPARATOR)), //set default dir: empty string if "activeConfigFiles" is empty or has no path separator
+                            utfCvrtTo<wxString>(beforeLast(activeCfgFilename, FILE_NAME_SEPARATOR)), //set default dir: empty string if "activeConfigFiles" is empty or has no path separator
                             wxEmptyString,
                             wxString(L"FreeFileSync (*.ffs_gui;*.ffs_batch)|*.ffs_gui;*.ffs_batch") + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_OPEN | wxFD_MULTIPLE);
@@ -2866,12 +2870,12 @@ bool MainDialog::loadConfiguration(const std::vector<Zstring>& filenames)
     {
         if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
         {
-            wxMessageBox(error.toString(), _("Warning"), wxOK | wxICON_WARNING, this);
+            wxMessageBox(error.toString(), L"FreeFileSync - " + _("Warning"), wxOK | wxICON_WARNING, this);
             setConfig(newGuiCfg, filenames);
             setLastUsedConfig(filenames, xmlAccess::XmlGuiConfig()); //simulate changed config due to parsing errors
         }
         else
-            wxMessageBox(error.toString(), _("Error"), wxOK | wxICON_ERROR, this);
+            wxMessageBox(error.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR, this);
         return false;
     }
 }
@@ -3308,7 +3312,8 @@ void MainDialog::OnCompare(wxCommandEvent& event)
     clearGrid(); //avoid memory peak by clearing old data first
 
     disableAllElements(true); //CompareStatusHandler will internally process Window messages, so avoid unexpected callbacks!
-    ZEN_ON_SCOPE_EXIT(updateUiNow(); enableAllElements()); //ui update before enabling buttons again: prevent strange behaviour of delayed button clicks
+    auto app = wxTheApp; //fix lambda/wxWigets/VC fuck up
+    ZEN_ON_SCOPE_EXIT(app->Yield(); enableAllElements()); //ui update before enabling buttons again: prevent strange behaviour of delayed button clicks
 
     try
     {
@@ -4093,12 +4098,11 @@ void MainDialog::OnMenuGlobalSettings(wxCommandEvent& event)
 void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
 {
     //get a filename
-    const wxString defaultFileName = L"FileList.csv"; //proposal
     wxFileDialog filePicker(this, //creating this on freestore leads to memleak!
                             wxEmptyString,
                             wxEmptyString,
-                            defaultFileName,
-                            _("Comma separated list") + L" (*.csv)|*.csv" + L"|" +_("All files") + L" (*.*)|*",
+                            L"FileList.csv", //default file name
+                            _("Comma-separated values") + L" (*.csv)|*.csv" + L"|" +_("All files") + L" (*.*)|*",
                             wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (filePicker.ShowModal() != wxID_OK)
         return;
@@ -4220,7 +4224,7 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
         }
         catch (const FileError& e)
         {
-            wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR, this);
+            wxMessageBox(e.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR, this);
         }
     }
 }
@@ -4288,7 +4292,7 @@ void MainDialog::switchProgramLanguage(int langID)
     newGlobalCfg.programLanguage = langID;
 
     //show new dialog, then delete old one
-    MainDialog::create(getConfig(), activeConfigFiles, newGlobalCfg, false);
+    MainDialog::create(getConfig(), activeConfigFiles, &newGlobalCfg, false);
 
     //we don't use Close():
     //1. we don't want to show the prompt to save current config in OnClose()

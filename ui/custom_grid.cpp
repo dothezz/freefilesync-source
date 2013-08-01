@@ -811,19 +811,19 @@ public:
                         break;
                         case BLOCKPOS_LEFT:
                         {
-                            SyncDirectionEvent evt(rowFirst, rowLast, SYNC_DIR_LEFT);
+                            SyncDirectionEvent evt(rowFirst, rowLast, SyncDirection::LEFT);
                             evtHandler->ProcessEvent(evt);
                         }
                         break;
                         case BLOCKPOS_MIDDLE:
                         {
-                            SyncDirectionEvent evt(rowFirst, rowLast, SYNC_DIR_NONE);
+                            SyncDirectionEvent evt(rowFirst, rowLast, SyncDirection::NONE);
                             evtHandler->ProcessEvent(evt);
                         }
                         break;
                         case BLOCKPOS_RIGHT:
                         {
-                            SyncDirectionEvent evt(rowFirst, rowLast, SYNC_DIR_RIGHT);
+                            SyncDirectionEvent evt(rowFirst, rowLast, SyncDirection::RIGHT);
                             evtHandler->ProcessEvent(evt);
                         }
                         break;
@@ -983,13 +983,13 @@ private:
                             case BLOCKPOS_CHECK_BOX:
                                 break;
                             case BLOCKPOS_LEFT:
-                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_LEFT)), rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
+                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::LEFT)), rect, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, buffer);
                                 break;
                             case BLOCKPOS_MIDDLE:
-                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_NONE)), rect, wxALIGN_CENTER, buffer);
+                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::NONE)), rect, wxALIGN_CENTER, buffer);
                                 break;
                             case BLOCKPOS_RIGHT:
-                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SYNC_DIR_RIGHT)), rect, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, buffer);
+                                drawBitmapRtlMirror(dc, getSyncOpImage(fsObj->testSyncOperation(SyncDirection::RIGHT)), rect, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, buffer);
                                 break;
                         }
                     else //default

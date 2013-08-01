@@ -57,9 +57,9 @@ private:
 
         //##################### schedule old temporary files for deletion ####################
         if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
-            return fileObj.setSyncDir(SYNC_DIR_LEFT);
+            return fileObj.setSyncDir(SyncDirection::LEFT);
         else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
-            return fileObj.setSyncDir(SYNC_DIR_RIGHT);
+            return fileObj.setSyncDir(SyncDirection::RIGHT);
         //####################################################################################
 
         switch (cat)
@@ -81,13 +81,13 @@ private:
                 break;
             case FILE_CONFLICT:
             case FILE_DIFFERENT_METADATA: //use setting from "conflict/cannot categorize"
-                if (dirCfg.conflict == SYNC_DIR_NONE)
+                if (dirCfg.conflict == SyncDirection::NONE)
                     fileObj.setSyncDirConflict(fileObj.getCatExtraDescription()); //take over category conflict
                 else
                     fileObj.setSyncDir(dirCfg.conflict);
                 break;
             case FILE_EQUAL:
-                fileObj.setSyncDir(SYNC_DIR_NONE);
+                fileObj.setSyncDir(SyncDirection::NONE);
                 break;
         }
     }
@@ -110,7 +110,7 @@ private:
                 break;
             case SYMLINK_CONFLICT:
             case SYMLINK_DIFFERENT_METADATA: //use setting from "conflict/cannot categorize"
-                if (dirCfg.conflict == SYNC_DIR_NONE)
+                if (dirCfg.conflict == SyncDirection::NONE)
                     linkObj.setSyncDirConflict(linkObj.getCatExtraDescription()); //take over category conflict
                 else
                     linkObj.setSyncDir(dirCfg.conflict);
@@ -119,7 +119,7 @@ private:
                 linkObj.setSyncDir(dirCfg.different);
                 break;
             case SYMLINK_EQUAL:
-                linkObj.setSyncDir(SYNC_DIR_NONE);
+                linkObj.setSyncDir(SyncDirection::NONE);
                 break;
         }
     }
@@ -130,9 +130,9 @@ private:
 
         //########### schedule abandoned temporary recycle bin directory for deletion  ##########
         if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
-            return setSyncDirectionRec(SYNC_DIR_LEFT, dirObj); //
+            return setSyncDirectionRec(SyncDirection::LEFT, dirObj); //
         else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
-            return setSyncDirectionRec(SYNC_DIR_RIGHT, dirObj); //don't recurse below!
+            return setSyncDirectionRec(SyncDirection::RIGHT, dirObj); //don't recurse below!
         //#######################################################################################
 
         switch (cat)
@@ -144,10 +144,10 @@ private:
                 dirObj.setSyncDir(dirCfg.exRightSideOnly);
                 break;
             case DIR_EQUAL:
-                dirObj.setSyncDir(SYNC_DIR_NONE);
+                dirObj.setSyncDir(SyncDirection::NONE);
                 break;
             case DIR_DIFFERENT_METADATA: //use setting from "conflict/cannot categorize"
-                if (dirCfg.conflict == SYNC_DIR_NONE)
+                if (dirCfg.conflict == SyncDirection::NONE)
                     dirObj.setSyncDirConflict(dirObj.getCatExtraDescription()); //take over category conflict
                 else
                     dirObj.setSyncDir(dirCfg.conflict);
@@ -408,9 +408,9 @@ private:
 
         //##################### schedule old temporary files for deletion ####################
         if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
-            return fileObj.setSyncDir(SYNC_DIR_LEFT);
+            return fileObj.setSyncDir(SyncDirection::LEFT);
         else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
-            return fileObj.setSyncDir(SYNC_DIR_RIGHT);
+            return fileObj.setSyncDir(SyncDirection::RIGHT);
         //####################################################################################
 
         //try to find corresponding database entry
@@ -432,7 +432,7 @@ private:
             if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
                 fileObj.setSyncDirConflict(txtDbNotInSync);
             else
-                fileObj.setSyncDir(changeOnLeft ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT);
+                fileObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
         }
         else
         {
@@ -468,7 +468,7 @@ private:
             if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
                 linkObj.setSyncDirConflict(txtDbNotInSync);
             else
-                linkObj.setSyncDir(changeOnLeft ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT);
+                linkObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
         }
         else
         {
@@ -485,9 +485,9 @@ private:
 
         //########### schedule abandoned temporary recycle bin directory for deletion  ##########
         if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
-            return setSyncDirectionRec(SYNC_DIR_LEFT, dirObj); //
+            return setSyncDirectionRec(SyncDirection::LEFT, dirObj); //
         else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
-            return setSyncDirectionRec(SYNC_DIR_RIGHT, dirObj); //don't recurse below!
+            return setSyncDirectionRec(SyncDirection::RIGHT, dirObj); //don't recurse below!
         //#######################################################################################
 
         //try to find corresponding database entry
@@ -511,7 +511,7 @@ private:
                 if (dbEntry && !stillInSync(dbEntry->second))
                     dirObj.setSyncDirConflict(txtDbNotInSync);
                 else
-                    dirObj.setSyncDir(changeOnLeft ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT);
+                    dirObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
             }
             else
             {
@@ -599,11 +599,11 @@ private:
 
     Algorithm:
     ----------
-    DB-file left  <--- (name, size, date) --->   DB-file right
-       |                                              |
-       |  (file ID, size, date)                       |  (file ID, size, date)
-      \|/                                            \|/
-    file left only                               file right only
+    DB-file left  <--- (name, size, date) --->  DB-file right
+       |                                             |
+       |  (file ID, size, date)                      |  (file ID, size, date)
+      \|/                                           \|/
+    file left only                             file right only
 
        FAT caveat: File Ids are generally not stable when file is either moved or renamed!
        => 1. Move/rename operations on FAT cannot be detected reliably.
@@ -1384,10 +1384,10 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
                 auto cfgIter = baseDirCfgs.find(&fsObj.root());
                 if (cfgIter != baseDirCfgs.end())
                 {
-                    SyncDirection newDir = SYNC_DIR_NONE;
+                    SyncDirection newDir = SyncDirection::NONE;
 
                     if (cfgIter->second.var == DirectionConfig::AUTOMATIC)
-                        newDir = fsObj.isEmpty<LEFT_SIDE>() ? SYNC_DIR_RIGHT : SYNC_DIR_LEFT;
+                        newDir = fsObj.isEmpty<LEFT_SIDE>() ? SyncDirection::RIGHT : SyncDirection::LEFT;
                     else
                     {
                         const DirectionSet& dirCfg = extractDirections(cfgIter->second);

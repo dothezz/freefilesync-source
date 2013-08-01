@@ -49,7 +49,7 @@ private:
 class SyncStatusHandler : public zen::StatusHandler
 {
 public:
-    SyncStatusHandler(wxTopLevelWindow* parentDlg,
+    SyncStatusHandler(wxFrame* parentDlg,
                       size_t lastSyncsLogFileSizeMax,
                       xmlAccess::OnGuiError handleError,
                       const std::wstring& jobName,
@@ -70,7 +70,6 @@ private:
     virtual void abortThisProcess(); //throw GuiAbortProcess
     void onProgressDialogTerminate();
 
-    wxTopLevelWindow* parentDlg_;
     SyncProgressDialog* progressDlg; //managed to have shorter lifetime than this handler!
     const size_t lastSyncsLogFileSizeMax_;
     xmlAccess::OnGuiError handleError_;

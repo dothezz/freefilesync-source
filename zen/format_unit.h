@@ -16,19 +16,12 @@ namespace zen
 std::wstring filesizeToShortString(Int64 filesize);
 std::wstring remainingTimeToString(double timeInSec);
 std::wstring fractionToString(double fraction); //within [0, 1]
+std::wstring utcToLocalTimeString(Int64 utcTime); //like Windows Explorer would...
+
+std::wstring formatThreeDigitPrecision(double value); //= *at least* three digits
 
 template <class NumberType>
 std::wstring toGuiString(NumberType number); //format integer number including thousands separator
-
-std::wstring utcToLocalTimeString(Int64 utcTime); //like Windows Explorer would...
-
-
-
-
-
-
-
-
 
 
 

@@ -29,10 +29,10 @@ template <class T, class U>
 struct SelectIf<false, T, U> : ResultType<U> {};
 //------------------------------------------------------
 template <class T, class U>
-struct IsSameType : StaticBool<false> {};
+struct IsSameType : FalseType {};
 
 template <class T>
-struct IsSameType<T, T> : StaticBool<true> {};
+struct IsSameType<T, T> : TrueType {};
 
 //------------------------------------------------------
 template <bool, class T = void>

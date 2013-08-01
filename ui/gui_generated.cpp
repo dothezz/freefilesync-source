@@ -1098,6 +1098,9 @@ CompareProgressDlgGenerated::CompareProgressDlgGenerated( wxWindow* parent, wxWi
 	
 	bSizer42 = new wxBoxSizer( wxHORIZONTAL );
 	
+	wxBoxSizer* bSizer162StretchSpeedAndRemTimeIndependently;
+	bSizer162StretchSpeedAndRemTimeIndependently = new wxBoxSizer( wxHORIZONTAL );
+	
 	wxBoxSizer* bSizer157;
 	bSizer157 = new wxBoxSizer( wxVERTICAL );
 	
@@ -1142,10 +1145,10 @@ CompareProgressDlgGenerated::CompareProgressDlgGenerated( wxWindow* parent, wxWi
 	bSizer157->Add( bSizerFilesRemaining, 0, 0, 5 );
 	
 	
-	bSizer42->Add( bSizer157, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer162StretchSpeedAndRemTimeIndependently->Add( bSizer157, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
+	bSizer162StretchSpeedAndRemTimeIndependently->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	sSizerSpeed = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -1160,10 +1163,16 @@ CompareProgressDlgGenerated::CompareProgressDlgGenerated( wxWindow* parent, wxWi
 	sSizerSpeed->Add( m_staticTextSpeed, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
 	
 	
-	bSizer42->Add( sSizerSpeed, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer162StretchSpeedAndRemTimeIndependently->Add( sSizerSpeed, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer42->Add( bSizer162StretchSpeedAndRemTimeIndependently, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer42->Add( 10, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxBoxSizer* bSizer163;
+	bSizer163 = new wxBoxSizer( wxHORIZONTAL );
 	
 	sSizerTimeRemaining = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -1178,10 +1187,10 @@ CompareProgressDlgGenerated::CompareProgressDlgGenerated( wxWindow* parent, wxWi
 	sSizerTimeRemaining->Add( m_staticTextRemTime, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
 	
 	
-	bSizer42->Add( sSizerTimeRemaining, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer163->Add( sSizerTimeRemaining, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
+	bSizer163->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	sSizerTimeElapsed = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -1197,7 +1206,10 @@ CompareProgressDlgGenerated::CompareProgressDlgGenerated( wxWindow* parent, wxWi
 	sSizerTimeElapsed->Add( m_staticTextTimeElapsed, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
 	
 	
-	bSizer42->Add( sSizerTimeElapsed, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer163->Add( sSizerTimeElapsed, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer42->Add( bSizer163, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer40->Add( bSizer42, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
@@ -1215,17 +1227,20 @@ CompareProgressDlgGenerated::~CompareProgressDlgGenerated()
 {
 }
 
-SyncProgressDlgGenerated::SyncProgressDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+SyncProgressPanelGenerated::SyncProgressPanelGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
-	this->SetSizeHints( wxSize( 470,260 ), wxDefaultSize );
-	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-	
 	bSizerRoot = new wxBoxSizer( wxVERTICAL );
 	
 	bSizer42 = new wxBoxSizer( wxHORIZONTAL );
 	
+	
+	bSizer42->Add( 32, 0, 0, 0, 5 );
+	
+	
+	bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
+	
 	m_bitmapStatus = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 32,32 ), 0 );
-	bSizer42->Add( m_bitmapStatus, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	bSizer42->Add( m_bitmapStatus, 0, wxALIGN_CENTER_VERTICAL|wxALL, 2 );
 	
 	m_staticTextPhase = new wxStaticText( this, wxID_ANY, _("Synchronizing..."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextPhase->Wrap( -1 );
@@ -1236,11 +1251,32 @@ SyncProgressDlgGenerated::SyncProgressDlgGenerated( wxWindow* parent, wxWindowID
 	m_animCtrlSyncing = new wxAnimationCtrl( this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxSize( 32,32 ), wxAC_DEFAULT_STYLE ); 
 	m_animCtrlSyncing->SetMinSize( wxSize( 32,32 ) );
 	
-	bSizer42->Add( m_animCtrlSyncing, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	bSizer42->Add( m_animCtrlSyncing, 0, wxALIGN_CENTER_VERTICAL|wxALL, 2 );
 	
 	
-	bSizerRoot->Add( bSizer42, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT, 5 );
+	bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_bpButtonMinimizeToTray = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 32,32 ), wxBU_AUTODRAW );
+	m_bpButtonMinimizeToTray->SetToolTip( _("Minimize to notification area") );
+	
+	bSizer42->Add( m_bpButtonMinimizeToTray, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizerRoot->Add( bSizer42, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	
+	bSizerStatusText = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticTextStatus = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextStatus->Wrap( -1 );
+	bSizerStatusText->Add( m_staticTextStatus, 0, wxEXPAND|wxLEFT, 10 );
+	
+	
+	bSizerStatusText->Add( 0, 5, 0, 0, 5 );
+	
+	
+	bSizerRoot->Add( bSizerStatusText, 0, wxEXPAND, 5 );
+	
+	wxStaticLine* m_staticlineHeader;
 	m_staticlineHeader = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
 	bSizerRoot->Add( m_staticlineHeader, 0, wxEXPAND, 5 );
 	
@@ -1250,101 +1286,181 @@ SyncProgressDlgGenerated::SyncProgressDlgGenerated( wxWindow* parent, wxWindowID
 	wxBoxSizer* bSizer173;
 	bSizer173 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticTextStatus = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextStatus->Wrap( -1 );
-	bSizer173->Add( m_staticTextStatus, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
-	
-	m_gauge1 = new wxGauge( m_panelProgress, wxID_ANY, 100, wxDefaultPosition, wxSize( -1,14 ), wxGA_HORIZONTAL );
-	bSizer173->Add( m_gauge1, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
-	
 	bSizer171 = new wxBoxSizer( wxHORIZONTAL );
 	
 	
 	bSizer171->Add( 10, 0, 0, 0, 5 );
 	
-	wxFlexGridSizer* fgSizer10;
-	fgSizer10 = new wxFlexGridSizer( 0, 2, 2, 5 );
-	fgSizer10->SetFlexibleDirection( wxBOTH );
-	fgSizer10->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxBoxSizer* bSizer164;
+	bSizer164 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticTextLabelItemsProc = new wxStaticText( m_panelProgress, wxID_ANY, _("Items processed:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLabelItemsProc->Wrap( -1 );
-	fgSizer10->Add( m_staticTextLabelItemsProc, 0, wxALIGN_BOTTOM, 5 );
+	m_panelItemsProcessed = new wxPanel( m_panelProgress, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panelItemsProcessed->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
 	
-	bSizerItemsProc = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* bSizer165;
+	bSizer165 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticTextProcessedObj = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	
+	bSizer165->Add( 0, 5, 0, 0, 5 );
+	
+	wxStaticText* m_staticText96;
+	m_staticText96 = new wxStaticText( m_panelItemsProcessed, wxID_ANY, _("Items processed:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText96->Wrap( -1 );
+	bSizer165->Add( m_staticText96, 0, wxALIGN_BOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer169;
+	bSizer169 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticTextProcessedObj = new wxStaticText( m_panelItemsProcessed, wxID_ANY, _("dummy"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	m_staticTextProcessedObj->Wrap( -1 );
 	m_staticTextProcessedObj->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 	
-	bSizerItemsProc->Add( m_staticTextProcessedObj, 0, wxALIGN_BOTTOM, 5 );
+	bSizer169->Add( m_staticTextProcessedObj, 0, wxALIGN_BOTTOM, 5 );
 	
-	m_staticTextDataProcessed = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDataProcessed = new wxStaticText( m_panelItemsProcessed, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextDataProcessed->Wrap( -1 );
-	bSizerItemsProc->Add( m_staticTextDataProcessed, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
+	bSizer169->Add( m_staticTextDataProcessed, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
 	
 	
-	fgSizer10->Add( bSizerItemsProc, 0, wxALIGN_BOTTOM, 5 );
+	bSizer165->Add( bSizer169, 0, wxALIGN_BOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextLabelItemsRem = new wxStaticText( m_panelProgress, wxID_ANY, _("Items remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLabelItemsRem->Wrap( -1 );
-	fgSizer10->Add( m_staticTextLabelItemsRem, 0, wxALIGN_BOTTOM, 5 );
 	
-	bSizerItemsRem = new wxBoxSizer( wxHORIZONTAL );
+	bSizer165->Add( 0, 5, 0, 0, 5 );
 	
-	m_staticTextRemainingObj = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	
+	m_panelItemsProcessed->SetSizer( bSizer165 );
+	m_panelItemsProcessed->Layout();
+	bSizer165->Fit( m_panelItemsProcessed );
+	bSizer164->Add( m_panelItemsProcessed, 0, wxEXPAND|wxTOP, 7 );
+	
+	m_panelItemsRemaining = new wxPanel( m_panelProgress, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panelItemsRemaining->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+	
+	wxBoxSizer* bSizer166;
+	bSizer166 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer166->Add( 0, 5, 0, 0, 5 );
+	
+	wxStaticText* m_staticText97;
+	m_staticText97 = new wxStaticText( m_panelItemsRemaining, wxID_ANY, _("Items remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText97->Wrap( -1 );
+	bSizer166->Add( m_staticText97, 0, wxALIGN_BOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer170;
+	bSizer170 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticTextRemainingObj = new wxStaticText( m_panelItemsRemaining, wxID_ANY, _("dummy"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	m_staticTextRemainingObj->Wrap( -1 );
 	m_staticTextRemainingObj->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 	
-	bSizerItemsRem->Add( m_staticTextRemainingObj, 0, wxALIGN_BOTTOM, 5 );
+	bSizer170->Add( m_staticTextRemainingObj, 0, wxALIGN_BOTTOM, 5 );
 	
-	m_staticTextDataRemaining = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDataRemaining = new wxStaticText( m_panelItemsRemaining, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextDataRemaining->Wrap( -1 );
-	bSizerItemsRem->Add( m_staticTextDataRemaining, 0, wxALIGN_BOTTOM|wxLEFT, 5 );
+	bSizer170->Add( m_staticTextDataRemaining, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
 	
 	
-	fgSizer10->Add( bSizerItemsRem, 0, wxALIGN_BOTTOM, 5 );
+	bSizer166->Add( bSizer170, 0, wxALIGN_BOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticText84 = new wxStaticText( m_panelProgress, wxID_ANY, _("Speed:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText84->Wrap( -1 );
-	fgSizer10->Add( m_staticText84, 0, wxALIGN_BOTTOM, 5 );
 	
-	m_staticTextSpeed = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextSpeed->Wrap( -1 );
-	m_staticTextSpeed->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	bSizer166->Add( 0, 5, 0, 0, 5 );
 	
-	fgSizer10->Add( m_staticTextSpeed, 0, wxALIGN_BOTTOM, 5 );
 	
-	m_staticTextLabelRemTime = new wxStaticText( m_panelProgress, wxID_ANY, _("Time remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLabelRemTime->Wrap( -1 );
-	fgSizer10->Add( m_staticTextLabelRemTime, 0, wxALIGN_BOTTOM, 5 );
+	m_panelItemsRemaining->SetSizer( bSizer166 );
+	m_panelItemsRemaining->Layout();
+	bSizer166->Fit( m_panelItemsRemaining );
+	bSizer164->Add( m_panelItemsRemaining, 0, wxTOP|wxEXPAND, 7 );
 	
-	m_staticTextRemTime = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_panelTimeRemaining = new wxPanel( m_panelProgress, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panelTimeRemaining->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+	
+	wxBoxSizer* bSizer167;
+	bSizer167 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer167->Add( 0, 5, 0, 0, 5 );
+	
+	wxStaticText* m_staticText98;
+	m_staticText98 = new wxStaticText( m_panelTimeRemaining, wxID_ANY, _("Time remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText98->Wrap( -1 );
+	bSizer167->Add( m_staticText98, 0, wxALIGN_BOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	m_staticTextRemTime = new wxStaticText( m_panelTimeRemaining, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextRemTime->Wrap( -1 );
 	m_staticTextRemTime->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 	
-	fgSizer10->Add( m_staticTextRemTime, 0, wxALIGN_BOTTOM, 5 );
+	bSizer167->Add( m_staticTextRemTime, 0, wxALIGN_BOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticTextLabelElapsedTime = new wxStaticText( m_panelProgress, wxID_ANY, _("Time elapsed:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextLabelElapsedTime->Wrap( -1 );
-	fgSizer10->Add( m_staticTextLabelElapsedTime, 0, wxALIGN_BOTTOM, 5 );
 	
-	m_staticTextTimeElapsed = new wxStaticText( m_panelProgress, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer167->Add( 0, 5, 0, 0, 5 );
+	
+	
+	m_panelTimeRemaining->SetSizer( bSizer167 );
+	m_panelTimeRemaining->Layout();
+	bSizer167->Fit( m_panelTimeRemaining );
+	bSizer164->Add( m_panelTimeRemaining, 0, wxTOP|wxEXPAND, 7 );
+	
+	wxPanel* m_panelTimeElapsed;
+	m_panelTimeElapsed = new wxPanel( m_panelProgress, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panelTimeElapsed->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+	
+	wxBoxSizer* bSizer168;
+	bSizer168 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer168->Add( 0, 5, 0, 0, 5 );
+	
+	wxStaticText* m_staticText961;
+	m_staticText961 = new wxStaticText( m_panelTimeElapsed, wxID_ANY, _("Time elapsed:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText961->Wrap( -1 );
+	bSizer168->Add( m_staticText961, 0, wxALIGN_BOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	m_staticTextTimeElapsed = new wxStaticText( m_panelTimeElapsed, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextTimeElapsed->Wrap( -1 );
 	m_staticTextTimeElapsed->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 	
-	fgSizer10->Add( m_staticTextTimeElapsed, 0, wxALIGN_BOTTOM, 5 );
+	bSizer168->Add( m_staticTextTimeElapsed, 0, wxALIGN_BOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	
-	bSizer171->Add( fgSizer10, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer168->Add( 0, 5, 0, 0, 5 );
+	
+	
+	m_panelTimeElapsed->SetSizer( bSizer168 );
+	m_panelTimeElapsed->Layout();
+	bSizer168->Fit( m_panelTimeElapsed );
+	bSizer164->Add( m_panelTimeElapsed, 0, wxTOP|wxEXPAND, 7 );
+	
+	
+	bSizer171->Add( bSizer164, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer171->Add( 10, 0, 0, 0, 5 );
 	
-	m_panelGraph = new zen::Graph2D( m_panelProgress, wxID_ANY, wxDefaultPosition, wxSize( 340,150 ), wxTAB_TRAVERSAL );
-	m_panelGraph->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+	wxBoxSizer* bSizer161;
+	bSizer161 = new wxBoxSizer( wxVERTICAL );
 	
-	bSizer171->Add( m_panelGraph, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxTOP, 10 );
+	
+	bSizer161->Add( 0, 15, 0, 0, 5 );
+	
+	m_panelGraphBytes = new zen::Graph2D( m_panelProgress, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_panelGraphBytes->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+	
+	bSizer161->Add( m_panelGraphBytes, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	m_panelGraphItems = new zen::Graph2D( m_panelProgress, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_panelGraphItems->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+	
+	bSizer161->Add( m_panelGraphItems, 1, wxEXPAND, 5 );
+	
+	
+	bSizer161->Add( 420, 0, 0, 0, 5 );
+	
+	
+	bSizer171->Add( bSizer161, 1, wxEXPAND, 5 );
+	
+	
+	bSizer171->Add( 0, 230, 0, 0, 5 );
 	
 	
 	bSizer173->Add( bSizer171, 1, wxEXPAND, 5 );
@@ -1404,26 +1520,10 @@ SyncProgressDlgGenerated::SyncProgressDlgGenerated( wxWindow* parent, wxWindowID
 	this->SetSizer( bSizerRoot );
 	this->Layout();
 	bSizerRoot->Fit( this );
-	
-	this->Centre( wxBOTH );
-	
-	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncProgressDlgGenerated::OnClose ) );
-	this->Connect( wxEVT_ICONIZE, wxIconizeEventHandler( SyncProgressDlgGenerated::OnIconize ) );
-	m_buttonClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnOkay ), NULL, this );
-	m_buttonPause->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnPause ), NULL, this );
-	m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnCancel ), NULL, this );
 }
 
-SyncProgressDlgGenerated::~SyncProgressDlgGenerated()
+SyncProgressPanelGenerated::~SyncProgressPanelGenerated()
 {
-	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncProgressDlgGenerated::OnClose ) );
-	this->Disconnect( wxEVT_ICONIZE, wxIconizeEventHandler( SyncProgressDlgGenerated::OnIconize ) );
-	m_buttonClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnOkay ), NULL, this );
-	m_buttonPause->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnPause ), NULL, this );
-	m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncProgressDlgGenerated::OnCancel ), NULL, this );
-	
 }
 
 LogPanelGenerated::LogPanelGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -1439,13 +1539,13 @@ LogPanelGenerated::LogPanelGenerated( wxWindow* parent, wxWindowID id, const wxP
 	wxBoxSizer* bSizer154;
 	bSizer154 = new wxBoxSizer( wxVERTICAL );
 	
-	m_bpButtonErrors = new ToggleButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), wxBU_AUTODRAW );
+	m_bpButtonErrors = new ToggleButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 49,49 ), wxBU_AUTODRAW );
 	bSizer154->Add( m_bpButtonErrors, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_bpButtonWarnings = new ToggleButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), wxBU_AUTODRAW );
+	m_bpButtonWarnings = new ToggleButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 49,49 ), wxBU_AUTODRAW );
 	bSizer154->Add( m_bpButtonWarnings, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	m_bpButtonInfo = new ToggleButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), wxBU_AUTODRAW );
+	m_bpButtonInfo = new ToggleButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 49,49 ), wxBU_AUTODRAW );
 	bSizer154->Add( m_bpButtonInfo, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	
@@ -1478,6 +1578,200 @@ LogPanelGenerated::~LogPanelGenerated()
 	m_bpButtonErrors->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LogPanelGenerated::OnErrors ), NULL, this );
 	m_bpButtonWarnings->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LogPanelGenerated::OnWarnings ), NULL, this );
 	m_bpButtonInfo->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LogPanelGenerated::OnInfo ), NULL, this );
+	
+}
+
+SyncConfirmationDlgGenerated::SyncConfirmationDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
+	
+	wxBoxSizer* bSizer134;
+	bSizer134 = new wxBoxSizer( wxVERTICAL );
+	
+	m_panelStatistics = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_panelStatistics->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+	
+	wxBoxSizer* bSizer169;
+	bSizer169 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_bitmapSync = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer169->Add( m_bitmapSync, 0, wxALL, 10 );
+	
+	m_staticline39 = new wxStaticLine( m_panelStatistics, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
+	bSizer169->Add( m_staticline39, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer162;
+	bSizer162 = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizer172;
+	bSizer172 = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText84 = new wxStaticText( m_panelStatistics, wxID_ANY, _("Variant"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText84->Wrap( -1 );
+	bSizer172->Add( m_staticText84, 0, wxALL, 5 );
+	
+	m_staticTextVariant = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextVariant->Wrap( -1 );
+	m_staticTextVariant->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	
+	bSizer172->Add( m_staticTextVariant, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	
+	bSizer172->Add( 0, 10, 0, 0, 5 );
+	
+	
+	bSizer162->Add( bSizer172, 0, wxEXPAND, 5 );
+	
+	m_staticline14 = new wxStaticLine( m_panelStatistics, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	bSizer162->Add( m_staticline14, 0, wxEXPAND, 5 );
+	
+	m_staticText83 = new wxStaticText( m_panelStatistics, wxID_ANY, _("Statistics"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText83->Wrap( -1 );
+	bSizer162->Add( m_staticText83, 0, wxALL, 5 );
+	
+	wxFlexGridSizer* fgSizer11;
+	fgSizer11 = new wxFlexGridSizer( 2, 7, 2, 5 );
+	fgSizer11->SetFlexibleDirection( wxBOTH );
+	fgSizer11->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_bitmapCreateLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	m_bitmapCreateLeft->SetToolTip( _("Number of files and folders that will be created") );
+	
+	fgSizer11->Add( m_bitmapCreateLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_bitmapUpdateLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	m_bitmapUpdateLeft->SetToolTip( _("Number of files that will be overwritten") );
+	
+	fgSizer11->Add( m_bitmapUpdateLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_bitmapDeleteLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	m_bitmapDeleteLeft->SetToolTip( _("Number of files and folders that will be deleted") );
+	
+	fgSizer11->Add( m_bitmapDeleteLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_bitmapData = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	m_bitmapData->SetToolTip( _("Total bytes to copy") );
+	
+	fgSizer11->Add( m_bitmapData, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_bitmapDeleteRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	m_bitmapDeleteRight->SetToolTip( _("Number of files and folders that will be deleted") );
+	
+	fgSizer11->Add( m_bitmapDeleteRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_bitmapUpdateRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	m_bitmapUpdateRight->SetToolTip( _("Number of files that will be overwritten") );
+	
+	fgSizer11->Add( m_bitmapUpdateRight, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_bitmapCreateRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	m_bitmapCreateRight->SetToolTip( _("Number of files and folders that will be created") );
+	
+	fgSizer11->Add( m_bitmapCreateRight, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_staticTextCreateLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextCreateLeft->Wrap( -1 );
+	m_staticTextCreateLeft->SetToolTip( _("Number of files and folders that will be created") );
+	
+	fgSizer11->Add( m_staticTextCreateLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_staticTextUpdateLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUpdateLeft->Wrap( -1 );
+	m_staticTextUpdateLeft->SetToolTip( _("Number of files that will be overwritten") );
+	
+	fgSizer11->Add( m_staticTextUpdateLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_staticTextDeleteLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDeleteLeft->Wrap( -1 );
+	m_staticTextDeleteLeft->SetToolTip( _("Number of files and folders that will be deleted") );
+	
+	fgSizer11->Add( m_staticTextDeleteLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextData = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextData->Wrap( -1 );
+	m_staticTextData->SetToolTip( _("Total bytes to copy") );
+	
+	fgSizer11->Add( m_staticTextData, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextDeleteRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDeleteRight->Wrap( -1 );
+	m_staticTextDeleteRight->SetToolTip( _("Number of files and folders that will be deleted") );
+	
+	fgSizer11->Add( m_staticTextDeleteRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextUpdateRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextUpdateRight->Wrap( -1 );
+	m_staticTextUpdateRight->SetToolTip( _("Number of files that will be overwritten") );
+	
+	fgSizer11->Add( m_staticTextUpdateRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticTextCreateRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextCreateRight->Wrap( -1 );
+	m_staticTextCreateRight->SetToolTip( _("Number of files and folders that will be created") );
+	
+	fgSizer11->Add( m_staticTextCreateRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer162->Add( fgSizer11, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxRIGHT|wxLEFT, 25 );
+	
+	
+	bSizer162->Add( 0, 5, 0, 0, 5 );
+	
+	
+	bSizer169->Add( bSizer162, 0, 0, 5 );
+	
+	
+	m_panelStatistics->SetSizer( bSizer169 );
+	m_panelStatistics->Layout();
+	bSizer169->Fit( m_panelStatistics );
+	bSizer134->Add( m_panelStatistics, 0, wxEXPAND, 5 );
+	
+	m_staticline12 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	bSizer134->Add( m_staticline12, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer164;
+	bSizer164 = new wxBoxSizer( wxVERTICAL );
+	
+	m_checkBoxDontShowAgain = new wxCheckBox( this, wxID_ANY, _("Don't show this dialog again"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer164->Add( m_checkBoxDontShowAgain, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_buttonStartSync = new wxButton( this, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+	m_buttonStartSync->SetDefault(); 
+	m_buttonStartSync->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	
+	bSizerStdButtons->Add( m_buttonStartSync, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
+	bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
+	
+	
+	bSizer164->Add( bSizerStdButtons, 0, wxALIGN_RIGHT, 5 );
+	
+	
+	bSizer134->Add( bSizer164, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( bSizer134 );
+	this->Layout();
+	bSizer134->Fit( this );
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncConfirmationDlgGenerated::OnClose ) );
+	m_buttonStartSync->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncConfirmationDlgGenerated::OnStartSync ), NULL, this );
+	m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncConfirmationDlgGenerated::OnCancel ), NULL, this );
+}
+
+SyncConfirmationDlgGenerated::~SyncConfirmationDlgGenerated()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncConfirmationDlgGenerated::OnClose ) );
+	m_buttonStartSync->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncConfirmationDlgGenerated::OnStartSync ), NULL, this );
+	m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncConfirmationDlgGenerated::OnCancel ), NULL, this );
 	
 }
 
@@ -3188,200 +3482,6 @@ GlobalSettingsDlgGenerated::~GlobalSettingsDlgGenerated()
 	m_buttonDefault->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnDefault ), NULL, this );
 	m_buttonOkay->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnOkay ), NULL, this );
 	m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnCancel ), NULL, this );
-	
-}
-
-SyncConfirmationDlgGenerated::SyncConfirmationDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
-	
-	wxBoxSizer* bSizer134;
-	bSizer134 = new wxBoxSizer( wxVERTICAL );
-	
-	m_panelStatistics = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	m_panelStatistics->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
-	
-	wxBoxSizer* bSizer169;
-	bSizer169 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_bitmapSync = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer169->Add( m_bitmapSync, 0, wxALL, 10 );
-	
-	m_staticline39 = new wxStaticLine( m_panelStatistics, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL );
-	bSizer169->Add( m_staticline39, 0, wxEXPAND, 5 );
-	
-	wxBoxSizer* bSizer162;
-	bSizer162 = new wxBoxSizer( wxVERTICAL );
-	
-	wxBoxSizer* bSizer172;
-	bSizer172 = new wxBoxSizer( wxVERTICAL );
-	
-	m_staticText84 = new wxStaticText( m_panelStatistics, wxID_ANY, _("Variant"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText84->Wrap( -1 );
-	bSizer172->Add( m_staticText84, 0, wxALL, 5 );
-	
-	m_staticTextVariant = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextVariant->Wrap( -1 );
-	m_staticTextVariant->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
-	
-	bSizer172->Add( m_staticTextVariant, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
-	
-	
-	bSizer172->Add( 0, 10, 0, 0, 5 );
-	
-	
-	bSizer162->Add( bSizer172, 0, wxEXPAND, 5 );
-	
-	m_staticline14 = new wxStaticLine( m_panelStatistics, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	bSizer162->Add( m_staticline14, 0, wxEXPAND, 5 );
-	
-	m_staticText83 = new wxStaticText( m_panelStatistics, wxID_ANY, _("Statistics"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText83->Wrap( -1 );
-	bSizer162->Add( m_staticText83, 0, wxALL, 5 );
-	
-	wxFlexGridSizer* fgSizer11;
-	fgSizer11 = new wxFlexGridSizer( 2, 7, 2, 5 );
-	fgSizer11->SetFlexibleDirection( wxBOTH );
-	fgSizer11->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_bitmapCreateLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	m_bitmapCreateLeft->SetToolTip( _("Number of files and folders that will be created") );
-	
-	fgSizer11->Add( m_bitmapCreateLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_bitmapUpdateLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	m_bitmapUpdateLeft->SetToolTip( _("Number of files that will be overwritten") );
-	
-	fgSizer11->Add( m_bitmapUpdateLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_bitmapDeleteLeft = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	m_bitmapDeleteLeft->SetToolTip( _("Number of files and folders that will be deleted") );
-	
-	fgSizer11->Add( m_bitmapDeleteLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_bitmapData = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	m_bitmapData->SetToolTip( _("Total bytes to copy") );
-	
-	fgSizer11->Add( m_bitmapData, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_bitmapDeleteRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	m_bitmapDeleteRight->SetToolTip( _("Number of files and folders that will be deleted") );
-	
-	fgSizer11->Add( m_bitmapDeleteRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_bitmapUpdateRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	m_bitmapUpdateRight->SetToolTip( _("Number of files that will be overwritten") );
-	
-	fgSizer11->Add( m_bitmapUpdateRight, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_bitmapCreateRight = new wxStaticBitmap( m_panelStatistics, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	m_bitmapCreateRight->SetToolTip( _("Number of files and folders that will be created") );
-	
-	fgSizer11->Add( m_bitmapCreateRight, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_staticTextCreateLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextCreateLeft->Wrap( -1 );
-	m_staticTextCreateLeft->SetToolTip( _("Number of files and folders that will be created") );
-	
-	fgSizer11->Add( m_staticTextCreateLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_staticTextUpdateLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUpdateLeft->Wrap( -1 );
-	m_staticTextUpdateLeft->SetToolTip( _("Number of files that will be overwritten") );
-	
-	fgSizer11->Add( m_staticTextUpdateLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_staticTextDeleteLeft = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextDeleteLeft->Wrap( -1 );
-	m_staticTextDeleteLeft->SetToolTip( _("Number of files and folders that will be deleted") );
-	
-	fgSizer11->Add( m_staticTextDeleteLeft, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticTextData = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextData->Wrap( -1 );
-	m_staticTextData->SetToolTip( _("Total bytes to copy") );
-	
-	fgSizer11->Add( m_staticTextData, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticTextDeleteRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextDeleteRight->Wrap( -1 );
-	m_staticTextDeleteRight->SetToolTip( _("Number of files and folders that will be deleted") );
-	
-	fgSizer11->Add( m_staticTextDeleteRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticTextUpdateRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextUpdateRight->Wrap( -1 );
-	m_staticTextUpdateRight->SetToolTip( _("Number of files that will be overwritten") );
-	
-	fgSizer11->Add( m_staticTextUpdateRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticTextCreateRight = new wxStaticText( m_panelStatistics, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextCreateRight->Wrap( -1 );
-	m_staticTextCreateRight->SetToolTip( _("Number of files and folders that will be created") );
-	
-	fgSizer11->Add( m_staticTextCreateRight, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	bSizer162->Add( fgSizer11, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxRIGHT|wxLEFT, 25 );
-	
-	
-	bSizer162->Add( 0, 5, 0, 0, 5 );
-	
-	
-	bSizer169->Add( bSizer162, 0, 0, 5 );
-	
-	
-	m_panelStatistics->SetSizer( bSizer169 );
-	m_panelStatistics->Layout();
-	bSizer169->Fit( m_panelStatistics );
-	bSizer134->Add( m_panelStatistics, 0, wxEXPAND, 5 );
-	
-	m_staticline12 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	bSizer134->Add( m_staticline12, 0, wxEXPAND, 5 );
-	
-	wxBoxSizer* bSizer164;
-	bSizer164 = new wxBoxSizer( wxVERTICAL );
-	
-	m_checkBoxDontShowAgain = new wxCheckBox( this, wxID_ANY, _("Don't show this dialog again"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer164->Add( m_checkBoxDontShowAgain, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP|wxRIGHT|wxLEFT, 5 );
-	
-	bSizerStdButtons = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_buttonStartSync = new wxButton( this, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-	m_buttonStartSync->SetDefault(); 
-	m_buttonStartSync->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
-	
-	bSizerStdButtons->Add( m_buttonStartSync, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
-	m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( -1,30 ), 0 );
-	bSizerStdButtons->Add( m_buttonCancel, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
-	
-	
-	bSizer164->Add( bSizerStdButtons, 0, wxALIGN_RIGHT, 5 );
-	
-	
-	bSizer134->Add( bSizer164, 1, wxEXPAND, 5 );
-	
-	
-	this->SetSizer( bSizer134 );
-	this->Layout();
-	bSizer134->Fit( this );
-	
-	this->Centre( wxBOTH );
-	
-	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncConfirmationDlgGenerated::OnClose ) );
-	m_buttonStartSync->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncConfirmationDlgGenerated::OnStartSync ), NULL, this );
-	m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncConfirmationDlgGenerated::OnCancel ), NULL, this );
-}
-
-SyncConfirmationDlgGenerated::~SyncConfirmationDlgGenerated()
-{
-	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncConfirmationDlgGenerated::OnClose ) );
-	m_buttonStartSync->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncConfirmationDlgGenerated::OnStartSync ), NULL, this );
-	m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncConfirmationDlgGenerated::OnCancel ), NULL, this );
 	
 }
 

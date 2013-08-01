@@ -620,20 +620,28 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
                                         nullptr, // __in  LPCTSTR lpPassword,
                                         nullptr, // __in  LPCTSTR lpUsername,
                                         0);      //__in  DWORD dwFlags
+        //53L	ERROR_BAD_NETPATH		The network path was not found.
+        //86L	ERROR_INVALID_PASSWORD
+        //1219L	ERROR_SESSION_CREDENTIAL_CONFLICT	Multiple connections to a server or shared resource by the same user, using more than one user name, are not allowed. Disconnect all previous connections to the server or shared resource and try again.
+        //1326L	ERROR_LOGON_FAILURE	Logon failure: unknown user name or bad password.
+        //1236L ERROR_CONNECTION_ABORTED
         if (somethingExists(trgRes.lpRemoteName)) //blocks!
             return; //success: connection usable! -> don't care about "rv"
 
         if (rv == ERROR_BAD_NETPATH || //Windows 7
-            rv == ERROR_BAD_NET_NAME)  //XP
+            rv == ERROR_BAD_NET_NAME|| //XP
+            rv == ERROR_CONNECTION_ABORTED) //failed to connect to a network that existed not too long ago; will later return ERROR_BAD_NETPATH
             return; //no need to show a prompt for an unreachable network device
 
         //2. if first attempt failed, we need to *force* prompt by using CONNECT_PROMPT
         if (allowUserInteraction)
         {
             //avoid problem II.)
-            DWORD rv2= WNetCancelConnection2(trgRes.lpRemoteName, //_In_  LPCTSTR lpName,
-                                             0,					  //_In_  DWORD dwFlags,
-                                             true);				  //_In_  BOOL fForce
+            DWORD rv2= ::WNetCancelConnection2(trgRes.lpRemoteName, //_In_  LPCTSTR lpName,
+                                               0,					  //_In_  DWORD dwFlags,
+                                               true);				  //_In_  BOOL fForce
+            //2250L ERROR_NOT_CONNECTED
+
             //enforce login prompt
             DWORD rv3 = ::WNetAddConnection2(&trgRes, // __in  LPNETRESOURCE lpNetResource,
                                              nullptr, // __in  LPCTSTR lpPassword,
@@ -641,11 +649,6 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
                                              CONNECT_INTERACTIVE | CONNECT_PROMPT); //__in  DWORD dwFlags
             (void)rv2;
             (void)rv3;
-            //Sample error codes:
-            //53L	ERROR_BAD_NETPATH		The network path was not found.
-            //86L	ERROR_INVALID_PASSWORD
-            //1219L	ERROR_SESSION_CREDENTIAL_CONFLICT	Multiple connections to a server or shared resource by the same user, using more than one user name, are not allowed. Disconnect all previous connections to the server or shared resource and try again.
-            //1326L	ERROR_LOGON_FAILURE	Logon failure: unknown user name or bad password.
         }
     };
 

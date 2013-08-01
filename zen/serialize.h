@@ -56,7 +56,7 @@ private:
 //----------------------------------------------------------------------
 //functions based on binary container abstraction
 template <class BinContainer>         void saveBinStream(const Zstring& filename, const BinContainer& cont); //throw FileError
-template <class BinContainer> BinContainer loadBinStream(const Zstring& filename); //throw FileError, ErrorNotExisting
+template <class BinContainer> BinContainer loadBinStream(const Zstring& filename); //throw FileError
 
 
 /*
@@ -157,11 +157,11 @@ void saveBinStream(const Zstring& filename, const BinContainer& cont) //throw Fi
 
 
 template <class BinContainer> inline
-BinContainer loadBinStream(const Zstring& filename) //throw FileError, ErrorNotExisting
+BinContainer loadBinStream(const Zstring& filename) //throw FileError
 {
     assert_static(sizeof(typename BinContainer::value_type) == 1); //expect: bytes (until further)
 
-    FileInput fileIn(filename); //throw FileError, ErrorNotExisting
+    FileInput fileIn(filename); //throw FileError
 
     BinContainer contOut;
     const size_t blockSize = 128 * 1024;

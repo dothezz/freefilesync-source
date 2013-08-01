@@ -180,7 +180,7 @@ public:
         errorMsg.clear();
         errorResponse.reset();
 
-        dummy.unlock(); //optimization for condition_variable::notify_one()
+        dummy.unlock(); //optimization for condition_variable::notify_all()
         conditionCanReportError.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
 
         return rv;
@@ -194,7 +194,7 @@ public:
             FillBufferCallback::HandleError rv = callback.reportError(copyStringTo<std::wstring>(errorMsg)); //throw!
             errorResponse = make_unique<FillBufferCallback::HandleError>(rv);
 
-            dummy.unlock(); //optimization for condition_variable::notify_one()
+            dummy.unlock(); //optimization for condition_variable::notify_all()
             conditionGotResponse.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
         }
     }
@@ -236,7 +236,7 @@ public:
             std::wstring statusText = copyStringTo<std::wstring>(textScanning);
             const long activeCount = activeWorker;
             if (activeCount >= 2)
-                statusText += L" " + replaceCpy(_P("[1 Thread]", "[%x Threads]", activeCount), L"%x", numberTo<std::wstring>(activeCount));
+                statusText += L" [" + replaceCpy(_P("1 thread", "%x threads", activeCount), L"%x", numberTo<std::wstring>(activeCount)) + L"]";
 
             statusText += L" " + fmtFileName(filename);
             return statusText;
@@ -273,8 +273,8 @@ private:
     boost::detail::atomic_count itemsScanned;
     boost::detail::atomic_count activeWorker;
 };
-//-------------------------------------------------------------------------------------------------
 
+//-------------------------------------------------------------------------------------------------
 
 struct TraverserShared
 {

@@ -233,11 +233,11 @@ void zen::checkForUpdateNow(wxWindow* parent)
                     wxLaunchDefaultBrowser(L"http://freefilesync.sourceforge.net/get_latest.php");
             }
             else
-                wxMessageBox(_("FreeFileSync is up to date."), _("Information"), wxOK | wxICON_INFORMATION, parent);
+                wxMessageBox(_("FreeFileSync is up to date."), L"FreeFileSync - " + _("Information"), wxOK | wxICON_INFORMATION, parent);
             break;
 
         case GET_VER_NO_CONNECTION:
-            wxMessageBox(_("Unable to connect to sourceforge.net."), _("Error"), wxOK | wxICON_ERROR, parent);
+            wxMessageBox(_("Unable to connect to sourceforge.net."), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR, parent);
             break;
 
         case GET_VER_PAGE_NOT_FOUND:

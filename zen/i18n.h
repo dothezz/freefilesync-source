@@ -68,6 +68,7 @@ std::wstring translate(const std::wstring& text)
 inline
 std::wstring translate(const std::wstring& singular, const std::wstring& plural, int n)
 {
+    if (n < 0) n = -n;
     return getTranslator() ? getTranslator()->translate(singular, plural, n) : n == 1 ? singular : plural;
 }
 

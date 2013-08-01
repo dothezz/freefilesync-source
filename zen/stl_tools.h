@@ -183,6 +183,9 @@ template <class K, class V> class hash_map : public std::map<K, V> {};
 #else
 template <class T>          class hash_set : public std::unordered_set<T> {};
 template <class K, class V> class hash_map : public std::unordered_map<K, V> {};
+//C++11:
+//template <class T>          using hash_set = std::unordered_set<T>;
+//template <class K, class V> using hash_map = std::unordered_map<K, V>;
 #endif
 
 //as long as variadic templates are not available in MSVC

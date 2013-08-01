@@ -426,7 +426,7 @@ public:
     {
         assert(boost::this_thread::get_id() == mainThreadId );
         {
-            boost::unique_lock<boost::mutex> dummy(lockFiles);
+            boost::lock_guard<boost::mutex> dummy(lockFiles);
             filesToLoad = newLoad;
         }
         conditionNewFiles.notify_all(); //instead of notify_one(); workaround bug: https://svn.boost.org/trac/boost/ticket/7796
@@ -437,7 +437,7 @@ public:
     {
         assert(boost::this_thread::get_id() == mainThreadId );
         {
-            boost::unique_lock<boost::mutex> dummy(lockFiles);
+            boost::lock_guard<boost::mutex> dummy(lockFiles);
             filesToLoad.push_back(newEntry); //set as next item to retrieve
         }
         conditionNewFiles.notify_all();

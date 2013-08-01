@@ -316,9 +316,8 @@ public:
         try { tryCleanup(false); }
         catch (...) {} //always (try to) clean up, even if synchronization is aborted!
         /*
-        do not allow user callback:
-        - make sure this stays non-blocking!
-        - avoid throwing user abort exception again, leading to incomplete clean-up!
+        may block heavily, but still do not allow user callback:
+        -> avoid throwing user cancel exception again, leading to incomplete clean-up!
         */
     }
 
@@ -364,8 +363,6 @@ private:
     std::wstring txtRemovingFile;
     std::wstring txtRemovingSymlink;
     std::wstring txtRemovingDirectory;
-
-    bool cleanedUp;
 };
 
 
@@ -380,8 +377,7 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel, //nothrow!
     versioningDir_(versioningDir),
     versioningStyle_(versioningStyle),
     timeStamp_(timeStamp),
-    deletionPolicy_(handleDel),
-    cleanedUp(false)
+    deletionPolicy_(handleDel)
 {
     switch (deletionPolicy_)
     {
@@ -480,42 +476,42 @@ Zstring DeletionHandling::getOrCreateRecyclerTempDirPf() //throw FileError
 
 void DeletionHandling::tryCleanup(bool allowUserCallback) //throw FileError
 {
-    if (!cleanedUp)
+    switch (deletionPolicy_)
     {
-        switch (deletionPolicy_)
-        {
-            case DELETE_PERMANENTLY:
-                break;
+        case DELETE_PERMANENTLY:
+            break;
 
-            case DELETE_TO_RECYCLER:
+        case DELETE_TO_RECYCLER:
 #ifdef ZEN_WIN
-                if (!recyclerTmpDir.empty())
-                {
-                    //move content of temporary directory to recycle bin in a single call
-                    CallbackMassRecycling cbmr(procCallback_);
-                    recycleOrDelete(toBeRecycled, allowUserCallback ? &cbmr : nullptr); //throw FileError
+            if (!toBeRecycled.empty())
+            {
+                //move content of temporary directory to recycle bin in a single call
+                CallbackMassRecycling cbmr(procCallback_);
+                recycleOrDelete(toBeRecycled, allowUserCallback ? &cbmr : nullptr); //throw FileError
+                toBeRecycled.clear();
+            }
 
-                    //clean up temp directory itself (should contain remnant empty directories only)
-                    removeDirectory(recyclerTmpDir); //throw FileError
-                }
+            //clean up temp directory itself (should contain remnant empty directories only)
+            if (!recyclerTmpDir.empty())
+            {
+                removeDirectory(recyclerTmpDir); //throw FileError
+                recyclerTmpDir.clear();
+            }
 #endif
-                break;
+            break;
 
-            case DELETE_TO_VERSIONING:
-                //if (versioner.get())
-                //{
-                //    if (allowUserCallback)
-                //    {
-                //        procCallback_.reportStatus(_("Removing old versions...")); //throw ?
-                //        versioner->limitVersions([&] { procCallback_.requestUiRefresh(); /*throw ? */ }); //throw FileError
-                //    }
-                //    else
-                //        versioner->limitVersions([] {}); //throw FileError
-                //}
-                break;
-        }
-
-        cleanedUp = true;
+        case DELETE_TO_VERSIONING:
+            //if (versioner.get())
+            //{
+            //    if (allowUserCallback)
+            //    {
+            //        procCallback_.reportStatus(_("Removing old versions...")); //throw ?
+            //        versioner->limitVersions([&] { procCallback_.requestUiRefresh(); /*throw ? */ }); //throw FileError
+            //    }
+            //    else
+            //        versioner->limitVersions([] {}); //throw FileError
+            //}
+            break;
     }
 }
 
@@ -856,9 +852,8 @@ private:
         //[...]
 
         //recurse into sub-dirs
-        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(), [&](const HierarchyObject& subDir) { this->recurse(subDir); });
-        //for (auto& subDir : hierObj.refSubDirs())
-        //      recurse(subDir);
+        for (auto& subDir : hierObj.refSubDirs())
+            recurse(subDir);
     }
 
     Int64 spaceNeededLeft;
@@ -1063,7 +1058,7 @@ void SynchronizeFolderPair::prepare2StepMove(FilePair& sourceObj,
     sourceObj.removeObject<side>(); //remove only *after* evaluating "sourceObj, side"!
 
     //prepare move in second pass
-    tempFile.setSyncDir(side == LEFT_SIDE ? SYNC_DIR_LEFT : SYNC_DIR_RIGHT);
+    tempFile.setSyncDir(side == LEFT_SIDE ? SyncDirection::LEFT : SyncDirection::RIGHT);
 
     targetObj.setMoveRef(tempFile .getId());
     tempFile .setMoveRef(targetObj.getId());
@@ -1146,7 +1141,8 @@ void SynchronizeFolderPair::manageFileMove(FilePair& sourceObj,
             return prepare2StepMove<side>(sourceObj, targetObj); //throw FileError
 
         //finally start move! this should work now:
-        synchronizeFile(sourceObj); //throw FileError
+        synchronizeFile(targetObj); //throw FileError
+        //SynchronizeFolderPair::synchronizeFileInt() is *not* expecting SO_MOVE_LEFT_SOURCE/SO_MOVE_RIGHT_SOURCE => start move from targetObj, not sourceObj!
     }
     //else: sourceObj will not be deleted, and is not standing in the way => delay to second pass
     //note: this case may include new "move sources" from two-step sub-routine!!!
@@ -1504,6 +1500,7 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& fileObj, SyncOperation 
 
                 procCallback_.updateProcessedData(1, 0);
             }
+            else (assert(false));
             break;
 
         case SO_OVERWRITE_LEFT:
@@ -1532,7 +1529,10 @@ void SynchronizeFolderPair::synchronizeFileInt(FilePair& fileObj, SyncOperation 
 
                 //fileObj.removeObject<sideTrg>(); -> doesn't make sense for isFollowedSymlink(); "fileObj, sideTrg" evaluated below!
 
-                reportStatus(txtOverwritingFile, targetFile); //restore status text copy file
+                //if fail-safe file copy is active, then the next operation will be a simple "rename"
+                //=> don't risk reportStatus() throwing GuiAbortProcess() leaving the target deleted rather than updated!
+                if (!transactionalFileCopy_)
+                    reportStatus(txtOverwritingFile, targetFile); //restore status text copy file
             }); //throw FileError
 
             //update FilePair
@@ -1668,12 +1668,14 @@ void SynchronizeFolderPair::synchronizeLinkInt(SymlinkPair& linkObj, SyncOperati
         case SO_OVERWRITE_RIGHT:
             reportInfo(txtOverwritingLink, linkObj.getFullName<sideTrg>());
 
-            reportStatus(getDelHandling<sideTrg>().getTxtRemovingSymLink(), linkObj.getFullName<sideTrg>());
+            //reportStatus(getDelHandling<sideTrg>().getTxtRemovingSymLink(), linkObj.getFullName<sideTrg>());
             getDelHandling<sideTrg>().removeLinkUpdating(linkObj.getFullName<sideTrg>(), linkObj.getObjRelativeName(), 0, [] {}); //throw FileError
 
             //linkObj.removeObject<sideTrg>(); -> "linkObj, sideTrg" evaluated below!
 
-            reportStatus(txtOverwritingLink, linkObj.getFullName<sideTrg>()); //restore status text
+            //=> don't risk reportStatus() throwing GuiAbortProcess() leaving the target deleted rather than updated:
+
+            //reportStatus(txtOverwritingLink, linkObj.getFullName<sideTrg>()); //restore status text
             zen::copySymlink(linkObj.getFullName<sideSrc>(),
                              linkObj.getBaseDirPf<sideTrg>() + linkObj.getRelativeName<sideSrc>(), //respect differences in case of source object
                              copyFilePermissions_); //throw FileError
@@ -2172,14 +2174,12 @@ void zen::synchronize(const TimeComp& timeStamp,
     //check if user accidentally selected wrong directories for sync
     if (!significantDiff.empty())
     {
-        std::wstring msg = _("Significant difference detected:");
+        std::wstring msg = _("The following folders are significantly different. Make sure you are matching the correct folders for synchronization.");
 
         for (auto it = significantDiff.begin(); it != significantDiff.end(); ++it)
             msg += std::wstring(L"\n\n") +
                    it->first + L" <-> " + L"\n" +
                    it->second;
-        msg += L"\n\n";
-        msg += _("More than 50% of the total number of files will be copied or deleted.");
 
         callback.reportWarning(msg, warnings.warningSignificantDifference);
     }
@@ -2245,12 +2245,11 @@ void zen::synchronize(const TimeComp& timeStamp,
         //loop through all directory pairs
         for (auto j = begin(folderCmp); j != end(folderCmp); ++j)
         {
-            //exclude some pathological case (leftdir, rightdir are empty)
+            //exclude pathological cases (e.g. leftdir, rightdir are empty)
             if (EqualFilename()(j->getBaseDirPf<LEFT_SIDE>(), j->getBaseDirPf<RIGHT_SIDE>()))
                 continue;
 
             //------------------------------------------------------------------------------------------
-            //always report folder pairs for log file, even if there is no work to do
             callback.reportInfo(_("Synchronizing folder pair:") + L"\n" +
                                 L"    " + j->getBaseDirPf<LEFT_SIDE >() + L"\n" +
                                 L"    " + j->getBaseDirPf<RIGHT_SIDE>());

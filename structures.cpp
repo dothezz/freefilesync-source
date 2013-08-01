@@ -55,21 +55,21 @@ DirectionSet zen::extractDirections(const DirectionConfig& cfg)
             throw std::logic_error("there are no predefined directions for automatic mode!");
 
         case DirectionConfig::MIRROR:
-            output.exLeftSideOnly  = SYNC_DIR_RIGHT;
-            output.exRightSideOnly = SYNC_DIR_RIGHT;
-            output.leftNewer       = SYNC_DIR_RIGHT;
-            output.rightNewer      = SYNC_DIR_RIGHT;
-            output.different       = SYNC_DIR_RIGHT;
-            output.conflict        = SYNC_DIR_RIGHT;
+            output.exLeftSideOnly  = SyncDirection::RIGHT;
+            output.exRightSideOnly = SyncDirection::RIGHT;
+            output.leftNewer       = SyncDirection::RIGHT;
+            output.rightNewer      = SyncDirection::RIGHT;
+            output.different       = SyncDirection::RIGHT;
+            output.conflict        = SyncDirection::RIGHT;
             break;
 
         case DirectionConfig::UPDATE:
-            output.exLeftSideOnly  = SYNC_DIR_RIGHT;
-            output.exRightSideOnly = SYNC_DIR_NONE;
-            output.leftNewer       = SYNC_DIR_RIGHT;
-            output.rightNewer      = SYNC_DIR_NONE;
-            output.different       = SYNC_DIR_RIGHT;
-            output.conflict        = SYNC_DIR_NONE;
+            output.exLeftSideOnly  = SyncDirection::RIGHT;
+            output.exRightSideOnly = SyncDirection::NONE;
+            output.leftNewer       = SyncDirection::RIGHT;
+            output.rightNewer      = SyncDirection::NONE;
+            output.different       = SyncDirection::RIGHT;
+            output.conflict        = SyncDirection::NONE;
             break;
 
         case DirectionConfig::CUSTOM:
@@ -83,12 +83,12 @@ DirectionSet zen::extractDirections(const DirectionConfig& cfg)
 DirectionSet zen::getTwoWaySet()
 {
     DirectionSet output;
-    output.exLeftSideOnly  = SYNC_DIR_RIGHT;
-    output.exRightSideOnly = SYNC_DIR_LEFT;
-    output.leftNewer       = SYNC_DIR_RIGHT;
-    output.rightNewer      = SYNC_DIR_LEFT;
-    output.different       = SYNC_DIR_NONE;
-    output.conflict        = SYNC_DIR_NONE;
+    output.exLeftSideOnly  = SyncDirection::RIGHT;
+    output.exRightSideOnly = SyncDirection::LEFT;
+    output.leftNewer       = SyncDirection::RIGHT;
+    output.rightNewer      = SyncDirection::LEFT;
+    output.different       = SyncDirection::NONE;
+    output.conflict        = SyncDirection::NONE;
     return output;
 }
 

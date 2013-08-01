@@ -68,7 +68,7 @@ public:
         }
         catch (const std::exception& e) //exceptions must be catched per thread
         {
-            wxSafeShowMessage(_("An exception occurred"), utfCvrtTo<wxString>(e.what()) + L" (Dirlock)"); //simple wxMessageBox won't do for threads
+            wxSafeShowMessage(L"FreeFileSync - " + _("An exception occurred"), utfCvrtTo<wxString>(e.what()) + L" (Dirlock)"); //simple wxMessageBox won't do for threads
         }
     }
 
@@ -123,7 +123,7 @@ private:
 
 namespace
 {
-UInt64 getLockFileSize(const Zstring& filename) //throw FileError, ErrorNotExisting
+UInt64 getLockFileSize(const Zstring& filename) //throw FileError
 {
 #ifdef ZEN_WIN
     WIN32_FIND_DATA fileInfo = {};
@@ -144,11 +144,7 @@ UInt64 getLockFileSize(const Zstring& filename) //throw FileError, ErrorNotExist
     const ErrorCode lastError = getLastError();
     const std::wstring errorMsg = replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(filename));
     const std::wstring errorDescr = formatSystemError(functionName, lastError);
-
-    if (errorCodeForNotExisting(lastError))
-        throw ErrorNotExisting(errorMsg, errorDescr);
-    else
-        throw FileError(errorMsg, errorDescr);
+    throw FileError(errorMsg, errorDescr);
 }
 
 
@@ -359,9 +355,9 @@ struct LockInformation //throw FileError
 //wxGetFullHostName() is a performance killer for some users, so don't touch!
 
 
-LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw FileError, ErrorNotExisting
+LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw FileError
 {
-    BinStreamIn streamIn = loadBinStream<BinaryStream>(lockfilename); //throw FileError, ErrorNotExisting
+    BinStreamIn streamIn = loadBinStream<BinaryStream>(lockfilename); //throw FileError
     try
     {
         return LockInformation(streamIn); //throw UnexpectedEndOfStreamError
@@ -374,9 +370,9 @@ LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw FileError,
 
 
 inline
-std::string retrieveLockId(const Zstring& lockfilename) //throw FileError, ErrorNotExisting
+std::string retrieveLockId(const Zstring& lockfilename) //throw FileError
 {
-    return retrieveLockInfo(lockfilename).lockId;
+    return retrieveLockInfo(lockfilename).lockId; //throw FileError
 }
 
 
@@ -408,6 +404,7 @@ ProcessStatus getProcessStatus(const LockInformation& lockInfo) //throw FileErro
 
 const std::int64_t TICKS_PER_SEC = ticksPerSec(); //= 0 on error
 
+
 void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw FileError
 {
     const std::wstring infoMsg = replaceCpy(_("Waiting while directory is locked (%x)..."), L"%x", fmtFileName(lockfilename));
@@ -422,7 +419,7 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
         std::string originalLockId; //empty if it cannot be retrieved
         try
         {
-            const LockInformation& lockInfo = retrieveLockInfo(lockfilename); //throw FileError, ErrorNotExisting
+            const LockInformation& lockInfo = retrieveLockInfo(lockfilename); //throw FileError
             originalLockId = lockInfo.lockId;
             switch (getProcessStatus(lockInfo)) //throw FileError
             {
@@ -443,7 +440,7 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
         while (true)
         {
             const TickVal now = getTicks();
-            const UInt64 fileSizeNew = ::getLockFileSize(lockfilename); //throw FileError, ErrorNotExisting
+            const UInt64 fileSizeNew = ::getLockFileSize(lockfilename); //throw FileError
 
             if (TICKS_PER_SEC <= 0 || !lastLifeSign.isValid() || !now.isValid())
                 throw FileError(L"System Timer failed!"); //no i18n: "should" never throw ;)
@@ -462,10 +459,10 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                 //now that the lock is in place check existence again: meanwhile another process may have deleted and created a new lock!
 
                 if (!originalLockId.empty())
-                    if (retrieveLockId(lockfilename) != originalLockId) //throw FileError, ErrorNotExisting -> since originalLockId is filled, we are not expecting errors!
+                    if (retrieveLockId(lockfilename) != originalLockId) //throw FileError -> since originalLockId is filled, we are not expecting errors!
                         return; //another process has placed a new lock, leave scope: the wait for the old lock is technically over...
 
-                if (::getLockFileSize(lockfilename) != fileSizeOld) //throw FileError, ErrorNotExisting
+                if (::getLockFileSize(lockfilename) != fileSizeOld) //throw FileError
                     continue; //late life sign
 
                 removeFile(lockfilename); //throw FileError
@@ -494,9 +491,11 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
             }
         }
     }
-    catch (const ErrorNotExisting&)
+    catch (FileError&)
     {
-        return; //what we are waiting for...
+        if (!somethingExists(lockfilename)) //a benign(?) race condition with FileError
+            return; //what we are waiting for...
+        throw;
     }
 }
 
@@ -582,7 +581,7 @@ public:
     ~SharedDirLock()
     {
         threadObj.interrupt(); //thread lifetime is subset of this instances's life
-        threadObj.join(); //we assume precondition "threadObj.joinable()"!!!
+        threadObj.join(); //we assert precondition "threadObj.joinable()"!!!
 
         ::releaseLock(lockfilename_); //throw ()
     }
@@ -618,7 +617,7 @@ public:
 
         try //check based on lock GUID, deadlock prevention: "lockfilename" may be an alternative name for a lock already owned by this process
         {
-            const std::string lockId = retrieveLockId(lockfilename); //throw FileError, ErrorNotExisting
+            const std::string lockId = retrieveLockId(lockfilename); //throw FileError
             if (const std::shared_ptr<SharedDirLock>& activeLock = getActiveLock(lockId)) //returns null-lock if not found
             {
                 fileToGuid[lockfilename] = lockId; //found an alias for one of our active locks
@@ -629,7 +628,7 @@ public:
 
         //lock not owned by us => create a new one
         auto newLock = std::make_shared<SharedDirLock>(lockfilename, callback); //throw FileError
-        const std::string& newLockGuid = retrieveLockId(lockfilename); //throw FileError, ErrorNotExisting
+        const std::string& newLockGuid = retrieveLockId(lockfilename); //throw FileError
 
         //update registry
         fileToGuid[lockfilename] = newLockGuid; //throw()

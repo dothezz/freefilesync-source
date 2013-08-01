@@ -83,6 +83,26 @@ std::set<Zstring, LessFilename> determineExistentDirs(const std::set<Zstring, Le
 
     tryReportingError2([&]
     {
+        warn_static("remove after test")
+#if 0
+        dirsEx.clear();
+        std::for_each(dirnames.begin(), dirnames.end(),
+        [&](const Zstring& dirname)
+        {
+            if (!dirname.empty())
+            {
+                loginNetworkShare(dirname, allowUserInteraction);
+
+                const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
+                if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) != 0) //returns true for (dir-)symlinks also
+                    dirsEx.insert(dirname);
+                else
+                    throw FileError(_("Cannot find the following folders:") + L"\n" + std::wstring(L"\n") + dirname,
+                    attr == INVALID_FILE_ATTRIBUTES ? formatSystemError(L"GetFileAttributes", getLastError()) : L"not a directory!");
+            }
+        });
+
+#else
         dirsEx = getExistingDirsUpdating(dirnames, allowUserInteraction, callback); //check *all* directories on each try!
 
         //get list of not existing directories
@@ -95,6 +115,7 @@ std::set<Zstring, LessFilename> determineExistentDirs(const std::set<Zstring, Le
             std::for_each(dirsMissing.begin(), dirsMissing.end(), [&](const Zstring& dirname) { msg += std::wstring(L"\n") + dirname; });
             throw FileError(msg, _("You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization."));
         }
+#endif
     }, callback);
 
     return dirsEx;
@@ -268,8 +289,8 @@ std::wstring getConflictInvalidDate(const Zstring& fileNameFull, Int64 utcTime)
 std::wstring getConflictSameDateDiffSize(const FilePair& fileObj)
 {
     return replaceCpy(_("Files %x have the same date but a different size."), L"%x", fmtFileName(fileObj.getObjRelativeName())) + L"\n" +
-           arrowLeft  + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
-           arrowRight + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<RIGHT_SIDE>());
+           L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<LEFT_SIDE >()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<LEFT_SIDE>()) + L"\n" +
+           L"    " + arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.getLastWriteTime<RIGHT_SIDE>()) + L"    " + _("Size:") + L" " + toGuiString(fileObj.getFileSize<RIGHT_SIDE>());
 }
 
 
@@ -277,8 +298,8 @@ inline
 std::wstring getDescrDiffMetaShortnameCase(const FileSystemObject& fsObj)
 {
     return _("Items differ in attributes only") + L"\n" +
-           arrowLeft  + L"    " + fmtFileName(fsObj.getShortName<LEFT_SIDE >()) + L"\n" +
-           arrowRight + L"    " + fmtFileName(fsObj.getShortName<RIGHT_SIDE>());
+           L"    " + arrowLeft  + L" " + fmtFileName(fsObj.getShortName<LEFT_SIDE >()) + L"\n" +
+           L"    " + arrowRight + L" " + fmtFileName(fsObj.getShortName<RIGHT_SIDE>());
 }
 
 
@@ -286,8 +307,8 @@ template <class FileOrLinkPair> inline
 std::wstring getDescrDiffMetaDate(const FileOrLinkPair& fileObj)
 {
     return _("Items differ in attributes only") + L"\n" +
-           arrowLeft  + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.template getLastWriteTime<LEFT_SIDE >()) + L"\n" +
-           arrowRight + L"    " + _("Date:") + L" " + utcToLocalTimeString(fileObj.template getLastWriteTime<RIGHT_SIDE>());
+           L"    " + arrowLeft  + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.template getLastWriteTime<LEFT_SIDE >()) + L"\n" +
+           L"    " + arrowRight + L" " + _("Date:") + L" " + utcToLocalTimeString(fileObj.template getLastWriteTime<RIGHT_SIDE>());
 }
 
 //-----------------------------------------------------------------------------

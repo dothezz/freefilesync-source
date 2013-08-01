@@ -8,7 +8,7 @@
 #define XMLPROCESSING_H_INCLUDED
 
 #include <vector>
-#include <wx/string.h>
+//#include <wx/string.h>
 #include <zen/zstring.h>
 #include "../lib/xml_base.h"
 
@@ -18,9 +18,9 @@ namespace xmlAccess
 struct XmlRealConfig
 {
     XmlRealConfig() : delay(10) {}
-    std::vector<wxString> directories;
-    wxString commandline;
-    size_t delay;
+    std::vector<Zstring> directories;
+    Zstring commandline;
+    unsigned int delay;
 };
 
 void readRealConfig(const Zstring& filename, XmlRealConfig& config);        //throw FfsXmlError

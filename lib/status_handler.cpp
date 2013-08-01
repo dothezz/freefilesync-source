@@ -5,20 +5,11 @@
 // **************************************************************************
 
 #include "status_handler.h"
-#include <wx/app.h>
+//#include <wx/app.h>
 #include <zen/tick_count.h>
 
 using namespace zen;
 
-
-void zen::updateUiNow()
-{
-    //process UI events and prevent application from "not responding"   -> NO performance issue!
-    wxTheApp->Yield();
-
-    //    while (wxTheApp->Pending())
-    //        wxTheApp->Dispatch();
-}
 
 namespace
 {

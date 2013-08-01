@@ -294,7 +294,7 @@ private:
 
     static void normalize(std::string& text)
     {
-        zen::trim(text); //remmove whitespace from end
+        zen::trim(text); //remove whitespace from both ends
 
         //Delimiter:
         //----------
@@ -378,8 +378,11 @@ private:
         if (token().type == Token::TK_PLURAL_BEGIN)
             return parsePlural(pluralOut, pluralInfo);
 
+        if (token().type != Token::TK_TEXT)
+            throw ParsingError(L"Source text empty", scn.posRow(), scn.posCol());
         std::string original = tk.text;
-        consumeToken(Token::TK_TEXT);
+        nextToken();
+
         consumeToken(Token::TK_SRC_END);
 
         consumeToken(Token::TK_TRG_BEGIN);

@@ -24,47 +24,45 @@
 using namespace zen;
 
 
+std::wstring zen::formatThreeDigitPrecision(double value)
+{
+    //print at least three digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
+    if (numeric::abs(value) < 9.995) //9.999 must not be formatted as "10.00"
+        return printNumber<std::wstring>(L"%.2f", value);
+    if (numeric::abs(value) < 99.95) //99.99 must not be formatted as "100.0"
+        return printNumber<std::wstring>(L"%.1f", value);
+    return numberTo<std::wstring>(numeric::round(value));
+}
+
+
 std::wstring zen::filesizeToShortString(Int64 size)
 {
     //if (size < 0) return _("Error"); -> really?
 
     if (numeric::abs(size) <= 999)
-        return replaceCpy(_P("1 Byte", "%x Bytes", to<int>(size)), L"%x", numberTo<std::wstring>(size));
-
-    auto formatUnitSize = [](double sizeInUnit, const std::wstring& unitTxt) -> std::wstring
-    {
-        //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
-        const size_t fullunits = static_cast<size_t>(numeric::abs(sizeInUnit));
-        const int precisionDigits = fullunits < 10 ? 2 : fullunits < 100 ? 1 : 0; //sprintf requires "int"
-
-        wchar_t buffer[50];
-#ifdef __MINGW32__
-        int charsWritten =  ::_snwprintf(buffer, 50, L"%.*f", precisionDigits, sizeInUnit); //MinGW does not comply to the C standard here
-#else
-        int charsWritten = std::swprintf(buffer, 50, L"%.*f", precisionDigits, sizeInUnit);
-#endif
-        return charsWritten > 0 ? replaceCpy(unitTxt, L"%x", std::wstring(buffer, charsWritten)) : _("Error");
-    };
+        return replaceCpy(_P("1 byte", "%x bytes", to<int>(size)), L"%x", numberTo<std::wstring>(size));
 
     double sizeInUnit = to<double>(size);
-    sizeInUnit /= 1024;
-    if (numeric::abs(sizeInUnit) <= 999)
-        return formatUnitSize(sizeInUnit, _("%x KB"));
+    auto formatUnit = [&](const std::wstring& unitTxt) { return replaceCpy(unitTxt, L"%x", formatThreeDigitPrecision(sizeInUnit)); };
 
     sizeInUnit /= 1024;
-    if (numeric::abs(sizeInUnit) <= 999)
-        return formatUnitSize(sizeInUnit, _("%x MB"));
+    if (numeric::abs(sizeInUnit) < 999.5)
+        return formatUnit(_("%x KB"));
 
     sizeInUnit /= 1024;
-    if (numeric::abs(sizeInUnit) <= 999)
-        return formatUnitSize(sizeInUnit, _("%x GB"));
+    if (numeric::abs(sizeInUnit) < 999.5)
+        return formatUnit(_("%x MB"));
 
     sizeInUnit /= 1024;
-    if (numeric::abs(sizeInUnit) <= 999)
-        return formatUnitSize(sizeInUnit, _("%x TB"));
+    if (numeric::abs(sizeInUnit) < 999.5)
+        return formatUnit(_("%x GB"));
 
     sizeInUnit /= 1024;
-    return formatUnitSize(sizeInUnit, _("%x PB"));
+    if (numeric::abs(sizeInUnit) < 999.5)
+        return formatUnit(_("%x TB"));
+
+    sizeInUnit /= 1024;
+    return formatUnit(_("%x PB"));
 }
 
 
@@ -148,7 +146,7 @@ std::wstring zen::remainingTimeToString(double timeInSec)
 
 std::wstring zen::fractionToString(double fraction)
 {
-    return printNumber<std::wstring>(L"%3.2f", fraction * 100.0) + L'%'; //no need to internationalize fraction!?
+    return printNumber<std::wstring>(L"%.2f", fraction * 100.0) + L'%'; //no need to internationalize fraction!?
 }
 
 

@@ -103,6 +103,7 @@ struct OptionalDialogs
     bool warningDirectoryLockFailed;
     bool popupOnConfigChange;
     bool confirmSyncStart;
+    bool confirmExternalCommandMassInvoke;
 };
 
 
@@ -278,15 +279,6 @@ void writeConfig(const XmlBatchConfig&    config, const Zstring& filename); //th
 void writeConfig(const XmlGlobalSettings& config);                          //
 
 //convert (multiple) *.ffs_gui, *.ffs_batch files or combinations of both into target config structure:
-enum MergeType
-{
-    MERGE_GUI,       //pure gui config files
-    MERGE_BATCH,     //  " batch   "
-    MERGE_GUI_BATCH, //gui and batch files
-    MERGE_OTHER
-};
-MergeType getMergeType(const std::vector<Zstring>& filenames); //noexcept
-
 void readAnyConfig(const std::vector<Zstring>& filenames, XmlGuiConfig& config); //throw FfsXmlError
 
 //config conversion utilities

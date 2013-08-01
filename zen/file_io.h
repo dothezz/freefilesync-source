@@ -39,7 +39,7 @@ typedef FILE* FileHandle;
 class FileInput : public FileInputBase
 {
 public:
-    FileInput(const Zstring& filename);                    //throw FileError, ErrorNotExisting
+    FileInput(const Zstring& filename);                    //throw FileError
     FileInput(FileHandle handle, const Zstring& filename); //takes ownership!
     ~FileInput();
 
@@ -68,7 +68,7 @@ private:
 class FileInputUnbuffered : public FileInputBase
 {
 public:
-    FileInputUnbuffered(const Zstring& filename); //throw FileError, ErrorNotExisting
+    FileInputUnbuffered(const Zstring& filename); //throw FileError
     ~FileInputUnbuffered();
 
     //considering safe-read.c it seems buffer size should be a multiple of 8192

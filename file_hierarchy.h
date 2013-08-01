@@ -379,7 +379,7 @@ public:
     //sync settings
     SyncDirection getSyncDir() const;
     void setSyncDir(SyncDirection newDir);
-    void setSyncDirConflict(const std::wstring& description); //set syncDir = SYNC_DIR_NONE + fill conflict description
+    void setSyncDirConflict(const std::wstring& description); //set syncDir = SyncDirection::NONE + fill conflict description
 
     bool isActive() const;
     void setActive(bool active);
@@ -410,7 +410,7 @@ protected:
                      CompareFilesResult defaultCmpResult) :
         cmpResult(defaultCmpResult),
         selectedForSynchronization(true),
-        syncDir_(static_cast<unsigned char>(SYNC_DIR_NONE)),
+        syncDir_(SyncDirection::NONE),
         shortNameLeft_(shortNameLeft),
         shortNameRight_(shortNameRight),
         //shortNameRight_(shortNameRight == shortNameLeft ? shortNameLeft : shortNameRight), -> strangely doesn't seem to shrink peak memory consumption at all!
@@ -437,7 +437,7 @@ private:
 
     bool selectedForSynchronization;
 
-    unsigned char syncDir_; //use "char" instead of "SyncDirection" lacking C++11 custom size enum classes to optimize memory layout!
+    SyncDirection syncDir_; //1 byte: optimize memory layout!
     std::unique_ptr<std::wstring> syncDirConflict; //non-empty if we have a conflict setting sync-direction
     //get rid of std::wstring small string optimization (consumes 32/48 byte on VS2010 x86/x64!)
 
@@ -641,14 +641,14 @@ std::wstring FileSystemObject::getCatExtraDescription() const
 inline
 SyncDirection FileSystemObject::getSyncDir() const
 {
-    return static_cast<SyncDirection>(syncDir_);
+    return syncDir_;
 }
 
 
 inline
 void FileSystemObject::setSyncDir(SyncDirection newDir)
 {
-    syncDir_ = static_cast<unsigned char>(newDir);
+    syncDir_ = newDir;
     syncDirConflict.reset();
 
     notifySyncCfgChanged();
@@ -658,7 +658,7 @@ void FileSystemObject::setSyncDir(SyncDirection newDir)
 inline
 void FileSystemObject::setSyncDirConflict(const std::wstring& description)
 {
-    syncDir_ = static_cast<unsigned char>(SYNC_DIR_NONE);
+    syncDir_ = SyncDirection::NONE;
     syncDirConflict.reset(new std::wstring(description));
 
     notifySyncCfgChanged();
@@ -751,7 +751,7 @@ void FileSystemObject::removeObject<LEFT_SIDE>()
     shortNameLeft_.clear();
     removeObjectL();
 
-    setSyncDir(SYNC_DIR_NONE); //calls notifySyncCfgChanged()
+    setSyncDir(SyncDirection::NONE); //calls notifySyncCfgChanged()
 }
 
 
@@ -762,7 +762,7 @@ void FileSystemObject::removeObject<RIGHT_SIDE>()
     shortNameRight_.clear();
     removeObjectR();
 
-    setSyncDir(SYNC_DIR_NONE); //calls notifySyncCfgChanged()
+    setSyncDir(SyncDirection::NONE); //calls notifySyncCfgChanged()
 }
 
 
@@ -772,7 +772,7 @@ void FileSystemObject::setSynced(const Zstring& shortName)
     assert(!isEmpty());
     shortNameRight_ = shortNameLeft_ = shortName;
     cmpResult = FILE_EQUAL;
-    setSyncDir(SYNC_DIR_NONE);
+    setSyncDir(SyncDirection::NONE);
 }
 
 

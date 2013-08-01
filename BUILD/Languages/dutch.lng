@@ -7,57 +7,6 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Cannot determine final path for %x.</source>
-<target></target>
-
-<source>Failed to register to receive system messages.</source>
-<target></target>
-
-<source>Cannot create symbolic link %x.</source>
-<target></target>
-
-<source>Select a variant</source>
-<target></target>
-
-<source>Check for new &version</source>
-<target></target>
-
-<source>&Tools</source>
-<target></target>
-
-<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
-<target></target>
-
-<source>&Download</source>
-<target></target>
-
-<source>New version found</source>
-<target></target>
-
-<source>Switching to FreeFileSync main dialog</source>
-<target></target>
-
-<source>Data verification error: %x and %y have different content.</source>
-<target></target>
-
-<source>Cannot determine volume name for %x.</source>
-<target></target>
-
-<source>Starting comparison</source>
-<target></target>
-
-<source>Resolving symbolic link %x</source>
-<target></target>
-
-<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
-<target></target>
-
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target></target>
-
-<source>The database entry is not in sync considering current settings.</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Beide zijdes zijn veranderd sinds de laatste synchronisatie.</target>
 
@@ -66,6 +15,9 @@
 
 <source>No change since last synchronization.</source>
 <target>Geen veranderingen sinds de laatste synchronisatie.</target>
+
+<source>The database entry is not in sync considering current settings.</source>
+<target>De database is niet gesynchroniseerd volgens de huidige instellingen.</target>
 
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
 <target>Stel standaard synchronisatie richtingen in: Oude bestanden worden door nieuwere bestanden overschreven.</target>
@@ -91,17 +43,56 @@
 <source>Deleting symbolic link %x</source>
 <target>Verwijderen van snelkoppeling %x</target>
 
+<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>De Prullenbak is niet beschikbaar voor de volgende mappen. De bestanden zullen permanent worden verwijderd:</target>
+
 <source>An exception occurred</source>
 <target>Er heeft een uitzondering plaatsgevonden</target>
 
-<source>Cannot find file %x.</source>
-<target>Kan bestand %x niet vinden.</target>
+<source>A directory path is expected after %x.</source>
+<target>Een bestandslocatie pad is verwacht na %x.</target>
+
+<source>Syntax error</source>
+<target>Syntax fout</target>
+
+<source>Cannot open file %x.</source>
+<target>Kan bestand %x niet openen.</target>
 
 <source>Error</source>
 <target>Fout</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Bestand %x bevat geen valide configuratie.</target>
+
+<source>Unequal number of left and right directories specified.</source>
+<target>Oneven nummer van linker en rechter bestandslocaties gespecificeerd.</target>
+
+<source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
+<target>Het configuratiebestand mag geen instellingen bevatten voor een bestandslocatie level als bestandslocaties in de command line ingesteld zijn.</target>
+
+<source>Warning</source>
+<target>Waarschuwing</target>
+
+<source>Directories cannot be set for more than one configuration file.</source>
+<target>Bestandslocaties kunnen niet voor meer dan een configuratiebestand gemaakt worden.</target>
+
+<source>Syntax:</source>
+<target>Syntax:</target>
+
+<source>config files</source>
+<target>configuratiebestanden</target>
+
+<source>directory</source>
+<target>bestandslocatie</target>
+
+<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
+<target>Elk aantal FreeFileSync .ffs_gui en/of .ffs_batch configuratiebestanden.</target>
+
+<source>Any number of alternative directories for at most one config file.</source>
+<target>Elk aantal alternatieve bestandslocaties voor een configuratiebestand.</target>
+
+<source>Command line</source>
+<target>Opdrachtregel</target>
 
 <source>A folder input field is empty.</source>
 <target>Een map invoerveld is leeg.</target>
@@ -114,6 +105,9 @@
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
 <target>U kunt deze foutmelding negeren om elke map als leeg te markeren. De mappen worden dan automatisch aangemaakt tijdens de synchronisatie.</target>
+
+<source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
+<target>De volgende mappen hebben afhankelijke paden. Wees voorzichtig bij het opzetten van synchronisatieregels:</target>
 
 <source>File %x has an invalid date.</source>
 <target>Bestand %x heeft een ongeldige datum.</target>
@@ -130,11 +124,17 @@
 <source>Items differ in attributes only</source>
 <target>Items verschillen alleen in attributen</target>
 
+<source>Resolving symbolic link %x</source>
+<target>Bezig met vinden van snelkoppeling %x</target>
+
 <source>Comparing content of files %x</source>
 <target>De inhoud van %x bestanden wordt vergeleken</target>
 
 <source>Generating file list...</source>
 <target>Genereren van bestandslijst...</target>
+
+<source>Starting comparison</source>
+<target>Vergelijking starten</target>
 
 <source>Calculating sync directions...</source>
 <target>Synchronisatie richtingen calculeren...</target>
@@ -251,12 +251,12 @@
 <target>Totale tijd:</target>
 
 <source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
 </source>
 <target>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
 </target>
 
 <source>%x MB</source>
@@ -278,12 +278,12 @@
 <target>Doorzoekt:</target>
 
 <source>
-<pluralform>[1 Thread]</pluralform>
-<pluralform>[%x Threads]</pluralform>
+<pluralform>1 thread</pluralform>
+<pluralform>%x threads</pluralform>
 </source>
 <target>
-<pluralform>[1 Thread]</pluralform>
-<pluralform>[%x Threads]</pluralform>
+<pluralform>1 thread</pluralform>
+<pluralform>%x threads</pluralform>
 </target>
 
 <source>Encoding extended time information: %x</source>
@@ -291,6 +291,9 @@
 
 <source>/sec</source>
 <target>/sec</target>
+
+<source>%x items</source>
+<target>%x items</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Configuratiebestand %x alleen deels geladen.</target>
@@ -313,8 +316,11 @@
 <source>Cannot load file %x.</source>
 <target>Kan bestand %x niet laden.</target>
 
-<source>Volume name %x not part of file name %y.</source>
-<target>Schijfnaam %x maakt geen deel uit van bestandsnaam %y.</target>
+<source>Cannot determine volume name for %x.</source>
+<target>Kan volumenaam voor %x niet bepalen.</target>
+
+<source>Volume name %x is not part of file path %y.</source>
+<target>Schijfnaam %x is geen deel van bestandspad %y.</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Bezig met afbreken: Wacht op beëindiging huidige bewerking...</target>
@@ -382,9 +388,6 @@
 <source>Idle time between last detected change and execution of command</source>
 <target>Tijd tussen de laatste gedetecteerde verandering en de uitvoering van het commando</target>
 
-<source>Command line</source>
-<target>Opdrachtregel</target>
-
 <source>
 The command is triggered if:
 - files or subfolders change
@@ -408,9 +411,6 @@ De opdracht word geactiveerd als:
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Geautomatiseerde Synchronisatie</target>
 
-<source>Warning</source>
-<target>Waarschuwing</target>
-
 <source>Build: %x</source>
 <target>Build: %x</target>
 
@@ -420,14 +420,20 @@ De opdracht word geactiveerd als:
 <source>All files</source>
 <target>Alle bestanden</target>
 
+<source>Directory monitoring active</source>
+<target>Bestandslocatie controle actief</target>
+
+<source>Waiting until all directories are available...</source>
+<target>Wachten tot alle bestandslocaties beschikbaar zijn...</target>
+
 <source>&Restore</source>
 <target>&Herstellen</target>
 
+<source>&Show error</source>
+<target>Laat &fouten zien</target>
+
 <source>&Exit</source>
 <target>&Afsluiten</target>
-
-<source>Waiting for missing directories...</source>
-<target>Wacht op ontbrekende mappen...</target>
 
 <source>Invalid command line:</source>
 <target>Ongeldige opdrachtregel:</target>
@@ -438,14 +444,14 @@ De opdracht word geactiveerd als:
 <source>File time and size</source>
 <target>Bestandstijd- en grootte</target>
 
-<source> Two way </source>
-<target> Twee kanten op </target>
+<source>Two way</source>
+<target>Twee kanten op</target>
 
 <source>Mirror</source>
-<target>Spiegelen </target>
+<target>Spiegelen</target>
 
 <source>Update</source>
-<target>Bijwerken </target>
+<target>Bijwerken</target>
 
 <source>Custom</source>
 <target>Aangepast</target>
@@ -501,11 +507,8 @@ De opdracht word geactiveerd als:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>De volgende items hebben onopgeloste conflicten en zullen niet worden gesynchroniseerd:</target>
 
-<source>Significant difference detected:</source>
-<target>Significant verschil gedetecteerd:</target>
-
-<source>More than 50% of the total number of files will be copied or deleted.</source>
-<target>Meer dan 50% van alle bestanden zal gekopiëerd of verwijderd worden.</target>
+<source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
+<target>De volgende mappen zijn heel verschillend. Wees er zeker van dat dit de goede mappen zijn voor synchronisatie.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Niet genoeg vrije schijfruimte beschikbaar op:</target>
@@ -528,6 +531,9 @@ De opdracht word geactiveerd als:
 <source>Creating Volume Shadow Copy for %x...</source>
 <target>Bezig met Volume Schaduwkopie te maken voor %x...</target>
 
+<source>Data verification error: %x and %y have different content.</source>
+<target>Data verificatie fout: %x en %y hebben een verschillende inhoud.</target>
+
 <source>Synchronization aborted</source>
 <target>Synchronisatie afgebroken</target>
 
@@ -549,11 +555,23 @@ De opdracht word geactiveerd als:
 <source>Press "Switch" to resolve issues in FreeFileSync main dialog.</source>
 <target>Druk op "Omschakelen" om problemen op te lossen in het hoofdscherm van FreeFileSync.</target>
 
+<source>Switching to FreeFileSync main dialog</source>
+<target>Wisselen naar FreeFileSync hoofdscherm</target>
+
+<source>Retrying operation after error:</source>
+<target>Bewerking opnieuw proberen na fout:</target>
+
 <source>A new version of FreeFileSync is available:</source>
 <target>Er is een nieuwe versie van FreeFileSync beschikbaar:</target>
 
 <source>Download now?</source>
 <target>Nu downloaden?</target>
+
+<source>New version found</source>
+<target>Nieuwe versie gevonden</target>
+
+<source>&Download</source>
+<target>&Download</target>
 
 <source>FreeFileSync is up to date.</source>
 <target>U gebruikt de nieuwste versie van FreeFileSync.</target>
@@ -563,6 +581,9 @@ De opdracht word geactiveerd als:
 
 <source>Unable to connect to sourceforge.net.</source>
 <target>Kan geen verbinding maken met sourceforge.net.</target>
+
+<source>Cannot find current FreeFileSync version number online. Do you want to check manually?</source>
+<target>Kan huidige FreeFileSync versienummer niet online vinden. Wilt u handmatig controleren?</target>
 
 <source>Symlink</source>
 <target>Symlink</target>
@@ -666,11 +687,17 @@ De opdracht word geactiveerd als:
 <source>&Global settings...</source>
 <target>&Algemene instellingen...</target>
 
+<source>&Tools</source>
+<target>&Gereedschap</target>
+
 <source>&Check now</source>
 <target>&Controleer nu</target>
 
 <source>Check &automatically once a week</source>
 <target>Controleer &automatisch eens per week</target>
+
+<source>Check for new &version</source>
+<target>Kijk voor een nieuwe &versie</target>
 
 <source>Compare</source>
 <target>Vergelijk</target>
@@ -729,6 +756,9 @@ De opdracht word geactiveerd als:
 <source>Synchronizing...</source>
 <target>Synchroniseert...</target>
 
+<source>Minimize to notification area</source>
+<target>Minimaliseer naar systeemvak</target>
+
 <source>On completion</source>
 <target>Na voltooiing</target>
 
@@ -737,6 +767,18 @@ De opdracht word geactiveerd als:
 
 <source>&Pause</source>
 <target>&Pauze</target>
+
+<source>Variant</source>
+<target>Variant</target>
+
+<source>Statistics</source>
+<target>Statistieken</target>
+
+<source>Don't show this dialog again</source>
+<target>Laat deze dialoog niet meer zien</target>
+
+<source>Select a variant</source>
+<target>Selecteer een variant</target>
 
 <source>
 Files are found equal if
@@ -942,15 +984,6 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen.
 <source>&Default</source>
 <target>&Standaard</target>
 
-<source>Variant</source>
-<target>Variant</target>
-
-<source>Statistics</source>
-<target>Statistieken</target>
-
-<source>Don't show this dialog again</source>
-<target>Laat deze dialoog niet meer zien</target>
-
 <source>Find what:</source>
 <target>Vind wat:</target>
 
@@ -960,14 +993,14 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen.
 <source>&Find next</source>
 <target>&Vind volgende</target>
 
+<source>Start synchronization</source>
+<target>Start synchronisatie</target>
+
 <source>Delete</source>
 <target>Verwijderen</target>
 
 <source>Configure filter</source>
 <target>Filterconfiguratie</target>
-
-<source>Start synchronization</source>
-<target>Start synchronisatie</target>
 
 <source>Find</source>
 <target>Vind</target>
@@ -1001,6 +1034,24 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen.
 
 <source>Compare both sides</source>
 <target>Vergelijk beide zijdes</target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+<pluralform>Weet u zeker dat u commando %y wilt uitvoeren voor 1 item?</pluralform>
+<pluralform>Weet u zeker dat u commando %y wilt uitvoeren voor %x items?</pluralform>
+</target>
+
+<source>Confirm</source>
+<target>Bevestigen</target>
+
+<source>&Execute</source>
+<target>&Uitvoeren</target>
+
+<source>&Don't show this dialog again</source>
+<target>Laat deze dialoog &niet meer zien</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1143,8 +1194,8 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen.
 <source>All folders are in sync</source>
 <target>Alle mappen zijn gesynchroniseerd</target>
 
-<source>Comma separated list</source>
-<target>Kommagescheiden bestand</target>
+<source>Comma-separated values</source>
+<target>Door komma gescheiden waarden</target>
 
 <source>File list exported</source>
 <target>Bestandslijst geëxporteerd</target>
@@ -1197,14 +1248,11 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen.
 <source>Completed</source>
 <target>Voltooid</target>
 
-<source>Continue</source>
-<target>Doorgaan</target>
+<source>&Continue</source>
+<target>&Doorgaan</target>
 
-<source>Pause</source>
-<target>Pauze</target>
-
-<source>Logging</source>
-<target>Loggen</target>
+<source>Log</source>
+<target>Log</target>
 
 <source>Cannot find %x</source>
 <target>Kan %x niet vinden</target>
@@ -1299,9 +1347,6 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen.
 <source>Append a timestamp to each file name</source>
 <target>Voeg een timestamp aan elke bestandsnaam toe</target>
 
-<source>Folder</source>
-<target>Map</target>
-
 <source>File</source>
 <target>Bestand</target>
 
@@ -1356,6 +1401,9 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen.
 <source>Cannot create directory %x.</source>
 <target>Kan map %x niet aanmaken.</target>
 
+<source>Cannot create symbolic link %x.</source>
+<target>Kan snelkoppeling %x niet aanmaken.</target>
+
 <source>Cannot find system function %x.</source>
 <target>Kan systeemfunctie %x niet vinden.</target>
 
@@ -1407,6 +1455,9 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen.
 <pluralform>%x dagen</pluralform>
 </target>
 
+<source>Failed to register to receive system messages.</source>
+<target>Registreren voor het ontvangen van systeemmeldingen is mislukt.</target>
+
 <source>Cannot set privilege %x.</source>
 <target>Kan privilege %x niet instellen.</target>
 
@@ -1418,6 +1469,9 @@ Opmerking: Bestandsnamen moeten relatief zijn aan de basis mappen.
 
 <source>Unable to move %x to the Recycle Bin.</source>
 <target>Niet mogelijk om %x naar de Prullenbak te verplaatsen.</target>
+
+<source>Cannot determine final path for %x.</source>
+<target>Kan pad voor %x niet vaststellen.</target>
 
 <source>Error Code %x:</source>
 <target>Foutcode %x:</target>

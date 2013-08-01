@@ -23,7 +23,6 @@ inline std::vector<Zstring> toZ(const std::vector<wxString>& strList)
     std::transform(strList.begin(), strList.end(), std::back_inserter(tmp), [](const wxString& str) { return toZ(str); });
     return tmp;
 }
-
 }
 
 #endif // STRINGCONV_H_INCLUDED

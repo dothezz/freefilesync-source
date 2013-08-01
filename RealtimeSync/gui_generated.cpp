@@ -100,6 +100,8 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     bSizer1->Add( m_staticText7, 0, wxALL, 5 );
 
     m_panelMainFolder = new wxPanel( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panelMainFolder->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+
     wxFlexGridSizer* fgSizer1;
     fgSizer1 = new wxFlexGridSizer( 0, 2, 0, 0 );
     fgSizer1->AddGrowableCol( 1 );
@@ -152,6 +154,8 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 
     m_scrolledWinFolders = new wxScrolledWindow( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
     m_scrolledWinFolders->SetScrollRate( 10, 10 );
+    m_scrolledWinFolders->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+
     bSizerFolders = new wxBoxSizer( wxVERTICAL );
 
 
@@ -243,6 +247,8 @@ MainDlgGenerated::~MainDlgGenerated()
 
 FolderGenerated::FolderGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
+    this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+
     wxBoxSizer* bSizer114;
     bSizer114 = new wxBoxSizer( wxHORIZONTAL );
 

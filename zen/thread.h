@@ -128,7 +128,7 @@ public:
     void reportFinished(std::unique_ptr<T>&& result)
     {
         {
-            boost::unique_lock<boost::mutex> dummy(lockResult);
+            boost::lock_guard<boost::mutex> dummy(lockResult);
             ++jobsFinished;
             if (!result_)
                 result_ = std::move(result);
@@ -149,7 +149,6 @@ public:
     std::unique_ptr<T> getResult(size_t jobsTotal)
     {
         boost::unique_lock<boost::mutex> dummy(lockResult);
-
         while (!jobDone(jobsTotal))
             conditionJobDone.timed_wait(dummy, boost::posix_time::milliseconds(50)); //interruption point!
 

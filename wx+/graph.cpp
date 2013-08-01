@@ -9,8 +9,9 @@
 #include <algorithm>
 #include <numeric>
 #include <zen/basic_math.h>
+#include <zen/scope_guard.h>
 #include <wx/settings.h>
-#include "rtl.h"
+#include "dc.h"
 
 using namespace zen;
 
@@ -31,8 +32,8 @@ double zen::nextNiceNumber(double blockSize) //round to next number which is a c
     const double e = std::pow(10, k);
     if (numeric::isNull(e))
         return 0;
-    const double a = blockSize / e; //blockSize = a * 10^k with a in (1, 10)
-    assert(1 < a && a < 10);
+    const double a = blockSize / e; //blockSize = a * 10^k with a in [1, 10)
+    assert(1 <= a && a < 10);
 
     //have a look at leading two digits: "nice" numbers start with 1, 2, 2.5 and 5
     const double steps[] = { 1, 2, 2.5, 5, 10 };
@@ -78,18 +79,22 @@ public:
     ConvertCoord(double valMin, double valMax, size_t screenSize) :
         min_(valMin),
         scaleToReal(screenSize == 0 ? 0 : (valMax - valMin) / screenSize),
-        scaleToScr(numeric::isNull((valMax - valMin)) ? 0 : screenSize / (valMax - valMin)) {}
+        scaleToScr(numeric::isNull((valMax - valMin)) ? 0 : screenSize / (valMax - valMin)),
+        outOfBoundsLow (-1 * scaleToReal + valMin),
+        outOfBoundsHigh((screenSize + 1) * scaleToReal + valMin) { if (outOfBoundsLow > outOfBoundsHigh) std::swap(outOfBoundsLow, outOfBoundsHigh); }
 
     double screenToReal(double screenPos) const //input value: [0, screenSize - 1]
     {
-        return screenPos * scaleToReal + min_; //come close to valMax, but NEVER reach it!
+        return screenPos * scaleToReal + min_;
     }
     double realToScreen(double realPos) const //return screen position in pixel (but with double precision!)
     {
         return (realPos - min_) * scaleToScr;
     }
-    int realToScreenRound(double realPos) const //useful to find "proper" y-pixel positions
+    int realToScreenRound(double realPos) const //returns -1 and screenSize + 1 if out of bounds!
     {
+        //catch large double values: if double is larger than what int can represent => undefined behavior!
+        numeric::confine(realPos , outOfBoundsLow, outOfBoundsHigh);
         return numeric::round(realToScreen(realPos));
     }
 
@@ -97,19 +102,22 @@ private:
     double min_;
     double scaleToReal;
     double scaleToScr;
+
+    double outOfBoundsLow;
+    double outOfBoundsHigh;
 };
 
 
 //enlarge value range to display to a multiple of a "useful" block size
 void widenRange(double& valMin, double& valMax, //in/out
                 int& blockCount, //out
-                int graphAreaSize,   //in pixel
-                int optimalBlockSize, //
+                int graphAreaSize,      //in pixel
+                int optimalBlockSizePx, //
                 const LabelFormatter& labelFmt)
 {
     if (graphAreaSize > 0)
     {
-        double valRangePerBlock = (valMax - valMin) * optimalBlockSize / graphAreaSize; //proposal
+        double valRangePerBlock = (valMax - valMin) * optimalBlockSizePx / graphAreaSize; //proposal
         valRangePerBlock = labelFmt.getOptimalBlockSize(valRangePerBlock);
         if (!numeric::isNull(valRangePerBlock))
         {
@@ -145,7 +153,7 @@ void drawXLabel(wxDC& dc, double xMin, double xMax, int blockCount, const Conver
 
         //draw x axis labels
         const wxString label = labelFmt.formatText(valX, valRangePerBlock);
-        wxSize labelExtent = dc.GetMultiLineTextExtent(label);
+        const wxSize labelExtent = dc.GetMultiLineTextExtent(label);
         dc.DrawText(label, wxPoint(x - labelExtent.GetWidth() / 2, labelArea.y + (labelArea.height - labelExtent.GetHeight()) / 2)); //center
     }
 }
@@ -173,31 +181,223 @@ void drawYLabel(wxDC& dc, double yMin, double yMax, int blockCount, const Conver
 
         //draw y axis labels
         const wxString label = labelFmt.formatText(valY, valRangePerBlock);
-        wxSize labelExtent = dc.GetMultiLineTextExtent(label);
+        const wxSize labelExtent = dc.GetMultiLineTextExtent(label);
         dc.DrawText(label, wxPoint(labelArea.x + (labelArea.width - labelExtent.GetWidth()) / 2, y - labelExtent.GetHeight() / 2)); //center
     }
 }
 
 
-template <class StdContainter>
-void subsample(StdContainter& cont, size_t factor)
+void drawCornerText(wxDC& dc, const wxRect& graphArea, const wxString& txt, Graph2D::PosCorner pos)
 {
-    if (factor <= 1) return;
+    if (txt.empty()) return;
+    const int borderX = 5;
+    const int borderY = 2; //it looks like wxDC::GetMultiLineTextExtent() precisely returns width, but too large a height: maybe they consider "text row height"?
 
-    auto itOut = cont.begin();
-    for (auto itIn = cont.begin(); cont.end() - itIn >= static_cast<ptrdiff_t>(factor); itIn += factor) //don't even let iterator point out of range!
-        *itOut++ = std::accumulate(itIn, itIn + factor, 0.0) / static_cast<double>(factor);
+    wxDCTextColourChanger dummy(dc, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //use user setting for labels
+    wxSize txtExtent = dc.GetMultiLineTextExtent(txt);
+    txtExtent.x += 2 * borderX;
+    txtExtent.y += 2 * borderY;
 
-    cont.erase(itOut, cont.end());
+    wxPoint drawPos = graphArea.GetTopLeft();
+    switch (pos)
+    {
+        case Graph2D::CORNER_TOP_LEFT:
+            break;
+        case Graph2D::CORNER_TOP_RIGHT:
+            drawPos.x += graphArea.width - txtExtent.GetWidth();
+            break;
+        case Graph2D::CORNER_BOTTOM_LEFT:
+            drawPos.y += graphArea.height - txtExtent.GetHeight();
+            break;
+        case Graph2D::CORNER_BOTTOM_RIGHT:
+            drawPos.x += graphArea.width  - txtExtent.GetWidth();
+            drawPos.y += graphArea.height - txtExtent.GetHeight();
+            break;
+    }
+    dc.DrawText(txt, drawPos + wxPoint(borderX, borderY));
+}
+
+
+warn_static("review")
+
+template <class Function, class Function2>
+void cutPoints(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, Function isInside, Function2 getIntersection)
+{
+    assert(curvePoints.size() == oobMarker.size());
+    if (curvePoints.size() != oobMarker.size() || curvePoints.empty()) return;
+    auto isMarkedOob = [&](size_t index) { return oobMarker[index] != 0; };
+
+    std::vector<CurvePoint> curvePointsTmp;
+    std::vector<char> oobMarkerTmp;
+    auto savePoint = [&](const CurvePoint& pt, bool markedOob) { curvePointsTmp.push_back(pt); oobMarkerTmp.push_back(markedOob);  };
+
+	warn_static("perf: avoid these push_backs")
+
+    bool lastPointInside = isInside(curvePoints[0]);
+    if (lastPointInside)
+        savePoint(curvePoints[0], isMarkedOob(0));
+
+    for (auto it = curvePoints.begin() + 1; it != curvePoints.end(); ++it)
+    {
+        const size_t index = it - curvePoints.begin();
+
+        const bool pointInside = isInside(*it);
+        if (pointInside != lastPointInside)
+        {
+            lastPointInside = pointInside;
+
+            const CurvePoint is = getIntersection(*(it - 1), *it); //getIntersection returns *it when delta is zero
+            savePoint(is, !pointInside || isMarkedOob(index - 1));
+        }
+        if (pointInside)
+            savePoint(*it, isMarkedOob(index));
+    }
+    curvePointsTmp.swap(curvePoints);
+    oobMarkerTmp  .swap(oobMarker);
+}
+
+
+struct GetIntersectionX
+{
+    GetIntersectionX(double x) : x_(x) {}
+    CurvePoint operator()(const CurvePoint& from, const CurvePoint& to) const
+    {
+        const double deltaX = to.x - from.x;
+        const double deltaY = to.y - from.y;
+        return !numeric::isNull(deltaX) ? CurvePoint(x_, from.y + (x_ - from.x) / deltaX * deltaY) : to;
+    };
+private:
+    double x_;
+};
+
+struct GetIntersectionY
+{
+    GetIntersectionY(double y) : y_(y) {}
+    CurvePoint operator()(const CurvePoint& from, const CurvePoint& to) const
+    {
+        const double deltaX = to.x - from.x;
+        const double deltaY = to.y - from.y;
+        return !numeric::isNull(deltaY) ? CurvePoint(from.x + (y_ - from.y) / deltaY * deltaX, y_) : to;
+    };
+private:
+    double y_;
+};
+
+void cutPointsOutsideX(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, double minX, double maxX)
+{
+    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.x >= minX; }, GetIntersectionX(minX));
+    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.x <= maxX; }, GetIntersectionX(maxX));
+}
+
+void cutPointsOutsideY(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, double minY, double maxY)
+{
+    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.y >= minY; }, GetIntersectionY(minY));
+    cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.y <= maxY; }, GetIntersectionY(maxY));
 }
 }
+
+
+warn_static("review")
+void ContinuousCurveData::getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const
+{
+    if (pixelWidth <= 1) return;
+    const ConvertCoord cvrtX(minX, maxX, pixelWidth - 1); //map [minX, maxX] to [0, pixelWidth - 1]
+
+    std::pair<double, double> rangeX = getRangeX();
+    //catch large double values: if double is larger than what int can represent => undefined behavior!
+    const double xOutOfBoundsLow  = cvrtX.screenToReal(-1);
+    const double xOutOfBoundsHigh = cvrtX.screenToReal(pixelWidth);
+    numeric::confine(rangeX.first , xOutOfBoundsLow, xOutOfBoundsHigh); //don't confine to [minX, maxX] which
+    numeric::confine(rangeX.second, xOutOfBoundsLow, xOutOfBoundsHigh); //would prevent empty ranges
+
+    const int posFrom = std::ceil (cvrtX.realToScreen(std::max(rangeX.first,  minX))); //do not step outside [minX, maxX]
+    const int posTo   = std::floor(cvrtX.realToScreen(std::min(rangeX.second, maxX))); //
+    //conversion from std::floor/std::ceil double return value to int is loss-free for full value range of 32-bit int! tested successfully on MSVC
+
+    for (int i = posFrom; i <= posTo; ++i)
+    {
+        const double x = cvrtX.screenToReal(i);
+        points.push_back(CurvePoint(x, getValue(x)));
+    }
+}
+
+
+void SparseCurveData::getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const
+{
+    if (pixelWidth <= 1) return;
+    const ConvertCoord cvrtX(minX, maxX, pixelWidth - 1); //map [minX, maxX] to [0, pixelWidth - 1]
+    const std::pair<double, double> rangeX = getRangeX();
+
+    auto addPoint = [&](const CurvePoint& pt)
+    {
+        warn_static("verify steps")
+        if (addSteps_ && !points.empty())
+            if (pt.y != points.back().y)
+                points.push_back(CurvePoint(pt.x, points.back().y));
+        points.push_back(pt);
+    };
+
+    const int posFrom = cvrtX.realToScreenRound(std::max(rangeX.first,  minX));
+    const int posTo   = cvrtX.realToScreenRound(std::min(rangeX.second, maxX));
+
+    for (int i = posFrom; i <= posTo; ++i)
+    {
+        const double x = cvrtX.screenToReal(i);
+        Opt<CurvePoint> ptLe = getLessEq(x);
+        Opt<CurvePoint> ptGe = getGreaterEq(x);
+        //both non-existent and invalid return values are mapped to out of expected range: => check on posLe/posGe NOT ptLe/ptGE in the following!
+        const int posLe = ptLe ? cvrtX.realToScreenRound(ptLe->x) : i + 1;
+        const int posGe = ptGe ? cvrtX.realToScreenRound(ptGe->x) : i - 1;
+        assert(!ptLe || posLe <= i); //check for invalid return values
+        assert(!ptGe || posGe >= i); //
+
+        if (posGe == i) //test if point would be mapped to pixel x-position i
+        {
+            if (posLe == i) //
+                addPoint(x - ptLe->x < ptGe->x - x ? *ptLe : *ptGe);
+            else
+                addPoint(*ptGe);
+        }
+        else
+        {
+            if (posLe == i)
+                addPoint(*ptLe);
+            else //no point for x-position i
+            {
+                if (i == posFrom && posGe > i)
+                {
+                    if (posLe < i)
+                        addPoint(*ptLe); //use first point outside display area!
+                    else if (posGe > posTo) //curve starts outside the draw range!
+                        break;
+                }
+            }
+
+            if (posGe < i)
+                break;
+
+            if (posGe > posTo) //last point outside the display area!
+            {
+                if (i == posTo && posLe == i) //no need for outside point if last position was already set above
+                    break;
+
+                addPoint(*ptGe);
+                break;
+            }
+            if (posGe > i) //skip sparse area
+                i = posGe - 1;
+        }
+    }
+}
+
 
 Graph2D::Graph2D(wxWindow* parent,
                  wxWindowID winid,
                  const wxPoint& pos,
                  const wxSize& size,
                  long style,
-                 const wxString& name) : wxPanel(parent, winid, pos, size, style, name)
+                 const wxString& name) : wxPanel(parent, winid, pos, size, style, name),
+				 labelFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial")
 {
     Connect(wxEVT_PAINT, wxPaintEventHandler(Graph2D::onPaintEvent), nullptr, this);
     Connect(wxEVT_SIZE,  wxSizeEventHandler (Graph2D::onSizeEvent ), nullptr, this);
@@ -272,14 +472,14 @@ void Graph2D::OnMouseCaptureLost(wxMouseCaptureLostEvent& event)
 }
 
 
-void Graph2D::setData(const std::shared_ptr<GraphData>& data, const CurveAttributes& ca)
+void Graph2D::setCurve(const std::shared_ptr<CurveData>& data, const CurveAttributes& ca)
 {
     curves_.clear();
-    addData(data, ca);
+    addCurve(data, ca);
 }
 
 
-void Graph2D::addData(const std::shared_ptr<GraphData>& data, const CurveAttributes& ca)
+void Graph2D::addCurve(const std::shared_ptr<CurveData>& data, const CurveAttributes& ca)
 {
     CurveAttributes newAttr = ca;
     if (newAttr.autoColor)
@@ -288,22 +488,13 @@ void Graph2D::addData(const std::shared_ptr<GraphData>& data, const CurveAttribu
     Refresh();
 }
 
-namespace //putting this into function scope makes MSVC crash...
-{
-struct CurveSamples
-{
-    CurveSamples() : offsetX(0) {}
-    std::vector<double> yValues; //actual y-values at each screen pixel position
-    int offsetX;                 //x-value offset in pixels
-};
-}
 
 void Graph2D::render(wxDC& dc) const
 {
     using namespace numeric;
 
     //set label font right at the start so that it is considered by wxDC::GetTextExtent below!
-    dc.SetFont(wxFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial"));
+    dc.SetFont(labelFont);
 
     const wxRect clientRect = GetClientRect(); //DON'T use wxDC::GetSize()! DC may be larger than visible area!
     {
@@ -365,27 +556,25 @@ void Graph2D::render(wxDC& dc) const
     //set label areas respecting graph area border!
     const wxRect xLabelArea(graphArea.x, xLabelPosY, graphArea.width, attr.xLabelHeight);
     const wxRect yLabelArea(yLabelPosX, graphArea.y, attr.yLabelWidth, graphArea.height);
-
     const wxPoint graphAreaOrigin = graphArea.GetTopLeft();
 
     //detect x value range
     double minX = attr.minXauto ?  std::numeric_limits<double>::infinity() : attr.minX; //automatic: ensure values are initialized by first curve
     double maxX = attr.maxXauto ? -std::numeric_limits<double>::infinity() : attr.maxX; //
-    if (!curves_.empty())
-        for (auto it = curves_.begin(); it != curves_.end(); ++it)
-            if (it->first.get())
-            {
-                const GraphData& graph = *it->first;
-                assert(graph.getXBegin() <= graph.getXEnd() + 1.0e-9);
-                //GCC fucks up badly when comparing two *binary identical* doubles and finds "begin > end" with diff of 1e-18
+    for (auto it = curves_.begin(); it != curves_.end(); ++it)
+        if (const CurveData* curve = it->first.get())
+        {
+            const std::pair<double, double> rangeX = curve->getRangeX();
+            assert(rangeX.first <= rangeX.second + 1.0e-9);
+            //GCC fucks up badly when comparing two *binary identical* doubles and finds "begin > end" with diff of 1e-18
 
-                if (attr.minXauto)
-                    minX = std::min(minX, graph.getXBegin());
-                if (attr.maxXauto)
-                    maxX = std::max(maxX, graph.getXEnd());
-            }
+            if (attr.minXauto)
+                minX = std::min(minX, rangeX.first);
+            if (attr.maxXauto)
+                maxX = std::max(maxX, rangeX.second);
+        }
 
-    if (minX < maxX && maxX - minX < std::numeric_limits<double>::infinity()) //valid x-range
+    if (minX <= maxX && maxX - minX < std::numeric_limits<double>::infinity()) //valid x-range
     {
         int blockCountX = 0;
         //enlarge minX, maxX to a multiple of a "useful" block size
@@ -396,39 +585,37 @@ void Graph2D::render(wxDC& dc) const
                        dc.GetTextExtent(L"100000000000000").GetWidth(),
                        *attr.labelFmtX);
 
-        //detect y value range
-        std::vector<CurveSamples> yValuesList(curves_.size());
+        //get raw values + detect y value range
         double minY = attr.minYauto ?  std::numeric_limits<double>::infinity() : attr.minY; //automatic: ensure values are initialized by first curve
         double maxY = attr.maxYauto ? -std::numeric_limits<double>::infinity() : attr.maxY; //
-        {
-            const int AVG_FACTOR = 2; //some averaging of edgy input data to smoothen behavior on window resize
-            const ConvertCoord cvrtX(minX, maxX, graphArea.width * AVG_FACTOR);
 
-            for (auto it = curves_.begin(); it != curves_.end(); ++it)
-                if (const GraphData* graph = it->first.get())
+        std::vector<std::vector<CurvePoint>> curvePoints(curves_.size());
+        std::vector<std::vector<char>>       oobMarker  (curves_.size()); //effectively a std::vector<bool> marking points that start a out of bounds line
+
+        for (auto it = curves_.begin(); it != curves_.end(); ++it)
+            if (const CurveData* curve = it->first.get())
+            {
+                const size_t index = it - curves_.begin();
+                std::vector<CurvePoint>& points = curvePoints[index];
+                auto&                    marker = oobMarker[index];
+
+                curve->getPoints(minX, maxX, graphArea.width, points);
+
+                //cut points outside visible x-range now in order to calculate height of visible points only!
+                marker.resize(points.size()); //default value: false
+                cutPointsOutsideX(points, marker, minX, maxX);
+
+                if ((attr.minYauto || attr.maxYauto) && !points.empty())
                 {
-                    CurveSamples& samples = yValuesList[it - curves_.begin()];
-                    {
-                        const int posFirst = std::ceil(cvrtX.realToScreen(std::max(graph->getXBegin(), minX))); //do not step outside [xBegin, xEnd) range => 2 x ceil!
-                        const int posLast  = std::ceil(cvrtX.realToScreen(std::min(graph->getXEnd  (), maxX))); //
-                        //conversion from std::ceil double return valute to int is loss-free for full value range of 32-bit int! tested successfully on MSVC
-
-                        for (int i = posFirst; i < posLast; ++i)
-                            samples.yValues.push_back(graph->getValue(cvrtX.screenToReal(i)));
-
-                        subsample(samples.yValues, AVG_FACTOR);
-                        samples.offsetX = posFirst / AVG_FACTOR;
-                    }
-                    if (!samples.yValues.empty())
-                    {
-                        if (attr.minYauto)
-                            minY = std::min(minY, *std::min_element(samples.yValues.begin(), samples.yValues.end()));
-                        if (attr.maxYauto)
-                            maxY = std::max(maxY, *std::max_element(samples.yValues.begin(), samples.yValues.end()));
-                    }
+                    auto itPair = std::minmax_element(points.begin(), points.end(), [](const CurvePoint& lhs, const CurvePoint& rhs) { return lhs.y < rhs.y; });
+                    if (attr.minYauto)
+                        minY = std::min(minY, itPair.first->y);
+                    if (attr.maxYauto)
+                        maxY = std::max(maxY, itPair.second->y);
                 }
-        }
-        if (minY < maxY) //valid y-range
+            }
+
+        if (minY <= maxY) //valid y-range
         {
             int blockCountY = 0;
             //enlarge minY, maxY to a multiple of a "useful" block size
@@ -439,44 +626,55 @@ void Graph2D::render(wxDC& dc) const
                            3 * dc.GetTextExtent(L"1").GetHeight(),
                            *attr.labelFmtY);
 
-            const ConvertCoord cvrtX(minX, maxX, graphArea.width); //map [minX, maxX) to [0, graphWidth)
-            const ConvertCoord cvrtY(maxY, minY, graphArea.height <= 0 ? 0 : graphArea.height - 1); //map [minY, maxY] to [graphHeight - 1, 0]
+            if (graphArea.width <= 1 || graphArea.height <= 1) return;
+            const ConvertCoord cvrtX(minX, maxX, graphArea.width  - 1); //map [minX, maxX] to [0, pixelWidth - 1]
+            const ConvertCoord cvrtY(maxY, minY, graphArea.height - 1); //map [minY, maxY] to [pixelHeight - 1, 0]
 
             //calculate curve coordinates on graph area
-            auto getCurvePoints = [&](size_t index, std::vector<wxPoint>& points)
-            {
-                if (index < yValuesList.size())
-                {
-                    CurveSamples& samples = yValuesList[index];
+            std::vector<std::vector<wxPoint>> drawPoints(curves_.size());
 
-                    for (auto it = samples.yValues.begin(); it != samples.yValues.end(); ++it)
-                        points.push_back(wxPoint(samples.offsetX + (it - samples.yValues.begin()),
-                                                 cvrtY.realToScreenRound(*it)) + graphAreaOrigin);
-                }
-            };
+            for (size_t index = 0; index < curves_.size(); ++index)
+            {
+                //cut points outside visible y-range before calculating pixels:
+                //1. realToScreenRound() deforms out-of-range values!
+                //2. pixels that are grossly out of range may become a severe performance problem when drawing on the DC (Windows)
+                cutPointsOutsideY(curvePoints[index], oobMarker[index], minY, maxY);
+
+                auto& points = drawPoints[index];
+                for (const auto& pt : curvePoints[index])
+                    points.push_back(wxPoint(cvrtX.realToScreenRound(pt.x),
+                                             cvrtY.realToScreenRound(pt.y)) + graphAreaOrigin);
+            }
 
             //update active mouse selection
             if (activeSel.get() &&
                 graphArea.width > 0 && graphArea.height > 0)
             {
-                wxPoint startPos   = activeSel->getStartPos()   - graphAreaOrigin; //make relative to graphArea
-                wxPoint currentPos = activeSel->refCurrentPos() - graphAreaOrigin;
+                auto widen = [](double* low, double* high)
+                {
+                    if (*low > *high)
+                        std::swap(low, high);
+                    *low  -= 0.5;
+                    *high += 0.5;
+                };
+
+                const wxPoint screenStart   = activeSel->getStartPos()   - graphAreaOrigin; //make relative to graphArea
+                const wxPoint screenCurrent = activeSel->refCurrentPos() - graphAreaOrigin;
 
                 //normalize positions: a mouse selection is symmetric and *not* an half-open range!
-                confine(startPos  .x, 0, graphArea.width  - 1);
-                confine(currentPos.x, 0, graphArea.width  - 1);
-                confine(startPos  .y, 0, graphArea.height - 1);
-                confine(currentPos.y, 0, graphArea.height - 1);
+                double screenFromX = confineCpy(screenStart  .x, 0, graphArea.width  - 1);
+                double screenFromY = confineCpy(screenStart  .y, 0, graphArea.height - 1);
+                double screenToX   = confineCpy(screenCurrent.x, 0, graphArea.width  - 1);
+                double screenToY   = confineCpy(screenCurrent.y, 0, graphArea.height - 1);
+                widen(&screenFromX, &screenToX); //use full pixel range for selection!
+                widen(&screenFromY, &screenToY);
 
-                auto& from = activeSel->refSelection().from;
-                auto& to   = activeSel->refSelection().to;
+                //save current selection as "double" coordinates
+                activeSel->refSelection().from = CurvePoint(cvrtX.screenToReal(screenFromX),
+                                                            cvrtY.screenToReal(screenFromY));
 
-                //save current selection as double coordinates
-                from.x = cvrtX.screenToReal(startPos  .x + (startPos.x <= currentPos.x ? 0 : 1)); // use full pixel range for selection!
-                to  .x = cvrtX.screenToReal(currentPos.x + (startPos.x <= currentPos.x ? 1 : 0));
-
-                from.y = cvrtY.screenToReal(startPos  .y + (startPos.y <= currentPos.y ? 0 : 1));
-                to  .y = cvrtY.screenToReal(currentPos.y + (startPos.y <= currentPos.y ? 1 : 0));
+                activeSel->refSelection().to = CurvePoint(cvrtX.screenToReal(screenToX),
+                                                          cvrtY.screenToReal(screenToY));
             }
 
             //#################### begin drawing ####################
@@ -484,8 +682,7 @@ void Graph2D::render(wxDC& dc) const
             for (auto it = curves_.begin(); it != curves_.end(); ++it)
                 if (it->second.drawCurveArea)
                 {
-                    std::vector<wxPoint> points;
-                    getCurvePoints(it - curves_.begin(), points);
+                    std::vector<wxPoint> points = drawPoints[it - curves_.begin()];
                     if (!points.empty())
                     {
                         points.push_back(wxPoint(points.back ().x, graphArea.GetBottom())); //add lower right and left corners
@@ -502,36 +699,39 @@ void Graph2D::render(wxDC& dc) const
             if (activeSel)
                 allSelections.push_back(activeSel->refSelection());
             {
-                //alpha channel (not yet) supported on wxMSW, so draw selection before curves
+                //alpha channel not supported on wxMSW, so draw selection before curves
                 wxDCBrushChanger dummy(dc, wxColor(168, 202, 236)); //light blue
                 wxDCPenChanger  dummy2(dc, wxColor(51,  153, 255)); //dark blue
 
+                auto shrink = [](double* low, double* high)
+                {
+                    if (*low > *high)
+                        std::swap(low, high);
+                    *low  += 0.5;
+                    *high -= 0.5;
+                    if (*low > *high)
+                        *low = *high = (*low + *high) / 2;
+                };
+
                 for (auto it = allSelections.begin(); it != allSelections.end(); ++it)
                 {
-                    //harmonize with active mouse selection above!
-                    wxPoint pixelFrom(cvrtX.realToScreenRound(it->from.x),
-                                      cvrtY.realToScreenRound(it->from.y));
-                    wxPoint pixelTo(cvrtX.realToScreenRound(it->to.x),
-                                    cvrtY.realToScreenRound(it->to.y));
-                    //convert half-open to inclusive ranges for use with wxDC::DrawRectangle
-                    if (pixelFrom.x != pixelTo.x) //no matter how small the selection, always draw at least one pixel!
-                    {
-                        pixelFrom.x -= pixelFrom.x < pixelTo.x ? 0 : 1;
-                        pixelTo  .x -= pixelFrom.x < pixelTo.x ? 1 : 0;
-                    }
-                    if (pixelFrom.y != pixelTo.y)
-                    {
-                        pixelFrom.y -= pixelFrom.y < pixelTo.y ? 0 : 1;
-                        pixelTo  .y -= pixelFrom.y < pixelTo.y ? 1 : 0;
-                    }
-                    confine(pixelFrom.x, 0, graphArea.width  - 1);
-                    confine(pixelTo  .x, 0, graphArea.width  - 1);
-                    confine(pixelFrom.y, 0, graphArea.height - 1);
-                    confine(pixelTo  .y, 0, graphArea.height - 1);
+                    //harmonize with active mouse selection above
+                    double screenFromX = cvrtX.realToScreen(it->from.x);
+                    double screenFromY = cvrtY.realToScreen(it->from.y);
+                    double screenToX   = cvrtX.realToScreen(it->to.x);
+                    double screenToY   = cvrtY.realToScreen(it->to.y);
+                    shrink(&screenFromX, &screenToX);
+                    shrink(&screenFromY, &screenToY);
 
-                    pixelFrom += graphAreaOrigin;
-                    pixelTo   += graphAreaOrigin;
+                    confine(screenFromX, 0.0, graphArea.width  - 1.0);
+                    confine(screenFromY, 0.0, graphArea.height - 1.0);
+                    confine(screenToX,   0.0, graphArea.width  - 1.0);
+                    confine(screenToY,   0.0, graphArea.height - 1.0);
 
+                    const wxPoint pixelFrom = wxPoint(numeric::round(screenFromX),
+                                                      numeric::round(screenFromY)) + graphAreaOrigin;
+                    const wxPoint pixelTo = wxPoint(numeric::round(screenToX),
+                                                    numeric::round(screenToY)) + graphAreaOrigin;
                     switch (attr.mouseSelMode)
                     {
                         case SELECT_NONE:
@@ -554,17 +754,42 @@ void Graph2D::render(wxDC& dc) const
             drawYLabel(dc, minY, maxY, blockCountY, cvrtY, graphArea, yLabelArea, *attr.labelFmtY);
 
             //4. finally draw curves
-            for (auto it = curves_.begin(); it != curves_.end(); ++it)
             {
-                std::vector<wxPoint> points;
-                getCurvePoints(it - curves_.begin(), points);
-                if (!points.empty())
+                dc.SetClippingRegion(graphArea); //prevent thick curves from drawing slightly outside
+                ZEN_ON_SCOPE_EXIT(dc.DestroyClippingRegion());
+
+                for (auto it = curves_.begin(); it != curves_.end(); ++it)
                 {
                     wxDCPenChanger dummy(dc, wxPen(it->second.color, it->second.lineWidth));
-                    dc.DrawLines(static_cast<int>(points.size()), &points[0]);
-                    dc.DrawPoint(points.back()); //wxDC::DrawLines() doesn't draw last pixel
+
+                    const size_t index = it - curves_.begin();
+                    std::vector<wxPoint>& points = drawPoints[index]; //alas wxDC::DrawLines() is not const-correct!!!
+                    auto&                 marker = oobMarker [index];
+                    assert(points.size() == marker.size());
+                    warn_static("review")
+
+                    //draw all parts of the curve except for the out-of-bounds ranges
+                    size_t pointsIndexFirst = 0;
+                    while (pointsIndexFirst < points.size())
+                    {
+                        size_t pointsIndexLast = std::find(marker.begin() + pointsIndexFirst, marker.end(), true) - marker.begin();
+                        if (pointsIndexLast < points.size()) ++ pointsIndexLast;
+
+                        const int pointCount = static_cast<int>(pointsIndexLast - pointsIndexFirst);
+                        if (pointCount > 0)
+                        {
+                            if (pointCount >= 2) //on OS X wxWidgets has a nasty assert on this
+                                dc.DrawLines(pointCount, &points[pointsIndexFirst]);
+                            dc.DrawPoint(points[pointsIndexLast - 1]); //wxDC::DrawLines() doesn't draw last pixel
+                        }
+                        pointsIndexFirst = std::find(marker.begin() + pointsIndexLast, marker.end(), false) - marker.begin();
+                    }
                 }
             }
+
+            //5. draw corner texts
+            for (auto it = attr.cornerTexts.begin(); it != attr.cornerTexts.end(); ++it)
+                drawCornerText(dc, graphArea, it->second, it->first);
         }
     }
 }

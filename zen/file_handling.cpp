@@ -45,67 +45,111 @@
 
 using namespace zen;
 
+warn_static("remove after test")
 
-bool zen::fileExists(const Zstring& filename)
+namespace
+{
+void writeSysErrorIfNeeded(std::wstring* sysErrorMsg, const wchar_t* functionName, ErrorCode lastError)
+{
+    if (sysErrorMsg)
+    {
+        //skip uninteresting error codes:
+#ifdef ZEN_WIN
+        if (lastError == ERROR_FILE_NOT_FOUND ||
+            lastError == ERROR_PATH_NOT_FOUND) return;
+        //lastError == ERROR_BAD_NETPATH    || //e.g. for a path like: \\192.168.1.1\test
+        //lastError == ERROR_NETNAME_DELETED;
+
+#elif defined ZEN_LINUX || defined ZEN_MAC
+        if (lastError == ENOENT) return;
+#endif
+        *sysErrorMsg = formatSystemError(functionName, lastError);
+    }
+}
+}
+
+
+bool zen::fileExists(const Zstring& filename, std::wstring* sysErrorMsg)
 {
     //symbolic links (broken or not) are also treated as existing files!
 #ifdef ZEN_WIN
+    const wchar_t functionName[] = L"GetFileAttributes";
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
-    return attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0; //returns true for (file-)symlinks also
+    if (attr != INVALID_FILE_ATTRIBUTES)
+        return (attr & FILE_ATTRIBUTE_DIRECTORY) == 0; //returns true for (file-)symlinks also
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
+    const wchar_t functionName[] = L"lstat";
     struct ::stat fileInfo = {};
-    return ::lstat(filename.c_str(), &fileInfo) == 0 &&
-           (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
+    if (::lstat(filename.c_str(), &fileInfo) == 0)
+        return S_ISREG(fileInfo.st_mode) || S_ISLNK(fileInfo.st_mode); //in Linux a symbolic link is neither file nor directory
 #endif
+    writeSysErrorIfNeeded(sysErrorMsg, functionName, getLastError());
+    return false;
 }
 
 
-bool zen::dirExists(const Zstring& dirname)
+bool zen::dirExists(const Zstring& dirname, std::wstring* sysErrorMsg)
 {
     //symbolic links (broken or not) are also treated as existing directories!
 #ifdef ZEN_WIN
+    const wchar_t functionName[] = L"GetFileAttributes";
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
-    return attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) != 0; //returns true for (dir-)symlinks also
+    if (attr != INVALID_FILE_ATTRIBUTES)
+        return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0; //returns true for (dir-)symlinks also
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
+    const wchar_t functionName[] = L"lstat";
     struct ::stat dirInfo = {};
-    return ::lstat(dirname.c_str(), &dirInfo) == 0 &&
-           (S_ISLNK(dirInfo.st_mode) || S_ISDIR(dirInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
+    if (::lstat(dirname.c_str(), &dirInfo) == 0)
+        return S_ISDIR(dirInfo.st_mode) || S_ISLNK(dirInfo.st_mode); //in Linux a symbolic link is neither file nor directory
 #endif
+    writeSysErrorIfNeeded(sysErrorMsg, functionName, getLastError());
+    return false;
 }
 
 
-bool zen::symlinkExists(const Zstring& linkname)
+bool zen::symlinkExists(const Zstring& linkname, std::wstring* sysErrorMsg)
 {
 #ifdef ZEN_WIN
-    WIN32_FIND_DATA fileInfo = {};
+    const wchar_t functionName[] = L"FindFirstFile";
+    WIN32_FIND_DATA linkInfo = {};
+    const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(linkname).c_str(), &linkInfo);
+    if (searchHandle != INVALID_HANDLE_VALUE)
     {
-        const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(linkname).c_str(), &fileInfo);
-        if (searchHandle == INVALID_HANDLE_VALUE)
-            return false;
         ::FindClose(searchHandle);
+        return isSymlink(linkInfo);
     }
-    return isSymlink(fileInfo);
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    struct ::stat fileInfo = {};
-    return ::lstat(linkname.c_str(), &fileInfo) == 0 &&
-           S_ISLNK(fileInfo.st_mode); //symbolic link
+    const wchar_t functionName[] = L"lstat";
+    struct ::stat linkInfo = {};
+    if (::lstat(linkname.c_str(), &linkInfo) == 0)
+        return S_ISLNK(linkInfo.st_mode);
 #endif
+    writeSysErrorIfNeeded(sysErrorMsg, functionName, getLastError());
+    return false;
 }
 
 
-bool zen::somethingExists(const Zstring& objname)
+bool zen::somethingExists(const Zstring& objname, std::wstring* sysErrorMsg)
 {
 #ifdef ZEN_WIN
+    const wchar_t functionName[] = L"GetFileAttributes";
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
-    return attr != INVALID_FILE_ATTRIBUTES || ::GetLastError() == ERROR_SHARING_VIOLATION; //"C:\pagefile.sys"
+    if (attr != INVALID_FILE_ATTRIBUTES)
+        return true;
+    if (::GetLastError() == ERROR_SHARING_VIOLATION) //"C:\pagefile.sys"
+        return true;
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
+    const wchar_t functionName[] = L"lstat";
     struct ::stat fileInfo = {};
-    return ::lstat(objname.c_str(), &fileInfo) == 0;
+    if (::lstat(objname.c_str(), &fileInfo) == 0)
+        return true;
 #endif
+    writeSysErrorIfNeeded(sysErrorMsg, functionName, getLastError());
+    return false;
 }
 
 
@@ -275,9 +319,6 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
 #endif
     {
         ErrorCode lastError = getLastError();
-        if (errorCodeForNotExisting(lastError)) //no error situation if file is not existing! manual deletion relies on it!
-            return false;
-
 #ifdef ZEN_WIN
         if (lastError == ERROR_ACCESS_DENIED) //function fails if file is read-only
         {
@@ -288,7 +329,6 @@ bool zen::removeFile(const Zstring& filename) //throw FileError
             lastError = ::GetLastError();
         }
 #endif
-        //after "lastError" evaluation it *may* be redundant to check existence again, but better be safe than sorry:
         if (!somethingExists(filename)) //warning: changes global error code!!
             return false; //neither file nor any other object (e.g. broken symlink) with that name existing
 
@@ -2119,7 +2159,7 @@ void copyFileLinuxMac(const Zstring& sourceFile,
                       FileAttrib* newAttrib) //throw FileError, ErrorTargetPathMissing, ErrorTargetExisting
 {
     //open sourceFile for reading
-    FileInputUnbuffered fileIn(sourceFile); //throw FileError, ErrorNotExisting
+    FileInputUnbuffered fileIn(sourceFile); //throw FileError
 
     struct ::stat sourceInfo = {};
     if (::fstat(fileIn.getDescriptor(), &sourceInfo) != 0) //read file attributes from source

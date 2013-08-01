@@ -36,11 +36,6 @@ void confine(T& val, const T& minVal, const T& maxVal); //make sure minVal <= va
 template <class T>
 T confineCpy(const T& val, const T& minVal, const T& maxVal);
 
-template <class InputIterator>
-std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last);
-template <class InputIterator, class Compare>
-std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last, Compare comp);
-
 template <class T, class InputIterator> //precondition: range must be sorted!
 auto nearMatch(const T& val, InputIterator first, InputIterator last) -> typename std::iterator_traits<InputIterator>::value_type;
 
@@ -160,6 +155,8 @@ void confine(T& val, const T& minVal, const T& maxVal) //name trim, clamp?
 }
 
 
+/*
+part of C++11 now!
 template <class InputIterator, class Compare> inline
 std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, InputIterator last, Compare compLess)
 {
@@ -200,7 +197,7 @@ std::pair<InputIterator, InputIterator> minMaxElement(InputIterator first, Input
 {
     return minMaxElement(first, last, std::less<typename std::iterator_traits<InputIterator>::value_type>());
 }
-
+*/
 
 template <class T, class InputIterator> inline
 auto nearMatch(const T& val, InputIterator first, InputIterator last) -> typename std::iterator_traits<InputIterator>::value_type

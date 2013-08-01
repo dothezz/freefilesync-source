@@ -96,7 +96,7 @@ public:
 
 
     //context of main thread
-    void getChanges(std::vector<DirWatcher::Entry>& output) //throw FileError, ErrorNotExisting
+    void getChanges(std::vector<DirWatcher::Entry>& output) //throw FileError
     {
         boost::lock_guard<boost::mutex> dummy(lockAccess);
 
@@ -105,9 +105,6 @@ public:
         {
             const std::wstring msg   = copyStringTo<std::wstring>(errorInfo->msg);
             const std::wstring descr = copyStringTo<std::wstring>(errorInfo->descr);
-
-            if (errorCodeForNotExisting(errorInfo->errorCode))
-                throw ErrorNotExisting(msg, descr);
             throw FileError(msg, descr);
         }
 
@@ -163,9 +160,6 @@ public:
             const DWORD lastError = ::GetLastError(); //copy before making other system calls!
             const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(directory));
             const std::wstring errorDescr = formatSystemError(L"CreateFile", lastError);
-
-            if (errorCodeForNotExisting(lastError))
-                throw ErrorNotExisting(errorMsg, errorDescr);
             throw FileError(errorMsg, errorDescr);
         }
 
@@ -199,7 +193,6 @@ public:
                     const DWORD lastError = ::GetLastError(); //copy before making other system calls!
                     return shared_->reportError(replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(dirnamePf)), formatSystemError(L"CreateEvent", lastError), lastError);
                 }
-
                 ZEN_ON_SCOPE_EXIT(::CloseHandle(overlapped.hEvent));
 
                 DWORD bytesReturned = 0; //should not be needed for async calls, still pass it to help broken drivers
@@ -465,9 +458,6 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
             const ErrorCode lastError = getLastError(); //copy before making other system calls!
             const std::wstring errorMsg = replaceCpy(_("Cannot monitor directory %x."), L"%x", fmtFileName(subdir));
             const std::wstring errorDescr = formatSystemError(L"inotify_add_watch", lastError);
-
-            if (errorCodeForNotExisting(lastError))
-                throw ErrorNotExisting(errorMsg, errorDescr);
             throw FileError(errorMsg, errorDescr);
         }
 

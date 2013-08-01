@@ -1,6 +1,29 @@
+FreeFileSync 5.19
+-----------------
+Redesigned progress dialog including new items graph
+New command line syntax: set directory names of a .ffs_gui/.ffs_batch externally
+Explicit button on progress dialog to minimize to systray
+Fixed progress graph labels being truncated (Debian, Ubuntu, openSUSE)
+Resolved main dialog z-order issues during sync (OS X)
+Reduced progress dialog layout twitching
+Further improved comparison speed by 10%
+Use proper config file path in file picker dialog (OS X)
+Never interrupt when updating a file with fail-safe file copy after target was deleted 
+Prevent crash when closing progress dialog while paused (OS X)
+Support external command lines starting with whitespace (Windows)
+Show warning before starting external applications for more than 10 items
+Start external applications synchronously if needed to avoid running out of system resources
+Don't show hidden progress dialog when showing an error message in silent batch mode (OS X)
+Correctly show file names containing ampersand characters in progress dialog
+Adapt size of results dialog to fit contents
+Correctly execute file move before parent directory will be deleted
+Show a blinking system tray icon on errors instead of a modal dialog in RealtimeSync
+Added installation size for Windows' Add/Remove Programs
+
+
 FreeFileSync 5.18
 -----------------
-Workaround boost 1.54 bug "Procedure Entry Point Not Found in Kernel32.dll" (Windows XP)
+Work around boost 1.54 bug "The procedure entry point GetTickCount64 could not be located in the dynamic link library KERNEL32.dll" (Windows XP)
 
 
 FreeFileSync 5.17
@@ -30,6 +53,7 @@ Improved sync progress dialog layout
 Suppress dubious wxWidgets error message "locale 'es_AR' can not be set". (OS X)
 Don't show busy cursor on synchronization results dialog
 Log error message upon retry as type info only
+Updated translation files
 
 
 FreeFileSync 5.16

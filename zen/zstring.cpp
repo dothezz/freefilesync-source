@@ -33,19 +33,15 @@ public:
     void insert(const void* ptr, size_t size)
     {
         boost::lock_guard<boost::mutex> dummy(lockActStrings);
-        if (activeStrings.find(ptr) != activeStrings.end())
+        if (!activeStrings.insert(std::make_pair(ptr, size)).second)
             reportProblem("Fatal Error: New memory points into occupied space: " + rawMemToString(ptr, size));
-
-        activeStrings[ptr] = size;
     }
 
     void remove(const void* ptr)
     {
         boost::lock_guard<boost::mutex> dummy(lockActStrings);
-        if (activeStrings.find(ptr) == activeStrings.end())
+        if (activeStrings.erase(ptr) != 1)
             reportProblem("Fatal Error: No memory available for deallocation at this location!");
-
-        activeStrings.erase(ptr);
     }
 
     static LeakChecker& instance() { static LeakChecker inst; return inst; }

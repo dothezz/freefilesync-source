@@ -10,7 +10,7 @@
 #include <functional>
 #include <zen/error_log.h>
 //#include <zen/zstring.h>
-#include <wx/toplevel.h>
+#include <wx/frame.h>
 #include "../lib/status_handler.h"
 //#include "main_dlg.h"
 
@@ -18,7 +18,7 @@
 class CompareProgressDialog
 {
 public:
-    CompareProgressDialog(wxTopLevelWindow& parentWindow); //CompareProgressDialog will be owned by parentWindow!
+    CompareProgressDialog(wxFrame& parentWindow); //CompareProgressDialog will be owned by parentWindow!
 
     wxWindow* getAsWindow(); //convenience! don't abuse!
 
@@ -52,7 +52,7 @@ struct SyncProgressDialog
 
     //---------------------------------------------------------------------------
 
-    virtual wxWindow* getAsWindow() = 0; //convenience! don't abuse!
+    virtual wxWindow* getWindowIfVisible() = 0; //may be nullptr; don't abuse, use as parent for modal dialogs only!
 
     virtual void initNewPhase() = 0; //call after "StatusHandler::initNewPhase"
     virtual void notifyProgressChange() = 0; //throw (), required by graph!
@@ -71,7 +71,7 @@ protected:
 SyncProgressDialog* createProgressDialog(zen::AbortCallback& abortCb,
                                          const std::function<void()>& notifyWindowTerminate, //note: user closing window cannot be prevented on OS X! (And neither on Windows during system shutdown!)
                                          const zen::Statistics& syncStat,
-                                         wxTopLevelWindow* parentWindow, //may be nullptr
+                                         wxFrame* parentWindow, //may be nullptr
                                          bool showProgress,
                                          const wxString& jobName,
                                          const std::wstring& execWhenFinished,

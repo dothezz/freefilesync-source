@@ -27,7 +27,7 @@ public:
 
     void execute() const
     {
-        MainDialog::create(guiCfg, referenceFiles, globalSettings_, true); //new toplevel window
+        MainDialog::create(guiCfg, referenceFiles, &globalSettings_, true); //new toplevel window
     }
 
 private:

@@ -250,8 +250,8 @@
 <target>الفحص:</target>
 
 <source>
-<pluralform>[1 Thread]</pluralform>
-<pluralform>[%x Threads]</pluralform>
+<pluralform>1 thread</pluralform>
+<pluralform>%x threads</pluralform>
 </source>
 <target>
 <pluralform>0 بند</pluralform>

@@ -57,6 +57,11 @@ Zstring applyLongPathPrefixImpl(const Zstring& path)
     assert(!path.empty()); //nicely check almost all WinAPI accesses!
     assert(!zen::isWhiteSpace(path[0]));
 
+    //http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx#naming_conventions))
+    /*
+      - special names like ".NUL" create all kinds of trouble (e.g. CreateDirectory() reports success, but does nothing)
+        unless prefix is supplied => accept as limitation
+    */
     if (path.length() >= maxPath || //maximum allowed path length without prefix is (MAX_PATH - 1)
         endsWith(path, L' ') || //by default all Win32 APIs trim trailing spaces and period, unless long path prefix is supplied!
         endsWith(path, L'.'))   //note: adding long path prefix might screw up relative paths "." and ".."!

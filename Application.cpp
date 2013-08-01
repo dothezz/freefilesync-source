@@ -41,18 +41,21 @@ IMPLEMENT_APP(Application)
 
 namespace
 {
+/*
 boost::thread::id mainThreadId = boost::this_thread::get_id();
 
 void onTerminationRequested()
 {
-    std::wstring msg = boost::this_thread::get_id() == mainThreadId ?
-                       L"Termination requested in main thread!\n\n" :
-                       L"Termination requested in worker thread!\n\n";
-    msg += L"Please file a bug report at: http://sourceforge.net/projects/freefilesync";
+std::wstring msg = boost::this_thread::get_id() == mainThreadId ?
+                   L"Termination requested in main thread!\n\n" :
+                   L"Termination requested in worker thread!\n\n";
+msg += L"Please file a bug report at: http://sourceforge.net/projects/freefilesync";
 
-    wxSafeShowMessage(_("An exception occurred"), msg);
-    std::abort();
+wxSafeShowMessage(_("An exception occurred"), msg);
+std::abort();
 }
+*/
+
 #ifdef _MSC_VER
 void crtInvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved) { assert(false); }
 #endif
@@ -118,7 +121,8 @@ const wxEventType EVENT_ENTER_EVENT_LOOP = wxNewEventType();
 
 bool Application::OnInit()
 {
-    std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
+    //-> this seems rather useless:
+    //std::set_terminate(onTerminationRequested); //unlike wxWidgets uncaught exception handling, this works for all worker threads
 
 #ifdef ZEN_WIN
 #ifdef _MSC_VER
@@ -262,9 +266,10 @@ void Application::onQueryEndSession(wxEvent& event)
 }
 
 
-void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg);
-void runGuiMode(const std::vector<Zstring>& cfgFileName);
-void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode);
+void runGuiMode();
+void runGuiMode(const XmlGuiConfig& guiCfg, const std::vector<Zstring>& referenceFiles);
+void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode);
+void showSyntaxHelp();
 
 
 void Application::launch(const std::vector<Zstring>& commandArgs)
@@ -279,131 +284,247 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
         //tentatively set program language to OS default until GlobalSettings.xml is read later
         setLanguage(xmlAccess::XmlGlobalSettings().programLanguage); //throw FileError
     }
-    catch (const FileError&) {} //no messagebox: consider batch job!
+    catch (const FileError&) { assert(false); } //no messagebox: consider batch job!
 
-    if (commandArgs.empty())
-        runGuiMode(commandArgs);
-    else
+
+    //parse command line arguments
+    std::vector<Zstring> leftDirs;
+    std::vector<Zstring> rightDirs;
+    std::vector<std::pair<Zstring, XmlType>> configFiles; //XmlType: batch or GUI files only
     {
-        const bool gotDirNames = std::any_of(commandArgs.begin(), commandArgs.end(), [](const Zstring& dirname) { return dirExists(dirname); });
-        if (gotDirNames) //mode 1: create temp configuration based on directory names passed
+        const Zchar optionLeftDir [] = Zstr("-leftdir");
+        const Zchar optionRightDir[] = Zstr("-rightdir");
+
+        auto syntaxHelpRequested = [](const Zstring& arg)
+        {
+            auto it = std::find_if(arg.begin(), arg.end(), [](Zchar c) { return c != Zchar('/') && c != Zchar('-'); });
+            const Zstring argTmp(it, arg.end());
+            return argTmp == Zstr("help") ||
+                   argTmp == Zstr("h")    ||
+                   argTmp == Zstr("?");
+        };
+
+        for (auto it = commandArgs.begin(); it != commandArgs.end(); ++it)
+            if (syntaxHelpRequested(*it))
+                return showSyntaxHelp();
+            else if (*it == optionLeftDir)
+            {
+                if (++it == commandArgs.end())
+                {
+                    wxMessageBox(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionLeftDir)), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+                    return;
+                }
+                leftDirs.push_back(*it);
+            }
+            else if (*it == optionRightDir)
+            {
+                if (++it == commandArgs.end())
+                {
+                    wxMessageBox(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionRightDir)), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+                    return;
+                }
+                rightDirs.push_back(*it);
+            }
+            else
+            {
+                Zstring filename = *it;
+                if (!fileExists(filename)) //...be a little tolerant
+                {
+                    if (fileExists(filename + Zstr(".ffs_batch")))
+                        filename += Zstr(".ffs_batch");
+                    else if (fileExists(filename + Zstr(".ffs_gui")))
+                        filename += Zstr(".ffs_gui");
+                    else
+                    {
+                        wxMessageBox(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+                        return;
+                    }
+                }
+
+                switch (getXmlType(filename)) //throw()
+                {
+                    case XML_TYPE_GLOBAL:
+                    case XML_TYPE_OTHER:
+                        wxMessageBox(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+                        return;
+
+                    case XML_TYPE_GUI:
+                        configFiles.push_back(std::make_pair(filename, XML_TYPE_GUI));
+                        break;
+                    case XML_TYPE_BATCH:
+                        configFiles.push_back(std::make_pair(filename, XML_TYPE_BATCH));
+                        break;
+                }
+            }
+    }
+
+    if (leftDirs.size() != rightDirs.size())
+    {
+        wxMessageBox(_("Unequal number of left and right directories specified."), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+        return;
+    }
+
+    auto hasNonDefaultConfig = [](const FolderPairEnh& fp)
+    {
+        return !(fp == FolderPairEnh(fp.leftDirectory,
+                                     fp.rightDirectory,
+                                     nullptr, nullptr, FilterConfig()));
+    };
+
+    auto replaceDirectories = [&](MainConfiguration& mainCfg)
+    {
+        if (!leftDirs.empty())
+        {
+            //check if config at folder-pair level is present: this probably doesn't make sense when replacing/adding the user-specified directories
+            if (hasNonDefaultConfig(mainCfg.firstPair) || std::any_of(mainCfg.additionalPairs.begin(), mainCfg.additionalPairs.end(), hasNonDefaultConfig))
+            {
+                wxMessageBox(_("The config file must not contain settings at directory pair level when directories are set via command line."), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+                return false;
+            }
+
+            mainCfg.additionalPairs.clear();
+            for (size_t i = 0; i < leftDirs.size(); ++i)
+                if (i == 0)
+                {
+                    mainCfg.firstPair.leftDirectory  = leftDirs [0];
+                    mainCfg.firstPair.rightDirectory = rightDirs[0];
+                }
+                else
+                    mainCfg.additionalPairs.push_back(FolderPairEnh(leftDirs [i],
+                                                                    rightDirs[i],
+                                                                    nullptr, nullptr, FilterConfig()));
+        }
+        return true;
+    };
+
+    //distinguish sync scenarios:
+    //---------------------------
+    if (configFiles.empty())
+    {
+        //gui mode: default startup
+        if (leftDirs.empty())
+            runGuiMode();
+        //gui mode: default config with given directories
+        else
         {
             XmlGuiConfig guiCfg;
             guiCfg.mainCfg.syncCfg.directionCfg.var = DirectionConfig::MIRROR;
 
-            for (auto it = commandArgs.begin(); it != commandArgs.end(); ++it)
-            {
-                size_t index = it - commandArgs.begin();
-
-                FolderPairEnh* fp = nullptr;
-                if (index < 2)
-                    fp = &guiCfg.mainCfg.firstPair;
-                else
-                {
-                    guiCfg.mainCfg.additionalPairs.resize((index - 2) / 2 + 1);
-                    fp = &guiCfg.mainCfg.additionalPairs.back();
-                }
-
-                if (index % 2 == 0)
-                    fp->leftDirectory = *it;
-                else
-                    fp->rightDirectory = *it;
-            }
-
-            runGuiMode(guiCfg);
+            if (!replaceDirectories(guiCfg.mainCfg)) return;
+            runGuiMode(guiCfg, std::vector<Zstring>());
         }
-        else //mode 2: try to set config/batch-filename set by %1 parameter
+    }
+    else if (configFiles.size() == 1)
+    {
+        const Zstring filename = configFiles[0].first;
+
+        //batch mode
+        if (configFiles[0].second == XML_TYPE_BATCH)
         {
-            std::vector<Zstring> argsTmp = commandArgs;
-
-            for (auto it = argsTmp.begin(); it != argsTmp.end(); ++it)
+            XmlBatchConfig batchCfg;
+            try
             {
-                const Zstring& filename = *it;
-
-                if (!fileExists(filename)) //...be a little tolerant
+                readConfig(filename, batchCfg);
+            }
+            catch (const xmlAccess::FfsXmlError& e)
+            {
+                wxMessageBox(e.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
+                raiseReturnCode(returnCode, FFS_RC_ABORTED);
+                return;
+            }
+            if (!replaceDirectories(batchCfg.mainCfg)) return;
+            runBatchMode(batchCfg, filename, returnCode);
+        }
+        //GUI mode: single config
+        else
+        {
+            XmlGuiConfig guiCfg;
+            try
+            {
+                readConfig(filename, guiCfg);
+            }
+            catch (const xmlAccess::FfsXmlError& e)
+            {
+                if (e.getSeverity() == FfsXmlError::WARNING)
+                    wxMessageBox(e.toString(), L"FreeFileSync - " + _("Warning"), wxOK | wxICON_WARNING);
+                //what about simulating changed config on parsing errors????
+                else
                 {
-                    if (fileExists(filename + Zstr(".ffs_batch")))
-                        *it += Zstr(".ffs_batch");
-                    else if (fileExists(filename + Zstr(".ffs_gui")))
-                        *it += Zstr(".ffs_gui");
-                    else
-                    {
-                        wxMessageBox(replaceCpy(_("Cannot find file %x."), L"%x", fmtFileName(filename)), _("Error"), wxOK | wxICON_ERROR);
-                        return;
-                    }
+                    wxMessageBox(e.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+                    return;
                 }
             }
+            if (!replaceDirectories(guiCfg.mainCfg)) return;
+            //what about simulating changed config due to directory replacement?
+            //-> propably fine to not show as changed on GUI and not ask user to save on exit!
 
-            switch (getMergeType(argsTmp)) //throw ()
-            {
-                case MERGE_BATCH: //pure batch config files
-                    if (argsTmp.size() == 1)
-                        runBatchMode(argsTmp[0], returnCode);
-                    else
-                        runGuiMode(argsTmp);
-                    break;
-
-                case MERGE_GUI:       //pure gui config files
-                case MERGE_GUI_BATCH: //gui and batch files
-                    runGuiMode(argsTmp);
-                    break;
-
-                case MERGE_OTHER: //= none or unknown;
-                    //argsTmp are not empty and contain at least one non-gui/non-batch config file: find it!
-                    std::find_if(argsTmp.begin(), argsTmp.end(),
-                                 [](const Zstring& filename) -> bool
-                    {
-                        switch (getXmlType(filename)) //throw()
-                        {
-                            case XML_TYPE_GLOBAL:
-                            case XML_TYPE_OTHER:
-                                wxMessageBox(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)), _("Error"), wxOK | wxICON_ERROR);
-                                return true;
-
-                            case XML_TYPE_GUI:
-                            case XML_TYPE_BATCH:
-                                break;
-                        }
-                        return false;
-                    });
-                    break;
-            }
+            runGuiMode(guiCfg, { filename }); //caveat: guiCfg and filename do not match if directories were set/replaced via command line!
         }
     }
-}
-
-
-void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg)
-{
-    MainDialog::create(guiCfg, true);
-}
-
-
-void runGuiMode(const std::vector<Zstring>& cfgFileNames)
-{
-    MainDialog::create(cfgFileNames);
-}
-
-
-void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
-{
-    //load XML settings
-    XmlBatchConfig batchCfg;
-    try
+    //gui mode: merged configs
+    else
     {
-        readConfig(filename, batchCfg);
-    }
-    catch (const xmlAccess::FfsXmlError& e)
-    {
-        wxMessageBox(e.toString(), _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
-        raiseReturnCode(returnCode, FFS_RC_ABORTED);
-        return;
-    }
+        if (!leftDirs.empty())
+        {
+            wxMessageBox(_("Directories cannot be set for more than one configuration file."), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+            return;
+        }
 
+        std::vector<Zstring> filenames;
+        for (const auto& item : configFiles)
+            filenames.push_back(item.first);
+
+        XmlGuiConfig guiCfg; //structure to receive gui settings with default values
+        try
+        {
+            readAnyConfig(filenames, guiCfg); //throw FfsXmlError
+        }
+        catch (const FfsXmlError& e)
+        {
+            if (e.getSeverity() == FfsXmlError::WARNING)
+                wxMessageBox(e.toString(), L"FreeFileSync - " + _("Warning"), wxOK | wxICON_WARNING);
+            //what about simulating changed config on parsing errors????
+            else
+            {
+                wxMessageBox(e.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+                return;
+            }
+        }
+        runGuiMode(guiCfg, filenames);
+    }
+}
+
+
+void runGuiMode() { MainDialog::create(); }
+
+
+void runGuiMode(const xmlAccess::XmlGuiConfig& guiCfg,
+                const std::vector<Zstring>& referenceFiles)
+{
+    MainDialog::create(guiCfg, referenceFiles, nullptr, true); //startComparison == true!
+}
+
+
+void showSyntaxHelp()
+{
+    wxMessageBox(_("Syntax:") + L"\n" +
+                 L"FreeFileSync [" + _("config files") + L"]\n[-leftdir " + _("directory") + L"] [-rightdir " + _("directory") + L"]" + L"\n" +
+                 L"\n" +
+                 _("config files") + L"\n" +
+                 _("Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.") + L"\n\n"
+
+                 L"-leftdir " + _("directory") + L" -rightdir " + _("directory") + L"\n" +
+                 _("Any number of alternative directories for at most one config file."),
+                 L"FreeFileSync - " + _("Command line"), wxOK | wxICON_INFORMATION);
+}
+
+
+void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode)
+{
     auto notifyError = [&](const std::wstring& msg)
     {
         if (batchCfg.handleError == ON_ERROR_POPUP)
-            wxMessageBox(msg.c_str(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(msg.c_str(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
         else //"exit" or "ignore"
             logError(utfCvrtTo<std::string>(msg));
 
@@ -445,11 +566,11 @@ void runBatchMode(const Zstring& filename, FfsReturnCode& returnCode)
 
         const TimeComp timeStamp = localTime();
 
-        const SwitchToGui switchBatchToGui(filename, batchCfg, globalCfg); //prepare potential operational switch
+        const SwitchToGui switchBatchToGui(referenceFile, batchCfg, globalCfg); //prepare potential operational switch
 
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(batchCfg.showProgress, //throw BatchAbortProcess
-                                         extractJobName(filename),
+                                         extractJobName(referenceFile),
                                          timeStamp,
                                          batchCfg.logFileDirectory,
                                          batchCfg.logfilesCountLimit,

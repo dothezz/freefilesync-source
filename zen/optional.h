@@ -45,6 +45,7 @@ public:
         if (tmp.valid)
             value = tmp.value;
         valid = tmp.valid;
+		return *this;
     }
 
     ////rvalue optimization: only basic exception safety:

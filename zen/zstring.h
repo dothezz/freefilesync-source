@@ -28,11 +28,11 @@ class AllocatorFreeStoreChecked
 public:
     static void* allocate(size_t size) //throw std::bad_alloc
     {
-        void* newMem = ::operator new(size);
+        void* ptr = zen::AllocatorOptimalSpeed::allocate(size);
 #ifndef NDEBUG
-        z_impl::leakCheckerInsert(newMem, size); //test Zbase for memory leaks
+        z_impl::leakCheckerInsert(ptr, size); //test Zbase for memory leaks
 #endif
-        return newMem;
+        return ptr;
     }
 
     static void deallocate(void* ptr)
@@ -40,10 +40,10 @@ public:
 #ifndef NDEBUG
         z_impl::leakCheckerRemove(ptr); //check for memory leaks
 #endif
-        ::operator delete(ptr);
+        zen::AllocatorOptimalSpeed::deallocate(ptr);
     }
 
-    static size_t calcCapacity(size_t length) { return std::max<size_t>(16, length + length / 2); } //exponential growth + min size
+    static size_t calcCapacity(size_t length) { return zen::AllocatorOptimalSpeed::calcCapacity(length); }
 };
 
 

@@ -8,7 +8,7 @@
 #define TASKBARPROGRESS_H_INCLUDED
 
 #include <memory>
-#include <wx/toplevel.h>
+#include <wx/frame.h>
 
 /*
 Windows 7; show progress in windows superbar via ITaskbarList3 Interface: http://msdn.microsoft.com/en-us/library/dd391692(VS.85).aspx
@@ -27,7 +27,7 @@ class TaskbarNotAvailable {};
 class Taskbar
 {
 public:
-    Taskbar(const wxTopLevelWindow& window); //throw TaskbarNotAvailable()
+    Taskbar(const wxFrame& window); //throw TaskbarNotAvailable
     ~Taskbar();
 
     enum Status

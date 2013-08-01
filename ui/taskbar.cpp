@@ -30,7 +30,7 @@ using namespace tbseven;
 class Taskbar::Pimpl //throw TaskbarNotAvailable
 {
 public:
-    Pimpl(const wxTopLevelWindow& window) :
+    Pimpl(const wxFrame& window) :
         assocWindow(window.GetHWND()),
         setStatus_  (getDllName(), funName_setStatus),
         setProgress_(getDllName(), funName_setProgress)
@@ -86,7 +86,7 @@ const char FFS_DESKTOP_FILE[] = "freefilesync.desktop";
 class Taskbar::Pimpl //throw (TaskbarNotAvailable)
 {
 public:
-    Pimpl(const wxTopLevelWindow& window) :
+    Pimpl(const wxFrame& window) :
         tbEntry(unity_launcher_entry_get_for_desktop_id(FFS_DESKTOP_FILE))
         //tbEntry(unity_launcher_entry_get_for_app_uri("application://freefilesync.desktop"))
     {
@@ -133,7 +133,7 @@ private:
 class Taskbar::Pimpl
 {
 public:
-    Pimpl(const wxTopLevelWindow& window) {}
+    Pimpl(const wxFrame& window) {}
 
     ~Pimpl() { setDockText(""); }
 
@@ -161,7 +161,7 @@ private:
 class Taskbar::Pimpl
 {
 public:
-    Pimpl(const wxTopLevelWindow& window) { throw TaskbarNotAvailable(); }
+    Pimpl(const wxFrame& window) { throw TaskbarNotAvailable(); }
     void setStatus(Status status) {}
     void setProgress(double fraction) {}
 };
@@ -169,7 +169,7 @@ public:
 
 //########################################################################################################
 
-Taskbar::Taskbar(const wxTopLevelWindow& window) : pimpl_(new Pimpl(window)) {} //throw TaskbarNotAvailable
+Taskbar::Taskbar(const wxFrame& window) : pimpl_(new Pimpl(window)) {} //throw TaskbarNotAvailable
 Taskbar::~Taskbar() {}
 
 void Taskbar::setStatus(Status status) { pimpl_->setStatus(status); }

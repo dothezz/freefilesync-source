@@ -21,7 +21,7 @@ namespace zen
 Allocator Policy:
 -----------------
     void* allocate(size_t size) //throw std::bad_alloc
-    void deallocate(void* ptr)
+    void deallocate(void* ptr)  //must handle deallocate(nullptr)!
     size_t calcCapacity(size_t length)
 */
 class AllocatorOptimalSpeed //exponential growth + min size
@@ -30,8 +30,9 @@ public:
     //::operator new/ ::operator delete show same performance characterisics like malloc()/free()!
     static void* allocate(size_t size) { return ::operator new(size); } //throw std::bad_alloc
     static void  deallocate(void* ptr) { ::operator delete(ptr); }
-    static size_t calcCapacity(size_t length) { return std::max<size_t>(std::max<size_t>(16, length), length + length / 2); } //size_t might overflow!
-    //any growth rate should not exceed golden ratio: 1.618033989
+    static size_t calcCapacity(size_t length) { return std::max<size_t>(16, std::max(length + length / 2, length)); }
+    //- size_t might overflow! => better catch here than return a too small size covering up the real error: a way too large length!
+    //- any growth rate should not exceed golden ratio: 1.618033989
 };
 
 
@@ -52,7 +53,7 @@ template <typename Char, //Character Type
     Char* create(size_t size)
     Char* create(size_t size, size_t minCapacity)
     Char* clone(Char* ptr)
-    void destroy(Char* ptr)
+    void destroy(Char* ptr) //must handle destroy(nullptr)!
     bool canWrite(const Char* ptr, size_t minCapacity) //needs to be checked before writing to "ptr"
     size_t length(const Char* ptr)
     void setLength(Char* ptr, size_t newLength)
@@ -87,7 +88,7 @@ protected:
         return newData;
     }
 
-    static void destroy(Char* ptr) { AP::deallocate(descr(ptr)); }
+    static void destroy(Char* ptr) { AP::deallocate(descr(ptr)); } //should support destroy(nullptr)!
 
     //this needs to be checked before writing to "ptr"
     static bool canWrite(const Char* ptr, size_t minCapacity) { return minCapacity <= descr(ptr)->capacity; }
@@ -141,6 +142,7 @@ protected:
 
     static void destroy(Char* ptr)
     {
+        if (!ptr) return; //support destroy(nullptr)
         assert(descr(ptr)->refCount > 0);
         if (--descr(ptr)->refCount == 0) //operator--() is overloaded to decrement and evaluate in a single atomic operation!
         {
@@ -251,7 +253,7 @@ public:
 
 private:
     Zbase(int);             //
-    Zbase& operator=(int);  //detect usage errors
+    Zbase& operator=(int);  //detect usage errors by creating an intentional ambiguity with "Char"
     Zbase& operator+=(int); //
     void push_back(int);    //
 
@@ -281,15 +283,6 @@ template <class Char, template <class, class> class SP, class AP> inline Zbase<C
 
 template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(      Char          lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
 template <class Char, template <class, class> class SP, class AP> inline Zbase<Char, SP, AP> operator+(const Char*         lhs, const Zbase<Char, SP, AP>& rhs) { return Zbase<Char, SP, AP>(lhs) += rhs; }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -361,16 +354,9 @@ Zbase<Char, SP, AP>::Zbase(const Zbase<Char, SP, AP>& source)
 template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>::Zbase(Zbase<Char, SP, AP>&& tmp)
 {
-    if (this->canWrite(tmp.rawStr, 0)) //perf: following optimization saves about 4%
-    {
-        //do not increment ref-count of an unshared string! We'd lose optimization opportunity of reusing its memory!
-        //instead create a dummy string and swap:
-        rawStr = this->create(0); //no perf issue! see comment in default constructor
-        rawStr[0] = 0;
-        swap(tmp);
-    }
-    else //shared representation: yet another "add ref" won't hurt
-        rawStr = this->clone(tmp.rawStr);
+    rawStr = tmp.rawStr;
+    tmp.rawStr = nullptr; //usually nullptr would violate the class invarants, but it is good enough for the destructor!
+    //caveat: do not increment ref-count of an unshared string! We'd lose optimization opportunity of reusing its memory!
 }
 
 
@@ -388,7 +374,7 @@ Zbase<Char, SP, AP>::Zbase(const S& other, typename S::value_type)
 template <class Char, template <class, class> class SP, class AP> inline
 Zbase<Char, SP, AP>::~Zbase()
 {
-    this->destroy(rawStr);
+    this->destroy(rawStr); //rawStr may be nullptr; see move constructor!
 }
 
 
@@ -499,25 +485,25 @@ Zbase<Char, SP, AP>& Zbase<Char, SP, AP>::replace(size_t pos1, size_t n1, const 
 template <class Char, template <class, class> class SP, class AP> inline
 void Zbase<Char, SP, AP>::resize(size_t newSize, Char fillChar)
 {
+    const size_t oldSize = length();
     if (this->canWrite(rawStr, newSize))
     {
-        if (length() < newSize)
-            std::fill(rawStr + length(), rawStr + newSize, fillChar);
+        if (oldSize < newSize)
+            std::fill(rawStr + oldSize, rawStr + newSize, fillChar);
         rawStr[newSize] = 0;
-        this->setLength(rawStr, newSize); //keep after call to length()
+        this->setLength(rawStr, newSize);
     }
     else
     {
         Char* newStr = this->create(newSize);
-        newStr[newSize] = 0;
-
-        if (length() < newSize)
+        if (oldSize < newSize)
         {
-            std::copy(rawStr, rawStr + length(), newStr);
-            std::fill(newStr + length(), newStr + newSize, fillChar);
+            std::copy(rawStr, rawStr + oldSize, newStr);
+            std::fill(newStr + oldSize, newStr + newSize, fillChar);
         }
         else
             std::copy(rawStr, rawStr + newSize, newStr);
+        newStr[newSize] = 0;
 
         this->destroy(rawStr);
         rawStr = newStr;
@@ -614,7 +600,7 @@ void Zbase<Char, SP, AP>::clear()
     {
         if (this->canWrite(rawStr, 0))
         {
-            rawStr[0] = 0;        //keep allocated memory
+            rawStr[0] = 0;              //keep allocated memory
             this->setLength(rawStr, 0); //
         }
         else
@@ -636,8 +622,9 @@ void Zbase<Char, SP, AP>::reserve(size_t minCapacity) //make unshared and check 
     if (!this->canWrite(rawStr, minCapacity))
     {
         //allocate a new string
-        Char* newStr = this->create(length(), std::max(minCapacity, length())); //reserve() must NEVER shrink the string: logical const!
-        std::copy(rawStr, rawStr + length() + 1, newStr); //include 0-termination
+        const size_t len = length();
+        Char* newStr = this->create(len, std::max(len, minCapacity)); //reserve() must NEVER shrink the string: logical const!
+        std::copy(rawStr, rawStr + len + 1, newStr); //include 0-termination
 
         this->destroy(rawStr);
         rawStr = newStr;

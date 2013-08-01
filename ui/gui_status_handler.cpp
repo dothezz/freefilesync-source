@@ -8,6 +8,7 @@
 #include <wx/wupdlock.h>
 #include <wx+/shell_execute.h>
 #include <wx+/button.h>
+#include <wx/app.h>
 #include "msg_popup.h"
 #include "main_dlg.h"
 #include "exec_finished_box.h"
@@ -169,13 +170,12 @@ void CompareStatusHandler::abortThisProcess()
 
 //########################################################################################################
 
-SyncStatusHandler::SyncStatusHandler(wxTopLevelWindow* parentDlg,
+SyncStatusHandler::SyncStatusHandler(wxFrame* parentDlg,
                                      size_t lastSyncsLogFileSizeMax,
                                      OnGuiError handleError,
                                      const std::wstring& jobName,
                                      const std::wstring& execWhenFinished,
                                      std::vector<std::wstring>& execFinishedHistory) :
-    parentDlg_(parentDlg),
     progressDlg(createProgressDialog(*this, [this] { this->onProgressDialogTerminate(); }, *this, parentDlg, true, jobName, execWhenFinished, execFinishedHistory)),
             lastSyncsLogFileSizeMax_(lastSyncsLogFileSizeMax),
             handleError_(handleError),
@@ -267,7 +267,7 @@ SyncStatusHandler::~SyncStatusHandler()
         //-> nicely manages dialog lifetime
         while (progressDlg)
         {
-            updateUiNow(); //*first* refresh GUI (removing flicker) before sleeping!
+            wxTheApp->Yield(); //*first* refresh GUI (removing flicker) before sleeping!
             boost::this_thread::sleep(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL));
         }
     }
@@ -313,7 +313,7 @@ ProcessCallback::Response SyncStatusHandler::reportError(const std::wstring& err
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showErrorDlg(parentDlg_,
+            switch (showErrorDlg(progressDlg->getWindowIfVisible(),
                                  ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_CANCEL,
                                  errorMessage,
                                  &ignoreNextErrors))
@@ -357,7 +357,7 @@ void SyncStatusHandler::reportFatalError(const std::wstring& errorMessage)
             forceUiRefresh();
 
             bool ignoreNextErrors = false;
-            switch (showFatalErrorDlg(parentDlg_,
+            switch (showFatalErrorDlg(progressDlg->getWindowIfVisible(),
                                       ReturnFatalErrorDlg::BUTTON_IGNORE |  ReturnFatalErrorDlg::BUTTON_CANCEL,
                                       errorMessage, &ignoreNextErrors))
             {
@@ -395,7 +395,7 @@ void SyncStatusHandler::reportWarning(const std::wstring& warningMessage, bool& 
             forceUiRefresh();
 
             bool dontWarnAgain = false;
-            switch (showWarningDlg(parentDlg_,
+            switch (showWarningDlg(progressDlg->getWindowIfVisible(),
                                    ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_CANCEL,
                                    warningMessage, dontWarnAgain))
             {

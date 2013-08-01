@@ -227,7 +227,7 @@ void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
                              errorMsg);      //out, optional: call freeString() after use!
             if (errorMsg)
             {
-                wxMessageBox(errorMsg, _("Error"), wxOK | wxICON_ERROR);
+                wxMessageBox(errorMsg, /*L"FreeFileSync - " +*/ _("Error"), wxOK | wxICON_ERROR); //component used by FFS *and* RTS!
                 return;
             }
             if (cancelled || !selectedFolder)

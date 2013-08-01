@@ -21,6 +21,9 @@ struct StaticInt
 template <bool b>
 struct StaticBool : StaticInt<b> {};
 
+typedef StaticBool<true>  TrueType;
+typedef StaticBool<false> FalseType;
+
 template <class EnumType, EnumType val>
 struct StaticEnum
 {
@@ -45,7 +48,7 @@ template <class T> struct IsArithmetic; //IsInteger or IsFloat
 //remaining non-arithmetic types: bool, char, wchar_t
 
 //optional: specialize new types like:
-//template <> struct IsUnsignedInt<UInt64> : StaticBool<true> {};
+//template <> struct IsUnsignedInt<UInt64> : TrueType {};
 
 //################# Class Members ########################
 
@@ -81,10 +84,10 @@ template <class T> struct IsArithmetic; //IsInteger or IsFloat
 
 
 //################ implementation ######################
-#define ZEN_SPECIALIZE_TRAIT(X, Y) template <> struct X<Y> : StaticBool<true> {};
+#define ZEN_SPECIALIZE_TRAIT(X, Y) template <> struct X<Y> : TrueType {};
 
 template <class T>
-struct IsUnsignedInt : StaticBool<false> {};
+struct IsUnsignedInt : FalseType {};
 
 ZEN_SPECIALIZE_TRAIT(IsUnsignedInt, unsigned char);
 ZEN_SPECIALIZE_TRAIT(IsUnsignedInt, unsigned short int);
@@ -94,7 +97,7 @@ ZEN_SPECIALIZE_TRAIT(IsUnsignedInt, unsigned long long int); //new with C++11 - 
 //------------------------------------------------------
 
 template <class T>
-struct IsSignedInt : StaticBool<false> {};
+struct IsSignedInt : FalseType {};
 
 ZEN_SPECIALIZE_TRAIT(IsSignedInt, signed char);
 ZEN_SPECIALIZE_TRAIT(IsSignedInt, short int);
@@ -104,7 +107,7 @@ ZEN_SPECIALIZE_TRAIT(IsSignedInt, long long int); //new with C++11 - same type a
 //------------------------------------------------------
 
 template <class T>
-struct IsFloat : StaticBool<false> {};
+struct IsFloat : FalseType {};
 
 ZEN_SPECIALIZE_TRAIT(IsFloat, float);
 ZEN_SPECIALIZE_TRAIT(IsFloat, double);
@@ -143,7 +146,7 @@ struct IsArithmetic : StaticBool<IsInteger<T>::value || IsFloat<T>::value> {};
     };                                                                                          \
     \
     template<class T>					                          \
-    struct HasMemberImpl_##NAME<false, T> : StaticBool<false> {}; \
+    struct HasMemberImpl_##NAME<false, T> : FalseType {}; \
     \
     template<typename T>                                          \
     struct HasMember_##NAME : StaticBool<HasMemberImpl_##NAME<std::is_class<T>::value, T>::value> {};
