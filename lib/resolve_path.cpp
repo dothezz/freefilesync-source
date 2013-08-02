@@ -598,7 +598,7 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
     	user account:	<Domain>\<user>		e.g. WIN-XP\ZenJu
     	network share:	\\<server>\<share>	e.g. \\WIN-XP\test
 
-    Windows Command Line:
+    Windows Command Line: 
     - list *all* active network connections, including deviceless ones which are hidden in Explorer:
     		net use
     - delete active connection:

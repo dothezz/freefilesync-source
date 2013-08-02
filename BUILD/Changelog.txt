@@ -1,3 +1,8 @@
+FreeFileSync 5.20
+-----------------
+Fixed crash on startup due to wxWigets 64-bit bug in font enumeration (Windows 8)
+
+
 FreeFileSync 5.19
 -----------------
 Redesigned progress dialog including new items graph

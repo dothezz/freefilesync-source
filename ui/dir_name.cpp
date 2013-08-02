@@ -235,7 +235,7 @@ void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
             newFolder = make_unique<wxString>(selectedFolder);
         }
     }
-#endif
+#endif 
     if (!newFolder.get())
     {
         wxDirDialog dirPicker(&selectButton_, _("Select a folder"), defaultDirname); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!
