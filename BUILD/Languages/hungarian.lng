@@ -11,7 +11,7 @@
 <target>Mindkét oldal megváltozott az utolsó szikronizálás óta.</target>
 
 <source>Cannot determine sync-direction:</source>
-<target>Nem lehet meghatározni a szinkronizálás irányát:</target>
+<target>Nem meghatározható a szinkronizálás iránya:</target>
 
 <source>No change since last synchronization.</source>
 <target>Az utolsó szinkronizálás óta nem történt változás.</target>
@@ -23,19 +23,19 @@
 <target>Alapértelmezett szinkronizálási irányok beállítása: a régebbi fájlokat írja felül az újabbakkal.</target>
 
 <source>Checking recycle bin availability for folder %x...</source>
-<target>A Lomtár elérhetőségének ellenőrzése a következő könyvtár vonatkozásában: %x.</target>
+<target>A Lomtár elérhetőségének ellenőrzése %x könyvtár vonatkozásában...</target>
 
-<source>Moving file %x to recycle bin</source>
-<target>%x fájl mozgatása a Lomtárba (Recycle Bin)</target>
+<source>Moving file %x to the recycle bin</source>
+<target>%x fájlt a Lomtárba mozgatja</target>
 
-<source>Moving folder %x to recycle bin</source>
-<target>%x könyvtár mozgatása a Lomtárba (Recycle Bin)</target>
+<source>Moving folder %x to the recycle bin</source>
+<target>%x könyvtárat a Lomtárba mozgatja</target>
 
-<source>Moving symbolic link %x to recycle bin</source>
-<target>%x szimbolikus hivatkozás mozgatása a Lomtárba (Recycle Bin)</target>
+<source>Moving symbolic link %x to the recycle bin</source>
+<target>%x szimbolikus linket a Lomtárba mozgatja</target>
 
 <source>Deleting file %x</source>
-<target>%x Fájl törlése</target>
+<target>%x fájl törlése</target>
 
 <source>Deleting folder %x</source>
 <target>%x könyvtár törlése</target>
@@ -43,23 +43,59 @@
 <source>Deleting symbolic link %x</source>
 <target>%x szimbolikus hivatkozás törlése</target>
 
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>A Lomtár nem elérhető a következő könytárak esetében. A fájlok ehelyett végleges törlésre kerülnek!</target>
+<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>A Lomtár nem elérhető a következő könytárak esetében. A fájlok ezért véglegesen törlődnek:</target>
 
 <source>An exception occurred</source>
-<target>Kivétel lépett fel</target>
+<target>Kivétel történt</target>
 
-<source>Cannot find file %x.</source>
-<target>Nem található a következő fájl: %x.</target>
+<source>A directory path is expected after %x.</source>
+<target>%x után egy könyvtár elérési útvonalának kell következnie.</target>
+
+<source>Syntax error</source>
+<target>Szintaktikai hiba</target>
+
+<source>Cannot open file %x.</source>
+<target>%x fájl nem nyitható.</target>
 
 <source>Error</source>
 <target>Hiba</target>
 
 <source>File %x does not contain a valid configuration.</source>
-<target>A következő fájl nem tartalmaz érvényes beállításokat: %x.</target>
+<target>%x fájl nem tartalmaz érvényes beállításokat.</target>
+
+<source>Unequal number of left and right directories specified.</source>
+<target>Eltérő számú bal- és jobboldali könyvtárat határozott meg.</target>
+
+<source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
+<target>A konfigurációs fájl nem tartalmazhat beállításokat könyvár-pár szinten, ha a könyvtárakat parancssorban állítjuk be.</target>
+
+<source>Warning</source>
+<target>Figyelmeztetés</target>
+
+<source>Directories cannot be set for more than one configuration file.</source>
+<target>A könyvtárakat nem lehet egynél több konfigurációs fájlra beállítani</target>
+
+<source>Syntax:</source>
+<target>Szintaxis:</target>
+
+<source>config files</source>
+<target>konfigurációs fájlok</target>
+
+<source>directory</source>
+<target>könyvtár</target>
+
+<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
+<target>Tetszőleges számú .ffs_gui és/vagy .ffs_batch konfigurációs fájl készíthető a FreeFileSync-hez</target>
+
+<source>Any number of alternative directories for at most one config file.</source>
+<target>Tetszőleges számú alternatív könyvtár legfeljebb egy konfigurációs fájlhoz</target>
+
+<source>Command line</source>
+<target>Parancssor</target>
 
 <source>A folder input field is empty.</source>
-<target>A könyvtár beviteli mezeje üres.</target>
+<target>A könyvtár beviteli mező üres.</target>
 
 <source>The corresponding folder will be considered as empty.</source>
 <target>A kapcsolódó könyvtárat üresként kezeli.</target>
@@ -68,7 +104,7 @@
 <target>A következő könyvtárak nem találhatóak:</target>
 
 <source>You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization.</source>
-<target>Figyelmen kívül hagyhatod ezt a hibát ezzel üresnek tekintve minden egyes könyvtárat. A könytárak automatikusan létrejönnek a szinkronizálás folyamán.</target>
+<target>Figyelmen kívül hagyhatod ezt a hibát, ezzel üresnek tekintve minden egyes könyvtárat. A könytárak ekkor automatikusan létrejönnek a szinkronizálás folyamán.</target>
 
 <source>The following folders have dependent paths. Be careful when setting up synchronization rules:</source>
 <target>A következő könytárak egymástól függő útvonalat tartalmaznak. Légy óvatos a szinkronizálás szabályainak meghatározásánál!</target>
@@ -215,12 +251,12 @@
 <target>Összes időszükségelet:</target>
 
 <source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
 </source>
 <target>
-<pluralform>1 Bájt</pluralform>
-<pluralform>%x Bájt</pluralform>
+<pluralform>1 bájt</pluralform>
+<pluralform>%x bájt</pluralform>
 </target>
 
 <source>%x MB</source>
@@ -242,12 +278,12 @@
 <target>Vizsgálat:</target>
 
 <source>
-<pluralform>[1 Thread]</pluralform>
-<pluralform>[%x Threads]</pluralform>
+<pluralform>1 thread</pluralform>
+<pluralform>%x threads</pluralform>
 </source>
 <target>
-<pluralform>[1 szál]</pluralform>
-<pluralform>[%x szál]</pluralform>
+<pluralform>1 szál</pluralform>
+<pluralform>%x szál</pluralform>
 </target>
 
 <source>Encoding extended time information: %x</source>
@@ -255,6 +291,9 @@
 
 <source>/sec</source>
 <target>/másodperc</target>
+
+<source>%x items</source>
+<target>%x elem</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>%x konfigurációs fájl csak részlegesen töltődött be: .</target>
@@ -268,8 +307,8 @@
 <source>Browse directory</source>
 <target>Tallózza a könyvtárat</target>
 
-<source>Cannot access Volume Shadow Copy Service.</source>
-<target>Nem sikerült elérni a kötet-árnyékmásolat (Volume Shadow Copy) szolgáltatást.</target>
+<source>Cannot access the Volume Shadow Copy Service.</source>
+<target>Nem elérhető a Kötet Árnyék-másolat szolgáltatás.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Kérjük, használd a FreeFileSync 64 bites verzióját az árnyékmásolatok készítéséhez ezen a rendszeren.</target>
@@ -280,8 +319,8 @@
 <source>Cannot determine volume name for %x.</source>
 <target>Nem lehet meghatározni a kötet-nevet a(z) %x számára</target>
 
-<source>Volume name %x not part of file name %y.</source>
-<target>%x kötet-nevet nem tartalmazza a(z) %y fájlnév.</target>
+<source>Volume name %x is not part of file path %y.</source>
+<target>%x kötet név nem része a(z) %y fájl elérési útvonalnak</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Megszakítást igényelt: Várakozás a folyamatban lévő művelet befejezésére...</target>
@@ -349,9 +388,6 @@
 <source>Idle time between last detected change and execution of command</source>
 <target>Üresjárat időtartama az utolsó változás észlelése és a parancs végrehajtása között</target>
 
-<source>Command line</source>
-<target>Parancssor</target>
-
 <source>
 The command is triggered if:
 - files or subfolders change
@@ -375,9 +411,6 @@ A parancs végrehajtódik, ha:
 <source>RealtimeSync - Automated Synchronization</source>
 <target>Valós idejű - Automatikus szinkronizálás</target>
 
-<source>Warning</source>
-<target>Figyelem</target>
-
 <source>Build: %x</source>
 <target>Build: %x</target>
 
@@ -387,14 +420,20 @@ A parancs végrehajtódik, ha:
 <source>All files</source>
 <target>Összes fájl</target>
 
+<source>Directory monitoring active</source>
+<target>A könytár figyelés aktív</target>
+
+<source>Waiting until all directories are available...</source>
+<target>Várakozik, amíg az összes könyvtár elérhetővé válik...</target>
+
 <source>&Restore</source>
 <target>&Visszaállít</target>
 
+<source>&Show error</source>
+<target>&Mutassa a hibákat</target>
+
 <source>&Exit</source>
 <target>&Kilép</target>
-
-<source>Waiting for missing directories...</source>
-<target>Várakozás a hiányzó könyvtárakra...</target>
 
 <source>Invalid command line:</source>
 <target>Érvénytelen parancssor:</target>
@@ -405,14 +444,14 @@ A parancs végrehajtódik, ha:
 <source>File time and size</source>
 <target>Fájl dátuma és mérete</target>
 
-<source> Two way </source>
-<target> Kétirányú </target>
+<source>Two way</source>
+<target>Kétirányú</target>
 
 <source>Mirror</source>
-<target>Tükröz </target>
+<target>Tükröz</target>
 
 <source>Update</source>
-<target>Frissít </target>
+<target>Frissít</target>
 
 <source>Custom</source>
 <target>Egyedi</target>
@@ -468,11 +507,8 @@ A parancs végrehajtódik, ha:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>A következő elemek feloldatlan ütközést tartalmaznak, így nem lesznek szinkronizálva:</target>
 
-<source>Significant difference detected:</source>
-<target>Jelentős különbség érzékelt:</target>
-
-<source>More than 50% of the total number of files will be copied or deleted.</source>
-<target>Az összes fájl több mint 50%-át másolni vagy törölni fogja.</target>
+<source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
+<target>A következő könyvtárak lényegileg különböznek. Győződjön meg róla, hogy a megfelelő könyvtárakat illesztette-e össze szinkronizáláshoz.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Nincs elég szabad lemezterület:</target>
@@ -492,11 +528,14 @@ A parancs végrehajtódik, ha:
 <source>Generating database...</source>
 <target>Adatbázis generálása...</target>
 
-<source>Creating Volume Shadow Copy for %x...</source>
-<target>Kötet árnyékmásolat (Volume Shadow Copy) létrehozása %x számára...</target>
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Készít egy ányékmásolat-kötetet %x számára</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>Adat-ellenőrzési hiba: %x és %y tartalma különböző.</target>
+
+<source>job name</source>
+<target>feladat neve</target>
 
 <source>Synchronization aborted</source>
 <target>A szinkronizálás megszakítva</target>
@@ -521,6 +560,9 @@ A parancs végrehajtódik, ha:
 
 <source>Switching to FreeFileSync main dialog</source>
 <target>Váltás a FreeFileSync fő párbeszéd-ablakára</target>
+
+<source>Retrying operation after error:</source>
+<target>Újrapróbálja a műveletet a hiba után:</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Elérhető a FreeFileSync új verziója:</target>
@@ -645,8 +687,8 @@ A parancs végrehajtódik, ha:
 <source>&Export file list...</source>
 <target>&Exportálja a fájllistát...</target>
 
-<source>&Global settings...</source>
-<target>&Globális beállítások...</target>
+<source>&Global settings</source>
+<target>&Globális beállítások</target>
 
 <source>&Tools</source>
 <target>Es&zközök</target>
@@ -717,6 +759,9 @@ A parancs végrehajtódik, ha:
 <source>Synchronizing...</source>
 <target>Szinkronizálás folyamatban...</target>
 
+<source>Minimize to notification area</source>
+<target>Minimalizálja a figyelmeztetési területre</target>
+
 <source>On completion</source>
 <target>Befejezés esetén</target>
 
@@ -725,6 +770,15 @@ A parancs végrehajtódik, ha:
 
 <source>&Pause</source>
 <target>&Várakozás</target>
+
+<source>Variant</source>
+<target>Variáns</target>
+
+<source>Statistics</source>
+<target>Statisztika</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Ne mutassa ismételten ezt a párbeszédablakot</target>
 
 <source>Select a variant</source>
 <target>Válassz egy variánst</target>
@@ -774,11 +828,17 @@ megegyezik
 <source>Configure your own synchronization rules.</source>
 <target>Állítsd be a saját szinkronizálási szabályaidat</target>
 
+<source>Detect moved files</source>
+<target>Érzékelje a mozgatott fájlokat</target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target>Adatbázis fájlok szükségesek. Nem minden fájlrendszer támogatja.</target>
+
 <source>Error handling</source>
 <target>Hibakezelés</target>
 
 <source>Ignore</source>
-<target>Kihagy</target>
+<target>Figyelmen kívül hagy</target>
 
 <source>Hide all error and warning messages</source>
 <target>Rejtse el az összes hibaüzenetet és figyelmeztetést</target>
@@ -798,17 +858,17 @@ megegyezik
 <source>Delete or overwrite files permanently</source>
 <target>Törölje vagy írja felül véglegesen a fájlokat</target>
 
-<source>Recycle Bin</source>
-<target>Lomtár (Recycle Bin)</target>
+<source>Recycle bin</source>
+<target>Lomtár</target>
 
-<source>Use Recycle Bin for deleted and overwritten files</source>
-<target>Használd a Lomtárat a törölt és felülírt fájlok számára</target>
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>Mentse a törölt és felülírt fájlokat a Lomtárba</target>
 
 <source>Versioning</source>
 <target>Verziókövetés</target>
 
-<source>Move files to user-defined folder</source>
-<target>Mozgasd a fájlokat  a felhasználó által megadott könyvtárba</target>
+<source>Move files to a user-defined folder</source>
+<target>Mozgassa a fájlokat egy a felhasználó által meghatározott könyvtárba</target>
 
 <source>Naming convention:</source>
 <target>Elnevezési konvenció:</target>
@@ -816,8 +876,8 @@ megegyezik
 <source>Batch job</source>
 <target>Kötegelt feladat</target>
 
-<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Kötegelt fájl létrehozása a szinkronizálás automatizálásához. Kattints duplán a fájlnévre vagy ütemezd a rendszered feladatütemezőjével: FreeFileSync.exe <feladatnév>.ffs_batch</target>
+<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target>Készitsen egy parancsfájlt a felügyelet nélküli szinkronizáláshoz. Az indításhoz kattintson kétszer erre a fájlra vagy ütemezze a feladat-tervezőben: %x</target>
 
 <source>Exit</source>
 <target>Kilép</target>
@@ -871,12 +931,12 @@ megegyezik
 <target>Törlés mindkét oldalon, még akkor is, ha a fájl csak az egyik oldalon lett kijelölve</target>
 
 <source>
-Only files that match all filter settings will be synchronized.
-Note: File names must be relative to base directories.
+Files will only be synchronized if they pass all filter rules.
+Note: File paths must be relative to base directories.
 </source>
 <target>
-Csak a valamennyi szűrő-beállításnak megfelelő fájlok lesznek szinkronizálva.
-Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
+A fájlokat csak akkor szinkronizálja, ha azok valamennyi szűrőfeltételnek megfelelnek.
+Megjegyzés: Az útvonalakat az alapkönyvtárakhoz képest kell megadni.
 </target>
 
 <source>Include</source>
@@ -906,20 +966,20 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>Fail-safe file copy</source>
 <target>Hibamentes fájlmásolás</target>
 
-<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Írja egy ideiglenes fájlba (*.ffs_tmp), majd azt nevezze át. Ez garantálja az konzisztens állapotot még végzetes hiba esetén is.</target>
+<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
+<target>Másolja először egy ideiglenes fájlba (*.ffs_tmp) aztán nevezze át. Ez garantálja a konzisztents állapotot végzetes hibák esetén is.</target>
 
 <source>Copy locked files</source>
 <target>Másolja a zárolt fájlokat</target>
 
-<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Másolja a megosztott vagy zárolt fájlokat  a Volume Shadow Copy szolgáltatással (Adminisztrátori jogosultság szükséges)</target>
+<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
+<target>A megosztott és zárolt fájlokat a kötet-árnyékmásolat szolgáltatás használatával másolja(adminisztrátori jogosultság szükséges)</target>
 
 <source>Copy file access permissions</source>
 <target>Másolja a fájl hozzáférési jogosultságokat</target>
 
-<source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Fájlok és könytárak jogosultságainak átvitele (Adminisztrátori jogosultság szükséges)</target>
+<source>Transfer file and folder permissions (requires administrator rights)</source>
+<target>Örökítse át a fájl és könyvtár jogosultságokat (adminisztrátori jogosultság szükséges)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Állítsa vissza a rejtett párbeszédablakokat</target>
@@ -933,15 +993,6 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>&Default</source>
 <target>&Alapértelmezett</target>
 
-<source>Variant</source>
-<target>Variáns</target>
-
-<source>Statistics</source>
-<target>Statisztika</target>
-
-<source>Don't show this dialog again</source>
-<target>Ne mutasd többé ezt a párbeszédablakot</target>
-
 <source>Find what:</source>
 <target>Mit keres:</target>
 
@@ -951,14 +1002,14 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>&Find next</source>
 <target>&Keresse a következőt</target>
 
+<source>Start synchronization</source>
+<target>Indítja a szinkronizálást</target>
+
 <source>Delete</source>
 <target>Töröl</target>
 
 <source>Configure filter</source>
 <target>Beállítja a szűrőt</target>
-
-<source>Start synchronization</source>
-<target>Indítja a szinkronizálást</target>
 
 <source>Find</source>
 <target>Keres:</target>
@@ -992,6 +1043,21 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 
 <source>Compare both sides</source>
 <target>Vesse össze mindkét oldalt</target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+<pluralform>Tényleg a végre akarja hajtani a(z) %y parancsot a következő elemen?</pluralform>
+<pluralform>Tényleg a végre akarja hajtani a(z) %y parancsot a következő %x elemen?</pluralform>
+</target>
+
+<source>Confirm</source>
+<target>Jóváhagy</target>
+
+<source>&Execute</source>
+<target>Vé&grehajt</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1029,11 +1095,14 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>Include temporarily</source>
 <target>Csatolja ideiglenesen</target>
 
-<source>Exclude via filter:</source>
-<target>Zárja ki szűrő segítségével:</target>
-
 <source>multiple selection</source>
 <target>többszörös kijelölés</target>
+
+<source>Include via filter:</source>
+<target>A szűrőt figyelembe véve adja hozzá</target>
+
+<source>Exclude via filter:</source>
+<target>Zárja ki szűrő segítségével:</target>
 
 <source>Include all</source>
 <target>Csatolja az összest</target>
@@ -1080,8 +1149,8 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>Do&n't save</source>
 <target>&ne mentse</target>
 
-<source>Never save changes</source>
-<target>Ne mentse a változtatásokat</target>
+<source>Never save &changes</source>
+<target>N&e mentse a változásokat</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mutassa a csak a bal oldalon létező fájlokat</target>
@@ -1134,8 +1203,8 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>All folders are in sync</source>
 <target>Minden könyvtár szinkronban</target>
 
-<source>Comma separated list</source>
-<target>CSV formátumú (vesszővel elválasztott) lista</target>
+<source>Comma-separated values</source>
+<target>Vesszővel elválasztott értékek (CSV)</target>
 
 <source>File list exported</source>
 <target>A fájllista exportálása befejeződött</target>
@@ -1143,8 +1212,8 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>Searching for program updates...</source>
 <target>Programfrissítés keresése...</target>
 
-<source>Ignore further errors</source>
-<target>Hagyja figyelmen kívül a további hibákat</target>
+<source>&Ignore subsequent errors</source>
+<target>F&igyelmen kívül hagyja az utána következő hibákat</target>
 
 <source>&Ignore</source>
 <target>&Kihagy</target>
@@ -1152,8 +1221,8 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>Fatal Error</source>
 <target>Kritikus hiba</target>
 
-<source>Don't show this warning again</source>
-<target>Ne mutassa ismét ezt a figyelmeztetést</target>
+<source>&Don't show this warning again</source>
+<target>&Ne mutassa ismételten ezt a figyelmeztetést</target>
 
 <source>&Switch</source>
 <target>&Váltás</target>
@@ -1188,14 +1257,11 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>Completed</source>
 <target>Befejeződött</target>
 
-<source>Continue</source>
-<target>Folytat</target>
+<source>&Continue</source>
+<target>&Folytat</target>
 
-<source>Pause</source>
-<target>Szünet</target>
-
-<source>Logging</source>
-<target>Naplózás</target>
+<source>Log</source>
+<target>Napló</target>
 
 <source>Cannot find %x</source>
 <target>Nem található: %x</target>
@@ -1231,12 +1297,12 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <target>Szűrő</target>
 
 <source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>Valóban a Lomtárba akarod mozgatni a következő elemet?</pluralform>
-<pluralform>Valóban a Lomtárba akarod mozgatni a következő %x elemet?</pluralform>
+<pluralform>Tényleg a Lomtárba akarja áthelyezni a következő elemet?</pluralform>
+<pluralform>Tényleg a Lomtárba akarja áthelyezni a következő %x elemet?</pluralform>
 </target>
 
 <source>
@@ -1289,9 +1355,6 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 
 <source>Append a timestamp to each file name</source>
 <target>Adjon időbélyeget minden fájlnévhez</target>
-
-<source>Folder</source>
-<target>Könyvtár</target>
 
 <source>File</source>
 <target>Fájl</target>
@@ -1413,8 +1476,8 @@ Megjegyzés: A fájlneveket az alapkönyvtárakhoz képest kell vizsgálni.
 <source>Cannot change process I/O priorities.</source>
 <target>Nem sikerült a folyamatok I/O prioritását megváltoztatni.</target>
 
-<source>Unable to move %x to the Recycle Bin.</source>
-<target>%x Lomtárba helyezése sikertelen.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>%x nem helyezhető a Lomtárba</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>Nem lehet meghatározni a végső útvonalat a(z) %x számára.</target>

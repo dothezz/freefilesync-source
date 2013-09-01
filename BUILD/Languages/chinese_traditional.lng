@@ -7,6 +7,9 @@
 	<plural_definition>0</plural_definition>
 </header>
 
+<source>Close search bar</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>自上次同步後，兩邊均已變更過。</target>
 
@@ -25,13 +28,13 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>正在檢查資源回收筒的可用性資料夾 %x...</target>
 
-<source>Moving file %x to recycle bin</source>
+<source>Moving file %x to the recycle bin</source>
 <target>正在移動檔案 %x 到資源回收筒</target>
 
-<source>Moving folder %x to recycle bin</source>
+<source>Moving folder %x to the recycle bin</source>
 <target>正在移動資料夾 %x 到資源回收筒</target>
 
-<source>Moving symbolic link %x to recycle bin</source>
+<source>Moving symbolic link %x to the recycle bin</source>
 <target>正在移動符號連結 %x 到資源回收筒</target>
 
 <source>Deleting file %x</source>
@@ -43,20 +46,56 @@
 <source>Deleting symbolic link %x</source>
 <target>正在刪除符號連結 %x</target>
 
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>資源回收筒不可用於以下資料夾！否則檔案將改為永久被刪除：</target>
+<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>資源回收筒不可用於以下資料夾。檔案將被永久刪除替代：</target>
 
 <source>An exception occurred</source>
 <target>發生異常</target>
 
-<source>Cannot find file %x.</source>
-<target>找不到檔案 %x。</target>
+<source>A directory path is expected after %x.</source>
+<target>%x 後預期的目錄路徑。</target>
+
+<source>Syntax error</source>
+<target>語法錯誤</target>
+
+<source>Cannot open file %x.</source>
+<target>無法開啟檔案 %x。</target>
 
 <source>Error</source>
 <target>錯誤</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>檔案 %x 不包含一個有效的配置。</target>
+
+<source>Unequal number of left and right directories specified.</source>
+<target>左邊和右邊指定的目錄數不相等。</target>
+
+<source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
+<target>目錄設定透過命令列時，該設定檔必須不包含配對目錄級別的設定。</target>
+
+<source>Warning</source>
+<target>警告</target>
+
+<source>Directories cannot be set for more than one configuration file.</source>
+<target>目錄無法設定多個配置檔。</target>
+
+<source>Syntax:</source>
+<target>語法：</target>
+
+<source>config files</source>
+<target>配置檔案</target>
+
+<source>directory</source>
+<target>目錄</target>
+
+<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
+<target>FreeFileSync .ffs_gui和/或.ffs_batch配置檔案的任意數量。</target>
+
+<source>Any number of alternative directories for at most one config file.</source>
+<target>替代目錄的任意數量中最多有一個配置文件。</target>
+
+<source>Command line</source>
+<target>命令列</target>
 
 <source>A folder input field is empty.</source>
 <target>資料夾輸入欄位是空的。</target>
@@ -214,11 +253,11 @@
 <target>全部時間：</target>
 
 <source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
 </source>
 <target>
-<pluralform>%x 位元組</pluralform>
+<pluralform>%x 個位元組</pluralform>
 </target>
 
 <source>%x MB</source>
@@ -240,11 +279,11 @@
 <target>正在掃瞄：</target>
 
 <source>
-<pluralform>[1 Thread]</pluralform>
-<pluralform>[%x Threads]</pluralform>
+<pluralform>1 thread</pluralform>
+<pluralform>%x threads</pluralform>
 </source>
 <target>
-<pluralform>[%x 個執行緒]</pluralform>
+<pluralform>%x 個執行緒</pluralform>
 </target>
 
 <source>Encoding extended time information: %x</source>
@@ -252,6 +291,9 @@
 
 <source>/sec</source>
 <target>/秒</target>
+
+<source>%x items</source>
+<target>%x 項目</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>只載入設定檔 %x 的一部份。</target>
@@ -265,7 +307,7 @@
 <source>Browse directory</source>
 <target>瀏覽目錄</target>
 
-<source>Cannot access Volume Shadow Copy Service.</source>
+<source>Cannot access the Volume Shadow Copy Service.</source>
 <target>無法讀取卷影複製服務。</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
@@ -277,8 +319,8 @@
 <source>Cannot determine volume name for %x.</source>
 <target>無法確定卷名為 %x。</target>
 
-<source>Volume name %x not part of file name %y.</source>
-<target>卷名 %x 並非檔名 %y 的一部份。</target>
+<source>Volume name %x is not part of file path %y.</source>
+<target>卷名 %x 不是檔案路徑 %y 的一部分。</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>中止請求：正在等待目前操作完成...</target>
@@ -346,9 +388,6 @@
 <source>Idle time between last detected change and execution of command</source>
 <target>最後檢測到變更和執行命令之間的閒置時間</target>
 
-<source>Command line</source>
-<target>命令列</target>
-
 <source>
 The command is triggered if:
 - files or subfolders change
@@ -372,9 +411,6 @@ The command is triggered if:
 <source>RealtimeSync - Automated Synchronization</source>
 <target>即時同步 - 自動同步</target>
 
-<source>Warning</source>
-<target>警告</target>
-
 <source>Build: %x</source>
 <target>建立：%x</target>
 
@@ -384,14 +420,20 @@ The command is triggered if:
 <source>All files</source>
 <target>所有檔案</target>
 
+<source>Directory monitoring active</source>
+<target>目錄監測啟動</target>
+
+<source>Waiting until all directories are available...</source>
+<target>等到所有目錄可用...</target>
+
 <source>&Restore</source>
 <target>還原(&R)</target>
 
+<source>&Show error</source>
+<target>顯示錯誤(&S)</target>
+
 <source>&Exit</source>
 <target>結束(&E)</target>
-
-<source>Waiting for missing directories...</source>
-<target>等待缺少的目錄...</target>
 
 <source>Invalid command line:</source>
 <target>無效的命令列：</target>
@@ -402,14 +444,14 @@ The command is triggered if:
 <source>File time and size</source>
 <target>檔案大小和日期</target>
 
-<source> Two way </source>
-<target> 雙向 </target>
+<source>Two way</source>
+<target>雙向</target>
 
 <source>Mirror</source>
-<target>鏡像 </target>
+<target>鏡像</target>
 
 <source>Update</source>
-<target>更新 </target>
+<target>更新</target>
 
 <source>Custom</source>
 <target>自訂</target>
@@ -465,11 +507,8 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>下列項目有未解決的衝突，將不會同步：</target>
 
-<source>Significant difference detected:</source>
-<target>檢測到顯著的差異：</target>
-
-<source>More than 50% of the total number of files will be copied or deleted.</source>
-<target>超過總數 50% 以上的檔案會被複製或刪除。</target>
+<source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
+<target>下列資料夾明顯不同。請確定要進行同步的資料夾匹配正確。</target>
 
 <source>Not enough free disk space available in:</source>
 <target>沒有足夠的可用空間：</target>
@@ -489,11 +528,14 @@ The command is triggered if:
 <source>Generating database...</source>
 <target>正在產生資料庫...</target>
 
-<source>Creating Volume Shadow Copy for %x...</source>
+<source>Creating a Volume Shadow Copy for %x...</source>
 <target>正在新建卷影複製為 %x...</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>資料驗證錯誤：%x 和 %y 內容不同！</target>
+
+<source>job name</source>
+<target>作業名稱</target>
 
 <source>Synchronization aborted</source>
 <target>同步已中止</target>
@@ -518,6 +560,9 @@ The command is triggered if:
 
 <source>Switching to FreeFileSync main dialog</source>
 <target>切換到FreeFileSync主對話框</target>
+
+<source>Retrying operation after error:</source>
+<target>錯誤後重試操作：</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>FreeFileSync有新版本可用：</target>
@@ -642,8 +687,8 @@ The command is triggered if:
 <source>&Export file list...</source>
 <target>匯出檔案清單(&E)...</target>
 
-<source>&Global settings...</source>
-<target>整體設定(&G)...</target>
+<source>&Global settings</source>
+<target>整體設定(&G)</target>
 
 <source>&Tools</source>
 <target>工具(&T)</target>
@@ -660,12 +705,6 @@ The command is triggered if:
 <source>Compare</source>
 <target>比對</target>
 
-<source>Comparison settings</source>
-<target>比對設定</target>
-
-<source>Synchronization settings</source>
-<target>同步設定</target>
-
 <source>Synchronize</source>
 <target>同步</target>
 
@@ -677,6 +716,12 @@ The command is triggered if:
 
 <source>Swap sides</source>
 <target>兩邊交換</target>
+
+<source>Find what:</source>
+<target>尋找內容：</target>
+
+<source>Match case</source>
+<target>區分大小寫</target>
 
 <source>Save as batch job</source>
 <target>另存為批次處理作業</target>
@@ -714,6 +759,9 @@ The command is triggered if:
 <source>Synchronizing...</source>
 <target>正在同步...</target>
 
+<source>Minimize to notification area</source>
+<target>最小化到通知區域</target>
+
 <source>On completion</source>
 <target>完成後</target>
 
@@ -722,6 +770,15 @@ The command is triggered if:
 
 <source>&Pause</source>
 <target>暫停(&P)</target>
+
+<source>Variant</source>
+<target>變數</target>
+
+<source>Statistics</source>
+<target>統計</target>
+
+<source>&Don't show this dialog again</source>
+<target>不要再顯示此對話框(&D)</target>
 
 <source>Select a variant</source>
 <target>選擇一個變數</target>
@@ -762,6 +819,12 @@ is the same
 <source>Configure your own synchronization rules.</source>
 <target>配置你自己的同步規則。</target>
 
+<source>Detect moved files</source>
+<target>檢測被移動的檔案</target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target>需要資料庫檔案。不支援所有檔案系統。</target>
+
 <source>Error handling</source>
 <target>錯誤處理</target>
 
@@ -786,17 +849,17 @@ is the same
 <source>Delete or overwrite files permanently</source>
 <target>永久刪除或覆蓋檔案</target>
 
-<source>Recycle Bin</source>
+<source>Recycle bin</source>
 <target>資源回收筒</target>
 
-<source>Use Recycle Bin for deleted and overwritten files</source>
-<target>將刪除和覆蓋的檔案移動到資源回收筒</target>
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>在資源回收筒中刪除備份和覆蓋檔案</target>
 
 <source>Versioning</source>
 <target>版本控制</target>
 
-<source>Move files to user-defined folder</source>
-<target>將檔案移動到使用者自訂的資料夾</target>
+<source>Move files to a user-defined folder</source>
+<target>將檔案移動到一個使用者定義的資料夾</target>
 
 <source>Naming convention:</source>
 <target>命名慣例：</target>
@@ -804,8 +867,8 @@ is the same
 <source>Batch job</source>
 <target>批次處理作業</target>
 
-<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>新建一個批次檔來自動執行同步。按兩下此檔案或安排在您的系統任務計畫表：FreeFileSync.exe <工作名稱>.ffs_batch</target>
+<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target>新建一個批次處理檔，用於無人值守同步。開始，點兩下此檔案，或安排在任務規劃中：%x</target>
 
 <source>Exit</source>
 <target>結束</target>
@@ -828,30 +891,6 @@ is the same
 <source>Limit maximum number of log files</source>
 <target>限制日誌檔的最大數量</target>
 
-<source>Source code written in C++ using:</source>
-<target>使用C++編寫的原始碼</target>
-
-<source>If you like FreeFileSync</source>
-<target>如果你喜歡FreeFileSync</target>
-
-<source>Donate with PayPal</source>
-<target>使用PayPal捐款</target>
-
-<source>Many thanks for localization:</source>
-<target>非常感謝本地化語系翻譯工作人員：</target>
-
-<source>Feedback and suggestions are welcome</source>
-<target>歡迎反饋意見和建議</target>
-
-<source>Homepage</source>
-<target>首頁</target>
-
-<source>Email</source>
-<target>信箱</target>
-
-<source>Published under the GNU General Public License</source>
-<target>在GNU通用公共許可證下發佈</target>
-
 <source>Delete on both sides</source>
 <target>兩邊都刪除</target>
 
@@ -859,12 +898,12 @@ is the same
 <target>即使只在一邊中選好檔案，還是會刪除兩邊檔案。</target>
 
 <source>
-Only files that match all filter settings will be synchronized.
-Note: File names must be relative to base directories.
+Files will only be synchronized if they pass all filter rules.
+Note: File paths must be relative to base directories.
 </source>
 <target>
-只有符合所有篩選器設定的檔案才會被同步。
-注意：檔名必須相對到基本目錄。
+如果他們通過所有的過濾規則，將只會同步檔案。
+注意：檔案路徑必須是相對於基本目錄。
 </target>
 
 <source>Include</source>
@@ -894,20 +933,20 @@ Note: File names must be relative to base directories.
 <source>Fail-safe file copy</source>
 <target>故障保護檔案複製</target>
 
-<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>第一次將檔寫入到一個暫存(*.ffs_tmp)，順便將它們重新命名。即使在嚴重錯誤的情況下，還可確保一致的狀態。</target>
+<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
+<target>先複製到一個臨時檔案(*.ffs_tmp)然後將其重新命名。即使發生致命錯誤時，還能確保一致的狀態。</target>
 
 <source>Copy locked files</source>
 <target>複製被鎖定的檔案</target>
 
-<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>複製共用或鎖定檔案使用使用卷影複製服務(需要管理員權限)</target>
+<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
+<target>共用的副本或鎖定的檔案使用卷影複製服務(需要管理員權限)</target>
 
 <source>Copy file access permissions</source>
 <target>複製檔案系統權限</target>
 
-<source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>傳輸檔案和資料夾權限(需要管理員權限)</target>
+<source>Transfer file and folder permissions (requires administrator rights)</source>
+<target>傳輸檔案和資料夾的權限(需要管理員權限)</target>
 
 <source>Restore hidden dialogs</source>
 <target>還原隱藏的對話框</target>
@@ -921,23 +960,38 @@ Note: File names must be relative to base directories.
 <source>&Default</source>
 <target>預設(&D)</target>
 
-<source>Variant</source>
-<target>變數</target>
+<source>Source code written in C++ using:</source>
+<target>使用C++編寫的原始碼</target>
 
-<source>Statistics</source>
-<target>統計</target>
+<source>If you like FreeFileSync</source>
+<target>如果你喜歡FreeFileSync</target>
 
-<source>Don't show this dialog again</source>
-<target>不再顯示此對話框</target>
+<source>Donate with PayPal</source>
+<target>使用PayPal捐款</target>
 
-<source>Find what:</source>
-<target>尋找內容：</target>
+<source>Feedback and suggestions are welcome</source>
+<target>歡迎反饋意見和建議</target>
 
-<source>Match case</source>
-<target>區分大小寫</target>
+<source>Homepage</source>
+<target>首頁</target>
 
-<source>&Find next</source>
-<target>找下一個(&F)</target>
+<source>Email</source>
+<target>信箱</target>
+
+<source>Published under the GNU General Public License</source>
+<target>在GNU通用公共許可證下發佈</target>
+
+<source>Many thanks for localization:</source>
+<target>非常感謝本地化語系翻譯工作人員：</target>
+
+<source>Start synchronization</source>
+<target>開始同步</target>
+
+<source>Comparison settings</source>
+<target>比對設定</target>
+
+<source>Synchronization settings</source>
+<target>同步設定</target>
 
 <source>Delete</source>
 <target>刪除</target>
@@ -945,17 +999,14 @@ Note: File names must be relative to base directories.
 <source>Configure filter</source>
 <target>配置篩選</target>
 
-<source>Start synchronization</source>
-<target>開始同步</target>
-
-<source>Find</source>
-<target>尋找</target>
-
 <source>Select time span</source>
 <target>選擇時間間隔</target>
 
 <source>Folder pairs</source>
 <target>配對資料夾</target>
+
+<source>Find</source>
+<target>尋找</target>
 
 <source>Overview</source>
 <target>摘要</target>
@@ -980,6 +1031,20 @@ Note: File names must be relative to base directories.
 
 <source>Compare both sides</source>
 <target>比對兩邊</target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+<pluralform>你真的要執行 %x 項目的命令 %y 嗎？</pluralform>
+</target>
+
+<source>Confirm</source>
+<target>確認</target>
+
+<source>&Execute</source>
+<target>執行(&E)</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1008,17 +1073,20 @@ Note: File names must be relative to base directories.
 <source>Set direction:</source>
 <target>設定方向：</target>
 
+<source>multiple selection</source>
+<target>多重選擇</target>
+
+<source>Include via filter:</source>
+<target>包括透過篩選器：</target>
+
+<source>Exclude via filter:</source>
+<target>使用篩選器排除：</target>
+
 <source>Exclude temporarily</source>
 <target>暫時排除</target>
 
 <source>Include temporarily</source>
 <target>暫時包括</target>
-
-<source>Exclude via filter:</source>
-<target>使用篩選器排除：</target>
-
-<source>multiple selection</source>
-<target>多重選擇</target>
 
 <source>Include all</source>
 <target>包括所有</target>
@@ -1065,8 +1133,8 @@ Note: File names must be relative to base directories.
 <source>Do&n't save</source>
 <target>不儲存(&N)</target>
 
-<source>Never save changes</source>
-<target>不要儲存變更</target>
+<source>Never save &changes</source>
+<target>從不保存更改(&c)</target>
 
 <source>Show files that exist on left side only</source>
 <target>顯示只存在於左邊的檔案</target>
@@ -1119,8 +1187,11 @@ Note: File names must be relative to base directories.
 <source>All folders are in sync</source>
 <target>所有資料夾都是同步的</target>
 
-<source>Comma separated list</source>
-<target>逗號分隔清單</target>
+<source>Cannot find %x</source>
+<target>找不到 %x</target>
+
+<source>Comma-separated values</source>
+<target>以逗號分隔值</target>
 
 <source>File list exported</source>
 <target>檔案清單已匯出</target>
@@ -1128,8 +1199,8 @@ Note: File names must be relative to base directories.
 <source>Searching for program updates...</source>
 <target>正在搜尋程式更新...</target>
 
-<source>Ignore further errors</source>
-<target>忽略進一步錯誤</target>
+<source>&Ignore subsequent errors</source>
+<target>忽略後續的錯誤(&I)</target>
 
 <source>&Ignore</source>
 <target>忽略(&I)</target>
@@ -1137,8 +1208,8 @@ Note: File names must be relative to base directories.
 <source>Fatal Error</source>
 <target>嚴重錯誤</target>
 
-<source>Don't show this warning again</source>
-<target>不再顯示此警告</target>
+<source>&Don't show this warning again</source>
+<target>不要再顯示此警告(&D)</target>
 
 <source>&Switch</source>
 <target>切換(&S)</target>
@@ -1173,17 +1244,11 @@ Note: File names must be relative to base directories.
 <source>Completed</source>
 <target>已完成</target>
 
-<source>Continue</source>
-<target>繼續</target>
+<source>&Continue</source>
+<target>繼續(&C)</target>
 
-<source>Pause</source>
-<target>暫停</target>
-
-<source>Logging</source>
-<target>日誌記錄</target>
-
-<source>Cannot find %x</source>
-<target>找不到 %x</target>
+<source>Log</source>
+<target>日誌</target>
 
 <source>Inactive</source>
 <target>停用</target>
@@ -1216,11 +1281,11 @@ Note: File names must be relative to base directories.
 <target>篩選器</target>
 
 <source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>您確定要將下列 %x 項目移動到資源回收筒嗎？</pluralform>
+<pluralform>你真的要將以下項目 %x 移動到資源回收筒嗎？</pluralform>
 </target>
 
 <source>
@@ -1228,7 +1293,7 @@ Note: File names must be relative to base directories.
 <pluralform>Do you really want to delete the following %x items?</pluralform>
 </source>
 <target>
-<pluralform>您確定要將下列 %x 項目刪除嗎？</pluralform>
+<pluralform>您真的要將下列 %x 項目刪除嗎？</pluralform>
 </target>
 
 <source>Direct</source>
@@ -1272,9 +1337,6 @@ Note: File names must be relative to base directories.
 
 <source>Append a timestamp to each file name</source>
 <target>將時間戳記附加到每個檔案名稱上</target>
-
-<source>Folder</source>
-<target>資料夾</target>
 
 <source>File</source>
 <target>檔案</target>
@@ -1393,7 +1455,7 @@ Note: File names must be relative to base directories.
 <source>Cannot change process I/O priorities.</source>
 <target>無法更改I/O處理優先順序。</target>
 
-<source>Unable to move %x to the Recycle Bin.</source>
+<source>Unable to move %x to the recycle bin.</source>
 <target>無法將 %x 移動到資源回收筒。</target>
 
 <source>Cannot determine final path for %x.</source>

@@ -29,6 +29,8 @@ void setupIcons(Grid& gridLeft, Grid& gridCenter, Grid& gridRight, bool show, Ic
 void clearSelection(Grid& gridLeft, Grid& gridCenter, Grid& gridRight); //clear all components
 void refresh(Grid& gridLeft, Grid& gridCenter, Grid& gridRight);
 
+void setScrollMaster(Grid& grid);
+
 //mark rows selected in navigation/compressed tree and navigate to leading object
 void setNavigationMarker(Grid& gridLeft,
                          hash_set<const FileSystemObject*>&& markedFilesAndLinks,//mark files/symlinks directly within a container

@@ -74,8 +74,8 @@ public:
     }
 
 private:
-	//associate "active" clipping area with each DC
-	static hash_map<wxDC*, wxRect>& refDcToAreaMap() { static hash_map<wxDC*, wxRect> clippingAreas; return clippingAreas; }
+    //associate "active" clipping area with each DC
+    static hash_map<wxDC*, wxRect>& refDcToAreaMap() { static hash_map<wxDC*, wxRect> clippingAreas; return clippingAreas; }
 
     std::unique_ptr<wxRect> oldRect;
     wxDC& dc_;

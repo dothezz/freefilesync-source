@@ -11,7 +11,6 @@
 #include <vector>
 #include <memory>
 #include <wx/panel.h>
-//#include <wx/dcbuffer.h>
 #include <zen/string_tools.h>
 #include <zen/optional.h>
 
@@ -98,11 +97,11 @@ private:
 
 struct VectorCurveData : public ArrayCurveData
 {
-	std::vector<double>& refData() { return data; }
+    std::vector<double>& refData() { return data; }
 private:
-	virtual double getValue(size_t pos) const final { return pos < data.size() ? data[pos] : 0; }
-	virtual size_t getSize() const final { return data.size(); }
-	std::vector<double> data;
+    virtual double getValue(size_t pos) const final { return pos < data.size() ? data[pos] : 0; }
+    virtual size_t getSize() const final { return data.size(); }
+    std::vector<double> data;
 };
 
 //------------------------------------------------------------------------------------------------------------
@@ -347,7 +346,7 @@ private:
 
     typedef std::vector<std::pair<std::shared_ptr<CurveData>, CurveAttributes>> CurveList;
     CurveList curves_;
-	wxFont labelFont; //perf!!! generating the font is *very* expensive! don't do this repeatedly in Graph2D::render()!
+    wxFont labelFont; //perf!!! generating the font is *very* expensive! don't do this repeatedly in Graph2D::render()!
 };
 }
 

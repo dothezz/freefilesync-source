@@ -35,10 +35,12 @@ public:
                   ExecWhenFinishedCfg* execWhenFinished); //optional input parameter
 
 private:
-    virtual void OnSyncTwoWay(wxCommandEvent& event) { directionCfg.var = DirectionConfig::AUTOMATIC; updateGui(); }
-    virtual void OnSyncMirror(wxCommandEvent& event) { directionCfg.var = DirectionConfig::MIRROR;    updateGui(); }
-    virtual void OnSyncUpdate(wxCommandEvent& event) { directionCfg.var = DirectionConfig::UPDATE;    updateGui(); }
-    virtual void OnSyncCustom(wxCommandEvent& event) { directionCfg.var = DirectionConfig::CUSTOM;    updateGui(); }
+    virtual void OnSyncTwoWay(wxCommandEvent& event) { directionCfg.var = DirectionConfig::TWOWAY; updateGui(); }
+    virtual void OnSyncMirror(wxCommandEvent& event) { directionCfg.var = DirectionConfig::MIRROR; updateGui(); }
+    virtual void OnSyncUpdate(wxCommandEvent& event) { directionCfg.var = DirectionConfig::UPDATE; updateGui(); }
+    virtual void OnSyncCustom(wxCommandEvent& event) { directionCfg.var = DirectionConfig::CUSTOM; updateGui(); }
+
+    virtual void OnToggleDetectMovedFiles(wxCommandEvent& event) { directionCfg.detectMovedFiles = !directionCfg.detectMovedFiles; updateGui(); }
 
     virtual void OnSyncTwoWayDouble(wxMouseEvent& event);
     virtual void OnSyncMirrorDouble(wxMouseEvent& event);
@@ -101,7 +103,7 @@ void updateConfigIcons(const DirectionConfig& directionCfg,
                        wxBitmapButton* buttonDifferent,
                        wxBitmapButton* buttonConflict)
 {
-    if (directionCfg.var != DirectionConfig::AUTOMATIC) //automatic mode needs no sync-directions
+    if (directionCfg.var != DirectionConfig::TWOWAY) //automatic mode needs no sync-directions
     {
         const DirectionSet dirCfg = extractDirections(directionCfg);
 
@@ -211,7 +213,7 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* parent,
                              ExecWhenFinishedCfg* execWhenFinished) :
     SyncCfgDlgGenerated(parent),
     handleDeletion(DELETE_TO_RECYCLER), //
-    onGuiError(ON_GUIERROR_POPUP), //dummy init
+    onGuiError(ON_GUIERROR_POPUP),      //dummy init
     outSyncCfg(syncCfg),
     outOptOnGuiError(handleError),
     outOptExecWhenFinished(execWhenFinished),
@@ -298,7 +300,7 @@ SyncCfgDialog::Config SyncCfgDialog::getConfig() const
     output.syncCfg.versioningDirectory = utfCvrtTo<Zstring>(versioningFolder.getName());
     output.syncCfg.versioningStyle     = getEnumVal(enumVersioningStyle, *m_choiceVersioningStyle),
 
-                   ////get single parameter "version limit" from both checkbox and spin ctrl:
+                   //get single parameter "version limit" from both checkbox and spin ctrl:
                    //   output.syncCfg.versionCountLimit   = m_checkBoxVersionsLimit->GetValue() ? m_spinCtrlVersionsLimit->GetValue() : -1;
 
                    output.onGuiError = onGuiError;
@@ -329,9 +331,13 @@ void SyncCfgDialog::updateGui()
                       m_bpButtonDifferent,
                       m_bpButtonConflict);
 
+    //selecting "detect move files" does not always make sense:
+    m_checkBoxDetectMove->Enable(detectMovedFilesSelectable(directionCfg));
+    m_checkBoxDetectMove->SetValue(detectMovedFilesEnabled(directionCfg)); //parameter NOT owned by checkbox!
+
     //display only relevant sync options
-    m_bitmapDatabase     ->Show(cfg.syncCfg.directionCfg.var == DirectionConfig::AUTOMATIC);
-    sbSizerSyncDirections->Show(cfg.syncCfg.directionCfg.var != DirectionConfig::AUTOMATIC);
+    m_bitmapDatabase     ->Show(cfg.syncCfg.directionCfg.var == DirectionConfig::TWOWAY);
+    sbSizerSyncDirections->Show(cfg.syncCfg.directionCfg.var != DirectionConfig::TWOWAY);
 
     switch (compareVar_) //sbSizerSyncDirections->Show resets child sizers!
     {
@@ -359,7 +365,7 @@ void SyncCfgDialog::updateGui()
 
     switch (cfg.syncCfg.directionCfg.var)
     {
-        case DirectionConfig::AUTOMATIC:
+        case DirectionConfig::TWOWAY:
             m_toggleBtnTwoWay->SetValue(true);
             m_staticTextAutomatic->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
             break;
@@ -512,7 +518,7 @@ void pressCustomDir(DirectionConfig& directionCfg, SyncDirection& syncdir)
 {
     switch (directionCfg.var)
     {
-        case DirectionConfig::AUTOMATIC:
+        case DirectionConfig::TWOWAY:
             assert(false);
             break;
         case DirectionConfig::MIRROR:
@@ -525,20 +531,21 @@ void pressCustomDir(DirectionConfig& directionCfg, SyncDirection& syncdir)
             toggleSyncDirection(syncdir);
 
             //some config optimization: if custom settings happen to match "mirror" or "update", just switch variant
-            DirectionSet currentSet = extractDirections(directionCfg);
-            DirectionSet setMirror;
-            DirectionSet setUpdate;
+            const DirectionSet setMirror = []
             {
                 DirectionConfig mirrorCfg;
                 mirrorCfg.var = DirectionConfig::MIRROR;
-                setMirror = extractDirections(mirrorCfg);
-            }
+                return extractDirections(mirrorCfg);
+            }();
+
+            const DirectionSet setUpdate = []
             {
                 DirectionConfig updateCfg;
                 updateCfg.var = DirectionConfig::UPDATE;
-                setUpdate = extractDirections(updateCfg);
-            }
+                return extractDirections(updateCfg);
+            }();
 
+            const DirectionSet currentSet = extractDirections(directionCfg);
             if (currentSet == setMirror)
                 directionCfg.var = DirectionConfig::MIRROR;
             else if (currentSet == setUpdate)

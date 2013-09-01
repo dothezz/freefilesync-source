@@ -11,7 +11,7 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-namespace zen { class BitmapButton; }
+namespace zen { class BitmapTextButton; }
 
 #include <wx/string.h>
 #include <wx/bitmap.h>
@@ -75,7 +75,7 @@ protected:
     wxStaticText* m_staticText6;
     wxTextCtrl* m_textCtrlCommand;
     wxStaticLine* m_staticline5;
-    zen::BitmapButton* m_buttonStart;
+    zen::BitmapTextButton* m_buttonStart;
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }

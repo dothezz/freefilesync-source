@@ -7,104 +7,11 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
-<source>Log</source>
-<target></target>
-
-<source>&Continue</source>
-<target></target>
-
-<source>Comma-separated values</source>
-<target></target>
-
-<source>&Don't show this dialog again</source>
-<target></target>
-
-<source>&Execute</source>
-<target></target>
-
-<source>Confirm</source>
-<target></target>
-
-<source>
-<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
-<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
-</source>
-<target></target>
-
-<source>Minimize to notification area</source>
-<target></target>
-
-<source>Retrying operation after error:</source>
-<target></target>
-
-<source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
-<target></target>
-
-<source>&Show error</source>
-<target></target>
-
-<source>Waiting until all directories are available...</source>
-<target></target>
-
-<source>Directory monitoring active</source>
-<target></target>
-
-<source>Volume name %x is not part of file path %y.</source>
-<target></target>
-
-<source>%x items</source>
-<target></target>
-
-<source>
-<pluralform>1 thread</pluralform>
-<pluralform>%x threads</pluralform>
-</source>
-<target></target>
-
-<source>
-<pluralform>1 byte</pluralform>
-<pluralform>%x bytes</pluralform>
-</source>
-<target></target>
-
-<source>Any number of alternative directories for at most one config file.</source>
-<target></target>
-
-<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
-<target></target>
-
-<source>directory</source>
-<target></target>
-
-<source>config files</source>
-<target></target>
-
-<source>Syntax:</source>
-<target></target>
-
-<source>Directories cannot be set for more than one configuration file.</source>
-<target></target>
-
-<source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
-<target></target>
-
-<source>Unequal number of left and right directories specified.</source>
-<target></target>
-
-<source>Cannot open file %x.</source>
-<target></target>
-
-<source>Syntax error</source>
-<target></target>
-
-<source>A directory path is expected after %x.</source>
-<target></target>
-
 <source>Both sides have changed since last synchronization.</source>
 <target>Ambos lados han cambiado desde la última sincronización.</target>
 
 <source>Cannot determine sync-direction:</source>
-<target>No se puede determinar la dirección de la sincronización:</target>
+<target>No se puede determinar la dirección de sincronización:</target>
 
 <source>No change since last synchronization.</source>
 <target>Ningún cambio desde la última sincronización.</target>
@@ -118,13 +25,13 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Comprobando disponibilidad de la papelera de reciclaje para la carpeta %x…</target>
 
-<source>Moving file %x to recycle bin</source>
+<source>Moving file %x to the recycle bin</source>
 <target>Mover archivo %x a la papelera de reciclaje</target>
 
-<source>Moving folder %x to recycle bin</source>
+<source>Moving folder %x to the recycle bin</source>
 <target>Mover carpeta %x a la papelera de reciclaje</target>
 
-<source>Moving symbolic link %x to recycle bin</source>
+<source>Moving symbolic link %x to the recycle bin</source>
 <target>Mover vínculo simbólico %x a la papelera de reciclaje</target>
 
 <source>Deleting file %x</source>
@@ -136,11 +43,20 @@
 <source>Deleting symbolic link %x</source>
 <target>Borrar vínculo simbólico %x</target>
 
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>La Papelera de reciclaje no está disponible para las carpetas siguientes. Los archivos se borrarán de forma permanente:</target>
+<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>La papelera de reciclaje no está disponible para las carpetas siguientes. Los archivos se borrarán de forma permanente:</target>
 
 <source>An exception occurred</source>
 <target>Ha ocurrido una excepción</target>
+
+<source>A directory path is expected after %x.</source>
+<target>Se esperaba una ruta de directorio después de %x.</target>
+
+<source>Syntax error</source>
+<target>Error de sintaxis</target>
+
+<source>Cannot open file %x.</source>
+<target>No se puede abrir el archivo %x.</target>
 
 <source>Error</source>
 <target>Error</target>
@@ -148,8 +64,32 @@
 <source>File %x does not contain a valid configuration.</source>
 <target>El archivo %x no contiene una configuración válida.</target>
 
+<source>Unequal number of left and right directories specified.</source>
+<target>Desigualdad en el número de directorios especificados a izquierda y derecha.</target>
+
+<source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
+<target>El archivo de configuración no debe incluir parámetros al nivel de un par de directorios cuando éstos se especifican desde la línea de comandos.</target>
+
 <source>Warning</source>
 <target>Atención</target>
+
+<source>Directories cannot be set for more than one configuration file.</source>
+<target>No se pueden definir directorios para más de un archivo de configuración.</target>
+
+<source>Syntax:</source>
+<target>Sintaxis:</target>
+
+<source>config files</source>
+<target>archivos de configuración</target>
+
+<source>directory</source>
+<target>directorio</target>
+
+<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
+<target>Cualquier número de archivos de configuración de FreeFileSync (.ffs_gui ó .ffs_batch).</target>
+
+<source>Any number of alternative directories for at most one config file.</source>
+<target>Cualquier número de directorios alternativos para un archivo de configuración como máximo.</target>
 
 <source>Command line</source>
 <target>Línea de comandos</target>
@@ -209,10 +149,10 @@
 <target>El elemento existe sólo en el lado derecho</target>
 
 <source>Left side is newer</source>
-<target>El lado izquierdo es más nuevo</target>
+<target>El lado izquierdo es más reciente</target>
 
 <source>Right side is newer</source>
-<target>El lado derecho es más nuevo</target>
+<target>El lado derecho es más reciente</target>
 
 <source>Items have different content</source>
 <target>Los elementos tienen contenido distinto</target>
@@ -221,7 +161,7 @@
 <target>Ambos lados son iguales</target>
 
 <source>Conflict/item cannot be categorized</source>
-<target>Conflicto</target>
+<target>No se puede categorizar el conflicto o elemento</target>
 
 <source>Copy new item to left</source>
 <target>Copiar nuevo elemento a la izquierda</target>
@@ -257,31 +197,31 @@
 <target>Actualizar atributos en la derecha</target>
 
 <source>Database file %x is incompatible.</source>
-<target>El archivo de base de datos %x es incompatible</target>
+<target>El archivo de base de datos %x es incompatible.</target>
 
 <source>Initial synchronization:</source>
 <target>Sincronización inicial:</target>
 
 <source>Database file %x does not yet exist.</source>
-<target>El archivo de base de datos %x aún no existe</target>
+<target>El archivo de base de datos %x aún no existe.</target>
 
 <source>Database file is corrupt:</source>
 <target>El archivo de base de datos está dañado:</target>
 
 <source>Cannot write file %x.</source>
-<target>No se puede escribir el archivo %x</target>
+<target>No se puede escribir el archivo %x.</target>
 
 <source>Cannot read file %x.</source>
-<target>No se puede leer el archivo %x</target>
+<target>No se puede leer el archivo %x.</target>
 
 <source>Database files do not share a common session.</source>
-<target>Los archivos de base de datos no comparten una sesión común</target>
+<target>Los archivos de base de datos no comparten una sesión común.</target>
 
 <source>Searching for folder %x...</source>
 <target>Buscando carpeta %x…</target>
 
 <source>Cannot read file attributes of %x.</source>
-<target>No se puede leer archivo de atributos de %x</target>
+<target>No se puede leer archivo de atributos de %x.</target>
 
 <source>Cannot get process information.</source>
 <target>No se puede obtener información del proceso.</target>
@@ -310,6 +250,15 @@
 <source>Total time:</source>
 <target>Tiempo total:</target>
 
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</target>
+
 <source>%x MB</source>
 <target>%x MB</target>
 
@@ -328,11 +277,23 @@
 <source>Scanning:</source>
 <target>Escanear:</target>
 
+<source>
+<pluralform>1 thread</pluralform>
+<pluralform>%x threads</pluralform>
+</source>
+<target>
+<pluralform>1 hilo</pluralform>
+<pluralform>%x hilos</pluralform>
+</target>
+
 <source>Encoding extended time information: %x</source>
-<target>Condificando información de hora extendida: %x</target>
+<target>Codificando información de hora extendida: %x</target>
 
 <source>/sec</source>
 <target>/seg</target>
+
+<source>%x items</source>
+<target>%x elementos</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Archivo de configuración %x cargado sólo parcialmente.</target>
@@ -346,7 +307,7 @@
 <source>Browse directory</source>
 <target>Examinar directorio</target>
 
-<source>Cannot access Volume Shadow Copy Service.</source>
+<source>Cannot access the Volume Shadow Copy Service.</source>
 <target>No se puede acceder al servicio de Instantánea de volumen.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
@@ -357,6 +318,9 @@
 
 <source>Cannot determine volume name for %x.</source>
 <target>No se puede determinar nombre del volumen de %x.</target>
+
+<source>Volume name %x is not part of file path %y.</source>
+<target>El nombre de volumen %x no es parte de la ruta de archivo %y.</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Anulación solicitada: esperando a que la operación actual finalice…</target>
@@ -401,7 +365,7 @@
 <target>3. Presione ’Inicio’.</target>
 
 <source>To get started just import a .ffs_batch file.</source>
-<target>Para comenzar, importe un archivo .ffs_batch</target>
+<target>Para comenzar, importe un archivo .ffs_batch.</target>
 
 <source>Folders to watch</source>
 <target>Carpetas para ver</target>
@@ -430,9 +394,9 @@ The command is triggered if:
 - new folders arrive (e.g. USB stick insert)
 </source>
 <target>
-El comando es disparado si::
+El comando es disparado si:
 - hay cambios en los archivos o subcarpetas
-- aparecen nuevas carpetas (Insertando una memoria USB, por ejemplo)
+- aparecen nuevas carpetas (en una memoria USB, por ejemplo)
 </target>
 
 <source>Start</source>
@@ -456,8 +420,17 @@ El comando es disparado si::
 <source>All files</source>
 <target>Todos los archivos</target>
 
+<source>Directory monitoring active</source>
+<target>Supervisión de directorios activada</target>
+
+<source>Waiting until all directories are available...</source>
+<target>Esperando que todos los directorios estén disponibles…</target>
+
 <source>&Restore</source>
 <target>&Restaurar</target>
+
+<source>&Show error</source>
+<target>Mo&strar error</target>
 
 <source>&Exit</source>
 <target>&Salir</target>
@@ -472,7 +445,7 @@ El comando es disparado si::
 <target>Fecha y tamaño del archivo</target>
 
 <source>Two way</source>
-<target>Dos formas</target>
+<target>Bidireccional</target>
 
 <source>Mirror</source>
 <target>Espejo</target>
@@ -534,6 +507,9 @@ El comando es disparado si::
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Los siguientes elementos tienen conflictos sin resolver y no serán sincronizados:</target>
 
+<source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
+<target>Las carpetas siguientes muestran diferencias significativas. Compruebe que hace coincidir las carpetas correctas para su sincronización.</target>
+
 <source>Not enough free disk space available in:</source>
 <target>Espacio en disco insuficiente en:</target>
 
@@ -552,11 +528,14 @@ El comando es disparado si::
 <source>Generating database...</source>
 <target>Generando base de datos…</target>
 
-<source>Creating Volume Shadow Copy for %x...</source>
-<target>Creando Instantánea de volumen para %x…</target>
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Creando una Instantánea de volumen para %x…</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>Error al comprobar los datos: %x y %y tienen contenidos diferentes.</target>
+
+<source>job name</source>
+<target>nombre de tarea</target>
 
 <source>Synchronization aborted</source>
 <target>Sincronización anulada</target>
@@ -581,6 +560,9 @@ El comando es disparado si::
 
 <source>Switching to FreeFileSync main dialog</source>
 <target>Cambiando a la ventana principal de FreeFileSync</target>
+
+<source>Retrying operation after error:</source>
+<target>Reintento de operación después de error:</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Una nueva versión de FreeFileSync está disponible:</target>
@@ -691,7 +673,7 @@ El comando es disparado si::
 <target>&Guardar</target>
 
 <source>Save as &batch job...</source>
-<target>Guardar como trabajo &batch …</target>
+<target>Guardar como tarea &lote…</target>
 
 <source>1. &Compare</source>
 <target>1. &Comparar</target>
@@ -705,8 +687,8 @@ El comando es disparado si::
 <source>&Export file list...</source>
 <target>&Exportar lista de archivos…</target>
 
-<source>&Global settings...</source>
-<target>&Opciones globales…</target>
+<source>&Global settings</source>
+<target>&Opciones globales</target>
 
 <source>&Tools</source>
 <target>Herramien&tas</target>
@@ -742,7 +724,7 @@ El comando es disparado si::
 <target>Intercambiar lados</target>
 
 <source>Save as batch job</source>
-<target>Salvar como tarea batch</target>
+<target>Salvar como tarea lote</target>
 
 <source>Hide excluded items</source>
 <target>Ocultar elementos excluidos</target>
@@ -777,6 +759,9 @@ El comando es disparado si::
 <source>Synchronizing...</source>
 <target>Sincronizando…</target>
 
+<source>Minimize to notification area</source>
+<target>Minimizar en el área de notificación</target>
+
 <source>On completion</source>
 <target>Al completar</target>
 
@@ -792,8 +777,8 @@ El comando es disparado si::
 <source>Statistics</source>
 <target>Estadísticas</target>
 
-<source>Don't show this dialog again</source>
-<target>No volver a mostrar este diálogo</target>
+<source>&Don't show this dialog again</source>
+<target>&No volver a mostrar este diálogo</target>
 
 <source>Select a variant</source>
 <target>Seleccione una variante</target>
@@ -843,6 +828,12 @@ es el mismo
 <source>Configure your own synchronization rules.</source>
 <target>Configuración de sus propias reglas de sincronización.</target>
 
+<source>Detect moved files</source>
+<target>Detectar archivos movidos</target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target>Archivos de base de datos requeridos. No son compatibles en todos los sistemas de archivos.</target>
+
 <source>Error handling</source>
 <target>Gestión de errores</target>
 
@@ -867,26 +858,26 @@ es el mismo
 <source>Delete or overwrite files permanently</source>
 <target>Borrar o Sobrescribir archivos permanentemente</target>
 
-<source>Recycle Bin</source>
+<source>Recycle bin</source>
 <target>Papelera de reciclaje</target>
 
-<source>Use Recycle Bin for deleted and overwritten files</source>
-<target>Utilizar la papelera de reciclaje para archivos eliminados y sobrescritos</target>
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>Se eliminó la copia de respaldo y se reemplazaron archivos en la papelera de reciclaje</target>
 
 <source>Versioning</source>
 <target>Control de versiones</target>
 
-<source>Move files to user-defined folder</source>
-<target>Mover archivos a una carpeta definida por el usuario</target>
+<source>Move files to a user-defined folder</source>
+<target>Mover archivos a una carpeta del usuario</target>
 
 <source>Naming convention:</source>
 <target>Convención de nomenclatura:</target>
 
 <source>Batch job</source>
-<target>Tarea por lotes</target>
+<target>Tarea lote</target>
 
-<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Crear archivo batch para sincronización automática. Haga doble clic en este archivo o prográmelo en el planificador de tareas del sistema: FreeFileSync.exe <job name>.ffs_batch</target>
+<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target>Crear archivo por lotes para sincronización desatendida. Para iniciar, haga doble clic en este archivo o prográmelo en el planificador de tareas : %x</target>
 
 <source>Exit</source>
 <target>Salir</target>
@@ -910,19 +901,19 @@ es el mismo
 <target>Limitar el número máximo de archivos de registro</target>
 
 <source>Source code written in C++ using:</source>
-<target>Código fuente escrito en C++ utilizando:</target>
+<target>Código fuente original en C++ con apoyo de:</target>
 
 <source>If you like FreeFileSync</source>
-<target>Si te gusta FreeFileSync</target>
+<target>¿Te gusta FreeFileSync? :</target>
 
 <source>Donate with PayPal</source>
-<target>Donar a través de PayPal</target>
+<target>Haz una donación por PayPal</target>
 
 <source>Many thanks for localization:</source>
 <target>Agradecimientos por las traducciones a:</target>
 
 <source>Feedback and suggestions are welcome</source>
-<target>Feedback y sugerencias son bienvenidas</target>
+<target>Comentarios y sugerencias bienvenidos :</target>
 
 <source>Homepage</source>
 <target>Página de inicio</target>
@@ -931,7 +922,7 @@ es el mismo
 <target>Correo electrónico</target>
 
 <source>Published under the GNU General Public License</source>
-<target>Publicado bajo GNU General Public License</target>
+<target>Publicado con derechos GNU General Public License :</target>
 
 <source>Delete on both sides</source>
 <target>Borrar en ambos lados</target>
@@ -940,12 +931,12 @@ es el mismo
 <target>Borrar en ambos lados incluso si el archivo está seleccionado en un solo lado</target>
 
 <source>
-Only files that match all filter settings will be synchronized.
-Note: File names must be relative to base directories.
+Files will only be synchronized if they pass all filter rules.
+Note: File paths must be relative to base directories.
 </source>
 <target>
-Sólo archivos en que coincidan todos los filtros serán sincronizados.
-Aviso: Los nombres de archivos deben ser relativos a los directorios base.
+Sólo se sincronizarán los archivos que cumplan todos los filtros.
+Nota: las rutas de archivo deben ser relativas a los directorios base.
 </target>
 
 <source>Include</source>
@@ -975,20 +966,20 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 <source>Fail-safe file copy</source>
 <target>Copia de archivo a prueba de fallos</target>
 
-<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
+<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
 <target>Escribir en archivo temporal (*.ffs_tmp) primero y después renombrarlo. Esto garantiza un estado consistente incluso en caso de error fatal.</target>
 
 <source>Copy locked files</source>
 <target>Copiar archivos bloqueados</target>
 
-<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Copiar archivos compartidos o bloqueados usando el servicio "Instantánea de volumen" (Requiere derechos de administrador)</target>
+<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
+<target>Copiar archivos compartidos o bloqueados usando el servicio de Instantánea de volumen (requiere derechos de administrador)</target>
 
 <source>Copy file access permissions</source>
 <target>Copiar permisos de acceso al archivo</target>
 
-<source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Transferir permisos de archivo y carpeta (Requiere derechos de Administrador)</target>
+<source>Transfer file and folder permissions (requires administrator rights)</source>
+<target>Transferir permisos de archivo y carpeta (requiere derechos de administrador)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Restaurar diálogos ocultos</target>
@@ -1054,6 +1045,21 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 <target>Comparar ambos lados</target>
 
 <source>
+<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+<pluralform>¿Realmente desea ejecutar la orden %y para un elemento?</pluralform>
+<pluralform>¿Realmente desea ejecutar la orden %y para %x elementos?</pluralform>
+</target>
+
+<source>Confirm</source>
+<target>Confirmar</target>
+
+<source>&Execute</source>
+<target>&Ejecutar</target>
+
+<source>
 <pluralform>1 directory</pluralform>
 <pluralform>%x directories</pluralform>
 </source>
@@ -1089,11 +1095,14 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 <source>Include temporarily</source>
 <target>Incluir temporalmente</target>
 
-<source>Exclude via filter:</source>
-<target>Excluir a través del filtro:</target>
-
 <source>multiple selection</source>
 <target>selección múltiple</target>
+
+<source>Include via filter:</source>
+<target>Incluir a través del filtro:</target>
+
+<source>Exclude via filter:</source>
+<target>Excluir a través del filtro:</target>
 
 <source>Include all</source>
 <target>Incluir todo</target>
@@ -1132,7 +1141,7 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 <target>Configuración guardada</target>
 
 <source>FreeFileSync batch</source>
-<target>Batch de FreeFileSync</target>
+<target>Lote de FreeFileSync</target>
 
 <source>Do you want to save changes to %x?</source>
 <target>¿Quiere guardar los cambios de %x?</target>
@@ -1140,8 +1149,8 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 <source>Do&n't save</source>
 <target>&No guardar</target>
 
-<source>Never save changes</source>
-<target>Nunca guardar cambios</target>
+<source>Never save &changes</source>
+<target>Nunca guardar &cambios</target>
 
 <source>Show files that exist on left side only</source>
 <target>Mostrar sólo archivos existentes en la izquierda</target>
@@ -1194,14 +1203,17 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 <source>All folders are in sync</source>
 <target>Todas las carpetas están sincronizadas</target>
 
+<source>Comma-separated values</source>
+<target>Valores separados por comas</target>
+
 <source>File list exported</source>
 <target>Lista de archivos exportada</target>
 
 <source>Searching for program updates...</source>
 <target>Buscando actualizaciones del programa…</target>
 
-<source>Ignore further errors</source>
-<target>Ignorar más errores</target>
+<source>&Ignore subsequent errors</source>
+<target>&Ignorar errores posteriores</target>
 
 <source>&Ignore</source>
 <target>&Ignorar</target>
@@ -1209,8 +1221,8 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 <source>Fatal Error</source>
 <target>Error fatal</target>
 
-<source>Don't show this warning again</source>
-<target>No volver a mostrar este aviso</target>
+<source>&Don't show this warning again</source>
+<target>&No volver a mostrar este aviso</target>
 
 <source>&Switch</source>
 <target>&Cambiar</target>
@@ -1244,6 +1256,12 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 
 <source>Completed</source>
 <target>Terminado</target>
+
+<source>&Continue</source>
+<target>&Continuar</target>
+
+<source>Log</source>
+<target>Registro</target>
 
 <source>Cannot find %x</source>
 <target>No se puede encontrar %x</target>
@@ -1279,12 +1297,12 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 <target>Filtro</target>
 
 <source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>¿Realmente desea mover este objeto a la papelera de reciclaje?</pluralform>
-<pluralform>¿Realmente desea mover estos %x objetos a la papelera de reciclaje?</pluralform>
+<pluralform>¿Realmente desea mover este elemento a la papelera de reciclaje?</pluralform>
+<pluralform>¿Realmente desea mover estos %x elementos a la papelera de reciclaje?</pluralform>
 </target>
 
 <source>
@@ -1456,10 +1474,10 @@ Aviso: Los nombres de archivos deben ser relativos a los directorios base.
 <target>Fallo al intentar suspender el sistema.</target>
 
 <source>Cannot change process I/O priorities.</source>
-<target>No se pudieron cambiar las priridades de E/S del proceso.</target>
+<target>No se pudieron cambiar las prioridades de E/S del proceso.</target>
 
-<source>Unable to move %x to the Recycle Bin.</source>
-<target>No se puede mover %x a la Papelera de reciclaje.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>Incapaz de mover %x a la papelera de reciclaje.</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>No se puede determinar la ruta final de %x.</target>

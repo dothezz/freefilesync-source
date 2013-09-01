@@ -14,8 +14,7 @@
 class ExecFinishedBox;
 class FolderHistoryBox;
 class ToggleButton;
-class wxStaticText;
-namespace zen{ class BitmapButton; }
+namespace zen{ class BitmapTextButton; }
 namespace zen{ class Graph2D; }
 namespace zen{ class Grid; }
 namespace zen{ class TripleSplitter; }
@@ -29,19 +28,19 @@ namespace zen{ class TripleSplitter; }
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/stattext.h>
 #include <wx/button.h>
-#include <wx/sizer.h>
 #include <wx/bmpbuttn.h>
+#include <wx/sizer.h>
 #include <wx/panel.h>
+#include <wx/stattext.h>
 #include <wx/combobox.h>
 #include <wx/scrolwin.h>
 #include <wx/statbmp.h>
 #include <wx/statline.h>
-#include <wx/listbox.h>
-#include <wx/checkbox.h>
-#include <wx/frame.h>
 #include <wx/textctrl.h>
+#include <wx/checkbox.h>
+#include <wx/listbox.h>
+#include <wx/frame.h>
 #include <wx/gauge.h>
 #include <wx/animate.h>
 #include <wx/notebook.h>
@@ -49,9 +48,9 @@ namespace zen{ class TripleSplitter; }
 #include <wx/tglbtn.h>
 #include <wx/choice.h>
 #include <wx/spinctrl.h>
-#include <wx/hyperlink.h>
 #include <wx/grid.h>
 #include <wx/calctrl.h>
+#include <wx/hyperlink.h>
 
 #include "../zen/i18n.h"
 
@@ -87,13 +86,11 @@ class MainDialogGenerated : public wxFrame
 		wxBoxSizer* bSizerPanelHolder;
 		wxPanel* m_panelTopButtons;
 		wxBoxSizer* bSizerTopButtons;
-		wxStaticText* m_staticTextCmpVariant;
-		zen::BitmapButton* m_buttonCompare;
-		zen::BitmapButton* m_buttonCancel;
+		zen::BitmapTextButton* m_buttonCompare;
+		zen::BitmapTextButton* m_buttonCancel;
 		wxBitmapButton* m_bpButtonCmpConfig;
-		wxStaticText* m_staticTextSyncVariant;
 		wxBitmapButton* m_bpButtonSyncConfig;
-		zen::BitmapButton* m_buttonSync;
+		zen::BitmapTextButton* m_buttonSync;
 		wxPanel* m_panelDirectoryPairs;
 		wxStaticText* m_staticTextResolvedPathL;
 		wxBitmapButton* m_bpButtonAddPair;
@@ -132,6 +129,11 @@ class MainDialogGenerated : public wxFrame
 		wxStaticText* m_staticTextStatusRightFiles;
 		wxStaticText* m_staticTextStatusRightBytes;
 		wxStaticText* m_staticTextFullStatus;
+		wxPanel* m_panelSearch;
+		wxBitmapButton* m_bpButtonHideSearch;
+		wxStaticText* m_staticText101;
+		wxTextCtrl* m_textCtrlSearchTxt;
+		wxCheckBox* m_checkBoxMatchCase;
 		wxPanel* m_panelConfig;
 		wxBoxSizer* bSizerConfig;
 		wxBitmapButton* m_bpButtonOpen;
@@ -198,6 +200,8 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnAddFolderPair( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveTopFolderPair( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSwapSides( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHideSearchPanel( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSearchGridEnter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCfgHistoryKeyEvent( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnLoadFromHistory( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLoadFromHistoryDoubleClick( wxCommandEvent& event ) { event.Skip(); }
@@ -470,6 +474,7 @@ class SyncCfgDlgGenerated : public wxDialog
 		wxStaticText* m_staticTextUpdate;
 		wxToggleButton* m_toggleBtnCustom;
 		wxStaticText* m_staticTextCustom;
+		wxCheckBox* m_checkBoxDetectMove;
 		wxBoxSizer* bSizerExtraConfig;
 		wxStaticLine* m_staticline321;
 		wxBoxSizer* bSizer179;
@@ -534,6 +539,7 @@ class SyncCfgDlgGenerated : public wxDialog
 		virtual void OnSyncUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSyncCustomDouble( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnSyncCustom( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnToggleDetectMovedFiles( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnErrorIgnore( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnErrorPopup( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeletionPermanent( wxCommandEvent& event ) { event.Skip(); }
@@ -568,14 +574,14 @@ class BatchDlgGenerated : public wxDialog
 	protected:
 		wxStaticBitmap* m_bitmapBatchJob;
 		wxStaticText* m_staticTextHeader;
-		wxStaticText* m_staticText44;
+		wxStaticText* m_staticTextDescr;
 		wxBitmapButton* m_bpButtonHelp;
 		wxStaticLine* m_staticline18;
 		wxPanel* m_panel35;
 		wxStaticText* m_staticText82;
 		wxToggleButton* m_toggleBtnErrorIgnore;
 		wxToggleButton* m_toggleBtnErrorPopup;
-		wxToggleButton* m_toggleBtnErrorExit;
+		wxToggleButton* m_toggleBtnErrorAbort;
 		wxStaticLine* m_staticline26;
 		wxStaticText* m_staticText81;
 		ExecFinishedBox* m_comboBoxExecFinished;
@@ -596,7 +602,7 @@ class BatchDlgGenerated : public wxDialog
 		virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnErrorIgnore( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnErrorPopup( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnErrorExit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnErrorAbort( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnToggleGenerateLogfile( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnToggleLogfilesLimit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveBatchJob( wxCommandEvent& event ) { event.Skip(); }
@@ -608,66 +614,6 @@ class BatchDlgGenerated : public wxDialog
 		
 		BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Save as batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~BatchDlgGenerated();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class AboutDlgGenerated
-///////////////////////////////////////////////////////////////////////////////
-class AboutDlgGenerated : public wxDialog 
-{
-	private:
-	
-	protected:
-		wxPanel* m_panel41;
-		wxStaticBitmap* m_bitmapLogo;
-		wxStaticLine* m_staticline341;
-		wxStaticText* m_build;
-		wxStaticLine* m_staticline3411;
-		wxStaticText* m_staticText72;
-		wxHyperlinkCtrl* m_hyperlink11;
-		wxHyperlinkCtrl* m_hyperlink9;
-		wxHyperlinkCtrl* m_hyperlink10;
-		wxHyperlinkCtrl* m_hyperlink7;
-		wxHyperlinkCtrl* m_hyperlink14;
-		wxHyperlinkCtrl* m_hyperlink15;
-		wxHyperlinkCtrl* m_hyperlink13;
-		wxHyperlinkCtrl* m_hyperlink16;
-		wxHyperlinkCtrl* m_hyperlink12;
-		wxHyperlinkCtrl* m_hyperlink18;
-		wxPanel* m_panel40;
-		wxPanel* m_panel39;
-		wxStaticText* m_staticText83;
-		wxButton* m_buttonDonate;
-		wxAnimationCtrl* m_animCtrlWink;
-		wxScrolledWindow* m_scrolledWindowTranslators;
-		wxBoxSizer* bSizerTranslators;
-		wxStaticText* m_staticText54;
-		wxFlexGridSizer* fgSizerTranslators;
-		wxStaticLine* m_staticline43;
-		wxStaticText* m_staticText94;
-		wxHyperlinkCtrl* m_hyperlink1;
-		wxStaticBitmap* m_bitmap9;
-		wxHyperlinkCtrl* m_hyperlink2;
-		wxStaticBitmap* m_bitmap10;
-		wxStaticLine* m_staticline34;
-		wxStaticText* m_staticText93;
-		wxStaticBitmap* m_bitmap13;
-		wxHyperlinkCtrl* m_hyperlink5;
-		wxStaticLine* m_staticline36;
-		wxBoxSizer* bSizerStdButtons;
-		wxButton* m_buttonClose;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnDonate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		AboutDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
-		~AboutDlgGenerated();
 	
 };
 
@@ -815,7 +761,7 @@ class GlobalSettingsDlgGenerated : public wxDialog
 		wxCheckBox* m_checkBoxCopyPermissions;
 		wxStaticText* m_staticText8211;
 		wxStaticLine* m_staticline191;
-		zen::BitmapButton* m_buttonResetDialogs;
+		zen::BitmapTextButton* m_buttonResetDialogs;
 		wxStaticLine* m_staticline192;
 		wxStaticText* m_staticText85;
 		wxBitmapButton* m_bpButtonAddRow;
@@ -863,34 +809,6 @@ class PopupDialogGenerated : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class SearchDialogGenerated
-///////////////////////////////////////////////////////////////////////////////
-class SearchDialogGenerated : public wxDialog 
-{
-	private:
-	
-	protected:
-		wxStaticText* m_staticText101;
-		wxTextCtrl* m_textCtrlSearchTxt;
-		wxCheckBox* m_checkBoxMatchCase;
-		wxButton* m_buttonFindNext;
-		wxButton* m_button29;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnText( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFindNext( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		SearchDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
-		~SearchDialogGenerated();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
 /// Class SelectTimespanDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
 class SelectTimespanDlgGenerated : public wxDialog 
@@ -918,6 +836,65 @@ class SelectTimespanDlgGenerated : public wxDialog
 		
 		SelectTimespanDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Select time span"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~SelectTimespanDlgGenerated();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class AboutDlgGenerated
+///////////////////////////////////////////////////////////////////////////////
+class AboutDlgGenerated : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxPanel* m_panel41;
+		wxStaticBitmap* m_bitmapLogo;
+		wxStaticLine* m_staticline341;
+		wxStaticText* m_build;
+		wxStaticLine* m_staticline3411;
+		wxStaticText* m_staticText96;
+		wxHyperlinkCtrl* m_hyperlink11;
+		wxHyperlinkCtrl* m_hyperlink9;
+		wxHyperlinkCtrl* m_hyperlink10;
+		wxHyperlinkCtrl* m_hyperlink7;
+		wxHyperlinkCtrl* m_hyperlink14;
+		wxHyperlinkCtrl* m_hyperlink15;
+		wxHyperlinkCtrl* m_hyperlink13;
+		wxHyperlinkCtrl* m_hyperlink16;
+		wxHyperlinkCtrl* m_hyperlink12;
+		wxHyperlinkCtrl* m_hyperlink18;
+		wxPanel* m_panelDonate;
+		wxPanel* m_panel39;
+		wxAnimationCtrl* m_animCtrlWink;
+		wxStaticText* m_staticText83;
+		wxButton* m_buttonDonate;
+		wxStaticText* m_staticText94;
+		wxStaticBitmap* m_bitmap9;
+		wxHyperlinkCtrl* m_hyperlink1;
+		wxStaticBitmap* m_bitmap10;
+		wxHyperlinkCtrl* m_hyperlink2;
+		wxStaticLine* m_staticline34;
+		wxStaticText* m_staticText93;
+		wxStaticBitmap* m_bitmap13;
+		wxHyperlinkCtrl* m_hyperlink5;
+		wxStaticLine* m_staticline37;
+		wxStaticText* m_staticText54;
+		wxScrolledWindow* m_scrolledWindowTranslators;
+		wxFlexGridSizer* fgSizerTranslators;
+		wxStaticLine* m_staticline36;
+		wxBoxSizer* bSizerStdButtons;
+		wxButton* m_buttonClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnDonate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		AboutDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~AboutDlgGenerated();
 	
 };
 

@@ -120,23 +120,22 @@ void moveItemToVersioning(const Zstring& fullName, //throw FileError
 
 
 //move source to target across volumes
-//no need to check if: - super-directories of target exist - source exists
+//no need to check if: - super-directories of target exist - source exists: done by moveItemToVersioning()
 //if target already exists, it is overwritten, even if it is a different type, e.g. a directory!
 template <class Function>
 void moveObject(const Zstring& sourceFile, //throw FileError
                 const Zstring& targetFile,
                 Function copyDelete) //throw FileError; fallback if move failed
 {
-    assert(!dirExists(sourceFile) || symlinkExists(sourceFile)); //we process files and symlinks only
+    assert(fileExists(sourceFile) || symlinkExists(sourceFile) || !somethingExists(sourceFile)); //we process files and symlinks only
 
     auto removeTarget = [&]
     {
         //remove target object
-        if (fileExists(targetFile)) //file or symlink
-            removeFile(targetFile); //throw FileError
-        else if (dirExists(targetFile)) //directory or symlink
+        if (dirExists(targetFile)) //directory or dir-symlink
             removeDirectory(targetFile); //throw FileError; we do not expect targetFile to be a directory in general => no callback required
-        //else assert(false); -> may simply not exist if ErrorDifferentVolume!
+        else //file or (broken) file-symlink
+            removeFile(targetFile); //throw FileError
     };
 
     //first try to move directly without copying
@@ -212,17 +211,10 @@ private:
 
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
     {
-        switch (getSymlinkType(fullName))
-        {
-            case SYMLINK_TYPE_DIR:
-                dirs_.push_back(shortName);
-                break;
-
-            case SYMLINK_TYPE_FILE:
-            case SYMLINK_TYPE_UNKNOWN:
-                files_.push_back(shortName);
-                break;
-        }
+        if (dirExists(fullName)) //dir symlink
+            dirs_.push_back(shortName);
+        else //file symlink, broken symlink
+            files_.push_back(shortName);
         return LINK_SKIP;
     }
 

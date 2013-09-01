@@ -15,19 +15,39 @@
 
 namespace zen
 {
-wxBitmap greyScale(const wxBitmap& bmp); //greyscale + brightness adaption
+enum class ImageStackLayout
+{
+    HORIZONTAL,
+    VERTICAL
+};
+
+enum class ImageStackAlignment
+{
+    CENTER,
+    LEFT,
+    RIGHT,
+    TOP = LEFT,
+    BOTTOM = RIGHT,
+};
+wxImage stackImages(const wxImage& img1, const wxImage& img2, ImageStackLayout dir, ImageStackAlignment align, int gap = 0);
+
+wxImage createImageFromText(const wxString& text, const wxFont& font, const wxColor& col);
+
+
+wxImage greyScale(const wxImage& img); //greyscale + brightness adaption
+wxBitmap greyScale(const wxBitmap& bmp); //
 wxBitmap layOver(const wxBitmap& foreground, const wxBitmap& background); //merge
 
-void move(wxImage& img, int up, int left = 0);
+//void moveImage(wxImage& img, int right, int up);
 void adjustBrightness(wxImage& img, int targetLevel);
 double getAvgBrightness(const wxImage& img); //in [0, 255]
 void brighten(wxImage& img, int level); //level: delta per channel in points
 
 bool isEqual(const wxBitmap& lhs, const wxBitmap& rhs); //pixel-wise equality (respecting alpha channel)
 
-wxColor gradient(const wxColor& from, const wxColor& to, double fraction); //maps fraction within [0, 1] to an intermediate color
+//wxColor gradient(const wxColor& from, const wxColor& to, double fraction); //maps fraction within [0, 1] to an intermediate color
 
-wxColour hsvColor(double h, double s, double v); //h within [0, 360), s, v within [0, 1]
+//wxColour hsvColor(double h, double s, double v); //h within [0, 360), s, v within [0, 1]
 
 
 
@@ -43,11 +63,23 @@ wxColour hsvColor(double h, double s, double v); //h within [0, 360), s, v withi
 
 
 //################################### implementation ###################################
+/*
 inline
-void move(wxImage& img, int up, int left)
+void moveImage(wxImage& img, int right, int up)
 {
-    img = img.GetSubImage(wxRect(std::max(0, left), std::max(0, up), img.GetWidth() - abs(left), img.GetHeight() - abs(up)));
-    img.Resize(wxSize(img.GetWidth() + abs(left), img.GetHeight() + abs(up)), wxPoint(-std::min(0, left), -std::min(0, up)));
+    img = img.GetSubImage(wxRect(std::max(0, -right), std::max(0, up), img.GetWidth() - abs(right), img.GetHeight() - abs(up)));
+    img.Resize(wxSize(img.GetWidth() + abs(right), img.GetHeight() + abs(up)), wxPoint(std::max(0, right), std::max(0, -up)));
+}
+*/
+
+
+inline
+wxImage greyScale(const wxImage& img)
+{
+    wxImage output = img.ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3); //treat all channels equally!
+    //wxImage output = bmp.ConvertToImage().ConvertToGreyscale();
+    adjustBrightness(output, 160);
+    return output;
 }
 
 
@@ -55,11 +87,7 @@ inline
 wxBitmap greyScale(const wxBitmap& bmp)
 {
     assert(!bmp.GetMask()); //wxWidgets screws up for the gazillionth time applying a mask instead of alpha channel if the .png image has only 0 and 0xff opacity values!!!
-
-    wxImage output = bmp.ConvertToImage().ConvertToGreyscale(1.0 / 3, 1.0 / 3, 1.0 / 3); //treat all channels equally!
-    //wxImage output = bmp.ConvertToImage().ConvertToGreyscale();
-    adjustBrightness(output, 160);
-    return output;
+    return greyScale(bmp.ConvertToImage());
 }
 
 
@@ -160,6 +188,7 @@ bool isEqual(const wxBitmap& lhs, const wxBitmap& rhs)
     return std::equal(imLhs.GetData(), imLhs.GetData() + pixelCount * 3, imRhs.GetData());
 }
 
+/*
 inline
 wxColor gradient(const wxColor& from, const wxColor& to, double fraction)
 {
@@ -170,8 +199,9 @@ wxColor gradient(const wxColor& from, const wxColor& to, double fraction)
                    from.Blue () + (to.Blue () - from.Blue ()) * fraction,
                    from.Alpha() + (to.Alpha() - from.Alpha()) * fraction);
 }
+*/
 
-
+/*
 inline
 wxColour hsvColor(double h, double s, double v) //h within [0, 360), s, v within [0, 1]
 {
@@ -218,6 +248,7 @@ wxColour hsvColor(double h, double s, double v) //h within [0, 360), s, v within
     assert(false);
     return *wxBLACK;
 }
+*/
 }
 
 #endif //IMAGE_TOOLS_HEADER_45782456427634254

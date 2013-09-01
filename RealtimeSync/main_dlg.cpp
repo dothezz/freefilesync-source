@@ -9,8 +9,7 @@
 #include <wx/msgdlg.h>
 #include <wx/wupdlock.h>
 #include <wx/filedlg.h>
-//#include <wx/utils.h>
-#include <wx+/button.h>
+#include <wx+/bitmap_button.h>
 #include <wx+/string_conv.h>
 #include <wx+/mouse_move_dlg.h>
 #include <wx+/font_size.h>
@@ -23,6 +22,9 @@
 #include "../lib/help_provider.h"
 #include "../lib/process_xml.h"
 #include "../lib/ffs_paths.h"
+#ifdef ZEN_MAC
+#include <ApplicationServices/ApplicationServices.h>
+#endif
 
 using namespace zen;
 
@@ -42,6 +44,12 @@ private:
 };
 
 
+void MainDialog::create(const Zstring& cfgFile)
+{
+    /*MainDialog* frame = */ new MainDialog(nullptr, cfgFile);
+}
+
+
 MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     : MainDlgGenerated(dlg)
 {
@@ -53,14 +61,16 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     SetIcon(GlobalResources::instance().programIconRTS); //set application icon
 
     setRelativeFontSize(*m_buttonStart, 1.5);
-    m_buttonStart->setInnerBorderSize(8);
 
     m_bpButtonRemoveTopFolder->Hide();
     m_panelMainFolder->Layout();
 
     m_bpButtonAddFolder      ->SetBitmapLabel(getResourceImage(L"item_add"));
     m_bpButtonRemoveTopFolder->SetBitmapLabel(getResourceImage(L"item_remove"));
-    m_buttonStart            ->setBitmapFront(getResourceImage(L"startRts"), 5);
+    ///m_buttonStart            ->setBitmapFront(getResourceImage(L"startRts"), 5);
+
+    setBitmapTextLabel(*m_buttonStart, getResourceImage(L"startRts").ConvertToImage(), m_buttonStart->GetLabel(), 5, 8);
+
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), nullptr, this);
@@ -106,9 +116,19 @@ MainDialog::MainDialog(wxDialog* dlg, const Zstring& cfgFileName)
     {
         wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED);
         this->OnStart(dummy2);
+        //don't Show()!
     }
     else
+    {
         m_buttonStart->SetFocus(); //don't "steal" focus if program is running from sys-tray"
+        Show();
+#ifdef ZEN_MAC
+        ProcessSerialNumber psn = { 0, kCurrentProcess };
+        ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon, even if we're not an application bundle
+        //if the executable is not yet in a bundle or if it is called through a launcher, we need to set focus manually:
+        ::SetFrontProcess(&psn);
+#endif
+    }
 
     //drag and drop .ffs_real and .ffs_batch on main dialog
     setupFileDrop(*m_panelMain);
@@ -193,6 +213,11 @@ void MainDialog::OnStart(wxCommandEvent& event)
     xmlAccess::XmlRealConfig currentCfg = getConfiguration();
 
     Hide();
+#ifdef ZEN_MAC
+    //hide dock icon: else user is able to forcefully show the hidden main dialog by clicking on the icon!!
+    ProcessSerialNumber psn = { 0, kCurrentProcess };
+    ::TransformProcessType(&psn, kProcessTransformToUIElementApplication);
+#endif
 
     switch (rts::startDirectoryMonitor(currentCfg, xmlAccess::extractJobName(utfCvrtTo<Zstring>(currentConfigFileName))))
     {
@@ -204,6 +229,10 @@ void MainDialog::OnStart(wxCommandEvent& event)
             break;
     }
     Show(); //don't show for EXIT_APP
+#ifdef ZEN_MAC
+    ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon again
+    ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
+#endif
     Raise();
 }
 

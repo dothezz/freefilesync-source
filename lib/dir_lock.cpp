@@ -506,7 +506,7 @@ void releaseLock(const Zstring& lockfilename) //throw ()
     {
         removeFile(lockfilename); //throw FileError
     }
-    catch (...) {}
+    catch (FileError&) {}
 }
 
 

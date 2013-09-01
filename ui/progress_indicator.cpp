@@ -12,6 +12,7 @@
 #include <wx/sound.h>
 #include <wx/clipbrd.h>
 #include <wx/msgdlg.h>
+#include <wx/dcclient.h>
 #include <wx/dataobj.h> //wxTextDataObject
 #include <zen/basic_math.h>
 #include <zen/format_unit.h>
@@ -34,13 +35,12 @@
 #include "tray_icon.h"
 #include "taskbar.h"
 #include "exec_finished_box.h"
-
-#include <wx/msgdlg.h>
+//#include <wx/msgdlg.h>
+#ifdef ZEN_MAC
+#include <ApplicationServices/ApplicationServices.h>
+#endif
 
 using namespace zen;
-
-warn_static("remove after test")
-#include <zen/perf.h>
 
 
 namespace
@@ -301,7 +301,7 @@ wxBitmap buttonReleased(const std::string& name)
     //getResourceImage(utfCvrtTo<wxString>(name)).ConvertToImage().ConvertToGreyscale(1.0/3, 1.0/3, 1.0/3); //treat all channels equally!
     //brighten(output, 30);
 
-    zen::move(output, 0, -1); //move image right one pixel
+    //zen::moveImage(output, 1, 0); //move image right one pixel
     return output;
 }
 
@@ -347,11 +347,7 @@ public:
 
                 size_t rowNumber = 0;
                 bool lastCharNewline = true;
-                std::for_each(it->message.begin(), it->message.end(),
-                              [&](wchar_t c)
-                {
-                    typedef Line Line; //workaround MSVC compiler bug!
-
+                for (const wchar_t c : it->message)
                     if (c == L'\n')
                     {
                         if (!lastCharNewline) //do not reference empty lines!
@@ -361,7 +357,7 @@ public:
                     }
                     else
                         lastCharNewline = false;
-                });
+
                 if (!lastCharNewline)
                     viewRef.push_back(Line(&*it, rowNumber));
             }
@@ -481,7 +477,7 @@ public:
             switch (static_cast<ColumnTypeMsg>(colType))
             {
                 case COL_TYPE_MSG_TIME:
-                    drawCellText(dc, rectTmp, getValue(row, colType), grid.IsEnabled(), wxALIGN_CENTER);
+                    drawCellText(dc, rectTmp, getValue(row, colType), true, wxALIGN_CENTER);
                     break;
 
                 case COL_TYPE_MSG_CATEGORY:
@@ -505,13 +501,13 @@ public:
                 {
                     rectTmp.x     += COLUMN_BORDER_LEFT;
                     rectTmp.width -= COLUMN_BORDER_LEFT;
-                    drawCellText(dc, rectTmp, getValue(row, colType), grid.IsEnabled());
+                    drawCellText(dc, rectTmp, getValue(row, colType), true);
                 }
                 break;
             }
     }
 
-    virtual size_t getBestSize(wxDC& dc, size_t row, ColumnType colType)
+    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType)
     {
         // -> synchronize renderCell() <-> getBestSize()
 
@@ -654,7 +650,6 @@ private:
         m_gridMessages->Refresh();   //update MVC "view"
     }
 
-
     void onGridButtonEvent(wxKeyEvent& event)
     {
         int keyCode = event.GetKeyCode();
@@ -736,18 +731,24 @@ namespace
 class CurveDataStatistics : public SparseCurveData
 {
 public:
-	CurveDataStatistics() : SparseCurveData(true), timeNow(0) {}
+    CurveDataStatistics() : SparseCurveData(true), /*true: add steps*/ timeNow(0) {}
 
     void clear() { samples.clear(); timeNow = 0; }
 
     void addRecord(long timeNowMs, double value)
     {
-        warn_static("review")
-		timeNow = timeNowMs;
+        //samples.clear();
+        //samples.insert(std::make_pair(-1000, 0));
+        //samples.insert(std::make_pair(0, 0));
+        //samples.insert(std::make_pair(1, 1));
+        //samples.insert(std::make_pair(1000, 0));
+        //return;
+
+        timeNow = timeNowMs;
         if (!samples.empty() && samples.rbegin()->second == value)
             return; //don't insert duplicate values
 
-        samples.insert(samples.end(), std::make_pair(timeNowMs, value)); //use fact that time is monotonously ascending
+        samples.insert(samples.end(), std::make_pair(timeNowMs, value)); //time is "expected" to be monotonously ascending
         //documentation differs about whether "hint" should be before or after the to be inserted element!
         //however "std::map<>::end()" is interpreted correctly by GCC and VS2010
 
@@ -756,29 +757,29 @@ public:
     }
 
 private:
-    virtual std::pair<double, double> getRangeX() const  final
+    virtual std::pair<double, double> getRangeX() const final
     {
-		if (samples.empty()) return std::make_pair(0.0, 0.0);
+        if (samples.empty()) return std::make_pair(0.0, 0.0);
 
-		double upperEndMs = std::max(timeNow, samples.rbegin()->first);
+        double upperEndMs = std::max(timeNow, samples.rbegin()->first);
 
-		//request some additional width by 5% elapsed time to make graph recalibrate before hitting the right border
-		//caveat: graph for batch mode binary comparison does NOT start at elapsed time 0!! PHASE_COMPARING_CONTENT and PHASE_SYNCHRONIZING!
-		//=> consider width of current sample set!
-		upperEndMs += 0.05 *(upperEndMs - samples.begin()->first);
+        //report some additional width by 5% elapsed time to make graph recalibrate before hitting the right border
+        //caveat: graph for batch mode binary comparison does NOT start at elapsed time 0!! PHASE_COMPARING_CONTENT and PHASE_SYNCHRONIZING!
+        //=> consider width of current sample set!
+        upperEndMs += 0.05 *(upperEndMs - samples.begin()->first);
 
         return std::make_pair(samples.begin()->first / 1000.0, //need not start with 0, e.g. "binary comparison, graph reset, followed by sync"
-                              upperEndMs / 1000.0);		
+                              upperEndMs / 1000.0);
     }
 
     virtual Opt<CurvePoint> getLessEq(double x) const final //x: seconds since begin
     {
-		const long timex = std::floor(x * 1000);
-		//------ add artifical last sample value -------
-		if (!samples.empty() && samples.rbegin()->first < timeNow)
-				if (timeNow <= timex)
-					return CurvePoint(timeNow / 1000.0, samples.rbegin()->second);
-		//--------------------------------------------------
+        const long timex = std::floor(x * 1000);
+        //------ add artifical last sample value -------
+        if (!samples.empty() && samples.rbegin()->first < timeNow)
+            if (timeNow <= timex)
+                return CurvePoint(timeNow / 1000.0, samples.rbegin()->second);
+        //--------------------------------------------------
 
         //find first key > x, then go one step back: => samples must be a std::map, NOT std::multimap!!!
         auto it = samples.upper_bound(timex);
@@ -791,14 +792,14 @@ private:
 
     virtual Opt<CurvePoint> getGreaterEq(double x) const final
     {
-		const long timex = std::ceil(x * 1000);
-		//------ add artifical last sample value -------
-		if (!samples.empty() && samples.rbegin()->first < timeNow)
-				if (samples.rbegin()->first < timex && timex <= timeNow)
-					return CurvePoint(timeNow / 1000.0, samples.rbegin()->second);
-		//--------------------------------------------------
+        const long timex = std::ceil(x * 1000);
+        //------ add artifical last sample value -------
+        if (!samples.empty() && samples.rbegin()->first < timeNow)
+            if (samples.rbegin()->first < timex && timex <= timeNow)
+                return CurvePoint(timeNow / 1000.0, samples.rbegin()->second);
+        //--------------------------------------------------
 
-		auto it = samples.lower_bound(timex);
+        auto it = samples.lower_bound(timex);
         if (it == samples.end())
             return NoValue();
         return CurvePoint(it->first / 1000.0, it->second);
@@ -807,7 +808,7 @@ private:
     static const size_t MAX_BUFFER_SIZE = 2500000; //sizeof(single node) worst case ~ 3 * 8 byte ptr + 16 byte key/value = 40 byte
 
     std::map<long, double> samples; //time, unit: [ms]  !don't use std::multimap, see getLessEq()
-	long timeNow; //help create an artificial record at the end of samples to visualize current time!
+    long timeNow; //help create an artificial record at the end of samples to visualize current time!
 };
 
 
@@ -823,41 +824,19 @@ private:
 
     virtual void getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const final
     {
-
-            warn_static("remove after test")
-#if 0
-				if (yTotal_ > 100)
-				{
-points.push_back(CurvePoint(0.38552801074951426,0.3861846045528107));
-points.push_back(CurvePoint(-0.5565680734345084,1.793989720937398));
-points.push_back(CurvePoint(2.85210684934041,3.339141677944872));
-points.push_back(CurvePoint(0.45404408959926135,0.7810567713436095));
-points.push_back(CurvePoint(2.303978218542433,-0.6610850551966995));
-points.push_back(CurvePoint(-2.5606633797896112,-0.4035597290287872));
-points.push_back(CurvePoint(-0.5394390537220716,0.40335295963067147));
-
-
-	//points.push_back(CurvePoint(0.2885508231771302,-1.9264175407823294));
-	//points.push_back(CurvePoint(-1.9332518577512143,0.6244007597162101));
-	//points.push_back(CurvePoint(3.116299689813205,1.6973640131005165));
-	//points.push_back(CurvePoint(0.0,0.0));
-	//points.push_back(CurvePoint(-5.993091301993007,0.5231778112837284));
-			return;
-				}
-#endif
-
-
-
-
-
+        //points.push_back(CurvePoint(-1, 0));
+        //points.push_back(CurvePoint(0, 0));
+        //points.push_back(CurvePoint(0.0001, 1));
+        //points.push_back(CurvePoint(1, 0));
+        //return;
 
         if (x <= maxX)
         {
             points.push_back(CurvePoint(x,    0));
             points.push_back(CurvePoint(x,    yCurrent_));
-			points.push_back(CurvePoint(maxX, yCurrent_));
+            points.push_back(CurvePoint(maxX, yCurrent_));
             points.push_back(CurvePoint(x,    yCurrent_));
-            points.push_back(CurvePoint(x,    yTotal_));            
+            points.push_back(CurvePoint(x,    yTotal_));
         }
     }
 
@@ -891,14 +870,17 @@ private:
 };
 
 
+const double stretchDefaultBlockSize = 1.4; //enlarge block default size
+
+
 struct LabelFormatterBytes : public LabelFormatter
 {
     virtual double getOptimalBlockSize(double bytesProposed) const
     {
+        bytesProposed *= stretchDefaultBlockSize; //enlarge block default size
+
         if (bytesProposed <= 1) //never smaller than 1 byte
             return 1;
-
-        bytesProposed *= 1.4; //enlarge block default size
 
         //round to next number which is a convenient to read block size
         const double k = std::floor(std::log(bytesProposed) / std::log(2.0));
@@ -919,6 +901,8 @@ struct LabelFormatterItemCount : public LabelFormatter
 {
     virtual double getOptimalBlockSize(double itemsProposed) const
     {
+        itemsProposed *= stretchDefaultBlockSize; //enlarge block default size
+
         const double steps[] = { 1, 2, 5, 10 };
         if (itemsProposed <= 10)
             return numeric::nearMatch(itemsProposed, std::begin(steps), std::end(steps)); //similar to nextNiceNumber(), but without the 2.5 step!
@@ -998,35 +982,7 @@ public:
 
     virtual void initNewPhase();
     virtual void notifyProgressChange();
-    virtual void updateGui() {
-		
-
-		warn_static("remove after test")
-#if 0
-			static bool init = false;
-			static wxStopWatch sw;
-			if (!init)
-			{
-				init = true;
-				sw.Start();
-			}
-			if (sw.Time() > 1000 * 10)
-			{
-				PERF_START
-					for (int i = 0; i < 10000; ++i)
-					//for (int i = 0; i < 1000000; ++i)
-						updateGuiInt(true); 
-				sw.Start();
-					sw.Pause();
-			}
-#endif	
-		
-		
-		
-		
-		
-		
-		updateGuiInt(true); }
+    virtual void updateGui() { updateGuiInt(true); }
 
     virtual std::wstring getExecWhenFinishedCommand() const { return pnl.m_comboBoxExecFinished->getValue(); }
 
@@ -1197,6 +1153,8 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
                                          setLabelY(Graph2D::Y_LABEL_RIGHT,  yLabelWidth,  std::make_shared<LabelFormatterItemCount>()).
                                          setSelectionMode(Graph2D::SELECT_NONE));
 
+    //pnl.m_panelGraphBytes->setAttributes(Graph2D::MainAttributes().setMinX(-1).setMaxX(1).setMinY(-1).setMaxY(1));
+
     pnl.m_panelGraphBytes->setCurve(curveDataBytes, Graph2D::CurveAttributes().setLineWidth(2).
                                     fillCurveArea(wxColor(205, 255, 202)).  //faint green
                                     setColor     (wxColor( 20, 200,   0))); //medium green
@@ -1217,30 +1175,18 @@ SyncProgressDialogImpl<TopLevelDialog>::SyncProgressDialogImpl(long style, //wxF
 
     updateDialogStatus(); //null-status will be shown while waiting for dir locks
 
-
-	warn_static("remove after test")
-#if 0
-		pnl.m_panelGraphBytes->setAttributes(Graph2D::MainAttributes().setMinX(-1).setMaxX(1).setMinY(-1).setMaxY(1));
-    pnl.m_panelGraphBytes->setCurve(curveDataBytesCurrent, Graph2D::CurveAttributes().setLineWidth(6).setColor(wxColor(12, 128, 0))		
-		.fillCurveArea(wxColor(198, 206, 255))  //faint blue
-		); //
-#endif
-
-
-
-
-
-
-
-
-
-
     this->Fit();
     pnl.Layout();
 
     if (showProgress)
     {
         this->Show();
+#ifdef ZEN_MAC
+        ProcessSerialNumber psn = { 0, kCurrentProcess };
+        ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon (consider non-silent batch mode)
+        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
+#endif
+
         pnl.m_buttonCancel->SetFocus(); //don't steal focus when starting in sys-tray!
 
         //clear gui flicker, remove dummy texts: window must be visible to make this work!
@@ -1260,6 +1206,11 @@ SyncProgressDialogImpl<TopLevelDialog>::~SyncProgressDialogImpl()
 
         //make sure main dialog is shown again if still "minimized to systray"! see SyncProgressDialog::closeWindowDirectly()
         parentFrame_->Show();
+#ifdef ZEN_MAC
+        ProcessSerialNumber psn = { 0, kCurrentProcess };
+        ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon (consider GUI mode with "close progress dialog")
+        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
+#endif
         //if (parentFrame_->IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
         //    parentFrame_->Iconize(false);
     }
@@ -1301,10 +1252,10 @@ void SyncProgressDialogImpl<TopLevelDialog>::initNewPhase()
     updateDialogStatus(); //evaluates "syncStat_->currentPhase()"
 
     //reset graphs (e.g. after binary comparison)
-            curveDataBytesTotal  ->setValue(0, 0);
-            curveDataBytesCurrent->setValue(0, 0, 0);
-            curveDataItemsTotal  ->setValue(0, 0);
-            curveDataItemsCurrent->setValue(0, 0, 0);
+    curveDataBytesTotal  ->setValue(0, 0);
+    curveDataBytesCurrent->setValue(0, 0, 0);
+    curveDataItemsTotal  ->setValue(0, 0);
+    curveDataItemsCurrent->setValue(0, 0, 0);
     curveDataBytes->clear();
     curveDataItems->clear();
 
@@ -1494,10 +1445,10 @@ void SyncProgressDialogImpl<TopLevelDialog>::updateGuiInt(bool allowYield)
             curveDataItemsTotal  ->setValue(timeNow, itemsTotal);
             curveDataItemsCurrent->setValue(timeNow, itemsCurrent, itemsTotal);
             //even though notifyProgressChange() already set the latest data, let's add another sample to have all curves consider "timeNow"
-			//no problem with adding too many records: CurveDataStatistics will remove duplicate entries!
-                curveDataBytes->addRecord(timeNow, to<double>(dataCurrent));
-                curveDataItems->addRecord(timeNow, itemsCurrent);
-    
+            //no problem with adding too many records: CurveDataStatistics will remove duplicate entries!
+            curveDataBytes->addRecord(timeNow, to<double>(dataCurrent));
+            curveDataItems->addRecord(timeNow, itemsCurrent);
+
             //remaining objects and data
             setText(*pnl.m_staticTextRemainingObj, toGuiString(itemsTotal - itemsCurrent), &layoutChanged);
             setText(*pnl.m_staticTextDataRemaining, L"(" + filesizeToShortString(dataTotal - dataCurrent) + L")", &layoutChanged);
@@ -1745,7 +1696,11 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
     //at the LATEST(!) to prevent access to currentStatusHandler
     //enable okay and close events; may be set in this method ONLY
 
-    wxWindowUpdateLocker dummy(this); //badly needed
+#if (defined __WXGTK__ || defined __WXOSX__)
+    //In wxWidgets 2.9.3 upwards, the wxWindow::Reparent() below fails on GTK and OS X if window is frozen! http://forums.codeblocks.org/index.php?topic=13388.45
+#else
+    wxWindowUpdateLocker dummy(this); //badly needed on Windows
+#endif
 
     paused_ = false; //you never know?
 
@@ -1824,7 +1779,7 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
     //hide current operation status
     pnl.bSizerStatusText->Show(false);
 
-    //show and prepare final statistics 
+    //show and prepare final statistics
     pnl.m_notebookResult->Show();
 
 #if defined ZEN_WIN || defined ZEN_LINUX
@@ -1835,15 +1790,15 @@ void SyncProgressDialogImpl<TopLevelDialog>::processHasFinished(SyncResult resul
     pnl.m_panelTimeRemaining->Hide();
 
     //1. re-arrange graph into results listbook
-    pnl.bSizerRoot->Detach(pnl.m_panelProgress);
+    const bool wasDetached = pnl.bSizerRoot->Detach(pnl.m_panelProgress);
+    assert(wasDetached);
+    (void)wasDetached;
     pnl.m_panelProgress->Reparent(pnl.m_notebookResult);
-#ifdef ZEN_LINUX //does not seem to be required on Win or OS X
-    wxTheApp->Yield(); //wxGTK 2.9.3 fails miserably at "reparent" whithout this
-#endif
-    pnl.m_notebookResult->AddPage(pnl.m_panelProgress, _("Statistics"), true); //AddPage() takes ownership!
+    pnl.m_notebookResult->AddPage(pnl.m_panelProgress, _("Statistics"), true);
 
     //2. log file
     const size_t posLog = 1;
+    assert(pnl.m_notebookResult->GetPageCount() == 1);
     LogPanel* logPanel = new LogPanel(pnl.m_notebookResult, log); //owned by m_notebookResult
     pnl.m_notebookResult->AddPage(logPanel, _("Log"), false);
     //bSizerHoldStretch->Insert(0, logPanel, 1, wxEXPAND);
@@ -1981,6 +1936,11 @@ void SyncProgressDialogImpl<TopLevelDialog>::minimizeToTray()
         this->Hide();
         if (parentFrame_)
             parentFrame_->Hide();
+#ifdef ZEN_MAC
+        //hide dock icon: else user is able to forcefully show the hidden main dialog by clicking on the icon!!
+        ProcessSerialNumber psn = { 0, kCurrentProcess };
+        ::TransformProcessType(&psn, kProcessTransformToUIElementApplication);
+#endif
     }
 }
 
@@ -2008,6 +1968,12 @@ void SyncProgressDialogImpl<TopLevelDialog>::resumeFromSystray()
 
         updateDialogStatus(); //restore Windows 7 task bar status   (e.g. required in pause mode)
         updateGuiInt(false);  //restore Windows 7 task bar progress (e.g. required in pause mode)
+
+#ifdef ZEN_MAC
+        ProcessSerialNumber psn = { 0, kCurrentProcess };
+        ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //show dock icon again
+        ::SetFrontProcess(&psn); //why isn't this covered by wxWindows::Raise()??
+#endif
     }
 }
 

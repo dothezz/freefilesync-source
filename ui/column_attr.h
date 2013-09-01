@@ -7,7 +7,6 @@
 #ifndef COL_ATTR_HEADER_189467891346732143214
 #define COL_ATTR_HEADER_189467891346732143214
 
-#include <stddef.h> //size_t
 #include <vector>
 
 namespace zen
@@ -34,18 +33,18 @@ struct ColumnAttributeRim
     bool          visible_;
 };
 
-
+warn_static("two stretched oclumsn: hide vergrößert range!")
 inline
 std::vector<ColumnAttributeRim> getDefaultColumnAttributesLeft()
 {
     std::vector<ColumnAttributeRim> attr;
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH,  250, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY,  200, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,   200, 0, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,  -280, 1, true)); //stretch to full width and substract sum of fixed size widths!
-    attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,       112, 0, false));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,        80, 0, true));
-    attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,   60, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_FULL_PATH,   250, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_DIRECTORY,   200, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_REL_PATH,    200, 0, true));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_FILENAME,   -280, 1, true)); //stretch to full width and substract sum of fixed size widths!
+    attr.push_back(ColumnAttributeRim(COL_TYPE_DATE,        112, 0, false));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_SIZE,         80, 0, true));
+    attr.push_back(ColumnAttributeRim(COL_TYPE_EXTENSION,    60, 0, false));
     return attr;
 }
 

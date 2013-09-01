@@ -228,6 +228,8 @@ bool isNull(T value)
 inline
 int round(double d)
 {
+    assert(d - 0.5 >= std::numeric_limits<int>::min() && //if double is larger than what int can represent:
+           d + 0.5 <= std::numeric_limits<int>::max());  //=> undefined behavior!
     return static_cast<int>(d < 0 ? d - 0.5 : d + 0.5);
 }
 

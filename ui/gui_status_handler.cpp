@@ -7,7 +7,7 @@
 #include "gui_status_handler.h"
 #include <wx/wupdlock.h>
 #include <wx+/shell_execute.h>
-#include <wx+/button.h>
+#include <wx+/bitmap_button.h>
 #include <wx/app.h>
 #include "msg_popup.h"
 #include "main_dlg.h"
@@ -238,12 +238,12 @@ SyncStatusHandler::~SyncStatusHandler()
         if (!abortIsRequested()) //if aborted (manually), we don't execute the command
         {
             const std::wstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
-            if (isCloseProgressDlgCommand(finalCommand))
-                showFinalResults = false; //take precedence over current visibility status
-            else if (!finalCommand.empty())
+            if (!finalCommand.empty())
             {
-                auto cmdexp = expandMacros(utfCvrtTo<Zstring>(finalCommand));
-                shellExecute(cmdexp);
+                if (isCloseProgressDlgCommand(finalCommand))
+                    showFinalResults = false; //take precedence over current visibility status
+                else
+                    shellExecute(expandMacros(utfCvrtTo<Zstring>(finalCommand)));
             }
         }
 

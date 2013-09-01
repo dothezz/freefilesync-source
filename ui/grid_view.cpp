@@ -297,34 +297,26 @@ void GridView::removeInvalidRows()
 class GridView::SerializeHierarchy
 {
 public:
+    static void execute(HierarchyObject& hierObj, std::vector<GridView::RefIndex>& sortedRef, size_t index) { SerializeHierarchy(sortedRef, index).recurse(hierObj); }
+
+private:
     SerializeHierarchy(std::vector<GridView::RefIndex>& sortedRef, size_t index) :
         index_(index),
         sortedRef_(sortedRef) {}
 
-    void execute(HierarchyObject& hierObj)
+    void recurse(HierarchyObject& hierObj)
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), *this);
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), *this);
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), *this);
+        for (FilePair& fileObj : hierObj.refSubFiles())
+            sortedRef_.push_back(RefIndex(index_, fileObj.getId()));
+        for (SymlinkPair& linkObj : hierObj.refSubLinks())
+            sortedRef_.push_back(RefIndex(index_, linkObj.getId()));
+        for (DirPair& dirObj : hierObj.refSubDirs())
+        {
+            sortedRef_.push_back(RefIndex(index_, dirObj.getId()));
+            recurse(dirObj); //add recursion here to list sub-objects directly below parent!
+        }
     }
 
-    void operator()(FilePair& fileObj)
-    {
-        sortedRef_.push_back(RefIndex(index_, fileObj.getId()));
-    }
-
-    void operator()(SymlinkPair& linkObj)
-    {
-        sortedRef_.push_back(RefIndex(index_, linkObj.getId()));
-    }
-
-    void operator()(DirPair& dirObj)
-    {
-        sortedRef_.push_back(RefIndex(index_, dirObj.getId()));
-        execute(dirObj); //add recursion here to list sub-objects directly below parent!
-    }
-
-private:
     size_t index_;
     std::vector<GridView::RefIndex>& sortedRef_;
 };
@@ -345,7 +337,7 @@ void GridView::setData(FolderComparison& folderCmp)
     });
 
     for (auto it = begin(folderCmp); it != end(folderCmp); ++it)
-        SerializeHierarchy(sortedRef, it - begin(folderCmp)).execute(*it);
+        SerializeHierarchy::execute(*it, sortedRef, it - begin(folderCmp));
 }
 
 

@@ -13,7 +13,7 @@ using namespace zen;
 namespace
 {
 //------------ Grid Constants -------------------------------
-const int SASH_HIT_TOLERANCE = 5; //currently onla a placebo!
+const int SASH_HIT_TOLERANCE = 5; //currently only a placebo!
 const int SASH_SIZE = 10;
 const double SASH_GRAVITY = 0.5; //value within [0, 1]; 1 := resize left only, 0 := resize right only
 const int CHILD_WINDOW_MIN_SIZE = 50; //min. size of managed windows
@@ -36,11 +36,9 @@ TripleSplitter::TripleSplitter(wxWindow* parent,
     Connect(wxEVT_SIZE,             wxSizeEventHandler (TripleSplitter::onSizeEvent      ), nullptr, this);
     //http://wiki.wxwidgets.org/Flicker-Free_Drawing
     Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(TripleSplitter::onEraseBackGround), nullptr, this);
-#if wxCHECK_VERSION(2, 9, 1)
+
     SetBackgroundStyle(wxBG_STYLE_PAINT);
-#else
-    SetBackgroundStyle(wxBG_STYLE_CUSTOM);
-#endif
+
     Connect(wxEVT_LEFT_DOWN,    wxMouseEventHandler(TripleSplitter::onMouseLeftDown  ), nullptr, this);
     Connect(wxEVT_LEFT_UP,      wxMouseEventHandler(TripleSplitter::onMouseLeftUp    ), nullptr, this);
     Connect(wxEVT_MOTION,       wxMouseEventHandler(TripleSplitter::onMouseMovement  ), nullptr, this);
@@ -48,6 +46,7 @@ TripleSplitter::TripleSplitter(wxWindow* parent,
     Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(TripleSplitter::onMouseCaptureLost), nullptr, this);
     Connect(wxEVT_LEFT_DCLICK,  wxMouseEventHandler(TripleSplitter::onMouseLeftDouble), nullptr, this);
 }
+
 
 TripleSplitter::~TripleSplitter() {} //make sure correct destructor gets created for std::unique_ptr<SashMove>
 
@@ -78,7 +77,7 @@ void TripleSplitter::updateWindowSizes()
 class TripleSplitter::SashMove
 {
 public:
-    SashMove(wxWindow& wnd, int mousePosX, int centerPosX) : wnd_(wnd), mousePosX_(mousePosX), centerPosX_(centerPosX)
+    SashMove(wxWindow& wnd, int mousePosX, int centerOffset) : wnd_(wnd), mousePosX_(mousePosX), centerOffset_(centerOffset)
     {
         wnd_.SetCursor(wxCURSOR_SIZEWE);
         wnd_.CaptureMouse();
@@ -89,13 +88,13 @@ public:
         if (wnd_.HasCapture())
             wnd_.ReleaseMouse();
     }
-    int getMousePosXStart () { return mousePosX_; }
-    int getCenterPosXStart() { return centerPosX_; }
+    int getMousePosXStart   () const { return mousePosX_; }
+    int getCenterOffsetStart() const { return centerOffset_; }
 
 private:
     wxWindow& wnd_;
     const int mousePosX_;
-    const int centerPosX_;
+    const int centerOffset_;
 };
 
 
@@ -113,6 +112,7 @@ int TripleSplitter::getCenterPosXOptimal() const
     return (clientRect.width - centerWidth) * SASH_GRAVITY; //allowed to be negative for extreme client widths!
 }
 
+
 int TripleSplitter::getCenterPosX() const
 {
     const wxRect clientRect = GetClientRect();
@@ -120,12 +120,12 @@ int TripleSplitter::getCenterPosX() const
     const int centerPosXOptimal = getCenterPosXOptimal();
 
     //normalize "centerPosXOptimal + centerOffset"
-    if (clientRect.width <  2 * CHILD_WINDOW_MIN_SIZE + centerWidth) //continuous transition between conditional branches!
+    if (clientRect.width <  2 * CHILD_WINDOW_MIN_SIZE + centerWidth)
         //use fixed "centeroffset" when "clientRect.width == 2 * CHILD_WINDOW_MIN_SIZE + centerWidth"
         return centerPosXOptimal + CHILD_WINDOW_MIN_SIZE - static_cast<int>(2 * CHILD_WINDOW_MIN_SIZE * SASH_GRAVITY); //avoid rounding error
-    else
-        return std::max(CHILD_WINDOW_MIN_SIZE, //make sure centerPosXOptimal + offset is within bounds
-                        std::min(centerPosXOptimal + centerOffset, clientRect.width - CHILD_WINDOW_MIN_SIZE - centerWidth));
+    //make sure transition between conditional branches is continuous!
+    return std::max(CHILD_WINDOW_MIN_SIZE, //make sure centerPosXOptimal + offset is within bounds
+                    std::min(centerPosXOptimal + centerOffset, clientRect.width - CHILD_WINDOW_MIN_SIZE - centerWidth));
 }
 
 
@@ -173,7 +173,7 @@ void TripleSplitter::onMouseLeftDown(wxMouseEvent& event)
 
     const int posX = event.GetPosition().x;
     if (hitOnSashLine(posX))
-        activeMove.reset(new SashMove(*this, posX, getCenterPosX()));
+        activeMove.reset(new SashMove(*this, posX, centerOffset));
     event.Skip();
 }
 
@@ -189,10 +189,11 @@ void TripleSplitter::onMouseMovement(wxMouseEvent& event)
 {
     if (activeMove)
     {
-        centerOffset = activeMove->getCenterPosXStart() - getCenterPosXOptimal() + event.GetPosition().x - activeMove->getMousePosXStart();
+        centerOffset = activeMove->getCenterOffsetStart() + event.GetPosition().x - activeMove->getMousePosXStart();
 
-        //CAVEAT: centerOffset is evaluated *before* normalization in getCenterPosX()!
-        //This can lead to the strange effect of window not immediately resizing when centerOffset is extremely off limits => normalize right here
+        //CAVEAT: function getCenterPosX() normalizes centerPosX *not* centerOffset!
+        //This can lead to the strange effect of window not immediately resizing when centerOffset is extremely off limits
+        //=> normalize centerOffset right here
         centerOffset = getCenterPosX() - getCenterPosXOptimal();
 
         updateWindowSizes();

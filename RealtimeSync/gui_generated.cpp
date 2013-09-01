@@ -5,7 +5,7 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#include "../wx+/button.h"
+#include "../wx+/bitmap_button.h"
 
 #include "gui_generated.h"
 
@@ -207,7 +207,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
     m_staticline5 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
     bSizerMain->Add( m_staticline5, 0, wxEXPAND, 5 );
 
-    m_buttonStart = new zen::BitmapButton( this, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+    m_buttonStart = new zen::BitmapTextButton( this, wxID_OK, _("Start"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
     m_buttonStart->SetDefault();
     m_buttonStart->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
 
@@ -300,7 +300,6 @@ ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     bSizer26->Add( m_bitmap10, 0, wxRIGHT|wxLEFT, 10 );
 
     m_textCtrl8 = new wxTextCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400,150 ), wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER );
-    m_textCtrl8->SetMaxLength( 0 );
     bSizer26->Add( m_textCtrl8, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxTOP, 5 );
 
 

@@ -18,7 +18,7 @@ namespace zen
 Semantics of SoftFilter:
 1. It potentially may match only one side => it MUST NOT be applied while traversing a single folder to avoid mismatches
 2. => it is applied after traversing and just marks rows, (NO deletions after comparison are allowed)
-3. => equivalent to a user temporarily (de-)selecting rows -> not relevant for <Automatic>-mode! ;)
+3. => equivalent to a user temporarily (de-)selecting rows => not relevant for <two way>-mode!
 */
 
 class SoftFilter
@@ -48,14 +48,6 @@ private:
     bool matchesFolder_;
 };
 }
-
-
-
-
-
-
-
-
 
 
 

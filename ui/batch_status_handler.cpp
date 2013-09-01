@@ -225,12 +225,12 @@ BatchStatusHandler::~BatchStatusHandler()
             if (!abortIsRequested()) //if aborted (manually), we don't execute the command
             {
                 const std::wstring finalCommand = progressDlg->getExecWhenFinishedCommand(); //final value (after possible user modification)
-                if (isCloseProgressDlgCommand(finalCommand))
-                    showFinalResults = false; //take precedence over current visibility status
-                else if (!finalCommand.empty())
+                if (!finalCommand.empty())
                 {
-                    auto cmdexp = expandMacros(utfCvrtTo<Zstring>(finalCommand));
-                    shellExecute(cmdexp);
+                    if (isCloseProgressDlgCommand(finalCommand))
+                        showFinalResults = false; //take precedence over current visibility status
+                    else
+                        shellExecute(expandMacros(utfCvrtTo<Zstring>(finalCommand)));
                 }
             }
 
@@ -329,7 +329,7 @@ void BatchStatusHandler::reportWarning(const std::wstring& warningMessage, bool&
         }
         break; //keep it! last switch might not find match
 
-        case xmlAccess::ON_ERROR_EXIT: //abort
+        case xmlAccess::ON_ERROR_ABORT:
             abortThisProcess();
             break;
 
@@ -374,7 +374,7 @@ ProcessCallback::Response BatchStatusHandler::reportError(const std::wstring& er
         }
         break; //used if last switch didn't find a match
 
-        case xmlAccess::ON_ERROR_EXIT: //abort
+        case xmlAccess::ON_ERROR_ABORT:
             abortThisProcess();
             break;
 
@@ -416,7 +416,7 @@ void BatchStatusHandler::reportFatalError(const std::wstring& errorMessage)
         }
         break;
 
-        case xmlAccess::ON_ERROR_EXIT: //abort
+        case xmlAccess::ON_ERROR_ABORT:
             abortThisProcess();
             break;
 

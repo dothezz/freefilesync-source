@@ -127,10 +127,6 @@ time per call | function
 #ifdef ZEN_WIN
 namespace
 {
-#ifdef __MINGW32__ //MinGW is clueless...
-#define LOCALE_INVARIANT 0x007f
-#endif
-
 //warning: LOCALE_INVARIANT is NOT available with Windows 2000, so we have to make yet another distinction...
 const LCID ZSTRING_INVARIANT_LOCALE = zen::winXpOrLater() ?
                                       LOCALE_INVARIANT :

@@ -66,8 +66,8 @@ bool isNullFilter(const FilterConfig& filterCfg)
 inline
 NormalizedFilter normalizeFilters(const FilterConfig& global, const FilterConfig& local)
 {
-    HardFilter::FilterRef globalName(new NameFilter(global.includeFilter, global.excludeFilter));
-    HardFilter::FilterRef localName (new NameFilter(local .includeFilter, local .excludeFilter));
+    HardFilter::FilterRef globalName = std::make_shared<NameFilter>(global.includeFilter, global.excludeFilter);
+    HardFilter::FilterRef localName  = std::make_shared<NameFilter>(local .includeFilter, local .excludeFilter);
 
     SoftFilter globalTimeSize(global.timeSpan, global.unitTimeSpan,
                               global.sizeMin,  global.unitSizeMin,

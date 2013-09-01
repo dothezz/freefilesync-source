@@ -7,6 +7,9 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural_definition>
 </header>
 
+<source>Close search bar</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Obje su strane promjenjene od posljednje sinkronizacije.</target>
 
@@ -25,14 +28,14 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Provjeravam dosupnost koša za smeće za mapu %x...</target>
 
-<source>Moving file %x to recycle bin</source>
-<target>Premještam datoteku %x u Koš za smeće</target>
+<source>Moving file %x to the recycle bin</source>
+<target>Premještam datoteku %x u koš</target>
 
-<source>Moving folder %x to recycle bin</source>
-<target>Premještam mapu %x u Koš za smeće</target>
+<source>Moving folder %x to the recycle bin</source>
+<target>Premještam datoteku %x u koš</target>
 
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Premještam simboličnu poveznicu %x u Koš za smeće</target>
+<source>Moving symbolic link %x to the recycle bin</source>
+<target>Premještam simobličnu opveznicu %x u koš</target>
 
 <source>Deleting file %x</source>
 <target>Brisanje datoteke %x</target>
@@ -43,8 +46,8 @@
 <source>Deleting symbolic link %x</source>
 <target>Brisanje simboličnih poveznica %x</target>
 
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Koš nije dostupan za sljedeće mape. Datoteke će biti nepovratno izbrisane:</target>
+<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>Koš nije dosuutpan za sljedeće mape. Zbog toga će datoteke biti trajno obrisane:</target>
 
 <source>An exception occurred</source>
 <target>Dogodilo se izuzeće</target>
@@ -310,8 +313,8 @@
 <source>Browse directory</source>
 <target>Odaberi direktorij</target>
 
-<source>Cannot access Volume Shadow Copy Service.</source>
-<target>Ne mogu pristupiti Volume Shadow Copy Servisu</target>
+<source>Cannot access the Volume Shadow Copy Service.</source>
+<target>Ne mogu pristupiti Voulme Shadow Copy servisu.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Molimo koristite FreeFileSync 64-bitnu verziju za izradu shadow kopija na ovom sustavu</target>
@@ -531,11 +534,14 @@ Naredba će biti pokrenuta ako se:
 <source>Generating database...</source>
 <target>Izrađujem bazu podataka...</target>
 
-<source>Creating Volume Shadow Copy for %x...</source>
-<target>Izrađujem Volume Shadow Kopiju za %x...</target>
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Lreiram Volume Shadow Copy za %x...</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>Greška pri provjeri podataka: %x i %y imaju različit sadržaj.</target>
+
+<source>job name</source>
+<target>Ime zadatka</target>
 
 <source>Synchronization aborted</source>
 <target>Sinkronizacija prekinuta</target>
@@ -687,8 +693,8 @@ Naredba će biti pokrenuta ako se:
 <source>&Export file list...</source>
 <target>&Izvoz liste datoteka...</target>
 
-<source>&Global settings...</source>
-<target>&Globalne postavke...</target>
+<source>&Global settings</source>
+<target>&Globalne postavke</target>
 
 <source>&Tools</source>
 <target>&Alati</target>
@@ -705,12 +711,6 @@ Naredba će biti pokrenuta ako se:
 <source>Compare</source>
 <target>Usporedi</target>
 
-<source>Comparison settings</source>
-<target>Postavke usporedbe</target>
-
-<source>Synchronization settings</source>
-<target>Postavke sinkronizacije</target>
-
 <source>Synchronize</source>
 <target>Sinkroniziraj</target>
 
@@ -722,6 +722,12 @@ Naredba će biti pokrenuta ako se:
 
 <source>Swap sides</source>
 <target>Zamjeni strane</target>
+
+<source>Find what:</source>
+<target>Nađi što:</target>
+
+<source>Match case</source>
+<target>Poklopi se</target>
 
 <source>Save as batch job</source>
 <target>Spremi kao slijedni zadatak</target>
@@ -777,8 +783,8 @@ Naredba će biti pokrenuta ako se:
 <source>Statistics</source>
 <target>Statistika</target>
 
-<source>Don't show this dialog again</source>
-<target>Ne prikazuj ovaj prozor ponovno</target>
+<source>&Don't show this dialog again</source>
+<target>&Nemoj više prikazivati ovaj dijaloški prozor</target>
 
 <source>Select a variant</source>
 <target>Odaberite varijantu</target>
@@ -828,6 +834,12 @@ jednak
 <source>Configure your own synchronization rules.</source>
 <target>Konfigurirajte vaša vlastita sinkronizacijska pravila.</target>
 
+<source>Detect moved files</source>
+<target>Proađene preseljene datoteke</target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target>Zahtjevaju se datoteke baze. Nisu podržai svi datotečni sustavi.</target>
+
 <source>Error handling</source>
 <target>Greška pri obradi</target>
 
@@ -852,17 +864,17 @@ jednak
 <source>Delete or overwrite files permanently</source>
 <target>Trajno izbriši ili prepiši datoteke</target>
 
-<source>Recycle Bin</source>
-<target>Koš za smeće</target>
+<source>Recycle bin</source>
+<target>Koš</target>
 
-<source>Use Recycle Bin for deleted and overwritten files</source>
-<target>Koristi Smeće za izbrisane i prepisane datoteke</target>
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>Spremi obrisae ili prepisane datoteke u koš</target>
 
 <source>Versioning</source>
 <target>Označi</target>
 
-<source>Move files to user-defined folder</source>
-<target>Premjesti datoteke u određenu mapu</target>
+<source>Move files to a user-defined folder</source>
+<target>Premjesti datoteke u mapu određenu od korsnika</target>
 
 <source>Naming convention:</source>
 <target>Pravilo imena:</target>
@@ -870,8 +882,8 @@ jednak
 <source>Batch job</source>
 <target>Slijedni zadatak</target>
 
-<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Izradite slijednu datoteku za automatizirati sinkronizaciju. Dvostruki klik na ovu datoteku ili dodajte obvezu u vašem sistemskom planeru: FreeFileSync.exe <naziv zadatka>.ffs_batch</target>
+<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target>Stvaranje batch datoteka za sinkronizaciju bez nadzora. Za početak, dvaput kliknite na ovu datoteku ili planirajte u planeru zadataka: %x</target>
 
 <source>Exit</source>
 <target>Izađi</target>
@@ -894,30 +906,6 @@ jednak
 <source>Limit maximum number of log files</source>
 <target>Ograniči maksimalan broj izvješća</target>
 
-<source>Source code written in C++ using:</source>
-<target>Izvorni kod napisan u C++ uz korištenje:</target>
-
-<source>If you like FreeFileSync</source>
-<target>Ako volite FreeFileSync</target>
-
-<source>Donate with PayPal</source>
-<target>Doniraj s PayPal</target>
-
-<source>Many thanks for localization:</source>
-<target>Velike zahvale idu:</target>
-
-<source>Feedback and suggestions are welcome</source>
-<target>Povratne informacije i prijedlozi su dobrodošli</target>
-
-<source>Homepage</source>
-<target>Početna stranica</target>
-
-<source>Email</source>
-<target>Email</target>
-
-<source>Published under the GNU General Public License</source>
-<target>Objavljeno pod licencom GNU General Public</target>
-
 <source>Delete on both sides</source>
 <target>Izbriši na obje strane</target>
 
@@ -925,12 +913,12 @@ jednak
 <target>Izbriši na obje strane iako je označena datoteka samo na jednoj strani</target>
 
 <source>
-Only files that match all filter settings will be synchronized.
-Note: File names must be relative to base directories.
+Files will only be synchronized if they pass all filter rules.
+Note: File paths must be relative to base directories.
 </source>
 <target>
-Samo datoteke koje odgovaraju svim filterskim postavkama će biti sinkronizirane.
-Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
+Datoteke će biti kopirane ukoliko zadovolje sve zahtjeve filtera.
+Pažnja: Putanje datoteka moraju biti relativne na ishodni direktorij.
 </target>
 
 <source>Include</source>
@@ -960,20 +948,20 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>Fail-safe file copy</source>
 <target>Kopiranje zaštićeno od grešaka</target>
 
-<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Zapiši u privremenu datoteku (*.ffs_tmp) najprije a onda ju preimenuj. Ovo garantira nepromjenjivost čak u slučaju kritične greške.</target>
+<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
+<target>Prvo kopiraj u privremenu datoteku (*ffs_tmp) zatim promijeni ime. Ovo osigurava dosljedno stanje čak i kod fatalne greške.</target>
 
 <source>Copy locked files</source>
 <target>Kopiraj zaključane datoteke</target>
 
-<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Kopiraj zajedničke ili zaključane datoteke koristeći Volume Shadow Copy Servis(Zahtjeva Administratorske ovlasti)</target>
+<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
+<target>Kopiraj dijeljene ili zaključane datoteke koristeći Volume Shadow Copy servis (potrebna su administratorska ovlaštenja)</target>
 
 <source>Copy file access permissions</source>
 <target>Kopiraj datotečna dopuštenja</target>
 
-<source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Premjesti datotečna dopuštenja (Zahtjeva administratorska prava)</target>
+<source>Transfer file and folder permissions (requires administrator rights)</source>
+<target>Prenesi dozvole za mape i datoteke (potrebna su administratorska ovlaštenja)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Prikaži skrivene prozore</target>
@@ -987,17 +975,38 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>&Default</source>
 <target>&Zadano</target>
 
-<source>Find what:</source>
-<target>Nađi što:</target>
+<source>Source code written in C++ using:</source>
+<target>Izvorni kod napisan u C++ uz korištenje:</target>
 
-<source>Match case</source>
-<target>Poklopi se</target>
+<source>If you like FreeFileSync</source>
+<target>Ako volite FreeFileSync</target>
 
-<source>&Find next</source>
-<target>&Nađi slijedeće</target>
+<source>Donate with PayPal</source>
+<target>Doniraj s PayPal</target>
+
+<source>Feedback and suggestions are welcome</source>
+<target>Povratne informacije i prijedlozi su dobrodošli</target>
+
+<source>Homepage</source>
+<target>Početna stranica</target>
+
+<source>Email</source>
+<target>Email</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Objavljeno pod licencom GNU General Public</target>
+
+<source>Many thanks for localization:</source>
+<target>Velike zahvale idu:</target>
 
 <source>Start synchronization</source>
 <target>Započni sinkronizaciju</target>
+
+<source>Comparison settings</source>
+<target>Postavke usporedbe</target>
+
+<source>Synchronization settings</source>
+<target>Postavke sinkronizacije</target>
 
 <source>Delete</source>
 <target>Izbriši</target>
@@ -1005,14 +1014,14 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>Configure filter</source>
 <target>Konfiguriraj filter</target>
 
-<source>Find</source>
-<target>Pronađi</target>
-
 <source>Select time span</source>
 <target>Izaberite mjerni raspon</target>
 
 <source>Folder pairs</source>
 <target>Par mape</target>
+
+<source>Find</source>
+<target>Pronađi</target>
 
 <source>Overview</source>
 <target>Pregled</target>
@@ -1054,9 +1063,6 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>&Execute</source>
 <target>&Izvrši</target>
 
-<source>&Don't show this dialog again</source>
-<target>&Nemoj više prikazivati ovaj dijaloški prozor</target>
-
 <source>
 <pluralform>1 directory</pluralform>
 <pluralform>%x directories</pluralform>
@@ -1090,17 +1096,20 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>Set direction:</source>
 <target>Odaberi smijer:</target>
 
+<source>multiple selection</source>
+<target>višestruki odabir</target>
+
+<source>Include via filter:</source>
+<target>Pridruži preko filtera:</target>
+
+<source>Exclude via filter:</source>
+<target>Isključi preko filtra:</target>
+
 <source>Exclude temporarily</source>
 <target>Izuzmi privremeno</target>
 
 <source>Include temporarily</source>
 <target>Trenutno uključi</target>
-
-<source>Exclude via filter:</source>
-<target>Isključi preko filtra:</target>
-
-<source>multiple selection</source>
-<target>višestruki odabir</target>
 
 <source>Include all</source>
 <target>Uključi sve</target>
@@ -1147,8 +1156,8 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>Do&n't save</source>
 <target>&Nemoj spremiti</target>
 
-<source>Never save changes</source>
-<target>Nikad ne spremaj promjene</target>
+<source>Never save &changes</source>
+<target>Nikad ne spremaj &promjene</target>
 
 <source>Show files that exist on left side only</source>
 <target>Prikaži datoteke koje postoje samo na lijevoj strani</target>
@@ -1201,6 +1210,9 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>All folders are in sync</source>
 <target>Sve mape su u sinkronizaciji</target>
 
+<source>Cannot find %x</source>
+<target>Nemogu pronaći %x</target>
+
 <source>Comma-separated values</source>
 <target>Zarezom odvojene vrijednosti</target>
 
@@ -1210,8 +1222,8 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>Searching for program updates...</source>
 <target>Pretražujem ažuriranja programa...</target>
 
-<source>Ignore further errors</source>
-<target>Zanemari buduće greške</target>
+<source>&Ignore subsequent errors</source>
+<target>&Zanemari naknadne pogreške</target>
 
 <source>&Ignore</source>
 <target>&Ignoriraj</target>
@@ -1219,8 +1231,8 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>Fatal Error</source>
 <target>Kritična greška</target>
 
-<source>Don't show this warning again</source>
-<target>Ne prikazuj ovo upozorenje ponovno</target>
+<source>&Don't show this warning again</source>
+<target>&Ne prikazuj više ovo upozorenje.</target>
 
 <source>&Switch</source>
 <target>&Zamjeni</target>
@@ -1261,9 +1273,6 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>Log</source>
 <target>Dnevnik</target>
 
-<source>Cannot find %x</source>
-<target>Nemogu pronaći %x</target>
-
 <source>Inactive</source>
 <target>Neaktivno</target>
 
@@ -1295,8 +1304,8 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <target>Filtriranje</target>
 
 <source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
 <pluralform>Dali stvarno želite premjestiti sljedeću %x stavku u koš?</pluralform>
@@ -1479,8 +1488,8 @@ Napomena: Imena datoteka moraju biti srodni s glavnim mapama.
 <source>Cannot change process I/O priorities.</source>
 <target>Ne može se promjeniti proces I/O prioriteta</target>
 
-<source>Unable to move %x to the Recycle Bin.</source>
-<target>Nije moguće premjestiti %x u koš za smeće.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>Nije moguće prebaciti %x u koš za smeće.</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>Ne mogu odrediti završnu putanju za %x.</target>

@@ -91,7 +91,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
         const DllFun<FunType_getLastError>     getLastError  (getDllName(), funName_getLastError);
 
         if (!moveToRecycler || !getLastError)
-            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", fmtFileName(filenames[0])),
+            throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(filenames[0])),
                             replaceCpy(_("Cannot load file %x."), L"%x", fmtFileName(getDllName())));
 
         std::vector<const wchar_t*> cNames;
@@ -108,7 +108,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
             if (filenames.size() > 1)
                 filenameFmt += L", ..."; //give at least some hint that there are multiple files, and the error need not be related to the first one
 
-            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", filenameFmt), getLastError()); //already includes details about locking errors!
+            throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", filenameFmt), getLastError()); //already includes details about locking errors!
         }
     }
     else //regular recycle bin usage: available since XP
@@ -133,7 +133,7 @@ void zen::recycleOrDelete(const std::vector<Zstring>& filenames, CallbackRecycli
         //"You should use fully-qualified path names with this function. Using it with relative path names is not thread safe."
         if (::SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
         {
-            throw FileError(replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", fmtFileName(filenames[0]))); //probably not the correct file name for file list larger than 1!
+            throw FileError(replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(filenames[0]))); //probably not the correct file name for file list larger than 1!
         }
     }
 }
@@ -159,7 +159,7 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
 
     if (!::g_file_trash(file, nullptr, &error))
     {
-        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", fmtFileName(filename));
+        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(filename));
 
         if (!error)
             throw FileError(errorMsg, L"Unknown error."); //user should never see this
@@ -190,7 +190,7 @@ bool zen::recycleOrDelete(const Zstring& filename) //throw FileError
 
     auto throwFileError = [&](OSStatus oss)
     {
-        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the Recycle Bin."), L"%x", fmtFileName(filename));
+        const std::wstring errorMsg = replaceCpy(_("Unable to move %x to the recycle bin."), L"%x", fmtFileName(filename));
         std::wstring errorDescr = L"OSStatus Code " + numberTo<std::wstring>(oss);
 
         if (const char* description = ::GetMacOSStatusCommentString(oss)) //found no documentation for proper use of GetMacOSStatusCommentString

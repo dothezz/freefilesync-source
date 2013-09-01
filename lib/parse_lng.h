@@ -107,10 +107,10 @@ public:
     template <class Function, class Function2>
     void visitItems(Function onTrans, Function2 onPluralTrans) const //onTrans takes (const TranslationMap::value_type&), onPluralTrans takes (const TranslationPluralMap::value_type&)
     {
-        for (auto it = sequence.begin(); it != sequence.end(); ++it)
-            if (auto regular = dynamic_cast<const RegularItem*>(it->get()))
+        for (const auto& item : sequence)
+            if (auto regular = dynamic_cast<const RegularItem*>(item.get()))
                 onTrans(regular->value);
-            else if (auto plural = dynamic_cast<const PluralItem*>(it->get()))
+            else if (auto plural = dynamic_cast<const PluralItem*>(item.get()))
                 onPluralTrans(plural->value);
             else assert(false);
     }
@@ -637,11 +637,10 @@ std::string generateLng(const TranslationUnorderedList& in, const TransHeader& h
         out += KnownTokens::text(Token::TK_SRC_END) + '\n';
 
         out += KnownTokens::text(Token::TK_TRG_BEGIN);
-        if (!forms.empty()) out += '\n';
+        out += '\n';
 
-        for (PluralForms::const_iterator j = forms.begin(); j != forms.end(); ++j)
+        for (std::string plForm : forms)
         {
-            std::string plForm = *j;
             formatMultiLineText(plForm);
 
             out += KnownTokens::text(Token::TK_PLURAL_BEGIN);

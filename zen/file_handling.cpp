@@ -45,74 +45,44 @@
 
 using namespace zen;
 
-warn_static("remove after test")
 
-namespace
-{
-void writeSysErrorIfNeeded(std::wstring* sysErrorMsg, const wchar_t* functionName, ErrorCode lastError)
-{
-    if (sysErrorMsg)
-    {
-        //skip uninteresting error codes:
-#ifdef ZEN_WIN
-        if (lastError == ERROR_FILE_NOT_FOUND ||
-            lastError == ERROR_PATH_NOT_FOUND) return;
-        //lastError == ERROR_BAD_NETPATH    || //e.g. for a path like: \\192.168.1.1\test
-        //lastError == ERROR_NETNAME_DELETED;
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
-        if (lastError == ENOENT) return;
-#endif
-        *sysErrorMsg = formatSystemError(functionName, lastError);
-    }
-}
-}
-
-
-bool zen::fileExists(const Zstring& filename, std::wstring* sysErrorMsg)
+bool zen::fileExists(const Zstring& filename)
 {
     //symbolic links (broken or not) are also treated as existing files!
 #ifdef ZEN_WIN
-    const wchar_t functionName[] = L"GetFileAttributes";
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
     if (attr != INVALID_FILE_ATTRIBUTES)
         return (attr & FILE_ATTRIBUTE_DIRECTORY) == 0; //returns true for (file-)symlinks also
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    const wchar_t functionName[] = L"lstat";
     struct ::stat fileInfo = {};
-    if (::lstat(filename.c_str(), &fileInfo) == 0)
-        return S_ISREG(fileInfo.st_mode) || S_ISLNK(fileInfo.st_mode); //in Linux a symbolic link is neither file nor directory
+    if (::stat(filename.c_str(), &fileInfo) == 0) //follow symlinks!
+        return S_ISREG(fileInfo.st_mode);
 #endif
-    writeSysErrorIfNeeded(sysErrorMsg, functionName, getLastError());
     return false;
 }
 
 
-bool zen::dirExists(const Zstring& dirname, std::wstring* sysErrorMsg)
+bool zen::dirExists(const Zstring& dirname)
 {
     //symbolic links (broken or not) are also treated as existing directories!
 #ifdef ZEN_WIN
-    const wchar_t functionName[] = L"GetFileAttributes";
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
     if (attr != INVALID_FILE_ATTRIBUTES)
         return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0; //returns true for (dir-)symlinks also
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    const wchar_t functionName[] = L"lstat";
     struct ::stat dirInfo = {};
-    if (::lstat(dirname.c_str(), &dirInfo) == 0)
-        return S_ISDIR(dirInfo.st_mode) || S_ISLNK(dirInfo.st_mode); //in Linux a symbolic link is neither file nor directory
+    if (::stat(dirname.c_str(), &dirInfo) == 0) //follow symlinks!
+        return S_ISDIR(dirInfo.st_mode);
 #endif
-    writeSysErrorIfNeeded(sysErrorMsg, functionName, getLastError());
     return false;
 }
 
 
-bool zen::symlinkExists(const Zstring& linkname, std::wstring* sysErrorMsg)
+bool zen::symlinkExists(const Zstring& linkname)
 {
 #ifdef ZEN_WIN
-    const wchar_t functionName[] = L"FindFirstFile";
     WIN32_FIND_DATA linkInfo = {};
     const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(linkname).c_str(), &linkInfo);
     if (searchHandle != INVALID_HANDLE_VALUE)
@@ -122,20 +92,17 @@ bool zen::symlinkExists(const Zstring& linkname, std::wstring* sysErrorMsg)
     }
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    const wchar_t functionName[] = L"lstat";
     struct ::stat linkInfo = {};
     if (::lstat(linkname.c_str(), &linkInfo) == 0)
         return S_ISLNK(linkInfo.st_mode);
 #endif
-    writeSysErrorIfNeeded(sysErrorMsg, functionName, getLastError());
     return false;
 }
 
 
-bool zen::somethingExists(const Zstring& objname, std::wstring* sysErrorMsg)
+bool zen::somethingExists(const Zstring& objname)
 {
 #ifdef ZEN_WIN
-    const wchar_t functionName[] = L"GetFileAttributes";
     const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
     if (attr != INVALID_FILE_ATTRIBUTES)
         return true;
@@ -143,32 +110,11 @@ bool zen::somethingExists(const Zstring& objname, std::wstring* sysErrorMsg)
         return true;
 
 #elif defined ZEN_LINUX || defined ZEN_MAC
-    const wchar_t functionName[] = L"lstat";
     struct ::stat fileInfo = {};
     if (::lstat(objname.c_str(), &fileInfo) == 0)
         return true;
 #endif
-    writeSysErrorIfNeeded(sysErrorMsg, functionName, getLastError());
     return false;
-}
-
-
-SymLinkType zen::getSymlinkType(const Zstring& linkname) //throw()
-{
-    assert(symlinkExists(linkname));
-#ifdef ZEN_WIN
-    const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(linkname).c_str());
-    if (attr == INVALID_FILE_ATTRIBUTES)
-        return SYMLINK_TYPE_UNKNOWN;
-    return (attr & FILE_ATTRIBUTE_DIRECTORY) ? SYMLINK_TYPE_DIR : SYMLINK_TYPE_FILE;
-
-#elif defined ZEN_LINUX || defined ZEN_MAC
-    //S_ISDIR and S_ISLNK are mutually exclusive on Linux => explicitly need to follow link
-    struct ::stat fileInfo = {};
-    if (::stat(linkname.c_str(), &fileInfo) != 0)
-        return SYMLINK_TYPE_UNKNOWN;
-    return S_ISDIR(fileInfo.st_mode) ? SYMLINK_TYPE_DIR : SYMLINK_TYPE_FILE;
-#endif
 }
 
 
@@ -531,7 +477,7 @@ public:
         {
             renameFile_sub(unrelatedFileParked, unrelatedFile); //throw FileError, ErrorDifferentVolume
         }
-        catch (...) {}
+        catch (FileError&) {}
     }
 private:
     Zstring unrelatedFile;
@@ -580,17 +526,10 @@ public:
     }
     virtual HandleLink onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
     {
-        switch (getSymlinkType(fullName))
-        {
-            case SYMLINK_TYPE_DIR:
-                dirs_.push_back(shortName);
-                break;
-
-            case SYMLINK_TYPE_FILE:
-            case SYMLINK_TYPE_UNKNOWN:
-                files_.push_back(shortName);
-                break;
-        }
+        if (dirExists(fullName)) //dir symlink
+            dirs_.push_back(shortName);
+        else //file symlink, broken symlink
+            files_.push_back(shortName);
         return LINK_SKIP;
     }
     virtual TraverseCallback* onDir(const Zchar* shortName, const Zstring& fullName)
@@ -918,7 +857,7 @@ void zen::setFileTime(const Zstring& filename, const Int64& modTime, ProcSymlink
         }
     }
 #ifndef NDEBUG //dst hack: verify data written
-    if (dst::isFatDrive(filename) && !dirExists(filename)) //throw()
+    if (dst::isFatDrive(filename) && fileExists(filename)) //throw()
     {
         FILETIME creationTimeDbg  = {};
         FILETIME lastWriteTimeDbg = {};
@@ -1282,13 +1221,13 @@ void zen::makeDirectory(const Zstring& directory, bool failIfExists) //throw Fil
     }
     catch (const FileError&)
     {
-        if (dirExists(directory)) //a file system race-condition!
+        /*
+        could there be situations where a directory/network path exists,
+        but creation fails with error different than "ErrorTargetExisting"??
+        - creation of C:\ fails with ERROR_ACCESS_DENIED rather than ERROR_ALREADY_EXISTS
+        */
+        if (somethingExists(directory)) //a file system race-condition! don't use dirExists() => harmonize with ErrorTargetExisting!
         {
-            /*
-            could there be situations where a directory/network path exists,
-            but creation fails with error different than "ErrorTargetExisting"??
-            - creation of C:\ fails with ERROR_ACCESS_DENIED rather than ERROR_ALREADY_EXISTS
-            */
             assert(false);
             if (failIfExists)
                 throw; //do NOT convert to ErrorTargetExisting: if "failIfExists", not getting a ErrorTargetExisting *atomically* is unexpected!
@@ -1313,7 +1252,7 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
     {
         dirTmp += FILE_NAME_SEPARATOR; //we do not support "C:" to represent a relative path!
 
-        const ErrorCode lastError = dirExists(dirTmp) ? ERROR_ALREADY_EXISTS : ERROR_PATH_NOT_FOUND;
+        const ErrorCode lastError = somethingExists(dirTmp) ? ERROR_ALREADY_EXISTS : ERROR_PATH_NOT_FOUND; //don't use dirExists() => harmonize with ErrorTargetExisting!
 
         const std::wstring errorMsg = replaceCpy(_("Cannot create directory %x."), L"%x", fmtFileName(dirTmp));
         const std::wstring errorDescr = formatSystemError(L"CreateDirectory", lastError);
@@ -1429,7 +1368,7 @@ void zen::makeDirectoryPlain(const Zstring& directory, //throw FileError, ErrorT
         }
 #endif
 
-        zen::ScopeGuard guardNewDir = zen::makeGuard([&] { try { removeDirectory(directory); } catch (...) {} }); //ensure cleanup:
+        zen::ScopeGuard guardNewDir = zen::makeGuard([&] { try { removeDirectory(directory); } catch (FileError&) {} }); //ensure cleanup:
 
         //enforce copying file permissions: it's advertized on GUI...
         if (copyFilePermissions)
@@ -1475,12 +1414,12 @@ void zen::copySymlink(const Zstring& sourceLink, const Zstring& targetLink, bool
         {
 #ifdef ZEN_WIN
             if (isDirLink)
-                removeDirectory(targetLink);
+                removeDirectory(targetLink); //throw FileError
             else
 #endif
-                removeFile(targetLink);
+                removeFile(targetLink); //throw FileError
         }
-        catch (...) {}
+        catch (FileError&) {}
     });
 
     //file times: essential for sync'ing a symlink: enforce this! (don't just try!)
@@ -1676,7 +1615,7 @@ void copyFileWindowsSparse(const Zstring& sourceFile,
 
         throw FileError(errorMsg, errorDescr);
     }
-    ScopeGuard guardTarget = makeGuard([&] { try { removeFile(targetFile); } catch (...) {} }); //transactional behavior: guard just after opening target and before managing hFileOut
+    ScopeGuard guardTarget = makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {} }); //transactional behavior: guard just after opening target and before managing hFileOut
     ZEN_ON_SCOPE_EXIT(::CloseHandle(hFileTarget));
 
     //----------------------------------------------------------------------
@@ -2018,7 +1957,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
     try { activatePrivilege(SE_RESTORE_NAME); }
     catch (const FileError&) {}
 
-    zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (...) {} });
+    zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {} });
     //transactional behavior: guard just before starting copy, we don't trust ::CopyFileEx(), do we? ;)
 
     DWORD copyFlags = COPY_FILE_FAIL_IF_EXISTS;
@@ -2091,7 +2030,7 @@ void copyFileWindowsDefault(const Zstring& sourceFile,
 
             //note: ERROR_INVALID_PARAMETER can also occur when copying to a SharePoint server or MS SkyDrive and the target filename is of a restricted type.
         }
-        catch (...) {}
+        catch (FileError&) {}
 
         throw FileError(errorMsg, errorDescr);
     }
@@ -2165,7 +2104,7 @@ void copyFileLinuxMac(const Zstring& sourceFile,
     if (::fstat(fileIn.getDescriptor(), &sourceInfo) != 0) //read file attributes from source
         throw FileError(replaceCpy(_("Cannot read file attributes of %x."), L"%x", fmtFileName(sourceFile)), formatSystemError(L"fstat", getLastError()));
 
-    zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (...) {} }); //transactional behavior: place guard before lifetime of FileOutput
+    zen::ScopeGuard guardTarget = zen::makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {} }); //transactional behavior: place guard before lifetime of FileOutput
     try
     {
         //create targetFile and open it for writing
@@ -2269,7 +2208,6 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
     if (transactionalCopy)
     {
         Zstring temporary = targetFile + zen::TEMP_FILE_ENDING; //use temporary file until a correct date has been set
-        zen::ScopeGuard guardTempFile = zen::makeGuard([&] { try { removeFile(temporary); } catch (...) {} }); //transactional behavior: ensure cleanup (e.g. network drop) -> ref to temporary[!]
 
         //raw file copy
         try
@@ -2286,9 +2224,12 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
             copyFileSelectOs(sourceFile, temporary, callback, sourceAttr); //throw FileError
         }
 
+        //transactional behavior: ensure cleanup; not needed before copyFileSelectOs() which is already transactional
+        zen::ScopeGuard guardTempFile = zen::makeGuard([&] { try { removeFile(temporary); } catch (FileError&) {} });
+
         //have target file deleted (after read access on source and target has been confirmed) => allow for almost transactional overwrite
         if (callback)
-            callback->deleteTargetFile(targetFile);
+            callback->deleteTargetFile(targetFile); //throw X
 
         //rename temporary file:
         //perf: this call is REALLY expensive on unbuffered volumes! ~40% performance decrease on FAT USB stick!
@@ -2319,7 +2260,6 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
     }
     else
     {
-        //have target file deleted
         if (callback) callback->deleteTargetFile(targetFile);
 
         copyFileSelectOs(sourceFile, targetFile, callback, sourceAttr); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
@@ -2335,7 +2275,7 @@ void zen::copyFile(const Zstring& sourceFile, //throw FileError, ErrorTargetPath
     //file permissions
     if (copyFilePermissions)
     {
-        zen::ScopeGuard guardTargetFile = zen::makeGuard([&] { try { removeFile(targetFile); } catch (...) {}});
+        zen::ScopeGuard guardTargetFile = zen::makeGuard([&] { try { removeFile(targetFile); } catch (FileError&) {}});
 
         copyObjectPermissions(sourceFile, targetFile, SYMLINK_FOLLOW); //throw FileError
 

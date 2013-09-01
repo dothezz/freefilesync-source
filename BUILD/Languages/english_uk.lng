@@ -7,6 +7,9 @@
 	<plural_definition>n == 1 ? 0 : 1</plural_definition>
 </header>
 
+<source>Close search bar</source>
+<target>Close search bar</target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Both sides have changed since last synchronisation.</target>
 
@@ -25,14 +28,14 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Checking recycle bin availability for folder %x...</target>
 
-<source>Moving file %x to recycle bin</source>
-<target>Moving file %x to recycle bin</target>
+<source>Moving file %x to the recycle bin</source>
+<target>Moving file %x to the recycle bin</target>
 
-<source>Moving folder %x to recycle bin</source>
-<target>Moving folder %x to recycle bin</target>
+<source>Moving folder %x to the recycle bin</source>
+<target>Moving folder %x to the recycle bin</target>
 
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Moving symbolic link %x to recycle bin</target>
+<source>Moving symbolic link %x to the recycle bin</source>
+<target>Moving symbolic link %x to the recycle bin</target>
 
 <source>Deleting file %x</source>
 <target>Deleting file %x</target>
@@ -43,8 +46,8 @@
 <source>Deleting symbolic link %x</source>
 <target>Deleting symbolic link %x</target>
 
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</target>
+<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</target>
 
 <source>An exception occurred</source>
 <target>An exception occurred</target>
@@ -307,8 +310,8 @@
 <source>Browse directory</source>
 <target>Browse directory</target>
 
-<source>Cannot access Volume Shadow Copy Service.</source>
-<target>Cannot access Volume Shadow Copy Service.</target>
+<source>Cannot access the Volume Shadow Copy Service.</source>
+<target>Cannot access the Volume Shadow Copy Service.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Please use FreeFileSync 64-bit version to create shadow copies on this system.</target>
@@ -528,11 +531,14 @@ The command is triggered if:
 <source>Generating database...</source>
 <target>Generating database...</target>
 
-<source>Creating Volume Shadow Copy for %x...</source>
-<target>Creating Volume Shadow Copy for %x...</target>
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Creating a Volume Shadow Copy for %x...</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>Data verification error: %x and %y have different content.</target>
+
+<source>job name</source>
+<target>job name</target>
 
 <source>Synchronization aborted</source>
 <target>Synchronisation aborted</target>
@@ -684,8 +690,8 @@ The command is triggered if:
 <source>&Export file list...</source>
 <target>&Export file list...</target>
 
-<source>&Global settings...</source>
-<target>&Global settings...</target>
+<source>&Global settings</source>
+<target>&Global settings</target>
 
 <source>&Tools</source>
 <target>&Tools</target>
@@ -702,12 +708,6 @@ The command is triggered if:
 <source>Compare</source>
 <target>Compare</target>
 
-<source>Comparison settings</source>
-<target>Comparison settings</target>
-
-<source>Synchronization settings</source>
-<target>Synchronisation settings</target>
-
 <source>Synchronize</source>
 <target>Synchronise</target>
 
@@ -719,6 +719,12 @@ The command is triggered if:
 
 <source>Swap sides</source>
 <target>Swap sides</target>
+
+<source>Find what:</source>
+<target>Find what:</target>
+
+<source>Match case</source>
+<target>Match case</target>
 
 <source>Save as batch job</source>
 <target>Save as batch job</target>
@@ -774,8 +780,8 @@ The command is triggered if:
 <source>Statistics</source>
 <target>Statistics</target>
 
-<source>Don't show this dialog again</source>
-<target>Don't show this dialogue again</target>
+<source>&Don't show this dialog again</source>
+<target>&Don't show this dialogue again</target>
 
 <source>Select a variant</source>
 <target>Select a variant</target>
@@ -825,6 +831,12 @@ is the same
 <source>Configure your own synchronization rules.</source>
 <target>Configure your own synchronisation rules.</target>
 
+<source>Detect moved files</source>
+<target>Detect moved files</target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target>Requires database files. Not supported by all file systems.</target>
+
 <source>Error handling</source>
 <target>Error handling</target>
 
@@ -849,17 +861,17 @@ is the same
 <source>Delete or overwrite files permanently</source>
 <target>Delete or overwrite files permanently</target>
 
-<source>Recycle Bin</source>
-<target>Recycle Bin</target>
+<source>Recycle bin</source>
+<target>Recycle bin</target>
 
-<source>Use Recycle Bin for deleted and overwritten files</source>
-<target>Use Recycle Bin for deleted and overwritten files</target>
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>Back up deleted and overwritten files in the recycle bin</target>
 
 <source>Versioning</source>
 <target>Versioning</target>
 
-<source>Move files to user-defined folder</source>
-<target>Move files to user-defined folder</target>
+<source>Move files to a user-defined folder</source>
+<target>Move files to a user-defined folder</target>
 
 <source>Naming convention:</source>
 <target>Naming convention:</target>
@@ -867,8 +879,8 @@ is the same
 <source>Batch job</source>
 <target>Batch job</target>
 
-<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Create a batch file to automate synchronisation. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</target>
+<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target>Create a batch file for unattended synchronisation. To start, double-click this file or schedule in a task planner: %x</target>
 
 <source>Exit</source>
 <target>Exit</target>
@@ -891,30 +903,6 @@ is the same
 <source>Limit maximum number of log files</source>
 <target>Limit maximum number of log files</target>
 
-<source>Source code written in C++ using:</source>
-<target>Source code written in C++ using:</target>
-
-<source>If you like FreeFileSync</source>
-<target>If you like FreeFileSync</target>
-
-<source>Donate with PayPal</source>
-<target>Donate with PayPal</target>
-
-<source>Many thanks for localization:</source>
-<target>Many thanks for localisation:</target>
-
-<source>Feedback and suggestions are welcome</source>
-<target>Feedback and suggestions are welcome</target>
-
-<source>Homepage</source>
-<target>Homepage</target>
-
-<source>Email</source>
-<target>E-mail</target>
-
-<source>Published under the GNU General Public License</source>
-<target>Published under the GNU General Public Licence</target>
-
 <source>Delete on both sides</source>
 <target>Delete on both sides</target>
 
@@ -922,12 +910,12 @@ is the same
 <target>Delete on both sides even if the file is selected on one side only</target>
 
 <source>
-Only files that match all filter settings will be synchronized.
-Note: File names must be relative to base directories.
+Files will only be synchronized if they pass all filter rules.
+Note: File paths must be relative to base directories.
 </source>
 <target>
-Only files that match all filter settings will be synchronised.
-Note: File names must be relative to base directories.
+Files will only be synchronised if they pass all filter rules.
+Note: File paths must be relative to base directories.
 </target>
 
 <source>Include</source>
@@ -957,20 +945,20 @@ Note: File names must be relative to base directories.
 <source>Fail-safe file copy</source>
 <target>Fail-safe file copy</target>
 
-<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</target>
+<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
+<target>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</target>
 
 <source>Copy locked files</source>
 <target>Copy locked files</target>
 
-<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</target>
+<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
+<target>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</target>
 
 <source>Copy file access permissions</source>
 <target>Copy file access permissions</target>
 
-<source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Transfer file and folder permissions (Requires Administrator rights)</target>
+<source>Transfer file and folder permissions (requires administrator rights)</source>
+<target>Transfer file and folder permissions (requires administrator rights)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Restore hidden dialogues</target>
@@ -984,17 +972,38 @@ Note: File names must be relative to base directories.
 <source>&Default</source>
 <target>&Default</target>
 
-<source>Find what:</source>
-<target>Find what:</target>
+<source>Source code written in C++ using:</source>
+<target>Source code written in C++ using:</target>
 
-<source>Match case</source>
-<target>Match case</target>
+<source>If you like FreeFileSync</source>
+<target>If you like FreeFileSync</target>
 
-<source>&Find next</source>
-<target>&Find next</target>
+<source>Donate with PayPal</source>
+<target>Donate with PayPal</target>
+
+<source>Feedback and suggestions are welcome</source>
+<target>Feedback and suggestions are welcome</target>
+
+<source>Homepage</source>
+<target>Homepage</target>
+
+<source>Email</source>
+<target>E-mail</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Published under the GNU General Public Licence</target>
+
+<source>Many thanks for localization:</source>
+<target>Many thanks for localisation:</target>
 
 <source>Start synchronization</source>
 <target>Start synchronisation</target>
+
+<source>Comparison settings</source>
+<target>Comparison settings</target>
+
+<source>Synchronization settings</source>
+<target>Synchronisation settings</target>
 
 <source>Delete</source>
 <target>Delete</target>
@@ -1002,14 +1011,14 @@ Note: File names must be relative to base directories.
 <source>Configure filter</source>
 <target>Configure filter</target>
 
-<source>Find</source>
-<target>Find</target>
-
 <source>Select time span</source>
 <target>Select time span</target>
 
 <source>Folder pairs</source>
 <target>Folder pairs</target>
+
+<source>Find</source>
+<target>Find</target>
 
 <source>Overview</source>
 <target>Overview</target>
@@ -1050,9 +1059,6 @@ Note: File names must be relative to base directories.
 <source>&Execute</source>
 <target>&Execute</target>
 
-<source>&Don't show this dialog again</source>
-<target>&Don't show this dialogue again</target>
-
 <source>
 <pluralform>1 directory</pluralform>
 <pluralform>%x directories</pluralform>
@@ -1083,17 +1089,20 @@ Note: File names must be relative to base directories.
 <source>Set direction:</source>
 <target>Set direction:</target>
 
+<source>multiple selection</source>
+<target>multiple selection</target>
+
+<source>Include via filter:</source>
+<target>Include via filter:</target>
+
+<source>Exclude via filter:</source>
+<target>Exclude via filter:</target>
+
 <source>Exclude temporarily</source>
 <target>Exclude temporarily</target>
 
 <source>Include temporarily</source>
 <target>Include temporarily</target>
-
-<source>Exclude via filter:</source>
-<target>Exclude via filter:</target>
-
-<source>multiple selection</source>
-<target>multiple selection</target>
 
 <source>Include all</source>
 <target>Include all</target>
@@ -1140,8 +1149,8 @@ Note: File names must be relative to base directories.
 <source>Do&n't save</source>
 <target>Do&n't save</target>
 
-<source>Never save changes</source>
-<target>Never save changes</target>
+<source>Never save &changes</source>
+<target>Never save &changes</target>
 
 <source>Show files that exist on left side only</source>
 <target>Show files that exist on left side only</target>
@@ -1194,6 +1203,9 @@ Note: File names must be relative to base directories.
 <source>All folders are in sync</source>
 <target>All folders are in sync</target>
 
+<source>Cannot find %x</source>
+<target>Cannot find %x</target>
+
 <source>Comma-separated values</source>
 <target>Comma-separated values</target>
 
@@ -1203,8 +1215,8 @@ Note: File names must be relative to base directories.
 <source>Searching for program updates...</source>
 <target>Searching for program updates...</target>
 
-<source>Ignore further errors</source>
-<target>Ignore further errors</target>
+<source>&Ignore subsequent errors</source>
+<target>&Ignore subsequent errors</target>
 
 <source>&Ignore</source>
 <target>&Ignore</target>
@@ -1212,8 +1224,8 @@ Note: File names must be relative to base directories.
 <source>Fatal Error</source>
 <target>Fatal Error</target>
 
-<source>Don't show this warning again</source>
-<target>Don't show this warning again</target>
+<source>&Don't show this warning again</source>
+<target>&Don't show this warning again</target>
 
 <source>&Switch</source>
 <target>&Switch</target>
@@ -1254,9 +1266,6 @@ Note: File names must be relative to base directories.
 <source>Log</source>
 <target>Log</target>
 
-<source>Cannot find %x</source>
-<target>Cannot find %x</target>
-
 <source>Inactive</source>
 <target>Inactive</target>
 
@@ -1288,12 +1297,12 @@ Note: File names must be relative to base directories.
 <target>Filter</target>
 
 <source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </target>
 
 <source>
@@ -1467,8 +1476,8 @@ Note: File names must be relative to base directories.
 <source>Cannot change process I/O priorities.</source>
 <target>Cannot change process I/O priorities.</target>
 
-<source>Unable to move %x to the Recycle Bin.</source>
-<target>Unable to move %x to the Recycle Bin.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>Unable to move %x to the recycle bin.</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>Cannot determine final path for %x.</target>

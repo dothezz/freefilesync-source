@@ -25,11 +25,6 @@ private:
     virtual int  OnRun();
     virtual bool OnExceptionInMainLoop() { throw; } //just re-throw and avoid display of additional messagebox: it will be caught in OnRun()
 
-#ifdef ZEN_MAC
-    virtual void MacOpenFiles(const wxArrayString& filenames);
-    virtual void MacNewFile();
-#endif
-
     void onEnterEventLoop(wxEvent& event);
     void onQueryEndSession(wxEvent& event);
     void launch(const std::vector<Zstring>& commandArgs);

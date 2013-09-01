@@ -10,7 +10,7 @@
 #include <wx/event.h>
 #include <wx/menu.h>
 #include <wx+/context_menu.h>
-#include <wx+/button.h>
+#include <wx+/bitmap_button.h>
 #include <wx+/image_tools.h>
 #include "dir_name.h"
 #include "small_dlgs.h"
@@ -86,12 +86,12 @@ private:
         //test for Null-filter
         if (!isNullFilter(localFilter))
         {
-            setImage(*basicPanel_.m_bpButtonLocalFilter, getResourceImage(L"filterSmall"));
+            setImage(*basicPanel_.m_bpButtonLocalFilter, getResourceImage(L"filter_small"));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter is active"));
         }
         else
         {
-            setImage(*basicPanel_.m_bpButtonLocalFilter, greyScale(getResourceImage(L"filterSmall")));
+            setImage(*basicPanel_.m_bpButtonLocalFilter, greyScale(getResourceImage(L"filter_small")));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
         }
     }

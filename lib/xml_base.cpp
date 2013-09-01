@@ -101,7 +101,7 @@ void xmlAccess::saveXmlDocument(const zen::XmlDoc& doc, const Zstring& filename)
             FileOutput outputFile(filename, FileOutput::ACC_OVERWRITE); //throw FileError
             outputFile.write(stream.c_str(), stream.length());          //
         }
-        catch (const FileError& error) //more detailed error messages than with wxWidgets
+        catch (const FileError& error)
         {
             throw FfsXmlError(error.toString());
         }

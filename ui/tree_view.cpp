@@ -57,9 +57,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
     };
 
     cont.firstFileId = nullptr;
-    std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-                  [&](FilePair& fileObj)
-    {
+    for (FilePair& fileObj : hierObj.refSubFiles())
         if (pred(fileObj))
         {
             cont.bytesNet += getBytes(fileObj);
@@ -68,11 +66,8 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
             if (!cont.firstFileId)
                 cont.firstFileId = fileObj.getId();
         }
-    });
 
-    std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-                  [&](SymlinkPair& linkObj)
-    {
+    for (SymlinkPair& linkObj : hierObj.refSubLinks())
         if (pred(linkObj))
         {
             ++cont.itemCountNet;
@@ -80,14 +75,13 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
             if (!cont.firstFileId)
                 cont.firstFileId = linkObj.getId();
         }
-    });
+
     cont.bytesGross     += cont.bytesNet;
     cont.itemCountGross += cont.itemCountNet;
 
     cont.subDirs.reserve(hierObj.refSubDirs().size()); //avoid expensive reallocations!
 
-    std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
-                  [&cont, pred](DirPair& subDirObj)
+    for (DirPair& subDirObj : hierObj.refSubDirs())
     {
         const bool included = pred(subDirObj);
 
@@ -107,7 +101,7 @@ void TreeView::extractVisibleSubtree(HierarchyObject& hierObj,  //in
             subDirView.objId = subDirObj.getId();
             compressNode(subDirView);
         }
-    });
+    }
 }
 
 
@@ -121,30 +115,30 @@ void calcPercentage(std::vector<std::pair<UInt64, int*>>& workList)
 
     if (total == 0U) //this case doesn't work with the error minimizing algorithm below
     {
-        std::for_each(workList.begin(), workList.end(), [](std::pair<UInt64, int*>& pair) { *pair.second = 0; });
+        for (std::pair<UInt64, int*>& pair : workList)
+            *pair.second = 0;
         return;
     }
 
     int remainingPercent = 100;
-    std::for_each(workList.begin(), workList.end(),
-                  [&](std::pair<UInt64, int*>& pair)
+    for (std::pair<UInt64, int*>& pair : workList)
     {
-        *pair.second = to<double>(pair.first) * 100 / to<double>(total); //round down
+        *pair.second = to<int>(pair.first * 100U / total); //round down
         remainingPercent -= *pair.second;
-    });
+    }
+    assert(remainingPercent >= 0);
+    assert(remainingPercent < static_cast<int>(workList.size()));
 
-    //find #remainingPercent items with largest absolute error
+    //distribute remaining percent so that overall error is minimized as much as possible:
     remainingPercent = std::min(remainingPercent, static_cast<int>(workList.size()));
     if (remainingPercent > 0)
     {
         std::nth_element(workList.begin(), workList.begin() + remainingPercent - 1, workList.end(),
                          [total](const std::pair<UInt64, int*>& lhs, const std::pair<UInt64, int*>& rhs)
         {
-            //return std::abs(*lhs.second - to<double>(lhs.first) * 100 / total) > std::abs(*rhs.second - to<double>(rhs.first) * 100 / total);
-            return (to<double>(lhs.first) - to<double>(rhs.first)) * 100 / to<double>(total) > *lhs.second - *rhs.second;
+            return lhs.first * 100U % total > rhs.first * 100U % total;
         });
 
-        //distribute remaining percent so that overall error is minimized as much as possible
         std::for_each(workList.begin(), workList.begin() + remainingPercent, [&](std::pair<UInt64, int*>& pair) { ++*pair.second; });
     }
 }
@@ -244,7 +238,7 @@ void TreeView::sortSingleLevel(std::vector<TreeLine>& items, ColumnTypeNavi colu
 }
 
 
-void TreeView::getChildren(const Container& cont, size_t level, std::vector<TreeLine>& output)
+void TreeView::getChildren(const Container& cont, unsigned int level, std::vector<TreeLine>& output)
 {
     output.clear();
     output.reserve(cont.subDirs.size() + 1); //keep pointers in "workList" valid
@@ -453,7 +447,7 @@ void TreeView::reduceNode(size_t row)
 {
     if (row < flatTree.size())
     {
-        const size_t parentLevel = flatTree[row].level_;
+        const unsigned int parentLevel = flatTree[row].level_;
 
         bool done = false;
         flatTree.erase(std::remove_if(flatTree.begin() + row + 1, flatTree.end(),
@@ -477,7 +471,7 @@ ptrdiff_t TreeView::getParent(size_t row) const
 {
     if (row < flatTree.size())
     {
-        const size_t level = flatTree[row].level_;
+        const auto level = flatTree[row].level_;
 
         while (row-- > 0)
             if (flatTree[row].level_ < level)
@@ -638,18 +632,13 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
                     HierarchyObject& parent = firstFile->parent();
 
                     //lazy evaluation: recheck "lastViewFilterPred" again rather than buffer and bloat "lastViewFilterPred"
-                    std::for_each(parent.refSubFiles().begin(), parent.refSubFiles().end(),
-                                  [&](FileSystemObject& fsObj)
-                    {
+                    for (FileSystemObject& fsObj : parent.refSubFiles())
                         if (lastViewFilterPred(fsObj))
                             filesAndLinks.push_back(&fsObj);
-                    });
-                    std::for_each(parent.refSubLinks().begin(), parent.refSubLinks().end(),
-                                  [&](FileSystemObject& fsObj)
-                    {
+
+                    for (FileSystemObject& fsObj : parent.refSubLinks())
                         if (lastViewFilterPred(fsObj))
                             filesAndLinks.push_back(&fsObj);
-                    });
 
                     return make_unique<TreeView::FilesNode>(percent, parentDir->bytesNet, parentDir->itemCountNet, level, filesAndLinks);
                 }
@@ -664,10 +653,6 @@ std::unique_ptr<TreeView::Node> TreeView::getLine(size_t row) const
 
 namespace
 {
-#ifdef _MSC_VER
-#pragma warning(disable:4428)	// VC wrongly issues warning C4428: universal-character-name encountered in source
-#endif
-
 wxString getShortDisplayNameForFolderPair(const Zstring& dirLeftPf, const Zstring& dirRightPf) //post-fixed with separator
 {
     assert(endsWith(dirLeftPf,  FILE_NAME_SEPARATOR) || dirLeftPf .empty());
@@ -1015,7 +1000,7 @@ private:
                             rectTmp.width -= widthNodeIcon + GAP_SIZE;
 
                             if (rectTmp.width > 0)
-                                drawCellText(dc, rectTmp, getValue(row, colType), grid.IsEnabled(), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                                drawCellText(dc, rectTmp, getValue(row, colType), isActive, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                         }
                     }
                 }
@@ -1038,11 +1023,11 @@ private:
                 rectTmp.width -= 2 * GAP_SIZE;
             }
 
-            drawCellText(dc, rectTmp, getValue(row, colType), grid.IsEnabled(), alignment);
+            drawCellText(dc, rectTmp, getValue(row, colType), true, alignment);
         }
     }
 
-    virtual size_t getBestSize(wxDC& dc, size_t row, ColumnType colType)
+    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType)
     {
         // -> synchronize renderCell() <-> getBestSize() <-> onMouseLeft()
 

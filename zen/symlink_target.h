@@ -12,7 +12,7 @@
 
 #ifdef ZEN_WIN
 #include "win.h" //includes "windows.h"
-#include "WinIoCtl.h"
+//#include <WinIoCtl.h>
 #include "privilege.h"
 #include "long_path_prefix.h"
 #include "dll.h"
@@ -43,7 +43,8 @@ Zstring getSymlinkTargetRaw(const Zstring& linkPath); //throw FileError
 
 
 //################################ implementation ################################
-#ifdef _MSC_VER //I don't have Windows Driver Kit at hands right now, so unfortunately we need to redefine this structures and cross fingers...
+#ifdef ZEN_WIN
+//I don't have Windows Driver Kit at hands right now, so unfortunately we need to redefine this structure and cross fingers...
 typedef struct _REPARSE_DATA_BUFFER //from ntifs.h
 {
     ULONG  ReparseTag;
@@ -76,7 +77,6 @@ typedef struct _REPARSE_DATA_BUFFER //from ntifs.h
 } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
 #define REPARSE_DATA_BUFFER_HEADER_SIZE   FIELD_OFFSET(REPARSE_DATA_BUFFER, GenericReparseBuffer)
 #endif
-
 
 namespace
 {

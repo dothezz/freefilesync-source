@@ -30,7 +30,7 @@ void HierarchyObject::removeEmptyRec()
     if (emptyExisting) //notify if actual deletion happened
         notifySyncCfgChanged(); //mustn't call this in ~FileSystemObject(), since parent, usually a DirPair, is already partially destroyed and existing as a pure HierarchyObject!
 
-    for (auto& subDir : refSubDirs())
+    for (DirPair& subDir : refSubDirs())
         subDir.removeEmptyRec(); //recurse
 }
 

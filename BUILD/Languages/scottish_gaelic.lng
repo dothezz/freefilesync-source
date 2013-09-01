@@ -25,14 +25,14 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>A' toirt sùil a bheil am biona ri fhaighin airson a' phasgain %x...</target>
 
-<source>Moving file %x to recycle bin</source>
-<target>A' gluasad an fhaidhle %x dhan bhiona ath-chuairteachaidh</target>
+<source>Moving file %x to the recycle bin</source>
+<target>A' gluasad an fhaidhle %x dhan bhiona</target>
 
-<source>Moving folder %x to recycle bin</source>
-<target>A' gluasad a' phasgain %x dhan bhiona ath-chuairteachaidh</target>
+<source>Moving folder %x to the recycle bin</source>
+<target>A' gluasad a' phasgain %x dhan bhiona</target>
 
-<source>Moving symbolic link %x to recycle bin</source>
-<target>A' gluasad an symbolic link %x dhan bhiona ath-chuairteachaidh</target>
+<source>Moving symbolic link %x to the recycle bin</source>
+<target>A' gluasad an symbolic link %x dhan bhiona</target>
 
 <source>Deleting file %x</source>
 <target>A' sguabadh às an fhaidhle %x</target>
@@ -43,20 +43,56 @@
 <source>Deleting symbolic link %x</source>
 <target>A' sguabadh às an symbolic link %x</target>
 
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Chan eil am biona ri làimh nam pasganan a leanas. Thèid na faidhlichean a sguabadh às gu buan an àite sin:</target>
+<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target>Chan eil am biona ri làimh airson nam pasganan a leanas. Thèid an sguabadh às gu buan an àite sin:</target>
 
 <source>An exception occurred</source>
 <target>Thachair eisgeachd</target>
 
-<source>Cannot find file %x.</source>
-<target>Cha deach am faidhle %x a lorg.</target>
+<source>A directory path is expected after %x.</source>
+<target>Tha dùil ri slighe pasgain an dèidh %x</target>
+
+<source>Syntax error</source>
+<target>Mearachd co-chàraidh</target>
+
+<source>Cannot open file %x.</source>
+<target>Cha ghabh am faidhle %x fhosgladh.</target>
 
 <source>Error</source>
 <target>Mearachd</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Chan eil rèiteachadh dligheach san fhaidhle %x.</target>
+
+<source>Unequal number of left and right directories specified.</source>
+<target>Chan eil àireamh nam pasganan air an taobh chlì 's an taobh deas co-ionnann</target>
+
+<source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
+<target>Chan fhaod roghainnean aig ìre paidhrichean nam pasganan a bhith san fhaidhle rèiteachaidh nuair a thathar a' cur pasganan slighe na loidhne-àithne.</target>
+
+<source>Warning</source>
+<target>Rabhadh</target>
+
+<source>Directories cannot be set for more than one configuration file.</source>
+<target>Cha ghabh pasganan a shuidheachadh airson barrachd air aon fhaidhle rèiteachaidh.</target>
+
+<source>Syntax:</source>
+<target>Co-chàradh:</target>
+
+<source>config files</source>
+<target>faidhlichean rèiteachaidh</target>
+
+<source>directory</source>
+<target>pasgan</target>
+
+<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
+<target>Àireamh sam bith de dh'fhaidhlichean rèiteachaidh FreeFileSync .ffs_gui agus/no .ffs_batch</target>
+
+<source>Any number of alternative directories for at most one config file.</source>
+<target>Àireamh sam bith de phasganan eile airson aon fhaidhle rèiteachaidh air a' char as fhaide.</target>
+
+<source>Command line</source>
+<target>Loidhne-àithne</target>
 
 <source>A folder input field is empty.</source>
 <target>Tha co-dhiù aon raon pasgain ann a tha falamh.</target>
@@ -217,14 +253,14 @@
 <target>An ùine gu lèir:</target>
 
 <source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
 </source>
 <target>
-<pluralform>%x bhaidht</pluralform>
-<pluralform>%x bhaidht</pluralform>
-<pluralform>%x baidht</pluralform>
-<pluralform>%x baidht</pluralform>
+<pluralform>%x byte</pluralform>
+<pluralform>%x bytes</pluralform>
+<pluralform>%x bytes</pluralform>
+<pluralform>%x bytes</pluralform>
 </target>
 
 <source>%x MB</source>
@@ -246,14 +282,14 @@
 <target>'Ga sganadh:</target>
 
 <source>
-<pluralform>[1 Thread]</pluralform>
-<pluralform>[%x Threads]</pluralform>
+<pluralform>1 thread</pluralform>
+<pluralform>%x threads</pluralform>
 </source>
 <target>
-<pluralform>[%x snàithlean]</pluralform>
-<pluralform>[%x shnàithlean]</pluralform>
-<pluralform>[%x snàithleanan]</pluralform>
-<pluralform>[%x snàithlean]</pluralform>
+<pluralform>%x shnàithlean</pluralform>
+<pluralform>%x shnàithlean</pluralform>
+<pluralform>%x snàithleanan</pluralform>
+<pluralform>%x snàithlean</pluralform>
 </target>
 
 <source>Encoding extended time information: %x</source>
@@ -261,6 +297,9 @@
 
 <source>/sec</source>
 <target>/diog</target>
+
+<source>%x items</source>
+<target>%x nithean</target>
 
 <source>Configuration file %x loaded partially only.</source>
 <target>Cha deach faidhle an rèiteachaidh %x a luchdadh gu tur.</target>
@@ -274,8 +313,8 @@
 <source>Browse directory</source>
 <target>Rùraich am pasgan</target>
 
-<source>Cannot access Volume Shadow Copy Service.</source>
-<target>Chan fhaigh sinn cothrom air seirbheis lethbhreacan-sgàile nan clàr.</target>
+<source>Cannot access the Volume Shadow Copy Service.</source>
+<target>Chan fhaigh sinn cothrom air seirbheise lethbhreacan sgàil an draibh.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Nach cleachd sibh an tionndadh 64 biot de FreeFileSync gus lethbhreacan-sgàile a chruthachadh air an t-siostam seo?</target>
@@ -286,8 +325,8 @@
 <source>Cannot determine volume name for %x.</source>
 <target>Chan urrainn dhuinn ainm an draibh airson %x a dhearbhadh.</target>
 
-<source>Volume name %x not part of file name %y.</source>
-<target>Chan eil an t-ainm clàir %x 'na phàirt dhen ainm fhaidhle %y.</target>
+<source>Volume name %x is not part of file path %y.</source>
+<target>Chan eil ainm an draibh %x 'na phàirt de shlighe an fhaodhle %y.</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Tha thu airson sgur dheth: A' feitheamh gus an crìochnaich an gnìomh làithreach...</target>
@@ -355,9 +394,6 @@
 <source>Idle time between last detected change and execution of command</source>
 <target>An tàmh eadar an t-atharrachadh mu dheireadh agus gnìomhachadh na h-àithne</target>
 
-<source>Command line</source>
-<target>Loidhne-àithne</target>
-
 <source>
 The command is triggered if:
 - files or subfolders change
@@ -381,9 +417,6 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Sioncronachadh fèin-obrachail</target>
 
-<source>Warning</source>
-<target>Rabhadh</target>
-
 <source>Build: %x</source>
 <target>Build: %x</target>
 
@@ -393,14 +426,20 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>All files</source>
 <target>Gach faidhle</target>
 
+<source>Directory monitoring active</source>
+<target>Tha na pasganan 'gam marasgladh</target>
+
+<source>Waiting until all directories are available...</source>
+<target>A' feitheamh gus am bi gach pasgan ri làimh...</target>
+
 <source>&Restore</source>
 <target>&Aisig</target>
 
+<source>&Show error</source>
+<target>&Seall a' mhearachd</target>
+
 <source>&Exit</source>
 <target>&Fàg an-seo</target>
-
-<source>Waiting for missing directories...</source>
-<target>A' feitheamh ris na pasgain a tha a dhìth...</target>
 
 <source>Invalid command line:</source>
 <target>Loidhne-àithne mhì-dhligheach:</target>
@@ -411,14 +450,14 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>File time and size</source>
 <target>Ceann-là is meud</target>
 
-<source> Two way </source>
-<target> An dà chomhair </target>
+<source>Two way</source>
+<target>An dà chomhair</target>
 
 <source>Mirror</source>
-<target>Sgàthanaich </target>
+<target>Sgàthanaich</target>
 
 <source>Update</source>
-<target>Ùraich </target>
+<target>Ùraich</target>
 
 <source>Custom</source>
 <target>Gnàthaichte</target>
@@ -474,11 +513,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Tha còmstrithean aig na nithean a leanas fhathast is cha dèid an sioncronachadh:</target>
 
-<source>Significant difference detected:</source>
-<target>Chaidh diofar mòr a lorg:</target>
-
-<source>More than 50% of the total number of files will be copied or deleted.</source>
-<target>Tha thu an impis barrachd air an dàrna leth dhe na faidhlichean uile sguabadh às no lethbhreac a dhèanamh dhiubh.</target>
+<source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
+<target>Tha diofar mòr eadar na pasganan a leanas. Dèan cinnteach gu bheil thu a' maidseadh nam pasganan ceart airson sioncronachadh.</target>
 
 <source>Not enough free disk space available in:</source>
 <target>Chan eil rùm saor gu leòr air an diosga:</target>
@@ -498,11 +534,14 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Generating database...</source>
 <target>A' gintinn an stòir-dhàta...</target>
 
-<source>Creating Volume Shadow Copy for %x...</source>
-<target>A' cruthachadh Volume Shadow Copy de %x...</target>
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>A' cruthachadh lethbhreac sgàil draibh airson %x...</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>Mearachd le dearbhadh an dàta: tha susbaint eadar-dhealaichte ann an %x agus %y.</target>
+
+<source>job name</source>
+<target>ainm na h-obrach</target>
 
 <source>Synchronization aborted</source>
 <target>Sguireadh dhen t-sioncronachadh</target>
@@ -527,6 +566,9 @@ Thèid an loidhne-àithne a chur gu dol:
 
 <source>Switching to FreeFileSync main dialog</source>
 <target>A' gearradh leum gu FreeFileSync sa phrìomh-chòmhradh</target>
+
+<source>Retrying operation after error:</source>
+<target>A' feuchainn ris an dèidh na mearachd:</target>
 
 <source>A new version of FreeFileSync is available:</source>
 <target>Tha tionndadh ùr de FreeFileSync ann:</target>
@@ -651,8 +693,8 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>&Export file list...</source>
 <target>Às-p&hortaich liosta nam faidhle...</target>
 
-<source>&Global settings...</source>
-<target>&Na roghainnean uile-choitcheann...</target>
+<source>&Global settings</source>
+<target>&Na roghainnean uile-choitcheann</target>
 
 <source>&Tools</source>
 <target>&Innealan</target>
@@ -668,12 +710,6 @@ Thèid an loidhne-àithne a chur gu dol:
 
 <source>Compare</source>
 <target>Dèan coimeas</target>
-
-<source>Comparison settings</source>
-<target>Roghainnean a' choimeasaidh</target>
-
-<source>Synchronization settings</source>
-<target>Roghainnean an t-sioncronachaidh</target>
 
 <source>Synchronize</source>
 <target>Dèan sioncronachadh</target>
@@ -723,6 +759,9 @@ Thèid an loidhne-àithne a chur gu dol:
 <source>Synchronizing...</source>
 <target>A' sioncronachadh...</target>
 
+<source>Minimize to notification area</source>
+<target>Lùghdach 's gluais gu raon nam brathan</target>
+
 <source>On completion</source>
 <target>Nuair a bhios e deiseil</target>
 
@@ -731,6 +770,15 @@ Thèid an loidhne-àithne a chur gu dol:
 
 <source>&Pause</source>
 <target>&Cuir 'na stad</target>
+
+<source>Variant</source>
+<target>Eugsamhail</target>
+
+<source>Statistics</source>
+<target>Stats</target>
+
+<source>&Don't show this dialog again</source>
+<target>&Na seall an còmhradh seo a-rithist</target>
 
 <source>Select a variant</source>
 <target>Tagh eug-samhail</target>
@@ -779,6 +827,12 @@ Bidh dà fhaidhle co-ionnann 'nar beachd-sa
 <source>Configure your own synchronization rules.</source>
 <target>Sònraich riaghailtean sioncronachaidh thu fhèin.</target>
 
+<source>Detect moved files</source>
+<target>Mothaich do dh'fhaidhlichean a chaidh a ghluasad</target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target>Feumaidh seo faidhlichean stòir-dhàta. Chan eil gach siostam fhaidhlichean a' cur taic ri seo.</target>
+
 <source>Error handling</source>
 <target>Làimhseachadh mhearachdan</target>
 
@@ -803,17 +857,17 @@ Bidh dà fhaidhle co-ionnann 'nar beachd-sa
 <source>Delete or overwrite files permanently</source>
 <target>Sguab às no sgrìobh thairis air faidhlichean gu buan</target>
 
-<source>Recycle Bin</source>
-<target>Am biona ath-chuairteachaidh</target>
+<source>Recycle bin</source>
+<target>Am biona</target>
 
-<source>Use Recycle Bin for deleted and overwritten files</source>
-<target>Cuir na chaidh a sguabadh as no sgrìobhadh thairis air sa bhiona ath-chuairteachaidh</target>
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>Dèan lethbhreac-glèidhidh de dh'fhaidhlichean sa bhiona a chaidh a sguabadh às no a chaidh sgrìobhadh thairis orra</target>
 
 <source>Versioning</source>
 <target>Versioning</target>
 
-<source>Move files to user-defined folder</source>
-<target>Gluais na faidhlichean dhan phasgan a shònraich an cleachdaiche</target>
+<source>Move files to a user-defined folder</source>
+<target>Gluais na faidhlichean gu àite a shònraich an cleachdaiche</target>
 
 <source>Naming convention:</source>
 <target>Gnàthas nan ainmean:</target>
@@ -821,8 +875,8 @@ Bidh dà fhaidhle co-ionnann 'nar beachd-sa
 <source>Batch job</source>
 <target>Obair baidse</target>
 
-<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Cruthaich faidhle batch airson sioncronachadh fèin-obrachail. Dèan briogadh dùbailte air an fhaidhle seo no cuir e air sgeideal an t-siostaim agad: FreeFileSync.exe <Jobname>.ffs_batch.</target>
+<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target>Cruthaich faidhle batch airson sioncronachadh a dh'obraicheas gun thusa a bhith an làthair. Gus a thòiseachadh, dèan briogadh dùbailte air an fhaidhle seo ann am planadair shaothraichean: %x</target>
 
 <source>Exit</source>
 <target>Fàg an-seo</target>
@@ -845,30 +899,6 @@ Bidh dà fhaidhle co-ionnann 'nar beachd-sa
 <source>Limit maximum number of log files</source>
 <target>Cuingich an àireamh as motha de dh'fhaidhlichean an loga</target>
 
-<source>Source code written in C++ using:</source>
-<target>Chaidh an còd tùsail a sgrìobhadh ann an C++ le taic:</target>
-
-<source>If you like FreeFileSync</source>
-<target>Ma tha FreeFileSync a' còrdadh riut</target>
-
-<source>Donate with PayPal</source>
-<target>Nach doir sibh tabhartas le PayPal?</target>
-
-<source>Many thanks for localization:</source>
-<target>Tha sinn fada an comain nan daoine a leanas airson eadar-theangachadh:</target>
-
-<source>Feedback and suggestions are welcome</source>
-<target>Tha sinn a' cur fàilte mhòr air beachd is moladh sam bith</target>
-
-<source>Homepage</source>
-<target>An duilleag-dhachaigh</target>
-
-<source>Email</source>
-<target>Post-d</target>
-
-<source>Published under the GNU General Public License</source>
-<target>Air fhoillseachadh fo GNU General Public License</target>
-
 <source>Delete on both sides</source>
 <target>Sguab às air an dà thaobh</target>
 
@@ -876,12 +906,12 @@ Bidh dà fhaidhle co-ionnann 'nar beachd-sa
 <target>Sguab às air an dà thaobh fiù mur an deach am faidhle a thaghadh ach air aon taobh</target>
 
 <source>
-Only files that match all filter settings will be synchronized.
-Note: File names must be relative to base directories.
+Files will only be synchronized if they pass all filter rules.
+Note: File paths must be relative to base directories.
 </source>
 <target>
-Cha dèid ach na faidhlichean a fhreagras ri gach roghainn na criathraige a shioncronachadh.
-An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain aca.
+Cha dèidh faidhlichean a shioncronachadh ach ma choileanas iad gach riaghailte na criathraige.
+An aire: Feumaidh slighean nam faidhlichean a bhith dàimheach ris na bun-phasganan.
 </target>
 
 <source>Include</source>
@@ -911,20 +941,20 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>Fail-safe file copy</source>
 <target>Dèan lethbhreac nach gabh fàilligeadh</target>
 
-<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Sgrìobh faidhle sealach (*.ffs_tmp) an toiseach agus cuir ainm eile air an uairsin. Bidh seo mar bharantas air staid sheasmhach, fiù ma thachras mearachd mharbhtach.</target>
+<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
+<target>Cuir lethbhreac dheth ann am faidhle sealach (*.ffs_tmp) an toiseach is thoir ainm ùr air an uairsin. Leis a seo, bidh staid sheasmhach agad fiù ma thachras mearachd mharbhtach.</target>
 
 <source>Copy locked files</source>
 <target>Dèan lethbhreac de dh'fhaidhlichean glaiste</target>
 
-<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Dèan lethbhreac de dh'fhaidhlichean glaiste no co-roinnte le seirbheis lethbhreacan-sgàile nan clàr (feumaidh seo còraichean rianaire)</target>
+<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
+<target>Dèan lethbhreac de dh'fhaidhlichean co-roinnte no glaiste le seirbheis lethbhreacan sgàil an draibh (feumaidh seo còraichean rianaire)</target>
 
 <source>Copy file access permissions</source>
 <target>Dèan lethbhreac de cheadan-inntrigidh nam faidhle</target>
 
-<source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Tar-chuir ceadan nam faidhle 's nam pasgan (feumaidh seo còraichean rianaire)</target>
+<source>Transfer file and folder permissions (requires administrator rights)</source>
+<target>Tar-chuir ceadan nam faidhlichean 's nam pasganan (feumaidh seo còraichean rianaire)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Aisig na còmhraidhean falaichte</target>
@@ -938,15 +968,6 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>&Default</source>
 <target>&Bun-roghainn</target>
 
-<source>Variant</source>
-<target>Eugsamhail</target>
-
-<source>Statistics</source>
-<target>Stats</target>
-
-<source>Don't show this dialog again</source>
-<target>Na seall an còmhradh seo a-rithist</target>
-
 <source>Find what:</source>
 <target>Lorg na leanas:</target>
 
@@ -956,14 +977,44 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>&Find next</source>
 <target>&Lorg an ath-fhear</target>
 
+<source>Source code written in C++ using:</source>
+<target>Chaidh an còd tùsail a sgrìobhadh ann an C++ le taic:</target>
+
+<source>If you like FreeFileSync</source>
+<target>Ma tha FreeFileSync a' còrdadh riut</target>
+
+<source>Donate with PayPal</source>
+<target>Nach doir sibh tabhartas le PayPal?</target>
+
+<source>Feedback and suggestions are welcome</source>
+<target>Tha sinn a' cur fàilte mhòr air beachd is moladh sam bith</target>
+
+<source>Homepage</source>
+<target>An duilleag-dhachaigh</target>
+
+<source>Email</source>
+<target>Post-d</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Air fhoillseachadh fo GNU General Public License</target>
+
+<source>Many thanks for localization:</source>
+<target>Tha sinn fada an comain nan daoine a leanas airson eadar-theangachadh:</target>
+
+<source>Start synchronization</source>
+<target>Tòisich air an t-sioncronachadh</target>
+
+<source>Comparison settings</source>
+<target>Roghainnean a' choimeasaidh</target>
+
+<source>Synchronization settings</source>
+<target>Roghainnean an t-sioncronachaidh</target>
+
 <source>Delete</source>
 <target>Sguab às</target>
 
 <source>Configure filter</source>
 <target>Rèitich a' chriathrag</target>
-
-<source>Start synchronization</source>
-<target>Tòisich air an t-sioncronachadh</target>
 
 <source>Find</source>
 <target>Lorg</target>
@@ -997,6 +1048,23 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 
 <source>Compare both sides</source>
 <target>Dèan coimeas air an dà thaobh</target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+<pluralform>A bheil thu cinnteach gu bheil thu airson an àithne %y a ruith air %x nì?</pluralform>
+<pluralform>A bheil thu cinnteach gu bheil thu airson an àithne %y a ruith air %x nì?</pluralform>
+<pluralform>A bheil thu cinnteach gu bheil thu airson an àithne %y a ruith air %x nithean?</pluralform>
+<pluralform>A bheil thu cinnteach gu bheil thu airson an àithne %y a ruith air %x nì?</pluralform>
+</target>
+
+<source>Confirm</source>
+<target>Dearbh</target>
+
+<source>&Execute</source>
+<target>&Cuir an gnìomh</target>
 
 <source>
 <pluralform>1 directory</pluralform>
@@ -1040,11 +1108,14 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>Include temporarily</source>
 <target>Gabh a-steach gu sealach</target>
 
-<source>Exclude via filter:</source>
-<target>Dùin a-mach le criathrag:</target>
-
 <source>multiple selection</source>
 <target>Ioma-thaghadh</target>
+
+<source>Include via filter:</source>
+<target>Gach a-steach slighe na criathraige:</target>
+
+<source>Exclude via filter:</source>
+<target>Dùin a-mach le criathrag:</target>
 
 <source>Include all</source>
 <target>Gabh a-steach na h-uile</target>
@@ -1091,8 +1162,8 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>Do&n't save</source>
 <target>&Na sàbhail</target>
 
-<source>Never save changes</source>
-<target>Na sàbhail atharraichean idir</target>
+<source>Never save &changes</source>
+<target>Na sàbhail atharrai&chean idir</target>
 
 <source>Show files that exist on left side only</source>
 <target>Na seall ach faidhlichean a tha air an taobh chlì a-mhàin</target>
@@ -1145,8 +1216,8 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>All folders are in sync</source>
 <target>Tha gach pasgan air a shioncronachadh</target>
 
-<source>Comma separated list</source>
-<target>Liosta air a sgaradh le cromagan</target>
+<source>Comma-separated values</source>
+<target>Luachan le cromagan eatarra</target>
 
 <source>File list exported</source>
 <target>Chaidh liosta nam faidhle às-phortadh</target>
@@ -1154,8 +1225,8 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>Searching for program updates...</source>
 <target>A' lorg ùrachaidhean a' phrògraim...</target>
 
-<source>Ignore further errors</source>
-<target>Leig seachad mearachd sam bith eile</target>
+<source>&Ignore subsequent errors</source>
+<target>Le&ig seachad mearachdan às a dhèidh seo</target>
 
 <source>&Ignore</source>
 <target>&Leig seachad</target>
@@ -1163,8 +1234,8 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>Fatal Error</source>
 <target>Mearachd mharbhtach</target>
 
-<source>Don't show this warning again</source>
-<target>Na seall an rabhadh seo a-rithist</target>
+<source>&Don't show this warning again</source>
+<target>Na seall an rabha&dh seo a-rithist</target>
 
 <source>&Switch</source>
 <target>&Dèan suids</target>
@@ -1199,14 +1270,11 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>Completed</source>
 <target>Deiseil</target>
 
-<source>Continue</source>
-<target>Lean air</target>
+<source>&Continue</source>
+<target>Lean air adhar&t</target>
 
-<source>Pause</source>
-<target>Cuir 'na stad</target>
-
-<source>Logging</source>
-<target>Logadh</target>
+<source>Log</source>
+<target>Logaich</target>
 
 <source>Cannot find %x</source>
 <target>Chan urrainn dhuinn %x a lorg.</target>
@@ -1242,14 +1310,14 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <target>Criathrag</target>
 
 <source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
-<pluralform>A bheil thu cinnteach gu bheil thu airson an %x nì seo a ghluasad dhan bhiona?</pluralform>
-<pluralform>A bheil thu cinnteach gu bheil thu airson na %x nì seo a ghluasad dhan bhiona?</pluralform>
-<pluralform>A bheil thu cinnteach gu bheil thu airson na %x nithean seo a ghluasad dhan bhiona?</pluralform>
-<pluralform>A bheil thu cinnteach gu bheil thu airson na %x nì seo a ghluasad dhan bhiona?</pluralform>
+<pluralform>A bheil thu cinnteach gu bheil thu airson an %x nì seo a chur dhan bhiona?</pluralform>
+<pluralform>A bheil thu cinnteach gu bheil thu airson an %x nì seo a chur dhan bhiona?</pluralform>
+<pluralform>A bheil thu cinnteach gu bheil thu airson na %x nithean seo a chur dhan bhiona?</pluralform>
+<pluralform>A bheil thu cinnteach gu bheil thu airson an %x nì seo a chur dhan bhiona?</pluralform>
 </target>
 
 <source>
@@ -1304,9 +1372,6 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 
 <source>Append a timestamp to each file name</source>
 <target>Cuir stampa-ama ris ainm gach faidhle</target>
-
-<source>Folder</source>
-<target>Pasgan</target>
 
 <source>File</source>
 <target>Faidhle</target>
@@ -1434,8 +1499,8 @@ An aire: Feumaidh ainmean nam faidhlichean a bhi dàimheach ris na bun-phasgain 
 <source>Cannot change process I/O priorities.</source>
 <target>Chan urrainn dhuinn na prìomhachasan I/O atharrachadh.</target>
 
-<source>Unable to move %x to the Recycle Bin.</source>
-<target>Chan urrainn dhuinn %x a ghluasad dhan bhiona ath-chuairteachaidh.</target>
+<source>Unable to move %x to the recycle bin.</source>
+<target>Cha ghabh %x a ghluasad dhan bhiona.</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>Chan urrainn dhuinn an t-slighe dheireannach airson %x a dhearbhadh.</target>

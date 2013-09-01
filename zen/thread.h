@@ -17,6 +17,9 @@
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #pragma GCC diagnostic ignored "-Wredundant-decls"
 #pragma GCC diagnostic ignored "-Wshadow"
+#ifndef __clang__ //clang defines __GNUC__, but doesn't support this warning
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#endif
 #endif
 #ifdef _MSC_VER
 #pragma warning(push)

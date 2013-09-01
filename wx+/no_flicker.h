@@ -15,7 +15,7 @@ namespace zen
 inline
 void setText(wxTextCtrl& control, const wxString& newText, bool* additionalLayoutChange = nullptr)
 {
-	const wxString& label = control.GetValue(); //perf: don't call twice!
+    const wxString& label = control.GetValue(); //perf: don't call twice!
     if (additionalLayoutChange && !*additionalLayoutChange) //never revert from true to false!
         *additionalLayoutChange = label.length() != newText.length(); //avoid screen flicker: update layout only when necessary
 
@@ -27,11 +27,11 @@ inline
 void setText(wxStaticText& control, wxString newText, bool* additionalLayoutChange = nullptr)
 {
 #ifdef ZEN_WIN
-	//wxStaticText handles ampersands incorrectly: https://sourceforge.net/p/freefilesync/bugs/279/
-	replace(newText, L'&', L"&&");
-#endif	
+    //wxStaticText handles ampersands incorrectly: https://sourceforge.net/p/freefilesync/bugs/279/
+    replace(newText, L'&', L"&&");
+#endif
 
-	const wxString& label = control.GetLabel(); //perf: don't call twice!
+    const wxString& label = control.GetLabel(); //perf: don't call twice!
     if (additionalLayoutChange && !*additionalLayoutChange)
         *additionalLayoutChange = label.length() != newText.length(); //avoid screen flicker: update layout only when necessary
 

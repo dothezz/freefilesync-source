@@ -4,15 +4,15 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef SEARCH_H_INCLUDED
-#define SEARCH_H_INCLUDED
+#ifndef SEARCH_H_423905762345342526587
+#define SEARCH_H_423905762345342526587
 
 #include <wx+/grid.h>
 
 namespace zen
 {
-void startFind(wxWindow* parent, Grid& gridL, Grid& gridR, bool& respectCase); //Strg + F
-void findNext( wxWindow* parent, Grid& gridL, Grid& gridR, bool& respectCase); //F3
+std::pair<const Grid*, ptrdiff_t> findGridMatch(const Grid& grid1, const Grid& grid2, const wxString& searchString, bool respectCase);
+//returns (grid/row) where the value was found, (nullptr, -1) if not found
 }
 
-#endif // SEARCH_H_INCLUDED
+#endif //SEARCH_H_423905762345342526587

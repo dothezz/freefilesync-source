@@ -25,7 +25,7 @@ using namespace std::rel_ops;
 
 void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
-    std::for_each(begin(folderCmp), end(folderCmp), std::mem_fun_ref(&BaseDirPair::flip));
+    std::for_each(begin(folderCmp), end(folderCmp), [](BaseDirPair& baseObj) { baseObj.flip(); });
     redetermineSyncDirection(config, folderCmp, [](const std::wstring&) {});
 }
 
@@ -36,22 +36,22 @@ namespace
 class Redetermine
 {
 public:
-    static void execute(const DirectionSet& dirCfgIn, HierarchyObject& hierObj)
-    {
-        Redetermine(dirCfgIn).recurse(hierObj);
-    }
+    static void execute(const DirectionSet& dirCfgIn, HierarchyObject& hierObj) { Redetermine(dirCfgIn).recurse(hierObj); }
 
 private:
     Redetermine(const DirectionSet& dirCfgIn) : dirCfg(dirCfgIn) {}
 
     void recurse(HierarchyObject& hierObj) const
     {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
+        for (FilePair& fileObj : hierObj.refSubFiles())
+            processFile(fileObj);
+        for (SymlinkPair& linkObj : hierObj.refSubLinks())
+            processLink(linkObj);
+        for (DirPair& dirObj : hierObj.refSubDirs())
+            processDir(dirObj);
     }
 
-    void operator()(FilePair& fileObj) const
+    void processFile(FilePair& fileObj) const
     {
         const CompareFilesResult cat = fileObj.getCategory();
 
@@ -92,7 +92,7 @@ private:
         }
     }
 
-    void operator()(SymlinkPair& linkObj) const
+    void processLink(SymlinkPair& linkObj) const
     {
         switch (linkObj.getLinkCategory())
         {
@@ -124,7 +124,7 @@ private:
         }
     }
 
-    void operator()(DirPair& dirObj) const
+    void processDir(DirPair& dirObj) const
     {
         const CompareDirResult cat = dirObj.getDirCategory();
 
@@ -162,28 +162,26 @@ private:
 
 //---------------------------------------------------------------------------------------------------------------
 
-struct AllEqual //test if non-equal items exist in scanned data
+//test if non-equal items exist in scanned data
+bool allItemsCategoryEqual(const HierarchyObject& hierObj)
 {
-    bool operator()(const HierarchyObject& hierObj) const
+    return std::all_of(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
+    [](const FilePair& fileObj) { return fileObj.getCategory() == FILE_EQUAL; })&&   //files
+
+    std::all_of(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
+    [](const SymlinkPair& linkObj) { return linkObj.getLinkCategory() == SYMLINK_EQUAL; })&&   //symlinks
+
+    std::all_of(hierObj.refSubDirs(). begin(), hierObj.refSubDirs().end(),
+                [](const DirPair& dirObj)
     {
-        return std::all_of(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
-        [](const FilePair& fileObj) { return fileObj.getCategory() == FILE_EQUAL; })&&  //files
-
-        std::all_of(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
-        [](const SymlinkPair& linkObj) { return linkObj.getLinkCategory() == SYMLINK_EQUAL; })&&  //symlinks
-
-        std::all_of(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(),
-                    [](const DirPair& dirObj)
-        {
-            return dirObj.getDirCategory() == DIR_EQUAL && AllEqual()(dirObj); //short circuit-behavior!
-        });    //directories
-    }
-};
+        return dirObj.getDirCategory() == DIR_EQUAL && allItemsCategoryEqual(dirObj); //short circuit-behavior!
+    });    //directories
+}
 }
 
 bool zen::allElementsEqual(const FolderComparison& folderCmp)
 {
-    return std::all_of(begin(folderCmp), end(folderCmp), AllEqual());
+    return std::all_of(begin(folderCmp), end(folderCmp), [](const BaseDirPair& baseObj) { return allItemsCategoryEqual(baseObj); });
 }
 
 //---------------------------------------------------------------------------------------------------------------
@@ -224,7 +222,7 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, size_t fil
     switch (compareVar)
     {
         case CMP_BY_TIME_SIZE:
-            if (dbFile.inSyncType == IN_SYNC_BINARY_EQUAL) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
+            if (dbFile.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
                 CmpFileTime::getResult(dbFile.left.lastWriteTimeRaw, dbFile.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL;
@@ -232,7 +230,7 @@ bool stillInSync(const InSyncFile& dbFile, CompareVariant compareVar, size_t fil
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
-            return dbFile.inSyncType == IN_SYNC_BINARY_EQUAL;
+            return dbFile.cmpVar == CMP_BY_CONTENT;
             //in contrast to comparison, we don't care about modification time here!
     }
     assert(false);
@@ -273,14 +271,14 @@ bool stillInSync(const InSyncSymlink& dbLink, CompareVariant compareVar, size_t 
     switch (compareVar)
     {
         case CMP_BY_TIME_SIZE:
-            if (dbLink.inSyncType == IN_SYNC_BINARY_EQUAL) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
+            if (dbLink.cmpVar == CMP_BY_CONTENT) return true; //special rule: this is already "good enough" for CMP_BY_TIME_SIZE!
 
             return //case-sensitive short name match is a database invariant!
                 CmpFileTime::getResult(dbLink.left.lastWriteTimeRaw, dbLink.right.lastWriteTimeRaw, fileTimeTolerance) == CmpFileTime::TIME_EQUAL;
 
         case CMP_BY_CONTENT:
             //case-sensitive short name match is a database invariant!
-            return dbLink.inSyncType == IN_SYNC_BINARY_EQUAL;
+            return dbLink.cmpVar == CMP_BY_CONTENT;
             //in contrast to comparison, we don't care about modification time here!
     }
     assert(false);
@@ -314,225 +312,60 @@ bool stillInSync(const InSyncDir& dbDir)
 
 //----------------------------------------------------------------------------------------------
 
-class RedetermineAuto
+class DetectMovedFiles
 {
 public:
-    static void execute(BaseDirPair& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
-    {
-        RedetermineAuto(baseDirectory, reportWarning);
-    }
+    static void execute(BaseDirPair& baseDirectory, const InSyncDir& dbContainer) { DetectMovedFiles(baseDirectory, dbContainer); }
 
 private:
-    RedetermineAuto(BaseDirPair& baseDirectory, std::function<void(const std::wstring&)> reportWarning) :
-        txtBothSidesChanged(_("Both sides have changed since last synchronization.")),
-        txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization.")),
-        txtDbNotInSync(_("Cannot determine sync-direction:") + L" \n" + _("The database entry is not in sync considering current settings.")),
+    DetectMovedFiles(BaseDirPair& baseDirectory, const InSyncDir& dbContainer) :
         cmpVar(baseDirectory.getCompVariant()),
-        fileTimeTolerance(baseDirectory.getFileTimeTolerance()),
-        reportWarning_(reportWarning)
+        fileTimeTolerance(baseDirectory.getFileTimeTolerance())
     {
-        if (AllEqual()(baseDirectory)) //nothing to do: abort and don't show any nag-screens
-            return;
+        recurse(baseDirectory);
 
-        //try to load sync-database files
-        std::shared_ptr<InSyncDir> lastSyncState = loadDBFile(baseDirectory);
-        if (!lastSyncState)
-        {
-            //set conservative "two-way" directions
-            DirectionSet twoWayCfg = getTwoWaySet();
-
-            Redetermine::execute(twoWayCfg, baseDirectory);
-            return;
-        }
-
-        //-> considering filter not relevant:
-        //if narrowing filter: all ok; if widening filter (if file ex on both sides -> conflict, fine; if file ex. on one side: copy to other side: fine)
-
-        recurse(baseDirectory, &*lastSyncState);
-
-        //----------- detect renamed files -----------------
         if (!exLeftOnly.empty() && !exRightOnly.empty())
-            detectRenamedFiles(*lastSyncState);
+            detectFilePairs(dbContainer);
     }
 
-    std::shared_ptr<InSyncDir> loadDBFile(const BaseDirPair& baseDirObj) //return nullptr on failure
+    void recurse(HierarchyObject& hierObj)
     {
-        try
+        for (FilePair& fileObj : hierObj.refSubFiles())
         {
-            return loadLastSynchronousState(baseDirObj); //throw FileError, FileErrorDatabaseNotExisting
-        }
-        catch (FileErrorDatabaseNotExisting&) {} //let's ignore this error, it seems there's no value in reporting it other than confuse users
-        catch (FileError& error) //e.g. incompatible database version
-        {
-            reportWarning_(error.toString() + L" \n\n" +
-                           _("Setting default synchronization directions: Old files will be overwritten with newer files."));
-        }
-        return nullptr;
-    }
+            const CompareFilesResult cat = fileObj.getCategory();
 
-    void recurse(HierarchyObject& hierObj, const InSyncDir* dbContainer)
-    {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { processFile   (fileObj, dbContainer); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { processSymlink(linkObj, dbContainer); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { processDir    (dirObj,  dbContainer); });
-    }
-
-    void processFile(FilePair& fileObj, const InSyncDir* dbContainer)
-    {
-        const CompareFilesResult cat = fileObj.getCategory();
-        if (cat == FILE_EQUAL)
-            return;
-
-        //----------------- prepare detection of renamed files -----------------
-        if (cat == FILE_LEFT_SIDE_ONLY)
-        {
-            if (fileObj.getFileId<LEFT_SIDE>() != FileId())
+            if (cat == FILE_LEFT_SIDE_ONLY)
             {
-                auto rv = exLeftOnly.insert(std::make_pair(fileObj.getFileId<LEFT_SIDE>(), &fileObj));
-                assert(rv.second);
-                if (!rv.second) //duplicate file ID!
-                    rv.first->second = nullptr;
+                if (fileObj.getFileId<LEFT_SIDE>() != FileId())
+                {
+                    auto rv = exLeftOnly.insert(std::make_pair(fileObj.getFileId<LEFT_SIDE>(), &fileObj));
+                    assert(rv.second);
+                    if (!rv.second) //duplicate file ID!
+                        rv.first->second = nullptr;
+                }
+            }
+            else if (cat == FILE_RIGHT_SIDE_ONLY)
+            {
+                if (fileObj.getFileId<RIGHT_SIDE>() != FileId())
+                {
+                    auto rv = exRightOnly.insert(std::make_pair(fileObj.getFileId<RIGHT_SIDE>(), &fileObj));
+                    assert(rv.second);
+                    if (!rv.second) //duplicate file ID!
+                        rv.first->second = nullptr;
+                }
             }
         }
-        else if (cat == FILE_RIGHT_SIDE_ONLY)
-        {
-            if (fileObj.getFileId<RIGHT_SIDE>() != FileId())
-            {
-                auto rv = exRightOnly.insert(std::make_pair(fileObj.getFileId<RIGHT_SIDE>(), &fileObj));
-                assert(rv.second);
-                if (!rv.second) //duplicate file ID!
-                    rv.first->second = nullptr;
-            }
-        }
-        //----------------------------------------------------------------------
-
-        //##################### schedule old temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
-            return fileObj.setSyncDir(SyncDirection::LEFT);
-        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
-            return fileObj.setSyncDir(SyncDirection::RIGHT);
-        //####################################################################################
-
-        //try to find corresponding database entry
-        const InSyncDir::FileList::value_type* dbEntry = nullptr;
-        if (dbContainer)
-        {
-            auto it = dbContainer->files.find(fileObj.getObjShortName());
-            if (it != dbContainer->files.end())
-                dbEntry = &*it;
-        }
-
-        //evaluation
-        const bool changeOnLeft  = !isEqual<LEFT_SIDE >(fileObj, dbEntry);
-        const bool changeOnRight = !isEqual<RIGHT_SIDE>(fileObj, dbEntry);
-
-        if (changeOnLeft != changeOnRight)
-        {
-            //if database entry not in sync according to current settings! -> do not set direction based on async status!
-            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
-                fileObj.setSyncDirConflict(txtDbNotInSync);
-            else
-                fileObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
-        }
-        else
-        {
-            if (changeOnLeft)
-                fileObj.setSyncDirConflict(txtBothSidesChanged);
-            else
-                fileObj.setSyncDirConflict(txtNoSideChanged);
-        }
+        for (DirPair& dirObj : hierObj.refSubDirs())
+            recurse(dirObj);
     }
 
-    void processSymlink(SymlinkPair& linkObj, const InSyncDir* dbContainer)
+    void detectFilePairs(const InSyncDir& container) const
     {
-        const CompareSymlinkResult cat = linkObj.getLinkCategory();
-        if (cat == SYMLINK_EQUAL)
-            return;
+        for (auto& dbFile : container.files)
+            findAndSetMovePair(dbFile.second);
 
-        //try to find corresponding database entry
-        const InSyncDir::LinkList::value_type* dbEntry = nullptr;
-        if (dbContainer)
-        {
-            auto it = dbContainer->symlinks.find(linkObj.getObjShortName());
-            if (it != dbContainer->symlinks.end())
-                dbEntry = &*it;
-        }
-
-        //evaluation
-        const bool changeOnLeft  = !isEqual<LEFT_SIDE >(linkObj, dbEntry);
-        const bool changeOnRight = !isEqual<RIGHT_SIDE>(linkObj, dbEntry);
-
-        if (changeOnLeft != changeOnRight)
-        {
-            //if database entry not in sync according to current settings! -> do not set direction based on async status!
-            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
-                linkObj.setSyncDirConflict(txtDbNotInSync);
-            else
-                linkObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
-        }
-        else
-        {
-            if (changeOnLeft)
-                linkObj.setSyncDirConflict(txtBothSidesChanged);
-            else
-                linkObj.setSyncDirConflict(txtNoSideChanged);
-        }
-    }
-
-    void processDir(DirPair& dirObj, const InSyncDir* dbContainer)
-    {
-        const CompareDirResult cat = dirObj.getDirCategory();
-
-        //########### schedule abandoned temporary recycle bin directory for deletion  ##########
-        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
-            return setSyncDirectionRec(SyncDirection::LEFT, dirObj); //
-        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
-            return setSyncDirectionRec(SyncDirection::RIGHT, dirObj); //don't recurse below!
-        //#######################################################################################
-
-        //try to find corresponding database entry
-        const InSyncDir::DirList::value_type* dbEntry = nullptr;
-        if (dbContainer)
-        {
-            auto it = dbContainer->dirs.find(dirObj.getObjShortName());
-            if (it != dbContainer->dirs.end())
-                dbEntry = &*it;
-        }
-
-        if (cat != DIR_EQUAL)
-        {
-            //evaluation
-            const bool changeOnLeft  = !isEqual<LEFT_SIDE >(dirObj, dbEntry);
-            const bool changeOnRight = !isEqual<RIGHT_SIDE>(dirObj, dbEntry);
-
-            if (changeOnLeft != changeOnRight)
-            {
-                //if database entry not in sync according to current settings! -> do not set direction based on async status!
-                if (dbEntry && !stillInSync(dbEntry->second))
-                    dirObj.setSyncDirConflict(txtDbNotInSync);
-                else
-                    dirObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
-            }
-            else
-            {
-                if (changeOnLeft)
-                    dirObj.setSyncDirConflict(txtBothSidesChanged);
-                else
-                    dirObj.setSyncDirConflict(txtNoSideChanged);
-            }
-        }
-
-        recurse(dirObj, dbEntry ? &dbEntry->second : nullptr); //recursion
-    }
-
-    //note: - we cannot integrate this traversal into "recurse()" since it may take a *slightly* different path: e.g. file renamed on both sides
-    void detectRenamedFiles(InSyncDir& container)
-    {
-        std::for_each(container.files.begin(), container.files.end(),
-        [&](std::pair<const Zstring, InSyncFile>& dbFile) { findAndSetMovePair(dbFile.second); });
-
-        std::for_each(container.dirs.begin(), container.dirs.end(),
-        [&](std::pair<const Zstring, InSyncDir>& dbDir) { detectRenamedFiles(dbDir.second); });
+        for (auto& dbDir : container.dirs)
+            detectFilePairs(dbDir.second);
     }
 
     static bool sameSizeAndDateLeft(const FilePair& fsObj, const InSyncFile& dbEntry)
@@ -576,19 +409,14 @@ private:
         }
     }
 
-    const std::wstring txtBothSidesChanged;
-    const std::wstring txtNoSideChanged;
-    const std::wstring txtDbNotInSync;
-
     const CompareVariant cmpVar;
     const size_t fileTimeTolerance;
-    std::function<void(const std::wstring&)> reportWarning_;
 
     std::map<FileId, FilePair*> exLeftOnly;  //FilePair* == nullptr for duplicate ids! => consider aliasing through symlinks!
     std::map<FileId, FilePair*> exRightOnly; //=> avoid ambiguity for mixtures of files/symlinks on one side and allow 1-1 mapping only!
 
     /*
-    detect renamed files
+    detect renamed files:
 
      X  ->  |_|      Create right
     |_| ->   Y       Delete right
@@ -613,20 +441,171 @@ private:
     Possible refinement
     -------------------
     If the file ID is wrong (FAT) or not available, we could at least allow direct association by name, instead of breaking the chain completely: support NTFS -> FAT
-
-    1. find equal entries in database:
-    	std::hash_map: DB* |-> DB*       onceEqual
-
-    2. build alternative mappings if file Id is available for database entries:
-    	std::map: FielId |-> DB*  leftIdToDbRight
-    	std::map: FielId |-> DB* rightIdToDbRight
-
-    3. collect files on one side during determination of sync directions:
-    	std::vector<FilePair*, DB*>   exLeftOnlyToDbRight   -> first try to use file Id, if failed associate via file name instead
-    	std::hash_map<DB*, FilePair*> dbRightToexRightOnly  ->
-
-    4. find renamed pairs
     */
+};
+
+//----------------------------------------------------------------------------------------------
+
+class RedetermineTwoWay
+{
+public:
+    static void execute(BaseDirPair& baseDirectory, const InSyncDir& dbContainer) { RedetermineTwoWay(baseDirectory, dbContainer); }
+
+private:
+    RedetermineTwoWay(BaseDirPair& baseDirectory, const InSyncDir& dbContainer) :
+        txtBothSidesChanged(_("Both sides have changed since last synchronization.")),
+        txtNoSideChanged(_("Cannot determine sync-direction:") + L" \n" + _("No change since last synchronization.")),
+        txtDbNotInSync(_("Cannot determine sync-direction:") + L" \n" + _("The database entry is not in sync considering current settings.")),
+        cmpVar(baseDirectory.getCompVariant()),
+        fileTimeTolerance(baseDirectory.getFileTimeTolerance())
+    {
+        //-> considering filter not relevant:
+        //if narrowing filter: all ok; if widening filter (if file ex on both sides -> conflict, fine; if file ex. on one side: copy to other side: fine)
+
+        recurse(baseDirectory, &dbContainer);
+    }
+
+    void recurse(HierarchyObject& hierObj, const InSyncDir* dbContainer) const
+    {
+        for (FilePair& fileObj : hierObj.refSubFiles())
+            processFile(fileObj, dbContainer);
+        for (SymlinkPair& linkObj : hierObj.refSubLinks())
+            processSymlink(linkObj, dbContainer);
+        for (DirPair& dirObj : hierObj.refSubDirs())
+            processDir(dirObj, dbContainer);
+    }
+
+    void processFile(FilePair& fileObj, const InSyncDir* dbContainer) const
+    {
+        const CompareFilesResult cat = fileObj.getCategory();
+        if (cat == FILE_EQUAL)
+            return;
+
+        //##################### schedule old temporary files for deletion ####################
+        if (cat == FILE_LEFT_SIDE_ONLY && endsWith(fileObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+            return fileObj.setSyncDir(SyncDirection::LEFT);
+        else if (cat == FILE_RIGHT_SIDE_ONLY && endsWith(fileObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+            return fileObj.setSyncDir(SyncDirection::RIGHT);
+        //####################################################################################
+
+        //try to find corresponding database entry
+        const InSyncDir::FileList::value_type* dbEntry = nullptr;
+        if (dbContainer)
+        {
+            auto it = dbContainer->files.find(fileObj.getObjShortName());
+            if (it != dbContainer->files.end())
+                dbEntry = &*it;
+        }
+
+        //evaluation
+        const bool changeOnLeft  = !isEqual<LEFT_SIDE >(fileObj, dbEntry);
+        const bool changeOnRight = !isEqual<RIGHT_SIDE>(fileObj, dbEntry);
+
+        if (changeOnLeft != changeOnRight)
+        {
+            //if database entry not in sync according to current settings! -> do not set direction based on async status!
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
+                fileObj.setSyncDirConflict(txtDbNotInSync);
+            else
+                fileObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
+        }
+        else
+        {
+            if (changeOnLeft)
+                fileObj.setSyncDirConflict(txtBothSidesChanged);
+            else
+                fileObj.setSyncDirConflict(txtNoSideChanged);
+        }
+    }
+
+    void processSymlink(SymlinkPair& linkObj, const InSyncDir* dbContainer) const
+    {
+        const CompareSymlinkResult cat = linkObj.getLinkCategory();
+        if (cat == SYMLINK_EQUAL)
+            return;
+
+        //try to find corresponding database entry
+        const InSyncDir::LinkList::value_type* dbEntry = nullptr;
+        if (dbContainer)
+        {
+            auto it = dbContainer->symlinks.find(linkObj.getObjShortName());
+            if (it != dbContainer->symlinks.end())
+                dbEntry = &*it;
+        }
+
+        //evaluation
+        const bool changeOnLeft  = !isEqual<LEFT_SIDE >(linkObj, dbEntry);
+        const bool changeOnRight = !isEqual<RIGHT_SIDE>(linkObj, dbEntry);
+
+        if (changeOnLeft != changeOnRight)
+        {
+            //if database entry not in sync according to current settings! -> do not set direction based on async status!
+            if (dbEntry && !stillInSync(dbEntry->second, cmpVar, fileTimeTolerance))
+                linkObj.setSyncDirConflict(txtDbNotInSync);
+            else
+                linkObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
+        }
+        else
+        {
+            if (changeOnLeft)
+                linkObj.setSyncDirConflict(txtBothSidesChanged);
+            else
+                linkObj.setSyncDirConflict(txtNoSideChanged);
+        }
+    }
+
+    void processDir(DirPair& dirObj, const InSyncDir* dbContainer) const
+    {
+        const CompareDirResult cat = dirObj.getDirCategory();
+
+        //########### schedule abandoned temporary recycle bin directory for deletion  ##########
+        if (cat == DIR_LEFT_SIDE_ONLY && endsWith(dirObj.getShortName<LEFT_SIDE>(), TEMP_FILE_ENDING))
+            return setSyncDirectionRec(SyncDirection::LEFT, dirObj); //
+        else if (cat == DIR_RIGHT_SIDE_ONLY && endsWith(dirObj.getShortName<RIGHT_SIDE>(), TEMP_FILE_ENDING))
+            return setSyncDirectionRec(SyncDirection::RIGHT, dirObj); //don't recurse below!
+        //#######################################################################################
+
+        //try to find corresponding database entry
+        const InSyncDir::DirList::value_type* dbEntry = nullptr;
+        if (dbContainer)
+        {
+            auto it = dbContainer->dirs.find(dirObj.getObjShortName());
+            if (it != dbContainer->dirs.end())
+                dbEntry = &*it;
+        }
+
+        if (cat != DIR_EQUAL)
+        {
+            //evaluation
+            const bool changeOnLeft  = !isEqual<LEFT_SIDE >(dirObj, dbEntry);
+            const bool changeOnRight = !isEqual<RIGHT_SIDE>(dirObj, dbEntry);
+
+            if (changeOnLeft != changeOnRight)
+            {
+                //if database entry not in sync according to current settings! -> do not set direction based on async status!
+                if (dbEntry && !stillInSync(dbEntry->second))
+                    dirObj.setSyncDirConflict(txtDbNotInSync);
+                else
+                    dirObj.setSyncDir(changeOnLeft ? SyncDirection::RIGHT : SyncDirection::LEFT);
+            }
+            else
+            {
+                if (changeOnLeft)
+                    dirObj.setSyncDirConflict(txtBothSidesChanged);
+                else
+                    dirObj.setSyncDirConflict(txtNoSideChanged);
+            }
+        }
+
+        recurse(dirObj, dbEntry ? &dbEntry->second : nullptr);
+    }
+
+    const std::wstring txtBothSidesChanged;
+    const std::wstring txtNoSideChanged;
+    const std::wstring txtDbNotInSync;
+
+    const CompareVariant cmpVar;
+    const size_t fileTimeTolerance;
 };
 }
 
@@ -652,15 +631,40 @@ std::vector<DirectionConfig> zen::extractDirectionCfg(const MainConfiguration& m
 }
 
 
-void zen::redetermineSyncDirection(const DirectionConfig& directConfig, BaseDirPair& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
+void zen::redetermineSyncDirection(const DirectionConfig& dirCfg, BaseDirPair& baseDirectory, std::function<void(const std::wstring&)> reportWarning)
 {
-    if (directConfig.var == DirectionConfig::AUTOMATIC)
-        RedetermineAuto::execute(baseDirectory, reportWarning);
-    else
+    //try to load sync-database files
+    std::shared_ptr<InSyncDir> lastSyncState;
+    if (dirCfg.var == DirectionConfig::TWOWAY || detectMovedFilesEnabled(dirCfg))
+        try
+        {
+            if (allItemsCategoryEqual(baseDirectory))
+                return; //nothing to do: abort and don't even try to open db files
+
+            lastSyncState = loadLastSynchronousState(baseDirectory); //throw FileError, FileErrorDatabaseNotExisting
+        }
+        catch (FileErrorDatabaseNotExisting&) {} //let's ignore this error, there's no value in reporting it other than confuse users
+        catch (FileError& error) //e.g. incompatible database version
+        {
+            reportWarning(error.toString() +
+                          (dirCfg.var == DirectionConfig::TWOWAY ?
+                           L" \n\n" + _("Setting default synchronization directions: Old files will be overwritten with newer files.") : std::wstring()));
+        }
+
+    //set sync directions
+    if (dirCfg.var == DirectionConfig::TWOWAY)
     {
-        DirectionSet dirCfg = extractDirections(directConfig);
-        Redetermine::execute(dirCfg, baseDirectory);
+        if (lastSyncState)
+            RedetermineTwoWay::execute(baseDirectory, *lastSyncState);
+        else //default fallback
+            Redetermine::execute(getTwoWayUpdateSet(), baseDirectory);
     }
+    else
+        Redetermine::execute(extractDirections(dirCfg), baseDirectory);
+
+    //detect renamed files
+    if (lastSyncState)
+        DetectMovedFiles::execute(baseDirectory, *lastSyncState);
 }
 
 
@@ -681,113 +685,88 @@ void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderCompa
     }
 }
 
-
 //---------------------------------------------------------------------------------------------------------------
-class SetNewDirection
-{
-public:
-    SetNewDirection(SyncDirection newDirection) : newDirection_(newDirection) {}
 
-    void operator()(FilePair& fileObj) const
+struct SetNewDirection
+{
+    static void execute(FilePair& fileObj, SyncDirection newDirection)
     {
         if (fileObj.getCategory() != FILE_EQUAL)
-            fileObj.setSyncDir(newDirection_);
+            fileObj.setSyncDir(newDirection);
     }
 
-    void operator()(SymlinkPair& linkObj) const
+    static void execute(SymlinkPair& linkObj, SyncDirection newDirection)
     {
         if (linkObj.getLinkCategory() != SYMLINK_EQUAL)
-            linkObj.setSyncDir(newDirection_);
+            linkObj.setSyncDir(newDirection);
     }
 
-    void operator()(DirPair& dirObj) const
+    static void execute(DirPair& dirObj, SyncDirection newDirection)
     {
         if (dirObj.getDirCategory() != DIR_EQUAL)
-            dirObj.setSyncDir(newDirection_);
-        execute(dirObj); //recursion
-    }
+            dirObj.setSyncDir(newDirection);
 
-private:
-    void execute(HierarchyObject& hierObj) const
-    {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
+        //recurse:
+        for (FilePair& fileObj : dirObj.refSubFiles())
+            execute(fileObj, newDirection);
+        for (SymlinkPair& linkObj : dirObj.refSubLinks())
+            execute(linkObj, newDirection);
+        for (DirPair& dirObj2 : dirObj.refSubDirs())
+            execute(dirObj2, newDirection);
     }
-
-    const SyncDirection newDirection_;
 };
 
 
 void zen::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj)
 {
-    SetNewDirection dirSetter(newDirection);
-
     //process subdirectories also!
     struct Recurse: public FSObjectVisitor
     {
-        Recurse(const SetNewDirection& ds) : dirSetter_(ds) {}
+        Recurse(SyncDirection newDir) : newDir_(newDir) {}
         virtual void visit(const FilePair& fileObj)
         {
-            dirSetter_(const_cast<FilePair&>(fileObj)); //phyiscal object is not const in this method anyway
+            SetNewDirection::execute(const_cast<FilePair&>(fileObj), newDir_); //phyiscal object is not const in this method anyway
         }
         virtual void visit(const SymlinkPair& linkObj)
         {
-            dirSetter_(const_cast<SymlinkPair&>(linkObj)); //
+            SetNewDirection::execute(const_cast<SymlinkPair&>(linkObj), newDir_); //
         }
         virtual void visit(const DirPair& dirObj)
         {
-            dirSetter_(const_cast<DirPair&>(dirObj)); //
+            SetNewDirection::execute(const_cast<DirPair&>(dirObj), newDir_); //
         }
     private:
-        const SetNewDirection& dirSetter_;
-    } recurse(dirSetter);
-    fsObj.accept(recurse);
+        SyncDirection newDir_;
+    } setDirVisitor(newDirection);
+    fsObj.accept(setDirVisitor);
 }
 
 //--------------- functions related to filtering ------------------------------------------------------------------------------------
 
-template <bool include>
-class InOrExcludeAllRows
+namespace
 {
-public:
-    void operator()(zen::BaseDirPair& baseDirectory) const //be careful with operator() to no get called by std::for_each!
-    {
-        execute(baseDirectory);
-    }
-
-    void execute(zen::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
-    {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
-    }
-
-private:
-    void operator()(zen::FilePair& fileObj) const
-    {
+template <bool include>
+void inOrExcludeAllRows(zen::HierarchyObject& hierObj)
+{
+    for (FilePair& fileObj : hierObj.refSubFiles())
         fileObj.setActive(include);
-    }
-
-    void operator()(zen::SymlinkPair& linkObj) const
-    {
+    for (SymlinkPair& linkObj : hierObj.refSubLinks())
         linkObj.setActive(include);
-    }
-
-    void operator()(zen::DirPair& dirObj) const
+    for (DirPair& dirObj : hierObj.refSubDirs())
     {
         dirObj.setActive(include);
-        execute(dirObj); //recursion
+        inOrExcludeAllRows<include>(dirObj); //recurse
     }
-};
+}
+}
 
 
 void zen::setActiveStatus(bool newStatus, zen::FolderComparison& folderCmp)
 {
     if (newStatus)
-        std::for_each(begin(folderCmp), end(folderCmp), InOrExcludeAllRows<true>());  //include all rows
+        std::for_each(begin(folderCmp), end(folderCmp), [](BaseDirPair& baseDirObj) { inOrExcludeAllRows<true>(baseDirObj); }); //include all rows
     else
-        std::for_each(begin(folderCmp), end(folderCmp), InOrExcludeAllRows<false>()); //exclude all rows
+        std::for_each(begin(folderCmp), end(folderCmp), [](BaseDirPair& baseDirObj) { inOrExcludeAllRows<false>(baseDirObj); }); //exclude all rows
 }
 
 
@@ -804,9 +783,9 @@ void zen::setActiveStatus(bool newStatus, zen::FileSystemObject& fsObj)
         virtual void visit(const DirPair& dirObj)
         {
             if (newStatus_)
-                InOrExcludeAllRows<true>().execute(const_cast<DirPair&>(dirObj)); //object is not physically const here anyway
+                inOrExcludeAllRows<true>(const_cast<DirPair&>(dirObj)); //object is not physically const here anyway
             else
-                InOrExcludeAllRows<false>().execute(const_cast<DirPair&>(dirObj)); //
+                inOrExcludeAllRows<false>(const_cast<DirPair&>(dirObj)); //
         }
     private:
         const bool newStatus_;
@@ -851,29 +830,34 @@ template <FilterStrategy strategy>
 class ApplyHardFilter
 {
 public:
-    ApplyHardFilter(const HardFilter& filterProcIn) : filterProc(filterProcIn) {}
-
-    void execute(zen::HierarchyObject& hierObj) const
-    {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
-    };
+    static void execute(HierarchyObject& hierObj, const HardFilter& filterProcIn) { ApplyHardFilter(hierObj, filterProcIn); }
 
 private:
-    void operator()(zen::FilePair& fileObj) const
+    ApplyHardFilter(HierarchyObject& hierObj, const HardFilter& filterProcIn) : filterProc(filterProcIn)  { recurse(hierObj); }
+
+    void recurse(HierarchyObject& hierObj) const
+    {
+        for (FilePair& fileObj : hierObj.refSubFiles())
+            processFile(fileObj);
+        for (SymlinkPair& linkObj : hierObj.refSubLinks())
+            processLink(linkObj);
+        for (DirPair& dirObj : hierObj.refSubDirs())
+            processDir(dirObj);
+    };
+
+    void processFile(FilePair& fileObj) const
     {
         if (Eval<strategy>().process(fileObj))
             fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
     }
 
-    void operator()(zen::SymlinkPair& linkObj) const
+    void processLink(SymlinkPair& linkObj) const
     {
         if (Eval<strategy>().process(linkObj))
             linkObj.setActive(filterProc.passFileFilter(linkObj.getObjRelativeName()));
     }
 
-    void operator()(zen::DirPair& dirObj) const
+    void processDir(DirPair& dirObj) const
     {
         bool subObjMightMatch = true;
         const bool filterPassed = filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch);
@@ -883,11 +867,11 @@ private:
 
         if (!subObjMightMatch) //use same logic like directory traversing here: evaluate filter in subdirs only if objects could match
         {
-            InOrExcludeAllRows<false>().execute(dirObj); //exclude all files dirs in subfolders
+            inOrExcludeAllRows<false>(dirObj); //exclude all files dirs in subfolders
             return;
         }
 
-        execute(dirObj);  //recursion
+        recurse(dirObj);
     }
 
     const HardFilter& filterProc;
@@ -901,17 +885,22 @@ template <FilterStrategy strategy>
 class ApplySoftFilter //falsify only! -> can run directly after "hard/base filter"
 {
 public:
-    ApplySoftFilter(const SoftFilter& timeSizeFilter) : timeSizeFilter_(timeSizeFilter) {}
-
-    void execute(zen::HierarchyObject& hierObj) const
-    {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
-    };
+    static void execute(HierarchyObject& hierObj, const SoftFilter& timeSizeFilter) { ApplySoftFilter(hierObj, timeSizeFilter); }
 
 private:
-    void operator()(zen::FilePair& fileObj) const
+    ApplySoftFilter(HierarchyObject& hierObj, const SoftFilter& timeSizeFilter) : timeSizeFilter_(timeSizeFilter) { recurse(hierObj); }
+
+    void recurse(zen::HierarchyObject& hierObj) const
+    {
+        for (FilePair& fileObj : hierObj.refSubFiles())
+            processFile(fileObj);
+        for (SymlinkPair& linkObj : hierObj.refSubLinks())
+            processLink(linkObj);
+        for (DirPair& dirObj : hierObj.refSubDirs())
+            processDir(dirObj);
+    };
+
+    void processFile(FilePair& fileObj) const
     {
         if (Eval<strategy>().process(fileObj))
         {
@@ -926,14 +915,14 @@ private:
                 //the only case with partially unclear semantics:
                 //file and time filters may match or not match on each side, leaving a total of 16 combinations for both sides!
                 /*
-                               ST S T -         ST := match size and time
-                               ---------         S := match size only
-                            ST |X|X|X|X|         T := match time only
-                            ------------         - := no match
+                               ST S T -       ST := match size and time
+                               ---------       S := match size only
+                            ST |X|X|X|X|       T := match time only
+                            ------------       - := no match
                              S |X|O|?|O|
-                            ------------         X := include row
-                             T |X|?|O|O|         O := exclude row
-                            ------------         ? := unclear
+                            ------------       X := include row
+                             T |X|?|O|O|       O := exclude row
+                            ------------       ? := unclear
                              - |X|O|O|O|
                             ------------
                 */
@@ -946,7 +935,7 @@ private:
         }
     }
 
-    void operator()(zen::SymlinkPair& linkObj) const
+    void processLink(SymlinkPair& linkObj) const
     {
         if (Eval<strategy>().process(linkObj))
         {
@@ -960,12 +949,12 @@ private:
         }
     }
 
-    void operator()(zen::DirPair& dirObj) const
+    void processDir(DirPair& dirObj) const
     {
         if (Eval<strategy>().process(dirObj))
             dirObj.setActive(timeSizeFilter_.matchFolder()); //if date filter is active we deactivate all folders: effectively gets rid of empty folders!
 
-        execute(dirObj);  //recursion
+        recurse(dirObj);
     }
 
     template <SelectedSide side, class T>
@@ -987,14 +976,14 @@ private:
 
 void zen::addHardFiltering(BaseDirPair& baseDirObj, const Zstring& excludeFilter)
 {
-    ApplyHardFilter<STRATEGY_AND>(NameFilter(FilterConfig().includeFilter, excludeFilter)).execute(baseDirObj);
+    ApplyHardFilter<STRATEGY_AND>::execute(baseDirObj, NameFilter(FilterConfig().includeFilter, excludeFilter));
 }
 
 
 void zen::addSoftFiltering(BaseDirPair& baseDirObj, const SoftFilter& timeSizeFilter)
 {
     if (!timeSizeFilter.isNull()) //since we use STRATEGY_AND, we may skip a "null" filter
-        ApplySoftFilter<STRATEGY_AND>(timeSizeFilter).execute(baseDirObj);
+        ApplySoftFilter<STRATEGY_AND>::execute(baseDirObj, timeSizeFilter);
 }
 
 
@@ -1019,7 +1008,7 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
         const NormalizedFilter normFilter = normalizeFilters(mainCfg.globalFilter, it->localFilter);
 
         //"set" hard filter
-        ApplyHardFilter<STRATEGY_SET>(*normFilter.nameFilter).execute(baseDirectory);
+        ApplyHardFilter<STRATEGY_SET>::execute(baseDirectory, *normFilter.nameFilter);
 
         //"and" soft filter
         addSoftFiltering(baseDirectory, normFilter.timeSizeFilter);
@@ -1030,20 +1019,26 @@ void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& m
 class FilterByTimeSpan
 {
 public:
-    FilterByTimeSpan(const Int64& timeFrom,
-                     const Int64& timeTo) :
-        timeFrom_(timeFrom),
-        timeTo_(timeTo) {}
-
-    void execute(zen::HierarchyObject& hierObj) const
-    {
-        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), [&](FilePair&    fileObj) { (*this)(fileObj); });
-        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), [&](SymlinkPair& linkObj) { (*this)(linkObj); });
-        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), [&](DirPair&      dirObj) { (*this)(dirObj); });
-    };
+    static void execute(HierarchyObject& hierObj, const Int64& timeFrom, const Int64& timeTo) { FilterByTimeSpan(hierObj, timeFrom, timeTo); }
 
 private:
-    void operator()(zen::FilePair& fileObj) const
+    FilterByTimeSpan(HierarchyObject& hierObj,
+                     const Int64& timeFrom,
+                     const Int64& timeTo) :
+        timeFrom_(timeFrom),
+        timeTo_(timeTo) { recurse(hierObj); }
+
+    void recurse(HierarchyObject& hierObj) const
+    {
+        for (FilePair& fileObj : hierObj.refSubFiles())
+            processFile(fileObj);
+        for (SymlinkPair& linkObj : hierObj.refSubLinks())
+            processLink(linkObj);
+        for (DirPair& dirObj : hierObj.refSubDirs())
+            processDir(dirObj);
+    };
+
+    void processFile(FilePair& fileObj) const
     {
         if (fileObj.isEmpty<LEFT_SIDE>())
             fileObj.setActive(matchTime<RIGHT_SIDE>(fileObj));
@@ -1054,7 +1049,7 @@ private:
                               matchTime<LEFT_SIDE>(fileObj));
     }
 
-    void operator()(zen::SymlinkPair& linkObj) const
+    void processLink(SymlinkPair& linkObj) const
     {
         if (linkObj.isEmpty<LEFT_SIDE>())
             linkObj.setActive(matchTime<RIGHT_SIDE>(linkObj));
@@ -1065,10 +1060,10 @@ private:
                               matchTime<LEFT_SIDE> (linkObj));
     }
 
-    void operator()(zen::DirPair& dirObj) const
+    void processDir(DirPair& dirObj) const
     {
         dirObj.setActive(false);
-        execute(dirObj);  //recursion
+        recurse(dirObj);
     }
 
     template <SelectedSide side, class T>
@@ -1085,8 +1080,7 @@ private:
 
 void zen::applyTimeSpanFilter(FolderComparison& folderCmp, const Int64& timeFrom, const Int64& timeTo)
 {
-    FilterByTimeSpan spanFilter(timeFrom, timeTo);
-    std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirPair& baseDirObj) { spanFilter.execute(baseDirObj); });
+    std::for_each(begin(folderCmp), end(folderCmp), [&](BaseDirPair& baseDirObj) { FilterByTimeSpan::execute(baseDirObj, timeFrom, timeTo); });
 }
 
 
@@ -1235,9 +1229,9 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
     {
         if (useRecycleBin_)
         {
-            txtRemovingFile      = _("Moving file %x to recycle bin"         );
-            txtRemovingDirectory = _("Moving folder %x to recycle bin"       );
-            txtRemovingSymlink   = _("Moving symbolic link %x to recycle bin");
+            txtRemovingFile      = _("Moving file %x to the recycle bin"         );
+            txtRemovingDirectory = _("Moving folder %x to the recycle bin"       );
+            txtRemovingSymlink   = _("Moving symbolic link %x to the recycle bin");
         }
         else
         {
@@ -1264,17 +1258,12 @@ struct ItemDeleter : public FSObjectVisitor  //throw FileError, but nothrow cons
         if (useRecycleBin_)
             zen::recycleOrDelete(linkObj.getFullName<side>()); //throw FileError
         else
-            switch (getSymlinkType(linkObj.getFullName<side>()))
-            {
-                case SYMLINK_TYPE_DIR:
-                    zen::removeDirectory(linkObj.getFullName<side>()); //throw FileError
-                    break;
-
-                case SYMLINK_TYPE_FILE:
-                case SYMLINK_TYPE_UNKNOWN:
-                    zen::removeFile(linkObj.getFullName<side>()); //throw FileError
-                    break;
-            }
+        {
+            if (dirExists(linkObj.getFullName<side>())) //dir symlink
+                zen::removeDirectory(linkObj.getFullName<side>()); //throw FileError
+            else //file symlink, broken symlink
+                zen::removeFile(linkObj.getFullName<side>()); //throw FileError
+        }
     }
 
     virtual void visit(const DirPair& dirObj)
@@ -1386,7 +1375,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
                 {
                     SyncDirection newDir = SyncDirection::NONE;
 
-                    if (cfgIter->second.var == DirectionConfig::AUTOMATIC)
+                    if (cfgIter->second.var == DirectionConfig::TWOWAY)
                         newDir = fsObj.isEmpty<LEFT_SIDE>() ? SyncDirection::RIGHT : SyncDirection::LEFT;
                     else
                     {
@@ -1420,7 +1409,7 @@ void zen::deleteFromGridAndHD(const std::vector<FileSystemObject*>& rowsToDelete
     if (useRecycleBin &&
     std::any_of(hasRecyclerBuffer.begin(), hasRecyclerBuffer.end(), [](std::pair<Zstring, bool> item) { return !item.second; }))
     {
-        std::wstring msg = _("The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:") + L"\n";
+        std::wstring msg = _("The recycle bin is not available for the following folders. Files will be deleted permanently instead:") + L"\n";
 
         for (auto it = hasRecyclerBuffer.begin(); it != hasRecyclerBuffer.end(); ++it)
             if (!it->second)

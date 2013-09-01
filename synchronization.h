@@ -45,9 +45,9 @@ private:
 
     void recurse(const HierarchyObject& hierObj);
 
-    void calcStats(const FilePair& fileObj);
-    void calcStats(const SymlinkPair& linkObj);
-    void calcStats(const DirPair& dirObj);
+    void processFile(const FilePair& fileObj);
+    void processLink(const SymlinkPair& linkObj);
+    void processDir(const DirPair& dirObj);
 
     int createLeft, createRight;
     int updateLeft, updateRight;
@@ -60,16 +60,16 @@ private:
 
 struct FolderPairSyncCfg
 {
-    FolderPairSyncCfg(bool automaticMode,
+    FolderPairSyncCfg(bool saveSyncDB,
                       const DeletionPolicy handleDel,
                       VersioningStyle versioningStyle,
                       const Zstring& versioningDirFmt) :
-        inAutomaticMode(automaticMode),
+        saveSyncDB_(saveSyncDB),
         handleDeletion(handleDel),
         versioningStyle_(versioningStyle),
         versioningFolder(versioningDirFmt) {}
 
-    bool inAutomaticMode; //update database if in automatic mode
+    bool saveSyncDB_; //save database if in automatic mode or dection of moved files is active
     DeletionPolicy handleDeletion;
     VersioningStyle versioningStyle_;
     Zstring versioningFolder; //formatted directory name

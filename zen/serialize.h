@@ -95,7 +95,7 @@ struct BinStreamIn //throw UnexpectedEndOfStreamError
     }
 
 private:
-    const BinaryStream buffer;
+    BinaryStream buffer;
     size_t pos;
 };
 

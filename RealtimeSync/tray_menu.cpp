@@ -16,6 +16,7 @@
 #include <wx/taskbar.h>
 #include <wx/icon.h> //Linux needs this
 #include <wx/app.h>
+#include <wx/timer.h>
 #include "resources.h"
 #include "gui_generated.h"
 #include "monitor.h"

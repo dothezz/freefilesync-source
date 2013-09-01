@@ -32,7 +32,7 @@ std::wstring zen::getVariantName(DirectionConfig::Variant var)
 {
     switch (var)
     {
-        case DirectionConfig::AUTOMATIC:
+        case DirectionConfig::TWOWAY:
             return L"<- " + _("Two way") + L" ->";
         case DirectionConfig::MIRROR:
             return _("Mirror") + L" ->>";
@@ -51,7 +51,7 @@ DirectionSet zen::extractDirections(const DirectionConfig& cfg)
     DirectionSet output;
     switch (cfg.var)
     {
-        case DirectionConfig::AUTOMATIC:
+        case DirectionConfig::TWOWAY:
             throw std::logic_error("there are no predefined directions for automatic mode!");
 
         case DirectionConfig::MIRROR:
@@ -80,7 +80,26 @@ DirectionSet zen::extractDirections(const DirectionConfig& cfg)
 }
 
 
-DirectionSet zen::getTwoWaySet()
+bool zen::detectMovedFilesSelectable(const DirectionConfig& cfg)
+{
+    if (cfg.var == DirectionConfig::TWOWAY)
+        return false; //moved files are always detected since we have the database file anyway
+
+    const DirectionSet tmp = zen::extractDirections(cfg);
+    return (tmp.exLeftSideOnly  == SyncDirection::RIGHT &&
+            tmp.exRightSideOnly == SyncDirection::RIGHT) ||
+           (tmp.exLeftSideOnly  == SyncDirection::LEFT&&
+            tmp.exRightSideOnly == SyncDirection::LEFT);
+}
+
+
+bool zen::detectMovedFilesEnabled(const DirectionConfig& cfg)
+{
+    return detectMovedFilesSelectable(cfg) ? cfg.detectMovedFiles : cfg.var == DirectionConfig::TWOWAY;
+}
+
+
+DirectionSet zen::getTwoWayUpdateSet()
 {
     DirectionSet output;
     output.exLeftSideOnly  = SyncDirection::RIGHT;
@@ -100,10 +119,10 @@ std::wstring MainConfiguration::getCompVariantName() const
                                         cmpConfig.compareVar; //fallback to main sync cfg
 
     //test if there's a deviating variant within the additional folder pairs
-    for (auto fp = additionalPairs.begin(); fp != additionalPairs.end(); ++fp)
+    for (const FolderPairEnh& fp : additionalPairs)
     {
-        const CompareVariant thisVariant = fp->altCmpConfig.get() ?
-                                           fp->altCmpConfig->compareVar :
+        const CompareVariant thisVariant = fp.altCmpConfig.get() ?
+                                           fp.altCmpConfig->compareVar :
                                            cmpConfig.compareVar; //fallback to main sync cfg
         if (thisVariant != firstVariant)
             return _("Multiple...");
@@ -121,10 +140,10 @@ std::wstring MainConfiguration::getSyncVariantName() const
                                                   syncCfg.directionCfg.var; //fallback to main sync cfg
 
     //test if there's a deviating variant within the additional folder pairs
-    for (auto fp = additionalPairs.begin(); fp != additionalPairs.end(); ++fp)
+    for (const FolderPairEnh& fp : additionalPairs)
     {
-        const DirectionConfig::Variant thisVariant = fp->altSyncConfig.get() ?
-                                                     fp->altSyncConfig->directionCfg.var :
+        const DirectionConfig::Variant thisVariant = fp.altSyncConfig.get() ?
+                                                     fp.altSyncConfig->directionCfg.var :
                                                      syncCfg.directionCfg.var;
         if (thisVariant != firstVariant)
             return _("Multiple...");
@@ -317,28 +336,14 @@ void zen::resolveUnits(size_t timeSpan, UnitTime unitTimeSpan,
 
 namespace
 {
-bool sameFilter(const std::vector<FolderPairEnh>& folderPairs)
-{
-    if (folderPairs.empty())
-        return true;
-
-    for (std::vector<FolderPairEnh>::const_iterator fp = folderPairs.begin(); fp != folderPairs.end(); ++fp)
-        if (!(fp->localFilter == folderPairs[0].localFilter))
-            return false;
-
-    return true;
-}
-
-
 FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& local)
 {
     FilterConfig out = local;
 
     //hard filter
-
-    //pragmatism: if both global and local include filter contain data, only local filter is preserved
     if (out.includeFilter == FilterConfig().includeFilter)
         out.includeFilter = global.includeFilter;
+    //else: if both global and local include filter contain data, only local filter is preserved
 
     trim(out.excludeFilter, true, false);
     out.excludeFilter = global.excludeFilter + Zstr("\n") + out.excludeFilter;
@@ -386,9 +391,14 @@ FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& l
 
 
 inline
-bool isEmpty(const FolderPairEnh& fp)
+bool effectivelyEmpty(const FolderPairEnh& fp)
 {
-    return fp == FolderPairEnh();
+    auto isEmpty = [](Zstring dirname)
+    {
+        trim(dirname);
+        return dirname.empty();
+    };
+    return isEmpty(fp.leftDirectory) && isEmpty(fp.rightDirectory);
 }
 }
 
@@ -404,28 +414,28 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
 
     //merge folder pair config
     std::vector<FolderPairEnh> fpMerged;
-    for (auto iterMain = mainCfgs.begin(); iterMain != mainCfgs.end(); ++iterMain)
+    for (const MainConfiguration& mainCfg : mainCfgs)
     {
         std::vector<FolderPairEnh> fpTmp;
 
-        //list non-empty local configurations
-        if (!isEmpty(iterMain->firstPair))
-            fpTmp.push_back(iterMain->firstPair);
-        std::copy_if(iterMain->additionalPairs.begin(), iterMain->additionalPairs.end(), std::back_inserter(fpTmp),
-        [](const FolderPairEnh& fp) { return !isEmpty(fp); });
+        //skip empty folder pairs
+        if (!effectivelyEmpty(mainCfg.firstPair))
+            fpTmp.push_back(mainCfg.firstPair);
+        for (const FolderPairEnh& fp : mainCfg.additionalPairs)
+            if (!effectivelyEmpty(fp))
+                fpTmp.push_back(fp);
 
         //move all configuration down to item level
-        for (std::vector<FolderPairEnh>::iterator fp = fpTmp.begin(); fp != fpTmp.end(); ++fp)
+        for (FolderPairEnh& fp : fpTmp)
         {
-            if (!fp->altCmpConfig.get())
-                fp->altCmpConfig = std::make_shared<CompConfig>(iterMain->cmpConfig);
+            if (!fp.altCmpConfig.get())
+                fp.altCmpConfig = std::make_shared<CompConfig>(mainCfg.cmpConfig);
 
-            if (!fp->altSyncConfig.get())
-                fp->altSyncConfig = std::make_shared<SyncConfig>(iterMain->syncCfg);
+            if (!fp.altSyncConfig.get())
+                fp.altSyncConfig = std::make_shared<SyncConfig>(mainCfg.syncCfg);
 
-            fp->localFilter = mergeFilterConfig(iterMain->globalFilter, fp->localFilter);
+            fp.localFilter = mergeFilterConfig(mainCfg.globalFilter, fp.localFilter);
         }
-
         fpMerged.insert(fpMerged.end(), fpTmp.begin(), fpTmp.end());
     }
 
@@ -438,23 +448,24 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
     //find out which comparison and synchronization setting are used most often and use them as new "header"
     std::vector<std::pair<CompConfig, int>> cmpCfgStat;
     std::vector<std::pair<SyncConfig, int>> syncCfgStat;
-    for (auto fp = fpMerged.begin(); fp != fpMerged.end(); ++fp) //rather inefficient algorithm, but it does not require a less-than operator!
+    for (const FolderPairEnh& fp : fpMerged)
     {
+        //rather inefficient algorithm, but it does not require a less-than operator:
         {
-            const CompConfig& cmpCfg = *fp->altCmpConfig;
+            const CompConfig& cmpCfg = *fp.altCmpConfig;
 
             auto it = std::find_if(cmpCfgStat.begin(), cmpCfgStat.end(),
-            [&](const std::pair<CompConfig, int>& entry) { return entry.first == cmpCfg; });
+            [&](const std::pair<CompConfig, int>& entry) { return effectivelyEqual(entry.first, cmpCfg); });
             if (it == cmpCfgStat.end())
                 cmpCfgStat.push_back(std::make_pair(cmpCfg, 1));
             else
                 ++(it->second);
         }
         {
-            const SyncConfig& syncCfg = *fp->altSyncConfig;
+            const SyncConfig& syncCfg = *fp.altSyncConfig;
 
             auto it = std::find_if(syncCfgStat.begin(), syncCfgStat.end(),
-            [&](const std::pair<SyncConfig, int>& entry) { return entry.first == syncCfg; });
+            [&](const std::pair<SyncConfig, int>& entry) { return effectivelyEqual(entry.first, syncCfg); });
             if (it == syncCfgStat.end())
                 syncCfgStat.push_back(std::make_pair(syncCfg, 1));
             else
@@ -462,7 +473,7 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
         }
     }
 
-    //set most-used comparison and synchronization settions as new header options
+    //set most-used comparison and synchronization settings as new header options
     const CompConfig cmpCfgHead = cmpCfgStat.empty() ? CompConfig() :
                                   std::max_element(cmpCfgStat.begin(), cmpCfgStat.end(),
     [](const std::pair<CompConfig, int>& lhs, const std::pair<CompConfig, int>& rhs) { return lhs.second < rhs.second; })->first;
@@ -473,24 +484,24 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
     //########################################################################################################################
 
     FilterConfig globalFilter;
-    const bool equalFilters = sameFilter(fpMerged);
-    if (equalFilters)
+    const bool allFiltersEqual = std::all_of(fpMerged.begin(), fpMerged.end(), [&](const FolderPairEnh& fp) { return fp.localFilter == fpMerged[0].localFilter; });
+    if (allFiltersEqual)
         globalFilter = fpMerged[0].localFilter;
 
     //strip redundancy...
-    for (auto fp = fpMerged.begin(); fp != fpMerged.end(); ++fp)
+    for (FolderPairEnh& fp : fpMerged)
     {
         //if local config matches output global config we don't need local one
-        if (fp->altCmpConfig &&
-            *fp->altCmpConfig == cmpCfgHead)
-            fp->altCmpConfig.reset();
+        if (fp.altCmpConfig &&
+            effectivelyEqual(*fp.altCmpConfig, cmpCfgHead))
+            fp.altCmpConfig.reset();
 
-        if (fp->altSyncConfig &&
-            *fp->altSyncConfig == syncCfgHead)
-            fp->altSyncConfig.reset();
+        if (fp.altSyncConfig &&
+            effectivelyEqual(*fp.altSyncConfig, syncCfgHead))
+            fp.altSyncConfig.reset();
 
-        if (equalFilters) //use global filter in this case
-            fp->localFilter = FilterConfig();
+        if (allFiltersEqual) //use global filter in this case
+            fp.localFilter = FilterConfig();
     }
 
     //final assembly
@@ -501,6 +512,5 @@ MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
     cfgOut.firstPair    = fpMerged[0];
     cfgOut.additionalPairs.assign(fpMerged.begin() + 1, fpMerged.end());
     cfgOut.onCompletion = mainCfgs[0].onCompletion;
-
     return cfgOut;
 }

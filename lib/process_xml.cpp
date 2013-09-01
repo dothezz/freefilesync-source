@@ -14,15 +14,14 @@
 
 using namespace zen;
 using namespace xmlAccess; //functionally needed for correct overload resolution!!!
-
 using namespace std::rel_ops;
 
 namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
 const int XML_FORMAT_VER_GLOBAL    = 1;
-const int XML_FORMAT_VER_FFS_GUI   = 1;
-const int XML_FORMAT_VER_FFS_BATCH = 1;
+const int XML_FORMAT_VER_FFS_GUI   = 2;
+const int XML_FORMAT_VER_FFS_BATCH = 2;
 //-------------------------------------------------------------------------------------------------------------------------------
 }
 
@@ -49,7 +48,7 @@ XmlType xmlAccess::getXmlType(const Zstring& filename) //throw()
 {
     try
     {
-        //do NOT use zen::loadStream as it will superfluously load even huge files!
+        //do NOT use zen::loadStream as it will needlessly load even huge files!
         XmlDoc doc = loadXmlDocument(filename); //throw FfsXmlError, quick exit if file is not an FFS XML
         return ::getXmlType(doc);
     }
@@ -78,6 +77,7 @@ void setXmlType(XmlDoc& doc, XmlType type) //throw()
             break;
     }
 }
+
 //################################################################################################################
 
 Zstring xmlAccess::getGlobalConfigFile()
@@ -110,8 +110,8 @@ xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchCo
 
     switch (batchCfg.handleError)
     {
-        case ON_ERROR_EXIT:
         case ON_ERROR_POPUP:
+        case ON_ERROR_ABORT:
             output.handleError = ON_GUIERROR_POPUP;
             break;
         case ON_ERROR_IGNORE:
@@ -186,10 +186,10 @@ void writeText(const CompareVariant& value, std::string& output)
     switch (value)
     {
         case zen::CMP_BY_TIME_SIZE:
-            output = "ByTimeAndSize";
+            output = "TimeAndSize";
             break;
         case zen::CMP_BY_CONTENT:
-            output = "ByContent";
+            output = "Content";
             break;
     }
 }
@@ -199,12 +199,19 @@ bool readText(const std::string& input, CompareVariant& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    if (tmp == "ByTimeAndSize")
+    warn_static("remove after migration. 2013.08.20")
+    if (tmp == "ByTimeAndSize") //obsolete
         value = zen::CMP_BY_TIME_SIZE;
-    else if (tmp == "ByContent")
+    else if (tmp == "ByContent") //obsolete
         value = zen::CMP_BY_CONTENT;
     else
-        return false;
+
+        if (tmp == "TimeAndSize")
+            value = zen::CMP_BY_TIME_SIZE;
+        else if (tmp == "Content")
+            value = zen::CMP_BY_CONTENT;
+        else
+            return false;
     return true;
 }
 
@@ -251,11 +258,11 @@ void writeText(const OnError& value, std::string& output)
         case ON_ERROR_IGNORE:
             output = "Ignore";
             break;
-        case ON_ERROR_EXIT:
-            output = "Exit";
-            break;
         case ON_ERROR_POPUP:
             output = "Popup";
+            break;
+        case ON_ERROR_ABORT:
+            output = "Abort";
             break;
     }
 }
@@ -265,14 +272,19 @@ bool readText(const std::string& input, OnError& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    if (tmp == "Ignore")
-        value = ON_ERROR_IGNORE;
-    else if (tmp == "Exit")
-        value = ON_ERROR_EXIT;
-    else if (tmp == "Popup")
-        value = ON_ERROR_POPUP;
+    warn_static("remove after migration. 2013.08.20")
+    if (tmp == "Exit") //obsolete
+        value = ON_ERROR_ABORT;
     else
-        return false;
+
+        if (tmp == "Ignore")
+            value = ON_ERROR_IGNORE;
+        else if (tmp == "Popup")
+            value = ON_ERROR_POPUP;
+        else if (tmp == "Abort")
+            value = ON_ERROR_ABORT;
+        else
+            return false;
     return true;
 }
 
@@ -372,7 +384,7 @@ bool readText(const std::string& input, DeletionPolicy& value)
     else if (tmp == "MoveToCustomDirectory")//obsolete name
         value = DELETE_TO_VERSIONING;
     else
-        //------------------
+
         if (tmp == "Permanent")
             value = DELETE_PERMANENTLY;
         else if (tmp == "RecycleBin")
@@ -390,14 +402,14 @@ void writeText(const SymLinkHandling& value, std::string& output)
 {
     switch (value)
     {
-        case SYMLINK_IGNORE:
-            output = "Ignore";
+        case SYMLINK_EXCLUDE:
+            output = "Exclude";
             break;
         case SYMLINK_USE_DIRECTLY:
-            output = "UseDirectly";
+            output = "Direct";
             break;
         case SYMLINK_FOLLOW_LINK:
-            output = "FollowLink";
+            output = "Follow";
             break;
     }
 }
@@ -407,58 +419,23 @@ bool readText(const std::string& input, SymLinkHandling& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    if (tmp == "Ignore")
-        value = SYMLINK_IGNORE;
-    else if (tmp == "UseDirectly")
+    warn_static("remove after migration. 2013.08.20")
+    if (tmp == "UseDirectly") //obsolete!
         value = SYMLINK_USE_DIRECTLY;
-    else if (tmp == "FollowLink")
+    else if (tmp == "FollowLink") //obsolete!
         value = SYMLINK_FOLLOW_LINK;
+    else if (tmp == "Ignore") //obsolete!
+        value = SYMLINK_EXCLUDE;
     else
-        return false;
-    return true;
-}
 
-
-template <> inline
-void writeText(const UnitTime& value, std::string& output)
-{
-    switch (value)
-    {
-        case UTIME_NONE:
-            output = "Inactive";
-            break;
-        case UTIME_TODAY:
-            output = "Today";
-            break;
-        case UTIME_THIS_MONTH:
-            output = "Month";
-            break;
-        case UTIME_THIS_YEAR:
-            output = "Year";
-            break;
-        case UTIME_LAST_X_DAYS:
-            output = "x-days";
-            break;
-    }
-}
-
-template <> inline
-bool readText(const std::string& input, UnitTime& value)
-{
-    std::string tmp = input;
-    zen::trim(tmp);
-    if (tmp == "Inactive")
-        value = UTIME_NONE;
-    else if (tmp == "Today")
-        value = UTIME_TODAY;
-    else if (tmp == "Month")
-        value = UTIME_THIS_MONTH;
-    else if (tmp == "Year")
-        value = UTIME_THIS_YEAR;
-    else if (tmp == "x-days")
-        value = UTIME_LAST_X_DAYS;
-    else
-        return false;
+        if (tmp == "Exclude")
+            value = SYMLINK_EXCLUDE;
+        else if (tmp == "Direct")
+            value = SYMLINK_USE_DIRECTLY;
+        else if (tmp == "Follow")
+            value = SYMLINK_FOLLOW_LINK;
+        else
+            return false;
     return true;
 }
 
@@ -557,7 +534,7 @@ void writeText(const UnitSize& value, std::string& output)
     switch (value)
     {
         case USIZE_NONE:
-            output = "Inactive";
+            output = "None";
             break;
         case USIZE_BYTE:
             output = "Byte";
@@ -576,19 +553,71 @@ bool readText(const std::string& input, UnitSize& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    if (tmp == "Inactive")
+    warn_static("remove after migration. 2013.08.20")
+    if (tmp == "Inactive") //obsolete!
         value = USIZE_NONE;
-    else if (tmp == "Byte")
-        value = USIZE_BYTE;
-    else if (tmp == "KB")
-        value = USIZE_KB;
-    else if (tmp == "MB")
-        value = USIZE_MB;
     else
-        return false;
+
+        if (tmp == "None")
+            value = USIZE_NONE;
+        else if (tmp == "Byte")
+            value = USIZE_BYTE;
+        else if (tmp == "KB")
+            value = USIZE_KB;
+        else if (tmp == "MB")
+            value = USIZE_MB;
+        else
+            return false;
     return true;
 }
 
+template <> inline
+void writeText(const UnitTime& value, std::string& output)
+{
+    switch (value)
+    {
+        case UTIME_NONE:
+            output = "None";
+            break;
+        case UTIME_TODAY:
+            output = "Today";
+            break;
+        case UTIME_THIS_MONTH:
+            output = "Month";
+            break;
+        case UTIME_THIS_YEAR:
+            output = "Year";
+            break;
+        case UTIME_LAST_X_DAYS:
+            output = "x-days";
+            break;
+    }
+}
+
+template <> inline
+bool readText(const std::string& input, UnitTime& value)
+{
+    std::string tmp = input;
+    zen::trim(tmp);
+    warn_static("remove after migration. 2013.08.20")
+    if (tmp == "Inactive") //obsolete!
+        value = UTIME_NONE;
+    else
+
+        if (tmp == "None")
+            value = UTIME_NONE;
+        else if (tmp == "Today")
+            value = UTIME_TODAY;
+        else if (tmp == "Month")
+            value = UTIME_THIS_MONTH;
+        else if (tmp == "Year")
+            value = UTIME_THIS_YEAR;
+        else if (tmp == "x-days")
+            value = UTIME_LAST_X_DAYS;
+        else
+            return false;
+    return true;
+}
 
 template <> inline
 void writeText(const VersioningStyle& value, std::string& output)
@@ -599,7 +628,7 @@ void writeText(const VersioningStyle& value, std::string& output)
             output = "Replace";
             break;
         case VER_STYLE_ADD_TIMESTAMP:
-            output = "AddTimeStamp";
+            output = "TimeStamp";
             break;
     }
 }
@@ -609,12 +638,17 @@ bool readText(const std::string& input, VersioningStyle& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    if (tmp == "Replace")
-        value = VER_STYLE_REPLACE;
-    else if (tmp == "AddTimeStamp")
+    warn_static("remove after migration. 2013.08.20")
+    if (tmp == "AddTimeStamp") //obsolete
         value = VER_STYLE_ADD_TIMESTAMP;
     else
-        return false;
+
+        if (tmp == "Replace")
+            value = VER_STYLE_REPLACE;
+        else if (tmp == "TimeStamp")
+            value = VER_STYLE_ADD_TIMESTAMP;
+        else
+            return false;
     return true;
 }
 
@@ -624,8 +658,8 @@ void writeText(const DirectionConfig::Variant& value, std::string& output)
 {
     switch (value)
     {
-        case DirectionConfig::AUTOMATIC:
-            output = "Automatic";
+        case DirectionConfig::TWOWAY:
+            output = "TwoWay";
             break;
         case DirectionConfig::MIRROR:
             output = "Mirror";
@@ -644,16 +678,21 @@ bool readText(const std::string& input, DirectionConfig::Variant& value)
 {
     std::string tmp = input;
     zen::trim(tmp);
-    if (tmp == "Automatic")
-        value = DirectionConfig::AUTOMATIC;
-    else if (tmp == "Mirror")
-        value = DirectionConfig::MIRROR;
-    else if (tmp == "Update")
-        value = DirectionConfig::UPDATE;
-    else if (tmp == "Custom")
-        value = DirectionConfig::CUSTOM;
+    warn_static("remove after migration. 2013.08.20")
+    if (tmp == "Automatic") //obsolete!
+        value = DirectionConfig::TWOWAY;
     else
-        return false;
+
+        if (tmp == "TwoWay")
+            value = DirectionConfig::TWOWAY;
+        else if (tmp == "Mirror")
+            value = DirectionConfig::MIRROR;
+        else if (tmp == "Update")
+            value = DirectionConfig::UPDATE;
+        else if (tmp == "Custom")
+            value = DirectionConfig::CUSTOM;
+        else
+            return false;
     return true;
 }
 
@@ -781,6 +820,10 @@ void readConfig(const XmlIn& in, DirectionConfig& directCfg)
     inCustDir["RightNewer"](directCfg.custom.rightNewer);
     inCustDir["Different" ](directCfg.custom.different);
     inCustDir["Conflict"  ](directCfg.custom.conflict);
+
+    warn_static("remove check after migration. 2013.08.17")
+    if (in["DetectMovedFiles"]) //new value: remove check
+        in["DetectMovedFiles"](directCfg.detectMovedFiles);
 }
 
 
@@ -1052,7 +1095,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //###########################################################
 
     inWnd["ViewFilterDefault"](config.gui.viewFilterDefault);
-    inWnd["Perspective"      ](config.gui.guiPerspectiveLast);
+    inWnd["Perspective2"     ](config.gui.guiPerspectiveLast);
 
     std::vector<Zstring> tmp = splitFilterByLines(config.gui.defaultExclusionFilter); //default value
     inGui["DefaultExclusionFilter"](tmp);
@@ -1236,6 +1279,8 @@ void writeConfig(const DirectionConfig& directCfg, XmlOut& out)
     outCustDir["RightNewer"](directCfg.custom.rightNewer);
     outCustDir["Different" ](directCfg.custom.different);
     outCustDir["Conflict"  ](directCfg.custom.conflict);
+
+    out["DetectMovedFiles"](directCfg.detectMovedFiles);
 }
 
 
@@ -1431,7 +1476,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //###########################################################
 
     outWnd["ViewFilterDefault"](config.gui.viewFilterDefault);
-    outWnd["Perspective"      ](config.gui.guiPerspectiveLast);
+    outWnd["Perspective2"     ](config.gui.guiPerspectiveLast);
 
     outGui["DefaultExclusionFilter"](splitFilterByLines(config.gui.defaultExclusionFilter));
 

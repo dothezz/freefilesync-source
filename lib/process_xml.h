@@ -29,9 +29,9 @@ XmlType getXmlType(const Zstring& filename); //throw()
 
 enum OnError
 {
-    ON_ERROR_POPUP,
     ON_ERROR_IGNORE,
-    ON_ERROR_EXIT
+    ON_ERROR_POPUP,
+    ON_ERROR_ABORT
 };
 
 enum OnGuiError

@@ -166,6 +166,7 @@ public:
     GridDataBase(Grid& grid, const std::shared_ptr<const zen::GridView>& gridDataView) : grid_(grid), gridDataView_(gridDataView) {}
 
     void holdOwnership(const std::shared_ptr<GridEventManager>& evtMgr) { evtMgr_ = evtMgr; }
+    GridEventManager* getEventManager() { return evtMgr_.get(); }
 
 protected:
     Grid& refGrid() { return grid_; }
@@ -557,7 +558,7 @@ private:
         }
     }
 
-    virtual size_t getBestSize(wxDC& dc, size_t row, ColumnType colType)
+    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType)
     {
         //  Partitioning:
         //   ________________________________
@@ -1011,9 +1012,9 @@ private:
             case COL_TYPE_CHECKBOX:
                 break;
             case COL_TYPE_CMP_CATEGORY:
-                return _("Category");
+                return _("Category") + L" (F9)";
             case COL_TYPE_SYNC_ACTION:
-                return _("Action");
+                return _("Action") + L" (F9)";
         }
         return wxEmptyString;
     }
@@ -1335,6 +1336,8 @@ public:
 
     ~GridEventManager() { assert(!scrollbarUpdatePending); }
 
+    void setScrollMaster(const Grid& grid) { scrollMaster = &grid; }
+
 private:
     void onCenterSelectBegin(GridClickEvent& event)
     {
@@ -1422,14 +1425,14 @@ private:
     void onResizeColumnL(GridColumnResizeEvent& event) { resizeOtherSide(gridL_, gridR_, event.colType_, event.offset_); }
     void onResizeColumnR(GridColumnResizeEvent& event) { resizeOtherSide(gridR_, gridL_, event.colType_, event.offset_); }
 
-    void resizeOtherSide(const Grid& src, Grid& trg, ColumnType type, ptrdiff_t offset)
+    void resizeOtherSide(const Grid& src, Grid& trg, ColumnType type, int offset)
     {
         //find stretch factor of resized column: type is unique due to makeConsistent()!
         std::vector<Grid::ColumnAttribute> cfgSrc = src.getColumnConfig();
         auto it = std::find_if(cfgSrc.begin(), cfgSrc.end(), [&](Grid::ColumnAttribute& ca) { return ca.type_ == type; });
         if (it == cfgSrc.end())
             return;
-        const ptrdiff_t stretchSrc = it->stretch_;
+        const int stretchSrc = it->stretch_;
 
         //we do not propagate resizings on stretched columns to the other side: awkward user experience
         if (stretchSrc > 0)
@@ -1706,11 +1709,23 @@ void gridview::refresh(Grid& gridLeft, Grid& gridCenter, Grid& gridRight)
 }
 
 
+void gridview::setScrollMaster(Grid& grid)
+{
+    if (auto prov = dynamic_cast<GridDataBase*>(grid.getDataProvider()))
+        if (auto evtMgr = prov->getEventManager())
+        {
+            evtMgr->setScrollMaster(grid);
+            return;
+        }
+    assert(false);
+}
+
+
 void gridview::setNavigationMarker(Grid& gridLeft,
                                    hash_set<const FileSystemObject*>&& markedFilesAndLinks,
                                    hash_set<const HierarchyObject*>&& markedContainer)
 {
-    if (auto* provLeft  = dynamic_cast<GridDataLeft*>(gridLeft.getDataProvider()))
+    if (auto provLeft = dynamic_cast<GridDataLeft*>(gridLeft.getDataProvider()))
         provLeft->setNavigationMarker(std::move(markedFilesAndLinks), std::move(markedContainer));
     else
         assert(false);
@@ -1720,7 +1735,7 @@ void gridview::setNavigationMarker(Grid& gridLeft,
 
 void gridview::highlightSyncAction(Grid& gridCenter, bool value)
 {
-    if (auto* provMiddle = dynamic_cast<GridDataMiddle*>(gridCenter.getDataProvider()))
+    if (auto provMiddle = dynamic_cast<GridDataMiddle*>(gridCenter.getDataProvider()))
         provMiddle->highlightSyncAction(value);
     else
         assert(false);

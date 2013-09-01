@@ -102,13 +102,7 @@ public:
         return wxBitmap(fileIcon);
 
 #elif defined ZEN_LINUX
-#if wxCHECK_VERSION(2, 9, 4)
         return wxBitmap(release()); //ownership passed!
-#else
-        wxBitmap newIcon;
-        newIcon.SetPixbuf(release()); //ownership passed!
-        return newIcon;
-#endif
 
 #elif defined ZEN_MAC
         ZEN_ON_SCOPE_EXIT(IconHolder().swap(*this)); //destroy after extraction
@@ -358,7 +352,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
                                             0,                //DWORD dwFileAttributes,
                                             &fileInfo,        //_Inout_  SHFILEINFO *psfi,
                                             sizeof(fileInfo), //UINT cbFileInfo,
-                                            SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES)) //UINT uFlags
+                                            SHGFI_SYSICONINDEX /*| SHGFI_ATTRIBUTES*/)) //UINT uFlags
     {
         (void)imgList;
         //imgList->Release(); //empiric study: crash on XP if we release this! Seems we do not own it... -> also no GDI leak on Win7 -> okay
@@ -368,13 +362,13 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
         //        for example, for use in a list view. Conversely, an HIMAGELIST can be cast as a pointer to an IImageList."
         //http://msdn.microsoft.com/en-us/library/windows/desktop/bb762185(v=vs.85).aspx
 
-#ifndef SFGAO_LINK //Shobjidl.h
+#ifdef __MINGW32__ //Shobjidl.h
 #define SFGAO_LINK 0x00010000L     // Shortcut (link) or symlinks
 #endif
 
         warn_static("support SFGAO_GHOSTED or hidden?")
-
-        const bool isLink = (fileInfo.dwAttributes & SFGAO_LINK) != 0;
+        //requires SHGFI_ATTRIBUTES
+        //const bool isLink = (fileInfo.dwAttributes & SFGAO_LINK) != 0;
 
         if (getIconByIndex && releaseImageData)
             if (const thumb::ImageData* imgData = getIconByIndex(fileInfo.iIcon, getThumbSizeType(sz)))
@@ -398,7 +392,7 @@ IconHolder getAssociatedIcon(const Zstring& filename, IconBuffer::IconSize sz)
     {
         return IconHolder(new osx::ImageData(osx::getFileIcon(filename.c_str(), IconBuffer::getSize(sz)))); //throw SysError
     }
-    catch (zen::SysError&) {}
+    catch (zen::SysError&) { assert(false); }
 #endif
     return ::getGenericFileIcon(sz); //make sure this does not internally call getAssociatedIcon("someDefaultFile.txt")!!! => endless recursion!
 }
@@ -454,7 +448,7 @@ class Buffer
 {
 public:
     //called by main and worker thread:
-    bool hasFileIcon(const Zstring& fileName)
+    bool hasFileIcon(const Zstring& fileName) const
     {
         boost::lock_guard<boost::mutex> dummy(lockIconList);
         return iconList.find(fileName) != iconList.end();
@@ -519,7 +513,7 @@ private:
         //- prohibit even wxBitmap() default constructor - better be safe than sorry!
     };
 
-    boost::mutex lockIconList;
+    mutable boost::mutex lockIconList;
     std::map<Zstring, IconData, LessFilename> iconList; //shared resource; Zstring is thread-safe like an int
     std::queue<Zstring> iconSequence; //save sequence of buffer entry to delete oldest elements
 };

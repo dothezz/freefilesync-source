@@ -186,12 +186,7 @@ private:
                 {
                     PDEV_BROADCAST_HANDLE body = reinterpret_cast<PDEV_BROADCAST_HANDLE>(lParam);
 
-#ifdef __MINGW32__
-                    const HDEVNOTIFY requestNotification = reinterpret_cast<HDEVNOTIFY>(body->dbch_hdevnotify);
-#else
-                    const HDEVNOTIFY requestNotification = body->dbch_hdevnotify;
-#endif
-                    if (requestNotification == hNotification) //is it for the notification we registered?
+                    if (body->dbch_hdevnotify == hNotification) //is it for the notification we registered?
                         switch (wParam)
                         {
                             case DBT_DEVICEQUERYREMOVE:

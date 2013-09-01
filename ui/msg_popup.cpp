@@ -60,7 +60,7 @@ ErrorDlg::ErrorDlg(wxWindow* parent, int activeButtons, const wxString& messageT
     SetTitle(!caption.empty() ? caption : _("Error"));
     m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_error"));
     m_textCtrlMessage->SetValue(messageText);
-    checkBoxIgnoreErrors.SetLabel(_("Ignore further errors"));
+    checkBoxIgnoreErrors.SetLabel(_("&Ignore subsequent errors"));
     buttonIgnore.SetLabel(_("&Ignore"));
     buttonRetry .SetLabel(_("&Retry"));
     //buttonIgnore.SetId(wxID_IGNORE); -> setting id after button creation breaks "mouse snap to" functionality
@@ -174,7 +174,7 @@ WarningDlg::WarningDlg(wxWindow* parent,  int activeButtons, const wxString& mes
     SetTitle(_("Warning"));
     m_bitmapMsgType->SetBitmap(getResourceImage(L"msg_warning"));
     m_textCtrlMessage->SetValue(messageText);
-    checkBoxDontShowAgain.SetLabel(_("Don't show this warning again"));
+    checkBoxDontShowAgain.SetLabel(_("&Don't show this warning again"));
     buttonIgnore.SetLabel(_("&Ignore"));
     buttonSwitch.SetLabel(_("&Switch"));
     //buttonIgnore.SetId(wxID_IGNORE); -> see comment in ErrorDlg

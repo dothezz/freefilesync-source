@@ -13,15 +13,11 @@
 
 #include <cassert>
 #include "win.h"     //includes "windows.h"
-#include "Windowsx.h" //WM_MOUSEWHEEL
+#include <Windowsx.h> //WM_MOUSEWHEEL
 
 
 namespace
 {
-#ifndef WM_MOUSEHWHEEL //MinGW is clueless...
-#define WM_MOUSEHWHEEL                  0x020E
-#endif
-
 LRESULT CALLBACK mouseInputHook(int nCode, WPARAM wParam, LPARAM lParam)
 {
     //"if nCode is less than zero, the hook procedure must pass the message to the CallNextHookEx function

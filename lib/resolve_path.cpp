@@ -115,12 +115,8 @@ private:
 
         //================================================================================================
         //SHGetKnownFolderPath: API available only with Windows Vista and later:
-#ifdef __MINGW32__ //MinGW is clueless about Vista...
-#define REFKNOWNFOLDERID const GUID&
+#ifdef __MINGW32__
 #define KF_FLAG_DONT_VERIFY 0x00004000
-        const GUID FOLDERID_Downloads       = { 0x374de290, 0x123f, 0x4565, { 0x91, 0x64, 0x39, 0xc4, 0x92, 0x5e, 0x46, 0x7b} };
-        const GUID FOLDERID_PublicDownloads = { 0x3d644c9b, 0x1fb8, 0x4f30, { 0x9b, 0x45, 0xf6, 0x70, 0x23, 0x5f, 0x79, 0xc0} };
-        const GUID FOLDERID_QuickLaunch     = { 0x52a4f021, 0x7b75, 0x48a9, { 0x9f, 0x6b, 0x4b, 0x87, 0xa2, 0x10, 0xbc, 0x8f} };
 #endif
         typedef HRESULT (STDAPICALLTYPE* SHGetKnownFolderPathFunc)(REFKNOWNFOLDERID rfid, DWORD dwFlags, HANDLE hToken, PWSTR* ppszPath);
         const SysDllFun<SHGetKnownFolderPathFunc> shGetKnownFolderPath(L"Shell32.dll", "SHGetKnownFolderPath");
@@ -598,7 +594,7 @@ void zen::loginNetworkShare(const Zstring& dirnameOrig, bool allowUserInteractio
     	user account:	<Domain>\<user>		e.g. WIN-XP\ZenJu
     	network share:	\\<server>\<share>	e.g. \\WIN-XP\test
 
-    Windows Command Line: 
+    Windows Command Line:
     - list *all* active network connections, including deviceless ones which are hidden in Explorer:
     		net use
     - delete active connection:

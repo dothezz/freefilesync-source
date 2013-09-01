@@ -25,7 +25,7 @@ CXXFLAGS  += `wx-config --cxxflags --debug=no`
 LINKFLAGS += `wx-config --libs     --debug=no` -lboost_thread -lboost_system -lz
 else
 #static wxWidgets and boost library linkage for precompiled release
-WX_CONFIG_BIN =$(HOME)/Desktop/wxGTK-2.8.12/lib/release/bin/wx-config
+WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.5/lib/release/bin/wx-config
 CXXFLAGS  += -I$(HOME)/Desktop/boost_1_54_0
 BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_54_0/stage/lib
 
@@ -39,7 +39,7 @@ ifeq ($(OPERATING_SYSTEM_NAME), Darwin)
 COMPILER_BIN=clang++ -stdlib=libc++
 CXXFLAGS += -DZEN_MAC
 
-WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.4/lib/release/bin/wx-config
+WX_CONFIG_BIN =$(HOME)/Desktop/wxWidgets-2.9.5/lib/release/bin/wx-config
 CXXFLAGS  += -I$(HOME)/Desktop/boost_1_54_0
 BOOST_LIB_DIR =$(HOME)/Desktop/boost_1_54_0/stage/lib
 MACOS_SDK     =-mmacosx-version-min=10.7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
@@ -50,7 +50,7 @@ CXXFLAGS  += $(MACOS_SDK) `$(WX_CONFIG_BIN) --cxxflags --debug=no --static=yes`
 LINKFLAGS += $(MACOS_SDK) `$(WX_CONFIG_BIN) --libs     --debug=no --static=yes` $(BOOST_LIB_DIR)/libboost_thread.a $(BOOST_LIB_DIR)/libboost_system.a
 
 endif
-#####################################################################################################
+######################################################
 
 CPP_LIST= #internal list of all *.cpp files needed for compilation
 CPP_LIST+=application.cpp
@@ -74,7 +74,7 @@ CPP_LIST+=../zen/file_handling.cpp
 CPP_LIST+=../zen/file_io.cpp
 CPP_LIST+=../zen/file_traverser.cpp
 CPP_LIST+=../zen/zstring.cpp
-CPP_LIST+=../wx+/button.cpp
+CPP_LIST+=../wx+/image_tools.cpp
 
 #list of all *.o files (we need the "RTS" subdirectory to handle "../*.cpp" files
 OBJECT_LIST=$(CPP_LIST:%.cpp=../OBJ/RTS_GCC_Make_Release/RTS/%.o)

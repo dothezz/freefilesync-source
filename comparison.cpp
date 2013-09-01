@@ -74,7 +74,6 @@ void checkForIncompleteInput(const std::vector<FolderPairCfg>& folderPairsForm, 
                                _("The corresponding folder will be considered as empty."), warningInputFieldEmpty);
 }
 
-
 std::set<Zstring, LessFilename> determineExistentDirs(const std::set<Zstring, LessFilename>& dirnames,
                                                       bool allowUserInteraction,
                                                       ProcessCallback& callback)
@@ -83,26 +82,6 @@ std::set<Zstring, LessFilename> determineExistentDirs(const std::set<Zstring, Le
 
     tryReportingError2([&]
     {
-        warn_static("remove after test")
-#if 0
-        dirsEx.clear();
-        std::for_each(dirnames.begin(), dirnames.end(),
-        [&](const Zstring& dirname)
-        {
-            if (!dirname.empty())
-            {
-                loginNetworkShare(dirname, allowUserInteraction);
-
-                const DWORD attr = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
-                if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) != 0) //returns true for (dir-)symlinks also
-                    dirsEx.insert(dirname);
-                else
-                    throw FileError(_("Cannot find the following folders:") + L"\n" + std::wstring(L"\n") + dirname,
-                    attr == INVALID_FILE_ATTRIBUTES ? formatSystemError(L"GetFileAttributes", getLastError()) : L"not a directory!");
-            }
-        });
-
-#else
         dirsEx = getExistingDirsUpdating(dirnames, allowUserInteraction, callback); //check *all* directories on each try!
 
         //get list of not existing directories
@@ -115,7 +94,6 @@ std::set<Zstring, LessFilename> determineExistentDirs(const std::set<Zstring, Le
             std::for_each(dirsMissing.begin(), dirsMissing.end(), [&](const Zstring& dirname) { msg += std::wstring(L"\n") + dirname; });
             throw FileError(msg, _("You can ignore this error to consider each folder as empty. The folders then will be created automatically during synchronization."));
         }
-#endif
     }, callback);
 
     return dirsEx;
@@ -425,8 +403,8 @@ void categorizeSymlinkByContent(SymlinkPair& linkObj, size_t fileTimeTolerance, 
         if (targetPathRawL == targetPathRawR
 #ifdef ZEN_WIN //type of symbolic link is relevant for Windows only
             &&
-            getSymlinkType(linkObj.getFullName<LEFT_SIDE >()) ==
-            getSymlinkType(linkObj.getFullName<RIGHT_SIDE>())
+            dirExists(linkObj.getFullName<LEFT_SIDE >()) == //check if dir-symlink
+            dirExists(linkObj.getFullName<RIGHT_SIDE>())    //
 #endif
            )
         {
@@ -565,16 +543,16 @@ private:
 template <SelectedSide side>
 void MergeSides::fillOneSide(const DirContainer& dirCont, HierarchyObject& output)
 {
-    for (auto it = dirCont.files.cbegin(); it != dirCont.files.cend(); ++it)
-        output.addSubFile<side>(it->first, it->second);
+    for (const auto& file : dirCont.files)
+        output.addSubFile<side>(file.first, file.second);
 
-    for (auto it = dirCont.links.cbegin(); it != dirCont.links.cend(); ++it)
-        output.addSubLink<side>(it->first, it->second);
+    for (const auto& link : dirCont.links)
+        output.addSubLink<side>(link.first, link.second);
 
-    for (auto it = dirCont.dirs.cbegin(); it != dirCont.dirs.cend(); ++it)
+    for (const auto& dir : dirCont.dirs)
     {
-        DirPair& newDirMap = output.addSubDir<side>(it->first);
-        fillOneSide<side>(it->second, newDirMap); //recurse
+        DirPair& newDirMap = output.addSubDir<side>(dir.first);
+        fillOneSide<side>(dir.second, newDirMap); //recurse
     }
 }
 
@@ -681,22 +659,18 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
 }
 
 //mark excluded directories (see fillBuffer()) + remove superfluous excluded subdirectories
-//note: this cannot be done while traversing directory, since both sides need to be taken into account, both for filtering AND removing subdirs!
 void removeFilteredDirs(HierarchyObject& hierObj, const HardFilter& filterProc)
 {
-    auto& subDirs = hierObj.refSubDirs();
-
     //process subdirs recursively
-    std::for_each(subDirs.begin(), subDirs.end(),
-                  [&](DirPair& dirObj)
+    for (DirPair& dirObj : hierObj.refSubDirs())
     {
         dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), nullptr)); //subObjMightMatch is always true in this context!
         removeFilteredDirs(dirObj, filterProc);
-    });
+    }
 
     //remove superfluous directories -> note: this does not invalidate "std::vector<FilePair*>& undefinedFiles", since we delete folders only
     //and there is no side-effect for memory positions of FilePair and SymlinkPair thanks to zen::FixedList!
-    subDirs.remove_if([](DirPair& dirObj)
+    hierObj.refSubDirs().remove_if([](DirPair& dirObj)
     {
         return !dirObj.isActive() &&
                dirObj.refSubDirs ().empty() &&
@@ -741,14 +715,13 @@ std::shared_ptr<BaseDirPair> ComparisonBuffer::performComparison(const FolderPai
     if (bufValueLeft ) filterAddFailedItemReads(bufValueLeft ->failedItemReads);
     if (bufValueRight) filterAddFailedItemReads(bufValueRight->failedItemReads);
 
-    //a pity VC11 screws up on std::make_shared with 7 arguments...
-    std::shared_ptr<BaseDirPair> output(new BaseDirPair(fpCfg.leftDirectoryFmt,
-                                                        bufValueLeft != nullptr, //dir existence must be checked only once: available iff buffer entry exists!
-                                                        fpCfg.rightDirectoryFmt,
-                                                        bufValueRight != nullptr,
-                                                        fpCfg.filter.nameFilter,
-                                                        fpCfg.compareVar,
-                                                        fileTimeTolerance));
+    std::shared_ptr<BaseDirPair> output = std::make_shared<BaseDirPair>(fpCfg.leftDirectoryFmt,
+                                                                        bufValueLeft != nullptr, //dir existence must be checked only once: available iff buffer entry exists!
+                                                                        fpCfg.rightDirectoryFmt,
+                                                                        bufValueRight != nullptr,
+                                                                        fpCfg.filter.nameFilter,
+                                                                        fpCfg.compareVar,
+                                                                        fileTimeTolerance);
     //PERF_START;
     MergeSides(undefinedFiles, undefinedLinks).execute(bufValueLeft  ? bufValueLeft ->dirCont : DirContainer(),
                                                        bufValueRight ? bufValueRight->dirCont : DirContainer(), *output);
@@ -865,8 +838,7 @@ void zen::compare(size_t fileTimeTolerance,
 
             //process binary comparison in one block
             std::vector<FolderPairCfg> workLoadByContent;
-            std::for_each(cfgList.begin(), cfgList.end(), [&](const FolderPairCfg& fpCfg)
-            {
+            for (const FolderPairCfg& fpCfg : cfgList)
                 switch (fpCfg.compareVar)
                 {
                     case CMP_BY_TIME_SIZE:
@@ -875,12 +847,10 @@ void zen::compare(size_t fileTimeTolerance,
                         workLoadByContent.push_back(fpCfg);
                         break;
                 }
-            });
             std::list<std::shared_ptr<BaseDirPair>> outputByContent = cmpBuff.compareByContent(workLoadByContent);
 
             //write output in order
-            std::for_each(cfgList.begin(), cfgList.end(), [&](const FolderPairCfg& fpCfg)
-            {
+            for (const FolderPairCfg& fpCfg : cfgList)
                 switch (fpCfg.compareVar)
                 {
                     case CMP_BY_TIME_SIZE:
@@ -895,7 +865,6 @@ void zen::compare(size_t fileTimeTolerance,
                         }
                         break;
                 }
-            });
         }
 
         assert(outputTmp.size() == cfgList.size());

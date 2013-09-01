@@ -47,11 +47,11 @@ struct GridClickEvent : public wxMouseEvent
 
 struct GridColumnResizeEvent : public wxCommandEvent
 {
-    GridColumnResizeEvent(ptrdiff_t offset, ColumnType colType, size_t compPos) : wxCommandEvent(EVENT_GRID_COL_RESIZE), colType_(colType), offset_(offset), compPos_(compPos) {}
+    GridColumnResizeEvent(int offset, ColumnType colType, size_t compPos) : wxCommandEvent(EVENT_GRID_COL_RESIZE), colType_(colType), offset_(offset), compPos_(compPos) {}
     virtual wxEvent* Clone() const { return new GridColumnResizeEvent(*this); }
 
     const ColumnType colType_;
-    const ptrdiff_t  offset_;
+    const int        offset_;
     const size_t     compPos_;
 };
 
@@ -96,7 +96,7 @@ public:
     virtual wxString getValue(size_t row, ColumnType colType) const = 0;
     virtual void renderRowBackgound(wxDC& dc, const wxRect& rect, size_t row, bool enabled, bool selected, bool hasFocus); //default implementation
     virtual void renderCell(Grid& grid, wxDC& dc, const wxRect& rect, size_t row, ColumnType colType); //
-    virtual size_t getBestSize(wxDC& dc, size_t row, ColumnType colType); //must correspond to renderCell()!
+    virtual int getBestSize(wxDC& dc, size_t row, ColumnType colType); //must correspond to renderCell()!
     virtual wxString getToolTip(size_t row, ColumnType colType) const { return wxString(); }
 
     //label area
@@ -127,7 +127,7 @@ public:
 
     size_t getRowCount() const;
 
-    void setRowHeight(size_t height);
+    void setRowHeight(int height);
 
     //grid component := a grid is divided into multiple components each of which is essentially a set of connected columns
     void setComponentCount(size_t count) { comp.resize(count); updateWindowSizes(); }
@@ -135,13 +135,13 @@ public:
 
     struct ColumnAttribute
     {
-        ColumnAttribute(ColumnType type, ptrdiff_t offset, ptrdiff_t stretch, bool visible = true) : type_(type), visible_(visible), stretch_(std::max<ptrdiff_t>(stretch, 0)), offset_(offset) {}
+        ColumnAttribute(ColumnType type, int offset, int stretch, bool visible = true) : type_(type), visible_(visible), stretch_(std::max(stretch, 0)), offset_(offset) { assert(stretch >=0 ); }
         ColumnType type_;
         bool visible_;
-        //first client width is partitioned according to all available stretch factors, then "offset_" is added
+        //first, client width is partitioned according to all available stretch factors, then "offset_" is added
         //universal model: a non-stretched column has stretch factor 0 with the "offset" becoming identical to final width!
-        ptrdiff_t stretch_; //>= 0
-        ptrdiff_t offset_;
+        int stretch_; //>= 0
+        int offset_;
     };
 
     void setColumnConfig(const std::vector<ColumnAttribute>& attr, size_t compPos = 0); //set column count + widths
@@ -212,7 +212,7 @@ private:
     virtual WXLRESULT MSWDefWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam); //support horizontal mouse wheel
 #endif
 
-    ptrdiff_t getBestColumnSize(size_t col, size_t compPos) const; //return -1 on error
+    int getBestColumnSize(size_t col, size_t compPos) const; //return -1 on error
 
     friend class GridData;
     class SubWindow;
@@ -229,9 +229,9 @@ private:
         std::vector<size_t> get() const
         {
             std::vector<size_t> selection;
-            for (auto iter = rowSelectionValue.begin(); iter != rowSelectionValue.end(); ++iter)
-                if (*iter != 0)
-                    selection.push_back(iter - rowSelectionValue.begin());
+            for (size_t row = 0; row < rowSelectionValue.size(); ++row)
+                if (rowSelectionValue[row] != 0)
+                    selection.push_back(row);
             return selection;
         }
 
@@ -257,10 +257,10 @@ private:
 
     struct VisibleColumn
     {
-        VisibleColumn(ColumnType type, ptrdiff_t offset, ptrdiff_t stretch) : type_(type), stretch_(stretch), offset_(offset) {}
+        VisibleColumn(ColumnType type, int offset, int stretch) : type_(type), stretch_(stretch), offset_(offset) {}
         ColumnType type_;
-        ptrdiff_t stretch_; //>= 0
-        ptrdiff_t offset_;
+        int stretch_; //>= 0
+        int offset_;
     };
 
     struct Component
@@ -278,15 +278,16 @@ private:
 
     struct ColumnWidth
     {
-        ColumnWidth(ColumnType type, ptrdiff_t width) : type_(type), width_(width) {}
+        ColumnWidth(ColumnType type, int width) : type_(type), width_(width) {}
         ColumnType type_;
-        ptrdiff_t width_;
+        int width_;
     };
     std::vector<std::vector<ColumnWidth>> getColWidths()                 const; //
     std::vector<std::vector<ColumnWidth>> getColWidths(int mainWinWidth) const; //evaluate stretched columns; structure matches "comp"
-    ptrdiff_t                             getColWidthsSum(int mainWinWidth) const;
+    int                                   getColWidthsSum(int mainWinWidth) const;
+    std::vector<std::vector<int>> getColStretchedWidths(int clientWidth) const; //final width = (normalized) (stretchedWidth + offset)
 
-    Opt<ptrdiff_t> getColWidth(size_t col, size_t compPos) const
+    Opt<int> getColWidth(size_t col, size_t compPos) const
     {
         const auto& widths = getColWidths();
         if (compPos < widths.size() && col < widths[compPos].size())
@@ -294,10 +295,7 @@ private:
         return NoValue();
     }
 
-    ptrdiff_t getStretchTotal() const; //sum of all stretch factors
-    static ptrdiff_t getColStretchedWidth(ptrdiff_t stretch, ptrdiff_t stretchTotal, int mainWinWidth); //final width = stretchedWidth + (normalized) offset
-
-    void setColWidthAndNotify(ptrdiff_t width, size_t col, size_t compPos, bool notifyAsync = false);
+    void setColWidthAndNotify(int width, size_t col, size_t compPos, bool notifyAsync = false);
 
     wxRect getColumnLabelArea(ColumnType colType, size_t compPos) const; //returns empty rect if column not found
 
@@ -342,7 +340,7 @@ private:
     bool drawRowLabel;
 
     std::vector<Component> comp;
-    size_t colSizeOld; //at the time of last Grid::Refresh()
+    size_t rowCountOld; //at the time of last Grid::Refresh()
 };
 }
 

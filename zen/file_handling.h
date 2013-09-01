@@ -18,19 +18,10 @@ struct CallbackRemoveDir;
 struct CallbackCopyFile;
 
 
-bool fileExists     (const Zstring& filename, std::wstring* sysErrorMsg = nullptr); //noexcept; check whether file      *or* (file) symlink exists
-bool dirExists      (const Zstring& dirname , std::wstring* sysErrorMsg = nullptr); //noexcept; check whether directory *or* (dir)  symlink exists
-bool symlinkExists  (const Zstring& linkname, std::wstring* sysErrorMsg = nullptr); //noexcept; check whether a symbolic link exists
-bool somethingExists(const Zstring& objname , std::wstring* sysErrorMsg = nullptr); //noexcept; check whether any object with this name exists
-//sysErrorMsg: optional in + optional out! written only for non-expected errors other than ERROR_FILE_NOT_FOUND/ENOENT, ect...
-
-enum SymLinkType
-{
-    SYMLINK_TYPE_DIR,     //Windows: may be broken
-    SYMLINK_TYPE_FILE,    //Windows: may be broken
-    SYMLINK_TYPE_UNKNOWN, //Windows: unable to determine type; Linux: broken Symlink
-};
-SymLinkType getSymlinkType(const Zstring& linkname); //noexcept
+bool fileExists     (const Zstring& filename); //noexcept; check whether file      or file-symlink exists
+bool dirExists      (const Zstring& dirname ); //noexcept; check whether directory or dir-symlink exists
+bool symlinkExists  (const Zstring& linkname); //noexcept; check whether a symbolic link exists
+bool somethingExists(const Zstring& objname ); //noexcept; check whether any object with this name exists
 
 enum ProcSymlink
 {

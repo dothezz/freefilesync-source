@@ -4,8 +4,8 @@
 // * Copyright (C) Zenju (zenju AT gmx DOT de) - All Rights Reserved        *
 // **************************************************************************
 
-#ifndef FFS_FILTER_H_INCLUDED
-#define FFS_FILTER_H_INCLUDED
+#ifndef HARD_FILTER_H_825780275842758345
+#define HARD_FILTER_H_825780275842758345
 
 #include <vector>
 #include <memory>
@@ -267,5 +267,4 @@ HardFilter::FilterRef combineFilters(const HardFilter::FilterRef& first,
 }
 
 
-#endif // FFS_FILTER_H_INCLUDED
-
+#endif //HARD_FILTER_H_825780275842758345

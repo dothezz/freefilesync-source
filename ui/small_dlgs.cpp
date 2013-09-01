@@ -11,7 +11,7 @@
 #include <zen/tick_count.h>
 #include <zen/stl_tools.h>
 #include <wx+/choice_enum.h>
-#include <wx+/button.h>
+#include <wx+/bitmap_button.h>
 #include <wx+/rtl.h>
 #include <wx+/no_flicker.h>
 #include <wx+/mouse_move_dlg.h>
@@ -66,18 +66,15 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
         wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, getResourceImage(it->languageFlag), wxDefaultPosition, wxSize(-1, 11), 0 );
         fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER);
 
-        //language name
-        wxStaticText* staticTextLanguage = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, it->languageName, wxDefaultPosition, wxDefaultSize, 0 );
-        staticTextLanguage->Wrap(-1);
-        fgSizerTranslators->Add(staticTextLanguage, 0, wxALIGN_CENTER_VERTICAL);
-
         //translator name
         wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, it->translatorName, wxDefaultPosition, wxDefaultSize, 0 );
         staticTextTranslator->Wrap(-1);
         fgSizerTranslators->Add(staticTextTranslator, 0, wxALIGN_CENTER_VERTICAL);
-    }
 
-    bSizerTranslators->Fit(m_scrolledWindowTranslators);
+        staticBitmapFlag    ->SetToolTip(it->languageName);
+        staticTextTranslator->SetToolTip(it->languageName);
+    }
+    fgSizerTranslators->Fit(m_scrolledWindowTranslators);
 
 #ifdef ZEN_WIN
     new zen::MouseMoveWindow(*this); //-> put *after* creating credits
@@ -112,7 +109,6 @@ AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
         tmp.Resize(wxSize(GetClientSize().GetWidth(), tmp.GetHeight()), wxPoint(0, 0), 255, 255, 255); //enlarge to fit full width
         bmpLogo = wxBitmap(tmp);
     }
-
     {
         wxMemoryDC dc(bmpLogo);
         dc.SetTextForeground(wxColor(2, 2, 2)); //for some unknown reason SetBitmap below seems to replace wxBLACK with white on accessibility high contrast schemes!!
@@ -177,14 +173,16 @@ FilterDlg::FilterDlg(wxWindow* parent,
 
     setRelativeFontSize(*m_staticTextHeader, 1.25);
 
+#ifndef __WXGTK__  //wxWidgets holds portability promise by not supporting for multi-line controls...not
     m_textCtrlInclude->SetMaxLength(0); //allow large filter entries!
     m_textCtrlExclude->SetMaxLength(0); //
+#endif
 
     m_textCtrlInclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(FilterDlg::onKeyEvent), nullptr, this);
     m_textCtrlExclude->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(FilterDlg::onKeyEvent), nullptr, this);
 
     enumTimeDescr.
-    add(UTIME_NONE,        _("Inactive")).
+    add(UTIME_NONE, L"(" + _("Inactive") + L")"). //meta options should be enclosed in parentheses
     add(UTIME_TODAY,       _("Today")).
     //    add(UTIME_THIS_WEEK,   _("This week")).
     add(UTIME_THIS_MONTH,  _("This month")).
@@ -192,7 +190,7 @@ FilterDlg::FilterDlg(wxWindow* parent,
     add(UTIME_LAST_X_DAYS, _("Last x days"));
 
     enumSizeDescr.
-    add(USIZE_NONE, _("Inactive")).
+    add(USIZE_NONE, L"(" + _("Inactive") + L")"). //meta options should be enclosed in parentheses
     add(USIZE_BYTE, _("Byte")).
     add(USIZE_KB,   _("KB")).
     add(USIZE_MB,   _("MB"));
@@ -369,7 +367,9 @@ DeleteDialog::DeleteDialog(wxWindow* parent,
         m_checkBoxDeleteBothSides->SetValue(true);
     }
 
+#ifndef __WXGTK__  //wxWidgets holds portability promise by not supporting for multi-line controls...not
     m_textCtrlFileList->SetMaxLength(0); //allow large entries!
+#endif
 
     updateGui();
 
@@ -390,8 +390,8 @@ void DeleteDialog::updateGui()
     wxString header;
     if (m_checkBoxUseRecycler->GetValue())
     {
-        header = _P("Do you really want to move the following item to the Recycle Bin?",
-                    "Do you really want to move the following %x items to the Recycle Bin?", delInfo.second);
+        header = _P("Do you really want to move the following item to the recycle bin?",
+                    "Do you really want to move the following %x items to the recycle bin?", delInfo.second);
         m_bitmapDeleteType->SetBitmap(getResourceImage(L"recycler"));
     }
     else
@@ -587,7 +587,7 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
     m_bpButtonHelp->SetBitmapLabel(getResourceImage(L"help"));
 
     enumDescrHandleSyml.
-    add(SYMLINK_IGNORE,       _("Exclude")).
+    add(SYMLINK_EXCLUDE,      _("Exclude")).
     add(SYMLINK_USE_DIRECTLY, _("Direct")).
     add(SYMLINK_FOLLOW_LINK,  _("Follow"));
 
@@ -679,7 +679,7 @@ private:
     virtual void OnRemoveRow(wxCommandEvent& event);
     void onResize(wxSizeEvent& event);
 
-    void set(const xmlAccess::ExternalApps& extApp);
+    void setExtApp(const xmlAccess::ExternalApps& extApp);
     xmlAccess::ExternalApps getExtApp();
 
     xmlAccess::XmlGlobalSettings& settings;
@@ -698,9 +698,9 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     setRelativeFontSize(*m_staticTextHeader, 1.25);
 
     m_bitmapSettings    ->SetBitmap     (getResourceImage(L"settings"));
-    m_buttonResetDialogs->setBitmapFront(getResourceImage(L"reset_dialogs"), 5);
     m_bpButtonAddRow    ->SetBitmapLabel(getResourceImage(L"item_add"));
     m_bpButtonRemoveRow ->SetBitmapLabel(getResourceImage(L"item_remove"));
+    setBitmapTextLabel(*m_buttonResetDialogs, getResourceImage(L"reset_dialogs").ConvertToImage(), m_buttonResetDialogs->GetLabel());
 
     m_checkBoxCopyLocked     ->SetValue(globalSettings.copyLockedFiles);
     m_checkBoxTransCopy      ->SetValue(globalSettings.transactionalFileCopy);
@@ -713,7 +713,7 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     m_staticTextCopyLocked->Hide();
 #endif
 
-    set(globalSettings.gui.externelApplications);
+    setExtApp(globalSettings.gui.externelApplications);
 
     const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + L"\n\n" +
                              L"%item_path%    \t" + _("- full file or folder name") + L"\n" +
@@ -782,11 +782,11 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
     m_checkBoxCopyLocked     ->SetValue(defaultCfg.copyLockedFiles);
     m_checkBoxTransCopy      ->SetValue(defaultCfg.transactionalFileCopy);
     m_checkBoxCopyPermissions->SetValue(defaultCfg.copyFilePermissions);
-    set(defaultCfg.gui.externelApplications);
+    setExtApp(defaultCfg.gui.externelApplications);
 }
 
 
-void GlobalSettingsDlg::set(const xmlAccess::ExternalApps& extApp)
+void GlobalSettingsDlg::setExtApp(const xmlAccess::ExternalApps& extApp)
 {
     auto extAppTmp = extApp;
     vector_remove_if(extAppTmp, [](decltype(extAppTmp[0])& entry) { return entry.first.empty() && entry.second.empty(); });
@@ -935,11 +935,15 @@ SelectTimespanDlg::SelectTimespanDlg(wxWindow* parent, Int64& timeFrom, Int64& t
     m_calendarFrom->SetDate(utcToLocalDateTime(to<time_t>(timeFrom_)));
     m_calendarTo  ->SetDate(utcToLocalDateTime(to<time_t>(timeTo_)));
 
+#if wxCHECK_VERSION(2, 9, 5)
+    //doesn't seem to be a problem here:
+#else
     //wxDatePickerCtrl::BestSize() does not respect year field and trims it, both wxMSW/wxGTK - why isn't there anybody testing this wxWidgets stuff???
     wxSize minSz = m_calendarFrom->GetBestSize();
     minSz.x += 30;
     m_calendarFrom->SetMinSize(minSz);
     m_calendarTo  ->SetMinSize(minSz);
+#endif
 
     Fit();
     m_buttonOkay->SetFocus();

@@ -220,7 +220,7 @@ void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
                                    }; //some random GUID => have Windows save IFileDialog state separately from other file/dir pickers!
 
             showFolderPicker(static_cast<HWND>(selectButton_.GetHWND()),                //in;  ==HWND
-                             defaultDirname.empty() ? nullptr : defaultDirname.c_str(), //in, optional!
+                             defaultDirname.empty() ? static_cast<const wchar_t*>(nullptr) : defaultDirname.c_str(), //in, optional!
                              &guid,
                              selectedFolder, //out: call freeString() after use!
                              cancelled,      //out
@@ -235,7 +235,7 @@ void DirectoryName<NameControl>::onSelectDir(wxCommandEvent& event)
             newFolder = make_unique<wxString>(selectedFolder);
         }
     }
-#endif 
+#endif
     if (!newFolder.get())
     {
         wxDirDialog dirPicker(&selectButton_, _("Select a folder"), defaultDirname); //put modal wxWidgets dialogs on stack: creating on freestore leads to memleak!

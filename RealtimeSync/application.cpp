@@ -24,9 +24,6 @@
 
 #elif defined ZEN_LINUX
 #include <gtk/gtk.h>
-
-#elif defined ZEN_MAC
-#include <ApplicationServices/ApplicationServices.h>
 #endif
 
 using namespace zen;
@@ -72,10 +69,6 @@ bool Application::OnInit()
 
 #elif defined ZEN_LINUX
     ::gtk_rc_parse((zen::getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
-
-#elif defined ZEN_MAC
-    ProcessSerialNumber psn = { 0, kCurrentProcess };
-    ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //behave like an application bundle, even when the app is not packaged (yet)
 #endif
 
     SetAppName(L"FreeFileSync"); //reuse FFS's name, to have "GetUserDataDir()/GetResourcesDir()" return the same directory in ffs_paths.cpp
@@ -137,8 +130,7 @@ void Application::onEnterEventLoop(wxEvent& event)
     if (!commandArgs.empty())
         cfgFilename = commandArgs[0];
 
-    MainDialog* frame = new MainDialog(nullptr, cfgFilename);
-    frame->Show();
+    MainDialog::create(cfgFilename);
 }
 
 

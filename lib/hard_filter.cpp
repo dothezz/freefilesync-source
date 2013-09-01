@@ -65,52 +65,65 @@ const Zstring asteriskSepAsterisk = asteriskSep + asterisk;
 }
 
 
-void addFilterEntry(const Zstring& filtername, std::vector<Zstring>& fileFilter, std::vector<Zstring>& directoryFilter)
+void addFilterEntry(const Zstring& filterPhrase, std::vector<Zstring>& fileFilter, std::vector<Zstring>& directoryFilter)
 {
-    Zstring filterFormatted = filtername;
-
 #if defined ZEN_WIN || defined ZEN_MAC
     //Windows does NOT distinguish between upper/lower-case
+    Zstring filterFormatted = filterPhrase;
     makeUpper(filterFormatted);
 #elif defined ZEN_LINUX
+    const Zstring& filterFormatted = filterPhrase;
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
+    /*
+      phrase  | action
+    +---------+--------
+    | \blah   | remove \
+    | \*blah  | remove \
+    | \*\blah | remove \
+    | \*\*    | remove \
+    +---------+--------
+    | *blah   |
+    | *\blah  |	-> add blah
+    | *\*blah | -> add *blah
+    +---------+--------
+    | blah\   | remove \; directory only
+    | blah*\  | remove \; directory only
+    | blah\*\ | remove \; directory only
+    +---------+--------
+    | blah*   |
+    | blah\*  | add blah for directory only
+    | blah*\* | add blah* for directory only
+    +---------+--------
+    */
+    auto processTail = [&fileFilter, &directoryFilter](const Zstring& phrase)
+    {
+        if (endsWith(phrase, FILE_NAME_SEPARATOR)) //only relevant for directory filtering
+        {
+            const Zstring dirPhrase = beforeLast(phrase, FILE_NAME_SEPARATOR);
+            if (!dirPhrase.empty())
+                directoryFilter.push_back(dirPhrase);
+        }
+        else if (!phrase.empty())
+        {
+            fileFilter     .push_back(phrase);
+            directoryFilter.push_back(phrase);
+            if (endsWith(phrase, sepAsterisk)) // abc\*
+            {
+                const Zstring dirPhrase = beforeLast(phrase, sepAsterisk);
+                if (!dirPhrase.empty())
+                    directoryFilter.push_back(dirPhrase);
+            }
+        }
+    };
+
     if (startsWith(filterFormatted, FILE_NAME_SEPARATOR)) // \abc
-        filterFormatted = afterFirst(filterFormatted, FILE_NAME_SEPARATOR); //leading separator is optional!
-
-    //some syntactic sugar:
-    if (filterFormatted == asteriskSepAsterisk) // *\* := match everything except files directly in base directory
+        processTail(afterFirst(filterFormatted, FILE_NAME_SEPARATOR));
+    else
     {
-        fileFilter.     push_back(filterFormatted);
-        directoryFilter.push_back(asterisk);
-        return;
-    }
-    //more syntactic sugar: handle beginning of filtername
-    else if (startsWith(filterFormatted, asteriskSep)) // *\abc
-    {
-        addFilterEntry(filterFormatted.c_str() + 2, fileFilter, directoryFilter); //recursion is finite
-    }
-    //--------------------------------------------------------------------------------------------------
-    //even more syntactic sugar: handle end of filtername
-    if (endsWith(filterFormatted, FILE_NAME_SEPARATOR))
-    {
-        const Zstring candidate = beforeLast(filterFormatted, FILE_NAME_SEPARATOR);
-        if (!candidate.empty())
-            directoryFilter.push_back(candidate); //only relevant for directory filtering
-    }
-    else if (endsWith(filterFormatted, sepAsterisk)) // abc\*
-    {
-        fileFilter     .push_back(filterFormatted);
-        directoryFilter.push_back(filterFormatted);
-
-        const Zstring candidate = beforeLast(filterFormatted, FILE_NAME_SEPARATOR);
-        if (!candidate.empty())
-            directoryFilter.push_back(candidate); //only relevant for directory filtering
-    }
-    else if (!filterFormatted.empty())
-    {
-        fileFilter.     push_back(filterFormatted);
-        directoryFilter.push_back(filterFormatted);
+        processTail(filterFormatted);
+        if (startsWith(filterFormatted, asteriskSep)) // *\abc
+            processTail(afterFirst(filterFormatted, asteriskSep));
     }
 }
 

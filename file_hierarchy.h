@@ -173,8 +173,8 @@ public:
                          const FileDescriptor& right);
 
     template <SelectedSide side>
-    FilePair& addSubFile(const Zstring&          shortNameRight, //file exists on one side only
-                         const FileDescriptor&   right);
+    FilePair& addSubFile(const Zstring&          shortName, //file exists on one side only
+                         const FileDescriptor&   descr);
 
     SymlinkPair& addSubLink(const Zstring&        shortNameLeft,
                             const LinkDescriptor& left,  //link exists on both sides
@@ -833,9 +833,12 @@ void FileSystemObject::flip()
 inline
 void HierarchyObject::flip()
 {
-    std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FilePair   ::flip));
-    std::for_each(refSubDirs ().begin(), refSubDirs ().end(), std::mem_fun_ref(&DirPair    ::flip));
-    std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&SymlinkPair::flip));
+    for (FilePair& fileObj : refSubFiles())
+        fileObj.flip();
+    for (SymlinkPair& linkObj : refSubLinks())
+        linkObj.flip();
+    for (DirPair& dirObj : refSubDirs())
+        dirObj.flip();
 }
 
 
@@ -942,18 +945,24 @@ void DirPair::flip()
 inline
 void DirPair::removeObjectL()
 {
-    std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
-    std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
-    std::for_each(refSubDirs(). begin(), refSubDirs() .end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
+    for (FilePair& fileObj : refSubFiles())
+        fileObj.removeObject<LEFT_SIDE>();
+    for (SymlinkPair& linkObj : refSubLinks())
+        linkObj.removeObject<LEFT_SIDE>();
+    for (DirPair& dirObj : refSubDirs())
+        dirObj.removeObject<LEFT_SIDE>();
 }
 
 
 inline
 void DirPair::removeObjectR()
 {
-    std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
-    std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
-    std::for_each(refSubDirs(). begin(), refSubDirs(). end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
+    for (FilePair& fileObj : refSubFiles())
+        fileObj.removeObject<RIGHT_SIDE>();
+    for (SymlinkPair& linkObj : refSubLinks())
+        linkObj.removeObject<RIGHT_SIDE>();
+    for (DirPair& dirObj : refSubDirs())
+        dirObj.removeObject<RIGHT_SIDE>();
 }
 
 

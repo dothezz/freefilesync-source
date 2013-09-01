@@ -368,30 +368,24 @@ DirCallback::HandleLink DirCallback::onSymlink(const Zchar* shortName, const Zst
 {
     boost::this_thread::interruption_point();
 
+    //update status information no matter whether object is excluded or not!
+    cfg.acb_.reportCurrentFile(fullName, cfg.threadID_);
+
     switch (cfg.handleSymlinks_)
     {
-        case SYMLINK_IGNORE:
+        case SYMLINK_EXCLUDE:
             return LINK_SKIP;
 
         case SYMLINK_USE_DIRECTLY:
-        {
-            //update status information no matter whether object is excluded or not!
-            cfg.acb_.reportCurrentFile(fullName, cfg.threadID_);
-
-            //------------------------------------------------------------------------------------
-            const Zstring& relName = relNameParentPf_ + shortName;
-
-            //apply filter before processing (use relative name!)
-            if (cfg.filterInstance->passFileFilter(relName)) //always use file filter: Link type may not be "stable" on Linux!
+            if (cfg.filterInstance->passFileFilter(relNameParentPf_ + shortName)) //always use file filter: Link type may not be "stable" on Linux!
             {
                 output_.addSubLink(shortName, LinkDescriptor(details.lastWriteTime));
                 cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
             }
-        }
-        return LINK_SKIP;
+            return LINK_SKIP;
 
         case SYMLINK_FOLLOW_LINK:
-            return LINK_FOLLOW;
+            return cfg.filterInstance->passFileFilter(relNameParentPf_ + shortName) ? LINK_FOLLOW : LINK_SKIP; //filter broken symlinks before trying to follow them!
     }
 
     assert(false);
@@ -546,32 +540,28 @@ void zen::fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
 
     zen::ScopeGuard guardWorker = zen::makeGuard([&]
     {
-        std::for_each(worker.begin(), worker.end(), [](boost::thread& wt) { wt.interrupt(); }); //interrupt all at once first, then join
-        std::for_each(worker.begin(), worker.end(), [](boost::thread& wt)
-        {
+        for (boost::thread& wt : worker)
+            wt.interrupt(); //interrupt all at once first, then join
+        for (boost::thread& wt : worker)
             if (wt.joinable()) //= precondition of thread::join(), which throws an exception if violated!
                 wt.join();     //in this context it is possible a thread is *not* joinable anymore due to the thread::timed_join() below!
-        });
     });
 
     auto acb = std::make_shared<AsyncCallback>();
 
     //init worker threads
-    std::for_each(keysToRead.begin(), keysToRead.end(),
-                  [&](const DirectoryKey& key)
+    for (const DirectoryKey& key : keysToRead)
     {
         assert(buf.find(key) == buf.end());
         DirectoryValue& dirOutput = buf[key];
 
         const long threadId = static_cast<long>(worker.size());
         worker.emplace_back(WorkerThread(threadId, acb, key, dirOutput));
-    });
+    }
 
     //wait until done
-    for (auto it = worker.begin(); it != worker.end(); ++it)
+    for (boost::thread& wt : worker)
     {
-        boost::thread& wt = *it;
-
         do
         {
             //update status

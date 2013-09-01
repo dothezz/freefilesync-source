@@ -25,7 +25,7 @@ std::wstring getVariantName(CompareVariant var);
 
 enum SymLinkHandling
 {
-    SYMLINK_IGNORE,
+    SYMLINK_EXCLUDE,
     SYMLINK_USE_DIRECTLY,
     SYMLINK_FOLLOW_LINK
 };
@@ -98,7 +98,7 @@ enum SyncOperation
     SO_UNRESOLVED_CONFLICT
 };
 
-std::wstring getSymbol     (SyncOperation op); //method used for exporting .csv file only!
+std::wstring getSymbol(SyncOperation op); //method used for exporting .csv file only!
 
 
 struct DirectionSet
@@ -119,7 +119,7 @@ struct DirectionSet
     SyncDirection conflict;
 };
 
-DirectionSet getTwoWaySet();
+DirectionSet getTwoWayUpdateSet();
 
 inline
 bool operator==(const DirectionSet& lhs, const DirectionSet& rhs)
@@ -136,39 +136,49 @@ struct DirectionConfig //technical representation of sync-config
 {
     enum Variant
     {
-        AUTOMATIC, //use sync-database to determine directions
+        TWOWAY, //use sync-database to determine directions
         MIRROR,    //predefined
         UPDATE,    //
         CUSTOM     //use custom directions
     };
 
-    DirectionConfig() : var(AUTOMATIC) {}
+    DirectionConfig() : var(TWOWAY), detectMovedFiles(false) {}
 
     Variant var;
-
-    //custom sync directions
-    DirectionSet custom;
+    DirectionSet custom; //custom sync directions
+    bool detectMovedFiles; //dependent from Variant: e.g. always active for DirectionConfig::TWOWAY! => use functions below for evaluation!
 };
 
 inline
 bool operator==(const DirectionConfig& lhs, const DirectionConfig& rhs)
 {
-    return lhs.var == rhs.var &&
-           (lhs.var != DirectionConfig::CUSTOM ||  lhs.custom == rhs.custom); //directions are only relevant if variant "custom" is active
+    return lhs.var              == rhs.var &&
+           lhs.custom           == rhs.custom &&
+           lhs.detectMovedFiles == rhs.detectMovedFiles;
+    //adapt effectivelyEqual() on changes, too!
 }
 
-//get sync directions: DON'T call for variant AUTOMATIC!
-DirectionSet extractDirections(const DirectionConfig& cfg);
+bool detectMovedFilesSelectable(const DirectionConfig& cfg);
+bool detectMovedFilesEnabled   (const DirectionConfig& cfg);
+
+DirectionSet extractDirections(const DirectionConfig& cfg); //get sync directions: DON'T call for DirectionConfig::TWOWAY!
 
 std::wstring getVariantName(DirectionConfig::Variant var);
 
+inline
+bool effectivelyEqual(const DirectionConfig& lhs, const DirectionConfig& rhs)
+{
+    return (lhs.var == DirectionConfig::TWOWAY) == (rhs.var == DirectionConfig::TWOWAY) && //either both two-way or none
+           (lhs.var == DirectionConfig::TWOWAY || extractDirections(lhs) == extractDirections(rhs)) &&
+           detectMovedFilesEnabled(lhs) == detectMovedFilesEnabled(rhs);
+}
 
 
 struct CompConfig
 {
     CompConfig() :
         compareVar(CMP_BY_TIME_SIZE),
-        handleSymlinks(SYMLINK_IGNORE) {}
+        handleSymlinks(SYMLINK_EXCLUDE) {}
 
     CompareVariant compareVar;
     SymLinkHandling handleSymlinks;
@@ -180,6 +190,9 @@ bool operator==(const CompConfig& lhs, const CompConfig& rhs)
     return lhs.compareVar     == rhs.compareVar &&
            lhs.handleSymlinks == rhs.handleSymlinks;
 }
+
+inline
+bool effectivelyEqual(const CompConfig& lhs, const CompConfig& rhs) { return lhs == rhs; } //no change in behavior
 
 
 enum DeletionPolicy
@@ -211,10 +224,22 @@ struct SyncConfig
     //int versionCountLimit; //max versions per file (DELETE_TO_VERSIONING); < 0 := no limit
 };
 
+
 inline
 bool operator==(const SyncConfig& lhs, const SyncConfig& rhs)
 {
-    return lhs.directionCfg   == rhs.directionCfg   &&
+    return lhs.directionCfg        == rhs.directionCfg   &&
+           lhs.handleDeletion      == rhs.handleDeletion &&
+           lhs.versioningStyle     == rhs.versioningStyle &&
+           lhs.versioningDirectory == rhs.versioningDirectory;
+    //adapt effectivelyEqual() on changes, too!
+}
+
+
+inline
+bool effectivelyEqual(const SyncConfig& lhs, const SyncConfig& rhs)
+{
+    return effectivelyEqual(lhs.directionCfg, rhs.directionCfg) &&
            lhs.handleDeletion == rhs.handleDeletion &&
            (lhs.handleDeletion != DELETE_TO_VERSIONING || //only compare deletion directory if required!
             (lhs.versioningStyle   == rhs.versioningStyle &&
@@ -372,6 +397,7 @@ bool operator==(const MainConfiguration& lhs, const MainConfiguration& rhs)
            lhs.additionalPairs  == rhs.additionalPairs &&
            lhs.onCompletion     == rhs.onCompletion;
 }
+
 
 //facilitate drag & drop config merge:
 MainConfiguration merge(const std::vector<MainConfiguration>& mainCfgs);

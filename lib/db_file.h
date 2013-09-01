@@ -14,12 +14,6 @@ namespace zen
 {
 const Zstring SYNC_DB_FILE_ENDING = Zstr(".ffs_db");
 
-enum InSyncType
-{
-    IN_SYNC_BINARY_EQUAL,     //checked file content
-    IN_SYNC_ATTRIBUTES_EQUAL, //only "looks" like they're equal
-};
-
 struct InSyncDescrFile //subset of FileDescriptor
 {
     InSyncDescrFile(const Int64& lastWriteTimeRawIn,
@@ -41,19 +35,19 @@ struct InSyncDescrLink
 //artificial hierarchy of last synchronous state:
 struct InSyncFile
 {
-    InSyncFile(const InSyncDescrFile& l, const InSyncDescrFile& r, InSyncType type, const UInt64& fileSizeIn) : left(l), right(r), inSyncType(type), fileSize(fileSizeIn) {}
+    InSyncFile(const InSyncDescrFile& l, const InSyncDescrFile& r, CompareVariant cv, const UInt64& fileSizeIn) : left(l), right(r), cmpVar(cv), fileSize(fileSizeIn) {}
     InSyncDescrFile left;
     InSyncDescrFile right;
-    InSyncType inSyncType;
+    CompareVariant cmpVar; //the one active while finding "file in sync"
     UInt64 fileSize; //file size must be identical on both sides!
 };
 
 struct InSyncSymlink
 {
-    InSyncSymlink(const InSyncDescrLink& l, const InSyncDescrLink& r, InSyncType type) : left(l), right(r), inSyncType(type) {}
+    InSyncSymlink(const InSyncDescrLink& l, const InSyncDescrLink& r, CompareVariant cv) : left(l), right(r), cmpVar(cv) {}
     InSyncDescrLink left;
     InSyncDescrLink right;
-    InSyncType inSyncType;
+    CompareVariant cmpVar;
 };
 
 struct InSyncDir
@@ -86,14 +80,14 @@ struct InSyncDir
         return dirs.insert(std::make_pair(shortName, InSyncDir(st))).first->second;
     }
 
-    void addFile(const Zstring& shortName, const InSyncDescrFile& dataL, const InSyncDescrFile& dataR, InSyncType type, const UInt64& fileSize)
+    void addFile(const Zstring& shortName, const InSyncDescrFile& dataL, const InSyncDescrFile& dataR, CompareVariant cmpVar, const UInt64& fileSize)
     {
-        files.insert(std::make_pair(shortName, InSyncFile(dataL, dataR, type, fileSize)));
+        files.insert(std::make_pair(shortName, InSyncFile(dataL, dataR, cmpVar, fileSize)));
     }
 
-    void addSymlink(const Zstring& shortName, const InSyncDescrLink& dataL, const InSyncDescrLink& dataR, InSyncType type)
+    void addSymlink(const Zstring& shortName, const InSyncDescrLink& dataL, const InSyncDescrLink& dataR, CompareVariant cmpVar)
     {
-        symlinks.insert(std::make_pair(shortName, InSyncSymlink(dataL, dataR, type)));
+        symlinks.insert(std::make_pair(shortName, InSyncSymlink(dataL, dataR, cmpVar)));
     }
 };
 

@@ -16,7 +16,7 @@
 using namespace zen;
 
 
-//todo: support zoom via mouse wheel
+//todo: support zoom via mouse wheel?
 
 const wxEventType zen::wxEVT_GRAPH_SELECTION = wxNewEventType();
 
@@ -218,40 +218,38 @@ void drawCornerText(wxDC& dc, const wxRect& graphArea, const wxString& txt, Grap
 }
 
 
-warn_static("review")
-
+//calculate intersection of polygon with half-plane
 template <class Function, class Function2>
 void cutPoints(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, Function isInside, Function2 getIntersection)
 {
     assert(curvePoints.size() == oobMarker.size());
     if (curvePoints.size() != oobMarker.size() || curvePoints.empty()) return;
-    auto isMarkedOob = [&](size_t index) { return oobMarker[index] != 0; };
+    auto isMarkedOob = [&](size_t index) { return oobMarker[index] != 0; }; //test if point is start of a OOB line
 
     std::vector<CurvePoint> curvePointsTmp;
-    std::vector<char> oobMarkerTmp;
-    auto savePoint = [&](const CurvePoint& pt, bool markedOob) { curvePointsTmp.push_back(pt); oobMarkerTmp.push_back(markedOob);  };
+    std::vector<char>       oobMarkerTmp;
+    curvePointsTmp.reserve(curvePoints.size()); //allocating memory for these containers is one
+    oobMarkerTmp  .reserve(oobMarker  .size()); //of the more expensive operations of Graph2D!
 
-	warn_static("perf: avoid these push_backs")
+    auto savePoint = [&](const CurvePoint& pt, bool markedOob) { curvePointsTmp.push_back(pt); oobMarkerTmp.push_back(markedOob); };
 
-    bool lastPointInside = isInside(curvePoints[0]);
-    if (lastPointInside)
+    bool pointInside = isInside(curvePoints[0]);
+    if (pointInside)
         savePoint(curvePoints[0], isMarkedOob(0));
 
-    for (auto it = curvePoints.begin() + 1; it != curvePoints.end(); ++it)
+    for (size_t index = 1; index < curvePoints.size(); ++index)
     {
-        const size_t index = it - curvePoints.begin();
-
-        const bool pointInside = isInside(*it);
-        if (pointInside != lastPointInside)
+        if (isInside(curvePoints[index]) != pointInside)
         {
-            lastPointInside = pointInside;
-
-            const CurvePoint is = getIntersection(*(it - 1), *it); //getIntersection returns *it when delta is zero
+            pointInside = !pointInside;
+            const CurvePoint is = getIntersection(curvePoints[index - 1],
+                                                  curvePoints[index]); //getIntersection returns *it when delta is zero
             savePoint(is, !pointInside || isMarkedOob(index - 1));
         }
         if (pointInside)
-            savePoint(*it, isMarkedOob(index));
+            savePoint(curvePoints[index], isMarkedOob(index));
     }
+
     curvePointsTmp.swap(curvePoints);
     oobMarkerTmp  .swap(oobMarker);
 }
@@ -264,7 +262,7 @@ struct GetIntersectionX
     {
         const double deltaX = to.x - from.x;
         const double deltaY = to.y - from.y;
-        return !numeric::isNull(deltaX) ? CurvePoint(x_, from.y + (x_ - from.x) / deltaX * deltaY) : to;
+        return numeric::isNull(deltaX) ? to : CurvePoint(x_, from.y + (x_ - from.x) / deltaX * deltaY);
     };
 private:
     double x_;
@@ -277,7 +275,7 @@ struct GetIntersectionY
     {
         const double deltaX = to.x - from.x;
         const double deltaY = to.y - from.y;
-        return !numeric::isNull(deltaY) ? CurvePoint(from.x + (y_ - from.y) / deltaY * deltaX, y_) : to;
+        return numeric::isNull(deltaY) ? to : CurvePoint(from.x + (y_ - from.y) / deltaY * deltaX, y_);
     };
 private:
     double y_;
@@ -285,6 +283,7 @@ private:
 
 void cutPointsOutsideX(std::vector<CurvePoint>& curvePoints, std::vector<char>& oobMarker, double minX, double maxX)
 {
+    assert(std::find(oobMarker.begin(), oobMarker.end(), true) == oobMarker.end());
     cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.x >= minX; }, GetIntersectionX(minX));
     cutPoints(curvePoints, oobMarker, [&](const CurvePoint& pt) { return pt.x <= maxX; }, GetIntersectionX(maxX));
 }
@@ -297,27 +296,28 @@ void cutPointsOutsideY(std::vector<CurvePoint>& curvePoints, std::vector<char>& 
 }
 
 
-warn_static("review")
 void ContinuousCurveData::getPoints(double minX, double maxX, int pixelWidth, std::vector<CurvePoint>& points) const
 {
     if (pixelWidth <= 1) return;
     const ConvertCoord cvrtX(minX, maxX, pixelWidth - 1); //map [minX, maxX] to [0, pixelWidth - 1]
 
-    std::pair<double, double> rangeX = getRangeX();
-    //catch large double values: if double is larger than what int can represent => undefined behavior!
-    const double xOutOfBoundsLow  = cvrtX.screenToReal(-1);
-    const double xOutOfBoundsHigh = cvrtX.screenToReal(pixelWidth);
-    numeric::confine(rangeX.first , xOutOfBoundsLow, xOutOfBoundsHigh); //don't confine to [minX, maxX] which
-    numeric::confine(rangeX.second, xOutOfBoundsLow, xOutOfBoundsHigh); //would prevent empty ranges
+    const std::pair<double, double> rangeX = getRangeX();
 
-    const int posFrom = std::ceil (cvrtX.realToScreen(std::max(rangeX.first,  minX))); //do not step outside [minX, maxX]
-    const int posTo   = std::floor(cvrtX.realToScreen(std::min(rangeX.second, maxX))); //
-    //conversion from std::floor/std::ceil double return value to int is loss-free for full value range of 32-bit int! tested successfully on MSVC
-
-    for (int i = posFrom; i <= posTo; ++i)
+    const double screenLow  = cvrtX.realToScreen(std::max(rangeX.first,  minX)); //=> xLow >= 0
+    const double screenHigh = cvrtX.realToScreen(std::min(rangeX.second, maxX)); //=> xHigh <= pixelWidth - 1
+    //if double is larger than what int can represent => undefined behavior!
+    //=> convert to int not before checking value range!
+    if (screenLow <= screenHigh)
     {
-        const double x = cvrtX.screenToReal(i);
-        points.push_back(CurvePoint(x, getValue(x)));
+        const int posFrom = std::ceil (screenLow ); //do not step outside [minX, maxX] in loop below!
+        const int posTo   = std::floor(screenHigh); //
+        //conversion from std::floor/std::ceil double return value to int is loss-free for full value range of 32-bit int! tested successfully on MSVC
+
+        for (int i = posFrom; i <= posTo; ++i)
+        {
+            const double x = cvrtX.screenToReal(i);
+            points.push_back(CurvePoint(x, getValue(x)));
+        }
     }
 }
 
@@ -330,10 +330,15 @@ void SparseCurveData::getPoints(double minX, double maxX, int pixelWidth, std::v
 
     auto addPoint = [&](const CurvePoint& pt)
     {
-        warn_static("verify steps")
-        if (addSteps_ && !points.empty())
-            if (pt.y != points.back().y)
-                points.push_back(CurvePoint(pt.x, points.back().y));
+        if (!points.empty())
+        {
+            if (pt.x <= points.back().x) //allow ascending x-positions only! algorithm below may cause double-insertion after empty x-ranges!
+                return;
+
+            if (addSteps_)
+                if (pt.y != points.back().y)
+                    points.push_back(CurvePoint(pt.x, points.back().y));
+        }
         points.push_back(pt);
     };
 
@@ -345,13 +350,37 @@ void SparseCurveData::getPoints(double minX, double maxX, int pixelWidth, std::v
         const double x = cvrtX.screenToReal(i);
         Opt<CurvePoint> ptLe = getLessEq(x);
         Opt<CurvePoint> ptGe = getGreaterEq(x);
-        //both non-existent and invalid return values are mapped to out of expected range: => check on posLe/posGe NOT ptLe/ptGE in the following!
+        //both non-existent and invalid return values are mapped to out of expected range: => check on posLe/posGe NOT ptLe/ptGe in the following!
         const int posLe = ptLe ? cvrtX.realToScreenRound(ptLe->x) : i + 1;
         const int posGe = ptGe ? cvrtX.realToScreenRound(ptGe->x) : i - 1;
         assert(!ptLe || posLe <= i); //check for invalid return values
         assert(!ptGe || posGe >= i); //
+        /*
+        Breakdown of all combinations of posLe, posGe and expected action (n >= 1)
+        Note: For every empty x-range of at least one pixel, both next and previous points must be saved to keep the interpolating line stable!!!
 
-        if (posGe == i) //test if point would be mapped to pixel x-position i
+          posLe | posGe | action
+        +-------+-------+--------
+        | none  | none  | break
+        |   i   | none  | save ptLe; break
+        | i - n | none  | break;
+        +-------+-------+--------
+        | none  |   i   | save ptGe; continue
+        |   i   |   i   | save one of ptLe, ptGe; continue
+        | i - n |   i   | save ptGe; continue
+        +-------+-------+--------
+        | none  | i + n | save ptGe; jump to position posGe + 1
+        |   i   | i + n | save ptLe; if n == 1: continue; else: save ptGe; jump to position posGe + 1
+        | i - n | i + n | save ptLe, ptGe; jump to position posGe + 1
+        +-------+-------+--------
+        */
+        if (posGe < i)
+        {
+            if (posLe == i)
+                addPoint(*ptLe);
+            break;
+        }
+        else if (posGe == i) //test if point would be mapped to pixel x-position i
         {
             if (posLe == i) //
                 addPoint(x - ptLe->x < ptGe->x - x ? *ptLe : *ptGe);
@@ -360,32 +389,14 @@ void SparseCurveData::getPoints(double minX, double maxX, int pixelWidth, std::v
         }
         else
         {
-            if (posLe == i)
+            if (posLe <= i)
                 addPoint(*ptLe);
-            else //no point for x-position i
+
+            if (posLe != i || posGe > i + 1)
             {
-                if (i == posFrom && posGe > i)
-                {
-                    if (posLe < i)
-                        addPoint(*ptLe); //use first point outside display area!
-                    else if (posGe > posTo) //curve starts outside the draw range!
-                        break;
-                }
-            }
-
-            if (posGe < i)
-                break;
-
-            if (posGe > posTo) //last point outside the display area!
-            {
-                if (i == posTo && posLe == i) //no need for outside point if last position was already set above
-                    break;
-
                 addPoint(*ptGe);
-                break;
+                i = posGe; //skip sparse area: +1 will be added by for-loop!
             }
-            if (posGe > i) //skip sparse area
-                i = posGe - 1;
         }
     }
 }
@@ -397,7 +408,7 @@ Graph2D::Graph2D(wxWindow* parent,
                  const wxSize& size,
                  long style,
                  const wxString& name) : wxPanel(parent, winid, pos, size, style, name),
-				 labelFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial")
+    labelFont(wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, L"Arial")
 {
     Connect(wxEVT_PAINT, wxPaintEventHandler(Graph2D::onPaintEvent), nullptr, this);
     Connect(wxEVT_SIZE,  wxSizeEventHandler (Graph2D::onSizeEvent ), nullptr, this);
@@ -405,11 +416,8 @@ Graph2D::Graph2D(wxWindow* parent,
     Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(Graph2D::onEraseBackGround), nullptr, this);
 
     //SetDoubleBuffered(true); slow as hell!
-#if wxCHECK_VERSION(2, 9, 1)
+
     SetBackgroundStyle(wxBG_STYLE_PAINT);
-#else
-    SetBackgroundStyle(wxBG_STYLE_CUSTOM);
-#endif
 
     Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(Graph2D::OnMouseLeftDown), nullptr, this);
     Connect(wxEVT_MOTION,    wxMouseEventHandler(Graph2D::OnMouseMovement), nullptr, this);
@@ -493,7 +501,7 @@ void Graph2D::render(wxDC& dc) const
 {
     using namespace numeric;
 
-    //set label font right at the start so that it is considered by wxDC::GetTextExtent below!
+    //set label font right at the start so that it is considered by wxDC::GetTextExtent() below!
     dc.SetFont(labelFont);
 
     const wxRect clientRect = GetClientRect(); //DON'T use wxDC::GetSize()! DC may be larger than visible area!
@@ -590,18 +598,17 @@ void Graph2D::render(wxDC& dc) const
         double maxY = attr.maxYauto ? -std::numeric_limits<double>::infinity() : attr.maxY; //
 
         std::vector<std::vector<CurvePoint>> curvePoints(curves_.size());
-        std::vector<std::vector<char>>       oobMarker  (curves_.size()); //effectively a std::vector<bool> marking points that start a out of bounds line
+        std::vector<std::vector<char>>       oobMarker  (curves_.size()); //effectively a std::vector<bool> marking points that start an out-of-bounds line
 
-        for (auto it = curves_.begin(); it != curves_.end(); ++it)
-            if (const CurveData* curve = it->first.get())
+        for (size_t index = 0; index < curves_.size(); ++index)
+            if (const CurveData* curve = curves_[index].first.get())
             {
-                const size_t index = it - curves_.begin();
                 std::vector<CurvePoint>& points = curvePoints[index];
-                auto&                    marker = oobMarker[index];
+                auto&                    marker = oobMarker  [index];
 
                 curve->getPoints(minX, maxX, graphArea.width, points);
 
-                //cut points outside visible x-range now in order to calculate height of visible points only!
+                //cut points outside visible x-range now in order to calculate height of visible line fragments only!
                 marker.resize(points.size()); //default value: false
                 cutPointsOutsideX(points, marker, minX, maxX);
 
@@ -637,18 +644,17 @@ void Graph2D::render(wxDC& dc) const
             {
                 //cut points outside visible y-range before calculating pixels:
                 //1. realToScreenRound() deforms out-of-range values!
-                //2. pixels that are grossly out of range may become a severe performance problem when drawing on the DC (Windows)
+                //2. pixels that are grossly out of range can be a severe performance problem when drawing on the DC (Windows)
                 cutPointsOutsideY(curvePoints[index], oobMarker[index], minY, maxY);
 
                 auto& points = drawPoints[index];
-                for (const auto& pt : curvePoints[index])
+                for (const CurvePoint& pt : curvePoints[index])
                     points.push_back(wxPoint(cvrtX.realToScreenRound(pt.x),
                                              cvrtY.realToScreenRound(pt.y)) + graphAreaOrigin);
             }
 
             //update active mouse selection
-            if (activeSel.get() &&
-                graphArea.width > 0 && graphArea.height > 0)
+            if (activeSel.get() && graphArea.width > 0 && graphArea.height > 0)
             {
                 auto widen = [](double* low, double* high)
                 {
@@ -766,30 +772,29 @@ void Graph2D::render(wxDC& dc) const
                     std::vector<wxPoint>& points = drawPoints[index]; //alas wxDC::DrawLines() is not const-correct!!!
                     auto&                 marker = oobMarker [index];
                     assert(points.size() == marker.size());
-                    warn_static("review")
 
-                    //draw all parts of the curve except for the out-of-bounds ranges
-                    size_t pointsIndexFirst = 0;
-                    while (pointsIndexFirst < points.size())
+                    //draw all parts of the curve except for the out-of-bounds fragments
+                    size_t drawIndexFirst = 0;
+                    while (drawIndexFirst < points.size())
                     {
-                        size_t pointsIndexLast = std::find(marker.begin() + pointsIndexFirst, marker.end(), true) - marker.begin();
-                        if (pointsIndexLast < points.size()) ++ pointsIndexLast;
+                        size_t drawIndexLast = std::find(marker.begin() + drawIndexFirst, marker.end(), true) - marker.begin();
+                        if (drawIndexLast < points.size()) ++ drawIndexLast;
 
-                        const int pointCount = static_cast<int>(pointsIndexLast - pointsIndexFirst);
+                        const int pointCount = static_cast<int>(drawIndexLast - drawIndexFirst);
                         if (pointCount > 0)
                         {
                             if (pointCount >= 2) //on OS X wxWidgets has a nasty assert on this
-                                dc.DrawLines(pointCount, &points[pointsIndexFirst]);
-                            dc.DrawPoint(points[pointsIndexLast - 1]); //wxDC::DrawLines() doesn't draw last pixel
+                                dc.DrawLines(pointCount, &points[drawIndexFirst]);
+                            dc.DrawPoint(points[drawIndexLast - 1]); //wxDC::DrawLines() doesn't draw last pixel
                         }
-                        pointsIndexFirst = std::find(marker.begin() + pointsIndexLast, marker.end(), false) - marker.begin();
+                        drawIndexFirst = std::find(marker.begin() + drawIndexLast, marker.end(), false) - marker.begin();
                     }
                 }
             }
 
             //5. draw corner texts
-            for (auto it = attr.cornerTexts.begin(); it != attr.cornerTexts.end(); ++it)
-                drawCornerText(dc, graphArea, it->second, it->first);
+            for (const auto& ct : attr.cornerTexts)
+                drawCornerText(dc, graphArea, ct.second, ct.first);
         }
     }
 }

@@ -7,6 +7,178 @@
 	<plural_definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<11 || n%100>14) ? 1 : 2</plural_definition>
 </header>
 
+<source>Unable to move %x to the recycle bin.</source>
+<target></target>
+
+<source>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Log</source>
+<target></target>
+
+<source>&Continue</source>
+<target></target>
+
+<source>&Don't show this warning again</source>
+<target></target>
+
+<source>&Ignore subsequent errors</source>
+<target></target>
+
+<source>Comma-separated values</source>
+<target></target>
+
+<source>Never save &changes</source>
+<target></target>
+
+<source>Include via filter:</source>
+<target></target>
+
+<source>&Execute</source>
+<target></target>
+
+<source>Confirm</source>
+<target></target>
+
+<source>
+<pluralform>Do you really want to execute the command %y for 1 item?</pluralform>
+<pluralform>Do you really want to execute the command %y for %x items?</pluralform>
+</source>
+<target>
+</target>
+
+<source>Transfer file and folder permissions (requires administrator rights)</source>
+<target></target>
+
+<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
+<target></target>
+
+<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
+<target></target>
+
+<source>
+Files will only be synchronized if they pass all filter rules.
+Note: File paths must be relative to base directories.
+</source>
+<target></target>
+
+<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target></target>
+
+<source>Move files to a user-defined folder</source>
+<target></target>
+
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target></target>
+
+<source>Recycle bin</source>
+<target></target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target></target>
+
+<source>Detect moved files</source>
+<target></target>
+
+<source>&Don't show this dialog again</source>
+<target></target>
+
+<source>Minimize to notification area</source>
+<target></target>
+
+<source>Retrying operation after error:</source>
+<target></target>
+
+<source>job name</source>
+<target></target>
+
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target></target>
+
+<source>The following folders are significantly different. Make sure you are matching the correct folders for synchronization.</source>
+<target></target>
+
+<source>&Show error</source>
+<target></target>
+
+<source>Waiting until all directories are available...</source>
+<target></target>
+
+<source>Directory monitoring active</source>
+<target></target>
+
+<source>Volume name %x is not part of file path %y.</source>
+<target></target>
+
+<source>Cannot access the Volume Shadow Copy Service.</source>
+<target></target>
+
+<source>%x items</source>
+<target></target>
+
+<source>
+<pluralform>1 thread</pluralform>
+<pluralform>%x threads</pluralform>
+</source>
+<target>
+</target>
+
+<source>
+<pluralform>1 byte</pluralform>
+<pluralform>%x bytes</pluralform>
+</source>
+<target>
+</target>
+
+<source>Any number of alternative directories for at most one config file.</source>
+<target></target>
+
+<source>Any number of FreeFileSync .ffs_gui and/or .ffs_batch configuration files.</source>
+<target></target>
+
+<source>directory</source>
+<target></target>
+
+<source>config files</source>
+<target></target>
+
+<source>Syntax:</source>
+<target></target>
+
+<source>Directories cannot be set for more than one configuration file.</source>
+<target></target>
+
+<source>The config file must not contain settings at directory pair level when directories are set via command line.</source>
+<target></target>
+
+<source>Unequal number of left and right directories specified.</source>
+<target></target>
+
+<source>Cannot open file %x.</source>
+<target></target>
+
+<source>Syntax error</source>
+<target></target>
+
+<source>A directory path is expected after %x.</source>
+<target></target>
+
+<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<target></target>
+
+<source>Moving symbolic link %x to the recycle bin</source>
+<target></target>
+
+<source>Moving folder %x to the recycle bin</source>
+<target></target>
+
+<source>Moving file %x to the recycle bin</source>
+<target></target>
+
 <source>Both sides have changed since last synchronization.</source>
 <target>Со времени последней синхронизации с обеих сторон произошли изменения.</target>
 
@@ -28,15 +200,6 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Проверка доступности "Корзины" для папки %x...</target>
 
-<source>Moving file %x to recycle bin</source>
-<target>Перемещение файла %x в "Корзину"</target>
-
-<source>Moving folder %x to recycle bin</source>
-<target>Перемещение папки %x в "Корзину"</target>
-
-<source>Moving symbolic link %x to recycle bin</source>
-<target>Перемещение символьной ссылки %x в "Корзину"</target>
-
 <source>Deleting file %x</source>
 <target>Удаление файла %x</target>
 
@@ -46,20 +209,20 @@
 <source>Deleting symbolic link %x</source>
 <target>Удаление символьной ссылки %x</target>
 
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
-<target>Для этого пути "Корзина" недоступна! Файлы будут удалены безвозвратно:</target>
-
 <source>An exception occurred</source>
 <target>Исключение произошло</target>
-
-<source>Cannot find file %x.</source>
-<target>Невозможно найти файл %x.</target>
 
 <source>Error</source>
 <target>Ошибка</target>
 
 <source>File %x does not contain a valid configuration.</source>
 <target>Файл %x не содержит действительной конфигурации.</target>
+
+<source>Warning</source>
+<target>Внимание</target>
+
+<source>Command line</source>
+<target>Командная строка</target>
 
 <source>A folder input field is empty.</source>
 <target>Поле ввода папки пустое.</target>
@@ -218,16 +381,6 @@
 <source>Total time:</source>
 <target>Общее время:</target>
 
-<source>
-<pluralform>1 Byte</pluralform>
-<pluralform>%x Bytes</pluralform>
-</source>
-<target>
-<pluralform>%x Байт</pluralform>
-<pluralform>%x Байта</pluralform>
-<pluralform>%x Байт</pluralform>
-</target>
-
 <source>%x MB</source>
 <target>%x МБ</target>
 
@@ -245,16 +398,6 @@
 
 <source>Scanning:</source>
 <target>Сканирую:</target>
-
-<source>
-<pluralform>[1 Thread]</pluralform>
-<pluralform>[%x Threads]</pluralform>
-</source>
-<target>
-<pluralform>[%x поток]</pluralform>
-<pluralform>[%x потока]</pluralform>
-<pluralform>[%x потоков]</pluralform>
-</target>
 
 <source>Encoding extended time information: %x</source>
 <target>Кодирование расширенной информации о времени: %x</target>
@@ -274,9 +417,6 @@
 <source>Browse directory</source>
 <target>Обзор папок</target>
 
-<source>Cannot access Volume Shadow Copy Service.</source>
-<target>Невозможно получить доступ к службе Теневого Копирования Тома.</target>
-
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
 <target>Пожалуйста, используйте 64-разрядную версию FreeFileSync для создания теневых копий на этой системе.</target>
 
@@ -285,9 +425,6 @@
 
 <source>Cannot determine volume name for %x.</source>
 <target>Невозможно определить имя тома для %x.</target>
-
-<source>Volume name %x not part of file name %y.</source>
-<target>Имя тома %x не является частью имени файла %y.</target>
 
 <source>Abort requested: Waiting for current operation to finish...</source>
 <target>Запрос отмены: Ожидайте, пока текущая операция завершится...</target>
@@ -355,9 +492,6 @@
 <source>Idle time between last detected change and execution of command</source>
 <target>Время задержки между последним обнаруженным изменением и выполнением командной строки в секундах</target>
 
-<source>Command line</source>
-<target>Командная строка</target>
-
 <source>
 The command is triggered if:
 - files or subfolders change
@@ -381,9 +515,6 @@ The command is triggered if:
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Автоматическая синхронизация</target>
 
-<source>Warning</source>
-<target>Внимание</target>
-
 <source>Build: %x</source>
 <target>сборка %x</target>
 
@@ -399,9 +530,6 @@ The command is triggered if:
 <source>&Exit</source>
 <target>&Выход</target>
 
-<source>Waiting for missing directories...</source>
-<target>Ожидание пропущенных папок...</target>
-
 <source>Invalid command line:</source>
 <target>Неверная командная строка:</target>
 
@@ -411,14 +539,14 @@ The command is triggered if:
 <source>File time and size</source>
 <target>Дата и размер файла</target>
 
-<source> Two way </source>
-<target> В обе стороны </target>
+<source>Two way</source>
+<target>В обе стороны</target>
 
 <source>Mirror</source>
-<target>Зеркало </target>
+<target>Зеркало</target>
 
 <source>Update</source>
-<target>Обновить </target>
+<target>Обновить</target>
 
 <source>Custom</source>
 <target>Выборочно</target>
@@ -474,12 +602,6 @@ The command is triggered if:
 <source>The following items have unresolved conflicts and will not be synchronized:</source>
 <target>Следующие элементы имеют неурегулированные конфликты и не будут синхронизированы:</target>
 
-<source>Significant difference detected:</source>
-<target>Обнаружено существенное различие:</target>
-
-<source>More than 50% of the total number of files will be copied or deleted.</source>
-<target>Более 50% общего количества файлов будет скопировано или удалено.</target>
-
 <source>Not enough free disk space available in:</source>
 <target>Не достаточно свободного места в:</target>
 
@@ -497,9 +619,6 @@ The command is triggered if:
 
 <source>Generating database...</source>
 <target>Создание базы данных...</target>
-
-<source>Creating Volume Shadow Copy for %x...</source>
-<target>Создание Тома Теневого Копирования для %x...</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>Ошибка проверки данных: %x и %y имеют разное содержание!</target>
@@ -651,8 +770,8 @@ The command is triggered if:
 <source>&Export file list...</source>
 <target>&Экспортировать список файлов...</target>
 
-<source>&Global settings...</source>
-<target>&Глобальные настройки...</target>
+<source>&Global settings</source>
+<target>&Глобальные настройки</target>
 
 <source>&Tools</source>
 <target>&Опции</target>
@@ -732,6 +851,12 @@ The command is triggered if:
 <source>&Pause</source>
 <target>&Пауза</target>
 
+<source>Variant</source>
+<target>Вариант</target>
+
+<source>Statistics</source>
+<target>Статистика</target>
+
 <source>Select a variant</source>
 <target>Выберите вариант</target>
 
@@ -799,26 +924,14 @@ is the same
 <source>Delete or overwrite files permanently</source>
 <target>Удалить или перезаписать файлы, не помещая в "Корзину"</target>
 
-<source>Recycle Bin</source>
-<target>Переместить в "Корзину"</target>
-
-<source>Use Recycle Bin for deleted and overwritten files</source>
-<target>Использовать "Корзину" для удаленных и перезаписанных файлов</target>
-
 <source>Versioning</source>
 <target>Архивировать</target>
-
-<source>Move files to user-defined folder</source>
-<target>Переместить файлы в пользовательскую папку</target>
 
 <source>Naming convention:</source>
 <target>Условие переименования:</target>
 
 <source>Batch job</source>
 <target>Пакетное задание</target>
-
-<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Создайте файл пакетного задания для автоматической синхронизации. Для запуска дважды кликните на файле или создайте расписание в планировщике вашей системы: FreeFileSync.exe <название>.ffs_batch</target>
 
 <source>Exit</source>
 <target>Выход</target>
@@ -871,15 +984,6 @@ is the same
 <source>Delete on both sides even if the file is selected on one side only</source>
 <target>Удалить с обеих сторон, даже если файл выделен только на одной стороне</target>
 
-<source>
-Only files that match all filter settings will be synchronized.
-Note: File names must be relative to base directories.
-</source>
-<target>
-Только файлы, соответствующие всем настройкам фильтра, будут синхронизированы.
-Примечание: Файлы должны относиться к синхронизируемым папкам.
-</target>
-
 <source>Include</source>
 <target>Включить</target>
 
@@ -907,20 +1011,11 @@ Note: File names must be relative to base directories.
 <source>Fail-safe file copy</source>
 <target>Отказоустойчивое копирование файла</target>
 
-<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Сначала копировать во временные файлы (*.ffs_tmp), затем переименовывать их. Это гарантирует целостность заменяемых файлов в случае возникновения фатальной ошибки копирования.</target>
-
 <source>Copy locked files</source>
 <target>Копирование заблокированных файлов</target>
 
-<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Копирование общих или заблокированных файлов с использованием службы Теневого Копирования Тома (требуются права Администратора)</target>
-
 <source>Copy file access permissions</source>
 <target>Копирование прав доступа к файлам</target>
-
-<source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Передача прав доступа к файлам/папкам (требуются права Администратора)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Восстановить скрытые диалоговые окна?</target>
@@ -934,15 +1029,6 @@ Note: File names must be relative to base directories.
 <source>&Default</source>
 <target>&По умолчанию</target>
 
-<source>Variant</source>
-<target>Вариант</target>
-
-<source>Statistics</source>
-<target>Статистика</target>
-
-<source>Don't show this dialog again</source>
-<target>Больше не показывать это окно</target>
-
 <source>Find what:</source>
 <target>Найти:</target>
 
@@ -952,14 +1038,14 @@ Note: File names must be relative to base directories.
 <source>&Find next</source>
 <target>&Найти далее</target>
 
+<source>Start synchronization</source>
+<target>Начать синхронизацию</target>
+
 <source>Delete</source>
 <target>Удалить</target>
 
 <source>Configure filter</source>
 <target>Настройки фильтра</target>
-
-<source>Start synchronization</source>
-<target>Начать синхронизацию</target>
 
 <source>Find</source>
 <target>Найти</target>
@@ -1033,11 +1119,11 @@ Note: File names must be relative to base directories.
 <source>Include temporarily</source>
 <target>Временно включить</target>
 
-<source>Exclude via filter:</source>
-<target>Исключить через фильтр:</target>
-
 <source>multiple selection</source>
 <target>групповое выделение</target>
+
+<source>Exclude via filter:</source>
+<target>Исключить через фильтр:</target>
 
 <source>Include all</source>
 <target>Включить все</target>
@@ -1083,9 +1169,6 @@ Note: File names must be relative to base directories.
 
 <source>Do&n't save</source>
 <target>&Не сохранять</target>
-
-<source>Never save changes</source>
-<target>Никогда не сохранять изменения</target>
 
 <source>Show files that exist on left side only</source>
 <target>Показать файлы, существующие только слева</target>
@@ -1138,26 +1221,17 @@ Note: File names must be relative to base directories.
 <source>All folders are in sync</source>
 <target>Все папки синхронизированы</target>
 
-<source>Comma separated list</source>
-<target>Список, разделяемый запятыми</target>
-
 <source>File list exported</source>
 <target>Список файлов экспортирован</target>
 
 <source>Searching for program updates...</source>
 <target>Проверка обновлений программы...</target>
 
-<source>Ignore further errors</source>
-<target>Игнорировать последующие ошибки</target>
-
 <source>&Ignore</source>
 <target>&Игнорировать</target>
 
 <source>Fatal Error</source>
 <target>Критическая ошибка</target>
-
-<source>Don't show this warning again</source>
-<target>Больше не показывать это предупреждение</target>
 
 <source>&Switch</source>
 <target>&Переключить</target>
@@ -1192,15 +1266,6 @@ Note: File names must be relative to base directories.
 <source>Completed</source>
 <target>Завершено</target>
 
-<source>Continue</source>
-<target>Продолжить</target>
-
-<source>Pause</source>
-<target>Пауза</target>
-
-<source>Logging</source>
-<target>Лог-файлы</target>
-
 <source>Cannot find %x</source>
 <target>Невозможно найти %x</target>
 
@@ -1233,16 +1298,6 @@ Note: File names must be relative to base directories.
 
 <source>Filter</source>
 <target>Фильтр</target>
-
-<source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
-</source>
-<target>
-<pluralform>Вы точно хотите переместить следующий %x элемент в "Корзину"?</pluralform>
-<pluralform>Вы точно хотите переместить следующие %x элемента в "Корзину"?</pluralform>
-<pluralform>Вы точно хотите переместить следующие %x элементов в "Корзину"?</pluralform>
-</target>
 
 <source>
 <pluralform>Do you really want to delete the following item?</pluralform>
@@ -1298,9 +1353,6 @@ Note: File names must be relative to base directories.
 
 <source>Append a timestamp to each file name</source>
 <target>Добавить отметку времени для каждого имени файла</target>
-
-<source>Folder</source>
-<target>Папка</target>
 
 <source>File</source>
 <target>Файл</target>
@@ -1424,9 +1476,6 @@ Note: File names must be relative to base directories.
 
 <source>Cannot change process I/O priorities.</source>
 <target>Невозможно изменить приоритет процесса.</target>
-
-<source>Unable to move %x to the Recycle Bin.</source>
-<target>Невозможно переместить %x в "Корзину".</target>
 
 <source>Cannot determine final path for %x.</source>
 <target>Невозможно определить конечный путь для %x.</target>

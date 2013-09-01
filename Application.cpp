@@ -28,9 +28,6 @@
 
 #elif defined ZEN_LINUX
 #include <gtk/gtk.h>
-
-#elif defined ZEN_MAC
-#include <ApplicationServices/ApplicationServices.h>
 #endif
 
 using namespace zen;
@@ -135,18 +132,13 @@ bool Application::OnInit()
 #elif defined ZEN_LINUX
     ::gtk_init(nullptr, nullptr);
     ::gtk_rc_parse((getResourceDir() + "styles.gtk_rc").c_str()); //remove inner border from bitmap buttons
-
-#elif defined ZEN_MAC
-    ProcessSerialNumber psn = { 0, kCurrentProcess };
-    ::TransformProcessType(&psn, kProcessTransformToForegroundApplication); //behave like an application bundle, even when the app is not packaged (yet)
 #endif
 
-#if wxCHECK_VERSION(2, 9, 1)
 #ifdef ZEN_WIN
     wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping -> Windows only
 #endif
-    wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s is default for Windows: http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
-#endif
+    //Windows User Experience Interaction Guidelines: tool tips should have 5s timeout, info tips no timeout => compromise:
+    wxToolTip::SetAutoPop(7000); //http://msdn.microsoft.com/en-us/library/windows/desktop/aa511495.aspx
 
     SetAppName(L"FreeFileSync"); //if not set, the default is the executable's name!
 
@@ -180,12 +172,10 @@ void Application::onEnterEventLoop(wxEvent& event)
     launch(commandArgs);
 }
 
-warn_static("finish")
-
 #ifdef ZEN_MAC
 /*
-Initialization call sequences on OS X
--------------------------------------
+wxWidgets initialization sequence on OS X is a mess:
+----------------------------------------------------
 1. double click FFS app bundle or execute from command line without arguments
 	OnInit()
 	OnRun()
@@ -204,27 +194,9 @@ Initialization call sequences on OS X
 	MacOpenFiles() -> WTF!?
 	onEnterEventLoop()
 	MacNewFile()   -> yes, wxWidgets screws up once again: http://trac.wxwidgets.org/ticket/14558
+
+=> solution: map Apple events to regular command line via launcher
 */
-void Application::MacOpenFiles(const wxArrayString& filenames)
-{
-
-    //	long wxExecute(const wxString& command, int sync = wxEXEC_ASYNC, wxProcess *callback = NULL)
-
-    //  std::vector<wxString>(filenames.begin(), filenames.end())
-    //	startApplication(commandArgs);
-
-    //if (!fileNames.empty())
-    //	wxMessageBox(fileNames[0]);
-    wxApp::MacOpenFiles(filenames);
-}
-
-
-void Application::MacNewFile()
-{
-    wxApp::MacNewFile();
-}
-
-//virtual void wxApp::MacReopenApp 	( 		)
 #endif
 
 
@@ -286,6 +258,11 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     }
     catch (const FileError&) { assert(false); } //no messagebox: consider batch job!
 
+    auto notifyError = [&](const std::wstring& msg, const std::wstring& header)
+    {
+        wxMessageBox(msg.c_str(), L"FreeFileSync - " + header, wxOK | wxICON_ERROR);
+        raiseReturnCode(returnCode, FFS_RC_ABORTED);
+    };
 
     //parse command line arguments
     std::vector<Zstring> leftDirs;
@@ -311,7 +288,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             {
                 if (++it == commandArgs.end())
                 {
-                    wxMessageBox(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionLeftDir)), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+                    notifyError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionLeftDir)), _("Syntax error"));
                     return;
                 }
                 leftDirs.push_back(*it);
@@ -320,7 +297,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             {
                 if (++it == commandArgs.end())
                 {
-                    wxMessageBox(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionRightDir)), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+                    notifyError(replaceCpy(_("A directory path is expected after %x."), L"%x", utfCvrtTo<std::wstring>(optionRightDir)), _("Syntax error"));
                     return;
                 }
                 rightDirs.push_back(*it);
@@ -336,7 +313,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                         filename += Zstr(".ffs_gui");
                     else
                     {
-                        wxMessageBox(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+                        notifyError(replaceCpy(_("Cannot open file %x."), L"%x", fmtFileName(filename)), _("Error"));
                         return;
                     }
                 }
@@ -345,7 +322,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                 {
                     case XML_TYPE_GLOBAL:
                     case XML_TYPE_OTHER:
-                        wxMessageBox(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+                        notifyError(replaceCpy(_("File %x does not contain a valid configuration."), L"%x", fmtFileName(filename)), _("Error"));
                         return;
 
                     case XML_TYPE_GUI:
@@ -360,7 +337,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
 
     if (leftDirs.size() != rightDirs.size())
     {
-        wxMessageBox(_("Unequal number of left and right directories specified."), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+        notifyError(_("Unequal number of left and right directories specified."), _("Syntax error"));
         return;
     }
 
@@ -378,7 +355,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             //check if config at folder-pair level is present: this probably doesn't make sense when replacing/adding the user-specified directories
             if (hasNonDefaultConfig(mainCfg.firstPair) || std::any_of(mainCfg.additionalPairs.begin(), mainCfg.additionalPairs.end(), hasNonDefaultConfig))
             {
-                wxMessageBox(_("The config file must not contain settings at directory pair level when directories are set via command line."), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+                notifyError(_("The config file must not contain settings at directory pair level when directories are set via command line."), _("Syntax error"));
                 return false;
             }
 
@@ -428,8 +405,8 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             }
             catch (const xmlAccess::FfsXmlError& e)
             {
-                wxMessageBox(e.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
-                raiseReturnCode(returnCode, FFS_RC_ABORTED);
+                //batch mode: break on errors AND even warnings!
+                notifyError(e.toString(), _("Error"));
                 return;
             }
             if (!replaceDirectories(batchCfg.mainCfg)) return;
@@ -450,7 +427,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
                 //what about simulating changed config on parsing errors????
                 else
                 {
-                    wxMessageBox(e.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+                    notifyError(e.toString(), _("Error"));
                     return;
                 }
             }
@@ -466,7 +443,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
     {
         if (!leftDirs.empty())
         {
-            wxMessageBox(_("Directories cannot be set for more than one configuration file."), L"FreeFileSync - " + _("Syntax error"), wxOK | wxICON_ERROR);
+            notifyError(_("Directories cannot be set for more than one configuration file."), _("Syntax error"));
             return;
         }
 
@@ -486,7 +463,7 @@ void Application::launch(const std::vector<Zstring>& commandArgs)
             //what about simulating changed config on parsing errors????
             else
             {
-                wxMessageBox(e.toString(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
+                notifyError(e.toString(), _("Error"));
                 return;
             }
         }
@@ -521,14 +498,14 @@ void showSyntaxHelp()
 
 void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, FfsReturnCode& returnCode)
 {
-    auto notifyError = [&](const std::wstring& msg)
+    auto notifyError = [&](const std::wstring& msg, FfsReturnCode rc)
     {
         if (batchCfg.handleError == ON_ERROR_POPUP)
             wxMessageBox(msg.c_str(), L"FreeFileSync - " + _("Error"), wxOK | wxICON_ERROR);
         else //"exit" or "ignore"
             logError(utfCvrtTo<std::string>(msg));
 
-        raiseReturnCode(returnCode, FFS_RC_FINISHED_WITH_ERRORS);
+        raiseReturnCode(returnCode, rc);
     };
 
     XmlGlobalSettings globalCfg;
@@ -542,7 +519,7 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
     {
         assert(false);
         if (e.getSeverity() != FfsXmlError::WARNING) //ignore parsing errors: should be migration problems only *cross-fingers*
-            return notifyError(e.toString()); //abort sync!
+            return notifyError(e.toString(), FFS_RC_ABORTED); //abort sync!
     }
 
     try
@@ -551,7 +528,7 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
     }
     catch (const FileError& e)
     {
-        notifyError(e.toString());
+        notifyError(e.toString(), FFS_RC_FINISHED_WITH_WARNINGS);
         //continue!
     }
 
@@ -590,7 +567,7 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
                 allowPwPrompt = true;
                 break;
             case ON_ERROR_IGNORE:
-            case ON_ERROR_EXIT:
+            case ON_ERROR_ABORT:
                 break;
         }
 
@@ -633,6 +610,6 @@ void runBatchMode(const XmlBatchConfig& batchCfg, const Zstring& referenceFile, 
     }
     catch (const xmlAccess::FfsXmlError& e)
     {
-        notifyError(e.toString());
+        notifyError(e.toString(), FFS_RC_FINISHED_WITH_WARNINGS);
     }
 }

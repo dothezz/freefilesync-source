@@ -25,13 +25,13 @@
 <source>Checking recycle bin availability for folder %x...</source>
 <target>Prüfe Verfügbarkeit des Papierkorbs für Ordner %x...</target>
 
-<source>Moving file %x to recycle bin</source>
+<source>Moving file %x to the recycle bin</source>
 <target>Verschiebe Datei %x in den Papierkorb</target>
 
-<source>Moving folder %x to recycle bin</source>
+<source>Moving folder %x to the recycle bin</source>
 <target>Verschiebe Ordner %x in den Papierkorb</target>
 
-<source>Moving symbolic link %x to recycle bin</source>
+<source>Moving symbolic link %x to the recycle bin</source>
 <target>Verschiebe Symbolischen Link %x in den Papierkorb</target>
 
 <source>Deleting file %x</source>
@@ -43,7 +43,7 @@
 <source>Deleting symbolic link %x</source>
 <target>Lösche Symbolischen Link %x</target>
 
-<source>The Recycle Bin is not available for the following folders. Files will be deleted permanently instead:</source>
+<source>The recycle bin is not available for the following folders. Files will be deleted permanently instead:</source>
 <target>Der Papierkorb ist für die folgenden Ordner nicht verfügbar. Die Dateien werden stattdessen permanent gelöscht:</target>
 
 <source>An exception occurred</source>
@@ -290,7 +290,7 @@
 <target>Speichere erweiterte Zeitinformation: %x</target>
 
 <source>/sec</source>
-<target>/s</target>
+<target>/sek</target>
 
 <source>%x items</source>
 <target>%x Elemente</target>
@@ -307,7 +307,7 @@
 <source>Browse directory</source>
 <target>Verzeichnis öffnen</target>
 
-<source>Cannot access Volume Shadow Copy Service.</source>
+<source>Cannot access the Volume Shadow Copy Service.</source>
 <target>Auf den Volumenschattenkopiedienst kann nicht zugegriffen werden.</target>
 
 <source>Please use FreeFileSync 64-bit version to create shadow copies on this system.</source>
@@ -528,11 +528,14 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Generating database...</source>
 <target>Erzeuge Synchronisationsdatenbank...</target>
 
-<source>Creating Volume Shadow Copy for %x...</source>
-<target>Erstelle Volumenschattenkopie für %x...</target>
+<source>Creating a Volume Shadow Copy for %x...</source>
+<target>Erstelle eine Volumenschattenkopie für %x...</target>
 
 <source>Data verification error: %x and %y have different content.</source>
 <target>Verifizierungsfehler: %x und %y haben unterschiedlichen Inhalt.</target>
+
+<source>job name</source>
+<target>Auftragsname</target>
 
 <source>Synchronization aborted</source>
 <target>Synchronisation abgebrochen</target>
@@ -670,7 +673,7 @@ Die Befehlszeile wird ausgelöst, wenn:
 <target>&Speichern</target>
 
 <source>Save as &batch job...</source>
-<target>Speichern als &Batch-Job...</target>
+<target>Speichern als &Batch-Auftrag...</target>
 
 <source>1. &Compare</source>
 <target>1. &Vergleichen</target>
@@ -684,8 +687,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>&Export file list...</source>
 <target>Dateiliste e&xportieren...</target>
 
-<source>&Global settings...</source>
-<target>&Globale Einstellungen...</target>
+<source>&Global settings</source>
+<target>&Globale Einstellungen</target>
 
 <source>&Tools</source>
 <target>E&xtras</target>
@@ -702,12 +705,6 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Compare</source>
 <target>Vergleichen</target>
 
-<source>Comparison settings</source>
-<target>Vergleichseinstellungen</target>
-
-<source>Synchronization settings</source>
-<target>Synchronisationseinstellungen</target>
-
 <source>Synchronize</source>
 <target>Synchronisieren</target>
 
@@ -720,8 +717,17 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Swap sides</source>
 <target>Seiten vertauschen</target>
 
+<source>Close search bar</source>
+<target>Suchleiste schließen</target>
+
+<source>Find what:</source>
+<target>Suchen nach:</target>
+
+<source>Match case</source>
+<target>Groß-/Kleinschreibung</target>
+
 <source>Save as batch job</source>
-<target>Als Batch-Job speichern</target>
+<target>Als Batch-Auftrag speichern</target>
 
 <source>Hide excluded items</source>
 <target>Ausgeschlossene Elemente verstecken</target>
@@ -774,8 +780,8 @@ Die Befehlszeile wird ausgelöst, wenn:
 <source>Statistics</source>
 <target>Statistiken</target>
 
-<source>Don't show this dialog again</source>
-<target>Diesen Dialog nicht mehr anzeigen</target>
+<source>&Don't show this dialog again</source>
+<target>&Diesen Dialog nicht mehr anzeigen</target>
 
 <source>Select a variant</source>
 <target>Variante auswählen</target>
@@ -825,6 +831,12 @@ gleich ist
 <source>Configure your own synchronization rules.</source>
 <target>Eigene Synchronisationsregeln definieren.</target>
 
+<source>Detect moved files</source>
+<target>Verschobene Dateien erkennen</target>
+
+<source>Requires database files. Not supported by all file systems.</source>
+<target>Benötigt Datenbankdateien. Wird nicht von allen Dateisystemen unterstützt.</target>
+
 <source>Error handling</source>
 <target>Fehlerbehandlung</target>
 
@@ -849,26 +861,26 @@ gleich ist
 <source>Delete or overwrite files permanently</source>
 <target>Dateien endgültig löschen oder überschreiben</target>
 
-<source>Recycle Bin</source>
+<source>Recycle bin</source>
 <target>Papierkorb</target>
 
-<source>Use Recycle Bin for deleted and overwritten files</source>
-<target>Verwende den Papierkorb für gelöschte und überschriebene Dateien</target>
+<source>Back up deleted and overwritten files in the recycle bin</source>
+<target>Gelöschte und überschriebene Dateien im Papierkorb sichern</target>
 
 <source>Versioning</source>
 <target>Versionierung</target>
 
-<source>Move files to user-defined folder</source>
-<target>Dateien in den benutzerdefinierten Ordner verschieben</target>
+<source>Move files to a user-defined folder</source>
+<target>Dateien in einen benutzerdefinierten Ordner verschieben</target>
 
 <source>Naming convention:</source>
 <target>Namenskonvention:</target>
 
 <source>Batch job</source>
-<target>Batch-Job</target>
+<target>Batch-Auftrag</target>
 
-<source>Create a batch file to automate synchronization. Double-click this file or schedule in your system's task planner: FreeFileSync.exe <job name>.ffs_batch</source>
-<target>Erstellt eine Batchdatei für die automatisierte Synchronisation. Anschließend die Datei doppelklicken oder in den Taskplaner des Betriebssystems eintragen: FreeFileSync.exe <Jobname>.ffs_batch.</target>
+<source>Create a batch file for unattended synchronization. To start, double-click this file or schedule in a task planner: %x</source>
+<target>Erstellt eine Batchdatei für die unbeaufsichtigte Synchronisation. Zum Starten die Datei doppelklicken oder in einen Taskplaner eintragen: %x</target>
 
 <source>Exit</source>
 <target>Beenden</target>
@@ -891,30 +903,6 @@ gleich ist
 <source>Limit maximum number of log files</source>
 <target>Maximale Anzahl der Logdateien begrenzen</target>
 
-<source>Source code written in C++ using:</source>
-<target>Sourcecode in C++ geschrieben mit Hilfe von:</target>
-
-<source>If you like FreeFileSync</source>
-<target>Wenn Sie FreeFileSync mögen</target>
-
-<source>Donate with PayPal</source>
-<target>Mit PayPal spenden</target>
-
-<source>Many thanks for localization:</source>
-<target>Vielen Dank für die Lokalisation:</target>
-
-<source>Feedback and suggestions are welcome</source>
-<target>Feedback und Vorschläge sind willkommen</target>
-
-<source>Homepage</source>
-<target>Homepage</target>
-
-<source>Email</source>
-<target>Email</target>
-
-<source>Published under the GNU General Public License</source>
-<target>Veröffentlicht unter der Allgemeinen Öffentlichen GNU-Lizenz</target>
-
 <source>Delete on both sides</source>
 <target>Auf beiden Seiten löschen</target>
 
@@ -922,12 +910,12 @@ gleich ist
 <target>Lösche auf beiden Seiten, auch wenn die Datei nur auf einer Seite markiert ist</target>
 
 <source>
-Only files that match all filter settings will be synchronized.
-Note: File names must be relative to base directories.
+Files will only be synchronized if they pass all filter rules.
+Note: File paths must be relative to base directories.
 </source>
 <target>
-Nur Dateien, die zu allen Filtereinstellungen passen, werden synchronisiert.
-Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
+Es werden nur Dateien synchronisiert, die zu allen Filterregeln passen.
+Achtung: Dateipfade müssen relativ zu den Basisverzeichnissen sein.
 </target>
 
 <source>Include</source>
@@ -957,20 +945,20 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>Fail-safe file copy</source>
 <target>Dateien ausfallsicher kopieren</target>
 
-<source>Write to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of fatal error.</source>
-<target>Schreibe zunächst in eine temporäre Datei (*.ffs_tmp) und benenne diese anschließend um. Dadurch wird ein konsistenter Status auch im größten Fehlerfall sichergestellt.</target>
+<source>Copy to a temporary file (*.ffs_tmp) first then rename it. This guarantees a consistent state even in case of a fatal error.</source>
+<target>Kopiere zunächst in eine temporäre Datei (*.ffs_tmp) und benenne diese anschließend um. Dadurch wird ein konsistenter Datenstand auch im größten Fehlerfall garantiert.</target>
 
 <source>Copy locked files</source>
 <target>Gesperrte Dateien kopieren</target>
 
-<source>Copy shared or locked files using Volume Shadow Copy Service (Requires Administrator rights)</source>
-<target>Kopiere gesperrte Dateien mit Hilfe des Volumenschattenkopie-Dienstes (Benötigt Administratorrechte)</target>
+<source>Copy shared or locked files using the Volume Shadow Copy Service (requires administrator rights)</source>
+<target>Kopiere gesperrte Dateien mit Hilfe des Volumenschattenkopie-Dienstes (benötigt Administratorrechte)</target>
 
 <source>Copy file access permissions</source>
 <target>Dateizugriffsberechtigungen kopieren</target>
 
-<source>Transfer file and folder permissions (Requires Administrator rights)</source>
-<target>Übertrage Datei- und Ordnerberechtigungen (Benötigt Administratorrechte)</target>
+<source>Transfer file and folder permissions (requires administrator rights)</source>
+<target>Übertrage Datei- und Ordnerberechtigungen (benötigt Administratorrechte)</target>
 
 <source>Restore hidden dialogs</source>
 <target>Versteckte Dialoge wiederherstellen</target>
@@ -984,32 +972,53 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>&Default</source>
 <target>&Standard</target>
 
-<source>Find what:</source>
-<target>Suchen nach:</target>
+<source>Source code written in C++ using:</source>
+<target>Sourcecode in C++ geschrieben mit Hilfe von:</target>
 
-<source>Match case</source>
-<target>Groß-/Kleinschreibung</target>
+<source>If you like FreeFileSync</source>
+<target>Wenn Sie FreeFileSync mögen</target>
 
-<source>&Find next</source>
-<target>&Weitersuchen</target>
+<source>Donate with PayPal</source>
+<target>Mit PayPal spenden</target>
+
+<source>Feedback and suggestions are welcome</source>
+<target>Feedback und Vorschläge sind willkommen</target>
+
+<source>Homepage</source>
+<target>Homepage</target>
+
+<source>Email</source>
+<target>Email</target>
+
+<source>Published under the GNU General Public License</source>
+<target>Veröffentlicht unter der Allgemeinen Öffentlichen GNU-Lizenz</target>
+
+<source>Many thanks for localization:</source>
+<target>Vielen Dank für die Lokalisation:</target>
 
 <source>Start synchronization</source>
 <target>Synchronisation starten</target>
+
+<source>Comparison settings</source>
+<target>Vergleichseinstellungen</target>
+
+<source>Synchronization settings</source>
+<target>Synchronisationseinstellungen</target>
 
 <source>Delete</source>
 <target>Löschen</target>
 
 <source>Configure filter</source>
-<target>Konfiguriere Filter</target>
-
-<source>Find</source>
-<target>Suchen</target>
+<target>Filter konfigurieren</target>
 
 <source>Select time span</source>
 <target>Zeitspanne auswählen</target>
 
 <source>Folder pairs</source>
 <target>Ordnerpaare</target>
+
+<source>Find</source>
+<target>Suchen</target>
 
 <source>Overview</source>
 <target>Übersicht</target>
@@ -1050,9 +1059,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>&Execute</source>
 <target>&Ausführen</target>
 
-<source>&Don't show this dialog again</source>
-<target>&Diesen Dialog nicht mehr anzeigen</target>
-
 <source>
 <pluralform>1 directory</pluralform>
 <pluralform>%x directories</pluralform>
@@ -1083,17 +1089,20 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>Set direction:</source>
 <target>Setze Richtung:</target>
 
+<source>multiple selection</source>
+<target>Mehrfachauswahl</target>
+
+<source>Include via filter:</source>
+<target>Über Filter einschließen:</target>
+
+<source>Exclude via filter:</source>
+<target>Über Filter ausschließen:</target>
+
 <source>Exclude temporarily</source>
 <target>Temporär ausschließen</target>
 
 <source>Include temporarily</source>
 <target>Temporär einschließen</target>
-
-<source>Exclude via filter:</source>
-<target>Über Filter ausschließen:</target>
-
-<source>multiple selection</source>
-<target>Mehrfachauswahl</target>
 
 <source>Include all</source>
 <target>Alle einschließen</target>
@@ -1140,8 +1149,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>Do&n't save</source>
 <target>&Nicht speichern</target>
 
-<source>Never save changes</source>
-<target>Änderungen nie speichern</target>
+<source>Never save &changes</source>
+<target>Änderungen nie &speichern</target>
 
 <source>Show files that exist on left side only</source>
 <target>Nur links existierende Dateien anzeigen</target>
@@ -1194,6 +1203,9 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>All folders are in sync</source>
 <target>Alle Ordner sind synchron</target>
 
+<source>Cannot find %x</source>
+<target>%x wurde nicht gefunden.</target>
+
 <source>Comma-separated values</source>
 <target>Kommagetrennte Werte</target>
 
@@ -1203,8 +1215,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>Searching for program updates...</source>
 <target>Suche nach aktualisierten Programmversionen...</target>
 
-<source>Ignore further errors</source>
-<target>Weitere Fehler ignorieren</target>
+<source>&Ignore subsequent errors</source>
+<target>&Nachfolgende Fehler ignorieren</target>
 
 <source>&Ignore</source>
 <target>&Ignorieren</target>
@@ -1212,8 +1224,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>Fatal Error</source>
 <target>Schwerer Fehler</target>
 
-<source>Don't show this warning again</source>
-<target>Diese Warnung nicht mehr anzeigen</target>
+<source>&Don't show this warning again</source>
+<target>&Diese Warnung nicht mehr anzeigen</target>
 
 <source>&Switch</source>
 <target>&Wechseln</target>
@@ -1254,9 +1266,6 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>Log</source>
 <target>Protokoll</target>
 
-<source>Cannot find %x</source>
-<target>%x wurde nicht gefunden.</target>
-
 <source>Inactive</source>
 <target>Inaktiv</target>
 
@@ -1288,8 +1297,8 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <target>Filter</target>
 
 <source>
-<pluralform>Do you really want to move the following item to the Recycle Bin?</pluralform>
-<pluralform>Do you really want to move the following %x items to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following item to the recycle bin?</pluralform>
+<pluralform>Do you really want to move the following %x items to the recycle bin?</pluralform>
 </source>
 <target>
 <pluralform>Soll das folgende Element wirklich in den Papierkorb verschoben werden?</pluralform>
@@ -1467,7 +1476,7 @@ Achtung: Dateinamen müssen relativ zu den Basisverzeichnissen sein.
 <source>Cannot change process I/O priorities.</source>
 <target>Die Eingabe/Ausgabe Prioritäten für den Prozess konnten nicht geändert werden.</target>
 
-<source>Unable to move %x to the Recycle Bin.</source>
+<source>Unable to move %x to the recycle bin.</source>
 <target>%x kann nicht in den Papierkorb verschoben werden.</target>
 
 <source>Cannot determine final path for %x.</source>

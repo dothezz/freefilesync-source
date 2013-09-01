@@ -7,6 +7,8 @@
 #ifndef OPTIONAL_H_2857428578342203589
 #define OPTIONAL_H_2857428578342203589
 
+#include <cassert>
+
 namespace zen
 {
 /*
@@ -45,26 +47,19 @@ public:
         if (tmp.valid)
             value = tmp.value;
         valid = tmp.valid;
-		return *this;
+        return *this;
     }
 
     ////rvalue optimization: only basic exception safety:
     //   Opt(Opt&& tmp) : value(std::move(tmp.value)), valid(tmp.valid) {}
 
-#ifdef _MSC_VER
-private:
-    struct ConversionToBool { int dummy; };
-public:
-    operator int ConversionToBool::* () const { return valid ? &ConversionToBool::dummy : nullptr; }
-#else
     explicit operator bool() const { return valid; } //thank you C++11!!!
-#endif
 
-    const T& operator*() const { return value; }
-    /**/  T& operator*()       { return value; }
+    const T& operator*() const { assert(valid); return value; }
+    /**/  T& operator*()       { assert(valid); return value; }
 
-    const T* operator->() const { return &value; }
-    /**/  T* operator->()       { return &value; }
+    const T* operator->() const { assert(valid); return &value; }
+    /**/  T* operator->()       { assert(valid); return &value; }
 
     void reset() { valid = false; }
 

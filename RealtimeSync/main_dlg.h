@@ -13,6 +13,7 @@
 #include <zen/zstring.h>
 #include <zen/async_task.h>
 #include <wx+/file_drop.h>
+#include <wx/timer.h>
 #include "../ui/dir_name.h"
 
 namespace xmlAccess
@@ -25,10 +26,12 @@ class DirectoryPanel;
 class MainDialog: public MainDlgGenerated
 {
 public:
+    static void create(const Zstring& cfgFile);
+
+private:
     MainDialog(wxDialog* dlg, const Zstring& cfgFileName);
     ~MainDialog();
 
-private:
     void loadConfig(const Zstring& filename);
 
     virtual void OnClose          (wxCloseEvent& event)   { Destroy(); }

@@ -57,12 +57,12 @@ public:
     //---------------------------------------------------------------------
     struct Node
     {
-        Node(int percent, UInt64 bytes, int itemCount, size_t level, NodeStatus status) :
+        Node(int percent, UInt64 bytes, int itemCount, unsigned int level, NodeStatus status) :
             percent_(percent), level_(level), status_(status), bytes_(bytes), itemCount_(itemCount) {}
         virtual ~Node() {}
 
         const int percent_; //[0, 100]
-        const size_t level_;
+        const unsigned int level_;
         const NodeStatus status_;
         const UInt64 bytes_;
         const int itemCount_;
@@ -70,13 +70,13 @@ public:
 
     struct FilesNode : public Node
     {
-        FilesNode(int percent, UInt64 bytes, int itemCount, size_t level, const std::vector<FileSystemObject*>& filesAndLinks) : Node(percent, bytes, itemCount, level, STATUS_EMPTY), filesAndLinks_(filesAndLinks)  {}
+        FilesNode(int percent, UInt64 bytes, int itemCount, unsigned int level, const std::vector<FileSystemObject*>& filesAndLinks) : Node(percent, bytes, itemCount, level, STATUS_EMPTY), filesAndLinks_(filesAndLinks)  {}
         std::vector<FileSystemObject*> filesAndLinks_; //files or symlinks; pointers are bound!
     };
 
     struct DirNode : public Node
     {
-        DirNode(int percent, UInt64 bytes, int itemCount, size_t level, NodeStatus status, DirPair& dirObj) : Node(percent, bytes, itemCount, level, status), dirObj_(dirObj) {}
+        DirNode(int percent, UInt64 bytes, int itemCount, unsigned int level, NodeStatus status, DirPair& dirObj) : Node(percent, bytes, itemCount, level, status), dirObj_(dirObj) {}
         DirPair& dirObj_;
     };
 
@@ -137,9 +137,9 @@ private:
 
     struct TreeLine
     {
-        TreeLine(size_t level, int percent, const Container* node, enum NodeType type) : level_(level), percent_(percent), node_(node), type_(type) {}
+        TreeLine(unsigned int level, int percent, const Container* node, enum NodeType type) : level_(level), percent_(percent), node_(node), type_(type) {}
 
-        size_t level_;
+        unsigned int level_;
         int percent_;      //[0, 100]
         const Container* node_; //
         NodeType type_;         //we choose to increase size of "flatTree" rather than "folderCmpView" by not using dynamic polymorphism!
@@ -148,7 +148,7 @@ private:
     static void compressNode(Container& cont);
     template <class Function>
     static void extractVisibleSubtree(HierarchyObject& hierObj, Container& cont, Function includeObject);
-    void getChildren(const Container& cont, size_t level, std::vector<TreeLine>& output);
+    void getChildren(const Container& cont, unsigned int level, std::vector<TreeLine>& output);
     template <class Predicate> void updateView(Predicate pred);
     void applySubView(std::vector<RootNodeImpl>&& newView);
 

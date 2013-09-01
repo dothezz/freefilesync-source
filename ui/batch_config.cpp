@@ -43,7 +43,7 @@ private:
     virtual void OnSaveBatchJob(wxCommandEvent& event);
     virtual void OnErrorPopup (wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_POPUP;  updateGui(); }
     virtual void OnErrorIgnore(wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_IGNORE; updateGui(); }
-    virtual void OnErrorExit  (wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_EXIT;   updateGui(); }
+    virtual void OnErrorAbort (wxCommandEvent& event) { localBatchCfg.handleError = ON_ERROR_ABORT;  updateGui(); }
 
     virtual void OnToggleGenerateLogfile(wxCommandEvent& event) { updateGui(); }
     virtual void OnToggleLogfilesLimit  (wxCommandEvent& event) { updateGui(); }
@@ -76,6 +76,8 @@ BatchDialog::BatchDialog(wxWindow* parent,
     wxWindowUpdateLocker dummy(this); //avoid display distortion
     setRelativeFontSize(*m_staticTextHeader, 1.25);
 
+    m_staticTextDescr->SetLabel(replaceCpy(m_staticTextDescr->GetLabel(), L"%x", L"FreeFileSync.exe <" + _("job name") + L">.ffs_batch"));
+
     m_comboBoxExecFinished->initHistory(onCompletionHistory, onCompletionHistoryMax);
 
     m_bpButtonHelp  ->SetBitmapLabel(getResourceImage(L"help"));
@@ -101,7 +103,7 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
 
     m_toggleBtnErrorIgnore->SetValue(false);
     m_toggleBtnErrorPopup ->SetValue(false);
-    m_toggleBtnErrorExit  ->SetValue(false);
+    m_toggleBtnErrorAbort ->SetValue(false);
     switch (cfg.handleError) //*not* owned by GUI controls
     {
         case ON_ERROR_IGNORE:
@@ -110,8 +112,8 @@ void BatchDialog::updateGui() //re-evaluate gui after config changes
         case ON_ERROR_POPUP:
             m_toggleBtnErrorPopup->SetValue(true);
             break;
-        case ON_ERROR_EXIT:
-            m_toggleBtnErrorExit->SetValue(true);
+        case ON_ERROR_ABORT:
+            m_toggleBtnErrorAbort->SetValue(true);
             break;
     }
 }
